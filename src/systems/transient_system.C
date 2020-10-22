@@ -40,7 +40,7 @@ TransientSystem<Base>::TransientSystem (EquationSystems & es,
                                         const std::string & name_in,
                                         const unsigned int number_in) :
 
-  Base                 (es, name_in, number_in)
+  Base(es, name_in, number_in)
 {
   this->add_old_vectors();
 }
@@ -48,16 +48,7 @@ TransientSystem<Base>::TransientSystem (EquationSystems & es,
 
 
 template <class Base>
-TransientSystem<Base>::~TransientSystem ()
-{
-  this->clear();
-
-  // We still have std::unique_ptrs for API compatibility, but
-  // now that we're System::add_vector()ing these, we can trust
-  // the base class to handle memory management
-  old_local_solution.release();
-  older_local_solution.release();
-}
+TransientSystem<Base>::~TransientSystem () = default;
 
 
 
@@ -66,11 +57,6 @@ void TransientSystem<Base>::clear ()
 {
   // clear the parent data
   Base::clear();
-
-  // the old & older local solutions
-  // are now deleted by System!
-  // old_local_solution->clear();
-  // older_local_solution->clear();
 
   // FIXME: This preserves maximum backwards compatibility,
   // but is probably grossly unnecessary:
