@@ -65,8 +65,6 @@ template <typename T>
 void TypeVector<T>::write_unformatted (std::ostream & os,
                                        const bool newline) const
 {
-  libmesh_assert (os);
-
   os << std::setiosflags(std::ios::showpoint)
      << (*this)(0) << " "
      << (*this)(1) << " "
