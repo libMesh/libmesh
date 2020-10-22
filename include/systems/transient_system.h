@@ -116,7 +116,7 @@ public:
    * current solution with any ghost values needed from
    * other processors.
    */
-  std::unique_ptr<NumericVector<Number>> old_local_solution;
+  NumericVector<Number> * old_local_solution;
 
   /**
    * All the values I need to compute my contribution
@@ -124,8 +124,7 @@ public:
    * current solution with any ghost values needed from
    * other processors.
    */
-  std::unique_ptr<NumericVector<Number>> older_local_solution;
-
+  NumericVector<Number> * older_local_solution;
 
 protected:
 

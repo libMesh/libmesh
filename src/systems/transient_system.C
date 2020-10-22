@@ -40,7 +40,9 @@ TransientSystem<Base>::TransientSystem (EquationSystems & es,
                                         const std::string & name_in,
                                         const unsigned int number_in) :
 
-  Base(es, name_in, number_in)
+  Base(es, name_in, number_in),
+  old_local_solution(nullptr),
+  older_local_solution(nullptr)
 {
   this->add_old_vectors();
 }
@@ -57,11 +59,6 @@ void TransientSystem<Base>::clear ()
 {
   // clear the parent data
   Base::clear();
-
-  // FIXME: This preserves maximum backwards compatibility,
-  // but is probably grossly unnecessary:
-  old_local_solution.release();
-  older_local_solution.release();
 
   // Restore us to a "basic" state
   this->add_old_vectors();
@@ -131,21 +128,15 @@ Number TransientSystem<Base>::older_solution (const dof_id_type global_dof_numbe
 template <class Base>
 void TransientSystem<Base>::add_old_vectors()
 {
+  ParallelType type =
 #ifdef LIBMESH_ENABLE_GHOSTED
-  old_local_solution =
-    std::unique_ptr<NumericVector<Number>>
-    (&(this->add_vector("_transient_old_local_solution", true, GHOSTED)));
-  older_local_solution =
-    std::unique_ptr<NumericVector<Number>>
-    (&(this->add_vector("_transient_older_local_solution", true, GHOSTED)));
+    GHOSTED;
 #else
-  old_local_solution =
-    std::unique_ptr<NumericVector<Number>>
-    (&(this->add_vector("_transient_old_local_solution", true, SERIAL)));
-  older_local_solution =
-    std::unique_ptr<NumericVector<Number>>
-    (&(this->add_vector("_transient_older_local_solution", true, SERIAL)));
+    SERIAL;
 #endif
+
+  old_local_solution = &(this->add_vector("_transient_old_local_solution", true, type));
+  older_local_solution = &(this->add_vector("_transient_older_local_solution", true, type));
 }
 
 // ------------------------------------------------------------

@@ -501,10 +501,10 @@ private:
                                 libmesh_real(sys.point_value(0,p)),
                                 TOLERANCE*TOLERANCE*10);
         LIBMESH_ASSERT_FP_EQUAL(libmesh_real(cubic_test(p,param,"","") + Number(10)),
-                                libmesh_real(sys.point_value(0,p,sys.old_local_solution.get())),
+                                libmesh_real(sys.point_value(0,p,sys.old_local_solution)),
                                 TOLERANCE*TOLERANCE*100);
         LIBMESH_ASSERT_FP_EQUAL(libmesh_real(cubic_test(p,param,"","") + Number(20)),
-                                libmesh_real(sys.point_value(0,p,sys.older_local_solution.get())),
+                                libmesh_real(sys.point_value(0,p,sys.older_local_solution)),
                                 TOLERANCE*TOLERANCE*100);
       }
     if (v_subdomains.count(sbd_id))
@@ -513,10 +513,10 @@ private:
                                 libmesh_real(sys.point_value(1,p)),
                                 TOLERANCE*TOLERANCE*10);
         LIBMESH_ASSERT_FP_EQUAL(libmesh_real(new_linear_test(p,param,"","") + Number(10)),
-                                libmesh_real(sys.point_value(1,p,sys.old_local_solution.get())),
+                                libmesh_real(sys.point_value(1,p,sys.old_local_solution)),
                                 TOLERANCE*TOLERANCE*100);
         LIBMESH_ASSERT_FP_EQUAL(libmesh_real(new_linear_test(p,param,"","") + Number(20)),
-                                libmesh_real(sys.point_value(1,p,sys.older_local_solution.get())),
+                                libmesh_real(sys.point_value(1,p,sys.older_local_solution)),
                                 TOLERANCE*TOLERANCE*100);
       }
     if (w_subdomains.count(sbd_id))
@@ -525,10 +525,10 @@ private:
                                 libmesh_real(sys.point_value(2,p)),
                                 TOLERANCE*TOLERANCE*10);
         LIBMESH_ASSERT_FP_EQUAL(libmesh_real(disc_thirds_test(p,param,"","") + Number(10)),
-                                libmesh_real(sys.point_value(2,p,sys.old_local_solution.get())),
+                                libmesh_real(sys.point_value(2,p,sys.old_local_solution)),
                                 TOLERANCE*TOLERANCE*100);
         LIBMESH_ASSERT_FP_EQUAL(libmesh_real(disc_thirds_test(p,param,"","") + Number(20)),
-                                libmesh_real(sys.point_value(2,p,sys.older_local_solution.get())),
+                                libmesh_real(sys.point_value(2,p,sys.older_local_solution)),
                                 TOLERANCE*TOLERANCE*100);
       }
   }
