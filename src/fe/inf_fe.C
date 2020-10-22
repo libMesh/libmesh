@@ -117,7 +117,7 @@ void InfFE<Dim,T_radial,T_map>::attach_quadrature_rule (QBase * q)
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem * inf_elem)
 {
-  base_elem.reset(InfFEBase::build_elem(inf_elem));
+  base_elem = InfFEBase::build_elem(inf_elem);
 }
 
 

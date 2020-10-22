@@ -77,7 +77,7 @@ public:
 
     // 1.)
     // build a base element to do the map inversion in the base face
-    std::unique_ptr<Elem> base_elem (InfFEBase::build_elem (inf_elem));
+    std::unique_ptr<const Elem> base_elem = InfFEBase::build_elem (inf_elem);
 
     // the origin of the infinite element
     const Point o = inf_elem->origin();

@@ -44,7 +44,7 @@ Point InfFEMap::map (const unsigned int dim,
   libmesh_assert(inf_elem);
   libmesh_assert_not_equal_to (dim, 0);
 
-  std::unique_ptr<Elem>      base_elem (InfFEBase::build_elem (inf_elem));
+  std::unique_ptr<const Elem> base_elem = InfFEBase::build_elem (inf_elem);
 
   const Order        radial_mapping_order (InfFERadial::mapping_order());
   const Real         v                    (reference_point(dim-1));
@@ -111,7 +111,7 @@ Point InfFEMap::inverse_map (const unsigned int dim,
 
   // 1.)
   // build a base element to do the map inversion in the base face
-  std::unique_ptr<Elem> base_elem (InfFEBase::build_elem (inf_elem));
+  std::unique_ptr<const Elem> base_elem = InfFEBase::build_elem (inf_elem);
 
   // The point on the reference element (which we are looking for).
   // start with an invalid guess:
@@ -251,9 +251,17 @@ Point InfFEMap::inverse_map (const unsigned int dim,
     }
 
 #ifndef NDEBUG
-  // In debug mode, the validity of base_elems id is checked.
-  // Thus, we should set it to a valid  one:
-  base_elem->set_id(inf_elem->id());
+  // FIXME: In debug mode, the base_elem must have a valid id(), since
+  // inverse_map() may call elem->id() in some code paths, and
+  // DofObject::id() asserts if the id is not valid.  Thus, we should
+  // set base_elem's id to something valid, but this is tricky to do
+  // since base_elem is otherwise treated as const, as it is
+  // originally built from a const InfElem.  It would be nice if there
+  // was some workaround for this, such as build_side_ptr() actually
+  // setting a valid id (anything other than libMesh::invalid_uint
+  // would probably work).
+  auto settable_elem = const_cast<Elem *>(base_elem.get());
+  settable_elem->set_id(inf_elem->id());
 #endif
 
   // 3.)
