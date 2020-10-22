@@ -128,7 +128,7 @@ DofMap::build_sparsity (const MeshBase & mesh) const
     _augment_sparsity_pattern->augment_sparsity_pattern
       (sp->sparsity_pattern, sp->n_nz, sp->n_oz);
 
-  return std::unique_ptr<SparsityPattern::Build>(sp.release());
+  return sp;
 }
 
 
