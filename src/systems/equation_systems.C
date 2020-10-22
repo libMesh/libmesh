@@ -801,7 +801,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
   // Divide to get the average value at the nodes
   parallel_soln /= repeat_count;
 
-  return std::unique_ptr<NumericVector<Number>>(parallel_soln_ptr.release());
+  return parallel_soln_ptr;
 }
 
 
@@ -1033,7 +1033,7 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
     } // end loop over var_nums
 
   parallel_soln.close();
-  return std::unique_ptr<NumericVector<Number>>(parallel_soln_ptr.release());
+  return parallel_soln_ptr;
 }
 
 
