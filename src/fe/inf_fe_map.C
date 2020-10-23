@@ -250,20 +250,6 @@ Point InfFEMap::inverse_map (const unsigned int dim,
       libmesh_error_msg("Invalid dim = " << dim);
     }
 
-#ifndef NDEBUG
-  // FIXME: In debug mode, the base_elem must have a valid id(), since
-  // inverse_map() may call elem->id() in some code paths, and
-  // DofObject::id() asserts if the id is not valid.  Thus, we should
-  // set base_elem's id to something valid, but this is tricky to do
-  // since base_elem is otherwise treated as const, as it is
-  // originally built from a const InfElem.  It would be nice if there
-  // was some workaround for this, such as build_side_ptr() actually
-  // setting a valid id (anything other than libMesh::invalid_uint
-  // would probably work).
-  auto settable_elem = const_cast<Elem *>(base_elem.get());
-  settable_elem->set_id(inf_elem->id());
-#endif
-
   // 3.)
   // Now we have the intersection-point (projection of physical point onto base-element).
   // Lets compute its internal coordinates (being p(0) and p(1)):
