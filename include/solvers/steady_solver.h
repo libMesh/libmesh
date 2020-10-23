@@ -129,7 +129,7 @@ public:
    * Fills in an ErrorVector that contains the weighted sum of errors from all the QoIs and can be used to guide AMR.
    * CURRENTLY ONLY SUPPORTED for Backward Euler.
    */
-  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error);
+  virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error) override;
 
 protected:
 

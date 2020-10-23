@@ -603,7 +603,7 @@ protected:
    */
   virtual void read_var_names_impl(const char * var_type,
                                    int & count,
-                                   std::vector<std::string> & result);
+                                   std::vector<std::string> & result) override;
 
 private:
   /**
