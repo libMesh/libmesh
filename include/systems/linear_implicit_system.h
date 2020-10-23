@@ -129,12 +129,6 @@ public:
   virtual LinearSolver<Number> * get_linear_solver() const override;
 
   /**
-   * Releases a pointer to a linear solver acquired by
-   * \p this->get_linear_solver()
-   */
-  virtual void release_linear_solver(LinearSolver<Number> *) const override;
-
-  /**
    * Assembles a residual in \p rhs and/or a jacobian in \p matrix,
    * as requested.
    */
@@ -148,14 +142,6 @@ public:
    * the system type in an equation system file.
    */
   virtual std::string system_type () const override { return "LinearImplicit"; }
-
-  /**
-   * The \p LinearSolver defines the interface used to
-   * solve the linear_implicit system.  This class handles all the
-   * details of interfacing with various linear algebra packages
-   * like PETSc or LASPACK.
-   */
-  std::unique_ptr<LinearSolver<Number>> linear_solver;
 
   /**
    * \returns The number of iterations

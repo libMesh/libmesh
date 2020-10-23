@@ -193,10 +193,6 @@ std::pair<unsigned int, Real> DifferentiableSystem::get_linear_solve_parameters(
 
 
 
-void DifferentiableSystem::release_linear_solver(LinearSolver<Number> *) const
-{
-}
-
 void DifferentiableSystem::add_second_order_dot_vars()
 {
   const std::set<unsigned int> & second_order_vars = this->get_second_order_vars();

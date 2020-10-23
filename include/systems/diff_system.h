@@ -118,12 +118,6 @@ public:
   get_linear_solve_parameters() const override;
 
   /**
-   * Releases a pointer to a linear solver acquired by
-   * \p this->get_linear_solver()
-   */
-  virtual void release_linear_solver(LinearSolver<Number> *) const override;
-
-  /**
    * Assembles a residual in \p rhs and/or a jacobian in \p matrix,
    * as requested.
    * Note that in some cases only

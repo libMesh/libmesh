@@ -135,7 +135,7 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
     }
 
   // The sensitivity problem is linear
-  LinearSolver<Number> * linear_solver = this->get_linear_solver();
+  LinearSolver<Number> * solver = this->get_linear_solver();
 
   // Our iteration counts and residuals will be sums of the individual
   // results
@@ -148,11 +148,11 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
   for (auto p : make_range(parameters.size()))
     {
       std::pair<unsigned int, Real> rval =
-        linear_solver->solve (*matrix, pc,
-                              this->add_sensitivity_solution(p),
-                              this->get_sensitivity_rhs(p),
-                              double(solver_params.second),
-                              solver_params.first);
+        solver->solve (*matrix, pc,
+                       this->add_sensitivity_solution(p),
+                       this->get_sensitivity_rhs(p),
+                       double(solver_params.second),
+                       solver_params.first);
 
       totalrval.first  += rval.first;
       totalrval.second += rval.second;
@@ -165,8 +165,6 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
       (*this, &this->get_sensitivity_solution(p),
        /* homogeneous = */ true);
 #endif
-
-  this->release_linear_solver(linear_solver);
 
   return totalrval;
 }
@@ -185,7 +183,7 @@ ImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
                     /* get_jacobian = */ true);
 
   // The adjoint problem is linear
-  LinearSolver<Number> * linear_solver = this->get_linear_solver();
+  LinearSolver<Number> * solver = this->get_linear_solver();
 
   // Reset and build the RHS from the QOI derivative
   this->assemble_qoi_derivative(qoi_indices,
@@ -202,16 +200,14 @@ ImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
     if (qoi_indices.has_index(i))
       {
         const std::pair<unsigned int, Real> rval =
-          linear_solver->adjoint_solve (*matrix, this->add_adjoint_solution(i),
-                                        this->get_adjoint_rhs(i),
-                                        double(solver_params.second),
-                                        solver_params.first);
+          solver->adjoint_solve (*matrix, this->add_adjoint_solution(i),
+                                 this->get_adjoint_rhs(i),
+                                 double(solver_params.second),
+                                 solver_params.first);
 
         totalrval.first  += rval.first;
         totalrval.second += rval.second;
       }
-
-  this->release_linear_solver(linear_solver);
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
@@ -337,7 +333,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
   }
 
   // The weighted adjoint-adjoint problem is linear
-  LinearSolver<Number> * linear_solver = this->get_linear_solver();
+  LinearSolver<Number> * solver = this->get_linear_solver();
 
   // Our iteration counts and residuals will be sums of the individual
   // results
@@ -349,16 +345,14 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
     if (qoi_indices.has_index(i))
       {
         const std::pair<unsigned int, Real> rval =
-          linear_solver->solve (*matrix, this->add_weighted_sensitivity_adjoint_solution(i),
-                                *(temprhs[i]),
-                                double(solver_params.second),
-                                solver_params.first);
+          solver->solve (*matrix, this->add_weighted_sensitivity_adjoint_solution(i),
+                         *(temprhs[i]),
+                         double(solver_params.second),
+                         solver_params.first);
 
         totalrval.first  += rval.first;
         totalrval.second += rval.second;
       }
-
-  this->release_linear_solver(linear_solver);
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
@@ -433,18 +427,16 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector & parameters_i
   this->matrix->close();
 
   // The weighted sensitivity problem is linear
-  LinearSolver<Number> * linear_solver = this->get_linear_solver();
+  LinearSolver<Number> * solver = this->get_linear_solver();
 
   std::pair<unsigned int, Real> solver_params =
     this->get_linear_solve_parameters();
 
   const std::pair<unsigned int, Real> rval =
-    linear_solver->solve (*matrix, this->add_weighted_sensitivity_solution(),
-                          *temprhs,
-                          double(solver_params.second),
-                          solver_params.first);
-
-  this->release_linear_solver(linear_solver);
+    solver->solve (*matrix, this->add_weighted_sensitivity_solution(),
+                   *temprhs,
+                   double(solver_params.second),
+                   solver_params.first);
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
@@ -1201,26 +1193,20 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
 
 LinearSolver<Number> * ImplicitSystem::get_linear_solver() const
 {
-  // This function allocates memory and hands it back to the user as a
-  // naked pointer.  This makes it too easy to leak memory, and
-  // therefore this function is deprecated.  After a period of
-  // deprecation, this function will eventually be marked with a
-  // libmesh_error_msg().
-  libmesh_deprecated();
-  // libmesh_error_msg("This function should be overridden by derived classes. "
-  //                   "It does not contain a valid LinearSolver to hand back to "
-  //                   "the user, so it creates one, opening up the possibility "
-  //                   "of a memory leak.");
+  // Note: we always start "from scratch" to mimic the original
+  // behavior of this function. The goal is not to reuse the
+  // LinearSolver object, but to manage its lifetime in a more
+  // consistent manner.
+  linear_solver.reset();
 
-  LinearSolver<Number> * new_solver =
-    LinearSolver<Number>::build(this->comm()).release();
+  linear_solver = LinearSolver<Number>::build(this->comm());
 
   if (libMesh::on_command_line("--solver-system-names"))
-    new_solver->init((this->name()+"_").c_str());
+    linear_solver->init((this->name() + "_").c_str());
   else
-    new_solver->init();
+    linear_solver->init();
 
-  return new_solver;
+  return linear_solver.get();
 }
 
 
@@ -1233,12 +1219,14 @@ std::pair<unsigned int, Real> ImplicitSystem::get_linear_solve_parameters() cons
 
 
 
-void ImplicitSystem::release_linear_solver(LinearSolver<Number> * s) const
+void ImplicitSystem::release_linear_solver(LinearSolver<Number> *) const
 {
-  // This is the counterpart of the get_linear_solver() function, which is now deprecated.
+  // This function was originally paired with get_linear_solver()
+  // calls when that returned a dumb pointer which needed to be
+  // cleaned up. Since get_linear_solver() now just returns a pointer
+  // to a LinearSolver object managed by this class, this function no
+  // longer needs to do any cleanup.
   libmesh_deprecated();
-
-  delete s;
 }
 
 

@@ -48,7 +48,6 @@ ContinuationSystem::ContinuationSystem (EquationSystems & es,
   newton_stepgrowth_aggressiveness(1.),
   newton_progress_check(true),
   rhs_mode(Residual),
-  linear_solver(LinearSolver<Number>::build(es.comm())),
   tangent_initialized(false),
   newton_solver(nullptr),
   dlambda_ds(0.707),
@@ -61,6 +60,11 @@ ContinuationSystem::ContinuationSystem (EquationSystems & es,
   // Warn about using untested code
   libmesh_experimental();
 
+  // linear_solver is now in the ImplicitSystem base class, but we are
+  // going to keep using it basically the way we did before it was
+  // moved.
+  linear_solver = LinearSolver<Number>::build(es.comm());
+
   if (libMesh::on_command_line("--solver-system-names"))
     linear_solver->init((this->name()+"_").c_str());
   else
@@ -70,18 +74,12 @@ ContinuationSystem::ContinuationSystem (EquationSystems & es,
 
 
 
-ContinuationSystem::~ContinuationSystem ()
-{
-  this->clear();
-}
-
+ContinuationSystem::~ContinuationSystem () = default;
 
 
 
 void ContinuationSystem::clear()
 {
-  // FIXME: Do anything here, e.g. zero vectors, etc?
-
   // Call the Parent's clear function
   Parent::clear();
 }

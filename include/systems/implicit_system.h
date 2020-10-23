@@ -111,18 +111,19 @@ public:
   virtual std::string system_type () const override { return "Implicit"; }
 
   /**
-   * \returns A pointer to a linear solver appropriate for use in
-   * adjoint and/or sensitivity solves
+   * \returns A dumb pointer to a local std::unique_ptr<LinearSolver>
+   * member which can be used in adjoint and/or sensitivity solves.
    *
-   * This function must be overridden in derived classes, since this
-   * base class does not have a valid LinearSolver to hand back a
-   * pointer to.
+   * To mimic the previous behavior of this function, if the
+   * linear_solver member is already initialized when this function is
+   * called, this function first clears it. That is, no attempt is
+   * made to reuse an existing LinearSolver object. The user MUST NOT
+   * attempt to clean up this pointer, otherwise the std::unique_ptr
+   * held by this class will likely become corrupted.
    *
-   * \deprecated This function's current behavior, i.e. allocating a
-   * LinearSolver and handing it back to the user, makes it very easy
-   * to leak memory, and probably won't have the intended effect,
-   * i.e. of setting some parameters on a LinearSolver that the System
-   * would later use internally.
+   * This function is virtual so it can be overridden in derived
+   * classes if necessary, however most will probably just want to use
+   * the base class behavior.
    */
   virtual LinearSolver<Number> * get_linear_solver() const;
 
@@ -135,12 +136,11 @@ public:
   get_linear_solve_parameters() const;
 
   /**
-   * Releases a pointer to a linear solver acquired by
-   * \p this->get_linear_solver()
+   * Currently a no-op.
    *
-   * \deprecated This function is designed to work with the deprecated
-   * get_linear_solver() function, so its use is now deprecated as
-   * well.
+   * \deprecated This function no longer needs to be called, since
+   * get_linear_solver() no longer returns a heap-allocated dumb
+   * pointer.
    */
   virtual void release_linear_solver(LinearSolver<Number> *) const;
 
@@ -319,6 +319,16 @@ public:
    * to take care of setting these to zero before assembly begins
    */
   bool zero_out_matrix_and_rhs;
+
+  /**
+   * This class handles all the details of interfacing with various
+   * linear algebra packages like PETSc or LASPACK.  This is a public
+   * member for backwards compatibility reasons, but in general it's
+   * better to use get_linear_solver() to access this member, since
+   * that function will also handle initialization if it hasn't
+   * already been taken care of.
+   */
+  mutable std::unique_ptr<LinearSolver<Number>> linear_solver;
 
 protected:
   /**
