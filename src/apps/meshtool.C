@@ -120,7 +120,7 @@ int main (int argc, char ** argv)
   // Number of refinements
   if (command_line.search(1, "-r"))
     {
-      int tmp;
+      int tmp = 0;
       tmp = command_line.next(tmp);
       n_rsteps = cast_int<unsigned int>(tmp);
     }
@@ -128,7 +128,7 @@ int main (int argc, char ** argv)
   // Number of subdomains for partitioning
   if (command_line.search(1, "-p"))
     {
-      int tmp;
+      int tmp = 0;
       tmp = command_line.next(tmp);
       n_subdomains = cast_int<unsigned int>(tmp);
     }
