@@ -33,6 +33,7 @@
 #pragma clang diagnostic ignored "-Wunused-private-field"
 #pragma clang diagnostic ignored "-Wextra"
 #pragma clang diagnostic ignored "-Wredundant-decls"
+#pragma clang diagnostic ignored "-Wcast-align"
 #pragma clang diagnostic ignored "-Wcast-qual"
 #pragma clang diagnostic ignored "-Wswitch-default"
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"

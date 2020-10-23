@@ -46,7 +46,6 @@ Point InfFEMap::map (const unsigned int dim,
 
   std::unique_ptr<Elem>      base_elem (InfFEBase::build_elem (inf_elem));
 
-  const Order        radial_mapping_order (InfFERadial::mapping_order());
   const Real         v                    (reference_point(dim-1));
 
   // map in the base face
@@ -75,6 +74,9 @@ Point InfFEMap::map (const unsigned int dim,
   // used e.g. for \p inverse_map() and \p reinit() explicitly.
   return (base_point-inf_elem->origin())*2./(1.-v)+inf_elem->origin();
 
+#if 0 // Leave this documented, but w/o unreachable-code warnings
+  const Order radial_mapping_order (InfFERadial::mapping_order());
+
   // map in the outer node face not necessary. Simply
   // compute the outer_point = base_point + (base_point-origin)
   const Point outer_point (base_point * 2. - inf_elem->origin());
@@ -86,6 +88,7 @@ Point InfFEMap::map (const unsigned int dim,
   p.add_scaled (outer_point, eval (v, radial_mapping_order, 1));
 
   return p;
+#endif
 }
 
 

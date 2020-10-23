@@ -451,8 +451,6 @@ int main (int argc, char ** argv)
 
   // To keep the number of vectors consistent between the primal and adjoint
   // loops, we will also pre-add the adjoint rhs vector
-  const std::string & adjoint_rhs_name0 = "adjoint_rhs0";
-  const std::string & adjoint_rhs_name1 = "adjoint_rhs1";
   system.add_vector("adjoint_rhs0", false, GHOSTED);
   system.add_vector("adjoint_rhs1", false, GHOSTED);
 
