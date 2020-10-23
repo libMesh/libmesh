@@ -29,8 +29,11 @@
 #include <memory>
 #include <cstdio> // FILE
 #ifdef LIBMESH_HAVE_XDR
+// I see a redundant declaration warning here on Ubuntu 20.10
+#include "libmesh/ignore_warnings.h"
 # include <rpc/rpc.h>
 # include <rpc/xdr.h>
+#include "libmesh/restore_warnings.h"
 #endif
 
 #include <iosfwd>
