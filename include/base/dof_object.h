@@ -784,7 +784,6 @@ unsigned int DofObject::n_dofs (const unsigned int s,
 inline
 dof_id_type DofObject::id () const
 {
-  libmesh_assert (this->valid_id());
   return _id;
 }
 
