@@ -1638,12 +1638,6 @@ public:
             // Get pointer to the DirichletBoundary object
             const auto & dirichlet = db_pair.second;
 
-            // TODO: Add sanity check that the boundary ids associated
-            // with the DirichletBoundary objects are actually present in
-            // the mesh. Currently this is a private function on DofMap so
-            // we can't call it here, but maybe it could be made public.
-            // dof_map.check_dirichlet_bcid_consistency(mesh, *dirichlet);
-
             // Loop over all the variables which this DirichletBoundary object is responsible for
             for (const auto & var : dirichlet->variables)
               {
@@ -1845,6 +1839,12 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 
   if (!_dirichlet_boundaries->empty())
     {
+      // Sanity check that the boundary ids associated with the
+      // DirichletBoundary objects are actually present in the
+      // mesh.
+      for (const auto & dirichlet : *_dirichlet_boundaries)
+        this->check_dirichlet_bcid_consistency(mesh, *dirichlet);
+
       // Threaded loop over local over elems applying all Dirichlet BCs
       Threads::parallel_for
         (range,
