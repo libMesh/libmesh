@@ -65,12 +65,14 @@ public:
   /**
    * Special functions.
    * - This class contains unique_ptrs so it can't be default copy assigned/constructed
+   * - This class inherits from System so it can't be default move assigned/constructed
+   *   (to be defaulted later, after we make the System tree move-compatible)
    * - Destructor is defaulted out-of-line
    */
-  RBConstruction (RBConstruction &&) = default;
+  RBConstruction (RBConstruction &&) = delete;
   RBConstruction (const RBConstruction &) = delete;
   RBConstruction & operator= (const RBConstruction &) = delete;
-  RBConstruction & operator= (RBConstruction &&) = default;
+  RBConstruction & operator= (RBConstruction &&) = delete;
   virtual ~RBConstruction ();
 
   /**
