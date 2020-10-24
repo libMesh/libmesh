@@ -32,17 +32,10 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // InfFEBase class members
-Elem * InfFEBase::build_elem (const Elem * inf_elem)
+std::unique_ptr<const Elem> InfFEBase::build_elem (const Elem * inf_elem)
 {
-  std::unique_ptr<const Elem> ape(inf_elem->build_side_ptr(0));
-
-  // The incoming inf_elem is const, but this function is required to
-  // return a non-const Elem * so that it can be used by
-  // update_base_elem().  Therefore a const_cast seems to be
-  // unavoidable here.
-  return const_cast<Elem *>(ape.release());
+  return inf_elem->build_side_ptr(0);
 }
-
 
 
 

@@ -44,7 +44,7 @@ Point InfFEMap::map (const unsigned int dim,
   libmesh_assert(inf_elem);
   libmesh_assert_not_equal_to (dim, 0);
 
-  std::unique_ptr<Elem>      base_elem (InfFEBase::build_elem (inf_elem));
+  std::unique_ptr<const Elem> base_elem = InfFEBase::build_elem (inf_elem);
 
   const Real         v                    (reference_point(dim-1));
 
@@ -114,7 +114,7 @@ Point InfFEMap::inverse_map (const unsigned int dim,
 
   // 1.)
   // build a base element to do the map inversion in the base face
-  std::unique_ptr<Elem> base_elem (InfFEBase::build_elem (inf_elem));
+  std::unique_ptr<const Elem> base_elem = InfFEBase::build_elem (inf_elem);
 
   // The point on the reference element (which we are looking for).
   // start with an invalid guess:
@@ -252,12 +252,6 @@ Point InfFEMap::inverse_map (const unsigned int dim,
     default:
       libmesh_error_msg("Invalid dim = " << dim);
     }
-
-#ifndef NDEBUG
-  // In debug mode, the validity of base_elems id is checked.
-  // Thus, we should set it to a valid  one:
-  base_elem->set_id(inf_elem->id());
-#endif
 
   // 3.)
   // Now we have the intersection-point (projection of physical point onto base-element).

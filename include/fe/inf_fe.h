@@ -160,11 +160,12 @@ private:
 public:
 
   /**
-   * Build the base element of an infinite element.  Be careful,
-   * this method allocates memory!  So be sure to delete the
-   * new element afterward.
+   * Build the base element of an infinite element. Here "base" refers
+   * to the non-infinite/traditional geometric element face which is
+   * associated with this infinite element. A const base Elem is built
+   * from a const input InfElem.
    */
-  static Elem * build_elem (const Elem * inf_elem);
+  static std::unique_ptr<const Elem> build_elem (const Elem * inf_elem);
 
   /**
    * \returns The base element associated to
@@ -1091,10 +1092,11 @@ protected:
   std::unique_ptr<QBase> radial_qrule;
 
   /**
-   * The base element associated with the
-   * current infinite element
+   * The "base" (aka non-infinite) element associated with the current
+   * infinite element. We treat is as const since the InfFE should not
+   * have to modify the geometric Elem in order to do its calculations.
    */
-  std::unique_ptr<Elem> base_elem;
+  std::unique_ptr<const Elem> base_elem;
 
   /**
    * Have a \p FE<Dim-1,T_base> handy for base approximation.
