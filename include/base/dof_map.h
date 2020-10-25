@@ -1340,6 +1340,12 @@ public:
   DirichletBoundaries *
   get_adjoint_dirichlet_boundaries(unsigned int q);
 
+  /**
+   * Check that all the ids in dirichlet_bcids are actually present in the mesh.
+   * If not, this will throw an error.
+   */
+  void check_dirichlet_bcid_consistency (const MeshBase & mesh,
+                                         const DirichletBoundary & boundary) const;
 #endif // LIBMESH_ENABLE_DIRICHLET
 
 
@@ -1832,12 +1838,6 @@ private:
 #endif
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  /**
-   * Check that all the ids in dirichlet_bcids are actually present in the mesh.
-   * If not, this will throw an error.
-   */
-  void check_dirichlet_bcid_consistency (const MeshBase & mesh,
-                                         const DirichletBoundary & boundary) const;
   /**
    * Data structure containing Dirichlet functions.  The ith
    * entry is the constraint matrix row for boundaryid i.

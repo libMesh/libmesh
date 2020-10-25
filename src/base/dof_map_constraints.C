@@ -1561,10 +1561,6 @@ public:
      * input function \p f gives the arbitrary solution.
      */
 
-    // Check for a quick return in case there's no work to be done.
-    if (dirichlets.empty())
-      return;
-
     // Figure out which System the DirichletBoundary objects are
     // defined for. We break out of the loop as soon as we encounter a
     // valid System pointer, the assumption is thus that all Variables
@@ -1641,12 +1637,6 @@ public:
           {
             // Get pointer to the DirichletBoundary object
             const auto & dirichlet = db_pair.second;
-
-            // TODO: Add sanity check that the boundary ids associated
-            // with the DirichletBoundary objects are actually present in
-            // the mesh. Currently this is a private function on DofMap so
-            // we can't call it here, but maybe it could be made public.
-            // dof_map.check_dirichlet_bcid_consistency(mesh, *dirichlet);
 
             // Loop over all the variables which this DirichletBoundary object is responsible for
             for (const auto & var : dirichlet->variables)
@@ -1847,22 +1837,31 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
-  // Threaded loop over local over elems applying all Dirichlet BCs
-  Threads::parallel_for
-    (range,
-     ConstrainDirichlet(*this, mesh, time, *_dirichlet_boundaries,
-                        AddPrimalConstraint(*this)));
-
-  // Threaded loop over local over elems per QOI applying all adjoint
-  // Dirichlet BCs.  Note that the ConstElemRange is reset before each
-  // execution of Threads::parallel_for().
-
-  for (auto qoi_index : index_range(_adjoint_dirichlet_boundaries))
+  if (!_dirichlet_boundaries->empty())
     {
+      // Sanity check that the boundary ids associated with the
+      // DirichletBoundary objects are actually present in the
+      // mesh.
+      for (const auto & dirichlet : *_dirichlet_boundaries)
+        this->check_dirichlet_bcid_consistency(mesh, *dirichlet);
+
+      // Threaded loop over local over elems applying all Dirichlet BCs
       Threads::parallel_for
-        (range.reset(),
-         ConstrainDirichlet(*this, mesh, time, *(_adjoint_dirichlet_boundaries[qoi_index]),
-                            AddAdjointConstraint(*this, qoi_index)));
+        (range,
+         ConstrainDirichlet(*this, mesh, time, *_dirichlet_boundaries,
+                            AddPrimalConstraint(*this)));
+
+      // Threaded loop over local over elems per QOI applying all adjoint
+      // Dirichlet BCs.  Note that the ConstElemRange is reset before each
+      // execution of Threads::parallel_for().
+
+      for (auto qoi_index : index_range(_adjoint_dirichlet_boundaries))
+        {
+          Threads::parallel_for
+            (range.reset(),
+             ConstrainDirichlet(*this, mesh, time, *(_adjoint_dirichlet_boundaries[qoi_index]),
+                                AddAdjointConstraint(*this, qoi_index)));
+        }
     }
 
 #endif // LIBMESH_ENABLE_DIRICHLET
@@ -5043,7 +5042,12 @@ DirichletBoundaries::~DirichletBoundaries()
 void DofMap::check_dirichlet_bcid_consistency (const MeshBase & mesh,
                                                const DirichletBoundary & boundary) const
 {
-  const std::set<boundary_id_type>& mesh_bcids = mesh.get_boundary_info().get_boundary_ids();
+  const std::set<boundary_id_type>& mesh_side_bcids =
+    mesh.get_boundary_info().get_boundary_ids();
+  const std::set<boundary_id_type>& mesh_edge_bcids =
+    mesh.get_boundary_info().get_edge_boundary_ids();
+  const std::set<boundary_id_type>& mesh_node_bcids =
+    mesh.get_boundary_info().get_node_boundary_ids();
   const std::set<boundary_id_type>& dbc_bcids = boundary.b;
 
   // DirichletBoundary id sets should be consistent across all ranks
@@ -5054,7 +5058,9 @@ void DofMap::check_dirichlet_bcid_consistency (const MeshBase & mesh,
       // DirichletBoundary id sets should be consistent across all ranks
       libmesh_assert(mesh.comm().verify(bc_id));
 
-      bool found_bcid = (mesh_bcids.find(bc_id) != mesh_bcids.end());
+      bool found_bcid = (mesh_side_bcids.find(bc_id) != mesh_side_bcids.end() ||
+                         mesh_edge_bcids.find(bc_id) != mesh_edge_bcids.end() ||
+                         mesh_node_bcids.find(bc_id) != mesh_node_bcids.end());
 
       // On a distributed mesh, boundary id sets may *not* be
       // consistent across all ranks, since not all ranks see all
