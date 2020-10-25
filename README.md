@@ -12,6 +12,8 @@ The default is to build libmesh "out of tree," i.e. within a separate `build` di
 1. `make check` (optional, runs the example programs and unit tests when possible)
 1. `make install`
 
+Afterward, `make uninstall` is available if needed to remove the files
+copied to /path/to/libmesh/install by `make install`.
 
 ## METHODS
 libMesh supports the notion of multiple methods, that is, configuration
