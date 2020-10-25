@@ -1561,10 +1561,6 @@ public:
      * input function \p f gives the arbitrary solution.
      */
 
-    // Check for a quick return in case there's no work to be done.
-    if (dirichlets.empty())
-      return;
-
     // Figure out which System the DirichletBoundary objects are
     // defined for. We break out of the loop as soon as we encounter a
     // valid System pointer, the assumption is thus that all Variables
@@ -1847,22 +1843,25 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
-  // Threaded loop over local over elems applying all Dirichlet BCs
-  Threads::parallel_for
-    (range,
-     ConstrainDirichlet(*this, mesh, time, *_dirichlet_boundaries,
-                        AddPrimalConstraint(*this)));
-
-  // Threaded loop over local over elems per QOI applying all adjoint
-  // Dirichlet BCs.  Note that the ConstElemRange is reset before each
-  // execution of Threads::parallel_for().
-
-  for (auto qoi_index : index_range(_adjoint_dirichlet_boundaries))
+  if (!_dirichlet_boundaries->empty())
     {
+      // Threaded loop over local over elems applying all Dirichlet BCs
       Threads::parallel_for
-        (range.reset(),
-         ConstrainDirichlet(*this, mesh, time, *(_adjoint_dirichlet_boundaries[qoi_index]),
-                            AddAdjointConstraint(*this, qoi_index)));
+        (range,
+         ConstrainDirichlet(*this, mesh, time, *_dirichlet_boundaries,
+                            AddPrimalConstraint(*this)));
+
+      // Threaded loop over local over elems per QOI applying all adjoint
+      // Dirichlet BCs.  Note that the ConstElemRange is reset before each
+      // execution of Threads::parallel_for().
+
+      for (auto qoi_index : index_range(_adjoint_dirichlet_boundaries))
+        {
+          Threads::parallel_for
+            (range.reset(),
+             ConstrainDirichlet(*this, mesh, time, *(_adjoint_dirichlet_boundaries[qoi_index]),
+                                AddAdjointConstraint(*this, qoi_index)));
+        }
     }
 
 #endif // LIBMESH_ENABLE_DIRICHLET
