@@ -1671,9 +1671,13 @@ public:
    * and faces with a corresponding id that facilitates setting boundary
    * conditions.
    *
-   * Direct access to this class will be removed in future libMesh
-   * versions.  Use the \p get_boundary_info() accessor instead.
+   * Direct access to this class is now officially deprecated and will
+   * be removed in future libMesh versions.  Use the \p get_boundary_info()
+   * accessor instead.
    */
+#ifndef LIBMESH_ENABLE_DEPRECATED
+protected:
+#endif
   std::unique_ptr<BoundaryInfo> boundary_info;
 
 
