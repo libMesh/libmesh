@@ -24,11 +24,13 @@
 #include "libmesh/libmesh_config.h"
 #include "libmesh/threads.h"
 #include "libmesh/libmesh.h" // libMesh::on_command_line
+#include "libmesh/libmesh_exceptions.h" // libmesh_try, libmesh_catch
 
 // C++ includes
 #include <iostream>
 #include <string>
 #include <map>
+#include <exception> // std::terminate
 
 namespace libMesh
 {
@@ -100,14 +102,14 @@ protected:
    * the constructor of any derived class that will be
    * reference counted.
    */
-  void increment_constructor_count (const std::string & name);
+  void increment_constructor_count (const std::string & name) noexcept;
 
   /**
    * Increments the destruction counter. Should be called in
    * the destructor of any derived class that will be
    * reference counted.
    */
-  void increment_destructor_count (const std::string & name);
+  void increment_destructor_count (const std::string & name) noexcept;
 
   /**
    * Data structure to log the information.  The log is
@@ -178,12 +180,23 @@ inline ReferenceCounter::~ReferenceCounter()
 
 #if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 inline
-void ReferenceCounter::increment_constructor_count (const std::string & name)
+void ReferenceCounter::increment_constructor_count (const std::string & name) noexcept
 {
-  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-  std::pair<unsigned int, unsigned int> & p = _counts[name];
-
-  p.first++;
+  libmesh_try
+  {
+    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+    std::pair<unsigned int, unsigned int> & p = _counts[name];
+    p.first++;
+  }
+  libmesh_catch (...)
+  {
+    auto stream = libMesh::err.get();
+    stream->exceptions(stream->goodbit); // stream must not throw
+    libMesh::err << "Encountered unrecoverable error while calling "
+                 << "ReferenceCounter::increment_constructor_count() "
+                 << "for a(n) " << name << " object." << std::endl;
+    std::terminate();
+  }
 }
 #endif
 
@@ -191,12 +204,23 @@ void ReferenceCounter::increment_constructor_count (const std::string & name)
 
 #if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 inline
-void ReferenceCounter::increment_destructor_count (const std::string & name)
+void ReferenceCounter::increment_destructor_count (const std::string & name) noexcept
 {
-  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-  std::pair<unsigned int, unsigned int> & p = _counts[name];
-
-  p.second++;
+  libmesh_try
+  {
+    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+    std::pair<unsigned int, unsigned int> & p = _counts[name];
+    p.second++;
+  }
+  libmesh_catch (...)
+  {
+    auto stream = libMesh::err.get();
+    stream->exceptions(stream->goodbit); // stream must not throw
+    libMesh::err << "Encountered unrecoverable error while calling "
+                 << "ReferenceCounter::increment_destructor_count() "
+                 << "for a(n) " << name << " object." << std::endl;
+    std::terminate();
+  }
 }
 #endif
 
