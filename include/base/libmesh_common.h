@@ -439,7 +439,8 @@ struct casting_compare {
 #define libmesh_exceptionless_error_msg(msg)                            \
   do {                                                                  \
     libMesh::err << msg << std::endl;                                   \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); \
+    libmesh_try { libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); } \
+    libmesh_catch (...) {}                                              \
     std::terminate();                                                   \
   } while (0)
 
