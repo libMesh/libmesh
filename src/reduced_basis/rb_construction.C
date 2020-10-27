@@ -54,6 +54,8 @@
 #include <fstream>
 #include <sstream>
 #include <limits>
+#include <stdlib.h> // mkstemps on Linux
+#include <unistd.h> // mkstemps on MacOS
 
 namespace libMesh
 {
@@ -1241,6 +1243,40 @@ void RBConstruction::enrich_basis_from_rhs_terms(const bool resize_rb_eval_data)
             check_convergence(*get_linear_solver());
         }
 
+      // Debugging: enable this code to print the rhs that was used in
+      // the most recent truth solve to a uniquely-named file.
+      if (false)
+        {
+          char temp_file[] = "truth_rhs_XXXXXX.dat";
+          int fd = mkstemps(temp_file, 4);
+          if (fd != -1)
+            {
+              libMesh::out << "Writing truth system rhs to file: " << temp_file << std::endl;
+              rhs->print_matlab(std::string(temp_file));
+            }
+        }
+
+      // Debugging: enable this code to print the most recent truth
+      // solution to a uniquely-named file.
+#ifdef LIBMESH_HAVE_EXODUS_API
+      if (false)
+        {
+          // Note: mkstemps creates a file and returns an open file descriptor to it.
+          // The filename is created from a template which must have 6 'X' characters followed
+          // by a suffix having the specified length (in this case 4, for ".exo").
+          char temp_file[] = "truth_XXXXXX.exo";
+          int fd = mkstemps(temp_file, 4);
+          if (fd != -1)
+            {
+              libMesh::out << "Writing truth solution to file: " << temp_file << std::endl;
+              ExodusII_IO exo_io(this->get_mesh());
+              std::set<std::string> system_names = {this->name()};
+              exo_io.write_equation_systems(std::string(temp_file),
+                                            this->get_equation_systems(), &system_names);
+            }
+        }
+#endif
+
       // Call user-defined post-processing routines on the truth solution.
       post_process_truth_solution();
 
@@ -1466,18 +1502,14 @@ Real RBConstruction::truth_solve(int plot_solution)
           get_output_vector(n,q_l)->dot(*solution);
     }
 
+#ifdef LIBMESH_HAVE_EXODUS_API
   if (plot_solution > 0)
     {
-#if defined(LIBMESH_USE_COMPLEX_NUMBERS)
-      GMVIO(get_mesh()).write_equation_systems ("truth.gmv",
-                                                this->get_equation_systems());
-#else
-#ifdef LIBMESH_HAVE_EXODUS_API
-      ExodusII_IO(get_mesh()).write_equation_systems ("truth.e",
-                                                      this->get_equation_systems());
-#endif
-#endif
+      ExodusII_IO exo_io(this->get_mesh());
+      std::set<std::string> system_names = {this->name()};
+      exo_io.write_equation_systems("truth.exo", this->get_equation_systems(), &system_names);
     }
+#endif
 
   // Get the X norm of the truth solution
   // Useful for normalizing our true error data
