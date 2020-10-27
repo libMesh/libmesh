@@ -37,9 +37,8 @@ public:
 
 #if LIBMESH_DIM > 1
 #ifdef LIBMESH_HAVE_EXODUS_API
-  // Still not yet working?
-  // CPPUNIT_TEST( testExodusCopyNodalSolutionDistributed );
-  // CPPUNIT_TEST( testExodusCopyElementSolutionDistributed );
+  CPPUNIT_TEST( testExodusCopyNodalSolutionDistributed );
+  CPPUNIT_TEST( testExodusCopyElementSolutionDistributed );
   CPPUNIT_TEST( testExodusCopyNodalSolutionReplicated );
   CPPUNIT_TEST( testExodusCopyElementSolutionReplicated );
   CPPUNIT_TEST( testExodusReadHeader );
