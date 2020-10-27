@@ -595,9 +595,13 @@ void ExodusII_IO::copy_nodal_solution(System & system,
           for (std::size_t i=0; i != query_size; ++i)
             {
               const auto it = node_var_value_map.find(ids[i]);
-              libmesh_assert(it != node_var_value_map.end());
-              values[i] = it->second;
-              node_var_value_map.erase(it);
+              if (it != node_var_value_map.end())
+                {
+                  values[i] = it->second;
+                  node_var_value_map.erase(it);
+                }
+              else
+                values[i] = std::numeric_limits<Real>::quiet_NaN();
             }
         };
 
@@ -609,7 +613,8 @@ void ExodusII_IO::copy_nodal_solution(System & system,
         {
           const std::size_t query_size = ids.size();
           for (std::size_t i=0; i != query_size; ++i)
-            node_var_value_map[ids[i]] = values[i];
+            if (!libmesh_isnan(values[i]))
+              node_var_value_map[ids[i]] = values[i];
         };
 
       Real * value_ex = nullptr;
@@ -698,9 +703,13 @@ void ExodusII_IO::copy_elemental_solution(System & system,
           for (std::size_t i=0; i != query_size; ++i)
             {
               const auto it = elem_var_value_map.find(ids[i]);
-              libmesh_assert(it != elem_var_value_map.end());
-              values[i] = it->second;
-              elem_var_value_map.erase(it);
+              if (it != elem_var_value_map.end())
+                {
+                  values[i] = it->second;
+                  elem_var_value_map.erase(it);
+                }
+              else
+                values[i] = std::numeric_limits<Real>::quiet_NaN();
             }
         };
 
@@ -712,7 +721,8 @@ void ExodusII_IO::copy_elemental_solution(System & system,
         {
           const std::size_t query_size = ids.size();
           for (std::size_t i=0; i != query_size; ++i)
-            elem_var_value_map[ids[i]] = values[i];
+            if (!libmesh_isnan(values[i]))
+              elem_var_value_map[ids[i]] = values[i];
         };
 
       Real * value_ex = nullptr;
