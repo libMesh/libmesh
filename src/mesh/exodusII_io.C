@@ -569,7 +569,7 @@ void ExodusII_IO::copy_nodal_solution(System & system,
 
   auto & node_var_value_map = exio_helper->nodal_var_values;
 
-  const bool serial_on_zero = !mesh.is_serial_on_zero();
+  const bool serial_on_zero = mesh.is_serial_on_zero();
 
   // If our mesh isn't serial, then non-root processors need to
   // request the data for their parts of the mesh and insert it
@@ -672,7 +672,7 @@ void ExodusII_IO::copy_elemental_solution(System & system,
       exio_helper->read_elemental_var_values(exodus_var_name, timestep, elem_var_value_map);
     }
 
-  const bool serial_on_zero = !mesh.is_serial_on_zero();
+  const bool serial_on_zero = mesh.is_serial_on_zero();
 
   // If our mesh isn't serial, then non-root processors need to
   // request the data for their parts of the mesh and insert it
