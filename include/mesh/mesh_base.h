@@ -154,6 +154,12 @@ public:
   { return _is_prepared; }
 
   /**
+   * Tells this we have done some operation where we should no longer consider ourself prepared
+   */
+  void set_isnt_prepared()
+  { _is_prepared = false; }
+
+  /**
    * \returns \p true if all elements and nodes of the mesh
    * exist on the current processor, \p false otherwise
    */
