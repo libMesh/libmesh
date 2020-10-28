@@ -59,16 +59,23 @@ class TransientSystem : public Base
 public:
 
   /**
-   * Constructor.  Initializes required
-   * data structures.
+   * Constructor.
    */
   TransientSystem (EquationSystems & es,
                    const std::string & name,
                    const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class has the same restrictions as the union of its
+   *   potential base classes (currently LinearImplicitSystem,
+   *   NonlinearImplicitSystem, ExplicitSystem, and System).
+   * - Destructor is defaulted out-of-line.
    */
+  TransientSystem (const TransientSystem &) = delete;
+  TransientSystem & operator= (const TransientSystem &) = delete;
+  TransientSystem (TransientSystem &&) = default;
+  TransientSystem & operator= (TransientSystem &&) = delete;
   virtual ~TransientSystem ();
 
   /**
