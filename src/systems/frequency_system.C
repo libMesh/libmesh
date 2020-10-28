@@ -20,14 +20,8 @@
 // Local includes
 #include "libmesh/libmesh_config.h"
 
-/*
- * Require complex arithmetic
- */
+// This class is only enabled in complex numbers builds
 #if defined(LIBMESH_USE_COMPLEX_NUMBERS)
-
-
-// C++ includes
-#include <cstdio>          // for sprintf
 
 // Local includes
 #include "libmesh/frequency_system.h"
@@ -36,13 +30,12 @@
 #include "libmesh/linear_solver.h"
 #include "libmesh/numeric_vector.h"
 
+// C++ includes
+#include <cstdio>          // for sprintf
+
 namespace libMesh
 {
 
-
-
-// ------------------------------------------------------------
-// FrequencySystem implementation
 FrequencySystem::FrequencySystem (EquationSystems & es,
                                   const std::string & name_in,
                                   const unsigned int number_in) :
@@ -60,13 +53,7 @@ FrequencySystem::FrequencySystem (EquationSystems & es,
 
 
 
-FrequencySystem::~FrequencySystem ()
-{
-  this->clear ();
-
-  // the additional matrices and vectors are cleared and zero'ed in System
-}
-
+FrequencySystem::~FrequencySystem () = default;
 
 
 
@@ -79,17 +66,15 @@ void FrequencySystem::clear ()
   _finished_init            = false;
   _finished_assemble        = false;
 
-  /*
-   * We have to distinguish between the
-   * simple straightforward "clear()"
-   * and the clear that also touches the
-   * EquationSystems parameters "current frequency" etc.
-   * Namely, when reading from file (through equation_systems_io.C
-   * methods), the param's are read in, then the systems.
-   * Prior to reading a system, this system gets cleared...
-   * And there, all the previously loaded frequency parameters
-   * would get lost...
-   */
+  // We have to distinguish between the
+  // simple straightforward "clear()"
+  // and the clear that also touches the
+  // EquationSystems parameters "current frequency" etc.
+  // Namely, when reading from file (through equation_systems_io.C
+  // methods), the param's are read in, then the systems.
+  // Prior to reading a system, this system gets cleared...
+  // And there, all the previously loaded frequency parameters
+  // would get lost...
 }
 
 
@@ -128,11 +113,9 @@ void FrequencySystem::init_data ()
   // make sure we have frequencies to solve for
   if (!_finished_set_frequencies)
     {
-      /*
-       * when this system was read from file, check
-       * if this has a "n_frequencies" parameter,
-       * and initialize us with these.
-       */
+      // when this system was read from file, check
+      // if this has a "n_frequencies" parameter,
+      // and initialize us with these.
       if (es.parameters.have_parameter<unsigned int> ("n_frequencies"))
         {
 #ifndef NDEBUG

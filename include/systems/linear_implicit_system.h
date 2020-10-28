@@ -57,16 +57,21 @@ class LinearImplicitSystem : public ImplicitSystem
 public:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * Constructor.
    */
   LinearImplicitSystem (EquationSystems & es,
                         const std::string & name,
                         const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class has the same restrictions/defaults as its base class.
+   * - The destructor is defaulted out-of-line.
    */
+  LinearImplicitSystem (const LinearImplicitSystem &) = delete;
+  LinearImplicitSystem & operator= (const LinearImplicitSystem &) = delete;
+  LinearImplicitSystem (LinearImplicitSystem &&) = default;
+  LinearImplicitSystem & operator= (LinearImplicitSystem &&) = delete;
   virtual ~LinearImplicitSystem ();
 
   /**

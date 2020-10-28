@@ -45,16 +45,21 @@ class OptimizationSystem : public ImplicitSystem
 public:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * Constructor.
    */
   OptimizationSystem (EquationSystems & es,
                       const std::string & name,
                       const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class has the same restrictions/defaults as its base class.
+   * - The destructor is defaulted out-of-line.
    */
+  OptimizationSystem (const OptimizationSystem &) = delete;
+  OptimizationSystem & operator= (const OptimizationSystem &) = delete;
+  OptimizationSystem (OptimizationSystem &&) = default;
+  OptimizationSystem & operator= (OptimizationSystem &&) = delete;
   virtual ~OptimizationSystem ();
 
   /**

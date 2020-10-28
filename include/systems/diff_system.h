@@ -57,16 +57,25 @@ class DifferentiableSystem : public ImplicitSystem,
 public:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * Constructor.
    */
   DifferentiableSystem (EquationSystems & es,
                         const std::string & name,
                         const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class has the same restrictions as its base class.
+   * - This class also can't be default move constructed because it
+   *   manually manages the memory of the _diff_physics and diff_qoi
+   *   objects.
+   * - The destructor potentially cleans up the _diff_physics and
+   *   diff_qoi objects.
    */
+  DifferentiableSystem (const DifferentiableSystem &) = delete;
+  DifferentiableSystem & operator= (const DifferentiableSystem &) = delete;
+  DifferentiableSystem (DifferentiableSystem &&) = delete;
+  DifferentiableSystem & operator= (DifferentiableSystem &&) = delete;
   virtual ~DifferentiableSystem ();
 
   /**

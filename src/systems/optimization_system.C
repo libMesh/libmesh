@@ -17,8 +17,6 @@
 
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/equation_systems.h"
 #include "libmesh/libmesh_logging.h"
@@ -31,8 +29,6 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// OptimizationSystem implementation
 OptimizationSystem::OptimizationSystem (EquationSystems & es,
                                         const std::string & name_in,
                                         const unsigned int number_in) :
@@ -50,11 +46,7 @@ OptimizationSystem::OptimizationSystem (EquationSystems & es,
 
 
 
-OptimizationSystem::~OptimizationSystem ()
-{
-  // Clear data
-  this->clear();
-}
+OptimizationSystem::~OptimizationSystem () = default;
 
 
 

@@ -64,8 +64,14 @@ public:
              const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class has the same restrictions as its base class.
+   * - The destructor is defaulted out-of-line.
    */
+  FEMSystem (const FEMSystem &) = delete;
+  FEMSystem & operator= (const FEMSystem &) = delete;
+  FEMSystem (FEMSystem &&) = delete;
+  FEMSystem & operator= (FEMSystem &&) = delete;
   virtual ~FEMSystem ();
 
   /**

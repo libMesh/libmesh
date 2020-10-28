@@ -56,8 +56,7 @@ class RBConstructionBase : public Base, public RBParametrized
 public:
 
   /**
-   * Constructor.  Initializes required
-   * data structures.
+   * Constructor.
    */
   RBConstructionBase (EquationSystems & es,
                       const std::string & name,
@@ -65,11 +64,13 @@ public:
 
   /**
    * Special functions.
-   * - This class contains a unique_ptr so it can't be copy assigned/constructed.
+   * - This class has the same restrictions as the union of its
+   *   potential base classes (currently LinearImplicitSystem and
+   *   EigenSystem).
    * - Destructor is defaulted out-of-line.
    */
   RBConstructionBase (RBConstructionBase &&) = default;
-  RBConstructionBase & operator= (RBConstructionBase &&) = default;
+  RBConstructionBase & operator= (RBConstructionBase &&) = delete;
   RBConstructionBase (const RBConstructionBase &) = delete;
   RBConstructionBase & operator= (const RBConstructionBase &) = delete;
   virtual ~RBConstructionBase ();

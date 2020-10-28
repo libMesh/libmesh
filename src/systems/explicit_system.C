@@ -17,8 +17,6 @@
 
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/explicit_system.h"
 #include "libmesh/numeric_vector.h"
@@ -27,8 +25,8 @@ namespace libMesh
 {
 
 
-// ------------------------------------------------------------
-// ExplicitSystem implementation
+ExplicitSystem::~ExplicitSystem() = default;
+
 ExplicitSystem::ExplicitSystem (EquationSystems & es,
                                 const std::string & name_in,
                                 const unsigned int number_in) :
