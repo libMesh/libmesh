@@ -63,8 +63,14 @@ public:
                      const unsigned int number_in);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class has the same restrictions/defaults as its base class.
+   * - Destructor is defaulted out-of-line
    */
+  RBSCMConstruction (RBSCMConstruction &&) = default;
+  RBSCMConstruction (const RBSCMConstruction &) = delete;
+  RBSCMConstruction & operator= (const RBSCMConstruction &) = delete;
+  RBSCMConstruction & operator= (RBSCMConstruction &&) = delete;
   virtual ~RBSCMConstruction ();
 
   /**

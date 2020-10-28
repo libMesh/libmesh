@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-
+// libMesh includes
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
 #include "libmesh/equation_systems.h"
@@ -834,9 +834,7 @@ FEMSystem::FEMSystem (EquationSystems & es,
 }
 
 
-FEMSystem::~FEMSystem ()
-{
-}
+FEMSystem::~FEMSystem () = default;
 
 
 

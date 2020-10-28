@@ -57,16 +57,21 @@ class EigenSystem : public System
 public:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * Constructor.
    */
   EigenSystem (EquationSystems & es,
                const std::string & name_in,
                const unsigned int number_in);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class has the same restrictions/defaults as its base class.
+   * - Destructor is defaulted out-of-line
    */
+  EigenSystem (const EigenSystem &) = delete;
+  EigenSystem & operator= (const EigenSystem &) = delete;
+  EigenSystem (EigenSystem &&) = default;
+  EigenSystem & operator= (EigenSystem &&) = delete;
   virtual ~EigenSystem ();
 
   /**

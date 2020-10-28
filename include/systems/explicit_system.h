@@ -50,12 +50,22 @@ class ExplicitSystem : public System
 public:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * Constructor.
    */
   ExplicitSystem (EquationSystems & es,
                   const std::string & name,
                   const unsigned int number);
+
+  /**
+   * Special functions.
+   * - This class has the same restrictions/defaults as its base class.
+   * - The destructor is defaulted out-of-line.
+   */
+  ExplicitSystem (const ExplicitSystem &) = delete;
+  ExplicitSystem & operator= (const ExplicitSystem &) = delete;
+  ExplicitSystem (ExplicitSystem &&) = default;
+  ExplicitSystem & operator= (ExplicitSystem &&) = delete;
+  virtual ~ExplicitSystem ();
 
   /**
    * The type of system.
@@ -112,7 +122,6 @@ public:
    * right-hand-side vector b.
    */
   NumericVector<Number> * rhs;
-
 
 private:
 

@@ -37,8 +37,6 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// ImplicitSystem implementation
 ImplicitSystem::ImplicitSystem (EquationSystems & es,
                                 const std::string & name_in,
                                 const unsigned int number_in) :
@@ -51,11 +49,7 @@ ImplicitSystem::ImplicitSystem (EquationSystems & es,
 
 
 
-ImplicitSystem::~ImplicitSystem ()
-{
-  // Clear data
-  this->clear();
-}
+ImplicitSystem::~ImplicitSystem () = default;
 
 
 

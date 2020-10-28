@@ -17,8 +17,6 @@
 
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/diff_solver.h"
@@ -30,8 +28,6 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// NonlinearImplicitSystem implementation
 NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems & es,
                                                   const std::string & name_in,
                                                   const unsigned int number_in) :
@@ -60,11 +56,7 @@ NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems & es,
 
 
 
-NonlinearImplicitSystem::~NonlinearImplicitSystem ()
-{
-  // Clear data
-  this->clear();
-}
+NonlinearImplicitSystem::~NonlinearImplicitSystem () = default;
 
 
 

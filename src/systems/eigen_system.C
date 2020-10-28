@@ -36,8 +36,6 @@ namespace libMesh
 {
 
 
-// ------------------------------------------------------------
-// EigenSystem implementation
 EigenSystem::EigenSystem (EquationSystems & es,
                           const std::string & name_in,
                           const unsigned int number_in
@@ -57,11 +55,7 @@ EigenSystem::EigenSystem (EquationSystems & es,
 
 
 
-EigenSystem::~EigenSystem ()
-{
-  // clear data
-  this->clear();
-}
+EigenSystem::~EigenSystem () = default;
 
 
 

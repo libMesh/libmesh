@@ -58,16 +58,21 @@ class ImplicitSystem : public ExplicitSystem
 public:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * Constructor.
    */
   ImplicitSystem (EquationSystems & es,
                   const std::string & name,
                   const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class has the same restrictions/defaults as its base class.
+   * - The destructor is defaulted out-of-line.
    */
+  ImplicitSystem (const ImplicitSystem &) = delete;
+  ImplicitSystem & operator= (const ImplicitSystem &) = delete;
+  ImplicitSystem (ImplicitSystem &&) = default;
+  ImplicitSystem & operator= (ImplicitSystem &&) = delete;
   virtual ~ImplicitSystem ();
 
   /**

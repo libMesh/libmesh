@@ -48,12 +48,22 @@ class CondensedEigenSystem : public EigenSystem
 public:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * Constructor.
    */
   CondensedEigenSystem (EquationSystems & es,
                         const std::string & name_in,
                         const unsigned int number_in);
+
+  /**
+   * Special functions.
+   * - This class has the same restrictions/defaults as its base class.
+   * - The destructor is defaulted out-of-line.
+   */
+  CondensedEigenSystem (const CondensedEigenSystem &) = delete;
+  CondensedEigenSystem & operator= (const CondensedEigenSystem &) = delete;
+  CondensedEigenSystem (CondensedEigenSystem &&) = default;
+  CondensedEigenSystem & operator= (CondensedEigenSystem &&) = delete;
+  virtual ~CondensedEigenSystem ();
 
   /**
    * The type of system.

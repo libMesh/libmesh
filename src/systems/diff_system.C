@@ -16,6 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+// libMesh includes
 #include "libmesh/diff_solver.h"
 #include "libmesh/diff_system.h"
 #include "libmesh/time_solver.h"
@@ -24,6 +25,7 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/zero_function.h"
 
+// C++ includes
 #include <utility> // std::swap
 
 namespace libMesh

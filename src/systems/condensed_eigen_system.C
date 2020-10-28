@@ -43,6 +43,8 @@ CondensedEigenSystem::CondensedEigenSystem (EquationSystems & es,
 {
 }
 
+CondensedEigenSystem::~CondensedEigenSystem() = default;
+
 void
 CondensedEigenSystem::initialize_condensed_dofs(const std::set<dof_id_type> & global_dirichlet_dofs_set)
 {

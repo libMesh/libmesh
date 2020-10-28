@@ -64,12 +64,10 @@ public:
 
   /**
    * Special functions.
-   * - This class contains unique_ptrs so it can't be default copy assigned/constructed
-   * - This class inherits from System so it can't be default move assigned/constructed
-   *   (to be defaulted later, after we make the System tree move-compatible)
+   * - This class has the same restrictions/defaults as its base class.
    * - Destructor is defaulted out-of-line
    */
-  RBConstruction (RBConstruction &&) = delete;
+  RBConstruction (RBConstruction &&) = default;
   RBConstruction (const RBConstruction &) = delete;
   RBConstruction & operator= (const RBConstruction &) = delete;
   RBConstruction & operator= (RBConstruction &&) = delete;

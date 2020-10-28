@@ -53,17 +53,22 @@ class NewmarkSystem : public LinearImplicitSystem
 public:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * Constructor.
    */
   NewmarkSystem (EquationSystems & es,
                  const std::string & name,
                  const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class has the same restrictions/defaults as its base class.
+   * - The destructor is defaulted out-of-line.
    */
-  ~NewmarkSystem ();
+  NewmarkSystem (const NewmarkSystem &) = delete;
+  NewmarkSystem & operator= (const NewmarkSystem &) = delete;
+  NewmarkSystem (NewmarkSystem &&) = default;
+  NewmarkSystem & operator= (NewmarkSystem &&) = delete;
+  virtual ~NewmarkSystem ();
 
   /**
    * The type of system.

@@ -56,16 +56,21 @@ class NonlinearImplicitSystem : public ImplicitSystem
 public:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * Constructor.
    */
   NonlinearImplicitSystem (EquationSystems & es,
                            const std::string & name,
                            const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class has the same restrictions/defaults as its base class.
+   * - The destructor is defaulted out-of-line.
    */
+  NonlinearImplicitSystem (const NonlinearImplicitSystem &) = delete;
+  NonlinearImplicitSystem & operator= (const NonlinearImplicitSystem &) = delete;
+  NonlinearImplicitSystem (NonlinearImplicitSystem &&) = default;
+  NonlinearImplicitSystem & operator= (NonlinearImplicitSystem &&) = delete;
   virtual ~NonlinearImplicitSystem ();
 
   /**
