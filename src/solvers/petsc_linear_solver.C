@@ -450,53 +450,64 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
                                     &subprecond);
       LIBMESH_CHKERR(ierr);
 
-      /* Since removing columns of the matrix changes the equation
-         system, we will now change the right hand side to compensate
-         for this.  Note that this is not necessary if \p SUBSET_ZERO
-         has been selected.  */
+      // Since removing columns of the matrix changes the equation
+      // system, we will now change the right hand side to compensate
+      // for this.  Note that this is not necessary if \p SUBSET_ZERO
+      // has been selected.
       if (_subset_solve_mode!=SUBSET_ZERO)
         {
           this->create_complement_is(rhs_in);
           PetscInt is_complement_local_size =
-            cast_int<PetscInt>(rhs_in.local_size()-is_local_size);
+            cast_int<PetscInt>(rhs_in.local_size() - is_local_size);
 
-          Vec subvec1 = nullptr;
-          Mat submat1 = nullptr;
-          VecScatter scatter1 = nullptr;
+          // Create Vec
+          // Note: we define and then immediately call a lambda in
+          // order to build a unique_ptr which will automatically
+          // clean up the Vec.
+          auto subvec1 = [&]()
+            {
+              Vec tmp;
+              ierr = VecCreate(this->comm().get(), &tmp);
+              LIBMESH_CHKERR(ierr);
+              ierr = VecSetSizes(tmp, is_complement_local_size, PETSC_DECIDE);
+              LIBMESH_CHKERR(ierr);
+              ierr = VecSetFromOptions(tmp);
+              LIBMESH_CHKERR(ierr);
+              return std::unique_ptr<Vec, VecDeleter>(&tmp);
+            }();
 
-          ierr = VecCreate(this->comm().get(),&subvec1);
-          LIBMESH_CHKERR(ierr);
-          ierr = VecSetSizes(subvec1,is_complement_local_size,PETSC_DECIDE);
-          LIBMESH_CHKERR(ierr);
-          ierr = VecSetFromOptions(subvec1);
+          // Create VecScatter and scatter and use it to scatter values into subvec1
+          auto scatter1 = [&]()
+            {
+              VecScatter tmp;
+              ierr = VecScatterCreate(rhs->vec(), *_restrict_solve_to_is_complement, *subvec1, nullptr, &tmp);
+              LIBMESH_CHKERR(ierr);
+              ierr = VecScatterBegin(tmp, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), *subvec1, INSERT_VALUES, SCATTER_FORWARD);
+              LIBMESH_CHKERR(ierr);
+              ierr = VecScatterEnd(tmp, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), *subvec1, INSERT_VALUES, SCATTER_FORWARD);
+              LIBMESH_CHKERR(ierr);
+              return std::unique_ptr<VecScatter, VecScatterDeleter>(&tmp);
+            }();
+
+          // v *= -1
+          ierr = VecScale(*subvec1, -1.0);
           LIBMESH_CHKERR(ierr);
 
-          ierr = VecScatterCreate(rhs->vec(), *_restrict_solve_to_is_complement, subvec1, nullptr, &scatter1);
-          LIBMESH_CHKERR(ierr);
+          // Create Mat
+          auto submat1 = [&]()
+            {
+              Mat tmp;
+              ierr = LibMeshCreateSubMatrix(matrix->mat(),
+                                            *_restrict_solve_to_is,
+                                            *_restrict_solve_to_is_complement,
+                                            MAT_INITIAL_MATRIX,
+                                            &tmp);
+              LIBMESH_CHKERR(ierr);
+              return std::unique_ptr<Mat, MatDeleter>(&tmp);
+            }();
 
-          ierr = VecScatterBegin(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
-          LIBMESH_CHKERR(ierr);
-          ierr = VecScatterEnd(scatter1,_subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(),subvec1,INSERT_VALUES,SCATTER_FORWARD);
-          LIBMESH_CHKERR(ierr);
-
-          ierr = VecScale(subvec1,-1.0);
-          LIBMESH_CHKERR(ierr);
-
-          ierr = LibMeshCreateSubMatrix(matrix->mat(),
-                                        *_restrict_solve_to_is,
-                                        *_restrict_solve_to_is_complement,
-                                        MAT_INITIAL_MATRIX,
-                                        &submat1);
-          LIBMESH_CHKERR(ierr);
-
-          ierr = MatMultAdd(submat1,subvec1,subrhs,subrhs);
-          LIBMESH_CHKERR(ierr);
-
-          ierr = VecScatterDestroy(&scatter1);
-          LIBMESH_CHKERR(ierr);
-          ierr = VecDestroy(&subvec1);
-          LIBMESH_CHKERR(ierr);
-          ierr = MatDestroy(&submat1);
+          // Compute subrhs = subrhs + (submat * subvec1)
+          ierr = MatMultAdd(*submat1, *subvec1, subrhs, subrhs);
           LIBMESH_CHKERR(ierr);
         }
       ierr = KSPSetOperators(*_ksp, submat, subprecond);

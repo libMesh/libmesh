@@ -308,6 +308,33 @@ private:
     }
   };
 
+  struct VecDeleter
+  {
+    void operator()(Vec * vec)
+    {
+      PetscErrorCode ierr = VecDestroy(vec);
+      LIBMESH_CHKERR(ierr);
+    }
+  };
+
+  struct MatDeleter
+  {
+    void operator()(Mat * mat)
+    {
+      PetscErrorCode ierr = MatDestroy(mat);
+      LIBMESH_CHKERR(ierr);
+    }
+  };
+
+  struct VecScatterDeleter
+  {
+    void operator()(VecScatter * scatter)
+    {
+      PetscErrorCode ierr = VecScatterDestroy(scatter);
+      LIBMESH_CHKERR(ierr);
+    }
+  };
+
   /**
    * Krylov subspace context
    */
