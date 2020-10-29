@@ -130,15 +130,6 @@ public:
   void parallel_sync ();
 };
 
-#if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
-/**
- * Dummy function that does nothing but can be used to prohibit
- * compiler optimization in some situations where some compilers
- * have optimization bugs.
- */
-void _dummy_function(void);
-#endif
-
 }
 
 
