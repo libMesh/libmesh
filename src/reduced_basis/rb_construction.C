@@ -54,6 +54,8 @@
 #include <fstream>
 #include <sstream>
 #include <limits>
+#include <stdlib.h> // mkstemps on Linux
+#include <unistd.h> // mkstemps on MacOS
 
 namespace libMesh
 {
@@ -618,49 +620,51 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
   const MeshBase & mesh = this->get_mesh();
 
   // First add any node-based terms (e.g. point loads)
-  // We only enter this loop if we have at least one
-  // nodeset, since we use nodesets to indicate
-  // where to impose the node-based terms.
-  if (mesh.get_boundary_info().n_nodeset_conds() > 0)
+
+  // Make a std::set of all the nodes that are in 1 or more
+  // nodesets. We only want to call get_nodal_values() once per Node
+  // per ElemAssembly object, regardless of how many nodesets it
+  // appears in.
+  std::set<dof_id_type> nodes_with_nodesets;
+  for (const auto & t : mesh.get_boundary_info().build_node_list())
+    nodes_with_nodesets.insert(std::get<0>(t));
+
+  for (const auto & id : nodes_with_nodesets)
     {
-      // build_node_list() returns a vector of (node-id, bc-id) tuples.
-      for (const auto & t : mesh.get_boundary_info().build_node_list())
+      const Node & node = mesh.node_ref(id);
+
+      // If node is on this processor, then all dofs on node are too
+      // so we can do the add below safely
+      if (node.processor_id() == this->comm().rank())
         {
-          const Node & node = mesh.node_ref(std::get<0>(t));
+          // Get the values to add to the rhs vector
+          std::vector<dof_id_type> nodal_dof_indices;
+          DenseMatrix<Number> nodal_matrix;
+          DenseVector<Number> nodal_rhs;
+          elem_assembly->get_nodal_values(nodal_dof_indices,
+                                          nodal_matrix,
+                                          nodal_rhs,
+                                          *this,
+                                          node);
 
-          // If node is on this processor, then all dofs on node are too
-          // so we can do the add below safely
-          if (node.processor_id() == this->comm().rank())
+          // Perform any required user-defined postprocessing on
+          // the matrix and rhs.
+          //
+          // TODO: We need to postprocess node matrices and vectors
+          // in some cases (e.g. when rotations are applied to
+          // nodes), but since we don't have a FEMContext at this
+          // point we would need to have a different interface
+          // taking the DenseMatrix, DenseVector, and probably the
+          // current node that we are on...
+          // this->post_process_elem_matrix_and_vector(nodal_matrix, nodal_rhs);
+
+          if (!nodal_dof_indices.empty())
             {
-              // Get the values to add to the rhs vector
-              std::vector<dof_id_type> nodal_dof_indices;
-              DenseMatrix<Number> nodal_matrix;
-              DenseVector<Number> nodal_rhs;
-              elem_assembly->get_nodal_values(nodal_dof_indices,
-                                              nodal_matrix,
-                                              nodal_rhs,
-                                              *this,
-                                              node);
+              if (assemble_vector)
+                input_vector->add_vector(nodal_rhs, nodal_dof_indices);
 
-              // Perform any required user-defined postprocessing on
-              // the matrix and rhs.
-              //
-              // TODO: We need to postprocess node matrices and vectors
-              // in some cases (e.g. when rotations are applied to
-              // nodes), but since we don't have a FEMContext at this
-              // point we would need to have a different interface
-              // taking the DenseMatrix, DenseVector, and probably the
-              // current node that we are on...
-              // this->post_process_elem_matrix_and_vector(nodal_matrix, nodal_rhs);
-
-              if (!nodal_dof_indices.empty())
-                {
-                  if (assemble_vector)
-                    input_vector->add_vector(nodal_rhs, nodal_dof_indices);
-
-                  if (assemble_matrix)
-                    input_matrix->add_matrix(nodal_matrix, nodal_dof_indices);
-                }
+              if (assemble_matrix)
+                input_matrix->add_matrix(nodal_matrix, nodal_dof_indices);
             }
         }
     }
@@ -1241,6 +1245,40 @@ void RBConstruction::enrich_basis_from_rhs_terms(const bool resize_rb_eval_data)
             check_convergence(*get_linear_solver());
         }
 
+      // Debugging: enable this code to print the rhs that was used in
+      // the most recent truth solve to a uniquely-named file.
+      if (false)
+        {
+          char temp_file[] = "truth_rhs_XXXXXX.dat";
+          int fd = mkstemps(temp_file, 4);
+          if (fd != -1)
+            {
+              libMesh::out << "Writing truth system rhs to file: " << temp_file << std::endl;
+              rhs->print_matlab(std::string(temp_file));
+            }
+        }
+
+      // Debugging: enable this code to print the most recent truth
+      // solution to a uniquely-named file.
+#ifdef LIBMESH_HAVE_EXODUS_API
+      if (false)
+        {
+          // Note: mkstemps creates a file and returns an open file descriptor to it.
+          // The filename is created from a template which must have 6 'X' characters followed
+          // by a suffix having the specified length (in this case 4, for ".exo").
+          char temp_file[] = "truth_XXXXXX.exo";
+          int fd = mkstemps(temp_file, 4);
+          if (fd != -1)
+            {
+              libMesh::out << "Writing truth solution to file: " << temp_file << std::endl;
+              ExodusII_IO exo_io(this->get_mesh());
+              std::set<std::string> system_names = {this->name()};
+              exo_io.write_equation_systems(std::string(temp_file),
+                                            this->get_equation_systems(), &system_names);
+            }
+        }
+#endif
+
       // Call user-defined post-processing routines on the truth solution.
       post_process_truth_solution();
 
@@ -1466,18 +1504,14 @@ Real RBConstruction::truth_solve(int plot_solution)
           get_output_vector(n,q_l)->dot(*solution);
     }
 
+#ifdef LIBMESH_HAVE_EXODUS_API
   if (plot_solution > 0)
     {
-#if defined(LIBMESH_USE_COMPLEX_NUMBERS)
-      GMVIO(get_mesh()).write_equation_systems ("truth.gmv",
-                                                this->get_equation_systems());
-#else
-#ifdef LIBMESH_HAVE_EXODUS_API
-      ExodusII_IO(get_mesh()).write_equation_systems ("truth.e",
-                                                      this->get_equation_systems());
-#endif
-#endif
+      ExodusII_IO exo_io(this->get_mesh());
+      std::set<std::string> system_names = {this->name()};
+      exo_io.write_equation_systems("truth.exo", this->get_equation_systems(), &system_names);
     }
+#endif
 
   // Get the X norm of the truth solution
   // Useful for normalizing our true error data
