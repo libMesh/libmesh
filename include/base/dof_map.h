@@ -523,6 +523,20 @@ public:
     return _sp->get_n_oz();
   }
 
+
+  /**
+   * \returns A constant pointer to the sparsity pattern stored here,
+   * once that has been computed.  Returns null if no sparsity pattern
+   * has yet been computed.
+   *
+   * If need_full_sparsity_pattern is false, the "sparsity pattern"
+   * may only own n_nz and n_oz lists.
+   */
+  const SparsityPattern::Build * get_sparsity_pattern() const
+  {
+    return _sp.get();
+  }
+
   // /**
   //  * Add an unknown of order \p order and finite element type
   //  * \p type to the system of equations.
