@@ -642,13 +642,13 @@ template<>
 bool FunctionParserADBase<long double>::JITCompile() { return JITCompileHelper("long double"); }
 
 template<typename Value_t>
-std::string FunctionParserADBase<Value_t>::JITCodeHash(const std::string & Value_t_name)
+FParserJIT::Hash FunctionParserADBase<Value_t>::JITCodeHash(const std::string & Value_t_name)
 {
   FParserJIT::Hash hasher;
   hasher.addData(std::string("version 2.0"));
   hasher.addData(this->mData->mByteCode);
   hasher.addData(Value_t_name);
-  return hasher.get();
+  return hasher;
 }
 
 template<typename Value_t>
@@ -667,7 +667,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
     return false;
 
   // compute SHA1 hash of the function
-  std::string hash = JITCodeHash(Value_t_name);
+  std::string hash = JITCodeHash(Value_t_name).get();
 #ifndef NDEBUG
   hash += "_dbg";
 #endif

@@ -9,6 +9,11 @@
 template<typename Value_t>
 class ADImplementation;
 
+namespace FParserJIT
+{
+  class Hash;
+}
+
 template<typename Value_t>
 class FunctionParserADBase : public FunctionParserBase<Value_t>
 {
@@ -138,7 +143,7 @@ protected:
 
 #if LIBMESH_HAVE_FPARSER_JIT
   /// return a SHA1 hash for the current bytecode and value type name
-  std::string JITCodeHash(const std::string & value_type_name);
+  FParserJIT::Hash JITCodeHash(const std::string & value_type_name);
 
   /// write generated C++ code to stream
   bool JITCodeGen(std::ostream & ccout, const std::string & fname, const std::string & Value_t_name);
