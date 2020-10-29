@@ -86,6 +86,34 @@ public:
          const bool implicit_neighbor_dofs_in,
          const bool need_full_sparsity_pattern_in);
 
+  Build (Build & other, Threads::split);
+
+  void operator()(const ConstElemRange & range);
+
+  void join (const Build & other);
+
+  void parallel_sync ();
+
+  const SparsityPattern::Graph & get_sparsity_pattern() const
+  { return sparsity_pattern; }
+
+  const SparsityPattern::NonlocalGraph & get_nonlocal_pattern() const
+  { return nonlocal_pattern; }
+
+  /**
+   * The number of on-processor nonzeros in my portion of the
+   * global matrix.
+   */
+  const std::vector<dof_id_type> & get_n_nz() const
+  { return n_nz; }
+
+  /**
+   * The number of off-processor nonzeros in my portion of the
+   * global matrix.
+   */
+  const std::vector<dof_id_type> & get_n_oz() const
+  { return n_oz; }
+
 private:
   const DofMap & dof_map;
   const CouplingMatrix * dof_coupling;
@@ -114,18 +142,12 @@ private:
 public:
 
   SparsityPattern::Graph sparsity_pattern;
+
   SparsityPattern::NonlocalGraph nonlocal_pattern;
 
   std::vector<dof_id_type> n_nz;
+
   std::vector<dof_id_type> n_oz;
-
-  Build (Build & other, Threads::split);
-
-  void operator()(const ConstElemRange & range);
-
-  void join (const Build & other);
-
-  void parallel_sync ();
 };
 
 }
