@@ -105,7 +105,7 @@ DofMap::build_sparsity (const MeshBase & mesh) const
   const processor_id_type proc_id        = mesh.processor_id();
   const dof_id_type n_dofs_on_proc = this->n_dofs_on_processor(proc_id);
 #endif
-  libmesh_assert_equal_to (sp->sparsity_pattern.size(), n_dofs_on_proc);
+  libmesh_assert_equal_to (sp->get_sparsity_pattern().size(), n_dofs_on_proc);
 
   // Check to see if we have any extra stuff to add to the sparsity_pattern
   if (_extra_sparsity_function)
@@ -118,14 +118,12 @@ DofMap::build_sparsity (const MeshBase & mesh) const
                        << std::endl;
         }
 
-      _extra_sparsity_function
-        (sp->sparsity_pattern, sp->n_nz,
-         sp->n_oz, _extra_sparsity_context);
+      sp->apply_extra_sparsity_function(_extra_sparsity_function,
+                                        _extra_sparsity_context);
     }
 
   if (_augment_sparsity_pattern)
-    _augment_sparsity_pattern->augment_sparsity_pattern
-      (sp->sparsity_pattern, sp->n_nz, sp->n_oz);
+    sp->apply_extra_sparsity_object(*_augment_sparsity_pattern);
 
   return sp;
 }
@@ -298,7 +296,7 @@ void DofMap::attach_matrix (SparseMatrix<Number> & matrix)
       libmesh_assert(need_full_sparsity_pattern);
       libmesh_assert(_sp.get());
 
-      matrix.update_sparsity_pattern (_sp->sparsity_pattern);
+      matrix.update_sparsity_pattern (_sp->get_sparsity_pattern());
     }
 
   if (matrix.need_full_sparsity_pattern())

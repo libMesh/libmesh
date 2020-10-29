@@ -193,21 +193,10 @@ public:
   ~DofMap();
 
   /**
-   * Abstract base class to be used to add user-defined implicit
-   * degree of freedom couplings.
+   * Backwards compatibility for prior AugmentSparsityPattern users.
    */
-  class AugmentSparsityPattern
-  {
-  public:
-    virtual ~AugmentSparsityPattern () {}
-
-    /**
-     * User-defined function to augment the sparsity pattern.
-     */
-    virtual void augment_sparsity_pattern (SparsityPattern::Graph & sparsity,
-                                           std::vector<dof_id_type> & n_nz,
-                                           std::vector<dof_id_type> & n_oz) = 0;
-  };
+  class AugmentSparsityPattern : public SparsityPattern::AugmentSparsityPattern
+  {};
 
   /**
    * Abstract base class to be used to add user-defined parallel
@@ -412,7 +401,7 @@ public:
    *
    * This is an advanced function... use at your own peril!
    */
-  void attach_extra_sparsity_object (DofMap::AugmentSparsityPattern & asp)
+  void attach_extra_sparsity_object (SparsityPattern::AugmentSparsityPattern & asp)
   {
     _augment_sparsity_pattern = &asp;
   }
@@ -1667,7 +1656,7 @@ private:
   /**
    * Function object to call to add extra entries to the sparsity pattern
    */
-  AugmentSparsityPattern * _augment_sparsity_pattern;
+  SparsityPattern::AugmentSparsityPattern * _augment_sparsity_pattern;
 
   /**
    * A function pointer to a function to call to add extra entries to the sparsity pattern
