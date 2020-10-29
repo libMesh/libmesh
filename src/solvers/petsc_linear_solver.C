@@ -453,7 +453,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
 
           // Create Vec
           // Note: we can't use libmesh_make_unique for a type with a custom deleter.
-          std::unique_ptr<Vec, VecDeleter> subvec1(new Vec);
+          petsc_unique_ptr<Vec> subvec1(new Vec);
           ierr = VecCreate(this->comm().get(), subvec1.get());
           LIBMESH_CHKERR(ierr);
           ierr = VecSetSizes(*subvec1, is_complement_local_size, PETSC_DECIDE);
@@ -462,7 +462,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
           LIBMESH_CHKERR(ierr);
 
           // Create VecScatter
-          std::unique_ptr<VecScatter, VecScatterDeleter> scatter1(new VecScatter);
+          petsc_unique_ptr<VecScatter> scatter1(new VecScatter);
           ierr = VecScatterCreate(rhs->vec(), *_restrict_solve_to_is_complement, *subvec1, nullptr, scatter1.get());
           LIBMESH_CHKERR(ierr);
 
@@ -477,7 +477,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
           LIBMESH_CHKERR(ierr);
 
           // Create Mat
-          std::unique_ptr<Mat, MatDeleter> submat1(new Mat);
+          petsc_unique_ptr<Mat> submat1(new Mat);
           ierr = LibMeshCreateSubMatrix(matrix->mat(),
                                         *_restrict_solve_to_is,
                                         *_restrict_solve_to_is_complement,

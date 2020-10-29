@@ -26,6 +26,7 @@
 
 #include "libmesh/petsc_macro.h"
 #include "libmesh/petsc_solver_exception.h"
+#include "libmesh/petsc_unique_ptr.h" // petsc_unique_ptr
 
 // Petsc include files.
 #ifdef I
@@ -285,74 +286,22 @@ private:
   PC _pc;
 
   /**
-   * Custom deleter objects, to be used whenever unique_ptrs to PETSc
-   * objects go out of scope or are reset(). Just calls the
-   * corresponding PETSc "XXXDestroy" function and checks the return
-   * value. If these structs are generally useful outside of this
-   * class, they could be moved to e.g. petsc_macro.h instead.
-   */
-  struct KSPDeleter
-  {
-    void operator()(KSP * ksp)
-    {
-      PetscErrorCode ierr = KSPDestroy(ksp);
-      LIBMESH_CHKERR(ierr);
-    }
-  };
-
-  struct ISDeleter
-  {
-    void operator()(IS * is)
-    {
-      PetscErrorCode ierr = ISDestroy(is);
-      LIBMESH_CHKERR(ierr);
-    }
-  };
-
-  struct VecDeleter
-  {
-    void operator()(Vec * vec)
-    {
-      PetscErrorCode ierr = VecDestroy(vec);
-      LIBMESH_CHKERR(ierr);
-    }
-  };
-
-  struct MatDeleter
-  {
-    void operator()(Mat * mat)
-    {
-      PetscErrorCode ierr = MatDestroy(mat);
-      LIBMESH_CHKERR(ierr);
-    }
-  };
-
-  struct VecScatterDeleter
-  {
-    void operator()(VecScatter * scatter)
-    {
-      PetscErrorCode ierr = VecScatterDestroy(scatter);
-      LIBMESH_CHKERR(ierr);
-    }
-  };
-
-  /**
    * Krylov subspace context
    */
-  std::unique_ptr<KSP, KSPDeleter> _ksp;
+  petsc_unique_ptr<KSP> _ksp;
 
   /**
    * PETSc index set containing the dofs on which to solve (\p nullptr
    * means solve on all dofs).
    */
-  std::unique_ptr<IS, ISDeleter> _restrict_solve_to_is;
+  petsc_unique_ptr<IS> _restrict_solve_to_is;
 
   /**
    * PETSc index set, complement to \p _restrict_solve_to_is.  This
    * will be created on demand by the method \p
    * _create_complement_is().
    */
-  std::unique_ptr<IS, ISDeleter> _restrict_solve_to_is_complement;
+  petsc_unique_ptr<IS> _restrict_solve_to_is_complement;
 
   /**
    * \returns The local size of \p _restrict_solve_to_is.
