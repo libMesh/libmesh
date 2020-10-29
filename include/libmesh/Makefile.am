@@ -245,6 +245,7 @@ BUILT_SOURCES = \
         petsc_preconditioner.h \
         petsc_shell_matrix.h \
         petsc_solver_exception.h \
+        petsc_unique_ptr.h \
         petsc_vector.h \
         preconditioner.h \
         raw_accessor.h \
@@ -1266,6 +1267,9 @@ petsc_shell_matrix.h: $(top_srcdir)/include/numerics/petsc_shell_matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_solver_exception.h: $(top_srcdir)/include/numerics/petsc_solver_exception.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+petsc_unique_ptr.h: $(top_srcdir)/include/numerics/petsc_unique_ptr.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_vector.h: $(top_srcdir)/include/numerics/petsc_vector.h
