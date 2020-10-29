@@ -32,7 +32,6 @@ namespace libMesh
 {
 
 // Forward declarations
-class MeshBase;
 class DofMap;
 class CouplingMatrix;
 
@@ -80,8 +79,14 @@ static void sort_row (const BidirectionalIterator begin,
  */
 class Build : public ParallelObject
 {
+public:
+  Build (const DofMap & dof_map_in,
+         const CouplingMatrix * dof_coupling_in,
+         const std::set<GhostingFunctor *> & coupling_functors_in,
+         const bool implicit_neighbor_dofs_in,
+         const bool need_full_sparsity_pattern_in);
+
 private:
-  const MeshBase & mesh;
   const DofMap & dof_map;
   const CouplingMatrix * dof_coupling;
   const std::set<GhostingFunctor *> & coupling_functors;
@@ -113,13 +118,6 @@ public:
 
   std::vector<dof_id_type> n_nz;
   std::vector<dof_id_type> n_oz;
-
-  Build (const MeshBase & mesh_in,
-         const DofMap & dof_map_in,
-         const CouplingMatrix * dof_coupling_in,
-         const std::set<GhostingFunctor *> & coupling_functors_in,
-         const bool implicit_neighbor_dofs_in,
-         const bool need_full_sparsity_pattern_in);
 
   Build (Build & other, Threads::split);
 

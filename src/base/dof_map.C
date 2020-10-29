@@ -89,8 +89,7 @@ DofMap::build_sparsity (const MeshBase & mesh) const
   // the number of nonzeros per row can be estimated from the
   // sparsity patterns created on each thread.
   auto sp = libmesh_make_unique<SparsityPattern::Build>
-    (mesh,
-     *this,
+    (*this,
      this->_dof_coupling,
      this->_coupling_functors,
      implicit_neighbor_dofs,
