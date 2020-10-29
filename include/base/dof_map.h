@@ -214,11 +214,19 @@ public:
   };
 
   /**
-   * Additional matrices may be handled with this \p DofMap.
+   * Additional matrices may be attached to this \p DofMap.
    * They are initialized to the same sparsity structure as
    * the major matrix.
    */
   void attach_matrix (SparseMatrix<Number> & matrix);
+
+  /**
+   * Additional matrices may be be temporarily initialized by this \p
+   * DofMap.
+   * They are initialized to the same sparsity structure as
+   * the major matrix.
+   */
+  void update_sparsity_pattern(SparseMatrix<Number> & matrix) const;
 
   /**
    * Matrices should not be attached more than once.  We can test for
@@ -239,6 +247,11 @@ public:
    * preallocation of sparse matrices.
    */
   void compute_sparsity (const MeshBase &);
+
+  /**
+   * Returns true iff a sparsity pattern has already been computed.
+   */
+  bool computed_sparsity_already () const;
 
   /**
    * Clears the sparsity pattern
@@ -493,8 +506,8 @@ public:
    */
   const std::vector<dof_id_type> & get_n_nz() const
   {
-    libmesh_assert(_n_nz);
-    return *_n_nz;
+    libmesh_assert(_sp);
+    return _sp->get_n_nz();
   }
 
   /**
@@ -506,8 +519,8 @@ public:
    */
   const std::vector<dof_id_type> & get_n_oz() const
   {
-    libmesh_assert(_n_oz);
-    return *_n_oz;
+    libmesh_assert(_sp);
+    return _sp->get_n_oz();
   }
 
   // /**
@@ -1737,24 +1750,11 @@ private:
   bool need_full_sparsity_pattern;
 
   /**
-   * The sparsity pattern of the global matrix, kept around if it
-   * might be needed by future additions of the same type of matrix.
+   * The sparsity pattern of the global matrix.  If
+   * need_full_sparsity_pattern is true, we save the entire sparse
+   * graph here.  Otherwise we save just the n_nz and n_oz vectors.
    */
   std::unique_ptr<SparsityPattern::Build> _sp;
-
-  /**
-   * The number of on-processor nonzeros in my portion of the
-   * global matrix.  If need_full_sparsity_pattern is true, this will
-   * just be a pointer into the corresponding sparsity pattern vector.
-   * Otherwise we have to new/delete it ourselves.
-   */
-  std::vector<dof_id_type> * _n_nz;
-
-  /**
-   * The number of off-processor nonzeros in my portion of the
-   * global matrix; allocated similar to _n_nz.
-   */
-  std::vector<dof_id_type> * _n_oz;
 
   /**
    * Total number of degrees of freedom.
