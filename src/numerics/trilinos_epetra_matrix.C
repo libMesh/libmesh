@@ -82,8 +82,8 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph & sp
   libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->NumGlobalPoints()), m);
   libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->MaxAllGID()+1), m);
 
-  const std::vector<numeric_index_type> & n_nz = this->_dof_map->get_n_nz();
-  const std::vector<numeric_index_type> & n_oz = this->_dof_map->get_n_oz();
+  const std::vector<numeric_index_type> & n_nz = this->_sp->get_n_nz();
+  const std::vector<numeric_index_type> & n_oz = this->_sp->get_n_oz();
 
   // Make sure the sparsity pattern isn't empty
   libmesh_assert_equal_to (n_nz.size(), n_l);

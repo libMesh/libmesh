@@ -43,7 +43,10 @@ namespace libMesh
 template <typename T> class SparseMatrix;
 template <typename T> class DenseMatrix;
 class DofMap;
-namespace SparsityPattern { class Graph; }
+namespace SparsityPattern {
+  class Build;
+  class Graph;
+}
 template <typename T> class NumericVector;
 
 // This template helper function must be declared before it
@@ -106,10 +109,22 @@ public:
   virtual bool initialized() const { return _is_initialized; }
 
   /**
-   * Get a pointer to the \p DofMap to use.
+   * Set a pointer to the \p DofMap to use.  If a separate sparsity
+   * pattern is not being used, use the one from the DofMap.
+   *
+   * The lifetime of \p dof_map must exceed the lifetime of \p this.
    */
-  void attach_dof_map (const DofMap & dof_map)
-  { _dof_map = &dof_map; }
+  void attach_dof_map (const DofMap & dof_map);
+
+  /**
+   * Set a pointer to a sparsity pattern to use.  Useful in cases
+   * where a matrix requires a wider (or for efficiency narrower)
+   * pattern than most matrices in the system, or in cases where no
+   * system sparsity pattern is being calculated by the DofMap.
+   *
+   * The lifetime of \p sp must exceed the lifetime of \p this.
+   */
+  void attach_sparsity_pattern (const SparsityPattern::Build & sp);
 
   /**
    * \returns \p true if this sparse matrix format needs to be fed the
@@ -473,9 +488,17 @@ protected:
   }
 
   /**
-   * The \p DofMap object associated with this object.
+   * The \p DofMap object associated with this object.  May be queried
+   * for degree-of-freedom counts on processors.
    */
   DofMap const * _dof_map;
+
+  /**
+   * The \p sparsity pattern associated with this object.  Should be
+   * queried for entry counts (or with need_full_sparsity_pattern,
+   * patterns) when needed.
+   */
+  SparsityPattern::Build const * _sp;
 
   /**
    * Flag indicating whether or not the matrix has been initialized.

@@ -303,15 +303,20 @@ void DofMap::update_sparsity_pattern(SparseMatrix<Number> & matrix) const
   // If we've already computed sparsity, then it's too late
   // to wait for "compute_sparsity" to help with sparse matrix
   // initialization, and we need to handle this matrix individually
-  if (matrix.need_full_sparsity_pattern() &&
-      this->computed_sparsity_already())
+  if (this->computed_sparsity_already())
     {
-      // We'd better have already computed the full sparsity pattern
-      // if we need it here
-      libmesh_assert(need_full_sparsity_pattern);
       libmesh_assert(_sp.get());
 
-      matrix.update_sparsity_pattern (_sp->get_sparsity_pattern());
+      if (matrix.need_full_sparsity_pattern())
+        {
+          // We'd better have already computed the full sparsity
+          // pattern if we need it here
+          libmesh_assert(need_full_sparsity_pattern);
+
+          matrix.update_sparsity_pattern (_sp->get_sparsity_pattern());
+        }
+
+      matrix.attach_sparsity_pattern(*_sp);
     }
 }
 

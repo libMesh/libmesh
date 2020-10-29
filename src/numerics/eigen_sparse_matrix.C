@@ -87,12 +87,12 @@ void EigenSparseMatrix<T>::init (const ParallelType)
   libmesh_assert_equal_to (m_l, n_rows);
   libmesh_assert_equal_to (n_l, n_cols);
 
-  const std::vector<numeric_index_type> & n_nz = this->_dof_map->get_n_nz();
+  const std::vector<numeric_index_type> & n_nz = this->_sp->get_n_nz();
 
 #ifndef NDEBUG
   // The following variables are only used for assertions,
   // so avoid declaring them when asserts are inactive.
-  const std::vector<numeric_index_type> & n_oz = this->_dof_map->get_n_oz();
+  const std::vector<numeric_index_type> & n_oz = this->_sp->get_n_oz();
 #endif
 
   // Make sure the sparsity pattern isn't empty

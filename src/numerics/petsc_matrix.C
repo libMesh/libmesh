@@ -352,8 +352,8 @@ void PetscMatrix<T>::init (const ParallelType)
   const numeric_index_type m_l  = n_l;
 
 
-  const std::vector<numeric_index_type> & n_nz = this->_dof_map->get_n_nz();
-  const std::vector<numeric_index_type> & n_oz = this->_dof_map->get_n_oz();
+  const std::vector<numeric_index_type> & n_nz = this->_sp->get_n_nz();
+  const std::vector<numeric_index_type> & n_oz = this->_sp->get_n_oz();
 
   // Make sure the sparsity pattern isn't empty unless the matrix is 0x0
   libmesh_assert_equal_to (n_nz.size(), m_l);

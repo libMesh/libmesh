@@ -173,8 +173,8 @@ void LaspackMatrix<T>::init (const ParallelType)
 #ifndef NDEBUG
   // The following variables are only used for assertions,
   // so avoid declaring them when asserts are inactive.
-  const std::vector<numeric_index_type> & n_nz = this->_dof_map->get_n_nz();
-  const std::vector<numeric_index_type> & n_oz = this->_dof_map->get_n_oz();
+  const std::vector<numeric_index_type> & n_nz = this->_sp->get_n_nz();
+  const std::vector<numeric_index_type> & n_oz = this->_sp->get_n_oz();
 #endif
 
   // Make sure the sparsity pattern isn't empty
