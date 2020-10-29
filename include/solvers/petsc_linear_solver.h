@@ -42,6 +42,7 @@
 // C++ includes
 #include <cstddef>
 #include <vector>
+#include <memory>
 
 //--------------------------------------------------------------------
 // Functions with C linkage to pass to PETSc.  PETSc will call these
@@ -105,7 +106,7 @@ public:
   /**
    * Destructor.
    */
-  ~PetscLinearSolver ();
+  virtual ~PetscLinearSolver () = default;
 
   /**
    * Release all memory and clear data structures.
@@ -233,7 +234,7 @@ public:
    * This is useful if you are for example setting a custom
    * convergence test with KSPSetConvergenceTest().
    */
-  KSP ksp() { this->init(); return _ksp; }
+  KSP ksp();
 
   /**
    * Fills the input vector with the sequence of residual norms
@@ -284,34 +285,86 @@ private:
   PC _pc;
 
   /**
+   * Custom deleter objects, to be used whenever unique_ptrs to PETSc
+   * objects go out of scope or are reset(). Just calls the
+   * corresponding PETSc "XXXDestroy" function and checks the return
+   * value. If these structs are generally useful outside of this
+   * class, they could be moved to e.g. petsc_macro.h instead.
+   */
+  struct KSPDeleter
+  {
+    void operator()(KSP * ksp)
+    {
+      PetscErrorCode ierr = KSPDestroy(ksp);
+      LIBMESH_CHKERR(ierr);
+    }
+  };
+
+  struct ISDeleter
+  {
+    void operator()(IS * is)
+    {
+      PetscErrorCode ierr = ISDestroy(is);
+      LIBMESH_CHKERR(ierr);
+    }
+  };
+
+  struct VecDeleter
+  {
+    void operator()(Vec * vec)
+    {
+      PetscErrorCode ierr = VecDestroy(vec);
+      LIBMESH_CHKERR(ierr);
+    }
+  };
+
+  struct MatDeleter
+  {
+    void operator()(Mat * mat)
+    {
+      PetscErrorCode ierr = MatDestroy(mat);
+      LIBMESH_CHKERR(ierr);
+    }
+  };
+
+  struct VecScatterDeleter
+  {
+    void operator()(VecScatter * scatter)
+    {
+      PetscErrorCode ierr = VecScatterDestroy(scatter);
+      LIBMESH_CHKERR(ierr);
+    }
+  };
+
+  /**
    * Krylov subspace context
    */
-  KSP _ksp;
+  std::unique_ptr<KSP, KSPDeleter> _ksp;
 
   /**
    * PETSc index set containing the dofs on which to solve (\p nullptr
    * means solve on all dofs).
    */
-  IS _restrict_solve_to_is;
+  std::unique_ptr<IS, ISDeleter> _restrict_solve_to_is;
 
   /**
    * PETSc index set, complement to \p _restrict_solve_to_is.  This
    * will be created on demand by the method \p
    * _create_complement_is().
    */
-  IS _restrict_solve_to_is_complement;
+  std::unique_ptr<IS, ISDeleter> _restrict_solve_to_is_complement;
 
   /**
    * \returns The local size of \p _restrict_solve_to_is.
    */
-  PetscInt _restrict_solve_to_is_local_size() const;
+  PetscInt restrict_solve_to_is_local_size() const;
 
   /**
    * Creates \p _restrict_solve_to_is_complement to contain all
    * indices that are local in \p vec_in, except those that are
    * contained in \p _restrict_solve_to_is.
    */
-  void _create_complement_is (const NumericVector<T> & vec_in);
+  void create_complement_is (const NumericVector<T> & vec_in);
 
   /**
    * If restrict-solve-to-subset mode is active, this member decides
@@ -319,49 +372,6 @@ private:
    */
   SubsetSolveMode _subset_solve_mode;
 };
-
-
-/*----------------------- functions ----------------------------------*/
-template <typename T>
-inline
-PetscLinearSolver<T>::~PetscLinearSolver ()
-{
-  this->clear ();
-}
-
-
-
-template <typename T>
-inline PetscInt
-PetscLinearSolver<T>::_restrict_solve_to_is_local_size() const
-{
-  libmesh_assert(_restrict_solve_to_is);
-
-  PetscInt s;
-  int ierr = ISGetLocalSize(_restrict_solve_to_is, &s);
-  LIBMESH_CHKERR(ierr);
-
-  return s;
-}
-
-
-
-template <typename T>
-void
-PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> & vec_in)
-{
-  libmesh_assert(_restrict_solve_to_is);
-  if (_restrict_solve_to_is_complement==nullptr)
-    {
-      int ierr = ISComplement(_restrict_solve_to_is,
-                              vec_in.first_local_index(),
-                              vec_in.last_local_index(),
-                              &_restrict_solve_to_is_complement);
-      LIBMESH_CHKERR(ierr);
-    }
-}
-
-
 
 } // namespace libMesh
 
