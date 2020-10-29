@@ -1446,6 +1446,11 @@ public:
    */
   unsigned int sys_number() const;
 
+  /**
+   * Builds a sparsity pattern
+   */
+  std::unique_ptr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh) const;
+
 private:
 
   /**
@@ -1481,11 +1486,6 @@ private:
                           const DofObject & obj,
                           std::vector<dof_id_type> & di,
                           const unsigned int vn) const;
-
-  /**
-   * Builds a sparsity pattern
-   */
-  std::unique_ptr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh) const;
 
   /**
    * Invalidates all active DofObject dofs for this system
