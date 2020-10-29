@@ -66,6 +66,27 @@ static void sort_row (const BidirectionalIterator begin,
                       BidirectionalIterator       middle,
                       const BidirectionalIterator end);
 
+
+
+  /**
+   * Abstract base class to be used to add user-defined implicit
+   * degree of freedom couplings.
+   */
+  class AugmentSparsityPattern
+  {
+  public:
+    virtual ~AugmentSparsityPattern () {}
+
+    /**
+     * User-defined function to augment the sparsity pattern.
+     */
+    virtual void augment_sparsity_pattern (SparsityPattern::Graph & sparsity,
+                                           std::vector<dof_id_type> & n_nz,
+                                           std::vector<dof_id_type> & n_oz) = 0;
+  };
+
+
+
 /**
  * This helper class can be called on multiple threads to compute
  * the sparsity pattern (or graph) of the sparse matrix resulting
@@ -113,6 +134,21 @@ public:
    */
   const std::vector<dof_id_type> & get_n_oz() const
   { return n_oz; }
+
+  void apply_extra_sparsity_object(SparsityPattern::AugmentSparsityPattern & asp);
+
+  void apply_extra_sparsity_function(void (*func)(SparsityPattern::Graph & sparsity,
+                                                   std::vector<dof_id_type> & n_nz,
+                                                   std::vector<dof_id_type> & n_oz,
+                                                   void * context),
+                                      void * context)
+  { func(sparsity_pattern, n_nz, n_oz, context); }
+
+  void clear_full_sparsity()
+  {
+    sparsity_pattern.clear();
+    nonlocal_pattern.clear();
+  }
 
 private:
   const DofMap & dof_map;

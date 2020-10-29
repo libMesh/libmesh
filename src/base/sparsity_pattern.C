@@ -638,5 +638,11 @@ void Build::parallel_sync ()
 }
 
 
+void Build::apply_extra_sparsity_object(SparsityPattern::AugmentSparsityPattern & asp)
+{
+  asp.augment_sparsity_pattern (sparsity_pattern, n_nz, n_oz);
+}
+
+
 } // namespace SparsityPattern
 } // namespace libMesh
