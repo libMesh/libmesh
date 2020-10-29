@@ -138,7 +138,7 @@ protected:
 
 #if LIBMESH_HAVE_FPARSER_JIT
   /// return a SHA1 hash for the current bytecode and value type name
-  std::string JITCodeHash(const std::string & value_type_name);
+  std::size_t JITCodeHash(const std::string & value_type_name = "");
 
   /// write generated C++ code to stream
   bool JITCodeGen(std::ostream & ccout, const std::string & fname, const std::string & Value_t_name);
@@ -205,39 +205,12 @@ protected:
 
 #ifdef LIBMESH_HAVE_FPARSER_JIT
 
-/// Forward declare SHA1 hash object
-class SHA1;
-
 /// Namespacing the utility classes (rather than nesting them in a templated class)
 namespace FParserJIT
 {
-/// Simplified C++ interface to lib SHA1
-class Hash
-{
-public:
-  Hash();
-  ~Hash();
 
-  template <typename T>
-  void addData(const T & v);
-
-  std::string get();
-
-protected:
-  /// the actual lib SHA1 call is in the helper so that we don't need to make lib/sha1.h available
-  void addDataHelper(const char * start, std::size_t size);
-
-  SHA1 * _sha1;
-};
-
-template <typename T>
-void Hash::addData(const T & v)
-{
-  auto start = v.data();
-  std::size_t size = v.size() * sizeof(*start);
-  if (size > 0)
-    addDataHelper(reinterpret_cast<const char *>(start), size);
-}
+/// return a hex representation of the given hash
+std::string hashToString(std::size_t hash);
 
 /// Handle compilation, caching, and temporary files
 class Compiler
