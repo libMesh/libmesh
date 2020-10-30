@@ -25,6 +25,20 @@
 // libMesh includes
 #include "libmesh/petsc_solver_exception.h"
 
+// PETSc includes
+#ifdef I
+# define LIBMESH_SAW_I
+#endif
+
+#include <petscksp.h>
+#include <petscvec.h>
+#include <petscis.h>
+#include <petscmat.h>
+
+#ifndef LIBMESH_SAW_I
+# undef I // Avoid complex.h contamination
+#endif
+
 // C++ includes
 #include <memory>
 
