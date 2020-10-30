@@ -332,6 +332,15 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         nodes[2] = Point (0.,0.,0.);
         return;
       }
+    case EDGE4:
+      {
+        nodes.resize(4);
+        nodes[0] = Point (-1.,0.,0.);
+        nodes[1] = Point (1.,0.,0.);
+        nodes[2] = Point (-1./3.,0.,0.);
+        nodes[3] - Point (1./3.,0.,0.);
+        return;
+      }
     case TRI3:
     case TRISHELL3:
       {
