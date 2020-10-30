@@ -107,6 +107,20 @@ public:
          const bool implicit_neighbor_dofs_in,
          const bool need_full_sparsity_pattern_in);
 
+  /**
+   * Special functions.
+   * - The Build object holds references to DofMap and coupling
+   *   functors, therefore it can't be assigned.
+   */
+  Build (const Build &) = default;
+  Build & operator= (const Build &) = delete;
+  Build (Build &&) = default;
+  Build & operator= (Build &&) = delete;
+  ~Build () = default;
+
+  /**
+   * Splitting constructor, for use in multithreaded loops.
+   */
   Build (Build & other, Threads::split);
 
   void operator()(const ConstElemRange & range);
