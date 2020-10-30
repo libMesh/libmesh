@@ -833,6 +833,7 @@ include_HEADERS = \
         numerics/petsc_preconditioner.h \
         numerics/petsc_shell_matrix.h \
         numerics/petsc_solver_exception.h \
+        numerics/petsc_unique_ptr.h \
         numerics/petsc_vector.h \
         numerics/preconditioner.h \
         numerics/raw_accessor.h \
