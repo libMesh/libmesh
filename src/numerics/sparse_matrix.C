@@ -46,9 +46,25 @@ template <typename T>
 SparseMatrix<T>::SparseMatrix (const Parallel::Communicator & comm_in) :
   ParallelObject(comm_in),
   _dof_map(nullptr),
+  _sp(nullptr),
   _is_initialized(false)
 {}
 
+
+
+template <typename T>
+void SparseMatrix<T>::attach_dof_map (const DofMap & dof_map)
+{
+  _dof_map = &dof_map;
+}
+
+
+
+template <typename T>
+void SparseMatrix<T>::attach_sparsity_pattern (const SparsityPattern::Build & sp)
+{
+  _sp = &sp;
+}
 
 
 

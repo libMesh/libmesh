@@ -89,8 +89,7 @@ DofMap::build_sparsity (const MeshBase & mesh) const
   // the number of nonzeros per row can be estimated from the
   // sparsity patterns created on each thread.
   auto sp = libmesh_make_unique<SparsityPattern::Build>
-    (mesh,
-     *this,
+    (*this,
      this->_dof_coupling,
      this->_coupling_functors,
      implicit_neighbor_dofs,
@@ -106,7 +105,7 @@ DofMap::build_sparsity (const MeshBase & mesh) const
   const processor_id_type proc_id        = mesh.processor_id();
   const dof_id_type n_dofs_on_proc = this->n_dofs_on_processor(proc_id);
 #endif
-  libmesh_assert_equal_to (sp->sparsity_pattern.size(), n_dofs_on_proc);
+  libmesh_assert_equal_to (sp->get_sparsity_pattern().size(), n_dofs_on_proc);
 
   // Check to see if we have any extra stuff to add to the sparsity_pattern
   if (_extra_sparsity_function)
@@ -119,14 +118,12 @@ DofMap::build_sparsity (const MeshBase & mesh) const
                        << std::endl;
         }
 
-      _extra_sparsity_function
-        (sp->sparsity_pattern, sp->n_nz,
-         sp->n_oz, _extra_sparsity_context);
+      sp->apply_extra_sparsity_function(_extra_sparsity_function,
+                                        _extra_sparsity_context);
     }
 
   if (_augment_sparsity_pattern)
-    _augment_sparsity_pattern->augment_sparsity_pattern
-      (sp->sparsity_pattern, sp->n_nz, sp->n_oz);
+    sp->apply_extra_sparsity_object(*_augment_sparsity_pattern);
 
   return sp;
 }
@@ -157,8 +154,6 @@ DofMap::DofMap(const unsigned int number,
   _default_coupling(libmesh_make_unique<DefaultCoupling>()),
   _default_evaluating(libmesh_make_unique<DefaultCoupling>()),
   need_full_sparsity_pattern(false),
-  _n_nz(nullptr),
-  _n_oz(nullptr),
   _n_dfs(0),
   _n_SCALAR_dofs(0)
 #ifdef LIBMESH_ENABLE_AMR
@@ -282,28 +277,47 @@ void DofMap::attach_matrix (SparseMatrix<Number> & matrix)
 
   _matrices.push_back(&matrix);
 
+  this->update_sparsity_pattern(matrix);
+
+  if (matrix.need_full_sparsity_pattern())
+    need_full_sparsity_pattern = true;
+}
+
+
+
+bool DofMap::computed_sparsity_already() const
+{
+  bool computed_sparsity_already = _sp &&
+    (!_sp->get_n_nz().empty() ||
+     !_sp->get_n_oz().empty());
+  this->comm().max(computed_sparsity_already);
+  return computed_sparsity_already;
+}
+
+
+
+void DofMap::update_sparsity_pattern(SparseMatrix<Number> & matrix) const
+{
   matrix.attach_dof_map (*this);
 
   // If we've already computed sparsity, then it's too late
   // to wait for "compute_sparsity" to help with sparse matrix
   // initialization, and we need to handle this matrix individually
-  bool computed_sparsity_already =
-    ((_n_nz && !_n_nz->empty()) ||
-     (_n_oz && !_n_oz->empty()));
-  this->comm().max(computed_sparsity_already);
-  if (computed_sparsity_already &&
-      matrix.need_full_sparsity_pattern())
+  if (this->computed_sparsity_already())
     {
-      // We'd better have already computed the full sparsity pattern
-      // if we need it here
-      libmesh_assert(need_full_sparsity_pattern);
       libmesh_assert(_sp.get());
 
-      matrix.update_sparsity_pattern (_sp->sparsity_pattern);
-    }
+      if (matrix.need_full_sparsity_pattern())
+        {
+          // We'd better have already computed the full sparsity
+          // pattern if we need it here
+          libmesh_assert(need_full_sparsity_pattern);
 
-  if (matrix.need_full_sparsity_pattern())
-    need_full_sparsity_pattern = true;
+          matrix.update_sparsity_pattern (_sp->get_sparsity_pattern());
+        }
+
+      matrix.attach_sparsity_pattern(*_sp);
+    }
 }
 
 
@@ -1774,48 +1788,23 @@ void DofMap::compute_sparsity(const MeshBase & mesh)
   // It is possible that some \p SparseMatrix implementations want to
   // see the sparsity pattern before we throw it away.  If so, we
   // share a view of its arrays, and we pass it in to the matrices.
-  if (need_full_sparsity_pattern)
+  for (const auto & mat : _matrices)
     {
-      _n_nz = &_sp->n_nz;
-      _n_oz = &_sp->n_oz;
-
-      for (const auto & mat : _matrices)
-        mat->update_sparsity_pattern (_sp->sparsity_pattern);
+      mat->attach_sparsity_pattern (*_sp);
+      if (need_full_sparsity_pattern)
+        mat->update_sparsity_pattern (_sp->get_sparsity_pattern());
     }
-  // If we don't need the full sparsity pattern anymore, steal the
-  // arrays we do need and free the rest of the memory
-  else
-    {
-      if (!_n_nz)
-        _n_nz = new std::vector<dof_id_type>();
-      _n_nz->swap(_sp->n_nz);
-      if (!_n_oz)
-        _n_oz = new std::vector<dof_id_type>();
-      _n_oz->swap(_sp->n_oz);
-
-      _sp.reset();
-    }
+  // If we don't need the full sparsity pattern anymore, free the
+  // parts of it we don't need.
+  if (!need_full_sparsity_pattern)
+    _sp->clear_full_sparsity();
 }
 
 
 
 void DofMap::clear_sparsity()
 {
-  if (need_full_sparsity_pattern)
-    {
-      libmesh_assert(_sp.get());
-      libmesh_assert(!_n_nz || _n_nz == &_sp->n_nz);
-      libmesh_assert(!_n_oz || _n_oz == &_sp->n_oz);
-      _sp.reset();
-    }
-  else
-    {
-      libmesh_assert(!_sp.get());
-      delete _n_nz;
-      delete _n_oz;
-    }
-  _n_nz = nullptr;
-  _n_oz = nullptr;
+  _sp.reset();
 }
 
 
@@ -2901,15 +2890,15 @@ std::string DofMap::get_info() const
   dof_id_type max_n_nz = 0, max_n_oz = 0;
   long double avg_n_nz = 0, avg_n_oz = 0;
 
-  if (_n_nz)
+  if (_sp)
     {
-      for (const auto & val : *_n_nz)
+      for (const auto & val : _sp->get_n_nz())
         {
           max_n_nz = std::max(max_n_nz, val);
           avg_n_nz += val;
         }
 
-      std::size_t n_nz_size = _n_nz->size();
+      std::size_t n_nz_size = _sp->get_n_nz().size();
 
       this->comm().max(max_n_nz);
       this->comm().sum(avg_n_nz);
@@ -2917,15 +2906,13 @@ std::string DofMap::get_info() const
 
       avg_n_nz /= std::max(n_nz_size,std::size_t(1));
 
-      libmesh_assert(_n_oz);
-
-      for (const auto & val : *_n_oz)
+      for (const auto & val : _sp->get_n_oz())
         {
           max_n_oz = std::max(max_n_oz, val);
           avg_n_oz += val;
         }
 
-      std::size_t n_oz_size = _n_oz->size();
+      std::size_t n_oz_size = _sp->get_n_oz().size();
 
       this->comm().max(max_n_oz);
       this->comm().sum(avg_n_oz);

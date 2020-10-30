@@ -32,7 +32,6 @@ namespace libMesh
 {
 
 // Forward declarations
-class MeshBase;
 class DofMap;
 class CouplingMatrix;
 
@@ -67,6 +66,27 @@ static void sort_row (const BidirectionalIterator begin,
                       BidirectionalIterator       middle,
                       const BidirectionalIterator end);
 
+
+
+  /**
+   * Abstract base class to be used to add user-defined implicit
+   * degree of freedom couplings.
+   */
+  class AugmentSparsityPattern
+  {
+  public:
+    virtual ~AugmentSparsityPattern () {}
+
+    /**
+     * User-defined function to augment the sparsity pattern.
+     */
+    virtual void augment_sparsity_pattern (SparsityPattern::Graph & sparsity,
+                                           std::vector<dof_id_type> & n_nz,
+                                           std::vector<dof_id_type> & n_oz) = 0;
+  };
+
+
+
 /**
  * This helper class can be called on multiple threads to compute
  * the sparsity pattern (or graph) of the sparse matrix resulting
@@ -80,8 +100,103 @@ static void sort_row (const BidirectionalIterator begin,
  */
 class Build : public ParallelObject
 {
+public:
+  Build (const DofMap & dof_map_in,
+         const CouplingMatrix * dof_coupling_in,
+         const std::set<GhostingFunctor *> & coupling_functors_in,
+         const bool implicit_neighbor_dofs_in,
+         const bool need_full_sparsity_pattern_in);
+
+  /**
+   * Special functions.
+   * - The Build object holds references to DofMap and coupling
+   *   functors, therefore it can't be assigned.
+   */
+  Build (const Build &) = default;
+  Build & operator= (const Build &) = delete;
+  Build (Build &&) = default;
+  Build & operator= (Build &&) = delete;
+  ~Build () = default;
+
+  /**
+   * Splitting constructor, for use in multithreaded loops.
+   */
+  Build (Build & other, Threads::split);
+
+  /**
+   * Add entries from a range of elements to this object's sparsity
+   * pattern.
+   */
+  void operator()(const ConstElemRange & range);
+
+  /**
+   * Combine the sparsity pattern in \p other with this object's
+   * sparsity pattern.  Useful in multithreaded loops.
+   */
+  void join (const Build & other);
+
+  /**
+   * Send sparsity pattern data relevant to other processors to those
+   * processors, and receive and incorporate data relevant to us.
+   */
+  void parallel_sync ();
+
+  /**
+   * Rows of sparse matrix indices, indexed by the offset from the
+   * first DoF on this processor.
+   */
+  const SparsityPattern::Graph & get_sparsity_pattern() const
+  { return sparsity_pattern; }
+
+  /**
+   * Rows of sparse matrix indices, mapped from global DoF number,
+   * which belong on other processors.  Stored here only temporarily
+   * until a parallel_sync() sends them where they belong.
+   */
+  const SparsityPattern::NonlocalGraph & get_nonlocal_pattern() const
+  { return nonlocal_pattern; }
+
+  /**
+   * The number of on-processor nonzeros in my portion of the
+   * global matrix.
+   */
+  const std::vector<dof_id_type> & get_n_nz() const
+  { return n_nz; }
+
+  /**
+   * The number of off-processor nonzeros in my portion of the
+   * global matrix.
+   */
+  const std::vector<dof_id_type> & get_n_oz() const
+  { return n_oz; }
+
+  /**
+   * Let a user-provided AugmentSparsityPattern subclass modify our
+   * sparsity structure.
+   */
+  void apply_extra_sparsity_object(SparsityPattern::AugmentSparsityPattern & asp);
+
+  /**
+   * Let a user-provided function modify our sparsity structure.
+   */
+  void apply_extra_sparsity_function(void (*func)(SparsityPattern::Graph & sparsity,
+                                                   std::vector<dof_id_type> & n_nz,
+                                                   std::vector<dof_id_type> & n_oz,
+                                                   void * context),
+                                      void * context)
+  { func(sparsity_pattern, n_nz, n_oz, context); }
+
+  /**
+   * Clear the "full" details of our sparsity structure, leaving only
+   * the counts of non-zero entries.
+   */
+  void clear_full_sparsity()
+  {
+    sparsity_pattern.clear();
+    nonlocal_pattern.clear();
+  }
+
 private:
-  const MeshBase & mesh;
   const DofMap & dof_map;
   const CouplingMatrix * dof_coupling;
   const std::set<GhostingFunctor *> & coupling_functors;
@@ -109,35 +224,13 @@ private:
 public:
 
   SparsityPattern::Graph sparsity_pattern;
+
   SparsityPattern::NonlocalGraph nonlocal_pattern;
 
   std::vector<dof_id_type> n_nz;
+
   std::vector<dof_id_type> n_oz;
-
-  Build (const MeshBase & mesh_in,
-         const DofMap & dof_map_in,
-         const CouplingMatrix * dof_coupling_in,
-         const std::set<GhostingFunctor *> & coupling_functors_in,
-         const bool implicit_neighbor_dofs_in,
-         const bool need_full_sparsity_pattern_in);
-
-  Build (Build & other, Threads::split);
-
-  void operator()(const ConstElemRange & range);
-
-  void join (const Build & other);
-
-  void parallel_sync ();
 };
-
-#if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
-/**
- * Dummy function that does nothing but can be used to prohibit
- * compiler optimization in some situations where some compilers
- * have optimization bugs.
- */
-void _dummy_function(void);
-#endif
 
 }
 

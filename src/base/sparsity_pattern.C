@@ -41,14 +41,12 @@ namespace SparsityPattern
 //-------------------------------------------------------
 // we need to implement these constructors here so that
 // a full DofMap definition is available.
-Build::Build (const MeshBase & mesh_in,
-              const DofMap & dof_map_in,
+Build::Build (const DofMap & dof_map_in,
               const CouplingMatrix * dof_coupling_in,
               const std::set<GhostingFunctor *> & coupling_functors_in,
               const bool implicit_neighbor_dofs_in,
               const bool need_full_sparsity_pattern_in) :
   ParallelObject(dof_map_in),
-  mesh(mesh_in),
   dof_map(dof_map_in),
   dof_coupling(dof_coupling_in),
   coupling_functors(coupling_functors_in),
@@ -64,7 +62,6 @@ Build::Build (const MeshBase & mesh_in,
 
 Build::Build (Build & other, Threads::split) :
   ParallelObject(other),
-  mesh(other.mesh),
   dof_map(other.dof_map),
   dof_coupling(other.dof_coupling),
   coupling_functors(other.coupling_functors),
@@ -108,7 +105,7 @@ void Build::handle_vi_vj(const std::vector<dof_id_type> & element_dofs_i,
   const unsigned int n_dofs_on_element_i =
     cast_int<unsigned int>(element_dofs_i.size());
 
-  const processor_id_type proc_id     = mesh.processor_id();
+  const processor_id_type proc_id     = dof_map.processor_id();
   const dof_id_type first_dof_on_proc = dof_map.first_dof(proc_id);
   const dof_id_type end_dof_on_proc   = dof_map.end_dof(proc_id);
 
@@ -235,7 +232,7 @@ void Build::operator()(const ConstElemRange & range)
   // fed into a PetscMatrix to allocate exactly the number of nonzeros
   // necessary to store the matrix.  This algorithm should be linear
   // in the (# of elements)*(# nodes per element)
-  const processor_id_type proc_id           = mesh.processor_id();
+  const processor_id_type proc_id     = dof_map.processor_id();
   const dof_id_type n_dofs_on_proc    = dof_map.n_dofs_on_processor(proc_id);
   const dof_id_type first_dof_on_proc = dof_map.first_dof(proc_id);
   const dof_id_type end_dof_on_proc   = dof_map.end_dof(proc_id);
@@ -365,7 +362,7 @@ void Build::operator()(const ConstElemRange & range)
 
 void Build::join (const SparsityPattern::Build & other)
 {
-  const processor_id_type proc_id           = mesh.processor_id();
+  const processor_id_type proc_id           = dof_map.processor_id();
   const dof_id_type       n_global_dofs     = dof_map.n_dofs();
   const dof_id_type       n_dofs_on_proc    = dof_map.n_dofs_on_processor(proc_id);
   const dof_id_type       first_dof_on_proc = dof_map.first_dof(proc_id);
@@ -638,6 +635,12 @@ void Build::parallel_sync ()
   // Make sure to cleanup requests
   Parallel::wait(dof_sends);
   Parallel::wait(row_sends);
+}
+
+
+void Build::apply_extra_sparsity_object(SparsityPattern::AugmentSparsityPattern & asp)
+{
+  asp.augment_sparsity_pattern (sparsity_pattern, n_nz, n_oz);
 }
 
 
