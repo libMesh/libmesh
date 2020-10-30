@@ -1172,6 +1172,42 @@ void System::project_vector (NumericVector<Number> & new_vector,
 
   new_vector.close();
 
+  // Look for spline bases, in which case we need to backtrack
+  // to calculate the spline DoF values.
+  std::vector<const Variable *> rational_vars;
+  for (auto varnum : vars)
+    {
+      const Variable & var = this->get_dof_map().variable(varnum);
+      if (var.type().family == RATIONAL_BERNSTEIN)
+        rational_vars.push_back(&var);
+    }
+
+  // Okay, but are we really using any *spline* bases, or just
+  // unconstrained rational bases?
+  bool using_spline_bases = false;
+  if (!rational_vars.empty())
+    {
+      // Look for a spline node: a NodeElem with a rational variable
+      // on it.
+      for (auto & elem : active_local_range)
+        if (elem->type() == NODEELEM)
+          for (auto rational_var : rational_vars)
+            if (rational_var->active_on_subdomain(elem->subdomain_id()))
+              {
+                using_spline_bases = true;
+                goto checked_on_splines;
+              }
+    }
+
+checked_on_splines:
+
+  // Not every processor may have a NodeElem, especially while
+  // we're not partitioning them efficiently yet.
+  this->comm().max(using_spline_bases);
+
+  if (using_spline_bases)
+    this->solve_for_unconstrained_dofs(new_vector, is_adjoint);
+
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   if (is_adjoint == -1)
     this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);

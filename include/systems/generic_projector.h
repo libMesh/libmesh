@@ -1589,6 +1589,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
             continue;
           FEType fe_type = var.type();
 
+          // If we're trying to do projections on an isogeometric
+          // analysis mesh, only the finite element nodes constrained
+          // by those spline nodes truly have delta function degrees
+          // of freedom.  We'll have to back out the spline degrees of
+          // freedom indirectly later.
+          if (fe_type.family == RATIONAL_BERNSTEIN &&
+              elem->type() == NODEELEM)
+            continue;
+
           if (FEInterface::n_dofs_at_node(fe_type, elem, 0))
             vertex_vars.insert(vertex_vars.end(), v_num);
 
