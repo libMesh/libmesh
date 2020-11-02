@@ -28,6 +28,7 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/petsc_macro.h"
 #include "libmesh/petsc_dm_wrapper.h"
+#include "libmesh/wrapped_petsc.h"
 
 // PETSc includes
 #ifdef I
@@ -97,7 +98,7 @@ protected:
   /**
    * Nonlinear solver context
    */
-  SNES _snes;
+  WrappedPetsc<SNES> _snes;
 
   /**
    * Wrapper object for interacting with PetscDM

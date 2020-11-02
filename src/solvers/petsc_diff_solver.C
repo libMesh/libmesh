@@ -51,8 +51,9 @@ extern "C"
     if (solver.verbose)
       libMesh::out << "  PetscDiffSolver step " << its
                    << ", |residual|_2 = " << fnorm << std::endl;
-    if (solver.linear_solution_monitor.get()) {
-      int ierr = 0;
+    if (solver.linear_solution_monitor.get())
+    {
+      PetscErrorCode ierr = 0;
 
       Vec petsc_delta_u;
       ierr = SNESGetSolutionUpdate(snes, &petsc_delta_u);
@@ -200,10 +201,7 @@ void PetscDiffSolver::init ()
 
 
 
-PetscDiffSolver::~PetscDiffSolver ()
-{
-  this->clear();
-}
+PetscDiffSolver::~PetscDiffSolver () = default;
 
 
 
@@ -211,8 +209,8 @@ void PetscDiffSolver::clear()
 {
   LOG_SCOPE("clear()", "PetscDiffSolver");
 
-  int ierr = SNESDestroy(&_snes);
-  LIBMESH_CHKERR(ierr);
+  // calls custom deleter
+  _snes.destroy();
 
 #if !PETSC_VERSION_LESS_THAN(3,7,3)
 #if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
@@ -294,7 +292,7 @@ unsigned int PetscDiffSolver::solve()
   PetscVector<Number> & r =
     *(cast_ptr<PetscVector<Number> *>(_system.rhs));
 
-  int ierr = 0;
+  PetscErrorCode ierr = 0;
 
   ierr = SNESSetFunction (_snes, r.vec(),
                           __libmesh_petsc_diff_solver_residual, this);
@@ -318,11 +316,11 @@ unsigned int PetscDiffSolver::solve()
   SNESGetConvergedReason(_snes, &reason);
 
   PetscInt l_its, nl_its;
-  ierr = SNESGetLinearSolveIterations(_snes,&l_its);
+  ierr = SNESGetLinearSolveIterations(_snes, &l_its);
   LIBMESH_CHKERR(ierr);
   this->_inner_iterations = l_its;
 
-  ierr = SNESGetIterationNumber(_snes,&nl_its);
+  ierr = SNESGetIterationNumber(_snes, &nl_its);
   LIBMESH_CHKERR(ierr);
   this->_outer_iterations = nl_its;
 
@@ -331,9 +329,9 @@ unsigned int PetscDiffSolver::solve()
 
 void PetscDiffSolver::setup_petsc_data()
 {
-  int ierr=0;
+  PetscErrorCode ierr = 0;
 
-  ierr = SNESCreate(this->comm().get(),&_snes);
+  ierr = SNESCreate(this->comm().get(), _snes.get());
   LIBMESH_CHKERR(ierr);
 
   ierr = SNESMonitorSet (_snes, __libmesh_petsc_diff_solver_monitor,
@@ -352,7 +350,7 @@ void PetscDiffSolver::setup_petsc_data()
 #if !PETSC_VERSION_LESS_THAN(3,7,3)
 #if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
   if (use_petsc_dm)
-    this->_dm_wrapper.init_and_attach_petscdm(_system, _snes);
+    this->_dm_wrapper.init_and_attach_petscdm(_system, *_snes);
 #endif
 #endif
 
