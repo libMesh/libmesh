@@ -23,10 +23,15 @@
 #ifdef LIBMESH_HAVE_PETSC
 
 #include "libmesh_exceptions.h"
+
 #ifdef I
 # define LIBMESH_SAW_I
 #endif
+
+#include "libmesh/ignore_warnings.h"
 #include <petscsys.h>
+#include "libmesh/restore_warnings.h"
+
 #ifndef LIBMESH_SAW_I
 # undef I // Avoid complex.h contamination
 #endif
