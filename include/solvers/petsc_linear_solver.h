@@ -26,7 +26,7 @@
 
 #include "libmesh/petsc_macro.h"
 #include "libmesh/petsc_solver_exception.h"
-#include "libmesh/petsc_unique_ptr.h" // petsc_unique_ptr
+#include "libmesh/wrapped_petsc.h"
 
 // Petsc include files.
 #ifdef I
@@ -288,20 +288,20 @@ private:
   /**
    * Krylov subspace context
    */
-  petsc_unique_ptr<KSP> _ksp;
+  WrappedPetsc<KSP> _ksp;
 
   /**
    * PETSc index set containing the dofs on which to solve (\p nullptr
    * means solve on all dofs).
    */
-  petsc_unique_ptr<IS> _restrict_solve_to_is;
+  WrappedPetsc<IS> _restrict_solve_to_is;
 
   /**
    * PETSc index set, complement to \p _restrict_solve_to_is.  This
    * will be created on demand by the method \p
    * _create_complement_is().
    */
-  petsc_unique_ptr<IS> _restrict_solve_to_is_complement;
+  WrappedPetsc<IS> _restrict_solve_to_is_complement;
 
   /**
    * \returns The local size of \p _restrict_solve_to_is.
