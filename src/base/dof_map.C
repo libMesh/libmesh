@@ -909,7 +909,7 @@ void DofMap::clear()
 
 
 
-void DofMap::distribute_dofs (MeshBase & mesh)
+std::size_t DofMap::distribute_dofs (MeshBase & mesh)
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -1080,6 +1080,9 @@ void DofMap::distribute_dofs (MeshBase & mesh)
   // EquationSystems call that for us, after we've added constraint
   // dependencies to the send_list too.
   // this->sort_send_list ();
+
+  // Return total number of DOFs across all procs.
+  return std::accumulate(dofs_on_proc.begin(), dofs_on_proc.end(), static_cast<std::size_t>(0));
 }
 
 
