@@ -1081,7 +1081,12 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
   // dependencies to the send_list too.
   // this->sort_send_list ();
 
-  // Return total number of DOFs across all procs.
+  // Return total number of DOFs across all procs. We compute and
+  // return this as a std::size_t so that we can detect situations in
+  // which the total number of DOFs across all procs would exceed the
+  // capability of the underlying NumericVector representation to
+  // index into it correctly (std::size_t is the largest unsigned
+  // type, so no NumericVector representation can exceed it).
   return std::accumulate(dofs_on_proc.begin(), dofs_on_proc.end(), static_cast<std::size_t>(0));
 }
 
