@@ -17,10 +17,8 @@
 
 
 
-// Local includes
-#include "libmesh/partitioner.h"
-
 // libMesh includes
+#include "libmesh/partitioner.h"
 #include "libmesh/elem.h"
 #include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
@@ -28,6 +26,7 @@
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/parallel_ghost_sync.h"
+#include "libmesh/wrapped_petsc.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -717,36 +716,43 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
           i++;
         }
 
-      Mat adj;
-      MatPartitioning part;
-      IS is;
-      PetscInt local_size, rows_size, cols_size;
-      PetscInt *adj_i, *adj_j;
+      // Next we construct an IS from a MatPartitioning
+      WrappedPetsc<IS> is;
+      {
+        PetscInt *adj_i, *adj_j;
+        PetscCalloc1(rows.size(), &adj_i);
+        PetscCalloc1(cols.size(), &adj_j);
+        PetscInt rows_size = cast_int<PetscInt>(rows.size());
+        for (PetscInt ii=0; ii<rows_size; ii++)
+          adj_i[ii] = rows[ii];
+
+        PetscInt cols_size = cast_int<PetscInt>(cols.size());
+        for (PetscInt ii=0; ii<cols_size; ii++)
+          adj_j[ii] = cols[ii];
+
+        const PetscInt sz = cast_int<PetscInt>(pmap.second.size());
+
+        // Create sparse matrix representing an adjacency list
+        WrappedPetsc<Mat> adj;
+        MatCreateMPIAdj(PETSC_COMM_SELF, sz, sz, adj_i, adj_j, nullptr, adj.get());
+
+        // Create MatPartitioning object
+        WrappedPetsc<MatPartitioning> part;
+        MatPartitioningCreate(PETSC_COMM_SELF, part.get());
+
+        // Apply MatPartitioning, storing results in "is"
+        MatPartitioningSetAdjacency(part, adj);
+        MatPartitioningSetNParts(part, 2);
+        PetscObjectSetOptionsPrefix((PetscObject)(*part), "balance_");
+        MatPartitioningSetFromOptions(part);
+        MatPartitioningApply(part, is.get());
+      }
+
+      PetscInt local_size;
       const PetscInt *indices;
-      PetscCalloc1(rows.size(), &adj_i);
-      PetscCalloc1(cols.size(), &adj_j);
-      rows_size = cast_int<PetscInt>(rows.size());
-      for (PetscInt ii=0; ii<rows_size; ii++)
-        adj_i[ii] = rows[ii];
-
-      cols_size = cast_int<PetscInt>(cols.size());
-      for (PetscInt ii=0; ii<cols_size; ii++)
-        adj_j[ii] = cols[ii];
-
-      const PetscInt sz = cast_int<PetscInt>(pmap.second.size());
-      MatCreateMPIAdj(PETSC_COMM_SELF, sz, sz, adj_i, adj_j,nullptr,&adj);
-      MatPartitioningCreate(PETSC_COMM_SELF,&part);
-      MatPartitioningSetAdjacency(part,adj);
-      MatPartitioningSetNParts(part,2);
-      PetscObjectSetOptionsPrefix((PetscObject)part, "balance_");
-      MatPartitioningSetFromOptions(part);
-      MatPartitioningApply(part,&is);
-
-      MatDestroy(&adj);
-      MatPartitioningDestroy(&part);
-
       ISGetLocalSize(is, &local_size);
       ISGetIndices(is, &indices);
+
       i = 0;
       for (auto id : pmap.second)
         {
@@ -759,7 +765,6 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
           i++;
         }
       ISRestoreIndices(is, &indices);
-      ISDestroy(&is);
     }
 #else
   libmesh_error_msg("PETSc is required");
