@@ -10,17 +10,30 @@ using namespace FUNCTIONPARSERTYPES;
 #include "fpoptimizer/codetree.hh"
 using namespace FPoptimizer_CodeTree;
 
-#include <cstdio>
 #include <sys/stat.h>
 #include <errno.h>
 #include <unistd.h>
+
+#include <cstdio>
+#include <iomanip>
+#include <strstream>
+
+// hashing complex numbers
+namespace std {
+  template <typename T>
+  struct hash<std::complex<T>> {
+    size_t operator()(const std::complex<T> & val) {
+      return hash<T>{}(val.real()) ^ hash<T>{}(val.imag());
+    }
+  };
+}
+
+#include <libmesh/hashing.h>
 
 #if LIBMESH_HAVE_FPARSER_JIT
 #  define FPARSER_CACHING
 #  include <dlfcn.h>
 #endif
-
-#include "lib/sha1.h"
 
 // There are several case statements in this file where we
 // intentionally want to fall through, so let's not get warned about
@@ -440,31 +453,24 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
     const std::string jitdir = ".jitcache";
     if (cached)
     {
-      // generate a sha1 hash of the Value type size, byte code, immediate list, and registered derivatives
-      SHA1 *sha1 = new SHA1();
-      char result[41]; // 40 sha1 chars plus null
-      size_t value_t_size = sizeof(Value_t);
-      sha1->addBytes(reinterpret_cast<const char *>(&value_t_size), sizeof(value_t_size));
-      sha1->addBytes(reinterpret_cast<const char *>(&this->mData->mByteCode[0]), this->mData->mByteCode.size() * sizeof(unsigned));
-      if (!this->mData->mImmed.empty())
-        sha1->addBytes(reinterpret_cast<const char *>(&this->mData->mImmed[0]), this->mData->mImmed.size() * sizeof(Value_t));
+      // generate a hash of the Value type size, byte code, immediate list, and registered derivatives
+      auto h = JITCodeHash();
+      libMesh::boostcopy::hash_combine(h, sizeof(Value_t));
+      for (auto i : this->mData->mImmed)
+        libMesh::boostcopy::hash_combine(h, i);
       for (const auto & reg : this->mRegisteredDerivatives)
-        sha1->addBytes(reinterpret_cast<const char *>(&reg), sizeof(VariableDerivative));
-
-      unsigned char* digest = sha1->getDigest();
-      for (unsigned int i = 0; i<20; ++i)
-        sprintf(&(result[i*2]), "%02x", digest[i]);
-      free(digest);
-      delete sha1;
+      {
+        libMesh::boostcopy::hash_combine(h, reg.var);
+        libMesh::boostcopy::hash_combine(h, reg.dependence);
+        libMesh::boostcopy::hash_combine(h, reg.derivative);
+      }
 
       // variable number
       char var_number_string[sizeof(unsigned int) * 2 + 1]; // two hex chars per byte plus null
       sprintf(var_number_string, "%x", var_number - VarBegin);
 
       // function name
-      cachename = jitdir + "/d_";
-      cachename += result;
-      cachename += "_";
+      cachename = jitdir + "/d_" + FParserJIT::hashToString(h) + "_";
       cachename += var_number_string;
 
       // try to open cache file
@@ -642,13 +648,14 @@ template<>
 bool FunctionParserADBase<long double>::JITCompile() { return JITCompileHelper("long double"); }
 
 template<typename Value_t>
-std::string FunctionParserADBase<Value_t>::JITCodeHash(const std::string & Value_t_name)
+std::size_t FunctionParserADBase<Value_t>::JITCodeHash(const std::string & Value_t_name)
 {
-  FParserJIT::Hash hasher;
-  hasher.addData(std::string("version 2.0"));
-  hasher.addData(this->mData->mByteCode);
-  hasher.addData(Value_t_name);
-  return hasher.get();
+  // start with a version tag in case the JIT function signature changes
+  std::size_t h = std::hash<std::string>{}("v3");
+  for (auto b :this->mData->mByteCode)
+    libMesh::boostcopy::hash_combine(h, b);
+  libMesh::boostcopy::hash_combine(h, Value_t_name);
+  return h;
 }
 
 template<typename Value_t>
@@ -666,8 +673,8 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   if (isEmpty())
     return false;
 
-  // compute SHA1 hash of the function
-  std::string hash = JITCodeHash(Value_t_name);
+  // compute hash of the function
+  std::string hash = FParserJIT::hashToString(JITCodeHash(Value_t_name));
 #ifndef NDEBUG
   hash += "_dbg";
 #endif
@@ -1008,29 +1015,13 @@ bool FunctionParserADBase<Value_t>::JITCodeGen(std::ostream & ccout, const std::
 namespace FParserJIT
 {
 
-Hash::Hash()
-  : _sha1(new SHA1())
+std::string
+hashToString(std::size_t hash)
 {
-}
-
-std::string Hash::get()
-{
-  char result[41];
-  unsigned char* digest = _sha1->getDigest();
-  for (unsigned int i = 0; i<20; ++i)
-    sprintf(&(result[i*2]), "%02x", digest[i]);
-  free(digest);
-  return result;
-}
-
-void Hash::addDataHelper(const char * start, std::size_t size)
-{
-  _sha1->addBytes(start, size);
-}
-
-Hash::~Hash()
-{
-  delete _sha1;
+  std::stringstream stream;
+  stream << std::setfill ('0') << std::setw(sizeof(std::size_t)*2)
+         << std::hex << hash;
+  return stream.str();
 }
 
 Compiler::Compiler(const std::string & master_hash)
