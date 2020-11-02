@@ -112,7 +112,7 @@ void PetscLinearSolver<T>::clear ()
     {
       this->_is_initialized = false;
 
-      // Calls custom deleters
+      // Calls specialized destroy() functions
       if (_restrict_solve_to_is)
         _restrict_solve_to_is.reset_to_zero();
       if (_restrict_solve_to_is_complement)
@@ -147,7 +147,6 @@ void PetscLinearSolver<T>::init (const char * name)
 
       PetscErrorCode ierr=0;
 
-      // Can't use libmesh_make_unique with custom deleter
       ierr = KSPCreate (this->comm().get(), _ksp.get());
       LIBMESH_CHKERR(ierr);
 
@@ -339,11 +338,8 @@ PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int> * const
         petsc_dofs[i] = (*dofs)[i];
 
       // Create the IS
-      // Notes:
-      // 1.) PETSc now takes over ownership of the "petsc_dofs"
+      // PETSc now takes over ownership of the "petsc_dofs"
       // array, so we don't have to worry about it any longer.
-      // 2.) We can't use libmesh_make_unique for a type with a custom
-      // deleter.
       ierr = ISCreateGeneral(this->comm().get(),
                              cast_int<PetscInt>(dofs->size()),
                              petsc_dofs, PETSC_OWN_POINTER,
@@ -456,7 +452,6 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
             cast_int<PetscInt>(rhs_in.local_size() - is_local_size);
 
           // Create Vec
-          // Note: we can't use libmesh_make_unique for a type with a custom deleter.
           WrappedPetsc<Vec> subvec1;
           ierr = VecCreate(this->comm().get(), subvec1.get());
           LIBMESH_CHKERR(ierr);
