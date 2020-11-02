@@ -22,37 +22,8 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
-// libMesh includes
-#include "libmesh/petsc_solver_exception.h"
-#include "libmesh/petsc_macro.h"
-
-// PETSc includes
-#ifdef I
-# define LIBMESH_SAW_I
-#endif
-
-#include <petscksp.h>
-#include <petscvec.h>
-#include <petscis.h>
-#include <petscmat.h>
-#include <petscviewer.h>
-#include <petscpc.h>
-#include <petscsnes.h>
-#include <petscdm.h>
-#include <petscsf.h>
-// PetscSection got its own header file in 3.12, prior to that it was
-// defined in petscis.h
-#if !PETSC_VERSION_LESS_THAN(3,12,0)
-#include <petscsection.h>
-#endif
-
-#ifndef LIBMESH_SAW_I
-# undef I // Avoid complex.h contamination
-#endif
-
 // C++ includes
-#include <memory>
-#include <utility> // std::swap
+#include <utility> // std::swap, std::move
 
 namespace libMesh
 {
@@ -203,23 +174,6 @@ struct WrappedPetsc
 private:
   T obj;
 };
-
-// Specializations of the destroy() method for different PETSc classes
-// Notes:
-// 1.) Must be inlined since this is in a header, otherwise will violate the One Definition Rule
-// 2.) This could also be macro-ized, but maybe it's not necessary?
-template <> inline void WrappedPetsc<Vec>::destroy() { VecDestroy(&obj); }
-template <> inline void WrappedPetsc<KSP>::destroy() { KSPDestroy(&obj); }
-template <> inline void WrappedPetsc<IS>::destroy() { ISDestroy(&obj); }
-template <> inline void WrappedPetsc<Mat>::destroy() { MatDestroy(&obj); }
-template <> inline void WrappedPetsc<VecScatter>::destroy() { VecScatterDestroy(&obj); }
-template <> inline void WrappedPetsc<PetscViewer>::destroy() { PetscViewerDestroy(&obj); }
-template <> inline void WrappedPetsc<MatNullSpace>::destroy() { MatNullSpaceDestroy(&obj); }
-template <> inline void WrappedPetsc<DM>::destroy() { DMDestroy(&obj); }
-template <> inline void WrappedPetsc<MatPartitioning>::destroy() { MatPartitioningDestroy(&obj); }
-template <> inline void WrappedPetsc<SNES>::destroy() { SNESDestroy(&obj); }
-template <> inline void WrappedPetsc<PC>::destroy() { PCDestroy(&obj); }
-template <> inline void WrappedPetsc<PetscSection>::destroy() { PetscSectionDestroy(&obj); }
 
 } // namespace libMesh
 
