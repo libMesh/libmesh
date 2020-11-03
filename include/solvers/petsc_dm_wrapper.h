@@ -18,20 +18,19 @@
 #ifndef LIBMESH_PETSC_DM_WRAPPER_H
 #define LIBMESH_PETSC_DM_WRAPPER_H
 
-#include "libmesh/libmesh_common.h"
 #include "libmesh/petsc_macro.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 #if !PETSC_VERSION_LESS_THAN(3,7,3)
 #if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
 
-#include <vector>
-#include <memory>
-#include <unordered_map>
-#include <map>
+// libMesh includes
+#include "libmesh/petsc_macro.h"
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_vector.h"
+#include "libmesh/wrapped_petsc.h"
 
 // PETSc includes
-#include "libmesh/ignore_warnings.h"
 #ifdef I
 # define LIBMESH_SAW_I
 #endif
@@ -39,9 +38,12 @@
 #ifndef LIBMESH_SAW_I
 # undef I // Avoid complex.h contamination
 #endif
-#include "libmesh/restore_warnings.h"
-#include "libmesh/petsc_matrix.h"
-#include "libmesh/petsc_vector.h"
+
+// C++ includes
+#include <vector>
+#include <memory>
+#include <unordered_map>
+#include <map>
 
 namespace libMesh
 {
@@ -107,25 +109,58 @@ namespace libMesh
 
   private:
 
-    //! Vector of DMs for all grid levels
-    std::vector<std::unique_ptr<DM>> _dms;
+    /**
+     * Vector of DMs for all grid levels. These are PETSc objects
+     * created by calling DMShellCreate(), so we are responsible for
+     * cleaning them up.
+     */
+    std::vector<WrappedPetsc<DM>> _dms;
 
-    //! Vector of PETScSections for all grid levels
-    std::vector<std::unique_ptr<PetscSection>> _sections;
+    /**
+     * Vector of PETScSections for all grid levels.  These are PETSc
+     * objects which are attached to the DM by calling DMSetLocalSection().
+     * While the DM takes care of destroying existing PetscSections in
+     * calls to DMSetLocalSection(), it does not appear to clean up
+     * PetscSections it holds when it is destroyed, so we manage their
+     * lifetimes using WrappedPetsc objects.
+     */
+    std::vector<WrappedPetsc<PetscSection>> _sections;
 
-    //! Vector of star forests for all grid levels
-    std::vector<std::unique_ptr<PetscSF>> _star_forests;
+    /**
+     * Vector of star forests for all grid levels. These are PETSc
+     * objects which are attached to the DM by calling
+     * DMSetSectionSF(). The DM seems to take care of cleaning these
+     * up itself as far as I can tell, so we do not try to manage
+     * their lifetime in any way.
+     */
+    std::vector<PetscSF> _star_forests;
 
-    //! Vector of projection matrixes for all grid levels
+    /**
+     * Vector of projection matrixes for all grid levels.  These are
+     * C++ objects, they are cleaned up automatically by their
+     * destructors.
+     */
     std::vector<std::unique_ptr<PetscMatrix<Number>>> _pmtx_vec;
 
-    //! Vector of sub projection matrixes for all grid levels for fieldsplit
+    /**
+     * Vector of sub projection matrixes for all grid levels for
+     * fieldsplit.  These are C++ objects, they are cleaned up
+     * automatically by their destructors.
+     */
     std::vector<std::unique_ptr<PetscMatrix<Number>>> _subpmtx_vec;
 
-    //! Vector of internal PetscDM context structs for all grid levels
-    std::vector<std::unique_ptr<PetscDMContext>> _ctx_vec;
+    /**
+     * Vector of internal PetscDM context structs for all grid levels
+     * Pointers to these C++ objects are passed to DMShellSetContext(),
+     * they are cleaned up automatically by their destructors.
+     */
+    std::vector<PetscDMContext> _ctx_vec;
 
-    //! Vector of solution vectors for all grid levels
+    /**
+     * Vector of solution vectors for all grid levels.  These are C++
+     * objects, they are cleaned up automatically by their
+     * destructors.
+     */
     std::vector<std::unique_ptr<PetscVector<Number>>> _vec_vec;
 
     //! Stores n_dofs for each grid level, to be used for projection matrix sizing
@@ -137,32 +172,32 @@ namespace libMesh
     //! Init all the n_mesh_level dependent data structures
     void init_dm_data(unsigned int n_levels, const Parallel::Communicator & comm);
 
-    //! Get reference to DM for the given mesh level
     /**
+     * Get reference to DM for the given mesh level.
      * init_dm_data() should be called before this function.
      */
     DM & get_dm(unsigned int level)
       { libmesh_assert_less(level, _dms.size());
-        return *(_dms[level].get()); }
+        return *_dms[level]; }
 
-    //! Get reference to PetscSection for the given mesh level
     /**
+     * Get reference to PetscSection for the given mesh level.
      * init_dm_data() should be called before this function.
      */
     PetscSection & get_section(unsigned int level)
       { libmesh_assert_less(level, _sections.size());
-        return *(_sections[level].get()); }
+        return *_sections[level]; }
 
-    //! Get reference to PetscSF for the given mesh level
     /**
+     * Get reference to PetscSF for the given mesh level.
      * init_dm_data() should be called before this function.
      */
     PetscSF & get_star_forest(unsigned int level)
       { libmesh_assert_less(level, _star_forests.size());
-        return *(_star_forests[level].get()); }
+        return _star_forests[level]; }
 
-    //! Takes System, empty PetscSection and populates the PetscSection
     /**
+     * Takes System, empty PetscSection and populates the PetscSection.
      * Take the System in its current state and an empty PetscSection and then
      * populate the PetscSection. The PetscSection is comprised of global "point"
      * numbers, where a "point" in PetscDM parlance is a geometric entity: node, edge,
@@ -172,8 +207,8 @@ namespace libMesh
      */
     void build_section(const System & system, PetscSection & section);
 
-    //! Takes System, empty PetscSF and populates the PetscSF
     /**
+     * Takes System, empty PetscSF and populates the PetscSF.
      * The PetscSF (star forest) is a cousin of PetscSection. PetscSection
      * has the DoF info, and PetscSF gives the parallel distribution of the
      * DoF info. So PetscSF should only be necessary when we have more than
@@ -186,8 +221,8 @@ namespace libMesh
      */
     void build_sf( const System & system, PetscSF & star_forest );
 
-    //! Helper function for build_section.
     /**
+     * Helper function for build_section.
      * This function will count how many "points" on the current processor have
      * DoFs associated with them and give that count to PETSc. We need to cache
      * a mapping between the global node id and our local count that we do in this
@@ -200,8 +235,8 @@ namespace libMesh
                                      std::unordered_map<dof_id_type,dof_id_type> & elem_map,
                                      std::map<dof_id_type,unsigned int> & scalar_map);
 
-    //! Helper function for build_section.
     /**
+     * Helper function for build_section.
      * This function will set the DoF info for each "point" in the PetscSection.
      */
     void add_dofs_to_section (const System & system,
@@ -210,19 +245,18 @@ namespace libMesh
                               const std::unordered_map<dof_id_type,dof_id_type> & elem_map,
                               const std::map<dof_id_type,unsigned int> & scalar_map);
 
-    //! Helper function to sanity check PetscSection construction
     /**
+     * Helper function to sanity check PetscSection construction
      * The PetscSection contains local dof information. This helper function just facilitates
      * sanity checking that in fact it only has n_local_dofs.
      */
     dof_id_type check_section_n_dofs( PetscSection & section );
 
-    //! Helper function to reduce code duplication when setting dofs in section
+    // Helper function to reduce code duplication when setting dofs in section
     void add_dofs_helper (const System & system,
                           const DofObject & dof_object,
                           dof_id_type local_id,
                           PetscSection & section);
-
   };
 
 }

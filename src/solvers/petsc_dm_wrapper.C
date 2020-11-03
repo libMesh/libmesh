@@ -423,24 +423,27 @@ namespace libMesh
   } // end extern C functions
 
 
-  PetscDMWrapper::~PetscDMWrapper()
-  {
-    this->clear();
-  }
+  PetscDMWrapper::~PetscDMWrapper() = default;
 
   void PetscDMWrapper::clear()
   {
-    // PETSc will destroy the attached PetscSection, PetscSF as well as
-    // other relateds such as the Projections so we just tidy up the
-    // containers here.
-
+    // Calls custom deleters
     _dms.clear();
     _sections.clear();
-    _star_forests.clear();
-    _pmtx_vec.clear();
-    _vec_vec.clear();
-    _ctx_vec.clear();
 
+    // We don't manage the lifetime of the PetscSF objects
+    _star_forests.clear();
+
+    // The relevant C++ destructors are called for these objects
+    // automatically.
+    _pmtx_vec.clear();
+    _subpmtx_vec.clear();
+    _vec_vec.clear();
+
+    // These members are trivially clear()able.
+    _ctx_vec.clear();
+    _mesh_dof_sizes.clear();
+    _mesh_dof_loc_sizes.clear();
   }
 
   void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
@@ -581,50 +584,48 @@ namespace libMesh
     for( unsigned int i=1; i <= n_levels; i++ )
       {
         // Set context dimension
-        (*_ctx_vec[i-1]).mesh_dim = mesh.mesh_dimension();
+        _ctx_vec[i-1].mesh_dim = mesh.mesh_dimension();
 
         // Create and attach a sized vector to the current ctx
         _vec_vec[i-1]->init( _mesh_dof_sizes[i-1] );
-        _ctx_vec[i-1]->current_vec = _vec_vec[i-1].get();
+        _ctx_vec[i-1].current_vec = _vec_vec[i-1].get();
 
         // Set a global DM to be used as reference when using fieldsplit
-        _ctx_vec[i-1]->global_dm = &(this->get_dm(n_levels-1));
+        _ctx_vec[i-1].global_dm = &(this->get_dm(n_levels-1));
 
         if (n_levels > 1 )
           {
             // Set pointers to surrounding dm levels to help PETSc refine/coarsen
             if ( i == 1 ) // were at the coarsest mesh
               {
-                (*_ctx_vec[i-1]).coarser_dm = nullptr;
-                (*_ctx_vec[i-1]).finer_dm   = _dms[1].get();
+                _ctx_vec[i-1].coarser_dm = nullptr;
+                _ctx_vec[i-1].finer_dm   = _dms[1].get();
               }
             else if( i == n_levels ) // were at the finest mesh
               {
-                (*_ctx_vec[i-1]).coarser_dm = _dms[_dms.size() - 2].get();
-                (*_ctx_vec[i-1]).finer_dm   = nullptr;
+                _ctx_vec[i-1].coarser_dm = _dms[_dms.size() - 2].get();
+                _ctx_vec[i-1].finer_dm   = nullptr;
               }
             else // were in the middle of the hierarchy
               {
-                (*_ctx_vec[i-1]).coarser_dm = _dms[i-2].get();
-                (*_ctx_vec[i-1]).finer_dm   = _dms[i].get();
+                _ctx_vec[i-1].coarser_dm = _dms[i-2].get();
+                _ctx_vec[i-1].finer_dm   = _dms[i].get();
               }
           }
-
       } // End context creation
 
     // Attach a vector and context to each DM
     if ( n_levels >= 1 )
       {
-
         for ( unsigned int i = 1; i <= n_levels ; ++i)
           {
             DM & dm = this->get_dm(i-1);
 
-            ierr = DMShellSetGlobalVector( dm, (*_ctx_vec[ i-1 ]).current_vec->vec() );
-            CHKERRABORT(system.comm().get(),ierr);
+            ierr = DMShellSetGlobalVector( dm, _ctx_vec[i-1].current_vec->vec() );
+            CHKERRABORT(system.comm().get(), ierr);
 
-            ierr = DMShellSetContext( dm, _ctx_vec[ i-1 ].get() );
-            CHKERRABORT(system.comm().get(),ierr);
+            ierr = DMShellSetContext( dm, &_ctx_vec[i-1] );
+            CHKERRABORT(system.comm().get(), ierr);
           }
       }
 
@@ -633,16 +634,15 @@ namespace libMesh
     // old_dof_indices information in the projection creation.
     if (n_levels > 1 )
       {
-
         // First, stash the coarse dof indices for FS purposes
         unsigned int n_vars  = system.n_vars();
-        _ctx_vec[0]->dof_vec.resize(n_vars);
+        _ctx_vec[0].dof_vec.resize(n_vars);
 
         for( unsigned int v = 0; v < n_vars; v++ )
           {
             std::vector<numeric_index_type> di;
             system.get_dof_map().local_variable_indices(di, system.get_mesh(), v);
-            _ctx_vec[0]->dof_vec[v] = di;
+            _ctx_vec[0].dof_vec[v] = di;
           }
 
         START_LOG ("PDM_refine", "PetscDMWrapper");
@@ -665,21 +665,21 @@ namespace libMesh
           {
             // Stash the rest of the dof indices
             unsigned int n_vars  = system.n_vars();
-            _ctx_vec[i]->dof_vec.resize(n_vars);
+            _ctx_vec[i].dof_vec.resize(n_vars);
 
             for( unsigned int v = 0; v < n_vars; v++ )
               {
                 std::vector<numeric_index_type> di;
                 system.get_dof_map().local_variable_indices(di, system.get_mesh(), v);
-                _ctx_vec[i]->dof_vec[v] = di;
+                _ctx_vec[i].dof_vec[v] = di;
               }
 
             unsigned int ndofs_c = _mesh_dof_sizes[i-1];
             unsigned int ndofs_f = _mesh_dof_sizes[i];
 
             // Create the Interpolation matrix and set its pointer
-            _ctx_vec[i-1]->K_interp_ptr = _pmtx_vec[i-1].get();
-            _ctx_vec[i-1]->K_sub_interp_ptr = _subpmtx_vec[i-1].get();
+            _ctx_vec[i-1].K_interp_ptr = _pmtx_vec[i-1].get();
+            _ctx_vec[i-1].K_sub_interp_ptr = _subpmtx_vec[i-1].get();
 
             unsigned int ndofs_local     = system.get_dof_map().n_dofs_on_processor(system.processor_id());
             unsigned int ndofs_old_first = system.get_dof_map().first_old_dof(system.processor_id());
@@ -687,22 +687,22 @@ namespace libMesh
             unsigned int ndofs_old_size  = ndofs_old_end - ndofs_old_first;
 
             // Init and zero the matrix
-            _ctx_vec[i-1]->K_interp_ptr->init(ndofs_f, ndofs_c, ndofs_local, ndofs_old_size, 30 , 20);
+            _ctx_vec[i-1].K_interp_ptr->init(ndofs_f, ndofs_c, ndofs_local, ndofs_old_size, 30 , 20);
 
             // Disable Mat destruction since PETSc destroys these for us
-            _ctx_vec[i-1]->K_interp_ptr->set_destroy_mat_on_exit(false);
-            _ctx_vec[i-1]->K_sub_interp_ptr->set_destroy_mat_on_exit(false);
+            _ctx_vec[i-1].K_interp_ptr->set_destroy_mat_on_exit(false);
+            _ctx_vec[i-1].K_sub_interp_ptr->set_destroy_mat_on_exit(false);
 
             // TODO: Projection matrix sparsity pattern?
-            //MatSetOption(_ctx_vec[i-1]->K_interp_ptr->mat(), MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+            //MatSetOption(_ctx_vec[i-1].K_interp_ptr->mat(), MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
 
             // Compute the interpolation matrix and set K_interp_ptr
             START_LOG ("PDM_proj_mat", "PetscDMWrapper");
-            system.projection_matrix(*_ctx_vec[i-1]->K_interp_ptr);
+            system.projection_matrix(*_ctx_vec[i-1].K_interp_ptr);
             STOP_LOG  ("PDM_proj_mat", "PetscDMWrapper");
 
             // Always close matrix that contains altered data
-            _ctx_vec[i-1]->K_interp_ptr->close();
+            _ctx_vec[i-1].K_interp_ptr->close();
           }
 
         // Move to next grid to make next projection
@@ -719,7 +719,6 @@ namespace libMesh
             START_LOG ("PDM_cnstrnts", "PetscDMWrapper");
             system.reinit_constraints();
             STOP_LOG  ("PDM_cnstrnts", "PetscDMWrapper");
-
           }
       } // End create transfer operators. System back at the finest grid
 
@@ -1112,12 +1111,9 @@ namespace libMesh
 
     for( unsigned int i = 0; i < n_levels; i++ )
       {
-        _dms[i] = libmesh_make_unique<DM>();
-        _sections[i] = libmesh_make_unique<PetscSection>();
-        _star_forests[i] = libmesh_make_unique<PetscSF>();
-        _ctx_vec[i] = libmesh_make_unique<PetscDMContext>();
-        _pmtx_vec[i]= libmesh_make_unique<PetscMatrix<Number>>(comm);
-        _subpmtx_vec[i]= libmesh_make_unique<PetscMatrix<Number>>(comm);
+        // Call C++ object constructors
+        _pmtx_vec[i] = libmesh_make_unique<PetscMatrix<Number>>(comm);
+        _subpmtx_vec[i] = libmesh_make_unique<PetscMatrix<Number>>(comm);
         _vec_vec[i] = libmesh_make_unique<PetscVector<Number>>(comm);
       }
   }

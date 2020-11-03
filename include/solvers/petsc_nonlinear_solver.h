@@ -28,6 +28,7 @@
 // Local includes
 #include "libmesh/nonlinear_solver.h"
 #include "libmesh/petsc_macro.h"
+#include "libmesh/wrapped_petsc.h"
 
 // PETSc includes
 #ifdef I
@@ -107,7 +108,7 @@ public:
   /**
    * \returns The raw PETSc snes context pointer.
    */
-  SNES snes() { this->init(); return _snes; }
+  SNES snes();
 
   /**
    * Call the Petsc solver.  It calls the method below, using the
@@ -205,7 +206,7 @@ protected:
   /**
    * Nonlinear solver context
    */
-  SNES _snes;
+  WrappedPetsc<SNES> _snes;
 
   /**
    * Store the reason for SNES convergence/divergence for use even after the _snes

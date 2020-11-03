@@ -16,9 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <unistd.h> // mkstemp
-#include <fstream>
 
 #include "libmesh/libmesh_config.h"
 
@@ -31,7 +28,11 @@
 #include "libmesh/petsc_vector.h"
 #include "libmesh/parallel.h"
 #include "libmesh/utility.h"
+#include "libmesh/wrapped_petsc.h"
 
+// C++ includes
+#include <unistd.h> // mkstemp
+#include <fstream>
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
 
@@ -644,23 +645,20 @@ void PetscMatrix<T>::print_matlab (const std::string & name) const
       const_cast<PetscMatrix<T> *>(this)->close();
     }
 
-  PetscErrorCode ierr=0;
-  PetscViewer petsc_viewer;
+  PetscErrorCode ierr = 0;
 
-
+  WrappedPetsc<PetscViewer> petsc_viewer;
   ierr = PetscViewerCreate (this->comm().get(),
-                            &petsc_viewer);
+                            petsc_viewer.get());
   LIBMESH_CHKERR(ierr);
 
-  /**
-   * Create an ASCII file containing the matrix
-   * if a filename was provided.
-   */
+  // Create an ASCII file containing the matrix
+  // if a filename was provided.
   if (name != "")
     {
       ierr = PetscViewerASCIIOpen( this->comm().get(),
                                    name.c_str(),
-                                   &petsc_viewer);
+                                   petsc_viewer.get());
       LIBMESH_CHKERR(ierr);
 
 #if PETSC_VERSION_LESS_THAN(3,7,0)
@@ -677,9 +675,7 @@ void PetscMatrix<T>::print_matlab (const std::string & name) const
       LIBMESH_CHKERR(ierr);
     }
 
-  /**
-   * Otherwise the matrix will be dumped to the screen.
-   */
+  // Otherwise the matrix will be dumped to the screen.
   else
     {
 #if PETSC_VERSION_LESS_THAN(3,7,0)
@@ -695,13 +691,6 @@ void PetscMatrix<T>::print_matlab (const std::string & name) const
       ierr = MatView (_mat, PETSC_VIEWER_STDOUT_WORLD);
       LIBMESH_CHKERR(ierr);
     }
-
-
-  /**
-   * Destroy the viewer.
-   */
-  ierr = PetscViewerDestroy (&petsc_viewer);
-  LIBMESH_CHKERR(ierr);
 }
 
 
@@ -909,19 +898,20 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
 
   // Construct row and column index sets.
   PetscErrorCode ierr=0;
-  IS isrow, iscol;
 
+  WrappedPetsc<IS> isrow;
   ierr = ISCreateGeneral(this->comm().get(),
                          cast_int<PetscInt>(rows.size()),
                          numeric_petsc_cast(rows.data()),
                          PETSC_USE_POINTER,
-                         &isrow); LIBMESH_CHKERR(ierr);
+                         isrow.get()); LIBMESH_CHKERR(ierr);
 
+  WrappedPetsc<IS> iscol;
   ierr = ISCreateGeneral(this->comm().get(),
                          cast_int<PetscInt>(cols.size()),
                          numeric_petsc_cast(cols.data()),
                          PETSC_USE_POINTER,
-                         &iscol); LIBMESH_CHKERR(ierr);
+                         iscol.get()); LIBMESH_CHKERR(ierr);
 
   // Extract submatrix
   ierr = LibMeshCreateSubMatrix(_mat,
@@ -933,10 +923,6 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
   // Specify that the new submatrix is initialized and close it.
   petsc_submatrix->_is_initialized = true;
   petsc_submatrix->close();
-
-  // Clean up PETSc data structures
-  ierr = ISDestroy(&isrow); LIBMESH_CHKERR(ierr);
-  ierr = ISDestroy(&iscol); LIBMESH_CHKERR(ierr);
 }
 
 

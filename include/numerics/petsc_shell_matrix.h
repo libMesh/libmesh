@@ -20,8 +20,8 @@
 
 
 #include "libmesh/libmesh_config.h"
-#ifdef LIBMESH_HAVE_PETSC
 
+#ifdef LIBMESH_HAVE_PETSC
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -32,6 +32,7 @@
 #include "libmesh/petsc_solver_exception.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/wrapped_petsc.h"
 
 // Petsc include files.
 #ifdef I
@@ -60,10 +61,7 @@ public:
 
   PetscShellMatrix (const Parallel::Communicator & comm_in);
 
-  /**
-   * Destructor.
-   */
-  virtual ~PetscShellMatrix ();
+  virtual ~PetscShellMatrix () = default;
 
   virtual numeric_index_type m () const override;
 
@@ -102,7 +100,7 @@ protected:
   /**
    * Petsc Shell Matrix
    */
-  Mat  _mat;
+  WrappedPetsc<Mat> _mat;
 
   bool _is_initialized;
 };
@@ -114,18 +112,8 @@ template <typename T>
 inline
 PetscShellMatrix<T>::PetscShellMatrix (const Parallel::Communicator & comm_in):
   ShellMatrix<T>(comm_in),
-  _mat(nullptr),
   _is_initialized(false)
 {}
-
-
-
-template <typename T>
-inline
-PetscShellMatrix<T>::~PetscShellMatrix ()
-{
-  this->clear();
-}
 
 
 
@@ -136,7 +124,7 @@ numeric_index_type PetscShellMatrix<T>::m () const
   PetscErrorCode ierr;
   PetscInt m;
 
-  ierr = MatGetSize(_mat,&m,nullptr);
+  ierr = MatGetSize(_mat, &m, nullptr);
   LIBMESH_CHKERR(ierr);
 
   return m;
@@ -151,7 +139,7 @@ numeric_index_type PetscShellMatrix<T>::n () const
   PetscErrorCode ierr;
   PetscInt n;
 
-  ierr = MatGetSize(_mat,nullptr,&n);
+  ierr = MatGetSize(_mat, nullptr, &n);
   LIBMESH_CHKERR(ierr);
 
   return n;
@@ -165,7 +153,7 @@ numeric_index_type PetscShellMatrix<T>::local_m () const
   PetscErrorCode ierr;
   PetscInt m;
 
-  ierr = MatGetLocalSize(_mat,&m,nullptr);
+  ierr = MatGetLocalSize(_mat, &m, nullptr);
   LIBMESH_CHKERR(ierr);
 
   return m;
@@ -180,7 +168,7 @@ numeric_index_type PetscShellMatrix<T>::local_n () const
   PetscErrorCode ierr;
   PetscInt n;
 
-  ierr = MatGetLocalSize(_mat,nullptr,&n);
+  ierr = MatGetLocalSize(_mat, nullptr, &n);
   LIBMESH_CHKERR(ierr);
 
   return n;
@@ -194,8 +182,8 @@ void PetscShellMatrix<T>::get_diagonal (NumericVector<T> & dest) const
   // Make sure the NumericVector passed in is really a PetscVector
   PetscVector<T> & petsc_dest = cast_ref<PetscVector<T> &>(dest);
 
-  PetscErrorCode ierr =
-    MatGetDiagonal(_mat,petsc_dest.vec()); LIBMESH_CHKERR(ierr);
+  PetscErrorCode ierr = MatGetDiagonal(_mat, petsc_dest.vec());
+  LIBMESH_CHKERR(ierr);
 }
 
 

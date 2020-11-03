@@ -31,6 +31,13 @@ namespace libMesh
 {
 
 template <typename T>
+PetscPreconditioner<T>::PetscPreconditioner (const libMesh::Parallel::Communicator & comm_in) :
+  Preconditioner<T>(comm_in)
+{}
+
+
+
+template <typename T>
 void PetscPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> & y)
 {
   PetscVector<T> & x_pvec = cast_ref<PetscVector<T> &>(const_cast<NumericVector<T> &>(x));
@@ -39,7 +46,7 @@ void PetscPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> 
   Vec x_vec = x_pvec.vec();
   Vec y_vec = y_pvec.vec();
 
-  int ierr = PCApply(_pc,x_vec,y_vec);
+  PetscErrorCode ierr = PCApply(_pc, x_vec, y_vec);
   LIBMESH_CHKERR(ierr);
 }
 
@@ -54,22 +61,14 @@ void PetscPreconditioner<T>::init ()
   // Clear the preconditioner in case it has been created in the past
   if (!this->_is_initialized)
     {
-      // Should probably use PCReset(), but it's not working at the moment so we'll destroy instead
-      if (_pc)
-        {
-          int ierr = PCDestroy(&_pc);
-          LIBMESH_CHKERR(ierr);
-        }
-
-      int ierr = PCCreate(this->comm().get(),&_pc);
+      PetscErrorCode ierr = PCCreate(this->comm().get(), _pc.get());
       LIBMESH_CHKERR(ierr);
 
-      PetscMatrix<T> * pmatrix = cast_ptr<PetscMatrix<T> *, SparseMatrix<T>>(this->_matrix);
-
+      auto pmatrix = cast_ptr<PetscMatrix<T> *>(this->_matrix);
       _mat = pmatrix->mat();
     }
 
-  int ierr = PCSetOperators(_pc,_mat,_mat);
+  PetscErrorCode ierr = PCSetOperators(_pc, _mat, _mat);
   LIBMESH_CHKERR(ierr);
 
   // Set the PCType.  Note: this used to be done *before* the call to
@@ -79,7 +78,7 @@ void PetscPreconditioner<T>::init ()
   // the operators have been set.
   // 2.) It should be safe to call set_petsc_preconditioner_type()
   // multiple times.
-  set_petsc_preconditioner_type(this->_preconditioner_type, _pc);
+  set_petsc_preconditioner_type(this->_preconditioner_type, *_pc);
 
   this->_is_initialized = true;
 }
@@ -89,20 +88,24 @@ void PetscPreconditioner<T>::init ()
 template <typename T>
 void PetscPreconditioner<T>::clear()
 {
-  if (_pc)
-    {
-      int ierr = PCDestroy(&_pc);
-      LIBMESH_CHKERR(ierr);
-    }
+  // Calls custom deleter
+  _pc.destroy();
 }
 
+
+
+template <typename T>
+PC PetscPreconditioner<T>::pc()
+{
+  return _pc;
+}
 
 
 
 template <typename T>
 void PetscPreconditioner<T>::set_petsc_preconditioner_type (const PreconditionerType & preconditioner_type, PC & pc)
 {
-  int ierr = 0;
+  PetscErrorCode ierr = 0;
 
   // get the communicator from the PETSc object
   Parallel::communicator comm;
@@ -241,7 +244,7 @@ template <typename T>
 void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(const PCType type, PC & pc)
 {
   // For catching PETSc error return codes
-  int ierr = 0;
+  PetscErrorCode ierr = 0;
 
   // get the communicator from the PETSc object
   Parallel::communicator comm;
@@ -284,7 +287,6 @@ void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(const PCType type,
       ierr = PCSetType(subpc, type);
       CHKERRABORT(comm,ierr);
     }
-
 }
 
 

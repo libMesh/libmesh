@@ -597,10 +597,7 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
 
 
 template <typename T>
-PetscNonlinearSolver<T>::~PetscNonlinearSolver ()
-{
-  this->clear ();
-}
+PetscNonlinearSolver<T>::~PetscNonlinearSolver () = default;
 
 
 
@@ -611,10 +608,8 @@ void PetscNonlinearSolver<T>::clear ()
     {
       this->_is_initialized = false;
 
-      PetscErrorCode ierr=0;
-
-      ierr = SNESDestroy(&_snes);
-      LIBMESH_CHKERR(ierr);
+      // Calls custom deleter
+      _snes.destroy();
 
       // Reset the nonlinear iteration counter.  This information is only relevant
       // *during* the solve().  After the solve is completed it should return to
@@ -635,7 +630,7 @@ void PetscNonlinearSolver<T>::init (const char * name)
 
       PetscErrorCode ierr=0;
 
-      ierr = SNESCreate(this->comm().get(),&_snes);
+      ierr = SNESCreate(this->comm().get(), _snes.get());
       LIBMESH_CHKERR(ierr);
 
       if (name)
@@ -645,19 +640,20 @@ void PetscNonlinearSolver<T>::init (const char * name)
         }
 
       // Attaching a DM to SNES.
-      DM dm;
-      ierr = DMCreate(this->comm().get(), &dm);LIBMESH_CHKERR(ierr);
-      ierr = DMSetType(dm,DMLIBMESH);LIBMESH_CHKERR(ierr);
-      ierr = DMlibMeshSetSystem(dm,this->system());LIBMESH_CHKERR(ierr);
-      if (name)
-        {
-          ierr = DMSetOptionsPrefix(dm,name);    LIBMESH_CHKERR(ierr);
-        }
-      ierr = DMSetFromOptions(dm);               LIBMESH_CHKERR(ierr);
-      ierr = DMSetUp(dm);                        LIBMESH_CHKERR(ierr);
-      ierr = SNESSetDM(this->_snes, dm);         LIBMESH_CHKERR(ierr);
-      // SNES now owns the reference to dm.
-      ierr = DMDestroy(&dm);                     LIBMESH_CHKERR(ierr);
+      {
+        WrappedPetsc<DM> dm;
+        ierr = DMCreate(this->comm().get(), dm.get()); LIBMESH_CHKERR(ierr);
+        ierr = DMSetType(dm, DMLIBMESH);               LIBMESH_CHKERR(ierr);
+        ierr = DMlibMeshSetSystem(dm, this->system()); LIBMESH_CHKERR(ierr);
+        if (name)
+          {
+            ierr = DMSetOptionsPrefix(dm, name);       LIBMESH_CHKERR(ierr);
+          }
+        ierr = DMSetFromOptions(dm);                   LIBMESH_CHKERR(ierr);
+        ierr = DMSetUp(dm);                            LIBMESH_CHKERR(ierr);
+        ierr = SNESSetDM(_snes, dm);                   LIBMESH_CHKERR(ierr);
+        // SNES now owns the reference to dm.
+      }
 
       if (_default_monitor)
         {
@@ -709,6 +705,17 @@ void PetscNonlinearSolver<T>::init (const char * name)
     }
 }
 
+
+
+template <typename T>
+SNES PetscNonlinearSolver<T>::snes()
+{
+  this->init();
+  return _snes;
+}
+
+
+
 template <typename T>
 void
 PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace * computeSubspaceObject,
@@ -725,56 +732,50 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
   *msp = PETSC_NULL;
   if (sp.size())
     {
-      Vec * modes;
-      PetscScalar * dots;
       PetscInt nmodes = cast_int<PetscInt>(sp.size());
 
-      ierr = PetscMalloc2(nmodes,&modes,nmodes,&dots);
-      LIBMESH_CHKERR(ierr);
+      std::vector<Vec> modes(nmodes);
+      std::vector<PetscScalar> dots(nmodes);
 
       for (PetscInt i=0; i<nmodes; ++i)
         {
-          PetscVector<T> * pv = cast_ptr<PetscVector<T> *>(sp[i]);
-          Vec v = pv->vec();
+          auto pv = cast_ptr<PetscVector<T> *>(sp[i]);
 
-          ierr = VecDuplicate(v, modes+i);
+          ierr = VecDuplicate(pv->vec(), &modes[i]);
           LIBMESH_CHKERR(ierr);
 
-          ierr = VecCopy(v,modes[i]);
+          ierr = VecCopy(pv->vec(), modes[i]);
           LIBMESH_CHKERR(ierr);
         }
 
       // Normalize.
-      ierr = VecNormalize(modes[0],PETSC_NULL);
+      ierr = VecNormalize(modes[0], PETSC_NULL);
       LIBMESH_CHKERR(ierr);
 
       for (PetscInt i=1; i<nmodes; i++)
         {
           // Orthonormalize vec[i] against vec[0:i-1]
-          ierr = VecMDot(modes[i],i,modes,dots);
+          ierr = VecMDot(modes[i], i, modes.data(), dots.data());
           LIBMESH_CHKERR(ierr);
 
           for (PetscInt j=0; j<i; j++)
             dots[j] *= -1.;
 
-          ierr = VecMAXPY(modes[i],i,dots,modes);
+          ierr = VecMAXPY(modes[i], i, dots.data(), modes.data());
           LIBMESH_CHKERR(ierr);
 
-          ierr = VecNormalize(modes[i],PETSC_NULL);
+          ierr = VecNormalize(modes[i], PETSC_NULL);
           LIBMESH_CHKERR(ierr);
         }
 
-      ierr = MatNullSpaceCreate(this->comm().get(), PETSC_FALSE, nmodes, modes, msp);
+      ierr = MatNullSpaceCreate(this->comm().get(), PETSC_FALSE, nmodes, modes.data(), msp);
       LIBMESH_CHKERR(ierr);
 
       for (PetscInt i=0; i<nmodes; ++i)
         {
-          ierr = VecDestroy(modes+i);
+          ierr = VecDestroy(&modes[i]);
           LIBMESH_CHKERR(ierr);
         }
-
-      ierr = PetscFree2(modes,dots);
-      LIBMESH_CHKERR(ierr);
     }
 }
 
@@ -814,13 +815,11 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   // Only set the nullspace if we have a way of computing it and the result is non-empty.
   if (this->nullspace || this->nullspace_object)
     {
-      MatNullSpace msp;
-      this->build_mat_null_space(this->nullspace_object, this->nullspace, &msp);
+      WrappedPetsc<MatNullSpace> msp;
+      this->build_mat_null_space(this->nullspace_object, this->nullspace, msp.get());
       if (msp)
         {
           ierr = MatSetNullSpace(pre->mat(), msp);
-          LIBMESH_CHKERR(ierr);
-          ierr = MatNullSpaceDestroy(&msp);
           LIBMESH_CHKERR(ierr);
         }
     }
@@ -831,13 +830,11 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
 #if PETSC_VERSION_LESS_THAN(3,6,0)
       libmesh_warning("MatSetTransposeNullSpace is only supported for PETSc >= 3.6, transpose nullspace will be ignored.");
 #else
-      MatNullSpace msp = PETSC_NULL;
-      this->build_mat_null_space(this->transpose_nullspace_object, this->transpose_nullspace, &msp);
+      WrappedPetsc<MatNullSpace> msp;
+      this->build_mat_null_space(this->transpose_nullspace_object, this->transpose_nullspace, msp.get());
       if (msp)
         {
           ierr = MatSetTransposeNullSpace(pre->mat(), msp);
-          LIBMESH_CHKERR(ierr);
-          ierr = MatNullSpaceDestroy(&msp);
           LIBMESH_CHKERR(ierr);
         }
 #endif
@@ -846,14 +843,12 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   // Only set the nearnullspace if we have a way of computing it and the result is non-empty.
   if (this->nearnullspace || this->nearnullspace_object)
     {
-      MatNullSpace msp = PETSC_NULL;
-      this->build_mat_null_space(this->nearnullspace_object, this->nearnullspace, &msp);
+      WrappedPetsc<MatNullSpace> msp;
+      this->build_mat_null_space(this->nearnullspace_object, this->nearnullspace, msp.get());
 
       if (msp)
         {
           ierr = MatSetNearNullSpace(pre->mat(), msp);
-          LIBMESH_CHKERR(ierr);
-          ierr = MatNullSpaceDestroy(&msp);
           LIBMESH_CHKERR(ierr);
         }
     }
@@ -923,7 +918,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   LIBMESH_CHKERR(ierr);
 
   Mat J;
-  ierr = SNESGetJacobian(_snes,&J,PETSC_NULL,PETSC_NULL,PETSC_NULL);
+  ierr = SNESGetJacobian(_snes, &J, PETSC_NULL, PETSC_NULL, PETSC_NULL);
   LIBMESH_CHKERR(ierr);
   ierr = MatMFFDSetFunction(J, libmesh_petsc_snes_mffd_interface, this);
   LIBMESH_CHKERR(ierr);
@@ -956,7 +951,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   ierr = SNESSolve (_snes, PETSC_NULL, x->vec());
   LIBMESH_CHKERR(ierr);
 
-  ierr = SNESGetIterationNumber(_snes,&n_iterations);
+  ierr = SNESGetIterationNumber(_snes, &n_iterations);
   LIBMESH_CHKERR(ierr);
 
   ierr = SNESGetLinearSolveIterations(_snes, &_n_linear_iterations);

@@ -569,14 +569,14 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	parsed_fem_function.h parsed_fem_function_parameter.h \
 	parsed_function.h parsed_function_parameter.h petsc_macro.h \
 	petsc_matrix.h petsc_preconditioner.h petsc_shell_matrix.h \
-	petsc_solver_exception.h petsc_unique_ptr.h petsc_vector.h \
-	preconditioner.h raw_accessor.h refinement_selector.h \
-	shell_matrix.h sparse_matrix.h sparse_shell_matrix.h \
-	sum_shell_matrix.h tensor_shell_matrix.h tensor_tools.h \
-	tensor_value.h trilinos_epetra_matrix.h \
-	trilinos_epetra_vector.h trilinos_preconditioner.h tuple_of.h \
-	type_n_tensor.h type_tensor.h type_vector.h vector_value.h \
-	wrapped_function.h wrapped_functor.h zero_function.h \
+	petsc_solver_exception.h petsc_vector.h preconditioner.h \
+	raw_accessor.h refinement_selector.h shell_matrix.h \
+	sparse_matrix.h sparse_shell_matrix.h sum_shell_matrix.h \
+	tensor_shell_matrix.h tensor_tools.h tensor_value.h \
+	trilinos_epetra_matrix.h trilinos_epetra_vector.h \
+	trilinos_preconditioner.h tuple_of.h type_n_tensor.h \
+	type_tensor.h type_vector.h vector_value.h wrapped_function.h \
+	wrapped_functor.h wrapped_petsc.h zero_function.h \
 	libmesh_call_mpi.h parallel.h parallel_algebra.h \
 	parallel_bin_sorter.h parallel_conversion_utils.h \
 	parallel_elem.h parallel_ghost_sync.h parallel_hilbert.h \
@@ -1608,9 +1608,6 @@ petsc_shell_matrix.h: $(top_srcdir)/include/numerics/petsc_shell_matrix.h
 petsc_solver_exception.h: $(top_srcdir)/include/numerics/petsc_solver_exception.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-petsc_unique_ptr.h: $(top_srcdir)/include/numerics/petsc_unique_ptr.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 petsc_vector.h: $(top_srcdir)/include/numerics/petsc_vector.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1672,6 +1669,9 @@ wrapped_function.h: $(top_srcdir)/include/numerics/wrapped_function.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 wrapped_functor.h: $(top_srcdir)/include/numerics/wrapped_functor.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+wrapped_petsc.h: $(top_srcdir)/include/numerics/wrapped_petsc.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 zero_function.h: $(top_srcdir)/include/numerics/zero_function.h

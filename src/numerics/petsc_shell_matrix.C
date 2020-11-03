@@ -28,13 +28,10 @@ template <typename T>
 void PetscShellMatrix<T>::vector_mult (NumericVector<T> & dest,
                                         const NumericVector<T> & arg) const
 {
-  PetscErrorCode ierr=0;
-
   PetscVector<T> & petsc_dest = cast_ref<PetscVector<T> &>(dest);
-
   const PetscVector<T> & petsc_arg = cast_ref<const PetscVector<T> &>(arg);
 
-  ierr = MatMult(_mat, petsc_arg.vec(), petsc_dest.vec());
+  PetscErrorCode ierr = MatMult(_mat, petsc_arg.vec(), petsc_dest.vec());
   LIBMESH_CHKERR(ierr);
 }
 
@@ -44,13 +41,10 @@ template <typename T>
 void PetscShellMatrix<T>::vector_mult_add (NumericVector<T> & dest,
                                             const NumericVector<T> & arg) const
 {
-  PetscErrorCode ierr=0;
-
   PetscVector<T> & petsc_dest = cast_ref<PetscVector<T> &>(dest);
-
   const PetscVector<T> & petsc_arg = cast_ref<const PetscVector<T> &>(arg);
 
-  ierr = MatMultAdd(_mat, petsc_arg.vec(), petsc_dest.vec(), petsc_dest.vec());
+  PetscErrorCode ierr = MatMultAdd(_mat, petsc_arg.vec(), petsc_dest.vec(), petsc_dest.vec());
   LIBMESH_CHKERR(ierr);
 }
 
@@ -58,13 +52,9 @@ void PetscShellMatrix<T>::vector_mult_add (NumericVector<T> & dest,
 template <typename T>
 void PetscShellMatrix<T>::clear ()
 {
-  PetscErrorCode ierr=0;
-
-  if ((this->initialized()))
+  if (this->initialized())
     {
-      ierr = MatDestroy (&_mat);
-      LIBMESH_CHKERR(ierr);
-
+      _mat.destroy();
       this->_is_initialized = false;
     }
 }
@@ -94,12 +84,12 @@ void PetscShellMatrix<T>::init ()
   PetscInt m_local    = static_cast<PetscInt>(m_l);
   PetscInt n_local    = static_cast<PetscInt>(n_l);
 
-  ierr = MatCreate(this->comm().get(), &_mat);
+  ierr = MatCreate(this->comm().get(), _mat.get());
   LIBMESH_CHKERR(ierr);
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
   LIBMESH_CHKERR(ierr);
   PetscInt blocksize  = static_cast<PetscInt>(this->_dof_map->block_size());
-  ierr = MatSetBlockSize(_mat,blocksize);
+  ierr = MatSetBlockSize(_mat, blocksize);
   LIBMESH_CHKERR(ierr);
 
   ierr = MatSetType(_mat, MATSHELL);

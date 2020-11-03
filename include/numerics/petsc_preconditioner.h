@@ -24,12 +24,13 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
-// Local includes
+// libMesh includes
 #include "libmesh/preconditioner.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/petsc_macro.h"
+#include "libmesh/wrapped_petsc.h"
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
 namespace libMesh
@@ -69,10 +70,7 @@ public:
    */
   PetscPreconditioner (const libMesh::Parallel::Communicator & comm_in);
 
-  /**
-   * Destructor.
-   */
-  virtual ~PetscPreconditioner ();
+  virtual ~PetscPreconditioner () = default;
 
   virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) override;
 
@@ -84,7 +82,7 @@ public:
    * \returns The PETSc PC object.  Can be useful for implementing
    * more advanced algorithms.
    */
-  PC pc() { return _pc; }
+  PC pc();
 
   /**
    * Tells PETSc to use the user-specified preconditioner.
@@ -96,10 +94,11 @@ protected:
   /**
    * Preconditioner context
    */
-  PC _pc;
+  WrappedPetsc<PC> _pc;
 
   /**
-   * PETSc Mat pulled out of the _matrix object during init().
+   * PETSc Mat pulled out of the _matrix object during init(). We
+   * aren't responsible for cleaning up this one.
    */
   Mat _mat;
 
@@ -113,27 +112,6 @@ private:
    */
   static void set_petsc_subpreconditioner_type(const PCType type, PC & pc);
 };
-
-
-
-
-/*----------------------- inline functions ----------------------------------*/
-template <typename T>
-inline
-PetscPreconditioner<T>::PetscPreconditioner (const libMesh::Parallel::Communicator & comm_in) :
-  Preconditioner<T>(comm_in),
-  _pc(PETSC_NULL)
-{
-}
-
-
-
-template <typename T>
-inline
-PetscPreconditioner<T>::~PetscPreconditioner ()
-{
-  this->clear ();
-}
 
 } // namespace libMesh
 

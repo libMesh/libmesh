@@ -259,6 +259,7 @@ libmesh_SOURCES =  \
         src/numerics/trilinos_preconditioner.C \
         src/numerics/type_tensor.C \
         src/numerics/type_vector.C \
+        src/numerics/wrapped_petsc.C \
         src/parallel/parallel_bin_sorter.C \
         src/parallel/parallel_elem.C \
         src/parallel/parallel_ghost_sync.C \
