@@ -31,6 +31,9 @@
 #include "libmesh/eigen_core_support.h"
 #include "libmesh/numeric_vector.h"
 
+// C++ includes
+#include <limits>
+
 namespace libMesh
 {
 
@@ -225,6 +228,8 @@ public:
                                const NumericVector<T> & vec2) override;
 
   virtual void swap (NumericVector<T> & v) override;
+
+  virtual std::size_t max_allowed_id() const override;
 
   /**
    * References to the underlying Eigen data types.
@@ -523,6 +528,16 @@ void EigenSparseVector<T>::swap (NumericVector<T> & other)
   std::swap (this->_type,           v._type);
 }
 
+
+
+template <typename T>
+inline
+std::size_t EigenSparseVector<T>::max_allowed_id () const
+{
+  // We use the Eigen::Matrix type which appears to be templated on
+  // int for its sizes, see e.g. https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html
+  return std::numeric_limits<int>::max();
+}
 
 } // namespace libMesh
 

@@ -40,6 +40,7 @@
 // C++ includes
 #include <cstddef>
 #include <vector>
+#include <limits>
 
 // Forward declarations
 class Epetra_IntSerialDenseVector;
@@ -252,6 +253,8 @@ public:
                                  const std::vector<numeric_index_type> & rows) const override;
 
   virtual void swap (NumericVector<T> & v) override;
+
+  virtual std::size_t max_allowed_id() const override;
 
   /**
    * \returns The raw Epetra_Vector pointer.
@@ -829,6 +832,17 @@ void EpetraVector<T>::swap (NumericVector<T> & other)
   std::swap(last_edit, v.last_edit);
   std::swap(ignoreNonLocalEntries_, v.ignoreNonLocalEntries_);
 }
+
+
+
+template <typename T>
+inline
+std::size_t EpetraVector<T>::max_allowed_id () const
+{
+  // Epetra_Vector seems to use hard-coded ints in its various indexing routines.
+  return std::numeric_limits<int>::max();
+}
+
 
 
 // Trilinos only got serious about const in version 10.4

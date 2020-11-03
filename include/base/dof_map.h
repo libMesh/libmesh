@@ -238,8 +238,9 @@ public:
    * Distribute dofs on the current mesh.  Also builds the send list for
    * processor \p proc_id, which defaults to 0 for ease of use in serial
    * applications.
+   * \returns The total number of DOFs for the System, summed across all procs.
    */
-  void distribute_dofs (MeshBase &);
+  std::size_t distribute_dofs (MeshBase &);
 
   /**
    * Computes the sparsity pattern for the matrices corresponding to

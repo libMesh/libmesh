@@ -717,6 +717,19 @@ public:
    */
   virtual void swap (NumericVector<T> & v);
 
+  /**
+   * \returns the max number of entries (across all procs) that the
+   * NumericVector can have.
+   *
+   * Although we define numeric_index_type, and it is typically
+   * required that the NumericVector's underlying implementation's
+   * indices have _size_ equal to sizeof(numeric_index_type), these
+   * two types can still have different _signedness_, which affects
+   * the maximum number of values which can be stored in the
+   * NumericVector.
+   */
+  virtual std::size_t max_allowed_id() const = 0;
+
 protected:
 
   /**

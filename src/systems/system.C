@@ -219,7 +219,14 @@ void System::init_data ()
     _dof_map->add_variable_group(this->variable_group(vg));
 
   // Distribute the degrees of freedom on the mesh
-  _dof_map->distribute_dofs (mesh);
+  auto total_dofs = _dof_map->distribute_dofs (mesh);
+
+  // Throw an error if the total number of DOFs is not capable of
+  // being indexed by our solution vector.
+  auto max_allowed_id = solution->max_allowed_id();
+  libmesh_error_msg_if(total_dofs > max_allowed_id,
+                       "Cannot allocate a NumericVector with " << total_dofs << " degrees of freedom. "
+                       "The vector can only index up to " << max_allowed_id << " entries.");
 
   // Recreate any user or internal constraints
   this->reinit_constraints();

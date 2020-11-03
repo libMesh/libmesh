@@ -227,6 +227,8 @@ public:
 
   virtual void swap (NumericVector<T> & v) override;
 
+  virtual std::size_t max_allowed_id() const override;
+
 private:
 
   /**
@@ -657,6 +659,14 @@ void DistributedVector<T>::swap (NumericVector<T> & other)
 
   // This should be O(1) with any reasonable STL implementation
   std::swap(_values, v._values);
+}
+
+template <typename T>
+inline
+std::size_t DistributedVector<T>::max_allowed_id () const
+{
+  // Uses a std:vector<T>, so our indexing matches that
+  return std::numeric_limits<typename std::vector<T>::size_type>::max();
 }
 
 } // namespace libMesh
