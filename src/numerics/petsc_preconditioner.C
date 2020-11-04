@@ -61,6 +61,10 @@ void PetscPreconditioner<T>::init ()
   // Clear the preconditioner in case it has been created in the past
   if (!this->_is_initialized)
     {
+      // Should probably use PCReset(), but it's not working at the moment so we'll destroy instead
+      if (_pc)
+        _pc.destroy();
+
       PetscErrorCode ierr = PCCreate(this->comm().get(), _pc.get());
       LIBMESH_CHKERR(ierr);
 
