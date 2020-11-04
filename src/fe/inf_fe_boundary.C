@@ -221,7 +221,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
         }
   }
 
-  this->reinit(inf_side->parent(), &qp);
+  this->reinit(inf_side->interior_parent(), &qp);
 
 }
 
