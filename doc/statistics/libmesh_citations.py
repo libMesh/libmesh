@@ -72,11 +72,9 @@ width = 0.8
 # cycle but more attractive colors."
 ax.bar(x[0:N], n_papers[0:N], width, color=u'#4878cf', align='center')
 
-# Set up the xtick locations and labels.  Note that you have to offset
-# the position of the ticks by width/2, where width is the width of
-# the bars.
-ax.set_xticks(np.linspace(1,N,N))
-ax.set_xticklabels(ticklabels)
+# Set up the xtick locations and labels.
+ax.set_xticks(x[::2]) # place ticks at every other element of x
+ax.set_xticklabels(ticklabels[::2])
 ax.tick_params(direction='out')
 ax.set_xlim([0,N+1])
 
@@ -86,6 +84,11 @@ fig.suptitle(title_string)
 
 # Save as PDF
 plt.savefig('libmesh_citations.pdf')
+
+# Also save png for uploading to wiki. On Ubuntu, you may need to run
+# the following command to get this working:
+# sudo apt-get install dvipng
+# plt.savefig('libmesh_citations.png', format='png', dpi=200)
 
 # Local Variables:
 # python-indent: 2

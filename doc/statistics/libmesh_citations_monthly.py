@@ -171,3 +171,8 @@ ax1.set_xticklabels(['Year Start', 'Year End'])
 ax1.set_ylabel('N. Publications')
 ax1.legend(loc='upper left', prop=fontP)
 plt.savefig('libmesh_citations_monthly.pdf', format='pdf')
+
+# Also save png for uploading to wiki. On Ubuntu, you may need to run
+# the following command to get this working:
+# sudo apt-get install dvipng
+# plt.savefig('libmesh_citations_monthly.png', format='png', dpi=200)
