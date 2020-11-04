@@ -115,9 +115,10 @@ public:
         unsigned int n_sf = FE<2,LAGRANGE>::n_shape_functions(base_elem->type(),base_elem->default_order());
 
         // guess base element coordinates: p=xi,eta,0
-        // in first iteration, never run with 'secure' to avoid false warnings.
+        // in first iteration, never run with 'secure' or
+        // 'extra_checks' to avoid false warnings.
         Point ref_point= FEMap::inverse_map(2, base_elem.get(), intersection,
-                                            TOLERANCE, false);
+                                            TOLERANCE, false, false);
 
         // Newton iteration
         for(unsigned int it=0; it<iter_max; ++it)
