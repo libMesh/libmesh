@@ -221,7 +221,9 @@ private:
                              std::vector<dof_id_type> & dofs_vi,
                              unsigned int vi);
 
-public:
+#ifndef LIBMESH_ENABLE_DEPRECATED
+private:
+#endif
 
   SparsityPattern::Graph sparsity_pattern;
 
