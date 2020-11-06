@@ -3240,6 +3240,18 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
     _adjoint_constraint_values.empty() ?
     0 : _adjoint_constraint_values.rbegin()->first+1;
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  // We may need to send nodes ahead of data about them
+  std::vector<Parallel::Request> packed_range_sends;
+
+  // We may be receiving packed_range sends out of order with
+  // parallel_sync tags, so make sure they're received correctly.
+  Parallel::MessageTag range_tag = this->comm().get_unique_tag();
+
+  // We only need to do these sends on a distributed mesh
+  const bool dist_mesh = !mesh.is_serial();
+#endif
+
   // We might have calculated constraints for constrained dofs
   // which have support on other processors.
   // Push these out first.
@@ -3405,10 +3417,16 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
 
     for (auto & p : pushed_node_id_vecs)
       {
-        auto & node_keys_vals = pushed_node_keys_vals[p.first];
+        const processor_id_type pid = p.first;
+
+        // FIXME - this could be an unordered set, given a
+        // hash<pointers> specialization
+        std::set<const Node *> nodes_requested;
+
+        auto & node_keys_vals = pushed_node_keys_vals[pid];
         node_keys_vals.reserve(p.second.size());
 
-        auto & offsets = pushed_offsets[p.first];
+        auto & offsets = pushed_offsets[pid];
         offsets.reserve(p.second.size());
 
         for (auto & pushed_node_id : p.second)
@@ -3422,9 +3440,29 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
               node_keys_vals.back();
             this_node_kv.reserve(row_size);
             for (const auto & j : row)
-              this_node_kv.emplace_back(j.first->id(), j.second);
+              {
+                this_node_kv.emplace_back(j.first->id(), j.second);
+
+                // If we're not sure whether our send
+                // destination already has this node, let's give
+                // it a copy.
+                if (j.first->processor_id() != pid && dist_mesh)
+                  nodes_requested.insert(j.first);
+              }
 
             offsets.push_back(_node_constraints[node].second);
+
+          }
+
+        // Constraining nodes might not even exist on our
+        // correspondant's subset of a distributed mesh, so let's
+        // make them exist.
+        if (dist_mesh)
+          {
+            packed_range_sends.push_back(Parallel::Request());
+            this->comm().send_packed_range
+              (pid, &mesh, nodes_requested.begin(), nodes_requested.end(),
+               packed_range_sends.back(), range_tag);
           }
       }
 
@@ -3536,6 +3574,14 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
     for (auto & p : received_node_id_vecs)
       {
         const processor_id_type pid = p.first;
+
+        // Before we act on any new constraint rows, we may need to
+        // make sure we have all the nodes involved!
+        if (dist_mesh)
+          this->comm().receive_packed_range
+            (pid, &mesh, mesh_inserter_iterator<Node>(mesh),
+             (Node**)nullptr, range_tag);
+
         const auto & pushed_node_ids_to_me = p.second;
         libmesh_assert(received_node_keys_vals.count(pid));
         libmesh_assert(received_offsets.count(pid));
@@ -3596,10 +3642,6 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
   bool unexpanded_set_nonempty = !unexpanded_nodes.empty();
   this->comm().max(unexpanded_set_nonempty);
 
-  // We may be receiving packed_range sends out of order with
-  // parallel_sync tags, so make sure they're received correctly.
-  Parallel::MessageTag range_tag = this->comm().get_unique_tag();
-
   while (unexpanded_set_nonempty)
     {
       // Let's make sure we don't lose sync in this loop.
@@ -3653,22 +3695,16 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
 
       typedef std::vector<std::pair<dof_id_type, Real>> row_datum;
 
-      // We may need to send nodes ahead of data about them
-      std::vector<Parallel::Request> packed_range_sends;
-
       auto node_row_gather_functor =
         [this,
          & mesh,
+         dist_mesh,
          & packed_range_sends,
          & range_tag]
         (processor_id_type pid,
          const std::vector<dof_id_type> & ids,
          std::vector<row_datum> & data)
         {
-          // Do we need to keep track of requested nodes to send
-          // later?
-          const bool dist_mesh = !mesh.is_serial();
-
           // FIXME - this could be an unordered set, given a
           // hash<pointers> specialization
           std::set<const Node *> nodes_requested;
@@ -3753,6 +3789,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
       auto node_row_action_functor =
         [this,
          & mesh,
+         dist_mesh,
          & range_tag,
          & unexpanded_nodes]
         (processor_id_type pid,
@@ -3761,7 +3798,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
         {
           // Before we act on any new constraint rows, we may need to
           // make sure we have all the nodes involved!
-          if (!mesh.is_serial())
+          if (dist_mesh)
             this->comm().receive_packed_range
               (pid, &mesh, mesh_inserter_iterator<Node>(mesh),
                (Node**)nullptr, range_tag);
@@ -3834,13 +3871,13 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
         (this->comm(), requested_node_ids, node_rhs_gather_functor,
          node_rhs_action_functor, node_rhs_ex);
 
-      Parallel::wait(packed_range_sends);
 
       // We have to keep recursing while the unexpanded set is
       // nonempty on *any* processor
       unexpanded_set_nonempty = !unexpanded_nodes.empty();
       this->comm().max(unexpanded_set_nonempty);
     }
+  Parallel::wait(packed_range_sends);
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 }
 
