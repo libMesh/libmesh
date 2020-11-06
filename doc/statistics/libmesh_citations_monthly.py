@@ -133,6 +133,13 @@ pub_2020 = [
   '2020-11-01', 158,
 ]
 
+# 2021 monthly publication totals (first of each month)
+pub_2021 = [
+  '2020-09-01', 0,
+  '2020-10-01', 1,
+  '2020-11-01', 4,
+]
+
 """
 Function that plots one year's worth of data
 """
