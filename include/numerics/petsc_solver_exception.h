@@ -76,11 +76,21 @@ public:
       throw PetscSolverException(ierr);         \
     } } while (0)
 
+// Two-argument CHKERR macro that takes both a comm and an error
+// code. When exceptions are enabled, the comm is not used for
+// anything.  This is helpful when you need to call LIBMESH_CHKERR but
+// you're not in a ParallelObject.
+#define LIBMESH_CHKERR2(comm, ierr) LIBMESH_CHKERR(ierr);
+
 #else
 
 // If we don't have exceptions enabled, just fall back on calling
 // PETSc's CHKERRABORT macro.
 #define LIBMESH_CHKERR(ierr) CHKERRABORT(this->comm().get(), ierr);
+
+// Two argument version of the function above where you pass in the comm
+// instead of relying on it being available from the "this" pointer.
+#define LIBMESH_CHKERR2(comm, ierr) CHKERRABORT(comm.get(), ierr);
 
 // Let's also be backwards-compatible with the old macro name.
 #define LIBMESH_CHKERRABORT(ierr) LIBMESH_CHKERR(ierr)
