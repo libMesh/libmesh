@@ -1200,7 +1200,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
 
   done_saving_ids = sort_work.edges.empty() &&
     sort_work.sides.empty() && sort_work.interiors.empty();
-  system.comm().max(done_saving_ids);
 
   {
     ProjectVertices project_vertices(*this);
@@ -1212,7 +1211,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
   }
 
   done_saving_ids = sort_work.sides.empty() && sort_work.interiors.empty();
-  system.comm().max(done_saving_ids);
 
   this->send_and_insert_dof_values(ids_to_push, action);
 
@@ -1227,7 +1225,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
   }
 
   done_saving_ids = sort_work.interiors.empty();
-  system.comm().max(done_saving_ids);
 
   this->send_and_insert_dof_values(ids_to_push, action);
 
