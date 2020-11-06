@@ -730,7 +730,7 @@ void DynaIO::add_spline_constraints(DofMap & dof_map,
                                     unsigned int var_num)
 {
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  const MeshBase & mesh = this->mesh();
+  MeshBase & mesh = this->mesh();
 
   // We have some strict compatibility requirements here still
   if (mesh.allow_renumbering() ||
@@ -766,6 +766,9 @@ void DynaIO::add_spline_constraints(DofMap & dof_map,
       // conflict with *any* other constraints.
       dof_map.add_constraint_row(constrained_id, dc_row, false);
     }
+
+  dof_map.process_constraints(mesh);
+  dof_map.prepare_send_list();
 #else
   libmesh_ignore(dof_map, sys_num, var_num);
   libmesh_not_implemented();

@@ -7,6 +7,7 @@
 #include <libmesh/mesh_generation.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/replicated_mesh.h>
+#include <libmesh/enum_norm_type.h>
 
 #include <libmesh/dyna_io.h>
 #include <libmesh/exodusII_io.h>
@@ -28,6 +29,18 @@ Number six_x_plus_sixty_y (const Point& p,
   const Real & y = p(1);
 
   return 6*x + 60*y;
+}
+
+
+Number sin_x_plus_cos_y (const Point& p,
+                         const Parameters&,
+                         const std::string&,
+                         const std::string&)
+{
+  const Real & x = p(0);
+  const Real & y = p(1);
+
+  return sin(x) + cos(y);
 }
 
 
@@ -578,7 +591,7 @@ public:
 #endif // LIBMESH_HAVE_SOLVER
   }
 
-  void testProjectionRegression(MeshBase & mesh, DynaIO & dyna)
+  void testProjectionRegression(MeshBase & mesh, DynaIO & dyna, std::array<Real, 4> expected_norms)
   {
     int order = 0;
     for (const auto elem : mesh.element_ptr_range())
@@ -593,12 +606,33 @@ public:
 
     es.init();
     dyna.add_spline_constraints(sys.get_dof_map(), sys.number(), n_var);
-    sys.reinit_constraints();
 
-    sys.project_solution(six_x_plus_sixty_y, nullptr, es.parameters);
+    sys.project_solution(sin_x_plus_cos_y, nullptr, es.parameters);
+
+    // Calculate some norms, skipping the spline points, and compare
+    // to regression standard values
+    std::set<unsigned int> skip_dimensions {0};
+    const Real L2_norm =
+      sys.calculate_norm(*sys.solution, 0, L2, &skip_dimensions);
+//    std::cout.precision(16);
+//    std::cout << "L2_norm = " << L2_norm << std::endl;
+    LIBMESH_ASSERT_FP_EQUAL(L2_norm, expected_norms[0], TOLERANCE);
+    const Real Linf_norm =
+      sys.calculate_norm(*sys.solution, 0, L_INF, &skip_dimensions);
+//    std::cout << "Linf_norm = " << Linf_norm << std::endl;
+    LIBMESH_ASSERT_FP_EQUAL(Linf_norm, expected_norms[1], TOLERANCE);
+    const Real H1_norm =
+      sys.calculate_norm(*sys.solution, 0, H1_SEMINORM, &skip_dimensions);
+//    std::cout << "H1_norm = " << H1_norm << std::endl;
+    LIBMESH_ASSERT_FP_EQUAL(H1_norm, expected_norms[2], TOLERANCE);
+    const Real W1inf_norm =
+      sys.calculate_norm(*sys.solution, 0, W1_INF_SEMINORM, &skip_dimensions);
+//    std::cout << "W1inf_norm = " << W1inf_norm << std::endl;
+    // W1_inf seems more sensitive to FP error...
+    LIBMESH_ASSERT_FP_EQUAL(W1inf_norm, expected_norms[3], 10*TOLERANCE);
   }
 
-  void testDynaFileMappings (const std::string & filename)
+  void testDynaFileMappings (const std::string & filename, std::array<Real, 4> expected_norms)
   {
     Mesh mesh(*TestCommWorld);
 
@@ -616,29 +650,44 @@ public:
     CPPUNIT_ASSERT_EQUAL(mesh.default_mapping_type(),
                          RATIONAL_BERNSTEIN_MAP);
 
+    // Useful when trying out different projection functions
+    // std::cout << filename << ":" << std::endl;
+
     testMasterCenters(mesh);
 
-    testProjectionRegression(mesh, dyna);
+    testProjectionRegression(mesh, dyna, expected_norms);
   }
 
   void testDynaFileMappingsFEMEx5 ()
   {
-    testDynaFileMappings("meshes/PressurizedCyl_Patch6_256Elem.bxt.gz");
+    testDynaFileMappings("meshes/PressurizedCyl_Patch6_256Elem.bxt.gz",
+    // Regression values for sin_x_plus_cos_y
+                         {0.9639857809698268, 1.839870171669186,
+                          0.7089812562241862, 1.306121188539059});
   }
 
   void testDynaFileMappingsBlockWithHole ()
   {
-    testDynaFileMappings("meshes/BlockWithHole_Patch9.bxt.gz");
+    testDynaFileMappings("meshes/BlockWithHole_Patch9.bxt.gz",
+    // Regression values for sin_x_plus_cos_y
+                         {3.226125496262302, 1.97405596521291,
+                          2.533759662135491, 1.413785069495184});
   }
 
   void testDynaFileMappingsPlateWithHole ()
   {
-    testDynaFileMappings("meshes/PlateWithHole_Patch8.bxt.gz");
+    testDynaFileMappings("meshes/PlateWithHole_Patch8.bxt.gz",
+    // Regression values for sin_x_plus_cos_y
+                         {2.2812154374012, 1.974049990211937,
+                          1.791640772215248, 1.413679237529376});
   }
 
   void testDynaFileMappingsCyl3d ()
   {
-    testDynaFileMappings("meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz");
+    testDynaFileMappings("meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz",
+    // Regression values for sin_x_plus_cos_y
+                         {0.9636130896326653, 1.823294442918401,
+                          0.7080084233124895, 1.314114853940283});
   }
 };
 

@@ -1861,9 +1861,10 @@ protected:
   virtual void init_matrices ();
 
   /**
-   * \returns Whether or not matrices can still be added.
+   * \returns Whether or not matrices can still be added without
+   * expensive per-matrix initialization.
    */
-  bool can_add_matrices() const { return _can_add_matrices; }
+  bool can_add_matrices() const { return !_matrices_initialized; }
 
   /**
    * Projects the vector defined on the old mesh onto the
@@ -1887,7 +1888,24 @@ protected:
                        NumericVector<Number> &,
                        int is_adjoint = -1) const;
 
+  /*
+   * If we have e.g. a element space constrained by spline values, we
+   * can directly project only on the constrained basis; to get
+   * consistent constraining values we have to solve for them.
+   *
+   * Constrain the new vector using the requested adjoint rather than
+   * primal constraints if is_adjoint is non-negative.
+   */
+  void solve_for_unconstrained_dofs (NumericVector<Number> &,
+                                     int is_adjoint = -1) const;
+
 private:
+  /**
+   * Helper function to keep DofMap forward declarable in system.h
+   */
+  void late_matrix_init(SparseMatrix<Number> & mat,
+                        ParallelType type);
+
   /**
    * Finds the discrete norm for the entries in the vector
    * corresponding to Dofs associated with var.
@@ -2126,9 +2144,9 @@ private:
   std::map<std::string, ParallelType> _matrix_types;
 
   /**
-   * \p true when additional matrices may still be added, \p false otherwise.
+   * \p false when additional matrices being added require initialization, \p true otherwise.
    */
-  bool _can_add_matrices;
+  bool _matrices_initialized;
 
   /**
    * Holds true if the solution vector should be projected
@@ -2538,20 +2556,20 @@ SparseMatrix<Number> &
 System::add_matrix (const std::string & mat_name,
                     const ParallelType type)
 {
-  // only add matrices before initializing...
-  if (!_can_add_matrices)
-    libmesh_error_msg("ERROR: Too late.  Cannot add matrices to the system after initialization"
-                      << "\n any more.  You should have done this earlier.");
-
   // Return the matrix if it is already there.
   if (this->have_matrix(mat_name))
     return *(_matrices[mat_name]);
 
-  // Otherwise build the matrix and return it.
+  // Otherwise build the matrix to return.
   auto pr = _matrices.emplace(mat_name, libmesh_make_unique<MatrixType<Number>>(this->comm()));
   _matrix_types.emplace(mat_name, type);
 
-  return *(pr.first->second);
+  SparseMatrix<Number> & mat = *(pr.first->second);
+
+  // Initialize it first if we've already initialized the others.
+  this->late_matrix_init(mat, type);
+
+  return mat;
 }
 
 

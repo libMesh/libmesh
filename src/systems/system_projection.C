@@ -39,6 +39,7 @@
 
 #include "libmesh/compare_types.h"
 #include "libmesh/int_range.h"
+#include "libmesh/linear_solver.h"
 
 using MetaPhysicL::DynamicSparseNumberArray;
 
@@ -1171,6 +1172,42 @@ void System::project_vector (NumericVector<Number> & new_vector,
 
   new_vector.close();
 
+  // Look for spline bases, in which case we need to backtrack
+  // to calculate the spline DoF values.
+  std::vector<const Variable *> rational_vars;
+  for (auto varnum : vars)
+    {
+      const Variable & var = this->get_dof_map().variable(varnum);
+      if (var.type().family == RATIONAL_BERNSTEIN)
+        rational_vars.push_back(&var);
+    }
+
+  // Okay, but are we really using any *spline* bases, or just
+  // unconstrained rational bases?
+  bool using_spline_bases = false;
+  if (!rational_vars.empty())
+    {
+      // Look for a spline node: a NodeElem with a rational variable
+      // on it.
+      for (auto & elem : active_local_range)
+        if (elem->type() == NODEELEM)
+          for (auto rational_var : rational_vars)
+            if (rational_var->active_on_subdomain(elem->subdomain_id()))
+              {
+                using_spline_bases = true;
+                goto checked_on_splines;
+              }
+    }
+
+checked_on_splines:
+
+  // Not every processor may have a NodeElem, especially while
+  // we're not partitioning them efficiently yet.
+  this->comm().max(using_spline_bases);
+
+  if (using_spline_bases)
+    this->solve_for_unconstrained_dofs(new_vector, is_adjoint);
+
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   if (is_adjoint == -1)
     this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
@@ -1989,6 +2026,62 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
           }
         }  // end elem loop
     } // end variables loop
+}
+
+
+void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
+                                          int is_adjoint) const
+{
+  const DofMap & dof_map = this->get_dof_map();
+
+  std::unique_ptr<SparseMatrix<Number>> mat =
+    SparseMatrix<Number>::build(this->comm());
+
+  std::unique_ptr<SparsityPattern::Build> sp;
+
+  if (dof_map.computed_sparsity_already())
+    dof_map.update_sparsity_pattern(*mat);
+  else
+    {
+      mat->attach_dof_map(dof_map);
+      sp = dof_map.build_sparsity(this->get_mesh());
+      mat->attach_sparsity_pattern(*sp);
+    }
+
+  mat->init();
+
+  libmesh_assert_equal_to(vec.size(), dof_map.n_dofs());
+  libmesh_assert_equal_to(vec.local_size(), dof_map.n_local_dofs());
+
+  std::unique_ptr<NumericVector<Number>> rhs =
+    NumericVector<Number>::build(this->comm());
+
+  rhs->init(dof_map.n_dofs(), dof_map.n_local_dofs(), false,
+            PARALLEL);
+
+  for (dof_id_type d : IntRange<dof_id_type>(dof_map.first_dof(),
+                                             dof_map.end_dof()))
+    {
+      if (dof_map.is_constrained_dof(d))
+        {
+          DenseMatrix<Number> K(1,1);
+          DenseVector<Number> F(1);
+          std::vector<dof_id_type> dof_indices(1, d);
+          K(0,0) = 1;
+          F(0) = (*this->solution)(d);
+          dof_map.heterogenously_constrain_element_matrix_and_vector
+            (K, F, dof_indices, false, is_adjoint);
+          mat->add_matrix(K, dof_indices);
+          rhs->add_vector(F, dof_indices);
+        }
+    }
+
+  std::unique_ptr<LinearSolver<Number>> linear_solver =
+    LinearSolver<Number>::build(this->comm());
+
+  linear_solver->solve(*mat, vec, *rhs,
+                       double(this->get_equation_systems().parameters.get<Real>("linear solver tolerance")),
+                       this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations"));
 }
 
 

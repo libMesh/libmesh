@@ -1200,7 +1200,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
 
   done_saving_ids = sort_work.edges.empty() &&
     sort_work.sides.empty() && sort_work.interiors.empty();
-  system.comm().max(done_saving_ids);
 
   {
     ProjectVertices project_vertices(*this);
@@ -1212,7 +1211,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
   }
 
   done_saving_ids = sort_work.sides.empty() && sort_work.interiors.empty();
-  system.comm().max(done_saving_ids);
 
   this->send_and_insert_dof_values(ids_to_push, action);
 
@@ -1227,7 +1225,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
   }
 
   done_saving_ids = sort_work.interiors.empty();
-  system.comm().max(done_saving_ids);
 
   this->send_and_insert_dof_values(ids_to_push, action);
 
@@ -1588,6 +1585,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
           if (!var.active_on_subdomain(elem->subdomain_id()))
             continue;
           FEType fe_type = var.type();
+
+          // If we're trying to do projections on an isogeometric
+          // analysis mesh, only the finite element nodes constrained
+          // by those spline nodes truly have delta function degrees
+          // of freedom.  We'll have to back out the spline degrees of
+          // freedom indirectly later.
+          if (fe_type.family == RATIONAL_BERNSTEIN &&
+              elem->type() == NODEELEM)
+            continue;
 
           if (FEInterface::n_dofs_at_node(fe_type, elem, 0))
             vertex_vars.insert(vertex_vars.end(), v_num);
