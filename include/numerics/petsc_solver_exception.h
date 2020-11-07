@@ -22,7 +22,7 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
-#include "libmesh_exceptions.h"
+#include "libmesh/libmesh_exceptions.h"
 
 #ifdef I
 # define LIBMESH_SAW_I
@@ -38,6 +38,12 @@
 
 namespace libMesh
 {
+
+// Forward declarations
+namespace Parallel
+{
+class Communicator;
+}
 
 // The SolverException class is only defined when exceptions are enabled.
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
@@ -78,9 +84,13 @@ public:
 
 // Two-argument CHKERR macro that takes both a comm and an error
 // code. When exceptions are enabled, the comm is not used for
-// anything.  This is helpful when you need to call LIBMESH_CHKERR but
-// you're not in a ParallelObject.
-#define LIBMESH_CHKERR2(comm, ierr) LIBMESH_CHKERR(ierr);
+// anything, so we libmesh_ignore() it.  This macro is useful when you
+// need to call LIBMESH_CHKERR but you're not in a ParallelObject.
+#define LIBMESH_CHKERR2(comm, ierr)             \
+  do {                                          \
+    libmesh_ignore(comm);                       \
+    LIBMESH_CHKERR(ierr);                       \
+  } while (0)
 
 #else
 
@@ -96,6 +106,21 @@ public:
 #define LIBMESH_CHKERRABORT(ierr) LIBMESH_CHKERR(ierr)
 
 #endif
+
+/**
+ * Saves a few lines of code by calling both VecScatterBegin() and
+ * VecScatterEnd(), checking errors after each.
+ */
+template<class ...Args>
+inline
+void VecScatterBeginEnd(const Parallel::Communicator & comm, const Args&... args)
+{
+  PetscErrorCode ierr = 0;
+  ierr = VecScatterBegin(args...);
+  LIBMESH_CHKERR2(comm, ierr);
+  ierr = VecScatterEnd(args...);
+  LIBMESH_CHKERR2(comm, ierr);
+}
 
 } // namespace libMesh
 
