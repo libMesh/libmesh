@@ -985,12 +985,7 @@ void PetscMatrix<T>::close ()
   //   if (this->closed())
   //     return;
 
-  PetscErrorCode ierr=0;
-
-  ierr = MatAssemblyBegin (_mat, MAT_FINAL_ASSEMBLY);
-  LIBMESH_CHKERR(ierr);
-  ierr = MatAssemblyEnd   (_mat, MAT_FINAL_ASSEMBLY);
-  LIBMESH_CHKERR(ierr);
+  MatAssemblyBeginEnd(this->comm(), _mat, MAT_FINAL_ASSEMBLY);
 }
 
 template <typename T>
@@ -998,12 +993,7 @@ void PetscMatrix<T>::flush ()
 {
   semiparallel_only();
 
-  PetscErrorCode ierr=0;
-
-  ierr = MatAssemblyBegin (_mat, MAT_FLUSH_ASSEMBLY);
-  LIBMESH_CHKERR(ierr);
-  ierr = MatAssemblyEnd   (_mat, MAT_FLUSH_ASSEMBLY);
-  LIBMESH_CHKERR(ierr);
+  MatAssemblyBeginEnd(this->comm(), _mat, MAT_FLUSH_ASSEMBLY);
 }
 
 

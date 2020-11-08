@@ -107,20 +107,22 @@ public:
 
 #endif
 
-/**
- * Saves a few lines of code by calling both VecScatterBegin() and
- * VecScatterEnd(), checking errors after each.
- */
-template<class ...Args>
-inline
-void VecScatterBeginEnd(const Parallel::Communicator & comm, const Args&... args)
-{
-  PetscErrorCode ierr = 0;
-  ierr = VecScatterBegin(args...);
-  LIBMESH_CHKERR2(comm, ierr);
-  ierr = VecScatterEnd(args...);
-  LIBMESH_CHKERR2(comm, ierr);
-}
+#define PETSC_BEGIN_END(Function)                                       \
+  template<class ...Args>                                               \
+  inline                                                                \
+  void Function ## BeginEnd(const Parallel::Communicator & comm, const Args&... args) \
+  {                                                                     \
+    PetscErrorCode ierr = 0;                                            \
+    ierr = Function ## Begin(args...);                                  \
+    LIBMESH_CHKERR2(comm, ierr);                                        \
+    ierr = Function ## End(args...);                                    \
+    LIBMESH_CHKERR2(comm, ierr);                                        \
+  }
+
+PETSC_BEGIN_END(VecScatter) // VecScatterBeginEnd
+PETSC_BEGIN_END(MatAssembly) // MatAssemblyBeginEnd
+PETSC_BEGIN_END(VecAssembly) // VecAssemblyBeginEnd
+PETSC_BEGIN_END(VecGhostUpdate) // VecGhostUpdateBeginEnd
 
 } // namespace libMesh
 

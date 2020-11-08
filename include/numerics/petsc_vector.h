@@ -816,20 +816,10 @@ void PetscVector<T>::close ()
 
   this->_restore_array();
 
-  PetscErrorCode ierr=0;
-
-  ierr = VecAssemblyBegin(_vec);
-  LIBMESH_CHKERR(ierr);
-  ierr = VecAssemblyEnd(_vec);
-  LIBMESH_CHKERR(ierr);
+  VecAssemblyBeginEnd(this->comm(), _vec);
 
   if (this->type() == GHOSTED)
-    {
-      ierr = VecGhostUpdateBegin(_vec,INSERT_VALUES,SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecGhostUpdateEnd(_vec,INSERT_VALUES,SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-    }
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 
   this->_is_closed = true;
 }

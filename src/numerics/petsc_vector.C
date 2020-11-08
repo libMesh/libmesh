@@ -666,14 +666,9 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in) const
   }
 
   // Make sure ghost dofs are up to date
+  // We do not call "close" here to save a global reduction
   if (v_local->type() == GHOSTED)
-  {
-    // We do not call "close" here to save a global reduction
-    ierr = VecGhostUpdateBegin(v_local->_vec,INSERT_VALUES,SCATTER_FORWARD);
-    LIBMESH_CHKERR(ierr);
-    ierr = VecGhostUpdateEnd(v_local->_vec,INSERT_VALUES,SCATTER_FORWARD);
-    LIBMESH_CHKERR(ierr);
-  }
+    VecGhostUpdateBeginEnd(this->comm(), v_local->_vec, INSERT_VALUES, SCATTER_FORWARD);
 }
 
 
