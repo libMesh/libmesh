@@ -651,10 +651,7 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in) const
     WrappedPetsc<VecScatter> scatter;
     ierr = VecScatterCreateToAll(_vec, scatter.get(), nullptr);
     LIBMESH_CHKERR(ierr);
-    ierr = VecScatterBegin(scatter, _vec, v_local->_vec, INSERT_VALUES, SCATTER_FORWARD);
-    LIBMESH_CHKERR(ierr);
-    ierr = VecScatterEnd(scatter, _vec, v_local->_vec, INSERT_VALUES, SCATTER_FORWARD);
-    LIBMESH_CHKERR(ierr);
+    VecScatterBeginEnd(this->comm(), scatter, _vec, v_local->_vec, INSERT_VALUES, SCATTER_FORWARD);
   }
   // Two vectors have the same size, and we should just do a simple copy.
   // v_local could be either a parallel or ghosted vector
@@ -669,14 +666,9 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in) const
   }
 
   // Make sure ghost dofs are up to date
+  // We do not call "close" here to save a global reduction
   if (v_local->type() == GHOSTED)
-  {
-    // We do not call "close" here to save a global reduction
-    ierr = VecGhostUpdateBegin(v_local->_vec,INSERT_VALUES,SCATTER_FORWARD);
-    LIBMESH_CHKERR(ierr);
-    ierr = VecGhostUpdateEnd(v_local->_vec,INSERT_VALUES,SCATTER_FORWARD);
-    LIBMESH_CHKERR(ierr);
-  }
+    VecGhostUpdateBeginEnd(this->comm(), v_local->_vec, INSERT_VALUES, SCATTER_FORWARD);
 }
 
 
@@ -731,13 +723,7 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in,
 
 
   // Perform the scatter
-  ierr = VecScatterBegin(scatter, _vec, v_local->_vec,
-                         INSERT_VALUES, SCATTER_FORWARD);
-  LIBMESH_CHKERR(ierr);
-
-  ierr = VecScatterEnd  (scatter, _vec, v_local->_vec,
-                         INSERT_VALUES, SCATTER_FORWARD);
-  LIBMESH_CHKERR(ierr);
+  VecScatterBeginEnd(this->comm(), scatter, _vec, v_local->_vec, INSERT_VALUES, SCATTER_FORWARD);
 
   // Make sure ghost dofs are up to date
   if (v_local->type() == GHOSTED)
@@ -778,11 +764,7 @@ void PetscVector<T>::localize (std::vector<T> & v_local,
   LIBMESH_CHKERR(ierr);
 
   // Do the scatter
-  ierr = VecScatterBegin(scatter, _vec, dest, INSERT_VALUES, SCATTER_FORWARD);
-  LIBMESH_CHKERR(ierr);
-
-  ierr = VecScatterEnd(scatter, _vec, dest, INSERT_VALUES, SCATTER_FORWARD);
-  LIBMESH_CHKERR(ierr);
+  VecScatterBeginEnd(this->comm(), scatter, _vec, dest, INSERT_VALUES, SCATTER_FORWARD);
 
   // Get access to the values stored in dest.
   PetscScalar * values;
@@ -850,13 +832,8 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
                             scatter.get());
     LIBMESH_CHKERR(ierr);
 
-    ierr = VecScatterBegin(scatter, _vec, parallel_vec._vec,
-                           INSERT_VALUES, SCATTER_FORWARD);
-    LIBMESH_CHKERR(ierr);
-
-    ierr = VecScatterEnd  (scatter, _vec, parallel_vec._vec,
-                           INSERT_VALUES, SCATTER_FORWARD);
-    LIBMESH_CHKERR(ierr);
+    // Perform the scatter
+    VecScatterBeginEnd(this->comm(), scatter, _vec, parallel_vec._vec, INSERT_VALUES, SCATTER_FORWARD);
   }
 
   // localize like normal
@@ -940,10 +917,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
           ierr = VecScatterCreateToZero(_vec, ctx.get(), vout.get());
           LIBMESH_CHKERR(ierr);
 
-          ierr = VecScatterBegin(ctx, _vec, vout, INSERT_VALUES, SCATTER_FORWARD);
-          LIBMESH_CHKERR(ierr);
-          ierr = VecScatterEnd(ctx, _vec, vout, INSERT_VALUES, SCATTER_FORWARD);
-          LIBMESH_CHKERR(ierr);
+          VecScatterBeginEnd(this->comm(), ctx, _vec, vout, INSERT_VALUES, SCATTER_FORWARD);
 
           if (processor_id() == 0)
             {
@@ -1230,17 +1204,7 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
                           scatter.get()); LIBMESH_CHKERR(ierr);
 
   // Actually perform the scatter
-  ierr = VecScatterBegin(scatter,
-                         this->_vec,
-                         petsc_subvector->_vec,
-                         INSERT_VALUES,
-                         SCATTER_FORWARD); LIBMESH_CHKERR(ierr);
-
-  ierr = VecScatterEnd(scatter,
-                       this->_vec,
-                       petsc_subvector->_vec,
-                       INSERT_VALUES,
-                       SCATTER_FORWARD); LIBMESH_CHKERR(ierr);
+  VecScatterBeginEnd(this->comm(), scatter, this->_vec, petsc_subvector->_vec, INSERT_VALUES, SCATTER_FORWARD);
 }
 
 

@@ -417,15 +417,8 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
       ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is, subrhs, nullptr, scatter.get());
       LIBMESH_CHKERR(ierr);
 
-      ierr = VecScatterBegin(scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecScatterEnd(scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-
-      ierr = VecScatterBegin(scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecScatterEnd(scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
+      VecScatterBeginEnd(this->comm(), scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
+      VecScatterBeginEnd(this->comm(), scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
 
       ierr = LibMeshCreateSubMatrix(matrix->mat(),
                                     _restrict_solve_to_is,
@@ -466,10 +459,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
           LIBMESH_CHKERR(ierr);
 
           // Scatter values into subvec1
-          ierr = VecScatterBegin(scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
-          LIBMESH_CHKERR(ierr);
-          ierr = VecScatterEnd(scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
-          LIBMESH_CHKERR(ierr);
+          VecScatterBeginEnd(this->comm(), scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
 
           // Scale: v *= -1
           ierr = VecScale(subvec1, -1.0);
@@ -574,10 +564,8 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
         default:
           libmesh_error_msg("Invalid subset solve mode = " << _subset_solve_mode);
         }
-      ierr = VecScatterBegin(scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecScatterEnd(scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
-      LIBMESH_CHKERR(ierr);
+
+      VecScatterBeginEnd(this->comm(), scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
 
       if (this->_preconditioner)
         {
@@ -651,15 +639,8 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
       ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is, subrhs, nullptr, scatter.get());
       LIBMESH_CHKERR(ierr);
 
-      ierr = VecScatterBegin(scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecScatterEnd(scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-
-      ierr = VecScatterBegin(scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecScatterEnd(scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
+      VecScatterBeginEnd(this->comm(), scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
+      VecScatterBeginEnd(this->comm(), scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
 
       ierr = LibMeshCreateSubMatrix(matrix->mat(),
                                     _restrict_solve_to_is,
@@ -697,10 +678,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
           ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is_complement, subvec1, nullptr, scatter1.get());
           LIBMESH_CHKERR(ierr);
 
-          ierr = VecScatterBegin(scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
-          LIBMESH_CHKERR(ierr);
-          ierr = VecScatterEnd(scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
-          LIBMESH_CHKERR(ierr);
+          VecScatterBeginEnd(this->comm(), scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
 
           ierr = VecScale(subvec1, -1.0);
           LIBMESH_CHKERR(ierr);
@@ -795,10 +773,8 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
         default:
           libmesh_error_msg("Invalid subset solve mode = " << _subset_solve_mode);
         }
-      ierr = VecScatterBegin(scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecScatterEnd(scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
-      LIBMESH_CHKERR(ierr);
+
+      VecScatterBeginEnd(this->comm(), scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
 
       if (this->_preconditioner)
         {
@@ -888,15 +864,8 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
       ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is, subrhs, nullptr, scatter.get());
       LIBMESH_CHKERR(ierr);
 
-      ierr = VecScatterBegin(scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecScatterEnd(scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-
-      ierr = VecScatterBegin(scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecScatterEnd(scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
+      VecScatterBeginEnd(this->comm(), scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
+      VecScatterBeginEnd(this->comm(), scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
 
       ierr = LibMeshCreateSubMatrix(mat,
                                     _restrict_solve_to_is,
@@ -927,10 +896,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is_complement, subvec1, nullptr, scatter1.get());
           LIBMESH_CHKERR(ierr);
 
-          ierr = VecScatterBegin(scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
-          LIBMESH_CHKERR(ierr);
-          ierr = VecScatterEnd(scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
-          LIBMESH_CHKERR(ierr);
+          VecScatterBeginEnd(this->comm(), scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
 
           ierr = VecScale(subvec1, -1.0);
           LIBMESH_CHKERR(ierr);
@@ -1024,10 +990,8 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
         default:
           libmesh_error_msg("Invalid subset solve mode = " << _subset_solve_mode);
         }
-      ierr = VecScatterBegin(scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecScatterEnd(scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
-      LIBMESH_CHKERR(ierr);
+
+      VecScatterBeginEnd(this->comm(), scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
     }
 
   // return the # of its. and the final residual norm.
@@ -1114,15 +1078,8 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
       ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is, subrhs, nullptr, scatter.get());
       LIBMESH_CHKERR(ierr);
 
-      ierr = VecScatterBegin(scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecScatterEnd(scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-
-      ierr = VecScatterBegin(scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecScatterEnd(scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
-      LIBMESH_CHKERR(ierr);
+      VecScatterBeginEnd(this->comm(), scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
+      VecScatterBeginEnd(this->comm(), scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
 
       ierr = LibMeshCreateSubMatrix(mat,
                                     _restrict_solve_to_is,
@@ -1159,10 +1116,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is_complement, subvec1, nullptr, scatter1.get());
           LIBMESH_CHKERR(ierr);
 
-          ierr = VecScatterBegin(scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
-          LIBMESH_CHKERR(ierr);
-          ierr = VecScatterEnd(scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
-          LIBMESH_CHKERR(ierr);
+          VecScatterBeginEnd(this->comm(), scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
 
           ierr = VecScale(subvec1, -1.0);
           LIBMESH_CHKERR(ierr);
@@ -1271,10 +1225,8 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
         default:
           libmesh_error_msg("Invalid subset solve mode = " << _subset_solve_mode);
         }
-      ierr = VecScatterBegin(scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecScatterEnd(scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
-      LIBMESH_CHKERR(ierr);
+
+      VecScatterBeginEnd(this->comm(), scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
 
       if (this->_preconditioner)
         {
