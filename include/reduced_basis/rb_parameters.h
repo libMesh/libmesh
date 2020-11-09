@@ -125,6 +125,18 @@ public:
   void get_extra_parameter_names(std::set<std::string> & param_names) const;
 
   /**
+   * Erase \p param_name  from _parameters. If \p param_name is not present
+   * in _parameters, then do nothing.
+   */
+  void erase_parameter(const std::string & param_name);
+
+  /**
+   * Erase \p param_name  from _extra_parameters. If \p param_name is not present
+   * in _extra_parameters, then do nothing.
+   */
+  void erase_extra_parameter(const std::string & param_name);
+
+  /**
    * Get const_iterator access to the parameters stored in this RBParameters object.
    */
   const_iterator begin() const;
