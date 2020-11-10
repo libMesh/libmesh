@@ -73,6 +73,8 @@ Singleton::Singleton ()
 
 Singleton::Setup::Setup ()
 {
+  SingletonMutex::scoped_lock lock(setup_mtx);
+
   get_setup_cache().push_back (this);
 }
 
