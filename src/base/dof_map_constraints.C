@@ -1734,10 +1734,14 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
   MeshTools::libmesh_assert_valid_boundary_ids(mesh);
 #endif
 
-  // We might get constraint equations from AMR hanging nodes in 2D/3D
-  // or from boundary conditions in any dimension
+  const auto & constraint_rows = mesh.get_constraint_rows();
+
+  // We might get constraint equations from AMR hanging nodes in
+  // 2D/3D, or from spline constraint rows or boundary conditions in
+  // any dimension
   const bool possible_local_constraints = false
     || !mesh.n_elem()
+    || !constraint_rows.empty()
 #ifdef LIBMESH_ENABLE_AMR
     || mesh.mesh_dimension() > 1
 #endif
@@ -1757,22 +1761,64 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
   this->comm().max(possible_global_constraints);
 #endif
 
-  if (!possible_global_constraints)
-    {
-      // Clear out any old constraints; maybe the user just deleted
-      // their last remaining dirichlet/periodic/user constraint?
-      // Note: any _stashed_dof_constraints are not cleared as it
-      // may be the user's intention to restore them later.
+  // Recalculate dof constraints from scratch.  (Or just clear them,
+  // if the user has just deleted their last dirichlet/periodic/user
+  // constraint)
+  // Note: any _stashed_dof_constraints are not cleared as it
+  // may be the user's intention to restore them later.
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-      _dof_constraints.clear();
-      _primal_constraint_values.clear();
-      _adjoint_constraint_values.clear();
+  _dof_constraints.clear();
+  _primal_constraint_values.clear();
+  _adjoint_constraint_values.clear();
 #endif
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-      _node_constraints.clear();
+  _node_constraints.clear();
 #endif
 
-      return;
+  if (!possible_global_constraints)
+    return;
+
+  // Start with spline node constraints.
+  if (!constraint_rows.empty())
+    {
+      // We have some strict compatibility requirements here still
+      if (mesh.allow_renumbering() ||
+          (!mesh.is_replicated() &&
+           mesh.allow_remote_element_removal()))
+        libmesh_not_implemented();
+
+      const unsigned int sys_num = this->sys_number();
+      for (auto & node_row : constraint_rows)
+        {
+          const Node * node = mesh.query_node_ptr(node_row.first);
+          if (!node)
+            continue;
+          for (auto var_num : IntRange<unsigned int>(0, this->n_variables()))
+            {
+              const FEFamily & fe_family = this->variable_type(var_num).family;
+
+              // constraint_rows only applies to nodal variables
+              if (fe_family != LAGRANGE &&
+                  fe_family != RATIONAL_BERNSTEIN)
+                continue;
+
+              DofConstraintRow dc_row;
+
+              const dof_id_type constrained_id =
+                node->dof_number(sys_num, var_num, 0);
+              for (auto pr : node_row.second)
+                {
+                  const Node & spline_node = mesh.node_ref(pr.first);
+                  const dof_id_type spline_dof_id =
+                    spline_node.dof_number(sys_num, var_num, 0);
+                  dc_row[spline_dof_id] = pr.second;
+                }
+
+              // Don't forbid constraint overwrite, or we're likely to
+              // conflict with *any* other constraints.
+              this->add_constraint_row(constrained_id, dc_row, false);
+            }
+        }
     }
 
   // Here we build the hanging node constraints.  This is done
@@ -1803,9 +1849,6 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 #endif
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  // recalculate node constraints from scratch
-  _node_constraints.clear();
-
   Threads::parallel_for (range,
                          ComputeNodeConstraints (_node_constraints,
 #ifdef LIBMESH_ENABLE_PERIODIC
@@ -1814,13 +1857,6 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
                                                  mesh));
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
-
-  // recalculate dof constraints from scratch
-  // Note: any _stashed_dof_constraints are not cleared as it
-  // may be the user's intention to restore them later.
-  _dof_constraints.clear();
-  _primal_constraint_values.clear();
-  _adjoint_constraint_values.clear();
 
   // Look at all the variables in the system.  Reset the element
   // range at each iteration -- there is no need to reconstruct it.

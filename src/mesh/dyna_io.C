@@ -724,48 +724,10 @@ void DynaIO::read_mesh(std::istream & in)
 }
 
 
-void DynaIO::add_spline_constraints(DofMap & dof_map,
-                                    unsigned int sys_num,
-                                    unsigned int var_num)
+void DynaIO::add_spline_constraints(DofMap &,
+                                    unsigned int,
+                                    unsigned int)
 {
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  MeshBase & mesh = this->mesh();
-
-  // We have some strict compatibility requirements here still
-  if (mesh.allow_renumbering() ||
-      (!mesh.is_replicated() &&
-       mesh.allow_remote_element_removal()))
-    libmesh_not_implemented();
-
-  const auto & constraint_rows = mesh.get_constraint_rows();
-
-  for (auto & node_row : constraint_rows)
-    {
-      DofConstraintRow dc_row;
-      const Node * node = mesh.query_node_ptr(node_row.first);
-      if (!node)
-        continue;
-      const dof_id_type constrained_id =
-        node->dof_number(sys_num, var_num, 0);
-      for (auto pr : node_row.second)
-        {
-          const Node & spline_node = mesh.node_ref(pr.first);
-          const dof_id_type spline_dof_id =
-            spline_node.dof_number(sys_num, var_num, 0);
-          dc_row[spline_dof_id] = pr.second;
-        }
-
-      // Don't forbid constraint overwrite, or we're likely to
-      // conflict with *any* other constraints.
-      dof_map.add_constraint_row(constrained_id, dc_row, false);
-    }
-
-  dof_map.process_constraints(mesh);
-  dof_map.prepare_send_list();
-#else
-  libmesh_ignore(dof_map, sys_num, var_num);
-  libmesh_not_implemented();
-#endif
 }
 
 
