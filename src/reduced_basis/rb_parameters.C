@@ -94,6 +94,16 @@ void RBParameters::get_extra_parameter_names(std::set<std::string> & param_names
     param_names.insert(pr.first);
 }
 
+void RBParameters::erase_parameter(const std::string & param_name)
+{
+  _parameters.erase(param_name);
+}
+
+void RBParameters::erase_extra_parameter(const std::string & param_name)
+{
+  _extra_parameters.erase(param_name);
+}
+
 RBParameters::const_iterator RBParameters::begin() const
 {
   return _parameters.begin();

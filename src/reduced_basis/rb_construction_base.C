@@ -486,7 +486,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
   if (num_params > 3)
     {
       libMesh::out << "ERROR: Deterministic training sample generation "
-                   << " not implemented for more than three parameters." << std::endl;
+                   << "not implemented for more than three parameters." << std::endl;
       libmesh_not_implemented();
     }
 
