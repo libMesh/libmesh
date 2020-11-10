@@ -127,8 +127,7 @@ DynaIO::ElementDefinition::ElementDefinition
 
 
 DynaIO::DynaIO (MeshBase & mesh) :
-  MeshInput<MeshBase>  (mesh),
-  constraint_rows_broadcast (false)
+  MeshInput<MeshBase>  (mesh)
 {
 }
 
@@ -187,8 +186,6 @@ void DynaIO::read_mesh(std::istream & in)
 
   // clear any of our own data
   spline_node_ptrs.clear();
-  constraint_rows.clear();
-  constraint_rows_broadcast = false;
 
   // Expect different sections, in this order, perhaps with blank
   // lines and/or comments in between:
@@ -575,6 +572,8 @@ void DynaIO::read_mesh(std::istream & in)
   // calculated from multiple neighboring elements.
   std::map<std::vector<std::pair<dof_id_type, Real>>, Node *> local_nodes;
 
+  auto & constraint_rows = mesh.get_constraint_rows();
+
   for (auto block_num : make_range(n_elem_blocks))
     {
       elem_constraint_mat[block_num].resize(block_n_elem[block_num]);
@@ -738,13 +737,7 @@ void DynaIO::add_spline_constraints(DofMap & dof_map,
        mesh.allow_remote_element_removal()))
     libmesh_not_implemented();
 
-  // We do mesh reads in serial, and the mesh broadcast doesn't
-  // broadcast our internal data, so we may need to do that now
-  if (!constraint_rows_broadcast)
-    {
-      mesh.comm().broadcast(constraint_rows);
-      constraint_rows_broadcast = true;
-    }
+  const auto & constraint_rows = mesh.get_constraint_rows();
 
   for (auto & node_row : constraint_rows)
     {

@@ -97,17 +97,6 @@ private:
   // constraint rows easily later.
   std::vector<Node *> spline_node_ptrs;
 
-  // Keep track of the constraint equations associated with each FE
-  // node.
-  //
-  // constraint_rows[FE_node][i].first is the constraining spline
-  // node, and .second is the constraining coefficient.
-  std::map<dof_id_type, std::vector<std::pair<dof_id_type, Real>>>
-    constraint_rows;
-
-  // Have we broadcast the constraint_rows to non-root procs yet?
-  bool constraint_rows_broadcast;
-
   /**
    * Implementation of the read() function.  This function
    * is called by the public interface function and implements
