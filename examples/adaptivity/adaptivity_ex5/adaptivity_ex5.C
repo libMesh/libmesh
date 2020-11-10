@@ -36,7 +36,7 @@
 
 // libMesh includes
 #include "libmesh/libmesh.h"
-#include "libmesh/mesh.h"
+#include "libmesh/replicated_mesh.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/gmv_io.h"
 #include "libmesh/exodusII_io.h"
@@ -225,7 +225,8 @@ int main (int argc, char ** argv)
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Create a new mesh on the default MPI communicator.
-  Mesh mesh(init.comm());
+  // There seems to be a DistributedMesh bug triggered here.
+  ReplicatedMesh mesh(init.comm());
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
