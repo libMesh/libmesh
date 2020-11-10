@@ -295,15 +295,6 @@ int main (int argc, char ** argv)
   // Initialize the system
   equation_systems.init ();
 
-  // Add any spline constraints for IGA problems
-  if (use_iga)
-    {
-      for (unsigned int n = 0; n != system.n_vars(); ++n)
-        dyna_io.add_spline_constraints(system.get_dof_map(),
-                                       system.number(), n);
-      system.reinit_constraints();
-    }
-
   // Set the time stepping options
   system.deltat = deltat;
 
