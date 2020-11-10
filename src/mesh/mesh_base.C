@@ -541,6 +541,8 @@ void MeshBase::clear ()
   // Clear element dimensions
   _elem_dims.clear();
 
+  _constraint_rows.clear();
+
   // Clear our point locator.
   this->clear_point_locator();
 }
