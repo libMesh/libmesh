@@ -1586,11 +1586,9 @@ private:
    * Build the constraint matrix C and the forcing vector H
    * associated with the element degree of freedom indices elem_dofs.
    * The optional parameter \p called_recursively should be left at
-   * the default value \p false.  This is used to handle the special
-   * case of an element's degrees of freedom being constrained in
-   * terms of other, local degrees of freedom.  The usual case is for
-   * an elements DOFs to be constrained by some other, external DOFs
-   * and/or Dirichlet conditions.
+   * the default value \p false. It used to be necessary to call this function
+   * recursively to handle "unexpanded" constraints, but we now
+   * expand all the constraints before calling this function.
    *
    * The forcing vector will depend on which solution's heterogenous
    * constraints are being applied.  For the default \p qoi_index this
