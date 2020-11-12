@@ -3002,23 +3002,21 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number> & C,
           dof_set.insert (item.first);
       }
 
-  // May be safe to return at this point
-  // (but remember to stop the perflog)
+  // We can return now if there aren't any constraints
   if (!we_have_constraints)
     return;
 
   for (const auto & dof : elem_dofs)
     dof_set.erase (dof);
 
-  // If we added any DOFS then we need to do this recursively.
-  // It is possible that we just added a DOF that is also
-  // constrained!
-  //
-  // Also, we need to handle the special case of an element having DOFs
-  // constrained in terms of other, local DOFs
-  if (!dof_set.empty() ||  // case 1: constrained in terms of other DOFs
-      !called_recursively) // case 2: constrained in terms of our own DOFs
-    {
+  // libMesh now expands all constraints before calling build_constraint_matrix(),
+  // so there should be no DOFs left in dof_set to handle, and no need to call
+  // this function recursively.
+  libmesh_error_msg_if(called_recursively, "DofMap::build_constraint_matrix() should no longer be called recursively.");
+  libmesh_error_msg_if(!dof_set.empty(),
+                       "All constraints should have been expanded before calling DofMap::build_constraint_matrix(), "
+                       "but dof_set still contains " << dof_set.size() << " entries.");
+
       const unsigned int old_size =
         cast_int<unsigned int>(elem_dofs.size());
 
@@ -3058,19 +3056,7 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number> & C,
             C(i,i) = 1.;
           }
 
-      // May need to do this recursively.  It is possible
-      // that we just replaced a constrained DOF with another
-      // constrained DOF.
-      DenseMatrix<Number> Cnew;
-
-      this->build_constraint_matrix (Cnew, elem_dofs, true);
-
-      if ((C.n() == Cnew.m()) &&
-          (Cnew.n() == elem_dofs.size())) // If the constraint matrix
-        C.right_multiply(Cnew);           // is constrained...
-
       libmesh_assert_equal_to (C.n(), elem_dofs.size());
-    }
 }
 
 
