@@ -161,6 +161,29 @@ public:
    */
   virtual BoundingBox loose_bounding_box () const override;
 
+  /**
+   * \returns \p true if the point p is contained in this element,
+   * false otherwise.
+   *
+   * Performs an initial tight bounding box check (as an optimization step)
+   * and (if that passes) then uses the user-defined tolerance "tol" in a
+   * call to inverse_map() to actually test if the point is in the element.
+   *
+   * In the case of a non-planar QUAD4, this splits the face into two
+   * TRI3 elems and calls contains_point() on said elems instead.
+   *
+   * \note This routine should not be used to determine if a point
+   * is merely "nearby" an element to within some tolerance. For that,
+   * use Quad4::close_to_point() instead.
+   */
+  bool contains_point(const Point & p, Real tol = TOLERANCE) const override;
+
+  /**
+   * \returns \p true if this element is "close" to the point p, where
+   * "close" is determined by the tolerance tol.
+   */
+  bool close_to_point(const Point & p, Real tol) const override;
+
 protected:
 
   /**

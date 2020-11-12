@@ -243,4 +243,44 @@ Quad4::loose_bounding_box () const
 }
 
 
+
+bool
+Quad4::contains_point (const Point & p, Real tol) const
+{
+  if (Quad4::has_affine_map())
+    return Quad::contains_point(p, tol);
+
+  auto tri3_side = Elem::build(TRI3);
+  tri3_side->set_node(0) = const_cast<Node *>(&this->node_ref(0));
+  tri3_side->set_node(1) = const_cast<Node *>(&this->node_ref(1));
+  tri3_side->set_node(2) = const_cast<Node *>(&this->node_ref(3));
+
+  if (tri3_side->contains_point(p, tol))
+    return true;
+
+  tri3_side->set_node(0) = const_cast<Node *>(&this->node_ref(2));
+
+  return tri3_side->contains_point(p, tol);
+}
+
+
+bool
+Quad4::close_to_point (const Point & p, Real tol) const
+{
+  if (Quad4::has_affine_map())
+    return Quad::close_to_point(p, tol);
+
+  auto tri3_side = Elem::build(TRI3);
+  tri3_side->set_node(0) = const_cast<Node *>(&this->node_ref(0));
+  tri3_side->set_node(1) = const_cast<Node *>(&this->node_ref(1));
+  tri3_side->set_node(2) = const_cast<Node *>(&this->node_ref(3));
+
+  if (tri3_side->close_to_point(p, tol))
+    return true;
+
+  tri3_side->set_node(0) = const_cast<Node *>(&this->node_ref(2));
+
+  return tri3_side->close_to_point(p, tol);
+}
+
 } // namespace libMesh
