@@ -1830,7 +1830,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
           for (auto j : make_range(this->num_nodes_per_elem))
             {
               const unsigned int connect_index   = (i*this->num_nodes_per_elem)+j;
-              const unsigned int elem_node_index = conv.get_node_map(j);
+              const unsigned int elem_node_index = conv.get_inverse_node_map(j); // inverse node map is used for writing
 
               current_block_connectivity[connect_index] =
                 libmesh_map_find(libmesh_node_num_to_exodus,
