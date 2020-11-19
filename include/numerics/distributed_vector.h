@@ -132,6 +132,12 @@ public:
                      const bool fast = false,
                      const ParallelType = AUTOMATIC) override;
 
+  virtual void init (const numeric_index_type N,
+                     const numeric_index_type n_local,
+                     const std::shared_ptr<GlobalToLocalMap> ghost_map,
+                     const bool fast = false,
+                     const ParallelType = AUTOMATIC) override;
+
   virtual void init (const NumericVector<T> & other,
                      const bool fast = false) override;
 
@@ -409,6 +415,17 @@ void DistributedVector<T>::init (const numeric_index_type n,
   this->init(n, n_local, fast, ptype);
 }
 
+template <typename T>
+inline
+void DistributedVector<T>::init (const numeric_index_type n,
+                                 const numeric_index_type n_local,
+                                 const std::shared_ptr<GlobalToLocalMap> /*ghost_map*/,
+                                 const bool fast,
+                                 const ParallelType ptype)
+{
+  // TODO: we shouldn't ignore the ghost sparsity pattern
+  this->init(n, n_local, fast, ptype);
+}
 
 
 /* Default implementation for solver packages for which ghosted

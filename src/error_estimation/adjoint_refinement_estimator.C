@@ -546,12 +546,12 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // local ghosted vector, this ensures each processor has all the dof_indices to compute an error indicator for
   // an element it owns
   std::unique_ptr<NumericVector<Number>> localized_projected_residual = NumericVector<Number>::build(system.comm());
-  localized_projected_residual->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
+  localized_projected_residual->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_global_to_local_map(), false, GHOSTED);
   projected_residual.localize(*localized_projected_residual, system.get_dof_map().get_send_list());
 
   // Each adjoint solution will also require ghosting; for efficiency we'll reuse the same memory
   std::unique_ptr<NumericVector<Number>> localized_adjoint_solution = NumericVector<Number>::build(system.comm());
-  localized_adjoint_solution->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
+  localized_adjoint_solution->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_global_to_local_map(), false, GHOSTED);
 
   // We will loop over each adjoint solution, localize that adjoint
   // solution and then loop over local elements

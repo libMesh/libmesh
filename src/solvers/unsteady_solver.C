@@ -71,7 +71,7 @@ void UnsteadySolver::init_data()
 
 #ifdef LIBMESH_ENABLE_GHOSTED
   old_local_nonlinear_solution->init (_system.n_dofs(), _system.n_local_dofs(),
-                                      _system.get_dof_map().get_send_list(), false,
+                                      _system.get_dof_map().get_global_to_local_map(), false,
                                       GHOSTED);
 #else
   old_local_nonlinear_solution->init (_system.n_dofs(), false, SERIAL);
@@ -86,7 +86,7 @@ void UnsteadySolver::reinit ()
 
 #ifdef LIBMESH_ENABLE_GHOSTED
   old_local_nonlinear_solution->init (_system.n_dofs(), _system.n_local_dofs(),
-                                      _system.get_dof_map().get_send_list(), false,
+                                      _system.get_dof_map().get_global_to_local_map(), false,
                                       GHOSTED);
 #else
   old_local_nonlinear_solution->init (_system.n_dofs(), false, SERIAL);

@@ -2643,7 +2643,7 @@ void DofMap::enforce_constraints_exactly (const System & system,
     {
       v_built = NumericVector<Number>::build(this->comm());
       v_built->init (v->size(), v->local_size(),
-                     this->get_send_list(), true,
+                     this->get_global_to_local_map(), true,
                      GHOSTED);
       v->localize(*v_built, this->get_send_list());
       v_built->close();
@@ -2723,7 +2723,7 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
     {
       solution_built = NumericVector<Number>::build(this->comm());
       solution_built->init (solution->size(), solution->local_size(),
-                            this->get_send_list(), true, GHOSTED);
+                            this->get_global_to_local_map(), true, GHOSTED);
       solution->localize(*solution_built, this->get_send_list());
       solution_built->close();
       solution_local = solution_built.get();
@@ -2820,7 +2820,7 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
     {
       v_built = NumericVector<Number>::build(this->comm());
       v_built->init (v.size(), v.local_size(),
-                     this->get_send_list(), true, GHOSTED);
+                     this->get_global_to_local_map(), true, GHOSTED);
       v.localize(*v_built, this->get_send_list());
       v_built->close();
       v_local = v_built.get();

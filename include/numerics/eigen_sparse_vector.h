@@ -90,6 +90,18 @@ public:
                      const std::vector<numeric_index_type> & ghost,
                      const ParallelType = AUTOMATIC);
 
+   /**
+    * Constructor. Set local dimension to \p n_local, the global
+    * dimension to \p n, but additionally reserve memory for the
+    * indices specified by the \p ghost_map argument.
+    * \p ghost_map is a global-to-local map.
+    */
+   EigenSparseVector (const Parallel::Communicator & comm_in,
+                      const numeric_index_type N,
+                      const numeric_index_type n_local,
+                      const std::shared_ptr<GlobalToLocalMap> ghost_map,
+                      const ParallelType = AUTOMATIC);
+
   /**
    * Copy assignment operator. Does some state checks before copying
    * the underlying Eigen data type.
@@ -133,6 +145,12 @@ public:
   virtual void init (const numeric_index_type N,
                      const numeric_index_type n_local,
                      const std::vector<numeric_index_type> & ghost,
+                     const bool fast = false,
+                     const ParallelType = AUTOMATIC) override;
+
+  virtual void init (const numeric_index_type N,
+                     const numeric_index_type n_local,
+                     const std::shared_ptr<GlobalToLocalMap> ghost_map,
                      const bool fast = false,
                      const ParallelType = AUTOMATIC) override;
 
@@ -305,7 +323,17 @@ EigenSparseVector<T>::EigenSparseVector (const Parallel::Communicator & comm_in,
   this->init(N, n_local, ghost, false, ptype);
 }
 
-
+template <typename T>
+inline
+EigenSparseVector<T>::EigenSparseVector (const Parallel::Communicator & comm_in,
+                                         const numeric_index_type N,
+                                         const numeric_index_type n_local,
+                                         const std::shared_ptr<GlobalToLocalMap> ghost_map,
+                                         const ParallelType ptype)
+  : NumericVector<T>(comm_in, ptype)
+{
+  this->init(N, n_local, ghost_map, false, ptype);
+}
 
 template <typename T>
 inline
@@ -357,6 +385,18 @@ void EigenSparseVector<T>::init (const numeric_index_type n,
                                  const ParallelType ptype)
 {
   libmesh_assert(ghost.empty());
+  this->init(n,n_local,fast,ptype);
+}
+
+template <typename T>
+inline
+void EigenSparseVector<T>::init (const numeric_index_type n,
+                                 const numeric_index_type n_local,
+                                 std::shared_ptr<GlobalToLocalMap> libmesh_dbg_var(ghost_map),
+                                 const bool fast,
+                                 const ParallelType ptype)
+{
+  libmesh_assert(ghost_map->empty());
   this->init(n,n_local,fast,ptype);
 }
 

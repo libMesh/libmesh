@@ -46,11 +46,11 @@ void SecondOrderUnsteadySolver::init_data()
 
 #ifdef LIBMESH_ENABLE_GHOSTED
   _old_local_solution_rate->init (_system.n_dofs(), _system.n_local_dofs(),
-                                  _system.get_dof_map().get_send_list(), false,
+                                  _system.get_dof_map().get_global_to_local_map(), false,
                                   GHOSTED);
 
   _old_local_solution_accel->init (_system.n_dofs(), _system.n_local_dofs(),
-                                   _system.get_dof_map().get_send_list(), false,
+                                   _system.get_dof_map().get_global_to_local_map(), false,
                                    GHOSTED);
 #else
   _old_local_solution_rate->init (_system.n_dofs(), false, SERIAL);
@@ -64,11 +64,11 @@ void SecondOrderUnsteadySolver::reinit ()
 
 #ifdef LIBMESH_ENABLE_GHOSTED
   _old_local_solution_rate->init (_system.n_dofs(), _system.n_local_dofs(),
-                                  _system.get_dof_map().get_send_list(), false,
+                                  _system.get_dof_map().get_global_to_local_map(), false,
                                   GHOSTED);
 
   _old_local_solution_accel->init (_system.n_dofs(), _system.n_local_dofs(),
-                                   _system.get_dof_map().get_send_list(), false,
+                                   _system.get_dof_map().get_global_to_local_map(), false,
                                    GHOSTED);
 #else
   _old_local_solution_rate->init (_system.n_dofs(), false, SERIAL);

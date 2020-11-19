@@ -240,7 +240,7 @@ void System::init_data ()
   // Resize the current_local_solution for the current mesh
 #ifdef LIBMESH_ENABLE_GHOSTED
   current_local_solution->init (this->n_dofs(), this->n_local_dofs(),
-                                _dof_map->get_send_list(), false,
+                                _dof_map->get_global_to_local_map(), false,
                                 GHOSTED);
 #else
   current_local_solution->init (this->n_dofs(), false, SERIAL);
@@ -259,7 +259,7 @@ void System::init_data ()
         {
 #ifdef LIBMESH_ENABLE_GHOSTED
           pr.second->init (this->n_dofs(), this->n_local_dofs(),
-                           _dof_map->get_send_list(), false,
+                           _dof_map->get_global_to_local_map(), false,
                            GHOSTED);
 #else
           libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
@@ -359,7 +359,7 @@ void System::restrict_vectors ()
             {
 #ifdef LIBMESH_ENABLE_GHOSTED
               pr.second->init (this->n_dofs(), this->n_local_dofs(),
-                               _dof_map->get_send_list(), false,
+                               _dof_map->get_global_to_local_map(), false,
                                GHOSTED);
 #else
               libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
@@ -381,7 +381,7 @@ void System::restrict_vectors ()
 
 #ifdef LIBMESH_ENABLE_GHOSTED
   current_local_solution->init(this->n_dofs(),
-                               this->n_local_dofs(), send_list,
+                               this->n_local_dofs(), _dof_map->get_global_to_local_map(),
                                false, GHOSTED);
 #else
   current_local_solution->init(this->n_dofs());
@@ -725,7 +725,7 @@ NumericVector<Number> & System::add_vector (const std::string & vec_name,
         {
 #ifdef LIBMESH_ENABLE_GHOSTED
           buf->init (this->n_dofs(), this->n_local_dofs(),
-                     _dof_map->get_send_list(), false,
+                     _dof_map->get_global_to_local_map(), false,
                      GHOSTED);
 #else
           libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
@@ -1594,7 +1594,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
 
   // Localize the potentially parallel vector
   std::unique_ptr<NumericVector<Number>> local_v = NumericVector<Number>::build(this->comm());
-  local_v->init(v.size(), v.local_size(), _dof_map->get_send_list(),
+  local_v->init(v.size(), v.local_size(), _dof_map->get_global_to_local_map(),
                 true, GHOSTED);
   v.localize (*local_v, _dof_map->get_send_list());
 

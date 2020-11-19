@@ -323,7 +323,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
       new_vector_ptr = new_vector_built.get();
       local_old_vector = local_old_vector_built.get();
       new_vector_ptr->init(this->n_dofs(), this->n_local_dofs(),
-                           this->get_dof_map().get_send_list(), false,
+                           this->get_dof_map().get_global_to_local_map(), false,
                            GHOSTED);
       local_old_vector->init(old_v.size(), old_v.local_size(),
                              projection_list.send_list, false, GHOSTED);
@@ -342,7 +342,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
       projection_list.unique();
 
       new_v.init (this->n_dofs(), this->n_local_dofs(),
-                  this->get_dof_map().get_send_list(), false, GHOSTED);
+                  this->get_dof_map().get_global_to_local_map(), false, GHOSTED);
 
       local_old_vector_built = NumericVector<Number>::build(this->comm());
       new_vector_ptr = &new_v;

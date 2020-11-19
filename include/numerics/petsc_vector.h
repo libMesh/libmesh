@@ -109,6 +109,18 @@ public:
                const std::vector<numeric_index_type> & ghost,
                const ParallelType type = AUTOMATIC);
 
+   /**
+    * Constructor. Set local dimension to \p n_local, the global
+    * dimension to \p n, but additionally reserve memory for the
+    * indices specified by the \p ghost_map argument. \p ghost_map
+    * is a global-to-local map for ghosting elements.
+    */
+   PetscVector (const Parallel::Communicator & comm_in,
+                const numeric_index_type N,
+                const numeric_index_type n_local,
+                const std::shared_ptr<GlobalToLocalMap> ghost_map,
+                const ParallelType type = AUTOMATIC);
+
   /**
    * Constructor.  Creates a PetscVector assuming you already have a
    * valid PETSc Vec object.  In this case, \p v is NOT destroyed by the
@@ -158,6 +170,12 @@ public:
   virtual void init (const numeric_index_type N,
                      const numeric_index_type n_local,
                      const std::vector<numeric_index_type> & ghost,
+                     const bool fast = false,
+                     const ParallelType = AUTOMATIC) override;
+
+  virtual void init (const numeric_index_type N,
+                     const numeric_index_type n_local,
+                     const std::shared_ptr<GlobalToLocalMap> ghost_map,
                      const bool fast = false,
                      const ParallelType = AUTOMATIC) override;
 
@@ -431,15 +449,10 @@ private:
   void _restore_array() const;
 
   /**
-   * Type for map that maps global to local ghost cells.
-   */
-  typedef std::unordered_map<numeric_index_type,numeric_index_type> GlobalToLocalMap;
-
-  /**
    * Map that maps global to local ghost cells (will be empty if not
    * in ghost cell mode).
    */
-  GlobalToLocalMap _global_to_local_map;
+  std::shared_ptr<GlobalToLocalMap> _global_to_local_map;
 
   /**
    * This boolean value should only be set to false
@@ -473,7 +486,7 @@ PetscVector<T>::PetscVector (const Parallel::Communicator & comm_in, const Paral
   _last(0),
   _local_form(nullptr),
   _values(nullptr),
-  _global_to_local_map(),
+  _global_to_local_map(nullptr),
   _destroy_vec_on_exit(true),
   _values_manually_retrieved(false),
   _values_read_only(false)
@@ -492,7 +505,7 @@ PetscVector<T>::PetscVector (const Parallel::Communicator & comm_in,
   _array_is_present(false),
   _local_form(nullptr),
   _values(nullptr),
-  _global_to_local_map(),
+  _global_to_local_map(nullptr),
   _destroy_vec_on_exit(true),
   _values_manually_retrieved(false),
   _values_read_only(false)
@@ -512,7 +525,7 @@ PetscVector<T>::PetscVector (const Parallel::Communicator & comm_in,
   _array_is_present(false),
   _local_form(nullptr),
   _values(nullptr),
-  _global_to_local_map(),
+  _global_to_local_map(nullptr),
   _destroy_vec_on_exit(true),
   _values_manually_retrieved(false),
   _values_read_only(false)
@@ -533,12 +546,31 @@ PetscVector<T>::PetscVector (const Parallel::Communicator & comm_in,
   _array_is_present(false),
   _local_form(nullptr),
   _values(nullptr),
-  _global_to_local_map(),
+  _global_to_local_map(nullptr),
   _destroy_vec_on_exit(true),
   _values_manually_retrieved(false),
   _values_read_only(false)
 {
   this->init(n, n_local, ghost, false, ptype);
+}
+
+template <typename T>
+inline
+PetscVector<T>::PetscVector (const Parallel::Communicator & comm_in,
+                             const numeric_index_type n,
+                             const numeric_index_type n_local,
+                             const std::shared_ptr<GlobalToLocalMap> ghost_map,
+                             const ParallelType ptype) :
+  NumericVector<T>(comm_in, ptype),
+  _array_is_present(false),
+  _local_form(nullptr),
+  _values(nullptr),
+  _global_to_local_map(nullptr),
+  _destroy_vec_on_exit(true),
+  _values_manually_retrieved(false),
+  _values_read_only(false)
+{
+  this->init(n, n_local, ghost_map, false, ptype);
 }
 
 
@@ -553,7 +585,7 @@ PetscVector<T>::PetscVector (Vec v,
   _array_is_present(false),
   _local_form(nullptr),
   _values(nullptr),
-  _global_to_local_map(),
+  _global_to_local_map(nullptr),
   _destroy_vec_on_exit(false),
   _values_manually_retrieved(false),
   _values_read_only(false)
@@ -599,8 +631,13 @@ PetscVector<T>::PetscVector (Vec v,
           ierr = ISLocalToGlobalMappingGetIndices(mapping,&indices);
           LIBMESH_CHKERR(ierr);
 
+          // We need to create a GlobalToLocalMap object to take ghosting elements
+          // from Petsc Vec
+          _global_to_local_map = std::make_shared<GlobalToLocalMap>();
+
           for (numeric_index_type i=ghost_begin; i<ghost_end; i++)
-            _global_to_local_map[indices[i]] = i-my_local_size;
+            (*_global_to_local_map)[indices[i]] = i-my_local_size;
+
           this->_type = GHOSTED;
           ierr = ISLocalToGlobalMappingRestoreIndices(mapping, &indices);
           LIBMESH_CHKERR(ierr);
@@ -745,10 +782,13 @@ void PetscVector<T>::init (const numeric_index_type n,
   libmesh_assert(ptype == AUTOMATIC || ptype == GHOSTED);
   this->_type = GHOSTED;
 
+  // Create a new object to take ghosting elements from 'ghost'
+  _global_to_local_map = std::make_shared<GlobalToLocalMap>();
+
   /* Make the global-to-local ghost cell map.  */
   for (auto i : index_range(ghost))
     {
-      _global_to_local_map[ghost[i]] = i;
+      (*_global_to_local_map)[ghost[i]] = i;
     }
 
   /* Create vector.  */
@@ -767,7 +807,63 @@ void PetscVector<T>::init (const numeric_index_type n,
     this->zero ();
 }
 
+template <typename T>
+inline
+void PetscVector<T>::init (const numeric_index_type n,
+                           const numeric_index_type n_local,
+                           const std::shared_ptr<GlobalToLocalMap> map_ghost,
+                           const bool fast,
+                           const ParallelType libmesh_dbg_var(ptype))
+{
+  parallel_object_only();
 
+  libmesh_assert(map_ghost);
+
+  PetscErrorCode ierr=0;
+  PetscInt petsc_n=static_cast<PetscInt>(n);
+  PetscInt petsc_n_local=static_cast<PetscInt>(n_local);
+  PetscInt petsc_n_ghost=static_cast<PetscInt>(map_ghost->size());
+
+  libmesh_assert(sizeof(PetscInt) == sizeof(numeric_index_type));
+
+  std::vector<PetscInt> ghost;
+  ghost.reserve(map_ghost->size());
+  for (auto mg = map_ghost->begin(); mg != map_ghost->end(); mg++)
+    ghost.push_back(mg->first);
+
+  // Sort is necessary because PETSc does not sort ghosting elements.
+  // In libMesh, we assume the ghosting elements are sorted when users
+  // access data using global indices.
+  std::sort(ghost.begin(),ghost.end());
+
+  PetscInt * petsc_ghost = ghost.empty() ? PETSC_NULL :
+    const_cast<PetscInt *>(reinterpret_cast<const PetscInt *>(ghost.data()));
+
+  // Clear initialized vectors
+  if (this->initialized())
+    this->clear();
+
+  libmesh_assert(ptype == AUTOMATIC || ptype == GHOSTED);
+  this->_type = GHOSTED;
+
+  // Share a ghost map to save memory
+  _global_to_local_map = map_ghost;
+
+  /* Create vector.  */
+  ierr = VecCreateGhost (this->comm().get(), petsc_n_local, petsc_n,
+                         petsc_n_ghost, petsc_ghost,
+                         &_vec);
+  LIBMESH_CHKERR(ierr);
+
+  ierr = VecSetFromOptions (_vec);
+  LIBMESH_CHKERR(ierr);
+
+  this->_is_initialized = true;
+  this->_is_closed = true;
+
+  if (fast == false)
+    this->zero ();
+}
 
 template <typename T>
 inline
@@ -788,6 +884,7 @@ void PetscVector<T>::init (const NumericVector<T> & other,
       v._restore_array();
     }
 
+  // Two vectors will share the same map
   this->_global_to_local_map = v._global_to_local_map;
 
   // Even if we're initializing sizes based on an uninitialized or
@@ -845,7 +942,8 @@ void PetscVector<T>::clear ()
 
   this->_is_closed = this->_is_initialized = false;
 
-  _global_to_local_map.clear();
+  if (_global_to_local_map)
+    _global_to_local_map.reset();
 }
 
 
@@ -1025,15 +1123,17 @@ numeric_index_type PetscVector<T>::map_global_to_local_index (const numeric_inde
       return i-first;
     }
 
-  GlobalToLocalMap::const_iterator it = _global_to_local_map.find(i);
+  libmesh_assert (_global_to_local_map);
+
+  GlobalToLocalMap::const_iterator it = _global_to_local_map->find(i);
 #ifndef NDEBUG
-  const GlobalToLocalMap::const_iterator end = _global_to_local_map.end();
+  const GlobalToLocalMap::const_iterator end = _global_to_local_map->end();
   if (it == end)
     {
       std::ostringstream error_message;
       error_message << "No index " << i << " in ghosted vector.\n"
                     << "Vector contains [" << first << ',' << last << ")\n";
-      GlobalToLocalMap::const_iterator b = _global_to_local_map.begin();
+      GlobalToLocalMap::const_iterator b = _global_to_local_map->begin();
       if (b == end)
         {
           error_message << "And empty ghost array.\n";
@@ -1048,7 +1148,7 @@ numeric_index_type PetscVector<T>::map_global_to_local_index (const numeric_inde
 
       libmesh_error_msg(error_message.str());
     }
-  libmesh_assert (it != _global_to_local_map.end());
+  libmesh_assert (it != _global_to_local_map->end());
 #endif
   return it->second+last-first;
 }

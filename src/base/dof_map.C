@@ -145,6 +145,7 @@ DofMap::DofMap(const unsigned int number,
   _end_df(),
   _first_scalar_df(),
   _send_list(),
+  _global_to_local_map(std::make_shared<GlobalToLocalMap>()),
   _augment_sparsity_pattern(nullptr),
   _extra_sparsity_function(nullptr),
   _extra_sparsity_context(nullptr),
@@ -1706,6 +1707,12 @@ void DofMap::prepare_send_list ()
   // Remove the end of the send_list.  Use the "swap trick"
   // from Effective STL
   std::vector<dof_id_type> (_send_list.begin(), new_end).swap (_send_list);
+
+  libmesh_assert(_global_to_local_map);
+
+  /* Make the global-to-local ghost cell map.  */
+  for (auto i : index_range(_send_list))
+    (*_global_to_local_map)[_send_list[i]] = i;
 
   // Make sure the send list has nothing invalid in it.
   libmesh_assert(_send_list.empty() || _send_list.back() < this->n_dofs());

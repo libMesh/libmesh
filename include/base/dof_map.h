@@ -74,7 +74,7 @@ template <typename T> class DenseMatrix;
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 
-
+typedef std::unordered_map<numeric_index_type,numeric_index_type> GlobalToLocalMap;
 
 // ------------------------------------------------------------
 // Do we need constraints for anything?
@@ -473,6 +473,10 @@ public:
   void clear_send_list ()
   {
     _send_list.clear();
+
+    // _global_to_local_map needs to match _send_list
+    if (_global_to_local_map)
+      _global_to_local_map->clear();
   }
 
   /**
@@ -497,6 +501,8 @@ public:
    * computation.
    */
   const std::vector<dof_id_type> & get_send_list() const { return _send_list; }
+
+  const std::shared_ptr<GlobalToLocalMap> get_global_to_local_map() const { return _global_to_local_map; }
 
   /**
    * \returns A constant reference to the \p _n_nz list for this processor.
@@ -1686,6 +1692,12 @@ private:
    * solution on my processor.
    */
   std::vector<dof_id_type> _send_list;
+
+  /**
+   * Map that maps global to local ghost cells (will be empty if not
+   * in ghost cell mode).
+   */
+  std::shared_ptr<GlobalToLocalMap> _global_to_local_map;
 
   /**
    * Function object to call to add extra entries to the sparsity pattern

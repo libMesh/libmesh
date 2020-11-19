@@ -58,6 +58,11 @@ template <typename T> class SparseMatrix;
 template <typename T> class ShellMatrix;
 
 /**
+ * Type for map that maps global to local ghost cells.
+ */
+typedef std::unordered_map<numeric_index_type,numeric_index_type> GlobalToLocalMap;
+
+/**
  * \brief Provides a uniform interface to vector storage schemes for different
  * linear algebra libraries.
  *
@@ -111,6 +116,18 @@ public:
                  const numeric_index_type n_local,
                  const std::vector<numeric_index_type> & ghost,
                  const ParallelType ptype = AUTOMATIC);
+
+   /**
+    * Constructor. Set local dimension to \p n_local, the global
+    * dimension to \p n, but additionally reserve memory for the
+    * indices specified by the \p ghost_map argument.
+    * \p ghost_map is global-to-local map for ghosting elements.
+    */
+   NumericVector (const Parallel::Communicator & comm_in,
+                  const numeric_index_type N,
+                  const numeric_index_type n_local,
+                  const std::shared_ptr<GlobalToLocalMap> ghost_map,
+                  const ParallelType ptype = AUTOMATIC);
 
   /**
    * This _looks_ like a copy assignment operator, but note that,
@@ -233,6 +250,17 @@ public:
                      const std::vector<numeric_index_type> & ghost,
                      const bool fast = false,
                      const ParallelType ptype = AUTOMATIC) = 0;
+
+   /**
+    * Create a vector that holds tha local indices plus those specified
+    * in the \p ghost_map argument. \p ghost_map is a global-to-local map
+    * for ghosting elements.
+    */
+   virtual void init (const numeric_index_type n,
+                      const numeric_index_type n_local,
+                      const std::shared_ptr<GlobalToLocalMap> ghost_map,
+                      const bool fast = false,
+                      const ParallelType ptype = AUTOMATIC) = 0;
 
   /**
    * Creates a vector that has the same dimension and storage type as
@@ -807,6 +835,22 @@ NumericVector<T>::NumericVector (const Parallel::Communicator & comm_in,
                                  const numeric_index_type /*n*/,
                                  const numeric_index_type /*n_local*/,
                                  const std::vector<numeric_index_type> & /*ghost*/,
+                                 const ParallelType ptype) :
+  ParallelObject(comm_in),
+  _is_closed(false),
+  _is_initialized(false),
+  _type(ptype)
+{
+  libmesh_not_implemented(); // Abstract base class!
+  // init(n, n_local, ghost, false, ptype);
+}
+
+template <typename T>
+inline
+NumericVector<T>::NumericVector (const Parallel::Communicator & comm_in,
+                                 const numeric_index_type /*n*/,
+                                 const numeric_index_type /*n_local*/,
+                                 const std::shared_ptr<GlobalToLocalMap> /*ghost_map*/,
                                  const ParallelType ptype) :
   ParallelObject(comm_in),
   _is_closed(false),

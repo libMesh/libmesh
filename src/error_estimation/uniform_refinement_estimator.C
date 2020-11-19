@@ -308,7 +308,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
       projected_solutions[i] = NumericVector<Number>::build(system.comm());
       projected_solutions[i]->init(system.solution->size(),
                                    system.solution->local_size(),
-                                   system.get_dof_map().get_send_list(),
+                                   system.get_dof_map().get_global_to_local_map(),
                                    true, GHOSTED);
       system.solution->localize(*projected_solutions[i],
                                 system.get_dof_map().get_send_list());
