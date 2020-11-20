@@ -61,7 +61,8 @@ namespace libMesh
 // ------------------------------------------------------------
 // DofMap member functions
 std::unique_ptr<SparsityPattern::Build>
-DofMap::build_sparsity (const MeshBase & mesh) const
+DofMap::build_sparsity (const MeshBase & mesh,
+                        bool calculate_constrained) const
 {
   libmesh_assert (mesh.is_prepared());
 
@@ -93,7 +94,8 @@ DofMap::build_sparsity (const MeshBase & mesh) const
      this->_dof_coupling,
      this->_coupling_functors,
      implicit_neighbor_dofs,
-     need_full_sparsity_pattern);
+     need_full_sparsity_pattern,
+     calculate_constrained);
 
   Threads::parallel_reduce (ConstElemRange (mesh.active_local_elements_begin(),
                                             mesh.active_local_elements_end()), *sp);
@@ -1791,7 +1793,7 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase & mesh) const
 
 void DofMap::compute_sparsity(const MeshBase & mesh)
 {
-  _sp = this->build_sparsity(mesh);
+  _sp = this->build_sparsity(mesh, this->_constrained_sparsity_construction);
 
   // It is possible that some \p SparseMatrix implementations want to
   // see the sparsity pattern before we throw it away.  If so, we
