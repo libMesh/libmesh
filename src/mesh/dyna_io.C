@@ -705,7 +705,10 @@ void DynaIO::read_mesh(std::istream & in)
                       w += coef * libmesh_vector_at(spline_weights,
                                                     my_node_idx);
 
-                      constraint_row.emplace_back(spline_node->id(), coef);
+                      // We don't need to store 0 entries;
+                      // constraint_rows is a sparse structure.
+                      if (coef)
+                        constraint_row.emplace_back(spline_node->id(), coef);
                     }
 
                   Node *n = mesh.add_point(p);
