@@ -1655,6 +1655,13 @@ private:
    */
   void add_constraints_to_send_list();
 
+  /**
+   * Adds any spline constraints from the Mesh to our DoF constraints.
+   * If any Dirichlet constraints exist on spline-constrained nodes,
+   * l2-projects those constraints onto the spline basis.
+   */
+  void process_mesh_constraint_rows(const MeshBase & mesh);
+
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 
   /**
