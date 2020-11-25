@@ -76,11 +76,11 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
     libmesh_not_implemented();
 
   const dof_id_type n_range_elem = std::distance(beg, end);
-  const dof_id_type n_elem = mesh.n_elem();
+  const dof_id_type max_elem_id = mesh.max_elem_id();
 
   // The forward_map maps the range's element ids into a contiguous
   // block of indices.
-  std::vector<dof_id_type> forward_map (n_elem, DofObject::invalid_id);
+  std::vector<dof_id_type> forward_map (max_elem_id, DofObject::invalid_id);
 
   // the reverse_map maps the contiguous ids back
   // to active elements
