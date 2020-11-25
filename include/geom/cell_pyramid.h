@@ -151,6 +151,19 @@ public:
 
   virtual std::vector<unsigned int> sides_on_edge(const unsigned int e) const override final;
 
+  /**
+  * \returns Node 4 (the apex) if \p is at the apex within the tolerance
+  * \p tol. If \p is not at the apex within the tolerance \p tol, will
+  * return invalid_uint.
+  *
+  * The Jacobian at the apex is singular because directional derivatives
+  * are defined in four directions, independently (four edges meet).
+  * Therefore, we can check for this in a caught, failed inverse mapping
+  * and return the correct point without failure if it is the apex.
+  * This behavior _does_ require exceptions to be enabled.
+  */
+  unsigned int local_singular_node(const Point & p, const Real tol = TOLERANCE*TOLERANCE) const override final;
+
 protected:
 
   /**

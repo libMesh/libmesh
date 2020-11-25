@@ -1878,6 +1878,16 @@ Point FEMap::inverse_map (const unsigned int dim,
               }
             libmesh_catch (ConvergenceFailure &)
               {
+                // If we encountered a singular Jacobian, but are at
+                // a singular node, return said singular node.
+                const unsigned int local_singular_node =
+                  elem->local_singular_node(physical_point, tolerance);
+                if (local_singular_node != invalid_uint)
+                {
+                  libmesh_assert_less(local_singular_node, elem->n_nodes());
+                  return elem->master_point(local_singular_node);
+                }
+
                 // We encountered a singular Jacobian.  The value of
                 // dp is zero, since it was never changed during the
                 // call to RealTensorValue::solve().  We don't want to
