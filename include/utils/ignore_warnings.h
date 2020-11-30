@@ -46,6 +46,13 @@
 // This was introduced in 3.6
 #pragma clang diagnostic ignored "-Winconsistent-missing-override"
 #endif // clang > 3.5
+// These were introduced in clang 10
+#if (__clang_major__ > 9)
+// Ignore warnings from code that does "if (foo) bar();"
+#pragma clang diagnostic ignored "-Wmisleading-indentation"
+#pragma clang diagnostic ignored "-Wint-in-bool-context"
+#pragma clang diagnostic ignored "-Wdeprecated-copy"
+#endif // clang > 9
 #endif
 
 #if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__)
