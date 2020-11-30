@@ -29,6 +29,7 @@
 // With quad precision we need the shim function declarations to
 // precede the MetaPhysicL use of them
 #include "libmesh/libmesh_common.h"
+#include "libmesh/compare_types.h"
 
 // FIXME - having to do this with MetaPhysicL brings me shame - RHS
 #include "libmesh/ignore_warnings.h"
@@ -36,10 +37,6 @@
 // using them.
 #include "metaphysicl/dynamicsparsenumberarray_decl.h"
 #include "libmesh/restore_warnings.h"
-
-#include "libmesh/compare_types.h"
-#include "libmesh/int_range.h"
-#include "libmesh/linear_solver.h"
 
 using MetaPhysicL::DynamicSparseNumberArray;
 
@@ -111,7 +108,9 @@ void convert_from_receive (SendT & received,
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/generic_projector.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/linear_solver.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/quadrature.h"
