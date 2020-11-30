@@ -133,4 +133,21 @@ Real BoundingBox::signed_distance(const Point & p) const
     }
 }
 
+
+void BoundingBox::scale(const Real factor)
+{
+  Real append;
+  for (unsigned int dim = 0; dim != LIBMESH_DIM; ++dim)
+  {
+    if (this->first(dim) != std::numeric_limits<Real>::max() &&
+        this->second(dim) != -std::numeric_limits<Real>::max())
+    {
+      libmesh_assert_greater_equal(this->second(dim), this->first(dim));
+      append = (this->second(dim) - this->first(dim)) * factor;
+      this->first(dim) -= append;
+      this->second(dim) += append;
+    }
+  }
+}
+
 } // namespace libMesh

@@ -140,6 +140,17 @@ public:
    * d <= 0 if the point is inside the Bounding Box
    */
   Real signed_distance(const Point & p) const;
+
+  /**
+   * Scales each dimension of the bounding box by \p factor.
+   *
+   * Has no effect for dimensions in which either
+   * min(dim) == std::numeric_limits<Real>::max() or
+   * max(dim) == -std::numeric_limits<Real>::max(),
+   * which is the "invalid" state set by the default
+   * constructor and by invalidate().
+   */
+  void scale(const Real factor);
 };
 
 

@@ -64,13 +64,7 @@ public:
               (BoundingBox(elem->point(n), elem->point(n)));
           }
 
-        for (unsigned int d=0; d != LIBMESH_DIM; ++d)
-          {
-            const Real widening =
-              (wide_bbox.max()(d) - wide_bbox.min()(d)) / 3;
-            wide_bbox.min()(d) -= widening;
-            wide_bbox.max()(d) += widening;
-          }
+        wide_bbox.scale(1. / 3.);
 
         CPPUNIT_ASSERT(!bbox.contains_point(wide_bbox.min()));
         CPPUNIT_ASSERT(!bbox.contains_point(wide_bbox.max()));
