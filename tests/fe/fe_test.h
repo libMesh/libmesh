@@ -354,6 +354,10 @@ public:
             if (!_elem->contains_point(p))
               continue;
 
+            // If at a singular node, cannot use FEMap::map
+            if (_elem->local_singular_node(p) != invalid_uint)
+              continue;
+
             std::vector<Point> master_points
               (1, FEMap::inverse_map(_dim, _elem, p));
 
@@ -430,6 +434,10 @@ public:
             if (k > 0)
               p(2) = Real(k)/_ny;
             if (!_elem->contains_point(p))
+              continue;
+
+            // If at a singular node, cannot use FEMap::map
+            if (_elem->local_singular_node(p) != invalid_uint)
               continue;
 
             std::vector<Point> master_points
@@ -516,6 +524,10 @@ public:
             if (k > 0)
               p(2) = Real(k)/_ny;
             if (!_elem->contains_point(p))
+              continue;
+
+            // If at a singular node, cannot use FEMap::map
+            if (_elem->local_singular_node(p) != invalid_uint)
               continue;
 
             std::vector<Point> master_points
@@ -616,6 +628,10 @@ public:
             if (k > 0)
               p(2) = Real(k)/_ny;
             if (!_elem->contains_point(p))
+              continue;
+
+            // If at a singular node, cannot use FEMap::map
+            if (_elem->local_singular_node(p) != invalid_uint)
               continue;
 
             std::vector<Point> master_points
@@ -726,6 +742,10 @@ public:
             if (k > 0)
               p(2) = Real(k)/_ny;
             if (!_elem->contains_point(p))
+              continue;
+
+            // If at a singular node, cannot use FEMap::map
+            if (_elem->local_singular_node(p) != invalid_uint)
               continue;
 
             std::vector<Point> master_points
