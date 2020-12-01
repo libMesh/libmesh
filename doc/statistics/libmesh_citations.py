@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import matplotlib.pyplot as plt
 import numpy as np
+import argparse
 
 """
 This script creates a bar graph of the number of "papers using libmesh" by year.
@@ -45,6 +46,11 @@ data = [
 '\'21', 8,
     ]
 
+# Parse command line args
+parser = argparse.ArgumentParser()
+parser.add_argument("--png", action='store_true', default=False)
+args = parser.parse_args()
+
 # Extract the x-axis labels from the data array
 ticklabels = data[0::2]
 
@@ -88,7 +94,11 @@ plt.savefig('libmesh_citations.pdf')
 # Also save png for uploading to wiki. On Ubuntu, you may need to run
 # the following command to get this working:
 # sudo apt-get install dvipng
-# plt.savefig('libmesh_citations.png', format='png', dpi=200)
+# To subsequently update the website,
+# cp *.png ~/projects/libMesh.github.io/images/
+# and then push the changes.
+if args.png:
+  plt.savefig('libmesh_citations.png', format='png', dpi=200)
 
 # Local Variables:
 # python-indent: 2

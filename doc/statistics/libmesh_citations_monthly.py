@@ -4,6 +4,7 @@ import numpy as np
 from matplotlib import rcParams
 import datetime
 from matplotlib.dates import date2num, num2date
+import argparse
 
 rcParams['font.family'] = 'DejaVu Sans'
 rcParams['font.size'] = 13
@@ -169,6 +170,10 @@ def plot_one_year(year, data, color):
     # Plot data
     ax1.plot(x, y, marker='o', color=color, linewidth=2, label=str(year))
 
+# Parse command line args
+parser = argparse.ArgumentParser()
+parser.add_argument("--png", action='store_true', default=False)
+args = parser.parse_args()
 
 # Draw vertical lines at beg/end of year. Note: the data is from
 # the first of every month, so draw the end of year line on
@@ -195,4 +200,8 @@ plt.savefig('libmesh_citations_monthly.pdf', format='pdf')
 # Also save png for uploading to wiki. On Ubuntu, you may need to run
 # the following command to get this working:
 # sudo apt-get install dvipng
-# plt.savefig('libmesh_citations_monthly.png', format='png', dpi=200)
+# To subsequently update the website,
+# cp *.png ~/projects/libMesh.github.io/images/
+# and then push the changes.
+if args.png:
+    plt.savefig('libmesh_citations_monthly.png', format='png', dpi=200)
