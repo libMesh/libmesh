@@ -15,12 +15,13 @@
 
 // Add Tests to runner that match user-provided regex.
 void add_matching_tests_to_runner(CppUnit::Test * test,
+                                  const std::string & r_str,
                                   const std::regex & r,
                                   CppUnit::TextUi::TestRunner & runner,
                                   CppUnit::TestSuite & rejects)
 {
   // If we running all tests we just add the "All Tests" test and then return
-  if (test->getName() == "All Tests" && std::regex_search(test->getName(), r))
+  if (test->getName() == "All Tests" && r_str == "All Tests")
   {
     libMesh::out << test->getName() << std::endl;
     runner.addTest(test);
@@ -42,7 +43,7 @@ void add_matching_tests_to_runner(CppUnit::Test * test,
 
   // Call this recursively on each of our children, if any.
   for (int i = 0; i < test->getChildTestCount(); i++)
-    add_matching_tests_to_runner(test->getChildTestAt(i), r, runner, rejects);
+    add_matching_tests_to_runner(test->getChildTestAt(i), r_str, r, runner, rejects);
 }
 
 #endif
@@ -95,7 +96,7 @@ int main(int argc, char ** argv)
 
   // Add all tests which match the re to the runner object.
   libMesh::out << "Will run the following tests:" << std::endl;
-  add_matching_tests_to_runner(registry.makeTest(), the_regex, runner, rejects);
+  add_matching_tests_to_runner(registry.makeTest(), regex_string, the_regex, runner, rejects);
 #else
   // If no C++11 <regex> just run all the tests.
   runner.addTest(registry.makeTest());
