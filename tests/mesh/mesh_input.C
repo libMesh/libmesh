@@ -604,8 +604,12 @@ public:
     unsigned int n_var =
       sys.add_variable("n", Order(order), RATIONAL_BERNSTEIN);
 
-    es.init();
     dyna.add_spline_constraints(sys.get_dof_map(), sys.number(), n_var);
+    // `add_spline_constraints` secretly changed `send_list` and `global_to_local_map`
+    // by calling `dof_map.prepare_send_list()`
+    // If we initialize system earlier, then PetscVector will be out of sync
+    // We should init system only when everything is ready.
+    es.init();
 
     sys.project_solution(sin_x_plus_cos_y, nullptr, es.parameters);
 

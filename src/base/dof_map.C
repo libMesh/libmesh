@@ -1710,6 +1710,9 @@ void DofMap::prepare_send_list ()
 
   libmesh_assert(_global_to_local_map);
 
+  //Let us clear up '_global_to_local_map', and build it from scratch
+  _global_to_local_map->clear();
+
   /* Make the global-to-local ghost cell map.  */
   for (auto i : index_range(_send_list))
     (*_global_to_local_map)[_send_list[i]] = i;
