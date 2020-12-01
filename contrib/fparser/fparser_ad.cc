@@ -16,7 +16,7 @@ using namespace FPoptimizer_CodeTree;
 
 #include <cstdio>
 #include <iomanip>
-#include <strstream>
+#include <sstream>
 
 // hashing complex numbers
 namespace std {
