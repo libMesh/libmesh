@@ -93,11 +93,28 @@ public:
             CPPUNIT_ASSERT(elem->is_edge_on_side(edge, side_on_edge));
       }
   }
+
+  void test_contains_point_node()
+  {
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      for (const auto n : elem->node_index_range())
+#ifndef LIBMESH_ENABLE_EXCEPTIONS
+        // If this node has a singular Jacobian, we need exceptions in order
+        // to catch the failed inverse_map solve and return the singular
+        // master point. Therefore, if we don't have exceptions and we're
+        // at a singular node, we can't test this. As of the writing of
+        // this comment, this issue exists for only Pyramid elements at
+        // the apex.
+        if (elem->local_singular_node(elem->point(n), TOLERANCE*TOLERANCE) == invalid_uint)
+#endif
+          CPPUNIT_ASSERT(elem->contains_point(elem->point(n)));
+  }
 };
 
 #define ELEMTEST                                \
   CPPUNIT_TEST( test_bounding_box );            \
-  CPPUNIT_TEST( test_maps );
+  CPPUNIT_TEST( test_maps );                    \
+  CPPUNIT_TEST( test_contains_point_node );
 
 #define INSTANTIATE_ELEMTEST(elemtype)                          \
   class ElemTest_##elemtype : public ElemTest<elemtype> {       \
