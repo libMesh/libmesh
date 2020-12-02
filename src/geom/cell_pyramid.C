@@ -220,4 +220,10 @@ std::vector<unsigned int> Pyramid::sides_on_edge(const unsigned int e) const
 
 
 
+unsigned int Pyramid::local_singular_node(const Point & p, const Real tol) const
+{
+  return this->node_ref(4).absolute_fuzzy_equals(p, tol) ? 4 : invalid_uint;
+}
+
+
 } // namespace libMesh

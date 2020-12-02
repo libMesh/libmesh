@@ -1553,6 +1553,21 @@ public:
   void libmesh_assert_valid_node_pointers() const;
 #endif // DEBUG
 
+  /**
+   * \returns The local node index of the given point IF said node
+   * has a singular Jacobian for this element. If the given point
+   * is not a node or is a node and does not have a singular Jacobian,
+   * this will return invalid_uint.
+   *
+   * The intention is for this to be overriden in derived element
+   * classes that do have nodes that have singular Jacobians. When
+   * mapping failures are caught, we can check this to see if the
+   * failed physical point is actually a singular point and
+   * return the correct master point.
+   */
+  virtual unsigned int local_singular_node(const Point & /* p */, const Real /* tol */ = TOLERANCE*TOLERANCE) const
+  { return invalid_uint; }
+
 protected:
 
   /**
