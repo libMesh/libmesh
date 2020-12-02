@@ -96,6 +96,7 @@ private:
   // Keep track of spline node indexing, so as to enable adding
   // constraint rows easily later.
   std::vector<Node *> spline_node_ptrs;
+  std::unordered_map<Node *, Elem *> spline_nodeelem_ptrs;
 
   /**
    * Implementation of the read() function.  This function

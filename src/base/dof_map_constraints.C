@@ -1937,7 +1937,8 @@ void DofMap::process_mesh_constraint_rows(const MeshBase & mesh)
                 node->dof_number(sys_num, var_num, 0);
               for (auto pr : node_row.second)
                 {
-                  const Node & spline_node = mesh.node_ref(pr.first);
+                  const Node & spline_node =
+                    mesh.elem_ref(pr.first.first).node_ref(pr.first.second);
                   const dof_id_type spline_dof_id =
                     spline_node.dof_number(sys_num, var_num, 0);
                   dc_row[spline_dof_id] = pr.second;

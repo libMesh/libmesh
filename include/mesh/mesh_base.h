@@ -1657,13 +1657,14 @@ public:
   const std::map<subdomain_id_type, std::string> & get_subdomain_name_map () const
   { return _block_id_to_name; }
 
-  std::map<dof_id_type, std::vector<std::pair<dof_id_type, Real>>> &
-    get_constraint_rows()
-  { return _constraint_rows; }
+  typedef std::map<dof_id_type, std::vector<std::pair<std::pair<dof_id_type, unsigned int>, Real>>>
+    constraint_rows_type;
 
-  const std::map<dof_id_type, std::vector<std::pair<dof_id_type, Real>>> &
-    get_constraint_rows() const
-  { return _constraint_rows; }
+  constraint_rows_type & get_constraint_rows()
+  { libmesh_experimental(); return _constraint_rows; }
+
+  const constraint_rows_type & get_constraint_rows() const
+  { libmesh_experimental(); return _constraint_rows; }
 
   /**
    * Search the mesh and cache the different dimensions of the elements
@@ -1882,10 +1883,13 @@ protected:
   // mesh, such as FE nodes whose Rational Bernstein values need to be
   // constrained in terms of values on spline control nodes.
   //
-  // _constraint_rows[constrained_node_id][i].first is a constraining
-  // node id, and .second is that node's constraint coefficient.
-  std::map<dof_id_type, std::vector<std::pair<dof_id_type, Real>>>
-    _constraint_rows;
+  // _constraint_rows[constrained_node_id][i].first.first is an
+  // element id,
+  // _constraint_rows[constrained_node_id][i].first.second is the
+  // local node id of that element which is a constraining node,
+  // _constraint_rows[constrained_node_id][i].second is that node's
+  // constraint coefficient.
+  constraint_rows_type _constraint_rows;
 
   /**
    * If nonzero, we will call PointLocatorBase::set_close_to_point_tol()

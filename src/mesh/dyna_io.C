@@ -173,19 +173,21 @@ void DynaIO::read (const std::string & name)
 
 void DynaIO::read_mesh(std::istream & in)
 {
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
+
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  libmesh_assert_equal_to (MeshInput<MeshBase>::mesh().processor_id(), 0);
+  libmesh_assert_equal_to (mesh.processor_id(), 0);
 
   libmesh_error_msg_if(!in.good(), "Can't read input stream");
 
   // clear any data in the mesh
-  MeshBase & mesh = MeshInput<MeshBase>::mesh();
   mesh.clear();
 
   // clear any of our own data
   spline_node_ptrs.clear();
+  spline_nodeelem_ptrs.clear();
 
   // Expect different sections, in this order, perhaps with blank
   // lines and/or comments in between:
@@ -332,6 +334,7 @@ void DynaIO::read_mesh(std::istream & in)
               Elem * elem = mesh.add_elem(Elem::build(NODEELEM));
               elem->set_node(0) = n;
               elem->subdomain_id() = 1; // Separate id to ease Exodus output
+              spline_nodeelem_ptrs[n] = elem;
             }
             ++n_nodes_read;
 
@@ -683,7 +686,7 @@ void DynaIO::read_mesh(std::istream & in)
                 {
                   Point p(0);
                   Real w = 0;
-                  std::vector<std::pair<dof_id_type, Real>> constraint_row;
+                  std::vector<std::pair<std::pair<dof_id_type, unsigned int>, Real>> constraint_row;
 
                   for (auto spline_node_index :
                        make_range(block_n_coef_vec[block_num]))
@@ -694,9 +697,9 @@ void DynaIO::read_mesh(std::istream & in)
                       const dyna_int_type elem_coef_vec_index =
                         my_constraint_rows[spline_node_index];
 
-                      const Node * spline_node =
-                          libmesh_vector_at(spline_node_ptrs,
-                                            my_node_idx);
+                      Node * spline_node =
+                        libmesh_vector_at(spline_node_ptrs,
+                                          my_node_idx);
 
                       const Real coef =
                         libmesh_vector_at(dense_constraint_vecs[0],
@@ -708,7 +711,11 @@ void DynaIO::read_mesh(std::istream & in)
                       // We don't need to store 0 entries;
                       // constraint_rows is a sparse structure.
                       if (coef)
-                        constraint_row.emplace_back(spline_node->id(), coef);
+                        {
+                          Elem * nodeelem =
+                            libmesh_map_find(spline_nodeelem_ptrs, spline_node);
+                          constraint_row.emplace_back(std::make_pair(nodeelem->id(), 0), coef);
+                        }
                     }
 
                   Node *n = mesh.add_point(p);
