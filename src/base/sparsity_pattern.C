@@ -98,6 +98,10 @@ void Build::sorted_connected_dofs(const Elem * elem,
   // We can be more efficient if we sort the element DOFs into
   // increasing order
   std::sort(dofs_vi.begin(), dofs_vi.end());
+
+  // Handle cases where duplicate nodes are intentionally assigned to
+  // a single element.
+  dofs_vi.erase(std::unique(dofs_vi.begin(), dofs_vi.end()), dofs_vi.end());
 }
 
 
