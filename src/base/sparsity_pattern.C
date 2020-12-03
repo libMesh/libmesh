@@ -537,6 +537,8 @@ void Build::parallel_sync ()
       for (auto i : IntRange<std::size_t>(0, n_rows))
         {
           const auto r = received_ids[i];
+          libmesh_assert(dof_map.local_index(r));
+
           const auto my_r = r - local_first_dof;
 
           auto & their_row = received_rows[i];
