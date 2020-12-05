@@ -1296,6 +1296,11 @@ public:
     return _periodic_boundaries.get();
   }
 
+  const PeriodicBoundaries * get_periodic_boundaries() const
+  {
+    return _periodic_boundaries.get();
+  }
+
 #endif // LIBMESH_ENABLE_PERIODIC
 
 
