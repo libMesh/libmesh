@@ -1657,7 +1657,7 @@ public:
   const std::map<subdomain_id_type, std::string> & get_subdomain_name_map () const
   { return _block_id_to_name; }
 
-  typedef std::map<dof_id_type, std::vector<std::pair<std::pair<dof_id_type, unsigned int>, Real>>>
+  typedef std::map<const Node *, std::vector<std::pair<std::pair<const Elem *, unsigned int>, Real>>>
     constraint_rows_type;
 
   constraint_rows_type & get_constraint_rows()

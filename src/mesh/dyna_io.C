@@ -686,7 +686,7 @@ void DynaIO::read_mesh(std::istream & in)
                 {
                   Point p(0);
                   Real w = 0;
-                  std::vector<std::pair<std::pair<dof_id_type, unsigned int>, Real>> constraint_row;
+                  std::vector<std::pair<std::pair<const Elem *, unsigned int>, Real>> constraint_row;
 
                   for (auto spline_node_index :
                        make_range(block_n_coef_vec[block_num]))
@@ -714,7 +714,7 @@ void DynaIO::read_mesh(std::istream & in)
                         {
                           Elem * nodeelem =
                             libmesh_map_find(spline_nodeelem_ptrs, spline_node);
-                          constraint_row.emplace_back(std::make_pair(nodeelem->id(), 0), coef);
+                          constraint_row.emplace_back(std::make_pair(nodeelem, 0), coef);
                         }
                     }
 
@@ -724,7 +724,7 @@ void DynaIO::read_mesh(std::istream & in)
                   local_nodes[key] = n;
                   elem->set_node(elem_defn->nodes[elem_node_index]) = n;
 
-                  constraint_rows[n->id()] = constraint_row;
+                  constraint_rows[n] = constraint_row;
                 }
             }
 

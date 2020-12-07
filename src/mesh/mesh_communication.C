@@ -1119,9 +1119,6 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
   mesh.set_default_mapping_type(ElemMappingType(map_type));
   mesh.set_default_mapping_data(map_data);
 
-  // We may have constraint rows on IsoGeometricAnalysis meshes
-  mesh.comm().broadcast(mesh.get_constraint_rows());
-
   // Broadcast nodes
   mesh.comm().broadcast_packed_range(&mesh,
                                      mesh.nodes_begin(),
@@ -1147,6 +1144,58 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
 
   // Make sure mesh_dimension and elem_dimensions are consistent.
   mesh.cache_elem_dims();
+
+  // We may have constraint rows on IsoGeometric Analysis meshes.  We
+  // don't want to send these along with constrained nodes (like we
+  // send boundary info for those nodes) because the associated rows'
+  // elements may not exist at that point.
+  auto & constraint_rows = mesh.get_constraint_rows();
+  bool have_constraint_rows = !constraint_rows.empty();
+  mesh.comm().broadcast(have_constraint_rows);
+  if (have_constraint_rows)
+    {
+      std::map<dof_id_type,
+               std::vector<std::tuple<dof_id_type, unsigned int, Real>>>
+        serialized_rows;
+
+      for (auto & row : constraint_rows)
+        {
+          const Node * node = row.first;
+          const dof_id_type rowid = node->id();
+          libmesh_assert(node == mesh.node_ptr(rowid));
+
+          std::vector<std::tuple<dof_id_type, unsigned int, Real>>
+            serialized_row;
+          for (auto & entry : row.second)
+            serialized_row.push_back
+              (std::make_tuple(entry.first.first->id(),
+                               entry.first.second, entry.second));
+
+          serialized_rows.emplace(rowid, std::move(serialized_row));
+        }
+
+      mesh.comm().broadcast(serialized_rows);
+      if (mesh.processor_id() != 0)
+        {
+          constraint_rows.clear();
+
+          for (auto & row : serialized_rows)
+            {
+              const dof_id_type rowid = row.first;
+              const Node * node = mesh.node_ptr(rowid);
+
+              std::vector<std::pair<std::pair<const Elem *, unsigned int>, Real>>
+                deserialized_row;
+              for (auto & entry : row.second)
+                deserialized_row.push_back
+                  (std::make_pair(std::make_pair(mesh.elem_ptr(std::get<0>(entry)),
+                                                 std::get<1>(entry)),
+                                                 std::get<2>(entry)));
+
+              constraint_rows.emplace(node, deserialized_row);
+            }
+        }
+    }
 
   // Broadcast all of the named entity information
   mesh.comm().broadcast(mesh.set_subdomain_name_map());
