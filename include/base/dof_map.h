@@ -255,6 +255,25 @@ public:
   bool computed_sparsity_already () const;
 
   /**
+   * Sets the current policy for constructing sparsity patterns: if
+   * \p use_constraints is true (for robustness), we explicitly
+   * account for sparsity entries created by constraint matrix pre-
+   * and post- application.  If \p use_constraints is false (for
+   * speed), we calculate only the sparsity pattern of an
+   * unconstrained matrix.  This is false by default, because in
+   * nearly all applications our constraints do not increase the
+   * number of non-zeros required in a sparse matrix.
+   */
+  void set_constrained_sparsity_construction(bool use_constraints);
+
+  /**
+   * Returns true iff the current policy when constructing sparsity
+   * patterns is to explicitly account for sparsity entries created by
+   * constraint matrix pre- and post- application.
+   */
+  bool constrained_sparsity_construction();
+
+  /**
    * Clears the sparsity pattern
    */
   void clear_sparsity();
@@ -1459,9 +1478,21 @@ public:
   unsigned int sys_number() const;
 
   /**
-   * Builds a sparsity pattern
+   * Builds a sparsity pattern for matrices using the current
+   * degree-of-freedom numbering and coupling.
+   *
+   * By default, ignores constraint equations, for build speed; this
+   * is valid for the combination of !need_full_sparsity_pattern and
+   * constraints which only come from periodic boundary conditions and
+   * adaptive mesh refinement, where matrix constraint adds some
+   * matrix entries but removes equally many (or more) other entries.
+   *
+   * Can be told to calculate sparsity for the constrained matrix,
+   * which may be necessary in the case of spline control node
+   * constraints or sufficiently many user constraints.
    */
-  std::unique_ptr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh) const;
+  std::unique_ptr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh,
+                                                         bool calculate_constrained = false) const;
 
 private:
 
@@ -1629,6 +1660,13 @@ private:
    */
   void add_constraints_to_send_list();
 
+  /**
+   * Adds any spline constraints from the Mesh to our DoF constraints.
+   * If any Dirichlet constraints exist on spline-constrained nodes,
+   * l2-projects those constraints onto the spline basis.
+   */
+  void process_mesh_constraint_rows(const MeshBase & mesh);
+
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 
   /**
@@ -1637,6 +1675,12 @@ private:
    * graph is cyclic.
    */
   bool _error_on_constraint_loop;
+
+  /**
+   * This flag indicates whether or not we explicity take constraint
+   * equations into account when computing a sparsity pattern.
+   */
+  bool _constrained_sparsity_construction;
 
   /**
    * The finite element type for each variable.
@@ -2071,6 +2115,29 @@ inline void DofMap::enforce_constraints_on_jacobian
    SparseMatrix<Number> *) const {}
 
 #endif // LIBMESH_ENABLE_CONSTRAINTS
+
+
+
+inline
+void DofMap::set_constrained_sparsity_construction(bool use_constraints)
+{
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+  _constrained_sparsity_construction = use_constraints;
+#endif
+  libmesh_ignore(use_constraints);
+}
+
+
+
+inline
+bool DofMap::constrained_sparsity_construction()
+{
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+  return _constrained_sparsity_construction;
+#else
+  return true;
+#endif
+}
 
 } // namespace libMesh
 

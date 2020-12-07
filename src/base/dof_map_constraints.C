@@ -31,6 +31,7 @@
 #include "libmesh/function_base.h"
 #include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/linear_solver.h" // for spline Dirichlet projection solves
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_inserter_iterator.h"
 #include "libmesh/mesh_tools.h" // for libmesh_assert_valid_boundary_ids()
@@ -61,6 +62,7 @@
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 #include <numeric>
+#include <unordered_set>
 
 // Anonymous namespace to hold helper classes
 namespace {
@@ -1734,10 +1736,14 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
   MeshTools::libmesh_assert_valid_boundary_ids(mesh);
 #endif
 
-  // We might get constraint equations from AMR hanging nodes in 2D/3D
-  // or from boundary conditions in any dimension
+  const auto & constraint_rows = mesh.get_constraint_rows();
+
+  // We might get constraint equations from AMR hanging nodes in
+  // 2D/3D, or from spline constraint rows or boundary conditions in
+  // any dimension
   const bool possible_local_constraints = false
     || !mesh.n_elem()
+    || !constraint_rows.empty()
 #ifdef LIBMESH_ENABLE_AMR
     || mesh.mesh_dimension() > 1
 #endif
@@ -1757,23 +1763,22 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
   this->comm().max(possible_global_constraints);
 #endif
 
-  if (!possible_global_constraints)
-    {
-      // Clear out any old constraints; maybe the user just deleted
-      // their last remaining dirichlet/periodic/user constraint?
-      // Note: any _stashed_dof_constraints are not cleared as it
-      // may be the user's intention to restore them later.
+  // Recalculate dof constraints from scratch.  (Or just clear them,
+  // if the user has just deleted their last dirichlet/periodic/user
+  // constraint)
+  // Note: any _stashed_dof_constraints are not cleared as it
+  // may be the user's intention to restore them later.
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-      _dof_constraints.clear();
-      _primal_constraint_values.clear();
-      _adjoint_constraint_values.clear();
+  _dof_constraints.clear();
+  _primal_constraint_values.clear();
+  _adjoint_constraint_values.clear();
 #endif
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-      _node_constraints.clear();
+  _node_constraints.clear();
 #endif
 
-      return;
-    }
+  if (!possible_global_constraints)
+    return;
 
   // Here we build the hanging node constraints.  This is done
   // by enforcing the condition u_a = u_b along hanging sides.
@@ -1803,9 +1808,6 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 #endif
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  // recalculate node constraints from scratch
-  _node_constraints.clear();
-
   Threads::parallel_for (range,
                          ComputeNodeConstraints (_node_constraints,
 #ifdef LIBMESH_ENABLE_PERIODIC
@@ -1814,13 +1816,6 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
                                                  mesh));
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
-
-  // recalculate dof constraints from scratch
-  // Note: any _stashed_dof_constraints are not cleared as it
-  // may be the user's intention to restore them later.
-  _dof_constraints.clear();
-  _primal_constraint_values.clear();
-  _adjoint_constraint_values.clear();
 
   // Look at all the variables in the system.  Reset the element
   // range at each iteration -- there is no need to reconstruct it.
@@ -1865,6 +1860,284 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
     }
 
 #endif // LIBMESH_ENABLE_DIRICHLET
+
+  // Handle spline node constraints last, so we can try to move
+  // existing constraints onto the spline basis if necessary.
+
+  this->process_mesh_constraint_rows(mesh);
+}
+
+
+
+void DofMap::process_mesh_constraint_rows(const MeshBase & mesh)
+{
+  const auto & constraint_rows = mesh.get_constraint_rows();
+
+  // If we already have simple Dirichlet constraints (with right hand
+  // sides but with no coupling between DoFs) on spline-constrained FE
+  // nodes, then we'll need a solve to compute the corresponding
+  // constraints on the relevant spline nodes.  (If we already have
+  // constraints with coupling between DoFs on spline-constrained FE
+  // nodes, then we'll need to go sit down and cry until we figure out
+  // how to handle that.)
+  if (!constraint_rows.empty())
+    {
+      // We have some strict compatibility requirements here still
+      if (mesh.allow_renumbering() ||
+          (!mesh.is_replicated() &&
+           mesh.allow_remote_element_removal()))
+        libmesh_not_implemented();
+
+      // We can't handle periodic boundary conditions on spline meshes
+      // yet.
+#ifdef LIBMESH_ENABLE_PERIODIC
+      libmesh_error_msg_if (!_periodic_boundaries->empty(),
+                            "Periodic boundary conditions are not yet implemented for spline meshes");
+#endif
+
+      // We can handle existing Dirichlet constraints, but we'll need
+      // to do solves to project them down onto the spline basis.
+      std::unique_ptr<SparsityPattern::Build> sp;
+      std::unique_ptr<SparseMatrix<Number>> mat;
+
+      const unsigned int n_adjoint_rhs =
+        _adjoint_constraint_values.size();
+
+      // [0] for primal rhs, [q+1] for adjoint qoi q
+      std::vector<std::unique_ptr<NumericVector<Number>>>
+        solve_rhs(n_adjoint_rhs+1);
+
+      // Keep track of which spline DoFs will be Dirichlet.
+      // We use a set here to make it easier to find what processors
+      // to send the DoFs to later.
+      std::set<dof_id_type> my_dirichlet_spline_dofs;
+
+      // And keep track of which non-spline Dofs were Dirichlet
+      std::unordered_set<dof_id_type> was_previously_constrained;
+
+      const unsigned int sys_num = this->sys_number();
+      for (auto & node_row : constraint_rows)
+        {
+          const Node * node = mesh.query_node_ptr(node_row.first);
+          if (!node)
+            continue;
+
+          for (auto var_num : IntRange<unsigned int>(0, this->n_variables()))
+            {
+              const FEFamily & fe_family = this->variable_type(var_num).family;
+
+              // constraint_rows only applies to nodal variables
+              if (fe_family != LAGRANGE &&
+                  fe_family != RATIONAL_BERNSTEIN)
+                continue;
+
+              DofConstraintRow dc_row;
+
+              const dof_id_type constrained_id =
+                node->dof_number(sys_num, var_num, 0);
+              for (auto pr : node_row.second)
+                {
+                  const Node & spline_node = mesh.node_ref(pr.first);
+                  const dof_id_type spline_dof_id =
+                    spline_node.dof_number(sys_num, var_num, 0);
+                  dc_row[spline_dof_id] = pr.second;
+                }
+
+              // See if we already have a constraint here.
+              if (this->is_constrained_dof(constrained_id))
+                {
+                  was_previously_constrained.insert(constrained_id);
+
+                  // Keep track of which spline DoFs will be
+                  // inheriting this non-spline DoF's constraints
+                  for (auto & row_entry : dc_row)
+                    my_dirichlet_spline_dofs.insert(row_entry.first);
+
+                  // If it wasn't a simple Dirichlet-type constraint
+                  // then I don't know what to do with it.  We'll make
+                  // this an assertion only because this should only
+                  // crop up with periodic boundary conditions, which
+                  // we've already made sure we don't have.
+                  libmesh_assert(_dof_constraints[constrained_id].empty());
+                }
+
+              // Add the constraint, replacing any previous, so we can
+              // use the new constraint in setting up the solve below
+              this->add_constraint_row(constrained_id, dc_row, false);
+            }
+        }
+
+      // my_dirichlet_spline_dofs may now include DoFs whose owners
+      // don't know they need to become spline DoFs!  We need to push
+      // this data to them.
+      if (this->comm().size() > 1)
+        {
+          std::unordered_map
+            <processor_id_type, std::vector<dof_id_type>>
+            their_dirichlet_spline_dofs;
+
+          // If we ever change the underlying container here then we'd
+          // better do some kind of sort before using it; we'll rely
+          // on sorting to make the processor id lookup efficient.
+          libmesh_assert(std::is_sorted(my_dirichlet_spline_dofs.begin(),
+                                        my_dirichlet_spline_dofs.end()));
+          processor_id_type destination_pid = 0;
+          for (auto d : my_dirichlet_spline_dofs)
+            {
+              libmesh_assert_less(d, this->end_dof(this->comm().size()-1));
+              while (d >= this->end_dof(destination_pid))
+                destination_pid++;
+
+              if (destination_pid != this->processor_id())
+                their_dirichlet_spline_dofs[destination_pid].push_back(d);
+            }
+
+          auto receive_dof_functor =
+            [& my_dirichlet_spline_dofs]
+            (processor_id_type,
+             const std::vector<dof_id_type> & dofs)
+            {
+              my_dirichlet_spline_dofs.insert(dofs.begin(), dofs.end());
+            };
+
+          Parallel::push_parallel_vector_data
+            (this->comm(), their_dirichlet_spline_dofs, receive_dof_functor);
+        }
+
+
+      // If anyone had any prior constraints in effect, then we need
+      // to convert them to constraints on the spline nodes.
+      //
+      // NOT simply testing prior_constraints here; maybe it turned
+      // out that all our constraints were on non-spline-constrained
+      // parts of a hybrid mesh?
+      bool important_prior_constraints =
+        !was_previously_constrained.empty();
+      this->comm().max(important_prior_constraints);
+
+      if (important_prior_constraints)
+        {
+          // Now that we have the spline constraints added, we can
+          // finally construct a sparsity pattern that correctly
+          // accounts for those constraints!
+          mat = SparseMatrix<Number>::build(this->comm());
+          for (auto q : IntRange<unsigned int>(0, n_adjoint_rhs+1))
+            {
+              solve_rhs[q] = NumericVector<Number>::build(this->comm());
+              solve_rhs[q]->init(this->n_dofs(), this->n_local_dofs(),
+                                 false, PARALLEL);
+            }
+
+          // We need to compute our own sparsity pattern, to take into
+          // account the particularly non-sparse rows that can be
+          // created by the spline constraints we just added.
+          mat->attach_dof_map(*this);
+          sp = this->build_sparsity(mesh);
+          mat->attach_sparsity_pattern(*sp);
+          mat->init();
+
+          for (auto & node_row : constraint_rows)
+            {
+              const Node * node = mesh.query_node_ptr(node_row.first);
+              if (!node)
+                continue;
+
+              for (auto var_num : IntRange<unsigned int>(0, this->n_variables()))
+                {
+                  const FEFamily & fe_family = this->variable_type(var_num).family;
+
+                  // constraint_rows only applies to nodal variables
+                  if (fe_family != LAGRANGE &&
+                      fe_family != RATIONAL_BERNSTEIN)
+                    continue;
+
+                  const dof_id_type constrained_id =
+                    node->dof_number(sys_num, var_num, 0);
+
+                  if (was_previously_constrained.count(constrained_id))
+                    {
+                      for (auto q : IntRange<unsigned int>(0, n_adjoint_rhs+1))
+                        {
+                          DenseMatrix<Number> K(1,1);
+                          DenseVector<Number> F(1);
+                          std::vector<dof_id_type> dof_indices(1, constrained_id);
+
+                          K(0,0) = 1;
+
+                          DofConstraintValueMap & vals = q ?
+                            _adjoint_constraint_values[q-1] :
+                            _primal_constraint_values;
+
+                          DofConstraintValueMap::const_iterator rhsit =
+                            vals.find(constrained_id);
+                          F(0) = (rhsit == vals.end()) ?  0 : rhsit->second;
+
+                          // We no longer need any rhs values here directly.
+                          if (rhsit != vals.end())
+                            vals.erase(rhsit);
+
+                          this->heterogenously_constrain_element_matrix_and_vector
+                            (K, F, dof_indices, false, q ? (q-1) : -1);
+                          if (!q)
+                            mat->add_matrix(K, dof_indices);
+                          solve_rhs[q]->add_vector(F, dof_indices);
+                        }
+                    }
+                }
+            }
+
+          // Any DoFs that aren't part of any constraint, directly or
+          // indirectly, need a diagonal term to make the matrix
+          // here invertible.
+          for (dof_id_type d : IntRange<dof_id_type>(this->first_dof(),
+                                                     this->end_dof()))
+            if (!was_previously_constrained.count(d) &&
+                !my_dirichlet_spline_dofs.count(d))
+              mat->add(d,d,1);
+
+          // At this point, we're finally ready to solve for Dirichlet
+          // constraint values on spline nodes.
+          std::unique_ptr<LinearSolver<Number>> linear_solver =
+            LinearSolver<Number>::build(this->comm());
+
+          std::unique_ptr<NumericVector<Number>> projected_vals =
+            NumericVector<Number>::build(this->comm());
+
+          projected_vals->init(this->n_dofs(), this->n_local_dofs(),
+                               false, PARALLEL);
+
+          DofConstraintRow empty_row;
+          for (auto sd : my_dirichlet_spline_dofs)
+            if (this->local_index(sd))
+              this->add_constraint_row(sd, empty_row);
+
+          for (auto q : IntRange<unsigned int>(0, n_adjoint_rhs+1))
+            {
+              // FIXME: we don't have an EquationSystems here, but I'd
+              // rather not hardcode these...
+              const double tol = TOLERANCE * TOLERANCE;
+              const unsigned int max_its = 5000;
+
+              linear_solver->solve(*mat, *projected_vals,
+                                   *(solve_rhs[q]), tol, max_its);
+
+              DofConstraintValueMap & vals = q ?
+                _adjoint_constraint_values[q-1] :
+                _primal_constraint_values;
+
+              for (auto sd : my_dirichlet_spline_dofs)
+                if (this->local_index(sd))
+                  {
+                    Number constraint_rhs = (*projected_vals)(sd);
+
+                    std::pair<DofConstraintValueMap::iterator, bool> rhs_it =
+                      vals.emplace(sd, constraint_rhs);
+                    if (!rhs_it.second)
+                      rhs_it.first->second = constraint_rhs;
+                  }
+            }
+        }
+    }
 }
 
 

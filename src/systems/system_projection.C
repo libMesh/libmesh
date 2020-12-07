@@ -2058,6 +2058,16 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
   rhs->init(dof_map.n_dofs(), dof_map.n_local_dofs(), false,
             PARALLEL);
 
+  // Here we start with the unconstrained (and indeterminate) linear
+  // system, K*u = f, where K is the identity matrix for constrained
+  // DoFs and 0 elsewhere, and f is the current solution values for
+  // constrained DoFs and 0 elsewhere.
+  // We then apply the usual heterogeneous constraint matrix C and
+  // offset h, where u = C*x + h,
+  // to get C^T*K*C*x = C^T*f - C^T*K*h
+  // - a constrained and no-longer-singular system that finds the
+  // closest approximation for the unconstrained degrees of freedom.
+
   for (dof_id_type d : IntRange<dof_id_type>(dof_map.first_dof(),
                                              dof_map.end_dof()))
     {

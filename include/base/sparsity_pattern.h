@@ -105,7 +105,8 @@ public:
          const CouplingMatrix * dof_coupling_in,
          const std::set<GhostingFunctor *> & coupling_functors_in,
          const bool implicit_neighbor_dofs_in,
-         const bool need_full_sparsity_pattern_in);
+         const bool need_full_sparsity_pattern_in,
+         const bool calculate_constrained_in = false);
 
   /**
    * Special functions.
@@ -202,6 +203,7 @@ private:
   const std::set<GhostingFunctor *> & coupling_functors;
   const bool implicit_neighbor_dofs;
   const bool need_full_sparsity_pattern;
+  const bool calculate_constrained;
 
   // If there are "spider" nodes in the mesh (i.e. a single node which
   // is connected to many 1D elements) and Constraints, we can end up

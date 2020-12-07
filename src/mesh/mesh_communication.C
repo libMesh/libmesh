@@ -1119,6 +1119,9 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
   mesh.set_default_mapping_type(ElemMappingType(map_type));
   mesh.set_default_mapping_data(map_data);
 
+  // We may have constraint rows on IsoGeometricAnalysis meshes
+  mesh.comm().broadcast(mesh.get_constraint_rows());
+
   // Broadcast nodes
   mesh.comm().broadcast_packed_range(&mesh,
                                      mesh.nodes_begin(),

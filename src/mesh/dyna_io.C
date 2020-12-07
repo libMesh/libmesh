@@ -127,8 +127,7 @@ DynaIO::ElementDefinition::ElementDefinition
 
 
 DynaIO::DynaIO (MeshBase & mesh) :
-  MeshInput<MeshBase>  (mesh),
-  constraint_rows_broadcast (false)
+  MeshInput<MeshBase>  (mesh)
 {
 }
 
@@ -187,8 +186,6 @@ void DynaIO::read_mesh(std::istream & in)
 
   // clear any of our own data
   spline_node_ptrs.clear();
-  constraint_rows.clear();
-  constraint_rows_broadcast = false;
 
   // Expect different sections, in this order, perhaps with blank
   // lines and/or comments in between:
@@ -575,6 +572,8 @@ void DynaIO::read_mesh(std::istream & in)
   // calculated from multiple neighboring elements.
   std::map<std::vector<std::pair<dof_id_type, Real>>, Node *> local_nodes;
 
+  auto & constraint_rows = mesh.get_constraint_rows();
+
   for (auto block_num : make_range(n_elem_blocks))
     {
       elem_constraint_mat[block_num].resize(block_n_elem[block_num]);
@@ -706,7 +705,10 @@ void DynaIO::read_mesh(std::istream & in)
                       w += coef * libmesh_vector_at(spline_weights,
                                                     my_node_idx);
 
-                      constraint_row.emplace_back(spline_node->id(), coef);
+                      // We don't need to store 0 entries;
+                      // constraint_rows is a sparse structure.
+                      if (coef)
+                        constraint_row.emplace_back(spline_node->id(), coef);
                     }
 
                   Node *n = mesh.add_point(p);
@@ -725,54 +727,10 @@ void DynaIO::read_mesh(std::istream & in)
 }
 
 
-void DynaIO::add_spline_constraints(DofMap & dof_map,
-                                    unsigned int sys_num,
-                                    unsigned int var_num)
+void DynaIO::add_spline_constraints(DofMap &,
+                                    unsigned int,
+                                    unsigned int)
 {
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  MeshBase & mesh = this->mesh();
-
-  // We have some strict compatibility requirements here still
-  if (mesh.allow_renumbering() ||
-      (!mesh.is_replicated() &&
-       mesh.allow_remote_element_removal()))
-    libmesh_not_implemented();
-
-  // We do mesh reads in serial, and the mesh broadcast doesn't
-  // broadcast our internal data, so we may need to do that now
-  if (!constraint_rows_broadcast)
-    {
-      mesh.comm().broadcast(constraint_rows);
-      constraint_rows_broadcast = true;
-    }
-
-  for (auto & node_row : constraint_rows)
-    {
-      DofConstraintRow dc_row;
-      const Node * node = mesh.query_node_ptr(node_row.first);
-      if (!node)
-        continue;
-      const dof_id_type constrained_id =
-        node->dof_number(sys_num, var_num, 0);
-      for (auto pr : node_row.second)
-        {
-          const Node & spline_node = mesh.node_ref(pr.first);
-          const dof_id_type spline_dof_id =
-            spline_node.dof_number(sys_num, var_num, 0);
-          dc_row[spline_dof_id] = pr.second;
-        }
-
-      // Don't forbid constraint overwrite, or we're likely to
-      // conflict with *any* other constraints.
-      dof_map.add_constraint_row(constrained_id, dc_row, false);
-    }
-
-  dof_map.process_constraints(mesh);
-  dof_map.prepare_send_list();
-#else
-  libmesh_ignore(dof_map, sys_num, var_num);
-  libmesh_not_implemented();
-#endif
 }
 
 

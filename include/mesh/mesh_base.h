@@ -1657,6 +1657,13 @@ public:
   const std::map<subdomain_id_type, std::string> & get_subdomain_name_map () const
   { return _block_id_to_name; }
 
+  std::map<dof_id_type, std::vector<std::pair<dof_id_type, Real>>> &
+    get_constraint_rows()
+  { return _constraint_rows; }
+
+  const std::map<dof_id_type, std::vector<std::pair<dof_id_type, Real>>> &
+    get_constraint_rows() const
+  { return _constraint_rows; }
 
   /**
    * Search the mesh and cache the different dimensions of the elements
@@ -1870,6 +1877,15 @@ protected:
    * passed in shared_ptr form
    */
   std::map<GhostingFunctor *, std::shared_ptr<GhostingFunctor> > _shared_functors;
+
+  // Keep track of any constraint equations that are inherent to the
+  // mesh, such as FE nodes whose Rational Bernstein values need to be
+  // constrained in terms of values on spline control nodes.
+  //
+  // _constraint_rows[constrained_node_id][i].first is a constraining
+  // node id, and .second is that node's constraint coefficient.
+  std::map<dof_id_type, std::vector<std::pair<dof_id_type, Real>>>
+    _constraint_rows;
 
   /**
    * If nonzero, we will call PointLocatorBase::set_close_to_point_tol()

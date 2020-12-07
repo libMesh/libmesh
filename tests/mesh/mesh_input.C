@@ -474,7 +474,7 @@ public:
 
     DynaIO dyna(mesh);
 
-    // Make DynaIO::add_spline_constraints work on DistributedMesh
+    // Make DynaIO spline constraints work on DistributedMesh
     mesh.allow_renumbering(false);
     mesh.allow_remote_element_removal(false);
 
@@ -528,7 +528,7 @@ public:
   {
     Mesh mesh(*TestCommWorld);
 
-    // Make DynaIO::add_spline_constraints work on DistributedMesh
+    // Make DynaIO spline constraints work on DistributedMesh
     mesh.allow_renumbering(false);
     mesh.allow_remote_element_removal(false);
 
@@ -583,7 +583,6 @@ public:
     System & sys = es.add_system<LinearImplicitSystem>("test");
     sys.add_variable("u", SECOND); // to match QUAD9
     es.init();
-    dyna.add_spline_constraints(sys.get_dof_map(), 0, 0);
 
     // We should have a constraint on every FE dof
     CPPUNIT_ASSERT_EQUAL(sys.get_dof_map().n_constrained_dofs(), dof_id_type(121));
@@ -601,11 +600,9 @@ public:
 
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");
-    unsigned int n_var =
-      sys.add_variable("n", Order(order), RATIONAL_BERNSTEIN);
+    sys.add_variable("n", Order(order), RATIONAL_BERNSTEIN);
 
     es.init();
-    dyna.add_spline_constraints(sys.get_dof_map(), sys.number(), n_var);
 
     sys.project_solution(sin_x_plus_cos_y, nullptr, es.parameters);
 
@@ -636,7 +633,7 @@ public:
   {
     Mesh mesh(*TestCommWorld);
 
-    // Make DynaIO::add_spline_constraints work on DistributedMesh
+    // Make DynaIO spline constraints work on DistributedMesh
     mesh.allow_renumbering(false);
     mesh.allow_remote_element_removal(false);
 
