@@ -511,6 +511,16 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
                                       (Elem**)nullptr,
                                       elemstag);
 
+  // At this point we have all the nodes and elems we need, so we can
+  // communicate any constraint rows that our targets will need.
+  auto & constraint_rows = mesh.get_constraint_rows();
+  bool have_constraint_rows = !constraint_rows.empty();
+  mesh.comm().broadcast(have_constraint_rows);
+  if (have_constraint_rows)
+    {
+      libmesh_not_implemented();
+    }
+
   // Wait for all sends to complete
   Parallel::wait (node_send_requests);
   Parallel::wait (element_send_requests);
