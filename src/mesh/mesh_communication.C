@@ -2143,6 +2143,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
 
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_refinement_tree(mesh);
+  MeshTools::libmesh_assert_valid_constraint_rows(mesh);
 #endif
 }
 
