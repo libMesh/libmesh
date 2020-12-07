@@ -1,4 +1,4 @@
-# Do not edit - automatically generated from ./rebuild_libmesh_SOURCES.sh
+# Do not edit - automatically generated from rebuild_libmesh_SOURCES.sh
 libmesh_SOURCES =  \
         src/base/default_coupling.C \
         src/base/dirichlet_boundary.C \
@@ -401,6 +401,7 @@ libmesh_SOURCES =  \
         src/systems/fem_system.C \
         src/systems/frequency_system.C \
         src/systems/implicit_system.C \
+        src/systems/inter_mesh_projection.C \
         src/systems/linear_implicit_system.C \
         src/systems/newmark_system.C \
         src/systems/nonlinear_implicit_system.C \
