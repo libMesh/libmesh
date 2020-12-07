@@ -845,6 +845,7 @@ void DistributedMesh::delete_node(Node * n)
 
   // Delete the node from the BoundaryInfo object
   this->get_boundary_info().remove(n);
+  _constraint_rows.erase(n);
 
   // But not yet from the container; we might invalidate
   // an iterator that way!
@@ -1379,6 +1380,7 @@ void DistributedMesh::renumber_nodes_and_elements ()
             // remove any boundary information associated with
             // this node
             this->get_boundary_info().remove (nd);
+            _constraint_rows.erase(nd);
 
             // delete the node
             delete nd;
