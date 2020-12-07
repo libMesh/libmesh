@@ -474,10 +474,6 @@ public:
 
     DynaIO dyna(mesh);
 
-    // Make DynaIO spline constraints work on DistributedMesh
-    mesh.allow_renumbering(false);
-    mesh.allow_remote_element_removal(false);
-
     if (mesh.processor_id() == 0)
       dyna.read("meshes/1_quad.bxt.gz");
     MeshCommunication().broadcast (mesh);
@@ -527,10 +523,6 @@ public:
   void testDynaReadPatch ()
   {
     Mesh mesh(*TestCommWorld);
-
-    // Make DynaIO spline constraints work on DistributedMesh
-    mesh.allow_renumbering(false);
-    mesh.allow_remote_element_removal(false);
 
     DynaIO dyna(mesh);
     if (mesh.processor_id() == 0)
@@ -632,10 +624,6 @@ public:
   void testDynaFileMappings (const std::string & filename, std::array<Real, 4> expected_norms)
   {
     Mesh mesh(*TestCommWorld);
-
-    // Make DynaIO spline constraints work on DistributedMesh
-    mesh.allow_renumbering(false);
-    mesh.allow_remote_element_removal(false);
 
     DynaIO dyna(mesh);
     if (mesh.processor_id() == 0)
