@@ -190,10 +190,38 @@ void connect_children(const MeshBase & mesh,
 }
 
 
-void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
+                      const MeshBase * mesh)
 {
-  // This parameter is not used when !LIBMESH_ENABLE_AMR.
-  libmesh_ignore(connected_elements);
+  // mesh was an optional parameter for API backwards compatibility
+  if (mesh && !mesh->get_constraint_rows().empty())
+    {
+      // We start with the constraint connections, not ancestors,
+      // because we don't need constraining nodes of elements'
+      // ancestors' constrained nodes.
+      const auto & constraint_rows = mesh->get_constraint_rows();
+
+      std::unordered_set<const Elem *> constraining_nodes_elems;
+      for (const Elem * elem : connected_elements)
+        {
+          for (const Node & node : elem->node_ref_range())
+            {
+              auto it = constraint_rows.find(&node);
+              // Retain all elements containing constraining nodes
+              if (it != constraint_rows.end())
+                for (auto & p : it->second)
+                  {
+                    const Elem * constraining_elem = p.first.first;
+                    libmesh_assert(constraining_elem ==
+                                   mesh->elem_ptr(constraining_elem->id()));
+                    constraining_nodes_elems.insert(constraining_elem);
+                  }
+            }
+        }
+
+      connected_elements.insert(constraining_nodes_elems.begin(),
+                                constraining_nodes_elems.end());
+    }
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -411,8 +439,10 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
                        elements_to_send);
 
       // The elements we need should have their ancestors and their
-      // subactive children present too.
-      connect_families(elements_to_send);
+      // subactive children present too.  If the mesh has any
+      // constraint rows, then elements with constrained nodes need
+      // elements with constraining nodes to remain present.
+      connect_families(elements_to_send, &mesh);
 
       std::set<const Node *> connected_nodes;
       reconnect_nodes(elements_to_send, connected_nodes);
@@ -2045,8 +2075,10 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
                    elements_to_keep);
 
   // The elements we need should have their ancestors and their
-  // subactive children present too.
-  connect_families(elements_to_keep);
+  // subactive children present too.  If the mesh has any
+  // constraint rows, then elements with constrained nodes need
+  // elements with constraining nodes to remain present.
+  connect_families(elements_to_keep, &mesh);
 
   // Don't delete nodes that our semilocal elements need
   std::set<const Node *> connected_nodes;
@@ -2089,6 +2121,19 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   // Much of our boundary info may have been for now-remote parts of
   // the mesh, in which case we don't want to keep local copies.
   mesh.get_boundary_info().regenerate_id_sets();
+
+  // Many of our constraint rows may have been for non-local parts of
+  // the mesh, which we don't need, and which we didn't specifically
+  // save dependencies for.  The mesh deleted rows for remote nodes
+  // when we deleted those, but let's delete rows for ghosted nodes.
+  for (auto & row : mesh.get_constraint_rows())
+    {
+      const Node * node = row.first;
+      libmesh_assert(node == mesh.node_ptr(node->id()));
+
+      if (node->processor_id() != mesh.processor_id())
+        mesh.get_constraint_rows().erase(node);
+    }
 
   // We now have all remote elements and nodes deleted; our ghosting
   // functors should be ready to delete any now-redundant cached data
