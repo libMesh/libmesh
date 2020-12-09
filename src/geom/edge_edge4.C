@@ -104,6 +104,86 @@ bool Edge4::has_affine_map() const
 
 
 
+bool Edge4::has_invertible_map(Real tol) const
+{
+  // dx/dxi = a*xi^2 + b*xi + c,
+  // where a, b, and c are vector quantities that depend on the
+  // nodal positions as follows:
+  const Point & x0 = this->point(0);
+  const Point & x1 = this->point(1);
+  const Point & x2 = this->point(2);
+  const Point & x3 = this->point(3);
+
+  Point a = 27./16 * (x1 - x0 + 3.*(x2 - x3));
+  Point b = 18./16 * (x0 + x1 - x2 - x3);
+  Point c = 1./16  * (x0 - x1 + 27.*(x3 - x2));
+
+  // Normalized midpoint value of Jacobian. If c==0, then dx/dxi(0) =
+  // 0 and the Jacobian is either zero on the whole element, or
+  // changes sign within the element. Either way, the element is not
+  // invertible. Note: use <= tol, so that if someone passes 0 for tol
+  // it still works.
+  Real c_norm = c.norm();
+  if (c_norm <= tol)
+    return false;
+
+  // Coefficients of the quadratic scalar function
+  // j(xi) := dot(c.unit(), dx/dxi)
+  //        = alpha*xi^2 + beta*xi + gamma
+  Real alpha = (a * c) / c_norm;
+  Real beta = (b * c) / c_norm;
+  Real gamma = c_norm;
+
+  // If alpha and beta are both (approximately) zero, then the
+  // Jacobian is actually constant but it's not zero (as we already
+  // checked) so the element is invertible!
+  if ((std::abs(alpha) <= tol) && (std::abs(beta) <= tol))
+    return true;
+
+  // If alpha is approximately zero, but beta is not, then j(xi) is
+  // actually linear and the Jacobian changes sign at the point xi =
+  // -gamma/beta, so we need to check whether that's in the
+  // element.
+  if (std::abs(alpha) <= tol)
+    {
+      // Debugging:
+      // libMesh::out << "alpha = " << alpha << ", std::abs(alpha) <= tol" << std::endl;
+
+      Real xi_0 = -gamma / beta;
+      return ((xi_0 < -1.) || (xi_0 > 1.));
+    }
+
+  // If alpha is not (approximately) zero, then j(xi) is quadratic
+  // and we need to solve for the roots.
+  Real sqrt_term = beta*beta - 4*alpha*gamma;
+
+  // Debugging:
+  // libMesh::out << "sqrt_term = " << sqrt_term << std::endl;
+
+  // If the term under the square root is negative, then the roots are
+  // imaginary and the element is invertible.
+  if (sqrt_term < 0)
+    return true;
+
+  sqrt_term = std::sqrt(sqrt_term);
+  Real
+    xi_1 = 0.5 * (-beta + sqrt_term) / alpha,
+    xi_2 = 0.5 * (-beta - sqrt_term) / alpha;
+
+  // libMesh::out << "xi_1 = " << xi_1 << std::endl;
+  // libMesh::out << "xi_2 = " << xi_2 << std::endl;
+
+  // If a root is outside the reference element, it is "OK".
+  bool
+    xi_1_ok = ((xi_1 < -1.) || (xi_1 > 1.)),
+    xi_2_ok = ((xi_2 < -1.) || (xi_2 > 1.));
+
+  // If both roots are OK, the element is invertible.
+  return xi_1_ok && xi_2_ok;
+}
+
+
+
 Order Edge4::default_order() const
 {
   return THIRD;

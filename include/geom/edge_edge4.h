@@ -119,6 +119,16 @@ public:
   virtual bool has_affine_map () const override;
 
   /**
+   * \returns \p true if the scalar quantity j(xi) := dot(dx/dxi(0),
+   * dx/dxi(xi)) is of single sign (either positive or negative)
+   * throughout the element.  For the Edge4, j(xi) is a quadratic
+   * function of xi, so the min/max can occur somewhere on the
+   * interior of the element, and it is therefore not sufficient to
+   * check only the vertex values.
+   */
+  virtual bool has_invertible_map(Real tol) const override;
+
+  /**
    * \returns \p EDGE4.
    */
   virtual ElemType type() const override { return EDGE4; }

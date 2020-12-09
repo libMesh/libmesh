@@ -93,6 +93,13 @@ Order Edge2::default_order() const
 
 
 
+bool Edge2::has_invertible_map(Real tol) const
+{
+  return this->volume() > tol;
+}
+
+
+
 void Edge2::connectivity(const unsigned int libmesh_dbg_var(sc),
                          const IOPackage iop,
                          std::vector<dof_id_type> & conn) const

@@ -209,6 +209,11 @@ public:
   virtual bool has_affine_map () const override { return true; }
 
   /**
+   * \returns \p true because it doesn't really make sense for a NodeElem.
+   */
+  virtual bool has_invertible_map(Real /*tol*/) const override { return true; }
+
+  /**
    * \returns \p true if the Lagrange shape functions on this element
    * are linear.
    */

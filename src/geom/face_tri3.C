@@ -128,6 +128,11 @@ Order Tri3::default_order() const
   return FIRST;
 }
 
+bool Tri3::has_invertible_map(Real tol) const
+{
+  return this->volume() > tol;
+}
+
 std::unique_ptr<Elem> Tri3::build_side_ptr (const unsigned int i,
                                             bool proxy)
 {

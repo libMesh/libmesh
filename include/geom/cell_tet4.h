@@ -136,6 +136,11 @@ public:
   virtual bool has_affine_map () const override { return true; }
 
   /**
+   * \returns \p true if the element has non-zero volume(), false otherwise.
+   */
+  virtual bool has_invertible_map(Real tol) const override;
+
+  /**
    * \returns \p true if the Lagrange shape functions on this element
    * are linear.
    */

@@ -100,6 +100,34 @@ bool Edge3::has_affine_map() const
 
 
 
+bool Edge3::has_invertible_map(Real tol) const
+{
+  Point a = this->point(0) + this->point(1) - 2 * this->point(2);
+  Point b = .5 * (this->point(1) - this->point(0));
+
+  // Normalized midpoint value of Jacobian. If b==0, then the
+  // endpoints of the Edge3 are at the same location, and the map is
+  // not invertible. We use <= in the comparison so that it makes sense
+  // for tol == 0
+  Real b_norm = b.norm();
+  if (b_norm <= tol)
+    return false;
+
+  Point n = b / b_norm;
+
+  // Compute n * (a*xi + b) at each endpoint and compare signs.
+  Real jac0 = n * (-a + b);
+  Real jac1 = n * ( a + b);
+
+  // Debugging
+  // libMesh::out << "jac0 = " << jac0 << std::endl;
+  // libMesh::out << "jac1 = " << jac1 << std::endl;
+
+  return ((jac0 > 0 && jac1 > 0) || (jac0 < 0 && jac1 < 0));
+}
+
+
+
 Order Edge3::default_order() const
 {
   return SECOND;

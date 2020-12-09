@@ -967,6 +967,16 @@ public:
   virtual bool has_affine_map () const { return false; }
 
   /**
+   * \returns \p true if the element map is invertible everywhere on
+   * the element, to within a user-specified tolerance. The tolerance
+   * is generally used in comparisons against zero, so it should be an
+   * absolute rather than a relative tolerance. Throws a
+   * libmesh_not_implemented() error unless specialized by derived
+   * classes.
+   */
+  virtual bool has_invertible_map(Real tol = TOLERANCE*TOLERANCE) const;
+
+  /**
    * \returns \p true if the Lagrange shape functions on this element
    * are linear.
    */

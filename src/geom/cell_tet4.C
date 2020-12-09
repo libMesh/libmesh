@@ -131,6 +131,12 @@ bool Tet4::is_child_on_side(const unsigned int /*c*/,
 
 
 
+bool Tet4::has_invertible_map(Real tol) const
+{
+  return this->volume() > tol;
+}
+
+
 
 bool Tet4::is_node_on_side(const unsigned int n,
                            const unsigned int s) const

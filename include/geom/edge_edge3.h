@@ -118,6 +118,13 @@ public:
   virtual bool has_affine_map () const override;
 
   /**
+   * \returns \p true if the Jacobian vector dx/dxi(xi) satisfies
+   * sgn(dot(dx/dxi(0), dx/dxi(-1))) == sgn(dot(dx/dxi(0), dx/dxi(1))),
+   * false otherwise.
+   */
+  virtual bool has_invertible_map(Real tol) const override;
+
+  /**
    * \returns \p EDGE3.
    */
   virtual ElemType type() const override { return EDGE3; }
