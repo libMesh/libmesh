@@ -1133,6 +1133,8 @@ enable_silent_rules
 enable_maintainer_mode
 enable_mpi
 with_mpi
+with_mpi_include
+with_mpi_lib
 enable_optional
 enable_petsc
 with_cc
@@ -2075,6 +2077,11 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-mpi[=DIR]        Prefix where MPI is installed (default is MPIHOME
                           and then MPI_HOME)
+  --with-mpi-include[=DIR]
+                          Prefix where MPI headers are installed (default is
+                          --with-mpi+/include)
+  --with-mpi-lib[=DIR]    Prefix where MPI binaries are installed (default is
+                          --with-mpi+/lib)
   --with-cc=CC            C compiler to use
   --with-fc=FC            Fortran compiler to use
   --with-f77=F77          Fortran compiler to use
@@ -4804,6 +4811,66 @@ fi
 fi
 
 
+
+
+# Check whether --with-mpi was given.
+if test "${with_mpi+set}" = set; then :
+  withval=$with_mpi;
+                                                                      if test "$enablempi" = yes && test "$withval" = no; then :
+  as_fn_error $? "Did you mean to disable MPI? If you really mean it, use the --disable-mpi option instead" "$LINENO" 5
+
+fi
+              MPI="$withval"
+
+else
+
+              $as_echo "note: MPI library path not given..."
+              if test x"$MPIHOME" != x; then :
+
+                      $as_echo "trying prefix=$MPIHOME"
+                      MPI=$MPIHOME
+
+else
+
+                      if test x"$MPI_HOME" != x; then :
+
+                              $as_echo "trying prefix=$MPI_HOME"
+                              MPI=$MPI_HOME
+
+fi
+
+fi
+
+fi
+
+
+
+# Check whether --with-mpi-include was given.
+if test "${with_mpi_include+set}" = set; then :
+  withval=$with_mpi_include;
+              MPI_INCLUDES_PATH="$withval"
+
+else
+
+              MPI_INCLUDES_PATH="$MPI/include"
+
+fi
+
+
+
+# Check whether --with-mpi-lib was given.
+if test "${with_mpi_lib+set}" = set; then :
+  withval=$with_mpi_lib;
+              MPI_LIBS_PATH="$withval"
+
+else
+
+              MPI_LIBS_PATH="$MPI/lib"
+
+fi
+
+
+#
 # --------------------------------------------------------------
 # Allow for disable-optional
 # --------------------------------------------------------------
@@ -4982,20 +5049,20 @@ fi
 fi
     if test "$enablepetsc" != no; then :
 
-                    if test "$PREFIX_INSTALLED_PETSC" = "no"; then :
+                                                                                if test "$PREFIX_INSTALLED_PETSC" = "no"; then :
 
-                  PETSCLINKLIBS=`make -s -C ${PETSC_DIR} getlinklibs`
-                  PETSCINCLUDEDIRS=`make -s -C ${PETSC_DIR} getincludedirs`
-                  PETSC_CXX=`make -s -C $PETSC_DIR getcxxcompiler`
-                  PETSC_MPI_INCLUDE_DIRS=`make -s -C $PETSC_DIR getmpiincludedirs`
-                  PETSC_MPI_LINK_LIBS=`make -s -C $PETSC_DIR getmpilinklibs`
+                  PETSCLINKLIBS=`make -s -C ${PETSC_DIR} SHELL=/bin/sh getlinklibs`
+                  PETSCINCLUDEDIRS=`make -s -C ${PETSC_DIR} SHELL=/bin/sh getincludedirs`
+                  PETSC_CXX=`make -s -C $PETSC_DIR SHELL=/bin/sh getcxxcompiler`
+                  PETSC_MPI_INCLUDE_DIRS=`make -s -C $PETSC_DIR SHELL=/bin/sh getmpiincludedirs`
+                  PETSC_MPI_LINK_LIBS=`make -s -C $PETSC_DIR SHELL=/bin/sh getmpilinklibs`
                   printf '%s\n' "include $PETSC_VARS_FILE" > Makefile_config_petsc
                   printf '%s\n' "getPETSC_CC_INCLUDES:" >> Makefile_config_petsc
                   printf '\t%s\n' "echo \$(PETSC_CC_INCLUDES)" >> Makefile_config_petsc
                   printf '%s\n' "getPETSC_FC_INCLUDES:" >> Makefile_config_petsc
                   printf '\t%s\n' "echo \$(PETSC_FC_INCLUDES)" >> Makefile_config_petsc
-                  PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
-                  PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_FC_INCLUDES`
+                  PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc SHELL=/bin/sh getPETSC_CC_INCLUDES`
+                  PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc SHELL=/bin/sh getPETSC_FC_INCLUDES`
                   rm -f Makefile_config_petsc
 
 else
@@ -5022,13 +5089,13 @@ fi
                   printf '\t%s\n' "echo \$(MPI_INCLUDE)" >> Makefile_config_petsc
                   printf '%s\n' "getmpilinklibs:" >> Makefile_config_petsc
                   printf '\t%s\n' "echo \$(MPI_LIB)" >> Makefile_config_petsc
-                  PETSCLINKLIBS=`make -s -f Makefile_config_petsc getlinklibs`
-                  PETSCINCLUDEDIRS=`make -s -f Makefile_config_petsc getincludedirs`
-                  PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
-                  PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_FC_INCLUDES`
-                  PETSC_CXX=`make -s -f Makefile_config_petsc getcxxcompiler`
-                  PETSC_MPI_INCLUDE_DIRS=`make -s -f Makefile_config_petsc getmpiincludedirs`
-                  PETSC_MPI_LINK_LIBS=`make -s -f Makefile_config_petsc getmpilinklibs`
+                  PETSCLINKLIBS=`make -s -f Makefile_config_petsc SHELL=/bin/sh getlinklibs`
+                  PETSCINCLUDEDIRS=`make -s -f Makefile_config_petsc SHELL=/bin/sh getincludedirs`
+                  PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc SHELL=/bin/sh getPETSC_CC_INCLUDES`
+                  PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc SHELL=/bin/sh getPETSC_FC_INCLUDES`
+                  PETSC_CXX=`make -s -f Makefile_config_petsc SHELL=/bin/sh getcxxcompiler`
+                  PETSC_MPI_INCLUDE_DIRS=`make -s -f Makefile_config_petsc SHELL=/bin/sh getmpiincludedirs`
+                  PETSC_MPI_LINK_LIBS=`make -s -f Makefile_config_petsc SHELL=/bin/sh getmpilinklibs`
                   rm -f Makefile_config_petsc
 
 fi
@@ -29526,8 +29593,14 @@ fi
 
 
     AX_MAJOR_VERSION=`echo "$VERSION" | $SED 's/\([^.][^.]*\).*/\1/'`
-    AX_MINOR_VERSION=`echo "$VERSION" | $SED 's/[^.][^.]*.\([^.][^.]*\).*/\1/'`
-    AX_POINT_VERSION=`echo "$VERSION" | $SED 's/[^.][^.]*.[^.][^.]*.\(.*\)/\1/'`
+    AX_MINOR_VERSION=`echo "$VERSION" | $SED -n 's/[^.][^.]*.\([^.][^.]*\).*/\1/p'`
+    if test "x$AX_MINOR_VERSION" = "x"; then :
+  AX_MINOR_VERSION=0
+fi
+    AX_POINT_VERSION=`echo "$VERSION" | $SED -n 's/[^.][^.]*.[^.][^.]*.\(.*\)/\1/p'`
+    if test "x$AX_POINT_VERSION" = "x"; then :
+  AX_POINT_VERSION=0
+fi
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking Major version" >&5
 $as_echo_n "checking Major version... " >&6; }
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $AX_MAJOR_VERSION" >&5
@@ -33776,10 +33849,9 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-elif test -n "$MPI"; then :
+elif test -n "$MPI_LIBS_PATH" -a -n "$MPI_INCLUDES_PATH"; then :
 
-    MPI_LIBS_PATH="$MPI/lib"
-    MPI_INCLUDES_PATH="$MPI/include"
+    $as_echo "note: Checking $MPI_LIBS_PATH and $MPI_INCLUDES_PATH for MPI"
 
     MPI_LIBS_TO_TEST=""
     if test -e $MPI_LIBS_PATH/libmpi.a; then :
@@ -33795,7 +33867,7 @@ fi
 
         if test x"$MPI_LIBS_TO_TEST" != x; then :
 
-            $as_echo "note: testing $MPI_LIBS_PATH/libmpi(.a/.so)"
+            $as_echo "note: testing $MPI_LIBS_PATH/libmpi(.a/.so/.dylib)"
 
                         tmpLIBS=$LIBS
 
@@ -33962,6 +34034,10 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
             LIBS=$tmpLIBS
+
+else
+
+            $as_echo "note: Could not find $MPI_LIBS_PATH/libmpi(.a/.so/.dylib)"
 
 fi
 
