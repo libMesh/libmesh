@@ -167,6 +167,8 @@ DistributedMesh::DistributedMesh (const UnstructuredMesh & other_mesh) :
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id = other_mesh.parallel_max_unique_id() +
                     this->processor_id();
+  _next_unpartitioned_unique_id = _next_unique_id +
+    (this->n_processors() - this->processor_id());
 #endif
   this->update_parallel_id_counts();
 }
