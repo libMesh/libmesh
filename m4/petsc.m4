@@ -95,6 +95,7 @@ AC_DEFUN([CONFIGURE_PETSC],
             petsc_use_debug=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_DEBUG`
             petsc_have_superlu_dist=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_SUPERLU_DIST`
             petsc_have_mumps=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_MUMPS`
+            petsc_have_strumpack=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_STRUMPACK`
             petsc_have_metis=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_METIS`
             petsc_have_chaco=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_CHACO`
             petsc_have_party=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PARTY`
@@ -228,6 +229,10 @@ AC_DEFUN([CONFIGURE_PETSC],
           # Set a #define if PETSc was built with MUMPS support
           AS_IF([test $petsc_have_mumps -gt 0],
                 [AC_DEFINE(PETSC_HAVE_MUMPS, 1, [Flag indicating whether or not PETSc was configured with MUMPS support])])
+
+          # Set a #define if PETSc was built with STRUMPACK support
+          AS_IF([test $petsc_have_strumpack -gt 0],
+                [AC_DEFINE(PETSC_HAVE_STRUMPACK, 1, [Flag indicating whether or not PETSc was configured with STRUMPACK support])])
 
           # Set a #define if PETSc was built with Chaco support
           AS_IF([test $petsc_have_chaco -gt 0],
