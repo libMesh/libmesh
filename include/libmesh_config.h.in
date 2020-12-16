@@ -657,6 +657,10 @@
    */
 #undef PETSC_HAVE_PTSCOTCH
 
+/* Flag indicating whether or not PETSc was configured with STRUMPACK support
+   */
+#undef PETSC_HAVE_STRUMPACK
+
 /* Flag indicating whether or not PETSc was configured with SuperLU_dist
    support */
 #undef PETSC_HAVE_SUPERLU_DIST
