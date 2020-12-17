@@ -17,6 +17,7 @@
 
 #include "L2system.h"
 
+#include "libmesh/elem.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fem_context.h"
@@ -74,6 +75,12 @@ bool L2System::element_time_derivative (bool request_jacobian,
                                         DiffContext & context)
 {
   FEMContext & c = cast_ref<FEMContext &>(context);
+
+  const Elem & elem = c.get_elem();
+
+  if (!_subdomains_list.empty() &&
+      !_subdomains_list.count(elem.subdomain_id()))
+    return request_jacobian;
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
