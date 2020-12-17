@@ -382,6 +382,28 @@ public:
   left_multiply (const TypeVector<T2> & p) const;
 
   /**
+   * Computes the vector z = A*x + y without creating an intermediate
+   * temporary. This makes sense as a static function since it does
+   * not require an object.
+   */
+  static
+  TypeVector<T>
+  axpy(const TypeTensor<T> & A,
+       const TypeVector<T> & x,
+       const TypeVector<T> & y)
+  {
+    TypeVector<T> ret;
+    for (int i=0; i<LIBMESH_DIM; i++)
+      {
+        for (int j=0; j<LIBMESH_DIM; j++)
+          ret(i) += A._coords[i*LIBMESH_DIM + j] * x(j);
+
+        ret(i) += y(i);
+      }
+    return ret;
+  }
+
+  /**
    * \returns The transpose of this tensor (with complex numbers not conjugated).
    */
   TypeTensor<T> transpose() const;
