@@ -324,8 +324,7 @@ public:
    * Computes the matrix-matrix-matrix product, D = A * B * C, or
    * D_ij = A_ik * B_kl * C_lj
    * without creating a temporary. This makes sense as a static function
-   * since it does not require an object but needs to access the _coords
-   * member of the passed-in objects for efficient indexing operations.
+   * since it does not require an object.
    */
   static
   TypeTensor<T>
@@ -333,19 +332,16 @@ public:
             const TypeTensor<T> & B,
             const TypeTensor<T> & C)
   {
-    // Macro for readability
-#define IDX(i,j) i*LIBMESH_DIM + j
-
-    TypeTensor<T> ret;
+    TypeTensor<T> D;
     for (int i=0; i<LIBMESH_DIM; i++)
       for (int j=0; j<LIBMESH_DIM; j++)
         for (int k=0; k<LIBMESH_DIM; k++)
           {
-            T Aik = A._coords[IDX(i,k)];
+            T Aik = A(i,k);
             for (int l=0; l<LIBMESH_DIM; l++)
-              ret._coords[IDX(i,j)] += Aik * B._coords[IDX(k,l)] * C._coords[IDX(l,j)];
+              D(i,j) += Aik * B(k,l) * C(l,j);
           }
-    return ret;
+    return D;
   }
 
   /**
@@ -392,15 +388,15 @@ public:
        const TypeVector<T> & x,
        const TypeVector<T> & y)
   {
-    TypeVector<T> ret;
+    TypeVector<T> z;
     for (int i=0; i<LIBMESH_DIM; i++)
       {
         for (int j=0; j<LIBMESH_DIM; j++)
-          ret(i) += A._coords[i*LIBMESH_DIM + j] * x(j);
+          z(i) += A(i,j) * x(j);
 
-        ret(i) += y(i);
+        z(i) += y(i);
       }
-    return ret;
+    return z;
   }
 
   /**
