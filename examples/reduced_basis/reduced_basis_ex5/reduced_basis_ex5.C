@@ -22,7 +22,7 @@
 
 
 // <h1>Reduced Basis: Example 5 - Reduced Basis Cantilever</h1>
-// 3D cantilever beam using the Reduced Basis Method
+// 1D/2D/3D cantilever beam using the Reduced Basis Method
 // \author David Knezevic
 // \author Kyunghoon "K" Lee
 // \date 2012
@@ -109,9 +109,8 @@ int main(int argc, char ** argv)
   // portion of this example
   libmesh_example_requires(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc or --enable-laspack");
 
-  // This example only works if libMesh was compiled for 3D
-  const unsigned int dim = 3;
-  libmesh_example_requires(dim == LIBMESH_DIM, "3D support");
+  // This example only works on all meshes if libMesh was compiled for 3D
+  libmesh_example_requires(LIBMESH_DIM == 3, "3D support");
 
 #ifndef LIBMESH_ENABLE_DIRICHLET
   libmesh_example_requires(false, "--enable-dirichlet");
@@ -194,6 +193,8 @@ int main(int argc, char ** argv)
 
   mesh.print_info();
 
+  const unsigned int dim = mesh.mesh_dimension();
+
   // Create an equation systems object.
   EquationSystems equation_systems(mesh);
 
@@ -206,14 +207,23 @@ int main(int argc, char ** argv)
   ExplicitSystem & stress_system =
     equation_systems.add_system<ExplicitSystem> ("StressSystem");
   stress_system.add_variable("sigma_00", CONSTANT, MONOMIAL);
-  stress_system.add_variable("sigma_01", CONSTANT, MONOMIAL);
-  stress_system.add_variable("sigma_02", CONSTANT, MONOMIAL);
-  stress_system.add_variable("sigma_10", CONSTANT, MONOMIAL);
-  stress_system.add_variable("sigma_11", CONSTANT, MONOMIAL);
-  stress_system.add_variable("sigma_12", CONSTANT, MONOMIAL);
-  stress_system.add_variable("sigma_20", CONSTANT, MONOMIAL);
-  stress_system.add_variable("sigma_21", CONSTANT, MONOMIAL);
-  stress_system.add_variable("sigma_22", CONSTANT, MONOMIAL);
+
+  // Lots of ifs to keep order consistent
+  if (dim > 1)
+    stress_system.add_variable("sigma_01", CONSTANT, MONOMIAL);
+  if (dim > 2)
+      stress_system.add_variable("sigma_02", CONSTANT, MONOMIAL);
+  if (dim > 1)
+      stress_system.add_variable("sigma_10", CONSTANT, MONOMIAL);
+  if (dim > 1)
+      stress_system.add_variable("sigma_11", CONSTANT, MONOMIAL);
+  if (dim > 2)
+    {
+      stress_system.add_variable("sigma_12", CONSTANT, MONOMIAL);
+      stress_system.add_variable("sigma_20", CONSTANT, MONOMIAL);
+      stress_system.add_variable("sigma_21", CONSTANT, MONOMIAL);
+      stress_system.add_variable("sigma_22", CONSTANT, MONOMIAL);
+    }
   stress_system.add_variable("vonMises", CONSTANT, MONOMIAL);
 
   // Initialize the data structures for the equation system.
@@ -347,13 +357,16 @@ void compute_stresses(EquationSystems & es)
   const MeshBase & mesh = es.get_mesh();
 
   const unsigned int dim = mesh.mesh_dimension();
+  libmesh_assert_less_equal(dim, 3);
 
   ElasticityRBConstruction & system = es.get_system<ElasticityRBConstruction>("RBElasticity");
 
   unsigned int displacement_vars[3];
   displacement_vars[0] = system.variable_number ("u");
-  displacement_vars[1] = system.variable_number ("v");
-  displacement_vars[2] = system.variable_number ("w");
+  if (dim > 1)
+    displacement_vars[1] = system.variable_number ("v");
+  if (dim > 2)
+    displacement_vars[2] = system.variable_number ("w");
   const unsigned int u_var = system.variable_number ("u");
 
   const DofMap & dof_map = system.get_dof_map();
@@ -370,14 +383,22 @@ void compute_stresses(EquationSystems & es)
   const DofMap & stress_dof_map = stress_system.get_dof_map();
   unsigned int sigma_vars[3][3];
   sigma_vars[0][0] = stress_system.variable_number ("sigma_00");
-  sigma_vars[0][1] = stress_system.variable_number ("sigma_01");
-  sigma_vars[0][2] = stress_system.variable_number ("sigma_02");
-  sigma_vars[1][0] = stress_system.variable_number ("sigma_10");
-  sigma_vars[1][1] = stress_system.variable_number ("sigma_11");
-  sigma_vars[1][2] = stress_system.variable_number ("sigma_12");
-  sigma_vars[2][0] = stress_system.variable_number ("sigma_20");
-  sigma_vars[2][1] = stress_system.variable_number ("sigma_21");
-  sigma_vars[2][2] = stress_system.variable_number ("sigma_22");
+
+  if (dim > 1)
+    {
+      sigma_vars[0][1] = stress_system.variable_number ("sigma_01");
+      sigma_vars[1][0] = stress_system.variable_number ("sigma_10");
+      sigma_vars[1][1] = stress_system.variable_number ("sigma_11");
+    }
+
+  if (dim > 2)
+    {
+      sigma_vars[0][2] = stress_system.variable_number ("sigma_02");
+      sigma_vars[1][2] = stress_system.variable_number ("sigma_12");
+      sigma_vars[2][0] = stress_system.variable_number ("sigma_20");
+      sigma_vars[2][1] = stress_system.variable_number ("sigma_21");
+      sigma_vars[2][2] = stress_system.variable_number ("sigma_22");
+    }
   unsigned int vonMises_var = stress_system.variable_number ("vonMises");
 
   // Storage for the stress dof indices on each element
@@ -389,17 +410,22 @@ void compute_stresses(EquationSystems & es)
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      for (unsigned int var=0; var<3; var++)
+      // We'll only be computing stresses on the primary manifold of a
+      // mesh, not, for instance, on spline nodes
+      if (elem->dim() != dim)
+        continue;
+
+      for (unsigned int var=0; var<dim; var++)
         dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
 
       fe->reinit (elem);
 
-      elem_sigma.resize(3, 3);
+      elem_sigma.resize(dim, dim);
 
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-        for (unsigned int C_i=0; C_i<3; C_i++)
-          for (unsigned int C_j=0; C_j<3; C_j++)
-            for (unsigned int C_k=0; C_k<3; C_k++)
+        for (unsigned int C_i=0; C_i<dim; C_i++)
+          for (unsigned int C_j=0; C_j<dim; C_j++)
+            for (unsigned int C_k=0; C_k<dim; C_k++)
               {
                 const unsigned int n_var_dofs = dof_indices_var[C_k].size();
 
@@ -408,7 +434,7 @@ void compute_stresses(EquationSystems & es)
                 for (unsigned int l=0; l<n_var_dofs; l++)
                   displacement_gradient.add_scaled(dphi[l][qp], system.current_solution(dof_indices_var[C_k][l]));
 
-                for (unsigned int C_l=0; C_l<3; C_l++)
+                for (unsigned int C_l=0; C_l<dim; C_l++)
                   elem_sigma(C_i,C_j) += JxW[qp] * (elasticity_tensor(C_i, C_j, C_k, C_l) * displacement_gradient(C_l));
               }
 
@@ -416,8 +442,8 @@ void compute_stresses(EquationSystems & es)
       elem_sigma.scale(1./elem->volume());
 
       // load elem_sigma data into stress_system
-      for (unsigned int i=0; i<3; i++)
-        for (unsigned int j=0; j<3; j++)
+      for (unsigned int i=0; i<dim; i++)
+        for (unsigned int j=0; j<dim; j++)
           {
             stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[i][j]);
 
@@ -434,11 +460,20 @@ void compute_stresses(EquationSystems & es)
           }
 
       // Also, the von Mises stress
-      Number vonMises_value = std::sqrt(0.5*(pow(elem_sigma(0,0) - elem_sigma(1,1),2.) +
-                                             pow(elem_sigma(1,1) - elem_sigma(2,2),2.) +
-                                             pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
-                                             6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
-                                             ));
+
+      // We're solving with general plane stress if in 2D, or with
+      // uniaxial stress if in 1D
+      Number sigma00 = elem_sigma(0,0);
+      Number sigma11 = (dim > 1) ? elem_sigma(1,1) : 0;
+      Number sigma22 = (dim > 2) ? elem_sigma(2,2) : 0;
+      Number sum_term = pow(sigma00 - sigma11,2);
+      if (dim > 1)
+        sum_term += pow(sigma11 - sigma22,2) +
+                    6.*pow(elem_sigma(0,1),2);
+      if (dim > 2)
+        sum_term += pow(sigma22 - sigma00,2) +
+                    6.*(pow(elem_sigma(1,2),2) + pow(elem_sigma(2,0),2));
+      Number vonMises_value = std::sqrt(0.5*sum_term);
       stress_dof_map.dof_indices (elem, stress_dof_indices_var, vonMises_var);
       dof_id_type dof_index = stress_dof_indices_var[0];
       if ((stress_system.solution->first_local_index() <= dof_index) &&

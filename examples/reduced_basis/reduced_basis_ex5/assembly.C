@@ -61,8 +61,7 @@ void AssemblyA0::interior_assembly(FEMContext & c)
 {
   const unsigned int n_components = rb_sys.n_vars();
 
-  // make sure we have three components
-  libmesh_assert_equal_to (n_components, 3);
+  libmesh_assert_less_equal(n_components, 3);
 
   const unsigned int u_var = rb_sys.u_var;
   const unsigned int v_var = rb_sys.v_var;
@@ -82,8 +81,10 @@ void AssemblyA0::interior_assembly(FEMContext & c)
 
   std::vector<unsigned int> n_var_dofs(n_components);
   n_var_dofs[u_var] = c.get_dof_indices(u_var).size();
-  n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
-  n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
+  if (n_components > 1)
+    n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
+  if (n_components > 2)
+    n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
 
   for (unsigned int C_i = 0; C_i < n_components; C_i++)
     {
@@ -120,8 +121,7 @@ void AssemblyA1::interior_assembly(FEMContext & c)
 {
   const unsigned int n_components = rb_sys.n_vars();
 
-  // make sure we have three components
-  libmesh_assert_equal_to (n_components, 3);
+  libmesh_assert_less_equal(n_components, 3);
 
   const unsigned int u_var = rb_sys.u_var;
   const unsigned int v_var = rb_sys.v_var;
@@ -141,8 +141,10 @@ void AssemblyA1::interior_assembly(FEMContext & c)
 
   std::vector<unsigned int> n_var_dofs(n_components);
   n_var_dofs[u_var] = c.get_dof_indices(u_var).size();
-  n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
-  n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
+  if (n_components > 1)
+    n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
+  if (n_components > 2)
+    n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
 
   for (unsigned int C_i = 0; C_i < n_components; C_i++)
     for (unsigned int C_j = 1; C_j < n_components; C_j++)
@@ -162,8 +164,7 @@ void AssemblyA2::interior_assembly(FEMContext & c)
 {
   const unsigned int n_components = rb_sys.n_vars();
 
-  // make sure we have three components
-  libmesh_assert_equal_to (n_components, 3);
+  libmesh_assert_less_equal(n_components, 3);
 
   const unsigned int u_var = rb_sys.u_var;
   const unsigned int v_var = rb_sys.v_var;
@@ -183,8 +184,10 @@ void AssemblyA2::interior_assembly(FEMContext & c)
 
   std::vector<unsigned int> n_var_dofs(n_components);
   n_var_dofs[u_var] = c.get_dof_indices(u_var).size();
-  n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
-  n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
+  if (n_components > 1)
+    n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
+  if (n_components > 2)
+    n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
 
   for (unsigned int C_i = 0; C_i < n_components; C_i++)
     {
@@ -337,6 +340,10 @@ void AssemblyPointLoadZ::get_nodal_rhs_values(std::map<numeric_index_type, Numbe
 
 void InnerProductAssembly::interior_assembly(FEMContext & c)
 {
+  const unsigned int n_components = rb_sys.n_vars();
+
+  libmesh_assert_less_equal(n_components, 3);
+
   const unsigned int u_var = rb_sys.u_var;
   const unsigned int v_var = rb_sys.v_var;
   const unsigned int w_var = rb_sys.w_var;
@@ -365,7 +372,7 @@ void InnerProductAssembly::interior_assembly(FEMContext & c)
     };
 
   for (unsigned int qp=0; qp<n_qpoints; qp++)
-    for (unsigned int d=0; d<3; ++d)
+    for (unsigned int d=0; d<n_components; ++d)
       for (unsigned int i=0; i<n_dofs; i++)
         for (unsigned int j=0; j<n_dofs; j++)
           Kdiag[d](i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
