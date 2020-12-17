@@ -2,8 +2,10 @@
 #include <libmesh/tensor_value.h>
 #include <libmesh/vector_value.h>
 
-#include "libmesh_cppunit.h"
+// C++ includes
+#include <cstdlib> // std::rand
 
+#include "libmesh_cppunit.h"
 
 using namespace libMesh;
 
@@ -21,6 +23,7 @@ public:
   CPPUNIT_TEST(testLeftMultiply);
 #endif
   CPPUNIT_TEST(testIsZero);
+  CPPUNIT_TEST(matMult3);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -60,6 +63,30 @@ private:
     LIBMESH_ASSERT_FP_EQUAL(34, left_mult(1), 1e-12);
     LIBMESH_ASSERT_FP_EQUAL(17, right_mult(0), 1e-12);
     LIBMESH_ASSERT_FP_EQUAL(39, right_mult(1), 1e-12);
+  }
+
+  void matMult3()
+  {
+    // Test that the operations
+    // .) A * B * C;
+    // .) A *= B; A *= C;
+    // .) mat_mult3(A, B, C);
+    // all give the same result.
+    auto r = [](){ return static_cast<Real>(std::rand()) / static_cast<Real>(RAND_MAX); };
+
+    RealTensorValue A(r(), r(), r(), r(), r(), r(), r(), r(), r());
+    RealTensorValue B(r(), r(), r(), r(), r(), r(), r(), r(), r());
+    RealTensorValue C(r(), r(), r(), r(), r(), r(), r(), r(), r());
+
+    RealTensorValue D1 = A * B * C;
+    RealTensorValue D2 = A; D2 *= B; D2 *= C;
+    RealTensorValue D3 = RealTensorValue::mat_mult3(A, B, C);
+
+    Real D12 = (D1 - D2).norm();
+    Real D23 = (D2 - D3).norm();
+
+    LIBMESH_ASSERT_FP_EQUAL(0, D12, TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(0, D23, TOLERANCE * TOLERANCE);
   }
 
   void testOuterProduct()
