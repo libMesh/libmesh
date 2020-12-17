@@ -25,6 +25,7 @@
 #include "libmesh/mesh.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/utility.h"
 
 using namespace libMesh;
 
@@ -70,9 +71,8 @@ void L2System::init_context(DiffContext & context)
   // Build a corresponding context for the input system if we haven't
   // already
   FEMContext *& input_context = input_contexts[&c];
-  if (!input_context)
+  if (input_system && !input_context)
     {
-      libmesh_assert(input_system);
       input_context = new FEMContext(*input_system);
 
       libmesh_assert(goal_func.get());
@@ -113,11 +113,12 @@ bool L2System::element_time_derivative (bool request_jacobian,
 
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
-  libmesh_assert (input_contexts.find(&c) != input_contexts.end());
-
-  FEMContext & input_c = *input_contexts[&c];
-  input_c.pre_fe_reinit(*input_system, &c.get_elem());
-  input_c.elem_fe_reinit();
+  FEMContext & input_c = *libmesh_map_find(input_contexts, &c);
+  if (input_system)
+    {
+      input_c.pre_fe_reinit(*input_system, &elem);
+      input_c.elem_fe_reinit();
+    }
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
