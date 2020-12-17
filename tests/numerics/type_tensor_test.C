@@ -21,10 +21,10 @@ public:
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST(testInverse);
   CPPUNIT_TEST(testLeftMultiply);
-#endif
-  CPPUNIT_TEST(testIsZero);
   CPPUNIT_TEST(matMult3);
   CPPUNIT_TEST(axpy);
+#endif
+  CPPUNIT_TEST(testIsZero);
 
   CPPUNIT_TEST_SUITE_END();
 
