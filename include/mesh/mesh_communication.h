@@ -265,8 +265,11 @@ void connect_children(const MeshBase & mesh,
                       std::set<const Elem *, CompareElemIdsByLevel> & connected_elements);
 
 // Take a set of elements and insert all elements' ancestors and
-// subactive descendants as well.
-void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements);
+// subactive descendants as well.  If a mesh is provided and has any
+// constraint rows, insert elements with the constraining nodes for
+// any constrained nodes in our set.
+void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
+                      const MeshBase * mesh = nullptr);
 
 // Take a set of elements and create a set of connected nodes.
 void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,

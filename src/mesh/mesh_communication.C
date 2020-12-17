@@ -190,10 +190,38 @@ void connect_children(const MeshBase & mesh,
 }
 
 
-void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
+                      const MeshBase * mesh)
 {
-  // This parameter is not used when !LIBMESH_ENABLE_AMR.
-  libmesh_ignore(connected_elements);
+  // mesh was an optional parameter for API backwards compatibility
+  if (mesh && !mesh->get_constraint_rows().empty())
+    {
+      // We start with the constraint connections, not ancestors,
+      // because we don't need constraining nodes of elements'
+      // ancestors' constrained nodes.
+      const auto & constraint_rows = mesh->get_constraint_rows();
+
+      std::unordered_set<const Elem *> constraining_nodes_elems;
+      for (const Elem * elem : connected_elements)
+        {
+          for (const Node & node : elem->node_ref_range())
+            {
+              auto it = constraint_rows.find(&node);
+              // Retain all elements containing constraining nodes
+              if (it != constraint_rows.end())
+                for (auto & p : it->second)
+                  {
+                    const Elem * constraining_elem = p.first.first;
+                    libmesh_assert(constraining_elem ==
+                                   mesh->elem_ptr(constraining_elem->id()));
+                    constraining_nodes_elems.insert(constraining_elem);
+                  }
+            }
+        }
+
+      connected_elements.insert(constraining_nodes_elems.begin(),
+                                constraining_nodes_elems.end());
+    }
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -411,8 +439,10 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
                        elements_to_send);
 
       // The elements we need should have their ancestors and their
-      // subactive children present too.
-      connect_families(elements_to_send);
+      // subactive children present too.  If the mesh has any
+      // constraint rows, then elements with constrained nodes need
+      // elements with constraining nodes to remain present.
+      connect_families(elements_to_send, &mesh);
 
       std::set<const Node *> connected_nodes;
       reconnect_nodes(elements_to_send, connected_nodes);
@@ -510,6 +540,16 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
                                       mesh_inserter_iterator<Elem>(mesh),
                                       (Elem**)nullptr,
                                       elemstag);
+
+  // At this point we have all the nodes and elems we need, so we can
+  // communicate any constraint rows that our targets will need.
+  auto & constraint_rows = mesh.get_constraint_rows();
+  bool have_constraint_rows = !constraint_rows.empty();
+  mesh.comm().broadcast(have_constraint_rows);
+  if (have_constraint_rows)
+    {
+      libmesh_not_implemented();
+    }
 
   // Wait for all sends to complete
   Parallel::wait (node_send_requests);
@@ -1119,9 +1159,6 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
   mesh.set_default_mapping_type(ElemMappingType(map_type));
   mesh.set_default_mapping_data(map_data);
 
-  // We may have constraint rows on IsoGeometricAnalysis meshes
-  mesh.comm().broadcast(mesh.get_constraint_rows());
-
   // Broadcast nodes
   mesh.comm().broadcast_packed_range(&mesh,
                                      mesh.nodes_begin(),
@@ -1147,6 +1184,58 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
 
   // Make sure mesh_dimension and elem_dimensions are consistent.
   mesh.cache_elem_dims();
+
+  // We may have constraint rows on IsoGeometric Analysis meshes.  We
+  // don't want to send these along with constrained nodes (like we
+  // send boundary info for those nodes) because the associated rows'
+  // elements may not exist at that point.
+  auto & constraint_rows = mesh.get_constraint_rows();
+  bool have_constraint_rows = !constraint_rows.empty();
+  mesh.comm().broadcast(have_constraint_rows);
+  if (have_constraint_rows)
+    {
+      std::map<dof_id_type,
+               std::vector<std::tuple<dof_id_type, unsigned int, Real>>>
+        serialized_rows;
+
+      for (auto & row : constraint_rows)
+        {
+          const Node * node = row.first;
+          const dof_id_type rowid = node->id();
+          libmesh_assert(node == mesh.node_ptr(rowid));
+
+          std::vector<std::tuple<dof_id_type, unsigned int, Real>>
+            serialized_row;
+          for (auto & entry : row.second)
+            serialized_row.push_back
+              (std::make_tuple(entry.first.first->id(),
+                               entry.first.second, entry.second));
+
+          serialized_rows.emplace(rowid, std::move(serialized_row));
+        }
+
+      mesh.comm().broadcast(serialized_rows);
+      if (mesh.processor_id() != 0)
+        {
+          constraint_rows.clear();
+
+          for (auto & row : serialized_rows)
+            {
+              const dof_id_type rowid = row.first;
+              const Node * node = mesh.node_ptr(rowid);
+
+              std::vector<std::pair<std::pair<const Elem *, unsigned int>, Real>>
+                deserialized_row;
+              for (auto & entry : row.second)
+                deserialized_row.push_back
+                  (std::make_pair(std::make_pair(mesh.elem_ptr(std::get<0>(entry)),
+                                                 std::get<1>(entry)),
+                                                 std::get<2>(entry)));
+
+              constraint_rows.emplace(node, deserialized_row);
+            }
+        }
+    }
 
   // Broadcast all of the named entity information
   mesh.comm().broadcast(mesh.set_subdomain_name_map());
@@ -1232,6 +1321,67 @@ void MeshCommunication::gather (const processor_id_type root_id, MeshBase & mesh
   // If we had a point locator, it's invalid now that there are new
   // elements it can't locate.
   mesh.clear_point_locator();
+
+  // We may have constraint rows on IsoGeometric Analysis meshes.  We
+  // don't want to send these along with constrained nodes (like we
+  // send boundary info for those nodes) because the associated rows'
+  // elements may not exist at that point.
+  auto & constraint_rows = mesh.get_constraint_rows();
+  bool have_constraint_rows = !constraint_rows.empty();
+  mesh.comm().broadcast(have_constraint_rows);
+  if (have_constraint_rows)
+    {
+      std::map<dof_id_type,
+               std::vector<std::tuple<dof_id_type, unsigned int, Real>>>
+        serialized_rows;
+
+      for (auto & row : constraint_rows)
+        {
+          const Node * node = row.first;
+          const dof_id_type rowid = node->id();
+          libmesh_assert(node == mesh.node_ptr(rowid));
+
+          std::vector<std::tuple<dof_id_type, unsigned int, Real>>
+            serialized_row;
+          for (auto & entry : row.second)
+            serialized_row.push_back
+              (std::make_tuple(entry.first.first->id(),
+                               entry.first.second, entry.second));
+
+          serialized_rows.emplace(rowid, std::move(serialized_row));
+        }
+
+      libmesh_not_implemented();
+
+      // TODO: THIS NEEDS TIMPI SUPPORT
+      /*
+      if (root_id == DofObject::invalid_processor_id)
+        mesh.comm().allgather(serialized_rows);
+      else
+        mesh.comm().gather(serialized_rows, root_id);
+      */
+
+      if (root_id == DofObject::invalid_processor_id ||
+          root_id == mesh.processor_id())
+        {
+          for (auto & row : serialized_rows)
+            {
+              const dof_id_type rowid = row.first;
+              const Node * node = mesh.node_ptr(rowid);
+
+              std::vector<std::pair<std::pair<const Elem *, unsigned int>, Real>>
+                deserialized_row;
+              for (auto & entry : row.second)
+                deserialized_row.push_back
+                  (std::make_pair(std::make_pair(mesh.elem_ptr(std::get<0>(entry)),
+                                                 std::get<1>(entry)),
+                                                 std::get<2>(entry)));
+
+              constraint_rows.emplace(node, deserialized_row);
+            }
+        }
+    }
+
 
   // If we are doing an allgather(), perform sanity check on the result.
   if (root_id == DofObject::invalid_processor_id)
@@ -1925,8 +2075,10 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
                    elements_to_keep);
 
   // The elements we need should have their ancestors and their
-  // subactive children present too.
-  connect_families(elements_to_keep);
+  // subactive children present too.  If the mesh has any
+  // constraint rows, then elements with constrained nodes need
+  // elements with constraining nodes to remain present.
+  connect_families(elements_to_keep, &mesh);
 
   // Don't delete nodes that our semilocal elements need
   std::set<const Node *> connected_nodes;
@@ -1970,6 +2122,19 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   // the mesh, in which case we don't want to keep local copies.
   mesh.get_boundary_info().regenerate_id_sets();
 
+  // Many of our constraint rows may have been for non-local parts of
+  // the mesh, which we don't need, and which we didn't specifically
+  // save dependencies for.  The mesh deleted rows for remote nodes
+  // when we deleted those, but let's delete rows for ghosted nodes.
+  for (auto & row : mesh.get_constraint_rows())
+    {
+      const Node * node = row.first;
+      libmesh_assert(node == mesh.node_ptr(node->id()));
+
+      if (node->processor_id() != mesh.processor_id())
+        mesh.get_constraint_rows().erase(node);
+    }
+
   // We now have all remote elements and nodes deleted; our ghosting
   // functors should be ready to delete any now-redundant cached data
   // they use too.
@@ -1978,6 +2143,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
 
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_refinement_tree(mesh);
+  MeshTools::libmesh_assert_valid_constraint_rows(mesh);
 #endif
 }
 

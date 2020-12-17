@@ -1400,6 +1400,23 @@ void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
 
 
 
+void MeshTools::libmesh_assert_valid_constraint_rows (const MeshBase & mesh)
+{
+  for (auto & row : mesh.get_constraint_rows())
+    {
+      const Node * node = row.first;
+      libmesh_assert(node == mesh.node_ptr(node->id()));
+
+      for (auto & pr : row.second)
+        {
+          const Elem * spline_elem = pr.first.first;
+          libmesh_assert(spline_elem == mesh.elem_ptr(spline_elem->id()));
+        }
+    }
+}
+
+
+
 namespace MeshTools {
 
 void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)

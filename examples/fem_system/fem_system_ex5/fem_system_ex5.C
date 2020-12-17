@@ -104,16 +104,6 @@ int main (int argc, char ** argv)
   // Use an IsoGeometricAnalysis mesh?
   const bool use_iga = infile("use_iga", true);
 
-  // Make DynaIO::add_spline_constraints work on DistributedMesh
-  if (use_iga)
-    {
-      mesh.allow_renumbering(false);
-      mesh.allow_remote_element_removal(false);
-    }
-
-  // Declare DynaIO here so we can use its constraint equations later
-  DynaIO dyna_io(mesh);
-
   // Declare a default FEType here to override if needed for IGA later
   FEType fe_type;
 
@@ -122,6 +112,8 @@ int main (int argc, char ** argv)
   // Load an IGA pressurized cylinder mesh or build a cantilever mesh
   if (use_iga)
     {
+      DynaIO dyna_io(mesh);
+
       libMesh::out << "\nReading IGA mesh.\n" << std::endl;
       if (mesh.processor_id() == 0)
         dyna_io.read(iga_filename);
@@ -352,23 +344,24 @@ int main (int argc, char ** argv)
     }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-  // Output initial state
-  {
-    std::ostringstream file_name;
+  // Output initial state (if we can - IGA meshs don't serialize yet)
+  if (mesh.is_serial() || !use_iga)
+    {
+      std::ostringstream file_name;
 
-    // We write the file in the ExodusII format.
-    file_name << std::string("out.")+time_solver+std::string(".e-s.")
-              << std::setw(3)
-              << std::setfill('0')
-              << std::right
-              << 0;
+      // We write the file in the ExodusII format.
+      file_name << std::string("out.")+time_solver+std::string(".e-s.")
+                << std::setw(3)
+                << std::setfill('0')
+                << std::right
+                << 0;
 
-    ExodusII_IO(mesh).write_timestep(file_name.str(),
-                                     equation_systems,
-                                     1, // This number indicates how many time steps
-                                        // are being written to the file
-                                     system.time);
-  }
+      ExodusII_IO(mesh).write_timestep(file_name.str(),
+                                       equation_systems,
+                                       1, // This number indicates how many time steps
+                                          // are being written to the file
+                                       system.time);
+    }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // Now we begin the timestep loop to compute the time-accurate
@@ -397,7 +390,9 @@ int main (int argc, char ** argv)
 
 #ifdef LIBMESH_HAVE_EXODUS_API
       // Write out this timestep if we're requested to
-      if ((t_step+1)%write_interval == 0)
+      // (if we can - IGA meshs don't serialize yet)
+      if ((mesh.is_serial() || !use_iga) &&
+          ((t_step+1)%write_interval == 0))
         {
           std::ostringstream file_name;
 

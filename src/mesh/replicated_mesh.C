@@ -630,6 +630,7 @@ void ReplicatedMesh::delete_node(Node * n)
 
   // Delete the node from the BoundaryInfo object
   this->get_boundary_info().remove(n);
+  _constraint_rows.erase(n);
 
   // delete the node
   --_n_nodes;
@@ -819,6 +820,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
             else // This node is orphaned, delete it!
               {
                 this->get_boundary_info().remove (nd);
+                _constraint_rows.erase(nd);
 
                 // delete the node
                 --_n_nodes;
@@ -853,6 +855,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
             // remove any boundary information associated with
             // this node
             this->get_boundary_info().remove (node);
+            _constraint_rows.erase(node);
 
             // delete the node
             --_n_nodes;
