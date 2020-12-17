@@ -119,6 +119,9 @@ int main(int argc, char ** argv)
   std::string parameters_filename = "reduced_basis_ex5.in";
   GetPot infile(parameters_filename);
 
+  // Override input file arguments from the command line
+  infile.parse_command_line(argc, argv);
+
   unsigned int n_elem_x = infile("n_elem_x", 0);
   unsigned int n_elem_y = infile("n_elem_y", 0);
   unsigned int n_elem_z = infile("n_elem_z", 0);
@@ -135,18 +138,40 @@ int main(int argc, char ** argv)
     online_mode = command_line.next(online_mode);
 
 
-  Mesh mesh (init.comm(), dim);
-  MeshTools::Generation::build_cube (mesh,
-                                     n_elem_x,
-                                     n_elem_y,
-                                     n_elem_z,
-                                     0., x_size,
-                                     0., y_size,
-                                     0., z_size,
-                                     HEX8);
+  Mesh mesh (init.comm());
+
+  // Read a mesh from file?
+  const std::string mesh_filename = infile("mesh_filename", "NO MESH FILE");
+
+  if (mesh_filename == "NO MESH FILE")
+    MeshTools::Generation::build_cube
+      (mesh, n_elem_x, n_elem_y, n_elem_z,
+       0., x_size, 0., y_size, 0., z_size, HEX27);
+  else
+    {
+      mesh.read(mesh_filename);
+
+      // We don't yet support the experimental BEXT sideset spec, so
+      // for now we'll add our required sidesets manually for our BEXT
+      // file.
+
+      // Each processor should know about each boundary condition it can
+      // see, so we loop over all elements, not just local elements.
+      for (const auto & elem : mesh.element_ptr_range())
+        for (auto side : elem->side_index_range())
+          if (!elem->neighbor_ptr(side))
+            {
+              Point side_center = elem->build_side_ptr(side)->centroid();
+              if (side_center(0) < 0.1)
+                mesh.get_boundary_info().add_side(elem, side, BOUNDARY_ID_MIN_X);
+              if (side_center(0) > 11.9)
+                mesh.get_boundary_info().add_side(elem, side, BOUNDARY_ID_MAX_X);
+            }
+    }
 
   // Let's add a node boundary condition so that we can impose a point
-  // load.
+  // load and get more test coverage in the build_cube case.
+
   // Each processor should know about each boundary condition it can
   // see, so we loop over all elements, not just local elements.
   for (const auto & elem : mesh.element_ptr_range())
