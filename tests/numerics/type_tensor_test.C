@@ -24,6 +24,7 @@ public:
 #endif
   CPPUNIT_TEST(testIsZero);
   CPPUNIT_TEST(matMult3);
+  CPPUNIT_TEST(axpy);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -87,6 +88,25 @@ private:
 
     LIBMESH_ASSERT_FP_EQUAL(0, D12, TOLERANCE * TOLERANCE);
     LIBMESH_ASSERT_FP_EQUAL(0, D23, TOLERANCE * TOLERANCE);
+  }
+
+  void axpy()
+  {
+    // Test that the operations
+    // .) A * x + y;
+    // .) axpy(A, x, y);
+    // all give the same result.
+    auto r = [](){ return static_cast<Real>(std::rand()) / static_cast<Real>(RAND_MAX); };
+
+    RealTensorValue A(r(), r(), r(), r(), r(), r(), r(), r(), r());
+    RealVectorValue x(r(), r(), r());
+    RealVectorValue y(r(), r(), r());
+
+    RealVectorValue z1 = A * x + y;
+    RealVectorValue z2 = RealTensorValue::axpy(A, x, y);
+
+    Real z12 = (z1 - z2).norm();
+    LIBMESH_ASSERT_FP_EQUAL(0, z12, TOLERANCE * TOLERANCE);
   }
 
   void testOuterProduct()
