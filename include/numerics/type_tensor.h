@@ -321,6 +321,34 @@ public:
   const TypeTensor<T> & operator *= (const TypeTensor<T2> &);
 
   /**
+   * Computes the matrix-matrix-matrix product, D = A * B * C, or
+   * D_ij = A_ik * B_kl * C_lj
+   * without creating a temporary. This makes sense as a static function
+   * since it does not require an object but needs to access the _coords
+   * member of the passed-in objects for efficient indexing operations.
+   */
+  static
+  TypeTensor<T>
+  mat_mult3(const TypeTensor<T> & A,
+            const TypeTensor<T> & B,
+            const TypeTensor<T> & C)
+  {
+    // Macro for readability
+#define IDX(i,j) i*LIBMESH_DIM + j
+
+    TypeTensor<T> ret;
+    for (int i=0; i<LIBMESH_DIM; i++)
+      for (int j=0; j<LIBMESH_DIM; j++)
+        for (int k=0; k<LIBMESH_DIM; k++)
+          {
+            T Aik = A._coords[IDX(i,k)];
+            for (int l=0; l<LIBMESH_DIM; l++)
+              ret._coords[IDX(i,j)] += Aik * B._coords[IDX(k,l)] * C._coords[IDX(l,j)];
+          }
+    return ret;
+  }
+
+  /**
    * Multiply 2 tensors together to return a scalar, i.e.
    * \f$ \sum_{ij} A_{ij} B_{ij} \f$
    * The tensors may contain different numeric types.
@@ -1382,6 +1410,9 @@ bool TypeTensor<T>::operator == (const TypeTensor<T> & rhs) const
 
 }
 
+//------------------------------------------------------
+// Non-member functions returning TypeTensors
+
 template <typename T, typename T2>
 inline
 TypeTensor<typename CompareTypes<T, T2>::supertype>
@@ -1394,7 +1425,6 @@ outer_product(const TypeVector<T> & a, const TypeVector<T2> & b)
 
   return ret;
 }
-
 
 } // namespace libMesh
 
