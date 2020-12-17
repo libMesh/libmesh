@@ -676,18 +676,25 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      if(elem->type() == NODEELEM)
+      const ElemType elemtype = elem->type();
+
+      if(elemtype == NODEELEM)
         {
-          // We skip NODEELEMs here since we assume that we
-          // do not perform any assembly directly on NODEELEMs
-          continue;
+          // We assume that we do not perform any assembly directly on
+          // NodeElems, so we skip the assembly calls.
+
+          // However, in a spline basis with Dirichlet constraints on
+          // spline nodes, a constrained matrix has to take those
+          // nodes into account.
+          if (!apply_dof_constraints)
+            continue;
         }
 
       // Subdivision elements need special care:
       // - skip ghost elements
       // - init special quadrature rule
       std::unique_ptr<QBase> qrule;
-      if (elem->type() == TRI3SUBDIVISION)
+      if (elemtype == TRI3SUBDIVISION)
         {
           const Tri3Subdivision * gh_elem = static_cast<const Tri3Subdivision *> (elem);
           if (gh_elem->is_ghost())
@@ -707,39 +714,43 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 
       context.pre_fe_reinit(*this, elem);
       context.elem_fe_reinit();
-      elem_assembly->interior_assembly(context);
 
-      const unsigned char n_sides = context.get_elem().n_sides();
-      for (context.side = 0; context.side != n_sides; ++context.side)
+      if (elemtype != NODEELEM)
         {
-          // May not need to apply fluxes on non-boundary elements
-          if ((context.get_elem().neighbor_ptr(context.get_side()) != nullptr) && !impose_internal_fluxes)
-            continue;
+          elem_assembly->interior_assembly(context);
 
-          // skip degenerate sides with zero area
-          if( (context.get_elem().side_ptr(context.get_side())->volume() <= 0.) && skip_degenerate_sides)
-            continue;
-
-          context.side_fe_reinit();
-          elem_assembly->boundary_assembly(context);
-
-          if (context.dg_terms_are_active())
+          const unsigned char n_sides = context.get_elem().n_sides();
+          for (context.side = 0; context.side != n_sides; ++context.side)
             {
-              input_matrix->add_matrix (context.get_elem_elem_jacobian(),
-                                        context.get_dof_indices(),
-                                        context.get_dof_indices());
+              // May not need to apply fluxes on non-boundary elements
+              if ((context.get_elem().neighbor_ptr(context.get_side()) != nullptr) && !impose_internal_fluxes)
+                continue;
 
-              input_matrix->add_matrix (context.get_elem_neighbor_jacobian(),
-                                        context.get_dof_indices(),
-                                        context.get_neighbor_dof_indices());
+              // skip degenerate sides with zero area
+              if( (context.get_elem().side_ptr(context.get_side())->volume() <= 0.) && skip_degenerate_sides)
+                continue;
 
-              input_matrix->add_matrix (context.get_neighbor_elem_jacobian(),
-                                        context.get_neighbor_dof_indices(),
-                                        context.get_dof_indices());
+              context.side_fe_reinit();
+              elem_assembly->boundary_assembly(context);
 
-              input_matrix->add_matrix (context.get_neighbor_neighbor_jacobian(),
-                                        context.get_neighbor_dof_indices(),
-                                        context.get_neighbor_dof_indices());
+              if (context.dg_terms_are_active())
+                {
+                  input_matrix->add_matrix (context.get_elem_elem_jacobian(),
+                                            context.get_dof_indices(),
+                                            context.get_dof_indices());
+
+                  input_matrix->add_matrix (context.get_elem_neighbor_jacobian(),
+                                            context.get_dof_indices(),
+                                            context.get_neighbor_dof_indices());
+
+                  input_matrix->add_matrix (context.get_neighbor_elem_jacobian(),
+                                            context.get_neighbor_dof_indices(),
+                                            context.get_dof_indices());
+
+                  input_matrix->add_matrix (context.get_neighbor_neighbor_jacobian(),
+                                            context.get_neighbor_dof_indices(),
+                                            context.get_neighbor_dof_indices());
+                }
             }
         }
 
