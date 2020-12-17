@@ -49,11 +49,23 @@ void L2System::init_context(DiffContext & context)
 {
   FEMContext & c = cast_ref<FEMContext &>(context);
 
+  FEBase * elem_fe = nullptr;
+
   // Now make sure we have requested all the data
   // we need to build the L2 system.
-  c.get_element_fe(0)->get_JxW();
-  c.get_element_fe(0)->get_phi();
-  c.get_element_fe(0)->get_xyz();
+
+  // We might have a multi-dimensional mesh
+  const std::set<unsigned char> & elem_dims =
+    c.elem_dimensions();
+
+  for (const auto & dim : elem_dims)
+    {
+      c.get_element_fe( 0, elem_fe, dim );
+
+      elem_fe->get_JxW();
+      elem_fe->get_phi();
+      elem_fe->get_xyz();
+    }
 
   // Build a corresponding context for the input system if we haven't
   // already
