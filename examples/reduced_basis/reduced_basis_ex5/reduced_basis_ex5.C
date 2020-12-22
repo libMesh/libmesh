@@ -367,7 +367,13 @@ void scale_mesh_and_plot(EquationSystems & es,
   compute_stresses(es);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-  ExodusII_IO (mesh).write_equation_systems (filename, es);
+  // Distributed IGA meshes don't yet support re-gathering to serial
+  bool do_write =
+    (es.get_mesh().get_constraint_rows().empty() ||
+     es.get_mesh().is_serial());
+  es.comm().min(do_write);
+  if (do_write)
+    ExodusII_IO (mesh).write_equation_systems (filename, es);
 #endif
 
   // Loop over the mesh nodes and move them!
