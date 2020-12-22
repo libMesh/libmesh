@@ -51,9 +51,9 @@ public:
                             const std::string & name_in,
                             const unsigned int number_in) :
     Parent(es, name_in, number_in),
+    u_var(0), v_var(0), w_var(0),
     elasticity_assembly_expansion(*this),
-    ip_assembly(*this),
-    u_var(0), v_var(0), w_var(0)
+    ip_assembly(*this)
   {}
 
   /**
