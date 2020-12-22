@@ -2126,13 +2126,20 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   // the mesh, which we don't need, and which we didn't specifically
   // save dependencies for.  The mesh deleted rows for remote nodes
   // when we deleted those, but let's delete rows for ghosted nodes.
-  for (auto & row : mesh.get_constraint_rows())
+  //
+  // We can't do erasure inside a range for
+  for (auto it = mesh.get_constraint_rows().begin(),
+       end = mesh.get_constraint_rows().end();
+       it != end;)
     {
+      auto & row = *it;
       const Node * node = row.first;
       libmesh_assert(node == mesh.node_ptr(node->id()));
 
       if (node->processor_id() != mesh.processor_id())
-        mesh.get_constraint_rows().erase(node);
+        mesh.get_constraint_rows().erase(it++);
+      else
+        ++it;
     }
 
   // We now have all remote elements and nodes deleted; our ghosting
