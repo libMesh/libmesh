@@ -162,7 +162,8 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = example-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = example-oprof$(EXEEXT)
 am__example_dbg_SOURCES_DIST = reduced_basis_ex5.C assembly.h \
-	assembly.C rb_classes.h reduced_basis_ex5.in run.sh
+	assembly.C rb_classes.h reduced_basis_ex5.in Twisted_Beam.bext.gz \
+	run.sh
 am__objects_1 = example_dbg-reduced_basis_ex5.$(OBJEXT) \
 	example_dbg-assembly.$(OBJEXT)
 am__objects_2 = $(am__objects_1)
@@ -178,7 +179,8 @@ example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_dbg_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_devel_SOURCES_DIST = reduced_basis_ex5.C assembly.h \
-	assembly.C rb_classes.h reduced_basis_ex5.in run.sh
+	assembly.C rb_classes.h reduced_basis_ex5.in Twisted_Beam.bext.gz \
+	run.sh
 am__objects_3 = example_devel-reduced_basis_ex5.$(OBJEXT) \
 	example_devel-assembly.$(OBJEXT)
 am__objects_4 = $(am__objects_3)
@@ -191,7 +193,8 @@ example_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_oprof_SOURCES_DIST = reduced_basis_ex5.C assembly.h \
-	assembly.C rb_classes.h reduced_basis_ex5.in run.sh
+	assembly.C rb_classes.h reduced_basis_ex5.in Twisted_Beam.bext.gz \
+	run.sh
 am__objects_5 = example_oprof-reduced_basis_ex5.$(OBJEXT) \
 	example_oprof-assembly.$(OBJEXT)
 am__objects_6 = $(am__objects_5)
@@ -204,7 +207,8 @@ example_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_opt_SOURCES_DIST = reduced_basis_ex5.C assembly.h \
-	assembly.C rb_classes.h reduced_basis_ex5.in run.sh
+	assembly.C rb_classes.h reduced_basis_ex5.in Twisted_Beam.bext.gz \
+	run.sh
 am__objects_7 = example_opt-reduced_basis_ex5.$(OBJEXT) \
 	example_opt-assembly.$(OBJEXT)
 am__objects_8 = $(am__objects_7)
@@ -216,7 +220,8 @@ example_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_opt_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_prof_SOURCES_DIST = reduced_basis_ex5.C assembly.h \
-	assembly.C rb_classes.h reduced_basis_ex5.in run.sh
+	assembly.C rb_classes.h reduced_basis_ex5.in Twisted_Beam.bext.gz \
+	run.sh
 am__objects_9 = example_prof-reduced_basis_ex5.$(OBJEXT) \
 	example_prof-assembly.$(OBJEXT)
 am__objects_10 = $(am__objects_9)
@@ -688,7 +693,7 @@ vtkversion = @vtkversion@
 example_name = reduced_basis_ex5
 check_SCRIPTS = run.sh
 install_dir = $(examples_install_path)/reduced_basis/ex5
-data = reduced_basis_ex5.C assembly.h assembly.C rb_classes.h reduced_basis_ex5.in run.sh
+data = reduced_basis_ex5.C assembly.h assembly.C rb_classes.h reduced_basis_ex5.in Twisted_Beam.bext.gz run.sh
 sources = $(data) run.sh
 
 ######################################################################
@@ -1372,6 +1377,7 @@ clean-local:
 	-rm -rf offline_data
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f reduced_basis_ex5.in && $(LN_S) -f $(srcdir)/reduced_basis_ex5.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f Twisted_Beam.bext.gz && $(LN_S) -f $(srcdir)/Twisted_Beam.bext.gz .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'
