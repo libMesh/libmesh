@@ -14,8 +14,8 @@ run_example_no_extra_options "$example_name" "$options"
 options="-online_mode 1"
 run_example_no_extra_options "$example_name" "$options"
 
-options="-online_mode 0 -ksp_type cg mesh_filename=Twisted_Beam.bext.gz"
+options="-online_mode 0 -ksp_type cg mesh_filename=Twisted_Beam.bext.gz order=2"
 run_example_no_extra_options "$example_name" "$options"
 
-options="-online_mode 1 mesh_filename=Twisted_Beam.bext.gz"
+options="-online_mode 1 mesh_filename=Twisted_Beam.bext.gz order=2"
 run_example_no_extra_options "$example_name" "$options"

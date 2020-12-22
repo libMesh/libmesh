@@ -228,6 +228,10 @@ int main(int argc, char ** argv)
   ElasticityRBConstruction & rb_con =
     equation_systems.add_system<ElasticityRBConstruction>("RBElasticity");
 
+  unsigned int order = infile("order", 1);
+
+  rb_con.var_order = Order(order);
+
   // Also, initialize an ExplicitSystem to store stresses
   ExplicitSystem & stress_system =
     equation_systems.add_system<ExplicitSystem> ("StressSystem");

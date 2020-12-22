@@ -51,7 +51,7 @@ public:
                             const std::string & name_in,
                             const unsigned int number_in) :
     Parent(es, name_in, number_in),
-    u_var(0), v_var(0), w_var(0),
+    u_var(0), v_var(0), w_var(0), var_order(FIRST),
     elasticity_assembly_expansion(*this),
     ip_assembly(*this)
   {}
@@ -80,11 +80,11 @@ public:
 
     libmesh_assert_less_equal(n_components, 3);
 
-    u_var = this->add_variable("u", SECOND);
+    u_var = this->add_variable("u", var_order);
     if (n_components > 1)
-      v_var = this->add_variable("v", SECOND);
+      v_var = this->add_variable("v", var_order);
     if (n_components > 2)
-      w_var = this->add_variable("w", SECOND);
+      w_var = this->add_variable("w", var_order);
 
     // Generate a DirichletBoundary object
     dirichlet_bc = build_zero_dirichlet_boundary_object();
@@ -131,11 +131,12 @@ public:
   }
 
   /**
-   * Variable numbers.
+   * Variable numbers and approximation order
    */
   unsigned int u_var;
   unsigned int v_var;
   unsigned int w_var;
+  Order var_order;
 
   /**
    * The object that stores the "assembly" expansion of the parameter dependent PDE.
