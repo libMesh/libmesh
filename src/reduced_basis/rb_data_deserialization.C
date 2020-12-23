@@ -288,31 +288,24 @@ void load_parameter_ranges(RBParametrized & rb_evaluation,
   try
 #endif
   {
-    unsigned int n_parameter_ranges = parameter_ranges.getNames().size();
-
-    for (unsigned int i=0; i<n_parameter_ranges; ++i)
+    const auto & parameter_names = parameter_ranges.getNames();
+    for (auto i : make_range(parameter_names.size()))
       {
-        std::string parameter_name = parameter_ranges.getNames()[i];
-        Real min_value = parameter_ranges.getMinValues()[i];
-        Real max_value = parameter_ranges.getMaxValues()[i];
-
-        parameters_min.set_value(parameter_name, min_value);
-        parameters_max.set_value(parameter_name, max_value);
+        parameters_min.set_value(parameter_names[i], parameter_ranges.getMinValues()[i]);
+        parameters_max.set_value(parameter_names[i], parameter_ranges.getMaxValues()[i]);
       }
 
-    unsigned int n_discrete_parameters = discrete_parameters_list.getNames().size();
 
-    for (unsigned int i=0; i<n_discrete_parameters; ++i)
+    const auto & discrete_names = discrete_parameters_list.getNames();
+    for (auto i : make_range(discrete_names.size()))
       {
-        std::string parameter_name = discrete_parameters_list.getNames()[i];
-
-        auto value_list = discrete_parameters_list.getValues()[i];
+        const auto & value_list = discrete_parameters_list.getValues()[i];
         unsigned int n_values = value_list.size();
         std::vector<Real> values(n_values);
         for (unsigned int j=0; j<n_values; ++j)
           values[j] = value_list[j];
 
-        discrete_parameter_values[parameter_name] = values;
+        discrete_parameter_values[discrete_names[i]] = values;
       }
   }
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
