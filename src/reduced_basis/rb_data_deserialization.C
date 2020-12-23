@@ -275,6 +275,18 @@ void load_parameter_ranges(RBParametrized & rb_evaluation,
   // Continuous parameters
   RBParameters parameters_min;
   RBParameters parameters_max;
+
+  // Discrete parameters
+  std::map<std::string, std::vector<Real>> discrete_parameter_values;
+
+  // The RBData::ParameterRanges::Reader (CapnProto class) will throw
+  // an exception if there is a problem with the data file (e.g. if it
+  // doesn't exist). We don't use the libmesh_try/catch() macros here
+  // since they don't really allow you to do any processing of the
+  // exception object.
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  try
+#endif
   {
     unsigned int n_parameter_ranges = parameter_ranges.getNames().size();
 
@@ -287,11 +299,7 @@ void load_parameter_ranges(RBParametrized & rb_evaluation,
         parameters_min.set_value(parameter_name, min_value);
         parameters_max.set_value(parameter_name, max_value);
       }
-  }
 
-  // Discrete parameters
-  std::map<std::string, std::vector<Real>> discrete_parameter_values;
-  {
     unsigned int n_discrete_parameters = discrete_parameters_list.getNames().size();
 
     for (unsigned int i=0; i<n_discrete_parameters; ++i)
@@ -307,6 +315,14 @@ void load_parameter_ranges(RBParametrized & rb_evaluation,
         discrete_parameter_values[parameter_name] = values;
       }
   }
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  catch (std::exception & e)
+  {
+    libmesh_error_msg("Error loading parameter ranges from capnp reader.\n"
+                      "This usually means that the training data either doesn't exist or is out of date.\n"
+                      "Detailed information about the error is below:\n\n" << e.what() << "\n");
+  }
+#endif
 
   rb_evaluation.initialize_parameters(parameters_min,
                                       parameters_max,
