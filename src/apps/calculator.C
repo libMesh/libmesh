@@ -140,12 +140,12 @@ int main(int argc, char ** argv)
       current_sys_name = old_sys.name();
 
       goal_function =
-        std::make_unique<ParsedFEMFunction<Number>>(old_sys, calcfunc);
+        libmesh_make_unique<ParsedFEMFunction<Number>>(old_sys, calcfunc);
     }
   else
     {
       goal_function =
-        std::make_unique<WrappedFunctor<Number>>(ParsedFunction<Number>(calcfunc));
+        libmesh_make_unique<WrappedFunctor<Number>>(ParsedFunction<Number>(calcfunc));
     }
 
   libMesh::out << "Calculating with system " << current_sys_name << std::endl;
