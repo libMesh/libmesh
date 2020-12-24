@@ -275,38 +275,47 @@ void load_parameter_ranges(RBParametrized & rb_evaluation,
   // Continuous parameters
   RBParameters parameters_min;
   RBParameters parameters_max;
-  {
-    unsigned int n_parameter_ranges = parameter_ranges.getNames().size();
-
-    for (unsigned int i=0; i<n_parameter_ranges; ++i)
-      {
-        std::string parameter_name = parameter_ranges.getNames()[i];
-        Real min_value = parameter_ranges.getMinValues()[i];
-        Real max_value = parameter_ranges.getMaxValues()[i];
-
-        parameters_min.set_value(parameter_name, min_value);
-        parameters_max.set_value(parameter_name, max_value);
-      }
-  }
 
   // Discrete parameters
   std::map<std::string, std::vector<Real>> discrete_parameter_values;
+
+  // The RBData::ParameterRanges::Reader (CapnProto class) will throw
+  // an exception if there is a problem with the data file (e.g. if it
+  // doesn't exist). We don't use the libmesh_try/catch() macros here
+  // since they don't really allow you to do any processing of the
+  // exception object.
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  try
+#endif
   {
-    unsigned int n_discrete_parameters = discrete_parameters_list.getNames().size();
-
-    for (unsigned int i=0; i<n_discrete_parameters; ++i)
+    const auto & parameter_names = parameter_ranges.getNames();
+    for (auto i : make_range(parameter_names.size()))
       {
-        std::string parameter_name = discrete_parameters_list.getNames()[i];
+        parameters_min.set_value(parameter_names[i], parameter_ranges.getMinValues()[i]);
+        parameters_max.set_value(parameter_names[i], parameter_ranges.getMaxValues()[i]);
+      }
 
-        auto value_list = discrete_parameters_list.getValues()[i];
+
+    const auto & discrete_names = discrete_parameters_list.getNames();
+    for (auto i : make_range(discrete_names.size()))
+      {
+        const auto & value_list = discrete_parameters_list.getValues()[i];
         unsigned int n_values = value_list.size();
         std::vector<Real> values(n_values);
         for (unsigned int j=0; j<n_values; ++j)
           values[j] = value_list[j];
 
-        discrete_parameter_values[parameter_name] = values;
+        discrete_parameter_values[discrete_names[i]] = values;
       }
   }
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  catch (std::exception & e)
+  {
+    libmesh_error_msg("Error loading parameter ranges from capnp reader.\n"
+                      "This usually means that the training data either doesn't exist or is out of date.\n"
+                      "Detailed information about the error is below:\n\n" << e.what() << "\n");
+  }
+#endif
 
   rb_evaluation.initialize_parameters(parameters_min,
                                       parameters_max,
