@@ -72,7 +72,10 @@ namespace libMesh
         // We will first project the solution and then move to the system.vectors
 
         // Construct local version of the current system vector
-	    // This has to be a serial vector
+        // This has to be a serial vector
+        // Roy's FIXME: Technically it just has to be a ghosted vector whose algebraically
+        // ghosted values cover a domain which is a superset of the to-system's domain ...
+        // that's hard to do and we can skip it until the poor scalability bites someone.
         std::unique_ptr<NumericVector<Number>> solution_vector_serial = NumericVector<Number>::build(from_system.comm());
 	    solution_vector_serial->init(from_system.solution->size(), true, SERIAL);
 
@@ -93,7 +96,7 @@ namespace libMesh
         GradientMeshFunction * gptr_solution = new GradientMeshFunction(mesh_func_solution);
         gptr_solution->init();
 
-        to_system.project_vector(*to_system.solution, dynamic_cast<FunctionBase<Number> *>(mesh_func_solution), dynamic_cast<FunctionBase<Gradient> *>(gptr_solution));
+        to_system.project_vector(*to_system.solution, mesh_func_solution, gptr_solution);
 
         // Delete all the MeshFunctions associated with the solution
         delete mesh_func_solution;
@@ -126,10 +129,7 @@ namespace libMesh
 
             // The fourth argument here is whether the vector is an adjoint solution or not, we will be getting that information
             // via the from_system instead of the to_system in case the user has not set the System::_vector_is_adjoint map to true.
-            // FIX ME: This is currently broken for rhs and adjoint rhs vector since we do not appear to be applying boundary constraints
-            // within the project_vector method.
-            to_system.project_vector(to_system.get_vector(vec_name), dynamic_cast<FunctionBase<Number> *>(mesh_func),
-                                    dynamic_cast<FunctionBase<Gradient> *>(gptr), from_system.vector_is_adjoint(vec_name));
+            to_system.project_vector(to_system.get_vector(vec_name), mesh_func, gptr, from_system.vector_is_adjoint(vec_name));
 
             // Delete all the MeshFunctions associated with the current vector
             delete mesh_func;
