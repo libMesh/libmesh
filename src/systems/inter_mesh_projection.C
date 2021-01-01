@@ -24,22 +24,28 @@ namespace libMesh
 {
     GradientMeshFunction::GradientMeshFunction(MeshFunction * _mesh_function)
     {
-     mesh_function = _mesh_function->clone();
+    // This looks odd and might yet not be the right/best thing to do. But the logic here is
+    // that we would ideally like to simply clone the passed in MeshFunction, but that returns
+    // a FunctionBase<Number> unique ptr. So we clone, release the obtained unique ptr to be able
+    // to reassign its ownership, and then cast this released ptr as a MeshFunction * to complete
+    // the assignment. Looks complicated, but other approaches to this assignment led to hard to
+    // untangle Seg Faults.
+     mesh_function = std::unique_ptr<MeshFunction>(libmesh_cast_ptr<MeshFunction *>((_mesh_function->clone()).release()));
      libmesh_experimental();
     }
 
     void GradientMeshFunction::operator() (const Point & p, const Real, DenseVector<Gradient> & output)
     {
-        Real time = 0.0;
-        mesh_function->gradient(p, time, output.get_values());
-        return;
+     Real time = 0.0;
+     mesh_function->gradient(p, time, output.get_values());
+     return;
     }
 
     InterMeshProjection::InterMeshProjection(System & _from_system, System & _to_system) :
     from_system(_from_system),
     to_system(_to_system)
     {
-        libmesh_experimental();
+     libmesh_experimental();
     }
 
     void InterMeshProjection::project_system_vectors()

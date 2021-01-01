@@ -83,11 +83,12 @@ namespace libMesh
         // Destructor
         virtual ~GradientMeshFunction () { }
 
-        virtual void init () { mesh_function->init(); }
+        virtual void init () { }
 
         virtual std::unique_ptr<FunctionBase<Gradient>> clone () const
         {
-          return libmesh_make_unique<GradientMeshFunction>(dynamic_cast<MeshFunction *>(mesh_function.get()));
+          //return libmesh_make_unique<GradientMeshFunction>(dynamic_cast<MeshFunction *>(mesh_function.get()));
+          return libmesh_make_unique<GradientMeshFunction>(mesh_function.get());
         }
 
         virtual Gradient operator() (const Point & , const Real)
