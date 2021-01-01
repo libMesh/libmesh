@@ -64,6 +64,7 @@ namespace libMesh
 
         for (unsigned int j = 0; j != n_vars; ++j)
         {
+          libmesh_assert_equal_to (to_system.variable_name(j), from_system.variable_name(j));
           variables_vector.push_back(j);
         }
 
