@@ -110,6 +110,9 @@ namespace libMesh
 
             // Construct local version of the current system vector
             // This has to be a serial vector
+            // Roy's FIXME: Technically it just has to be a ghosted vector whose algebraically
+            // ghosted values cover a domain which is a superset of the to-system's domain ...
+            // that's hard to do and we can skip it until the poor scalability bites someone.
             std::unique_ptr<NumericVector<Number>> current_vector_proxy = NumericVector<Number>::build(from_system.comm());
             current_vector_proxy->init(from_system.get_vector(vec_name).size(), true, SERIAL);
 
