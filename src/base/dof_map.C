@@ -1476,7 +1476,10 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
                       std::set<CouplingMatrix *>::iterator temp_it =
                         temporary_coupling_matrices.find(const_cast<CouplingMatrix *>(existing_it->second));
                       if (temp_it != temporary_coupling_matrices.end())
+                      {
+                        delete *temp_it;
                         temporary_coupling_matrices.erase(temp_it);
+                      }
 
                       existing_it->second = nullptr;
                     }
