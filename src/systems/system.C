@@ -284,7 +284,8 @@ void System::init_data ()
     pr.second->clear();
 
   // Initialize the matrices for the system
-  this->init_matrices();
+  if (!_basic_system_only)
+   this->init_matrices();
 }
 
 
@@ -410,7 +411,7 @@ void System::reinit ()
   // project_vector handles vector initialization now
   libmesh_assert_equal_to (solution->size(), current_local_solution->size());
 
-  if (!_matrices.empty())
+  if (!_matrices.empty() && !_basic_system_only)
     {
       // Clear the matrices
       for (auto & pr : _matrices)
