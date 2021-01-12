@@ -1263,7 +1263,7 @@ void PetscLinearSolver<T>::get_residual_history(std::vector<double> & hist)
   // vector may be different from what you are expecting.  For
   // example, TFQMR returns two residual values per iteration step.
 
-  // Recent development versions of PETSc require the residual 
+  // Recent development versions of PETSc require the residual
   // history vector pointer to be declared as const
 #if PETSC_VERSION_RELEASE == 0
   const PetscReal * p;
@@ -1303,8 +1303,8 @@ Real PetscLinearSolver<T>::get_initial_residual()
   // methods, the number of residuals returned in the history
   // vector may be different from what you are expecting.  For
   // example, TFQMR returns two residual values per iteration step.
- 
-  // Recent development versions of PETSc require the residual 
+
+  // Recent development versions of PETSc require the residual
   // history vector pointer to be declared as const
 #if PETSC_VERSION_RELEASE == 0
   const PetscReal * p;
