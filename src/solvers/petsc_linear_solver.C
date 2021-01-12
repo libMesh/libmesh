@@ -1262,7 +1262,7 @@ void PetscLinearSolver<T>::get_residual_history(std::vector<double> & hist)
   // methods, the number of residuals returned in the history
   // vector may be different from what you are expecting.  For
   // example, TFQMR returns two residual values per iteration step.
-  PetscReal * p;
+  const PetscReal * p;
   ierr = KSPGetResidualHistory(_ksp, &p, &its);
   LIBMESH_CHKERR(ierr);
 
@@ -1295,7 +1295,7 @@ Real PetscLinearSolver<T>::get_initial_residual()
   // methods, the number of residuals returned in the history
   // vector may be different from what you are expecting.  For
   // example, TFQMR returns two residual values per iteration step.
-  PetscReal * p;
+  const PetscReal * p;
   ierr = KSPGetResidualHistory(_ksp, &p, &its);
   LIBMESH_CHKERR(ierr);
 
