@@ -34,14 +34,8 @@ private:
 
   void testOuterProduct()
   {
-    DenseVector<Real> a(2);
-    a(0) = 1.0;
-    a(1) = 2.0;
-
-    DenseVector<Real> b(3);
-    b(0) = 3.0;
-    b(1) = 4.0;
-    b(2) = 5.0;
+    DenseVector<Real> a = {1.0, 2.0};
+    DenseVector<Real> b = {3.0, 4.0, 5.0};
 
     DenseMatrix<Real> a_times_b;
     a_times_b.outer_product(a, b);
