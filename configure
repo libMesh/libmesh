@@ -9110,6 +9110,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
       #include <vector>
       #include <string>
+      #include <initializer_list>
 
 int
 main ()
