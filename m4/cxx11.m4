@@ -931,6 +931,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_INITIALIZER_LIST],
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       @%:@include <vector>
       @%:@include <string>
+      @%:@include <initializer_list>
     ]], [[
       std::vector<std::string> v = { "xyzzy", "plugh", "abracadabra" };
     ]])],[
