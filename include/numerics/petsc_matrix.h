@@ -301,6 +301,18 @@ public:
   void get_row(numeric_index_type i,
                std::vector<numeric_index_type> & indices,
                std::vector<T> & values) const override;
+
+  /**
+   * Similar to the `create_submatrix` function, this function creates a \p
+   * submatrix which is defined by the indices given in the \p rows
+   * and \p cols vectors.
+   * Note: Both \p rows and \p cols can be unsorted;
+   *       Use the above function for better efficiency if your indices are sorted;
+   *       \p rows and \p cols can contain indices that are owned by other processors.
+   */
+   virtual void create_submatrix_nosort(SparseMatrix<T> & submatrix,
+                                        const std::vector<numeric_index_type> & rows,
+                                        const std::vector<numeric_index_type> & cols) const override;
 protected:
 
   /**
@@ -317,7 +329,6 @@ protected:
                               const std::vector<numeric_index_type> & rows,
                               const std::vector<numeric_index_type> & cols,
                               const bool reuse_submatrix) const override;
-
 private:
 
   /**
