@@ -40,13 +40,9 @@ private:
     DenseMatrix<Real> a_times_b;
     a_times_b.outer_product(a, b);
 
-    DenseMatrix<Real> a_times_b_correct(2, 3);
-    a_times_b_correct(0, 0) = 3.0;
-    a_times_b_correct(0, 1) = 4.0;
-    a_times_b_correct(0, 2) = 5.0;
-    a_times_b_correct(1, 0) = 6.0;
-    a_times_b_correct(1, 1) = 8.0;
-    a_times_b_correct(1, 2) = 10.0;
+    DenseMatrix<Real> a_times_b_correct(2, 3,
+                                        {3., 4., 5.,
+                                         6., 8., 10.});
 
     for (unsigned int i = 0; i < a.size(); ++i)
       for (unsigned int j = 0; j < b.size(); ++j)
@@ -57,27 +53,24 @@ private:
   {
     DenseMatrix<Number> U, VT;
     DenseVector<Real> sigma;
-    DenseMatrix<Number> A;
-
-    A.resize(3, 2);
-    A(0,0) = 1.0; A(0,1) = 2.0;
-    A(1,0) = 3.0; A(1,1) = 4.0;
-    A(2,0) = 5.0; A(2,1) = 6.0;
+    DenseMatrix<Number> A(3, 2, {
+        1.0, 2.0,
+        3.0, 4.0,
+        5.0, 6.0});
 
     A.svd(sigma, U, VT);
 
     // Solution for this case is (verified with numpy)
-    DenseMatrix<Number> true_U(3,2), true_VT(2,2);
-    DenseVector<Real> true_sigma(2);
-    true_U(0,0) = -2.298476964000715e-01; true_U(0,1) = 8.834610176985250e-01;
-    true_U(1,0) = -5.247448187602936e-01; true_U(1,1) = 2.407824921325463e-01;
-    true_U(2,0) = -8.196419411205157e-01; true_U(2,1) = -4.018960334334318e-01;
+    DenseMatrix<Number> true_U(3, 2, {
+        -2.298476964000715e-01, 8.834610176985250e-01,
+        -5.247448187602936e-01, 2.407824921325463e-01,
+        -8.196419411205157e-01, -4.018960334334318e-01});
 
-    true_VT(0,0) = -6.196294838293402e-01; true_VT(0,1) = -7.848944532670524e-01;
-    true_VT(1,0) = -7.848944532670524e-01; true_VT(1,1) = 6.196294838293400e-01;
+    DenseMatrix<Number> true_VT(2, 2, {
+        -6.196294838293402e-01, -7.848944532670524e-01,
+        -7.848944532670524e-01, 6.196294838293400e-01});
 
-    true_sigma(0) = 9.525518091565109e+00;
-    true_sigma(1) = 5.143005806586446e-01;
+    DenseVector<Real> true_sigma = {9.525518091565109e+00, 5.143005806586446e-01};
 
     // Tolerance is bounded by the double literals above and by using Real
     const Real tol = std::max(Real(1e-12), TOLERANCE*TOLERANCE);
