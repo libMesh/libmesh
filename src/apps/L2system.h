@@ -33,13 +33,15 @@ public:
   : libMesh::FEMSystem(es, name, number),
     input_system(nullptr),
     _fe_family("LAGRANGE"),
-    _fe_order(1) {}
+    _fe_order(1),
+    _subdomains_list() {}
 
   // Destructor; deletes extra context objects
   ~L2System();
 
   std::string & fe_family() { return _fe_family;  }
   unsigned int & fe_order() { return _fe_order;  }
+  std::set<libMesh::subdomain_id_type> & subdomains_list() { return _subdomains_list; }
 
   // We want to be able to project functions based on *other* systems'
   // values.  For that we need not only a FEMFunction but also a
@@ -68,4 +70,7 @@ protected:
   // The FE type to use
   std::string _fe_family;
   unsigned int _fe_order;
+
+  // Which subdomains to integrate on (all subdomains, if empty())
+  std::set<libMesh::subdomain_id_type> _subdomains_list;
 };

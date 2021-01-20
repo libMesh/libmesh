@@ -17,6 +17,7 @@
 
 #include "L2system.h"
 
+#include "libmesh/elem.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fem_context.h"
@@ -24,6 +25,7 @@
 #include "libmesh/mesh.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/utility.h"
 
 using namespace libMesh;
 
@@ -48,18 +50,29 @@ void L2System::init_context(DiffContext & context)
 {
   FEMContext & c = cast_ref<FEMContext &>(context);
 
+  FEBase * elem_fe = nullptr;
+
   // Now make sure we have requested all the data
   // we need to build the L2 system.
-  c.get_element_fe(0)->get_JxW();
-  c.get_element_fe(0)->get_phi();
-  c.get_element_fe(0)->get_xyz();
+
+  // We might have a multi-dimensional mesh
+  const std::set<unsigned char> & elem_dims =
+    c.elem_dimensions();
+
+  for (const auto & dim : elem_dims)
+    {
+      c.get_element_fe( 0, elem_fe, dim );
+
+      elem_fe->get_JxW();
+      elem_fe->get_phi();
+      elem_fe->get_xyz();
+    }
 
   // Build a corresponding context for the input system if we haven't
   // already
   FEMContext *& input_context = input_contexts[&c];
-  if (!input_context)
+  if (input_system && !input_context)
     {
-      libmesh_assert(input_system);
       input_context = new FEMContext(*input_system);
 
       libmesh_assert(goal_func.get());
@@ -74,6 +87,12 @@ bool L2System::element_time_derivative (bool request_jacobian,
                                         DiffContext & context)
 {
   FEMContext & c = cast_ref<FEMContext &>(context);
+
+  const Elem & elem = c.get_elem();
+
+  if (!_subdomains_list.empty() &&
+      !_subdomains_list.count(elem.subdomain_id()))
+    return request_jacobian;
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
@@ -94,11 +113,12 @@ bool L2System::element_time_derivative (bool request_jacobian,
 
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
-  libmesh_assert (input_contexts.find(&c) != input_contexts.end());
-
-  FEMContext & input_c = *input_contexts[&c];
-  input_c.pre_fe_reinit(*input_system, &c.get_elem());
-  input_c.elem_fe_reinit();
+  FEMContext & input_c = *libmesh_map_find(input_contexts, &c);
+  if (input_system)
+    {
+      input_c.pre_fe_reinit(*input_system, &elem);
+      input_c.elem_fe_reinit();
+    }
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {

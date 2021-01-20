@@ -51,6 +51,7 @@ public:
                             const std::string & name_in,
                             const unsigned int number_in) :
     Parent(es, name_in, number_in),
+    u_var(0), v_var(0), w_var(0), var_order(FIRST),
     elasticity_assembly_expansion(*this),
     ip_assembly(*this)
   {}
@@ -75,9 +76,15 @@ public:
    */
   virtual void init_data()
   {
-    u_var = this->add_variable("u", FIRST);
-    v_var = this->add_variable("v", FIRST);
-    w_var = this->add_variable("w", FIRST);
+    unsigned int n_components = this->get_mesh().mesh_dimension();
+
+    libmesh_assert_less_equal(n_components, 3);
+
+    u_var = this->add_variable("u", var_order);
+    if (n_components > 1)
+      v_var = this->add_variable("v", var_order);
+    if (n_components > 2)
+      w_var = this->add_variable("w", var_order);
 
     // Generate a DirichletBoundary object
     dirichlet_bc = build_zero_dirichlet_boundary_object();
@@ -85,8 +92,10 @@ public:
     // Set the Dirichlet boundary condition
     dirichlet_bc->b.insert(BOUNDARY_ID_MIN_X); // Dirichlet boundary at x=0
     dirichlet_bc->variables.push_back(u_var);
-    dirichlet_bc->variables.push_back(v_var);
-    dirichlet_bc->variables.push_back(w_var);
+    if (n_components > 1)
+      dirichlet_bc->variables.push_back(v_var);
+    if (n_components > 2)
+      dirichlet_bc->variables.push_back(w_var);
 
     // Attach dirichlet_bc (must do this _before_ Parent::init_data)
     get_dof_map().add_dirichlet_boundary(*dirichlet_bc);
@@ -122,11 +131,12 @@ public:
   }
 
   /**
-   * Variable numbers.
+   * Variable numbers and approximation order
    */
   unsigned int u_var;
   unsigned int v_var;
   unsigned int w_var;
+  Order var_order;
 
   /**
    * The object that stores the "assembly" expansion of the parameter dependent PDE.

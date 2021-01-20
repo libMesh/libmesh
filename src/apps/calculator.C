@@ -34,9 +34,10 @@
 #include "libmesh/newton_solver.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parsed_fem_function.h"
+#include "libmesh/parsed_function.h"
 #include "libmesh/point.h"
 #include "libmesh/steady_solver.h"
-#include "libmesh/enum_xdr_mode.h"
+#include "libmesh/wrapped_functor.h"
 
 
 using namespace libMesh;
@@ -54,6 +55,7 @@ void usage_error(const char * progname)
                << " --outsoln   filename  output solution file     [default: out_<insoln>]\n"
                << " --family    famname   output FEM family        [default: LAGRANGE]\n"
                << " --order     num       output FEM order         [default: 1]\n"
+               << " --subdomain num       subdomain id restriction [default: all subdomains]\n"
                << std::endl;
 
   exit(1);
@@ -92,55 +94,73 @@ int main(int argc, char ** argv)
   Mesh old_mesh(init.comm(), requested_dim);
 
   const std::string meshname =
-    assert_argument(cl, "--inmesh", argv[0], std::string("mesh.xda"));
+    assert_argument(cl, "--inmesh", argv[0], std::string(""));
 
-  old_mesh.read(meshname);
-  std::cout << "Mesh:" << std::endl;
-  old_mesh.print_info();
+  const std::string solnname = cl.follow(std::string(""), "--insoln");
+
+  if (solnname != "")
+    {
+      old_mesh.read(meshname);
+      std::cout << "Old Mesh:" << std::endl;
+      old_mesh.print_info();
+    }
 
   // Create a new mesh for a new EquationSystems
   Mesh new_mesh(init.comm(), requested_dim);
   new_mesh.read(meshname);
 
-  // Load the old solution from --insoln filename
-  // Construct the new solution from the old solution's headers, so
-  // that we get the system names and types, variable names and types,
-  // etc.
-  const std::string solnname =
-    assert_argument(cl, "--insoln", argv[0], std::string("soln.xda"));
-
+  // Load the old solution from --insoln filename, if that's been
+  // specified.
   EquationSystems old_es(old_mesh);
   EquationSystems new_es(new_mesh);
+  std::string current_sys_name = "new_sys";
 
-  XdrMODE read_mode;
+  const std::string calcfunc =
+    assert_argument(cl, "--calc", argv[0], std::string(""));
 
-  if (solnname.rfind(".xdr") < solnname.size())
-    read_mode = DECODE;
-  else if (solnname.rfind(".xda") < solnname.size())
-    read_mode = READ;
+  std::unique_ptr<FEMFunctionBase<Number>> goal_function;
+
+  if (solnname != "")
+    {
+      old_es.read(solnname,
+                  EquationSystems::READ_HEADER |
+                  EquationSystems::READ_DATA |
+                  EquationSystems::READ_ADDITIONAL_DATA |
+                  EquationSystems::READ_BASIC_ONLY);
+
+      old_es.print_info();
+
+      const unsigned int sysnum =
+        cl.follow(0, "--insys");
+
+      libmesh_assert_less(sysnum, old_es.n_systems());
+
+      System & old_sys = old_es.get_system(sysnum);
+
+      current_sys_name = old_sys.name();
+
+      goal_function =
+        libmesh_make_unique<ParsedFEMFunction<Number>>(old_sys, calcfunc);
+    }
   else
-    libmesh_error_msg("Unrecognized file extension on " << solnname);
-
-  old_es.read(solnname, read_mode,
-              EquationSystems::READ_HEADER |
-              EquationSystems::READ_DATA |
-              EquationSystems::READ_ADDITIONAL_DATA |
-              EquationSystems::READ_BASIC_ONLY);
-
-  old_es.print_info();
-
-
-  const unsigned int sysnum =
-    cl.follow(0, "--insys");
-
-  libmesh_assert_less(sysnum, old_es.n_systems());
-
-  System & old_sys = old_es.get_system(sysnum);
-  std::string current_sys_name = old_sys.name();
+    {
+      goal_function =
+        libmesh_make_unique<WrappedFunctor<Number>>(ParsedFunction<Number>(calcfunc));
+    }
 
   libMesh::out << "Calculating with system " << current_sys_name << std::endl;
 
   L2System & new_sys = new_es.add_system<L2System>(current_sys_name);
+
+  // Subdomains to integrate on
+  cl.disable_loop();
+  while (cl.search(1, "--subdomain"))
+    {
+      subdomain_id_type tmp;
+      tmp = cl.next(tmp);
+      new_sys.subdomains_list().insert(tmp);
+    }
+  cl.enable_loop();
 
   new_sys.time_solver =
     libmesh_make_unique<SteadySolver>(new_sys);
@@ -151,13 +171,10 @@ int main(int argc, char ** argv)
   new_sys.fe_order() =
     cl.follow(1, "--order");
 
-  const std::string calcfunc =
-    assert_argument(cl, "--calc", argv[0], std::string(""));
+  new_sys.goal_func = goal_function->clone();
 
-  ParsedFEMFunction<Number> goal_function(old_sys, calcfunc);
-
-  new_sys.goal_func = goal_function.clone();
-  new_sys.input_system = &old_sys;
+  if (solnname != "")
+    new_sys.input_system = &old_es.get_system(current_sys_name);
 
   new_es.init();
 
