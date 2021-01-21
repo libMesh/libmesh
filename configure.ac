@@ -215,7 +215,7 @@ AS_IF([test $cxx11required != irrelevant],
 # flag for the current compiler.  Adds the result to CXXFLAGS if
 # one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
 # --------------------------------------------------------------
-AX_CXX_COMPILE_STDCXX_11([],[mandatory])
+AX_CXX_COMPILE_STDCXX([11],[noext],[mandatory])
 
 # --------------------------------------------------------------
 # See compiler.m4 for the definition of this function.  It uses the
