@@ -20,9 +20,7 @@
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 
-// C/C++ includes
-#include <sstream>
-
+// llibmesh includes
 #include "libmesh/mesh_triangle_interface.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/face_tri3.h"
@@ -33,6 +31,11 @@
 #include "libmesh/mesh_triangle_holes.h"
 #include "libmesh/mesh_triangle_wrapper.h"
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/enum_to_string.h"
+
+// C/C++ includes
+#include <sstream>
+
 
 namespace libMesh
 {
@@ -342,7 +345,7 @@ void TriangleInterface::triangulate()
       }
 
     default:
-      libmesh_error_msg("ERROR: Unrecognized triangular element type.");
+      libmesh_error_msg("ERROR: Unrecognized triangular element type == " << Utility::enum_to_string(_elem_type));
     }
 
 

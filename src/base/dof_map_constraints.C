@@ -15,10 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// Local includes
-#include "libmesh/dof_map.h"
-
 // libMesh includes
+#include "libmesh/dof_map.h"
 #include "libmesh/boundary_info.h" // needed for dirichlet constraints
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
@@ -50,6 +48,7 @@
 #include "libmesh/system.h" // needed by enforce_constraints_exactly()
 #include "libmesh/tensor_tools.h"
 #include "libmesh/threads.h"
+#include "libmesh/enum_to_string.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -2943,7 +2942,7 @@ void DofMap::enforce_constraints_exactly (const System & system,
       v_global = v;
     }
   else // unknown v->type()
-    libmesh_error_msg("ERROR: Unknown v->type() == " << v->type());
+    libmesh_error_msg("ERROR: Unsupported NumericVector type == " << Utility::enum_to_string(v->type()));
 
   // We should never hit these asserts because we should error-out in
   // else clause above.  Just to be sure we don't try to use v_local
@@ -3015,7 +3014,7 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
       solution_local = solution_built.get();
     }
   else // unknown solution->type()
-    libmesh_error_msg("ERROR: Unknown solution->type() == " << solution->type());
+    libmesh_error_msg("ERROR: Unsupported NumericVector type == " << Utility::enum_to_string(solution->type()));
 
   // We should never hit these asserts because we should error-out in
   // else clause above.  Just to be sure we don't try to use solution_local

@@ -20,7 +20,7 @@
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_lagrange_shape_1D.h"
-
+#include "libmesh/enum_to_string.h"
 
 // Anonymous namespace for functions shared by LAGRANGE and
 // L2_LAGRANGE implementations. Implementations appear at the bottom
@@ -377,7 +377,7 @@ Real fe_lagrange_2D_shape(const ElemType type,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type: " << type);
+            libmesh_error_msg("ERROR: Unsupported 2D element type: " << Utility::enum_to_string(type));
           }
       }
 
@@ -476,7 +476,7 @@ Real fe_lagrange_2D_shape(const ElemType type,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type: " << type);
+            libmesh_error_msg("ERROR: Unsupported 2D element type: " << Utility::enum_to_string(type));
           }
       }
 
@@ -602,7 +602,7 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type: " << type);
+            libmesh_error_msg("ERROR: Unsupported 2D element type: " << Utility::enum_to_string(type));
           }
       }
 
@@ -805,7 +805,7 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type: " << type);
+            libmesh_error_msg("ERROR: Unsupported 2D element type: " << Utility::enum_to_string(type));
           }
       }
 
@@ -888,7 +888,7 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type: " << type);
+            libmesh_error_msg("ERROR: Unsupported 2D element type: " << Utility::enum_to_string(type));
 
           } // end switch (type)
       } // end case FIRST
@@ -1142,7 +1142,7 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
             }  // end case TRI6
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type: " << type);
+            libmesh_error_msg("ERROR: Unsupported 2D element type: " << Utility::enum_to_string(type));
           }
       } // end case SECOND
 

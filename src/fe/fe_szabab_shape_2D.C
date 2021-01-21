@@ -15,22 +15,20 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
-
-// C++ includes
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath> // for std::sqrt
-
-
 // Local includes
 #include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
+// libmesh includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/utility.h"
+#include "libmesh/enum_to_string.h"
 
+// C++ includes
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath> // for std::sqrt
 
 // Anonymous namespace to hold static std::sqrt values
 namespace
@@ -126,7 +124,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
             }
 
           default:
-            libmesh_error_msg("Invalid element type = " << type);
+            libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
           }
       }
 
@@ -225,7 +223,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
             }
 
           default:
-            libmesh_error_msg("Invalid element type = " << type);
+            libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
           }
       }
 
@@ -327,7 +325,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
             }
 
           default:
-            libmesh_error_msg("Invalid element type = " << type);
+            libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
           }
       }
 
@@ -443,7 +441,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
             } // case QUAD8/QUAD9
 
           default:
-            libmesh_error_msg("Invalid element type = " << type);
+            libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
 
           } // switch type
 
@@ -568,7 +566,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
             } // case QUAD8/QUAD9
 
           default:
-            libmesh_error_msg("Invalid element type = " << type);
+            libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
 
           } // switch type
 
@@ -709,7 +707,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
             } // case QUAD8/QUAD9
 
           default:
-            libmesh_error_msg("Invalid element type = " << type);
+            libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
 
           } // switch type
 
@@ -848,7 +846,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
             }
 
           default:
-            libmesh_error_msg("Invalid element type = " << type);
+            libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
           }
       }
 
@@ -952,7 +950,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
             }
 
           default:
-            libmesh_error_msg("Invalid element type = " << type);
+            libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
           }
       }
 
@@ -1059,7 +1057,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
             }
 
           default:
-            libmesh_error_msg("Invalid element type = " << type);
+            libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
           }
       }
 
@@ -1169,7 +1167,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
             }
 
           default:
-            libmesh_error_msg("Invalid element type = " << type);
+            libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
           }
       }
 
@@ -1277,7 +1275,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
             }
 
           default:
-            libmesh_error_msg("Invalid element type = " << type);
+            libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
           }
       }
 
@@ -1389,7 +1387,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
             }
 
           default:
-            libmesh_error_msg("Invalid element type = " << type);
+            libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
           }
       }
 

@@ -15,15 +15,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
-// C++ includes
-
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/utility.h"
-
+#include "libmesh/enum_to_string.h"
 
 namespace
 {
@@ -227,7 +224,7 @@ Real FE<1,HERMITE>::shape(const Elem * elem,
           }
       }
     default:
-      libmesh_error_msg("ERROR: Unsupported element type = " << type);
+      libmesh_error_msg("ERROR: Unsupported element type = " << Utility::enum_to_string(type));
     }
 }
 
@@ -302,7 +299,7 @@ Real FE<1,HERMITE>::shape_deriv(const Elem * elem,
           }
       }
     default:
-      libmesh_error_msg("ERROR: Unsupported element type = " << type);
+      libmesh_error_msg("ERROR: Unsupported element type = " << Utility::enum_to_string(type));
     }
 }
 
@@ -379,7 +376,7 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem * elem,
           }
       }
     default:
-      libmesh_error_msg("ERROR: Unsupported element type = " << type);
+      libmesh_error_msg("ERROR: Unsupported element type = " << Utility::enum_to_string(type));
     }
 }
 

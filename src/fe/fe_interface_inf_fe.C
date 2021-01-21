@@ -26,6 +26,7 @@
 #include "libmesh/fe_interface_macros.h"
 #include "libmesh/inf_fe.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_to_string.h"
 
 namespace libMesh
 {
@@ -366,7 +367,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
             }
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << fe_t.radial_family);
+            libmesh_error_msg("ERROR: Bad FEType.radial_family == " << Utility::enum_to_string(fe_t.radial_family));
           }
 
         break;
@@ -444,7 +445,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
             }
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << fe_t.radial_family);
+            libmesh_error_msg("ERROR: Bad FEType.radial_family == " << Utility::enum_to_string(fe_t.radial_family));
           }
 
         break;
@@ -524,7 +525,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << fe_t.radial_family);
+            libmesh_error_msg("ERROR: Bad FEType.radial_family == " << Utility::enum_to_string(fe_t.radial_family));
           }
 
         break;
@@ -563,7 +564,7 @@ Point FEInterface::ifem_map (const unsigned int dim,
     case ELLIPSOIDAL:
       libmesh_not_implemented_msg("ERROR: Spherical and Ellipsoidal IFEMs not (yet) implemented.");
     default:
-      libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+      libmesh_error_msg("Invalid map = " << Utility::enum_to_string(fe_t.inf_map));
     }
 }
 
@@ -599,7 +600,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
             */
 
           default:
-            libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+            libmesh_error_msg("Invalid map = " << Utility::enum_to_string(fe_t.inf_map));
           }
       }
 
@@ -625,7 +626,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
             */
 
           default:
-            libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+            libmesh_error_msg("Invalid map = " << Utility::enum_to_string(fe_t.inf_map));
           }
       }
 
@@ -651,7 +652,7 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
             */
 
           default:
-            libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+            libmesh_error_msg("Invalid map = " << Utility::enum_to_string(fe_t.inf_map));
           }
       }
 
@@ -682,7 +683,7 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
             return;
 
           default:
-            libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+            libmesh_error_msg("Invalid map = " << Utility::enum_to_string(fe_t.inf_map));
           }
       }
 
@@ -697,7 +698,7 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
             return;
 
           default:
-            libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+            libmesh_error_msg("Invalid map = " << Utility::enum_to_string(fe_t.inf_map));
           }
       }
 
@@ -712,7 +713,7 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
             return;
 
           default:
-            libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+            libmesh_error_msg("Invalid map = " << Utility::enum_to_string(fe_t.inf_map));
           }
       }
 

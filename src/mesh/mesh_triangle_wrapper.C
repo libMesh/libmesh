@@ -20,15 +20,15 @@
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 
-// Local includes
+// libmesh includes
 #include "libmesh/mesh_triangle_wrapper.h"
-
 #include "libmesh/boundary_info.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri6.h"
 #include "libmesh/point.h"
 #include "libmesh/unstructured_mesh.h"
+#include "libmesh/enum_to_string.h"
 
 namespace libMesh
 {
@@ -164,7 +164,7 @@ void TriangleWrapper::copy_tri_to_mesh(const triangulateio & triangle_data_input
           }
 
         default:
-          libmesh_error_msg("ERROR: Unrecognized triangular element type.");
+          libmesh_error_msg("ERROR: Unrecognized triangular element type == " << Utility::enum_to_string(type));
         }
     }
 

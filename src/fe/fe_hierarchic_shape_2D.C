@@ -20,7 +20,7 @@
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/number_lookups.h"
-
+#include "libmesh/enum_to_string.h"
 
 // Anonymous namespace for functions shared by HIERARCHIC and
 // L2_HIERARCHIC implementations. Implementations appear at the bottom
@@ -480,7 +480,7 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
       }
 
     default:
-      libmesh_error_msg("ERROR: Unsupported element type = " << elem->type());
+      libmesh_error_msg("ERROR: Unsupported element type = " << Utility::enum_to_string(elem->type()));
     }
 
   return 0.;
@@ -620,7 +620,7 @@ Real fe_hierarchic_2D_shape_deriv(const Elem * elem,
       }
 
     default:
-      libmesh_error_msg("ERROR: Unsupported element type = " << type);
+      libmesh_error_msg("ERROR: Unsupported element type = " << Utility::enum_to_string(type));
     }
 
   return 0.;

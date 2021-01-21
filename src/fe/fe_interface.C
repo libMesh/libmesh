@@ -118,7 +118,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
         libmesh_assert_equal_to (dim, 2);                               \
         prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
       default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+        libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
       }                                                                 \
   } while (0)
 
@@ -160,7 +160,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
       case NEDELEC_ONE:                                                 \
         prefix FENedelecOne<dim>::func_and_args suffix                  \
       default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+        libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
       }                                                                 \
   } while (0)
 
@@ -200,7 +200,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
       case MONOMIAL_VEC:                                                \
         libmesh_error_msg("Error: Can only request scalar valued elements for Real FEInterface::func_and_args"); \
       default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+        libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
       }                                                                 \
   } while (0)
 
@@ -229,7 +229,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
       case SUBDIVISION:                                                 \
         libmesh_error_msg("Error: Can only request vector valued elements for RealGradient FEInterface::shape"); \
       default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+        libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
       }                                                                 \
   } while (0)
 
@@ -260,7 +260,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
         libmesh_assert_equal_to (dim, 2);                               \
         prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
       default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+        libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
       }                                                                 \
   } while (0)
 
@@ -296,7 +296,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
       case NEDELEC_ONE:                                                 \
         prefix FENedelecOne<dim>::func_and_args suffix                  \
       default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+        libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
       }                                                                 \
   } while (0)
 
@@ -330,7 +330,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
       case MONOMIAL_VEC:                                                \
         libmesh_error_msg("Error: Can only request scalar valued elements for Real FEInterface::func_and_args"); \
       default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+        libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
       }                                                                 \
   } while (0)
 
@@ -356,7 +356,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
       case SUBDIVISION:                                                 \
         libmesh_error_msg("Error: Can only request vector valued elements for RealGradient FEInterface::func_and_args"); \
       default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+        libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
       }                                                                 \
   } while (0)
 #endif

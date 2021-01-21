@@ -16,13 +16,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
-// Local includes
+// libmesh includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_interface.h"
-
+#include "libmesh/enum_to_string.h"
 
 // Anonymous namespace for persistent variables.
 // This allows us to cache the global-to-local mapping transformation
@@ -268,7 +266,7 @@ Real FE<1,CLOUGH>::shape(const Elem * elem,
                 }
             }
           default:
-            libmesh_error_msg("ERROR: Unsupported element type = " << type);
+            libmesh_error_msg("ERROR: Unsupported element type = " << Utility::enum_to_string(type));
           }
       }
       // by default throw an error
@@ -358,7 +356,7 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem * elem,
                 }
             }
           default:
-            libmesh_error_msg("ERROR: Unsupported element type = " << type);
+            libmesh_error_msg("ERROR: Unsupported element type = " << Utility::enum_to_string(type));
           }
       }
       // by default throw an error
@@ -426,7 +424,7 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem * elem,
                 }
             }
           default:
-            libmesh_error_msg("ERROR: Unsupported element type = " << type);
+            libmesh_error_msg("ERROR: Unsupported element type = " << Utility::enum_to_string(type));
           }
       }
       // by default throw an error
