@@ -16,11 +16,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_to_string.h"
 
 namespace libMesh
 {
@@ -163,7 +162,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem * elem,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << elem->type());
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(elem->type()));
           }
       }
 
@@ -473,7 +472,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << elem->type());
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(elem->type()));
           }
       }
 
@@ -747,7 +746,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << elem->type());
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(elem->type()));
 
           } //switch(type)
 

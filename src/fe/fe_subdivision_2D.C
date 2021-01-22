@@ -25,7 +25,7 @@
 #include "libmesh/fe_macro.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/utility.h"
-
+#include "libmesh/enum_to_string.h"
 
 namespace libMesh
 {
@@ -720,11 +720,11 @@ Real FE<2,SUBDIVISION>::shape(const ElemType type,
             libmesh_assert_less(i, 12);
             return FESubdivision::regular_shape(i,p(0),p(1));
           default:
-            libmesh_error_msg("ERROR: Unsupported element type!");
+            libmesh_error_msg("ERROR: Unsupported element type == " << Utility::enum_to_string(type));
           }
       }
     default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order!");
+      libmesh_error_msg("ERROR: Unsupported polynomial order == " << order);
     }
 }
 
@@ -776,11 +776,11 @@ Real FE<2,SUBDIVISION>::shape_deriv(const ElemType type,
             libmesh_assert_less(i, 12);
             return FESubdivision::regular_shape_deriv(i,j,p(0),p(1));
           default:
-            libmesh_error_msg("ERROR: Unsupported element type!");
+            libmesh_error_msg("ERROR: Unsupported element type == " << Utility::enum_to_string(type));
           }
       }
     default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order!");
+      libmesh_error_msg("ERROR: Unsupported polynomial order == " << order);
     }
 }
 
@@ -835,11 +835,11 @@ Real FE<2,SUBDIVISION>::shape_second_deriv(const ElemType type,
             libmesh_assert_less(i, 12);
             return FESubdivision::regular_shape_second_deriv(i,j,p(0),p(1));
           default:
-            libmesh_error_msg("ERROR: Unsupported element type!");
+            libmesh_error_msg("ERROR: Unsupported element type == " << Utility::enum_to_string(type));
           }
       }
     default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order!");
+      libmesh_error_msg("ERROR: Unsupported polynomial order == " << order);
     }
 }
 

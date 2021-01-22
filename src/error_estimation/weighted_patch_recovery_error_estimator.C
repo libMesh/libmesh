@@ -16,13 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <algorithm> // for std::fill
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath>     // for std::sqrt std::pow std::abs
-
-
-// Local Includes
+// libmesh includes
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/dof_map.h"
@@ -41,6 +35,12 @@
 #include "libmesh/enum_error_estimator_type.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/enum_norm_type.h"
+#include "libmesh/enum_to_string.h"
+
+// C++ includes
+#include <algorithm> // for std::fill
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath>     // for std::sqrt std::pow std::abs
 
 namespace libMesh
 {
@@ -489,7 +489,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 #endif
                     }
                   else
-                    libmesh_error_msg("Unsupported error norm type!");
+                    libmesh_error_msg("Unsupported error norm type == " << Utility::enum_to_string(error_estimator.error_norm.type(var)));
                 } // end quadrature loop
             } // end patch loop
 
@@ -837,7 +837,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                        error_estimator.error_norm.type(var) == H2_SEMINORM)
                 new_error_per_cell[e] += error_estimator.error_norm.weight_sq(var) * element_error;
               else
-                libmesh_error_msg("Unsupported error norm type!");
+                libmesh_error_msg("Unsupported error norm type == " << Utility::enum_to_string(error_estimator.error_norm.type(var)));
             }  // End (re) loop over patch elements
 
         } // end variables loop

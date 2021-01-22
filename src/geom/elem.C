@@ -329,7 +329,7 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
 #endif
 
     default:
-      libmesh_error_msg("ERROR: Undefined element type!");
+      libmesh_error_msg("ERROR: Undefined element type == " << Utility::enum_to_string(type));
     }
 }
 

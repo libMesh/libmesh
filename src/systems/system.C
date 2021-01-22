@@ -17,9 +17,6 @@
 
 
 
-// C++ includes
-#include <sstream>   // for std::ostringstream
-
 // Local includes
 #include "libmesh/dof_map.h"
 #include "libmesh/equation_systems.h"
@@ -51,6 +48,9 @@
 #include "libmesh/vector_value.h"
 #include "libmesh/tensor_tools.h"
 #include "libmesh/enum_norm_type.h"
+
+// C++ includes
+#include <sstream>   // for std::ostringstream
 
 namespace libMesh
 {
@@ -1520,7 +1520,7 @@ Real System::discrete_var_norm(const NumericVector<Number> & v,
   if (norm_type == DISCRETE_L_INF)
     return v.subset_linfty_norm(var_indices);
   else
-    libmesh_error_msg("Invalid norm_type = " << norm_type);
+    libmesh_error_msg("Invalid norm_type = " << Utility::enum_to_string(norm_type));
 }
 
 
@@ -1578,7 +1578,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
           if (norm_type0 == DISCRETE_L_INF)
             return v.linfty_norm();
           else
-            libmesh_error_msg("Invalid norm_type0 = " << norm_type0);
+            libmesh_error_msg("Invalid norm_type0 = " << Utility::enum_to_string(norm_type0));
         }
 
       for (auto var : make_range(this->n_vars()))

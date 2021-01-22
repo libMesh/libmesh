@@ -20,6 +20,7 @@
 #include "libmesh/hcurl_fe_transformation.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/enum_to_string.h"
 
 namespace libMesh
 {
@@ -61,7 +62,7 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
       return libmesh_make_unique<H1FETransformation<OutputShape>>();
 
     default:
-      libmesh_error_msg("Unknown family = " << fe_type.family);
+      libmesh_error_msg("Unknown family = " << Utility::enum_to_string(fe_type.family));
     }
 }
 

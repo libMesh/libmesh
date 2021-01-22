@@ -17,7 +17,7 @@
 
 
 
-// Local includes
+// libmesh includes
 #include "libmesh/mesh_generation.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/mesh_refinement.h"
@@ -50,6 +50,7 @@
 #include "libmesh/int_range.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_ghost_sync.h"
+#include "libmesh/enum_to_string.h"
 
 // C++ includes
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
@@ -93,7 +94,7 @@ unsigned int idx(const ElemType type,
       }
 
     default:
-      libmesh_error_msg("ERROR: Unrecognized 2D element type.");
+      libmesh_error_msg("ERROR: Unrecognized 2D element type == " << Utility::enum_to_string(type));
     }
 
   return libMesh::invalid_uint;
@@ -133,7 +134,7 @@ unsigned int idx(const ElemType type,
       }
 
     default:
-      libmesh_error_msg("ERROR: Unrecognized element type.");
+      libmesh_error_msg("ERROR: Unrecognized element type == " << Utility::enum_to_string(type));
     }
 
   return libMesh::invalid_uint;
@@ -389,7 +390,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unrecognized 1D element type.");
+            libmesh_error_msg("ERROR: Unrecognized 1D element type == " << Utility::enum_to_string(type));
           }
 
         // Reserve nodes
@@ -415,7 +416,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unrecognized 1D element type.");
+            libmesh_error_msg("ERROR: Unrecognized 1D element type == " << Utility::enum_to_string(type));
           }
 
 
@@ -449,7 +450,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unrecognized 1D element type.");
+            libmesh_error_msg("ERROR: Unrecognized 1D element type == " << Utility::enum_to_string(type));
 
           }
 
@@ -513,7 +514,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unrecognized 1D element type.");
+            libmesh_error_msg("ERROR: Unrecognized 1D element type == " << Utility::enum_to_string(type));
           }
 
         // Move the nodes to their final locations.
@@ -579,7 +580,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unrecognized 2D element type.");
+            libmesh_error_msg("ERROR: Unrecognized 2D element type == " << Utility::enum_to_string(type));
           }
 
 
@@ -606,7 +607,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
           default:
-            libmesh_error_msg("ERROR: Unrecognized 2D element type.");
+            libmesh_error_msg("ERROR: Unrecognized 2D element type == " << Utility::enum_to_string(type));
           }
 
 
@@ -645,7 +646,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
           default:
-            libmesh_error_msg("ERROR: Unrecognized 2D element type.");
+            libmesh_error_msg("ERROR: Unrecognized 2D element type == " << Utility::enum_to_string(type));
           }
 
 
@@ -795,7 +796,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
           default:
-            libmesh_error_msg("ERROR: Unrecognized 2D element type.");
+            libmesh_error_msg("ERROR: Unrecognized 2D element type == " << Utility::enum_to_string(type));
           }
 
 
@@ -881,7 +882,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unrecognized 3D element type.");
+            libmesh_error_msg("ERROR: Unrecognized 3D element type == " << Utility::enum_to_string(type));
           }
 
 
@@ -918,7 +919,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unrecognized 3D element type.");
+            libmesh_error_msg("ERROR: Unrecognized 3D element type == " << Utility::enum_to_string(type));
           }
 
 
@@ -964,7 +965,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
           default:
-            libmesh_error_msg("ERROR: Unrecognized 3D element type.");
+            libmesh_error_msg("ERROR: Unrecognized 3D element type == " << Utility::enum_to_string(type));
           }
 
 
@@ -1238,7 +1239,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
           default:
-            libmesh_error_msg("ERROR: Unrecognized 3D element type.");
+            libmesh_error_msg("ERROR: Unrecognized 3D element type == " << Utility::enum_to_string(type));
           }
 
 

@@ -34,6 +34,7 @@
 #include "libmesh/cell_prism6.h"
 #include "libmesh/utility.h"
 #include "libmesh/boundary_info.h"
+#include "libmesh/enum_to_string.h"
 
 // C++ includes
 #include <array>
@@ -1116,7 +1117,7 @@ void UNVIO::elements_out(std::ostream & out_file)
           }
 
         default:
-          libmesh_error_msg("ERROR: Element type = " << elem->type() << " not supported in " << "UNVIO!");
+          libmesh_error_msg("ERROR: Element type = " << Utility::enum_to_string(elem->type()) << " not supported in " << "UNVIO!");
         }
 
       dof_id_type elem_id = elem->id();

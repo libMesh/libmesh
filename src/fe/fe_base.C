@@ -38,6 +38,7 @@
 #include "libmesh/tensor_value.h"
 #include "libmesh/threads.h"
 #include "libmesh/fe_type.h"
+#include "libmesh/enum_to_string.h"
 
 // Anonymous namespace, for a helper function for periodic boundary
 // constraint calculations
@@ -232,7 +233,7 @@ FEGenericBase<Real>::build (const unsigned int dim,
             return libmesh_make_unique<FEScalar<0>>(fet);
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
+            libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
           }
       }
       // 1D
@@ -279,7 +280,7 @@ FEGenericBase<Real>::build (const unsigned int dim,
             return libmesh_make_unique<FEScalar<1>>(fet);
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
+            libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
           }
       }
 
@@ -331,7 +332,7 @@ FEGenericBase<Real>::build (const unsigned int dim,
             return libmesh_make_unique<FESubdivision>(fet);
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
+            libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
           }
       }
 
@@ -380,7 +381,7 @@ FEGenericBase<Real>::build (const unsigned int dim,
             return libmesh_make_unique<FEScalar<3>>(fet);
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
+            libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
           }
       }
 
@@ -410,7 +411,7 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
             return libmesh_make_unique<FEMonomialVec<0>>(fet);
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
+            libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
           }
       }
     case 1:
@@ -424,7 +425,7 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
             return libmesh_make_unique<FEMonomialVec<1>>(fet);
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
+            libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
           }
       }
     case 2:
@@ -441,7 +442,7 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
             return libmesh_make_unique<FENedelecOne<2>>(fet);
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
+            libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
           }
       }
     case 3:
@@ -458,7 +459,7 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
             return libmesh_make_unique<FENedelecOne<3>>(fet);
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
+            libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
           }
       }
 
@@ -490,7 +491,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
         switch (fet.radial_family)
           {
           case INFINITE_MAP:
-            libmesh_error_msg("ERROR: Can't build an infinite element with FEFamily = " << fet.radial_family);
+            libmesh_error_msg("ERROR: Can't build an infinite element with FEFamily = " << Utility::enum_to_string(fet.radial_family));
 
           case JACOBI_20_00:
             {
@@ -500,7 +501,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                   return libmesh_make_unique<InfFE<1,JACOBI_20_00,CARTESIAN>>(fet);
 
                 default:
-                  libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << fet.inf_map);
+                  libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
                 }
             }
 
@@ -512,7 +513,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                   return libmesh_make_unique<InfFE<1,JACOBI_30_00,CARTESIAN>>(fet);
 
                 default:
-                  libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << fet.inf_map);
+                  libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
                 }
             }
 
@@ -524,7 +525,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                   return libmesh_make_unique<InfFE<1,LEGENDRE,CARTESIAN>>(fet);
 
                 default:
-                  libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << fet.inf_map);
+                  libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
                 }
             }
 
@@ -536,12 +537,12 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                   return libmesh_make_unique<InfFE<1,LAGRANGE,CARTESIAN>>(fet);
 
                 default:
-                  libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << fet.inf_map);
+                  libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
                 }
             }
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << fet.radial_family);
+            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << Utility::enum_to_string(fet.radial_family));
           }
       }
 
@@ -554,7 +555,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
         switch (fet.radial_family)
           {
           case INFINITE_MAP:
-            libmesh_error_msg("ERROR: Can't build an infinite element with FEFamily = " << fet.radial_family);
+            libmesh_error_msg("ERROR: Can't build an infinite element with FEFamily = " << Utility::enum_to_string(fet.radial_family));
 
           case JACOBI_20_00:
             {
@@ -564,7 +565,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                   return libmesh_make_unique<InfFE<2,JACOBI_20_00,CARTESIAN>>(fet);
 
                 default:
-                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
                 }
             }
 
@@ -576,7 +577,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                   return libmesh_make_unique<InfFE<2,JACOBI_30_00,CARTESIAN>>(fet);
 
                 default:
-                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
                 }
             }
 
@@ -588,7 +589,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                   return libmesh_make_unique<InfFE<2,LEGENDRE,CARTESIAN>>(fet);
 
                 default:
-                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
                 }
             }
 
@@ -600,12 +601,12 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                   return libmesh_make_unique<InfFE<2,LAGRANGE,CARTESIAN>>(fet);
 
                 default:
-                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
                 }
             }
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << fet.radial_family);
+            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << Utility::enum_to_string(fet.radial_family));
           }
       }
 
@@ -618,7 +619,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
         switch (fet.radial_family)
           {
           case INFINITE_MAP:
-            libmesh_error_msg("ERROR: Don't build an infinite element with FEFamily = " << fet.radial_family);
+            libmesh_error_msg("ERROR: Don't build an infinite element with FEFamily = " << Utility::enum_to_string(fet.radial_family));
 
           case JACOBI_20_00:
             {
@@ -628,7 +629,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                   return libmesh_make_unique<InfFE<3,JACOBI_20_00,CARTESIAN>>(fet);
 
                 default:
-                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
                 }
             }
 
@@ -640,7 +641,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                   return libmesh_make_unique<InfFE<3,JACOBI_30_00,CARTESIAN>>(fet);
 
                 default:
-                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
                 }
             }
 
@@ -652,7 +653,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                   return libmesh_make_unique<InfFE<3,LEGENDRE,CARTESIAN>>(fet);
 
                 default:
-                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
                 }
             }
 
@@ -664,12 +665,12 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                   return libmesh_make_unique<InfFE<3,LAGRANGE,CARTESIAN>>(fet);
 
                 default:
-                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
                 }
             }
 
           default:
-            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << fet.radial_family);
+            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << Utility::enum_to_string(fet.radial_family));
           }
       }
 

@@ -20,7 +20,7 @@
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_lagrange_shape_1D.h"
-
+#include "libmesh/enum_to_string.h"
 
 // Anonymous namespace for functions shared by LAGRANGE and
 // L2_LAGRANGE implementations. Implementations appear at the bottom
@@ -437,7 +437,7 @@ Real fe_lagrange_3D_shape(const ElemType type,
 
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << type);
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
           }
       }
 
@@ -820,7 +820,7 @@ Real fe_lagrange_3D_shape(const ElemType type,
 
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << type);
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
           }
       }
 
@@ -1123,7 +1123,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
 
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << type);
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
           }
       }
 
@@ -2161,7 +2161,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
 
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << type);
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
           }
       }
 
@@ -2393,7 +2393,7 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << type);
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
           }
 
       }
@@ -3879,7 +3879,7 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
             }
 
           default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << type);
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
           }
       }
 

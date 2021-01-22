@@ -15,14 +15,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ includes
-#include <fstream>
-#include <set>
-#include <cstring> // std::memcpy
-#include <numeric>
-#include <unordered_map>
-#include <cstddef>
-
 // Local includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_logging.h"
@@ -32,6 +24,15 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/int_range.h"
 #include "libmesh/utility.h" // map_find
+#include "libmesh/enum_to_string.h"
+
+// C++ includes
+#include <fstream>
+#include <set>
+#include <cstring> // std::memcpy
+#include <numeric>
+#include <unordered_map>
+#include <cstddef>
 
 namespace libMesh
 {
@@ -1105,7 +1106,7 @@ void GmshIO::write_post (const std::string & fname,
                   break;
                 }
               default:
-                libmesh_error_msg("ERROR: Nonexistent element type " << elem->type());
+                libmesh_error_msg("ERROR: Nonexistent element type " << Utility::enum_to_string(elem->type()));
               }
           }
       }
