@@ -109,7 +109,7 @@ int main (int argc, char ** argv)
 
 
   // Print information about the mesh to the screen.
-  mesh.print_info();
+  mesh.print_info(libMesh::out, /* verbosity = */ 2);
 
   // Let's add some node and edge boundary conditions.
   // Each processor should know about each boundary condition it can
