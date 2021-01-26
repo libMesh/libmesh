@@ -51,8 +51,7 @@ namespace libMesh
     void InterMeshProjection::project_system_vectors()
     {
         // Number of vectors to be projected
-        unsigned int n_vecs = from_system.n_vectors();
-        libmesh_assert_equal_to (to_system.n_vectors(), n_vecs);
+        libmesh_assert_equal_to (to_system.n_vectors(), from_system.n_vectors());
 
         // Number of variable components in each vector
         unsigned int n_vars = from_system.n_vars();
@@ -60,7 +59,7 @@ namespace libMesh
 
         // We are going to use the multi-variable MeshFunction, so we can pass
         // a single vector of variables rather than have a MeshFunction for each variable
-	    std::vector<unsigned int> variables_vector;
+        std::vector<unsigned int> variables_vector;
 
         for (unsigned int j = 0; j != n_vars; ++j)
         {
@@ -77,7 +76,7 @@ namespace libMesh
         // ghosted values cover a domain which is a superset of the to-system's domain ...
         // that's hard to do and we can skip it until the poor scalability bites someone.
         std::unique_ptr<NumericVector<Number>> solution_vector_serial = NumericVector<Number>::build(from_system.comm());
-	    solution_vector_serial->init(from_system.solution->size(), true, SERIAL);
+        solution_vector_serial->init(from_system.solution->size(), true, SERIAL);
 
         std::vector<Number> solution_vector;
         from_system.update_global_solution(solution_vector);
