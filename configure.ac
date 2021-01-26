@@ -211,11 +211,12 @@ AS_IF([test $cxx11required != irrelevant],
       [AC_MSG_WARN([C++11 is now always required for libMesh])])
 
 # --------------------------------------------------------------
-# Standard autoconf macro for determining the proper -std=c++11
-# flag for the current compiler.  Adds the result to CXXFLAGS if
-# one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
+# Autoconf macro for determining the proper -std=c++??
+# flag, for the current compiler, for the user's requested C++
+# standards level.  Adds the required flag to CXXFLAGS if
+# one is found.  Exits if no acceptable flag is found.
 # --------------------------------------------------------------
-AX_CXX_COMPILE_STDCXX([11],[noext],[mandatory])
+ACSM_CXX_COMPILER_STANDARD([2011], [2017])
 
 # --------------------------------------------------------------
 # See compiler.m4 for the definition of this function.  It uses the
