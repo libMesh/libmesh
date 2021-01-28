@@ -674,6 +674,21 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 
   this->init_context(context);
 
+  // It's possible for the assembly loop below to throw an exception
+  // on one (or some subset) of the processors. This can happen when
+  // e.g. the mesh contains one or more elements with negative
+  // Jacobian. In that case, we stop assembling on the processor(s)
+  // that threw and let the other processors finish assembly. Then we
+  // synchronize to check whether an exception was thrown on _any_
+  // processor, and if so, re-throw it on _all_ processors. This way,
+  // we make it easier for callers to handle exceptions in parallel
+  // during assembly: they can simply assume that the code either
+  // throws on all procs or on no procs.
+  int assembly_threw = 0;
+
+  libmesh_try
+  {
+
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
       const ElemType elemtype = elem->type();
@@ -838,12 +853,32 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
       if (assemble_vector)
         input_vector->add_vector (context.get_elem_residual(),
                                   context.get_dof_indices() );
-    }
+    } // end for (elem)
 
+  } // libmesh_try
+  libmesh_catch(...)
+  {
+    assembly_threw = 1;
+  }
+
+  // Note: regardless of whether any procs threw during assembly (and
+  // thus didn't finish assembling), we should not leave the matrix
+  // and vector in an inconsistent state, since it may be possible to
+  // recover from the exception. Therefore, we close them now. The
+  // assumption here is that the nature of the exception does not
+  // prevent the matrix and vector from still being assembled (albeit
+  // with incomplete data).
   if (assemble_matrix)
     input_matrix->close();
   if (assemble_vector)
     input_vector->close();
+
+  // Check for exceptions on any procs and if there is one, re-throw
+  // it on all procs.
+  this->comm().max(assembly_threw);
+
+  if (assembly_threw)
+    libmesh_error_msg("Error during assembly in RBConstruction::add_scaled_matrix_and_vector()");
 }
 
 void RBConstruction::set_context_solution_vec(NumericVector<Number> & vec)
