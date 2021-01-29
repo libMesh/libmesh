@@ -163,9 +163,12 @@ int main(int argc, char ** argv)
           if (!elem->neighbor_ptr(side))
             {
               Point side_center = elem->build_side_ptr(side)->centroid();
-              if (side_center(0) < 0.1)
+              // Yes, BOUNDARY_ID_MIN_X is a weird ID to use at
+              // min(z), but we got an IGA cantilever mesh with the
+              // lever arm in the z direction
+              if (side_center(2) < 0.1)
                 mesh.get_boundary_info().add_side(elem, side, BOUNDARY_ID_MIN_X);
-              if (side_center(0) > 11.9)
+              if (side_center(2) > 11.9)
                 mesh.get_boundary_info().add_side(elem, side, BOUNDARY_ID_MAX_X);
             }
     }
