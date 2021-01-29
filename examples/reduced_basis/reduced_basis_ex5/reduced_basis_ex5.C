@@ -51,6 +51,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/nemesis_io.h"
 #include "libmesh/rb_data_serialization.h"
 #include "libmesh/rb_data_deserialization.h"
 #include "libmesh/enum_solver_package.h"
@@ -346,7 +347,7 @@ int main(int argc, char ** argv)
           rb_con.load_rb_solution();
 
           const RBParameters & rb_eval_params = rb_eval.get_parameters();
-          scale_mesh_and_plot(equation_systems, rb_eval_params, "RB_sol.e");
+          scale_mesh_and_plot(equation_systems, rb_eval_params, "RB_sol");
         }
     }
 
@@ -359,7 +360,7 @@ int main(int argc, char ** argv)
 
 void scale_mesh_and_plot(EquationSystems & es,
                          const RBParameters & mu,
-                         const std::string & filename)
+                         const std::string & file_basename)
 {
   // Loop over the mesh nodes and move them!
   MeshBase & mesh = es.get_mesh();
@@ -372,12 +373,16 @@ void scale_mesh_and_plot(EquationSystems & es,
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // Distributed IGA meshes don't yet support re-gathering to serial
-  bool do_write =
+  bool do_exodus_write =
     (es.get_mesh().get_constraint_rows().empty() ||
      es.get_mesh().is_serial());
-  es.comm().min(do_write);
-  if (do_write)
-    ExodusII_IO (mesh).write_equation_systems (filename, es);
+  es.comm().min(do_exodus_write);
+  if (do_exodus_write)
+    ExodusII_IO (mesh).write_equation_systems (file_basename+".e", es);
+#ifdef LIBMESH_HAVE_NEMESIS_API
+  else
+    Nemesis_IO (mesh).write_equation_systems (file_basename+".nem", es);
+#endif
 #endif
 
   // Loop over the mesh nodes and move them!
