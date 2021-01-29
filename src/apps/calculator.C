@@ -38,6 +38,7 @@
 #include "libmesh/point.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/wrapped_functor.h"
+#include "libmesh/elem.h"
 
 
 using namespace libMesh;
@@ -156,7 +157,7 @@ int main(int argc, char ** argv)
   cl.disable_loop();
   while (cl.search(1, "--subdomain"))
     {
-      subdomain_id_type tmp;
+      subdomain_id_type tmp = Elem::invalid_subdomain_id;
       tmp = cl.next(tmp);
       new_sys.subdomains_list().insert(tmp);
     }
