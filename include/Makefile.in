@@ -578,7 +578,7 @@ SUBDIRS = libmesh
 # cleaned by 'make distclean'
 DISTCLEANFILES = libmesh_config.h
 
-# Do not edit - automatically generated from ./rebuild_include_HEADERS.sh
+# Do not edit - automatically generated from rebuild_include_HEADERS.sh
 # These are headers we need to compile the libMesh library but should
 # not be installed.  These header files may have implementation
 # details which are not required for the public interface
@@ -981,6 +981,7 @@ include_HEADERS = \
         systems/frequency_system.h \
         systems/generic_projector.h \
         systems/implicit_system.h \
+        systems/inter_mesh_projection.h \
         systems/linear_implicit_system.h \
         systems/newmark_system.h \
         systems/nonlinear_implicit_system.h \
