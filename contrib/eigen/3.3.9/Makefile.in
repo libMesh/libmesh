@@ -97,18 +97,17 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_code_coverage.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_compiler_control_args.m4 \
-	$(top_srcdir)/m4/autoconf-submodule/acsm_cxx_compiler_standard.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_mpi.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_scrape_petsc_configure.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_summarize_env.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_test_sanitize_flags.m4 \
-	$(top_srcdir)/m4/autoconf-submodule/ax_cxx_compile_stdcxx.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/ax_prefix_config_h.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/ax_split_version.m4 \
 	$(top_srcdir)/m4/ac_cxx_rtti.m4 $(top_srcdir)/m4/all_static.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
 	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
 	$(top_srcdir)/m4/ax_compiler_vendor.m4 \
+	$(top_srcdir)/m4/ax_cxx_compile_stdcxx_11.m4 \
 	$(top_srcdir)/m4/ax_gcc_archflag.m4 \
 	$(top_srcdir)/m4/ax_gcc_x86_cpuid.m4 \
 	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/m4/ax_pthread.m4 \
@@ -317,8 +316,6 @@ GXX_VERSION = @GXX_VERSION@
 GZSTREAM_INCLUDE = @GZSTREAM_INCLUDE@
 GZSTREAM_LIB = @GZSTREAM_LIB@
 HAVE_CXX11 = @HAVE_CXX11@
-HAVE_CXX14 = @HAVE_CXX14@
-HAVE_CXX17 = @HAVE_CXX17@
 HAVE_DOT = @HAVE_DOT@
 HAVE_GCOV_TOOLS = @HAVE_GCOV_TOOLS@
 HDF5_CFLAGS = @HDF5_CFLAGS@
