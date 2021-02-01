@@ -26,6 +26,15 @@
 #include "libmesh/threads.h"
 #include "libmesh/enum_to_string.h"
 
+
+#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+// to have the macro 'inf_fe_switch' available.
+#include "libmesh/fe_interface_macros.h"
+#include "libmesh/inf_fe.h"
+#endif
+#endif
+
 namespace libMesh
 {
 
@@ -662,7 +671,6 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
 }
 
 
-
 #ifdef LIBMESH_ENABLE_AMR
 void lagrange_compute_constraints (DofConstraints & constraints,
                                    DofMap & dof_map,
@@ -679,6 +687,31 @@ void lagrange_compute_constraints (DofConstraints & constraints,
   // Only constrain active and ancestor elements
   if (elem->subactive())
     return;
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+   if (elem->infinite())
+   {
+      const FEType fe_t = dof_map.variable_type(variable_number);
+
+      // expand the infinite_compute_constraint in its template-arguments.
+      switch(Dim)
+      {
+         case 2:
+            {
+            inf_fe_family_mapping_switch(2, inf_compute_constraints (constraints, dof_map, variable_number, elem) , ,; break;);
+            break;
+          }
+         case 3:
+            {
+            inf_fe_family_mapping_switch(3, inf_compute_constraints (constraints, dof_map, variable_number, elem) , ,; break;);
+            break;
+            }
+         default:
+           libmesh_error_msg("Invalid dim = " << Dim);
+      }
+      return;
+   }
+#endif
 
   FEType fe_type = dof_map.variable_type(variable_number);
 

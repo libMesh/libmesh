@@ -40,6 +40,11 @@
 #include "libmesh/threads.h"
 #include "libmesh/enum_elem_type.h"
 
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#include "libmesh/inf_fe.h"
+#include "libmesh/fe_interface_macros.h"
+#endif
+
 namespace libMesh
 {
 
@@ -874,6 +879,32 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
   if (elem->subactive())
     return;
 
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  if (elem->infinite())
+    {
+      const FEType fe_t(elem->default_order(), FEMap::map_fe_type(*elem));
+
+      // expand the infinite_compute_constraint in its template-arguments.
+      switch(Dim)
+      {
+         case 2:
+            {
+            inf_fe_family_mapping_switch(2, inf_compute_constraints (constraints, dof_map, variable_number, elem) , ,; break;);
+            break;
+          }
+         case 3:
+            {
+            inf_fe_family_mapping_switch(3, inf_compute_constraints (constraints, dof_map, variable_number, elem) , ,; break;);
+            break;
+            }
+         default:
+           libmesh_error_msg("Invalid dim = " << Dim);
+      }
+      return;
+    }
+
+#endif
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
   const FEType fe_type(elem->default_order(), mapping_family);
 
