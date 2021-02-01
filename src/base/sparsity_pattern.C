@@ -515,8 +515,7 @@ void Build::parallel_sync ()
   std::map<processor_id_type, std::vector<dof_id_type>> received_ids_map;
 
   auto ids_action_functor =
-    [this,
-     & received_ids_map]
+    [& received_ids_map]
     (processor_id_type pid,
      const std::vector<dof_id_type> & received_ids)
     {
