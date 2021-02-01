@@ -1661,10 +1661,10 @@ public:
     constraint_rows_type;
 
   constraint_rows_type & get_constraint_rows()
-  { libmesh_experimental(); return _constraint_rows; }
+  { return _constraint_rows; }
 
   const constraint_rows_type & get_constraint_rows() const
-  { libmesh_experimental(); return _constraint_rows; }
+  { return _constraint_rows; }
 
   /**
    * Search the mesh and cache the different dimensions of the elements
