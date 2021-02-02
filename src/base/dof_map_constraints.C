@@ -1894,6 +1894,9 @@ void DofMap::process_mesh_constraint_rows(const MeshBase & mesh)
   libmesh_assert(!constraint_rows_empty);
 #endif
 
+  // This is fairly new code, still a bit experimental.
+  libmesh_experimental();
+
   // We can't handle periodic boundary conditions on spline meshes
   // yet.
 #ifdef LIBMESH_ENABLE_PERIODIC
