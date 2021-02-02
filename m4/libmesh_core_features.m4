@@ -17,7 +17,7 @@ AC_ARG_WITH([gdb-command],
     AS_HELP_STRING([--with-gdb-command=commandname],
                    [Specify command to invoke gdb.  Use --without-gdb-command to disable GDB backtraces.]),
     [gdb_command="$withval"],
-    [gdb_command="gdb"])
+    [gdb_command="no"])
 
 AC_DEFINE_UNQUOTED(GDB_COMMAND, "$gdb_command", [command to invoke gdb])
 AC_MSG_RESULT([configuring gdb command... "$gdb_command"])
