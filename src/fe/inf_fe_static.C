@@ -1219,10 +1219,7 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_node_constraints (NodeConstraints 
   //        because constraining the non-base points requires knowledge of the T_map and T_radial
   //        parameters; but they are not accessible via the element and may differ between variables.
   //
-  // FIXME: it remains to be checked if constraint of 'outer' nodes is required of if it is sufficient
-  //        to constrain the base nodes, similar to 'inf_compute_constraints'.
-  //
-  // For the moment being, we just check if this element can be checked and fail otherwise.
+  // For the moment being, we just check if this element can be skipped and fail otherwise.
 
   // if one of the sides needs a constraint, an error is thrown.
   // In other cases, we leave the function regularly.
