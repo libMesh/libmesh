@@ -89,13 +89,9 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
       return;
     }
 
-  /*
-   * set up the PointLocator: currently we always get this from the
-   * MeshBase we're associated with.
-   */
+  // The Mesh owns the "master" PointLocator, while handing us a
+  // PointLocator "proxy" that forwards all requests to the master.
   const MeshBase & mesh = this->_eqn_systems.get_mesh();
-
-  // Take ownership
   _point_locator = mesh.sub_point_locator();
 
   // ready for use
