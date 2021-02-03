@@ -814,6 +814,7 @@ void MeshFunction::disable_out_of_mesh_mode()
 void MeshFunction::set_point_locator_tolerance(Real tol)
 {
   _point_locator->set_close_to_point_tol(tol);
+  _point_locator->set_contains_point_tol(tol);
 }
 
 void MeshFunction::unset_point_locator_tolerance()
