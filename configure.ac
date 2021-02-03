@@ -171,46 +171,6 @@ AS_IF([test "x$enablemarch" != "xno"],
       ])
 
 # --------------------------------------------------------------
-# Allow the user to explicitly turn off C++11 support by saying
-# --disable-cxx11?  This is no longer supported.
-#
-# We'll leave the "option" in place for a release, though, just in
-# case anyone is specifying --enable-cxx11 in their build scripts
-# --------------------------------------------------------------
-AC_ARG_ENABLE(cxx11,
-              AC_HELP_STRING([--disable-cxx11],
-                             [build without C++11 support (no longer supported!)]),
-              [AS_CASE("${enableval}",
-                       [yes], [enablecxx11=yes],
-                       [no],  [AC_MSG_ERROR(libMesh now requires C++11)],
-                       [AC_MSG_ERROR(bad value ${enableval} for --disable-cxx11)])],
-              [enablecxx11=irrelevant])
-
-AS_IF([test $enablecxx11 != irrelevant],
-      [AC_MSG_WARN([--enable/disable-cxx11 are now deprecated])])
-enablecxx11=yes
-
-# --------------------------------------------------------------
-# Setting --enable-cxx11-required causes an error to be emitted during
-# configure if the compiler does not support a specific subset of
-# C++11 features.  This is useful for app codes which require C++11,
-# since it prevents situations where libmesh is built without C++11
-# support (which may take a very long time), and then the app fails to
-# compile, requiring you to redo everything.
-# --------------------------------------------------------------
-AC_ARG_ENABLE(cxx11-required,
-              AC_HELP_STRING([--enable-cxx11-required],
-                             [Error if compiler does not support C++11]),
-              [AS_CASE("${enableval}",
-                       [yes], [cxx11required=yes],
-                       [no],  [cxx11required=no],
-                       [AC_MSG_ERROR(bad value ${enableval} for --enable-cxx11-required)])],
-              [cxx11required=irrelevant])
-
-AS_IF([test $cxx11required != irrelevant],
-      [AC_MSG_WARN([C++11 is now always required for libMesh])])
-
-# --------------------------------------------------------------
 # Autoconf macro for determining the proper -std=c++??
 # flag, for the current compiler, for the user's requested C++
 # standards level.  Adds the required flag to CXXFLAGS if
