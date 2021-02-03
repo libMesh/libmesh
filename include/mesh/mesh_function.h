@@ -101,15 +101,17 @@ public:
   ~MeshFunction ();
 
   /**
-   * Override the FunctionBase::init() member function by calling our
-   * own and specifying the Trees::NODES method.  specifies the method
-   * to use when building a \p PointLocator
+   * Override the FunctionBase::init() member function.
    */
-  virtual void init () override { this->init(Trees::NODES); }
+  virtual void init () override;
 
   /**
    * The actual initialization process.  Takes an optional argument which
    * specifies the method to use when building a \p PointLocator
+   *
+   * \deprecated The input argument is not used (was it ever?) to
+   * control the PointLocator type which is built, so one should
+   * instead call the version of init() taking no args.
    */
   void init (const Trees::BuildType point_locator_build_type);
 

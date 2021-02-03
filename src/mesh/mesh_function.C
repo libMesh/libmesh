@@ -77,7 +77,7 @@ MeshFunction::~MeshFunction () = default;
 
 
 
-void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
+void MeshFunction::init ()
 {
   // are indices of the desired variable(s) provided?
   libmesh_assert_greater (this->_system_vars.size(), 0);
@@ -97,6 +97,19 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
   // ready for use
   this->_initialized = true;
 }
+
+
+
+void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
+{
+  libmesh_deprecated();
+
+  // Call the init() taking no args instead. Note: this is backwards
+  // compatible because the argument was not used for anything
+  // previously anyway.
+  this->init();
+}
+
 
 
 void
