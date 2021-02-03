@@ -58,7 +58,7 @@ AC_DEFUN([CONFIGURE_METAPHYSICL],
           METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/src/numerics/include -I\$(top_srcdir)/contrib/metaphysicl/src/core/include -I\$(top_srcdir)/contrib/metaphysicl/src/utilities/include"
           AC_DEFINE(HAVE_METAPHYSICL, 1, [Flag indicating whether the library will be compiled with MetaPhysicL support])
           AC_MSG_RESULT(<<< Configuring library with MetaPhysicL support >>>)
-          AC_CONFIG_SUBDIRS([contrib/metaphysicl])
+          AX_SUBDIRS_CONFIGURE([contrib/metaphysicl],[--with-cxx-std=20$acsm_cxx_version])
         ],
         [
           METAPHYSICL_INCLUDE=""
