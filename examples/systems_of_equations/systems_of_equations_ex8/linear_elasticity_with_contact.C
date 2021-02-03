@@ -24,6 +24,7 @@
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/boundary_info.h"
+#include "libmesh/tensor_value.h"
 
 // The nonlinear solver and system we will be using
 #include "libmesh/nonlinear_solver.h"
@@ -209,12 +210,10 @@ void LinearElasticityWithContact::add_contact_edge_elements()
 {
   MeshBase & mesh = _sys.get_mesh();
 
-  std::map<dof_id_type, dof_id_type>::iterator it = _contact_node_map.begin();
-  std::map<dof_id_type, dof_id_type>::iterator it_end = _contact_node_map.end();
-  for( ; it != it_end ; ++it )
+  for (const auto & pr : _contact_node_map)
     {
-      dof_id_type master_node_id = it->first;
-      dof_id_type slave_node_id = it->second;
+      dof_id_type master_node_id = pr.first;
+      dof_id_type slave_node_id = pr.second;
 
       Node & master_node = mesh.node_ref(master_node_id);
       Node & slave_node = mesh.node_ref(slave_node_id);
@@ -315,7 +314,7 @@ void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Num
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
           // Row is variable u, v, or w column is x, y, or z
-          DenseMatrix<Number> grad_u(3, 3);
+          TensorValue<Number> grad_u;
           for (unsigned int var_i=0; var_i<3; var_i++)
             for (unsigned int var_j=0; var_j<3; var_j++)
               for (unsigned int j=0; j<n_var_dofs; j++)
@@ -363,13 +362,10 @@ void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Num
   // one processor.
   _lambda_plus_penalty_values.clear();
 
-  std::map<dof_id_type, dof_id_type>::iterator it = _contact_node_map.begin();
-  std::map<dof_id_type, dof_id_type>::iterator it_end = _contact_node_map.end();
-
-  for ( ; it != it_end; ++it)
+  for (const auto & pr : _contact_node_map)
     {
-      dof_id_type lower_point_id = it->first;
-      dof_id_type upper_point_id = it->second;
+      dof_id_type lower_point_id = pr.first;
+      dof_id_type upper_point_id = pr.second;
 
       Point upper_to_lower;
       {
@@ -488,10 +484,10 @@ void LinearElasticityWithContact::compute_stresses()
   const MeshBase & mesh = _sys.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
 
-  unsigned int displacement_vars[3];
-  displacement_vars[0] = _sys.variable_number ("u");
-  displacement_vars[1] = _sys.variable_number ("v");
-  displacement_vars[2] = _sys.variable_number ("w");
+  unsigned int displacement_vars[] = {
+    _sys.variable_number ("u"),
+    _sys.variable_number ("v"),
+    _sys.variable_number ("w")};
   const unsigned int u_var = _sys.variable_number ("u");
 
   const DofMap & dof_map = _sys.get_dof_map();
@@ -506,13 +502,13 @@ void LinearElasticityWithContact::compute_stresses()
   // Also, get a reference to the ExplicitSystem
   ExplicitSystem & stress_system = es.get_system<ExplicitSystem>("StressSystem");
   const DofMap & stress_dof_map = stress_system.get_dof_map();
-  unsigned int sigma_vars[6];
-  sigma_vars[0] = stress_system.variable_number ("sigma_00");
-  sigma_vars[1] = stress_system.variable_number ("sigma_01");
-  sigma_vars[2] = stress_system.variable_number ("sigma_02");
-  sigma_vars[3] = stress_system.variable_number ("sigma_11");
-  sigma_vars[4] = stress_system.variable_number ("sigma_12");
-  sigma_vars[5] = stress_system.variable_number ("sigma_22");
+  unsigned int sigma_vars[] = {
+    stress_system.variable_number ("sigma_00"),
+    stress_system.variable_number ("sigma_01"),
+    stress_system.variable_number ("sigma_02"),
+    stress_system.variable_number ("sigma_11"),
+    stress_system.variable_number ("sigma_12"),
+    stress_system.variable_number ("sigma_22")};
   unsigned int vonMises_var = stress_system.variable_number ("vonMises");
 
   // Storage for the stress dof indices on each element
@@ -520,7 +516,7 @@ void LinearElasticityWithContact::compute_stresses()
   std::vector<dof_id_type> stress_dof_indices_var;
 
   // To store the stress tensor on each element
-  DenseMatrix<Number> elem_avg_stress_tensor(3, 3);
+  TensorValue<Number> elem_avg_stress_tensor;
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
@@ -538,19 +534,19 @@ void LinearElasticityWithContact::compute_stresses()
       fe->reinit (elem);
 
       // clear the stress tensor
-      elem_avg_stress_tensor.resize(3, 3);
+      elem_avg_stress_tensor.zero();
 
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
           // Row is variable u1, u2, or u3, column is x, y, or z
-          DenseMatrix<Number> grad_u(3, 3);
+          TensorValue<Number> grad_u;
           for (unsigned int var_i=0; var_i<3; var_i++)
             for (unsigned int var_j=0; var_j<3; var_j++)
               for (unsigned int j=0; j<n_var_dofs; j++)
                 grad_u(var_i, var_j) +=
                   dphi[j][qp](var_j) * _sys.current_solution(dof_indices_var[var_i][j]);
 
-          DenseMatrix<Number> stress_tensor(3, 3);
+          TensorValue<Number> stress_tensor;
           for (unsigned int i=0; i<3; i++)
             for (unsigned int j=0; j<3; j++)
               for (unsigned int k=0; k<3; k++)
@@ -560,11 +556,11 @@ void LinearElasticityWithContact::compute_stresses()
 
           // We want to plot the average stress on each element, hence
           // we integrate stress_tensor
-          elem_avg_stress_tensor.add(JxW[qp], stress_tensor);
+          elem_avg_stress_tensor.add_scaled(stress_tensor, JxW[qp]);
         }
 
       // Get the average stress per element by dividing by volume
-      elem_avg_stress_tensor.scale(1./elem->volume());
+      elem_avg_stress_tensor /= elem->volume();
 
       // load elem_sigma data into stress_system
       unsigned int stress_var_index = 0;
@@ -610,19 +606,17 @@ std::pair<Real, Real> LinearElasticityWithContact::update_lambdas()
   Real max_delta_lambda = 0.;
   Real max_new_lambda = 0.;
 
-  std::map<dof_id_type, Real>::iterator it = _lambdas.begin();
-  std::map<dof_id_type, Real>::iterator it_end = _lambdas.end();
-  for ( ; it != it_end; ++it)
+  for (auto & pr : _lambdas)
     {
-      dof_id_type upper_node_id = it->first;
+      dof_id_type upper_node_id = pr.first;
 
-      std::map<dof_id_type, Real>::iterator new_lambda_it = _lambda_plus_penalty_values.find(upper_node_id);
+      auto new_lambda_it = _lambda_plus_penalty_values.find(upper_node_id);
       libmesh_error_msg_if(new_lambda_it == _lambda_plus_penalty_values.end(), "New lambda value not found");
 
       Real new_lambda = new_lambda_it->second;
-      Real old_lambda = it->second;
+      Real old_lambda = pr.second;
 
-      it->second = new_lambda;
+      pr.second = new_lambda;
 
       Real delta_lambda = std::abs(new_lambda-old_lambda);
       if (delta_lambda > max_delta_lambda)
@@ -643,12 +637,10 @@ std::pair<Real, Real> LinearElasticityWithContact::get_least_and_max_gap_functio
   Real least_value = std::numeric_limits<Real>::max();
   Real max_value = std::numeric_limits<Real>::min();
 
-  std::map<dof_id_type, dof_id_type>::iterator it = _contact_node_map.begin();
-  std::map<dof_id_type, dof_id_type>::iterator it_end = _contact_node_map.end();
-  for ( ; it != it_end; ++it)
+  for (const auto & pr : _contact_node_map)
     {
-      dof_id_type lower_point_id = it->first;
-      dof_id_type upper_point_id = it->second;
+      dof_id_type lower_point_id = pr.first;
+      dof_id_type upper_point_id = pr.second;
 
       Point upper_to_lower;
       {

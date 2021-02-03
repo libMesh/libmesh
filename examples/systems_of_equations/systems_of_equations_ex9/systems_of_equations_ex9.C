@@ -64,6 +64,8 @@
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/tensor_value.h"
+#include "libmesh/vector_value.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -91,7 +93,7 @@ public:
     set_variable(0);
     set_variable(1);
     set_variable(2);
-    set_transformation_matrix(get_rotation_matrix());
+    set_up_rotation_matrix();
   }
 
   /**
@@ -113,39 +115,43 @@ public:
     set_variable(0);
     set_variable(1);
     set_variable(2);
-    set_transformation_matrix(get_rotation_matrix());
+    set_up_rotation_matrix();
   }
 
   /**
    * Destructor
    */
-  virtual ~AzimuthalPeriodicBoundary() {}
+  virtual ~AzimuthalPeriodicBoundary() = default;
 
   /**
-   * Get the rotation matrix for this transformation.
+   * Computes and stores the rotation matrix for this transformation,
+   * and then calls the base class API to store it. This should only
+   * be done once, since the direction and angle do not change once
+   * the class is constructed.
    */
-  DenseMatrix<Real> get_rotation_matrix() const
+  void set_up_rotation_matrix()
   {
     // Formula for rotation matrix about an axis is given on wikipedia:
     // en.wikipedia.org/wiki/Rotation_matrix
     // We rotate by angle theta about the axis defined by u, which is a
     // unit vector in the direction of _axis.
+    // Note: this example already requires LIBMESH_DIM==3 so we don't
+    // explicitly check for that here.
     Point u = _axis.unit();
     Real u_x = u(0);
     Real u_y = u(1);
     Real u_z = u(2);
-    DenseMatrix<Real> R(3,3);
-    R(0,0) = cos(_theta) + u_x*u_x*(1.0 - cos(_theta));
-    R(0,1) = u_x*u_y*(1.0 - cos(_theta)) - u_z*sin(_theta);
-    R(0,2) = u_x*u_z*(1.0 - cos(_theta)) + u_y*sin(_theta);
-    R(1,0) = u_y*u_x*(1.0 - cos(_theta)) + u_z*sin(_theta);
-    R(1,1) = cos(_theta) + u_y*u_y*(1.0 - cos(_theta));
-    R(1,2) = u_y*u_z*(1.0 - cos(_theta)) - u_x*sin(_theta);
-    R(2,0) = u_z*u_x*(1.0 - cos(_theta)) - u_y*sin(_theta);
-    R(2,1) = u_z*u_y*(1.0 - cos(_theta)) + u_x*sin(_theta);
-    R(2,2) = cos(_theta) + u_z*u_z*(1.0 - cos(_theta));
+    Real cost = std::cos(_theta);
+    Real sint = std::sin(_theta);
+    _R = RealTensorValue
+      (cost + u_x*u_x*(1.0 - cost),     u_x*u_y*(1.0 - cost) - u_z*sint, u_x*u_z*(1.0 - cost) + u_y*sint,
+       u_y*u_x*(1.0 - cost) + u_z*sint, cost + u_y*u_y*(1.0 - cost),     u_y*u_z*(1.0 - cost) - u_x*sint,
+       u_z*u_x*(1.0 - cost) - u_y*sint, u_z*u_y*(1.0 - cost) + u_x*sint, cost + u_z*u_z*(1.0 - cost));
 
-    return R;
+    // For generality, PeriodicBoundaryBase::set_transformation_matrix() takes an
+    // (n_vars * n_vars) DenseMatrix which we construct on the fly.
+    this->set_transformation_matrix
+      (DenseMatrix<Real> (3, 3, {_R(0,0), _R(0,1), _R(0,2), _R(1,0), _R(1,1), _R(1,2), _R(2,0), _R(2,1), _R(2,2)}));
   }
 
   /**
@@ -155,24 +161,10 @@ public:
    */
   virtual Point get_corresponding_pos(const Point & pt) const override
   {
-    DenseVector<Real> translated_pt(3);
-    for(unsigned int i=0; i<3; i++)
-    {
-      translated_pt(i) = pt(i) - _center(i);
-    }
-
     // Note that since _theta defines the angle from "paired boundary" to
-    // "my boundary", and we want the inverse of that here, we must use
-    // vector_mult_transpose below.
-    DenseVector<Real> rotated_pt;
-    get_transformation_matrix().vector_mult_transpose(rotated_pt, translated_pt);
-
-    Point corresponding_pos;
-    for(unsigned int i=0; i<3; i++)
-    {
-      corresponding_pos(i) = rotated_pt(i) + _center(i);
-    }
-    return corresponding_pos;
+    // "my boundary", and we want the inverse of that here, we multiply
+    // by the transpose of the transformation matrix below.
+    return _R.left_multiply(pt - _center) + _center;
   }
 
   /**
@@ -193,7 +185,9 @@ private:
   Point _center;
   Point _axis;
   Real _theta;
+  RealTensorValue _R;
 };
+
 #endif // LIBMESH_ENABLE_PERIODIC
 
 class LinearElasticity : public System::Assembly
@@ -316,19 +310,12 @@ public:
                           JxW[qp] * elasticity_tensor(i,j,k,l) * dphi[dof_j][qp](l) * dphi[dof_i][qp](j);
 
             // assemble \int_Omega f_i v_i \dx
-            DenseVector<Number> f_vec(3);
-            if(elem->subdomain_id() == 101)
-              {
-                f_vec(0) = 1.;
-                f_vec(1) = 1.;
-                f_vec(2) = 0.;
-              }
-            else if(elem->subdomain_id() == 1)
-              {
-                f_vec(0) = 0.36603;
-                f_vec(1) = 1.36603;
-                f_vec(2) = 0.;
-              }
+            // The mesh for this example has two subdomains with ids 1
+            // and 101, and the forcing function is different on each.
+            auto f_vec = (elem->subdomain_id() == 101 ?
+                          VectorValue<Number>(1., 1., 0.) :
+                          VectorValue<Number>(0.36603, 1.36603, 0.));
+
             for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
               for (unsigned int i=0; i<3; i++)
                 Fe_var[i](dof_i) += JxW[qp] * (f_vec(i) * phi[dof_i][qp]);
