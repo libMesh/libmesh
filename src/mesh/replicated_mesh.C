@@ -1319,6 +1319,17 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
                                std::get<1>(t),
                                std::get<2>(t));
 
+      const auto & other_ns_id_to_name = other_boundary.get_nodeset_name_map();
+      auto & ns_id_to_name = boundary.set_nodeset_name_map();
+      ns_id_to_name.insert(other_ns_id_to_name.begin(), other_ns_id_to_name.end());
+
+      const auto & other_ss_id_to_name = other_boundary.get_sideset_name_map();
+      auto & ss_id_to_name = boundary.set_sideset_name_map();
+      ss_id_to_name.insert(other_ss_id_to_name.begin(), other_ss_id_to_name.end());
+
+      const auto & other_es_id_to_name = other_boundary.get_edgeset_name_map();
+      auto & es_id_to_name = boundary.set_edgeset_name_map();
+      es_id_to_name.insert(other_es_id_to_name.begin(), other_es_id_to_name.end());
     } // end if (other_mesh)
 
   // Finally, we need to "merge" the overlapping nodes
