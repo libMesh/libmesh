@@ -1159,13 +1159,14 @@ public:
   GhostingFunctor & default_ghosting() { return *_default_ghosting; }
 
   /**
-   * Constructs a list of all subdomain identifiers in the global mesh.
+   * Constructs a list of all subdomain identifiers in the local mesh if
+   * \p global == false, and in the global mesh if \p global == true (default).
    * Subdomains correspond to separate subsets of the mesh which could correspond
    * e.g. to different materials in a solid mechanics application,
    * or regions where different physical processes are important.  The subdomain
    * mapping is independent from the parallel decomposition.
    */
-  void subdomain_ids (std::set<subdomain_id_type> & ids) const;
+  void subdomain_ids (std::set<subdomain_id_type> & ids, const bool global = true) const;
 
   /**
    * \returns The number of subdomains in the global mesh. Subdomains correspond
@@ -1175,6 +1176,15 @@ public:
    * from the parallel decomposition.
    */
   subdomain_id_type n_subdomains () const;
+
+  /**
+   * \returns The number of subdomains in the local mesh. Subdomains correspond
+   * to separate subsets of the mesh which could correspond e.g. to different
+   * materials in a solid mechanics application, or regions where different
+   * physical processes are important.  The subdomain mapping is independent
+   * from the parallel decomposition.
+   */
+  subdomain_id_type n_local_subdomains () const;
 
   /**
    * \returns The number of partitions which have been defined via
@@ -1190,13 +1200,28 @@ public:
   /**
    * \returns A string containing relevant information
    * about the mesh.
+   *
+   * \p verbosity sets the verbosity, with 0 being the least and 2 being the greatest.
+   * 0 - Dimensions, number of nodes, number of elems, number of subdomains, number of
+   *     partitions, prepared status.
+   * 1 - Adds the mesh bounding box, mesh element types, specific nodesets/edgesets/sidesets
+   *     with element types, number of nodes/edges/sides.
+   * 2 - Adds volume information and bounding boxes to boundary information.
+   *
+   * The \p global parameter pertains primarily to verbosity levels 1 and above.
+   * When \p global == true, information is only output on rank 0 and the information
+   * is reduced. When \p global == false, information is output on all ranks that pertains
+   * only to that local partition.
    */
-  std::string get_info () const;
+  std::string get_info (const unsigned int verbosity = 0, const bool global = true) const;
 
   /**
    * Prints relevant information about the mesh.
+   *
+   * Take note of the docstring for get_info() for more information pretaining to
+   * the \p verbosity and \p global parameters.
    */
-  void print_info (std::ostream & os=libMesh::out) const;
+  void print_info (std::ostream & os=libMesh::out, const unsigned int verbosity = 0, const bool global = true) const;
 
   /**
    * Equivalent to calling print_info() above, but now you can write:

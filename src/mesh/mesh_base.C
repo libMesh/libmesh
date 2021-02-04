@@ -35,11 +35,13 @@
 #include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_algebra.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/point_locator_base.h"
 #include "libmesh/threads.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_point_locator_type.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
@@ -560,10 +562,11 @@ void MeshBase::remove_ghosting_functor(GhostingFunctor & ghosting_functor)
 
 
 
-void MeshBase::subdomain_ids (std::set<subdomain_id_type> & ids) const
+void MeshBase::subdomain_ids (std::set<subdomain_id_type> & ids, const bool global /* = true */) const
 {
   // This requires an inspection on every processor
-  parallel_object_only();
+  if (global)
+    parallel_object_only();
 
   ids.clear();
 
@@ -571,7 +574,8 @@ void MeshBase::subdomain_ids (std::set<subdomain_id_type> & ids) const
     ids.insert(elem->subdomain_id());
 
   // Some subdomains may only live on other processors
-  this->comm().set_union(ids);
+  if (global)
+    this->comm().set_union(ids);
 }
 
 
@@ -584,6 +588,17 @@ subdomain_id_type MeshBase::n_subdomains() const
   std::set<subdomain_id_type> ids;
 
   this->subdomain_ids (ids);
+
+  return cast_int<subdomain_id_type>(ids.size());
+}
+
+
+
+subdomain_id_type MeshBase::n_local_subdomains() const
+{
+  std::set<subdomain_id_type> ids;
+
+  this->subdomain_ids (ids, /* global = */ false);
 
   return cast_int<subdomain_id_type>(ids.size());
 }
@@ -650,11 +665,11 @@ dof_id_type MeshBase::n_active_sub_elem () const
 
 
 
-std::string MeshBase::get_info() const
+std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const bool global /* = true */) const
 {
   std::ostringstream oss;
 
-  oss << " Mesh Information:"                                  << '\n';
+  oss << " Mesh Information:" << '\n';
 
   if (!_elem_dims.empty())
     {
@@ -666,27 +681,457 @@ std::string MeshBase::get_info() const
       oss << "}\n";
     }
 
-  oss << "  spatial_dimension()=" << this->spatial_dimension() << '\n'
-      << "  n_nodes()="           << this->n_nodes()           << '\n'
-      << "    n_local_nodes()="   << this->n_local_nodes()     << '\n'
-      << "  n_elem()="            << this->n_elem()            << '\n'
-      << "    n_local_elem()="    << this->n_local_elem()      << '\n'
+  oss << "  spatial_dimension()="     << this->spatial_dimension()                            << '\n'
+      << "  n_nodes()="               << this->n_nodes()                                      << '\n'
+      << "    n_local_nodes()="       << this->n_local_nodes()                                << '\n'
+      << "  n_elem()="                << this->n_elem()                                       << '\n'
+      << "    n_local_elem()="        << this->n_local_elem()                                 << '\n';
 #ifdef LIBMESH_ENABLE_AMR
-      << "    n_active_elem()="   << this->n_active_elem()     << '\n'
+  oss << "    n_active_elem()="       << this->n_active_elem()                                << '\n';
 #endif
-      << "  n_subdomains()="      << static_cast<std::size_t>(this->n_subdomains()) << '\n'
-      << "  n_partitions()="      << static_cast<std::size_t>(this->n_partitions()) << '\n'
-      << "  n_processors()="      << static_cast<std::size_t>(this->n_processors()) << '\n'
-      << "  n_threads()="         << static_cast<std::size_t>(libMesh::n_threads()) << '\n'
-      << "  processor_id()="      << static_cast<std::size_t>(this->processor_id()) << '\n';
+  if (global)
+    oss << "  n_subdomains()="        << static_cast<std::size_t>(this->n_subdomains())       << '\n';
+  else
+    oss << "  n_local_subdomains()= " << static_cast<std::size_t>(this->n_local_subdomains()) << '\n';
+  oss << "  n_partitions()="          << static_cast<std::size_t>(this->n_partitions())       << '\n'
+      << "  n_processors()="          << static_cast<std::size_t>(this->n_processors())       << '\n'
+      << "  n_threads()="             << static_cast<std::size_t>(libMesh::n_threads())       << '\n'
+      << "  processor_id()="          << static_cast<std::size_t>(this->processor_id())       << '\n'
+      << "  is_prepared()="           << (this->is_prepared() ? "true" : "false")             << '\n'
+      << "  is_replicated()="         << (this->is_replicated() ? "true" : "false")           << '\n';
+
+  if (verbosity > 0)
+    {
+      if (global)
+        {
+          libmesh_parallel_only(this->comm());
+          if (this->processor_id() != 0)
+            oss << "\n Detailed global get_info() (verbosity > 0) is reduced and output to only rank 0.";
+        }
+
+      // Helper for printing element types
+      const auto elem_type_helper = [](const std::set<int> & elem_types) {
+        std::stringstream ss;
+        for (auto it = elem_types.begin(); it != elem_types.end();)
+          {
+            ss << Utility::enum_to_string((ElemType)*it);
+            if (++it != elem_types.end())
+              ss << ", ";
+          }
+        return ss.str();
+      };
+
+      // Helper for whether or not the given DofObject is to be included. If we're doing
+      // a global reduction, we also count unpartitioned objects on rank 0.
+      const auto include_object = [this, &global](const DofObject & dof_object) {
+        return this->processor_id() == dof_object.processor_id() ||
+               (global &&
+                this->processor_id() == 0 &&
+                dof_object.processor_id() == DofObject::invalid_processor_id);
+      };
+
+      Real volume = 0;
+
+      // Add bounding box information
+      const auto bbox = global ? MeshTools::create_bounding_box(*this) : MeshTools::create_local_bounding_box(*this);
+      if (!global || this->processor_id() == 0)
+        oss << "\n " << (global ? "" : "Local ") << "Mesh Bounding Box:\n"
+            << "  Minimum: " << bbox.min()                << "\n"
+            << "  Maximum: " << bbox.max()                << "\n"
+            << "  Delta:   " << (bbox.max() - bbox.min()) << "\n";
+
+      // Obtain the global or local element types
+      std::set<int> elem_types;
+      for (const Elem * elem : this->active_local_element_ptr_range())
+        elem_types.insert(elem->type());
+      if (global)
+        {
+          // Pick up unpartitioned elems on rank 0
+          if (this->processor_id() == 0)
+            for (const Elem * elem : as_range(this->active_unpartitioned_elements_begin(),
+                                              this->active_unpartitioned_elements_end()))
+              elem_types.insert(elem->type());
+
+          this->comm().set_union(elem_types);
+        }
+
+      // Add element types
+      if (!global || this->processor_id() == 0)
+        oss << "\n " << (global ? "" : "Local ") << "Mesh Element Type(s):\n  "
+            << elem_type_helper(elem_types) << "\n";
+
+      // Reduce the nodeset ids
+      auto nodeset_ids = this->get_boundary_info().get_node_boundary_ids();
+      if (global)
+        this->comm().set_union(nodeset_ids);
+
+      // Accumulate local information for each nodeset
+      struct NodesetInfo
+      {
+        std::size_t num_nodes = 0;
+        BoundingBox bbox;
+      };
+      std::map<boundary_id_type, NodesetInfo> nodeset_info_map;
+      for (const auto & pair : this->get_boundary_info().get_nodeset_map())
+        {
+          const Node * node = pair.first;
+          if (!include_object(*node))
+            continue;
+
+          const auto id = pair.second;
+          NodesetInfo & info = nodeset_info_map[id];
+
+          ++info.num_nodes;
+
+          if (verbosity > 1)
+            info.bbox.union_with(*node);
+        }
+
+      // Add nodeset info
+      if (!global || this->processor_id() == 0)
+        {
+          oss << "\n " << (global ? "" : "Local ") << "Mesh Nodesets:\n";
+          if (nodeset_ids.empty())
+            oss << "  None\n";
+        }
+
+      const auto & nodeset_name_map = this->get_boundary_info().get_sideset_name_map();
+      for (const auto id : nodeset_ids)
+        {
+          NodesetInfo & info = nodeset_info_map[id];
+
+          // Reduce the local information for this nodeset if required
+          if (global)
+            {
+              this->comm().sum(info.num_nodes);
+              if (verbosity > 1)
+                {
+                  this->comm().min(info.bbox.min());
+                  this->comm().min(info.bbox.max());
+                }
+            }
+
+          const bool has_name = nodeset_name_map.count(id) && nodeset_name_map.at(id).size();
+          const std::string name = has_name ? nodeset_name_map.at(id) : "";
+          if (global)
+            libmesh_assert(this->comm().verify(name));
+
+          if (global ? this->processor_id() == 0 : info.num_nodes > 0)
+            {
+              oss << "  Nodeset " << id;
+              if (has_name)
+                oss << " (" << name << ")";
+              oss << ", " << info.num_nodes << " " << (global ? "" : "local ") << "nodes\n";
+
+              if (verbosity > 1)
+              {
+                oss << "   " << (global ? "Bounding" : "Local bounding") << " box minimum: "
+                    << info.bbox.min() << "\n"
+                    << "   " << (global ? "Bounding" : "Local bounding") << " box maximum: "
+                    << info.bbox.max() << "\n"
+                    << "   " << (global ? "Bounding" : "Local bounding") << " box delta: "
+                    << (info.bbox.max() - info.bbox.min()) << "\n";
+              }
+            }
+        }
+
+      // Reduce the sideset ids
+      auto sideset_ids = this->get_boundary_info().get_side_boundary_ids();
+      if (global)
+        this->comm().set_union(sideset_ids);
+
+      // Accumulate local information for each sideset
+      struct SidesetInfo
+      {
+        std::size_t num_sides = 0;
+        Real volume = 0;
+        std::set<int> side_elem_types;
+        std::set<int> elem_types;
+        std::set<dof_id_type> elem_ids;
+        std::set<dof_id_type> node_ids;
+        BoundingBox bbox;
+      };
+      std::map<boundary_id_type, SidesetInfo> sideset_info_map;
+      for (const auto & pair : this->get_boundary_info().get_sideset_map())
+        {
+          const Elem * elem = pair.first;
+          if (!include_object(*elem))
+            continue;
+
+          const auto id = pair.second.second;
+          SidesetInfo & info = sideset_info_map[id];
+
+          const auto s = pair.second.first;
+          const auto side = elem->build_side_ptr(s);
+
+          ++info.num_sides;
+          info.side_elem_types.insert(side->type());
+          info.elem_types.insert(elem->type());
+          info.elem_ids.insert(elem->id());
+
+          for (const Node & node : side->node_ref_range())
+            if (include_object(node))
+              info.node_ids.insert(node.id());
+
+          if (verbosity > 1)
+          {
+            info.volume += side->volume();
+            info.bbox.union_with(side->loose_bounding_box());
+          }
+        }
+
+      // Add sideset info
+      if (!global || this->processor_id() == 0)
+        {
+          oss << "\n " << (global ? "" : "Local ") << "Mesh Sidesets:\n";
+          if (sideset_ids.empty())
+            oss << "  None\n";
+        }
+      const auto & sideset_name_map = this->get_boundary_info().get_sideset_name_map();
+      for (const auto id : sideset_ids)
+        {
+          SidesetInfo & info = sideset_info_map[id];
+
+          auto num_elems = info.elem_ids.size();
+          auto num_nodes = info.node_ids.size();
+
+          // Reduce the local information for this sideset if required
+          if (global)
+            {
+              this->comm().sum(info.num_sides);
+              this->comm().set_union(info.side_elem_types, 0);
+              this->comm().sum(num_elems);
+              this->comm().set_union(info.elem_types, 0);
+              this->comm().sum(num_nodes);
+              if (verbosity > 1)
+              {
+                this->comm().sum(info.volume);
+                this->comm().min(info.bbox.min());
+                this->comm().max(info.bbox.max());
+              }
+            }
+
+          const bool has_name = sideset_name_map.count(id) && sideset_name_map.at(id).size();
+          const std::string name = has_name ? sideset_name_map.at(id) : "";
+          if (global)
+            libmesh_assert(this->comm().verify(name));
+
+          if (global ? this->processor_id() == 0 : info.num_sides > 0)
+            {
+              oss << "  Sideset " << id;
+              if (has_name)
+                oss << " (" << name << ")";
+              oss << ", " << info.num_sides << " sides (" << elem_type_helper(info.side_elem_types) << ")"
+                  << ", " << num_elems << " " << (global ? "" : "local ") << "elems (" << elem_type_helper(info.elem_types) << ")"
+                  << ", " << num_nodes << " " << (global ? "" : "local ") << "nodes\n";
+
+              if (verbosity > 1)
+              {
+                oss << "   " << (global ? "Side" : "Local side") << " volume: " << info.volume << "\n"
+                    << "   " << (global ? "Bounding" : "Local bounding") << " box minimum: "
+                    << info.bbox.min() << "\n"
+                    << "   " << (global ? "Bounding" : "Local bounding") << " box maximum: "
+                    << info.bbox.max() << "\n"
+                    << "   " << (global ? "Bounding" : "Local bounding") << " box delta: "
+                    << (info.bbox.max() - info.bbox.min()) << "\n";
+              }
+            }
+        }
+
+      // Reduce the edgeset ids
+      auto edgeset_ids = this->get_boundary_info().get_edge_boundary_ids();
+      if (global)
+        this->comm().set_union(edgeset_ids);
+
+      // Accumulate local information for each edgeset
+      struct EdgesetInfo
+      {
+        std::size_t num_edges = 0;
+        std::set<int> edge_elem_types;
+        BoundingBox bbox;
+      };
+      std::map<boundary_id_type, EdgesetInfo> edgeset_info_map;
+      for (const auto & pair : this->get_boundary_info().get_edgeset_map())
+        {
+          const Elem * elem = pair.first;
+          if (!include_object(*elem))
+            continue;
+
+          const auto id = pair.second.second;
+          EdgesetInfo & info = edgeset_info_map[id];
+
+          const auto edge = elem->build_edge_ptr(pair.second.first);
+
+          ++info.num_edges;
+          info.edge_elem_types.insert(edge->type());
+
+          if (verbosity > 1)
+            info.bbox.union_with(edge->loose_bounding_box());
+        }
+
+      // Add edgeset info
+      if (!global || this->processor_id() == 0)
+        {
+          oss << "\n " << (global ? "" : "Local ") << "Mesh Edgesets:\n";
+          if (edgeset_ids.empty())
+            oss << "  None\n";
+        }
+
+      const auto & edgeset_name_map = this->get_boundary_info().get_edgeset_name_map();
+      for (const auto id : edgeset_ids)
+        {
+          EdgesetInfo & info = edgeset_info_map[id];
+
+          // Reduce the local information for this edgeset if required
+          if (global)
+            {
+              this->comm().sum(info.num_edges);
+              this->comm().set_union(info.edge_elem_types, 0);
+              if (verbosity > 1)
+                {
+                  this->comm().min(info.bbox.min());
+                  this->comm().min(info.bbox.max());
+                }
+            }
+
+          const bool has_name = edgeset_name_map.count(id) && edgeset_name_map.at(id).size();
+          const std::string name = has_name ? edgeset_name_map.at(id) : "";
+          if (global)
+            libmesh_assert(this->comm().verify(name));
+
+          if (global ? this->processor_id() == 0 : info.num_edges > 0)
+            {
+              oss << "  Edgeset " << id;
+              if (has_name)
+                oss << " (" << name << ")";
+              oss << ", " << info.num_edges << " " << (global ? "" : "local ") << "edges ("
+                  << elem_type_helper(info.edge_elem_types) << ")\n";
+
+              if (verbosity > 1)
+              {
+                oss << "   " << (global ? "Bounding" : "Local bounding") << " box minimum: "
+                    << info.bbox.min() << "\n"
+                    << "   " << (global ? "Bounding" : "Local bounding") << " box maximum: "
+                    << info.bbox.max() << "\n"
+                    << "   " << (global ? "Bounding" : "Local bounding") << " box delta: "
+                    << (info.bbox.max() - info.bbox.min()) << "\n";
+              }
+            }
+        }
+
+      // Reduce the block IDs and block names
+      std::set<subdomain_id_type> subdomains;
+      for (const Elem * elem : this->active_element_ptr_range())
+        if (include_object(*elem))
+          subdomains.insert(elem->subdomain_id());
+      if (global)
+        this->comm().set_union(subdomains);
+
+      // Accumulate local information for each subdomain
+      struct SubdomainInfo
+      {
+        std::size_t num_elems = 0;
+        Real volume = 0;
+        std::set<int> elem_types;
+        std::set<dof_id_type> active_node_ids;
+#ifdef LIBMESH_ENABLE_AMR
+        std::size_t num_active_elems = 0;
+#endif
+        BoundingBox bbox;
+      };
+      std::map<subdomain_id_type, SubdomainInfo> subdomain_info_map;
+      for (const Elem * elem : this->element_ptr_range())
+        if (include_object(*elem))
+          {
+            SubdomainInfo & info = subdomain_info_map[elem->subdomain_id()];
+
+            ++info.num_elems;
+            info.elem_types.insert(elem->type());
+
+#ifdef LIBMESH_ENABLE_AMR
+            if (elem->active())
+              ++info.num_active_elems;
+#endif
+
+            for (const Node & node : elem->node_ref_range())
+              if (include_object(node) && node.active())
+                info.active_node_ids.insert(node.id());
+
+            if (verbosity > 1 && elem->active())
+              {
+                info.volume += elem->volume();
+                info.bbox.union_with(elem->loose_bounding_box());
+              }
+          }
+
+      // Add subdomain info
+      oss << "\n " << (global ? "" : "Local ") << "Mesh Subdomains:\n";
+      const auto & subdomain_name_map = this->get_subdomain_name_map();
+      for (const auto id : subdomains)
+      {
+        SubdomainInfo & info = subdomain_info_map[id];
+
+        auto num_active_nodes = info.active_node_ids.size();
+
+        // Reduce the information for this subdomain if needed
+        if (global)
+          {
+            this->comm().sum(info.num_elems);
+#ifdef LIBMESH_ENABLE_AMR
+            this->comm().sum(info.num_active_elems);
+#endif
+            this->comm().sum(num_active_nodes);
+            this->comm().set_union(info.elem_types, 0);
+            if (verbosity > 1)
+            {
+              this->comm().min(info.bbox.min());
+              this->comm().max(info.bbox.max());
+              this->comm().sum(info.volume);
+            }
+          }
+        if (verbosity > 1)
+          volume += info.volume;
+
+        const bool has_name = subdomain_name_map.count(id);
+        const std::string name = has_name ? subdomain_name_map.at(id) : "";
+        if (global)
+          libmesh_assert(this->comm().verify(name));
+
+        if (!global || this->processor_id() == 0)
+          {
+            oss << "  Subdomain " << id;
+            if (has_name)
+              oss << " (" << name << ")";
+            oss << ": " << info.num_elems << " " << (global ? "" : "local ") << "elems "
+                << "(" << elem_type_helper(info.elem_types);
+#ifdef LIBMESH_ENABLE_AMR
+            oss << ", " << info.num_active_elems << " active";
+#endif
+            oss << "), " << num_active_nodes << " " << (global ? "" : "local ") << "active nodes\n";
+            if (verbosity > 1)
+            {
+              oss << "   " << (global ? "Volume" : "Local volume") << ": " << info.volume << "\n";
+              oss << "   " << (global ? "Bounding" : "Local bounding") << " box minimum: "
+                  << info.bbox.min() << "\n"
+                  << "   " << (global ? "Bounding" : "Local bounding") << " box maximum: "
+                  << info.bbox.max() << "\n"
+                  << "   " << (global ? "Bounding" : "Local bounding") << " box delta: "
+                  << (info.bbox.max() - info.bbox.min()) << "\n";
+            }
+          }
+      }
+
+      oss << "  " << (global ? "Global" : "Local") << " mesh volume = " << volume << "\n";
+
+    }
 
   return oss.str();
 }
 
 
-void MeshBase::print_info(std::ostream & os) const
+void MeshBase::print_info(std::ostream & os, const unsigned int verbosity /* = 0 */, const bool global /* = true */) const
 {
-  os << this->get_info()
+  os << this->get_info(verbosity, global)
      << std::endl;
 }
 

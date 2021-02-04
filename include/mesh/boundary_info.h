@@ -838,6 +838,23 @@ public:
    */
   static const boundary_id_type invalid_id;
 
+  /**
+   * \returns A const reference to the nodeset map.
+   */
+  const std::multimap<const Node *, boundary_id_type> & get_nodeset_map () const
+  { return _boundary_node_id; }
+
+  /**
+   * \returns A const reference to the edgeset map.
+   */
+  const std::multimap<const Elem *, std::pair<unsigned short int, boundary_id_type>> & get_edgeset_map () const
+  { return _boundary_edge_id; }
+
+  /**
+   * \returns A const reference to the sideset map.
+   */
+  const std::multimap<const Elem *, std::pair<unsigned short int, boundary_id_type>> & get_sideset_map() const
+  { return _boundary_side_id; }
 
 private:
 
