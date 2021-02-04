@@ -77,7 +77,7 @@ MeshFunction::~MeshFunction () = default;
 
 
 
-void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
+void MeshFunction::init ()
 {
   // are indices of the desired variable(s) provided?
   libmesh_assert_greater (this->_system_vars.size(), 0);
@@ -89,18 +89,27 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
       return;
     }
 
-  /*
-   * set up the PointLocator: currently we always get this from the
-   * MeshBase we're associated with.
-   */
+  // The Mesh owns the "master" PointLocator, while handing us a
+  // PointLocator "proxy" that forwards all requests to the master.
   const MeshBase & mesh = this->_eqn_systems.get_mesh();
-
-  // Take ownership
   _point_locator = mesh.sub_point_locator();
 
   // ready for use
   this->_initialized = true;
 }
+
+
+
+void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
+{
+  libmesh_deprecated();
+
+  // Call the init() taking no args instead. Note: this is backwards
+  // compatible because the argument was not used for anything
+  // previously anyway.
+  this->init();
+}
+
 
 
 void
@@ -805,6 +814,7 @@ void MeshFunction::disable_out_of_mesh_mode()
 void MeshFunction::set_point_locator_tolerance(Real tol)
 {
   _point_locator->set_close_to_point_tol(tol);
+  _point_locator->set_contains_point_tol(tol);
 }
 
 void MeshFunction::unset_point_locator_tolerance()
