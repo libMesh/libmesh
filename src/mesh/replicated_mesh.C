@@ -1499,26 +1499,8 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
     {
       LOG_SCOPE("stitch_meshes clear bcids", "ReplicatedMesh");
 
-      // Container to catch boundary IDs passed back from BoundaryInfo.
-      std::vector<boundary_id_type> bc_ids;
-
-      for (auto & el : element_ptr_range())
-        for (auto side_id : el->side_index_range())
-          if (el->neighbor_ptr(side_id) != nullptr)
-            {
-              // Completely remove the side from the boundary_info object if it has either
-              // this_mesh_boundary_id or other_mesh_boundary_id.
-              this->get_boundary_info().boundary_ids (el, side_id, bc_ids);
-
-              if (std::find(bc_ids.begin(), bc_ids.end(), this_mesh_boundary_id) != bc_ids.end() ||
-                  std::find(bc_ids.begin(), bc_ids.end(), other_mesh_boundary_id) != bc_ids.end())
-                this->get_boundary_info().remove_side(el, side_id);
-            }
-
-      // Removing stitched-away boundary ids might have removed an id
-      // *entirely*, so we need to recompute boundary id sets to check
-      // for that.
-      this->get_boundary_info().regenerate_id_sets();
+      this->get_boundary_info().clear_stitched_boundary_side_ids(
+          this_mesh_boundary_id, other_mesh_boundary_id, /*clear_nodeset_data=*/true);
     }
 }
 

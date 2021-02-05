@@ -346,6 +346,17 @@ public:
                     const boundary_id_type id);
 
   /**
+   * Clear sideset information along a stitched mesh interface
+   * @param sideset_id A sideset on one side of the stitched mesh interface
+   * @param other_sideset_id The sideset on the other side of the stitched mesh interface
+   * @param clear_nodeset_data Whether to clear boundary information for the nodes along
+   *                           the stitched mesh interface
+   */
+  void clear_stitched_boundary_side_ids (boundary_id_type sideset_id,
+                                         boundary_id_type other_sideset_id,
+                                         bool clear_nodeset_data = false);
+
+  /**
    * Removes all entities (nodes, sides, edges, shellfaces) with boundary
    * id \p id from their respective containers and erases any record of
    * \p id's existence from the BoundaryInfo object.  That is, after
