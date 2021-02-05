@@ -121,7 +121,7 @@ public:
       CPPUNIT_ASSERT_EQUAL(header_info.num_dim, 2);
       CPPUNIT_ASSERT_EQUAL(header_info.num_elem, 9);
       CPPUNIT_ASSERT_EQUAL(header_info.num_elem_blk, 1);
-      CPPUNIT_ASSERT_EQUAL(header_info.num_node_sets, 0);
+      CPPUNIT_ASSERT_EQUAL(header_info.num_node_sets, 4);
       CPPUNIT_ASSERT_EQUAL(header_info.num_side_sets, 4);
       CPPUNIT_ASSERT_EQUAL(header_info.num_edge_blk, 0);
       CPPUNIT_ASSERT_EQUAL(header_info.num_edge, 0);
