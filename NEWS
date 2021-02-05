@@ -1,3 +1,10 @@
+1.6.0 -> 1.6.1
+  * Make ReferenceCounter::increment_{de,con}structor_count() noexcept
+  * Generalize default constructors for TypeTensor and TypeVector
+  * Re-reserve non-zero pattern after Eigen::setZero
+  * Fix compilation with both CAPNP and GLPK enabled
+  * Do *not* sync done_saving_ids across processors
+
 1.5.1 -> 1.6.0
   * Exodus/Nemesis
     - Add MappedOutputVector/MappedInputVector classes for single-precision I/O
