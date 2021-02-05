@@ -179,7 +179,15 @@ void EigenSparseMatrix<T>::clear ()
 template <typename T>
 void EigenSparseMatrix<T>::zero ()
 {
+  // This doesn't just zero, it clears the entire non-zero structure!
   _mat.setZero();
+
+  if (this->_sp)
+  {
+    // Re-reserve our non-zero structure
+    const std::vector<numeric_index_type> & n_nz = this->_sp->get_n_nz();
+    _mat.reserve(n_nz);
+  }
 }
 
 
