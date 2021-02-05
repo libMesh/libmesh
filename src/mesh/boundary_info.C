@@ -161,12 +161,19 @@ void BoundaryInfo::clear()
 
 void BoundaryInfo::regenerate_id_sets()
 {
+  const auto old_ss_id_to_name = _ss_id_to_name;
+  const auto old_ns_id_to_name = _ns_id_to_name;
+  const auto old_es_id_to_name = _es_id_to_name;
+
   // Clear the old caches
   _boundary_ids.clear();
   _side_boundary_ids.clear();
   _node_boundary_ids.clear();
   _edge_boundary_ids.clear();
   _shellface_boundary_ids.clear();
+  _ss_id_to_name.clear();
+  _ns_id_to_name.clear();
+  _es_id_to_name.clear();
 
   // Loop over id maps to regenerate each set.
   for (const auto & pr : _boundary_node_id)
@@ -174,6 +181,9 @@ void BoundaryInfo::regenerate_id_sets()
       const boundary_id_type id = pr.second;
       _boundary_ids.insert(id);
       _node_boundary_ids.insert(id);
+      auto it = old_ns_id_to_name.find(id);
+      if (it != old_ns_id_to_name.end())
+        _ns_id_to_name.emplace(id, it->second);
     }
 
   for (const auto & pr : _boundary_edge_id)
@@ -181,6 +191,9 @@ void BoundaryInfo::regenerate_id_sets()
       const boundary_id_type id = pr.second.second;
       _boundary_ids.insert(id);
       _edge_boundary_ids.insert(id);
+      auto it = old_es_id_to_name.find(id);
+      if (it != old_es_id_to_name.end())
+        _es_id_to_name.emplace(id, it->second);
     }
 
   for (const auto & pr : _boundary_side_id)
@@ -188,6 +201,9 @@ void BoundaryInfo::regenerate_id_sets()
       const boundary_id_type id = pr.second.second;
       _boundary_ids.insert(id);
       _side_boundary_ids.insert(id);
+      auto it = old_ss_id_to_name.find(id);
+      if (it != old_ss_id_to_name.end())
+        _ss_id_to_name.emplace(id, it->second);
     }
 
   for (const auto & pr : _boundary_shellface_id)
@@ -196,6 +212,11 @@ void BoundaryInfo::regenerate_id_sets()
       _boundary_ids.insert(id);
       _shellface_boundary_ids.insert(id);
     }
+
+  // Handle global data
+  _communicator.set_union(_ss_id_to_name);
+  _communicator.set_union(_ns_id_to_name);
+  _communicator.set_union(_es_id_to_name);
 }
 
 
