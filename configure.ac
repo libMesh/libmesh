@@ -171,51 +171,12 @@ AS_IF([test "x$enablemarch" != "xno"],
       ])
 
 # --------------------------------------------------------------
-# Allow the user to explicitly turn off C++11 support by saying
-# --disable-cxx11?  This is no longer supported.
-#
-# We'll leave the "option" in place for a release, though, just in
-# case anyone is specifying --enable-cxx11 in their build scripts
+# Autoconf macro for determining the proper -std=c++??
+# flag, for the current compiler, for the user's requested C++
+# standards level.  Adds the required flag to CXXFLAGS if
+# one is found.  Exits if no acceptable flag is found.
 # --------------------------------------------------------------
-AC_ARG_ENABLE(cxx11,
-              AC_HELP_STRING([--disable-cxx11],
-                             [build without C++11 support (no longer supported!)]),
-              [AS_CASE("${enableval}",
-                       [yes], [enablecxx11=yes],
-                       [no],  [AC_MSG_ERROR(libMesh now requires C++11)],
-                       [AC_MSG_ERROR(bad value ${enableval} for --disable-cxx11)])],
-              [enablecxx11=irrelevant])
-
-AS_IF([test $enablecxx11 != irrelevant],
-      [AC_MSG_WARN([--enable/disable-cxx11 are now deprecated])])
-enablecxx11=yes
-
-# --------------------------------------------------------------
-# Setting --enable-cxx11-required causes an error to be emitted during
-# configure if the compiler does not support a specific subset of
-# C++11 features.  This is useful for app codes which require C++11,
-# since it prevents situations where libmesh is built without C++11
-# support (which may take a very long time), and then the app fails to
-# compile, requiring you to redo everything.
-# --------------------------------------------------------------
-AC_ARG_ENABLE(cxx11-required,
-              AC_HELP_STRING([--enable-cxx11-required],
-                             [Error if compiler does not support C++11]),
-              [AS_CASE("${enableval}",
-                       [yes], [cxx11required=yes],
-                       [no],  [cxx11required=no],
-                       [AC_MSG_ERROR(bad value ${enableval} for --enable-cxx11-required)])],
-              [cxx11required=irrelevant])
-
-AS_IF([test $cxx11required != irrelevant],
-      [AC_MSG_WARN([C++11 is now always required for libMesh])])
-
-# --------------------------------------------------------------
-# Standard autoconf macro for determining the proper -std=c++11
-# flag for the current compiler.  Adds the result to CXXFLAGS if
-# one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
-# --------------------------------------------------------------
-AX_CXX_COMPILE_STDCXX_11([],[mandatory])
+ACSM_CXX_COMPILER_STANDARD([2011], [2017])
 
 # --------------------------------------------------------------
 # See compiler.m4 for the definition of this function.  It uses the
@@ -291,130 +252,6 @@ AS_IF([test "x$enableparanoid" != "xyes"],
            AC_MSG_RESULT(<<< Disabling extra paranoid compiler warnings >>>)])
          CXXFLAGS="$old_CXXFLAGS"])
 AC_SUBST(ANY_PARANOID_FLAGS)
-
-# --------------------------------------------------------------
-# Test for mandatory C++11 features, those which libMesh now requires
-# for internal use.
-# --------------------------------------------------------------
-LIBMESH_TEST_CXX11_AUTO
-AS_IF([test "x$have_cxx11_auto" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 auto variable support])])
-
-LIBMESH_TEST_CXX11_RANGEFOR
-AS_IF([test "x$have_cxx11_rangefor" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 ranged-for loop support])])
-
-# Technically we require uniform initialization, but this is the
-# closest test we have
-LIBMESH_TEST_CXX11_INITIALIZER_LIST
-AS_IF([test "x$have_cxx11_initializer_list" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 initializer list support])])
-
-LIBMESH_TEST_CXX11_UNIQUE_PTR
-AS_IF([test "x$have_cxx11_unique_ptr" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 std::unique_ptr support])])
-
-LIBMESH_TEST_CXX11_MAKE_UNIQUE_WORKAROUND
-AS_IF([test "x$have_cxx11_make_unique_workaround" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 variadic template support])])
-
-LIBMESH_TEST_CXX11_TUPLE
-AS_IF([test "x$have_cxx11_tuple" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 std::tuple support])])
-
-LIBMESH_TEST_CXX11_LAMBDA
-AS_IF([test "x$have_cxx11_lambda" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 lambda support])])
-
-LIBMESH_TEST_CXX11_FIXED_TYPE_ENUM
-AS_IF([test "x$have_cxx11_fixed_type_enum" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 fixed type enumeration support])])
-
-LIBMESH_TEST_CXX11_FIXED_TYPE_ENUM_FWD
-AS_IF([test "x$have_cxx11_fixed_type_enum_fwd" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 fixed type enumeration forward declaration support])])
-
-LIBMESH_TEST_CXX11_OVERRIDE
-AS_IF([test "x$have_cxx11_override" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 compiler support the override keyword])])
-
-LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS
-AS_IF([test "x$have_cxx11_move_constructors" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 move constructor support])])
-
-LIBMESH_TEST_CXX11_DELETED_FUNCTIONS
-AS_IF([test "x$have_cxx11_deleted_functions" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 deleted function support])])
-
-LIBMESH_TEST_CXX11_DEFAULTED_FUNCTIONS
-AS_IF([test "x$have_cxx11_defaulted_functions" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 defaulted function support])])
-
-LIBMESH_TEST_CXX11_NULLPTR
-AS_IF([test "x$have_cxx11_nullptr" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires the C++11 nullptr keyword])])
-
-LIBMESH_TEST_CXX11_FINAL
-AS_IF([test "x$have_cxx11_final" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires the C++11 final keyword])])
-
-LIBMESH_TEST_CXX11_DECLTYPE
-AS_IF([test "x$have_cxx11_decltype" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires the C++11 decltype keyword])])
-
-LIBMESH_TEST_CXX11_BEGIN_END
-AS_IF([test "x$have_cxx11_begin_end" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 std::begin/end support])])
-
-LIBMESH_TEST_CXX11_CONTAINER_ERASE
-AS_IF([test "x$have_cxx11_container_erase" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 support for std container erase() functions returning iterators])])
-
-LIBMESH_TEST_CXX11_CONTAINER_EMPLACE
-AS_IF([test "x$have_cxx11_container_emplace" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 support for std container emplace() functions])])
-
-LIBMESH_TEST_CXX11_IOTA
-AS_IF([test "x$have_cxx11_iota" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 support for std::iota])])
-
-LIBMESH_TEST_CXX11_VECTOR_DATA
-AS_IF([test "x$have_cxx11_vector_data" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 support for std::vector::data()])])
-
-LIBMESH_TEST_CXX11_SHARED_PTR
-AS_IF([test "x$have_cxx11_shared_ptr" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 support for std::shared_ptr])])
-
-LIBMESH_TEST_CXX11_RVALUE_REFERENCES
-AS_IF([test "x$have_cxx11_rvalue_references" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 support for rvalue references])])
-
-LIBMESH_TEST_CXX11_TO_STRING
-AS_IF([test "x$have_cxx11_to_string" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 support for std::to_string()])])
-
-LIBMESH_TEST_CXX11_CONSTEXPR
-AS_IF([test "x$have_cxx11_constexpr" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 support for constexpr])])
-
-LIBMESH_TEST_CXX11_VARIADIC_TEMPLATES
-AS_IF([test "x$have_cxx11_variadic_templates" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 support for variadic templates])])
-
-LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS
-AS_IF([test "x$have_cxx11_alias_declarations" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 support for alias declarations])])
-
-LIBMESH_TEST_CXX11_ARRAY
-AS_IF([test "x$have_cxx11_array" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 support for std::array])])
-
-LIBMESH_TEST_CXX11_ISNAN_ISINF
-AS_IF([test "x$have_cxx11_isnan" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 support for std::isnan])])
-AS_IF([test "x$have_cxx11_isinf" != "xyes"],
-      [AC_MSG_ERROR([libMesh requires C++11 support for std::isinf])])
 
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims

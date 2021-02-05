@@ -1,7 +1,173 @@
 dnl ----------------------------------------------------------------
 dnl Tests for various C++11 features.  These will probably only work
-dnl if they are run after the autoconf test that sets -std=c++11.
+dnl if they are run after the autoconf test that sets e.g. -std=c++11.
 dnl ----------------------------------------------------------------
+
+dnl Run the "mandatory" collection of C++ (currently C++11) tests.  Set
+dnl have_cxx_all=yes if all pass, no if not.
+dnl
+dnl This is in the ACSM namespace because it is a "callback" from an
+dnl ACSM macro.
+
+AC_DEFUN([ACSM_TEST_CXX_ALL],
+  [
+    # If nothing fails later we're good to go
+    have_cxx_all=yes
+
+    # --------------------------------------------------------------
+    # Test for mandatory C++11 features, those which libMesh now requires
+    # for internal use.
+    # --------------------------------------------------------------
+    LIBMESH_TEST_CXX11_AUTO
+    AS_IF([test "x$have_cxx11_auto" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 auto variable support])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_RANGEFOR
+    AS_IF([test "x$have_cxx11_rangefor" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 ranged-for loop support])
+           have_cxx_all=no])
+
+    # Technically we require uniform initialization, but this is the
+    # closest test we have
+    LIBMESH_TEST_CXX11_INITIALIZER_LIST
+    AS_IF([test "x$have_cxx11_initializer_list" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 initializer list support])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_UNIQUE_PTR
+    AS_IF([test "x$have_cxx11_unique_ptr" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 std::unique_ptr support])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_MAKE_UNIQUE_WORKAROUND
+    AS_IF([test "x$have_cxx11_make_unique_workaround" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 variadic template support])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_TUPLE
+    AS_IF([test "x$have_cxx11_tuple" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 std::tuple support])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_LAMBDA
+    AS_IF([test "x$have_cxx11_lambda" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 lambda support])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_FIXED_TYPE_ENUM
+    AS_IF([test "x$have_cxx11_fixed_type_enum" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 fixed type enumeration support])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_FIXED_TYPE_ENUM_FWD
+    AS_IF([test "x$have_cxx11_fixed_type_enum_fwd" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 fixed type enumeration forward declaration support])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_OVERRIDE
+    AS_IF([test "x$have_cxx11_override" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 compiler support the override keyword])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS
+    AS_IF([test "x$have_cxx11_move_constructors" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 move constructor support])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_DELETED_FUNCTIONS
+    AS_IF([test "x$have_cxx11_deleted_functions" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 deleted function support])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_DEFAULTED_FUNCTIONS
+    AS_IF([test "x$have_cxx11_defaulted_functions" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 defaulted function support])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_NULLPTR
+    AS_IF([test "x$have_cxx11_nullptr" != "xyes"],
+          [AC_MSG_WARN([libMesh requires the C++11 nullptr keyword])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_FINAL
+    AS_IF([test "x$have_cxx11_final" != "xyes"],
+          [AC_MSG_WARN([libMesh requires the C++11 final keyword])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_DECLTYPE
+    AS_IF([test "x$have_cxx11_decltype" != "xyes"],
+          [AC_MSG_WARN([libMesh requires the C++11 decltype keyword])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_BEGIN_END
+    AS_IF([test "x$have_cxx11_begin_end" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 std::begin/end support])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_CONTAINER_ERASE
+    AS_IF([test "x$have_cxx11_container_erase" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 support for std container erase() functions returning iterators])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_CONTAINER_EMPLACE
+    AS_IF([test "x$have_cxx11_container_emplace" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 support for std container emplace() functions])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_IOTA
+    AS_IF([test "x$have_cxx11_iota" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 support for std::iota])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_VECTOR_DATA
+    AS_IF([test "x$have_cxx11_vector_data" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 support for std::vector::data()])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_SHARED_PTR
+    AS_IF([test "x$have_cxx11_shared_ptr" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 support for std::shared_ptr])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_RVALUE_REFERENCES
+    AS_IF([test "x$have_cxx11_rvalue_references" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 support for rvalue references])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_TO_STRING
+    AS_IF([test "x$have_cxx11_to_string" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 support for std::to_string()])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_CONSTEXPR
+    AS_IF([test "x$have_cxx11_constexpr" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 support for constexpr])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_VARIADIC_TEMPLATES
+    AS_IF([test "x$have_cxx11_variadic_templates" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 support for variadic templates])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS
+    AS_IF([test "x$have_cxx11_alias_declarations" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 support for alias declarations])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_ARRAY
+    AS_IF([test "x$have_cxx11_array" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 support for std::array])
+           have_cxx_all=no])
+
+    LIBMESH_TEST_CXX11_ISNAN_ISINF
+    AS_IF([test "x$have_cxx11_isnan" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 support for std::isnan])
+           have_cxx_all=no])
+    AS_IF([test "x$have_cxx11_isinf" != "xyes"],
+          [AC_MSG_WARN([libMesh requires C++11 support for std::isinf])
+           have_cxx_all=no])
+  ])
 
 dnl Test C++11 std::isnan, std::isinf
 AC_DEFUN([LIBMESH_TEST_CXX11_ISNAN_ISINF],
@@ -12,7 +178,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_ISNAN_ISINF],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_MSG_CHECKING(for C++11 std::isnan)
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
@@ -56,7 +222,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_ARRAY],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <array>
@@ -85,7 +251,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_VECTOR_DATA],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <vector>
@@ -113,7 +279,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_IOTA],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <vector>
@@ -142,7 +308,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_CONTAINER_ERASE],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <map>
@@ -189,7 +355,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_CONTAINER_EMPLACE],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <map>
@@ -242,12 +408,11 @@ AC_DEFUN([LIBMESH_TEST_CXX11_BEGIN_END],
     AC_LANG_PUSH([C++])
 
     dnl For this and all of the C++ standards tests: Save the original
-    dnl CXXFLAGS (if any) before appending the $switch determined by
-    dnl AX_CXX_COMPILE_STDCXX_11, and any compiler flags specified by
+    dnl CXXFLAGS (if any) before appending any compiler flags specified by
     dnl the user in the libmesh_CXXFLAGS environment variable, letting
     dnl that override everything else.
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <iterator>
@@ -276,12 +441,11 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TUPLE],
     AC_LANG_PUSH([C++])
 
     dnl For this and all of the C++ standards tests: Save the original
-    dnl CXXFLAGS (if any) before appending the $switch determined by
-    dnl AX_CXX_COMPILE_STDCXX_11, and any compiler flags specified by
+    dnl CXXFLAGS (if any) before appending any compiler flags specified by
     dnl the user in the libmesh_CXXFLAGS environment variable, letting
     dnl that override everything else.
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <tuple>
@@ -330,12 +494,11 @@ AC_DEFUN([LIBMESH_TEST_CXX11_FIXED_TYPE_ENUM],
     AC_LANG_PUSH([C++])
 
     dnl For this and all of the C++ standards tests: Save the original
-    dnl CXXFLAGS (if any) before appending the $switch determined by
-    dnl AX_CXX_COMPILE_STDCXX_11, and any compiler flags specified by
+    dnl CXXFLAGS (if any) before appending any compiler flags specified by
     dnl the user in the libmesh_CXXFLAGS environment variable, letting
     dnl that override everything else.
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     enum Fruit : int {APPLE=0, ORANGE=1};
@@ -365,7 +528,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_FIXED_TYPE_ENUM_FWD],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <iostream>
@@ -401,7 +564,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <utility>
@@ -444,7 +607,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_RANGEFOR],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
         @%:@include <iostream>
@@ -482,7 +645,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_DECLTYPE],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
         @%:@include <vector>
@@ -516,7 +679,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_RVALUE_REFERENCES],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       int foo(int && x) { return x; }
@@ -548,7 +711,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_AUTO],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     ]], [[
@@ -578,7 +741,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_LAMBDA],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       // typedef for a function pointer that takes int and returns bool.
@@ -615,7 +778,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_CONSTEXPR],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       constexpr int multiply (int x, int y) { return x * y; }
@@ -646,7 +809,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       template <typename T>
@@ -685,7 +848,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_SHARED_PTR],
 
     # Save any original value that CXXFLAGS had
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <memory>
@@ -723,7 +886,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_UNIQUE_PTR],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <iostream>
@@ -765,7 +928,7 @@ AC_DEFUN([LIBMESH_TEST_CXX14_MAKE_UNIQUE],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <memory>
@@ -803,7 +966,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MAKE_UNIQUE_WORKAROUND],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <memory>
@@ -847,7 +1010,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_REGEX],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     dnl We actually have to try and *run* the test program, since
     dnl GCC up to 4.8 will compile this but then is not able to run it.
@@ -891,7 +1054,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_OVERRIDE],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     ]], [[
@@ -926,7 +1089,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_INITIALIZER_LIST],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       @%:@include <vector>
@@ -958,7 +1121,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_VARIADIC_TEMPLATES],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       // Base case
@@ -998,7 +1161,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_THREAD],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       @%:@include <thread>
@@ -1047,7 +1210,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_CONDITION_VARIABLE],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     # Test code is from the accepted answer on:
     # http://stackoverflow.com/questions/16350473/why-do-i-need-stdcondition-variable
@@ -1116,7 +1279,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       @%:@include <iostream>
@@ -1260,7 +1423,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MATH_FUNCS],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     # Test for asinh
     AC_MSG_CHECKING(for C++11 std::asinh support in <cmath>)
@@ -1389,7 +1552,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_DELETED_FUNCTIONS],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     class Foo
@@ -1421,7 +1584,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_DEFAULTED_FUNCTIONS],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     class Foo
@@ -1455,7 +1618,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_FINAL],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     // Test that a function can be declared final.
@@ -1565,7 +1728,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_NULLPTR],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <cstddef>
@@ -1600,7 +1763,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TO_STRING],
     AC_LANG_PUSH([C++])
 
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       @%:@include <string>
