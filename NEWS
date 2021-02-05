@@ -1,9 +1,19 @@
 1.6.0 -> 1.6.1
-  * Make ReferenceCounter::increment_{de,con}structor_count() noexcept
-  * Generalize default constructors for TypeTensor and TypeVector
-  * Re-reserve non-zero pattern after Eigen::setZero
-  * Fix compilation with both CAPNP and GLPK enabled
   * Do *not* sync done_saving_ids across processors
+  * Fix compilation with both CAPNP and GLPK enabled
+  * Re-reserve non-zero pattern after Eigen::setZero
+  * Generalize default constructors for TypeTensor and TypeVector
+  * Make ReferenceCounter::increment_{de,con}structor_count() noexcept
+  * Work around warnings in system xdr/rpc headers
+  * Don't try to cast ostream to bool
+  * Remove potential deadlock with Singletons and RemoteElem
+  * Fix NemesisIO Hex27 output issue
+  * Fix SFC Partitioner on distributed meshes
+  * Don't apply a regex to the string "All Tests"
+  * Remove non-unique DOF ids in Build::sorted_connected_dofs()
+  * Initialize next_unpartitioned_unique_id
+  * Eliminate leak in merge_ghost_functor_outputs
+  * MeshFunction::set_point_locator_tolerance(): set both PointLocator tolerances
 
 1.5.1 -> 1.6.0
   * Exodus/Nemesis
