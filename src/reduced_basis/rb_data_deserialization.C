@@ -866,12 +866,12 @@ void load_rb_scm_evaluation_data(RBSCMEvaluation & rb_scm_eval,
       rb_scm_evaluation_reader.getCJ();
 
     rb_scm_eval.C_J.resize(cJ_parameters_outer.size());
-    for (auto i : index_range(cJ_parameters_outer))
+    for (auto i : make_range(cJ_parameters_outer.size()))
       {
         auto cJ_parameters_inner =
           cJ_parameters_outer[i];
 
-        for (auto j : index_range(cJ_parameters_inner))
+        for (auto j : make_range(cJ_parameters_inner.size()))
           {
             std::string param_name = cJ_parameters_inner[j].getName();
             Real param_value = cJ_parameters_inner[j].getValue();
