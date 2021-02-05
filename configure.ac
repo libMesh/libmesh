@@ -2,7 +2,7 @@
 # configure.ac file for libmesh.  Used by Automake to generate
 # aclocal.m4 and Makefile.in. See also: http://tinyurl.com/hatuyfn
 # --------------------------------------------------------------
-AC_INIT([libmesh], [1.6.0], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.github.io])
+AC_INIT([libmesh], [1.6.1], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.github.io])
 AC_PREREQ([2.69])
 
 # by default CFLAGS and CXXFLAGS are set to '-g -O2' on systems that support them.
