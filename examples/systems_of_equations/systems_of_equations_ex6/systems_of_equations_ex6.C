@@ -67,6 +67,9 @@
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/petsc_macro.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/tensor_value.h"
+#include "libmesh/vector_value.h"
+#include "libmesh/utility.h"
 
 #define x_scaling 1.3
 
@@ -231,20 +234,14 @@ public:
                           JxW[qp] * elasticity_tensor(i,j,k,l) * dphi[dof_j][qp](l) * dphi[dof_i][qp](j);
 
             // assemble \int_Omega f_i v_i \dx
-            DenseVector<Number> f_vec(3);
-            f_vec(0) =  0.;
-            f_vec(1) =  0.;
-            f_vec(2) = -1.;
+            VectorValue<Number> f_vec(0., 0., -1.);
             for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
               for (unsigned int i=0; i<3; i++)
                 Fe_var[i](dof_i) += JxW[qp] * (f_vec(i) * phi[dof_i][qp]);
           }
 
         // assemble \int_\Gamma g_i v_i \ds
-        DenseVector<Number> g_vec(3);
-        g_vec(0) = 0.;
-        g_vec(1) = 0.;
-        g_vec(2) = -1.;
+        VectorValue<Number> g_vec(0., 0., -1.);
         {
           for (auto side : elem->side_index_range())
             if (elem->neighbor_ptr(side) == nullptr)
@@ -320,13 +317,11 @@ public:
 
         fe->reinit (elem);
 
-        std::vector<DenseMatrix<Number>> stress_tensor_qp(qrule.n_points());
+        std::vector<TensorValue<Number>> stress_tensor_qp(qrule.n_points());
         for (unsigned int qp=0; qp<qrule.n_points(); qp++)
           {
-            stress_tensor_qp[qp].resize(3,3);
-
             // Row is variable u1, u2, or u3, column is x, y, or z
-            DenseMatrix<Number> grad_u(3,3);
+            TensorValue<Number> grad_u;
             for (unsigned int var_i=0; var_i<3; var_i++)
               for (unsigned int var_j=0; var_j<3; var_j++)
                 for (unsigned int j=0; j<n_var_dofs; j++)
@@ -340,9 +335,7 @@ public:
           }
 
         stress_dof_map.dof_indices (elem, vonmises_dof_indices_var, vonMises_var);
-        std::vector<DenseMatrix<Number>> elem_sigma_vec(vonmises_dof_indices_var.size());
-        for (std::size_t index=0; index<elem_sigma_vec.size(); index++)
-          elem_sigma_vec[index].resize(3,3);
+        std::vector<TensorValue<Number>> elem_sigma_vec(vonmises_dof_indices_var.size());
 
         // Below we project each component of the stress tensor onto a L2_LAGRANGE discretization.
         // Note that this gives a discontinuous stress plot on element boundaries, which is
@@ -395,12 +388,12 @@ public:
             elem_sigma_vec[index](2,1) = elem_sigma_vec[index](1,2);
 
             // Get the von Mises stress from the projected stress tensor
-            Number vonMises_value = std::sqrt(0.5*(pow(elem_sigma_vec[index](0,0) - elem_sigma_vec[index](1,1), 2.) +
-                                                   pow(elem_sigma_vec[index](1,1) - elem_sigma_vec[index](2,2), 2.) +
-                                                   pow(elem_sigma_vec[index](2,2) - elem_sigma_vec[index](0,0), 2.) +
-                                                   6.*(pow(elem_sigma_vec[index](0,1), 2.) +
-                                                       pow(elem_sigma_vec[index](1,2), 2.) +
-                                                       pow(elem_sigma_vec[index](2,0), 2.))));
+            Number vonMises_value = std::sqrt(0.5*(Utility::pow<2>(elem_sigma_vec[index](0,0) - elem_sigma_vec[index](1,1)) +
+                                                   Utility::pow<2>(elem_sigma_vec[index](1,1) - elem_sigma_vec[index](2,2)) +
+                                                   Utility::pow<2>(elem_sigma_vec[index](2,2) - elem_sigma_vec[index](0,0)) +
+                                                   6.*(Utility::pow<2>(elem_sigma_vec[index](0,1)) +
+                                                       Utility::pow<2>(elem_sigma_vec[index](1,2)) +
+                                                       Utility::pow<2>(elem_sigma_vec[index](2,0)))));
 
             dof_id_type dof_index = vonmises_dof_indices_var[index];
 
