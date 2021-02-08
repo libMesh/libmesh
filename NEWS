@@ -14,6 +14,8 @@
   * Initialize next_unpartitioned_unique_id
   * Eliminate leak in merge_ghost_functor_outputs
   * MeshFunction::set_point_locator_tolerance(): set both PointLocator tolerances
+  * The SHAPE and SKEW metrics for Quad elements should have similar bounds.
+  * Turn off gdb backtraces by default
 
 1.5.1 -> 1.6.0
   * Exodus/Nemesis
