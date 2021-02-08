@@ -31815,7 +31815,7 @@ $as_echo "---------------------------------------------" >&6; }
 if test "${with_gdb_command+set}" = set; then :
   withval=$with_gdb_command; gdb_command="$withval"
 else
-  gdb_command="gdb"
+  gdb_command="no"
 fi
 
 
