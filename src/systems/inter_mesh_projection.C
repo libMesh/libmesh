@@ -18,8 +18,6 @@
 // Local includes
 #include "libmesh/inter_mesh_projection.h"
 
-// C++ includes
-
 namespace libMesh
 {
     GradientMeshFunction::GradientMeshFunction(MeshFunction * _mesh_function)
@@ -30,7 +28,7 @@ namespace libMesh
     // to reassign its ownership, and then cast this released ptr as a MeshFunction * to complete
     // the assignment. Looks complicated, but other approaches to this assignment led to hard to
     // untangle Seg Faults.
-     mesh_function = std::unique_ptr<MeshFunction>(libmesh_cast_ptr<MeshFunction *>((_mesh_function->clone()).release()));
+     mesh_function = std::unique_ptr<MeshFunction>(cast_ptr<MeshFunction *>((_mesh_function->clone()).release()));
      libmesh_experimental();
     }
 
