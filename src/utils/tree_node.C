@@ -586,8 +586,15 @@ TreeNode<N>::find_element (const Point & p,
         // Search the active elements in the active TreeNode.
         for (const auto & elem : elements)
           if (!allowed_subdomains || allowed_subdomains->count(elem->subdomain_id()))
-            if (elem->active() && elem->contains_point(p, relative_tol))
-              return elem;
+            if (elem->active())
+              {
+                bool found = relative_tol > TOLERANCE
+                  ? elem->close_to_point(p, relative_tol)
+                  : elem->contains_point(p);
+
+                if (found)
+                  return elem;
+              }
 
       // The point was not found in any element
       return nullptr;
@@ -614,8 +621,15 @@ TreeNode<N>::find_elements (const Point & p,
         // Search the active elements in the active TreeNode.
         for (const auto & elem : elements)
           if (!allowed_subdomains || allowed_subdomains->count(elem->subdomain_id()))
-            if (elem->active() && elem->contains_point(p, relative_tol))
-              candidate_elements.insert(elem);
+            if (elem->active())
+              {
+                bool found = relative_tol > TOLERANCE
+                  ? elem->close_to_point(p, relative_tol)
+                  : elem->contains_point(p);
+
+                if (found)
+                  candidate_elements.insert(elem);
+              }
     }
   else
     this->find_elements_in_children(p, candidate_elements,

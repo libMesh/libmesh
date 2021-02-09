@@ -196,14 +196,21 @@ const Elem * PointLocatorTree::operator() (const Point & p,
   LOG_SCOPE("operator()", "PointLocatorTree");
 
   // If we're provided with an allowed_subdomains list and have a cached element, make sure it complies
-  if (allowed_subdomains && this->_element && !allowed_subdomains->count(this->_element->subdomain_id())) this->_element = nullptr;
+  if (allowed_subdomains && this->_element && !allowed_subdomains->count(this->_element->subdomain_id()))
+    this->_element = nullptr;
 
-  if (this->_element != nullptr) {
-    if (_use_contains_point_tol && !(this->_element->contains_point(p, _contains_point_tol)))
-      this->_element = nullptr;
-    else if (!(this->_element->contains_point(p)))
-      this->_element = nullptr;
-  }
+  if (this->_element != nullptr)
+    {
+      // If the user specified a custom tolerance, we actually call
+      // Elem::close_to_point() instead, since Elem::contains_point()
+      // warns about using non-default BoundingBox tolerances.
+      if (_use_contains_point_tol && !(this->_element->close_to_point(p, _contains_point_tol)))
+        this->_element = nullptr;
+
+      // Otherwise, just call contains_point(p) with default tolerances.
+      else if (!(this->_element->contains_point(p)))
+        this->_element = nullptr;
+    }
 
   // First check the element from last time before asking the tree
   if (this->_element==nullptr)
