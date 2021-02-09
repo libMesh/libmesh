@@ -85,12 +85,16 @@ public:
                 const FunctionBase<Number> * master=nullptr);
 
   /**
+   * A regular copy constructor. Replicates the steps of MeshFunction::clone().
+   */
+  MeshFunction (const MeshFunction & mf);
+
+  /**
    * Special functions.
    * - This class conains a unique_ptr so it can't be default copy constructed.
    * - This class contains const references so it can't be default copy/move assigned.
    * - The destructor is defaulted out-of-line.
    */
-  MeshFunction (const MeshFunction &) = delete;
   MeshFunction (MeshFunction &&) = default;
   MeshFunction & operator= (const MeshFunction &) = delete;
   MeshFunction & operator= (MeshFunction &&) = delete;
