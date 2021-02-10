@@ -20,8 +20,8 @@
 
 namespace libMesh
 {
-GradientMeshFunction::GradientMeshFunction(MeshFunction * _mesh_function):
-  mesh_function(libmesh_make_unique<MeshFunction>(*_mesh_function))
+GradientMeshFunction::GradientMeshFunction(const MeshFunction & _mesh_function):
+  mesh_function(libmesh_make_unique<MeshFunction>(_mesh_function))
 {
   libmesh_experimental();
 }
@@ -82,7 +82,7 @@ void InterMeshProjection::project_system_vectors()
   // For some element types (say C1) we also need to pass a gradient evaluation MeshFunction
   // To do this evaluate, a new shim class GradientMeshFunction has been added which redirects
   // gptr::operator evaluations inside projection methods into MeshFunction::gradient calls.
-  GradientMeshFunction gptr_solution(&mesh_func_solution);
+  GradientMeshFunction gptr_solution(mesh_func_solution);
   gptr_solution.init();
 
   to_system.project_vector(*to_system.solution, &mesh_func_solution, &gptr_solution);
@@ -109,7 +109,7 @@ void InterMeshProjection::project_system_vectors()
 
       // Project the current system vector, you need to check if this vector is an adjoint to pass
       // the right options to project_vector
-      GradientMeshFunction gptr(&mesh_func);
+      GradientMeshFunction gptr(mesh_func);
       gptr.init();
 
       // The fourth argument here is whether the vector is an adjoint solution or not, we will be getting that information
