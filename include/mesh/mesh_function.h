@@ -85,7 +85,7 @@ public:
                 const FunctionBase<Number> * master=nullptr);
 
   /**
-   * A regular copy constructor. Replicates the steps of MeshFunction::clone().
+   * A regular copy constructor.
    */
   MeshFunction (const MeshFunction & mf);
 
