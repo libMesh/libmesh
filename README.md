@@ -74,3 +74,4 @@ and compiled directly with libMesh, others can be used via third-party installat
 
 ## License
 LibMesh is open source software distributed under the LGPL license, version 2.1.
+
