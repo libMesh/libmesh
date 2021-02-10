@@ -71,7 +71,26 @@ MeshFunction::MeshFunction (const EquationSystems & eqn_systems,
 {
 }
 
+MeshFunction::MeshFunction (const MeshFunction & mf):
+  FunctionBase<Number> (mf._master),
+  ParallelObject       (mf._eqn_systems),
+  _eqn_systems         (mf._eqn_systems),
+  _vector              (mf._vector),
+  _dof_map             (mf._dof_map),
+  _system_vars         (mf._system_vars),
+  _out_of_mesh_mode    (mf._out_of_mesh_mode)
+{
+  // Initialize the mf and set the point locator if the
+  // input mf had done so.
+  if(mf.initialized())
+  {
+    this->init();
 
+    if(mf.get_point_locator().initialized())
+      this->set_point_locator_tolerance(mf.get_point_locator().get_close_to_point_tol());
+
+  }
+}
 
 MeshFunction::~MeshFunction () = default;
 
@@ -126,15 +145,7 @@ MeshFunction::clear ()
 
 std::unique_ptr<FunctionBase<Number>> MeshFunction::clone () const
 {
-  MeshFunction * mf_clone =
-    new MeshFunction(_eqn_systems, _vector, _dof_map, _system_vars, this);
-
-  if (this->initialized())
-    mf_clone->init();
-  mf_clone->set_point_locator_tolerance(
-    this->get_point_locator().get_close_to_point_tol());
-
-  return std::unique_ptr<FunctionBase<Number>>(mf_clone);
+  return libmesh_make_unique<MeshFunction>(*this);
 }
 
 
@@ -724,11 +735,11 @@ const Elem * MeshFunction::find_element(const Point & p,
       element->find_point_neighbors(p, point_neighbors);
       element = nullptr;
       for (const auto & elem : point_neighbors)
-          if (elem->processor_id() == this->processor_id())
-            {
-              element = elem;
-              break;
-            }
+        if (elem->processor_id() == this->processor_id())
+          {
+            element = elem;
+            break;
+          }
     }
 
   return element;

@@ -37,71 +37,70 @@
 namespace libMesh
 {
 
-    // Forward declarations
+// Forward declarations
 
-    /**
-     * This class implements inter mesh projection, i.e. projection of
-     * vectors defined on a given mesh (from_mesh associated with from_system)
-     * to another mesh (to_mesh of to_system).
-     */
+/**
+ * This class implements inter mesh projection, i.e. projection of
+ * vectors defined on a given mesh (from_mesh associated with from_system)
+ * to another mesh (to_mesh of to_system).
+ */
 
-    class InterMeshProjection
-    {
-        public:
+class InterMeshProjection
+{
+public:
 
-        // Constructor, specifies the _from_system whose vectors will be
-        // projected onto the _to_mesh
-        InterMeshProjection(System & _from_system, System & _to_mesh);
+  // Constructor, specifies the _from_system whose vectors will be
+  // projected onto the _to_mesh
+  InterMeshProjection(System & _from_system, System & _to_mesh);
 
-        // Projects from_system vectors onto the to_mesh
-        void project_system_vectors();
+  // Projects from_system vectors onto the to_mesh
+  void project_system_vectors();
 
-        static Number fptr(const Point & p, const Parameters &, const std::string & libmesh_dbg_var(sys_name), const std::string & unknown_name);
+  static Number fptr(const Point & p, const Parameters &, const std::string & libmesh_dbg_var(sys_name), const std::string & unknown_name);
 
-        static Gradient gptr(const Point & p, const Parameters &, const std::string & libmesh_dbg_var(sys_name), const std::string & unknown_name);
+  static Gradient gptr(const Point & p, const Parameters &, const std::string & libmesh_dbg_var(sys_name), const std::string & unknown_name);
 
-        private:
+private:
 
-        // Local copy of the _from_system
-        System & from_system;
+  // Local copy of the _from_system
+  System & from_system;
 
-        // Local copy of the _to_system
-        System & to_system;
+  // Local copy of the _to_system
+  System & to_system;
 
-    };
+};
 
-    // This class provides the functor we will supply to System::project_vector
-    // inside InterMeshProjection::project_system_vectors.
-    // Object is constructed by passing in a pointer to the mesh function whose
-    // gradient we want to shim via operator().
-    class GradientMeshFunction : public FunctionBase<Gradient>
-    {
-        public:
-        // Constructor
-        GradientMeshFunction(MeshFunction * _mesh_function);
+// This class provides the functor we will supply to System::project_vector
+// inside InterMeshProjection::project_system_vectors.
+// Object is constructed by passing in a pointer to the mesh function whose
+// gradient we want to shim via operator().
+class GradientMeshFunction : public FunctionBase<Gradient>
+{
+public:
+  // Constructor
+  GradientMeshFunction(const MeshFunction & _mesh_function);
 
-        // Destructor
-        virtual ~GradientMeshFunction () { }
+  // Destructor
+  virtual ~GradientMeshFunction () { }
 
-        virtual void init () { }
+  virtual void init () { }
 
-        virtual std::unique_ptr<FunctionBase<Gradient>> clone () const
-        {
-          //return libmesh_make_unique<GradientMeshFunction>(dynamic_cast<MeshFunction *>(mesh_function.get()));
-          return libmesh_make_unique<GradientMeshFunction>(mesh_function.get());
-        }
+  virtual std::unique_ptr<FunctionBase<Gradient>> clone () const
+  {
+    return libmesh_make_unique<GradientMeshFunction>(*mesh_function);
+  }
 
-        virtual Gradient operator() (const Point & , const Real)
-        { libmesh_not_implemented(); }
+  virtual Gradient operator() (const Point & , const Real)
+  { libmesh_not_implemented(); }
 
-        virtual void operator() (const Point & p, const Real, DenseVector<Gradient> & output);
+  virtual void operator() (const Point & p, const Real, DenseVector<Gradient> & output);
 
-        private:
+private:
 
-        // Local copy of the passed in mesh function.
-        std::unique_ptr<MeshFunction> mesh_function;
+  // Local copy of the passed in mesh function.
+  std::unique_ptr<MeshFunction> mesh_function;
 
-    };
+};
 }
 
 #endif // LIBMESH_INTER_MESH_PROJECTION_H
