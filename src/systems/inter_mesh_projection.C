@@ -75,18 +75,17 @@ void InterMeshProjection::project_system_vectors()
   (*solution_vector_serial) = solution_vector;
 
   // Construct a MeshFunction for the solution
-  std::unique_ptr<MeshFunction> mesh_func_solution(new MeshFunction(from_system.get_equation_systems(), *solution_vector_serial,
-                     from_system.get_dof_map(), variables_vector));
+  MeshFunction mesh_func_solution(from_system.get_equation_systems(), *solution_vector_serial, from_system.get_dof_map(), variables_vector);
 
-  mesh_func_solution->init();
+  mesh_func_solution.init();
 
   // For some element types (say C1) we also need to pass a gradient evaluation MeshFunction
   // To do this evaluate, a new shim class GradientMeshFunction has been added which redirects
   // gptr::operator evaluations inside projection methods into MeshFunction::gradient calls.
-  std::unique_ptr<GradientMeshFunction> gptr_solution(new GradientMeshFunction(mesh_func_solution.get()));
-  gptr_solution->init();
+  GradientMeshFunction gptr_solution(&mesh_func_solution);
+  gptr_solution.init();
 
-  to_system.project_vector(*to_system.solution, mesh_func_solution.get(), gptr_solution.get());
+  to_system.project_vector(*to_system.solution, &mesh_func_solution, &gptr_solution);
 
   // Now loop over the vectors in system.vectors (includes old_nonlin_sol, rhs, adjoints, adjoint_rhs, sensitivity_rhs)
   for (System::vectors_iterator vec = from_system.vectors_begin(), vec_end = from_system.vectors_end(); vec != vec_end; ++vec)
@@ -105,18 +104,17 @@ void InterMeshProjection::project_system_vectors()
       from_system.get_vector(vec_name).localize(*current_vector_proxy);
 
       // Construct a MeshFunction for the current component
-      std::unique_ptr<MeshFunction> mesh_func(new MeshFunction(from_system.get_equation_systems(), *current_vector_proxy,
-                     from_system.get_dof_map(), variables_vector));
-      mesh_func->init();
+      MeshFunction mesh_func(from_system.get_equation_systems(), *current_vector_proxy, from_system.get_dof_map(), variables_vector);
+      mesh_func.init();
 
       // Project the current system vector, you need to check if this vector is an adjoint to pass
       // the right options to project_vector
-      std::unique_ptr<GradientMeshFunction> gptr(new GradientMeshFunction(mesh_func.get()));
-      gptr->init();
+      GradientMeshFunction gptr(&mesh_func);
+      gptr.init();
 
       // The fourth argument here is whether the vector is an adjoint solution or not, we will be getting that information
       // via the from_system instead of the to_system in case the user has not set the System::_vector_is_adjoint map to true.
-      to_system.project_vector(to_system.get_vector(vec_name), mesh_func.get(), gptr.get(), from_system.vector_is_adjoint(vec_name));
+      to_system.project_vector(to_system.get_vector(vec_name), &mesh_func, &gptr, from_system.vector_is_adjoint(vec_name));
 
     }
   // End loop over the vectors in the system
