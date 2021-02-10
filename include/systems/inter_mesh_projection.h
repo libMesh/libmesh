@@ -87,7 +87,7 @@ public:
 
   virtual std::unique_ptr<FunctionBase<Gradient>> clone () const
   {
-    return libmesh_make_unique<GradientMeshFunction>(*(mesh_function.get()));
+    return libmesh_make_unique<GradientMeshFunction>(*mesh_function);
   }
 
   virtual Gradient operator() (const Point & , const Real)
