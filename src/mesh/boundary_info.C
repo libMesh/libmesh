@@ -161,12 +161,19 @@ void BoundaryInfo::clear()
 
 void BoundaryInfo::regenerate_id_sets()
 {
+  const auto old_ss_id_to_name = _ss_id_to_name;
+  const auto old_ns_id_to_name = _ns_id_to_name;
+  const auto old_es_id_to_name = _es_id_to_name;
+
   // Clear the old caches
   _boundary_ids.clear();
   _side_boundary_ids.clear();
   _node_boundary_ids.clear();
   _edge_boundary_ids.clear();
   _shellface_boundary_ids.clear();
+  _ss_id_to_name.clear();
+  _ns_id_to_name.clear();
+  _es_id_to_name.clear();
 
   // Loop over id maps to regenerate each set.
   for (const auto & pr : _boundary_node_id)
@@ -174,6 +181,9 @@ void BoundaryInfo::regenerate_id_sets()
       const boundary_id_type id = pr.second;
       _boundary_ids.insert(id);
       _node_boundary_ids.insert(id);
+      auto it = old_ns_id_to_name.find(id);
+      if (it != old_ns_id_to_name.end())
+        _ns_id_to_name.emplace(id, it->second);
     }
 
   for (const auto & pr : _boundary_edge_id)
@@ -181,6 +191,9 @@ void BoundaryInfo::regenerate_id_sets()
       const boundary_id_type id = pr.second.second;
       _boundary_ids.insert(id);
       _edge_boundary_ids.insert(id);
+      auto it = old_es_id_to_name.find(id);
+      if (it != old_es_id_to_name.end())
+        _es_id_to_name.emplace(id, it->second);
     }
 
   for (const auto & pr : _boundary_side_id)
@@ -188,6 +201,9 @@ void BoundaryInfo::regenerate_id_sets()
       const boundary_id_type id = pr.second.second;
       _boundary_ids.insert(id);
       _side_boundary_ids.insert(id);
+      auto it = old_ss_id_to_name.find(id);
+      if (it != old_ss_id_to_name.end())
+        _ss_id_to_name.emplace(id, it->second);
     }
 
   for (const auto & pr : _boundary_shellface_id)
@@ -196,6 +212,11 @@ void BoundaryInfo::regenerate_id_sets()
       _boundary_ids.insert(id);
       _shellface_boundary_ids.insert(id);
     }
+
+  // Handle global data
+  _communicator.set_union(_ss_id_to_name);
+  _communicator.set_union(_ns_id_to_name);
+  _communicator.set_union(_es_id_to_name);
 }
 
 
@@ -2601,5 +2622,81 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
   // to save memory, also ought to reserve memory
 }
 
+void BoundaryInfo::clear_stitched_boundary_side_ids (const boundary_id_type sideset_id,
+                                                     const boundary_id_type other_sideset_id,
+                                                     const bool clear_nodeset_data)
+{
+  auto end_it = _boundary_side_id.end();
+  auto it = _boundary_side_id.begin();
+
+  // This predicate checks to see whether the pred_pr triplet's boundary ID matches sideset_id
+  // (other_sideset_id) *and* whether there is a boundary information triplet on the other side of
+  // the face whose boundary ID matches the other_sideset_id (sideset_id). We return a pair where
+  // first is a boolean indicating our condition is true or false, and second is an iterator to the
+  // neighboring triplet if our condition is true
+  auto predicate =
+      [sideset_id, other_sideset_id](
+          const std::pair<const Elem *, std::pair<unsigned short int, boundary_id_type>> & pred_pr,
+          const std::multimap<const Elem *, std::pair<unsigned short int, boundary_id_type>> &
+              pred_container) {
+        const Elem & elem = *pred_pr.first;
+        const auto elem_side = pred_pr.second.first;
+        const Elem * const other_elem = elem.neighbor_ptr(elem_side);
+        if (!other_elem)
+          return std::make_pair(false, pred_container.end());
+
+        const auto elem_side_bnd_id = pred_pr.second.second;
+        auto other_elem_side_bnd_id = BoundaryInfo::invalid_id;
+        if (elem_side_bnd_id == sideset_id)
+          other_elem_side_bnd_id = other_sideset_id;
+        else if (elem_side_bnd_id == other_sideset_id)
+          other_elem_side_bnd_id = sideset_id;
+        else
+          return std::make_pair(false, pred_container.end());
+
+        const auto other_elem_side = other_elem->which_neighbor_am_i(&elem);
+        const typename std::decay<decltype(pred_container)>::type::value_type other_sideset_info(
+            other_elem, std::make_pair(other_elem_side, other_elem_side_bnd_id));
+        auto other_range = pred_container.equal_range(other_elem);
+        libmesh_assert_msg(
+            other_range.first != other_range.second,
+            "No matching sideset information for other element in boundary information");
+        auto other_it = std::find(other_range.first, other_range.second, other_sideset_info);
+        libmesh_assert_msg(
+            other_it != pred_container.end(),
+            "No matching sideset information for other element in boundary information");
+        return std::make_pair(true, other_it);
+      };
+
+  for (; it != end_it;)
+  {
+    auto pred_result = predicate(*it, _boundary_side_id);
+    if (pred_result.first)
+    {
+      // First erase associated nodeset information
+      if (clear_nodeset_data)
+      {
+        const Elem & elem = *it->first;
+        const auto elem_side = it->second.first;
+        const auto local_node_nums = elem.nodes_on_side(elem_side);
+        for (const auto local_node_num : local_node_nums)
+          // This will remove all boundary info associated with this node, e.g. nodeset info
+          // for both sideset_id and other_sideset_id which is what we want
+          this->remove(elem.node_ptr(local_node_num));
+      }
+
+      // Now erase the sideset information
+      _boundary_side_id.erase(pred_result.second);
+      it = _boundary_side_id.erase(it);
+    }
+    else
+      ++it;
+  }
+
+  // Removing stitched-away boundary ids might have removed an id
+  // *entirely*, so we need to recompute boundary id sets to check
+  // for that.
+  this->regenerate_id_sets();
+}
 
 } // namespace libMesh

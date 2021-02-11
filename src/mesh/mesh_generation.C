@@ -429,7 +429,13 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case EDGE2:
             {
               for (unsigned int i=0; i<=nx; i++)
-                mesh.add_point (Point(static_cast<Real>(i)/nx, 0, 0), node_id++);
+              {
+                const Node * const node = mesh.add_point (Point(static_cast<Real>(i)/nx, 0, 0), node_id++);
+                if (i == 0)
+                  boundary_info.add_node(node, 0);
+                if (i == nx)
+                  boundary_info.add_node(node, 1);
+              }
 
               break;
             }
@@ -437,14 +443,26 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case EDGE3:
             {
               for (unsigned int i=0; i<=2*nx; i++)
-                mesh.add_point (Point(static_cast<Real>(i)/(2*nx), 0, 0), node_id++);
+              {
+                const Node * const node = mesh.add_point (Point(static_cast<Real>(i)/(2*nx), 0, 0), node_id++);
+                if (i == 0)
+                  boundary_info.add_node(node, 0);
+                if (i == 2*nx)
+                  boundary_info.add_node(node, 1);
+              }
               break;
             }
 
           case EDGE4:
             {
               for (unsigned int i=0; i<=3*nx; i++)
-                mesh.add_point (Point(static_cast<Real>(i)/(3*nx), 0, 0), node_id++);
+              {
+                const Node * const node = mesh.add_point (Point(static_cast<Real>(i)/(3*nx), 0, 0), node_id++);
+                if (i == 0)
+                  boundary_info.add_node(node, 0);
+                if (i == 3*nx)
+                  boundary_info.add_node(node, 1);
+              }
 
               break;
             }
@@ -624,9 +642,21 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             {
               for (unsigned int j=0; j<=ny; j++)
                 for (unsigned int i=0; i<=nx; i++)
-                  mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx),
-                                        static_cast<Real>(j)/static_cast<Real>(ny),
-                                        0.), node_id++);
+                {
+                  const Node * const node =
+                      mesh.add_point(Point(static_cast<Real>(i) / static_cast<Real>(nx),
+                                           static_cast<Real>(j) / static_cast<Real>(ny),
+                                           0.),
+                                     node_id++);
+                  if (j == 0)
+                    boundary_info.add_node(node, 0);
+                  if (j == ny)
+                    boundary_info.add_node(node, 2);
+                  if (i == 0)
+                    boundary_info.add_node(node, 3);
+                  if (i == nx)
+                    boundary_info.add_node(node, 1);
+                }
 
               break;
             }
@@ -637,9 +667,21 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             {
               for (unsigned int j=0; j<=(2*ny); j++)
                 for (unsigned int i=0; i<=(2*nx); i++)
-                  mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
-                                        static_cast<Real>(j)/static_cast<Real>(2*ny),
-                                        0), node_id++);
+                {
+                  const Node * const node =
+                      mesh.add_point(Point(static_cast<Real>(i) / static_cast<Real>(2 * nx),
+                                           static_cast<Real>(j) / static_cast<Real>(2 * ny),
+                                           0),
+                                     node_id++);
+                  if (j == 0)
+                    boundary_info.add_node(node, 0);
+                  if (j == 2*ny)
+                    boundary_info.add_node(node, 2);
+                  if (i == 0)
+                    boundary_info.add_node(node, 3);
+                  if (i == 2*nx)
+                    boundary_info.add_node(node, 1);
+                }
 
               break;
             }
@@ -936,9 +978,25 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               for (unsigned int k=0; k<=nz; k++)
                 for (unsigned int j=0; j<=ny; j++)
                   for (unsigned int i=0; i<=nx; i++)
-                    mesh.add_point(Point(static_cast<Real>(i)/static_cast<Real>(nx),
-                                         static_cast<Real>(j)/static_cast<Real>(ny),
-                                         static_cast<Real>(k)/static_cast<Real>(nz)), node_id++);
+                  {
+                    const Node * const node =
+                        mesh.add_point(Point(static_cast<Real>(i) / static_cast<Real>(nx),
+                                             static_cast<Real>(j) / static_cast<Real>(ny),
+                                             static_cast<Real>(k) / static_cast<Real>(nz)),
+                                       node_id++);
+                    if (k == 0)
+                      boundary_info.add_node(node, 0);
+                    if (k == nz)
+                      boundary_info.add_node(node, 5);
+                    if (j == 0)
+                      boundary_info.add_node(node, 1);
+                    if (j == ny)
+                      boundary_info.add_node(node, 3);
+                    if (i == 0)
+                      boundary_info.add_node(node, 4);
+                    if (i == nx)
+                      boundary_info.add_node(node, 2);
+                  }
 
               break;
             }
@@ -956,9 +1014,25 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               for (unsigned int k=0; k<=(2*nz); k++)
                 for (unsigned int j=0; j<=(2*ny); j++)
                   for (unsigned int i=0; i<=(2*nx); i++)
-                    mesh.add_point(Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
-                                         static_cast<Real>(j)/static_cast<Real>(2*ny),
-                                         static_cast<Real>(k)/static_cast<Real>(2*nz)), node_id++);
+                  {
+                    const Node * const node =
+                        mesh.add_point(Point(static_cast<Real>(i) / static_cast<Real>(2 * nx),
+                                             static_cast<Real>(j) / static_cast<Real>(2 * ny),
+                                             static_cast<Real>(k) / static_cast<Real>(2 * nz)),
+                                       node_id++);
+                    if (k == 0)
+                      boundary_info.add_node(node, 0);
+                    if (k == 2*nz)
+                      boundary_info.add_node(node, 5);
+                    if (j == 0)
+                      boundary_info.add_node(node, 1);
+                    if (j == 2*ny)
+                      boundary_info.add_node(node, 3);
+                    if (i == 0)
+                      boundary_info.add_node(node, 4);
+                    if (i == 2*nx)
+                      boundary_info.add_node(node, 2);
+                  }
 
               break;
             }

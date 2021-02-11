@@ -346,6 +346,17 @@ public:
                     const boundary_id_type id);
 
   /**
+   * Clear sideset information along a stitched mesh interface
+   * @param sideset_id A sideset on one side of the stitched mesh interface
+   * @param other_sideset_id The sideset on the other side of the stitched mesh interface
+   * @param clear_nodeset_data Whether to clear boundary information for the nodes along
+   *                           the stitched mesh interface
+   */
+  void clear_stitched_boundary_side_ids (boundary_id_type sideset_id,
+                                         boundary_id_type other_sideset_id,
+                                         bool clear_nodeset_data = false);
+
+  /**
    * Removes all entities (nodes, sides, edges, shellfaces) with boundary
    * id \p id from their respective containers and erases any record of
    * \p id's existence from the BoundaryInfo object.  That is, after
@@ -912,6 +923,8 @@ private:
    * See _side_boundary_ids, _edge_boundary_ids, _node_boundary_ids, and
    * _shellface_boundary_ids for sets containing IDs for only sides, edges,
    * nodes, and shell faces, respectively.
+   *
+   * This only contains information related to this process's local and ghosted elements
    */
   std::set<boundary_id_type> _boundary_ids;
 
@@ -921,6 +934,8 @@ private:
    * \note \p _boundary_ids is the union of this set, \p
    * _edge_boundary_ids, \p _node_boundary_ids, and \p
    * _shellface_boundary_ids.
+   *
+   * This only contains information related to this process's local and ghosted elements
    */
   std::set<boundary_id_type> _side_boundary_ids;
 
@@ -930,6 +945,8 @@ private:
    *
    * \note \p _boundary_ids is the union of this set, \p _side_boundary_ids,
    * \p _node_boundary_ids, and \p _shellface_boundary_ids.
+   *
+   * This only contains information related to this process's local and ghosted elements
    */
   std::set<boundary_id_type> _edge_boundary_ids;
 
@@ -939,6 +956,8 @@ private:
    * \note \p _boundary_ids is the union of this set, \p
    * _edge_boundary_ids, \p _side_boundary_ids, and \p
    * _shellface_boundary_ids.
+   *
+   * This only contains information related to this process's local and ghosted elements
    */
   std::set<boundary_id_type> _node_boundary_ids;
 
@@ -949,6 +968,8 @@ private:
    * \note \p _boundary_ids is the union of this set, \p
    * _side_boundary_ids, \p _edge_boundary_ids, and \p
    * _node_boundary_ids.
+   *
+   * This only contains information related to this process's local and ghosted elements
    */
   std::set<boundary_id_type> _shellface_boundary_ids;
 
@@ -956,6 +977,9 @@ private:
    * This structure maintains the mapping of named side sets
    * for file formats that support named blocks.  Currently
    * this is only implemented for ExodusII
+   *
+   * This data is global in nature, meaning it should be an aggregate of information across
+   * processors
    */
   std::map<boundary_id_type, std::string> _ss_id_to_name;
 
@@ -963,6 +987,9 @@ private:
    * This structure maintains the mapping of named node sets
    * for file formats that support named blocks.  Currently
    * this is only implemented for ExodusII
+   *
+   * This data is global in nature, meaning it should be an aggregate of information across
+   * processors
    */
   std::map<boundary_id_type, std::string> _ns_id_to_name;
 
@@ -970,6 +997,9 @@ private:
    * This structure maintains the mapping of named edge sets
    * for file formats that support named blocks.  Currently
    * this is only implemented for ExodusII
+   *
+   * This data is global in nature, meaning it should be an aggregate of information across
+   * processors
    */
   std::map<boundary_id_type, std::string> _es_id_to_name;
 };
