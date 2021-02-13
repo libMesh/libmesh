@@ -752,11 +752,11 @@ void DynaIO::clear_spline_nodes()
 
   auto & constraint_rows = mesh.get_constraint_rows();
 
-  std::vector<Elem *> spline_nodeelem_ptrs;
+  std::vector<Elem *> nodeelem_to_delete;
 
   for (auto & elem : mesh.element_ptr_range())
     if (elem->type() == NODEELEM)
-      spline_nodeelem_ptrs.push_back(elem);
+      nodeelem_to_delete.push_back(elem);
 
   // All our constraint_rows ought to be for spline constraints we're
   // about to get rid of.
@@ -768,7 +768,7 @@ void DynaIO::clear_spline_nodes()
 
   constraint_rows.clear();
 
-  for (Elem * elem : spline_nodeelem_ptrs)
+  for (Elem * elem : nodeelem_to_delete)
     {
       Node * node = elem->node_ptr(0);
       mesh.delete_elem(elem);
