@@ -126,8 +126,10 @@ DynaIO::ElementDefinition::ElementDefinition
 
 
 
-DynaIO::DynaIO (MeshBase & mesh) :
-  MeshInput<MeshBase>  (mesh)
+DynaIO::DynaIO (MeshBase & mesh,
+                bool keep_spline_nodes) :
+  MeshInput<MeshBase> (mesh),
+  _keep_spline_nodes  (keep_spline_nodes)
 {
 }
 
@@ -731,6 +733,9 @@ void DynaIO::read_mesh(std::istream & in)
           mesh.add_elem(std::move(elem));
         }
     }
+
+  if (!_keep_spline_nodes)
+    this->clear_spline_nodes();
 }
 
 
@@ -738,6 +743,37 @@ void DynaIO::add_spline_constraints(DofMap &,
                                     unsigned int,
                                     unsigned int)
 {
+}
+
+
+void DynaIO::clear_spline_nodes()
+{
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
+
+  auto & constraint_rows = mesh.get_constraint_rows();
+
+  std::vector<Elem *> spline_nodeelem_ptrs;
+
+  for (auto & elem : mesh.element_ptr_range())
+    if (elem->type() == NODEELEM)
+      spline_nodeelem_ptrs.push_back(elem);
+
+  // All our constraint_rows ought to be for spline constraints we're
+  // about to get rid of.
+#ifndef NDEBUG
+  for (auto & node_row : constraint_rows)
+    for (auto pr : node_row.second)
+      libmesh_assert(pr.first.first->type() == NODEELEM);
+#endif
+
+  constraint_rows.clear();
+
+  for (Elem * elem : spline_nodeelem_ptrs)
+    {
+      Node * node = elem->node_ptr(0);
+      mesh.delete_elem(elem);
+      mesh.delete_node(node);
+    }
 }
 
 

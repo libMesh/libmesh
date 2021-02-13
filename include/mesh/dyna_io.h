@@ -56,9 +56,16 @@ public:
   /**
    * Constructor.  Takes a non-const Mesh reference which it
    * will fill up with elements via the read() command.
+   *
+   * By default \p keep_spline_nodes is true, and when reading a BEXT
+   * file we retain the spline nodes and their constraints on FE
+   * nodes.  If \p keep_spline_nodes is false, we only keep the FE
+   * elements, which are no longer constrained to have higher
+   * continuity.
    */
   explicit
-  DynaIO (MeshBase & mesh);
+  DynaIO (MeshBase & mesh,
+          bool keep_spline_nodes = true);
 
   /**
    * Reads in a mesh in the Dyna format from the ASCII file given by
@@ -92,11 +99,23 @@ public:
                               unsigned int sys_num,
                               unsigned int var_num);
 
+  /**
+   * Removes any spline nodes (both NodeElem and Node), leaving only
+   * the FE mesh generated from those splines.  Also removes node
+   * constraints to the now-missing nodes.
+   */
+  void clear_spline_nodes();
+
 private:
   // Keep track of spline node indexing, so as to enable adding
   // constraint rows easily later.
   std::vector<Node *> spline_node_ptrs;
   std::unordered_map<Node *, Elem *> spline_nodeelem_ptrs;
+
+  /**
+   * Whether to keep or eventually discard spline nodes
+   */
+  bool _keep_spline_nodes;
 
   /**
    * Implementation of the read() function.  This function
