@@ -152,6 +152,15 @@ int main(int argc, char ** argv)
     {
       mesh.read(mesh_filename);
 
+      // We might be using legacy reduced_basis I/O, which relies on
+      // Hilbert curve renumbering ... and if we have overlapping
+      // nodes, as in the case of IGA meshes where FE nodes and spline
+      // nodes can coincide, then we need unique_id() values to
+      // disambiguate them when sorting.
+#if !defined(LIBMESH_HAVE_CAPNPROTO) && !defined(LIBMESH_ENABLE_UNIQUE_ID)
+  libmesh_example_requires(false, "--enable-unique-id or --enable-capnp");
+#endif
+
       // We don't yet support the experimental BEXT sideset spec, so
       // for now we'll add our required sidesets manually for our BEXT
       // file.
