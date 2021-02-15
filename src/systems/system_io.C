@@ -908,20 +908,34 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
       ids.clear(); /**/ ids.reserve (xfer_ids_size[blk]);
       vals.resize(recv_vals_size[blk]);
 
+#ifdef DEBUG
+      std::unordered_set<dof_id_type> seen_ids;
+#endif
+
       if (recv_vals_size[blk] != 0) // only if there are nonzero values to receive
         for (iterator_type it=begin; it!=end; ++it)
-          if (((*it)->id() >= first_object) && // object in [first_object,last_object)
-              ((*it)->id() <   last_object))
-            {
-              ids.push_back((*it)->id());
+          {
+            dof_id_type id = (*it)->id();
+#ifdef DEBUG
+            // Any renumbering tricks should not have given us any
+            // duplicate ids.
+            libmesh_assert(!seen_ids.count(id));
+            seen_ids.insert(id);
+#endif
 
-              unsigned int n_comp_tot=0;
+            if ((id >= first_object) && // object in [first_object,last_object)
+                (id <   last_object))
+              {
+                ids.push_back(id);
 
-              for (const auto & var : vars_to_read)
-                n_comp_tot += (*it)->n_comp(sys_num, var);
+                unsigned int n_comp_tot=0;
 
-              ids.push_back (n_comp_tot*num_vecs);
-            }
+                for (const auto & var : vars_to_read)
+                  n_comp_tot += (*it)->n_comp(sys_num, var);
+
+                ids.push_back (n_comp_tot*num_vecs);
+              }
+          }
 
 #ifdef LIBMESH_HAVE_MPI
       id_tags[blk]  = this->comm().get_unique_tag(100*num_blks + blk);

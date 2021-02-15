@@ -51,6 +51,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/nemesis_io.h"
 #include "libmesh/rb_data_serialization.h"
 #include "libmesh/rb_data_deserialization.h"
 #include "libmesh/enum_solver_package.h"
@@ -151,6 +152,15 @@ int main(int argc, char ** argv)
     {
       mesh.read(mesh_filename);
 
+      // We might be using legacy reduced_basis I/O, which relies on
+      // Hilbert curve renumbering ... and if we have overlapping
+      // nodes, as in the case of IGA meshes where FE nodes and spline
+      // nodes can coincide, then we need unique_id() values to
+      // disambiguate them when sorting.
+#if !defined(LIBMESH_HAVE_CAPNPROTO) && !defined(LIBMESH_ENABLE_UNIQUE_ID)
+  libmesh_example_requires(false, "--enable-unique-id or --enable-capnp");
+#endif
+
       // We don't yet support the experimental BEXT sideset spec, so
       // for now we'll add our required sidesets manually for our BEXT
       // file.
@@ -162,9 +172,12 @@ int main(int argc, char ** argv)
           if (!elem->neighbor_ptr(side))
             {
               Point side_center = elem->build_side_ptr(side)->centroid();
-              if (side_center(0) < 0.1)
+              // Yes, BOUNDARY_ID_MIN_X is a weird ID to use at
+              // min(z), but we got an IGA cantilever mesh with the
+              // lever arm in the z direction
+              if (side_center(2) < 0.1)
                 mesh.get_boundary_info().add_side(elem, side, BOUNDARY_ID_MIN_X);
-              if (side_center(0) > 11.9)
+              if (side_center(2) > 11.9)
                 mesh.get_boundary_info().add_side(elem, side, BOUNDARY_ID_MAX_X);
             }
     }
@@ -346,7 +359,7 @@ int main(int argc, char ** argv)
           rb_con.load_rb_solution();
 
           const RBParameters & rb_eval_params = rb_eval.get_parameters();
-          scale_mesh_and_plot(equation_systems, rb_eval_params, "RB_sol.e");
+          scale_mesh_and_plot(equation_systems, rb_eval_params, "RB_sol");
         }
     }
 
@@ -359,7 +372,7 @@ int main(int argc, char ** argv)
 
 void scale_mesh_and_plot(EquationSystems & es,
                          const RBParameters & mu,
-                         const std::string & filename)
+                         const std::string & file_basename)
 {
   // Loop over the mesh nodes and move them!
   MeshBase & mesh = es.get_mesh();
@@ -372,12 +385,16 @@ void scale_mesh_and_plot(EquationSystems & es,
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // Distributed IGA meshes don't yet support re-gathering to serial
-  bool do_write =
+  bool do_exodus_write =
     (es.get_mesh().get_constraint_rows().empty() ||
      es.get_mesh().is_serial());
-  es.comm().min(do_write);
-  if (do_write)
-    ExodusII_IO (mesh).write_equation_systems (filename, es);
+  es.comm().min(do_exodus_write);
+  if (do_exodus_write)
+    ExodusII_IO (mesh).write_equation_systems (file_basename+".e", es);
+#ifdef LIBMESH_HAVE_NEMESIS_API
+  else
+    Nemesis_IO (mesh).write_equation_systems (file_basename+".nem", es);
+#endif
 #endif
 
   // Loop over the mesh nodes and move them!
