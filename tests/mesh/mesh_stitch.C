@@ -79,7 +79,7 @@ public:
     std::set<std::string> ss_names;
     std::for_each(ss_id_to_name.begin(),
                   ss_id_to_name.end(),
-                  [&ss_names, this](const std::pair<boundary_id_type, std::string> & map_pr) {
+                  [&ss_names](const std::pair<boundary_id_type, std::string> & map_pr) {
                     ss_names.insert(map_pr.second);
                   });
     std::set<std::string> expected_names = {{"zero_left",
@@ -98,7 +98,7 @@ public:
     std::set<std::string> ns_names;
     std::for_each(ns_id_to_name.begin(),
                   ns_id_to_name.end(),
-                  [&ns_names, this](const std::pair<boundary_id_type, std::string> & map_pr) {
+                  [&ns_names](const std::pair<boundary_id_type, std::string> & map_pr) {
                     ns_names.insert(map_pr.second);
                   });
     CPPUNIT_ASSERT(ns_names == expected_names);
