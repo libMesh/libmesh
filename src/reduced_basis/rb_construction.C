@@ -1293,7 +1293,7 @@ void RBConstruction::enrich_basis_from_rhs_terms(const bool resize_rb_eval_data)
 
       // Debugging: enable this code to print the rhs that was used in
       // the most recent truth solve to a uniquely-named file.
-      if (false)
+#if 0
         {
           char temp_file[] = "truth_rhs_XXXXXX.dat";
           int fd = mkstemps(temp_file, 4);
@@ -1303,11 +1303,12 @@ void RBConstruction::enrich_basis_from_rhs_terms(const bool resize_rb_eval_data)
               rhs->print_matlab(std::string(temp_file));
             }
         }
+#endif // 0
 
       // Debugging: enable this code to print the most recent truth
       // solution to a uniquely-named file.
 #ifdef LIBMESH_HAVE_EXODUS_API
-      if (false)
+#if 0
         {
           // Note: mkstemps creates a file and returns an open file descriptor to it.
           // The filename is created from a template which must have 6 'X' characters followed
@@ -1323,7 +1324,8 @@ void RBConstruction::enrich_basis_from_rhs_terms(const bool resize_rb_eval_data)
                                             this->get_equation_systems(), &system_names);
             }
         }
-#endif
+#endif // 0
+#endif // LIBMESH_HAVE_EXODUS_API
 
       // Call user-defined post-processing routines on the truth solution.
       post_process_truth_solution();
