@@ -205,14 +205,8 @@ protected:
    * These are shared_ptrs to vectors since, if we are not the "master"
    * PointLocator, they need to point at the master's vectors instead.
    */
-  std::shared_ptr<std::vector<dof_id_type>> _ids;
+  std::shared_ptr<std::vector<Elem *>> _elems;
   std::shared_ptr<std::vector<Point>> _point_cloud;
-
-  /**
-   * We can use a local BoundingBox check to quickly rule out
-   * exhaustive KD-Tree searches.
-   */
-  std::shared_ptr<BoundingBox> _local_bbox;
 
   // kd_tree will be initialized during init() and then automatically
   // cleaned up by the destructor. We always create a LIBMESH_DIM
@@ -230,6 +224,12 @@ protected:
   mutable std::vector<Real> _out_dist_sqr;
 
   /**
+   * Vector of indices used by indirect sort. Stored as a class member
+   * so we don't have to allocate it from scratch for every search.
+   */
+  mutable std::vector<std::size_t> _b;
+
+  /**
    * Helper function that wraps the call to the KDTree's
    * findNeighbors() routine.  Must be passed the Point to search for
    * and the number of results to return. Stores the results of the
@@ -240,14 +240,6 @@ protected:
   nanoflann::KNNResultSet<Real>
   kd_tree_find_neighbors(const Point & p,
                          std::size_t num_results) const;
-
-  /**
-   * Before performing a KD-Tree search, check if it is even possible
-   * for the Point to be found on this processor.  Note: if a custom
-   * contains_point() tolerance is used, this does an "inflated" bbox
-   * intersection check, otherwise it just does a contains_point() check.
-   */
-  bool search_local_bbox(const Point & p) const;
 };
 
 } // namespace libMesh
