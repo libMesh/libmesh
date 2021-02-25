@@ -290,7 +290,7 @@ public:
    * Aborts the program if \p libmesh_assert_yes is true and the mesh
    * does not satisfy the level one restriction.
    */
-  bool test_level_one (bool libmesh_assert_yes = false);
+  bool test_level_one (bool libmesh_assert_yes = false) const;
 
   /**
    * \returns \p true if the mesh has no elements flagged to be
@@ -299,7 +299,7 @@ public:
    * Aborts the program if libmesh_assert_yes is true and the mesh has
    * flagged elements.
    */
-  bool test_unflagged (bool libmesh_assert_yes = false);
+  bool test_unflagged (bool libmesh_assert_yes = false) const;
 
   /**
    * Add a node to the mesh.  The node should be node n of child c of
@@ -733,7 +733,7 @@ private:
    */
   Elem * topological_neighbor (Elem * elem,
                                const PointLocatorBase * point_locator,
-                               const unsigned int side);
+                               const unsigned int side) const;
 
   /**
    * Local dispatch function for checking the correct has_neighbor
@@ -741,7 +741,7 @@ private:
    */
   bool has_topological_neighbor (const Elem * elem,
                                  const PointLocatorBase * point_locator,
-                                 const Elem * neighbor);
+                                 const Elem * neighbor) const;
 
   /**
    * Data structure that holds the new nodes information.

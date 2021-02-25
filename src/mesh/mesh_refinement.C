@@ -354,7 +354,7 @@ void MeshRefinement::update_nodes_map ()
 
 
 
-bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
+bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass)) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -429,7 +429,7 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
 
 
 
-bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
+bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass)) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -1794,7 +1794,7 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
 
 Elem * MeshRefinement::topological_neighbor(Elem * elem,
                                             const PointLocatorBase * point_locator,
-                                            const unsigned int side)
+                                            const unsigned int side) const
 {
 #ifdef LIBMESH_ENABLE_PERIODIC
   if (_periodic_boundaries && !_periodic_boundaries->empty())
@@ -1810,7 +1810,7 @@ Elem * MeshRefinement::topological_neighbor(Elem * elem,
 
 bool MeshRefinement::has_topological_neighbor(const Elem * elem,
                                               const PointLocatorBase * point_locator,
-                                              const Elem * neighbor)
+                                              const Elem * neighbor) const
 {
 #ifdef LIBMESH_ENABLE_PERIODIC
   if (_periodic_boundaries && !_periodic_boundaries->empty())
