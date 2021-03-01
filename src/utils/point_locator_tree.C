@@ -63,28 +63,17 @@ PointLocatorTree::PointLocatorTree (const MeshBase & mesh,
 
 
 
-PointLocatorTree::~PointLocatorTree ()
-{
-  this->clear ();
-}
+PointLocatorTree::~PointLocatorTree () = default;
 
 
 
 void PointLocatorTree::clear ()
 {
-  // only delete the tree when we are the master
-  if (this->_tree != nullptr)
-    {
-      if (this->_master == nullptr)
-        // we own the tree
-        delete this->_tree;
-      else
-        // someone else owns and therefore deletes the tree
-        this->_tree = nullptr;
+  this->_initialized = false;
 
-      // make sure operator () throws an assertion
-      this->_initialized = false;
-    }
+  // reset() actually frees the memory if we are master, otherwise it
+  // just reduces the ref. count.
+  _tree.reset();
 }
 
 
@@ -125,11 +114,11 @@ void PointLocatorTree::init (Trees::BuildType build_type)
           LOG_SCOPE("init(no master)", "PointLocatorTree");
 
           if (LIBMESH_DIM == 1)
-            _tree = new Trees::BinaryTree (this->_mesh, get_target_bin_size(), _build_type);
+            _tree = std::make_shared<Trees::BinaryTree>(this->_mesh, get_target_bin_size(), _build_type);
           else if (LIBMESH_DIM == 2)
-            _tree = new Trees::QuadTree (this->_mesh, get_target_bin_size(), _build_type);
+            _tree = std::make_shared<Trees::QuadTree>(this->_mesh, get_target_bin_size(), _build_type);
           else if (this->_mesh.mesh_dimension() == 3) // && LIBMESH_DIM==3
-            _tree = new Trees::OctTree (this->_mesh, get_target_bin_size(), _build_type);
+            _tree = std::make_shared<Trees::OctTree>(this->_mesh, get_target_bin_size(), _build_type);
           else
             {
               // LIBMESH_DIM==3 but we have a mesh with only 1D/2D
@@ -154,9 +143,9 @@ void PointLocatorTree::init (Trees::BuildType build_type)
                 is_planar_xy = true;
 
               if (is_planar_xy)
-                _tree = new Trees::QuadTree (this->_mesh, get_target_bin_size(), _build_type);
+                _tree = std::make_shared<Trees::QuadTree>(this->_mesh, get_target_bin_size(), _build_type);
               else
-                _tree = new Trees::OctTree (this->_mesh, get_target_bin_size(), _build_type);
+                _tree = std::make_shared<Trees::OctTree>(this->_mesh, get_target_bin_size(), _build_type);
             }
         }
 
