@@ -1207,7 +1207,7 @@ std::unique_ptr<PointLocatorBase> MeshBase::sub_point_locator () const
       // And it may require parallel communication
       parallel_object_only();
 
-#ifdef LIBMESH_HAVE_NANOFLANN
+#ifdef LIBMESH_ENABLE_NANOFLANN_POINTLOCATOR
       _point_locator = PointLocatorBase::build(NANOFLANN, *this);
 #else
       _point_locator = PointLocatorBase::build(TREE_ELEMENTS, *this);
@@ -1220,7 +1220,7 @@ std::unique_ptr<PointLocatorBase> MeshBase::sub_point_locator () const
   // Otherwise there was a master point locator, and we can grab a
   // sub-locator easily.
   return
-#ifdef LIBMESH_HAVE_NANOFLANN
+#ifdef LIBMESH_ENABLE_NANOFLANN_POINTLOCATOR
     PointLocatorBase::build(NANOFLANN, *this, _point_locator.get());
 #else
     PointLocatorBase::build(TREE_ELEMENTS, *this, _point_locator.get());
