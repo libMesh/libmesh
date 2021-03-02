@@ -48760,22 +48760,13 @@ fi
 
 
 # -------------------------------------------------------------------
-# Petsc -- We arelady called CONFIGURE_PETSC in LIBMESH_SET_COMPILERS
+# Petsc -- We already called ACSM_SCRAPE_PETSC_CONFIGURE in
+# LIBMESH_SET_COMPILERS, so it's possible that the $enablepetsc
+# flag is already set to "no", in which case we won't do further
+# PETSc configuration here.
 # -------------------------------------------------------------------
-if test $enablepetsc != no; then :
 
-
-
-
-
-  # Setting --enable-petsc-required causes an error to be emitted
-  # during configure if PETSc is not detected successfully during
-  # configure.  This is useful for app codes which require PETSc (like
-  # MOOSE-based apps), since it prevents situations where libmesh is
-  # accidentally built without PETSc support (which may take a very
-  # long time), and then the app fails to compile, requiring you to
-  # redo everything.
-  # Check whether --enable-petsc-required was given.
+# Check whether --enable-petsc-required was given.
 if test "${enable_petsc_required+set}" = set; then :
   enableval=$enable_petsc_required; case "${enableval}" in #(
   yes) :
@@ -48790,18 +48781,12 @@ else
 fi
 
 
-  # Setting --enable-petsc-hypre-required causes an error to be
-  # emitted during configure if PETSc with builtin Hypre is not
-  # detected successfully.  This is useful for app codes which require
-  # both PETSc and Hypre (like MOOSE-based apps), since it prevents
-  # libmesh from being accidentally built without PETSc and Hypre
-  # support.
-  # Check whether --enable-petsc-hypre-required was given.
+# Check whether --enable-petsc-hypre-required was given.
 if test "${enable_petsc_hypre_required+set}" = set; then :
   enableval=$enable_petsc_hypre_required; case "${enableval}" in #(
   yes) :
     petschyprerequired=yes
-                                 petscrequired=yes ;; #(
+                               petscrequired=yes ;; #(
   no) :
     petschyprerequired=no ;; #(
   *) :
@@ -48810,6 +48795,20 @@ esac
 else
   petschyprerequired=no
 fi
+
+
+if test "x$enablepetsc" = "xno" && test "x$petscrequired" = "xyes"; then :
+                          as_fn_error 3 "*** PETSc was not found, but --enable-petsc-required was specified." "$LINENO" 5
+fi
+
+if test "x$enablepetsc" = "xno" && test "x$petschyprerequired" = "xyes"; then :
+  as_fn_error 4 "*** PETSc was not found, but --enable-petsc-hypre-required was specified." "$LINENO" 5
+fi
+
+if test "x$enablepetsc" != "xno"; then :
+
+
+
 
 
   if test "$enablepetsc" !=  no; then :
