@@ -51,6 +51,20 @@ class Elem;
  * libmesh must be built with nanoflann enabled for this class to
  * work.
  *
+ * This PointLocator is still considered "experimental", so it is not
+ * enabled in libMesh by default. In particular, there may be false
+ * negatives (i.e. failures to find a containing Elem for a given
+ * Point even though there actually is one in the Mesh) on adaptively
+ * refined meshes, meshes with intersecting mixed-dimension manifolds,
+ * and meshes with large aspect ratio changes across neighboring
+ * elements. That said, the Nanoflann PointLocator did successfully
+ * pass all the MOOSE CI testing that we threw at it (and even
+ * uncovered some bugs in said tests) so it will likely work well for
+ * most applications outside of the categories mentioned above.
+ *
+ * You must configure libmesh with --enable-nanoflann-pointlocator in
+ * order to use this class.
+ *
  * \author John W. Peterson
  * \date 2021
  */
