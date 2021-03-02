@@ -191,6 +191,14 @@ public:
   virtual Real get_contains_point_tol() const;
 
   /**
+   * The contains_point_tol may be nonzero (in fact it defaults to
+   * non-zero) but unless the user calls set_contains_point_tol(), it
+   * won't actually be *used*. This const accessor can be used to
+   * determine the current status of this flag.
+   */
+  bool get_use_contains_point_tol() const { return _use_contains_point_tol; }
+
+  /**
    * Get a const reference to this PointLocator's mesh.
    */
   const MeshBase & get_mesh() const;

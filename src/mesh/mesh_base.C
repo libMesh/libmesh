@@ -43,6 +43,7 @@
 #include "libmesh/enum_point_locator_type.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/point_locator_nanoflann.h"
 
 namespace libMesh
 {
@@ -1206,7 +1207,11 @@ std::unique_ptr<PointLocatorBase> MeshBase::sub_point_locator () const
       // And it may require parallel communication
       parallel_object_only();
 
+#ifdef LIBMESH_ENABLE_NANOFLANN_POINTLOCATOR
+      _point_locator = PointLocatorBase::build(NANOFLANN, *this);
+#else
       _point_locator = PointLocatorBase::build(TREE_ELEMENTS, *this);
+#endif
 
       if (_point_locator_close_to_point_tol > 0.)
         _point_locator->set_close_to_point_tol(_point_locator_close_to_point_tol);
@@ -1214,7 +1219,12 @@ std::unique_ptr<PointLocatorBase> MeshBase::sub_point_locator () const
 
   // Otherwise there was a master point locator, and we can grab a
   // sub-locator easily.
-  return PointLocatorBase::build(TREE_ELEMENTS, *this, _point_locator.get());
+  return
+#ifdef LIBMESH_ENABLE_NANOFLANN_POINTLOCATOR
+    PointLocatorBase::build(NANOFLANN, *this, _point_locator.get());
+#else
+    PointLocatorBase::build(TREE_ELEMENTS, *this, _point_locator.get());
+#endif
 }
 
 

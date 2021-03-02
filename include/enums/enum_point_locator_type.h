@@ -36,6 +36,7 @@ enum PointLocatorType : int {
                        TREE = 0,
                        TREE_ELEMENTS,
                        TREE_LOCAL_ELEMENTS,
+                       NANOFLANN,
                        // Invalid
                        INVALID_LOCATOR};
 }

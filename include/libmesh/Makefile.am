@@ -452,6 +452,7 @@ BUILT_SOURCES = \
         perfmon.h \
         plt_loader.h \
         point_locator_base.h \
+        point_locator_nanoflann.h \
         point_locator_tree.h \
         pointer_to_pointer_iter.h \
         pool_allocator.h \
@@ -1889,6 +1890,9 @@ plt_loader.h: $(top_srcdir)/include/utils/plt_loader.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 point_locator_base.h: $(top_srcdir)/include/utils/point_locator_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+point_locator_nanoflann.h: $(top_srcdir)/include/utils/point_locator_nanoflann.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 point_locator_tree.h: $(top_srcdir)/include/utils/point_locator_tree.h

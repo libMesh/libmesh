@@ -55,7 +55,7 @@ namespace Trees
  * \date 2003
  * \brief Base class for different Tree types.
  */
-enum BuildType {NODES=0,
+enum BuildType : int {NODES=0,
                 ELEMENTS,
                 LOCAL_ELEMENTS,
                 INVALID_BUILD_TYPE };

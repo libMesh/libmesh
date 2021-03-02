@@ -1279,6 +1279,7 @@ enable_cppunit
 with_cppunit_include
 with_cppunit_lib
 enable_nanoflann
+enable_nanoflann_pointlocator
 enable_metaphysicl
 enable_metaphysicl_required
 '
@@ -2069,6 +2070,8 @@ Optional Features:
                           Build fparser with bytecode debugging functions
   --disable-cppunit       Build without cppunit C++ unit testing support
   --disable-nanoflann     build without nanoflann KD-tree support
+  --enable-nanoflann-pointlocator
+                          use Nanoflann-based PointLocator (experimental)
   --disable-metaphysicl   build without MetaPhysicL suppport
   --enable-metaphysicl-required
                           Error if MetaPhysicL is not detected by configure
@@ -55591,6 +55594,21 @@ else
 fi
 
 
+      # Check whether --enable-nanoflann-pointlocator was given.
+if test "${enable_nanoflann_pointlocator+set}" = set; then :
+  enableval=$enable_nanoflann_pointlocator; case "${enableval}" in #(
+  yes) :
+    enablenanoflannpointlocator=yes ;; #(
+  no) :
+    enablenanoflannpointlocator=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-nanoflann-pointlocator" "$LINENO" 5 ;;
+esac
+else
+  enablenanoflannpointlocator=no
+fi
+
+
       if test "x$enablenanoflann" = "xyes"; then :
 
           NANOFLANN_INCLUDE="-I\$(top_srcdir)/contrib/nanoflann/include"
@@ -55599,6 +55617,16 @@ $as_echo "#define HAVE_NANOFLANN 1" >>confdefs.h
 
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with nanoflann KDtree support >>>" >&5
 $as_echo "<<< Configuring library with nanoflann KDtree support >>>" >&6; }
+
+          if test "x$enablenanoflannpointlocator" = "xyes"; then :
+
+
+$as_echo "#define ENABLE_NANOFLANN_POINTLOCATOR 1" >>confdefs.h
+
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Nanoflann-based PointLocator >>>" >&5
+$as_echo "<<< Configuring library with Nanoflann-based PointLocator >>>" >&6; }
+
+fi
 
 else
 

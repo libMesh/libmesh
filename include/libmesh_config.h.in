@@ -138,6 +138,10 @@
 /* Flag indicating if the library should be built with infinite elements */
 #undef ENABLE_INFINITE_ELEMENTS
 
+/* Flag indicating whether the library will use the (experimental)
+   Nanoflann-based PointLocator */
+#undef ENABLE_NANOFLANN_POINTLOCATOR
+
 /* Flag indicating if the library should be built with node constraints
    support */
 #undef ENABLE_NODE_CONSTRAINTS

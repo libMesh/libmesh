@@ -425,6 +425,7 @@ libmesh_SOURCES =  \
         src/utils/plt_loader_read.C \
         src/utils/plt_loader_write.C \
         src/utils/point_locator_base.C \
+        src/utils/point_locator_nanoflann.C \
         src/utils/point_locator_tree.C \
         src/utils/statistics.C \
         src/utils/string_to_enum.C \
