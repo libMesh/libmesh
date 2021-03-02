@@ -9,38 +9,6 @@ AC_DEFUN([CONFIGURE_PETSC],
   dnl try compiles, try links, etc.
   AC_REQUIRE([LIBMESH_SET_COMPILERS])
 
-  # Setting --enable-petsc-required causes an error to be emitted
-  # during configure if PETSc is not detected successfully during
-  # configure.  This is useful for app codes which require PETSc (like
-  # MOOSE-based apps), since it prevents situations where libmesh is
-  # accidentally built without PETSc support (which may take a very
-  # long time), and then the app fails to compile, requiring you to
-  # redo everything.
-  AC_ARG_ENABLE(petsc-required,
-                AC_HELP_STRING([--enable-petsc-required],
-                               [Error if PETSc is not detected by configure]),
-                [AS_CASE("${enableval}",
-                         [yes], [petscrequired=yes],
-                         [no],  [petscrequired=no],
-                         [AC_MSG_ERROR(bad value ${enableval} for --enable-petsc-required)])],
-                     [petscrequired=no])
-
-  # Setting --enable-petsc-hypre-required causes an error to be
-  # emitted during configure if PETSc with builtin Hypre is not
-  # detected successfully.  This is useful for app codes which require
-  # both PETSc and Hypre (like MOOSE-based apps), since it prevents
-  # libmesh from being accidentally built without PETSc and Hypre
-  # support.
-  AC_ARG_ENABLE(petsc-hypre-required,
-                AC_HELP_STRING([--enable-petsc-hypre-required],
-                               [Error if a PETSc with Hypre is not detected by configure]),
-                [AS_CASE("${enableval}",
-                         [yes], [petschyprerequired=yes
-                                 petscrequired=yes],
-                         [no],  [petschyprerequired=no],
-                         [AC_MSG_ERROR(bad value ${enableval} for --enable-petsc-hypre-required)])],
-                     [petschyprerequired=no])
-
   AS_IF([test "$enablepetsc" !=  no],
         [
     # AC_REQUIRE:

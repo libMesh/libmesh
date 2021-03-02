@@ -168,9 +168,59 @@ AS_IF([test "x$enablempi" = xyes],
 
 
 # -------------------------------------------------------------------
-# Petsc -- We arelady called CONFIGURE_PETSC in LIBMESH_SET_COMPILERS
+# Petsc -- We already called ACSM_SCRAPE_PETSC_CONFIGURE in
+# LIBMESH_SET_COMPILERS, so it's possible that the $enablepetsc
+# flag is already set to "no", in which case we won't do further
+# PETSc configuration here.
 # -------------------------------------------------------------------
-AS_IF([test $enablepetsc != no],
+
+dnl Setting --enable-petsc-required causes an error to be emitted
+dnl during configure if PETSc is not detected successfully during
+dnl configure.  This is useful for app codes which require PETSc (like
+dnl MOOSE-based apps), since it prevents situations where libmesh is
+dnl accidentally built without PETSc support (which may take a very
+dnl long time), and then the app fails to compile, requiring you to
+dnl redo everything.
+AC_ARG_ENABLE(petsc-required,
+              AC_HELP_STRING([--enable-petsc-required],
+                             [Error if PETSc is not detected by configure]),
+              [AS_CASE("${enableval}",
+                       [yes], [petscrequired=yes],
+                       [no],  [petscrequired=no],
+                       [AC_MSG_ERROR(bad value ${enableval} for --enable-petsc-required)])],
+                   [petscrequired=no])
+
+dnl Setting --enable-petsc-hypre-required causes an error to be
+dnl emitted during configure if PETSc with builtin Hypre is not
+dnl detected successfully.  This is useful for app codes which require
+dnl both PETSc and Hypre (like MOOSE-based apps), since it prevents
+dnl libmesh from being accidentally built without PETSc and Hypre
+dnl support.
+AC_ARG_ENABLE(petsc-hypre-required,
+              AC_HELP_STRING([--enable-petsc-hypre-required],
+                             [Error if a PETSc with Hypre is not detected by configure]),
+              [AS_CASE("${enableval}",
+                       [yes], [petschyprerequired=yes
+                               petscrequired=yes],
+                       [no],  [petschyprerequired=no],
+                       [AC_MSG_ERROR(bad value ${enableval} for --enable-petsc-hypre-required)])],
+                   [petschyprerequired=no])
+
+dnl If $enablepetsc is already set to no, then we won't call even call
+dnl CONFIGURE_PETSC below.  If PETSc was required, we need to throw an
+dnl error now instead of compiling libmesh in an invalid configuration.
+AS_IF([test "x$enablepetsc" = "xno" && test "x$petscrequired" = "xyes"],
+      dnl We return error code 3 here, since 0 means success and 1 is
+      dnl indistinguishable from other errors.  Ideally, all of the
+      dnl AC_MSG_ERROR calls in our m4 files would return a different
+      dnl error code, but currently this is not implemented.
+      [AC_MSG_ERROR([*** PETSc was not found, but --enable-petsc-required was specified.], 3)])
+
+dnl If PETSc + Hypre is required, throw an error if we don't have it.
+AS_IF([test "x$enablepetsc" = "xno" && test "x$petschyprerequired" = "xyes"],
+      [AC_MSG_ERROR([*** PETSc was not found, but --enable-petsc-hypre-required was specified.], 4)])
+
+AS_IF([test "x$enablepetsc" != "xno"],
       [
         CONFIGURE_PETSC
         libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
