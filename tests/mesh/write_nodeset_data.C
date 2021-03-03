@@ -35,6 +35,9 @@ public:
                                         -1., 1.,
                                         QUAD4);
 
+    // Add an empty nodeset
+    mesh.get_boundary_info().nodeset_name(4) = "empty";
+
     BoundaryInfo & bi = mesh.get_boundary_info();
 
     // Meshes created via build_square() don't have any nodesets
@@ -47,11 +50,12 @@ public:
     std::vector<BoundaryInfo::NodeBCTuple> all_bc_tuples = bi.build_node_list();
 
     // Data structures to be passed to ExodusII_IO::write_nodeset_data()
-    std::vector<std::string> var_names = {"var1", "var2"};
+    std::vector<std::string> var_names = {"var1", "var2", "var3"};
     std::vector<std::set<boundary_id_type>> node_boundary_ids =
       {
         {0, 2}, // var1 is defined on nodesets 0 and 2
-        {1, 3}  // var2 is defined on nodesets 1 and 3
+        {1, 3}, // var2 is defined on nodesets 1 and 3
+        {4}     // var3 is only defined on the empty nodeset 4
       };
 
     // Data structure mapping (node, id) tuples to Real values that

@@ -41,16 +41,20 @@ public:
                                         -1., 1.,
                                         QUAD4);
 
+    // Add an empty sideset
+    mesh.get_boundary_info().sideset_name(4) = "empty";
+
     // Get list of all (elem, side, id) tuples
     std::vector<BoundaryInfo::BCTuple> all_bc_tuples =
       mesh.get_boundary_info().build_side_list();
 
     // Data structures to be passed to ExodusII_IO::write_sideset_data
-    std::vector<std::string> var_names = {"var1", "var2"};
+    std::vector<std::string> var_names = {"var1", "var2", "var3"};
     std::vector<std::set<boundary_id_type>> side_ids =
       {
         {0, 2}, // var1 is defined on sidesets 0 and 2
-        {1, 3}  // var2 is defined on sidesets 1 and 3
+        {1, 3}, // var2 is defined on sidesets 1 and 3
+        {4}     // var3 is only defined on the empty sideset 4
       };
 
     // Data structure mapping (elem, side, id) tuples to Real values that
