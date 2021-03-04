@@ -1668,7 +1668,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
     {
       const boundary_id_type id = pair.first;
 
-      if (std::find(unique_side_boundaries.begin(),unique_side_boundaries.end(),id)
+      if (std::find(unique_side_boundaries.begin(),
+                    unique_side_boundaries.end(), id)
             == unique_side_boundaries.end())
         unique_side_boundaries.push_back(id);
     }
@@ -1678,7 +1679,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
     {
       const boundary_id_type id = pair.first;
 
-      if (std::find(unique_node_boundaries.begin(),unique_node_boundaries.end(),id)
+      if (std::find(unique_node_boundaries.begin(),
+                    unique_node_boundaries.end(), id)
             == unique_node_boundaries.end())
         unique_node_boundaries.push_back(id);
     }
@@ -2300,7 +2302,8 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
     {
       const boundary_id_type id = pair.first;
 
-      if (std::find(side_boundary_ids.begin(),side_boundary_ids.end(),id)
+      if (std::find(side_boundary_ids.begin(),
+                    side_boundary_ids.end(), id)
             == side_boundary_ids.end())
         side_boundary_ids.push_back(id);
     }
@@ -2333,7 +2336,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
             {
               sets[i].num_entry = elem_it->second.size();
               sets[i].entry_list = elem_it->second.data();
-              sets[i].extra_list = libmesh_map_find(side,ss_id).data();
+              sets[i].extra_list = libmesh_map_find(side, ss_id).data();
             }
         }
 
@@ -2377,7 +2380,8 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
     {
       const boundary_id_type id = pair.first;
 
-      if (std::find(node_boundary_ids.begin(),node_boundary_ids.end(),id)
+      if (std::find(node_boundary_ids.begin(),
+                    node_boundary_ids.end(), id)
             == node_boundary_ids.end())
         node_boundary_ids.push_back(id);
     }
