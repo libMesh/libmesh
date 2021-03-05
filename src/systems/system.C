@@ -215,8 +215,15 @@ void System::init_data ()
   MeshBase & mesh = this->get_mesh();
 
   // Add all variable groups to our underlying DofMap
+  unsigned int n_dof_map_vg = _dof_map->n_variable_groups();
   for (auto vg : make_range(this->n_variable_groups()))
-    _dof_map->add_variable_group(this->variable_group(vg));
+    {
+      const VariableGroup & group = this->variable_group(vg);
+      if (vg < n_dof_map_vg)
+        libmesh_assert(group == _dof_map->variable_group(vg));
+      else
+        _dof_map->add_variable_group(group);
+    }
 
   // Distribute the degrees of freedom on the mesh
   auto total_dofs = _dof_map->distribute_dofs (mesh);
