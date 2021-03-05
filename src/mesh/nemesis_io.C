@@ -1443,16 +1443,17 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   std::vector<std::string> names;
 
   // All of which should be low order monomials for now
-  const FEType type(CONSTANT, MONOMIAL);
+  const std::vector<FEType> type = {FEType(CONSTANT, MONOMIAL), FEType(CONSTANT, MONOMIAL_VEC)};
 
   // If _output_variables is populated, only output the monomials which are
   // also in the _output_variables vector.
-  if (_output_variables.size() > 0)
+  if (_output_variables.size())
     {
       std::vector<std::string> monomials;
 
       // Create a list of monomial variable names
-      es.build_variable_names(monomials, &type);
+      es.build_variable_names(monomials, &type[0]); /*scalars*/
+      es.build_variable_names(monomials, &type[1]); /*vectors*/
 
       // Filter that list against the _output_variables list.  Note: if names is still empty after
       // all this filtering, all the monomial variables will be gathered
@@ -1464,15 +1465,14 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   // The 'names' vector will here be updated with the variable's names
   // that are actually eligible to write
   std::vector<std::pair<unsigned int, unsigned int>> var_nums =
-    es.find_variable_numbers (names, &type);
+    es.find_variable_numbers (names, /*type=*/nullptr, &type);
 
-  // build_parallel_elemental_solution_vector() can return a nullptr,
-  // in which case there are no constant monomial variables to write,
-  // and we can just return.
+  // find_variable_numbers() can return a nullptr, in which case there are no constant monomial
+  // variables to write, and we can just return.
   if (var_nums.empty())
     {
       if (_verbose)
-        libMesh::out << "No CONSTANT, MONOMIAL data to be written." << std::endl;
+        libMesh::out << "No CONSTANT, MONOMIAL or CONSTANT, MONOMIAL_VEC data to be written." << std::endl;
       return;
     }
 
