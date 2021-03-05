@@ -87,6 +87,18 @@ public:
   {}
 
   /**
+   * \returns true iff the \p other Variable has the same
+   * characteristics and system numbering as this one.
+   */
+  bool operator== ( const Variable & other) const {
+    return (_sys == other._sys) &&
+           (_name == other._name) &&
+           (_active_subdomains == other._active_subdomains) &&
+           (_first_scalar_number == other._first_scalar_number) &&
+           (_type == other._type);
+  }
+
+  /**
    * \returns A pointer to the System this Variable is part of.
    */
   System * system() const
@@ -210,6 +222,15 @@ public:
               var_active_subdomains),
     _names(var_names)
   {}
+
+  /**
+   * \returns true iff the \p other VariableGroup has exactly the same
+   * Variable members as this one.
+   */
+  bool operator== ( const VariableGroup & other) const {
+    return (this->Variable::operator==(other)) &&
+           (_names == other._names);
+  }
 
   /**
    * \returns The number of variables in this \p VariableGroup
