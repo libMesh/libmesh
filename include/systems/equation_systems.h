@@ -25,6 +25,7 @@
 #include "libmesh/parameters.h"
 #include "libmesh/system.h"
 #include "libmesh/parallel_object.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
 namespace libMesh
@@ -49,6 +50,7 @@ enum XdrMODE : int;
 #include <set>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
@@ -556,17 +558,7 @@ protected:
   /**
    * Data structure holding the systems.
    */
-  std::map<std::string, System *> _systems;
-
-  /**
-   * Typedef for system iterators
-   */
-  typedef std::map<std::string, System *>::iterator       system_iterator;
-
-  /**
-   * Typedef for constant system iterators
-   */
-  typedef std::map<std::string, System *>::const_iterator const_system_iterator;
+  std::map<std::string, std::unique_ptr<System>> _systems;
 
   /**
    * Flag for whether to call coarsen/refine in reinit().
@@ -649,31 +641,31 @@ template <typename T_sys>
 inline
 T_sys & EquationSystems::add_system (const std::string & name)
 {
-  T_sys * ptr = nullptr;
-
   if (!_systems.count(name))
     {
       const unsigned int sys_num = this->n_systems();
-      ptr = new T_sys(*this, name, sys_num);
 
-      _systems.emplace(name, ptr);
+      auto result =
+        _systems.emplace(name, libmesh_make_unique<T_sys>(*this, name, sys_num));
 
       if (!_enable_default_ghosting)
         this->_remove_default_ghosting(sys_num);
 
       // Tell all the \p DofObject entities to add a system.
       this->_add_system_to_nodes_and_elems();
+
+      // Return reference to newly added item
+      auto it = result.first;
+      auto & sys_ptr = it->second;
+      return cast_ref<T_sys &>(*sys_ptr);
     }
   else
     {
       // We now allow redundant add_system calls, to make it
       // easier to load data from files for user-derived system
       // subclasses
-      ptr = &(this->get_system<T_sys>(name));
+      return this->get_system<T_sys>(name);
     }
-
-  // Return a dynamically casted reference to the newly added System.
-  return *ptr;
 }
 
 
@@ -696,9 +688,11 @@ const T_sys & EquationSystems::get_system (const unsigned int num) const
   libmesh_assert_less (num, this->n_systems());
 
   for (auto & pr : _systems)
-    if (pr.second->number() == num)
-      return *cast_ptr<T_sys *>(pr.second);
-
+    {
+      const auto & sys_ptr = pr.second;
+      if (sys_ptr->number() == num)
+        return cast_ref<const T_sys &>(*sys_ptr);
+    }
   // Error if we made it here
   libmesh_error_msg("ERROR: no system number " << num << " found!");
 }
@@ -713,8 +707,11 @@ T_sys & EquationSystems::get_system (const unsigned int num)
   libmesh_assert_less (num, this->n_systems());
 
   for (auto & pr : _systems)
-    if (pr.second->number() == num)
-      return *cast_ptr<T_sys *>(pr.second);
+    {
+      auto & sys_ptr = pr.second;
+      if (sys_ptr->number() == num)
+        return cast_ref<T_sys &>(*sys_ptr);
+    }
 
   // Error if we made it here
   libmesh_error_msg("ERROR: no system number " << num << " found!");
@@ -729,13 +726,14 @@ template <typename T_sys>
 inline
 const T_sys & EquationSystems::get_system (const std::string & name) const
 {
-  const_system_iterator pos = _systems.find(name);
+  auto pos = _systems.find(name);
 
   // Check for errors
   libmesh_error_msg_if(pos == _systems.end(), "ERROR: no system named \"" << name << "\" found!");
 
   // Attempt dynamic cast
-  return *cast_ptr<T_sys *>(pos->second);
+  const auto & sys_ptr = pos->second;
+  return cast_ref<const T_sys &>(*sys_ptr);
 }
 
 
@@ -747,13 +745,14 @@ template <typename T_sys>
 inline
 T_sys & EquationSystems::get_system (const std::string & name)
 {
-  system_iterator pos = _systems.find(name);
+  auto pos = _systems.find(name);
 
   // Check for errors
   libmesh_error_msg_if(pos == _systems.end(), "ERROR: no system named " << name << " found!");
 
   // Attempt dynamic cast
-  return *cast_ptr<T_sys *>(pos->second);
+  auto & sys_ptr = pos->second;
+  return cast_ref<T_sys &>(*sys_ptr);
 }
 
 
