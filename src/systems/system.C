@@ -288,7 +288,25 @@ void System::init_data ()
    this->init_matrices();
 }
 
+void System::reinit_mesh ()
+{
+  // First initialize any required data:
+  // either only the basic System data
+  if (_basic_system_only)
+    System::init_data();
+  // or all the derived class' data too
+  else
+    this->init_data();
 
+  // If no variables have been added to this system
+  // don't do anything
+  if (!this->n_vars())
+    return;
+
+  // Then call the user-provided initialization function
+  this->user_initialization();
+
+}
 
 void System::init_matrices ()
 {
