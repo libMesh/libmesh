@@ -125,6 +125,12 @@ public:
   virtual void reinit ();
 
   /**
+   * Handle the association of a completely *new* mesh with the
+   * EquationSystem and all the Systems assigned to it.
+   */
+  virtual void reinit_mesh ();
+
+  /**
    * Enable or disable default ghosting functors on the Mesh and on
    * all Systems.  Standard ghosting is enabled by default.  If
    * disabled, default ghosting will also be disabled on any later
