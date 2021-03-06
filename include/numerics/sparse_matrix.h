@@ -300,7 +300,7 @@ public:
   /**
    * Compute Y = A*X for matrix \p X.
    */
-  virtual void matrix_matrix_mult (SparseMatrix<T> & /*X*/, SparseMatrix<T> & /*Y*/)
+  virtual void matrix_matrix_mult (SparseMatrix<T> & /*X*/, SparseMatrix<T> & /*Y*/, bool /*reuse*/)
   { libmesh_not_implemented(); }
 
   /**

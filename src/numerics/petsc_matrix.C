@@ -80,6 +80,7 @@ namespace libMesh
 template <typename T>
 PetscMatrix<T>::PetscMatrix(const Parallel::Communicator & comm_in) :
   SparseMatrix<T>(comm_in),
+  _mat(nullptr),
   _destroy_mat_on_exit(true),
   _mat_type(AIJ)
 {}
@@ -1248,7 +1249,7 @@ void PetscMatrix<T>::add (const T a_in, const SparseMatrix<T> & X_in)
 
 
 template <typename T>
-void PetscMatrix<T>::matrix_matrix_mult (SparseMatrix<T> & X_in, SparseMatrix<T> & Y_out)
+void PetscMatrix<T>::matrix_matrix_mult (SparseMatrix<T> & X_in, SparseMatrix<T> & Y_out, bool reuse)
 {
   libmesh_assert (this->initialized());
 
@@ -1266,9 +1267,17 @@ void PetscMatrix<T>::matrix_matrix_mult (SparseMatrix<T> & X_in, SparseMatrix<T>
 
   semiparallel_only();
 
-  ierr = MatMatMult(_mat, X->_mat, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &Y->_mat);
-  LIBMESH_CHKERR(ierr);
-
+  if (reuse)
+  {
+    ierr = MatMatMult(_mat, X->_mat, MAT_REUSE_MATRIX, PETSC_DEFAULT, &Y->_mat);
+    LIBMESH_CHKERR(ierr);
+  }
+  else
+  {
+    Y->clear();
+    ierr = MatMatMult(_mat, X->_mat, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &Y->_mat);
+    LIBMESH_CHKERR(ierr);
+  }
   // Specify that the new matrix is initialized
   // We do not close it here as `MatMatMult` ensures Y being closed
   Y->_is_initialized = true;
