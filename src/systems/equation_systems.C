@@ -47,13 +47,6 @@
 namespace libMesh
 {
 
-// Forward Declarations
-
-
-
-
-// ------------------------------------------------------------
-// EquationSystems class implementation
 EquationSystems::EquationSystems (MeshBase & m) :
   ParallelObject (m),
   _mesh          (m),
@@ -67,10 +60,7 @@ EquationSystems::EquationSystems (MeshBase & m) :
 
 
 
-EquationSystems::~EquationSystems ()
-{
-  this->clear ();
-}
+EquationSystems::~EquationSystems () = default;
 
 
 
@@ -79,18 +69,8 @@ void EquationSystems::clear ()
   // Clear any additional parameters
   parameters.clear ();
 
-  // clear the systems.  We must delete them
-  // since we newed them!
-  while (!_systems.empty())
-    {
-      system_iterator pos = _systems.begin();
-
-      System * sys = pos->second;
-      delete sys;
-      sys = nullptr;
-
-      _systems.erase (pos);
-    }
+  // Clear the systems.
+  _systems.clear();
 }
 
 
@@ -462,9 +442,6 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
 {
   unsigned int var_num=0;
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
-
   // Need to size var_names by scalar variables plus all the
   // vector components for all the vector variables
   //Could this be replaced by a/some convenience methods?[PB]
@@ -472,18 +449,21 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
     unsigned int n_scalar_vars = 0;
     unsigned int n_vector_vars = 0;
 
-    for (; pos != end; ++pos)
+    for (const auto & pr : _systems)
       {
+        const auto & sys_name = pr.first;
+        const auto & sys_ptr = pr.second;
+
         // Check current system is listed in system_names, and skip pos if not
         bool use_current_system = (system_names == nullptr);
         if (!use_current_system)
-          use_current_system = system_names->count(pos->first);
-        if (!use_current_system || pos->second->hide_output())
+          use_current_system = system_names->count(sys_name);
+        if (!use_current_system || sys_ptr->hide_output())
           continue;
 
-        for (auto vn : make_range(pos->second->n_vars()))
+        for (auto vn : make_range(sys_ptr->n_vars()))
           {
-            if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
+            if (FEInterface::field_type(sys_ptr->variable_type(vn)) == TYPE_VECTOR)
               n_vector_vars++;
             else
               n_scalar_vars++;
@@ -504,24 +484,24 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
     var_names.resize( nv );
   }
 
-  // reset
-  pos = _systems.begin();
-
-  for (; pos != end; ++pos)
+  for (const auto & pr : _systems)
     {
+      const auto & sys_name = pr.first;
+      const auto & sys_ptr = pr.second;
+
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == nullptr);
       if (!use_current_system)
-        use_current_system = system_names->count(pos->first);
-      if (!use_current_system || pos->second->hide_output())
+        use_current_system = system_names->count(sys_name);
+      if (!use_current_system || sys_ptr->hide_output())
         continue;
 
-      for (auto vn : make_range(pos->second->n_vars()))
+      for (auto vn : make_range(sys_ptr->n_vars()))
         {
-          const std::string & var_name = pos->second->variable_name(vn);
-          const FEType & fe_type = pos->second->variable_type(vn);
+          const std::string & var_name = sys_ptr->variable_name(vn);
+          const FEType & fe_type = sys_ptr->variable_type(vn);
 
-          unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type);
+          unsigned int n_vec_dim = FEInterface::n_vec_dim( sys_ptr->get_mesh(), fe_type);
 
           // Filter on the type if requested
           if (type == nullptr || (type && *type == fe_type))
@@ -597,21 +577,21 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
   {
     unsigned int n_scalar_vars = 0;
     unsigned int n_vector_vars = 0;
-    const_system_iterator       pos = _systems.begin();
-    const const_system_iterator end = _systems.end();
-
-    for (; pos != end; ++pos)
+    for (const auto & pr : _systems)
       {
+        const auto & sys_name = pr.first;
+        const auto & sys_ptr = pr.second;
+
         // Check current system is listed in system_names, and skip pos if not
         bool use_current_system = (system_names == nullptr);
         if (!use_current_system)
-          use_current_system = system_names->count(pos->first);
-        if (!use_current_system || pos->second->hide_output())
+          use_current_system = system_names->count(sys_name);
+        if (!use_current_system || sys_ptr->hide_output())
           continue;
 
-        for (auto vn : make_range(pos->second->n_vars()))
+        for (auto vn : make_range(sys_ptr->n_vars()))
           {
-            if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
+            if (FEInterface::field_type(sys_ptr->variable_type(vn)) == TYPE_VECTOR)
               n_vector_vars++;
             else
               n_scalar_vars++;
@@ -661,28 +641,28 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
   // loop over the elements and build the nodal solution
   // from the element solution.  Then insert this nodal solution
   // into the vector passed to build_solution_vector.
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
-
-  for (; pos != end; ++pos)
+  for (const auto & pr : _systems)
     {
+      const auto & sys_name = pr.first;
+      const auto & sys_ptr = pr.second;
+
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == nullptr);
       if (!use_current_system)
-        use_current_system = system_names->count(pos->first);
-      if (!use_current_system || pos->second->hide_output())
+        use_current_system = system_names->count(sys_name);
+      if (!use_current_system || sys_ptr->hide_output())
         continue;
 
-      const System & system  = *(pos->second);
+      const System & system  = *sys_ptr;
       const unsigned int nv_sys = system.n_vars();
       const unsigned int sys_num = system.number();
 
       //Could this be replaced by a/some convenience methods?[PB]
       unsigned int n_scalar_vars = 0;
       unsigned int n_vector_vars = 0;
-      for (auto vn : make_range(pos->second->n_vars()))
+      for (auto vn : make_range(sys_ptr->n_vars()))
         {
-          if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
+          if (FEInterface::field_type(sys_ptr->variable_type(vn)) == TYPE_VECTOR)
             n_vector_vars++;
           else
             n_scalar_vars++;
@@ -719,7 +699,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
           const Variable & var_description = system.variable(var);
           const DofMap & dof_map           = system.get_dof_map();
 
-          unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type );
+          unsigned int n_vec_dim = FEInterface::n_vec_dim( sys_ptr->get_mesh(), fe_type );
 
           for (const auto & elem : _mesh.active_local_element_ptr_range())
             {
@@ -827,19 +807,17 @@ void EquationSystems::get_vars_active_subdomains(const std::vector<std::string> 
   vars_active_subdomains.clear();
   vars_active_subdomains.resize(names.size());
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
-
-  for (; pos != end; ++pos)
+  for (const auto & pr : _systems)
     {
-      for (auto vn : make_range(pos->second->n_vars()))
+      const auto & sys_ptr = pr.second;
+      for (auto vn : make_range(sys_ptr->n_vars()))
         {
-          const std::string & var_name = pos->second->variable_name(vn);
+          const std::string & var_name = sys_ptr->variable_name(vn);
 
           auto names_it = std::find(names.begin(), names.end(), var_name);
           if(names_it != names.end())
             {
-              const Variable & variable = pos->second->variable(vn);
+              const Variable & variable = sys_ptr->variable(vn);
               const std::set<subdomain_id_type> & active_subdomains = variable.active_subdomains();
               vars_active_subdomains[std::distance(names.begin(), names_it)] = active_subdomains;
             }
@@ -896,13 +874,9 @@ EquationSystems::find_variable_numbers
 
   names.clear();
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
-  unsigned sys_ctr = 0;
-
-  for (; pos != end; ++pos, ++sys_ctr)
+  for (const auto & pr : _systems)
     {
-      const System & system = *(pos->second);
+      const System & system = *(pr.second);
       const unsigned int nv_sys = system.n_vars();
 
       for (unsigned int var=0; var < nv_sys; ++var)
@@ -1055,24 +1029,25 @@ EquationSystems::build_discontinuous_solution_vector
 
   for (const auto & pr : _systems)
     {
+      const auto & sys_name = pr.first;
+      const auto & sys_ptr = pr.second;
+
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == nullptr);
       if (!use_current_system)
-        use_current_system = system_names->count(pr.first);
-      if (!use_current_system || pr.second->hide_output())
+        use_current_system = system_names->count(sys_name);
+      if (!use_current_system || sys_ptr->hide_output())
         continue;
-
-      const System * system  = pr.second;
 
       // Loop over all variables in this System and check whether we
       // are supposed to use each one.
-      for (auto var_id : make_range(system->n_vars()))
+      for (auto var_id : make_range(sys_ptr->n_vars()))
         {
           bool use_current_var = (var_names == nullptr);
           if (!use_current_var)
             use_current_var = std::count(var_names->begin(),
                                          var_names->end(),
-                                         system->variable_name(var_id));
+                                         sys_ptr->variable_name(var_id));
 
           // Only increment the total number of vars if we are
           // supposed to use this one.
@@ -1104,14 +1079,16 @@ EquationSystems::build_discontinuous_solution_vector
   // into the vector passed to build_solution_vector.
   for (const auto & pr : _systems)
     {
+      const auto & sys_name = pr.first;
+      const auto & system = pr.second;
+
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == nullptr);
       if (!use_current_system)
-        use_current_system = system_names->count(pr.first);
-      if (!use_current_system || pr.second->hide_output())
+        use_current_system = system_names->count(sys_name);
+      if (!use_current_system || system->hide_output())
         continue;
 
-      const System * system  = pr.second;
       const unsigned int nv_sys = system->n_vars();
 
       system->update_global_solution (sys_soln, 0);
@@ -1230,18 +1207,15 @@ bool EquationSystems::compare (const EquationSystems & other_es,
   else
     {
       // start comparing each system
-      const_system_iterator       pos = _systems.begin();
-      const const_system_iterator end = _systems.end();
-
-      for (; pos != end; ++pos)
+      for (const auto & pr : _systems)
         {
-          const std::string & sys_name = pos->first;
-          const System &  system        = *(pos->second);
+          const auto & sys_name = pr.first;
+          const auto & sys_ptr = pr.second;
 
           // get the other system
           const System & other_system   = other_es.get_system (sys_name);
 
-          os_result.push_back (system.compare (other_system, threshold, verbose));
+          os_result.push_back (sys_ptr->compare (other_system, threshold, verbose));
 
         }
 
@@ -1275,11 +1249,8 @@ std::string EquationSystems::get_info () const
       << "  n_systems()=" << this->n_systems() << '\n';
 
   // Print the info for the individual systems
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
-
-  for (; pos != end; ++pos)
-    oss << pos->second->get_info();
+  for (const auto & pr : _systems)
+    oss << pr.second->get_info();
 
 
   //   // Possibly print the parameters
@@ -1324,11 +1295,8 @@ unsigned int EquationSystems::n_vars () const
 {
   unsigned int tot=0;
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
-
-  for (; pos != end; ++pos)
-    tot += pos->second->n_vars();
+  for (const auto & pr : _systems)
+    tot += pr.second->n_vars();
 
   return tot;
 }
@@ -1339,11 +1307,8 @@ std::size_t EquationSystems::n_dofs () const
 {
   std::size_t tot=0;
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
-
-  for (; pos != end; ++pos)
-    tot += pos->second->n_dofs();
+  for (const auto & pr : _systems)
+    tot += pr.second->n_dofs();
 
   return tot;
 }
@@ -1355,11 +1320,8 @@ std::size_t EquationSystems::n_active_dofs () const
 {
   std::size_t tot=0;
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
-
-  for (; pos != end; ++pos)
-    tot += pos->second->n_active_dofs();
+  for (const auto & pr : _systems)
+    tot += pr.second->n_active_dofs();
 
   return tot;
 }
