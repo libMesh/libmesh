@@ -241,8 +241,10 @@ public:
 
   /**
    * Compute Y = A*X for matrix \p X.
+   * Set reuse = true if this->_mat and X have the same nonzero pattern as before,
+   * and Y is obtained from a previous call to this function with reuse = false
    */
-  virtual void matrix_matrix_mult (SparseMatrix<T> & X, SparseMatrix<T> & Y) override;
+  virtual void matrix_matrix_mult (SparseMatrix<T> & X, SparseMatrix<T> & Y, bool reuse = false) override;
 
   /**
     * Add \p scalar* \p spm to the rows and cols of this matrix (A):
