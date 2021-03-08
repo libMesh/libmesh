@@ -573,9 +573,18 @@ void MeshBase::subdomain_ids (std::set<subdomain_id_type> & ids, const bool glob
   for (const auto & elem : this->active_local_element_ptr_range())
     ids.insert(elem->subdomain_id());
 
-  // Some subdomains may only live on other processors
   if (global)
-    this->comm().set_union(ids);
+    {
+      // Only include the unpartitioned elements if the user requests the global IDs.
+      // In the case of the local subdomain IDs, it doesn't make sense to include the
+      // unpartitioned elements because said elements do not have a sense of locality.
+      for (const auto & elem : as_range(this->active_unpartitioned_elements_begin(),
+                                        this->active_unpartitioned_elements_end()))
+        ids.insert(elem->subdomain_id());
+
+      // Some subdomains may only live on other processors
+      this->comm().set_union(ids);
+    }
 }
 
 
