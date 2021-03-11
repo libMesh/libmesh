@@ -1165,6 +1165,10 @@ public:
    * e.g. to different materials in a solid mechanics application,
    * or regions where different physical processes are important.  The subdomain
    * mapping is independent from the parallel decomposition.
+   *
+   * Unpartitioned elements are included in the set in the case that \p
+   * global == true. If \p global == false, the unpartitioned elements are not
+   * included because unpartitioned elements do not have a sense of locality.
    */
   void subdomain_ids (std::set<subdomain_id_type> & ids, const bool global = true) const;
 
