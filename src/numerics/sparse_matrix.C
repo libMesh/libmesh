@@ -56,6 +56,8 @@ template <typename T>
 void SparseMatrix<T>::attach_dof_map (const DofMap & dof_map)
 {
   _dof_map = &dof_map;
+  if (!_sp)
+    _sp = dof_map.get_sparsity_pattern();
 }
 
 
