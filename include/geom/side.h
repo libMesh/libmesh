@@ -31,6 +31,8 @@ namespace libMesh
 class Point;
 class Node;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
+
 /**
  * This defines the \p Side class.  A \p Side is basically a proxy
  * (or stand-in replacement) class for an element's side.  It acts
@@ -57,6 +59,10 @@ public:
     SideType(const_cast<Elem *>(parent_in)),
     _side_number(side_in)
   {
+    // Our more-optimized non-proxy side code makes this class
+    // obsolete.
+    libmesh_deprecated();
+
     libmesh_assert(parent_in);
     // may not be true when building infinite element sides
     // libmesh_assert_less (_side_number, this->parent()->n_sides());
@@ -90,6 +96,7 @@ private:
   const unsigned int _side_number;
 };
 
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 /**
