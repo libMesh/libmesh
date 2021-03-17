@@ -193,6 +193,8 @@ std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i,
   std::unique_ptr<Elem> edge;
   if (proxy)
     {
+#ifdef LIBMESH_ENABLE_DEPRECATED
+      libmesh_deprecated();
       switch (i)
         {
           // base
@@ -213,8 +215,10 @@ std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i,
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
+#else
+      libmesh_error();
+#endif // LIBMESH_ENABLE_DEPRECATED
     }
-
   else
     {
       switch (i)

@@ -212,6 +212,8 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
   std::unique_ptr<Elem> face;
   if (proxy)
     {
+#ifdef LIBMESH_ENABLE_DEPRECATED
+      libmesh_deprecated();
       switch (i)
         {
         case 0:
@@ -232,6 +234,9 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
+#else
+      libmesh_error();
+#endif // LIBMESH_ENABLE_DEPRECATED
     }
 
   else

@@ -2313,7 +2313,14 @@ Elem::simple_build_side_ptr (const unsigned int i,
 
   std::unique_ptr<Elem> face;
   if (proxy)
-    face = libmesh_make_unique<Side<Sideclass,Subclass>>(this,i);
+    {
+#ifdef LIBMESH_ENABLE_DEPRECATED
+      face = libmesh_make_unique<Side<Sideclass,Subclass>>(this,i);
+      libmesh_deprecated();
+#else
+      libmesh_error();
+#endif
+    }
   else
     {
       face = libmesh_make_unique<Sideclass>(this);
