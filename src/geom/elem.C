@@ -1664,14 +1664,14 @@ void Elem::active_family_tree_by_topological_neighbor (std::vector<Elem *> & fam
 }
 
 
-bool Elem::is_child_on_edge(const unsigned int libmesh_dbg_var(c),
+bool Elem::is_child_on_edge(const unsigned int c,
                             const unsigned int e) const
 {
   libmesh_assert_less (c, this->n_children());
   libmesh_assert_less (e, this->n_edges());
 
   std::unique_ptr<const Elem> my_edge = this->build_edge_ptr(e);
-  std::unique_ptr<const Elem> child_edge = this->build_edge_ptr(e);
+  std::unique_ptr<const Elem> child_edge = this->child_ptr(c)->build_edge_ptr(e);
 
   // We're assuming that an overlapping child edge has the same
   // number and orientation as its parent
