@@ -128,7 +128,8 @@ std::vector<unsigned>
 InfHex18::nodes_on_edge(const unsigned int e) const
 {
   libmesh_assert_less(e, n_edges());
-  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
+  auto trim = (e < 4) ? 0 : 1;
+  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e]) - trim};
 }
 
 bool InfHex18::is_node_on_edge(const unsigned int n,

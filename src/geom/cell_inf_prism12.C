@@ -117,7 +117,8 @@ std::vector<unsigned>
 InfPrism12::nodes_on_edge(const unsigned int e) const
 {
   libmesh_assert_less(e, n_edges());
-  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
+  auto trim = (e < 3) ? 0 : 1;
+  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e]) - trim};
 }
 
 std::vector<unsigned>
