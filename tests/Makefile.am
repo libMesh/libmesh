@@ -42,6 +42,7 @@ unit_tests_sources = \
   fe/fe_xyz_test.C \
   fe/dual_shape_verification_test.C \
   geom/bbox_test.C \
+  geom/edge_test.C \
   geom/elem_test.C \
   geom/node_test.C \
   geom/point_test.C \
