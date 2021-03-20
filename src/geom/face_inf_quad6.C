@@ -228,6 +228,11 @@ std::unique_ptr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
     edge->set_parent(nullptr);
   edge->set_interior_parent(this);
 
+  edge->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  edge->set_p_level(this->p_level());
+#endif
+
   return edge;
 }
 

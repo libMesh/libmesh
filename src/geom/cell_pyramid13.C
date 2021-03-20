@@ -240,6 +240,11 @@ std::unique_ptr<Elem> Pyramid13::build_side_ptr (const unsigned int i, bool prox
     face->set_parent(nullptr);
   face->set_interior_parent(this);
 
+  face->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  face->set_p_level(this->p_level());
+#endif
+
   return face;
 }
 

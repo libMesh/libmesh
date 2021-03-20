@@ -235,6 +235,11 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
     face->set_parent(nullptr);
   face->set_interior_parent(this);
 
+  face->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  face->set_p_level(this->p_level());
+#endif
+
   return face;
 }
 
