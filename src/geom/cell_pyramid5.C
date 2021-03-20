@@ -234,6 +234,13 @@ std::unique_ptr<Elem> Pyramid5::build_edge_ptr (const unsigned int i)
 
 
 
+void Pyramid5::build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i)
+{
+  this->simple_build_edge_ptr<Pyramid5>(edge, i, EDGE2);
+}
+
+
+
 void Pyramid5::connectivity(const unsigned int libmesh_dbg_var(sc),
                             const IOPackage iop,
                             std::vector<dof_id_type> & conn) const

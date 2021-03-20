@@ -866,6 +866,24 @@ public:
   std::unique_ptr<const Elem> build_edge_ptr (const unsigned int i) const;
 
   /**
+   * Resets the loose element \p edge, which may currently point to a
+   * different edge than \p i or even a different element than \p
+   * this, to point to edge \p i on \p this.  If \p edge is currently
+   * an element of the wrong type, it will be freed and a new element
+   * allocated; otherwise no memory allocation will occur.
+   *
+   * This should not be called with proxy SideEdge elements.  This will
+   * cause \p side to be a full-ordered element, even if it is handed
+   * a lower-ordered element that must be replaced.
+   *
+   * The const version of this function is non-virtual; it simply
+   * calls the virtual non-const version and const_casts the return
+   * type.
+   */
+  virtual void build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i) = 0;
+  void build_edge_ptr (std::unique_ptr<const Elem> & edge, const unsigned int i) const;
+
+  /**
    * \returns The default approximation order for this element type.
    * This is the order that will be used to compute the map to the
    * reference element.

@@ -236,6 +236,57 @@ std::unique_ptr<Elem> InfPrism6::build_edge_ptr (const unsigned int i)
   return this->simple_build_edge_ptr<InfEdge2,InfPrism6>(i);
 }
 
+
+
+void InfPrism6::build_edge_ptr (std::unique_ptr<Elem> & edge,
+                                const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_edges());
+
+  switch (i)
+    {
+      // the base edges
+    case 0:
+    case 1:
+    case 2:
+      {
+        if (!edge.get() || edge->type() != EDGE2)
+          {
+            edge = this->build_edge_ptr(i);
+            return;
+          }
+        break;
+      }
+
+      // the infinite edges
+    case 3:
+    case 4:
+    case 5:
+      {
+        if (!edge.get() || edge->type() != INFEDGE2)
+          {
+            edge = this->build_edge_ptr(i);
+            return;
+          }
+        break;
+      }
+
+    default:
+      libmesh_error_msg("Invalid edge i = " << i);
+    }
+
+  edge->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  edge->set_p_level(this->p_level());
+#endif
+
+  // Set the nodes
+  for (auto n : edge->node_index_range())
+    edge->set_node(n) = this->node_ptr(InfPrism6::edge_nodes_map[i][n]);
+}
+
+
+
 void InfPrism6::connectivity(const unsigned int libmesh_dbg_var(sc),
                              const IOPackage iop,
                              std::vector<dof_id_type> & conn) const

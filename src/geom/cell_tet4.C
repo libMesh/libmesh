@@ -182,6 +182,14 @@ std::unique_ptr<Elem> Tet4::build_edge_ptr (const unsigned int i)
 }
 
 
+
+void Tet4::build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i)
+{
+  this->simple_build_edge_ptr<Tet4>(edge, i, EDGE2);
+}
+
+
+
 void Tet4::connectivity(const unsigned int libmesh_dbg_var(sc),
                         const IOPackage iop,
                         std::vector<dof_id_type> & conn) const

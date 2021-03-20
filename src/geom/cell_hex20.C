@@ -226,6 +226,13 @@ std::unique_ptr<Elem> Hex20::build_edge_ptr (const unsigned int i)
 
 
 
+void Hex20::build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i)
+{
+  this->simple_build_edge_ptr<Hex20>(edge, i, EDGE3);
+}
+
+
+
 void Hex20::connectivity(const unsigned int sc,
                          const IOPackage iop,
                          std::vector<dof_id_type> & conn) const

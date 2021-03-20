@@ -233,6 +233,13 @@ std::unique_ptr<Elem> Tet10::build_edge_ptr (const unsigned int i)
 
 
 
+void Tet10::build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i)
+{
+  this->simple_build_edge_ptr<Tet10>(edge, i, EDGE3);
+}
+
+
+
 void Tet10::connectivity(const unsigned int sc,
                          const IOPackage iop,
                          std::vector<dof_id_type> & conn) const

@@ -360,6 +360,13 @@ std::unique_ptr<Elem> Prism18::build_edge_ptr (const unsigned int i)
 
 
 
+void Prism18::build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i)
+{
+  this->simple_build_edge_ptr<Prism18>(edge, i, EDGE3);
+}
+
+
+
 void Prism18::connectivity(const unsigned int sc,
                            const IOPackage iop,
                            std::vector<dof_id_type> & conn) const

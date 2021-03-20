@@ -178,6 +178,12 @@ public:
   { return build_side_ptr(i); }
 
   /**
+   * side and edge are identical for faces.
+   */
+  virtual void build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i) override final
+  { build_side_ptr(edge, i); }
+
+  /**
    * is_edge_on_side is trivial in 2D.
    */
   virtual bool is_edge_on_side(const unsigned int e,

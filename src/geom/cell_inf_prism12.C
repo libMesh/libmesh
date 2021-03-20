@@ -290,6 +290,7 @@ void InfPrism12::build_side_ptr (std::unique_ptr<Elem> & side,
 }
 
 
+
 std::unique_ptr<Elem> InfPrism12::build_edge_ptr (const unsigned int i)
 {
   if (i < 3) // base edges
@@ -298,6 +299,56 @@ std::unique_ptr<Elem> InfPrism12::build_edge_ptr (const unsigned int i)
   // infinite edges
   return this->simple_build_edge_ptr<InfEdge2,InfPrism12>(i);
 }
+
+
+
+void InfPrism12::build_edge_ptr (std::unique_ptr<Elem> & edge,
+                                 const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_edges());
+
+  switch (i)
+    {
+      // the base edges
+    case 0:
+    case 1:
+    case 2:
+      {
+        if (!edge.get() || edge->type() != EDGE3)
+          {
+            edge = this->build_edge_ptr(i);
+            return;
+          }
+        break;
+      }
+
+      // the infinite edges
+    case 3:
+    case 4:
+    case 5:
+      {
+        if (!edge.get() || edge->type() != INFEDGE2)
+          {
+            edge = this->build_edge_ptr(i);
+            return;
+          }
+        break;
+      }
+
+    default:
+      libmesh_error_msg("Invalid edge i = " << i);
+    }
+
+  edge->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  edge->set_p_level(this->p_level());
+#endif
+
+  // Set the nodes
+  for (auto n : edge->node_index_range())
+    edge->set_node(n) = this->node_ptr(InfPrism12::edge_nodes_map[i][n]);
+}
+
 
 
 void InfPrism12::connectivity(const unsigned int sc,
