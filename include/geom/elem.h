@@ -820,18 +820,16 @@ public:
    * delete the object.
    *
    * The second argument, which is true by default, specifies that a
-   * "proxy" element (of type Side) will be returned.  This type of
-   * value is useful because it does not allocate additional
-   * memory, and is usually sufficient for FE calculation purposes.
-   * If you really need a full-ordered, non-proxy side object, call
-   * this function with proxy=false.
+   * "proxy" element (of type Side) will be returned.  This option is
+   * now deprecated; full-featured elements have been made more
+   * efficient.
    *
    * The const version of this function is non-virtual; it simply
    * calls the virtual non-const version and const_casts the return
    * type.
    */
-  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i, bool proxy=true) = 0;
-  std::unique_ptr<const Elem> build_side_ptr (const unsigned int i, bool proxy=true) const;
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i, bool proxy=false) = 0;
+  std::unique_ptr<const Elem> build_side_ptr (const unsigned int i, bool proxy=false) const;
 
   /**
    * Resets the loose element \p side, which may currently point to a
