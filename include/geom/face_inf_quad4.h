@@ -125,7 +125,7 @@ public:
    * the sides 1, 2.
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy=true) override;
+                                                bool proxy=false) override;
 
   /**
    * Rebuilds an EDGE2 or INFEDGE2 coincident with face i.

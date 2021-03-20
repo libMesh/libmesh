@@ -123,7 +123,7 @@ public:
   virtual Order default_order() const override;
 
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy=true) override;
+                                                bool proxy=false) override;
 
   /**
    * Rebuilds an EDGE2 coincident with face i.
