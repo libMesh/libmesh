@@ -882,9 +882,9 @@ private:
                       const std::set<subdomain_id_type> & subdomains_relative_to);
 
   /**
-   * The Mesh this boundary info pertains to.
+   * A pointer to the Mesh this boundary info pertains to.
    */
-  MeshBase & _mesh;
+  MeshBase * _mesh;
 
   /**
    * Data structure that maps nodes in the mesh
