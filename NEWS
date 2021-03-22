@@ -1,4 +1,5 @@
 1.6.1 -> 1.6.2
+  * Fix for --enable-petsc-required
   * Fix nodes_on_edge for 2nd order InfCell cases
   * Fix Elem::is_child_on_edge
   * Fix asserts in PetscMatrix::add_sparse_matrix()
