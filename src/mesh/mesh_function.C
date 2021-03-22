@@ -800,6 +800,12 @@ const PointLocatorBase & MeshFunction::get_point_locator () const
   return *_point_locator;
 }
 
+PointLocatorBase & MeshFunction::get_point_locator ()
+{
+  libmesh_assert (this->initialized());
+  return *_point_locator;
+}
+
 void MeshFunction::enable_out_of_mesh_mode(const DenseVector<Number> & value)
 {
   libmesh_assert (this->initialized());

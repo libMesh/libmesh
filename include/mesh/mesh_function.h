@@ -265,6 +265,7 @@ public:
    * is called.
    */
   const PointLocatorBase & get_point_locator () const;
+  PointLocatorBase & get_point_locator ();
 
   /**
    * Enables out-of-mesh mode.  In this mode, if asked for a point
