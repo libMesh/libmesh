@@ -1230,8 +1230,10 @@ PetscMatrix<T>::add_sparse_matrix (const SparseMatrix<T> & spm,
                                    const std::map<numeric_index_type, numeric_index_type> & col_ltog,
                                    const T scalar)
 {
-  libmesh_assert_equal_to(spm.m(), row_ltog.size());
-  libmesh_assert_equal_to(spm.n(), col_ltog.size());
+  // size of spm is usually greater than row_ltog and col_ltog in parallel as the indices are owned by the processor
+  // also, we should allow adding certain parts of spm to _mat
+  libmesh_assert_greater_equal(spm.m(), row_ltog.size());
+  libmesh_assert_greater_equal(spm.n(), col_ltog.size());
 
   // make sure matrix has larger size than spm
   libmesh_assert_greater_equal(this->m(), spm.m());
