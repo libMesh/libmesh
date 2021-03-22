@@ -1,3 +1,9 @@
+1.6.1 -> 1.6.2
+  * Fix nodes_on_edge for 2nd order InfCell cases
+  * Fix Elem::is_child_on_edge
+  * Fix asserts in PetscMatrix::add_sparse_matrix()
+  * Fix residual history vector pointer constness in newer PETSc versions
+
 1.6.0 -> 1.6.1
   * Do *not* sync done_saving_ids across processors
   * Fix compilation with both CAPNP and GLPK enabled
