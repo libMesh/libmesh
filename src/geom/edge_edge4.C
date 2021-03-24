@@ -106,6 +106,9 @@ bool Edge4::has_affine_map() const
 
 bool Edge4::has_invertible_map(Real tol) const
 {
+  // At the moment this only makes sense for Lagrange elements
+  libmesh_assert_equal_to(this->mapping_type(), LAGRANGE_MAP);
+
   // dx/dxi = a*xi^2 + b*xi + c,
   // where a, b, and c are vector quantities that depend on the
   // nodal positions as follows:

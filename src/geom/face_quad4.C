@@ -141,6 +141,9 @@ bool Quad4::has_affine_map() const
 
 bool Quad4::has_invertible_map(Real tol) const
 {
+  // At the moment this only makes sense for Lagrange elements
+  libmesh_assert_equal_to(this->mapping_type(), LAGRANGE_MAP);
+
   // Side vectors
   Point s0 = this->point(1) - this->point(0);
   Point s1 = this->point(2) - this->point(1);

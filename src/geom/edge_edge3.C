@@ -102,6 +102,9 @@ bool Edge3::has_affine_map() const
 
 bool Edge3::has_invertible_map(Real tol) const
 {
+  // At the moment this only makes sense for Lagrange elements
+  libmesh_assert_equal_to(this->mapping_type(), LAGRANGE_MAP);
+
   // The "Jacobian vector" (dx/dxi, dy/dxi, dz/dxi) is:
   // j(xi) := a*xi + b, where
   Point a = this->point(0) + this->point(1) - 2 * this->point(2);
