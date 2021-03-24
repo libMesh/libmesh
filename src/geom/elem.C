@@ -2241,6 +2241,16 @@ bool Elem::point_test(const Point & p, Real box_tol, Real map_tol) const
 
 
 
+bool Elem::has_invertible_map(Real /*tol*/) const
+{
+  libmesh_not_implemented();
+
+  // We won't get here
+  return true;
+}
+
+
+
 void Elem::print_info (std::ostream & os) const
 {
   os << this->get_info()

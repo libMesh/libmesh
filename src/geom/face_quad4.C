@@ -139,6 +139,72 @@ bool Quad4::has_affine_map() const
 
 
 
+bool Quad4::has_invertible_map(Real tol) const
+{
+  // At the moment this only makes sense for Lagrange elements
+  libmesh_assert_equal_to(this->mapping_type(), LAGRANGE_MAP);
+
+  // Side vectors
+  Point s0 = this->point(1) - this->point(0);
+  Point s1 = this->point(2) - this->point(1);
+  Point s2 = this->point(3) - this->point(2);
+  Point s3 = this->point(0) - this->point(3);
+
+  // Cross products of side vectors
+  Point v1 = s3.cross(s0);
+  Point v2 = s2.cross(s0);
+  Point v3 = s3.cross(s1);
+
+  // A unit vector in the direction of:
+  // f(xi, eta) = (v1 + xi*v2 + eta*v3)
+  // at the midpoint (xi, eta) = (1/2, 1/2) of the element. (Note that
+  // we are using the [0,1]^2 reference element definition for the
+  // Quad4 instead of the [-1,1]^2 reference element that is typically
+  // used for FEM calculations.) We use this as a "reference" vector
+  // and compare the sign of dot(n,f) at each vertex.
+  Point n = v1 + .5 * (v2 + v3);
+  Real norm_n = n.norm();
+
+  // If the Jacobian vector at the midpoint of the element is zero,
+  // then it must be either zero for the entire element, or change
+  // sign at the vertices. Either way the element is non-invertible.
+  if (norm_n <= tol)
+    return false;
+
+  n /= norm_n;
+
+  // Debugging
+  // std::cout << "n=" << n << std::endl;
+
+  // Compute scalar quantity n * (v1 + xi*v2 + eta*v3) at each
+  // vertex. If it is non-zero and has the same sign at each
+  // vertex, the the element is invertible, otherwise it is not.
+  std::array<Real, 4> vertex_vals;
+  unsigned int ctr = 0;
+  for (unsigned int i=0; i<2; ++i)
+    for (unsigned int j=0; j<2; ++j)
+      vertex_vals[ctr++] = n * (v1 + Real(i)*v2 + Real(j)*v3);
+
+  // Debugging:
+  // std::cout << "Vertex values: ";
+  // for (const auto & val : vertex_vals)
+  //   std::cout << val << " ";
+  // std::cout << std::endl;
+
+  auto result = std::minmax_element(vertex_vals.begin(), vertex_vals.end());
+  Real min_vertex = *(result.first);
+  Real max_vertex = *(result.second);
+
+  // Debugging
+  // std::cout << "min_vertex=" << min_vertex << std::endl;
+  // std::cout << "max_vertex=" << max_vertex << std::endl;
+
+  // If max and min are both on the same side of 0, we are invertible, otherwise we are not.
+  return ((max_vertex > 0 && min_vertex > 0) || (max_vertex < 0 && min_vertex < 0));
+}
+
+
+
 Order Quad4::default_order() const
 {
   return FIRST;

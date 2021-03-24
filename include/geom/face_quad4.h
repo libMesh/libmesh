@@ -118,6 +118,11 @@ public:
   virtual bool has_affine_map () const override;
 
   /**
+   * \returns \p true if the element convex, false otherwise.
+   */
+  virtual bool has_invertible_map(Real tol) const override;
+
+  /**
    * \returns FIRST.
    */
   virtual Order default_order() const override;

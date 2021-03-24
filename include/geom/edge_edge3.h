@@ -118,6 +118,14 @@ public:
   virtual bool has_affine_map () const override;
 
   /**
+   * \returns \p true if the element map is everywhere invertible,
+   * false otherwise. The user can pass a custom tol >= 0 to this
+   * function if desired to make the check more stringent, i.e.
+   * to also catch elements which are "almost" non-invertible.
+   */
+  virtual bool has_invertible_map(Real tol) const override;
+
+  /**
    * \returns \p EDGE3.
    */
   virtual ElemType type() const override { return EDGE3; }
