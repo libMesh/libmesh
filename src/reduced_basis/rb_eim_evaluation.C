@@ -174,6 +174,41 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
 
   LOG_SCOPE("rb_eim_solves()", "RBEIMEvaluation");
 
+  if (_EIM_rhs_vec)
+    {
+      // In this case we set up _rb_eim_solutions based on the EIM_rhs vectors in
+      // _EIM_rhs_vec. The motivation of this is when we have trained an EIM representation
+      // based on lookup_table data, but then we want to use it in the Online stage for new
+      // data that is not contained in the lookup_table. In this case we can set values
+      // in _EIM_rhs_vec as needed and compute _rb_eim_solutions based on that.
+
+      // Clear _rb_eim_solves_mus and _rb_eim_solves_N since these are not used in
+      // this case.
+      _rb_eim_solves_mus.clear();
+      _rb_eim_solves_N = 0;
+
+      libmesh_error_msg_if(_EIM_rhs_vec->size() != mus.size(), "We expect vector sizes to match");
+
+      _rb_eim_solutions.resize(_EIM_rhs_vec->size());
+      for (unsigned int rhs_index : index_range(*_EIM_rhs_vec))
+        {
+          const DenseVector<Number> & EIM_rhs = (*_EIM_rhs_vec)[rhs_index];
+
+          libmesh_error_msg_if(EIM_rhs.size() > get_n_basis_functions(),
+                              "Error: N cannot be larger than the number of basis functions in rb_eim_solves");
+
+          libmesh_error_msg_if(EIM_rhs.size()==0, "Error: N must be greater than 0 in rb_eim_solves");
+
+          const unsigned int N = EIM_rhs.size();
+          DenseMatrix<Number> interpolation_matrix_N;
+          _interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
+
+          interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[rhs_index]);
+        }
+
+      return;
+    }
+
   _rb_eim_solves_mus = mus;
   _rb_eim_solves_N = N;
 
@@ -498,6 +533,16 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   _interpolation_points_subdomain_id.emplace_back(subdomain_id);
   _interpolation_points_qp.emplace_back(qp);
   _interpolation_points_xyz_perturbations.emplace_back(perturbs);
+}
+
+void RBEIMEvaluation::set_EIM_rhs_vec(std::unique_ptr<std::vector<DenseVector<Number>>> EIM_rhs_vec)
+{
+  _EIM_rhs_vec = std::move(EIM_rhs_vec);
+}
+
+const std::vector<DenseVector<Number>> & RBEIMEvaluation::get_EIM_rhs() const
+{
+  return *_EIM_rhs_vec;
 }
 
 void RBEIMEvaluation::
