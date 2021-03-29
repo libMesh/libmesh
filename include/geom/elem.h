@@ -2425,6 +2425,19 @@ Elem::build_edge_ptr (const unsigned int i) const
 
 
 
+inline
+void
+Elem::build_edge_ptr (std::unique_ptr<const Elem> & elem,
+                      const unsigned int i) const
+{
+  // Hand off to the non-const version of this function
+  Elem * me = const_cast<Elem *>(this);
+  std::unique_ptr<Elem> e {const_cast<Elem *>(elem.release())};
+  me->build_edge_ptr(e, i);
+  elem.reset(e.release());
+}
+
+
 template <typename Edgeclass, typename Subclass>
 inline
 std::unique_ptr<Elem>
