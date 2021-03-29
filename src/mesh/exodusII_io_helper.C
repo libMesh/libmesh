@@ -882,15 +882,12 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
   // of the same Edge.
   typedef std::pair<dof_id_type, unsigned int> ElemEdgePair;
   std::unordered_map<dof_id_type, std::vector<ElemEdgePair>> edge_map;
+  std::unique_ptr<Elem> edge_ptr;
   for (const auto & elem : mesh.element_ptr_range())
     for (auto e : elem->edge_index_range())
       {
-        // TODO: Make various Elem::compute_key() functions
-        // unprotected, this would allow us to avoid calling
-        // build_edge_ptr() repeatedly in case that turns out to be
-        // a bottleneck.
-        std::unique_ptr<Elem> edge = elem->build_edge_ptr(e);
-        dof_id_type edge_key = edge->key();
+        elem->build_edge_ptr(edge_ptr, e);
+        dof_id_type edge_key = edge_ptr->key();
 
         // Creates vector if not already there
         auto & vec = edge_map[edge_key];
@@ -980,15 +977,14 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
                   // this check avoids a false positive.
 
                   // Build edge indicated by elem_edge_pair
-                  auto candidate_edge =
-                    mesh.elem_ptr(elem_edge_pair.first)->
-                    build_edge_ptr(elem_edge_pair.second);
+                  mesh.elem_ptr(elem_edge_pair.first)->
+                    build_edge_ptr(edge_ptr, elem_edge_pair.second);
 
                   // Determine whether this candidate edge is a "real" match,
                   // i.e. also has the same orientation.
                   bool is_match = true;
                   for (int n=0; n<num_nodes_per_edge; ++n)
-                    if (candidate_edge->node_id(n) != edge->node_id(n))
+                    if (edge_ptr->node_id(n) != edge->node_id(n))
                       {
                         is_match = false;
                         break;
@@ -1961,6 +1957,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   std::map<boundary_id_type, std::vector<int>> edge_id_to_conn;
   std::map<boundary_id_type, std::pair<ElemType, unsigned int>> edge_id_to_elem_type;
 
+  std::unique_ptr<const Elem> edge;
   for (const auto & t : edge_tuples)
     {
       dof_id_type elem_id = std::get<0>(t);
@@ -1968,8 +1965,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       boundary_id_type b_id = std::get<2>(t);
 
       // Build the edge in question
-      std::unique_ptr<const Elem> edge =
-        mesh.elem_ptr(elem_id)->build_edge_ptr(edge_id);
+      mesh.elem_ptr(elem_id)->build_edge_ptr(edge, edge_id);
 
       // Error checking: make sure that all edges in this block are
       // the same geometric type.

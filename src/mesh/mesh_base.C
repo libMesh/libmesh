@@ -961,6 +961,8 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
         BoundingBox bbox;
       };
       std::map<boundary_id_type, EdgesetInfo> edgeset_info_map;
+      std::unique_ptr<const Elem> edge;
+
       for (const auto & pair : this->get_boundary_info().get_edgeset_map())
         {
           const Elem * elem = pair.first;
@@ -970,7 +972,7 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
           const auto id = pair.second.second;
           EdgesetInfo & info = edgeset_info_map[id];
 
-          const auto edge = elem->build_edge_ptr(pair.second.first);
+          elem->build_edge_ptr(edge, pair.second.first);
 
           ++info.num_edges;
           info.edge_elem_types.insert(edge->type());
