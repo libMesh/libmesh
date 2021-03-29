@@ -96,7 +96,6 @@ private:
   const unsigned int _side_number;
 };
 
-#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 /**
@@ -122,6 +121,10 @@ public:
     EdgeType(const_cast<Elem *>(my_parent)),
     _edge_number(my_edge)
   {
+    // Our more-optimized non-proxy side code makes this class
+    // obsolete.
+    libmesh_deprecated();
+
     libmesh_assert(my_parent);
     libmesh_assert_less (_edge_number, this->parent()->n_edges());
     libmesh_assert_equal_to (this->dim(), 1);
@@ -148,6 +151,7 @@ private:
   const unsigned int _edge_number;
 };
 
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 } // namespace libMesh
 
