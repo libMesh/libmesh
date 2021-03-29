@@ -195,7 +195,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
       DenseMatrix<Number> interpolation_matrix_N;
       _interpolation_matrix.get_principal_submatrix((*_EIM_rhs_vec)[0].size(), interpolation_matrix_N);
 
-      for (unsigned int rhs_index : index_range(*_EIM_rhs_vec))
+      for (auto rhs_index : index_range(*_EIM_rhs_vec))
         {
           const DenseVector<Number> & EIM_rhs = (*_EIM_rhs_vec)[rhs_index];
 
