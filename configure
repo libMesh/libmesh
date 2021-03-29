@@ -43915,7 +43915,7 @@ _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define IO_COMPATIBILITY_VERSION "0.7.4"
+#define IO_COMPATIBILITY_VERSION "1.7.0"
 _ACEOF
 
 
