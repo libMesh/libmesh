@@ -199,9 +199,8 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
 
           libmesh_error_msg_if(EIM_rhs.size()==0, "Error: N must be greater than 0 in rb_eim_solves");
 
-          const unsigned int N = EIM_rhs.size();
           DenseMatrix<Number> interpolation_matrix_N;
-          _interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
+          _interpolation_matrix.get_principal_submatrix(EIM_rhs.size(), interpolation_matrix_N);
 
           interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[rhs_index]);
         }
