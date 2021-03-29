@@ -188,7 +188,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
       _rb_eim_solves_N = 0;
 
       libmesh_error_msg_if(_EIM_rhs_vec->size() != mus.size(), "We expect vector sizes to match");
-      libmesh_error_msg_if(_EIM_rhs_vec.empty(), "_EIM_rhs_vec should not be empty");
+      libmesh_error_msg_if(_EIM_rhs_vec->empty(), "_EIM_rhs_vec should not be empty");
 
       _rb_eim_solutions.resize(_EIM_rhs_vec->size());
 
