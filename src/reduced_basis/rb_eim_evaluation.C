@@ -188,8 +188,13 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
       _rb_eim_solves_N = 0;
 
       libmesh_error_msg_if(_EIM_rhs_vec->size() != mus.size(), "We expect vector sizes to match");
+      libmesh_error_msg_if(_EIM_rhs_vec.empty(), "_EIM_rhs_vec should not be empty");
 
       _rb_eim_solutions.resize(_EIM_rhs_vec->size());
+
+      DenseMatrix<Number> interpolation_matrix_N;
+      _interpolation_matrix.get_principal_submatrix((*_EIM_rhs_vec)[0].size(), interpolation_matrix_N);
+
       for (unsigned int rhs_index : index_range(*_EIM_rhs_vec))
         {
           const DenseVector<Number> & EIM_rhs = (*_EIM_rhs_vec)[rhs_index];
@@ -199,8 +204,8 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
 
           libmesh_error_msg_if(EIM_rhs.size()==0, "Error: N must be greater than 0 in rb_eim_solves");
 
-          DenseMatrix<Number> interpolation_matrix_N;
-          _interpolation_matrix.get_principal_submatrix(EIM_rhs.size(), interpolation_matrix_N);
+          libmesh_error_msg_if(EIM_rhs.size()!=(*_EIM_rhs_vec)[0].size(),
+                               "Error: EIM_rhs sizes should all be the same");
 
           interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[rhs_index]);
         }
