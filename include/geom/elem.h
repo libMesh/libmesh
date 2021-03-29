@@ -1752,6 +1752,22 @@ protected:
                        const unsigned int i,
                        ElemType sidetype);
 
+  /**
+   * An implementation for simple (all edges equal) elements
+   */
+  template <typename Edgeclass, typename Subclass>
+  std::unique_ptr<Elem>
+  simple_build_edge_ptr(const unsigned int i);
+
+  /**
+   * An implementation for simple (all edges equal) elements
+   */
+  template <typename Subclass>
+  void simple_build_edge_ptr(std::unique_ptr<Elem> & edge,
+                             const unsigned int i,
+                             ElemType edgetype);
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -2405,6 +2421,57 @@ Elem::build_edge_ptr (const unsigned int i) const
   Elem * me = const_cast<Elem *>(this);
   const Elem * e = const_cast<const Elem *>(me->build_edge_ptr(i).release());
   return std::unique_ptr<const Elem>(e);
+}
+
+
+
+template <typename Edgeclass, typename Subclass>
+inline
+std::unique_ptr<Elem>
+Elem::simple_build_edge_ptr (const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_edges());
+
+  std::unique_ptr<Elem> edge = libmesh_make_unique<Edgeclass>(this);
+
+  for (auto n : edge->node_index_range())
+    edge->set_node(n) = this->node_ptr(Subclass::edge_nodes_map[i][n]);
+
+  edge->set_interior_parent(this);
+  edge->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  edge->set_p_level(this->p_level());
+#endif
+
+  return edge;
+}
+
+
+
+
+template <typename Subclass>
+inline
+void
+Elem::simple_build_edge_ptr (std::unique_ptr<Elem> & edge,
+                             const unsigned int i,
+                             ElemType edgetype)
+{
+  libmesh_assert_less (i, this->n_edges());
+
+  if (!edge.get() || edge->type() != edgetype)
+    {
+      Subclass & real_me = cast_ref<Subclass&>(*this);
+      edge = real_me.Subclass::build_edge_ptr(i);
+    }
+  else
+    {
+      edge->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+      edge->set_p_level(this->p_level());
+#endif
+      for (auto n : edge->node_index_range())
+        edge->set_node(n) = this->node_ptr(Subclass::edge_nodes_map[i][n]);
+    }
 }
 
 
