@@ -256,6 +256,18 @@ public:
     const std::vector<Point> & perturbs);
 
   /**
+   * Take ownership of EIM_rhs_vec and set _EIM_rhs_vec. These RHS vectors
+   * will be used in rb_eim_solve(), instead of RHS vectors constructed based
+   * on the input parameters.
+   */
+  void set_EIM_rhs_vec(std::unique_ptr<std::vector<DenseVector<Number>>> EIM_rhs_vec);
+
+  /**
+   * Get a const reference to _EIM_rhs_vec.
+   */
+  const std::vector<DenseVector<Number>> & get_EIM_rhs() const;
+
+  /**
    * Boolean to indicate whether we evaluate a posteriori error bounds
    * when eim_solve is called.
    */
@@ -369,6 +381,11 @@ private:
    * generally will not start at zero.
    */
   std::vector<QpDataMap> _local_eim_basis_functions;
+
+  /**
+   * The RHS vectors that will be used in rb_eim_solves(), if they are initialized.
+   */
+  std::unique_ptr<std::vector<DenseVector<Number>>> _EIM_rhs_vec;
 
   /**
    * Print the contents of _local_eim_basis_functions to libMesh::out.
