@@ -297,9 +297,7 @@ void Pyramid13::build_side_ptr (std::unique_ptr<Elem> & side,
 
 std::unique_ptr<Elem> Pyramid13::build_edge_ptr (const unsigned int i)
 {
-  libmesh_assert_less (i, this->n_edges());
-
-  return libmesh_make_unique<SideEdge<Edge3,Pyramid13>>(this,i);
+  return this->simple_build_edge_ptr<Edge3,Pyramid13>(i);
 }
 
 

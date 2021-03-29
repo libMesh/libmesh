@@ -221,9 +221,7 @@ unsigned int Hex20::local_edge_node(unsigned int edge,
 
 std::unique_ptr<Elem> Hex20::build_edge_ptr (const unsigned int i)
 {
-  libmesh_assert_less (i, this->n_edges());
-
-  return libmesh_make_unique<SideEdge<Edge3,Hex20>>(this,i);
+  return this->simple_build_edge_ptr<Edge3,Hex20>(i);
 }
 
 

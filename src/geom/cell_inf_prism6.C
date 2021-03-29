@@ -229,13 +229,11 @@ void InfPrism6::build_side_ptr (std::unique_ptr<Elem> & side,
 
 std::unique_ptr<Elem> InfPrism6::build_edge_ptr (const unsigned int i)
 {
-  libmesh_assert_less (i, n_edges());
-
   if (i < 3)
-    return libmesh_make_unique<SideEdge<Edge2,InfPrism6>>(this,i);
+    return this->simple_build_edge_ptr<Edge2,InfPrism6>(i);
 
   // infinite edges
-  return libmesh_make_unique<SideEdge<InfEdge2,InfPrism6>>(this,i);
+  return this->simple_build_edge_ptr<InfEdge2,InfPrism6>(i);
 }
 
 void InfPrism6::connectivity(const unsigned int libmesh_dbg_var(sc),

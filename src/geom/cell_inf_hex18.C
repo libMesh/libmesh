@@ -328,13 +328,11 @@ void InfHex18::build_side_ptr (std::unique_ptr<Elem> & side,
 
 std::unique_ptr<Elem> InfHex18::build_edge_ptr (const unsigned int i)
 {
-  libmesh_assert_less (i, this->n_edges());
-
   if (i < 4) // base edges
-    return libmesh_make_unique<SideEdge<Edge3,InfHex18>>(this,i);
+    return this->simple_build_edge_ptr<Edge3,InfHex18>(i);
 
   // infinite edges
-  return libmesh_make_unique<SideEdge<InfEdge2,InfHex18>>(this,i);
+  return this->simple_build_edge_ptr<InfEdge2,InfHex18>(i);
 }
 
 
