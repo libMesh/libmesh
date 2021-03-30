@@ -2305,7 +2305,7 @@ Elem::side_ptr (std::unique_ptr<const Elem> & elem,
   Elem * me = const_cast<Elem *>(this);
   std::unique_ptr<Elem> e {const_cast<Elem *>(elem.release())};
   me->side_ptr(e, i);
-  elem.reset(e.release());
+  elem = std::move(e);
 }
 
 
@@ -2332,7 +2332,7 @@ Elem::build_side_ptr (std::unique_ptr<const Elem> & elem,
   Elem * me = const_cast<Elem *>(this);
   std::unique_ptr<Elem> e {const_cast<Elem *>(elem.release())};
   me->build_side_ptr(e, i);
-  elem.reset(e.release());
+  elem = std::move(e);
 }
 
 
@@ -2452,7 +2452,7 @@ Elem::build_edge_ptr (std::unique_ptr<const Elem> & elem,
   Elem * me = const_cast<Elem *>(this);
   std::unique_ptr<Elem> e {const_cast<Elem *>(elem.release())};
   me->build_edge_ptr(e, i);
-  elem.reset(e.release());
+  elem = std::move(e);
 }
 
 
