@@ -148,6 +148,8 @@ std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i,
   std::unique_ptr<Elem> face;
   if (proxy)
     {
+#ifdef LIBMESH_ENABLE_DEPRECATED
+      libmesh_deprecated();
       switch (i)
         {
           // base
@@ -170,8 +172,10 @@ std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i,
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
+#else
+      libmesh_error();
+#endif // LIBMESH_ENABLE_DEPRECATED
     }
-
   else
     {
       // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
@@ -208,6 +212,11 @@ std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i,
     face->set_parent(nullptr);
   face->set_interior_parent(this);
 
+  face->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  face->set_p_level(this->p_level());
+#endif
+
   return face;
 }
 
@@ -222,14 +231,64 @@ void InfHex8::build_side_ptr (std::unique_ptr<Elem> & side,
 
 std::unique_ptr<Elem> InfHex8::build_edge_ptr (const unsigned int i)
 {
-  libmesh_assert_less (i, this->n_edges());
-
   if (i < 4) // base edges
-    return libmesh_make_unique<SideEdge<Edge2,InfHex8>>(this,i);
+    return this->simple_build_edge_ptr<Edge2,InfHex8>(i);
 
   // infinite edges
-  return libmesh_make_unique<SideEdge<InfEdge2,InfHex8>>(this,i);
+  return this->simple_build_edge_ptr<InfEdge2,InfHex8>(i);
 }
+
+
+
+void InfHex8::build_edge_ptr (std::unique_ptr<Elem> & edge,
+                              const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_edges());
+
+  switch (i)
+    {
+      // the base edges
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      {
+        if (!edge.get() || edge->type() != EDGE2)
+          {
+            edge = this->build_edge_ptr(i);
+            return;
+          }
+        break;
+      }
+
+      // the infinite edges
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+      {
+        if (!edge.get() || edge->type() != INFEDGE2)
+          {
+            edge = this->build_edge_ptr(i);
+            return;
+          }
+        break;
+      }
+
+    default:
+      libmesh_error_msg("Invalid edge i = " << i);
+    }
+
+  edge->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  edge->set_p_level(this->p_level());
+#endif
+
+  // Set the nodes
+  for (auto n : edge->node_index_range())
+    edge->set_node(n) = this->node_ptr(InfHex8::edge_nodes_map[i][n]);
+}
+
 
 
 void InfHex8::connectivity(const unsigned int libmesh_dbg_var(sc),

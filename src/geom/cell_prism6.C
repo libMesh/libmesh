@@ -163,6 +163,8 @@ std::unique_ptr<Elem> Prism6::build_side_ptr (const unsigned int i,
   std::unique_ptr<Elem> face;
   if (proxy)
     {
+#ifdef LIBMESH_ENABLE_DEPRECATED
+      libmesh_deprecated();
       switch(i)
         {
         case 0:
@@ -183,8 +185,10 @@ std::unique_ptr<Elem> Prism6::build_side_ptr (const unsigned int i,
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
+#else
+      libmesh_error();
+#endif // LIBMESH_ENABLE_DEPRECATED
     }
-
   else
     {
       switch (i)
@@ -217,6 +221,11 @@ std::unique_ptr<Elem> Prism6::build_side_ptr (const unsigned int i,
     face->set_parent(nullptr);
   face->set_interior_parent(this);
 
+  face->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  face->set_p_level(this->p_level());
+#endif
+
   return face;
 }
 
@@ -232,9 +241,14 @@ void Prism6::build_side_ptr (std::unique_ptr<Elem> & side,
 
 std::unique_ptr<Elem> Prism6::build_edge_ptr (const unsigned int i)
 {
-  libmesh_assert_less (i, this->n_edges());
+  return this->simple_build_edge_ptr<Edge2,Prism6>(i);
+}
 
-  return libmesh_make_unique<SideEdge<Edge2,Prism6>>(this,i);
+
+
+void Prism6::build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i)
+{
+  this->simple_build_edge_ptr<Prism6>(edge, i, EDGE2);
 }
 
 

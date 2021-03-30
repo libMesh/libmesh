@@ -134,7 +134,7 @@ public:
    * \note The \p std::unique_ptr<Elem> takes care of freeing memory.
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy=true) override;
+                                                bool proxy=false) override;
 
   /**
    * Rebuilds a \p TRI3 built coincident with face 0, or an \p INFQUAD4
@@ -150,6 +150,12 @@ public:
    * \note that the \p std::unique_ptr<Elem> takes care of freeing memory.
    */
   virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) override;
+
+  /**
+   * Rebuilds a \p EDGE3 built coincident with edges 0 to 2, or \p
+   * INFEDGE2 built coincident with edges 3 to 5.
+   */
+  virtual void build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i) override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,

@@ -176,9 +176,14 @@ void Hex8::build_side_ptr (std::unique_ptr<Elem> & side,
 
 std::unique_ptr<Elem> Hex8::build_edge_ptr (const unsigned int i)
 {
-  libmesh_assert_less (i, this->n_edges());
+  return this->simple_build_edge_ptr<Edge2,Hex8>(i);
+}
 
-  return libmesh_make_unique<SideEdge<Edge2,Hex8>>(this,i);
+
+
+void Hex8::build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i)
+{
+  this->simple_build_edge_ptr<Hex8>(edge, i, EDGE2);
 }
 
 

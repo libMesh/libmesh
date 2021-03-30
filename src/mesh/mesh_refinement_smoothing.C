@@ -137,6 +137,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
   std::map<std::pair<unsigned int, unsigned int>, unsigned char>
     max_p_level_at_edge;
 
+  std::unique_ptr<const Elem> edge, pedge;
   // Loop over all the active elements & fill the maps
   for (auto & elem : _mesh.active_element_ptr_range())
     {
@@ -150,7 +151,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
       // Set the max_level at each edge
       for (auto n : elem->edge_index_range())
         {
-          std::unique_ptr<const Elem> edge = elem->build_edge_ptr(n);
+          elem->build_edge_ptr(edge, n);
           dof_id_type childnode0 = edge->node_id(0);
           dof_id_type childnode1 = edge->node_id(1);
           if (childnode1 < childnode0)
@@ -158,7 +159,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 
           for (const Elem * p = elem; p != nullptr; p = p->parent())
             {
-              std::unique_ptr<const Elem> pedge = p->build_edge_ptr(n);
+              p->build_edge_ptr(pedge, n);
               dof_id_type node0 = pedge->node_id(0);
               dof_id_type node1 = pedge->node_id(1);
 
@@ -214,7 +215,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
       // Loop over the nodes, check for possible mismatch
       for (auto n : elem->edge_index_range())
         {
-          std::unique_ptr<Elem> edge = elem->build_edge_ptr(n);
+          elem->build_edge_ptr(edge, n);
           dof_id_type node0 = edge->node_id(0);
           dof_id_type node1 = edge->node_id(1);
           if (node1 < node0)

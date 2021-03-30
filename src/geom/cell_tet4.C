@@ -184,10 +184,16 @@ void Tet4::build_side_ptr (std::unique_ptr<Elem> & side,
 
 std::unique_ptr<Elem> Tet4::build_edge_ptr (const unsigned int i)
 {
-  libmesh_assert_less (i, this->n_edges());
-
-  return libmesh_make_unique<SideEdge<Edge2,Tet4>>(this,i);
+  return this->simple_build_edge_ptr<Edge2,Tet4>(i);
 }
+
+
+
+void Tet4::build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i)
+{
+  this->simple_build_edge_ptr<Tet4>(edge, i, EDGE2);
+}
+
 
 
 void Tet4::connectivity(const unsigned int libmesh_dbg_var(sc),

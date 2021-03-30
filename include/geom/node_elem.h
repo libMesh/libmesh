@@ -153,6 +153,12 @@ public:
   { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }
 
   /**
+   * The \p Elem::build_edge_ptr() member makes no sense for nodes.
+   */
+  virtual void build_edge_ptr (std::unique_ptr<Elem> &, const unsigned int) override
+  { libmesh_not_implemented(); }
+
+  /**
    * \returns 1.
    */
   virtual unsigned int n_sub_elem() const override { return 1; }

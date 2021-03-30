@@ -820,18 +820,16 @@ public:
    * delete the object.
    *
    * The second argument, which is true by default, specifies that a
-   * "proxy" element (of type Side) will be returned.  This type of
-   * value is useful because it does not allocate additional
-   * memory, and is usually sufficient for FE calculation purposes.
-   * If you really need a full-ordered, non-proxy side object, call
-   * this function with proxy=false.
+   * "proxy" element (of type Side) will be returned.  This option is
+   * now deprecated; full-featured elements have been made more
+   * efficient.
    *
    * The const version of this function is non-virtual; it simply
    * calls the virtual non-const version and const_casts the return
    * type.
    */
-  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i, bool proxy=true) = 0;
-  std::unique_ptr<const Elem> build_side_ptr (const unsigned int i, bool proxy=true) const;
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i, bool proxy=false) = 0;
+  std::unique_ptr<const Elem> build_side_ptr (const unsigned int i, bool proxy=false) const;
 
   /**
    * Resets the loose element \p side, which may currently point to a
@@ -866,6 +864,24 @@ public:
    */
   virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) = 0;
   std::unique_ptr<const Elem> build_edge_ptr (const unsigned int i) const;
+
+  /**
+   * Resets the loose element \p edge, which may currently point to a
+   * different edge than \p i or even a different element than \p
+   * this, to point to edge \p i on \p this.  If \p edge is currently
+   * an element of the wrong type, it will be freed and a new element
+   * allocated; otherwise no memory allocation will occur.
+   *
+   * This should not be called with proxy SideEdge elements.  This will
+   * cause \p side to be a full-ordered element, even if it is handed
+   * a lower-ordered element that must be replaced.
+   *
+   * The const version of this function is non-virtual; it simply
+   * calls the virtual non-const version and const_casts the return
+   * type.
+   */
+  virtual void build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i) = 0;
+  void build_edge_ptr (std::unique_ptr<const Elem> & edge, const unsigned int i) const;
 
   /**
    * \returns The default approximation order for this element type.
@@ -1764,6 +1780,22 @@ protected:
                        const unsigned int i,
                        ElemType sidetype);
 
+  /**
+   * An implementation for simple (all edges equal) elements
+   */
+  template <typename Edgeclass, typename Subclass>
+  std::unique_ptr<Elem>
+  simple_build_edge_ptr(const unsigned int i);
+
+  /**
+   * An implementation for simple (all edges equal) elements
+   */
+  template <typename Subclass>
+  void simple_build_edge_ptr(std::unique_ptr<Elem> & edge,
+                             const unsigned int i,
+                             ElemType edgetype);
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -2283,7 +2315,7 @@ Elem::side_ptr (std::unique_ptr<const Elem> & elem,
   Elem * me = const_cast<Elem *>(this);
   std::unique_ptr<Elem> e {const_cast<Elem *>(elem.release())};
   me->side_ptr(e, i);
-  elem.reset(e.release());
+  elem = std::move(e);
 }
 
 
@@ -2310,7 +2342,7 @@ Elem::build_side_ptr (std::unique_ptr<const Elem> & elem,
   Elem * me = const_cast<Elem *>(this);
   std::unique_ptr<Elem> e {const_cast<Elem *>(elem.release())};
   me->build_side_ptr(e, i);
-  elem.reset(e.release());
+  elem = std::move(e);
 }
 
 
@@ -2325,7 +2357,14 @@ Elem::simple_build_side_ptr (const unsigned int i,
 
   std::unique_ptr<Elem> face;
   if (proxy)
-    face = libmesh_make_unique<Side<Sideclass,Subclass>>(this,i);
+    {
+#ifdef LIBMESH_ENABLE_DEPRECATED
+      face = libmesh_make_unique<Side<Sideclass,Subclass>>(this,i);
+      libmesh_deprecated();
+#else
+      libmesh_error();
+#endif
+    }
   else
     {
       face = libmesh_make_unique<Sideclass>(this);
@@ -2338,6 +2377,11 @@ Elem::simple_build_side_ptr (const unsigned int i,
 #endif
     face->set_parent(nullptr);
   face->set_interior_parent(this);
+
+  face->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  face->set_p_level(this->p_level());
+#endif
 
   return face;
 }
@@ -2405,6 +2449,70 @@ Elem::build_edge_ptr (const unsigned int i) const
   Elem * me = const_cast<Elem *>(this);
   const Elem * e = const_cast<const Elem *>(me->build_edge_ptr(i).release());
   return std::unique_ptr<const Elem>(e);
+}
+
+
+
+inline
+void
+Elem::build_edge_ptr (std::unique_ptr<const Elem> & elem,
+                      const unsigned int i) const
+{
+  // Hand off to the non-const version of this function
+  Elem * me = const_cast<Elem *>(this);
+  std::unique_ptr<Elem> e {const_cast<Elem *>(elem.release())};
+  me->build_edge_ptr(e, i);
+  elem = std::move(e);
+}
+
+
+template <typename Edgeclass, typename Subclass>
+inline
+std::unique_ptr<Elem>
+Elem::simple_build_edge_ptr (const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_edges());
+
+  std::unique_ptr<Elem> edge = libmesh_make_unique<Edgeclass>(this);
+
+  for (auto n : edge->node_index_range())
+    edge->set_node(n) = this->node_ptr(Subclass::edge_nodes_map[i][n]);
+
+  edge->set_interior_parent(this);
+  edge->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  edge->set_p_level(this->p_level());
+#endif
+
+  return edge;
+}
+
+
+
+
+template <typename Subclass>
+inline
+void
+Elem::simple_build_edge_ptr (std::unique_ptr<Elem> & edge,
+                             const unsigned int i,
+                             ElemType edgetype)
+{
+  libmesh_assert_less (i, this->n_edges());
+
+  if (!edge.get() || edge->type() != edgetype)
+    {
+      Subclass & real_me = cast_ref<Subclass&>(*this);
+      edge = real_me.Subclass::build_edge_ptr(i);
+    }
+  else
+    {
+      edge->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+      edge->set_p_level(this->p_level());
+#endif
+      for (auto n : edge->node_index_range())
+        edge->set_node(n) = this->node_ptr(Subclass::edge_nodes_map[i][n]);
+    }
 }
 
 

@@ -198,6 +198,9 @@ public:
   virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int) override
   { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }
 
+  virtual void build_edge_ptr (std::unique_ptr<Elem> &, const unsigned int) override
+  { libmesh_not_implemented(); }
+
   virtual Order default_order () const override
   { libmesh_not_implemented(); return static_cast<Order>(1); }
 

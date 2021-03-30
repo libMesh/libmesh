@@ -160,7 +160,7 @@ public:
    * \returns A pointer to a NodeElem for the specified node.
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy=true) override final;
+                                                bool proxy=false) override final;
 
   /**
    * Rebuilds a NODEELEM for the specified node.
@@ -173,6 +173,12 @@ public:
    */
   virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int) override final
   { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }
+
+  /**
+   * The \p Elem::build_edge_ptr() member makes no sense for edges.
+   */
+  virtual void build_edge_ptr (std::unique_ptr<Elem> &, const unsigned int) override final
+  { libmesh_not_implemented(); }
 
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
 

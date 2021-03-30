@@ -179,6 +179,8 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
   std::unique_ptr<Elem> face;
   if (proxy)
     {
+#ifdef LIBMESH_ENABLE_DEPRECATED
+      libmesh_deprecated();
       switch (i)
         {
           // base
@@ -200,6 +202,9 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
+#else
+      libmesh_error();
+#endif // LIBMESH_ENABLE_DEPRECATED
     }
 
   else
@@ -234,6 +239,11 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
 #endif
     face->set_parent(nullptr);
   face->set_interior_parent(this);
+
+  face->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  face->set_p_level(this->p_level());
+#endif
 
   return face;
 }
@@ -280,16 +290,65 @@ void InfPrism12::build_side_ptr (std::unique_ptr<Elem> & side,
 }
 
 
+
 std::unique_ptr<Elem> InfPrism12::build_edge_ptr (const unsigned int i)
+{
+  if (i < 3) // base edges
+    return this->simple_build_edge_ptr<Edge3,InfPrism12>(i);
+
+  // infinite edges
+  return this->simple_build_edge_ptr<InfEdge2,InfPrism12>(i);
+}
+
+
+
+void InfPrism12::build_edge_ptr (std::unique_ptr<Elem> & edge,
+                                 const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 
-  if (i < 3) // base edges
-    return libmesh_make_unique<SideEdge<Edge3,InfPrism12>>(this,i);
+  switch (i)
+    {
+      // the base edges
+    case 0:
+    case 1:
+    case 2:
+      {
+        if (!edge.get() || edge->type() != EDGE3)
+          {
+            edge = this->build_edge_ptr(i);
+            return;
+          }
+        break;
+      }
 
-  // infinite edges
-  return libmesh_make_unique<SideEdge<InfEdge2,InfPrism12>>(this,i);
+      // the infinite edges
+    case 3:
+    case 4:
+    case 5:
+      {
+        if (!edge.get() || edge->type() != INFEDGE2)
+          {
+            edge = this->build_edge_ptr(i);
+            return;
+          }
+        break;
+      }
+
+    default:
+      libmesh_error_msg("Invalid edge i = " << i);
+    }
+
+  edge->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  edge->set_p_level(this->p_level());
+#endif
+
+  // Set the nodes
+  for (auto n : edge->node_index_range())
+    edge->set_node(n) = this->node_ptr(InfPrism12::edge_nodes_map[i][n]);
 }
+
 
 
 void InfPrism12::connectivity(const unsigned int sc,

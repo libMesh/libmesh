@@ -175,6 +175,8 @@ std::unique_ptr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
   std::unique_ptr<Elem> edge;
   if (proxy)
     {
+#ifdef LIBMESH_ENABLE_DEPRECATED
+      libmesh_deprecated();
       switch (i)
         {
         case 0:
@@ -193,8 +195,10 @@ std::unique_ptr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
+#else
+      libmesh_error();
+#endif // LIBMESH_ENABLE_DEPRECATED
     }
-
   else
     {
       switch (i)
@@ -227,6 +231,11 @@ std::unique_ptr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
 #endif
     edge->set_parent(nullptr);
   edge->set_interior_parent(this);
+
+  edge->subdomain_id() = this->subdomain_id();
+#ifdef LIBMESH_ENABLE_AMR
+  edge->set_p_level(this->p_level());
+#endif
 
   return edge;
 }
