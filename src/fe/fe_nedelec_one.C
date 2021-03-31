@@ -81,11 +81,11 @@ void nedelec_one_nodal_soln(const Elem * elem,
             {
               libmesh_assert_equal_to (elem_soln.size(), 6);
               libmesh_assert_equal_to (nodal_soln.size(), 10*3);
-              
+
               break;
             }
 
-            
+
           case HEX20:
           case HEX27:
             {
