@@ -124,6 +124,7 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
     _boundary_side_id.emplace(_mesh->elem_ptr(pr.first->id()), pr.second);
 
   _boundary_ids = other_boundary_info._boundary_ids;
+  _global_boundary_ids = other_boundary_info._global_boundary_ids;
   _side_boundary_ids = other_boundary_info._side_boundary_ids;
   _node_boundary_ids = other_boundary_info._node_boundary_ids;
   _edge_boundary_ids = other_boundary_info._edge_boundary_ids;
@@ -214,9 +215,15 @@ void BoundaryInfo::regenerate_id_sets()
     }
 
   // Handle global data
-  _communicator.set_union(_ss_id_to_name);
-  _communicator.set_union(_ns_id_to_name);
-  _communicator.set_union(_es_id_to_name);
+  _global_boundary_ids = _boundary_ids;
+  libmesh_assert(_mesh);
+  if (!_mesh->is_serial())
+    {
+      _communicator.set_union(_ss_id_to_name);
+      _communicator.set_union(_ns_id_to_name);
+      _communicator.set_union(_es_id_to_name);
+      _communicator.set_union(_global_boundary_ids);
+    }
 }
 
 
@@ -2697,6 +2704,13 @@ void BoundaryInfo::clear_stitched_boundary_side_ids (const boundary_id_type side
   // *entirely*, so we need to recompute boundary id sets to check
   // for that.
   this->regenerate_id_sets();
+}
+
+const std::set<boundary_id_type> &
+BoundaryInfo::get_global_boundary_ids() const
+{
+  libmesh_assert(_mesh && _mesh->is_prepared());
+  return _global_boundary_ids;
 }
 
 } // namespace libMesh

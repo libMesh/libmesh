@@ -234,11 +234,11 @@ public:
 
   /**
    * Most of the time you should not need to call this, as the element
-   * dimensions will be set automatically by a call to cache_elem_dims(),
+   * dimensions will be set automatically by a call to cache_elem_data(),
    * therefore only call this if you know what you're doing.
    *
    * In some specialized situations, for example when adding a single
-   * Elem on all procs, it can be faster to skip calling cache_elem_dims()
+   * Elem on all procs, it can be faster to skip calling cache_elem_data()
    * and simply specify the element dimensions manually, which is why this
    * setter exists.
    */
@@ -996,7 +996,7 @@ public:
    *  1.) call \p find_neighbors()
    *  2.) call \p partition()
    *  3.) call \p renumber_nodes_and_elements()
-   *  4.) call \p cache_elem_dims()
+   *  4.) call \p cache_elem_data()
    *
    * The argument to skip renumbering is now deprecated - to prevent a
    * mesh from being renumbered, set allow_renumbering(false). The argument to skip
@@ -1696,17 +1696,37 @@ public:
   { return _constraint_rows; }
 
   /**
+   * \deprecated This method has ben replaced by \p cache_elem_data which
+   * caches data in addition to elem dimensions (e.g. elem subdomain ids)
    * Search the mesh and cache the different dimensions of the elements
    * present in the mesh.  This is done in prepare_for_use(), but can
    * be done manually by other classes after major mesh modifications.
    */
   void cache_elem_dims();
 
+  /*
+   * Search the mesh and cache data for the elements
+   * present in the mesh.  This is done in prepare_for_use(), but can
+   * be done manually by other classes after major mesh modifications.
+   * Data cached includes:
+   *   - elem dimensions
+   *   - elem subdomains
+   */
+  void cache_elem_data();
+
   /**
    * Search the mesh for elements that have a neighboring element
    * of dim+1 and set that element as the interior parent
    */
   void detect_interior_parents();
+
+  /**
+   * \return The cached mesh subdomains. As long as the mesh is prepared, this
+   * should contain all the subdomain ids across processors. Relies on the mesh
+   * being prepared
+   */
+  const std::set<subdomain_id_type> & get_mesh_subdomains() const
+  { libmesh_assert(this->is_prepared()); return _mesh_subdomains; }
 
 
   /**
@@ -1836,6 +1856,11 @@ protected:
    * will contain 1 and 2.
    */
   std::set<unsigned char> _elem_dims;
+
+  /**
+   * We cache the subdomain ids of the elements present in the mesh.
+   */
+  std::set<subdomain_id_type> _mesh_subdomains;
 
   /**
    * The "spatial dimension" of the Mesh.  See the documentation for

@@ -731,12 +731,17 @@ public:
    * \returns A set of the boundary ids which exist on semilocal parts
    * of the mesh.
    *
-   * DistributedMesh-compatible code may need a set_union or other
-   * manipulations to work with sets of boundary ids which include ids
-   * on remote parts of the mesh.
+   * Code that wishes to access boundary ids on all parts of the mesh, including
+   * non-local parts, should call \p get_global_boundary_ids
    */
   const std::set<boundary_id_type> & get_boundary_ids () const
   { return _boundary_ids; }
+
+  /**
+   * \returns A set of the boundary ids which exist globally
+   * on the mesh. Relies on the mesh being prepared
+   */
+  const std::set<boundary_id_type> & get_global_boundary_ids () const;
 
   /**
    * \returns A reference to the set of the boundary IDs specified on
@@ -927,6 +932,18 @@ private:
    * This only contains information related to this process's local and ghosted elements
    */
   std::set<boundary_id_type> _boundary_ids;
+
+  /**
+   * A collection of user-specified boundary ids for sides, edges, nodes,
+   * and shell faces.
+   * See _side_boundary_ids, _edge_boundary_ids, _node_boundary_ids, and
+   * _shellface_boundary_ids for sets containing IDs for only sides, edges,
+   * nodes, and shell faces, respectively.
+   *
+   * Unlike \p _boundary_ids, this member should contain boundary ids from across
+   * all processors after the mesh is prepared
+   */
+  std::set<boundary_id_type> _global_boundary_ids;
 
   /**
    * Set of user-specified boundary IDs for sides *only*.
