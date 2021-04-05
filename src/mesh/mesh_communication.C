@@ -1183,7 +1183,7 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
                                        mesh_inserter_iterator<Elem>(mesh));
 
   // Make sure mesh_dimension and elem_dimensions are consistent.
-  mesh.cache_elem_dims();
+  mesh.cache_elem_data();
 
   // We may have constraint rows on IsoGeometric Analysis meshes.  We
   // don't want to send these along with constrained nodes (like we
@@ -2117,10 +2117,6 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   // If we had a point locator, it's invalid now that some of the
   // elements it pointed to have been deleted.
   mesh.clear_point_locator();
-
-  // Much of our boundary info may have been for now-remote parts of
-  // the mesh, in which case we don't want to keep local copies.
-  mesh.get_boundary_info().regenerate_id_sets();
 
   // Many of our constraint rows may have been for non-local parts of
   // the mesh, which we don't need, and which we didn't specifically

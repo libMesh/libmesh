@@ -163,11 +163,11 @@ unsigned int MeshBase::mesh_dimension() const
 void MeshBase::set_elem_dimensions(const std::set<unsigned char> & elem_dims)
 {
 #ifdef DEBUG
-  // In debug mode, we call cache_elem_dims() and then make sure
+  // In debug mode, we call cache_elem_data() and then make sure
   // the result actually agrees with what the user specified.
   parallel_object_only();
 
-  this->cache_elem_dims();
+  this->cache_elem_data();
   libmesh_assert_msg(_elem_dims == elem_dims, \
                      "Specified element dimensions does not match true element dimensions!");
 #endif
@@ -435,7 +435,7 @@ void MeshBase::prepare_for_use ()
   // support mixed-dimension meshes), but we want consistent
   // mesh_dimension anyways.
   //
-  // cache_elem_dims() should get the elem_dimensions() and
+  // cache_elem_data() should get the elem_dimensions() and
   // mesh_dimension() correct later, and we don't need it earlier.
 
 
@@ -474,7 +474,7 @@ void MeshBase::prepare_for_use ()
 
   // Search the mesh for all the dimensions of the elements
   // and cache them.
-  this->cache_elem_dims();
+  this->cache_elem_data();
 
   // Search the mesh for elements that have a neighboring element
   // of dim+1 and set that element as the interior parent
@@ -514,6 +514,13 @@ void MeshBase::prepare_for_use ()
   // parallelized.
   if (this->_allow_remote_element_removal)
     this->delete_remote_elements();
+
+  // Much of our boundary info may have been for now-remote parts of the mesh,
+  // in which case we don't want to keep local copies of data meant to be
+  // local. On the other hand we may have deleted, or the user may have added in
+  // a distributed fashion, boundary data that is meant to be global. So we
+  // handle both of those scenarios here
+  this->get_boundary_info().regenerate_id_sets();
 
   if (!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
@@ -1299,18 +1306,33 @@ subdomain_id_type MeshBase::get_id_by_name(const std::string & name) const
 
 void MeshBase::cache_elem_dims()
 {
+  libmesh_deprecated();
+
+  this->cache_elem_data();
+}
+
+void MeshBase::cache_elem_data()
+{
   // This requires an inspection on every processor
   parallel_object_only();
 
   // Need to clear _elem_dims first in case all elements of a
   // particular dimension have been deleted.
   _elem_dims.clear();
+  _mesh_subdomains.clear();
 
   for (const auto & elem : this->active_element_ptr_range())
+  {
     _elem_dims.insert(cast_int<unsigned char>(elem->dim()));
+    _mesh_subdomains.insert(elem->subdomain_id());
+  }
 
-  // Some different dimension elements may only live on other processors
-  this->comm().set_union(_elem_dims);
+  if (!this->is_serial())
+  {
+    // Some different dimension elements may only live on other processors
+    this->comm().set_union(_elem_dims);
+    this->comm().set_union(_mesh_subdomains);
+  }
 
   // If the largest element dimension found is larger than the current
   // _spatial_dimension, increase _spatial_dimension.
