@@ -98,6 +98,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
       case L2_HIERARCHIC:                                               \
         prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
+      case SIDE_HIERARCHIC:                                             \
+        prefix FE<dim,SIDE_HIERARCHIC>::func_and_args suffix            \
       case LAGRANGE:                                                    \
         prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
       case L2_LAGRANGE:                                                 \
@@ -134,6 +136,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
       case L2_HIERARCHIC:                                               \
         prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
+      case SIDE_HIERARCHIC:                                             \
+        prefix FE<dim,SIDE_HIERARCHIC>::func_and_args suffix            \
       case LAGRANGE:                                                    \
         prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
       case LAGRANGE_VEC:                                                \
@@ -176,6 +180,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
       case L2_HIERARCHIC:                                               \
         prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
+      case SIDE_HIERARCHIC:                                             \
+        prefix FE<dim,SIDE_HIERARCHIC>::func_and_args suffix            \
       case LAGRANGE:                                                    \
         prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
       case L2_LAGRANGE:                                                 \
@@ -218,6 +224,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
       case HERMITE:                                                     \
       case HIERARCHIC:                                                  \
       case L2_HIERARCHIC:                                               \
+      case SIDE_HIERARCHIC:                                             \
       case LAGRANGE:                                                    \
       case L2_LAGRANGE:                                                 \
       case MONOMIAL:                                                    \
@@ -246,6 +253,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
       case L2_HIERARCHIC:                                               \
         prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
+      case SIDE_HIERARCHIC:                                             \
+        prefix FE<dim,SIDE_HIERARCHIC>::func_and_args suffix            \
       case LAGRANGE:                                                    \
         prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
       case L2_LAGRANGE:                                                 \
@@ -276,6 +285,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
       case L2_HIERARCHIC:                                               \
         prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
+      case SIDE_HIERARCHIC:                                             \
+        prefix FE<dim,SIDE_HIERARCHIC>::func_and_args suffix            \
       case LAGRANGE:                                                    \
         prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
       case LAGRANGE_VEC:                                                \
@@ -312,6 +323,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix  FE<dim,HIERARCHIC>::func_and_args suffix                \
       case L2_HIERARCHIC:                                               \
         prefix  FE<dim,L2_HIERARCHIC>::func_and_args suffix             \
+      case SIDE_HIERARCHIC:                                             \
+        prefix  FE<dim,SIDE_HIERARCHIC>::func_and_args suffix           \
       case LAGRANGE:                                                    \
         prefix  FE<dim,LAGRANGE>::func_and_args suffix                  \
       case L2_LAGRANGE:                                                 \
@@ -348,6 +361,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
       case HERMITE:                                                     \
       case HIERARCHIC:                                                  \
       case L2_HIERARCHIC:                                               \
+      case SIDE_HIERARCHIC:                                             \
       case LAGRANGE:                                                    \
       case L2_LAGRANGE:                                                 \
       case MONOMIAL:                                                    \
@@ -2051,6 +2065,12 @@ void FEInterface::compute_constraints (DofConstraints & constraints,
                                                       variable_number,
                                                       elem); return;
 
+          case SIDE_HIERARCHIC:
+            FE<2,SIDE_HIERARCHIC>::compute_constraints (constraints,
+                                                        dof_map,
+                                                        variable_number,
+                                                        elem); return;
+
           case LAGRANGE_VEC:
             FE<2,LAGRANGE_VEC>::compute_constraints (constraints,
                                                      dof_map,
@@ -2111,6 +2131,12 @@ void FEInterface::compute_constraints (DofConstraints & constraints,
                                                       dof_map,
                                                       variable_number,
                                                       elem); return;
+
+          case SIDE_HIERARCHIC:
+            FE<3,SIDE_HIERARCHIC>::compute_constraints (constraints,
+                                                        dof_map,
+                                                        variable_number,
+                                                        elem); return;
 
           case LAGRANGE_VEC:
             FE<3,LAGRANGE_VEC>::compute_constraints (constraints,
@@ -2521,6 +2547,44 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return unknown;
         }
       break;
+    case SIDE_HIERARCHIC:
+      switch (el_t)
+        {
+        case EDGE2:
+        case EDGE3:
+        case EDGE4:
+          return unlimited; // although it's all the same as 0...
+        case TRI3:
+        case TRISHELL3:
+          return 0;
+        case TRI6:
+          return unlimited;
+        case QUAD4:
+        case QUADSHELL4:
+          return 0;
+        case QUAD8:
+        case QUADSHELL8:
+        case QUAD9:
+          return unlimited;
+        case TET4:
+        case TET10:
+          return 0;
+        case HEX8:
+        case HEX20:
+          return 0;
+        case HEX27:
+          return unlimited;
+        case PRISM6:
+        case PRISM15:
+        case PRISM18:
+        case PYRAMID5:
+        case PYRAMID13:
+        case PYRAMID14:
+          return 0;
+        default:
+          return unknown;
+        }
+      break;
     case SUBDIVISION:
       switch (el_t)
         {
@@ -2560,6 +2624,7 @@ bool FEInterface::extra_hanging_dofs(const FEType & fe_t)
     case MONOMIAL:
     case MONOMIAL_VEC:
     case L2_HIERARCHIC:
+    case SIDE_HIERARCHIC:
     case XYZ:
     case SUBDIVISION:
     case LAGRANGE_VEC:
@@ -2648,6 +2713,10 @@ FEContinuity FEInterface::get_continuity(const FEType & fe_type)
 
     case NEDELEC_ONE:
       return H_CURL;
+
+      // Side elements
+    case SIDE_HIERARCHIC:
+      return SIDE_DISCONTINUOUS;
 
     default:
       libmesh_error_msg("Unknown FE Family " << Utility::enum_to_string(fe_type.family));

@@ -1,4 +1,4 @@
-# Do not edit - automatically generated from rebuild_libmesh_SOURCES.sh
+# Do not edit - automatically generated from ./rebuild_libmesh_SOURCES.sh
 libmesh_SOURCES =  \
         src/base/default_coupling.C \
         src/base/dirichlet_boundary.C \
@@ -90,6 +90,7 @@ libmesh_SOURCES =  \
         src/fe/fe_scalar_shape_1D.C \
         src/fe/fe_scalar_shape_2D.C \
         src/fe/fe_scalar_shape_3D.C \
+        src/fe/fe_side_hierarchic.C \
         src/fe/fe_subdivision_2D.C \
         src/fe/fe_szabab.C \
         src/fe/fe_szabab_shape_0D.C \

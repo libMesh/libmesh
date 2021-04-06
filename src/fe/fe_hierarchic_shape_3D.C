@@ -29,6 +29,10 @@ namespace
 {
 using namespace libMesh;
 
+unsigned int cube_side(const Point & p);
+
+Point cube_side_point(unsigned int sidenum, const Point & interior_point);
+
 Real fe_hierarchic_3D_shape(const Elem * elem,
                             const Order order,
                             const unsigned int i,
@@ -63,6 +67,33 @@ Point get_min_point(const Elem * elem,
   return std::min(std::min(elem->point(a),elem->point(b)),
                   std::min(elem->point(c),elem->point(d)));
 }
+
+unsigned int nth_node(unsigned int n,
+                      const Elem & elem)
+{
+  std::array<const Point *, 4> points =
+    {&elem.point(0),
+     &elem.point(1),
+     &elem.point(2),
+     &elem.point(3)};
+
+  std::sort(points.begin(), points.end(),
+            [](const Point * a, const Point * b)
+            { return *a < *b; });
+
+  const Point * pn = points[n];
+
+  if (pn == &elem.point(0))
+    return 0;
+  else if (pn == &elem.point(1))
+    return 1;
+  else if (pn == &elem.point(2))
+    return 2;
+
+  libmesh_assert(pn == &elem.point(3));
+  return 3;
+}
+
 
 void cube_indices(const Elem * elem,
                   const unsigned int totalorder,
@@ -672,6 +703,7 @@ namespace libMesh
 
 LIBMESH_DEFAULT_VECTORIZED_FE(3,HIERARCHIC)
 LIBMESH_DEFAULT_VECTORIZED_FE(3,L2_HIERARCHIC)
+LIBMESH_DEFAULT_VECTORIZED_FE(3,SIDE_HIERARCHIC)
 
 
 template <>
@@ -691,6 +723,18 @@ Real FE<3,L2_HIERARCHIC>::shape(const ElemType,
                                 const Order,
                                 const unsigned int,
                                 const Point &)
+{
+  libmesh_error_msg("Hierarchic shape functions require an Elem for edge/face orientation.");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<3,SIDE_HIERARCHIC>::shape(const ElemType,
+                                  const Order,
+                                  const unsigned int,
+                                  const Point &)
 {
   libmesh_error_msg("Hierarchic shape functions require an Elem for edge/face orientation.");
   return 0.;
@@ -744,6 +788,79 @@ Real FE<3,L2_HIERARCHIC>::shape(const FEType fet,
 }
 
 
+
+template <>
+Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
+                                  const Order order,
+                                  const unsigned int i,
+                                  const Point & p,
+                                  const bool add_p_level)
+{
+#if LIBMESH_DIM == 3
+  libmesh_assert(elem);
+  const ElemType type = elem->type();
+
+  const Order totalorder =
+    static_cast<Order>(order+add_p_level*elem->p_level());
+
+  switch (type)
+    {
+    case HEX27:
+      {
+        const unsigned int dofs_per_side = (totalorder+1u)*(totalorder+1u);
+        libmesh_assert_less(i, 6*dofs_per_side);
+
+        const unsigned int sidenum = cube_side(p);
+        const unsigned int dof_offset = sidenum * dofs_per_side;
+
+        if (i < dof_offset) // i is on a previous side
+          return 0;
+
+        if (i >= dof_offset + dofs_per_side) // i is on a later side
+          return 0;
+
+        if (totalorder == 0) // special case since raw HIERARCHIC lacks CONSTANTs
+          return 1;
+
+        unsigned int side_i = i - dof_offset;
+
+        std::unique_ptr<const Elem> side = elem->build_side_ptr(sidenum);
+
+        // "vertex" nodes are now decoupled from vertices, so we have
+        // to order them consistently otherwise
+        if (side_i < 4)
+          side_i = nth_node(side_i, *side);
+
+        // Edge nodes are already ordered consistently in 2D
+
+        // Interior nodes need to be reordered consistently!?  FIXME
+
+        const Point sidep = cube_side_point(sidenum, p);
+        return FE<2,HIERARCHIC>::shape(side.get(), order, side_i, sidep, add_p_level);
+      }
+
+    default:
+      libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
+    }
+
+#else // LIBMESH_DIM != 3
+  libmesh_ignore(elem, order, i, p, add_p_level);
+  libmesh_not_implemented();
+#endif
+}
+
+
+template <>
+Real FE<3,SIDE_HIERARCHIC>::shape(const FEType fet,
+                                  const Elem * elem,
+                                  const unsigned int i,
+                                  const Point & p,
+                                  const bool add_p_level)
+{
+  return FE<3,SIDE_HIERARCHIC>::shape(elem,fet.order, i, p, add_p_level);
+}
+
+
 template <>
 Real FE<3,HIERARCHIC>::shape_deriv(const ElemType,
                                    const Order,
@@ -763,6 +880,19 @@ Real FE<3,L2_HIERARCHIC>::shape_deriv(const ElemType,
                                       const unsigned int,
                                       const unsigned int,
                                       const Point & )
+{
+  libmesh_error_msg("Hierarchic shape functions require an Elem for edge/face orientation.");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<3,SIDE_HIERARCHIC>::shape_deriv(const ElemType,
+                                        const Order,
+                                        const unsigned int,
+                                        const unsigned int,
+                                        const Point & )
 {
   libmesh_error_msg("Hierarchic shape functions require an Elem for edge/face orientation.");
   return 0.;
@@ -819,6 +949,168 @@ Real FE<3,L2_HIERARCHIC>::shape_deriv(const FEType fet,
 }
 
 
+
+template <>
+Real FE<3,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
+                                        const Order order,
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point & p,
+                                        const bool add_p_level)
+{
+#if LIBMESH_DIM == 3
+  libmesh_assert(elem);
+  const ElemType type = elem->type();
+
+  const Order totalorder =
+    static_cast<Order>(order+add_p_level*elem->p_level());
+
+  if (totalorder == 0) // special case since raw HIERARCHIC lacks CONSTANTs
+    return 0; // constants have zero derivative
+
+  switch (type)
+    {
+    case HEX27:
+      {
+        const unsigned int dofs_per_side = (totalorder+1u)*(totalorder+1u);
+        libmesh_assert_less(i, 6*dofs_per_side);
+
+        const unsigned int sidenum = cube_side(p);
+        const unsigned int dof_offset = sidenum * dofs_per_side;
+
+        if (i < dof_offset) // i is on a previous side
+          return 0;
+
+        if (i >= dof_offset + dofs_per_side) // i is on a later side
+          return 0;
+
+        unsigned int side_i = i - dof_offset;
+
+        std::unique_ptr<const Elem> side = elem->build_side_ptr(sidenum);
+
+        // "vertex" nodes are now decoupled from vertices, so we have
+        // to order them consistently otherwise
+        if (side_i < 4)
+          side_i = nth_node(side_i, *side);
+
+        // Edge nodes are already ordered consistently in 2D
+
+        // Interior nodes need to be reordered consistently!?  FIXME
+
+        // What direction on the side corresponds to the derivative
+        // direction we want?
+        unsigned int sidej = 100;
+
+        // Do we need a -1 here to flip that direction?
+        Real f = 1.;
+
+        switch (j)
+          {
+          case 0: // d()/dxi
+            {
+              switch (sidenum)
+                {
+                case 0:
+                  sidej = 1;
+                  break;
+                case 1:
+                  sidej = 0;
+                  break;
+                case 2:
+                  return 0;
+                case 3:
+                  sidej = 0;
+                  f = -1;
+                  break;
+                case 4:
+                  return 0;
+                case 5:
+                  sidej = 0;
+                  break;
+                default:
+                  libmesh_error();
+                }
+              break;
+            }
+          case 1: // d()/deta
+            {
+              switch (sidenum)
+                {
+                case 0:
+                  sidej = 0;
+                  break;
+                case 1:
+                  return 0;
+                case 2:
+                  sidej = 0;
+                  break;
+                case 3:
+                  return 0;
+                case 4:
+                  sidej = 0;
+                  f = -1;
+                  break;
+                case 5:
+                  sidej = 1;
+                  break;
+                default:
+                  libmesh_error();
+                }
+              break;
+            }
+          case 2: // d()/dzeta
+            {
+              switch (sidenum)
+                {
+                case 0:
+                  return 0;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                  sidej = 1;
+                  break;
+                case 5:
+                  return 0;
+                default:
+                  libmesh_error();
+                }
+              break;
+            }
+
+          default:
+            libmesh_error_msg("Invalid derivative index j = " << j);
+          }
+
+        const Point sidep = cube_side_point(sidenum, p);
+        return f * FE<2,HIERARCHIC>::shape_deriv(side.get(), order,
+                                                 side_i, sidej, sidep,
+                                                 add_p_level);
+      }
+
+    default:
+      libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
+    }
+
+#else // LIBMESH_DIM != 3
+  libmesh_ignore(elem, order, i, j, p, add_p_level);
+  libmesh_not_implemented();
+#endif
+}
+
+
+template <>
+Real FE<3,SIDE_HIERARCHIC>::shape_deriv(const FEType fet,
+                                        const Elem * elem,
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point & p,
+                                        const bool add_p_level)
+{
+  return FE<3,SIDE_HIERARCHIC>::shape_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
@@ -840,6 +1132,19 @@ Real FE<3,L2_HIERARCHIC>::shape_second_deriv(const ElemType,
                                              const unsigned int,
                                              const unsigned int,
                                              const Point & )
+{
+  libmesh_error_msg("Hierarchic shape functions require an Elem for edge/face orientation.");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<3,SIDE_HIERARCHIC>::shape_second_deriv(const ElemType,
+                                               const Order,
+                                               const unsigned int,
+                                               const unsigned int,
+                                               const Point & )
 {
   libmesh_error_msg("Hierarchic shape functions require an Elem for edge/face orientation.");
   return 0.;
@@ -896,6 +1201,232 @@ Real FE<3,L2_HIERARCHIC>::shape_second_deriv(const FEType fet,
   return fe_hierarchic_3D_shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
 }
 
+
+template <>
+Real FE<3,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
+                                               const Order order,
+                                               const unsigned int i,
+                                               const unsigned int j,
+                                               const Point & p,
+                                               const bool add_p_level)
+{
+#if LIBMESH_DIM == 3
+  libmesh_assert(elem);
+  const ElemType type = elem->type();
+
+  const Order totalorder =
+    static_cast<Order>(order+add_p_level*elem->p_level());
+
+  if (totalorder == 0) // special case since raw HIERARCHIC lacks CONSTANTs
+    return 0; // constants have zero derivative
+
+  switch (type)
+    {
+    case HEX27:
+      {
+        const unsigned int dofs_per_side = (totalorder+1u)*(totalorder+1u);
+        libmesh_assert_less(i, 6*dofs_per_side);
+
+        const unsigned int sidenum = cube_side(p);
+        const unsigned int dof_offset = sidenum * dofs_per_side;
+
+        if (i < dof_offset) // i is on a previous side
+          return 0;
+
+        if (i >= dof_offset + dofs_per_side) // i is on a later side
+          return 0;
+
+        unsigned int side_i = i - dof_offset;
+
+        std::unique_ptr<const Elem> side = elem->build_side_ptr(sidenum);
+
+        // "vertex" nodes are now decoupled from vertices, so we have
+        // to order them consistently otherwise
+        if (side_i < 4)
+          side_i = nth_node(side_i, *side);
+
+        // Edge nodes are already ordered consistently in 2D
+
+        // Interior nodes need to be reordered consistently!?  FIXME
+
+        // What second derivative or mixed derivative on the side
+        // corresponds to the xi/eta/zeta mix we were asked for?
+        unsigned int sidej = 100;
+
+        // Do we need a -1 here to flip the final derivative value?
+        Real f = 1.;
+
+        switch (j)
+          {
+          case 0: // d^2()/dxi^2
+            {
+              switch (sidenum)
+                {
+                case 0:
+                  sidej = 2;
+                  break;
+                case 1:
+                  sidej = 0;
+                  break;
+                case 2:
+                  return 0;
+                case 3:
+                  sidej = 0;
+                  break;
+                case 4:
+                  return 0;
+                case 5:
+                  sidej = 0;
+                  break;
+                default:
+                  libmesh_error();
+                }
+              break;
+            }
+          case 1: // d^2()/dxideta
+            {
+              switch (sidenum)
+                {
+                case 0:
+                  sidej = 1;
+                  break;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                  return 0;
+                case 5:
+                  sidej = 1;
+                  break;
+                default:
+                  libmesh_error();
+                }
+              break;
+            }
+          case 2: // d^2()/deta^2
+            {
+              switch (sidenum)
+                {
+                case 0:
+                  sidej = 0;
+                  break;
+                case 1:
+                  return 0;
+                case 2:
+                  sidej = 0;
+                  break;
+                case 3:
+                  return 0;
+                case 4:
+                  sidej = 0;
+                  break;
+                case 5:
+                  sidej = 2;
+                  break;
+                default:
+                  libmesh_error();
+                }
+              break;
+            }
+          case 3: // d^2()/dxidzeta
+            {
+              switch (sidenum)
+                {
+                case 0:
+                  return 0;
+                case 1:
+                  sidej = 1;
+                  break;
+                case 2:
+                  return 0;
+                case 3:
+                  sidej = 1;
+                  f = -1;
+                  break;
+                case 4:
+                case 5:
+                  return 0;
+                default:
+                  libmesh_error();
+                }
+              break;
+            }
+          case 4: // d^2()/detadzeta
+            {
+              switch (sidenum)
+                {
+                case 0:
+                case 1:
+                  return 0;
+                case 2:
+                  sidej = 1;
+                  break;
+                case 3:
+                  return 0;
+                case 4:
+                  sidej = 1;
+                  f = -1;
+                  break;
+                case 5:
+                  return 0;
+                default:
+                  libmesh_error();
+                }
+              break;
+            }
+          case 5: // d^2()/dzeta^2
+            {
+              switch (sidenum)
+                {
+                case 0:
+                  return 0;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                  sidej = 2;
+                  break;
+                case 5:
+                  return 0;
+                default:
+                  libmesh_error();
+                }
+              break;
+            }
+
+          default:
+            libmesh_error_msg("Invalid derivative index j = " << j);
+          }
+
+        const Point sidep = cube_side_point(sidenum, p);
+        return f * FE<2,HIERARCHIC>::shape_second_deriv(side.get(),
+                                                        order, side_i,
+                                                        sidej, sidep,
+                                                        add_p_level);
+      }
+
+    default:
+      libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
+    }
+
+#else // LIBMESH_DIM != 3
+  libmesh_ignore(elem, order, i, j, p, add_p_level);
+  libmesh_not_implemented();
+#endif
+}
+
+
+template <>
+Real FE<3,SIDE_HIERARCHIC>::shape_second_deriv(const FEType fet,
+                                               const Elem * elem,
+                                               const unsigned int i,
+                                               const unsigned int j,
+                                               const Point & p,
+                                               const bool add_p_level)
+{
+  return FE<3,SIDE_HIERARCHIC>::shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 } // namespace libMesh
@@ -905,6 +1436,73 @@ Real FE<3,L2_HIERARCHIC>::shape_second_deriv(const FEType fet,
 namespace
 {
 using namespace libMesh;
+
+
+unsigned int cube_side (const Point & p)
+{
+  const Real xi = p(0), eta = p(1), zeta = p(2);
+  const Real absxi   = std::abs(xi),
+             abseta  = std::abs(eta),
+             abszeta = std::abs(zeta);
+  const Real maxabs_xi_eta   = std::max(absxi, abseta),
+             maxabs_xi_zeta  = std::max(absxi, abszeta),
+             maxabs_eta_zeta = std::max(abseta, abszeta);
+
+  if (zeta < -maxabs_xi_eta)
+    return 0;
+  else if (eta < -maxabs_xi_zeta)
+    return 1;
+  else if (xi > maxabs_eta_zeta)
+    return 2;
+  else if (eta > maxabs_xi_zeta)
+    return 3;
+  else if (xi < -maxabs_eta_zeta)
+    return 4;
+  else if (zeta > maxabs_xi_eta)
+    return 5;
+  else
+    libmesh_error_msg("Cannot determine side to evaluate");
+}
+
+
+
+Point cube_side_point(unsigned int sidenum, const Point & p)
+{
+  Point sidep;
+
+  switch (sidenum)
+    {
+    case 0:
+      sidep(0) = p(1);
+      sidep(1) = p(0);
+      break;
+    case 1:
+      sidep(0) = p(0);
+      sidep(1) = p(2);
+      break;
+    case 2:
+      sidep(0) = p(1);
+      sidep(1) = p(2);
+      break;
+    case 3:
+      sidep(0) = -p(0);
+      sidep(1) = p(2);
+      break;
+    case 4:
+      sidep(0) = -p(1);
+      sidep(1) = p(2);
+      break;
+    case 5:
+      sidep(0) = p(0);
+      sidep(1) = p(1);
+      break;
+    default:
+      libmesh_error();
+    }
+
+  return sidep;
+}
+
 
 Real fe_hierarchic_3D_shape(const Elem * elem,
                             const Order order,

@@ -99,6 +99,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
           case L2_HIERARCHIC:
             return libmesh_make_unique<FE<0,L2_HIERARCHIC>>(fet);
 
+          case SIDE_HIERARCHIC:
+            return libmesh_make_unique<FE<0,SIDE_HIERARCHIC>>(fet);
+
           case MONOMIAL:
             return libmesh_make_unique<FE<0,MONOMIAL>>(fet);
 
@@ -151,6 +154,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
 
           case L2_HIERARCHIC:
             return libmesh_make_unique<FE<1,L2_HIERARCHIC>>(fet);
+
+          case SIDE_HIERARCHIC:
+            return libmesh_make_unique<FE<1,SIDE_HIERARCHIC>>(fet);
 
           case MONOMIAL:
             return libmesh_make_unique<FE<1,MONOMIAL>>(fet);
@@ -206,6 +212,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
 
           case L2_HIERARCHIC:
             return libmesh_make_unique<FE<2,L2_HIERARCHIC>>(fet);
+
+          case SIDE_HIERARCHIC:
+            return libmesh_make_unique<FE<2,SIDE_HIERARCHIC>>(fet);
 
           case MONOMIAL:
             return libmesh_make_unique<FE<2,MONOMIAL>>(fet);
@@ -267,6 +276,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
 
           case L2_HIERARCHIC:
             return libmesh_make_unique<FE<3,L2_HIERARCHIC>>(fet);
+
+          case SIDE_HIERARCHIC:
+            return libmesh_make_unique<FE<3,SIDE_HIERARCHIC>>(fet);
 
           case MONOMIAL:
             return libmesh_make_unique<FE<3,MONOMIAL>>(fet);
