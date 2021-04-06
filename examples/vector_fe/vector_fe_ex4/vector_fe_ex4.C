@@ -76,9 +76,21 @@ int main (int argc, char ** argv)
     command_line_value(std::string("element_type"),
                        std::string("HEX27"));
 
-  libmesh_error_msg_if(elem_str != "HEX20" && elem_str != "HEX27",
+  // In general we expect O(h) convergence in *both* the L2 and
+  // H(curl) norms when using Nedelec elements. For more information
+  // on this topic, see the relevant results in other software [1-3]
+  // and the descriptions in [4,5]. In this particular example, we
+  // have observed O(h^2) convergence in L2 for HEX20s, but the reason
+  // for the higher-than-expected rate is not currently known.
+  //
+  // [1]: deal.ii, https://www.dealii.org/reports/nedelec/nedelec.pdf
+  // [2]: FEMPAR, https://www.sciencedirect.com/science/article/pii/S096599781831113X
+  // [3]: FEniCS, https://fenicsproject.org/pub/book/book/fenics-book-2011-06-24.pdf
+  // [4]: Monk, https://icerm.brown.edu/materials/Slides/tw-18-7/Finite_Element_Methods_for_Maxwells_Equations_%5D_Peter_Monk,_University_of_Delaware.pdf
+  // [5]: Hiptmair at al., https://www.sam.math.ethz.ch/sam_reports/reports_final/reports2009/2009-04_fp.pdf
+  libmesh_error_msg_if(elem_str != "TET10" && elem_str != "HEX20" && elem_str != "HEX27",
                        "You entered: " << elem_str <<
-                       " but this example must be run with HEX20 or HEX27.");
+                       " but this example must be run with TET10, HEX20 or HEX27.");
 
   MeshTools::Generation::build_cube (mesh,
                                      grid_size,
