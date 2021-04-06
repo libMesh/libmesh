@@ -373,7 +373,7 @@ public:
 
             f(p, x, y, z);
           }
-#endif
+#endif // LIBMESH_ENABLE_EXCEPTIONS
   }
 
 
@@ -428,415 +428,284 @@ public:
 
   void testGradU()
   {
-    // Clough-Tocher elements still don't work multithreaded
-    if (family == CLOUGH && libMesh::n_threads() > 1)
-      return;
+    auto f = [this](Point p, Real x, Real y, Real z)
+      {
+        Parameters dummy;
 
-    // Handle the "more processors than elements" case
-    if (!this->_elem)
-      return;
+        Gradient grad_u = 0;
+        for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
+          grad_u += this->_fe->get_dphi()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
 
-    Parameters dummy;
-
-    // These tests require exceptions to be enabled because a
-    // TypeTensor::solve() call down in Elem::contains_point()
-    // actually throws a non-fatal exception for a certain Point which
-    // is not in the Elem. When exceptions are not enabled, this test
-    // simply aborts.
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-    for (unsigned int i=0; i != this->_nx; ++i)
-      for (unsigned int j=0; j != this->_ny; ++j)
-        for (unsigned int k=0; k != this->_nz; ++k)
+        if (family == RATIONAL_BERNSTEIN && order > 1)
           {
-            Point p(Real(i)/this->_nx);
-            if (j > 0)
-              p(1) = Real(j)/this->_ny;
-            if (k > 0)
-              p(2) = Real(k)/this->_ny;
-            if (!this->_elem->contains_point(p))
-              continue;
+            const Gradient rat_grad =
+              rational_test_grad(p, dummy, "", "");
 
-            // If at a singular node, cannot use FEMap::map
-            if (this->_elem->local_singular_node(p) != invalid_uint)
-              continue;
-
-            std::vector<Point> master_points
-              (1, FEMap::inverse_map(this->_dim, this->_elem, p));
-
-            this->_fe->reinit(this->_elem, &master_points);
-
-            Gradient grad_u = 0;
-            for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
-              grad_u += this->_fe->get_dphi()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
-
-            if (family == RATIONAL_BERNSTEIN && order > 1)
-              {
-                const Gradient rat_grad =
-                  rational_test_grad(p, dummy, "", "");
-
-                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)),
-                                        libmesh_real(rat_grad(0)),
-                                        this->_grad_tol);
-                if (this->_dim > 1)
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)),
-                                          libmesh_real(rat_grad(1)),
-                                          this->_grad_tol);
-                if (this->_dim > 2)
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)),
-                                          libmesh_real(rat_grad(2)),
-                                          this->_grad_tol);
-              }
-            else if (order > 1)
-              {
-                const Real & x = p(0);
-                const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
-                const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
-
-                LIBMESH_ASSERT_FP_EQUAL(2*x+0.125*y+0.0625*z, libmesh_real(grad_u(0)),
-                                        this->_grad_tol);
-                if (this->_dim > 1)
-                  LIBMESH_ASSERT_FP_EQUAL(y+0.125*x+0.03125*z, libmesh_real(grad_u(1)),
-                                          this->_grad_tol);
-                if (this->_dim > 2)
-                  LIBMESH_ASSERT_FP_EQUAL(0.5*z+0.0625*x+0.03125*y, libmesh_real(grad_u(2)),
-                                          this->_grad_tol);
-              }
-            else
-              {
-                LIBMESH_ASSERT_FP_EQUAL(1.0, libmesh_real(grad_u(0)),
-                                        this->_grad_tol);
-                if (this->_dim > 1)
-                  LIBMESH_ASSERT_FP_EQUAL(0.25, libmesh_real(grad_u(1)),
-                                          this->_grad_tol);
-                if (this->_dim > 2)
-                  LIBMESH_ASSERT_FP_EQUAL(0.0625, libmesh_real(grad_u(2)),
-                                          this->_grad_tol);
-              }
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)),
+                                    libmesh_real(rat_grad(0)),
+                                    this->_grad_tol);
+            if (this->_dim > 1)
+              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)),
+                                      libmesh_real(rat_grad(1)),
+                                      this->_grad_tol);
+            if (this->_dim > 2)
+              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)),
+                                      libmesh_real(rat_grad(2)),
+                                      this->_grad_tol);
           }
-#endif
+        else if (order > 1)
+          {
+            const Real & x = p(0);
+            const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
+            const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+
+            LIBMESH_ASSERT_FP_EQUAL(2*x+0.125*y+0.0625*z, libmesh_real(grad_u(0)),
+                                    this->_grad_tol);
+            if (this->_dim > 1)
+              LIBMESH_ASSERT_FP_EQUAL(y+0.125*x+0.03125*z, libmesh_real(grad_u(1)),
+                                      this->_grad_tol);
+            if (this->_dim > 2)
+              LIBMESH_ASSERT_FP_EQUAL(0.5*z+0.0625*x+0.03125*y, libmesh_real(grad_u(2)),
+                                      this->_grad_tol);
+          }
+        else
+          {
+            LIBMESH_ASSERT_FP_EQUAL(1.0, libmesh_real(grad_u(0)),
+                                    this->_grad_tol);
+            if (this->_dim > 1)
+              LIBMESH_ASSERT_FP_EQUAL(0.25, libmesh_real(grad_u(1)),
+                                      this->_grad_tol);
+            if (this->_dim > 2)
+              LIBMESH_ASSERT_FP_EQUAL(0.0625, libmesh_real(grad_u(2)),
+                                      this->_grad_tol);
+          }
+      };
+
+    testLoop(f);
   }
 
   void testGradUComp()
   {
-    // Clough-Tocher elements still don't work multithreaded
-    if (family == CLOUGH && libMesh::n_threads() > 1)
-      return;
+    auto f = [this](Point p, Real x, Real y, Real z)
+      {
+        Parameters dummy;
 
-    // Handle the "more processors than elements" case
-    if (!this->_elem)
-      return;
-
-    Parameters dummy;
-
-    // These tests require exceptions to be enabled because a
-    // TypeTensor::solve() call down in Elem::contains_point()
-    // actually throws a non-fatal exception for a certain Point which
-    // is not in the Elem. When exceptions are not enabled, this test
-    // simply aborts.
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-    for (unsigned int i=0; i != this->_nx; ++i)
-      for (unsigned int j=0; j != this->_ny; ++j)
-        for (unsigned int k=0; k != this->_nz; ++k)
+        Number grad_u_x = 0, grad_u_y = 0, grad_u_z = 0;
+        for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
           {
-            Point p(Real(i)/this->_nx);
-            if (j > 0)
-              p(1) = Real(j)/this->_ny;
-            if (k > 0)
-              p(2) = Real(k)/this->_ny;
-            if (!this->_elem->contains_point(p))
-              continue;
-
-            // If at a singular node, cannot use FEMap::map
-            if (this->_elem->local_singular_node(p) != invalid_uint)
-              continue;
-
-            std::vector<Point> master_points
-              (1, FEMap::inverse_map(this->_dim, this->_elem, p));
-
-            this->_fe->reinit(this->_elem, &master_points);
-
-            Number grad_u_x = 0, grad_u_y = 0, grad_u_z = 0;
-            for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
-              {
-                grad_u_x += this->_fe->get_dphidx()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            grad_u_x += this->_fe->get_dphidx()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
 #if LIBMESH_DIM > 1
-                grad_u_y += this->_fe->get_dphidy()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            grad_u_y += this->_fe->get_dphidy()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
 #endif
 #if LIBMESH_DIM > 2
-                grad_u_z += this->_fe->get_dphidz()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            grad_u_z += this->_fe->get_dphidz()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
 #endif
-              }
-
-            if (family == RATIONAL_BERNSTEIN && order > 1)
-              {
-                const Gradient rat_grad =
-                  rational_test_grad(p, dummy, "", "");
-
-                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x),
-                                        libmesh_real(rat_grad(0)),
-                                        this->_grad_tol);
-                if (this->_dim > 1)
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y),
-                                          libmesh_real(rat_grad(1)),
-                                          this->_grad_tol);
-                if (this->_dim > 2)
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z),
-                                          libmesh_real(rat_grad(2)),
-                                          this->_grad_tol);
-              }
-            else if (order > 1)
-              {
-                const Real & x = p(0);
-                const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
-                const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
-
-                LIBMESH_ASSERT_FP_EQUAL(2*x+0.125*y+0.0625*z, libmesh_real(grad_u_x),
-                                        this->_grad_tol);
-                if (this->_dim > 1)
-                  LIBMESH_ASSERT_FP_EQUAL(y+0.125*x+0.03125*z, libmesh_real(grad_u_y),
-                                          this->_grad_tol);
-                if (this->_dim > 2)
-                  LIBMESH_ASSERT_FP_EQUAL(0.5*z+0.0625*x+0.03125*y, libmesh_real(grad_u_z),
-                                          this->_grad_tol);
-              }
-            else
-              {
-                LIBMESH_ASSERT_FP_EQUAL(1.0, libmesh_real(grad_u_x),
-                                        this->_grad_tol);
-                if (this->_dim > 1)
-                  LIBMESH_ASSERT_FP_EQUAL(0.25, libmesh_real(grad_u_y),
-                                          this->_grad_tol);
-                if (this->_dim > 2)
-                  LIBMESH_ASSERT_FP_EQUAL(0.0625, libmesh_real(grad_u_z),
-                                          this->_grad_tol);
-              }
           }
-#endif
+
+        if (family == RATIONAL_BERNSTEIN && order > 1)
+          {
+            const Gradient rat_grad =
+              rational_test_grad(p, dummy, "", "");
+
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x),
+                                    libmesh_real(rat_grad(0)),
+                                    this->_grad_tol);
+            if (this->_dim > 1)
+              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y),
+                                      libmesh_real(rat_grad(1)),
+                                      this->_grad_tol);
+            if (this->_dim > 2)
+              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z),
+                                      libmesh_real(rat_grad(2)),
+                                      this->_grad_tol);
+          }
+        else if (order > 1)
+          {
+            const Real & x = p(0);
+            const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
+            const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+
+            LIBMESH_ASSERT_FP_EQUAL(2*x+0.125*y+0.0625*z, libmesh_real(grad_u_x),
+                                    this->_grad_tol);
+            if (this->_dim > 1)
+              LIBMESH_ASSERT_FP_EQUAL(y+0.125*x+0.03125*z, libmesh_real(grad_u_y),
+                                      this->_grad_tol);
+            if (this->_dim > 2)
+              LIBMESH_ASSERT_FP_EQUAL(0.5*z+0.0625*x+0.03125*y, libmesh_real(grad_u_z),
+                                      this->_grad_tol);
+          }
+        else
+          {
+            LIBMESH_ASSERT_FP_EQUAL(1.0, libmesh_real(grad_u_x),
+                                    this->_grad_tol);
+            if (this->_dim > 1)
+              LIBMESH_ASSERT_FP_EQUAL(0.25, libmesh_real(grad_u_y),
+                                      this->_grad_tol);
+            if (this->_dim > 2)
+              LIBMESH_ASSERT_FP_EQUAL(0.0625, libmesh_real(grad_u_z),
+                                      this->_grad_tol);
+          }
+      };
+
+    testLoop(f);
   }
 
 
   void testHessU()
   {
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    // Clough-Tocher elements still don't work multithreaded
-    if (family == CLOUGH && libMesh::n_threads() > 1)
-      return;
-
     // Szabab elements don't have second derivatives yet
     if (family == SZABAB)
       return;
 
-    // Handle the "more processors than elements" case
-    if (!this->_elem)
-      return;
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+    auto f = [this](Point p, Real x, Real y, Real z)
+      {
+        Parameters dummy;
 
-    Parameters dummy;
+        Tensor hess_u;
+        for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
+          hess_u += this->_fe->get_d2phi()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
 
-    // These tests require exceptions to be enabled because a
-    // TypeTensor::solve() call down in Elem::contains_point()
-    // actually throws a non-fatal exception for a certain Point which
-    // is not in the Elem. When exceptions are not enabled, this test
-    // simply aborts.
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-    for (unsigned int i=0; i != this->_nx; ++i)
-      for (unsigned int j=0; j != this->_ny; ++j)
-        for (unsigned int k=0; k != this->_nz; ++k)
+        if (family == RATIONAL_BERNSTEIN && order > 1)
           {
-            Point p(Real(i)/this->_nx);
-            if (j > 0)
-              p(1) = Real(j)/this->_ny;
-            if (k > 0)
-              p(2) = Real(k)/this->_ny;
-            if (!this->_elem->contains_point(p))
-              continue;
-
-            // If at a singular node, cannot use FEMap::map
-            if (this->_elem->local_singular_node(p) != invalid_uint)
-              continue;
-
-            std::vector<Point> master_points
-              (1, FEMap::inverse_map(this->_dim, this->_elem, p));
-
-            this->_fe->reinit(this->_elem, &master_points);
-
-            Tensor hess_u;
-            for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
-              hess_u += this->_fe->get_d2phi()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
-
-            if (family == RATIONAL_BERNSTEIN && order > 1)
+            // TODO: Yeah we'll test the ugly expressions later.
+          }
+        else if (order > 1)
+          {
+            LIBMESH_ASSERT_FP_EQUAL(2, libmesh_real(hess_u(0,0)),
+                                    this->_hess_tol);
+            if (this->_dim > 1)
               {
-                // TODO: Yeah we'll test the ugly expressions later.
-              }
-            else if (order > 1)
-              {
-                LIBMESH_ASSERT_FP_EQUAL(2, libmesh_real(hess_u(0,0)),
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,1)), libmesh_real(hess_u(1,0)),
                                         this->_hess_tol);
-                if (this->_dim > 1)
-                  {
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,1)), libmesh_real(hess_u(1,0)),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(0.125, libmesh_real(hess_u(0,1)),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(1, libmesh_real(hess_u(1,1)),
-                                            this->_hess_tol);
-                  }
-                if (this->_dim > 2)
-                  {
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,2)), libmesh_real(hess_u(2,0)),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,2)), libmesh_real(hess_u(2,1)),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(0.0625, libmesh_real(hess_u(0,2)),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(0.03125, libmesh_real(hess_u(1,2)),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(0.5, libmesh_real(hess_u(2,2)),
-                                            this->_hess_tol);
-                  }
-              }
-            else
-              {
-                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(0,0)),
+                LIBMESH_ASSERT_FP_EQUAL(0.125, libmesh_real(hess_u(0,1)),
                                         this->_hess_tol);
-                if (this->_dim > 1)
-                  {
-                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(0,1)),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(1,0)),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(1,1)),
-                                            this->_hess_tol);
-                  }
-                if (this->_dim > 2)
-                  {
-                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(0,2)),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(1,2)),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(2,0)),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(2,1)),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(2,2)),
-                                            this->_hess_tol);
-                  }
+                LIBMESH_ASSERT_FP_EQUAL(1, libmesh_real(hess_u(1,1)),
+                                        this->_hess_tol);
+              }
+            if (this->_dim > 2)
+              {
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,2)), libmesh_real(hess_u(2,0)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,2)), libmesh_real(hess_u(2,1)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(0.0625, libmesh_real(hess_u(0,2)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(0.03125, libmesh_real(hess_u(1,2)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(0.5, libmesh_real(hess_u(2,2)),
+                                        this->_hess_tol);
               }
           }
-#endif // LIBMESH_ENABLE_EXCEPTIONS
+        else
+          {
+            LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(0,0)),
+                                    this->_hess_tol);
+            if (this->_dim > 1)
+              {
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(0,1)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(1,0)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(1,1)),
+                                        this->_hess_tol);
+              }
+            if (this->_dim > 2)
+              {
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(0,2)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(1,2)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(2,0)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(2,1)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u(2,2)),
+                                        this->_hess_tol);
+              }
+          }
+      };
+
+    testLoop(f);
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
   }
 
   void testHessUComp()
   {
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    // Clough-Tocher elements still don't work multithreaded
-    if (family == CLOUGH && libMesh::n_threads() > 1)
-      return;
-
     // Szabab elements don't have second derivatives yet
     if (family == SZABAB)
       return;
 
-    // Handle the "more processors than elements" case
-    if (!this->_elem)
-      return;
+    auto f = [this](Point p, Real x, Real y, Real z)
+      {
+        Parameters dummy;
 
-    Parameters dummy;
-
-    // Why are we seeing O(1e-5) errors??
-    this->_hess_tol = sqrt(TOLERANCE);
-
-    // These tests require exceptions to be enabled because a
-    // TypeTensor::solve() call down in Elem::contains_point()
-    // actually throws a non-fatal exception for a certain Point which
-    // is not in the Elem. When exceptions are not enabled, this test
-    // simply aborts.
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-    for (unsigned int i=0; i != this->_nx; ++i)
-      for (unsigned int j=0; j != this->_ny; ++j)
-        for (unsigned int k=0; k != this->_nz; ++k)
+        Number hess_u_xx = 0, hess_u_xy = 0, hess_u_yy = 0,
+               hess_u_xz = 0, hess_u_yz = 0, hess_u_zz = 0;
+        for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
           {
-            Point p(Real(i)/this->_nx);
-            if (j > 0)
-              p(1) = Real(j)/this->_ny;
-            if (k > 0)
-              p(2) = Real(k)/this->_ny;
-            if (!this->_elem->contains_point(p))
-              continue;
-
-            // If at a singular node, cannot use FEMap::map
-            if (this->_elem->local_singular_node(p) != invalid_uint)
-              continue;
-
-            std::vector<Point> master_points
-              (1, FEMap::inverse_map(this->_dim, this->_elem, p));
-
-            this->_fe->reinit(this->_elem, &master_points);
-
-            Number hess_u_xx = 0, hess_u_xy = 0, hess_u_yy = 0,
-                   hess_u_xz = 0, hess_u_yz = 0, hess_u_zz = 0;
-            for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
-              {
-                hess_u_xx += this->_fe->get_d2phidx2()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            hess_u_xx += this->_fe->get_d2phidx2()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
 #if LIBMESH_DIM > 1
-                hess_u_xy += this->_fe->get_d2phidxdy()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
-                hess_u_yy += this->_fe->get_d2phidy2()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            hess_u_xy += this->_fe->get_d2phidxdy()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            hess_u_yy += this->_fe->get_d2phidy2()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
 #endif
 #if LIBMESH_DIM > 2
-                hess_u_xz += this->_fe->get_d2phidxdz()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
-                hess_u_yz += this->_fe->get_d2phidydz()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
-                hess_u_zz += this->_fe->get_d2phidz2()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            hess_u_xz += this->_fe->get_d2phidxdz()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            hess_u_yz += this->_fe->get_d2phidydz()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+            hess_u_zz += this->_fe->get_d2phidz2()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
 #endif
-              }
+          }
 
-            if (family == RATIONAL_BERNSTEIN && order > 1)
+        if (family == RATIONAL_BERNSTEIN && order > 1)
+          {
+            // TODO: tedious calculus
+          }
+        else if (order > 1)
+          {
+            LIBMESH_ASSERT_FP_EQUAL(2, libmesh_real(hess_u_xx),
+                                    this->_hess_tol);
+            if (this->_dim > 1)
               {
-                // TODO: tedious calculus
-              }
-            else if (order > 1)
-              {
-                LIBMESH_ASSERT_FP_EQUAL(2, libmesh_real(hess_u_xx),
+                LIBMESH_ASSERT_FP_EQUAL(0.125, libmesh_real(hess_u_xy),
                                         this->_hess_tol);
-                if (this->_dim > 1)
-                  {
-                    LIBMESH_ASSERT_FP_EQUAL(0.125, libmesh_real(hess_u_xy),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(1, libmesh_real(hess_u_yy),
-                                            this->_hess_tol);
-                  }
-                if (this->_dim > 2)
-                  {
-                    LIBMESH_ASSERT_FP_EQUAL( 0.0625, libmesh_real(hess_u_xz),
-                                             this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL( 0.03125, libmesh_real(hess_u_yz),
-                                             this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL( 0.5, libmesh_real(hess_u_zz),
-                                             this->_hess_tol);
-                  }
-              }
-            else
-              {
-                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_xx),
+                LIBMESH_ASSERT_FP_EQUAL(1, libmesh_real(hess_u_yy),
                                         this->_hess_tol);
-                if (this->_dim > 1)
-                  {
-                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_xy),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_yy),
-                                            this->_hess_tol);
-                  }
-                if (this->_dim > 2)
-                  {
-                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_xz),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_yz),
-                                            this->_hess_tol);
-                    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_zz),
-                                            this->_hess_tol);
-                  }
+              }
+            if (this->_dim > 2)
+              {
+                LIBMESH_ASSERT_FP_EQUAL( 0.0625, libmesh_real(hess_u_xz),
+                                         this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL( 0.03125, libmesh_real(hess_u_yz),
+                                         this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL( 0.5, libmesh_real(hess_u_zz),
+                                         this->_hess_tol);
               }
           }
-#endif // LIBMESH_ENABLE_EXCEPTIONS
+        else
+          {
+            LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_xx),
+                                    this->_hess_tol);
+            if (this->_dim > 1)
+              {
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_xy),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_yy),
+                                        this->_hess_tol);
+              }
+            if (this->_dim > 2)
+              {
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_xz),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_yz),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real(hess_u_zz),
+                                        this->_hess_tol);
+              }
+          }
+      };
+
+    testLoop(f);
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
   }
 
