@@ -331,7 +331,8 @@ class FETest : public FETestBase<order, family, elem_type, 1> {
 
 public:
 
-  void testU()
+  template <typename Functor>
+  void testLoop(Functor f)
   {
     // Clough-Tocher elements still don't work multithreaded
     if (family == CLOUGH && libMesh::n_threads() > 1)
@@ -340,8 +341,6 @@ public:
     // Handle the "more processors than elements" case
     if (!this->_elem)
       return;
-
-    Parameters dummy;
 
     // These tests require exceptions to be enabled because a
     // TypeTensor::solve() call down in Elem::contains_point()
@@ -372,28 +371,41 @@ public:
             // Reinit at point to test against analytic solution
             this->_fe->reinit(this->_elem, &master_points);
 
-            Number u = 0;
-            for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
-              u += this->_fe->get_phi()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
-
-            if (family == RATIONAL_BERNSTEIN && order > 1)
-              LIBMESH_ASSERT_FP_EQUAL
-                (libmesh_real(rational_test(p, dummy, "", "")),
-                 libmesh_real(u),
-                 this->_value_tol);
-            else if (order > 1)
-              LIBMESH_ASSERT_FP_EQUAL
-                (libmesh_real(x*x + 0.5*y*y + 0.25*z*z + 0.125*x*y +
-                              0.0625*x*z + 0.03125*y*z),
-                 libmesh_real(u),
-                 this->_value_tol);
-            else
-              LIBMESH_ASSERT_FP_EQUAL
-                (libmesh_real(x + 0.25*y + 0.0625*z),
-                 libmesh_real(u),
-                 this->_value_tol);
+            f(p, x, y, z);
           }
 #endif
+  }
+
+
+  void testU()
+  {
+    auto f = [this](Point p, Real x, Real y, Real z)
+      {
+        Parameters dummy;
+
+        Number u = 0;
+        for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
+          u += this->_fe->get_phi()[d][0] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
+
+        if (family == RATIONAL_BERNSTEIN && order > 1)
+          LIBMESH_ASSERT_FP_EQUAL
+            (libmesh_real(rational_test(p, dummy, "", "")),
+             libmesh_real(u),
+             this->_value_tol);
+        else if (order > 1)
+          LIBMESH_ASSERT_FP_EQUAL
+            (libmesh_real(x*x + 0.5*y*y + 0.25*z*z + 0.125*x*y +
+                          0.0625*x*z + 0.03125*y*z),
+             libmesh_real(u),
+             this->_value_tol);
+        else
+          LIBMESH_ASSERT_FP_EQUAL
+            (libmesh_real(x + 0.25*y + 0.0625*z),
+             libmesh_real(u),
+             this->_value_tol);
+      };
+
+    testLoop(f);
   }
 
   void testDualDoesntScreamAndDie()
