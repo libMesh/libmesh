@@ -1545,7 +1545,8 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
   // We don't need to constrain discontinuous elements
   if (cont == DISCONTINUOUS)
     return;
-  libmesh_assert (cont == C_ZERO || cont == C_ONE);
+  libmesh_assert (cont == C_ZERO || cont == C_ONE ||
+                  cont == SIDE_DISCONTINUOUS);
 
   std::unique_ptr<FEGenericBase<OutputShape>> neigh_fe
     (FEGenericBase<OutputShape>::build(Dim, base_fe_type));
@@ -1566,7 +1567,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
   std::vector<dof_id_type> my_dof_indices, neigh_dof_indices;
   std::vector<unsigned int> my_side_dofs, neigh_side_dofs;
 
-  if (cont != C_ZERO)
+  if (cont == C_ONE)
     {
       const std::vector<Point> & ref_face_normals =
         my_fe->get_normals();
@@ -1681,7 +1682,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
                   for (unsigned int qp = 0; qp != n_qp; ++qp)
                     {
                       Ke(is,js) += JxW[qp] * TensorTools::inner_product(phi[i][qp], phi[j][qp]);
-                      if (cont != C_ZERO)
+                      if (cont == C_ONE)
                         Ke(is,js) += JxW[qp] *
                           TensorTools::inner_product((*dphi)[i][qp] *
                                                      (*face_normals)[qp],
@@ -1705,7 +1706,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
                       Fe(js) += JxW[qp] *
                         TensorTools::inner_product(neigh_phi[i][qp],
                                                    phi[j][qp]);
-                      if (cont != C_ZERO)
+                      if (cont == C_ONE)
                         Fe(js) += JxW[qp] *
                           TensorTools::inner_product((*neigh_dphi)[i][qp] *
                                                      (*face_normals)[qp],
