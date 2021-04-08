@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// <h1>Miscellaneous Example 10 - Hydrogen Atom Using Infinite Elements With Imaginary Frequency</h1>
+// <h1>Miscellaneous Example 14 - Hydrogen Atom Using Infinite Elements With Imaginary Frequency</h1>
 // \author Hubert Weissmann
 // \date 2017
 //
