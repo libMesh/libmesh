@@ -34,6 +34,7 @@ namespace libMesh
 // forward declarations
 class DofConstraints;
 class DofMap;
+class QGauss;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
