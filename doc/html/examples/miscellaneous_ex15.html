@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="libMesh development team">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<br> <h1> Link to the source code for this example: </h1>
+<a href="https://github.com/libMesh/libmesh/tree/master/examples/miscellaneous/miscellaneous_ex15" target="_blank">Open miscellaneous_ex15 in new tab.</a>
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example miscellaneous_ex15:
+*   ./example-opt  
+***************************************************************
+ 
+Running /data/tm162/bin/libmesh/amr-build_DSK/examples/miscellaneous/miscellaneous_ex15/.libs/example-opt
+
+ Mesh Information:
+  elem_dimensions()={3}
+  spatial_dimension()=3
+  n_nodes()=27
+    n_local_nodes()=27
+  n_elem()=2
+    n_local_elem()=2
+    n_active_elem()=2
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ Verbose mode disabled in non-debug mode.
+*** Warning, This code is untested, experimental, or likely to see future API changes: ./include/libmesh/mesh_base.h, line 1667, compiled Apr  6 2021 at 21:42:21 ***
+
+ -----------------------------------------------------------------------
+| Time:           Thu Apr  8 16:40:43 2021                              |
+| OS:             Linux                                                 |
+| HostName:       hydrogenium                                           |
+| OS Release:     5.4.0-60-generic                                      |
+| OS Version:     #67~18.04.1-Ubuntu SMP Tue Jan 5 22:01:05 UTC 2021    |
+| Machine:        x86_64                                                |
+| Username:       tm162                                                 |
+| Configuration:  ../configure  '--prefix=/usr/best_library/libmesh/'   |
+|  '--enable-default-comm-world'                                        |
+|  '--disable-strict-lgpl'                                              |
+|  '--disable-second'                                                   |
+|  '--enable-reference-counting'                                        |
+|  '--disable-maintainer-mode'                                          |
+|  '--enable-qhull'                                                     |
+|  '--disable-nodeconstraint'                                           |
+|  '--enable-petsc'                                                     |
+|  '--enable-mpi'                                                       |
+|  '--enable-complex'                                                   |
+|  '--enable-tetgen'                                                    |
+|  '--enable-ifem'                                                      |
+|  '--enable-everything'                                                |
+|  'PETSC_DIR=/usr/other_library/petsc_3_13'                            |
+|  'PETSC_ARCH='                                                        |
+ -----------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=2.46743, Active time=0.840133                                                   |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DefaultCoupling                                                                                                 |
+|   operator()                       314        0.0007      0.000002    0.0007      0.000002    0.08     0.08     |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     3          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   build_sparsity()                 3          0.0103      0.003434    0.0119      0.003958    1.23     1.41     |
+|   create_dof_constraints()         3          0.0002      0.000060    0.0002      0.000060    0.02     0.02     |
+|   distribute_dofs()                3          0.0004      0.000123    0.0074      0.002464    0.04     0.88     |
+|   dof_indices()                    3144       0.0067      0.000002    0.0067      0.000002    0.80     0.80     |
+|   old_dof_indices()                2044       0.0035      0.000002    0.0035      0.000002    0.42     0.42     |
+|   prepare_send_list()              4          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   reinit()                         3          0.0070      0.002341    0.0070      0.002341    0.84     0.84     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        1296       0.0094      0.000007    0.0094      0.000007    1.12     1.12     |
+|   init_shape_functions()           1153       0.0038      0.000003    0.0038      0.000003    0.45     0.45     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             1296       0.0012      0.000001    0.0012      0.000001    0.14     0.14     |
+|   init_reference_to_physical_map() 1153       0.0036      0.000003    0.0036      0.000003    0.43     0.43     |
+|   inverse_map()                    1102       0.0094      0.000009    0.0094      0.000009    1.12     1.12     |
+|                                                                                                                 |
+| GenericProjector                                                                                                |
+|   project                          4          0.0030      0.000752    0.0366      0.009141    0.36     4.35     |
+|   project_edges                    4          0.0009      0.000234    0.0285      0.007133    0.11     3.40     |
+|   project_interiors                4          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   project_sides                    4          0.0002      0.000060    0.0035      0.000873    0.03     0.42     |
+|   project_vertices                 4          0.0002      0.000062    0.0015      0.000382    0.03     0.18     |
+|                                                                                                                 |
+| InfElemBuilder                                                                                                  |
+|   build_inf_elem()                 1          0.0001      0.000071    0.0001      0.000071    0.01     0.01     |
+|                                                                                                                 |
+| InfFE                                                                                                           |
+|   compute_shape_functions()        448        0.0994      0.000222    0.0994      0.000222    11.84    11.84    |
+|   init_radial_shape_functions()    283        0.0003      0.000001    0.0003      0.000001    0.03     0.03     |
+|   init_shape_functions()           295        0.0124      0.000042    0.0124      0.000042    1.47     1.47     |
+|                                                                                                                 |
+| InfFEMap                                                                                                        |
+|   inverse_map()                    322        0.0031      0.000010    0.0076      0.000024    0.37     0.91     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   contract()                       2          0.0000      0.000011    0.0001      0.000032    0.00     0.01     |
+|   find_neighbors()                 6          0.0120      0.002003    0.0120      0.002003    1.43     1.43     |
+|   renumber_nodes_and_elem()        10         0.0019      0.000187    0.0019      0.000187    0.22     0.22     |
+|                                                                                                                 |
+| MeshBase                                                                                                        |
+|   prepare_for_use()                4          0.0012      0.000307    0.0168      0.004196    0.15     2.00     |
+|                                                                                                                 |
+| MeshRefinement                                                                                                  |
+|   _coarsen_elements()              2          0.0000      0.000013    0.0000      0.000013    0.00     0.00     |
+|   _refine_elements()               4          0.0008      0.000189    0.0035      0.000880    0.09     0.42     |
+|   add_node()                       4992       0.0022      0.000000    0.0022      0.000000    0.26     0.26     |
+|   make_coarsening_compatible()     2          0.0001      0.000073    0.0001      0.000073    0.02     0.02     |
+|   make_flags_parallel_consistent() 4          0.0001      0.000030    0.0001      0.000030    0.01     0.01     |
+|   make_refinement_compatible()     2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_cube()                     1          0.0320      0.031966    0.0320      0.031966    3.80     3.80     |
+|                                                                                                                 |
+| OldSolutionBase                                                                                                 |
+|   check_old_context(c,p)           982        0.0007      0.000001    0.0042      0.000004    0.09     0.50     |
+|                                                                                                                 |
+| OldSolutionValue                                                                                                |
+|   Number eval_at_node()            276        0.0001      0.000000    0.0001      0.000000    0.01     0.01     |
+|   eval_at_point()                  982        0.0075      0.000008    0.0276      0.000028    0.90     3.29     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   set_node_processor_ids()         2          0.0004      0.000177    0.0004      0.000177    0.04     0.04     |
+|   single_partition_range()         4          0.0018      0.000443    0.0018      0.000443    0.21     0.21     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          3          0.4316      0.143858    0.4316      0.143858    51.37    51.37    |
+|                                                                                                                 |
+| PointLocatorTree                                                                                                |
+|   init(no master)                  1          0.0038      0.003757    0.0038      0.003757    0.45     0.45     |
+|   operator()                       3          0.0030      0.001003    0.0098      0.003268    0.36     1.17     |
+|                                                                                                                 |
+| System                                                                                                          |
+|   assemble()                       3          0.1550      0.051678    0.2763      0.092105    18.45    32.89    |
+|   project_vector(old,new)          2          0.0086      0.004325    0.0459      0.022963    1.03     5.47     |
+|                                                                                                                 |
+| TopologyMap                                                                                                     |
+|   init()                           4          0.0015      0.000371    0.0015      0.000371    0.18     0.18     |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            20181      0.8401                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example miscellaneous_ex15:
+*   ./example-opt  
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>
