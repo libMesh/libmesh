@@ -27,12 +27,7 @@ AC_DEFUN([CONFIGURE_TECIO],
           dnl If the user specified a path to look for X11 headers in, honor
           dnl that and don't try to look elsewhere.  If the compilation fails
           dnl then they must figure out why on their own.
-          AS_IF([test "x$withteciox11inc" != "xno"], [TECIO_CPPFLAGS="-I$withteciox11inc"],
-                dnl The user did not specify where to look, so see if the file
-                dnl exists in the usual Linux location...
-                [test -r /usr/include/X11/Intrinsic.h], [TECIO_CPPFLAGS="-I/usr/include"],
-                dnl ... and if not there, try the Mac (XQuartz) location.
-                [test -r /opt/X11/include/X11/Intrinsic.h], [TECIO_CPPFLAGS="-I/opt/X11/include"])
+          AS_IF([test "x$withteciox11inc" != "xno"], [TECIO_CPPFLAGS="-I$withteciox11inc"])
 
           dnl Print a status message
           AS_IF([test "x$TECIO_CPPFLAGS" != "x"],
