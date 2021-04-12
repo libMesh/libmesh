@@ -1763,6 +1763,35 @@ protected:
                                   dof_id_type n3);
 
   /**
+   * Swaps two node_ptrs
+   */
+  void swap2nodes(unsigned int n1, unsigned int n2)
+  {
+    Node * temp = this->node_ptr(n1);
+    this->set_node(n1) = this->node_ptr(n2);
+    this->set_node(n2) = temp;
+  }
+
+  /**
+   * Swaps three node_ptrs, "rotating" them.
+   */
+  void swap3nodes(unsigned int n1, unsigned int n2, unsigned int n3)
+  {
+    swap2nodes(n1, n2);
+    swap2nodes(n2, n3);
+  }
+
+  /**
+   * Swaps four node_ptrs, "rotating" them.
+   */
+  void swap4nodes(unsigned int n1, unsigned int n2, unsigned int n3,
+                  unsigned int n4)
+  {
+    swap3nodes(n1, n2, n3);
+    swap2nodes(n3, n4);
+  }
+
+  /**
    * An implementation for simple (all sides equal) elements
    */
   template <typename Sideclass, typename Subclass>
