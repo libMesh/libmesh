@@ -175,8 +175,8 @@ public:
     _mesh = new Mesh(*TestCommWorld);
     const std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
     _dim = test_elem->dim();
-    const unsigned int ny = (_dim > 1) * build_nx;
-    const unsigned int nz = (_dim > 2) * build_nx;
+    const unsigned int build_ny = (_dim > 1) * build_nx;
+    const unsigned int build_nz = (_dim > 2) * build_nx;
 
     unsigned char weight_index = 0;
 
@@ -200,8 +200,8 @@ public:
       }
 
     MeshTools::Generation::build_cube (*_mesh,
-                                       1, ny, nz,
-                                       0., 1., 0., ny, 0., nz,
+                                       build_nx, build_ny, build_nz,
+                                       0., 1., 0., 1., 0., 1.,
                                        elem_type);
 
     // Set rational weights so we can exactly match our test solution
