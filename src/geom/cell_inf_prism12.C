@@ -563,9 +563,23 @@ const float InfPrism12::_embedding_matrix[InfPrism12::num_children][InfPrism12::
   };
 
 
-
-
 #endif
+
+
+void
+InfPrism12::permute(unsigned int perm_num)
+{
+  libmesh_assert_less (perm_num, 3);
+
+  for (unsigned int i = 0; i != perm_num; ++i)
+    {
+      swap3nodes(0,1,2);
+      swap3nodes(3,4,5);
+      swap3nodes(6,7,8);
+      swap3nodes(9,10,11);
+    }
+}
+
 
 } // namespace libMesh
 

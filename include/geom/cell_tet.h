@@ -191,7 +191,10 @@ public:
 
 #endif // LIBMESH_ENABLE_AMR
 
-
+  /**
+   * Four sides, three orientations.
+   */
+  virtual unsigned int n_permutations() const override final { return 12; }
 
 protected:
 

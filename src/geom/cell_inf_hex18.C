@@ -646,9 +646,22 @@ const float InfHex18::_embedding_matrix[InfHex18::num_children][InfHex18::num_no
   };
 
 
-
-
 #endif
+
+
+void
+InfHex18::permute(unsigned int perm_num)
+{
+  libmesh_assert_less (perm_num, 4);
+
+  for (unsigned int i = 0; i != perm_num; ++i)
+    {
+      swap4nodes(0,1,2,3);
+      swap4nodes(4,5,6,7);
+      swap4nodes(8,9,10,11);
+      swap4nodes(12,13,14,15);
+    }
+}
 
 } // namespace libMesh
 

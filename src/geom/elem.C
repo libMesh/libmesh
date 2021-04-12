@@ -64,6 +64,7 @@
 #include "libmesh/cell_pyramid14.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/quadrature_nodal.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/reference_elem.h"
@@ -2243,9 +2244,30 @@ bool Elem::point_test(const Point & p, Real box_tol, Real map_tol) const
 
 bool Elem::has_invertible_map(Real /*tol*/) const
 {
-  libmesh_not_implemented();
+  QNodal qnodal {this->dim()};
+  FEMap fe_map;
+  auto & jac = fe_map.get_jacobian();
 
-  // We won't get here
+  qnodal.init(this->type());
+  auto & qp = qnodal.get_points();
+  libmesh_assert_equal_to(qp.size(), this->n_nodes());
+
+  std::vector<Point> one_point(1);
+  std::vector<Real> one_weight(1,1);
+  for (auto i : index_range(qp))
+    {
+      if (this->is_singular_node(i))
+        continue;
+
+      one_point[0] = qp[i];
+
+      fe_map.init_reference_to_physical_map(this->dim(), one_point, this);
+      fe_map.compute_map(this->dim(), one_weight, this, false);
+
+      if (jac[0] <= 0)
+        return false;
+    }
+
   return true;
 }
 

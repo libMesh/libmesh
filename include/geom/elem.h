@@ -1686,6 +1686,27 @@ public:
   static std::unique_ptr<Elem> build_with_id (const ElemType type,
                                               dof_id_type id);
 
+  /**
+   * Returns the number of independent permutations of element nodes -
+   * e.g. a cube can be reoriented to put side 0 where side N is (for
+   * 0 <= N < 6) and then rotated in one of four ways, giving 24
+   * possible permutations.
+   *
+   * Permutations which change the mapping Jacobian of an element
+   * (i.e. flipping the element) are not allowed in this definition.
+   */
+  virtual unsigned int n_permutations() const = 0;
+
+  /**
+   * Permutes the element (by swapping node_ptr values) according to
+   * the specified index.
+   *
+   * This is useful for regression testing, by making it easy to make
+   * a structured mesh behave more like an arbitrarily unstructured
+   * mesh.
+   */
+  virtual void permute(unsigned int perm_num) = 0;
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**

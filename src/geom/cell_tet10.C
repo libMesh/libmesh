@@ -838,5 +838,43 @@ Real Tet10::volume () const
 }
 
 
+void Tet10::permute(unsigned int perm_num)
+{
+  libmesh_assert_less (perm_num, 12);
+
+  const unsigned int side = perm_num % 4;
+  const unsigned int rotate = perm_num / 4;
+
+  for (unsigned int i = 0; i != rotate; ++i)
+    {
+      swap3nodes(0,1,2);
+      swap3nodes(4,5,6);
+      swap3nodes(7,8,9);
+    }
+
+  switch (side) {
+  case 0:
+    break;
+  case 1:
+    swap3nodes(0,2,3);
+    swap3nodes(4,5,8);
+    swap3nodes(6,9,7);
+    break;
+  case 2:
+    swap3nodes(2,0,3);
+    swap3nodes(5,4,8);
+    swap3nodes(6,7,9);
+    break;
+  case 3:
+    swap3nodes(2,1,3);
+    swap3nodes(5,8,9);
+    swap3nodes(6,4,7);
+    break;
+  default:
+    libmesh_error();
+  }
+}
+
+
 
 } // namespace libMesh

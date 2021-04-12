@@ -1000,4 +1000,40 @@ const float Prism18::_embedding_matrix[Prism18::num_children][Prism18::num_nodes
 
 #endif
 
+
+void
+Prism18::permute(unsigned int perm_num)
+{
+  libmesh_assert_less (perm_num, 6);
+  const unsigned int side = perm_num % 2;
+  const unsigned int rotate = perm_num / 2;
+
+  for (unsigned int i = 0; i != rotate; ++i)
+    {
+      swap3nodes(0,1,2);
+      swap3nodes(3,4,5);
+      swap3nodes(6,7,8);
+      swap3nodes(9,10,11);
+      swap3nodes(12,13,14);
+      swap3nodes(15,16,17);
+    }
+
+  switch (side) {
+  case 0:
+    break;
+  case 1:
+    swap2nodes(1,3);
+    swap2nodes(0,4);
+    swap2nodes(2,5);
+    swap2nodes(6,12);
+    swap2nodes(9,10);
+    swap2nodes(7,14);
+    swap2nodes(8,13);
+    swap2nodes(16,17);
+    break;
+  default:
+    libmesh_error();
+  }
+}
+
 } // namespace libMesh

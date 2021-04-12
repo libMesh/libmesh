@@ -187,6 +187,11 @@ public:
   virtual std::vector<unsigned int> sides_on_edge(const unsigned int) const override final
   { return {}; }
 
+  // Any edge permutation flips the mapping Jacobian negative
+  virtual unsigned int n_permutations() const override final { return 0; }
+
+  virtual void permute(unsigned int) override final { libmesh_error(); }
+
 protected:
 
   /**

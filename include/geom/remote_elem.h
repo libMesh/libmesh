@@ -226,6 +226,9 @@ public:
 
 #endif // LIBMESH_ENABLE_AMR
 
+  virtual unsigned int n_permutations() const { libmesh_error(); return 0; }
+
+  virtual void permute(unsigned int) { libmesh_error(); }
 
 protected:
 

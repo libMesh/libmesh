@@ -183,6 +183,10 @@ public:
    */
   virtual std::pair<Real, Real> qual_bounds (const ElemQuality q) const override;
 
+  /**
+   * Four sides, one orientation each.
+   */
+  virtual unsigned int n_permutations() const override final { return 4; }
 
 protected:
 

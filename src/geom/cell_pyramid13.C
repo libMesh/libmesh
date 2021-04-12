@@ -712,4 +712,18 @@ Real Pyramid13::volume () const
   return vol;
 }
 
+
+void Pyramid13::permute(unsigned int perm_num)
+{
+  libmesh_assert_less (perm_num, 4);
+
+  for (unsigned int i = 0; i != perm_num; ++i)
+    {
+      swap4nodes(0,1,2,3);
+      swap4nodes(5,6,7,8);
+      swap4nodes(9,10,11,12);
+    }
+}
+
+
 } // namespace libMesh

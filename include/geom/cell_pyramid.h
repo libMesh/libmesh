@@ -170,6 +170,11 @@ public:
    */
   virtual bool is_singular_node(unsigned int node_idx) const override final { return (node_idx == 4); }
 
+  /**
+   * One quad side, four orientations.
+   */
+  virtual unsigned int n_permutations() const override final { return 4; }
+
 protected:
 
   /**
