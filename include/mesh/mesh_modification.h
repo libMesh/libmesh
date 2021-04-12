@@ -58,6 +58,13 @@ void distort (MeshBase & mesh,
  * Randomly permute the nodal ordering of each element (without
  * twisting the element mapping.  This is useful for regression
  * testing with a variety of element orientations.
+ *
+ * This function does not currently handle meshes with any element
+ * refinement.
+ *
+ * This function does not currently permute BoundaryInfo data
+ * associated with element sides, which will likely be scrambled by
+ * the permutation.
  */
 void permute_elements (MeshBase & mesh);
 
