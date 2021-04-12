@@ -1594,6 +1594,12 @@ public:
   virtual unsigned int local_singular_node(const Point & /* p */, const Real /* tol */ = TOLERANCE*TOLERANCE) const
   { return invalid_uint; }
 
+  /**
+   * \returns true iff the node at the given index has a singular
+   * mapping; i.e. is the degree-4 node on a Pyramid.
+   */
+  virtual bool is_singular_node(unsigned int /* node_i */) const { return false; }
+
 protected:
 
   /**
