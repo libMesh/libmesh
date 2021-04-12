@@ -2016,15 +2016,24 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
             {
               libmesh_assert_equal_to(vertex.n_comp(sys_num, var), 0);
             }
-          else if (cont == C_ZERO)
+          else if (cont == C_ZERO ||
+                   cont == SIDE_DISCONTINUOUS)
             {
-              libmesh_assert(vertex.n_comp(sys_num, var));
+              if (cont == SIDE_DISCONTINUOUS &&
+                  elem.dim() != 1)
+                {
+                  libmesh_assert_equal_to(vertex.n_comp(sys_num, var), 0);
+                  continue;
+                }
+
               const FValue val = f.eval_at_node
                 (context, var_component, /*dim=*/ 0, // Don't care w/C0
                  vertex, extra_hanging_dofs[var], system.time);
 
               if (field_type == TYPE_VECTOR)
               {
+                libmesh_assert_equal_to(vertex.n_comp(sys_num, var), elem.dim());
+
                 // We will have a number of nodal value DoFs equal to the elem dim
                 for (unsigned int i = 0; i < elem.dim(); ++i)
                 {
@@ -2040,7 +2049,12 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
               }
               else
               {
-                // C_ZERO elements have a single nodal value DoF at vertices
+                // C_ZERO elements have a single nodal value DoF at
+                // vertices.  We can't assert n_comp==1 here,
+                // because if this is a hanging node then it may have
+                // more face/edge DoFs, but we don't need to deal with
+                // those here.
+
                 const dof_id_type id = vertex.dof_number(sys_num, var, 0);
                 insert_id(id, val, vertex.processor_id());
               }
