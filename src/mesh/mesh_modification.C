@@ -144,6 +144,51 @@ void MeshTools::Modification::distort (MeshBase & mesh,
 
 
 
+void MeshTools::Modification::permute_elements(MeshBase & mesh)
+{
+  LOG_SCOPE("permute_elements()", "MeshTools::Modification");
+
+  // We don't yet support doing permute() on a parent element, which
+  // would require us to consistently permute all its children and
+  // give them different local child numbers.
+  unsigned int n_levels = MeshTools::n_levels(mesh);
+  if (n_levels > 1)
+    libmesh_error();
+
+  const unsigned int seed = 123456;
+
+  // seed the random number generator.
+  // We'll loop from 1 to max_elem_id on every processor, even those
+  // that don't have a particular element, so that the pseudorandom
+  // numbers will be the same everywhere.
+  std::srand(seed);
+
+
+  for (auto e_id : make_range(mesh.max_elem_id()))
+    {
+      int my_rand = std::rand();
+
+      Elem * elem = mesh.query_elem_ptr(e_id);
+
+      if (!elem)
+        continue;
+
+      const unsigned int max_permutation = elem->n_permutations();
+      if (!max_permutation)
+        continue;
+
+      const unsigned int perm = my_rand % max_permutation;
+
+      elem->permute(perm);
+    }
+
+  // Neighbor links need to be cleared and reassigned to their new
+  // sides
+  mesh.find_neighbors();
+}
+
+
+
 void MeshTools::Modification::redistribute (MeshBase & mesh,
                                             const FunctionBase<Real> & mapfunc)
 {

@@ -55,6 +55,13 @@ void distort (MeshBase & mesh,
               const Real factor, const bool perturb_boundary=false);
 
 /**
+ * Randomly permute the nodal ordering of each element (without
+ * twisting the element mapping.  This is useful for regression
+ * testing with a variety of element orientations.
+ */
+void permute_elements (MeshBase & mesh);
+
+/**
  * Deterministically perturb the nodal locations.  This function will
  * move each node from it's current x/y/z coordinates to a new x/y/z
  * coordinate given by the first LIBMESH_DIM components of the
