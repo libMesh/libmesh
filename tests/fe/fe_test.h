@@ -10,6 +10,7 @@
 #include <libmesh/fe_interface.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
+#include <libmesh/mesh_modification.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/system.h>
 #include <libmesh/quadrature_gauss.h>
@@ -203,6 +204,13 @@ public:
                                        build_nx, build_ny, build_nz,
                                        0., 1., 0., 1., 0., 1.,
                                        elem_type);
+
+    // Permute our elements randomly so we test all sorts of
+    // orientations ... except with Hermite elements, which are only
+    // designed to support meshes with a single orientation shared by
+    // all elements.
+    if (family != HERMITE)
+      MeshTools::Modification::permute_elements(*_mesh);
 
     // Set rational weights so we can exactly match our test solution
     if (family == RATIONAL_BERNSTEIN)
