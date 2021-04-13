@@ -96,6 +96,8 @@ AC_DEFUN([CONFIGURE_PETSC],
           CXXFLAGS="$saveCXXFLAGS $PETSCINCLUDEDIRS"
 
           AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+          @%:@undef MAJOR_VERSION
+          @%:@undef MINOR_VERSION
           @%:@include <petsc.h>
           static char help[]="";
 
@@ -130,6 +132,8 @@ AC_DEFUN([CONFIGURE_PETSC],
           CFLAGS="$saveCFLAGS $PETSCINCLUDEDIRS"
 
           AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+          @%:@undef MAJOR_VERSION
+          @%:@undef MINOR_VERSION
           @%:@include <petsctao.h>
           static char help[]="";
 
