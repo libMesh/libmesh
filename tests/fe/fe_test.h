@@ -91,6 +91,39 @@ Gradient quadratic_test_grad (const Point & p,
 }
 
 
+inline
+Number fe_cubic_test (const Point& p,
+                      const Parameters&,
+                      const std::string&,
+                      const std::string&)
+{
+  const Real & x = p(0);
+  const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
+  const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+
+  return x*(1-x)*(1-x) + x*x*(1-y) + x*(1-y)*(1-z) + y*(1-y)*z + z*(1-z)*(1-z);
+}
+
+inline
+Gradient fe_cubic_test_grad (const Point & p,
+                             const Parameters&,
+                             const std::string&,
+                             const std::string&)
+{
+  const Real & x = p(0);
+  const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
+  const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
+
+  Gradient grad = 3*x*x-4*x+1 + 2*x*(1-y) + (1-y)*(1-z);
+  if (LIBMESH_DIM > 1)
+    grad(1) = -x*x - x*(1-z) + (1-2*y)*z;
+  if (LIBMESH_DIM > 2)
+    grad(2) = -x*(1-y) + y*(1-y) + 3*z*z-4*z+1;
+
+  return grad;
+}
+
+
 // Higher order rational bases need uniform weights to exactly
 // represent linears; we can easily try out other functions on
 // tensor product elements.
@@ -254,6 +287,10 @@ public:
       {
         _sys->project_solution(rational_test, rational_test_grad, _es->parameters);
       }
+    else if (order > 2)
+      {
+        _sys->project_solution(fe_cubic_test, fe_cubic_test_grad, _es->parameters);
+      }
     else if (order > 1)
       {
         _sys->project_solution(quadratic_test, quadratic_test_grad, _es->parameters);
@@ -279,11 +316,11 @@ public:
     _ny = (_dim > 1) ? _nx : 1;
     _nz = (_dim > 2) ? _nx : 1;
 
-    // TOLERANCE * TOLERANCE doesn't work for 3D cubic Hermite?
     this->_value_tol = TOLERANCE * sqrt(TOLERANCE);
 
-    // TOLERANCE * sqrt(TOLERANCE) too low for 3D quartic Hierarchic
-    this->_grad_tol = 2 * TOLERANCE * sqrt(TOLERANCE);
+    // We see 6.5*tol*sqrt(tol) errors on cubic Hermites with the fe_cubic
+    // hermite test function
+    this->_grad_tol = 8 * TOLERANCE * sqrt(TOLERANCE);
 
     this->_hess_tol = sqrt(TOLERANCE); // FIXME: we see some ~1e-5 errors?!?
 
@@ -400,6 +437,11 @@ public:
             (libmesh_real(rational_test(p, dummy, "", "")),
              libmesh_real(u),
              this->_value_tol);
+        else if (order > 2)
+          LIBMESH_ASSERT_FP_EQUAL
+            (libmesh_real(fe_cubic_test(p, dummy, "", "")),
+             libmesh_real(u),
+             this->_value_tol);
         else if (order > 1)
           LIBMESH_ASSERT_FP_EQUAL
             (libmesh_real(x*x + 0.5*y*y + 0.25*z*z + 0.125*x*y +
@@ -459,6 +501,23 @@ public:
             if (this->_dim > 2)
               LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)),
                                       libmesh_real(rat_grad(2)),
+                                      this->_grad_tol);
+          }
+        else if (order > 2)
+          {
+            const Gradient cub_grad =
+              fe_cubic_test_grad(p, dummy, "", "");
+
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)),
+                                    libmesh_real(cub_grad(0)),
+                                    this->_grad_tol);
+            if (this->_dim > 1)
+              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)),
+                                      libmesh_real(cub_grad(1)),
+                                      this->_grad_tol);
+            if (this->_dim > 2)
+              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)),
+                                      libmesh_real(cub_grad(2)),
                                       this->_grad_tol);
           }
         else if (order > 1)
@@ -527,6 +586,23 @@ public:
                                       libmesh_real(rat_grad(2)),
                                       this->_grad_tol);
           }
+        else if (order > 2)
+          {
+            const Gradient cub_grad =
+              fe_cubic_test_grad(p, dummy, "", "");
+
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x),
+                                    libmesh_real(cub_grad(0)),
+                                    this->_grad_tol);
+            if (this->_dim > 1)
+              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y),
+                                      libmesh_real(cub_grad(1)),
+                                      this->_grad_tol);
+            if (this->_dim > 2)
+              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z),
+                                      libmesh_real(cub_grad(2)),
+                                      this->_grad_tol);
+          }
         else if (order > 1)
           {
             const Real & x = p(0);
@@ -577,6 +653,41 @@ public:
         if (family == RATIONAL_BERNSTEIN && order > 1)
           {
             // TODO: Yeah we'll test the ugly expressions later.
+          }
+        else if (order > 2)
+          {
+            const Real & x = p(0);
+            const Real & y = LIBMESH_DIM > 1 ? p(1) : 0;
+            const Real & z = LIBMESH_DIM > 2 ? p(2) : 0;
+            const RealTensor full_hess { 6*x-4+2*(1-y), -2*x+z-1,     y-1,
+                                              -2*x+z-1,     -2*z, x+1-2*y,
+                                                   y-1,  x+1-2*y, 6*z-4 };
+
+            LIBMESH_ASSERT_FP_EQUAL(full_hess(0,0), libmesh_real(hess_u(0,0)),
+                                    this->_hess_tol);
+            if (this->_dim > 1)
+              {
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,1)), libmesh_real(hess_u(1,0)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(full_hess(0,1), libmesh_real(hess_u(0,1)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(full_hess(1,1), libmesh_real(hess_u(1,1)),
+                                        this->_hess_tol);
+              }
+            if (this->_dim > 2)
+              {
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,2)), libmesh_real(hess_u(2,0)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,2)), libmesh_real(hess_u(2,1)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(full_hess(0,2), libmesh_real(hess_u(0,2)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(full_hess(1,2), libmesh_real(hess_u(1,2)),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(full_hess(2,2), libmesh_real(hess_u(2,2)),
+                                        this->_hess_tol);
+              }
+
           }
         else if (order > 1)
           {
@@ -668,6 +779,35 @@ public:
         if (family == RATIONAL_BERNSTEIN && order > 1)
           {
             // TODO: tedious calculus
+          }
+        else if (order > 2)
+          {
+            const Real & x = p(0);
+            const Real & y = LIBMESH_DIM > 1 ? p(1) : 0;
+            const Real & z = LIBMESH_DIM > 2 ? p(2) : 0;
+            const RealTensor full_hess { 6*x-4+2*(1-y), -2*x+z-1,     y-1,
+                                              -2*x+z-1,     -2*z, x+1-2*y,
+                                                   y-1,  x+1-2*y, 6*z-4 };
+
+            LIBMESH_ASSERT_FP_EQUAL(full_hess(0,0), libmesh_real(hess_u_xx),
+                                    this->_hess_tol);
+            if (this->_dim > 1)
+              {
+                LIBMESH_ASSERT_FP_EQUAL(full_hess(0,1), libmesh_real(hess_u_xy),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(full_hess(1,1), libmesh_real(hess_u_yy),
+                                        this->_hess_tol);
+              }
+            if (this->_dim > 2)
+              {
+                LIBMESH_ASSERT_FP_EQUAL(full_hess(0,2), libmesh_real(hess_u_xz),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(full_hess(1,2), libmesh_real(hess_u_yz),
+                                        this->_hess_tol);
+                LIBMESH_ASSERT_FP_EQUAL(full_hess(2,2), libmesh_real(hess_u_zz),
+                                        this->_hess_tol);
+              }
+
           }
         else if (order > 1)
           {
