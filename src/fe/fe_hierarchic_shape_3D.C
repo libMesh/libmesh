@@ -94,6 +94,62 @@ unsigned int remap_node(unsigned int n,
 }
 
 
+void cube_remap(unsigned int & side_i,
+                const Elem & side,
+                unsigned int totalorder,
+                Point & sidep)
+{
+  // "vertex" nodes are now decoupled from vertices, so we have
+  // to order them consistently otherwise
+  if (side_i < 4)
+    side_i = remap_node<4>(side_i, side, 0);
+
+  // And "edge" nodes are decoupled from edges, so we have to
+  // reorder them too!
+  else if (side_i < 4u*totalorder)
+    {
+      unsigned int side_node = (side_i - 4)/(totalorder-1)+4;
+      side_node = remap_node<4>(side_node, side, 4);
+      side_i = ((side_i - 4) % (totalorder - 1)) // old local edge_i
+        + 4 + (side_node-4)*(totalorder-1);
+    }
+
+  // Interior dofs in 2D don't care about where xi/eta point in
+  // physical space, but here we need them to match from both
+  // sides of a face!
+  else
+    {
+      unsigned int min_side_node = remap_node<4>(0, side, 0);
+      const bool flip = (side.point(min_side_node) < side.point((min_side_node+1)%4));
+
+      switch (min_side_node) {
+      case 0:
+        if (flip)
+          std::swap(sidep(0), sidep(1));
+        break;
+      case 1:
+        sidep(0) = -sidep(0);
+        if (!flip)
+          std::swap(sidep(0), sidep(1));
+        break;
+      case 2:
+        sidep(0) = -sidep(0);
+        sidep(1) = -sidep(1);
+        if (flip)
+          std::swap(sidep(0), sidep(1));
+        break;
+      case 3:
+        sidep(1) = -sidep(1);
+        if (!flip)
+          std::swap(sidep(0), sidep(1));
+        break;
+      default:
+        libmesh_error();
+      }
+    }
+}
+
+
 void cube_indices(const Elem * elem,
                   const unsigned int totalorder,
                   const unsigned int i,
@@ -825,19 +881,10 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
 
         std::unique_ptr<const Elem> side = elem->build_side_ptr(sidenum);
 
-        // "vertex" nodes are now decoupled from vertices, so we have
-        // to order them consistently otherwise
-        if (side_i < 4)
-          side_i = remap_node<4>(side_i, *side, 0);
+        Point sidep = cube_side_point(sidenum, p);
 
-        // And "edge" nodes are decoupled from edges, so we have to
-        // reorder them too!
-        else if (side_i < 8)
-          side_i = remap_node<4>(side_i, *side, 4);
+        cube_remap(side_i, *side, totalorder, sidep);
 
-        // Interior nodes need to be reordered consistently!?  FIXME
-
-        const Point sidep = cube_side_point(sidenum, p);
         return FE<2,HIERARCHIC>::shape(side.get(), order, side_i, sidep, add_p_level);
       }
 
@@ -990,17 +1037,9 @@ Real FE<3,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
 
         std::unique_ptr<const Elem> side = elem->build_side_ptr(sidenum);
 
-        // "vertex" nodes are now decoupled from vertices, so we have
-        // to order them consistently otherwise
-        if (side_i < 4)
-          side_i = remap_node<4>(side_i, *side, 0);
+        Point sidep = cube_side_point(sidenum, p);
 
-        // And "edge" nodes are decoupled from edges, so we have to
-        // reorder them too!
-        else if (side_i < 8)
-          side_i = remap_node<4>(side_i, *side, 4);
-
-        // Interior nodes need to be reordered consistently!?  FIXME
+        cube_remap(side_i, *side, totalorder, sidep);
 
         // What direction on the side corresponds to the derivative
         // direction we want?
@@ -1087,7 +1126,6 @@ Real FE<3,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
             libmesh_error_msg("Invalid derivative index j = " << j);
           }
 
-        const Point sidep = cube_side_point(sidenum, p);
         return f * FE<2,HIERARCHIC>::shape_deriv(side.get(), order,
                                                  side_i, sidej, sidep,
                                                  add_p_level);
@@ -1245,17 +1283,9 @@ Real FE<3,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
 
         std::unique_ptr<const Elem> side = elem->build_side_ptr(sidenum);
 
-        // "vertex" nodes are now decoupled from vertices, so we have
-        // to order them consistently otherwise
-        if (side_i < 4)
-          side_i = remap_node<4>(side_i, *side, 0);
+        Point sidep = cube_side_point(sidenum, p);
 
-        // And "edge" nodes are decoupled from edges, so we have to
-        // reorder them too!
-        else if (side_i < 8)
-          side_i = remap_node<4>(side_i, *side, 4);
-
-        // Interior nodes need to be reordered consistently!?  FIXME
+        cube_remap(side_i, *side, totalorder, sidep);
 
         // What second derivative or mixed derivative on the side
         // corresponds to the xi/eta/zeta mix we were asked for?
@@ -1406,7 +1436,6 @@ Real FE<3,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
             libmesh_error_msg("Invalid derivative index j = " << j);
           }
 
-        const Point sidep = cube_side_point(sidenum, p);
         return f * FE<2,HIERARCHIC>::shape_second_deriv(side.get(),
                                                         order, side_i,
                                                         sidej, sidep,
