@@ -633,7 +633,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
                     elem->point(0) > elem->point(1))
                   f = -1;
 
-                return f*FE<1,HIERARCHIC>::shape_second_deriv(EDGE3, totalorder, i, 0, f*xi);
+                return FE<1,HIERARCHIC>::shape_second_deriv(EDGE3, totalorder, i, 0, f*xi);
               }
             else           // side 1
               {
@@ -649,7 +649,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
                     elem->point(1) > elem->point(2))
                   f = -1;
 
-                return f*FE<1,HIERARCHIC>::shape_second_deriv(EDGE3, totalorder, side_i, 0, f*eta);
+                return FE<1,HIERARCHIC>::shape_second_deriv(EDGE3, totalorder, side_i, 0, f*eta);
               }
           }
         else // xi < eta
@@ -668,7 +668,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
                     elem->point(3) > elem->point(2))
                   f = -1;
 
-                return f*FE<1,HIERARCHIC>::shape_second_deriv(EDGE3, totalorder, side_i, 0, f*xi);
+                return FE<1,HIERARCHIC>::shape_second_deriv(EDGE3, totalorder, side_i, 0, f*xi);
               }
             else           // side 3
               {
@@ -683,7 +683,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
                     elem->point(0) > elem->point(3))
                   f = -1;
 
-                return f*FE<1,HIERARCHIC>::shape_second_deriv(EDGE3, totalorder, side_i, 0, f*eta);
+                return FE<1,HIERARCHIC>::shape_second_deriv(EDGE3, totalorder, side_i, 0, f*eta);
               }
           }
       }
