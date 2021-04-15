@@ -68,30 +68,29 @@ Point get_min_point(const Elem * elem,
                   std::min(elem->point(c),elem->point(d)));
 }
 
-unsigned int nth_node(unsigned int n,
-                      const Elem & elem)
+// Remap non-face-nodes based on point ordering
+template <unsigned int N_nodes>
+unsigned int remap_node(unsigned int n,
+                        const Elem & elem,
+                        unsigned int nodebegin)
 {
-  std::array<const Point *, 4> points =
-    {&elem.point(0),
-     &elem.point(1),
-     &elem.point(2),
-     &elem.point(3)};
+  std::array<const Point *, N_nodes> points;
+
+  for (auto i : IntRange<unsigned int>(0, N_nodes))
+    points[i] = &elem.point(nodebegin+i);
 
   std::sort(points.begin(), points.end(),
             [](const Point * a, const Point * b)
             { return *a < *b; });
 
-  const Point * pn = points[n];
+  const Point * pn = points[n-nodebegin];
 
-  if (pn == &elem.point(0))
-    return 0;
-  else if (pn == &elem.point(1))
-    return 1;
-  else if (pn == &elem.point(2))
-    return 2;
+  for (auto i : IntRange<unsigned int>(nodebegin, nodebegin+N_nodes))
+    if (pn == &elem.point(i))
+      return i;
 
-  libmesh_assert(pn == &elem.point(3));
-  return 3;
+  libmesh_assert(false);
+  return libMesh::invalid_uint;
 }
 
 
@@ -829,9 +828,12 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
         // "vertex" nodes are now decoupled from vertices, so we have
         // to order them consistently otherwise
         if (side_i < 4)
-          side_i = nth_node(side_i, *side);
+          side_i = remap_node<4>(side_i, *side, 0);
 
-        // Edge nodes are already ordered consistently in 2D
+        // And "edge" nodes are decoupled from edges, so we have to
+        // reorder them too!
+        else if (side_i < 8)
+          side_i = remap_node<4>(side_i, *side, 4);
 
         // Interior nodes need to be reordered consistently!?  FIXME
 
@@ -991,9 +993,12 @@ Real FE<3,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
         // "vertex" nodes are now decoupled from vertices, so we have
         // to order them consistently otherwise
         if (side_i < 4)
-          side_i = nth_node(side_i, *side);
+          side_i = remap_node<4>(side_i, *side, 0);
 
-        // Edge nodes are already ordered consistently in 2D
+        // And "edge" nodes are decoupled from edges, so we have to
+        // reorder them too!
+        else if (side_i < 8)
+          side_i = remap_node<4>(side_i, *side, 4);
 
         // Interior nodes need to be reordered consistently!?  FIXME
 
@@ -1243,9 +1248,12 @@ Real FE<3,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
         // "vertex" nodes are now decoupled from vertices, so we have
         // to order them consistently otherwise
         if (side_i < 4)
-          side_i = nth_node(side_i, *side);
+          side_i = remap_node<4>(side_i, *side, 0);
 
-        // Edge nodes are already ordered consistently in 2D
+        // And "edge" nodes are decoupled from edges, so we have to
+        // reorder them too!
+        else if (side_i < 8)
+          side_i = remap_node<4>(side_i, *side, 4);
 
         // Interior nodes need to be reordered consistently!?  FIXME
 
