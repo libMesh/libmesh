@@ -238,12 +238,22 @@ public:
                                        0., 1., 0., 1., 0., 1.,
                                        elem_type);
 
-    // Permute our elements randomly so we test all sorts of
-    // orientations ... except with Hermite elements, which are only
-    // designed to support meshes with a single orientation shared by
-    // all elements.
-    if (family != HERMITE)
-      MeshTools::Modification::permute_elements(*_mesh);
+    // Permute our elements randomly and rotate our mesh so we test
+    // all sorts of orientations ... except with Hermite elements,
+    // which are only designed to support meshes with a single
+    // orientation shared by all elements.  We're also not rotating
+    // the rational elements, since our test solution was designed for
+    // a specific weighted mesh.
+    if (family != HERMITE &&
+        family != RATIONAL_BERNSTEIN)
+      {
+        MeshTools::Modification::permute_elements(*_mesh);
+
+        // Not yet testing manifolds embedded in higher-D space
+        if (_dim > 1)
+          MeshTools::Modification::rotate(*_mesh, 4,
+                                          8*(_dim>2), 16*(_dim>2));
+      }
 
     // Set rational weights so we can exactly match our test solution
     if (family == RATIONAL_BERNSTEIN)
