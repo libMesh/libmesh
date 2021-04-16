@@ -33,8 +33,10 @@ RealTensor tangential_hessian (RealTensor hess,
   CPPUNIT_TEST( testHessU );                    \
   CPPUNIT_TEST( testHessUComp );
 
+const unsigned int N_x=2;
+
 template <Order order, FEFamily family, ElemType elem_type>
-class FESideTest : public FETestBase<order, family, elem_type, 2> {
+class FESideTest : public FETestBase<order, family, elem_type, N_x> {
 
 private:
   FEBase * _fe_side;
@@ -43,7 +45,7 @@ private:
 public:
   void setUp()
   {
-    FETestBase<order,family,elem_type,2>::setUp();
+    FETestBase<order,family,elem_type,N_x>::setUp();
 
     FEType fe_type = this->_sys->variable_type(0);
     _fe_side = FEBase::build(this->_dim, fe_type).release();
@@ -92,7 +94,7 @@ public:
   {
     delete _fe_side;
     delete _qrule_side;
-    FETestBase<order,family,elem_type,2>::tearDown();
+    FETestBase<order,family,elem_type,N_x>::tearDown();
   }
 
   template <typename Functor>
