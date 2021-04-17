@@ -97,6 +97,24 @@ Real RBEIMEvaluation::rb_eim_solve(unsigned int N)
   libmesh_error_msg_if(N > get_n_basis_functions(), "Error: N cannot be larger than the number of basis functions in rb_solve");
   libmesh_error_msg_if(N==0, "Error: N must be greater than 0 in rb_solve");
 
+  if (get_parametrized_function().is_lookup_table)
+    {
+      Real lookup_table_param =
+        get_parameters().get_value(get_parametrized_function().lookup_table_param_name);
+
+      // Cast lookup_table_param to an unsigned integer so that we can use
+      // it as an index into the EIM rhs values obtained from the lookup table.
+      unsigned int lookup_table_index =
+        cast_int<unsigned int>(std::round(lookup_table_param));
+
+      DenseVector<Number> values;
+      eim_solutions[lookup_table_index].get_principal_subvector(N, values);
+      _rb_eim_solution = values;
+
+      // Don't evaluate an error bound in this case
+      return -1.;
+    }
+
   // Get the rhs by sampling parametrized_function
   // at the first N interpolation_points
   DenseVector<Number> EIM_rhs(N);

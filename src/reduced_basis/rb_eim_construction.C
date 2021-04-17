@@ -340,6 +340,15 @@ Real RBEIMConstruction::train_eim_approximation()
       libMesh::out << std::endl << "---- Basis dimension: "
                    << rbe.get_n_basis_functions() << " ----" << std::endl;
 
+      if (get_rb_eim_evaluation().get_parametrized_function().is_lookup_table &&
+          best_fit_type_flag == EIM_BEST_FIT)
+        {
+          // If this is a lookup table and we're using "EIM best fit" then we
+          // need to update the eim_solutions after each EIM enrichment so that
+          // we can call rb_eim_eval.rb_eim_solve() from within compute_max_eim_error().
+          store_eim_solutions_for_training_set();
+        }
+
       libMesh::out << "Computing EIM error on training set" << std::endl;
       std::pair<Real,unsigned int> max_error_pair = compute_max_eim_error();
       abs_greedy_error = max_error_pair.first;
@@ -406,8 +415,11 @@ Real RBEIMConstruction::train_eim_approximation()
       }
     } // end while(true)
 
-  if (get_rb_eim_evaluation().get_parametrized_function().is_lookup_table)
+  if (get_rb_eim_evaluation().get_parametrized_function().is_lookup_table &&
+      best_fit_type_flag != EIM_BEST_FIT)
     {
+      // We only enter here if best_fit_type_flag != EIM_BEST_FIT because we
+      // already called this above in the EIM_BEST_FIT case.
       store_eim_solutions_for_training_set();
     }
 
@@ -1008,10 +1020,11 @@ Real RBEIMConstruction::compute_best_fit_error(unsigned int training_index)
         // (rb_eim_solve provides the EIM basis function coefficients used below)
 
         // Turn off error estimation for this rb_eim_solve, we use the linfty norm instead
+        bool stashed_evaluate_eim_error_bound = get_rb_eim_evaluation().evaluate_eim_error_bound;
         get_rb_eim_evaluation().evaluate_eim_error_bound = false;
         get_rb_eim_evaluation().set_parameters( get_parameters() );
         get_rb_eim_evaluation().rb_eim_solve(RB_size);
-        get_rb_eim_evaluation().evaluate_eim_error_bound = true;
+        get_rb_eim_evaluation().evaluate_eim_error_bound = stashed_evaluate_eim_error_bound;
 
         best_fit_coeffs = get_rb_eim_evaluation().get_rb_eim_solution();
         break;
