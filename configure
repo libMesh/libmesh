@@ -48927,6 +48927,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
+          #undef MAJOR_VERSION
+          #undef MINOR_VERSION
           #include <petsc.h>
           static char help[]="";
 
@@ -48983,6 +48985,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
+          #undef MAJOR_VERSION
+          #undef MINOR_VERSION
           #include <petsctao.h>
           static char help[]="";
 
