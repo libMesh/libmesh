@@ -21,12 +21,16 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
+#include "libmesh/ignore_warnings.h"
+
 // PETSc includes
 #if !PETSC_RELEASE_LESS_THAN(3,6,0)
 # include <petsc/private/dmimpl.h>
 #else
 # include <petsc-private/dmimpl.h>
 #endif
+
+#include "libmesh/restore_warnings.h"
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
