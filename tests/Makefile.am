@@ -37,6 +37,7 @@ unit_tests_sources = \
   fe/fe_monomial_test.C \
   fe/fe_rational_map.C \
   fe/fe_rational_test.C \
+  fe/fe_side_test.C \
   fe/fe_szabab_test.C \
   fe/fe_test.h \
   fe/fe_xyz_test.C \

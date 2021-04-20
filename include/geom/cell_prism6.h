@@ -198,6 +198,8 @@ public:
    */
   virtual BoundingBox loose_bounding_box () const override;
 
+  virtual void permute(unsigned int perm_num) override final;
+
 protected:
 
   /**

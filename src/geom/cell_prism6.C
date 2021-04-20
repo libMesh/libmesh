@@ -494,4 +494,32 @@ Prism6::loose_bounding_box () const
   return Elem::loose_bounding_box();
 }
 
+
+void
+Prism6::permute(unsigned int perm_num)
+{
+  libmesh_assert_less (perm_num, 6);
+  const unsigned int side = perm_num % 2;
+  const unsigned int rotate = perm_num / 2;
+
+  for (unsigned int i = 0; i != rotate; ++i)
+    {
+      swap3nodes(0,1,2);
+      swap3nodes(3,4,5);
+    }
+
+  switch (side) {
+  case 0:
+    break;
+  case 1:
+    swap2nodes(1,3);
+    swap2nodes(0,4);
+    swap2nodes(2,5);
+    break;
+  default:
+    libmesh_error();
+  }
+
+}
+
 } // namespace libMesh

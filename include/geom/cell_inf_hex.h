@@ -182,6 +182,11 @@ public:
    */
   virtual bool contains_point (const Point & p, Real tol=TOLERANCE) const override;
 
+  /**
+   * One non-infinite side, four orientations.
+   */
+  virtual unsigned int n_permutations() const override final { return 4; }
+
 protected:
 
   /**

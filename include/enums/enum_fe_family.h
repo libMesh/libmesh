@@ -62,6 +62,8 @@ enum FEFamily : int {
                MONOMIAL_VEC = 43,
                // Rational basis functions
                RATIONAL_BERNSTEIN = 61,
+               // Side-supported basis functions
+               SIDE_HIERARCHIC = 71,
                // Invalid
                INVALID_FE   = 99};
 
@@ -78,7 +80,8 @@ enum FEContinuity : int {
                    DISCONTINUOUS,
                    C_ZERO,
                    C_ONE,
-                   H_CURL};
+                   H_CURL,
+                   SIDE_DISCONTINUOUS};
 
 /**
  * \enum libMesh::FEFieldType defines an \p enum for finite element

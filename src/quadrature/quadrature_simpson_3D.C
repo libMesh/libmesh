@@ -132,6 +132,95 @@ void QSimpson::init_3D(const ElemType, unsigned int)
 
 
       //---------------------------------------------
+      // Pyramid quadrature rules
+    case PYRAMID5:
+    case PYRAMID13:
+    case PYRAMID14:
+      {
+        _points.resize(14);
+        _weights.resize(14);
+
+        _points[0](0) = -1.;
+        _points[0](1) = -1.;
+        _points[0](2) = 0.;
+
+        _points[1](0) = 1.;
+        _points[1](1) = -1.;
+        _points[1](2) = 0.;
+
+        _points[2](0) = 1.;
+        _points[2](1) = 1.;
+        _points[2](2) = 0.;
+
+        _points[3](0) = -1.;
+        _points[3](1) = 1.;
+        _points[3](2) = 0.;
+
+        _points[4](0) = 0.;
+        _points[4](1) = 0.;
+        _points[4](2) = 1.;
+
+        _points[5](0) = 0.;
+        _points[5](1) = -1.;
+        _points[5](2) = 0.;
+
+        _points[6](0) = 1.;
+        _points[6](1) = 0.;
+        _points[6](2) = 0.;
+
+        _points[7](0) = 0.;
+        _points[7](1) = 1.;
+        _points[7](2) = 0.;
+
+        _points[8](0) = -1.;
+        _points[8](1) = 0.;
+        _points[8](2) = 0.;
+
+        _points[9](0) = 0.;
+        _points[9](1) = -0.5;
+        _points[9](2) = 0.5;
+
+        _points[10](0) = 0.5;
+        _points[10](1) = 0.;
+        _points[10](2) = 0.5;
+
+        _points[11](0) = 0.;
+        _points[11](1) = 0.5;
+        _points[11](2) = 0.5;
+
+        _points[12](0) = -0.5;
+        _points[12](1) = 0.;
+        _points[12](2) = 0.5;
+
+        _points[13](0) = 0.;
+        _points[13](1) = 0.;
+        _points[13](2) = 0.;
+
+        // These are of dubious value since we can't integrate on the
+        // vertex where the mapping Jacobian is ill-defined, and even
+        // if we could it looks like we'd need negative weight at that
+        // vertex to give us exact integrals of both z and z^2.  So I
+        // punt and just use QTrap weights.
+        _weights[0] = 1/Real(4);
+        _weights[1] = _weights[0];
+        _weights[2] = _weights[0];
+        _weights[3] = _weights[0];
+        _weights[4] = 1/Real(3);
+        _weights[5] = 0;
+        _weights[6] = 0;
+        _weights[7] = 0;
+        _weights[8] = 0;
+        _weights[9] = 0;
+        _weights[10] = 0;
+        _weights[11] = 0;
+        _weights[12] = 0;
+        _weights[13] = 0;
+
+       return;
+      }
+
+
+      //---------------------------------------------
       // Unsupported type
     default:
       libmesh_error_msg("ERROR: Unsupported type: " << Utility::enum_to_string(_type));

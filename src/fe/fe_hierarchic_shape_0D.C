@@ -27,6 +27,20 @@ namespace libMesh
 
 LIBMESH_DEFAULT_VECTORIZED_FE(0,HIERARCHIC)
 LIBMESH_DEFAULT_VECTORIZED_FE(0,L2_HIERARCHIC)
+LIBMESH_DEFAULT_VECTORIZED_FE(0,SIDE_HIERARCHIC)
+
+
+
+template <>
+Real FE<0,HIERARCHIC>::shape(const ElemType,
+                             const Order,
+                             const unsigned int libmesh_dbg_var(i),
+                             const Point &)
+{
+  libmesh_assert_less (i, 1);
+  return 1.;
+}
+
 
 
 template <>
@@ -41,14 +55,13 @@ Real FE<0,L2_HIERARCHIC>::shape(const ElemType,
 
 
 
-
 template <>
-Real FE<0,HIERARCHIC>::shape(const ElemType,
-                             const Order,
-                             const unsigned int libmesh_dbg_var(i),
-                             const Point &)
+Real FE<0,SIDE_HIERARCHIC>::shape(const ElemType,
+                                  const Order,
+                                  const unsigned int,
+                                  const Point &)
 {
-  libmesh_assert_less (i, 1);
+  libmesh_error_msg("No side variables in 0D!");
   return 1.;
 }
 
@@ -78,6 +91,21 @@ Real FE<0,L2_HIERARCHIC>::shape(const Elem *,
   return 1.;
 }
 
+
+
+template <>
+Real FE<0,SIDE_HIERARCHIC>::shape(const Elem *,
+                                  const Order,
+                                  const unsigned int,
+                                  const Point &,
+                                  const bool)
+{
+  libmesh_error_msg("No side variables in 0D!");
+  return 1.;
+}
+
+
+
 template <>
 Real FE<0,HIERARCHIC>::shape(const FEType,
                              const Elem *,
@@ -99,6 +127,19 @@ Real FE<0,L2_HIERARCHIC>::shape(const FEType,
                                 const bool)
 {
   libmesh_assert_less (i, 1);
+  return 1.;
+}
+
+
+
+template <>
+Real FE<0,SIDE_HIERARCHIC>::shape(const FEType,
+                                  const Elem *,
+                                  const unsigned int,
+                                  const Point &,
+                                  const bool)
+{
+  libmesh_error_msg("No side variables in 0D!");
   return 1.;
 }
 
@@ -184,6 +225,46 @@ Real FE<0,L2_HIERARCHIC>::shape_deriv(const FEType,
 }
 
 
+
+template <>
+Real FE<0,SIDE_HIERARCHIC>::shape_deriv(const ElemType,
+                                        const Order,
+                                        const unsigned int,
+                                        const unsigned int,
+                                        const Point &)
+{
+  libmesh_error_msg("No spatial derivatives in 0D!");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<0,SIDE_HIERARCHIC>::shape_deriv(const Elem *,
+                                        const Order,
+                                        const unsigned int,
+                                        const unsigned int,
+                                        const Point &,
+                                        const bool)
+{
+  libmesh_error_msg("No spatial derivatives in 0D!");
+  return 0.;
+}
+
+
+template <>
+Real FE<0,SIDE_HIERARCHIC>::shape_deriv(const FEType,
+                                        const Elem *,
+                                        const unsigned int,
+                                        const unsigned int,
+                                        const Point &,
+                                        const bool)
+{
+  libmesh_error_msg("No spatial derivatives in 0D!");
+  return 0.;
+}
+
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
@@ -258,6 +339,47 @@ Real FE<0,L2_HIERARCHIC>::shape_second_deriv(const FEType,
                                              const unsigned int,
                                              const Point &,
                                              const bool)
+{
+  libmesh_error_msg("No spatial derivatives in 0D!");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<0,SIDE_HIERARCHIC>::shape_second_deriv(const ElemType,
+                                               const Order,
+                                               const unsigned int,
+                                               const unsigned int,
+                                               const Point &)
+{
+  libmesh_error_msg("No spatial derivatives in 0D!");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<0,SIDE_HIERARCHIC>::shape_second_deriv(const Elem *,
+                                               const Order,
+                                               const unsigned int,
+                                               const unsigned int,
+                                               const Point &,
+                                               const bool)
+{
+  libmesh_error_msg("No spatial derivatives in 0D!");
+  return 0.;
+}
+
+
+
+template <>
+Real FE<0,SIDE_HIERARCHIC>::shape_second_deriv(const FEType,
+                                               const Elem *,
+                                               const unsigned int,
+                                               const unsigned int,
+                                               const Point &,
+                                               const bool)
 {
   libmesh_error_msg("No spatial derivatives in 0D!");
   return 0.;

@@ -1594,6 +1594,12 @@ public:
   virtual unsigned int local_singular_node(const Point & /* p */, const Real /* tol */ = TOLERANCE*TOLERANCE) const
   { return invalid_uint; }
 
+  /**
+   * \returns true iff the node at the given index has a singular
+   * mapping; i.e. is the degree-4 node on a Pyramid.
+   */
+  virtual bool is_singular_node(unsigned int /* node_i */) const { return false; }
+
 protected:
 
   /**
@@ -1680,6 +1686,27 @@ public:
   static std::unique_ptr<Elem> build_with_id (const ElemType type,
                                               dof_id_type id);
 
+  /**
+   * Returns the number of independent permutations of element nodes -
+   * e.g. a cube can be reoriented to put side 0 where side N is (for
+   * 0 <= N < 6) and then rotated in one of four ways, giving 24
+   * possible permutations.
+   *
+   * Permutations which change the mapping Jacobian of an element
+   * (i.e. flipping the element) are not allowed in this definition.
+   */
+  virtual unsigned int n_permutations() const = 0;
+
+  /**
+   * Permutes the element (by swapping node_ptr values) according to
+   * the specified index.
+   *
+   * This is useful for regression testing, by making it easy to make
+   * a structured mesh behave more like an arbitrarily unstructured
+   * mesh.
+   */
+  virtual void permute(unsigned int perm_num) = 0;
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -1755,6 +1782,35 @@ protected:
                                   dof_id_type n1,
                                   dof_id_type n2,
                                   dof_id_type n3);
+
+  /**
+   * Swaps two node_ptrs
+   */
+  void swap2nodes(unsigned int n1, unsigned int n2)
+  {
+    Node * temp = this->node_ptr(n1);
+    this->set_node(n1) = this->node_ptr(n2);
+    this->set_node(n2) = temp;
+  }
+
+  /**
+   * Swaps three node_ptrs, "rotating" them.
+   */
+  void swap3nodes(unsigned int n1, unsigned int n2, unsigned int n3)
+  {
+    swap2nodes(n1, n2);
+    swap2nodes(n2, n3);
+  }
+
+  /**
+   * Swaps four node_ptrs, "rotating" them.
+   */
+  void swap4nodes(unsigned int n1, unsigned int n2, unsigned int n3,
+                  unsigned int n4)
+  {
+    swap3nodes(n1, n2, n3);
+    swap2nodes(n3, n4);
+  }
 
   /**
    * An implementation for simple (all sides equal) elements

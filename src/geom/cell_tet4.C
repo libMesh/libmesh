@@ -580,4 +580,34 @@ float Tet4::embedding_matrix (const unsigned int i,
 // }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
+void Tet4::permute(unsigned int perm_num)
+{
+  libmesh_assert_less (perm_num, 12);
+
+  const unsigned int side = perm_num % 4;
+  const unsigned int rotate = perm_num / 4;
+
+  for (unsigned int i = 0; i != rotate; ++i)
+    {
+      swap3nodes(0,1,2);
+    }
+
+  switch (side) {
+  case 0:
+    break;
+  case 1:
+    swap3nodes(0,2,3);
+    break;
+  case 2:
+    swap3nodes(2,0,3);
+    break;
+  case 3:
+    swap3nodes(2,1,3);
+    break;
+  default:
+    libmesh_error();
+  }
+}
+
+
 } // namespace libMesh

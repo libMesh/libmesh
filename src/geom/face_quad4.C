@@ -309,4 +309,15 @@ Quad4::loose_bounding_box () const
 }
 
 
+void Quad4::permute(unsigned int perm_num)
+{
+  libmesh_assert_less (perm_num, 4);
+
+  for (unsigned int i = 0; i != perm_num; ++i)
+    {
+      swap4nodes(0,1,2,3);
+    }
+}
+
+
 } // namespace libMesh

@@ -244,6 +244,8 @@ public:
    */
   virtual Real volume () const override;
 
+  virtual void permute(unsigned int perm_num) override final;
+
 protected:
 
   /**

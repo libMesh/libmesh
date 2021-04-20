@@ -109,11 +109,22 @@ public:
 #endif
           CPPUNIT_ASSERT(elem->contains_point(elem->point(n)));
   }
+
+  void test_permute()
+  {
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      for (const auto p : IntRange<unsigned int>(0, elem->n_permutations()))
+        {
+          elem->permute(p);
+          CPPUNIT_ASSERT(elem->has_invertible_map());
+        }
+  }
 };
 
 #define ELEMTEST                                \
   CPPUNIT_TEST( test_bounding_box );            \
   CPPUNIT_TEST( test_maps );                    \
+  CPPUNIT_TEST( test_permute );                    \
   CPPUNIT_TEST( test_contains_point_node );
 
 #define INSTANTIATE_ELEMTEST(elemtype)                          \

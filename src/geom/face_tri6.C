@@ -471,4 +471,17 @@ const unsigned short int Tri6::_second_order_vertex_child_index[Tri6::num_nodes]
     1,2,2     // Edges
   };
 
+
+void Tri6::permute(unsigned int perm_num)
+{
+  libmesh_assert_less (perm_num, 3);
+
+  for (unsigned int i = 0; i != perm_num; ++i)
+    {
+      swap3nodes(0,1,2);
+      swap3nodes(3,4,5);
+    }
+}
+
+
 } // namespace libMesh

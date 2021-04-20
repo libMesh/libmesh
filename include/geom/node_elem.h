@@ -249,6 +249,12 @@ public:
 
 #endif
 
+  /**
+   * No way to reorient a single node.
+   */
+  virtual unsigned int n_permutations() const override final { return 0; }
+
+  virtual void permute(unsigned int) override final { libmesh_error(); }
 
 protected:
 

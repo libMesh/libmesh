@@ -14,18 +14,20 @@
 #include <regex>
 
 // Add Tests to runner that match user-provided regex.
-void add_matching_tests_to_runner(CppUnit::Test * test,
-                                  const std::string & r_str,
-                                  const std::regex & r,
-                                  CppUnit::TextUi::TestRunner & runner,
-                                  CppUnit::TestSuite & rejects)
+int add_matching_tests_to_runner(CppUnit::Test * test,
+                                 const std::string & r_str,
+                                 const std::regex & r,
+                                 CppUnit::TextUi::TestRunner & runner,
+                                 CppUnit::TestSuite & rejects)
 {
+  int n_tests_added = 0;
+
   // If we running all tests we just add the "All Tests" test and then return
   if (test->getName() == "All Tests" && r_str == "All Tests")
   {
     libMesh::out << test->getName() << std::endl;
     runner.addTest(test);
-    return;
+    return -12345;
   }
 
   if (test->getChildTestCount() == 0)
@@ -34,6 +36,7 @@ void add_matching_tests_to_runner(CppUnit::Test * test,
     if (std::regex_search(test->getName(), r))
     {
       libMesh::out << test->getName() << std::endl;
+      n_tests_added ++;
       runner.addTest(test);
     }
     // Add the test to the rejects it can be cleaned up later
@@ -43,7 +46,11 @@ void add_matching_tests_to_runner(CppUnit::Test * test,
 
   // Call this recursively on each of our children, if any.
   for (int i = 0; i < test->getChildTestCount(); i++)
-    add_matching_tests_to_runner(test->getChildTestAt(i), r_str, r, runner, rejects);
+    n_tests_added +=
+      add_matching_tests_to_runner(test->getChildTestAt(i), r_str, r,
+                                   runner, rejects);
+
+  return n_tests_added;
 }
 
 #endif
@@ -96,7 +103,11 @@ int main(int argc, char ** argv)
 
   // Add all tests which match the re to the runner object.
   libMesh::out << "Will run the following tests:" << std::endl;
-  add_matching_tests_to_runner(registry.makeTest(), regex_string, the_regex, runner, rejects);
+  const int n_tests_added =
+    add_matching_tests_to_runner(registry.makeTest(), regex_string,
+                                 the_regex, runner, rejects);
+  if (n_tests_added >= 0)
+    libMesh::out << "--- Running " << n_tests_added << " tests in total." << std::endl;
 #else
   // If no C++11 <regex> just run all the tests.
   runner.addTest(registry.makeTest());

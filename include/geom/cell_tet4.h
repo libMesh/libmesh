@@ -241,6 +241,8 @@ public:
    */
   virtual bool contains_point (const Point & p, Real tol) const override;
 
+  virtual void permute(unsigned int perm_num) override final;
+
 protected:
 
   /**

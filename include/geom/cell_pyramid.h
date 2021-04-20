@@ -164,6 +164,17 @@ public:
   */
   unsigned int local_singular_node(const Point & p, const Real tol = TOLERANCE*TOLERANCE) const override final;
 
+  /**
+   * \returns true iff the node at the given index has a singular
+   * mapping; i.e. is the degree-4 node on a Pyramid.
+   */
+  virtual bool is_singular_node(unsigned int node_idx) const override final { return (node_idx == 4); }
+
+  /**
+   * One quad side, four orientations.
+   */
+  virtual unsigned int n_permutations() const override final { return 4; }
+
 protected:
 
   /**

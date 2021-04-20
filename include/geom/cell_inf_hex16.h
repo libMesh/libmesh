@@ -237,6 +237,8 @@ public:
    */
   static const unsigned int edge_sides_map[num_edges][2];
 
+  virtual void permute(unsigned int perm_num) override final;
+
 protected:
 
   /**

@@ -71,6 +71,7 @@ ERRORS_IN_0D(CLOUGH)
 ERRORS_IN_0D(HERMITE)
 ERRORS_IN_0D(HIERARCHIC)
 ERRORS_IN_0D(L2_HIERARCHIC)
+ERRORS_IN_0D(SIDE_HIERARCHIC)
 ERRORS_IN_0D(LAGRANGE)
 ERRORS_IN_0D(L2_LAGRANGE)
 ERRORS_IN_0D(LAGRANGE_VEC)
@@ -91,6 +92,7 @@ REINIT_ERROR(1, CLOUGH, edge_reinit)        { libmesh_error_msg("ERROR: Cannot e
 REINIT_ERROR(1, HERMITE, edge_reinit)       { libmesh_error_msg("ERROR: Cannot edge_reinit 1D HERMITE elements!"); }
 REINIT_ERROR(1, HIERARCHIC, edge_reinit)    { libmesh_error_msg("ERROR: Cannot edge_reinit 1D HIERARCHIC elements!"); }
 REINIT_ERROR(1, L2_HIERARCHIC, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 1D L2_HIERARCHIC elements!"); }
+REINIT_ERROR(1, SIDE_HIERARCHIC, edge_reinit) { libmesh_error_msg("ERROR: Cannot edge_reinit 1D SIDE_HIERARCHIC elements!"); }
 REINIT_ERROR(1, LAGRANGE, edge_reinit)      { libmesh_error_msg("ERROR: Cannot edge_reinit 1D LAGRANGE elements!"); }
 REINIT_ERROR(1, LAGRANGE_VEC, edge_reinit)  { libmesh_error_msg("ERROR: Cannot edge_reinit 1D LAGRANGE_VEC elements!"); }
 REINIT_ERROR(1, L2_LAGRANGE, edge_reinit)   { libmesh_error_msg("ERROR: Cannot edge_reinit 1D L2_LAGRANGE elements!"); }
@@ -1090,6 +1092,7 @@ REINIT_AND_SIDE_MAPS(LAGRANGE_VEC);
 REINIT_AND_SIDE_MAPS(L2_LAGRANGE);
 REINIT_AND_SIDE_MAPS(HIERARCHIC);
 REINIT_AND_SIDE_MAPS(L2_HIERARCHIC);
+REINIT_AND_SIDE_MAPS(SIDE_HIERARCHIC);
 REINIT_AND_SIDE_MAPS(CLOUGH);
 REINIT_AND_SIDE_MAPS(HERMITE);
 REINIT_AND_SIDE_MAPS(MONOMIAL);

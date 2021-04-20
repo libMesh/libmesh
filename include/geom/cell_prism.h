@@ -146,6 +146,11 @@ public:
 
   virtual std::vector<unsigned int> sides_on_edge(const unsigned int e) const override final;
 
+  /**
+   * Two triangular sides, three orientations.
+   */
+  virtual unsigned int n_permutations() const override final { return 6; }
+
 protected:
 
   /**

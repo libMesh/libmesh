@@ -223,6 +223,13 @@ public:
     return ( this->point(0)*2 - this->point(this->n_vertices()/2) );
   }
 
+  /**
+   * One non-infinite side; any orientation change flips the mapping
+   * Jacobian negative.
+   */
+  virtual unsigned int n_permutations() const override final { return 0; }
+
+  virtual void permute(unsigned int) override final { libmesh_error(); }
 
 protected:
 
