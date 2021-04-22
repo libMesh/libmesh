@@ -104,7 +104,7 @@ public:
     if (family == CLOUGH && libMesh::n_threads() > 1)
       return;
 
-    for (auto e : this->_mesh->active_element_ptr_range())
+    for (auto e : this->_mesh->active_local_element_ptr_range())
       {
         this->_elem = e;
 
