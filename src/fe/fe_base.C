@@ -744,7 +744,7 @@ void FEGenericBase<OutputType>::compute_shape_functions (const Elem * elem,
 }
 
 template <>
-void FEGenericBase<Real>::compute_dual_shape_coeffs ()
+void FEGenericBase<Real>::compute_dual_shape_coeffs (const QBase & default_qrule)
 {
   // Start logging the dual coeff computation
   LOG_SCOPE("compute_dual_shape_coeffs()", "FE");
@@ -756,25 +756,25 @@ void FEGenericBase<Real>::compute_dual_shape_coeffs ()
   dual_coeff.resize(sz, sz);
   DenseMatrix<Real> A(sz, sz), D(sz, sz);
 
-  const std::vector<Real> JxW = this->get_JxW();
-
-  for (auto i : index_range(phi))
-    for (auto qp : index_range(phi[i]))
+  const std::vector<Real> & weights = default_qrule.get_weights();
+  // we do not need J here as it will be canceled in the A^-1*D calculation anyways
+  for (const auto i : index_range(dual_phi))
+    for (const auto qp : index_range(dual_phi[i]))
     {
-      D(i,i) += JxW[qp]*phi[i][qp];
-      for (auto j : index_range(phi))
-        A(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
+      D(i,i) += weights[qp]*dual_phi[i][qp];
+      for (const auto j : index_range(dual_phi))
+        A(i,j) += weights[qp]*dual_phi[i][qp]*dual_phi[j][qp];
     }
 
   // dual_coeff = A^-1*D
-  for (auto j : index_range(phi))
+  for (const auto j : index_range(dual_phi))
   {
     DenseVector<Real> Dcol(sz), coeffcol(sz);
-    for (auto i : index_range(phi))
+    for (const auto i : index_range(dual_phi))
       Dcol(i) = D(i, j);
     A.cholesky_solve(Dcol, coeffcol);
 
-    for (auto row : index_range(phi))
+    for (const auto row : index_range(dual_phi))
       dual_coeff(row, j)=coeffcol(row);
   }
 }
@@ -790,8 +790,8 @@ void FEGenericBase<Real>::compute_dual_shape_functions ()
   libmesh_assert(dual_coeff.n() == phi.size());
 
   // initialize dual basis
-  for (auto j : index_range(phi))
-    for (auto qp : index_range(phi[j]))
+  for (const auto j : index_range(phi))
+    for (const auto qp : index_range(phi[j]))
     {
       dual_phi[j][qp] = 0;
       if (calculate_dphi)
@@ -803,9 +803,9 @@ void FEGenericBase<Real>::compute_dual_shape_functions ()
     }
 
   // compute dual basis
-  for (auto j : index_range(phi))
-    for (auto i : index_range(phi))
-      for (auto qp : index_range(phi[j]))
+  for (const auto j : index_range(phi))
+    for (const auto i : index_range(phi))
+      for (const auto qp : index_range(phi[j]))
       {
         dual_phi[j][qp] += dual_coeff(i, j) * phi[i][qp];
         if (calculate_dphi)

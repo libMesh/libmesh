@@ -26,6 +26,7 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/quadrature_gauss.h"
 
 namespace {
   // Put this outside a templated class, so we only get 1 warning
@@ -297,17 +298,33 @@ void FE<Dim,T>::reinit(const Elem * elem,
       {
         if (T != LAGRANGE)
           nonlagrange_dual_warning();
+        if (this->calculate_dual_coeff)
+        {
+          // In order for the matrices for the biorthogonality condition to be
+          // non-singular, the dual basis coefficients must be computed when the
+          // primal shape functions are evaluated with a quadrature rule. *But* a
+          // user may be reiniting with integration points from a mortar segment,
+          // which is valid, so a simple `if (!pts)` check is not
+          // appropriate. We're just gonna have to trust the user on this one. If
+          // they "screw up" we'll throw an exception from the LU decomposition,
+          // and they can choose to handle it or not
 
-        // In order for the matrices for the biorthogonality condition to be
-        // non-singular, the dual basis coefficients must be computed when the
-        // primal shape functions are evaluated with a quadrature rule. *But* a
-        // user may be reiniting with integration points from a mortar segment,
-        // which is valid, so a simple `if (!pts)` check is not
-        // appropriate. We're just gonna have to trust the user on this one. If
-        // they "screw up" we'll throw an exception from the LU decomposition,
-        // and they can choose to handle it or not
-        this->compute_dual_shape_coeffs();
-
+          // instead of using the customized qrule from mortar segments,
+          // we need the default qrule for computing the dual coefficients
+          FEType default_fe_type(this->get_order(), T);
+          QGauss default_qrule(elem->dim(), default_fe_type.default_quadrature_order());
+          default_qrule.init(elem->type(), elem->p_level());
+          // In preparation of computing dual_coeff, we compute the default shape
+          // function values and save these in dual_phi (instead of declaring a
+          // new container). The TRUE dual_phi values are computed in
+          // compute_dual_shape_functions()
+          all_shapes(elem, default_fe_type.order, default_qrule.get_points(), this->dual_phi);
+          this->compute_dual_shape_coeffs(default_qrule);
+          // only compute the dual coefficient once
+          this->calculate_dual_coeff = false;
+        }
+        // the dual shape functions relies on the customized shape functions
+        // and the coefficient matrix, \p dual_coeff
         this->compute_dual_shape_functions();
       }
     }
