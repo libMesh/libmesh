@@ -47,9 +47,9 @@ public:
   void testMeshMoveAssign()
   {
 
-    // We will do 4 tests:
-    // {ReplicatedMesh ,DistributedMesh} x {Mesh 2 from Memory, From File}
-    std::array<std::string, 2> mesh_types = {"replicated", "distributed"};
+    // We will do 6 tests:
+    // {Mesh, ReplicatedMesh ,DistributedMesh} x {Mesh 2 from Memory, From File}
+    std::array<std::string, 3> mesh_types = {"Mesh", "replicated", "distributed"};
     std::array<std::string, 2> mesh_two_cases = {"from_memory", "from_file"};
 
     // Create two mesh ptrs.
@@ -70,7 +70,11 @@ public:
         * this same object using MeshBase::operator = (&&).
         */
 
-       if (mesh_type.compare("replicated") == 0)
+       if (mesh_type.compare("Mesh") == 0)
+       {
+        mesh_one = std::make_shared<Mesh>(*TestCommWorld);
+       }
+       else if (mesh_type.compare("replicated") == 0)
        {
         mesh_one = std::make_shared<ReplicatedMesh>(*TestCommWorld);
        }
@@ -122,7 +126,11 @@ public:
 
        es.init();
 
-       if (mesh_type.compare("replicated") == 0)
+       if (mesh_type.compare("Mesh") == 0)
+       {
+        mesh_two = std::make_shared<Mesh>(*TestCommWorld);
+       }
+       else if (mesh_type.compare("replicated") == 0)
        {
         mesh_two = std::make_shared<ReplicatedMesh>(*TestCommWorld);
        }
