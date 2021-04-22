@@ -67,6 +67,8 @@ protected:
    */
   BoundaryInfo (MeshBase & m);
 
+  void set_mesh (MeshBase & m) { _mesh = &m; }
+
 public:
   /**
    * Copy assignment operator
