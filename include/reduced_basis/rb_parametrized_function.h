@@ -26,6 +26,7 @@
 // C++ includes
 #include <unordered_map>
 #include <vector>
+#include <map>
 
 namespace libMesh
 {
@@ -131,6 +132,13 @@ public:
   virtual void initialize_lookup_table();
 
   /**
+   * Get the value stored in _parameter_independent_data associated with
+   * \p region_name and \p property_name.
+   */
+  Number get_parameter_independent_data(const std::string & property_name,
+                                        subdomain_id_type sbd_id) const;
+
+  /**
    * Storage for pre-evaluated values. The indexing is given by:
    *   parameter index --> point index --> component index --> value.
    */
@@ -172,6 +180,17 @@ public:
    * that this function uses finite differencing.
    */
   Real fd_delta;
+
+protected:
+
+  /**
+   * In some cases we need to store parameter-independent data which is related
+   * to this function but since it is parameter-indepedent should not be returned
+   * as part of evaluate().
+   *
+   * We index this data by "property name" --> subdomain_id --> value.
+   */
+  std::map<std::string,std::map<subdomain_id_type,Real>> _parameter_independent_data;
 };
 
 }

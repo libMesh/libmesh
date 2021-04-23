@@ -178,4 +178,10 @@ void RBParametrizedFunction::initialize_lookup_table()
   // No-op by default, override in subclasses as needed
 }
 
+Number RBParametrizedFunction::get_parameter_independent_data(const std::string & property_name,
+                                                              subdomain_id_type sbd_id) const
+{
+  return libmesh_map_find(libmesh_map_find(_parameter_independent_data, property_name), sbd_id);
+}
+
 }
