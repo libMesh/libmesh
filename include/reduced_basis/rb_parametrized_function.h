@@ -190,7 +190,7 @@ protected:
    *
    * We index this data by "property name" --> subdomain_id --> value.
    */
-  std::map<std::string,std::map<subdomain_id_type,Real>> _parameter_independent_data;
+  std::map<std::string, std::map<subdomain_id_type, Number>> _parameter_independent_data;
 };
 
 }
