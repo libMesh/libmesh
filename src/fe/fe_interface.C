@@ -1965,9 +1965,8 @@ void FEInterface::compute_data(const unsigned int dim,
       for (unsigned int d=0; d<dim; d++)
         data.local_transform[d].resize(dim);
 
-      UniquePtr<FEBase> fe (FEBase::build(dim, fe_t));
-      std::vector<Point> pt(1);
-      pt[0]=p;
+      auto fe = FEBase::build(dim, fe_t);
+      std::vector<Point> pt = {p};
       fe->get_dphideta(); // to compute the map
       fe->reinit(elem, &pt);
 

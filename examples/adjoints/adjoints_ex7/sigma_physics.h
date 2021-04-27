@@ -13,13 +13,22 @@ class SigmaPhysics : public FEMPhysics
 {
 public:
   // Constructor
-  SigmaPhysics():FEMPhysics(){}
+  SigmaPhysics() : FEMPhysics() {}
+
+  // Special functions
+  SigmaPhysics (SigmaPhysics &&) = default;
+  SigmaPhysics (const SigmaPhysics &) = default;
+  SigmaPhysics & operator= (const SigmaPhysics &) = default;
+  SigmaPhysics & operator= (SigmaPhysics &&) = default;
+  virtual ~SigmaPhysics () = default;
 
   Real & k() { return _k; }
   bool & analytic_jacobians() { return _analytic_jacobians; }
 
-    // System initialization
+  // System initialization
   virtual void init_data (System & sys);
+
+  virtual std::unique_ptr<DifferentiablePhysics> clone_physics() override;
 
 protected:
 
@@ -30,9 +39,6 @@ protected:
   // Time dependent parts
   virtual bool element_time_derivative (bool request_jacobian,
                                         DiffContext & context);
-
-  // Clone Physics copy constructor
-  virtual UniquePtr<DifferentiablePhysics> clone_physics();
 
   // The parameters to solve for
   Real _k;
@@ -49,5 +55,4 @@ protected:
 
   // Calculate Jacobians analytically or not?
   bool _analytic_jacobians;
-
 };

@@ -27,11 +27,15 @@
 // We still provide the UniquePtr alias for backwards compatibility,
 // but it should now be considered deprecated and users should just
 // use std::unique_ptr instead.
+#ifdef LIBMESH_ENABLE_DEPRECATED
+
 namespace libMesh
 {
 template<typename T>
 using UniquePtr = std::unique_ptr<T>;
 }
+
+#endif
 
 // Set up the libmesh_make_unique macro. We don't yet require C++14, so this is a C++11 based workaround.
 #ifdef LIBMESH_HAVE_CXX14_MAKE_UNIQUE

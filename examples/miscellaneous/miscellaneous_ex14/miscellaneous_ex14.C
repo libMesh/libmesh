@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// <h1>Miscellaneous Example 10 - Hydrogen Atom Using Infinite Elements With Imaginary Frequency</h1>
+// <h1>Miscellaneous Example 14 - Hydrogen Atom Using Infinite Elements With Imaginary Frequency</h1>
 // \author Hubert Weissmann
 // \date 2017
 //
@@ -513,14 +513,11 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
    // loop over INFINITE ELEMENTS
    sd=1;{
       QGauss qrule2 (dim-1, fe_type.default_quadrature_order());
-      UniquePtr<FEBase> face_fe (FEBase::build_InfFE(dim, fe_type));
+      auto face_fe = FEBase::build_InfFE(dim, fe_type);
       face_fe->attach_quadrature_rule (&qrule2);
 
-      MeshBase::const_element_iterator          el  = mesh.active_local_subdomain_elements_begin(sd);
-      const MeshBase::const_element_iterator end_el = mesh.active_local_subdomain_elements_end(sd);
-      for ( ; el != end_el; ++el){
-         const Elem* elem = *el;
-
+      for (const auto & elem : mesh.active_local_subdomain_elements_ptr_range(sd))
+      {
          //dof_map.dof_indices (elem, dof_indices_lm,lm_num);
          dof_map.dof_indices (elem, dof_indices);
 
@@ -562,14 +559,11 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
    // loop over NEIGHBOURS OF INFINITE ELEMENTS
    sd=2; {
       QGauss qrule2 (dim-1, fe_type.default_quadrature_order());
-      UniquePtr<FEBase> face_fe (FEBase::build(dim, fe_type));
+      auto face_fe = FEBase::build(dim, fe_type);
       face_fe->attach_quadrature_rule (&qrule2);
 
-      MeshBase::const_element_iterator       el  = mesh.active_local_subdomain_elements_begin(sd);
-      const MeshBase::const_element_iterator end_el = mesh.active_local_subdomain_elements_end(sd);
-      for ( ; el != end_el; ++el){
-         const Elem* elem = *el;
-
+      for (const auto & elem : mesh.active_local_subdomain_elements_ptr_range(sd))
+      {
          dof_map.dof_indices (elem, dof_indices);
 
 #ifdef DEBUG

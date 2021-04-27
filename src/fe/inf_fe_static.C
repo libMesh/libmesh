@@ -525,9 +525,8 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
           // compute the reference->physical map at the point \p p.
           // Use another fe_map to avoid interference with \p this->_fe_map
           // which is initialized at the quadrature points...
-          UniquePtr<FEBase> fe (FEBase::build_InfFE(Dim, fet));
-          std::vector<Point> pt(1);
-          pt[0]=p;
+          auto fe = FEBase::build_InfFE(Dim, fet);
+          std::vector<Point> pt = {p};
           fe->get_dphideta(); // to compute the map
           fe->reinit(inf_elem, &pt);
 
