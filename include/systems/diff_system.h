@@ -161,8 +161,8 @@ public:
   virtual std::unique_ptr<DifferentiablePhysics> clone_physics() override
   {
     libmesh_not_implemented();
-    // dummy
-    return std::unique_ptr<DifferentiablePhysics>(this);
+    // dummy to avoid compiler warnings, not a real implementation
+    return std::unique_ptr<DifferentiablePhysics>(nullptr);
   }
 
   /**
@@ -171,8 +171,8 @@ public:
   virtual std::unique_ptr<DifferentiableQoI> clone() override
   {
     libmesh_not_implemented();
-    // dummy
-    return std::unique_ptr<DifferentiableQoI>(this);
+    // dummy to avoid compiler warnings, not a real implementation
+    return std::unique_ptr<DifferentiableQoI>(nullptr);
   }
 
   /**
