@@ -312,11 +312,12 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
     }
 }
 
-UniquePtr<AdjointRefinementEstimator> build_adjoint_refinement_error_estimator(QoISet &qois, FEMPhysics* supplied_physics, FEMParameters &/*param*/)
+std::unique_ptr<AdjointRefinementEstimator>
+build_adjoint_refinement_error_estimator(QoISet &qois, FEMPhysics* supplied_physics, FEMParameters &/*param*/)
 {
   std::cout<<"Computing the error estimate using the Adjoint Refinement Error Estimator"<<std::endl<<std::endl;
 
-  AdjointRefinementEstimator *adjoint_refinement_estimator = new AdjointRefinementEstimator;
+  auto adjoint_refinement_estimator = libmesh_make_unique<AdjointRefinementEstimator>();
 
   adjoint_refinement_estimator->qoi_set() = qois;
 
@@ -331,7 +332,7 @@ UniquePtr<AdjointRefinementEstimator> build_adjoint_refinement_error_estimator(Q
   // Since we are dealing with model error, 0 h refinements are legal.
   adjoint_refinement_estimator->number_h_refinements = 0;
 
-  return UniquePtr<AdjointRefinementEstimator>(adjoint_refinement_estimator);
+  return adjoint_refinement_estimator;
 }
 
 // The main program.
@@ -714,8 +715,8 @@ int main (int argc, char ** argv)
       qois.set_weight(1, 0.5);
 
       // The adjoint refinement error estimator object (which also computed model error)
-      UniquePtr<AdjointRefinementEstimator> adjoint_refinement_error_estimator =
-      build_adjoint_refinement_error_estimator(qois, dynamic_cast<FEMPhysics *>(sigma_physics), param);
+      auto adjoint_refinement_error_estimator =
+        build_adjoint_refinement_error_estimator(qois, dynamic_cast<FEMPhysics *>(sigma_physics), param);
 
       // Error Vector to be filled by the error estimator at each timestep
       ErrorVector QoI_elementwise_error;

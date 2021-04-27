@@ -176,8 +176,7 @@ F(i) += JxW[qp] * ( ( -sigma * (grad_T * dphi[i][qp]) ) + (f * phi[i][qp]) );
   return compute_jacobian;
 }
 
-// Copy Constructor
-UniquePtr<DifferentiablePhysics> SigmaPhysics::clone_physics()
+std::unique_ptr<DifferentiablePhysics> SigmaPhysics::clone_physics()
 {
-  return UniquePtr<DifferentiablePhysics>(dynamic_cast<DifferentiablePhysics *>(this));
+  return libmesh_make_unique<SigmaPhysics>(*this);
 }
