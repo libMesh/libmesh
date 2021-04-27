@@ -516,11 +516,8 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
       auto face_fe = FEBase::build_InfFE(dim, fe_type);
       face_fe->attach_quadrature_rule (&qrule2);
 
-      MeshBase::const_element_iterator          el  = mesh.active_local_subdomain_elements_begin(sd);
-      const MeshBase::const_element_iterator end_el = mesh.active_local_subdomain_elements_end(sd);
-      for ( ; el != end_el; ++el){
-         const Elem* elem = *el;
-
+      for (const auto & elem : mesh.active_local_subdomain_elements_ptr_range(sd))
+      {
          //dof_map.dof_indices (elem, dof_indices_lm,lm_num);
          dof_map.dof_indices (elem, dof_indices);
 
@@ -565,11 +562,8 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
       auto face_fe = FEBase::build(dim, fe_type);
       face_fe->attach_quadrature_rule (&qrule2);
 
-      MeshBase::const_element_iterator       el  = mesh.active_local_subdomain_elements_begin(sd);
-      const MeshBase::const_element_iterator end_el = mesh.active_local_subdomain_elements_end(sd);
-      for ( ; el != end_el; ++el){
-         const Elem* elem = *el;
-
+      for (const auto & elem : mesh.active_local_subdomain_elements_ptr_range(sd))
+      {
          dof_map.dof_indices (elem, dof_indices);
 
 #ifdef DEBUG
