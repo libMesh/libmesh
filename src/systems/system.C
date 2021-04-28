@@ -1183,8 +1183,6 @@ unsigned int System::add_variable (const std::string & var,
                                    const FEType & type,
                                    const std::set<subdomain_id_type> * const active_subdomains)
 {
-  libmesh_assert(!this->is_initialized());
-
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
   for (auto v : make_range(this->n_vars()))
@@ -1195,6 +1193,8 @@ unsigned int System::add_variable (const std::string & var,
 
         libmesh_error_msg("ERROR: incompatible variable " << var << " has already been added for this system!");
       }
+
+  libmesh_assert(!this->is_initialized());
 
   // Optimize for VariableGroups here - if the user is adding multiple
   // variables of the same FEType and subdomain restriction, catch
