@@ -110,7 +110,13 @@ public:
    * If you need to copy a Mesh, use the clone() method.
    */
   MeshBase & operator= (const MeshBase &) = delete;
-  MeshBase & operator= (MeshBase &&) = delete;
+  MeshBase & operator= (MeshBase && other_mesh);
+
+  /**
+   * Shim to allow operator = (&&) to behave like a virtual function
+   * without having to be one.
+   */
+  virtual MeshBase & assign(MeshBase && other_mesh) = 0;
 
   /**
    * Virtual "copy constructor"
@@ -1745,6 +1751,15 @@ protected:
 
 
 protected:
+  /**
+   * Moves any superclass data (e.g. GhostingFunctors that might rely
+   * on element and nodal data (which is managed by subclasses!)
+   * being already moved first.
+   *
+   * Must be manually called in dofobject-managing subclass move
+   * operators.
+   */
+  void post_dofobject_moves(MeshBase && other_mesh);
 
   /**
    * \returns A writable reference to the number of partitions.

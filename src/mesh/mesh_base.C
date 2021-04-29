@@ -142,6 +142,48 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
     _partitioner = other_mesh._partitioner->clone();
 }
 
+MeshBase& MeshBase::operator= (MeshBase && other_mesh)
+{
+  // Move assign as a ParallelObject.
+  this->ParallelObject::operator=(other_mesh);
+
+  _n_parts = other_mesh.n_partitions();
+  _default_mapping_type = other_mesh.default_mapping_type();
+  _default_mapping_data = other_mesh.default_mapping_data();
+  _is_prepared = other_mesh.is_prepared();
+  _point_locator = std::move(other_mesh._point_locator);
+  _count_lower_dim_elems_in_point_locator = other_mesh.get_count_lower_dim_elems_in_point_locator();
+  #ifdef LIBMESH_ENABLE_UNIQUE_ID
+    _next_unique_id = other_mesh.next_unique_id();
+  #endif
+  _skip_noncritical_partitioning = other_mesh.skip_noncritical_partitioning();
+  _skip_all_partitioning = other_mesh.skip_partitioning();
+  _skip_renumber_nodes_and_elements = !(other_mesh.allow_renumbering());
+  _skip_find_neighbors = !(other_mesh.allow_find_neighbors());
+  _allow_remote_element_removal = other_mesh.allow_remote_element_removal();
+  _block_id_to_name = std::move(other_mesh._block_id_to_name);
+  _elem_dims = std::move(other_mesh.elem_dimensions());
+  _spatial_dimension = other_mesh.spatial_dimension();
+  _elem_integer_names = std::move(other_mesh._elem_integer_names);
+  _elem_integer_default_values = std::move(other_mesh._elem_integer_default_values);
+  _node_integer_names = std::move(other_mesh._node_integer_names);
+  _node_integer_default_values = std::move(other_mesh._node_integer_default_values);
+  _point_locator_close_to_point_tol = other_mesh.get_point_locator_close_to_point_tol();
+
+  // This relies on our subclasses *not* invalidating pointers when we
+  // do their portion of the move assignment later!
+  boundary_info = std::move(other_mesh.boundary_info);
+  boundary_info->set_mesh(*this);
+
+  // We're *not* really done at this point, but we have the problem
+  // that some of our data movement might be expecting subclasses data
+  // movement to happen first.  We'll let subclasses handle that by
+  // calling our post_dofobject_moves()
+  return *this;
+}
+
+
+
 MeshBase::~MeshBase()
 {
   this->clear();
@@ -1516,6 +1558,48 @@ MeshBase::merge_extra_integer_names(const MeshBase & other)
   returnval.first = this->add_elem_integers(other._elem_integer_names, true, &other._elem_integer_default_values);
   returnval.second = this->add_node_integers(other._node_integer_names, true, &other._node_integer_default_values);
   return returnval;
+}
+
+
+
+void
+MeshBase::post_dofobject_moves(MeshBase && other_mesh)
+{
+  // Now that all the DofObject moving is done, we can move the GhostingFunctor objects
+  // which include the _default_ghosting,_ghosting_functors and _shared_functors. We also need
+  // to set the mesh object associated with these functors to the assignee mesh.
+
+   // _default_ghosting
+  _default_ghosting = std::move(other_mesh._default_ghosting);
+  _default_ghosting->set_mesh(this);
+
+  // _ghosting_functors
+  _ghosting_functors = std::move(other_mesh._ghosting_functors);
+
+  std::set<GhostingFunctor *>::const_iterator gf_begin_it = _ghosting_functors.begin();
+  std::set<GhostingFunctor *>::const_iterator gf_end_it = _ghosting_functors.end();
+
+  for (auto gf = gf_begin_it; gf != gf_end_it; ++gf )
+  {
+    (*gf)->set_mesh(this);
+  }
+
+  // _shared_functors
+  _shared_functors = std::move(other_mesh._shared_functors);
+
+  std::map<GhostingFunctor *, std::shared_ptr<GhostingFunctor>>::const_iterator sf_begin_it = _shared_functors.begin();
+  std::map<GhostingFunctor *, std::shared_ptr<GhostingFunctor>>::iterator sf_end_it = _shared_functors.end();
+
+  for (auto sf = sf_begin_it; sf != sf_end_it; sf++ )
+  {
+    (sf->second)->set_mesh(this);
+  }
+
+  // _constraint_rows
+  _constraint_rows = std::move(other_mesh._constraint_rows);
+
+  if (other_mesh.partitioner())
+    _partitioner = std::move(other_mesh.partitioner());
 }
 
 
