@@ -81,7 +81,7 @@ public:
     InverseDistanceInterpolation<KDDim> (comm_in,8,2),
     _r_bbox(0.),
     _r_override(radius)
-  { libmesh_experimental(); }
+  { }
 
   /**
    * Clears all internal data structures and restores to a
