@@ -86,19 +86,19 @@ private:
 
   // For TBB compatibility and thread safety we'll copy these in
   // operator()
-  const FFunctor & master_f;
-  const GFunctor * master_g;  // Needed for C1 type elements only
+  FFunctor & master_f;
+  GFunctor * master_g;  // Needed for C1 type elements only
   bool g_was_copied, map_was_created;
-  const ProjectionAction & master_action;
+  ProjectionAction & master_action;
   const std::vector<unsigned int> & variables;
   std::unordered_map<dof_id_type, std::vector<dof_id_type>> * nodes_to_elem;
   bool done_saving_ids;
 
 public:
   GenericProjector (const System & system_in,
-                    const FFunctor & f_in,
-                    const GFunctor * g_in,
-                    const ProjectionAction & act_in,
+                    FFunctor & f_in,
+                    GFunctor * g_in,
+                    ProjectionAction & act_in,
                     const std::vector<unsigned int> & variables_in,
                     std::unordered_map<dof_id_type, std::vector<dof_id_type>> *
                       nodes_to_elem_in = nullptr) :
