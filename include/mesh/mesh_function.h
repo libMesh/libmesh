@@ -180,9 +180,9 @@ public:
 
   /**
    * Computes values at coordinate \p p and for time \p time, which
-   * defaults to zero, optionally restricting the point to the passed
-   * subdomain_ids. This is useful in cases where there are multiple
-   * dimensioned elements, for example.
+   * defaults to zero, optionally restricting the point to the
+   * MeshFunction subdomain_ids. This is useful in cases where there
+   * are multiple dimensioned elements, for example.
    */
   void operator() (const Point & p,
                    const Real time,
@@ -190,8 +190,8 @@ public:
 
   /**
    * Computes values at coordinate \p p and for time \p time,
-   * restricting the point to the passed subdomain_ids. This is useful in
-   * cases where there are multiple dimensioned elements, for example.
+   * restricting the point to the passed subdomain_ids, which
+   * parameter overrides the internal subdomain_ids.
    */
   void operator() (const Point & p,
                    const Real time,
@@ -219,14 +219,23 @@ public:
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
+   * defaults to zero, optionally restricting the point to the
+   * MeshFunction subdomain_ids.
+   */
+  void gradient (const Point & p,
+                 const Real time,
+                 std::vector<Gradient> & output);
+
+  /**
+   * Computes gradients at coordinate \p p and for time \p time, which
    * defaults to zero, optionally restricting the point to the passed
-   * subdomain_ids. This is useful in cases where there are multiple
-   * dimensioned elements, for example.
+   * subdomain_ids, which parameter overrides the internal
+   * subdomain_ids.
    */
   void gradient (const Point & p,
                  const Real time,
                  std::vector<Gradient> & output,
-                 const std::set<subdomain_id_type> * subdomain_ids = nullptr);
+                 const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
    * Similar to gradient, but with the difference
@@ -249,6 +258,15 @@ public:
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
+   * defaults to zero, optionally restricting the point to the
+   * MeshFunction subdomain_ids.
+   */
+  void hessian (const Point & p,
+                const Real time,
+                std::vector<Tensor> & output);
+
+  /**
+   * Computes gradients at coordinate \p p and for time \p time, which
    * defaults to zero, optionally restricting the point to the passed
    * subdomain_ids. This is useful in cases where there are multiple
    * dimensioned elements, for example.
@@ -256,7 +274,7 @@ public:
   void hessian (const Point & p,
                 const Real time,
                 std::vector<Tensor> & output,
-                const std::set<subdomain_id_type> * subdomain_ids = nullptr);
+                const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
    * \returns The current \p PointLocator object, for use elsewhere.
@@ -309,6 +327,15 @@ public:
    */
   void unset_point_locator_tolerance();
 
+  /**
+   * Choose a default list of subdomain ids to be searched for points.
+   * If the provided list pointer is null or if no list has been
+   * provided, then all subdomain ids are searched.  This list can be
+   * overridden on a per-evaluation basis by using the method
+   * overrides with a similar argument.
+   */
+  void set_subdomain_ids(const std::set<subdomain_id_type> * subdomain_ids);
+
 protected:
 
   /**
@@ -354,6 +381,11 @@ protected:
    * points in the mesh.
    */
   std::unique_ptr<PointLocatorBase> _point_locator;
+
+  /**
+   * A default set of subdomain ids in which to search for points.
+   */
+  std::unique_ptr<std::set<subdomain_id_type>> _subdomain_ids;
 
   /**
    * \p true if out-of-mesh mode is enabled.  See \p
