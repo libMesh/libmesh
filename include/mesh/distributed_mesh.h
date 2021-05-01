@@ -94,11 +94,6 @@ public:
   virtual MeshBase & assign(MeshBase && other_mesh) override;
 
   /**
-   * Move node and elements from a DistributedMesh.
-   */
-  virtual void move_nodes_and_elements(MeshBase && other_mesh) override;
-
-  /**
    * Virtual copy-constructor, creates a copy of this mesh
    */
   virtual std::unique_ptr<MeshBase> clone () const override
@@ -563,6 +558,11 @@ public:
 
 
 protected:
+
+  /**
+   * Move node and elements from a DistributedMesh.
+   */
+  virtual void move_nodes_and_elements(MeshBase && other_mesh) override;
 
   /**
    * The vertices (spatial coordinates) of the mesh.
