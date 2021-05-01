@@ -1576,23 +1576,17 @@ MeshBase::post_dofobject_moves(MeshBase && other_mesh)
   // _ghosting_functors
   _ghosting_functors = std::move(other_mesh._ghosting_functors);
 
-  std::set<GhostingFunctor *>::const_iterator gf_begin_it = _ghosting_functors.begin();
-  std::set<GhostingFunctor *>::const_iterator gf_end_it = _ghosting_functors.end();
-
-  for (auto gf = gf_begin_it; gf != gf_end_it; ++gf )
+  for (const auto gf : _ghosting_functors )
   {
-    (*gf)->set_mesh(this);
+    gf->set_mesh(this);
   }
 
   // _shared_functors
   _shared_functors = std::move(other_mesh._shared_functors);
 
-  std::map<GhostingFunctor *, std::shared_ptr<GhostingFunctor>>::const_iterator sf_begin_it = _shared_functors.begin();
-  std::map<GhostingFunctor *, std::shared_ptr<GhostingFunctor>>::iterator sf_end_it = _shared_functors.end();
-
-  for (auto sf = sf_begin_it; sf != sf_end_it; sf++ )
+  for (const auto sf : _shared_functors )
   {
-    (sf->second)->set_mesh(this);
+    (sf.second)->set_mesh(this);
   }
 
   // _constraint_rows
