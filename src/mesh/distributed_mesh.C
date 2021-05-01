@@ -63,7 +63,7 @@ DistributedMesh & DistributedMesh::operator= (DistributedMesh && other_mesh)
   // Move assign as an UnstructuredMesh.
   this->UnstructuredMesh::operator=(std::move(other_mesh));
 
-  // Nodes and elements belong to ReplicatedMesh and have to be
+  // Nodes and elements belong to DistributedMesh and have to be
   // moved before we can move arbitrary GhostingFunctor, Partitioner,
   // etc. subclasses.
   this->move_nodes_and_elements(std::move(other_mesh));
@@ -78,7 +78,7 @@ DistributedMesh & DistributedMesh::operator= (DistributedMesh && other_mesh)
 
 MeshBase & DistributedMesh::assign(MeshBase && other_mesh)
 {
-  *this = std::move(*(cast_ptr<DistributedMesh*>(&other_mesh)));
+  *this = std::move(cast_ref<DistributedMesh&>(other_mesh));
 
   return *this;
 }
