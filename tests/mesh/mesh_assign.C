@@ -58,11 +58,11 @@ public:
 
     for(auto& mesh_type : mesh_types)
     {
-      std::cout<<"Running test with "<<mesh_type<<" mesh."<<std::endl<<std::endl;
+      libMesh::out << "Running test with " << mesh_type << " mesh." << std::endl << std::endl;
 
       for(auto mesh_two_case_type : mesh_two_cases )
       {
-       std::cout<<"Running test with mesh two "<<mesh_two_case_type<<"."<<std::endl<<std::endl;
+       libMesh::out << "Running test with mesh two " << mesh_two_case_type << "." << std::endl << std::endl;
 
        /**
         * Build a 2d 2x2 square mesh (mesh_one) covering [0.0, 1.0] x [0.0, 1.0]
@@ -93,7 +93,7 @@ public:
                                           0., 1.,
                                           QUAD9);
 
-       std::cout<<"Info from mesh one."<<std::endl<<std::endl;
+       libMesh::out << "Info from mesh one." << std::endl << std::endl;
        mesh_one->print_info();
 
        // build_square adds boundary_ids 0,1,2,3 for the bottom, right,
@@ -117,7 +117,7 @@ public:
        const std::set<boundary_id_type> bottom_right_bdry_ids(all_bdry_ids, all_bdry_ids + 1);
 
        // The variables for which we are defining the bc.
-       std::vector<unsigned int> variables;
+       std::vector<unsigned int> variables = {0};
        variables.push_back(0);
 
        DirichletBoundary dirichlet_bc(bottom_right_bdry_ids, variables, &one);
@@ -158,17 +158,17 @@ public:
                                               QUAD4);
 
           // Uniformly refine mesh_two
-          std::unique_ptr<MeshRefinement> mesh_refinement(new MeshRefinement(*mesh_two));
+          std::unique_ptr<MeshRefinement> mesh_refinement(libmesh_make_unique<MeshRefinement>(*mesh_two));
 
           mesh_refinement->uniformly_refine(1);
-          std::cout<<"Info from mesh two, from memory."<<std::endl<<std::endl;
+          libMesh::out << "Info from mesh two, from memory." << std::endl << std::endl;
           mesh_two->print_info();
 
           // Move mesh_two into mesh_one
           system.get_mesh().clear();
           system.get_mesh().assign(std::move(*mesh_two));
           mesh_two->clear();
-          std::cout<<"Info from mesh one, after moving."<<std::endl<<std::endl;
+          libMesh::out << "Info from mesh one, after moving." << std::endl << std::endl;
           system.get_mesh().print_info();
 
           // Assert that the moved into mesh has the right number of elements.
@@ -184,7 +184,7 @@ public:
           // Write out the mesh xda, this currently fails with DistributedMesh,
           // running on more than 8 processors, when the mesh to be moved in is
           // read from a file.
-          std::cout<<"Write out the mesh, read from memory."<<std::endl<<std::endl;
+          libMesh::out << "Write out the mesh, read from memory." << std::endl << std::endl;
           system.get_mesh().write("mesh.out.memory.moved.xda");
 
           system.get_mesh().clear();
@@ -192,7 +192,7 @@ public:
         else if (mesh_two_case_type.compare("from_file") == 0)
         {
           mesh_two->read("meshes/mesh_assign_test_mesh.xda");
-          std::cout<<"Info from mesh two, from file."<<std::endl<<std::endl;
+          libMesh::out << "Info from mesh two, from file." << std::endl << std::endl;
           mesh_two->print_info();
 
           // Read in the mesh at this time instant and reinit to project solutions on to the new mesh
@@ -200,7 +200,7 @@ public:
           system.get_mesh().assign(std::move(*mesh_two));
 
           mesh_two->clear();
-          std::cout<<"Info from mesh one, after moving."<<std::endl<<std::endl;
+          libMesh::out << "Info from mesh one, after moving." << std::endl << std::endl;
           system.get_mesh().print_info();
 
           // Assert that the moved into mesh has the right number of elements.
@@ -209,7 +209,7 @@ public:
           system.get_equation_systems().reinit_mesh();
           system.get_equation_systems().reinit();
 
-          std::cout<<"Write out the mesh, read from file."<<std::endl<<std::endl;
+          libMesh::out << "Write out the mesh, read from file." << std::endl << std::endl;
           system.get_mesh().write("mesh.out.file.moved.xda");
 
           system.get_mesh().clear();
