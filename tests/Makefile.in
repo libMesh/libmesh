@@ -2003,7 +2003,8 @@ data = meshes/1_quad.bxt.gz \
 CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	mesh_with_soln.e elemental_from_nodal.e write_sideset_data.e \
 	write_nodeset_data.e write_edgeset_data.e read_header_test.e \
-	output.dat periodic.e $(am__append_12) $(am__append_13)
+	output.dat periodic.e mesh.out.memory.moved.xda \
+	mesh.out.file.moved.xda $(am__append_12) $(am__append_13)
 
 # need to link any data files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
