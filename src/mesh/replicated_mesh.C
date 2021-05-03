@@ -173,6 +173,40 @@ ReplicatedMesh::ReplicatedMesh (const UnstructuredMesh & other_mesh) :
       other_boundary_info.get_nodeset_name(node_bnd_id);
 }
 
+ReplicatedMesh & ReplicatedMesh::operator= (ReplicatedMesh && other_mesh)
+{
+  // Move assign as an UnstructuredMesh
+  this->UnstructuredMesh::operator=(std::move(other_mesh));
+
+  // Nodes and elements belong to ReplicatedMesh and have to be
+  // moved before we can move arbitrary GhostingFunctor, Partitioner,
+  // etc. subclasses.
+  this->move_nodes_and_elements(std::move(other_mesh));
+
+  // Handle those remaining moves.
+  this->post_dofobject_moves(std::move(other_mesh));
+
+  return *this;
+}
+
+MeshBase & ReplicatedMesh::assign(MeshBase && other_mesh)
+{
+  *this = std::move(cast_ref<ReplicatedMesh&>(other_mesh));
+
+  return *this;
+}
+
+void ReplicatedMesh::move_nodes_and_elements(MeshBase && other_meshbase)
+{
+  ReplicatedMesh & other_mesh = cast_ref<ReplicatedMesh&>(other_meshbase);
+
+  this->_nodes = std::move(other_mesh._nodes);
+  this->_n_nodes = other_mesh.n_nodes();
+
+  this->_elements = std::move(other_mesh._elements);
+  this->_n_elem = other_mesh.n_elem();
+}
+
 
 const Point & ReplicatedMesh::point (const dof_id_type i) const
 {

@@ -287,6 +287,11 @@ public:
   virtual void reinit_constraints ();
 
   /**
+   * Reinitializes the system with a new mesh.
+   */
+  virtual void reinit_mesh();
+
+  /**
    * \returns \p true iff this system has been initialized.
    */
   bool is_initialized();

@@ -58,7 +58,30 @@ DistributedMesh::DistributedMesh (const Parallel::Communicator & comm_in,
   _partitioner = libmesh_make_unique<ParmetisPartitioner>();
 }
 
+DistributedMesh & DistributedMesh::operator= (DistributedMesh && other_mesh)
+{
+  // Move assign as an UnstructuredMesh.
+  this->UnstructuredMesh::operator=(std::move(other_mesh));
 
+  // Nodes and elements belong to DistributedMesh and have to be
+  // moved before we can move arbitrary GhostingFunctor, Partitioner,
+  // etc. subclasses.
+  this->move_nodes_and_elements(std::move(other_mesh));
+
+  _extra_ghost_elems = std::move(other_mesh._extra_ghost_elems);
+
+  // Handle remaining MeshBase moves.
+  this->post_dofobject_moves(std::move(other_mesh));
+
+  return *this;
+}
+
+MeshBase & DistributedMesh::assign(MeshBase && other_mesh)
+{
+  *this = std::move(cast_ref<DistributedMesh&>(other_mesh));
+
+  return *this;
+}
 
 DistributedMesh::~DistributedMesh ()
 {
@@ -173,6 +196,31 @@ DistributedMesh::DistributedMesh (const UnstructuredMesh & other_mesh) :
   this->update_parallel_id_counts();
 }
 
+void DistributedMesh::move_nodes_and_elements(MeshBase && other_meshbase)
+{
+  DistributedMesh & other_mesh = cast_ref<DistributedMesh&>(other_meshbase);
+
+  this->_nodes = std::move(other_mesh._nodes);
+  this->_n_nodes = other_mesh.n_nodes();
+
+  this->_elements = std::move(other_mesh._elements);
+  this->_n_elem = other_mesh.n_elem();
+
+  _is_serial = other_mesh.is_serial();
+  _is_serial_on_proc_0 = other_mesh.is_serial_on_zero();
+
+  _max_node_id = other_mesh.max_node_id();
+  _max_elem_id = other_mesh.max_elem_id();
+
+  _next_free_local_node_id = other_mesh._next_free_local_node_id;
+  _next_free_local_elem_id = other_mesh._next_free_local_elem_id;
+  _next_free_unpartitioned_node_id = other_mesh._next_free_unpartitioned_node_id;
+  _next_free_unpartitioned_elem_id = other_mesh._next_free_unpartitioned_elem_id;
+
+  #ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unpartitioned_unique_id = other_mesh._next_unpartitioned_unique_id;
+  #endif
+}
 
 // We use cached values for these so they can be called
 // from one processor without bothering the rest, but

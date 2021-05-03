@@ -59,6 +59,7 @@ unit_tests_sources = \
   mesh/checkpoint.C \
   mesh/contains_point.C \
   mesh/extra_integers.C \
+  mesh/mesh_assign.C \
   mesh/mesh_generation_test.C \
   mesh/mesh_input.C \
   mesh/mesh_function.C \
@@ -259,7 +260,9 @@ CLEANFILES = cube_mesh.xda \
              write_edgeset_data.e \
              read_header_test.e \
              output.dat \
-             periodic.e
+             periodic.e \
+             mesh.out.memory.moved.xda \
+             mesh.out.file.moved.xda
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD

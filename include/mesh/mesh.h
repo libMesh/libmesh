@@ -79,10 +79,15 @@ public:
   Mesh(Mesh &&) = delete;
 
   /**
-   * Copy and move assignment are not allowed.
+   * Copy assignment is not allowed.
    */
   Mesh & operator= (const Mesh &) = delete;
-  Mesh & operator= (Mesh &&) = delete;
+
+  /**
+   * Move assignment is allowed.
+   */
+  Mesh & operator= (Mesh &&) = default;
+
 };
 
 

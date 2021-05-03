@@ -69,10 +69,17 @@ public:
   UnstructuredMesh(UnstructuredMesh &&) = delete;
 
   /**
-   * Copy and move assignment are not allowed.
+   * Copy assignment is not allowed.
    */
   UnstructuredMesh & operator= (const UnstructuredMesh &) = delete;
-  UnstructuredMesh & operator= (UnstructuredMesh &&) = delete;
+
+  /**
+   * Move assignment is allowed, by subclasses who handle
+   * post_dofobject_moves()
+   */
+  UnstructuredMesh & operator= (UnstructuredMesh && other_mesh) = default;
+
+  virtual MeshBase & assign(MeshBase && other_mesh) override = 0;
 
   /**
    * Destructor.
@@ -167,6 +174,11 @@ public:
                                         dof_id_type element_id_offset = 0,
                                         dof_id_type node_id_offset = 0,
                                         unique_id_type unique_id_offset = 0);
+
+  /**
+   * Move node and elements from other_mesh to this mesh.
+   */
+  virtual void move_nodes_and_elements(MeshBase && other_mesh) = 0;
 
 
   /**

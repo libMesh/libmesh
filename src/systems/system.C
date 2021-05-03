@@ -215,8 +215,15 @@ void System::init_data ()
   MeshBase & mesh = this->get_mesh();
 
   // Add all variable groups to our underlying DofMap
+  unsigned int n_dof_map_vg = _dof_map->n_variable_groups();
   for (auto vg : make_range(this->n_variable_groups()))
-    _dof_map->add_variable_group(this->variable_group(vg));
+    {
+      const VariableGroup & group = this->variable_group(vg);
+      if (vg < n_dof_map_vg)
+        libmesh_assert(group == _dof_map->variable_group(vg));
+      else
+        _dof_map->add_variable_group(group);
+    }
 
   // Distribute the degrees of freedom on the mesh
   auto total_dofs = _dof_map->distribute_dofs (mesh);
@@ -288,7 +295,25 @@ void System::init_data ()
    this->init_matrices();
 }
 
+void System::reinit_mesh ()
+{
+  // First initialize any required data:
+  // either only the basic System data
+  if (_basic_system_only)
+    System::init_data();
+  // or all the derived class' data too
+  else
+    this->init_data();
 
+  // If no variables have been added to this system
+  // don't do anything
+  if (!this->n_vars())
+    return;
+
+  // Then call the user-provided initialization function
+  this->user_initialization();
+
+}
 
 void System::init_matrices ()
 {
@@ -1183,8 +1208,6 @@ unsigned int System::add_variable (const std::string & var,
                                    const FEType & type,
                                    const std::set<subdomain_id_type> * const active_subdomains)
 {
-  libmesh_assert(!this->is_initialized());
-
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
   for (auto v : make_range(this->n_vars()))
@@ -1195,6 +1218,8 @@ unsigned int System::add_variable (const std::string & var,
 
         libmesh_error_msg("ERROR: incompatible variable " << var << " has already been added for this system!");
       }
+
+  libmesh_assert(!this->is_initialized());
 
   // Optimize for VariableGroups here - if the user is adding multiple
   // variables of the same FEType and subdomain restriction, catch
