@@ -24,6 +24,15 @@ Number projection_function (const Point & p,
     cos(.5*libMesh::pi*p(2));
 }
 
+Number trilinear_function (const Point & p,
+                           const Parameters &,
+                           const std::string &,
+                           const std::string &)
+{
+  return 8*p(0) + 80*p(1) + 800*p(2);
+}
+
+
 class MeshFunctionTest : public CppUnit::TestCase
 {
   /**
@@ -33,6 +42,9 @@ public:
   CPPUNIT_TEST_SUITE( MeshFunctionTest );
 
 #if LIBMESH_DIM > 1
+  CPPUNIT_TEST( test_subdomain_id_sets );
+#endif
+#if LIBMESH_DIM > 2
 #ifdef LIBMESH_ENABLE_AMR
   CPPUNIT_TEST( test_p_level );
 #endif
@@ -46,6 +58,93 @@ public:
   void setUp() {}
 
   void tearDown() {}
+
+  // test that mesh function works correctly with subdomain id sets.
+  void test_subdomain_id_sets()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_square (mesh,
+                                         4, 4,
+                                         0., 1.,
+                                         0., 1.,
+                                         QUAD4);
+
+    // Set a subdomain id for all elements, based on location.
+    for (auto & elem : mesh.active_element_ptr_range())
+      {
+        Point c = elem->centroid();
+        elem->subdomain_id() =
+          subdomain_id_type(c(0)*4) + subdomain_id_type(c(1)*4)*10;
+      }
+
+    // Add a discontinuous variable so we can easily see what side of
+    // an interface we're querying
+    EquationSystems es(mesh);
+    System & sys = es.add_system<System> ("SimpleSystem");
+    unsigned int u_var = sys.add_variable("u", CONSTANT, MONOMIAL);
+
+    es.init();
+    sys.project_solution(trilinear_function, nullptr, es.parameters);
+
+    const std::vector<unsigned int> variables(1,u_var);
+    MeshFunction mesh_function (sys.get_equation_systems(),
+                                *sys.current_local_solution,
+                                sys.get_dof_map(),
+                                variables);
+
+    // Checkerboard pattern
+    const std::set<subdomain_id_type> sbdids1 {0,2,11,13,20,22,31,33};
+    const std::set<subdomain_id_type> sbdids2 {1,3,10,12,21,23,30,32};
+    mesh_function.init();
+    mesh_function.enable_out_of_mesh_mode(DenseVector<Number>());
+    mesh_function.set_subdomain_ids(&sbdids1);
+
+    DenseVector<Number> vec_values;
+    const std::string dummy;
+
+    // Make sure the MeshFunction's values interpolate the projected solution
+    // at the nodes
+    for (auto & elem : mesh.active_local_element_ptr_range())
+      {
+        const Point c = elem->centroid();
+        const Real expected_value =
+          libmesh_real(trilinear_function(c, es.parameters, dummy, dummy));
+        const std::vector<Point> offsets
+          {{0,-1/8.}, {1/8.,0}, {0,1/8.}, {-1/8.,0}};
+        for (Point offset : offsets)
+          {
+            const Point p = c + offset;
+            mesh_function(p, 0, vec_values, &sbdids1);
+            const Number retval1 = vec_values.empty() ? -12345 : vec_values(0);
+            mesh_function(p, 0, vec_values, &sbdids2);
+            const Number retval2 = vec_values.empty() ? -12345 : vec_values(0);
+            mesh_function(c, 0, vec_values, nullptr);
+            const Number retval3 = vec_values.empty() ? -12345 : vec_values(0);
+
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(retval3), expected_value,
+                                    TOLERANCE * TOLERANCE);
+
+            if (sbdids1.count(elem->subdomain_id()))
+              {
+                CPPUNIT_ASSERT(!sbdids2.count(elem->subdomain_id()));
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(retval1), expected_value,
+                                        TOLERANCE * TOLERANCE);
+
+                mesh_function(c, 0, vec_values, &sbdids2);
+                CPPUNIT_ASSERT(vec_values.empty());
+              }
+            else
+              {
+                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(retval2), expected_value,
+                                        TOLERANCE * TOLERANCE);
+
+                mesh_function(c, 0, vec_values, &sbdids1);
+                CPPUNIT_ASSERT(vec_values.empty());
+              }
+          }
+      }
+  }
 
   // test that mesh function works correctly with non-zero
   // Elem::p_level() values.

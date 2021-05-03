@@ -90,6 +90,11 @@ MeshFunction::MeshFunction (const MeshFunction & mf):
       this->set_point_locator_tolerance(mf.get_point_locator().get_close_to_point_tol());
 
   }
+
+  if (mf._subdomain_ids)
+    _subdomain_ids =
+      libmesh_make_unique<std::set<subdomain_id_type>>
+        (*mf._subdomain_ids);
 }
 
 MeshFunction::~MeshFunction () = default;
@@ -216,7 +221,7 @@ void MeshFunction::operator() (const Point & p,
                                const Real time,
                                DenseVector<Number> & output)
 {
-  this->operator() (p, time, output, nullptr);
+  this->operator() (p, time, output, this->_subdomain_ids.get());
 }
 
 void MeshFunction::operator() (const Point & p,
@@ -309,7 +314,7 @@ void MeshFunction::discontinuous_value (const Point & p,
                                         const Real time,
                                         std::map<const Elem *, DenseVector<Number>> & output)
 {
-  this->discontinuous_value (p, time, output, nullptr);
+  this->discontinuous_value (p, time, output, this->_subdomain_ids.get());
 }
 
 
@@ -392,6 +397,15 @@ void MeshFunction::discontinuous_value (const Point & p,
       // Insert temp_output into output
       output[element] = temp_output;
     }
+}
+
+
+
+void MeshFunction::gradient (const Point & p,
+                             const Real time,
+                             std::vector<Gradient> & output)
+{
+  this->gradient(p, time, output, this->_subdomain_ids.get());
 }
 
 
@@ -506,7 +520,7 @@ void MeshFunction::discontinuous_gradient (const Point & p,
                                            const Real time,
                                            std::map<const Elem *, std::vector<Gradient>> & output)
 {
-  this->discontinuous_gradient (p, time, output, nullptr);
+  this->discontinuous_gradient (p, time, output, this->_subdomain_ids.get());
 }
 
 
@@ -621,6 +635,15 @@ void MeshFunction::discontinuous_gradient (const Point & p,
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+void MeshFunction::hessian (const Point & p,
+                            const Real time,
+                            std::vector<Tensor> & output)
+{
+  this->hessian(p, time, output, this->_subdomain_ids.get());
+}
+
+
+
 void MeshFunction::hessian (const Point & p,
                             const Real,
                             std::vector<Tensor> & output,
@@ -837,6 +860,14 @@ void MeshFunction::set_point_locator_tolerance(Real tol)
 void MeshFunction::unset_point_locator_tolerance()
 {
   _point_locator->unset_close_to_point_tol();
+}
+
+void MeshFunction::set_subdomain_ids(const std::set<subdomain_id_type> * subdomain_ids)
+{
+  if (subdomain_ids)
+    _subdomain_ids.reset();
+  else
+    _subdomain_ids = libmesh_make_unique<std::set<subdomain_id_type>>(*subdomain_ids);
 }
 
 } // namespace libMesh
