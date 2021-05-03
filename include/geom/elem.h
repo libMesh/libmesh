@@ -1600,6 +1600,14 @@ public:
    */
   virtual bool is_singular_node(unsigned int /* node_i */) const { return false; }
 
+  /**
+   * \returns The local index of the center node on the side \p side.
+   *
+   * A center node is a node that is located at the centroid of the given side.
+   * If the given side does not have a center node, this will return invalid_uint.
+   */
+  virtual unsigned int center_node_on_side(const unsigned short side) const;
+
 protected:
 
   /**

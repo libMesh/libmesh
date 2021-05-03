@@ -230,6 +230,9 @@ public:
 
   virtual void permute(unsigned int) { libmesh_error(); }
 
+  virtual unsigned int center_node_on_side(const unsigned short) const override
+  { libmesh_error(); return invalid_uint; }
+
 protected:
 
   /**

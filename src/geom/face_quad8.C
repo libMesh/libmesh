@@ -505,4 +505,11 @@ void Quad8::permute(unsigned int perm_num)
 }
 
 
+unsigned int Quad8::center_node_on_side(const unsigned short side) const
+{
+  libmesh_assert_less (side, Quad8::num_sides);
+  return side + 4;
+}
+
+
 } // namespace libMesh

@@ -2758,4 +2758,12 @@ unsigned int Elem::opposite_node(const unsigned int /*n*/,
   libmesh_not_implemented();
 }
 
+
+unsigned int Elem::center_node_on_side(const unsigned short libmesh_dbg_var(side)) const
+{
+  libmesh_assert_less (side, this->n_sides());
+  return invalid_uint;
+}
+
+
 } // namespace libMesh

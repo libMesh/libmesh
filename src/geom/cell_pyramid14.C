@@ -773,4 +773,11 @@ void Pyramid14::permute(unsigned int perm_num)
 }
 
 
+unsigned int Pyramid14::center_node_on_side(const unsigned short side) const
+{
+  libmesh_assert_less (side, Pyramid14::num_sides);
+  return side == 4 ? 13 : invalid_uint;
+}
+
+
 } // namespace libMesh

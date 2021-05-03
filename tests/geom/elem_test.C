@@ -119,13 +119,36 @@ public:
           CPPUNIT_ASSERT(elem->has_invertible_map());
         }
   }
+
+  void test_center_node_on_side()
+  {
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      for (const auto s : elem->side_index_range())
+        {
+          if (elem->type() == EDGE2 || elem->type() == EDGE3 || elem->type() == EDGE4)
+            CPPUNIT_ASSERT_EQUAL((unsigned int)s, elem->center_node_on_side(s));
+          else if (elem->type() == TRI6)
+            CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 3), elem->center_node_on_side(s));
+          else if (elem->type() == QUAD8 || elem->type() == QUAD9 || elem->type() == QUADSHELL8)
+            CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 4), elem->center_node_on_side(s));
+          else if (elem->type() == HEX27)
+            CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 20), elem->center_node_on_side(s));
+          else if (elem->type() == PRISM18 && s >= 1 && s <= 3)
+            CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 14), elem->center_node_on_side(s));
+          else if (elem->type() == PYRAMID14 && s == 4)
+            CPPUNIT_ASSERT_EQUAL((unsigned int)(13), elem->center_node_on_side(s));
+          else
+            CPPUNIT_ASSERT_EQUAL(invalid_uint, elem->center_node_on_side(s));
+        }
+  }
 };
 
 #define ELEMTEST                                \
   CPPUNIT_TEST( test_bounding_box );            \
   CPPUNIT_TEST( test_maps );                    \
-  CPPUNIT_TEST( test_permute );                    \
-  CPPUNIT_TEST( test_contains_point_node );
+  CPPUNIT_TEST( test_permute );                 \
+  CPPUNIT_TEST( test_contains_point_node );     \
+  CPPUNIT_TEST( test_center_node_on_side );
 
 #define INSTANTIATE_ELEMTEST(elemtype)                          \
   class ElemTest_##elemtype : public ElemTest<elemtype> {       \
