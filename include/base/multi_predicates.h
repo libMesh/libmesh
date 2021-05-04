@@ -678,6 +678,28 @@ struct ActiveSubdomainSet : abstract_multi_predicate<T>
 
 
 /**
+ * Used to iterate over non-nullptr, active elements with a given PID
+ * whose subdomains are in a user-specified set.
+ */
+template <typename T>
+struct ActiveLocalSubdomainSet : abstract_multi_predicate<T>
+{
+  ActiveLocalSubdomainSet(processor_id_type my_pid,
+                          std::set<subdomain_id_type> sset)
+  {
+    this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new active<T>);
+    this->_predicates.push_back(new pid<T>(my_pid));
+    this->_predicates.push_back(new subdomain_set<T>(sset));
+  }
+};
+
+
+
+
+
+
+/**
  * Used to iterate over non-nullptr elements not owned by a given
  * processor but semi-local to that processor, i.e. ghost elements.
  */
