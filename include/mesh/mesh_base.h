@@ -1560,6 +1560,13 @@ public:
   virtual SimpleRange<element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) = 0;
   virtual SimpleRange<const_element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) const = 0;
 
+  virtual element_iterator active_local_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) = 0;
+  virtual element_iterator active_local_subdomain_set_elements_end (std::set<subdomain_id_type> ss) = 0;
+  virtual const_element_iterator active_local_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) const = 0;
+  virtual const_element_iterator active_local_subdomain_set_elements_end (std::set<subdomain_id_type> ss) const = 0;
+  virtual SimpleRange<element_iterator> active_local_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) = 0;
+  virtual SimpleRange<const_element_iterator> active_local_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) const = 0;
+
   virtual element_iterator local_level_elements_begin (unsigned int level) = 0;
   virtual element_iterator local_level_elements_end (unsigned int level) = 0;
   virtual const_element_iterator local_level_elements_begin (unsigned int level) const = 0;
