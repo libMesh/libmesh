@@ -192,6 +192,8 @@ public:
 
   virtual void permute(unsigned int) override final { libmesh_error(); }
 
+  unsigned int center_node_on_side(const unsigned short side) const override final;
+
 protected:
 
   /**

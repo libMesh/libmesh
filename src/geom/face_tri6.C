@@ -484,4 +484,11 @@ void Tri6::permute(unsigned int perm_num)
 }
 
 
+unsigned int Tri6::center_node_on_side(const unsigned short side) const
+{
+  libmesh_assert_less (side, Tri6::num_sides);
+  return side + 3;
+}
+
+
 } // namespace libMesh

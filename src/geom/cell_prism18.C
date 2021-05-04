@@ -1036,4 +1036,12 @@ Prism18::permute(unsigned int perm_num)
   }
 }
 
+
+unsigned int Prism18::center_node_on_side(const unsigned short side) const
+{
+  libmesh_assert_less (side, Prism18::num_sides);
+  return (side >= 1 && side <= 3) ? side + 14 : invalid_uint;
+}
+
+
 } // namespace libMesh

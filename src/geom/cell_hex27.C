@@ -1259,4 +1259,11 @@ Hex27::permute(unsigned int perm_num)
 }
 
 
+unsigned int Hex27::center_node_on_side(const unsigned short side) const
+{
+  libmesh_assert_less (side, Hex27::num_sides);
+  return side + 20;
+}
+
+
 } // namespace libMesh

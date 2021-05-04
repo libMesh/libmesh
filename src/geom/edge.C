@@ -135,4 +135,10 @@ Edge::nodes_on_edge(const unsigned int e) const
   return nodes_on_side(e);
 }
 
+unsigned int Edge::center_node_on_side(const unsigned short side) const
+{
+  libmesh_assert_less (side, this->n_sides());
+  return side;
+}
+
 } // namespace libMesh
