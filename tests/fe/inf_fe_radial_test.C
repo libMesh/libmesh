@@ -5,10 +5,17 @@
 #include "libmesh/inf_elem_builder.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/quadrature_gauss.h"
-#include "libmesh/elem.h"
 #include "libmesh/inf_fe.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/jacobi_polynomials.h"
+
+#ifdef LIBMESH_ENABLE_AMR
+#include "libmesh/equation_systems.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/linear_implicit_system.h"
+#include "libmesh/point_locator_tree.h"
+#include "libmesh/dof_map.h"
+#endif
 
 // unit test includes
 #include "test_comm.h"
@@ -22,6 +29,7 @@
 #include "libmesh/fe.h"
 
 #include "libmesh/face_tri6.h"
+//#include "libmesh/cell_tet4.h"
 
 using namespace libMesh;
 
@@ -43,6 +51,9 @@ public:
   CPPUNIT_TEST( testInfQuants );
   CPPUNIT_TEST( testSides );
   CPPUNIT_TEST( testInfQuants_numericDeriv );
+#ifdef LIBMESH_ENABLE_AMR
+  CPPUNIT_TEST( testRefinement );
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -774,6 +785,162 @@ public:
 
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
   }
+
+#ifdef LIBMESH_ENABLE_AMR
+  void testRefinement()
+  {
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+    // 1. create a mesh with one finite element, add an infinite element at each side
+    ReplicatedMesh mesh(*TestCommWorld);
+
+    {
+      mesh.set_mesh_dimension(3);
+      mesh.set_spatial_dimension(3);
+
+      // we'll create a slightly deformed hex:
+      mesh.add_point(Point(-0.7,-0.8, 0.7),0);
+      mesh.add_point(Point(-0.8, 0.8, 0.8),1);
+      mesh.add_point(Point( 0.8, 0.8, 0.7),2);
+      mesh.add_point(Point( 0.8,-0.8, 0.8),3);
+      mesh.add_point(Point(-0.8,-0.8,-0.8),4);
+      mesh.add_point(Point(-0.8, 0.8,-0.7),5);
+      mesh.add_point(Point( 0.8, 0.7,-0.8),6);
+      mesh.add_point(Point( 0.8,-0.8,-0.8),7);
+      Elem * elem = mesh.add_elem(Elem::build_with_id(HEX8, 0));
+      for (unsigned int i=0; i< 8; ++i)
+        elem->set_node(i) = mesh.node_ptr(i);
+
+      InfElemBuilder builder(mesh);
+      builder.build_inf_elem();
+
+      mesh.prepare_for_use();
+      mesh.all_second_order();
+    }
+
+    EquationSystems es(mesh);
+    FEType fe_type(FIRST, LAGRANGE);
+    // set some high radial order:
+    fe_type.radial_order=NINTH;
+    LinearImplicitSystem & dummy = es.add_system<LinearImplicitSystem> ("dummy");
+    dummy.add_variable("var", fe_type);
+
+    // 2. refine the finite element !!!
+    {
+      MeshRefinement mesh_refinement(mesh);
+      // refine one of the elements:
+      mesh.elem_ptr(2)->set_refinement_flag(Elem::REFINE);
+      mesh_refinement.refine_elements();
+      // having done this: refine its 1-st child as well to get two refinement-levels.
+      mesh.elem_ptr(2)->child_ptr(1)->set_refinement_flag(Elem::REFINE);
+      // Here, due to sanity-checking, the neighbors of the doubly-refined element
+      // are refined to at least first level.
+      mesh_refinement.refine_elements();
+    }
+
+    // 3. go through all DOFs and check that they are continuous between elements at nodes
+    {
+      // here, the constraints are computed.
+      es.reinit();
+
+      PointLocatorTree pt_lctr(mesh);
+      pt_lctr.enable_out_of_mesh_mode();
+
+      std::vector<dof_id_type> dof_indices;
+
+      UniquePtr<FEBase> fe (FEBase::build(3, fe_type));
+      UniquePtr<FEBase> inf_fe (FEBase::build_InfFE(3, fe_type));
+
+      const DofMap& dof_map = dummy.get_dof_map();
+
+      const auto n_end = mesh.nodes_end();
+      auto n_it = mesh.nodes_begin();
+
+      // loop over all nodes: We will check that for all nodes each DOF has the same value on all elements.
+      for(; n_it != n_end; ++n_it)
+        {
+          const Node* node = *n_it;
+          // check that DOF-values coincide on all elements that contain this node:
+          // For this, we first search one element containing node as reference element
+          // and than loop over all other elements that contain that node
+          const Elem * some_elem = pt_lctr(*node);
+
+          dof_map.dof_indices (some_elem, dof_indices);
+
+          FEBase * cfe = libmesh_nullptr;
+
+          if (some_elem->infinite())
+            cfe = inf_fe.get();
+          else
+            cfe = fe.get();
+
+          const std::vector<std::vector<Real> >&          phi = cfe->get_phi();
+
+          const Point node_internal = FEInterface::inverse_map(3, fe_type, some_elem, *node);
+          std::vector<Point> eval_pt(1, node_internal);
+          cfe->reinit(some_elem, &eval_pt);
+
+          // safe the values phi[i] of some_elem in a vector.
+          // Than we will test if the values are the same at the other elements.
+          DenseVector<Number> reference_values(dof_indices.size());
+          std::vector<dof_id_type> reference_indices(dof_indices.size());
+          for (unsigned int i=0; i< dof_indices.size(); ++i)
+            {
+              reference_indices[i]=dof_indices[i];
+              reference_values(i)=phi[i][0];
+            }
+          dof_map.constrain_element_vector(reference_values, reference_indices);
+
+          std::set<const libMesh::Elem *> elements;
+          some_elem->find_point_neighbors(*node, elements);
+
+          for (auto const_elem : elements)
+            {
+              if (some_elem->id() == const_elem->id())
+                continue;
+
+              // we need a non-const pointer, so we just create a second pointer:
+              Elem* elem = mesh.elem_ptr(const_elem->id());
+              dof_map.dof_indices (elem, dof_indices);
+              if (elem->infinite())
+                cfe = inf_fe.get();
+              else
+                cfe = fe.get();
+
+              const std::vector<std::vector<Real> >&          phi1 = cfe->get_phi();
+              eval_pt[0]=FEInterface::inverse_map(3, fe_type, elem, *node);
+
+              cfe->reinit(elem, &eval_pt);
+
+              DenseVector<Number> phi_values(phi1.size());
+              for( unsigned int i=0; i < phi_values.size(); ++i)
+                phi_values(i) =  phi1[i][0];
+
+              dof_map.constrain_element_vector(phi_values, dof_indices);
+
+              for(unsigned int i=0; i< dof_indices.size(); ++i)
+                {
+                  dof_id_type glob_ind=DofObject::invalid_id;
+                  for(unsigned int gi=0; gi < reference_indices.size(); ++gi)
+                    {
+                      if (reference_indices[gi] == dof_indices[i])
+                        {
+                          glob_ind = gi;
+                          break;
+                        }
+                    }
+                  // If element was found check that the values agree
+                  if (glob_ind != DofObject::invalid_id)
+                    LIBMESH_ASSERT_FP_EQUAL(real(phi_values(i)), real(reference_values(glob_ind)), TOLERANCE);
+                }
+
+            }
+
+        }
+
+    }
+#endif
+  }
+#endif
 
   void setUp()
   {
