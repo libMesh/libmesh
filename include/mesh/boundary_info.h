@@ -937,22 +937,28 @@ private:
 
   /**
    * This structure maintains the mapping of named side sets
-   * for file formats that support named blocks.  Currently
-   * this is only implemented for ExodusII
+   * for file formats (Exodus, Gmsh) that support this.
+   *
+   * This data is global in nature, meaning it should be an aggregate of information across
+   * processors
    */
   std::map<boundary_id_type, std::string> _ss_id_to_name;
 
   /**
    * This structure maintains the mapping of named node sets
-   * for file formats that support named blocks.  Currently
-   * this is only implemented for ExodusII
+   * for file formats (Exodus, Gmsh) that support this.
+   *
+   * This data is global in nature, meaning it should be an aggregate of information across
+   * processors
    */
   std::map<boundary_id_type, std::string> _ns_id_to_name;
 
   /**
    * This structure maintains the mapping of named edge sets
-   * for file formats that support named blocks.  Currently
-   * this is only implemented for ExodusII
+   * for file formats (Exodus, Gmsh) that support this.
+   *
+   * This data is global in nature, meaning it should be an aggregate of information across
+   * processors
    */
   std::map<boundary_id_type, std::string> _es_id_to_name;
 };
