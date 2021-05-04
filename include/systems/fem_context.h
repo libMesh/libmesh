@@ -994,16 +994,6 @@ public:
   void set_jacobian_tolerance(Real tol);
 
   /**
-   * System from which to acquire moving mesh information
-   */
-  System * _mesh_sys;
-
-  /**
-   * Variables from which to acquire moving mesh information
-   */
-  unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
-
-  /**
    * Current side for side_* to examine
    */
   unsigned char side;
@@ -1036,6 +1026,16 @@ public:
                                             const int get_derivative_level = -1) const;
 
 protected:
+
+  /**
+   * System from which to acquire moving mesh information
+   */
+  System * _mesh_sys;
+
+  /**
+   * Variables from which to acquire moving mesh information
+   */
+  unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
 
   /**
    * Keep track of what type of algebra reinitialization is to be done
