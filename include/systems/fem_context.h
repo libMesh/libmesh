@@ -1026,6 +1026,12 @@ public:
   void attach_quadrature_rules();
 
   /**
+   * Return a pointer to the vector of active variables being computed
+   * for, or a null pointer if all variables in the system are active.
+   */
+  const std::vector<unsigned int> * active_vars() const { return _active_vars.get(); }
+
+  /**
    * Helper function to reduce some code duplication in the *_point_* methods.
    *
    * get_derivative_level should be -1 to get_ everything, 0 to
