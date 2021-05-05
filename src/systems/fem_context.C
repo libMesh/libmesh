@@ -36,8 +36,9 @@
 namespace libMesh
 {
 
-FEMContext::FEMContext (const System & sys)
-  : FEMContext(sys, sys.extra_quadrature_order)
+FEMContext::FEMContext (const System & sys,
+                        const std::vector<unsigned int> * active_vars)
+  : FEMContext(sys, sys.extra_quadrature_order, active_vars)
 {
   init_internal_data(sys);
 }

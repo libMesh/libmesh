@@ -65,16 +65,22 @@ public:
 
   /**
    * Constructor.  Allocates some but fills no data structures.
+   *
+   * Optionally specify a limited number of variables to be "active"
+   * and thus calculated on.  If \p active_vars is null then
+   * calculations will be prepared for every variable in \p sys.
    */
   explicit
-  FEMContext (const System & sys);
+  FEMContext (const System & sys,
+              const std::vector<unsigned int> * active_vars = nullptr);
 
   /**
    * Constructor.  Specify the extra quadrature order instead
-   * of getting it from \p sys.  Optionally specify a limited number
-   * of variables to be "active" and thus calculated on.  If
-   * \p active_vars is null then calculations will be prepared for
-   * every variable in \p sys.
+   * of getting it from \p sys.
+   *
+   * Optionally specify a limited number of variables to be "active"
+   * and thus calculated on.  If \p active_vars is null then
+   * calculations will be prepared for every variable in \p sys.
    */
   explicit
   FEMContext (const System & sys,
