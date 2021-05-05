@@ -37,33 +37,18 @@ namespace libMesh
 {
 
 FEMContext::FEMContext (const System & sys)
-  : DiffContext(sys),
-    _mesh_sys(nullptr),
-    _mesh_x_var(0),
-    _mesh_y_var(0),
-    _mesh_z_var(0),
-    side(0), edge(0),
-    _atype(CURRENT),
-    _custom_solution(nullptr),
-    _boundary_info(sys.get_mesh().get_boundary_info()),
-    _elem(nullptr),
-    _dim(cast_int<unsigned char>(sys.get_mesh().mesh_dimension())),
-    _elem_dim(0), /* This will be reset in set_elem(). */
-    _elem_dims(sys.get_mesh().elem_dimensions()),
-    _element_qrule(4),
-    _side_qrule(4),
-    _extra_quadrature_order(sys.extra_quadrature_order)
+  : FEMContext(sys, sys.extra_quadrature_order)
 {
   init_internal_data(sys);
 }
 
 FEMContext::FEMContext (const System & sys, int extra_quadrature_order)
   : DiffContext(sys),
+    side(0), edge(0),
     _mesh_sys(nullptr),
     _mesh_x_var(0),
     _mesh_y_var(0),
     _mesh_z_var(0),
-    side(0), edge(0),
     _atype(CURRENT),
     _custom_solution(nullptr),
     _boundary_info(sys.get_mesh().get_boundary_info()),
@@ -77,6 +62,7 @@ FEMContext::FEMContext (const System & sys, int extra_quadrature_order)
 {
   init_internal_data(sys);
 }
+
 
 
 FEType FEMContext::find_hardest_fe_type()
