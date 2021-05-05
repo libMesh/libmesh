@@ -84,9 +84,9 @@ FEType FEMContext::find_hardest_fe_type()
   const System & sys = this->get_system();
   FEType hardest_fe_type = sys.variable_type(0);
 
-  for (auto i : make_range(sys.n_vars()))
+  auto check_var = [&hardest_fe_type, &sys](unsigned int v)
     {
-      FEType fe_type = sys.variable_type(i);
+      FEType fe_type = sys.variable_type(v);
 
       // Make sure we find a non-SCALAR FE family, even in the case
       // where the first variable(s) weren't
@@ -105,7 +105,14 @@ FEType FEMContext::find_hardest_fe_type()
       // to crank up the quadrature order on other types.
       if (fe_type.family != SCALAR && fe_type.order > hardest_fe_type.order)
         hardest_fe_type = fe_type;
-    }
+    };
+
+  if (_active_vars)
+    for (auto v : *_active_vars)
+      check_var(v);
+  else
+    for (auto v : make_range(sys.n_vars()))
+      check_var(v);
 
   return hardest_fe_type;
 }
@@ -114,21 +121,27 @@ FEType FEMContext::find_hardest_fe_type()
 void FEMContext::attach_quadrature_rules()
 {
   const System & sys = this->get_system();
-  const unsigned int nv = sys.n_vars();
 
-  for (const auto & dim : _elem_dims)
+  auto attach_rules = [this, &sys](unsigned int v)
     {
-      for (unsigned int i=0; i != nv; ++i)
+      for (const auto & dim : _elem_dims)
         {
-          FEType fe_type = sys.variable_type(i);
+          FEType fe_type = sys.variable_type(v);
 
           _element_fe[dim][fe_type]->attach_quadrature_rule(_element_qrule[dim].get());
           _side_fe[dim][fe_type]->attach_quadrature_rule(_side_qrule[dim].get());
 
           if (dim == 3)
             _edge_fe[fe_type]->attach_quadrature_rule(_edge_qrule.get());
-        }
-    }
+        };
+    };
+
+  if (_active_vars)
+    for (auto v : *_active_vars)
+      attach_rules(v);
+  else
+    for (auto v : make_range(sys.n_vars()))
+      attach_rules(v);
 }
 
 
@@ -204,16 +217,48 @@ void FEMContext::init_internal_data(const System & sys)
 
   bool have_scalar = false;
 
-  for (unsigned int i=0; i != nv; ++i)
-    if (sys.variable_type(i).family == SCALAR)
-      {
-        have_scalar = true;
-        break;
-      }
+  if (_active_vars)
+    {
+      for (auto v : *_active_vars)
+        if (sys.variable_type(v).family == SCALAR)
+          {
+            have_scalar = true;
+            break;
+          }
+    }
+  else
+    {
+      for (auto v : make_range(sys.n_vars()))
+        if (sys.variable_type(v).family == SCALAR)
+          {
+            have_scalar = true;
+            break;
+          }
+    }
 
   if (have_scalar)
     // SCALAR FEs have dimension 0 by assumption
     _elem_dims.insert(0);
+
+  auto build_var_fe = [this, &sys](unsigned int dim,
+                                   unsigned int i)
+    {
+      FEType fe_type = sys.variable_type(i);
+
+      if (_element_fe[dim][fe_type] == nullptr)
+        {
+          _element_fe[dim][fe_type] = FEAbstract::build(dim, fe_type);
+          _side_fe[dim][fe_type] = FEAbstract::build(dim, fe_type);
+
+          if (dim == 3)
+            _edge_fe[fe_type] = FEAbstract::build(dim, fe_type);
+        }
+
+      _element_fe_var[dim][i] = _element_fe[dim][fe_type].get();
+      _side_fe_var[dim][i] = _side_fe[dim][fe_type].get();
+      if ((dim) == 3)
+        _edge_fe_var[i] = _edge_fe[fe_type].get();
+    };
 
   for (const auto & dim : _elem_dims)
     {
@@ -223,25 +268,12 @@ void FEMContext::init_internal_data(const System & sys)
       if (dim == 3)
         _edge_fe_var.resize(nv);
 
-
-      for (unsigned int i=0; i != nv; ++i)
-        {
-          FEType fe_type = sys.variable_type(i);
-
-          if (_element_fe[dim][fe_type] == nullptr)
-            {
-              _element_fe[dim][fe_type] = FEAbstract::build(dim, fe_type);
-              _side_fe[dim][fe_type] = FEAbstract::build(dim, fe_type);
-
-              if (dim == 3)
-                _edge_fe[fe_type] = FEAbstract::build(dim, fe_type);
-            }
-
-          _element_fe_var[dim][i] = _element_fe[dim][fe_type].get();
-          _side_fe_var[dim][i] = _side_fe[dim][fe_type].get();
-          if ((dim) == 3)
-            _edge_fe_var[i] = _edge_fe[fe_type].get();
-        }
+      if (_active_vars)
+        for (auto v : *_active_vars)
+          build_var_fe(dim, v);
+      else
+        for (auto v : make_range(nv))
+          build_var_fe(dim, v);
     }
 
   this->use_default_quadrature_rules(_extra_quadrature_order);
@@ -1745,59 +1777,65 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
             const unsigned int n_dofs_var = cast_int<unsigned int>
               (this->get_dof_indices(i).size());
 
-            this->get_elem_solution(i).reposition
-              (sub_dofs, n_dofs_var);
 
-            // Only make space for these if we're using DiffSystem
-            // This is assuming *only* DiffSystem is using elem_solution_rate/accel
-            const DifferentiableSystem * diff_system = dynamic_cast<const DifferentiableSystem *>(&sys);
-            if (diff_system)
+            if (!_active_vars ||
+                std::binary_search(_active_vars->begin(),
+                                   _active_vars->end(), i))
               {
-                // Now, we only need these if the solver is unsteady
-                if (!diff_system->get_time_solver().is_steady())
-                  {
-                    this->get_elem_solution_rate(i).reposition
-                      (sub_dofs, n_dofs_var);
-
-                    // We only need accel space if the TimeSolver is second order
-                    const UnsteadySolver & time_solver = cast_ref<const UnsteadySolver &>(diff_system->get_time_solver());
-
-                    if (time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty())
-                      this->get_elem_solution_accel(i).reposition
-                        (sub_dofs, n_dofs_var);
-                  }
-              }
-
-            if (sys.use_fixed_solution)
-              this->get_elem_fixed_solution(i).reposition
-                (sub_dofs, n_dofs_var);
-
-            if (algebraic_type() != OLD)
-              {
-                this->get_elem_residual(i).reposition
+                this->get_elem_solution(i).reposition
                   (sub_dofs, n_dofs_var);
 
-                for (std::size_t q=0; q != n_qoi; ++q)
-                  this->get_qoi_derivatives(q,i).reposition
+                // Only make space for these if we're using DiffSystem
+                // This is assuming *only* DiffSystem is using elem_solution_rate/accel
+                const DifferentiableSystem * diff_system = dynamic_cast<const DifferentiableSystem *>(&sys);
+                if (diff_system)
+                  {
+                    // Now, we only need these if the solver is unsteady
+                    if (!diff_system->get_time_solver().is_steady())
+                      {
+                        this->get_elem_solution_rate(i).reposition
+                          (sub_dofs, n_dofs_var);
+
+                        // We only need accel space if the TimeSolver is second order
+                        const UnsteadySolver & time_solver = cast_ref<const UnsteadySolver &>(diff_system->get_time_solver());
+
+                        if (time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty())
+                          this->get_elem_solution_accel(i).reposition
+                            (sub_dofs, n_dofs_var);
+                      }
+                  }
+
+                if (sys.use_fixed_solution)
+                  this->get_elem_fixed_solution(i).reposition
                     (sub_dofs, n_dofs_var);
 
-                for (unsigned int j=0; j != i; ++j)
+                if (algebraic_type() != OLD)
                   {
-                    const unsigned int n_dofs_var_j =
-                      cast_int<unsigned int>
-                      (this->get_dof_indices(j).size());
+                    this->get_elem_residual(i).reposition
+                      (sub_dofs, n_dofs_var);
 
-                    this->get_elem_jacobian(i,j).reposition
-                      (sub_dofs, this->get_elem_residual(j).i_off(),
-                       n_dofs_var, n_dofs_var_j);
-                    this->get_elem_jacobian(j,i).reposition
-                      (this->get_elem_residual(j).i_off(), sub_dofs,
-                       n_dofs_var_j, n_dofs_var);
+                    for (std::size_t q=0; q != n_qoi; ++q)
+                      this->get_qoi_derivatives(q,i).reposition
+                        (sub_dofs, n_dofs_var);
+
+                    for (unsigned int j=0; j != i; ++j)
+                      {
+                        const unsigned int n_dofs_var_j =
+                          cast_int<unsigned int>
+                          (this->get_dof_indices(j).size());
+
+                        this->get_elem_jacobian(i,j).reposition
+                          (sub_dofs, this->get_elem_residual(j).i_off(),
+                           n_dofs_var, n_dofs_var_j);
+                        this->get_elem_jacobian(j,i).reposition
+                          (this->get_elem_residual(j).i_off(), sub_dofs,
+                           n_dofs_var_j, n_dofs_var);
+                      }
+                    this->get_elem_jacobian(i,i).reposition
+                      (sub_dofs, sub_dofs,
+                       n_dofs_var,
+                       n_dofs_var);
                   }
-                this->get_elem_jacobian(i,i).reposition
-                  (sub_dofs, sub_dofs,
-                   n_dofs_var,
-                   n_dofs_var);
               }
 
             sub_dofs += n_dofs_var;
@@ -1828,7 +1866,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
 
           // Initialize the per-variable data for elem.
           unsigned int sub_dofs = 0;
-          for (auto i : make_range(sys.n_vars()))
+          auto init_localized_var_data = [this, localized_vec_it, &sub_dofs](unsigned int i)
             {
               const unsigned int n_dofs_var = cast_int<unsigned int>
                 (this->get_dof_indices(i).size());
@@ -1840,7 +1878,15 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
                 (sub_dofs, n_dofs_var);
 
               sub_dofs += n_dofs_var;
-            }
+            };
+
+          if (_active_vars)
+            for (auto v : *_active_vars)
+              init_localized_var_data(v);
+          else
+            for (auto v : make_range(sys.n_vars()))
+              init_localized_var_data(v);
+
           libmesh_assert_equal_to (sub_dofs, n_dofs);
         }
     }
