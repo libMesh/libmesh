@@ -245,7 +245,7 @@ int main (int argc, char** argv)
   //fetch the solver-object used internally to be able to manipulate it using the self-written class
   // to set the transformation
   SlepcEigenSolver<Number> * solver =
-    libmesh_cast_ptr<SlepcEigenSolver<Number>* >( &eig_sys.get_eigen_solver() );
+    cast_ptr<SlepcEigenSolver<Number>* >( &eig_sys.get_eigen_solver() );
 
   // setup of our class @SlepcSolverConfiguration
   SlepcSolverConfiguration ConfigSolver(*solver);
