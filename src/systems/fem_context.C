@@ -42,7 +42,9 @@ FEMContext::FEMContext (const System & sys)
   init_internal_data(sys);
 }
 
-FEMContext::FEMContext (const System & sys, int extra_quadrature_order)
+FEMContext::FEMContext (const System & sys,
+                        int extra_quadrature_order,
+                        const std::vector<unsigned int> * active_vars)
   : DiffContext(sys),
     side(0), edge(0),
     _mesh_sys(nullptr),
@@ -60,6 +62,10 @@ FEMContext::FEMContext (const System & sys, int extra_quadrature_order)
     _side_qrule(4),
     _extra_quadrature_order(extra_quadrature_order)
 {
+  if (active_vars)
+    _active_vars =
+      libmesh_make_unique<std::vector<unsigned int>>(*active_vars);
+
   init_internal_data(sys);
 }
 

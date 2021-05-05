@@ -71,10 +71,16 @@ public:
 
   /**
    * Constructor.  Specify the extra quadrature order instead
-   * of getting it from \p sys.
+   * of getting it from \p sys.  Optionally specify a limited number
+   * of variables to be "active" and thus calculated on.  If
+   * \p active_vars is null then calculations will be prepared for
+   * every variable in \p sys.
    */
   explicit
-  FEMContext (const System & sys, int extra_quadrature_order);
+  FEMContext (const System & sys,
+              int extra_quadrature_order,
+              const std::vector<unsigned int> * active_vars = nullptr);
+
 
   /**
    * Destructor.
@@ -1026,6 +1032,12 @@ public:
                                             const int get_derivative_level = -1) const;
 
 protected:
+
+  /**
+   * Variables on which to enable calculations, or nullptr if all
+   * variables in the System are to be enabled
+   */
+  std::unique_ptr<const std::vector<unsigned int>> _active_vars;
 
   /**
    * System from which to acquire moving mesh information
