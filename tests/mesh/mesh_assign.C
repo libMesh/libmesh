@@ -28,7 +28,12 @@ public:
 /* Tests need a 2d mesh and Dirichlet boundary conditions */
 #if LIBMESH_DIM > 1
 # ifdef LIBMESH_ENABLE_DIRICHLET
-  CPPUNIT_TEST( testMeshMoveAssign );
+  CPPUNIT_TEST( testMeshMoveAssignFromMemory );
+  CPPUNIT_TEST( testReplicatedMeshMoveAssignFromMemory );
+  CPPUNIT_TEST( testDistributedMeshMoveAssignFromMemory );
+  CPPUNIT_TEST( testMeshMoveAssignFromFile );
+  CPPUNIT_TEST( testReplicatedMeshMoveAssignFromFile );
+  CPPUNIT_TEST( testDistributedMeshMoveAssignFromFile );
 # endif
 #endif
 
@@ -45,22 +50,14 @@ public:
   {
   }
 
-  void testMeshMoveAssign()
+  void testMeshMoveAssign(const std::string & mesh_type,
+                          const std::string & mesh_creation_type)
   {
-
-    // We will do 6 tests:
-    // {Mesh, ReplicatedMesh ,DistributedMesh} x {Mesh 2 from Memory, From File}
-    std::array<std::string, 3> mesh_types = {"Mesh", "replicated", "distributed"};
-    std::array<std::string, 2> mesh_two_cases = {"from_memory", "from_file"};
 
     // Create two mesh ptrs.
     std::shared_ptr<UnstructuredMesh> mesh_one;
     std::shared_ptr<UnstructuredMesh> mesh_two;
 
-    for(auto& mesh_type : mesh_types)
-    {
-      for(auto mesh_two_case_type : mesh_two_cases )
-      {
        /**
         * Build a 2d 2x2 square mesh (mesh_one) covering [0.0, 1.0] x [0.0, 1.0]
         * with linear Quad elements. A new mesh will later be moved to
@@ -137,7 +134,7 @@ public:
         libmesh_error_msg("Error: specified mesh_type not understood");
        }
 
-       if(mesh_two_case_type.compare("from_memory") == 0)
+       if(mesh_creation_type.compare("from_memory") == 0)
        {
          /**
           * Build another 2d 2x2 square mesh (mesh_two) covering [0.0, 1.0] x [0.0, 1.0]
@@ -178,7 +175,7 @@ public:
 
           system.get_mesh().clear();
         }
-        else if (mesh_two_case_type.compare("from_file") == 0)
+        else if (mesh_creation_type.compare("from_file") == 0)
         {
           mesh_two->read("meshes/mesh_assign_test_mesh.xda");
 
@@ -202,12 +199,25 @@ public:
         {
          libmesh_error_msg("Error: invalid mesh two case type.");
         }
+  }
 
-      }// End loop over mesh two memory vs file case
+  void testMeshMoveAssignFromMemory()
+  { testMeshMoveAssign("Mesh", "from_memory"); }
 
-    }// End loop over type of mesh to be tested
+  void testReplicatedMeshMoveAssignFromMemory()
+  { testMeshMoveAssign("replicated", "from_memory"); }
 
-  } // End definition of MeshAssignTest
+  void testDistributedMeshMoveAssignFromMemory()
+  { testMeshMoveAssign("distributed", "from_memory"); }
+
+  void testMeshMoveAssignFromFile()
+  { testMeshMoveAssign("Mesh", "from_file"); }
+
+  void testReplicatedMeshMoveAssignFromFile()
+  { testMeshMoveAssign("replicated", "from_file"); }
+
+  void testDistributedMeshMoveAssignFromFile()
+  { testMeshMoveAssign("distributed", "from_file"); }
 
 }; // End definition of class MeshAssignTest
 
