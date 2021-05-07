@@ -28,7 +28,12 @@ public:
 /* Tests need a 2d mesh and Dirichlet boundary conditions */
 #if LIBMESH_DIM > 1
 # ifdef LIBMESH_ENABLE_DIRICHLET
-  CPPUNIT_TEST( testMeshMoveAssign );
+  CPPUNIT_TEST( testMeshMoveAssignFromMemory );
+  CPPUNIT_TEST( testReplicatedMeshMoveAssignFromMemory );
+  CPPUNIT_TEST( testDistributedMeshMoveAssignFromMemory );
+  CPPUNIT_TEST( testMeshMoveAssignFromFile );
+  CPPUNIT_TEST( testReplicatedMeshMoveAssignFromFile );
+  CPPUNIT_TEST( testDistributedMeshMoveAssignFromFile );
 # endif
 #endif
 
@@ -45,25 +50,13 @@ public:
   {
   }
 
-  void testMeshMoveAssign()
+  void testMeshMoveAssign(const std::string & mesh_type,
+                          const std::string & mesh_creation_type)
   {
-
-    // We will do 6 tests:
-    // {Mesh, ReplicatedMesh ,DistributedMesh} x {Mesh 2 from Memory, From File}
-    std::array<std::string, 3> mesh_types = {"Mesh", "replicated", "distributed"};
-    std::array<std::string, 2> mesh_two_cases = {"from_memory", "from_file"};
 
     // Create two mesh ptrs.
     std::shared_ptr<UnstructuredMesh> mesh_one;
     std::shared_ptr<UnstructuredMesh> mesh_two;
-
-    for(auto& mesh_type : mesh_types)
-    {
-      libMesh::out << "Running test with " << mesh_type << " mesh." << std::endl << std::endl;
-
-      for(auto mesh_two_case_type : mesh_two_cases )
-      {
-       libMesh::out << "Running test with mesh two " << mesh_two_case_type << "." << std::endl << std::endl;
 
        /**
         * Build a 2d 2x2 square mesh (mesh_one) covering [0.0, 1.0] x [0.0, 1.0]
@@ -93,9 +86,6 @@ public:
                                           0., 1.,
                                           0., 1.,
                                           QUAD9);
-
-       libMesh::out << "Info from mesh one." << std::endl << std::endl;
-       mesh_one->print_info();
 
        // build_square adds boundary_ids 0,1,2,3 for the bottom, right,
        // top, and left sides, respectively.
@@ -144,7 +134,7 @@ public:
         libmesh_error_msg("Error: specified mesh_type not understood");
        }
 
-       if(mesh_two_case_type.compare("from_memory") == 0)
+       if(mesh_creation_type.compare("from_memory") == 0)
        {
          /**
           * Build another 2d 2x2 square mesh (mesh_two) covering [0.0, 1.0] x [0.0, 1.0]
@@ -162,15 +152,11 @@ public:
           std::unique_ptr<MeshRefinement> mesh_refinement(libmesh_make_unique<MeshRefinement>(*mesh_two));
 
           mesh_refinement->uniformly_refine(1);
-          libMesh::out << "Info from mesh two, from memory." << std::endl << std::endl;
-          mesh_two->print_info();
 
           // Move mesh_two into mesh_one
           system.get_mesh().clear();
           system.get_mesh().assign(std::move(*mesh_two));
           mesh_two->clear();
-          libMesh::out << "Info from mesh one, after moving." << std::endl << std::endl;
-          system.get_mesh().print_info();
 
           // Assert that the moved into mesh has the right number of elements.
           CPPUNIT_ASSERT_EQUAL(system.get_mesh().n_elem(), dof_id_type(20));
@@ -185,24 +171,19 @@ public:
           // Write out the mesh xda, this currently fails with DistributedMesh,
           // running on more than 8 processors, when the mesh to be moved in is
           // read from a file.
-          libMesh::out << "Write out the mesh, read from memory." << std::endl << std::endl;
           system.get_mesh().write("mesh.out.memory.moved.xda");
 
           system.get_mesh().clear();
         }
-        else if (mesh_two_case_type.compare("from_file") == 0)
+        else if (mesh_creation_type.compare("from_file") == 0)
         {
           mesh_two->read("meshes/mesh_assign_test_mesh.xda");
-          libMesh::out << "Info from mesh two, from file." << std::endl << std::endl;
-          mesh_two->print_info();
 
           // Read in the mesh at this time instant and reinit to project solutions on to the new mesh
           system.get_mesh().clear();
           system.get_mesh().assign(std::move(*mesh_two));
 
           mesh_two->clear();
-          libMesh::out << "Info from mesh one, after moving." << std::endl << std::endl;
-          system.get_mesh().print_info();
 
           // Assert that the moved into mesh has the right number of elements.
           CPPUNIT_ASSERT_EQUAL(system.get_mesh().n_elem(), dof_id_type(42));
@@ -210,7 +191,6 @@ public:
           system.get_equation_systems().reinit_mesh();
           system.get_equation_systems().reinit();
 
-          libMesh::out << "Write out the mesh, read from file." << std::endl << std::endl;
           system.get_mesh().write("mesh.out.file.moved.xda");
 
           system.get_mesh().clear();
@@ -219,12 +199,25 @@ public:
         {
          libmesh_error_msg("Error: invalid mesh two case type.");
         }
+  }
 
-      }// End loop over mesh two memory vs file case
+  void testMeshMoveAssignFromMemory()
+  { testMeshMoveAssign("Mesh", "from_memory"); }
 
-    }// End loop over type of mesh to be tested
+  void testReplicatedMeshMoveAssignFromMemory()
+  { testMeshMoveAssign("replicated", "from_memory"); }
 
-  } // End definition of MeshAssignTest
+  void testDistributedMeshMoveAssignFromMemory()
+  { testMeshMoveAssign("distributed", "from_memory"); }
+
+  void testMeshMoveAssignFromFile()
+  { testMeshMoveAssign("Mesh", "from_file"); }
+
+  void testReplicatedMeshMoveAssignFromFile()
+  { testMeshMoveAssign("replicated", "from_file"); }
+
+  void testDistributedMeshMoveAssignFromFile()
+  { testMeshMoveAssign("distributed", "from_file"); }
 
 }; // End definition of class MeshAssignTest
 
