@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// <h1>Miscellaneous Example 12 - Quad8 Shell Elements</h1>
+// <h1>Miscellaneous Example 13 - Quad8 Shell Elements</h1>
 // \author Sylvain Vallaghe
 // \date 2017
 //
