@@ -560,7 +560,7 @@ public:
 
 
 
-  const std::vector<Point> & get_xyz () const override
+  virtual const std::vector<Point> & get_xyz () const override
   { calculate_map = true; return xyz; }
 
   /**
@@ -569,7 +569,7 @@ public:
    * The Jacobian cannot be computed for Infinite elements!
    *
    */
-  const std::vector<Real> & get_JxW () const override
+  virtual const std::vector<Real> & get_JxW () const override
   {
       //libmesh_not_implemented();
       return this->JxW;
@@ -583,7 +583,7 @@ public:
    * Since J diverges there, a respectize decay-function must be
    * applied to obtain well-defined quantities.
    */
-  const std::vector<Real> & get_JxWxdecay_sq () const override
+  virtual const std::vector<Real> & get_JxWxdecay_sq () const override
   { calculate_map = true; return this->JxWxdecay;}
 
 
@@ -597,7 +597,7 @@ public:
    * The factor r must be compensated for by the Sobolev \p weight.
    * (i.e. by using \p get_Sobolev_weightxR_sq())
    **/
-  const std::vector<std::vector<OutputShape>> & get_phi_over_decayxR () const override
+  virtual const std::vector<std::vector<OutputShape>> & get_phi_over_decayxR () const override
   { libmesh_assert(!calculations_started || calculate_phi);
     calculate_phi = true; return phixr; }
 
@@ -607,7 +607,7 @@ public:
    * but in case of \p InfFE, weighted with r/decay.
    * See \p  get_phi_over_decayxR() for details.
    */
-  const std::vector<std::vector<OutputGradient>> & get_dphi_over_decayxR () const override
+  virtual const std::vector<std::vector<OutputGradient>> & get_dphi_over_decayxR () const override
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = calculate_dphiref = true; return dphixr; }
 
@@ -619,7 +619,7 @@ public:
    * In contrast to the shape function, its gradient stays finite
    * when divided by the decay function.
    */
-  const std::vector<std::vector<OutputGradient>> & get_dphi_over_decay () const override
+  virtual const std::vector<std::vector<OutputGradient>> & get_dphi_over_decay () const override
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = calculate_dphiref = true; return dphixr_sq; }
 
@@ -628,51 +628,51 @@ public:
    * \returns The element tangents in xi-direction at the quadrature
    * points.
    */
-  const std::vector<RealGradient> & get_dxyzdxi() const override
+  virtual const std::vector<RealGradient> & get_dxyzdxi() const override
   { calculate_map = true; libmesh_not_implemented();}
   /**
    * \returns The element tangents in eta-direction at the quadrature
    * points.
    */
-  const std::vector<RealGradient> & get_dxyzdeta() const override
+  virtual const std::vector<RealGradient> & get_dxyzdeta() const override
   { calculate_map = true; libmesh_not_implemented();}
   /**
    * \returns The element tangents in zeta-direction at the quadrature
    * points.
    */
-  const std::vector<RealGradient> & get_dxyzdzeta() const override
+  virtual const std::vector<RealGradient> & get_dxyzdzeta() const override
   { calculate_map = true; libmesh_not_implemented();}
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * \returns The second partial derivatives in xi.
    */
-  const std::vector<RealGradient> & get_d2xyzdxi2() const override
+  virtual const std::vector<RealGradient> & get_d2xyzdxi2() const override
   { calculate_map = true; libmesh_not_implemented();}
   /**
    * \returns The second partial derivatives in eta.
    */
-  const std::vector<RealGradient> & get_d2xyzdeta2() const override
+  virtual const std::vector<RealGradient> & get_d2xyzdeta2() const override
   { calculate_map = true; libmesh_not_implemented();}
   /**
    * \returns The second partial derivatives in zeta.
    */
-  const std::vector<RealGradient> & get_d2xyzdzeta2() const override
+  virtual const std::vector<RealGradient> & get_d2xyzdzeta2() const override
   { calculate_map = true; libmesh_not_implemented();}
   /**
    * \returns The second partial derivatives in xi-eta.
    */
-  const std::vector<RealGradient> & get_d2xyzdxideta() const override
+  virtual const std::vector<RealGradient> & get_d2xyzdxideta() const override
   { calculate_map = true; libmesh_not_implemented();}
   /**
    * \returns The second partial derivatives in xi-zeta.
    */
-  const std::vector<RealGradient> & get_d2xyzdxidzeta() const override
+  virtual const std::vector<RealGradient> & get_d2xyzdxidzeta() const override
   { calculate_map = true; libmesh_not_implemented();}
   /**
    * \returns The second partial derivatives in eta-zeta.
    */
-  const std::vector<RealGradient> & get_d2xyzdetadzeta() const override
+  virtual const std::vector<RealGradient> & get_d2xyzdetadzeta() const override
   { calculate_map = true; libmesh_not_implemented();}
 #endif
 
@@ -680,55 +680,55 @@ public:
    * \returns The dxi/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dxidx() const override
+  virtual const std::vector<Real> & get_dxidx() const override
   { calculate_map = true; return dxidx_map;}
   /**
    * \returns The dxi/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dxidy() const override
+  virtual const std::vector<Real> & get_dxidy() const override
   { calculate_map = true; return dxidy_map;}
   /**
    * \returns The dxi/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dxidz() const override
+  virtual const std::vector<Real> & get_dxidz() const override
   { calculate_map = true; return dxidz_map;}
   /**
    * \returns The deta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_detadx() const override
+  virtual const std::vector<Real> & get_detadx() const override
   { calculate_map = true; return detadx_map;}
   /**
    * \returns The deta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_detady() const override
+  virtual const std::vector<Real> & get_detady() const override
   { calculate_map = true; return detady_map;}
   /**
    * \returns The deta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_detadz() const override
+  virtual const std::vector<Real> & get_detadz() const override
   { calculate_map = true; return detadz_map;}
   /**
    * \returns The dzeta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dzetadx() const override
+  virtual const std::vector<Real> & get_dzetadx() const override
   { calculate_map = true; return dzetadx_map;}
   /**
    * \returns The dzeta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dzetady() const override
+  virtual const std::vector<Real> & get_dzetady() const override
   { calculate_map = true; return dzetady_map;}
   /**
    * \returns The dzeta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
-  const std::vector<Real> & get_dzetadz() const override
+  virtual const std::vector<Real> & get_dzetadz() const override
   { calculate_map = true; return dzetadz_map;}
 
   /**
@@ -738,21 +738,21 @@ public:
    * used for the trial function space.  This renders the
    * variational form easily computable.
    */
-  const std::vector<Real> & get_Sobolev_weight() const override
+  virtual const std::vector<Real> & get_Sobolev_weight() const override
   { calculate_map = true; return weight; }
 
 
   /**
    * \returns The tangent vectors for face integration.
    */
-  const std::vector<std::vector<Point>> & get_tangents() const override
+  virtual const std::vector<std::vector<Point>> & get_tangents() const override
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return tangents; }
 
   /**
    * \returns The outward pointing normal vectors for face integration.
    */
-  const std::vector<Point> & get_normals() const override
+  virtual const std::vector<Point> & get_normals() const override
   { libmesh_assert(!calculations_started || calculate_dxyz);
     calculate_dxyz = true; return normals; }
 
@@ -760,7 +760,7 @@ public:
   /**
    * \returns The curvatures for use in face integration.
    */
-  const std::vector<Real> & get_curvatures() const override
+  virtual const std::vector<Real> & get_curvatures() const override
   { calculate_map = true; libmesh_not_implemented();}
 #endif
 
@@ -769,7 +769,7 @@ public:
    * but weighted with the radial coordinate square.
    *
    */
-  const std::vector<Real> & get_Sobolev_weightxR_sq() const override
+  virtual const std::vector<Real> & get_Sobolev_weightxR_sq() const override
   { calculate_map = true; return weightxr_sq; }
 
 
@@ -779,7 +779,7 @@ public:
    * but weighted with the radial coordinate square.
    *
    */
-  const std::vector<RealGradient> & get_Sobolev_dweightxR_sq() const override
+  virtual const std::vector<RealGradient> & get_Sobolev_dweightxR_sq() const override
   { calculate_map = true; return dweightxr_sq; }
 
 protected:
@@ -879,7 +879,7 @@ protected:
    * Use \p compute_shape_functions(const Elem*, const std::vector<Point> &, const std::vector<Point> &)
    * instead.
    */
-  void compute_shape_functions(const Elem *, const std::vector<Point> & ) override
+  virtual void compute_shape_functions(const Elem *, const std::vector<Point> & ) override
   {
      //FIXME: it seems this function cannot be left out because
      // it is pure virtual in \p FEBase

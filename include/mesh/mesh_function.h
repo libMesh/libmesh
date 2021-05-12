@@ -139,8 +139,8 @@ public:
    * \returns The value of variable 0 at point \p p and for \p time,
    * which defaults to zero.
    */
-  Number operator() (const Point & p,
-                     const Real time=0.) override;
+  virtual Number operator() (const Point & p,
+                             const Real time=0.) override;
 
   /**
    * \returns A map of values of variable 0 at point
@@ -184,9 +184,9 @@ public:
    * MeshFunction subdomain_ids. This is useful in cases where there
    * are multiple dimensioned elements, for example.
    */
-  void operator() (const Point & p,
-                   const Real time,
-                   DenseVector<Number> & output) override;
+  virtual void operator() (const Point & p,
+                           const Real time,
+                           DenseVector<Number> & output) override;
 
   /**
    * Computes values at coordinate \p p and for time \p time,

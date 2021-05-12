@@ -181,7 +181,7 @@ public:
 
   virtual numeric_index_type m () const override;
 
-  numeric_index_type local_m () const final;
+  virtual numeric_index_type local_m () const final;
 
   virtual numeric_index_type n () const override;
 
@@ -250,6 +250,7 @@ public:
     * Add \p scalar* \p spm to the rows and cols of this matrix (A):
     * A(rows[i], cols[j]) += scalar * spm(i,j)
     */
+  virtual
   void add_sparse_matrix (const SparseMatrix<T> & spm,
                           const std::map<numeric_index_type,numeric_index_type> & row_ltog,
                           const std::map<numeric_index_type,numeric_index_type> & col_ltog,
@@ -300,6 +301,7 @@ public:
    */
   Mat mat () { libmesh_assert (_mat); return _mat; }
 
+  virtual
   void get_row(numeric_index_type i,
                std::vector<numeric_index_type> & indices,
                std::vector<T> & values) const override;
