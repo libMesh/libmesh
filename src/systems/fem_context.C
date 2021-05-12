@@ -64,8 +64,15 @@ FEMContext::FEMContext (const System & sys,
     _extra_quadrature_order(extra_quadrature_order)
 {
   if (active_vars)
-    _active_vars =
-      libmesh_make_unique<std::vector<unsigned int>>(*active_vars);
+    {
+      auto vars_copy =
+        libmesh_make_unique<std::vector<unsigned int>>(*active_vars);
+
+      // We want to do quick binary_search later
+      std::sort(vars_copy->begin(), vars_copy->end());
+
+      _active_vars = std::move(vars_copy);
+    }
 
   init_internal_data(sys);
 }
