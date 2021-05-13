@@ -22,7 +22,7 @@
 // \date 2010
 //
 // This example shows how the transient Navier-Stokes problem from
-// example 13 can be solved using a scalar Lagrange multiplier
+// systems_of_equations_ex2 can be solved using a scalar Lagrange multiplier
 // formulation to constrain the integral of the pressure variable,
 // rather than pinning the pressure at a single point.
 

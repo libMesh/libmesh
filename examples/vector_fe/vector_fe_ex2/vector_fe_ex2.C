@@ -23,7 +23,7 @@
 // \date 2012
 //
 // This example shows how the transient nonlinear problem from
-// example 13 can be solved using the
+// systems_of_equations_ex2 can be solved using the
 // DifferentiableSystem class framework
 
 // Basic include files
