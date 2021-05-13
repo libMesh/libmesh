@@ -32,6 +32,10 @@ message_done_running() {
 }
 
 run_example() {
+    # when benchmarking we only run specific benchmark examples
+    if (test "x${LIBMESH_BENCHMARK}" != "x"); then
+      return
+    fi
 
     example_name=$1
     shift
@@ -90,4 +94,40 @@ run_example() {
 
 run_example_no_extra_options() {
   LIBMESH_OPTIONS='' run_example $@
+}
+
+
+benchmark_example() {
+    benchmark_level=$1
+    shift
+    example_name=$1
+    shift
+    options=$@
+
+    # when benchmarking we only run specific benchmark examples
+    if (test "x${LIBMESH_BENCHMARK}" = "x"); then
+      return
+    fi
+
+    if (test ${LIBMESH_BENCHMARK} -lt ${benchmark_level}); then
+      return
+    fi
+
+    executable=example-opt
+
+    if (test ! -x ${executable}); then
+        echo "ERROR: cannot find ${executable}!"
+        exit 1
+    fi
+
+    message_running $example_name $executable $options
+
+    $LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS
+    RETVAL=$?
+    # If we don't return 'success' or 'skip', quit
+    if [ $RETVAL -ne 0 -a $RETVAL -ne 77 ]; then
+      exit $RETVAL
+    fi
+
+    message_done_running $example_name $executable $options
 }
