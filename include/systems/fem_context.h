@@ -65,16 +65,28 @@ public:
 
   /**
    * Constructor.  Allocates some but fills no data structures.
+   *
+   * Optionally specify a limited number of variables to be "active"
+   * and thus calculated on.  If \p active_vars is null then
+   * calculations will be prepared for every variable in \p sys.
    */
   explicit
-  FEMContext (const System & sys);
+  FEMContext (const System & sys,
+              const std::vector<unsigned int> * active_vars = nullptr);
 
   /**
    * Constructor.  Specify the extra quadrature order instead
    * of getting it from \p sys.
+   *
+   * Optionally specify a limited number of variables to be "active"
+   * and thus calculated on.  If \p active_vars is null then
+   * calculations will be prepared for every variable in \p sys.
    */
   explicit
-  FEMContext (const System & sys, int extra_quadrature_order);
+  FEMContext (const System & sys,
+              int extra_quadrature_order,
+              const std::vector<unsigned int> * active_vars = nullptr);
+
 
   /**
    * Destructor.
@@ -994,16 +1006,6 @@ public:
   void set_jacobian_tolerance(Real tol);
 
   /**
-   * System from which to acquire moving mesh information
-   */
-  System * _mesh_sys;
-
-  /**
-   * Variables from which to acquire moving mesh information
-   */
-  unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
-
-  /**
    * Current side for side_* to examine
    */
   unsigned char side;
@@ -1024,6 +1026,12 @@ public:
   void attach_quadrature_rules();
 
   /**
+   * Return a pointer to the vector of active variables being computed
+   * for, or a null pointer if all variables in the system are active.
+   */
+  const std::vector<unsigned int> * active_vars() const { return _active_vars.get(); }
+
+  /**
    * Helper function to reduce some code duplication in the *_point_* methods.
    *
    * get_derivative_level should be -1 to get_ everything, 0 to
@@ -1036,6 +1044,22 @@ public:
                                             const int get_derivative_level = -1) const;
 
 protected:
+
+  /**
+   * Variables on which to enable calculations, or nullptr if all
+   * variables in the System are to be enabled
+   */
+  std::unique_ptr<const std::vector<unsigned int>> _active_vars;
+
+  /**
+   * System from which to acquire moving mesh information
+   */
+  System * _mesh_sys;
+
+  /**
+   * Variables from which to acquire moving mesh information
+   */
+  unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
 
   /**
    * Keep track of what type of algebra reinitialization is to be done
