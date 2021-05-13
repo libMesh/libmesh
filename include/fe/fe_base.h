@@ -217,10 +217,10 @@ public:
     return dual_phi;
   }
 
-  void request_phi() const override
+  virtual void request_phi() const override
   { get_phi(); }
 
-  void request_dual_phi() const override
+  virtual void request_dual_phi() const override
   { get_dual_phi(); }
 
   /**
@@ -235,10 +235,10 @@ public:
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = calculate_dual = calculate_dphiref = true; return dual_dphi; }
 
-  void request_dphi() const override
+  virtual void request_dphi() const override
   { get_dphi(); }
 
-  void request_dual_dphi() const override
+  virtual void request_dual_dphi() const override
   { get_dual_dphi(); }
 
   const DenseMatrix<Real> & get_dual_coeff() const
@@ -516,15 +516,15 @@ public:
   /**
    * Prints the value of each shape function at each quadrature point.
    */
-  void print_phi(std::ostream & os) const override;
-  void print_dual_phi(std::ostream & os) const override;
+  virtual void print_phi(std::ostream & os) const override;
+  virtual void print_dual_phi(std::ostream & os) const override;
 
   /**
    * Prints the value of each shape function's derivative
    * at each quadrature point.
    */
-  void print_dphi(std::ostream & os) const override;
-  void print_dual_dphi(std::ostream & os) const override;
+  virtual void print_dphi(std::ostream & os) const override;
+  virtual void print_dual_dphi(std::ostream & os) const override;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -532,8 +532,8 @@ public:
    * Prints the value of each shape function's second derivatives
    * at each quadrature point.
    */
-  void print_d2phi(std::ostream & os) const override;
-  void print_dual_d2phi(std::ostream & os) const override;
+  virtual void print_d2phi(std::ostream & os) const override;
+  virtual void print_dual_d2phi(std::ostream & os) const override;
 
 #endif
 
