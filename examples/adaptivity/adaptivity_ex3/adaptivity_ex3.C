@@ -345,6 +345,11 @@ int main(int argc, char ** argv)
       // Compute the error.
       exact_sol.compute_error("Laplace", "u");
 
+      // The error should at least be sane, but it isn't if the solver
+      // failed badly enough
+      if (libmesh_isnan(exact_sol.l2_error("Laplace", "u")))
+        libmesh_error_msg("NaN solve result");
+
       // Print out the error values
       libMesh::out << "L2-Error is: "
                    << exact_sol.l2_error("Laplace", "u")
