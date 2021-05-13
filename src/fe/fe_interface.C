@@ -2187,14 +2187,24 @@ void FEInterface::compute_periodic_constraints (DofConstraints & constraints,
                                                 const unsigned int variable_number,
                                                 const Elem * elem)
 {
-  // No element-specific optimizations currently exist
-  FEBase::compute_periodic_constraints (constraints,
-                                        dof_map,
-                                        boundaries,
-                                        mesh,
-                                        point_locator,
-                                        variable_number,
-                                        elem);
+  const FEType & fe_t = dof_map.variable_type(variable_number);
+  // No element-specific optimizations currently exist, although
+  // we do have to select the right compute_periodic_constraints
+  // for the OutputType of this FEType.
+  switch (field_type(fe_t))
+  {
+    case TYPE_SCALAR:
+      FEBase::compute_periodic_constraints(
+          constraints, dof_map, boundaries, mesh, point_locator, variable_number, elem);
+      break;
+    case TYPE_VECTOR:
+      FEVectorBase::compute_periodic_constraints(
+          constraints, dof_map, boundaries, mesh, point_locator, variable_number, elem);
+      break;
+    default:
+      libmesh_error_msg(
+          "compute_periodic_constraints only set up for vector or scalar FEFieldTypes");
+  }
 }
 
 #endif // #ifdef LIBMESH_ENABLE_PERIODIC
