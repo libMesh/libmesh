@@ -172,7 +172,7 @@ int main (int argc, char ** argv)
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
-  // Declare the system "Navier-Stokes" and its variables.
+  // Declare the system and its variables.
   ElasticitySystem & system =
     equation_systems.add_system<ElasticitySystem> ("Linear Elasticity");
 
@@ -195,10 +195,9 @@ int main (int argc, char ** argv)
       a_system->add_variable("u_accel", FIRST, LAGRANGE);
       a_system->add_variable("v_accel", FIRST, LAGRANGE);
       a_system->add_variable("w_accel", FIRST, LAGRANGE);
-    }
 
-  if (time_solver == std::string("newmark"))
-    system.time_solver = libmesh_make_unique<NewmarkSolver>(system);
+      system.time_solver = libmesh_make_unique<NewmarkSolver>(system);
+    }
 
   else if( time_solver == std::string("euler") )
     {
