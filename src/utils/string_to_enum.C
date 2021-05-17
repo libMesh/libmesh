@@ -392,6 +392,7 @@ void init_solvertype_to_enum ()
       solvertype_to_enum["TCQMR"         ]=TCQMR;
       solvertype_to_enum["TFQMR"         ]=TFQMR;
       solvertype_to_enum["BICG"          ]=BICG;
+      solvertype_to_enum["BICGSTAB"      ]=BICGSTAB;
       solvertype_to_enum["MINRES"        ]=MINRES;
       solvertype_to_enum["GMRES"         ]=GMRES;
       solvertype_to_enum["LSQR"          ]=LSQR;
@@ -401,6 +402,7 @@ void init_solvertype_to_enum ()
       solvertype_to_enum["SSOR"          ]=SSOR;
       solvertype_to_enum["RICHARDSON"    ]=RICHARDSON;
       solvertype_to_enum["CHEBYSHEV"     ]=CHEBYSHEV;
+      solvertype_to_enum["SPARSELU"      ]=SPARSELU;
       solvertype_to_enum["INVALID_SOLVER"]=INVALID_SOLVER;
     }
 }
