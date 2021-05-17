@@ -213,7 +213,7 @@ Real VariationalMeshSmoother::smooth(unsigned int)
   _logfile << "Saving Result" << std::endl;
   writegr(R);
 
-  libmesh_assert_greater (_dist_norm, 0);
+  libmesh_assert_greater (_dist_norm, 0.);
   return _dist_norm;
 }
 
@@ -950,6 +950,8 @@ void VariationalMeshSmoother::full_smooth(Array2D<Real> & R,
              << " qmin=" << qmin
              << " min volume = " << Vmin
              << std::endl;
+
+  libmesh_error_msg_if(Vmin <= 0., "Found element(s) with negative volume.");
 
   // compute max distortion measure over all cells
   Real epsilon = 1.e-9;
