@@ -130,7 +130,7 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     18, // INFHEX18
 
     6,  // INFPRISM6
-    16, // INFPRISM12
+    12, // INFPRISM12
 
     1,  // NODEELEM
 
