@@ -27,7 +27,7 @@
 namespace libMesh
 {
 // Small helper function to make contains_point() more readable.
-bool is_between(Real min, Real check, Real max)
+inline bool is_between(Real min, Real check, Real max)
 {
   return min <= check && check <= max;
 }
