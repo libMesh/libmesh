@@ -146,28 +146,10 @@ bool EquationSystems::reinit_solutions ()
   const unsigned int n_sys = this->n_systems();
   libmesh_assert_not_equal_to (n_sys, 0);
 
-  // We may have added new systems since our last
-  // EquationSystems::(re)init call
-  bool _added_new_systems = false;
+  // And any new systems will need initialization
   for (unsigned int i=0; i != n_sys; ++i)
     if (!this->get_system(i).is_initialized())
-      _added_new_systems = true;
-
-  if (_added_new_systems)
-    {
-      // Our DofObjects will need space for the additional systems
-      for (auto & node : _mesh.node_ptr_range())
-        node->set_n_systems(n_sys);
-
-      for (auto & elem : _mesh.element_ptr_range())
-        elem->set_n_systems(n_sys);
-
-      // And any new systems will need initialization
-      for (unsigned int i=0; i != n_sys; ++i)
-        if (!this->get_system(i).is_initialized())
-          this->get_system(i).init();
-    }
-
+      this->get_system(i).init();
 
   // We used to assert that all nodes and elements *already* had
   // n_systems() properly set; however this is false in the case where
@@ -179,15 +161,15 @@ bool EquationSystems::reinit_solutions ()
   {
     // All the nodes
     for (auto & node : _mesh.node_ptr_range())
-      node->set_n_systems(this->n_systems());
+      node->set_n_systems(n_sys);
 
     // All the elements
     for (auto & elem : _mesh.element_ptr_range())
-      elem->set_n_systems(this->n_systems());
+      elem->set_n_systems(n_sys);
   }
 
   // Localize each system's vectors
-  for (unsigned int i=0; i != this->n_systems(); ++i)
+  for (unsigned int i=0; i != n_sys; ++i)
     this->get_system(i).re_update();
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -198,7 +180,7 @@ bool EquationSystems::reinit_solutions ()
   // refine_and_coarsen_elements or refine_uniformly have already
   // been called
   {
-    for (unsigned int i=0; i != this->n_systems(); ++i)
+    for (unsigned int i=0; i != n_sys; ++i)
       {
         System & sys = this->get_system(i);
 
