@@ -200,7 +200,6 @@ bool EquationSystems::reinit_solutions ()
 
         sys.prolong_vectors();
       }
-    //FIXME: why have this if we set it to 'true' anyway?
     mesh_changed = true;
   }
 
