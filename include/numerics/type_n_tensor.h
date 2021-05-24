@@ -76,13 +76,19 @@ public:
    * \returns A proxy for the \f$ i^{th} \f$ slice of the tensor.
    */
   const TypeNTensor<N-1,T> slice (const unsigned int /*i*/) const
-  { return TypeNTensor<N-1,T>(); }
+  {
+    libmesh_not_implemented();
+    return TypeNTensor<N-1,T>();
+  }
 
   /**
    * \returns A writable proxy for the \f$ i^{th} \f$ slice of the tensor.
    */
   TypeNTensor<N-1,T> slice (const unsigned int /*i*/)
-  { return TypeNTensor<N-1,T>(); }
+  {
+    libmesh_not_implemented();
+    return TypeNTensor<N-1,T>();
+  }
 
   template <typename Scalar>
   typename boostcopy::enable_if_c<
@@ -97,14 +103,20 @@ public:
   template<typename T2>
   TypeNTensor<N,typename CompareTypes<T, T2>::supertype>
   operator + (const TypeNTensor<N,T2> &) const
-  { return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>(); }
+  {
+    libmesh_not_implemented();
+    return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>();
+  }
 
   /**
    * Add to this tensor.
    */
   template<typename T2>
   const TypeNTensor<N,T> & operator += (const TypeNTensor<N,T2> &/*rhs*/)
-  { return *this; }
+  {
+    libmesh_not_implemented();
+    return *this;
+  }
 
   /**
    * Subtract two tensors.
@@ -112,20 +124,29 @@ public:
   template<typename T2>
   TypeNTensor<N,typename CompareTypes<T, T2>::supertype>
   operator - (const TypeNTensor<N,T2> &) const
-  { return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>(); }
+  {
+    libmesh_not_implemented();
+    return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>();
+  }
 
   /**
    * Subtract from this tensor.
    */
   template<typename T2>
   const TypeNTensor<N,T> & operator -= (const TypeNTensor<N,T2> &)
-  { return *this; }
+  {
+    libmesh_not_implemented();
+    return *this;
+  }
 
   /**
    * \returns The negative of a tensor.
    */
   TypeNTensor<N,T> operator - () const
-  { return *this; }
+  {
+    libmesh_not_implemented();
+    return *this;
+  }
 
   /**
    * Multiply every entry of a tensor by a number.
@@ -135,13 +156,20 @@ public:
     ScalarTraits<Scalar>::value,
     TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>>::type
   operator * (const Scalar) const
-  { return TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>(); }
+  {
+    libmesh_not_implemented();
+    return TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>();
+  }
 
   /**
    * Multiply every entry of this tensor by a number.
    */
   template <typename Scalar>
-  const TypeNTensor<N,T> & operator *= (const Scalar) { return *this; }
+  const TypeNTensor<N,T> & operator *= (const Scalar)
+  {
+    libmesh_not_implemented();
+    return *this;
+  }
 
   /**
    * Divide every entry of a tensor by a number.
@@ -150,12 +178,20 @@ public:
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
     TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>>::type
-  operator / (const Scalar) const { return *this; }
+  operator / (const Scalar) const
+  {
+    libmesh_not_implemented();
+    return *this;
+  }
 
   /**
    * Divide every entry of this tensor by a number.
    */
-  const TypeNTensor<N,T> & operator /= (const T) { return *this; }
+  const TypeNTensor<N,T> & operator /= (const T)
+  {
+    libmesh_not_implemented();
+    return *this;
+  }
 
   /**
    * Multiply 2 tensors together to return a scalar, i.e.
@@ -168,13 +204,21 @@ public:
    */
   template <typename T2>
   typename CompareTypes<T,T2>::supertype
-  contract (const TypeNTensor<N,T2> &) const { return 0; }
+  contract (const TypeNTensor<N,T2> &) const
+  {
+    libmesh_not_implemented();
+    return 0;
+  }
 
   /**
    * \returns The Frobenius norm of the tensor squared, i.e. the sum of the
    * entry magnitudes squared.
    */
-  auto norm_sq() const -> decltype(std::norm(T())) { return 0.;}
+  auto norm_sq() const -> decltype(std::norm(T()))
+  {
+    libmesh_not_implemented();
+    return 0.;
+  }
 
   /**
    * Set all entries of the tensor to 0.
@@ -185,7 +229,10 @@ public:
    * \returns \p true if two tensors are equal, \p false otherwise.
    */
   bool operator == (const TypeNTensor<N,T> & /*rhs*/) const
-  { return true; }
+  {
+    libmesh_not_implemented();
+    return true;
+  }
 
   /**
    * \returns \p true if this tensor is "less" than another.
@@ -193,13 +240,19 @@ public:
    * Useful for sorting.
    */
   bool operator < (const TypeNTensor<N,T> & /*rhs*/) const
-  { return false; }
+  {
+    libmesh_not_implemented();
+    return false;
+  }
 
   /**
    * \returns \p true if this tensor is "greater" than another.
    */
   bool operator > (const TypeNTensor<N,T> & /*rhs*/) const
-  { return false; }
+  {
+    libmesh_not_implemented();
+    return false;
+  }
 
   /**
    * Do a formatted print of this tensor to a stream which defaults to
