@@ -181,15 +181,18 @@ int main (int argc, char ** argv)
       libmesh_error_msg("ERROR: Initial timestep not specified!");
     }
 
-  // This value is also obtained from the command line, and specifies
-  // the number of time steps to take.
+  // This command line value specifies how many time steps to take.
   unsigned int n_timesteps = 0;
 
-  // Again do a search on the command line for the argument
   if (command_line.search("-n_timesteps"))
     n_timesteps = command_line.next(0);
   else
     libmesh_error_msg("ERROR: Number of timesteps not specified");
+
+  // This command line value specifies how far to allow refinement
+  unsigned int max_h_level = 5;
+  if (command_line.search("-max_h_level"))
+    max_h_level = command_line.next(n_timesteps);
 
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
@@ -402,7 +405,7 @@ int main (int argc, char ** argv)
               // coarsened.
               mesh_refinement.refine_fraction() = 0.80;
               mesh_refinement.coarsen_fraction() = 0.07;
-              mesh_refinement.max_h_level() = 5;
+              mesh_refinement.max_h_level() = max_h_level;
               mesh_refinement.flag_elements_by_error_fraction (error);
 
               // This call actually refines and coarsens the flagged
