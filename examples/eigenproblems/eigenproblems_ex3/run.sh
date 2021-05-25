@@ -14,3 +14,6 @@ run_example_no_extra_options "$example_name" "$options"
 
 options="-n_evals 5 -mesh_name drum2 -plotting_index 2 $slepc_options"
 run_example_no_extra_options "$example_name" "$options"
+
+# No benchmark problems here - these are run on mesh files without
+# scaling built into the examples.
