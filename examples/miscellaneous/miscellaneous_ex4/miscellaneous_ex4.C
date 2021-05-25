@@ -117,9 +117,15 @@ int main (int argc, char ** argv)
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
+  // Get command line arguments for mesh size
+  GetPot input(argc, argv);
+
+  const unsigned int nx = input("nx", 16);
+  const unsigned int ny = input("ny", 16);
+
   MeshTools::Generation::build_square (mesh,
-                                       16,
-                                       16,
+                                       nx,
+                                       ny,
                                        -1., 1.,
                                        -1., 1.,
                                        QUAD4);

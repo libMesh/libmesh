@@ -29,11 +29,13 @@
 #include "libmesh/meshfree_interpolation.h"
 #include "libmesh/radial_basis_interpolation.h"
 #include "libmesh/mesh.h"
+#include "libmesh/mesh_refinement.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/tecplot_io.h"
 #include "libmesh/threads.h"
 #include "libmesh/node.h"
+#include "libmesh/getpot.h"
 #include "meshless_interpolation_function.h"
 
 // C++ includes
@@ -134,6 +136,8 @@ int main(int argc, char ** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
   {
+    GetPot input(argc, argv);
+
     // Demonstration case 1
     {
       std::vector<Point>       tgt_pts;
@@ -152,7 +156,9 @@ int main(int argc, char ** argv)
       idi.set_field_variables (field_vars);
       rbi.set_field_variables (field_vars);
 
-      create_random_point_cloud (100,
+      const int n_source_points = input("n_source_points", 100);
+
+      create_random_point_cloud (n_source_points,
                                  idi.get_source_points());
 
 
@@ -182,7 +188,9 @@ int main(int argc, char ** argv)
 
       // Interpolate to some other random points, and evaluate the result
       {
-        create_random_point_cloud (10,
+        const int n_target_points = input("n_target_points", 100);
+
+        create_random_point_cloud (n_target_points,
                                    tgt_pts);
 
         //tgt_pts = rbi.get_source_points();
@@ -225,6 +233,13 @@ int main(int argc, char ** argv)
 
       mesh_a.read("struct.ucd.gz");
       mesh_b.read("unstruct.ucd.gz");
+
+      // Refine the meshes if requested
+      const int n_refinements = input("n_refinements", 0);
+      MeshRefinement mesh_refinement_a(mesh_a);
+      mesh_refinement_a.uniformly_refine(n_refinements);
+      MeshRefinement mesh_refinement_b(mesh_b);
+      mesh_refinement_b.uniformly_refine(n_refinements);
 
       // Create equation systems objects.
       EquationSystems
