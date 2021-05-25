@@ -29,3 +29,6 @@ run_example_no_extra_options "$example_name" "$options"
 
 options="deltat=0.25 n_timesteps=5 time_solver=euler2 theta=0.5 $common_options $petsc_options"
 run_example_no_extra_options "$example_name" "$options"
+
+# No benchmarks here - we don't do IGA refinement yet so it's hard to
+# scale this up.
