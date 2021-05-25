@@ -84,6 +84,9 @@ int main (int argc, char ** argv)
   // Parse the input file
   GetPot infile("fem_system_ex4.in");
 
+  // But allow the command line to override it.
+  infile.parse_command_line(argc, argv);
+
   // Read in parameters from the input file
   const Real global_tolerance          = infile("global_tolerance", 0.);
   const unsigned int nelem_target      = infile("n_elements", 400);

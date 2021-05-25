@@ -180,6 +180,9 @@ int main(int argc, char ** argv)
   // read simulation parameters from file
   GetPot args = GetPot("solid.in");
 
+  // But allow the command line to override
+  args.parse_command_line(argc, argv);
+
   // Create System and Mesh
   int dim = args("mesh/generation/dimension", 3);
   libmesh_example_requires(dim <= LIBMESH_DIM, "3D support");
