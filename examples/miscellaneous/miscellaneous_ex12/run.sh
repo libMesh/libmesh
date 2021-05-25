@@ -13,3 +13,6 @@ run_example "$example_name" "$options"
 options="-distributed_load 1 -pc_type jacobi -ksp_type cg"
 
 run_example "$example_name" "$options"
+
+# No benchmarks here - if we scale up a little we spend 90%+ of our
+# time in the solver
