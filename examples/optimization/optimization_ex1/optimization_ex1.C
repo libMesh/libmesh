@@ -231,6 +231,7 @@ void AssembleOptimization::hessian (const NumericVector<Number> & /*soln*/,
                                     SparseMatrix<Number> & H_f,
                                     OptimizationSystem & /*sys*/)
 {
+  LOG_SCOPE("hessian()", "AssembleOptimization");
   H_f.zero();
   H_f.add(1., *A_matrix);
 }
