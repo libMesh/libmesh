@@ -113,7 +113,11 @@ benchmark_example() {
       return
     fi
 
-    executable=example-opt
+    if (test "x${METHOD}" = "x"); then
+        METHOD=opt
+    fi
+
+    executable=example-${METHOD}
 
     if (test ! -x ${executable}); then
         echo "ERROR: cannot find ${executable}!"
