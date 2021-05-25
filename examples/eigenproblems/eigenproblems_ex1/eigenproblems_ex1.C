@@ -47,6 +47,7 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/getpot.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -80,8 +81,22 @@ int main (int argc, char ** argv)
 
   libMesh::out << std::endl << std::endl;
 
-  // Get the number of eigen values to be computed from argv[2]
-  const unsigned int nev = std::atoi(argv[2]);
+  // Get the number of eigen values to be computed from "-n", and
+  // possibly the mesh size from -nx and -ny
+
+  GetPot command_line (argc, argv);
+
+  int nev = 5;
+  if (command_line.search(1, "-n"))
+    nev = command_line.next(nev);
+
+  int nx = 20;
+  if (command_line.search(1, "-nx"))
+    nx = command_line.next(nx);
+
+  int ny = 20;
+  if (command_line.search(1, "-ny"))
+    ny = command_line.next(ny);
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
@@ -93,7 +108,7 @@ int main (int argc, char ** argv)
   // Use the internal mesh generator to create a uniform
   // 2D grid on a square.
   MeshTools::Generation::build_square (mesh,
-                                       20, 20,
+                                       nx, ny,
                                        -1., 1.,
                                        -1., 1.,
                                        QUAD4);
