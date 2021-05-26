@@ -56,6 +56,7 @@
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/petsc_macro.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/mesh_refinement.h"
 
 // Local includes
 #include "linear_elasticity_with_contact.h"
@@ -83,6 +84,8 @@ int main (int argc, char ** argv)
   libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   GetPot infile("systems_of_equations_ex8.in");
+  infile.parse_command_line(argc,argv);
+
   const std::string approx_order = infile("approx_order", "FIRST");
   const std::string fe_family = infile("fe_family", "LAGRANGE");
 
@@ -98,6 +101,10 @@ int main (int argc, char ** argv)
   // This example code has not been written to cope with a distributed mesh
   ReplicatedMesh mesh(init.comm());
   mesh.read("systems_of_equations_ex8.exo");
+
+  const unsigned int n_refinements = infile("n_refinements", 0);
+  MeshRefinement mesh_refinement(mesh);
+  mesh_refinement.uniformly_refine(n_refinements);
 
   mesh.print_info();
 

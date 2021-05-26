@@ -431,12 +431,24 @@ int main (int argc, char ** argv)
   libmesh_example_requires(false, "--enable-dirichlet");
 #endif
 
+  // Get the mesh size from the command line.
+  GetPot command_line (argc, argv);
+
+  int nx = 32, ny = 8, nz = 4;
+  if (command_line.search(1, "-nx"))
+    nx = command_line.next(nx);
+  if (command_line.search(1, "-ny"))
+    ny = command_line.next(ny);
+  if (command_line.search(1, "-nz"))
+    nz = command_line.next(nz);
+
+
   // Create a 3D mesh distributed across the default MPI communicator.
   Mesh mesh(init.comm(), dim);
   MeshTools::Generation::build_cube (mesh,
-                                     32,
-                                     8,
-                                     4,
+                                     nx,
+                                     ny,
+                                     nz,
                                      0., 1.*x_scaling,
                                      0., 0.3,
                                      0., 0.1,

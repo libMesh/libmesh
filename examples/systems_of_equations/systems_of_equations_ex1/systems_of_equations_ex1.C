@@ -45,6 +45,7 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/getpot.h"
 
 // For systems of equations the DenseSubMatrix
 // and DenseSubVector provide convenient ways for
@@ -87,13 +88,20 @@ int main (int argc, char ** argv)
   // across the default MPI communicator.
   Mesh mesh(init.comm());
 
+  // Get the mesh size from the command line.
+  GetPot command_line (argc, argv);
+
+  int n_elem = 15;
+  if (command_line.search(1, "-n_elem"))
+    n_elem = command_line.next(n_elem);
+
   // Use the MeshTools::Generation mesh generator to create a uniform
   // 2D grid on the square [-1,1]^2.  We instruct the mesh generator
   // to build a mesh of 8x8 Quad9 elements.  Building these
   // higher-order elements allows us to use higher-order
   // approximation, as in example 3.
   MeshTools::Generation::build_square (mesh,
-                                       15, 15,
+                                       n_elem, n_elem,
                                        0., 1.,
                                        0., 1.,
                                        QUAD9);
