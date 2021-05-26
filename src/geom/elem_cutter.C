@@ -194,8 +194,10 @@ void ElemCutter::find_intersection_points(const Elem & elem,
               const Point x_star = (edge->point(0)*(1-d_star) +
                                     edge->point(1)*d_star);
 
+              /*
               std::cout << "adding cut point (d_star, x_star) = "
                         << d_star << " , " << x_star << std::endl;
+              */
 
               _intersection_pts.push_back (x_star);
             }
@@ -227,7 +229,7 @@ void ElemCutter::cut_2D (const Elem & elem,
 
 #else // OK, LIBMESH_HAVE_TRIANGLE
 
-  std::cout << "Inside cut face element!\n";
+  // std::cout << "Inside cut face element!\n";
 
   libmesh_assert (_inside_mesh_2D.get()  != nullptr);
   libmesh_assert (_outside_mesh_2D.get() != nullptr);
@@ -307,7 +309,7 @@ void ElemCutter::cut_3D (const Elem & elem,
 
 #else // OK, LIBMESH_HAVE_TETGEN
 
-  std::cout << "Inside cut cell element!\n";
+  // std::cout << "Inside cut cell element!\n";
 
   libmesh_assert (_inside_mesh_3D.get()  != nullptr);
   libmesh_assert (_outside_mesh_3D.get() != nullptr);

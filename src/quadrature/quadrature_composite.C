@@ -105,7 +105,7 @@ void QComposite<QSubCell>::init (const Elem & elem,
   // inside subelem
   {
     const std::vector<Elem const *> & inside_elem (_elem_cutter.inside_elements());
-    std::cout << inside_elem.size() << " elements inside\n";
+    // std::cout << inside_elem.size() << " elements inside\n";
 
     this->add_subelem_values(inside_elem);
   }
@@ -113,12 +113,12 @@ void QComposite<QSubCell>::init (const Elem & elem,
   // outside subelem
   {
     const std::vector<Elem const *> & outside_elem (_elem_cutter.outside_elements());
-    std::cout << outside_elem.size() << " elements outside\n";
+    // std::cout << outside_elem.size() << " elements outside\n";
 
     this->add_subelem_values(outside_elem);
   }
 
-  this->print_info();
+  // this->print_info();
 }
 
 
