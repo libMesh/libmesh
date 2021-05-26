@@ -49,6 +49,7 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/getpot.h"
 
 // This example will solve a linear transient system,
 // so we need to include the TransientLinearImplicitSystem definition.
@@ -122,8 +123,8 @@ int main (int argc, char ** argv)
 
   // Read the mesh from file.  This is the coarse mesh that will be used
   // in example 10 to demonstrate adaptive mesh refinement.  Here we will
-  // simply read it in and uniformly refine it 5 times before we compute
-  // with it.
+  // simply read it in and uniformly refine it before we compute with
+  // it.
   //
   // Create a mesh object, with dimension to be overridden later,
   // distributed across the default MPI communicator.
@@ -131,14 +132,16 @@ int main (int argc, char ** argv)
 
   mesh.read ("mesh.xda");
 
+  // Query the command line for the number of mesh refinements to use
+  GetPot input(argc, argv);
+  const unsigned int n_refinements = input("n_refinements", 5);
+
   // Create a MeshRefinement object to handle refinement of our mesh.
   // This class handles all the details of mesh refinement and coarsening.
   MeshRefinement mesh_refinement (mesh);
 
-  // Uniformly refine the mesh 5 times.  This is the
-  // first time we use the mesh refinement capabilities
-  // of the library.
-  mesh_refinement.uniformly_refine (5);
+  // Uniformly refine the mesh as requested.
+  mesh_refinement.uniformly_refine (n_refinements);
 
   // Print information about the mesh to the screen.
   mesh.print_info();
