@@ -69,6 +69,8 @@ void RadialBasisInterpolation<KDDim,RBF>::prepare_for_use()
   libmesh_assert_equal_to (this->_src_vals.size(), n_src_pts*this->n_field_variables());
 
   {
+    LOG_SCOPE ("prepare_for_use():bbox", "RadialBasisInterpolation<>");
+
     Point
       &p_min(_src_bbox.min()),
       &p_max(_src_bbox.max());
@@ -112,6 +114,9 @@ void RadialBasisInterpolation<KDDim,RBF>::prepare_for_use()
 
   DynamicMatrix A(n_src_pts, n_src_pts), x(n_src_pts,n_vars), b(n_src_pts,n_vars);
 
+  {
+  LOG_SCOPE ("prepare_for_use():mat", "RadialBasisInterpolation<>");
+
   for (std::size_t i=0; i<n_src_pts; i++)
     {
       const Point & x_i (_src_pts[i]);
@@ -132,11 +137,16 @@ void RadialBasisInterpolation<KDDim,RBF>::prepare_for_use()
       for (unsigned int var=0; var<n_vars; var++)
         b(i,var) = _src_vals[i*n_vars + var];
     }
+  }
 
 
-  // Solve the linear system
-  x = A.ldlt().solve(b);
-  //x = A.fullPivLu().solve(b);
+  {
+    LOG_SCOPE ("prepare_for_use():solve", "RadialBasisInterpolation<>");
+
+    // Solve the linear system
+    x = A.ldlt().solve(b);
+    //x = A.fullPivLu().solve(b);
+  }
 
   // save  the weights for each variable
   _weights.resize (this->_src_vals.size());
