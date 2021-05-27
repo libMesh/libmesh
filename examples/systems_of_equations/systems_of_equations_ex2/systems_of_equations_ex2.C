@@ -192,7 +192,11 @@ int main (int argc, char** argv)
 
   // We also set a standard linear solver flag in the EquationSystems object
   // which controls the maximum number of linear solver iterations allowed.
-  equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
+  int max_iter = 25;
+  if (command_line.search(1, "-max_iter"))
+    max_iter = command_line.next(max_iter);
+
+  equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = max_iter;
 
   // Tell the system of equations what the timestep is by using
   // the set_parameter function.  The matrix assembly routine can
