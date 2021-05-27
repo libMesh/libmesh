@@ -50,7 +50,7 @@ void create_random_point_cloud (const unsigned int Npts,
                                 std::vector<Point> & pts,
                                 const Real max_range = 10)
 {
-  libMesh::out << "Generating "<< Npts << " point cloud...";
+  libMesh::out << "Generating "<< Npts << " local point cloud...";
   pts.resize(Npts);
 
   for (size_t i=0;i<Npts;i++)
@@ -158,7 +158,12 @@ int main(int argc, char ** argv)
 
       const int n_source_points = input("n_source_points", 100);
 
-      create_random_point_cloud (n_source_points,
+      // Source points are independent on each processor
+      const int my_n_source_points =
+        n_source_points / init.comm().size() +
+        (init.comm().rank() < n_source_points % init.comm().size());
+
+      create_random_point_cloud (my_n_source_points,
                                  idi.get_source_points());
 
 
