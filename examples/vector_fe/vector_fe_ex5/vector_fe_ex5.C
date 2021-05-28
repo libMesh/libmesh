@@ -83,6 +83,9 @@ main(int argc, char ** argv)
   const std::size_t nx = input_file("nx", 15);
   const std::size_t ny = input_file("ny", 15);
 
+  // Read approximation order - default to FIRST
+  const unsigned int approx_order = input_file("approx_order", 1);
+
   // Brief message to the user regarding the program name
   // and command line arguments.
   libMesh::out << "Running " << argv[0];
@@ -117,10 +120,10 @@ main(int argc, char ** argv)
   // The Poisson system is another example of a steady system.
   auto & nl_system = equation_systems.add_system<NonlinearImplicitSystem>("Poisson");
 
-  // Adds the variable "u" to "Poisson".  "u"
-  // will be approximated using first-order vector monomial elements.
+  // Adds the variable "u" to "Poisson". Variable "u" will be approximated using
+  // first-order (can be overridden with command line) vector monomial elements.
   // Since the mesh is 2-D, "u" will have two components.
-  nl_system.add_variable("u", FIRST, MONOMIAL_VEC);
+  nl_system.add_variable("u", static_cast<Order>(approx_order), MONOMIAL_VEC);
 
   // Set the residual and Jacobian evaluation functions
   auto & nl_solver = *nl_system.nonlinear_solver;
@@ -136,7 +139,24 @@ main(int argc, char ** argv)
   nl_system.solve();
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-  ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
+  if (! approx_order) /* CONSTANT, MONOMIAL_VEC */
+    {
+      // Warn about trivial solution for CONSTANT approximations (Poisson must be at least C1)
+      libMesh::out << "\nWARNING: The elemental vector order is CONSTANT. The solution" << std::endl
+                   << "written out to 'out_constant.e' will be trivial." << std::endl;
+
+      // Need to get string of variable names (vector components) for 'set_output_variables()'
+      std::vector<std::string> varnames;
+      equation_systems.build_variable_names(varnames);
+
+      // Create ExodusII object with an unambigous filename (indicating this solution is special)
+      ExodusII_IO exo_ptr(mesh);
+      exo_ptr.write("out_constant.e");
+      exo_ptr.set_output_variables(varnames);
+      exo_ptr.write_element_data(equation_systems);
+    }
+  else
+    ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
 #endif
 
   // All done.
