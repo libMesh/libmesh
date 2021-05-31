@@ -702,8 +702,13 @@ void ExodusII_IO::copy_elemental_solution(System & system,
                                           unsigned int timestep)
 {
   const unsigned int var_num = system.variable_number(system_var_name);
-  libmesh_error_msg_if(system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL),
-                       "Error! Trying to copy elemental solution into a variable that is not of CONSTANT MONOMIAL type.");
+  // Assert that variable is an elemental one.
+  //
+  // NOTE: Currently, this reader is capable of reading only individual components of MONOMIAL_VEC
+  //       types, and each must be written out to its own CONSTANT MONOMIAL variable
+  libmesh_error_msg_if((system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL))
+                       && (system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL_VEC)),
+                       "Error! Trying to copy elemental solution into a variable that is not of CONSTANT MONOMIAL nor CONSTANT MONOMIAL_VEC type.");
 
   const MeshBase & mesh = MeshInput<MeshBase>::mesh();
   const DofMap & dof_map = system.get_dof_map();

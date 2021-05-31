@@ -56,9 +56,12 @@ public:
   CPPUNIT_TEST( testExodusCopyElementSolutionReplicated );
   CPPUNIT_TEST( testExodusReadHeader );
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
+  CPPUNIT_TEST( testExodusCopyElementVectorDistributed );
+  CPPUNIT_TEST( testExodusCopyElementVectorReplicated );
+
   // Eventually this will support complex numbers.
   CPPUNIT_TEST( testExodusWriteElementDataFromDiscontinuousNodalData );
-#endif // LIBMESH_USE_COMPLEX_NUMBERS
+#endif // !LIBMESH_USE_COMPLEX_NUMBERS
 #endif // LIBMESH_HAVE_EXODUS_API
 
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
@@ -69,7 +72,11 @@ public:
   CPPUNIT_TEST( testNemesisCopyNodalSolutionReplicated );
   CPPUNIT_TEST( testNemesisCopyElementSolutionDistributed );
   CPPUNIT_TEST( testNemesisCopyElementSolutionReplicated );
-#endif
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
+  CPPUNIT_TEST( testNemesisCopyElementVectorDistributed );
+  CPPUNIT_TEST( testNemesisCopyElementVectorReplicated );
+#endif // !LIBMESH_USE_COMPLEX_NUMBERS
+#endif // defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
 #ifdef LIBMESH_HAVE_GZSTREAM
   CPPUNIT_TEST( testDynaReadElem );
@@ -305,6 +312,125 @@ public:
 
 
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
+  // So this tester runs through pretty much the same process as 'testCopyElementSolutionImpl()'
+  // except for a CONSTANT MONOMIAL_VEC variable. It mainly serves as a test for writing elemental
+  // vector variables to elements in ExodusII files, and is not actually a test for reading and
+  // copying an elemental solution.
+  template <typename MeshType, typename IOType>
+  void testCopyElementVectorImpl(const std::string & filename)
+  {
+    {
+      MeshType mesh(*TestCommWorld);
+
+      EquationSystems es(mesh);
+      System & sys = es.add_system<System> ("SimpleSystem");
+      auto e_var = sys.add_variable("e", CONSTANT, MONOMIAL_VEC);
+
+      MeshTools::Generation::build_square (mesh,
+                                           3, 3,
+                                           0., 1., 0., 1.);
+
+      es.init();
+
+      // Here, we're going to manually set up the solution because the 'project_solution()' and
+      // 'project_vector()' methods don't work so well with CONSTANT MONOMIAL_VEC variables. They
+      // each lead to an error downstream asserting positive-definiteness when Cholesky decomposing.
+      // Interestingly, the error is only invoked for CONSTANT MONOMIAL_VEC, and not, e.g.,
+      // CONSTANT MONOMIAL nor FIRST LAGRANGE_VEC.
+      //
+      // Anyways, the important thing here is that we test the ExodusII and Nemesis writers, how
+      // the solution is set is hardly important, and we're pretty much following the same
+      // philosophy as the 'test2DProjectVectorFE()' unit tester in 'systems_test.C'
+      Parameters params;
+      for (const auto & elem : mesh.active_local_element_ptr_range())
+      {
+        const Point & p = elem->vertex_average();
+
+        // Set the x-component with the value from 'six_x_plus_sixty_y()' and the y-component
+        // with that from 'sin_x_plus_cos_y()' at the element centroid (vertex average)
+        sys.current_local_solution->set(
+          elem->dof_number(sys.number(), e_var, 0), six_x_plus_sixty_y(p, params, "", ""));
+        sys.current_local_solution->set(
+          elem->dof_number(sys.number(), e_var, 1), sin_x_plus_cos_y(p, params, "", ""));
+      }
+
+      // After setting values, we need to assemble
+      sys.current_local_solution->close();
+
+      IOType meshinput(mesh);
+
+      // Don't try to write element data as nodal data
+      std::set<std::string> sys_list;
+      meshinput.write_equation_systems(filename, es, &sys_list);
+
+      // Just write it as element data
+      meshinput.write_element_data(es);
+    }
+
+    {
+      MeshType mesh(*TestCommWorld);
+      IOType meshinput(mesh);
+
+      // Avoid getting Nemesis solution values mixed up
+      if (meshinput.is_parallel_format())
+        {
+          mesh.allow_renumbering(false);
+          mesh.skip_noncritical_partitioning(true);
+        }
+
+      EquationSystems es(mesh);
+      System & sys = es.add_system<System> ("SimpleSystem");
+
+      // We have to read the CONSTANT MONOMIAL_VEC var "e" into separate CONSTANT MONOMIAL vars
+      // "e_x" and "e_y" because 'copy_elemental_solution()' currently doesn't support vectors.
+      // Again, this isn't a test for reading/copying an elemental vector solution, only writing.
+      sys.add_variable("teste_x", CONSTANT, MONOMIAL);
+      sys.add_variable("teste_y", CONSTANT, MONOMIAL);
+
+      if (mesh.processor_id() == 0 || meshinput.is_parallel_format())
+        meshinput.read(filename);
+      if (!meshinput.is_parallel_format())
+        MeshCommunication().broadcast(mesh);
+      mesh.prepare_for_use();
+
+      es.init();
+
+      // Read the solution e_x and e_y into variable teste_x and teste_y, respectively.
+      meshinput.copy_elemental_solution(sys, "teste_x", "e_x");
+      meshinput.copy_elemental_solution(sys, "teste_y", "e_y");
+
+      // Exodus only handles double precision
+      Real exotol = std::max(TOLERANCE*TOLERANCE, Real(1e-12));
+
+      for (Real x = Real(1.L/6.L); x < 1; x += Real(1.L/3.L))
+        for (Real y = Real(1.L/6.L); y < 1; y += Real(1.L/3.L))
+          {
+            Point p(x,y);
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
+                                    libmesh_real(6*x+60*y),
+                                    exotol);
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(1,p)),
+                                    libmesh_real(sin(x)+cos(y)),
+                                    exotol);
+          }
+    }
+  }
+
+  void testExodusCopyElementVectorReplicated ()
+  { testCopyElementVectorImpl<ReplicatedMesh, ExodusII_IO>("repl_with_elem_vec.e"); }
+
+  void testExodusCopyElementVectorDistributed ()
+  { testCopyElementVectorImpl<DistributedMesh,ExodusII_IO>("dist_with_elem_vec.e"); }
+
+#if defined(LIBMESH_HAVE_NEMESIS_API)
+  void testNemesisCopyElementVectorReplicated ()
+  { testCopyElementVectorImpl<ReplicatedMesh,Nemesis_IO>("repl_with_elem_vec.nem"); }
+
+  void testNemesisCopyElementVectorDistributed ()
+  { testCopyElementVectorImpl<DistributedMesh,Nemesis_IO>("dist_with_elem_vec.nem"); }
+#endif
+
+
   void testExodusWriteElementDataFromDiscontinuousNodalData()
   {
     // first scope: write file
