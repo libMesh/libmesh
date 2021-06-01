@@ -118,6 +118,8 @@ void LinearImplicitSystem::solve ()
   else
     linear_solver->init();
 
+  linear_solver->init_names(*this);
+
   // Get the user-specified linear solver tolerance
   const double tol =
     double(es.parameters.get<Real>("linear solver tolerance"));
