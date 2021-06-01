@@ -21,6 +21,6 @@ solver_quiet = false
 dimension = 2
 
 # Nonlinear solver tolerance
-relative_step_tolerance = 1e-7
+relative_step_tolerance = 1e-6
 
-relative_residual_tolerance = 1.e-7
+relative_residual_tolerance = 1.e-6
