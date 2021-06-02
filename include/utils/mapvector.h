@@ -20,6 +20,9 @@
 #ifndef LIBMESH_MAPVECTOR_H
 #define LIBMESH_MAPVECTOR_H
 
+// libMesh Includes   -------------------------------
+#include "libmesh/pool_allocator.h"
+
 // C++ Includes   -----------------------------------
 #include <map>
 
@@ -36,10 +39,13 @@ namespace libMesh
  */
 
 template <typename Val, typename index_t=unsigned int>
-class mapvector : public std::map<index_t, Val>
+class mapvector :
+  public std::map<index_t, Val, std::less<index_t>,
+                  FastPoolAllocator<std::pair<const index_t, Val>>>
 {
 public:
-  typedef std::map<index_t, Val> maptype;
+  typedef std::map<index_t, Val, std::less<index_t>,
+                   FastPoolAllocator<std::pair<const index_t, Val>>> maptype;
 
   Val & operator[] (const index_t & k)
   {
