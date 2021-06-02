@@ -25,6 +25,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_communication.h"
+#include "libmesh/metis_partitioner.h"
 #include "libmesh/parmetis_partitioner.h"
 
 // TIMPI includes
@@ -54,8 +55,10 @@ DistributedMesh::DistributedMesh (const Parallel::Communicator & comm_in,
   _next_unique_id = this->processor_id();
 #endif
 
-  // FIXME: give parmetis the communicator!
-  _partitioner = libmesh_make_unique<ParmetisPartitioner>();
+  if (libMesh::on_command_line("--use-metis-partitioner"))
+    _partitioner = libmesh_make_unique<MetisPartitioner>();
+  else
+    _partitioner = libmesh_make_unique<ParmetisPartitioner>();
 }
 
 DistributedMesh & DistributedMesh::operator= (DistributedMesh && other_mesh)

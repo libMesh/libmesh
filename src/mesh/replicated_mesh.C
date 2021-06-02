@@ -22,6 +22,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/metis_partitioner.h"
+#include "libmesh/parmetis_partitioner.h"
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/utility.h"
 #include "libmesh/parallel.h"
@@ -92,7 +93,10 @@ ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
   // here in the constructor.
   _next_unique_id = 0;
 #endif
-  _partitioner = libmesh_make_unique<MetisPartitioner>();
+  if (libMesh::on_command_line("--use-parmetis-partitioner"))
+    _partitioner = libmesh_make_unique<ParmetisPartitioner>();
+  else
+    _partitioner = libmesh_make_unique<MetisPartitioner>();
 }
 
 
