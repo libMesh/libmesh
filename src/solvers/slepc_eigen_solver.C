@@ -32,6 +32,14 @@
 #include "libmesh/enum_eigen_solver_type.h"
 #include "libmesh/petsc_shell_matrix.h"
 
+// PETSc 3.15 includes a non-release SLEPc 3.14.2 that has already
+// deprecated STPrecondSetMatForPC but that hasn't upgraded its
+// version number to let us switch to the non-deprecated version.  If
+// we're in that situation we need to ignore the deprecated warning.
+#if SLEPC_VERSION_LESS_THAN(3,15,0) && !SLEPC_VERSION_LESS_THAN(3,14,2)
+#include "libmesh/ignore_warnings.h"
+#endif
+
 namespace libMesh
 {
 
@@ -1060,6 +1068,11 @@ template class SlepcEigenSolver<Number>;
 
 } // namespace libMesh
 
+
+// In case we do unity builds someday
+#if SLEPC_VERSION_LESS_THAN(3,15,0) && !SLEPC_VERSION_LESS_THAN(3,14,2)
+#include "libmesh/restore_warnings.h"
+#endif
 
 
 #endif // #ifdef LIBMESH_HAVE_SLEPC
