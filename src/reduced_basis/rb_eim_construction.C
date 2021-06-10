@@ -59,7 +59,8 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
     _Nmax(0),
     _rel_training_tolerance(1.e-4),
     _abs_training_tolerance(1.e-12),
-    _max_abs_value_in_training_set(0.)
+    _max_abs_value_in_training_set(0.),
+    _max_abs_value_in_training_set_index(0)
 {
   // The training set should be the same on all processors in the
   // case of EIM training.
@@ -324,8 +325,11 @@ Real RBEIMConstruction::train_eim_approximation()
   Real initial_greedy_error = 0.;
   bool initial_greedy_error_initialized = false;
   std::vector<RBParameters> greedy_param_list;
-  greedy_param_list.emplace_back();
-  unsigned int current_training_index = 0;
+
+  // Initialize the current training index to the index that corresponds
+  // to the largest (in terms of infinity norm) function in the training set.
+  // We do this to ensure that the first EIM basis function is not zero.
+  unsigned int current_training_index = _max_abs_value_in_training_set_index;
   set_params_from_training_set(current_training_index);
   while (true)
     {
@@ -619,7 +623,11 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
 
                 Real abs_value = std::abs(value);
                 if (abs_value > _max_abs_value_in_training_set)
-                  _max_abs_value_in_training_set = abs_value;
+                  {
+                    _max_abs_value_in_training_set = abs_value;
+                    _max_abs_value_in_training_set_index = i;
+                  }
+
               }
           }
 
@@ -925,6 +933,8 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
   this->comm().broadcast(optimal_point_perturbs, proc_ID_index);
 
   libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
+
+  libmesh_error_msg_if(optimal_value == 0., "New EIM basis function should not be zero");
 
   // Scale local_pf so that its largest value is 1.0
   scale_parametrized_function(local_pf, 1./optimal_value);
