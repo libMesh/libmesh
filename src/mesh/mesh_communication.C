@@ -2096,10 +2096,11 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
                    mesh.pid_elements_end(DofObject::invalid_processor_id),
                    elements_to_keep);
 
-  // The elements we need should have their ancestors and their
-  // subactive children present too.  If the mesh has any
-  // constraint rows, then elements with constrained nodes need
-  // elements with constraining nodes to remain present.
+  // The elements we need should have their ancestors, their
+  // interior_parent links, and their subactive children present too.
+  // If the mesh has any constraint rows, then elements with
+  // constrained nodes need elements with constraining nodes to remain
+  // present.
   connect_families(elements_to_keep, &mesh);
 
   // Don't delete nodes that our semilocal elements need
