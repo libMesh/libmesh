@@ -326,6 +326,11 @@ private:
   Real _max_abs_value_in_training_set;
 
   /**
+   * The training sample index at which we found _max_abs_value_in_training_set.
+   */
+  unsigned int _max_abs_value_in_training_set_index;
+
+  /**
    * The quadrature point locations, quadrature point weights (JxW), and subdomain IDs
    * on every element local to this processor.
    *
