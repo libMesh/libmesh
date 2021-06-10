@@ -232,7 +232,7 @@ int main (int argc, char ** argv)
 
 
   // Add the variable "u" to "Poisson".  "u"
-  // will be approximated using second-order approximation.
+  // will be approximated using second-order approximation by default
   unsigned int u_var = system.add_variable("u",
                                            Utility::string_to_enum<Order>   (order),
                                            Utility::string_to_enum<FEFamily>(family));
