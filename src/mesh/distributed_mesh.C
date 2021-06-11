@@ -288,10 +288,10 @@ dof_id_type DistributedMesh::parallel_max_elem_id() const
 
   dof_id_type max_local = 0;
 
-  mapvector<Elem *,dof_id_type>::const_reverse_veclike_iterator
+  dofobject_container<Elem>::const_reverse_veclike_iterator
     rit = _elements.rbegin();
 
-  const mapvector<Elem *,dof_id_type>::const_reverse_veclike_iterator
+  const dofobject_container<Elem>::const_reverse_veclike_iterator
     rend = _elements.rend();
 
   // Look for the maximum element id.  Search backwards through
@@ -362,10 +362,10 @@ dof_id_type DistributedMesh::parallel_max_node_id() const
 
   dof_id_type max_local = 0;
 
-  mapvector<Node *,dof_id_type>::const_reverse_veclike_iterator
+  dofobject_container<Node>::const_reverse_veclike_iterator
     rit = _nodes.rbegin();
 
-  const mapvector<Node *,dof_id_type>::const_reverse_veclike_iterator
+  const dofobject_container<Node>::const_reverse_veclike_iterator
     rend = _nodes.rend();
 
   // Look for the maximum node id.  Search backwards through
@@ -547,9 +547,9 @@ Elem * DistributedMesh::add_elem (Elem * e)
         (this->n_processors() + 1) + this->processor_id();
 
 #ifndef NDEBUG
-    // We need a const mapvector so we don't inadvertently create
+    // We need a const dofobject_container so we don't inadvertently create
     // nullptr entries when testing for non-nullptr ones
-    const mapvector<Elem *, dof_id_type> & const_elements = _elements;
+    const dofobject_container<Elem> & const_elements = _elements;
 #endif
     libmesh_assert(!const_elements[_next_free_unpartitioned_elem_id]);
     libmesh_assert(!const_elements[_next_free_local_elem_id]);
@@ -807,9 +807,9 @@ Node * DistributedMesh::add_node (Node * n)
         (this->n_processors() + 1) + this->processor_id();
 
 #ifndef NDEBUG
-    // We need a const mapvector so we don't inadvertently create
+    // We need a const dofobject_container so we don't inadvertently create
     // nullptr entries when testing for non-nullptr ones
-    const mapvector<Node *,dof_id_type> & const_nodes = _nodes;
+    const dofobject_container<Node> & const_nodes = _nodes;
 #endif
     libmesh_assert(!const_nodes[_next_free_unpartitioned_node_id]);
     libmesh_assert(!const_nodes[_next_free_local_node_id]);
@@ -1033,7 +1033,7 @@ void DistributedMesh::update_post_partitioning ()
 
 
 template <typename T>
-void DistributedMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T *, dof_id_type> & objects) const
+void DistributedMesh::libmesh_assert_valid_parallel_object_ids(const dofobject_container<T> & objects) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -1150,12 +1150,12 @@ void DistributedMesh::libmesh_assert_valid_parallel_flags () const
 
 template <typename T>
 dof_id_type
-DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
+DistributedMesh::renumber_dof_objects(dofobject_container<T> & objects)
 {
   // This function must be run on all processors at once
   parallel_object_only();
 
-  typedef typename mapvector<T *,dof_id_type>::veclike_iterator object_iterator;
+  typedef typename dofobject_container<T>::veclike_iterator object_iterator;
 
   // In parallel we may not know what objects other processors have.
   // Start by figuring out how many
@@ -1576,16 +1576,16 @@ void DistributedMesh::delete_remote_elements()
 
   // Now make sure the containers actually shrink - strip
   // any newly-created nullptr voids out of the element array
-  mapvector<Elem *,dof_id_type>::veclike_iterator e_it        = _elements.begin();
-  const mapvector<Elem *,dof_id_type>::veclike_iterator e_end = _elements.end();
+  dofobject_container<Elem>::veclike_iterator e_it        = _elements.begin();
+  const dofobject_container<Elem>::veclike_iterator e_end = _elements.end();
   while (e_it != e_end)
     if (!*e_it)
       e_it = _elements.erase(e_it);
     else
       ++e_it;
 
-  mapvector<Node *,dof_id_type>::veclike_iterator n_it        = _nodes.begin();
-  const mapvector<Node *,dof_id_type>::veclike_iterator n_end = _nodes.end();
+  dofobject_container<Node>::veclike_iterator n_it        = _nodes.begin();
+  const dofobject_container<Node>::veclike_iterator n_end = _nodes.end();
   while (n_it != n_end)
     if (!*n_it)
       n_it = _nodes.erase(n_it);
