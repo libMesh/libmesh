@@ -550,7 +550,20 @@ unsigned int Elem::which_node_am_i(unsigned int side,
 bool Elem::contains_vertex_of(const Elem * e) const
 {
   // Our vertices are the first numbered nodes
+  const unsigned int nv = e->n_vertices();
+
+  // Check for vertex-to-vertex containment first; contains_point() is
+  // expensive
   for (auto n : make_range(e->n_vertices()))
+    {
+      const Node * vertex = e->node_ptr(n);
+      for (auto & my_n : this->node_ref_range())
+        if (&my_n == vertex)
+          return true;
+    }
+
+  // Our vertices are the first numbered nodes
+  for (auto n : make_range(nv))
     if (this->contains_point(e->point(n)))
       return true;
   return false;
