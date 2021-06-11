@@ -449,19 +449,50 @@ AS_IF([test "$enablenodeconstraint" != no],
 
 # -------------------------------------------------------------
 # Mesh == ParallelMesh -- disabled by default for max compatibility
+# This flag is old/deprecated
 # -------------------------------------------------------------
 AC_ARG_ENABLE(parmesh,
               AS_HELP_STRING([--enable-parmesh],
-                             [Use distributed ParallelMesh as Mesh]),
+                             [Deprecated alias of --enable-distmesh]),
               enableparmesh=$enableval,
               enableparmesh=no)
 
-AS_IF([test "$enableparmesh" != no],
+AS_IF([test "$enabledistmesh" != no],
       [
-        AC_DEFINE(ENABLE_PARMESH, 1, [Flag indicating if the library should use the experimental ParallelMesh as its default Mesh type])
-        AC_MSG_RESULT(<<< Configuring library to use ParallelMesh >>>)
+        AC_MSG_RESULT(<<< --enable-parmesh is deprecated; use --enable-distmesh >>>)
       ])
 # -------------------------------------------------------------
+
+# -------------------------------------------------------------
+# Mesh == DistributedMesh -- disabled by default for max
+# compatibility, so DistributedMesh must be chosen manually
+# -------------------------------------------------------------
+AC_ARG_ENABLE(distmesh,
+              AS_HELP_STRING([--enable-distmesh],
+                             [Use DistributedMesh as Mesh]),
+              enabledistmesh=$enableval,
+              enabledistmesh=$enableparmesh)
+
+AS_IF([test "$enabledistmesh" != no],
+      [
+        AC_DEFINE(ENABLE_PARMESH, 1, [Flag indicating if the library should use the experimental ParallelMesh as its default Mesh type])
+        AC_MSG_RESULT(<<< Defaulting library to DistributedMesh >>>)
+      ])
+# -------------------------------------------------------------
+#
+
+# -------------------------------------------------------------
+# size of mapvector/chunked_mapvector nodes -- default 1 object
+# -------------------------------------------------------------
+AC_ARG_WITH([mapvector_chunk_size],
+            AS_HELP_STRING([--with-mapvector-chunk-size=<uint, e.g. 64>],
+                           [objects per DistributedMesh mapvector chunk [1]]),
+            [mapvector_chunk_size="$withval"],
+            [mapvector_chunk_size=1])
+
+AC_DEFINE_UNQUOTED(MAPVECTOR_CHUNK_SIZE, $mapvector_chunk_size, [size of mapvector chunks])
+AC_MSG_RESULT([configuring size of mapvector chunks: $mapvector_chunk_size])
+
 
 
 
