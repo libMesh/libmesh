@@ -21,8 +21,14 @@
 #define LIBMESH_DISTRIBUTED_MESH_H
 
 // Local Includes
-// #include "libmesh/chunked_mapvector.h"
-#include "libmesh/mapvector.h"
+#include "libmesh_config.h"
+
+#if LIBMESH_MAPVECTOR_CHUNK_SIZE == 1
+#  include "libmesh/mapvector.h"
+#else
+#  include "libmesh/chunked_mapvector.h"
+#endif
+
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 
@@ -53,8 +59,11 @@ class DistributedMesh : public UnstructuredMesh
 public:
 
   template <typename Obj>
+#if LIBMESH_MAPVECTOR_CHUNK_SIZE == 1
   using dofobject_container = mapvector<Obj *, dof_id_type>;
-//  using dofobject_container = chunked_mapvector<Obj *, dof_id_type, 64>;
+#else
+  using dofobject_container = chunked_mapvector<Obj *, dof_id_type, LIBMESH_MAPVECTOR_CHUNK_SIZE>;
+#endif
 
   /**
    * Constructor.  Takes \p dim, the dimension of the mesh.
