@@ -1025,6 +1025,7 @@ include_HEADERS = \
         timpi_shims/request.h \
         timpi_shims/standard_type.h \
         timpi_shims/status.h \
+        utils/chunked_mapvector.h \
         utils/compare_types.h \
         utils/enum_to_string.h \
         utils/error_vector.h \
