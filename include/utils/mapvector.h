@@ -75,6 +75,9 @@ public:
       return it != other.it;
     }
 
+  private:
+    friend class mapvector;
+
     typename maptype::iterator it;
   };
 
@@ -110,6 +113,9 @@ public:
       return it != other.it;
     }
 
+  private:
+    friend class mapvector;
+
     typename maptype::const_iterator it;
   };
 
@@ -142,6 +148,9 @@ public:
     bool operator!=(const const_reverse_veclike_iterator & other) const {
       return it != other.it;
     }
+
+  private:
+    friend class mapvector;
 
     typename maptype::const_reverse_iterator it;
   };
