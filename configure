@@ -1196,6 +1196,8 @@ enable_periodic
 enable_dirichlet
 enable_nodeconstraint
 enable_parmesh
+enable_distmesh
+with_mapvector_chunk_size
 enable_ghosted
 enable_node_valence
 enable_1D_only
@@ -2002,7 +2004,8 @@ Optional Features:
   --disable-periodic      build without periodic boundary condition support
   --disable-dirichlet     build without Dirichlet boundary constraint support
   --enable-nodeconstraint build with node constraints support
-  --enable-parmesh        Use distributed ParallelMesh as Mesh
+  --enable-parmesh        Deprecated alias of --enable-distmesh
+  --enable-distmesh       Use DistributedMesh as Mesh
   --disable-ghosted       Use dense instead of sparse/ghosted local vectors
   --disable-node-valence  Do not compute and store node valence values
   --enable-1D-only        build with support for 1D meshes only
@@ -2122,6 +2125,8 @@ Optional Packages:
                           subdomain_id [2]
   --with-unique-id-bytes=<1|2|4|8>
                           bytes used per unique id [8]
+  --with-mapvector-chunk-size=<uint, e.g. 64>
+                          objects per DistributedMesh mapvector chunk [1]
   --with-boost[=ARG]      use Boost library from a standard location
                           (ARG=yes), from the specified location (ARG=<path>),
                           or disable it (ARG=no) [ARG=yes]
@@ -46808,6 +46813,7 @@ fi
 
 # -------------------------------------------------------------
 # Mesh == ParallelMesh -- disabled by default for max compatibility
+# This flag is old/deprecated
 # -------------------------------------------------------------
 # Check whether --enable-parmesh was given.
 if test "${enable_parmesh+set}" = set; then :
@@ -46817,16 +46823,58 @@ else
 fi
 
 
-if test "$enableparmesh" != no; then :
+if test "$enabledistmesh" != no; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< --enable-parmesh is deprecated; use --enable-distmesh >>>" >&5
+$as_echo "<<< --enable-parmesh is deprecated; use --enable-distmesh >>>" >&6; }
+
+fi
+# -------------------------------------------------------------
+
+# -------------------------------------------------------------
+# Mesh == DistributedMesh -- disabled by default for max
+# compatibility, so DistributedMesh must be chosen manually
+# -------------------------------------------------------------
+# Check whether --enable-distmesh was given.
+if test "${enable_distmesh+set}" = set; then :
+  enableval=$enable_distmesh; enabledistmesh=$enableval
+else
+  enabledistmesh=$enableparmesh
+fi
+
+
+if test "$enabledistmesh" != no; then :
 
 
 $as_echo "#define ENABLE_PARMESH 1" >>confdefs.h
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library to use ParallelMesh >>>" >&5
-$as_echo "<<< Configuring library to use ParallelMesh >>>" >&6; }
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Defaulting library to DistributedMesh >>>" >&5
+$as_echo "<<< Defaulting library to DistributedMesh >>>" >&6; }
 
 fi
 # -------------------------------------------------------------
+#
+
+# -------------------------------------------------------------
+# size of mapvector/chunked_mapvector nodes -- default 1 object
+# -------------------------------------------------------------
+
+# Check whether --with-mapvector_chunk_size was given.
+if test "${with_mapvector_chunk_size+set}" = set; then :
+  withval=$with_mapvector_chunk_size; mapvector_chunk_size="$withval"
+else
+  mapvector_chunk_size=1
+fi
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define MAPVECTOR_CHUNK_SIZE $mapvector_chunk_size
+_ACEOF
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: configuring size of mapvector chunks: $mapvector_chunk_size" >&5
+$as_echo "configuring size of mapvector chunks: $mapvector_chunk_size" >&6; }
+
 
 
 
