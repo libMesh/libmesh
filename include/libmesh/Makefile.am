@@ -433,6 +433,7 @@ BUILT_SOURCES = \
         request.h \
         standard_type.h \
         status.h \
+        chunked_mapvector.h \
         compare_types.h \
         enum_to_string.h \
         error_vector.h \
@@ -1833,6 +1834,9 @@ standard_type.h: $(top_srcdir)/include/timpi_shims/standard_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 status.h: $(top_srcdir)/include/timpi_shims/status.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+chunked_mapvector.h: $(top_srcdir)/include/utils/chunked_mapvector.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 compare_types.h: $(top_srcdir)/include/utils/compare_types.h
