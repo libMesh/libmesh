@@ -47,16 +47,6 @@ public:
   typedef std::map<index_t, Val, std::less<index_t>,
                    FastPoolAllocator<std::pair<const index_t, Val>>> maptype;
 
-  Val & operator[] (const index_t & k)
-  {
-    return maptype::operator[](k);
-  }
-  Val operator[] (const index_t & k) const
-  {
-    typename maptype::const_iterator it = this->find(k);
-    return it == this->end().it? Val() : it->second;
-  }
-
   class veclike_iterator
   {
   public:
@@ -66,6 +56,8 @@ public:
     veclike_iterator(const veclike_iterator & i) = default;
 
     Val & operator*() const { return it->second; }
+
+    index_t index() const { return it->first; }
 
     veclike_iterator & operator++() { ++it; return *this; }
 
@@ -100,6 +92,8 @@ public:
 
     const Val & operator*() const { return it->second; }
 
+    index_t index() const { return it->first; }
+
     const_veclike_iterator & operator++() { ++it; return *this; }
 
     const_veclike_iterator operator++(int) {
@@ -118,6 +112,60 @@ public:
 
     typename maptype::const_iterator it;
   };
+
+  class const_reverse_veclike_iterator
+  {
+  public:
+    const_reverse_veclike_iterator(const typename maptype::const_reverse_iterator & i)
+      : it(i) {}
+
+    const_reverse_veclike_iterator(const const_veclike_iterator & i)
+      : it(i.it) {}
+
+    const_reverse_veclike_iterator(const veclike_iterator & i)
+      : it(i.it) {}
+
+    const Val & operator*() const { return it->second; }
+
+    const_reverse_veclike_iterator & operator++() { ++it; return *this; }
+
+    const_reverse_veclike_iterator operator++(int) {
+      const_reverse_veclike_iterator i = *this;
+      ++(*this);
+      return i;
+    }
+
+    bool operator==(const const_reverse_veclike_iterator & other) const {
+      return it == other.it;
+    }
+
+    bool operator!=(const const_reverse_veclike_iterator & other) const {
+      return it != other.it;
+    }
+
+    typename maptype::const_reverse_iterator it;
+  };
+
+  veclike_iterator find (const index_t & k)
+  {
+    return veclike_iterator(maptype::find(k));
+  }
+
+  const_veclike_iterator find (const index_t & k) const
+  {
+    return const_veclike_iterator(maptype::find(k));
+  }
+
+  Val & operator[] (const index_t & k)
+  {
+    return maptype::operator[](k);
+  }
+
+  Val operator[] (const index_t & k) const
+  {
+    auto it = this->maptype::find(k);
+    return it == this->end().it? Val() : it->second;
+  }
 
   void erase(index_t i) {
     maptype::erase(i);

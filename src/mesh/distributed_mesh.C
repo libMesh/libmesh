@@ -288,22 +288,25 @@ dof_id_type DistributedMesh::parallel_max_elem_id() const
 
   dof_id_type max_local = 0;
 
-  mapvector<Elem *,dof_id_type>::maptype::const_reverse_iterator
+  mapvector<Elem *,dof_id_type>::const_reverse_veclike_iterator
     rit = _elements.rbegin();
 
-  const mapvector<Elem *,dof_id_type>::maptype::const_reverse_iterator
+  const mapvector<Elem *,dof_id_type>::const_reverse_veclike_iterator
     rend = _elements.rend();
 
   // Look for the maximum element id.  Search backwards through
   // elements so we can break out early.  Beware of nullptr entries that
   // haven't yet been cleared from _elements.
   for (; rit != rend; ++rit)
-    if (rit->second)
-      {
-        libmesh_assert_equal_to(rit->second->id(), rit->first);
-        max_local = rit->first + 1;
-        break;
-      }
+    {
+      const DofObject *d = *rit;
+      if (d)
+        {
+          libmesh_assert(_elements[d->id()] == d);
+          max_local = d->id() + 1;
+          break;
+        }
+    }
 
   this->comm().max(max_local);
   return max_local;
@@ -359,22 +362,25 @@ dof_id_type DistributedMesh::parallel_max_node_id() const
 
   dof_id_type max_local = 0;
 
-  mapvector<Node *,dof_id_type>::maptype::const_reverse_iterator
+  mapvector<Node *,dof_id_type>::const_reverse_veclike_iterator
     rit = _nodes.rbegin();
 
-  const mapvector<Node *,dof_id_type>::maptype::const_reverse_iterator
+  const mapvector<Node *,dof_id_type>::const_reverse_veclike_iterator
     rend = _nodes.rend();
 
-  // Look for the maximum element id.  Search backwards through
-  // elements so we can break out early.  Beware of nullptr entries that
-  // haven't yet been cleared from _elements.
+  // Look for the maximum node id.  Search backwards through
+  // nodes so we can break out early.  Beware of nullptr entries that
+  // haven't yet been cleared from _nodes
   for (; rit != rend; ++rit)
-    if (rit->second)
-      {
-        libmesh_assert_equal_to(rit->second->id(), rit->first);
-        max_local = rit->first + 1;
-        break;
-      }
+    {
+      const DofObject *d = *rit;
+      if (d)
+        {
+          libmesh_assert(_nodes[d->id()] == d);
+          max_local = d->id() + 1;
+          break;
+        }
+    }
 
   this->comm().max(max_local);
   return max_local;
@@ -413,10 +419,10 @@ Node * DistributedMesh::node_ptr (const dof_id_type i)
 
 const Node * DistributedMesh::query_node_ptr (const dof_id_type i) const
 {
-  std::map<dof_id_type, Node *>::const_iterator it = _nodes.find(i);
-  if (it != _nodes.end().it)
+  auto it = _nodes.find(i);
+  if (it != _nodes.end())
     {
-      const Node * n = it->second;
+      const Node * n = *it;
       libmesh_assert (!n || n->id() == i);
       return n;
     }
@@ -429,10 +435,10 @@ const Node * DistributedMesh::query_node_ptr (const dof_id_type i) const
 
 Node * DistributedMesh::query_node_ptr (const dof_id_type i)
 {
-  std::map<dof_id_type, Node *>::const_iterator it = _nodes.find(i);
-  if (it != _nodes.end().it)
+  auto it = _nodes.find(i);
+  if (it != _nodes.end())
     {
-      Node * n = it->second;
+      Node * n = *it;
       libmesh_assert (!n || n->id() == i);
       return n;
     }
@@ -467,10 +473,10 @@ Elem * DistributedMesh::elem_ptr (const dof_id_type i)
 
 const Elem * DistributedMesh::query_elem_ptr (const dof_id_type i) const
 {
-  std::map<dof_id_type, Elem *>::const_iterator it = _elements.find(i);
-  if (it != _elements.end().it)
+  auto it = _elements.find(i);
+  if (it != _elements.end())
     {
-      const Elem * e = it->second;
+      const Elem * e = *it;
       libmesh_assert (!e || e->id() == i);
       return e;
     }
@@ -483,8 +489,8 @@ const Elem * DistributedMesh::query_elem_ptr (const dof_id_type i) const
 
 Elem * DistributedMesh::query_elem_ptr (const dof_id_type i)
 {
-  std::map<dof_id_type, Elem *>::const_iterator it = _elements.find(i);
-  if (it != _elements.end().it)
+  auto it = _elements.find(i);
+  if (it != _elements.end())
     {
       Elem * e = _elements[i];
       libmesh_assert (!e || e->id() == i);
@@ -724,9 +730,9 @@ Node * DistributedMesh::add_point (const Point & p,
                                    const processor_id_type proc_id)
 {
   auto n_it = _nodes.find(id);
-  if (n_it != _nodes.end().it)
+  if (n_it != _nodes.end())
     {
-      Node * n = n_it->second;
+      Node * n = *n_it;
       libmesh_assert (n);
       libmesh_assert_equal_to (n->id(), id);
 
@@ -1229,6 +1235,8 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
   for (it = objects.begin(); it != end; ++it)
     {
       T * obj = *it;
+      if (!obj)
+        continue;
       if (obj->processor_id() == this->processor_id())
         obj->set_id(next_id++);
       else if (obj->processor_id() != DofObject::invalid_processor_id)
@@ -1347,6 +1355,8 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
   for (it = objects.begin(); it != end; ++it)
     {
       T * obj = *it;
+      if (!obj)
+        continue;
       if (obj->processor_id() == DofObject::invalid_processor_id)
         obj->set_id(next_id++);
     }
@@ -1483,20 +1493,34 @@ void DistributedMesh::renumber_nodes_and_elements ()
 
 void DistributedMesh::fix_broken_node_and_element_numbering ()
 {
-  // We need access to iterators for the underlying containers,
-  // not the mapvector<> reimplementations.
-  mapvector<Node *,dof_id_type>::maptype & nodes = this->_nodes;
-  mapvector<Elem *,dof_id_type>::maptype & elems = this->_elements;
+  // We can't use range-for here because we need access to the special
+  // iterators' methods, not just to their dereferenced values.
 
   // Nodes first
-  for (auto & pr : nodes)
-    if (pr.second != nullptr)
-      pr.second->set_id() = pr.first;
+  for (auto pr = this->_nodes.begin(),
+           end = this->_nodes.end(); pr != end; ++pr)
+    {
+      Node * n = *pr;
+      if (n != nullptr)
+        {
+          const dof_id_type id = pr.index();
+          n->set_id() = id;
+          libmesh_assert_equal_to(this->node_ptr(id), n);
+        }
+    }
 
   // Elements next
-  for (const auto & pr : elems)
-    if (pr.second != nullptr)
-      pr.second->set_id() = pr.first;
+  for (auto pr = this->_elements.begin(),
+           end = this->_elements.end(); pr != end; ++pr)
+    {
+      Elem * e = *pr;
+      if (e != nullptr)
+        {
+          const dof_id_type id = pr.index();
+          e->set_id() = id;
+          libmesh_assert_equal_to(this->elem_ptr(id), e);
+        }
+    }
 }
 
 
