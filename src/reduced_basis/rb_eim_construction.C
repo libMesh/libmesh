@@ -637,7 +637,9 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
 
   libMesh::out << "Parametrized functions in training set initialized" << std::endl;
 
-  comm().max(_max_abs_value_in_training_set);
+  unsigned int max_id = 0;
+  comm().maxloc(_max_abs_value_in_training_set, max_id);
+  comm().broadcast(_max_abs_value_in_training_set_index, max_id);
   libMesh::out << "Maximum absolute value in the training set: "
     << _max_abs_value_in_training_set << std::endl << std::endl;
 }
