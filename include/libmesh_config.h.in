@@ -623,6 +623,9 @@
 /* libMesh major version number */
 #undef MAJOR_VERSION
 
+/* size of mapvector chunks */
+#undef MAPVECTOR_CHUNK_SIZE
+
 /* libMesh micro version number */
 #undef MICRO_VERSION
 

@@ -20,7 +20,7 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/dof_map.h"
-#include "libmesh/mapvector.h"
+#include "libmesh/distributed_mesh.h"
 
 namespace libMesh
 {
@@ -71,10 +71,10 @@ INSTANTIATE_ELEM_PREDICATES(std::vector<Elem *>::iterator);
 INSTANTIATE_ELEM_PREDICATES(std::vector<Elem *>::const_iterator);
 INSTANTIATE_NODAL_PREDICATES(std::vector<Node *>::iterator);
 INSTANTIATE_NODAL_PREDICATES(std::vector<Node *>::const_iterator);
-INSTANTIATE_ELEM_PREDICATES(mapvector<Elem * LIBMESH_COMMA dof_id_type>::veclike_iterator);
-INSTANTIATE_ELEM_PREDICATES(mapvector<Elem * LIBMESH_COMMA dof_id_type>::const_veclike_iterator);
-INSTANTIATE_NODAL_PREDICATES(mapvector<Node * LIBMESH_COMMA dof_id_type>::veclike_iterator);
-INSTANTIATE_NODAL_PREDICATES(mapvector<Node * LIBMESH_COMMA dof_id_type>::const_veclike_iterator);
+INSTANTIATE_ELEM_PREDICATES(DistributedMesh::dofobject_container<Elem>::veclike_iterator);
+INSTANTIATE_ELEM_PREDICATES(DistributedMesh::dofobject_container<Elem>::const_veclike_iterator);
+INSTANTIATE_NODAL_PREDICATES(DistributedMesh::dofobject_container<Node>::veclike_iterator);
+INSTANTIATE_NODAL_PREDICATES(DistributedMesh::dofobject_container<Node>::const_veclike_iterator);
 
 
 } // namespace Predicates
