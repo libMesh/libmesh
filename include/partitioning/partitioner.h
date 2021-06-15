@@ -36,6 +36,7 @@ namespace libMesh
 
 // Forward Declarations
 class ErrorVector;
+enum PartitionerType : int;
 
 /**
  * The \p Partitioner class provides a uniform interface for
@@ -65,6 +66,13 @@ public:
   Partitioner & operator= (const Partitioner &) = default;
   Partitioner & operator= (Partitioner &&) = default;
   virtual ~Partitioner() = default;
+
+  /**
+   * Builds a \p Partitioner of the type specified by
+   * \p partitioner_type
+   */
+  static std::unique_ptr<Partitioner>
+  build(const PartitionerType solver_package);
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.

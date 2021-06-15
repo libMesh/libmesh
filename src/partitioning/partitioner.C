@@ -20,6 +20,7 @@
 // libMesh includes
 #include "libmesh/partitioner.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
@@ -27,6 +28,18 @@
 #include "libmesh/mesh_communication.h"
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/wrapped_petsc.h"
+
+// Subclasses to build()
+#include "libmesh/enum_partitioner_type.h"
+#include "libmesh/centroid_partitioner.h"
+#include "libmesh/hilbert_sfc_partitioner.h"
+#include "libmesh/linear_partitioner.h"
+#include "libmesh/mapped_subdomain_partitioner.h"
+#include "libmesh/metis_partitioner.h"
+#include "libmesh/morton_sfc_partitioner.h"
+#include "libmesh/parmetis_partitioner.h"
+#include "libmesh/sfc_partitioner.h"
+#include "libmesh/subdomain_partitioner.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -132,6 +145,38 @@ const dof_id_type Partitioner::communication_blocksize =
 
 // ------------------------------------------------------------
 // Partitioner implementation
+
+std::unique_ptr<Partitioner>
+Partitioner::build (const PartitionerType partitioner_type)
+{
+  switch (partitioner_type)
+  {
+    case CENTROID_PARTITIONER:
+      return libmesh_make_unique<CentroidPartitioner>();
+    case LINEAR_PARTITIONER:
+      return libmesh_make_unique<LinearPartitioner>();
+    case MAPPED_SUBDOMAIN_PARTITIONER:
+      return libmesh_make_unique<MappedSubdomainPartitioner>();
+    case METIS_PARTITIONER:
+      return libmesh_make_unique<MetisPartitioner>();
+    case PARMETIS_PARTITIONER:
+      return libmesh_make_unique<ParmetisPartitioner>();
+    case HILBERT_SFC_PARTITIONER:
+      return libmesh_make_unique<HilbertSFCPartitioner>();
+    case MORTON_SFC_PARTITIONER:
+      return libmesh_make_unique<MortonSFCPartitioner>();
+    case SFC_PARTITIONER:
+      return libmesh_make_unique<SFCPartitioner>();
+    case SUBDOMAIN_PARTITIONER:
+      return libmesh_make_unique<SubdomainPartitioner>();
+    default:
+      libmesh_error_msg("Invalid partitioner type: " <<
+                        Utility::enum_to_string(partitioner_type));
+  }
+}
+
+
+
 void Partitioner::partition (MeshBase & mesh)
 {
   this->partition(mesh,mesh.n_processors());
