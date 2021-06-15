@@ -250,7 +250,7 @@ public:
                                              y+0.125*x+0.03125*z,
                                              0.5*z+0.0625*x+0.03125*y };
 
-              const Gradient tangential_grad = full_grad - ((full_grad * n) * n);
+              const RealGradient tangential_grad = full_grad - ((full_grad * n) * n);
 
               LIBMESH_ASSERT_FP_EQUAL(tangential_grad(0),
                                       libmesh_real(grad_u(0)),
@@ -270,7 +270,7 @@ public:
                                              0.25,
                                              0.0625 };
 
-              const Gradient tangential_grad = full_grad - ((full_grad * n) * n);
+              const RealGradient tangential_grad = full_grad - ((full_grad * n) * n);
 
               LIBMESH_ASSERT_FP_EQUAL(tangential_grad(0),
                                       libmesh_real(grad_u(0)),
@@ -392,7 +392,7 @@ public:
                                              y+0.125*x+0.03125*z,
                                              0.5*z+0.0625*x+0.03125*y };
 
-              const Gradient tangential_grad = full_grad - ((full_grad * n) * n);
+              const RealGradient tangential_grad = full_grad - ((full_grad * n) * n);
 
               LIBMESH_ASSERT_FP_EQUAL(tangential_grad(0),
                                       libmesh_real(grad_u_x),
@@ -412,7 +412,7 @@ public:
                                              0.25,
                                              0.0625 };
 
-              const Gradient tangential_grad = full_grad - ((full_grad * n) * n);
+              const RealGradient tangential_grad = full_grad - ((full_grad * n) * n);
 
               LIBMESH_ASSERT_FP_EQUAL(tangential_grad(0),
                                       libmesh_real(grad_u_x),
