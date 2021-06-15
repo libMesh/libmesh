@@ -516,9 +516,10 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	enum_error_estimator_type.h enum_fe_family.h \
 	enum_inf_map_type.h enum_io_package.h enum_matrix_build_type.h \
 	enum_norm_type.h enum_order.h enum_parallel_type.h \
-	enum_point_locator_type.h enum_preconditioner_type.h \
-	enum_quadrature_type.h enum_solver_package.h \
-	enum_solver_type.h enum_subset_solve_mode.h enum_xdr_mode.h \
+	enum_partitioner_type.h enum_point_locator_type.h \
+	enum_preconditioner_type.h enum_quadrature_type.h \
+	enum_solver_package.h enum_solver_type.h \
+	enum_subset_solve_mode.h enum_xdr_mode.h \
 	adjoint_refinement_estimator.h \
 	adjoint_residual_error_estimator.h discontinuity_measure.h \
 	error_estimator.h exact_error_estimator.h exact_solution.h \
@@ -1032,6 +1033,9 @@ enum_order.h: $(top_srcdir)/include/enums/enum_order.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_parallel_type.h: $(top_srcdir)/include/enums/enum_parallel_type.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+enum_partitioner_type.h: $(top_srcdir)/include/enums/enum_partitioner_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_point_locator_type.h: $(top_srcdir)/include/enums/enum_point_locator_type.h
