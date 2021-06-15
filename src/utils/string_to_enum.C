@@ -35,6 +35,7 @@
 #include "libmesh/enum_norm_type.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/enum_parallel_type.h"
+#include "libmesh/enum_partitioner_type.h"
 #include "libmesh/enum_point_locator_type.h"
 #include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/enum_quadrature_type.h"
@@ -290,6 +291,37 @@ void init_quadrature_type_to_enum ()
       quadrature_type_to_enum["QCLOUGH"    ]=QCLOUGH;
       quadrature_type_to_enum["QGAUSS_LOBATTO"    ]=QGAUSS_LOBATTO;
       quadrature_type_to_enum["QNODAL"]=QNODAL;
+    }
+}
+
+
+INSTANTIATE_ENUM_MAPS(PartitionerType, partitioner_type)
+
+// Initialize partitioner_type_to_enum on first call
+void init_partitioner_type_to_enum ()
+{
+  if (partitioner_type_to_enum.empty())
+    {
+      partitioner_type_to_enum["CENTROID_PARTITIONER"        ]=CENTROID_PARTITIONER;
+      partitioner_type_to_enum["LINEAR_PARTITIONER"          ]=LINEAR_PARTITIONER;
+      partitioner_type_to_enum["SFC_PARTITIONER"             ]=SFC_PARTITIONER;
+      partitioner_type_to_enum["HILBERT_SFC_PARTITIONER"     ]=HILBERT_SFC_PARTITIONER;
+      partitioner_type_to_enum["MORTON_SFC_PARTITIONER"      ]=MORTON_SFC_PARTITIONER;
+      partitioner_type_to_enum["METIS_PARTITIONER"           ]=METIS_PARTITIONER;
+      partitioner_type_to_enum["PARMETIS_PARTITIONER"        ]=PARMETIS_PARTITIONER;
+      partitioner_type_to_enum["SUBDOMAIN_PARTITIONER"       ]=SUBDOMAIN_PARTITIONER;
+      partitioner_type_to_enum["MAPPED_SUBDOMAIN_PARTITIONER"]=MAPPED_SUBDOMAIN_PARTITIONER;
+
+      //shorter
+      partitioner_type_to_enum["CENTROID"                    ]=CENTROID_PARTITIONER;
+      partitioner_type_to_enum["LINEAR"                      ]=LINEAR_PARTITIONER;
+      partitioner_type_to_enum["SFC"                         ]=SFC_PARTITIONER;
+      partitioner_type_to_enum["HILBERT_SFC"                 ]=HILBERT_SFC_PARTITIONER;
+      partitioner_type_to_enum["MORTON_SFC"                  ]=MORTON_SFC_PARTITIONER;
+      partitioner_type_to_enum["METIS"                       ]=METIS_PARTITIONER;
+      partitioner_type_to_enum["PARMETIS"                    ]=PARMETIS_PARTITIONER;
+      partitioner_type_to_enum["SUBDOMAIN"                   ]=SUBDOMAIN_PARTITIONER;
+      partitioner_type_to_enum["MAPPED_SUBDOMAIN"            ]=MAPPED_SUBDOMAIN_PARTITIONER;
     }
 }
 
@@ -646,6 +678,7 @@ INSTANTIATE_STRING_TO_ENUM(Order,order)
 INSTANTIATE_STRING_TO_ENUM(FEFamily,fefamily)
 INSTANTIATE_STRING_TO_ENUM(InfMapType,inf_map_type)
 INSTANTIATE_STRING_TO_ENUM(QuadratureType,quadrature_type)
+INSTANTIATE_STRING_TO_ENUM(PartitionerType,partitioner_type)
 INSTANTIATE_STRING_TO_ENUM(PreconditionerType,preconditioner_type)
 
 #ifdef LIBMESH_ENABLE_AMR
