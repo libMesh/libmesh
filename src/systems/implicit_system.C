@@ -1200,6 +1200,8 @@ LinearSolver<Number> * ImplicitSystem::get_linear_solver() const
   else
     linear_solver->init();
 
+  linear_solver->init_names(*this);
+
   return linear_solver.get();
 }
 

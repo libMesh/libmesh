@@ -65,6 +65,9 @@ void NonlinearImplicitSystem::clear ()
   // clear the nonlinear solver
   nonlinear_solver->clear();
 
+  // FIXME - this is necessary for petsc_auto_fieldsplit
+  // nonlinear_solver->init_names(*this);
+
   // clear the parent data
   Parent::clear();
 }
@@ -75,6 +78,9 @@ void NonlinearImplicitSystem::reinit ()
 {
   // re-initialize the nonlinear solver interface
   nonlinear_solver->clear();
+
+  // FIXME - this is necessary for petsc_auto_fieldsplit
+  // nonlinear_solver->init_names(*this);
 
   if (diff_solver.get())
     diff_solver->reinit();
@@ -172,6 +178,9 @@ void NonlinearImplicitSystem::solve ()
         nonlinear_solver->init((this->name()+"_").c_str());
       else
         nonlinear_solver->init();
+
+      // FIXME - this is necessary for petsc_auto_fieldsplit
+      // nonlinear_solver->init_names(*this);
 
       // Solve the nonlinear system.
       const std::pair<unsigned int, Real> rval =

@@ -69,6 +69,8 @@ ContinuationSystem::ContinuationSystem (EquationSystems & es,
     linear_solver->init((this->name()+"_").c_str());
   else
     linear_solver->init();
+
+  linear_solver->init_names(*this);
 }
 
 

@@ -61,6 +61,8 @@ void TimeSolver::reinit ()
     this->linear_solver()->init((_system.name()+"_").c_str());
   else
     this->linear_solver()->init();
+
+  this->_linear_solver->init_names(_system);
 }
 
 
@@ -86,6 +88,8 @@ void TimeSolver::init_data ()
     this->linear_solver()->init((_system.name()+"_").c_str());
   else
     this->linear_solver()->init();
+
+  this->linear_solver()->init_names(_system);
 }
 
 
