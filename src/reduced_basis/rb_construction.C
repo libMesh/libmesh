@@ -728,6 +728,11 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
         }
 
       context.pre_fe_reinit(*this, elem);
+
+      // Do nothing in case there are no dof_indices on the current element
+      if ( context.get_dof_indices().empty() )
+        continue;
+
       context.elem_fe_reinit();
 
       if (elemtype != NODEELEM)
