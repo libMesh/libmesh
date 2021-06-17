@@ -61,6 +61,7 @@ include_HEADERS =  \
         enums/enum_norm_type.h \
         enums/enum_order.h \
         enums/enum_parallel_type.h \
+        enums/enum_partitioner_type.h \
         enums/enum_point_locator_type.h \
         enums/enum_preconditioner_type.h \
         enums/enum_quadrature_type.h \

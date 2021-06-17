@@ -25,7 +25,8 @@
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_communication.h"
-#include "libmesh/parmetis_partitioner.h"
+#include "libmesh/partitioner.h"
+#include "libmesh/string_to_enum.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -54,8 +55,12 @@ DistributedMesh::DistributedMesh (const Parallel::Communicator & comm_in,
   _next_unique_id = this->processor_id();
 #endif
 
-  // FIXME: give parmetis the communicator!
-  _partitioner = libmesh_make_unique<ParmetisPartitioner>();
+  const std::string default_partitioner = "parmetis";
+  const std::string my_partitioner =
+    libMesh::command_line_value("--default-partitioner",
+                                default_partitioner);
+  _partitioner = Partitioner::build
+    (Utility::string_to_enum<PartitionerType>(my_partitioner));
 }
 
 DistributedMesh & DistributedMesh::operator= (DistributedMesh && other_mesh)

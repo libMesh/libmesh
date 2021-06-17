@@ -51,6 +51,7 @@ BUILT_SOURCES = \
         enum_norm_type.h \
         enum_order.h \
         enum_parallel_type.h \
+        enum_partitioner_type.h \
         enum_point_locator_type.h \
         enum_preconditioner_type.h \
         enum_quadrature_type.h \
@@ -688,6 +689,9 @@ enum_order.h: $(top_srcdir)/include/enums/enum_order.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_parallel_type.h: $(top_srcdir)/include/enums/enum_parallel_type.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+enum_partitioner_type.h: $(top_srcdir)/include/enums/enum_partitioner_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_point_locator_type.h: $(top_srcdir)/include/enums/enum_point_locator_type.h

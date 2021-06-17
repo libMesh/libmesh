@@ -21,11 +21,12 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/metis_partitioner.h"
+#include "libmesh/partitioner.h"
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/utility.h"
 #include "libmesh/parallel.h"
 #include "libmesh/point.h"
+#include "libmesh/string_to_enum.h"
 #ifdef LIBMESH_HAVE_NANOFLANN
 #include "libmesh/nanoflann.hpp"
 #endif
@@ -92,7 +93,13 @@ ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
   // here in the constructor.
   _next_unique_id = 0;
 #endif
-  _partitioner = libmesh_make_unique<MetisPartitioner>();
+
+  const std::string default_partitioner = "metis";
+  const std::string my_partitioner =
+    libMesh::command_line_value("--default-partitioner",
+                                default_partitioner);
+  _partitioner = Partitioner::build
+    (Utility::string_to_enum<PartitionerType>(my_partitioner));
 }
 
 
