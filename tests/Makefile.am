@@ -92,6 +92,7 @@ unit_tests_sources = \
   numerics/dense_matrix_test.C \
   numerics/petsc_matrix_test.C \
   numerics/diagonal_matrix_test.C \
+  numerics/lumped_mass_matrix_test.C \
   numerics/eigen_sparse_matrix_test.C \
   parallel/message_tag.C \
   parallel/packed_range_test.C \

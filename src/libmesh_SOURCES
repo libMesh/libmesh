@@ -243,6 +243,7 @@ libmesh_SOURCES =  \
         src/numerics/eigen_sparse_vector.C \
         src/numerics/laspack_matrix.C \
         src/numerics/laspack_vector.C \
+        src/numerics/lumped_mass_matrix.C \
         src/numerics/numeric_vector.C \
         src/numerics/petsc_matrix.C \
         src/numerics/petsc_preconditioner.C \

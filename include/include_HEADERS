@@ -1,4 +1,4 @@
-# Do not edit - automatically generated from rebuild_include_HEADERS.sh
+# Do not edit - automatically generated from ./rebuild_include_HEADERS.sh
 # These are headers we need to compile the libMesh library but should
 # not be installed.  These header files may have implementation
 # details which are not required for the public interface
@@ -243,6 +243,7 @@ include_HEADERS =  \
         numerics/eigen_sparse_vector.h \
         numerics/fem_function_base.h \
         numerics/function_base.h \
+        numerics/lumped_mass_matrix.h \
         numerics/numeric_vector.h \
         numerics/parsed_fem_function.h \
         numerics/parsed_fem_function_parameter.h \
