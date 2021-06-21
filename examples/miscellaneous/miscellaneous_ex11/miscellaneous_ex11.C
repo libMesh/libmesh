@@ -59,6 +59,7 @@
 #include "libmesh/exodusII_io.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/parallel.h"
+#include "libmesh/getpot.h"
 
 // These are the include files typically needed for subdivision elements.
 #include "libmesh/face_tri3_subdivision.h"
@@ -114,11 +115,17 @@ int main (int argc, char ** argv)
   const Real L = 100.;
   MeshTools::Modification::scale(mesh, L, L, L);
 
+  // Get the number of mesh refinements from the command line
+  GetPot command_line (argc, argv);
+  int n_refinements = 3;
+  if (command_line.search(1, "-n_refinements"))
+    n_refinements = command_line.next(n_refinements);
+
   // Quadrisect the mesh triangles a few times to obtain a
   // finer mesh.  Subdivision surface elements require the
   // refinement data to be removed afterward.
   MeshRefinement mesh_refinement (mesh);
-  mesh_refinement.uniformly_refine (3);
+  mesh_refinement.uniformly_refine (n_refinements);
   MeshTools::Modification::flatten (mesh);
 
   // Write the mesh before the ghost elements are added.

@@ -72,6 +72,9 @@ main(int argc, char ** argv)
   // Parse input file
   GetPot input_file("vector_fe_ex5.in");
 
+  // But allow the command line to override it.
+  input_file.parse_command_line(argc, argv);
+
   // Read DG parameters
   const Real epsilon = input_file("epsilon", -1);
   const Real sigma = input_file("sigma", 6);

@@ -508,6 +508,9 @@ int main (int argc, char** argv)
   //Parse the input file
   GetPot input_file("miscellaneous_ex5.in");
 
+  // But allow the command line to override it.
+  input_file.parse_command_line(argc, argv);
+
   //Read in parameters from the input file
   const unsigned int adaptive_refinement_steps = input_file("max_adaptive_r_steps", 3);
   const unsigned int uniform_refinement_steps  = input_file("uniform_h_r_steps", 3);

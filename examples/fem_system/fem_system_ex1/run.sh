@@ -37,6 +37,8 @@ run_example "$example_name" "solver_type=petscdiff coarsegridsize=6 transient=fa
 # And again with some timestepping coverage
 run_example "$example_name" "solver_type=petscdiff coarsegridsize=6 coarserefinements=1 transient=true n_timesteps=3 $fs_lu_options"
 
+benchmark_example 1 "$example_name" "solver_type=petscdiff coarsegridsize=6 coarserefinements=3 transient=true n_timesteps=3 $fs_lu_options"
+
 # Rerun with options demonstrating fieldpslit+gmg on the velocity
 # block, if we have a new enough PETSc
 
@@ -67,5 +69,9 @@ fs_gmg_options="--use_petsc_dm --node-major-dofs \
 
 run_example "$example_name" "solver_type=petscdiff coarsegridsize=6 coarserefinements=2 transient=false n_timesteps=1 $fs_gmg_options"
 
+benchmark_example 1 "$example_name" "solver_type=petscdiff coarsegridsize=6 coarserefinements=3 transient=false n_timesteps=1 $fs_gmg_options"
+
 # Now rerun same thing with over a distributed mesh
 run_example "$example_name" "mesh_type=distributed solver_type=petscdiff coarsegridsize=6 coarserefinements=2 transient=false n_timesteps=1 $fs_gmg_options"
+
+benchmark_example 1 "$example_name" "mesh_type=distributed solver_type=petscdiff coarsegridsize=6 coarserefinements=3 transient=false n_timesteps=1 $fs_gmg_options"

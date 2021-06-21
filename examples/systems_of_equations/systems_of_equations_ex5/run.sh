@@ -9,3 +9,6 @@ example_name=systems_of_equations_ex5
 options="-ksp_type cg"
 
 run_example "$example_name" "$options"
+
+# No benchmark here - this spends 97+% of time in the linear solve
+# benchmark_example 1 "$example_name" "$options -nx 500 -ny 100"

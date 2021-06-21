@@ -58,6 +58,7 @@
 #include "libmesh/const_function.h"
 #include "libmesh/parsed_function.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/getpot.h"
 
 // C++ includes
 #include <iostream>
@@ -117,13 +118,20 @@ int main (int argc, char** argv)
   // across the default MPI communicator.
   Mesh mesh(init.comm());
 
+  // Get the mesh size from the command line.
+  GetPot command_line (argc, argv);
+
+  int n_elem = 20;
+  if (command_line.search(1, "-n_elem"))
+    n_elem = command_line.next(n_elem);
+
   // Use the MeshTools::Generation mesh generator to create a uniform
   // 2D grid on the square [-1,1]^2.  We instruct the mesh generator
   // to build a mesh of 8x8 Quad9 elements in 2D.  Building these
   // higher-order elements allows us to use higher-order polynomial
   // approximations for the velocity.
   MeshTools::Generation::build_square (mesh,
-                                       20, 20,
+                                       n_elem, n_elem,
                                        0., 1.,
                                        0., 1.,
                                        QUAD9);
@@ -184,7 +192,11 @@ int main (int argc, char** argv)
 
   // We also set a standard linear solver flag in the EquationSystems object
   // which controls the maximum number of linear solver iterations allowed.
-  equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
+  int max_iter = 25;
+  if (command_line.search(1, "-max_iter"))
+    max_iter = command_line.next(max_iter);
+
+  equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = max_iter;
 
   // Tell the system of equations what the timestep is by using
   // the set_parameter function.  The matrix assembly routine can

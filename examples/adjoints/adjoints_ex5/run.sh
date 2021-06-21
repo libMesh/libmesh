@@ -19,3 +19,7 @@ run_example "$example_name" n_timesteps=10 timesolver_tolerance=0.0 timesolver_u
 run_example "$example_name" n_timesteps=7 timesolver_tolerance=1.0 timesolver_upper_tolerance=1.2 solution_history_type=memory
 # Save previous timestep solution on disk
 run_example "$example_name" n_timesteps=7 timesolver_tolerance=1.0 timesolver_upper_tolerance=1.2 solution_history_type=file
+
+# Benchmark examples - just using adaptivity here
+benchmark_example 1 "$example_name" extrarefinements=6 n_timesteps=7 timesolver_tolerance=1.0 timesolver_upper_tolerance=1.2 solution_history_type=memory
+benchmark_example 1 "$example_name" extrarefinements=6 n_timesteps=7 timesolver_tolerance=1.0 timesolver_upper_tolerance=1.2 solution_history_type=file

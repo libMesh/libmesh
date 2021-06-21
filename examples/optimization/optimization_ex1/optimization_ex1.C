@@ -231,6 +231,7 @@ void AssembleOptimization::hessian (const NumericVector<Number> & /*soln*/,
                                     SparseMatrix<Number> & H_f,
                                     OptimizationSystem & /*sys*/)
 {
+  LOG_SCOPE("hessian()", "AssembleOptimization");
   H_f.zero();
   H_f.add(1., *A_matrix);
 }
@@ -274,6 +275,8 @@ int main (int argc, char ** argv)
     }
 
   GetPot infile("optimization_ex1.in");
+  infile.parse_command_line(argc, argv);
+
   const std::string approx_order = infile("approx_order", "FIRST");
   const std::string fe_family = infile("fe_family", "LAGRANGE");
   const unsigned int n_elem = infile("n_elem", 10);

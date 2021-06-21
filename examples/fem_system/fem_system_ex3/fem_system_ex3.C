@@ -96,12 +96,16 @@ int main (int argc, char ** argv)
   // Make sure libMesh was compiled for 3D
   libmesh_example_requires(dim == LIBMESH_DIM, "3D support");
 
+  const unsigned int nx = infile("nx", 32);
+  const unsigned int ny = infile("ny", 8);
+  const unsigned int nz = infile("nz", 4);
+
   // Create a 3D mesh distributed across the default MPI communicator.
   Mesh mesh(init.comm(), dim);
   MeshTools::Generation::build_cube (mesh,
-                                     32,
-                                     8,
-                                     4,
+                                     nx,
+                                     ny,
+                                     nz,
                                      0., 1.*x_scaling,
                                      0., 0.3,
                                      0., 0.1,

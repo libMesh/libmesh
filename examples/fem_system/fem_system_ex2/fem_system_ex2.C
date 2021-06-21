@@ -68,6 +68,7 @@ void setup(EquationSystems & systems,
   double sizez = args("mesh/generation/size", 2.0, 2);
   MeshTools::Generation::build_cube(mesh, nx, ny, nz,
                                     origx, origx+sizex, origy, origy+sizey, origz, origz+sizez, eltype);
+  mesh.print_info();
 
   // Creating Systems
   SolidSystem & imms = systems.add_system<SolidSystem> ("solid");
@@ -96,7 +97,9 @@ void run_timestepping(EquationSystems & systems, GetPot & args)
 
   SolidSystem & solid_system = systems.get_system<SolidSystem>("solid");
 
+#ifdef LIBMESH_HAVE_VTK
   std::unique_ptr<VTKIO> io = libmesh_make_unique<VTKIO>(systems.get_mesh());
+#endif
 
   Real duration = args("duration", 1.0);
 
@@ -130,6 +133,7 @@ void run_timestepping(EquationSystems & systems, GetPot & args)
       out << "Doing a reinit of the equation systems" << std::endl;
       systems.reinit();
 
+#ifdef LIBMESH_HAVE_VTK
       if (t_step % args("output/frequency", 1) == 0)
         {
           std::stringstream file_name;
@@ -142,6 +146,7 @@ void run_timestepping(EquationSystems & systems, GetPot & args)
 
           io->write_equation_systems(file_name.str(), systems);
         }
+#endif
       // Advance to the next timestep in a transient problem
       out << "Advancing to next step" << std::endl;
       solid_system.time_solver->advance_timestep();
@@ -159,11 +164,6 @@ int main(int argc, char ** argv)
   libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
                            "--enable-petsc, --enable-trilinos, or --enable-eigen");
 
-  // Skip this example if we do not meet certain requirements
-#ifndef LIBMESH_HAVE_VTK
-  libmesh_example_requires(false, "--enable-vtk");
-#endif
-
   // Trilinos gives us an inverted element on this one...
   libmesh_example_requires(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
 
@@ -179,6 +179,9 @@ int main(int argc, char ** argv)
 
   // read simulation parameters from file
   GetPot args = GetPot("solid.in");
+
+  // But allow the command line to override
+  args.parse_command_line(argc, argv);
 
   // Create System and Mesh
   int dim = args("mesh/generation/dimension", 3);

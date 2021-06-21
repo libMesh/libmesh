@@ -57,6 +57,7 @@
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_solver_type.h"
 #include "libmesh/parallel.h"
+#include "libmesh/mesh_refinement.h"
 
 // Eigen includes
 #ifdef LIBMESH_HAVE_EIGEN
@@ -140,6 +141,15 @@ int main (int argc, char ** argv)
   }
   Mesh mesh (init.comm(), 3);
   mesh.read("cylinder.xdr");
+
+  // Get the number of mesh refinements from the command line
+  int n_refinements = 0;
+  if (command_line.search(1, "-n_refinements"))
+    n_refinements = command_line.next(n_refinements);
+
+  // Refine the mesh if requested
+  MeshRefinement mesh_refinement (mesh);
+  mesh_refinement.uniformly_refine (n_refinements);
 
   // Print information about the mesh to the screen.
   mesh.print_info();

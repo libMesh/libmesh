@@ -46,6 +46,7 @@
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/enum_xdr_mode.h"
+#include "libmesh/getpot.h"
 
 // Define the Finite and Infinite Element object.
 #include "libmesh/fe.h"
@@ -98,10 +99,17 @@ int main (int argc, char ** argv)
   // communicator.
   Mesh mesh(init.comm());
 
+  // Get command line arguments for mesh size
+  GetPot input(argc, argv);
+
+  const unsigned int nx = input("nx", 4),
+                     ny = input("ny", 4),
+                     nz = input("nz", 4);
+
   // Use the internal mesh generator to create elements
   // on the square [-1,1]^3, of type Hex8.
   MeshTools::Generation::build_cube (mesh,
-                                     4, 4, 4,
+                                     nx, ny, nz,
                                      -1., 1.,
                                      -1., 1.,
                                      -1., 1.,

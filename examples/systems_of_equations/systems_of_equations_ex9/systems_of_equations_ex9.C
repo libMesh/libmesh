@@ -58,6 +58,7 @@
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/getpot.h"
+#include "libmesh/mesh_refinement.h"
 #include "libmesh/solver_configuration.h"
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/petsc_macro.h"
@@ -406,6 +407,11 @@ int main (int argc, char ** argv)
 #endif // LIBMESH_ENABLE_PERIODIC
 
   mesh.read("systems_of_equations_ex9.exo");
+
+  GetPot input(argc, argv);
+  const unsigned int n_refinements = input("n_refinements", 0);
+  MeshRefinement mesh_refinement(mesh);
+  mesh_refinement.uniformly_refine(n_refinements);
 
   // Print information about the mesh to the screen.
   mesh.print_info();

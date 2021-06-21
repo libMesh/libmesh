@@ -18,3 +18,5 @@ run_example_no_extra_options "$example_name" "$options"
 
 options="element_type=QUAD9 -pc_type jacobi"
 run_example_no_extra_options "$example_name" "$options"
+
+# No benchmark until we decide what to do about no_extra_options there

@@ -105,6 +105,9 @@ int main (int argc, char ** argv)
   std::string parameters_filename = "reduced_basis_ex1.in";
   GetPot infile(parameters_filename);
 
+  // But allow the command line to override it
+  infile.parse_command_line(argc, argv);
+
   unsigned int n_elem = infile("n_elem", 1);       // Determines the number of elements in the "truth" mesh
   const unsigned int dim = 2;                      // The number of spatial dimensions
 

@@ -19,3 +19,6 @@ run_example "$example_name" mesh_partitioner_type=Hilbert coarserefinements=2 ma
 run_example "$example_name" mesh_partitioner_type=Morton coarserefinements=2 max_adaptivesteps=4
 run_example "$example_name" mesh_partitioner_type=Linear coarserefinements=2 max_adaptivesteps=4
 run_example "$example_name" mesh_partitioner_type=Centroid coarserefinements=2 max_adaptivesteps=4
+
+# Benchmark parameters
+benchmark_example 1 "$example_name" coarserefinements=6

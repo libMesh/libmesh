@@ -58,6 +58,9 @@ int main (int argc, char** argv)
   // Parse the input file
   GetPot infile("vector_fe_ex2.in");
 
+  // But allow the command line to override it.
+  infile.parse_command_line(argc, argv);
+
   // Read in parameters from the input file
   const unsigned int grid_size = infile("grid_size", 2);
 
