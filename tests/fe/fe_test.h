@@ -25,7 +25,8 @@
   CPPUNIT_TEST( testGradUComp );                \
   CPPUNIT_TEST( testHessU );                    \
   CPPUNIT_TEST( testHessUComp );                \
-  CPPUNIT_TEST( testDualDoesntScreamAndDie );
+  CPPUNIT_TEST( testDualDoesntScreamAndDie );   \
+  CPPUNIT_TEST( testCustomReinit );
 
 using namespace libMesh;
 
@@ -865,6 +866,30 @@ public:
 
     testLoop(f);
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+  }
+
+  void testCustomReinit()
+  {
+    std::vector<Point> q_points;
+    std::vector<Real> weights;
+    q_points.resize(3); weights.resize(3);
+    q_points[0](0) = 0.0; q_points[0](1) = 0.0; weights[0] = Real(1)/6;
+    q_points[1](0) = 1.0; q_points[1](1) = 0.0; weights[1] = weights[0];
+    q_points[2](0) = 0.0; q_points[2](1) = 1.0; weights[2] = weights[0];
+
+    FEType fe_type = this->_sys->variable_type(0);
+    std::unique_ptr<FEBase> fe (FEBase::build(this->_dim, fe_type));
+    const int extraorder = 3;
+    std::unique_ptr<QBase> qrule (fe_type.default_quadrature_rule (this->_dim, extraorder));
+    fe->attach_quadrature_rule (qrule.get());
+
+    const std::vector<Point> & q_pos = fe->get_xyz();
+
+    for (const auto & elem : this->_mesh->active_local_element_ptr_range()) {
+      fe->reinit (elem, &q_points, &weights);
+      CPPUNIT_ASSERT_EQUAL(q_points.size(), std::size_t(3));
+      CPPUNIT_ASSERT_EQUAL(q_pos.size(), std::size_t(3));  // 6? bug?
+    }
   }
 
 };
