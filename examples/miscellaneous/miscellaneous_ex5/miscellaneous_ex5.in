@@ -1,17 +1,19 @@
 # Solve a singular or non-singular problem
-singularity = true        
+singularity = true
 
 # In what dimension
-dimension = 3 
+dimension = 3
 
 # With what elements ("tensor", "simplex")
 element_type = tensor
 
+fe_family = MONOMIAL
+
 # minimum approximation order
-p_order = 1 
+p_order = 1
 
 # Mesh refinement type: h, p, or hp
-refinement_type = h 
+refinement_type = h
 
 # Number of uniform refinement steps
 uniform_h_r_steps = 2
