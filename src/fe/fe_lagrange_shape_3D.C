@@ -29,11 +29,13 @@ namespace
 {
 using namespace libMesh;
 
+template <FEFamily T>
 Real fe_lagrange_3D_shape(const ElemType,
                           const Order order,
                           const unsigned int i,
                           const Point & p);
 
+template <FEFamily T>
 Real fe_lagrange_3D_shape_deriv(const ElemType type,
                                 const Order order,
                                 const unsigned int i,
@@ -42,6 +44,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
+template <FEFamily T>
 Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
                                        const Order order,
                                        const unsigned int i,
@@ -66,7 +69,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
                            const unsigned int i,
                            const Point & p)
 {
-  return fe_lagrange_3D_shape(type, order, i, p);
+  return fe_lagrange_3D_shape<LAGRANGE>(type, order, i, p);
 }
 
 
@@ -77,7 +80,7 @@ Real FE<3,L2_LAGRANGE>::shape(const ElemType type,
                               const unsigned int i,
                               const Point & p)
 {
-  return fe_lagrange_3D_shape(type, order, i, p);
+  return fe_lagrange_3D_shape<L2_LAGRANGE>(type, order, i, p);
 }
 
 
@@ -92,7 +95,7 @@ Real FE<3,LAGRANGE>::shape(const Elem * elem,
   libmesh_assert(elem);
 
   // call the orientation-independent shape functions
-  return fe_lagrange_3D_shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
+  return fe_lagrange_3D_shape<LAGRANGE>(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
 }
 
 
@@ -107,7 +110,7 @@ Real FE<3,L2_LAGRANGE>::shape(const Elem * elem,
   libmesh_assert(elem);
 
   // call the orientation-independent shape functions
-  return fe_lagrange_3D_shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
+  return fe_lagrange_3D_shape<L2_LAGRANGE>(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
 }
 
 
@@ -120,7 +123,7 @@ Real FE<3,LAGRANGE>::shape(const FEType fet,
                            const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_lagrange_3D_shape(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, p);
+  return fe_lagrange_3D_shape<LAGRANGE>(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, p);
 }
 
 
@@ -133,7 +136,7 @@ Real FE<3,L2_LAGRANGE>::shape(const FEType fet,
                               const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_lagrange_3D_shape(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, p);
+  return fe_lagrange_3D_shape<L2_LAGRANGE>(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, p);
 }
 
 template <>
@@ -143,7 +146,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
                                  const unsigned int j,
                                  const Point & p)
 {
-  return fe_lagrange_3D_shape_deriv(type, order, i, j, p);
+  return fe_lagrange_3D_shape_deriv<LAGRANGE>(type, order, i, j, p);
 }
 
 
@@ -155,7 +158,7 @@ Real FE<3,L2_LAGRANGE>::shape_deriv(const ElemType type,
                                     const unsigned int j,
                                     const Point & p)
 {
-  return fe_lagrange_3D_shape_deriv(type, order, i, j, p);
+  return fe_lagrange_3D_shape_deriv<L2_LAGRANGE>(type, order, i, j, p);
 }
 
 
@@ -171,7 +174,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const Elem * elem,
   libmesh_assert(elem);
 
   // call the orientation-independent shape function derivatives
-  return fe_lagrange_3D_shape_deriv(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+  return fe_lagrange_3D_shape_deriv<LAGRANGE>(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
 }
 
 
@@ -186,7 +189,7 @@ Real FE<3,L2_LAGRANGE>::shape_deriv(const Elem * elem,
   libmesh_assert(elem);
 
   // call the orientation-independent shape function derivatives
-  return fe_lagrange_3D_shape_deriv(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+  return fe_lagrange_3D_shape_deriv<L2_LAGRANGE>(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
 }
 
 
@@ -199,7 +202,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const FEType fet,
                                  const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_lagrange_3D_shape_deriv(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
+  return fe_lagrange_3D_shape_deriv<LAGRANGE>(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
 }
 
 
@@ -212,7 +215,7 @@ Real FE<3,L2_LAGRANGE>::shape_deriv(const FEType fet,
                                     const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_lagrange_3D_shape_deriv(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
+  return fe_lagrange_3D_shape_deriv<L2_LAGRANGE>(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -224,7 +227,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
                                         const unsigned int j,
                                         const Point & p)
 {
-  return fe_lagrange_3D_shape_second_deriv(type, order, i, j, p);
+  return fe_lagrange_3D_shape_second_deriv<LAGRANGE>(type, order, i, j, p);
 }
 
 
@@ -236,7 +239,7 @@ Real FE<3,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
                                            const unsigned int j,
                                            const Point & p)
 {
-  return fe_lagrange_3D_shape_second_deriv(type, order, i, j, p);
+  return fe_lagrange_3D_shape_second_deriv<L2_LAGRANGE>(type, order, i, j, p);
 }
 
 
@@ -252,7 +255,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const Elem * elem,
   libmesh_assert(elem);
 
   // call the orientation-independent shape function derivatives
-  return fe_lagrange_3D_shape_second_deriv
+  return fe_lagrange_3D_shape_second_deriv<LAGRANGE>
     (elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
 }
 
@@ -269,7 +272,7 @@ Real FE<3,L2_LAGRANGE>::shape_second_deriv(const Elem * elem,
   libmesh_assert(elem);
 
   // call the orientation-independent shape function derivatives
-  return fe_lagrange_3D_shape_second_deriv
+  return fe_lagrange_3D_shape_second_deriv<L2_LAGRANGE>
     (elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
 }
 
@@ -283,7 +286,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const FEType fet,
                                         const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_lagrange_3D_shape_second_deriv
+  return fe_lagrange_3D_shape_second_deriv<LAGRANGE>
     (elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
 }
 
@@ -298,7 +301,7 @@ Real FE<3,L2_LAGRANGE>::shape_second_deriv(const FEType fet,
                                            const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_lagrange_3D_shape_second_deriv
+  return fe_lagrange_3D_shape_second_deriv<L2_LAGRANGE>
     (elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
 }
 
@@ -313,6 +316,7 @@ namespace
 {
 using namespace libMesh;
 
+template <FEFamily T>
 Real fe_lagrange_3D_shape(const ElemType type,
                           const Order order,
                           const unsigned int i,
@@ -531,6 +535,10 @@ Real fe_lagrange_3D_shape(const ElemType type,
             }
 
             // triquadratic hexahedral shape functions
+          case HEX8:
+            libmesh_assert_msg(T == L2_LAGRANGE,
+                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
           case HEX27:
             {
               libmesh_assert_less (i, 27);
@@ -554,6 +562,10 @@ Real fe_lagrange_3D_shape(const ElemType type,
             }
 
             // quadratic tetrahedral shape functions
+          case TET4:
+            libmesh_assert_msg(T == L2_LAGRANGE,
+                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
           case TET10:
             {
               libmesh_assert_less (i, 10);
@@ -663,6 +675,10 @@ Real fe_lagrange_3D_shape(const ElemType type,
             }
 
             // quadratic prism shape functions
+          case PRISM6:
+            libmesh_assert_msg(T == L2_LAGRANGE,
+                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
           case PRISM18:
             {
               libmesh_assert_less (i, 18);
@@ -746,6 +762,10 @@ Real fe_lagrange_3D_shape(const ElemType type,
             // Quadratic shape functions, as defined in R. Graglia, "Higher order
             // bases on pyramidal elements", IEEE Trans Antennas and Propagation,
             // vol 47, no 5, May 1999.
+          case PYRAMID5:
+            libmesh_assert_msg(T == L2_LAGRANGE,
+                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
           case PYRAMID14:
             {
               libmesh_assert_less (i, 14);
@@ -838,6 +858,7 @@ Real fe_lagrange_3D_shape(const ElemType type,
 
 
 
+template <FEFamily T>
 Real fe_lagrange_3D_shape_deriv(const ElemType type,
                                 const Order order,
                                 const unsigned int i,
@@ -1390,6 +1411,10 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
             }
 
             // triquadratic hexahedral shape functions
+          case HEX8:
+            libmesh_assert_msg(T == L2_LAGRANGE,
+                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
           case HEX27:
             {
               libmesh_assert_less (i, 27);
@@ -1430,6 +1455,10 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
             }
 
             // quadratic tetrahedral shape functions
+          case TET4:
+            libmesh_assert_msg(T == L2_LAGRANGE,
+                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
           case TET10:
             {
               libmesh_assert_less (i, 10);
@@ -1724,6 +1753,10 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
 
 
             // quadratic prism shape functions
+          case PRISM6:
+            libmesh_assert_msg(T == L2_LAGRANGE,
+                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
           case PRISM18:
             {
               libmesh_assert_less (i, 18);
@@ -1935,6 +1968,10 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
             // Quadratic shape functions, as defined in R. Graglia, "Higher order
             // bases on pyramidal elements", IEEE Trans Antennas and Propagation,
             // vol 47, no 5, May 1999.
+          case PYRAMID5:
+            libmesh_assert_msg(T == L2_LAGRANGE,
+                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
           case PYRAMID14:
             {
               libmesh_assert_less (i, 14);
@@ -2181,6 +2218,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
+template <FEFamily T>
 Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
                                        const Order order,
                                        const unsigned int i,
@@ -2674,6 +2712,10 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
             }
 
             // triquadratic hexahedral shape functions
+          case HEX8:
+            libmesh_assert_msg(T == L2_LAGRANGE,
+                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
           case HEX27:
             {
               libmesh_assert_less (i, 27);
@@ -2735,6 +2777,10 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
             }
 
             // quadratic tetrahedral shape functions
+          case TET4:
+            libmesh_assert_msg(T == L2_LAGRANGE,
+                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
           case TET10:
             {
               // The area coordinates are the same as used for the
@@ -3021,6 +3067,10 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
 
 
             // quadratic prism shape functions
+          case PRISM6:
+            libmesh_assert_msg(T == L2_LAGRANGE,
+                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
           case PRISM18:
             {
               libmesh_assert_less (i, 18);
@@ -3076,6 +3126,10 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
             // Quadratic shape functions, as defined in R. Graglia, "Higher order
             // bases on pyramidal elements", IEEE Trans Antennas and Propagation,
             // vol 47, no 5, May 1999.
+          case PYRAMID5:
+            libmesh_assert_msg(T == L2_LAGRANGE,
+                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
           case PYRAMID14:
             {
               libmesh_assert_less (i, 14);
