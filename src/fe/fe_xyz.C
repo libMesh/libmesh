@@ -594,17 +594,10 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point> & qp,
                                       const Elem * libmesh_dbg_var(elem))
 {
   libmesh_assert(elem);
-  this->calculations_started = true;
 
-  // If the user forgot to request anything, we'll be safe and
-  // calculate everything:
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_d2phi)
-    this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = true;
-#else
-  if (!this->calculate_phi && !this->calculate_dphi)
-    this->calculate_phi = this->calculate_dphi = true;
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+  // FIXME: Is this redundant here? Who's calling init_shape_functions
+  // from code that hasn't already done a determine_calculations()?
+  this->determine_calculations();
 
   // Start logging the shape function initialization
   LOG_SCOPE("init_shape_functions()", "FE");
