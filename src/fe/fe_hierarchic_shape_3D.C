@@ -33,12 +33,14 @@ unsigned int cube_side(const Point & p);
 
 Point cube_side_point(unsigned int sidenum, const Point & interior_point);
 
+template <FEFamily T>
 Real fe_hierarchic_3D_shape(const Elem * elem,
                             const Order order,
                             const unsigned int i,
                             const Point & p,
                             const bool add_p_level);
 
+template <FEFamily T>
 Real fe_hierarchic_3D_shape_deriv(const Elem * elem,
                                   const Order order,
                                   const unsigned int i,
@@ -48,6 +50,7 @@ Real fe_hierarchic_3D_shape_deriv(const Elem * elem,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
+template <FEFamily T>
 Real fe_hierarchic_3D_shape_second_deriv(const Elem * elem,
                                          const Order order,
                                          const unsigned int i,
@@ -804,7 +807,7 @@ Real FE<3,HIERARCHIC>::shape(const Elem * elem,
                              const Point & p,
                              const bool add_p_level)
 {
-  return fe_hierarchic_3D_shape(elem, order, i, p, add_p_level);
+  return fe_hierarchic_3D_shape<HIERARCHIC>(elem, order, i, p, add_p_level);
 }
 
 
@@ -815,7 +818,7 @@ Real FE<3,HIERARCHIC>::shape(const FEType fet,
                              const Point & p,
                              const bool add_p_level)
 {
-  return fe_hierarchic_3D_shape(elem, fet.order, i, p, add_p_level);
+  return fe_hierarchic_3D_shape<HIERARCHIC>(elem, fet.order, i, p, add_p_level);
 }
 
 
@@ -828,7 +831,7 @@ Real FE<3,L2_HIERARCHIC>::shape(const Elem * elem,
                                 const Point & p,
                                 const bool add_p_level)
 {
-  return fe_hierarchic_3D_shape(elem, order, i, p, add_p_level);
+  return fe_hierarchic_3D_shape<L2_HIERARCHIC>(elem, order, i, p, add_p_level);
 }
 
 
@@ -839,7 +842,7 @@ Real FE<3,L2_HIERARCHIC>::shape(const FEType fet,
                                 const Point & p,
                                 const bool add_p_level)
 {
-  return fe_hierarchic_3D_shape(elem, fet.order, i, p, add_p_level);
+  return fe_hierarchic_3D_shape<L2_HIERARCHIC>(elem, fet.order, i, p, add_p_level);
 }
 
 
@@ -957,7 +960,7 @@ Real FE<3,HIERARCHIC>::shape_deriv(const Elem * elem,
                                    const Point & p,
                                    const bool add_p_level)
 {
-  return fe_hierarchic_3D_shape_deriv(elem, order, i, j, p, add_p_level);
+  return fe_hierarchic_3D_shape_deriv<HIERARCHIC>(elem, order, i, j, p, add_p_level);
 }
 
 
@@ -969,7 +972,7 @@ Real FE<3,HIERARCHIC>::shape_deriv(const FEType fet,
                                    const Point & p,
                                    const bool add_p_level)
 {
-  return fe_hierarchic_3D_shape_deriv(elem, fet.order, i, j, p, add_p_level);
+  return fe_hierarchic_3D_shape_deriv<HIERARCHIC>(elem, fet.order, i, j, p, add_p_level);
 }
 
 
@@ -982,7 +985,7 @@ Real FE<3,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
                                       const Point & p,
                                       const bool add_p_level)
 {
-  return fe_hierarchic_3D_shape_deriv(elem, order, i, j, p, add_p_level);
+  return fe_hierarchic_3D_shape_deriv<L2_HIERARCHIC>(elem, order, i, j, p, add_p_level);
 }
 
 
@@ -994,7 +997,7 @@ Real FE<3,L2_HIERARCHIC>::shape_deriv(const FEType fet,
                                       const Point & p,
                                       const bool add_p_level)
 {
-  return fe_hierarchic_3D_shape_deriv(elem, fet.order, i, j, p, add_p_level);
+  return fe_hierarchic_3D_shape_deriv<L2_HIERARCHIC>(elem, fet.order, i, j, p, add_p_level);
 }
 
 
@@ -1203,7 +1206,7 @@ Real FE<3,HIERARCHIC>::shape_second_deriv(const Elem * elem,
                                           const Point & p,
                                           const bool add_p_level)
 {
-  return fe_hierarchic_3D_shape_second_deriv(elem, order, i, j, p, add_p_level);
+  return fe_hierarchic_3D_shape_second_deriv<HIERARCHIC>(elem, order, i, j, p, add_p_level);
 }
 
 
@@ -1216,7 +1219,7 @@ Real FE<3,HIERARCHIC>::shape_second_deriv(const FEType fet,
                                           const Point & p,
                                           const bool add_p_level)
 {
-  return fe_hierarchic_3D_shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
+  return fe_hierarchic_3D_shape_second_deriv<HIERARCHIC>(elem, fet.order, i, j, p, add_p_level);
 }
 
 
@@ -1229,7 +1232,7 @@ Real FE<3,L2_HIERARCHIC>::shape_second_deriv(const Elem * elem,
                                              const Point & p,
                                              const bool add_p_level)
 {
-  return fe_hierarchic_3D_shape_second_deriv(elem, order, i, j, p, add_p_level);
+  return fe_hierarchic_3D_shape_second_deriv<L2_HIERARCHIC>(elem, order, i, j, p, add_p_level);
 }
 
 
@@ -1241,7 +1244,7 @@ Real FE<3,L2_HIERARCHIC>::shape_second_deriv(const FEType fet,
                                              const Point & p,
                                              const bool add_p_level)
 {
-  return fe_hierarchic_3D_shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
+  return fe_hierarchic_3D_shape_second_deriv<L2_HIERARCHIC>(elem, fet.order, i, j, p, add_p_level);
 }
 
 
@@ -1540,7 +1543,7 @@ Point cube_side_point(unsigned int sidenum, const Point & p)
   return sidep;
 }
 
-
+template <FEFamily T>
 Real fe_hierarchic_3D_shape(const Elem * elem,
                             const Order order,
                             const unsigned int i,
@@ -1559,7 +1562,7 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
     {
     case HEX8:
     case HEX20:
-      libmesh_assert_less (totalorder, 2);
+      libmesh_assert (T == L2_HIERARCHIC || totalorder < 2);
       libmesh_fallthrough();
     case HEX27:
       {
@@ -1574,9 +1577,9 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
 
         cube_indices(elem, totalorder, i, xi, eta, zeta, i0, i1, i2);
 
-        return (FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i0, xi)*
-                FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i1, eta)*
-                FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i2, zeta));
+        return (FE<1,T>::shape(EDGE3, totalorder, i0, xi)*
+                FE<1,T>::shape(EDGE3, totalorder, i1, eta)*
+                FE<1,T>::shape(EDGE3, totalorder, i2, zeta));
       }
 
     default:
@@ -1591,6 +1594,7 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
 
 
 
+template <FEFamily T>
 Real fe_hierarchic_3D_shape_deriv(const Elem * elem,
                                   const Order order,
                                   const unsigned int i,
@@ -1637,8 +1641,8 @@ Real fe_hierarchic_3D_shape_deriv(const Elem * elem,
       libmesh_error_msg("Invalid derivative index j = " << j);
     }
 
-  return (FE<3,HIERARCHIC>::shape(elem, order, i, pp, add_p_level) -
-          FE<3,HIERARCHIC>::shape(elem, order, i, pm, add_p_level))/2./eps;
+  return (FE<3,T>::shape(elem, order, i, pp, add_p_level) -
+          FE<3,T>::shape(elem, order, i, pm, add_p_level))/2./eps;
 #else // LIBMESH_DIM != 3
   libmesh_ignore(elem, order, i, j, p, add_p_level);
   libmesh_not_implemented();
@@ -1649,6 +1653,7 @@ Real fe_hierarchic_3D_shape_deriv(const Elem * elem,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
+template <FEFamily T>
 Real fe_hierarchic_3D_shape_second_deriv(const Elem * elem,
                                          const Order order,
                                          const unsigned int i,
@@ -1721,8 +1726,8 @@ Real fe_hierarchic_3D_shape_second_deriv(const Elem * elem,
       libmesh_error_msg("Invalid derivative index j = " << j);
     }
 
-  return (FE<3,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pp, add_p_level) -
-          FE<3,HIERARCHIC>::shape_deriv(elem, order, i, prevj, pm, add_p_level))
+  return (FE<3,T>::shape_deriv(elem, order, i, prevj, pp, add_p_level) -
+          FE<3,T>::shape_deriv(elem, order, i, prevj, pm, add_p_level))
     / 2. / eps;
 }
 

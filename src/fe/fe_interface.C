@@ -2227,7 +2227,6 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
   switch (fe_t.family)
     {
     case LAGRANGE:
-    case L2_LAGRANGE: // TODO: L2_LAGRANGE can have higher "max_order" than LAGRANGE
     case LAGRANGE_VEC:
       switch (el_t)
         {
@@ -2271,6 +2270,8 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         }
       break;
     case MONOMIAL:
+    case L2_LAGRANGE:
+    case L2_HIERARCHIC:
     case MONOMIAL_VEC:
       switch (el_t)
         {
@@ -2481,44 +2482,6 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         }
       break;
     case HIERARCHIC:
-      switch (el_t)
-        {
-        case EDGE2:
-        case EDGE3:
-        case EDGE4:
-          return unlimited;
-        case TRI3:
-        case TRISHELL3:
-          return 1;
-        case TRI6:
-          return unlimited;
-        case QUAD4:
-        case QUADSHELL4:
-          return 1;
-        case QUAD8:
-        case QUADSHELL8:
-        case QUAD9:
-          return unlimited;
-        case TET4:
-        case TET10:
-          return 0;
-        case HEX8:
-        case HEX20:
-          return 1;
-        case HEX27:
-          return unlimited;
-        case PRISM6:
-        case PRISM15:
-        case PRISM18:
-        case PYRAMID5:
-        case PYRAMID13:
-        case PYRAMID14:
-          return 0;
-        default:
-          return unknown;
-        }
-      break;
-    case L2_HIERARCHIC:
       switch (el_t)
         {
         case EDGE2:

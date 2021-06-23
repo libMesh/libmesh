@@ -262,8 +262,10 @@ void l2_lagrange_nodal_soln(const Elem * elem,
           default:
             {
               // By default the element solution _is_ nodal,
-              // so just copy it.
-              nodal_soln = elem_soln;
+              // so just copy the portion relevant to the nodal solution
+              libmesh_assert_less_equal(nodal_soln.size(), elem_soln.size());
+              for (const auto i : index_range(nodal_soln))
+                nodal_soln[i] = elem_soln[i];
 
               return;
             }
@@ -276,8 +278,10 @@ void l2_lagrange_nodal_soln(const Elem * elem,
     default:
       {
         // By default the element solution _is_ nodal,
-        // so just copy it.
-        nodal_soln = elem_soln;
+        // so just copy the portion relevant to the nodal solution
+        libmesh_assert_less_equal(nodal_soln.size(), elem_soln.size());
+        for (const auto i : index_range(nodal_soln))
+          nodal_soln[i] = elem_soln[i];
 
         return;
       }
@@ -285,8 +289,6 @@ void l2_lagrange_nodal_soln(const Elem * elem,
 }
 
 
-// TODO: We should make this work, for example, for SECOND on a TRI3
-// (this is valid with L2_LAGRANGE, but not with LAGRANGE)
 unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
 {
   switch (o)
@@ -353,9 +355,11 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
           case NODEELEM:
             return 1;
 
+          case EDGE2:
           case EDGE3:
             return 3;
 
+          case TRI3:
           case TRI6:
             return 6;
 
@@ -363,27 +367,32 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
           case QUADSHELL8:
             return 8;
 
+          case QUAD4:
           case QUAD9:
             return 9;
 
+          case TET4:
           case TET10:
             return 10;
 
           case HEX20:
             return 20;
 
+          case HEX8:
           case HEX27:
             return 27;
 
           case PRISM15:
             return 15;
 
+          case PRISM6:
           case PRISM18:
             return 18;
 
           case PYRAMID13:
             return 13;
 
+          case PYRAMID5:
           case PYRAMID14:
             return 14;
 
@@ -402,6 +411,8 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
           case NODEELEM:
             return 1;
 
+          case EDGE2:
+          case EDGE3:
           case EDGE4:
             return 4;
 
