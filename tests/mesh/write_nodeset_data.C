@@ -25,7 +25,8 @@ public:
 
   CPPUNIT_TEST_SUITE_END();
 
-  void testWrite()
+  template <typename IOClass>
+  void testWriteImpl(const std::string & filename)
   {
     Mesh mesh(*TestCommWorld);
     mesh.allow_renumbering(false);
@@ -92,12 +93,10 @@ public:
 
       } // done constructing bc_vals
 
-#ifdef LIBMESH_HAVE_EXODUS_API
-
     // We write the file in the ExodusII format.
     {
-      ExodusII_IO writer(mesh);
-      writer.write("write_nodeset_data.e");
+      IOClass writer(mesh);
+      writer.write(filename);
       writer.write_nodeset_data (/*timestep=*/1, var_names, node_boundary_ids, bc_vals);
     }
 
@@ -106,8 +105,8 @@ public:
 
     // Now read it back in
     Mesh read_mesh(*TestCommWorld);
-    ExodusII_IO reader(read_mesh);
-    reader.read("write_nodeset_data.e");
+    IOClass reader(read_mesh);
+    reader.read(filename);
 
     std::vector<std::string> read_in_var_names;
     std::vector<std::set<boundary_id_type>> read_in_node_boundary_ids;
@@ -119,7 +118,12 @@ public:
     CPPUNIT_ASSERT(read_in_var_names == var_names);
     CPPUNIT_ASSERT(read_in_node_boundary_ids == node_boundary_ids);
     CPPUNIT_ASSERT(read_in_bc_vals == bc_vals);
+  }
 
+  void testWrite()
+  {
+#ifdef LIBMESH_HAVE_EXODUS_API
+    testWriteImpl<ExodusII_IO>("write_nodeset_data.e");
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
   }
 };

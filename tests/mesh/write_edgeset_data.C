@@ -28,7 +28,8 @@ public:
 
   CPPUNIT_TEST_SUITE_END();
 
-  void testWrite()
+  template <typename IOClass>
+  void testWriteImpl(const std::string & filename)
   {
     ReplicatedMesh mesh(*TestCommWorld);
 
@@ -67,12 +68,10 @@ public:
     bi.edgeset_name(0) = "back_edgeset";
     bi.edgeset_name(5) = "front_edgeset";
 
-#ifdef LIBMESH_HAVE_EXODUS_API
-
-    // We write the file in the ExodusII format.
+    // We write the file in the requested format.
     {
-      ExodusII_IO writer(mesh);
-      writer.write("write_edgeset_data.e");
+      IOClass writer(mesh);
+      writer.write(filename);
     }
 
     // Make sure that the writing is done before the reading starts.
@@ -80,8 +79,8 @@ public:
 
     // Now read it back in
     ReplicatedMesh read_mesh(*TestCommWorld);
-    ExodusII_IO reader(read_mesh);
-    reader.read("write_edgeset_data.e");
+    IOClass reader(read_mesh);
+    reader.read(filename);
 
     // Assert that we got back out what we put in.
     BoundaryInfo & read_bi = read_mesh.get_boundary_info();
@@ -97,7 +96,12 @@ public:
       counts[std::get<2>(t)]++;
     CPPUNIT_ASSERT(counts[0] == 100);
     CPPUNIT_ASSERT(counts[5] == 100);
+  }
 
+  void testWrite()
+  {
+#ifdef LIBMESH_HAVE_EXODUS_API
+    testWriteImpl<ExodusII_IO>("write_edgeset_data.e");
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
   }
 };
