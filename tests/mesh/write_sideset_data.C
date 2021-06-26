@@ -1,6 +1,7 @@
 // Basic include files
 #include "libmesh/equation_systems.h"
 #include "libmesh/exodusII_io.h"
+#include "libmesh/nemesis_io.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/parallel.h" // set_union
@@ -23,7 +24,12 @@ public:
   CPPUNIT_TEST_SUITE(WriteSidesetData);
 
 #if LIBMESH_DIM > 1
-  CPPUNIT_TEST(testWrite);
+#ifdef LIBMESH_HAVE_EXODUS_API
+  CPPUNIT_TEST(testWriteExodus);
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
+#ifdef LIBMESH_HAVE_NEMESIS_API
+  // CPPUNIT_TEST(testWriteNemesis); // Not yet implemented
+#endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -119,11 +125,15 @@ public:
     CPPUNIT_ASSERT(read_in_bc_vals == bc_vals);
   }
 
-  void testWrite()
+  void testWriteExodus()
   {
-#ifdef LIBMESH_HAVE_EXODUS_API
     testWriteImpl<ExodusII_IO>("write_sideset_data.e");
-#endif // #ifdef LIBMESH_HAVE_EXODUS_API
+  }
+
+  void testWriteNemesis()
+  {
+    // FIXME: Not yet implemented
+    // testWriteImpl<Nemesis_IO>("write_sideset_data.n");
   }
 
 };
