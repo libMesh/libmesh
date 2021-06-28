@@ -547,19 +547,33 @@ unsigned int Elem::which_node_am_i(unsigned int side,
 
 
 
-bool Elem::contains_vertex_of(const Elem * e) const
+bool Elem::contains_vertex_of(const Elem * e, bool mesh_connection) const
 {
   // Our vertices are the first numbered nodes
   const unsigned int nv = e->n_vertices();
+  const unsigned int my_nv = this->n_vertices();
 
   // Check for vertex-to-vertex containment first; contains_point() is
   // expensive
-  for (auto n : make_range(e->n_vertices()))
+  for (auto n : make_range(nv))
     {
       const Node * vertex = e->node_ptr(n);
-      for (auto & my_n : this->node_ref_range())
-        if (&my_n == vertex)
+      for (auto my_n : make_range(my_nv))
+        if (&this->node_ref(my_n) == vertex)
           return true;
+    }
+
+  // If e is in our mesh, then we might be done testing
+  if (mesh_connection)
+    {
+      const unsigned int l = this->level();
+      const unsigned int el = e->level();
+
+      if (l >= el)
+        return false;
+
+      // We could also return false for l==el-1 iff we knew we had no
+      // triangular faces, but we don't have an API to check that.
     }
 
   // Our vertices are the first numbered nodes

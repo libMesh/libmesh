@@ -438,9 +438,12 @@ public:
 
   /**
    * \returns \p true if a vertex of \p e is contained
-   * in this element.
+   * in this element.  If \p mesh_connection is true, looks
+   * specifically for containment possibilities of an element \p e
+   * that is connected to \p this via membership in the same manifold
+   * of the same mesh.
    */
-  bool contains_vertex_of(const Elem * e) const;
+  bool contains_vertex_of(const Elem * e, bool mesh_connection=false) const;
 
   /**
    * \returns \p true if an edge of \p e is contained in
