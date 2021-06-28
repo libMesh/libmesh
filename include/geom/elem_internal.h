@@ -403,8 +403,8 @@ find_point_neighbors(T this_elem,
 {
   libmesh_assert(start_elem);
   libmesh_assert(start_elem->active());
-  libmesh_assert(start_elem->contains_vertex_of(this_elem) ||
-                 this_elem->contains_vertex_of(start_elem));
+  libmesh_assert(start_elem->contains_vertex_of(this_elem, true) ||
+                 this_elem->contains_vertex_of(start_elem, true));
 
   neighbor_set.clear();
   neighbor_set.insert(start_elem);
@@ -424,8 +424,8 @@ find_point_neighbors(T this_elem,
                 {
                   if (current_neighbor->active())                // ... if it is active
                     {
-                      if (this_elem->contains_vertex_of(current_neighbor) // ... and touches us
-                          || current_neighbor->contains_vertex_of(this_elem))
+                      if (this_elem->contains_vertex_of(current_neighbor, true) // ... and touches us
+                          || current_neighbor->contains_vertex_of(this_elem, true))
                         {
                           // Make sure we'll test it
                           if (!neighbor_set.count(current_neighbor))
@@ -446,8 +446,8 @@ find_point_neighbors(T this_elem,
 
                       for (const auto & current_child : active_neighbor_children)
                         {
-                          if (this_elem->contains_vertex_of(current_child) ||
-                              current_child->contains_vertex_of(this_elem))
+                          if (this_elem->contains_vertex_of(current_child, true) ||
+                              current_child->contains_vertex_of(this_elem, true))
                             {
                               // Make sure we'll test it
                               if (!neighbor_set.count(current_child))
@@ -479,8 +479,8 @@ find_interior_neighbors(T this_elem,
     return;
 
   T ip = this_elem->interior_parent();
-  libmesh_assert (ip->contains_vertex_of(this_elem) ||
-                  this_elem->contains_vertex_of(ip));
+  libmesh_assert (ip->contains_vertex_of(this_elem, true) ||
+                  this_elem->contains_vertex_of(ip, true));
 
   libmesh_assert (!ip->subactive());
 
@@ -489,8 +489,8 @@ find_interior_neighbors(T this_elem,
     {                   // ip->child_ptr(c) is only good with AMR.
       for (auto & child : ip->child_ref_range())
         {
-          if (child.contains_vertex_of(this_elem) ||
-              this_elem->contains_vertex_of(&child))
+          if (child.contains_vertex_of(this_elem, true) ||
+              this_elem->contains_vertex_of(&child, true))
             {
               ip = &child;
               break;
