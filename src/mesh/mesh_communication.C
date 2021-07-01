@@ -1544,7 +1544,7 @@ struct SyncNodeIds
 #ifdef LIBMESH_ENABLE_AMR
 struct SyncPLevels
 {
-  typedef unsigned char datum;
+  typedef std::pair<unsigned char,unsigned char> datum;
 
   SyncPLevels(MeshBase & _mesh) :
     mesh(_mesh) {}
@@ -1560,7 +1560,9 @@ struct SyncPLevels
     for (const auto & id : ids)
       {
         Elem & elem = mesh.elem_ref(id);
-        ids_out.push_back(cast_int<unsigned char>(elem.p_level()));
+        ids_out.push_back
+          (std::make_pair(cast_int<unsigned char>(elem.p_level()),
+                          static_cast<unsigned char>(elem.p_refinement_flag())));
       }
   }
 
@@ -1570,7 +1572,12 @@ struct SyncPLevels
     for (auto i : index_range(old_ids))
       {
         Elem & elem = mesh.elem_ref(old_ids[i]);
-        elem.set_p_level(new_p_levels[i]);
+        // Make sure these are consistent
+        elem.hack_p_level_and_refinement_flag
+          (new_p_levels[i].first,
+           static_cast<Elem::RefinementState>(new_p_levels[i].second));
+        // Make sure parents' levels are consistent
+        elem.set_p_level(new_p_levels[i].first);
       }
   }
 };
