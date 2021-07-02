@@ -79,7 +79,7 @@ void Elem::set_p_level(unsigned int p)
         }
     }
 
-  _p_level = cast_int<unsigned char>(p);
+  this->hack_p_level(p);
 }
 
 

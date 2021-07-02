@@ -1546,6 +1546,15 @@ public:
   void hack_p_level (const unsigned int p);
 
   /**
+   * Sets the value of the p-refinement level for the element
+   * without altering the p-level of its ancestors; also sets the
+   * p_refinement_flag, simultaneously so that they can be safely
+   * checked for mutual consistency
+   */
+  void hack_p_level_and_refinement_flag (const unsigned int p,
+                                         RefinementState pflag);
+
+  /**
    * Refine the element.
    */
   virtual void refine (MeshRefinement & mesh_refinement);
@@ -2947,6 +2956,13 @@ void Elem::hack_p_level(unsigned int p)
 }
 
 
+inline
+void Elem::hack_p_level_and_refinement_flag (unsigned int p,
+                                             RefinementState pflag)
+{
+  _pflag = cast_int<unsigned char>(pflag);
+  this->hack_p_level(p);
+}
 
 #endif // ifdef LIBMESH_ENABLE_AMR
 
