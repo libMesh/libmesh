@@ -671,7 +671,7 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
   // Optionally store EIM solutions for the training set
   if (rb_eim_evaluation.get_parametrized_function().is_lookup_table)
     {
-      const std::vector<DenseVector<Number>> & eim_solutions = rb_eim_evaluation.eim_solutions;
+      const std::vector<DenseVector<Number>> & eim_solutions = rb_eim_evaluation.eim_solutions_for_training_set;
 
       auto eim_rhs_list_outer =
         rb_eim_evaluation_builder.initEimSolutionsForTrainingSet(eim_solutions.size());

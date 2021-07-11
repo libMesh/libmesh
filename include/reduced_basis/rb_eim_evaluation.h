@@ -274,13 +274,14 @@ public:
                                bool read_binary_basis_functions = true);
 
   /**
-   * Storage for EIM solutions. This is typically used in the case that we have
-   * is_lookup_table==true in our RBParametrizedFunction, since in that case we
-   * need to store all the EIM solutions on the training set so that we do not
-   * always need to refer to the lookup table itself (since in some cases, like
-   * in the Online stage, the lookup table is not available).
+   * Storage for EIM solutions from the training set. This is typically used in
+   * the case that we have is_lookup_table==true in our RBParametrizedFunction,
+   * since in that case we need to store all the EIM solutions on the training
+   * set so that we do not always need to refer to the lookup table itself
+   * (since in some cases, like in the Online stage, the lookup table is not
+   * available).
    */
-  std::vector<DenseVector<Number>> eim_solutions;
+  std::vector<DenseVector<Number>> eim_solutions_for_training_set;
 
 private:
 

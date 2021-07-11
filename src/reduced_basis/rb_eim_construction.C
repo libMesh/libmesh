@@ -493,7 +493,7 @@ void RBEIMConstruction::store_eim_solutions_for_training_set()
 
   RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
 
-  std::vector<DenseVector<Number>> & eim_solutions = get_rb_eim_evaluation().eim_solutions;
+  std::vector<DenseVector<Number>> & eim_solutions = get_rb_eim_evaluation().eim_solutions_for_training_set;
   eim_solutions.clear();
   eim_solutions.resize(get_n_training_samples());
   for (auto i : make_range(get_n_training_samples()))
