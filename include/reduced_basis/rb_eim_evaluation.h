@@ -205,6 +205,16 @@ public:
   std::vector<Number> get_rb_eim_solutions_entries(unsigned int index) const;
 
   /**
+   * Return a const reference to the EIM solutions for the parameters in the training set.
+   */
+  const std::vector<DenseVector<Number>> & get_eim_solutions_for_training_set() const;
+
+  /**
+   * Return a writeable reference to the EIM solutions for the parameters in the training set.
+   */
+  std::vector<DenseVector<Number>> & get_eim_solutions_for_training_set();
+
+  /**
    * Set the data associated with EIM interpolation points.
    */
   void add_interpolation_points_xyz(Point p);
@@ -273,6 +283,13 @@ public:
                                const std::string & directory_name = "offline_data",
                                bool read_binary_basis_functions = true);
 
+private:
+
+  /**
+   * The EIM solution coefficients from the most recent call to rb_eim_solves().
+   */
+  std::vector<DenseVector<Number>> _rb_eim_solutions;
+
   /**
    * Storage for EIM solutions from the training set. This is typically used in
    * the case that we have is_lookup_table==true in our RBParametrizedFunction,
@@ -281,14 +298,7 @@ public:
    * (since in some cases, like in the Online stage, the lookup table is not
    * available).
    */
-  std::vector<DenseVector<Number>> eim_solutions_for_training_set;
-
-private:
-
-  /**
-   * The EIM solution coefficients from the most recent call to rb_eim_solves().
-   */
-  std::vector<DenseVector<Number>> _rb_eim_solutions;
+  std::vector<DenseVector<Number>> _eim_solutions_for_training_set;
 
   /**
    * The parameters and the number of basis functions that were used in the

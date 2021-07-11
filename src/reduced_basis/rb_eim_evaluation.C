@@ -138,7 +138,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
             cast_int<unsigned int>(std::round(lookup_table_param));
 
           DenseVector<Number> values;
-          eim_solutions_for_training_set[lookup_table_index].get_principal_subvector(N, values);
+          _eim_solutions_for_training_set[lookup_table_index].get_principal_subvector(N, values);
           _rb_eim_solutions[mu_index] = values;
         }
 
@@ -340,6 +340,16 @@ std::vector<Number> RBEIMEvaluation::get_rb_eim_solutions_entries(unsigned int i
     }
 
   return rb_eim_solutions_entries;
+}
+
+const std::vector<DenseVector<Number>> & RBEIMEvaluation::get_eim_solutions_for_training_set() const
+{
+  return _eim_solutions_for_training_set;
+}
+
+std::vector<DenseVector<Number>> & RBEIMEvaluation::get_eim_solutions_for_training_set()
+{
+  return _eim_solutions_for_training_set;
 }
 
 void RBEIMEvaluation::add_interpolation_points_xyz(Point p)

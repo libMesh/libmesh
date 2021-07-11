@@ -798,7 +798,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       auto eim_rhs_list_outer =
         rb_eim_evaluation_reader.getEimSolutionsForTrainingSet();
 
-      std::vector<DenseVector<Number>> & eim_solutions = rb_eim_evaluation.eim_solutions_for_training_set;
+      std::vector<DenseVector<Number>> & eim_solutions = rb_eim_evaluation.get_eim_solutions_for_training_set();
       eim_solutions.clear();
       eim_solutions.resize(eim_rhs_list_outer.size());
 
