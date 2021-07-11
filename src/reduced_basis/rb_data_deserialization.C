@@ -792,7 +792,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
-  // Optionally load EIM rhs values for the training set
+  // Optionally load EIM solutions for the training set
   if (rb_eim_evaluation.get_parametrized_function().is_lookup_table)
     {
       auto eim_rhs_list_outer =

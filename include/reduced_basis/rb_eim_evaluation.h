@@ -99,19 +99,11 @@ public:
   RBParametrizedFunction & get_parametrized_function();
 
   /**
-   * Calculate the EIM approximation to parametrized_function
-   * using the first \p N EIM basis functions. Store the
-   * solution coefficients in the member _eim_solution.
-   * \returns The EIM a posteriori error bound.
-   */
-  virtual Real rb_eim_solve(unsigned int N);
-
-  /**
    * Calculate the EIM approximation for the given
    * right-hand side vector \p EIM_rhs. Store the
    * solution coefficients in the member _eim_solution.
    */
-  void rb_eim_solve(DenseVector<Number> & EIM_rhs);
+  DenseVector<Number> rb_eim_solve(DenseVector<Number> & EIM_rhs);
 
   /**
    * Perform rb_eim_solves at each mu in \p mus and store the results
@@ -203,10 +195,9 @@ public:
   const QpDataMap & get_basis_function(unsigned int i) const;
 
   /**
-   * Return a const reference to the EIM solution coefficients from the most
-   * recent solve.
+   * Return the EIM solution coefficients from the most recent call to rb_eim_solves().
    */
-  const DenseVector<Number> & get_rb_eim_solution() const;
+  const std::vector<DenseVector<Number>> & get_rb_eim_solutions() const;
 
   /**
    * Return entry \p index for each solution in _rb_eim_solutions.
@@ -256,24 +247,6 @@ public:
     const std::vector<Point> & perturbs);
 
   /**
-   * Take ownership of EIM_rhs_vec and set _EIM_rhs_vec. These RHS vectors
-   * will be used in rb_eim_solve(), instead of RHS vectors constructed based
-   * on the input parameters.
-   */
-  void set_EIM_rhs_vec(std::unique_ptr<std::vector<DenseVector<Number>>> EIM_rhs_vec);
-
-  /**
-   * Get a const reference to _EIM_rhs_vec.
-   */
-  const std::vector<DenseVector<Number>> & get_EIM_rhs() const;
-
-  /**
-   * Boolean to indicate whether we evaluate a posteriori error bounds
-   * when eim_solve is called.
-   */
-  bool evaluate_eim_error_bound;
-
-  /**
    * Write out all the basis functions to file.
    * \p sys is used for file IO
    * \p directory_name specifies which directory to write files to
@@ -301,17 +274,15 @@ public:
                                bool read_binary_basis_functions = true);
 
   /**
-   * Storage for EIM solutions in the case that we have is_lookup_table==true
-   * in our RBParametrizedFunction.
+   * Storage for EIM solutions. This is typically used in the case that we have
+   * is_lookup_table==true in our RBParametrizedFunction, since in that case we
+   * need to store all the EIM solutions on the training set so that we do not
+   * always need to refer to the lookup table itself (since in some cases, like
+   * in the Online stage, the lookup table is not available).
    */
   std::vector<DenseVector<Number>> eim_solutions;
 
 private:
-
-  /**
-   * The EIM solution coefficients from the most recent rb_eim_solve().
-   */
-  DenseVector<Number> _rb_eim_solution;
 
   /**
    * The EIM solution coefficients from the most recent call to rb_eim_solves().
@@ -381,11 +352,6 @@ private:
    * generally will not start at zero.
    */
   std::vector<QpDataMap> _local_eim_basis_functions;
-
-  /**
-   * The RHS vectors that will be used in rb_eim_solves(), if they are initialized.
-   */
-  std::unique_ptr<std::vector<DenseVector<Number>>> _EIM_rhs_vec;
 
   /**
    * Print the contents of _local_eim_basis_functions to libMesh::out.
