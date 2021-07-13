@@ -792,13 +792,13 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
-  // Optionally load EIM rhs values for the training set
+  // Optionally load EIM solutions for the training set
   if (rb_eim_evaluation.get_parametrized_function().is_lookup_table)
     {
       auto eim_rhs_list_outer =
         rb_eim_evaluation_reader.getEimSolutionsForTrainingSet();
 
-      std::vector<DenseVector<Number>> & eim_solutions = rb_eim_evaluation.eim_solutions;
+      std::vector<DenseVector<Number>> & eim_solutions = rb_eim_evaluation.get_eim_solutions_for_training_set();
       eim_solutions.clear();
       eim_solutions.resize(eim_rhs_list_outer.size());
 

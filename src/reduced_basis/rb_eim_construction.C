@@ -321,9 +321,7 @@ Real RBEIMConstruction::train_eim_approximation()
                        "Error: We currently only support EIM training starting from an empty basis");
 
   libMesh::out << std::endl << "---- Performing Greedy EIM basis enrichment ----" << std::endl;
-  Real abs_greedy_error = 0.;
-  Real initial_greedy_error = 0.;
-  bool initial_greedy_error_initialized = false;
+  Real greedy_error = 0.;
   std::vector<RBParameters> greedy_param_list;
 
   // Initialize the current training index to the index that corresponds
@@ -355,18 +353,11 @@ Real RBEIMConstruction::train_eim_approximation()
 
       libMesh::out << "Computing EIM error on training set" << std::endl;
       std::pair<Real,unsigned int> max_error_pair = compute_max_eim_error();
-      abs_greedy_error = max_error_pair.first;
+      greedy_error = max_error_pair.first;
       current_training_index = max_error_pair.second;
       set_params_from_training_set(current_training_index);
 
-      libMesh::out << "Maximum EIM error is " << abs_greedy_error << std::endl << std::endl;
-
-      // record the initial error
-      if (!initial_greedy_error_initialized)
-        {
-          initial_greedy_error = abs_greedy_error;
-          initial_greedy_error_initialized = true;
-        }
+      libMesh::out << "Maximum EIM error is " << greedy_error << std::endl << std::endl;
 
       // Convergence and/or termination tests
       {
@@ -377,21 +368,17 @@ Real RBEIMConstruction::train_eim_approximation()
             break;
           }
 
-        // We scale the absolution tolerance by the maximum absolute value in our
-        // training set, because otherwise users would need to know the magnitude
-        // of the functions being considered before setting the absolute tolerance.
-        // It is more reliable to compute the relevant magnitude and scale the tolerance
-        // by that magnitude.
-        if (abs_greedy_error < (get_abs_training_tolerance() * get_max_abs_value_in_training_set()))
+        // We consider the relative tolerance as relative to the maximum value in the training
+        // set, since we assume that this maximum value provides a relevant scaling.
+        if (greedy_error < (get_rel_training_tolerance() * get_max_abs_value_in_training_set()))
           {
-            libMesh::out << "Absolute error tolerance reached." << std::endl;
+            libMesh::out << "Relative error tolerance reached." << std::endl;
             break;
           }
 
-        Real rel_greedy_error = abs_greedy_error/initial_greedy_error;
-        if (rel_greedy_error < get_rel_training_tolerance())
+        if (greedy_error < get_abs_training_tolerance())
           {
-            libMesh::out << "Relative error tolerance reached." << std::endl;
+            libMesh::out << "Absolute error tolerance reached." << std::endl;
             break;
           }
 
@@ -427,7 +414,7 @@ Real RBEIMConstruction::train_eim_approximation()
       store_eim_solutions_for_training_set();
     }
 
-  return abs_greedy_error;
+  return greedy_error;
 }
 
 void RBEIMConstruction::initialize_eim_assembly_objects()
@@ -506,7 +493,7 @@ void RBEIMConstruction::store_eim_solutions_for_training_set()
 
   RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
 
-  std::vector<DenseVector<Number>> & eim_solutions = get_rb_eim_evaluation().eim_solutions;
+  std::vector<DenseVector<Number>> & eim_solutions = get_rb_eim_evaluation().get_eim_solutions_for_training_set();
   eim_solutions.clear();
   eim_solutions.resize(get_n_training_samples());
   for (auto i : make_range(get_n_training_samples()))
@@ -529,10 +516,7 @@ void RBEIMConstruction::store_eim_solutions_for_training_set()
                                                                  eim_eval.get_interpolation_points_comp(j),
                                                                  eim_eval.get_interpolation_points_qp(j));
             }
-
-          eim_eval.set_parameters( get_parameters() );
-          eim_eval.rb_eim_solve(EIM_rhs);
-          eim_solutions[i] = eim_eval.get_rb_eim_solution();
+          eim_solutions[i] = eim_eval.rb_eim_solve(EIM_rhs);
         }
     }
 }
@@ -554,15 +538,73 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
   libmesh_error_msg_if(get_n_training_samples() != get_local_n_training_samples(),
                        "Error: Training samples should be the same on all procs");
 
-  for (auto i : make_range(get_n_training_samples()))
-    {
-      Real best_fit_error = compute_best_fit_error(i);
+  const unsigned int RB_size = get_rb_eim_evaluation().get_n_basis_functions();
 
-      if (best_fit_error > max_err)
+  if(best_fit_type_flag == PROJECTION_BEST_FIT)
+    {
+      for (auto training_index : make_range(get_n_training_samples()))
         {
-          max_err_index = i;
-          max_err = best_fit_error;
+          // Make a copy of the pre-computed solution for the specified training sample
+          // since we will modify it below to compute the best fit error.
+          QpDataMap solution_copy = _local_parametrized_functions_for_training[training_index];
+
+          // Perform an L2 projection in order to find the best approximation to
+          // the parametrized function from the current EIM space.
+          DenseVector<Number> best_fit_rhs(RB_size);
+          for (unsigned int i=0; i<RB_size; i++)
+            {
+              best_fit_rhs(i) = inner_product(solution_copy, get_rb_eim_evaluation().get_basis_function(i));
+            }
+
+          // Now compute the best fit by an LU solve
+          DenseMatrix<Number> RB_inner_product_matrix_N(RB_size);
+          _eim_projection_matrix.get_principal_submatrix(RB_size, RB_inner_product_matrix_N);
+
+          DenseVector<Number> best_fit_coeffs;
+          RB_inner_product_matrix_N.lu_solve(best_fit_rhs, best_fit_coeffs);
+
+          get_rb_eim_evaluation().decrement_vector(solution_copy, best_fit_coeffs);
+          Real best_fit_error = get_max_abs_value(solution_copy);
+
+          if (best_fit_error > max_err)
+            {
+              max_err_index = training_index;
+              max_err = best_fit_error;
+            }
         }
+    }
+  else if(best_fit_type_flag == EIM_BEST_FIT)
+    {
+      // Perform EIM solve in order to find the approximation to solution
+      // (rb_eim_solve provides the EIM basis function coefficients used below)
+
+      std::vector<RBParameters> training_parameters_copy(get_n_training_samples());
+      for (auto training_index : make_range(get_n_training_samples()))
+        {
+          training_parameters_copy[training_index] = get_params_from_training_set(training_index);
+        }
+
+      get_rb_eim_evaluation().rb_eim_solves(training_parameters_copy, RB_size);
+      const std::vector<DenseVector<Number>> & rb_eim_solutions = get_rb_eim_evaluation().get_rb_eim_solutions();
+
+      for (auto training_index : make_range(get_n_training_samples()))
+        {
+          const DenseVector<Number> & best_fit_coeffs = rb_eim_solutions[training_index];
+
+          QpDataMap solution_copy = _local_parametrized_functions_for_training[training_index];
+          get_rb_eim_evaluation().decrement_vector(solution_copy, best_fit_coeffs);
+          Real best_fit_error = get_max_abs_value(solution_copy);
+
+          if (best_fit_error > max_err)
+            {
+              max_err_index = training_index;
+              max_err = best_fit_error;
+            }
+        }
+    }
+  else
+    {
+      libmesh_error_msg("EIM best fit type not recognized");
     }
 
   return std::make_pair(max_err,max_err_index);
@@ -856,11 +898,11 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
         }
 
       eim_eval.set_parameters( get_parameters() );
-      eim_eval.rb_eim_solve(EIM_rhs);
+      DenseVector<Number> rb_eim_solution = eim_eval.rb_eim_solve(EIM_rhs);
 
       // Load the "EIM residual" into solution by subtracting
       // the EIM approximation
-      get_rb_eim_evaluation().decrement_vector(local_pf, eim_eval.get_rb_eim_solution());
+      get_rb_eim_evaluation().decrement_vector(local_pf, rb_eim_solution);
     }
 
   // Find the quadrature point at which local_pf (which now stores
@@ -992,63 +1034,6 @@ void RBEIMConstruction::update_eim_matrices()
       eim_eval.set_interpolation_matrix_entry(RB_size-1, j, value);
 
     }
-}
-
-Real RBEIMConstruction::compute_best_fit_error(unsigned int training_index)
-{
-  LOG_SCOPE("compute_best_fit_error()", "RBEIMConstruction");
-
-  set_params_from_training_set(training_index);
-
-  // Make a copy of the pre-computed solution for the specified training sample
-  // since we will modify it below to compute the best fit error.
-  QpDataMap solution_copy = _local_parametrized_functions_for_training[training_index];
-
-  const unsigned int RB_size = get_rb_eim_evaluation().get_n_basis_functions();
-  DenseVector<Number> best_fit_coeffs;
-
-  switch(best_fit_type_flag)
-    {
-    case(PROJECTION_BEST_FIT):
-      {
-        // Perform an L2 projection in order to find the best approximation to
-        // the parametrized function from the current EIM space.
-        DenseVector<Number> best_fit_rhs(RB_size);
-        for (unsigned int i=0; i<RB_size; i++)
-          {
-            best_fit_rhs(i) = inner_product(solution_copy, get_rb_eim_evaluation().get_basis_function(i));
-          }
-
-        // Now compute the best fit by an LU solve
-        DenseMatrix<Number> RB_inner_product_matrix_N(RB_size);
-        _eim_projection_matrix.get_principal_submatrix(RB_size, RB_inner_product_matrix_N);
-
-        RB_inner_product_matrix_N.lu_solve(best_fit_rhs, best_fit_coeffs);
-        break;
-      }
-    case(EIM_BEST_FIT):
-      {
-        // Perform EIM solve in order to find the approximation to solution
-        // (rb_eim_solve provides the EIM basis function coefficients used below)
-
-        // Turn off error estimation for this rb_eim_solve, we use the linfty norm instead
-        bool stashed_evaluate_eim_error_bound = get_rb_eim_evaluation().evaluate_eim_error_bound;
-        get_rb_eim_evaluation().evaluate_eim_error_bound = false;
-        get_rb_eim_evaluation().set_parameters( get_parameters() );
-        get_rb_eim_evaluation().rb_eim_solve(RB_size);
-        get_rb_eim_evaluation().evaluate_eim_error_bound = stashed_evaluate_eim_error_bound;
-
-        best_fit_coeffs = get_rb_eim_evaluation().get_rb_eim_solution();
-        break;
-      }
-    default:
-      libmesh_error_msg("Should not reach here");
-    }
-
-  get_rb_eim_evaluation().decrement_vector(solution_copy, best_fit_coeffs);
-
-  Real best_fit_error = get_max_abs_value(solution_copy);
-  return best_fit_error;
 }
 
 void RBEIMConstruction::scale_parametrized_function(

@@ -220,13 +220,6 @@ private:
   std::pair<Real, unsigned int> compute_max_eim_error();
 
   /**
-   * Compute the maximum (i.e. l-infinity norm) error of the best fit
-   * of the parametrized function at training index \p training_index
-   * into the EIM approximation space.
-   */
-  Real compute_best_fit_error(unsigned int training_index);
-
-  /**
    * Compute and store the parametrized function for each
    * parameter in the training set at all the stored qp locations.
    */
