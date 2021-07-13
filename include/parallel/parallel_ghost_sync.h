@@ -851,6 +851,32 @@ struct SyncSubdomainIds
   MeshBase & mesh;
 };
 
+// This struct can be created and passed to the
+// Parallel::sync_dofobject_data_by_id() function
+// for sync element integers.
+struct SyncElementIntegers
+{
+  // The constructor.  You need a reference to the mesh where you will
+  // be setting/getting element integers and an existing element integer name.
+  explicit
+  SyncElementIntegers(MeshBase & m, const std::string & integer_name);
+
+  // The datum typedef is required of this functor, so that the
+  // Parallel::sync_dofobject_data_by_id() function can create e.g.
+  // std::vector<datum>.
+  typedef dof_id_type datum;
+
+  // First required interface.  This function must fill up the data vector for the
+  // ids specified in the ids vector.
+  void gather_data(const std::vector<dof_id_type> & ids, std::vector<datum> & data) const;
+
+  // Second required interface.  This function must do something with the data in
+  // the data vector for the ids in the ids vector.
+  void act_on_data(const std::vector<dof_id_type> & ids,  const std::vector<datum> & data) const;
+
+  MeshBase & mesh;
+  unsigned int ind;
+};
 
 } // namespace libMesh
 

@@ -67,7 +67,7 @@ SyncSubdomainIds::SyncSubdomainIds(MeshBase & m)
 {}
 
 void SyncSubdomainIds::gather_data (const std::vector<dof_id_type> & ids,
-                                        std::vector<datum> & ids_out) const
+                                    std::vector<datum> & ids_out) const
 {
   ids_out.reserve(ids.size());
 
@@ -79,12 +79,38 @@ void SyncSubdomainIds::gather_data (const std::vector<dof_id_type> & ids,
 }
 
 void SyncSubdomainIds::act_on_data (const std::vector<dof_id_type> & ids,
-                              const std::vector<datum> & subdomain_ids) const
+                                    const std::vector<datum> & subdomain_ids) const
 {
   for (auto i : index_range(ids))
     {
       Elem & elem = mesh.elem_ref(ids[i]);
       elem.subdomain_id()=subdomain_ids[i];
+    }
+}
+
+SyncElementIntegers::SyncElementIntegers(MeshBase & m, const std::string & integer_name)
+  : mesh(m), ind(m.get_elem_integer_index(integer_name))
+{}
+
+void SyncElementIntegers::gather_data(const std::vector<dof_id_type> & ids,
+                                      std::vector<dof_id_type> & ids_out) const
+{
+  ids_out.reserve(ids.size());
+
+  for (const auto & id : ids)
+    {
+      Elem & elem = mesh.elem_ref(id);
+      ids_out.push_back(elem.get_extra_integer(ind));
+    }
+}
+
+void SyncElementIntegers::act_on_data(const std::vector<dof_id_type> & ids,
+                                      const std::vector<dof_id_type> & integer_ids) const
+{
+  for (auto i : index_range(ids))
+    {
+      Elem & elem = mesh.elem_ref(ids[i]);
+      elem.set_extra_integer(ind, integer_ids[i]);
     }
 }
 
