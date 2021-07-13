@@ -1013,6 +1013,12 @@ public:
   DofConstraints::const_iterator constraint_rows_end() const
   { return _dof_constraints.end(); }
 
+  /**
+   * Provide a const accessor to the DofConstraints map. This allows the user
+   * to quickly search the data structure rather than just iterating over it.
+   */
+  const DofConstraints & get_dof_constraints() const { return _dof_constraints; }
+
   void stash_dof_constraints()
   {
     libmesh_assert(_stashed_dof_constraints.empty());
