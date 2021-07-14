@@ -155,6 +155,12 @@ public:
   void read_node_num_map();
 
   /**
+   * Reads the optional \p bex_cv_blocks from the \p ExodusII mesh
+   * file.
+   */
+  void read_bex_cv_blocks();
+
+  /**
    * Prints the nodal information, by default to \p libMesh::out.
    */
   void print_nodes(std::ostream & out = libMesh::out);
@@ -650,6 +656,19 @@ public:
 
   // z locations of node points
   std::vector<Real> z;
+
+  // Spline weights associated with node points, in IGA meshes
+  std::vector<Real> w;
+
+  // Number of Bezier Extraction coefficient vectors in a block
+  unsigned int bex_num_elem_cvs;
+
+  // Bezier Extraction connectivity indices, in IGA meshes
+  std::vector<std::vector<long unsigned int>> bex_cv_conn;
+
+  // Bezier Extraction coefficient vectors, in IGA meshes
+  // bex_dense_constraint_vecs[block_num][vec_num][column_num] = coef
+  std::vector<std::vector<std::vector<Real>>> bex_dense_constraint_vecs;
 
   // Type of element in a given block
   std::vector<char> elem_type;

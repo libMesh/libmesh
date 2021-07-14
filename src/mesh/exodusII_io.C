@@ -177,6 +177,10 @@ void ExodusII_IO::read (const std::string & fname)
   // a node_num_map, the identity map is returned by this call.
   exio_helper->read_node_num_map();
 
+  // Read any Bezier Extraction coefficient vectors from the file,
+  // such as might occur in an IsoGeometric Analysis (IGA) mesh.
+  exio_helper->read_bex_cv_blocks();
+
   // Loop over the nodes, create Nodes with local processor_id 0.
   for (int i=0; i<exio_helper->num_nodes; i++)
     {

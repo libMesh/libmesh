@@ -119,6 +119,9 @@ const std::vector<int> hex_inverse_edge_map =
   // in a Bezier element block
   inline void libmesh_assert_bezier_elem(const char * libmesh_dbg_var(elem_type_str))
   {
+#if EX_API_VERS_NODOT < 800
+    libmesh_error_msg("Reading Bezier Extraction from Exodus files requires ExodusII v8");
+#endif
     libmesh_assert_greater(strlen(elem_type_str), 4);
     libmesh_assert_equal_to(std::string(elem_type_str, elem_type_str+4), "BEX_");
   }
@@ -156,6 +159,7 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   num_nodes_per_elem(0),
   num_attr(0),
   num_elem_all_sidesets(0),
+  bex_num_elem_cvs(0),
   num_time_steps(0),
   num_nodal_vars(0),
   num_elem_vars(0),
@@ -755,6 +759,34 @@ void ExodusII_IO_Helper::read_nodes()
       EX_CHECK_ERR(ex_err, "Error retrieving nodal data.");
       message("Nodal data retrieved successfully.");
     }
+
+  // If a nodal attribute bex_weight exists, we get spline weights
+  // from it
+  int n_nodal_attr = 0;
+  ex_err = exII::ex_get_attr_param(ex_id, exII::EX_NODAL, 0, & n_nodal_attr);
+  EX_CHECK_ERR(ex_err, "Error getting number of nodal attributes.");
+
+  if (n_nodal_attr > 0)
+    {
+      std::vector<std::vector<char>> attr_name_data
+        (n_nodal_attr, std::vector<char>(MAX_STR_LENGTH + 1));
+      std::vector<char *> attr_names(n_nodal_attr);
+      for (auto i : index_range(attr_names))
+        attr_names[i] = attr_name_data[i].data();
+
+      ex_err = exII::ex_get_attr_names(ex_id, exII::EX_NODAL, 0, attr_names.data());
+      EX_CHECK_ERR(ex_err, "Error getting nodal attribute names.");
+
+      for (auto i : index_range(attr_names))
+        if (std::string("bex_weight") == attr_names[i])
+          {
+            w.resize(num_nodes);
+            ex_err =
+              exII::ex_get_one_attr (ex_id, exII::EX_NODAL, 0, i+1,
+                                     MappedInputVector(w, _single_precision).data());
+            EX_CHECK_ERR(ex_err, "Error getting Bezier Extraction nodal weights");
+          }
+    }
 }
 
 
@@ -780,6 +812,96 @@ void ExodusII_IO_Helper::read_node_num_map ()
         libMesh::out << node_num_map[i] << ", ";
       libMesh::out << "... " << node_num_map.back() << std::endl;
     }
+}
+
+
+void ExodusII_IO_Helper::read_bex_cv_blocks()
+{
+  // If global attributes bex_* exist, we look for Bezier Extraction
+  // coefficient data there.
+
+  // This API doesn't work the way the docs would lead me to expect -
+  // we need one from a newer Exodus version than 5.22
+  // int n_global_attr = 0;
+  // ex_err = exII::ex_get_attr_param(ex_id, exII::EX_GLOBAL, 0, & n_global_attr);
+#if EX_API_VERS_NODOT >= 800
+  int n_global_attr = exII::ex_get_attribute_count(ex_id, exII::EX_GLOBAL, 0);
+  EX_CHECK_ERR(n_global_attr, "Error getting number of global attributes.");
+
+  if (n_global_attr > 0)
+    {
+      std::vector<exII::ex_attribute> attributes(n_global_attr);
+
+      ex_err = exII::ex_get_attribute_param(ex_id, exII::EX_GLOBAL, 0, attributes.data());
+      EX_CHECK_ERR(ex_err, "Error getting global attribute parameters.");
+
+      ex_err = exII::ex_get_attributes(ex_id, n_global_attr, attributes.data());
+      EX_CHECK_ERR(ex_err, "Error getting global attribute values.");
+
+      std::vector<int> bex_num_cv_blocks(2, 0);
+      std::vector<long unsigned int> bex_cv_block_info;
+
+      for (auto attr : attributes)
+        {
+          if (std::string("bex_num_cv_blocks") == attr.name)
+            {
+              if (attr.type != exII::EX_INTEGER)
+                libmesh_error_msg("Found non-integer bex_num_cv_blocks");
+
+              if (attr.value_count > 2)
+                libmesh_error_msg("Looking for at most 2 bex_num_cv_blocks; found " << attr.value_count);
+
+              const int * as_int = static_cast<int *>(attr.values);
+              std::copy(as_int, as_int+attr.value_count, bex_num_cv_blocks.begin());
+
+              if (bex_num_cv_blocks[1])
+                libmesh_not_implemented_msg("Bezier Extraction sparse coefficient blocks are unsupported");
+            }
+          else if (std::string("bex_cv_block_info") == attr.name)
+            {
+              if (attr.type != exII::EX_INTEGER)
+                libmesh_error_msg("Found non-integer bex_cv_block_info");
+
+              if (!bex_num_cv_blocks[0])
+                libmesh_not_implemented_msg("Inconsistent/reordered Bezier Extraction coefficient block counts");
+
+              const std::size_t block_data_size = 2*bex_num_cv_blocks[0];
+              if (attr.value_count != block_data_size)
+                libmesh_error_msg("Looking for " << block_data_size << " bex_num_cv_blocks; found " << attr.value_count);
+
+              bex_cv_block_info.resize(block_data_size, 0);
+
+              const int * as_int = static_cast<int *>(attr.values);
+              std::copy(as_int, as_int+block_data_size, bex_cv_block_info.begin());
+            }
+          else if (std::string("bex_dense_cv_blocks") == attr.name)
+            {
+              if (attr.type != exII::EX_DOUBLE)
+                libmesh_error_msg("Found non-double bex_dense_cv_blocks");
+
+              if (bex_cv_block_info.empty())
+                libmesh_not_implemented_msg("Inconsistent/reordered Bezier Extraction coefficient block info");
+
+              const double * as_double = static_cast<double *>(attr.values);
+
+              bex_dense_constraint_vecs.clear();
+              bex_dense_constraint_vecs.resize(bex_num_cv_blocks[0]);
+              std::size_t offset = 0;
+              for (auto i : IntRange<std::size_t>(0, bex_num_cv_blocks[0]))
+                {
+                  bex_dense_constraint_vecs[i].resize(bex_cv_block_info[2*i]);
+                  for (auto & vec : bex_dense_constraint_vecs[i])
+                    {
+                      const int vecsize = bex_cv_block_info[2*i+1];
+                      vec.resize(vecsize);
+                      std::copy(as_double+offset, as_double+offset+vecsize, vec.begin());
+                      offset += vecsize;
+                    }
+                }
+            }
+        }
+    }
+#endif // EX_API_VERS_NODOT >= 800
 }
 
 
@@ -947,6 +1069,96 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
       EX_CHECK_ERR(ex_err, "Error reading block connectivity.");
       message("Connectivity retrieved successfully for block: ", block);
     }
+
+  // If we had any attributes for this block, check to see if some of
+  // them were Bezier-extension attributes.
+
+  // num_attr above is zero, not actually the number of block attributes?
+  // ex_get_attr_param *also* gives me zero?  Really, Exodus?
+#if EX_API_VERS_NODOT >= 800
+  int real_n_attr = exII::ex_get_attribute_count(ex_id, exII::EX_ELEM_BLOCK, block_ids[block]);
+  EX_CHECK_ERR(real_n_attr, "Error getting number of element block attributes.");
+
+  if (real_n_attr > 0)
+    {
+      std::vector<exII::ex_attribute> attributes(real_n_attr);
+
+      ex_err = exII::ex_get_attribute_param(ex_id, exII::EX_ELEM_BLOCK, block_ids[block], attributes.data());
+      EX_CHECK_ERR(ex_err, "Error getting element block attribute parameters.");
+
+      ex_err = exII::ex_get_attributes(ex_id, real_n_attr, attributes.data());
+      EX_CHECK_ERR(ex_err, "Error getting element block attribute values.");
+
+      for (auto attr : attributes)
+        {
+          if (std::string("bex_elem_degrees") == attr.name)
+            {
+              if (attr.type != exII::EX_INTEGER)
+                libmesh_error_msg("Found non-integer bex_elem_degrees");
+
+              if (attr.value_count > 3)
+                libmesh_error_msg("Looking for at most 3 bex_elem_degrees; found " << attr.value_count);
+
+              libmesh_assert_bezier_elem(elem_type.data());
+
+              std::vector<int> bex_elem_degrees(3); // max dim
+
+              const int * as_int = static_cast<int *>(attr.values);
+              std::copy(as_int, as_int+attr.value_count, bex_elem_degrees.begin());
+
+              // Right now Bezier extraction elements aren't possible
+              // for p>2 and aren't useful for p<2, and we don't
+              // support anisotropic p...
+#ifndef NDEBUG
+              const auto & conv = get_conversion(std::string(elem_type.data()));
+
+              for (auto d : IntRange<int>(0, conv.dim))
+                libmesh_assert_equal_to(bex_elem_degrees[d], 2);
+#endif
+            }
+          else if (std::string("bex_num_elem_cvs") == attr.name)
+            {
+              if (attr.type != exII::EX_INTEGER)
+                libmesh_error_msg("Found non-integer bex_num_elem_cvs");
+
+              if (attr.value_count > 3)
+                libmesh_error_msg("Looking for 1 bex_num_elem_cvs; found " << attr.value_count);
+
+              libmesh_assert_bezier_elem(elem_type.data());
+
+              const int * as_int = static_cast<int *>(attr.values);
+              bex_num_elem_cvs = *as_int;
+            }
+          else if (std::string("bex_cv_conn") == attr.name)
+            {
+              if (attr.type != exII::EX_INTEGER)
+                libmesh_error_msg("Found non-integer bex_num_cv_blocks");
+
+              libmesh_assert_bezier_elem(elem_type.data());
+
+              // We'd better have seen the number of cvs before we see
+              // the cv connectivity
+              libmesh_assert_not_equal_to(bex_num_elem_cvs, 0);
+
+              std::vector<int> bex_cv_conn_data(num_elem_this_blk * bex_num_elem_cvs);
+
+              const int * as_int = static_cast<int *>(attr.values);
+              std::copy(as_int, as_int+attr.value_count, bex_cv_conn_data.begin());
+
+              bex_cv_conn.resize(num_elem_this_blk);
+              std::size_t offset = 0;
+              for (auto e : IntRange<std::size_t>(0, num_elem_this_blk))
+                {
+                  bex_cv_conn[e].resize(bex_num_elem_cvs);
+                  std::copy(bex_cv_conn_data.data()+offset,
+                            bex_cv_conn_data.data()+offset+bex_num_elem_cvs,
+                            bex_cv_conn[e].begin());
+                  offset += bex_num_elem_cvs;
+                }
+            }
+        }
+    }
+#endif // EX_API_VERS_NODOT >= 800
 }
 
 
