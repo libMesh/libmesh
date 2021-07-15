@@ -447,17 +447,32 @@ void RBEIMEvaluation::set_observation_points_and_components(
 
 unsigned int RBEIMEvaluation::get_n_observation_points() const
 {
-  return _observation_points.size();
+  return _observation_points_xyz.size();
 }
 
 const std::vector<Point> & RBEIMEvaluation::get_observation_points() const
 {
-  return _observation_points;
+  return _observation_points_xyz;
 }
 
 const std::vector<unsigned int> & RBEIMEvaluation::get_observation_components() const
 {
-  return _observation_components;
+  return _observation_points_comp;
+}
+
+Number RBEIMEvaluation::get_observation_value(unsigned int bf_index, unsigned int obs_pt_index) const
+{
+  if (bf_index >= _observation_points_values.size())
+    libmesh_error_msg("Invalid basis function index: " << bf_index);
+  if (obs_pt_index >= _observation_points_values[bf_index].size())
+    libmesh_error_msg("Invalid observation point index: " << obs_pt_index);
+
+  return _observation_points_values[bf_index][obs_pt_index];
+}
+
+void RBEIMEvaluation::add_observation_values_for_basis_function(const std::vector<Number> & values)
+{
+  _observation_points_values.emplace_back(values);
 }
 
 void RBEIMEvaluation::add_basis_function_and_interpolation_data(

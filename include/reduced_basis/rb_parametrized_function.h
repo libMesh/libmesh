@@ -139,6 +139,18 @@ public:
                                         subdomain_id_type sbd_id) const;
 
   /**
+   * Evaluate the parametrized function for the parameter \p mu at the set of
+   * \p observation_points. We return only the component of the function specified
+   * by \p observation_components, and we also provide \p elem_ids and \p sbd_ids
+   * since that info can be required for the evaluation in some cases.
+   */
+  virtual std::vector<Number> evaluate_at_observation_points(const RBParameters & mu,
+                                                             const std::vector<Point> & observation_points,
+                                                             const std::vector<unsigned int> & observation_components,
+                                                             const std::vector<dof_id_type> & elem_ids,
+                                                             const std::vector<subdomain_id_type> & sbd_ids);
+
+  /**
    * Storage for pre-evaluated values. The indexing is given by:
    *   parameter index --> point index --> component index --> value.
    */

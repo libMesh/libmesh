@@ -279,6 +279,16 @@ public:
   const std::vector<unsigned int> & get_observation_components() const;
 
   /**
+   * Get the observation value for the specified basis function and observation point.
+   */
+  Number get_observation_value(unsigned int bf_index, unsigned int obs_pt_index) const;
+
+  /**
+   * Add values at the observation points for a new basis function.
+   */
+  void add_observation_values_for_basis_function(const std::vector<Number> & values);
+
+  /**
    * Write out all the basis functions to file.
    * \p sys is used for file IO
    * \p directory_name specifies which directory to write files to
@@ -416,26 +426,12 @@ private:
    * for i=1,...,n_bfs, and j=1,...,n.
    *
    * These observation values can be used to observe the EIM approximation
-   * at specific points of interest, defined by the observation points.
+   * at specific points of interest, where the points of interest are defined
+   * by the observation points.
    */
   std::vector<Point> _observation_points_xyz;
   std::vector<unsigned int> _observation_points_comp;
   std::vector<std::vector<Number>> _observation_points_values;
-
-  /**
-   * We also store the element ID and qp index of each observation
-   * point so that we can evaluate our basis functions at these
-   * points by simply looking up the appropriate stored values.
-   * This data is only needed during the EIM training since it
-   * helps us to set up _observation_points_values correctly.
-   *
-   * Note: This approach assumes that we use the closet qp to
-   * the observation point to "look up" the value at the EIM
-   * point. This is the natural approach to use here since
-   * the EIM functions are only stored at qps.
-   */
-  std::vector<dof_id_type> _observation_points_elem_id;
-  std::vector<unsigned int> _observation_points_qp;
 
 };
 

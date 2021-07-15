@@ -417,21 +417,6 @@ Real RBEIMConstruction::train_eim_approximation()
       store_eim_solutions_for_training_set();
     }
 
-  if (rbe.get_n_observation_points() > 0)
-    {
-      TODO: Complete this
-      for (unsigned int i=0; i<rbe.get_n_basis_functions(); i++)
-        for (unsigned int j=0; j<rbe.get_n_observation_points(); j++)
-        {
-          Number value =
-            eim_eval.get_eim_basis_function_value(i,
-                                                  eim_eval.get_observation_points_elem_id(j),
-                                                  eim_eval.get_observation_points_comp(j),
-                                                  eim_eval.get_observation_points_qp(j));
-          eim_eval.set_observation_points_value(i, j, value);
-        }
-    }
-
   return greedy_error;
 }
 
@@ -638,13 +623,13 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
 
   libMesh::out << "Initializing parametrized functions in training set..." << std::endl;
 
-  if (get_rb_eim_evaluation().get_parametrized_function().is_lookup_table)
-    get_rb_eim_evaluation().get_parametrized_function().initialize_lookup_table();
+  RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
+
+  if (eim_eval.get_parametrized_function().is_lookup_table)
+    eim_eval.get_parametrized_function().initialize_lookup_table();
 
   // Store the locations of all quadrature points
   initialize_qp_data();
-
-  RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
 
   // Keep track of the largest value in our parametrized functions
   // in the training set. We can use this value for normalization
@@ -702,6 +687,35 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
   comm().broadcast(_max_abs_value_in_training_set_index, max_id);
   libMesh::out << "Maximum absolute value in the training set: "
     << _max_abs_value_in_training_set << std::endl << std::endl;
+
+  _parametrized_functions_for_training_obs_values.resize( get_n_training_samples() );
+
+  // Finally, we also evaluate the parametrized functions for training at the "observation points"
+  if (eim_eval.get_n_observation_points() > 0)
+    {
+      std::vector<dof_id_type> observation_points_elem_ids;
+      std::vector<subdomain_id_type> observation_points_sbd_ids;
+      initialize_observation_points_data(observation_points_elem_ids, observation_points_sbd_ids);
+
+      for (auto i : make_range(get_n_training_samples()))
+        {
+          libMesh::out << "Initializing observation values for training sample "
+            << (i+1) << " of " << get_n_training_samples() << std::endl;
+
+          set_params_from_training_set(i);
+
+          _parametrized_functions_for_training_obs_values[i] =
+            eim_eval.get_parametrized_function().evaluate_at_observation_points(get_parameters(),
+                                                                                eim_eval.get_observation_points(),
+                                                                                eim_eval.get_observation_components(),
+                                                                                observation_points_elem_ids,
+                                                                                observation_points_sbd_ids);
+
+          if (_parametrized_functions_for_training_obs_values[i].size() != eim_eval.get_n_observation_points())
+            libmesh_error_msg("Number of observation values should match number of observation points");
+        }
+    }
+
 }
 
 void RBEIMConstruction::initialize_qp_data()
@@ -734,16 +748,6 @@ void RBEIMConstruction::initialize_qp_data()
 
   _local_quad_point_locations_perturbations.clear();
 
-  // We will find the closest qp to each observation point and store that
-  // in _observation_points_elem_id and _observation_points_qp. We could
-  // use a PointLocator to find the elements containing the observation points
-  // but we're looping over all the qps anyway, so it is simple to do a linear
-  // search over all qps.
-  const std::vector<Point> & observation_points = get_rb_eim_evaluation().get_observation_points();
-  std::vector<Real> observation_points_dist_to_qp(observation_points.size(), std::numeric_limits<Real>::max());
-  std::vector<dof_id_type> observation_points_elem_id(observation_points.size());
-  std::vector<unsigned int> observation_points_qp(observation_points.size());
-
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
       dof_id_type elem_id = elem->id();
@@ -754,22 +758,6 @@ void RBEIMConstruction::initialize_qp_data()
       _local_quad_point_locations[elem_id] = xyz;
       _local_quad_point_JxW[elem_id] = JxW;
       _local_quad_point_subdomain_ids[elem_id] = elem->subdomain_id();
-
-      for(unsigned int i : index_range(observation_points))
-      {
-        const Point & observation_point = observation_points[i];
-
-        for(unsigned int qp : index_range(xyz))
-        {
-          Real dist = (observation_point - xyz[qp]).norm();
-          if(dist < observation_points_dist_to_qp[i])
-          {
-            observation_points_dist_to_qp[i] = dist;
-            observation_points_elem_id[i] = elem_id;
-            observation_points_qp[i] = qp;
-          }
-        }
-      }
 
       if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
         {
@@ -856,9 +844,43 @@ void RBEIMConstruction::initialize_qp_data()
           _local_quad_point_locations_perturbations[elem_id] = xyz_perturb_vec_at_qps;
         }
     }
+}
 
-  TODO: Need to broadcast observation_points_elem_id and observation_points_qp to make sure
-  all procs ahve the correct data. Then set the data in the RBEIMEvaluation.
+void RBEIMConstruction::initialize_observation_points_data(
+  std::vector<dof_id_type> & observation_points_elem_ids,
+  std::vector<subdomain_id_type> & observation_points_sbd_ids)
+{
+  LOG_SCOPE("initialize_observation_points_data()", "RBEIMConstruction");
+
+  RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
+
+  if (eim_eval.get_n_observation_points() == 0)
+    return;
+
+  libMesh::out << "Initializing observation point locations" << std::endl;
+
+  const MeshBase & mesh = this->get_mesh();
+
+  const std::vector<Point> & observation_points = eim_eval.get_observation_points();
+
+  std::unique_ptr<PointLocatorBase> point_locator = mesh.sub_point_locator();
+
+  observation_points_elem_ids.resize(observation_points.size());
+  observation_points_sbd_ids.resize(observation_points.size());
+
+  for (unsigned int obs_pt_index : index_range(observation_points))
+    {
+      const Point & p = observation_points[obs_pt_index];
+      const Elem * elem = (*point_locator)(p);
+
+      if (!elem)
+        {
+          libmesh_error_msg("No element containing observation found");
+        }
+
+      observation_points_elem_ids[obs_pt_index] = elem->id();
+      observation_points_sbd_ids[obs_pt_index] = elem->subdomain_id();
+    }
 }
 
 Number
@@ -924,15 +946,21 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
   // will modify this below to give us a new basis function.
   auto local_pf = _local_parametrized_functions_for_training[training_index];
 
+  bool has_obs_vals = (eim_eval.get_n_observation_points() > 0);
+
+  std::vector<Number> new_bf_obs_vals;
+  if (has_obs_vals)
+    new_bf_obs_vals = _parametrized_functions_for_training_obs_values[training_index];
+
   // If we have at least one basis function, then we need to use
   // rb_eim_solve() to find the EIM interpolation error. Otherwise,
   // just use solution as is.
-  if (get_rb_eim_evaluation().get_n_basis_functions() > 0)
+  if (eim_eval.get_n_basis_functions() > 0)
     {
       // Get the right-hand side vector for the EIM approximation
       // by sampling the parametrized function (stored in solution)
       // at the interpolation points.
-      unsigned int RB_size = get_rb_eim_evaluation().get_n_basis_functions();
+      unsigned int RB_size = eim_eval.get_n_basis_functions();
       DenseVector<Number> EIM_rhs(RB_size);
       for (unsigned int i=0; i<RB_size; i++)
         {
@@ -949,7 +977,14 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
 
       // Load the "EIM residual" into solution by subtracting
       // the EIM approximation
-      get_rb_eim_evaluation().decrement_vector(local_pf, rb_eim_solution);
+      eim_eval.decrement_vector(local_pf, rb_eim_solution);
+
+      if(has_obs_vals)
+        {
+          for (unsigned int i=0; i<eim_eval.get_n_observation_points(); i++)
+            for (unsigned int j=0; j<RB_size; j++)
+              new_bf_obs_vals[i] -= rb_eim_solution(j) * eim_eval.get_observation_value(i,j);
+        }
     }
 
   // Find the quadrature point at which local_pf (which now stores
@@ -1039,6 +1074,16 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
                                                      optimal_subdomain_id,
                                                      optimal_qp,
                                                      optimal_point_perturbs);
+
+  if (has_obs_vals)
+    {
+      // Apply the scame scaling to new_bf_obs_vals as we did to
+      // the new basis function itself
+      for(Number & value : new_bf_obs_vals)
+        value *= 1./optimal_value;
+
+      eim_eval.add_observation_values_for_basis_function(new_bf_obs_vals);
+    }
 }
 
 void RBEIMConstruction::update_eim_matrices()
