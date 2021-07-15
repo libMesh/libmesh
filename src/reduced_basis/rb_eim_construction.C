@@ -48,6 +48,9 @@
 #include "libmesh/rb_eim_evaluation.h"
 #include "libmesh/rb_parametrized_function.h"
 
+// C++ include
+#include <limits>
+
 namespace libMesh
 {
 
@@ -406,12 +409,27 @@ Real RBEIMConstruction::train_eim_approximation()
       }
     } // end while(true)
 
-  if (get_rb_eim_evaluation().get_parametrized_function().is_lookup_table &&
+  if (rbe.get_parametrized_function().is_lookup_table &&
       best_fit_type_flag != EIM_BEST_FIT)
     {
       // We only enter here if best_fit_type_flag != EIM_BEST_FIT because we
       // already called this above in the EIM_BEST_FIT case.
       store_eim_solutions_for_training_set();
+    }
+
+  if (rbe.get_n_observation_points() > 0)
+    {
+      TODO: Complete this
+      for (unsigned int i=0; i<rbe.get_n_basis_functions(); i++)
+        for (unsigned int j=0; j<rbe.get_n_observation_points(); j++)
+        {
+          Number value =
+            eim_eval.get_eim_basis_function_value(i,
+                                                  eim_eval.get_observation_points_elem_id(j),
+                                                  eim_eval.get_observation_points_comp(j),
+                                                  eim_eval.get_observation_points_qp(j));
+          eim_eval.set_observation_points_value(i, j, value);
+        }
     }
 
   return greedy_error;
@@ -716,6 +734,16 @@ void RBEIMConstruction::initialize_qp_data()
 
   _local_quad_point_locations_perturbations.clear();
 
+  // We will find the closest qp to each observation point and store that
+  // in _observation_points_elem_id and _observation_points_qp. We could
+  // use a PointLocator to find the elements containing the observation points
+  // but we're looping over all the qps anyway, so it is simple to do a linear
+  // search over all qps.
+  const std::vector<Point> & observation_points = get_rb_eim_evaluation().get_observation_points();
+  std::vector<Real> observation_points_dist_to_qp(observation_points.size(), std::numeric_limits<Real>::max());
+  std::vector<dof_id_type> observation_points_elem_id(observation_points.size());
+  std::vector<unsigned int> observation_points_qp(observation_points.size());
+
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
       dof_id_type elem_id = elem->id();
@@ -726,6 +754,22 @@ void RBEIMConstruction::initialize_qp_data()
       _local_quad_point_locations[elem_id] = xyz;
       _local_quad_point_JxW[elem_id] = JxW;
       _local_quad_point_subdomain_ids[elem_id] = elem->subdomain_id();
+
+      for(unsigned int i : index_range(observation_points))
+      {
+        const Point & observation_point = observation_points[i];
+
+        for(unsigned int qp : index_range(xyz))
+        {
+          Real dist = (observation_point - xyz[qp]).norm();
+          if(dist < observation_points_dist_to_qp[i])
+          {
+            observation_points_dist_to_qp[i] = dist;
+            observation_points_elem_id[i] = elem_id;
+            observation_points_qp[i] = qp;
+          }
+        }
+      }
 
       if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
         {
@@ -812,6 +856,9 @@ void RBEIMConstruction::initialize_qp_data()
           _local_quad_point_locations_perturbations[elem_id] = xyz_perturb_vec_at_qps;
         }
     }
+
+  TODO: Need to broadcast observation_points_elem_id and observation_points_qp to make sure
+  all procs ahve the correct data. Then set the data in the RBEIMEvaluation.
 }
 
 Number

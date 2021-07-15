@@ -372,7 +372,6 @@ void RBEIMEvaluation::add_interpolation_points_xyz_perturbations(const std::vect
   _interpolation_points_xyz_perturbations.emplace_back(perturbs);
 }
 
-
 void RBEIMEvaluation::add_interpolation_points_elem_id(dof_id_type elem_id)
 {
   _interpolation_points_elem_id.emplace_back(elem_id);
@@ -436,6 +435,29 @@ void RBEIMEvaluation::set_interpolation_matrix_entry(unsigned int i, unsigned in
 const DenseMatrix<Number> & RBEIMEvaluation::get_interpolation_matrix() const
 {
   return _interpolation_matrix;
+}
+
+void RBEIMEvaluation::set_observation_points_and_components(
+  const std::vector<Point> & observation_points_xyz,
+  const std::vector<unsigned int> & observation_points_comp)
+{
+  _observation_points_xyz = observation_points_xyz;
+  _observation_points_comp = observation_points_comp;
+}
+
+unsigned int RBEIMEvaluation::get_n_observation_points() const
+{
+  return _observation_points.size();
+}
+
+const std::vector<Point> & RBEIMEvaluation::get_observation_points() const
+{
+  return _observation_points;
+}
+
+const std::vector<unsigned int> & RBEIMEvaluation::get_observation_components() const
+{
+  return _observation_components;
 }
 
 void RBEIMEvaluation::add_basis_function_and_interpolation_data(
