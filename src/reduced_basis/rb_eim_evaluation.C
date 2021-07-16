@@ -462,17 +462,25 @@ const std::vector<unsigned int> & RBEIMEvaluation::get_observation_components() 
 
 Number RBEIMEvaluation::get_observation_value(unsigned int bf_index, unsigned int obs_pt_index) const
 {
-  if (bf_index >= _observation_points_values.size())
-    libmesh_error_msg("Invalid basis function index: " << bf_index);
-  if (obs_pt_index >= _observation_points_values[bf_index].size())
-    libmesh_error_msg("Invalid observation point index: " << obs_pt_index);
+  libmesh_error_msg_if(bf_index >= _observation_points_value.size(), "Invalid basis function index: " << bf_index);
+  libmesh_error_msg_if(obs_pt_index >= _observation_points_value[bf_index].size(), "Invalid observation point index: " << obs_pt_index);
 
-  return _observation_points_values[bf_index][obs_pt_index];
+  return _observation_points_value[bf_index][obs_pt_index];
+}
+
+const std::vector<std::vector<Number>> & RBEIMEvaluation::get_observation_values() const
+{
+  return _observation_points_value;
 }
 
 void RBEIMEvaluation::add_observation_values_for_basis_function(const std::vector<Number> & values)
 {
-  _observation_points_values.emplace_back(values);
+  _observation_points_value.emplace_back(values);
+}
+
+void RBEIMEvaluation::set_observation_values(const std::vector<std::vector<Number>> & values)
+{
+  _observation_points_value = values;
 }
 
 void RBEIMEvaluation::add_basis_function_and_interpolation_data(

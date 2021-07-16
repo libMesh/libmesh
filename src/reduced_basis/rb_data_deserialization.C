@@ -715,7 +715,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
-  // Interpolation points componnents
+  // Interpolation points components
   {
     auto interpolation_points_comp_list =
       rb_eim_evaluation_reader.getInterpolationComp();
@@ -813,6 +813,59 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
             }
           eim_solutions[i] = values;
         }
+    }
+
+  // Optionally load observation points data for the EIM basis functions
+  unsigned int n_obs_pts = rb_eim_evaluation.get_n_observation_points();
+  if (n_obs_pts > 0)
+    {
+      {
+        auto observation_points_xyz_list =
+          rb_eim_evaluation_reader.getObservationPointsXyz();
+
+        std::vector<Point> observation_points_xyz;
+        for (unsigned int i=0; i<observation_points_xyz_list.size(); ++i)
+          {
+            Point p;
+            load_point(observation_points_xyz_list[i], p);
+            observation_points_xyz.emplace_back(p);
+          }
+
+        auto observation_points_comp_list =
+          rb_eim_evaluation_reader.getObservationPointsComp();
+
+        std::vector<unsigned int> observation_points_comp;
+        for (unsigned int i=0; i<observation_points_comp_list.size(); ++i)
+          {
+            observation_points_comp.emplace_back(observation_points_comp_list[i]);
+          }
+
+        libmesh_error_msg_if(observation_points_xyz_list.size() != observation_points_comp.size(),
+                             "Size error while reading the EIM observation points.");
+
+        rb_eim_evaluation.set_observation_points_and_components(observation_points_xyz, observation_points_comp);
+      }
+
+      {
+        auto obs_values_list_outer =
+          rb_eim_evaluation_reader.getObservationPointsValue();
+
+        std::vector<std::vector<Number>> observation_values;
+        observation_values.resize(obs_values_list_outer.size());
+
+        for (auto i : make_range(obs_values_list_outer.size()))
+          {
+            auto obs_values_list_inner = obs_values_list_outer[i];
+
+            observation_values[i].resize(obs_values_list_inner.size());
+            for (auto j : index_range(observation_values[i]))
+              {
+                observation_values[i][j] = load_scalar_value(obs_values_list_inner[j]);
+              }
+          }
+
+        rb_eim_evaluation.set_observation_values(observation_values);
+      }
     }
 }
 

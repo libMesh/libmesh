@@ -284,9 +284,20 @@ public:
   Number get_observation_value(unsigned int bf_index, unsigned int obs_pt_index) const;
 
   /**
+   * Get a const reference to all the observation values, indexed as follows:
+   *  basis_function index --> observation point index --> value.
+   */
+  const std::vector<std::vector<Number>> & get_observation_values() const;
+
+  /**
    * Add values at the observation points for a new basis function.
    */
   void add_observation_values_for_basis_function(const std::vector<Number> & values);
+
+  /**
+   * Set all observation values.
+   */
+  void set_observation_values(const std::vector<std::vector<Number>> & values);
 
   /**
    * Write out all the basis functions to file.
@@ -428,10 +439,13 @@ private:
    * These observation values can be used to observe the EIM approximation
    * at specific points of interest, where the points of interest are defined
    * by the observation points.
+   *
+   * _observation_points_value is indexed as follows:
+   *  basis_function index --> observatio point index --> value
    */
   std::vector<Point> _observation_points_xyz;
   std::vector<unsigned int> _observation_points_comp;
-  std::vector<std::vector<Number>> _observation_points_values;
+  std::vector<std::vector<Number>> _observation_points_value;
 
 };
 

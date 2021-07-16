@@ -688,6 +688,50 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
             }
         }
     }
+
+  // Optionally store observation points data for the EIM basis functions
+  unsigned int n_obs_pts = rb_eim_evaluation.get_n_observation_points();
+  if (n_obs_pts > 0)
+    {
+      {
+        auto observation_points_list =
+          rb_eim_evaluation_builder.initObservationPointsXyz(n_obs_pts);
+
+        const std::vector<Point> & obs_pts = rb_eim_evaluation.get_observation_points();
+        for (unsigned int i=0; i < n_obs_pts; ++i)
+          add_point_to_builder(obs_pts[i],
+                              observation_points_list[i]);
+      }
+
+      {
+        auto observation_comps_list =
+          rb_eim_evaluation_builder.initObservationPointsComp(n_obs_pts);
+
+        const std::vector<unsigned int> & obs_comps = rb_eim_evaluation.get_observation_components();
+        for (unsigned int i=0; i < n_obs_pts; ++i)
+          observation_comps_list.set(i,
+                                     obs_comps[i]);
+      }
+
+      {
+        const std::vector<std::vector<Number>> & observation_values = rb_eim_evaluation.get_observation_values();
+
+        auto obs_values_list_outer =
+          rb_eim_evaluation_builder.initObservationPointsValue(observation_values.size());
+        for (auto i : make_range(observation_values.size()))
+          {
+            const std::vector<Number> & values = observation_values[i];
+            auto obs_values_list_inner = obs_values_list_outer.init(i, values.size());
+
+            for (auto j : index_range(values))
+              {
+                set_scalar_in_list(obs_values_list_inner,
+                                  j,
+                                  values[j]);
+              }
+          }
+      }
+    }
 }
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)

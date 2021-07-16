@@ -711,8 +711,8 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
                                                                                 observation_points_elem_ids,
                                                                                 observation_points_sbd_ids);
 
-          if (_parametrized_functions_for_training_obs_values[i].size() != eim_eval.get_n_observation_points())
-            libmesh_error_msg("Number of observation values should match number of observation points");
+          libmesh_error_msg_if(_parametrized_functions_for_training_obs_values[i].size() != eim_eval.get_n_observation_points(),
+                               "Number of observation values should match number of observation points");
         }
     }
 
@@ -873,10 +873,7 @@ void RBEIMConstruction::initialize_observation_points_data(
       const Point & p = observation_points[obs_pt_index];
       const Elem * elem = (*point_locator)(p);
 
-      if (!elem)
-        {
-          libmesh_error_msg("No element containing observation found");
-        }
+      libmesh_error_msg_if (!elem, "No element containing observation found");
 
       observation_points_elem_ids[obs_pt_index] = elem->id();
       observation_points_sbd_ids[obs_pt_index] = elem->subdomain_id();
