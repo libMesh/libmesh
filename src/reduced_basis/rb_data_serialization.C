@@ -700,7 +700,7 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
         const std::vector<Point> & obs_pts = rb_eim_evaluation.get_observation_points();
         for (unsigned int i=0; i < n_obs_pts; ++i)
           add_point_to_builder(obs_pts[i],
-                              observation_points_list[i]);
+                               observation_points_list[i]);
       }
 
       {
@@ -726,8 +726,8 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
             for (auto j : index_range(values))
               {
                 set_scalar_in_list(obs_values_list_inner,
-                                  j,
-                                  values[j]);
+                                   j,
+                                   values[j]);
               }
           }
       }
