@@ -438,11 +438,9 @@ const DenseMatrix<Number> & RBEIMEvaluation::get_interpolation_matrix() const
 }
 
 void RBEIMEvaluation::set_observation_points_and_components(
-  const std::vector<Point> & observation_points_xyz,
-  const std::vector<unsigned int> & observation_points_comp)
+  const std::vector<Point> & observation_points_xyz)
 {
   _observation_points_xyz = observation_points_xyz;
-  _observation_points_comp = observation_points_comp;
 }
 
 unsigned int RBEIMEvaluation::get_n_observation_points() const
@@ -455,32 +453,27 @@ const std::vector<Point> & RBEIMEvaluation::get_observation_points() const
   return _observation_points_xyz;
 }
 
-const std::vector<unsigned int> & RBEIMEvaluation::get_observation_components() const
-{
-  return _observation_points_comp;
-}
-
-Number RBEIMEvaluation::get_observation_value(unsigned int bf_index, unsigned int obs_pt_index) const
+const std::vector<Number> & RBEIMEvaluation:get_observation_values(unsigned int bf_index, unsigned int obs_pt_index) const
 {
   libmesh_error_msg_if(bf_index >= _observation_points_value.size(), "Invalid basis function index: " << bf_index);
   libmesh_error_msg_if(obs_pt_index >= _observation_points_value[bf_index].size(), "Invalid observation point index: " << obs_pt_index);
 
-  return _observation_points_value[bf_index][obs_pt_index];
+  return _observation_points_values[bf_index][obs_pt_index];
 }
 
-const std::vector<std::vector<Number>> & RBEIMEvaluation::get_observation_values() const
+const std::vector<std::vector<std::vector<Number>>> & RBEIMEvaluation::get_observation_values() const
 {
-  return _observation_points_value;
+  return _observation_points_values;
 }
 
-void RBEIMEvaluation::add_observation_values_for_basis_function(const std::vector<Number> & values)
+void RBEIMEvaluation::add_observation_values_for_basis_function(const std::vector<std::vector<Number>> & values)
 {
-  _observation_points_value.emplace_back(values);
+  _observation_points_values.emplace_back(values);
 }
 
-void RBEIMEvaluation::set_observation_values(const std::vector<std::vector<Number>> & values)
+void RBEIMEvaluation::set_observation_values(const std::vector<std::vector<std::vector<Number>>> & values)
 {
-  _observation_points_value = values;
+  _observation_points_values = values;
 }
 
 void RBEIMEvaluation::add_basis_function_and_interpolation_data(

@@ -361,9 +361,9 @@ private:
    * in the training set. These values are used to obtain the observation values that are stored in
    * RBEIMEvaluation.
    *
-   * Indexing is: training_index --> observation point index --> value.
+   * Indexing is: training_index --> observation point index --> component --> value.
    */
-  std::vector<std::vector<Number>> _parametrized_functions_for_training_obs_values;
+  std::vector<std::vector<std::vector<Number>>> _parametrized_functions_for_training_obs_values;
 
 };
 

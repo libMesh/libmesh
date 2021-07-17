@@ -831,36 +831,28 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
             observation_points_xyz.emplace_back(p);
           }
 
-        auto observation_points_comp_list =
-          rb_eim_evaluation_reader.getObservationPointsComp();
-
-        std::vector<unsigned int> observation_points_comp;
-        for (unsigned int i=0; i<observation_points_comp_list.size(); ++i)
-          {
-            observation_points_comp.emplace_back(observation_points_comp_list[i]);
-          }
-
-        libmesh_error_msg_if(observation_points_xyz_list.size() != observation_points_comp.size(),
-                             "Size error while reading the EIM observation points.");
-
-        rb_eim_evaluation.set_observation_points_and_components(observation_points_xyz, observation_points_comp);
+        rb_eim_evaluation.set_observation_points(observation_points_xyz);
       }
 
       {
         auto obs_values_list_outer =
           rb_eim_evaluation_reader.getObservationPointsValue();
 
-        std::vector<std::vector<Number>> observation_values;
+        std::vector<std::vector<std::vector<Number>>> observation_values;
         observation_values.resize(obs_values_list_outer.size());
 
         for (auto i : make_range(obs_values_list_outer.size()))
           {
-            auto obs_values_list_inner = obs_values_list_outer[i];
+            auto obs_values_list_middle = obs_values_list_outer[i];
 
-            observation_values[i].resize(obs_values_list_inner.size());
+            observation_values[i].resize(obs_values_list_middle.size());
             for (auto j : index_range(observation_values[i]))
               {
-                observation_values[i][j] = load_scalar_value(obs_values_list_inner[j]);
+                auto obs_values_list_inner = obs_values_list_middle[j];
+
+                observation_values[i][j].resize(obs_values_list_inner.size());
+                for (auto k : index_range(observation_values[i]))
+                  observation_values[i][j][k] = load_scalar_value(obs_values_list_inner[k]);
               }
           }
 

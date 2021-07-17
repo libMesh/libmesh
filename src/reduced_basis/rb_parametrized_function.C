@@ -184,14 +184,13 @@ Number RBParametrizedFunction::get_parameter_independent_data(const std::string 
   return libmesh_map_find(libmesh_map_find(_parameter_independent_data, property_name), sbd_id);
 }
 
-std::vector<Number> RBParametrizedFunction::evaluate_at_observation_points(const RBParameters & mu,
-                                                                           const std::vector<Point> & observation_points,
-                                                                           const std::vector<unsigned int> & observation_components,
-                                                                           const std::vector<dof_id_type> & elem_ids,
-                                                                           const std::vector<subdomain_id_type> & sbd_ids)
+std::vector<std::vector<Number>> RBParametrizedFunction::evaluate_at_observation_points(const RBParameters & mu,
+                                                                                        const std::vector<Point> & observation_points,
+                                                                                        const std::vector<dof_id_type> & elem_ids,
+                                                                                        const std::vector<subdomain_id_type> & sbd_ids)
 {
   // return an empty vector by default, override this in subclasses if necessary
-  return std::vector<Number>();
+  return std::vector<std::vector<Number>>();
 }
 
 }

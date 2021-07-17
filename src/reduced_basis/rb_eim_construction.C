@@ -945,7 +945,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
 
   bool has_obs_vals = (eim_eval.get_n_observation_points() > 0);
 
-  std::vector<Number> new_bf_obs_vals;
+  std::vector<std::vector<Number>> new_bf_obs_vals;
   if (has_obs_vals)
     new_bf_obs_vals = _parametrized_functions_for_training_obs_values[training_index];
 
@@ -980,7 +980,8 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
         {
           for (unsigned int i=0; i<RB_size; i++)
             for (unsigned int j=0; j<eim_eval.get_n_observation_points(); j++)
-              new_bf_obs_vals[j] -= rb_eim_solution(i) * eim_eval.get_observation_value(i,j);
+              for (unsigned int k=0; k<new_bf_obs_vals[j].size(); k++)
+                new_bf_obs_vals[j][k] -= rb_eim_solution(i) * eim_eval.get_observation_value(i,j)[k];
         }
     }
 
@@ -1076,8 +1077,9 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
     {
       // Apply the scame scaling to new_bf_obs_vals as we did to
       // the new basis function itself
-      for(Number & value : new_bf_obs_vals)
-        value *= 1./optimal_value;
+      for (unsigned int i=0; i<new_bf_obs_vals.size(); i++)
+        for (unsigned int j=0; j<new_bf_obs_vals[i].size(); j++)
+          new_bf_obs_vals[i][j] *= 1./optimal_value;
 
       eim_eval.add_observation_values_for_basis_function(new_bf_obs_vals);
     }
