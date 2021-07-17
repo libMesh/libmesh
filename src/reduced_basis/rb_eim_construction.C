@@ -978,9 +978,9 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
 
       if(has_obs_vals)
         {
-          for (unsigned int i=0; i<eim_eval.get_n_observation_points(); i++)
-            for (unsigned int j=0; j<RB_size; j++)
-              new_bf_obs_vals[i] -= rb_eim_solution(j) * eim_eval.get_observation_value(i,j);
+          for (unsigned int i=0; i<RB_size; i++)
+            for (unsigned int j=0; j<eim_eval.get_n_observation_points(); j++)
+              new_bf_obs_vals[j] -= rb_eim_solution(i) * eim_eval.get_observation_value(i,j);
         }
     }
 
