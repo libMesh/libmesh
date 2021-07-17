@@ -836,7 +836,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
 
       {
         auto obs_values_list_outer =
-          rb_eim_evaluation_reader.getObservationPointsValue();
+          rb_eim_evaluation_reader.getObservationPointsValues();
 
         std::vector<std::vector<std::vector<Number>>> observation_values;
         observation_values.resize(obs_values_list_outer.size());

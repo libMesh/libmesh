@@ -706,7 +706,7 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
       {
         const std::vector<std::vector<std::vector<Number>>> & observation_values = rb_eim_evaluation.get_observation_values();
         auto obs_values_list_outer =
-          rb_eim_evaluation_builder.initObservationPointsValue(observation_values.size());
+          rb_eim_evaluation_builder.initObservationPointsValues(observation_values.size());
 
         for (auto i : make_range(observation_values.size()))
           {

@@ -437,8 +437,7 @@ const DenseMatrix<Number> & RBEIMEvaluation::get_interpolation_matrix() const
   return _interpolation_matrix;
 }
 
-void RBEIMEvaluation::set_observation_points_and_components(
-  const std::vector<Point> & observation_points_xyz)
+void RBEIMEvaluation::set_observation_points(const std::vector<Point> & observation_points_xyz)
 {
   _observation_points_xyz = observation_points_xyz;
 }
@@ -453,10 +452,10 @@ const std::vector<Point> & RBEIMEvaluation::get_observation_points() const
   return _observation_points_xyz;
 }
 
-const std::vector<Number> & RBEIMEvaluation:get_observation_values(unsigned int bf_index, unsigned int obs_pt_index) const
+const std::vector<Number> & RBEIMEvaluation::get_observation_values(unsigned int bf_index, unsigned int obs_pt_index) const
 {
-  libmesh_error_msg_if(bf_index >= _observation_points_value.size(), "Invalid basis function index: " << bf_index);
-  libmesh_error_msg_if(obs_pt_index >= _observation_points_value[bf_index].size(), "Invalid observation point index: " << obs_pt_index);
+  libmesh_error_msg_if(bf_index >= _observation_points_values.size(), "Invalid basis function index: " << bf_index);
+  libmesh_error_msg_if(obs_pt_index >= _observation_points_values[bf_index].size(), "Invalid observation point index: " << obs_pt_index);
 
   return _observation_points_values[bf_index][obs_pt_index];
 }

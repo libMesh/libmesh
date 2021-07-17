@@ -259,8 +259,7 @@ public:
   /**
    * Set the observation points and components.
    */
-  void set_observation_points_and_components(
-    const std::vector<Point> & observation_points_xyz);
+  void set_observation_points(const std::vector<Point> & observation_points_xyz);
 
   /**
    * Get the number of observation points.

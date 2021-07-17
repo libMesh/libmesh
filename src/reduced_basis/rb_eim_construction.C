@@ -707,7 +707,6 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
           _parametrized_functions_for_training_obs_values[i] =
             eim_eval.get_parametrized_function().evaluate_at_observation_points(get_parameters(),
                                                                                 eim_eval.get_observation_points(),
-                                                                                eim_eval.get_observation_components(),
                                                                                 observation_points_elem_ids,
                                                                                 observation_points_sbd_ids);
 
@@ -981,7 +980,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
           for (unsigned int i=0; i<RB_size; i++)
             for (unsigned int j=0; j<eim_eval.get_n_observation_points(); j++)
               for (unsigned int k=0; k<new_bf_obs_vals[j].size(); k++)
-                new_bf_obs_vals[j][k] -= rb_eim_solution(i) * eim_eval.get_observation_value(i,j)[k];
+                new_bf_obs_vals[j][k] -= rb_eim_solution(i) * eim_eval.get_observation_values(i,j)[k];
         }
     }
 
