@@ -43,7 +43,8 @@ namespace libMesh
 RBEIMEvaluation::RBEIMEvaluation(const Parallel::Communicator & comm)
 :
 ParallelObject(comm),
-_rb_eim_solves_N(0)
+_rb_eim_solves_N(0),
+_preserve_rb_eim_solutions(false)
 {
 }
 
@@ -111,6 +112,16 @@ DenseVector<Number> RBEIMEvaluation::rb_eim_solve(DenseVector<Number> & EIM_rhs)
 void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
                                     unsigned int N)
 {
+  if (_preserve_rb_eim_solutions)
+    {
+      // In this case we preserve _rb_eim_solutions and hence we
+      // just return immediately so that we skip updating
+      // _rb_eim_solutions below. This is relevant in cases where
+      // we set up _rb_eim_solutions elsewhere and we don't want
+      // to override it.
+      return;
+    }
+
   libmesh_error_msg_if(N > get_n_basis_functions(),
     "Error: N cannot be larger than the number of basis functions in rb_eim_solves");
   libmesh_error_msg_if(N==0, "Error: N must be greater than 0 in rb_eim_solves");
@@ -323,6 +334,11 @@ RBEIMEvaluation::get_basis_function(unsigned int i) const
   return _local_eim_basis_functions[i];
 }
 
+void RBEIMEvaluation::set_rb_eim_solutions(const std::vector<DenseVector<Number>> & rb_eim_solutions)
+{
+  _rb_eim_solutions = rb_eim_solutions;
+}
+
 const std::vector<DenseVector<Number>> & RBEIMEvaluation::get_rb_eim_solutions() const
 {
   return _rb_eim_solutions;
@@ -463,6 +479,16 @@ const std::vector<Number> & RBEIMEvaluation::get_observation_values(unsigned int
 const std::vector<std::vector<std::vector<Number>>> & RBEIMEvaluation::get_observation_values() const
 {
   return _observation_points_values;
+}
+
+void RBEIMEvaluation::set_preserve_rb_eim_solutions(bool preserve_rb_eim_solutions)
+{
+  _preserve_rb_eim_solutions = preserve_rb_eim_solutions;
+}
+
+bool RBEIMEvaluation::get_preserve_rb_eim_solutions() const
+{
+  return _preserve_rb_eim_solutions;
 }
 
 void RBEIMEvaluation::add_observation_values_for_basis_function(const std::vector<std::vector<Number>> & values)

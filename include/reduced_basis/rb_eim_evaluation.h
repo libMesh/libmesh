@@ -195,6 +195,13 @@ public:
   const QpDataMap & get_basis_function(unsigned int i) const;
 
   /**
+   * Set _rb_eim_solutions. Normally we update _rb_eim_solutions by performing
+   * and EIM solve, but in some cases we want to set the EIM solution coefficients
+   * elsewhere, so this setter enables us to do that.
+   */
+  void set_rb_eim_solutions(const std::vector<DenseVector<Number>> & rb_eim_solutions);
+
+  /**
    * Return the EIM solution coefficients from the most recent call to rb_eim_solves().
    */
   const std::vector<DenseVector<Number>> & get_rb_eim_solutions() const;
@@ -291,6 +298,16 @@ public:
    * Set all observation values.
    */
   void set_observation_values(const std::vector<std::vector<std::vector<Number>>> & values);
+
+  /**
+   * Set _preserve_rb_eim_solutions.
+   */
+  void set_preserve_rb_eim_solutions(bool preserve_rb_eim_solutions);
+
+  /**
+   * Get _preserve_rb_eim_solutions.
+   */
+  bool get_preserve_rb_eim_solutions() const;
 
   /**
    * Write out all the basis functions to file.
@@ -437,6 +454,13 @@ private:
    */
   std::vector<Point> _observation_points_xyz;
   std::vector<std::vector<std::vector<Number>>> _observation_points_values;
+
+  /**
+   * Boolean to indicate if we skip updating _rb_eim_solutions in rb_eim_solves().
+   * This is relevant for cases when we set up _rb_eim_solutions elsewhere and we
+   * want to avoid changing it.
+   */
+  bool _preserve_rb_eim_solutions;
 
 };
 
