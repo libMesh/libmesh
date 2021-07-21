@@ -610,11 +610,11 @@ void DofMap::reinit(MeshBase & mesh)
           if (!vg_description.active_on_subdomain(elem->subdomain_id()))
             continue;
 
-          const ElemType type = elem->type();
-
           FEType fe_type = base_fe_type;
 
 #ifdef LIBMESH_ENABLE_AMR
+          const ElemType type = elem->type();
+
           // Make sure we haven't done more p refinement than we can
           // handle
           if (elem->p_level() + base_fe_type.order >
