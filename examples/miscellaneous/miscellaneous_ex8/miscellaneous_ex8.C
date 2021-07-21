@@ -241,10 +241,16 @@ int main(int argc, char ** argv)
 
       // Refine the meshes if requested
       const int n_refinements = input("n_refinements", 0);
+
+      // Skip adaptive runs on a non-adaptive libMesh build
+#ifndef LIBMESH_ENABLE_AMR
+      libmesh_example_requires(n_refinements==0, "--enable-amr");
+#else
       MeshRefinement mesh_refinement_a(mesh_a);
       mesh_refinement_a.uniformly_refine(n_refinements);
       MeshRefinement mesh_refinement_b(mesh_b);
       mesh_refinement_b.uniformly_refine(n_refinements);
+#endif
 
       // Create equation systems objects.
       EquationSystems

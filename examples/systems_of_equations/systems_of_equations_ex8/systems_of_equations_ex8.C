@@ -103,8 +103,13 @@ int main (int argc, char ** argv)
   mesh.read("systems_of_equations_ex8.exo");
 
   const unsigned int n_refinements = infile("n_refinements", 0);
+  // Skip adaptive runs on a non-adaptive libMesh build
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_example_requires(n_refinements==0, "--enable-amr");
+#else
   MeshRefinement mesh_refinement(mesh);
   mesh_refinement.uniformly_refine(n_refinements);
+#endif
 
   mesh.print_info();
 
