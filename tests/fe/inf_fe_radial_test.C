@@ -467,7 +467,8 @@ public:
 
   void testInfQuants_numericDeriv ()
   {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+    // We use AMR internally to build_sphere
+#if defined(LIBMESH_ENABLE_INFINITE_ELEMENTS) && defined(LIBMESH_ENABLE_AMR)
     ReplicatedMesh mesh(*TestCommWorld);
     MeshTools::Generation::build_sphere
       (mesh, /*rad*/ 1,
@@ -648,7 +649,7 @@ public:
           }
       }
 
-#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
+#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS && LIBMESH_ENABLE_AMR
   }
 
   void testDifferentOrders ()
