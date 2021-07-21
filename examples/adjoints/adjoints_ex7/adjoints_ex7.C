@@ -312,6 +312,7 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
     }
 }
 
+#ifdef LIBMESH_ENABLE_AMR
 std::unique_ptr<AdjointRefinementEstimator>
 build_adjoint_refinement_error_estimator(QoISet &qois, FEMPhysics* supplied_physics, FEMParameters &/*param*/)
 {
@@ -334,6 +335,7 @@ build_adjoint_refinement_error_estimator(QoISet &qois, FEMPhysics* supplied_phys
 
   return adjoint_refinement_estimator;
 }
+#endif // LIBMESH_ENABLE_AMR
 
 // The main program.
 int main (int argc, char ** argv)

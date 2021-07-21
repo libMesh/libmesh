@@ -134,12 +134,14 @@ void TimeSolver::integrate_adjoint_sensitivity(const QoISet & /* qois */, const 
   libmesh_not_implemented();
 }
 
+#ifdef LIBMESH_ENABLE_AMR
 void TimeSolver::integrate_adjoint_refinement_error_estimate
   (AdjointRefinementEstimator & /* adjoint_refinement_error_estimator */,
    ErrorVector & /* QoI_elementwise_error */)
 {
   libmesh_not_implemented();
 }
+#endif // LIBMESH_ENABLE_AMR
 
 Real TimeSolver::last_completed_timestep_size()
 {

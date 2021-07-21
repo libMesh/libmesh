@@ -410,8 +410,13 @@ int main (int argc, char ** argv)
 
   GetPot input(argc, argv);
   const unsigned int n_refinements = input("n_refinements", 0);
+  // Skip adaptive runs on a non-adaptive libMesh build
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_example_requires(n_refinements==0, "--enable-amr");
+#else
   MeshRefinement mesh_refinement(mesh);
   mesh_refinement.uniformly_refine(n_refinements);
+#endif
 
   // Print information about the mesh to the screen.
   mesh.print_info();

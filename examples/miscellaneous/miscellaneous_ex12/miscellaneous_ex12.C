@@ -148,8 +148,13 @@ int main (int argc, char ** argv)
     n_refinements = command_line.next(n_refinements);
 
   // Refine the mesh if requested
+  // Skip adaptive runs on a non-adaptive libMesh build
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_example_requires(n_refinements==0, "--enable-amr");
+#else
   MeshRefinement mesh_refinement (mesh);
   mesh_refinement.uniformly_refine (n_refinements);
+#endif
 
   // Print information about the mesh to the screen.
   mesh.print_info();

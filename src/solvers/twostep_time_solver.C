@@ -380,6 +380,7 @@ void TwostepTimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const
      sensitivities[i][j] = sensitivities_first_half[i][j] + sensitivities_second_half[i][j];
 }
 
+#ifdef LIBMESH_ENABLE_AMR
 void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error)
 {
   // We use a numerical integration scheme consistent with the theta used for the timesolver.
@@ -431,5 +432,6 @@ void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefin
     }
   }
 }
+#endif // LIBMESH_ENABLE_AMR
 
 } // namespace libMesh

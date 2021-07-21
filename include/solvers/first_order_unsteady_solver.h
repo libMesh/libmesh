@@ -92,7 +92,9 @@ public:
 
   virtual void integrate_qoi_timestep() override = 0;
 
+#ifdef LIBMESH_ENABLE_AMR
   virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error) override = 0;
+#endif // LIBMESH_ENABLE_AMR
 
 protected:
 
