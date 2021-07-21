@@ -851,7 +851,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
                 auto obs_values_list_inner = obs_values_list_middle[j];
 
                 observation_values[i][j].resize(obs_values_list_inner.size());
-                for (auto k : index_range(observation_values[i]))
+                for (auto k : index_range(observation_values[i][j]))
                   observation_values[i][j][k] = load_scalar_value(obs_values_list_inner[k]);
               }
           }

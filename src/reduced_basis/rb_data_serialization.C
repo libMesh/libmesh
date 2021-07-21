@@ -715,7 +715,7 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
             for (auto j : make_range(observation_values[i].size()))
               {
                 auto obs_values_list_inner = obs_values_list_middle.init(j, observation_values[i][j].size());
-                for (auto k : make_range(observation_values[i].size()))
+                for (auto k : make_range(observation_values[i][j].size()))
                   {
                     set_scalar_in_list(obs_values_list_inner,
                                        k,
