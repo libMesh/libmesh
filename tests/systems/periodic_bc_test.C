@@ -245,7 +245,7 @@ private:
           const Number approx = sys.point_value(0,p);
           LIBMESH_ASSERT_FP_EQUAL(libmesh_real(exact),
                                   libmesh_real(approx),
-                                  TOLERANCE*TOLERANCE*10);
+                                  TOLERANCE*TOLERANCE*20);
         }
   }
 
