@@ -310,10 +310,12 @@ void UnsteadySolver::integrate_qoi_timestep()
   libmesh_not_implemented();
 }
 
+#ifdef LIBMESH_ENABLE_AMR
 void UnsteadySolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & /*adjoint_refinement_error_estimator*/, ErrorVector & /*QoI_elementwise_error*/)
 {
   libmesh_not_implemented();
 }
+#endif // LIBMESH_ENABLE_AMR
 
 Number UnsteadySolver::old_nonlinear_solution(const dof_id_type global_dof_number)
   const

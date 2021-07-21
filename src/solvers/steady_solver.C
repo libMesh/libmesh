@@ -109,6 +109,7 @@ void SteadySolver::integrate_adjoint_sensitivity(const QoISet & qois, const Para
   return;
 }
 
+#ifdef LIBMESH_ENABLE_AMR
 void SteadySolver::integrate_adjoint_refinement_error_estimate
   (AdjointRefinementEstimator & adjoint_refinement_error_estimator,
    ErrorVector & QoI_elementwise_error)
@@ -132,5 +133,6 @@ void SteadySolver::integrate_adjoint_refinement_error_estimate
 
   return;
 }
+#endif // LIBMESH_ENABLE_AMR
 
 } // namespace libMesh

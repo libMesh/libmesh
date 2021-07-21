@@ -122,6 +122,7 @@ public:
    */
   virtual void integrate_adjoint_sensitivity(const QoISet & qois, const ParameterVector & parameter_vector, SensitivityData & sensitivities) override;
 
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * A method to compute the adjoint refinement error estimate at the current timestep.
    * int_{tstep_start}^{tstep_end} R(u^h,z) dt
@@ -130,6 +131,7 @@ public:
    * CURRENTLY ONLY SUPPORTED for Backward Euler.
    */
   virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error) override;
+#endif // LIBMESH_ENABLE_AMR
 
 protected:
 

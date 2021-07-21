@@ -318,6 +318,7 @@ void Euler2Solver::integrate_qoi_timestep()
   }
 }
 
+#ifdef LIBMESH_ENABLE_AMR
 void Euler2Solver::integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error)
 {
   // Currently, we only support this functionality when Backward-Euler time integration is used.
@@ -480,5 +481,6 @@ void Euler2Solver::integrate_adjoint_refinement_error_estimate(AdjointRefinement
   }
 
 }
+#endif // LIBMESH_ENABLE_AMR
 
 } // namespace libMesh
