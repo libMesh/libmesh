@@ -134,6 +134,7 @@ public:
         libmesh_error_msg("Error: specified mesh_type not understood");
        }
 
+#ifdef LIBMESH_ENABLE_AMR // We refine or read refined meshes for this test
        if(mesh_creation_type.compare("from_memory") == 0)
        {
          /**
@@ -199,6 +200,7 @@ public:
         {
          libmesh_error_msg("Error: invalid mesh two case type.");
         }
+#endif // LIBMESH_ENABLE_AMR
   }
 
   void testMeshMoveAssignFromMemory()
