@@ -1857,10 +1857,14 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 
       for (auto qoi_index : index_range(_adjoint_dirichlet_boundaries))
         {
-          Threads::parallel_for
-            (range.reset(),
-             ConstrainDirichlet(*this, mesh, time, *(_adjoint_dirichlet_boundaries[qoi_index]),
-                                AddAdjointConstraint(*this, qoi_index)));
+          const DirichletBoundaries & adb_q =
+            *(_adjoint_dirichlet_boundaries[qoi_index]);
+
+          if (!adb_q.empty())
+            Threads::parallel_for
+              (range.reset(),
+               ConstrainDirichlet(*this, mesh, time, adb_q,
+                                  AddAdjointConstraint(*this, qoi_index)));
         }
     }
 
