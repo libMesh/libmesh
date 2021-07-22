@@ -195,6 +195,13 @@ public:
   const QpDataMap & get_basis_function(unsigned int i) const;
 
   /**
+   * Set _rb_eim_solutions. Normally we update _rb_eim_solutions by performing
+   * and EIM solve, but in some cases we want to set the EIM solution coefficients
+   * elsewhere, so this setter enables us to do that.
+   */
+  void set_rb_eim_solutions(const std::vector<DenseVector<Number>> & rb_eim_solutions);
+
+  /**
    * Return the EIM solution coefficients from the most recent call to rb_eim_solves().
    */
   const std::vector<DenseVector<Number>> & get_rb_eim_solutions() const;
@@ -255,6 +262,52 @@ public:
     subdomain_id_type subdomain_id,
     unsigned int qp,
     const std::vector<Point> & perturbs);
+
+  /**
+   * Set the observation points and components.
+   */
+  void set_observation_points(const std::vector<Point> & observation_points_xyz);
+
+  /**
+   * Get the number of observation points.
+   */
+  unsigned int get_n_observation_points() const;
+
+  /**
+   * Get the observation points.
+   */
+  const std::vector<Point> & get_observation_points() const;
+
+  /**
+   * Get the observation value for the specified basis function and observation point.
+   */
+  const std::vector<Number> & get_observation_values(unsigned int bf_index, unsigned int obs_pt_index) const;
+
+  /**
+   * Get a const reference to all the observation values, indexed as follows:
+   *  basis_function index --> observation point index --> value.
+   */
+  const std::vector<std::vector<std::vector<Number>>> & get_observation_values() const;
+
+  /**
+   * Add values at the observation points for a new basis function.
+   */
+  void add_observation_values_for_basis_function(const std::vector<std::vector<Number>> & values);
+
+  /**
+   * Set all observation values.
+   */
+  void set_observation_values(const std::vector<std::vector<std::vector<Number>>> & values);
+
+  /**
+   * Set _preserve_rb_eim_solutions.
+   */
+  void set_preserve_rb_eim_solutions(bool preserve_rb_eim_solutions);
+
+  /**
+   * Get _preserve_rb_eim_solutions.
+   */
+  bool get_preserve_rb_eim_solutions() const;
 
   /**
    * Write out all the basis functions to file.
@@ -360,7 +413,7 @@ private:
    * is as follows:
    *   basis function index --> element ID --> variable --> quadrature point --> value
    * We use a map to index the element ID, since the IDs on this processor in
-   * generally will not start at zero.
+   * general will not start at zero.
    */
   std::vector<QpDataMap> _local_eim_basis_functions;
 
@@ -383,6 +436,32 @@ private:
    * they are read in on processor 0.
    */
   void distribute_bfs(const System & sys);
+
+  /**
+   * Let {p_1,...,p_n} be a set of n "observation points", where we can
+   * observe the values of our EIM basis functions. Also, let
+   * {comp_k} be the components of the EIM basis function that
+   * we will observe. Then the corresponding observation values, v_ijk,
+   * are given by:
+   *  v_ijk = eim_basis_function[i][p_j][comp_k].
+   *
+   * These observation values can be used to observe the EIM approximation
+   * at specific points of interest, where the points of interest are defined
+   * by the observation points.
+   *
+   * _observation_points_value is indexed as follows:
+   *  basis_function index --> observation point index --> comp index --> value
+   */
+  std::vector<Point> _observation_points_xyz;
+  std::vector<std::vector<std::vector<Number>>> _observation_points_values;
+
+  /**
+   * Boolean to indicate if we skip updating _rb_eim_solutions in rb_eim_solves().
+   * This is relevant for cases when we set up _rb_eim_solutions elsewhere and we
+   * want to avoid changing it.
+   */
+  bool _preserve_rb_eim_solutions;
+
 };
 
 }

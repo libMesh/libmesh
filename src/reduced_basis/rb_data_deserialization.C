@@ -715,7 +715,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
-  // Interpolation points componnents
+  // Interpolation points components
   {
     auto interpolation_points_comp_list =
       rb_eim_evaluation_reader.getInterpolationComp();
@@ -813,6 +813,51 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
             }
           eim_solutions[i] = values;
         }
+    }
+
+  // Optionally load observation points data for the EIM basis functions
+  unsigned int n_obs_pts = rb_eim_evaluation.get_n_observation_points();
+  if (n_obs_pts > 0)
+    {
+      {
+        auto observation_points_xyz_list =
+          rb_eim_evaluation_reader.getObservationPointsXyz();
+
+        std::vector<Point> observation_points_xyz;
+        for (unsigned int i=0; i<observation_points_xyz_list.size(); ++i)
+          {
+            Point p;
+            load_point(observation_points_xyz_list[i], p);
+            observation_points_xyz.emplace_back(p);
+          }
+
+        rb_eim_evaluation.set_observation_points(observation_points_xyz);
+      }
+
+      {
+        auto obs_values_list_outer =
+          rb_eim_evaluation_reader.getObservationPointsValues();
+
+        std::vector<std::vector<std::vector<Number>>> observation_values;
+        observation_values.resize(obs_values_list_outer.size());
+
+        for (auto i : make_range(obs_values_list_outer.size()))
+          {
+            auto obs_values_list_middle = obs_values_list_outer[i];
+
+            observation_values[i].resize(obs_values_list_middle.size());
+            for (auto j : index_range(observation_values[i]))
+              {
+                auto obs_values_list_inner = obs_values_list_middle[j];
+
+                observation_values[i][j].resize(obs_values_list_inner.size());
+                for (auto k : index_range(observation_values[i][j]))
+                  observation_values[i][j][k] = load_scalar_value(obs_values_list_inner[k]);
+              }
+          }
+
+        rb_eim_evaluation.set_observation_values(observation_values);
+      }
     }
 }
 
