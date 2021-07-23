@@ -609,6 +609,17 @@ int ADImplementation<Value_t>::AutoDiff(unsigned int _var, typename FunctionPars
 }
 
 template<typename Value_t>
+std::size_t FunctionParserADBase<Value_t>::JITCodeHash(const std::string & Value_t_name)
+{
+  // start with a version tag in case the JIT function signature changes
+  std::size_t h = std::hash<std::string>{}("v3");
+  for (auto b :this->mData->mByteCode)
+    libMesh::boostcopy::hash_combine(h, b);
+  libMesh::boostcopy::hash_combine(h, Value_t_name);
+  return h;
+}
+
+template<typename Value_t>
 void FunctionParserADBase<Value_t>::Optimize()
 {
   FunctionParserBase<Value_t>::Optimize();
@@ -646,17 +657,6 @@ template<>
 bool FunctionParserADBase<float>::JITCompile() { return JITCompileHelper("float"); }
 template<>
 bool FunctionParserADBase<long double>::JITCompile() { return JITCompileHelper("long double"); }
-
-template<typename Value_t>
-std::size_t FunctionParserADBase<Value_t>::JITCodeHash(const std::string & Value_t_name)
-{
-  // start with a version tag in case the JIT function signature changes
-  std::size_t h = std::hash<std::string>{}("v3");
-  for (auto b :this->mData->mByteCode)
-    libMesh::boostcopy::hash_combine(h, b);
-  libMesh::boostcopy::hash_combine(h, Value_t_name);
-  return h;
-}
 
 template<typename Value_t>
 bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t_name,
@@ -1011,6 +1011,8 @@ bool FunctionParserADBase<Value_t>::JITCodeGen(std::ostream & ccout, const std::
   return true;
 }
 
+#endif // LIBMESH_HAVE_FPARSER_JIT
+
 // Helper tools for the just in time compilation process
 namespace FParserJIT
 {
@@ -1023,6 +1025,8 @@ hashToString(std::size_t hash)
          << std::hex << hash;
   return stream.str();
 }
+
+#ifdef LIBMESH_HAVE_FPARSER_JIT
 
 Compiler::Compiler(const std::string & master_hash)
   : _jitdir(".jitcache"),
@@ -1182,9 +1186,11 @@ void * Compiler::getFunction(const std::string & fname)
 
   throw std::runtime_error(error);
 }
-}
 
 #endif // LIBMESH_HAVE_FPARSER_JIT
+
+} // namespace FParserJIT
+
 
 template <typename Value_t>
 void FunctionParserADBase<Value_t>::updatePImmed() {
