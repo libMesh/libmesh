@@ -215,18 +215,18 @@ public:
     /**
      * String identifying the type of parameter stored.
      */
-    virtual std::string type () const;
+    virtual std::string type () const override;
 #endif // LIBMESH_HAVE_RTTI
 
     /**
      * Prints the parameter value to the specified stream.
      */
-    virtual void print(std::ostream &) const;
+    virtual void print(std::ostream &) const override;
 
     /**
      * Clone this value.  Useful in copy-construction.
      */
-    virtual Value * clone () const;
+    virtual Value * clone () const override;
 
   private:
     /**
