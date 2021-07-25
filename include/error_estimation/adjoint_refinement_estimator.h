@@ -97,7 +97,7 @@ public:
   virtual void estimate_error (const System & system,
                                ErrorVector & error_per_cell,
                                const NumericVector<Number> * solution_vector = nullptr,
-                               bool estimate_parent_error = false);
+                               bool estimate_parent_error = false) override;
 
   /**
    * This is an accessor function to access the computed global
@@ -108,7 +108,7 @@ public:
     return computed_global_QoI_errors[qoi_index];
   }
 
-  virtual ErrorEstimatorType type() const;
+  virtual ErrorEstimatorType type() const override;
 
   /**
    * How many h refinements to perform to get the fine grid

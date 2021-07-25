@@ -70,14 +70,14 @@ public:
   /**
    * Setter: change the value of the parameter we access.
    */
-  virtual void set (const T & new_value) {
+  virtual void set (const T & new_value) override {
     _func.set_inline_value(_name, new_value);
   }
 
   /**
    * Getter: get the value of the parameter we access.
    */
-  virtual const T & get () const {
+  virtual const T & get () const override {
     _current_val = _func.get_inline_value(_name);
     return _current_val;
   }
@@ -85,7 +85,7 @@ public:
   /**
    * \returns A new copy of the accessor.
    */
-  virtual std::unique_ptr<ParameterAccessor<T>> clone() const {
+  virtual std::unique_ptr<ParameterAccessor<T>> clone() const override {
     return libmesh_make_unique<ParsedFunctionParameter<T>>(_func, _name);
   }
 
