@@ -136,10 +136,10 @@ public:
 
 protected:
 
-#if LIBMESH_HAVE_FPARSER_JIT
   /// return a SHA1 hash for the current bytecode and value type name
   std::size_t JITCodeHash(const std::string & value_type_name = "");
 
+#if LIBMESH_HAVE_FPARSER_JIT
   /// write generated C++ code to stream
   bool JITCodeGen(std::ostream & ccout, const std::string & fname, const std::string & Value_t_name);
 
@@ -203,7 +203,6 @@ protected:
   } UnknownSerializationVersionException;
 };
 
-#ifdef LIBMESH_HAVE_FPARSER_JIT
 
 /// Namespacing the utility classes (rather than nesting them in a templated class)
 namespace FParserJIT
@@ -211,6 +210,8 @@ namespace FParserJIT
 
 /// return a hex representation of the given hash
 std::string hashToString(std::size_t hash);
+
+#if LIBMESH_HAVE_FPARSER_JIT
 
 /// Handle compilation, caching, and temporary files
 class Compiler
@@ -236,9 +237,10 @@ protected:
   const std::string _master_hash;
   const bool _use_cache;
 };
-} // namespace FParserJIT
 
 #endif // LIBMESH_HAVE_FPARSER_JIT
+
+} // namespace FParserJIT
 
 class FunctionParserAD: public FunctionParserADBase<double> {};
 class FunctionParserAD_f: public FunctionParserADBase<float> {};
