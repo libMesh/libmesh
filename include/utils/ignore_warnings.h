@@ -81,6 +81,8 @@
 #pragma GCC diagnostic ignored "-Wlogical-op"
 // Ignore warnings from code that uses deprecated members of std, like std::auto_ptr.
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+// This is mostly for the (deprecated...) C++ MPI wrappers
+#pragma GCC diagnostic ignored "-Wsuggest-override"
 #if (__GNUC__ > 5)
 // Ignore this for VTK
 #pragma GCC diagnostic ignored "-Wfloat-conversion"

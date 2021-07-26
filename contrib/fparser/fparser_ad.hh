@@ -196,10 +196,10 @@ protected:
 
   // Exceptions
   class UnknownVariable : public std::exception {
-    virtual const char* what() const throw() { return "Unknown variable"; }
+    virtual const char* what() const throw() override { return "Unknown variable"; }
   } UnknownVariableException;
   class UnknownSerializationVersion : public std::exception {
-    virtual const char* what() const throw() { return "Unknown serialization file version"; }
+    virtual const char* what() const throw() override { return "Unknown serialization file version"; }
   } UnknownSerializationVersionException;
 };
 
