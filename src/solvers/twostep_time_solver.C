@@ -124,6 +124,9 @@ void TwostepTimeSolver::solve()
       // Attempt the 'half timestep solve'
       core_time_solver->solve();
 
+      // If we successfully completed the solve, let the time solver know the deltat used
+      this->last_deltat = _system.deltat;
+
       // Increment system.time, and save the half solution to solution history
       core_time_solver->advance_timestep();
 
