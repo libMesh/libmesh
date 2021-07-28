@@ -232,10 +232,6 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
         else
         libmesh_error_msg("Unrecognized solution history type: " << param.solution_history_type);
 
-        // The Memory/File Solution History object we will set the system SolutionHistory object to
-        FileSolutionHistory heatsystem_solution_history(system);
-        system.time_solver->set_solution_history(heatsystem_solution_history);
-
       }
     }
   else
