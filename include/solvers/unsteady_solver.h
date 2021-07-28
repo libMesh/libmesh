@@ -195,6 +195,16 @@ public:
     first_adjoint_step = first_adjoint_step_setting;
   }
 
+  /*
+   * A setter for the first_solver boolean. Useful for example if we are using
+   * a nested time solver, and the outer solver wants to tell the inner one that
+   * the initial conditions have already been handled.
+   */
+  void set_first_solve(bool first_solve_setting)
+  {
+    first_solve = first_solve_setting;
+  }
+
 protected:
 
   /**
