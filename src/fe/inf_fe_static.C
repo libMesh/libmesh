@@ -1296,7 +1296,7 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
 
   libmesh_assert(fe_type.family == LAGRANGE);
 
-  std::vector<dof_id_type> child_side_dof_indices, parent_side_dof_indices;
+  std::vector<dof_id_type> child_base_dof_indices, parent_base_dof_indices;
   std::vector<dof_id_type> child_elem_dof_indices, parent_elem_dof_indices;
 
   const Elem * parent_elem = child_elem->parent();
@@ -1349,42 +1349,42 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
           // we ALWAYS take the base element for reference:
           // - For s=0, we refine all dofs with `radial_shape_index == 0
           // - for s>0, we refine all dofs whose corresponding base_shape has its support point shared with neighbor(s)
-          std::unique_ptr<const Elem> child_side, parent_side;
-          child_elem->build_side_ptr(child_side, 0);
-          parent_elem->build_side_ptr(parent_side, 0);
+          std::unique_ptr<const Elem> child_base, parent_base;
+          child_elem->build_side_ptr(child_base, 0);
+          parent_elem->build_side_ptr(parent_base, 0);
 
-          const unsigned int n_side_dofs =
-            FEInterface::n_dofs(fe_type, child_side.get());
+          const unsigned int n_base_dofs =
+            FEInterface::n_dofs(fe_type, child_base.get());
 
           // We need global DOF indices for both base and 'full' elements
-          dof_map.dof_indices (child_side.get(), child_side_dof_indices,
+          dof_map.dof_indices (child_base.get(), child_base_dof_indices,
                                variable_number);
-          dof_map.dof_indices (parent_side.get(), parent_side_dof_indices,
+          dof_map.dof_indices (parent_base.get(), parent_base_dof_indices,
                                variable_number);
 
 
           // First we loop over the childs base DOFs (nodes) and check which of them needs constraint
           // and which can be skipped.
-          for (unsigned int child_side_dof=0; child_side_dof != n_side_dofs; ++child_side_dof)
+          for (unsigned int child_base_dof=0; child_base_dof != n_base_dofs; ++child_base_dof)
             {
-              libmesh_assert_less (child_side_dof, child_side->n_nodes());
+              libmesh_assert_less (child_base_dof, child_base->n_nodes());
 
               // Childs global dof index.
-              const dof_id_type child_side_dof_g = child_side_dof_indices[child_side_dof];
+              const dof_id_type child_base_dof_g = child_base_dof_indices[child_base_dof];
 
               // Hunt for "constraining against myself" cases before
               // we bother creating a constraint row
               bool self_constraint = false;
-              for (unsigned int parent_side_dof=0;
-                   parent_side_dof != n_side_dofs; parent_side_dof++)
+              for (unsigned int parent_base_dof=0;
+                   parent_base_dof != n_base_dofs; parent_base_dof++)
                 {
-                  libmesh_assert_less (parent_side_dof, parent_side->n_nodes());
+                  libmesh_assert_less (parent_base_dof, parent_base->n_nodes());
 
                   // Their global dof index.
-                  const dof_id_type parent_side_dof_g =
-                    parent_side_dof_indices[parent_side_dof];
+                  const dof_id_type parent_base_dof_g =
+                    parent_base_dof_indices[parent_base_dof];
 
-                  if (parent_side_dof_g == child_side_dof_g)
+                  if (parent_base_dof_g == child_base_dof_g)
                     {
                       self_constraint = true;
                       break;
@@ -1395,13 +1395,13 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
                 continue;
 
               // now we need to constrain all __child_elem__ DOFs whose base corresponds to
-              // child_side_dof.
-              //  --> loop over all child_elem dofs whose base_shape_index == child_side_dof
+              // child_base_dof.
+              //  --> loop over all child_elem dofs whose base_shape_index == child_base_dof
               unsigned int n_elem_dofs = FEInterface::n_dofs(fe_type, child_elem);
               libmesh_assert_equal_to(n_elem_dofs, n_total_dofs);
               for(unsigned int child_elem_dof=0; child_elem_dof != n_elem_dofs; ++child_elem_dof)
                 {
-                  if (base_shape_index[child_elem_dof] != child_side_dof)
+                  if (base_shape_index[child_elem_dof] != child_base_dof)
                     continue;
 
                   // independent from the radial description, the first radial DOF is 1 at the base
@@ -1417,7 +1417,7 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
                     {
                       // If the neighbor is not the base, we must check now if the support point of the dof
                       // is actually shared with that neighbor:
-                      if ( !child_elem->neighbor_ptr(s)->contains_point(child_side->point(child_side_dof)) )
+                      if ( !child_elem->neighbor_ptr(s)->contains_point(child_base->point(child_base_dof)) )
                         continue;
                     }
 
@@ -1440,26 +1440,26 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
                   }
 
                   // The support point of the DOF
-                  const Point & support_point = child_side->point(child_side_dof);
+                  const Point & support_point = child_base->point(child_base_dof);
 
                   // Figure out where my (base) node lies on the parents reference element.
                   const Point mapped_point = FEMap::inverse_map(Dim-1,
-                                                                parent_side.get(),
+                                                                parent_base.get(),
                                                                 support_point);
 
                   // now we need the parents base DOFs, evaluated at the mapped_point for refinement:
-                  for (unsigned int parent_side_dof=0;
-                       parent_side_dof != n_side_dofs; parent_side_dof++)
+                  for (unsigned int parent_base_dof=0;
+                       parent_base_dof != n_base_dofs; parent_base_dof++)
                     {
 
                       const Real parent_base_dof_value = FEInterface::shape(Dim-1,
                                                                             fe_type,
-                                                                            parent_side.get(),
-                                                                            parent_side_dof,
+                                                                            parent_base.get(),
+                                                                            parent_base_dof,
                                                                             mapped_point);
 
 
-                      // all parent elements DOFs whose base_index corresponds to parent_side_dof
+                      // all parent elements DOFs whose base_index corresponds to parent_base_dof
                       //  must be constrained with the parent_base_dof_value.
 
                       // The value of the radial function does not play a role here:
@@ -1471,7 +1471,7 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
                       for (unsigned int parent_elem_dof=0;
                            parent_elem_dof != n_elem_dofs; parent_elem_dof++)
                         {
-                          if (base_shape_index[parent_elem_dof] != parent_side_dof)
+                          if (base_shape_index[parent_elem_dof] != parent_base_dof)
                             continue;
 
                           // only constrain with coinciding radial DOFs.
@@ -1495,7 +1495,7 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
                           // in which case i better equal j.
                           else if (parent_base_dof_value >= .999)
                             {
-                              libmesh_assert_equal_to (child_side_dof_g, parent_side_dof_indices[parent_side_dof]);
+                              libmesh_assert_equal_to (child_base_dof_g, parent_base_dof_indices[parent_base_dof]);
                               libmesh_assert_equal_to (child_elem_dof_g, parent_elem_dof_g);
                             }
 #endif
