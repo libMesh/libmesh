@@ -1244,10 +1244,6 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
                                                            const Elem * child_elem)
 {
 
-  //FIXME: Here we assume that base_elements are of Lagrange-type.
-  //       we should check that at least?!
-  //       (but it is called only from lagrange_compute_constraints().)
-  //
   // only constrain elements in 2,3d.
   if (Dim == 1)
     return;
@@ -1269,16 +1265,36 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
   if (!need_constraints)
     return;
 
-  // for infinite elements, the computation of constraints is somewhat different
+  // For infinite elements, the computation of constraints is somewhat different
   // than for Lagrange elements:
-  // 1) Only the base element (i.e. side(0) ) may be refined.
-  //    Thus, in radial direction no constraints must be considered.
+  // 1) When an infinite element is refined, only the base element (i.e. side(0) ) is refined.
+  //
   // 2) Due to the tensorial structure of shape functions (base_shape * radial_function),
   //    it must be ensured that all element DOFs inherit that constraint.
-  // Consequently, the constraints are computed on the base (base_shape) but must
-  // be applied to all DOFs with the respective base_shape index (i.e. for all radial_functions).
+  //    It is important here to distinguish the (total) DOF from base DOF and radial DOF contributions.
+  //
+  // 3) Due to the generality of radial polynomial (of type fe_type.radial_family and with order fe_type.radial_order)
+  //    here basis functions cannot be mapped to nodes: Independent from the radial polynomial,
+  //    infinite elements have one set of nodes at the base (side(0)) and a second set at twice the distance to their origin.
+  //
+  //    Independent from the polynomial and degree used, the first radial DOF is 1 at the base while all others are 0 there
+  //
+  //Constraining of DOFs is only needed when a DOF is nonzero at the elements face shared with a coarser element.
+  // Thus, the following scheme is used here:
+  //
+  //  -If the coarser element is the neighbor(0) (i.e. we share only the base), we must constrain
+  //   all DOFs that correspond to the first order radial contribution.
+  //  -if an infinite neighbor is coarser (than 'child_elem'), all those DOFs must be constrained
+  //   whose contribution from the base is non-zero at the interface.
+  //   In this case, we lack a point-assignement between DOFs and nodes, but since there is no refinement in radial direction,
+  //   the radial polynomials coincide on neighboring elements.
+  //   Thus, if one constraines these DOFs at one (arbitrary) point correctly, they match for each point along the radial direction.
+  //   Hence, we constrain them with the same values as those DOFs belonging to the first order polynomial, obtaining consistent
+  //   constraints that mimick constraints that are computed at the support points for each radial polynomial contribution.
 
   FEType fe_type = dof_map.variable_type(variable_number);
+
+  libmesh_assert(fe_type.family == LAGRANGE);
 
   std::vector<dof_id_type> child_side_dof_indices, parent_side_dof_indices;
   std::vector<dof_id_type> child_elem_dof_indices, parent_elem_dof_indices;
