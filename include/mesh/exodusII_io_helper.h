@@ -254,11 +254,6 @@ public:
   void close();
 
   /**
-   * \returns The value obtained from a generic exII::ex_inquire() call.
-   */
-  int inquire(int req_info, std::string error_msg="");
-
-  /**
    * Reads and stores the timesteps in the 'time_steps' array.
    */
   void read_time_steps();

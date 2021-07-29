@@ -87,6 +87,26 @@ const std::vector<int> hex_edge_map =
 const std::vector<int> hex_inverse_edge_map =
   {1,2,3,4,9,10,12,11,5,6,7,8};
 
+  /**
+   * \returns The value obtained from a generic exII::ex_inquire() call.
+   */
+  int inquire(libMesh::ExodusII_IO_Helper & e2h, exII::ex_inquiry req_info_in, std::string error_msg="")
+  {
+    int ret_int = 0;
+    char ret_char = 0;
+    float ret_float = 0.;
+
+    e2h.ex_err = exII::ex_inquire(e2h.ex_id,
+                                  req_info_in,
+                                  &ret_int,
+                                  &ret_float,
+                                  &ret_char);
+
+    EX_CHECK_ERR(e2h.ex_err, error_msg);
+
+    return ret_int;
+  }
+
 } // end anonymous namespace
 
 
@@ -595,7 +615,7 @@ void ExodusII_IO_Helper::read_qa_records()
 {
   // The QA records are four MAX_STR_LENGTH-byte character strings.
   int num_qa_rec =
-    this->inquire(exII::EX_INQ_QA, "Error retrieving number of QA records");
+    inquire(*this, exII::EX_INQ_QA, "Error retrieving number of QA records");
 
   if (verbose)
     libMesh::out << "Found "
@@ -1050,7 +1070,7 @@ void ExodusII_IO_Helper::read_sideset_info()
       num_df_per_set.resize(num_side_sets);
 
       // Inquire about the length of the concatenated side sets element list
-      num_elem_all_sidesets = inquire(exII::EX_INQ_SS_ELEM_LEN, "Error retrieving length of the concatenated side sets element list!");
+      num_elem_all_sidesets = inquire(*this, exII::EX_INQ_SS_ELEM_LEN, "Error retrieving length of the concatenated side sets element list!");
 
       elem_list.resize (num_elem_all_sidesets);
       side_list.resize (num_elem_all_sidesets);
@@ -1148,20 +1168,20 @@ void ExodusII_IO_Helper::read_all_nodesets()
   // Figure out how many nodesets there are in the file so we can
   // properly resize storage as necessary.
   num_node_sets =
-    this->inquire
-    (exII::EX_INQ_NODE_SETS,
+    inquire
+    (*this, exII::EX_INQ_NODE_SETS,
      "Error retrieving number of node sets");
 
   // Figure out how many nodes there are in all the nodesets.
   int total_nodes_in_all_sets =
-    this->inquire
-    (exII::EX_INQ_NS_NODE_LEN,
+    inquire
+    (*this, exII::EX_INQ_NS_NODE_LEN,
      "Error retrieving number of nodes in all node sets.");
 
   // Figure out how many distribution factors there are in all the nodesets.
   int total_df_in_all_sets =
-    this->inquire
-    (exII::EX_INQ_NS_DF_LEN,
+    inquire
+    (*this, exII::EX_INQ_NS_DF_LEN,
      "Error retrieving number of distribution factors in all node sets.");
 
   // If there are no nodesets, there's nothing to read in.
@@ -1231,25 +1251,6 @@ void ExodusII_IO_Helper::close()
 
 
 
-int ExodusII_IO_Helper::inquire(int req_info_in, std::string error_msg)
-{
-  int ret_int = 0;
-  char ret_char = 0;
-  float ret_float = 0.;
-
-  ex_err = exII::ex_inquire(ex_id,
-                            req_info_in,
-                            &ret_int,
-                            &ret_float,
-                            &ret_char);
-
-  EX_CHECK_ERR(ex_err, error_msg);
-
-  return ret_int;
-}
-
-
-
 void ExodusII_IO_Helper::read_time_steps()
 {
   // Make sure we have an up-to-date count of the number of time steps in the file.
@@ -1270,7 +1271,7 @@ void ExodusII_IO_Helper::read_time_steps()
 void ExodusII_IO_Helper::read_num_time_steps()
 {
   num_time_steps =
-    this->inquire(exII::EX_INQ_TIME, "Error retrieving number of time steps");
+    inquire(*this, exII::EX_INQ_TIME, "Error retrieving number of time steps");
 }
 
 
@@ -3309,7 +3310,7 @@ void ExodusII_IO_Helper::write_information_records(const std::vector<std::string
   // example, if we're appending) and in that case, according to the
   // Exodus documentation, writing more information records is not
   // supported.
-  int num_info = inquire(exII::EX_INQ_INFO, "Error retrieving the number of information records from file!");
+  int num_info = inquire(*this, exII::EX_INQ_INFO, "Error retrieving the number of information records from file!");
   if (num_info > 0)
     {
       libMesh::err << "Warning! The Exodus file already contains information records.\n"
