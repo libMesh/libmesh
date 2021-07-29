@@ -691,7 +691,7 @@ AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF_V4, test x$netcdfversion = x4)
 
 # -------------------------------------------------------------
 # ExodusII -- enabled by default (it is distributed in contrib)
-# (note that ExodusII requires netCDF
+# (note that ExodusII requires netCDF)
 # -------------------------------------------------------------
 CONFIGURE_EXODUS
 AS_IF([test $enableexodus = yes],
@@ -700,6 +700,7 @@ AS_IF([test $enableexodus = yes],
 AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS,      test x$enableexodus  = xyes)
 AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS_V509, test x$exodusversion = xv5.09)
 AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS_V522, test x$exodusversion = xv5.22)
+AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS_V811, test x$exodusversion = xv8.11)
 
 # -------------------------------------------------------------
 # Nemesis -- enabled by default (it is distributed in contrib)
@@ -712,6 +713,7 @@ AS_IF([test $enablenemesis = yes],
 AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS,      test x$enablenemesis  = xyes)
 AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS_V309, test x$nemesisversion = xv3.09)
 AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS_V522, test x$nemesisversion = xv5.22)
+AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS_V811, test x$nemesisversion = xv8.11)
 
 
 

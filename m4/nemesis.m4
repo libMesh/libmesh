@@ -7,16 +7,17 @@ AC_DEFUN([CONFIGURE_NEMESIS],
                 AS_HELP_STRING([--disable-nemesis],
                                [build without NemesisII API support]),
                 [AS_CASE("${enableval}",
-                         [yes|new|v522], [enablenemesis=yes ; nemesisversion="v5.22"],
+                         [yes|v811], [enablenemesis=yes ; nemesisversion="v8.11"],
+                         [new|v522], [enablenemesis=yes ; nemesisversion="v5.22"],
                          [old|v309],     [enablenemesis=yes ; nemesisversion="v3.09"],
                          [no],           [enablenemesis=no  ; nemesisversion=no],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-nemesis)])],
                 [
                   # if unspecified, depend on exodus
                   enablenemesis=$enableexodus ;
-                  AS_IF([test "x$exodusversion" = "xv5.22"],
-                        [nemesisversion="v5.22"],
-                        [nemesisversion="v3.09"])
+                  AS_IF([test "x$exodusversion" = "xv5.09"],
+                        [nemesisversion="v3.09"],
+                        [nemesisversion="$exodusversion"])
                 ])
 
   # Trump --enable-nemesis with --disable-mpi
@@ -38,6 +39,12 @@ AC_DEFUN([CONFIGURE_NEMESIS],
             AC_DEFINE(HAVE_NEMESIS_API, 1, [Flag indicating whether the library will be compiled with Nemesis support])
             AC_MSG_RESULT(<<< Configuring library with Nemesis version $nemesisversion support >>>)
           ],
+          ["v8.11"],
+          [
+            NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/$nemesisversion/nemesis"
+            AC_DEFINE(HAVE_NEMESIS_API, 1, [Flag indicating whether the library will be compiled with Nemesis support])
+            AC_MSG_RESULT(<<< Configuring library with Nemesis version $nemesisversion support >>>)
+          ],
           [
             NEMESIS_INCLUDE=""
             enablenemesis=no
@@ -45,5 +52,6 @@ AC_DEFUN([CONFIGURE_NEMESIS],
 
   AC_CONFIG_FILES([contrib/nemesis/v3.09/Makefile])
   AC_CONFIG_FILES([contrib/nemesis/v5.22/nemesis/Makefile])
+  AC_CONFIG_FILES([contrib/nemesis/v8.11/nemesis/Makefile])
   AC_SUBST(NEMESIS_INCLUDE)
 ])
