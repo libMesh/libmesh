@@ -115,6 +115,14 @@ const std::vector<int> hex_inverse_edge_map =
     return ret_int;
   }
 
+  // Bezier Extraction assertions: if we see BEx data we had better be
+  // in a Bezier element block
+  inline void libmesh_assert_bezier_elem(const char * libmesh_dbg_var(elem_type_str))
+  {
+    libmesh_assert_greater(strlen(elem_type_str), 4);
+    libmesh_assert_equal_to(std::string(elem_type_str, elem_type_str+4), "BEX_");
+  }
+
 } // end anonymous namespace
 
 
