@@ -895,6 +895,7 @@ public:
       inverse_shellface_map(nullptr),
       shellface_index_offset(0),
       libmesh_type(INVALID_ELEM),
+      dim(0),
       exodus_type("")
   {}
 
@@ -1015,6 +1016,12 @@ public:
    * element type.
    */
   ElemType libmesh_type;
+
+  /**
+   * The element dimension; useful since we don't seem to have a cheap
+   * way to look this up from ElemType
+   */
+  int dim;
 
   /**
    * The string corresponding to the Exodus type for this element
