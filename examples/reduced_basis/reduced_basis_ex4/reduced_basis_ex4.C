@@ -99,6 +99,14 @@ int main (int argc, char ** argv)
   if (command_line.search(1, "-online_mode"))
     online_mode = command_line.next(online_mode);
 
+  int eim_training_function_to_plot = 0;
+  if (command_line.search(1, "-eim_training_function_to_plot"))
+    eim_training_function_to_plot = command_line.next(eim_training_function_to_plot);
+
+  int eim_basis_function_to_plot = 0;
+  if (command_line.search(1, "-eim_basis_function_to_plot"))
+    eim_basis_function_to_plot = command_line.next(eim_basis_function_to_plot);
+
   ReplicatedMesh mesh (init.comm(), dim);
   MeshTools::Generation::build_square (mesh,
                                        n_elem, n_elem,
@@ -148,6 +156,21 @@ int main (int argc, char ** argv)
 
         // Write out the EIM basis functions
         eim_rb_eval.write_out_basis_functions("eim_data", eim_binary_io);
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+        // Plot one of the parametrized functions from the training set
+        eim_rb_eval.project_qp_data_map_onto_system(eim_construction,
+                                                    eim_construction.get_parametrized_function_from_training_set(eim_training_function_to_plot),
+                                                    /*eim_var*/ 0);
+        std::set<std::string> system_names = {eim_construction.name()};
+        ExodusII_IO(mesh).write_equation_systems("eim_parametrized_function.e", equation_systems, &system_names);
+
+        // Plot one of the basis functions
+        eim_rb_eval.project_qp_data_map_onto_system(eim_construction,
+                                                    eim_rb_eval.get_basis_function(eim_basis_function_to_plot),
+                                                    /*eim_var*/ 0);
+        ExodusII_IO(mesh).write_equation_systems("eim_basis_function.e", equation_systems, &system_names);
+#endif
       }
 
       {
@@ -247,7 +270,7 @@ int main (int argc, char ** argv)
       rb_eval.read_in_basis_functions(rb_construction, "rb_data");
       rb_construction.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
-          ExodusII_IO(mesh).write_equation_systems("RB_sol.e", equation_systems);
+      ExodusII_IO(mesh).write_equation_systems("RB_sol.e", equation_systems);
 #endif
     }
 

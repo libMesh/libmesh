@@ -336,6 +336,36 @@ public:
                                const std::string & directory_name = "offline_data",
                                bool read_binary_basis_functions = true);
 
+  /**
+   * Project variable \p var of \p bf_data into the solution vector of System.
+   */
+  void project_qp_data_map_onto_system(System & sys,
+                                       const QpDataMap & bf_data,
+                                       unsigned int var);
+
+  /**
+   * Return a set that specifies which EIM variables will be projected
+   * and written out in write_out_projected_basis_functions().
+   * By default this returns an empty vector, but can be overridden in
+   * subclasses to specify the EIM variables that are relevant for visualization.
+   */
+  virtual std::set<unsigned int> get_eim_vars_to_project_and_write() const;
+
+  /**
+   * Project all basis functions using project_qp_data_map_onto_system() and
+   * then write out the resulting vectors.
+   */
+  void write_out_projected_basis_functions(System & sys,
+                                           const std::string & directory_name = "offline_data");
+
+  /**
+   * Indicate whether we should apply scaling to the components of the parametrized
+   * function during basis function enrichment in order give an approximately uniform
+   * magnitude for all components. This is helpful in cases where the components vary
+   * widely in magnitude.
+   */
+  virtual bool scale_components_in_enrichment() const;
+
 private:
 
   /**

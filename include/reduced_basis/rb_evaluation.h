@@ -206,11 +206,11 @@ public:
    * Same as write_out_basis_functions, except in this case we pass in the vectors to be
    * written.
    */
-  virtual void write_out_vectors(System & sys,
-                                 std::vector<NumericVector<Number>*> & vectors,
-                                 const std::string & directory_name = "offline_data",
-                                 const std::string & data_name = "bf",
-                                 const bool write_binary_basis_functions = true);
+  static void write_out_vectors(System & sys,
+                                std::vector<NumericVector<Number>*> & vectors,
+                                const std::string & directory_name = "offline_data",
+                                const std::string & data_name = "bf",
+                                const bool write_binary_basis_functions = true);
 
   /**
    * Read in all the basis functions from file.
@@ -228,11 +228,11 @@ public:
    * written. We assume that the size of vectors indicates the number of vectors
    * that need to be read in.
    */
-  void read_in_vectors(System & sys,
-                       std::vector<std::unique_ptr<NumericVector<Number>>> & vectors,
-                       const std::string & directory_name,
-                       const std::string & data_name,
-                       const bool read_binary_vectors);
+  static void read_in_vectors(System & sys,
+                              std::vector<std::unique_ptr<NumericVector<Number>>> & vectors,
+                              const std::string & directory_name,
+                              const std::string & data_name,
+                              const bool read_binary_vectors);
 
   /**
    * Performs read_in_vectors for a list of directory names and data names.
@@ -240,11 +240,11 @@ public:
    * way. This function only renumbers the dofs once at the start (and reverts
    * it at the end), which can save a lot of work compared to renumbering on every read.
    */
-  void read_in_vectors_from_multiple_files(System & sys,
-                                           std::vector<std::vector<std::unique_ptr<NumericVector<Number>>> *> multiple_vectors,
-                                           const std::vector<std::string> & multiple_directory_names,
-                                           const std::vector<std::string> & multiple_data_names,
-                                           const bool read_binary_vectors);
+  static void read_in_vectors_from_multiple_files(System & sys,
+                                                  std::vector<std::vector<std::unique_ptr<NumericVector<Number>>> *> multiple_vectors,
+                                                  const std::vector<std::string> & multiple_directory_names,
+                                                  const std::vector<std::string> & multiple_data_names,
+                                                  const bool read_binary_vectors);
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
@@ -345,7 +345,7 @@ protected:
   /**
    * Helper function that checks if \p file_name exists.
    */
-  void assert_file_exists(const std::string & file_name);
+  static void assert_file_exists(const std::string & file_name);
 
 private:
 

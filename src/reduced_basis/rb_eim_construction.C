@@ -94,7 +94,12 @@ void RBEIMConstruction::set_rb_eim_evaluation(RBEIMEvaluation & rb_eim_eval_in)
 RBEIMEvaluation & RBEIMConstruction::get_rb_eim_evaluation()
 {
   libmesh_error_msg_if(!_rb_eim_eval, "Error: RBEIMEvaluation object hasn't been initialized yet");
+  return *_rb_eim_eval;
+}
 
+const RBEIMEvaluation & RBEIMConstruction::get_rb_eim_evaluation() const
+{
+  libmesh_error_msg_if(!_rb_eim_eval, "Error: RBEIMEvaluation object hasn't been initialized yet");
   return *_rb_eim_eval;
 }
 
@@ -524,6 +529,13 @@ void RBEIMConstruction::store_eim_solutions_for_training_set()
     }
 }
 
+const RBEIMEvaluation::QpDataMap & RBEIMConstruction::get_parametrized_function_from_training_set(unsigned int training_index) const
+{
+  libmesh_error_msg_if(training_index >= _local_parametrized_functions_for_training.size(),
+                       "Invalid index: " << training_index);
+  return _local_parametrized_functions_for_training[training_index];
+}
+
 std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
 {
   LOG_SCOPE("compute_max_eim_error()", "RBEIMConstruction");
@@ -636,6 +648,15 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
   // purposes, for example.
   _max_abs_value_in_training_set = 0.;
 
+  unsigned int n_comps = eim_eval.get_parametrized_function().get_n_components();
+
+  // Keep track of the maximum value per component. This will allow
+  // us to scale the components to all have a similar magnitude,
+  // which is helpful during the error assessment for the basis
+  // enrichment to ensure that components with smaller magnitude
+  // are not ignored.
+  std::vector<Real> max_abs_value_per_component_in_training_set(n_comps);
+
   _local_parametrized_functions_for_training.resize( get_n_training_samples() );
   for (auto i : make_range(get_n_training_samples()))
     {
@@ -648,8 +669,6 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
                                                                                      _local_quad_point_locations,
                                                                                      _local_quad_point_subdomain_ids,
                                                                                      _local_quad_point_locations_perturbations);
-
-      unsigned int n_comps = eim_eval.get_parametrized_function().get_n_components();
 
       for (const auto & pr : _local_quad_point_locations)
       {
@@ -673,6 +692,8 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
                     _max_abs_value_in_training_set_index = i;
                   }
 
+                if (abs_value > max_abs_value_per_component_in_training_set[comp])
+                  max_abs_value_per_component_in_training_set[comp] = abs_value;
               }
           }
 
@@ -687,6 +708,22 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
   comm().broadcast(_max_abs_value_in_training_set_index, max_id);
   libMesh::out << "Maximum absolute value in the training set: "
     << _max_abs_value_in_training_set << std::endl << std::endl;
+
+  // Calculate the maximum value for each component in the training set
+  // across all components
+  comm().max(max_abs_value_per_component_in_training_set);
+
+  // We store the maximum value across all components divided by the maximum value for this component
+  // so that when we scale using these factors all components should have a magnitude on the same
+  // order as the maximum component.
+  _component_scaling_in_training_set.resize(n_comps);
+  for(unsigned int i : make_range(n_comps))
+    {
+      if (max_abs_value_per_component_in_training_set[i] == 0.)
+        _component_scaling_in_training_set[i] = 1.;
+      else
+        _component_scaling_in_training_set[i] = _max_abs_value_in_training_set / max_abs_value_per_component_in_training_set[i];
+    }
 
   _parametrized_functions_for_training_obs_values.resize( get_n_training_samples() );
 
@@ -920,9 +957,21 @@ Real RBEIMConstruction::get_max_abs_value(const QpDataMap & v) const
 
       for (const auto & comp : index_range(v_comp_and_qp))
         {
+          // If scale_components_in_enrichment() returns true then we
+          // apply a scaling to give an approximately uniform scaling
+          // for all components.
+          Real comp_scaling = 1.;
+          if (get_rb_eim_evaluation().scale_components_in_enrichment())
+            {
+              // Make sure that _component_scaling_in_training_set is initialized
+              libmesh_error_msg_if(comp >= _component_scaling_in_training_set.size(),
+                                   "Invalid vector index");
+              comp_scaling = _component_scaling_in_training_set[comp];
+            }
+
           const std::vector<Number> & v_qp = v_comp_and_qp[comp];
           for (Number value : v_qp)
-            max_value = std::max(max_value, std::abs(value));
+            max_value = std::max(max_value, std::abs(value * comp_scaling));
         }
     }
 

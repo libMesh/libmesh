@@ -944,14 +944,14 @@ void RBEvaluation::write_out_vectors(System & sys,
 {
   LOG_SCOPE("write_out_vectors()", "RBEvaluation");
 
-  if (this->processor_id() == 0)
+  if (sys.comm().rank() == 0)
     {
       // Make a directory to store all the data files
       Utility::mkdir(directory_name.c_str());
     }
 
   // Make sure processors are synced up before we begin
-  this->comm().barrier();
+  sys.comm().barrier();
 
   std::ostringstream file_name;
   const std::string basis_function_suffix = (write_binary_vectors ? ".xdr" : ".dat");
@@ -1046,7 +1046,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
     return;
 
   // Make sure processors are synced up before we begin
-  this->comm().barrier();
+  sys.comm().barrier();
 
   std::ostringstream file_name;
   const std::string basis_function_suffix = (read_binary_vectors ? ".xdr" : ".dat");
@@ -1081,7 +1081,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
                 << "_data" << basis_function_suffix;
 
       // On processor zero check to be sure the file exists
-      if (this->processor_id() == 0)
+      if (sys.comm().rank() == 0)
         {
           struct stat stat_info;
           int stat_result = stat(file_name.str().c_str(), &stat_info);
