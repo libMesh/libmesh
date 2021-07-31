@@ -117,6 +117,7 @@
 #include <iostream>
 #include <sys/time.h>
 #include <iomanip>
+#include <fenv.h>
 
 void write_output(EquationSystems & es,
                   unsigned int t_step,       // The current time step count
@@ -350,6 +351,8 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
 // The main program.
 int main (int argc, char ** argv)
 {
+  feenableexcept(FE_INVALID);
+
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_ignore(argc, argv);
@@ -627,6 +630,9 @@ int main (int argc, char ** argv)
       // dQ/dp = int_{0}^{T} partialQ/partialp - partialR/partialp(u,z;p) dt
       // The quantity partialQ/partialp - partialR/partialp(u,z;p) is evaluated internally by the ImplicitSystem::adjoint_qoi_parameter_sensitivity function.
       // This sensitivity evaluation is called internally by an overloaded TimeSolver::integrate_adjoint_sensitivity method which we call below.
+
+      // Reset the time
+      system.time = 0.0;
 
       // Prepare the quantities we need to pass to TimeSolver::integrate_adjoint_sensitivity
       QoISet qois;

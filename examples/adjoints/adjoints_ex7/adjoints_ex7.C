@@ -82,6 +82,7 @@
 #include <iostream>
 #include <sys/time.h>
 #include <iomanip>
+#include <fenv.h>
 
 void write_output(EquationSystems & es,
                   unsigned int t_step,       // The current time step count
@@ -336,6 +337,8 @@ build_adjoint_refinement_error_estimator(QoISet &qois, FEMPhysics* supplied_phys
 // The main program.
 int main (int argc, char ** argv)
 {
+  feenableexcept(FE_INVALID);
+
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_ignore(argc, argv);
@@ -695,6 +698,9 @@ int main (int argc, char ** argv)
           primal_solution.swap(dual_solution_1);
         }
       // End adjoint timestep loop
+
+      // Reset the time before looping over time again
+      system.time = 0.0;
 
       // Now that we have computed both the primal and adjoint solutions, we can compute the goal-oriented error estimates.
       // For this, we will need to build a ARefEE error estimator object, and supply a pointer to the 'true physics' object,
