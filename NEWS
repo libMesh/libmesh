@@ -1,4 +1,22 @@
 1.6.1 -> 1.6.2
+  * Mimic stl and boost constructors in our allocators
+  * Weaken partitioner_test for SFC on 8+ processors
+  * Fix for deprecated warning in SLEPc not-quite-3.15
+  * fix typo in type_to_n_nodes_map
+  * amended solver_types
+  * set constant 0 to float
+  * Fix example doc and combine if-statements
+  * Fix docs that referred to old example
+  * Update docs for named boundary (side, edge, node) sets.
+  * Make RadialBasisInterpolation quiet
+  * misc_ex13: fix doc string
+  * Prerequest nothing on side FE in RB ex2
+  * libmesh_cast_ptr -> cast_ptr in example
+  * Fix deprecated warnings in SLEPc 3.15
+  * Add missing PYRAMID14 master point
+  * Don't try to autodetect headers for tecio in system
+  * Wrap Petsc include for dmimpl.h in ignore and restore warnings.
+  * undef MAJOR_VERSION and MINOR_VERSION before including petsc.h in config tests
   * Fix for --enable-petsc-required
   * Fix nodes_on_edge for 2nd order InfCell cases
   * Fix Elem::is_child_on_edge
