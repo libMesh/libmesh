@@ -38,6 +38,14 @@
 
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 
+#include <libmesh/ignore_warnings.h>
+namespace exII {
+extern "C" {
+#include "exodusII.h" // defines MAX_LINE_LENGTH, MAX_STR_LENGTH used later
+}
+}
+#include <libmesh/restore_warnings.h>
+
 namespace libMesh
 {
 
