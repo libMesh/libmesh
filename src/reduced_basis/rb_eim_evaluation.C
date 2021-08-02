@@ -1139,7 +1139,6 @@ void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
   LOG_SCOPE("project_basis_function_onto_system()", "RBEIMEvaluation");
 
   libmesh_error_msg_if(sys.n_vars() == 0, "System must have at least one variable");
-  sys.solution->zero();
 
   FEMContext context(sys);
   {
@@ -1159,7 +1158,17 @@ void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
   const std::vector<Real> & JxW = elem_fe->get_JxW();
   const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
 
-  std::unique_ptr<NumericVector<Number>> repeat_count = sys.solution->zero_clone();
+  // Get a reference to the current_local_solution vector, which has
+  // GHOSTED DOFs. Make sure it is initially zeroed, since we will now
+  // accumulate values into it.
+  auto & current_local_soln = *(sys.current_local_solution);
+  current_local_soln.zero();
+
+  // The repeat_count vector will store the number of times a
+  // projected value has been assigned to a node. We get a reference
+  // to it for convenience in the code below.
+  std::unique_ptr<NumericVector<Number>> repeat_count_ptr = current_local_soln.zero_clone();
+  auto & repeat_count = *repeat_count_ptr;
 
   for (const auto & elem : sys.get_mesh().active_local_element_ptr_range())
     {
@@ -1177,37 +1186,36 @@ void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
 
       DenseMatrix<Number> Me(n_proj_dofs, n_proj_dofs);
       DenseVector<Number> Fe(n_proj_dofs);
-      for (unsigned int qp=0; qp<n_qpoints; qp++)
-      {
-        for (unsigned int i=0; i<n_proj_dofs; i++)
+      for (auto qp : make_range(n_qpoints))
+        for (auto i : make_range(n_proj_dofs))
           {
             Fe(i) += JxW[qp] * qp_data[qp] * phi[i][qp];
 
-            for (unsigned int j=0; j<n_proj_dofs; j++)
+            for (auto j : make_range(n_proj_dofs))
               Me(i,j) += JxW[qp] * phi[i][qp] * phi[j][qp];
           }
-      }
 
       DenseVector<Number> projected_data;
       Me.cholesky_solve(Fe, projected_data);
 
-      for(unsigned int i : make_range(n_proj_dofs))
+      for (auto i : make_range(n_proj_dofs))
         {
-          Number soln_value = (*sys.solution)(dof_indices[i]);
-          Number repeat_count_value = (*repeat_count)(dof_indices[i]);
-
-          sys.solution->set(dof_indices[i], soln_value + projected_data(i));
-          repeat_count->set(dof_indices[i], repeat_count_value + 1.);
+          current_local_soln.add(dof_indices[i], projected_data(i));
+          repeat_count.add(dof_indices[i], 1.);
         }
     }
 
-  sys.solution->close();
-  repeat_count->close();
+  current_local_soln.close();
+  repeat_count.close();
 
   // Average the projected QP values to get nodal values
-  (*sys.solution) /= (*repeat_count);
+  current_local_soln /= repeat_count;
+  current_local_soln.close();
 
-  sys.solution->close();
+  // Copy values from the GHOSTED current_local_solution vector into
+  // sys.solution, since that is what will ultimately be plotted/used
+  // by other parts of the code.
+  (*sys.solution) = current_local_soln;
 }
 
 std::set<unsigned int> RBEIMEvaluation::get_eim_vars_to_project_and_write() const
