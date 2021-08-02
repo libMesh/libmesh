@@ -94,10 +94,10 @@ private:
 
   // Exceptions
   class UnsupportedOpcode : public std::exception {
-    virtual const char* what() const throw() { return "Unsupported opcode"; }
+    virtual const char* what() const noexcept { return "Unsupported opcode"; }
   } UnsupportedOpcodeException;
   class RefuseToTakeCrazyDerivative : public std::exception {
-    virtual const char* what() const throw() { return "The derivative of this expression would be undefined at a countable number of points."; }
+    virtual const char* what() const noexcept { return "The derivative of this expression would be undefined at a countable number of points."; }
   } RefuseToTakeCrazyDerivativeException;
 };
 
