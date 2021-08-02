@@ -2725,8 +2725,7 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
         }
     } // end loop over vars
 
-  ex_err = exII::ex_update(ex_id);
-  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+  this->update();
 }
 
 

@@ -1239,7 +1239,7 @@ void Nemesis_IO::write (const std::string & base_filename)
 
   // Not sure if this is really necessary, but go ahead and flush the file
   // once we have written all this stuff.
-  nemhelper->ex_err = exII::ex_update(nemhelper->ex_id);
+  nemhelper->update();
 
   if ((mesh.get_boundary_info().n_edge_conds() > 0) && _verbose)
     libmesh_warning("Warning: Mesh contains edge boundary IDs, but these "

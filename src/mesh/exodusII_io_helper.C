@@ -2625,8 +2625,7 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
     }
   EX_CHECK_ERR(ex_err, "Error writing timestep.");
 
-  ex_err = exII::ex_update(ex_id);
-  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+  this->update();
 }
 
 
@@ -3139,8 +3138,7 @@ void ExodusII_IO_Helper::write_element_values
         }
     }
 
-  ex_err = exII::ex_update(ex_id);
-  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+  this->update();
 }
 
 
@@ -3272,8 +3270,7 @@ void ExodusII_IO_Helper::write_element_values_element_major
           }
       } // for each var_id
 
-  ex_err = exII::ex_update(ex_id);
-  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+  this->update();
 }
 
 
@@ -3294,8 +3291,7 @@ ExodusII_IO_Helper::write_nodal_values(int var_id,
 
       EX_CHECK_ERR(ex_err, "Error writing nodal values.");
 
-      ex_err = exII::ex_update(ex_id);
-      EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+      this->update();
     }
 }
 
@@ -3333,8 +3329,7 @@ void ExodusII_IO_Helper::write_information_records(const std::vector<std::string
       ex_err = exII::ex_put_info(ex_id, num_records, info.get_char_star_star());
       EX_CHECK_ERR(ex_err, "Error writing global values.");
 
-      ex_err = exII::ex_update(ex_id);
-      EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+      this->update();
     }
 }
 
