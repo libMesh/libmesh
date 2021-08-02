@@ -3353,9 +3353,16 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Real> & values, i
 
       EX_CHECK_ERR(ex_err, "Error writing global values.");
 
-      ex_err = exII::ex_update(ex_id);
-      EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+      this->update();
     }
+}
+
+
+
+void ExodusII_IO_Helper::update()
+{
+  ex_err = exII::ex_update(ex_id);
+  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
 }
 
 

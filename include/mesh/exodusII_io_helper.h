@@ -423,6 +423,11 @@ public:
   void write_global_values(const std::vector<Real> & values, int timestep);
 
   /**
+   * Uses ex_update() to flush buffers to file.
+   */
+  void update();
+
+  /**
    * Reads the vector of global variables.
    */
   void read_global_values(std::vector<Real> & values, int timestep);
