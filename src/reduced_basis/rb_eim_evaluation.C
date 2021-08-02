@@ -1204,14 +1204,9 @@ void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
   sys.solution->close();
   repeat_count->close();
 
-  numeric_index_type first = sys.solution->first_local_index();
-  numeric_index_type last = sys.solution->last_local_index();
-  for (numeric_index_type i=first; i<last; i++)
-    {
-      Number soln_value = (*sys.solution)(i);
-      Number repeat_count_value = (*repeat_count)(i);
-      sys.solution->set(i, soln_value/repeat_count_value);
-    }
+  // Average the projected QP values to get nodal values
+  (*sys.solution) /= (*repeat_count);
+
   sys.solution->close();
 }
 
