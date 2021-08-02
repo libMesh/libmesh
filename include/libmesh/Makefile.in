@@ -101,10 +101,12 @@ target_triplet = @target@
 @LIBMESH_ENABLE_EXODUS_V509_TRUE@	exodusII_ext.h
 @LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_7 = exodusII.h
 @LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_8 = exodusII.h
-@LIBMESH_ENABLE_NETCDF_V4_TRUE@am__append_9 = netcdf.h
-@LIBMESH_ENABLE_NETCDF_V4_TRUE@am__append_10 = netcdf.h
-@LIBMESH_ENABLE_CAPNPROTO_TRUE@am__append_11 = rb_data.capnp.h
-@LIBMESH_ENABLE_CAPNPROTO_TRUE@am__append_12 = rb_data.capnp.h
+@LIBMESH_ENABLE_EXODUS_V811_TRUE@am__append_9 = exodusII.h
+@LIBMESH_ENABLE_EXODUS_V811_TRUE@am__append_10 = exodusII.h
+@LIBMESH_ENABLE_NETCDF_V4_TRUE@am__append_11 = netcdf.h
+@LIBMESH_ENABLE_NETCDF_V4_TRUE@am__append_12 = netcdf.h
+@LIBMESH_ENABLE_CAPNPROTO_TRUE@am__append_13 = rb_data.capnp.h
+@LIBMESH_ENABLE_CAPNPROTO_TRUE@am__append_14 = rb_data.capnp.h
 subdir = include/libmesh
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps =  \
@@ -662,10 +664,10 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	vectormap.h xdr_cxx.h parallel_communicator_specializations \
 	$(am__append_1) $(am__append_3) $(am__append_5) \
 	$(am__append_7) $(am__append_9) $(am__append_11) \
-	libmesh_config.h
+	$(am__append_13) libmesh_config.h
 DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) $(am__append_4) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
-	$(am__append_12) libmesh_config.h
+	$(am__append_12) $(am__append_14) libmesh_config.h
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -886,6 +888,9 @@ uninstall-am:
 
 @LIBMESH_ENABLE_EXODUS_V522_TRUE@exodusII.h: $(top_srcdir)/contrib/exodusii/v5.22/exodus/cbind/include/exodusII.h
 @LIBMESH_ENABLE_EXODUS_V522_TRUE@	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+@LIBMESH_ENABLE_EXODUS_V811_TRUE@exodusII.h: $(top_srcdir)/contrib/exodusii/v8.11/exodus/include/exodusII.h
+@LIBMESH_ENABLE_EXODUS_V811_TRUE@	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 @LIBMESH_ENABLE_NETCDF_V4_TRUE@netcdf.h: $(top_srcdir)/contrib/netcdf/v4/include/netcdf.h
 @LIBMESH_ENABLE_NETCDF_V4_TRUE@	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
