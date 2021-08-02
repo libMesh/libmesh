@@ -21,6 +21,7 @@
 #include "libmesh/rb_eim_evaluation.h"
 #include "libmesh/rb_eim_theta.h"
 #include "libmesh/rb_parametrized_function.h"
+#include "libmesh/rb_evaluation.h"
 #include "libmesh/utility.h" // Utility::mkdir
 
 // libMesh includes
@@ -29,6 +30,8 @@
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/elem.h"
 #include "libmesh/system.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/quadrature.h"
 #include "timpi/parallel_implementation.h"
 
 // C++ includes
@@ -1127,6 +1130,138 @@ void RBEIMEvaluation::distribute_bfs(const System & sys)
             } // end for (e)
         } // end for proc_id
     } // if (rank == 0)
+}
+
+void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
+                                                      const QpDataMap & qp_data_map,
+                                                      unsigned int var)
+{
+  LOG_SCOPE("project_basis_function_onto_system()", "RBEIMEvaluation");
+
+  libmesh_error_msg_if(sys.n_vars() == 0, "System must have at least one variable");
+
+  FEMContext context(sys);
+  {
+    // Pre-request relevant data for all dimensions
+    for (unsigned int dim=1; dim<=3; ++dim)
+      if (sys.get_mesh().elem_dimensions().count(dim))
+        for (auto init_var : make_range(sys.n_vars()))
+        {
+          auto fe = context.get_element_fe(init_var, dim);
+          fe->get_JxW();
+          fe->get_phi();
+        }
+  }
+
+  FEBase * elem_fe = nullptr;
+  context.get_element_fe( 0, elem_fe );
+  const std::vector<Real> & JxW = elem_fe->get_JxW();
+  const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+
+  // Get a reference to the current_local_solution vector, which has
+  // GHOSTED DOFs. Make sure it is initially zeroed, since we will now
+  // accumulate values into it.
+  auto & current_local_soln = *(sys.current_local_solution);
+  current_local_soln.zero();
+
+  // The repeat_count vector will store the number of times a
+  // projected value has been assigned to a node. We get a reference
+  // to it for convenience in the code below.
+  std::unique_ptr<NumericVector<Number>> repeat_count_ptr = current_local_soln.zero_clone();
+  auto & repeat_count = *repeat_count_ptr;
+
+  for (const auto & elem : sys.get_mesh().active_local_element_ptr_range())
+    {
+      context.pre_fe_reinit(sys, elem);
+      context.elem_fe_reinit();
+
+      const std::vector<dof_id_type> & dof_indices = context.get_dof_indices(/*var=*/0);
+      unsigned int n_proj_dofs = dof_indices.size();
+      unsigned int n_qpoints = context.get_element_qrule().n_points();
+
+      const std::vector<std::vector<Number>> & var_and_qp_data = libmesh_map_find(qp_data_map, elem->id());
+      libmesh_error_msg_if(var >= var_and_qp_data.size(), "Invalid EIM variable number: " << var);
+      const std::vector<Number> & qp_data = var_and_qp_data[var];
+      libmesh_error_msg_if(qp_data.size() != n_qpoints, "Invalid EIM variable number: " << var);
+
+      DenseMatrix<Number> Me(n_proj_dofs, n_proj_dofs);
+      DenseVector<Number> Fe(n_proj_dofs);
+      for (auto qp : make_range(n_qpoints))
+        for (auto i : make_range(n_proj_dofs))
+          {
+            Fe(i) += JxW[qp] * qp_data[qp] * phi[i][qp];
+
+            for (auto j : make_range(n_proj_dofs))
+              Me(i,j) += JxW[qp] * phi[i][qp] * phi[j][qp];
+          }
+
+      DenseVector<Number> projected_data;
+      Me.cholesky_solve(Fe, projected_data);
+
+      for (auto i : make_range(n_proj_dofs))
+        {
+          current_local_soln.add(dof_indices[i], projected_data(i));
+          repeat_count.add(dof_indices[i], 1.);
+        }
+    }
+
+  current_local_soln.close();
+  repeat_count.close();
+
+  // Average the projected QP values to get nodal values
+  current_local_soln /= repeat_count;
+  current_local_soln.close();
+
+  // Copy values from the GHOSTED current_local_solution vector into
+  // sys.solution, since that is what will ultimately be plotted/used
+  // by other parts of the code.
+  (*sys.solution) = current_local_soln;
+}
+
+std::set<unsigned int> RBEIMEvaluation::get_eim_vars_to_project_and_write() const
+{
+  return std::set<unsigned int>();
+}
+
+void RBEIMEvaluation::write_out_projected_basis_functions(System & sys,
+                                                          const std::string & directory_name)
+{
+  if (get_eim_vars_to_project_and_write().empty())
+    return;
+
+  for (unsigned int eim_var : get_eim_vars_to_project_and_write())
+    {
+      std::vector<std::unique_ptr<NumericVector<Number>>> projected_bfs;
+      for (unsigned int bf_index : make_range(get_n_basis_functions()))
+        {
+          project_qp_data_map_onto_system(
+            sys,
+            get_basis_function(bf_index),
+            eim_var);
+
+          projected_bfs.emplace_back(sys.solution->clone());
+        }
+
+      // Create projected_bfs_ptrs so that we can call RBEvaluation::write_out_vectors()
+      std::vector<NumericVector<Number>*> projected_bfs_ptrs(projected_bfs.size());
+      for (unsigned int i : index_range(projected_bfs))
+        {
+          projected_bfs_ptrs[i] = projected_bfs[i].get();
+        }
+
+      RBEvaluation::write_out_vectors(sys,
+                                      projected_bfs_ptrs,
+                                      directory_name,
+                                      "projected_bf_var_" + std::to_string(eim_var));
+    }
+}
+
+bool RBEIMEvaluation::scale_components_in_enrichment() const
+{
+  // Return false by default, but we override this in subclasses
+  // where the parametrized function components differ widely in
+  // magnitude.
+  return false;
 }
 
 } // namespace libMesh

@@ -96,6 +96,11 @@ public:
   RBEIMEvaluation & get_rb_eim_evaluation();
 
   /**
+   * Get a const reference to the RBEvaluation object.
+   */
+  const RBEIMEvaluation & get_rb_eim_evaluation() const;
+
+  /**
    * Perform initialization of this object to prepare for running
    * train_eim_approximation().
    */
@@ -201,6 +206,12 @@ public:
    * initializing the look-up table data.
    */
   void store_eim_solutions_for_training_set();
+
+  /**
+   * Get a const reference to the specified parametrized function from
+   * the training set.
+   */
+  const QpDataMap & get_parametrized_function_from_training_set(unsigned int training_index) const;
 
   /**
    * Enum that indicates which type of "best fit" algorithm
@@ -331,6 +342,15 @@ private:
    * The training sample index at which we found _max_abs_value_in_training_set.
    */
   unsigned int _max_abs_value_in_training_set_index;
+
+  /**
+   * Keep track of a scaling factor for each component of the parametrized functions in
+   * the training set which "scales up" each component to have a similar magnitude as
+   * the largest component encountered in the training set. This can give more uniform
+   * scaling across all components and is helpful in cases where components have widely
+   * varying magnitudes.
+   */
+  std::vector<Real> _component_scaling_in_training_set;
 
   /**
    * The quadrature point locations, quadrature point weights (JxW), and subdomain IDs
