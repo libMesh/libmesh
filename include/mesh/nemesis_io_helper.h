@@ -47,6 +47,9 @@ extern "C" {
 #  ifdef EXODUS_II_HDR
 #    undef EXODUS_II_HDR
 #  endif
+#  ifdef EXODUSII_H
+#    undef EXODUSII_H
+#  endif
 #  include "ne_nemesisI.h"
 }
 }

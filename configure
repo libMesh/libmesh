@@ -682,6 +682,8 @@ LIBMESH_ENABLE_LIBHILBERT_FALSE
 LIBMESH_ENABLE_LIBHILBERT_TRUE
 LIBHILBERT_LIBRARY
 LIBHILBERT_INCLUDE
+LIBMESH_ENABLE_NEMESIS_V811_FALSE
+LIBMESH_ENABLE_NEMESIS_V811_TRUE
 LIBMESH_ENABLE_NEMESIS_V522_FALSE
 LIBMESH_ENABLE_NEMESIS_V522_TRUE
 LIBMESH_ENABLE_NEMESIS_V309_FALSE
@@ -689,6 +691,8 @@ LIBMESH_ENABLE_NEMESIS_V309_TRUE
 LIBMESH_ENABLE_NEMESIS_FALSE
 LIBMESH_ENABLE_NEMESIS_TRUE
 NEMESIS_INCLUDE
+LIBMESH_ENABLE_EXODUS_V811_FALSE
+LIBMESH_ENABLE_EXODUS_V811_TRUE
 LIBMESH_ENABLE_EXODUS_V522_FALSE
 LIBMESH_ENABLE_EXODUS_V522_TRUE
 LIBMESH_ENABLE_EXODUS_V509_FALSE
@@ -54742,26 +54746,34 @@ fi
 
 # -------------------------------------------------------------
 # ExodusII -- enabled by default (it is distributed in contrib)
-# (note that ExodusII requires netCDF
+# (note that ExodusII requires netCDF)
 # -------------------------------------------------------------
 
   # Check whether --enable-exodus was given.
 if test "${enable_exodus+set}" = set; then :
   enableval=$enable_exodus; case "${enableval}" in #(
-  yes|new|v522) :
+  yes|v811) :
     enableexodus=yes
-                                          exodusversion="v5.22" ;; #(
+                                      exodusversion="v8.11" ;; #(
+  new|v522) :
+    enableexodus=yes
+                                      exodusversion="v5.22" ;; #(
   old|v509) :
     enableexodus=yes
-                                          exodusversion="v5.09" ;; #(
+                                      exodusversion="v5.09" ;; #(
   no) :
     enableexodus=no
-                                          exodusversion=no ;; #(
+                                      exodusversion=no ;; #(
   *) :
     as_fn_error $? "bad value ${enableval} for --enable-exodus" "$LINENO" 5 ;;
 esac
 else
-  enableexodus=$enablenetcdf ; exodusversion="v5.22"
+  enableexodus=$enablenetcdf ;
+                 if test "x$enablehdf5" = "xyes"; then :
+  exodusversion=v8.11
+else
+  exodusversion=v5.22
+fi
 fi
 
     if test "x$enableexodus" = "xno"; then :
@@ -54811,6 +54823,14 @@ fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus Fortran API >>>" >&5
 $as_echo "<<< Configuring library with Exodus Fortran API >>>" >&6; }
 fi ;; #(
+  "v8.11") :
+    EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/exodus/include -I\$(top_srcdir)/contrib/exodusii/$exodusversion/exodus/sierra"
+
+$as_echo "#define HAVE_EXODUS_API 1" >>confdefs.h
+
+                      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
+$as_echo "<<< Configuring library with Exodus version $exodusversion support >>>" >&6; }
+                                            enableexodusfortran=no ;; #(
   *) :
 
           EXODUS_INCLUDE=""
@@ -54822,6 +54842,8 @@ esac
   ac_config_files="$ac_config_files contrib/exodusii/v5.09/Makefile"
 
   ac_config_files="$ac_config_files contrib/exodusii/v5.22/exodus/Makefile"
+
+  ac_config_files="$ac_config_files contrib/exodusii/v8.11/exodus/Makefile"
 
 
 
@@ -54862,6 +54884,14 @@ else
   LIBMESH_ENABLE_EXODUS_V522_FALSE=
 fi
 
+ if test x$exodusversion = xv8.11; then
+  LIBMESH_ENABLE_EXODUS_V811_TRUE=
+  LIBMESH_ENABLE_EXODUS_V811_FALSE='#'
+else
+  LIBMESH_ENABLE_EXODUS_V811_TRUE='#'
+  LIBMESH_ENABLE_EXODUS_V811_FALSE=
+fi
+
 
 # -------------------------------------------------------------
 # Nemesis -- enabled by default (it is distributed in contrib)
@@ -54871,7 +54901,9 @@ fi
   # Check whether --enable-nemesis was given.
 if test "${enable_nemesis+set}" = set; then :
   enableval=$enable_nemesis; case "${enableval}" in #(
-  yes|new|v522) :
+  yes|v811) :
+    enablenemesis=yes ; nemesisversion="v8.11" ;; #(
+  new|v522) :
     enablenemesis=yes ; nemesisversion="v5.22" ;; #(
   old|v309) :
     enablenemesis=yes ; nemesisversion="v3.09" ;; #(
@@ -54884,10 +54916,10 @@ else
 
                   # if unspecified, depend on exodus
                   enablenemesis=$enableexodus ;
-                  if test "x$exodusversion" = "xv5.22"; then :
-  nemesisversion="v5.22"
-else
+                  if test "x$exodusversion" = "xv5.09"; then :
   nemesisversion="v3.09"
+else
+  nemesisversion="$exodusversion"
 fi
 
 fi
@@ -54917,6 +54949,15 @@ $as_echo "#define HAVE_NEMESIS_API 1" >>confdefs.h
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Nemesis version $nemesisversion support >>>" >&5
 $as_echo "<<< Configuring library with Nemesis version $nemesisversion support >>>" >&6; }
            ;; #(
+  "v8.11") :
+
+            NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/$nemesisversion/nemesis"
+
+$as_echo "#define HAVE_NEMESIS_API 1" >>confdefs.h
+
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Nemesis version $nemesisversion support >>>" >&5
+$as_echo "<<< Configuring library with Nemesis version $nemesisversion support >>>" >&6; }
+           ;; #(
   *) :
 
             NEMESIS_INCLUDE=""
@@ -54927,6 +54968,8 @@ esac
   ac_config_files="$ac_config_files contrib/nemesis/v3.09/Makefile"
 
   ac_config_files="$ac_config_files contrib/nemesis/v5.22/nemesis/Makefile"
+
+  ac_config_files="$ac_config_files contrib/nemesis/v8.11/nemesis/Makefile"
 
 
 
@@ -54956,6 +54999,14 @@ fi
 else
   LIBMESH_ENABLE_NEMESIS_V522_TRUE='#'
   LIBMESH_ENABLE_NEMESIS_V522_FALSE=
+fi
+
+ if test x$nemesisversion = xv8.11; then
+  LIBMESH_ENABLE_NEMESIS_V811_TRUE=
+  LIBMESH_ENABLE_NEMESIS_V811_FALSE='#'
+else
+  LIBMESH_ENABLE_NEMESIS_V811_TRUE='#'
+  LIBMESH_ENABLE_NEMESIS_V811_FALSE=
 fi
 
 
@@ -56717,6 +56768,10 @@ if test -z "${LIBMESH_ENABLE_EXODUS_V522_TRUE}" && test -z "${LIBMESH_ENABLE_EXO
   as_fn_error $? "conditional \"LIBMESH_ENABLE_EXODUS_V522\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${LIBMESH_ENABLE_EXODUS_V811_TRUE}" && test -z "${LIBMESH_ENABLE_EXODUS_V811_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_EXODUS_V811\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${LIBMESH_ENABLE_NEMESIS_TRUE}" && test -z "${LIBMESH_ENABLE_NEMESIS_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_NEMESIS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -56727,6 +56782,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_NEMESIS_V522_TRUE}" && test -z "${LIBMESH_ENABLE_NEMESIS_V522_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_NEMESIS_V522\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_NEMESIS_V811_TRUE}" && test -z "${LIBMESH_ENABLE_NEMESIS_V811_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_NEMESIS_V811\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_LIBHILBERT_TRUE}" && test -z "${LIBMESH_ENABLE_LIBHILBERT_FALSE}"; then
@@ -58055,8 +58114,10 @@ do
     "contrib/capnproto/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/capnproto/Makefile" ;;
     "contrib/exodusii/v5.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.09/Makefile" ;;
     "contrib/exodusii/v5.22/exodus/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.22/exodus/Makefile" ;;
+    "contrib/exodusii/v8.11/exodus/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v8.11/exodus/Makefile" ;;
     "contrib/nemesis/v3.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/nemesis/v3.09/Makefile" ;;
     "contrib/nemesis/v5.22/nemesis/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/nemesis/v5.22/nemesis/Makefile" ;;
+    "contrib/nemesis/v8.11/nemesis/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/nemesis/v8.11/nemesis/Makefile" ;;
     "contrib/libHilbert/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/libHilbert/Makefile" ;;
     "contrib/fparser/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/fparser/Makefile" ;;
     "contrib/fparser/extrasrc/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/fparser/extrasrc/Makefile" ;;

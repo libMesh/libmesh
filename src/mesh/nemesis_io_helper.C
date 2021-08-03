@@ -38,6 +38,14 @@
 
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 
+#include <libmesh/ignore_warnings.h>
+namespace exII {
+extern "C" {
+#include "exodusII.h" // defines MAX_LINE_LENGTH, MAX_STR_LENGTH used later
+}
+}
+#include <libmesh/restore_warnings.h>
+
 namespace libMesh
 {
 
@@ -2725,8 +2733,7 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
         }
     } // end loop over vars
 
-  ex_err = exII::ex_update(ex_id);
-  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+  this->update();
 }
 
 

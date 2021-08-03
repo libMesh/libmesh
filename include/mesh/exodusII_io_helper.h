@@ -56,14 +56,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include <libmesh/ignore_warnings.h>
-namespace exII {
-extern "C" {
-#include "exodusII.h" // defines MAX_LINE_LENGTH, MAX_STR_LENGTH used later
-}
-}
-#include <libmesh/restore_warnings.h>
-
 namespace libMesh
 {
 
@@ -254,11 +246,6 @@ public:
   void close();
 
   /**
-   * \returns The value obtained from a generic exII::ex_inquire() call.
-   */
-  int inquire(int req_info, std::string error_msg="");
-
-  /**
    * Reads and stores the timesteps in the 'time_steps' array.
    */
   void read_time_steps();
@@ -426,6 +413,11 @@ public:
    * Writes the vector of global variables.
    */
   void write_global_values(const std::vector<Real> & values, int timestep);
+
+  /**
+   * Uses ex_update() to flush buffers to file.
+   */
+  void update();
 
   /**
    * Reads the vector of global variables.
