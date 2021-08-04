@@ -24,6 +24,8 @@ public:
   CPPUNIT_TEST( testExtraIntegersEdge2 );
   CPPUNIT_TEST( testExtraIntegersTri6 );
 
+  CPPUNIT_TEST( testExtraIntegersExodusReading );
+
 #ifdef LIBMESH_HAVE_XDR
   CPPUNIT_TEST( testExtraIntegersCheckpointEdge3 );
   CPPUNIT_TEST( testExtraIntegersCheckpointHex8 );
@@ -196,6 +198,20 @@ public:
 
   void testExtraIntegersCheckpointHex8() { checkpoint_helper(HEX8, 2, true); }
 
+  void testExtraIntegersExodusLoading()
+  {
+    Mesh mesh(*TestCommWorld);
+    /*
+     This is a 3-by-3 mesh contains the following element integer:
+     material_id = '0 -1    -2
+                    1 -5600 4503599627370496
+                    2 -3    4503599627370497'
+    */
+    const std::string filename = "meshes/elem_integer_example.e";
+    ExodusII_IO exreader(*mesh);
+    exreader.set_extra_integer_vars({"material_id"});
+    exreader.read(filename);
+  }
 };
 
 

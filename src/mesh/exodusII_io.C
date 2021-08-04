@@ -286,7 +286,32 @@ void ExodusII_IO::read (const std::string & fname)
 
           // Assign extra integer IDs
           for (auto & id : extra_ids)
-            elem->set_extra_integer(id, std::round(elem_ids[id][elem->id()]));
+          {
+            Real v = elem_ids[id][elem->id()];
+            // if digits of Real is greater than of dof_id_type, we can do direct conversion
+            if (std::numeric_limits<Real>::digits > std::numeric_limits<dof_id_type>::digits)
+              elem->set_extra_integer(id, std::round(v));
+            else
+            {
+              if (v == (Real) DofObject::invalid_id)
+                elem->set_extra_integer(id, DofObject::invalid_id);
+              else
+              {
+                // otherwise we need to check if the real number is outside of the range
+                long long int max_representation = 1;
+                max_representation = (max_representation << std::numeric_limits<Real>::digits);
+                libmesh_error_msg_if(v > (Real) max_representation,
+                                     "Error! An element integer value higher than "
+                                     << max_representation
+                                     << " was found! Exodus uses real numbers for storing element "
+                                     " integers, which can only represent integers from 0 to "
+                                     << max_representation
+                                     << ".");
+
+                elem->set_extra_integer(id, std::round(v));
+              }
+            }
+          }
 
           // Set all the nodes for this element
           for (int k=0; k<exio_helper->num_nodes_per_elem; k++)
