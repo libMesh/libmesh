@@ -103,7 +103,7 @@ Point LocationMap<Node>::point_of(const Node & node) const
 template <>
 Point LocationMap<Elem>::point_of(const Elem & elem) const
 {
-  return elem.centroid();
+  return elem.vertex_average();
 }
 
 

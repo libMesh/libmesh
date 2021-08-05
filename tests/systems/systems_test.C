@@ -1120,14 +1120,14 @@ public:
                                       0., 0.,
                                       QUAD4);
 
-    auto el_beg = mesh.elements_begin();
-    auto el_end = mesh.elements_end();
-    auto el = mesh.elements_begin();
-    for (; el != el_end; ++el)
-      if ((*el)->centroid()(0) <= 0.5 && (*el)->centroid()(1) <= 0.5)
-        (*el)->subdomain_id() = 0;
-      else
-        (*el)->subdomain_id() = 1;
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        Point c = elem->vertex_average();
+        if (c(0) <= 0.5 && c(1) <= 0.5)
+          elem->subdomain_id() = 0;
+        else
+          elem->subdomain_id() = 1;
+      }
 
     mesh.prepare_for_use();
 

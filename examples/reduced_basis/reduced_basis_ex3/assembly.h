@@ -209,7 +209,7 @@ struct OutputAssembly : ElemAssembly
 
     Real output_area = (max_x-min_x) * (max_y-min_y);
 
-    Point centroid = c.get_elem().centroid();
+    Point centroid = c.get_elem().vertex_average();
     if ((min_x <= centroid(0)) && (centroid(0) <= max_x) &&
         (min_y <= centroid(1)) && (centroid(1) <= max_y))
       for (unsigned int qp=0; qp != n_qpoints; qp++)

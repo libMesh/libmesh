@@ -253,7 +253,7 @@ public:
     unsigned int side_num=7;
     MeshBase::const_element_iterator           el = mesh.elements_begin();
     const MeshBase::const_element_iterator end_el = mesh.elements_end();
-    Point side_pt = infinite_elem->side_ptr(0)->centroid();
+    Point side_pt = infinite_elem->side_ptr(0)->vertex_average();
 
     Elem * finite_elem = infinite_elem->neighbor_ptr(0);
     for(unsigned int i=0; i<finite_elem->n_sides(); ++i)

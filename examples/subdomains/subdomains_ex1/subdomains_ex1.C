@@ -242,7 +242,7 @@ int main (int argc, char ** argv)
   // the circle to 1.
   for (auto elem : mesh.element_ptr_range())
     {
-      Real d = elem->centroid().norm();
+      Real d = elem->vertex_average().norm();
       if (d < 0.8)
         elem->subdomain_id() = 1;
     }

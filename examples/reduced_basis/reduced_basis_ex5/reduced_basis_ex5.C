@@ -171,7 +171,7 @@ int main(int argc, char ** argv)
         for (auto side : elem->side_index_range())
           if (!elem->neighbor_ptr(side))
             {
-              Point side_center = elem->build_side_ptr(side)->centroid();
+              Point side_center = elem->build_side_ptr(side)->vertex_average();
               // Yes, BOUNDARY_ID_MIN_X is a weird ID to use at
               // min(z), but we got an IGA cantilever mesh with the
               // lever arm in the z direction

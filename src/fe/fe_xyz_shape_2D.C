@@ -41,7 +41,7 @@ Real FE<2,XYZ>::shape(const Elem * elem,
 
   libmesh_assert(elem);
 
-  Point centroid = elem->centroid();
+  Point centroid = elem->vertex_average();
   Point max_distance = Point(0.,0.,0.);
   for (const Point & p : elem->node_ref_range())
     for (unsigned int d = 0; d < 2; d++)
@@ -182,7 +182,7 @@ Real FE<2,XYZ>::shape_deriv(const Elem * elem,
   libmesh_assert_less (j, 2);
   libmesh_assert(elem);
 
-  Point centroid = elem->centroid();
+  Point centroid = elem->vertex_average();
   Point max_distance = Point(0.,0.,0.);
   for (const Point & p : elem->node_ref_range())
     for (unsigned int d = 0; d < 2; d++)
@@ -401,7 +401,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem * elem,
   libmesh_assert_less_equal (j, 2);
   libmesh_assert(elem);
 
-  Point centroid = elem->centroid();
+  Point centroid = elem->vertex_average();
   Point max_distance = Point(0.,0.,0.);
   for (unsigned int p = 0; p < elem->n_nodes(); p++)
     for (unsigned int d = 0; d < 2; d++)

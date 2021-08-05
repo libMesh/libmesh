@@ -93,7 +93,7 @@ get_dofobject_key (const Elem * e,
   Hilbert::HilbertIndices index;
   CFixBitVec icoords[3];
   Hilbert::BitVecType bv;
-  get_hilbert_coords (e->centroid(), bbox, icoords);
+  get_hilbert_coords (e->vertex_average(), bbox, icoords);
   Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, bv);
   index = bv;
 
@@ -252,13 +252,13 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       //           {
       //             libMesh::err << "level " << (*elemj)->level()
       //                          << " elem\n" << (**elemj)
-      //                          << " centroid " << (*elemj)->centroid()
+      //                          << " centroid " << (*elemj)->vertex_average()
       //                          << " has HilbertIndices " << elem_keys[j]
       //                          << " or " << get_dofobject_key((*elemj), bbox)
       //                          << std::endl;
       //             libMesh::err << "level " << (*elemi)->level()
       //                          << " elem\n" << (**elemi)
-      //                          << " centroid " << (*elemi)->centroid()
+      //                          << " centroid " << (*elemi)->vertex_average()
       //                          << " has HilbertIndices " << elem_keys[i]
       //                          << " or " << get_dofobject_key((*elemi), bbox)
       //                          << std::endl;
@@ -645,14 +645,14 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
                   libMesh::err <<
                     "level " << (*elemj)->level() << " elem\n" <<
                     (**elemj) << " centroid " <<
-                    (*elemj)->centroid() << " has HilbertIndices " <<
+                    (*elemj)->vertex_average() << " has HilbertIndices " <<
                     elem_keys[j] << " or " <<
                     get_dofobject_key((*elemj), bbox) <<
                     std::endl;
                   libMesh::err <<
                     "level " << (*elemi)->level() << " elem\n" <<
                     (**elemi) << " centroid " <<
-                    (*elemi)->centroid() << " has HilbertIndices " <<
+                    (*elemi)->vertex_average() << " has HilbertIndices " <<
                     elem_keys[i] << " or " <<
                     get_dofobject_key((*elemi), bbox) <<
                     std::endl;

@@ -74,7 +74,7 @@ protected:
 
     for (auto & elem : _mesh->active_element_ptr_range())
       {
-        const Point c = elem->centroid();
+        const Point c = elem->vertex_average();
         if (c(0) < 0.6 && c(1) < 0.4)
           elem->subdomain_id() = 1;
         else
@@ -127,7 +127,7 @@ protected:
 
     for (auto & elem : _mesh->active_element_ptr_range())
       {
-        const Point c = elem->centroid();
+        const Point c = elem->vertex_average();
         if (c(0) < 0.6 && c(1) < 0.4)
           {
             if (c(0) > 0.4)
@@ -227,7 +227,7 @@ public:
             CPPUNIT_ASSERT_EQUAL(pip->level(), elem->level());
 
             // We only added right edges
-            LIBMESH_ASSERT_FP_EQUAL(0.8, elem->centroid()(0),
+            LIBMESH_ASSERT_FP_EQUAL(0.8, elem->vertex_average()(0),
                                     TOLERANCE*TOLERANCE);
           }
         else
@@ -256,7 +256,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(pip->level(), elem->level());
 
         // We only added left edges
-        LIBMESH_ASSERT_FP_EQUAL(0.2, elem->centroid()(0),
+        LIBMESH_ASSERT_FP_EQUAL(0.2, elem->vertex_average()(0),
                                 TOLERANCE*TOLERANCE);
       }
 

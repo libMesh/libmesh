@@ -110,7 +110,7 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
     {
       libmesh_assert_less (elem->id(), forward_map.size());
 
-      const Point p = elem->centroid();
+      const Point p = elem->vertex_average();
 
       x[forward_map[elem->id()]] = double(p(0));
       y[forward_map[elem->id()]] = double(p(1));

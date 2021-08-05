@@ -73,7 +73,7 @@ public:
     // Set a subdomain id for all elements, based on location.
     for (auto & elem : mesh.active_element_ptr_range())
       {
-        Point c = elem->centroid();
+        Point c = elem->vertex_average();
         elem->subdomain_id() =
           subdomain_id_type(c(0)*4) + subdomain_id_type(c(1)*4)*10;
       }
@@ -107,7 +107,7 @@ public:
     // at the nodes
     for (auto & elem : mesh.active_local_element_ptr_range())
       {
-        const Point c = elem->centroid();
+        const Point c = elem->vertex_average();
         const Real expected_value =
           libmesh_real(trilinear_function(c, es.parameters, dummy, dummy));
         const std::vector<Point> offsets

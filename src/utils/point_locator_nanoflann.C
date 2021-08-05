@@ -103,7 +103,7 @@ PointLocatorNanoflann::init ()
           for (const auto & elem : _mesh.active_element_ptr_range())
             {
               _elems->push_back(elem);
-              _point_cloud->push_back(elem->centroid());
+              _point_cloud->push_back(elem->vertex_average());
             }
 
           // Construct the KD-Tree

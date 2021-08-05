@@ -612,7 +612,7 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
             Real tol=0.01*elem->hmin();
             while (found_s==0){
                for(unsigned int n=0; n< elem->n_sides(); n++){
-                  if (relevant_neighbor->close_to_point(elem->side_ptr(n)->centroid(), tol)){
+                  if (relevant_neighbor->close_to_point(elem->side_ptr(n)->vertex_average(), tol)){
                      found_s++;
                      side=n;
 #ifndef DEBUG

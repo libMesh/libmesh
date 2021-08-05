@@ -548,7 +548,7 @@ void VariationalMeshSmoother::adjust_adapt_data()
       // Only do this for active elements
       if (adapt_data[i])
         {
-          Point centroid = (*el)->centroid();
+          Point centroid = (*el)->vertex_average();
           bool in_aoe = false;
 
           // See if the elements centroid lies in the aoe mesh

@@ -38,7 +38,7 @@ public:
 
     const Real & x = p(0);
     const Real & y = p(1);
-    const Point centroid = c.get_elem().centroid();
+    const Point centroid = c.get_elem().vertex_average();
     const Real sign = centroid(1)/std::abs(centroid(1));
 
     // For testing we want something discontinuous on the slit,
@@ -402,7 +402,7 @@ public:
 
     for (const auto & elem : mesh2.active_local_element_ptr_range())
       {
-        const Elem * mesh1_elem = (*locator)(elem->centroid());
+        const Elem * mesh1_elem = (*locator)(elem->vertex_average());
         if (mesh1_elem)
           {
             CPPUNIT_ASSERT_EQUAL( elem->unique_id(),

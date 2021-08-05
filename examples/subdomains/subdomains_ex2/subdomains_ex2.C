@@ -189,7 +189,7 @@ int main (int argc, char ** argv)
 
   for (auto & elem : mesh.element_ptr_range())
     {
-      const Point cent = elem->centroid();
+      const Point cent = elem->vertex_average();
       if (dim > 1)
         {
           if ((cent(0) > 0) == (cent(1) > 0))

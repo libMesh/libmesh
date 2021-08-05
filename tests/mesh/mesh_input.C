@@ -379,7 +379,7 @@ public:
       for (const auto & elem : mesh.active_element_ptr_range())
         for (auto i : index_range(file_var_names))
           {
-            Real read_val = sys.point_value(i, elem->centroid());
+            Real read_val = sys.point_value(i, elem->vertex_average());
             LIBMESH_ASSERT_FP_EQUAL
               (expected_values[i], read_val, TOLERANCE*TOLERANCE);
           }
@@ -556,7 +556,7 @@ public:
         for (unsigned int side=0; side != 4; ++side)
           if (elem->neighbor_ptr(side))
             n_neighbors++;
-        Point c = elem->centroid();
+        Point c = elem->vertex_average();
 
         if (c(0) > 0.2 && c(0) < 0.8)
           n_neighbors_expected++;

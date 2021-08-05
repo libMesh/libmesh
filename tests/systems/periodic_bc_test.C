@@ -128,7 +128,7 @@ void periodic_bc_test_poisson(EquationSystems& es,
       for(unsigned int s=0; s != elem->n_sides(); ++s)
       {
         elem->build_side_ptr(elem_side, s);
-        Point centroid = elem_side->centroid();
+        Point centroid = elem_side->vertex_average();
         if (std::abs(centroid(1) - 1) < TOLERANCE)
           {
             fe_face->reinit(elem, s);
