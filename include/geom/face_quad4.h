@@ -155,6 +155,12 @@ public:
   static const unsigned int side_nodes_map[num_sides][nodes_per_side];
 
   /**
+   * An optimized method for computing the centroid of a
+   * 4-node quad with straight sides.
+   */
+  virtual Point centroid () const override;
+
+  /**
    * An optimized method for computing the area of a
    * 4-node quad with straight sides, but not necessarily a
    * parallelogram.
