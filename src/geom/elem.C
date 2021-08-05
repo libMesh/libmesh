@@ -357,6 +357,97 @@ const Elem * Elem::reference_elem () const
 
 Point Elem::centroid() const
 {
+  // The base class implementation builds a finite element of the correct
+  // order and computes the centroid, c=(cx, cy, cz), where:
+  //
+  // [cx]            [\int x dV]
+  // [cy] := (1/V) * [\int y dV]
+  // [cz]            [\int z dV]
+  //
+  // using quadrature. Note that we can expand "x" in the FE space as:
+  //
+  // x = \sum_i x_i \phi_i
+  //
+  // where x_i are the nodal positions of the element and \phi_i are the
+  // associated Lagrange shape functions. This allows us to write the
+  // integrals above as e.g.:
+  //
+  // \int x dV = \sum_i x_i \int \phi_i dV
+  //
+  // Defining:
+  //
+  // V_i := \int \phi_i dV
+  //
+  // we then have:
+  //
+  // [cx]           [\sum_i x_i V_i]
+  // [cy] = (1/V) * [\sum_i y_i V_i]
+  // [cz]           [\sum_i z_i V_i]
+  //
+  // where:
+  // V = \sum_i V_i
+  //
+  // Derived element types can overload this method to compute
+  // the centroid more efficiently when possible.
+
+  // If this Elem has an elevated p_level, then we need to generate a
+  // barebones copy of it with zero p_level and call true_centroid()
+  // on that instead.  This workaround allows us to avoid issues with
+  // calling FE::reinit() with a default_order() FEType, and then
+  // having that order incorrectly boosted by p_level.
+  if (_p_level)
+    {
+      auto elem_copy = Elem::build(this->type());
+
+      // Set node pointers
+      for (auto n : this->node_index_range())
+        elem_copy->set_node(n) = _nodes[n];
+
+      return elem_copy->true_centroid();
+    }
+
+  const FEFamily mapping_family = FEMap::map_fe_type(*this);
+  const FEType fe_type(this->default_order(), mapping_family);
+
+  // Build FE and attach quadrature rule.  The default quadrature rule
+  // integrates the mass matrix exactly, thus it is overkill to
+  // integrate the basis functions, but this is convenient.
+  std::unique_ptr<FEBase> fe = FEBase::build(this->dim(), fe_type);
+  QGauss qrule (this->dim(), fe_type.default_quadrature_order());
+  fe->attach_quadrature_rule(&qrule);
+
+  // Pre-request required data
+  const auto & JxW = fe->get_JxW();
+  const auto & phi = fe->get_phi();
+
+  // Re-compute element-specific values
+  fe->reinit(this);
+
+  // Number of basis functions
+  auto N = phi.size();
+  libmesh_assert_equal_to(N, this->n_nodes());
+
+  // Compute V_i
+  std::vector<Real> V(N);
+  for (auto qp : index_range(JxW))
+    for (auto i : make_range(N))
+      V[i] += JxW[qp] * phi[i][qp];
+
+  // Compute centroid
+  Point cp;
+  Real vol = 0.;
+
+  for (auto i : make_range(N))
+    {
+      cp += this->point(i) * V[i];
+      vol += V[i];
+    }
+
+  return cp / vol;
+}
+
+Point Elem::vertex_average() const
+{
   Point cp;
 
   const auto n_vertices = this->n_vertices();

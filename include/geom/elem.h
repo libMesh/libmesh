@@ -903,6 +903,16 @@ public:
   virtual Point centroid () const;
 
   /**
+   * \returns A Point at the average of the elment's vertices.
+   *
+   * \note This used to be the base class centroid() implementation, but
+   * the centroid is only equal to the vertex average in some special cases.
+   * The centroid() implementation now returns the "true" centroid of the
+   * element (up to quadrature error).
+   */
+  Point vertex_average () const;
+
+  /**
    * \returns The minimum vertex separation for the element.
    */
   virtual Real hmin () const;
