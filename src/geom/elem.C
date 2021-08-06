@@ -355,7 +355,7 @@ const Elem * Elem::reference_elem () const
 
 
 
-Point Elem::centroid() const
+Point Elem::true_centroid() const
 {
   // The base class implementation builds a finite element of the correct
   // order and computes the centroid, c=(cx, cy, cz), where:

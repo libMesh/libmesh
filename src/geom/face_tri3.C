@@ -187,7 +187,7 @@ void Tri3::connectivity(const unsigned int libmesh_dbg_var(sf),
 
 
 
-Point Tri3::centroid () const
+Point Tri3::true_centroid () const
 {
   return Elem::vertex_average();
 }

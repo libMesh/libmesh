@@ -158,7 +158,7 @@ public:
    * An optimized method for computing the centroid of a
    * 4-node quad with straight sides.
    */
-  virtual Point centroid () const override;
+  virtual Point true_centroid () const override;
 
   /**
    * An optimized method for computing the area of a

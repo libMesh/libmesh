@@ -321,7 +321,7 @@ const float Tet4::_embedding_matrix[Tet4::num_children][Tet4::num_nodes][Tet4::n
 
 
 
-Point Tet4::centroid () const
+Point Tet4::true_centroid () const
 {
   return Elem::vertex_average();
 }

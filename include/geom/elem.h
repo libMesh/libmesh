@@ -893,14 +893,24 @@ public:
    */
   virtual Order default_order () const = 0;
 
+  // TODO: deprecate this
+  // virtual Point centroid () const;
+
   /**
-   * \returns The centroid of the element. The centroid is
-   * computed as the average of all the element vertices.
+   * \returns The "true" geometric centroid of the element, c=(cx, cy,
+   * cz), where:
    *
-   * This method is virtual since some derived elements
-   * might want to use shortcuts to compute their centroid.
+   * [cx]            [\int x dV]
+   * [cy] := (1/V) * [\int y dV]
+   * [cz]            [\int z dV]
+   *
+   * This method is virtual since some derived elements might want to
+   * use shortcuts to compute their centroid. For most element types,
+   * this method is more expensive than calling vertex_average(), so
+   * if you only need a point which is located "somewhere" in the
+   * interior of the element, consider calling vertex_average() instead.
    */
-  virtual Point centroid () const;
+  virtual Point true_centroid () const;
 
   /**
    * \returns A Point at the average of the elment's vertices.

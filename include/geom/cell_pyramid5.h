@@ -186,7 +186,7 @@ public:
    * of the way up from the base on the line segment connecting the
    * centroid of the base and the Pyramid apex..
    */
-  virtual Point centroid () const override;
+  virtual Point true_centroid () const override;
 
   /**
    * Specialization for computing the volume of a pyramid.

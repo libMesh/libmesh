@@ -265,7 +265,7 @@ void Quad4::connectivity(const unsigned int libmesh_dbg_var(sf),
 
 
 
-Point Quad4::centroid () const
+Point Quad4::true_centroid () const
 {
   // Note: this function does a substantially similar behavior to the
   // volume() calculation, so it would be good if they could share

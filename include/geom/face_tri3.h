@@ -172,7 +172,7 @@ public:
    * The centroid of a 3-node triangle is simply given by the
    * average of its vertex positions.
    */
-  virtual Point centroid () const override;
+  virtual Point true_centroid () const override;
 
   /**
    * An optimized method for computing the area of a 3-node triangle.
