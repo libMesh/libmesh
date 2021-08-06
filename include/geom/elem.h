@@ -893,8 +893,14 @@ public:
    */
   virtual Order default_order () const = 0;
 
-  // TODO: deprecate this
-  // virtual Point centroid () const;
+  /**
+   * Calls Elem::vertex_average() for backwards compatibility. This
+   * method has now been deprecated, so it will be removed at some
+   * point in the future.  Calls to Elem::centroid() in user code
+   * should be updated to either call Elem::vertex_average() or
+   * Elem::true_centroid() on a case by case basis.
+   */
+  virtual Point centroid () const;
 
   /**
    * \returns The "true" geometric centroid of the element, c=(cx, cy,

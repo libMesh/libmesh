@@ -355,6 +355,19 @@ const Elem * Elem::reference_elem () const
 
 
 
+Point Elem::centroid() const
+{
+  libmesh_do_once(libMesh::err
+                  << "Elem::centroid() has been deprecated. Replace with either "
+                  << "Elem::vertex_average() to maintain existing behavior, or "
+                  << "the more expensive Elem::true_centroid() "
+                  << "in cases where the true 'geometric' centroid is required."
+                  << std::endl);
+  libmesh_deprecated();
+
+  return Elem::vertex_average();
+}
+
 Point Elem::true_centroid() const
 {
   // The base class implementation builds a finite element of the correct
