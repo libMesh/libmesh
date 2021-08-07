@@ -376,9 +376,9 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
       for (auto side : interior_parent->side_index_range())
         {
           interior_parent->build_side_ptr(interior_parent_side, side);
-          Real centroid_distance = (boundary_elem->vertex_average() - interior_parent_side->vertex_average()).norm();
+          Real va_distance = (boundary_elem->vertex_average() - interior_parent_side->vertex_average()).norm();
 
-          if (centroid_distance < (tolerance * boundary_elem->hmin()))
+          if (va_distance < (tolerance * boundary_elem->hmin()))
             {
               interior_parent_side_index = cast_int<unsigned char>(side);
               found_matching_sides = true;

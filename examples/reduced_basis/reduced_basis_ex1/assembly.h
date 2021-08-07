@@ -181,9 +181,9 @@ struct OutputAssembly : ElemAssembly
 
     Real output_area = (max_x-min_x) * (max_y-min_y);
 
-    Point centroid = c.get_elem().vertex_average();
-    if ((min_x <= centroid(0)) && (centroid(0) <= max_x) &&
-        (min_y <= centroid(1)) && (centroid(1) <= max_y))
+    Point avg = c.get_elem().vertex_average();
+    if ((min_x <= avg(0)) && (avg(0) <= max_x) &&
+        (min_y <= avg(1)) && (avg(1) <= max_y))
       for (unsigned int qp=0; qp != n_qpoints; qp++)
         for (unsigned int i=0; i != n_u_dofs; i++)
           c.get_elem_residual()(i) += JxW[qp] * (1.*phi[i][qp]) / output_area;

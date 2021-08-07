@@ -163,7 +163,7 @@ int main(int argc, char ** argv)
           const Point & n = face_normals[0];
 
           //libMesh::out << "elem = " << elem->id() << std::endl;
-          //libMesh::out << "centroid = " << elem->vertex_average() << std::endl;
+          //libMesh::out << "vertex average = " << elem->vertex_average() << std::endl;
           //libMesh::out << "p = " << p << std::endl;
           //libMesh::out << "n = " << n << std::endl;
 

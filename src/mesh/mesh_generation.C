@@ -1364,7 +1364,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             // Create tetrahedra or pyramids
             for (auto & base_hex : mesh.element_ptr_range())
               {
-                // Get a pointer to the node located at the HEX27 centroid
+                // Get a pointer to the node located at the HEX27 center
                 Node * apex_node = base_hex->node_ptr(26);
 
                 // Container to catch ids handed back from BoundaryInfo
@@ -1392,7 +1392,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                             new_elements.push_back( Elem::build(TET4) );
                             auto & sub_elem = new_elements.back();
                             sub_elem->set_node(0) = side->node_ptr(sub_tet);
-                            sub_elem->set_node(1) = side->node_ptr(8);                           // centroid of the face
+                            sub_elem->set_node(1) = side->node_ptr(8);                           // center of the face
                             sub_elem->set_node(2) = side->node_ptr(sub_tet==3 ? 0 : sub_tet+1 ); // wrap-around
                             sub_elem->set_node(3) = apex_node;                                   // apex node always used!
 

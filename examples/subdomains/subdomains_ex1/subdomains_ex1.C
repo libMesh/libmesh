@@ -238,7 +238,7 @@ int main (int argc, char ** argv)
   // Print information about the mesh to the screen.
   mesh.print_info();
 
-  // Now set the subdomain_id of all elements whose centroid is inside
+  // Now set the subdomain_id of all elements whose vertex average is inside
   // the circle to 1.
   for (auto elem : mesh.element_ptr_range())
     {

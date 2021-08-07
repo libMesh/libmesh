@@ -252,13 +252,13 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       //           {
       //             libMesh::err << "level " << (*elemj)->level()
       //                          << " elem\n" << (**elemj)
-      //                          << " centroid " << (*elemj)->vertex_average()
+      //                          << " vertex average " << (*elemj)->vertex_average()
       //                          << " has HilbertIndices " << elem_keys[j]
       //                          << " or " << get_dofobject_key((*elemj), bbox)
       //                          << std::endl;
       //             libMesh::err << "level " << (*elemi)->level()
       //                          << " elem\n" << (**elemi)
-      //                          << " centroid " << (*elemi)->vertex_average()
+      //                          << " vertex average " << (*elemi)->vertex_average()
       //                          << " has HilbertIndices " << elem_keys[i]
       //                          << " or " << get_dofobject_key((*elemi), bbox)
       //                          << std::endl;
@@ -644,14 +644,14 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
                 {
                   libMesh::err <<
                     "level " << (*elemj)->level() << " elem\n" <<
-                    (**elemj) << " centroid " <<
+                    (**elemj) << " vertex average " <<
                     (*elemj)->vertex_average() << " has HilbertIndices " <<
                     elem_keys[j] << " or " <<
                     get_dofobject_key((*elemj), bbox) <<
                     std::endl;
                   libMesh::err <<
                     "level " << (*elemi)->level() << " elem\n" <<
-                    (**elemi) << " centroid " <<
+                    (**elemi) << " vertex average " <<
                     (*elemi)->vertex_average() << " has HilbertIndices " <<
                     elem_keys[i] << " or " <<
                     get_dofobject_key((*elemi), bbox) <<

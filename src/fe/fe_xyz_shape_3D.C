@@ -40,21 +40,21 @@ Real FE<3,XYZ>::shape(const Elem * elem,
 #if LIBMESH_DIM == 3
   libmesh_assert(elem);
 
-  Point centroid = elem->vertex_average();
+  Point avg = elem->vertex_average();
   Point max_distance = Point(0.,0.,0.);
   for (unsigned int p = 0; p < elem->n_nodes(); p++)
     for (unsigned int d = 0; d < 3; d++)
       {
-        const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+        const Real distance = std::abs(avg(d) - elem->point(p)(d));
         max_distance(d) = std::max(distance, max_distance(d));
       }
 
   const Real x  = point_in(0);
   const Real y  = point_in(1);
   const Real z  = point_in(2);
-  const Real xc = centroid(0);
-  const Real yc = centroid(1);
-  const Real zc = centroid(2);
+  const Real xc = avg(0);
+  const Real yc = avg(1);
+  const Real zc = avg(2);
   const Real distx = max_distance(0);
   const Real disty = max_distance(1);
   const Real distz = max_distance(2);
@@ -216,7 +216,7 @@ Real FE<3,XYZ>::shape(const ElemType,
                       const unsigned int,
                       const Point &)
 {
-  libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
+  libmesh_error_msg("XYZ polynomials require the element.");
   return 0.;
 }
 
@@ -249,21 +249,21 @@ Real FE<3,XYZ>::shape_deriv(const Elem * elem,
   libmesh_assert(elem);
   libmesh_assert_less (j, 3);
 
-  Point centroid = elem->vertex_average();
+  Point avg = elem->vertex_average();
   Point max_distance = Point(0.,0.,0.);
   for (unsigned int p = 0; p < elem->n_nodes(); p++)
     for (unsigned int d = 0; d < 3; d++)
       {
-        const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+        const Real distance = std::abs(avg(d) - elem->point(p)(d));
         max_distance(d) = std::max(distance, max_distance(d));
       }
 
   const Real x  = point_in(0);
   const Real y  = point_in(1);
   const Real z  = point_in(2);
-  const Real xc = centroid(0);
-  const Real yc = centroid(1);
-  const Real zc = centroid(2);
+  const Real xc = avg(0);
+  const Real yc = avg(1);
+  const Real zc = avg(2);
   const Real distx = max_distance(0);
   const Real disty = max_distance(1);
   const Real distz = max_distance(2);
@@ -705,7 +705,7 @@ Real FE<3,XYZ>::shape_deriv(const ElemType,
                             const unsigned int,
                             const Point &)
 {
-  libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
+  libmesh_error_msg("XYZ polynomials require the element.");
   return 0.;
 }
 
@@ -739,21 +739,21 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem * elem,
   libmesh_assert(elem);
   libmesh_assert_less (j, 6);
 
-  Point centroid = elem->vertex_average();
+  Point avg = elem->vertex_average();
   Point max_distance = Point(0.,0.,0.);
   for (const Point & p : elem->node_ref_range())
     for (unsigned int d = 0; d < 3; d++)
       {
-        const Real distance = std::abs(centroid(d) - p(d));
+        const Real distance = std::abs(avg(d) - p(d));
         max_distance(d) = std::max(distance, max_distance(d));
       }
 
   const Real x  = point_in(0);
   const Real y  = point_in(1);
   const Real z  = point_in(2);
-  const Real xc = centroid(0);
-  const Real yc = centroid(1);
-  const Real zc = centroid(2);
+  const Real xc = avg(0);
+  const Real yc = avg(1);
+  const Real zc = avg(2);
   const Real distx = max_distance(0);
   const Real disty = max_distance(1);
   const Real distz = max_distance(2);
@@ -1413,7 +1413,7 @@ Real FE<3,XYZ>::shape_second_deriv(const ElemType,
                                    const unsigned int,
                                    const Point &)
 {
-  libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
+  libmesh_error_msg("XYZ polynomials require the element.");
   return 0.;
 }
 

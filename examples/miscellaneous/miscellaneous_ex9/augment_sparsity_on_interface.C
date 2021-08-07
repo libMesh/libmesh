@@ -31,9 +31,9 @@ void AugmentSparsityOnInterface::mesh_reinit ()
   // Loop over all elements (not just local elements) to make sure we find
   // "neighbor" elements on opposite sides of the crack.
 
-  // Map from (elem, side) to centroid
-  std::map<std::pair<const Elem *, unsigned char>, Point> lower_centroids;
-  std::map<std::pair<const Elem *, unsigned char>, Point> upper_centroids;
+  // Map from (elem, side) to vertex average
+  std::map<std::pair<const Elem *, unsigned char>, Point> lower_avgs;
+  std::map<std::pair<const Elem *, unsigned char>, Point> upper_avgs;
 
   for (const auto & elem : _mesh.active_element_ptr_range())
     for (auto side : elem->side_index_range())
@@ -43,22 +43,22 @@ void AugmentSparsityOnInterface::mesh_reinit ()
             {
               std::unique_ptr<const Elem> side_elem = elem->build_side_ptr(side);
 
-              lower_centroids[std::make_pair(elem, side)] = side_elem->vertex_average();
+              lower_avgs[std::make_pair(elem, side)] = side_elem->vertex_average();
             }
 
           if (_mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_upper))
             {
               std::unique_ptr<const Elem> side_elem = elem->build_side_ptr(side);
 
-              upper_centroids[std::make_pair(elem, side)] = side_elem->vertex_average();
+              upper_avgs[std::make_pair(elem, side)] = side_elem->vertex_average();
             }
         }
 
   // If we're doing a reinit on a distributed mesh then we may not see
-  // all the centroids, or even a matching number of centroids.
-  // std::size_t n_lower_centroids = lower_centroids.size();
-  // std::size_t n_upper_centroids = upper_centroids.size();
-  // libmesh_assert(n_lower_centroids == n_upper_centroids);
+  // all the vertex averages, or even a matching number of vertex averages.
+  // std::size_t n_lower_avgs = lower_avgs.size();
+  // std::size_t n_upper_avgs = upper_avgs.size();
+  // libmesh_assert(n_lower_avgs == n_upper_avgs);
 
   // Clear _lower_to_upper. This map will be used for matrix assembly later on.
   _lower_to_upper.clear();
@@ -68,26 +68,26 @@ void AugmentSparsityOnInterface::mesh_reinit ()
   // parallel, and sparsity calculations
   _upper_to_lower.clear();
 
-  // We do an N^2 search to find elements with matching centroids. This could be optimized,
-  // e.g. by first sorting the centroids based on their (x,y,z) location.
+  // We do an N^2 search to find elements with matching vertex averages. This could be optimized,
+  // e.g. by first sorting the vertex averages based on their (x,y,z) location.
   {
-    std::map<std::pair<const Elem *, unsigned char>, Point>::iterator it     = lower_centroids.begin();
-    std::map<std::pair<const Elem *, unsigned char>, Point>::iterator it_end = lower_centroids.end();
+    std::map<std::pair<const Elem *, unsigned char>, Point>::iterator it     = lower_avgs.begin();
+    std::map<std::pair<const Elem *, unsigned char>, Point>::iterator it_end = lower_avgs.end();
     for ( ; it != it_end; ++it)
       {
-        Point lower_centroid = it->second;
+        Point lower_avg = it->second;
 
-        // find closest centroid in upper_centroids
+        // find closest vertex average in upper_avgs
         Real min_distance = std::numeric_limits<Real>::max();
 
-        std::map<std::pair<const Elem *, unsigned char>, Point>::iterator inner_it     = upper_centroids.begin();
-        std::map<std::pair<const Elem *, unsigned char>, Point>::iterator inner_it_end = upper_centroids.end();
+        std::map<std::pair<const Elem *, unsigned char>, Point>::iterator inner_it     = upper_avgs.begin();
+        std::map<std::pair<const Elem *, unsigned char>, Point>::iterator inner_it_end = upper_avgs.end();
 
         for ( ; inner_it != inner_it_end; ++inner_it)
           {
-            Point upper_centroid = inner_it->second;
+            Point upper_avg = inner_it->second;
 
-            Real distance = (upper_centroid - lower_centroid).norm();
+            Real distance = (upper_avg - lower_avg).norm();
             if (distance < min_distance)
               {
                 min_distance = distance;
@@ -115,8 +115,8 @@ void AugmentSparsityOnInterface::mesh_reinit ()
 
     // Let's make sure we didn't miss any upper elements either
 #ifndef NDEBUG
-    std::map<std::pair<const Elem *, unsigned char>, Point>::iterator inner_it     = upper_centroids.begin();
-    std::map<std::pair<const Elem *, unsigned char>, Point>::iterator inner_it_end = upper_centroids.end();
+    std::map<std::pair<const Elem *, unsigned char>, Point>::iterator inner_it     = upper_avgs.begin();
+    std::map<std::pair<const Elem *, unsigned char>, Point>::iterator inner_it_end = upper_avgs.end();
 
     for ( ; inner_it != inner_it_end; ++inner_it)
       {

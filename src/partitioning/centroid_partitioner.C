@@ -50,18 +50,18 @@ void CentroidPartitioner::partition_range(MeshBase & mesh,
   if (!mesh.is_serial())
     libmesh_not_implemented();
 
-  // Compute the element centroids.  Note: we used to skip this step
+  // Compute the element vertex averages.  Note: we used to skip this step
   // if the number of elements was unchanged from the last call, but
   // that doesn't account for elements that have moved a lot since the
   // last time the Partitioner was called...
-  this->compute_centroids (it, end);
+  this->compute_vertex_avgs (it, end);
 
   switch (this->sort_method())
     {
     case X:
       {
-        std::stable_sort(_elem_centroids.begin(),
-                         _elem_centroids.end(),
+        std::stable_sort(_elem_vertex_avgs.begin(),
+                         _elem_vertex_avgs.end(),
                          CentroidPartitioner::sort_x);
 
         break;
@@ -70,8 +70,8 @@ void CentroidPartitioner::partition_range(MeshBase & mesh,
 
     case Y:
       {
-        std::stable_sort(_elem_centroids.begin(),
-                         _elem_centroids.end(),
+        std::stable_sort(_elem_vertex_avgs.begin(),
+                         _elem_vertex_avgs.end(),
                          CentroidPartitioner::sort_y);
 
         break;
@@ -81,8 +81,8 @@ void CentroidPartitioner::partition_range(MeshBase & mesh,
 
     case Z:
       {
-        std::stable_sort(_elem_centroids.begin(),
-                         _elem_centroids.end(),
+        std::stable_sort(_elem_vertex_avgs.begin(),
+                         _elem_vertex_avgs.end(),
                          CentroidPartitioner::sort_z);
 
         break;
@@ -91,8 +91,8 @@ void CentroidPartitioner::partition_range(MeshBase & mesh,
 
     case RADIAL:
       {
-        std::stable_sort(_elem_centroids.begin(),
-                         _elem_centroids.end(),
+        std::stable_sort(_elem_vertex_avgs.begin(),
+                         _elem_vertex_avgs.end(),
                          CentroidPartitioner::sort_radial);
 
         break;
@@ -103,11 +103,11 @@ void CentroidPartitioner::partition_range(MeshBase & mesh,
 
   // Compute target_size, the approximate number of elements on each processor.
   const dof_id_type target_size = cast_int<dof_id_type>
-    (_elem_centroids.size() / n);
+    (_elem_vertex_avgs.size() / n);
 
-  for (auto i : index_range(_elem_centroids))
+  for (auto i : index_range(_elem_vertex_avgs))
     {
-      Elem * elem = _elem_centroids[i].second;
+      Elem * elem = _elem_vertex_avgs[i].second;
 
       // FIXME: All "extra" elements go on the last processor... this
       // could probably be improved.
@@ -130,13 +130,13 @@ void CentroidPartitioner::_do_partition (MeshBase & mesh,
 
 
 
-void CentroidPartitioner::compute_centroids (MeshBase::element_iterator it,
-                                             MeshBase::element_iterator end)
+void CentroidPartitioner::compute_vertex_avgs (MeshBase::element_iterator it,
+                                               MeshBase::element_iterator end)
 {
-  _elem_centroids.clear();
+  _elem_vertex_avgs.clear();
 
   for (auto & elem : as_range(it, end))
-    _elem_centroids.emplace_back(elem->vertex_average(), elem);
+    _elem_vertex_avgs.emplace_back(elem->vertex_average(), elem);
 }
 
 
