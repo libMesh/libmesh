@@ -130,7 +130,7 @@ public:
 
                   libmesh_assert(sys.get_dof_map().is_evaluable(*n3, 0));
 
-                  Point p = n3->centroid();
+                  Point p = n3->vertex_average();
 
                   LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p,n3)),
                                           libmesh_real(cubic_point_neighbor_coupling_test(p,es.parameters,"","")),

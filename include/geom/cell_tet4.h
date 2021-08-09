@@ -207,6 +207,12 @@ public:
   static const unsigned int edge_sides_map[num_edges][2];
 
   /**
+   * The centroid of a 4-node tetrahedron is simply given by the
+   * average of its vertex positions.
+   */
+  virtual Point true_centroid () const override;
+
+  /**
    * An optimized method for computing the area of a
    * 4-node tetrahedron.
    */

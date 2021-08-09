@@ -370,15 +370,15 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
       const Elem * interior_parent = boundary_elem->interior_parent();
 
       // Find out which side of interior_parent boundary_elem corresponds to.
-      // Use centroid comparison as a way to check.
+      // Use distance between average vertex location as a way to check.
       unsigned char interior_parent_side_index = 0;
       bool found_matching_sides = false;
       for (auto side : interior_parent->side_index_range())
         {
           interior_parent->build_side_ptr(interior_parent_side, side);
-          Real centroid_distance = (boundary_elem->centroid() - interior_parent_side->centroid()).norm();
+          Real va_distance = (boundary_elem->vertex_average() - interior_parent_side->vertex_average()).norm();
 
-          if (centroid_distance < (tolerance * boundary_elem->hmin()))
+          if (va_distance < (tolerance * boundary_elem->hmin()))
             {
               interior_parent_side_index = cast_int<unsigned char>(side);
               found_matching_sides = true;

@@ -321,6 +321,13 @@ const float Tet4::_embedding_matrix[Tet4::num_children][Tet4::num_nodes][Tet4::n
 
 
 
+Point Tet4::true_centroid () const
+{
+  return Elem::vertex_average();
+}
+
+
+
 Real Tet4::volume () const
 {
   // The volume of a tetrahedron is 1/6 the box product formed

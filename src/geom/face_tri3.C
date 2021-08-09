@@ -187,6 +187,11 @@ void Tri3::connectivity(const unsigned int libmesh_dbg_var(sf),
 
 
 
+Point Tri3::true_centroid () const
+{
+  return Elem::vertex_average();
+}
+
 Real Tri3::volume () const
 {
   // 3-node triangles have the following formula for computing the area

@@ -46,8 +46,6 @@ public:
       {
         const BoundingBox bbox = elem->loose_bounding_box();
 
-        const Point centroid = elem->centroid();
-
         // The "loose" bounding box should actually be pretty tight
         // in most of these cases, but for weirdly aligned triangles
         // (such as occur in pyramid elements) it won't be, so we'll

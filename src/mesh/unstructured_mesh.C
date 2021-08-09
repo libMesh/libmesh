@@ -520,8 +520,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                                      << ", Bad neighbor proc_ID = " << neigh->processor_id() << std::endl;
                         libMesh::err << "Bad element size = " << current_elem->hmin()
                                      << ", Bad neighbor size = " << neigh->hmin() << std::endl;
-                        libMesh::err << "Bad element center = " << current_elem->centroid()
-                                     << ", Bad neighbor center = " << neigh->centroid() << std::endl;
+                        libMesh::err << "Bad element center = " << current_elem->vertex_average()
+                                     << ", Bad neighbor center = " << neigh->vertex_average() << std::endl;
                         libMesh::err << "ERROR: "
                                      << (current_elem->active()?"Active":"Ancestor")
                                      << " Element at level "

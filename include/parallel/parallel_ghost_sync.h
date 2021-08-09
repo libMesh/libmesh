@@ -48,7 +48,7 @@ namespace Parallel {
 /**
  * Request data about a range of ghost nodes uniquely identified by
  * their xyz location or a range of active ghost elements uniquely
- * identified by their centroids' xyz location.  Fulfill requests
+ * identified by their vertex averages' xyz location.  Fulfill requests
  * with
  * sync.gather_data(const std::vector<unsigned int> & ids,
  *                  std::vector<sync::datum> & data),

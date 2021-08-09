@@ -2,6 +2,7 @@
 #include <libmesh/elem.h>
 #include <libmesh/enum_elem_type.h>
 #include <libmesh/mesh_generation.h>
+#include <libmesh/mesh_modification.h>
 #include <libmesh/mesh.h>
 #include <libmesh/reference_elem.h>
 #include <libmesh/node.h>
@@ -23,6 +24,10 @@ public:
   CPPUNIT_TEST( testEdge3Invertible );
   CPPUNIT_TEST( testEdge4Invertible );
   CPPUNIT_TEST( testQuad4Invertible );
+  CPPUNIT_TEST( testTri3TrueCentroid );
+  CPPUNIT_TEST( testQuad4TrueCentroid );
+  CPPUNIT_TEST( testPyramid5TrueCentroid );
+  CPPUNIT_TEST( testHex20PLevelTrueCentroid );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -32,6 +37,112 @@ public:
 
   void tearDown()
   {
+  }
+
+  void testTri3TrueCentroid()
+  {
+    // The true_centroid() == vertex_average() == (1/3, 1/3) for reference Tri3
+    {
+      const Elem & tri3 = ReferenceElem::get(TRI3);
+      Point true_centroid = tri3.true_centroid();
+      LIBMESH_ASSERT_FP_EQUAL(Real(1)/3, true_centroid(0), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(Real(1)/3, true_centroid(1), TOLERANCE*TOLERANCE);
+    }
+  }
+
+  void testQuad4TrueCentroid()
+  {
+    // Test Quad4::true_centroid() override
+    {
+      const Elem & quad4 = ReferenceElem::get(QUAD4);
+      Point true_centroid = quad4.true_centroid();
+      LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(0), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(1), TOLERANCE*TOLERANCE);
+
+      // Compare to centroid computed via generic base class implementation
+      Point base_class_centroid = quad4.Elem::true_centroid();
+      CPPUNIT_ASSERT(true_centroid.absolute_fuzzy_equals(base_class_centroid, TOLERANCE*TOLERANCE));
+    }
+
+    // Check that "optimized" Quad4::true_centroid() gives same result
+    // as "generic" Elem::true_centroid() on a mesh of 10% distorted quads.
+    {
+      ReplicatedMesh mesh(*TestCommWorld);
+
+      MeshTools::Generation::build_square(mesh,
+                                          /*nx=*/2, /*ny=*/2,
+                                          /*xmin=*/0., /*xmax=*/1.,
+                                          /*ymin=*/0., /*ymax=*/1.,
+                                          QUAD4);
+
+      MeshTools::Modification::distort(mesh,
+                                       /*factor=*/0.1,
+                                       /*perturb_boundary=*/false);
+
+      for (const auto & elem : mesh.element_ptr_range())
+        {
+          Point derived_centroid = elem->true_centroid();
+          Point base_centroid = elem->Elem::true_centroid();
+          CPPUNIT_ASSERT(derived_centroid.absolute_fuzzy_equals(base_centroid, TOLERANCE*TOLERANCE));
+        }
+    }
+  }
+
+  void testPyramid5TrueCentroid()
+  {
+    // Test Pyramid5::true_centroid() override
+    {
+      const Elem & pyr5 = ReferenceElem::get(PYRAMID5);
+      Point true_centroid = pyr5.true_centroid();
+      LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(0), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(1), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0.25, true_centroid(2), TOLERANCE*TOLERANCE);
+    }
+
+    // Check that "optimized" Pyramid5::true_centroid() gives same result
+    // as "generic" Elem::true_centroid() on a mesh of 10% distorted pyramids.
+    {
+      ReplicatedMesh mesh(*TestCommWorld);
+
+      MeshTools::Generation::build_cube(mesh,
+                                        /*nelem=*/1, /*nelem=*/1, /*nelem=*/1,
+                                        /*xmin=*/-1, /*xmax=*/1,
+                                        /*ymin=*/-1, /*ymax=*/1,
+                                        /*zmin=*/-1, /*zmax=*/1,
+                                        PYRAMID5);
+
+      MeshTools::Modification::distort(mesh,
+                                       /*factor=*/0.1,
+                                       /*perturb_boundary=*/false);
+
+      for (const auto & elem : mesh.element_ptr_range())
+        {
+          Point derived_centroid = elem->true_centroid();
+          Point base_centroid = elem->Elem::true_centroid();
+          CPPUNIT_ASSERT(derived_centroid.absolute_fuzzy_equals(base_centroid, TOLERANCE*TOLERANCE));
+        }
+    }
+  }
+
+  void testHex20PLevelTrueCentroid()
+  {
+    // Test that Elem base class true_centroid() implementation works
+    // for an elevated p_level HEX20
+    {
+      ReplicatedMesh mesh(*TestCommWorld);
+      MeshTools::Generation::build_cube(mesh,
+                                        /*nelem=*/1, /*nelem=*/1, /*nelem=*/1,
+                                        /*xmin=*/-1, /*xmax=*/1,
+                                        /*ymin=*/-1, /*ymax=*/1,
+                                        /*zmin=*/-1, /*zmax=*/1,
+                                        HEX20);
+      Elem * hex20 = mesh.elem_ptr(0);
+      hex20->set_p_level(1);
+      Point true_centroid = hex20->true_centroid();
+      LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(0), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(1), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(2), TOLERANCE*TOLERANCE);
+    }
   }
 
   void testEdge3Volume()

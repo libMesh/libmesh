@@ -136,6 +136,12 @@ public:
                             std::vector<dof_id_type> & conn) const override;
 
   /**
+   * An optimized method for computing the centroid of a
+   * 2-node edge.
+   */
+  virtual Point true_centroid () const override;
+
+  /**
    * An optimized method for computing the length of a 2-node edge.
    */
   virtual Real volume () const override;

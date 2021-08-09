@@ -63,8 +63,8 @@ public:
       elem->set_node(2) = &two;
       elem->set_node(3) = &three;
 
-      // The centroid must be inside the element.
-      CPPUNIT_ASSERT (elem->contains_point(elem->centroid()));
+      // The centroid (equal to vertex average for Tet4) must be inside the element.
+      CPPUNIT_ASSERT (elem->contains_point(elem->vertex_average()));
 
       // The vertices must be contained in the element.
       CPPUNIT_ASSERT (elem->contains_point(zero));
@@ -96,8 +96,8 @@ public:
       elem->set_node(2) = &two;
       elem->set_node(3) = &three;
 
-      // The centroid must be inside the element.
-      CPPUNIT_ASSERT (elem->contains_point(elem->centroid()));
+      // The centroid (equal to vertex average for Tet4) must be inside the element.
+      CPPUNIT_ASSERT (elem->contains_point(elem->vertex_average()));
 
       // The vertices must be contained in the element.
       CPPUNIT_ASSERT (elem->contains_point(zero));
@@ -138,8 +138,8 @@ protected:
     Point oop(va.cross(vb));
     Point oop_unit = oop.unit();
 
-    // The triangle must contain its own centroid
-    CPPUNIT_ASSERT (elem->contains_point(elem->centroid()));
+    // The centroid (equal to vertex average for Tri3) must be inside the element.
+    CPPUNIT_ASSERT (elem->contains_point(elem->vertex_average()));
 
     // triangle should contain all its vertices
     CPPUNIT_ASSERT (elem->contains_point(a));
@@ -147,7 +147,7 @@ protected:
     CPPUNIT_ASSERT (elem->contains_point(c));
 
     // out of plane from the centroid, should *not* be in the element
-    CPPUNIT_ASSERT (!elem->contains_point(elem->centroid() + std::sqrt(TOLERANCE) * oop_unit));
+    CPPUNIT_ASSERT (!elem->contains_point(elem->vertex_average() + std::sqrt(TOLERANCE) * oop_unit));
 
     // These points should be outside the triangle
     CPPUNIT_ASSERT (!elem->contains_point(a + va * TOLERANCE * 10));

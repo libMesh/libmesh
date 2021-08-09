@@ -126,7 +126,7 @@ public:
                     CPPUNIT_ASSERT(sys.get_dof_map().is_evaluable(*n3));
                     evaluable_elements.insert(n3->id());
 
-                    Point p = n3->centroid();
+                    Point p = n3->vertex_average();
 
                     LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p,n3)),
                                             libmesh_real(cubic_default_coupling_test(p,es.parameters,"","")),

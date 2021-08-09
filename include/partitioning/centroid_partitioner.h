@@ -35,11 +35,16 @@ namespace libMesh
 class Elem;
 
 /**
- * Partitions the Mesh based on the locations of element centroids.
+ * Partitions the Mesh based on the locations of element vertex averages.
  * You must define what you mean by "less than" for the list of
- * element centroids, e.g. if you only care about distance in the
+ * element vertex averages, e.g. if you only care about distance in the
  * z-direction, you would define "less than" differently than if you
  * cared about radial distance.
+ *
+ * \note The name of this partitioner is historical: we do not
+ * partition based on the "true" geometric centroid since the vertex
+ * average is much easier to compute and works just as well as far as
+ * partitioning is concerned.
  *
  * \author John W. Peterson
  * \author Benjamin S. Kirk
@@ -51,7 +56,7 @@ public:
 
   /**
    * A typedef which controls the sorting method used for ordering the
-   * centroids. If e.g. \p X is chosen, then the centroids will be
+   * vertex averages. If e.g. \p X is chosen, then the vertex averages will be
    * sorted according to their x-coordinate.
    */
   enum CentroidSortMethod {X=0,
@@ -114,34 +119,34 @@ protected:
 private:
 
   /**
-   * Computes a list of element centroids for the mesh.
+   * Computes a list of element vertex averages for the mesh.
    */
-  void compute_centroids (MeshBase::element_iterator it,
-                          MeshBase::element_iterator end);
+  void compute_vertex_avgs (MeshBase::element_iterator it,
+                            MeshBase::element_iterator end);
 
   /**
-   * Helper function which sorts by the centroid's x-coordinate in the
+   * Helper function which sorts by the vertex average's x-coordinate in the
    * internal std::sort call.
    */
   static bool sort_x (const std::pair<Point, Elem *> & lhs,
                       const std::pair<Point, Elem *> & rhs);
 
   /**
-   * Helper function which sorts by the centroid's y-coordinate in the
+   * Helper function which sorts by the vertex average's y-coordinate in the
    * internal std::sort call.
    */
   static bool sort_y (const std::pair<Point, Elem *> & lhs,
                       const std::pair<Point, Elem *> & rhs);
 
   /**
-   * Helper function which sorts by the centroid's z-coordinate in the
+   * Helper function which sorts by the vertex average's z-coordinate in the
    * internal std::sort call.
    */
   static bool sort_z (const std::pair<Point, Elem *> & lhs,
                       const std::pair<Point, Elem *> & rhs);
 
   /**
-   * Helper function which sorts by the centroid's distance from the
+   * Helper function which sorts by the vertex averages's distance from the
    * origin in the internal std::sort call.
    */
   static bool sort_radial (const std::pair<Point, Elem *> & lhs,
@@ -153,10 +158,10 @@ private:
   CentroidSortMethod _sort_method;
 
   /**
-   * Vector which holds pairs of centroids and their respective
+   * Vector which holds pairs of vertex averages and their respective
    * element pointers.
    */
-  std::vector<std::pair<Point, Elem *>> _elem_centroids;
+  std::vector<std::pair<Point, Elem *>> _elem_vertex_avgs;
 };
 
 } // namespace libMesh

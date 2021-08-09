@@ -66,14 +66,14 @@ const std::vector<int> quadshell4_inverse_edge_map = {3, 4, 5, 6};
 const std::vector<int> hex27_node_map = {
   // Vertex and mid-edge nodes
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-  // Mid-face nodes and centroid
+  // Mid-face nodes and center node
   21, 25, 24, 26, 23, 22, 20};
 //20  21  22  23  24  25  26 // LibMesh indices
 
 const std::vector<int> hex27_inverse_node_map = {
   // Vertex and mid-edge nodes
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-  // Mid-face nodes and centroid
+  // Mid-face nodes and center node
   26, 20, 25, 24, 22, 21, 23};
 //20  21  22  23  24  25  26
 

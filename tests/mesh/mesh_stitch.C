@@ -170,7 +170,7 @@ public:
     for (const auto & elem : mesh0.element_ptr_range())
       {
         CPPUNIT_ASSERT_EQUAL(elem->n_extra_integers(), 5u);
-        const Point c = elem->centroid();
+        const Point c = elem->vertex_average();
         if (c(0) > 0 && c(1) > 0) // this came from mesh1
           CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(foo0e_idx), dof_id_type(2));
         else

@@ -133,6 +133,11 @@ void Edge2::connectivity(const unsigned int libmesh_dbg_var(sc),
 }
 
 
+Point Edge2::true_centroid () const
+{
+  return 0.5 * (this->point(0) + this->point(1));
+}
+
 Real Edge2::volume () const
 {
   // OK, so this is probably overkill, since it is equivalent to

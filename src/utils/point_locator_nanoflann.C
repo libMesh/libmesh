@@ -79,13 +79,13 @@ PointLocatorNanoflann::init ()
       bool we_are_master = (_master == nullptr);
 
       // If we are the master PointLocator, fill in the _point_cloud
-      // data structure with active, local element centroids.
+      // data structure with active, local element vertex averages.
       if (we_are_master)
         {
           _elems = std::make_shared<std::vector<Elem *>>();
           _point_cloud = std::make_shared<std::vector<Point>>();
 
-          // Make the KD-Tree out of active element centroids.
+          // Make the KD-Tree out of active element vertex averages.
           //
           // Note: we use active elements rather than active+local
           // elements since we sometimes need to be able to locate
@@ -103,7 +103,7 @@ PointLocatorNanoflann::init ()
           for (const auto & elem : _mesh.active_element_ptr_range())
             {
               _elems->push_back(elem);
-              _point_cloud->push_back(elem->centroid());
+              _point_cloud->push_back(elem->vertex_average());
             }
 
           // Construct the KD-Tree
@@ -186,7 +186,7 @@ PointLocatorNanoflann::operator() (const Point & p,
 
   // The results from Nanoflann are already sorted by (squared)
   // distance, but within that list of results, there may be some
-  // centroids which are equidistant from the searched-for
+  // vertex averages which are equidistant from the searched-for
   // Point. Therefore, we will now indirect_sort the results based on
   // elem id, so that the lowest-id Elem from the class of Elems which
   // are the same distance away from the search Point is always
@@ -236,7 +236,7 @@ PointLocatorNanoflann::operator() (const Point & p,
       const Elem * candidate_elem = (*_elems)[nanoflann_index];
 
       // Debugging: print the results
-      // libMesh::err << "Centroid/Elem id = " << candidate_elem->id()
+      // libMesh::err << "Vertex average/Elem id = " << candidate_elem->id()
       //              << ", dist^2 = " << _out_dist_sqr[r]
       //              << std::endl;
 
@@ -285,21 +285,21 @@ PointLocatorNanoflann::operator() (const Point & p,
   if (!_out_of_mesh_mode && !found_elem)
     {
       // Debugging: we are about to throw an error, but before we do,
-      // print information about the closest elements (by centroid
+      // print information about the closest elements (by vertex average
       // distance) that the Point was not found in.
       // for (auto r : make_range(result_set.size()))
       //   {
       //     auto nanoflann_index = _ret_index[_b[r]];
       //     const Elem * candidate_elem = (*_elems)[nanoflann_index];
       //
-      //     libMesh::err << "Centroid/Elem id = " << candidate_elem->id()
+      //     libMesh::err << "Vertex average/Elem id = " << candidate_elem->id()
       //                  << ", dist = " << std::sqrt(_out_dist_sqr[_b[r]])
       //                  << std::endl;
       //   } // end for(r)
 
 
       libmesh_error_msg("Point " << p << " was not contained within the closest " << n_elems_checked <<
-                        " elems (by centroid distance), and _out_of_mesh_mode was not enabled.");
+                        " elems (by vertex average distance), and _out_of_mesh_mode was not enabled.");
     }
 
   return found_elem;

@@ -173,14 +173,14 @@ public:
 
   /**
    * Returns the squared distance between the vector (p1[0], p1[1], p1[2])
-   * and the centroid of Elem "idx_p2" stored in _mesh
+   * and the vertex average of Elem "idx_p2" stored in _mesh
    */
   coord_t kdtree_distance(const coord_t * p1,
                           const std::size_t idx_p2,
                           std::size_t size) const;
 
   /**
-   * Returns the dim'th component of the idx'th centroid.
+   * Returns the dim'th component of the idx'th vertex average.
    */
   coord_t kdtree_get_pt(const std::size_t idx, int dim) const;
 
@@ -212,7 +212,7 @@ protected:
   /**
    * Lists of Points and ids which make up the "point cloud" that is
    * to be searched via Nanoflann. The point cloud can be comprised of
-   * Elem centroids or mesh Nodes, depending on the type of tree
+   * Elem vertex averages or mesh Nodes, depending on the type of tree
    * created. We keep two separate vectors since the Points in the
    * cloud may not be numbered contiguously in general.
    *

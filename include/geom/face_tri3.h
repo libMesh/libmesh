@@ -169,6 +169,12 @@ public:
   static const unsigned int side_nodes_map[num_sides][nodes_per_side];
 
   /**
+   * The centroid of a 3-node triangle is simply given by the
+   * average of its vertex positions.
+   */
+  virtual Point true_centroid () const override;
+
+  /**
    * An optimized method for computing the area of a 3-node triangle.
    */
   virtual Real volume () const override;

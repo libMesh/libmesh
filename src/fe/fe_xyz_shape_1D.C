@@ -40,16 +40,16 @@ Real FE<1,XYZ>::shape(const Elem * elem,
   libmesh_assert(elem);
   libmesh_assert_less_equal (i, order + add_p_level * elem->p_level());
 
-  Point centroid = elem->centroid();
+  Point avg = elem->vertex_average();
   Real max_distance = 0.;
   for (const Point & p : elem->node_ref_range())
     {
-      const Real distance = std::abs(centroid(0) - p(0));
+      const Real distance = std::abs(avg(0) - p(0));
       max_distance = std::max(distance, max_distance);
     }
 
   const Real x  = point_in(0);
-  const Real xc = centroid(0);
+  const Real xc = avg(0);
   const Real dx = (x - xc)/max_distance;
 
   // monomials. since they are hierarchic we only need one case block.
@@ -86,7 +86,7 @@ Real FE<1,XYZ>::shape(const ElemType,
                       const unsigned int,
                       const Point &)
 {
-  libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
+  libmesh_error_msg("XYZ polynomials require the element.");
   return 0.;
 }
 
@@ -119,16 +119,16 @@ Real FE<1,XYZ>::shape_deriv(const Elem * elem,
 
   libmesh_assert_equal_to (j, 0);
 
-  Point centroid = elem->centroid();
+  Point avg = elem->vertex_average();
   Real max_distance = 0.;
   for (const Point & p : elem->node_ref_range())
     {
-      const Real distance = std::abs(centroid(0) - p(0));
+      const Real distance = std::abs(avg(0) - p(0));
       max_distance = std::max(distance, max_distance);
     }
 
   const Real x  = point_in(0);
-  const Real xc = centroid(0);
+  const Real xc = avg(0);
   const Real dx = (x - xc)/max_distance;
 
   // monomials. since they are hierarchic we only need one case block.
@@ -166,7 +166,7 @@ Real FE<1,XYZ>::shape_deriv(const ElemType,
                             const unsigned int,
                             const Point &)
 {
-  libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
+  libmesh_error_msg("XYZ polynomials require the element.");
   return 0.;
 }
 
@@ -205,16 +205,16 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem * elem,
 
   libmesh_assert_equal_to (j, 0);
 
-  Point centroid = elem->centroid();
+  Point avg = elem->vertex_average();
   Real max_distance = 0.;
   for (const Point & p : elem->node_ref_range())
     {
-      const Real distance = std::abs(centroid(0) - p(0));
+      const Real distance = std::abs(avg(0) - p(0));
       max_distance = std::max(distance, max_distance);
     }
 
   const Real x  = point_in(0);
-  const Real xc = centroid(0);
+  const Real xc = avg(0);
   const Real dx = (x - xc)/max_distance;
   const Real dist2 = pow(max_distance,2.);
 
@@ -250,7 +250,7 @@ Real FE<1,XYZ>::shape_second_deriv(const ElemType,
                                    const unsigned int,
                                    const Point &)
 {
-  libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
+  libmesh_error_msg("XYZ polynomials require the element.");
   return 0.;
 }
 

@@ -105,12 +105,12 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
     }
   libmesh_assert_equal_to (el_num, n_range_elem);
 
-  // Get the centroid for each range element.
+  // Get the vertex average for each range element.
   for (const auto & elem : as_range(beg, end))
     {
       libmesh_assert_less (elem->id(), forward_map.size());
 
-      const Point p = elem->centroid();
+      const Point p = elem->vertex_average();
 
       x[forward_map[elem->id()]] = double(p(0));
       y[forward_map[elem->id()]] = double(p(1));
