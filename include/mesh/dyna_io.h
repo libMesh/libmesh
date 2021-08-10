@@ -106,43 +106,10 @@ public:
    */
   void clear_spline_nodes();
 
-private:
-  // Keep track of spline node indexing, so as to enable adding
-  // constraint rows easily later.
-  std::vector<Node *> spline_node_ptrs;
-  std::unordered_map<Node *, Elem *> spline_nodeelem_ptrs;
-
-  /**
-   * Whether to keep or eventually discard spline nodes
-   */
-  bool _keep_spline_nodes;
-
-  /**
-   * Implementation of the read() function.  This function
-   * is called by the public interface function and implements
-   * reading the file.
-   */
-  void read_mesh (std::istream & in);
-
   /**
    * The integer type DYNA uses
    */
   typedef int32_t dyna_int_type;
-
-  /**
-   * How many can we find on a line?
-   */
-  static const int max_ints_per_line = 10;
-
-  /**
-   * The floating-point type DYNA uses
-   */
-  typedef double dyna_fp_type;
-
-  /**
-   * How many can we find on a line?
-   */
-  static const int max_fps_per_line = 5;
 
   /**
    * Defines mapping from libMesh element types to LS-DYNA element
@@ -170,6 +137,50 @@ private:
     dyna_int_type p;
     std::vector<unsigned int> nodes;
   };
+
+
+  /**
+   * Finds the ElementDefinition corresponding to a particular element
+   * type.
+   */
+  static const ElementDefinition &
+  find_elem_definition(dyna_int_type dyna_elem, int dim, int p);
+
+  static const ElementDefinition &
+  find_elem_definition(ElemType libmesh_elem, int dim, int p);
+
+private:
+  // Keep track of spline node indexing, so as to enable adding
+  // constraint rows easily later.
+  std::vector<Node *> spline_node_ptrs;
+  std::unordered_map<Node *, Elem *> spline_nodeelem_ptrs;
+
+  /**
+   * Whether to keep or eventually discard spline nodes
+   */
+  bool _keep_spline_nodes;
+
+  /**
+   * Implementation of the read() function.  This function
+   * is called by the public interface function and implements
+   * reading the file.
+   */
+  void read_mesh (std::istream & in);
+
+  /**
+   * How many can we find on a line?
+   */
+  static const int max_ints_per_line = 10;
+
+  /**
+   * The floating-point type DYNA uses
+   */
+  typedef double dyna_fp_type;
+
+  /**
+   * How many can we find on a line?
+   */
+  static const int max_fps_per_line = 5;
 
   /**
    * struct which holds a map from LS-DYNA to libMesh element numberings
