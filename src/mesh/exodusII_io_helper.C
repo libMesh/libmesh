@@ -172,6 +172,7 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   _global_vars_initialized(false),
   _nodal_vars_initialized(false),
   _use_mesh_dimension_instead_of_spatial_dimension(false),
+  _end_elem_id(0),
   _write_as_dimension(0),
   _single_precision(single_precision)
 {
@@ -1317,6 +1318,13 @@ void ExodusII_IO_Helper::read_elem_num_map ()
   EX_CHECK_ERR(ex_err, "Error retrieving element number map.");
   message("Element numbering map retrieved successfully.");
 
+  if (num_elem)
+    {
+      auto it = std::max_element(elem_num_map.begin(), elem_num_map.end());
+      _end_elem_id = *it;
+    }
+  else
+    _end_elem_id = 0;
 
   if (verbose)
     {

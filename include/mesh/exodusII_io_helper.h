@@ -553,6 +553,10 @@ public:
   // Total number of elements in the mesh
   int & num_elem;
 
+  // Smallest element id which exceeds every element id in the mesh.
+  // (this may exceed num_elem due to mapping)
+  int end_elem_id() const;
+
   // Total number of element blocks
   int & num_elem_blk;
 
@@ -797,6 +801,9 @@ protected:
   // of the elements comprising the mesh) instead of the mesh's
   // spatial dimension, when writing.  By default this is false.
   bool _use_mesh_dimension_instead_of_spatial_dimension;
+
+  // Set once the elem num map has been read
+  int _end_elem_id;
 
   // Use this for num_dim when writing the Exodus file.  If non-zero, supersedes
   // any value set in _use_mesh_dimension_instead_of_spatial_dimension.
@@ -1089,6 +1096,13 @@ private:
   size_t counter;
   size_t table_size;
 };
+
+
+
+inline int ExodusII_IO_Helper::end_elem_id() const {
+  libmesh_assert_equal_to(std::size_t(num_elem), elem_num_map.size());
+  return _end_elem_id;
+}
 
 
 } // namespace libMesh
