@@ -389,10 +389,12 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T> & v_in)
 
   libmesh_assert_equal_to (this->size(), v->size());
 
-  VecGhostLocalFormRAII<T> ghost(*this, this->type() == GHOSTED);
-  VecGhostLocalFormRAII<T> v_ghost(*v, this->type() == GHOSTED);
-  PetscErrorCode ierr = VecAXPY(ghost.local_form, a, v_ghost.local_form);
+  PetscErrorCode ierr = VecAXPY(_vec, a, v->vec());
   LIBMESH_CHKERR(ierr);
+  if (this->type() == GHOSTED)
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
+
+  this->_is_closed = true;
 }
 
 
@@ -556,33 +558,12 @@ PetscVector<T>::operator = (const PetscVector<T> & v)
 
   PetscErrorCode ierr = 0;
 
-  if (((this->type()==PARALLEL) && (v.type()==GHOSTED)) ||
-      ((this->type()==GHOSTED) && (v.type()==PARALLEL)) ||
-      ((this->type()==GHOSTED) && (v.type()==SERIAL))   ||
-      ((this->type()==SERIAL) && (v.type()==GHOSTED)))
-    {
-      // Allow assignment of a ghosted to a parallel vector since this
-      // causes no difficulty.  See discussion in libmesh-devel of
-      // June 24, 2010.
-      ierr = VecCopy (v._vec, this->_vec);
-      LIBMESH_CHKERR(ierr);
-    }
-  else
-    {
-      // In all other cases, we assert that both vectors are of equal
-      // type.
-      libmesh_assert_equal_to (this->_type, v._type);
+  ierr = VecCopy (v._vec, this->_vec);
+  LIBMESH_CHKERR(ierr);
+  if (this->type() == GHOSTED)
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 
-      if (v.size() != 0)
-        {
-          VecGhostLocalFormRAII<T> ghost(*this, this->type() == GHOSTED);
-          VecGhostLocalFormRAII<T> v_ghost(v, this->type() == GHOSTED);
-          ierr = VecCopy (v_ghost.local_form, ghost.local_form);
-          LIBMESH_CHKERR(ierr);
-        }
-    }
-
-  close();
+  this->_is_closed = true;
 
   return *this;
 }
@@ -1067,11 +1048,12 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T> & vec1,
   const PetscVector<T> * vec2_petsc = cast_ptr<const PetscVector<T> *>(&vec2);
 
   // Call PETSc function.
-  VecGhostLocalFormRAII<T> ghost(*this, this->type() == GHOSTED);
-  VecGhostLocalFormRAII<T> v1_ghost(*vec1_petsc, this->type() == GHOSTED);
-  VecGhostLocalFormRAII<T> v2_ghost(*vec2_petsc, this->type() == GHOSTED);
-  PetscErrorCode ierr = VecPointwiseMult(ghost.local_form, v1_ghost.local_form, v2_ghost.local_form);
+  PetscErrorCode ierr = VecPointwiseMult(_vec, vec1_petsc->vec(), vec2_petsc->vec());
   LIBMESH_CHKERR(ierr);
+  if (this->type() == GHOSTED)
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
+
+  this->_is_closed = true;
 }
 
 
