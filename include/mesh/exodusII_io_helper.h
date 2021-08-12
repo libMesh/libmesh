@@ -102,6 +102,12 @@ public:
   ExodusII_IO_Helper & operator= (ExodusII_IO_Helper &&) = delete;
 
   /**
+   * \returns The ExodusII API version, in "nodot" format; e.g. 822
+   * for 8.22
+   */
+  static int get_exodus_version();
+
+  /**
    * \returns The current element type.
    *
    * \note The default behavior is for this value to be in all capital

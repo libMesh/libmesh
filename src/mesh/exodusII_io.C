@@ -74,6 +74,19 @@ ExodusII_IO::ExodusII_IO (MeshBase & mesh,
 {
 }
 
+
+
+int ExodusII_IO::get_exodus_version()
+{
+#ifdef LIBMESH_HAVE_EXODUS_API
+  return ExodusII_IO_Helper::get_exodus_version();
+#else
+  return 0;
+#endif
+}
+
+
+
 void ExodusII_IO::set_extra_integer_vars(const std::vector<std::string> & extra_integer_vars)
 {
   _extra_integer_vars = extra_integer_vars;

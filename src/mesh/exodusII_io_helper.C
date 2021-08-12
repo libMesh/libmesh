@@ -188,6 +188,13 @@ ExodusII_IO_Helper::~ExodusII_IO_Helper() = default;
 
 
 
+int ExodusII_IO_Helper::get_exodus_version()
+{
+  return EX_API_VERS_NODOT;
+}
+
+
+
 // Initialization function for conversion_map object
 void ExodusII_IO_Helper::init_conversion_map()
 {
