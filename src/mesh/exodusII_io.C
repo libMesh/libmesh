@@ -178,6 +178,16 @@ void ExodusII_IO::read (const std::string & fname)
   // a node_num_map, the identity map is returned by this call.
   exio_helper->read_node_num_map();
 
+  // Read the element number map from the Exodus file.  This is
+  // required if we want to preserve the numbering of elements as it
+  // exists in the Exodus file.  If the Exodus file does not contain
+  // an elem_num_map, the identity map is returned by this call.
+  //
+  // We now do this before creating nodes, so if we have any spline
+  // nodes that need a NodeElem attached we can give them unused elem
+  // ids.
+  exio_helper->read_elem_num_map();
+
   // Read any Bezier Extraction coefficient vectors from the file,
   // such as might occur in an IsoGeometric Analysis (IGA) mesh.
   exio_helper->read_bex_cv_blocks();
@@ -227,7 +237,7 @@ void ExodusII_IO::read (const std::string & fname)
 
           // Give the NodeElem ids at the end, so we can match any
           // existing ids in the file for other elements
-          elem->set_id() = exio_helper->num_elem + i;
+          elem->set_id() = exio_helper->end_elem_id() + i;
 
           elem->set_node(0) = added_node;
           Elem * added_elem = mesh.add_elem(std::move(elem));
@@ -245,12 +255,6 @@ void ExodusII_IO::read (const std::string & fname)
   // Reserve space for the elements.  Account for any NodeElem that
   // have already been attached to spline control nodes.
   mesh.reserve_elem(exio_helper->w.size() + exio_helper->num_elem);
-
-  // Read the element number map from the Exodus file.  This is
-  // required if we want to preserve the numbering of elements as it
-  // exists in the Exodus file.  If the Exodus file does not contain
-  // an elem_num_map, the identity map is returned by this call.
-  exio_helper->read_elem_num_map();
 
   // Read variables for extra integer IDs
   std::vector<std::map<dof_id_type, Real>> elem_ids(extra_ids.size());
@@ -279,7 +283,8 @@ void ExodusII_IO::read (const std::string & fname)
     {
       // Read the information for block i
       exio_helper->read_elem_in_block (i);
-      int subdomain_id = exio_helper->get_block_id(i);
+      const int subdomain_id = exio_helper->get_block_id(i);
+      max_subdomain_id = std::max(max_subdomain_id, subdomain_id);
 
       // populate the map of names
       std::string subdomain_name = exio_helper->get_block_name(i);
