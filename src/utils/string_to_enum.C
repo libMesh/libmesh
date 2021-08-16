@@ -171,6 +171,22 @@ void init_elem_type_to_enum ()
 }
 
 
+INSTANTIATE_ENUM_MAPS(ElemMappingType, elem_mapping_type)
+
+//----------------------------------------------------
+
+// Initialize elem_type_to_enum on first call
+void init_elem_mapping_type_to_enum ()
+{
+  if (elem_mapping_type_to_enum.empty())
+    {
+      elem_mapping_type_to_enum["LAGRANGE_MAP"          ]=LAGRANGE_MAP;
+      elem_mapping_type_to_enum["RATIONAL_BERNSTEIN_MAP"]=RATIONAL_BERNSTEIN_MAP;
+      elem_mapping_type_to_enum["INVALID_MAP"           ]=INVALID_MAP;
+    }
+}
+
+
 INSTANTIATE_ENUM_MAPS(Order, order)
 
 // Initialize order_to_enum on first call
@@ -678,6 +694,7 @@ namespace Utility {
 
 
 INSTANTIATE_STRING_TO_ENUM(ElemType,elem_type)
+INSTANTIATE_STRING_TO_ENUM(ElemMappingType,elem_mapping_type)
 INSTANTIATE_STRING_TO_ENUM(Order,order)
 INSTANTIATE_STRING_TO_ENUM(FEFamily,fefamily)
 INSTANTIATE_STRING_TO_ENUM(InfMapType,inf_map_type)
