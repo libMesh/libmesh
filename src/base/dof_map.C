@@ -1743,7 +1743,7 @@ void DofMap::set_implicit_neighbor_dofs(bool implicit_neighbor_dofs)
 }
 
 
-bool DofMap::use_coupled_neighbor_dofs(const MeshBase & mesh) const
+bool DofMap::use_coupled_neighbor_dofs(const MeshBase & /*mesh*/) const
 {
   // If we were asked on the command line, then we need to
   // include sensitivities between neighbor degrees of freedom
@@ -1787,8 +1787,7 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase & mesh) const
     bool all_discontinuous_dofs = true;
 
     for (auto var : make_range(this->n_variables()))
-      if (FEAbstract::build (mesh.mesh_dimension(),
-                             this->variable_type(var))->get_continuity() !=  DISCONTINUOUS)
+      if (FEInterface::get_continuity(this->variable_type(var)) !=  DISCONTINUOUS)
         all_discontinuous_dofs = false;
 
     if (all_discontinuous_dofs)
