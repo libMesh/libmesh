@@ -2473,8 +2473,18 @@ std::string Elem::get_info () const
       << "   dim()="     << this->dim()                            << '\n'
       << "   n_nodes()=" << this->n_nodes()                        << '\n';
 
+  oss << "   mapping=" << Utility::enum_to_string(this->mapping_type()) << '\n';
+
   for (auto n : this->node_index_range())
-    oss << "    " << n << this->node_ref(n);
+    {
+      oss << "    " << n << this->node_ref(n);
+      if (this->mapping_type() == RATIONAL_BERNSTEIN_MAP)
+        {
+          const unsigned char datum_index = this->mapping_data();
+          oss << "    weight=" <<
+            this->node_ref(n).get_extra_datum<Real>(datum_index) << '\n';
+        }
+    }
 
   oss << "   n_sides()=" << this->n_sides()                        << '\n';
 
