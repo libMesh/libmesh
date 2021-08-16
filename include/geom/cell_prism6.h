@@ -189,6 +189,12 @@ public:
   static const unsigned int edge_sides_map[num_edges][2];
 
   /**
+   * An Optimized numerical quadrature approach for computing the
+   * centroid of the Prism6.
+   */
+  virtual Point true_centroid () const override;
+
+  /**
    * Specialized function for computing the element volume.
    */
   virtual Real volume () const override;

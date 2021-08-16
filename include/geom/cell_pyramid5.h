@@ -182,13 +182,6 @@ public:
   static const unsigned int edge_sides_map[num_edges][2];
 
   /**
-   * According to Wikipedia: The centroid of a 5-node pyramid is 1/4
-   * of the way up from the base on the line segment connecting the
-   * centroid of the base and the Pyramid apex..
-   */
-  virtual Point true_centroid () const override;
-
-  /**
    * Specialization for computing the volume of a pyramid.
    */
   virtual Real volume () const override;

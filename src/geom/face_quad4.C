@@ -267,26 +267,23 @@ void Quad4::connectivity(const unsigned int libmesh_dbg_var(sf),
 
 Point Quad4::true_centroid () const
 {
-  // Note: this function does a substantially similar behavior to the
-  // volume() calculation, so it would be good if they could share
-  // code somehow without losing any performance by introducing extra
-  // function calls, etc.
-
-  // Short-hand references to our vertices
-  const Point & x0 = point(0);
-  const Point & x1 = point(1);
-  const Point & x2 = point(2);
-  const Point & x3 = point(3);
+  // Convenient references to our points
+  const Point
+    &x0 = point(0), &x1 = point(1),
+    &x2 = point(2), &x3 = point(3);
 
   // Construct "dx/d(xi)" and "dx/d(eta)" vectors which are columns of the Jacobian.
   // \vec{x}_{\xi}  = \vec{a1}*eta + \vec{b1}
   // \vec{x}_{\eta} = \vec{a2}*xi  + \vec{b2}
-  // This is copy-pasted directly from the output of a Python script.
+  // This is copy-pasted directly from the output of a Python script. Note: we are off
+  // by a factor of (1/4) here, but since the final result should have the same error
+  // in the numerator and denominator, it should cancel out while saving us some math
+  // operations.
   Point
-    a1 = x0/4 - x1/4 + x2/4 - x3/4,
-    b1 = -x0/4 + x1/4 + x2/4 - x3/4,
+    a1 = x0 - x1 + x2 - x3,
+    b1 = -x0 + x1 + x2 - x3,
     a2 = a1,
-    b2 = -x0/4 - x1/4 + x2/4 + x3/4;
+    b2 = -x0 - x1 + x2 + x3;
 
   // Use 2x2 quadrature to compute the integral of each basis function
   // (as defined on the [-1,1]^2 reference domain). We use a 4-point
@@ -297,17 +294,15 @@ Point Quad4::true_centroid () const
   // Nodal areas
   Real A0 = 0., A1 = 0., A2 = 0., A3 = 0.;
 
-  for (unsigned int i=0; i<2; ++i)
-    for (unsigned int j=0; j<2; ++j)
+  for (const auto & xi : q)
+    for (const auto & eta : q)
       {
-        Real xi = q[i];
-        Real eta = q[j];
         Real jxw = cross_norm(eta*a1 + b1, xi*a2 + b2);
 
-        A0 += jxw * 0.25 * (1-xi) * (1-eta); // basis function phi_0
-        A1 += jxw * 0.25 * (1+xi) * (1-eta); // basis function phi_1
-        A2 += jxw * 0.25 * (1+xi) * (1+eta); // basis function phi_2
-        A3 += jxw * 0.25 * (1-xi) * (1+eta); // basis function phi_3
+        A0 += jxw * (1-xi) * (1-eta); // 4 * phi_0
+        A1 += jxw * (1+xi) * (1-eta); // 4 * phi_1
+        A2 += jxw * (1+xi) * (1+eta); // 4 * phi_2
+        A3 += jxw * (1-xi) * (1+eta); // 4 * phi_3
       }
 
   // Compute centroid
@@ -315,6 +310,8 @@ Point Quad4::true_centroid () const
                x0(1)*A0 + x1(1)*A1 + x2(1)*A2 + x3(1)*A3,
                x0(2)*A0 + x1(2)*A1 + x2(2)*A2 + x3(2)*A3) / (A0 + A1 + A2 + A3);
 }
+
+
 
 Real Quad4::volume () const
 {

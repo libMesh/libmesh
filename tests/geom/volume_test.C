@@ -13,6 +13,9 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+// C++ includes
+#include <iomanip>
+
 using namespace libMesh;
 
 class VolumeTest : public CppUnit::TestCase
@@ -27,6 +30,8 @@ public:
   CPPUNIT_TEST( testTri3TrueCentroid );
   CPPUNIT_TEST( testQuad4TrueCentroid );
   CPPUNIT_TEST( testPyramid5TrueCentroid );
+  CPPUNIT_TEST( testHex8TrueCentroid );
+  CPPUNIT_TEST( testPrism6TrueCentroid );
   CPPUNIT_TEST( testHex20PLevelTrueCentroid );
   CPPUNIT_TEST_SUITE_END();
 
@@ -65,12 +70,12 @@ public:
     }
 
     // Check that "optimized" Quad4::true_centroid() gives same result
-    // as "generic" Elem::true_centroid() on a mesh of 10% distorted quads.
+    // as "generic" Elem::true_centroid() on a mesh of 10% distorted elements.
     {
       ReplicatedMesh mesh(*TestCommWorld);
 
       MeshTools::Generation::build_square(mesh,
-                                          /*nx=*/2, /*ny=*/2,
+                                          /*nx=*/3, /*ny=*/3,
                                           /*xmin=*/0., /*xmax=*/1.,
                                           /*ymin=*/0., /*ymax=*/1.,
                                           QUAD4);
@@ -83,14 +88,26 @@ public:
         {
           Point derived_centroid = elem->true_centroid();
           Point base_centroid = elem->Elem::true_centroid();
+
+          // Debugging: check results in detail
+          // auto flags = libMesh::out.flags();
+          // libMesh::out << std::scientific << std::setprecision(16);
+          // libMesh::out << "derived_centroid = " << derived_centroid << std::endl;
+          // libMesh::out << "base_centroid = " << base_centroid << std::endl;
+          // libMesh::out.flags(flags);
+
           CPPUNIT_ASSERT(derived_centroid.absolute_fuzzy_equals(base_centroid, TOLERANCE*TOLERANCE));
+
+          Real derived_volume = elem->volume();
+          Real base_volume = elem->Elem::volume();
+          LIBMESH_ASSERT_FP_EQUAL(base_volume, derived_volume, TOLERANCE*TOLERANCE);
         }
     }
   }
 
   void testPyramid5TrueCentroid()
   {
-    // Test Pyramid5::true_centroid() override
+    // Test Pyramid5::true_centroid() gives the correct result for a reference element
     {
       const Elem & pyr5 = ReferenceElem::get(PYRAMID5);
       Point true_centroid = pyr5.true_centroid();
@@ -99,30 +116,12 @@ public:
       LIBMESH_ASSERT_FP_EQUAL(0.25, true_centroid(2), TOLERANCE*TOLERANCE);
     }
 
-    // Check that "optimized" Pyramid5::true_centroid() gives same result
-    // as "generic" Elem::true_centroid() on a mesh of 10% distorted pyramids.
-    {
-      ReplicatedMesh mesh(*TestCommWorld);
-
-      MeshTools::Generation::build_cube(mesh,
-                                        /*nelem=*/1, /*nelem=*/1, /*nelem=*/1,
-                                        /*xmin=*/-1, /*xmax=*/1,
-                                        /*ymin=*/-1, /*ymax=*/1,
-                                        /*zmin=*/-1, /*zmax=*/1,
-                                        PYRAMID5);
-
-      MeshTools::Modification::distort(mesh,
-                                       /*factor=*/0.1,
-                                       /*perturb_boundary=*/false);
-
-      for (const auto & elem : mesh.element_ptr_range())
-        {
-          Point derived_centroid = elem->true_centroid();
-          Point base_centroid = elem->Elem::true_centroid();
-          CPPUNIT_ASSERT(derived_centroid.absolute_fuzzy_equals(base_centroid, TOLERANCE*TOLERANCE));
-        }
-    }
+    // Currently there is not an optimized Pyramid5::true_centroid() to compare against
+    // test_true_centroid_and_volume(PYRAMID5);
   }
+
+  void testHex8TrueCentroid() { test_true_centroid_and_volume(HEX8); }
+  void testPrism6TrueCentroid() { test_true_centroid_and_volume(PRISM6); }
 
   void testHex20PLevelTrueCentroid()
   {
@@ -373,6 +372,49 @@ protected:
 
     // Return whether or not this Elem has an invertible map
     return elem->has_invertible_map();
+  }
+
+  // Helper function for testing true_centroid() and volume() implementations for
+  // 3D elements
+  void test_true_centroid_and_volume(ElemType elem_type)
+  {
+    // Check that derived class true_centroid() gives same result as
+    // the base class Elem::true_centroid() on a 2x2x2 mesh of 10%
+    // distorted elements.
+    {
+      ReplicatedMesh mesh(*TestCommWorld);
+
+      MeshTools::Generation::build_cube(mesh,
+                                        /*nelem=*/2, /*nelem=*/2, /*nelem=*/2,
+                                        /*xmin=*/-1, /*xmax=*/1,
+                                        /*ymin=*/-1, /*ymax=*/1,
+                                        /*zmin=*/-1, /*zmax=*/1,
+                                        elem_type);
+
+      MeshTools::Modification::distort(mesh,
+                                       /*factor=*/0.1,
+                                       /*perturb_boundary=*/false);
+
+      for (const auto & elem : mesh.element_ptr_range())
+        {
+          Point derived_centroid = elem->true_centroid();
+          Point base_centroid = elem->Elem::true_centroid();
+
+          // Debugging: check results in detail
+          // auto flags = libMesh::out.flags();
+          // libMesh::out << std::scientific << std::setprecision(16);
+          // libMesh::out << "derived_centroid = " << derived_centroid << std::endl;
+          // libMesh::out << "base_centroid = " << base_centroid << std::endl;
+          // libMesh::out.flags(flags);
+
+          CPPUNIT_ASSERT(derived_centroid.absolute_fuzzy_equals(base_centroid, TOLERANCE*TOLERANCE));
+
+          // Make sure that base class and "optimized" routines for computing the cell volume agree
+          Real derived_volume = elem->volume();
+          Real base_volume = elem->Elem::volume();
+          LIBMESH_ASSERT_FP_EQUAL(base_volume, derived_volume, TOLERANCE*TOLERANCE);
+        }
+    }
   }
 };
 

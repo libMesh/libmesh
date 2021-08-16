@@ -185,6 +185,13 @@ public:
   static const unsigned int edge_sides_map[num_edges][2];
 
   /**
+   * We compute the centroid of the Hex using a customized numerical
+   * quadrature approach that avoids unnecessary object creation/heap
+   * allocations.
+   */
+  virtual Point true_centroid () const override;
+
+  /**
    * A specialization for computing the area of a hexahedron
    * with flat sides.
    */

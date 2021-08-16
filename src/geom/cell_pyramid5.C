@@ -282,13 +282,6 @@ void Pyramid5::connectivity(const unsigned int libmesh_dbg_var(sc),
 }
 
 
-Point Pyramid5::true_centroid () const
-{
-  // Centroid of the pyramid is (1/4) of the way along the line
-  // segment joining the base (side 4) centroid and the apex (point 4).
-  return 0.75 * Elem::build_side_ptr(4)->true_centroid() + 0.25 * this->point(4);
-}
-
 Real Pyramid5::volume () const
 {
   // The pyramid with a bilinear base has volume given by the

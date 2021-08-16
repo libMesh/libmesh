@@ -23,6 +23,10 @@
 #include "libmesh/face_quad4.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
+#include "libmesh/fe_lagrange_shape_1D.h"
+
+// C++ includes
+#include <array>
 
 namespace libMesh
 {
@@ -352,6 +356,88 @@ const float Hex8::_embedding_matrix[Hex8::num_children][Hex8::num_nodes][Hex8::n
 
 
 #endif
+
+
+
+Point Hex8::true_centroid () const
+{
+  // Convenient references to the vertices
+  const Point
+    &x0 = point(0), &x1 = point(1), &x2 = point(2), &x3 = point(3),
+    &x4 = point(4), &x5 = point(5), &x6 = point(6), &x7 = point(7);
+
+  // The Jacobian is dx/d(xi) dot (dx/d(eta) cross dx/d(zeta)), where
+  // dx/d(xi)   = a1*eta*zeta + b1*eta + c1*zeta + d1
+  // dx/d(eta)  = a2*xi*zeta  + b2*xi  + c2*zeta + d2
+  // dx/d(zeta) = a3*xi*eta   + b3*xi  + c3*eta  + d3
+
+  // Notes:
+  // 1.) Several of these coefficient vectors are equal, as noted below.
+  // 2.) These are all off by a factor of 8, but this cancels when we
+  //     divide by the volume, which will also be off by the same
+  //     factor.
+  Point
+    a1 = -x0 + x1 - x2 + x3 + x4 - x5 + x6 - x7,
+    a2 = a1,
+    a3 = a1;
+
+  Point
+    b1 = x0 - x1 + x2 - x3 + x4 - x5 + x6 - x7,
+    b2 = b1,
+    b3 = x0 - x1 - x2 + x3 - x4 + x5 + x6 - x7;
+
+  Point
+    c1 = b3,
+    c2 = x0 + x1 - x2 - x3 - x4 - x5 + x6 + x7,
+    c3 = c2;
+
+  Point
+    d1 = -x0 + x1 + x2 - x3 - x4 + x5 + x6 - x7,
+    d2 = -x0 - x1 + x2 + x3 - x4 - x5 + x6 + x7,
+    d3 = -x0 - x1 - x2 - x3 + x4 + x5 + x6 + x7;
+
+  // Use 2x2x2 quadrature to compute the integral of each basis
+  // function (as defined on the [-1,1]^3 reference domain). We use
+  // a quadrature rule which is exact for tri-cubics. The weights for
+  // this rule are all equal to 1.
+  static const Real q[2] = {-std::sqrt(3.)/3, std::sqrt(3.)/3.};
+
+  // Indices for computing tensor product basis functions. This is
+  // copied from fe_lagrange_shape_3D.C
+  static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
+  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
+  static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
+
+  // Compute nodal volumes
+  std::array<Real, Hex8::num_nodes> V{};
+
+  for (const auto & xi : q)
+    for (const auto & eta : q)
+      for (const auto & zeta : q)
+      {
+        Real jxw = triple_product(a1*eta*zeta + b1*eta + c1*zeta + d1,
+                                  a2*xi*zeta  + b2*xi  + c2*zeta + d2,
+                                  a3*xi*eta   + b3*xi  + c3*eta  + d3);
+
+        for (int i=0; i<Hex8::num_nodes; ++i)
+          V[i] += jxw *
+            fe_lagrange_1D_linear_shape(i0[i], xi) *
+            fe_lagrange_1D_linear_shape(i1[i], eta) *
+            fe_lagrange_1D_linear_shape(i2[i], zeta);
+      }
+
+  // Compute centroid
+  Point cp;
+  Real vol = 0.;
+
+  for (int i=0; i<Hex8::num_nodes; ++i)
+    {
+      cp += this->point(i) * V[i];
+      vol += V[i];
+    }
+
+  return cp / vol;
+}
 
 
 
