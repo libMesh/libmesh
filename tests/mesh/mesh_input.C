@@ -62,6 +62,9 @@ public:
   // Eventually this will support complex numbers.
   CPPUNIT_TEST( testExodusWriteElementDataFromDiscontinuousNodalData );
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
+
+  CPPUNIT_TEST( testExodusFileMappingsPlateWithHole);
+  CPPUNIT_TEST( testExodusFileMappingsCyl3d);
 #endif // LIBMESH_HAVE_EXODUS_API
 
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
@@ -772,7 +775,7 @@ public:
 #endif // LIBMESH_HAVE_SOLVER
   }
 
-  void testProjectionRegression(MeshBase & mesh, DynaIO & dyna, std::array<Real, 4> expected_norms)
+  void testProjectionRegression(MeshBase & mesh, std::array<Real, 4> expected_norms)
   {
     int order = 0;
     for (const auto elem : mesh.element_ptr_range())
@@ -830,7 +833,7 @@ public:
 
     testMasterCenters(mesh);
 
-    testProjectionRegression(mesh, dyna, expected_norms);
+    testProjectionRegression(mesh, expected_norms);
   }
 
   void testDynaFileMappingsFEMEx5 ()
@@ -863,6 +866,44 @@ public:
     // Regression values for sin_x_plus_cos_y
                          {0.9636130896326653, 1.823294442918401,
                           0.7080084233124895, 1.314114853940283});
+  }
+
+  void testExodusFileMappings (const std::string & filename, std::array<Real, 4> expected_norms)
+  {
+    Mesh mesh(*TestCommWorld);
+
+    ExodusII_IO exii(mesh);
+    // IGA Exodus meshes require ExodusII 8 or higher
+    if (exii.get_exodus_version() < 800)
+      return;
+
+    if (mesh.processor_id() == 0)
+      exii.read(filename);
+    MeshCommunication().broadcast (mesh);
+
+    mesh.prepare_for_use();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.default_mapping_type(),
+                         RATIONAL_BERNSTEIN_MAP);
+
+    testMasterCenters(mesh);
+
+    testProjectionRegression(mesh, expected_norms);
+  }
+
+  void testExodusFileMappingsPlateWithHole ()
+  {
+    testExodusFileMappings("meshes/PlateWithHole_Patch8.e",
+    // Regression values for sin_x_plus_cos_y
+                           {2.2812154374012, 1.974049990211937,
+                            1.791640772215248, 1.413679237529376});
+  }
+
+  void testExodusFileMappingsCyl3d ()
+  {
+    testExodusFileMappings("meshes/PressurizedCyl3d_Patch1_8Elem.e",
+                           {0.9636130896326653, 1.823294442918401,
+                            0.7080084233124895, 1.314114853940283});
   }
 };
 
