@@ -4,6 +4,8 @@
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_refinement.h>
 
+#include <libmesh/exodusII_io.h>
+
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
@@ -24,7 +26,12 @@ public:
   CPPUNIT_TEST( testExtraIntegersEdge2 );
   CPPUNIT_TEST( testExtraIntegersTri6 );
 
+#ifdef LIBMESH_HAVE_EXODUS_API
   CPPUNIT_TEST( testExtraIntegersExodusReading );
+#endif
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_ENABLE_EXCEPTIONS)
+  CPPUNIT_TEST( testBadExtraIntegersExodusReading );
+#endif
 
 #ifdef LIBMESH_HAVE_XDR
   CPPUNIT_TEST( testExtraIntegersCheckpointEdge3 );
@@ -198,20 +205,56 @@ public:
 
   void testExtraIntegersCheckpointHex8() { checkpoint_helper(HEX8, 2, true); }
 
-  void testExtraIntegersExodusLoading()
+#ifdef LIBMESH_HAVE_EXODUS_API
+  void testExtraIntegersExodusReading()
+  {
+    Mesh mesh(*TestCommWorld);
+    mesh.allow_renumbering(false);
+
+    // This 3-by-3 mesh contains the following element integers:
+    std::vector<std::ptrdiff_t> material_id = {0, -1, 2,
+                                               1,  3, 450359962,
+                                               2,  3, 450359963};
+    const std::string filename = "meshes/good_32bit_elem_integers.e";
+    ExodusII_IO exreader(mesh);
+    exreader.set_extra_integer_vars({"material_id"});
+    exreader.read(filename);
+
+    CPPUNIT_ASSERT(mesh.has_elem_integer("material_id"));
+    unsigned int int_idx = mesh.get_elem_integer_index("material_id");
+    for (dof_id_type i=0; i != 9; ++i)
+      {
+        Elem * elem = mesh.query_elem_ptr(i);
+        if (!elem)
+          continue;
+        if (material_id[i] == -1)
+          CPPUNIT_ASSERT_EQUAL(DofObject::invalid_id, elem->get_extra_integer(int_idx));
+        else
+          CPPUNIT_ASSERT_EQUAL(dof_id_type(material_id[i]), elem->get_extra_integer(int_idx));
+      }
+  }
+#endif
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_ENABLE_EXCEPTIONS)
+  void testBadExtraIntegersExodusReading()
   {
     Mesh mesh(*TestCommWorld);
     /*
-     This is a 3-by-3 mesh contains the following element integer:
-     material_id = '0 -1    -2
-                    1 -5600 4503599627370496
-                    2 -3    4503599627370497'
+     This 3-by-3 mesh contains the following element integers:
+     material_id = '0 -1    (unsigned long long)(-2) (bad)
+                    1  3    4503599627370496
+                    2  3    4503599627370497'
+     Real(-2) != Real(-1) (used for invalid_id), so we can tell
+     this is an error.
     */
-    const std::string filename = "meshes/elem_integer_example.e";
-    ExodusII_IO exreader(*mesh);
+    const std::string filename = "meshes/bad_64bit_elem_integers.e";
+    ExodusII_IO exreader(mesh);
     exreader.set_extra_integer_vars({"material_id"});
-    exreader.read(filename);
+    CPPUNIT_ASSERT_THROW_MESSAGE("Bad elem integer not detected",
+                                 exreader.read(filename),
+                                 libMesh::LogicError);
   }
+#endif
 };
 
 
