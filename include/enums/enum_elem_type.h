@@ -71,6 +71,11 @@ enum ElemType : int {
                TRISHELL3 = 30,
                QUADSHELL4 = 31,
                QUADSHELL8 = 32,
+               // Elems with Tri7 (Tri with mid-face node) faces
+               TRI7 = 33,
+               TET14 = 34,
+               PRISM20 = 35,
+               PYRAMID18 = 36,
                // Invalid
                INVALID_ELEM};   // should always be last
 
