@@ -116,6 +116,7 @@ void init_elem_type_to_enum ()
       elem_type_to_enum["TRISHELL3"      ]=TRISHELL3;
       elem_type_to_enum["TRI3SUBDIVISION"]=TRI3SUBDIVISION;
       elem_type_to_enum["TRI6"           ]=TRI6;
+      elem_type_to_enum["TRI7"           ]=TRI7;
 
       elem_type_to_enum["QUAD"           ]=QUAD4;
       elem_type_to_enum["QUAD4"          ]=QUAD4;
@@ -127,6 +128,7 @@ void init_elem_type_to_enum ()
       elem_type_to_enum["TET"            ]=TET4;
       elem_type_to_enum["TET4"           ]=TET4;
       elem_type_to_enum["TET10"          ]=TET10;
+      elem_type_to_enum["TET14"          ]=TET14;
 
       elem_type_to_enum["HEX"            ]=HEX8;
       elem_type_to_enum["HEX8"           ]=HEX8;
@@ -137,11 +139,13 @@ void init_elem_type_to_enum ()
       elem_type_to_enum["PRISM6"         ]=PRISM6;
       elem_type_to_enum["PRISM15"        ]=PRISM15;
       elem_type_to_enum["PRISM18"        ]=PRISM18;
+      elem_type_to_enum["PRISM20"        ]=PRISM20;
 
       elem_type_to_enum["PYRAMID"        ]=PYRAMID5;
       elem_type_to_enum["PYRAMID5"       ]=PYRAMID5;
       elem_type_to_enum["PYRAMID13"      ]=PYRAMID13;
       elem_type_to_enum["PYRAMID14"      ]=PYRAMID14;
+      elem_type_to_enum["PYRAMID18"      ]=PYRAMID18;
 
       elem_type_to_enum["INFEDGE"        ]=INFEDGE2;
       elem_type_to_enum["INFEDGE2"       ]=INFEDGE2;
