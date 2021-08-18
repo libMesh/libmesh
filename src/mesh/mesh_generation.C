@@ -26,6 +26,7 @@
 #include "libmesh/edge_edge4.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri6.h"
+#include "libmesh/face_tri7.h"
 #include "libmesh/face_quad4.h"
 #include "libmesh/face_quad8.h"
 #include "libmesh/face_quad9.h"
@@ -89,6 +90,7 @@ unsigned int idx(const ElemType type,
     case QUAD8:
     case QUAD9:
     case TRI6:
+    case TRI7:
       {
         return i + j*(2*nx+1);
       }
@@ -592,6 +594,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
           case TRI3:
           case TRI6:
+          case TRI7:
             {
               mesh.reserve_elem (2*nx*ny);
               break;
@@ -623,6 +626,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               break;
             }
 
+          case TRI7:
+            {
+              mesh.reserve_nodes( (2*nx+1)*(2*ny+1) + 2*nx*ny );
+              break;
+            }
 
           default:
             libmesh_error_msg("ERROR: Unrecognized 2D element type == " << Utility::enum_to_string(type));
@@ -664,6 +672,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case QUAD8:
           case QUAD9:
           case TRI6:
+          case TRI7:
             {
               for (unsigned int j=0; j<=(2*ny); j++)
                 for (unsigned int i=0; i<=(2*nx); i++)
@@ -682,6 +691,24 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                   if (i == 2*nx)
                     boundary_info.add_node(node, 1);
                 }
+
+              // We'll add any interior Tri7 nodes last, to keep from
+              // messing with our idx function
+              if (type == TRI7)
+                for (unsigned int j=0; j<(3*ny); j += 3)
+                  for (unsigned int i=0; i<(3*nx); i += 3)
+                    {
+                      // The bottom-right triangle's center node
+                      mesh.add_point(Point(static_cast<Real>(i+2) / static_cast<Real>(3 * nx),
+                                           static_cast<Real>(j+1) / static_cast<Real>(3 * ny),
+                                           0),
+                                     node_id++);
+                      // The top-left triangle's center node
+                      mesh.add_point(Point(static_cast<Real>(i+1) / static_cast<Real>(3 * nx),
+                                           static_cast<Real>(j+2) / static_cast<Real>(3 * ny),
+                                           0),
+                                     node_id++);
+                    }
 
               break;
             }
@@ -799,12 +826,13 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
           case TRI6:
+          case TRI7:
             {
               for (unsigned int j=0; j<(2*ny); j += 2)
                 for (unsigned int i=0; i<(2*nx); i += 2)
                   {
-                    // Add first Tri6
-                    Elem * elem = mesh.add_elem(Elem::build_with_id(TRI6, elem_id++));
+                    // Add first Tri in the bottom-right of its quad
+                    Elem * elem = mesh.add_elem(Elem::build_with_id(type, elem_id++));
                     elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
                     elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+2,j)  );
                     elem->set_node(2) = mesh.node_ptr(idx(type,nx,i+2,j+2));
@@ -812,20 +840,26 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                     elem->set_node(4) = mesh.node_ptr(idx(type,nx,i+2,j+1));
                     elem->set_node(5) = mesh.node_ptr(idx(type,nx,i+1,j+1));
 
+                    if (type == TRI7)
+                      elem->set_node(6) = mesh.node_ptr(elem->id()+(2*nx+1)*(2*ny+1));
+
                     if (j == 0)
                       boundary_info.add_side(elem, 0, 0);
 
                     if (i == 2*(nx-1))
                       boundary_info.add_side(elem, 1, 1);
 
-                    // Add second Tri6
-                    elem = mesh.add_elem(Elem::build_with_id(TRI6, elem_id++));
+                    // Add second Tri in the top left of its quad
+                    elem = mesh.add_elem(Elem::build_with_id(type, elem_id++));
                     elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
                     elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+2,j+2));
                     elem->set_node(2) = mesh.node_ptr(idx(type,nx,i,j+2)  );
                     elem->set_node(3) = mesh.node_ptr(idx(type,nx,i+1,j+1));
                     elem->set_node(4) = mesh.node_ptr(idx(type,nx,i+1,j+2));
                     elem->set_node(5) = mesh.node_ptr(idx(type,nx,i,j+1)  );
+
+                    if (type == TRI7)
+                      elem->set_node(6) = mesh.node_ptr(elem->id()+(2*nx+1)*(2*ny+1));
 
                     if (j == 2*(ny-1))
                       boundary_info.add_side(elem, 1, 2);
