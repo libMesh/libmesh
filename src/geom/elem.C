@@ -140,6 +140,11 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     3,  // TRISHELL3
     4,  // QUADSHELL4
     8,  // QUADSHELL8
+
+    7,  // TRI7
+    14, // TET14
+    20, // PRISM20
+    18, // PYRAMID18
   };
 
 const unsigned int Elem::type_to_n_sides_map [] =
@@ -190,6 +195,11 @@ const unsigned int Elem::type_to_n_sides_map [] =
     3,  // TRISHELL3
     4,  // QUADSHELL4
     4,  // QUADSHELL8
+
+    3,  // TRI7
+    4,  // TET14
+    5,  // PRISM20
+    5,  // PYRAMID18
   };
 
 const unsigned int Elem::type_to_n_edges_map [] =
@@ -240,6 +250,11 @@ const unsigned int Elem::type_to_n_edges_map [] =
     3,  // TRISHELL3
     4,  // QUADSHELL4
     4,  // QUADSHELL8
+
+    3,  // TRI7
+    6,  // TET14
+    9,  // PRISM20
+    8,  // PYRAMID18
   };
 
 // ------------------------------------------------------------
@@ -2574,6 +2589,7 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
       return EDGE2;
     case TRI3:
     case TRI6:
+    case TRI7:
       return TRI3;
     case TRISHELL3:
       return TRISHELL3;
@@ -2651,6 +2667,9 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
         // full_ordered not relevant
         return TRI6;
       }
+
+    case TRI7:
+      return TRI7;
 
       // Currently there is no TRISHELL6, so similarly to other types
       // where this is the case, we just return the input.
