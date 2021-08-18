@@ -338,6 +338,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
     case TRI3:
     case TRISHELL3:
     case TRI6:
+    case TRI7:
       {
         v.resize(7);
         v[0] = MAX_ANGLE;
