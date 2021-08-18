@@ -37,54 +37,6 @@
 
 namespace libMesh
 {
-
-/**
- * RAII struct which calls VecGhostGetLocalForm() in its constructor
- * and VecGhostRestoreLocalForm() in its destructor. Provides public
- * access to the resulting "local form" via the public "local_form"
- * member.
- */
-template <typename T>
-struct VecGhostLocalFormRAII
-{
-  /**
-   * Constructor. If enabled, calls VecGhostGetLocalForm(), otherwise
-   * just treats the Vec itself as the local form.
-   *
-   * Note that we are "abusing" the const PetscVector's ability
-   * to return a non-const Vec object via the vec() member. This is because
-   * there is currently no way to indicate to PETSc that a local form will be
-   * used in a read-only manner.
-   */
-  VecGhostLocalFormRAII(const PetscVector<T> & vec_in, bool enabled_in)
-    : vec(vec_in),
-      enabled(enabled_in)
-  {
-    if (enabled)
-      {
-        PetscErrorCode ierr = VecGhostGetLocalForm (vec.vec(), &local_form);
-        LIBMESH_CHKERR2(vec.comm(), ierr);
-      }
-    else
-      local_form = vec.vec();
-  }
-
-  /**
-   * Destructor. Calls VecGhostRestoreLocalForm() only if enabled.
-   * Does not check error messages since we should not throw from
-   * destructors in general.
-   */
-  ~VecGhostLocalFormRAII()
-  {
-    if (enabled)
-      VecGhostRestoreLocalForm (vec.vec(), &local_form);
-  }
-
-  const PetscVector<T> & vec;
-  bool enabled;
-  Vec local_form;
-};
-
 //-----------------------------------------------------------------------
 // PetscVector members
 
@@ -426,9 +378,10 @@ void PetscVector<T>::scale (const T factor_in)
 
   PetscScalar factor = PS(factor_in);
 
-  VecGhostLocalFormRAII<T> ghost(*this, this->type() == GHOSTED);
-  PetscErrorCode ierr = VecScale(ghost.local_form, factor);
+  PetscErrorCode ierr = VecScale(_vec, factor);
   LIBMESH_CHKERR(ierr);
+  if (this->type() == GHOSTED)
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 }
 
 template <typename T>
@@ -462,9 +415,10 @@ void PetscVector<T>::abs()
 {
   this->_restore_array();
 
-  VecGhostLocalFormRAII<T> ghost(*this, this->type() == GHOSTED);
-  PetscErrorCode ierr = VecAbs(ghost.local_form);
+  PetscErrorCode ierr = VecAbs(_vec);
   LIBMESH_CHKERR(ierr);
+  if (this->type() == GHOSTED)
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 }
 
 template <typename T>
@@ -521,9 +475,10 @@ PetscVector<T>::operator = (const T s_in)
 
   if (this->size() != 0)
     {
-      VecGhostLocalFormRAII<T> ghost(*this, this->type() == GHOSTED);
-      PetscErrorCode ierr = VecSet(ghost.local_form, s);
+      PetscErrorCode ierr = VecSet(_vec, s);
       LIBMESH_CHKERR(ierr);
+      if (this->type() == GHOSTED)
+        VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
     }
 
   return *this;
