@@ -962,6 +962,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
           case EDGE4:
           case TRI3:
           case TRI6:
+          case TRI7:
           case TET4:
           case TET10:
           case INFEDGE2:
