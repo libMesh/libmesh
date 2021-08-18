@@ -37,54 +37,6 @@
 
 namespace libMesh
 {
-
-/**
- * RAII struct which calls VecGhostGetLocalForm() in its constructor
- * and VecGhostRestoreLocalForm() in its destructor. Provides public
- * access to the resulting "local form" via the public "local_form"
- * member.
- */
-template <typename T>
-struct VecGhostLocalFormRAII
-{
-  /**
-   * Constructor. If enabled, calls VecGhostGetLocalForm(), otherwise
-   * just treats the Vec itself as the local form.
-   *
-   * Note that we are "abusing" the const PetscVector's ability
-   * to return a non-const Vec object via the vec() member. This is because
-   * there is currently no way to indicate to PETSc that a local form will be
-   * used in a read-only manner.
-   */
-  VecGhostLocalFormRAII(const PetscVector<T> & vec_in, bool enabled_in)
-    : vec(vec_in),
-      enabled(enabled_in)
-  {
-    if (enabled)
-      {
-        PetscErrorCode ierr = VecGhostGetLocalForm (vec.vec(), &local_form);
-        LIBMESH_CHKERR2(vec.comm(), ierr);
-      }
-    else
-      local_form = vec.vec();
-  }
-
-  /**
-   * Destructor. Calls VecGhostRestoreLocalForm() only if enabled.
-   * Does not check error messages since we should not throw from
-   * destructors in general.
-   */
-  ~VecGhostLocalFormRAII()
-  {
-    if (enabled)
-      VecGhostRestoreLocalForm (vec.vec(), &local_form);
-  }
-
-  const PetscVector<T> & vec;
-  bool enabled;
-  Vec local_form;
-};
-
 //-----------------------------------------------------------------------
 // PetscVector members
 
@@ -389,10 +341,12 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T> & v_in)
 
   libmesh_assert_equal_to (this->size(), v->size());
 
-  VecGhostLocalFormRAII<T> ghost(*this, this->type() == GHOSTED);
-  VecGhostLocalFormRAII<T> v_ghost(*v, this->type() == GHOSTED);
-  PetscErrorCode ierr = VecAXPY(ghost.local_form, a, v_ghost.local_form);
+  PetscErrorCode ierr = VecAXPY(_vec, a, v->vec());
   LIBMESH_CHKERR(ierr);
+  if (this->type() == GHOSTED)
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
+
+  this->_is_closed = true;
 }
 
 
@@ -424,9 +378,10 @@ void PetscVector<T>::scale (const T factor_in)
 
   PetscScalar factor = PS(factor_in);
 
-  VecGhostLocalFormRAII<T> ghost(*this, this->type() == GHOSTED);
-  PetscErrorCode ierr = VecScale(ghost.local_form, factor);
+  PetscErrorCode ierr = VecScale(_vec, factor);
   LIBMESH_CHKERR(ierr);
+  if (this->type() == GHOSTED)
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 }
 
 template <typename T>
@@ -460,9 +415,10 @@ void PetscVector<T>::abs()
 {
   this->_restore_array();
 
-  VecGhostLocalFormRAII<T> ghost(*this, this->type() == GHOSTED);
-  PetscErrorCode ierr = VecAbs(ghost.local_form);
+  PetscErrorCode ierr = VecAbs(_vec);
   LIBMESH_CHKERR(ierr);
+  if (this->type() == GHOSTED)
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 }
 
 template <typename T>
@@ -519,9 +475,10 @@ PetscVector<T>::operator = (const T s_in)
 
   if (this->size() != 0)
     {
-      VecGhostLocalFormRAII<T> ghost(*this, this->type() == GHOSTED);
-      PetscErrorCode ierr = VecSet(ghost.local_form, s);
+      PetscErrorCode ierr = VecSet(_vec, s);
       LIBMESH_CHKERR(ierr);
+      if (this->type() == GHOSTED)
+        VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
     }
 
   return *this;
@@ -556,33 +513,12 @@ PetscVector<T>::operator = (const PetscVector<T> & v)
 
   PetscErrorCode ierr = 0;
 
-  if (((this->type()==PARALLEL) && (v.type()==GHOSTED)) ||
-      ((this->type()==GHOSTED) && (v.type()==PARALLEL)) ||
-      ((this->type()==GHOSTED) && (v.type()==SERIAL))   ||
-      ((this->type()==SERIAL) && (v.type()==GHOSTED)))
-    {
-      // Allow assignment of a ghosted to a parallel vector since this
-      // causes no difficulty.  See discussion in libmesh-devel of
-      // June 24, 2010.
-      ierr = VecCopy (v._vec, this->_vec);
-      LIBMESH_CHKERR(ierr);
-    }
-  else
-    {
-      // In all other cases, we assert that both vectors are of equal
-      // type.
-      libmesh_assert_equal_to (this->_type, v._type);
+  ierr = VecCopy (v._vec, this->_vec);
+  LIBMESH_CHKERR(ierr);
+  if (this->type() == GHOSTED)
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 
-      if (v.size() != 0)
-        {
-          VecGhostLocalFormRAII<T> ghost(*this, this->type() == GHOSTED);
-          VecGhostLocalFormRAII<T> v_ghost(v, this->type() == GHOSTED);
-          ierr = VecCopy (v_ghost.local_form, ghost.local_form);
-          LIBMESH_CHKERR(ierr);
-        }
-    }
-
-  close();
+  this->_is_closed = true;
 
   return *this;
 }
@@ -1067,11 +1003,12 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T> & vec1,
   const PetscVector<T> * vec2_petsc = cast_ptr<const PetscVector<T> *>(&vec2);
 
   // Call PETSc function.
-  VecGhostLocalFormRAII<T> ghost(*this, this->type() == GHOSTED);
-  VecGhostLocalFormRAII<T> v1_ghost(*vec1_petsc, this->type() == GHOSTED);
-  VecGhostLocalFormRAII<T> v2_ghost(*vec2_petsc, this->type() == GHOSTED);
-  PetscErrorCode ierr = VecPointwiseMult(ghost.local_form, v1_ghost.local_form, v2_ghost.local_form);
+  PetscErrorCode ierr = VecPointwiseMult(_vec, vec1_petsc->vec(), vec2_petsc->vec());
   LIBMESH_CHKERR(ierr);
+  if (this->type() == GHOSTED)
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
+
+  this->_is_closed = true;
 }
 
 
