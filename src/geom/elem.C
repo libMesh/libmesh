@@ -39,6 +39,7 @@
 #include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/face_tri3_shell.h"
 #include "libmesh/face_tri6.h"
+#include "libmesh/face_tri7.h"
 #include "libmesh/face_quad4.h"
 #include "libmesh/face_quad4_shell.h"
 #include "libmesh/face_quad8.h"
@@ -285,6 +286,8 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
       return libmesh_make_unique<Tri3Subdivision>(p);
     case TRI6:
       return libmesh_make_unique<Tri6>(p);
+    case TRI7:
+      return libmesh_make_unique<Tri7>(p);
     case QUAD4:
       return libmesh_make_unique<Quad4>(p);
     case QUADSHELL4:
