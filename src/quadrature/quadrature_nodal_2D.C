@@ -145,6 +145,25 @@ void QNodal::init_2D(const ElemType, unsigned int)
         return;
       }
 
+    case TRI7:
+      {
+        // We can't exactly represent cubics with only seven nodes,
+        // but with w_i = integral(phi_i) for Lagrange shape functions
+        // phi_i, we not only get exact integrals of every Lagrange
+        // shape function, including the cubic bubble, we also get
+        // exact integrals of the rest of P^3 too.
+         _points =
+          {
+            Point(0.,0.), Point(+1,0.), Point(0.,+1), Point(.5,0.),
+            Point(.5,.5), Point(0.,.5), Point(1/Real(3),1/Real(3))
+          };
+
+        Real wv = Real(1)/15;
+        Real we = Real(1)/40;
+        _weights = {wv, wv, wv, we, we, we, Real(9)/40};
+        return;
+      }
+
     default:
       libmesh_error_msg("Element type not supported!:" << Utility::enum_to_string(_type));
     }

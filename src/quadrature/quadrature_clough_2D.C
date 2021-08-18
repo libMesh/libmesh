@@ -41,6 +41,7 @@ void QClough::init_2D(const ElemType, unsigned int)
       // Triangle quadrature rules
     case TRI3:
     case TRI6:
+    case TRI7:
       {
         std::vector<Point> & gausspoints = gauss_rule.get_points();
         std::vector<Real> & gaussweights = gauss_rule.get_weights();

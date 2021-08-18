@@ -55,6 +55,7 @@ void QGrid::init_2D(const ElemType, unsigned int)
     case TRISHELL3:
     case TRI3SUBDIVISION:
     case TRI6:
+    case TRI7:
       {
         const unsigned int np = (_order + 1)*(_order + 2)/2;
         const Real weight = Real(0.5)/np;
