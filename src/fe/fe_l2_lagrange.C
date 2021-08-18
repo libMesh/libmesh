@@ -80,10 +80,14 @@ void l2_lagrange_nodal_soln(const Elem * elem,
             }
 
 
+          case TRI7:
+            libmesh_assert_equal_to (nodal_soln.size(), 7);
+            nodal_soln[6] = (elem_soln[0] + elem_soln[1] + elem_soln[2])/3.;
+            libmesh_fallthrough();
           case TRI6:
             {
+              libmesh_assert (type == TRI7 || nodal_soln.size() == 6);
               libmesh_assert_equal_to (elem_soln.size(), 3);
-              libmesh_assert_equal_to (nodal_soln.size(), 6);
 
               nodal_soln[0] = elem_soln[0];
               nodal_soln[1] = elem_soln[1];
@@ -91,7 +95,6 @@ void l2_lagrange_nodal_soln(const Elem * elem,
               nodal_soln[3] = .5*(elem_soln[0] + elem_soln[1]);
               nodal_soln[4] = .5*(elem_soln[1] + elem_soln[2]);
               nodal_soln[5] = .5*(elem_soln[2] + elem_soln[0]);
-
               return;
             }
 
@@ -310,6 +313,7 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
           case TRI3:
           case TRISHELL3:
           case TRI6:
+          case TRI7:
             return 3;
 
           case QUAD4:
@@ -361,6 +365,7 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
 
           case TRI3:
           case TRI6:
+          case TRI7:
             return 6;
 
           case QUAD8:
@@ -415,6 +420,9 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
           case EDGE3:
           case EDGE4:
             return 4;
+
+          case TRI7:
+            return 7;
 
           case INVALID_ELEM:
             return 0;

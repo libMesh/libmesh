@@ -98,6 +98,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
             }
 
           case TRI6:
+          case TRI7:
             {
               const Real xi  = p(0);
               const Real eta = p(1);
@@ -263,6 +264,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
             }
 
           case TRI6:
+          case TRI7:
             {
               libmesh_assert_less (i, 3);
 
@@ -388,6 +390,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
             }
 
           case TRI6:
+          case TRI7:
             {
               libmesh_assert_less (i, 3);
               // All second derivatives for linear triangles are zero.

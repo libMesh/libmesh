@@ -121,6 +121,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case TRI3:
           case TRISHELL3:
           case TRI6:
+          case TRI7:
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
@@ -167,6 +168,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case TRI3:
           case TRISHELL3:
           case TRI6:
+          case TRI7:
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
@@ -213,6 +215,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case TRI3:
           case TRISHELL3:
           case TRI6:
+          case TRI7:
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
@@ -258,6 +261,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case TRI3:
           case TRISHELL3:
           case TRI6:
+          case TRI7:
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
@@ -302,6 +306,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case TRI3:
           case TRISHELL3:
           case TRI6:
+          case TRI7:
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:

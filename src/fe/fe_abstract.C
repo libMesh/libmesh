@@ -376,6 +376,18 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         nodes[5] = Point (0.,.5,0.);
         return;
       }
+    case TRI7:
+      {
+        nodes.resize(7);
+        nodes[0] = Point (0.,0.,0.);
+        nodes[1] = Point (1.,0.,0.);
+        nodes[2] = Point (0.,1.,0.);
+        nodes[3] = Point (.5,0.,0.);
+        nodes[4] = Point (.5,.5,0.);
+        nodes[5] = Point (0.,.5,0.);
+        nodes[6] = Point (1./3.,1./3.,0.);
+        return;
+      }
     case QUAD4:
     case QUADSHELL4:
       {
@@ -673,6 +685,7 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
     case TRI3:
     case TRISHELL3:
     case TRI6:
+    case TRI7:
       {
         // The reference triangle is isosceles
         // and is bound by xi=0, eta=0, and xi+eta=1.

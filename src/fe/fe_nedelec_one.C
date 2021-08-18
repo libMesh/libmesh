@@ -61,6 +61,7 @@ void nedelec_one_nodal_soln(const Elem * elem,
         switch (elem_type)
           {
           case TRI6:
+          case TRI7:
             {
               libmesh_assert_equal_to (elem_soln.size(), 3);
               libmesh_assert_equal_to (nodal_soln.size(), 6*2);
@@ -161,6 +162,7 @@ unsigned int nedelec_one_n_dofs(const ElemType t, const Order o)
         switch (t)
           {
           case TRI6:
+          case TRI7:
             return 3;
 
           case QUAD8:
@@ -201,6 +203,7 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
         switch (t)
           {
           case TRI6:
+          case TRI7:
             {
               switch (n)
                 {

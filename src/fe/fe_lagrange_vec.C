@@ -19,9 +19,10 @@
 
 // Local includes
 #include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
-#include "libmesh/elem.h"
 #include "libmesh/tensor_value.h"
 
 
@@ -61,10 +62,15 @@ void lagrange_vec_nodal_soln(const Elem * elem,
       {
         switch (type)
           {
+          case TRI7:
+            libmesh_assert_equal_to (nodal_soln.size(), 14);
+            nodal_soln[12] = (elem_soln[0] + elem_soln[2] + elem_soln[4])/3.;
+            nodal_soln[13] = (elem_soln[1] + elem_soln[3] + elem_soln[5])/3.;
+            libmesh_fallthrough();
           case TRI6:
             {
+              libmesh_assert (type == TRI7 || nodal_soln.size() == 12);
               libmesh_assert_equal_to (elem_soln.size(), 2*3);
-              libmesh_assert_equal_to (nodal_soln.size(), 2*6);
 
               // node 0 components
               nodal_soln[0] = elem_soln[0];
@@ -484,6 +490,21 @@ void lagrange_vec_nodal_soln(const Elem * elem,
       {
         switch (type)
           {
+          case TRI7:
+            {
+              libmesh_assert_equal_to (elem_soln.size(), 12);
+              libmesh_assert_equal_to (nodal_soln.size(), 14);
+
+              for (int i=0; i != 12; ++i)
+                nodal_soln[i] = elem_soln[i];
+
+              nodal_soln[12] = -1./9. * (elem_soln[0] + elem_soln[2] + elem_soln[4])
+                               +4./9. * (elem_soln[6] + elem_soln[8] + elem_soln[10]);
+              nodal_soln[13] = -1./9. * (elem_soln[1] + elem_soln[3] + elem_soln[5])
+                               +4./9. * (elem_soln[7] + elem_soln[9] + elem_soln[11]);
+
+              return;
+            }
           default:
             {
               // By default the element solution _is_ nodal,
@@ -495,11 +516,17 @@ void lagrange_vec_nodal_soln(const Elem * elem,
           }
       }
 
-    default:
+    case THIRD:
       {
+        // By default the element solution _is_ nodal,
+        // so just copy it.
+        nodal_soln = elem_soln;
 
+        return;
       }
 
+    default:
+      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(totalorder) << " selected for LAGRANGE FE family!");
     } // switch(totalorder)
 
 }// void lagrange_vec_nodal_soln
