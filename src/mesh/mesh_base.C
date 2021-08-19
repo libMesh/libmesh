@@ -1584,7 +1584,7 @@ MeshBase::post_dofobject_moves(MeshBase && other_mesh)
   // _shared_functors
   _shared_functors = std::move(other_mesh._shared_functors);
 
-  for (const auto sf : _shared_functors )
+  for (const auto & sf : _shared_functors )
   {
     (sf.second)->set_mesh(this);
   }
