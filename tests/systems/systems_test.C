@@ -26,6 +26,7 @@
 #include <libmesh/face_quad8.h>
 #include <libmesh/face_tri3.h>
 #include <libmesh/face_tri6.h>
+#include <libmesh/face_tri7.h>
 #include <libmesh/cell_hex8.h>
 #include <libmesh/cell_hex20.h>
 #include <libmesh/cell_hex27.h>
@@ -438,9 +439,11 @@ public:
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testProjectHierarchicQuad9 );
   CPPUNIT_TEST( testProjectHierarchicTri6 );
+  CPPUNIT_TEST( testProjectHierarchicTri7 );
   CPPUNIT_TEST( test2DProjectVectorFETri3 );
   CPPUNIT_TEST( test2DProjectVectorFEQuad4 );
   CPPUNIT_TEST( test2DProjectVectorFETri6 );
+  CPPUNIT_TEST( test2DProjectVectorFETri7 );
   CPPUNIT_TEST( test2DProjectVectorFEQuad8 );
   CPPUNIT_TEST( test2DProjectVectorFEQuad9 );
 #ifdef LIBMESH_HAVE_SOLVER
@@ -1632,11 +1635,13 @@ public:
   void testProjectHierarchicEdge3() { testProjectLine(EDGE3); }
   void testProjectHierarchicQuad9() { testProjectSquare(QUAD9); }
   void testProjectHierarchicTri6()  { testProjectSquare(TRI6); }
+  void testProjectHierarchicTri7()  { testProjectSquare(TRI7); }
   void testProjectHierarchicHex27() { testProjectCube(HEX27); }
   void testProjectMeshFunctionHex27() { testProjectCubeWithMeshFunction(HEX27); }
   void test2DProjectVectorFETri3() { test2DProjectVectorFE(TRI3); }
   void test2DProjectVectorFEQuad4() { test2DProjectVectorFE(QUAD4); }
   void test2DProjectVectorFETri6() { test2DProjectVectorFE(TRI6); }
+  void test2DProjectVectorFETri7() { test2DProjectVectorFE(TRI7); }
   void test2DProjectVectorFEQuad8() { test2DProjectVectorFE(QUAD8); }
   void test2DProjectVectorFEQuad9() { test2DProjectVectorFE(QUAD9); }
   void test3DProjectVectorFETet4() { test3DProjectVectorFE(TET4); }

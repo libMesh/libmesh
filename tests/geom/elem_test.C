@@ -125,7 +125,7 @@ public:
         {
           if (elem->type() == EDGE2 || elem->type() == EDGE3 || elem->type() == EDGE4)
             CPPUNIT_ASSERT_EQUAL((unsigned int)s, elem->center_node_on_side(s));
-          else if (elem->type() == TRI6)
+          else if (elem->type() == TRI6 || elem->type() == TRI7)
             CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 3), elem->center_node_on_side(s));
           else if (elem->type() == QUAD8 || elem->type() == QUAD9 || elem->type() == QUADSHELL8)
             CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 4), elem->center_node_on_side(s));
@@ -165,6 +165,7 @@ INSTANTIATE_ELEMTEST(EDGE4);
 #if LIBMESH_DIM > 1
 INSTANTIATE_ELEMTEST(TRI3);
 INSTANTIATE_ELEMTEST(TRI6);
+INSTANTIATE_ELEMTEST(TRI7);
 
 INSTANTIATE_ELEMTEST(QUAD4);
 INSTANTIATE_ELEMTEST(QUAD8);
