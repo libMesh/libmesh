@@ -1534,6 +1534,17 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
   if (!elem->active())
     return;
 
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+   if (elem->infinite())
+   {
+      // this would require some generalisation:
+      //  - e.g. the 'my_fe'-object needs generalisation
+      //  - due to lack of one-to-one correspondence of DOFs and nodes,
+      //    this doesn't work easily.
+      libmesh_not_implemented();
+   }
+#endif
+
   const Variable & var = dof_map.variable(variable_number);
   const FEType & base_fe_type = var.type();
 
@@ -1830,6 +1841,13 @@ compute_periodic_constraints (DofConstraints & constraints,
   // Only constrain active elements with this method
   if (!elem->active())
     return;
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+   if (elem->infinite())
+   {
+      libmesh_not_implemented();
+   }
+#endif
 
   const unsigned int Dim = elem->dim();
 

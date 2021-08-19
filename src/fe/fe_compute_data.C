@@ -46,6 +46,7 @@ void FEComputeData::init ()
   if (equation_systems.parameters.have_parameter<Real>("speed"))
     this->speed = this->equation_systems.parameters.get<Real>("speed");
 
+  // ensure that the wavenumber k=2. * libMesh::pi * frequency / speed is well-defined.
   libmesh_assert_not_equal_to(this->speed, 0);
 
   if (equation_systems.parameters.have_parameter<Number>("current frequency"))
@@ -59,11 +60,6 @@ void FEComputeData::init ()
       this->frequency = static_cast<Number> (this->equation_systems.parameters.get<Real>("current frequency"));
     }
 #endif
-
-  // ensure that the wavenumber k=2. * libMesh::pi * this->frequency / this->speed
-  // in src/fe/inf_fe_static.C: 310
-  // is well-defined. 0 as well as NaN will lead to problems here.
-  libmesh_assert_not_equal_to(this->frequency, 0.);
 
   this->phase = 0.;
 

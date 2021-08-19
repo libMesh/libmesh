@@ -29,6 +29,11 @@
 #include "libmesh/elem.h"
 #include "libmesh/enum_to_string.h"
 
+#include "libmesh/remote_elem.h"
+
+// to fetch NodeConstraintRow:
+#include "libmesh/dof_map.h"
+
 namespace libMesh
 {
 
@@ -1187,6 +1192,326 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
 }
 
 
+#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+void InfFE<Dim, T_radial, T_map>::inf_compute_node_constraints (NodeConstraints & constraints,const Elem * elem)
+{
+  // only constrain elements in 2,3d.
+  if (Dim == 1)
+    return;
+
+  libmesh_assert(child_elem);
+
+  // only constrain active and ancestor elements
+  if (child_elem->subactive())
+    return;
+
+  // for infinite elements, the computation of constraints is somewhat different
+  // than for Lagrange elements:
+  // 1) Only the base element (i.e. side(0) ) may be refined.
+  //    Thus, in radial direction no constraints must be considered.
+  // 2) Due to the tensorial structure of shape functions (base_shape * radial_function),
+  //    it must be ensured that all element DOFs inherit that constraint.
+  // Consequently, the constraints are computed on the base (baseh_shape) but must
+  // be applied to all DOFs with the respective base_shape index (i.e. for all radial_functions).
+  //
+  // FIXME: In the current form, this function does not work for infinite elements
+  //        because constraining the non-base points requires knowledge of the T_map and T_radial
+  //        parameters; but they are not accessible via the element and may differ between variables.
+  //
+  // For the moment being, we just check if this element can be skipped and fail otherwise.
+
+  // if one of the sides needs a constraint, an error is thrown.
+  // In other cases, we leave the function regularly.
+  for (auto s : elem->side_index_range())
+    {
+      if (elem->neighbor_ptr(s) != nullptr &&
+          elem->neighbor_ptr(s) != remote_elem)
+        if (elem->neighbor_ptr(s)->level() < elem->level())
+          {
+            libmesh_not_implemented();
+          }
+    }
+}
+
+#endif //LIBMESH_ENABLE_NODE_CONSTRAINTS
+
+
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & constraints,
+                                                           DofMap & dof_map,
+                                                           const unsigned int variable_number,
+                                                           const Elem * child_elem)
+{
+
+  // only constrain elements in 2,3d.
+  if (Dim == 1)
+    return;
+
+  libmesh_assert(child_elem);
+
+  // only constrain active and ancestor elements
+  if (child_elem->subactive())
+    return;
+
+  // Before we start to compute anything, lets check if any confinement is needed:
+  bool need_constraints=false;
+  for (auto child_neighbor : child_elem->neighbor_ptr_range())
+    if (child_neighbor->level() < child_elem->level())
+      {
+        need_constraints = true;
+        break;
+      }
+  if (!need_constraints)
+    return;
+
+  // For infinite elements, the computation of constraints is somewhat different
+  // than for Lagrange elements:
+  // 1) When an infinite element is refined, only the base element (i.e. side(0) ) is refined.
+  //
+  // 2) Due to the tensorial structure of shape functions (base_shape * radial_function),
+  //    it must be ensured that all element DOFs inherit that constraint.
+  //    It is important here to distinguish the (total) DOF from base DOF and radial DOF contributions.
+  //
+  // 3) Due to the generality of radial polynomial (of type fe_type.radial_family and with order fe_type.radial_order)
+  //    here basis functions cannot be mapped to nodes: Independent from the radial polynomial,
+  //    infinite elements have one set of nodes at the base (side(0)) and a second set at twice the distance to their origin.
+  //
+  //    Independent from the polynomial and degree used, the first radial DOF is 1 at the base while all others are 0 there
+  //
+  //Constraining of DOFs is only needed when a DOF is nonzero at the elements face shared with a coarser element.
+  // Thus, the following scheme is used here:
+  //
+  //  -If the coarser element is the neighbor(0) (i.e. we share only the base), we must constrain
+  //   all DOFs that correspond to the first order radial contribution.
+  //  -if an infinite neighbor is coarser (than 'child_elem'), all those DOFs must be constrained
+  //   whose contribution from the base is non-zero at the interface.
+  //   In this case, we lack a point-assignement between DOFs and nodes, but since there is no refinement in radial direction,
+  //   the radial polynomials coincide on neighboring elements.
+  //   Thus, if one constraines these DOFs at one (arbitrary) point correctly, they match for each point along the radial direction.
+  //   Hence, we constrain them with the same values as those DOFs belonging to the first order polynomial, obtaining consistent
+  //   constraints that mimick constraints that are computed at the support points for each radial polynomial contribution.
+
+  FEType fe_type = dof_map.variable_type(variable_number);
+
+  libmesh_assert(fe_type.family == LAGRANGE);
+
+  std::vector<dof_id_type> child_base_dof_indices, parent_base_dof_indices;
+  std::vector<dof_id_type> child_elem_dof_indices, parent_elem_dof_indices;
+
+  const Elem * parent_elem = child_elem->parent();
+
+  // This can't happen...  Only level-0 elements have nullptr
+  // parents, and no level-0 elements can be at a higher
+  // level than their neighbors!
+  libmesh_assert(parent_elem);
+
+  dof_map.dof_indices (child_elem, child_elem_dof_indices,
+                       variable_number);
+  dof_map.dof_indices (parent_elem, parent_elem_dof_indices,
+                       variable_number);
+
+  const unsigned int n_total_dofs = child_elem_dof_indices.size();
+  // fill the elements shape index map: we will have to use it later
+  // to find the elements dofs that correspond to certain base_elem_dofs.
+  std::vector<unsigned int> radial_shape_index(n_total_dofs);
+  std::vector<unsigned int> base_shape_index(n_total_dofs);
+  // fill the shape index map
+#ifdef DEBUG
+  unsigned int max_base_id=0;
+  unsigned int max_radial_id=0;
+#endif
+  for (unsigned int n=0; n<n_total_dofs; ++n)
+    {
+      compute_shape_indices (fe_type,
+                             child_elem,
+                             n,
+                             base_shape_index[n],
+                             radial_shape_index[n]);
+
+#ifdef DEBUG
+      if (base_shape_index[n] > max_base_id)
+        max_base_id = base_shape_index[n];
+      if (radial_shape_index[n] > max_radial_id)
+        max_radial_id = radial_shape_index[n];
+#endif
+    }
+
+#ifdef DEBUG
+  libmesh_assert_equal_to( (max_base_id+1)*(max_radial_id+1), n_total_dofs );
+#endif
+
+  for (auto s : child_elem->side_index_range())
+    if (child_elem->neighbor_ptr(s) != nullptr &&
+        child_elem->neighbor_ptr(s) != remote_elem)
+      if (child_elem->neighbor_ptr(s)->level() < child_elem->level())
+        {
+          // we ALWAYS take the base element for reference:
+          // - For s=0, we refine all dofs with `radial_shape_index == 0
+          // - for s>0, we refine all dofs whose corresponding base_shape has its support point shared with neighbor(s)
+          std::unique_ptr<const Elem> child_base, parent_base;
+          child_elem->build_side_ptr(child_base, 0);
+          parent_elem->build_side_ptr(parent_base, 0);
+
+          const unsigned int n_base_dofs =
+            FEInterface::n_dofs(fe_type, child_base.get());
+
+          // We need global DOF indices for both base and 'full' elements
+          dof_map.dof_indices (child_base.get(), child_base_dof_indices,
+                               variable_number);
+          dof_map.dof_indices (parent_base.get(), parent_base_dof_indices,
+                               variable_number);
+
+
+          // First we loop over the childs base DOFs (nodes) and check which of them needs constraint
+          // and which can be skipped.
+          for (unsigned int child_base_dof=0; child_base_dof != n_base_dofs; ++child_base_dof)
+            {
+              libmesh_assert_less (child_base_dof, child_base->n_nodes());
+
+              // Childs global dof index.
+              const dof_id_type child_base_dof_g = child_base_dof_indices[child_base_dof];
+
+              // Hunt for "constraining against myself" cases before
+              // we bother creating a constraint row
+              bool self_constraint = false;
+              for (unsigned int parent_base_dof=0;
+                   parent_base_dof != n_base_dofs; parent_base_dof++)
+                {
+                  libmesh_assert_less (parent_base_dof, parent_base->n_nodes());
+
+                  // Their global dof index.
+                  const dof_id_type parent_base_dof_g =
+                    parent_base_dof_indices[parent_base_dof];
+
+                  if (parent_base_dof_g == child_base_dof_g)
+                    {
+                      self_constraint = true;
+                      break;
+                    }
+                }
+
+              if (self_constraint)
+                continue;
+
+              // now we need to constrain all __child_elem__ DOFs whose base corresponds to
+              // child_base_dof.
+              //  --> loop over all child_elem dofs whose base_shape_index == child_base_dof
+              unsigned int n_elem_dofs = FEInterface::n_dofs(fe_type, child_elem);
+              libmesh_assert_equal_to(n_elem_dofs, n_total_dofs);
+              for(unsigned int child_elem_dof=0; child_elem_dof != n_elem_dofs; ++child_elem_dof)
+                {
+                  if (base_shape_index[child_elem_dof] != child_base_dof)
+                    continue;
+
+                  // independent from the radial description, the first radial DOF is 1 at the base
+                  // while all others start with 0.
+                  // Thus, to confine for the bases neighbor, we only need to refine DOFs that correspond
+                  // to the first radial DOF
+                  if (s==0)
+                    {
+                      if (radial_shape_index[child_elem_dof] > 0)
+                        continue;
+                    }
+                  else
+                    {
+                      // If the neighbor is not the base, we must check now if the support point of the dof
+                      // is actually shared with that neighbor:
+                      if ( !child_elem->neighbor_ptr(s)->contains_point(child_base->point(child_base_dof)) )
+                        continue;
+                    }
+
+
+                  const dof_id_type child_elem_dof_g = child_elem_dof_indices[child_elem_dof];
+
+                  DofConstraintRow * constraint_row;
+
+                  // we may be running constraint methods concurrently
+                  // on multiple threads, so we need a lock to
+                  // ensure that this constraint is "ours"
+                  {
+                    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+                    if (dof_map.is_constrained_dof(child_elem_dof_g))
+                      continue;
+
+                    constraint_row = &(constraints[child_elem_dof_g]);
+                    libmesh_assert(constraint_row->empty());
+                  }
+
+                  // The support point of the DOF
+                  const Point & support_point = child_base->point(child_base_dof);
+
+                  // Figure out where my (base) node lies on the parents reference element.
+                  const Point mapped_point = FEMap::inverse_map(Dim-1,
+                                                                parent_base.get(),
+                                                                support_point);
+
+                  // now we need the parents base DOFs, evaluated at the mapped_point for refinement:
+                  for (unsigned int parent_base_dof=0;
+                       parent_base_dof != n_base_dofs; parent_base_dof++)
+                    {
+
+                      const Real parent_base_dof_value = FEInterface::shape(Dim-1,
+                                                                            fe_type,
+                                                                            parent_base.get(),
+                                                                            parent_base_dof,
+                                                                            mapped_point);
+
+
+                      // all parent elements DOFs whose base_index corresponds to parent_base_dof
+                      //  must be constrained with the parent_base_dof_value.
+
+                      // The value of the radial function does not play a role here:
+                      // 1) only the function with radial_shape_index[] == 0 are 1 at the base,
+                      //    the others are 0.
+                      // 2) The radial basis is (usually) not a Lagrange polynomial.
+                      //    Thus, constraining according to a support point doesn't work.
+                      //    However, they reach '1' at a certain (radial) distance which is the same for parent and child.
+                      for (unsigned int parent_elem_dof=0;
+                           parent_elem_dof != n_elem_dofs; parent_elem_dof++)
+                        {
+                          if (base_shape_index[parent_elem_dof] != parent_base_dof)
+                            continue;
+
+                          // only constrain with coinciding radial DOFs.
+                          // Otherwise, we start coupling all DOFs with each other and end up in a mess.
+                          if (radial_shape_index[parent_elem_dof] != radial_shape_index[child_elem_dof])
+                            continue;
+
+                          // Their global dof index.
+                          const dof_id_type parent_elem_dof_g =
+                            parent_elem_dof_indices[parent_elem_dof];
+
+                          // Only add non-zero and non-identity values
+                          // for Lagrange basis functions. (parent_base is assumed to be of Lagrange-type).
+                          if ((std::abs(parent_base_dof_value) > 1.e-5) &&
+                              (std::abs(parent_base_dof_value) < .999))
+                            {
+                              constraint_row->emplace(parent_elem_dof_g, parent_base_dof_value);
+                            }
+#ifdef DEBUG
+                          // Protect for the case u_i = 0.999 u_j,
+                          // in which case i better equal j.
+                          else if (parent_base_dof_value >= .999)
+                            {
+                              libmesh_assert_equal_to (child_base_dof_g, parent_base_dof_indices[parent_base_dof]);
+                              libmesh_assert_equal_to (child_elem_dof_g, parent_elem_dof_g);
+                            }
+#endif
+                        }
+
+                    }
+                }
+
+            }
+        }
+}
+
+#endif // LIBMESH_ENABLE_AMR
+
 
 //--------------------------------------------------------------
 // Explicit instantiations
@@ -1245,6 +1570,16 @@ INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_data(const FEType &, const E
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, nodal_soln(const FEType &, const Elem *, const std::vector<Number> &, std::vector<Number> &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, nodal_soln(const FEType &, const Elem *, const std::vector<Number> &, std::vector<Number> &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, nodal_soln(const FEType &, const Elem *, const std::vector<Number> &, std::vector<Number> &));
+#ifdef LIBMESH_ENABLE_AMR
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, inf_compute_constraints(DofConstraints &, DofMap &, const unsigned int, const Elem *));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, inf_compute_constraints(DofConstraints &, DofMap &, const unsigned int, const Elem *));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, inf_compute_constraints(DofConstraints &, DofMap &, const unsigned int, const Elem *));
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, inf_compute_node_constraints(NodeConstraints & constraints,const Elem * elem));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, inf_compute_node_constraints(NodeConstraints & constraints,const Elem * elem));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, inf_compute_node_constraints(NodeConstraints & constraints,const Elem * elem));
+#endif
+#endif
 
 } // namespace libMesh
 

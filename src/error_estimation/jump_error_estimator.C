@@ -183,6 +183,16 @@ void JumpErrorEstimator::estimate_error (const System & system,
       const dof_id_type e_id = e->id();
 
 #ifdef LIBMESH_ENABLE_AMR
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      if (e->infinite())
+      {
+         libmesh_warning("Warning: Jumps on the boarder of infinite elements are ignored."
+                         << std::endl);
+         continue;
+      }
+#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
+
       // See if the parent of element e has been examined yet;
       // if not, we may want to compute the estimator on it
       const Elem * parent = e->parent();
@@ -221,6 +231,11 @@ void JumpErrorEstimator::estimate_error (const System & system,
                        a != n_active_neighbors; ++a)
                     {
                       const Elem * f = active_neighbors[a];
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+                      if (f ->infinite()) // don't take infinite elements into account
+                         continue;
+#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
                       // FIXME - what about when f->level <
                       // parent->level()??
                       if (f->level() >= parent->level())
@@ -307,8 +322,14 @@ void JumpErrorEstimator::estimate_error (const System & system,
               fine_context->side_fe_reinit();
             }
 
-          if (e->neighbor_ptr(n_e) != nullptr) // e is not on the boundary
+          // e is not on the boundary (infinite elements are treated as boundary)
+          if (e->neighbor_ptr(n_e) != nullptr
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+              && !e->neighbor_ptr(n_e) ->infinite()
+#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
+              )
             {
+
               const Elem * f           = e->neighbor_ptr(n_e);
               const dof_id_type f_id = f->id();
 

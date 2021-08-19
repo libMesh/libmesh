@@ -571,7 +571,6 @@ public:
    */
   virtual const std::vector<Real> & get_JxW () const override
   {
-      //libmesh_not_implemented();
       return this->JxW;
   }
 
@@ -781,6 +780,26 @@ public:
    */
   virtual const std::vector<RealGradient> & get_Sobolev_dweightxR_sq() const override
   { calculate_map = true; return dweightxr_sq; }
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+  /**
+   * Computes the constraint matrix contributions (for
+   * non-conforming adapted meshes) corresponding to
+   * variable number \p var_number, adapted to infinite elements.
+   */
+static void inf_compute_constraints (DofConstraints & constraints,
+                                     DofMap & dof_map,
+                                     const unsigned int variable_number,
+                                     const Elem * child_elem);
+#endif
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  static void inf_compute_node_constraints (NodeConstraints & constraints,
+                                        const Elem * elem);
+#endif
+
 
 protected:
 
