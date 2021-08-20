@@ -36,7 +36,7 @@ const int Edge2::nodes_per_edge;
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Edge2::_embedding_matrix[Edge2::num_children][Edge2::num_nodes][Edge2::num_nodes] =
+const Real Edge2::_embedding_matrix[Edge2::num_children][Edge2::num_nodes][Edge2::num_nodes] =
   {
     // embedding matrix for child 0
     {

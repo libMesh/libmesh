@@ -49,7 +49,7 @@ const unsigned int Tri7::side_nodes_map[Tri7::num_sides][Tri7::nodes_per_side] =
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Tri7::_embedding_matrix[Tri7::num_children][Tri7::num_nodes][Tri7::num_nodes] =
+const Real Tri7::_embedding_matrix[Tri7::num_children][Tri7::num_nodes][Tri7::num_nodes] =
   {
     // embedding matrix for child 0
     {

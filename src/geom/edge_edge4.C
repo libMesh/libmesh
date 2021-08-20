@@ -35,7 +35,7 @@ const int Edge4::nodes_per_edge;
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Edge4::_embedding_matrix[Edge4::num_children][Edge4::num_nodes][Edge4::num_nodes] =
+const Real Edge4::_embedding_matrix[Edge4::num_children][Edge4::num_nodes][Edge4::num_nodes] =
   {
     // embedding matrix for child 0
 

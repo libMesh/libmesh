@@ -1942,7 +1942,7 @@ unsigned int Elem::as_parent_node (unsigned int child,
             {
               for (signed char n = 0; n != nn; ++n)
                 {
-                  const float em_val = this->embedding_matrix
+                  const Real em_val = this->embedding_matrix
                     (c, cn, n);
                   if (em_val == 1)
                     {
@@ -2071,7 +2071,7 @@ Elem::parent_bracketing_nodes(unsigned int child,
 
                   for (unsigned int pn = 0; pn != nn; ++pn)
                     {
-                      const float em_val =
+                      const Real em_val =
                         this->embedding_matrix(c,n,pn);
 
                       libmesh_assert_not_equal_to (em_val, 1);
@@ -2134,7 +2134,7 @@ Elem::parent_bracketing_nodes(unsigned int child,
                     {
                       for (unsigned int pn = 0; pn != nn; ++pn)
                         {
-                          const float em_val =
+                          const Real em_val =
                             this->embedding_matrix(c,n,pn);
 
                           libmesh_assert_not_equal_to (em_val, 1);

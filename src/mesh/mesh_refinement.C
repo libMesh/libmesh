@@ -178,7 +178,7 @@ Node * MeshRefinement::add_node(Elem & parent,
   for (auto n : parent.node_index_range())
     {
       // The value from the embedding matrix
-      const float em_val = parent.embedding_matrix(child,node,n);
+      const Real em_val = parent.embedding_matrix(child,node,n);
 
       if (em_val != 0.)
         {

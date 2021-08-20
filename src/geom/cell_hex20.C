@@ -500,7 +500,7 @@ Real Hex20::volume () const
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Hex20::_embedding_matrix[Hex20::num_children][Hex20::num_nodes][Hex20::num_nodes] =
+const Real Hex20::_embedding_matrix[Hex20::num_children][Hex20::num_nodes][Hex20::num_nodes] =
   {
     // embedding matrix for child 0
     {

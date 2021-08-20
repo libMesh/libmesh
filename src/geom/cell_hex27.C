@@ -924,7 +924,7 @@ Real Hex27::volume () const
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Hex27::_embedding_matrix[Hex27::num_children][Hex27::num_nodes][Hex27::num_nodes] =
+const Real Hex27::_embedding_matrix[Hex27::num_children][Hex27::num_nodes][Hex27::num_nodes] =
   {
     // embedding matrix for child 0
     {

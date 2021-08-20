@@ -45,7 +45,7 @@ const unsigned int Tri6::side_nodes_map[Tri6::num_sides][Tri6::nodes_per_side] =
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Tri6::_embedding_matrix[Tri6::num_children][Tri6::num_nodes][Tri6::num_nodes] =
+const Real Tri6::_embedding_matrix[Tri6::num_children][Tri6::num_nodes][Tri6::num_nodes] =
   {
     // embedding matrix for child 0
     {

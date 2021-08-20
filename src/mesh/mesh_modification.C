@@ -1267,7 +1267,7 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
                             /*
                              * The value from the embedding matrix
                              */
-                            const float em_val = parent->embedding_matrix(c,nc,n);
+                            const Real em_val = parent->embedding_matrix(c,nc,n);
 
                             if (em_val != 0.)
                               point.add_scaled (parent->point(n), em_val);

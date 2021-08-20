@@ -1792,9 +1792,9 @@ public:
   /**
    * \returns The embedding matrix entry for the requested child.
    */
-  virtual float embedding_matrix (const unsigned int child_num,
-                                  const unsigned int child_node_num,
-                                  const unsigned int parent_node_num) const = 0;
+  virtual Real embedding_matrix (const unsigned int child_num,
+                                 const unsigned int child_node_num,
+                                 const unsigned int parent_node_num) const = 0;
 
   /**
    * \returns A "version number" that identifies which embedding

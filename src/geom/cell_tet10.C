@@ -549,7 +549,7 @@ const unsigned short int Tet10::_second_order_adjacent_vertices[6][2] =
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Tet10::_embedding_matrix[Tet10::num_children][Tet10::num_nodes][Tet10::num_nodes] =
+const Real Tet10::_embedding_matrix[Tet10::num_children][Tet10::num_nodes][Tet10::num_nodes] =
   {
     // embedding matrix for child 0
     {
@@ -674,9 +674,9 @@ const float Tet10::_embedding_matrix[Tet10::num_children][Tet10::num_nodes][Tet1
 
 
 
-float Tet10::embedding_matrix (const unsigned int i,
-                               const unsigned int j,
-                               const unsigned int k) const
+Real Tet10::embedding_matrix (const unsigned int i,
+                              const unsigned int j,
+                              const unsigned int k) const
 {
   // Choose an optimal diagonal, if one has not already been selected
   this->choose_diagonal();

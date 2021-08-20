@@ -441,7 +441,7 @@ InfHex16::second_order_child_vertex (const unsigned int n) const
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float InfHex16::_embedding_matrix[InfHex16::num_children][InfHex16::num_nodes][InfHex16::num_nodes] =
+const Real InfHex16::_embedding_matrix[InfHex16::num_children][InfHex16::num_nodes][InfHex16::num_nodes] =
   {
     // embedding matrix for child 0
     {

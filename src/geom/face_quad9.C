@@ -46,7 +46,7 @@ const unsigned int Quad9::side_nodes_map[Quad9::num_sides][Quad9::nodes_per_side
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Quad9::_embedding_matrix[Quad9::num_children][Quad9::num_nodes][Quad9::num_nodes] =
+const Real Quad9::_embedding_matrix[Quad9::num_children][Quad9::num_nodes][Quad9::num_nodes] =
   {
     // embedding matrix for child 0
     {
