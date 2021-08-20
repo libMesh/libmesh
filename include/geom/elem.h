@@ -894,6 +894,13 @@ public:
   virtual Order default_order () const = 0;
 
   /**
+   * \returns The default approximation order for side elements of
+   * this element type.  This may be lower for elements with 'bubble
+   * functions' in the Lagrange basis.
+   */
+  virtual Order default_side_order () const { return default_order(); }
+
+  /**
    * Calls Elem::vertex_average() for backwards compatibility. This
    * method has now been deprecated, so it will be removed at some
    * point in the future.  Calls to Elem::centroid() in user code
