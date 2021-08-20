@@ -131,9 +131,14 @@ public:
   virtual bool has_affine_map () const override;
 
   /**
-   * \returns SECOND.
+   * \returns THIRD.
    */
   virtual Order default_order() const override;
+
+  /**
+   * \returns SECOND - the sides are EDGE3
+   */
+  virtual Order default_side_order() const override;
 
   /**
    * Don't hide Elem::key() defined in the base class.

@@ -194,6 +194,13 @@ Order Tri7::default_order() const
 
 
 
+Order Tri7::default_side_order() const
+{
+  return SECOND;
+}
+
+
+
 dof_id_type Tri7::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
