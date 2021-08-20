@@ -929,7 +929,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
 
 #endif
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
-  const FEType fe_type(elem->default_order(), mapping_family);
+  const FEType fe_type(elem->default_side_order(), mapping_family);
 
   // Pull objects out of the loop to reduce heap operations
   std::vector<const Node *> my_nodes, parent_nodes;
@@ -1078,7 +1078,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
   const unsigned int Dim = elem->dim();
 
   const FEFamily mapping_family = FEMap::map_fe_type(*elem);
-  const FEType fe_type(elem->default_order(), mapping_family);
+  const FEType fe_type(elem->default_side_order(), mapping_family);
 
   // Pull objects out of the loop to reduce heap operations
   std::vector<const Node *> my_nodes, neigh_nodes;
