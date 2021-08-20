@@ -100,6 +100,18 @@ const float Tri7::_embedding_matrix[Tri7::num_children][Tri7::num_nodes][Tri7::n
     }
   };
 
+const std::vector<std::pair<unsigned char, unsigned char>>
+  Tri7::_parent_bracketing_nodes[Tri7::num_children][Tri7::num_nodes] =
+  {
+    // Child 0
+    {    {{}},   {{}},{{0,2}},{{0,3}},{{3,5}},{{0,5}},{{0,6}} },
+    // Child 1
+    { {{0,1}},   {{}},{{1,2}},{{1,3}},{{1,4}},{{3,4}},{{1,6}} },
+    // Child 2
+    { {{0,2}},{{1,2}},   {{}},{{4,5}},{{2,4}},{{2,5}},{{2,6}} },
+    // Child 3
+    { {{0,1}},{{1,2}},{{0,2}},{{3,4}},{{4,5}},{{3,5}},   {{}} }
+  };
 #endif
 
 
