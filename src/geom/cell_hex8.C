@@ -359,13 +359,10 @@ const float Hex8::_embedding_matrix[Hex8::num_children][Hex8::num_nodes][Hex8::n
 
 
 
-Point Hex8::true_centroid () const
+Point Hex8::centroid_from_points(
+  const Point & x0, const Point & x1, const Point & x2, const Point & x3,
+  const Point & x4, const Point & x5, const Point & x6, const Point & x7)
 {
-  // Convenient references to the vertices
-  const Point
-    &x0 = point(0), &x1 = point(1), &x2 = point(2), &x3 = point(3),
-    &x4 = point(4), &x5 = point(5), &x6 = point(6), &x7 = point(7);
-
   // The Jacobian is dx/d(xi) dot (dx/d(eta) cross dx/d(zeta)), where
   // dx/d(xi)   = a1*eta*zeta + b1*eta + c1*zeta + d1
   // dx/d(eta)  = a2*xi*zeta  + b2*xi  + c2*zeta + d2
@@ -427,18 +424,18 @@ Point Hex8::true_centroid () const
       }
 
   // Compute centroid
-  Point cp;
-  Real vol = 0.;
-
-  for (int i=0; i<Hex8::num_nodes; ++i)
-    {
-      cp += this->point(i) * V[i];
-      vol += V[i];
-    }
-
-  return cp / vol;
+  return
+    (x0*V[0] + x1*V[1] + x2*V[2] + x3*V[3] + x4*V[4] + x5*V[5] + x6*V[6] + x7*V[7]) /
+    (V[0] + V[1] + V[2] + V[3] + V[4] + V[5] + V[6] + V[7]);
 }
 
+
+Point Hex8::true_centroid () const
+{
+  return Hex8::centroid_from_points
+    (point(0), point(1), point(2), point(3),
+     point(4), point(5), point(6), point(7));
+}
 
 
 Real Hex8::volume () const

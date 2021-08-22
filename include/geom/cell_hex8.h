@@ -185,6 +185,17 @@ public:
   static const unsigned int edge_sides_map[num_edges][2];
 
   /**
+   * Class static helper function that computes the centroid of a
+   * hexahedral region from a set of input points which are assumed to
+   * be in counter-clockwise order. Hex8::true_centroid() and
+   * Pyramid5::true_centroid() are implemented in terms of this
+   * function.
+   */
+  static Point centroid_from_points(
+    const Point & x0, const Point & x1, const Point & x2, const Point & x3,
+    const Point & x4, const Point & x5, const Point & x6, const Point & x7);
+
+  /**
    * We compute the centroid of the Hex using a customized numerical
    * quadrature approach that avoids unnecessary object creation/heap
    * allocations.
