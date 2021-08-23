@@ -846,61 +846,57 @@ void ExodusII_IO_Helper::read_bex_cv_blocks()
       ex_err = exII::ex_get_attributes(ex_id, n_global_attr, attributes.data());
       EX_CHECK_ERR(ex_err, "Error getting global attribute values.");
 
-      std::vector<int> bex_num_cv_blocks(2, 0);
-      std::vector<long unsigned int> bex_cv_block_info;
+      int bex_num_dense_cv_blocks=0;
+      std::vector<long unsigned int> bex_dense_cv_info;
 
       for (auto attr : attributes)
         {
-          if (std::string("bex_num_cv_blocks") == attr.name)
+          if (std::string("bex_num_dense_cv_blocks") == attr.name)
             {
               if (attr.type != exII::EX_INTEGER)
-                libmesh_error_msg("Found non-integer bex_num_cv_blocks");
+                libmesh_error_msg("Found non-integer bex_num_dense_cv_blocks");
 
-              if (attr.value_count > 2)
-                libmesh_error_msg("Looking for at most 2 bex_num_cv_blocks; found " << attr.value_count);
+              if (attr.value_count > 1)
+                libmesh_error_msg("Looking for 1 bex_num_dense_cv_blocks; found " << attr.value_count);
 
-              const int * as_int = static_cast<int *>(attr.values);
-              std::copy(as_int, as_int+attr.value_count, bex_num_cv_blocks.begin());
-
-              if (bex_num_cv_blocks[1])
-                libmesh_not_implemented_msg("Bezier Extraction sparse coefficient blocks are unsupported");
+              bex_num_dense_cv_blocks = *(static_cast<int *>(attr.values));
             }
-          else if (std::string("bex_cv_block_info") == attr.name)
+          else if (std::string("bex_dense_cv_info") == attr.name)
             {
               if (attr.type != exII::EX_INTEGER)
-                libmesh_error_msg("Found non-integer bex_cv_block_info");
+                libmesh_error_msg("Found non-integer bex_dense_cv_info");
 
-              if (!bex_num_cv_blocks[0])
+              if (!bex_num_dense_cv_blocks)
                 libmesh_not_implemented_msg("Inconsistent/reordered Bezier Extraction coefficient block counts");
 
-              const std::size_t block_data_size = 2*bex_num_cv_blocks[0];
+              const std::size_t block_data_size = 2*bex_num_dense_cv_blocks;
               if (attr.value_count != block_data_size)
-                libmesh_error_msg("Looking for " << block_data_size << " bex_num_cv_blocks; found " << attr.value_count);
+                libmesh_error_msg("Looking for " << block_data_size << " bex_dense_cv_info; found " << attr.value_count);
 
-              bex_cv_block_info.resize(block_data_size, 0);
+              bex_dense_cv_info.resize(block_data_size, 0);
 
               const int * as_int = static_cast<int *>(attr.values);
-              std::copy(as_int, as_int+block_data_size, bex_cv_block_info.begin());
+              std::copy(as_int, as_int+block_data_size, bex_dense_cv_info.begin());
             }
           else if (std::string("bex_dense_cv_blocks") == attr.name)
             {
               if (attr.type != exII::EX_DOUBLE)
                 libmesh_error_msg("Found non-double bex_dense_cv_blocks");
 
-              if (bex_cv_block_info.empty())
+              if (bex_dense_cv_info.empty())
                 libmesh_not_implemented_msg("Inconsistent/reordered Bezier Extraction coefficient block info");
 
               const double * as_double = static_cast<double *>(attr.values);
 
               bex_dense_constraint_vecs.clear();
-              bex_dense_constraint_vecs.resize(bex_num_cv_blocks[0]);
+              bex_dense_constraint_vecs.resize(bex_num_dense_cv_blocks);
               std::size_t offset = 0;
-              for (auto i : IntRange<std::size_t>(0, bex_num_cv_blocks[0]))
+              for (auto i : IntRange<std::size_t>(0, bex_num_dense_cv_blocks))
                 {
-                  bex_dense_constraint_vecs[i].resize(bex_cv_block_info[2*i]);
+                  bex_dense_constraint_vecs[i].resize(bex_dense_cv_info[2*i]);
                   for (auto & vec : bex_dense_constraint_vecs[i])
                     {
-                      const int vecsize = bex_cv_block_info[2*i+1];
+                      const int vecsize = bex_dense_cv_info[2*i+1];
                       vec.resize(vecsize);
                       std::copy(as_double+offset, as_double+offset+vecsize, vec.begin());
                       offset += vecsize;
@@ -1140,7 +1136,7 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
           else if (std::string("bex_cv_conn") == attr.name)
             {
               if (attr.type != exII::EX_INTEGER)
-                libmesh_error_msg("Found non-integer bex_num_cv_blocks");
+                libmesh_error_msg("Found non-integer bex_cv_conn");
 
               libmesh_assert_bezier_elem(elem_type.data());
 
