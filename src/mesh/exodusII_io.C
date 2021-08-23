@@ -208,7 +208,8 @@ void ExodusII_IO::read (const std::string & fname)
   // If we have Rational Bezier weights, we'll need to
   // store them.
   unsigned char weight_index = 0;
-  if (!exio_helper->w.empty())
+  const bool weights_exist = !exio_helper->w.empty();
+  if (weights_exist)
     {
       const Real default_weight = 1.0;
       weight_index = cast_int<unsigned char>
@@ -244,6 +245,10 @@ void ExodusII_IO::read (const std::string & fname)
       // flagged as an unused node.
       if (!exio_helper->w.empty())
         {
+          const auto w = exio_helper->w[i];
+          Point & p = *added_node;
+          p /= w;  // Exodus Bezier Extraction stores spline nodes in projective space
+
           added_node->set_extra_datum<Real>(weight_index, exio_helper->w[i]);
 
           std::unique_ptr<Elem> elem = Elem::build(NODEELEM);
