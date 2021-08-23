@@ -10,6 +10,7 @@
 #include "libmesh_cppunit.h"
 
 #include <array>
+#include <cstddef> // std::ptrdiff_t
 
 using namespace libMesh;
 
