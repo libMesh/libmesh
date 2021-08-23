@@ -187,7 +187,8 @@ public:
   /**
    * Class static helper function that computes the centroid of a
    * hexahedral region from a set of input points which are assumed to
-   * be in counter-clockwise order. Hex8::true_centroid() and
+   * be in the standard "Hex8" ordering, possibly with some duplicates
+   * indicating a "degenerate" side. Hex8::true_centroid() and
    * Pyramid5::true_centroid() are implemented in terms of this
    * function.
    */
