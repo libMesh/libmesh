@@ -182,6 +182,12 @@ public:
   static const unsigned int edge_sides_map[num_edges][2];
 
   /**
+   * We compute the centroid of the Pyramid by treating it as a
+   * degenerate Hex8 element.
+   */
+  virtual Point true_centroid () const override;
+
+  /**
    * Specialization for computing the volume of a pyramid.
    */
   virtual Real volume () const override;

@@ -117,7 +117,7 @@ public:
     }
 
     // Currently there is not an optimized Pyramid5::true_centroid() to compare against
-    // test_true_centroid_and_volume(PYRAMID5);
+    test_true_centroid_and_volume(PYRAMID5);
   }
 
   void testHex8TrueCentroid() { test_true_centroid_and_volume(HEX8); }

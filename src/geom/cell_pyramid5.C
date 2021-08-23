@@ -24,6 +24,7 @@
 #include "libmesh/face_quad4.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
+#include "libmesh/cell_hex8.h"
 
 namespace libMesh
 {
@@ -280,6 +281,19 @@ void Pyramid5::connectivity(const unsigned int libmesh_dbg_var(sc),
       libmesh_error_msg("Unsupported IO package " << iop);
     }
 }
+
+
+Point Pyramid5::true_centroid () const
+{
+  // Call Hex8 static helper function, passing 4 copies of the final
+  // vertex point, effectively treating the Pyramid as a degenerate
+  // hexahedron.  In my testing, this still seems to give correct
+  // results.
+  return Hex8::centroid_from_points(
+    point(0), point(1), point(2), point(3),
+    point(4), point(4), point(4), point(4));
+}
+
 
 
 Real Pyramid5::volume () const
