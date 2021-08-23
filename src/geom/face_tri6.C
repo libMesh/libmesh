@@ -143,14 +143,17 @@ Tri6::nodes_on_edge(const unsigned int e) const
 bool Tri6::has_affine_map() const
 {
   // Make sure edges are straight
-  if (!this->point(3).relative_fuzzy_equals
-      ((this->point(0) + this->point(1))/2.))
+  Point v = this->point(1) - this->point(0);
+  if (!v.relative_fuzzy_equals
+      ((this->point(3) - this->point(0))*2))
     return false;
-  if (!this->point(4).relative_fuzzy_equals
-      ((this->point(1) + this->point(2))/2.))
+  v = this->point(2) - this->point(1);
+  if (!v.relative_fuzzy_equals
+      ((this->point(4) - this->point(1))*2))
     return false;
-  if (!this->point(5).relative_fuzzy_equals
-      ((this->point(2) + this->point(0))/2.))
+  v = this->point(2) - this->point(0);
+  if (!v.relative_fuzzy_equals
+      ((this->point(5) - this->point(0))*2))
     return false;
 
   return true;

@@ -93,6 +93,11 @@ public:
     BoundingBox bbox = MeshTools::create_bounding_box(mesh);
     CPPUNIT_ASSERT_EQUAL(bbox.min()(0), Real(-1.0));
     CPPUNIT_ASSERT_EQUAL(bbox.max()(0), Real(2.0));
+
+    // Do serial assertions *after* all parallel assertions, so we
+    // stay in sync after failure on only some processor(s)
+    for (auto & elem : mesh.element_ptr_range())
+      CPPUNIT_ASSERT(elem->has_affine_map());
   }
 
   void testBuildSquare(UnstructuredMesh & mesh, unsigned int n, ElemType type)
@@ -129,6 +134,11 @@ public:
     CPPUNIT_ASSERT(bbox.max()(0) >= Real(3.0));
     CPPUNIT_ASSERT(bbox.min()(1) <= Real(-4.0));
     CPPUNIT_ASSERT(bbox.max()(1) >= Real(5.0));
+
+    // Do serial assertions *after* all parallel assertions, so we
+    // stay in sync after failure on only some processor(s)
+    for (auto & elem : mesh.element_ptr_range())
+      CPPUNIT_ASSERT(elem->has_affine_map());
   }
 
   void testBuildCube(UnstructuredMesh & mesh, unsigned int n, ElemType type)
@@ -206,6 +216,17 @@ public:
     CPPUNIT_ASSERT(bbox.max()(1) >= Real(5.0));
     CPPUNIT_ASSERT(bbox.min()(2) <= Real(-6.0));
     CPPUNIT_ASSERT(bbox.max()(2) >= Real(7.0));
+
+    // We don't yet try to do affine map optimizations on pyramids
+    if (type == PYRAMID5 ||
+        type == PYRAMID13 ||
+        type == PYRAMID14)
+      return;
+
+    // Do serial assertions *after* all parallel assertions, so we
+    // stay in sync after failure on only some processor(s)
+    for (auto & elem : mesh.element_ptr_range())
+      CPPUNIT_ASSERT(elem->has_affine_map());
   }
 
   void testBuildSphere(unsigned int n_ref, ElemType type)

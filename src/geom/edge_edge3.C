@@ -94,8 +94,9 @@ bool Edge3::is_node_on_edge(const unsigned int,
 
 bool Edge3::has_affine_map() const
 {
-  return (this->point(2).relative_fuzzy_equals
-          ((this->point(0) + this->point(1))/2));
+  Point v = this->point(1) - this->point(0);
+  return (v.relative_fuzzy_equals
+          ((this->point(2) - this->point(0))*2));
 }
 
 
