@@ -93,11 +93,12 @@ bool Edge4::is_node_on_edge(const unsigned int,
 
 bool Edge4::has_affine_map() const
 {
-  if (!this->point(2).relative_fuzzy_equals
-      ((this->point(0)*2. + this->point(1))/3.))
+  Point v = this->point(1) - this->point(0);
+  if (!v.relative_fuzzy_equals
+      ((this->point(2) - this->point(0))*3))
     return false;
-  if (!this->point(3).relative_fuzzy_equals
-      ((this->point(0) + this->point(1)*2.)/3.))
+  if (!v.relative_fuzzy_equals
+      ((this->point(3) - this->point(0))*1.5))
     return false;
   return true;
 }
