@@ -219,6 +219,12 @@ void ExodusII_IO::read (const std::string & fname)
       mesh.set_default_mapping_data(weight_index);
     }
 
+  // If we have Bezier extraction coefficients, we'll need to put
+  // NODEELEM elements on spline nodes, since our Rational Bezier
+  // elements will be connected to nodes derived from those; nothing
+  // else will be directly connected to the spline nodes.
+  const bool bex_cv_exist = !exio_helper->bex_dense_constraint_vecs.empty();
+
   std::unordered_map<const Node *, Elem *> spline_nodeelem_ptrs;
 
   // Loop over the nodes, create Nodes with local processor_id 0.
@@ -243,14 +249,17 @@ void ExodusII_IO::read (const std::string & fname)
       // be used as control points for Bezier elements, and we need
       // to attach a NodeElem to each to make sure it doesn't get
       // flagged as an unused node.
-      if (!exio_helper->w.empty())
+      if (weights_exist)
         {
           const auto w = exio_helper->w[i];
           Point & p = *added_node;
           p /= w;  // Exodus Bezier Extraction stores spline nodes in projective space
 
           added_node->set_extra_datum<Real>(weight_index, exio_helper->w[i]);
+        }
 
+      if (bex_cv_exist)
+        {
           std::unique_ptr<Elem> elem = Elem::build(NODEELEM);
 
           // Give the NodeElem ids at the end, so we can match any
@@ -518,7 +527,9 @@ void ExodusII_IO::read (const std::string & fname)
                           if (coef)
                             {
                               p.add_scaled(spline_node, coef);
-                              w += coef * spline_node.get_extra_datum<Real>(weight_index) ;
+                              const Real spline_w = weights_exist ?
+                                spline_node.get_extra_datum<Real>(weight_index) : 1;
+                              w += coef * spline_w;
 
                               const Elem * nodeelem =
                                 libmesh_map_find(spline_nodeelem_ptrs, &spline_node);
@@ -527,7 +538,7 @@ void ExodusII_IO::read (const std::string & fname)
                         }
 
                       Node *n = mesh.add_point(p);
-                      if (!exio_helper->w.empty())
+                      if (weights_exist)
                         n->set_extra_datum<Real>(weight_index, w);
                       local_nodes[key] = n;
                       elem->set_node(dyna_elem_defn.nodes[elem_node_index]) = n;
