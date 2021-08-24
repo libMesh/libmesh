@@ -153,6 +153,10 @@ public:
     // might have had a bug in there at one point
     {
       ExodusII_IO exii(mesh);
+      // IGA Exodus meshes require ExodusII 8 or higher
+      if (exii.get_exodus_version() < 800)
+        return;
+
       if (mesh.processor_id() == 0)
         exii.read("meshes/Cube_With_Sidesets.e");
 
