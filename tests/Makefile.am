@@ -126,6 +126,8 @@ unit_tests_sources = \
 datadir = $(install_dir)
 data = meshes/1_quad.bxt.gz \
        meshes/25_quad.bxt.gz \
+       meshes/bad_64bit_elem_integers.e \
+       meshes/good_32bit_elem_integers.e \
        meshes/shark_tooth_tri6.xda.gz
 
 unit_tests_sources += \

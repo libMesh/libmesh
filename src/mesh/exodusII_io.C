@@ -39,10 +39,11 @@
 #include "timpi/parallel_sync.h"
 
 // C++ includes
-#include <fstream>
+#include <cmath>   // llround
 #include <cstring>
-#include <sstream>
+#include <fstream>
 #include <map>
+#include <sstream>
 
 namespace libMesh
 {
@@ -286,7 +287,40 @@ void ExodusII_IO::read (const std::string & fname)
 
           // Assign extra integer IDs
           for (auto & id : extra_ids)
-            elem->set_extra_integer(id, std::round(elem_ids[id][elem->id()]));
+          {
+            const Real v = elem_ids[id][elem->id()];
+
+            if (v == Real(-1))
+              {
+                elem->set_extra_integer(id, DofObject::invalid_id);
+                continue;
+              }
+
+            const long long iv = std::llround(v);
+
+            // Check if the real number is outside of the range we can
+            // convert exactly
+
+            long long max_representation = 1;
+            max_representation = (max_representation << std::numeric_limits<Real>::digits);
+            libmesh_error_msg_if(iv > max_representation,
+                                 "Error! An element integer value higher than "
+                                 << max_representation
+                                 << " was found! Exodus uses real numbers for storing element "
+                                 " integers, which can only represent integers from 0 to "
+                                 << max_representation
+                                 << ".");
+
+            libmesh_error_msg_if(iv < 0,
+                                 "Error! An element integer value less than -1"
+                                 << " was found! Exodus uses real numbers for storing element "
+                                 " integers, which can only represent integers from 0 to "
+                                 << max_representation
+                                 << ".");
+
+
+            elem->set_extra_integer(id, cast_int<dof_id_type>(iv));
+          }
 
           // Set all the nodes for this element
           for (int k=0; k<exio_helper->num_nodes_per_elem; k++)
