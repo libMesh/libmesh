@@ -262,6 +262,20 @@ void l2_lagrange_nodal_soln(const Elem * elem,
               return;
             }
 
+          case TRI7:
+            {
+              libmesh_assert_equal_to (elem_soln.size(), 6);
+              libmesh_assert_equal_to (nodal_soln.size(), 7);
+
+              for (int i=0; i != 6; ++i)
+                nodal_soln[i] = elem_soln[i];
+
+              nodal_soln[6] = -1./9. * (elem_soln[0] + elem_soln[1] + elem_soln[2])
+                              +4./9. * (elem_soln[3] + elem_soln[4] + elem_soln[5]);
+
+              return;
+            }
+
           default:
             {
               // By default the element solution _is_ nodal,
