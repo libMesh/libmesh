@@ -55,6 +55,9 @@ public:
   CPPUNIT_TEST( testExodusCopyNodalSolutionReplicated );
   CPPUNIT_TEST( testExodusCopyElementSolutionReplicated );
   CPPUNIT_TEST( testExodusReadHeader );
+#if LIBMESH_DIM > 2
+  CPPUNIT_TEST( testExodusIGASidesets );
+#endif
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
   CPPUNIT_TEST( testExodusCopyElementVectorDistributed );
   CPPUNIT_TEST( testExodusCopyElementVectorReplicated );
@@ -139,6 +142,82 @@ public:
       CPPUNIT_ASSERT_EQUAL(header_info.num_edge_blk, 0);
       CPPUNIT_ASSERT_EQUAL(header_info.num_edge, 0);
     }
+  }
+
+
+  void testExodusIGASidesets ()
+  {
+    Mesh mesh(*TestCommWorld);
+
+    // Block here so we trigger exii destructor early; I thought I
+    // might have had a bug in there at one point
+    {
+      ExodusII_IO exii(mesh);
+      if (mesh.processor_id() == 0)
+        exii.read("meshes/Cube_With_Sidesets.e");
+
+    }
+
+    MeshCommunication().broadcast(mesh);
+    mesh.prepare_for_use();
+
+    // 5^3 spline nodes + 7^3 Rational Bezier nodes
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(468));
+    // 5^3 spline elements + 3^3 Rational Bezier elements
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(),  dof_id_type(152));
+
+    // Check that we see the boundary ids we expect
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    // On a ReplicatedMesh, we should see all 6 boundary ids on each processor
+    if (mesh.is_serial())
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(6), bi.n_boundary_ids());
+
+    // On any mesh, we should see each id on *some* processor
+    {
+      const std::set<boundary_id_type> & bc_ids = bi.get_boundary_ids();
+      // CoreForm gave me a file with 1-based numbering! (faints)
+      for (boundary_id_type i = 1 ; i != 7; ++i)
+        {
+          bool has_bcid = bc_ids.count(i);
+          mesh.comm().max(has_bcid);
+          CPPUNIT_ASSERT(has_bcid);
+        }
+    }
+
+    // Indexed by bcid-1, because we count from 0, like God and
+    // Dijkstra intended!
+    std::vector<int> side_counts(6, 0);
+
+    // Map from our side numbers to the file's BCIDs
+    const boundary_id_type libmesh_side_to_bcid[] = {1, 4, 6, 3, 5, 2};
+
+    for (const auto & elem : mesh.active_local_element_ptr_range())
+      {
+        if (elem->type() == NODEELEM)
+          continue;
+
+        for (unsigned short side=0; side<elem->n_sides(); side++)
+          {
+            if (elem->neighbor_ptr(side))
+              CPPUNIT_ASSERT_EQUAL(bi.n_boundary_ids(elem, side), 0u);
+            else
+              {
+                CPPUNIT_ASSERT_EQUAL(bi.n_boundary_ids(elem, side), 1u);
+                std::vector<boundary_id_type> bids;
+                bi.boundary_ids(elem, side, bids);
+                side_counts[bids[0]-1]++;
+                CPPUNIT_ASSERT_EQUAL(libmesh_side_to_bcid[side], bids[0]);
+              }
+          }
+      }
+
+    for (auto bc_count : side_counts)
+      {
+        // We should have 3^2 sides with each id
+        mesh.comm().sum(bc_count);
+        CPPUNIT_ASSERT_EQUAL(bc_count, 9);
+      }
   }
 
 
