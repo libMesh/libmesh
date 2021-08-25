@@ -356,6 +356,7 @@ Real fe_lagrange_3D_shape(const ElemType type,
             // linear tetrahedral shape functions
           case TET4:
           case TET10:
+          case TET14:
             {
               libmesh_assert_less (i, 4);
 
@@ -567,8 +568,11 @@ Real fe_lagrange_3D_shape(const ElemType type,
                                "High order on first order elements only supported for L2 families");
             libmesh_fallthrough();
           case TET10:
+            libmesh_assert_less (i, 10);
+            libmesh_fallthrough();
+          case TET14:
             {
-              libmesh_assert_less (i, 10);
+              libmesh_assert_less (i, 14);
 
               // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
               const Real zeta1 = p(0);
@@ -844,6 +848,80 @@ Real fe_lagrange_3D_shape(const ElemType type,
           }
       }
 
+    case THIRD:
+      {
+        switch (type)
+          {
+            // quadratic Lagrange shape functions with a cubic bubble
+          case TET14:
+            {
+              libmesh_assert_less (i, 14);
+
+              // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
+              const Real zeta1 = p(0);
+              const Real zeta2 = p(1);
+              const Real zeta3 = p(2);
+              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+
+              // Bubble functions (not yet scaled) on side nodes
+              const Real bubble_012 = zeta0*zeta1*zeta2;
+              const Real bubble_013 = zeta0*zeta1*zeta3;
+              const Real bubble_123 = zeta1*zeta2*zeta3;
+              const Real bubble_023 = zeta0*zeta2*zeta3;
+
+              switch(i)
+                {
+                case 0:
+                  return zeta0*(2.*zeta0 - 1.) + 3.*(bubble_012+bubble_013+bubble_023);
+
+                case 1:
+                  return zeta1*(2.*zeta1 - 1.) + 3.*(bubble_012+bubble_013+bubble_123);
+
+                case 2:
+                  return zeta2*(2.*zeta2 - 1.) + 3.*(bubble_012+bubble_023+bubble_123);
+
+                case 3:
+                  return zeta3*(2.*zeta3 - 1.) + 3.*(bubble_013+bubble_023+bubble_123);
+
+                case 4:
+                  return 4.*zeta0*zeta1 - 12.*(bubble_012+bubble_013);
+
+                case 5:
+                  return 4.*zeta1*zeta2 - 12.*(bubble_012+bubble_123);
+
+                case 6:
+                  return 4.*zeta2*zeta0 - 12.*(bubble_012+bubble_023);
+
+                case 7:
+                  return 4.*zeta0*zeta3 - 12.*(bubble_013+bubble_023);
+
+                case 8:
+                  return 4.*zeta1*zeta3 - 12.*(bubble_013+bubble_123);
+
+                case 9:
+                  return 4.*zeta2*zeta3 - 12.*(bubble_023+bubble_123);
+
+                case 10:
+                  return 27.*bubble_012;
+
+                case 11:
+                  return 27.*bubble_013;
+
+                case 12:
+                  return 27.*bubble_123;
+
+                case 13:
+                  return 27.*bubble_023;
+
+                default:
+                  libmesh_error_msg("Invalid i = " << i);
+                }
+            }
+
+          default:
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
+          }
+      }
 
       // unsupported order
     default:
@@ -917,6 +995,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
             // linear tetrahedral shape functions
           case TET4:
           case TET10:
+          case TET14:
             {
               libmesh_assert_less (i, 4);
 
@@ -1460,6 +1539,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
                                "High order on first order elements only supported for L2 families");
             libmesh_fallthrough();
           case TET10:
+          case TET14:
             {
               libmesh_assert_less (i, 10);
 
@@ -2202,6 +2282,215 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
           }
       }
 
+    case THIRD:
+      {
+        switch (type)
+          {
+            // quadratic Lagrange shape functions with a cubic bubble
+          case TET14:
+            {
+              libmesh_assert_less (i, 14);
+
+              // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
+              const Real zeta1 = p(0);
+              const Real zeta2 = p(1);
+              const Real zeta3 = p(2);
+              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+
+              const Real dzeta0dxi = -1.;
+              const Real dzeta1dxi =  1.;
+              const Real dzeta2dxi =  0.;
+              const Real dzeta3dxi =  0.;
+              const Real dbubble012dxi = (zeta0-zeta1)*zeta2;
+              const Real dbubble013dxi = (zeta0-zeta1)*zeta3;
+              const Real dbubble123dxi = zeta2*zeta3;
+              const Real dbubble023dxi = -zeta2*zeta3;
+
+              const Real dzeta0deta = -1.;
+              const Real dzeta1deta =  0.;
+              const Real dzeta2deta =  1.;
+              const Real dzeta3deta =  0.;
+              const Real dbubble012deta = (zeta0-zeta2)*zeta1;
+              const Real dbubble013deta = -zeta1*zeta3;
+              const Real dbubble123deta = zeta1*zeta3;
+              const Real dbubble023deta = (zeta0-zeta2)*zeta3;
+
+              const Real dzeta0dzeta = -1.;
+              const Real dzeta1dzeta =  0.;
+              const Real dzeta2dzeta =  0.;
+              const Real dzeta3dzeta =  1.;
+              const Real dbubble012dzeta = -zeta1*zeta2;
+              const Real dbubble013dzeta = (zeta0-zeta3)*zeta1;
+              const Real dbubble123dzeta = zeta1*zeta2;
+              const Real dbubble023dzeta = (zeta0-zeta3)*zeta2;
+
+              switch (j)
+                {
+                  // d()/dxi
+                case 0:
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                        return (4.*zeta0 - 1.)*dzeta0dxi + 3.*(dbubble012dxi+dbubble013dxi+dbubble023dxi);
+
+                      case 1:
+                        return (4.*zeta1 - 1.)*dzeta1dxi + 3.*(dbubble012dxi+dbubble013dxi+dbubble123dxi);
+
+                      case 2:
+                        return (4.*zeta2 - 1.)*dzeta2dxi + 3.*(dbubble012dxi+dbubble023dxi+dbubble123dxi);
+
+                      case 3:
+                        return (4.*zeta3 - 1.)*dzeta3dxi + 3.*(dbubble013dxi+dbubble023dxi+dbubble123dxi);
+
+                      case 4:
+                        return 4.*(zeta0*dzeta1dxi + dzeta0dxi*zeta1) - 12.*(dbubble012dxi+dbubble013dxi);
+
+                      case 5:
+                        return 4.*(zeta1*dzeta2dxi + dzeta1dxi*zeta2) - 12.*(dbubble012dxi+dbubble123dxi);
+
+                      case 6:
+                        return 4.*(zeta0*dzeta2dxi + dzeta0dxi*zeta2) - 12.*(dbubble012dxi+dbubble023dxi);
+
+                      case 7:
+                        return 4.*(zeta0*dzeta3dxi + dzeta0dxi*zeta3) - 12.*(dbubble013dxi+dbubble023dxi);
+
+                      case 8:
+                        return 4.*(zeta1*dzeta3dxi + dzeta1dxi*zeta3) - 12.*(dbubble013dxi+dbubble123dxi);
+
+                      case 9:
+                        return 4.*(zeta2*dzeta3dxi + dzeta2dxi*zeta3) - 12.*(dbubble023dxi+dbubble123dxi);
+
+                      case 10:
+                        return 27.*dbubble012dxi;
+
+                      case 11:
+                        return 27.*dbubble013dxi;
+
+                      case 12:
+                        return 27.*dbubble123dxi;
+
+                      case 13:
+                        return 27.*dbubble023dxi;
+
+                      default:
+                        libmesh_error_msg("Invalid i = " << i);
+                      }
+                  }
+
+                  // d()/deta
+                case 1:
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                        return (4.*zeta0 - 1.)*dzeta0deta + 3.*(dbubble012deta+dbubble013deta+dbubble023deta);;
+
+                      case 1:
+                        return (4.*zeta1 - 1.)*dzeta1deta + 3.*(dbubble012deta+dbubble013deta+dbubble123deta);
+
+                      case 2:
+                        return (4.*zeta2 - 1.)*dzeta2deta + 3.*(dbubble012deta+dbubble023deta+dbubble123deta);
+
+                      case 3:
+                        return (4.*zeta3 - 1.)*dzeta3deta + 3.*(dbubble013deta+dbubble023deta+dbubble123deta);
+
+                      case 4:
+                        return 4.*(zeta0*dzeta1deta + dzeta0deta*zeta1) - 12.*(dbubble012deta+dbubble013deta);
+
+                      case 5:
+                        return 4.*(zeta1*dzeta2deta + dzeta1deta*zeta2) - 12.*(dbubble012deta+dbubble123deta);
+
+                      case 6:
+                        return 4.*(zeta0*dzeta2deta + dzeta0deta*zeta2) - 12.*(dbubble012deta+dbubble023deta);
+
+                      case 7:
+                        return 4.*(zeta0*dzeta3deta + dzeta0deta*zeta3) - 12.*(dbubble013deta+dbubble023deta);
+
+                      case 8:
+                        return 4.*(zeta1*dzeta3deta + dzeta1deta*zeta3) - 12.*(dbubble013deta+dbubble123deta);
+
+                      case 9:
+                        return 4.*(zeta2*dzeta3deta + dzeta2deta*zeta3) - 12.*(dbubble023deta+dbubble123deta);
+
+                      case 10:
+                        return 27.*dbubble012deta;
+
+                      case 11:
+                        return 27.*dbubble013deta;
+
+                      case 12:
+                        return 27.*dbubble123deta;
+
+                      case 13:
+                        return 27.*dbubble023deta;
+
+                      default:
+                        libmesh_error_msg("Invalid i = " << i);
+                      }
+                  }
+
+                  // d()/dzeta
+                case 2:
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                        return (4.*zeta0 - 1.)*dzeta0dzeta + 3.*(dbubble012dzeta+dbubble013dzeta+dbubble023dzeta);
+
+                      case 1:
+                        return (4.*zeta1 - 1.)*dzeta1dzeta + 3.*(dbubble012dzeta+dbubble013dzeta+dbubble123dzeta);
+
+                      case 2:
+                        return (4.*zeta2 - 1.)*dzeta2dzeta + 3.*(dbubble012dzeta+dbubble023dzeta+dbubble123dzeta);
+
+                      case 3:
+                        return (4.*zeta3 - 1.)*dzeta3dzeta + 3.*(dbubble013dzeta+dbubble023dzeta+dbubble123dzeta);
+
+                      case 4:
+                        return 4.*(zeta0*dzeta1dzeta + dzeta0dzeta*zeta1) - 12.*(dbubble012dzeta+dbubble013dzeta);
+
+                      case 5:
+                        return 4.*(zeta1*dzeta2dzeta + dzeta1dzeta*zeta2) - 12.*(dbubble012dzeta+dbubble123dzeta);
+
+                      case 6:
+                        return 4.*(zeta0*dzeta2dzeta + dzeta0dzeta*zeta2) - 12.*(dbubble012dzeta+dbubble023dzeta);
+
+                      case 7:
+                        return 4.*(zeta0*dzeta3dzeta + dzeta0dzeta*zeta3) - 12.*(dbubble013dzeta+dbubble023dzeta);
+
+                      case 8:
+                        return 4.*(zeta1*dzeta3dzeta + dzeta1dzeta*zeta3) - 12.*(dbubble013dzeta+dbubble123dzeta);
+
+                      case 9:
+                        return 4.*(zeta2*dzeta3dzeta + dzeta2dzeta*zeta3) - 12.*(dbubble023dzeta+dbubble123dzeta);
+
+                      case 10:
+                        return 27.*dbubble012dzeta;
+
+                      case 11:
+                        return 27.*dbubble013dzeta;
+
+                      case 12:
+                        return 27.*dbubble123dzeta;
+
+                      case 13:
+                        return 27.*dbubble023dzeta;
+
+                      default:
+                        libmesh_error_msg("Invalid i = " << i);
+                      }
+                  }
+
+                default:
+                  libmesh_error_msg("Invalid j = " << j);
+                }
+            }
+
+          default:
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
+          }
+      }
 
       // unsupported order
     default:
@@ -2782,6 +3071,7 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
                                "High order on first order elements only supported for L2 families");
             libmesh_fallthrough();
           case TET10:
+          case TET14:
             {
               // The area coordinates are the same as used for the
               // shape() and shape_deriv() functions.
@@ -3937,6 +4227,204 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
           }
       }
 
+    case THIRD:
+      {
+        switch (type)
+          {
+            // quadratic Lagrange shape functions with a cubic bubble
+          case TET14:
+            {
+              libmesh_assert_less (i, 14);
+
+              // The area coordinates are the same as used for the
+              // shape() and shape_deriv() functions.
+              // const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+              // const Real zeta1 = p(0);
+              // const Real zeta2 = p(1);
+              // const Real zeta3 = p(2);
+              static const Real dzetadxi[4][3] =
+                {
+                  {-1., -1., -1.},
+                  {1.,   0.,  0.},
+                  {0.,   1.,  0.},
+                  {0.,   0.,  1.}
+                };
+
+              // Convert from j -> (j,k) indices for independent variable
+              // (0=xi, 1=eta, 2=zeta)
+              static const unsigned short int independent_var_indices[6][2] =
+                {
+                  {0, 0}, // d^2 phi / dxi^2
+                  {0, 1}, // d^2 phi / dxi deta
+                  {1, 1}, // d^2 phi / deta^2
+                  {0, 2}, // d^2 phi / dxi dzeta
+                  {1, 2}, // d^2 phi / deta dzeta
+                  {2, 2}  // d^2 phi / dzeta^2
+                };
+
+              // Convert from i -> zeta indices.  Each quadratic shape
+              // function for the Tet10 depends on up to two of the zeta
+              // area coordinate functions (see the shape() function above).
+              // This table just tells which two area coords it uses.
+              static const unsigned short int zeta_indices[10][2] =
+                {
+                  {0, 0},
+                  {1, 1},
+                  {2, 2},
+                  {3, 3},
+                  {0, 1},
+                  {1, 2},
+                  {2, 0},
+                  {0, 3},
+                  {1, 3},
+                  {2, 3},
+                };
+
+              // Look up the independent variable indices for this value of j.
+              const unsigned int my_j = independent_var_indices[j][0];
+              const unsigned int my_k = independent_var_indices[j][1];
+
+              Real returnval = 0;
+              if (i<4)
+                returnval = 4.*dzetadxi[i][my_j]*dzetadxi[i][my_k];
+
+              else if (i<10)
+                {
+                  const unsigned short int my_m = zeta_indices[i][0];
+                  const unsigned short int my_n = zeta_indices[i][1];
+
+                  returnval =
+                    4.*(dzetadxi[my_n][my_j]*dzetadxi[my_m][my_k] +
+                        dzetadxi[my_m][my_j]*dzetadxi[my_n][my_k] );
+                }
+
+              const Real zeta1 = p(0);
+              const Real zeta2 = p(1);
+              const Real zeta3 = p(2);
+              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+
+              // Fill these with whichever derivative we're concerned
+              // with
+              Real d2bubble012, d2bubble013, d2bubble023, d2bubble123;
+              switch (j)
+                {
+                  // d^2()/dxi^2
+                case 0:
+                  {
+                    d2bubble012 = -2.*zeta2;
+                    d2bubble013 = -2.*zeta3;
+                    d2bubble023 = 0.;
+                    d2bubble123 = 0.;
+                    break;
+                  }
+
+                  // d^2()/dxideta
+                case 1:
+                  {
+                    d2bubble012 = (zeta0-zeta1)-zeta2;
+                    d2bubble013 = -zeta3;
+                    d2bubble123 = zeta3;
+                    d2bubble023 = -zeta3;
+                    break;
+                  }
+
+                  // d^2()/deta^2
+                case 2:
+                  {
+                    d2bubble012 = -2.*zeta1;
+                    d2bubble013 = 0.;
+                    d2bubble123 = 0.;
+                    d2bubble023 = -2.*zeta3;
+                    break;
+                  }
+
+                  // d^2()/dxi dzeta
+                case 3:
+                  {
+                    d2bubble012 = -zeta2;
+                    d2bubble013 = (zeta0-zeta3)-zeta1;
+                    d2bubble123 = zeta2;
+                    d2bubble023 = -zeta2;
+                    break;
+                  }
+
+                  // d^2()/deta dzeta
+                case 4:
+                  {
+                    d2bubble012 = -zeta1;
+                    d2bubble013 = -zeta1;
+                    d2bubble123 = zeta1;
+                    d2bubble023 = (zeta0-zeta3)-zeta2;
+                    break;
+                  }
+
+                  // d^2()/dzeta^2
+                case 5:
+                  {
+                    d2bubble012 = 0.;
+                    d2bubble013 = -2.*zeta1;
+                    d2bubble123 = 0.;
+                    d2bubble023 = -2.*zeta2;
+                    break;
+                  }
+
+                default:
+                  libmesh_error_msg("Invalid j = " << j);
+                }
+
+              switch (i)
+                {
+                case 0:
+                  return returnval + 3.*(d2bubble012+d2bubble013+d2bubble023);
+
+                case 1:
+                  return returnval + 3.*(d2bubble012+d2bubble013+d2bubble123);
+
+                case 2:
+                  return returnval + 3.*(d2bubble012+d2bubble023+d2bubble123);
+
+                case 3:
+                  return returnval + 3.*(d2bubble013+d2bubble023+d2bubble123);
+
+                case 4:
+                  return returnval - 12.*(d2bubble012+d2bubble013);
+
+                case 5:
+                  return returnval - 12.*(d2bubble012+d2bubble123);
+
+                case 6:
+                  return returnval - 12.*(d2bubble012+d2bubble023);
+
+                case 7:
+                  return returnval - 12.*(d2bubble013+d2bubble023);
+
+                case 8:
+                  return returnval - 12.*(d2bubble013+d2bubble123);
+
+                case 9:
+                  return returnval - 12.*(d2bubble023+d2bubble123);
+
+                case 10:
+                  return 27.*d2bubble012;
+
+                case 11:
+                  return 27.*d2bubble013;
+
+                case 12:
+                  return 27.*d2bubble123;
+
+                case 13:
+                  return 27.*d2bubble023;
+
+                default:
+                  libmesh_error_msg("Invalid i = " << i);
+                }
+            }
+
+          default:
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
+          }
+      }
 
       // unsupported order
     default:

@@ -2252,6 +2252,8 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return 1;
         case TET10:
           return 2;
+        case TET14:
+          return 3;
         case HEX8:
           return 1;
         case HEX20:
@@ -2291,6 +2293,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUAD9:
         case TET4:
         case TET10:
+        case TET14:
         case HEX8:
         case HEX20:
         case HEX27:
@@ -2330,6 +2333,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case TET4:
           return 1;
         case TET10:
+        case TET14:
           return 2;
         case HEX8:
           return 1;
@@ -2371,6 +2375,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return 7;
         case TET4:
         case TET10:
+        case TET14:
         case HEX8:
         case HEX20:
         case HEX27:
@@ -2403,6 +2408,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUAD9:
         case TET4:
         case TET10:
+        case TET14:
         case HEX8:
         case HEX20:
         case HEX27:
@@ -2437,6 +2443,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUAD9:
         case TET4:
         case TET10:
+        case TET14:
         case HEX8:
         case HEX20:
         case HEX27:
@@ -2472,6 +2479,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return unlimited;
         case TET4:
         case TET10:
+        case TET14:
           return 0;
         case HEX8:
           return 3;
@@ -2511,6 +2519,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return unlimited;
         case TET4:
         case TET10:
+        case TET14:
           return 0;
         case HEX8:
         case HEX20:
@@ -2550,6 +2559,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return unlimited;
         case TET4:
         case TET10:
+        case TET14:
           return 0;
         case HEX8:
         case HEX20:
@@ -2585,6 +2595,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUAD8:
         case QUAD9:
         case TET10:
+        case TET14:
         case HEX20:
         case HEX27:
           return 1;

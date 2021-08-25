@@ -126,10 +126,17 @@ void l2_lagrange_nodal_soln(const Elem * elem,
             }
 
 
+          case TET14:
+            libmesh_assert_equal_to (nodal_soln.size(), 14);
+            nodal_soln[10] = (elem_soln[0] + elem_soln[1] + elem_soln[2])/3.;
+            nodal_soln[11] = (elem_soln[0] + elem_soln[1] + elem_soln[3])/3.;
+            nodal_soln[12] = (elem_soln[1] + elem_soln[2] + elem_soln[3])/3.;
+            nodal_soln[13] = (elem_soln[0] + elem_soln[2] + elem_soln[3])/3.;
+            libmesh_fallthrough();
           case TET10:
             {
               libmesh_assert_equal_to (elem_soln.size(), 4);
-              libmesh_assert_equal_to (nodal_soln.size(), 10);
+              libmesh_assert (type == TET14 || nodal_soln.size() == 10);
 
               nodal_soln[0] = elem_soln[0];
               nodal_soln[1] = elem_soln[1];
@@ -276,6 +283,27 @@ void l2_lagrange_nodal_soln(const Elem * elem,
               return;
             }
 
+          case TET14:
+            {
+              libmesh_assert_equal_to (elem_soln.size(), 10);
+              libmesh_assert_equal_to (nodal_soln.size(), 14);
+
+              for (int i=0; i != 10; ++i)
+                nodal_soln[i] = elem_soln[i];
+
+              nodal_soln[10] = -1./9. * (elem_soln[0] + elem_soln[1] + elem_soln[2])
+                               +4./9. * (elem_soln[4] + elem_soln[5] + elem_soln[6]);
+              nodal_soln[11] = -1./9. * (elem_soln[0] + elem_soln[1] + elem_soln[3])
+                               +4./9. * (elem_soln[4] + elem_soln[7] + elem_soln[8]);
+              nodal_soln[12] = -1./9. * (elem_soln[1] + elem_soln[2] + elem_soln[3])
+                               +4./9. * (elem_soln[5] + elem_soln[8] + elem_soln[9]);
+              nodal_soln[13] = -1./9. * (elem_soln[0] + elem_soln[2] + elem_soln[3])
+                               +4./9. * (elem_soln[6] + elem_soln[7] + elem_soln[9]);
+
+              return;
+            }
+
+
           default:
             {
               // By default the element solution _is_ nodal,
@@ -339,6 +367,7 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
 
           case TET4:
           case TET10:
+          case TET14:
             return 4;
 
           case HEX8:
@@ -392,6 +421,7 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
 
           case TET4:
           case TET10:
+          case TET14:
             return 10;
 
           case HEX20:
@@ -437,6 +467,9 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
 
           case TRI7:
             return 7;
+
+          case TET14:
+            return 14;
 
           case INVALID_ELEM:
             return 0;

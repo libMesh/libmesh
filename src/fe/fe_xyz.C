@@ -131,6 +131,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
 
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
@@ -178,6 +179,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
 
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
@@ -225,6 +227,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
 
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
@@ -271,6 +274,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
 
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
@@ -316,6 +320,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
 
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
@@ -380,6 +385,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
             // 3D linears have 4 DOFs per element
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
@@ -430,6 +436,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
             // 3D quadratics have 10 DOFs per element
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
@@ -477,6 +484,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
 
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
@@ -524,6 +532,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
 
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
@@ -568,6 +577,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
 
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:

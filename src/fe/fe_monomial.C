@@ -131,6 +131,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
 
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
@@ -178,6 +179,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
 
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
@@ -225,6 +227,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
 
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
@@ -271,6 +274,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
 
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
@@ -316,6 +320,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
 
           case TET4:
           case TET10:
+          case TET14:
           case HEX8:
           case HEX20:
           case HEX27:
