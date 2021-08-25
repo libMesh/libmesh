@@ -2605,6 +2605,7 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
       return QUADSHELL4;
     case TET4:
     case TET10:
+    case TET14:
       return TET4;
     case HEX8:
     case HEX27:
@@ -2708,6 +2709,9 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
         // full_ordered not relevant
         return TET10;
       }
+
+    case TET14:
+      return TET14;
 
     case HEX8:
     case HEX20:
