@@ -54,6 +54,7 @@ void QSimpson::init_3D(const ElemType, unsigned int)
       // Tetrahedral quadrature rules
     case TET4:
     case TET10:
+    case TET14:
       {
         // This rule is created by combining 8 subtets
         // which use the trapezoidal rule.  The weights
