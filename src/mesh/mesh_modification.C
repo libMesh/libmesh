@@ -965,6 +965,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
           case TRI7:
           case TET4:
           case TET10:
+          case TET14:
           case INFEDGE2:
             // No way to split infinite quad/prism elements, so
             // hopefully no need to
