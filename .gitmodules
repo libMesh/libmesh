@@ -1,6 +1,6 @@
 [submodule "contrib/metaphysicl"]
 	path = contrib/metaphysicl
-	url = ../../roystgnr/MetaPhysicL
+	url = ../../libMesh/MetaPhysicL
 [submodule "contrib/timpi"]
 	path = contrib/timpi
 	url = ../../libMesh/TIMPI
