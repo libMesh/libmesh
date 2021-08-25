@@ -72,6 +72,9 @@ public:
   CPPUNIT_TEST( testNemesisCopyNodalSolutionReplicated );
   CPPUNIT_TEST( testNemesisCopyElementSolutionDistributed );
   CPPUNIT_TEST( testNemesisCopyElementSolutionReplicated );
+
+  CPPUNIT_TEST( testNemesisSingleElementDistributed );
+  CPPUNIT_TEST( testNemesisSingleElementReplicated );
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
   CPPUNIT_TEST( testNemesisCopyElementVectorDistributed );
   CPPUNIT_TEST( testNemesisCopyElementVectorReplicated );
@@ -308,7 +311,68 @@ public:
 
   void testNemesisCopyElementSolutionDistributed ()
   { testCopyElementSolutionImpl<DistributedMesh,Nemesis_IO>("dist_with_elem_soln.nem"); }
+
+
+  // This tests that a single-element mesh solution makes it through all of the API to write out a
+  // set of Nemesis files. When this executes in parallel, there are ((number of processors) - 1)
+  // subdomains with zero elements and therefore nothing to write, but the API should handle this.
+  template <typename MeshType, typename IOType>
+  void testSingleElementImpl(const std::string & filename)
+  {
+    {
+      // Generate a single 1x1 square element mesh
+      MeshType mesh(*TestCommWorld);
+      MeshTools::Generation::build_square(mesh, 1, 1);
+
+      EquationSystems es(mesh);
+      auto & sys = es.add_system<System>("SimpleSystem");
+      sys.add_variable("e", CONSTANT, MONOMIAL);
+
+      // Set an arbitrary solution for the single element DOF
+      es.init();
+      sys.project_solution(six_x_plus_sixty_y, nullptr, es.parameters);
+
+      // Write the solution to Nemesis file(s) - only proc 0 should have anything to write!
+      Nemesis_IO nem_io(mesh);
+      std::set<std::string> sys_list;
+      nem_io.write_equation_systems(filename, es, &sys_list);
+      nem_io.write_element_data(es);
+    }
+
+    // If we can read and copy the correct element value back into the mesh, we know the Nemesis
+    // file(s) were written properly.
+    {
+      MeshType mesh(*TestCommWorld);
+      EquationSystems es(mesh);
+      auto & sys = es.add_system<System>("SimpleSystem");
+      sys.add_variable("teste", CONSTANT, MONOMIAL);
+
+      Nemesis_IO nem_io(mesh);
+      if (mesh.processor_id() == 0 || nem_io.is_parallel_format())
+        nem_io.read(filename);
+
+      mesh.prepare_for_use();
+      es.init();
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+      nem_io.copy_elemental_solution(sys, "teste", "r_e");
+#else
+      nem_io.copy_elemental_solution(sys, "teste", "e");
 #endif
+
+      // The result should be '\frac{6 + 60}{2} = 33' at all points in the element domain
+      CPPUNIT_ASSERT_EQUAL(int(sys.solution->size()), 1);
+      CPPUNIT_ASSERT_EQUAL(libmesh_real(sys.point_value(0, Point(0.5, 0.5))), 33.0);
+    }
+  }
+
+
+  void testNemesisSingleElementReplicated ()
+  { testSingleElementImpl<ReplicatedMesh,Nemesis_IO>("repl_with_single_elem.nem"); }
+
+  void testNemesisSingleElementDistributed ()
+  { testSingleElementImpl<DistributedMesh,Nemesis_IO>("dist_with_single_elem.nem"); }
+#endif //defined(LIBMESH_HAVE_NEMESIS_API)
 
 
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS

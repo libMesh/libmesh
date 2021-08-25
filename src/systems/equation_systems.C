@@ -873,9 +873,9 @@ EquationSystems::find_variable_numbers
 
   libmesh_assert (this->n_systems());
 
-  // Resolve class of type input and ensure that at least one of them is null
-  libmesh_error_msg_if(type && types,
-                       "Input either 'type' or 'types' in find_variable_numbers, but not both.");
+  // Resolve class of type input and assert that at least one of them is null
+  libmesh_assert_msg(!type || !types,
+                     "Input 'type', 'types', or neither in find_variable_numbers, but not both.");
 
   std::vector<FEType> type_filter;
   if (type)
@@ -907,7 +907,7 @@ EquationSystems::find_variable_numbers
     {
       const System & system = *(pr.second);
 
-      for (unsigned int var = 0; var < system.n_vars(); ++var)
+      for (auto var : make_range(system.n_vars()))
         {
           // apply the type filter
           var_type = system.variable_type(var);
@@ -932,7 +932,7 @@ EquationSystems::find_variable_numbers
               else
                 continue;
             }
-          else /*scalar variable*/
+          else /*scalar-valued variable*/
             {
               name = system.variable_name(var);
               if (is_names_empty ||
