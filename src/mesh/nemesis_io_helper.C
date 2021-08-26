@@ -2644,10 +2644,25 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
   // For each variable in names,
   //   For each subdomain in subdomain_map,
   //     If this (subdomain, variable) combination is active
-  //       Extract our values into local_soln (localize is a collective)
-  //       Write local_soln to file
+  //       For each component in variable
+  //         Extract element values into local_soln (localize is a collective)
+  //         Write local_soln to file
+  //   Update var_ctr with number of vector components for variable
+  //
+  unsigned int var_ctr = 0;
   for (auto v : index_range(var_nums))
     {
+      const unsigned int sys_num = var_nums[v].first;
+      const unsigned int var = var_nums[v].second;
+      const System & system = es.get_system(sys_num);
+
+      // We need to check if the constant monomial is a scalar or a vector and set the number of
+      // components as the mesh dimension for the latter case as per es.find_variable_numbers().
+      // Even for the case where a variable is not active on any subdomain belonging to the
+      // processor, we still need to know this number to update 'var_ctr'.
+      const unsigned int n_comps =
+        (system.variable_type(var) == FEType(CONSTANT, MONOMIAL_VEC)) ? mesh.mesh_dimension() : 1;
+
       // Get list of active subdomains for variable v
       const auto & active_subdomains = vars_active_subdomains[v];
 
@@ -2660,77 +2675,90 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
           const std::vector<dof_id_type> & elem_ids =
             (it == subdomain_map.end()) ? empty_vec : it->second;
 
-          // Possibly skip this (variable, subdomain) combination
-          if (active_subdomains.empty() || active_subdomains.count(sbd_id))
+          // Possibly skip this (variable, subdomain) combination. Also, check that there is at
+          // least one element on the subdomain... Indeed, it is possible to have zero elements,
+          // e.g., when running "adaptivity_ex3" in parallel with the 'dimension=1' argument.
+          if ((active_subdomains.empty() || active_subdomains.count(sbd_id)) && elem_ids.size())
             {
               std::vector<numeric_index_type> required_indices;
               required_indices.reserve(elem_ids.size());
 
-              const unsigned int sys_num = var_nums[v].first;
+              // The number of DOF components needs to be equal to the expected number so that we
+              // know where to store data to correctly correspond to variable names - verify this by
+              // accessing the n_comp method for the last element ID, which should return the same
+              // value for all elements on a given subdomain, so we only need to check this once.
+              libmesh_assert_equal_to(n_comps, mesh.elem_ref(elem_ids.back()).n_comp(sys_num, var));
 
-              for (const auto & id : elem_ids)
-                required_indices.push_back
-                  (mesh.elem_ref(id).dof_number
-                    (sys_num, var_nums[v].second, 0));
+              // Loop through the DOFs of the variable and write the values for it on each element.
+              // The variable name should have been decomposed by es.find_variable_numbers().
+              for (unsigned int comp = 0; comp < n_comps; ++comp)
+              {
+                for (const auto & id : elem_ids)
+                    required_indices.push_back(mesh.elem_ref(id).dof_number(sys_num, var, comp));
 
-              std::vector<Number> local_soln;
-              es.get_system(sys_num).current_local_solution->get
-                (required_indices, local_soln);
+                std::vector<Number> local_soln;
+                system.current_local_solution->get(required_indices, local_soln);
 
-              // It's possible that there's nothing for us to write:
-              // we may not be responsible for any elements on the
-              // current subdomain.  We did still have to participate
-              // in the localize() call above, however, since it is a
-              // collective.
-              if (local_soln.size())
-                {
+                // reset for the next component
+                required_indices.clear();
+
+                // It's possible that there's nothing for us to write:
+                // we may not be responsible for any elements on the
+                // current subdomain.  We did still have to participate
+                // in the localize() call above, however, since it is a
+                // collective.
+                if (local_soln.size())
+                  {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-                  int stride = write_complex_abs ? 3 : 2;
-                  std::vector<Real> local_soln_buffer(local_soln.size());
-                  std::transform(local_soln.begin(), local_soln.end(),
-                                 local_soln_buffer.begin(), [](Number n) { return n.real(); });
-                  ex_err = exII::ex_put_elem_var(ex_id,
-                                                 timestep,
-                                                 static_cast<int>(stride*v+1),
-                                                 static_cast<int>(sbd_id),
-                                                 static_cast<int>(local_soln.size()),
-                                                 local_soln_buffer.data());
-                  EX_CHECK_ERR(ex_err, "Error writing element real values.");
+                    int stride = write_complex_abs ? 3 : 2;
+                    std::vector<Real> local_soln_buffer(local_soln.size());
+                    std::transform(local_soln.begin(), local_soln.end(),
+                                   local_soln_buffer.begin(), [](Number n) { return n.real(); });
+                    ex_err = exII::ex_put_elem_var(ex_id,
+                                                   timestep,
+                                                   static_cast<int>(stride*(var_ctr+comp)+1),
+                                                   static_cast<int>(sbd_id),
+                                                   static_cast<int>(local_soln.size()),
+                                                   local_soln_buffer.data());
+                    EX_CHECK_ERR(ex_err, "Error writing element real values.");
 
-                  std::transform(local_soln.begin(), local_soln.end(),
-                                 local_soln_buffer.begin(), [](Number n) { return n.imag(); });
-                  ex_err = exII::ex_put_elem_var(ex_id,
-                                                 timestep,
-                                                 static_cast<int>(stride*v+2),
-                                                 static_cast<int>(sbd_id),
-                                                 static_cast<int>(local_soln.size()),
-                                                 local_soln_buffer.data());
-                  EX_CHECK_ERR(ex_err, "Error writing element imaginary values.");
+                    std::transform(local_soln.begin(), local_soln.end(),
+                                   local_soln_buffer.begin(), [](Number n) { return n.imag(); });
+                    ex_err = exII::ex_put_elem_var(ex_id,
+                                                   timestep,
+                                                   static_cast<int>(stride*(var_ctr+comp)+2),
+                                                   static_cast<int>(sbd_id),
+                                                   static_cast<int>(local_soln.size()),
+                                                   local_soln_buffer.data());
+                    EX_CHECK_ERR(ex_err, "Error writing element imaginary values.");
 
-                  if (write_complex_abs)
-                    {
-                      std::transform(local_soln.begin(), local_soln.end(),
-                                     local_soln_buffer.begin(), [](Number n) { return std::abs(n); });
-                      ex_err = exII::ex_put_elem_var(ex_id,
-                                                     timestep,
-                                                     static_cast<int>(stride*v+2),
-                                                     static_cast<int>(sbd_id),
-                                                     static_cast<int>(local_soln.size()),
-                                                     local_soln_buffer.data());
-                      EX_CHECK_ERR(ex_err, "Error writing element magnitudes.");
-                    }
+                    if (write_complex_abs)
+                      {
+                        std::transform(local_soln.begin(), local_soln.end(),
+                                       local_soln_buffer.begin(), [](Number n) { return std::abs(n); });
+                        ex_err = exII::ex_put_elem_var(ex_id,
+                                                       timestep,
+                                                       static_cast<int>(stride*(var_ctr+comp)+2),
+                                                       static_cast<int>(sbd_id),
+                                                       static_cast<int>(local_soln.size()),
+                                                       local_soln_buffer.data());
+                        EX_CHECK_ERR(ex_err, "Error writing element magnitudes.");
+                      }
 #else // LIBMESH_USE_COMPLEX_NUMBERS
-                  ex_err = exII::ex_put_elem_var(ex_id,
-                                                 timestep,
-                                                 static_cast<int>(v+1),
-                                                 static_cast<int>(sbd_id),
-                                                 static_cast<int>(local_soln.size()),
-                                                 local_soln.data());
-                  EX_CHECK_ERR(ex_err, "Error writing element values.");
+                    ex_err = exII::ex_put_elem_var(ex_id,
+                                                   timestep,
+                                                   static_cast<int>(var_ctr+comp+1),
+                                                   static_cast<int>(sbd_id),
+                                                   static_cast<int>(local_soln.size()),
+                                                   local_soln.data());
+                    EX_CHECK_ERR(ex_err, "Error writing element values.");
 #endif // LIBMESH_USE_COMPLEX_NUMBERS
-                }
+                  }
+              } // end loop over vector components
             }
-        }
+        } // end loop over active subdomains
+
+        var_ctr += n_comps;
     } // end loop over vars
 
   this->update();

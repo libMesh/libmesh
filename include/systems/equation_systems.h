@@ -329,9 +329,10 @@ public:
                                   std::vector<std::set<subdomain_id_type>> & vars_active_subdomains) const;
 
   /**
-   * Retrieve the solution data for CONSTANT MONOMIALs.  If \p names
-   * is populated, only the variables corresponding to those names will
-   * be retrieved.  This can be used to filter which variables are retrieved.
+   * Retrieve the solution data for CONSTANT MONOMIALs and/or components of
+   * CONSTANT MONOMIAL_VECs. If 'names' is populated, only the variables
+   * corresponding to those names will be retrieved. This can be used to
+   * filter which variables are retrieved.
    *
    * \deprecated Call the more appropriately-named build_elemental_solution_vector()
    * instead.
@@ -340,9 +341,10 @@ public:
                      std::vector<std::string> & names) const;
 
   /**
-   * Retrieve the solution data for CONSTANT MONOMIALs.  If \p names
-   * is populated, only the variables corresponding to those names will
-   * be retrieved.  This can be used to filter which variables are retrieved.
+   * Retrieve the solution data for CONSTANT MONOMIALs and/or components of
+   * CONSTANT MONOMIAL_VECs. If 'names' is populated, only the variables
+   * corresponding to those names will be retrieved. This can be used to
+   * filter which variables are retrieved.
    *
    * This is the more appropriately-named replacement for the get_solution()
    * function defined above.
@@ -351,28 +353,49 @@ public:
                                         std::vector<std::string> & names) const;
 
   /**
-   * Finds system and variable numbers for any variables of \p type
-   * corresponding to the entries in the input 'names' vector.
+   * Finds system and variable numbers for any variables of 'type' or of
+   * 'types' corresponding to the entries in the input 'names' vector.
+   * If 'names' is empty, this returns all variables of the type.
+   * The names of vector variables are decomposed into individual ones
+   * suffixed with their cartesian component, but there will still be
+   * a single pair of system numbers for such vector variables. Thus,
+   * the size of the 'names' vector modified by this function may not
+   * be equal to that of the returned vector of pairs. Nevertheless, both
+   * should be sorted in accordance with ExodusII format, and so the
+   * developer just needs to know to separate dof_indices when
+   * accessing the system solution for vector variables.
+   *
+   * This function is designed to work for either a single type or a
+   * vector of types, but not both. This is because it can't simply be
+   * called a second time with another type as it filters (deletes) the
+   * names of those on the first call that used a different type. Thus,
+   * the 'types' argument is for the case where variables of multiple
+   * types are allowed to pass through.
+   *
+   * TODO: find a more generic way to handle this whole procedure.
    */
   std::vector<std::pair<unsigned int, unsigned int>>
   find_variable_numbers (std::vector<std::string> & names,
-                         const FEType * type=nullptr) const;
+                         const FEType * type=nullptr,
+                         const std::vector<FEType> * types=nullptr) const;
 
   /**
-   * Builds a parallel vector of CONSTANT MONOMIAL solution values
-   * corresponding to the entries in the input 'names' vector.  This
-   * vector is approximately uniformly distributed across all of the
-   * available processors.
+   * Builds a parallel vector of CONSTANT MONOMIAL and/or components of
+   * CONSTANT MONOMIAL_VEC solution values corresponding to the entries
+   * in the input 'names' vector. This vector is approximately uniformly
+   * distributed across all of the available processors.
    *
    * The related function build_elemental_solution_vector() is
    * implemented by calling this function and then calling
    * localize_to_one() on the resulting vector.
    *
-   * \returns A nullptr (if no CONSTANT, MONOMIAL variables exist on
-   * the system) or a std::unique_ptr to a var-major numeric vector of
-   * total length n_elem * n_vars ordered according to:
-   * [u0, u1, ... uN, v0, v1, ... vN, w0, w1, ... wN]
-   * for constant monomial variables (u, v, w) on a mesh with N elements.
+   * Returns a nullptr if no CONSTANT, MONOMIAL/MONOMIAL_VEC variables
+   * exist in the 'names' vector (if it is empty, then it will return all
+   * variables in the system of this type if any) or a std::unique_ptr to
+   * a var-major numeric vector of total length n_elem * n_vars, where
+   * n_vars includes all components of vectors, ordered according to:
+   * [u0, u1, ... uN, v0, v1, ... vN, w0, w1, ... wN] for constant monomial
+   * variables (u, v, w) on a mesh with N elements.
    */
   std::unique_ptr<NumericVector<Number>>
   build_parallel_elemental_solution_vector (std::vector<std::string> & names) const;

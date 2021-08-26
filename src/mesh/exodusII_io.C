@@ -702,8 +702,13 @@ void ExodusII_IO::copy_elemental_solution(System & system,
                                           unsigned int timestep)
 {
   const unsigned int var_num = system.variable_number(system_var_name);
-  libmesh_error_msg_if(system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL),
-                       "Error! Trying to copy elemental solution into a variable that is not of CONSTANT MONOMIAL type.");
+  // Assert that variable is an elemental one.
+  //
+  // NOTE: Currently, this reader is capable of reading only individual components of MONOMIAL_VEC
+  //       types, and each must be written out to its own CONSTANT MONOMIAL variable
+  libmesh_error_msg_if((system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL))
+                       && (system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL_VEC)),
+                       "Error! Trying to copy elemental solution into a variable that is not of CONSTANT MONOMIAL nor CONSTANT MONOMIAL_VEC type.");
 
   const MeshBase & mesh = MeshInput<MeshBase>::mesh();
   const DofMap & dof_map = system.get_dof_map();
@@ -916,10 +921,13 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   // also in the _output_variables vector.
   if (_output_variables.size() > 0)
     {
+      // Create a list of CONSTANT MONOMIAL variable names
       std::vector<std::string> monomials;
-      const FEType type(CONSTANT, MONOMIAL);
+      FEType type(CONSTANT, MONOMIAL);
+      es.build_variable_names(monomials, &type);
 
-      // Create a list of monomial variable names
+      // Now concatenate a list of CONSTANT MONOMIAL_VEC variable names
+      type = FEType(CONSTANT, MONOMIAL_VEC);
       es.build_variable_names(monomials, &type);
 
       // Filter that list against the _output_variables list.  Note: if names is still empty after
@@ -1030,6 +1038,16 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   // Get a subset of all variable names that are CONSTANT,
   // MONOMIALs. We treat those slightly differently since they can
   // truly only have a single value per Elem.
+  //
+  // Should the same apply here for CONSTANT MONOMIAL_VECs? [CW]
+  // That is, get rid of 'const' on 'fe_type' and rerun:
+  //    fe_type = FEType(CONSTANT, MONOMIAL_VEC);
+  //    es.build_variable_names(monomial_var_names, &fe_type);
+  // Then, es.find_variable_numbers() can be used without a type
+  // (since we know for sure they're monomials) like:
+  //    var_nums = es.find_variable_numbers(monomial_var_names)
+  // for which the DOF indices for 'var_nums' have to be resolved
+  // manually like in build_elemental_solution_vector()
   std::vector<std::string> monomial_var_names;
   const FEType fe_type(CONSTANT, MONOMIAL);
   es.build_variable_names(monomial_var_names, &fe_type);
