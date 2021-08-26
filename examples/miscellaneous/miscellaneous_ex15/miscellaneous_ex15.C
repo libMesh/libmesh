@@ -173,6 +173,11 @@ int main (int argc, char** argv)
   libmesh_example_requires(false, "--enable-ifem");
 #else
 
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  // Node constraints are not yet implemented for infinite elements.
+  libmesh_example_requires(false, "--disable-node-constraints");
+#endif
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   // UniformRefinement uses second derivatives if they are enabled,
   // but for infinite elements they are not implemented.
