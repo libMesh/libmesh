@@ -156,6 +156,8 @@ void QNodal::init_3D(const ElemType, unsigned int)
         _points[12](1) = 1/Real(3); _points[13](1) = 1/Real(3);
         _points[12](2) = 1/Real(3); _points[13](2) = 1/Real(3);
 
+        // RHS:
+        //
         // The ``optimal'' nodal quadrature here, the one that
         // integrates every Lagrange polynomial on these nodes
         // exactly, produces an indefinite mass matrix ...
@@ -164,15 +166,30 @@ void QNodal::init_3D(const ElemType, unsigned int)
         // const Real we = 0;
         // const Real wf = 3/Real(80);
 
-        // I'm going to average the above rule with our Tet10 rule, so
-        // we get something that's positive-definite on a Tet14 but
-        // that at least integrates quadratics exactly.  If I were
-        // less lazy I'd do the same optimization problem that John
-        // did for Quad8+Hex20, but I'm not so here we are. - Roy
-
-        const Real wv = (1/Real(240)+1/Real(192))/2;
-        const Real we = Real(14)/576/2;
-        const Real wf = 3/Real(80)/2;
+        // We could average that with our Tet10 rule and get:
+        //
+        // const Real wv = (1/Real(240)+1/Real(192))/2;
+        // const Real we = Real(14)/576/2;
+        // const Real wf = 3/Real(80)/2;
+        //
+        // Except our Tet10 rule won't actually exactly integrate
+        // quadratics! (exactly integrating quadratics wouldn't even
+        // have given a positive semidefinite mass matrix there...)
+        //
+        // John derived equations for wv and we based on symmetry and
+        // the requirement to exactly integrate quadratics; within
+        // those constraints we might pick the wf that maximizes the
+        // minimum nodal weight:
+        // const Real wf = Real(15)/440;
+        // const Real wv = -1/Real(120) + wf/3;
+        // const Real we = 1/Real(30) - wf*(Real(8)/9);
+        //
+        // But John also did the same clever optimization trick that
+        // quadrature_nodal_2D.C discusses in the context of Quad8 and
+        // Hex20 outputs, and for Tet14 that gives us:
+        const Real wv = Real(87)/47120;
+        const Real we = Real(164)/26505;
+        const Real wf = Real(1439)/47120;
 
         _weights = {wv, wv, wv, wv, we, we, we, we, we, we, wf, wf, wf, wf};
         return;
