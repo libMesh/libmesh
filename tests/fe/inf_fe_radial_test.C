@@ -931,7 +931,7 @@ public:
                     }
                   // If element was found check that the values agree
                   if (glob_ind != DofObject::invalid_id)
-                    LIBMESH_ASSERT_FP_EQUAL(real(phi_values(i)), real(reference_values(glob_ind)), TOLERANCE);
+                    LIBMESH_ASSERT_FP_EQUAL(std::real(phi_values(i)), std::real(reference_values(glob_ind)), TOLERANCE);
                 }
 
             }
