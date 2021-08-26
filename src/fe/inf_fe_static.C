@@ -1196,16 +1196,16 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim, T_radial, T_map>::inf_compute_node_constraints (NodeConstraints & constraints,const Elem * elem)
+void InfFE<Dim, T_radial, T_map>::inf_compute_node_constraints (NodeConstraints & /* constraints */,const Elem * elem)
 {
   // only constrain elements in 2,3d.
   if (Dim == 1)
     return;
 
-  libmesh_assert(child_elem);
+  libmesh_assert(elem);
 
   // only constrain active and ancestor elements
-  if (child_elem->subactive())
+  if (elem->subactive())
     return;
 
   // for infinite elements, the computation of constraints is somewhat different
