@@ -192,6 +192,7 @@ void init_ref_elem_table()
 
     ref_elem_file[TET4]     = ElemDataStrings::one_tet;
     ref_elem_file[TET10]    = ElemDataStrings::one_tet10;
+    ref_elem_file[TET14]    = ElemDataStrings::one_tet14;
 
     ref_elem_file[PRISM6]   = ElemDataStrings::one_prism;
     ref_elem_file[PRISM15]  = ElemDataStrings::one_prism15;
