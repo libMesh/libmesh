@@ -121,7 +121,7 @@ typedef LIBMESH_DEFAULT_SCALAR_TYPE Real;
 // For example, v == 0 is changed to std::abs(v) < TOLERANCE.
 
 #ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
-static const Real TOLERANCE = 2.5e-3;
+static constexpr Real TOLERANCE = 2.5e-3;
 # if defined (LIBMESH_DEFAULT_TRIPLE_PRECISION) || \
      defined (LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
 #  error Cannot define multiple precision levels
@@ -129,20 +129,20 @@ static const Real TOLERANCE = 2.5e-3;
 #endif
 
 #ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
-static const Real TOLERANCE = 1.e-8;
+static constexpr Real TOLERANCE = 1.e-8;
 # if defined (LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
 #  error Cannot define multiple precision levels
 # endif
 #endif
 
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-static const Real TOLERANCE = 1.e-11;
+static constexpr Real TOLERANCE = 1.e-11;
 #endif
 
 #if !defined (LIBMESH_DEFAULT_SINGLE_PRECISION) && \
     !defined (LIBMESH_DEFAULT_TRIPLE_PRECISION) && \
     !defined (LIBMESH_DEFAULT_QUADRUPLE_PRECISION)
-static const Real TOLERANCE = 1.e-6;
+static constexpr Real TOLERANCE = 1.e-6;
 #endif
 
 // Define the type to use for complex numbers
