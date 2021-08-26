@@ -51,7 +51,7 @@ public:
   CPPUNIT_TEST( testInfQuants );
   CPPUNIT_TEST( testSides );
   CPPUNIT_TEST( testInfQuants_numericDeriv );
-#ifdef LIBMESH_ENABLE_AMR
+#if defined(LIBMESH_ENABLE_AMR) && !defined(LIBMESH_ENABLE_NODE_CONSTRAINTS)
   CPPUNIT_TEST( testRefinement );
 #endif
   CPPUNIT_TEST_SUITE_END();
