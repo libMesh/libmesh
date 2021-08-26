@@ -848,8 +848,8 @@ public:
 
       std::vector<dof_id_type> dof_indices;
 
-      UniquePtr<FEBase> fe (FEBase::build(3, fe_type));
-      UniquePtr<FEBase> inf_fe (FEBase::build_InfFE(3, fe_type));
+      std::unique_ptr<FEBase> fe (FEBase::build(3, fe_type));
+      std::unique_ptr<FEBase> inf_fe (FEBase::build_InfFE(3, fe_type));
 
       const DofMap& dof_map = dummy.get_dof_map();
 
