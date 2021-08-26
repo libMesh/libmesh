@@ -134,7 +134,7 @@ Quad4::nodes_on_edge(const unsigned int e) const
 bool Quad4::has_affine_map() const
 {
   Point v = this->point(3) - this->point(0);
-  return (v.relative_fuzzy_equals(this->point(2) - this->point(1)));
+  return (v.relative_fuzzy_equals(this->point(2) - this->point(1), affine_tol));
 }
 
 

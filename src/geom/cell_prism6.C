@@ -215,8 +215,8 @@ bool Prism6::has_affine_map() const
 {
   // Make sure z edges are affine
   Point v = this->point(3) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(4) - this->point(1)) ||
-      !v.relative_fuzzy_equals(this->point(5) - this->point(2)))
+  if (!v.relative_fuzzy_equals(this->point(4) - this->point(1), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(5) - this->point(2), affine_tol))
     return false;
   return true;
 }

@@ -160,27 +160,27 @@ bool Tet10::has_affine_map() const
   // Make sure edges are straight
   Point v = this->point(1) - this->point(0);
   if (!v.relative_fuzzy_equals
-      ((this->point(4) - this->point(0))*2))
+      ((this->point(4) - this->point(0))*2, affine_tol))
     return false;
   v = this->point(2) - this->point(1);
   if (!v.relative_fuzzy_equals
-      ((this->point(5) - this->point(1))*2))
+      ((this->point(5) - this->point(1))*2, affine_tol))
     return false;
   v = this->point(2) - this->point(0);
   if (!v.relative_fuzzy_equals
-      ((this->point(6) - this->point(0))*2))
+      ((this->point(6) - this->point(0))*2, affine_tol))
     return false;
   v = this->point(3) - this->point(0);
   if (!v.relative_fuzzy_equals
-      ((this->point(7) - this->point(0))*2))
+      ((this->point(7) - this->point(0))*2, affine_tol))
     return false;
   v = this->point(3) - this->point(1);
   if (!v.relative_fuzzy_equals
-      ((this->point(8) - this->point(1))*2))
+      ((this->point(8) - this->point(1))*2, affine_tol))
     return false;
   v = this->point(3) - this->point(2);
   if (!v.relative_fuzzy_equals
-      ((this->point(9) - this->point(2))*2))
+      ((this->point(9) - this->point(2))*2, affine_tol))
     return false;
   return true;
 }

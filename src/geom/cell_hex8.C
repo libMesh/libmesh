@@ -141,13 +141,13 @@ bool Hex8::has_affine_map() const
 {
   // Make sure x-edge endpoints are affine
   Point v = this->point(1) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(2) - this->point(3)) ||
-      !v.relative_fuzzy_equals(this->point(5) - this->point(4)) ||
-      !v.relative_fuzzy_equals(this->point(6) - this->point(7)))
+  if (!v.relative_fuzzy_equals(this->point(2) - this->point(3), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(5) - this->point(4), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(6) - this->point(7), affine_tol))
     return false;
   // Make sure xz-faces are identical parallelograms
   v = this->point(4) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(7) - this->point(3)))
+  if (!v.relative_fuzzy_equals(this->point(7) - this->point(3), affine_tol))
     return false;
   // If all the above checks out, the map is affine
   return true;

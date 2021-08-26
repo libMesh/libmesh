@@ -135,26 +135,26 @@ bool Prism15::has_affine_map() const
 {
   // Make sure z edges are affine
   Point v = this->point(3) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(4) - this->point(1)) ||
-      !v.relative_fuzzy_equals(this->point(5) - this->point(2)))
+  if (!v.relative_fuzzy_equals(this->point(4) - this->point(1), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(5) - this->point(2), affine_tol))
     return false;
   // Make sure edges are straight
   v /= 2;
-  if (!v.relative_fuzzy_equals(this->point(9) - this->point(0)) ||
-      !v.relative_fuzzy_equals(this->point(10) - this->point(1)) ||
-      !v.relative_fuzzy_equals(this->point(11) - this->point(2)))
+  if (!v.relative_fuzzy_equals(this->point(9) - this->point(0), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(10) - this->point(1), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(11) - this->point(2), affine_tol))
     return false;
   v = (this->point(1) - this->point(0))/2;
-  if (!v.relative_fuzzy_equals(this->point(6) - this->point(0)) ||
-      !v.relative_fuzzy_equals(this->point(12) - this->point(3)))
+  if (!v.relative_fuzzy_equals(this->point(6) - this->point(0), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(12) - this->point(3), affine_tol))
     return false;
   v = (this->point(2) - this->point(0))/2;
-  if (!v.relative_fuzzy_equals(this->point(8) - this->point(0)) ||
-      !v.relative_fuzzy_equals(this->point(14) - this->point(3)))
+  if (!v.relative_fuzzy_equals(this->point(8) - this->point(0), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(14) - this->point(3), affine_tol))
     return false;
   v = (this->point(2) - this->point(1))/2;
-  if (!v.relative_fuzzy_equals(this->point(7) - this->point(1)) ||
-      !v.relative_fuzzy_equals(this->point(13) - this->point(4)))
+  if (!v.relative_fuzzy_equals(this->point(7) - this->point(1), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(13) - this->point(4), affine_tol))
     return false;
   return true;
 }

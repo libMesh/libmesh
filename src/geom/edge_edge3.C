@@ -96,7 +96,7 @@ bool Edge3::has_affine_map() const
 {
   Point v = this->point(1) - this->point(0);
   return (v.relative_fuzzy_equals
-          ((this->point(2) - this->point(0))*2));
+          ((this->point(2) - this->point(0))*2, affine_tol));
 }
 
 

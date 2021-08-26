@@ -146,41 +146,41 @@ bool Hex27::has_affine_map() const
 {
   // Make sure x-edge endpoints are affine
   Point v = this->point(1) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(2) - this->point(3)) ||
-      !v.relative_fuzzy_equals(this->point(5) - this->point(4)) ||
-      !v.relative_fuzzy_equals(this->point(6) - this->point(7)))
+  if (!v.relative_fuzzy_equals(this->point(2) - this->point(3), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(5) - this->point(4), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(6) - this->point(7), affine_tol))
     return false;
   // Make sure x-edges are straight
   // and x-face and center points are centered
   v /= 2;
-  if (!v.relative_fuzzy_equals(this->point(8) - this->point(0)) ||
-      !v.relative_fuzzy_equals(this->point(10) - this->point(3)) ||
-      !v.relative_fuzzy_equals(this->point(16) - this->point(4)) ||
-      !v.relative_fuzzy_equals(this->point(18) - this->point(7)) ||
-      !v.relative_fuzzy_equals(this->point(20) - this->point(11)) ||
-      !v.relative_fuzzy_equals(this->point(21) - this->point(12)) ||
-      !v.relative_fuzzy_equals(this->point(23) - this->point(15)) ||
-      !v.relative_fuzzy_equals(this->point(25) - this->point(19)) ||
-      !v.relative_fuzzy_equals(this->point(26) - this->point(24)))
+  if (!v.relative_fuzzy_equals(this->point(8) - this->point(0), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(10) - this->point(3), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(16) - this->point(4), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(18) - this->point(7), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(20) - this->point(11), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(21) - this->point(12), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(23) - this->point(15), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(25) - this->point(19), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(26) - this->point(24), affine_tol))
     return false;
   // Make sure xz-faces are identical parallelograms
   v = this->point(4) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(7) - this->point(3)))
+  if (!v.relative_fuzzy_equals(this->point(7) - this->point(3), affine_tol))
     return false;
   v /= 2;
-  if (!v.relative_fuzzy_equals(this->point(12) - this->point(0)) ||
-      !v.relative_fuzzy_equals(this->point(13) - this->point(1)) ||
-      !v.relative_fuzzy_equals(this->point(14) - this->point(2)) ||
-      !v.relative_fuzzy_equals(this->point(15) - this->point(3)) ||
-      !v.relative_fuzzy_equals(this->point(22) - this->point(9)) ||
-      !v.relative_fuzzy_equals(this->point(24) - this->point(11)))
+  if (!v.relative_fuzzy_equals(this->point(12) - this->point(0), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(13) - this->point(1), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(14) - this->point(2), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(15) - this->point(3), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(22) - this->point(9), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(24) - this->point(11), affine_tol))
     return false;
   // Make sure y-edges are straight
   v = (this->point(3) - this->point(0))/2;
-  if (!v.relative_fuzzy_equals(this->point(11) - this->point(0)) ||
-      !v.relative_fuzzy_equals(this->point(9) - this->point(1)) ||
-      !v.relative_fuzzy_equals(this->point(17) - this->point(5)) ||
-      !v.relative_fuzzy_equals(this->point(19) - this->point(4)))
+  if (!v.relative_fuzzy_equals(this->point(11) - this->point(0), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(9) - this->point(1), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(17) - this->point(5), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(19) - this->point(4), affine_tol))
     return false;
   // If all the above checks out, the map is affine
   return true;
