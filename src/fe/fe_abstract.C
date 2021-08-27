@@ -900,12 +900,12 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
       {
          case 2:
             {
-            inf_fe_family_mapping_switch(2, inf_compute_constraints (constraints, dof_map, variable_number, elem) , ,; break;);
+            inf_fe_family_mapping_switch(2, inf_compute_node_constraints (constraints, elem) , ,; break;);
             break;
           }
          case 3:
             {
-            inf_fe_family_mapping_switch(3, inf_compute_constraints (constraints, dof_map, variable_number, elem) , ,; break;);
+            inf_fe_family_mapping_switch(3, inf_compute_node_constraints (constraints, elem) , ,; break;);
             break;
             }
          default:

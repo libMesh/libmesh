@@ -51,7 +51,7 @@ public:
   CPPUNIT_TEST( testInfQuants );
   CPPUNIT_TEST( testSides );
   CPPUNIT_TEST( testInfQuants_numericDeriv );
-#ifdef LIBMESH_ENABLE_AMR
+#if defined(LIBMESH_ENABLE_AMR) && !defined(LIBMESH_ENABLE_NODE_CONSTRAINTS)
   CPPUNIT_TEST( testRefinement );
 #endif
   CPPUNIT_TEST_SUITE_END();
@@ -848,8 +848,8 @@ public:
 
       std::vector<dof_id_type> dof_indices;
 
-      UniquePtr<FEBase> fe (FEBase::build(3, fe_type));
-      UniquePtr<FEBase> inf_fe (FEBase::build_InfFE(3, fe_type));
+      std::unique_ptr<FEBase> fe (FEBase::build(3, fe_type));
+      std::unique_ptr<FEBase> inf_fe (FEBase::build_InfFE(3, fe_type));
 
       const DofMap& dof_map = dummy.get_dof_map();
 
@@ -931,7 +931,7 @@ public:
                     }
                   // If element was found check that the values agree
                   if (glob_ind != DofObject::invalid_id)
-                    LIBMESH_ASSERT_FP_EQUAL(real(phi_values(i)), real(reference_values(glob_ind)), TOLERANCE);
+                    LIBMESH_ASSERT_FP_EQUAL(std::real(phi_values(i)), std::real(reference_values(glob_ind)), TOLERANCE);
                 }
 
             }

@@ -62,8 +62,8 @@ void assemble_func(EquationSystems & es, const std::string & system_name)
   LinearImplicitSystem & f_system = es.get_system<LinearImplicitSystem> (system_name);
   const DofMap& dof_map = f_system.get_dof_map();
   const FEType fe_type = dof_map.variable_type(0);
-  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
-  UniquePtr<FEBase> inf_fe (FEBase::build_InfFE(dim, fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> inf_fe (FEBase::build_InfFE(dim, fe_type));
 
   const std::vector<dof_id_type > charged_objects = es.parameters.get<std::vector<dof_id_type> >("charged_elem_id");
   const auto qrule=fe_type.default_quadrature_rule(/*dim = */ 3, /*extra order = */ 3);
@@ -172,6 +172,11 @@ int main (int argc, char** argv)
 #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
   libmesh_example_requires(false, "--enable-ifem");
 #else
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  // Node constraints are not yet implemented for infinite elements.
+  libmesh_example_requires(false, "--disable-node-constraints");
+#endif
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   // UniformRefinement uses second derivatives if they are enabled,
