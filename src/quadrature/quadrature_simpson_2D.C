@@ -59,14 +59,21 @@ void QSimpson::init_2D(const ElemType, unsigned int)
     case TRI6:
     case TRI7:
       {
-        // I'm not sure if you would call this Simpson's
-        // rule for triangles.  What it *Really* is is
-        // four trapezoidal rules combined to give a six
-        // point rule.  The points lie at the nodal locations
-        // of the TRI6, so you can get diagonal element
-        // stiffness matrix entries for quadratic elements.
-        // This rule should be able to integrate a little
-        // better than linears exactly.
+        // The integral of the vertex Lagrange basis functions of the
+        // TRI6 is equal to 0, while the integral of the edge Lagrange
+        // basis functions is 1/6, so attempting to derive the weights
+        // of a nodal quadrature rule using this approach shows that
+        // we only require three quadrature points to get a rule which
+        // is exact for quadratics.
+        //
+        // Unfortunately, it is not possible to derive a nodal
+        // quadrature rule on the TRI6 which is exact for cubics, so
+        // we instead choose the weights such that they are all
+        // strictly positive while still integrating linears
+        // exactly. This avoids issues with this nodal quadrature rule
+        // producing a singular elemental mass matrix.  We use the
+        // "optimization" approach described in quadrature_nodal_2D.C
+        // to choose the weights.
 
         _points.resize(6);
         _weights.resize(6);
@@ -83,18 +90,18 @@ void QSimpson::init_2D(const ElemType, unsigned int)
         _points[3](0) = 0.5;
         _points[3](1) = 0.;
 
-        _points[4](0) = 0.;
+        _points[4](0) = 0.5;
         _points[4](1) = 0.5;
 
-        _points[5](0) = 0.5;
+        _points[5](0) = 0.;
         _points[5](1) = 0.5;
 
-        _weights[0] = Real(1)/24;
-        _weights[1] = Real(1)/24;
-        _weights[2] = Real(1)/24;
-        _weights[3] = 0.125;                            // 1./8.
-        _weights[4] = 0.125;                            // 1./8.
-        _weights[5] = 0.125;                            // 1./8.
+        _weights[0] = Real(1)/38; // 0.0263157894736842
+        _weights[1] = Real(1)/38;
+        _weights[2] = Real(1)/38;
+        _weights[3] = Real(8)/57; // 0.140350877192982
+        _weights[4] = Real(8)/57;
+        _weights[5] = Real(8)/57;
 
         return;
       }
