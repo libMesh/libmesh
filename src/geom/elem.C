@@ -49,6 +49,7 @@
 #include "libmesh/face_inf_quad6.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/cell_tet10.h"
+#include "libmesh/cell_tet14.h"
 #include "libmesh/cell_hex8.h"
 #include "libmesh/cell_hex20.h"
 #include "libmesh/cell_hex27.h"
@@ -304,6 +305,8 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
       return libmesh_make_unique<Tet4>(p);
     case TET10:
       return libmesh_make_unique<Tet10>(p);
+    case TET14:
+      return libmesh_make_unique<Tet14>(p);
     case HEX8:
       return libmesh_make_unique<Hex8>(p);
     case HEX20:
