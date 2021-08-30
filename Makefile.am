@@ -596,6 +596,26 @@ splitter_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 splitter_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
 splitter_dbg_LDADD      = libmesh_dbg.la
 
+# embedding
+opt_programs          += embedding-opt
+embedding_opt_SOURCES    = src/apps/embedding.C
+embedding_opt_CPPFLAGS   = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+embedding_opt_CXXFLAGS   = $(CXXFLAGS_OPT)
+embedding_opt_LDADD      = libmesh_opt.la
+
+devel_programs        += embedding-devel
+embedding_devel_SOURCES  = src/apps/embedding.C
+embedding_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+embedding_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+embedding_devel_LDADD    = libmesh_devel.la
+
+dbg_programs          += embedding-dbg
+embedding_dbg_SOURCES    = src/apps/embedding.C
+embedding_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+embedding_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
+embedding_dbg_LDADD      = libmesh_dbg.la
+
+
 if LIBMESH_OPT_MODE
   bin_PROGRAMS += $(opt_programs)
 endif
