@@ -2072,7 +2072,15 @@ CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	mesh_with_soln.e elemental_from_nodal.e write_sideset_data.e \
 	write_nodeset_data.e write_edgeset_data.e read_header_test.e \
 	output.dat periodic.e mesh.out.memory.moved.xda \
-	mesh.out.file.moved.xda $(am__append_12) $(am__append_13)
+	mesh.out.file.moved.xda repl_with_nodal_soln.nem.1.0 \
+	dist_with_elem_soln.e dist.e dist_with_nodal_soln.e \
+	dist_with_nodal_soln.nem.1.0 dist_with_elem_vec.e \
+	dist_with_single_elem.nem.1.0 dist_with_elem_soln.nem.1.0 \
+	rep.nem.1.0 repl_with_elem_soln.nem.1.0 \
+	repl_with_single_elem.nem.1.0 dist_with_elem_vec.nem.1.0 \
+	repl_with_elem_vec.nem.1.0 dist.nem.1.0 repl_with_elem_soln.e \
+	test_nemesis_read.nem.1.0 rep.e repl_with_nodal_soln.e \
+	repl_with_elem_vec.e $(am__append_12) $(am__append_13)
 
 # need to link any data files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp

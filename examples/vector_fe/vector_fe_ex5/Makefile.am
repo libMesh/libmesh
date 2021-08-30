@@ -4,7 +4,7 @@ install_dir   = $(examples_install_path)/vector_fe/ex5
 data          = vector_fe_ex5.C exact_solution.C assembly.C vector_fe_ex5.in run.sh
 sources       = $(data) run.sh
 
-CLEANFILES = out.e
+CLEANFILES = out.e out_constant.e
 
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
