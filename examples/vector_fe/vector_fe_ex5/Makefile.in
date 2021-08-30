@@ -694,7 +694,8 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = out.e $(am__append_1) $(example_name).html stdout.log
+CLEANFILES = out.e out_constant.e $(am__append_1) $(example_name).html \
+	stdout.log
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
 
 ######################################################################
