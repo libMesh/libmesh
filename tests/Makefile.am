@@ -270,7 +270,26 @@ CLEANFILES = cube_mesh.xda \
              output.dat \
              periodic.e \
              mesh.out.memory.moved.xda \
-             mesh.out.file.moved.xda
+             mesh.out.file.moved.xda \
+             repl_with_nodal_soln.nem.1.0 \
+             dist_with_elem_soln.e \
+             dist.e \
+             dist_with_nodal_soln.e \
+             dist_with_nodal_soln.nem.1.0 \
+             dist_with_elem_vec.e \
+             dist_with_single_elem.nem.1.0 \
+             dist_with_elem_soln.nem.1.0 \
+             rep.nem.1.0 \
+             repl_with_elem_soln.nem.1.0 \
+             repl_with_single_elem.nem.1.0 \
+             dist_with_elem_vec.nem.1.0 \
+             repl_with_elem_vec.nem.1.0 \
+             dist.nem.1.0 \
+             repl_with_elem_soln.e \
+             test_nemesis_read.nem.1.0 \
+             rep.e \
+             repl_with_nodal_soln.e \
+             repl_with_elem_vec.e
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD
