@@ -45,6 +45,7 @@ public:
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( buildCubeTet4 );
   CPPUNIT_TEST( buildCubeTet10 );
+  CPPUNIT_TEST( buildCubeTet14 );
   CPPUNIT_TEST( buildCubeHex8 );
   CPPUNIT_TEST( buildCubeHex20 );
   CPPUNIT_TEST( buildCubeHex27 );
@@ -287,6 +288,7 @@ public:
 
   void buildCubeTet4 ()      { tester(&MeshGenerationTest::testBuildCube, 2, TET4); }
   void buildCubeTet10 ()     { tester(&MeshGenerationTest::testBuildCube, 2, TET10); }
+  void buildCubeTet14 ()     { tester(&MeshGenerationTest::testBuildCube, 2, TET14); }
   void buildCubeHex8 ()      { tester(&MeshGenerationTest::testBuildCube, 2, HEX8); }
   void buildCubeHex20 ()     { tester(&MeshGenerationTest::testBuildCube, 2, HEX20); }
   void buildCubeHex27 ()     { tester(&MeshGenerationTest::testBuildCube, 2, HEX27); }
