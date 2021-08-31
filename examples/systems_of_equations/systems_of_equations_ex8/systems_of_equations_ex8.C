@@ -255,6 +255,10 @@ int main (int argc, char ** argv)
       current_max_gap_function = std::max(std::abs(least_gap_fn), std::abs(max_gap_fn));
     }
 
+  // Enforcing constraints imposes the non-zero Dirichlet constraints on the solution.
+  system.get_dof_map().enforce_constraints_exactly(system);
+  system.update();
+
   libMesh::out << "Computing stresses..." << std::endl;
 
   le.compute_stresses();
