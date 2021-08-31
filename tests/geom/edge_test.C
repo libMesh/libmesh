@@ -15,6 +15,7 @@
 #include <libmesh/cell_pyramid14.h>
 #include <libmesh/cell_pyramid5.h>
 #include <libmesh/cell_tet10.h>
+#include <libmesh/cell_tet14.h>
 #include <libmesh/cell_tet4.h>
 #include <libmesh/edge_edge2.h>
 #include <libmesh/edge_edge3.h>

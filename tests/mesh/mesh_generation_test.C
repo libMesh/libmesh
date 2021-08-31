@@ -205,9 +205,14 @@ public:
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
                              cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 8*n*n*n - 3*(n+1)*n*n));
         break;
-      case 14:
+      case 14: // pyramids, tets
+        if (type == PYRAMID14)
+          CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                               cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 8*n*n*n));
+        else // TET14
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                             cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 8*n*n*n));
+                             cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 14*n*n*n + 4*3*(n+1)*n*n +
+                                                   36*n*n*n + 4*3*(n+1)*n*n));
         break;
       default:
         libmesh_error();

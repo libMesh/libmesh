@@ -187,7 +187,8 @@ Gradient rational_test_grad (const Point& p,
 
 
 #define FE_CAN_TEST_CUBIC \
-  (((family != LAGRANGE && family != L2_LAGRANGE) || elem_type != TRI7) && order > 2)
+  (((family != LAGRANGE && family != L2_LAGRANGE) || \
+    (elem_type != TRI7 && elem_type != TET14)) && order > 2)
 
 
 
