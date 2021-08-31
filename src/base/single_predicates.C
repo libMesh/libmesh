@@ -52,15 +52,31 @@ evaluable<T>::operator()(const T & it) const
   return _dof_map.is_evaluable(**it, _var_num);
 }
 
+template <typename T>
+bool
+multi_evaluable<T>::operator()(const T & it) const
+{
+  for (const auto * const dof_map : _dof_maps)
+  {
+    libmesh_assert(dof_map);
+    if (!dof_map->is_evaluable(**it))
+      return false;
+  }
+
+  return true;
+}
+
 
 // Instantiate with the useful values of T
-#define INSTANTIATE_NODAL_PREDICATES(IterType)                          \
-  template bool bid<IterType>::operator()(const IterType &) const;      \
-  template bool bnd<IterType>::operator()(const IterType &) const;      \
-  template bool evaluable<IterType>::operator()(const IterType &) const
+#define INSTANTIATE_NODAL_PREDICATES(IterType)                                \
+  template bool bid<IterType>::operator()(const IterType &) const;            \
+  template bool bnd<IterType>::operator()(const IterType &) const;            \
+  template bool evaluable<IterType>::operator()(const IterType &) const;      \
+  template bool multi_evaluable<IterType>::operator()(const IterType &) const
 
-#define INSTANTIATE_ELEM_PREDICATES(IterType)                           \
-  template bool evaluable<IterType>::operator()(const IterType &) const
+#define INSTANTIATE_ELEM_PREDICATES(IterType)                                 \
+  template bool evaluable<IterType>::operator()(const IterType &) const;      \
+  template bool multi_evaluable<IterType>::operator()(const IterType &) const
 
 // Handle commas in macro arguments
 #define LIBMESH_COMMA ,

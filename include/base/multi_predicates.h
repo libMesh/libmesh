@@ -733,6 +733,23 @@ struct Evaluable: abstract_multi_predicate<T>
   }
 };
 
+
+
+/**
+ * Used to iterate over elements where solutions indexed by a given
+ * vector of DofMaps are evaluable for all variables
+ */
+template <typename T>
+struct MultiEvaluable: abstract_multi_predicate<T>
+{
+  MultiEvaluable(const std::vector<const DofMap *> & dof_maps)
+  {
+    this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new active<T>);
+    this->_predicates.push_back(new multi_evaluable<T>(dof_maps));
+  }
+};
+
 }
 
 
