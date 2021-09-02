@@ -1489,16 +1489,16 @@ public:
    * distributed by the given DofMaps) can be evaluated for all variables
    */
   virtual element_iterator
-  multi_evaluable_elements_begin (const std::vector<const DofMap *> & dof_maps) = 0;
+  multi_evaluable_elements_begin (std::vector<const DofMap *> dof_maps) = 0;
 
   virtual element_iterator
-  multi_evaluable_elements_end (const std::vector<const DofMap *> & dof_maps) = 0;
+  multi_evaluable_elements_end (std::vector<const DofMap *> dof_maps) = 0;
 
   virtual const_element_iterator
-  multi_evaluable_elements_begin (const std::vector<const DofMap *> & dof_maps) const = 0;
+  multi_evaluable_elements_begin (std::vector<const DofMap *> dof_maps) const = 0;
 
   virtual const_element_iterator
-  multi_evaluable_elements_end (const std::vector<const DofMap *> & dof_maps) const = 0;
+  multi_evaluable_elements_end (std::vector<const DofMap *> dof_maps) const = 0;
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
@@ -1712,16 +1712,16 @@ public:
    * distributed by the given DofMaps) can be evaluated for all variables
    */
   virtual node_iterator
-  multi_evaluable_nodes_begin (const std::vector<const DofMap *> & dof_maps) = 0;
+  multi_evaluable_nodes_begin (std::vector<const DofMap *> dof_maps) = 0;
 
   virtual node_iterator
-  multi_evaluable_nodes_end (const std::vector<const DofMap *> & dof_maps) = 0;
+  multi_evaluable_nodes_end (std::vector<const DofMap *> dof_maps) = 0;
 
   virtual const_node_iterator
-  multi_evaluable_nodes_begin (const std::vector<const DofMap *> & dof_maps) const = 0;
+  multi_evaluable_nodes_begin (std::vector<const DofMap *> dof_maps) const = 0;
 
   virtual const_node_iterator
-  multi_evaluable_nodes_end (const std::vector<const DofMap *> & dof_maps) const = 0;
+  multi_evaluable_nodes_end (std::vector<const DofMap *> dof_maps) const = 0;
 
   /**
    * \returns A writable reference to the whole subdomain name map

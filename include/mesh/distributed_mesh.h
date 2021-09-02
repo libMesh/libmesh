@@ -514,16 +514,16 @@ public:
                           unsigned int var_num = libMesh::invalid_uint) const override;
 
   virtual element_iterator
-  multi_evaluable_elements_begin (const std::vector<const DofMap *> & dof_maps) override;
+  multi_evaluable_elements_begin (std::vector<const DofMap *> dof_maps) override;
 
   virtual element_iterator
-  multi_evaluable_elements_end (const std::vector<const DofMap *> & dof_maps) override;
+  multi_evaluable_elements_end (std::vector<const DofMap *> dof_maps) override;
 
   virtual const_element_iterator
-  multi_evaluable_elements_begin (const std::vector<const DofMap *> & dof_maps) const override;
+  multi_evaluable_elements_begin (std::vector<const DofMap *> dof_maps) const override;
 
   virtual const_element_iterator
-  multi_evaluable_elements_end (const std::vector<const DofMap *> & dof_maps) const override;
+  multi_evaluable_elements_end (std::vector<const DofMap *> dof_maps) const override;
 
 #ifdef LIBMESH_ENABLE_AMR
   virtual element_iterator flagged_elements_begin (unsigned char rflag) override;
@@ -592,13 +592,13 @@ public:
                        unsigned int var_num = libMesh::invalid_uint) const override;
 
   virtual node_iterator
-  multi_evaluable_nodes_begin (const std::vector<const DofMap *> & dof_maps) override;
+  multi_evaluable_nodes_begin (std::vector<const DofMap *> dof_maps) override;
   virtual node_iterator
-  multi_evaluable_nodes_end (const std::vector<const DofMap *> & dof_maps) override;
+  multi_evaluable_nodes_end (std::vector<const DofMap *> dof_maps) override;
   virtual const_node_iterator
-  multi_evaluable_nodes_begin (const std::vector<const DofMap *> & dof_maps) const override;
+  multi_evaluable_nodes_begin (std::vector<const DofMap *> dof_maps) const override;
   virtual const_node_iterator
-  multi_evaluable_nodes_end (const std::vector<const DofMap *> & dof_maps) const override;
+  multi_evaluable_nodes_end (std::vector<const DofMap *> dof_maps) const override;
 
 protected:
 

@@ -496,7 +496,7 @@ protected:
 template <typename T>
 struct multi_evaluable : predicate<T>
 {
-  multi_evaluable(const std::vector<const DofMap *> & dof_maps) :
+  multi_evaluable(std::vector<const DofMap *> dof_maps) :
       _dof_maps(dof_maps) {}
   virtual ~multi_evaluable() {}
 
@@ -505,7 +505,7 @@ struct multi_evaluable : predicate<T>
 
 protected:
   virtual predicate<T> * clone() const override { return new multi_evaluable<T>(*this); }
-  const std::vector<const DofMap *> & _dof_maps;
+  std::vector<const DofMap *> _dof_maps;
 };
 
 
