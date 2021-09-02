@@ -5,6 +5,7 @@
 #include <libmesh/mesh_modification.h>
 #include <libmesh/mesh.h>
 #include <libmesh/reference_elem.h>
+#include <libmesh/replicated_mesh.h>
 #include <libmesh/node.h>
 #include <libmesh/enum_to_string.h>
 #include <libmesh/tensor_value.h>
