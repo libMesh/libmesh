@@ -132,6 +132,9 @@ data = meshes/1_quad.bxt.gz \
        meshes/PlateWithHole_Patch8.bxt.gz \
        meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz \
        meshes/PressurizedCyl_Patch6_256Elem.bxt.gz \
+       meshes/Cube_With_Sidesets.e \
+       meshes/PlateWithHole_Patch8.e \
+       meshes/PressurizedCyl3d_Patch1_8Elem.e \
        meshes/bad_64bit_elem_integers.e \
        meshes/good_32bit_elem_integers.e \
        meshes/mesh_assign_test_mesh.xda \
