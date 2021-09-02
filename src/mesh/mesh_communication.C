@@ -271,10 +271,18 @@ void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_
 
       total_family_insert(elem);
 
-      // We also need any interior parents, which will then need their
-      // own ancestors and descendants.
+      // We also need any interior parents on this mesh, which will
+      // then need their own ancestors and descendants.
       const Elem * interior_parent = elem->interior_parent();
+
+      // Don't try to grab interior parents from other meshes, e.g. if
+      // this was a BoundaryMesh associated with a separate Mesh.
+
+      // We can't test this if someone's using the pre-mesh-ptr API
+      libmesh_assert(!interior_parent || mesh);
+
       if (interior_parent &&
+          interior_parent == mesh->query_elem_ptr(interior_parent->id()) &&
           !connected_elements.count(interior_parent))
         {
           connected_elements.insert (interior_parent);
