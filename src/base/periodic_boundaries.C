@@ -104,9 +104,10 @@ const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
   // If we should have found a periodic neighbor but didn't then
   // either we're on a ghosted element with a remote periodic neighbor
   // or we're on a mesh with an inconsistent periodic boundary.
-  libmesh_assert_msg(!mesh.is_serial() &&
-                     (e->processor_id() != mesh.processor_id()),
-                     "Periodic boundary neighbor not found");
+  libmesh_error_msg_if(mesh.is_serial() ||
+                       (e->processor_id() == mesh.processor_id()),
+                       "Periodic boundary neighbor not found");
+
   if (neigh_side)
     *neigh_side = libMesh::invalid_uint;
   return remote_elem;
