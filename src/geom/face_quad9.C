@@ -161,19 +161,19 @@ bool Quad9::has_affine_map() const
 {
   // make sure corners form a parallelogram
   Point v = this->point(1) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(2) - this->point(3)))
+  if (!v.relative_fuzzy_equals(this->point(2) - this->point(3), affine_tol))
     return false;
   // make sure "horizontal" sides are straight
   v /= 2;
-  if (!v.relative_fuzzy_equals(this->point(4) - this->point(0)) ||
-      !v.relative_fuzzy_equals(this->point(6) - this->point(3)))
+  if (!v.relative_fuzzy_equals(this->point(4) - this->point(0), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(6) - this->point(3), affine_tol))
     return false;
   // make sure "vertical" sides are straight
   // and the center node is centered
   v = (this->point(3) - this->point(0))/2;
-  if (!v.relative_fuzzy_equals(this->point(7) - this->point(0)) ||
-      !v.relative_fuzzy_equals(this->point(5) - this->point(1)) ||
-      !v.relative_fuzzy_equals(this->point(8) - this->point(4)))
+  if (!v.relative_fuzzy_equals(this->point(7) - this->point(0), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(5) - this->point(1), affine_tol) ||
+      !v.relative_fuzzy_equals(this->point(8) - this->point(4), affine_tol))
     return false;
   return true;
 }

@@ -1804,6 +1804,11 @@ public:
 protected:
 
   /**
+   * Default tolerance to use in has_affine_map().
+   */
+  static constexpr Real affine_tol = TOLERANCE*TOLERANCE;
+
+  /**
    * \returns A hash key computed from a single node id.
    */
   static dof_id_type compute_key (dof_id_type n0);

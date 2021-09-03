@@ -95,10 +95,10 @@ bool Edge4::has_affine_map() const
 {
   Point v = this->point(1) - this->point(0);
   if (!v.relative_fuzzy_equals
-      ((this->point(2) - this->point(0))*3))
+      ((this->point(2) - this->point(0))*3, affine_tol))
     return false;
   if (!v.relative_fuzzy_equals
-      ((this->point(3) - this->point(0))*1.5))
+      ((this->point(3) - this->point(0))*1.5, affine_tol))
     return false;
   return true;
 }
