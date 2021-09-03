@@ -70,6 +70,12 @@
 /* workaround for potentially missing hash<string> */
 #undef DEFINE_HASH_STRING
 
+/* Exodus's major version number, as detected by exodus.m4 */
+#undef DETECTED_EXODUS_VERSION_MAJOR
+
+/* Exodus's minor version number, as detected by exodus.m4 */
+#undef DETECTED_EXODUS_VERSION_MINOR
+
 /* PETSc's major version number, as detected by petsc.m4 */
 #undef DETECTED_PETSC_VERSION_MAJOR
 

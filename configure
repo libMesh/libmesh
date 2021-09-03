@@ -54819,6 +54819,16 @@ fi
 
 $as_echo "#define HAVE_EXODUS_API 1" >>confdefs.h
 
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_EXODUS_VERSION_MAJOR 5
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_EXODUS_VERSION_MINOR 9
+_ACEOF
+
                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
 $as_echo "<<< Configuring library with Exodus version $exodusversion support >>>" >&6; }
                                             enableexodusfortran=no ;; #(
@@ -54826,6 +54836,16 @@ $as_echo "<<< Configuring library with Exodus version $exodusversion support >>>
     EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/exodus/cbind/include"
 
 $as_echo "#define HAVE_EXODUS_API 1" >>confdefs.h
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_EXODUS_VERSION_MAJOR 5
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_EXODUS_VERSION_MINOR 22
+_ACEOF
 
                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
 $as_echo "<<< Configuring library with Exodus version $exodusversion support >>>" >&6; }
@@ -54851,6 +54871,16 @@ fi ;; #(
     EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/exodus/include -I\$(top_srcdir)/contrib/exodusii/$exodusversion/exodus/sierra"
 
 $as_echo "#define HAVE_EXODUS_API 1" >>confdefs.h
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_EXODUS_VERSION_MAJOR 8
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_EXODUS_VERSION_MINOR 11
+_ACEOF
 
                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
 $as_echo "<<< Configuring library with Exodus version $exodusversion support >>>" >&6; }
