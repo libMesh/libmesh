@@ -41,11 +41,19 @@ AC_DEFUN([CONFIGURE_EXODUS],
                       dnl where it might be installed...
                       EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/include"
                       AC_DEFINE(HAVE_EXODUS_API, 1, [Flag indicating whether the library will be compiled with Exodus support])
+                      AC_DEFINE_UNQUOTED(DETECTED_EXODUS_VERSION_MAJOR, [5],
+                                        [Exodus's major version number, as detected by exodus.m4])
+                      AC_DEFINE_UNQUOTED(DETECTED_EXODUS_VERSION_MINOR, [9],
+                                        [Exodus's minor version number, as detected by exodus.m4])
                       AC_MSG_RESULT(<<< Configuring library with Exodus version $exodusversion support >>>)
                       dnl Exodus Fortran API requires v5.22
                       enableexodusfortran=no],
           ["v5.22"], [EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/exodus/cbind/include"
                       AC_DEFINE(HAVE_EXODUS_API, 1, [Flag indicating whether the library will be compiled with Exodus support])
+                      AC_DEFINE_UNQUOTED(DETECTED_EXODUS_VERSION_MAJOR, [5],
+                                        [Exodus's major version number, as detected by exodus.m4])
+                      AC_DEFINE_UNQUOTED(DETECTED_EXODUS_VERSION_MINOR, [22],
+                                        [Exodus's minor version number, as detected by exodus.m4])
                       AC_MSG_RESULT(<<< Configuring library with Exodus version $exodusversion support >>>)
                       AC_ARG_ENABLE(exodus-fortran,
                                     AS_HELP_STRING([--enable-exodus-fortran],
@@ -59,6 +67,10 @@ AC_DEFUN([CONFIGURE_EXODUS],
                             [AC_MSG_RESULT(<<< Configuring library with Exodus Fortran API >>>)])],
           ["v8.11"], [EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/exodus/include -I\$(top_srcdir)/contrib/exodusii/$exodusversion/exodus/sierra"
                       AC_DEFINE(HAVE_EXODUS_API, 1, [Flag indicating whether the library will be compiled with Exodus support])
+                      AC_DEFINE_UNQUOTED(DETECTED_EXODUS_VERSION_MAJOR, [8],
+                                        [Exodus's major version number, as detected by exodus.m4])
+                      AC_DEFINE_UNQUOTED(DETECTED_EXODUS_VERSION_MINOR, [11],
+                                        [Exodus's minor version number, as detected by exodus.m4])
                       AC_MSG_RESULT(<<< Configuring library with Exodus version $exodusversion support >>>)
                       dnl Exodus Fortran API requires v5.22
                       enableexodusfortran=no],
