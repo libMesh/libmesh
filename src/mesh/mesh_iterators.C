@@ -157,6 +157,7 @@ INSTANTIATE_ELEM_ACCESSORS(active_subdomain_elements,       ActiveSubdomain,    
 INSTANTIATE_ELEM_ACCESSORS(active_subdomain_set_elements,   ActiveSubdomainSet,   std::set<subdomain_id_type> ss, ss)
 INSTANTIATE_ELEM_ACCESSORS(ghost_elements,                  Ghost,                EMPTY,                          this->processor_id())
 INSTANTIATE_ELEM_ACCESSORS(evaluable_elements,              Evaluable,            const DofMap & dof_map LIBMESH_COMMA unsigned int var_num, dof_map, var_num)
+INSTANTIATE_ELEM_ACCESSORS(multi_evaluable_elements,        MultiEvaluable,       std::vector<const DofMap *> dof_maps, dof_maps)
 INSTANTIATE_ELEM_ACCESSORS(unpartitioned_elements,          PID,                  EMPTY,                          DofObject::invalid_processor_id)
 INSTANTIATE_ELEM_ACCESSORS(active_unpartitioned_elements,   ActivePID,            EMPTY,                          DofObject::invalid_processor_id)
 
@@ -178,5 +179,6 @@ INSTANTIATE_NODE_ACCESSORS(pid_nodes,    PID,     processor_id_type proc_id,    
 INSTANTIATE_NODE_ACCESSORS(bnd_nodes,    BND,     EMPTY,                               this->get_boundary_info())
 INSTANTIATE_NODE_ACCESSORS(bid_nodes,    BID,     boundary_id_type bndry_id, bndry_id, this->get_boundary_info())
 INSTANTIATE_NODE_ACCESSORS(evaluable_nodes, Evaluable, const DofMap & dof_map LIBMESH_COMMA unsigned int var_num, dof_map, var_num)
+INSTANTIATE_NODE_ACCESSORS(multi_evaluable_nodes, MultiEvaluable, std::vector<const DofMap *> dof_maps, dof_maps)
 
 } // namespace libMesh

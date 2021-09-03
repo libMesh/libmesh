@@ -467,7 +467,7 @@ protected:
 
 
 /**
- * \returns \p true if the pointer (which must be a local element) has
+ * \returns \p true if the pointer (which must be a non-null dof object) has
  * degrees of freedom which can be evaluated for the specified DofMap
  * and variable.
  */
@@ -486,6 +486,26 @@ protected:
   virtual predicate<T> * clone() const override { return new evaluable<T>(*this); }
   const DofMap & _dof_map;
   unsigned int _var_num;
+};
+
+/**
+ * \returns \p true if the pointer (which must be a non-null dof object) has
+ * degrees of freedom which can be evaluated for all variables in all the provided
+ * \p DofMaps
+ */
+template <typename T>
+struct multi_evaluable : predicate<T>
+{
+  multi_evaluable(std::vector<const DofMap *> dof_maps) :
+      _dof_maps(dof_maps) {}
+  virtual ~multi_evaluable() {}
+
+  // op()
+  virtual bool operator()(const T & it) const override;
+
+protected:
+  virtual predicate<T> * clone() const override { return new multi_evaluable<T>(*this); }
+  std::vector<const DofMap *> _dof_maps;
 };
 
 

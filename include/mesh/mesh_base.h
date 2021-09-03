@@ -1484,6 +1484,22 @@ public:
   evaluable_elements_end (const DofMap & dof_map,
                           unsigned int var_num = libMesh::invalid_uint) const = 0;
 
+  /**
+   * Iterate over elements in the Mesh where the solutions (as
+   * distributed by the given DofMaps) can be evaluated for all variables
+   */
+  virtual element_iterator
+  multi_evaluable_elements_begin (std::vector<const DofMap *> dof_maps) = 0;
+
+  virtual element_iterator
+  multi_evaluable_elements_end (std::vector<const DofMap *> dof_maps) = 0;
+
+  virtual const_element_iterator
+  multi_evaluable_elements_begin (std::vector<const DofMap *> dof_maps) const = 0;
+
+  virtual const_element_iterator
+  multi_evaluable_elements_end (std::vector<const DofMap *> dof_maps) const = 0;
+
 #ifdef LIBMESH_ENABLE_AMR
   /**
    * Iterate over all elements with a specified refinement flag.
@@ -1690,6 +1706,22 @@ public:
   virtual const_node_iterator
   evaluable_nodes_end (const DofMap & dof_map,
                        unsigned int var_num = libMesh::invalid_uint) const = 0;
+
+  /**
+   * Iterate over nodes in the Mesh where the solutions (as
+   * distributed by the given DofMaps) can be evaluated for all variables
+   */
+  virtual node_iterator
+  multi_evaluable_nodes_begin (std::vector<const DofMap *> dof_maps) = 0;
+
+  virtual node_iterator
+  multi_evaluable_nodes_end (std::vector<const DofMap *> dof_maps) = 0;
+
+  virtual const_node_iterator
+  multi_evaluable_nodes_begin (std::vector<const DofMap *> dof_maps) const = 0;
+
+  virtual const_node_iterator
+  multi_evaluable_nodes_end (std::vector<const DofMap *> dof_maps) const = 0;
 
   /**
    * \returns A writable reference to the whole subdomain name map
