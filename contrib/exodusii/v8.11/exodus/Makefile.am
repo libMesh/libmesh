@@ -3,7 +3,8 @@
 # is present. since we've implicitly guaranteed this for ~10 years
 # no need to break that trust now.
 includedir      = $(prefix)/include/libmesh
-include_HEADERS = include/exodusII.h
+include_HEADERS = include/exodusII.h \
+                  sierra/exodus_config.h
 
 pkg_cppflags = -I$(srcdir)/include -I$(srcdir)/sierra $(NETCDF_INCLUDE) $(EXODUS_NOT_NETCDF4_FLAG)
 pkg_sources  = \
