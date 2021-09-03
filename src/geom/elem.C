@@ -929,6 +929,20 @@ const Elem * Elem::interior_parent () const
                   (interior_p == remote_elem) ||
                   (interior_p->dim() > this->dim()));
 
+  // If an element in a multi-dimensional mesh has an interior_parent
+  // link, it should be at our level or coarser, just like a neighbor
+  // link.  Our collect_families() code relies on this, but it might
+  // be tempting for users to manually assign something that breaks
+  // it.
+  //
+  // However, we *also* create temporary side elements, and we don't
+  // bother with creating ancestors for those, so they can be at level
+  // 0 even when they're sides of non-level-0 elements.
+  libmesh_assert (!interior_p ||
+                  (interior_p->level() <= this->level()) ||
+                  (this->level() == 0 &&
+                   this->id() == DofObject::invalid_id));
+
   return interior_p;
 }
 

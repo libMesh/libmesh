@@ -247,23 +247,46 @@ void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_
     {
       const Elem * elem = *elem_rit;
       libmesh_assert(elem);
-      const Elem * parent = elem->parent();
 
       // We let ghosting functors worry about only active elements,
       // but the remote processor needs all its semilocal elements'
       // ancestors and active semilocal elements' descendants too.
+      const Elem * parent = elem->parent();
       if (parent)
         connected_elements.insert (parent);
 
-      if (elem->active() && elem->has_children())
+      auto total_family_insert = [& connected_elements](const Elem * e)
         {
-          std::vector<const Elem *> subactive_family;
-          elem->total_family_tree(subactive_family);
-          for (const auto & f : subactive_family)
+          if (e->active() && e->has_children())
             {
-              libmesh_assert(f != remote_elem);
-              connected_elements.insert(f);
+              std::vector<const Elem *> subactive_family;
+              e->total_family_tree(subactive_family);
+              for (const auto & f : subactive_family)
+                {
+                  libmesh_assert(f != remote_elem);
+                  connected_elements.insert(f);
+                }
             }
+        };
+
+      total_family_insert(elem);
+
+      // We also need any interior parents on this mesh, which will
+      // then need their own ancestors and descendants.
+      const Elem * interior_parent = elem->interior_parent();
+
+      // Don't try to grab interior parents from other meshes, e.g. if
+      // this was a BoundaryMesh associated with a separate Mesh.
+
+      // We can't test this if someone's using the pre-mesh-ptr API
+      libmesh_assert(!interior_parent || mesh);
+
+      if (interior_parent &&
+          interior_parent == mesh->query_elem_ptr(interior_parent->id()) &&
+          !connected_elements.count(interior_parent))
+        {
+          connected_elements.insert (interior_parent);
+          total_family_insert(interior_parent);
         }
     }
 
@@ -2081,10 +2104,11 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
                    mesh.pid_elements_end(DofObject::invalid_processor_id),
                    elements_to_keep);
 
-  // The elements we need should have their ancestors and their
-  // subactive children present too.  If the mesh has any
-  // constraint rows, then elements with constrained nodes need
-  // elements with constraining nodes to remain present.
+  // The elements we need should have their ancestors, their
+  // interior_parent links, and their subactive children present too.
+  // If the mesh has any constraint rows, then elements with
+  // constrained nodes need elements with constraining nodes to remain
+  // present.
   connect_families(elements_to_keep, &mesh);
 
   // Don't delete nodes that our semilocal elements need
