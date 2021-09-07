@@ -222,6 +222,15 @@ public:
         mesh.comm().sum(bc_count);
         CPPUNIT_ASSERT_EQUAL(bc_count, 9);
       }
+
+    // Test a write when we're done reading; I was getting weirdness
+    // from NetCDF at this point in a Moose output test.
+    {
+      ExodusII_IO exii(mesh);
+
+      if (mesh.processor_id() == 0)
+        exii.write("Cube_With_Sidesets_out.e");
+    }
   }
 
 
@@ -972,6 +981,16 @@ public:
     testMasterCenters(mesh);
 
     testProjectionRegression(mesh, expected_norms);
+
+    // Test a write when we're done reading; I was getting weirdness
+    // from NetCDF at this point in a Moose output test.
+    {
+      ExodusII_IO exii(mesh);
+
+      if (mesh.processor_id() == 0)
+        exii.write("exodus_file_mapping_out.e");
+    }
+
   }
 
   void testExodusFileMappingsPlateWithHole ()
