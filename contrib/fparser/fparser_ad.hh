@@ -137,7 +137,7 @@ public:
 protected:
 
   /// return a SHA1 hash for the current bytecode and value type name
-  std::size_t JITCodeHash(const std::string & value_type_name = "");
+  std::size_t JITCodeHash();
 
 #if LIBMESH_HAVE_FPARSER_JIT
   /// write generated C++ code to stream
