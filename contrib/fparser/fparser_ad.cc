@@ -609,13 +609,13 @@ int ADImplementation<Value_t>::AutoDiff(unsigned int _var, typename FunctionPars
 }
 
 template<typename Value_t>
-std::size_t FunctionParserADBase<Value_t>::JITCodeHash(const std::string & Value_t_name)
+std::size_t FunctionParserADBase<Value_t>::JITCodeHash()
 {
   // start with a version tag in case the JIT function signature changes
   std::size_t h = std::hash<std::string>{}("v3");
   for (auto b :this->mData->mByteCode)
     libMesh::boostcopy::hash_combine(h, b);
-  libMesh::boostcopy::hash_combine(h, Value_t_name);
+  libMesh::boostcopy::hash_combine(h, typeid(Value_t).hash_code());
   return h;
 }
 
@@ -674,7 +674,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
     return false;
 
   // compute hash of the function
-  std::string hash = FParserJIT::hashToString(JITCodeHash(Value_t_name));
+  std::string hash = FParserJIT::hashToString(JITCodeHash());
 #ifndef NDEBUG
   hash += "_dbg";
 #endif
