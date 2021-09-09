@@ -306,6 +306,9 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
     //Preallocate Memory if necessary
     this->reserve_nodes(other_mesh.n_nodes());
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+    unique_id_type potentially_next_unique_id = _next_unique_id;
+#endif
     for (const auto & oldn : other_mesh.node_ptr_range())
       {
         processor_id_type added_pid = cast_int<processor_id_type>
@@ -323,9 +326,15 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
                                   oldn->get_extra_integer(i));
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-        newn->set_unique_id(oldn->unique_id() + unique_id_offset);
-#endif
+        const unique_id_type new_unique_id = oldn->unique_id() + unique_id_offset;
+        newn->set_unique_id(new_unique_id);
+        potentially_next_unique_id = std::max(new_unique_id+1, potentially_next_unique_id);
       }
+
+    this->set_next_unique_id(potentially_next_unique_id);
+#else
+      }
+#endif
   }
 
   //Copy in Elements
