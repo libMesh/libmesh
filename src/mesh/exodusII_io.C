@@ -1809,6 +1809,21 @@ const std::vector<std::string> & ExodusII_IO::get_global_var_names()
   return exio_helper->global_var_names;
 }
 
+const std::vector<int> & ExodusII_IO::get_elem_num_map() const
+{
+  // We could make this function non-const and have it call
+  // exio_helper->read_elem_num_map() before returning a reference...
+  // but the intention is that this will be called some time after a
+  // mesh is read in, in which case it would be doing extra work to
+  // read in the elem_num_map twice.
+  return exio_helper->elem_num_map;
+}
+
+const std::vector<int> & ExodusII_IO::get_node_num_map() const
+{
+  return exio_helper->node_num_map;
+}
+
 ExodusII_IO_Helper & ExodusII_IO::get_exio_helper()
 {
   // Provide a warning when accessing the helper object

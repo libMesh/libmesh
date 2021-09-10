@@ -423,6 +423,27 @@ public:
    */
   const std::vector<std::string> & get_global_var_names();
 
+  /**
+   * Returns a const reference to the elem_num_map, which is a vector
+   * that is created when a Mesh is read from file.  LibMesh will
+   * number its mesh elements consistently with the elem_num_map
+   * array, except that the indices in this array are 1-based, and
+   * libmesh always uses a 0-based numbering. For example, given:
+   * elem_num_map = [4,2,3,1]
+   * libmesh will assign the first element it reads from the Exodus
+   * file elem->id() == 3, the second will get elem->id() == 1, and so
+   * on. We note that not all Exodus files contain an elem_num_map,
+   * and in that case, calling this function will return a reference
+   * to a vector containing the 1-based identity array, [1,2,3,...]
+   */
+  const std::vector<int> & get_elem_num_map() const;
+
+  /**
+   * Idential to the behavior of get_elem_num_map(), but for the
+   * node_num_map instead.
+   */
+  const std::vector<int> & get_node_num_map() const;
+
 #ifdef LIBMESH_HAVE_EXODUS_API
   /**
    * Return a reference to the ExodusII_IO_Helper object.
