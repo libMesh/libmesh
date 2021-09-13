@@ -42,7 +42,6 @@
 namespace libMesh
 {
 
-inline
 FEFamily
 FEMap::map_fe_type(const Elem & elem)
 {
