@@ -150,6 +150,10 @@ public:
                        const std::vector<Point> * const pts = nullptr,
                        const std::vector<Real> * const weights = nullptr) = 0;
 
+  virtual void reinit_dual_shape_coeffs (const Elem * elem,
+                                         const std::vector<Point> & pts,
+                                         const std::vector<Real> & JxW) = 0;
+
   /**
    * Reinitializes all the physical element-dependent data based on
    * the \p side of the element \p elem.  The \p tolerance parameter

@@ -452,6 +452,10 @@ public:
                        const std::vector<Point> * const pts = nullptr,
                        const std::vector<Real> * const weights = nullptr) override;
 
+  virtual void reinit_dual_shape_coeffs (const Elem * elem,
+                                         const std::vector<Point> & pts,
+                                         const std::vector<Real> & JxW) override;
+
   /**
    * Reinitializes all the physical element-dependent data based on
    * the \p side of \p face.  The \p tolerance parameter is passed to

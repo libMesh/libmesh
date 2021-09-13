@@ -298,37 +298,35 @@ void FE<Dim,T>::reinit(const Elem * elem,
       {
         if (T != LAGRANGE)
           nonlagrange_dual_warning();
-        if (this->calculate_dual_coeff)
-        {
-          // In order for the matrices for the biorthogonality condition to be
-          // non-singular, the dual basis coefficients must be computed when the
-          // primal shape functions are evaluated with a quadrature rule. *But* a
-          // user may be reiniting with integration points from a mortar segment,
-          // which is valid, so a simple `if (!pts)` check is not
-          // appropriate. We're just gonna have to trust the user on this one. If
-          // they "screw up" we'll throw an exception from the LU decomposition,
-          // and they can choose to handle it or not
-
-          // instead of using the customized qrule from mortar segments,
-          // we need the default qrule for computing the dual coefficients
-          FEType default_fe_type(this->get_order(), T);
-          QGauss default_qrule(elem->dim(), default_fe_type.default_quadrature_order());
-          default_qrule.init(elem->type(), elem->p_level());
-          // In preparation of computing dual_coeff, we compute the default shape
-          // function values and save these in dual_phi (instead of declaring a
-          // new container). The TRUE dual_phi values are computed in
-          // compute_dual_shape_functions()
-          all_shapes(elem, default_fe_type.order, default_qrule.get_points(), this->dual_phi);
-          this->compute_dual_shape_coeffs(default_qrule);
-          // only compute the dual coefficient once
-          this->calculate_dual_coeff = false;
-        }
         // the dual shape functions relies on the customized shape functions
         // and the coefficient matrix, \p dual_coeff
         this->compute_dual_shape_functions();
       }
     }
 }
+
+template <unsigned int Dim, FEFamily T>
+void FE<Dim,T>::reinit_dual_shape_coeffs(const Elem * elem,
+                                         const std::vector<Point> & pts,
+                                         const std::vector<Real> & JxW)
+{
+  // Set the type and p level for this element
+  this->elem_type = elem->type();
+  this->_p_level = elem->p_level();
+
+  const unsigned int n_shapes =
+    this->n_shape_functions(this->get_type(),
+                            this->get_order());
+
+  std::vector<std::vector<OutputShape>> phi_vals;
+  phi_vals.resize(n_shapes);
+  for (const auto i : make_range(phi_vals.size()))
+    phi_vals[i].resize(pts.size());
+
+  all_shapes(elem, this->get_order(), pts, phi_vals);
+  this->compute_dual_shape_coeffs(JxW, phi_vals);
+}
+
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_dual_shape_functions(const unsigned int n_shapes, const unsigned int n_qp)

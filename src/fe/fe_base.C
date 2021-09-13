@@ -743,38 +743,37 @@ void FEGenericBase<OutputType>::compute_shape_functions (const Elem * elem,
     this->_fe_trans->map_div(this->dim, elem, qp, (*this), this->div_phi);
 }
 
+
+// Note I am passing points instead of using members because size changes between calls
 template <>
-void FEGenericBase<Real>::compute_dual_shape_coeffs (const QBase & default_qrule)
+void FEGenericBase<Real>::compute_dual_shape_coeffs (const std::vector<Real> & JxW, const std::vector<std::vector<OutputShape>> & phi_vals)
 {
   // Start logging the dual coeff computation
   LOG_SCOPE("compute_dual_shape_coeffs()", "FE");
 
-  unsigned int sz=phi.size();
-  libmesh_error_msg_if(!sz, "ERROR:  dual basis should be computed after the primal basis");
+  unsigned int sz=phi_vals.size();
 
   //compute dual basis coefficient (dual_coeff)
   dual_coeff.resize(sz, sz);
   DenseMatrix<Real> A(sz, sz), D(sz, sz);
 
-  const std::vector<Real> & weights = default_qrule.get_weights();
-  // we do not need J here as it will be canceled in the A^-1*D calculation anyways
-  for (const auto i : index_range(dual_phi))
-    for (const auto qp : index_range(dual_phi[i]))
+  for (const auto i : index_range(phi_vals))
+    for (const auto qp : index_range(phi_vals[i]))
     {
-      D(i,i) += weights[qp]*dual_phi[i][qp];
-      for (const auto j : index_range(dual_phi))
-        A(i,j) += weights[qp]*dual_phi[i][qp]*dual_phi[j][qp];
+      D(i,i) += JxW[qp]*phi_vals[i][qp];
+      for (const auto j : index_range(phi_vals))
+        A(i,j) += JxW[qp]*phi_vals[i][qp]*phi_vals[j][qp];
     }
 
   // dual_coeff = A^-1*D
-  for (const auto j : index_range(dual_phi))
+  for (const auto j : index_range(phi_vals))
   {
     DenseVector<Real> Dcol(sz), coeffcol(sz);
-    for (const auto i : index_range(dual_phi))
+    for (const auto i : index_range(phi_vals))
       Dcol(i) = D(i, j);
     A.cholesky_solve(Dcol, coeffcol);
 
-    for (const auto row : index_range(dual_phi))
+    for (const auto row : index_range(phi_vals))
       dual_coeff(row, j)=coeffcol(row);
   }
 }
