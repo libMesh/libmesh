@@ -221,6 +221,19 @@ public:
     exreader.set_extra_integer_vars({"material_id"});
     exreader.read(filename);
 
+    // Test that the ExodusII_IO::get_{elem,node}_num_map() APIs give
+    // us something sensible.  Note: this is unrelated to reading
+    // extra integers, but, in my opinion, it does not warrant its own
+    // standalone test either.
+    const auto & elem_num_map = exreader.get_elem_num_map();
+    const auto & node_num_map = exreader.get_node_num_map();
+
+    // This mesh has trivial elem_num_map and node_num_map
+    for (int i=0; i != 9; ++i)
+      CPPUNIT_ASSERT_EQUAL(elem_num_map[i], i+1);
+    for (int i=0; i != 16; ++i)
+      CPPUNIT_ASSERT_EQUAL(node_num_map[i], i+1);
+
     CPPUNIT_ASSERT(mesh.has_elem_integer("material_id"));
     unsigned int int_idx = mesh.get_elem_integer_index("material_id");
     for (dof_id_type i=0; i != 9; ++i)
