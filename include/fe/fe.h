@@ -453,6 +453,20 @@ public:
                        const std::vector<Real> * const weights = nullptr) override;
 
   /**
+  * This re-computes the dual shape function coefficients.
+  * The dual shape coefficients are utilized when calculating dual shape functions.
+  */
+  virtual void reinit_dual_shape_coeffs (const Elem * elem,
+                                         const std::vector<Point> & pts,
+                                         const std::vector<Real> & JxW) override;
+
+  /**
+   * This computes the default dual shape function coefficients.
+   * The dual shape coefficients are utilized when calculating dual shape functions.
+   */
+   virtual void reinit_default_dual_shape_coeffs (const Elem * elem) override;
+
+  /**
    * Reinitializes all the physical element-dependent data based on
    * the \p side of \p face.  The \p tolerance parameter is passed to
    * the involved call to \p inverse_map().  By default the shape
