@@ -41,6 +41,7 @@ public:
   CPPUNIT_TEST( testPostInitAddSystem );
   CPPUNIT_TEST( testPostInitAddElem );
   CPPUNIT_TEST( testReinitWithNodeElem );
+  CPPUNIT_TEST( testBadVarNames );
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testRefineThenReinitPreserveFlags );
 #ifdef LIBMESH_ENABLE_AMR // needs project_solution, even for reordering
@@ -126,6 +127,33 @@ public:
     mesh.prepare_for_use();
 
     es.reinit();
+  }
+
+  void testBadVarNames()
+  {
+    Mesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_square(mesh, 1, 1);
+    EquationSystems es(mesh);
+    System &sys1 = es.add_system<System> ("SimpleSystem");
+    sys1.add_variable("u", FIRST, MONOMIAL_VEC);
+    es.init();
+
+    const FEType & fe_type = sys1.variable_type ("u");
+    std::vector<std::string> var_names;
+    std::set<std::string> system_names = {"SimpleSystem"};
+    es.build_variable_names(var_names, &fe_type);
+
+    System &sys2 = es.add_system<System> ("SecondSystem");
+    sys2.add_variable("u_x", FIRST);
+    sys2.add_variable("u_y", FIRST);
+    sys2.add_variable("u_z", FIRST);
+    es.reinit();
+
+    var_names.clear();
+    CPPUNIT_ASSERT_THROW_MESSAGE("Duplicate var names not detected",
+                                 es.build_variable_names(var_names,
+                                                         &fe_type),
+                                 libMesh::LogicError);
   }
 
   void testReinitWithNodeElem()
