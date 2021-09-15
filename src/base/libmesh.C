@@ -46,6 +46,7 @@
 #include <omp.h>
 #endif
 
+#include "stdlib.h" // C, not C++ - we need setenv() from POSIX
 #include "signal.h"
 
 
@@ -651,6 +652,22 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 
   if (libMesh::on_command_line("--enable-segv"))
     libMesh::enableSEGV(true);
+
+#ifdef LIBMESH_HAVE_HDF5
+  // We may be running with ExodusII configured not to use HDF5 (in
+  // which case user code which wants to lock files has to do flock()
+  // itself) or with ExodusII configured to use HDF5 (which will
+  // helpfully try to get an exclusive flock() itself, and then scream
+  // and die if user code has already locked the file.  To get
+  // consistent behavior, we need to disable file locking.  The only
+  // reliable way I can see to do this is via an HDF5 environment
+  // variable.
+  //
+  // If the user set this environment variable then we'll trust that
+  // they know what they're doing.  If not then we'll set FALSE,
+  // because that's a better default for us than the unset default.
+  setenv("HDF5_USE_FILE_LOCKING", "FALSE", /*overwrite=false*/0);
+#endif // LIBMESH_HAVE_HDF5
 
   // The library is now ready for use
   libMeshPrivateData::_is_initialized = true;
