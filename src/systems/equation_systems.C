@@ -452,6 +452,10 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
   // start indexing at end of possibly non-empty vector of variable names to avoid overwriting them
   unsigned int var_num = var_names.size();
 
+  // We'll want to double-check that we don't have any naming
+  // conflicts; this API causes problems down the line if so.
+  std::unordered_multiset<std::string> seen_names;
+
   // Need to size var_names by scalar variables plus all the
   // vector components for all the vector variables
   //Could this be replaced by a/some convenience methods?[PB]
@@ -469,10 +473,15 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
         if (!use_current_system)
           use_current_system = system_names->count(sys_name);
         if (!use_current_system || sys_ptr->hide_output())
-          continue;
+          {
+            for (auto vn : make_range(sys_ptr->n_vars()))
+              seen_names.insert(sys_ptr->variable_name(vn));
+            continue;
+          }
 
         for (auto vn : make_range(sys_ptr->n_vars()))
           {
+            seen_names.insert(sys_ptr->variable_name(vn));
             if (FEInterface::field_type(sys_ptr->variable_type(vn)) == TYPE_VECTOR)
               n_vector_vars++;
             else
@@ -523,15 +532,27 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
                     case 0:
                     case 1:
                       var_names[var_num++] = var_name;
+                      libmesh_error_msg_if(seen_names.count(var_name) > 1,
+                                           "Duplicate variable name "+var_name);
                       break;
                     case 2:
                       var_names[var_num++] = var_name+"_x";
                       var_names[var_num++] = var_name+"_y";
+                      libmesh_error_msg_if(seen_names.count(var_name+"_x"),
+                                           "Duplicate variable name "+var_name+"_x");
+                      libmesh_error_msg_if(seen_names.count(var_name+"_y"),
+                                           "Duplicate variable name "+var_name+"_y");
                       break;
                     case 3:
                       var_names[var_num++] = var_name+"_x";
                       var_names[var_num++] = var_name+"_y";
                       var_names[var_num++] = var_name+"_z";
+                      libmesh_error_msg_if(seen_names.count(var_name+"_x"),
+                                           "Duplicate variable name "+var_name+"_x");
+                      libmesh_error_msg_if(seen_names.count(var_name+"_y"),
+                                           "Duplicate variable name "+var_name+"_y");
+                      libmesh_error_msg_if(seen_names.count(var_name+"_z"),
+                                           "Duplicate variable name "+var_name+"_z");
                       break;
                     default:
                       libmesh_error_msg("Invalid dim in build_variable_names");
