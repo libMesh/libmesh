@@ -217,8 +217,8 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
-	mesh/write_vec_and_scalar.C mesh/all_second_order.C \
-	numerics/composite_function_test.C \
+	mesh/write_vec_and_scalar.C mesh/mesh_collection.C \
+	mesh/all_second_order.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -313,6 +313,7 @@ am__objects_3 = unit_tests_dbg-driver.$(OBJEXT) \
 	mesh/unit_tests_dbg-write_nodeset_data.$(OBJEXT) \
 	mesh/unit_tests_dbg-write_edgeset_data.$(OBJEXT) \
 	mesh/unit_tests_dbg-write_vec_and_scalar.$(OBJEXT) \
+	mesh/unit_tests_dbg-mesh_collection.$(OBJEXT) \
 	mesh/unit_tests_dbg-all_second_order.$(OBJEXT) \
 	numerics/unit_tests_dbg-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-coupling_matrix_test.$(OBJEXT) \
@@ -392,8 +393,8 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
-	mesh/write_vec_and_scalar.C mesh/all_second_order.C \
-	numerics/composite_function_test.C \
+	mesh/write_vec_and_scalar.C mesh/mesh_collection.C \
+	mesh/all_second_order.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -486,6 +487,7 @@ am__objects_5 = unit_tests_devel-driver.$(OBJEXT) \
 	mesh/unit_tests_devel-write_nodeset_data.$(OBJEXT) \
 	mesh/unit_tests_devel-write_edgeset_data.$(OBJEXT) \
 	mesh/unit_tests_devel-write_vec_and_scalar.$(OBJEXT) \
+	mesh/unit_tests_devel-mesh_collection.$(OBJEXT) \
 	mesh/unit_tests_devel-all_second_order.$(OBJEXT) \
 	numerics/unit_tests_devel-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_devel-coupling_matrix_test.$(OBJEXT) \
@@ -561,8 +563,8 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
-	mesh/write_vec_and_scalar.C mesh/all_second_order.C \
-	numerics/composite_function_test.C \
+	mesh/write_vec_and_scalar.C mesh/mesh_collection.C \
+	mesh/all_second_order.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -655,6 +657,7 @@ am__objects_7 = unit_tests_oprof-driver.$(OBJEXT) \
 	mesh/unit_tests_oprof-write_nodeset_data.$(OBJEXT) \
 	mesh/unit_tests_oprof-write_edgeset_data.$(OBJEXT) \
 	mesh/unit_tests_oprof-write_vec_and_scalar.$(OBJEXT) \
+	mesh/unit_tests_oprof-mesh_collection.$(OBJEXT) \
 	mesh/unit_tests_oprof-all_second_order.$(OBJEXT) \
 	numerics/unit_tests_oprof-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-coupling_matrix_test.$(OBJEXT) \
@@ -730,8 +733,8 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
-	mesh/write_vec_and_scalar.C mesh/all_second_order.C \
-	numerics/composite_function_test.C \
+	mesh/write_vec_and_scalar.C mesh/mesh_collection.C \
+	mesh/all_second_order.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -824,6 +827,7 @@ am__objects_9 = unit_tests_opt-driver.$(OBJEXT) \
 	mesh/unit_tests_opt-write_nodeset_data.$(OBJEXT) \
 	mesh/unit_tests_opt-write_edgeset_data.$(OBJEXT) \
 	mesh/unit_tests_opt-write_vec_and_scalar.$(OBJEXT) \
+	mesh/unit_tests_opt-mesh_collection.$(OBJEXT) \
 	mesh/unit_tests_opt-all_second_order.$(OBJEXT) \
 	numerics/unit_tests_opt-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_opt-coupling_matrix_test.$(OBJEXT) \
@@ -899,8 +903,8 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
-	mesh/write_vec_and_scalar.C mesh/all_second_order.C \
-	numerics/composite_function_test.C \
+	mesh/write_vec_and_scalar.C mesh/mesh_collection.C \
+	mesh/all_second_order.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -993,6 +997,7 @@ am__objects_11 = unit_tests_prof-driver.$(OBJEXT) \
 	mesh/unit_tests_prof-write_nodeset_data.$(OBJEXT) \
 	mesh/unit_tests_prof-write_edgeset_data.$(OBJEXT) \
 	mesh/unit_tests_prof-write_vec_and_scalar.$(OBJEXT) \
+	mesh/unit_tests_prof-mesh_collection.$(OBJEXT) \
 	mesh/unit_tests_prof-all_second_order.$(OBJEXT) \
 	numerics/unit_tests_prof-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_prof-coupling_matrix_test.$(OBJEXT) \
@@ -1222,6 +1227,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-extra_integers.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mapped_subdomain_partitioner_test.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_assign.Po \
+	mesh/$(DEPDIR)/unit_tests_dbg-mesh_collection.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_extruder.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_function.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po \
@@ -1247,6 +1253,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-extra_integers.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mapped_subdomain_partitioner_test.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_assign.Po \
+	mesh/$(DEPDIR)/unit_tests_devel-mesh_collection.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_extruder.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_function.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po \
@@ -1272,6 +1279,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-extra_integers.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mapped_subdomain_partitioner_test.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_assign.Po \
+	mesh/$(DEPDIR)/unit_tests_oprof-mesh_collection.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_extruder.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_function.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po \
@@ -1297,6 +1305,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-extra_integers.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mapped_subdomain_partitioner_test.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_assign.Po \
+	mesh/$(DEPDIR)/unit_tests_opt-mesh_collection.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_extruder.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_function.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po \
@@ -1322,6 +1331,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-extra_integers.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mapped_subdomain_partitioner_test.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_assign.Po \
+	mesh/$(DEPDIR)/unit_tests_prof-mesh_collection.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_extruder.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_function.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po \
@@ -2011,8 +2021,8 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
-	mesh/write_vec_and_scalar.C mesh/all_second_order.C \
-	numerics/composite_function_test.C \
+	mesh/write_vec_and_scalar.C mesh/mesh_collection.C \
+	mesh/all_second_order.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -2284,6 +2294,8 @@ mesh/unit_tests_dbg-write_edgeset_data.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-write_vec_and_scalar.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_dbg-mesh_collection.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-all_second_order.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/$(am__dirstamp):
@@ -2532,6 +2544,8 @@ mesh/unit_tests_devel-write_edgeset_data.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-write_vec_and_scalar.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_devel-mesh_collection.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-all_second_order.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_devel-composite_function_test.$(OBJEXT):  \
@@ -2732,6 +2746,8 @@ mesh/unit_tests_oprof-write_edgeset_data.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-write_vec_and_scalar.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_oprof-mesh_collection.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-all_second_order.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_oprof-composite_function_test.$(OBJEXT):  \
@@ -2932,6 +2948,8 @@ mesh/unit_tests_opt-write_edgeset_data.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-write_vec_and_scalar.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_opt-mesh_collection.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-all_second_order.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_opt-composite_function_test.$(OBJEXT):  \
@@ -3132,6 +3150,8 @@ mesh/unit_tests_prof-write_edgeset_data.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-write_vec_and_scalar.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_prof-mesh_collection.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-all_second_order.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_prof-composite_function_test.$(OBJEXT):  \
@@ -3411,6 +3431,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-extra_integers.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mapped_subdomain_partitioner_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_assign.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_collection.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_extruder.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_function.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po@am__quote@ # am--include-marker
@@ -3436,6 +3457,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-extra_integers.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mapped_subdomain_partitioner_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_assign.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_collection.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_extruder.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_function.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po@am__quote@ # am--include-marker
@@ -3461,6 +3483,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-extra_integers.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mapped_subdomain_partitioner_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_assign.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_collection.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_extruder.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_function.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po@am__quote@ # am--include-marker
@@ -3486,6 +3509,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-extra_integers.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mapped_subdomain_partitioner_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_assign.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_collection.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_extruder.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_function.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po@am__quote@ # am--include-marker
@@ -3511,6 +3535,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-extra_integers.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mapped_subdomain_partitioner_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_assign.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_collection.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_extruder.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_function.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po@am__quote@ # am--include-marker
@@ -4506,6 +4531,20 @@ mesh/unit_tests_dbg-write_vec_and_scalar.obj: mesh/write_vec_and_scalar.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_vec_and_scalar.C' object='mesh/unit_tests_dbg-write_vec_and_scalar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-write_vec_and_scalar.obj `if test -f 'mesh/write_vec_and_scalar.C'; then $(CYGPATH_W) 'mesh/write_vec_and_scalar.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_vec_and_scalar.C'; fi`
+
+mesh/unit_tests_dbg-mesh_collection.o: mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mesh_collection.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mesh_collection.Tpo -c -o mesh/unit_tests_dbg-mesh_collection.o `test -f 'mesh/mesh_collection.C' || echo '$(srcdir)/'`mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-mesh_collection.Tpo mesh/$(DEPDIR)/unit_tests_dbg-mesh_collection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_collection.C' object='mesh/unit_tests_dbg-mesh_collection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mesh_collection.o `test -f 'mesh/mesh_collection.C' || echo '$(srcdir)/'`mesh/mesh_collection.C
+
+mesh/unit_tests_dbg-mesh_collection.obj: mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mesh_collection.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mesh_collection.Tpo -c -o mesh/unit_tests_dbg-mesh_collection.obj `if test -f 'mesh/mesh_collection.C'; then $(CYGPATH_W) 'mesh/mesh_collection.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_collection.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-mesh_collection.Tpo mesh/$(DEPDIR)/unit_tests_dbg-mesh_collection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_collection.C' object='mesh/unit_tests_dbg-mesh_collection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mesh_collection.obj `if test -f 'mesh/mesh_collection.C'; then $(CYGPATH_W) 'mesh/mesh_collection.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_collection.C'; fi`
 
 mesh/unit_tests_dbg-all_second_order.o: mesh/all_second_order.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-all_second_order.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-all_second_order.Tpo -c -o mesh/unit_tests_dbg-all_second_order.o `test -f 'mesh/all_second_order.C' || echo '$(srcdir)/'`mesh/all_second_order.C
@@ -5837,6 +5876,20 @@ mesh/unit_tests_devel-write_vec_and_scalar.obj: mesh/write_vec_and_scalar.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-write_vec_and_scalar.obj `if test -f 'mesh/write_vec_and_scalar.C'; then $(CYGPATH_W) 'mesh/write_vec_and_scalar.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_vec_and_scalar.C'; fi`
 
+mesh/unit_tests_devel-mesh_collection.o: mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mesh_collection.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mesh_collection.Tpo -c -o mesh/unit_tests_devel-mesh_collection.o `test -f 'mesh/mesh_collection.C' || echo '$(srcdir)/'`mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mesh_collection.Tpo mesh/$(DEPDIR)/unit_tests_devel-mesh_collection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_collection.C' object='mesh/unit_tests_devel-mesh_collection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mesh_collection.o `test -f 'mesh/mesh_collection.C' || echo '$(srcdir)/'`mesh/mesh_collection.C
+
+mesh/unit_tests_devel-mesh_collection.obj: mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mesh_collection.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mesh_collection.Tpo -c -o mesh/unit_tests_devel-mesh_collection.obj `if test -f 'mesh/mesh_collection.C'; then $(CYGPATH_W) 'mesh/mesh_collection.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_collection.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mesh_collection.Tpo mesh/$(DEPDIR)/unit_tests_devel-mesh_collection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_collection.C' object='mesh/unit_tests_devel-mesh_collection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mesh_collection.obj `if test -f 'mesh/mesh_collection.C'; then $(CYGPATH_W) 'mesh/mesh_collection.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_collection.C'; fi`
+
 mesh/unit_tests_devel-all_second_order.o: mesh/all_second_order.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-all_second_order.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-all_second_order.Tpo -c -o mesh/unit_tests_devel-all_second_order.o `test -f 'mesh/all_second_order.C' || echo '$(srcdir)/'`mesh/all_second_order.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-all_second_order.Tpo mesh/$(DEPDIR)/unit_tests_devel-all_second_order.Po
@@ -7166,6 +7219,20 @@ mesh/unit_tests_oprof-write_vec_and_scalar.obj: mesh/write_vec_and_scalar.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_vec_and_scalar.C' object='mesh/unit_tests_oprof-write_vec_and_scalar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-write_vec_and_scalar.obj `if test -f 'mesh/write_vec_and_scalar.C'; then $(CYGPATH_W) 'mesh/write_vec_and_scalar.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_vec_and_scalar.C'; fi`
+
+mesh/unit_tests_oprof-mesh_collection.o: mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mesh_collection.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mesh_collection.Tpo -c -o mesh/unit_tests_oprof-mesh_collection.o `test -f 'mesh/mesh_collection.C' || echo '$(srcdir)/'`mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-mesh_collection.Tpo mesh/$(DEPDIR)/unit_tests_oprof-mesh_collection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_collection.C' object='mesh/unit_tests_oprof-mesh_collection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mesh_collection.o `test -f 'mesh/mesh_collection.C' || echo '$(srcdir)/'`mesh/mesh_collection.C
+
+mesh/unit_tests_oprof-mesh_collection.obj: mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mesh_collection.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mesh_collection.Tpo -c -o mesh/unit_tests_oprof-mesh_collection.obj `if test -f 'mesh/mesh_collection.C'; then $(CYGPATH_W) 'mesh/mesh_collection.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_collection.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-mesh_collection.Tpo mesh/$(DEPDIR)/unit_tests_oprof-mesh_collection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_collection.C' object='mesh/unit_tests_oprof-mesh_collection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mesh_collection.obj `if test -f 'mesh/mesh_collection.C'; then $(CYGPATH_W) 'mesh/mesh_collection.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_collection.C'; fi`
 
 mesh/unit_tests_oprof-all_second_order.o: mesh/all_second_order.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-all_second_order.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-all_second_order.Tpo -c -o mesh/unit_tests_oprof-all_second_order.o `test -f 'mesh/all_second_order.C' || echo '$(srcdir)/'`mesh/all_second_order.C
@@ -8497,6 +8564,20 @@ mesh/unit_tests_opt-write_vec_and_scalar.obj: mesh/write_vec_and_scalar.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-write_vec_and_scalar.obj `if test -f 'mesh/write_vec_and_scalar.C'; then $(CYGPATH_W) 'mesh/write_vec_and_scalar.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_vec_and_scalar.C'; fi`
 
+mesh/unit_tests_opt-mesh_collection.o: mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mesh_collection.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mesh_collection.Tpo -c -o mesh/unit_tests_opt-mesh_collection.o `test -f 'mesh/mesh_collection.C' || echo '$(srcdir)/'`mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mesh_collection.Tpo mesh/$(DEPDIR)/unit_tests_opt-mesh_collection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_collection.C' object='mesh/unit_tests_opt-mesh_collection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mesh_collection.o `test -f 'mesh/mesh_collection.C' || echo '$(srcdir)/'`mesh/mesh_collection.C
+
+mesh/unit_tests_opt-mesh_collection.obj: mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mesh_collection.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mesh_collection.Tpo -c -o mesh/unit_tests_opt-mesh_collection.obj `if test -f 'mesh/mesh_collection.C'; then $(CYGPATH_W) 'mesh/mesh_collection.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_collection.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mesh_collection.Tpo mesh/$(DEPDIR)/unit_tests_opt-mesh_collection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_collection.C' object='mesh/unit_tests_opt-mesh_collection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mesh_collection.obj `if test -f 'mesh/mesh_collection.C'; then $(CYGPATH_W) 'mesh/mesh_collection.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_collection.C'; fi`
+
 mesh/unit_tests_opt-all_second_order.o: mesh/all_second_order.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-all_second_order.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-all_second_order.Tpo -c -o mesh/unit_tests_opt-all_second_order.o `test -f 'mesh/all_second_order.C' || echo '$(srcdir)/'`mesh/all_second_order.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-all_second_order.Tpo mesh/$(DEPDIR)/unit_tests_opt-all_second_order.Po
@@ -9827,6 +9908,20 @@ mesh/unit_tests_prof-write_vec_and_scalar.obj: mesh/write_vec_and_scalar.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-write_vec_and_scalar.obj `if test -f 'mesh/write_vec_and_scalar.C'; then $(CYGPATH_W) 'mesh/write_vec_and_scalar.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_vec_and_scalar.C'; fi`
 
+mesh/unit_tests_prof-mesh_collection.o: mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mesh_collection.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mesh_collection.Tpo -c -o mesh/unit_tests_prof-mesh_collection.o `test -f 'mesh/mesh_collection.C' || echo '$(srcdir)/'`mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-mesh_collection.Tpo mesh/$(DEPDIR)/unit_tests_prof-mesh_collection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_collection.C' object='mesh/unit_tests_prof-mesh_collection.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mesh_collection.o `test -f 'mesh/mesh_collection.C' || echo '$(srcdir)/'`mesh/mesh_collection.C
+
+mesh/unit_tests_prof-mesh_collection.obj: mesh/mesh_collection.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mesh_collection.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mesh_collection.Tpo -c -o mesh/unit_tests_prof-mesh_collection.obj `if test -f 'mesh/mesh_collection.C'; then $(CYGPATH_W) 'mesh/mesh_collection.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_collection.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-mesh_collection.Tpo mesh/$(DEPDIR)/unit_tests_prof-mesh_collection.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_collection.C' object='mesh/unit_tests_prof-mesh_collection.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mesh_collection.obj `if test -f 'mesh/mesh_collection.C'; then $(CYGPATH_W) 'mesh/mesh_collection.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_collection.C'; fi`
+
 mesh/unit_tests_prof-all_second_order.o: mesh/all_second_order.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-all_second_order.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-all_second_order.Tpo -c -o mesh/unit_tests_prof-all_second_order.o `test -f 'mesh/all_second_order.C' || echo '$(srcdir)/'`mesh/all_second_order.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-all_second_order.Tpo mesh/$(DEPDIR)/unit_tests_prof-all_second_order.Po
@@ -10929,6 +11024,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-extra_integers.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mapped_subdomain_partitioner_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_assign.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_collection.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po
@@ -10954,6 +11050,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-extra_integers.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mapped_subdomain_partitioner_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_assign.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_collection.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po
@@ -10979,6 +11076,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-extra_integers.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mapped_subdomain_partitioner_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_assign.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_collection.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po
@@ -11004,6 +11102,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-extra_integers.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mapped_subdomain_partitioner_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_assign.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_collection.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po
@@ -11029,6 +11128,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-extra_integers.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mapped_subdomain_partitioner_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_assign.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_collection.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po
@@ -11451,6 +11551,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-extra_integers.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mapped_subdomain_partitioner_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_assign.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_collection.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po
@@ -11476,6 +11577,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-extra_integers.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mapped_subdomain_partitioner_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_assign.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_collection.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po
@@ -11501,6 +11603,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-extra_integers.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mapped_subdomain_partitioner_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_assign.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_collection.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po
@@ -11526,6 +11629,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-extra_integers.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mapped_subdomain_partitioner_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_assign.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_collection.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po
@@ -11551,6 +11655,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-extra_integers.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mapped_subdomain_partitioner_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_assign.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_collection.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_extruder.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_function.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po
