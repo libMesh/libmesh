@@ -230,6 +230,12 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
       }
   }
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  // We set the unique ids of nodes after adding them to the mesh such that our value of
+  // _next_unique_id may be wrong. So we amend that here
+  this->set_next_unique_id(other_mesh.parallel_max_unique_id() + unique_id_offset + 1);
+#endif
+
   //Finally prepare the new Mesh for use.  Keep the same numbering and
   //partitioning for now.
   this->allow_renumbering(false);
