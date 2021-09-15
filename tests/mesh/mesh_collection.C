@@ -25,15 +25,16 @@ private:
   {
     // to trigger duplicate unique ids in the old code, you needed the following circumstances:
     // The single mesh generation routine (e.g. build_cube) *must* add a node after all the elements
-    // such that it is not an element that has the largest unique id in the single mesh. (TET10 adds
-    // a node after all the elements are added becuase we call all_second_order after all the
-    // elements are created.) If an element has the highest unique id, then the final value for
-    // _next_unique_id will be correct at the end of copy_nodes_and_elements because we set the
-    // element unique ids before adding the elements into the original mesh, such that
-    // _next_unique_id gets correctly updated. But when a node has the highest unique id, then
-    // _next_unique_id will be incorrect and after one mesh collection the value of
-    // parallel_max_unique_id() will be conceptually wrong, such that the next time we collect a
-    // mesh we are at risk of duplicating unique ids
+    // such that it is not an element that has the largest unique id in the single mesh. (build_cube
+    // with TET10 adds a node after all the elements are added becuase it calls all_second_order
+    // after all the elements are created.) If an element has the highest unique id, then the final
+    // value for _next_unique_id was (and still is) correct at the end of copy_nodes_and_elements
+    // because we set the element unique ids before adding the elements into the original mesh, such
+    // that _next_unique_id gets correctly updated. But when a node has the highest unique id, then
+    // _next_unique_id would be incorrect with the old code (but is now correct with the new code!)
+    // and after one mesh collection the value of parallel_max_unique_id() would be conceptually
+    // wrong, such that the next time we collected a mesh we would be at risk of duplicating unique
+    // ids
     T mesh(*TestCommWorld, /*dim=*/3);
     MeshTools::Generation::build_cube(mesh, 2, 2, 2, 0, 1, 0, 1, 0, 1, TET10);
     Real dmin = 2, dmax = 3;
