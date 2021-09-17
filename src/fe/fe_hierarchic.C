@@ -128,6 +128,14 @@ unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
     case TRI6:
     case TRI7:
       return ((o+1)*(o+2)/2);
+    case TET4:
+      libmesh_assert_less (o, 2);
+      libmesh_fallthrough();
+    case TET10:
+      libmesh_assert_less (o, 3);
+      libmesh_fallthrough();
+    case TET14:
+      return ((o+1)*(o+2)*(o+3)/6);
     case INVALID_ELEM:
       return 0;
     default:
@@ -266,6 +274,43 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
           libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for HEX8/20/27!");
         }
 
+    case TET4:
+      libmesh_assert_less (o, 2);
+      libmesh_assert_less (n, 4);
+      libmesh_fallthrough();
+    case TET10:
+      libmesh_assert_less (o, 3);
+      libmesh_assert_less (n, 10);
+      libmesh_fallthrough();
+    case TET14:
+      libmesh_assert_less (n, 14);
+      switch (n)
+        {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+          return 1;
+
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+          return (o-1);
+
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+          return ((o-1)*(o-2)/2);
+
+        default:
+          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TET!");
+        }
+
+
     case INVALID_ELEM:
       return 0;
 
@@ -307,6 +352,14 @@ unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
       return 0;
     case HEX27:
       return ((o-1)*(o-1)*(o-1));
+    case TET4:
+      libmesh_assert_less (o, 2);
+      libmesh_fallthrough();
+    case TET10:
+      libmesh_assert_less (o, 3);
+      libmesh_fallthrough();
+    case TET14:
+      return ((o-3)*(o-2)*(o-1)/6);
     case INVALID_ELEM:
       return 0;
     default:
