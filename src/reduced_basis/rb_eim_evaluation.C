@@ -164,6 +164,8 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   std::vector<std::vector<std::vector<Number>>> output_all_comps;
   get_parametrized_function().vectorized_evaluate(mus,
                                                   _interpolation_points_xyz,
+                                                  _interpolation_points_elem_id,
+                                                  _interpolation_points_qp,
                                                   _interpolation_points_subdomain_id,
                                                   _interpolation_points_xyz_perturbations,
                                                   output_all_comps);

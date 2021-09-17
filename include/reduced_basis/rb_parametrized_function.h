@@ -82,6 +82,8 @@ public:
   virtual Number evaluate_comp(const RBParameters & mu,
                                unsigned int comp,
                                const Point & xyz,
+                               dof_id_type elem_id,
+                               unsigned int qp,
                                subdomain_id_type subdomain_id,
                                const std::vector<Point> & xyz_perturb);
 
@@ -94,6 +96,8 @@ public:
    */
   virtual std::vector<Number> evaluate(const RBParameters & mu,
                                        const Point & xyz,
+                                       dof_id_type elem_id,
+                                       unsigned int qp,
                                        subdomain_id_type subdomain_id,
                                        const std::vector<Point> & xyz_perturb) = 0;
 
@@ -102,6 +106,8 @@ public:
    */
   virtual void vectorized_evaluate(const std::vector<RBParameters> & mus,
                                    const std::vector<Point> & all_xyz,
+                                   const std::vector<dof_id_type> & elem_ids,
+                                   const std::vector<unsigned int> & qps,
                                    const std::vector<subdomain_id_type> & sbd_ids,
                                    const std::vector<std::vector<Point>> & all_xyz_perturb,
                                    std::vector<std::vector<std::vector<Number>>> & output);
