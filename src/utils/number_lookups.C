@@ -80,7 +80,7 @@ const unsigned char square_number_row[] = {
 };
 
 
-// square_number_*: indices for cube interiors
+// cube_number_*: indices for cube interiors
 const unsigned char cube_number_column[] = {
   0,
 
