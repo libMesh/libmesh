@@ -733,7 +733,10 @@ Real fe_triangle_helper (const Elem & elem,
   if (basisorder%2 && (elem.point(noden) > elem.point((noden+1)%3)))
     flip = -1.;
 
-  // Avoid NaN around vertices!
+  // Avoid NaN around vertices ... but we still have to match the true
+  // function, even when we're *outside* the triangle (crossval==0 on
+  // a line, not just at a point!), to handle imprecise queries and
+  // FDM derivatives correctly!
   if (crossval == 0.)
     {
       unsigned int basisfactorial = 1.;
@@ -742,7 +745,8 @@ Real fe_triangle_helper (const Elem & elem,
 
       return std::pow(edgenumerator, basisorder) / basisfactorial;
     }
-  // FIXME - what happens with roundoff when 0 < crossval < O(epsilon)?
+  // Experimentally, as c -> 0, n propto c, I'm still seeing good
+  // behavior from the default implementation below:
 
   const Real edgeval = edgenumerator / crossval;
   const Real crossfunc = std::pow(crossval, basisorder);
