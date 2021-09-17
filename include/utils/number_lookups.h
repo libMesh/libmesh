@@ -30,6 +30,9 @@ extern const unsigned char square_number_column[];
 extern const unsigned char cube_number_row[];
 extern const unsigned char cube_number_column[];
 extern const unsigned char cube_number_page[];
+extern const unsigned char tetrahedral_number_row[];
+extern const unsigned char tetrahedral_number_column[];
+extern const unsigned char tetrahedral_number_page[];
 
 } // namespace libMesh
 
