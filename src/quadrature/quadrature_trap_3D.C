@@ -54,6 +54,7 @@ void QTrap::init_3D(const ElemType, unsigned int)
       // Tetrahedral quadrature rules
     case TET4:
     case TET10:
+    case TET14:
       {
         _points.resize(4);
         _weights.resize(4);

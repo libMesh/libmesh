@@ -122,6 +122,79 @@ void QNodal::init_3D(const ElemType, unsigned int)
         return;
       }
 
+    case TET14:
+      {
+        _points.resize(14);
+        _weights.resize(14);
+
+        _points[0](0) = 0.;   _points[5](0) = .5;
+        _points[0](1) = 0.;   _points[5](1) = .5;
+        _points[0](2) = 0.;   _points[5](2) = 0.;
+
+        _points[1](0) = 1.;   _points[6](0) = 0.;
+        _points[1](1) = 0.;   _points[6](1) = .5;
+        _points[1](2) = 0.;   _points[6](2) = 0.;
+
+        _points[2](0) = 0.;   _points[7](0) = 0.;
+        _points[2](1) = 1.;   _points[7](1) = 0.;
+        _points[2](2) = 0.;   _points[7](2) = .5;
+
+        _points[3](0) = 0.;   _points[8](0) = .5;
+        _points[3](1) = 0.;   _points[8](1) = 0.;
+        _points[3](2) = 1.;   _points[8](2) = .5;
+
+        _points[4](0) = .5;   _points[9](0) = 0.;
+        _points[4](1) = 0.;   _points[9](1) = .5;
+        _points[4](2) = 0.;   _points[9](2) = .5;
+
+
+        _points[10](0) = 1/Real(3); _points[11](0) = 1/Real(3);
+        _points[10](1) = 1/Real(3); _points[11](1) = 0.;
+        _points[10](2) = 0.;        _points[11](2) = 1/Real(3);
+
+        _points[12](0) = 1/Real(3); _points[13](0) = 0.;
+        _points[12](1) = 1/Real(3); _points[13](1) = 1/Real(3);
+        _points[12](2) = 1/Real(3); _points[13](2) = 1/Real(3);
+
+        // RHS:
+        //
+        // The ``optimal'' nodal quadrature here, the one that
+        // integrates every Lagrange polynomial on these nodes
+        // exactly, produces an indefinite mass matrix ...
+        //
+        // const Real wv = 1/Real(240);
+        // const Real we = 0;
+        // const Real wf = 3/Real(80);
+
+        // We could average that with our Tet10 rule and get:
+        //
+        // const Real wv = (1/Real(240)+1/Real(192))/2;
+        // const Real we = Real(14)/576/2;
+        // const Real wf = 3/Real(80)/2;
+        //
+        // Except our Tet10 rule won't actually exactly integrate
+        // quadratics! (exactly integrating quadratics wouldn't even
+        // have given a positive semidefinite mass matrix there...)
+        //
+        // John derived equations for wv and we based on symmetry and
+        // the requirement to exactly integrate quadratics; within
+        // those constraints we might pick the wf that maximizes the
+        // minimum nodal weight:
+        // const Real wf = Real(15)/440;
+        // const Real wv = -1/Real(120) + wf/3;
+        // const Real we = 1/Real(30) - wf*(Real(8)/9);
+        //
+        // But John also did the same clever optimization trick that
+        // quadrature_nodal_2D.C discusses in the context of Quad8 and
+        // Hex20 outputs, and for Tet14 that gives us:
+        const Real wv = Real(87)/47120;
+        const Real we = Real(164)/26505;
+        const Real wf = Real(1439)/47120;
+
+        _weights = {wv, wv, wv, wv, we, we, we, we, we, we, wf, wf, wf, wf};
+        return;
+      }
+
     default:
       libmesh_error_msg("ERROR: Unsupported type: " << Utility::enum_to_string(_type));
     }

@@ -59,6 +59,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
             // Bernstein shape functions on the tetrahedron.
           case TET4:
           case TET10:
+          case TET14:
             {
               libmesh_assert_less (i, 4);
 
@@ -121,6 +122,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
 
             // Bernstein shape functions on the tetrahedron.
           case TET10:
+          case TET14:
             {
               libmesh_assert_less (i, 10);
 
@@ -1418,6 +1420,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
             // Bernstein shape functions on the tetrahedron.
           case TET4:
           case TET10:
+          case TET14:
             {
               // I have been lazy here and am using finite differences
               // to compute the derivatives!
@@ -1523,6 +1526,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
           {
             // Bernstein shape functions on the tetrahedron.
           case TET10:
+          case TET14:
             {
               // I have been lazy here and am using finite differences
               // to compute the derivatives!

@@ -31,6 +31,7 @@
 #include <libmesh/cell_hex20.h>
 #include <libmesh/cell_hex27.h>
 #include <libmesh/cell_tet10.h>
+#include <libmesh/cell_tet14.h>
 #include <libmesh/boundary_info.h>
 
 #include "test_comm.h"
@@ -457,6 +458,7 @@ public:
   CPPUNIT_TEST( test3DProjectVectorFETet4 );
   CPPUNIT_TEST( test3DProjectVectorFEHex8 );
   CPPUNIT_TEST( test3DProjectVectorFETet10 );
+  CPPUNIT_TEST( test3DProjectVectorFETet14 );
   CPPUNIT_TEST( test3DProjectVectorFEHex20 );
   CPPUNIT_TEST( test3DProjectVectorFEHex27 );
 #ifdef LIBMESH_HAVE_SOLVER
@@ -1647,6 +1649,7 @@ public:
   void test3DProjectVectorFETet4() { test3DProjectVectorFE(TET4); }
   void test3DProjectVectorFEHex8() { test3DProjectVectorFE(HEX8); }
   void test3DProjectVectorFETet10() { test3DProjectVectorFE(TET10); }
+  void test3DProjectVectorFETet14() { test3DProjectVectorFE(TET14); }
   void test3DProjectVectorFEHex20() { test3DProjectVectorFE(HEX20); }
   void test3DProjectVectorFEHex27() { test3DProjectVectorFE(HEX27); }
 

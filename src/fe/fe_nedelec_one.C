@@ -79,9 +79,13 @@ void nedelec_one_nodal_soln(const Elem * elem,
               break;
             }
           case TET10:
+          case TET14:
             {
               libmesh_assert_equal_to (elem_soln.size(), 6);
-              libmesh_assert_equal_to (nodal_soln.size(), 10*3);
+              if (elem_type == TET10)
+                libmesh_assert_equal_to (nodal_soln.size(), 10*3);
+              else
+                libmesh_assert_equal_to (nodal_soln.size(), 14*3);
 
               break;
             }
@@ -170,6 +174,7 @@ unsigned int nedelec_one_n_dofs(const ElemType t, const Order o)
             return 4;
 
           case TET10:
+          case TET14:
             return 6;
 
           case HEX20:
@@ -260,6 +265,7 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
                 }
             }
           case TET10:
+          case TET14:
             {
               switch (n)
                 {
@@ -275,6 +281,12 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
                 case 8:
                 case 9:
                   return 1;
+
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                  return 0;
 
                 default:
                   libmesh_error_msg("ERROR: Invalid node ID " << n);

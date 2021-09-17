@@ -53,6 +53,7 @@ void QGrid::init_3D(const ElemType, unsigned int)
       // Tetrahedral quadrature rules
     case TET4:
     case TET10:
+    case TET14:
       {
         const unsigned int np = (_order+1)*(_order+2)*(_order+3)/6;
         // Master tet has 1x1 triangle base, height 1, so volume = 1/6

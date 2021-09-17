@@ -38,6 +38,7 @@ void QGrundmann_Moller::init_3D(const ElemType, unsigned int)
     {
     case TET4:
     case TET10:
+    case TET14:
       {
         switch(get_order())
           {
@@ -155,7 +156,7 @@ void QGrundmann_Moller::init_3D(const ElemType, unsigned int)
               return;
             }
           } // end switch (order)
-      } // end case TET4, TET10
+      } // end case TET
 
     default:
       libmesh_error_msg("ERROR: Unsupported element type: " << Utility::enum_to_string(_type));

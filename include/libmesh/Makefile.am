@@ -118,6 +118,7 @@ BUILT_SOURCES = \
         cell_pyramid5.h \
         cell_tet.h \
         cell_tet10.h \
+        cell_tet14.h \
         cell_tet4.h \
         compare_elems_by_level.h \
         edge.h \
@@ -902,6 +903,9 @@ cell_tet.h: $(top_srcdir)/include/geom/cell_tet.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_tet10.h: $(top_srcdir)/include/geom/cell_tet10.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_tet14.h: $(top_srcdir)/include/geom/cell_tet14.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_tet4.h: $(top_srcdir)/include/geom/cell_tet4.h

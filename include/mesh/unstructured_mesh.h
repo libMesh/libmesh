@@ -140,6 +140,15 @@ public:
   virtual void all_second_order (const bool full_ordered=true) override;
 
   /**
+   * Converts a (conforming, non-refined) mesh with linear elements
+   * into a mesh with "complete" order elements, i.e. elements which
+   * can store degrees of freedom on any vertex, edge, or face.  For
+   * example, a mesh consisting of \p Tet4 or \p Tet10 will be
+   * converted to a mesh with \p Tet14 etc.
+   */
+  virtual void all_complete_order () override;
+
+  /**
    * Generates a new mesh containing all the elements which
    * are assigned to processor \p pid.  This mesh is written
    * to the pid_mesh reference which you must create and pass

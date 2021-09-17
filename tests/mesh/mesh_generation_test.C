@@ -45,6 +45,7 @@ public:
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( buildCubeTet4 );
   CPPUNIT_TEST( buildCubeTet10 );
+  CPPUNIT_TEST( buildCubeTet14 );
   CPPUNIT_TEST( buildCubeHex8 );
   CPPUNIT_TEST( buildCubeHex20 );
   CPPUNIT_TEST( buildCubeHex27 );
@@ -205,9 +206,14 @@ public:
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
                              cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 8*n*n*n - 3*(n+1)*n*n));
         break;
-      case 14:
+      case 14: // pyramids, tets
+        if (type == PYRAMID14)
+          CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                               cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 8*n*n*n));
+        else // TET14
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                             cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 8*n*n*n));
+                             cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 14*n*n*n + 4*3*(n+1)*n*n +
+                                                   36*n*n*n + 4*3*(n+1)*n*n));
         break;
       default:
         libmesh_error();
@@ -282,6 +288,7 @@ public:
 
   void buildCubeTet4 ()      { tester(&MeshGenerationTest::testBuildCube, 2, TET4); }
   void buildCubeTet10 ()     { tester(&MeshGenerationTest::testBuildCube, 2, TET10); }
+  void buildCubeTet14 ()     { tester(&MeshGenerationTest::testBuildCube, 2, TET14); }
   void buildCubeHex8 ()      { tester(&MeshGenerationTest::testBuildCube, 2, HEX8); }
   void buildCubeHex20 ()     { tester(&MeshGenerationTest::testBuildCube, 2, HEX20); }
   void buildCubeHex27 ()     { tester(&MeshGenerationTest::testBuildCube, 2, HEX27); }

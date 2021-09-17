@@ -154,6 +154,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem * elem,
             }
 
           case TET10:
+          case TET14:
             {
               libmesh_assert_less (i, 6);
 
@@ -514,6 +515,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
             }
 
           case TET10:
+          case TET14:
             {
               libmesh_assert_less (i, 6);
 
@@ -942,6 +944,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
             }
 
           case TET10:
+          case TET14:
             {
               libmesh_assert_less (i, 6);
               return RealGradient();

@@ -15,6 +15,7 @@
 #include <libmesh/cell_pyramid14.h>
 #include <libmesh/cell_pyramid5.h>
 #include <libmesh/cell_tet10.h>
+#include <libmesh/cell_tet14.h>
 #include <libmesh/cell_tet4.h>
 #include <libmesh/edge_edge2.h>
 #include <libmesh/edge_edge3.h>
@@ -159,6 +160,7 @@ INSTANTIATE_EDGETEST(Pyramid13, EDGE3, 0, 8);
 INSTANTIATE_EDGETEST(Pyramid14, EDGE3, 0, 8);
 INSTANTIATE_EDGETEST(Pyramid5,  EDGE2, 0, 8);
 INSTANTIATE_EDGETEST(Tet10,     EDGE3, 0, 6);
+INSTANTIATE_EDGETEST(Tet14,     EDGE3, 0, 6);
 INSTANTIATE_EDGETEST(Tet4,      EDGE2, 0, 6);
 INSTANTIATE_EDGETEST(Quad4,     EDGE2, 0, 4);
 INSTANTIATE_EDGETEST(Quad8,     EDGE3, 0, 4);

@@ -376,6 +376,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
 
     case TET4:
     case TET10:
+    case TET14:
       {
         v.resize(7);
         v[0]  = ASPECT_RATIO_BETA;

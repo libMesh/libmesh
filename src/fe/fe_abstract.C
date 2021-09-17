@@ -450,6 +450,25 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         nodes[9] = Point (0.,.5,.5);
         return;
       }
+    case TET14:
+      {
+        nodes.resize(14);
+        nodes[0] = Point (0.,0.,0.);
+        nodes[1] = Point (1.,0.,0.);
+        nodes[2] = Point (0.,1.,0.);
+        nodes[3] = Point (0.,0.,1.);
+        nodes[4] = Point (.5,0.,0.);
+        nodes[5] = Point (.5,.5,0.);
+        nodes[6] = Point (0.,.5,0.);
+        nodes[7] = Point (0.,0.,.5);
+        nodes[8] = Point (.5,0.,.5);
+        nodes[9] = Point (0.,.5,.5);
+        nodes[10] = Point (1/Real(3),1/Real(3),0.);
+        nodes[11] = Point (1/Real(3),0.,1/Real(3));
+        nodes[12] = Point (1/Real(3),1/Real(3),1/Real(3));
+        nodes[10] = Point (0.,1/Real(3),1/Real(3));
+        return;
+      }
     case HEX8:
       {
         nodes.resize(8);
@@ -717,6 +736,7 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
 
     case TET4:
     case TET10:
+    case TET14:
       {
         // The reference tetrahedral is isosceles
         // and is bound by xi=0, eta=0, zeta=0,

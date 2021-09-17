@@ -716,6 +716,7 @@ include_HEADERS = \
         geom/cell_pyramid5.h \
         geom/cell_tet.h \
         geom/cell_tet10.h \
+        geom/cell_tet14.h \
         geom/cell_tet4.h \
         geom/compare_elems_by_level.h \
         geom/edge.h \

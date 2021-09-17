@@ -54,6 +54,7 @@ void QGauss::init_3D(const ElemType, unsigned int)
       // Tetrahedral quadrature rules
     case TET4:
     case TET10:
+    case TET14:
       {
         switch(get_order())
           {
@@ -495,7 +496,7 @@ void QGauss::init_3D(const ElemType, unsigned int)
                 }
             }
           }
-      } // end case TET4,TET10
+      } // end case TET
 
 
 
