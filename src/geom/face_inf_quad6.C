@@ -97,7 +97,7 @@ InfQuad6::nodes_on_edge(const unsigned int e) const
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float InfQuad6::_embedding_matrix[InfQuad6::num_children][InfQuad6::num_nodes][InfQuad6::num_nodes] =
+const Real InfQuad6::_embedding_matrix[InfQuad6::num_children][InfQuad6::num_nodes][InfQuad6::num_nodes] =
   {
     // embedding matrix for child 0
     {

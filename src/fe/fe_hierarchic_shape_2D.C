@@ -175,6 +175,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
   switch (type)
     {
     case TRI6:
+    case TRI7:
       {
         libmesh_not_implemented();
         return 0;
@@ -394,6 +395,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
   switch (type)
     {
     case TRI6:
+    case TRI7:
       {
         libmesh_not_implemented();
         return 0;
@@ -607,6 +609,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
   switch (type)
     {
     case TRI6:
+    case TRI7:
       {
         libmesh_not_implemented();
         return 0;
@@ -767,13 +770,15 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
     case TRI3:
     case TRISHELL3:
     case TRI6:
+    case TRI7:
       {
         const Real zeta1 = p(0);
         const Real zeta2 = p(1);
         const Real zeta0 = 1. - zeta1 - zeta2;
 
         libmesh_assert_less (i, (totalorder+1u)*(totalorder+2u)/2);
-        libmesh_assert (T == L2_HIERARCHIC || elem->type() == TRI6 || totalorder < 2);
+        libmesh_assert (T == L2_HIERARCHIC || elem->type() == TRI6 ||
+                        elem->type() == TRI7 || totalorder < 2);
 
         // Vertex DoFs
         if (i == 0)
@@ -927,6 +932,7 @@ Real fe_hierarchic_2D_shape_deriv(const Elem * elem,
     case TRI3:
     case TRISHELL3:
     case TRI6:
+    case TRI7:
       {
         const Real eps = 1.e-6;
 

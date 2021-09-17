@@ -87,10 +87,14 @@ void lagrange_nodal_soln(const Elem * elem,
             }
 
 
+          case TRI7:
+            libmesh_assert_equal_to (nodal_soln.size(), 7);
+            nodal_soln[6] = (elem_soln[0] + elem_soln[1] + elem_soln[2])/3.;
+            libmesh_fallthrough();
           case TRI6:
             {
+              libmesh_assert (type == TRI7 || nodal_soln.size() == 6);
               libmesh_assert_equal_to (elem_soln.size(), 3);
-              libmesh_assert_equal_to (nodal_soln.size(), 6);
 
               nodal_soln[0] = elem_soln[0];
               nodal_soln[1] = elem_soln[1];
@@ -309,6 +313,20 @@ void lagrange_nodal_soln(const Elem * elem,
               return;
             }
 
+          case TRI7:
+            {
+              libmesh_assert_equal_to (elem_soln.size(), 6);
+              libmesh_assert_equal_to (nodal_soln.size(), 7);
+
+              for (int i=0; i != 6; ++i)
+                nodal_soln[i] = elem_soln[i];
+
+              nodal_soln[6] = -1./9. * (elem_soln[0] + elem_soln[1] + elem_soln[2])
+                              +4./9. * (elem_soln[3] + elem_soln[4] + elem_soln[5]);
+
+              return;
+            }
+
           default:
             {
               // By default the element solution _is_ nodal,
@@ -358,6 +376,7 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
           case TRISHELL3:
           case TRI3SUBDIVISION:
           case TRI6:
+          case TRI7:
             return 3;
 
           case QUAD4:
@@ -407,6 +426,7 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
             return 3;
 
           case TRI6:
+          case TRI7:
             return 6;
 
           case QUAD8:
@@ -454,6 +474,9 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
 
           case EDGE4:
             return 4;
+
+          case TRI7:
+            return 7;
 
           case INVALID_ELEM:
             return 0;
@@ -505,6 +528,7 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
           case TRISHELL3:
           case TRI3SUBDIVISION:
           case TRI6:
+          case TRI7:
             {
               switch (n)
                 {
@@ -641,6 +665,9 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
           case PYRAMID14:
             return 1;
 
+          case TRI7:
+            return (n < 6);
+
           case INVALID_ELEM:
             return 0;
 
@@ -655,6 +682,7 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
           {
           case NODEELEM:
           case EDGE4:
+          case TRI7:
             return 1;
 
           case INVALID_ELEM:

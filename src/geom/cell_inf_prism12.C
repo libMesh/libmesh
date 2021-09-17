@@ -490,7 +490,7 @@ const unsigned short int InfPrism12::_second_order_vertex_child_index[InfPrism12
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float InfPrism12::_embedding_matrix[InfPrism12::num_children][InfPrism12::num_nodes][InfPrism12::num_nodes] =
+const Real InfPrism12::_embedding_matrix[InfPrism12::num_children][InfPrism12::num_nodes][InfPrism12::num_nodes] =
   {
     // embedding matrix for child 0
     {

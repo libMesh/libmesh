@@ -57,6 +57,7 @@ void QSimpson::init_2D(const ElemType, unsigned int)
     case TRISHELL3:
     case TRI3SUBDIVISION:
     case TRI6:
+    case TRI7:
       {
         // I'm not sure if you would call this Simpson's
         // rule for triangles.  What it *Really* is is

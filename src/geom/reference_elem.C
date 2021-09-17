@@ -179,6 +179,7 @@ void init_ref_elem_table()
     // 2D elements
     ref_elem_file[TRI3]     = ElemDataStrings::one_tri;
     ref_elem_file[TRI6]     = ElemDataStrings::one_tri6;
+    ref_elem_file[TRI7]     = ElemDataStrings::one_tri7;
 
     ref_elem_file[QUAD4]    = ElemDataStrings::one_quad;
     ref_elem_file[QUAD8]    = ElemDataStrings::one_quad8;

@@ -126,6 +126,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
 
           case TRI3:
           case TRI6:
+          case TRI7:
             return 3;
 
           case QUAD4:
@@ -155,6 +156,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 3;
 
           case TRI6:
+          case TRI7:
             return 6;
 
           case QUAD8:
@@ -184,6 +186,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 4;
 
           case TRI6:
+          case TRI7:
             return 10;
 
           case QUAD8:
@@ -212,6 +215,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 5;
 
           case TRI6:
+          case TRI7:
             return 15;
 
           case QUAD8:
@@ -240,6 +244,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 6;
 
           case TRI6:
+          case TRI7:
             return 21;
 
           case QUAD8:
@@ -268,6 +273,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 7;
 
           case TRI6:
+          case TRI7:
             return 28;
 
           case QUAD8:
@@ -295,6 +301,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 8;
 
           case TRI6:
+          case TRI7:
             return 36;
 
           case QUAD8:
@@ -355,6 +362,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
             // The 2D Szabo-Babuska defined on a 6-noded triangle
           case TRI3:
           case TRI6:
+          case TRI7:
             {
               switch (n)
                 {
@@ -368,8 +376,12 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                 case 5:
                   return 0;
 
+                case 6:
+                  libmesh_assert(t == TRI7);
+                  return 0;
+
                 default:
-                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI3/6!");
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI3/6/7!");
                 }
             }
 
@@ -441,6 +453,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
 
             // The 2D Szabo-Babuska defined on a 6-noded triangle
           case TRI6:
+          case TRI7:
             {
               switch (n)
                 {
@@ -454,8 +467,12 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                 case 5:
                   return 1;
 
+                case 6:
+                  libmesh_assert(t == TRI7);
+                  return 0;
+
                 default:
-                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6/7!");
                 }
             }
 
@@ -525,6 +542,10 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
 
 
             // The 2D Szabo-Babuska defined on a 6-noded triangle
+          case TRI7:
+            if (n == 6)
+              return 1;
+            libmesh_fallthrough();
           case TRI6:
             {
               switch (n)
@@ -540,7 +561,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 2;
 
                 default:
-                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6/7!");
                 }
             }
 
@@ -609,7 +630,11 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
             }
 
 
-            // The 2D Szabo-Babuska defined on a 6-noded triangle
+            // The 2D Szabo-Babuska defined on a 6/7-noded triangle
+          case TRI7:
+            if (n == 6)
+              return 3;
+            libmesh_fallthrough();
           case TRI6:
             {
               switch (n)
@@ -694,7 +719,11 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
             }
 
 
-            // The 2D Szabo-Babuska defined on a 6-noded triangle
+            // The 2D Szabo-Babuska defined on a 6/7-noded triangle
+          case TRI7:
+            if (n == 6)
+              return 6;
+            libmesh_fallthrough();
           case TRI6:
             {
               switch (n)
@@ -779,7 +808,11 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
             }
 
 
-            // The 2D Szabo-Babuska defined on a 6-noded triangle
+            // The 2D Szabo-Babuska defined on a 6/7-noded triangle
+          case TRI7:
+            if (n == 6)
+              return 10;
+            libmesh_fallthrough();
           case TRI6:
             {
               switch (n)
@@ -863,7 +896,11 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
             }
 
 
-            // The 2D Szabo-Babuska defined on a 6-noded triangle
+            // The 2D Szabo-Babuska defined on a 6/7-noded triangle
+          case TRI7:
+            if (n == 6)
+              return 15;
+            libmesh_fallthrough();
           case TRI6:
             {
               switch (n)
@@ -947,6 +984,7 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
             // The 2D Szabo-Babuska defined on a triangle
           case TRI3:
           case TRI6:
+          case TRI7:
             return 0;
 
             // The 2D tensor-product Szabo-Babuska defined on a
@@ -984,6 +1022,7 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
 
             // The 2D Szabo-Babuska defined on a 6-noded triangle
           case TRI6:
+          case TRI7:
             return 0;
 
             // The 2D tensor-product Szabo-Babuska defined on a
@@ -1026,6 +1065,9 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case TRI6:
             return 1;
 
+          case TRI7:
+            return 0;
+
             // The 2D tensor-product Szabo-Babuska defined on a
             // eight-noded quadrilateral.
           case QUAD8:
@@ -1065,6 +1107,9 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
             // The 2D Szabo-Babuska defined on a 6-noded triangle
           case TRI6:
             return 3;
+
+          case TRI7:
+            return 0;
 
             // The 2D tensor-product Szabo-Babuska defined on a
             // eight-noded quadrilateral.
@@ -1106,6 +1151,9 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case TRI6:
             return 6;
 
+          case TRI7:
+            return 0;
+
             // The 2D tensor-product Szabo-Babuska defined on a
             // eight-noded quadrilateral.
           case QUAD8:
@@ -1145,6 +1193,9 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case TRI6:
             return 10;
 
+          case TRI7:
+            return 0;
+
             // The 2D tensor-product Szabo-Babuska defined on a
             // eight-noded quadrilateral.
           case QUAD8:
@@ -1183,6 +1234,9 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
             // The 2D Szabo-Babuska defined on a 6-noded triangle
           case TRI6:
             return 15;
+
+          case TRI7:
+            return 0;
 
             // The 2D tensor-product Szabo-Babuska defined on a
             // eight-noded quadrilateral.

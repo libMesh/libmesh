@@ -324,7 +324,7 @@ void InfHex8::connectivity(const unsigned int libmesh_dbg_var(sc),
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float InfHex8::_embedding_matrix[InfHex8::num_children][InfHex8::num_nodes][InfHex8::num_nodes] =
+const Real InfHex8::_embedding_matrix[InfHex8::num_children][InfHex8::num_nodes][InfHex8::num_nodes] =
   {
     // embedding matrix for child 0
     {

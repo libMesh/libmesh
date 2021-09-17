@@ -811,7 +811,7 @@ Real Prism18::volume () const
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Prism18::_embedding_matrix[Prism18::num_children][Prism18::num_nodes][Prism18::num_nodes] =
+const Real Prism18::_embedding_matrix[Prism18::num_children][Prism18::num_nodes][Prism18::num_nodes] =
   {
     // embedding matrix for child 0
     {

@@ -156,6 +156,7 @@ include_HEADERS =  \
         geom/face_tri3_shell.h \
         geom/face_tri3_subdivision.h \
         geom/face_tri6.h \
+        geom/face_tri7.h \
         geom/node.h \
         geom/node_elem.h \
         geom/node_range.h \

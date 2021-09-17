@@ -167,6 +167,7 @@ libmesh_SOURCES =  \
         src/geom/face_tri3_shell.C \
         src/geom/face_tri3_subdivision.C \
         src/geom/face_tri6.C \
+        src/geom/face_tri7.C \
         src/geom/node.C \
         src/geom/node_elem.C \
         src/geom/plane.C \

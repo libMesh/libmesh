@@ -60,6 +60,7 @@ void QTrap::init_2D(const ElemType, unsigned int)
     case TRISHELL3:
     case TRI3SUBDIVISION:
     case TRI6:
+    case TRI7:
       {
         _points.resize(3);
         _weights.resize(3);

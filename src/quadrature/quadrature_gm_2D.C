@@ -40,6 +40,7 @@ void QGrundmann_Moller::init_2D(const ElemType, unsigned int)
     case TRISHELL3:
     case TRI3SUBDIVISION:
     case TRI6:
+    case TRI7:
       {
         switch(get_order())
           {
@@ -51,7 +52,7 @@ void QGrundmann_Moller::init_2D(const ElemType, unsigned int)
               return;
             }
           } // end switch (order)
-      } // end case TRI3, TRI6
+      } // end case TRI
 
     default:
       libmesh_error_msg("ERROR: Unsupported element type: " << Utility::enum_to_string(_type));

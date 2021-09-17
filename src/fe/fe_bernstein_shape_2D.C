@@ -142,6 +142,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
       libmesh_assert_less (totalorder, 2);
       libmesh_fallthrough();
     case TRI6:
+    case TRI7:
       switch (totalorder)
         {
         case FIRST:
@@ -364,7 +365,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
               default:
                 libmesh_error_msg("Invalid shape function index shape = " << shape);
               } // switch shape
-          } // case TRI6
+          }
         default:
           libmesh_error_msg("Invalid totalorder = " << totalorder);
         } // switch order
@@ -524,6 +525,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
       libmesh_assert_less (totalorder, 2);
       libmesh_fallthrough();
     case TRI6:
+    case TRI7:
       {
         // I have been lazy here and am using finite differences
         // to compute the derivatives!
@@ -689,6 +691,7 @@ Real FE<2,BERNSTEIN>::shape_second_deriv(const Elem * elem,
     case QUAD8:
     case QUADSHELL8:
     case TRI6:
+    case TRI7:
       {
         // I have been lazy here and am using finite differences
         // to compute the derivatives!

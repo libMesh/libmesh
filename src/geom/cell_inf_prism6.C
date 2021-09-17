@@ -322,7 +322,7 @@ void InfPrism6::connectivity(const unsigned int libmesh_dbg_var(sc),
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float InfPrism6::_embedding_matrix[InfPrism6::num_children][InfPrism6::num_nodes][InfPrism6::num_nodes] =
+const Real InfPrism6::_embedding_matrix[InfPrism6::num_children][InfPrism6::num_nodes][InfPrism6::num_nodes] =
   {
     // embedding matrix for child 0
     {

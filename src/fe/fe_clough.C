@@ -99,6 +99,7 @@ unsigned int clough_n_dofs(const ElemType t, const Order o)
         switch (t)
           {
           case TRI6:
+          case TRI7:
             return 9;
 
           default:
@@ -111,6 +112,7 @@ unsigned int clough_n_dofs(const ElemType t, const Order o)
         switch (t)
           {
           case TRI6:
+          case TRI7:
             return 12;
 
           default:
@@ -140,6 +142,7 @@ unsigned int clough_n_dofs_at_node(const ElemType t,
           {
             // The 2D Clough-Tocher defined on a 6-noded triangle
           case TRI6:
+          case TRI7:
             {
               switch (n)
                 {
@@ -151,10 +154,11 @@ unsigned int clough_n_dofs_at_node(const ElemType t,
                 case 3:
                 case 4:
                 case 5:
+                case 6:
                   return 0;
 
                 default:
-                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI!");
                 }
             }
 
@@ -169,6 +173,7 @@ unsigned int clough_n_dofs_at_node(const ElemType t,
           {
             // The 2D Clough-Tocher defined on a 6-noded triangle
           case TRI6:
+          case TRI7:
             {
               switch (n)
                 {
@@ -181,6 +186,9 @@ unsigned int clough_n_dofs_at_node(const ElemType t,
                 case 4:
                 case 5:
                   return 1;
+
+                case 6:
+                  return 0;
 
                 default:
                   libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
@@ -212,6 +220,7 @@ unsigned int clough_n_dofs_per_elem(const ElemType t, const Order o)
           {
             // The 2D clough defined on a 6-noded triangle
           case TRI6:
+          case TRI7:
             return 0;
 
           default:

@@ -33,6 +33,7 @@ public:
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( buildSquareTri3 );
   CPPUNIT_TEST( buildSquareTri6 );
+  CPPUNIT_TEST( buildSquareTri7 );
   CPPUNIT_TEST( buildSquareQuad4 );
   CPPUNIT_TEST( buildSquareQuad8 );
   CPPUNIT_TEST( buildSquareQuad9 );
@@ -108,23 +109,28 @@ public:
     else
       CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n*2));
 
-    const unsigned int n_nodes = Elem::type_to_n_nodes_map[type];
-
-    switch (n_nodes)
+    switch (type)
       {
-      case 3: // First-order elements
-      case 4:
+      case TRI3: // First-order elements
+      case QUAD4:
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
                              cast_int<dof_id_type>((n+1)*(n+1)));
         break;
-      case 6: // Second-order elements
-      case 9:
+      case TRI6: // Second-order elements
+      case QUAD9:
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
                              cast_int<dof_id_type>((2*n+1)*(2*n+1)));
         break;
-      default: // QUAD8
+      case QUAD8: // Not-really-second-order element missing center nodes
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
                              cast_int<dof_id_type>((2*n+1)*(2*n+1) - n*n));
+        break;
+      case TRI7: // Not-really-second-order element with extra center nodes
+        CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                             cast_int<dof_id_type>((2*n+1)*(2*n+1) + 2*n*n));
+        break;
+      default: // Wait, what did we try to build?
+        CPPUNIT_ASSERT(false);
       }
 
     // Our bounding boxes can be loose on higher order elements, but
@@ -266,6 +272,7 @@ public:
 
   void buildSquareTri3 ()    { tester(&MeshGenerationTest::testBuildSquare, 3, TRI3); }
   void buildSquareTri6 ()    { tester(&MeshGenerationTest::testBuildSquare, 4, TRI6); }
+  void buildSquareTri7 ()    { tester(&MeshGenerationTest::testBuildSquare, 4, TRI7); }
   void buildSquareQuad4 ()   { tester(&MeshGenerationTest::testBuildSquare, 4, QUAD4); }
   void buildSquareQuad8 ()   { tester(&MeshGenerationTest::testBuildSquare, 4, QUAD8); }
   void buildSquareQuad9 ()   { tester(&MeshGenerationTest::testBuildSquare, 4, QUAD9); }

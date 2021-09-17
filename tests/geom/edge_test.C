@@ -27,6 +27,7 @@
 #include <libmesh/face_quad9.h>
 #include <libmesh/face_tri3.h>
 #include <libmesh/face_tri6.h>
+#include <libmesh/face_tri7.h>
 
 #include <vector>
 
@@ -164,6 +165,7 @@ INSTANTIATE_EDGETEST(Quad8,     EDGE3, 0, 4);
 INSTANTIATE_EDGETEST(Quad9,     EDGE3, 0, 4);
 INSTANTIATE_EDGETEST(Tri3,      EDGE2, 0, 3);
 INSTANTIATE_EDGETEST(Tri6,      EDGE3, 0, 3);
+INSTANTIATE_EDGETEST(Tri7,      EDGE3, 0, 3);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 INSTANTIATE_EDGETEST(InfHex16,   EDGE3,    0, 4);

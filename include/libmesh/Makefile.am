@@ -146,6 +146,7 @@ BUILT_SOURCES = \
         face_tri3_shell.h \
         face_tri3_subdivision.h \
         face_tri6.h \
+        face_tri7.h \
         node.h \
         node_elem.h \
         node_range.h \
@@ -985,6 +986,9 @@ face_tri3_subdivision.h: $(top_srcdir)/include/geom/face_tri3_subdivision.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri6.h: $(top_srcdir)/include/geom/face_tri6.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_tri7.h: $(top_srcdir)/include/geom/face_tri7.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 node.h: $(top_srcdir)/include/geom/node.h

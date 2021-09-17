@@ -126,6 +126,7 @@ unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
       libmesh_assert_less (o, 2);
       libmesh_fallthrough();
     case TRI6:
+    case TRI7:
       return ((o+1)*(o+2)/2);
     case INVALID_ELEM:
       return 0;
@@ -165,6 +166,10 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
       libmesh_assert_less (o, 2);
       libmesh_fallthrough();
     case TRI6:
+      // Internal DoFs are associated with the elem on a Tri6, or node 6 on a Tri7
+      libmesh_assert_less (n, 6);
+      libmesh_fallthrough();
+    case TRI7:
       switch (n)
         {
         case 0:
@@ -177,9 +182,10 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
         case 5:
           return (o-1);
 
-          // Internal DoFs are associated with the elem, not its nodes
+        case 6:
+          return ((o-1)*(o-2)/2);
         default:
-          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
+          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI!");
         }
     case QUAD4:
     case QUADSHELL4:
@@ -289,6 +295,8 @@ unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
       return 0;
     case TRI6:
       return ((o-1)*(o-2)/2);
+    case TRI7:
+      return 0;
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:

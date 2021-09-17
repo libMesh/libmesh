@@ -269,9 +269,9 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  virtual float embedding_matrix (const unsigned int,
-                                  const unsigned int,
-                                  const unsigned int) const override
+  virtual Real embedding_matrix (const unsigned int,
+                                 const unsigned int,
+                                 const unsigned int) const override
   { libmesh_not_implemented(); return 0.; }
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;

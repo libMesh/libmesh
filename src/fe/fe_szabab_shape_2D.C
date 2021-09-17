@@ -80,6 +80,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
             // Szabo-Babuska shape functions on the triangle.
           case TRI3:
           case TRI6:
+          case TRI7:
             {
               const Real l1 = 1-p(0)-p(1);
               const Real l2 = p(0);
@@ -137,6 +138,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
 
             // Szabo-Babuska shape functions on the triangle.
           case TRI6:
+          case TRI7:
             {
               Real l1 = 1-p(0)-p(1);
               Real l2 = p(0);
@@ -237,6 +239,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           {
             // Szabo-Babuska shape functions on the triangle.
           case TRI6:
+          case TRI7:
             {
               Real l1 = 1-p(0)-p(1);
               Real l2 = p(0);
@@ -339,6 +342,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           {
             // Szabo-Babuska shape functions on the triangle.
           case TRI6:
+          case TRI7:
             {
               Real l1 = 1-p(0)-p(1);
               Real l2 = p(0);
@@ -393,7 +397,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
                 default:
                   libmesh_error_msg("Invalid i = " << i);
                 }
-            } // case TRI6
+            } // case TRI6/TRI7
 
             // Szabo-Babuska shape functions on the quadrilateral.
           case QUAD8:
@@ -454,6 +458,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           {
             // Szabo-Babuska shape functions on the triangle.
           case TRI6:
+          case TRI7:
             {
               Real l1 = 1-p(0)-p(1);
               Real l2 = p(0);
@@ -518,7 +523,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
                 default:
                   libmesh_error_msg("Invalid i = " << i);
                 }
-            } // case TRI6
+            } // case TRI6/TRI7
 
             // Szabo-Babuska shape functions on the quadrilateral.
           case QUAD8:
@@ -580,6 +585,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           {
             // Szabo-Babuska shape functions on the triangle.
           case TRI6:
+          case TRI7:
             {
 
               Real l1 = 1-p(0)-p(1);
@@ -655,7 +661,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
                 default:
                   libmesh_error_msg("Invalid i = " << i);
                 }
-            } // case TRI6
+            } // case TRI6/TRI7
 
             // Szabo-Babuska shape functions on the quadrilateral.
           case QUAD8:
@@ -777,6 +783,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
             // Szabo-Babuska shape functions on the triangle.
           case TRI3:
           case TRI6:
+          case TRI7:
             {
               // Here we use finite differences to compute the derivatives!
               const Real eps = 1.e-6;
@@ -859,6 +866,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
           {
             // Szabo-Babuska shape functions on the triangle.
           case TRI6:
+          case TRI7:
             {
               // Here we use finite differences to compute the derivatives!
               const Real eps = 1.e-6;
@@ -965,6 +973,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 
             // Szabo-Babuska shape functions on the triangle.
           case TRI6:
+          case TRI7:
             {
               // Here we use finite differences to compute the derivatives!
               const Real eps = 1.e-6;
@@ -1073,6 +1082,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 
             // Szabo-Babuska shape functions on the triangle.
           case TRI6:
+          case TRI7:
             {
               // Here we use finite differences to compute the derivatives!
               const Real eps = 1.e-6;
@@ -1181,6 +1191,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 
             // Szabo-Babuska shape functions on the triangle.
           case TRI6:
+          case TRI7:
             {
               // Here we use finite differences to compute the derivatives!
               const Real eps = 1.e-6;
@@ -1289,6 +1300,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 
             // Szabo-Babuska shape functions on the triangle.
           case TRI6:
+          case TRI7:
             {
               // Here we use finite differences to compute the derivatives!
               const Real eps = 1.e-6;

@@ -151,6 +151,7 @@ unsigned int bernstein_n_dofs(const ElemType t, const Order o)
       libmesh_assert_less (o, 2);
       libmesh_fallthrough();
     case TRI6:
+    case TRI7:
       return ((o+1)*(o+2)/2);
     case TET4:
       libmesh_assert_less (o, 2);
@@ -197,6 +198,10 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
       libmesh_assert_less (o, 2);
       libmesh_fallthrough();
     case TRI6:
+      // Internal DoFs are associated with the elem on a Tri6, or node 6 on a Tri7
+      libmesh_assert_less (n, 6);
+      libmesh_fallthrough();
+    case TRI7:
       switch (n)
         {
         case 0:
@@ -208,9 +213,11 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
         case 4:
         case 5:
           return (o-1);
-          // Internal DoFs are associated with the elem, not its nodes
+
+        case 6:
+          return ((o-1)*(o-2)/2);
         default:
-          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
+          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI!");
         }
     case QUAD4:
       libmesh_assert_less (n, 4);
@@ -343,6 +350,8 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
       return 0;
     case TRI6:
       return ((o-1)*(o-2)/2);
+    case TRI7:
+      return 0;
     case QUAD8:
     case QUADSHELL8:
       if (o <= 2)

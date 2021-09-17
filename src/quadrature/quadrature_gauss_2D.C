@@ -72,6 +72,7 @@ void QGauss::init_2D(const ElemType, unsigned int)
     case TRISHELL3:
     case TRI3SUBDIVISION:
     case TRI6:
+    case TRI7:
       {
         switch(get_order())
           {

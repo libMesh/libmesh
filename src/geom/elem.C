@@ -39,6 +39,7 @@
 #include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/face_tri3_shell.h"
 #include "libmesh/face_tri6.h"
+#include "libmesh/face_tri7.h"
 #include "libmesh/face_quad4.h"
 #include "libmesh/face_quad4_shell.h"
 #include "libmesh/face_quad8.h"
@@ -140,6 +141,11 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     3,  // TRISHELL3
     4,  // QUADSHELL4
     8,  // QUADSHELL8
+
+    7,  // TRI7
+    14, // TET14
+    20, // PRISM20
+    18, // PYRAMID18
   };
 
 const unsigned int Elem::type_to_n_sides_map [] =
@@ -190,6 +196,11 @@ const unsigned int Elem::type_to_n_sides_map [] =
     3,  // TRISHELL3
     4,  // QUADSHELL4
     4,  // QUADSHELL8
+
+    3,  // TRI7
+    4,  // TET14
+    5,  // PRISM20
+    5,  // PYRAMID18
   };
 
 const unsigned int Elem::type_to_n_edges_map [] =
@@ -240,6 +251,11 @@ const unsigned int Elem::type_to_n_edges_map [] =
     3,  // TRISHELL3
     4,  // QUADSHELL4
     4,  // QUADSHELL8
+
+    3,  // TRI7
+    6,  // TET14
+    9,  // PRISM20
+    8,  // PYRAMID18
   };
 
 // ------------------------------------------------------------
@@ -270,6 +286,8 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
       return libmesh_make_unique<Tri3Subdivision>(p);
     case TRI6:
       return libmesh_make_unique<Tri6>(p);
+    case TRI7:
+      return libmesh_make_unique<Tri7>(p);
     case QUAD4:
       return libmesh_make_unique<Quad4>(p);
     case QUADSHELL4:
@@ -1924,7 +1942,7 @@ unsigned int Elem::as_parent_node (unsigned int child,
             {
               for (signed char n = 0; n != nn; ++n)
                 {
-                  const float em_val = this->embedding_matrix
+                  const Real em_val = this->embedding_matrix
                     (c, cn, n);
                   if (em_val == 1)
                     {
@@ -2053,7 +2071,7 @@ Elem::parent_bracketing_nodes(unsigned int child,
 
                   for (unsigned int pn = 0; pn != nn; ++pn)
                     {
-                      const float em_val =
+                      const Real em_val =
                         this->embedding_matrix(c,n,pn);
 
                       libmesh_assert_not_equal_to (em_val, 1);
@@ -2116,7 +2134,7 @@ Elem::parent_bracketing_nodes(unsigned int child,
                     {
                       for (unsigned int pn = 0; pn != nn; ++pn)
                         {
-                          const float em_val =
+                          const Real em_val =
                             this->embedding_matrix(c,n,pn);
 
                           libmesh_assert_not_equal_to (em_val, 1);
@@ -2574,6 +2592,7 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
       return EDGE2;
     case TRI3:
     case TRI6:
+    case TRI7:
       return TRI3;
     case TRISHELL3:
       return TRISHELL3;
@@ -2651,6 +2670,9 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
         // full_ordered not relevant
         return TRI6;
       }
+
+    case TRI7:
+      return TRI7;
 
       // Currently there is no TRISHELL6, so similarly to other types
       // where this is the case, we just return the input.

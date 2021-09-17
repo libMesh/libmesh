@@ -239,7 +239,7 @@ void Hex8::connectivity(const unsigned int libmesh_dbg_var(sc),
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Hex8::_embedding_matrix[Hex8::num_children][Hex8::num_nodes][Hex8::num_nodes] =
+const Real Hex8::_embedding_matrix[Hex8::num_children][Hex8::num_nodes][Hex8::num_nodes] =
   {
     // The 8 children of the Hex-type elements can be thought of as being
     // associated with the 8 vertices of the Hex.  Some of the children are

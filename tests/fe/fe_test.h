@@ -186,6 +186,9 @@ Gradient rational_test_grad (const Point& p,
 }
 
 
+#define FE_CAN_TEST_CUBIC \
+  (((family != LAGRANGE && family != L2_LAGRANGE) || elem_type != TRI7) && order > 2)
+
 
 
 template <Order order, FEFamily family, ElemType elem_type, unsigned int build_nx>
@@ -298,7 +301,9 @@ public:
       {
         _sys->project_solution(rational_test, rational_test_grad, _es->parameters);
       }
-    else if (order > 2)
+    // Lagrange "cubic" on Tet7 only supports a bubble function, not
+    // all of P^3
+    else if (FE_CAN_TEST_CUBIC)
       {
         _sys->project_solution(fe_cubic_test, fe_cubic_test_grad, _es->parameters);
       }
@@ -331,7 +336,8 @@ public:
 
     // We see 6.5*tol*sqrt(tol) errors on cubic Hermites with the fe_cubic
     // hermite test function
-    this->_grad_tol = 8 * TOLERANCE * sqrt(TOLERANCE);
+    // On Tri7 we see 10*tol*sqrt(tol) errors, even!
+    this->_grad_tol = 12 * TOLERANCE * sqrt(TOLERANCE);
 
     this->_hess_tol = sqrt(TOLERANCE); // FIXME: we see some ~1e-5 errors?!?
 
@@ -448,7 +454,7 @@ public:
             (libmesh_real(rational_test(p, dummy, "", "")),
              libmesh_real(u),
              this->_value_tol);
-        else if (order > 2)
+        else if (FE_CAN_TEST_CUBIC)
           LIBMESH_ASSERT_FP_EQUAL
             (libmesh_real(fe_cubic_test(p, dummy, "", "")),
              libmesh_real(u),
@@ -514,7 +520,7 @@ public:
                                       libmesh_real(rat_grad(2)),
                                       this->_grad_tol);
           }
-        else if (order > 2)
+        else if (FE_CAN_TEST_CUBIC)
           {
             const Gradient cub_grad =
               fe_cubic_test_grad(p, dummy, "", "");
@@ -597,7 +603,7 @@ public:
                                       libmesh_real(rat_grad(2)),
                                       this->_grad_tol);
           }
-        else if (order > 2)
+        else if (FE_CAN_TEST_CUBIC)
           {
             const Gradient cub_grad =
               fe_cubic_test_grad(p, dummy, "", "");
@@ -665,7 +671,7 @@ public:
           {
             // TODO: Yeah we'll test the ugly expressions later.
           }
-        else if (order > 2)
+        else if (FE_CAN_TEST_CUBIC)
           {
             const Real & x = p(0);
             const Real & y = LIBMESH_DIM > 1 ? p(1) : 0;
@@ -791,7 +797,7 @@ public:
           {
             // TODO: tedious calculus
           }
-        else if (order > 2)
+        else if (FE_CAN_TEST_CUBIC)
           {
             const Real & x = p(0);
             const Real & y = LIBMESH_DIM > 1 ? p(1) : 0;

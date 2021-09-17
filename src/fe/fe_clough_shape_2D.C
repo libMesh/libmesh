@@ -1842,6 +1842,7 @@ Real FE<2,CLOUGH>::shape(const Elem * elem,
           {
             // C1 functions on the Clough-Tocher triangle.
           case TRI6:
+          case TRI7:
             {
               libmesh_assert_less (i, 9);
               // FIXME: it would be nice to calculate (and cache)
@@ -1920,6 +1921,7 @@ Real FE<2,CLOUGH>::shape(const Elem * elem,
           {
             // C1 functions on the Clough-Tocher triangle.
           case TRI6:
+          case TRI7:
             {
               libmesh_assert_less (i, 12);
 
@@ -2049,6 +2051,7 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem * elem,
           {
             // C1 functions on the Clough-Tocher triangle.
           case TRI6:
+          case TRI7:
             {
               libmesh_assert_less (i, 9);
               // FIXME: it would be nice to calculate (and cache)
@@ -2127,6 +2130,7 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem * elem,
           {
             // C1 functions on the Clough-Tocher triangle.
           case TRI6:
+          case TRI7:
             {
               libmesh_assert_less (i, 12);
 
@@ -2255,6 +2259,7 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem * elem,
           {
             // C1 functions on the Clough-Tocher triangle.
           case TRI6:
+          case TRI7:
             {
               libmesh_assert_less (i, 9);
               // FIXME: it would be nice to calculate (and cache)
@@ -2333,6 +2338,7 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem * elem,
           {
             // C1 functions on the Clough-Tocher triangle.
           case TRI6:
+          case TRI7:
             {
               libmesh_assert_less (i, 12);
 

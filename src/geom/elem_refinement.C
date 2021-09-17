@@ -187,7 +187,7 @@ void Elem::coarsen()
           for (unsigned int n=0; n<n_n; n++)
             {
               // The value from the embedding matrix
-              const float em_val = this->embedding_matrix(c,cnode,n);
+              const Real em_val = this->embedding_matrix(c,cnode,n);
 
               // The node location is somewhere between existing vertices
               if ((em_val != 0.) && (em_val != 1.))

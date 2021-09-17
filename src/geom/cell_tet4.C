@@ -240,7 +240,7 @@ void Tet4::connectivity(const unsigned int libmesh_dbg_var(sc),
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Tet4::_embedding_matrix[Tet4::num_children][Tet4::num_nodes][Tet4::num_nodes] =
+const Real Tet4::_embedding_matrix[Tet4::num_children][Tet4::num_nodes][Tet4::num_nodes] =
   {
     // embedding matrix for child 0
     {
@@ -418,9 +418,9 @@ bool Tet4::contains_point (const Point & p, Real tol) const
 
 
 #ifdef LIBMESH_ENABLE_AMR
-float Tet4::embedding_matrix (const unsigned int i,
-                              const unsigned int j,
-                              const unsigned int k) const
+Real Tet4::embedding_matrix (const unsigned int i,
+                             const unsigned int j,
+                             const unsigned int k) const
 {
   // Choose an optimal diagonal, if one has not already been selected
   this->choose_diagonal();
