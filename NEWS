@@ -1,3 +1,302 @@
+1.6.2 -> 1.7.0
+  * Benchmarking support
+    - Add benchmark_example() macro, $LIBMESH_BENCHMARK env
+    - Add CLI overrides, comments, performance logging, and benchmark parameters to many examples
+  * BoundaryInfo
+    - Apply zero-D nodeset names in gmsh_IO
+    - Act on id to name maps in BoundaryInfo::regenerate_id_sets
+    - Selectively remove boundary information after mesh stitching
+    - Add nodes into nodesets in build_cube
+    - Add set names from other mesh when stitching
+    - MeshBase reference member in BoundaryInfo changed to pointer
+  * Docs
+    - Mention "make uninstall" in README.md
+    - Update Elem documentation with reference coordinate intervals.
+    - Update DenseMatrix docs
+    - Add more verbose documentation for InfFE constraints
+    - Improve comments on AMR with InfElem.
+    - Update documentation for intro_ex3, ex4
+  * Elem
+    - Fix Elem::is_child_on_edge()
+    - Add Elem::center_node_on_side()
+    - Add Elem::true_centroid(), Elem::vertex_average(), deprecate Elem::centroid()
+    - Add optimized Elem::true_centroid() overrides for some Elems
+    - Use displacement vectors for relative_fuzzy_equals() in has_affine_map() tests
+    - Don't connect interior_parents in other meshes
+    - Handle interior_parents in connect_families()
+    - Assert interior_parent() AMR consistency
+    - Use hack_p_level inside set_p_level
+    - Sync p refinement flags along with p levels
+    - Add Elem::hack_p_level_and_refinement_flag and use in Elem unpack
+    - Add Elem::n_permutations(), Elem::permute()
+    - Add Elem::swap*nodes helper functions
+    - Add Elem::is_singular_node()
+    - Deprecate the SideEdge class
+    - Use non-allocating build_edge_ptr where possible
+    - Add "fill" overload for build_edge_ptr
+    - Stop using SideEdge proxies
+    - Add const version of build_edge_ptr
+    - Add Elem::simple_build_edge_ptr implementation
+    - Deprecate the Side class
+    - Deprecate attempts to build proxy Side objects
+    - Stop building proxy sides by default
+    - Set subdomain_id+p_level in all side/edge elems
+    - Add Elem::has_invertible_map() and overrides for some elements
+  * ExodusIO
+    - Support empty sidesets + nodesets in ExodusII
+    - Update contrib ExodusII to version 8.11
+    - Get exodusII.h include out of our headers
+    - Add and use ExodusII_IO_Helper::update()
+    - inquire() function signature change, move to anonymous namespace
+    - Undef multiple guard macros for Exodus+Nemesis
+    - Fix Exodus extra integers unit tests
+    - Fix extra_integers read in ExodusII_IO
+    - Add support for writing components of CONSTANT MONOMIAL_VEC variables
+    - Add ExodusII_IO::get_elem_num_map() and get_node_num_map() APIs
+    - Add ExodusII_IO::write_nodeset_data() API
+    - Add unit test of writing nodeset data to Exodus file
+    - Exodus_II_IO::copy_*_solution(DistMesh) fixes
+    - Make ExodusII_IO_Helper::nodal_var_values a map
+    - Handle incomplete node and elem var maps
+    - Add number of nodes per Elem sanity check
+  * FE
+    - Fix FE side unit tests with --enable-complex
+    - Allow second order L2_LAGRANGE on first order elements
+    - Allow arbitrary order L2_HIERARCHIC with arbitrary order elements
+    - Change max order for L2 families
+    - Rotate FE test meshes after permuting elements
+    - Add a cubic to fe_test analytic functions
+    - Fix p>2 SIDE_HIERARCHIC second derivatives
+    - Permuting edges fixes p=2 SIDE_HIERARCHIC HEX27
+    - Disable higher order SIDE_HIERARCHIC on HEX27
+    - Add warnings to permute_elements doc
+    - Test all FE except HERMITE with permuted elements
+    - Add test_permute unit test
+    - Non-templated FEMap instantiate shim
+    - Add missing PYRAMID14 master point
+    - Add Unit tests for SIDE_HIERARCHIC FE
+    - Support SIDE_DISCONTINUOUS in projections
+    - Add SIDE_HIERARCHIC FE and related enums
+    - Add shape functions for NEDELEC_ONE FEs on TET10 mesh elements
+  * FEMContext
+    - Use vars vectors in GenericProjector functors
+    - Use _active_vars in FEMContext calculations
+    - Sort FEMContext::_active_vars
+    - Optional active_vars in all FEMContext::FEMContext
+    - Add active_vars member, accessor to FEMContext
+    - Use delegating constructor idiom for FEMContext
+    - Raw ALE variables should be protected
+    - Fix docs that referred to old example
+  * InfFE
+    - Disable misc ex15 with --enable-node-constraints
+    - Don't test InfFE AMR with ENABLE_NODE_CONSTRAINTS
+    - Fix compilation with node constraints + InfFE
+    - Update documentation
+    - add further virtual_for_inffe-statements
+    - add dimension-parameter for decay_deriv
+    - correct computation of derivatives for non-affine mapped base
+    - correct base_point function for non-affine base
+    - add test for inf side
+    - add new InfElem test: numerical derivatives
+    - change in InfFE::reinit(elem, pts):
+    - Add support for InfFE::reinit(side)
+    - Adapted tests for infinite elements; added further test-calculations.
+    - fix inverse_map in InfFE: for nonaffine base, the intersection was wrong
+    - Update misc_ex1, ex14 to new InfFE APIs
+    - Change 'child_side' to 'child_base' to reduce confusion.
+    - Add test-calc. for infinite elem + AMR
+    - Add html documentation for new example
+    - Ran bootstrap for the new example
+    - Add new example: miscellaneous 15
+    - Enable AMR with infinite elements
+  * Isogeometric Analysis (IGA)
+    - Rational function shapes_need_reinit is true!
+    - Test inverse_map on less trivial master points
+    - Fix manifold-vs-nodeelem checks
+    - testMasterCenters() in IGA unit tests
+    - Use gzipped bxt meshes in unit tests
+    - Support zipped files with DynaIO
+    - Add testProjectionRegression to Dyna unit tests
+    - Move BERNSTEIN HEX27 interior DoFs to node
+    - DynaIO unit tests on more meshes.
+    - Do some regression testing on IGA projections
+    - Process constraints when DynaIO adds them
+    - Do *not* sync done_saving_ids across processors
+    - Deprecate SparsityPattern::Build direct access
+    - solve_for_constrained_dofs for IGA project_vector
+    - Added System::solve_for_unconstrained_dofs
+    - Allow belated System::add_matrix()
+    - DofMap::process_mesh_constraint_rows
+    - Don't store zero entries in IGA constraint rows
+    - DofMap::constrained_sparsity_construction() option
+    - Comment on math in solve_for_unconstrained_dofs()
+    - Omit add_spline_constraints call in fem_system_ex5
+    - Don't call add_spline_constraints in Dyna tests
+    - Move spline constraint work from DynaIO to DofMap
+    - Use MeshBase constraint_rows in DynaIO
+    - Store constraint_rows with a MeshBase
+    - Allow renumbering and distributing on IGA meshes
+    - delete_remote_elements support for constraint_rows
+    - Beginning gather(constraint_rows) work
+    - Don't try to redistribute() constraint_rows
+    - Remove deleted nodes from Mesh constraint_rows
+    - Store mesh constraint_rows by pointer
+    - Store elem ids in MeshBase::constraint_rows
+    - Default to non-SECOND approximations again
+    - Run reduced_basis_ex5 twice, once with .bext mesh
+    - Don't try to reserialize a distributed IGA mesh
+    - Fix delete_remote_elements constraint erasure
+    - Add Twisted_Beam bext file
+    - Allow reduced_basis_ex5 to read mesh files
+    - Support 1D/2D calculations in reduced_basis_ex5
+    - Do not skip NodeElems with constrained DoFs!
+    - Use new L2System features in calculator app
+    - Support null L2System::input_system
+    - Support multi-dimensional meshes in L2system
+    - Add subdomains_list to apps L2system
+  * Mesh
+    - Include unpartitioned elements in MeshBase::subdomain_ids
+    - Allow Elem, Node re-insert in ReplicatedMesh
+    - Move MeshCommunication::*gather to MeshBase
+    - Implement mesh move constructors in terms of MeshBase::assign() function
+    - Add more verbose output to MeshBase::get_info()
+    - Add API to tell mesh it is not prepared
+    - Deprecate public MeshBase::boundary_info member
+    - Add global data structures for mesh subdomain and boundary ids
+  * MeshFunction
+    - Add MeshFunction copy constructor; implement MeshFunction clone() in terms of this
+    - MeshFunction::set_point_locator_tolerance(): set both PointLocator tolerances
+    - MeshFunction: use unique_ptr to manage PointLocator
+    - Copy point locator tolerance in MeshFunction::clone()
+    - Add non-const accessor for underlying PointLocator
+  * Misc. bugfixes and improvements
+    - Ghost periodic point neighbors in GhostPointNeighbors
+    - Add MeshInput::is_parallel_format() accessor
+    - Update contrib version of Eigen to 3.3.9
+    - Update contrib version of lcov to 1.15
+    - Upgrade TIMPI to 1.7.0_bootstrapped
+    - Update MetaPhysicL to 1.1.0_bootstrapped
+    - Add TypeVector overloads for std::norm and friends for Eigen::Matrix
+    - Add support for exchanging adjoint physics
+    - System: store unique_ptrs in _vectors map
+    - Add copy assignment+constructor for ParsedFunction and unit tests
+    - Move basic matrix storage and create virtual matrix APIs in System
+    - Add InterMeshProjection class to handle arbitrary projections between meshes
+    - PointLocatorTree: use std::shared_ptr to manage tree
+    - Add new PointLocator derived class based on Nanoflann
+    - Don't try to autodetect headers for tecio in system locations
+    - Add nodal quadrature rules for Pyramids
+    - Add MeshModification::permute_elements()
+    - Officially deprecate UniquePtr
+    - Improve performance of BoundingBox::contains_point() by inlining it
+    - Add chunked_mapvector, a variant of mapvector that tries to improve performance
+    - Mimic STL and boost constructors in our allocators
+    - DofMap: add const DofConstraints accessor
+    - Fix --disable-amr builds
+    - Fix --enable-all-static builds
+    - fparser: update deprecated throw specifications
+    - Fix BC issue in systems_of_equations_ex8
+    - Create multi_evaluable predicate
+    - Add Elem::affine_tol and use in has_affine_map comparison tests
+    - Disable HDF5 file locking unless the user insists
+    - Set next unique id in copy_nodes_and_elements
+    - PointLocatorTree: avoid Elem::contains_point() warning when using custom tolerances
+    - Updates to C++11/14/17 configure tests
+    - Fix compilation with both CAPNP and GLPK enabled
+    - Turn off gdb backtraces by default
+    - Add and test Dense{Vector,Matrix} std::initializer_list constructors
+    - Add configure test for C++11 <initializer_list> header
+    - Avoid allocating sparse matrix when using JFNK
+    - Fix leak in merge_ghost_functor_outputs
+    - Detect if PETSc has strumpack
+    - Add local_singular_node to Elem for catching singular nodes in inverse_map
+    - Add bounding box scaling
+    - Remove potential deadlock with Singletons and RemoteElem
+    - DofMap::distribute_dofs() now returns the total number of DOFs across all procs
+    - Drop SHA1 lib, use std::hash instead
+    - Add EDGE4 case to get_refspace_nodes
+    - Use RAII to clean up some PETSc objects with WrappedPetsc<T>
+    - Don't potentially throw from 'exceptionless' error macros
+    - Make ReferenceCounter::increment_{de,con}structor_count() noexcept
+    - Re-enable check_dirichlet_bcid_consistency
+    - Move linear_solver member from LinearImplicitSystem to ImplicitSystem
+    - ImplicitSystem::get_linear_solver() now throws an error
+    - UnsteadySolver: old_local_nonlinear_solution is now a std::shared_ptr
+    - PeriodicBoundaries now stores unique_ptrs instead of dumb ptrs
+    - Fix scatter for node constraints
+    - Add some vector CompareTypes
+    - Fix possible overflow in PeriodicBoundaries::neighbor
+    - Ignore remote elems coming from pbcs in DefaultCoupling
+    - ParsedFEMFunction: change "parsers" to a vector of unique_ptrs
+    - Generalize default constructors for TypeTensor and TypeVector
+  * NemesisIO
+    - Support Nemesis writes of complex-valued elem data
+    - Unit tests for Nemesis::copy_elemental_solution
+    - Add Nemesis copy_nodal_solution unit tests
+    - Allow testing Exodus copy_*_solution distributed
+    - Test Exodus+Nemesis both replicated+distributed
+    - Factor Exodus/Nemesis into separate unit tests
+    - NemesisIO::copy_nodal_solution
+    - Use NemesisIO::read even on one processor
+    - Manually set unique_id in NemesisIO
+    - Keep internal node_num_map one-based in Nemesis_IO
+    - Nemesis_IO::get_nodal_var_names()
+    - Unit test for NemesisIO write_equation_systems
+    - Handle empty node intersections
+    - Write Nemesis cmaps even if they're empty
+    - NemesisIO::assert_symmetric_cmaps() refactoring
+    - NemesisIO::write_nodal_solution subparametric case
+    - Implement NemesisIO(ReplicatedMesh&)
+    - Test Nemesis read for arbitrary MeshType
+    - Add testNemesisRead() unit test
+    - Fix off-by-one errors in Nemesis_IO
+    - Remove Nemesis_IO_Helper::put_n_coord
+    - Remove Nemesis_IO_Helper::create
+    - Fixes for --disable-nemesis builds
+    - Fix NemesisIO Hex27 output issue
+  * NumericVector
+    - Add virtual NumericVector::max_allowed_id() API.
+    - Generalize multi-vector operations to always use global forms
+    - NumericVector: Make indexing add/set operations toggle _is_closed
+    - DistributedVector GHOSTED in serial can be SERIAL
+    - Read/write numeric vector projection/type info
+  * Partitioner
+    - Use Partitioner::build with command line override
+    - Add/use Partitioner::build(PartitionerType) with command line override
+    - Add PartitionerType enum
+    - Fix SFC Partitioner on distributed meshes
+  * Reduced Basis
+    - Enable plotting of EIM functions
+    - Updates to RBConstruction truth solve outputs
+    - RBConstruction: Handle exceptions thrown during assembly
+    - Add observation values to EIM
+    - Update rb_data.capnp and serialization/deserialization support for EIM observation values
+    - Add _preserve_rb_eim_solutions flag to RBEIMEvaluation
+    - Made eim_solutions_for_training_set private with getters in RBEIMEvaluation
+    - Cleanup of RBEIMConstruction
+    - Skip reinit when there are no DOFs on Elem
+    - Enable eim-best-fit with lookup table
+    - Add set_EIM_rhs_vec() to RBEIMEvaluation
+  * SparseMatrix
+    - Fix memory issue for matrix_matrix_mult and add option for reusing matrix
+    - Add PetscMatrix::create_submatrix_nosort()
+    - Add PetscMatrix::add_sparse_matrix()
+    - Fix PetscMatrix::matrix_matrix_mult()
+    - Fix PetscMatrix::print_personal()
+    - Add LumpedMassMatrix
+  * SparsityPattern
+    - Add comments to SparsityPattern::Build methods
+    - default+delete SparsityPattern::Build functions
+    - Use SparsityPattern for n_nz in SparseMatrix
+    - Make DofMap::build_sparsity() public
+    - DofMap::get_sparsity_pattern() accessor
+    - Keep n_nz and n_oz in SparsityPattern::Build
+    - Use new SparsityPatternBuild accessors in DofMap
+    - More SparsityPattern::Build methods
+    - Add SparsityPattern::build accessors, reorganize
+    - Remove SparsityPattern::Build::mesh
+    - Remove non-unique DOF ids in Build::sorted_connected_dofs()
+
 1.6.1 -> 1.6.2
   * Mimic stl and boost constructors in our allocators
   * Weaken partitioner_test for SFC on 8+ processors
@@ -149,7 +448,6 @@
   * Allow adaptivity_ex3 to run with more variables
   * Misc. bugfixes
     - Fixes for compilation with PETSc enabled, MPI disabled
-    - Copy point locator tolerance in MeshFunction::clone()
     - Threading: OverlappingCouplingFunctor, MeshFunction, Clough-Tocher, etc.
     - Sync nodes after all_second_order if not replicated
     - Add missing PYRAMID cases to l2_lagrange_n_dofs()
