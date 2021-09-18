@@ -167,7 +167,6 @@
     - Add MeshFunction copy constructor; implement MeshFunction clone() in terms of this
     - MeshFunction::set_point_locator_tolerance(): set both PointLocator tolerances
     - MeshFunction: use unique_ptr to manage PointLocator
-    - Copy point locator tolerance in MeshFunction::clone()
     - Add non-const accessor for underlying PointLocator
   * Misc. bugfixes and improvements
     - Ghost periodic point neighbors in GhostPointNeighbors
@@ -448,6 +447,7 @@
   * Allow adaptivity_ex3 to run with more variables
   * Misc. bugfixes
     - Fixes for compilation with PETSc enabled, MPI disabled
+    - Copy point locator tolerance in MeshFunction::clone()
     - Threading: OverlappingCouplingFunctor, MeshFunction, Clough-Tocher, etc.
     - Sync nodes after all_second_order if not replicated
     - Add missing PYRAMID cases to l2_lagrange_n_dofs()
