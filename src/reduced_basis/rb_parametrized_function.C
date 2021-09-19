@@ -53,6 +53,16 @@ RBParametrizedFunction::evaluate_comp(const RBParameters & mu,
   return values[comp];
 }
 
+std::vector<Number> RBParametrizedFunction::evaluate(const RBParameters & mu,
+                                                     const Point & xyz,
+                                                     subdomain_id_type subdomain_id,
+                                                     const std::vector<Point> & xyz_perturb)
+{
+  // Use default values of elem_id and qp, since the assumption is they are not needed
+  // in this case.
+  return evaluate(mu, xyz, /*elem_id*/ 0, /*qp*/ 0, subdomain_id, xyz_perturb);
+}
+
 void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters> & mus,
                                                  const std::vector<Point> & all_xyz,
                                                  const std::vector<dof_id_type> & elem_ids,
@@ -98,6 +108,23 @@ void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters>
             }
         }
     }
+}
+
+void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters> & mus,
+                                                 const std::vector<Point> & all_xyz,
+                                                 const std::vector<subdomain_id_type> & sbd_ids,
+                                                 const std::vector<std::vector<Point>> & all_xyz_perturb,
+                                                 std::vector<std::vector<std::vector<Number>>> & output)
+{
+  // Use default values of elem_id and qp, since the assumption is they are not needed
+  // in this case.
+  return vectorized_evaluate(mus,
+                             all_xyz,
+                             /*elem_ids*/ {},
+                             /*qps*/ {},
+                             sbd_ids,
+                             all_xyz_perturb,
+                             output);
 }
 
 void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBParameters & mu,
