@@ -102,31 +102,12 @@ public:
                                        const std::vector<Point> & xyz_perturb) = 0;
 
   /**
-   * Same as above except without the elem_id and qp arguments. This is the original API and is retained
-   * for backwards compatibility.
-   */
-  virtual std::vector<Number> evaluate(const RBParameters & mu,
-                                       const Point & xyz,
-                                       subdomain_id_type subdomain_id,
-                                       const std::vector<Point> & xyz_perturb);
-
-  /**
    * Vectorized version of evaluate. If requires_xyz_perturbations==false, then all_xyz_perturb will not be used.
    */
   virtual void vectorized_evaluate(const std::vector<RBParameters> & mus,
                                    const std::vector<Point> & all_xyz,
                                    const std::vector<dof_id_type> & elem_ids,
                                    const std::vector<unsigned int> & qps,
-                                   const std::vector<subdomain_id_type> & sbd_ids,
-                                   const std::vector<std::vector<Point>> & all_xyz_perturb,
-                                   std::vector<std::vector<std::vector<Number>>> & output);
-
-  /**
-   * Same as above except without the elem_id and qp arguments. This is the original API and is retained
-   * for backwards compatibility.
-   */
-  virtual void vectorized_evaluate(const std::vector<RBParameters> & mus,
-                                   const std::vector<Point> & all_xyz,
                                    const std::vector<subdomain_id_type> & sbd_ids,
                                    const std::vector<std::vector<Point>> & all_xyz_perturb,
                                    std::vector<std::vector<std::vector<Number>>> & output);
