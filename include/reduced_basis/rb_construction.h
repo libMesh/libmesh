@@ -835,6 +835,12 @@ protected:
    */
   void preevaluate_thetas();
 
+  /**
+   * Reset the _preevaluate_thetas_completed flag to false. We can use this to force
+   * us to recalculate preevaluate thetas, in cases where that is necessary.
+   */
+  void reset_preevaluate_thetas_completed();
+
   //----------- PROTECTED DATA MEMBERS -----------//
 
   /**
@@ -969,6 +975,13 @@ private:
    * Flag to indicate if we preevaluate the theta functions
    */
   bool _preevaluate_thetas_flag;
+
+  /**
+   * Flag to indicate if the preevaluate_thetas function has been called, since
+   * this allows us to avoid calling preevaluate_thetas more than once, which is
+   * typically unnecessary.
+   */
+  bool _preevaluate_thetas_completed;
 
   /**
    * The current training parameter index during reduced basis training.
