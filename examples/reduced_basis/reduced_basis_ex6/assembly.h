@@ -43,6 +43,7 @@ using libMesh::RealGradient;
 using libMesh::Elem;
 using libMesh::FEBase;
 using libMesh::subdomain_id_type;
+using libMesh::dof_id_type;
 
 // The function we're approximating with EIM
 struct Gxyz : public RBParametrizedFunction
@@ -55,6 +56,8 @@ struct Gxyz : public RBParametrizedFunction
   virtual std::vector<Number>
   evaluate(const RBParameters & mu,
            const Point & p,
+           dof_id_type /*elem_id*/,
+           unsigned int /*qp*/,
            subdomain_id_type /*subdomain_id*/,
            const std::vector<Point> & /*p_perturb*/) override
   {
