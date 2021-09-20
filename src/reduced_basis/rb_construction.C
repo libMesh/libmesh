@@ -87,7 +87,8 @@ RBConstruction::RBConstruction (EquationSystems & es,
     abs_training_tolerance(1.e-12),
     normalize_rb_bound_in_greedy(false),
     RB_training_type("Greedy"),
-    _preevaluate_thetas_flag(false)
+    _preevaluate_thetas_flag(false),
+    _preevaluate_thetas_completed(false)
 {
   // set assemble_before_solve flag to false
   // so that we control matrix assembly.
@@ -2642,6 +2643,10 @@ void RBConstruction::preevaluate_thetas()
 
   _evaluated_thetas.resize(get_local_n_training_samples());
 
+  // Early return if we've already preevaluated thetas.
+  if (_preevaluate_thetas_completed)
+    return;
+
   if ( get_local_n_training_samples() == 0 )
     return;
 
@@ -2675,6 +2680,13 @@ void RBConstruction::preevaluate_thetas()
       for (auto i : make_range(get_local_n_training_samples()))
         _evaluated_thetas[i][n_A_terms + q_f] = F_vals[i];
     }
+
+  _preevaluate_thetas_completed = true;
+}
+
+void RBConstruction::reset_preevaluate_thetas_completed()
+{
+  _preevaluate_thetas_completed = false;
 }
 
 } // namespace libMesh
