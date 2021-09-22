@@ -466,7 +466,7 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         nodes[10] = Point (1/Real(3),1/Real(3),0.);
         nodes[11] = Point (1/Real(3),0.,1/Real(3));
         nodes[12] = Point (1/Real(3),1/Real(3),1/Real(3));
-        nodes[10] = Point (0.,1/Real(3),1/Real(3));
+        nodes[13] = Point (0.,1/Real(3),1/Real(3));
         return;
       }
     case HEX8:
