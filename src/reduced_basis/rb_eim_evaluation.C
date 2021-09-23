@@ -61,6 +61,7 @@ void RBEIMEvaluation::clear()
   _interpolation_points_xyz_perturbations.clear();
   _interpolation_points_elem_id.clear();
   _interpolation_points_qp.clear();
+  _interpolation_points_phi_i_qp.clear();
 
   _interpolation_matrix.resize(0,0);
 
@@ -77,6 +78,7 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
   _interpolation_points_xyz_perturbations.clear();
   _interpolation_points_elem_id.clear();
   _interpolation_points_qp.clear();
+  _interpolation_points_phi_i_qp.clear();
 
   _interpolation_matrix.resize(Nmax,Nmax);
 }
@@ -168,6 +170,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
                                                   _interpolation_points_qp,
                                                   _interpolation_points_subdomain_id,
                                                   _interpolation_points_xyz_perturbations,
+                                                  _interpolation_points_phi_i_qp,
                                                   output_all_comps);
 
   std::vector<std::vector<Number>> evaluated_values_at_interp_points(output_all_comps.size());
@@ -403,6 +406,11 @@ void RBEIMEvaluation::add_interpolation_points_qp(unsigned int qp)
   _interpolation_points_qp.emplace_back(qp);
 }
 
+void RBEIMEvaluation::add_interpolation_points_phi_i_qp(const std::vector<Real> & phi_i_qp)
+{
+  _interpolation_points_phi_i_qp.emplace_back(phi_i_qp);
+}
+
 Point RBEIMEvaluation::get_interpolation_points_xyz(unsigned int index) const
 {
   libmesh_error_msg_if(index >= _interpolation_points_xyz.size(), "Error: Invalid index");
@@ -443,6 +451,13 @@ unsigned int RBEIMEvaluation::get_interpolation_points_qp(unsigned int index) co
   libmesh_error_msg_if(index >= _interpolation_points_qp.size(), "Error: Invalid index");
 
   return _interpolation_points_qp[index];
+}
+
+const std::vector<Real> & RBEIMEvaluation::get_interpolation_points_phi_i_qp(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _interpolation_points_phi_i_qp.size(), "Error: Invalid index");
+
+  return _interpolation_points_phi_i_qp[index];
 }
 
 void RBEIMEvaluation::set_interpolation_matrix_entry(unsigned int i, unsigned int j, Number value)
@@ -513,7 +528,8 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   dof_id_type elem_id,
   subdomain_id_type subdomain_id,
   unsigned int qp,
-  const std::vector<Point> & perturbs)
+  const std::vector<Point> & perturbs,
+  const std::vector<Real> & phi_i_qp)
 {
   _local_eim_basis_functions.emplace_back(bf);
 
@@ -523,6 +539,7 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   _interpolation_points_subdomain_id.emplace_back(subdomain_id);
   _interpolation_points_qp.emplace_back(qp);
   _interpolation_points_xyz_perturbations.emplace_back(perturbs);
+  _interpolation_points_phi_i_qp.emplace_back(phi_i_qp);
 }
 
 void RBEIMEvaluation::

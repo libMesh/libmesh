@@ -668,7 +668,8 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
       eim_eval.get_parametrized_function().preevaluate_parametrized_function_on_mesh(get_parameters(),
                                                                                      _local_quad_point_locations,
                                                                                      _local_quad_point_subdomain_ids,
-                                                                                     _local_quad_point_locations_perturbations);
+                                                                                     _local_quad_point_locations_perturbations,
+                                                                                     *this);
 
       for (const auto & pr : _local_quad_point_locations)
       {
@@ -1042,20 +1043,38 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
   subdomain_id_type optimal_subdomain_id = 0;
   unsigned int optimal_qp = 0;
   std::vector<Point> optimal_point_perturbs;
+  std::vector<Real> optimal_point_phi_i_qp;
 
   // Initialize largest_abs_value to be negative so that it definitely gets updated.
   Real largest_abs_value = -1.;
+
+  // In order to compute phi_i_qp, we initialize a FEMContext
+  FEMContext con(*this);
+  for (auto dim : con.elem_dimensions())
+    {
+      auto fe = con.get_element_fe(/*var=*/0, dim);
+      fe->get_phi();
+    }
 
   for (const auto & pr : local_pf)
     {
       dof_id_type elem_id = pr.first;
       const auto & comp_and_qp = pr.second;
 
+      // Also initialize phi in order to compute phi_i_qp
+      const Elem & elem_ref = get_mesh().elem_ref(elem_id);
+      con.pre_fe_reinit(*this, &elem_ref);
+
+      auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
+      const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+
+      elem_fe->reinit(&elem_ref);
+
       for (const auto & comp : index_range(comp_and_qp))
         {
           const std::vector<Number> & qp_values = comp_and_qp[comp];
 
-          for (unsigned int qp : index_range(qp_values))
+          for (auto qp : index_range(qp_values))
             {
               Number value = qp_values[qp];
               Real abs_value = std::abs(value);
@@ -1067,6 +1086,10 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
                   optimal_comp = comp;
                   optimal_elem_id = elem_id;
                   optimal_qp = qp;
+
+                  optimal_point_phi_i_qp.resize(phi.size());
+                  for(auto i : index_range(phi))
+                    optimal_point_phi_i_qp[i] = phi[i][qp];
 
                   const auto & point_list =
                     libmesh_map_find(_local_quad_point_locations, elem_id);
@@ -1103,6 +1126,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
   this->comm().broadcast(optimal_subdomain_id, proc_ID_index);
   this->comm().broadcast(optimal_qp, proc_ID_index);
   this->comm().broadcast(optimal_point_perturbs, proc_ID_index);
+  this->comm().broadcast(optimal_point_phi_i_qp, proc_ID_index);
 
   libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
 
@@ -1119,7 +1143,8 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
                                                      optimal_elem_id,
                                                      optimal_subdomain_id,
                                                      optimal_qp,
-                                                     optimal_point_perturbs);
+                                                     optimal_point_perturbs,
+                                                     optimal_point_phi_i_qp);
 
   if (has_obs_vals)
     {

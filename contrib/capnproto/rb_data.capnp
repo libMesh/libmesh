@@ -117,6 +117,7 @@ struct RBEIMEvaluationReal @0xf8121d2237427a80 {
   eimSolutionsForTrainingSet @10 :List(List(Real));
   observationPointsXyz       @11 :List(Point3D);
   observationPointsValues    @12 :List(List(List(Real)));
+  interpolationPhiValues     @13 :List(List(Real));
 }
 struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   nBfs                       @0  :Integer;
@@ -132,4 +133,5 @@ struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   eimSolutionsForTrainingSet @10 :List(List(Complex));
   observationPointsXyz       @11 :List(Point3D);
   observationPointsValues    @12 :List(List(List(Complex)));
+  interpolationPhiValues     @13 :List(List(Real));
 }
