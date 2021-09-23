@@ -230,6 +230,7 @@ public:
   void add_interpolation_points_xyz_perturbations(const std::vector<Point> & perturbs);
   void add_interpolation_points_elem_id(dof_id_type elem_id);
   void add_interpolation_points_qp(unsigned int qp);
+  void add_interpolation_points_phi_i_qp(const std::vector<Real> & phi_i_qp);
 
   /**
    * Get the data associated with EIM interpolation points.
@@ -240,6 +241,7 @@ public:
   const std::vector<Point> & get_interpolation_points_xyz_perturbations(unsigned int index) const;
   dof_id_type get_interpolation_points_elem_id(unsigned int index) const;
   unsigned int get_interpolation_points_qp(unsigned int index) const;
+  const std::vector<Real> & get_interpolation_points_phi_i_qp(unsigned int index) const;
 
   /**
    * Set entry of the EIM interpolation matrix.
@@ -261,7 +263,8 @@ public:
     dof_id_type elem_id,
     subdomain_id_type subdomain_id,
     unsigned int qp,
-    const std::vector<Point> & perturbs);
+    const std::vector<Point> & perturbs,
+    const std::vector<Real> & phi_i_qp);
 
   /**
    * Set the observation points and components.
@@ -422,6 +425,13 @@ private:
    */
   std::vector<dof_id_type> _interpolation_points_elem_id;
   std::vector<unsigned int> _interpolation_points_qp;
+
+  /**
+   * We store the shape function values at the qp as well. These values
+   * allows us to evaluate parametrized functions that depend on nodal
+   * data.
+   */
+  std::vector<std::vector<Real>> _interpolation_points_phi_i_qp;
 
   /**
    * Store the parametrized function that will be approximated

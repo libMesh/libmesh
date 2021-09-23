@@ -33,6 +33,7 @@ namespace libMesh
 
 class RBParameters;
 class Point;
+class System;
 
 /**
  * A simple functor class that provides a RBParameter-dependent function.
@@ -85,7 +86,8 @@ public:
                                dof_id_type elem_id,
                                unsigned int qp,
                                subdomain_id_type subdomain_id,
-                               const std::vector<Point> & xyz_perturb);
+                               const std::vector<Point> & xyz_perturb,
+                               const std::vector<Real> & phi_i_qp);
 
   /**
    * Evaluate the parametrized function at the specified point for
@@ -99,7 +101,8 @@ public:
                                        dof_id_type elem_id,
                                        unsigned int qp,
                                        subdomain_id_type subdomain_id,
-                                       const std::vector<Point> & xyz_perturb) = 0;
+                                       const std::vector<Point> & xyz_perturb,
+                                       const std::vector<Real> & phi_i_qp) = 0;
 
   /**
    * Vectorized version of evaluate. If requires_xyz_perturbations==false, then all_xyz_perturb will not be used.
@@ -110,6 +113,7 @@ public:
                                    const std::vector<unsigned int> & qps,
                                    const std::vector<subdomain_id_type> & sbd_ids,
                                    const std::vector<std::vector<Point>> & all_xyz_perturb,
+                                   const std::vector<std::vector<Real>> & phi_i_qp,
                                    std::vector<std::vector<std::vector<Number>>> & output);
 
   /**
@@ -120,7 +124,8 @@ public:
   virtual void preevaluate_parametrized_function_on_mesh(const RBParameters & mu,
                                                          const std::unordered_map<dof_id_type, std::vector<Point>> & all_xyz,
                                                          const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
-                                                         const std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > & all_xyz_perturb);
+                                                         const std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > & all_xyz_perturb,
+                                                         const System & sys);
 
   /**
    * Look up the preevaluate values of the parametrized function for
