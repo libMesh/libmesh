@@ -859,6 +859,28 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
         rb_eim_evaluation.set_observation_values(observation_values);
       }
     }
+
+  // The shape function values at the interpolation points. This can be used to evaluate nodal data
+  // at EIM interpolation points, which are at quadrature points.
+  {
+    auto interpolation_points_list_outer =
+      rb_eim_evaluation_reader.getInterpolationPhiValues();
+
+    libmesh_error_msg_if(interpolation_points_list_outer.size() != n_bfs,
+                         "Size error while reading the eim interpolation points.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        auto interpolation_points_list_inner = interpolation_points_list_outer[i];
+
+        std::vector<Real> phi_i_qp(interpolation_points_list_inner.size());
+        for (unsigned int j=0; j<phi_i_qp.size(); j++)
+          {
+            phi_i_qp[j] = load_scalar_value(interpolation_points_list_inner[j]);
+          }
+        rb_eim_evaluation.add_interpolation_points_phi_i_qp(phi_i_qp);
+      }
+  }
 }
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
