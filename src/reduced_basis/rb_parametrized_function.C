@@ -161,7 +161,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
 
       elem_fe->reinit(&elem_ref);
 
-      for (unsigned int qp : index_range(xyz_vec))
+      for (auto qp : index_range(xyz_vec))
         {
           mesh_to_preevaluated_values_map[elem_id][qp] = counter;
 
@@ -171,7 +171,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
           sbd_ids_vec[counter] = subdomain_id;
 
           phi_i_qp_vec[counter].resize(phi.size());
-          for(unsigned int i : index_range(phi))
+          for(auto i : index_range(phi))
             phi_i_qp_vec[counter][i] = phi[i][qp];
 
           if (requires_xyz_perturbations)

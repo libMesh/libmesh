@@ -1074,7 +1074,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
         {
           const std::vector<Number> & qp_values = comp_and_qp[comp];
 
-          for (unsigned int qp : index_range(qp_values))
+          for (auto qp : index_range(qp_values))
             {
               Number value = qp_values[qp];
               Real abs_value = std::abs(value);
@@ -1088,7 +1088,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
                   optimal_qp = qp;
 
                   optimal_point_phi_i_qp.resize(phi.size());
-                  for(unsigned int i : index_range(phi))
+                  for(auto i : index_range(phi))
                     optimal_point_phi_i_qp[i] = phi[i][qp];
 
                   const auto & point_list =
