@@ -876,7 +876,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
         std::vector<Real> phi_i_qp(interpolation_points_list_inner.size());
         for (unsigned int j=0; j<phi_i_qp.size(); j++)
           {
-            phi_i_qp[j] = load_scalar_value(interpolation_points_list_inner[j]);
+            phi_i_qp[j] = interpolation_points_list_inner[j];
           }
         rb_eim_evaluation.add_interpolation_points_phi_i_qp(phi_i_qp);
       }
