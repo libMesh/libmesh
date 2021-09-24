@@ -738,9 +738,9 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
 
         for (unsigned int j : index_range(phi_i_qp_vec))
           {
-            set_scalar_in_list(interpolation_points_list_inner,
-                               j,
-                               phi_i_qp_vec[j]);
+            // Here we can use set() instead of set_scalar_in_list() because
+            // phi stores real-valued data only.
+            interpolation_points_list_inner.set(j, phi_i_qp_vec[j]);
           }
       }
   }
