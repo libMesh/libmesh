@@ -24,6 +24,11 @@
 // TODO: icpc options
 #ifdef __clang__
 #pragma clang diagnostic push
+// The first four should remain here to avoid warnings about warnings
+#pragma clang diagnostic ignored "-Wunknown-pragmas"
+#pragma clang diagnostic ignored "-Wpragmas"
+#pragma clang diagnostic ignored "-Wunknown-warning-option"
+#pragma clang diagnostic ignored "-Wunknown-warning"
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #pragma clang diagnostic ignored "-Wextra-semi"
 #pragma clang diagnostic ignored "-Wvariadic-macros"
@@ -59,6 +64,12 @@
 // GCC > 4.5 supports diagnostic pragmas with push/pop
 #if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ > 5)
 #pragma GCC diagnostic push
+// The first four should remain here to avoid warnings about warnings
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wunknown-warning"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 // These two don't work?
 #pragma GCC diagnostic ignored "-Wpedantic"
 #pragma GCC diagnostic ignored "-Wdeprecated"
