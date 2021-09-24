@@ -43,21 +43,12 @@
 #pragma clang diagnostic ignored "-Wswitch-default"
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #pragma clang diagnostic ignored "-Woverloaded-virtual"
-// This isn't supported in 3.4.2 at least
-#if (__clang_major__ > 3)
 #pragma clang diagnostic ignored "-Wmacro-redefined"
-#endif
-#if (__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ > 5)
-// This was introduced in 3.6
 #pragma clang diagnostic ignored "-Winconsistent-missing-override"
-#endif // clang > 3.5
-// These were introduced in clang 10
-#if (__clang_major__ > 9)
 // Ignore warnings from code that does "if (foo) bar();"
 #pragma clang diagnostic ignored "-Wmisleading-indentation"
 #pragma clang diagnostic ignored "-Wint-in-bool-context"
 #pragma clang diagnostic ignored "-Wdeprecated-copy"
-#endif // clang > 9
 #endif
 
 #if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__)
@@ -94,24 +85,16 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 // This is mostly for the (deprecated...) C++ MPI wrappers
 #pragma GCC diagnostic ignored "-Wsuggest-override"
-#if (__GNUC__ > 5)
 // Ignore this for VTK
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 // Ignore warnings from code that does "if (foo) bar();"
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
 // Ignore warnings from bad placement new use
 #pragma GCC diagnostic ignored "-Wplacement-new"
-#if (__GNUC__ > 6)
 #pragma GCC diagnostic ignored "-Wint-in-bool-context"
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-#if (__GNUC__ > 7)
 #pragma GCC diagnostic ignored "-Wparentheses"
 #pragma GCC diagnostic ignored "-Wcast-function-type"
-#if (__GNUC__ > 8)
 #pragma GCC diagnostic ignored "-Wdeprecated-copy"
-#endif // GCC > 8
-#endif // GCC > 7
-#endif // GCC > 6
-#endif // GCC > 5
-#endif // GCC > 4.5
+#endif
 #endif // __GNUC__ && !__INTEL_COMPILER
