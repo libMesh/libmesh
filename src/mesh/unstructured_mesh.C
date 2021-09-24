@@ -158,7 +158,6 @@ void transfer_elem(const Elem & lo_elem,
 
           hi_node->set_unique_id(new_unique_id);
 #endif
-          libmesh_ignore(max_new_nodes_per_elem);
 
           /*
            * insert the new node with its defining vertex
