@@ -7,7 +7,11 @@ AC_DEFUN([CONFIGURE_EXODUS],
                 AS_HELP_STRING([--disable-exodus],
                                [build without ExodusII API support]),
                 [AS_CASE("${enableval}",
-                         [yes|v811], [enableexodus=yes
+                         [yes],      [enableexodus=yes
+                                      AS_IF([test "x$enablehdf5" = "xyes"],
+                                            [exodusversion=v8.11],
+                                            [exodusversion=v5.22])],
+                         [v811],     [enableexodus=yes
                                       exodusversion="v8.11"],
                          [new|v522], [enableexodus=yes
                                       exodusversion="v5.22"],
