@@ -54752,7 +54752,14 @@ fi
   # Check whether --enable-exodus was given.
 if test "${enable_exodus+set}" = set; then :
   enableval=$enable_exodus; case "${enableval}" in #(
-  yes|v811) :
+  yes) :
+    enableexodus=yes
+                                      if test "x$enablehdf5" = "xyes"; then :
+  exodusversion=v8.11
+else
+  exodusversion=v5.22
+fi ;; #(
+  v811) :
     enableexodus=yes
                                       exodusversion="v8.11" ;; #(
   new|v522) :
