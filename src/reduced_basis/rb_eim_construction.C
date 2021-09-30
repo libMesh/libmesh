@@ -746,7 +746,8 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
             eim_eval.get_parametrized_function().evaluate_at_observation_points(get_parameters(),
                                                                                 eim_eval.get_observation_points(),
                                                                                 observation_points_elem_ids,
-                                                                                observation_points_sbd_ids);
+                                                                                observation_points_sbd_ids,
+                                                                                *this);
 
           libmesh_error_msg_if(_parametrized_functions_for_training_obs_values[i].size() != eim_eval.get_n_observation_points(),
                                "Number of observation values should match number of observation points");
