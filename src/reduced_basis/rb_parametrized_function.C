@@ -271,8 +271,7 @@ std::vector<std::vector<Number>> RBParametrizedFunction::evaluate_at_observation
           /*secure*/ true,
           /*extra_checks*/ false);
 
-      std::vector<Point> obs_pt_ref_coords_vec;
-      obs_pt_ref_coords_vec.push_back(obs_pt_ref_coords);
+      std::vector<Point> obs_pt_ref_coords_vec = {obs_pt_ref_coords};
 
       con.pre_fe_reinit(sys, &elem_ref);
       con.get_element_fe(/*var*/ 0, elem_ref.dim())->reinit(&elem_ref, &obs_pt_ref_coords_vec);
