@@ -159,7 +159,8 @@ public:
   virtual std::vector<std::vector<Number>> evaluate_at_observation_points(const RBParameters & mu,
                                                                           const std::vector<Point> & observation_points,
                                                                           const std::vector<dof_id_type> & elem_ids,
-                                                                          const std::vector<subdomain_id_type> & sbd_ids);
+                                                                          const std::vector<subdomain_id_type> & sbd_ids,
+                                                                          const System & sys);
 
   /**
    * Storage for pre-evaluated values. The indexing is given by:

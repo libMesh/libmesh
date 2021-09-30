@@ -229,13 +229,71 @@ Number RBParametrizedFunction::get_parameter_independent_data(const std::string 
   return libmesh_map_find(libmesh_map_find(_parameter_independent_data, property_name), sbd_id);
 }
 
-std::vector<std::vector<Number>> RBParametrizedFunction::evaluate_at_observation_points(const RBParameters & /*mu*/,
-                                                                                        const std::vector<Point> & /*observation_points*/,
-                                                                                        const std::vector<dof_id_type> & /*elem_ids*/,
-                                                                                        const std::vector<subdomain_id_type> & /*sbd_ids*/)
+std::vector<std::vector<Number>> RBParametrizedFunction::evaluate_at_observation_points(const RBParameters & mu,
+                                                                                        const std::vector<Point> & observation_points,
+                                                                                        const std::vector<dof_id_type> & elem_ids,
+                                                                                        const std::vector<subdomain_id_type> & sbd_ids,
+                                                                                        const System & sys)
 {
-  // return an empty vector by default, override this in subclasses if necessary
-  return std::vector<std::vector<Number>>();
+  unsigned int n_points = observation_points.size();
+
+  if (n_points == 0)
+    return std::vector<std::vector<Number>>();
+
+  const std::vector<unsigned int> qps_vec(n_points);
+  std::vector<std::vector<Real>> phi_i_qp_vec(n_points);
+
+  // In order to compute phi_i_qp, we initialize a FEMContext
+  FEMContext con(sys);
+  for (auto dim : con.elem_dimensions())
+    {
+      auto fe = con.get_element_fe(/*var=*/0, dim);
+      fe->get_phi();
+    }
+
+  for (unsigned int obs_pt_idx : index_range(observation_points))
+    {
+      const Point & obs_pt = observation_points[obs_pt_idx];
+      dof_id_type elem_id = elem_ids[obs_pt_idx];
+
+      // Also initialize phi in order to compute phi_i_qp
+      const Elem & elem_ref = sys.get_mesh().elem_ref(elem_id);
+
+      auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
+      const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+
+      Point obs_pt_ref_coords =
+        FEMap::inverse_map(
+          elem_ref.dim(),
+          &elem_ref,
+          obs_pt,
+          /*tolerance*/ TOLERANCE,
+          /*secure*/ true,
+          /*extra_checks*/ false);
+
+      std::vector<Point> obs_pt_ref_coords_vec;
+      obs_pt_ref_coords_vec.push_back(obs_pt_ref_coords);
+
+      con.pre_fe_reinit(sys, &elem_ref);
+      con.get_element_fe(/*var*/ 0, elem_ref.dim())->reinit(&elem_ref, &obs_pt_ref_coords_vec);
+
+      phi_i_qp_vec[obs_pt_idx].resize(phi.size());
+      for(auto i : index_range(phi))
+        phi_i_qp_vec[obs_pt_idx][i] = phi[i][/*qp*/ 0];
+    }
+
+  std::vector<std::vector<std::vector<Number>>> obs_pt_values;
+
+  vectorized_evaluate({mu},
+                      observation_points,
+                      elem_ids,
+                      qps_vec,
+                      sbd_ids,
+                      /*all_xyz_perturb_vec*/ {},
+                      phi_i_qp_vec,
+                      obs_pt_values);
+
+  return obs_pt_values[0];
 }
 
 }
