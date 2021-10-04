@@ -1281,12 +1281,18 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
   /*
    * The maximum number of new second order nodes we might be adding,
-   * for use when picking unique unique_id values later
+   * for use when picking unique unique_id values later. This variable
+   * is not used unless unique ids are enabled, so libmesh_ignore() it
+   * to avoid warnings in that case.
    */
   unsigned int max_new_nodes_per_elem;
 
+#ifndef LIBMESH_ENABLE_UNIQUE_ID
+  libmesh_ignore(max_new_nodes_per_elem);
+#endif
+
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-    unique_id_type max_unique_id = this->parallel_max_unique_id();
+  unique_id_type max_unique_id = this->parallel_max_unique_id();
 #endif
 
   /*
@@ -1495,12 +1501,18 @@ void UnstructuredMesh::all_complete_order ()
 
   /*
    * The maximum number of new second order nodes we might be adding,
-   * for use when picking unique unique_id values later
+   * for use when picking unique unique_id values later. This variable
+   * is not used unless unique ids are enabled, so libmesh_ignore() it
+   * to avoid warnings in that case.
    */
   unsigned int max_new_nodes_per_elem;
 
+#ifndef LIBMESH_ENABLE_UNIQUE_ID
+  libmesh_ignore(max_new_nodes_per_elem);
+#endif
+
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-    unique_id_type max_unique_id = this->parallel_max_unique_id();
+  unique_id_type max_unique_id = this->parallel_max_unique_id();
 #endif
 
   /*
