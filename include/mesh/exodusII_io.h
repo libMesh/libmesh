@@ -313,6 +313,21 @@ public:
                      std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals);
 
   /**
+   * Similar to read_sideset_data(), but instead of creating one
+   * std::map per sideset per variable, creates a single map of (elem,
+   * side, boundary_id) tuples, and stores the exo file array indices
+   * for any/all sideset variables on that sideset (they are all the
+   * same). In cases where there are hundreds of sideset variables on
+   * a single sideset, it is more efficient to store the array indices
+   * in a quickly searchable data structure than to repeat the
+   * indexing once per variable as is done in the read_sideset_data()
+   * case.
+   */
+  void
+  get_sideset_data_indices (int timestep,
+                            std::map<BoundaryInfo::BCTuple, unsigned int> & bc_array_indices);
+
+  /**
    * The Exodus format can also store values on nodesets. This can be
    * thought of as an alternative to defining a nodal variable
    * field on lower-dimensional elements making up a part of the
