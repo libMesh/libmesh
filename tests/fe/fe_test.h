@@ -8,6 +8,7 @@
 #include <libmesh/equation_systems.h>
 #include <libmesh/fe_base.h>
 #include <libmesh/fe_interface.h>
+#include <libmesh/function_base.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_modification.h>
@@ -29,6 +30,35 @@
   CPPUNIT_TEST( testCustomReinit );
 
 using namespace libMesh;
+
+
+class SkewFunc : public FunctionBase<Real>
+{
+  std::unique_ptr<FunctionBase<Real>> clone () const override
+  { return libmesh_make_unique<SkewFunc>(); }
+
+  Real operator() (const Point & p,
+                     const Real time = 0.) override
+  { libmesh_not_implemented(); } // scalar-only API
+
+  // Skew in x based on y, y based on z
+  void operator() (const Point & p,
+                   const Real time,
+                   DenseVector<Real> & output)
+  {
+    output.resize(3);
+    output(0) = p(0);
+#if LIBMESH_DIM > 0
+    output(0) += .1*p(1);
+    output(1) = p(1);
+#endif
+#if LIBMESH_DIM > 1
+    output(1) += .2*p(2);
+    output(2) = p(2);
+#endif
+  }
+};
+
 
 inline
 Number linear_test (const Point& p,
@@ -243,12 +273,12 @@ public:
                                        0., 1., 0., 1., 0., 1.,
                                        elem_type);
 
-    // Permute our elements randomly and rotate our mesh so we test
-    // all sorts of orientations ... except with Hermite elements,
-    // which are only designed to support meshes with a single
-    // orientation shared by all elements.  We're also not rotating
-    // the rational elements, since our test solution was designed for
-    // a specific weighted mesh.
+    // Permute our elements randomly and rotate and skew our mesh so
+    // we test all sorts of orientations ... except with Hermite
+    // elements, which are only designed to support meshes with a
+    // single orientation shared by all elements.  We're also not
+    // rotating and/or skewing the rational elements, since our test
+    // solution was designed for a specific weighted mesh.
     if (family != HERMITE &&
         family != RATIONAL_BERNSTEIN)
       {
@@ -258,6 +288,9 @@ public:
         if (_dim > 1)
           MeshTools::Modification::rotate(*_mesh, 4,
                                           8*(_dim>2), 16*(_dim>2));
+
+        SkewFunc skew_func;
+        MeshTools::Modification::redistribute(*_mesh, skew_func);
       }
 
     // Set rational weights so we can exactly match our test solution

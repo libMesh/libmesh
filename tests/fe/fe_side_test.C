@@ -7,7 +7,7 @@ template <typename MyTensor, typename MyVector>
 MyTensor tangential_hessian (const MyTensor hess,
                              const MyVector normal)
 {
-  const MyVector full_hess_n = hess*normal;
+  auto full_hess_n = hess*normal;
   MyTensor tang_hess = hess;
 
   const MyTensor n_n = outer_product(normal, normal);
@@ -16,10 +16,10 @@ MyTensor tangential_hessian (const MyTensor hess,
       MyVector ek {0};
       ek(k) = 1;
       const auto Hkn = ek * full_hess_n;
-      const MyVector Hkn_ek = Hkn*ek;
+      const auto Hkn_ek = Hkn*ek;
       tang_hess -= outer_product(Hkn_ek, normal);
       tang_hess -= outer_product(normal, Hkn_ek);
-      tang_hess += 2*(Hkn_ek*normal) * n_n;
+      tang_hess += 2.*(Hkn_ek*normal) * n_n;
     }
   tang_hess -= normal*(full_hess_n) * n_n;
 
