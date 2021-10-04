@@ -2874,6 +2874,86 @@ read_sideset_data(const MeshBase & mesh,
 }
 
 
+void
+ExodusII_IO_Helper::
+get_sideset_data_indices (const MeshBase & mesh,
+                          int timestep,
+                          std::map<BoundaryInfo::BCTuple, unsigned int> & bc_array_indices)
+{
+  // This reads the sideset variable names into the local
+  // sideset_var_names data structure.
+  this->read_var_names(SIDESET);
+
+  if (num_sideset_vars)
+    {
+      // Read the sideset data truth table
+      std::vector<int> sset_var_tab(num_side_sets * num_sideset_vars);
+      ex_err = exII::ex_get_sset_var_tab
+        (ex_id,
+         num_side_sets,
+         num_sideset_vars,
+         sset_var_tab.data());
+      EX_CHECK_ERR(ex_err, "Error reading sideset variable truth table.");
+
+      // Store the sideset data array indices.
+      //
+      // Note: we assume that read_sideset() has already been called
+      // for each sideset, so the required values in elem_list and
+      // side_list are already present.
+      int offset=0;
+      for (int ss=0; ss<num_side_sets; ++ss)
+        {
+          offset += (ss > 0 ? num_sides_per_set[ss-1] : 0);
+          for (int var=0; var<num_sideset_vars; ++var)
+            {
+              int is_present = sset_var_tab[num_sideset_vars*ss + var];
+
+              if (is_present)
+                {
+                  // Note: we don't actually call exII::ex_get_sset_var() here because
+                  // we don't need the values. We only need the indices into that vector
+                  // for each (elem, side, boundary_id) tuple.
+                  for (int i=0; i<num_sides_per_set[ss]; ++i)
+                    {
+                      dof_id_type exodus_elem_id = elem_list[i + offset];
+                      unsigned int exodus_side_id = side_list[i + offset];
+
+                      // FIXME: We should use exodus_elem_num_to_libmesh for this,
+                      // but it apparently is never set up, so just
+                      // subtract 1 from the Exodus elem id.
+                      dof_id_type converted_elem_id = exodus_elem_id - 1;
+
+                      // Map Exodus side id to libmesh side id.
+                      // Map from Exodus side ids to libmesh side ids.
+                      const auto & conv = get_conversion(mesh.elem_ptr(converted_elem_id)->type());
+
+                      // Map from Exodus side id to libmesh side id.
+                      // Note: the mapping is defined on 0-based indices, so subtract
+                      // 1 before doing the mapping.
+                      unsigned int converted_side_id = conv.get_side_map(exodus_side_id - 1);
+
+                      // Make a BCTuple key from the converted information.
+                      BoundaryInfo::BCTuple key = std::make_tuple
+                        (converted_elem_id,
+                         converted_side_id,
+                         ss_ids[ss]);
+
+                      // Store (elem, side, b_id) tuple with corresponding array index
+                      bc_array_indices.emplace(key, cast_int<unsigned int>(i));
+                    } // end for (i)
+
+                  // We only need to get the indices once per sideset
+                  // (not once per variable defined on this sideset)
+                  // so we can break out of this var loop as soon as
+                  // any variable is_present.
+                  break; // out of var loop
+                } // end if (present)
+            } // end for (var)
+        } // end for (ss)
+    } // end if (num_sideset_vars)
+}
+
+
 
 void ExodusII_IO_Helper::
 write_nodeset_data (int timestep,
