@@ -1279,13 +1279,13 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
    */
   std::map<std::vector<dof_id_type>, Node *> adj_vertices_to_so_nodes;
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
   /*
    * The maximum number of new second order nodes we might be adding,
    * for use when picking unique unique_id values later
    */
   unsigned int max_new_nodes_per_elem;
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
     unique_id_type max_unique_id = this->parallel_max_unique_id();
 #endif
 
@@ -1302,7 +1302,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * to Edge3.  Something like 1/2 of n_nodes() have
        * to be added
        */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 3 - 2;
+#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (1.5*static_cast<double>(this->n_nodes())));
       break;
@@ -1312,7 +1314,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * in 2D, either refine from Tri3 to Tri6 (double the nodes)
        * or from Quad4 to Quad8 (again, double) or Quad9 (2.25 that much)
        */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 9 - 4;
+#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (2*static_cast<double>(this->n_nodes())));
       break;
@@ -1325,7 +1329,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * quite some nodes, and since we do not want to overburden the memory by
        * a too conservative guess, use the lower bound
        */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 27 - 8;
+#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (2.5*static_cast<double>(this->n_nodes())));
       break;
@@ -1493,14 +1499,14 @@ void UnstructuredMesh::all_complete_order ()
    */
   std::map<std::vector<dof_id_type>, Node *> adj_vertices_to_co_nodes;
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
   /*
    * The maximum number of new second order nodes we might be adding,
    * for use when picking unique unique_id values later
    */
   unsigned int max_new_nodes_per_elem;
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-    unique_id_type max_unique_id = this->parallel_max_unique_id();
+  unique_id_type max_unique_id = this->parallel_max_unique_id();
 #endif
 
   /*
@@ -1516,7 +1522,9 @@ void UnstructuredMesh::all_complete_order ()
        * to Edge3.  Something like 1/2 of n_nodes() have
        * to be added
        */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 3 - 2;
+#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (1.5*static_cast<double>(this->n_nodes())));
       break;
@@ -1527,7 +1535,9 @@ void UnstructuredMesh::all_complete_order ()
        * the nodes) but might refine from Quad4 to Quad9
        * (2.25 times the nodes)
        */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 9 - 4;
+#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (2*static_cast<double>(this->n_nodes())));
       break;
@@ -1541,7 +1551,9 @@ void UnstructuredMesh::all_complete_order ()
        * overburden the memory by a too conservative guess, use a
        * moderate bound
        */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 27 - 8;
+#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (2.5*static_cast<double>(this->n_nodes())));
       break;
