@@ -34,6 +34,9 @@ unsigned int cube_side(const Point & p);
 
 Point cube_side_point(unsigned int sidenum, const Point & interior_point);
 
+std::array<unsigned int, 3> oriented_tet_nodes(const Elem & elem,
+                                               unsigned int face_num);
+
 template <FEFamily T>
 Real fe_hierarchic_3D_shape(const Elem * elem,
                             const Order order,
@@ -1544,6 +1547,36 @@ Point cube_side_point(unsigned int sidenum, const Point & p)
   return sidep;
 }
 
+
+std::array<unsigned int, 3> oriented_tet_nodes(const Elem & elem,
+                                               unsigned int face_num)
+{
+  // Reorient nodes to account for flipping and rotation.
+  // We could try to identify indices with symmetric shape
+  // functions, to skip this in those cases, if we really
+  // need to optimize later.
+  std::array<unsigned int, 3> face_vertex
+    { Tet4::side_nodes_map[face_num][0],
+      Tet4::side_nodes_map[face_num][1],
+      Tet4::side_nodes_map[face_num][2] };
+
+  // With only 3 items, we should bubble sort!
+  // Programming-for-MechE's class pays off!
+  bool lastcheck = true;
+  if (elem.point(face_vertex[0]) > elem.point(face_vertex[1]))
+    {
+      std::swap(face_vertex[0], face_vertex[1]);
+      lastcheck = true;
+    }
+  if (elem.point(face_vertex[1]) > elem.point(face_vertex[2]))
+    std::swap(face_vertex[1], face_vertex[2]);
+  if (lastcheck && elem.point(face_vertex[0]) > elem.point(face_vertex[1]))
+    std::swap(face_vertex[0], face_vertex[1]);
+
+  return face_vertex;
+}
+
+
 template <FEFamily T>
 Real fe_hierarchic_3D_shape(const Elem * elem,
                             const Order order,
@@ -1636,30 +1669,11 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
             const int dofs_per_face = (totalorder - 1u) * (totalorder - 2u) / 2;
             const int face_num = (i - (6u*totalorder - 2u)) / dofs_per_face;
 
-            // Reorient nodes to account for flipping and rotation.
-            // We could try to identify indices with symmetric shape
-            // functions, to skip this in those cases, if we really
-            // need to optimize later.
-            unsigned int facevertex0 = Tet4::side_nodes_map[face_num][0],
-                         facevertex1 = Tet4::side_nodes_map[face_num][1],
-                         facevertex2 = Tet4::side_nodes_map[face_num][2];
-
-            // With only 3 items, we should bubble sort!
-            // Programming-for-MechE's class pays off!
-            bool lastcheck = true;
-            if (elem->point(facevertex0) > elem->point(facevertex1))
-              {
-                std::swap(facevertex0, facevertex1);
-                lastcheck = true;
-              }
-            if (elem->point(facevertex1) > elem->point(facevertex2))
-              std::swap(facevertex1, facevertex2);
-            if (lastcheck && elem->point(facevertex0) > elem->point(facevertex1))
-              std::swap(facevertex0, facevertex1);
-
-            const Real zeta0 = zeta[facevertex0],
-                       zeta1 = zeta[facevertex1],
-                       zeta2 = zeta[facevertex2];
+            const std::array<unsigned int, 3> face_vertex =
+              oriented_tet_nodes(*elem, face_num);
+            const Real zeta0 = zeta[face_vertex[0]],
+                       zeta1 = zeta[face_vertex[1]],
+                       zeta2 = zeta[face_vertex[2]];
 
             const unsigned int basisnum =
               i - 4 -
