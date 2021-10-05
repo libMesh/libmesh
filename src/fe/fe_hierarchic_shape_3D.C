@@ -1738,74 +1738,8 @@ Real fe_hierarchic_3D_shape_second_deriv(const Elem * elem,
                                          const Point & p,
                                          const bool add_p_level)
 {
-  libmesh_assert(elem);
-
-  const Real eps = 1.e-6;
-  Point pp, pm;
-  unsigned int prevj = libMesh::invalid_uint;
-
-  switch (j)
-    {
-      //  d^2()/dxi^2
-    case 0:
-      {
-        pp = Point(p(0)+eps, p(1), p(2));
-        pm = Point(p(0)-eps, p(1), p(2));
-        prevj = 0;
-        break;
-      }
-
-      //  d^2()/dxideta
-    case 1:
-      {
-        pp = Point(p(0), p(1)+eps, p(2));
-        pm = Point(p(0), p(1)-eps, p(2));
-        prevj = 0;
-        break;
-      }
-
-      //  d^2()/deta^2
-    case 2:
-      {
-        pp = Point(p(0), p(1)+eps, p(2));
-        pm = Point(p(0), p(1)-eps, p(2));
-        prevj = 1;
-        break;
-      }
-
-      //  d^2()/dxidzeta
-    case 3:
-      {
-        pp = Point(p(0), p(1), p(2)+eps);
-        pm = Point(p(0), p(1), p(2)-eps);
-        prevj = 0;
-        break;
-      }
-
-      //  d^2()/detadzeta
-    case 4:
-      {
-        pp = Point(p(0), p(1), p(2)+eps);
-        pm = Point(p(0), p(1), p(2)-eps);
-        prevj = 1;
-        break;
-      }
-
-      //  d^2()/dzeta^2
-    case 5:
-      {
-        pp = Point(p(0), p(1), p(2)+eps);
-        pm = Point(p(0), p(1), p(2)-eps);
-        prevj = 2;
-        break;
-      }
-    default:
-      libmesh_error_msg("Invalid derivative index j = " << j);
-    }
-
-  return (FE<3,T>::shape_deriv(elem, order, i, prevj, pp, add_p_level) -
-          FE<3,T>::shape_deriv(elem, order, i, prevj, pm, add_p_level))
-    / 2. / eps;
+  return fe_fdm_second_deriv(elem, order, i, j, p, add_p_level,
+                             FE<3,T>::shape_deriv);
 }
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
