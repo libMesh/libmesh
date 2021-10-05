@@ -1587,7 +1587,7 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
     case TET10:
     case TET14:
       {
-        const Real zeta[4] = { 1. - p(0) - p(1) - p(2), p(0), p(1), p(2) };
+        const Real zeta[4] = { 1 - p(0) - p(1) - p(2), p(0), p(1), p(2) };
 
         // Nodal DoFs
         if (i < 4)

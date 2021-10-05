@@ -162,7 +162,7 @@ bool Quad4::has_invertible_map(Real tol) const
   // Quad4 instead of the [-1,1]^2 reference element that is typically
   // used for FEM calculations.) We use this as a "reference" vector
   // and compare the sign of dot(n,f) at each vertex.
-  Point n = v1 + .5 * (v2 + v3);
+  Point n = v1 + Real(.5) * (v2 + v3);
   Real norm_n = n.norm();
 
   // If the Jacobian vector at the midpoint of the element is zero,

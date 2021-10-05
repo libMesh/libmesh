@@ -118,9 +118,9 @@ bool Edge4::has_invertible_map(Real tol) const
   const Point & x2 = this->point(2);
   const Point & x3 = this->point(3);
 
-  Point a = 27./16 * (x1 - x0 + 3.*(x2 - x3));
-  Point b = 18./16 * (x0 + x1 - x2 - x3);
-  Point c = 1./16  * (x0 - x1 + 27.*(x3 - x2));
+  Point a = Real(27)/16 * (x1 - x0 + 3*(x2 - x3));
+  Point b = Real(18)/16 * (x0 + x1 - x2 - x3);
+  Point c = Real(1)/16  * (x0 - x1 + 27*(x3 - x2));
 
   // Normalized midpoint value of Jacobian. If c==0, then dx/dxi(0) =
   // 0 and the Jacobian is either zero on the whole element, or

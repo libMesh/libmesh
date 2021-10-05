@@ -109,7 +109,7 @@ bool Edge3::has_invertible_map(Real tol) const
   // The "Jacobian vector" (dx/dxi, dy/dxi, dz/dxi) is:
   // j(xi) := a*xi + b, where
   Point a = this->point(0) + this->point(1) - 2 * this->point(2);
-  Point b = .5 * (this->point(1) - this->point(0));
+  Point b = Real(.5) * (this->point(1) - this->point(0));
 
   // Now we solve for the point xi_m where j(xi_m) \cdot j(0) = 0.
   // If this occurs somewhere on the reference element, then the
