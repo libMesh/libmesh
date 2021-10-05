@@ -527,36 +527,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
     case TRI6:
     case TRI7:
       {
-        // I have been lazy here and am using finite differences
-        // to compute the derivatives!
-        const Real eps = 1.e-4;
-
-        switch (j)
-          {
-            //  d()/dxi
-          case 0:
-            {
-              const Point pp(p(0)+eps, p(1));
-              const Point pm(p(0)-eps, p(1));
-
-              return (FE<2,BERNSTEIN>::shape(elem, totalorder, i, pp) -
-                      FE<2,BERNSTEIN>::shape(elem, totalorder, i, pm))/2./eps;
-            }
-
-            // d()/deta
-          case 1:
-            {
-              const Point pp(p(0), p(1)+eps);
-              const Point pm(p(0), p(1)-eps);
-
-              return (FE<2,BERNSTEIN>::shape(elem, totalorder, i, pp) -
-                      FE<2,BERNSTEIN>::shape(elem, totalorder, i, pm))/2./eps;
-            }
-
-
-          default:
-            libmesh_error_msg("Invalid shape function derivative j = " << j);
-          }
+        return fe_fdm_deriv(elem, order, i, j, p, add_p_level, FE<2,BERNSTEIN>::shape);
       }
 
     default:
