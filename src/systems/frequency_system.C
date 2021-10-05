@@ -345,10 +345,6 @@ void FrequencySystem::solve (const unsigned int n_start,
   const unsigned int maxits =
     es.parameters.get<unsigned int>("linear solver maximum iterations");
 
-
-  //   // return values
-  //   std::vector<std::pair<unsigned int, Real>> vec_rval;
-
   // start solver loop
   for (unsigned int n=n_start; n<= n_stop; n++)
     {
@@ -356,12 +352,7 @@ void FrequencySystem::solve (const unsigned int n_start,
       this->set_current_frequency(n);
 
       // Call the user-supplied pre-solve method
-      START_LOG("user_pre_solve()", "FrequencySystem");
-
-      this->solve_system (es, this->name());
-
-      STOP_LOG("user_pre_solve()", "FrequencySystem");
-
+      LOG_CALL("user_pre_solve()", "FrequencySystem", this->solve_system(es, this->name()));
 
       // Solve the linear system for this specific frequency
       const std::pair<unsigned int, Real> rval =
@@ -381,8 +372,6 @@ void FrequencySystem::solve (const unsigned int n_start,
 
   // sanity check
   //libmesh_assert_equal_to (vec_rval.size(), (n_stop-n_start+1));
-
-  //return vec_rval;
 }
 
 

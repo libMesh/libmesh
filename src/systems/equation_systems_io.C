@@ -269,7 +269,7 @@ void EquationSystems::_read_impl (const std::string & name,
     else
       libmesh_deprecated();
 
-    START_LOG("read()","EquationSystems");
+    LOG_SCOPE("read()", "EquationSystems");
 
     // 2.)
     // Read the number of equation systems
@@ -354,8 +354,6 @@ void EquationSystems::_read_impl (const std::string & name,
       if (!read_legacy_format && partition_agnostic)
         _mesh.fix_broken_node_and_element_numbering();
     }
-
-  STOP_LOG("read()","EquationSystems");
 
   // Localize each system's data
   this->update();

@@ -88,7 +88,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
                                             const bool be_verbose,
                                             std::vector<const Node *> * inner_boundary_nodes)
 {
-  START_LOG("build_inf_elem()", "InfElemBuilder");
+  LOG_SCOPE("build_inf_elem()", "InfElemBuilder");
 
   // first determine the origin of the
   // infinite elements.  For this, the
@@ -252,9 +252,6 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
       // There are no inner boundary nodes, so simply build the infinite elements
       this->build_inf_elem(origin, x_sym, y_sym, z_sym, be_verbose);
     }
-
-
-  STOP_LOG("build_inf_elem()", "InfElemBuilder");
 
   // when finished with building the Ifems,
   // it remains to prepare the mesh for use:

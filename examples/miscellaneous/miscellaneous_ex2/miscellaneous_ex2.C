@@ -292,6 +292,7 @@ int main (int argc, char ** argv)
 void assemble_helmholtz(EquationSystems & es,
                         const std::string & system_name)
 {
+  LOG_SCOPE("assemble_helmholtz", "misc_ex2");
 
   // It is a good idea to make sure we are assembling
   // the proper system.
@@ -373,9 +374,6 @@ void assemble_helmholtz(EquationSystems & es,
   // the element matrix and right-hand-side contributions.
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      // Start logging the element initialization.
-      START_LOG("elem init", "assemble_helmholtz");
-
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
       // matrix and right-hand-side this element will
@@ -391,23 +389,16 @@ void assemble_helmholtz(EquationSystems & es,
       // Zero & resize the element matrix and right-hand side before
       // summing them, with different element types in the mesh this
       // is quite necessary.
-      {
-        const unsigned int n_dof_indices = dof_indices.size();
+      const unsigned int n_dof_indices = dof_indices.size();
 
-        Ke.resize          (n_dof_indices, n_dof_indices);
-        Ce.resize          (n_dof_indices, n_dof_indices);
-        Me.resize          (n_dof_indices, n_dof_indices);
-        zero_matrix.resize (n_dof_indices, n_dof_indices);
-        Fe.resize          (n_dof_indices);
-      }
-
-      // Stop logging the element initialization.
-      STOP_LOG("elem init", "assemble_helmholtz");
+      Ke.resize          (n_dof_indices, n_dof_indices);
+      Ce.resize          (n_dof_indices, n_dof_indices);
+      Me.resize          (n_dof_indices, n_dof_indices);
+      zero_matrix.resize (n_dof_indices, n_dof_indices);
+      Fe.resize          (n_dof_indices);
 
       // Now loop over the quadrature points.  This handles
       // the numeric integration.
-      START_LOG("stiffness & mass", "assemble_helmholtz");
-
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
           // Now we will build the element matrix.  This involves
@@ -421,8 +412,6 @@ void assemble_helmholtz(EquationSystems & es,
               }
         }
 
-      STOP_LOG("stiffness & mass", "assemble_helmholtz");
-
       // Now compute the contribution to the element matrix
       // (due to mixed boundary conditions) if the current
       // element lies on the boundary.
@@ -433,8 +422,6 @@ void assemble_helmholtz(EquationSystems & es,
       for (auto side : elem->side_index_range())
         if (elem->neighbor_ptr(side) == nullptr)
           {
-            LOG_SCOPE("damping", "assemble_helmholtz");
-
             // Declare a special finite element object for
             // boundary integration.
             std::unique_ptr<FEBase> fe_face (FEBase::build(dim, fe_type));
@@ -504,7 +491,7 @@ void assemble_helmholtz(EquationSystems & es,
 void add_M_C_K_helmholtz(EquationSystems & es,
                          const std::string & system_name)
 {
-  START_LOG("init phase", "add_M_C_K_helmholtz");
+  LOG_SCOPE("add_M_C_K_helmholtz()", "misc_ex2");
 
   // Verify that we are assembling the system we think we are.
   libmesh_assert_equal_to (system_name, "Helmholtz");
@@ -558,10 +545,6 @@ void add_M_C_K_helmholtz(EquationSystems & es,
   damping.close ();
   mass.close ();
 
-  STOP_LOG("init phase", "add_M_C_K_helmholtz");
-
-  START_LOG("global matrix & vector additions", "add_M_C_K_helmholtz");
-
   // Add the stiffness and mass with the proper frequency to the
   // overall system.  For this to work properly, the matrix has
   // to be not only initialized, but filled with the identical
@@ -575,8 +558,6 @@ void add_M_C_K_helmholtz(EquationSystems & es,
   matrix.add (scale_mass,      mass);
   matrix.add (scale_damping,   damping);
   rhs.add    (scale_rhs,       freq_indep_rhs);
-
-  STOP_LOG("global matrix & vector additions", "add_M_C_K_helmholtz");
 
   // The linear system involving "matrix" and "rhs" is now ready to be solved.
 }

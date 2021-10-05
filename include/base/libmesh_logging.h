@@ -119,6 +119,12 @@ private:
 
 #endif
 
+// If performance logging is disabled, the LOG_SCOPE(a,b) will be a no-op.
+#define LOG_CALL(a,b,X)   \
+  do {                    \
+    LOG_SCOPE(a,b);       \
+    X;                    \
+  } while (0)
 
 
 

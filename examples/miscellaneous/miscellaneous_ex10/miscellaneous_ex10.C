@@ -71,7 +71,6 @@ void assemble_and_solve(MeshBase &,
 
 int main (int argc, char ** argv)
 {
-  START_LOG("Initialize and create cubes", "main");
   LibMeshInit init (argc, argv);
 
   // This example requires a linear solver package.
@@ -118,56 +117,61 @@ int main (int argc, char ** argv)
   ReplicatedMesh mesh5(init.comm());
   ReplicatedMesh mesh6(init.comm());
   ReplicatedMesh mesh7(init.comm());
-  MeshTools::Generation::build_cube (mesh, ps, ps, ps, -1,    0,    0,  1,  0, 1, HEX8);
-  MeshTools::Generation::build_cube (mesh1, ps, ps, ps,    0,  1,    0,  1,  0, 1, HEX8);
-  MeshTools::Generation::build_cube (mesh2, ps, ps, ps, -1,    0, -1,    0,  0, 1, HEX8);
-  MeshTools::Generation::build_cube (mesh3, ps, ps, ps,    0,  1, -1,    0,  0, 1, HEX8);
-  MeshTools::Generation::build_cube (mesh4, ps, ps, ps, -1,    0,    0,  1, -1, 0, HEX8);
-  MeshTools::Generation::build_cube (mesh5, ps, ps, ps,    0,  1,    0,  1, -1, 0, HEX8);
-  MeshTools::Generation::build_cube (mesh6, ps, ps, ps, -1,    0, -1,    0, -1, 0, HEX8);
-  MeshTools::Generation::build_cube (mesh7, ps, ps, ps,    0,  1, -1,    0, -1, 0, HEX8);
-
-  // Generate a single unstitched reference mesh
   ReplicatedMesh nostitch_mesh(init.comm());
-  MeshTools::Generation::build_cube (nostitch_mesh, ps*2, ps*2, ps*2, -1, 1, -1, 1, -1, 1, HEX8);
-  STOP_LOG("Initialize and create cubes", "main");
+  {
+    LOG_SCOPE("Initialize and create cubes", "main");
+    MeshTools::Generation::build_cube (mesh, ps, ps, ps, -1,    0,    0,  1,  0, 1, HEX8);
+    MeshTools::Generation::build_cube (mesh1, ps, ps, ps,    0,  1,    0,  1,  0, 1, HEX8);
+    MeshTools::Generation::build_cube (mesh2, ps, ps, ps, -1,    0, -1,    0,  0, 1, HEX8);
+    MeshTools::Generation::build_cube (mesh3, ps, ps, ps,    0,  1, -1,    0,  0, 1, HEX8);
+    MeshTools::Generation::build_cube (mesh4, ps, ps, ps, -1,    0,    0,  1, -1, 0, HEX8);
+    MeshTools::Generation::build_cube (mesh5, ps, ps, ps,    0,  1,    0,  1, -1, 0, HEX8);
+    MeshTools::Generation::build_cube (mesh6, ps, ps, ps, -1,    0, -1,    0, -1, 0, HEX8);
+    MeshTools::Generation::build_cube (mesh7, ps, ps, ps,    0,  1, -1,    0, -1, 0, HEX8);
 
-  START_LOG("Stitching", "main");
+    // Generate a single unstitched reference mesh
+    MeshTools::Generation::build_cube (nostitch_mesh, ps*2, ps*2, ps*2, -1, 1, -1, 1, -1, 1, HEX8);
+  }
+
   // We stitch the meshes in a hierarchical way.
-  mesh.stitch_meshes(mesh1, 2, 4, TOLERANCE, true, true, false, false);
-  mesh2.stitch_meshes(mesh3, 2, 4, TOLERANCE, true, true, false, false);
-  mesh.stitch_meshes(mesh2, 1, 3, TOLERANCE, true, true, false, false);
-  mesh4.stitch_meshes(mesh5, 2, 4, TOLERANCE, true, true, false, false);
-  mesh6.stitch_meshes(mesh7, 2, 4, TOLERANCE, true, true, false, false);
-  mesh4.stitch_meshes(mesh6, 1, 3, TOLERANCE, true, true, false, false);
-  mesh.stitch_meshes(mesh4, 0, 5, TOLERANCE, true, true, false, false);
-  STOP_LOG("Stitching", "main");
+  {
+    LOG_SCOPE("Stitching", "main");
+    mesh.stitch_meshes(mesh1, 2, 4, TOLERANCE, true, true, false, false);
+    mesh2.stitch_meshes(mesh3, 2, 4, TOLERANCE, true, true, false, false);
+    mesh.stitch_meshes(mesh2, 1, 3, TOLERANCE, true, true, false, false);
+    mesh4.stitch_meshes(mesh5, 2, 4, TOLERANCE, true, true, false, false);
+    mesh6.stitch_meshes(mesh7, 2, 4, TOLERANCE, true, true, false, false);
+    mesh4.stitch_meshes(mesh6, 1, 3, TOLERANCE, true, true, false, false);
+    mesh.stitch_meshes(mesh4, 0, 5, TOLERANCE, true, true, false, false);
+  }
 
-  START_LOG("Initialize and solve systems", "main");
   EquationSystems equation_systems_stitch (mesh);
-  assemble_and_solve(mesh, equation_systems_stitch);
-
   EquationSystems equation_systems_nostitch (nostitch_mesh);
-  assemble_and_solve(nostitch_mesh, equation_systems_nostitch);
-  STOP_LOG("Initialize and solve systems", "main");
+  {
+    LOG_SCOPE("Initialize and solve systems", "main");
+    assemble_and_solve(mesh, equation_systems_stitch);
+    assemble_and_solve(nostitch_mesh, equation_systems_nostitch);
+  }
 
-  START_LOG("Result comparison", "main");
-  ExactSolution comparison(equation_systems_stitch);
-  comparison.attach_reference_solution(&equation_systems_nostitch);
-  comparison.compute_error("Poisson", "u");
-  Real error = comparison.l2_error("Poisson", "u");
-  libmesh_assert_less(error, TOLERANCE*sqrt(TOLERANCE));
-  libMesh::out << "L2 error between stitched and non-stitched cases: " << error << std::endl;
-  STOP_LOG("Result comparison", "main");
+  {
+    LOG_SCOPE("Result comparison", "main");
+    ExactSolution comparison(equation_systems_stitch);
+    comparison.attach_reference_solution(&equation_systems_nostitch);
+    comparison.compute_error("Poisson", "u");
+    Real error = comparison.l2_error("Poisson", "u");
+    libmesh_assert_less(error, TOLERANCE*sqrt(TOLERANCE));
+    libMesh::out << "L2 error between stitched and non-stitched cases: " << error << std::endl;
+  }
 
-  START_LOG("Output", "main");
 #ifdef LIBMESH_HAVE_EXODUS_API
-  ExodusII_IO(mesh).write_equation_systems("solution_stitch.exo",
-                                           equation_systems_stitch);
-  ExodusII_IO(nostitch_mesh).write_equation_systems("solution_nostitch.exo",
-                                                    equation_systems_nostitch);
+  {
+    LOG_SCOPE("Output", "main");
+    ExodusII_IO(mesh).write_equation_systems("solution_stitch.exo",
+                                             equation_systems_stitch);
+    ExodusII_IO(nostitch_mesh).write_equation_systems("solution_nostitch.exo",
+                                                      equation_systems_nostitch);
+  }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
-  STOP_LOG("Output", "main");
 
   return 0;
 }
