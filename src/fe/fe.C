@@ -717,6 +717,89 @@ OutputShape fe_fdm_deriv(const Elem * elem,
 }
 
 
+template <typename OutputShape>
+OutputShape
+fe_fdm_second_deriv(const Elem * elem,
+                    const Order order,
+                    const unsigned int i,
+                    const unsigned int j,
+                    const Point & p,
+                    const bool add_p_level,
+                    OutputShape(*deriv_func)
+                      (const Elem *, const Order,
+                       const unsigned int, const unsigned int,
+                       const Point &, const bool))
+{
+  // cheat by using finite difference approximations:
+  const Real eps = 1.e-6;
+  Point pp = p, pm = p;
+  unsigned int deriv_j = 0;
+
+  switch (j)
+    {
+      //  d^2() / dxi^2
+    case 0:
+      {
+        pp(0) += eps;
+        pm(0) -= eps;
+        deriv_j = 0;
+        break;
+      }
+
+      // d^2() / dxi deta
+    case 1:
+      {
+        pp(1) += eps;
+        pm(1) -= eps;
+        deriv_j = 0;
+        break;
+      }
+
+      // d^2() / deta^2
+    case 2:
+      {
+        pp(1) += eps;
+        pm(1) -= eps;
+        deriv_j = 1;
+        break;
+      }
+
+      // d^2()/dxidzeta
+    case 3:
+      {
+        pp(2) += eps;
+        pm(2) -= eps;
+        deriv_j = 0;
+        break;
+      }                  // d^2()/deta^2
+
+      // d^2()/detadzeta
+    case 4:
+      {
+        pp(2) += eps;
+        pm(2) -= eps;
+        deriv_j = 1;
+        break;
+      }
+
+      // d^2()/dzeta^2
+    case 5:
+      {
+        pp(2) += eps;
+        pm(2) -= eps;
+        deriv_j = 2;
+        break;
+      }
+
+    default:
+      libmesh_error_msg("Invalid shape function derivative j = " << j);
+    }
+
+  return (deriv_func(elem, order, i, deriv_j, pp, add_p_level) -
+          deriv_func(elem, order, i, deriv_j, pm, add_p_level))/2./eps;
+}
+
+
 template
 Real fe_fdm_deriv<Real>(const Elem *, const Order, const unsigned int,
                         const unsigned int, const Point &, const bool,
@@ -731,6 +814,22 @@ fe_fdm_deriv<RealGradient>(const Elem *, const Order, const unsigned int,
                            RealGradient(*shape_func)
                              (const Elem *, const Order, const unsigned int,
                               const Point &, const bool));
+
+template
+Real
+fe_fdm_second_deriv<Real>(const Elem *, const Order, const unsigned int,
+                          const unsigned int, const Point &, const bool,
+                          Real(*shape_func)
+                            (const Elem *, const Order, const unsigned int,
+                             const unsigned int, const Point &, const bool));
+
+template
+RealGradient
+fe_fdm_second_deriv<RealGradient>(const Elem *, const Order, const unsigned int,
+                           const unsigned int, const Point &, const bool,
+                           RealGradient(*shape_func)
+                             (const Elem *, const Order, const unsigned int,
+                              const unsigned int, const Point &, const bool));
 
 
 
