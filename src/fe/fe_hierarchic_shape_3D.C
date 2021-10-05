@@ -1723,51 +1723,7 @@ Real fe_hierarchic_3D_shape_deriv(const Elem * elem,
                                   const Point & p,
                                   const bool add_p_level)
 {
-#if LIBMESH_DIM == 3
-  libmesh_assert(elem);
-
-  libmesh_assert_less (j, 3);
-
-  // cheat by using finite difference approximations:
-  const Real eps = 1.e-6;
-  Point pp, pm;
-
-  switch (j)
-    {
-      // d()/dxi
-    case 0:
-      {
-        pp = Point(p(0)+eps, p(1), p(2));
-        pm = Point(p(0)-eps, p(1), p(2));
-        break;
-      }
-
-      // d()/deta
-    case 1:
-      {
-        pp = Point(p(0), p(1)+eps, p(2));
-        pm = Point(p(0), p(1)-eps, p(2));
-        break;
-      }
-
-      // d()/dzeta
-    case 2:
-      {
-        pp = Point(p(0), p(1), p(2)+eps);
-        pm = Point(p(0), p(1), p(2)-eps);
-        break;
-      }
-
-    default:
-      libmesh_error_msg("Invalid derivative index j = " << j);
-    }
-
-  return (FE<3,T>::shape(elem, order, i, pp, add_p_level) -
-          FE<3,T>::shape(elem, order, i, pm, add_p_level))/2./eps;
-#else // LIBMESH_DIM != 3
-  libmesh_ignore(elem, order, i, j, p, add_p_level);
-  libmesh_not_implemented();
-#endif
+  return fe_fdm_deriv(elem, order, i, j, p, add_p_level, FE<3,T>::shape);
 }
 
 
