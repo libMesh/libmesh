@@ -731,7 +731,7 @@ fe_fdm_second_deriv(const Elem * elem,
                        const Point &, const bool))
 {
   // cheat by using finite difference approximations:
-  const Real eps = 1.e-6;
+  const Real eps = 1.e-5;
   Point pp = p, pm = p;
   unsigned int deriv_j = 0;
 
