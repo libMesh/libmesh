@@ -177,8 +177,67 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
     case TRI6:
     case TRI7:
       {
-        libmesh_not_implemented();
-        return 0;
+        libmesh_assert_less(i, 3*dofs_per_side);
+
+        // Flip odd degree of freedom values if necessary
+        // to keep continuity on sides.  We'll flip xi/eta rather than
+        // flipping phi, so that we can use this to handle the "nodal"
+        // degrees of freedom too.
+        Real f = 1.;
+
+        const Real zeta1 = p(0);
+        const Real zeta2 = p(1);
+        const Real zeta0 = 1. - zeta1 - zeta2;
+
+        if (zeta1 > zeta2 && zeta0 > zeta2) // side 0
+          {
+            if (i >= dofs_per_side)
+              return 0;
+
+            if (totalorder == 0) // special case since raw HIERARCHIC lacks CONSTANTs
+              return 1;
+
+            if ((i < 2 || i % 2) &&
+                elem->point(0) > elem->point(1))
+              f = -1;
+
+            return FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i, f*(zeta1-zeta0));
+          }
+        else if (zeta1 > zeta0 && zeta2 > zeta0) // side 1
+          {
+            if (i < dofs_per_side ||
+                i >= 2*dofs_per_side)
+              return 0;
+
+            if (totalorder == 0) // special case since raw HIERARCHIC lacks CONSTANTs
+              return 1;
+
+            const unsigned int side_i = i - dofs_per_side;
+
+            if ((side_i < 2 || side_i % 2) &&
+                elem->point(1) > elem->point(2))
+              f = -1;
+
+            return FE<1,HIERARCHIC>::shape(EDGE3, totalorder, side_i, f*(zeta2-zeta1));
+          }
+        else // side 2
+          {
+            libmesh_assert (zeta2 >= zeta1 && zeta0 >= zeta1); // On a corner???
+
+            if (i < 2*dofs_per_side)
+              return 0;
+
+            if (totalorder == 0) // special case since raw HIERARCHIC lacks CONSTANTs
+              return 1;
+
+            const unsigned int side_i = i - 2*dofs_per_side;
+
+            if ((side_i < 2 || side_i % 2) &&
+                elem->point(2) > elem->point(0))
+              f = -1;
+
+            return FE<1,HIERARCHIC>::shape(EDGE3, totalorder, side_i, f*(zeta0-zeta2));
+          }
       }
     case QUAD8:
     case QUADSHELL8:
@@ -397,9 +456,112 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
     case TRI6:
     case TRI7:
       {
-        libmesh_not_implemented();
-        return 0;
+        const Real eps = 1.e-6;
+
+        libmesh_assert_less (j, 2);
+
+        switch (j)
+          {
+            //  d()/dxi
+          case 0:
+            {
+              const Point pp(p(0)+eps, p(1));
+              const Point pm(p(0)-eps, p(1));
+
+              return (FE<2,SIDE_HIERARCHIC>::shape(elem, order, i, pp) -
+                      FE<2,SIDE_HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
+            }
+
+            // d()/deta
+          case 1:
+            {
+              const Point pp(p(0), p(1)+eps);
+              const Point pm(p(0), p(1)-eps);
+
+              return (FE<2,SIDE_HIERARCHIC>::shape(elem, order, i, pp) -
+                      FE<2,SIDE_HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
+            }
+
+          default:
+            libmesh_error_msg("Invalid derivative index j = " << j);
+          }
       }
+#if 0
+      {
+        libmesh_assert_less(i, 3*dofs_per_side);
+        libmesh_assert_less (j, 2);
+
+        // Flip odd degree of freedom values if necessary
+        // to keep continuity on sides.  We'll flip xi/eta rather than
+        // flipping phi, so that we can use this to handle the "nodal"
+        // degrees of freedom too.
+        Real f = 1.;
+
+        const Real zeta1 = p(0);
+        const Real zeta2 = p(1);
+        const Real zeta0 = 1. - zeta1 - zeta2;
+
+        if (zeta1 > zeta2 && zeta0 > zeta2) // side 0
+          {
+            if (j == 1) // d/deta is perpendicular here
+              return 0;
+
+            if (i >= dofs_per_side)
+              return 0;
+
+            if (totalorder == 0) // special case since raw HIERARCHIC lacks CONSTANTs
+              return 0;
+
+            if ((i < 2 || i % 2) &&
+                elem->point(0) > elem->point(1))
+              f = -1;
+
+            return f*FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i, 0, f*(zeta1-zeta0));
+          }
+        else if (zeta1 > zeta0 && zeta2 > zeta0) // side 1
+          {
+            if (i < dofs_per_side ||
+                i >= 2*dofs_per_side)
+              return 0;
+
+            if (totalorder == 0) // special case since raw HIERARCHIC lacks CONSTANTs
+              return 0;
+
+            const unsigned int side_i = i - dofs_per_side;
+
+            if ((side_i < 2 || side_i % 2) &&
+                elem->point(1) > elem->point(2))
+              f = -1;
+
+            Real g = 1;
+            if (j == 0) // 2D d/dxi is in the opposite direction on this edge
+              g = -1;
+
+            return f*g*FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, side_i, 0, f*(zeta2-zeta1));
+          }
+        else // side 2
+          {
+            libmesh_assert (zeta2 >= zeta1 && zeta0 >= zeta1); // On a corner???
+
+            if (j == 0) // d/dxi is perpendicular here
+              return 0;
+
+            if (i < 2*dofs_per_side)
+              return 0;
+
+            if (totalorder == 0) // special case since raw HIERARCHIC lacks CONSTANTs
+              return 0;
+
+            const unsigned int side_i = i - 2*dofs_per_side;
+
+            if ((side_i < 2 || side_i % 2) &&
+                elem->point(2) > elem->point(0))
+              f = -1;
+
+            return -f*FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, side_i, 0, f*(zeta0-zeta2));
+          }
+      }
+#endif
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
@@ -611,8 +773,47 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
     case TRI6:
     case TRI7:
       {
-        libmesh_not_implemented();
-        return 0;
+        // I have been lazy here and am using finite differences
+        // to compute the derivatives!
+        const Real eps = 1.e-6;
+        Point pp, pm;
+        unsigned int prevj = libMesh::invalid_uint;
+
+        switch (j)
+          {
+            //  d^2()/dxi^2
+          case 0:
+            {
+              pp = Point(p(0)+eps, p(1));
+              pm = Point(p(0)-eps, p(1));
+              prevj = 0;
+              break;
+            }
+
+            // d^2()/dxideta
+          case 1:
+            {
+              pp = Point(p(0), p(1)+eps);
+              pm = Point(p(0), p(1)-eps);
+              prevj = 0;
+              break;
+            }
+
+            // d^2()/deta^2
+          case 2:
+            {
+              pp = Point(p(0), p(1)+eps);
+              pm = Point(p(0), p(1)-eps);
+              prevj = 1;
+              break;
+            }
+          default:
+            libmesh_error_msg("Invalid derivative index j = " << j);
+          }
+
+        return (FE<2,SIDE_HIERARCHIC>::shape_deriv(elem, order, i, prevj, pp, add_p_level) -
+                FE<2,SIDE_HIERARCHIC>::shape_deriv(elem, order, i, prevj, pm, add_p_level)
+                )/2./eps;
       }
     case QUAD8:
     case QUADSHELL8:
