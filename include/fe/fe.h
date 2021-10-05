@@ -1241,6 +1241,22 @@ typedef FE<3,MONOMIAL> FEMonomial3D;
 
 }
 
+/**
+ * Helper function for finite differenced derivatives in cases where
+ * analytical calculations haven't been done yet.
+ */
+template <typename OutputShape>
+OutputShape fe_fdm_deriv(const Elem * elem,
+                         const Order order,
+                         const unsigned int i,
+                         const unsigned int j,
+                         const Point & p,
+                         const bool add_p_level,
+                         OutputShape(*shape_func)
+                           (const Elem *, const Order,
+                            const unsigned int, const Point &,
+                            const bool));
+
 } // namespace libMesh
 
 #define LIBMESH_DEFAULT_VECTORIZED_FE(MyDim, MyType) \
