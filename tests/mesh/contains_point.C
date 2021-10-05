@@ -36,7 +36,7 @@ public:
     containsPointTri3Helper(a, b, c, a);
 
     // Ben's 1st "small triangle" test case.
-    containsPointTri3Helper(a/5000., b/5000., c/5000., c/5000.);
+    containsPointTri3Helper(a/5000, b/5000, c/5000, c/5000);
 
     // Ben's 2nd "small triangle" test case.
     containsPointTri3Helper(Point(0.000808805, 0.0047284,  0.),

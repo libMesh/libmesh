@@ -362,7 +362,7 @@ public:
 
       // The result should be '\frac{6 + 60}{2} = 33' at all points in the element domain
       CPPUNIT_ASSERT_EQUAL(int(sys.solution->size()), 1);
-      CPPUNIT_ASSERT_EQUAL(libmesh_real(sys.point_value(0, Point(0.5, 0.5))), 33.0);
+      CPPUNIT_ASSERT_EQUAL(libmesh_real(sys.point_value(0, Point(0.5, 0.5))), Real(33));
     }
   }
 
