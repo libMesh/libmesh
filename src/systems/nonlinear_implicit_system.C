@@ -159,7 +159,7 @@ void NonlinearImplicitSystem::set_solver_parameters ()
 void NonlinearImplicitSystem::solve ()
 {
   // Log how long the nonlinear solve takes.
-  START_LOG("solve()", "System");
+  LOG_SCOPE("solve()", "System");
 
   this->set_solver_parameters();
 
@@ -193,9 +193,6 @@ void NonlinearImplicitSystem::solve ()
       _n_nonlinear_iterations   = rval.first;
       _final_nonlinear_residual = rval.second;
     }
-
-  // Stop logging the nonlinear solve
-  STOP_LOG("solve()", "System");
 
   // Update the system after the solve
   this->update();

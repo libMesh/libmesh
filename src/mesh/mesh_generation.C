@@ -311,7 +311,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                                        const ElemType type,
                                        const bool gauss_lobatto_grid)
 {
-  START_LOG("build_cube()", "MeshTools::Generation");
+  LOG_SCOPE("build_cube()", "MeshTools::Generation");
 
   // Declare that we are using the indexing utility routine
   // in the "Private" part of our current namespace.  If this doesn't
@@ -1528,10 +1528,6 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
       libmesh_error_msg("Unknown dimension " << mesh.mesh_dimension());
     }
 
-  STOP_LOG("build_cube()", "MeshTools::Generation");
-
-
-
   // Done building the mesh.  Now prepare it for use.
   mesh.prepare_for_use ();
 }
@@ -1630,7 +1626,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
   libmesh_assert_greater (rad, 0.);
   //libmesh_assert_greater (nr, 0); // must refine at least once otherwise will end up with a square/cube
 
-  START_LOG("build_sphere()", "MeshTools::Generation");
+  LOG_SCOPE("build_sphere()", "MeshTools::Generation");
 
   // Clear the mesh and start from scratch, but save the original
   // mesh_dimension, since the original intent of this function was to
@@ -2120,9 +2116,6 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
       if (!elem->neighbor_ptr(s))
         boundary_info.add_side(elem, s, 0);
 
-  STOP_LOG("build_sphere()", "MeshTools::Generation");
-
-
   // Done building the mesh.  Now prepare it for use.
   mesh.prepare_for_use();
 }
@@ -2137,10 +2130,10 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                                              RealVectorValue extrusion_vector,
                                              QueryElemSubdomainIDBase * elem_subdomain)
 {
+  LOG_SCOPE("build_extrusion()", "MeshTools::Generation");
+
   if (!cross_section.n_elem())
     return;
-
-  START_LOG("build_extrusion()", "MeshTools::Generation");
 
   dof_id_type orig_elem = cross_section.n_elem();
   dof_id_type orig_nodes = cross_section.n_nodes();
@@ -2458,8 +2451,6 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
             }
         }
     }
-
-  STOP_LOG("build_extrusion()", "MeshTools::Generation");
 
   // Done building the mesh.  Now prepare it for use.
   mesh.prepare_for_use();

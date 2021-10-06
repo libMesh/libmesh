@@ -153,12 +153,10 @@ initialize_inequality_constraints_storage(const std::vector<std::set<numeric_ind
 
 void OptimizationSystem::solve ()
 {
-  START_LOG("solve()", "OptimizationSystem");
+  LOG_SCOPE("solve()", "OptimizationSystem");
 
   optimization_solver->init();
   optimization_solver->solve ();
-
-  STOP_LOG("solve()", "OptimizationSystem");
 
   this->update();
 }

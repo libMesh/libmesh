@@ -116,7 +116,7 @@ void XdrIO::write (const std::string & name)
 
   Xdr io ((this->processor_id() == 0) ? name : "", this->binary() ? ENCODE : WRITE);
 
-  START_LOG("write()","XdrIO");
+  LOG_SCOPE("write()","XdrIO");
 
   // convenient reference to our mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
@@ -241,8 +241,6 @@ void XdrIO::write (const std::string & name)
       // write the "shell face" boundary condition information
       this->write_serialized_shellface_bcs (io, n_shellface_bcs);
     }
-
-  STOP_LOG("write()","XdrIO");
 
   // pause all processes until the writing ends -- this will
   // protect for the pathological case where a write is

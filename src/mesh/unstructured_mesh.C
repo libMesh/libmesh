@@ -1081,6 +1081,8 @@ bool UnstructuredMesh::contract ()
 
 void UnstructuredMesh::all_first_order ()
 {
+  LOG_SCOPE("all_first_order()", "Mesh");
+
   /*
    * when the mesh is not prepared,
    * at least renumber the nodes and
@@ -1089,8 +1091,6 @@ void UnstructuredMesh::all_first_order ()
    */
   if (!this->_is_prepared)
     this->renumber_nodes_and_elements ();
-
-  START_LOG("all_first_order()", "Mesh");
 
   /**
    * Prepare to identify (and then delete) a bunch of no-longer-used nodes.
@@ -1215,8 +1215,6 @@ void UnstructuredMesh::all_first_order ()
   // caches are correct.
   this->get_boundary_info().regenerate_id_sets();
 
-  STOP_LOG("all_first_order()", "Mesh");
-
   // On hanging nodes that used to also be second order nodes, we
   // might now have an invalid nodal processor_id()
   Partitioner::set_node_processor_ids(*this);
@@ -1231,6 +1229,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 {
   // This function must be run on all processors at once
   parallel_object_only();
+
+  LOG_SCOPE("all_second_order()", "Mesh");
 
   /*
    * when the mesh is not prepared,
@@ -1262,8 +1262,6 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   this->comm().max(already_second_order);
   if (already_second_order)
     return;
-
-  START_LOG("all_second_order()", "Mesh");
 
   /*
    * this map helps in identifying second order
@@ -1422,8 +1420,6 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
 
 
-  STOP_LOG("all_second_order()", "Mesh");
-
   // On a DistributedMesh our ghost node processor ids may be bad,
   // the ids of nodes touching remote elements may be inconsistent,
   // unique_ids of newly added non-local nodes remain unset, and our
@@ -1462,6 +1458,14 @@ void UnstructuredMesh::all_complete_order ()
   parallel_object_only();
 
   /*
+   * If the mesh is already complete ordered then we have nothing to
+   * do ... but what if we have a hybrid mesh where some elements are
+   * of complete order and others aren't?  So we won't short-circuit
+   * here.
+   */
+  LOG_SCOPE("all_complete_order()", "Mesh");
+
+  /*
    * when the mesh is not prepared,
    * at least renumber the nodes and
    * elements, so that the node ids
@@ -1476,14 +1480,6 @@ void UnstructuredMesh::all_complete_order ()
    */
   if (!this->n_elem())
     return;
-
-  /*
-   * If the mesh is already complete ordered then we have nothing to
-   * do ... but what if we have a hybrid mesh where some elements are
-   * of complete order and others aren't?  So we won't short-circuit
-   * here.
-   */
-  START_LOG("all_complete_order()", "Mesh");
 
   /*
    * this map helps in identifying second order
@@ -1628,8 +1624,6 @@ void UnstructuredMesh::all_complete_order ()
 #endif
 
 
-
-  STOP_LOG("all_complete_order()", "Mesh");
 
   // On a DistributedMesh our ghost node processor ids may be bad,
   // the ids of nodes touching remote elements may be inconsistent,
