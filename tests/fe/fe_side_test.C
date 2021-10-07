@@ -254,9 +254,9 @@ public:
               const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
               const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
 
-              const RealGradient full_grad { 2*x+0.125*y+0.0625*z,
-                                             y+0.125*x+0.03125*z,
-                                             0.5*z+0.0625*x+0.03125*y };
+              const RealGradient full_grad { 2*x+0.125f*y+0.0625f*z,
+                                             y+0.125f*x+0.03125f*z,
+                                             0.5f*z+0.0625f*x+0.03125f*y };
 
               const RealGradient tangential_grad = full_grad - ((full_grad * n) * n);
 
@@ -403,9 +403,9 @@ public:
               const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
               const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
 
-              const RealGradient full_grad { 2*x+0.125*y+0.0625*z,
-                                             y+0.125*x+0.03125*z,
-                                             0.5*z+0.0625*x+0.03125*y };
+              const RealGradient full_grad { 2*x+0.125f*y+0.0625f*z,
+                                             y+0.125f*x+0.03125f*z,
+                                             0.5f*z+0.0625f*x+0.03125f*y };
 
               const RealGradient tangential_grad = full_grad - ((full_grad * n) * n);
 

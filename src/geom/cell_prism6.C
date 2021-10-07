@@ -72,7 +72,7 @@ struct NodalVolumeIntegral
       switch(i)
       {
         case 0:
-          return 1. - x - y;
+          return 1 - x - y;
 
         case 1:
           return x;
