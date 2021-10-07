@@ -302,7 +302,8 @@ void ExodusII_IO::read (const std::string & fname)
             // convert exactly
 
             long long max_representation = 1;
-            max_representation = (max_representation << std::numeric_limits<Real>::digits);
+            max_representation = (max_representation << std::min(std::numeric_limits<Real>::digits,
+                                                                 std::numeric_limits<double>::digits));
             libmesh_error_msg_if(iv > max_representation,
                                  "Error! An element integer value higher than "
                                  << max_representation
