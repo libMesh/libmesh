@@ -223,6 +223,11 @@ AS_IF([test "x$enablepetsc" = "xno" && test "x$petschyprerequired" = "xyes"],
 AS_IF([test "x$enablepetsc" != "xno"],
       [
         CONFIGURE_PETSC
+      ])
+dnl CONFIGURE_PETSC may set enablepetsc=no if the provided copy is broken -
+dnl if so then don't add these libraries
+AS_IF([test "x$enablepetsc" != "xno"],
+      [
         libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
         libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"
       ])
