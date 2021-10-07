@@ -64,8 +64,17 @@ public:
                bool single_precision=false);
 
   /**
-   * Destructor.
+   * ExodusII_IO special functions:
+   * - Can't be (default) copy constructed or assigned since they
+   *   contain a unique_ptr member.
+   * - Can't be (default) move assigned because the helper class
+       contains references.
+   * - The destructor is responsible for closing the file
    */
+  ExodusII_IO (ExodusII_IO &&) = default;
+  ExodusII_IO (const ExodusII_IO &) = delete;
+  ExodusII_IO & operator= (const ExodusII_IO &) = delete;
+  ExodusII_IO & operator= (ExodusII_IO &&) = delete;
   virtual ~ExodusII_IO ();
 
   /**
