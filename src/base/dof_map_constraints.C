@@ -2137,7 +2137,7 @@ void DofMap::process_mesh_constraint_rows(const MeshBase & mesh)
         {
           // FIXME: we don't have an EquationSystems here, but I'd
           // rather not hardcode these...
-          const double tol = TOLERANCE * TOLERANCE;
+          const double tol = double(TOLERANCE * TOLERANCE);
           const unsigned int max_its = 5000;
 
           linear_solver->solve(*mat, *projected_vals,
