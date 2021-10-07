@@ -1611,8 +1611,7 @@ read_sideset_data(int timestep,
 
 void
 ExodusII_IO::
-get_sideset_data_indices (int timestep,
-                          std::map<BoundaryInfo::BCTuple, unsigned int> & bc_array_indices)
+get_sideset_data_indices (std::map<BoundaryInfo::BCTuple, unsigned int> & bc_array_indices)
 
 {
   libmesh_error_msg_if(!exio_helper->opened_for_reading,
@@ -1620,7 +1619,7 @@ get_sideset_data_indices (int timestep,
                        "before calling ExodusII_IO::get_sideset_data_indices()!");
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-  exio_helper->get_sideset_data_indices(mesh, timestep, bc_array_indices);
+  exio_helper->get_sideset_data_indices(mesh, bc_array_indices);
 }
 
 void

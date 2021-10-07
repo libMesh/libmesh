@@ -324,8 +324,7 @@ public:
    * case.
    */
   void
-  get_sideset_data_indices (int timestep,
-                            std::map<BoundaryInfo::BCTuple, unsigned int> & bc_array_indices);
+  get_sideset_data_indices (std::map<BoundaryInfo::BCTuple, unsigned int> & bc_array_indices);
 
   /**
    * The Exodus format can also store values on nodesets. This can be

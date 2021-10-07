@@ -2877,7 +2877,6 @@ read_sideset_data(const MeshBase & mesh,
 void
 ExodusII_IO_Helper::
 get_sideset_data_indices (const MeshBase & mesh,
-                          int timestep,
                           std::map<BoundaryInfo::BCTuple, unsigned int> & bc_array_indices)
 {
   // This reads the sideset variable names into the local

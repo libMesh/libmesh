@@ -354,7 +354,6 @@ public:
    */
   void
   get_sideset_data_indices (const MeshBase & mesh,
-                            int timestep,
                             std::map<BoundaryInfo::BCTuple, unsigned int> & bc_array_indices);
 
   /**

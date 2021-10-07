@@ -127,8 +127,7 @@ public:
 
     // Also check that the flat indices match those in the file
     std::map<BoundaryInfo::BCTuple, unsigned int> bc_array_indices;
-    reader.get_sideset_data_indices
-      (/*timestep=*/1, bc_array_indices);
+    reader.get_sideset_data_indices(bc_array_indices);
 
     // Debugging
     // for (const auto & pr : bc_array_indices)
