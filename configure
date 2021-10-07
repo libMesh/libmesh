@@ -51949,6 +51949,10 @@ if test "${with_metis_include+set}" = set; then :
 fi
 
 
+      if test "x$enablepetsc" = "xno" && test "x$build_metis" = "xpetsc"; then :
+  as_fn_error $? "--with-metis=PETSc cannot be used without a working copy of PETSc." "$LINENO" 5
+fi
+
       if test "x$petsc_have_metis" != "x" && test $petsc_have_metis -gt 0; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Using PETSc Metis support to avoid PETSc conflict>>>" >&5
 $as_echo "<<< Using PETSc Metis support to avoid PETSc conflict>>>" >&6; }
@@ -52111,6 +52115,10 @@ if test "${with_parmetis_include+set}" = set; then :
               build_parmetis=no
 fi
 
+
+      if test "x$enablepetsc" = "xno" && test "x$build_parmetis" = "xpetsc"; then :
+  as_fn_error $? "--with-parmetis=PETSc cannot be used without a working copy of PETSc." "$LINENO" 5
+fi
 
       if test "x$petsc_have_metis" = "x"; then :
   petsc_have_metis=0
