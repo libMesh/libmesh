@@ -49217,6 +49217,10 @@ fi
   as_fn_error 4 "*** PETSc with Hypre was not found, but --enable-petsc-hypre-required was specified." "$LINENO" 5
 fi
 
+
+fi
+if test "x$enablepetsc" != "xno"; then :
+
         libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
         libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"
 
