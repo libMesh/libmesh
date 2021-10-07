@@ -30,6 +30,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <deque>
 #include <sys/time.h>
 
 namespace libMesh
@@ -203,9 +204,11 @@ public:
    *
    * This method must be passed the exact same pointers as were passed
    * to fast_push, not merely pointers to identical strings.
+   * This method is called from the PerfItem destructor, so it should
+   * not throw. We have therefore marked it noexcept as a reminder.
    */
   void fast_pop (const char * label,
-                 const char * header="");
+                 const char * header="") noexcept;
 
   /**
    * Pop the event \p label off the stack, resuming any lower event.
@@ -469,26 +472,70 @@ void PerfLog::fast_push (const char * label,
 
 inline
 void PerfLog::fast_pop(const char * libmesh_dbg_var(label),
-                       const char * libmesh_dbg_var(header))
+                       const char * libmesh_dbg_var(header)) noexcept
 {
   if (this->log_events)
     {
-      libmesh_assert (!log_stack.empty());
+      // If there's nothing on the stack, then we can't pop anything. Previously we
+      // asserted that the log_stack was not empty, but we should not throw from
+      // this function, so instead just return in that case.
+      if (log_stack.empty())
+        return;
 
 #ifndef NDEBUG
-      PerfData * perf_data = &(log[std::make_pair(header,label)]);
-      if (perf_data != log_stack.top())
+      // In debug mode, we carefully check that before popping the stack,
+      // we have the correct event.
+
+      // Get pointer to corresonding PerfData, or nullptr if it does not exist.
+      auto it = log.find(std::make_pair(header, label));
+      PerfData * perf_data = (it == log.end()) ? nullptr : &(it->second);
+
+      // If this event is not found in the log, then it could indicate
+      // that you have a STOP_LOG(a,b) without a corresponding
+      // START_LOG(a,b) call. We don't pop anything from the log_stack
+      // in this case.
+      if (!perf_data)
         {
           libMesh::err << "PerfLog can't pop (" << header << ',' << label << ')' << std::endl;
-          libMesh::err << "From top of stack of running logs:" << std::endl;
-          for (auto i : log)
-            if (&(i.second) == log_stack.top())
-              libMesh::err << '(' << i.first.first << ',' << i.first.second << ')' << std::endl;
+          libMesh::err << "No such event was found in the log, you may have a mismatched START/STOP_LOG statement." << std::endl;
+          return;
+        }
 
-          libmesh_assert_equal_to (perf_data, log_stack.top());
+      if (perf_data != log_stack.top())
+        {
+          // We've been asked to pop an event which is not at the
+          // top() of the log_stack. The event may be deeper in the
+          // stack instead, so search for it now. If we find it, we'll
+          // pop all intermediate items off the stack (abandoning any
+          // attempt to time them accurately) and let the optimized
+          // code path take over from there.
+          std::deque<PerfData*> tmp_stack;
+
+          while (!log_stack.empty() && perf_data != log_stack.top())
+            {
+              tmp_stack.push_front(log_stack.top());
+              log_stack.pop();
+            }
+
+          // If we exhaustively searched the log_stack without finding
+          // the event, we can't do anything else so just put
+          // everything back and return, not doing anything for this
+          // event.
+          if (log_stack.empty())
+            {
+              while (!tmp_stack.empty())
+                {
+                  log_stack.push(tmp_stack.back());
+                  tmp_stack.pop_back();
+                }
+
+              return;
+            }
         }
 #endif
 
+      // In optimized mode, we just pop from the top of the stack and
+      // resume timing the next entry.
       total_time += log_stack.top()->stopit();
 
       log_stack.pop();
