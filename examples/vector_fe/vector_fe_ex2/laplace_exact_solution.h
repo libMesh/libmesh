@@ -25,9 +25,8 @@ using namespace libMesh;
 class LaplaceExactSolution
 {
 public:
-  LaplaceExactSolution(){}
-
-  ~LaplaceExactSolution(){}
+  LaplaceExactSolution() = default;
+  ~LaplaceExactSolution() = default;
 
   Real operator() (unsigned int component,
                    Real x,
@@ -57,9 +56,8 @@ public:
 class LaplaceExactGradient
 {
 public:
-  LaplaceExactGradient(){}
-
-  ~LaplaceExactGradient(){}
+  LaplaceExactGradient() = default;
+  ~LaplaceExactGradient() = default;
 
   RealGradient operator() (unsigned int component,
                            Real x,

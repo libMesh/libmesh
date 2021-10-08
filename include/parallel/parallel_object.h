@@ -85,7 +85,7 @@ public:
   /**
    * Destructor.  Virtual because we are a base class.
    */
-  virtual ~ParallelObject () {}
+  virtual ~ParallelObject () = default;
 
   /**
    * \returns A reference to the \p Parallel::Communicator object

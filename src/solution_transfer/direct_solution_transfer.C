@@ -29,8 +29,7 @@ DirectSolutionTransfer::DirectSolutionTransfer(const libMesh::Parallel::Communic
   SolutionTransfer(comm_in)
 {}
 
-DirectSolutionTransfer::~DirectSolutionTransfer()
-{}
+DirectSolutionTransfer::~DirectSolutionTransfer() = default;
 
 void
 DirectSolutionTransfer::transfer(const Variable & from_var,

@@ -55,9 +55,9 @@ protected:
 public:
 
   /**
-   * Destructor. (Empty.)
+   * Destructor.
    */
-  virtual ~Factory () {}
+  virtual ~Factory () = default;
 
   /**
    * Builds an object of type Base identified by name.
@@ -97,7 +97,7 @@ public:
   /**
    * Destructor.  Empty.
    */
-  ~FactoryImp () {}
+  ~FactoryImp () = default;
 
 private:
 

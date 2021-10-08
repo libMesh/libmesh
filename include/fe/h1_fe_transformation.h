@@ -42,9 +42,9 @@ class H1FETransformation : public FETransformationBase<OutputShape>
 public:
 
   H1FETransformation()
-    : FETransformationBase<OutputShape>(){}
+    : FETransformationBase<OutputShape>() {}
 
-  virtual ~H1FETransformation(){}
+  virtual ~H1FETransformation() = default;
 
   /**
    * Pre-requests any necessary data from FEMap

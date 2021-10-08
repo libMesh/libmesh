@@ -246,7 +246,7 @@ public:
    */
   explicit
   InfFE(const FEType & fet);
-  ~InfFE() {}
+  ~InfFE() = default;
 
   // The static public members for access from FEInterface etc
 

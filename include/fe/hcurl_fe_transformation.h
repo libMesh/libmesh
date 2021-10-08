@@ -38,9 +38,9 @@ class HCurlFETransformation : public FETransformationBase<OutputShape>
 public:
 
   HCurlFETransformation()
-    : FETransformationBase<OutputShape>(){}
+    : FETransformationBase<OutputShape>() {}
 
-  virtual ~HCurlFETransformation(){}
+  virtual ~HCurlFETransformation() = default;
 
   /**
    * Pre-requests any necessary data from FEMap

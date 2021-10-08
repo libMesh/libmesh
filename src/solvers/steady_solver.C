@@ -28,9 +28,7 @@ namespace libMesh
 
 
 
-SteadySolver::~SteadySolver ()
-{
-}
+SteadySolver::~SteadySolver () = default;
 
 
 

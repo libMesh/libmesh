@@ -59,7 +59,7 @@ public:
    * Virtual destructor - we'll be deleting subclasses from
    * pointers-to-ParameterAccessor
    */
-  virtual ~ParameterAccessor() {}
+  virtual ~ParameterAccessor() = default;
 
   /**
    * Setter: change the value of the parameter we access.

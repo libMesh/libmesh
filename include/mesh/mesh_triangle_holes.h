@@ -51,12 +51,12 @@ public:
   /**
    * Constructor
    */
-  Hole() {}
+  Hole() = default;
 
   /**
    * Destructor
    */
-  virtual ~Hole() {}
+  virtual ~Hole() = default;
 
   /**
    * The number of geometric points which define the hole.

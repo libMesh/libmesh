@@ -169,7 +169,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~Value() {}
+    virtual ~Value() = default;
 
 #ifdef LIBMESH_HAVE_RTTI
     /**

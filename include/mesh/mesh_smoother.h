@@ -48,7 +48,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MeshSmoother() {}
+  virtual ~MeshSmoother() = default;
 
   /**
    * Function which actually performs the smoothing operations.

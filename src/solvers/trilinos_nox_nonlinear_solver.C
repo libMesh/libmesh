@@ -87,8 +87,7 @@ Problem_Interface::Problem_Interface(NoxNonlinearSolver<Number> * solver) :
 
 
 
-Problem_Interface::~Problem_Interface()
-{}
+Problem_Interface::~Problem_Interface() = default;
 
 
 

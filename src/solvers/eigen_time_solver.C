@@ -45,9 +45,7 @@ EigenTimeSolver::EigenTimeSolver (sys_type & s)
   eigen_solver->set_position_of_spectrum(LARGEST_MAGNITUDE);
 }
 
-EigenTimeSolver::~EigenTimeSolver ()
-{
-}
+EigenTimeSolver::~EigenTimeSolver () = default;
 
 void EigenTimeSolver::reinit ()
 {

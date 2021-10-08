@@ -53,7 +53,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~RBAssemblyExpansion() {}
+  virtual ~RBAssemblyExpansion() = default;
 
   /**
    * Perform the specified A interior assembly.

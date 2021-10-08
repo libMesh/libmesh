@@ -17,8 +17,6 @@
 
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/plane.h"
 
@@ -29,9 +27,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Plane class member functions
-Plane::Plane ()
-{
-}
+Plane::Plane () = default;
 
 
 
@@ -61,9 +57,7 @@ Plane::Plane (const Plane & other_plane) :
 
 
 
-Plane::~Plane ()
-{
-}
+Plane::~Plane () = default;
 
 
 

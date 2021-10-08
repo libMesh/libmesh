@@ -90,7 +90,7 @@ public:
   /**
    * Default destructor.
    */
-  ~BasicOStreamProxy () {}
+  ~BasicOStreamProxy () = default;
 
   //
   // Functions that get passed to the proxied target:

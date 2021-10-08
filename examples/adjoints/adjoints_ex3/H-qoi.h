@@ -15,8 +15,8 @@ using namespace libMesh;
 class CoupledSystemQoI : public DifferentiableQoI
 {
 public:
-  CoupledSystemQoI() {}
-  virtual ~CoupledSystemQoI(){}
+  CoupledSystemQoI() = default;
+  virtual ~CoupledSystemQoI() = default;
 
   virtual void init_qoi(std::vector<Number> & sys_qoi);
   virtual void init_context(DiffContext &);

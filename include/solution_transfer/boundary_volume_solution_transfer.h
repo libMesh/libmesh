@@ -51,7 +51,7 @@ public:
     SolutionTransfer(comm_in)
   {}
 
-  virtual ~BoundaryVolumeSolutionTransfer() {}
+  virtual ~BoundaryVolumeSolutionTransfer() = default;
 
   /**
    * Transfer values from a Variable in a System associated with a

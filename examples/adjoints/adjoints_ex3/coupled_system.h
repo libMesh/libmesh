@@ -113,7 +113,7 @@ public:
   {var = var_number;}
 
   // Destructor
-  virtual ~CoupledFEMFunctionsx () {}
+  virtual ~CoupledFEMFunctionsx () = default;
 
   virtual std::unique_ptr<FEMFunctionBase<Number>> clone () const
   {
@@ -144,7 +144,7 @@ public:
   { var = var_number; }
 
   // Destructor
-  virtual ~CoupledFEMFunctionsy () {}
+  virtual ~CoupledFEMFunctionsy () = default;
 
   virtual std::unique_ptr<FEMFunctionBase<Number>> clone () const
   {

@@ -54,7 +54,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~LaplaceMeshSmoother() {}
+  virtual ~LaplaceMeshSmoother() = default;
 
   /**
    * Redefinition of the smooth function from the

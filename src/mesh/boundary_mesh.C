@@ -17,8 +17,6 @@
 
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/boundary_mesh.h"
 
@@ -31,11 +29,6 @@ BoundaryMesh::BoundaryMesh(const Parallel::Communicator & comm_in,
 {
 }
 
-
-
-BoundaryMesh::~BoundaryMesh()
-{
-  this->clear();
-}
+BoundaryMesh::~BoundaryMesh() = default;
 
 } // namespace libMesh

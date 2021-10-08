@@ -114,7 +114,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~VariationalMeshSmoother() {}
+  virtual ~VariationalMeshSmoother() = default;
 
   /**
    * Redefinition of the smooth function from the

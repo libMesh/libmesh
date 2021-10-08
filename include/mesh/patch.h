@@ -58,7 +58,7 @@ public:
   /**
    * Destructor.
    */
-  ~Patch() {}
+  ~Patch() = default;
 
   /**
    * This function finds all elements which touch the current patch at

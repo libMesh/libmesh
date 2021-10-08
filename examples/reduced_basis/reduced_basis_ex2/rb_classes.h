@@ -102,7 +102,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~SimpleRBConstruction () {}
+  virtual ~SimpleRBConstruction () = default;
 
   /**
    * The type of system.

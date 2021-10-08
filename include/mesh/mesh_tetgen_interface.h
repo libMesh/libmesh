@@ -64,7 +64,7 @@ public:
   /**
    * Empty destructor.
    */
-  ~TetGenMeshInterface() {}
+  ~TetGenMeshInterface() = default;
 
   /**
    * Method to set switches to tetgen, allowing for different behaviours

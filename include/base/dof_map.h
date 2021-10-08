@@ -205,7 +205,7 @@ public:
   class AugmentSendList
   {
   public:
-    virtual ~AugmentSendList () {}
+    virtual ~AugmentSendList () = default;
 
     /**
      * User-defined function to augment the send list.

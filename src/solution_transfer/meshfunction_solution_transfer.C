@@ -31,8 +31,7 @@ MeshFunctionSolutionTransfer::MeshFunctionSolutionTransfer(const libMesh::Parall
   SolutionTransfer(comm_in)
 {}
 
-MeshFunctionSolutionTransfer::~MeshFunctionSolutionTransfer()
-{}
+MeshFunctionSolutionTransfer::~MeshFunctionSolutionTransfer() = default;
 
 void
 MeshFunctionSolutionTransfer::transfer(const Variable & from_var,

@@ -53,9 +53,7 @@ PointLocatorBase::PointLocatorBase (const MeshBase & mesh,
 
 
 
-PointLocatorBase::~PointLocatorBase ()
-{
-}
+PointLocatorBase::~PointLocatorBase () = default;
 
 
 

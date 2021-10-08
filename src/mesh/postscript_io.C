@@ -63,9 +63,7 @@ PostscriptIO::PostscriptIO (const MeshBase & mesh_in) :
 
 
 
-PostscriptIO::~PostscriptIO ()
-{
-}
+PostscriptIO::~PostscriptIO () = default;
 
 
 

@@ -47,10 +47,7 @@ EigenSolver<T>::EigenSolver (const Parallel::Communicator & comm_in) :
 
 
 template <typename T>
-EigenSolver<T>::~EigenSolver ()
-{
-  this->clear ();
-}
+EigenSolver<T>::~EigenSolver () = default;
 
 
 

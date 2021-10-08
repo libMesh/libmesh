@@ -31,15 +31,8 @@ namespace libMesh
 {
 // ------------------------------------------------------------
 // SubdomainSelection implementation
-SystemSubsetBySubdomain::SubdomainSelection::
-SubdomainSelection (void)
-{
-}
-
-SystemSubsetBySubdomain::SubdomainSelection::
-~SubdomainSelection (void)
-{
-}
+SystemSubsetBySubdomain::SubdomainSelection::SubdomainSelection () = default;
+SystemSubsetBySubdomain::SubdomainSelection::~SubdomainSelection () = default;
 
 SystemSubsetBySubdomain::SubdomainSelectionByList::
 SubdomainSelectionByList (const std::set<subdomain_id_type> & list):
@@ -83,10 +76,7 @@ SystemSubsetBySubdomain (const System & system,
   this->init(subdomain_ids);
 }
 
-SystemSubsetBySubdomain::
-~SystemSubsetBySubdomain (void)
-{
-}
+SystemSubsetBySubdomain::~SystemSubsetBySubdomain () = default;
 
 const std::vector<unsigned int> &
 SystemSubsetBySubdomain::dof_ids() const

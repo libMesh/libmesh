@@ -26,9 +26,8 @@ using namespace libMesh;
 class CurlCurlExactSolution
 {
 public:
-  CurlCurlExactSolution(){}
-
-  ~CurlCurlExactSolution(){}
+  CurlCurlExactSolution() = default;
+  ~CurlCurlExactSolution() = default;
 
   RealGradient operator() (Real x, Real y)
   {

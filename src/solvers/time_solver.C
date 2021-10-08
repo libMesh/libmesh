@@ -43,9 +43,7 @@ TimeSolver::TimeSolver (sys_type & s)
 
 
 
-TimeSolver::~TimeSolver ()
-{
-}
+TimeSolver::~TimeSolver () = default;
 
 
 

@@ -44,7 +44,7 @@ protected:
   /**
    * Destructor.
    */
-  virtual ~Singleton() {}
+  virtual ~Singleton() = default;
 
 public:
 
@@ -64,7 +64,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~Setup() {}
+    virtual ~Setup() = default;
 
     /**
      * Setup method.  Importantly, this is called *after main()* from the

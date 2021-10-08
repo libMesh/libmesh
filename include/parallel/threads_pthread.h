@@ -86,7 +86,7 @@ class spin_mutex
 {
 public:
   spin_mutex() { ulock = OS_UNFAIR_LOCK_INIT; }
-  ~spin_mutex() {}
+  ~spin_mutex() = default;
 
   void lock () { os_unfair_lock_lock(&ulock); }
   void unlock () { os_unfair_lock_unlock(&ulock); }
@@ -114,7 +114,7 @@ class spin_mutex
 {
 public:
   spin_mutex() : slock(0) {} // The convention is that the lock being zero is _unlocked_
-  ~spin_mutex() {}
+  ~spin_mutex() = default;
 
   void lock () { OSSpinLockLock(&slock); }
   void unlock () { OSSpinLockUnlock(&slock); }

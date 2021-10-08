@@ -45,7 +45,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~SolutionHistory () {}
+  virtual ~SolutionHistory () = default;
 
   /**
    * Function to store a solution, pure virtual

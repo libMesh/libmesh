@@ -75,7 +75,7 @@ static void sort_row (const BidirectionalIterator begin,
   class AugmentSparsityPattern
   {
   public:
-    virtual ~AugmentSparsityPattern () {}
+    virtual ~AugmentSparsityPattern () = default;
 
     /**
      * User-defined function to augment the sparsity pattern.

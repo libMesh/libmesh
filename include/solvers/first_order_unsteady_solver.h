@@ -85,7 +85,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~FirstOrderUnsteadySolver (){}
+  virtual ~FirstOrderUnsteadySolver () = default;
 
   virtual unsigned int time_order() const override
   { return 1; }

@@ -29,8 +29,7 @@ SecondOrderUnsteadySolver::SecondOrderUnsteadySolver (sys_type & s)
     _old_local_solution_accel(NumericVector<Number>::build(s.comm()))
 {}
 
-SecondOrderUnsteadySolver::~SecondOrderUnsteadySolver ()
-{}
+SecondOrderUnsteadySolver::~SecondOrderUnsteadySolver () = default;
 
 void SecondOrderUnsteadySolver::init ()
 {

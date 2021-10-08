@@ -49,10 +49,8 @@ public:
                            const NumericVector<Number> & res,
                            const Real & norm_res,
                            const unsigned int iteration) = 0;
-  virtual ~LinearSolutionMonitor();
+  virtual ~LinearSolutionMonitor() = default;
 };
-
-inline LinearSolutionMonitor::~LinearSolutionMonitor() {}
 
 /**
  * This is a generic class that defines a solver to handle
@@ -93,7 +91,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~DiffSolver () {}
+  virtual ~DiffSolver () = default;
 
   /**
    * The initialization function.  This method is used to

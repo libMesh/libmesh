@@ -70,9 +70,7 @@ DGFEMContext::DGFEMContext (const System & sys)
     }
 }
 
-DGFEMContext::~DGFEMContext()
-{
-}
+DGFEMContext::~DGFEMContext() = default;
 
 void DGFEMContext::side_fe_reinit()
 {

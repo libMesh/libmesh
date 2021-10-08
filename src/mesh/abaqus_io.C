@@ -225,11 +225,7 @@ AbaqusIO::AbaqusIO (MeshBase & mesh_in) :
 
 
 
-
-AbaqusIO::~AbaqusIO ()
-{
-}
-
+AbaqusIO::~AbaqusIO () = default;
 
 
 

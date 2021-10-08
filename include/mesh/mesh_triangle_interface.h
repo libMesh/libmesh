@@ -69,7 +69,7 @@ public:
   /**
    * Empty destructor.
    */
-  ~TriangleInterface() {}
+  ~TriangleInterface() = default;
 
   /**
    * The TriangulationType is used with the general triangulate function

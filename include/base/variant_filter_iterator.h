@@ -71,7 +71,7 @@ public:
    */
   struct IterBase
   {
-    virtual ~IterBase() {}
+    virtual ~IterBase() = default;
     virtual  IterBase * clone() const = 0;
 
     /**
@@ -108,7 +108,7 @@ public:
    */
   struct PredBase
   {
-    virtual ~PredBase() {}
+    virtual ~PredBase() = default;
     virtual PredBase * clone() const = 0;
     virtual bool operator()(const IterBase * in) const = 0;
 
@@ -157,7 +157,7 @@ public:
     /**
      * Destructor
      */
-    virtual ~Iter () {}
+    virtual ~Iter () = default;
 
     /**
      * \returns A copy of this object as a pointer to
@@ -256,7 +256,7 @@ public:
     /**
      * Destructor
      */
-    virtual ~Pred () {}
+    virtual ~Pred () = default;
 
     /**
      * \returns A copy of this object as a pointer to the base class.

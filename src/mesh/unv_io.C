@@ -84,9 +84,7 @@ UNVIO::UNVIO (const MeshBase & mesh) :
 
 
 
-UNVIO::~UNVIO ()
-{
-}
+UNVIO::~UNVIO () = default;
 
 
 

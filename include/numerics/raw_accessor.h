@@ -99,7 +99,7 @@ public:
       _dim(dim)
   {}
 
-  ~RawAccessor(){}
+  ~RawAccessor() = default;
 
   typename RawFieldType<FieldType>::type & operator()( unsigned int i );
   const typename RawFieldType<FieldType>::type & operator()( unsigned int i ) const;
@@ -158,7 +158,7 @@ public:
       _dim(dim)
   {}
 
-  ~RawAccessor(){}
+  ~RawAccessor() = default;
 
   typename RawFieldType<FieldType>::type & operator()( unsigned int /*i*/ )
   { return dummy; }

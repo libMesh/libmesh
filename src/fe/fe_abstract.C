@@ -69,9 +69,7 @@ FEAbstract::FEAbstract(const unsigned int d,
 }
 
 
-FEAbstract::~FEAbstract()
-{
-}
+FEAbstract::~FEAbstract() = default;
 
 
 std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,

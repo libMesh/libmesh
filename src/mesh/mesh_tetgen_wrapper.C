@@ -39,9 +39,7 @@ TetGenWrapper::TetGenWrapper() :
 
 
 
-TetGenWrapper::~TetGenWrapper()
-{
-}
+TetGenWrapper::~TetGenWrapper() = default;
 
 
 

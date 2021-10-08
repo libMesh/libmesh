@@ -51,10 +51,8 @@ OptimizationSolver<T>::OptimizationSolver (sys_type & s) :
 
 template <typename T>
 inline
-OptimizationSolver<T>::~OptimizationSolver ()
-{
-  this->clear ();
-}
+OptimizationSolver<T>::~OptimizationSolver () = default;
+
 
 
 template <typename T>
