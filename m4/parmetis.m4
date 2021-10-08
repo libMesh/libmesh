@@ -30,6 +30,11 @@ AC_DEFUN([CONFIGURE_PARMETIS],
               build_parmetis=no],
              [])
 
+  dnl Sanity check - it doesn't make any sense to specify parmetis with PETSc
+  dnl when PETSc itself is not available
+  AS_IF([test "x$enablepetsc" = "xno" && test "x$build_parmetis" = "xpetsc"],
+        [AC_MSG_ERROR(--with-parmetis=PETSc cannot be used without a working copy of PETSc.)])
+
   dnl Initialize $petsc_have_* to 0 if not already set. They may be
   dnl unset if the user configured with --disable-petsc
   AS_IF([test "x$petsc_have_metis" = "x"], [petsc_have_metis=0])

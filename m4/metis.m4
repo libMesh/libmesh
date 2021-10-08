@@ -31,6 +31,11 @@ AC_DEFUN([CONFIGURE_METIS],
               build_metis=no],
              [])
 
+  dnl Sanity check - it doesn't make any sense to specify metis with PETSc when
+  dnl PETSc itself is not available
+  AS_IF([test "x$enablepetsc" = "xno" && test "x$build_metis" = "xpetsc"],
+        [AC_MSG_ERROR(--with-metis=PETSc cannot be used without a working copy of PETSc.)])
+
   dnl If PETSc has its own METIS, default to using that one regardless
   dnl of what the user specified (if anything) in --with-metis.
   AS_IF([test "x$petsc_have_metis" != "x" && test $petsc_have_metis -gt 0],
