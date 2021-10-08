@@ -64,8 +64,17 @@ public:
                bool single_precision=false);
 
   /**
-   * Destructor.
+   * ExodusII_IO special functions:
+   * - Can't be (default) copy constructed or assigned since they
+   *   contain a unique_ptr member.
+   * - Can't be (default) move assigned because the helper class
+       contains references.
+   * - The destructor is responsible for closing the file
    */
+  ExodusII_IO (ExodusII_IO &&) = default;
+  ExodusII_IO (const ExodusII_IO &) = delete;
+  ExodusII_IO & operator= (const ExodusII_IO &) = delete;
+  ExodusII_IO & operator= (ExodusII_IO &&) = delete;
   virtual ~ExodusII_IO ();
 
   /**
@@ -311,6 +320,20 @@ public:
                      std::vector<std::string> & var_names,
                      std::vector<std::set<boundary_id_type>> & side_ids,
                      std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals);
+
+  /**
+   * Similar to read_sideset_data(), but instead of creating one
+   * std::map per sideset per variable, creates a single map of (elem,
+   * side, boundary_id) tuples, and stores the exo file array indices
+   * for any/all sideset variables on that sideset (they are all the
+   * same). In cases where there are hundreds of sideset variables on
+   * a single sideset, it is more efficient to store the array indices
+   * in a quickly searchable data structure than to repeat the
+   * indexing once per variable as is done in the read_sideset_data()
+   * case.
+   */
+  void
+  get_sideset_data_indices (std::map<BoundaryInfo::BCTuple, unsigned int> & bc_array_indices);
 
   /**
    * The Exodus format can also store values on nodesets. This can be

@@ -343,6 +343,20 @@ public:
                      std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals);
 
   /**
+   * Similar to read_sideset_data(), but instead of creating one
+   * std::map per sideset per variable, creates a single map of (elem,
+   * side, boundary_id) tuples, and stores the exo file array indexing
+   * for any/all sideset variables on that sideset (they are all the
+   * same). This function does not actually call exII::ex_get_sset_var()
+   * to get values, and can be useful if only the original ordering of
+   * (elem, side) pairs in the exo file is required in cases where a
+   * separate approach is used to read the sideset data arrays.
+   */
+  void
+  get_sideset_data_indices (const MeshBase & mesh,
+                            std::map<BoundaryInfo::BCTuple, unsigned int> & bc_array_indices);
+
+  /**
    * Write nodeset data for the requested timestep.
    */
   void
