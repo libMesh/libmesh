@@ -572,7 +572,7 @@ void PetscMatrix<T>::clear () noexcept
 {
   if ((this->initialized()) && (this->_destroy_mat_on_exit))
     {
-      semiparallel_only();
+      exceptionless_semiparallel_only();
 
       // If we encounter an error here, print a warning but otherwise
       // keep going since we may be recovering from an exception.
