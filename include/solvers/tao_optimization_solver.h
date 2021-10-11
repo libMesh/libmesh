@@ -83,8 +83,9 @@ public:
 
   /**
    * Release all memory and clear data structures.
+   * clear() is called from the destructor, so it should not throw.
    */
-  virtual void clear () override;
+  virtual void clear () noexcept override;
 
   /**
    * Initialize data structures if not done so already.

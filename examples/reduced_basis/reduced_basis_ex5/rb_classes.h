@@ -59,7 +59,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~ElasticityRBConstruction () {}
+  virtual ~ElasticityRBConstruction () = default;
 
   /**
    * The type of system.

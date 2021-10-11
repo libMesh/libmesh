@@ -91,7 +91,7 @@ public:
     /**
      * Destructor.  Virtual because we will have virtual functions.
      */
-    virtual ~ElementFlagging () {}
+    virtual ~ElementFlagging () = default;
 
     /**
      * Callback function to be used for marking elements for refinement.

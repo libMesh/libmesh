@@ -248,9 +248,7 @@ NewtonSolver::NewtonSolver (sys_type & s)
 
 
 
-NewtonSolver::~NewtonSolver ()
-{
-}
+NewtonSolver::~NewtonSolver () = default;
 
 
 

@@ -68,7 +68,7 @@ template <typename T> struct abstract_multi_predicate;
 template <typename T>
 struct predicate
 {
-  virtual ~predicate() {}
+  virtual ~predicate() = default;
   virtual bool operator()(const T & it) const = 0;
 
 protected:
@@ -83,7 +83,7 @@ protected:
 template <typename T>
 struct is_null : predicate<T>
 {
-  virtual ~is_null() {}
+  virtual ~is_null() = default;
   virtual bool operator()(const T & it) const override { return *it == nullptr; }
 
 protected:
@@ -109,7 +109,7 @@ protected:
 template <typename T>
 struct active : predicate<T>
 {
-  virtual ~active() {}
+  virtual ~active() = default;
   virtual bool operator()(const T & it) const override { return (*it)->active(); }
 
 protected:
@@ -135,7 +135,7 @@ protected:
 template <typename T>
 struct ancestor : predicate<T>
 {
-  virtual ~ancestor() {}
+  virtual ~ancestor() = default;
   virtual bool operator()(const T & it) const override { return (*it)->ancestor(); }
 
 protected:
@@ -161,7 +161,7 @@ protected:
 template <typename T>
 struct subactive : predicate<T>
 {
-  virtual ~subactive() {}
+  virtual ~subactive() = default;
   virtual bool operator()(const T & it) const override { return (*it)->subactive(); }
 
 protected:
@@ -189,7 +189,7 @@ template <typename T>
 struct pid : predicate<T>
 {
   pid(processor_id_type p) : _pid(p) {}
-  virtual ~pid() {}
+  virtual ~pid() = default;
 
   // op()
   virtual bool operator()(const T & it) const override { return (*it)->processor_id() == _pid; }
@@ -212,7 +212,7 @@ struct bid : predicate<T>
     _bid(b_id),
     _bndry_info(bndry_info)
   {}
-  virtual ~bid() {}
+  virtual ~bid() = default;
 
   // op()
   virtual bool operator()(const T & it) const override;
@@ -234,7 +234,7 @@ struct bnd : predicate<T>
   bnd(const BoundaryInfo & bndry_info) :
     _bndry_info(bndry_info)
   {}
-  virtual ~bnd() {}
+  virtual ~bnd() = default;
 
   // op()
   virtual bool operator()(const T & it) const override;
@@ -254,7 +254,7 @@ template <typename T>
 struct semilocal_pid : predicate<T>
 {
   semilocal_pid(processor_id_type p) : _pid(p) {}
-  virtual ~semilocal_pid() {}
+  virtual ~semilocal_pid() = default;
 
   // op()
   virtual bool operator()(const T & it) const override { return (*it)->is_semilocal(_pid); }
@@ -274,7 +274,7 @@ template <typename T>
 struct facelocal_pid : predicate<T>
 {
   facelocal_pid(processor_id_type p) : _pid(p) {}
-  virtual ~facelocal_pid() {}
+  virtual ~facelocal_pid() = default;
 
   // op()
   virtual bool operator()(const T & it) const override
@@ -318,7 +318,7 @@ template <typename T>
 struct elem_type : predicate<T>
 {
   elem_type (ElemType t) : _elem_type(t) {}
-  virtual ~elem_type() {}
+  virtual ~elem_type() = default;
 
   virtual bool operator()(const T & it) const override { return (*it)->type() == _elem_type; }
 
@@ -339,7 +339,7 @@ template <typename T>
 struct flagged : predicate<T>
 {
   flagged (unsigned char rflag) : _rflag(rflag) {}
-  virtual ~flagged() {}
+  virtual ~flagged() = default;
 
   virtual bool operator()(const T & it) const override { return (*it)->refinement_flag() == _rflag; }
 
@@ -361,7 +361,7 @@ template <typename T>
 struct level : predicate<T>
 {
   level (unsigned int l) : _level(l) {}
-  virtual ~level() {}
+  virtual ~level() = default;
 
   virtual bool operator()(const T & it) const override { return (*it)->level() == _level; }
 
@@ -396,7 +396,7 @@ protected:
 template <typename T>
 struct null_neighbor : predicate<T>
 {
-  virtual ~null_neighbor() {}
+  virtual ~null_neighbor() = default;
   virtual bool operator()(const T & it) const override
   {
     return (*it)->on_boundary();
@@ -418,7 +418,7 @@ protected:
 template <typename T>
 struct boundary_side : predicate<T>
 {
-  virtual ~boundary_side() {}
+  virtual ~boundary_side() = default;
   virtual bool operator()(const T & it) const override
   {
     return it.side_on_boundary();
@@ -436,7 +436,7 @@ template <typename T>
 struct subdomain : predicate<T>
 {
   subdomain(subdomain_id_type sid) : _subdomain(sid) {}
-  virtual ~subdomain() {}
+  virtual ~subdomain() = default;
 
   // op()
   virtual bool operator()(const T & it) const override { return (*it)->subdomain_id() == _subdomain; }
@@ -455,7 +455,7 @@ template <typename T>
 struct subdomain_set : predicate<T>
 {
   subdomain_set(std::set<subdomain_id_type> sset) : _subdomain_set(sset) {}
-  virtual ~subdomain_set() {}
+  virtual ~subdomain_set() = default;
 
   // op()
   virtual bool operator()(const T & it) const override { return _subdomain_set.count((*it)->subdomain_id()); }
@@ -477,7 +477,7 @@ struct evaluable : predicate<T>
   evaluable(const DofMap & dof_map,
             unsigned int var_num) :
     _dof_map(dof_map), _var_num(var_num) {}
-  virtual ~evaluable() {}
+  virtual ~evaluable() = default;
 
   // op()
   virtual bool operator()(const T & it) const override;
@@ -498,7 +498,7 @@ struct multi_evaluable : predicate<T>
 {
   multi_evaluable(std::vector<const DofMap *> dof_maps) :
       _dof_maps(dof_maps) {}
-  virtual ~multi_evaluable() {}
+  virtual ~multi_evaluable() = default;
 
   // op()
   virtual bool operator()(const T & it) const override;

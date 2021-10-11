@@ -62,7 +62,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~DifferentiableQoI () {}
+  virtual ~DifferentiableQoI () = default;
 
   /**
    * Initialize system qoi. By default, does nothing in order to maintain backward

@@ -70,7 +70,7 @@ public:
   /**
    * Destructor.
    */
-  ~TypeNTensor() {}
+  ~TypeNTensor() = default;
 
   /**
    * \returns A proxy for the \f$ i^{th} \f$ slice of the tensor.

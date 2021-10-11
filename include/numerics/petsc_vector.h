@@ -139,7 +139,10 @@ public:
 
   virtual void close () override;
 
-  virtual void clear () override;
+  /**
+   * clear() is called from the destructor, so it should not throw.
+   */
+  virtual void clear () noexcept override;
 
   virtual void zero () override;
 
@@ -829,19 +832,20 @@ void PetscVector<T>::close ()
 
 template <typename T>
 inline
-void PetscVector<T>::clear ()
+void PetscVector<T>::clear () noexcept
 {
-  parallel_object_only();
+  exceptionless_parallel_object_only();
 
   if (this->initialized())
     this->_restore_array();
 
   if ((this->initialized()) && (this->_destroy_vec_on_exit))
     {
-      PetscErrorCode ierr=0;
-
-      ierr = VecDestroy(&_vec);
-      LIBMESH_CHKERR(ierr);
+      // If we encounter an error here, print a warning but otherwise
+      // keep going since we may be recovering from an exception.
+      PetscErrorCode ierr = VecDestroy(&_vec);
+      if (ierr)
+        libmesh_warning("Warning: VecDestroy returned a non-zero error code which we ignored.");
     }
 
   this->_is_closed = this->_is_initialized = false;

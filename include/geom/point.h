@@ -79,9 +79,9 @@ public:
   {}
 
   /**
-   * Empty.
+   * Destructor.
    */
-  ~Point() {}
+  ~Point() = default;
 
 protected:
 

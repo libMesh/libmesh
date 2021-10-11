@@ -104,9 +104,7 @@ XdrIO::XdrIO (const MeshBase & mesh, const bool binary_in) :
 
 
 
-XdrIO::~XdrIO ()
-{
-}
+XdrIO::~XdrIO () = default;
 
 
 

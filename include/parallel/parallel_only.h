@@ -29,12 +29,17 @@
 // parallel on every processor at once
 
 #undef libmesh_parallel_only
+#undef libmesh_exceptionless_parallel_only
 #ifndef NDEBUG
 #define libmesh_parallel_only(comm_obj) do {                            \
     libmesh_assert((comm_obj).verify(std::string(__FILE__)));           \
     libmesh_assert((comm_obj).verify(std::to_string(__LINE__))); } while (0)
+#define libmesh_exceptionless_parallel_only(comm_obj) do {              \
+    libmesh_exceptionless_assert((comm_obj).verify(std::string(__FILE__))); \
+    libmesh_exceptionless_assert((comm_obj).verify(std::to_string(__LINE__))); } while (0)
 #else
 #define libmesh_parallel_only(comm_obj)  ((void) 0)
+#define libmesh_exceptionless_parallel_only(comm_obj)  ((void) 0)
 #endif
 
 // Macro to identify and debug functions which should only be called in

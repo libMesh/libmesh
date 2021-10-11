@@ -65,16 +65,15 @@ SlepcEigenSolver<T>::~SlepcEigenSolver ()
 
 
 template <typename T>
-void SlepcEigenSolver<T>::clear ()
+void SlepcEigenSolver<T>::clear () noexcept
 {
   if (this->initialized())
     {
       this->_is_initialized = false;
 
-      PetscErrorCode ierr=0;
-
-      ierr = LibMeshEPSDestroy(&_eps);
-      LIBMESH_CHKERR(ierr);
+      PetscErrorCode ierr = LibMeshEPSDestroy(&_eps);
+      if (ierr)
+        libmesh_warning("Warning: EPSDestroy returned a non-zero error code which we ignored.");
 
       // SLEPc default eigenproblem solver
       this->_eigen_solver_type = KRYLOVSCHUR;

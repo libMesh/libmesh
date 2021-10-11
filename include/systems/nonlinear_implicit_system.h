@@ -90,7 +90,7 @@ public:
   class ComputeResidual
   {
   public:
-    virtual ~ComputeResidual () {}
+    virtual ~ComputeResidual () = default;
     /**
      * Residual function.  This function will be called to compute the
      * residual and must be implemented by the user in a derived class.
@@ -108,7 +108,7 @@ public:
   class ComputeJacobian
   {
   public:
-    virtual ~ComputeJacobian () {}
+    virtual ~ComputeJacobian () = default;
 
     /**
      * Jacobian function.  This function will be called to compute the
@@ -127,7 +127,7 @@ public:
   class ComputeBounds
   {
   public:
-    virtual ~ComputeBounds () {}
+    virtual ~ComputeBounds () = default;
 
     /**
      * This function will be called to compute the bounds vector and
@@ -152,7 +152,7 @@ public:
   class ComputeVectorSubspace
   {
   public:
-    virtual ~ComputeVectorSubspace () {}
+    virtual ~ComputeVectorSubspace () = default;
 
     /**
      * This function will be called to compute the subspace basis
@@ -170,7 +170,7 @@ public:
   class ComputeResidualandJacobian
   {
   public:
-    virtual ~ComputeResidualandJacobian () {}
+    virtual ~ComputeResidualandJacobian () = default;
 
     /**
      * Residual & Jacobian function, calculated simultaneously.
@@ -192,7 +192,7 @@ public:
   class ComputePostCheck
   {
   public:
-    virtual ~ComputePostCheck () {}
+    virtual ~ComputePostCheck () = default;
 
     /**
      * This interface, which is inspired by PETSc's, passes the user:

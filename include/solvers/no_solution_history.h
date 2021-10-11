@@ -44,7 +44,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~NoSolutionHistory() {}
+  virtual ~NoSolutionHistory() = default;
 
   /**
    * Virtual function store which we will be overriding

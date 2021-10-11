@@ -107,9 +107,7 @@ Sphere::Sphere(const Point & pa,
 
 
 
-Sphere::~Sphere ()
-{
-}
+Sphere::~Sphere () = default;
 
 
 

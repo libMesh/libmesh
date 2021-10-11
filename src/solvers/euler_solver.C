@@ -35,9 +35,7 @@ EulerSolver::EulerSolver (sys_type & s)
 
 
 
-EulerSolver::~EulerSolver ()
-{
-}
+EulerSolver::~EulerSolver () = default;
 
 
 

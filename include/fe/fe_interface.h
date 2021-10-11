@@ -76,7 +76,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~FEInterface() {}
+  virtual ~FEInterface() = default;
 
   /**
    * \returns The number of shape functions associated with this

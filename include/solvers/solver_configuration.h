@@ -43,12 +43,12 @@ public:
   /**
    *  Constructor.
    */
-  SolverConfiguration () {}
+  SolverConfiguration () = default;
 
   /**
    * Destructor.
    */
-  virtual ~SolverConfiguration () {}
+  virtual ~SolverConfiguration () = default;
 
   /**
    * Apply options during initialization of a solver.

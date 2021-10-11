@@ -141,7 +141,7 @@ public:
     /**
      * Destructor.  Virtual because we will have virtual functions.
      */
-    virtual ~Initialization () {}
+    virtual ~Initialization () = default;
 
     /**
      * Initialization function.  This function will be called
@@ -165,7 +165,7 @@ public:
     /**
      * Destructor.  Virtual because we will have virtual functions.
      */
-    virtual ~Assembly () {}
+    virtual ~Assembly () = default;
 
     /**
      * Assembly function.  This function will be called
@@ -189,7 +189,7 @@ public:
     /**
      * Destructor.  Virtual because we will have virtual functions.
      */
-    virtual ~Constraint () {}
+    virtual ~Constraint () = default;
 
     /**
      * Constraint function.  This function will be called
@@ -213,7 +213,7 @@ public:
     /**
      * Destructor.  Virtual because we will have virtual functions.
      */
-    virtual ~QOI () {}
+    virtual ~QOI () = default;
 
     /**
      * Quantity of interest function.  This function will be called
@@ -237,7 +237,7 @@ public:
     /**
      * Destructor.  Virtual because we will have virtual functions.
      */
-    virtual ~QOIDerivative () {}
+    virtual ~QOIDerivative () = default;
 
     /**
      * Quantity of interest derivative function. This function will

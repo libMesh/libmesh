@@ -43,8 +43,8 @@ class FETransformationBase
 {
 public:
 
-  FETransformationBase(){}
-  virtual ~FETransformationBase(){}
+  FETransformationBase() = default;
+  virtual ~FETransformationBase() = default;
 
   /**
    * Builds an FETransformation object based on the finite element type

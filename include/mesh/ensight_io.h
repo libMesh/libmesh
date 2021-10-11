@@ -65,7 +65,7 @@ public:
   /**
    * Empty destructor.
    */
-  ~EnsightIO () {}
+  ~EnsightIO () = default;
 
   /**
    * Tell the EnsightIO interface to output the finite element (not

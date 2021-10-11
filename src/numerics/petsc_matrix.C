@@ -568,16 +568,17 @@ std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::clone () const
 }
 
 template <typename T>
-void PetscMatrix<T>::clear ()
+void PetscMatrix<T>::clear () noexcept
 {
-  PetscErrorCode ierr=0;
-
   if ((this->initialized()) && (this->_destroy_mat_on_exit))
     {
-      semiparallel_only();
+      exceptionless_semiparallel_only();
 
-      ierr = MatDestroy (&_mat);
-      LIBMESH_CHKERR(ierr);
+      // If we encounter an error here, print a warning but otherwise
+      // keep going since we may be recovering from an exception.
+      PetscErrorCode ierr = MatDestroy (&_mat);
+      if (ierr)
+        libmesh_warning("Warning: MatDestroy returned a non-zero error code which we ignored.");
 
       this->_is_initialized = false;
     }

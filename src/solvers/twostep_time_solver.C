@@ -45,9 +45,7 @@ TwostepTimeSolver::TwostepTimeSolver (sys_type & s)
 
 
 
-TwostepTimeSolver::~TwostepTimeSolver ()
-{
-}
+TwostepTimeSolver::~TwostepTimeSolver () = default;
 
 
 

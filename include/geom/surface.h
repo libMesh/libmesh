@@ -46,17 +46,17 @@ public:
   /**
    * Constructor.  Does nothing at the moment.
    */
-  Surface () {}
+  Surface () = default;
 
   /**
    * Copy-constructor.
    */
-  Surface (const Surface &) {}
+  Surface (const Surface &) = default;
 
   /**
    * Destructor.
    */
-  virtual ~Surface () {}
+  virtual ~Surface () = default;
 
   /**
    * \returns \p true if the point p is above the surface,

@@ -55,7 +55,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~FEMPhysics () {}
+  virtual ~FEMPhysics () = default;
 
   /**
    * Adds a pseudo-convection contribution on \p elem to

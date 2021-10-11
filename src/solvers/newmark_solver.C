@@ -32,8 +32,7 @@ NewmarkSolver::NewmarkSolver (sys_type & s)
     _initial_accel_set(false)
 {}
 
-NewmarkSolver::~NewmarkSolver ()
-{}
+NewmarkSolver::~NewmarkSolver () = default;
 
 Real NewmarkSolver::error_order() const
 {

@@ -50,8 +50,7 @@ ElemCutter::ElemCutter() :
 
 
 
-ElemCutter::~ElemCutter()
-{}
+ElemCutter::~ElemCutter() = default;
 
 
 

@@ -43,7 +43,7 @@ public:
     SolutionTransfer(comm_in)
   {}
 
-  virtual ~MeshfreeSolutionTransfer() {}
+  virtual ~MeshfreeSolutionTransfer() = default;
 
   /**
    * Transfer the values of a variable to another.

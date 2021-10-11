@@ -45,7 +45,7 @@ public:
     ParallelObject(comm_in)
   {}
 
-  virtual ~SolutionTransfer() {}
+  virtual ~SolutionTransfer() = default;
 
   /**
    * Transfer the values of a variable to another.

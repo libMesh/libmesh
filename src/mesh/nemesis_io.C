@@ -112,9 +112,7 @@ Nemesis_IO::Nemesis_IO (MeshBase & mesh,
 
 // Destructor.  Defined in the C file so we can be sure to get away
 // with a forward declaration of Nemesis_IO_Helper in the header file.
-Nemesis_IO::~Nemesis_IO ()
-{
-}
+Nemesis_IO::~Nemesis_IO () = default;
 
 
 

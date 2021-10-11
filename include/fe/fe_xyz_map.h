@@ -47,7 +47,7 @@ public:
     calculate_xyz = true;
   }
 
-  virtual ~FEXYZMap(){}
+  virtual ~FEXYZMap() = default;
 
   /**
    * Special implementation for XYZ finite elements

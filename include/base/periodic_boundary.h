@@ -52,7 +52,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~PeriodicBoundary() {}
+  virtual ~PeriodicBoundary() = default;
 
   /**
    * Copy constructor, with option for the copy to represent an inverse transformation.

@@ -17,9 +17,6 @@
 
 
 
-// C++ includes
-
-
 // Local includes
 #include "libmesh/system_subset.h"
 
@@ -34,13 +31,11 @@ SystemSubset::SystemSubset (const System & system):
 }
 
 
-SystemSubset::~SystemSubset (void)
-{
-}
+SystemSubset::~SystemSubset () = default;
 
 
 const System &
-SystemSubset::get_system(void)const
+SystemSubset::get_system() const
 {
   return _system;
 }

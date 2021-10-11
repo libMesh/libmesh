@@ -53,7 +53,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~RBThetaExpansion() {}
+  virtual ~RBThetaExpansion() = default;
 
   /**
    * Evaluate theta_q_a at the current parameter. Override

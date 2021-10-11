@@ -79,7 +79,7 @@ public:
   class ComputeObjective
   {
   public:
-    virtual ~ComputeObjective () {}
+    virtual ~ComputeObjective () = default;
 
     /**
      * This function will be called to compute the objective function
@@ -100,7 +100,7 @@ public:
   class ComputeGradient
   {
   public:
-    virtual ~ComputeGradient () {}
+    virtual ~ComputeGradient () = default;
 
     /**
      * This function will be called to compute the gradient of the
@@ -121,7 +121,7 @@ public:
   class ComputeHessian
   {
   public:
-    virtual ~ComputeHessian () {}
+    virtual ~ComputeHessian () = default;
 
     /**
      * This function will be called to compute the Hessian of
@@ -140,7 +140,7 @@ public:
   class ComputeEqualityConstraints
   {
   public:
-    virtual ~ComputeEqualityConstraints () {}
+    virtual ~ComputeEqualityConstraints () = default;
 
     /**
      * This function will be called to evaluate the equality constraints
@@ -158,7 +158,7 @@ public:
   class ComputeEqualityConstraintsJacobian
   {
   public:
-    virtual ~ComputeEqualityConstraintsJacobian () {}
+    virtual ~ComputeEqualityConstraintsJacobian () = default;
 
     /**
      * This function will be called to evaluate the Jacobian of C_eq(X).
@@ -174,7 +174,7 @@ public:
   class ComputeInequalityConstraints
   {
   public:
-    virtual ~ComputeInequalityConstraints () {}
+    virtual ~ComputeInequalityConstraints () = default;
 
     /**
      * This function will be called to evaluate the equality constraints
@@ -192,7 +192,7 @@ public:
   class ComputeInequalityConstraintsJacobian
   {
   public:
-    virtual ~ComputeInequalityConstraintsJacobian () {}
+    virtual ~ComputeInequalityConstraintsJacobian () = default;
 
     /**
      * This function will be called to evaluate the Jacobian of C_ineq(X).
@@ -209,7 +209,7 @@ public:
   class ComputeLowerAndUpperBounds
   {
   public:
-    virtual ~ComputeLowerAndUpperBounds () {}
+    virtual ~ComputeLowerAndUpperBounds () = default;
 
     /**
      * This function should update the following two vectors:

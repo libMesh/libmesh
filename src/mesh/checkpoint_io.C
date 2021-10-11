@@ -178,9 +178,7 @@ CheckpointIO::CheckpointIO (const MeshBase & mesh, const bool binary_in) :
 {
 }
 
-CheckpointIO::~CheckpointIO ()
-{
-}
+CheckpointIO::~CheckpointIO () = default;
 
 processor_id_type CheckpointIO::select_split_config(const std::string & input_name, header_id_type & data_size)
 {

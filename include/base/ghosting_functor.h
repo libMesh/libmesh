@@ -178,7 +178,7 @@ public:
   /**
    * Virtual destructor; this is an abstract base class.
    */
-  virtual ~GhostingFunctor() {}
+  virtual ~GhostingFunctor() = default;
 
   /**
    * A clone() is needed because GhostingFunctor can not be shared between

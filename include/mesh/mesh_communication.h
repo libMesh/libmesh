@@ -54,12 +54,12 @@ public:
   /**
    * Constructor.
    */
-  MeshCommunication () {}
+  MeshCommunication () = default;
 
   /**
    * Destructor.
    */
-  ~MeshCommunication () {}
+  ~MeshCommunication () = default;
 
   /**
    * Clears all data structures and resets to a pristine state.

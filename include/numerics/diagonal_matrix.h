@@ -56,6 +56,12 @@ public:
   explicit DiagonalMatrix(const Parallel::Communicator & comm);
 
   /**
+   * This class does not manually manage any memory, so the destructor
+   * can be safely defaulted.
+   */
+  virtual ~DiagonalMatrix() = default;
+
+  /**
    * unique pointers can be moved but not copied
    */
   DiagonalMatrix(DiagonalMatrix &&) = default;

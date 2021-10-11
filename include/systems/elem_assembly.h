@@ -40,16 +40,14 @@ class ElemAssembly : public ReferenceCountedObject<ElemAssembly>
 public:
 
   /**
-   * Constructor.  Initializes required
-   * data structures.
+   * Constructor.
    */
-  ElemAssembly ()
-  {}
+  ElemAssembly () = default;
 
   /**
    * Destructor.
    */
-  virtual ~ElemAssembly () {}
+  virtual ~ElemAssembly () = default;
 
   /**
    * Perform the element interior assembly.

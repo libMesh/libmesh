@@ -123,7 +123,10 @@ public:
 
   virtual void close () override;
 
-  virtual void clear () override;
+  /**
+   * clear() is called from the destructor, so it should not throw.
+   */
+  virtual void clear () noexcept override;
 
   virtual void zero () override;
 
@@ -671,7 +674,7 @@ void EpetraVector<T>::close ()
 
 template <typename T>
 inline
-void EpetraVector<T>::clear ()
+void EpetraVector<T>::clear () noexcept
 {
   if (this->initialized())
     {

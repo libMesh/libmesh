@@ -43,9 +43,7 @@ namespace libMesh
   }
 
 
-FileSolutionHistory::~FileSolutionHistory ()
-{
-}
+FileSolutionHistory::~FileSolutionHistory () = default;
 
 // This function finds, if it can, the entry where we're supposed to
 // be storing data, leaves stored_sols unchanged if it cant find an entry

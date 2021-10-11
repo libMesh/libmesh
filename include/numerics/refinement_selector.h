@@ -50,15 +50,14 @@ class RefinementSelector
 public:
 
   /**
-   * Constructor. Empty.
+   * Constructor.
    */
-  RefinementSelector() {}
+  RefinementSelector() = default;
 
   /**
    * Destructor.
    */
-  virtual ~RefinementSelector() {}
-
+  virtual ~RefinementSelector() = default;
 
   /**
    * This pure virtual function must be redefined

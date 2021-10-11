@@ -82,7 +82,7 @@ public:
   /**
    * Destructor.  Virtual so we can derive from the \p StatisticsVector
    */
-  virtual ~StatisticsVector () {}
+  virtual ~StatisticsVector () = default;
 
 
   /**

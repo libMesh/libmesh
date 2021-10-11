@@ -17,8 +17,8 @@ using namespace libMesh;
 class LaplaceQoI : public DifferentiableQoI
 {
 public:
-  LaplaceQoI(){}
-  virtual ~LaplaceQoI(){}
+  LaplaceQoI() = default;
+  virtual ~LaplaceQoI() = default;
 
   virtual void init_qoi(std::vector<Number> & sys_qoi);
 

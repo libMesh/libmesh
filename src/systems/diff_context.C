@@ -95,9 +95,7 @@ DiffContext::DiffContext (const System & sys) :
 
 
 
-DiffContext::~DiffContext ()
-{
-}
+DiffContext::~DiffContext () = default;
 
 
 void DiffContext::set_deltat_pointer(Real * dt)

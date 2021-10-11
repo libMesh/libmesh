@@ -26,9 +26,7 @@
 namespace libMesh
 {
 
-MemorySolutionHistory::~MemorySolutionHistory ()
-{
-}
+MemorySolutionHistory::~MemorySolutionHistory () = default;
 
 // This function finds, if it can, the entry where we're supposed to
 // be storing data

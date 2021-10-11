@@ -70,7 +70,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~PeriodicBoundaryBase() {}
+  virtual ~PeriodicBoundaryBase() = default;
 
   /**
    * This function should be overridden by derived classes to

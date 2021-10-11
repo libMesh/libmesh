@@ -125,10 +125,7 @@ void MeshRefinement::set_periodic_boundaries_ptr(PeriodicBoundaries * pb_ptr)
 
 
 
-MeshRefinement::~MeshRefinement ()
-{
-  this->clear();
-}
+MeshRefinement::~MeshRefinement () = default;
 
 
 

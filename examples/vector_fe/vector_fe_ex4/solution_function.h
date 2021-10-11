@@ -34,7 +34,7 @@ public:
   SolutionFunction(const unsigned int u_var)
     : _u_var(u_var) {}
 
-  ~SolutionFunction() {}
+  ~SolutionFunction() = default;
 
   virtual Number operator() (const Point &, const Real = 0)
   { libmesh_not_implemented(); }
@@ -75,7 +75,7 @@ public:
 
   SolutionGradient(const unsigned int u_var)
     : _u_var(u_var) {}
-  ~SolutionGradient(){}
+  ~SolutionGradient() = default;
 
   virtual Gradient operator() (const Point &,
                                const Real = 0)

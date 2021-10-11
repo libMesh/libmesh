@@ -44,7 +44,7 @@ public:
   virtual std::unique_ptr<MeshBase> clone () const override
   { return libmesh_make_unique<ParallelMesh>(*this); }
 
-  ~ParallelMesh() {}
+  ~ParallelMesh() = default;
 };
 
 } // namespace libMesh

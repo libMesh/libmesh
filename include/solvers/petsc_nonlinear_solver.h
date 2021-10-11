@@ -191,7 +191,7 @@ public:
   class ComputeLineSearchObject
   {
   public:
-    virtual ~ComputeLineSearchObject () {}
+    virtual ~ComputeLineSearchObject () = default;
 
     virtual void linesearch (SNESLineSearch linesearch) = 0;
   };

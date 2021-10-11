@@ -23,12 +23,7 @@
 namespace libMesh
 {
 
-DifferentiablePhysics::~DifferentiablePhysics()
-{
-  DifferentiablePhysics::clear_physics();
-}
-
-
+DifferentiablePhysics::~DifferentiablePhysics() = default;
 
 void DifferentiablePhysics::clear_physics ()
 {
