@@ -165,7 +165,10 @@ public:
    */
   void reset_preallocation();
 
-  virtual void clear () override;
+  /**
+   * clear() is called from the destructor, so it should not throw.
+   */
+  virtual void clear () noexcept override;
 
   virtual void zero () override;
 

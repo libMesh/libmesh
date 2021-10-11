@@ -427,16 +427,15 @@ TaoOptimizationSolver<T>::~TaoOptimizationSolver ()
 
 
 template <typename T>
-void TaoOptimizationSolver<T>::clear ()
+void TaoOptimizationSolver<T>::clear () noexcept
 {
   if (this->initialized())
     {
       this->_is_initialized = false;
 
-      PetscErrorCode ierr=0;
-
-      ierr = TaoDestroy(&_tao);
-      LIBMESH_CHKERR(ierr);
+      PetscErrorCode ierr = TaoDestroy(&_tao);
+      if (ierr)
+        libmesh_warning("Warning: TaoDestroy returned a non-zero error code which we ignored.");
     }
 }
 

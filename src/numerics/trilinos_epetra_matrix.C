@@ -237,14 +237,14 @@ std::unique_ptr<SparseMatrix<T>> EpetraMatrix<T>::clone () const
 
 
 template <typename T>
-void EpetraMatrix<T>::clear ()
+void EpetraMatrix<T>::clear () noexcept
 {
-  //  delete _mat;
-  //  delete _map;
+  // FIXME: clear() doesn't actually free the memory managed by this
+  // class, so it probably leaks memory.
+  // delete _mat;
+  // delete _map;
 
   this->_is_initialized = false;
-
-  libmesh_assert (!this->initialized());
 }
 
 
