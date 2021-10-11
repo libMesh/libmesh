@@ -834,7 +834,7 @@ template <typename T>
 inline
 void PetscVector<T>::clear () noexcept
 {
-  parallel_object_only();
+  exceptionless_parallel_object_only();
 
   if (this->initialized())
     this->_restore_array();
