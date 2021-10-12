@@ -399,7 +399,8 @@ void EulerSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementE
 
   // Error contribution from this timestep
   for(unsigned int i = 0; i < QoI_elementwise_error.size(); i++)
-    QoI_elementwise_error[i] = ((QoI_elementwise_error_right[i] + QoI_elementwise_error_left[i])/2.)*(time_right - time_left);
+    QoI_elementwise_error[i] = float(((QoI_elementwise_error_right[i] + QoI_elementwise_error_left[i])/2)
+                                     * (time_right - time_left));
 
   // QoI set spatially integrated errors contribution from this timestep
   for (auto j : make_range(_system.n_qois()))

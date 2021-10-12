@@ -123,6 +123,10 @@ Packing<const Node *>::packable_size (const Node * const & node,
 }
 
 
+// Ignore warning about memcpy to a boost float128 address
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+#include "libmesh/ignore_warnings.h"
+#endif
 
 template <>
 void
@@ -169,28 +173,6 @@ Packing<const Node *>::pack (const Node * const & node,
 
   for (const auto & bid : bcs)
     *data_out++ = bid;
-}
-
-
-
-template <>
-void
-Packing<const Node *>::pack (const Node * const & node,
-                             std::back_insert_iterator<std::vector<largest_id_type>> data_out,
-                             const DistributedMesh * mesh)
-{
-  pack(node, data_out, static_cast<const MeshBase*>(mesh));
-}
-
-
-
-template <>
-void
-Packing<const Node *>::pack (const Node * const & node,
-                             std::back_insert_iterator<std::vector<largest_id_type>> data_out,
-                             const ParallelMesh * mesh)
-{
-  pack(node, data_out, static_cast<const MeshBase*>(mesh));
 }
 
 
@@ -299,6 +281,32 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
 #endif
 
   return node;
+}
+
+
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+#include "libmesh/restore_warnings.h"
+#endif
+
+
+template <>
+void
+Packing<const Node *>::pack (const Node * const & node,
+                             std::back_insert_iterator<std::vector<largest_id_type>> data_out,
+                             const DistributedMesh * mesh)
+{
+  pack(node, data_out, static_cast<const MeshBase*>(mesh));
+}
+
+
+
+template <>
+void
+Packing<const Node *>::pack (const Node * const & node,
+                             std::back_insert_iterator<std::vector<largest_id_type>> data_out,
+                             const ParallelMesh * mesh)
+{
+  pack(node, data_out, static_cast<const MeshBase*>(mesh));
 }
 
 

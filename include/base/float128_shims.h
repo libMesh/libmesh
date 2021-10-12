@@ -137,20 +137,36 @@ inline boost::multiprecision::float128 pow
   return boost::multiprecision::pow(in1, in2);
 }
 
-// Boost leaves a lot of C++11 math undefined??
+// Boost float128 leaves a lot of C++11 math undefined?  So we'll just
+// add shims as we need them, for maximum compatibility with older
+// Boost versions.
 
+// Stuff that was defined as far back as I've tested:
+LIBMESH_FLOAT128_UNARY(trunc)
+LIBMESH_FLOAT128_UNARY(round)
+
+// log1p was added in Boost 1.63
+#if BOOST_VERSION > 106300
+LIBMESH_FLOAT128_UNARY(log1p)
+#endif
+
+// This doesn't take Real->Real:
+inline long long llround
+  (const boost::multiprecision::float128 in)
+{
+  return boost::multiprecision::llround(in);
+}
+
+// Stuff that wasn't, that we don't need yet:
 // LIBMESH_FLOAT128_UNARY(exp2)
 // LIBMESH_FLOAT128_UNARY(expm1)
 // LIBMESH_FLOAT128_UNARY(log2)
-// LIBMESH_FLOAT128_UNARY(log1p)
 // LIBMESH_FLOAT128_UNARY(cbrt)
 // LIBMESH_FLOAT128_UNARY(asinh)
 // LIBMESH_FLOAT128_UNARY(acosh)
 // LIBMESH_FLOAT128_UNARY(atanh)
 // LIBMESH_FLOAT128_UNARY(erf)
 // LIBMESH_FLOAT128_UNARY(erfc)
-LIBMESH_FLOAT128_UNARY(trunc)
-LIBMESH_FLOAT128_UNARY(round)
 // LIBMESH_FLOAT128_UNARY(nearbyint)
 // LIBMESH_FLOAT128_UNARY(rint)
 

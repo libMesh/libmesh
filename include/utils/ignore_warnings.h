@@ -96,5 +96,6 @@
 #pragma GCC diagnostic ignored "-Wparentheses"
 #pragma GCC diagnostic ignored "-Wcast-function-type"
 #pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
 #endif // __GNUC__ && !__INTEL_COMPILER

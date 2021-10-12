@@ -173,7 +173,7 @@ Real RBSCMEvaluation::get_SCM_LB()
       else
         {
           // GLPK indexing is not zero based!
-          glp_set_col_bnds(lp, q+1, GLP_DB, B_min[q], B_max[q]);
+          glp_set_col_bnds(lp, q+1, GLP_DB, double(B_min[q]), double(B_max[q]));
         }
 
       // If B_max is not defined, just set lower bounds...
@@ -201,7 +201,7 @@ Real RBSCMEvaluation::get_SCM_LB()
 
       // Set the lower bound on the auxiliary variable
       // due to the stability constant at mu_index
-      glp_set_row_bnds(lp, m+1, GLP_LO, C_J_stability_vector[m], 0.);
+      glp_set_row_bnds(lp, m+1, GLP_LO, double(C_J_stability_vector[m]), 0.);
 
       // Now define the matrix that relates the y's
       // to the auxiliary variables at the current
@@ -214,7 +214,7 @@ Real RBSCMEvaluation::get_SCM_LB()
           ja[count] = q+1;
 
           // This can only handle Reals right now
-          ar[count] = libmesh_real( rb_theta_expansion->eval_A_theta(q,get_parameters()) );
+          ar[count] = double(libmesh_real( rb_theta_expansion->eval_A_theta(q,get_parameters()) ));
         }
     }
 
@@ -226,7 +226,7 @@ Real RBSCMEvaluation::get_SCM_LB()
 
   for (unsigned int q=0; q<rb_theta_expansion->get_n_A_terms(); q++)
     {
-      glp_set_obj_coef(lp,q+1, libmesh_real( rb_theta_expansion->eval_A_theta(q,get_parameters()) ) );
+      glp_set_obj_coef(lp,q+1, double(libmesh_real( rb_theta_expansion->eval_A_theta(q,get_parameters()) )) );
     }
 
   // Use this command to initialize the basis for the LP

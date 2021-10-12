@@ -1328,7 +1328,7 @@ PetscMatrix<T>::add_sparse_matrix (const SparseMatrix<T> & spm,
     for (auto i : index_range(gcols))
     {
       gcols[i] = libmesh_map_find(col_ltog, lcols[i]);
-      values[i] = scalar * vals[i];
+      values[i] = PS(scalar) * vals[i];
     }
 
     ierr = MatSetValues(_mat, 1, grow, ncols, gcols.data(), values.data(), ADD_VALUES);
