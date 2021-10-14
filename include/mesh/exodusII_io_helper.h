@@ -928,6 +928,7 @@ public:
       shellface_index_offset(0),
       libmesh_type(INVALID_ELEM),
       dim(0),
+      n_nodes(0),
       exodus_type("")
   {}
 
@@ -1054,6 +1055,11 @@ public:
    * way to look this up from ElemType
    */
   int dim;
+
+  /**
+   * The number of nodes per element; useful likewise
+   */
+  int n_nodes;
 
   /**
    * The string corresponding to the Exodus type for this element

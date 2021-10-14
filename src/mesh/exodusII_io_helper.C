@@ -115,15 +115,17 @@ const std::vector<int> hex_inverse_edge_map =
     return ret_int;
   }
 
-  // Bezier Extraction assertions: if we see BEx data we had better be
-  // in a Bezier element block
-  inline void libmesh_assert_bezier_elem(const char * libmesh_dbg_var(elem_type_str))
+  // Bezier Extraction test: if we see BEx data we had better be in a
+  // Bezier element block
+  inline bool is_bezier_elem(const char * elem_type_str)
   {
+    // Reading Bezier Extraction from Exodus files requires ExodusII v8
 #if EX_API_VERS_NODOT < 800
-    libmesh_error_msg("Reading Bezier Extraction from Exodus files requires ExodusII v8");
+    return false;
 #endif
-    libmesh_assert_greater(strlen(elem_type_str), 4);
-    libmesh_assert_equal_to(std::string(elem_type_str, elem_type_str+4), "BEX_");
+    if (strlen(elem_type_str) <= 4)
+      return false;
+    return (std::string(elem_type_str, elem_type_str+4) == "BEX_");
   }
 
 } // end anonymous namespace
@@ -202,23 +204,27 @@ void ExodusII_IO_Helper::init_conversion_map()
     auto & conv = conversion_map[NODEELEM];
     conv.libmesh_type = NODEELEM;
     conv.exodus_type = "SPHERE";
+    conv.n_nodes = 1;
   }
   {
     auto & conv = conversion_map[EDGE2];
     conv.libmesh_type = EDGE2;
     conv.dim = 1;
+    conv.n_nodes = 2;
     conv.exodus_type = "EDGE2";
   }
   {
     auto & conv = conversion_map[EDGE3];
     conv.libmesh_type = EDGE3;
     conv.dim = 1;
+    conv.n_nodes = 3;
     conv.exodus_type = "EDGE3";
   }
   {
     auto & conv = conversion_map[QUAD4];
     conv.libmesh_type = QUAD4;
     conv.dim = 2;
+    conv.n_nodes = 4;
     conv.exodus_type = "QUAD4";
   }
   {
@@ -227,12 +233,14 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.shellface_index_offset = 2;
     conv.libmesh_type = QUADSHELL4;
     conv.dim = 2;
+    conv.n_nodes = 4;
     conv.exodus_type = "SHELL4";
   }
   {
     auto & conv = conversion_map[QUAD8];
     conv.libmesh_type = QUAD8;
     conv.dim = 2;
+    conv.n_nodes = 8;
     conv.exodus_type = "QUAD8";
   }
   {
@@ -241,18 +249,21 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.shellface_index_offset = 2;
     conv.libmesh_type = QUADSHELL8;
     conv.dim = 2;
+    conv.n_nodes = 8;
     conv.exodus_type = "SHELL8";
   }
   {
     auto & conv = conversion_map[QUAD9];
     conv.libmesh_type = QUAD9;
     conv.dim = 2;
+    conv.n_nodes = 9;
     conv.exodus_type = "QUAD9";
   }
   {
     auto & conv = conversion_map[TRI3];
     conv.libmesh_type = TRI3;
     conv.dim = 2;
+    conv.n_nodes = 3;
     conv.exodus_type = "TRI3";
   }
   {
@@ -261,18 +272,21 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.shellface_index_offset = 2;
     conv.libmesh_type = TRISHELL3;
     conv.dim = 2;
+    conv.n_nodes = 3;
     conv.exodus_type = "TRISHELL3";
   }
   {
     auto & conv = conversion_map[TRI3SUBDIVISION];
     conv.libmesh_type = TRI3SUBDIVISION;
     conv.dim = 2;
+    conv.n_nodes = 3;
     conv.exodus_type = "TRI3";
   }
   {
     auto & conv = conversion_map[TRI6];
     conv.libmesh_type = TRI6;
     conv.dim = 2;
+    conv.n_nodes = 6;
     conv.exodus_type = "TRI6";
   }
   {
@@ -281,6 +295,7 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.inverse_side_map = &hex_inverse_face_map;
     conv.libmesh_type = HEX8;
     conv.dim = 3;
+    conv.n_nodes = 8;
     conv.exodus_type = "HEX8";
   }
   {
@@ -289,6 +304,7 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.inverse_side_map = &hex_inverse_face_map;
     conv.libmesh_type = HEX20;
     conv.dim = 3;
+    conv.n_nodes = 20;
     conv.exodus_type = "HEX20";
   }
   {
@@ -299,6 +315,7 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.inverse_side_map = &hex_inverse_face_map;
     conv.libmesh_type = HEX27;
     conv.dim = 3;
+    conv.n_nodes = 27;
     conv.exodus_type = "HEX27";
   }
   {
@@ -307,6 +324,7 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.inverse_side_map = &tet_inverse_face_map;
     conv.libmesh_type = TET4;
     conv.dim = 3;
+    conv.n_nodes = 4;
     conv.exodus_type = "TETRA4";
   }
   {
@@ -315,6 +333,7 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.inverse_side_map = &tet_inverse_face_map;
     conv.libmesh_type = TET10;
     conv.dim = 3;
+    conv.n_nodes = 10;
     conv.exodus_type = "TETRA10";
   }
   {
@@ -323,6 +342,7 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.inverse_side_map = &prism_inverse_face_map;
     conv.libmesh_type = PRISM6;
     conv.dim = 3;
+    conv.n_nodes = 6;
     conv.exodus_type = "WEDGE";
   }
   {
@@ -331,6 +351,7 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.inverse_side_map = &prism_inverse_face_map;
     conv.libmesh_type = PRISM15;
     conv.dim = 3;
+    conv.n_nodes = 15;
     conv.exodus_type = "WEDGE15";
   }
   {
@@ -339,24 +360,28 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.inverse_side_map = &prism_inverse_face_map;
     conv.libmesh_type = PRISM18;
     conv.dim = 3;
+    conv.n_nodes = 18;
     conv.exodus_type = "WEDGE18";
   }
   {
     auto & conv = conversion_map[PYRAMID5];
     conv.libmesh_type = PYRAMID5;
     conv.dim = 3;
+    conv.n_nodes = 5;
     conv.exodus_type = "PYRAMID5";
   }
   {
     auto & conv = conversion_map[PYRAMID13];
     conv.libmesh_type = PYRAMID13;
     conv.dim = 3;
+    conv.n_nodes = 13;
     conv.exodus_type = "PYRAMID13";
   }
   {
     auto & conv = conversion_map[PYRAMID14];
     conv.libmesh_type = PYRAMID14;
     conv.dim = 3;
+    conv.n_nodes = 14;
     conv.exodus_type = "PYRAMID14";
   }
 }
@@ -825,71 +850,91 @@ void ExodusII_IO_Helper::read_node_num_map ()
 
 void ExodusII_IO_Helper::read_bex_cv_blocks()
 {
-  // If global attributes bex_* exist, we look for Bezier Extraction
-  // coefficient data there.
+  // If a bex blob exists, we look for Bezier Extraction coefficient
+  // data there.
 
-  // This API doesn't work the way the docs would lead me to expect -
-  // we need one from a newer Exodus version than 5.22
-  // int n_global_attr = 0;
-  // ex_err = exII::ex_get_attr_param(ex_id, exII::EX_GLOBAL, 0, & n_global_attr);
+  // These APIs require newer Exodus than 5.22
 #if EX_API_VERS_NODOT >= 800
-  int n_global_attr = exII::ex_get_attribute_count(ex_id, exII::EX_GLOBAL, 0);
-  EX_CHECK_ERR(n_global_attr, "Error getting number of global attributes.");
+  int n_blobs = exII::ex_inquire_int(ex_id, exII::EX_INQ_BLOB);
 
-  if (n_global_attr > 0)
+  if (n_blobs > 0)
     {
-      std::vector<exII::ex_attribute> attributes(n_global_attr);
-
-      ex_err = exII::ex_get_attribute_param(ex_id, exII::EX_GLOBAL, 0, attributes.data());
-      EX_CHECK_ERR(ex_err, "Error getting global attribute parameters.");
-
-      ex_err = exII::ex_get_attributes(ex_id, n_global_attr, attributes.data());
-      EX_CHECK_ERR(ex_err, "Error getting global attribute values.");
-
-      int bex_num_dense_cv_blocks=0;
-      std::vector<long unsigned int> bex_dense_cv_info;
-
-      for (auto attr : attributes)
+      std::vector<exII::ex_blob> blobs(n_blobs);
+      std::vector<std::vector<char>> blob_names(n_blobs);
+      for (auto i : make_range(n_blobs))
         {
-          if (std::string("bex_num_dense_cv_blocks") == attr.name)
+          blob_names[i].resize(MAX_STR_LENGTH+1);
+          blobs[i].name = blob_names[i].data();
+        }
+
+      ex_err = exII::ex_get_blobs(ex_id, blobs.data());
+      EX_CHECK_ERR(ex_err, "Error getting blobs.");
+
+      bool found_blob = false;
+      const exII::ex_blob * my_blob = &blobs[0];
+      for (const auto & blob : blobs)
+        {
+          if (std::string("bex_cv_blob") == blob.name)
             {
-              if (attr.type != exII::EX_INTEGER)
-                libmesh_error_msg("Found non-integer bex_num_dense_cv_blocks");
-
-              if (attr.value_count > 1)
-                libmesh_error_msg("Looking for 1 bex_num_dense_cv_blocks; found " << attr.value_count);
-
-              bex_num_dense_cv_blocks = *(static_cast<int *>(attr.values));
+              found_blob = true;
+              my_blob = &blob;
             }
-          else if (std::string("bex_dense_cv_info") == attr.name)
+        }
+
+      if (!found_blob)
+        libmesh_error_msg("Found no bex_cv_blob for bezier elements");
+
+      const int n_blob_attr =
+        exII::ex_get_attribute_count(ex_id, exII::EX_BLOB,
+                                     my_blob->id);
+
+      std::vector<exII::ex_attribute> attributes(n_blob_attr);
+      ex_err = exII::ex_get_attribute_param(ex_id, exII::EX_BLOB,
+                                            my_blob->id,
+                                            attributes.data());
+      EX_CHECK_ERR(ex_err, "Error getting bex blob attribute parameters.");
+
+      int bex_num_dense_cv_blocks = 0;
+      std::vector<int> bex_dense_cv_info;
+      for (auto & attr : attributes)
+        {
+          if (std::string("bex_dense_cv_info") == attr.name)
             {
-              if (attr.type != exII::EX_INTEGER)
-                libmesh_error_msg("Found non-integer bex_dense_cv_info");
+              const std::size_t value_count = attr.value_count;
+              if (value_count % 2)
+                libmesh_error_msg("Found odd number of bex_dense_cv_info");
 
-              if (!bex_num_dense_cv_blocks)
-                libmesh_not_implemented_msg("Inconsistent/reordered Bezier Extraction coefficient block counts");
+              bex_dense_cv_info.resize(value_count);
+              attr.values = bex_dense_cv_info.data();
+              exII::ex_get_attribute(ex_id, &attr);
 
-              const std::size_t block_data_size = 2*bex_num_dense_cv_blocks;
-              if (attr.value_count != block_data_size)
-                libmesh_error_msg("Looking for " << block_data_size << " bex_dense_cv_info; found " << attr.value_count);
-
-              bex_dense_cv_info.resize(block_data_size, 0);
-
-              const int * as_int = static_cast<int *>(attr.values);
-              std::copy(as_int, as_int+block_data_size, bex_dense_cv_info.begin());
+              bex_num_dense_cv_blocks = value_count / 2;
             }
-          else if (std::string("bex_dense_cv_blocks") == attr.name)
+        }
+
+      if (bex_dense_cv_info.empty())
+        libmesh_error_msg("No bex_dense_cv_info found");
+
+      int n_blob_vars;
+      exII::ex_get_variable_param(ex_id, exII::EX_BLOB, &n_blob_vars);
+      std::vector<char> var_name (MAX_STR_LENGTH + 1);
+      for (auto v_id : make_range(1,n_blob_vars+1))
+        {
+          ex_err = exII::ex_get_variable_name(ex_id, exII::EX_BLOB, v_id, var_name.data());
+          EX_CHECK_ERR(ex_err, "Error reading bex blob var name.");
+
+          if (std::string("bex_dense_cv_blocks") == var_name.data())
             {
-              if (attr.type != exII::EX_DOUBLE)
-                libmesh_error_msg("Found non-double bex_dense_cv_blocks");
+              std::vector<double> bex_dense_cv_blocks(my_blob->num_entry);
 
-              if (bex_dense_cv_info.empty())
-                libmesh_not_implemented_msg("Inconsistent/reordered Bezier Extraction coefficient block info");
-
-              const double * as_double = static_cast<double *>(attr.values);
+              ex_err = exII::ex_get_var(ex_id, 1, exII::EX_BLOB, v_id,
+                                        my_blob->id, my_blob->num_entry,
+                                        bex_dense_cv_blocks.data());
+              EX_CHECK_ERR(ex_err, "Error reading bex_dense_cv_blocks.");
 
               bex_dense_constraint_vecs.clear();
               bex_dense_constraint_vecs.resize(bex_num_dense_cv_blocks);
+
               std::size_t offset = 0;
               for (auto i : IntRange<std::size_t>(0, bex_num_dense_cv_blocks))
                 {
@@ -898,7 +943,9 @@ void ExodusII_IO_Helper::read_bex_cv_blocks()
                     {
                       const int vecsize = bex_dense_cv_info[2*i+1];
                       vec.resize(vecsize);
-                      std::copy(as_double+offset, as_double+offset+vecsize, vec.begin());
+                      std::copy(&bex_dense_cv_blocks[offset],
+                                &bex_dense_cv_blocks[offset+vecsize],
+                                vec.begin());
                       offset += vecsize;
                     }
                 }
@@ -1029,12 +1076,13 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
   // Unlike the other "extended" APIs, this one does not use a parameter struct.
   int num_edges_per_elem = 0;
   int num_faces_per_elem = 0;
+  int num_node_data_per_elem = 0;
   ex_err = exII::ex_get_block(ex_id,
                               exII::EX_ELEM_BLOCK,
                               block_ids[block],
                               elem_type.data(),
                               &num_elem_this_blk,
-                              &num_nodes_per_elem,
+                              &num_node_data_per_elem,
                               &num_edges_per_elem, // 0 or -1 if no "extended" block info
                               &num_faces_per_elem, // 0 or -1 if no "extended" block info
                               &num_attr);
@@ -1050,6 +1098,18 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
   if (!(num_faces_per_elem == 0) && !(num_faces_per_elem == -1))
     libmesh_warning("Exodus files with extended face connectivity not currently supported.");
 
+  // If we have a Bezier element here, then we've packed constraint
+  // vector connectivity at the end of the nodal connectivity, and
+  // num_nodes_per_elem reflected both.
+  const bool is_bezier = is_bezier_elem(elem_type.data());
+  if (is_bezier)
+    {
+      const auto & conv = get_conversion(std::string(elem_type.data()));
+      num_nodes_per_elem = conv.n_nodes;
+    }
+  else
+    num_nodes_per_elem = num_node_data_per_elem;
+
   if (verbose)
     libMesh::out << "Read a block of " << num_elem_this_blk
                  << " " << elem_type.data() << "(s)"
@@ -1059,7 +1119,7 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
   // Read in the connectivity of the elements of this block,
   // watching out for the case where we actually have no
   // elements in this block (possible with parallel files)
-  connect.resize(num_nodes_per_elem*num_elem_this_blk);
+  connect.resize(num_node_data_per_elem*num_elem_this_blk);
 
   if (!connect.empty())
     {
@@ -1103,7 +1163,7 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
               if (attr.value_count > 3)
                 libmesh_error_msg("Looking for at most 3 bex_elem_degrees; found " << attr.value_count);
 
-              libmesh_assert_bezier_elem(elem_type.data());
+              libmesh_assert(is_bezier);
 
               std::vector<int> bex_elem_degrees(3); // max dim
 
@@ -1120,48 +1180,39 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
                 libmesh_assert_equal_to(bex_elem_degrees[d], 2);
 #endif
             }
-          else if (std::string("bex_num_elem_cvs") == attr.name)
+        }
+    }
+
+  if (is_bezier)
+    {
+      // We'd better have the number of cvs we expect
+      bex_num_elem_cvs = num_node_data_per_elem - num_nodes_per_elem;
+      libmesh_assert_greater_equal(bex_num_elem_cvs, 0);
+
+      // The old connect vector is currently a mix of the expected
+      // connectivity and any Bezier extraction connectivity;
+      // disentangle that, if necessary.
+      bex_cv_conn.resize(num_elem_this_blk);
+      if (bex_num_elem_cvs)
+        {
+          std::vector<int> old_connect(num_nodes_per_elem * num_elem_this_blk);
+          old_connect.swap(connect);
+          auto src = old_connect.data();
+          auto dst = connect.data();
+          for (auto e : IntRange<std::size_t>(0, num_elem_this_blk))
             {
-              if (attr.type != exII::EX_INTEGER)
-                libmesh_error_msg("Found non-integer bex_num_elem_cvs");
+              std::copy(src, src + num_nodes_per_elem, dst);
+              src += num_nodes_per_elem;
+              dst += num_nodes_per_elem;
 
-              if (attr.value_count > 3)
-                libmesh_error_msg("Looking for 1 bex_num_elem_cvs; found " << attr.value_count);
-
-              libmesh_assert_bezier_elem(elem_type.data());
-
-              const int * as_int = static_cast<int *>(attr.values);
-              bex_num_elem_cvs = *as_int;
-            }
-          else if (std::string("bex_cv_conn") == attr.name)
-            {
-              if (attr.type != exII::EX_INTEGER)
-                libmesh_error_msg("Found non-integer bex_cv_conn");
-
-              libmesh_assert_bezier_elem(elem_type.data());
-
-              // We'd better have seen the number of cvs before we see
-              // the cv connectivity
-              libmesh_assert_not_equal_to(bex_num_elem_cvs, 0);
-
-              std::vector<int> bex_cv_conn_data(num_elem_this_blk * bex_num_elem_cvs);
-
-              const int * as_int = static_cast<int *>(attr.values);
-              std::copy(as_int, as_int+attr.value_count, bex_cv_conn_data.begin());
-
-              bex_cv_conn.resize(num_elem_this_blk);
-              std::size_t offset = 0;
-              for (auto e : IntRange<std::size_t>(0, num_elem_this_blk))
-                {
-                  bex_cv_conn[e].resize(bex_num_elem_cvs);
-                  std::copy(bex_cv_conn_data.data()+offset,
-                            bex_cv_conn_data.data()+offset+bex_num_elem_cvs,
-                            bex_cv_conn[e].begin());
-                  offset += bex_num_elem_cvs;
-                }
+              bex_cv_conn[e].resize(bex_num_elem_cvs);
+              std::copy(src, src + bex_num_elem_cvs,
+                        bex_cv_conn[e].begin());
+              src += bex_num_elem_cvs;
             }
         }
     }
+
 #endif // EX_API_VERS_NODOT >= 800
 }
 
