@@ -338,14 +338,14 @@ void init_preconditioner_type_to_enum ()
   if (preconditioner_type_to_enum.empty())
     {
       preconditioner_type_to_enum["IDENTITY_PRECOND"      ]=IDENTITY_PRECOND;
-      preconditioner_type_to_enum["JACOBI_PRECOND"    ]=JACOBI_PRECOND;
+      preconditioner_type_to_enum["JACOBI_PRECOND"        ]=JACOBI_PRECOND;
       preconditioner_type_to_enum["BLOCK_JACOBI_PRECOND"  ]=BLOCK_JACOBI_PRECOND;
       preconditioner_type_to_enum["SOR_PRECOND"           ]=SOR_PRECOND;
       preconditioner_type_to_enum["SSOR_PRECOND"          ]=SSOR_PRECOND;
-      preconditioner_type_to_enum["EISENSTAT_PRECOND"    ]=EISENSTAT_PRECOND;
-      preconditioner_type_to_enum["ASM_PRECOND"    ]=ASM_PRECOND;
-      preconditioner_type_to_enum["CHOLESKY_PRECOND"    ]=CHOLESKY_PRECOND;
-      preconditioner_type_to_enum["ICC_PRECOND"    ]=ICC_PRECOND;
+      preconditioner_type_to_enum["EISENSTAT_PRECOND"     ]=EISENSTAT_PRECOND;
+      preconditioner_type_to_enum["ASM_PRECOND"           ]=ASM_PRECOND;
+      preconditioner_type_to_enum["CHOLESKY_PRECOND"      ]=CHOLESKY_PRECOND;
+      preconditioner_type_to_enum["ICC_PRECOND"           ]=ICC_PRECOND;
       preconditioner_type_to_enum["ILU_PRECOND"           ]=ILU_PRECOND;
       preconditioner_type_to_enum["LU_PRECOND"            ]=LU_PRECOND;
       preconditioner_type_to_enum["USER_PRECOND"          ]=USER_PRECOND;
