@@ -762,6 +762,9 @@ protected:
   // If true, whenever there is an I/O operation, only perform if if we are on processor 0.
   bool _run_only_on_proc0;
 
+  // This flag gets set after the create() function has been successfully called.
+  bool _opened_by_create;
+
   // True once the elem vars are initialized
   bool _elem_vars_initialized;
 

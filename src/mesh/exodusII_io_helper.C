@@ -155,6 +155,7 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   opened_for_writing(false),
   opened_for_reading(false),
   _run_only_on_proc0(run_only_on_proc0),
+  _opened_by_create(false),
   _elem_vars_initialized(false),
   _global_vars_initialized(false),
   _nodal_vars_initialized(false),
@@ -1247,24 +1248,31 @@ void ExodusII_IO_Helper::read_all_nodesets()
 
 void ExodusII_IO_Helper::close()
 {
-  // Always call close on processor 0.
-  // If we're running on multiple processors, i.e. as one of several Nemesis files,
-  // we call close on all processors...
-  if ((this->processor_id() == 0) || (!_run_only_on_proc0))
+  // Call ex_close on every processor that did ex_open or ex_create;
+  // newer Exodus versions error if we try to reopen a file that
+  // hasn't been officially closed.  Don't close the file if we didn't
+  // open it; this also raises an Exodus error.
+
+  // We currently do ex_open on every proc (to do read operations on
+  // every proc), but we do ex_create on every proc only for Nemesis
+  // files.
+  if (!_opened_by_create ||
+      (this->processor_id() == 0) ||
+      (!_run_only_on_proc0))
     {
-      // Don't close the file if it was never opened, this raises an Exodus error
       if (opened_for_writing || opened_for_reading)
         {
           ex_err = exII::ex_close(ex_id);
           EX_CHECK_ERR(ex_err, "Error closing Exodus file.");
           message("Exodus file closed successfully.");
-
-          // Now that the file is closed, it's no longer opened for
-          // reading or writing.
-          opened_for_writing = false;
-          opened_for_reading = false;
         }
     }
+
+  // Now that the file is closed, it's no longer opened for
+  // reading or writing.
+  opened_for_writing = false;
+  opened_for_reading = false;
+  _opened_by_create = false;
 }
 
 
@@ -1626,6 +1634,7 @@ void ExodusII_IO_Helper::create(std::string filename)
     }
 
   opened_for_writing = true;
+  _opened_by_create = true;
   current_filename = filename;
 }
 
