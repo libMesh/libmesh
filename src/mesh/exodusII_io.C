@@ -1768,21 +1768,35 @@ void ExodusII_IO::write_nodal_data_common(std::string fname,
       // it.
       if (_append)
         {
-          exio_helper->open(fname.c_str(), /*read_only=*/false);
-          // If we're appending, it's not valid to call exio_helper->initialize()
-          // or exio_helper->initialize_nodal_variables(), but we do need to set up
-          // certain aspects of the Helper object itself, such as the number of nodes
-          // and elements.  We do that by reading the header...
-          exio_helper->read_and_store_header_info();
+          // We do our writing only from proc 0, to avoid race
+          // conditions with Exodus 8
+          if (!MeshOutput<MeshBase>::mesh().processor_id())
+            {
+              exio_helper->open(fname.c_str(), /*read_only=*/false);
+              // If we're appending, it's not valid to call exio_helper->initialize()
+              // or exio_helper->initialize_nodal_variables(), but we do need to set up
+              // certain aspects of the Helper object itself, such as the number of nodes
+              // and elements.  We do that by reading the header...
+              exio_helper->read_and_store_header_info();
 
-          // ...and reading the block info
-          exio_helper->read_block_info();
+              // ...and reading the block info
+              exio_helper->read_block_info();
+            }
+            // Keep other processors aware of what we've done on root
+          else
+            {
+              exio_helper->opened_for_writing = true;
+              exio_helper->current_filename = fname;
+            }
         }
       else
         {
           exio_helper->create(fname);
 
+          // But some of our write calls are parallel-only, due to
+          // calls to parallel-only getter functions.
           exio_helper->initialize(fname, mesh, !continuous);
+
           exio_helper->write_nodal_coordinates(mesh, !continuous);
           exio_helper->write_elements(mesh, !continuous);
 

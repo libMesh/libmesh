@@ -1253,10 +1253,10 @@ void ExodusII_IO_Helper::close()
   // hasn't been officially closed.  Don't close the file if we didn't
   // open it; this also raises an Exodus error.
 
-  // We currently do ex_open on every proc (to do read operations on
-  // every proc), but we do ex_create on every proc only for Nemesis
-  // files.
-  if (!_opened_by_create ||
+  // We currently do read-only ex_open on every proc (to do read
+  // operations on every proc), but we do ex_open and ex_create for
+  // writes on every proc only with Nemesis files.
+  if (!(_opened_by_create || opened_for_writing) ||
       (this->processor_id() == 0) ||
       (!_run_only_on_proc0))
     {
