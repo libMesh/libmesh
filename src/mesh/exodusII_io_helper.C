@@ -1645,6 +1645,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   // The majority of this function only executes on processor 0, so any functions
   // which are collective, like n_active_elem() or n_edge_conds() must be called
   // before the processors' execution paths diverge.
+  libmesh_parallel_only(mesh.comm());
+
   unsigned int n_active_elem = mesh.n_active_elem();
   const BoundaryInfo & bi = mesh.get_boundary_info();
   num_edge = bi.n_edge_conds();
@@ -1879,6 +1881,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
 void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_discontinuous)
 {
   // n_active_elem() is a parallel_only function
+  libmesh_parallel_only(mesh.comm());
   unsigned int n_active_elem = mesh.n_active_elem();
 
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
