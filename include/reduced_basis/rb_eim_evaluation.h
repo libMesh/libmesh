@@ -99,9 +99,14 @@ public:
   void set_parametrized_function(std::unique_ptr<RBParametrizedFunction> pf);
 
   /**
-   * Get a const reference to the parametrized function.
+   * Get a reference to the parametrized function.
    */
   RBParametrizedFunction & get_parametrized_function();
+
+  /**
+   * Get a const reference to the parametrized function.
+   */
+  const RBParametrizedFunction & get_parametrized_function() const;
 
   /**
    * Calculate the EIM approximation for the given
@@ -134,6 +139,12 @@ public:
                         const DenseVector<Number> & coeffs);
 
   /**
+   * Same as decrement_vector() except for Side data.
+   */
+  void side_decrement_vector(SideQpDataMap & v,
+                             const DenseVector<Number> & coeffs);
+
+  /**
    * Build a vector of RBTheta objects that accesses the components
    * of the RB_solution member variable of this RBEvaluation.
    * Store these objects in the member vector rb_theta_objects.
@@ -163,6 +174,16 @@ public:
     std::vector<Number> & values);
 
   /**
+   * Same as get_parametrized_function_values_at_qps() except for side data.
+   */
+  static void get_parametrized_function_side_values_at_qps(
+    const SideQpDataMap & pf,
+    dof_id_type elem_id,
+    unsigned int side_index,
+    unsigned int comp,
+    std::vector<Number> & values);
+
+  /**
    * Same as above, except that we just return the value at the qp^th
    * quadrature point.
    */
@@ -170,6 +191,17 @@ public:
     const Parallel::Communicator & comm,
     const QpDataMap & pf,
     dof_id_type elem_id,
+    unsigned int comp,
+    unsigned int qp);
+
+  /**
+   * Same as get_parametrized_function_value() except for side data.
+   */
+  static Number get_parametrized_side_function_value(
+    const Parallel::Communicator & comm,
+    const SideQpDataMap & pf,
+    dof_id_type elem_id,
+    unsigned int side_index,
     unsigned int comp,
     unsigned int qp);
 
@@ -186,6 +218,15 @@ public:
                                             std::vector<Number> & values) const;
 
   /**
+   * Same as get_eim_basis_function_values_at_qps() except for side data.
+   */
+  void get_eim_basis_function_side_values_at_qps(unsigned int basis_function_index,
+                                                 dof_id_type elem_id,
+                                                 unsigned int side_index,
+                                                 unsigned int var,
+                                                 std::vector<Number> & values) const;
+
+  /**
    * Same as above, except that we just return the value at the qp^th
    * quadrature point.
    */
@@ -195,9 +236,23 @@ public:
                                       unsigned int qp) const;
 
   /**
+   * Same as get_eim_basis_function_value() except for side data.
+   */
+  Number get_eim_basis_function_side_value(unsigned int basis_function_index,
+                                          dof_id_type elem_id,
+                                          unsigned int side_index,
+                                          unsigned int comp,
+                                          unsigned int qp) const;
+
+  /**
    * Get a reference to the i^th basis function.
    */
   const QpDataMap & get_basis_function(unsigned int i) const;
+
+  /**
+   * Get a reference to the i^th side basis function.
+   */
+  const SideQpDataMap & get_side_basis_function(unsigned int i) const;
 
   /**
    * Set _rb_eim_solutions. Normally we update _rb_eim_solutions by performing
@@ -271,6 +326,21 @@ public:
     unsigned int comp,
     dof_id_type elem_id,
     subdomain_id_type subdomain_id,
+    unsigned int qp,
+    const std::vector<Point> & perturbs,
+    const std::vector<Real> & phi_i_qp);
+
+  /**
+   * Add \p side_bf to our EIM basis.
+   */
+  void add_side_basis_function_and_interpolation_data(
+    const SideQpDataMap & side_bf,
+    Point p,
+    unsigned int comp,
+    dof_id_type elem_id,
+    unsigned int side_index,
+    subdomain_id_type subdomain_id,
+    boundary_id_type boundary_id,
     unsigned int qp,
     const std::vector<Point> & perturbs,
     const std::vector<Real> & phi_i_qp);
@@ -379,6 +449,36 @@ public:
   virtual bool scale_components_in_enrichment() const;
 
 private:
+
+  /**
+   * Method that writes out element interior EIM basis functions. This may be called by
+   * write_out_basis_functions().
+   */
+  void write_out_interior_basis_functions(const std::string & directory_name,
+                                          bool write_binary_basis_functions);
+
+  /**
+   * Method that writes out element side EIM basis functions. This may be called by
+   * write_out_basis_functions().
+   */
+  void write_out_side_basis_functions(const std::string & directory_name,
+                                      bool write_binary_basis_functions);
+
+  /**
+   * Method that reads in element interior EIM basis functions. This may be called by
+   * read_in_basis_functions().
+   */
+  void read_in_interior_basis_functions(const System & sys,
+                                        const std::string & directory_name,
+                                        bool read_binary_basis_functions);
+
+  /**
+   * Method that reads in element side EIM basis functions. This may be called by
+   * read_in_basis_functions().
+   */
+  void read_in_side_basis_functions(const System & sys,
+                                    const std::string & directory_name,
+                                    bool read_binary_basis_functions);
 
   /**
    * The EIM solution coefficients from the most recent call to rb_eim_solves().
@@ -497,11 +597,21 @@ private:
   void gather_bfs();
 
   /**
+   * Same as gather_bfs() except for side data.
+   */
+  void side_gather_bfs();
+
+  /**
    * Helper function that distributes the entries of
    * _local_eim_basis_functions to their respective processors after
    * they are read in on processor 0.
    */
   void distribute_bfs(const System & sys);
+
+  /**
+   * Same as distribute_bfs() except for side data.
+   */
+  void side_distribute_bfs(const System & sys);
 
   /**
    * Let {p_1,...,p_n} be a set of n "observation points", where we can

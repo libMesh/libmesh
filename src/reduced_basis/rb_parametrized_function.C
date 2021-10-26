@@ -317,7 +317,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
     }
 
   unsigned int counter = 0;
-  for (const auto & xyz_pair : all_xyz)
+  for (const auto & xyz_pair : side_all_xyz)
     {
       auto elem_side_pair = xyz_pair.first;
       dof_id_type elem_id = elem_side_pair.first;
@@ -325,8 +325,8 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
 
       const std::vector<Point> & xyz_vec = xyz_pair.second;
 
-      subdomain_id_type subdomain_id = libmesh_map_find(sbd_ids, elem_id);
-      boundary_id_type boundary_id = libmesh_map_find(boundary_ids, elem_side_pair);
+      subdomain_id_type subdomain_id = libmesh_map_find(sbd_ids, elem_side_pair);
+      boundary_id_type boundary_id = libmesh_map_find(side_boundary_ids, elem_side_pair);
 
       // The amount of data to be stored for each component
       auto n_qp = xyz_vec.size();
@@ -362,7 +362,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
           if (requires_xyz_perturbations)
             {
               const auto & qps_and_perturbs =
-                libmesh_map_find(all_xyz_perturb, elem_side_pair);
+                libmesh_map_find(side_all_xyz_perturb, elem_side_pair);
               libmesh_error_msg_if(qp >= qps_and_perturbs.size(), "Error: Invalid qp");
 
               all_xyz_perturb_vec[counter] = qps_and_perturbs[qp];
@@ -506,6 +506,11 @@ const std::set<boundary_id_type> & RBParametrizedFunction::get_parametrized_func
 void RBParametrizedFunction::set_parametrized_function_boundary_ids(const std::set<boundary_id_type> & boundary_ids)
 {
   _parametrized_function_boundary_ids = boundary_ids;
+}
+
+bool RBParametrizedFunction::on_mesh_sides() const
+{
+  return !get_parametrized_function_boundary_ids().empty();
 }
 
 }

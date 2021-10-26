@@ -27,6 +27,7 @@
 #include <unordered_map>
 #include <vector>
 #include <map>
+#include <set>
 
 namespace libMesh
 {
@@ -96,9 +97,8 @@ public:
                                     unsigned int comp,
                                     const Point & xyz,
                                     dof_id_type elem_id,
-                                    unsigend int side_index,
+                                    unsigned int side_index,
                                     unsigned int qp,
-                                    dof_id_type node_id,
                                     subdomain_id_type subdomain_id,
                                     boundary_id_type boundary_id,
                                     const std::vector<Point> & xyz_perturb,
@@ -125,8 +125,10 @@ public:
   virtual std::vector<Number> side_evaluate(const RBParameters & mu,
                                             const Point & xyz,
                                             dof_id_type elem_id,
+                                            unsigned int side_index,
                                             unsigned int qp,
                                             subdomain_id_type subdomain_id,
+                                            boundary_id_type boundary_id,
                                             const std::vector<Point> & xyz_perturb,
                                             const std::vector<Real> & phi_i_qp) = 0;
 
@@ -214,6 +216,11 @@ public:
    */
   const std::set<boundary_id_type> & get_parametrized_function_boundary_ids() const;
   void set_parametrized_function_boundary_ids(const std::set<boundary_id_type> & boundary_ids);
+
+  /**
+   * @return true if this parametrized function is defined on mesh sides.
+   */
+  bool on_mesh_sides() const;
 
   /**
    * Evaluate the parametrized function for the parameter \p mu at the set of
