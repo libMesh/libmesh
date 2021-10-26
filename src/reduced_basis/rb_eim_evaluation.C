@@ -391,6 +391,11 @@ void RBEIMEvaluation::add_interpolation_points_subdomain_id(subdomain_id_type sb
   _interpolation_points_subdomain_id.emplace_back(sbd_id);
 }
 
+void RBEIMEvaluation::add_interpolation_points_boundary_id(boundary_id_type b_id)
+{
+  _interpolation_points_boundary_id.emplace_back(b_id);
+}
+
 void RBEIMEvaluation::add_interpolation_points_xyz_perturbations(const std::vector<Point> & perturbs)
 {
   _interpolation_points_xyz_perturbations.emplace_back(perturbs);
@@ -399,6 +404,11 @@ void RBEIMEvaluation::add_interpolation_points_xyz_perturbations(const std::vect
 void RBEIMEvaluation::add_interpolation_points_elem_id(dof_id_type elem_id)
 {
   _interpolation_points_elem_id.emplace_back(elem_id);
+}
+
+void RBEIMEvaluation::add_interpolation_points_side_index(unsigned int side_index)
+{
+  _interpolation_points_side_index.emplace_back(side_index);
 }
 
 void RBEIMEvaluation::add_interpolation_points_qp(unsigned int qp)
@@ -432,6 +442,13 @@ subdomain_id_type RBEIMEvaluation::get_interpolation_points_subdomain_id(unsigne
   return _interpolation_points_subdomain_id[index];
 }
 
+boundary_id_type RBEIMEvaluation::get_interpolation_points_boundary_id(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _interpolation_points_boundary_id.size(), "Error: Invalid index");
+
+  return _interpolation_points_boundary_id[index];
+}
+
 const std::vector<Point> & RBEIMEvaluation::get_interpolation_points_xyz_perturbations(unsigned int index) const
 {
   libmesh_error_msg_if(index >= _interpolation_points_xyz_perturbations.size(), "Error: Invalid index");
@@ -444,6 +461,13 @@ dof_id_type RBEIMEvaluation::get_interpolation_points_elem_id(unsigned int index
   libmesh_error_msg_if(index >= _interpolation_points_elem_id.size(), "Error: Invalid index");
 
   return _interpolation_points_elem_id[index];
+}
+
+unsigned int RBEIMEvaluation::get_interpolation_points_side_index(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _interpolation_points_side_index.size(), "Error: Invalid index");
+
+  return _interpolation_points_side_index[index];
 }
 
 unsigned int RBEIMEvaluation::get_interpolation_points_qp(unsigned int index) const

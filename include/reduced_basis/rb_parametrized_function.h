@@ -90,6 +90,21 @@ public:
                                const std::vector<Real> & phi_i_qp);
 
   /**
+   * Same as evaluate_comp() but for element sides.
+   */
+  virtual Number side_evaluate_comp(const RBParameters & mu,
+                                    unsigned int comp,
+                                    const Point & xyz,
+                                    dof_id_type elem_id,
+                                    unsigend int side_index,
+                                    unsigned int qp,
+                                    dof_id_type node_id,
+                                    subdomain_id_type subdomain_id,
+                                    boundary_id_type boundary_id,
+                                    const std::vector<Point> & xyz_perturb,
+                                    const std::vector<Real> & phi_i_qp);
+
+  /**
    * Evaluate the parametrized function at the specified point for
    * parameter \p mu.  If requires_xyz_perturbations==false, then
    * xyz_perturb will not be used.
@@ -105,6 +120,17 @@ public:
                                        const std::vector<Real> & phi_i_qp) = 0;
 
   /**
+   * Same as evaluate() but for element sides.
+   */
+  virtual std::vector<Number> side_evaluate(const RBParameters & mu,
+                                            const Point & xyz,
+                                            dof_id_type elem_id,
+                                            unsigned int qp,
+                                            subdomain_id_type subdomain_id,
+                                            const std::vector<Point> & xyz_perturb,
+                                            const std::vector<Real> & phi_i_qp) = 0;
+
+  /**
    * Vectorized version of evaluate. If requires_xyz_perturbations==false, then all_xyz_perturb will not be used.
    */
   virtual void vectorized_evaluate(const std::vector<RBParameters> & mus,
@@ -115,6 +141,20 @@ public:
                                    const std::vector<std::vector<Point>> & all_xyz_perturb,
                                    const std::vector<std::vector<Real>> & phi_i_qp,
                                    std::vector<std::vector<std::vector<Number>>> & output);
+
+  /**
+   * Same as vectorized_evaluate() but on element sides.
+   */
+  virtual void side_vectorized_evaluate(const std::vector<RBParameters> & mus,
+                                        const std::vector<Point> & all_xyz,
+                                        const std::vector<dof_id_type> & elem_ids,
+                                        const std::vector<unsigned int> & side_indices,
+                                        const std::vector<unsigned int> & qps,
+                                        const std::vector<subdomain_id_type> & sbd_ids,
+                                        const std::vector<boundary_id_type> & boundary_ids,
+                                        const std::vector<std::vector<Point>> & all_xyz_perturb,
+                                        const std::vector<std::vector<Real>> & phi_i_qp,
+                                        std::vector<std::vector<std::vector<Number>>> & output);
 
   /**
    * Store the result of vectorized_evaluate. This is helpful during EIM training,
@@ -128,12 +168,31 @@ public:
                                                          const System & sys);
 
   /**
+   * Same as preevaluate_parametrized_function_on_mesh() except for mesh sides.
+   */
+  virtual void preevaluate_parametrized_function_on_mesh_sides(const RBParameters & mu,
+                                                               const std::map<std::pair<dof_id_type,unsigned int>, std::vector<Point>> & side_all_xyz,
+                                                               const std::map<std::pair<dof_id_type,unsigned int>, subdomain_id_type> & sbd_ids,
+                                                               const std::map<std::pair<dof_id_type,unsigned int>, boundary_id_type> & side_boundary_ids,
+                                                               const std::map<std::pair<dof_id_type,unsigned int>, std::vector<std::vector<Point>> > & side_all_xyz_perturb,
+                                                               const System & sys);
+
+  /**
    * Look up the preevaluate values of the parametrized function for
    * component \p comp, element \p elem_id, and quadrature point \p qp.
    */
   virtual Number lookup_preevaluated_value_on_mesh(unsigned int comp,
                                                    dof_id_type elem_id,
                                                    unsigned int qp) const;
+
+  /**
+   * Look up the preevaluated values of the parametrized function for
+   * component \p comp, element \p elem_id, \p side_index, and quadrature point \p qp.
+   */
+  virtual Number lookup_preevaluated_side_value_on_mesh(unsigned int comp,
+                                                        dof_id_type elem_id,
+                                                        unsigned int side_index,
+                                                        unsigned int qp) const;
 
   /**
    * If this parametrized function is defined based on a lookup table then
@@ -148,6 +207,13 @@ public:
    */
   Number get_parameter_independent_data(const std::string & property_name,
                                         subdomain_id_type sbd_id) const;
+
+  /**
+   * For RBParametrizedFunctions defined on element sides, we get/set the boundary
+   * IDs that this parametrized function is defined on.
+   */
+  const std::set<boundary_id_type> & get_parametrized_function_boundary_ids() const;
+  void set_parametrized_function_boundary_ids(const std::set<boundary_id_type> & boundary_ids);
 
   /**
    * Evaluate the parametrized function for the parameter \p mu at the set of
@@ -177,6 +243,13 @@ public:
    * that point.
    */
   std::unordered_map<dof_id_type, std::vector<unsigned int>> mesh_to_preevaluated_values_map;
+
+  /**
+   * Similar to the above except this map stores the data on element sides.
+   * The indexing here is:
+   *  (elem_id,side index) --> qp --> point_index
+   */
+  std::map<std::pair<dof_id_type,unsigned int>, std::vector<unsigned int>> mesh_to_preevaluated_side_values_map;
 
   /**
    * Boolean to indicate whether this parametrized function requires xyz perturbations
@@ -215,6 +288,13 @@ protected:
    * We index this data by "property name" --> subdomain_id --> value.
    */
   std::map<std::string, std::map<subdomain_id_type, Number>> _parameter_independent_data;
+
+  /**
+   * In the case of an RBParametrizedFunction defined on element sides, this defines
+   * the set of boundary IDs that the function is defined on.
+   */
+  std::set<boundary_id_type> _parametrized_function_boundary_ids;
+
 };
 
 }

@@ -76,6 +76,11 @@ public:
   typedef std::map<dof_id_type, std::vector<std::vector<Number>>> QpDataMap;
 
   /**
+   * Type of the data structure used to map from (elem id, side index) -> [n_vars][n_qp] data.
+   */
+  typedef std::map<std::pair<dof_id_type,unsigned int>, std::vector<std::vector<Number>>> SideQpDataMap;
+
+  /**
    * Clear this object.
    */
   virtual void clear() override;
@@ -227,8 +232,10 @@ public:
   void add_interpolation_points_xyz(Point p);
   void add_interpolation_points_comp(unsigned int comp);
   void add_interpolation_points_subdomain_id(subdomain_id_type sbd_id);
+  void add_interpolation_points_boundary_id(boundary_id_type b_id);
   void add_interpolation_points_xyz_perturbations(const std::vector<Point> & perturbs);
   void add_interpolation_points_elem_id(dof_id_type elem_id);
+  void add_interpolation_points_side_index(unsigned int side_index);
   void add_interpolation_points_qp(unsigned int qp);
   void add_interpolation_points_phi_i_qp(const std::vector<Real> & phi_i_qp);
 
@@ -238,8 +245,10 @@ public:
   Point get_interpolation_points_xyz(unsigned int index) const;
   unsigned int get_interpolation_points_comp(unsigned int index) const;
   subdomain_id_type get_interpolation_points_subdomain_id(unsigned int index) const;
+  boundary_id_type get_interpolation_points_boundary_id(unsigned int index) const;
   const std::vector<Point> & get_interpolation_points_xyz_perturbations(unsigned int index) const;
   dof_id_type get_interpolation_points_elem_id(unsigned int index) const;
+  unsigned int get_interpolation_points_side_index(unsigned int index) const;
   unsigned int get_interpolation_points_qp(unsigned int index) const;
   const std::vector<Real> & get_interpolation_points_phi_i_qp(unsigned int index) const;
 
@@ -427,6 +436,13 @@ private:
   std::vector<unsigned int> _interpolation_points_qp;
 
   /**
+   * If the EIM approximation applies to element sides, then we need to
+   * store the side index and boundary ID for each quadrature point.
+   */
+  std::vector<unsigned int> _interpolation_points_side_index;
+  std::vector<boundary_id_type> _interpolation_points_boundary_id;
+
+  /**
    * We store the shape function values at the qp as well. These values
    * allows us to evaluate parametrized functions that depend on nodal
    * data.
@@ -456,6 +472,16 @@ private:
    * general will not start at zero.
    */
   std::vector<QpDataMap> _local_eim_basis_functions;
+
+  /**
+   * The EIM basis functions on element sides. We store values at quadrature points
+   * on elements that are local to this processor. The indexing
+   * is as follows:
+   *   basis function index --> (element ID,side index) --> variable --> quadrature point --> value
+   * We use a map to index the element ID, since the IDs on this processor in
+   * general will not start at zero.
+   */
+  std::vector<SideQpDataMap> _local_side_eim_basis_functions;
 
   /**
    * Print the contents of _local_eim_basis_functions to libMesh::out.
