@@ -769,6 +769,7 @@ void Pyramid14::permute(unsigned int perm_num)
       swap4nodes(0,1,2,3);
       swap4nodes(5,6,7,8);
       swap4nodes(9,10,11,12);
+      swap4neighbors(0,1,2,3);
     }
 }
 

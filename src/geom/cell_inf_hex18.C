@@ -660,6 +660,7 @@ InfHex18::permute(unsigned int perm_num)
       swap4nodes(4,5,6,7);
       swap4nodes(8,9,10,11);
       swap4nodes(12,13,14,15);
+      swap4neighbors(1,2,3,4);
     }
 }
 

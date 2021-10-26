@@ -597,6 +597,7 @@ void Tet4::permute(unsigned int perm_num)
   for (unsigned int i = 0; i != rotate; ++i)
     {
       swap3nodes(0,1,2);
+      swap3neighbors(1,2,3);
     }
 
   switch (side) {
@@ -604,12 +605,15 @@ void Tet4::permute(unsigned int perm_num)
     break;
   case 1:
     swap3nodes(0,2,3);
+    swap3neighbors(0,2,1);
     break;
   case 2:
     swap3nodes(2,0,3);
+    swap3neighbors(0,1,2);
     break;
   case 3:
     swap3nodes(2,1,3);
+    swap3neighbors(0,1,3);
     break;
   default:
     libmesh_error();

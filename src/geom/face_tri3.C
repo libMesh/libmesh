@@ -270,6 +270,7 @@ void Tri3::permute(unsigned int perm_num)
   for (unsigned int i = 0; i != perm_num; ++i)
     {
       swap3nodes(0,1,2);
+      swap3neighbors(0,1,2);
     }
 }
 

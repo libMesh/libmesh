@@ -490,6 +490,7 @@ Hex8::permute(unsigned int perm_num)
     {
       swap4nodes(0,1,2,3);
       swap4nodes(4,5,6,7);
+      swap4neighbors(1,2,3,4);
     }
 
   switch (side) {
@@ -498,24 +499,30 @@ Hex8::permute(unsigned int perm_num)
   case 1:
     swap4nodes(3,7,4,0);
     swap4nodes(2,6,5,1);
+    swap4neighbors(0,3,5,1);
     break;
   case 2:
     swap4nodes(0,4,5,1);
     swap4nodes(3,7,6,2);
+    swap4neighbors(0,4,5,2);
     break;
   case 3:
     swap4nodes(0,4,7,3);
     swap4nodes(1,5,6,2);
+    swap4neighbors(0,1,5,3);
     break;
   case 4:
     swap4nodes(1,5,4,0);
     swap4nodes(2,6,7,3);
+    swap4neighbors(0,2,5,4);
     break;
   case 5:
     swap2nodes(0,7);
     swap2nodes(1,6);
     swap2nodes(2,5);
     swap2nodes(3,4);
+    swap2neighbors(0,5);
+    swap2neighbors(1,3);
     break;
   default:
     libmesh_error();

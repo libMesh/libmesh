@@ -753,6 +753,7 @@ Prism15::permute(unsigned int perm_num)
       swap3nodes(6,7,8);
       swap3nodes(9,10,11);
       swap3nodes(12,13,14);
+      swap3neighbors(1,2,3);
     }
 
   switch (side) {
@@ -766,6 +767,8 @@ Prism15::permute(unsigned int perm_num)
     swap2nodes(9,10);
     swap2nodes(7,14);
     swap2nodes(8,13);
+    swap2neighbors(0,4);
+    swap2neighbors(2,3);
     break;
   default:
     libmesh_error();
