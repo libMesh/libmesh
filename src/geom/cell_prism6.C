@@ -511,6 +511,7 @@ Prism6::permute(unsigned int perm_num)
     {
       swap3nodes(0,1,2);
       swap3nodes(3,4,5);
+      swap3neighbors(1,2,3);
     }
 
   switch (side) {
@@ -520,6 +521,8 @@ Prism6::permute(unsigned int perm_num)
     swap2nodes(1,3);
     swap2nodes(0,4);
     swap2nodes(2,5);
+    swap2neighbors(0,4);
+    swap2neighbors(2,3);
     break;
   default:
     libmesh_error();
