@@ -81,6 +81,11 @@ public:
   typedef RBEIMEvaluation::QpDataMap QpDataMap;
 
   /**
+   * Type of the data structure used to map from (elem id,side_index) -> [n_vars][n_qp] data.
+   */
+  typedef RBEIMEvaluation::SideQpDataMap SideQpDataMap;
+
+  /**
    * Clear this object.
    */
   virtual void clear() override;
@@ -260,10 +265,20 @@ private:
   Number inner_product(const QpDataMap & v, const QpDataMap & w);
 
   /**
+   * Same as inner_product() except for side data.
+   */
+  Number side_inner_product(const SideQpDataMap & v, const SideQpDataMap & w);
+
+  /**
    * Get the maximum absolute value from a vector stored in the format that we use
    * for basis functions.
    */
   Real get_max_abs_value(const QpDataMap & v) const;
+
+  /**
+   * Same as get_max_abs_value() except for side data.
+   */
+  Real get_side_max_abs_value(const SideQpDataMap & v) const;
 
   /**
    * Add a new basis function to the EIM approximation.
@@ -289,6 +304,13 @@ private:
    */
   static void scale_parametrized_function(
     QpDataMap & local_pf,
+    Number scaling_factor);
+
+  /**
+   * Same as scale_parametrized_function() excecpt for side data.
+   */
+  static void scale_side_parametrized_function(
+    SideQpDataMap & local_pf,
     Number scaling_factor);
 
   /**
@@ -333,6 +355,13 @@ private:
   std::vector<QpDataMap> _local_parametrized_functions_for_training;
 
   /**
+   * Same as _local_parametrized_functions_for_training except for side data.
+   * The indexing is as follows:
+   *   basis function index --> (element ID,side index) --> variable --> quadrature point --> value
+   */
+  std::vector<SideQpDataMap> _local_side_parametrized_functions_for_training;
+
+  /**
    * Maximum value in _local_parametrized_functions_for_training across all processors.
    * This can be used for normalization purposes, for example.
    */
@@ -375,6 +404,14 @@ private:
    * to the mapping function derivatives.
    */
   std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > _local_quad_point_locations_perturbations;
+
+  /**
+   * Same as above except for side data.
+   */
+  std::map<std::pair<dof_id_type,unsigned int>, std::vector<Point> > _local_side_quad_point_locations;
+  std::map<std::pair<dof_id_type,unsigned int>, std::vector<Real> > _local_side_quad_point_JxW;
+  std::map<std::pair<dof_id_type,unsigned int>, boundary_id_type > _local_side_quad_point_boundary_ids;
+  std::map<std::pair<dof_id_type,unsigned int>, std::vector<std::vector<Point>> > _local_side_quad_point_locations_perturbations;
 
   /**
    * We also optionally store the values at the "observation points" for all parametrized functions

@@ -83,6 +83,11 @@ void RBEIMConstruction::clear()
   _local_quad_point_JxW.clear();
   _local_quad_point_subdomain_ids.clear();
 
+  _local_side_parametrized_functions_for_training.clear();
+  _local_side_quad_point_locations.clear();
+  _local_side_quad_point_JxW.clear();
+  _local_side_quad_point_boundary_ids.clear();
+
   _eim_projection_matrix.resize(0,0);
 }
 
@@ -504,27 +509,55 @@ void RBEIMConstruction::store_eim_solutions_for_training_set()
   std::vector<DenseVector<Number>> & eim_solutions = get_rb_eim_evaluation().get_eim_solutions_for_training_set();
   eim_solutions.clear();
   eim_solutions.resize(get_n_training_samples());
+
+  unsigned int RB_size = get_rb_eim_evaluation().get_n_basis_functions();
+
   for (auto i : make_range(get_n_training_samples()))
     {
-      const auto & local_pf = _local_parametrized_functions_for_training[i];
-
-      unsigned int RB_size = get_rb_eim_evaluation().get_n_basis_functions();
-      if (RB_size > 0)
+      if (eim_eval.get_parametrized_function().on_mesh_sides())
         {
-          // Get the right-hand side vector for the EIM approximation
-          // by sampling the parametrized function (stored in solution)
-          // at the interpolation points.
-          DenseVector<Number> EIM_rhs(RB_size);
-          for (unsigned int j=0; j<RB_size; j++)
+          const auto & local_side_pf = _local_side_parametrized_functions_for_training[i];
+
+          if (RB_size > 0)
             {
-              EIM_rhs(j) =
-                RBEIMEvaluation::get_parametrized_function_value(comm(),
-                                                                 local_pf,
-                                                                 eim_eval.get_interpolation_points_elem_id(j),
-                                                                 eim_eval.get_interpolation_points_comp(j),
-                                                                 eim_eval.get_interpolation_points_qp(j));
+              // Get the right-hand side vector for the EIM approximation
+              // by sampling the parametrized function (stored in solution)
+              // at the interpolation points.
+              DenseVector<Number> EIM_rhs(RB_size);
+              for (unsigned int j=0; j<RB_size; j++)
+                {
+                  EIM_rhs(j) =
+                    RBEIMEvaluation::get_parametrized_function_side_value(comm(),
+                                                                          local_side_pf,
+                                                                          eim_eval.get_interpolation_points_elem_id(j),
+                                                                          eim_eval.get_interpolation_points_side_index(j),
+                                                                          eim_eval.get_interpolation_points_comp(j),
+                                                                          eim_eval.get_interpolation_points_qp(j));
+                }
+              eim_solutions[i] = eim_eval.rb_eim_solve(EIM_rhs);
             }
-          eim_solutions[i] = eim_eval.rb_eim_solve(EIM_rhs);
+        }
+      else
+        {
+          const auto & local_pf = _local_parametrized_functions_for_training[i];
+
+          if (RB_size > 0)
+            {
+              // Get the right-hand side vector for the EIM approximation
+              // by sampling the parametrized function (stored in solution)
+              // at the interpolation points.
+              DenseVector<Number> EIM_rhs(RB_size);
+              for (unsigned int j=0; j<RB_size; j++)
+                {
+                  EIM_rhs(j) =
+                    RBEIMEvaluation::get_parametrized_function_value(comm(),
+                                                                    local_pf,
+                                                                    eim_eval.get_interpolation_points_elem_id(j),
+                                                                    eim_eval.get_interpolation_points_comp(j),
+                                                                    eim_eval.get_interpolation_points_qp(j));
+                }
+              eim_solutions[i] = eim_eval.rb_eim_solve(EIM_rhs);
+            }
         }
     }
 }
@@ -559,32 +592,65 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
     {
       for (auto training_index : make_range(get_n_training_samples()))
         {
-          // Make a copy of the pre-computed solution for the specified training sample
-          // since we will modify it below to compute the best fit error.
-          QpDataMap solution_copy = _local_parametrized_functions_for_training[training_index];
-
-          // Perform an L2 projection in order to find the best approximation to
-          // the parametrized function from the current EIM space.
-          DenseVector<Number> best_fit_rhs(RB_size);
-          for (unsigned int i=0; i<RB_size; i++)
+          if (get_rb_eim_evaluation().get_parametrized_function().on_mesh_sides())
             {
-              best_fit_rhs(i) = inner_product(solution_copy, get_rb_eim_evaluation().get_basis_function(i));
+              // Make a copy of the pre-computed solution for the specified training sample
+              // since we will modify it below to compute the best fit error.
+              SideQpDataMap solution_copy = _local_side_parametrized_functions_for_training[training_index];
+
+              // Perform an L2 projection in order to find the best approximation to
+              // the parametrized function from the current EIM space.
+              DenseVector<Number> best_fit_rhs(RB_size);
+              for (unsigned int i=0; i<RB_size; i++)
+                {
+                  best_fit_rhs(i) = side_inner_product(solution_copy, get_rb_eim_evaluation().get_side_basis_function(i));
+                }
+
+              // Now compute the best fit by an LU solve
+              DenseMatrix<Number> RB_inner_product_matrix_N(RB_size);
+              _eim_projection_matrix.get_principal_submatrix(RB_size, RB_inner_product_matrix_N);
+
+              DenseVector<Number> best_fit_coeffs;
+              RB_inner_product_matrix_N.lu_solve(best_fit_rhs, best_fit_coeffs);
+
+              get_rb_eim_evaluation().side_decrement_vector(solution_copy, best_fit_coeffs);
+              Real best_fit_error = get_side_max_abs_value(solution_copy);
+
+              if (best_fit_error > max_err)
+                {
+                  max_err_index = training_index;
+                  max_err = best_fit_error;
+                }
             }
-
-          // Now compute the best fit by an LU solve
-          DenseMatrix<Number> RB_inner_product_matrix_N(RB_size);
-          _eim_projection_matrix.get_principal_submatrix(RB_size, RB_inner_product_matrix_N);
-
-          DenseVector<Number> best_fit_coeffs;
-          RB_inner_product_matrix_N.lu_solve(best_fit_rhs, best_fit_coeffs);
-
-          get_rb_eim_evaluation().decrement_vector(solution_copy, best_fit_coeffs);
-          Real best_fit_error = get_max_abs_value(solution_copy);
-
-          if (best_fit_error > max_err)
+          else
             {
-              max_err_index = training_index;
-              max_err = best_fit_error;
+              // Make a copy of the pre-computed solution for the specified training sample
+              // since we will modify it below to compute the best fit error.
+              QpDataMap solution_copy = _local_parametrized_functions_for_training[training_index];
+
+              // Perform an L2 projection in order to find the best approximation to
+              // the parametrized function from the current EIM space.
+              DenseVector<Number> best_fit_rhs(RB_size);
+              for (unsigned int i=0; i<RB_size; i++)
+                {
+                  best_fit_rhs(i) = inner_product(solution_copy, get_rb_eim_evaluation().get_basis_function(i));
+                }
+
+              // Now compute the best fit by an LU solve
+              DenseMatrix<Number> RB_inner_product_matrix_N(RB_size);
+              _eim_projection_matrix.get_principal_submatrix(RB_size, RB_inner_product_matrix_N);
+
+              DenseVector<Number> best_fit_coeffs;
+              RB_inner_product_matrix_N.lu_solve(best_fit_rhs, best_fit_coeffs);
+
+              get_rb_eim_evaluation().decrement_vector(solution_copy, best_fit_coeffs);
+              Real best_fit_error = get_max_abs_value(solution_copy);
+
+              if (best_fit_error > max_err)
+                {
+                  max_err_index = training_index;
+                  max_err = best_fit_error;
+                }
             }
         }
     }
@@ -606,14 +672,29 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
         {
           const DenseVector<Number> & best_fit_coeffs = rb_eim_solutions[training_index];
 
-          QpDataMap solution_copy = _local_parametrized_functions_for_training[training_index];
-          get_rb_eim_evaluation().decrement_vector(solution_copy, best_fit_coeffs);
-          Real best_fit_error = get_max_abs_value(solution_copy);
-
-          if (best_fit_error > max_err)
+          if (get_rb_eim_evaluation().get_parametrized_function().on_mesh_sides())
             {
-              max_err_index = training_index;
-              max_err = best_fit_error;
+              SideQpDataMap solution_copy = _local_side_parametrized_functions_for_training[training_index];
+              get_rb_eim_evaluation().side_decrement_vector(solution_copy, best_fit_coeffs);
+              Real best_fit_error = get_side_max_abs_value(solution_copy);
+
+              if (best_fit_error > max_err)
+                {
+                  max_err_index = training_index;
+                  max_err = best_fit_error;
+                }
+            }
+          else
+            {
+              QpDataMap solution_copy = _local_parametrized_functions_for_training[training_index];
+              get_rb_eim_evaluation().decrement_vector(solution_copy, best_fit_coeffs);
+              Real best_fit_error = get_max_abs_value(solution_copy);
+
+              if (best_fit_error > max_err)
+                {
+                  max_err_index = training_index;
+                  max_err = best_fit_error;
+                }
             }
         }
     }
@@ -947,9 +1028,72 @@ RBEIMConstruction::inner_product(const QpDataMap & v, const QpDataMap & w)
   return val;
 }
 
+Number
+RBEIMConstruction::side_inner_product(const SideQpDataMap & v, const SideQpDataMap & w)
+{
+  LOG_SCOPE("side_inner_product()", "RBEIMConstruction");
+
+  Number val = 0.;
+
+  for (const auto & pr : v)
+    {
+      auto elem_and_side = pr.first;
+      const auto & v_comp_and_qp = pr.second;
+
+      const auto & w_comp_and_qp = libmesh_map_find(w, elem_and_side);
+      const auto & JxW = libmesh_map_find(_local_side_quad_point_JxW, elem_and_side);
+
+      for (const auto & comp : index_range(v_comp_and_qp))
+        {
+          const std::vector<Number> & v_qp = v_comp_and_qp[comp];
+          const std::vector<Number> & w_qp = w_comp_and_qp[comp];
+
+          for (unsigned int qp : index_range(JxW))
+            val += JxW[qp] * v_qp[qp] * libmesh_conj(w_qp[qp]);
+        }
+    }
+
+  comm().sum(val);
+  return val;
+}
+
 Real RBEIMConstruction::get_max_abs_value(const QpDataMap & v) const
 {
   LOG_SCOPE("get_max_abs_value()", "RBEIMConstruction");
+
+  Real max_value = 0.;
+
+  for (const auto & pr : v)
+    {
+      const auto & v_comp_and_qp = pr.second;
+
+      for (const auto & comp : index_range(v_comp_and_qp))
+        {
+          // If scale_components_in_enrichment() returns true then we
+          // apply a scaling to give an approximately uniform scaling
+          // for all components.
+          Real comp_scaling = 1.;
+          if (get_rb_eim_evaluation().scale_components_in_enrichment())
+            {
+              // Make sure that _component_scaling_in_training_set is initialized
+              libmesh_error_msg_if(comp >= _component_scaling_in_training_set.size(),
+                                   "Invalid vector index");
+              comp_scaling = _component_scaling_in_training_set[comp];
+            }
+
+          const std::vector<Number> & v_qp = v_comp_and_qp[comp];
+          for (Number value : v_qp)
+            max_value = std::max(max_value, std::abs(value * comp_scaling));
+        }
+    }
+
+  comm().max(max_value);
+  return max_value;
+}
+
+Real RBEIMConstruction::get_side_max_abs_value(const SideQpDataMap & v) const
+{
+  LOG_SCOPE("get_side_max_abs_value()", "RBEIMConstruction");
 
   Real max_value = 0.;
 

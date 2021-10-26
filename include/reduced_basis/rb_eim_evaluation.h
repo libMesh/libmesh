@@ -197,7 +197,7 @@ public:
   /**
    * Same as get_parametrized_function_value() except for side data.
    */
-  static Number get_parametrized_side_function_value(
+  static Number get_parametrized_function_side_value(
     const Parallel::Communicator & comm,
     const SideQpDataMap & pf,
     dof_id_type elem_id,

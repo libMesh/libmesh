@@ -382,7 +382,7 @@ Number RBEIMEvaluation::get_parametrized_function_value(
   return value;
 }
 
-Number RBEIMEvaluation::get_parametrized_side_function_value(
+Number RBEIMEvaluation::get_parametrized_function_side_value(
   const Parallel::Communicator & comm,
   const SideQpDataMap & pf,
   dof_id_type elem_id,
@@ -463,7 +463,7 @@ Number RBEIMEvaluation::get_eim_basis_function_side_value(unsigned int basis_fun
   libmesh_error_msg_if(basis_function_index >= _local_side_eim_basis_functions.size(),
                        "Invalid side basis function index: " << basis_function_index);
 
-  return get_parametrized_side_function_value(
+  return get_parametrized_function_side_value(
     comm(),
     _local_side_eim_basis_functions[basis_function_index],
     elem_id,
