@@ -181,10 +181,6 @@ void MeshTools::Modification::permute_elements(MeshBase & mesh)
 
       elem->permute(perm);
     }
-
-  // Neighbor links need to be cleared and reassigned to their new
-  // sides
-  mesh.find_neighbors();
 }
 
 
