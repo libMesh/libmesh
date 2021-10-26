@@ -117,7 +117,7 @@ public:
                                        unsigned int qp,
                                        subdomain_id_type subdomain_id,
                                        const std::vector<Point> & xyz_perturb,
-                                       const std::vector<Real> & phi_i_qp) = 0;
+                                       const std::vector<Real> & phi_i_qp);
 
   /**
    * Same as evaluate() but for element sides.
@@ -130,7 +130,7 @@ public:
                                             subdomain_id_type subdomain_id,
                                             boundary_id_type boundary_id,
                                             const std::vector<Point> & xyz_perturb,
-                                            const std::vector<Real> & phi_i_qp) = 0;
+                                            const std::vector<Real> & phi_i_qp);
 
   /**
    * Vectorized version of evaluate. If requires_xyz_perturbations==false, then all_xyz_perturb will not be used.
