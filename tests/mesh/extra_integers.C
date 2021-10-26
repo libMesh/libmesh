@@ -229,6 +229,8 @@ public:
     const auto & node_num_map = exreader.get_node_num_map();
 
     // This mesh has trivial elem_num_map and node_num_map
+    CPPUNIT_ASSERT_EQUAL(int(elem_num_map.size()), 9);
+    CPPUNIT_ASSERT_EQUAL(int(node_num_map.size()), 16);
     for (int i=0; i != 9; ++i)
       CPPUNIT_ASSERT_EQUAL(elem_num_map[i], i+1);
     for (int i=0; i != 16; ++i)
