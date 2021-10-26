@@ -392,6 +392,7 @@ InfHex8::permute(unsigned int perm_num)
     {
       swap4nodes(0,1,2,3);
       swap4nodes(4,5,6,7);
+      swap4neighbors(1,2,3,4);
     }
 }
 

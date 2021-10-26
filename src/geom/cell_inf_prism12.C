@@ -577,6 +577,7 @@ InfPrism12::permute(unsigned int perm_num)
       swap3nodes(3,4,5);
       swap3nodes(6,7,8);
       swap3nodes(9,10,11);
+      swap3neighbors(1,2,3);
     }
 }
 

@@ -1845,12 +1845,32 @@ protected:
   }
 
   /**
+   * Swaps two neighbor_ptrs
+   */
+  void swap2neighbors(unsigned int n1, unsigned int n2)
+  {
+    Elem * temp = this->neighbor_ptr(n1);
+    this->set_neighbor(n1, this->neighbor_ptr(n2));
+    this->set_neighbor(n2, temp);
+  }
+
+  /**
    * Swaps three node_ptrs, "rotating" them.
    */
   void swap3nodes(unsigned int n1, unsigned int n2, unsigned int n3)
   {
     swap2nodes(n1, n2);
     swap2nodes(n2, n3);
+  }
+
+  /**
+   * Swaps three neighbor_ptrs, "rotating" them.
+   */
+  void swap3neighbors(unsigned int n1, unsigned int n2,
+                      unsigned int n3)
+  {
+    swap2neighbors(n1, n2);
+    swap2neighbors(n2, n3);
   }
 
   /**
@@ -1862,6 +1882,17 @@ protected:
     swap3nodes(n1, n2, n3);
     swap2nodes(n3, n4);
   }
+
+  /**
+   * Swaps four neighbor_ptrs, "rotating" them.
+   */
+  void swap4neighbors(unsigned int n1, unsigned int n2,
+                      unsigned int n3, unsigned int n4)
+  {
+    swap3neighbors(n1, n2, n3);
+    swap2neighbors(n3, n4);
+  }
+
 
   /**
    * An implementation for simple (all sides equal) elements

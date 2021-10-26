@@ -1202,6 +1202,7 @@ Hex27::permute(unsigned int perm_num)
       swap4nodes(12,13,14,15);
       swap4nodes(16,17,18,19);
       swap4nodes(21,22,23,24);
+      swap4neighbors(1,2,3,4);
     }
 
   switch (side) {
@@ -1214,6 +1215,7 @@ Hex27::permute(unsigned int perm_num)
     swap4nodes(2,6,5,1);
     swap4nodes(9,14,17,13);
     swap4nodes(20,23,25,21);
+    swap4neighbors(0,3,5,1);
     break;
   case 2:
     swap4nodes(0,4,5,1);
@@ -1222,6 +1224,7 @@ Hex27::permute(unsigned int perm_num)
     swap4nodes(10,15,18,14);
     swap4nodes(11,19,17,9);
     swap4nodes(20,24,25,22);
+    swap4neighbors(0,4,5,2);
     break;
   case 3:
     swap4nodes(0,4,7,3);
@@ -1230,6 +1233,7 @@ Hex27::permute(unsigned int perm_num)
     swap4nodes(1,5,6,2);
     swap4nodes(13,17,14,9);
     swap4nodes(20,21,25,23);
+    swap4neighbors(0,1,5,3);
     break;
   case 4:
     swap4nodes(1,5,4,0);
@@ -1238,6 +1242,7 @@ Hex27::permute(unsigned int perm_num)
     swap4nodes(2,6,7,3);
     swap4nodes(10,14,18,15);
     swap4nodes(20,22,25,24);
+    swap4neighbors(0,2,5,4);
     break;
   case 5:
     swap2nodes(0,7);
@@ -1252,6 +1257,8 @@ Hex27::permute(unsigned int perm_num)
     swap2nodes(13,14);
     swap2nodes(20,25);
     swap2nodes(21,23);
+    swap2neighbors(0,5);
+    swap2neighbors(1,3);
     break;
   default:
     libmesh_error();

@@ -331,6 +331,7 @@ void Pyramid5::permute(unsigned int perm_num)
   for (unsigned int i = 0; i != perm_num; ++i)
     {
       swap4nodes(0,1,2,3);
+      swap4neighbors(0,1,2,3);
     }
 }
 

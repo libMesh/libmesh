@@ -516,6 +516,7 @@ void Quad9::permute(unsigned int perm_num)
     {
       swap4nodes(0,1,2,3);
       swap4nodes(4,5,6,7);
+      swap4neighbors(0,1,2,3);
     }
 }
 

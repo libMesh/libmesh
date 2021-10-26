@@ -719,6 +719,7 @@ Hex20::permute(unsigned int perm_num)
       swap4nodes(8,9,10,11);
       swap4nodes(12,13,14,15);
       swap4nodes(16,17,18,19);
+      swap4neighbors(1,2,3,4);
     }
 
   switch (side) {
@@ -730,6 +731,7 @@ Hex20::permute(unsigned int perm_num)
     swap4nodes(10,18,16,8);
     swap4nodes(2,6,5,1);
     swap4nodes(9,14,17,13);
+    swap4neighbors(0,3,5,1);
     break;
   case 2:
     swap4nodes(0,4,5,1);
@@ -737,6 +739,7 @@ Hex20::permute(unsigned int perm_num)
     swap4nodes(3,7,6,2);
     swap4nodes(10,15,18,14);
     swap4nodes(11,19,17,9);
+    swap4neighbors(0,4,5,2);
     break;
   case 3:
     swap4nodes(0,4,7,3);
@@ -744,6 +747,7 @@ Hex20::permute(unsigned int perm_num)
     swap4nodes(8,16,18,10);
     swap4nodes(1,5,6,2);
     swap4nodes(13,17,14,9);
+    swap4neighbors(0,1,5,3);
     break;
   case 4:
     swap4nodes(1,5,4,0);
@@ -751,6 +755,7 @@ Hex20::permute(unsigned int perm_num)
     swap4nodes(9,17,19,11);
     swap4nodes(2,6,7,3);
     swap4nodes(10,14,18,15);
+    swap4neighbors(0,2,5,4);
     break;
   case 5:
     swap2nodes(0,7);
@@ -763,6 +768,8 @@ Hex20::permute(unsigned int perm_num)
     swap2nodes(12,15);
     swap2nodes(9,17);
     swap2nodes(13,14);
+    swap2neighbors(0,5);
+    swap2neighbors(1,3);
     break;
   default:
     libmesh_error();

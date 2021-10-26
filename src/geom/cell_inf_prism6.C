@@ -382,6 +382,7 @@ InfPrism6::permute(unsigned int perm_num)
     {
       swap3nodes(0,1,2);
       swap3nodes(3,4,5);
+      swap3neighbors(1,2,3);
     }
 }
 
