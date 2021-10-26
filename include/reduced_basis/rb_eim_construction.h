@@ -273,7 +273,39 @@ private:
    * Get the maximum absolute value from a vector stored in the format that we use
    * for basis functions.
    */
-  Real get_max_abs_value(const QpDataMap & v) const;
+  template <class DataMap>
+  Real get_max_abs_value(const DataMap & v) const
+  {
+    Real max_value = 0.;
+
+    for (const auto & pr : v)
+      {
+        const auto & v_comp_and_qp = pr.second;
+
+        for (const auto & comp : index_range(v_comp_and_qp))
+          {
+            // If scale_components_in_enrichment() returns true then we
+            // apply a scaling to give an approximately uniform scaling
+            // for all components.
+            Real comp_scaling = 1.;
+            if (get_rb_eim_evaluation().scale_components_in_enrichment())
+              {
+                // Make sure that _component_scaling_in_training_set is initialized
+                libmesh_error_msg_if(comp >= _component_scaling_in_training_set.size(),
+                                    "Invalid vector index");
+                comp_scaling = _component_scaling_in_training_set[comp];
+              }
+
+            const std::vector<Number> & v_qp = v_comp_and_qp[comp];
+            for (Number value : v_qp)
+              max_value = std::max(max_value, std::abs(value * comp_scaling));
+          }
+      }
+
+    comm().max(max_value);
+    return max_value;
+  }
+
 
   /**
    * Same as get_max_abs_value() except for side data.
@@ -302,9 +334,25 @@ private:
   /**
    * Scale all values in \p pf by \p scaling_factor
    */
-  static void scale_parametrized_function(
-    QpDataMap & local_pf,
-    Number scaling_factor);
+  template<class DataMap>
+  static void scale_parametrized_function(DataMap & local_pf,
+                                          Number scaling_factor)
+  {
+    for (auto & pr : local_pf)
+      {
+        auto & comp_and_qp = pr.second;
+
+        for (unsigned int comp : index_range(comp_and_qp))
+          {
+            std::vector<Number> & qp_values = comp_and_qp[comp];
+
+            for (unsigned int qp : index_range(qp_values))
+              {
+                qp_values[qp] *= scaling_factor;
+              }
+          }
+      }
+  }
 
   /**
    * Same as scale_parametrized_function() excecpt for side data.

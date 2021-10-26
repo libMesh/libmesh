@@ -614,7 +614,7 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
               RB_inner_product_matrix_N.lu_solve(best_fit_rhs, best_fit_coeffs);
 
               get_rb_eim_evaluation().side_decrement_vector(solution_copy, best_fit_coeffs);
-              Real best_fit_error = get_side_max_abs_value(solution_copy);
+              Real best_fit_error = get_max_abs_value(solution_copy);
 
               if (best_fit_error > max_err)
                 {
@@ -676,7 +676,7 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
             {
               SideQpDataMap solution_copy = _local_side_parametrized_functions_for_training[training_index];
               get_rb_eim_evaluation().side_decrement_vector(solution_copy, best_fit_coeffs);
-              Real best_fit_error = get_side_max_abs_value(solution_copy);
+              Real best_fit_error = get_max_abs_value(solution_copy);
 
               if (best_fit_error > max_err)
                 {
@@ -856,111 +856,247 @@ void RBEIMConstruction::initialize_qp_data()
   FEMContext context(*this);
   init_context(context);
 
-  FEBase * elem_fe = nullptr;
-  context.get_element_fe( 0, elem_fe );
-  const std::vector<Real> & JxW = elem_fe->get_JxW();
-  const std::vector<Point> & xyz = elem_fe->get_xyz();
-
-  _local_quad_point_locations.clear();
-  _local_quad_point_subdomain_ids.clear();
-  _local_quad_point_JxW.clear();
-
-  _local_quad_point_locations_perturbations.clear();
-
-  for (const auto & elem : mesh.active_local_element_ptr_range())
+  if (get_rb_eim_evaluation().get_parametrized_function().on_mesh_sides())
     {
-      dof_id_type elem_id = elem->id();
+      const std::set<boundary_id_type> & parametrized_function_boundary_ids =
+        get_rb_eim_evaluation().get_parametrized_function().get_parametrized_function_boundary_ids();
+      libmesh_error_msg_if (parametrized_function_boundary_ids.empty(),
+                            "Need to have non-empty boundary IDs to initialize side data");
 
-      context.pre_fe_reinit(*this, elem);
-      context.elem_fe_reinit();
+      FEBase* side_fe = nullptr;
+      context.get_side_fe( 0, side_fe );
 
-      _local_quad_point_locations[elem_id] = xyz;
-      _local_quad_point_JxW[elem_id] = JxW;
-      _local_quad_point_subdomain_ids[elem_id] = elem->subdomain_id();
+      const std::vector<Real> & JxW_side = side_fe->get_JxW();
+      const std::vector< Point > & xyz_side = side_fe->get_xyz();
 
-      if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
+      _local_side_quad_point_locations.clear();
+      _local_side_quad_point_boundary_ids.clear();
+      _local_side_quad_point_JxW.clear();
+
+      _local_side_quad_point_locations_perturbations.clear();
+
+      // BoundaryInfo and related data structures
+      const auto & binfo = mesh.get_boundary_info();
+      std::vector<boundary_id_type> side_boundary_ids;
+
+      for (const auto & elem : mesh.active_local_element_ptr_range())
         {
-          Real fd_delta = get_rb_eim_evaluation().get_parametrized_function().fd_delta;
+          dof_id_type elem_id = elem->id();
 
-          std::vector<std::vector<Point>> xyz_perturb_vec_at_qps;
+          context.pre_fe_reinit(*this, elem);
 
-          for (const Point & xyz_qp : xyz)
+          for (context.side = 0;
+               context.side != context.get_elem().n_sides();
+               ++context.side)
             {
-              std::vector<Point> xyz_perturb_vec;
-              if (elem->dim() == 3)
+              // skip non-boundary elements
+              if(!context.get_elem().neighbor_ptr(context.side))
                 {
-                  Point xyz_perturb = xyz_qp;
+                  binfo.boundary_ids(elem, context.side, side_boundary_ids);
 
-                  xyz_perturb(0) += fd_delta;
-                  xyz_perturb_vec.emplace_back(xyz_perturb);
-                  xyz_perturb(0) -= fd_delta;
+                  bool has_side_boundary_id = false;
+                  boundary_id_type matching_boundary_id = BoundaryInfo::invalid_id;
+                  for(boundary_id_type side_boundary_id : side_boundary_ids)
+                    if(parametrized_function_boundary_ids.count(side_boundary_id))
+                      {
+                        has_side_boundary_id = true;
+                        matching_boundary_id = side_boundary_id;
+                        break;
+                      }
 
-                  xyz_perturb(1) += fd_delta;
-                  xyz_perturb_vec.emplace_back(xyz_perturb);
-                  xyz_perturb(1) -= fd_delta;
+                  if(has_side_boundary_id)
+                  {
+                    context.get_side_fe(/*var=*/0, elem->dim())->reinit(elem, context.side);
 
-                  xyz_perturb(2) += fd_delta;
-                  xyz_perturb_vec.emplace_back(xyz_perturb);
-                  xyz_perturb(2) -= fd_delta;
+                    auto elem_side_pair = std::make_pair(elem_id, context.side);
+
+                    _local_side_quad_point_locations[elem_side_pair] = xyz_side;
+                    _local_side_quad_point_JxW[elem_side_pair] = JxW_side;
+                    _local_side_quad_point_boundary_ids[elem_side_pair] = matching_boundary_id;
+
+                    if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
+                      {
+                        Real fd_delta = get_rb_eim_evaluation().get_parametrized_function().fd_delta;
+
+                        std::vector<std::vector<Point>> xyz_perturb_vec_at_qps;
+
+                        for (const Point & xyz_qp : xyz_side)
+                          {
+                            std::vector<Point> xyz_perturb_vec;
+                            if (elem->dim() == 3)
+                              {
+                                // In this case we have a 3D element, and hence the side is 2D.
+                                //
+                                // We use the following approach to perturb xyz:
+                                //  1) inverse map xyz to the reference element
+                                //  2) perturb on the reference element in the (xi,eta) "directions"
+                                //  3) map the perturbed points back to the physical element
+                                // This approach is necessary to ensure that the perturbed points
+                                // are still in the element's side.
+
+                                std::unique_ptr<const Elem> elem_side;
+                                elem->build_side_ptr(elem_side, context.side);
+
+                                Point xi_eta =
+                                  FEMap::inverse_map(elem_side->dim(),
+                                                    elem_side.get(),
+                                                    xyz_qp,
+                                                    /*Newton iteration tolerance*/ TOLERANCE,
+                                                    /*secure*/ true);
+
+                                // Inverse map should map back to a 2D reference domain
+                                libmesh_assert(std::abs(xi_eta(2)) < TOLERANCE);
+
+                                Point xi_eta_perturb = xi_eta;
+
+                                xi_eta_perturb(0) += fd_delta;
+                                Point xyz_perturb_0 =
+                                  FEMap::map(elem_side->dim(),
+                                            elem_side.get(),
+                                            xi_eta_perturb);
+                                xi_eta_perturb(0) -= fd_delta;
+
+                                xi_eta_perturb(1) += fd_delta;
+                                Point xyz_perturb_1 =
+                                  FEMap::map(elem_side->dim(),
+                                            elem_side.get(),
+                                            xi_eta_perturb);
+                                xi_eta_perturb(1) -= fd_delta;
+
+                                // Finally, we rescale xyz_perturb_0 and xyz_perturb_1 so that
+                                // (xyz_perturb - xyz_qp).norm() == fd_delta, since this is
+                                // required in order to compute finite differences correctly.
+                                Point unit_0 = (xyz_perturb_0-xyz_qp).unit();
+                                Point unit_1 = (xyz_perturb_1-xyz_qp).unit();
+
+                                xyz_perturb_vec.emplace_back(xyz_qp + fd_delta*unit_0);
+                                xyz_perturb_vec.emplace_back(xyz_qp + fd_delta*unit_1);
+                              }
+                            else
+                              {
+                                // We current do nothing for sides of dim=2 or dim=1 elements
+                                // since we have no need for this capability so far.
+                                // Support for these cases could be added if it is needed.
+                              }
+
+                            xyz_perturb_vec_at_qps.emplace_back(xyz_perturb_vec);
+                          }
+
+                        _local_side_quad_point_locations_perturbations[elem_side_pair] = xyz_perturb_vec_at_qps;
+                      }
+                  }
                 }
-              else if (elem->dim() == 2)
-                {
-                  // In this case we assume that we have a 2D element
-                  // embedded in 3D space. In this case we have to use
-                  // the following approach to perturb xyz:
-                  //  1) inverse map xyz to the reference element
-                  //  2) perturb on the reference element in the (xi,eta) "directions"
-                  //  3) map the perturbed points back to the physical element
-                  // This approach is necessary to ensure that the perturbed points
-                  // are still in the element.
-
-                  Point xi_eta =
-                    FEMap::inverse_map(elem->dim(),
-                                      elem,
-                                      xyz_qp,
-                                      /*Newton iteration tolerance*/ TOLERANCE,
-                                      /*secure*/ true);
-
-                  // Inverse map should map back to a 2D reference domain
-                  libmesh_assert(std::abs(xi_eta(2)) < TOLERANCE);
-
-                  Point xi_eta_perturb = xi_eta;
-
-                  xi_eta_perturb(0) += fd_delta;
-                  Point xyz_perturb_0 =
-                    FEMap::map(elem->dim(),
-                               elem,
-                               xi_eta_perturb);
-                  xi_eta_perturb(0) -= fd_delta;
-
-                  xi_eta_perturb(1) += fd_delta;
-                  Point xyz_perturb_1 =
-                    FEMap::map(elem->dim(),
-                               elem,
-                               xi_eta_perturb);
-                  xi_eta_perturb(1) -= fd_delta;
-
-                  // Finally, we rescale xyz_perturb_0 and xyz_perturb_1 so that
-                  // (xyz_perturb - xyz_qp).norm() == fd_delta, since this is
-                  // required in order to compute finite differences correctly.
-                  Point unit_0 = (xyz_perturb_0-xyz_qp).unit();
-                  Point unit_1 = (xyz_perturb_1-xyz_qp).unit();
-
-                  xyz_perturb_vec.emplace_back(xyz_qp + fd_delta*unit_0);
-                  xyz_perturb_vec.emplace_back(xyz_qp + fd_delta*unit_1);
-                }
-              else
-                {
-                  // We current do nothing in the dim=1 case since
-                  // we have no need for this capability so far.
-                  // Support for this case could be added if it is
-                  // needed.
-                }
-
-              xyz_perturb_vec_at_qps.emplace_back(xyz_perturb_vec);
             }
+        }
+    }
+  else
+    {
+      FEBase * elem_fe = nullptr;
+      context.get_element_fe( 0, elem_fe );
+      const std::vector<Real> & JxW = elem_fe->get_JxW();
+      const std::vector<Point> & xyz = elem_fe->get_xyz();
 
-          _local_quad_point_locations_perturbations[elem_id] = xyz_perturb_vec_at_qps;
+      _local_quad_point_locations.clear();
+      _local_quad_point_subdomain_ids.clear();
+      _local_quad_point_JxW.clear();
+
+      _local_quad_point_locations_perturbations.clear();
+
+      for (const auto & elem : mesh.active_local_element_ptr_range())
+        {
+          dof_id_type elem_id = elem->id();
+
+          context.pre_fe_reinit(*this, elem);
+          context.elem_fe_reinit();
+
+          _local_quad_point_locations[elem_id] = xyz;
+          _local_quad_point_JxW[elem_id] = JxW;
+          _local_quad_point_subdomain_ids[elem_id] = elem->subdomain_id();
+
+          if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
+            {
+              Real fd_delta = get_rb_eim_evaluation().get_parametrized_function().fd_delta;
+
+              std::vector<std::vector<Point>> xyz_perturb_vec_at_qps;
+
+              for (const Point & xyz_qp : xyz)
+                {
+                  std::vector<Point> xyz_perturb_vec;
+                  if (elem->dim() == 3)
+                    {
+                      Point xyz_perturb = xyz_qp;
+
+                      xyz_perturb(0) += fd_delta;
+                      xyz_perturb_vec.emplace_back(xyz_perturb);
+                      xyz_perturb(0) -= fd_delta;
+
+                      xyz_perturb(1) += fd_delta;
+                      xyz_perturb_vec.emplace_back(xyz_perturb);
+                      xyz_perturb(1) -= fd_delta;
+
+                      xyz_perturb(2) += fd_delta;
+                      xyz_perturb_vec.emplace_back(xyz_perturb);
+                      xyz_perturb(2) -= fd_delta;
+                    }
+                  else if (elem->dim() == 2)
+                    {
+                      // In this case we assume that we have a 2D element
+                      // embedded in 3D space. In this case we have to use
+                      // the following approach to perturb xyz:
+                      //  1) inverse map xyz to the reference element
+                      //  2) perturb on the reference element in the (xi,eta) "directions"
+                      //  3) map the perturbed points back to the physical element
+                      // This approach is necessary to ensure that the perturbed points
+                      // are still in the element.
+
+                      Point xi_eta =
+                        FEMap::inverse_map(elem->dim(),
+                                          elem,
+                                          xyz_qp,
+                                          /*Newton iteration tolerance*/ TOLERANCE,
+                                          /*secure*/ true);
+
+                      // Inverse map should map back to a 2D reference domain
+                      libmesh_assert(std::abs(xi_eta(2)) < TOLERANCE);
+
+                      Point xi_eta_perturb = xi_eta;
+
+                      xi_eta_perturb(0) += fd_delta;
+                      Point xyz_perturb_0 =
+                        FEMap::map(elem->dim(),
+                                  elem,
+                                  xi_eta_perturb);
+                      xi_eta_perturb(0) -= fd_delta;
+
+                      xi_eta_perturb(1) += fd_delta;
+                      Point xyz_perturb_1 =
+                        FEMap::map(elem->dim(),
+                                  elem,
+                                  xi_eta_perturb);
+                      xi_eta_perturb(1) -= fd_delta;
+
+                      // Finally, we rescale xyz_perturb_0 and xyz_perturb_1 so that
+                      // (xyz_perturb - xyz_qp).norm() == fd_delta, since this is
+                      // required in order to compute finite differences correctly.
+                      Point unit_0 = (xyz_perturb_0-xyz_qp).unit();
+                      Point unit_1 = (xyz_perturb_1-xyz_qp).unit();
+
+                      xyz_perturb_vec.emplace_back(xyz_qp + fd_delta*unit_0);
+                      xyz_perturb_vec.emplace_back(xyz_qp + fd_delta*unit_1);
+                    }
+                  else
+                    {
+                      // We current do nothing in the dim=1 case since
+                      // we have no need for this capability so far.
+                      // Support for this case could be added if it is
+                      // needed.
+                    }
+
+                  xyz_perturb_vec_at_qps.emplace_back(xyz_perturb_vec);
+                }
+
+              _local_quad_point_locations_perturbations[elem_id] = xyz_perturb_vec_at_qps;
+            }
         }
     }
 }
@@ -975,6 +1111,9 @@ void RBEIMConstruction::initialize_observation_points_data(
 
   if (eim_eval.get_n_observation_points() == 0)
     return;
+
+  libmesh_error_msg_if (eim_eval.get_parametrized_function().on_mesh_sides(),
+                        "initialize_observation_points_data() not currently supported for data on element sides");
 
   libMesh::out << "Initializing observation point locations" << std::endl;
 
@@ -1055,74 +1194,6 @@ RBEIMConstruction::side_inner_product(const SideQpDataMap & v, const SideQpDataM
 
   comm().sum(val);
   return val;
-}
-
-Real RBEIMConstruction::get_max_abs_value(const QpDataMap & v) const
-{
-  LOG_SCOPE("get_max_abs_value()", "RBEIMConstruction");
-
-  Real max_value = 0.;
-
-  for (const auto & pr : v)
-    {
-      const auto & v_comp_and_qp = pr.second;
-
-      for (const auto & comp : index_range(v_comp_and_qp))
-        {
-          // If scale_components_in_enrichment() returns true then we
-          // apply a scaling to give an approximately uniform scaling
-          // for all components.
-          Real comp_scaling = 1.;
-          if (get_rb_eim_evaluation().scale_components_in_enrichment())
-            {
-              // Make sure that _component_scaling_in_training_set is initialized
-              libmesh_error_msg_if(comp >= _component_scaling_in_training_set.size(),
-                                   "Invalid vector index");
-              comp_scaling = _component_scaling_in_training_set[comp];
-            }
-
-          const std::vector<Number> & v_qp = v_comp_and_qp[comp];
-          for (Number value : v_qp)
-            max_value = std::max(max_value, std::abs(value * comp_scaling));
-        }
-    }
-
-  comm().max(max_value);
-  return max_value;
-}
-
-Real RBEIMConstruction::get_side_max_abs_value(const SideQpDataMap & v) const
-{
-  LOG_SCOPE("get_side_max_abs_value()", "RBEIMConstruction");
-
-  Real max_value = 0.;
-
-  for (const auto & pr : v)
-    {
-      const auto & v_comp_and_qp = pr.second;
-
-      for (const auto & comp : index_range(v_comp_and_qp))
-        {
-          // If scale_components_in_enrichment() returns true then we
-          // apply a scaling to give an approximately uniform scaling
-          // for all components.
-          Real comp_scaling = 1.;
-          if (get_rb_eim_evaluation().scale_components_in_enrichment())
-            {
-              // Make sure that _component_scaling_in_training_set is initialized
-              libmesh_error_msg_if(comp >= _component_scaling_in_training_set.size(),
-                                   "Invalid vector index");
-              comp_scaling = _component_scaling_in_training_set[comp];
-            }
-
-          const std::vector<Number> & v_qp = v_comp_and_qp[comp];
-          for (Number value : v_qp)
-            max_value = std::max(max_value, std::abs(value * comp_scaling));
-        }
-    }
-
-  comm().max(max_value);
-  return max_value;
 }
 
 void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
@@ -1342,28 +1413,6 @@ void RBEIMConstruction::update_eim_matrices()
                                               eim_eval.get_interpolation_points_qp(RB_size-1));
       eim_eval.set_interpolation_matrix_entry(RB_size-1, j, value);
 
-    }
-}
-
-void RBEIMConstruction::scale_parametrized_function(
-    QpDataMap & local_pf,
-    Number scaling_factor)
-{
-  LOG_SCOPE("scale_parametrized_function()", "RBEIMConstruction");
-
-  for (auto & pr : local_pf)
-    {
-      auto & comp_and_qp = pr.second;
-
-      for (unsigned int comp : index_range(comp_and_qp))
-        {
-          std::vector<Number> & qp_values = comp_and_qp[comp];
-
-          for (unsigned int qp : index_range(qp_values))
-            {
-              qp_values[qp] *= scaling_factor;
-            }
-        }
     }
 }
 
