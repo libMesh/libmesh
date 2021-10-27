@@ -86,6 +86,7 @@ void RBEIMConstruction::clear()
   _local_side_parametrized_functions_for_training.clear();
   _local_side_quad_point_locations.clear();
   _local_side_quad_point_JxW.clear();
+  _local_side_quad_point_subdomain_ids.clear();
   _local_side_quad_point_boundary_ids.clear();
 
   _eim_projection_matrix.resize(0,0);
@@ -738,103 +739,180 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
   // are not ignored.
   std::vector<Real> max_abs_value_per_component_in_training_set(n_comps);
 
-  _local_parametrized_functions_for_training.resize( get_n_training_samples() );
-  for (auto i : make_range(get_n_training_samples()))
+  if (eim_eval.get_parametrized_function().on_mesh_sides())
     {
-      libMesh::out << "Initializing parametrized function for training sample "
-        << (i+1) << " of " << get_n_training_samples() << std::endl;
-
-      set_params_from_training_set(i);
-
-      eim_eval.get_parametrized_function().preevaluate_parametrized_function_on_mesh(get_parameters(),
-                                                                                     _local_quad_point_locations,
-                                                                                     _local_quad_point_subdomain_ids,
-                                                                                     _local_quad_point_locations_perturbations,
-                                                                                     *this);
-
-      for (const auto & pr : _local_quad_point_locations)
-      {
-        dof_id_type elem_id = pr.first;
-        const auto & xyz_vector = pr.second;
-
-        std::vector<std::vector<Number>> comps_and_qps(n_comps);
-        for (unsigned int comp=0; comp<n_comps; comp++)
-          {
-            comps_and_qps[comp].resize(xyz_vector.size());
-            for (unsigned int qp : index_range(xyz_vector))
-              {
-                Number value =
-                  eim_eval.get_parametrized_function().lookup_preevaluated_value_on_mesh(comp, elem_id, qp);
-                comps_and_qps[comp][qp] = value;
-
-                Real abs_value = std::abs(value);
-                if (abs_value > _max_abs_value_in_training_set)
-                  {
-                    _max_abs_value_in_training_set = abs_value;
-                    _max_abs_value_in_training_set_index = i;
-                  }
-
-                if (abs_value > max_abs_value_per_component_in_training_set[comp])
-                  max_abs_value_per_component_in_training_set[comp] = abs_value;
-              }
-          }
-
-        _local_parametrized_functions_for_training[i][elem_id] = comps_and_qps;
-      }
-    }
-
-  libMesh::out << "Parametrized functions in training set initialized" << std::endl;
-
-  unsigned int max_id = 0;
-  comm().maxloc(_max_abs_value_in_training_set, max_id);
-  comm().broadcast(_max_abs_value_in_training_set_index, max_id);
-  libMesh::out << "Maximum absolute value in the training set: "
-    << _max_abs_value_in_training_set << std::endl << std::endl;
-
-  // Calculate the maximum value for each component in the training set
-  // across all components
-  comm().max(max_abs_value_per_component_in_training_set);
-
-  // We store the maximum value across all components divided by the maximum value for this component
-  // so that when we scale using these factors all components should have a magnitude on the same
-  // order as the maximum component.
-  _component_scaling_in_training_set.resize(n_comps);
-  for(unsigned int i : make_range(n_comps))
-    {
-      if (max_abs_value_per_component_in_training_set[i] == 0.)
-        _component_scaling_in_training_set[i] = 1.;
-      else
-        _component_scaling_in_training_set[i] = _max_abs_value_in_training_set / max_abs_value_per_component_in_training_set[i];
-    }
-
-  _parametrized_functions_for_training_obs_values.resize( get_n_training_samples() );
-
-  // Finally, we also evaluate the parametrized functions for training at the "observation points"
-  if (eim_eval.get_n_observation_points() > 0)
-    {
-      std::vector<dof_id_type> observation_points_elem_ids;
-      std::vector<subdomain_id_type> observation_points_sbd_ids;
-      initialize_observation_points_data(observation_points_elem_ids, observation_points_sbd_ids);
-
+      _local_side_parametrized_functions_for_training.resize( get_n_training_samples() );
       for (auto i : make_range(get_n_training_samples()))
         {
-          libMesh::out << "Initializing observation values for training sample "
+          libMesh::out << "Initializing parametrized function for training sample "
             << (i+1) << " of " << get_n_training_samples() << std::endl;
 
           set_params_from_training_set(i);
 
-          _parametrized_functions_for_training_obs_values[i] =
-            eim_eval.get_parametrized_function().evaluate_at_observation_points(get_parameters(),
-                                                                                eim_eval.get_observation_points(),
-                                                                                observation_points_elem_ids,
-                                                                                observation_points_sbd_ids,
-                                                                                *this);
+          eim_eval.get_parametrized_function().preevaluate_parametrized_function_on_mesh_sides(get_parameters(),
+                                                                                               _local_side_quad_point_locations,
+                                                                                               _local_side_quad_point_subdomain_ids,
+                                                                                               _local_side_quad_point_boundary_ids,
+                                                                                               _local_side_quad_point_locations_perturbations,
+                                                                                               *this);
 
-          libmesh_error_msg_if(_parametrized_functions_for_training_obs_values[i].size() != eim_eval.get_n_observation_points(),
-                               "Number of observation values should match number of observation points");
+          for (const auto & pr : _local_side_quad_point_locations)
+          {
+            auto elem_side_pair = pr.first;
+            const auto & xyz_vector = pr.second;
+
+            std::vector<std::vector<Number>> comps_and_qps(n_comps);
+            for (unsigned int comp=0; comp<n_comps; comp++)
+              {
+                comps_and_qps[comp].resize(xyz_vector.size());
+                for (unsigned int qp : index_range(xyz_vector))
+                  {
+                    Number value =
+                      eim_eval.get_parametrized_function().lookup_preevaluated_side_value_on_mesh(comp,
+                                                                                                  elem_side_pair.first,
+                                                                                                  elem_side_pair.second,
+                                                                                                  qp);
+                    comps_and_qps[comp][qp] = value;
+
+                    Real abs_value = std::abs(value);
+                    if (abs_value > _max_abs_value_in_training_set)
+                      {
+                        _max_abs_value_in_training_set = abs_value;
+                        _max_abs_value_in_training_set_index = i;
+                      }
+
+                    if (abs_value > max_abs_value_per_component_in_training_set[comp])
+                      max_abs_value_per_component_in_training_set[comp] = abs_value;
+                  }
+              }
+
+            _local_side_parametrized_functions_for_training[i][elem_side_pair] = comps_and_qps;
+          }
+        }
+
+      libMesh::out << "Parametrized functions in training set initialized" << std::endl;
+
+      unsigned int max_id = 0;
+      comm().maxloc(_max_abs_value_in_training_set, max_id);
+      comm().broadcast(_max_abs_value_in_training_set_index, max_id);
+      libMesh::out << "Maximum absolute value in the training set: "
+        << _max_abs_value_in_training_set << std::endl << std::endl;
+
+      // Calculate the maximum value for each component in the training set
+      // across all components
+      comm().max(max_abs_value_per_component_in_training_set);
+
+      // We store the maximum value across all components divided by the maximum value for this component
+      // so that when we scale using these factors all components should have a magnitude on the same
+      // order as the maximum component.
+      _component_scaling_in_training_set.resize(n_comps);
+      for(unsigned int i : make_range(n_comps))
+        {
+          if (max_abs_value_per_component_in_training_set[i] == 0.)
+            _component_scaling_in_training_set[i] = 1.;
+          else
+            _component_scaling_in_training_set[i] = _max_abs_value_in_training_set / max_abs_value_per_component_in_training_set[i];
         }
     }
+  else
+    {
+      _local_parametrized_functions_for_training.resize( get_n_training_samples() );
+      for (auto i : make_range(get_n_training_samples()))
+        {
+          libMesh::out << "Initializing parametrized function for training sample "
+            << (i+1) << " of " << get_n_training_samples() << std::endl;
 
+          set_params_from_training_set(i);
+
+          eim_eval.get_parametrized_function().preevaluate_parametrized_function_on_mesh(get_parameters(),
+                                                                                        _local_quad_point_locations,
+                                                                                        _local_quad_point_subdomain_ids,
+                                                                                        _local_quad_point_locations_perturbations,
+                                                                                        *this);
+
+          for (const auto & pr : _local_quad_point_locations)
+          {
+            dof_id_type elem_id = pr.first;
+            const auto & xyz_vector = pr.second;
+
+            std::vector<std::vector<Number>> comps_and_qps(n_comps);
+            for (unsigned int comp=0; comp<n_comps; comp++)
+              {
+                comps_and_qps[comp].resize(xyz_vector.size());
+                for (unsigned int qp : index_range(xyz_vector))
+                  {
+                    Number value =
+                      eim_eval.get_parametrized_function().lookup_preevaluated_value_on_mesh(comp, elem_id, qp);
+                    comps_and_qps[comp][qp] = value;
+
+                    Real abs_value = std::abs(value);
+                    if (abs_value > _max_abs_value_in_training_set)
+                      {
+                        _max_abs_value_in_training_set = abs_value;
+                        _max_abs_value_in_training_set_index = i;
+                      }
+
+                    if (abs_value > max_abs_value_per_component_in_training_set[comp])
+                      max_abs_value_per_component_in_training_set[comp] = abs_value;
+                  }
+              }
+
+            _local_parametrized_functions_for_training[i][elem_id] = comps_and_qps;
+          }
+        }
+
+      libMesh::out << "Parametrized functions in training set initialized" << std::endl;
+
+      unsigned int max_id = 0;
+      comm().maxloc(_max_abs_value_in_training_set, max_id);
+      comm().broadcast(_max_abs_value_in_training_set_index, max_id);
+      libMesh::out << "Maximum absolute value in the training set: "
+        << _max_abs_value_in_training_set << std::endl << std::endl;
+
+      // Calculate the maximum value for each component in the training set
+      // across all components
+      comm().max(max_abs_value_per_component_in_training_set);
+
+      // We store the maximum value across all components divided by the maximum value for this component
+      // so that when we scale using these factors all components should have a magnitude on the same
+      // order as the maximum component.
+      _component_scaling_in_training_set.resize(n_comps);
+      for(unsigned int i : make_range(n_comps))
+        {
+          if (max_abs_value_per_component_in_training_set[i] == 0.)
+            _component_scaling_in_training_set[i] = 1.;
+          else
+            _component_scaling_in_training_set[i] = _max_abs_value_in_training_set / max_abs_value_per_component_in_training_set[i];
+        }
+
+      _parametrized_functions_for_training_obs_values.resize( get_n_training_samples() );
+
+      // Finally, we also evaluate the parametrized functions for training at the "observation points"
+      if (eim_eval.get_n_observation_points() > 0)
+        {
+          std::vector<dof_id_type> observation_points_elem_ids;
+          std::vector<subdomain_id_type> observation_points_sbd_ids;
+          initialize_observation_points_data(observation_points_elem_ids, observation_points_sbd_ids);
+
+          for (auto i : make_range(get_n_training_samples()))
+            {
+              libMesh::out << "Initializing observation values for training sample "
+                << (i+1) << " of " << get_n_training_samples() << std::endl;
+
+              set_params_from_training_set(i);
+
+              _parametrized_functions_for_training_obs_values[i] =
+                eim_eval.get_parametrized_function().evaluate_at_observation_points(get_parameters(),
+                                                                                    eim_eval.get_observation_points(),
+                                                                                    observation_points_elem_ids,
+                                                                                    observation_points_sbd_ids,
+                                                                                    *this);
+
+              libmesh_error_msg_if(_parametrized_functions_for_training_obs_values[i].size() != eim_eval.get_n_observation_points(),
+                                  "Number of observation values should match number of observation points");
+            }
+        }
+    }
 }
 
 void RBEIMConstruction::initialize_qp_data()
@@ -870,6 +948,7 @@ void RBEIMConstruction::initialize_qp_data()
       const std::vector< Point > & xyz_side = side_fe->get_xyz();
 
       _local_side_quad_point_locations.clear();
+      _local_side_quad_point_subdomain_ids.clear();
       _local_side_quad_point_boundary_ids.clear();
       _local_side_quad_point_JxW.clear();
 
@@ -912,6 +991,7 @@ void RBEIMConstruction::initialize_qp_data()
 
                     _local_side_quad_point_locations[elem_side_pair] = xyz_side;
                     _local_side_quad_point_JxW[elem_side_pair] = JxW_side;
+                    _local_side_quad_point_subdomain_ids[elem_side_pair] = elem->subdomain_id();
                     _local_side_quad_point_boundary_ids[elem_side_pair] = matching_boundary_id;
 
                     if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)

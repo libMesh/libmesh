@@ -458,6 +458,7 @@ private:
    */
   std::map<std::pair<dof_id_type,unsigned int>, std::vector<Point> > _local_side_quad_point_locations;
   std::map<std::pair<dof_id_type,unsigned int>, std::vector<Real> > _local_side_quad_point_JxW;
+  std::map<std::pair<dof_id_type,unsigned int>, subdomain_id_type > _local_side_quad_point_subdomain_ids;
   std::map<std::pair<dof_id_type,unsigned int>, boundary_id_type > _local_side_quad_point_boundary_ids;
   std::map<std::pair<dof_id_type,unsigned int>, std::vector<std::vector<Point>> > _local_side_quad_point_locations_perturbations;
 
