@@ -78,6 +78,12 @@ public:
   virtual ~ExodusII_IO ();
 
   /**
+   * \returns The ExodusII API version, in "nodot" format (e.g. 822
+   * for 8.22), or 0 if ExodusII support is not available.
+   */
+  static int get_exodus_version();
+
+  /**
    * This method implements reading a mesh from a specified file.
    * Open the file named \p name and read the mesh in Sandia National Lab's
    * ExodusII format. This is the method to use for reading in meshes generated

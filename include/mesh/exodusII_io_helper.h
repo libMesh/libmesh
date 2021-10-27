@@ -102,6 +102,12 @@ public:
   ExodusII_IO_Helper & operator= (ExodusII_IO_Helper &&) = delete;
 
   /**
+   * \returns The ExodusII API version, in "nodot" format; e.g. 822
+   * for 8.22
+   */
+  static int get_exodus_version();
+
+  /**
    * \returns The current element type.
    *
    * \note The default behavior is for this value to be in all capital
@@ -153,6 +159,12 @@ public:
    * file.
    */
   void read_node_num_map();
+
+  /**
+   * Reads the optional \p bex_cv_blocks from the \p ExodusII mesh
+   * file.
+   */
+  void read_bex_cv_blocks();
 
   /**
    * Prints the nodal information, by default to \p libMesh::out.
@@ -547,6 +559,10 @@ public:
   // Total number of elements in the mesh
   int & num_elem;
 
+  // Smallest element id which exceeds every element id in the mesh.
+  // (this may exceed num_elem due to mapping)
+  int end_elem_id() const;
+
   // Total number of element blocks
   int & num_elem_blk;
 
@@ -650,6 +666,19 @@ public:
 
   // z locations of node points
   std::vector<Real> z;
+
+  // Spline weights associated with node points, in IGA meshes
+  std::vector<Real> w;
+
+  // Number of Bezier Extraction coefficient vectors in a block
+  unsigned int bex_num_elem_cvs;
+
+  // Bezier Extraction connectivity indices, in IGA meshes
+  std::vector<std::vector<long unsigned int>> bex_cv_conn;
+
+  // Bezier Extraction coefficient vectors, in IGA meshes
+  // bex_dense_constraint_vecs[block_num][vec_num][column_num] = coef
+  std::vector<std::vector<std::vector<Real>>> bex_dense_constraint_vecs;
 
   // Type of element in a given block
   std::vector<char> elem_type;
@@ -779,6 +808,9 @@ protected:
   // spatial dimension, when writing.  By default this is false.
   bool _use_mesh_dimension_instead_of_spatial_dimension;
 
+  // Set once the elem num map has been read
+  int _end_elem_id;
+
   // Use this for num_dim when writing the Exodus file.  If non-zero, supersedes
   // any value set in _use_mesh_dimension_instead_of_spatial_dimension.
   unsigned _write_as_dimension;
@@ -895,6 +927,8 @@ public:
       inverse_shellface_map(nullptr),
       shellface_index_offset(0),
       libmesh_type(INVALID_ELEM),
+      dim(0),
+      n_nodes(0),
       exodus_type("")
   {}
 
@@ -1017,6 +1051,17 @@ public:
   ElemType libmesh_type;
 
   /**
+   * The element dimension; useful since we don't seem to have a cheap
+   * way to look this up from ElemType
+   */
+  int dim;
+
+  /**
+   * The number of nodes per element; useful likewise
+   */
+  int n_nodes;
+
+  /**
    * The string corresponding to the Exodus type for this element
    */
   std::string exodus_type;
@@ -1063,6 +1108,13 @@ private:
   size_t counter;
   size_t table_size;
 };
+
+
+
+inline int ExodusII_IO_Helper::end_elem_id() const {
+  libmesh_assert_equal_to(std::size_t(num_elem), elem_num_map.size());
+  return _end_elem_id;
+}
 
 
 } // namespace libMesh
