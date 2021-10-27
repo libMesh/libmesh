@@ -228,8 +228,7 @@ public:
     {
       ExodusII_IO exii(mesh);
 
-      if (mesh.processor_id() == 0)
-        exii.write("Cube_With_Sidesets_out.e");
+      exii.write("Cube_With_Sidesets_out.e");
     }
   }
 
