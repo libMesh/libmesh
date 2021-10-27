@@ -54,6 +54,9 @@ AC_DEFUN([CONFIGURE_TECIO],
         [
           dnl Set tecio platform-specific compiler flags.
           AS_CASE("${host_os}",
+                  [*bsd*], [TECIO_CPPFLAGS="-DUNIXX $TECIO_CPPFLAGS"
+                            AC_CHECK_SIZEOF([void *])
+                            AS_IF([test "x$ac_cv_sizeof_void_p" = "x8"], [TECIO_CPPFLAGS="-DLONGIS64 $TECIO_CPPFLAGS"])],
                   [*linux*], [TECIO_CPPFLAGS="-DLINUX $TECIO_CPPFLAGS"
                               AC_CHECK_SIZEOF([void *])
                               AS_IF([test "x$ac_cv_sizeof_void_p" = "x8"], [TECIO_CPPFLAGS="-DLINUX64 $TECIO_CPPFLAGS"])],
