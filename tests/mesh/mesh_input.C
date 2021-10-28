@@ -986,8 +986,7 @@ public:
     {
       ExodusII_IO exii(mesh);
 
-      if (mesh.processor_id() == 0)
-        exii.write("exodus_file_mapping_out.e");
+      exii.write("exodus_file_mapping_out.e");
     }
 
   }
