@@ -284,7 +284,7 @@ void RBEIMEvaluation::side_decrement_vector(SideQpDataMap & v,
 
       for (const auto & comp : index_range(v_comp_and_qp))
         for (unsigned int qp : index_range(v_comp_and_qp[comp]))
-          for (unsigned int i : index_range(_local_eim_basis_functions))
+          for (unsigned int i : index_range(_local_side_eim_basis_functions))
             {
               // Check that entry (elem_and_side,comp,qp) exists in _local_side_eim_basis_functions so that
               // we get a clear error message if there is any missing data
