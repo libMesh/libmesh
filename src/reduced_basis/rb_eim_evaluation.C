@@ -237,7 +237,10 @@ unsigned int RBEIMEvaluation::get_n_basis_functions() const
 
 void RBEIMEvaluation::set_n_basis_functions(unsigned int n_bfs)
 {
-  _local_eim_basis_functions.resize(n_bfs);
+  if (get_parametrized_function().on_mesh_sides())
+    _local_side_eim_basis_functions.resize(n_bfs);
+  else
+    _local_eim_basis_functions.resize(n_bfs);
 }
 
 void RBEIMEvaluation::decrement_vector(QpDataMap & v,
@@ -427,7 +430,7 @@ void RBEIMEvaluation::get_eim_basis_function_side_values_at_qps(unsigned int bas
                                                                 unsigned int comp,
                                                                 std::vector<Number> & values) const
 {
-  libmesh_error_msg_if(basis_function_index >= _local_eim_basis_functions.size(),
+  libmesh_error_msg_if(basis_function_index >= _local_side_eim_basis_functions.size(),
                        "Invalid basis function index: " << basis_function_index);
 
   get_parametrized_function_side_values_at_qps(

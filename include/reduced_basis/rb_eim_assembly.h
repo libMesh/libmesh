@@ -76,6 +76,14 @@ public:
                                std::vector<Number> & values);
 
   /**
+   * Same as evaluate_basis_function() except for side data.
+   */
+  void evaluate_side_basis_function(dof_id_type elem_id,
+                                    unsigned int side_index,
+                                    unsigned int var,
+                                    std::vector<Number> & values);
+
+  /**
    * Get a reference to the RBEIMEvaluation object.
    */
   RBEIMConstruction & get_rb_eim_construction();
