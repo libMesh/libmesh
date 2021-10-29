@@ -39,6 +39,8 @@
 #include "libmesh/steady_solver.h"
 #include "libmesh/wrapped_functor.h"
 #include "libmesh/elem.h"
+#include "libmesh/parallel_implementation.h"
+#include "libmesh/string_to_enum.h"
 
 
 using namespace libMesh;
@@ -57,6 +59,7 @@ void usage_error(const char * progname)
                << " --family    famname   output FEM family        [default: LAGRANGE]\n"
                << " --order     num       output FEM order         [default: 1]\n"
                << " --subdomain num       subdomain id restriction [default: all subdomains]\n"
+               << " --integral            only calculate integral, not projection\n"
                << std::endl;
 
   exit(1);
@@ -76,6 +79,65 @@ T assert_argument (GetPot & cl,
     }
   return cl.next(defaultarg);
 }
+
+
+struct Integrate {
+  Integrate (const System & sys,
+             const FEMFunctionBase<Number> & f) :
+    _sys(sys), _f(f.clone()), _integral(0) {}
+
+  Integrate (Integrate & other, Threads::split) :
+    _sys(other._sys), _f(other._f->clone()), _integral(0) {}
+
+  void operator() (const ConstElemRange & range) {
+    FEMContext context(_sys);
+
+    FEBase * elem_fe = nullptr;
+    context.get_element_fe(0, elem_fe);
+
+    const std::vector<Real> & JxW = elem_fe->get_JxW();
+    const std::vector<Point> & xyz = elem_fe->get_xyz();
+
+    _f->init_context(context);
+
+    // If _f didn't need anything, that wasn't a fluke
+    elem_fe->get_nothing();
+
+    // We only integrate on the highest dimensional elements in the
+    // mesh, lest we be adding apples to oranges
+    const unsigned int mesh_dim = _sys.get_mesh().mesh_dimension();
+
+    for (const auto & elem : range)
+      {
+        if (elem->dim() < mesh_dim)
+          continue;
+
+        context.pre_fe_reinit(_sys, elem);
+        context.elem_fe_reinit();
+
+        for (auto qp : index_range(JxW))
+          {
+            const Number output = (*_f)(context, xyz[qp]);
+
+            _integral += output * JxW[qp];
+          }
+      }
+  }
+
+  void join (const Integrate & other)
+  {
+    _integral += other._integral;
+  }
+
+  Number integral () const { return _integral; }
+
+private:
+  const System & _sys;
+
+  std::unique_ptr<FEMFunctionBase<Number>> _f;
+
+  Number _integral;
+};
 
 
 int main(int argc, char ** argv)
@@ -99,25 +161,25 @@ int main(int argc, char ** argv)
 
   const std::string solnname = cl.follow(std::string(""), "--insoln");
 
-  if (solnname != "")
+  if (meshname != "")
     {
       old_mesh.read(meshname);
       std::cout << "Old Mesh:" << std::endl;
       old_mesh.print_info();
     }
 
-  // Create a new mesh for a new EquationSystems
-  Mesh new_mesh(init.comm(), requested_dim);
-  new_mesh.read(meshname);
-
   // Load the old solution from --insoln filename, if that's been
   // specified.
   EquationSystems old_es(old_mesh);
-  EquationSystems new_es(new_mesh);
   std::string current_sys_name = "new_sys";
 
   const std::string calcfunc =
     assert_argument(cl, "--calc", argv[0], std::string(""));
+
+  const std::string family =
+    cl.follow(std::string("LAGRANGE"), "--family");
+
+  const int order = cl.follow(1, "--order");
 
   std::unique_ptr<FEMFunctionBase<Number>> goal_function;
 
@@ -145,54 +207,98 @@ int main(int argc, char ** argv)
     }
   else
     {
+      current_sys_name = "bare_sys";
+
+      // FEMContext doesn't like seeing systems with no variables
+      System & dummy_sys = old_es.add_system<System>(current_sys_name);
+
+      // And if we're using an IsoGeometric Analysis mesh, we'd better
+      // make sure the user can specify order and family to make it
+      // iso.
+      dummy_sys.add_variable("dummy", static_cast<Order>(order),
+                             Utility::string_to_enum<FEFamily>(family));
+
+      old_es.init();
+
       goal_function =
         libmesh_make_unique<WrappedFunctor<Number>>(ParsedFunction<Number>(calcfunc));
     }
 
   libMesh::out << "Calculating with system " << current_sys_name << std::endl;
 
-  L2System & new_sys = new_es.add_system<L2System>(current_sys_name);
-
   // Subdomains to integrate on
+  std::set<libMesh::subdomain_id_type> subdomains_list;
   cl.disable_loop();
   while (cl.search(1, "--subdomain"))
     {
       subdomain_id_type tmp = Elem::invalid_subdomain_id;
       tmp = cl.next(tmp);
-      new_sys.subdomains_list().insert(tmp);
+      subdomains_list.insert(tmp);
     }
   cl.enable_loop();
 
-  new_sys.time_solver =
-    libmesh_make_unique<SteadySolver>(new_sys);
-
-  new_sys.fe_family() =
-    cl.follow(std::string("LAGRANGE"), "--family");
-
-  new_sys.fe_order() =
-    cl.follow(1, "--order");
-
-  new_sys.goal_func = goal_function->clone();
-
+  std::string default_outsolnname = "out_soln.xda";
   if (solnname != "")
-    new_sys.input_system = &old_es.get_system(current_sys_name);
+    default_outsolnname = "out_"+solnname;
+  const std::string outsolnname =
+    cl.follow(default_outsolnname, "--outsoln");
 
-  new_es.init();
+  if (!cl.search("--integral"))
+    {
+      // Create a new mesh and a new EquationSystems
+      Mesh new_mesh(init.comm(), requested_dim);
+      new_mesh.read(meshname);
 
-  DiffSolver & solver = *(new_sys.time_solver->diff_solver().get());
-  solver.quiet = false;
-  solver.verbose = true;
-  solver.relative_step_tolerance = 1e-10;
+      EquationSystems new_es(new_mesh);
 
-  new_sys.solve();
+      L2System & new_sys = new_es.add_system<L2System>(current_sys_name);
 
-  // Write out the new solution file
-  const std::string outsolnname = cl.follow(std::string("out_"+solnname), "--outsoln");
+      new_sys.subdomains_list() = std::move(subdomains_list);
 
-  new_es.write(outsolnname.c_str(),
-               EquationSystems::WRITE_DATA |
-               EquationSystems::WRITE_ADDITIONAL_DATA);
-  libMesh::out << "Wrote solution " << outsolnname << std::endl;
+      new_sys.time_solver =
+        libmesh_make_unique<SteadySolver>(new_sys);
+
+      new_sys.fe_family() = family;
+      new_sys.fe_order() = order;
+
+      new_sys.goal_func = goal_function->clone();
+
+      if (solnname != "")
+        new_sys.input_system = &old_es.get_system(current_sys_name);
+
+      new_es.init();
+
+      DiffSolver & solver = *(new_sys.time_solver->diff_solver().get());
+      solver.quiet = false;
+      solver.verbose = true;
+      solver.relative_step_tolerance = 1e-10;
+
+      new_sys.solve();
+
+      // Write out the new solution file
+      new_es.write(outsolnname.c_str(),
+                   EquationSystems::WRITE_DATA |
+                   EquationSystems::WRITE_ADDITIONAL_DATA);
+      libMesh::out << "Wrote solution " << outsolnname << std::endl;
+    }
+  else
+    {
+      // If we aren't doing a projection, then we just do an integral
+      System & old_sys = old_es.get_system<System>(current_sys_name);
+
+      ConstElemRange active_local_elem_range
+        (old_mesh.active_local_elements_begin(),
+         old_mesh.active_local_elements_end());
+
+      Integrate integrate(old_sys, *goal_function);
+
+      Threads::parallel_reduce (active_local_elem_range,
+                                integrate);
+
+      Number integral = integrate.integral();
+      old_mesh.comm().sum(integral);
+      std::cout << "Integral is " << integral << std::endl;
+    }
 
   return 0;
 }
