@@ -237,7 +237,11 @@ int main(int argc, char ** argv)
     }
   cl.enable_loop();
 
-  const std::string outsolnname = cl.follow(std::string("out_"+solnname), "--outsoln");
+  std::string default_outsolnname = "out_soln.xda";
+  if (solnname != "")
+    default_outsolnname = "out_"+solnname;
+  const std::string outsolnname =
+    cl.follow(default_outsolnname, "--outsoln");
 
   if (!cl.search("--integral"))
     {
