@@ -1383,7 +1383,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
                         optimal_point_phi_i_qp[i] = phi_side[i][qp];
 
                       const auto & point_list =
-                        libmesh_map_find(_local_quad_point_locations, elem_id);
+                        libmesh_map_find(_local_side_quad_point_locations, elem_and_side);
 
                       libmesh_error_msg_if(qp >= point_list.size(), "Error: Invalid qp");
 
@@ -1395,7 +1395,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
                       if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
                         {
                           const auto & perturb_list =
-                            libmesh_map_find(_local_quad_point_locations_perturbations, elem_id);
+                            libmesh_map_find(_local_side_quad_point_locations_perturbations, elem_and_side);
 
                           libmesh_error_msg_if(qp >= perturb_list.size(), "Error: Invalid qp");
 
@@ -1622,36 +1622,72 @@ void RBEIMConstruction::update_eim_matrices()
 
   libmesh_assert_msg(RB_size >= 1, "Must have at least 1 basis function.");
 
-  // update the matrix that is used to evaluate L2 projections
-  // into the EIM approximation space
-  for (unsigned int i=(RB_size-1); i<RB_size; i++)
+  if (eim_eval.get_parametrized_function().on_mesh_sides())
     {
-      for (unsigned int j=0; j<RB_size; j++)
+      // update the matrix that is used to evaluate L2 projections
+      // into the EIM approximation space
+      for (unsigned int i=(RB_size-1); i<RB_size; i++)
         {
-          Number value = inner_product(eim_eval.get_basis_function(j),
-                                       eim_eval.get_basis_function(i));
-
-          _eim_projection_matrix(i,j) = value;
-          if (i!=j)
+          for (unsigned int j=0; j<RB_size; j++)
             {
-              // The inner product matrix is assumed to be hermitian
-              _eim_projection_matrix(j,i) = libmesh_conj(value);
+              Number value = side_inner_product(eim_eval.get_side_basis_function(j),
+                                                eim_eval.get_side_basis_function(i));
+
+              _eim_projection_matrix(i,j) = value;
+              if (i!=j)
+                {
+                  // The inner product matrix is assumed to be hermitian
+                  _eim_projection_matrix(j,i) = libmesh_conj(value);
+                }
             }
         }
+
+      // update the EIM interpolation matrix
+      for (unsigned int j=0; j<RB_size; j++)
+        {
+          // Evaluate the basis functions at the new interpolation point in order
+          // to update the interpolation matrix
+          Number value =
+            eim_eval.get_eim_basis_function_side_value(j,
+                                                       eim_eval.get_interpolation_points_elem_id(RB_size-1),
+                                                       eim_eval.get_interpolation_points_side_index(RB_size-1),
+                                                       eim_eval.get_interpolation_points_comp(RB_size-1),
+                                                       eim_eval.get_interpolation_points_qp(RB_size-1));
+          eim_eval.set_interpolation_matrix_entry(RB_size-1, j, value);
+        }
     }
-
-  // update the EIM interpolation matrix
-  for (unsigned int j=0; j<RB_size; j++)
+  else
     {
-      // Evaluate the basis functions at the new interpolation point in order
-      // to update the interpolation matrix
-      Number value =
-        eim_eval.get_eim_basis_function_value(j,
-                                              eim_eval.get_interpolation_points_elem_id(RB_size-1),
-                                              eim_eval.get_interpolation_points_comp(RB_size-1),
-                                              eim_eval.get_interpolation_points_qp(RB_size-1));
-      eim_eval.set_interpolation_matrix_entry(RB_size-1, j, value);
+      // update the matrix that is used to evaluate L2 projections
+      // into the EIM approximation space
+      for (unsigned int i=(RB_size-1); i<RB_size; i++)
+        {
+          for (unsigned int j=0; j<RB_size; j++)
+            {
+              Number value = inner_product(eim_eval.get_basis_function(j),
+                                           eim_eval.get_basis_function(i));
 
+              _eim_projection_matrix(i,j) = value;
+              if (i!=j)
+                {
+                  // The inner product matrix is assumed to be hermitian
+                  _eim_projection_matrix(j,i) = libmesh_conj(value);
+                }
+            }
+        }
+
+      // update the EIM interpolation matrix
+      for (unsigned int j=0; j<RB_size; j++)
+        {
+          // Evaluate the basis functions at the new interpolation point in order
+          // to update the interpolation matrix
+          Number value =
+            eim_eval.get_eim_basis_function_value(j,
+                                                  eim_eval.get_interpolation_points_elem_id(RB_size-1),
+                                                  eim_eval.get_interpolation_points_comp(RB_size-1),
+                                                  eim_eval.get_interpolation_points_qp(RB_size-1));
+          eim_eval.set_interpolation_matrix_entry(RB_size-1, j, value);
+        }
     }
 }
 
