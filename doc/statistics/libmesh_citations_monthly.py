@@ -165,6 +165,14 @@ pub_2021 = [
   '2021-08-01', 113,
   '2021-09-01', 121,
   '2021-10-01', 144,
+  '2021-11-01', 162,
+]
+
+# 2022 monthly publication totals (first of each month)
+pub_2022 = [
+  '2021-09-01', 0,
+  '2021-10-01', 2,
+  '2021-11-01', 6,
 ]
 
 """
@@ -201,6 +209,7 @@ plot_one_year(2018, pub_2018, muted_light_blue)
 plot_one_year(2019, pub_2019, muted_green)
 plot_one_year(2020, pub_2020, muted_red)
 plot_one_year(2021, pub_2021, muted_pink)
+plot_one_year(2022, pub_2022, muted_orange)
 
 # Label beginning and end of year.
 ax1.set_xticks([0, 12])
