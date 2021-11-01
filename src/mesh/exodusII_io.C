@@ -209,7 +209,17 @@ void ExodusII_IO::read (const std::string & fname)
   // store them.
   unsigned char weight_index = 0;
   const bool weights_exist = !exio_helper->w.empty();
-  if (weights_exist)
+
+  // If we have Bezier extraction coefficients, we'll need to put
+  // NODEELEM elements on spline nodes, since our Rational Bezier
+  // elements will be connected to nodes derived from those; nothing
+  // else will be directly connected to the spline nodes.
+  const bool bex_cv_exist = !exio_helper->bex_dense_constraint_vecs.empty();
+
+  // Even if weights don't exist, we still use RATIONAL_BERNSTEIN for
+  // Bezier-Bernstein BEX elements, we just use 1.0 as the weight on
+  // every node.
+  if (bex_cv_exist)
     {
       const Real default_weight = 1.0;
       weight_index = cast_int<unsigned char>
@@ -218,12 +228,6 @@ void ExodusII_IO::read (const std::string & fname)
       mesh.set_default_mapping_type(RATIONAL_BERNSTEIN_MAP);
       mesh.set_default_mapping_data(weight_index);
     }
-
-  // If we have Bezier extraction coefficients, we'll need to put
-  // NODEELEM elements on spline nodes, since our Rational Bezier
-  // elements will be connected to nodes derived from those; nothing
-  // else will be directly connected to the spline nodes.
-  const bool bex_cv_exist = !exio_helper->bex_dense_constraint_vecs.empty();
 
   std::unordered_map<const Node *, Elem *> spline_nodeelem_ptrs;
 
