@@ -960,13 +960,18 @@ void RBEvaluation::write_out_vectors(System & sys,
   Xdr bf_data(file_name.str(),
               write_binary_vectors ? ENCODE : WRITE);
 
-  std::string version("libMesh-" + libMesh::get_io_compatibility_version());
+  // Following EquationSystems::write(), we should only write the header information
+  // if we're proc 0
+  if (sys.comm().rank() == 0)
+    {
+      std::string version("libMesh-" + libMesh::get_io_compatibility_version());
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  version += " with infinite elements";
+      version += " with infinite elements";
 #endif
-  bf_data.data(version ,"# File Format Identifier");
+      bf_data.data(version ,"# File Format Identifier");
 
-  sys.write_header(bf_data, /*(unused arg)*/ version, /*write_additional_data=*/false);
+      sys.write_header(bf_data, /*(unused arg)*/ version, /*write_additional_data=*/false);
+    }
 
   // Following EquationSystemsIO::write, we use a temporary numbering (node major)
   // before writing out the data
