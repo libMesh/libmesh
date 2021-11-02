@@ -367,6 +367,7 @@ void init_preconditioner_type_to_enum ()
       preconditioner_type_to_enum["USER_PRECOND"          ]=USER_PRECOND;
       preconditioner_type_to_enum["SHELL_PRECOND"         ]=SHELL_PRECOND;
       preconditioner_type_to_enum["AMG_PRECOND"           ]=AMG_PRECOND;
+      preconditioner_type_to_enum["SVD_PRECOND"           ]=SVD_PRECOND;
       preconditioner_type_to_enum["INVALID_PRECONDITIONER"]=INVALID_PRECONDITIONER;
 
       //shorter
@@ -384,6 +385,7 @@ void init_preconditioner_type_to_enum ()
       preconditioner_type_to_enum["USER"        ]=USER_PRECOND;
       preconditioner_type_to_enum["SHELL"       ]=SHELL_PRECOND;
       preconditioner_type_to_enum["AMG"         ]=AMG_PRECOND;
+      preconditioner_type_to_enum["SVD"         ]=SVD_PRECOND;
       preconditioner_type_to_enum["INVALID"     ]=INVALID_PRECONDITIONER;
     }
 }

@@ -212,6 +212,11 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
       CHKERRABORT(comm,ierr);
       break;
 
+    case SVD_PRECOND:
+      ierr = PCSetType (pc, const_cast<KSPType>(PCSVD));
+      CHKERRABORT(comm,ierr);
+      break;
+
     case USER_PRECOND:
       ierr = PCSetType (pc, const_cast<KSPType>(PCMAT));
       CHKERRABORT(comm,ierr);
