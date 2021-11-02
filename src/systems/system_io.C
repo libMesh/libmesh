@@ -2253,12 +2253,12 @@ std::size_t System::read_serialized_vectors (Xdr & io,
       // Get the buffer size
       io.data(vector_length);
 
-      libmesh_assert_equal_to (num_vecs, vectors.size());
+      libmesh_error_msg_if (num_vecs != vectors.size(), "Unexpected value of num_vecs");
 
       if (num_vecs != 0)
         {
-          libmesh_assert_not_equal_to (vectors[0], 0);
-          libmesh_assert_equal_to     (vectors[0]->size(), vector_length);
+          libmesh_error_msg_if (vectors[0] == nullptr, "vectors[0] should not be null");
+          libmesh_error_msg_if (vectors[0]->size() != vector_length, "Inconsistent vector sizes");
         }
     }
 
