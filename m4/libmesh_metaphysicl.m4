@@ -17,6 +17,7 @@ AC_DEFUN([CONFIGURE_METAPHYSICL],
                              [internal: build from contrib]),
               [AS_CASE("${withval}",
                        [internal], [build_metaphysicl=yes],
+                       [yes], [build_metaphysicl=yes],
                        [METAPHYSICL_DIR="${withval}"
                         build_metaphysicl=no])
                enablemetaphysicl=yes],
