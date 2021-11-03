@@ -1227,7 +1227,8 @@ void RBEIMEvaluation::print_local_eim_basis_functions() const
       libMesh::out << "Side basis function " << bf << std::endl;
       for (const auto & pr : _local_side_eim_basis_functions[bf])
         {
-          auto [elem_id, side_index] = pr.first;
+          const auto & elem_id = pr.first.first;
+          const auto & side_index = pr.first.second;
           libMesh::out << "Elem " << elem_id << ", Side " << side_index << std::endl;
           const auto & array = pr.second;
           for (auto var : index_range(array))
