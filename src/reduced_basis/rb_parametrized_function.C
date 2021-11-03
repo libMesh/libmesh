@@ -77,13 +77,13 @@ RBParametrizedFunction::side_evaluate_comp(const RBParameters & mu,
 }
 
 std::vector<Number>
-RBParametrizedFunction::evaluate(const RBParameters & mu,
-                                 const Point & xyz,
-                                 dof_id_type elem_id,
-                                 unsigned int qp,
-                                 subdomain_id_type subdomain_id,
-                                 const std::vector<Point> & xyz_perturb,
-                                 const std::vector<Real> & phi_i_qp)
+RBParametrizedFunction::evaluate(const RBParameters & /*mu*/,
+                                 const Point & /*xyz*/,
+                                 dof_id_type /*elem_id*/,
+                                 unsigned int /*qp*/,
+                                 subdomain_id_type /*subdomain_id*/,
+                                 const std::vector<Point> & /*xyz_perturb*/,
+                                 const std::vector<Real> & /*phi_i_qp*/)
 {
   // This method should be overridden in subclasses, so we just give a not implemented error message here
   libmesh_not_implemented();
@@ -92,15 +92,15 @@ RBParametrizedFunction::evaluate(const RBParameters & mu,
 }
 
 std::vector<Number>
-RBParametrizedFunction::side_evaluate(const RBParameters & mu,
-                                      const Point & xyz,
-                                      dof_id_type elem_id,
-                                      unsigned int side_index,
-                                      unsigned int qp,
-                                      subdomain_id_type subdomain_id,
-                                      boundary_id_type boundary_id,
-                                      const std::vector<Point> & xyz_perturb,
-                                      const std::vector<Real> & phi_i_qp)
+RBParametrizedFunction::side_evaluate(const RBParameters & /*mu*/,
+                                      const Point & /*xyz*/,
+                                      dof_id_type /*elem_id*/,
+                                      unsigned int /*side_index*/,
+                                      unsigned int /*qp*/,
+                                      subdomain_id_type /*subdomain_id*/,
+                                      boundary_id_type /*boundary_id*/,
+                                      const std::vector<Point> & /*xyz_perturb*/,
+                                      const std::vector<Real> & /*phi_i_qp*/)
 {
   // This method should be overridden in subclasses, so we just give a not implemented error message here
   libmesh_not_implemented();
