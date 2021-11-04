@@ -360,6 +360,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
 
       subdomain_id_type subdomain_id = libmesh_map_find(sbd_ids, elem_side_pair);
       boundary_id_type boundary_id = libmesh_map_find(side_boundary_ids, elem_side_pair);
+      unsigned int side_type = libmesh_map_find(side_types, elem_side_pair);
 
       // The amount of data to be stored for each component
       auto n_qp = xyz_vec.size();
@@ -368,49 +369,10 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
       const Elem & elem_ref = sys.get_mesh().elem_ref(elem_id);
       con.pre_fe_reinit(sys, &elem_ref);
 
-      if (elem_ref.dim() == 2 && side_index > elem_ref.n_sides())
+      // side_type == 0 --> standard side
+      // side_type == 1 --> shellface
+      if (side_type == 0)
         {
-          // This must be the "shellface" case
-
-          auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
-          const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
-
-          elem_fe->reinit(&elem_ref);
-
-          for (auto qp : index_range(xyz_vec))
-            {
-              mesh_to_preevaluated_side_values_map[elem_side_pair][qp] = counter;
-
-              all_xyz_vec[counter] = xyz_vec[qp];
-              elem_ids_vec[counter] = elem_side_pair.first;
-              side_indices_vec[counter] = elem_side_pair.second;
-              qps_vec[counter] = qp;
-              sbd_ids_vec[counter] = subdomain_id;
-              boundary_ids_vec[counter] = boundary_id;
-
-              phi_i_qp_vec[counter].resize(phi.size());
-              for(auto i : index_range(phi))
-                phi_i_qp_vec[counter][i] = phi[i][qp];
-
-              if (requires_xyz_perturbations)
-                {
-                  const auto & qps_and_perturbs =
-                    libmesh_map_find(side_all_xyz_perturb, elem_side_pair);
-                  libmesh_error_msg_if(qp >= qps_and_perturbs.size(), "Error: Invalid qp");
-
-                  all_xyz_perturb_vec[counter] = qps_and_perturbs[qp];
-                }
-              else
-                {
-                  all_xyz_perturb_vec[counter] = empty_perturbs;
-                }
-              counter++;
-            }
-        }
-      else
-        {
-          // This must be the "standard side" (i.e. non-shellface) case
-
           std::unique_ptr<const Elem> elem_side;
           elem_ref.build_side_ptr(elem_side, side_index);
 
@@ -448,6 +410,45 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
               counter++;
             }
         }
+      else if (side_type == 1)
+        {
+          auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
+          const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+
+          elem_fe->reinit(&elem_ref);
+
+          for (auto qp : index_range(xyz_vec))
+            {
+              mesh_to_preevaluated_side_values_map[elem_side_pair][qp] = counter;
+
+              all_xyz_vec[counter] = xyz_vec[qp];
+              elem_ids_vec[counter] = elem_side_pair.first;
+              side_indices_vec[counter] = elem_side_pair.second;
+              qps_vec[counter] = qp;
+              sbd_ids_vec[counter] = subdomain_id;
+              boundary_ids_vec[counter] = boundary_id;
+
+              phi_i_qp_vec[counter].resize(phi.size());
+              for(auto i : index_range(phi))
+                phi_i_qp_vec[counter][i] = phi[i][qp];
+
+              if (requires_xyz_perturbations)
+                {
+                  const auto & qps_and_perturbs =
+                    libmesh_map_find(side_all_xyz_perturb, elem_side_pair);
+                  libmesh_error_msg_if(qp >= qps_and_perturbs.size(), "Error: Invalid qp");
+
+                  all_xyz_perturb_vec[counter] = qps_and_perturbs[qp];
+                }
+              else
+                {
+                  all_xyz_perturb_vec[counter] = empty_perturbs;
+                }
+              counter++;
+            }
+        }
+      else
+        libmesh_error_msg ("Unrecognized side_type: " << side_type);
     }
 
   std::vector<RBParameters> mus {mu};
