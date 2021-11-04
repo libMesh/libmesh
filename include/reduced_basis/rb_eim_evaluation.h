@@ -76,6 +76,11 @@ public:
   typedef std::map<dof_id_type, std::vector<std::vector<Number>>> QpDataMap;
 
   /**
+   * Type of the data structure used to map from (elem id, side index) -> [n_vars][n_qp] data.
+   */
+  typedef std::map<std::pair<dof_id_type,unsigned int>, std::vector<std::vector<Number>>> SideQpDataMap;
+
+  /**
    * Clear this object.
    */
   virtual void clear() override;
@@ -94,9 +99,14 @@ public:
   void set_parametrized_function(std::unique_ptr<RBParametrizedFunction> pf);
 
   /**
-   * Get a const reference to the parametrized function.
+   * Get a reference to the parametrized function.
    */
   RBParametrizedFunction & get_parametrized_function();
+
+  /**
+   * Get a const reference to the parametrized function.
+   */
+  const RBParametrizedFunction & get_parametrized_function() const;
 
   /**
    * Calculate the EIM approximation for the given
@@ -129,6 +139,12 @@ public:
                         const DenseVector<Number> & coeffs);
 
   /**
+   * Same as decrement_vector() except for Side data.
+   */
+  void side_decrement_vector(SideQpDataMap & v,
+                             const DenseVector<Number> & coeffs);
+
+  /**
    * Build a vector of RBTheta objects that accesses the components
    * of the RB_solution member variable of this RBEvaluation.
    * Store these objects in the member vector rb_theta_objects.
@@ -158,6 +174,16 @@ public:
     std::vector<Number> & values);
 
   /**
+   * Same as get_parametrized_function_values_at_qps() except for side data.
+   */
+  static void get_parametrized_function_side_values_at_qps(
+    const SideQpDataMap & pf,
+    dof_id_type elem_id,
+    unsigned int side_index,
+    unsigned int comp,
+    std::vector<Number> & values);
+
+  /**
    * Same as above, except that we just return the value at the qp^th
    * quadrature point.
    */
@@ -165,6 +191,17 @@ public:
     const Parallel::Communicator & comm,
     const QpDataMap & pf,
     dof_id_type elem_id,
+    unsigned int comp,
+    unsigned int qp);
+
+  /**
+   * Same as get_parametrized_function_value() except for side data.
+   */
+  static Number get_parametrized_function_side_value(
+    const Parallel::Communicator & comm,
+    const SideQpDataMap & pf,
+    dof_id_type elem_id,
+    unsigned int side_index,
     unsigned int comp,
     unsigned int qp);
 
@@ -181,6 +218,15 @@ public:
                                             std::vector<Number> & values) const;
 
   /**
+   * Same as get_eim_basis_function_values_at_qps() except for side data.
+   */
+  void get_eim_basis_function_side_values_at_qps(unsigned int basis_function_index,
+                                                 dof_id_type elem_id,
+                                                 unsigned int side_index,
+                                                 unsigned int var,
+                                                 std::vector<Number> & values) const;
+
+  /**
    * Same as above, except that we just return the value at the qp^th
    * quadrature point.
    */
@@ -190,9 +236,23 @@ public:
                                       unsigned int qp) const;
 
   /**
+   * Same as get_eim_basis_function_value() except for side data.
+   */
+  Number get_eim_basis_function_side_value(unsigned int basis_function_index,
+                                          dof_id_type elem_id,
+                                          unsigned int side_index,
+                                          unsigned int comp,
+                                          unsigned int qp) const;
+
+  /**
    * Get a reference to the i^th basis function.
    */
   const QpDataMap & get_basis_function(unsigned int i) const;
+
+  /**
+   * Get a reference to the i^th side basis function.
+   */
+  const SideQpDataMap & get_side_basis_function(unsigned int i) const;
 
   /**
    * Set _rb_eim_solutions. Normally we update _rb_eim_solutions by performing
@@ -227,8 +287,10 @@ public:
   void add_interpolation_points_xyz(Point p);
   void add_interpolation_points_comp(unsigned int comp);
   void add_interpolation_points_subdomain_id(subdomain_id_type sbd_id);
+  void add_interpolation_points_boundary_id(boundary_id_type b_id);
   void add_interpolation_points_xyz_perturbations(const std::vector<Point> & perturbs);
   void add_interpolation_points_elem_id(dof_id_type elem_id);
+  void add_interpolation_points_side_index(unsigned int side_index);
   void add_interpolation_points_qp(unsigned int qp);
   void add_interpolation_points_phi_i_qp(const std::vector<Real> & phi_i_qp);
 
@@ -238,8 +300,10 @@ public:
   Point get_interpolation_points_xyz(unsigned int index) const;
   unsigned int get_interpolation_points_comp(unsigned int index) const;
   subdomain_id_type get_interpolation_points_subdomain_id(unsigned int index) const;
+  boundary_id_type get_interpolation_points_boundary_id(unsigned int index) const;
   const std::vector<Point> & get_interpolation_points_xyz_perturbations(unsigned int index) const;
   dof_id_type get_interpolation_points_elem_id(unsigned int index) const;
+  unsigned int get_interpolation_points_side_index(unsigned int index) const;
   unsigned int get_interpolation_points_qp(unsigned int index) const;
   const std::vector<Real> & get_interpolation_points_phi_i_qp(unsigned int index) const;
 
@@ -262,6 +326,21 @@ public:
     unsigned int comp,
     dof_id_type elem_id,
     subdomain_id_type subdomain_id,
+    unsigned int qp,
+    const std::vector<Point> & perturbs,
+    const std::vector<Real> & phi_i_qp);
+
+  /**
+   * Add \p side_bf to our EIM basis.
+   */
+  void add_side_basis_function_and_interpolation_data(
+    const SideQpDataMap & side_bf,
+    Point p,
+    unsigned int comp,
+    dof_id_type elem_id,
+    unsigned int side_index,
+    subdomain_id_type subdomain_id,
+    boundary_id_type boundary_id,
     unsigned int qp,
     const std::vector<Point> & perturbs,
     const std::vector<Real> & phi_i_qp);
@@ -372,6 +451,36 @@ public:
 private:
 
   /**
+   * Method that writes out element interior EIM basis functions. This may be called by
+   * write_out_basis_functions().
+   */
+  void write_out_interior_basis_functions(const std::string & directory_name,
+                                          bool write_binary_basis_functions);
+
+  /**
+   * Method that writes out element side EIM basis functions. This may be called by
+   * write_out_basis_functions().
+   */
+  void write_out_side_basis_functions(const std::string & directory_name,
+                                      bool write_binary_basis_functions);
+
+  /**
+   * Method that reads in element interior EIM basis functions. This may be called by
+   * read_in_basis_functions().
+   */
+  void read_in_interior_basis_functions(const System & sys,
+                                        const std::string & directory_name,
+                                        bool read_binary_basis_functions);
+
+  /**
+   * Method that reads in element side EIM basis functions. This may be called by
+   * read_in_basis_functions().
+   */
+  void read_in_side_basis_functions(const System & sys,
+                                    const std::string & directory_name,
+                                    bool read_binary_basis_functions);
+
+  /**
    * The EIM solution coefficients from the most recent call to rb_eim_solves().
    */
   std::vector<DenseVector<Number>> _rb_eim_solutions;
@@ -427,6 +536,13 @@ private:
   std::vector<unsigned int> _interpolation_points_qp;
 
   /**
+   * If the EIM approximation applies to element sides, then we need to
+   * store the side index and boundary ID for each quadrature point.
+   */
+  std::vector<unsigned int> _interpolation_points_side_index;
+  std::vector<boundary_id_type> _interpolation_points_boundary_id;
+
+  /**
    * We store the shape function values at the qp as well. These values
    * allows us to evaluate parametrized functions that depend on nodal
    * data.
@@ -458,6 +574,16 @@ private:
   std::vector<QpDataMap> _local_eim_basis_functions;
 
   /**
+   * The EIM basis functions on element sides. We store values at quadrature points
+   * on elements that are local to this processor. The indexing
+   * is as follows:
+   *   basis function index --> (element ID,side index) --> variable --> quadrature point --> value
+   * We use a map to index the element ID, since the IDs on this processor in
+   * general will not start at zero.
+   */
+  std::vector<SideQpDataMap> _local_side_eim_basis_functions;
+
+  /**
    * Print the contents of _local_eim_basis_functions to libMesh::out.
    * Helper function mainly useful for debugging.
    */
@@ -471,11 +597,21 @@ private:
   void gather_bfs();
 
   /**
+   * Same as gather_bfs() except for side data.
+   */
+  void side_gather_bfs();
+
+  /**
    * Helper function that distributes the entries of
    * _local_eim_basis_functions to their respective processors after
    * they are read in on processor 0.
    */
   void distribute_bfs(const System & sys);
+
+  /**
+   * Same as distribute_bfs() except for side data.
+   */
+  void side_distribute_bfs(const System & sys);
 
   /**
    * Let {p_1,...,p_n} be a set of n "observation points", where we can

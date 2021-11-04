@@ -32,6 +32,7 @@
 #include "libmesh/system.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/quadrature.h"
+#include "libmesh/boundary_info.h"
 #include "timpi/parallel_implementation.h"
 
 // C++ includes
@@ -58,8 +59,10 @@ void RBEIMEvaluation::clear()
   _interpolation_points_xyz.clear();
   _interpolation_points_comp.clear();
   _interpolation_points_subdomain_id.clear();
+  _interpolation_points_boundary_id.clear();
   _interpolation_points_xyz_perturbations.clear();
   _interpolation_points_elem_id.clear();
+  _interpolation_points_side_index.clear();
   _interpolation_points_qp.clear();
   _interpolation_points_phi_i_qp.clear();
 
@@ -75,8 +78,10 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
   _interpolation_points_xyz.clear();
   _interpolation_points_comp.clear();
   _interpolation_points_subdomain_id.clear();
+  _interpolation_points_boundary_id.clear();
   _interpolation_points_xyz_perturbations.clear();
   _interpolation_points_elem_id.clear();
+  _interpolation_points_side_index.clear();
   _interpolation_points_qp.clear();
   _interpolation_points_phi_i_qp.clear();
 
@@ -89,6 +94,13 @@ void RBEIMEvaluation::set_parametrized_function(std::unique_ptr<RBParametrizedFu
 }
 
 RBParametrizedFunction & RBEIMEvaluation::get_parametrized_function()
+{
+  libmesh_error_msg_if(!_parametrized_function, "Parametrized function not initialized yet");
+
+  return *_parametrized_function;
+}
+
+const RBParametrizedFunction & RBEIMEvaluation::get_parametrized_function() const
 {
   libmesh_error_msg_if(!_parametrized_function, "Parametrized function not initialized yet");
 
@@ -164,14 +176,26 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   // output all comps indexing is as follows:
   //   mu index --> interpolation point index --> component index --> value.
   std::vector<std::vector<std::vector<Number>>> output_all_comps;
-  get_parametrized_function().vectorized_evaluate(mus,
-                                                  _interpolation_points_xyz,
-                                                  _interpolation_points_elem_id,
-                                                  _interpolation_points_qp,
-                                                  _interpolation_points_subdomain_id,
-                                                  _interpolation_points_xyz_perturbations,
-                                                  _interpolation_points_phi_i_qp,
-                                                  output_all_comps);
+  if(get_parametrized_function().on_mesh_sides())
+    get_parametrized_function().side_vectorized_evaluate(mus,
+                                                         _interpolation_points_xyz,
+                                                         _interpolation_points_elem_id,
+                                                         _interpolation_points_side_index,
+                                                         _interpolation_points_qp,
+                                                         _interpolation_points_subdomain_id,
+                                                         _interpolation_points_boundary_id,
+                                                         _interpolation_points_xyz_perturbations,
+                                                         _interpolation_points_phi_i_qp,
+                                                         output_all_comps);
+  else
+    get_parametrized_function().vectorized_evaluate(mus,
+                                                    _interpolation_points_xyz,
+                                                    _interpolation_points_elem_id,
+                                                    _interpolation_points_qp,
+                                                    _interpolation_points_subdomain_id,
+                                                    _interpolation_points_xyz_perturbations,
+                                                    _interpolation_points_phi_i_qp,
+                                                    output_all_comps);
 
   std::vector<std::vector<Number>> evaluated_values_at_interp_points(output_all_comps.size());
 
@@ -205,12 +229,18 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
 
 unsigned int RBEIMEvaluation::get_n_basis_functions() const
 {
-  return _local_eim_basis_functions.size();
+  if (get_parametrized_function().on_mesh_sides())
+    return _local_side_eim_basis_functions.size();
+  else
+    return _local_eim_basis_functions.size();
 }
 
 void RBEIMEvaluation::set_n_basis_functions(unsigned int n_bfs)
 {
-  _local_eim_basis_functions.resize(n_bfs);
+  if (get_parametrized_function().on_mesh_sides())
+    _local_side_eim_basis_functions.resize(n_bfs);
+  else
+    _local_eim_basis_functions.resize(n_bfs);
 }
 
 void RBEIMEvaluation::decrement_vector(QpDataMap & v,
@@ -240,7 +270,35 @@ void RBEIMEvaluation::decrement_vector(QpDataMap & v,
               v_comp_and_qp[comp][qp] -= coeffs(i) * basis_comp_and_qp[comp][qp];
             }
     }
+}
 
+void RBEIMEvaluation::side_decrement_vector(SideQpDataMap & v,
+                                            const DenseVector<Number> & coeffs)
+{
+  LOG_SCOPE("side_decrement_vector()", "RBEIMEvaluation");
+
+  libmesh_error_msg_if(get_n_basis_functions() != coeffs.size(),
+                       "Error: Number of coefficients should match number of basis functions");
+
+  for (auto & pr : v)
+    {
+      auto elem_and_side = pr.first;
+      auto & v_comp_and_qp = pr.second;
+
+      for (const auto & comp : index_range(v_comp_and_qp))
+        for (unsigned int qp : index_range(v_comp_and_qp[comp]))
+          for (unsigned int i : index_range(_local_side_eim_basis_functions))
+            {
+              // Check that entry (elem_and_side,comp,qp) exists in _local_side_eim_basis_functions so that
+              // we get a clear error message if there is any missing data
+              const auto & basis_comp_and_qp = libmesh_map_find(_local_side_eim_basis_functions[i], elem_and_side);
+
+              libmesh_error_msg_if(comp >= basis_comp_and_qp.size(), "Error: Invalid comp");
+              libmesh_error_msg_if(qp >= basis_comp_and_qp[comp].size(), "Error: Invalid qp");
+
+              v_comp_and_qp[comp][qp] -= coeffs(i) * basis_comp_and_qp[comp][qp];
+            }
+    }
 }
 
 void RBEIMEvaluation::initialize_eim_theta_objects()
@@ -282,6 +340,28 @@ void RBEIMEvaluation::get_parametrized_function_values_at_qps(
   }
 }
 
+void RBEIMEvaluation::get_parametrized_function_side_values_at_qps(
+  const SideQpDataMap & pf,
+  dof_id_type elem_id,
+  unsigned int side_index,
+  unsigned int comp,
+  std::vector<Number> & values)
+{
+  LOG_SCOPE("get_parametrized_function_side_values_at_qps()", "RBEIMConstruction");
+
+  values.clear();
+
+  const auto it = pf.find(std::make_pair(elem_id,side_index));
+  if (it != pf.end())
+  {
+    const auto & comps_and_qps_on_elem = it->second;
+    libmesh_error_msg_if(comp >= comps_and_qps_on_elem.size(),
+                         "Invalid comp index: " << comp);
+
+    values = comps_and_qps_on_elem[comp];
+  }
+}
+
 Number RBEIMEvaluation::get_parametrized_function_value(
   const Parallel::Communicator & comm,
   const QpDataMap & pf,
@@ -291,6 +371,30 @@ Number RBEIMEvaluation::get_parametrized_function_value(
 {
   std::vector<Number> values;
   get_parametrized_function_values_at_qps(pf, elem_id, comp, values);
+
+  // In parallel, values should only be non-empty on one processor
+  Number value = 0.;
+  if (!values.empty())
+  {
+    libmesh_error_msg_if(qp >= values.size(), "Error: Invalid qp index");
+
+    value = values[qp];
+  }
+  comm.sum(value);
+
+  return value;
+}
+
+Number RBEIMEvaluation::get_parametrized_function_side_value(
+  const Parallel::Communicator & comm,
+  const SideQpDataMap & pf,
+  dof_id_type elem_id,
+  unsigned int side_index,
+  unsigned int comp,
+  unsigned int qp)
+{
+  std::vector<Number> values;
+  get_parametrized_function_side_values_at_qps(pf, elem_id, side_index, comp, values);
 
   // In parallel, values should only be non-empty on one processor
   Number value = 0.;
@@ -320,6 +424,23 @@ void RBEIMEvaluation::get_eim_basis_function_values_at_qps(unsigned int basis_fu
     values);
 }
 
+void RBEIMEvaluation::get_eim_basis_function_side_values_at_qps(unsigned int basis_function_index,
+                                                                dof_id_type elem_id,
+                                                                unsigned int side_index,
+                                                                unsigned int comp,
+                                                                std::vector<Number> & values) const
+{
+  libmesh_error_msg_if(basis_function_index >= _local_side_eim_basis_functions.size(),
+                       "Invalid basis function index: " << basis_function_index);
+
+  get_parametrized_function_side_values_at_qps(
+    _local_side_eim_basis_functions[basis_function_index],
+    elem_id,
+    side_index,
+    comp,
+    values);
+}
+
 Number RBEIMEvaluation::get_eim_basis_function_value(unsigned int basis_function_index,
                                                      dof_id_type elem_id,
                                                      unsigned int comp,
@@ -336,10 +457,34 @@ Number RBEIMEvaluation::get_eim_basis_function_value(unsigned int basis_function
     qp);
 }
 
+Number RBEIMEvaluation::get_eim_basis_function_side_value(unsigned int basis_function_index,
+                                                          dof_id_type elem_id,
+                                                          unsigned int side_index,
+                                                          unsigned int comp,
+                                                          unsigned int qp) const
+{
+  libmesh_error_msg_if(basis_function_index >= _local_side_eim_basis_functions.size(),
+                       "Invalid side basis function index: " << basis_function_index);
+
+  return get_parametrized_function_side_value(
+    comm(),
+    _local_side_eim_basis_functions[basis_function_index],
+    elem_id,
+    side_index,
+    comp,
+    qp);
+}
+
 const RBEIMEvaluation::QpDataMap &
 RBEIMEvaluation::get_basis_function(unsigned int i) const
 {
   return _local_eim_basis_functions[i];
+}
+
+const RBEIMEvaluation::SideQpDataMap &
+RBEIMEvaluation::get_side_basis_function(unsigned int i) const
+{
+  return _local_side_eim_basis_functions[i];
 }
 
 void RBEIMEvaluation::set_rb_eim_solutions(const std::vector<DenseVector<Number>> & rb_eim_solutions)
@@ -391,6 +536,11 @@ void RBEIMEvaluation::add_interpolation_points_subdomain_id(subdomain_id_type sb
   _interpolation_points_subdomain_id.emplace_back(sbd_id);
 }
 
+void RBEIMEvaluation::add_interpolation_points_boundary_id(boundary_id_type b_id)
+{
+  _interpolation_points_boundary_id.emplace_back(b_id);
+}
+
 void RBEIMEvaluation::add_interpolation_points_xyz_perturbations(const std::vector<Point> & perturbs)
 {
   _interpolation_points_xyz_perturbations.emplace_back(perturbs);
@@ -399,6 +549,11 @@ void RBEIMEvaluation::add_interpolation_points_xyz_perturbations(const std::vect
 void RBEIMEvaluation::add_interpolation_points_elem_id(dof_id_type elem_id)
 {
   _interpolation_points_elem_id.emplace_back(elem_id);
+}
+
+void RBEIMEvaluation::add_interpolation_points_side_index(unsigned int side_index)
+{
+  _interpolation_points_side_index.emplace_back(side_index);
 }
 
 void RBEIMEvaluation::add_interpolation_points_qp(unsigned int qp)
@@ -432,6 +587,13 @@ subdomain_id_type RBEIMEvaluation::get_interpolation_points_subdomain_id(unsigne
   return _interpolation_points_subdomain_id[index];
 }
 
+boundary_id_type RBEIMEvaluation::get_interpolation_points_boundary_id(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _interpolation_points_boundary_id.size(), "Error: Invalid index");
+
+  return _interpolation_points_boundary_id[index];
+}
+
 const std::vector<Point> & RBEIMEvaluation::get_interpolation_points_xyz_perturbations(unsigned int index) const
 {
   libmesh_error_msg_if(index >= _interpolation_points_xyz_perturbations.size(), "Error: Invalid index");
@@ -444,6 +606,13 @@ dof_id_type RBEIMEvaluation::get_interpolation_points_elem_id(unsigned int index
   libmesh_error_msg_if(index >= _interpolation_points_elem_id.size(), "Error: Invalid index");
 
   return _interpolation_points_elem_id[index];
+}
+
+unsigned int RBEIMEvaluation::get_interpolation_points_side_index(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _interpolation_points_side_index.size(), "Error: Invalid index");
+
+  return _interpolation_points_side_index[index];
 }
 
 unsigned int RBEIMEvaluation::get_interpolation_points_qp(unsigned int index) const
@@ -542,11 +711,48 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   _interpolation_points_phi_i_qp.emplace_back(phi_i_qp);
 }
 
+void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
+  const SideQpDataMap & side_bf,
+  Point p,
+  unsigned int comp,
+  dof_id_type elem_id,
+  unsigned int side_index,
+  subdomain_id_type subdomain_id,
+  boundary_id_type boundary_id,
+  unsigned int qp,
+  const std::vector<Point> & perturbs,
+  const std::vector<Real> & phi_i_qp)
+{
+  _local_side_eim_basis_functions.emplace_back(side_bf);
+
+  _interpolation_points_xyz.emplace_back(p);
+  _interpolation_points_comp.emplace_back(comp);
+  _interpolation_points_elem_id.emplace_back(elem_id);
+  _interpolation_points_side_index.emplace_back(side_index);
+  _interpolation_points_subdomain_id.emplace_back(subdomain_id);
+  _interpolation_points_boundary_id.emplace_back(boundary_id);
+  _interpolation_points_qp.emplace_back(qp);
+  _interpolation_points_xyz_perturbations.emplace_back(perturbs);
+  _interpolation_points_phi_i_qp.emplace_back(phi_i_qp);
+}
+
 void RBEIMEvaluation::
 write_out_basis_functions(const std::string & directory_name,
                           bool write_binary_basis_functions)
 {
   LOG_SCOPE("write_out_basis_functions()", "RBEIMEvaluation");
+
+  if (get_parametrized_function().on_mesh_sides())
+    write_out_side_basis_functions(directory_name, write_binary_basis_functions);
+  else
+    write_out_interior_basis_functions(directory_name, write_binary_basis_functions);
+}
+
+void RBEIMEvaluation::
+write_out_interior_basis_functions(const std::string & directory_name,
+                                   bool write_binary_basis_functions)
+{
+  LOG_SCOPE("write_out_interior_basis_functions()", "RBEIMEvaluation");
 
   // Quick return if there is no work to do. Note: make sure all procs
   // agree there is no work to do.
@@ -660,11 +866,142 @@ write_out_basis_functions(const std::string & directory_name,
 }
 
 void RBEIMEvaluation::
+write_out_side_basis_functions(const std::string & directory_name,
+                               bool write_binary_basis_functions)
+{
+  LOG_SCOPE("write_out_side_basis_functions()", "RBEIMEvaluation");
+
+  // Quick return if there is no work to do. Note: make sure all procs
+  // agree there is no work to do.
+  bool is_empty = _local_side_eim_basis_functions.empty();
+  this->comm().verify(is_empty);
+
+  if (is_empty)
+    return;
+
+  // Gather basis function data from other procs, storing it in
+  // _local_side_eim_basis_functions, so that we can then print everything
+  // from processor 0.
+  this->side_gather_bfs();
+
+  // Write values from processor 0 only.
+  if (this->processor_id() == 0)
+    {
+      // Make a directory to store all the data files
+      Utility::mkdir(directory_name.c_str());
+
+      // Create filename
+      std::ostringstream file_name;
+      const std::string basis_function_suffix = (write_binary_basis_functions ? ".xdr" : ".dat");
+      file_name << directory_name << "/" << "bf_data" << basis_function_suffix;
+
+      // Create XDR writer object
+      Xdr xdr(file_name.str(), write_binary_basis_functions ? ENCODE : WRITE);
+
+      // Write number of basis functions to file. Note: the
+      // Xdr::data() function takes non-const references, so you can't
+      // pass e.g. vec.size() to that interface.
+      auto n_bf = _local_side_eim_basis_functions.size();
+      xdr.data(n_bf, "# Number of basis functions");
+
+      // We assume that each basis function has data for the same
+      // number of (elem,side) pairs as basis function 0, which is equal to the
+      // size of the map.
+      auto n_elem = _local_side_eim_basis_functions[0].size();
+      xdr.data(n_elem, "# Number of (elem,side) pairs");
+
+      // We assume that each element has the same number of variables,
+      // and we get the number of vars from the first element of the
+      // first basis function.
+      auto n_vars = _local_side_eim_basis_functions[0].begin()->second.size();
+      xdr.data(n_vars, "# Number of variables");
+
+      // We write out the following arrays:
+      // - element IDs
+      // - side indices
+      // - n_qp_per_elem_side
+      std::vector<unsigned int> n_qp_per_elem_side;
+      std::vector<unsigned int> elem_ids;
+      std::vector<unsigned int> side_indices;
+      elem_ids.reserve(n_elem);
+      side_indices.reserve(n_elem);
+      n_qp_per_elem_side.reserve(n_elem);
+      for (const auto & pr : _local_side_eim_basis_functions[0])
+        {
+          const auto & elem_side_pair = pr.first;
+          elem_ids.push_back(elem_side_pair.first);
+          side_indices.push_back(elem_side_pair.second);
+
+          // array[n_vars][n_qp] per Elem. We get the number of QPs
+          // for variable 0, assuming they are all the same.
+          const auto & array = pr.second;
+          n_qp_per_elem_side.push_back(array[0].size());
+        }
+      xdr.data(elem_ids, "# Elem IDs");
+      xdr.data(side_indices, "# Side indices");
+      xdr.data(n_qp_per_elem_side, "# Number of QPs per Elem");
+
+      // The total amount of qp data for each var is the sum of the
+      // entries in the "n_qp_per_elem" array.
+      auto n_qp_data =
+        std::accumulate(n_qp_per_elem_side.begin(),
+                        n_qp_per_elem_side.end(),
+                        0u);
+
+      // Reserve space to store continguous vectors of qp data for each var
+      std::vector<std::vector<Number>> qp_data(n_vars);
+      for (auto var : index_range(qp_data))
+        qp_data[var].reserve(n_qp_data);
+
+      // Now we construct a vector for each basis function, for each
+      // variable which is ordered according to:
+      // [ [qp vals for Elem 0], [qp vals for Elem 1], ... [qp vals for Elem N] ]
+      // and write it to file.
+      for (auto bf : index_range(_local_side_eim_basis_functions))
+        {
+          // Clear any data from previous bf
+          for (auto var : index_range(qp_data))
+            qp_data[var].clear();
+
+          for (const auto & pr : _local_side_eim_basis_functions[bf])
+            {
+              // array[n_vars][n_qp] per Elem
+              const auto & array = pr.second;
+              for (auto var : index_range(array))
+                {
+                  // Insert all qp values for this var
+                  qp_data[var].insert(/*insert at*/qp_data[var].end(),
+                                      /*data start*/array[var].begin(),
+                                      /*data end*/array[var].end());
+                }
+            }
+
+          // Write all the var values for this bf
+          for (auto var : index_range(qp_data))
+            xdr.data_stream(qp_data[var].data(), qp_data[var].size(), /*line_break=*/qp_data[var].size());
+        }
+    }
+}
+
+void RBEIMEvaluation::
 read_in_basis_functions(const System & sys,
-                        const std::string & directory_name,
-                        bool read_binary_basis_functions)
+                                 const std::string & directory_name,
+                                 bool read_binary_basis_functions)
 {
   LOG_SCOPE("read_in_basis_functions()", "RBEIMEvaluation");
+
+  if (get_parametrized_function().on_mesh_sides())
+    read_in_side_basis_functions(sys, directory_name, read_binary_basis_functions);
+  else
+    read_in_interior_basis_functions(sys, directory_name, read_binary_basis_functions);
+}
+
+void RBEIMEvaluation::
+read_in_interior_basis_functions(const System & sys,
+                                 const std::string & directory_name,
+                                 bool read_binary_basis_functions)
+{
+  LOG_SCOPE("read_in_interior_basis_functions()", "RBEIMEvaluation");
 
   // Read values on processor 0 only.
   if (sys.comm().rank() == 0)
@@ -758,14 +1095,141 @@ read_in_basis_functions(const System & sys,
   this->distribute_bfs(sys);
 }
 
+void RBEIMEvaluation::
+read_in_side_basis_functions(const System & sys,
+                             const std::string & directory_name,
+                             bool read_binary_basis_functions)
+{
+  LOG_SCOPE("read_in_basis_functions()", "RBEIMEvaluation");
+
+  // Read values on processor 0 only.
+  if (sys.comm().rank() == 0)
+    {
+      // Create filename
+      std::ostringstream file_name;
+      const std::string basis_function_suffix = (read_binary_basis_functions ? ".xdr" : ".dat");
+      file_name << directory_name << "/" << "bf_data" << basis_function_suffix;
+
+      // Create XDR reader object
+      Xdr xdr(file_name.str(), read_binary_basis_functions ? DECODE : READ);
+
+      // Read in the number of basis functions. The comment parameter
+      // is ignored when reading.
+      std::size_t n_bf;
+      xdr.data(n_bf);
+
+      // Read in the number of elements
+      std::size_t n_elem_side;
+      xdr.data(n_elem_side);
+
+      // Read in the number of variables.
+      std::size_t n_vars;
+      xdr.data(n_vars);
+
+      std::vector<unsigned int> elem_ids(n_elem_side);
+      xdr.data(elem_ids);
+      std::vector<unsigned int> side_indices(n_elem_side);
+      xdr.data(side_indices);
+
+      // Read in vector containing the number of QPs per elem. We can
+      // create this vector with the required size or let it be read
+      // from the file and sized for us.
+      std::vector<unsigned int> n_qp_per_elem_side(n_elem_side);
+      xdr.data(n_qp_per_elem_side);
+
+      // The total amount of qp data for each var is the sum of the
+      // entries in the "n_qp_per_elem" array.
+      auto n_qp_data =
+        std::accumulate(n_qp_per_elem_side.begin(),
+                        n_qp_per_elem_side.end(),
+                        0u);
+
+      // Allocate space to store all required basis functions,
+      // clearing any data that may have been there previously.
+      _local_side_eim_basis_functions.clear();
+      _local_side_eim_basis_functions.resize(n_bf);
+      for (auto i : index_range(_local_side_eim_basis_functions))
+        for (std::size_t elem_side_idx=0; elem_side_idx<n_elem_side; ++elem_side_idx)
+          {
+            unsigned int elem_id = elem_ids[elem_side_idx];
+            unsigned int side_index = side_indices[elem_side_idx];
+            auto elem_side_pair = std::make_pair(elem_id, side_index);
+
+            auto & array = _local_side_eim_basis_functions[i][elem_side_pair];
+            array.resize(n_vars);
+          }
+
+      // Allocate temporary storage for one var's worth of qp data.
+      std::vector<Number> qp_data;
+
+      // Read in data for each basis function
+      for (auto i : index_range(_local_side_eim_basis_functions))
+        {
+          // Reference to the data map for the current basis function.
+          auto & bf_map = _local_side_eim_basis_functions[i];
+
+          for (std::size_t var=0; var<n_vars; ++var)
+            {
+              qp_data.clear();
+              qp_data.resize(n_qp_data);
+
+              // Read data using data_stream() since that is
+              // (currently) how we write it out. The "line_break"
+              // parameter of data_stream() is ignored while reading.
+              xdr.data_stream(qp_data.data(), qp_data.size());
+
+              // Iterate over the qp_data vector, filling in the
+              // "small" vectors for each Elem.
+              auto cursor = qp_data.begin();
+              for (std::size_t elem_side_idx=0; elem_side_idx<n_elem_side; ++elem_side_idx)
+                {
+                  unsigned int elem_id = elem_ids[elem_side_idx];
+                  unsigned int side_index = side_indices[elem_side_idx];
+                  auto elem_side_pair = std::make_pair(elem_id, side_index);
+
+                  // Get reference to the [n_vars][n_qp] array for
+                  // this Elem. We assign() into the vector of
+                  // quadrature point values, which allocates space if
+                  // it doesn't already exist.
+                  auto & array = bf_map[elem_side_pair];
+                  array[var].assign(cursor, cursor + n_qp_per_elem_side[elem_side_idx]);
+                  std::advance(cursor, n_qp_per_elem_side[elem_side_idx]);
+                }
+            } // end for (var)
+        } // end for (i)
+    } // end if processor 0
+
+  // Distribute the basis function information to the processors that require it
+  this->side_distribute_bfs(sys);
+}
+
 void RBEIMEvaluation::print_local_eim_basis_functions() const
 {
   for (auto bf : index_range(_local_eim_basis_functions))
     {
-      libMesh::out << "Basis function " << bf << std::endl;
+      libMesh::out << "Interior basis function " << bf << std::endl;
       for (const auto & pr : _local_eim_basis_functions[bf])
         {
           libMesh::out << "Elem " << pr.first << std::endl;
+          const auto & array = pr.second;
+          for (auto var : index_range(array))
+            {
+              libMesh::out << "Variable " << var << std::endl;
+              for (auto qp : index_range(array[var]))
+                libMesh::out << array[var][qp] << " ";
+              libMesh::out << std::endl;
+            }
+        }
+    }
+
+  for (auto bf : index_range(_local_side_eim_basis_functions))
+    {
+      libMesh::out << "Side basis function " << bf << std::endl;
+      for (const auto & pr : _local_side_eim_basis_functions[bf])
+        {
+          const auto & elem_id = pr.first.first;
+          const auto & side_index = pr.first.second;
+          libMesh::out << "Elem " << elem_id << ", Side " << side_index << std::endl;
           const auto & array = pr.second;
           for (auto var : index_range(array))
             {
@@ -920,6 +1384,154 @@ void RBEIMEvaluation::gather_bfs()
 
                   array[var].assign(cursor, cursor + n_qp_this_elem);
                   std::advance(cursor, n_qp_this_elem);
+                }
+            }
+        }
+    } // end loop over basis functions
+}
+
+void RBEIMEvaluation::side_gather_bfs()
+{
+  // We need to gather _local_side_eim_basis_functions data from other
+  // procs for printing.
+  //
+  // Ideally, this could be accomplished by simply calling:
+  // this->comm().gather(/*root_id=*/0, _local_side_eim_basis_functions);
+  //
+  // but the data structure seems to be too complicated for this to
+  // work automatically. (I get some error about the function called
+  // being "private within this context".) Therefore, we have to
+  // gather the information manually.
+
+  // So we can avoid calling this many times below
+  auto n_procs = this->n_processors();
+
+  // In serial there's nothing to gather
+  if (n_procs == 1)
+    return;
+
+  // Current assumption is that the number of basis functions stored on
+  // each processor is the same, the only thing that differs is the number
+  // of elements, so make sure that is the case now.
+  auto n_bf = _local_side_eim_basis_functions.size();
+  this->comm().verify(n_bf);
+
+  // This function should never be called if there are no basis
+  // functions, so if it was, something went wrong.
+  libmesh_error_msg_if(!n_bf, "SideRBEIMEvaluation::gather_bfs() should not be called with 0 basis functions.");
+
+  // The number of variables should be the same on all processors
+  // and we can get this from _local_side_eim_basis_functions. However,
+  // it may be that some processors have no local elements, so on
+  // those processors we cannot look up the size from
+  // _local_side_eim_basis_functions. As a result we use comm().max(n_vars)
+  // to make sure all processors agree on the final value.
+  std::size_t n_vars =
+    _local_side_eim_basis_functions[0].empty() ? 0 : _local_side_eim_basis_functions[0].begin()->second.size();
+  this->comm().max(n_vars);
+
+  // Gather list of (elem,side) pairs stored on each processor to proc 0.  We
+  // use basis function 0 as an example and assume all the basis
+  // functions are distributed similarly.
+  std::vector<std::pair<dof_id_type,unsigned int>> elem_side_pairs;
+  elem_side_pairs.reserve(_local_side_eim_basis_functions[0].size());
+  for (const auto & pr : _local_side_eim_basis_functions[0])
+    elem_side_pairs.push_back(pr.first);
+  this->comm().gather(/*root_id=*/0, elem_side_pairs);
+
+  // Store the number of qps per Elem on this processor. Again, use
+  // basis function 0 (and variable 0) to get this information, then
+  // apply it to all basis functions.
+  std::vector<unsigned int> n_qp_per_elem_side;
+  n_qp_per_elem_side.reserve(_local_side_eim_basis_functions[0].size());
+  for (const auto & pr : _local_side_eim_basis_functions[0])
+    {
+      // array[n_vars][n_qp] per (elem,side). We get the number of QPs
+      // for variable 0, assuming they are all the same.
+      const auto & array = pr.second;
+      n_qp_per_elem_side.push_back(array[0].size());
+    }
+
+  // Before gathering, compute the total amount of local qp data for
+  // each var, which is the sum of the entries in the "n_qp_per_elem_side" array.
+  // This will be used to reserve space in a vector below.
+  auto n_local_qp_data =
+    std::accumulate(n_qp_per_elem_side.begin(),
+                    n_qp_per_elem_side.end(),
+                    0u);
+
+  // Gather the number of qps per Elem for each processor onto processor 0.
+  this->comm().gather(/*root_id=*/0, n_qp_per_elem_side);
+
+  // Sanity check: On processor 0, this checks that we have gathered the same number
+  // of (elem,side) pairs and qp counts.
+  libmesh_error_msg_if(elem_side_pairs.size() != n_qp_per_elem_side.size(),
+                       "Must gather same number of Elem ids as qps per Elem.");
+
+  // Reserve space to store contiguous vectors of qp data for each var
+  std::vector<std::vector<Number>> gathered_qp_data(n_vars);
+  for (auto var : index_range(gathered_qp_data))
+    gathered_qp_data[var].reserve(n_local_qp_data);
+
+  // Now we construct a vector for each basis function, for each
+  // variable, which is ordered according to:
+  // [ [qp vals for Elem 0], [qp vals for Elem 1], ... [qp vals for Elem N] ]
+  // and gather it to processor 0.
+  for (auto bf : index_range(_local_side_eim_basis_functions))
+    {
+      // Clear any data from previous bf
+      for (auto var : index_range(gathered_qp_data))
+        gathered_qp_data[var].clear();
+
+      for (const auto & pr : _local_side_eim_basis_functions[bf])
+        {
+          // array[n_vars][n_qp] per (elem,side) pair
+          const auto & array = pr.second;
+          for (auto var : index_range(array))
+            {
+              // Insert all qp values for this var
+              gathered_qp_data[var].insert(/*insert at*/gathered_qp_data[var].end(),
+                                           /*data start*/array[var].begin(),
+                                           /*data end*/array[var].end());
+            }
+        }
+
+      // Reference to the data map for the current basis function.
+      auto & bf_map = _local_side_eim_basis_functions[bf];
+
+      for (auto var : index_range(gathered_qp_data))
+        {
+          // For each var, gather gathered_qp_data[var] onto processor
+          // 0. There apparently is not a gather overload for
+          // vector-of-vectors...
+          this->comm().gather(/*root_id=*/0, gathered_qp_data[var]);
+
+          // On processor 0, iterate over the gathered_qp_data[var]
+          // vector we just gathered, filling in the "small" vectors
+          // for each Elem. Note: here we ignore the fact that we
+          // already have the data on processor 0 and just overwrite
+          // it, this makes the indexing logic a bit simpler.
+          if (this->processor_id() == 0)
+            {
+              auto cursor = gathered_qp_data[var].begin();
+              for (auto i : index_range(elem_side_pairs))
+                {
+                  auto elem_side_pair = elem_side_pairs[i];
+                  auto n_qp_this_elem_side = n_qp_per_elem_side[i];
+
+                  // Get reference to the [n_vars][n_qp] array for
+                  // this Elem. We assign() into the vector of
+                  // quadrature point values, which allocates space if
+                  // it doesn't already exist.
+                  auto & array = bf_map[elem_side_pair];
+
+                  // Possibly allocate space if this is data for a new
+                  // element we haven't seen before.
+                  if (array.empty())
+                    array.resize(n_vars);
+
+                  array[var].assign(cursor, cursor + n_qp_this_elem_side);
+                  std::advance(cursor, n_qp_this_elem_side);
                 }
             }
         }
@@ -1146,6 +1758,258 @@ void RBEIMEvaluation::distribute_bfs(const System & sys)
               // Delete this Elem's information from every basis function.
               for (auto & bf_map : _local_eim_basis_functions)
                 bf_map.erase(elem_id);
+            } // end for (e)
+        } // end for proc_id
+    } // if (rank == 0)
+}
+
+void RBEIMEvaluation::side_distribute_bfs(const System & sys)
+{
+  // So we can avoid calling these many times below
+  auto n_procs = sys.comm().size();
+  auto rank = sys.comm().rank();
+
+  // In serial there's nothing to distribute
+  if (n_procs == 1)
+    return;
+
+  // Broadcast the number of basis functions from proc 0. After
+  // distributing, all procs should have the same number of basis
+  // functions.
+  auto n_bf = _local_side_eim_basis_functions.size();
+  sys.comm().broadcast(n_bf);
+
+  // Allocate enough space to store n_bf basis functions on non-zero ranks
+  if (rank != 0)
+    _local_side_eim_basis_functions.resize(n_bf);
+
+  // Broadcast the number of variables from proc 0. After
+  // distributing, all procs should have the same number of variables.
+  auto n_vars = _local_side_eim_basis_functions[0].begin()->second.size();
+  sys.comm().broadcast(n_vars);
+
+  const std::set<boundary_id_type> & parametrized_function_boundary_ids =
+    get_parametrized_function().get_parametrized_function_boundary_ids();
+
+  // Construct lists of elem ids owned by different processors
+  const MeshBase & mesh = sys.get_mesh();
+
+  // BoundaryInfo and related data structures
+  const auto & binfo = mesh.get_boundary_info();
+  std::vector<boundary_id_type> side_boundary_ids;
+
+  std::vector<dof_id_type> gathered_local_elem_ids;
+  std::vector<dof_id_type> gathered_local_side_indices;
+  for (const auto & elem : mesh.active_local_element_ptr_range())
+    {
+      for (unsigned int side = 0; side != elem->n_sides(); ++side)
+        {
+          // skip non-boundary elements
+          if(!elem->neighbor_ptr(side))
+            {
+              binfo.boundary_ids(elem, side, side_boundary_ids);
+
+              bool has_side_boundary_id = false;
+              for(boundary_id_type side_boundary_id : side_boundary_ids)
+                if(parametrized_function_boundary_ids.count(side_boundary_id))
+                  {
+                    has_side_boundary_id = true;
+                    break;
+                  }
+
+              if(has_side_boundary_id)
+                {
+                  gathered_local_elem_ids.push_back(elem->id());
+                  gathered_local_side_indices.push_back(side);
+                }
+            }
+        }
+    }
+
+  // Gather the number of local elems from all procs to proc 0
+  auto n_local_elems = gathered_local_elem_ids.size();
+  std::vector<std::size_t> gathered_n_local_elems = {n_local_elems};
+  sys.comm().gather(/*root_id=*/0, gathered_n_local_elems);
+
+  // Gather the (elem,side) owned by each processor onto processor 0.
+  sys.comm().gather(/*root_id=*/0, gathered_local_elem_ids);
+  sys.comm().gather(/*root_id=*/0, gathered_local_side_indices);
+
+  // Construct vectors of "start" and "one-past-the-end" indices into
+  // the gathered_local_elem_ids vector for each proc. Only valid on
+  // processor 0.
+  std::vector<std::size_t> start_elem_ids_index, end_elem_ids_index;
+
+  if (rank == 0)
+    {
+      start_elem_ids_index.resize(n_procs);
+      start_elem_ids_index[0] = 0;
+      for (processor_id_type p=1; p<n_procs; ++p)
+        start_elem_ids_index[p] = start_elem_ids_index[p-1] + gathered_n_local_elems[p-1];
+
+      end_elem_ids_index.resize(n_procs);
+      end_elem_ids_index[n_procs - 1] = gathered_local_elem_ids.size();
+      for (processor_id_type p=0; p<n_procs - 1; ++p)
+        end_elem_ids_index[p] = start_elem_ids_index[p+1];
+    }
+
+  // On processor 0, using basis function 0 and variable 0, prepare a
+  // vector with the number of qps per Elem.  Then scatter this vector
+  // out to the processors that require it. The order of this vector
+  // matches the gathered_local_elem_ids ordering. The counts will be
+  // gathered_n_local_elems, since there will be one qp count per Elem.
+  std::vector<unsigned int> n_qp_per_elem_data;
+
+  // On rank 0, the "counts" vector holds the number of floating point values that
+  // are to be scattered to each proc. It is only required on proc 0.
+  std::vector<int> counts;
+
+  if (rank == 0)
+    {
+      n_qp_per_elem_data.reserve(gathered_local_elem_ids.size());
+      counts.resize(n_procs);
+
+      auto & bf_map = _local_side_eim_basis_functions[0];
+
+      for (processor_id_type p=0; p<n_procs; ++p)
+        {
+          for (auto e : make_range(start_elem_ids_index[p], end_elem_ids_index[p]))
+            {
+              auto elem_id = gathered_local_elem_ids[e];
+              auto side_index = gathered_local_side_indices[e];
+
+              // Get reference to array[n_vars][n_qp] for current Elem.
+              // Throws an error if the required elem_id is not found.
+              const auto & array = libmesh_map_find(bf_map, std::make_pair(elem_id, side_index));
+
+              auto n_qps = array[0].size();
+
+              // We use var==0 to set the number of qps for all vars
+              n_qp_per_elem_data.push_back(n_qps);
+
+              // Accumulate the count for this proc
+              counts[p] += n_qps;
+            } // end for (e)
+        } // end for proc_id
+    } // if (rank == 0)
+
+  // Now scatter the n_qp_per_elem_data to all procs (must call the
+  // scatter on all procs, it is a collective).
+  {
+    std::vector<unsigned int> recv;
+    std::vector<int> tmp(gathered_n_local_elems.begin(), gathered_n_local_elems.end());
+    sys.comm().scatter(n_qp_per_elem_data, tmp, recv, /*root_id=*/0);
+
+    // Now swap n_qp_per_elem_data and recv. All processors now have a
+    // vector of length n_local_elems containing the number of
+    // quadarature points per Elem.
+    n_qp_per_elem_data.swap(recv);
+  }
+
+  // For each basis function and each variable, build a vector
+  // of qp data in the Elem ordering given by the
+  // gathered_local_elem_ids, then call
+  //
+  // sys.comm().scatter(data, counts, recv, /*root_id=*/0);
+  std::vector<std::vector<Number>> qp_data(n_vars);
+  if (rank == 0)
+    {
+      // The total amount of qp data is given by summing the entries
+      // of the "counts" vector.
+      auto n_qp_data =
+        std::accumulate(counts.begin(), counts.end(), 0u);
+
+      // On processor 0, reserve enough space to hold all the qp
+      // data for a single basis function for each var.
+      for (auto var : index_range(qp_data))
+        qp_data[var].reserve(n_qp_data);
+    }
+
+  // The recv_qp_data vector will be used on the receiving end of all
+  // the scatters below.
+  std::vector<Number> recv_qp_data;
+
+  // Loop from 0..n_bf on _all_ procs, since the scatters inside this
+  // loop are collective.
+  for (auto bf : make_range(n_bf))
+    {
+      // Prepare data for scattering (only on proc 0)
+      if (rank == 0)
+        {
+          // Reference to the data map for the current basis function.
+          auto & bf_map = _local_side_eim_basis_functions[bf];
+
+          // Clear any data from previous bf
+          for (auto var : index_range(qp_data))
+            qp_data[var].clear();
+
+          for (processor_id_type p=0; p<n_procs; ++p)
+            {
+              for (auto e : make_range(start_elem_ids_index[p], end_elem_ids_index[p]))
+                {
+                  auto elem_id = gathered_local_elem_ids[e];
+                  auto side_index = gathered_local_side_indices[e];
+
+                  // Get reference to array[n_vars][n_qp] for current Elem.
+                  // Throws an error if the required (elem,side) is not found.
+                  const auto & array = libmesh_map_find(bf_map, std::make_pair(elem_id, side_index));
+
+                  for (auto var : index_range(array))
+                    {
+                      // Insert all qp values for this var
+                      qp_data[var].insert(/*insert at*/qp_data[var].end(),
+                                          /*data start*/array[var].begin(),
+                                          /*data end*/array[var].end());
+                    } // end for (var)
+                } // end for (e)
+            } // end for proc_id
+        } // end if rank==0
+
+      // Perform the scatters (all procs)
+      for (auto var : make_range(n_vars))
+        {
+          // Do the scatter for the current var
+          sys.comm().scatter(qp_data[var], counts, recv_qp_data, /*root_id=*/0);
+
+          if (rank != 0)
+            {
+              // Store the scattered data we received in _local_side_eim_basis_functions[bf]
+              auto & bf_map = _local_side_eim_basis_functions[bf];
+              auto cursor = recv_qp_data.begin();
+
+              for (auto i : index_range(gathered_local_elem_ids))
+                {
+                  auto elem_id = gathered_local_elem_ids[i];
+                  auto side_index = gathered_local_side_indices[i];
+                  auto n_qp_this_elem = n_qp_per_elem_data[i];
+                  auto & array = bf_map[std::make_pair(elem_id, side_index)];
+
+                  // Create space to store the data if it doesn't already exist.
+                  if (array.empty())
+                    array.resize(n_vars);
+
+                  array[var].assign(cursor, cursor + n_qp_this_elem);
+                  std::advance(cursor, n_qp_this_elem);
+                }
+            } // if (rank != 0)
+        } // end for (var)
+    } // end for (bf)
+
+  // Now that the scattering is done, delete non-local Elem
+  // information from processor 0's _local_side_eim_basis_functions data
+  // structure.
+  if (rank == 0)
+    {
+      for (processor_id_type p=1; p<n_procs; ++p)
+        {
+          for (auto e : make_range(start_elem_ids_index[p], end_elem_ids_index[p]))
+            {
+              auto elem_id = gathered_local_elem_ids[e];
+              auto side_index = gathered_local_side_indices[e];
+
+              // Delete this Elem's information from every basis function.
+              for (auto & bf_map : _local_side_eim_basis_functions)
+                bf_map.erase(std::make_pair(elem_id, side_index));
             } // end for (e)
         } // end for proc_id
     } // if (rank == 0)

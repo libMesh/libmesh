@@ -743,6 +743,21 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
+  // Interpolation points side indices, relevant if the parametrized function is defined on mesh sides
+  if (rb_eim_evaluation.get_parametrized_function().on_mesh_sides())
+  {
+    auto interpolation_points_boundary_id_list =
+      rb_eim_evaluation_reader.getInterpolationBoundaryId();
+
+    libmesh_error_msg_if(interpolation_points_boundary_id_list.size() != n_bfs,
+                         "Size error while reading the eim interpolation boundary IDs.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        rb_eim_evaluation.add_interpolation_points_boundary_id(interpolation_points_boundary_id_list[i]);
+      }
+  }
+
   // Interpolation points element IDs
   {
     auto interpolation_points_elem_id_list =
@@ -754,6 +769,21 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
     for (unsigned int i=0; i<n_bfs; ++i)
       {
         rb_eim_evaluation.add_interpolation_points_elem_id(interpolation_points_elem_id_list[i]);
+      }
+  }
+
+  // Interpolation points side indices, relevant if the parametrized function is defined on mesh sides
+  if (rb_eim_evaluation.get_parametrized_function().on_mesh_sides())
+  {
+    auto interpolation_points_side_index_list =
+      rb_eim_evaluation_reader.getInterpolationSideIndex();
+
+    libmesh_error_msg_if(interpolation_points_side_index_list.size() != n_bfs,
+                         "Size error while reading the eim interpolation side indices.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        rb_eim_evaluation.add_interpolation_points_side_index(interpolation_points_side_index_list[i]);
       }
   }
 

@@ -81,6 +81,11 @@ public:
   typedef RBEIMEvaluation::QpDataMap QpDataMap;
 
   /**
+   * Type of the data structure used to map from (elem id,side_index) -> [n_vars][n_qp] data.
+   */
+  typedef RBEIMEvaluation::SideQpDataMap SideQpDataMap;
+
+  /**
    * Clear this object.
    */
   virtual void clear() override;
@@ -260,10 +265,52 @@ private:
   Number inner_product(const QpDataMap & v, const QpDataMap & w);
 
   /**
+   * Same as inner_product() except for side data.
+   */
+  Number side_inner_product(const SideQpDataMap & v, const SideQpDataMap & w);
+
+  /**
    * Get the maximum absolute value from a vector stored in the format that we use
    * for basis functions.
    */
-  Real get_max_abs_value(const QpDataMap & v) const;
+  template <class DataMap>
+  Real get_max_abs_value(const DataMap & v) const
+  {
+    Real max_value = 0.;
+
+    for (const auto & pr : v)
+      {
+        const auto & v_comp_and_qp = pr.second;
+
+        for (const auto & comp : index_range(v_comp_and_qp))
+          {
+            // If scale_components_in_enrichment() returns true then we
+            // apply a scaling to give an approximately uniform scaling
+            // for all components.
+            Real comp_scaling = 1.;
+            if (get_rb_eim_evaluation().scale_components_in_enrichment())
+              {
+                // Make sure that _component_scaling_in_training_set is initialized
+                libmesh_error_msg_if(comp >= _component_scaling_in_training_set.size(),
+                                    "Invalid vector index");
+                comp_scaling = _component_scaling_in_training_set[comp];
+              }
+
+            const std::vector<Number> & v_qp = v_comp_and_qp[comp];
+            for (Number value : v_qp)
+              max_value = std::max(max_value, std::abs(value * comp_scaling));
+          }
+      }
+
+    comm().max(max_value);
+    return max_value;
+  }
+
+
+  /**
+   * Same as get_max_abs_value() except for side data.
+   */
+  Real get_side_max_abs_value(const SideQpDataMap & v) const;
 
   /**
    * Add a new basis function to the EIM approximation.
@@ -287,8 +334,31 @@ private:
   /**
    * Scale all values in \p pf by \p scaling_factor
    */
-  static void scale_parametrized_function(
-    QpDataMap & local_pf,
+  template<class DataMap>
+  static void scale_parametrized_function(DataMap & local_pf,
+                                          Number scaling_factor)
+  {
+    for (auto & pr : local_pf)
+      {
+        auto & comp_and_qp = pr.second;
+
+        for (unsigned int comp : index_range(comp_and_qp))
+          {
+            std::vector<Number> & qp_values = comp_and_qp[comp];
+
+            for (unsigned int qp : index_range(qp_values))
+              {
+                qp_values[qp] *= scaling_factor;
+              }
+          }
+      }
+  }
+
+  /**
+   * Same as scale_parametrized_function() excecpt for side data.
+   */
+  static void scale_side_parametrized_function(
+    SideQpDataMap & local_pf,
     Number scaling_factor);
 
   /**
@@ -333,6 +403,13 @@ private:
   std::vector<QpDataMap> _local_parametrized_functions_for_training;
 
   /**
+   * Same as _local_parametrized_functions_for_training except for side data.
+   * The indexing is as follows:
+   *   basis function index --> (element ID,side index) --> variable --> quadrature point --> value
+   */
+  std::vector<SideQpDataMap> _local_side_parametrized_functions_for_training;
+
+  /**
    * Maximum value in _local_parametrized_functions_for_training across all processors.
    * This can be used for normalization purposes, for example.
    */
@@ -375,6 +452,24 @@ private:
    * to the mapping function derivatives.
    */
   std::unordered_map<dof_id_type, std::vector<std::vector<Point>> > _local_quad_point_locations_perturbations;
+
+  /**
+   * Same as above except for side data.
+   */
+  std::map<std::pair<dof_id_type,unsigned int>, std::vector<Point> > _local_side_quad_point_locations;
+  std::map<std::pair<dof_id_type,unsigned int>, std::vector<Real> > _local_side_quad_point_JxW;
+  std::map<std::pair<dof_id_type,unsigned int>, subdomain_id_type > _local_side_quad_point_subdomain_ids;
+  std::map<std::pair<dof_id_type,unsigned int>, boundary_id_type > _local_side_quad_point_boundary_ids;
+  std::map<std::pair<dof_id_type,unsigned int>, std::vector<std::vector<Point>> > _local_side_quad_point_locations_perturbations;
+
+  /**
+   * For side data, we also store "side type" info. This is used to distinguish between
+   * data that is stored on a "shellface" vs. a "standard side". The convention we use
+   * here is:
+   *  0 --> standard side
+   *  1 --> shellface
+   */
+  std::map<std::pair<dof_id_type,unsigned int>, unsigned int > _local_side_quad_point_side_types;
 
   /**
    * We also optionally store the values at the "observation points" for all parametrized functions

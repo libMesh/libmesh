@@ -51,6 +51,17 @@ void RBEIMAssembly::evaluate_basis_function(dof_id_type elem_id,
   libmesh_error_msg_if(values.empty(), "Error: EIM basis function has no entries on this element for this processor");
 }
 
+void RBEIMAssembly::evaluate_side_basis_function(dof_id_type elem_id,
+                                                 unsigned int side_index,
+                                                 unsigned int comp,
+                                                 std::vector<Number> & values)
+{
+  get_rb_eim_construction().get_rb_eim_evaluation().get_eim_basis_function_side_values_at_qps(
+    _basis_function_index, elem_id, side_index, comp, values);
+
+  libmesh_error_msg_if(values.empty(), "Error: EIM basis function has no entries on this element for this processor");
+}
+
 RBEIMConstruction & RBEIMAssembly::get_rb_eim_construction()
 {
   return _rb_eim_con;
