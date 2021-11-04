@@ -950,9 +950,12 @@ include_HEADERS = \
         solvers/eigen_time_solver.h \
         solvers/euler2_solver.h \
         solvers/euler_solver.h \
+        solvers/file_history_data.h \
         solvers/file_solution_history.h \
         solvers/first_order_unsteady_solver.h \
+        solvers/history_data.h \
         solvers/linear_solver.h \
+        solvers/memory_history_data.h \
         solvers/memory_solution_history.h \
         solvers/newmark_solver.h \
         solvers/newton_solver.h \
