@@ -1078,7 +1078,6 @@ void RBEIMConstruction::initialize_qp_data()
             if (elem->dim() == 2)
               for (unsigned int shellface_index=0; shellface_index<2; shellface_index++)
                 {
-                  std::vector<boundary_id_type> side_boundary_ids;
                   binfo.shellface_boundary_ids(elem, shellface_index, side_boundary_ids);
 
                   bool has_side_boundary_id = false;
