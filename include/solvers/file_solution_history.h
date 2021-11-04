@@ -26,6 +26,7 @@
 #include "libmesh/enum_xdr_mode.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/libmesh.h"
+#include "libmesh/diff_system.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
@@ -50,7 +51,7 @@ public:
    * Constructor, reference to system to be passed by user, set the
    * stored_sols iterator to some initial value
    */
-  FileSolutionHistory(System & system_);
+  FileSolutionHistory(DifferentiableSystem & system_);
   /**
    * Destructor
    */
@@ -67,18 +68,6 @@ public:
   virtual void retrieve(bool is_adjoint_solve, Real time) override;
 
   /**
-   * Virtual function retrieve which we will be overriding to erase timesteps
-   */
-  virtual void erase(Real time) override;
-
-  /**
-   * Typedef for Stored Solutions iterator, a list of pairs of the
-   * system time and filenames of the stored solutions
-   */
-  typedef std::map<Real, std::string> map_type;
-  typedef map_type::iterator stored_solutions_iterator;
-
-  /**
    * Definition of the clone function needed for the setter function
    */
   virtual std::unique_ptr<SolutionHistory > clone() const override
@@ -88,33 +77,8 @@ public:
 
 private:
 
-  // This list of pairs will hold the timestamp and filename of each stored solution
-  map_type stored_solutions;
-
-  // The stored solutions iterator
-  stored_solutions_iterator stored_sols;
-
-  // A helper function to locate entries at a given time
-  // Behaviour depends on whether we are calling this function
-  // while storing or retrieving/erasing entries.
-  // While storing, if no entry in our map matches our time key,
-  // we will create a new entry in the map. If we are not storing,
-  // not matching a given time key implies an error.
-  void find_stored_entry(Real time, bool storing = false);
-
   // A system reference
-  System & _system ;
-
-  // A 'timestamp' that belongs specifically to FSH, this will be used to generate filenames
-  unsigned int localTimestamp;
-
-  // To assign filenames a timestamp, we will maintain a datastructure within
-  // FileSolutionHistory which will map system.time to 'timestamps'
-  std::map<Real, unsigned int> timeTotimestamp;
-
-  // An iterator for the timeTotimestamp map, will help member functions distinguish
-  // between primal and adjoint time loops
-  std::map<Real, unsigned int>::iterator timeTotimestamp_iterator;
+  DifferentiableSystem & _system ;
 
   /**
    * A vector of pointers to vectors holding the adjoint solution at the last time step

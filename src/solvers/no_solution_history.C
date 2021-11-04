@@ -32,10 +32,4 @@ void NoSolutionHistory::retrieve(bool /* is_adjoint_solve */, Real /* time */)
   libmesh_not_implemented();
 }
 
-void NoSolutionHistory::erase(Real /* time */)
-{
-  // Nothing was stored, so nothing can be erased
-  libmesh_not_implemented();
-}
-
 }
