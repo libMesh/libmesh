@@ -1094,8 +1094,9 @@ void RBEIMConstruction::initialize_qp_data()
                   {
                     context.elem_fe_reinit();
 
-                    // We use n_sides+shellface_index to give the side index of a shellface
-                    auto elem_side_pair = std::make_pair(elem_id, elem->n_sides()+shellface_index);
+                    // We use shellface_index as the side_index since shellface boundary conditions
+                    // are stored separately from side boundary conditions in BoundaryInfo.
+                    auto elem_side_pair = std::make_pair(elem_id, shellface_index);
 
                     _local_side_quad_point_locations[elem_side_pair] = xyz;
                     _local_side_quad_point_JxW[elem_side_pair] = JxW;
