@@ -387,6 +387,7 @@ libmesh_SOURCES =  \
         src/solvers/petscdmlibmeshimpl.C \
         src/solvers/second_order_unsteady_solver.C \
         src/solvers/slepc_eigen_solver.C \
+        src/solvers/solution_history.C \
         src/solvers/steady_solver.C \
         src/solvers/tao_optimization_solver.C \
         src/solvers/time_solver.C \
