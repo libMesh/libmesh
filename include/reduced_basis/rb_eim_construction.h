@@ -463,6 +463,15 @@ private:
   std::map<std::pair<dof_id_type,unsigned int>, std::vector<std::vector<Point>> > _local_side_quad_point_locations_perturbations;
 
   /**
+   * For side data, we also store "side type" info. This is used to distinguish between
+   * data that is stored on a "shellface" vs. a "standard side". The convention we use
+   * here is:
+   *  0 --> standard side
+   *  1 --> shellface
+   */
+  std::map<std::pair<dof_id_type,unsigned int>, unsigned int > _local_side_quad_point_side_types;
+
+  /**
    * We also optionally store the values at the "observation points" for all parametrized functions
    * in the training set. These values are used to obtain the observation values that are stored in
    * RBEIMEvaluation.

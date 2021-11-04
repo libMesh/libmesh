@@ -88,6 +88,7 @@ void RBEIMConstruction::clear()
   _local_side_quad_point_JxW.clear();
   _local_side_quad_point_subdomain_ids.clear();
   _local_side_quad_point_boundary_ids.clear();
+  _local_side_quad_point_side_types.clear();
 
   _eim_projection_matrix.resize(0,0);
 }
@@ -753,6 +754,7 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
                                                                                                _local_side_quad_point_locations,
                                                                                                _local_side_quad_point_subdomain_ids,
                                                                                                _local_side_quad_point_boundary_ids,
+                                                                                               _local_side_quad_point_side_types,
                                                                                                _local_side_quad_point_locations_perturbations,
                                                                                                *this);
 
@@ -957,6 +959,7 @@ void RBEIMConstruction::initialize_qp_data()
       _local_side_quad_point_subdomain_ids.clear();
       _local_side_quad_point_boundary_ids.clear();
       _local_side_quad_point_JxW.clear();
+      _local_side_quad_point_side_types.clear();
 
       _local_side_quad_point_locations_perturbations.clear();
 
@@ -999,6 +1002,9 @@ void RBEIMConstruction::initialize_qp_data()
                     _local_side_quad_point_JxW[elem_side_pair] = JxW_side;
                     _local_side_quad_point_subdomain_ids[elem_side_pair] = elem->subdomain_id();
                     _local_side_quad_point_boundary_ids[elem_side_pair] = matching_boundary_id;
+
+                    // This is a standard side (not a shellface) so set side type to 0
+                    _local_side_quad_point_side_types[elem_side_pair] = 0;
 
                     if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
                       {
@@ -1102,6 +1108,9 @@ void RBEIMConstruction::initialize_qp_data()
                     _local_side_quad_point_JxW[elem_side_pair] = JxW;
                     _local_side_quad_point_subdomain_ids[elem_side_pair] = elem->subdomain_id();
                     _local_side_quad_point_boundary_ids[elem_side_pair] = matching_boundary_id;
+
+                    // This is a shellface (not a standard side) so set side type to 1
+                    _local_side_quad_point_side_types[elem_side_pair] = 1;
 
                     if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
                       {
@@ -1430,11 +1439,6 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
       FEMContext con(*this);
       init_context(con);
 
-      FEBase* side_fe = nullptr;
-      con.get_side_fe( 0, side_fe );
-
-      const std::vector<std::vector<Real>> & phi_side = side_fe->get_phi();
-
       for (const auto & pr : local_pf)
         {
           auto elem_and_side = pr.first;
@@ -1442,55 +1446,119 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
           unsigned int side_index = elem_and_side.second;
           const auto & comp_and_qp = pr.second;
 
-          // Also initialize phi in order to compute phi_i_qp
           const Elem & elem_ref = get_mesh().elem_ref(elem_id);
           con.pre_fe_reinit(*this, &elem_ref);
 
-          side_fe->reinit(&elem_ref, side_index);
+          unsigned int side_type = libmesh_map_find(_local_side_quad_point_side_types, elem_and_side);
 
-          for (const auto & comp : index_range(comp_and_qp))
+          // side_type == 0 --> standard side
+          // side_type == 1 --> shellface
+          if (side_type == 0)
             {
-              const std::vector<Number> & qp_values = comp_and_qp[comp];
+              auto side_fe = con.get_side_fe(/*var=*/ 0);
+              const std::vector<std::vector<Real>> & phi_side = side_fe->get_phi();
 
-              for (auto qp : index_range(qp_values))
+              side_fe->reinit(&elem_ref, side_index);
+
+              for (const auto & comp : index_range(comp_and_qp))
                 {
-                  Number value = qp_values[qp];
-                  Real abs_value = std::abs(value);
+                  const std::vector<Number> & qp_values = comp_and_qp[comp];
 
-                  if (abs_value > largest_abs_value)
+                  for (auto qp : index_range(qp_values))
                     {
-                      largest_abs_value = abs_value;
-                      optimal_value = value;
-                      optimal_comp = comp;
-                      optimal_elem_id = elem_id;
-                      optimal_side_index = side_index;
-                      optimal_qp = qp;
+                      Number value = qp_values[qp];
+                      Real abs_value = std::abs(value);
 
-                      // TODO: We only want the "dofs on side" entries
-                      // from phi_side. Could do this by initing an FE object
-                      // on the side itself, rather than using get_side_fe().
-                      optimal_point_phi_i_qp.resize(phi_side.size());
-                      for(auto i : index_range(phi_side))
-                        optimal_point_phi_i_qp[i] = phi_side[i][qp];
-
-                      const auto & point_list =
-                        libmesh_map_find(_local_side_quad_point_locations, elem_and_side);
-
-                      libmesh_error_msg_if(qp >= point_list.size(), "Error: Invalid qp");
-
-                      optimal_point = point_list[qp];
-
-                      optimal_subdomain_id = libmesh_map_find(_local_side_quad_point_subdomain_ids, elem_and_side);
-                      optimal_boundary_id = libmesh_map_find(_local_side_quad_point_boundary_ids, elem_and_side);
-
-                      if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
+                      if (abs_value > largest_abs_value)
                         {
-                          const auto & perturb_list =
-                            libmesh_map_find(_local_side_quad_point_locations_perturbations, elem_and_side);
+                          largest_abs_value = abs_value;
+                          optimal_value = value;
+                          optimal_comp = comp;
+                          optimal_elem_id = elem_id;
+                          optimal_side_index = side_index;
+                          optimal_qp = qp;
 
-                          libmesh_error_msg_if(qp >= perturb_list.size(), "Error: Invalid qp");
+                          // TODO: We only want the "dofs on side" entries
+                          // from phi_side. Could do this by initing an FE object
+                          // on the side itself, rather than using get_side_fe().
+                          optimal_point_phi_i_qp.resize(phi_side.size());
+                          for(auto i : index_range(phi_side))
+                            optimal_point_phi_i_qp[i] = phi_side[i][qp];
 
-                          optimal_point_perturbs = perturb_list[qp];
+                          const auto & point_list =
+                            libmesh_map_find(_local_side_quad_point_locations, elem_and_side);
+
+                          libmesh_error_msg_if(qp >= point_list.size(), "Error: Invalid qp");
+
+                          optimal_point = point_list[qp];
+
+                          optimal_subdomain_id = libmesh_map_find(_local_side_quad_point_subdomain_ids, elem_and_side);
+                          optimal_boundary_id = libmesh_map_find(_local_side_quad_point_boundary_ids, elem_and_side);
+
+                          if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
+                            {
+                              const auto & perturb_list =
+                                libmesh_map_find(_local_side_quad_point_locations_perturbations, elem_and_side);
+
+                              libmesh_error_msg_if(qp >= perturb_list.size(), "Error: Invalid qp");
+
+                              optimal_point_perturbs = perturb_list[qp];
+                            }
+                        }
+                    }
+                }
+            }
+          else if (side_type == 1)
+            {
+              auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
+              const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+
+              con.elem_fe_reinit();
+
+              for (const auto & comp : index_range(comp_and_qp))
+                {
+                  const std::vector<Number> & qp_values = comp_and_qp[comp];
+
+                  for (auto qp : index_range(qp_values))
+                    {
+                      Number value = qp_values[qp];
+                      Real abs_value = std::abs(value);
+
+                      if (abs_value > largest_abs_value)
+                        {
+                          largest_abs_value = abs_value;
+                          optimal_value = value;
+                          optimal_comp = comp;
+                          optimal_elem_id = elem_id;
+                          optimal_side_index = side_index;
+                          optimal_qp = qp;
+
+                          // TODO: We only want the "dofs on side" entries
+                          // from phi_side. Could do this by initing an FE object
+                          // on the side itself, rather than using get_side_fe().
+                          optimal_point_phi_i_qp.resize(phi.size());
+                          for(auto i : index_range(phi))
+                            optimal_point_phi_i_qp[i] = phi[i][qp];
+
+                          const auto & point_list =
+                            libmesh_map_find(_local_side_quad_point_locations, elem_and_side);
+
+                          libmesh_error_msg_if(qp >= point_list.size(), "Error: Invalid qp");
+
+                          optimal_point = point_list[qp];
+
+                          optimal_subdomain_id = libmesh_map_find(_local_side_quad_point_subdomain_ids, elem_and_side);
+                          optimal_boundary_id = libmesh_map_find(_local_side_quad_point_boundary_ids, elem_and_side);
+
+                          if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
+                            {
+                              const auto & perturb_list =
+                                libmesh_map_find(_local_side_quad_point_locations_perturbations, elem_and_side);
+
+                              libmesh_error_msg_if(qp >= perturb_list.size(), "Error: Invalid qp");
+
+                              optimal_point_perturbs = perturb_list[qp];
+                            }
                         }
                     }
                 }

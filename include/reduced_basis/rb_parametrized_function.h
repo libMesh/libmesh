@@ -176,6 +176,7 @@ public:
                                                                const std::map<std::pair<dof_id_type,unsigned int>, std::vector<Point>> & side_all_xyz,
                                                                const std::map<std::pair<dof_id_type,unsigned int>, subdomain_id_type> & sbd_ids,
                                                                const std::map<std::pair<dof_id_type,unsigned int>, boundary_id_type> & side_boundary_ids,
+                                                               const std::map<std::pair<dof_id_type,unsigned int>, unsigned int> & side_types,
                                                                const std::map<std::pair<dof_id_type,unsigned int>, std::vector<std::vector<Point>> > & side_all_xyz_perturb,
                                                                const System & sys);
 
