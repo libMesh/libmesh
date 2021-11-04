@@ -358,10 +358,13 @@ BUILT_SOURCES = \
         eigen_time_solver.h \
         euler2_solver.h \
         euler_solver.h \
+        file_history_data.h \
         file_solution_history.h \
         first_order_unsteady_solver.h \
+        history_data.h \
         laspack_linear_solver.h \
         linear_solver.h \
+        memory_history_data.h \
         memory_solution_history.h \
         newmark_solver.h \
         newton_solver.h \
@@ -1625,16 +1628,25 @@ euler2_solver.h: $(top_srcdir)/include/solvers/euler2_solver.h
 euler_solver.h: $(top_srcdir)/include/solvers/euler_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+file_history_data.h: $(top_srcdir)/include/solvers/file_history_data.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 file_solution_history.h: $(top_srcdir)/include/solvers/file_solution_history.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 first_order_unsteady_solver.h: $(top_srcdir)/include/solvers/first_order_unsteady_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+history_data.h: $(top_srcdir)/include/solvers/history_data.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 laspack_linear_solver.h: $(top_srcdir)/include/solvers/laspack_linear_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 linear_solver.h: $(top_srcdir)/include/solvers/linear_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+memory_history_data.h: $(top_srcdir)/include/solvers/memory_history_data.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 memory_solution_history.h: $(top_srcdir)/include/solvers/memory_solution_history.h
