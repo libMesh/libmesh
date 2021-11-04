@@ -941,9 +941,15 @@ void RBEIMConstruction::initialize_qp_data()
       libmesh_error_msg_if (parametrized_function_boundary_ids.empty(),
                             "Need to have non-empty boundary IDs to initialize side data");
 
+      // elem_fe is used for shellface data
+      FEBase * elem_fe = nullptr;
+      context.get_element_fe( 0, elem_fe );
+      const std::vector<Real> & JxW = elem_fe->get_JxW();
+      const std::vector<Point> & xyz = elem_fe->get_xyz();
+
+      // side_fe is used for element side data
       FEBase* side_fe = nullptr;
       context.get_side_fe( 0, side_fe );
-
       const std::vector<Real> & JxW_side = side_fe->get_JxW();
       const std::vector< Point > & xyz_side = side_fe->get_xyz();
 
@@ -1067,6 +1073,91 @@ void RBEIMConstruction::initialize_qp_data()
                   }
                 }
             }
+
+            // In the case of 2D elements, we also check the shellfaces
+            if (elem->dim() == 2)
+              for (unsigned int shellface_index=0; shellface_index<2; shellface_index++)
+                {
+                  std::vector<boundary_id_type> side_boundary_ids;
+                  binfo.shellface_boundary_ids(elem, shellface_index, side_boundary_ids);
+
+                  bool has_side_boundary_id = false;
+                  boundary_id_type matching_boundary_id = BoundaryInfo::invalid_id;
+                  for(boundary_id_type side_boundary_id : side_boundary_ids)
+                    if(parametrized_function_boundary_ids.count(side_boundary_id))
+                      {
+                        has_side_boundary_id = true;
+                        matching_boundary_id = side_boundary_id;
+                        break;
+                      }
+
+                  if(has_side_boundary_id)
+                  {
+                    context.elem_fe_reinit();
+
+                    // We use n_sides+shellface_index to give the side index of a shellface
+                    auto elem_side_pair = std::make_pair(elem_id, elem->n_sides()+shellface_index);
+
+                    _local_side_quad_point_locations[elem_side_pair] = xyz;
+                    _local_side_quad_point_JxW[elem_side_pair] = JxW;
+                    _local_side_quad_point_subdomain_ids[elem_side_pair] = elem->subdomain_id();
+                    _local_side_quad_point_boundary_ids[elem_side_pair] = matching_boundary_id;
+
+                    if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
+                      {
+                        Real fd_delta = get_rb_eim_evaluation().get_parametrized_function().fd_delta;
+
+                        std::vector<std::vector<Point>> xyz_perturb_vec_at_qps;
+
+                        for (const Point & xyz_qp : xyz)
+                          {
+                            std::vector<Point> xyz_perturb_vec;
+                            // Here we follow the same approach as above for getting xyz_perturb_vec,
+                            // except that we are using the element itself instead of its side.
+                            {
+                              Point xi_eta =
+                                FEMap::inverse_map(elem->dim(),
+                                                   elem,
+                                                   xyz_qp,
+                                                   /*Newton iteration tolerance*/ TOLERANCE,
+                                                   /*secure*/ true);
+
+                              // Inverse map should map back to a 2D reference domain
+                              libmesh_assert(std::abs(xi_eta(2)) < TOLERANCE);
+
+                              Point xi_eta_perturb = xi_eta;
+
+                              xi_eta_perturb(0) += fd_delta;
+                              Point xyz_perturb_0 =
+                                FEMap::map(elem->dim(),
+                                            elem,
+                                            xi_eta_perturb);
+                              xi_eta_perturb(0) -= fd_delta;
+
+                              xi_eta_perturb(1) += fd_delta;
+                              Point xyz_perturb_1 =
+                                FEMap::map(elem->dim(),
+                                            elem,
+                                            xi_eta_perturb);
+                              xi_eta_perturb(1) -= fd_delta;
+
+                              // Finally, we rescale xyz_perturb_0 and xyz_perturb_1 so that
+                              // (xyz_perturb - xyz_qp).norm() == fd_delta, since this is
+                              // required in order to compute finite differences correctly.
+                              Point unit_0 = (xyz_perturb_0-xyz_qp).unit();
+                              Point unit_1 = (xyz_perturb_1-xyz_qp).unit();
+
+                              xyz_perturb_vec.emplace_back(xyz_qp + fd_delta*unit_0);
+                              xyz_perturb_vec.emplace_back(xyz_qp + fd_delta*unit_1);
+                            }
+
+                            xyz_perturb_vec_at_qps.emplace_back(xyz_perturb_vec);
+                          }
+
+                        _local_side_quad_point_locations_perturbations[elem_side_pair] = xyz_perturb_vec_at_qps;
+                      }
+                  }
+                }
         }
     }
   else

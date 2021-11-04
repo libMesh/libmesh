@@ -364,46 +364,88 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
       auto n_qp = xyz_vec.size();
       mesh_to_preevaluated_side_values_map[elem_side_pair].resize(n_qp);
 
-      // Also initialize phi in order to compute phi_i_qp
       const Elem & elem_ref = sys.get_mesh().elem_ref(elem_id);
-
-      std::unique_ptr<const Elem> elem_side;
-      elem_ref.build_side_ptr(elem_side, side_index);
-
       con.pre_fe_reinit(sys, &elem_ref);
 
-      auto side_fe = con.get_side_fe(/*var=*/0, elem_ref.dim());
-      side_fe->reinit(&elem_ref, side_index);
-
-      const std::vector<std::vector<Real>> & phi = side_fe->get_phi();
-      for (auto qp : index_range(xyz_vec))
+      if (elem_ref.dim() == 2 && side_index > elem_ref.n_sides())
         {
-          mesh_to_preevaluated_side_values_map[elem_side_pair][qp] = counter;
+          // This must be the "shellface" case
 
-          all_xyz_vec[counter] = xyz_vec[qp];
-          elem_ids_vec[counter] = elem_side_pair.first;
-          side_indices_vec[counter] = elem_side_pair.second;
-          qps_vec[counter] = qp;
-          sbd_ids_vec[counter] = subdomain_id;
-          boundary_ids_vec[counter] = boundary_id;
+          auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
+          const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
 
-          phi_i_qp_vec[counter].resize(phi.size());
-          for(auto i : index_range(phi))
-            phi_i_qp_vec[counter][i] = phi[i][qp];
+          elem_fe->reinit(&elem_ref);
 
-          if (requires_xyz_perturbations)
+          for (auto qp : index_range(xyz_vec))
             {
-              const auto & qps_and_perturbs =
-                libmesh_map_find(side_all_xyz_perturb, elem_side_pair);
-              libmesh_error_msg_if(qp >= qps_and_perturbs.size(), "Error: Invalid qp");
+              mesh_to_preevaluated_side_values_map[elem_side_pair][qp] = counter;
 
-              all_xyz_perturb_vec[counter] = qps_and_perturbs[qp];
+              all_xyz_vec[counter] = xyz_vec[qp];
+              elem_ids_vec[counter] = elem_side_pair.first;
+              side_indices_vec[counter] = elem_side_pair.second;
+              qps_vec[counter] = qp;
+              sbd_ids_vec[counter] = subdomain_id;
+              boundary_ids_vec[counter] = boundary_id;
+
+              phi_i_qp_vec[counter].resize(phi.size());
+              for(auto i : index_range(phi))
+                phi_i_qp_vec[counter][i] = phi[i][qp];
+
+              if (requires_xyz_perturbations)
+                {
+                  const auto & qps_and_perturbs =
+                    libmesh_map_find(side_all_xyz_perturb, elem_side_pair);
+                  libmesh_error_msg_if(qp >= qps_and_perturbs.size(), "Error: Invalid qp");
+
+                  all_xyz_perturb_vec[counter] = qps_and_perturbs[qp];
+                }
+              else
+                {
+                  all_xyz_perturb_vec[counter] = empty_perturbs;
+                }
+              counter++;
             }
-          else
+        }
+      else
+        {
+          // This must be the "standard side" (i.e. non-shellface) case
+
+          std::unique_ptr<const Elem> elem_side;
+          elem_ref.build_side_ptr(elem_side, side_index);
+
+          auto side_fe = con.get_side_fe(/*var=*/0, elem_ref.dim());
+          side_fe->reinit(&elem_ref, side_index);
+
+          const std::vector<std::vector<Real>> & phi = side_fe->get_phi();
+          for (auto qp : index_range(xyz_vec))
             {
-              all_xyz_perturb_vec[counter] = empty_perturbs;
+              mesh_to_preevaluated_side_values_map[elem_side_pair][qp] = counter;
+
+              all_xyz_vec[counter] = xyz_vec[qp];
+              elem_ids_vec[counter] = elem_side_pair.first;
+              side_indices_vec[counter] = elem_side_pair.second;
+              qps_vec[counter] = qp;
+              sbd_ids_vec[counter] = subdomain_id;
+              boundary_ids_vec[counter] = boundary_id;
+
+              phi_i_qp_vec[counter].resize(phi.size());
+              for(auto i : index_range(phi))
+                phi_i_qp_vec[counter][i] = phi[i][qp];
+
+              if (requires_xyz_perturbations)
+                {
+                  const auto & qps_and_perturbs =
+                    libmesh_map_find(side_all_xyz_perturb, elem_side_pair);
+                  libmesh_error_msg_if(qp >= qps_and_perturbs.size(), "Error: Invalid qp");
+
+                  all_xyz_perturb_vec[counter] = qps_and_perturbs[qp];
+                }
+              else
+                {
+                  all_xyz_perturb_vec[counter] = empty_perturbs;
+                }
+              counter++;
             }
-          counter++;
         }
     }
 
