@@ -109,7 +109,8 @@ Xdr::Xdr (const std::string & name,
   comm_len(xdr_MAX_STRING_LENGTH),
   gzipped_file(false),
   bzipped_file(false),
-  xzipped_file(false)
+  xzipped_file(false),
+  version_number(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION, LIBMESH_MINOR_VERSION, LIBMESH_MICRO_VERSION))
 {
   this->open(name);
 }
