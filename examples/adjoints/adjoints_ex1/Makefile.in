@@ -102,7 +102,10 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_code_coverage.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_compiler_control_args.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_compiler_flags.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_cxx_compiler_standard.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_enable_paranoid.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_enable_werror.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_mpi.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_scrape_petsc_configure.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_summarize_env.m4 \
@@ -441,10 +444,10 @@ am__DIST_COMMON = $(srcdir)/Makefile.in \
 	$(top_srcdir)/examples/Make.common
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
+ACSM_ANY_PARANOID_FLAGS = @ACSM_ANY_PARANOID_FLAGS@
+ACSM_ANY_WERROR_FLAG = @ACSM_ANY_WERROR_FLAG@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
-ANY_PARANOID_FLAGS = @ANY_PARANOID_FLAGS@
-ANY_WERROR_FLAG = @ANY_WERROR_FLAG@
 AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
@@ -492,15 +495,17 @@ CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 
 # We might have turned on -Werror and/or paranoid warnings
-CXXFLAGS_DBG = @CXXFLAGS_DBG@ $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
-CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@ $(ANY_WERROR_FLAG) \
-	$(ANY_PARANOID_FLAGS)
+CXXFLAGS_DBG = @CXXFLAGS_DBG@ $(ACSM_ANY_WERROR_FLAG) \
+	$(ACSM_ANY_PARANOID_FLAGS)
+CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@ $(ACSM_ANY_WERROR_FLAG) \
+	$(ACSM_ANY_PARANOID_FLAGS)
 CXXFLAGS_DVL = @CXXFLAGS_DVL@
-CXXFLAGS_OPROF = @CXXFLAGS_OPROF@ $(ANY_WERROR_FLAG) \
-	$(ANY_PARANOID_FLAGS)
-CXXFLAGS_OPT = @CXXFLAGS_OPT@ $(ANY_WERROR_FLAG) $(ANY_PARANOID_FLAGS)
-CXXFLAGS_PROF = @CXXFLAGS_PROF@ $(ANY_WERROR_FLAG) \
-	$(ANY_PARANOID_FLAGS)
+CXXFLAGS_OPROF = @CXXFLAGS_OPROF@ $(ACSM_ANY_WERROR_FLAG) \
+	$(ACSM_ANY_PARANOID_FLAGS)
+CXXFLAGS_OPT = @CXXFLAGS_OPT@ $(ACSM_ANY_WERROR_FLAG) \
+	$(ACSM_ANY_PARANOID_FLAGS)
+CXXFLAGS_PROF = @CXXFLAGS_PROF@ $(ACSM_ANY_WERROR_FLAG) \
+	$(ACSM_ANY_PARANOID_FLAGS)
 CXXSHAREDFLAG = @CXXSHAREDFLAG@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@

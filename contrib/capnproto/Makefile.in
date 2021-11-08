@@ -100,7 +100,10 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_code_coverage.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_compiler_control_args.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_compiler_flags.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_cxx_compiler_standard.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_enable_paranoid.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_enable_werror.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_mpi.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_scrape_petsc_configure.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_summarize_env.m4 \
@@ -342,10 +345,10 @@ am__DIST_COMMON = $(srcdir)/Makefile.in \
 	$(top_srcdir)/contrib/Make.common
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
+ACSM_ANY_PARANOID_FLAGS = @ACSM_ANY_PARANOID_FLAGS@
+ACSM_ANY_WERROR_FLAG = @ACSM_ANY_WERROR_FLAG@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
-ANY_PARANOID_FLAGS = @ANY_PARANOID_FLAGS@
-ANY_WERROR_FLAG = @ANY_WERROR_FLAG@
 AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
