@@ -17,6 +17,7 @@ using namespace FPoptimizer_CodeTree;
 #include <cstdio>
 #include <iomanip>
 #include <sstream>
+#include <algorithm>
 
 // hashing complex numbers
 namespace std {
@@ -1133,6 +1134,10 @@ bool Compiler::run(const std::string & compiler_options)
 #else
   std::string command = FPARSER_JIT_COMPILER " -O2 -shared -rdynamic -fPIC ";
 #endif
+  // remove trailing \0 which for some yet unknown reason appear on Apple Silicon
+  command.erase(std::find_if(command.rbegin(), command.rend(), [](unsigned char ch) {
+    return ch != 0;
+  }).base(), command.end());
   command += ccname_cc + " " + compiler_options + " -o " + _objectname;
   status = system(command.c_str());
 #ifndef NDEBUG
