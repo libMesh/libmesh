@@ -201,57 +201,9 @@ LIBMESH_SET_METHODS
 
 AC_CONFIG_FILES([contrib/utils/libmesh.pc:$LIBMESH_PC_IN])
 
-# By default we merely enable some warnings, but we can turn those
-# into errors (for library code only, not contrib or external code)
-# by configuring with --enable-werror
-AC_ARG_ENABLE(werror,
-              AC_HELP_STRING([--enable-werror],
-                             [Turn compilation warnings into errors]),
-              [AS_CASE("${enableval}",
-                       [yes], [enablewerror=yes],
-                       [no],  [enablewerror=no],
-                       [AC_MSG_ERROR(bad value ${enableval} for --enable-werror)])],
-              [enablewerror=no])
+ACSM_ENABLE_WERROR
 
-ANY_WERROR_FLAG=$WERROR_FLAGS
-AS_IF([test "x$enablewerror" != "xyes"],
-        [ANY_WERROR_FLAG=''
-         AC_MSG_RESULT(<<< Compiler warnings are just warnings >>>)],
-        [AX_CHECK_COMPILE_FLAG($WERROR_FLAGS,
-          [AC_MSG_RESULT(<<< Compiler warnings are now errors >>>)],
-          [ANY_WERROR_FLAG=''
-           AC_MSG_RESULT(<<< Compiler does not support $WERROR_FLAGS >>>)
-           AC_MSG_RESULT(<<< Compiler warnings are just warnings >>>)])])
-AC_SUBST(ANY_WERROR_FLAG)
-
-# By default we merely enable some of the most common compiler
-# warnings, but we can turn on as many warnings as we avoid triggering
-# (for library code only, not contrib or external code) by configuring
-# with --enable-paranoid-warnings
-AC_ARG_ENABLE(paranoid-warnings,
-              AC_HELP_STRING([--enable-paranoid-warnings],
-                             [Turn on paranoid compiler warnings]),
-              [AS_CASE("${enableval}",
-                       [yes], [enableparanoid=yes],
-                       [no],  [enableparanoid=no],
-                       [AC_MSG_ERROR(bad value ${enableval} for --enable-paranoid-warnings)])],
-              [enableparanoid=no])
-
-dnl Test paranoid warning flags with -Werror on so we can detect if
-dnl some are unrecognized
-ANY_PARANOID_FLAGS=$PARANOID_FLAGS
-AS_IF([test "x$enableparanoid" != "xyes"],
-        [ANY_PARANOID_FLAGS=''
-         AC_MSG_RESULT(<<< Disabling extra paranoid compiler warnings >>>)],
-        [old_CXXFLAGS="$CXXFLAGS"
-         CXXFLAGS="$CXXFLAGS $WERROR_FLAGS $PARANOID_FLAGS"
-         AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
-          [AC_MSG_RESULT(<<< Enabled extra paranoid compiler warnings >>>)],
-          [ANY_PARANOID_FLAGS=''
-           AC_MSG_RESULT(<<< Compiler may not support all of $PARANOID_FLAGS >>>)
-           AC_MSG_RESULT(<<< Disabling extra paranoid compiler warnings >>>)])
-         CXXFLAGS="$old_CXXFLAGS"])
-AC_SUBST(ANY_PARANOID_FLAGS)
+ACSM_ENABLE_PARANOID
 
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
