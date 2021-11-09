@@ -288,8 +288,8 @@ Real InfHex::quality (const ElemQuality q) const
         std::vector<Real> edge_ratios(2);
 
         // Bottom
-        edge_ratios[8] = std::min(d01, d23) / std::max(d01, d23);
-        edge_ratios[9] = std::min(d03, d12) / std::max(d03, d12);
+        edge_ratios[0] = std::min(d01, d23) / std::max(d01, d23);
+        edge_ratios[1] = std::min(d03, d12) / std::max(d03, d12);
 
         return *(std::min_element(edge_ratios.begin(), edge_ratios.end())) ;
 
