@@ -151,6 +151,27 @@ public:
                        const std::vector<Real> * const weights = nullptr) = 0;
 
   /**
+   * This re-computes the dual shape function coefficients using CUSTOMIZED qrule.
+   * The dual shape coefficients are utilized when calculating dual shape functions.
+   * This has not been implemented for InfFE
+   */
+  virtual void reinit_dual_shape_coeffs (const Elem * /*elem*/,
+                                         const std::vector<Point> & /*pts*/,
+                                         const std::vector<Real> & /*JxW*/)
+  {
+    libmesh_error_msg("Customized dual shape coefficient calculation has not been implemented for this FE type.");
+  }
+
+  /**
+   * This re-computes the dual shape function coefficients using DEFAULT qrule.
+   * This has not been implemented for InfFE
+   */
+  virtual void reinit_default_dual_shape_coeffs (const Elem * /*elem*/)
+  {
+    libmesh_error_msg("Default dual shape coefficient calculation has not been implemented for this FE type.");
+  }
+
+  /**
    * Reinitializes all the physical element-dependent data based on
    * the \p side of the element \p elem.  The \p tolerance parameter
    * is passed to the involved call to \p inverse_map().  By default the
@@ -586,9 +607,9 @@ public:
   void set_calculate_dual(const bool val){calculate_dual = val; }
 
   /**
-   * set calculate_dual_coeff as needed
+   * set calculate_default_dual_coeff as needed
    */
-  void set_calculate_dual_coeff(const bool val){calculate_dual_coeff = val; }
+  void set_calculate_default_dual_coeff(const bool val){calculate_default_dual_coeff = val; }
 
 protected:
 
@@ -626,9 +647,9 @@ protected:
   mutable bool calculate_dual;
 
   /**
-   * Are we calculating the coefficient for the dual basis?
+   * Are we calculating the coefficient for the dual basis using the default qrule?
    */
-  mutable bool calculate_dual_coeff;
+  mutable bool calculate_default_dual_coeff;
 
   /**
    * Are we potentially deliberately calculating nothing?
