@@ -67,6 +67,7 @@ public:
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
 
   CPPUNIT_TEST( testExodusFileMappingsPlateWithHole);
+  CPPUNIT_TEST( testExodusFileMappingsTwoBlocks);
   CPPUNIT_TEST( testExodusFileMappingsCyl3d);
 #endif // LIBMESH_HAVE_EXODUS_API
 
@@ -712,8 +713,13 @@ public:
   {
     auto locator = mesh.sub_point_locator();
 
-    const std::set<subdomain_id_type> manifold_subdomain { 0 };
-    const std::set<subdomain_id_type> nodeelem_subdomain { 1 };
+    // A multiblock Exodus file will have a subdomain for each block;
+    // we stick the nodeelem subdomain at the end.
+    const subdomain_id_type nodeelems = mesh.n_subdomains()-1;
+    const std::set<subdomain_id_type> nodeelem_subdomain { nodeelems };
+    std::set<subdomain_id_type> manifold_subdomain;
+    for (auto i : make_range(nodeelems))
+      manifold_subdomain.insert(i);
 
     for (auto & elem : mesh.element_ptr_range())
       {
@@ -997,6 +1003,14 @@ public:
     // Regression values for sin_x_plus_cos_y
                            {2.2812154374012, 1.974049990211937,
                             1.791640772215248, 1.413679237529376});
+  }
+
+  void testExodusFileMappingsTwoBlocks ()
+  {
+    testExodusFileMappings("meshes/two_quads_two_blocks.e",
+    // Regression values for sin_x_plus_cos_y
+                           {2.03496953073072, 1.97996853164955,
+                            1.18462134113435, 1.03085301158959});
   }
 
   void testExodusFileMappingsCyl3d ()
