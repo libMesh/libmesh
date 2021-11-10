@@ -909,6 +909,9 @@ void ExodusII_IO_Helper::read_bex_cv_blocks()
               exII::ex_get_attribute(ex_id, &attr);
 
               bex_num_dense_cv_blocks = value_count / 2;
+
+              libmesh_error_msg_if(bex_num_dense_cv_blocks > 1,
+                                   "Found more than 1 dense bex CV block; unsure how to handle that");
             }
         }
 
