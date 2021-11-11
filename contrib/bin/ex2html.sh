@@ -26,7 +26,7 @@ cat <<EOF > $output_file
       <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
       <li><a href="../installation.html">Installation</a></li>
       <li><a href="../examples.html">Examples</a></li>
-     <li><a href="../doxygen/index.html">Documentation</a></li>
+     <li><a href="https://mooseframework.inl.gov/docs/doxygen/libmesh/index.html">Documentation</a></li>
     </ul>
   </nav>
 
@@ -41,7 +41,7 @@ cat <<EOF > $output_file
         <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
         <li><a href="../installation.html">Installation</a></li>
         <li><a href="../examples.html">Examples</a></li>
-        <li><a href="../doxygen/index.html">Documentation</a></li>
+        <li><a href="https://mooseframework.inl.gov/docs/doxygen/libmesh/index.html">Documentation</a></li>
       </ul>
     </nav>
 
