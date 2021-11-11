@@ -46,6 +46,28 @@
 #include <map>
 #include <sstream>
 
+namespace
+{
+  using namespace libMesh;
+
+  const std::vector<Real> & bex_constraint_vec(std::size_t i,
+                                               const ExodusII_IO_Helper & helper)
+  {
+    std::size_t vec_offset = 0;
+    for (auto block_num : index_range(helper.bex_dense_constraint_vecs))
+    {
+      const auto & vecblock = helper.bex_dense_constraint_vecs[block_num];
+      libmesh_assert_greater_equal(i, vec_offset);
+      if (i - vec_offset < vecblock.size())
+        return vecblock[i - vec_offset];
+
+      vec_offset += vecblock.size();
+    }
+
+    libmesh_error_msg("Requested BEX coefficient vector " << i << " not found");
+  }
+}
+
 namespace libMesh
 {
 
@@ -456,9 +478,7 @@ void ExodusII_IO::read (const std::string & fname)
                   const auto & my_constraint_rows = exio_helper->bex_cv_conn[elem_num];
                   const unsigned long elem_coef_vec_index =
                     my_constraint_rows[spline_node_index] - 1; // Exodus isn't 0-based
-                  const auto & my_vec =
-                    libmesh_vector_at(exio_helper->bex_dense_constraint_vecs[i],
-                                      elem_coef_vec_index);
+                  const auto & my_vec = bex_constraint_vec(elem_coef_vec_index, *exio_helper);
                   for (auto elem_node_index :
                        make_range(elem->n_nodes()))
                     {
@@ -484,9 +504,11 @@ void ExodusII_IO::read (const std::string & fname)
                       const unsigned long elem_coef_vec_index =
                         my_constraint_rows[spline_node_index] - 1; // Exodus isn't 0-based
 
+                      auto & coef_vec =
+                        bex_constraint_vec(elem_coef_vec_index, *exio_helper);
+
                       const Real coef =
-                        libmesh_vector_at(exio_helper->bex_dense_constraint_vecs[i],
-                                          elem_coef_vec_index)[elem_node_index];
+                        libmesh_vector_at(coef_vec, elem_node_index);
 
                       const int gi = (elem_num)*exio_helper->num_nodes_per_elem +
                         spline_node_index;
@@ -522,9 +544,10 @@ void ExodusII_IO::read (const std::string & fname)
 
                           const Node & spline_node = mesh.node_ref(libmesh_node_id);
 
+                          auto & coef_vec =
+                            bex_constraint_vec(elem_coef_vec_index, *exio_helper);
                           const Real coef =
-                            libmesh_vector_at(exio_helper->bex_dense_constraint_vecs[i],
-                                              elem_coef_vec_index)[elem_node_index];
+                            libmesh_vector_at(coef_vec, elem_node_index);
 
                           // We don't need to store 0 entries;
                           // constraint_rows is a sparse structure.
