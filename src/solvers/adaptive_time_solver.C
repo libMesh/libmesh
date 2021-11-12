@@ -97,6 +97,7 @@ void AdaptiveTimeSolver::advance_timestep ()
     // the initial condition. The actual solution computed via this solve
     // will be stored when we call advance_timestep in the user's timestep loop
     first_solve = false;
+    core_time_solver->set_first_solve(false);
     }
 
   // For the adaptive time solver, all SH operations

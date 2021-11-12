@@ -82,6 +82,7 @@
 #include <iostream>
 #include <sys/time.h>
 #include <iomanip>
+#include <fenv.h>
 
 void write_output(EquationSystems & es,
                   unsigned int t_step,       // The current time step count
@@ -232,10 +233,6 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
         else
         libmesh_error_msg("Unrecognized solution history type: " << param.solution_history_type);
 
-        // The Memory/File Solution History object we will set the system SolutionHistory object to
-        FileSolutionHistory heatsystem_solution_history(system);
-        system.time_solver->set_solution_history(heatsystem_solution_history);
-
       }
     }
   else
@@ -340,6 +337,8 @@ build_adjoint_refinement_error_estimator(QoISet &qois, FEMPhysics* supplied_phys
 // The main program.
 int main (int argc, char ** argv)
 {
+  feenableexcept(FE_INVALID);
+
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_ignore(argc, argv);
@@ -699,6 +698,9 @@ int main (int argc, char ** argv)
           primal_solution.swap(dual_solution_1);
         }
       // End adjoint timestep loop
+
+      // Reset the time before looping over time again
+      system.time = 0.0;
 
       // Now that we have computed both the primal and adjoint solutions, we can compute the goal-oriented error estimates.
       // For this, we will need to build a ARefEE error estimator object, and supply a pointer to the 'true physics' object,

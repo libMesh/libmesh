@@ -23,6 +23,7 @@
 // Local includes
 #include "libmesh/numeric_vector.h"
 #include "libmesh/solution_history.h"
+#include "libmesh/diff_system.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
@@ -47,7 +48,7 @@ public:
    * Constructor, reference to system to be passed by user, set the
    * stored_sols iterator to some initial value
    */
-  MemorySolutionHistory(System & system_) : stored_sols(stored_solutions.end()), _system(system_)
+  MemorySolutionHistory(DifferentiableSystem & system_) : SolutionHistory(), _system(system_)
   { libmesh_experimental(); }
 
   /**
@@ -65,18 +66,7 @@ public:
    */
   virtual void retrieve(bool is_adjoint_solve, Real time) override;
 
-  /**
-   * Virtual function retrieve which we will be overriding to erase timesteps
-   */
-  virtual void erase(Real time) override;
-
-  /**
-   * Typedef for Stored Solutions iterator, a list of pairs of the current
-   * system time, map of strings and saved vectors
-   */
   typedef std::map<std::string, std::unique_ptr<NumericVector<Number>>> map_type;
-  typedef std::map<Real, map_type> map_map_type;
-  typedef map_map_type::iterator stored_solutions_iterator;
 
   /**
    * Definition of the clone function needed for the setter function
@@ -88,23 +78,8 @@ public:
 
 private:
 
-  // This list of pairs will hold the current time and stored vectors
-  // from each timestep
-  map_map_type stored_solutions;
-
-  // The stored solutions iterator
-  stored_solutions_iterator stored_sols;
-
-  // A helper function to locate entries at a given time
-  // Behaviour depends on whether we are calling this function
-  // while storing or retrieving/erasing entries.
-  // While storing, if no entry in our map matches our time key,
-  // we will create a new entry in the map. If we are not storing,
-  // not matching a given time key implies an error.
-  void find_stored_entry(Real time, bool storing = false);
-
   // A system reference
-  System & _system ;
+  DifferentiableSystem & _system ;
 };
 
 } // end namespace libMesh
