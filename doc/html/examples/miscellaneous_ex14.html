@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="libMesh development team">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="../doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<br> <h1> Link to the source code for this example: </h1>
+<a href="https://github.com/libMesh/libmesh/tree/master/examples/miscellaneous/miscellaneous_ex14" target="_blank">Open miscellaneous_ex14 in new tab.</a>
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example miscellaneous_ex14:
+*   ./example-opt sample.in 
+***************************************************************
+ 
+Running /data/bin/libmesh/build_DSK/examples/miscellaneous/miscellaneous_ex14/.libs/example-opt sample.in
+
+ Verbose mode disabled in non-debug mode.
+Warning: Second derivatives for Infinite elements are not yet implemented!
+../master/src/fe/inf_fe.C, line 43, compiled Nov 15 2021 at 16:00:12 ***
+Number of converged eigenpairs: 2
+        (-0.502308,0.0131547)
+*** Warning, This code is deprecated, and likely to be removed in future library versions! ../master/src/fe/inf_fe_static.C, line 69, compiled Nov 15 2021 at 16:00:54 ***
+*** Warning, This code is deprecated, and likely to be removed in future library versions! ../master/src/fe/fe_interface.C, line 551, compiled Nov 15 2021 at 15:57:12 ***
+        (-0.502308,-0.0131547)
+
+ ----------------------------------------------------------------------
+| Time:           Tue Nov 16 20:03:40 2021                             |
+| OS:             Linux                                                |
+| HostName:       hydrogenium                                          |
+| OS Release:     5.4.0-80-generic                                     |
+| OS Version:     #90~18.04.1-Ubuntu SMP Tue Jul 13 19:40:02 UTC 2021  |
+| Machine:        x86_64                                               |
+| Username:       balticpinguin                                        |
+| Configuration:  ../master/configure  '--prefix=/data/bin/DSK/libmesh_tst/'|
+|  '--enable-sanitize=dbg'                                             |
+|  '--enable-default-comm-world'                                       |
+|  '--enable-reference-counting'                                       |
+|  '--enable-glibcxx-debugging-cppunit'                                |
+|  '--disable-strict-lgpl'                                             |
+|  '--disable-unique-id'                                               |
+|  '--disable-maintainer-mode'                                         |
+|  '--disable-nodeconstraint'                                          |
+|  '--enable-werror'                                                   |
+|  '--enable-petsc'                                                    |
+|  '--enable-mpi'                                                      |
+|  '--enable-complex'                                                  |
+|  '--enable-tetgen'                                                   |
+|  '--enable-ifem'                                                     |
+|  '--enable-everything'                                               |
+|  'PETSC_DIR=/data/bin/DSK/petsc_3_13'                                |
+|  'PETSC_ARCH='                                                       |
+|  'SLEPC_DIR=/data/bin/DSK/slepc_3_13'                                |
+ ----------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=6.52522, Active time=6.10993                                                    |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DefaultCoupling                                                                                                 |
+|   operator()                       544        0.0010      0.000002    0.0010      0.000002    0.02     0.02     |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   build_sparsity()                 1          0.0144      0.014439    0.0164      0.016383    0.24     0.27     |
+|   create_dof_constraints()         1          0.0001      0.000084    0.0001      0.000084    0.00     0.00     |
+|   distribute_dofs()                1          0.0006      0.000581    0.0026      0.002622    0.01     0.04     |
+|   dof_indices()                    2768       0.0060      0.000002    0.0060      0.000002    0.10     0.10     |
+|   prepare_send_list()              2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   reinit()                         1          0.0020      0.002040    0.0020      0.002040    0.03     0.03     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_parallel_solution_vector() 2          0.0031      0.001527    0.0047      0.002365    0.05     0.08     |
+|   build_solution_vector()          2          0.0000      0.000020    0.0048      0.002385    0.00     0.08     |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               2          0.0433      0.021636    0.0433      0.021636    0.71     0.71     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        936        0.0080      0.000009    0.0080      0.000009    0.13     0.13     |
+|   init_shape_functions()           585        0.0041      0.000007    0.0041      0.000007    0.07     0.07     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_face_map()               96         0.0002      0.000002    0.0002      0.000002    0.00     0.00     |
+|   compute_map()                    936        0.0073      0.000008    0.0073      0.000008    0.12     0.12     |
+|   init_face_shape_functions()      1          0.0000      0.000011    0.0000      0.000011    0.00     0.00     |
+|   init_reference_to_physical_map() 585        0.0052      0.000009    0.0052      0.000009    0.09     0.09     |
+|   inverse_map()                    51316      0.6944      0.000014    0.6944      0.000014    11.37    11.37    |
+|                                                                                                                 |
+| InfElemBuilder                                                                                                  |
+|   build_inf_elem()                 1          0.0004      0.000410    0.0004      0.000410    0.01     0.01     |
+|                                                                                                                 |
+| InfFE                                                                                                           |
+|   compute_shape_functions()        290        0.0257      0.000089    0.0257      0.000089    0.42     0.42     |
+|   init_radial_shape_functions()    291        0.0003      0.000001    0.0003      0.000001    0.00     0.00     |
+|   init_shape_functions()           195        0.0091      0.000047    0.0091      0.000047    0.15     0.15     |
+|                                                                                                                 |
+| InfFEMap                                                                                                        |
+|   inverse_map()                    2456       0.0041      0.000002    0.0155      0.000006    0.07     0.25     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   all_second_order()               1          0.0044      0.004386    0.0051      0.005118    0.07     0.08     |
+|   find_neighbors()                 9          0.0058      0.000642    0.0058      0.000642    0.09     0.09     |
+|   renumber_nodes_and_elem()        14         0.0004      0.000027    0.0004      0.000027    0.01     0.01     |
+|                                                                                                                 |
+| MeshBase                                                                                                        |
+|   prepare_for_use()                7          0.0004      0.000054    0.0059      0.000839    0.01     0.10     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         2          0.0000      0.000018    0.0481      0.024040    0.00     0.79     |
+|                                                                                                                 |
+| MeshRefinement                                                                                                  |
+|   _refine_elements()               2          0.0007      0.000346    0.0027      0.001354    0.01     0.04     |
+|   add_node()                       4032       0.0015      0.000000    0.0015      0.000000    0.02     0.02     |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_sphere()                   1          0.0047      0.004692    0.0171      0.017115    0.08     0.28     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   set_node_processor_ids()         1          0.0003      0.000250    0.0003      0.000250    0.00     0.00     |
+|   single_partition_range()         7          0.0003      0.000037    0.0003      0.000037    0.00     0.00     |
+|                                                                                                                 |
+| PointLocatorTree                                                                                                |
+|   init(no master)                  1          0.0049      0.004933    0.0049      0.004933    0.08     0.08     |
+|   operator()                       400        0.0050      0.000013    0.6906      0.001726    0.08     11.30    |
+|                                                                                                                 |
+| SlepcEigenSolver                                                                                                |
+|   solve_generalized()              1          4.5972      4.597239    4.5972      4.597239    75.24    75.24    |
+|                                                                                                                 |
+| System                                                                                                          |
+|   assemble()                       1          0.6550      0.655038    0.7177      0.717693    10.72    11.75    |
+|                                                                                                                 |
+| TopologyMap                                                                                                     |
+|   init()                           2          0.0001      0.000073    0.0001      0.000073    0.00     0.00     |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            65494      6.1099                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+
+ 
+***************************************************************
+* Done Running Example miscellaneous_ex14:
+*   ./example-opt sample.in 
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>
