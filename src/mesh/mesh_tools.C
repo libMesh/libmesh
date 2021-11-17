@@ -348,32 +348,6 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void MeshTools::find_boundary_nodes (const MeshBase & mesh,
-                                     std::vector<bool> & on_boundary)
-{
-  libmesh_deprecated();
-
-  // Resize the vector which holds boundary nodes and fill with false.
-  on_boundary.resize(mesh.max_node_id());
-  std::fill(on_boundary.begin(),
-            on_boundary.end(),
-            false);
-
-  // Loop over elements, find those on boundary, and
-  // mark them as true in on_boundary.
-  for (const auto & elem : mesh.active_element_ptr_range())
-    for (auto s : elem->side_index_range())
-      if (elem->neighbor_ptr(s) == nullptr) // on the boundary
-        {
-          const auto nodes_on_side = elem->nodes_on_side(s);
-
-          for (auto & node_id : nodes_on_side)
-            on_boundary[node_id] = true;
-        }
-}
-#endif
-
 std::unordered_set<dof_id_type>
 MeshTools::find_boundary_nodes(const MeshBase & mesh)
 {
