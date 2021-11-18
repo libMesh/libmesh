@@ -706,6 +706,9 @@ lcov-reset:
 	$(lcov_bin)/lcov --directory . --zerocounters
 
 coverage: lcov-reset check lcov-report
+	$(MAKE) lcov-reset
+	$(MAKE) check
+	$(MAKE) lcov-report
 
 CLEANFILES += src/apps/*.gcda src/apps/*.gcno
 
