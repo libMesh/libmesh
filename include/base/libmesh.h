@@ -38,10 +38,16 @@ enum SolverPackage : int;
 #include <string>
 #include <vector>
 
+// Forward declarations
+
 // For dealing with MPI stuff in VTK.
 #if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
 class vtkMPIController;
 #endif
+
+namespace TIMPI {
+  class TIMPIInit;
+}
 
 /**
  * The \p libMesh namespace provides an interface to certain functionality
@@ -115,16 +121,23 @@ public:
   virtual ~LibMeshInit();
 
   /**
-   * Returns the Communicator created by this libMesh object, which
-   * will be a compatibility shim if MPI is not enabled, or a wrapper
-   * for the user-input MPI_Comm if we were constructed with one, or a
-   * wrapper for MPI_COMM_WORLD by default.
+   * Returns a Communicator created from the TIMPIInit object we hold,
+   * which will be a compatibility shim if MPI is not enabled.
    */
   const Parallel::Communicator & comm() const { return *_comm; }
 
   Parallel::Communicator & comm() { return *_comm; }
 
 private:
+  // Should we just bite the bullet, use unique_ptr here, and bring an
+  // #include <memory> into everything?
+  TIMPI::TIMPIInit * _timpi_init;
+
+  // Or should we keep this around so we can still inline its
+  // accessors despite forward declaring _timpi_init?
+  //
+  // This is constructed from the TIMPI::Communicator, for backwards
+  // compatibility.
   Parallel::Communicator * _comm;
 
 #if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)

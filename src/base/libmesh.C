@@ -33,6 +33,7 @@
 
 // TIMPI includes
 #include "timpi/communicator.h"
+#include "timpi/timpi_init.h"
 
 // C/C++ includes
 #include <iostream>
@@ -100,9 +101,6 @@ std::streambuf * out_buf (nullptr);
 std::streambuf * err_buf (nullptr);
 
 std::unique_ptr<libMesh::Threads::task_scheduler_init> task_scheduler;
-#if defined(LIBMESH_HAVE_MPI)
-bool libmesh_initialized_mpi = false;
-#endif
 #if defined(LIBMESH_HAVE_PETSC)
 bool libmesh_initialized_petsc = false;
 #endif
@@ -398,50 +396,12 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // Allow the user to bypass MPI initialization
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
-      // Check whether the calling program has already initialized
-      // MPI, and avoid duplicate Init/Finalize
-      int flag;
-      timpi_call_mpi(MPI_Initialized (&flag));
-
-      if (!flag)
-        {
-          int mpi_thread_provided;
-          const int mpi_thread_requested = libMesh::n_threads() > 1 ?
-            MPI_THREAD_FUNNELED :
-            MPI_THREAD_SINGLE;
-
-          timpi_call_mpi
-            (MPI_Init_thread (&argc, const_cast<char ***>(&argv),
-                              mpi_thread_requested, &mpi_thread_provided));
-
-          if ((libMesh::n_threads() > 1) &&
-              (mpi_thread_provided < MPI_THREAD_FUNNELED))
-            {
-              libmesh_warning("Warning: MPI failed to guarantee MPI_THREAD_FUNNELED\n"
-                              << "for a threaded run.\n"
-                              << "Be sure your library is funneled-thread-safe..."
-                              << std::endl);
-
-              // Ideally, if an MPI stack tells us it's unsafe for us
-              // to use threads, we shouldn't use threads.
-              // In practice, we've encountered one MPI stack (an
-              // mvapich2 configuration) that returned
-              // MPI_THREAD_SINGLE as a proper warning, two stacks
-              // that handle MPI_THREAD_FUNNELED properly, and two
-              // current stacks plus a couple old stacks that return
-              // MPI_THREAD_SINGLE but support libMesh threaded runs
-              // anyway.
-
-              // libMesh::libMeshPrivateData::_n_threads = 1;
-              // task_scheduler = libmesh_make_unique<Threads::task_scheduler_init>(libMesh::n_threads());
-            }
-          libmesh_initialized_mpi = true;
-        }
-
-      // Duplicate the input communicator for internal use
-      // And get a Parallel::Communicator copy too, to use
-      // as a default for that API
-      this->_comm = new Parallel::Communicator(COMM_WORLD_IN);
+      const bool using_threads = libMesh::n_threads() > 1;
+      const bool handle_mpi_errors = false; // libMesh does this
+      this->_timpi_init =
+        new TIMPI::TIMPIInit(argc, argv, using_threads,
+                             handle_mpi_errors, COMM_WORLD_IN);
+      _comm = new Parallel::Communicator(this->_timpi_init->comm().get());
 
       libMesh::GLOBAL_COMM_WORLD = COMM_WORLD_IN;
 
@@ -477,7 +437,10 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 
 #else
   libmesh_ignore(COMM_WORLD_IN);
-  this->_comm = new Parallel::Communicator(); // So comm() doesn't dereference null
+  this->_timpi_init =
+    new TIMPI::TIMPIInit(argc, argv, using_threads,
+                         handle_mpi_errors);
+  _comm = new Parallel::Communicator(this->_timpi_init->comm().get());
 #endif
 
 #if defined(LIBMESH_HAVE_PETSC)
@@ -796,31 +759,16 @@ LibMeshInit::~LibMeshInit()
   _vtk_mpi_controller->Delete();
 #endif
 
+  delete this->_comm;
+
 #if defined(LIBMESH_HAVE_MPI)
   // Allow the user to bypass MPI finalization
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
-      this->comm().clear();
-      delete this->_comm;
-
-      if (libmesh_initialized_mpi)
-        {
-          // We can't just libmesh_assert here because destructor,
-          // but we ought to report any errors
-          unsigned int error_code = MPI_Finalize();
-          if (error_code != MPI_SUCCESS)
-            {
-              char error_string[MPI_MAX_ERROR_STRING+1];
-              int error_string_len;
-              MPI_Error_string(error_code, error_string,
-                               &error_string_len);
-              std::cerr << "Failure from MPI_Finalize():\n"
-                        << error_string << std::endl;
-            }
-        }
+      delete this->_timpi_init;
     }
 #else
-  delete this->_comm;
+  delete this->_timpi_init;
 #endif
 }
 
