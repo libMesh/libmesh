@@ -354,6 +354,14 @@ AC_SUBST(PWD)
 LIBMESH_CORE_FEATURES
 
 
+# --------------------------------------------------------------
+# configure TIMPI, which is practically libMesh core
+#
+# Use AX_SUBDIRS_CONFIGURE here so we get timpi_config.h before
+# contrib/metaphysicl might need it later.
+# --------------------------------------------------------------
+AX_SUBDIRS_CONFIGURE([contrib/timpi])
+
 
 # --------------------------------------------------------------
 # configure optional, external packages and libraries
@@ -450,8 +458,6 @@ AS_IF([test "x$enablenested" = "xyes"],
         ac_configure_args_SAVE="$ac_configure_args"
         ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC' CPPFLAGS='$HDF5_CPPFLAGS $CPPFLAGS' LIBS='$HDF5_LIBS $LIBS'"
       ])
-
-AC_CONFIG_SUBDIRS([contrib/timpi])
 
 # Create output files. Also configures any subpackages
 AC_OUTPUT
