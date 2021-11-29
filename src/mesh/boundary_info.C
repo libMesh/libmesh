@@ -89,7 +89,8 @@ const boundary_id_type BoundaryInfo::invalid_id = -123;
 // BoundaryInfo functions
 BoundaryInfo::BoundaryInfo(MeshBase & m) :
   ParallelObject(m.comm()),
-  _mesh (&m)
+  _mesh (&m),
+  _children_on_boundary(false)
 {
 }
 
@@ -950,8 +951,11 @@ void BoundaryInfo::add_side(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Only add BCs for level-0 elements.
-  libmesh_assert_equal_to (elem->level(), 0);
+  // Users try to mark boundary on child elements
+  // If this happens, we will allow users to remove
+  // side from child elements as well
+  if (elem->level())
+    _children_on_boundary = true;
 
   libmesh_error_msg_if(id == invalid_id, "ERROR: You may not set a boundary ID of "
                        << invalid_id
@@ -979,8 +983,11 @@ void BoundaryInfo::add_side(const Elem * elem,
 
   libmesh_assert(elem);
 
-  // Only add BCs for level-0 elements.
-  libmesh_assert_equal_to (elem->level(), 0);
+  // Users try to mark boundary on child elements
+  // If this happens, we will allow users to remove
+  // side from child elements as well
+  if (elem->level())
+    _children_on_boundary = true;
 
   // Don't add the same ID twice
   auto bounds = _boundary_side_id.equal_range(elem);
@@ -1357,8 +1364,8 @@ void BoundaryInfo::remove_edge (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Only level 0 elements are stored in BoundaryInfo.
-  libmesh_assert_equal_to (elem->level(), 0);
+  // Only level 0 elements unless the flag "_children_on_boundary" is on.
+  libmesh_assert(elem->level()==0 || _children_on_boundary);
 
   // Erase (elem, edge, *) entries from map.
   erase_if(_boundary_edge_id, elem,
@@ -1374,8 +1381,8 @@ void BoundaryInfo::remove_edge (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Only level 0 elements are stored in BoundaryInfo.
-  libmesh_assert_equal_to (elem->level(), 0);
+  // Only level 0 elements unless the flag "_children_on_boundary" is on.
+  libmesh_assert(elem->level() == 0 || _children_on_boundary);
 
   // Erase (elem, edge, id) entries from map.
   erase_if(_boundary_edge_id, elem,
@@ -1389,8 +1396,8 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Only level 0 elements are stored in BoundaryInfo.
-  libmesh_assert_equal_to (elem->level(), 0);
+  // Only level 0 elements unless the flag "_children_on_boundary" is on.
+  libmesh_assert(elem->level() == 0 || _children_on_boundary);
 
   // Shells only have 2 faces
   libmesh_assert_less(shellface, 2);
@@ -1409,8 +1416,8 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Only level 0 elements are stored in BoundaryInfo.
-  libmesh_assert_equal_to (elem->level(), 0);
+  // Only level 0 elements unless the flag "_children_on_boundary" is on.
+  libmesh_assert(elem->level() == 0 || _children_on_boundary);
 
   // Shells only have 2 faces
   libmesh_assert_less(shellface, 2);
@@ -1426,8 +1433,8 @@ void BoundaryInfo::remove_side (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Only level 0 elements are stored in BoundaryInfo.
-  libmesh_assert_equal_to (elem->level(), 0);
+  // Only level 0 elements unless the flag "_children_on_boundary" is on.
+  libmesh_assert(elem->level() == 0 || _children_on_boundary);
 
   // Erase (elem, side, *) entries from map.
   erase_if(_boundary_side_id, elem,
@@ -1442,6 +1449,9 @@ void BoundaryInfo::remove_side (const Elem * elem,
                                 const boundary_id_type id)
 {
   libmesh_assert(elem);
+
+  // Only level 0 elements unless the flag "_children_on_boundary" is on.
+  libmesh_assert(elem->level() == 0 || _children_on_boundary);
 
   // Erase (elem, side, id) entries from map.
   erase_if(_boundary_side_id, elem,
@@ -1489,12 +1499,21 @@ void BoundaryInfo::remove_id (boundary_id_type id)
 unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
                                                  const boundary_id_type boundary_id_in) const
 {
-  const Elem * searched_elem = elem;
+  std::vector<const Elem *>  searched_elem_vec;
+  // If elem has boundary information, we return that when
+  // the flag "_children_on_boundary" is on
+  if (_children_on_boundary)
+    searched_elem_vec.push_back(elem);
+  // Otherwise, we return boundary information of its
+  // parent if any
   if (elem->level() != 0)
-    searched_elem = elem->top_parent();
+    searched_elem_vec.push_back(elem->top_parent());
 
-  // elem may have zero or multiple occurrences
-  for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
+  for (auto it = searched_elem_vec.begin(); it != searched_elem_vec.end(); ++it)
+  {
+    const Elem * searched_elem = *it;
+    // elem may have zero or multiple occurrences
+    for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
     {
       // if this is true we found the requested boundary_id
       // of the element and want to return the side
@@ -1525,7 +1544,8 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
           if (!p)
             return side;
         }
-    }
+     }
+  }
 
   // if we get here, we found elem in the data structure but not
   // the requested boundary id, so return the default value
@@ -1539,12 +1559,20 @@ BoundaryInfo::sides_with_boundary_id(const Elem * const elem,
 {
   std::vector<unsigned int> returnval;
 
-  const Elem * searched_elem = elem;
+  std::vector<const Elem *>  searched_elem_vec;
+  // If elem has boundary information, that is part of return when
+  // the flag "_children_on_boundary" is on
+  if (_children_on_boundary)
+    searched_elem_vec.push_back(elem);
+  // Return boundary information of its parent as well
   if (elem->level() != 0)
-    searched_elem = elem->top_parent();
+    searched_elem_vec.push_back(elem->top_parent());
 
-  // elem may have zero or multiple occurrences
-  for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
+  for (auto it = searched_elem_vec.begin(); it != searched_elem_vec.end(); ++it)
+  {
+    const Elem * searched_elem = *it;
+    // elem may have zero or multiple occurrences
+    for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
     {
       // if this is true we found the requested boundary_id
       // of the element and want to return the side
@@ -1579,7 +1607,7 @@ BoundaryInfo::sides_with_boundary_id(const Elem * const elem,
             returnval.push_back(side);
         }
     }
-
+  }
   return returnval;
 }
 
@@ -1794,7 +1822,8 @@ BoundaryInfo::build_node_list_from_side_list()
       // Need to loop over the sides of any possible children
       std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
-      elem->active_family_tree_by_side (family, id_pair.first);
+      if (!elem->subactive())
+        elem->active_family_tree_by_side (family, id_pair.first);
 #else
       family.push_back(elem);
 #endif
@@ -2156,7 +2185,8 @@ BoundaryInfo::build_active_side_list () const
       // Loop over the sides of possible children
       std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
-      elem->active_family_tree_by_side(family, id_pair.first);
+      if (!elem->subactive())
+        elem->active_family_tree_by_side(family, id_pair.first);
 #else
       family.push_back(elem);
 #endif
