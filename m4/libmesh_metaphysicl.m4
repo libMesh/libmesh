@@ -58,7 +58,28 @@ AC_DEFUN([CONFIGURE_METAPHYSICL],
           METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/src/numerics/include -I\$(top_srcdir)/contrib/metaphysicl/src/core/include -I\$(top_srcdir)/contrib/metaphysicl/src/utilities/include"
           AC_DEFINE(HAVE_METAPHYSICL, 1, [Flag indicating whether the library will be compiled with MetaPhysicL support])
           AC_MSG_RESULT(<<< Configuring library with MetaPhysicL support >>>)
-          AX_SUBDIRS_CONFIGURE([contrib/metaphysicl],[--with-cxx-std=20$acsm_cxx_version])
+
+          dnl MetaPhysicL needs to know which TIMPI library to link to
+          dnl for "make check"
+          my_method=dbg
+          AS_IF([test "x$build_devel" = xyes],
+                [my_method=devel])
+          AS_IF([test "x$build_prof" = xyes],
+                [my_method=prof])
+          AS_IF([test "x$build_oprof" = xyes],
+                [my_method=oprof])
+          AS_IF([test "x$build_opt" = xyes],
+                [my_method=opt])
+
+          dnl Autoconf doesn't define $abs_top_srcdir at this point;
+          dnl here's a trick from GraphicsMagick:
+          my_top_srcdir="$(cd $srcdir && pwd)"
+
+          dnl FIXME: setting TIMPI_DIR, even to something invalid, is
+          dnl currently the best way to get MetaPhysicL to recognize
+          dnl that we really want TIMPI.
+
+          AX_SUBDIRS_CONFIGURE([contrib/metaphysicl],[[--with-cxx-std=20$acsm_cxx_version],[CPPFLAGS=-I$my_top_srcdir/contrib/timpi/src/algorithms/include/ -I$my_top_srcdir/contrib/timpi/src/parallel/include/ -I$my_top_srcdir/contrib/timpi/src/utilities/include/ -I$ac_abs_top_builddir/contrib/timpi/src/utilities/include/ $CPPFLAGS],[LDFLAGS=-L$ac_abs_top_builddir/contrib/timpi/src/ $LDFLAGS],[TIMPI_DIR=$my_top_srcdir/contrib/timpi/],[--with-timpi-method=$my_method]])
         ],
         [
           METAPHYSICL_INCLUDE=""

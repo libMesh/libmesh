@@ -223,6 +223,11 @@ target_triplet = @target@
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_127 = fparser/libprof.la
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_128 = fparser/liboprof.la
 @LIBMESH_ENABLE_NANOFLANN_TRUE@am__append_129 = nanoflann
+
+######################################################################
+# This must come *after* timpi - we now use TIMPI headers in
+# MetaPhysicL when they're available
+######################################################################
 @LIBMESH_ENABLE_METAPHYSICL_TRUE@am__append_130 = metaphysicl
 @LIBMESH_OPT_MODE_TRUE@am__append_131 = libcontrib_opt.la
 @LIBMESH_DBG_MODE_TRUE@am__append_132 = libcontrib_dbg.la
@@ -445,7 +450,7 @@ DIST_SUBDIRS = capnproto boost/include eigen/eigen gmv gzstream \
 	exodusii/v8.11/exodus nemesis/v3.09 nemesis/v5.22/nemesis \
 	nemesis/v8.11/nemesis tecplot/tecio tecplot/binary triangle \
 	tetgen qhull/qhull libHilbert laspack metis parmetis sfcurves \
-	fparser nanoflann metaphysicl timpi
+	fparser nanoflann timpi metaphysicl
 am__DIST_COMMON = $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp README
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -792,8 +797,8 @@ SUBDIRS = $(am__append_1) $(am__append_7) $(am__append_8) \
 	$(am__append_63) $(am__append_69) $(am__append_75) \
 	$(am__append_81) $(am__append_87) $(am__append_93) \
 	$(am__append_99) $(am__append_105) $(am__append_111) \
-	$(am__append_117) $(am__append_123) $(am__append_129) \
-	$(am__append_130) timpi
+	$(am__append_117) $(am__append_123) $(am__append_129) timpi \
+	$(am__append_130)
 opt_libs = $(am__append_2) $(am__append_10) $(am__append_16) \
 	$(am__append_22) $(am__append_28) $(am__append_34) \
 	$(am__append_40) $(am__append_46) $(am__append_52) \
