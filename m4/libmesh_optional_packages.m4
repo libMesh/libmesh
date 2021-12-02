@@ -506,6 +506,18 @@ AS_IF([test "x$DOXYGEN" != x],
 
 
 # -------------------------------------------------------------
+# poly2tri -- enabled by default
+# -------------------------------------------------------------
+CONFIGURE_POLY2TRI
+AS_IF([test $enablepoly2tri = yes],
+      [libmesh_contrib_INCLUDES="$POLY2TRI_INCLUDE $libmesh_contrib_INCLUDES"])
+AM_CONDITIONAL(LIBMESH_ENABLE_POLY2TRI, test x$enablepoly2tri = xyes)
+AC_CONFIG_FILES([contrib/poly2tri/modified/Makefile])
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
 # TetGen -- enabled unless --enable-strict-lgpl is specified
 # -------------------------------------------------------------
 AS_IF([test $enablestrictlgpl = yes],
