@@ -24,7 +24,7 @@ poly2tri/poly2tri.h : $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/poly2tri.
 
 poly2tri/common/shapes.h : $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.h
 	$(AM_V_GEN) $(MKDIR_P) poly2tri/common/
-	$(AM_V_GEN) rm -f $@ && $(LN_S) -f $< $@
+	$(AM_V_GEN) rm -f $@ && cp -f $< $@
 
 poly2tri/common/utils.h : $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/utils.h
 	$(AM_V_GEN) $(MKDIR_P) poly2tri/common/
@@ -40,8 +40,8 @@ poly2tri/sweep/cdt.h : $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cd
 
 poly2tri/sweep/sweep_context.h : $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.h
 	$(AM_V_GEN) $(MKDIR_P) poly2tri/sweep/
-	$(AM_V_GEN) rm -f $@ && $(LN_S) -f $< $@
+	$(AM_V_GEN) rm -f $@ && cp -f $< $@
 
 poly2tri/sweep/sweep.h : $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.h
 	$(AM_V_GEN) $(MKDIR_P) poly2tri/sweep/
-	$(AM_V_GEN) rm -f $@ && $(LN_S) -f $< $@
+	$(AM_V_GEN) rm -f $@ && cp -f $< $@
