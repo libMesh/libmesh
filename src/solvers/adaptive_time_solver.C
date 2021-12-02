@@ -121,30 +121,23 @@ void AdaptiveTimeSolver::advance_timestep ()
 
 void AdaptiveTimeSolver::adjoint_advance_timestep ()
 {
-  // All calls to adjoint_advance_timestep are made in the user's
-  // code. This first call is made immediately after the adjoint initial conditions
-  // are set. This is in the user code outside the adjoint time loop.
-  if (!first_adjoint_step)
-    {
-      // The adjoint system has been solved. We need to store the adjoint solution and
-      // load the primal solutions for the next time instance (t - delta_ti).
-      _system.time -= this->completed_timestep_size;
-    }
-  else
-    {
-      // The first adjoint step simply saves the given adjoint initial condition
-      // So there is a store, but no solve, no actual timestep, so no need to change system time
-      first_adjoint_step = false;
-    }
+  // Store the computed full step adjoint solution for future use (sub steps are handled internally by the core time solver)
+  core_time_solver->get_solution_history().store(true, _system.time);
+
+  // For the first adjoint step ensure that we use the last primal timestep.
+  if (first_adjoint_step)
+  {
+    _system.deltat = dynamic_cast<DifferentiableSystem &>(_system).time_solver->TimeSolver::last_completed_timestep_size();
+    first_adjoint_step = false;
+  }
+
+  _system.time -= _system.deltat;
 
   // For the adaptive time solver, all SH operations
   // are handled by the core_time_solver's SH object
   // Retrieve the primal solution for the next adjoint calculation,
   // by using the core time solver's solution history object.
   core_time_solver->get_solution_history().retrieve(true, _system.time);
-
-  // Store the computed full step adjoint solution for future use (sub steps are handled internally by the core time solver)
-  core_time_solver->get_solution_history().store(true, _system.time);
 
   // We also need to tell the core time solver that the adjoint initial conditions have been set
   core_time_solver->set_first_adjoint_step(false);

@@ -295,10 +295,6 @@ void TwostepTimeSolver::solve()
 
 std::pair<unsigned int, Real> TwostepTimeSolver::adjoint_solve (const QoISet & qoi_indices)
 {
-  // The adjoint timestepping mirrors the scheme used for the forward problem
-  // So the deltat, once set by solution history, will not be changed
-  Real old_time = _system.time;
-
   // Take the first adjoint 'half timestep'
   core_time_solver->adjoint_solve(qoi_indices);
 
@@ -308,18 +304,25 @@ std::pair<unsigned int, Real> TwostepTimeSolver::adjoint_solve (const QoISet & q
   // Adjoint advance the timestep
   core_time_solver->adjoint_advance_timestep();
 
+ // We have to contend with the fact that the delta_t set by SolutionHistory will not be the
+ // delta_t for the adjoint solve. At time t_i, the adjoint solve uses the same delta_t
+ // as the primal solve, pulling the adjoint solution from t_i+1 to t_i.
+ // FSH however sets delta_t to the value which takes us from t_i to t_i-1.
+ // Therefore use the last_deltat for the solve and reset system delta_t after the solve.
+  Real temp_deltat = _system.deltat;
+  _system.deltat = last_deltat;
+
   // The second half timestep
   std::pair<unsigned int, Real> full_adjoint_output = core_time_solver->adjoint_solve(qoi_indices);
 
-  // Record the sub step deltat we used for the last adjoint solve.
+  // Record the sub step deltat we used for the last adjoint solve and reset the system deltat to the
+  // value set by SolutionHistory.
   last_deltat = _system.deltat;
+  _system.deltat = temp_deltat;
 
   // Record the total size of the last timestep, for a 2StepTS, this is
   // simply twice the deltat for each sub(half) step.
   this->completed_timestep_size = 2.0*_system.deltat;
-
-  // Reset the system.time
-  _system.time = old_time;
 
   return full_adjoint_output;
 }
