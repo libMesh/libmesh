@@ -9,4 +9,4 @@
 	url = ../../libMesh/autoconf-submodule
 [submodule "contrib/poly2tri/poly2tri"]
 	path = contrib/poly2tri/poly2tri
-	url = git@github.com:jhasse/poly2tri.git
+	url = ../../jhasse/poly2tri.git
