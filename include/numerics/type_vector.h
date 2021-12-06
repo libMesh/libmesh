@@ -436,7 +436,8 @@ public:
    * newline by default, however, this behavior can be controlled with
    * the \p newline parameter.
    */
-  void write_unformatted (std::ostream & out, const bool newline = true) const;
+  void write_unformatted (std::ostream & out_stream,
+                          const bool newline = true) const;
 
 protected:
 

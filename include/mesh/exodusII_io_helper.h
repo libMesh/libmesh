@@ -169,7 +169,7 @@ public:
   /**
    * Prints the nodal information, by default to \p libMesh::out.
    */
-  void print_nodes(std::ostream & out = libMesh::out);
+  void print_nodes(std::ostream & out_stream = libMesh::out);
 
   /**
    * Reads information for all of the blocks in the \p ExodusII mesh
