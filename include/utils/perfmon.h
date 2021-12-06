@@ -58,7 +58,8 @@ public:
 
   ~PerfMon ();
   void reset ();
-  double print (std::string msg="NULL", std::ostream & out = libMesh::out);
+  double print (std::string msg="NULL",
+                std::ostream & my_out = libMesh::out);
 
 private:
 

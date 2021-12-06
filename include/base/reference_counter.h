@@ -76,7 +76,7 @@ public:
   /**
    * Prints the reference information, by default to \p libMesh::out.
    */
-  static void print_info (std::ostream & out = libMesh::out);
+  static void print_info (std::ostream & out_stream = libMesh::out);
 
   /**
    * Prints the number of outstanding (created, but not yet
