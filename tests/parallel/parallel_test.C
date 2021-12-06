@@ -151,18 +151,16 @@ public:
 
   void testBroadcast()
   {
-    std::vector<unsigned int> src(3), dest(3);
-
-    src[0]=0;
-    src[1]=1;
-    src[2]=2;
+    // Workaround for spurious warning from operator=
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100366
+    std::vector<unsigned int> src{0,1,2}, dest(3,0);
 
     if (TestCommWorld->rank() == 0)
       dest = src;
 
     TestCommWorld->broadcast(dest);
 
-    for (std::size_t i=0; i<src.size(); i++)
+    for (std::size_t i=0; i<3; i++)
       CPPUNIT_ASSERT_EQUAL( src[i] , dest[i] );
   }
 
