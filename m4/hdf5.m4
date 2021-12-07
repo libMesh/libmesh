@@ -5,7 +5,7 @@ AC_DEFUN([CONFIGURE_HDF5],
 [
   AC_ARG_ENABLE(hdf5,
                 AS_HELP_STRING([--enable-hdf5],
-                               [build libmesh with HDF5 support, the selected HDF5 must be compatible with contrib/netcdf]),
+                               [build with HDF5 support; the selected HDF5 must be compatible with our netcdf]),
                 [AS_CASE("${enableval}",
                          [yes], [enablehdf5=yes],
                          [no],  [enablehdf5=no],
