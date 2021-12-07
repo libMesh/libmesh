@@ -781,12 +781,12 @@ public:
   /**
    * Prints the boundary information data structure.
    */
-  void print_info (std::ostream & out=libMesh::out) const;
+  void print_info (std::ostream & out_stream=libMesh::out) const;
 
   /**
    * Prints a summary of the boundary information.
    */
-  void print_summary (std::ostream & out=libMesh::out) const;
+  void print_summary (std::ostream & out_stream=libMesh::out) const;
 
   /**
    * \returns A reference for getting an optional name for a sideset.

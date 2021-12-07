@@ -444,7 +444,8 @@ public:
    * Unformatted print to the stream \p out.  Simply prints the elements
    * of the tensor separated by spaces and newlines.
    */
-  void write_unformatted (std::ostream & out, const bool newline = true) const;
+  void write_unformatted (std::ostream & out_stream,
+                          const bool newline = true) const;
 
 protected:
 
