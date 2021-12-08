@@ -368,12 +368,6 @@ void FE<Dim,T>::side_map (const Elem * elem,
   for (unsigned int i = 0; i < n_points; i++)
     reference_points[i].zero();
 
-  std::vector<unsigned int> elem_nodes_map;
-  elem_nodes_map.resize(side->n_nodes());
-  for (auto j : side->node_index_range())
-    for (auto i : elem->node_index_range())
-      if (side->node_id(j) == elem->node_id(i))
-        elem_nodes_map[j] = i;
   std::vector<Point> refspace_nodes;
   this->get_refspace_nodes(elem->type(), refspace_nodes);
 
@@ -382,7 +376,7 @@ void FE<Dim,T>::side_map (const Elem * elem,
   // sum over the nodes
   for (auto i : index_range(psi_map))
     {
-      const Point & side_node = refspace_nodes[elem_nodes_map[i]];
+      const Point & side_node = refspace_nodes[elem->local_side_node(s,i)];
       for (unsigned int p=0; p<n_points; p++)
         reference_points[p].add_scaled (side_node, psi_map[i][p]);
     }
