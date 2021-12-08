@@ -61,6 +61,7 @@ void Edge::side_ptr (std::unique_ptr<Elem> & side,
   else
     {
       side->subdomain_id() = this->subdomain_id();
+      side->set_mapping_type(this->mapping_type());
 
       side->set_node(0) = this->node_ptr(i);
     }

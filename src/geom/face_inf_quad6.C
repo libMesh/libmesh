@@ -233,6 +233,7 @@ std::unique_ptr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
   edge->set_interior_parent(this);
 
   edge->subdomain_id() = this->subdomain_id();
+  edge->set_mapping_type(this->mapping_type());
 #ifdef LIBMESH_ENABLE_AMR
   edge->set_p_level(this->p_level());
 #endif
@@ -278,6 +279,7 @@ void InfQuad6::build_side_ptr (std::unique_ptr<Elem> & side,
     }
 
   side->subdomain_id() = this->subdomain_id();
+  side->set_mapping_type(this->mapping_type());
 #ifdef LIBMESH_ENABLE_AMR
   side->set_p_level(this->p_level());
 #endif

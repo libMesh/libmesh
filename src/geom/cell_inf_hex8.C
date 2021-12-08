@@ -213,6 +213,7 @@ std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i,
   face->set_interior_parent(this);
 
   face->subdomain_id() = this->subdomain_id();
+  face->set_mapping_type(this->mapping_type());
 #ifdef LIBMESH_ENABLE_AMR
   face->set_p_level(this->p_level());
 #endif
@@ -280,6 +281,7 @@ void InfHex8::build_edge_ptr (std::unique_ptr<Elem> & edge,
     }
 
   edge->subdomain_id() = this->subdomain_id();
+  edge->set_mapping_type(this->mapping_type());
 #ifdef LIBMESH_ENABLE_AMR
   edge->set_p_level(this->p_level());
 #endif
