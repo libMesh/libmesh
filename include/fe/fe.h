@@ -507,6 +507,16 @@ public:
                          std::vector<Point> &       reference_points) override;
 
   /**
+   * Computes the reference space quadrature points on the side of
+   * an element based on the edge quadrature points.
+   */
+  virtual void edge_map (const Elem * elem,
+                         const Elem * edge,
+                         const unsigned int e,
+                         const std::vector<Point> & reference_edge_points,
+                         std::vector<Point> &       reference_points);
+
+  /**
    * Provides the class with the quadrature rule, which provides the
    * locations (on a reference element) where the shape functions are
    * to be calculated.
