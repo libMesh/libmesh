@@ -295,7 +295,7 @@ void FE<Dim,T>::edge_reinit(const Elem * elem,
 
       // We might not need to reinitialize the shape functions
       if ((this->get_type() != elem->type())                   ||
-          (edge->type() != static_cast<int>(last_edge))        || // Comparison between enum and unsigned, cast the unsigned to int
+          (edge->type() != last_edge)                          ||
           this->shapes_need_reinit()                           ||
           !this->shapes_on_quadrature)
         {

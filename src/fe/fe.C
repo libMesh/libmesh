@@ -48,7 +48,7 @@ template <unsigned int Dim, FEFamily T>
 FE<Dim,T>::FE (const FEType & fet) :
   FEGenericBase<typename FEOutputType<T>::type> (Dim,fet),
   last_side(INVALID_ELEM),
-  last_edge(libMesh::invalid_uint)
+  last_edge(INVALID_ELEM)
 {
   // Sanity check.  Make sure the
   // Family specified in the template instantiation

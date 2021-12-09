@@ -660,7 +660,7 @@ protected:
    */
   ElemType last_side;
 
-  unsigned int last_edge;
+  ElemType last_edge;
 };
 
 
