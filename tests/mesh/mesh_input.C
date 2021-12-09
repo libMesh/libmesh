@@ -888,6 +888,9 @@ public:
 
     sys.project_solution(sin_x_plus_cos_y, nullptr, es.parameters);
 
+    // Make this easy to tweak in the future
+    const double my_tolerance = TOLERANCE;
+
     // Calculate some norms, skipping the spline points, and compare
     // to regression standard values
     std::set<unsigned int> skip_dimensions {0};
@@ -895,20 +898,20 @@ public:
       sys.calculate_norm(*sys.solution, 0, L2, &skip_dimensions);
 //    std::cout.precision(16);
 //    std::cout << "L2_norm = " << L2_norm << std::endl;
-    LIBMESH_ASSERT_FP_EQUAL(L2_norm, expected_norms[0], TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(L2_norm, expected_norms[0], my_tolerance);
     const Real Linf_norm =
       sys.calculate_norm(*sys.solution, 0, L_INF, &skip_dimensions);
 //    std::cout << "Linf_norm = " << Linf_norm << std::endl;
-    LIBMESH_ASSERT_FP_EQUAL(Linf_norm, expected_norms[1], TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(Linf_norm, expected_norms[1], my_tolerance);
     const Real H1_norm =
       sys.calculate_norm(*sys.solution, 0, H1_SEMINORM, &skip_dimensions);
 //    std::cout << "H1_norm = " << H1_norm << std::endl;
-    LIBMESH_ASSERT_FP_EQUAL(H1_norm, expected_norms[2], TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(H1_norm, expected_norms[2], my_tolerance);
     const Real W1inf_norm =
       sys.calculate_norm(*sys.solution, 0, W1_INF_SEMINORM, &skip_dimensions);
 //    std::cout << "W1inf_norm = " << W1inf_norm << std::endl;
     // W1_inf seems more sensitive to FP error...
-    LIBMESH_ASSERT_FP_EQUAL(W1inf_norm, expected_norms[3], 10*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(W1inf_norm, expected_norms[3], 10*my_tolerance);
   }
 
   void testDynaFileMappings (const std::string & filename, std::array<Real, 4> expected_norms)
