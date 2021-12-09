@@ -945,8 +945,8 @@ public:
   {
     testDynaFileMappings("meshes/BlockWithHole_Patch9.bxt.gz",
     // Regression values for sin_x_plus_cos_y
-                         {3.226125496262302, 1.97405596521291,
-                          2.533759662135491, 1.413785069495184});
+                         {3.22612556930183, 1.97405365384733,
+                          2.53376235803176, 1.41374070517223});
   }
 
   void testDynaFileMappingsPlateWithHole ()
@@ -961,8 +961,8 @@ public:
   {
     testDynaFileMappings("meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz",
     // Regression values for sin_x_plus_cos_y
-                         {0.9636130896326653, 1.823294442918401,
-                          0.7080084233124895, 1.314114853940283});
+                         {0.963612880188165, 1.82329452603503,
+                          0.707998701597943, 1.31399222566683});
   }
 
   void testExodusFileMappings (const std::string & filename, std::array<Real, 4> expected_norms)
@@ -1016,8 +1016,8 @@ public:
   void testExodusFileMappingsCyl3d ()
   {
     testExodusFileMappings("meshes/PressurizedCyl3d_Patch1_8Elem.e",
-                           {0.9636130896326653, 1.823294442918401,
-                            0.7080084233124895, 1.314114853940283});
+                           {0.963612880188165, 1.82329452603503,
+                            0.707998701597943, 1.31399222566683});
   }
 };
 
