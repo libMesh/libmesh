@@ -4,6 +4,7 @@
 #include <libmesh/enum_elem_type.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
+#include <libmesh/elem_side_builder.h>
 
 #include "libmesh_cppunit.h"
 
@@ -146,6 +147,26 @@ public:
       for (const auto s : elem->side_index_range())
         CPPUNIT_ASSERT_EQUAL(elem->build_side_ptr(s)->type(), elem->side_type(s));
   }
+
+  void test_elem_side_builder()
+  {
+    ElemSideBuilder cache;
+    for (auto & elem : _mesh->active_local_element_ptr_range())
+      for (const auto s : elem->side_index_range())
+      {
+        const auto side = elem->build_side_ptr(s);
+
+        auto & cached_side = cache(*elem, s);
+        CPPUNIT_ASSERT_EQUAL(side->type(), cached_side.type());
+        for (const auto n : side->node_index_range())
+          CPPUNIT_ASSERT_EQUAL(side->node_ref(n), cached_side.node_ref(n));
+
+        const auto & const_cached_side = cache(const_cast<const Elem &>(*elem), s);
+        CPPUNIT_ASSERT_EQUAL(side->type(), const_cached_side.type());
+        for (const auto n : side->node_index_range())
+          CPPUNIT_ASSERT_EQUAL(side->node_ref(n), const_cached_side.node_ref(n));
+      }
+  }
 };
 
 #define ELEMTEST                                \
@@ -154,7 +175,8 @@ public:
   CPPUNIT_TEST( test_permute );                 \
   CPPUNIT_TEST( test_contains_point_node );     \
   CPPUNIT_TEST( test_center_node_on_side );     \
-  CPPUNIT_TEST( test_side_type );
+  CPPUNIT_TEST( test_side_type );               \
+  CPPUNIT_TEST( test_elem_side_builder );
 
 #define INSTANTIATE_ELEMTEST(elemtype)                          \
   class ElemTest_##elemtype : public ElemTest<elemtype> {       \
