@@ -386,6 +386,16 @@ InfPrism6::permute(unsigned int perm_num)
     }
 }
 
+
+ElemType
+InfPrism6::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 4);
+  if (s == 0)
+    return TRI3;
+  return INFQUAD4;
+}
+
 } // namespace libMesh
 
 #endif  // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

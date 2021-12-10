@@ -777,4 +777,13 @@ Prism15::permute(unsigned int perm_num)
 }
 
 
+ElemType
+Prism15::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  if (s == 0 || s == 4)
+    return TRI6;
+  return QUAD8;
+}
+
 } // namespace libMesh

@@ -1273,4 +1273,12 @@ unsigned int Hex27::center_node_on_side(const unsigned short side) const
 }
 
 
+ElemType
+Hex27::side_type (const unsigned int libmesh_dbg_var(s)) const
+{
+  libmesh_assert_less (s, 6);
+  return QUAD9;
+}
+
+
 } // namespace libMesh

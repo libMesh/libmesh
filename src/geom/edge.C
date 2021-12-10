@@ -141,4 +141,10 @@ unsigned int Edge::center_node_on_side(const unsigned short side) const
   return side;
 }
 
+ElemType Edge::side_type (const unsigned int libmesh_dbg_var(s)) const
+{
+  libmesh_assert_less (s, 2);
+  return NODEELEM;
+}
+
 } // namespace libMesh

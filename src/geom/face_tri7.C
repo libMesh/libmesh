@@ -508,4 +508,12 @@ unsigned int Tri7::center_node_on_side(const unsigned short side) const
 }
 
 
+ElemType
+Tri7::side_type (const unsigned int libmesh_dbg_var(s)) const
+{
+  libmesh_assert_less (s, 3);
+  return EDGE3;
+}
+
+
 } // namespace libMesh

@@ -233,6 +233,12 @@ public:
   virtual unsigned int center_node_on_side(const unsigned short) const override
   { libmesh_error(); return invalid_uint; }
 
+  virtual ElemType side_type (const unsigned int) const override
+  {
+    libmesh_not_implemented();
+    return INVALID_ELEM;
+  }
+
 protected:
 
   /**

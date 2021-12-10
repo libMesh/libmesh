@@ -781,4 +781,13 @@ unsigned int Pyramid14::center_node_on_side(const unsigned short side) const
 }
 
 
+ElemType Pyramid14::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  if (s < 4)
+    return TRI6;
+  return QUAD9;
+}
+
+
 } // namespace libMesh

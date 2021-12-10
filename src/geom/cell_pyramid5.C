@@ -335,5 +335,13 @@ void Pyramid5::permute(unsigned int perm_num)
     }
 }
 
+ElemType Pyramid5::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  if (s < 4)
+    return TRI3;
+  return QUAD4;
+}
+
 
 } // namespace libMesh

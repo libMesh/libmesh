@@ -886,5 +886,11 @@ void Tet10::permute(unsigned int perm_num)
 }
 
 
+ElemType Tet10::side_type (const unsigned int libmesh_dbg_var(s)) const
+{
+  libmesh_assert_less (s, 4);
+  return TRI6;
+}
+
 
 } // namespace libMesh

@@ -160,6 +160,7 @@ public:
    */
   static const unsigned int side_nodes_map[num_sides][nodes_per_side];
 
+  ElemType side_type (const unsigned int s) const override final;
 
 protected:
 

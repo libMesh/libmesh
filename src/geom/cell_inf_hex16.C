@@ -547,6 +547,17 @@ InfHex16::permute(unsigned int perm_num)
     }
 }
 
+
+ElemType
+InfHex16::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  if (s == 0)
+    return QUAD8;
+  return INFQUAD6;
+}
+
+
 } // namespace libMesh
 
 #endif  // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

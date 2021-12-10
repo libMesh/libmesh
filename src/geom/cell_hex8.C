@@ -530,4 +530,12 @@ Hex8::permute(unsigned int perm_num)
 }
 
 
+ElemType
+Hex8::side_type (const unsigned int libmesh_dbg_var(s)) const
+{
+  libmesh_assert_less (s, 6);
+  return QUAD4;
+}
+
+
 } // namespace libMesh

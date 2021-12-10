@@ -621,4 +621,11 @@ void Tet4::permute(unsigned int perm_num)
 }
 
 
+ElemType Tet4::side_type (const unsigned int libmesh_dbg_var(s)) const
+{
+  libmesh_assert_less (s, 4);
+  return TRI3;
+}
+
+
 } // namespace libMesh

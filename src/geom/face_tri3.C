@@ -274,5 +274,11 @@ void Tri3::permute(unsigned int perm_num)
     }
 }
 
+ElemType
+Tri3::side_type (const unsigned int libmesh_dbg_var(s)) const
+{
+  libmesh_assert_less (s, 3);
+  return EDGE2;
+}
 
 } // namespace libMesh

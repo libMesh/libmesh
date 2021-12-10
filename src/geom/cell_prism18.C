@@ -1047,4 +1047,14 @@ unsigned int Prism18::center_node_on_side(const unsigned short side) const
 }
 
 
+ElemType
+Prism18::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  if (s == 0 || s == 4)
+    return TRI6;
+  return QUAD9;
+}
+
+
 } // namespace libMesh

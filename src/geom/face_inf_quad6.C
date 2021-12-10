@@ -363,9 +363,18 @@ InfQuad6::second_order_child_vertex (const unsigned int n) const
     (0, 2*n-7);
 }
 
+
+ElemType
+InfQuad6::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 3);
+  if (s == 0)
+    return EDGE3;
+  return INFEDGE2;
+}
+
+
 } // namespace libMesh
-
-
 
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

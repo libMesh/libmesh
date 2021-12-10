@@ -139,6 +139,13 @@ public:
             CPPUNIT_ASSERT_EQUAL(invalid_uint, elem->center_node_on_side(s));
         }
   }
+
+  void test_side_type()
+  {
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      for (const auto s : elem->side_index_range())
+        CPPUNIT_ASSERT_EQUAL(elem->build_side_ptr(s)->type(), elem->side_type(s));
+  }
 };
 
 #define ELEMTEST                                \
@@ -146,7 +153,8 @@ public:
   CPPUNIT_TEST( test_maps );                    \
   CPPUNIT_TEST( test_permute );                 \
   CPPUNIT_TEST( test_contains_point_node );     \
-  CPPUNIT_TEST( test_center_node_on_side );
+  CPPUNIT_TEST( test_center_node_on_side );     \
+  CPPUNIT_TEST( test_side_type );
 
 #define INSTANTIATE_ELEMTEST(elemtype)                          \
   class ElemTest_##elemtype : public ElemTest<elemtype> {       \

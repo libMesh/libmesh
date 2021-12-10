@@ -530,6 +530,16 @@ Prism6::permute(unsigned int perm_num)
 
 }
 
+
+ElemType
+Prism6::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  if (s == 0 || s == 4)
+    return TRI3;
+  return QUAD4;
+}
+
 } // namespace libMesh
 
 namespace // anonymous

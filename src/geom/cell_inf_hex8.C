@@ -397,6 +397,16 @@ InfHex8::permute(unsigned int perm_num)
 }
 
 
+ElemType
+InfHex8::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  if (s == 0)
+    return QUAD4;
+  return INFQUAD4;
+}
+
+
 } // namespace libMesh
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

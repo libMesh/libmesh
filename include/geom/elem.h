@@ -636,6 +636,11 @@ public:
   virtual unsigned int n_sides () const = 0;
 
   /**
+   * \returns The type of element for side \p s.
+   */
+  virtual ElemType side_type (const unsigned int s) const = 0;
+
+  /**
    * \returns An integer range from 0 up to (but not including)
    * the number of sides this element has.
    */
