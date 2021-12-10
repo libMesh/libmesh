@@ -153,6 +153,7 @@ libmesh_SOURCES =  \
         src/geom/elem_cutter.C \
         src/geom/elem_quality.C \
         src/geom/elem_refinement.C \
+        src/geom/elem_side_builder.C \
         src/geom/face.C \
         src/geom/face_inf_quad.C \
         src/geom/face_inf_quad4.C \
