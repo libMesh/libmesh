@@ -11,6 +11,7 @@
 #include "libmesh/parameters.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/elem_side_builder.h"
 
 #include <memory>
 
@@ -192,14 +193,17 @@ compute_residual(const NumericVector<Number> & X,
       }
     }
 
+    // To avoid extraneous allocation when building element sides (to compute their volumes)
+    ElemSideBuilder side_builder;
+
     // Now we consider residual contributions from the sides
     for (auto side : elem->side_index_range())
     {
       // We need to compute h for penalty terms
-      std::unique_ptr<const Elem> elem_side(elem->build_side_ptr(side));
+      const auto side_volume = side_builder(*elem, side).volume();
       fe_face->reinit(elem, side);
       const auto elem_b_order = static_cast<unsigned int>(fe_face->get_order());
-      const auto h_elem = elem->volume() / elem_side->volume() / std::pow(elem_b_order, 2);
+      const auto h_elem = elem->volume() / side_volume / std::pow(elem_b_order, 2);
 
       // build the face solution value and gradient
       u.resize(qface.n_points());
@@ -404,6 +408,9 @@ compute_jacobian(const NumericVector<Number> &,
   std::vector<dof_id_type> dof_indices;
   std::vector<dof_id_type> dof_indices_neighbor;
 
+  // To avoid extraneous allocation when building element sides (to compute their volumes)
+  ElemSideBuilder side_builder;
+
   // Now we will loop over all the elements in the mesh.
   // We will compute the element matrix and right-hand-side
   // contribution.
@@ -446,10 +453,10 @@ compute_jacobian(const NumericVector<Number> &,
     for (auto side : elem->side_index_range())
     {
       // We need to compute h for penalty terms
-      std::unique_ptr<const Elem> elem_side(elem->build_side_ptr(side));
+      const auto side_volume = side_builder(*elem, side).volume();
       fe_face->reinit(elem, side);
       const auto elem_b_order = static_cast<unsigned int>(fe_face->get_order());
-      const auto h_elem = elem->volume() / elem_side->volume() / std::pow(elem_b_order, 2);
+      const auto h_elem = elem->volume() / side_volume / std::pow(elem_b_order, 2);
 
       // No neighbor means we must be on a boundary
       if (!elem->neighbor_ptr(side))

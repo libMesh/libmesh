@@ -4,6 +4,7 @@
 // libMesh includes
 #include "libmesh/elem.h"
 #include "libmesh/boundary_info.h"
+#include "libmesh/elem_side_builder.h"
 
 using namespace libMesh;
 
@@ -35,20 +36,23 @@ void AugmentSparsityOnInterface::mesh_reinit ()
   std::map<std::pair<const Elem *, unsigned char>, Point> lower;
   std::map<std::pair<const Elem *, unsigned char>, Point> upper;
 
+  // To avoid extraneous allocation when getting element side vertex averages
+  std::unique_ptr<const Elem> side_elem;
+
   for (const auto & elem : _mesh.active_element_ptr_range())
     for (auto side : elem->side_index_range())
       if (elem->neighbor_ptr(side) == nullptr)
         {
           if (_mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_lower))
             {
-              std::unique_ptr<const Elem> side_elem = elem->build_side_ptr(side);
+              elem->build_side_ptr(side_elem, side);
 
               lower[std::make_pair(elem, side)] = side_elem->vertex_average();
             }
 
           if (_mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_upper))
             {
-              std::unique_ptr<const Elem> side_elem = elem->build_side_ptr(side);
+              elem->build_side_ptr(side_elem, side);
 
               upper[std::make_pair(elem, side)] = side_elem->vertex_average();
             }
