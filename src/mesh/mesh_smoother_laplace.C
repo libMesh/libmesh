@@ -29,6 +29,7 @@
 #include "libmesh/parallel_ghost_sync.h" // sync_dofobject_data_by_id()
 #include "libmesh/parallel_algebra.h" // StandardType<Point>
 #include "libmesh/int_range.h"
+#include "libmesh/elem_side_builder.h"
 
 namespace libMesh
 {
@@ -152,6 +153,9 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
 
 void LaplaceMeshSmoother::init()
 {
+  // For avoiding extraneous element side construction
+  ElemSideBuilder side_builder;
+
   switch (_mesh.mesh_dimension())
     {
 
@@ -176,9 +180,9 @@ void LaplaceMeshSmoother::init()
               if ((elem->neighbor_ptr(s) == nullptr) ||
                   (elem->id() > elem->neighbor_ptr(s)->id()))
                 {
-                  std::unique_ptr<const Elem> side(elem->build_side_ptr(s));
-                  _graph[side->node_id(0)].push_back(side->node_id(1));
-                  _graph[side->node_id(1)].push_back(side->node_id(0));
+                  const Elem & side = side_builder(*elem, s);
+                  _graph[side.node_id(0)].push_back(side.node_id(1));
+                  _graph[side.node_id(1)].push_back(side.node_id(0));
                 }
             }
         _initialized = true;
@@ -187,6 +191,9 @@ void LaplaceMeshSmoother::init()
 
     case 3: // Stolen blatantly from build_L_graph in mesh_base.C
       {
+        // Extra builder for the face elements
+        ElemSideBuilder face_builder;
+
         // Initialize space in the graph.
         _graph.resize(_mesh.max_node_id());
 
@@ -195,20 +202,17 @@ void LaplaceMeshSmoother::init()
             if ((elem->neighbor_ptr(f) == nullptr) ||
                 (elem->id() > elem->neighbor_ptr(f)->id()))
               {
-                // We need a full (i.e. non-proxy) element for the face, since we will
-                // be looking at its sides as well!
-                std::unique_ptr<const Elem> face = elem->build_side_ptr(f, /*proxy=*/false);
+                const Elem & face = face_builder(*elem, f);
 
-                for (auto s : face->side_index_range()) // Loop over face's edges
+                for (auto s : face.side_index_range()) // Loop over face's edges
                   {
-                    // Here we can use a proxy
-                    std::unique_ptr<const Elem> side = face->build_side_ptr(s);
+                    const Elem & side = side_builder(face, s);
 
                     // At this point, we just insert the node numbers
                     // again.  At the end we'll call sort and unique
                     // to make sure there are no duplicates
-                    _graph[side->node_id(0)].push_back(side->node_id(1));
-                    _graph[side->node_id(1)].push_back(side->node_id(0));
+                    _graph[side.node_id(0)].push_back(side.node_id(1));
+                    _graph[side.node_id(1)].push_back(side.node_id(0));
                   }
               }
 

@@ -40,6 +40,7 @@
 #include "libmesh/remote_elem.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/unstructured_mesh.h"
+#include "libmesh/elem_side_builder.h"
 
 namespace
 {
@@ -373,6 +374,9 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
     unique_id_type max_unique_id = mesh.parallel_max_unique_id();
 #endif
+
+    // For avoiding extraneous allocation when building side elements
+    std::unique_ptr<const Elem> elem_side, subside_elem;
 
     for (auto & elem : mesh.element_ptr_range())
       {
@@ -1022,7 +1026,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                   continue;
 
                 // Make a sorted list of node ids for elem->side(sn)
-                std::unique_ptr<Elem> elem_side = elem->build_side_ptr(sn);
+                elem->build_side_ptr(elem_side, sn);
                 std::vector<dof_id_type> elem_side_nodes(elem_side->n_nodes());
                 for (unsigned int esn=0,
                      n_esn = cast_int<unsigned int>(elem_side_nodes.size());
@@ -1035,7 +1039,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                     {
                       for (auto subside : subelem[i]->side_index_range())
                         {
-                          std::unique_ptr<Elem> subside_elem = subelem[i]->build_side_ptr(subside);
+                          subelem[i]->build_side_ptr(subside_elem, subside);
 
                           // Make a list of *vertex* node ids for this subside, see if they are all present
                           // in elem->side(sn).  Note 1: we can't just compare elem->key(sn) to
@@ -1176,6 +1180,9 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
   std::unordered_set<dof_id_type> boundary_node_ids =
     MeshTools::find_boundary_nodes (mesh);
 
+  // For avoiding extraneous element side allocation
+  ElemSideBuilder side_builder;
+
   for (unsigned int iter=0; iter<n_iterations; iter++)
     {
       /*
@@ -1214,10 +1221,9 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
                         if ((elem->neighbor_ptr(s) != nullptr) &&
                             (elem->id() > elem->neighbor_ptr(s)->id()))
                           {
-                            std::unique_ptr<const Elem> side(elem->build_side_ptr(s));
-
-                            const Node & node0 = side->node_ref(0);
-                            const Node & node1 = side->node_ref(1);
+                            const Elem & side = side_builder(*elem, s);
+                            const Node & node0 = side.node_ref(0);
+                            const Node & node1 = side.node_ref(1);
 
                             Real node_weight = 1.;
                             // calculate the weight of the nodes

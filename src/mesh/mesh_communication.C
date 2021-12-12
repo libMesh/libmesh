@@ -36,6 +36,7 @@
 #include "libmesh/utility.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/int_range.h"
+#include "libmesh/elem_side_builder.h"
 
 // C++ Includes
 #include <numeric>
@@ -682,8 +683,8 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
   {
     std::set<dof_id_type> my_interface_node_set;
 
-    // Pull objects out of the loop to reduce heap operations
-    std::unique_ptr<const Elem> side;
+    // For avoiding extraneous element side construction
+    ElemSideBuilder side_builder;
 
     // since parent nodes are a subset of children nodes, this should be sufficient
     for (const auto & elem : mesh.active_local_element_ptr_range())
@@ -697,10 +698,10 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
             for (auto s : elem->side_index_range())
               if (elem->neighbor_ptr(s) == nullptr)
                 {
-                  elem->build_side_ptr(side, s);
+                  const Elem & side = side_builder(*elem, s);
 
-                  for (auto n : make_range(side->n_vertices()))
-                    my_interface_node_set.insert (side->node_id(n));
+                  for (auto n : make_range(side.n_vertices()))
+                    my_interface_node_set.insert (side.node_id(n));
                 }
           }
       }

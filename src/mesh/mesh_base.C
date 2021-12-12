@@ -44,6 +44,7 @@
 #include "libmesh/enum_to_string.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/point_locator_nanoflann.h"
+#include "libmesh/elem_side_builder.h"
 
 namespace libMesh
 {
@@ -910,6 +911,7 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
         std::set<dof_id_type> node_ids;
         BoundingBox bbox;
       };
+      ElemSideBuilder side_builder;
       std::map<boundary_id_type, SidesetInfo> sideset_info_map;
       for (const auto & pair : this->get_boundary_info().get_sideset_map())
         {
@@ -921,21 +923,21 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
           SidesetInfo & info = sideset_info_map[id];
 
           const auto s = pair.second.first;
-          const auto side = elem->build_side_ptr(s);
+          const Elem & side = side_builder(*elem, s);
 
           ++info.num_sides;
-          info.side_elem_types.insert(side->type());
+          info.side_elem_types.insert(side.type());
           info.elem_types.insert(elem->type());
           info.elem_ids.insert(elem->id());
 
-          for (const Node & node : side->node_ref_range())
+          for (const Node & node : side.node_ref_range())
             if (include_object(node))
               info.node_ids.insert(node.id());
 
           if (verbosity > 1)
           {
-            info.volume += side->volume();
-            info.bbox.union_with(side->loose_bounding_box());
+            info.volume += side.volume();
+            info.bbox.union_with(side.loose_bounding_box());
           }
         }
 
