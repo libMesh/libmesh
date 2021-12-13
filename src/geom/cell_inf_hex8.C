@@ -64,19 +64,6 @@ const unsigned int InfHex8::edge_nodes_map[InfHex8::num_edges][InfHex8::nodes_pe
     {3, 7}  // Edge 7
   };
 
-const unsigned int InfHex8::edge_sides_map[InfHex8::num_edges][2] =
-  {
-    {0, 1}, // Edge 0
-    {1, 2}, // Edge 1
-    {0, 3}, // Edge 2
-    {0, 4}, // Edge 3
-    {1, 4}, // Edge 4
-    {1, 2}, // Edge 5
-    {2, 3}, // Edge 6
-    {3, 4}  // Edge 7
-  };
-
-
 // ------------------------------------------------------------
 // InfHex8 class member functions
 
