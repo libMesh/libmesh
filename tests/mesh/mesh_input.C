@@ -713,14 +713,6 @@ public:
   {
     auto locator = mesh.sub_point_locator();
 
-    // A multiblock Exodus file will have a subdomain for each block;
-    // we stick the nodeelem subdomain at the end.
-    const subdomain_id_type nodeelems = mesh.n_subdomains()-1;
-    const std::set<subdomain_id_type> nodeelem_subdomain { nodeelems };
-    std::set<subdomain_id_type> manifold_subdomain;
-    for (auto i : make_range(nodeelems))
-      manifold_subdomain.insert(i);
-
     for (auto & elem : mesh.element_ptr_range())
       {
         Point master_pt = {}; // center, for tensor product elements
@@ -746,11 +738,9 @@ public:
 
         CPPUNIT_ASSERT(elem->contains_point(physical_pt));
 
-        const std::set<subdomain_id_type> * sbd_set =
-          (elem->type() == NODEELEM) ?
-          &nodeelem_subdomain : &manifold_subdomain;
+        std::set<subdomain_id_type> my_subdomain { elem->subdomain_id() };
 
-        const Elem * located_elem = (*locator)(physical_pt, sbd_set);
+        const Elem * located_elem = (*locator)(physical_pt, &my_subdomain);
 
         CPPUNIT_ASSERT(located_elem == elem);
       }
