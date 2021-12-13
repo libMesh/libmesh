@@ -139,8 +139,7 @@ public:
   /**
    * Overwrite the training parameters with new_training_set.
    */
-  virtual void load_training_set(std::map<std::string, std::vector<Number>> & new_training_set,
-                                 bool serial_training_set);
+  virtual void load_training_set(std::map<std::string, std::vector<Number>> & new_training_set);
 
   /**
    * Overwrite the local part of the training set for \p param_name using \p values.

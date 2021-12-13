@@ -263,8 +263,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
 }
 
 template <class Base>
-void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vector<Number>> & new_training_set,
-                                                 bool serial_training_set)
+void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vector<Number>> & new_training_set)
 {
   // First, make sure that an initial training set has already been
   // generated
