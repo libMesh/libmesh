@@ -2523,6 +2523,7 @@ Elem::simple_build_side_ptr (const unsigned int i,
     face->set_parent(nullptr);
   face->set_interior_parent(this);
 
+  face->set_mapping_type(this->mapping_type());
   face->subdomain_id() = this->subdomain_id();
 #ifdef LIBMESH_ENABLE_AMR
   face->set_p_level(this->p_level());
@@ -2550,6 +2551,7 @@ Elem::simple_build_side_ptr (std::unique_ptr<Elem> & side,
   else
     {
       side->subdomain_id() = this->subdomain_id();
+      side->set_mapping_type(this->mapping_type());
 #ifdef LIBMESH_ENABLE_AMR
       side->set_p_level(this->p_level());
 #endif
@@ -2624,6 +2626,7 @@ Elem::simple_build_edge_ptr (const unsigned int i)
     edge->set_node(n) = this->node_ptr(Subclass::edge_nodes_map[i][n]);
 
   edge->set_interior_parent(this);
+  edge->set_mapping_type(this->mapping_type());
   edge->subdomain_id() = this->subdomain_id();
 #ifdef LIBMESH_ENABLE_AMR
   edge->set_p_level(this->p_level());
@@ -2651,6 +2654,7 @@ Elem::simple_build_edge_ptr (std::unique_ptr<Elem> & edge,
     }
   else
     {
+      edge->set_mapping_type(this->mapping_type());
       edge->subdomain_id() = this->subdomain_id();
 #ifdef LIBMESH_ENABLE_AMR
       edge->set_p_level(this->p_level());
