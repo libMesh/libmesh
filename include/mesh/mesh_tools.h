@@ -366,6 +366,16 @@ void find_hanging_nodes_and_parents(const MeshBase & mesh,
  */
 void correct_node_proc_ids(MeshBase &);
 
+/**
+ * Remove spline node (for IsoGeometric Analysis meshes) elements
+ * and nodes and constraints from the mesh.  This should be done
+ * after the mesh is read but before the constraints are used by
+ * System initialization.  The result is a mesh and solution space
+ * with lower required continuity and more unconstrained degrees of
+ * freedom, but with fewer total degrees of freedom and far fewer
+ * constraint equations.
+ */
+void clear_spline_nodes(MeshBase &);
 
 #ifdef DEBUG
 /**
