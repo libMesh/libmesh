@@ -373,6 +373,20 @@ public:
                      std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals);
 
   /**
+   * Similar to read_nodeset_data(), but instead of creating one
+   * std::map per nodeset per variable, creates a single map of
+   * (node_id, boundary_id) tuples, and stores the exo file array indices
+   * for any/all nodeset variables on that nodeset (they are all the
+   * same). In cases where there are hundreds of nodeset variables on
+   * a single nodeset, it is more efficient to store the array indices
+   * in a quickly searchable data structure than to repeat the
+   * indexing once per variable as is done in the read_nodeset_data()
+   * case.
+   */
+  void
+  get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> & bc_array_indices);
+
+  /**
    * Set the elemental variables in the Exodus file to be read into extra
    * element integers. The names of these elemental variables will be used to
    * name the extra element integers.

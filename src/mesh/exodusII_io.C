@@ -1863,6 +1863,17 @@ get_sideset_data_indices (std::map<BoundaryInfo::BCTuple, unsigned int> & bc_arr
 
 void
 ExodusII_IO::
+get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> & bc_array_indices)
+{
+  libmesh_error_msg_if(!exio_helper->opened_for_reading,
+                       "ERROR, ExodusII file must be opened for reading "
+                       "before calling ExodusII_IO::get_nodeset_data_indices()!");
+
+  exio_helper->get_nodeset_data_indices(bc_array_indices);
+}
+
+void
+ExodusII_IO::
 write_nodeset_data (int timestep,
                     const std::vector<std::string> & var_names,
                     std::vector<std::set<boundary_id_type>> & node_boundary_ids,
