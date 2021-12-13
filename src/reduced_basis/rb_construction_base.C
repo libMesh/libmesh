@@ -329,7 +329,6 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
       // length of training_parameters unchanged and overwrite the entries of the specified
       // parameters from new_training_set. Note that we repeatedly loop over new_training_set
       // to fill up the entire length of training_vector.
-      //
 
       for (auto & pr : training_parameters)
         {
