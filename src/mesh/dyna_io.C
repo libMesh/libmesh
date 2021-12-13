@@ -22,6 +22,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/dyna_io.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/mesh_tools.h"
 #include "libmesh/int_range.h"
 #include "libmesh/utility.h"
 
@@ -729,7 +730,7 @@ void DynaIO::read_mesh(std::istream & in)
     }
 
   if (!_keep_spline_nodes)
-    this->clear_spline_nodes();
+    MeshTools::clear_spline_nodes(MeshInput<MeshBase>::mesh());
 }
 
 
@@ -742,32 +743,9 @@ void DynaIO::add_spline_constraints(DofMap &,
 
 void DynaIO::clear_spline_nodes()
 {
-  MeshBase & mesh = MeshInput<MeshBase>::mesh();
+  libmesh_deprecated();
 
-  auto & constraint_rows = mesh.get_constraint_rows();
-
-  std::vector<Elem *> nodeelem_to_delete;
-
-  for (auto & elem : mesh.element_ptr_range())
-    if (elem->type() == NODEELEM)
-      nodeelem_to_delete.push_back(elem);
-
-  // All our constraint_rows ought to be for spline constraints we're
-  // about to get rid of.
-#ifndef NDEBUG
-  for (auto & node_row : constraint_rows)
-    for (auto pr : node_row.second)
-      libmesh_assert(pr.first.first->type() == NODEELEM);
-#endif
-
-  constraint_rows.clear();
-
-  for (Elem * elem : nodeelem_to_delete)
-    {
-      Node * node = elem->node_ptr(0);
-      mesh.delete_elem(elem);
-      mesh.delete_node(node);
-    }
+  MeshTools::clear_spline_nodes(MeshInput<MeshBase>::mesh());
 }
 
 
