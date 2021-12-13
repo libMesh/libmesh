@@ -60,17 +60,6 @@ const unsigned int InfPrism12::edge_nodes_map[InfPrism12::num_edges][InfPrism12:
     {2, 5, 99}  // Side 5
   };
 
-const unsigned int InfPrism12::edge_sides_map[InfPrism12::num_edges][2] =
-  {
-    {0, 1}, // Edge 0
-    {0, 2}, // Edge 1
-    {0, 3}, // Edge 2
-    {1, 3}, // Edge 3
-    {1, 2}, // Edge 4
-    {2, 3}  // Edge 5
-  };
-
-
 // ------------------------------------------------------------
 // InfPrism12 class member functions
 
@@ -119,13 +108,6 @@ InfPrism12::nodes_on_edge(const unsigned int e) const
   libmesh_assert_less(e, n_edges());
   auto trim = (e < 3) ? 0 : 1;
   return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e]) - trim};
-}
-
-std::vector<unsigned>
-InfPrism12::sides_on_edge(const unsigned int e) const
-{
-  libmesh_assert_less(e, n_edges());
-  return {std::begin(edge_sides_map[e]), std::end(edge_sides_map[e])};
 }
 
 bool InfPrism12::is_node_on_edge(const unsigned int n,

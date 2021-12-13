@@ -184,11 +184,6 @@ public:
   static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
 
   /**
-   * This maps each edge to the sides that contain said edge.
-   */
-  static const unsigned int edge_sides_map[num_edges][2];
-
-  /**
    * An Optimized numerical quadrature approach for computing the
    * centroid of the Prism6.
    */

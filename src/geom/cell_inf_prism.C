@@ -54,7 +54,15 @@ const Real InfPrism::_master_points[12][3] =
     {0, .5, 1}
   };
 
-
+const unsigned int InfPrism::edge_sides_map[6][2] =
+  {
+    {0, 1}, // Edge 0
+    {0, 2}, // Edge 1
+    {0, 3}, // Edge 2
+    {1, 3}, // Edge 3
+    {1, 2}, // Edge 4
+    {2, 3}  // Edge 5
+  };
 
 // ------------------------------------------------------------
 // InfPrism class member functions
@@ -208,8 +216,7 @@ bool InfPrism::is_edge_on_side (const unsigned int e,
   libmesh_assert_less (e, this->n_edges());
   libmesh_assert_less (s, this->n_sides());
 
-  return (InfPrism6::edge_sides_map[e][0] == s ||
-          InfPrism6::edge_sides_map[e][1] == s);
+  return (edge_sides_map[e][0] == s || edge_sides_map[e][1] == s);
 }
 
 bool InfPrism::contains_point (const Point & p, Real tol) const
@@ -288,6 +295,12 @@ bool InfPrism::contains_point (const Point & p, Real tol) const
   return FEInterface::on_reference_element(mapped_point, this->type(), tol);
 }
 
+std::vector<unsigned>
+InfPrism::sides_on_edge(const unsigned int e) const
+{
+  libmesh_assert_less(e, n_edges());
+  return {std::begin(edge_sides_map[e]), std::end(edge_sides_map[e])};
+}
 
 } // namespace libMesh
 

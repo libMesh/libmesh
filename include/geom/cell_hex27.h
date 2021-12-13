@@ -246,11 +246,6 @@ public:
   static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
 
   /**
-   * This maps each edge to the sides that contain said edge.
-   */
-  static const unsigned int edge_sides_map[num_edges][2];
-
-  /**
    * A specialization for computing the volume of a Hex27.
    */
   virtual Real volume () const override;

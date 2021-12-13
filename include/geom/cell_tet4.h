@@ -202,11 +202,6 @@ public:
   static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
 
   /**
-   * This maps each edge to the sides that contain said edge.
-   */
-  static const unsigned int edge_sides_map[num_edges][2];
-
-  /**
    * The centroid of a 4-node tetrahedron is simply given by the
    * average of its vertex positions.
    */

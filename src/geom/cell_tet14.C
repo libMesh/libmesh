@@ -62,17 +62,6 @@ const unsigned int Tet14::edge_nodes_map[Tet14::num_edges][Tet14::nodes_per_edge
     {2, 3, 9}  // Edge 5
   };
 
-const unsigned int Tet14::edge_sides_map[Tet14::num_edges][2] =
-  {
-    {0, 1}, // Edge 0
-    {0, 2}, // Edge 1
-    {0, 3}, // Edge 2
-    {1, 3}, // Edge 3
-    {1, 2}, // Edge 4
-    {2, 3}  // Edge 5
-  };
-
-
 // ------------------------------------------------------------
 // Tet14 class member functions
 

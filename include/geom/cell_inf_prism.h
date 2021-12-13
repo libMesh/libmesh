@@ -169,6 +169,13 @@ public:
    */
   virtual unsigned int n_permutations() const override final { return 3; }
 
+  std::vector<unsigned int> sides_on_edge(const unsigned int e) const override final;
+
+  /**
+   * This maps each edge to the sides that contain said edge.
+   */
+  static const unsigned int edge_sides_map[6][2];
+
 protected:
 
   /**

@@ -180,11 +180,6 @@ public:
   static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
 
   /**
-   * This maps each edge to the sides that contain said edge.
-   */
-  static const unsigned int edge_sides_map[num_edges][2];
-
-  /**
    * Class static helper function that computes the centroid of a
    * hexahedral region from a set of input points which are assumed to
    * be in the standard "Hex8" ordering, possibly with some duplicates

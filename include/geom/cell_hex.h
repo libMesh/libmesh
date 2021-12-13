@@ -172,6 +172,11 @@ public:
    */
   virtual unsigned int n_permutations() const override final { return 24; }
 
+  /**
+   * This maps each edge to the sides that contain said edge.
+   */
+  static const unsigned int edge_sides_map[12][2];
+
 protected:
 
   /**
