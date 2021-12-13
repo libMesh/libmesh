@@ -318,7 +318,7 @@ void RBConstruction::set_rb_construction_parameters(
     {
       // Note that we must call initialize_training_parameters() before
       // load_training_set() in order to initialize the parameter vectors.
-      load_training_set(*training_sample_list, serial_training_set);
+      load_training_set(*training_sample_list);
     }
 }
 
