@@ -283,16 +283,31 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
       for (auto & pr : training_parameters)
         pr.second.reset(nullptr);
 
-      // Get the number of local and global training parameters
-      numeric_index_type n_local_training_samples  =
-        cast_int<numeric_index_type>(new_training_set.begin()->second.size());
-      numeric_index_type n_global_training_samples = n_local_training_samples;
-      this->comm().sum(n_global_training_samples);
-
-      for (auto & pr : training_parameters)
+      numeric_index_type n_local_training_samples = 0;
+      if(!serial_training_set)
         {
-          pr.second = NumericVector<Number>::build(this->comm());
-          pr.second->init(n_global_training_samples, n_local_training_samples, false, PARALLEL);
+          // Get the number of local and global training parameters
+          n_local_training_samples =
+            cast_int<numeric_index_type>(new_training_set.begin()->second.size());
+          numeric_index_type n_global_training_samples = n_local_training_samples;
+          this->comm().sum(n_global_training_samples);
+
+          for (auto & pr : training_parameters)
+            {
+              pr.second = NumericVector<Number>::build(this->comm());
+              pr.second->init(n_global_training_samples, n_local_training_samples, false, PARALLEL);
+            }
+        }
+      else
+        {
+          n_local_training_samples =
+            cast_int<numeric_index_type>(new_training_set.begin()->second.size());
+
+          for (auto & pr : training_parameters)
+            {
+              pr.second = NumericVector<Number>::build(this->comm());
+              pr.second->init(n_local_training_samples, false, SERIAL);
+            }
         }
 
       for (auto & pr : training_parameters)
@@ -314,6 +329,7 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
       // length of training_parameters unchanged and overwrite the entries of the specified
       // parameters from new_training_set. Note that we repeatedly loop over new_training_set
       // to fill up the entire length of training_vector.
+      //
 
       for (auto & pr : training_parameters)
         {
@@ -321,6 +337,9 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
           if (new_training_set.count(param_name))
             {
               NumericVector<Number> * training_vector = pr.second.get();
+
+              libmesh_error_msg_if(serial_training_set && training_vector->type() != SERIAL,
+                                   "Expected training samples vector to be SERIAL");
 
               numeric_index_type first_index = training_vector->first_local_index();
               for (numeric_index_type i=0; i<training_vector->local_size(); i++)
