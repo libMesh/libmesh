@@ -985,8 +985,8 @@ write_out_side_basis_functions(const std::string & directory_name,
 
 void RBEIMEvaluation::
 read_in_basis_functions(const System & sys,
-                                 const std::string & directory_name,
-                                 bool read_binary_basis_functions)
+                        const std::string & directory_name,
+                        bool read_binary_basis_functions)
 {
   LOG_SCOPE("read_in_basis_functions()", "RBEIMEvaluation");
 
@@ -1824,6 +1824,29 @@ void RBEIMEvaluation::side_distribute_bfs(const System & sys)
                 }
             }
         }
+
+        // In the case of 2D elements, we also check the shellfaces
+        if (elem->dim() == 2)
+          for (unsigned int shellface_index=0; shellface_index<2; shellface_index++)
+            {
+              binfo.shellface_boundary_ids(elem, shellface_index, side_boundary_ids);
+
+              bool has_side_boundary_id = false;
+              for(boundary_id_type side_boundary_id : side_boundary_ids)
+                if(parametrized_function_boundary_ids.count(side_boundary_id))
+                  {
+                    has_side_boundary_id = true;
+                    break;
+                  }
+
+              if(has_side_boundary_id)
+                {
+                  // We use shellface_index as the side_index since shellface boundary conditions
+                  // are stored separately from side boundary conditions in BoundaryInfo.
+                  gathered_local_elem_ids.push_back(elem->id());
+                  gathered_local_side_indices.push_back(shellface_index);
+                }
+            }
     }
 
   // Gather the number of local elems from all procs to proc 0
