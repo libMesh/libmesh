@@ -7,6 +7,7 @@
 #include "libmesh/parallel.h" // set_union
 #include "libmesh/string_to_enum.h"
 #include "libmesh/boundary_info.h"
+#include "libmesh/utility.h" // libmesh_map_find
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -124,6 +125,60 @@ public:
     CPPUNIT_ASSERT(read_in_var_names == var_names);
     CPPUNIT_ASSERT(read_in_node_boundary_ids == node_boundary_ids);
     CPPUNIT_ASSERT(read_in_bc_vals == bc_vals);
+
+    // Also check that the flat indices match those in the file
+    std::map<BoundaryInfo::NodeBCTuple, unsigned int> bc_array_indices;
+    reader.get_nodeset_data_indices(bc_array_indices);
+
+    // Debugging
+    // for (const auto & pr : bc_array_indices)
+    //   {
+    //     const auto & t = pr.first;
+    //     const auto & node_id = std::get<0>(t);
+    //     const auto & boundary_id = std::get<1>(t);
+    //     libMesh::out << "(node, boundary_id) = "
+    //                  << "(" << node_id << ", " << boundary_id << ")"
+    //                  << " is at array index " << pr.second
+    //                  << std::endl;
+    //   }
+
+    // For this test case, the nodeset arrays are ordered as follows:
+    // ns_prop1 = 0, 1, 2, 3, 4 ;
+    // ns_names = "bottom", "right", "top", "left", "empty" ;
+    //
+    // Exodus (1-based) node ids
+    // node_ns1 = 1, 2, 3, 4, 5, 6 ;
+    // node_ns2 = 6, 12, 18, 24, 30, 36 ;
+    // node_ns3 = 31, 32, 33, 34, 35, 36 ;
+    // node_ns4 = 1, 7, 13, 19, 25, 31 ;
+
+    // Check the node ids in the "bottom" nodeset, which contains the
+    // first six nodes in order.
+    for (unsigned int i=0; i<6; ++i)
+      CPPUNIT_ASSERT_EQUAL
+        (static_cast<unsigned int>(i),
+         libmesh_map_find(bc_array_indices, std::make_tuple(/*node_id=*/cast_int<dof_id_type>(i), /*b_id=*/0)));
+
+    // Check the node ids in the "right" sideset, which contains every
+    // 6th node starting from 5, i.e. 5, 11, 17
+    for (unsigned int i=0; i<6; ++i)
+      CPPUNIT_ASSERT_EQUAL
+        (static_cast<unsigned int>(i),
+         libmesh_map_find(bc_array_indices, std::make_tuple(/*node_id=*/cast_int<dof_id_type>(6*i + 5), /*b_id=*/1)));
+
+    // Check the node ids in the "top" sideset, which contains the last
+    // six nodes in order.
+    for (unsigned int i=0; i<6; ++i)
+      CPPUNIT_ASSERT_EQUAL
+        (static_cast<unsigned int>(i),
+         libmesh_map_find(bc_array_indices, std::make_tuple(/*node_id=*/cast_int<dof_id_type>(30 + i), /*b_id=*/2)));
+
+    // Check the node ids in the "left" sideset, which contains every
+    // 6th node starting from 0, i.e. 0, 6, 12
+    for (unsigned int i=0; i<6; ++i)
+      CPPUNIT_ASSERT_EQUAL
+        (static_cast<unsigned int>(i),
+         libmesh_map_find(bc_array_indices, std::make_tuple(/*node_id=*/cast_int<dof_id_type>(6*i), /*b_id=*/3)));
   }
 
   void testWriteExodus()

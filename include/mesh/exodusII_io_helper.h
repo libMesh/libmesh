@@ -387,6 +387,16 @@ public:
                      std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals);
 
   /**
+   * Similar to read_nodeset_data(), but instead of creating one
+   * std::map per nodeset per variable, creates a single map of
+   * (node_id, boundary_id) tuples, and stores the exo file array
+   * indexing for any/all nodeset variables on that nodeset (they are
+   * all the same).
+   */
+  void
+  get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> & bc_array_indices);
+
+  /**
    * Writes the vector of values to the element variables.
    *
    * The 'values' vector is assumed to be in the order:
