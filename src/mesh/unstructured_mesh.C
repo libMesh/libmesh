@@ -234,7 +234,7 @@ void transfer_elem(const Elem & lo_elem,
   hi_elem->processor_id() = lo_pid;
   hi_elem->subdomain_id() = lo_elem.subdomain_id();
 
-  const unsigned int nei = hi_elem->n_extra_integers();
+  const unsigned int nei = lo_elem.n_extra_integers();
   hi_elem->add_extra_integers(nei);
   for (unsigned int i=0; i != nei; ++i)
     hi_elem->set_extra_integer(i, lo_elem.get_extra_integer(i));
