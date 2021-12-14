@@ -5,16 +5,33 @@ AC_DEFUN([CONFIGURE_HDF5],
 [
   AC_ARG_ENABLE(hdf5,
                 AS_HELP_STRING([--enable-hdf5],
-                               [build libmesh with HDF5 support, the selected HDF5 must be compatible with contrib/netcdf]),
+                               [build with HDF5 support; the selected HDF5 must be compatible with our netcdf]),
                 [AS_CASE("${enableval}",
                          [yes], [enablehdf5=yes],
                          [no],  [enablehdf5=no],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-hdf5)])],
                 [enablehdf5=no])
 
+  dnl Setting --enable-hdf5-required causes an error to be emitted during
+  dnl configure if HDF5 is not successfully detected. This is useful for app
+  dnl codes which require HDF5 (like IsoGeometric Analysis simulations
+  dnl using Exodus IGA meshes), since it prevents situations where
+  dnl libmesh is accidentally built without HDF5 support (which may
+  dnl take a very long time), and then the read fails at runtime,
+  dnl requiring you to redo everything.
+  AC_ARG_ENABLE(hdf5-required,
+                AS_HELP_STRING([--enable-hdf5-required],
+                               [Error if HDF5 is not detected by configure]),
+                [AS_CASE("${enableval}",
+                         [yes], [hdf5required=yes],
+                         [no],  [hdf5required=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-hdf5-required)])],
+                [hdf5required=no])
+
+
   AS_IF([test "x$enablehdf5" = "xyes"],
         [
-          AX_PATH_HDF5(1.8.0,no)
+          AX_PATH_HDF5(1.8.0,$hdf5required)
           AS_IF([test "x$HAVE_HDF5" = "x0"],
                 [
                   enablehdf5=no

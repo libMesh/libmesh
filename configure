@@ -1272,6 +1272,7 @@ enable_curl
 with_curl_include
 with_curl_lib
 enable_hdf5
+enable_hdf5_required
 with_hdf5
 enable_netcdf
 enable_exodus
@@ -2064,8 +2065,9 @@ Optional Features:
   --enable-capnp-required Error if Cap'n Proto support is not detected by
                           configure
   --enable-curl           link against libcurl, for using the cURL API
-  --enable-hdf5           build libmesh with HDF5 support, the selected HDF5
-                          must be compatible with contrib/netcdf
+  --enable-hdf5           build with HDF5 support; the selected HDF5 must be
+                          compatible with our netcdf
+  --enable-hdf5-required  Error if HDF5 is not detected by configure
   --disable-netcdf        build without netCDF binary I/O
   --disable-exodus        build without ExodusII API support
   --enable-exodus-fortran build with ExodusII Fortran API support
@@ -54522,6 +54524,22 @@ else
 fi
 
 
+                # Check whether --enable-hdf5-required was given.
+if test "${enable_hdf5_required+set}" = set; then :
+  enableval=$enable_hdf5_required; case "${enableval}" in #(
+  yes) :
+    hdf5required=yes ;; #(
+  no) :
+    hdf5required=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-hdf5-required" "$LINENO" 5 ;;
+esac
+else
+  hdf5required=no
+fi
+
+
+
   if test "x$enablehdf5" = "xyes"; then :
 
 
@@ -54554,7 +54572,7 @@ fi
 
 
 
-is_package_required=no
+is_package_required=$hdf5required
 
 if test "x${with_hdf5}" != "xno"; then :
 
