@@ -1360,7 +1360,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
       so_elem->processor_id() = lo_pid;
       so_elem->subdomain_id() = lo_elem->subdomain_id();
 
-      const unsigned int nei = so_elem->n_extra_integers();
+      const unsigned int nei = lo_elem->n_extra_integers();
       so_elem->add_extra_integers(nei);
       for (unsigned int i=0; i != nei; ++i)
         so_elem->set_extra_integer(i, lo_elem->get_extra_integer(i));
