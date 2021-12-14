@@ -176,7 +176,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   // output all comps indexing is as follows:
   //   mu index --> interpolation point index --> component index --> value.
   std::vector<std::vector<std::vector<Number>>> output_all_comps;
-  if(get_parametrized_function().on_mesh_sides())
+  if (get_parametrized_function().on_mesh_sides())
     get_parametrized_function().side_vectorized_evaluate(mus,
                                                          _interpolation_points_xyz,
                                                          _interpolation_points_elem_id,
@@ -199,10 +199,10 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
 
   std::vector<std::vector<Number>> evaluated_values_at_interp_points(output_all_comps.size());
 
-  for(unsigned int mu_index : index_range(evaluated_values_at_interp_points))
+  for (unsigned int mu_index : index_range(evaluated_values_at_interp_points))
     {
       evaluated_values_at_interp_points[mu_index].resize(N);
-      for(unsigned int interp_pt_index=0; interp_pt_index<N; interp_pt_index++)
+      for (unsigned int interp_pt_index=0; interp_pt_index<N; interp_pt_index++)
         {
           unsigned int comp = _interpolation_points_comp[interp_pt_index];
 
@@ -215,7 +215,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   _interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
 
   _rb_eim_solutions.resize(mus.size());
-  for(unsigned int mu_index : index_range(mus))
+  for (unsigned int mu_index : index_range(mus))
     {
       DenseVector<Number> EIM_rhs(N);
       for (unsigned int i=0; i<N; i++)
@@ -1805,19 +1805,19 @@ void RBEIMEvaluation::side_distribute_bfs(const System & sys)
       for (unsigned int side = 0; side != elem->n_sides(); ++side)
         {
           // skip non-boundary elements
-          if(!elem->neighbor_ptr(side))
+          if (!elem->neighbor_ptr(side))
             {
               binfo.boundary_ids(elem, side, side_boundary_ids);
 
               bool has_side_boundary_id = false;
-              for(boundary_id_type side_boundary_id : side_boundary_ids)
-                if(parametrized_function_boundary_ids.count(side_boundary_id))
+              for (boundary_id_type side_boundary_id : side_boundary_ids)
+                if (parametrized_function_boundary_ids.count(side_boundary_id))
                   {
                     has_side_boundary_id = true;
                     break;
                   }
 
-              if(has_side_boundary_id)
+              if (has_side_boundary_id)
                 {
                   gathered_local_elem_ids.push_back(elem->id());
                   gathered_local_side_indices.push_back(side);
@@ -1832,14 +1832,14 @@ void RBEIMEvaluation::side_distribute_bfs(const System & sys)
               binfo.shellface_boundary_ids(elem, shellface_index, side_boundary_ids);
 
               bool has_side_boundary_id = false;
-              for(boundary_id_type side_boundary_id : side_boundary_ids)
-                if(parametrized_function_boundary_ids.count(side_boundary_id))
+              for (boundary_id_type side_boundary_id : side_boundary_ids)
+                if (parametrized_function_boundary_ids.count(side_boundary_id))
                   {
                     has_side_boundary_id = true;
                     break;
                   }
 
-              if(has_side_boundary_id)
+              if (has_side_boundary_id)
                 {
                   // We use shellface_index as the side_index since shellface boundary conditions
                   // are stored separately from side boundary conditions in BoundaryInfo.
