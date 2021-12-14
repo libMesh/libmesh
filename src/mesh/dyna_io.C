@@ -302,7 +302,9 @@ void DynaIO::read_mesh(std::istream & in)
             spline_node_ptrs.resize(n_spline_nodes);
             spline_weights.resize(n_spline_nodes);
 
-            if (weight_control_flag)
+            // Even if we have w=1.0, we still want RATIONAL_BERNSTEIN
+            // elements!
+            // if (weight_control_flag)
               {
                 // If we ever add more nodes that aren't in this file,
                 // merge this mesh with a non-spline mesh, etc., 1.0
