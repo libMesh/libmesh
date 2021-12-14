@@ -46,6 +46,7 @@
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/getpot.h"
+#include "libmesh/elem_side_builder.h"
 
 // For systems of equations the DenseSubMatrix
 // and DenseSubVector provide convenient ways for
@@ -361,22 +362,25 @@ void assemble_stokes (EquationSystems & es,
       // the matrix resulting from the L2 projection penalty
       // approach introduced in example 3.
       {
+        // To avoid extraneous memory allocation when building element sides
+        ElemSideBuilder side_builder;
+
         // The following loops over the sides of the element.
         // If the element has no neighbor on a side then that
         // side MUST live on a boundary of the domain.
         for (auto s : elem->side_index_range())
           if (elem->neighbor_ptr(s) == nullptr)
             {
-              std::unique_ptr<const Elem> side (elem->build_side_ptr(s));
+              const Elem & side = side_builder(*elem, s);
 
               // Loop over the nodes on the side.
-              for (auto ns : side->node_index_range())
+              for (auto ns : side.node_index_range())
                 {
                   // The location on the boundary of the current
                   // node.
 
                   // const Real xf = side->point(ns)(0);
-                  const Real yf = side->point(ns)(1);
+                  const Real yf = side.point(ns)(1);
 
                   // The penalty value.  \f$ \frac{1}{\epsilon \f$
                   const Real penalty = 1.e10;
@@ -393,7 +397,7 @@ void assemble_stokes (EquationSystems & es,
                   // the side.  That defined where in the element matrix
                   // the boundary condition will be applied.
                   for (auto n : elem->node_index_range())
-                    if (elem->node_id(n) == side->node_id(ns))
+                    if (elem->node_id(n) == side.node_id(ns))
                       {
                         // Matrix contribution.
                         Kuu(n,n) += penalty;

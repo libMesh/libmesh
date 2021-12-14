@@ -251,11 +251,6 @@ public:
   static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
 
   /**
-   * This maps each edge to the sides that contain said edge.
-   */
-  static const unsigned int edge_sides_map[num_edges][2];
-
-  /**
    * A specialization for computing the volume of a Prism18.
    */
   virtual Real volume () const override;
@@ -263,6 +258,8 @@ public:
   virtual void permute(unsigned int perm_num) override final;
 
   unsigned int center_node_on_side(const unsigned short side) const override final;
+
+  ElemType side_type (const unsigned int s) const override final;
 
 protected:
 

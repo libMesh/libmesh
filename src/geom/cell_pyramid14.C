@@ -61,18 +61,6 @@ const unsigned int Pyramid14::edge_nodes_map[Pyramid14::num_edges][Pyramid14::no
     {3, 4, 12}  // Edge 7
   };
 
-const unsigned int Pyramid14::edge_sides_map[Pyramid14::num_edges][2] =
-  {
-    {0, 4}, // Edge 0
-    {1, 4}, // Edge 1
-    {2, 4}, // Edge 2
-    {3, 4}, // Edge 3
-    {0, 3}, // Edge 4
-    {0, 1}, // Edge 5
-    {1, 2}, // Edge 6
-    {2, 3}  // Edge 7
-  };
-
 // ------------------------------------------------------------
 // Pyramid14 class member functions
 
@@ -780,6 +768,15 @@ unsigned int Pyramid14::center_node_on_side(const unsigned short side) const
 {
   libmesh_assert_less (side, Pyramid14::num_sides);
   return side == 4 ? 13 : invalid_uint;
+}
+
+
+ElemType Pyramid14::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  if (s < 4)
+    return TRI6;
+  return QUAD9;
 }
 
 

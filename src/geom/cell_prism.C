@@ -55,8 +55,18 @@ const Real Prism::_master_points[18][3] =
     {0, 0.5, 0}
   };
 
-
-
+const unsigned int Prism::edge_sides_map[9][2] =
+  {
+    {0, 1}, // Edge 0
+    {0, 2}, // Edge 1
+    {0, 3}, // Edge 2
+    {1, 3}, // Edge 3
+    {1, 2}, // Edge 4
+    {2, 3}, // Edge 5
+    {1, 4}, // Edge 6
+    {2, 4}, // Edge 7
+    {3, 4}  // Edge 8
+  };
 
 // ------------------------------------------------------------
 // Prism class member functions
@@ -213,15 +223,16 @@ bool Prism::is_edge_on_side(const unsigned int e,
   libmesh_assert_less (e, this->n_edges());
   libmesh_assert_less (s, this->n_sides());
 
-  return (Prism6::edge_sides_map[e][0] == s ||
-          Prism6::edge_sides_map[e][1] == s);
+  return (edge_sides_map[e][0] == s || edge_sides_map[e][1] == s);
 }
 
 
 
 std::vector<unsigned int> Prism::sides_on_edge(const unsigned int e) const
 {
-  return {Prism6::edge_sides_map[e][0], Prism6::edge_sides_map[e][1]};
+  libmesh_assert_less(e, this->n_edges());
+
+  return {edge_sides_map[e][0], edge_sides_map[e][1]};
 }
 
 

@@ -62,19 +62,6 @@ const unsigned int Pyramid5::edge_nodes_map[Pyramid5::num_edges][Pyramid5::nodes
     {3, 4}  // Edge 7
   };
 
-const unsigned int Pyramid5::edge_sides_map[Pyramid5::num_edges][2] =
-  {
-    {0, 4}, // Edge 0
-    {1, 4}, // Edge 1
-    {2, 4}, // Edge 2
-    {3, 4}, // Edge 3
-    {0, 3}, // Edge 4
-    {0, 1}, // Edge 5
-    {1, 2}, // Edge 6
-    {2, 3}  // Edge 7
-  };
-
-
 // ------------------------------------------------------------
 // Pyramid5 class member functions
 
@@ -334,6 +321,14 @@ void Pyramid5::permute(unsigned int perm_num)
       swap4nodes(0,1,2,3);
       swap4neighbors(0,1,2,3);
     }
+}
+
+ElemType Pyramid5::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  if (s < 4)
+    return TRI3;
+  return QUAD4;
 }
 
 

@@ -184,11 +184,6 @@ public:
   static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
 
   /**
-   * This maps each edge to the sides that contain said edge.
-   */
-  static const unsigned int edge_sides_map[num_edges][2];
-
-  /**
    * An Optimized numerical quadrature approach for computing the
    * centroid of the Prism6.
    */
@@ -205,6 +200,8 @@ public:
   virtual BoundingBox loose_bounding_box () const override;
 
   virtual void permute(unsigned int perm_num) override final;
+
+  ElemType side_type (const unsigned int s) const override final;
 
 protected:
 

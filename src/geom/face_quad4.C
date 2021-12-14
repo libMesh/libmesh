@@ -369,4 +369,10 @@ void Quad4::permute(unsigned int perm_num)
 }
 
 
+ElemType Quad4::side_type (const unsigned int libmesh_dbg_var(s)) const
+{
+  libmesh_assert_less (s, 4);
+  return EDGE2;
+}
+
 } // namespace libMesh

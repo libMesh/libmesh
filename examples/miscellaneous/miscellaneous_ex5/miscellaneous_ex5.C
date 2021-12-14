@@ -54,6 +54,7 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/exact_solution.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/elem_side_builder.h"
 //#define QORDER TWENTYSIXTH
 
 // Bring in everything from the libMesh namespace
@@ -234,6 +235,12 @@ void assemble_ellipticdg(EquationSystems & es,
   // The global system matrix
   SparseMatrix<Number> & matrix = ellipticdg_system.get_system_matrix();
 
+  // We need to compute element side volumes, which requires obtaining
+  // a side element. Instead of constructing a new side every time,
+  // we leverage the ElemSideBuilder which can produce element sides
+  // and only allocates memory for each unique element side type.
+  ElemSideBuilder side_builder;
+
   // Now we will loop over all the elements in the mesh.  We will
   // compute first the element interior matrix and right-hand-side contribution
   // and then the element and neighbors boundary matrix contributions.
@@ -277,13 +284,13 @@ void assemble_ellipticdg(EquationSystems & es,
         {
           if (elem->neighbor_ptr(side) == nullptr)
             {
-              // Pointer to the element face
+              // Reinit the side
               fe_elem_face->reinit(elem, side);
 
-              std::unique_ptr<const Elem> elem_side (elem->build_side_ptr(side));
               // h element dimension to compute the interior penalty penalty parameter
+              const auto side_volume = side_builder(*elem, side).volume();
               const unsigned int elem_b_order = static_cast<unsigned int> (fe_elem_face->get_order());
-              const Real h_elem = elem->volume()/elem_side->volume() * 1./pow(elem_b_order, 2.);
+              const Real h_elem = elem->volume()/side_volume * 1./pow(elem_b_order, 2.);
 
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
@@ -337,14 +344,13 @@ void assemble_ellipticdg(EquationSystems & es,
                    (elem_id < neighbor_id)) ||
                   (neighbor->level() < elem->level()))
                 {
-                  // Pointer to the element side
-                  std::unique_ptr<const Elem> elem_side (elem->build_side_ptr(side));
+                  const Elem & elem_side = side_builder(*elem, side);
 
                   // h dimension to compute the interior penalty penalty parameter
                   const unsigned int elem_b_order = static_cast<unsigned int>(fe_elem_face->get_order());
                   const unsigned int neighbor_b_order = static_cast<unsigned int>(fe_neighbor_face->get_order());
                   const double side_order = (elem_b_order + neighbor_b_order)/2.;
-                  const Real h_elem = (elem->volume()/elem_side->volume()) * 1./pow(side_order,2.);
+                  const Real h_elem = (elem->volume()/elem_side.volume()) * 1./pow(side_order,2.);
 
                   // The quadrature point locations on the neighbor side
                   std::vector<Point> qface_neighbor_point;
@@ -362,7 +368,7 @@ void assemble_ellipticdg(EquationSystems & es,
                   unsigned int side_neighbor = neighbor->which_neighbor_am_i(elem);
                   if (refinement_type == "p")
                     fe_neighbor_face->side_map (neighbor,
-                                                elem_side.get(),
+                                                &elem_side,
                                                 side_neighbor,
                                                 qface.get_points(),
                                                 qface_neighbor_point);

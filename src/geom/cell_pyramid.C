@@ -50,8 +50,17 @@ const Real Pyramid::_master_points[14][3] =
     {0, 0, 0}
   };
 
-
-
+const unsigned int Pyramid::edge_sides_map[8][2] =
+  {
+    {0, 4}, // Edge 0
+    {1, 4}, // Edge 1
+    {2, 4}, // Edge 2
+    {3, 4}, // Edge 3
+    {0, 3}, // Edge 4
+    {0, 1}, // Edge 5
+    {1, 2}, // Edge 6
+    {2, 3}  // Edge 7
+  };
 
 // ------------------------------------------------------------
 // Pyramid class member functions
@@ -208,15 +217,15 @@ bool Pyramid::is_edge_on_side(const unsigned int e,
   libmesh_assert_less (e, this->n_edges());
   libmesh_assert_less (s, this->n_sides());
 
-  return (Pyramid5::edge_sides_map[e][0] == s ||
-          Pyramid5::edge_sides_map[e][1] == s);
+  return (edge_sides_map[e][0] == s || edge_sides_map[e][1] == s);
 }
 
 
 
 std::vector<unsigned int> Pyramid::sides_on_edge(const unsigned int e) const
 {
-  return {Pyramid5::edge_sides_map[e][0], Pyramid5::edge_sides_map[e][1]};
+  libmesh_assert_less (e, this->n_edges());
+  return {edge_sides_map[e][0], edge_sides_map[e][1]};
 }
 
 

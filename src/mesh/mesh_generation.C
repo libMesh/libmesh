@@ -1403,6 +1403,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             // Temporary storage for new elements. (24 tets per hex, 6 pyramids)
             std::vector<std::unique_ptr<Elem>> new_elements;
 
+            // For avoiding extraneous construction of element sides
+            std::unique_ptr<Elem> side;
+
             if ((type == TET4) || (type == TET10) || (type == TET14))
               new_elements.reserve(24*mesh.n_elem());
             else
@@ -1429,7 +1432,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                     boundary_id_type b_id = ids.empty() ? BoundaryInfo::invalid_id : ids[0];
 
                     // Need to build the full-ordered side!
-                    std::unique_ptr<Elem> side = base_hex->build_side_ptr(s);
+                    base_hex->build_side_ptr(side, s);
 
                     if ((type == TET4) || (type == TET10) || (type == TET14))
                       {
@@ -1989,6 +1992,9 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
   // popping nodes to the boundary.
   MeshRefinement mesh_refinement (mesh);
 
+  // For avoiding extraneous element side construction
+  std::unique_ptr<Elem> side;
+
   // Loop over the elements, refine, pop nodes to boundary.
   for (unsigned int r=0; r<nr; r++)
     {
@@ -2004,7 +2010,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
         for (auto s : elem->side_index_range())
           if (elem->neighbor_ptr(s) == nullptr || (mesh.mesh_dimension() == 2 && !flat))
             {
-              std::unique_ptr<Elem> side(elem->build_side_ptr(s));
+              elem->build_side_ptr(side, s);
 
               // Pop each point to the sphere boundary.  Keep track of
               // any points we don't own, so we can push their "moved"
@@ -2093,7 +2099,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
         for (auto s : elem->side_index_range())
           if (elem->neighbor_ptr(s) == nullptr)
             {
-              std::unique_ptr<Elem> side(elem->build_side_ptr(s));
+              elem->build_side_ptr(side, s);
 
               // Pop each point to the sphere boundary
               for (auto n : side->node_index_range())
@@ -2521,6 +2527,9 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
   // Triangulate!
   t.triangulate();
 
+  // For avoiding extraneous side element construction
+  std::unique_ptr<const Elem> side;
+
   // The mesh is now generated, but we still need to mark the boundaries
   // to be consistent with the other build_square routines.  Note that all
   // hole boundary elements get the same ID, 4.
@@ -2528,7 +2537,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
     for (auto s : elem->side_index_range())
       if (elem->neighbor_ptr(s) == nullptr)
         {
-          std::unique_ptr<const Elem> side (elem->build_side_ptr(s));
+          elem->build_side_ptr(elem, s);
 
           // Check the location of the side's midpoint.  Since
           // the square has straight sides, the midpoint is not

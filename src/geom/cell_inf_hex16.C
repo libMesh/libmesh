@@ -64,18 +64,6 @@ const unsigned int InfHex16::edge_nodes_map[InfHex16::num_edges][InfHex16::nodes
     {3, 7, 99}  // Edge 7
   };
 
-const unsigned int InfHex16::edge_sides_map[InfHex16::num_edges][2] =
-  {
-    {0, 1}, // Edge 0
-    {1, 2}, // Edge 1
-    {0, 3}, // Edge 2
-    {0, 4}, // Edge 3
-    {1, 4}, // Edge 4
-    {1, 2}, // Edge 5
-    {2, 3}, // Edge 6
-    {3, 4}  // Edge 7
-  };
-
 // ------------------------------------------------------------
 // InfHex16 class member functions
 
@@ -549,6 +537,17 @@ InfHex16::permute(unsigned int perm_num)
       swap4neighbors(1,2,3,4);
     }
 }
+
+
+ElemType
+InfHex16::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  if (s == 0)
+    return QUAD8;
+  return INFQUAD6;
+}
+
 
 } // namespace libMesh
 

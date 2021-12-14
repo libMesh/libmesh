@@ -61,18 +61,6 @@ const unsigned int Pyramid13::edge_nodes_map[Pyramid13::num_edges][Pyramid13::no
     {3, 4, 12}  // Edge 7
   };
 
-const unsigned int Pyramid13::edge_sides_map[Pyramid13::num_edges][2] =
-  {
-    {0, 4}, // Edge 0
-    {1, 4}, // Edge 1
-    {2, 4}, // Edge 2
-    {3, 4}, // Edge 3
-    {0, 3}, // Edge 4
-    {0, 1}, // Edge 5
-    {1, 2}, // Edge 6
-    {2, 3}  // Edge 7
-  };
-
 // ------------------------------------------------------------
 // Pyramid13 class member functions
 
@@ -726,6 +714,15 @@ void Pyramid13::permute(unsigned int perm_num)
       swap4nodes(9,10,11,12);
       swap4neighbors(0,1,2,3);
     }
+}
+
+
+ElemType Pyramid13::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  if (s < 4)
+    return TRI6;
+  return QUAD8;
 }
 
 

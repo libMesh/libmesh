@@ -62,16 +62,6 @@ const unsigned int InfPrism6::edge_nodes_map[InfPrism6::num_edges][InfPrism6::no
     {2, 5}  // Edge 5
   };
 
-const unsigned int InfPrism6::edge_sides_map[InfPrism6::num_edges][2] =
-  {
-    {0, 1}, // Edge 0
-    {0, 2}, // Edge 1
-    {0, 3}, // Edge 2
-    {1, 3}, // Edge 3
-    {1, 2}, // Edge 4
-    {2, 3}  // Edge 5
-  };
-
 // ------------------------------------------------------------
 // InfPrism6 class member functions
 
@@ -116,13 +106,6 @@ InfPrism6::nodes_on_edge(const unsigned int e) const
 {
   libmesh_assert_less(e, n_edges());
   return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
-}
-
-std::vector<unsigned>
-InfPrism6::sides_on_edge(const unsigned int e) const
-{
-  libmesh_assert_less(e, n_edges());
-  return {std::begin(edge_sides_map[e]), std::end(edge_sides_map[e])};
 }
 
 bool InfPrism6::is_node_on_edge(const unsigned int n,
@@ -386,6 +369,16 @@ InfPrism6::permute(unsigned int perm_num)
       swap3nodes(3,4,5);
       swap3neighbors(1,2,3);
     }
+}
+
+
+ElemType
+InfPrism6::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 4);
+  if (s == 0)
+    return TRI3;
+  return INFQUAD4;
 }
 
 } // namespace libMesh

@@ -528,4 +528,11 @@ unsigned int Quad9::center_node_on_side(const unsigned short side) const
 }
 
 
+ElemType Quad9::side_type (const unsigned int libmesh_dbg_var(s)) const
+{
+  libmesh_assert_less (s, 4);
+  return EDGE3;
+}
+
+
 } // namespace libMesh

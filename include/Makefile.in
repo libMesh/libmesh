@@ -733,6 +733,7 @@ include_HEADERS = \
         geom/elem_internal.h \
         geom/elem_quality.h \
         geom/elem_range.h \
+        geom/elem_side_builder.h \
         geom/face.h \
         geom/face_inf_quad.h \
         geom/face_inf_quad4.h \

@@ -145,19 +145,6 @@ const unsigned int Prism6::edge_nodes_map[Prism6::num_edges][Prism6::nodes_per_e
     {3, 5}  // Edge 8
   };
 
-const unsigned int Prism6::edge_sides_map[Prism6::num_edges][2] =
-  {
-    {0, 1}, // Edge 0
-    {0, 2}, // Edge 1
-    {0, 3}, // Edge 2
-    {1, 3}, // Edge 3
-    {1, 2}, // Edge 4
-    {2, 3}, // Edge 5
-    {1, 4}, // Edge 6
-    {2, 4}, // Edge 7
-    {3, 4}  // Edge 8
-  };
-
 // ------------------------------------------------------------
 // Prism6 class member functions
 
@@ -529,6 +516,16 @@ Prism6::permute(unsigned int perm_num)
     libmesh_error();
   }
 
+}
+
+
+ElemType
+Prism6::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  if (s == 0 || s == 4)
+    return TRI3;
+  return QUAD4;
 }
 
 } // namespace libMesh

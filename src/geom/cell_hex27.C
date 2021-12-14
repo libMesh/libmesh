@@ -64,22 +64,6 @@ const unsigned int Hex27::edge_nodes_map[Hex27::num_edges][Hex27::nodes_per_edge
     {4, 7, 19}  // Edge 11
   };
 
-const unsigned int Hex27::edge_sides_map[Hex27::num_edges][2] =
-  {
-    {0, 1}, // Edge 0
-    {0, 2}, // Edge 1
-    {0, 3}, // Edge 2
-    {0, 4}, // Edge 3
-    {1, 4}, // Edge 4
-    {1, 2}, // Edge 5
-    {2, 3}, // Edge 6
-    {3, 4}, // Edge 7
-    {1, 5}, // Edge 8
-    {2, 5}, // Edge 9
-    {3, 5}, // Edge 10
-    {4, 5}  // Edge 11
-  };
-
 // ------------------------------------------------------------
 // Hex27 class member functions
 
@@ -1270,6 +1254,14 @@ unsigned int Hex27::center_node_on_side(const unsigned short side) const
 {
   libmesh_assert_less (side, Hex27::num_sides);
   return side + 20;
+}
+
+
+ElemType
+Hex27::side_type (const unsigned int libmesh_dbg_var(s)) const
+{
+  libmesh_assert_less (s, 6);
+  return QUAD9;
 }
 
 

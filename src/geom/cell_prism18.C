@@ -62,19 +62,6 @@ const unsigned int Prism18::edge_nodes_map[Prism18::num_edges][Prism18::nodes_pe
     {3, 5, 14}  // Edge 8
   };
 
-const unsigned int Prism18::edge_sides_map[Prism18::num_edges][2] =
-  {
-    {0, 1}, // Edge 0
-    {0, 2}, // Edge 1
-    {0, 3}, // Edge 2
-    {1, 3}, // Edge 3
-    {1, 2}, // Edge 4
-    {2, 3}, // Edge 5
-    {1, 4}, // Edge 6
-    {2, 4}, // Edge 7
-    {3, 4}  // Edge 8
-  };
-
 // ------------------------------------------------------------
 // Prism18 class member functions
 
@@ -1046,6 +1033,16 @@ unsigned int Prism18::center_node_on_side(const unsigned short side) const
 {
   libmesh_assert_less (side, Prism18::num_sides);
   return (side >= 1 && side <= 3) ? side + 14 : invalid_uint;
+}
+
+
+ElemType
+Prism18::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  if (s == 0 || s == 4)
+    return TRI6;
+  return QUAD9;
 }
 
 

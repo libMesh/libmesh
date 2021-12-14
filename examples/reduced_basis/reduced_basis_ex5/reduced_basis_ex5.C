@@ -56,6 +56,7 @@
 #include "libmesh/rb_data_deserialization.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_solver_type.h"
+#include "libmesh/elem_side_builder.h"
 
 // local includes
 #include "rb_classes.h"
@@ -165,13 +166,16 @@ int main(int argc, char ** argv)
       // for now we'll add our required sidesets manually for our BEXT
       // file.
 
+      // To avoid extraneous allocation when obtaining element side vertex averages
+      ElemSideBuilder side_builder;
+
       // Each processor should know about each boundary condition it can
       // see, so we loop over all elements, not just local elements.
       for (const auto & elem : mesh.element_ptr_range())
         for (auto side : elem->side_index_range())
           if (!elem->neighbor_ptr(side))
             {
-              Point side_center = elem->build_side_ptr(side)->vertex_average();
+              const Point side_center = side_builder(*elem, side).vertex_average();
               // Yes, BOUNDARY_ID_MIN_X is a weird ID to use at
               // min(z), but we got an IGA cantilever mesh with the
               // lever arm in the z direction
@@ -542,4 +546,3 @@ void compute_stresses(EquationSystems & es)
 }
 
 #endif // LIBMESH_ENABLE_DIRICHLET
-

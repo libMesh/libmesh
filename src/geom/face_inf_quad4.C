@@ -303,6 +303,17 @@ void InfQuad4::connectivity(const unsigned int libmesh_dbg_var(sf),
     }
 }
 
+
+ElemType
+InfQuad4::side_type (const unsigned int s) const
+{
+  libmesh_assert_less (s, 3);
+  if (s == 0)
+    return EDGE2;
+  return INFEDGE2;
+}
+
+
 } // namespace libMesh
 
 
