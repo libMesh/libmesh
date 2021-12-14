@@ -156,6 +156,16 @@ protected:
     // Make sure we didn't screw up any extra integers thereby.
     test_final_integers(mesh, i1);
 
+    // Try out switching to 2nd order and back
+    mesh.all_second_order();
+
+    test_final_integers(mesh, i1);
+
+    mesh.all_first_order();
+
+    test_final_integers(mesh, i1);
+
+    // And try refining if we can
 #ifdef LIBMESH_ENABLE_AMR
     MeshRefinement mr(mesh);
     mr.uniformly_refine(1);
