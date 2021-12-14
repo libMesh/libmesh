@@ -90,6 +90,7 @@ public:
 
 #ifdef LIBMESH_HAVE_GZSTREAM
   CPPUNIT_TEST( testDynaReadElem );
+  CPPUNIT_TEST( testDynaNoSplines );
   CPPUNIT_TEST( testDynaReadPatch );
   CPPUNIT_TEST( testDynaFileMappingsFEMEx5);
   CPPUNIT_TEST( testDynaFileMappingsBlockWithHole);
@@ -713,14 +714,6 @@ public:
   {
     auto locator = mesh.sub_point_locator();
 
-    // A multiblock Exodus file will have a subdomain for each block;
-    // we stick the nodeelem subdomain at the end.
-    const subdomain_id_type nodeelems = mesh.n_subdomains()-1;
-    const std::set<subdomain_id_type> nodeelem_subdomain { nodeelems };
-    std::set<subdomain_id_type> manifold_subdomain;
-    for (auto i : make_range(nodeelems))
-      manifold_subdomain.insert(i);
-
     for (auto & elem : mesh.element_ptr_range())
       {
         Point master_pt = {}; // center, for tensor product elements
@@ -746,11 +739,9 @@ public:
 
         CPPUNIT_ASSERT(elem->contains_point(physical_pt));
 
-        const std::set<subdomain_id_type> * sbd_set =
-          (elem->type() == NODEELEM) ?
-          &nodeelem_subdomain : &manifold_subdomain;
+        std::set<subdomain_id_type> my_subdomain { elem->subdomain_id() };
 
-        const Elem * located_elem = (*locator)(physical_pt, sbd_set);
+        const Elem * located_elem = (*locator)(physical_pt, &my_subdomain);
 
         CPPUNIT_ASSERT(located_elem == elem);
       }
@@ -758,27 +749,14 @@ public:
 
 
 
-  void testDynaReadElem ()
+  void helperTestingDynaQuad (const MeshBase & mesh)
   {
-    Mesh mesh(*TestCommWorld);
-
-    DynaIO dyna(mesh);
-
-    if (mesh.processor_id() == 0)
-      dyna.read("meshes/1_quad.bxt.gz");
-    MeshCommunication().broadcast (mesh);
-
-    mesh.prepare_for_use();
-
-    // We have 1 QUAD9 finite element, attached via a trivial map to 9
-    // spline Node+NodeElem objects
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(10));
-    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(18));
-
     CPPUNIT_ASSERT_EQUAL(mesh.default_mapping_type(),
                          RATIONAL_BERNSTEIN_MAP);
 
     unsigned char weight_index = mesh.default_mapping_data();
+
+    bool found_the_quad = false;
 
     for (auto & elem : mesh.element_ptr_range())
       {
@@ -786,6 +764,8 @@ public:
           continue;
 
         CPPUNIT_ASSERT_EQUAL(elem->type(), QUAD9);
+        found_the_quad = true;
+
         for (unsigned int n=0; n != 9; ++n)
           CPPUNIT_ASSERT_EQUAL
             (elem->node_ref(n).get_extra_datum<Real>(weight_index),
@@ -806,7 +786,51 @@ public:
 #endif
       }
 
+    TestCommWorld->max(found_the_quad);
+    CPPUNIT_ASSERT(found_the_quad);
+
     testMasterCenters(mesh);
+  }
+
+
+  void testDynaReadElem ()
+  {
+    Mesh mesh(*TestCommWorld);
+
+    DynaIO dyna(mesh);
+
+    if (mesh.processor_id() == 0)
+      dyna.read("meshes/1_quad.bxt.gz");
+    MeshCommunication().broadcast (mesh);
+
+    mesh.prepare_for_use();
+
+    // We have 1 QUAD9 finite element, attached via a trivial map to 9
+    // spline Node+NodeElem objects
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(10));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(18));
+
+    helperTestingDynaQuad(mesh);
+  }
+
+
+  void testDynaNoSplines ()
+  {
+    Mesh mesh(*TestCommWorld);
+
+    DynaIO dyna(mesh, /* keep_spline_nodes = */ false);
+
+    if (mesh.processor_id() == 0)
+      dyna.read("meshes/1_quad.bxt.gz");
+    MeshCommunication().broadcast (mesh);
+
+    mesh.prepare_for_use();
+
+    // We have 1 QUAD9 finite element
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(1));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(9));
+
+    helperTestingDynaQuad(mesh);
   }
 
 

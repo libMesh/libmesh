@@ -1171,6 +1171,41 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
 
 
 
+void MeshTools::clear_spline_nodes(MeshBase & mesh)
+{
+  std::vector<Elem *> nodeelem_to_delete;
+
+  for (auto & elem : mesh.element_ptr_range())
+    if (elem->type() == NODEELEM &&
+        elem->mapping_type() == RATIONAL_BERNSTEIN_MAP)
+      nodeelem_to_delete.push_back(elem);
+
+  auto & constraint_rows = mesh.get_constraint_rows();
+
+  // All our constraint_rows ought to be for spline constraints we're
+  // about to get rid of.
+#ifndef NDEBUG
+  for (auto & node_row : constraint_rows)
+    for (auto pr : node_row.second)
+      {
+        const Elem * elem = pr.first.first;
+        libmesh_assert(elem->type() == NODEELEM);
+        libmesh_assert(elem->mapping_type() == RATIONAL_BERNSTEIN_MAP);
+      }
+#endif
+
+  constraint_rows.clear();
+
+  for (Elem * elem : nodeelem_to_delete)
+    {
+      Node * node = elem->node_ptr(0);
+      mesh.delete_elem(elem);
+      mesh.delete_node(node);
+    }
+}
+
+
+
 #ifdef DEBUG
 void MeshTools::libmesh_assert_equal_n_systems (const MeshBase & mesh)
 {
