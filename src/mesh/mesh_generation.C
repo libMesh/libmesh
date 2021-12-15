@@ -2537,7 +2537,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
     for (auto s : elem->side_index_range())
       if (elem->neighbor_ptr(s) == nullptr)
         {
-          elem->build_side_ptr(elem, s);
+          elem->build_side_ptr(side, s);
 
           // Check the location of the side's midpoint.  Since
           // the square has straight sides, the midpoint is not
