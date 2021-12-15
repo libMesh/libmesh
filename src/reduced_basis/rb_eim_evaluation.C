@@ -2088,7 +2088,16 @@ void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
       const std::vector<std::vector<Number>> & var_and_qp_data = libmesh_map_find(qp_data_map, elem->id());
       libmesh_error_msg_if(var >= var_and_qp_data.size(), "Invalid EIM variable number: " << var);
       const std::vector<Number> & qp_data = var_and_qp_data[var];
-      libmesh_error_msg_if(qp_data.size() != n_qpoints, "Invalid EIM variable number: " << var);
+
+      // If qp_data doesn't match n_qpoints then we skip this element since this means
+      // that the EIM basis function is not applicable on this element. This can happen,
+      // for example, if we have 1D and 3D elements in the same mesh and the EIM basis
+      // functions have been set up for the 3D elements only. Note that the EIM is
+      // necessarily dependent on the element dimension since it is based on the number
+      // of quad. points per element. If multiple dimensions need to be supported then
+      // one can add a separate EIM for each dimension.
+      if (qp_data.size() != n_qpoints)
+        continue;
 
       DenseMatrix<Number> Me(n_proj_dofs, n_proj_dofs);
       DenseVector<Number> Fe(n_proj_dofs);
