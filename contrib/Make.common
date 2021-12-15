@@ -1,6 +1,6 @@
 ######################################################################
 #
-# Common environment for all contribued packages
+# Common environment for all contributed packages
 # 
 # If we are careful, common rules can be defined here, 
 # once and for all.

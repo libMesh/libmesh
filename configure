@@ -763,6 +763,8 @@ LIBMESH_ENABLE_TETGEN_FALSE
 LIBMESH_ENABLE_TETGEN_TRUE
 TETGEN_LIBRARY
 TETGEN_INCLUDE
+LIBMESH_ENABLE_POLY2TRI_FALSE
+LIBMESH_ENABLE_POLY2TRI_TRUE
 HAVE_DOT
 DOTPATH
 DOT
@@ -1249,6 +1251,7 @@ with_metis_include
 enable_parmetis
 with_parmetis
 with_parmetis_include
+enable_poly2tri
 enable_tetgen
 enable_triangle
 enable_qhull
@@ -2050,6 +2053,7 @@ Optional Features:
   --disable-metis         build without Metis graph partitioning support
   --disable-parmetis      build without Parmetis parallel graph partitioning
                           support
+  --enable-poly2tri       build with poly2tri API support
   --disable-tetgen        build without TetGen tetrahedralization library
                           support
   --disable-triangle      build without Triangle Delaunay triangulation
@@ -52550,6 +52554,55 @@ fi
 
 
 # -------------------------------------------------------------
+# poly2tri -- enabled by default
+# -------------------------------------------------------------
+
+  # Check whether --enable-poly2tri was given.
+if test "${enable_poly2tri+set}" = set; then :
+  enableval=$enable_poly2tri; case "${enableval}" in #(
+  yes) :
+    enablepoly2tri=yes ;; #(
+  no) :
+    enablepoly2tri=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-poly2tri" "$LINENO" 5 ;;
+esac
+else
+  enablepoly2tri=$enableoptional
+fi
+ # if unspecified, depend on enableoptional
+
+  POLY2TRI_INCLUDE=""
+
+    if test "x$enablepoly2tri" = "xyes"; then :
+
+                              POLY2TRI_INCLUDE="-I\$(top_builddir)/contrib/poly2tri/modified"
+
+$as_echo "#define HAVE_POLY2TRI 1" >>confdefs.h
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with poly2tri support >>>" >&5
+$as_echo "<<< Configuring library with poly2tri support >>>" >&6; }
+
+fi
+
+if test $enablepoly2tri = yes; then :
+  libmesh_contrib_INCLUDES="$POLY2TRI_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+ if test x$enablepoly2tri = xyes; then
+  LIBMESH_ENABLE_POLY2TRI_TRUE=
+  LIBMESH_ENABLE_POLY2TRI_FALSE='#'
+else
+  LIBMESH_ENABLE_POLY2TRI_TRUE='#'
+  LIBMESH_ENABLE_POLY2TRI_FALSE=
+fi
+
+ac_config_files="$ac_config_files contrib/poly2tri/modified/Makefile"
+
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
 # TetGen -- enabled unless --enable-strict-lgpl is specified
 # -------------------------------------------------------------
 if test $enablestrictlgpl = yes; then :
@@ -57096,6 +57149,10 @@ if test -z "${LIBMESH_ENABLE_PARMETIS_TRUE}" && test -z "${LIBMESH_ENABLE_PARMET
   as_fn_error $? "conditional \"LIBMESH_ENABLE_PARMETIS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${LIBMESH_ENABLE_POLY2TRI_TRUE}" && test -z "${LIBMESH_ENABLE_POLY2TRI_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_POLY2TRI\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${LIBMESH_ENABLE_TETGEN_TRUE}" && test -z "${LIBMESH_ENABLE_TETGEN_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_TETGEN\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -58506,6 +58563,7 @@ do
     "contrib/tecplot/binary/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/tecplot/binary/Makefile" ;;
     "contrib/metis/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/metis/Makefile" ;;
     "contrib/parmetis/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/parmetis/Makefile" ;;
+    "contrib/poly2tri/modified/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/poly2tri/modified/Makefile" ;;
     "contrib/tetgen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/tetgen/Makefile" ;;
     "contrib/triangle/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/triangle/Makefile" ;;
     "contrib/qhull/qhull/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/qhull/qhull/Makefile" ;;
@@ -60719,6 +60777,7 @@ fi
         if test "x$enablepetsc" = "xyes"; then :
   $as_echo "     version....................... : $petscversion"
 fi
+        $as_echo "  poly2tri......................... : $enablepoly2tri"
         $as_echo "  qhull............................ : $enableqhull"
         $as_echo "  sfcurves......................... : $enablesfc"
         $as_echo "  slepc............................ : $enableslepc"
@@ -60749,6 +60808,12 @@ fi
   $as_echo "     version....................... : $vtkversion"
 fi
         $as_echo
+        if test "x$libmesh_contrib_INCLUDES" != "x"; then :
+
+                $as_echo "  libmesh_contrib_INCLUDES......... : $libmesh_contrib_INCLUDES"
+                $as_echo
+
+fi
         if test "x$libmesh_optional_INCLUDES" != "x"; then :
 
                 $as_echo "  libmesh_optional_INCLUDES........ : $libmesh_optional_INCLUDES"

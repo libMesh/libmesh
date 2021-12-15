@@ -52,6 +52,7 @@ unit_tests_sources = \
   geom/side_test.C \
   geom/volume_test.C \
   geom/which_node_am_i_test.C \
+  mesh/all_second_order.C \
   mesh/all_tri.C \
   mesh/distort.C \
   mesh/boundary_mesh.C \
@@ -61,23 +62,23 @@ unit_tests_sources = \
   mesh/contains_point.C \
   mesh/extra_integers.C \
   mesh/mesh_assign.C \
+  mesh/mesh_collection.C \
+  mesh/mesh_extruder.C \
+  mesh/mesh_function.C \
+  mesh/mesh_function_dfem.C \
   mesh/mesh_generation_test.C \
   mesh/mesh_input.C \
-  mesh/mesh_function.C \
   mesh/mesh_stitch.C \
   mesh/mixed_dim_mesh_test.C \
   mesh/nodal_neighbors.C \
-  mesh/mesh_extruder.C \
+  mesh/libmesh_poly2tri.C \
   mesh/slit_mesh_test.C \
   mesh/spatial_dimension_test.C \
   mesh/mapped_subdomain_partitioner_test.C \
-  mesh/mesh_function_dfem.C \
   mesh/write_sideset_data.C \
   mesh/write_nodeset_data.C \
   mesh/write_edgeset_data.C \
   mesh/write_vec_and_scalar.C \
-  mesh/mesh_collection.C \
-  mesh/all_second_order.C \
   numerics/composite_function_test.C \
   numerics/coupling_matrix_test.C \
   numerics/distributed_vector_test.C \

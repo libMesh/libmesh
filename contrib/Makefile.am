@@ -121,6 +121,16 @@ endif
 endif
 
 
+if LIBMESH_ENABLE_POLY2TRI
+  SUBDIRS    += poly2tri/modified/
+  opt_libs   += poly2tri/modified/libopt.la
+  dbg_libs   += poly2tri/modified/libdbg.la
+  devel_libs += poly2tri/modified/libdevel.la
+  prof_libs  += poly2tri/modified/libprof.la
+  oprof_libs += poly2tri/modified/liboprof.la
+endif
+
+
 if LIBMESH_ENABLE_TECIO
   SUBDIRS    += tecplot/tecio
   opt_libs   += tecplot/tecio/libopt.la

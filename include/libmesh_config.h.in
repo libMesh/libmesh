@@ -490,6 +490,10 @@
    is available via PETSc */
 #undef HAVE_PETSC_TAO
 
+/* Flag indicating whether the library will be compiled with poly2tri support
+   */
+#undef HAVE_POLY2TRI
+
 /* Define if you have POSIX threads libraries and header files. */
 #undef HAVE_PTHREAD
 
