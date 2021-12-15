@@ -71,6 +71,7 @@ unit_tests_sources = \
   mesh/mesh_stitch.C \
   mesh/mixed_dim_mesh_test.C \
   mesh/nodal_neighbors.C \
+  mesh/libmesh_poly2tri.C \
   mesh/slit_mesh_test.C \
   mesh/spatial_dimension_test.C \
   mesh/mapped_subdomain_partitioner_test.C \
