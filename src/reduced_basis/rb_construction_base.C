@@ -265,6 +265,9 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
 template <class Base>
 void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vector<Number>> & new_training_set)
 {
+  // Make sure we're running this on all processors at the same time
+  libmesh_parallel_only(this->comm());
+
   // First, make sure that an initial training set has already been
   // generated
   libmesh_error_msg_if(!training_parameters_initialized,
@@ -274,12 +277,13 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
   libmesh_error_msg_if(new_training_set.size() > get_n_params(),
                        "Error: new_training_set should not have more than get_n_params() parameters.");
 
+  // Check that (new_training_set.size() == get_n_params()) is the same on all processes so that
+  // we go into the same branch of the "if" statement below on all processes.
+  bool size_matches = (new_training_set.size() == get_n_params());
+  this->comm().verify(size_matches);
+
   if (new_training_set.size() == get_n_params())
     {
-      // (new_training_set.size() == get_n_params()) should be the same on all processes, so
-      // we call libmesh_parallel_only() here to check this.
-      libmesh_parallel_only(this->comm());
-
       // If new_training_set stores values for all parameters, then we overwrite training_parameters
       // with new_training_set.
 
@@ -329,10 +333,6 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
     }
   else
     {
-      // (new_training_set.size() == get_n_params()) should be the same on all processes, so
-      // we call libmesh_parallel_only() here to check this.
-      libmesh_parallel_only(this->comm());
-
       // If new_training_set stores values for a subset of the parameters, then we keep the
       // length of training_parameters unchanged and overwrite the entries of the specified
       // parameters from new_training_set. Note that we repeatedly loop over new_training_set
