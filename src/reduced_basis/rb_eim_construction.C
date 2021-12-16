@@ -1530,6 +1530,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
       this->comm().broadcast(optimal_comp, proc_ID_index);
       this->comm().broadcast(optimal_elem_id, proc_ID_index);
       this->comm().broadcast(optimal_subdomain_id, proc_ID_index);
+      this->comm().broadcast(optimal_boundary_id, proc_ID_index);
       this->comm().broadcast(optimal_qp, proc_ID_index);
       this->comm().broadcast(optimal_point_perturbs, proc_ID_index);
       this->comm().broadcast(optimal_point_phi_i_qp, proc_ID_index);
