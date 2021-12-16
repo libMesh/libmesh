@@ -265,6 +265,9 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
 template <class Base>
 void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vector<Number>> & new_training_set)
 {
+  // Make sure we're running this on all processors at the same time
+  libmesh_parallel_only(this->comm());
+
   // First, make sure that an initial training set has already been
   // generated
   libmesh_error_msg_if(!training_parameters_initialized,
@@ -274,7 +277,12 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
   libmesh_error_msg_if(new_training_set.size() > get_n_params(),
                        "Error: new_training_set should not have more than get_n_params() parameters.");
 
-  if (new_training_set.size() == get_n_params())
+  // Check that (new_training_set.size() == get_n_params()) is the same on all processes so that
+  // we go into the same branch of the "if" statement below on all processes.
+  bool size_matches = (new_training_set.size() == get_n_params());
+  this->comm().verify(size_matches);
+
+  if (size_matches)
     {
       // If new_training_set stores values for all parameters, then we overwrite training_parameters
       // with new_training_set.
@@ -343,6 +351,7 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
               numeric_index_type first_index = training_vector->first_local_index();
               for (numeric_index_type i=0; i<training_vector->local_size(); i++)
                 {
+                  libmesh_error_msg_if (new_training_set[param_name].empty(), "new_training_set set should not be empty");
                   unsigned int new_training_set_index = i % new_training_set[param_name].size();
 
                   numeric_index_type index = first_index + i;
