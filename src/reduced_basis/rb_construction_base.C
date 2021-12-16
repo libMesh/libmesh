@@ -282,7 +282,7 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
   bool size_matches = (new_training_set.size() == get_n_params());
   this->comm().verify(size_matches);
 
-  if (new_training_set.size() == get_n_params())
+  if (size_matches)
     {
       // If new_training_set stores values for all parameters, then we overwrite training_parameters
       // with new_training_set.
