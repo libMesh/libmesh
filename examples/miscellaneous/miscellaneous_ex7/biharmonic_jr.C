@@ -473,6 +473,12 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
 
       if (J)
         {
+          if (R)
+            // The call to constrain_element_vector can modify the dof_indices based on constraints,
+            // but the input to constrain_element_matrix relies on using the unmodified indices, so
+            // we reset them here
+            dof_map.dof_indices(elem, dof_indices);
+
           // If the mesh has hanging nodes (e.g., as a result of refinement), those need to be constrained.
           dof_map.constrain_element_matrix(Je, dof_indices);
           J->add_matrix(Je, dof_indices);
