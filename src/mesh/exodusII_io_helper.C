@@ -3495,6 +3495,9 @@ void
 ExodusII_IO_Helper::
 get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> & bc_array_indices)
 {
+  // Clear existing data, we are going to build these data structures from scratch
+  bc_array_indices.clear();
+
   // This reads the nodeset variable names into the local
   // nodeset_var_names data structure.
   this->read_var_names(NODESET);
