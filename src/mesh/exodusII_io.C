@@ -1063,7 +1063,7 @@ void ExodusII_IO::copy_scalar_solution(System & system,
 #ifdef LIBMESH_HAVE_MPI
   if (this->n_processors() > 1)
   {
-    const Parallel::MessageTag tag(1);
+    const Parallel::MessageTag tag = this->comm().get_unique_tag(1);
     if (this->processor_id() == this->n_processors()-1)
       this->comm().receive(0, values_from_exodus, tag);
     if (this->processor_id() == 0)
