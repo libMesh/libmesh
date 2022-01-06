@@ -97,10 +97,17 @@ numeric_index_type RBConstructionBase<Base>::get_n_training_samples() const
   libmesh_assert(training_parameters_initialized);
 
   // First we check if there are no parameters here, and in that case we
-  // return 1 since a single training sample is sufficient to generate
-  // an RB approximation if there are not parameters.
+  // return 1 since a single training sample is sufficient to generate an
+  // RB approximation if there are no parameters. Note that in parallel,
+  // and when we don't have a serial training set, set return comm().size()
+  // so that each processor is assigned a single (empty) training sample.
   if (training_parameters.empty())
-    return 1;
+    {
+      if (serial_training_set)
+        return 1;
+      else
+        return this->comm().size();
+    }
 
   return training_parameters.begin()->second->size();
 }
@@ -110,6 +117,13 @@ numeric_index_type RBConstructionBase<Base>::get_local_n_training_samples() cons
 {
   libmesh_assert(training_parameters_initialized);
 
+  // First we check if there are no parameters here, and in that case we
+  // return 1 for both serial and parallel training sets. This is consistent
+  // with get_n_training_samples(), and avoids accessing
+  // training_parameters.begin() when training_parameters is empty.
+  if (training_parameters.empty())
+    return 1;
+
   return training_parameters.begin()->second->local_size();
 }
 
@@ -117,6 +131,19 @@ template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_first_local_training_index() const
 {
   libmesh_assert(training_parameters_initialized);
+
+  // First we check if there are no parameters here, and in that case we
+  // return 0 for a serial training set and comm().rank() for a parallel
+  // training set. This is consistent with get_n_training_samples(), and
+  // avoids accessing training_parameters.begin() when training_parameters
+  // is empty.
+  if (training_parameters.empty())
+    {
+      if (serial_training_set)
+        return 0;
+      else
+        return this->comm().rank();
+    }
 
   return training_parameters.begin()->second->first_local_index();
 }
