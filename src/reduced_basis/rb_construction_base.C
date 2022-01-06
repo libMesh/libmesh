@@ -96,8 +96,11 @@ numeric_index_type RBConstructionBase<Base>::get_n_training_samples() const
 {
   libmesh_assert(training_parameters_initialized);
 
+  // First we check if there are no parameters here, and in that case we
+  // return 1 since a single training sample is sufficient to generate
+  // an RB approximation if there are not parameters.
   if (training_parameters.empty())
-    return 0;
+    return 1;
 
   return training_parameters.begin()->second->size();
 }
@@ -107,9 +110,6 @@ numeric_index_type RBConstructionBase<Base>::get_local_n_training_samples() cons
 {
   libmesh_assert(training_parameters_initialized);
 
-  if (training_parameters.empty())
-    return 0;
-
   return training_parameters.begin()->second->local_size();
 }
 
@@ -117,9 +117,6 @@ template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_first_local_training_index() const
 {
   libmesh_assert(training_parameters_initialized);
-
-  if (training_parameters.empty())
-    return 0;
 
   return training_parameters.begin()->second->first_local_index();
 }
