@@ -206,6 +206,13 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
   // This vector will store the number of members each bin has.
   bin_members.resize(n_bins);
 
+#ifdef DEBUG
+  // we may not bin all values.
+  // Those we skip on purpose (e.g. inactive elements in an ErrorVector)
+  // should also not appear in the consistency-check below.
+  unsigned int unbinned=0;
+#endif
+
   dof_id_type data_index = 0;
   for (auto j : index_range(bin_members)) // bin vector indexing
     {
@@ -221,6 +228,9 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
           // ErrorVector.)  We just skip entries like that.
           if (current_val < min)
             {
+#ifdef DEBUG
+               unbinned++;
+#endif
               //     libMesh::out << "(debug) Skipping entry v[" << i << "]="
               //       << (*this)[i]
               //       << " which is less than the min value: min="
@@ -243,6 +253,10 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
           // Otherwise, increment current bin's count
           bin_members[j]++;
           // libMesh::out << "(debug) Binned index=" << i << std::endl;
+#ifdef DEBUG
+          if (i== n-1) // we read the last 'i' only in the last bin.
+             libmesh_assert_equal_to(j, bin_members.size()-1);
+#endif
         }
     }
 
@@ -253,12 +267,12 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
                                                static_cast<dof_id_type>(0),
                                                std::plus<dof_id_type>());
 
-  if (n != n_binned)
+  if (n-unbinned != n_binned)
     {
       libMesh::out << "Warning: The number of binned entries, n_binned="
                    << n_binned
-                   << ", did not match the total number of entries, n="
-                   << n << "." << std::endl;
+                   << ", did not match the total number of binnable entries, n="
+                   << n-unbinned << "." << std::endl;
     }
 #endif
 }
