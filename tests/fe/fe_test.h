@@ -327,10 +327,6 @@ public:
     _sys->add_variable("u", order, family);
     _es->init();
 
-    // Clough-Tocher elements still don't work multithreaded
-    if (family == CLOUGH && libMesh::n_threads() > 1)
-      return;
-
     if (family == RATIONAL_BERNSTEIN && order > 1)
       {
         _sys->project_solution(rational_test, rational_test_grad, _es->parameters);
@@ -388,10 +384,6 @@ public:
 
 #if LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-    // Clough-Tocher elements still don't work multithreaded
-    if (family == CLOUGH && libMesh::n_threads() > 1)
-      return;
-
     // Szabab elements don't have second derivatives yet
     if (family == SZABAB)
       return;
@@ -430,10 +422,6 @@ public:
   template <typename Functor>
   void testLoop(Functor f)
   {
-    // Clough-Tocher elements still don't work multithreaded
-    if (family == CLOUGH && libMesh::n_threads() > 1)
-      return;
-
     // Handle the "more processors than elements" case
     if (!this->_elem)
       return;
@@ -511,10 +499,6 @@ public:
 
   void testDualDoesntScreamAndDie()
   {
-    // Clough-Tocher elements still don't work multithreaded
-    if (family == CLOUGH && libMesh::n_threads() > 1)
-      return;
-
     // Handle the "more processors than elements" case
     if (!this->_elem)
       return;
