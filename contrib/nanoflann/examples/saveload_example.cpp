@@ -1,7 +1,7 @@
 /***********************************************************************
  * Software License Agreement (BSD License)
  *
- * Copyright 2011-2016 Jose Luis Blanco (joseluisblancoc@gmail.com).
+ * Copyright 2011-2022 Jose Luis Blanco (joseluisblancoc@gmail.com).
  *   All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,76 +26,80 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *************************************************************************/
 
-#include <nanoflann.hpp>
-#include "utils.h"
-
-#include <ctime>
 #include <cstdlib>
+#include <ctime>
+#include <fstream>
 #include <iostream>
+#include <nanoflann.hpp>
 
-using namespace std;
-using namespace nanoflann;
+#include "utils.h"
 
 void kdtree_save_load_demo(const size_t N)
 {
-	PointCloud<double> cloud;
+    PointCloud<double> cloud;
 
-	// Generate points:
-	generateRandomPointCloud(cloud, N);
+    // Generate points:
+    generateRandomPointCloud(cloud, N);
 
-	double query_pt[3] = { 0.5, 0.5, 0.5 };
+    double query_pt[3] = {0.5, 0.5, 0.5};
 
+    // construct a kd-tree index:
+    using my_kd_tree_t = nanoflann::KDTreeSingleIndexAdaptor<
+        nanoflann::L2_Simple_Adaptor<double, PointCloud<double>>,
+        PointCloud<double>, 3 /* dim */
+        >;
 
-	// construct a kd-tree index:
-	typedef KDTreeSingleIndexAdaptor<
-		L2_Simple_Adaptor<double, PointCloud<double> > ,
-		PointCloud<double>,
-		3 /* dim */
-		> my_kd_tree_t;
+    // Construct the index and save it:
+    // --------------------------------------------
+    {
+        my_kd_tree_t index(
+            3 /*dim*/, cloud,
+            nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
+        index.buildIndex();
 
+        std::ofstream f("index.bin", std::ofstream::binary);
 
-	// Construct the index and save it:
-	// --------------------------------------------
-	{
-		my_kd_tree_t   index(3 /*dim*/, cloud, KDTreeSingleIndexAdaptorParams(10 /* max leaf */) );
-		index.buildIndex();
+        if (f.bad()) throw std::runtime_error("Error writing index file!");
 
-		FILE *f = fopen("index.bin", "wb");
-		if (!f) throw std::runtime_error("Error writing index file!");
-		index.saveIndex(f);
-		fclose(f);
-	}
+        index.saveIndex(f);
+        f.close();
+    }
 
+    // Load the index from disk:
+    // --------------------------------------------
+    {
+        // Important: construct the index associated to the same dataset, since
+        // data points are NOT stored in the binary file.
+        my_kd_tree_t index(
+            3 /*dim*/, cloud,
+            nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
 
-	// Load the index from disk:
-	// --------------------------------------------
-	{
-		// Important: construct the index associated to the same dataset, since data points are NOT stored in the binary file.
-		my_kd_tree_t   index(3 /*dim*/, cloud, KDTreeSingleIndexAdaptorParams(10 /* max leaf */) );
+        std::ifstream f("index.bin", std::ofstream::binary);
 
-		FILE *f = fopen("index.bin", "rb");
-		if (!f) throw std::runtime_error("Error reading index file!");
-		index.loadIndex(f);
-		fclose(f);
+        if (f.fail()) throw std::runtime_error("Error reading index file!");
 
-		// do a knn search
-		const size_t num_results = 1;
-		size_t ret_index;
-		double out_dist_sqr;
-		nanoflann::KNNResultSet<double> resultSet(num_results);
-		resultSet.init(&ret_index, &out_dist_sqr );
-		index.findNeighbors(resultSet, &query_pt[0], nanoflann::SearchParams(10));
+        index.loadIndex(f);
+        f.close();
 
-		std::cout << "knnSearch(nn="<<num_results<<"): \n";
-		std::cout << "ret_index=" << ret_index << " out_dist_sqr=" << out_dist_sqr << endl;
-	}
+        // do a knn search
+        const size_t                    num_results = 1;
+        size_t                          ret_index;
+        double                          out_dist_sqr;
+        nanoflann::KNNResultSet<double> resultSet(num_results);
+        resultSet.init(&ret_index, &out_dist_sqr);
+        index.findNeighbors(
+            resultSet, &query_pt[0], nanoflann::SearchParams(10));
 
+        std::cout << "knnSearch(nn=" << num_results << "): \n";
+        std::cout << "ret_index=" << ret_index
+                  << " out_dist_sqr=" << out_dist_sqr << std::endl;
+    }
 }
 
 int main()
 {
-	// Randomize Seed
-	srand(time(NULL));
-	kdtree_save_load_demo(100000);
-	return 0;
+    // Randomize Seed
+    srand(static_cast<unsigned int>(time(nullptr)));
+    kdtree_save_load_demo(100000);
+    return 0;
 }

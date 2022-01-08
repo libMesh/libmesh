@@ -33,9 +33,54 @@
 
 #include "utils.h"
 
-template <typename num_t>
-void kdtree_demo(const size_t N)
+using namespace std;
+using namespace nanoflann;
+
+// This example demonstrate how to embed a custom parameter "myParam" into
+// the metric class My_Custom_Metric_Adaptor, whose constructor accepts
+// arbitrary parameters:
+
+template <
+    class T, class DataSource, typename _DistanceType = T,
+    typename AccessorType = uint32_t>
+struct My_Custom_Metric_Adaptor
 {
+    using ElementType  = T;
+    using DistanceType = _DistanceType;
+
+    const DataSource& data_source;
+
+    double _myParam = 1.0;
+
+    My_Custom_Metric_Adaptor(const DataSource& _data_source, double myParam)
+        : data_source(_data_source), _myParam(myParam)
+    {
+    }
+
+    inline DistanceType evalMetric(
+        const T* a, const AccessorType b_idx, size_t size) const
+    {
+        DistanceType result = DistanceType();
+        for (size_t i = 0; i < size; ++i)
+        {
+            const DistanceType diff =
+                a[i] - data_source.kdtree_get_pt(b_idx, i);
+            result += std::pow(diff, _myParam);
+        }
+        return result;
+    }
+
+    template <typename U, typename V>
+    inline DistanceType accum_dist(const U a, const V b, const size_t) const
+    {
+        return std::pow((a - b), _myParam);
+    }
+};
+
+static void kdtree_custom_metric_demo(const size_t N)
+{
+    using num_t = double;
+
     PointCloud<num_t> cloud;
 
     // Generate points:
@@ -44,14 +89,17 @@ void kdtree_demo(const size_t N)
     num_t query_pt[3] = {0.5, 0.5, 0.5};
 
     // construct a kd-tree index:
-    using my_kd_tree_t = nanoflann::KDTreeSingleIndexAdaptor<
-        nanoflann::L2_Simple_Adaptor<num_t, PointCloud<num_t>>,
-        PointCloud<num_t>, 3 /* dim */
+    using my_kd_tree_t = KDTreeSingleIndexAdaptor<
+        My_Custom_Metric_Adaptor<num_t, PointCloud<num_t>>, PointCloud<num_t>,
+        3 /* dim */
         >;
 
     dump_mem_usage();
 
-    my_kd_tree_t index(3 /*dim*/, cloud, {10 /* max leaf */});
+    // This will be forwarded to the metric class:
+    const double myMetricParam = 4.0;
+
+    my_kd_tree_t index(3 /*dim*/, cloud, {10 /* max leaf */}, myMetricParam);
     index.buildIndex();
 
     dump_mem_usage();
@@ -67,21 +115,20 @@ void kdtree_demo(const size_t N)
 
         std::cout << "knnSearch(nn=" << num_results << "): \n";
         std::cout << "ret_index=" << ret_index
-                  << " out_dist_sqr=" << out_dist_sqr << std::endl;
+                  << " out_dist_sqr=" << out_dist_sqr << endl;
     }
     {
         // Unsorted radius search:
-        const num_t                               radius = 1;
-        std::vector<std::pair<size_t, num_t>>     indices_dists;
-        nanoflann::RadiusResultSet<num_t, size_t> resultSet(
-            radius, indices_dists);
+        const num_t                           radius = 1;
+        std::vector<std::pair<size_t, num_t>> indices_dists;
+        RadiusResultSet<num_t, size_t>        resultSet(radius, indices_dists);
 
         index.findNeighbors(resultSet, query_pt, nanoflann::SearchParams());
 
         // Get worst (furthest) point, without sorting:
         std::pair<size_t, num_t> worst_pair = resultSet.worst_item();
-        std::cout << "Worst pair: idx=" << worst_pair.first
-                  << " dist=" << worst_pair.second << std::endl;
+        cout << "Worst pair: idx=" << worst_pair.first
+             << " dist=" << worst_pair.second << endl;
     }
 }
 
@@ -89,7 +136,6 @@ int main()
 {
     // Randomize Seed
     srand(static_cast<unsigned int>(time(nullptr)));
-    kdtree_demo<float>(1000000);
-    kdtree_demo<double>(1000000);
+    kdtree_custom_metric_demo(10000);
     return 0;
 }
