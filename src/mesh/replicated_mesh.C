@@ -1172,7 +1172,8 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
         if (use_binary_search)
         {
 #ifdef LIBMESH_HAVE_NANOFLANN
-          typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<Real, VectorOfNodesAdaptor>, VectorOfNodesAdaptor, 3> kd_tree_t;
+          typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<Real, VectorOfNodesAdaptor>,
+            VectorOfNodesAdaptor, 3, std::size_t> kd_tree_t;
 
           // Create the dataset needed to build the kd tree with nanoflann
           std::vector<std::pair<Point, dof_id_type>> this_mesh_nodes(this_boundary_node_ids.size());
@@ -1190,18 +1191,18 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
           this_kd_tree.buildIndex();
 
           // Storage for nearest neighbor in the loop below
-          std::vector<size_t> ret_index(1);
-          std::vector<Real> ret_dist_sqr(1);
+          std::size_t ret_index;
+          Real ret_dist_sqr;
 
           // Loop over other mesh. For each node, find its nearest neighbor in this mesh, and fill in the maps.
           for (auto node : other_boundary_node_ids)
           {
             const Real query_pt[] = {other_mesh->point(node)(0), other_mesh->point(node)(1), other_mesh->point(node)(2)};
-            this_kd_tree.knnSearch(&query_pt[0], 1, &ret_index[0], &ret_dist_sqr[0]);
-            if (ret_dist_sqr[0] < TOLERANCE*TOLERANCE)
+            this_kd_tree.knnSearch(&query_pt[0], 1, &ret_index, &ret_dist_sqr);
+            if (ret_dist_sqr < TOLERANCE*TOLERANCE)
             {
-              node_to_node_map[this_mesh_nodes[ret_index[0]].second] = node;
-              other_to_this_node_map[node] = this_mesh_nodes[ret_index[0]].second;
+              node_to_node_map[this_mesh_nodes[ret_index].second] = node;
+              other_to_this_node_map[node] = this_mesh_nodes[ret_index].second;
             }
           }
 
