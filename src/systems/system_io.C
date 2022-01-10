@@ -2146,7 +2146,8 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> & vec,
 #ifdef LIBMESH_HAVE_MPI
   if (this->n_processors() > 1)
     {
-      const Parallel::MessageTag val_tag(1);
+      const Parallel::MessageTag val_tag =
+        this->comm().get_unique_tag(1);
 
       // Post the receive on processor 0
       if (this->processor_id() == 0)
