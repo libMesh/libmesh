@@ -1,10 +1,38 @@
-nanoflann 1.3.0: (Unreleased)
+nanoflann 1.4.1: Released Jan 6, 2022
+  * Fix incorrect install directory for cmake target & config files.
+  * Do not install example binaries with `make install`.
+  * Provide working examples for cmake and pkgconfig under `examples/example_*` directories.
+
+nanoflann 1.4.0: Released Jan 2, 2022
+  * nanoflann::KDTreeSingleIndexAdaptor() ctor now forwards additional parameters to the metric class, enabling custom dynamic metrics.
+  * Add and apply a `.clang-format` file (same one than used in MOLAorg/MOLA projects).
+  * Examples: clean up and code modernization.
+  * CMake variables prefixed now with `NANOFLANN_` for easier integration of nanoflann as a Git submodule.
+  * Fixes for IndexType which are not of integral types [PR #154](https://github.com/jlblancoc/nanoflann/pull/154)
+  * save/load API upgraded from C `FILE*` to C++ file streams (By Dominic Kempf, Heidelberg University, [PR](https://github.com/jlblancoc/nanoflann/pull/157)).
+
+nanoflann 1.3.2: Released Nov 5, 2020
+  * Add optional argument for Eigen matrix layout [commit](https://github.com/jlblancoc/nanoflann/commit/40fa96badcfc4b1a2df38b40b8a368cf5521ace4).
+  * Throw exception on malloc failure [PR #126](https://github.com/jlblancoc/nanoflann/pull/126).
+  * Respect GNUInstallDirs in CMake install rules [PR #131](https://github.com/jlblancoc/nanoflann/pull/131).
+
+nanoflann 1.3.1: Released Oct 11, 2019
+  * Fixed bug in KDTreeSingleIndexDynamicAdaptor. See: https://github.com/jlblancoc/nanoflann/commit/a066148517d16c173954dcde13c1527481b9fad3
+  * Fix build in XCode.
+  * Simplify CMakeLists for Eigen example (requires Eigen3Config.cmake now)
+  * Avoid setting cmake global executable build path
+
+nanoflann 1.3.0: Released Aug 28, 2018
+  * Instructions for `make install` for Linux and Windows (Closes #87).
+  * Fix all (?) MSVC conversion warnings (Closes: #95).
+  * Avoid need for _USE_MATH_DEFINES in MSVC (Closes: #96)
+  * Eigen::Matrix datasets: now uses std::cref() to store a reference to matrix.
   * GSOC2017 contributions by Pranjal Kumar Rai:
     * Support for dynamic datasets.
     * Support for non-Euclidean spaces: SO(2), SO(3)
 
 nanoflann 1.2.3: Released Dec 20, 2016
-  * Fixed: split plane now correctly chooses the dimensions with the largest span. 
+  * Fixed: split plane now correctly chooses the dimensions with the largest span.
     Should lead to more optimal trees.
 
 nanoflann 1.2.2: Released Nov 10, 2016
