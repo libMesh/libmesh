@@ -97,7 +97,8 @@ void GhostPointNeighbors::operator()
       elem->find_point_neighbors(elem_point_neighbors);
 
       for (const auto & neigh : elem_point_neighbors)
-        coupled_elements.emplace(neigh, nullcm);
+        if (neigh->processor_id() != p)
+          coupled_elements.emplace(neigh, nullcm);
 
       // An interior_parent isn't on the same manifold so won't be
       // found as a point neighbor, and it may not share nodes so we
