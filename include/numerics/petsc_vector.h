@@ -1099,6 +1099,9 @@ void PetscVector<T>::get(const std::vector<numeric_index_type> & index,
 
   std::unique_lock<std::mutex> read_lock(_petsc_vector_mutex);
   _petsc_vector_cv.wait(read_lock, [this](){ return _array_is_present.load(); });
+  // When wait exits it means we've acquired and locked the mutex, but all we are doing now
+  // is reading, so it's safe to unlock and let other threads continue
+  read_lock.unlock();
   for (std::size_t i=0; i<num; i++)
     {
       const numeric_index_type local_index = this->map_global_to_local_index(index[i]);

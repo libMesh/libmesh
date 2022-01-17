@@ -1168,7 +1168,6 @@ void PetscVector<T>::_get_array(bool read_only) const
       std::lock_guard<std::mutex> do_once_lock(_petsc_vector_do_once_mutex);
       if (!_array_is_present)
         {
-          std::unique_lock<std::mutex> write_lock(_petsc_vector_mutex);
           PetscErrorCode ierr=0;
           if (this->type() != GHOSTED)
             {
