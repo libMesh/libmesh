@@ -558,6 +558,7 @@ protected:
    * Determine which values are to be calculated, for both the FE
    * itself and for the FEMap.
    */
+  virtual_for_inffe
   void determine_calculations();
 
   /**
