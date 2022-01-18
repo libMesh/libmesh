@@ -658,9 +658,8 @@ void PetscVector<T>::init (const numeric_index_type n,
   // create a sequential vector if on only 1 processor
   if (this->_type == SERIAL)
     {
-      ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &_vec);
-      CHKERRABORT(PETSC_COMM_SELF,ierr);
-
+      ierr = VecCreate(PETSC_COMM_SELF, &_vec);CHKERRABORT(PETSC_COMM_SELF,ierr);
+      ierr = VecSetSizes(_vec, petsc_n, petsc_n); CHKERRABORT(PETSC_COMM_SELF,ierr);
       ierr = VecSetFromOptions (_vec);
       CHKERRABORT(PETSC_COMM_SELF,ierr);
     }
@@ -670,15 +669,14 @@ void PetscVector<T>::init (const numeric_index_type n,
 #ifdef LIBMESH_HAVE_MPI
       PetscInt petsc_n_local=cast_int<PetscInt>(n_local);
       libmesh_assert_less_equal (n_local, n);
-      ierr = VecCreateMPI (this->comm().get(), petsc_n_local, petsc_n,
-                           &_vec);
-      LIBMESH_CHKERR(ierr);
+      // Use more generic function instead of VecCreateSeq/MPI
+      ierr = VecCreate(this->comm().get(), &_vec);LIBMESH_CHKERR(ierr);
+      ierr = VecSetSizes(_vec, petsc_n_local, petsc_n); LIBMESH_CHKERR(ierr);
 #else
       libmesh_assert_equal_to (n_local, n);
-      ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &_vec);
-      CHKERRABORT(PETSC_COMM_SELF,ierr);
+      ierr = VecCreate(PETSC_COMM_SELF, &_vec);CHKERRABORT(PETSC_COMM_SELF,ierr);
+      ierr = VecSetSizes(_vec, petsc_n, petsc_n); CHKERRABORT(PETSC_COMM_SELF,ierr);
 #endif
-
       ierr = VecSetFromOptions (_vec);
       LIBMESH_CHKERR(ierr);
     }
@@ -754,6 +752,13 @@ void PetscVector<T>::init (const numeric_index_type n,
   ierr = VecCreateGhost (this->comm().get(), petsc_n_local, petsc_n,
                          petsc_n_ghost, petsc_ghost,
                          &_vec);
+  LIBMESH_CHKERR(ierr);
+
+  // Add a prefix so that we can at least distinguish a ghosted vector from a
+  // nonghosted vector when using a petsc option.
+  // PETSc does not fully support VecGhost on GPU yet. This change allows us to
+  // trigger a nonghosted vector to use GPU without bothering the ghosted vectors.
+  ierr = PetscObjectAppendOptionsPrefix((PetscObject)_vec,"ghost_");
   LIBMESH_CHKERR(ierr);
 
   ierr = VecSetFromOptions (_vec);

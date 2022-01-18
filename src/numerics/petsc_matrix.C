@@ -166,6 +166,14 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 
       ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
       LIBMESH_CHKERR(ierr);
+
+      // MatSetFromOptions needs to happen before Preallocation routines
+      // since MatSetFromOptions can change matrix type and remove incompatible
+      // preallocation
+      ierr = MatSetOptionsPrefix(_mat, "");
+      LIBMESH_CHKERR(ierr);
+      ierr = MatSetFromOptions(_mat);
+      LIBMESH_CHKERR(ierr);
       ierr = MatSeqBAIJSetPreallocation(_mat, blocksize, n_nz/blocksize, NULL);
       LIBMESH_CHKERR(ierr);
       ierr = MatMPIBAIJSetPreallocation(_mat, blocksize,
@@ -180,6 +188,14 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
         case AIJ:
           ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
           LIBMESH_CHKERR(ierr);
+
+          // MatSetFromOptions needs to happen before Preallocation routines
+          // since MatSetFromOptions can change matrix type and remove incompatible
+          // preallocation
+          ierr = MatSetOptionsPrefix(_mat, "");
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSetFromOptions(_mat);
+          LIBMESH_CHKERR(ierr);
           ierr = MatSeqAIJSetPreallocation(_mat, n_nz, NULL);
           LIBMESH_CHKERR(ierr);
           ierr = MatMPIAIJSetPreallocation(_mat, n_nz, NULL, n_oz, NULL);
@@ -189,6 +205,14 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
         case HYPRE:
 #if !PETSC_VERSION_LESS_THAN(3,9,4) && LIBMESH_HAVE_PETSC_HYPRE
           ierr = MatSetType(_mat, MATHYPRE);
+
+          // MatSetFromOptions needs to happen before Preallocation routines
+          // since MatSetFromOptions can change matrix type and remove incompatible
+          // preallocation
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSetOptionsPrefix(_mat, "");
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSetFromOptions(_mat);
           LIBMESH_CHKERR(ierr);
           ierr = MatHYPRESetPreallocation(_mat, n_nz, NULL, n_oz, NULL);
           LIBMESH_CHKERR(ierr);
@@ -203,12 +227,6 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 
   // Make it an error for PETSc to allocate new nonzero entries during assembly
   ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
-  LIBMESH_CHKERR(ierr);
-
-  // Is prefix information available somewhere? Perhaps pass in the system name?
-  ierr = MatSetOptionsPrefix(_mat, "");
-  LIBMESH_CHKERR(ierr);
-  ierr = MatSetFromOptions(_mat);
   LIBMESH_CHKERR(ierr);
 
   this->zero ();
@@ -264,6 +282,14 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
       ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
       LIBMESH_CHKERR(ierr);
 
+      // MatSetFromOptions needs to happen before Preallocation routines
+      // since MatSetFromOptions can change matrix type and remove incompatible
+      // preallocation
+      LIBMESH_CHKERR(ierr);
+      ierr = MatSetOptionsPrefix(_mat, "");
+      LIBMESH_CHKERR(ierr);
+      ierr = MatSetFromOptions(_mat);
+      LIBMESH_CHKERR(ierr);
       // transform the per-entry n_nz and n_oz arrays into their block counterparts.
       std::vector<numeric_index_type> b_n_nz, b_n_oz;
 
@@ -292,6 +318,15 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
         case AIJ:
           ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
           LIBMESH_CHKERR(ierr);
+
+          // MatSetFromOptions needs to happen before Preallocation routines
+          // since MatSetFromOptions can change matrix type and remove incompatible
+          // preallocation
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSetOptionsPrefix(_mat, "");
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSetFromOptions(_mat);
+          LIBMESH_CHKERR(ierr);
           ierr = MatSeqAIJSetPreallocation (_mat,
                                             0,
                                             numeric_petsc_cast(n_nz.empty() ? nullptr : n_nz.data()));
@@ -306,6 +341,15 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
         case HYPRE:
 #if !PETSC_VERSION_LESS_THAN(3,9,4) && LIBMESH_HAVE_PETSC_HYPRE
           ierr = MatSetType(_mat, MATHYPRE);
+          LIBMESH_CHKERR(ierr);
+
+          // MatSetFromOptions needs to happen before Preallocation routines
+          // since MatSetFromOptions can change matrix type and remove incompatible
+          // preallocation
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSetOptionsPrefix(_mat, "");
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSetFromOptions(_mat);
           LIBMESH_CHKERR(ierr);
           ierr = MatHYPRESetPreallocation (_mat,
                                            0,
@@ -326,14 +370,6 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   // Make it an error for PETSc to allocate new nonzero entries during assembly
   ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
   LIBMESH_CHKERR(ierr);
-
-  // Is prefix information available somewhere? Perhaps pass in the system name?
-  ierr = MatSetOptionsPrefix(_mat, "");
-  LIBMESH_CHKERR(ierr);
-  ierr = MatSetFromOptions(_mat);
-  LIBMESH_CHKERR(ierr);
-
-
   this->zero();
 }
 
@@ -390,6 +426,15 @@ void PetscMatrix<T>::init (const ParallelType)
       ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
       LIBMESH_CHKERR(ierr);
 
+      // MatSetFromOptions needs to happen before Preallocation routines
+      // since MatSetFromOptions can change matrix type and remove incompatible
+      // preallocation
+      LIBMESH_CHKERR(ierr);
+      ierr = MatSetOptionsPrefix(_mat, "");
+      LIBMESH_CHKERR(ierr);
+      ierr = MatSetFromOptions(_mat);
+      LIBMESH_CHKERR(ierr);
+
       // transform the per-entry n_nz and n_oz arrays into their block counterparts.
       std::vector<numeric_index_type> b_n_nz, b_n_oz;
 
@@ -418,6 +463,15 @@ void PetscMatrix<T>::init (const ParallelType)
         case AIJ:
           ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
           LIBMESH_CHKERR(ierr);
+
+          // MatSetFromOptions needs to happen before Preallocation routines
+          // since MatSetFromOptions can change matrix type and remove incompatible
+          // preallocation
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSetOptionsPrefix(_mat, "");
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSetFromOptions(_mat);
+          LIBMESH_CHKERR(ierr);
           ierr = MatSeqAIJSetPreallocation (_mat,
                                             0,
                                             numeric_petsc_cast(n_nz.empty() ? nullptr : n_nz.data()));
@@ -432,6 +486,15 @@ void PetscMatrix<T>::init (const ParallelType)
         case HYPRE:
 #if !PETSC_VERSION_LESS_THAN(3,9,4) && LIBMESH_HAVE_PETSC_HYPRE
           ierr = MatSetType(_mat, MATHYPRE);
+          LIBMESH_CHKERR(ierr);
+
+          // MatSetFromOptions needs to happen before Preallocation routines
+          // since MatSetFromOptions can change matrix type and remove incompatible
+          // preallocation
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSetOptionsPrefix(_mat, "");
+          LIBMESH_CHKERR(ierr);
+          ierr = MatSetFromOptions(_mat);
           LIBMESH_CHKERR(ierr);
           ierr = MatHYPRESetPreallocation (_mat,
                                            0,
@@ -450,12 +513,6 @@ void PetscMatrix<T>::init (const ParallelType)
 
   // Make it an error for PETSc to allocate new nonzero entries during assembly
   ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
-  LIBMESH_CHKERR(ierr);
-
-  // Is prefix information available somewhere? Perhaps pass in the system name?
-  ierr = MatSetOptionsPrefix(_mat, "");
-  LIBMESH_CHKERR(ierr);
-  ierr = MatSetFromOptions(_mat);
   LIBMESH_CHKERR(ierr);
 
   this->zero();
