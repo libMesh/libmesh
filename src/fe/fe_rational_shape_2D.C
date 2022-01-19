@@ -67,6 +67,7 @@ void weighted_shapes(const Elem * elem,
 } // anonymous namespace
 
 
+
 namespace libMesh
 {
 
@@ -339,8 +340,6 @@ Real FE<2,RATIONAL_BERNSTEIN>::shape_second_deriv(const FEType fet,
 #endif
 
 
-// LIBMESH_DEFAULT_VECTORIZED_FE(2, RATIONAL_BERNSTEIN)
-
 template<>
 void FE<2,RATIONAL_BERNSTEIN>::shapes
   (const Elem * elem,
@@ -350,7 +349,6 @@ void FE<2,RATIONAL_BERNSTEIN>::shapes
    std::vector<OutputShape> & vi,
    const bool add_p_level)
 {
-//  FE<2,RATIONAL_BERNSTEIN>::default_shapes(elem,o,i,p,vi,add_p_level);
   libmesh_assert_equal_to(p.size(), vi.size());
   for (auto j : index_range(vi))
     vi[j] = FE<2,RATIONAL_BERNSTEIN>::shape (elem, o, i, p[j], add_p_level);
