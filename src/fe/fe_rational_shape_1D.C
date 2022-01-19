@@ -28,15 +28,50 @@
 
 
 namespace {
-static const libMesh::FEFamily _underlying_fe_family = libMesh::BERNSTEIN;
+using namespace libMesh;
+
+static const FEFamily _underlying_fe_family = BERNSTEIN;
+
+// shapes[i][j] is shape function phi_i at point p[j]
+void weighted_shapes(const Elem * elem,
+                     FEType fe_type,
+                     std::vector<std::vector<Real>> & shapes,
+                     const std::vector<Point> & p,
+                     const bool add_p_level)
+{
+  const int extra_order = add_p_level * elem->p_level();
+
+  const unsigned int n_sf =
+    FEInterface::n_shape_functions(fe_type, extra_order, elem);
+
+  libmesh_assert_equal_to (n_sf, elem->n_nodes());
+
+  std::vector<Real> node_weights(n_sf);
+
+  const unsigned char datum_index = elem->mapping_data();
+  for (unsigned int n=0; n<n_sf; n++)
+    node_weights[n] =
+      elem->node_ref(n).get_extra_datum<Real>(datum_index);
+
+  const std::size_t n_p = p.size();
+
+  shapes.resize(n_sf);
+  for (unsigned int i=0; i != n_sf; ++i)
+    {
+      auto & shapes_i = shapes[i];
+      shapes_i.resize(n_p, 0);
+      FEInterface::shapes(1, fe_type, elem, i, p, shapes_i, add_p_level);
+      for (auto & s : shapes_i)
+        s *= node_weights[i];
+    }
 }
+
+} // anonymous namespace
+
 
 
 namespace libMesh
 {
-
-
-LIBMESH_DEFAULT_VECTORIZED_FE(1,RATIONAL_BERNSTEIN)
 
 
 template <>
@@ -279,8 +314,77 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const FEType fet,
 }
 
 
-
 #endif
+
+
+template<>
+void FE<1,RATIONAL_BERNSTEIN>::shapes
+  (const Elem * elem,
+   const Order o,
+   const unsigned int i,
+   const std::vector<Point> & p,
+   std::vector<OutputShape> & vi,
+   const bool add_p_level)
+{
+  libmesh_assert_equal_to(p.size(), vi.size());
+  for (auto j : index_range(vi))
+    vi[j] = FE<1,RATIONAL_BERNSTEIN>::shape (elem, o, i, p[j], add_p_level);
+}
+
+template<>
+void FE<1,RATIONAL_BERNSTEIN>::all_shapes
+  (const Elem * elem,
+   const Order o,
+   const std::vector<Point> & p,
+   std::vector<std::vector<OutputShape>> & v,
+   const bool add_p_level)
+{
+  std::vector<std::vector<Real>> shapes;
+
+  FEType fe_type(o, _underlying_fe_family);
+
+  weighted_shapes(elem, fe_type, shapes, p, add_p_level);
+
+  std::vector<Real> shape_sums(p.size(), 0);
+
+  for (auto i : index_range(v))
+    {
+      libmesh_assert_equal_to ( p.size(), shapes[i].size() );
+      for (auto j : index_range(p))
+        shape_sums[j] += shapes[i][j];
+    }
+
+  for (auto i : index_range(v))
+    {
+      libmesh_assert_equal_to ( p.size(), v[i].size() );
+      for (auto j : index_range(v[i]))
+        {
+          v[i][j] = shapes[i][j] / shape_sums[j];
+
+#ifdef DEBUG
+          Real old_shape = FE<1,RATIONAL_BERNSTEIN>::shape (elem, o, i, p[j], add_p_level);
+          libmesh_assert(std::abs(v[i][j] - old_shape) < TOLERANCE*TOLERANCE);
+#endif
+        }
+    }
+}
+
+
+template<>
+void FE<1,RATIONAL_BERNSTEIN>::shape_derivs
+  (const Elem * elem,
+   const Order o,
+   const unsigned int i,
+   const unsigned int j,
+   const std::vector<Point> & p,
+   std::vector<OutputShape> & v,
+   const bool add_p_level)
+{
+  libmesh_assert_equal_to(p.size(), v.size());
+  for (auto vi : index_range(v))
+    v[vi] = FE<1,RATIONAL_BERNSTEIN>::shape_deriv (elem, o, i, j, p[vi], add_p_level);
+}
+
 
 } // namespace libMesh
 
