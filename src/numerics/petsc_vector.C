@@ -1151,12 +1151,6 @@ void PetscVector<T>::_get_array(bool read_only) const
 {
   libmesh_assert (this->initialized());
 
-#ifdef LIBMESH_HAVE_CXX11_THREAD
-  std::atomic_thread_fence(std::memory_order_acquire);
-#else
-  Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
-#endif
-
   // If the values have already been retrieved and we're currently
   // trying to get a non-read only view (ie read/write) and the
   // values are currently read only... then we need to restore
@@ -1171,9 +1165,7 @@ void PetscVector<T>::_get_array(bool read_only) const
 
   if (!_array_is_present)
     {
-#ifdef LIBMESH_HAVE_CXX11_THREAD
-      std::lock_guard<std::mutex> lock(_petsc_vector_mutex);
-#endif
+      std::lock_guard<std::mutex> do_once_lock(_petsc_vector_do_once_mutex);
       if (!_array_is_present)
         {
           PetscErrorCode ierr=0;
@@ -1222,12 +1214,8 @@ void PetscVector<T>::_get_array(bool read_only) const
             _first = static_cast<numeric_index_type>(petsc_first);
             _last = static_cast<numeric_index_type>(petsc_last);
           }
-#ifdef LIBMESH_HAVE_CXX11_THREAD
-          std::atomic_thread_fence(std::memory_order_release);
-          _array_is_present.store(true, std::memory_order_relaxed);
-#else
           _array_is_present = true;
-#endif
+          _petsc_vector_cv.notify_all();
         }
     }
 }
