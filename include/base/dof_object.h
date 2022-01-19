@@ -1325,6 +1325,22 @@ unsigned int DofObject::system_var_to_vg_var (const unsigned int s,
   return (var - accumulated_sum);
 }
 
+/**
+ * Comparison object to use with DofObject pointers.  This sorts by id(),
+ * so when we iterate over a set of DofObjects we visit the objects in
+ * order of increasing ID.
+ */
+struct CompareDofObjectsByID
+{
+  bool operator()(const DofObject * a,
+                  const DofObject * b) const
+  {
+    libmesh_assert (a);
+    libmesh_assert (b);
+
+    return a->id() < b->id();
+  }
+};
 
 } // namespace libMesh
 
