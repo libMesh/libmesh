@@ -410,14 +410,14 @@ private:
 
   /**
    * Mutex for _get_array and _restore_array.  This is part of the
-   * object to keep down thread contention when reading frmo multiple
+   * object to keep down thread contention when reading from multiple
    * PetscVectors simultaneously
    */
   mutable std::mutex _petsc_vector_mutex;
 
   /**
    * Condition variable for _get_array and _restore_array.  This is part of the
-   * object to keep down thread contention when reading frmo multiple
+   * object to keep down thread contention when reading from multiple
    * PetscVectors simultaneously
    */
   mutable std::condition_variable _petsc_vector_cv;
