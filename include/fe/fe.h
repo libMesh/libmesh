@@ -597,6 +597,30 @@ protected:
                                     const Elem * e);
 
   /**
+   * Fills \p dphidxi (and in higher dimensions, eta/zeta) derivative
+   * values for all shape functions, evaluated at points qp in p.  You
+   * must specify element order directly.  \p Internal arrays should
+   * already be the appropriate size.
+   *
+   * On a p-refined element, \p o should be the base order of the
+   * element if \p add_p_level is left \p true, or can be the base
+   * order of the element if \p add_p_level is set to \p false.
+   */
+  void all_shape_derivs(const Elem * elem,
+                        const Order o,
+                        const std::vector<Point> & p,
+                        const bool add_p_level = true);
+
+  /**
+   * A default implementation for all_shape_derivs
+   */
+  void default_all_shape_derivs (const Elem * elem,
+                                 const Order o,
+                                 const std::vector<Point> & p,
+                                 const bool add_p_level = true);
+
+
+  /**
    * Init \p dual_phi and potentially \p dual_dphi, \p dual_d2phi
    */
   void init_dual_shape_functions(unsigned int n_shapes, unsigned int n_qp);
@@ -1334,6 +1358,17 @@ void FE<MyDim,MyType>::shape_derivs                  \
 {                                                    \
   FE<MyDim,MyType>::default_shape_derivs             \
     (elem,o,i,j,p,v,add_p_level);                    \
+}                                                    \
+                                                     \
+template<>                                           \
+void FE<MyDim,MyType>::all_shape_derivs              \
+  (const Elem * elem,                                \
+   const Order o,                                    \
+   const std::vector<Point> & p,                     \
+   const bool add_p_level)                           \
+{                                                    \
+  this->default_all_shape_derivs                     \
+    (elem,o,p,add_p_level);                          \
 }
 
 

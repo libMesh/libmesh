@@ -585,11 +585,12 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
       // 1D
     case 1:
       {
-        // Compute the value of the approximation shape function i at quadrature point p
+        // Compute the values of the shape function derivatives
         if (this->calculate_dphiref)
-          for (unsigned int i=0; i<n_approx_shape_functions; i++)
-            FE<Dim,T>::shape_derivs(elem, this->fe_type.order, i, 0, qp, this->dphidxi[i]);
+          FE<Dim,T>::all_shape_derivs(elem, this->fe_type.order, qp);
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        // Compute the value of shape function i Hessians at quadrature point p
         if (this->calculate_d2phi)
           for (unsigned int i=0; i<n_approx_shape_functions; i++)
             for (unsigned int p=0; p<n_qp; p++)
@@ -605,14 +606,12 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
       // 2D
     case 2:
       {
-        // Compute the value of the approximation shape function i at quadrature point p
+        // Compute the values of the shape function derivatives
         if (this->calculate_dphiref)
-          for (unsigned int i=0; i<n_approx_shape_functions; i++)
-            {
-              FE<Dim,T>::shape_derivs(elem, this->fe_type.order, i, 0, qp, this->dphidxi[i]);
-              FE<Dim,T>::shape_derivs(elem, this->fe_type.order, i, 1, qp, this->dphideta[i]);
-            }
+          FE<Dim,T>::all_shape_derivs(elem, this->fe_type.order, qp);
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        // Compute the value of shape function i Hessians at quadrature point p
         if (this->calculate_d2phi)
           for (unsigned int i=0; i<n_approx_shape_functions; i++)
             for (unsigned int p=0; p<n_qp; p++)
@@ -633,15 +632,12 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
       // 3D
     case 3:
       {
-        // Compute the value of the approximation shape function i at quadrature point p
+        // Compute the values of the shape function derivatives
         if (this->calculate_dphiref)
-          for (unsigned int i=0; i<n_approx_shape_functions; i++)
-            {
-              FE<Dim,T>::shape_derivs(elem, this->fe_type.order, i, 0, qp, this->dphidxi[i]);
-              FE<Dim,T>::shape_derivs(elem, this->fe_type.order, i, 1, qp, this->dphideta[i]);
-              FE<Dim,T>::shape_derivs(elem, this->fe_type.order, i, 2, qp, this->dphidzeta[i]);
-            }
+          FE<Dim,T>::all_shape_derivs(elem, this->fe_type.order, qp);
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        // Compute the value of shape function i Hessians at quadrature point p
         if (this->calculate_d2phi)
           for (unsigned int i=0; i<n_approx_shape_functions; i++)
             for (unsigned int p=0; p<n_qp; p++)
@@ -667,6 +663,23 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
     this->init_dual_shape_functions(n_approx_shape_functions, n_qp);
 }
 
+template <unsigned int Dim, FEFamily T>
+void
+FE<Dim,T>::default_all_shape_derivs (const Elem * elem,
+                                     const Order o,
+                                     const std::vector<Point> & p,
+                                     const bool add_p_level)
+{
+  std::vector<std::vector<OutputShape>> * comps[3]
+    { &this->dphidxi, &this->dphideta, &this->dphidzeta };
+  for (unsigned int d=0; d != Dim; ++d)
+    {
+      auto & comps_d = *comps[d];
+      for (auto i : index_range(comps_d))
+        FE<Dim,T>::shape_derivs
+          (elem,o,i,d,p,comps_d[i],add_p_level);
+    }
+}
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

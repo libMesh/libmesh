@@ -409,6 +409,25 @@ void FE<2,RATIONAL_BERNSTEIN>::shape_derivs
 }
 
 
+template <>
+void
+FE<2,RATIONAL_BERNSTEIN>::all_shape_derivs (const Elem * elem,
+                                            const Order o,
+                                            const std::vector<Point> & p,
+                                            const bool add_p_level)
+{
+  std::vector<std::vector<OutputShape>> * comps[3]
+    { &this->dphidxi, &this->dphideta, &this->dphidzeta };
+  for (unsigned int d=0; d != 2; ++d)
+    {
+      libmesh_assert_equal_to(comps[d]->size(), elem->n_nodes());
+      auto & comps_d = *comps[d];
+      for (auto i : index_range(comps_d))
+        FE<2,RATIONAL_BERNSTEIN>::shape_derivs
+          (elem,o,i,d,p,comps_d[i],add_p_level);
+    }
+}
+
 
 } // namespace libMesh
 
