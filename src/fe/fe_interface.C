@@ -1677,6 +1677,74 @@ Real FEInterface::shape_deriv(const FEType & fe_t,
 
 
 
+template<>
+void FEInterface::shape_derivs<Real>(const FEType & fe_t,
+                                     const Elem * elem,
+                                     const unsigned int i,
+                                     const unsigned int j,
+                                     const std::vector<Point> & p,
+                                     std::vector<Real> & dphi,
+                                     const bool add_p_level)
+{
+  const Order o = fe_t.order;
+
+  switch(elem->dim())
+    {
+    case 0:
+      fe_scalar_vec_error_switch(0, shape_derivs(elem,o,i,j,p,dphi,add_p_level), , ; break;);
+      break;
+    case 1:
+      fe_scalar_vec_error_switch(1, shape_derivs(elem,o,i,j,p,dphi,add_p_level), , ; break;);
+      break;
+    case 2:
+      fe_scalar_vec_error_switch(2, shape_derivs(elem,o,i,j,p,dphi,add_p_level), , ; break;);
+      break;
+    case 3:
+      fe_scalar_vec_error_switch(3, shape_derivs(elem,o,i,j,p,dphi,add_p_level), , ; break;);
+      break;
+    default:
+      libmesh_error_msg("Invalid dimension = " << elem->dim());
+    }
+
+  return;
+}
+
+
+
+template<>
+void FEInterface::shape_derivs<RealGradient>(const FEType & fe_t,
+                                             const Elem * elem,
+                                             const unsigned int i,
+                                             const unsigned int j,
+                                             const std::vector<Point> & p,
+                                             std::vector<RealGradient> & dphi,
+                                             const bool add_p_level)
+{
+  const Order o = fe_t.order;
+
+  switch(elem->dim())
+    {
+    case 0:
+      fe_vector_scalar_error_switch(0, shape_derivs(elem,o,i,j,p,dphi,add_p_level), , ; break;);
+      break;
+    case 1:
+      fe_vector_scalar_error_switch(1, shape_derivs(elem,o,i,j,p,dphi,add_p_level), , ; break;);
+      break;
+    case 2:
+      fe_vector_scalar_error_switch(2, shape_derivs(elem,o,i,j,p,dphi,add_p_level), , ; break;);
+      break;
+    case 3:
+      fe_vector_scalar_error_switch(3, shape_derivs(elem,o,i,j,p,dphi,add_p_level), , ; break;);
+      break;
+    default:
+      libmesh_error_msg("Invalid dimension = " << elem->dim());
+    }
+
+  return;
+}
+
+
+
 FEInterface::shape_deriv_ptr
 FEInterface::shape_deriv_function(const unsigned int dim,
                                   const FEType & fe_t,
