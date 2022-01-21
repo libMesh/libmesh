@@ -226,16 +226,13 @@ FE<1,RATIONAL_BERNSTEIN>::all_shape_derivs (const Elem * elem,
                                             const std::vector<Point> & p,
                                             const bool add_p_level)
 {
-  std::vector<std::vector<OutputShape>> * comps[3]
+  FEType underlying_fe_type(o, _underlying_fe_family);
+
+  std::vector<std::vector<Real>> * comps[3]
     { &this->dphidxi, &this->dphideta, &this->dphidzeta };
-  for (unsigned int d=0; d != 1; ++d)
-    {
-      libmesh_assert_equal_to(comps[d]->size(), elem->n_nodes());
-      auto & comps_d = *comps[d];
-      for (auto i : index_range(comps_d))
-        FE<1,RATIONAL_BERNSTEIN>::shape_derivs
-          (elem,o,i,d,p,comps_d[i],add_p_level);
-    }
+
+  rational_all_shape_derivs (*elem, underlying_fe_type, p,
+                             comps, add_p_level);
 }
 
 
