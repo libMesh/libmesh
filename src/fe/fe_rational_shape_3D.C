@@ -30,7 +30,7 @@ using namespace libMesh;
 
 static const FEFamily _underlying_fe_family = BERNSTEIN;
 
-// shapes[i][j] is shape function phi_i at point p[j]
+// shapes[i][q] is shape function phi_i at point p[q]
 void weighted_shapes(const Elem * elem,
                      FEType fe_type,
                      std::vector<std::vector<Real>> & shapes,
@@ -63,6 +63,61 @@ void weighted_shapes(const Elem * elem,
         s *= node_weights[i];
     }
 }
+
+
+// shapes[i][q] is shape function phi_i at point p[q]
+// derivs[j][i][q] is dphi_i/dxi_j at p[q]
+void weighted_shapes_derivs(const Elem * elem,
+                            FEType fe_type,
+                            std::vector<std::vector<Real>> & shapes,
+                            std::vector<std::vector<std::vector<Real>>> & derivs,
+                            const std::vector<Point> & p,
+                            const bool add_p_level)
+{
+  const int extra_order = add_p_level * elem->p_level();
+  constexpr int dim = 3;
+
+  const unsigned int n_sf =
+    FEInterface::n_shape_functions(fe_type, extra_order, elem);
+
+  libmesh_assert_equal_to (n_sf, elem->n_nodes());
+
+  libmesh_assert_equal_to (dim, derivs.size());
+  for (unsigned int d = 0; d != dim; ++d)
+    derivs[d].resize(n_sf);
+
+  std::vector<Real> node_weights(n_sf);
+
+  const unsigned char datum_index = elem->mapping_data();
+  for (unsigned int n=0; n<n_sf; n++)
+    node_weights[n] =
+      elem->node_ref(n).get_extra_datum<Real>(datum_index);
+
+  const std::size_t n_p = p.size();
+
+  shapes.resize(n_sf);
+  for (unsigned int i=0; i != n_sf; ++i)
+    {
+      auto & shapes_i = shapes[i];
+
+      shapes_i.resize(n_p, 0);
+
+      FEInterface::shapes(dim, fe_type, elem, i, p, shapes_i, add_p_level);
+      for (auto & s : shapes_i)
+        s *= node_weights[i];
+
+      for (unsigned int d = 0; d != dim; ++d)
+        {
+          auto & derivs_di = derivs[d][i];
+          derivs_di.resize(n_p);
+          FEInterface::shape_derivs(fe_type, elem, i, d, p,
+                                    derivs_di, add_p_level);
+          for (auto & dip : derivs_di)
+            dip *= node_weights[i];
+        }
+    }
+}
+
 
 } // anonymous namespace
 
@@ -374,9 +429,9 @@ void FE<3,RATIONAL_BERNSTEIN>::all_shapes
 {
   std::vector<std::vector<Real>> shapes;
 
-  FEType fe_type(o, _underlying_fe_family);
+  FEType underlying_fe_type(o, _underlying_fe_family);
 
-  weighted_shapes(elem, fe_type, shapes, p, add_p_level);
+  weighted_shapes(elem, underlying_fe_type, shapes, p, add_p_level);
 
   std::vector<Real> shape_sums(p.size(), 0);
 
@@ -426,15 +481,56 @@ FE<3,RATIONAL_BERNSTEIN>::all_shape_derivs (const Elem * elem,
                                             const std::vector<Point> & p,
                                             const bool add_p_level)
 {
-  std::vector<std::vector<OutputShape>> * comps[3]
-    { &this->dphidxi, &this->dphideta, &this->dphidzeta };
-  for (unsigned int d=0; d != 3; ++d)
+  constexpr int my_dim = 3;
+
+  std::vector<std::vector<Real>> shapes;
+  std::vector<std::vector<std::vector<Real>>> derivs(my_dim);
+  FEType underlying_fe_type(o, _underlying_fe_family);
+
+  weighted_shapes_derivs(elem, underlying_fe_type, shapes, derivs, p,
+                         add_p_level);
+
+  std::vector<Real> shape_sums(p.size(), 0);
+  std::vector<std::vector<Real>> shape_deriv_sums(my_dim);
+  for (int d=0; d != my_dim; ++d)
+    shape_deriv_sums[d].resize(p.size());
+
+  for (auto i : index_range(shapes))
     {
-      libmesh_assert_equal_to(comps[d]->size(), elem->n_nodes());
+      libmesh_assert_equal_to ( p.size(), shapes[i].size() );
+      for (auto j : index_range(p))
+        shape_sums[j] += shapes[i][j];
+
+      for (int d=0; d != my_dim; ++d)
+        for (auto j : index_range(p))
+          shape_deriv_sums[d][j] += derivs[d][i][j];
+    }
+
+
+  std::vector<std::vector<OutputShape>> * comps[my_dim]
+    { &this->dphidxi, &this->dphideta, &this->dphidzeta };
+  for (unsigned int d=0; d != my_dim; ++d)
+    {
       auto & comps_d = *comps[d];
+      libmesh_assert_equal_to(comps_d.size(), elem->n_nodes());
+
       for (auto i : index_range(comps_d))
-        FE<3,RATIONAL_BERNSTEIN>::shape_derivs
-          (elem,o,i,d,p,comps_d[i],add_p_level);
+        {
+          auto & comps_di = comps_d[i];
+          auto & derivs_di = derivs[d][i];
+
+          for (auto j : index_range(comps_di))
+            {
+              comps_di[j] = (shape_sums[j] * derivs_di[j] -
+                shapes[i][j] * shape_deriv_sums[d][j]) /
+                shape_sums[j] / shape_sums[j];
+
+#ifdef DEBUG
+              Real old_deriv = FE<3,RATIONAL_BERNSTEIN>::shape_deriv (elem, o, i, d, p[j], add_p_level);
+              libmesh_assert(std::abs(comps_di[j] - old_deriv) < TOLERANCE*TOLERANCE);
+#endif
+            }
+        }
     }
 }
 
