@@ -953,6 +953,113 @@ Real rational_fe_shape_deriv(const Elem & elem,
 }
 
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+Real rational_fe_shape_second_deriv(const Elem & elem,
+                                    const FEType underlying_fe_type,
+                                    const unsigned int i,
+                                    const unsigned int j,
+                                    const Point & p,
+                                    const bool add_p_level)
+{
+  unsigned int j1, j2;
+  switch (j)
+    {
+    case 0:
+      // j = 0 ==> d^2 phi / dxi^2
+      j1 = j2 = 0;
+      break;
+    case 1:
+      // j = 1 ==> d^2 phi / dxi deta
+      j1 = 0;
+      j2 = 1;
+      break;
+    case 2:
+      // j = 2 ==> d^2 phi / deta^2
+      j1 = j2 = 1;
+      break;
+    case 3:
+      // j = 3 ==> d^2 phi / dxi dzeta
+      j1 = 0;
+      j2 = 2;
+      break;
+    case 4:
+      // j = 4 ==> d^2 phi / deta dzeta
+      j1 = 1;
+      j2 = 2;
+      break;
+    case 5:
+      // j = 5 ==> d^2 phi / dzeta^2
+      j1 = j2 = 2;
+      break;
+    default:
+      libmesh_error();
+    }
+
+  int extra_order = add_p_level * elem.p_level();
+
+  const unsigned int n_sf =
+    FEInterface::n_shape_functions(underlying_fe_type, extra_order,
+                                   &elem);
+
+  const unsigned int n_nodes = elem.n_nodes();
+  libmesh_assert_equal_to (n_sf, n_nodes);
+
+  std::vector<Real> node_weights(n_nodes);
+
+  const unsigned char datum_index = elem.mapping_data();
+  for (unsigned int n=0; n<n_nodes; n++)
+    node_weights[n] =
+      elem.node_ref(n).get_extra_datum<Real>(datum_index);
+
+  Real weighted_shape_i = 0, weighted_sum = 0,
+       weighted_grada_i = 0, weighted_grada_sum = 0,
+       weighted_gradb_i = 0, weighted_gradb_sum = 0,
+       weighted_hess_i = 0, weighted_hess_sum = 0;
+
+  for (unsigned int sf=0; sf<n_sf; sf++)
+    {
+      Real weighted_shape = node_weights[sf] *
+        FEInterface::shape(underlying_fe_type, extra_order, &elem, sf,
+                           p);
+      Real weighted_grada = node_weights[sf] *
+        FEInterface::shape_deriv(underlying_fe_type, extra_order,
+                                 &elem, sf, j1, p);
+      Real weighted_hess = node_weights[sf] *
+        FEInterface::shape_second_deriv(underlying_fe_type,
+                                        extra_order, &elem, sf, j, p);
+      weighted_sum += weighted_shape;
+      weighted_grada_sum += weighted_grada;
+      Real weighted_gradb = weighted_grada;
+      if (j1 != j2)
+        {
+          weighted_gradb = (j1 == j2) ? weighted_grada :
+            node_weights[sf] *
+            FEInterface::shape_deriv(underlying_fe_type, extra_order,
+                                     &elem, sf, j2, p);
+          weighted_grada_sum += weighted_grada;
+        }
+      weighted_hess_sum += weighted_hess;
+      if (sf == i)
+        {
+          weighted_shape_i = weighted_shape;
+          weighted_grada_i = weighted_grada;
+          weighted_gradb_i = weighted_gradb;
+          weighted_hess_i = weighted_hess;
+        }
+    }
+
+  if (j1 == j2)
+    weighted_gradb_sum = weighted_grada_sum;
+
+  return (weighted_sum * weighted_hess_i - weighted_grada_i * weighted_gradb_sum -
+          weighted_shape_i * weighted_hess_sum - weighted_gradb_i * weighted_grada_sum +
+          2 * weighted_grada_sum * weighted_shape_i * weighted_gradb_sum / weighted_sum) /
+         weighted_sum / weighted_sum;
+}
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
 
 template
 Real fe_fdm_deriv<Real>(const Elem *, const Order, const unsigned int,

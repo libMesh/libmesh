@@ -131,62 +131,17 @@ template <>
 Real FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem * elem,
                                                   const Order order,
                                                   const unsigned int i,
-                                                  const unsigned int libmesh_dbg_var(j),
+                                                  const unsigned int j,
                                                   const Point & p,
                                                   const bool add_p_level)
 {
-  // Don't need to switch on j.  1D shape functions
-  // depend on xi only!
-  libmesh_assert_equal_to (j, 0);
-
   libmesh_assert(elem);
 
-  int extra_order = add_p_level * elem->p_level();
-
   // FEType object to be passed to various FEInterface functions below.
-  FEType fe_type(order, _underlying_fe_family);
+  FEType underlying_fe_type(order, _underlying_fe_family);
 
-  const unsigned int n_sf =
-    FEInterface::n_shape_functions(fe_type, extra_order, elem);
-
-  const unsigned int n_nodes = elem->n_nodes();
-  libmesh_assert_equal_to (n_sf, n_nodes);
-
-  std::vector<Real> node_weights(n_nodes);
-
-  const unsigned char datum_index = elem->mapping_data();
-  for (unsigned int n=0; n<n_nodes; n++)
-    node_weights[n] =
-      elem->node_ref(n).get_extra_datum<Real>(datum_index);
-
-  Real weighted_shape_i = 0, weighted_sum = 0,
-       weighted_grad_i = 0, weighted_grad_sum = 0,
-       weighted_hess_i = 0, weighted_hess_sum = 0;
-
-  for (unsigned int sf=0; sf<n_sf; sf++)
-    {
-      Real weighted_shape = node_weights[sf] *
-        FEInterface::shape(fe_type, extra_order, elem, sf, p);
-      Real weighted_grad = node_weights[sf] *
-        FEInterface::shape_deriv(fe_type, extra_order, elem, sf, 0, p);
-      Real weighted_hess = node_weights[sf] *
-        FEInterface::shape_second_deriv(fe_type, extra_order, elem, sf, 0, p);
-      weighted_sum += weighted_shape;
-      weighted_grad_sum += weighted_grad;
-      weighted_hess_sum += weighted_hess;
-      if (sf == i)
-        {
-          weighted_shape_i = weighted_shape;
-          weighted_grad_i = weighted_grad;
-          weighted_hess_i = weighted_hess;
-        }
-    }
-
-  return (weighted_sum * weighted_sum *
-          (weighted_sum * weighted_hess_i - weighted_shape_i * weighted_hess_sum) -
-          (weighted_sum * weighted_grad_i - weighted_shape_i * weighted_grad_sum) *
-          2 * weighted_sum * weighted_grad_sum) /
-         (weighted_sum * weighted_sum * weighted_sum * weighted_sum);
+  return rational_fe_shape_second_deriv(*elem, underlying_fe_type, i,
+                                        j, p, add_p_level);
 }
 
 
