@@ -45,10 +45,12 @@ Real FE<2,RATIONAL_BERNSTEIN>::shape(const Elem * elem,
                                      const Point & p,
                                      const bool add_p_level)
 {
+  libmesh_assert(elem);
+
   // FEType object for the non-rational basis underlying this one
   FEType fe_type(order, _underlying_fe_family);
 
-  return rational_fe_shape(elem, fe_type, i, p, add_p_level);
+  return rational_fe_shape(*elem, fe_type, i, p, add_p_level);
 }
 
 

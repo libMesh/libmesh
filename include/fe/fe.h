@@ -1328,7 +1328,7 @@ void rational_fe_weighted_shapes(const Elem * elem,
                                  const std::vector<Point> & p,
                                  const bool add_p_level);
 
-Real rational_fe_shape(const Elem * elem,
+Real rational_fe_shape(const Elem & elem,
                        const FEType underlying_fe_type,
                        const unsigned int i,
                        const Point & p,
