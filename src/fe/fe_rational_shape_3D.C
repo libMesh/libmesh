@@ -30,40 +30,6 @@ using namespace libMesh;
 
 static const FEFamily _underlying_fe_family = BERNSTEIN;
 
-// shapes[i][q] is shape function phi_i at point p[q]
-void weighted_shapes(const Elem * elem,
-                     FEType fe_type,
-                     std::vector<std::vector<Real>> & shapes,
-                     const std::vector<Point> & p,
-                     const bool add_p_level)
-{
-  const int extra_order = add_p_level * elem->p_level();
-
-  const unsigned int n_sf =
-    FEInterface::n_shape_functions(fe_type, extra_order, elem);
-
-  libmesh_assert_equal_to (n_sf, elem->n_nodes());
-
-  std::vector<Real> node_weights(n_sf);
-
-  const unsigned char datum_index = elem->mapping_data();
-  for (unsigned int n=0; n<n_sf; n++)
-    node_weights[n] =
-      elem->node_ref(n).get_extra_datum<Real>(datum_index);
-
-  const std::size_t n_p = p.size();
-
-  shapes.resize(n_sf);
-  for (unsigned int i=0; i != n_sf; ++i)
-    {
-      auto & shapes_i = shapes[i];
-      shapes_i.resize(n_p, 0);
-      FEInterface::shapes(3, fe_type, elem, i, p, shapes_i, add_p_level);
-      for (auto & s : shapes_i)
-        s *= node_weights[i];
-    }
-}
-
 
 // shapes[i][q] is shape function phi_i at point p[q]
 // derivs[j][i][q] is dphi_i/dxi_j at p[q]
@@ -431,7 +397,8 @@ void FE<3,RATIONAL_BERNSTEIN>::all_shapes
 
   FEType underlying_fe_type(o, _underlying_fe_family);
 
-  weighted_shapes(elem, underlying_fe_type, shapes, p, add_p_level);
+  rational_fe_weighted_shapes(elem, underlying_fe_type, shapes, p,
+                              add_p_level);
 
   std::vector<Real> shape_sums(p.size(), 0);
 

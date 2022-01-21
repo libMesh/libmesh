@@ -1318,6 +1318,16 @@ fe_fdm_second_deriv(const Elem * elem,
                        const unsigned int, const unsigned int,
                        const Point &, const bool));
 
+/**
+ * Helper functions for rational basis functions.
+ */
+// shapes[i][j] is shape function phi_i at point p[j]
+void rational_fe_weighted_shapes(const Elem * elem,
+                                 FEType underlying_fe_type,
+                                 std::vector<std::vector<Real>> & shapes,
+                                 const std::vector<Point> & p,
+                                 const bool add_p_level);
+
 } // namespace libMesh
 
 #define LIBMESH_DEFAULT_VECTORIZED_FE(MyDim, MyType) \
