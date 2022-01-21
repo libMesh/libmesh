@@ -835,7 +835,7 @@ fe_fdm_second_deriv(const Elem * elem,
 
 
 void rational_fe_weighted_shapes(const Elem * elem,
-                                 FEType underlying_fe_type,
+                                 const FEType underlying_fe_type,
                                  std::vector<std::vector<Real>> & shapes,
                                  const std::vector<Point> & p,
                                  const bool add_p_level)
@@ -869,6 +869,42 @@ void rational_fe_weighted_shapes(const Elem * elem,
       for (auto & s : shapes_i)
         s *= node_weights[i];
     }
+}
+
+
+Real rational_fe_shape(const Elem * elem,
+                       const FEType underlying_fe_type,
+                       const unsigned int i,
+                       const Point & p,
+                       const bool add_p_level)
+{
+  libmesh_assert(elem);
+
+  int extra_order = add_p_level * elem->p_level();
+
+  const unsigned int n_sf =
+    FEInterface::n_shape_functions(underlying_fe_type, extra_order, elem);
+
+  libmesh_assert_equal_to (n_sf, elem->n_nodes());
+
+  std::vector<Real> node_weights(n_sf);
+
+  const unsigned char datum_index = elem->mapping_data();
+
+  Real weighted_shape_i = 0, weighted_sum = 0;
+
+  for (unsigned int sf=0; sf<n_sf; sf++)
+    {
+      Real node_weight =
+        elem->node_ref(sf).get_extra_datum<Real>(datum_index);
+      Real weighted_shape = node_weight *
+        FEInterface::shape(underlying_fe_type, extra_order, elem, sf, p);
+      weighted_sum += weighted_shape;
+      if (sf == i)
+        weighted_shape_i = weighted_shape;
+    }
+
+  return weighted_shape_i / weighted_sum;
 }
 
 

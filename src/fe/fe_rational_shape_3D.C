@@ -100,38 +100,10 @@ Real FE<3,RATIONAL_BERNSTEIN>::shape(const Elem * elem,
                                      const Point & p,
                                      const bool add_p_level)
 {
-  libmesh_assert(elem);
-
-  int extra_order = add_p_level * elem->p_level();
-
-  // FEType object to be passed to various FEInterface functions below.
+  // FEType object for the non-rational basis underlying this one
   FEType fe_type(order, _underlying_fe_family);
 
-  const unsigned int n_sf =
-    FEInterface::n_shape_functions(fe_type, extra_order, elem);
-
-  const unsigned int n_nodes = elem->n_nodes();
-  libmesh_assert_equal_to (n_sf, n_nodes);
-
-  std::vector<Real> node_weights(n_nodes);
-
-  const unsigned char datum_index = elem->mapping_data();
-  for (unsigned int n=0; n<n_nodes; n++)
-    node_weights[n] =
-      elem->node_ref(n).get_extra_datum<Real>(datum_index);
-
-  Real weighted_shape_i = 0, weighted_sum = 0;
-
-  for (unsigned int sf=0; sf<n_sf; sf++)
-    {
-      Real weighted_shape = node_weights[sf] *
-        FEInterface::shape(fe_type, extra_order, elem, sf, p);
-      weighted_sum += weighted_shape;
-      if (sf == i)
-        weighted_shape_i = weighted_shape;
-    }
-
-  return weighted_shape_i / weighted_sum;
+  return rational_fe_shape(elem, fe_type, i, p, add_p_level);
 }
 
 

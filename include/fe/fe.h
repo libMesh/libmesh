@@ -1323,10 +1323,16 @@ fe_fdm_second_deriv(const Elem * elem,
  */
 // shapes[i][j] is shape function phi_i at point p[j]
 void rational_fe_weighted_shapes(const Elem * elem,
-                                 FEType underlying_fe_type,
+                                 const FEType underlying_fe_type,
                                  std::vector<std::vector<Real>> & shapes,
                                  const std::vector<Point> & p,
                                  const bool add_p_level);
+
+Real rational_fe_shape(const Elem * elem,
+                       const FEType underlying_fe_type,
+                       const unsigned int i,
+                       const Point & p,
+                       const bool add_p_level);
 
 } // namespace libMesh
 
