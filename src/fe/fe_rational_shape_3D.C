@@ -246,35 +246,9 @@ void FE<3,RATIONAL_BERNSTEIN>::all_shapes
    std::vector<std::vector<OutputShape>> & v,
    const bool add_p_level)
 {
-  std::vector<std::vector<Real>> shapes;
-
   FEType underlying_fe_type(o, _underlying_fe_family);
 
-  rational_fe_weighted_shapes(elem, underlying_fe_type, shapes, p,
-                              add_p_level);
-
-  std::vector<Real> shape_sums(p.size(), 0);
-
-  for (auto i : index_range(v))
-    {
-      libmesh_assert_equal_to ( p.size(), shapes[i].size() );
-      for (auto j : index_range(p))
-        shape_sums[j] += shapes[i][j];
-    }
-
-  for (auto i : index_range(v))
-    {
-      libmesh_assert_equal_to ( p.size(), v[i].size() );
-      for (auto j : index_range(v[i]))
-        {
-          v[i][j] = shapes[i][j] / shape_sums[j];
-
-#ifdef DEBUG
-          Real old_shape = FE<3,RATIONAL_BERNSTEIN>::shape (elem, o, i, p[j], add_p_level);
-          libmesh_assert(std::abs(v[i][j] - old_shape) < TOLERANCE*TOLERANCE);
-#endif
-        }
-    }
+  rational_all_shapes(*elem, underlying_fe_type, p, v, add_p_level);
 }
 
 

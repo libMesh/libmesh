@@ -1347,6 +1347,12 @@ Real rational_fe_shape_second_deriv(const Elem & elem,
                                     const unsigned int j,
                                     const Point & p,
                                     const bool add_p_level);
+
+void rational_all_shapes (const Elem & elem,
+                          const FEType underlying_fe_type,
+                          const std::vector<Point> & p,
+                          std::vector<std::vector<Real>> & v,
+                          const bool add_p_level);
 } // namespace libMesh
 
 #define LIBMESH_DEFAULT_VECTORIZED_FE(MyDim, MyType) \

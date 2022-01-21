@@ -1061,6 +1061,36 @@ Real rational_fe_shape_second_deriv(const Elem & elem,
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
+void rational_all_shapes (const Elem & elem,
+                          const FEType underlying_fe_type,
+                          const std::vector<Point> & p,
+                          std::vector<std::vector<Real>> & v,
+                          const bool add_p_level)
+{
+  std::vector<std::vector<Real>> shapes;
+
+  rational_fe_weighted_shapes(&elem, underlying_fe_type, shapes, p,
+                              add_p_level);
+
+  std::vector<Real> shape_sums(p.size(), 0);
+
+  for (auto i : index_range(v))
+    {
+      libmesh_assert_equal_to ( p.size(), shapes[i].size() );
+      for (auto j : index_range(p))
+        shape_sums[j] += shapes[i][j];
+    }
+
+  for (auto i : index_range(v))
+    {
+      libmesh_assert_equal_to ( p.size(), v[i].size() );
+      for (auto j : index_range(v[i]))
+        v[i][j] = shapes[i][j] / shape_sums[j];
+    }
+}
+
+
+
 template
 Real fe_fdm_deriv<Real>(const Elem *, const Order, const unsigned int,
                         const unsigned int, const Point &, const bool,
