@@ -1328,6 +1328,15 @@ void rational_fe_weighted_shapes(const Elem * elem,
                                  const std::vector<Point> & p,
                                  const bool add_p_level);
 
+// shapes[i][q] is shape function phi_i at point p[q]
+// derivs[j][i][q] is dphi_i/dxi_j at p[q]
+void rational_fe_weighted_shapes_derivs(const Elem * elem,
+                                        const FEType fe_type,
+                                        std::vector<std::vector<Real>> & shapes,
+                                        std::vector<std::vector<std::vector<Real>>> & derivs,
+                                        const std::vector<Point> & p,
+                                        const bool add_p_level);
+
 Real rational_fe_shape(const Elem & elem,
                        const FEType underlying_fe_type,
                        const unsigned int i,
@@ -1353,6 +1362,13 @@ void rational_all_shapes (const Elem & elem,
                           const std::vector<Point> & p,
                           std::vector<std::vector<Real>> & v,
                           const bool add_p_level);
+
+void rational_all_shape_derivs (const Elem & elem,
+                                const FEType underlying_fe_type,
+                                const std::vector<Point> & p,
+                                std::vector<std::vector<Real>> * comps[3],
+                                const bool add_p_level);
+
 } // namespace libMesh
 
 #define LIBMESH_DEFAULT_VECTORIZED_FE(MyDim, MyType) \
