@@ -55,7 +55,9 @@
 #include <sstream>
 #include <limits>
 #include <stdlib.h> // mkstemps on Linux
+#ifdef LIBMESH_HAVE_UNISTD_H
 #include <unistd.h> // mkstemps on MacOS
+#endif
 
 namespace libMesh
 {

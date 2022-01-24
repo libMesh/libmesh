@@ -46,8 +46,10 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
-#include <sys/types.h> // getpid
-#include <unistd.h>
+#ifdef LIBMESH_HAVE_UNISTD_H
+#include <sys/types.h>
+#include <unistd.h>  // for getpid()
+#endif
 
 
 namespace libMesh

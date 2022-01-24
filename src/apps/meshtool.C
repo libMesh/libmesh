@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
-#include <unistd.h>
 #include <vector>
 
 // Local Includes

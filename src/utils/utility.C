@@ -21,10 +21,15 @@
 #include "libmesh/libmesh_logging.h"
 
 // System includes
-#include <sys/time.h>
+#ifdef LIBMESH_HAVE_SYS_STAT_H
 #include <sys/stat.h>
+#endif
+#ifdef LIBMESH_HAVE_SYS_TYPES_H
 #include <sys/types.h>
-#include <unistd.h>
+#endif
+#ifdef LIBMESH_HAVE_UNISTD_H
+#include <unistd.h> // for getuid(), getpid()
+#endif
 #include <sstream>
 
 #ifdef LIBMESH_HAVE_SYS_UTSNAME_H

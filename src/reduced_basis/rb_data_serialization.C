@@ -39,7 +39,9 @@
 // C++ includes
 #include <iostream>
 #include <fstream>
-#include <unistd.h>
+#ifdef LIBMESH_HAVE_UNISTD_H
+#include <unistd.h> // for close()
+#endif
 #include <fcntl.h>
 
 namespace libMesh
