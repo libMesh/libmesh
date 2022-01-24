@@ -391,13 +391,14 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // Make sure the construction worked
   libmesh_assert(remote_elem);
 
+  const bool using_threads = libMesh::n_threads() > 1;
+  const bool handle_mpi_errors = false; // libMesh does this
+
 #if defined(LIBMESH_HAVE_MPI)
 
   // Allow the user to bypass MPI initialization
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
-      const bool using_threads = libMesh::n_threads() > 1;
-      const bool handle_mpi_errors = false; // libMesh does this
       this->_timpi_init =
         new TIMPI::TIMPIInit(argc, argv, using_threads,
                              handle_mpi_errors, COMM_WORLD_IN);
