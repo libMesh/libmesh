@@ -193,6 +193,10 @@ void FEMContext::init_internal_data(const System & sys)
   // Reserve space for the FEAbstract and QBase objects for each
   // element dimension possibility (0,1,2,3)
 
+  // Note: we would simply resize() all four of these vectors, but
+  // some compilers (ICC 19, MSVC) generate a diagnostic about copying
+  // a std::unique_ptr in this case, so the following two lines are a
+  // workaround.
   _element_fe = std::vector<std::map<FEType, std::unique_ptr<FEAbstract>>>(4);
   _side_fe = std::vector<std::map<FEType, std::unique_ptr<FEAbstract>>>(4);
   _element_fe_var.resize(4);
