@@ -7097,6 +7097,10 @@ fi
 
                   ACSM_GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
                   case "$ACSM_GXX_VERSION_STRING" in #(
+  *21.*) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 21 >>>" >&5
+$as_echo "<<< C++ compiler is Intel(R) icc 21 >>>" >&6; }
+                            ACSM_GXX_VERSION=intel_icc_v21.x ;; #(
   *20.*) :
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 20 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 20 >>>" >&6; }
