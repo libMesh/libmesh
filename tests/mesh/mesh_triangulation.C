@@ -68,6 +68,12 @@ public:
 
         LIBMESH_ASSERT_FP_EQUAL(computed_area, area, TOLERANCE*TOLERANCE);
       }
+
+#ifdef LIBMESH_HAVE_TRIANGLE
+    // Make sure we're compatible with the old naming structure too
+    TriangleInterface::PolygonHole square(center, radius, 4);
+    LIBMESH_ASSERT_FP_EQUAL(square.area(), 2*radius*radius, TOLERANCE*TOLERANCE);
+#endif
   }
 
   void testTriangle()
