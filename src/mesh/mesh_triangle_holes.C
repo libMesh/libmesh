@@ -25,6 +25,38 @@ namespace libMesh
 {
 
 //
+// Hole member functions
+//
+Real TriangulatorInterface::Hole::area() const
+{
+  const unsigned int np = this->n_points();
+
+  if (np < 3)
+    return 0;
+
+  const Point p0 = this->point(0);
+
+  // Every segment (p_{i-1},p_i) from i=2 on defines a triangle w.r.t.
+  // p_0.  Add up the cross products of those triangles.  We'll save
+  // the division by 2 and the norm for the end.
+  //
+  // Your hole points had best be coplanar, but this should work
+  // regardless of which plane they're in.
+
+  Point areavec = 0;
+
+  for (unsigned int i=2; i != np; ++i)
+    {
+      const Point e_0im = this->point(i-1) - p0,
+                  e_0i  = this->point(i) - p0;
+
+      areavec += e_0im.cross(e_0i);
+    }
+
+  return areavec.norm() / 2;
+}
+
+//
 // PolygonHole member functions
 //
 TriangulatorInterface::PolygonHole::PolygonHole(const Point & center,

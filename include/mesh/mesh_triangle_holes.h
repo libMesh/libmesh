@@ -72,6 +72,11 @@ public:
   virtual Point inside() const = 0;
 
   /**
+   * Return the area of the hole
+   */
+  Real area() const;
+
+  /**
    * Starting indices of points for a hole with multiple disconnected boundaries.
    */
   virtual std::vector<unsigned int> segment_indices() const
