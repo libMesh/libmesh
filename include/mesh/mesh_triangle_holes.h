@@ -45,7 +45,7 @@ namespace libMesh
  * \date 2011
  * \brief Class for parameterizing 2D holes to be meshed with Triangle.
  */
-class TriangleInterface::Hole
+class TriangulatorInterface::Hole
 {
 public:
   /**
@@ -94,7 +94,7 @@ public:
  * A concrete instantiation of the Hole class that describes polygonal
  * (triangular, square, pentagonal, ...) holes.
  */
-class TriangleInterface::PolygonHole : public TriangleInterface::Hole
+class TriangulatorInterface::PolygonHole : public TriangulatorInterface::Hole
 {
 public:
   /**
@@ -139,7 +139,7 @@ private:
  * of Points which defines the hole (in order of connectivity) and
  * an arbitrary Point which lies inside the hole.
  */
-class TriangleInterface::ArbitraryHole : public TriangleInterface::Hole
+class TriangulatorInterface::ArbitraryHole : public TriangulatorInterface::Hole
 {
 public:
   /**
@@ -183,7 +183,7 @@ private:
 /**
  * A class for defining a 2-dimensional region for Triangle.
  */
-class TriangleInterface::Region
+class TriangulatorInterface::Region
 {
 public:
   /**

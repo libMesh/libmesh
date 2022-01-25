@@ -47,14 +47,7 @@ namespace libMesh
 // Forward Declarations
 class UnstructuredMesh;
 
-/**
- * A C++ interface between LibMesh and the Triangle library written by
- * J.R. Shewchuk.
- *
- * \author John W. Peterson
- * \date 2011
- */
-class TriangleInterface
+class TriangulatorInterface
 {
 public:
   /**
@@ -64,12 +57,12 @@ public:
    * and the convex hull will be meshed.
    */
   explicit
-  TriangleInterface(UnstructuredMesh & mesh);
+  TriangulatorInterface(UnstructuredMesh & mesh);
 
   /**
    * Empty destructor.
    */
-  ~TriangleInterface() = default;
+  ~TriangulatorInterface() = default;
 
   /**
    * The TriangulationType is used with the general triangulate function
@@ -78,26 +71,26 @@ public:
   enum TriangulationType
     {
       /**
-       * Uses the triangle library to first generate a convex hull from the set
-       * of points passed in, and then triangulate this set of points.  This
-       * is probably the most common type of usage.
+       * First generate a convex hull from the set of points passed
+       * in, and then triangulate this set of points.  This is
+       * probably the most common type of usage.
        */
       GENERATE_CONVEX_HULL = 0,
 
       /**
-       * Use the triangle library to triangulate a Planar Straight Line
-       * Graph which is defined implicitly by the order of the "points" vector:
-       * a straight line is assumed to lie between each successive pair of
-       * points, with an additional line joining the final and first points.
-       * In case your triangulation is a little too "structured" looking
-       * (which can happen when the initial PSLG is really simple) you can try to
-       * make the resulting triangulation a little more "unstructured" looking
-       * by setting insert_points to true in the triangulate() function.
+       * Triangulate the interior of a Planar Straight Line Graph,
+       * which is defined implicitly by the order of the "points"
+       * vector: a straight line is assumed to lie between each
+       * successive pair of points, with an additional line joining
+       * the final and first points.
+       *
+       * Explicitly telling the triangulator to add additional points
+       * may be important for this option.
        */
       PSLG = 1,
 
       /**
-       * Does nothing, used as a default value.
+       * Does nothing, used as a "null" value.
        */
       INVALID_TRIANGULATION_TYPE
     };
@@ -120,9 +113,8 @@ public:
 
   /**
    * This is the main public interface for this function.
-   * Internally, it calls Triangle's triangulate routine.
    */
-  void triangulate();
+  virtual void triangulate() = 0;
 
   /**
    * Sets and/or gets the desired element type.
@@ -136,15 +128,10 @@ public:
   Real & desired_area() {return _desired_area;}
 
   /**
-   * Sets and/or gets the minimum angle. Set to zero to disable area
-   * constraint.
+   * Sets and/or gets the minimum desired angle. Set to zero to
+   * disable angle constraint.
    */
   Real & minimum_angle() {return _minimum_angle;}
-
-  /**
-   * Sets and/or gets additional flags to be passed to triangle
-   */
-  std::string & extra_flags() {return _extra_flags;}
 
   /**
    * Sets and/or gets the desired triangulation type.
@@ -163,7 +150,7 @@ public:
   bool & smooth_after_generating() {return _smooth_after_generating;}
 
   /**
-   * Whether or not to make Triangle quiet
+   * Whether not to silence internal messages to stdout
    */
   bool & quiet() {return _quiet;}
 
@@ -174,15 +161,17 @@ public:
   void attach_hole_list(const std::vector<Hole*> * holes) {_holes = holes;}
 
   /**
-   * When constructing a PSLG, it is often not possible to do
-   * so implicitly through the ordering of the points.  You
-   * can use the segments vector to specify the segments explicitly,
-   * Ex: unit square numbered counter-clockwise starting from origin
+   * When constructing a PSLG, if the node numbers do not define the
+   * desired boundary segments implicitly through the ordering of the
+   * points, you can use the segments vector to specify the segments
+   * explicitly, Ex: unit square numbered counter-clockwise starting
+   * from origin
    * segments[0] = (0,1)
    * segments[1] = (1,2)
    * segments[2] = (2,3)
    * segments[3] = (3,0)
-   * For this case you could actually use the implicit ordering!
+   * (For the above case you could actually use the implicit
+   * ordering!)
    */
   std::vector<std::pair<unsigned int, unsigned int>> segments;
 
@@ -199,7 +188,7 @@ public:
    */
   void attach_region_list(const std::vector<Region*> * regions) { _regions = regions; }
 
-private:
+protected:
   /**
    * Reference to the mesh which is to be created by triangle.
    */
@@ -239,11 +228,6 @@ private:
   Real _minimum_angle;
 
   /**
-   * Additional flags to be passed to triangle
-   */
-  std::string _extra_flags;
-
-  /**
    * The type of triangulation to perform: choices are:
    * convex hull
    * PSLG
@@ -267,6 +251,49 @@ private:
    * Flag which tells if we want to suppress Triangle outputs
    */
   bool _quiet;
+};
+
+
+
+/**
+ * A C++ interface between LibMesh and the Triangle library written by
+ * J.R. Shewchuk.
+ *
+ * \author John W. Peterson
+ * \date 2011
+ */
+class TriangleInterface : public TriangulatorInterface
+{
+public:
+  /**
+   * The constructor.  A reference to the mesh containing the points
+   * which are to be triangulated must be provided.  Unless otherwise
+   * specified, a convex hull will be computed for the set of input points
+   * and the convex hull will be meshed.
+   */
+  explicit
+  TriangleInterface(UnstructuredMesh & mesh);
+
+  /**
+   * Empty destructor.
+   */
+  ~TriangleInterface() = default;
+
+  /**
+   * Internally, this calls Triangle's triangulate routine.
+   */
+  virtual void triangulate() override;
+
+  /**
+   * Sets and/or gets additional flags to be passed to triangle
+   */
+  std::string & extra_flags() {return _extra_flags;}
+
+private:
+  /**
+   * Additional flags to be passed to triangle
+   */
+  std::string _extra_flags;
 
   /**
    * Triangle only operates on serial meshes.
