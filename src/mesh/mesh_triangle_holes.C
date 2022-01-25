@@ -18,8 +18,6 @@
 
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_TRIANGLE
-
 // Local includes
 #include "libmesh/mesh_triangle_holes.h"
 
@@ -104,6 +102,3 @@ std::vector<unsigned int> TriangulatorInterface::ArbitraryHole::segment_indices(
 }
 
 } // namespace libMesh
-
-
-#endif // LIBMESH_HAVE_TRIANGLE

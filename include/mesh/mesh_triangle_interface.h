@@ -22,8 +22,6 @@
 
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_TRIANGLE
-
 // Local Includes
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh_serializer.h"
@@ -255,6 +253,8 @@ protected:
 
 
 
+#ifdef LIBMESH_HAVE_TRIANGLE
+
 /**
  * A C++ interface between LibMesh and the Triangle library written by
  * J.R. Shewchuk.
@@ -301,10 +301,8 @@ private:
   MeshSerializer _serializer;
 };
 
-} // namespace libMesh
-
-
-
 #endif // LIBMESH_HAVE_TRIANGLE
+
+} // namespace libMesh
 
 #endif // ifndef LIBMESH_MESH_TRIANGLE_INTERFACE_H

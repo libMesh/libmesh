@@ -20,11 +20,9 @@
 
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_TRIANGLE
-
 // Local includes
-#include "libmesh/mesh_triangle_interface.h"
 #include "libmesh/point.h"
+#include "libmesh/triangulator_interface.h"
 
 // C++ includes
 
@@ -222,7 +220,5 @@ private:
 };
 
 } // namespace libMesh
-
-#endif // LIBMESH_HAVE_TRIANGLE
 
 #endif // LIBMESH_MESH_TRIANGLE_HOLES_H
