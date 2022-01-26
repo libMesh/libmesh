@@ -1558,7 +1558,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
       std::vector<std::vector<Number>> new_bf_obs_vals;
       if (has_obs_vals)
         new_bf_obs_vals = _parametrized_functions_for_training_obs_values[training_index];
-      
+
       enrich_eim_approximation_on_interiors(_local_parametrized_functions_for_training[training_index],
                                             new_bf_obs_vals);
     }
