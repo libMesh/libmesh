@@ -598,9 +598,9 @@ protected:
 
   /**
    * Fills \p dphidxi (and in higher dimensions, eta/zeta) derivative
-   * values for all shape functions, evaluated at points qp in p.  You
-   * must specify element order directly.  \p Internal arrays should
-   * already be the appropriate size.
+   * values for all shape functions, evaluated at all points in p.
+   * You must specify element order directly.  \p Internal arrays
+   * should already be the appropriate size.
    *
    * On a p-refined element, \p o should be the base order of the
    * element if \p add_p_level is left \p true, or can be the base
