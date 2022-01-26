@@ -164,13 +164,16 @@ void RBEIMConstruction::set_best_fit_type_flag (const std::string & best_fit_typ
     {
       best_fit_type_flag = PROJECTION_BEST_FIT;
     }
+  else if (best_fit_type_string == "eim")
+    {
+      best_fit_type_flag = EIM_BEST_FIT;
+    }
+  else if (best_fit_type_string == "pod")
+    {
+      best_fit_type_flag = POD_BEST_FIT;
+    }
   else
-    if (best_fit_type_string == "eim")
-      {
-        best_fit_type_flag = EIM_BEST_FIT;
-      }
-    else
-      libmesh_error_msg("Error: invalid best_fit_type in input file");
+    libmesh_error_msg("Error: invalid best_fit_type in input file");
 }
 
 void RBEIMConstruction::print_info()
@@ -369,7 +372,20 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
 
 Real RBEIMConstruction::train_eim_approximation()
 {
-  LOG_SCOPE("train_eim_approximation()", "RBConstruction");
+  if(best_fit_type_flag == POD_BEST_FIT)
+    {
+      train_eim_approximation_with_POD();
+      return 0.;
+    }
+  else
+    {
+      return train_eim_approximation_with_greedy();
+    }
+}
+
+Real RBEIMConstruction::train_eim_approximation_with_greedy()
+{
+  LOG_SCOPE("train_eim_approximation_with_greedy()", "RBEIMConstruction");
 
   _eim_projection_matrix.resize(get_Nmax(),get_Nmax());
 
@@ -480,12 +496,12 @@ Real RBEIMConstruction::train_eim_approximation()
   return greedy_error;
 }
 
-void RBEIMConstruction::train_eim_approximation_with_POD()
+Real RBEIMConstruction::train_eim_approximation_with_POD()
 {
-  LOG_SCOPE("train_eim_approximation_with_POD()", "RBConstruction");
+  LOG_SCOPE("train_eim_approximation_with_POD()", "RBEIMConstruction");
 
   // _eim_projection_matrix is not used in the POD case, but we resize it here in any case
-  // to be consistent with what we do in train_eim_approximation().
+  // to be consistent with what we do in train_eim_approximation_with_greedy().
   _eim_projection_matrix.resize(get_Nmax(),get_Nmax());
 
   RBEIMEvaluation & rbe = get_rb_eim_evaluation();
@@ -536,6 +552,7 @@ void RBEIMConstruction::train_eim_approximation_with_POD()
 
   // Add dominant vectors from the POD as basis functions.
   unsigned int j = 0;
+  Real rel_err = 0.;
   while (true)
     {
       if (j >= get_Nmax() || j >= n_snapshots)
@@ -547,7 +564,7 @@ void RBEIMConstruction::train_eim_approximation_with_POD()
       // The "energy" error in the POD approximation is determined by the first omitted
       // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
       // "energy", in order to obtain a relative error.
-      const Real rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
+      rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
 
       libMesh::out << "Number of basis functions: " << j
                    << ", POD error norm: " << rel_err << std::endl;
@@ -595,6 +612,8 @@ void RBEIMConstruction::train_eim_approximation_with_POD()
       j++;
     }
   libMesh::out << std::endl;
+
+  return rel_err;
 }
 
 void RBEIMConstruction::initialize_eim_assembly_objects()

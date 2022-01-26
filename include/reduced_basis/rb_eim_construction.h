@@ -54,7 +54,7 @@ class RBEIMConstruction : public RBConstructionBase<System>
 {
 public:
 
-  enum BEST_FIT_TYPE { PROJECTION_BEST_FIT, EIM_BEST_FIT };
+  enum BEST_FIT_TYPE { PROJECTION_BEST_FIT, EIM_BEST_FIT, POD_BEST_FIT };
 
   /**
    * Constructor.  Optionally initializes required
@@ -147,15 +147,21 @@ public:
 
   /**
    * Generate the EIM approximation for the specified parametrized function
-   * using the Greedy Algorithm. Return the final tolerance.
+   * using either POD or the Greedy Algorithm. Return the final tolerance.
    */
   Real train_eim_approximation();
 
   /**
    * Generate the EIM approximation for the specified parametrized function
+   * using the Greedy Algorithm. Return the final tolerance.
+   */
+  Real train_eim_approximation_with_greedy();
+
+  /**
+   * Generate the EIM approximation for the specified parametrized function
    * using Proper Orthogonal Decomposition (POD). Return the final tolerance.
    */
-  void train_eim_approximation_with_POD();
+  Real train_eim_approximation_with_POD();
 
   /**
    * Build a vector of ElemAssembly objects that accesses the basis
