@@ -173,7 +173,7 @@ public:
 
   /**
    * Fills \p v[i][qp] with the values of the \f$ i^{th} \f$
-   * shape functions, evaluated at points qp in p.  You must specify
+   * shape functions, evaluated at all points in p.  You must specify
    * element order directly.  \p v should already be the appropriate
    * size.
    *
