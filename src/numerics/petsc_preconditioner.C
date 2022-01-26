@@ -303,7 +303,7 @@ void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(const PCType type,
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class PetscPreconditioner<Number>;
+template class LIBMESH_EXPORT PetscPreconditioner<Number>;
 
 } // namespace libMesh
 

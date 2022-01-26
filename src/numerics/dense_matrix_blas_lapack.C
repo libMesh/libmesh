@@ -1113,51 +1113,51 @@ void DenseMatrix<T>::_matvec_blas(T,
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template void DenseMatrix<Real>::_multiply_blas(const DenseMatrixBase<Real> &, _BLAS_Multiply_Flag);
-template void DenseMatrix<Real>::_lu_decompose_lapack();
-template void DenseMatrix<Real>::_lu_back_substitute_lapack(const DenseVector<Real> &,
+template LIBMESH_EXPORT void DenseMatrix<Real>::_multiply_blas(const DenseMatrixBase<Real> &, _BLAS_Multiply_Flag);
+template LIBMESH_EXPORT void DenseMatrix<Real>::_lu_decompose_lapack();
+template LIBMESH_EXPORT void DenseMatrix<Real>::_lu_back_substitute_lapack(const DenseVector<Real> &,
                                                             DenseVector<Real> &);
-template void DenseMatrix<Real>::_matvec_blas(Real,
+template LIBMESH_EXPORT void DenseMatrix<Real>::_matvec_blas(Real,
                                               Real,
                                               DenseVector<Real> &,
                                               const DenseVector<Real> &,
                                               bool) const;
-template void DenseMatrix<Real>::_svd_lapack(DenseVector<Real> &);
-template void DenseMatrix<Real>::_svd_lapack(DenseVector<Real> &,
+template LIBMESH_EXPORT void DenseMatrix<Real>::_svd_lapack(DenseVector<Real> &);
+template LIBMESH_EXPORT void DenseMatrix<Real>::_svd_lapack(DenseVector<Real> &,
                                              DenseMatrix<Number> &,
                                              DenseMatrix<Number> &);
-template void DenseMatrix<Real>::_svd_helper (char,
+template LIBMESH_EXPORT void DenseMatrix<Real>::_svd_helper (char,
                                               char,
                                               std::vector<Real> &,
                                               std::vector<Number> &,
                                               std::vector<Number> &);
-template void DenseMatrix<Real>::_svd_solve_lapack (const DenseVector<Real> &, DenseVector<Real> &, Real) const;
-template void DenseMatrix<Real>::_evd_lapack(DenseVector<Real> &,
+template LIBMESH_EXPORT void DenseMatrix<Real>::_svd_solve_lapack (const DenseVector<Real> &, DenseVector<Real> &, Real) const;
+template LIBMESH_EXPORT void DenseMatrix<Real>::_evd_lapack(DenseVector<Real> &,
                                              DenseVector<Real> &,
                                              DenseMatrix<Real> *,
                                              DenseMatrix<Real> *);
 
 #if !(LIBMESH_USE_REAL_NUMBERS)
-template void DenseMatrix<Number>::_multiply_blas(const DenseMatrixBase<Number> &, _BLAS_Multiply_Flag);
-template void DenseMatrix<Number>::_lu_decompose_lapack();
-template void DenseMatrix<Number>::_lu_back_substitute_lapack(const DenseVector<Number> &,
+template LIBMESH_EXPORT void DenseMatrix<Number>::_multiply_blas(const DenseMatrixBase<Number> &, _BLAS_Multiply_Flag);
+template LIBMESH_EXPORT void DenseMatrix<Number>::_lu_decompose_lapack();
+template LIBMESH_EXPORT void DenseMatrix<Number>::_lu_back_substitute_lapack(const DenseVector<Number> &,
                                                               DenseVector<Number> &);
-template void DenseMatrix<Number>::_matvec_blas(Number,
+template LIBMESH_EXPORT void DenseMatrix<Number>::_matvec_blas(Number,
                                                 Number,
                                                 DenseVector<Number> &,
                                                 const DenseVector<Number> &,
                                                 bool) const;
-template void DenseMatrix<Number>::_svd_lapack(DenseVector<Real> &);
-template void DenseMatrix<Number>::_svd_lapack(DenseVector<Real> &,
+template LIBMESH_EXPORT void DenseMatrix<Number>::_svd_lapack(DenseVector<Real> &);
+template LIBMESH_EXPORT void DenseMatrix<Number>::_svd_lapack(DenseVector<Real> &,
                                                DenseMatrix<Number> &,
                                                DenseMatrix<Number> &);
-template void DenseMatrix<Number>::_svd_helper (char,
+template LIBMESH_EXPORT void DenseMatrix<Number>::_svd_helper (char,
                                                 char,
                                                 std::vector<Real> &,
                                                 std::vector<Number> &,
                                                 std::vector<Number> &);
-template void DenseMatrix<Number>::_svd_solve_lapack (const DenseVector<Number> &, DenseVector<Number> &, Real) const;
-template void DenseMatrix<Number>::_evd_lapack(DenseVector<Number> &,
+template LIBMESH_EXPORT void DenseMatrix<Number>::_svd_solve_lapack (const DenseVector<Number> &, DenseVector<Number> &, Real) const;
+template LIBMESH_EXPORT void DenseMatrix<Number>::_evd_lapack(DenseVector<Number> &,
                                                DenseVector<Number> &,
                                                DenseMatrix<Number> *,
                                                DenseMatrix<Number> *);

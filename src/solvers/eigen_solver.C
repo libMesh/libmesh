@@ -101,7 +101,7 @@ void EigenSolver<T>::set_position_of_spectrum (Real pos, PositionOfSpectrum targ
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class EigenSolver<Number>;
+template class LIBMESH_EXPORT EigenSolver<Number>;
 
 } // namespace libMesh
 

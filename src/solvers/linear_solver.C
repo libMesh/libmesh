@@ -181,7 +181,7 @@ void LinearSolver<T>::set_solver_configuration(SolverConfiguration & solver_conf
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class LinearSolver<Number>;
+template class LIBMESH_EXPORT LinearSolver<Number>;
 
 
 

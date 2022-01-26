@@ -200,7 +200,7 @@ void LocationMap<Elem>::fill(MeshBase & mesh)
 
 
 
-template class LocationMap<Elem>;
-template class LocationMap<Node>;
+template class LIBMESH_EXPORT LocationMap<Elem>;
+template class LIBMESH_EXPORT LocationMap<Node>;
 
 } // namespace libMesh

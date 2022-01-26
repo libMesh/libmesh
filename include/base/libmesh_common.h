@@ -708,4 +708,11 @@ namespace libMesh {
 #endif
 
 
+#ifdef _MSC_VER
+#define LIBMESH_EXPORT __declspec(dllexport)
+#else
+#define LIBMESH_EXPORT
+#endif
+
+
 #endif // LIBMESH_LIBMESH_COMMON_H

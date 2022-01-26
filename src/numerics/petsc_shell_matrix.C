@@ -119,7 +119,7 @@ Mat PetscShellMatrix<T>::mat()
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class PetscShellMatrix<Number>;
+template class LIBMESH_EXPORT PetscShellMatrix<Number>;
 
 } // namespace libMesh
 

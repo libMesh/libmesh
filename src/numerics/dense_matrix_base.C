@@ -23,10 +23,10 @@ namespace libMesh
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template class DenseMatrixBase<Real>;
+template class LIBMESH_EXPORT DenseMatrixBase<Real>;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template class DenseMatrixBase<Complex>;
+template class LIBMESH_EXPORT DenseMatrixBase<Complex>;
 #endif
 
 } // namespace libMesh

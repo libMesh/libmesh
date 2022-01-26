@@ -3044,7 +3044,7 @@ std::string DofMap::get_info() const
 }
 
 
-template bool DofMap::is_evaluable<Elem>(const Elem &, unsigned int) const;
-template bool DofMap::is_evaluable<Node>(const Node &, unsigned int) const;
+template LIBMESH_EXPORT bool DofMap::is_evaluable<Elem>(const Elem &, unsigned int) const;
+template LIBMESH_EXPORT bool DofMap::is_evaluable<Node>(const Node &, unsigned int) const;
 
 } // namespace libMesh

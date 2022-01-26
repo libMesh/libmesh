@@ -993,29 +993,29 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &,
 
 
 //------------------------------------------------------------------
-template void MeshCommunication::find_global_indices<MeshBase::const_node_iterator> (const Parallel::Communicator &,
+template LIBMESH_EXPORT void MeshCommunication::find_global_indices<MeshBase::const_node_iterator> (const Parallel::Communicator &,
                                                                                      const libMesh::BoundingBox &,
                                                                                      const MeshBase::const_node_iterator &,
                                                                                      const MeshBase::const_node_iterator &,
                                                                                      std::vector<dof_id_type> &) const;
 
-template void MeshCommunication::find_global_indices<MeshBase::const_element_iterator> (const Parallel::Communicator &,
+template LIBMESH_EXPORT void MeshCommunication::find_global_indices<MeshBase::const_element_iterator> (const Parallel::Communicator &,
                                                                                         const libMesh::BoundingBox &,
                                                                                         const MeshBase::const_element_iterator &,
                                                                                         const MeshBase::const_element_iterator &,
                                                                                         std::vector<dof_id_type> &) const;
-template void MeshCommunication::find_global_indices<MeshBase::node_iterator> (const Parallel::Communicator &,
+template LIBMESH_EXPORT void MeshCommunication::find_global_indices<MeshBase::node_iterator> (const Parallel::Communicator &,
                                                                                const libMesh::BoundingBox &,
                                                                                const MeshBase::node_iterator &,
                                                                                const MeshBase::node_iterator &,
                                                                                std::vector<dof_id_type> &) const;
 
-template void MeshCommunication::find_global_indices<MeshBase::element_iterator> (const Parallel::Communicator &,
+template LIBMESH_EXPORT void MeshCommunication::find_global_indices<MeshBase::element_iterator> (const Parallel::Communicator &,
                                                                                   const libMesh::BoundingBox &,
                                                                                   const MeshBase::element_iterator &,
                                                                                   const MeshBase::element_iterator &,
                                                                                   std::vector<dof_id_type> &) const;
-template void MeshCommunication::find_local_indices<MeshBase::const_element_iterator> (const libMesh::BoundingBox &,
+template LIBMESH_EXPORT void MeshCommunication::find_local_indices<MeshBase::const_element_iterator> (const libMesh::BoundingBox &,
                                                                                        const MeshBase::const_element_iterator &,
                                                                                        const MeshBase::const_element_iterator &,
                                                                                        std::unordered_map<dof_id_type, dof_id_type> &) const;

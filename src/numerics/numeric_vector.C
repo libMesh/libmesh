@@ -392,6 +392,6 @@ void NumericVector<T>::add_vector (const NumericVector<T> & v,
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class NumericVector<Number>;
+template class LIBMESH_EXPORT NumericVector<Number>;
 
 } // namespace libMesh

@@ -253,7 +253,7 @@ void HCurlFETransformation<OutputShape>::map_curl(const unsigned int dim,
     } // switch(dim)
 }
 
-template class HCurlFETransformation<RealGradient>;
+template class LIBMESH_EXPORT HCurlFETransformation<RealGradient>;
 
 template<>
 void HCurlFETransformation<Real>::init_map_phi(const FEGenericBase<Real> & ) const

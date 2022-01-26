@@ -79,6 +79,6 @@ Preconditioner<T>::build_preconditioner(const libMesh::Parallel::Communicator & 
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class Preconditioner<Number>;
+template class LIBMESH_EXPORT Preconditioner<Number>;
 
 } // namespace libMesh

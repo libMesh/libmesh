@@ -141,10 +141,10 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
 
 
 // Explicitly instantiate for int, double
-template class Parallel::BinSorter<int, unsigned int>;
-template class Parallel::BinSorter<double, unsigned int>;
+template class LIBMESH_EXPORT Parallel::BinSorter<int, unsigned int>;
+template class LIBMESH_EXPORT Parallel::BinSorter<double, unsigned int>;
 #ifdef LIBMESH_HAVE_LIBHILBERT
-template class Parallel::BinSorter<Parallel::DofObjectKey, unsigned int>;
+template class LIBMESH_EXPORT Parallel::BinSorter<Parallel::DofObjectKey, unsigned int>;
 #endif
 
 } // namespace libMesh

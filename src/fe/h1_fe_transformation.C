@@ -708,7 +708,7 @@ void H1FETransformation<RealGradient>::map_div(const unsigned int dim,
 }
 
 // Explicit Instantiations
-template class H1FETransformation<Real>;
-template class H1FETransformation<RealGradient>;
+template class LIBMESH_EXPORT H1FETransformation<Real>;
+template class LIBMESH_EXPORT H1FETransformation<RealGradient>;
 
 } //namespace libMesh

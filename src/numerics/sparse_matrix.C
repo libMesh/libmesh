@@ -346,6 +346,6 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class SparseMatrix<Number>;
+template class LIBMESH_EXPORT SparseMatrix<Number>;
 
 } // namespace libMesh

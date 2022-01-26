@@ -107,10 +107,10 @@ void Histogram<KeyType,IdxType>::build_histogram ()
 
 
 // Explicitly instantiate for int, double
-template class Parallel::Histogram<int,    unsigned int>;
-template class Parallel::Histogram<double, unsigned int>;
+template class LIBMESH_EXPORT Parallel::Histogram<int,    unsigned int>;
+template class LIBMESH_EXPORT Parallel::Histogram<double, unsigned int>;
 #ifdef LIBMESH_HAVE_LIBHILBERT
-template class Parallel::Histogram<Parallel::DofObjectKey, unsigned int>;
+template class LIBMESH_EXPORT Parallel::Histogram<Parallel::DofObjectKey, unsigned int>;
 #endif
 
 } // namespace libMesh

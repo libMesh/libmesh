@@ -1100,28 +1100,28 @@ void FEMap::compute_edge_map(int dim,
 
 // Explicit FEMap Instantiations
 FACE_EDGE_SHAPE_ERROR(0,init_face_shape_functions)
-template void FEMap::init_face_shape_functions<1>(const std::vector<Point> &, const Elem *);
-template void FEMap::init_face_shape_functions<2>(const std::vector<Point> &, const Elem *);
-template void FEMap::init_face_shape_functions<3>(const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_face_shape_functions<1>(const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_face_shape_functions<2>(const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_face_shape_functions<3>(const std::vector<Point> &, const Elem *);
 
 FACE_EDGE_SHAPE_ERROR(0,init_edge_shape_functions)
-template void FEMap::init_edge_shape_functions<1>(const std::vector<Point> &, const Elem *);
-template void FEMap::init_edge_shape_functions<2>(const std::vector<Point> &, const Elem *);
-template void FEMap::init_edge_shape_functions<3>(const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_edge_shape_functions<1>(const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_edge_shape_functions<2>(const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_edge_shape_functions<3>(const std::vector<Point> &, const Elem *);
 
 //--------------------------------------------------------------
 // Explicit FE instantiations
 #define REINIT_AND_SIDE_MAPS(_type) \
-template void FE<1,_type>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const); \
-template void FE<1,_type>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &); \
-template void FE<2,_type>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const); \
-template void FE<2,_type>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &); \
-template void FE<2,_type>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &); \
-template void FE<2,_type>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const); \
-template void FE<3,_type>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const); \
-template void FE<3,_type>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &); \
-template void FE<3,_type>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &); \
-template void FE<3,_type>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const)
+template LIBMESH_EXPORT void FE<1,_type>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const); \
+template LIBMESH_EXPORT void FE<1,_type>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &); \
+template LIBMESH_EXPORT void FE<2,_type>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const); \
+template LIBMESH_EXPORT void FE<2,_type>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &); \
+template LIBMESH_EXPORT void FE<2,_type>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &); \
+template LIBMESH_EXPORT void FE<2,_type>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const); \
+template LIBMESH_EXPORT void FE<3,_type>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const); \
+template LIBMESH_EXPORT void FE<3,_type>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &); \
+template LIBMESH_EXPORT void FE<3,_type>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &); \
+template LIBMESH_EXPORT void FE<3,_type>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const)
 
 REINIT_AND_SIDE_MAPS(LAGRANGE);
 REINIT_AND_SIDE_MAPS(LAGRANGE_VEC);
@@ -1142,20 +1142,20 @@ REINIT_AND_SIDE_MAPS(SZABAB);
 REINIT_AND_SIDE_MAPS(RATIONAL_BERNSTEIN);
 #endif
 
-template void FE<2,SUBDIVISION>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,SUBDIVISION>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,NEDELEC_ONE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<2,NEDELEC_ONE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,NEDELEC_ONE>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<2,NEDELEC_ONE>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template LIBMESH_EXPORT void FE<2,SUBDIVISION>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template LIBMESH_EXPORT void FE<2,SUBDIVISION>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template LIBMESH_EXPORT void FE<2,NEDELEC_ONE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template LIBMESH_EXPORT void FE<2,NEDELEC_ONE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template LIBMESH_EXPORT void FE<2,NEDELEC_ONE>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template LIBMESH_EXPORT void FE<2,NEDELEC_ONE>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 
-template void FE<3,NEDELEC_ONE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
-template void FE<3,NEDELEC_ONE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,NEDELEC_ONE>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
-template void FE<3,NEDELEC_ONE>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template LIBMESH_EXPORT void FE<3,NEDELEC_ONE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template LIBMESH_EXPORT void FE<3,NEDELEC_ONE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template LIBMESH_EXPORT void FE<3,NEDELEC_ONE>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template LIBMESH_EXPORT void FE<3,NEDELEC_ONE>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 
 // Intel 9.1 complained it needed this in devel mode.
-//template void FE<2,XYZ>::init_face_shape_functions(const std::vector<Point> &, const Elem *);
-//template void FE<3,XYZ>::init_face_shape_functions(const std::vector<Point> &, const Elem *);
+//template LIBMESH_EXPORT void FE<2,XYZ>::init_face_shape_functions(const std::vector<Point> &, const Elem *);
+//template LIBMESH_EXPORT void FE<3,XYZ>::init_face_shape_functions(const std::vector<Point> &, const Elem *);
 
 } // namespace libMesh

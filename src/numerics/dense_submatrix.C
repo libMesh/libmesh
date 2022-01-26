@@ -65,10 +65,10 @@ void DenseSubMatrix<T>::right_multiply (const DenseMatrixBase<T> & M3)
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template class DenseSubMatrix<Real>;
+template class LIBMESH_EXPORT DenseSubMatrix<Real>;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template class DenseSubMatrix<Complex>;
+template class LIBMESH_EXPORT DenseSubMatrix<Complex>;
 #endif
 
 } // namespace libMesh

@@ -1486,7 +1486,7 @@ void PetscMatrix<T>::swap(PetscMatrix<T> & m_in)
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class PetscMatrix<Number>;
+template class LIBMESH_EXPORT PetscMatrix<Number>;
 
 } // namespace libMesh
 

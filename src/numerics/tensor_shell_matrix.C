@@ -52,6 +52,6 @@ void TensorShellMatrix<T>::get_diagonal (NumericVector<T> & dest) const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class TensorShellMatrix<Number>;
+template class LIBMESH_EXPORT TensorShellMatrix<Number>;
 
 } // namespace libMesh

@@ -653,7 +653,7 @@ int TaoOptimizationSolver<T>::get_converged_reason()
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class TaoOptimizationSolver<Number>;
+template class LIBMESH_EXPORT TaoOptimizationSolver<Number>;
 
 } // namespace libMesh
 

@@ -732,10 +732,10 @@ void RBConstructionBase<Base>::set_training_random_seed(unsigned int seed)
 
 // EigenSystem is only defined if we have SLEPc
 #if defined(LIBMESH_HAVE_SLEPC)
-template class RBConstructionBase<CondensedEigenSystem>;
+template class LIBMESH_EXPORT RBConstructionBase<CondensedEigenSystem>;
 #endif
 
-template class RBConstructionBase<LinearImplicitSystem>;
-template class RBConstructionBase<System>;
+template class LIBMESH_EXPORT RBConstructionBase<LinearImplicitSystem>;
+template class LIBMESH_EXPORT RBConstructionBase<System>;
 
 } // namespace libMesh

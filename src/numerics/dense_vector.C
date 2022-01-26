@@ -26,10 +26,10 @@ namespace libMesh
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template class DenseVector<Real>;
+template class LIBMESH_EXPORT DenseVector<Real>;
 
 //#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template class DenseVector<Complex>;
+template class LIBMESH_EXPORT DenseVector<Complex>;
 //#endif
 
 } // namespace libMesh

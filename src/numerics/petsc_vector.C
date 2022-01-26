@@ -1283,7 +1283,7 @@ void PetscVector<T>::_restore_array() const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class PetscVector<Number>;
+template class LIBMESH_EXPORT PetscVector<Number>;
 
 } // namespace libMesh
 

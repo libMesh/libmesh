@@ -469,7 +469,7 @@ Real EigenSparseVector<T>::min () const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class EigenSparseVector<Number>;
+template class LIBMESH_EXPORT EigenSparseVector<Number>;
 
 } // namespace libMesh
 

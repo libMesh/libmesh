@@ -337,7 +337,7 @@ LinearConvergenceReason EigenSparseLinearSolver<T>::get_converged_reason() const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class EigenSparseLinearSolver<Number>;
+template class LIBMESH_EXPORT EigenSparseLinearSolver<Number>;
 
 } // namespace libMesh
 

@@ -188,10 +188,10 @@ bool TypeTensor<Complex>::operator > (const TypeTensor<Complex> & rhs) const
 
 // ------------------------------------------------------------
 // Explicit instantiations
-template class TypeTensor<Real>;
+template class LIBMESH_EXPORT TypeTensor<Real>;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template class TypeTensor<Complex>;
+template class LIBMESH_EXPORT TypeTensor<Complex>;
 #endif
 
 } // namespace libMesh

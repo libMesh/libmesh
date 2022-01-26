@@ -49,7 +49,7 @@ void EigenPreconditioner<T>::init ()
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class EigenPreconditioner<Number>;
+template class LIBMESH_EXPORT EigenPreconditioner<Number>;
 
 } // namespace libMesh
 

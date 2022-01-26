@@ -136,10 +136,10 @@ void convert_from_receive (SendT & received,
 namespace libMesh {
 typedef DynamicSparseNumberArray<Real, dof_id_type> DSNAN;
 
-template void
+template LIBMESH_EXPORT void
 DenseMatrix<Real>::cholesky_solve(const DenseVector<DSNAN> &,
                                   DenseVector<DSNAN> &);
-template void
+template LIBMESH_EXPORT void
 DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<DSNAN> &,
                                              DenseVector<DSNAN> &) const;
 }

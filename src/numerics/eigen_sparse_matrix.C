@@ -363,7 +363,7 @@ Real EigenSparseMatrix<T>::linfty_norm () const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class EigenSparseMatrix<Number>;
+template class LIBMESH_EXPORT EigenSparseMatrix<Number>;
 
 } // namespace libMesh
 

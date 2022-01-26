@@ -110,6 +110,6 @@ LumpedMassMatrix<T>::operator=(NumericVector<T> && vec)
   return *this;
 }
 
-template class LumpedMassMatrix<Number>;
+template class LIBMESH_EXPORT LumpedMassMatrix<Number>;
 
 } // namespace libMesh

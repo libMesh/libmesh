@@ -513,7 +513,7 @@ void LaspackMatrix<T>::close()
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class LaspackMatrix<Number>;
+template class LIBMESH_EXPORT LaspackMatrix<Number>;
 
 } // namespace libMesh
 

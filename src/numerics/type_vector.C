@@ -214,10 +214,10 @@ bool TypeVector<Complex>::operator >= (const TypeVector<Complex> & rhs) const
 
 // ------------------------------------------------------------
 // Explicit instantiations
-template class TypeVector<Real>;
+template class LIBMESH_EXPORT TypeVector<Real>;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template class TypeVector<Complex>;
+template class LIBMESH_EXPORT TypeVector<Complex>;
 #endif
 
 } // namespace libMesh

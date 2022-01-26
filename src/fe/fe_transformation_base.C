@@ -67,7 +67,7 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
     }
 }
 
-template class FETransformationBase<Real>;
-template class FETransformationBase<RealGradient>;
+template class LIBMESH_EXPORT FETransformationBase<Real>;
+template class LIBMESH_EXPORT FETransformationBase<RealGradient>;
 
 } // namespace libMesh

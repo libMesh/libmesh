@@ -815,7 +815,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 }
 
 // Explicit instantiations of templated member functions
-template void ExactSolution::_compute_error<Real>(const std::string &, const std::string &, std::vector<Real> &);
-template void ExactSolution::_compute_error<RealGradient>(const std::string &, const std::string &, std::vector<Real> &);
+template LIBMESH_EXPORT void ExactSolution::_compute_error<Real>(const std::string &, const std::string &, std::vector<Real> &);
+template LIBMESH_EXPORT void ExactSolution::_compute_error<RealGradient>(const std::string &, const std::string &, std::vector<Real> &);
 
 } // namespace libMesh
