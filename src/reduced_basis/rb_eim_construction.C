@@ -54,6 +54,54 @@
 namespace libMesh
 {
 
+namespace
+{
+// We make an anonymous namespace for local helper functions. The helper functions below
+// are used to do some basic operators for QpDataMap and SideQpDataMap.
+
+// Recall that we have:
+// typedef std::map<dof_id_type, std::vector<std::vector<Number>>> QpDataMap;
+// typedef std::map<std::pair<dof_id_type,unsigned int>, std::vector<std::vector<Number>>> SideQpDataMap;
+
+// Implement u <- u + k*v
+template <typename DataMap>
+void add(DataMap & u, const Number k, const DataMap & v)
+{
+  for (auto & [key,val] : u)
+    {
+      std::vector<std::vector<Number>> & vec_vec_u = val;
+      const std::vector<std::vector<Number>> & vec_vec_v = libmesh_map_find(v, key);
+
+      libmesh_error_msg_if (vec_vec_u.size() != vec_vec_v.size(), "Size mismatch");
+
+      for (auto i : index_range(vec_vec_u))
+        {
+          libmesh_error_msg_if (vec_vec_u[i].size() != vec_vec_v[i].size(), "Size mismatch");
+          for (auto j : index_range(vec_vec_u[i]))
+            {
+              vec_vec_u[i][j] += k*vec_vec_v[i][j];
+            }
+        }
+    }
+}
+
+// Implement u <- k*u
+template <typename DataMap>
+void scale(DataMap & u, const Number k)
+{
+  for (auto & it : u)
+    {
+      std::vector<std::vector<Number>> & outer_vec = it.second;
+      for (auto & inner_vec : outer_vec)
+        for (auto & value : inner_vec)
+          {
+            value *= k;
+          }
+    }
+}
+
+}
+
 RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
                                       const std::string & name_in,
                                       const unsigned int number_in)
@@ -430,6 +478,123 @@ Real RBEIMConstruction::train_eim_approximation()
     }
 
   return greedy_error;
+}
+
+void RBEIMConstruction::train_eim_approximation_with_POD()
+{
+  LOG_SCOPE("train_eim_approximation_with_POD()", "RBConstruction");
+
+  // _eim_projection_matrix is not used in the POD case, but we resize it here in any case
+  // to be consistent with what we do in train_eim_approximation().
+  _eim_projection_matrix.resize(get_Nmax(),get_Nmax());
+
+  RBEIMEvaluation & rbe = get_rb_eim_evaluation();
+  rbe.initialize_parameters(*this);
+  rbe.resize_data_structures(get_Nmax());
+
+  libmesh_error_msg_if(rbe.get_n_basis_functions() > 0,
+                       "Error: We currently only support EIM training starting from an empty basis");
+
+  libMesh::out << std::endl << "---- Performing POD EIM basis enrichment ----" << std::endl;
+
+  // Set up the POD "correlation matrix"
+  unsigned int n_snapshots = get_n_training_samples();
+  DenseMatrix<Number> correlation_matrix(n_snapshots,n_snapshots);
+
+  for (unsigned int i=0; i<n_snapshots; i++)
+    for (unsigned int j=0; j<=i; j++)
+      {
+        Number inner_prod = 0.;
+        if (rbe.get_parametrized_function().on_mesh_sides())
+          {
+            inner_prod = side_inner_product(
+              _local_side_parametrized_functions_for_training[i],
+              _local_side_parametrized_functions_for_training[j]);
+          }
+        else
+          {
+            inner_prod = inner_product(
+              _local_parametrized_functions_for_training[i],
+              _local_parametrized_functions_for_training[j]);
+          }
+
+
+        correlation_matrix(i,j) = inner_prod;
+        if(i != j)
+          {
+            correlation_matrix(j,i) = libmesh_conj(inner_prod);
+          }
+      }
+
+  // compute SVD of correlation matrix
+  DenseVector<Real> sigma( n_snapshots );
+  DenseMatrix<Number> U( n_snapshots, n_snapshots );
+  DenseMatrix<Number> VT( n_snapshots, n_snapshots );
+  correlation_matrix.svd(sigma, U, VT );
+
+  libmesh_error_msg_if(sigma(0) == 0., "Zero singular value encountered in POD construction");
+
+  // Add dominant vectors from the POD as basis functions.
+  unsigned int j = 0;
+  while (true)
+    {
+      if (j >= get_Nmax() || j >= n_snapshots)
+        {
+          libMesh::out << "Maximum number of basis functions (" << j << ") reached." << std::endl;
+          break;
+        }
+
+      // The "energy" error in the POD approximation is determined by the first omitted
+      // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
+      // "energy", in order to obtain a relative error.
+      const Real rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
+
+      libMesh::out << "Number of basis functions: " << j
+                   << ", POD error norm: " << rel_err << std::endl;
+
+      if (rel_err < get_rel_training_tolerance())
+        {
+          libMesh::out << "Training tolerance reached." << std::endl;
+          break;
+        }
+
+      if (rbe.get_parametrized_function().on_mesh_sides())
+        {
+          // Make a "zero clone" by copying to get the same data layout, and then scaling by zero
+          SideQpDataMap v = _local_side_parametrized_functions_for_training[j];
+          scale(v, 0.);
+
+          for ( unsigned int i=0; i<n_snapshots; ++i )
+            add(v, U.el(i, j), _local_side_parametrized_functions_for_training[i] );
+
+          Real norm_v = std::sqrt(sigma(j));
+          scale(v, 1./norm_v);
+
+          enrich_eim_approximation_on_sides(v);
+          update_eim_matrices();
+        }
+      else
+        {
+          // Make a "zero clone" by copying to get the same data layout, and then scaling by zero
+          QpDataMap v = _local_parametrized_functions_for_training[j];
+          scale(v, 0.);
+
+          for ( unsigned int i=0; i<n_snapshots; ++i )
+            add(v, U.el(i, j), _local_parametrized_functions_for_training[i] );
+
+          Real norm_v = std::sqrt(sigma(j));
+          scale(v, 1./norm_v);
+
+          // We leave v_obs_vals empty for now, but we can support this later
+          // by accumulating v_obs_vals in the same way that we accumulate v.
+          std::vector<std::vector<Number>> v_obs_vals;
+          enrich_eim_approximation_on_interiors(v, v_obs_vals);
+          update_eim_matrices();
+        }
+
+      j++;
+    }
+  libMesh::out << std::endl;
 }
 
 void RBEIMConstruction::initialize_eim_assembly_objects()
@@ -1385,346 +1550,368 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
   set_params_from_training_set(training_index);
 
   if (eim_eval.get_parametrized_function().on_mesh_sides())
-    {
-      // Make a copy of the parametrized function for training index, since we
-      // will modify this below to give us a new basis function.
-      auto local_pf = _local_side_parametrized_functions_for_training[training_index];
-
-      // If we have at least one basis function, then we need to use
-      // rb_eim_solve() to find the EIM interpolation error. Otherwise,
-      // just use solution as is.
-      if (eim_eval.get_n_basis_functions() > 0)
-        {
-          // Get the right-hand side vector for the EIM approximation
-          // by sampling the parametrized function (stored in solution)
-          // at the interpolation points.
-          unsigned int RB_size = eim_eval.get_n_basis_functions();
-          DenseVector<Number> EIM_rhs(RB_size);
-          for (unsigned int i=0; i<RB_size; i++)
-            {
-              EIM_rhs(i) =
-                RBEIMEvaluation::get_parametrized_function_side_value(comm(),
-                                                                      local_pf,
-                                                                      eim_eval.get_interpolation_points_elem_id(i),
-                                                                      eim_eval.get_interpolation_points_side_index(i),
-                                                                      eim_eval.get_interpolation_points_comp(i),
-                                                                      eim_eval.get_interpolation_points_qp(i));
-            }
-
-          eim_eval.set_parameters( get_parameters() );
-          DenseVector<Number> rb_eim_solution = eim_eval.rb_eim_solve(EIM_rhs);
-
-          // Load the "EIM residual" into solution by subtracting
-          // the EIM approximation
-          eim_eval.side_decrement_vector(local_pf, rb_eim_solution);
-        }
-
-      // Find the quadrature point at which local_pf (which now stores
-      // the "EIM residual") has maximum absolute value
-      Number optimal_value = 0.;
-      Point optimal_point;
-      unsigned int optimal_comp = 0;
-      dof_id_type optimal_elem_id = DofObject::invalid_id;
-      unsigned int optimal_side_index = 0;
-      subdomain_id_type optimal_subdomain_id = 0;
-      boundary_id_type optimal_boundary_id = 0;
-      unsigned int optimal_qp = 0;
-      std::vector<Point> optimal_point_perturbs;
-      std::vector<Real> optimal_point_phi_i_qp;
-
-      // Initialize largest_abs_value to be negative so that it definitely gets updated.
-      Real largest_abs_value = -1.;
-
-      // In order to compute phi_i_qp, we initialize a FEMContext
-      FEMContext con(*this);
-      init_context(con);
-
-      for (const auto & pr : local_pf)
-        {
-          auto elem_and_side = pr.first;
-          dof_id_type elem_id = elem_and_side.first;
-          unsigned int side_index = elem_and_side.second;
-          const auto & comp_and_qp = pr.second;
-
-          const Elem & elem_ref = get_mesh().elem_ref(elem_id);
-          con.pre_fe_reinit(*this, &elem_ref);
-
-          unsigned int side_type = libmesh_map_find(_local_side_quad_point_side_types, elem_and_side);
-
-          std::vector<std::vector<Real>> phi;
-          // side_type == 0 --> standard side
-          // side_type == 1 --> shellface
-          if (side_type == 0)
-            {
-              // TODO: We only want the "dofs on side" entries
-              // from phi_side. Could do this by initing an FE object
-              // on the side itself, rather than using get_side_fe().
-              auto side_fe = con.get_side_fe(/*var=*/ 0);
-              side_fe->reinit(&elem_ref, side_index);
-
-              phi = side_fe->get_phi();
-            }
-          else if (side_type == 1)
-            {
-              con.elem_fe_reinit();
-
-              auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
-              phi = elem_fe->get_phi();
-            }
-          else
-            libmesh_error_msg ("Unrecognized side_type: " << side_type);
-
-          for (const auto & comp : index_range(comp_and_qp))
-            {
-              const std::vector<Number> & qp_values = comp_and_qp[comp];
-
-              for (auto qp : index_range(qp_values))
-                {
-                  Number value = qp_values[qp];
-                  Real abs_value = std::abs(value);
-
-                  if (abs_value > largest_abs_value)
-                    {
-                      largest_abs_value = abs_value;
-                      optimal_value = value;
-                      optimal_comp = comp;
-                      optimal_elem_id = elem_id;
-                      optimal_side_index = side_index;
-                      optimal_qp = qp;
-
-                      optimal_point_phi_i_qp.resize(phi.size());
-                      for(auto i : index_range(phi))
-                        optimal_point_phi_i_qp[i] = phi[i][qp];
-
-                      const auto & point_list =
-                        libmesh_map_find(_local_side_quad_point_locations, elem_and_side);
-
-                      libmesh_error_msg_if(qp >= point_list.size(), "Error: Invalid qp");
-
-                      optimal_point = point_list[qp];
-
-                      optimal_subdomain_id = libmesh_map_find(_local_side_quad_point_subdomain_ids, elem_and_side);
-                      optimal_boundary_id = libmesh_map_find(_local_side_quad_point_boundary_ids, elem_and_side);
-
-                      if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
-                        {
-                          const auto & perturb_list =
-                            libmesh_map_find(_local_side_quad_point_locations_perturbations, elem_and_side);
-
-                          libmesh_error_msg_if(qp >= perturb_list.size(), "Error: Invalid qp");
-
-                          optimal_point_perturbs = perturb_list[qp];
-                        }
-                    }
-                }
-            }
-        }
-
-      // Find out which processor has the largest of the abs values
-      // and broadcast from that processor.
-      unsigned int proc_ID_index;
-      this->comm().maxloc(largest_abs_value, proc_ID_index);
-
-      this->comm().broadcast(optimal_value, proc_ID_index);
-      this->comm().broadcast(optimal_point, proc_ID_index);
-      this->comm().broadcast(optimal_comp, proc_ID_index);
-      this->comm().broadcast(optimal_elem_id, proc_ID_index);
-      this->comm().broadcast(optimal_subdomain_id, proc_ID_index);
-      this->comm().broadcast(optimal_boundary_id, proc_ID_index);
-      this->comm().broadcast(optimal_qp, proc_ID_index);
-      this->comm().broadcast(optimal_point_perturbs, proc_ID_index);
-      this->comm().broadcast(optimal_point_phi_i_qp, proc_ID_index);
-
-      libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
-
-      libmesh_error_msg_if(optimal_value == 0., "New EIM basis function should not be zero");
-
-      // Scale local_pf so that its largest value is 1.0
-      scale_parametrized_function(local_pf, 1./optimal_value);
-
-      // Add local_pf as the new basis function and store data
-      // associated with the interpolation point.
-      eim_eval.add_side_basis_function_and_interpolation_data(local_pf,
-                                                              optimal_point,
-                                                              optimal_comp,
-                                                              optimal_elem_id,
-                                                              optimal_side_index,
-                                                              optimal_subdomain_id,
-                                                              optimal_boundary_id,
-                                                              optimal_qp,
-                                                              optimal_point_perturbs,
-                                                              optimal_point_phi_i_qp);
-    }
+    enrich_eim_approximation_on_sides(_local_side_parametrized_functions_for_training[training_index]);
   else
     {
-      // Make a copy of the parametrized function for training index, since we
-      // will modify this below to give us a new basis function.
-      auto local_pf = _local_parametrized_functions_for_training[training_index];
-
       bool has_obs_vals = (eim_eval.get_n_observation_points() > 0);
 
       std::vector<std::vector<Number>> new_bf_obs_vals;
       if (has_obs_vals)
         new_bf_obs_vals = _parametrized_functions_for_training_obs_values[training_index];
+      
+      enrich_eim_approximation_on_interiors(_local_parametrized_functions_for_training[training_index],
+                                            new_bf_obs_vals);
+    }
+}
 
-      // If we have at least one basis function, then we need to use
-      // rb_eim_solve() to find the EIM interpolation error. Otherwise,
-      // just use solution as is.
-      if (eim_eval.get_n_basis_functions() > 0)
+void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & side_pf)
+{
+  // Make a copy of the input parametrized function, since we will modify this below
+  // to give us a new basis function.
+  SideQpDataMap local_pf = side_pf;
+
+  RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
+
+  // If we have at least one basis function, then we need to use
+  // rb_eim_solve() to find the EIM interpolation error. Otherwise,
+  // just use solution as is.
+  if (eim_eval.get_n_basis_functions() > 0)
+    {
+      // Get the right-hand side vector for the EIM approximation
+      // by sampling the parametrized function (stored in solution)
+      // at the interpolation points.
+      unsigned int RB_size = eim_eval.get_n_basis_functions();
+      DenseVector<Number> EIM_rhs(RB_size);
+      for (unsigned int i=0; i<RB_size; i++)
         {
-          // Get the right-hand side vector for the EIM approximation
-          // by sampling the parametrized function (stored in solution)
-          // at the interpolation points.
-          unsigned int RB_size = eim_eval.get_n_basis_functions();
-          DenseVector<Number> EIM_rhs(RB_size);
-          for (unsigned int i=0; i<RB_size; i++)
-            {
-              EIM_rhs(i) =
-                RBEIMEvaluation::get_parametrized_function_value(comm(),
-                                                                local_pf,
-                                                                eim_eval.get_interpolation_points_elem_id(i),
-                                                                eim_eval.get_interpolation_points_comp(i),
-                                                                eim_eval.get_interpolation_points_qp(i));
-            }
-
-          eim_eval.set_parameters( get_parameters() );
-          DenseVector<Number> rb_eim_solution = eim_eval.rb_eim_solve(EIM_rhs);
-
-          // Load the "EIM residual" into solution by subtracting
-          // the EIM approximation
-          eim_eval.decrement_vector(local_pf, rb_eim_solution);
-
-          if(has_obs_vals)
-            {
-              for (unsigned int i=0; i<RB_size; i++)
-                for (unsigned int j=0; j<eim_eval.get_n_observation_points(); j++)
-                  for (unsigned int k=0; k<new_bf_obs_vals[j].size(); k++)
-                    new_bf_obs_vals[j][k] -= rb_eim_solution(i) * eim_eval.get_observation_values(i,j)[k];
-            }
+          EIM_rhs(i) =
+            RBEIMEvaluation::get_parametrized_function_side_value(comm(),
+                                                                  local_pf,
+                                                                  eim_eval.get_interpolation_points_elem_id(i),
+                                                                  eim_eval.get_interpolation_points_side_index(i),
+                                                                  eim_eval.get_interpolation_points_comp(i),
+                                                                  eim_eval.get_interpolation_points_qp(i));
         }
 
-      // Find the quadrature point at which local_pf (which now stores
-      // the "EIM residual") has maximum absolute value
-      Number optimal_value = 0.;
-      Point optimal_point;
-      unsigned int optimal_comp = 0;
-      dof_id_type optimal_elem_id = DofObject::invalid_id;
-      subdomain_id_type optimal_subdomain_id = 0;
-      unsigned int optimal_qp = 0;
-      std::vector<Point> optimal_point_perturbs;
-      std::vector<Real> optimal_point_phi_i_qp;
+      eim_eval.set_parameters( get_parameters() );
+      DenseVector<Number> rb_eim_solution = eim_eval.rb_eim_solve(EIM_rhs);
 
-      // Initialize largest_abs_value to be negative so that it definitely gets updated.
-      Real largest_abs_value = -1.;
+      // Load the "EIM residual" into solution by subtracting
+      // the EIM approximation
+      eim_eval.side_decrement_vector(local_pf, rb_eim_solution);
+    }
 
-      // In order to compute phi_i_qp, we initialize a FEMContext
-      FEMContext con(*this);
-      for (auto dim : con.elem_dimensions())
+  // Find the quadrature point at which local_pf (which now stores
+  // the "EIM residual") has maximum absolute value
+  Number optimal_value = 0.;
+  Point optimal_point;
+  unsigned int optimal_comp = 0;
+  dof_id_type optimal_elem_id = DofObject::invalid_id;
+  unsigned int optimal_side_index = 0;
+  subdomain_id_type optimal_subdomain_id = 0;
+  boundary_id_type optimal_boundary_id = 0;
+  unsigned int optimal_qp = 0;
+  std::vector<Point> optimal_point_perturbs;
+  std::vector<Real> optimal_point_phi_i_qp;
+
+  // Initialize largest_abs_value to be negative so that it definitely gets updated.
+  Real largest_abs_value = -1.;
+
+  // In order to compute phi_i_qp, we initialize a FEMContext
+  FEMContext con(*this);
+  init_context(con);
+
+  for (const auto & pr : local_pf)
+    {
+      auto elem_and_side = pr.first;
+      dof_id_type elem_id = elem_and_side.first;
+      unsigned int side_index = elem_and_side.second;
+      const auto & comp_and_qp = pr.second;
+
+      const Elem & elem_ref = get_mesh().elem_ref(elem_id);
+      con.pre_fe_reinit(*this, &elem_ref);
+
+      unsigned int side_type = libmesh_map_find(_local_side_quad_point_side_types, elem_and_side);
+
+      std::vector<std::vector<Real>> phi;
+      // side_type == 0 --> standard side
+      // side_type == 1 --> shellface
+      if (side_type == 0)
         {
-          auto fe = con.get_element_fe(/*var=*/0, dim);
-          fe->get_phi();
+          // TODO: We only want the "dofs on side" entries
+          // from phi_side. Could do this by initing an FE object
+          // on the side itself, rather than using get_side_fe().
+          auto side_fe = con.get_side_fe(/*var=*/ 0);
+          side_fe->reinit(&elem_ref, side_index);
+
+          phi = side_fe->get_phi();
         }
-
-      for (const auto & pr : local_pf)
+      else if (side_type == 1)
         {
-          dof_id_type elem_id = pr.first;
-          const auto & comp_and_qp = pr.second;
-
-          // Also initialize phi in order to compute phi_i_qp
-          const Elem & elem_ref = get_mesh().elem_ref(elem_id);
-          con.pre_fe_reinit(*this, &elem_ref);
+          con.elem_fe_reinit();
 
           auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
-          const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+          phi = elem_fe->get_phi();
+        }
+      else
+        libmesh_error_msg ("Unrecognized side_type: " << side_type);
 
-          elem_fe->reinit(&elem_ref);
+      for (const auto & comp : index_range(comp_and_qp))
+        {
+          const std::vector<Number> & qp_values = comp_and_qp[comp];
 
-          for (const auto & comp : index_range(comp_and_qp))
+          for (auto qp : index_range(qp_values))
             {
-              const std::vector<Number> & qp_values = comp_and_qp[comp];
+              Number value = qp_values[qp];
+              Real abs_value = std::abs(value);
 
-              for (auto qp : index_range(qp_values))
+              if (abs_value > largest_abs_value)
                 {
-                  Number value = qp_values[qp];
-                  Real abs_value = std::abs(value);
+                  largest_abs_value = abs_value;
+                  optimal_value = value;
+                  optimal_comp = comp;
+                  optimal_elem_id = elem_id;
+                  optimal_side_index = side_index;
+                  optimal_qp = qp;
 
-                  if (abs_value > largest_abs_value)
+                  optimal_point_phi_i_qp.resize(phi.size());
+                  for(auto i : index_range(phi))
+                    optimal_point_phi_i_qp[i] = phi[i][qp];
+
+                  const auto & point_list =
+                    libmesh_map_find(_local_side_quad_point_locations, elem_and_side);
+
+                  libmesh_error_msg_if(qp >= point_list.size(), "Error: Invalid qp");
+
+                  optimal_point = point_list[qp];
+
+                  optimal_subdomain_id = libmesh_map_find(_local_side_quad_point_subdomain_ids, elem_and_side);
+                  optimal_boundary_id = libmesh_map_find(_local_side_quad_point_boundary_ids, elem_and_side);
+
+                  if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
                     {
-                      largest_abs_value = abs_value;
-                      optimal_value = value;
-                      optimal_comp = comp;
-                      optimal_elem_id = elem_id;
-                      optimal_qp = qp;
+                      const auto & perturb_list =
+                        libmesh_map_find(_local_side_quad_point_locations_perturbations, elem_and_side);
 
-                      optimal_point_phi_i_qp.resize(phi.size());
-                      for(auto i : index_range(phi))
-                        optimal_point_phi_i_qp[i] = phi[i][qp];
+                      libmesh_error_msg_if(qp >= perturb_list.size(), "Error: Invalid qp");
 
-                      const auto & point_list =
-                        libmesh_map_find(_local_quad_point_locations, elem_id);
-
-                      libmesh_error_msg_if(qp >= point_list.size(), "Error: Invalid qp");
-
-                      optimal_point = point_list[qp];
-
-                      optimal_subdomain_id = libmesh_map_find(_local_quad_point_subdomain_ids, elem_id);
-
-                      if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
-                        {
-                          const auto & perturb_list =
-                            libmesh_map_find(_local_quad_point_locations_perturbations, elem_id);
-
-                          libmesh_error_msg_if(qp >= perturb_list.size(), "Error: Invalid qp");
-
-                          optimal_point_perturbs = perturb_list[qp];
-                        }
+                      optimal_point_perturbs = perturb_list[qp];
                     }
                 }
             }
         }
+    }
 
-      // Find out which processor has the largest of the abs values
-      // and broadcast from that processor.
-      unsigned int proc_ID_index;
-      this->comm().maxloc(largest_abs_value, proc_ID_index);
+  // Find out which processor has the largest of the abs values
+  // and broadcast from that processor.
+  unsigned int proc_ID_index;
+  this->comm().maxloc(largest_abs_value, proc_ID_index);
 
-      this->comm().broadcast(optimal_value, proc_ID_index);
-      this->comm().broadcast(optimal_point, proc_ID_index);
-      this->comm().broadcast(optimal_comp, proc_ID_index);
-      this->comm().broadcast(optimal_elem_id, proc_ID_index);
-      this->comm().broadcast(optimal_subdomain_id, proc_ID_index);
-      this->comm().broadcast(optimal_qp, proc_ID_index);
-      this->comm().broadcast(optimal_point_perturbs, proc_ID_index);
-      this->comm().broadcast(optimal_point_phi_i_qp, proc_ID_index);
+  this->comm().broadcast(optimal_value, proc_ID_index);
+  this->comm().broadcast(optimal_point, proc_ID_index);
+  this->comm().broadcast(optimal_comp, proc_ID_index);
+  this->comm().broadcast(optimal_elem_id, proc_ID_index);
+  this->comm().broadcast(optimal_subdomain_id, proc_ID_index);
+  this->comm().broadcast(optimal_boundary_id, proc_ID_index);
+  this->comm().broadcast(optimal_qp, proc_ID_index);
+  this->comm().broadcast(optimal_point_perturbs, proc_ID_index);
+  this->comm().broadcast(optimal_point_phi_i_qp, proc_ID_index);
 
-      libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
+  libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
 
-      libmesh_error_msg_if(optimal_value == 0., "New EIM basis function should not be zero");
+  libmesh_error_msg_if(optimal_value == 0., "New EIM basis function should not be zero");
 
-      // Scale local_pf so that its largest value is 1.0
-      scale_parametrized_function(local_pf, 1./optimal_value);
+  // Scale local_pf so that its largest value is 1.0
+  scale_parametrized_function(local_pf, 1./optimal_value);
 
-      // Add local_pf as the new basis function and store data
-      // associated with the interpolation point.
-      eim_eval.add_basis_function_and_interpolation_data(local_pf,
-                                                        optimal_point,
-                                                        optimal_comp,
-                                                        optimal_elem_id,
-                                                        optimal_subdomain_id,
-                                                        optimal_qp,
-                                                        optimal_point_perturbs,
-                                                        optimal_point_phi_i_qp);
+  // Add local_pf as the new basis function and store data
+  // associated with the interpolation point.
+  eim_eval.add_side_basis_function_and_interpolation_data(local_pf,
+                                                          optimal_point,
+                                                          optimal_comp,
+                                                          optimal_elem_id,
+                                                          optimal_side_index,
+                                                          optimal_subdomain_id,
+                                                          optimal_boundary_id,
+                                                          optimal_qp,
+                                                          optimal_point_perturbs,
+                                                          optimal_point_phi_i_qp);
+}
 
-      if (has_obs_vals)
+void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
+                                                              const std::vector<std::vector<Number>> & interior_pf_obs_values)
+{
+  // Make a copy of the input parametrized function, since we will modify this below
+  // to give us a new basis function.
+  QpDataMap local_pf = interior_pf;
+
+  RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
+
+  bool has_obs_vals = (eim_eval.get_n_observation_points() > 0);
+
+  std::vector<std::vector<Number>> new_bf_obs_vals;
+  if (has_obs_vals)
+    {
+      new_bf_obs_vals = interior_pf_obs_values;
+    }
+
+  // If we have at least one basis function, then we need to use
+  // rb_eim_solve() to find the EIM interpolation error. Otherwise,
+  // just use solution as is.
+  if (eim_eval.get_n_basis_functions() > 0)
+    {
+      // Get the right-hand side vector for the EIM approximation
+      // by sampling the parametrized function (stored in solution)
+      // at the interpolation points.
+      unsigned int RB_size = eim_eval.get_n_basis_functions();
+      DenseVector<Number> EIM_rhs(RB_size);
+      for (unsigned int i=0; i<RB_size; i++)
         {
-          // Apply the scame scaling to new_bf_obs_vals as we did to
-          // the new basis function itself
-          for (unsigned int i=0; i<new_bf_obs_vals.size(); i++)
-            for (unsigned int j=0; j<new_bf_obs_vals[i].size(); j++)
-              new_bf_obs_vals[i][j] *= 1./optimal_value;
-
-          eim_eval.add_observation_values_for_basis_function(new_bf_obs_vals);
+          EIM_rhs(i) =
+            RBEIMEvaluation::get_parametrized_function_value(comm(),
+                                                            local_pf,
+                                                            eim_eval.get_interpolation_points_elem_id(i),
+                                                            eim_eval.get_interpolation_points_comp(i),
+                                                            eim_eval.get_interpolation_points_qp(i));
         }
+
+      eim_eval.set_parameters( get_parameters() );
+      DenseVector<Number> rb_eim_solution = eim_eval.rb_eim_solve(EIM_rhs);
+
+      // Load the "EIM residual" into solution by subtracting
+      // the EIM approximation
+      eim_eval.decrement_vector(local_pf, rb_eim_solution);
+
+      if(has_obs_vals)
+        {
+          for (unsigned int i=0; i<RB_size; i++)
+            for (unsigned int j=0; j<eim_eval.get_n_observation_points(); j++)
+              for (unsigned int k=0; k<new_bf_obs_vals[j].size(); k++)
+                new_bf_obs_vals[j][k] -= rb_eim_solution(i) * eim_eval.get_observation_values(i,j)[k];
+        }
+    }
+
+  // Find the quadrature point at which local_pf (which now stores
+  // the "EIM residual") has maximum absolute value
+  Number optimal_value = 0.;
+  Point optimal_point;
+  unsigned int optimal_comp = 0;
+  dof_id_type optimal_elem_id = DofObject::invalid_id;
+  subdomain_id_type optimal_subdomain_id = 0;
+  unsigned int optimal_qp = 0;
+  std::vector<Point> optimal_point_perturbs;
+  std::vector<Real> optimal_point_phi_i_qp;
+
+  // Initialize largest_abs_value to be negative so that it definitely gets updated.
+  Real largest_abs_value = -1.;
+
+  // In order to compute phi_i_qp, we initialize a FEMContext
+  FEMContext con(*this);
+  for (auto dim : con.elem_dimensions())
+    {
+      auto fe = con.get_element_fe(/*var=*/0, dim);
+      fe->get_phi();
+    }
+
+  for (const auto & pr : local_pf)
+    {
+      dof_id_type elem_id = pr.first;
+      const auto & comp_and_qp = pr.second;
+
+      // Also initialize phi in order to compute phi_i_qp
+      const Elem & elem_ref = get_mesh().elem_ref(elem_id);
+      con.pre_fe_reinit(*this, &elem_ref);
+
+      auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
+      const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+
+      elem_fe->reinit(&elem_ref);
+
+      for (const auto & comp : index_range(comp_and_qp))
+        {
+          const std::vector<Number> & qp_values = comp_and_qp[comp];
+
+          for (auto qp : index_range(qp_values))
+            {
+              Number value = qp_values[qp];
+              Real abs_value = std::abs(value);
+
+              if (abs_value > largest_abs_value)
+                {
+                  largest_abs_value = abs_value;
+                  optimal_value = value;
+                  optimal_comp = comp;
+                  optimal_elem_id = elem_id;
+                  optimal_qp = qp;
+
+                  optimal_point_phi_i_qp.resize(phi.size());
+                  for(auto i : index_range(phi))
+                    optimal_point_phi_i_qp[i] = phi[i][qp];
+
+                  const auto & point_list =
+                    libmesh_map_find(_local_quad_point_locations, elem_id);
+
+                  libmesh_error_msg_if(qp >= point_list.size(), "Error: Invalid qp");
+
+                  optimal_point = point_list[qp];
+
+                  optimal_subdomain_id = libmesh_map_find(_local_quad_point_subdomain_ids, elem_id);
+
+                  if (get_rb_eim_evaluation().get_parametrized_function().requires_xyz_perturbations)
+                    {
+                      const auto & perturb_list =
+                        libmesh_map_find(_local_quad_point_locations_perturbations, elem_id);
+
+                      libmesh_error_msg_if(qp >= perturb_list.size(), "Error: Invalid qp");
+
+                      optimal_point_perturbs = perturb_list[qp];
+                    }
+                }
+            }
+        }
+    }
+
+  // Find out which processor has the largest of the abs values
+  // and broadcast from that processor.
+  unsigned int proc_ID_index;
+  this->comm().maxloc(largest_abs_value, proc_ID_index);
+
+  this->comm().broadcast(optimal_value, proc_ID_index);
+  this->comm().broadcast(optimal_point, proc_ID_index);
+  this->comm().broadcast(optimal_comp, proc_ID_index);
+  this->comm().broadcast(optimal_elem_id, proc_ID_index);
+  this->comm().broadcast(optimal_subdomain_id, proc_ID_index);
+  this->comm().broadcast(optimal_qp, proc_ID_index);
+  this->comm().broadcast(optimal_point_perturbs, proc_ID_index);
+  this->comm().broadcast(optimal_point_phi_i_qp, proc_ID_index);
+
+  libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
+
+  libmesh_error_msg_if(optimal_value == 0., "New EIM basis function should not be zero");
+
+  // Scale local_pf so that its largest value is 1.0
+  scale_parametrized_function(local_pf, 1./optimal_value);
+
+  // Add local_pf as the new basis function and store data
+  // associated with the interpolation point.
+  eim_eval.add_basis_function_and_interpolation_data(local_pf,
+                                                    optimal_point,
+                                                    optimal_comp,
+                                                    optimal_elem_id,
+                                                    optimal_subdomain_id,
+                                                    optimal_qp,
+                                                    optimal_point_perturbs,
+                                                    optimal_point_phi_i_qp);
+
+  if (has_obs_vals)
+    {
+      // Apply the scame scaling to new_bf_obs_vals as we did to
+      // the new basis function itself
+      for (unsigned int i=0; i<new_bf_obs_vals.size(); i++)
+        for (unsigned int j=0; j<new_bf_obs_vals[i].size(); j++)
+          new_bf_obs_vals[i][j] *= 1./optimal_value;
+
+      eim_eval.add_observation_values_for_basis_function(new_bf_obs_vals);
     }
 }
 
