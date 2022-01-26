@@ -585,11 +585,12 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
       // 1D
     case 1:
       {
-        // Compute the value of the approximation shape function i at quadrature point p
+        // Compute the values of the shape function derivatives
         if (this->calculate_dphiref)
-          for (unsigned int i=0; i<n_approx_shape_functions; i++)
-            FE<Dim,T>::shape_derivs(elem, this->fe_type.order, i, 0, qp, this->dphidxi[i]);
+          FE<Dim,T>::all_shape_derivs(elem, this->fe_type.order, qp);
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        // Compute the value of shape function i Hessians at quadrature point p
         if (this->calculate_d2phi)
           for (unsigned int i=0; i<n_approx_shape_functions; i++)
             for (unsigned int p=0; p<n_qp; p++)
@@ -605,14 +606,12 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
       // 2D
     case 2:
       {
-        // Compute the value of the approximation shape function i at quadrature point p
+        // Compute the values of the shape function derivatives
         if (this->calculate_dphiref)
-          for (unsigned int i=0; i<n_approx_shape_functions; i++)
-            {
-              FE<Dim,T>::shape_derivs(elem, this->fe_type.order, i, 0, qp, this->dphidxi[i]);
-              FE<Dim,T>::shape_derivs(elem, this->fe_type.order, i, 1, qp, this->dphideta[i]);
-            }
+          FE<Dim,T>::all_shape_derivs(elem, this->fe_type.order, qp);
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        // Compute the value of shape function i Hessians at quadrature point p
         if (this->calculate_d2phi)
           for (unsigned int i=0; i<n_approx_shape_functions; i++)
             for (unsigned int p=0; p<n_qp; p++)
@@ -633,15 +632,12 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
       // 3D
     case 3:
       {
-        // Compute the value of the approximation shape function i at quadrature point p
+        // Compute the values of the shape function derivatives
         if (this->calculate_dphiref)
-          for (unsigned int i=0; i<n_approx_shape_functions; i++)
-            {
-              FE<Dim,T>::shape_derivs(elem, this->fe_type.order, i, 0, qp, this->dphidxi[i]);
-              FE<Dim,T>::shape_derivs(elem, this->fe_type.order, i, 1, qp, this->dphideta[i]);
-              FE<Dim,T>::shape_derivs(elem, this->fe_type.order, i, 2, qp, this->dphidzeta[i]);
-            }
+          FE<Dim,T>::all_shape_derivs(elem, this->fe_type.order, qp);
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        // Compute the value of shape function i Hessians at quadrature point p
         if (this->calculate_d2phi)
           for (unsigned int i=0; i<n_approx_shape_functions; i++)
             for (unsigned int p=0; p<n_qp; p++)
@@ -667,6 +663,23 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
     this->init_dual_shape_functions(n_approx_shape_functions, n_qp);
 }
 
+template <unsigned int Dim, FEFamily T>
+void
+FE<Dim,T>::default_all_shape_derivs (const Elem * elem,
+                                     const Order o,
+                                     const std::vector<Point> & p,
+                                     const bool add_p_level)
+{
+  std::vector<std::vector<OutputShape>> * comps[3]
+    { &this->dphidxi, &this->dphideta, &this->dphidzeta };
+  for (unsigned int d=0; d != Dim; ++d)
+    {
+      auto & comps_d = *comps[d];
+      for (auto i : index_range(comps_d))
+        FE<Dim,T>::shape_derivs
+          (elem,o,i,d,p,comps_d[i],add_p_level);
+    }
+}
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -819,6 +832,364 @@ fe_fdm_second_deriv(const Elem * elem,
   return (deriv_func(elem, order, i, deriv_j, pp, add_p_level) -
           deriv_func(elem, order, i, deriv_j, pm, add_p_level))/2./eps;
 }
+
+
+void rational_fe_weighted_shapes(const Elem * elem,
+                                 const FEType underlying_fe_type,
+                                 std::vector<std::vector<Real>> & shapes,
+                                 const std::vector<Point> & p,
+                                 const bool add_p_level)
+{
+  const int extra_order = add_p_level * elem->p_level();
+
+  const int dim = elem->dim();
+
+  const unsigned int n_sf =
+    FEInterface::n_shape_functions(underlying_fe_type, extra_order,
+                                   elem);
+
+  libmesh_assert_equal_to (n_sf, elem->n_nodes());
+
+  std::vector<Real> node_weights(n_sf);
+
+  const unsigned char datum_index = elem->mapping_data();
+  for (unsigned int n=0; n<n_sf; n++)
+    node_weights[n] =
+      elem->node_ref(n).get_extra_datum<Real>(datum_index);
+
+  const std::size_t n_p = p.size();
+
+  shapes.resize(n_sf);
+  for (unsigned int i=0; i != n_sf; ++i)
+    {
+      auto & shapes_i = shapes[i];
+      shapes_i.resize(n_p, 0);
+      FEInterface::shapes(dim, underlying_fe_type, elem, i, p,
+                          shapes_i, add_p_level);
+      for (auto & s : shapes_i)
+        s *= node_weights[i];
+    }
+}
+
+
+void rational_fe_weighted_shapes_derivs(const Elem * elem,
+                                        const FEType fe_type,
+                                        std::vector<std::vector<Real>> & shapes,
+                                        std::vector<std::vector<std::vector<Real>>> & derivs,
+                                        const std::vector<Point> & p,
+                                        const bool add_p_level)
+{
+  const int extra_order = add_p_level * elem->p_level();
+  const unsigned int dim = elem->dim();
+
+  const unsigned int n_sf =
+    FEInterface::n_shape_functions(fe_type, extra_order, elem);
+
+  libmesh_assert_equal_to (n_sf, elem->n_nodes());
+
+  libmesh_assert_equal_to (dim, derivs.size());
+  for (unsigned int d = 0; d != dim; ++d)
+    derivs[d].resize(n_sf);
+
+  std::vector<Real> node_weights(n_sf);
+
+  const unsigned char datum_index = elem->mapping_data();
+  for (unsigned int n=0; n<n_sf; n++)
+    node_weights[n] =
+      elem->node_ref(n).get_extra_datum<Real>(datum_index);
+
+  const std::size_t n_p = p.size();
+
+  shapes.resize(n_sf);
+  for (unsigned int i=0; i != n_sf; ++i)
+    {
+      auto & shapes_i = shapes[i];
+
+      shapes_i.resize(n_p, 0);
+
+      FEInterface::shapes(dim, fe_type, elem, i, p, shapes_i, add_p_level);
+      for (auto & s : shapes_i)
+        s *= node_weights[i];
+
+      for (unsigned int d = 0; d != dim; ++d)
+        {
+          auto & derivs_di = derivs[d][i];
+          derivs_di.resize(n_p);
+          FEInterface::shape_derivs(fe_type, elem, i, d, p,
+                                    derivs_di, add_p_level);
+          for (auto & dip : derivs_di)
+            dip *= node_weights[i];
+        }
+    }
+}
+
+
+Real rational_fe_shape(const Elem & elem,
+                       const FEType underlying_fe_type,
+                       const unsigned int i,
+                       const Point & p,
+                       const bool add_p_level)
+{
+  int extra_order = add_p_level * elem.p_level();
+
+  const unsigned int n_sf =
+    FEInterface::n_shape_functions(underlying_fe_type, extra_order, &elem);
+
+  libmesh_assert_equal_to (n_sf, elem.n_nodes());
+
+  std::vector<Real> node_weights(n_sf);
+
+  const unsigned char datum_index = elem.mapping_data();
+
+  Real weighted_shape_i = 0, weighted_sum = 0;
+
+  for (unsigned int sf=0; sf<n_sf; sf++)
+    {
+      Real node_weight =
+        elem.node_ref(sf).get_extra_datum<Real>(datum_index);
+      Real weighted_shape = node_weight *
+        FEInterface::shape(underlying_fe_type, extra_order, &elem, sf, p);
+      weighted_sum += weighted_shape;
+      if (sf == i)
+        weighted_shape_i = weighted_shape;
+    }
+
+  return weighted_shape_i / weighted_sum;
+}
+
+
+Real rational_fe_shape_deriv(const Elem & elem,
+                             const FEType underlying_fe_type,
+                             const unsigned int i,
+                             const unsigned int j,
+                             const Point & p,
+                             const bool add_p_level)
+{
+  libmesh_assert_less(j, elem.dim());
+
+  int extra_order = add_p_level * elem.p_level();
+
+  const unsigned int n_sf =
+    FEInterface::n_shape_functions(underlying_fe_type, extra_order, &elem);
+
+  const unsigned int n_nodes = elem.n_nodes();
+  libmesh_assert_equal_to (n_sf, n_nodes);
+
+  std::vector<Real> node_weights(n_nodes);
+
+  const unsigned char datum_index = elem.mapping_data();
+  for (unsigned int n=0; n<n_nodes; n++)
+    node_weights[n] =
+      elem.node_ref(n).get_extra_datum<Real>(datum_index);
+
+  Real weighted_shape_i = 0, weighted_sum = 0,
+       weighted_grad_i = 0, weighted_grad_sum = 0;
+
+  for (unsigned int sf=0; sf<n_sf; sf++)
+    {
+      Real weighted_shape = node_weights[sf] *
+        FEInterface::shape(underlying_fe_type, extra_order, &elem, sf, p);
+      Real weighted_grad = node_weights[sf] *
+        FEInterface::shape_deriv(underlying_fe_type, extra_order, &elem, sf, j, p);
+      weighted_sum += weighted_shape;
+      weighted_grad_sum += weighted_grad;
+      if (sf == i)
+        {
+          weighted_shape_i = weighted_shape;
+          weighted_grad_i = weighted_grad;
+        }
+    }
+
+  return (weighted_sum * weighted_grad_i - weighted_shape_i * weighted_grad_sum) /
+         weighted_sum / weighted_sum;
+}
+
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+Real rational_fe_shape_second_deriv(const Elem & elem,
+                                    const FEType underlying_fe_type,
+                                    const unsigned int i,
+                                    const unsigned int j,
+                                    const Point & p,
+                                    const bool add_p_level)
+{
+  unsigned int j1, j2;
+  switch (j)
+    {
+    case 0:
+      // j = 0 ==> d^2 phi / dxi^2
+      j1 = j2 = 0;
+      break;
+    case 1:
+      // j = 1 ==> d^2 phi / dxi deta
+      j1 = 0;
+      j2 = 1;
+      break;
+    case 2:
+      // j = 2 ==> d^2 phi / deta^2
+      j1 = j2 = 1;
+      break;
+    case 3:
+      // j = 3 ==> d^2 phi / dxi dzeta
+      j1 = 0;
+      j2 = 2;
+      break;
+    case 4:
+      // j = 4 ==> d^2 phi / deta dzeta
+      j1 = 1;
+      j2 = 2;
+      break;
+    case 5:
+      // j = 5 ==> d^2 phi / dzeta^2
+      j1 = j2 = 2;
+      break;
+    default:
+      libmesh_error();
+    }
+
+  int extra_order = add_p_level * elem.p_level();
+
+  const unsigned int n_sf =
+    FEInterface::n_shape_functions(underlying_fe_type, extra_order,
+                                   &elem);
+
+  const unsigned int n_nodes = elem.n_nodes();
+  libmesh_assert_equal_to (n_sf, n_nodes);
+
+  std::vector<Real> node_weights(n_nodes);
+
+  const unsigned char datum_index = elem.mapping_data();
+  for (unsigned int n=0; n<n_nodes; n++)
+    node_weights[n] =
+      elem.node_ref(n).get_extra_datum<Real>(datum_index);
+
+  Real weighted_shape_i = 0, weighted_sum = 0,
+       weighted_grada_i = 0, weighted_grada_sum = 0,
+       weighted_gradb_i = 0, weighted_gradb_sum = 0,
+       weighted_hess_i = 0, weighted_hess_sum = 0;
+
+  for (unsigned int sf=0; sf<n_sf; sf++)
+    {
+      Real weighted_shape = node_weights[sf] *
+        FEInterface::shape(underlying_fe_type, extra_order, &elem, sf,
+                           p);
+      Real weighted_grada = node_weights[sf] *
+        FEInterface::shape_deriv(underlying_fe_type, extra_order,
+                                 &elem, sf, j1, p);
+      Real weighted_hess = node_weights[sf] *
+        FEInterface::shape_second_deriv(underlying_fe_type,
+                                        extra_order, &elem, sf, j, p);
+      weighted_sum += weighted_shape;
+      weighted_grada_sum += weighted_grada;
+      Real weighted_gradb = weighted_grada;
+      if (j1 != j2)
+        {
+          weighted_gradb = (j1 == j2) ? weighted_grada :
+            node_weights[sf] *
+            FEInterface::shape_deriv(underlying_fe_type, extra_order,
+                                     &elem, sf, j2, p);
+          weighted_grada_sum += weighted_grada;
+        }
+      weighted_hess_sum += weighted_hess;
+      if (sf == i)
+        {
+          weighted_shape_i = weighted_shape;
+          weighted_grada_i = weighted_grada;
+          weighted_gradb_i = weighted_gradb;
+          weighted_hess_i = weighted_hess;
+        }
+    }
+
+  if (j1 == j2)
+    weighted_gradb_sum = weighted_grada_sum;
+
+  return (weighted_sum * weighted_hess_i - weighted_grada_i * weighted_gradb_sum -
+          weighted_shape_i * weighted_hess_sum - weighted_gradb_i * weighted_grada_sum +
+          2 * weighted_grada_sum * weighted_shape_i * weighted_gradb_sum / weighted_sum) /
+         weighted_sum / weighted_sum;
+}
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+
+void rational_all_shapes (const Elem & elem,
+                          const FEType underlying_fe_type,
+                          const std::vector<Point> & p,
+                          std::vector<std::vector<Real>> & v,
+                          const bool add_p_level)
+{
+  std::vector<std::vector<Real>> shapes;
+
+  rational_fe_weighted_shapes(&elem, underlying_fe_type, shapes, p,
+                              add_p_level);
+
+  std::vector<Real> shape_sums(p.size(), 0);
+
+  for (auto i : index_range(v))
+    {
+      libmesh_assert_equal_to ( p.size(), shapes[i].size() );
+      for (auto j : index_range(p))
+        shape_sums[j] += shapes[i][j];
+    }
+
+  for (auto i : index_range(v))
+    {
+      libmesh_assert_equal_to ( p.size(), v[i].size() );
+      for (auto j : index_range(v[i]))
+        v[i][j] = shapes[i][j] / shape_sums[j];
+    }
+}
+
+
+void rational_all_shape_derivs (const Elem & elem,
+                                const FEType underlying_fe_type,
+                                const std::vector<Point> & p,
+                                std::vector<std::vector<Real>> * comps[3],
+                                const bool add_p_level)
+{
+  const int my_dim = elem.dim();
+
+  std::vector<std::vector<Real>> shapes;
+  std::vector<std::vector<std::vector<Real>>> derivs(my_dim);
+
+  rational_fe_weighted_shapes_derivs(&elem, underlying_fe_type,
+                                     shapes, derivs, p, add_p_level);
+
+  std::vector<Real> shape_sums(p.size(), 0);
+  std::vector<std::vector<Real>> shape_deriv_sums(my_dim);
+  for (int d=0; d != my_dim; ++d)
+    shape_deriv_sums[d].resize(p.size());
+
+  for (auto i : index_range(shapes))
+    {
+      libmesh_assert_equal_to ( p.size(), shapes[i].size() );
+      for (auto j : index_range(p))
+        shape_sums[j] += shapes[i][j];
+
+      for (int d=0; d != my_dim; ++d)
+        for (auto j : index_range(p))
+          shape_deriv_sums[d][j] += derivs[d][i][j];
+    }
+
+  for (int d=0; d != my_dim; ++d)
+    {
+      auto & comps_d = *comps[d];
+      libmesh_assert_equal_to(comps_d.size(), elem.n_nodes());
+
+      for (auto i : index_range(comps_d))
+        {
+          auto & comps_di = comps_d[i];
+          auto & derivs_di = derivs[d][i];
+
+          for (auto j : index_range(comps_di))
+            comps_di[j] = (shape_sums[j] * derivs_di[j] -
+              shapes[i][j] * shape_deriv_sums[d][j]) /
+              shape_sums[j] / shape_sums[j];
+        }
+    }
+}
+
 
 
 template

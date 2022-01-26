@@ -571,6 +571,19 @@ public:
                           const Point & p);
 
   /**
+   * Fills \p dphi with the derivatives of the \f$ i^{th} \f$ shape
+   * function at point \p p in direction \p j.
+   */
+  template<typename OutputType>
+  static void shape_derivs(const FEType & fe_t,
+                           const Elem * elem,
+                           const unsigned int i,
+                           const unsigned int j,
+                           const std::vector<Point> & p,
+                           std::vector<OutputType> & dphi,
+                           const bool add_p_level = true);
+
+  /**
    * Typedef for pointer to a function that returns FE shape function derivative values.
    * The \p p_level() of the passed-in \p elem is accounted for internally when
    * the \p add_p_level flag is set to true. For more information, see fe.h.

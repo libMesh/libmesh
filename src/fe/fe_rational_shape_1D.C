@@ -28,15 +28,16 @@
 
 
 namespace {
-static const libMesh::FEFamily _underlying_fe_family = libMesh::BERNSTEIN;
-}
+using namespace libMesh;
+
+static const FEFamily _underlying_fe_family = BERNSTEIN;
+
+} // anonymous namespace
+
 
 
 namespace libMesh
 {
-
-
-LIBMESH_DEFAULT_VECTORIZED_FE(1,RATIONAL_BERNSTEIN)
 
 
 template <>
@@ -48,36 +49,10 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  int extra_order = add_p_level * elem->p_level();
-
-  // FEType object to be passed to various FEInterface functions below.
+  // FEType object for the non-rational basis underlying this one
   FEType fe_type(order, _underlying_fe_family);
 
-  const unsigned int n_sf =
-    FEInterface::n_shape_functions(fe_type, extra_order, elem);
-
-  const unsigned int n_nodes = elem->n_nodes();
-  libmesh_assert_equal_to (n_sf, n_nodes);
-
-  std::vector<Real> node_weights(n_nodes);
-
-  const unsigned char datum_index = elem->mapping_data();
-  for (unsigned int n=0; n<n_nodes; n++)
-    node_weights[n] =
-      elem->node_ref(n).get_extra_datum<Real>(datum_index);
-
-  Real weighted_shape_i = 0, weighted_sum = 0;
-
-  for (unsigned int sf=0; sf<n_sf; sf++)
-    {
-      Real weighted_shape = node_weights[sf] *
-        FEInterface::shape(fe_type, extra_order, elem, sf, p);
-      weighted_sum += weighted_shape;
-      if (sf == i)
-        weighted_shape_i = weighted_shape;
-    }
-
-  return weighted_shape_i / weighted_sum;
+  return rational_fe_shape(*elem, fe_type, i, p, add_p_level);
 }
 
 
@@ -109,53 +84,16 @@ template <>
 Real FE<1,RATIONAL_BERNSTEIN>::shape_deriv(const Elem * elem,
                                            const Order order,
                                            const unsigned int i,
-                                           const unsigned int libmesh_dbg_var(j),
+                                           const unsigned int j,
                                            const Point & p,
                                            const bool add_p_level)
 {
-  // only d()/dxi in 1D!
-  libmesh_assert_equal_to (j, 0);
-
   libmesh_assert(elem);
 
-  int extra_order = add_p_level * elem->p_level();
+  FEType underlying_fe_type(order, _underlying_fe_family);
 
-  // FEType object to be passed to various FEInterface functions below.
-  FEType fe_type(order, _underlying_fe_family);
-
-  const unsigned int n_sf =
-    FEInterface::n_shape_functions(fe_type, extra_order, elem);
-
-  const unsigned int n_nodes = elem->n_nodes();
-  libmesh_assert_equal_to (n_sf, n_nodes);
-
-  std::vector<Real> node_weights(n_nodes);
-
-  const unsigned char datum_index = elem->mapping_data();
-  for (unsigned int n=0; n<n_nodes; n++)
-    node_weights[n] =
-      elem->node_ref(n).get_extra_datum<Real>(datum_index);
-
-  Real weighted_shape_i = 0, weighted_sum = 0,
-       weighted_grad_i = 0, weighted_grad_sum = 0;
-
-  for (unsigned int sf=0; sf<n_sf; sf++)
-    {
-      Real weighted_shape = node_weights[sf] *
-        FEInterface::shape(fe_type, extra_order, elem, sf, p);
-      Real weighted_grad = node_weights[sf] *
-        FEInterface::shape_deriv(fe_type, extra_order, elem, sf, 0, p);
-      weighted_sum += weighted_shape;
-      weighted_grad_sum += weighted_grad;
-      if (sf == i)
-        {
-          weighted_shape_i = weighted_shape;
-          weighted_grad_i = weighted_grad;
-        }
-    }
-
-  return (weighted_sum * weighted_grad_i - weighted_shape_i * weighted_grad_sum) /
-         weighted_sum / weighted_sum;
+  return rational_fe_shape_deriv(*elem, underlying_fe_type, i, j, p,
+                                 add_p_level);
 }
 
 
@@ -193,62 +131,17 @@ template <>
 Real FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem * elem,
                                                   const Order order,
                                                   const unsigned int i,
-                                                  const unsigned int libmesh_dbg_var(j),
+                                                  const unsigned int j,
                                                   const Point & p,
                                                   const bool add_p_level)
 {
-  // Don't need to switch on j.  1D shape functions
-  // depend on xi only!
-  libmesh_assert_equal_to (j, 0);
-
   libmesh_assert(elem);
 
-  int extra_order = add_p_level * elem->p_level();
-
   // FEType object to be passed to various FEInterface functions below.
-  FEType fe_type(order, _underlying_fe_family);
+  FEType underlying_fe_type(order, _underlying_fe_family);
 
-  const unsigned int n_sf =
-    FEInterface::n_shape_functions(fe_type, extra_order, elem);
-
-  const unsigned int n_nodes = elem->n_nodes();
-  libmesh_assert_equal_to (n_sf, n_nodes);
-
-  std::vector<Real> node_weights(n_nodes);
-
-  const unsigned char datum_index = elem->mapping_data();
-  for (unsigned int n=0; n<n_nodes; n++)
-    node_weights[n] =
-      elem->node_ref(n).get_extra_datum<Real>(datum_index);
-
-  Real weighted_shape_i = 0, weighted_sum = 0,
-       weighted_grad_i = 0, weighted_grad_sum = 0,
-       weighted_hess_i = 0, weighted_hess_sum = 0;
-
-  for (unsigned int sf=0; sf<n_sf; sf++)
-    {
-      Real weighted_shape = node_weights[sf] *
-        FEInterface::shape(fe_type, extra_order, elem, sf, p);
-      Real weighted_grad = node_weights[sf] *
-        FEInterface::shape_deriv(fe_type, extra_order, elem, sf, 0, p);
-      Real weighted_hess = node_weights[sf] *
-        FEInterface::shape_second_deriv(fe_type, extra_order, elem, sf, 0, p);
-      weighted_sum += weighted_shape;
-      weighted_grad_sum += weighted_grad;
-      weighted_hess_sum += weighted_hess;
-      if (sf == i)
-        {
-          weighted_shape_i = weighted_shape;
-          weighted_grad_i = weighted_grad;
-          weighted_hess_i = weighted_hess;
-        }
-    }
-
-  return (weighted_sum * weighted_sum *
-          (weighted_sum * weighted_hess_i - weighted_shape_i * weighted_hess_sum) -
-          (weighted_sum * weighted_grad_i - weighted_shape_i * weighted_grad_sum) *
-          2 * weighted_sum * weighted_grad_sum) /
-         (weighted_sum * weighted_sum * weighted_sum * weighted_sum);
+  return rational_fe_shape_second_deriv(*elem, underlying_fe_type, i,
+                                        j, p, add_p_level);
 }
 
 
@@ -279,8 +172,69 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const FEType fet,
 }
 
 
-
 #endif
+
+
+template<>
+void FE<1,RATIONAL_BERNSTEIN>::shapes
+  (const Elem * elem,
+   const Order o,
+   const unsigned int i,
+   const std::vector<Point> & p,
+   std::vector<OutputShape> & vi,
+   const bool add_p_level)
+{
+  libmesh_assert_equal_to(p.size(), vi.size());
+  for (auto j : index_range(vi))
+    vi[j] = FE<1,RATIONAL_BERNSTEIN>::shape (elem, o, i, p[j], add_p_level);
+}
+
+template<>
+void FE<1,RATIONAL_BERNSTEIN>::all_shapes
+  (const Elem * elem,
+   const Order o,
+   const std::vector<Point> & p,
+   std::vector<std::vector<OutputShape>> & v,
+   const bool add_p_level)
+{
+  FEType underlying_fe_type(o, _underlying_fe_family);
+
+  rational_all_shapes(*elem, underlying_fe_type, p, v, add_p_level);
+}
+
+
+template<>
+void FE<1,RATIONAL_BERNSTEIN>::shape_derivs
+  (const Elem * elem,
+   const Order o,
+   const unsigned int i,
+   const unsigned int j,
+   const std::vector<Point> & p,
+   std::vector<OutputShape> & v,
+   const bool add_p_level)
+{
+  libmesh_assert_equal_to(p.size(), v.size());
+  for (auto vi : index_range(v))
+    v[vi] = FE<1,RATIONAL_BERNSTEIN>::shape_deriv (elem, o, i, j, p[vi], add_p_level);
+}
+
+
+template <>
+void
+FE<1,RATIONAL_BERNSTEIN>::all_shape_derivs (const Elem * elem,
+                                            const Order o,
+                                            const std::vector<Point> & p,
+                                            const bool add_p_level)
+{
+  FEType underlying_fe_type(o, _underlying_fe_family);
+
+  std::vector<std::vector<Real>> * comps[3]
+    { &this->dphidxi, &this->dphideta, &this->dphidzeta };
+
+  rational_all_shape_derivs (*elem, underlying_fe_type, p,
+                             comps, add_p_level);
+}
+
 
 } // namespace libMesh
 
