@@ -679,7 +679,7 @@ AM_CONDITIONAL(LIBMESH_ENABLE_CURL, test x$enablecurl = xyes)
 
 
 # --------------------------------------------------------------
-# HDF5 -- enabled by default
+# HDF5 -- disabled by default
 # --------------------------------------------------------------
 CONFIGURE_HDF5
 AS_IF([test $enablehdf5 = yes],
