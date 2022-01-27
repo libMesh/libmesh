@@ -54,7 +54,7 @@ class RBEIMConstruction : public RBConstructionBase<System>
 {
 public:
 
-  enum BEST_FIT_TYPE { PROJECTION_BEST_FIT, EIM_BEST_FIT };
+  enum BEST_FIT_TYPE { PROJECTION_BEST_FIT, EIM_BEST_FIT, POD_BEST_FIT };
 
   /**
    * Constructor.  Optionally initializes required
@@ -146,10 +146,26 @@ public:
   virtual void print_info();
 
   /**
-   * Generate the EIM approximation for the specified parametrized function.
-   * Return the final tolerance from the training algorithm.
+   * Generate the EIM approximation for the specified parametrized function
+   * using either POD or the Greedy Algorithm. Return the final tolerance.
    */
   Real train_eim_approximation();
+
+  /**
+   * Generate the EIM approximation for the specified parametrized function
+   * using the Greedy Algorithm. Return the final tolerance.
+   * Method is virtual so that behavior can be specialized further in
+   * subclasses, if needed.
+   */
+  virtual Real train_eim_approximation_with_greedy();
+
+  /**
+   * Generate the EIM approximation for the specified parametrized function
+   * using Proper Orthogonal Decomposition (POD). Return the final tolerance.
+   * Method is virtual so that behavior can be specialized further in
+   * subclasses, if needed.
+   */
+  virtual Real train_eim_approximation_with_POD();
 
   /**
    * Build a vector of ElemAssembly objects that accesses the basis
@@ -316,6 +332,17 @@ private:
    * Add a new basis function to the EIM approximation.
    */
   void enrich_eim_approximation(unsigned int training_index);
+
+  /**
+   * Implementation of enrich_eim_approximation() for the case of element sides.
+   */
+  void enrich_eim_approximation_on_sides(const SideQpDataMap & interior_pf);
+
+  /**
+   * Implementation of enrich_eim_approximation() for the case of element interiors.
+   */
+  void enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
+                                             const std::vector<std::vector<Number>> & interior_pf_obs_values);
 
   /**
    * Update the matrices used in training the EIM approximation.
