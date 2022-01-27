@@ -1168,6 +1168,29 @@ struct CompareTypes<TypeVector<T>, TypeVector<T2>>
 {
   typedef TypeVector<typename CompareTypes<T,T2>::supertype> supertype;
 };
+
+template <typename T, typename T2, typename std::enable_if<ScalarTraits<T>::value, int>::type = 0>
+TypeVector<typename CompareTypes<T, T2>::supertype>
+outer_product(const T & a, const TypeVector<T2> & b)
+{
+  TypeVector<typename CompareTypes<T, T2>::supertype> ret;
+  for (unsigned int i = 0; i < LIBMESH_DIM; i++)
+    ret(i) = a * libmesh_conj(b(i));
+
+  return ret;
+}
+
+template <typename T, typename T2, typename std::enable_if<ScalarTraits<T2>::value, int>::type = 0>
+TypeVector<typename CompareTypes<T, T2>::supertype>
+outer_product(const TypeVector<T> & a, const T2 & b)
+{
+  TypeVector<typename CompareTypes<T, T2>::supertype> ret;
+  const auto conj_b = libmesh_conj(b);
+  for (unsigned int i = 0; i < LIBMESH_DIM; i++)
+    ret(i) = a(i) * conj_b;
+
+  return ret;
+}
 } // namespace libMesh
 
 namespace std
