@@ -154,14 +154,18 @@ public:
   /**
    * Generate the EIM approximation for the specified parametrized function
    * using the Greedy Algorithm. Return the final tolerance.
+   * Method is virtual so that behavior can be specialized further in
+   * subclasses, if needed.
    */
-  Real train_eim_approximation_with_greedy();
+  virtual Real train_eim_approximation_with_greedy();
 
   /**
    * Generate the EIM approximation for the specified parametrized function
    * using Proper Orthogonal Decomposition (POD). Return the final tolerance.
+   * Method is virtual so that behavior can be specialized further in
+   * subclasses, if needed.
    */
-  Real train_eim_approximation_with_POD();
+  virtual Real train_eim_approximation_with_POD();
 
   /**
    * Build a vector of ElemAssembly objects that accesses the basis

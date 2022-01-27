@@ -67,8 +67,11 @@ namespace
 template <typename DataMap>
 void add(DataMap & u, const Number k, const DataMap & v)
 {
-  for (auto & [key,val] : u)
+  for (auto & pr : u)
     {
+      const auto & key = pr.first;
+      auto & val = pr.second;
+
       std::vector<std::vector<Number>> & vec_vec_u = val;
       const std::vector<std::vector<Number>> & vec_vec_v = libmesh_map_find(v, key);
 
@@ -517,30 +520,38 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
   unsigned int n_snapshots = get_n_training_samples();
   DenseMatrix<Number> correlation_matrix(n_snapshots,n_snapshots);
 
+  std::cout << "Start computing correlation matrix" << std::endl;
   for (unsigned int i=0; i<n_snapshots; i++)
-    for (unsigned int j=0; j<=i; j++)
-      {
-        Number inner_prod = 0.;
-        if (rbe.get_parametrized_function().on_mesh_sides())
-          {
-            inner_prod = side_inner_product(
-              _local_side_parametrized_functions_for_training[i],
-              _local_side_parametrized_functions_for_training[j]);
-          }
-        else
-          {
-            inner_prod = inner_product(
-              _local_parametrized_functions_for_training[i],
-              _local_parametrized_functions_for_training[j]);
-          }
+    {
+      for (unsigned int j=0; j<=i; j++)
+        {
+          Number inner_prod = 0.;
+          if (rbe.get_parametrized_function().on_mesh_sides())
+            {
+              inner_prod = side_inner_product(
+                _local_side_parametrized_functions_for_training[i],
+                _local_side_parametrized_functions_for_training[j]);
+            }
+          else
+            {
+              inner_prod = inner_product(
+                _local_parametrized_functions_for_training[i],
+                _local_parametrized_functions_for_training[j]);
+            }
 
 
-        correlation_matrix(i,j) = inner_prod;
-        if(i != j)
-          {
-            correlation_matrix(j,i) = libmesh_conj(inner_prod);
-          }
-      }
+          correlation_matrix(i,j) = inner_prod;
+          if(i != j)
+            {
+              correlation_matrix(j,i) = libmesh_conj(inner_prod);
+            }
+        }
+
+      // Print out every 10th row so that we can see the progress
+      if ( (i+1) % 10 == 0)
+        std::cout << "Finished row " << (i+1) << " of " << n_snapshots << std::endl;
+    }
+  std::cout << "Finished computing correlation matrix" << std::endl;
 
   // compute SVD of correlation matrix
   DenseVector<Real> sigma( n_snapshots );
