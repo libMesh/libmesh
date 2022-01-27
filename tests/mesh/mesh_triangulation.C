@@ -69,6 +69,9 @@ public:
         LIBMESH_ASSERT_FP_EQUAL(computed_area, area, TOLERANCE*TOLERANCE);
       }
 
+    TriangulatorInterface::ArbitraryHole arbhole {center, {{0,-1},{2,-1},{2,1},{0,2}}};
+    LIBMESH_ASSERT_FP_EQUAL(arbhole.area(), Real(5), TOLERANCE*TOLERANCE);
+
 #ifdef LIBMESH_HAVE_TRIANGLE
     // Make sure we're compatible with the old naming structure too
     TriangleInterface::PolygonHole square(center, radius, 4);
