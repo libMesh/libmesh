@@ -31,7 +31,9 @@
 #include "libmesh/wrapped_petsc.h"
 
 // C++ includes
+#ifdef LIBMESH_HAVE_UNISTD_H
 #include <unistd.h> // mkstemp
+#endif
 #include <fstream>
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE

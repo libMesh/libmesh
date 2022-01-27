@@ -27,7 +27,9 @@
 #include <iomanip>
 #include <cstring>
 #include <ctime>
-#include <unistd.h>
+#ifdef LIBMESH_HAVE_UNISTD_H
+#include <unistd.h> // for getuid()
+#endif
 #include <sys/types.h>
 #include <vector>
 #include <sstream>

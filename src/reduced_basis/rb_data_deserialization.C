@@ -36,7 +36,9 @@
 #include "capnp/serialize.h"
 
 // C++ includes
-#include <unistd.h>
+#ifdef LIBMESH_HAVE_UNISTD_H
+#include <unistd.h> // for close()
+#endif
 #include <iostream>
 #include <fstream>
 #include <fcntl.h>

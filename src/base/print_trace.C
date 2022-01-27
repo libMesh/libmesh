@@ -46,7 +46,9 @@
 #include "libmesh/print_trace.h"
 #include "libmesh/libmesh.h"
 
+#ifdef LIBMESH_HAVE_UNISTD_H
 #include <unistd.h>  // needed for getpid()
+#endif
 #include <fstream>
 #include <sstream>
 #include <string>

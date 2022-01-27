@@ -1,7 +1,10 @@
 #include <fstream>
-#include <unistd.h>
 
 #include "libmesh/libmesh_common.h"
+
+#ifdef LIBMESH_HAVE_UNISTD_H
+#include <unistd.h> // needed for truncate()
+#endif
 
 #include "output.h"
 

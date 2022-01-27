@@ -23,7 +23,9 @@
 #include <sstream>
 #include <fstream>
 
+#ifdef LIBMESH_HAVE_UNISTD_H
 #include <unistd.h> // for getpid()
+#endif
 
 // Local includes
 #include "libmesh/xdr_cxx.h"
