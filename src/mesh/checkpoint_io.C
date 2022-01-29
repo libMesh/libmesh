@@ -46,6 +46,9 @@
 #include <sstream> // for ostringstream
 #include <unordered_map>
 #include <unordered_set>
+#ifdef LIBMESH_HAVE_DIRECT_H
+#include <direct.h> // rmdir() on Windows
+#endif
 
 namespace
 {

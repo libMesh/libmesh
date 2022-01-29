@@ -476,6 +476,7 @@ BUILT_SOURCES = \
         tree_node.h \
         utility.h \
         vectormap.h \
+        win_gettimeofday.h \
         xdr_cxx.h \
         parallel_communicator_specializations
 
@@ -1981,6 +1982,9 @@ utility.h: $(top_srcdir)/include/utils/utility.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 vectormap.h: $(top_srcdir)/include/utils/vectormap.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+win_gettimeofday.h: $(top_srcdir)/include/utils/win_gettimeofday.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 xdr_cxx.h: $(top_srcdir)/include/utils/xdr_cxx.h

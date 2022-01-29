@@ -23,10 +23,6 @@
 #include <sstream>
 #include <fstream>
 
-#ifdef LIBMESH_HAVE_UNISTD_H
-#include <unistd.h> // for getpid()
-#endif
-
 // Local includes
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/libmesh_logging.h"
@@ -37,6 +33,13 @@
 #endif
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/utility.h" // unzip_file
+
+#ifdef LIBMESH_HAVE_UNISTD_H
+#include <unistd.h> // for getpid() on Unix
+#endif
+#ifdef LIBMESH_HAVE_PROCESS_H
+#include <process.h> // for getpid() on Windows
+#endif
 
 // Anonymous namespace for implementation details.
 namespace {
