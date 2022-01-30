@@ -10,6 +10,7 @@
 #include <float.h>
 #include "../ncdump/isnan.h"
 #define strcasecmp _stricmp
+#define YY_NO_UNISTD_H
 #endif
 
 #ifdef USE_NETCDF4
