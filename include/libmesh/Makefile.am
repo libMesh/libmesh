@@ -210,6 +210,7 @@ BUILT_SOURCES = \
         sync_refinement_flags.h \
         tecplot_io.h \
         tetgen_io.h \
+        triangulator_interface.h \
         ucd_io.h \
         unstructured_mesh.h \
         unv_io.h \
@@ -1183,6 +1184,9 @@ tecplot_io.h: $(top_srcdir)/include/mesh/tecplot_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tetgen_io.h: $(top_srcdir)/include/mesh/tetgen_io.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+triangulator_interface.h: $(top_srcdir)/include/mesh/triangulator_interface.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ucd_io.h: $(top_srcdir)/include/mesh/ucd_io.h

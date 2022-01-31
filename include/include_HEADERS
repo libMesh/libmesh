@@ -219,6 +219,7 @@ include_HEADERS =  \
         mesh/sync_refinement_flags.h \
         mesh/tecplot_io.h \
         mesh/tetgen_io.h \
+        mesh/triangulator_interface.h \
         mesh/ucd_io.h \
         mesh/unstructured_mesh.h \
         mesh/unv_io.h \

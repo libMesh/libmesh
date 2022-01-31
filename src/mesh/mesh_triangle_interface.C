@@ -39,26 +39,6 @@
 
 namespace libMesh
 {
-//
-// Function definitions for the TriangulatorInterface class
-//
-
-// Constructor
-TriangulatorInterface::TriangulatorInterface(UnstructuredMesh & mesh)
-  : _mesh(mesh),
-    _holes(nullptr),
-    _markers(nullptr),
-    _regions(nullptr),
-    _elem_type(TRI3),
-    _desired_area(0.1),
-    _minimum_angle(20.0),
-    _triangulation_type(GENERATE_CONVEX_HULL),
-    _insert_extra_points(false),
-    _smooth_after_generating(true),
-    _quiet(true)
-{}
-
-
 
 //
 // Function definitions for the TrianguleInterface class
