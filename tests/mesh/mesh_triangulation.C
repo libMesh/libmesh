@@ -3,6 +3,7 @@
 #include <libmesh/mesh_triangle_holes.h>
 #include <libmesh/mesh_triangle_interface.h>
 #include <libmesh/point.h>
+#include <libmesh/poly2tri_triangulator.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -22,6 +23,10 @@ public:
   CPPUNIT_TEST_SUITE( MeshTriangulationTest );
 
   CPPUNIT_TEST( testTriangleHoleArea );
+
+#ifdef LIBMESH_HAVE_POLY2TRI
+  CPPUNIT_TEST( testPoly2Tri );
+#endif
 
 #ifdef LIBMESH_HAVE_TRIANGLE
   CPPUNIT_TEST( testTriangle );
@@ -79,11 +84,9 @@ public:
 #endif
   }
 
-  void testTriangle()
+  void testTriangulator(MeshBase & mesh,
+                        TriangulatorInterface & triangulator)
   {
-#ifdef LIBMESH_HAVE_TRIANGLE
-    Mesh mesh(*TestCommWorld);
-
     // A non-square quad, so we don't have ambiguity about which
     // diagonal a Delaunay algorithm will pick.
     mesh.add_point(Point(0,0));
@@ -91,14 +94,17 @@ public:
     mesh.add_point(Point(1,2));
     mesh.add_point(Point(0,1));
 
-    TriangleInterface triangle(mesh);
+    // Use the point order to define the boundary, because our
+    // Poly2Tri implementation doesn't do convex hulls yet, even when
+    // that would give the same answer.
+    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
 
     // Don't try to insert points yet
-    triangle.desired_area() = 1000;
-    triangle.minimum_angle() = 0;
-    triangle.smooth_after_generating() = false;
+    triangulator.desired_area() = 1000;
+    triangulator.minimum_angle() = 0;
+    triangulator.smooth_after_generating() = false;
 
-    triangle.triangulate();
+    triangulator.triangulate();
 
     CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(2));
     for (const auto & elem : mesh.element_ptr_range())
@@ -138,7 +144,30 @@ public:
           }
         CPPUNIT_ASSERT(found_triangle);
       }
-#endif // LIBMESH_HAVE_TRIANGLE
+  }
+
+
+  void testTriangle()
+  {
+#ifdef LIBMESH_HAVE_TRIANGLE
+    Mesh mesh(*TestCommWorld);
+
+    TriangleInterface triangle(mesh);
+
+    testTriangulator(mesh, triangle);
+#endif
+  }
+
+
+  void testPoly2Tri()
+  {
+#ifdef LIBMESH_HAVE_POLY2TRI
+    Mesh mesh(*TestCommWorld);
+
+    Poly2TriTriangulator p2t_tri(mesh);
+
+    testTriangulator(mesh, p2t_tri);
+#endif
   }
 
 };
