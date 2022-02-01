@@ -222,6 +222,7 @@ libmesh_SOURCES =  \
         src/mesh/nemesis_io_helper.C \
         src/mesh/off_io.C \
         src/mesh/patch.C \
+        src/mesh/poly2tri_triangulator.C \
         src/mesh/postscript_io.C \
         src/mesh/replicated_mesh.C \
         src/mesh/tecplot_io.C \

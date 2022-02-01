@@ -213,6 +213,7 @@ include_HEADERS =  \
         mesh/off_io.h \
         mesh/parallel_mesh.h \
         mesh/patch.h \
+        mesh/poly2tri_triangulator.h \
         mesh/postscript_io.h \
         mesh/replicated_mesh.h \
         mesh/serial_mesh.h \
