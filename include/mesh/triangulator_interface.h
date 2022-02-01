@@ -140,8 +140,8 @@ public:
   bool & insert_extra_points() {return _insert_extra_points;}
 
   /**
-   * Sets/gets flag which tells whether to do Delaunay mesh
-   * smoothing after generating the grid.
+   * Sets/gets flag which tells whether to do two steps of Laplace
+   * mesh smoothing after generating the grid.
    */
   bool & smooth_after_generating() {return _smooth_after_generating;}
 
@@ -185,6 +185,17 @@ public:
   void attach_region_list(const std::vector<Region*> * regions) { _regions = regions; }
 
 protected:
+  /**
+   * Helper function to add extra points (midpoints of initial
+   * segments) to a PSLG triangulation
+   */
+  void insert_any_extra_boundary_points();
+
+  /**
+   * Helper function to count points in and verify holes
+   */
+  unsigned int total_hole_points();
+
   /**
    * Reference to the mesh which is to be created by triangle.
    */
