@@ -453,10 +453,28 @@ AS_IF([test "x$enableexamples" = "xyes"],
 # additional arguments to be passed to those packages, do that here.
 # Specifically, we append libmesh_subpackage_arguments to ac_configure_args
 # before AC_OUTPUT recurses into our subpackages
+
+# We need our netcdf subpackage to be able to use whatever HDF5 we've
+# detected.  That means using whatever $HDF5_CPPFLAGS and $HDF5_LIBS
+# we've determined work - but if we're using PETSc it also means
+# passing along PETSc's directories in case we want to link to a
+# --download-hdf5 build there.
+SUB_CPPFLAGS="$CPPFLAGS"
+SUB_LIBS="$LIBS"
+AS_IF([test $enablehdf5 = yes],
+      [
+       SUB_CPPFLAGS="$HDF5_CPPFLAGS $SUB_CPPFLAGS"
+       SUB_LIBS="$HDF5_LIBS $SUB_LIBS"
+       AS_IF([test "x$enablepetsc" != "xno"],
+             [
+              SUB_CPPFLAGS="$PETSCINCLUDEDIRS $SUB_CPPFLAGS"
+              SUB_LIBS="$PETSCLINKLIBS $SUB_LIBS"
+             ])])
+
 AS_IF([test "x$enablenested" = "xyes"],
       [
         ac_configure_args_SAVE="$ac_configure_args"
-        ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC' CPPFLAGS='$HDF5_CPPFLAGS $CPPFLAGS' LIBS='$HDF5_LIBS $LIBS'"
+        ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC' CPPFLAGS='$SUB_CPPFLAGS' LIBS='$SUB_LIBS'"
       ])
 
 # Create output files. Also configures any subpackages

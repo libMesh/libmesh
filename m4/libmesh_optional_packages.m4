@@ -679,9 +679,28 @@ AM_CONDITIONAL(LIBMESH_ENABLE_CURL, test x$enablecurl = xyes)
 
 
 # --------------------------------------------------------------
-# HDF5 -- enabled by default
+# HDF5 -- disabled by default
 # --------------------------------------------------------------
+
+# PETSc configure can --download-hdf5, and that's a really convenient
+# feature for users ... but libMesh --enable-hdf5 will only detect it
+# if we add PETSc include and lib directory flags *here*; if we wait
+# until build time it's too late.
+
+ac_PETSCHDF5_save_CPPFLAGS="$CPPFLAGS"
+ac_PETSCHDF5_save_LDFLAGS="$LDFLAGS"
+
+AS_IF([test "x$enablepetsc" != "xno"],
+      [
+        CPPFLAGS="$PETSCINCLUDEDIRS $CPPFLAGS"
+        LDFLAGS="$PETSCLINKLIBS $LDFLAGS"
+      ])
+
 CONFIGURE_HDF5
+
+CPPFLAGS="$ac_PETSCHDF5_save_CPPFLAGS"
+LDFLAGS="$ac_PETSCHDF5_save_LDFLAGS"
+
 AS_IF([test $enablehdf5 = yes],
       [
         libmesh_optional_INCLUDES="$HDF5_CPPFLAGS $libmesh_optional_INCLUDES"

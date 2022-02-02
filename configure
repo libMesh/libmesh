@@ -54563,8 +54563,24 @@ fi
 
 
 # --------------------------------------------------------------
-# HDF5 -- enabled by default
+# HDF5 -- disabled by default
 # --------------------------------------------------------------
+
+# PETSc configure can --download-hdf5, and that's a really convenient
+# feature for users ... but libMesh --enable-hdf5 will only detect it
+# if we add PETSc include and lib directory flags *here*; if we wait
+# until build time it's too late.
+
+ac_PETSCHDF5_save_CPPFLAGS="$CPPFLAGS"
+ac_PETSCHDF5_save_LDFLAGS="$LDFLAGS"
+
+if test "x$enablepetsc" != "xno"; then :
+
+        CPPFLAGS="$PETSCINCLUDEDIRS $CPPFLAGS"
+        LDFLAGS="$PETSCLINKLIBS $LDFLAGS"
+
+fi
+
 
   # Check whether --enable-hdf5 was given.
 if test "${enable_hdf5+set}" = set; then :
@@ -54928,6 +54944,10 @@ $as_echo "<<< Configuring library with HDF5 support >>>" >&6; }
 fi
 
 fi
+
+
+CPPFLAGS="$ac_PETSCHDF5_save_CPPFLAGS"
+LDFLAGS="$ac_PETSCHDF5_save_LDFLAGS"
 
 if test $enablehdf5 = yes; then :
 
@@ -56493,10 +56513,30 @@ fi
 # additional arguments to be passed to those packages, do that here.
 # Specifically, we append libmesh_subpackage_arguments to ac_configure_args
 # before AC_OUTPUT recurses into our subpackages
+
+# We need our netcdf subpackage to be able to use whatever HDF5 we've
+# detected.  That means using whatever $HDF5_CPPFLAGS and $HDF5_LIBS
+# we've determined work - but if we're using PETSc it also means
+# passing along PETSc's directories in case we want to link to a
+# --download-hdf5 build there.
+SUB_CPPFLAGS="$CPPFLAGS"
+SUB_LIBS="$LIBS"
+if test $enablehdf5 = yes; then :
+
+       SUB_CPPFLAGS="$HDF5_CPPFLAGS $SUB_CPPFLAGS"
+       SUB_LIBS="$HDF5_LIBS $SUB_LIBS"
+       if test "x$enablepetsc" != "xno"; then :
+
+              SUB_CPPFLAGS="$PETSCINCLUDEDIRS $SUB_CPPFLAGS"
+              SUB_LIBS="$PETSCLINKLIBS $SUB_LIBS"
+
+fi
+fi
+
 if test "x$enablenested" = "xyes"; then :
 
         ac_configure_args_SAVE="$ac_configure_args"
-        ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC' CPPFLAGS='$HDF5_CPPFLAGS $CPPFLAGS' LIBS='$HDF5_LIBS $LIBS'"
+        ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC' CPPFLAGS='$SUB_CPPFLAGS' LIBS='$SUB_LIBS'"
 
 fi
 
