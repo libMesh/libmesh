@@ -209,6 +209,15 @@ public:
   { libmesh_not_implemented(); return false; }
 
   /**
+   * \returns The "circumcenter of mass" (area-weighted average of
+   * triangulation circumcenters) of the element.
+   *
+   * Trivial in 0D.
+   */
+  virtual Point quasicircumcenter () const
+  { return this->point(0); }
+
+  /**
    * \returns \p true if the element map is definitely affine within
    * numerical tolerances.
    */

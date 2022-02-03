@@ -91,6 +91,14 @@ public:
   virtual std::vector<unsigned int> sides_on_edge(const unsigned int e) const override final
   { return {e}; }
 
+  /**
+   * \returns The "circumcenter of mass" (area-weighted average of
+   * triangulation circumcenters) of the element.
+   *
+   * Currently ignores curvature of element edges.
+   */
+  virtual Point quasicircumcenter () const override;
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**

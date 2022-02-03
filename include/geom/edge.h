@@ -187,6 +187,16 @@ public:
   virtual std::vector<unsigned int> sides_on_edge(const unsigned int) const override final
   { return {}; }
 
+  /**
+   * \returns The "circumcenter of mass" (area-weighted average of
+   * triangulation circumcenters) of the element.
+   *
+   * Currently ignores curvature of element edges, which makes this
+   * trivial in 1D.
+   */
+  virtual Point quasicircumcenter () const override
+  { return (this->point(0) + this->point(1)) / 2; }
+
   // Any edge permutation flips the mapping Jacobian negative
   virtual unsigned int n_permutations() const override final { return 0; }
 
