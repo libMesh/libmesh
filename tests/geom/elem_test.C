@@ -221,11 +221,30 @@ public:
         if (elem->infinite())
           continue;
 #endif
+        const Point centroid = elem->true_centroid();
+        const Point vertex_avg = elem->vertex_average();
+        Point quasicc;
+        if (elem->dim() < 3)
+          quasicc = elem->quasicircumcenter();
 
         for (const auto p : IntRange<unsigned int>(0, elem->n_permutations()))
           {
             elem->permute(p);
             CPPUNIT_ASSERT(elem->has_invertible_map());
+            const Point new_centroid = elem->true_centroid();
+            const Point new_vertex_avg = elem->vertex_average();
+            Point new_quasicc;
+            if (elem->dim() < 3)
+              new_quasicc = elem->quasicircumcenter();
+            for (const auto d : make_range(LIBMESH_DIM))
+              {
+                LIBMESH_ASSERT_FP_EQUAL(centroid(d), new_centroid(d),
+                                        TOLERANCE*TOLERANCE);
+                LIBMESH_ASSERT_FP_EQUAL(vertex_avg(d), new_vertex_avg(d),
+                                        TOLERANCE*TOLERANCE);
+                LIBMESH_ASSERT_FP_EQUAL(quasicc(d), new_quasicc(d),
+                                        TOLERANCE*TOLERANCE);
+              }
           }
       }
   }
