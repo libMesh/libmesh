@@ -1,0 +1,37 @@
+commit 036e440ed40d804cdabb000f3cdf8481537f0c51
+Author: Max Khon <fjoe@samodelkin.net>
+Date:   Sat Jan 29 22:35:03 2022 +0700
+
+    Treat *.C files as C++
+
+diff --git a/build-aux/compile b/build-aux/compile
+index 99e50524b..042bc613a 100755
+--- a/build-aux/compile
++++ b/build-aux/compile
+@@ -53,7 +53,7 @@ func_file_conv ()
+ 	  MINGW*)
+ 	    file_conv=mingw
+ 	    ;;
+-	  CYGWIN*)
++	  CYGWIN* | MSYS*)
+ 	    file_conv=cygwin
+ 	    ;;
+ 	  *)
+@@ -67,7 +67,7 @@ func_file_conv ()
+ 	mingw/*)
+ 	  file=`cmd //C echo "$file " | sed -e 's/"\(.*\) " *$/\1/'`
+ 	  ;;
+-	cygwin/*)
++	cygwin/* | msys/*)
+ 	  file=`cygpath -m "$file" || echo "$file"`
+ 	  ;;
+ 	wine/*)
+@@ -204,7 +204,7 @@ func_cl_wrapper ()
+ 	  set x "$@" "$1"
+ 	  shift
+ 	  ;;
+-	*.cc | *.CC | *.cxx | *.CXX | *.[cC]++)
++	*.cc | *.CC | *.cxx | *.CXX | *.[cC]++ | *.C)
+ 	  func_file_conv "$1"
+ 	  set x "$@" -Tp"$file"
+ 	  shift

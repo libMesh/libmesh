@@ -164,6 +164,7 @@ autoreconf=`which autoreconf 2>/dev/null`
 if (test "x$autoreconf" != "x"); then
     if (test -x $autoreconf); then
 	$autoreconf -iv --force
+	patch -p1 <build-aux/compile.patch
 	exit 0
     fi
 fi
