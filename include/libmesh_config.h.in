@@ -408,6 +408,9 @@
 /* Flag indicating if the library should be built with calls to getpwuid() */
 #undef HAVE_GETPWUID
 
+/* Define to 1 if you have the `gettimeofday' function. */
+#undef HAVE_GETTIMEOFDAY
+
 /* define if the compiler supports glibc backtrace */
 #undef HAVE_GLIBC_BACKTRACE
 
@@ -453,6 +456,9 @@
 /* "The make directory command" */
 #undef HAVE_MKDIR
 
+/* Define to 1 if you have the `mkstemp' function. */
+#undef HAVE_MKSTEMP
+
 /* Flag indicating whether or not MPI is available */
 #undef HAVE_MPI
 
@@ -493,6 +499,9 @@
 /* Flag indicating whether the library will be compiled with poly2tri support
    */
 #undef HAVE_POLY2TRI
+
+/* Define to 1 if you have the <process.h> header file. */
+#undef HAVE_PROCESS_H
 
 /* Define if you have POSIX threads libraries and header files. */
 #undef HAVE_PTHREAD
@@ -556,6 +565,9 @@
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
