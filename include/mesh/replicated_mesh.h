@@ -110,6 +110,11 @@ public:
   virtual void clear() override;
 
   /**
+   * Clear internal Elem data.
+   */
+  virtual void clear_elems() override;
+
+  /**
    * Remove nullptr elements from arrays
    */
   virtual void renumber_nodes_and_elements () override;
