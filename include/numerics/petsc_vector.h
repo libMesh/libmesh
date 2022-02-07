@@ -416,19 +416,6 @@ private:
   mutable std::mutex _petsc_vector_mutex;
 
   /**
-   * Condition variable for _get_array and _restore_array.  This is part of the
-   * object to keep down thread contention when reading from multiple
-   * PetscVectors simultaneously
-   */
-  mutable std::condition_variable _petsc_vector_cv;
-
-  /**
-   * Mutex that helps enforce a call_once idiom within a method, where
-   * once means call for only one thread
-   */
-  mutable std::mutex _petsc_vector_do_once_mutex;
-
-  /**
    * Queries the array (and the local form if the vector is ghosted)
    * from PETSc.
    *
@@ -468,7 +455,7 @@ private:
   /**
    * Whether or not the data array is for read only access
    */
-  mutable std::atomic<bool> _values_read_only;
+  mutable bool _values_read_only;
 };
 
 
@@ -1097,11 +1084,6 @@ void PetscVector<T>::get(const std::vector<numeric_index_type> & index,
 
   const std::size_t num = index.size();
 
-  std::unique_lock<std::mutex> read_lock(_petsc_vector_mutex);
-  _petsc_vector_cv.wait(read_lock, [this](){ return _array_is_present.load(); });
-  // When wait exits it means we've acquired and locked the mutex, but all we are doing now
-  // is reading, so it's safe to unlock and let other threads continue
-  read_lock.unlock();
   for (std::size_t i=0; i<num; i++)
     {
       const numeric_index_type local_index = this->map_global_to_local_index(index[i]);

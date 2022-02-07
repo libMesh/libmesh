@@ -1151,22 +1151,24 @@ void PetscVector<T>::_get_array(bool read_only) const
 {
   libmesh_assert (this->initialized());
 
+  const bool initially_array_is_present = _array_is_present.load(std::memory_order_acquire);
+
   // If the values have already been retrieved and we're currently
   // trying to get a non-read only view (ie read/write) and the
   // values are currently read only... then we need to restore
   // the array first... and then retrieve it again.
-  if (_array_is_present && !read_only && _values_read_only)
+  if (initially_array_is_present && !read_only && _values_read_only)
     _restore_array();
 
   // If we already have a read/write array - and we're trying
   // to get a read only array - let's just use the read write
-  if (_array_is_present && read_only && !_values_read_only)
+  if (initially_array_is_present && read_only && !_values_read_only)
     _read_only_values = _values;
 
-  if (!_array_is_present)
+  if (!initially_array_is_present)
     {
-      std::lock_guard<std::mutex> do_once_lock(_petsc_vector_do_once_mutex);
-      if (!_array_is_present)
+      std::lock_guard<std::mutex> do_once_lock(_petsc_vector_mutex);
+      if (!_array_is_present.load(std::memory_order_relaxed))
         {
           PetscErrorCode ierr=0;
           if (this->type() != GHOSTED)
@@ -1214,8 +1216,7 @@ void PetscVector<T>::_get_array(bool read_only) const
             _first = static_cast<numeric_index_type>(petsc_first);
             _last = static_cast<numeric_index_type>(petsc_last);
           }
-          _array_is_present = true;
-          _petsc_vector_cv.notify_all();
+          _array_is_present.store(true, std::memory_order_release);
         }
     }
 }
