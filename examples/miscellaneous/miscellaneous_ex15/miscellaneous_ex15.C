@@ -81,12 +81,8 @@ void assemble_func(EquationSystems & es, const std::string & system_name)
 
   // Now we will loop over all the elements in the mesh that
   // live on the local processor.
-  //for (const auto & elem : mesh.active_local_element_ptr_range()){
-  MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
-  for (; elem_it != elem_end; ++elem_it)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      Elem* elem = *elem_it;
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
       // matrix and right-hand-side this element will
@@ -201,8 +197,6 @@ int main (int argc, char** argv)
                                      );
 
   mesh.print_info();
-  MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
   // The infinite elements are attached to all elements that build the outer surface of the FEM-region.
   InfElemBuilder builder(mesh);
