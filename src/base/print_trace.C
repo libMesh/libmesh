@@ -47,7 +47,12 @@
 #include "libmesh/libmesh.h"
 
 #ifdef LIBMESH_HAVE_UNISTD_H
-#include <unistd.h>  // needed for getpid()
+#include <unistd.h>  // needed for getpid() on Unix
+#endif
+#ifdef LIBMESH_HAVE_PROCESS_H
+#include <process.h> // for getpid() on Windows
+
+typedef int pid_t;
 #endif
 #include <fstream>
 #include <sstream>
@@ -55,6 +60,9 @@
 #include <cstdio> // std::remove
 #include <cstdlib> // std::system
 #include <sys/types.h> // pid_t
+#ifndef LIBMESH_HAVE_MKSTEMP
+#include "win_mkstemp.h"
+#endif
 
 #if defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
 #include <execinfo.h>

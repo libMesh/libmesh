@@ -31,7 +31,12 @@
 #include <string>
 #include <vector>
 #include <deque>
-#include <sys/time.h>
+#ifdef LIBMESH_HAVE_SYS_TIME_H
+#include <sys/time.h> // gettimeofday() on Unix
+#endif
+#ifndef LIBMESH_HAVE_GETTIMEOFDAY
+#include "libmesh/win_gettimeofday.h" // gettimeofday() on Windows
+#endif
 
 namespace libMesh
 {

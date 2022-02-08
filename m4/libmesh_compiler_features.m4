@@ -160,6 +160,8 @@ AC_CXX_RTTI
 # Check for headers
 # --------------------------------------------------------------
 AC_CHECK_HEADERS(getopt.h)
+AC_CHECK_HEADERS(sys/time.h)
+AC_CHECK_HEADERS(process.h)
 AC_CHECK_HEADERS(csignal)
 AC_CHECK_HEADERS(sys/resource.h)
 AC_CXX_HAVE_LOCALE
@@ -189,6 +191,8 @@ AC_CHECK_HEADERS(direct.h)
 AC_CHECK_DECLS([_mkdir], [], [], [
     #include <direct.h>
 ])
+
+AC_CHECK_FUNCS([mkstemp gettimeofday])
 
 # Check for uname header.
 AC_CHECK_HEADERS(sys/utsname.h)
