@@ -1,3 +1,4 @@
+#include <libmesh/parallel_implementation.h> // max()
 #include <libmesh/elem.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_triangle_holes.h>
@@ -26,10 +27,12 @@ public:
 
 #ifdef LIBMESH_HAVE_POLY2TRI
   CPPUNIT_TEST( testPoly2Tri );
+  CPPUNIT_TEST( testPoly2TriHoles );
 #endif
 
 #ifdef LIBMESH_HAVE_TRIANGLE
   CPPUNIT_TEST( testTriangle );
+  CPPUNIT_TEST( testTriangleHoles );
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -147,14 +150,90 @@ public:
   }
 
 
+  void testTriangulatorHoles(MeshBase & mesh,
+                             TriangulatorInterface & triangulator)
+  {
+    // A square quad; we'll put a diamond hole in the middle to make
+    // the Delaunay selection unambiguous.
+    mesh.add_point(Point(-1,-1));
+    mesh.add_point(Point(1,-1));
+    mesh.add_point(Point(1,1));
+    mesh.add_point(Point(-1,1));
+
+    // Use the point order to define the boundary, because our
+    // Poly2Tri implementation doesn't do convex hulls yet, even when
+    // that would give the same answer.
+    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
+
+    // Add a diamond hole in the center
+    TriangulatorInterface::PolygonHole diamond(Point(0), std::sqrt(2)/2, 4);
+    const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
+    triangulator.attach_hole_list(&holes);
+
+    // Don't try to insert points yet
+    triangulator.desired_area() = 1000;
+    triangulator.minimum_angle() = 0;
+    triangulator.smooth_after_generating() = false;
+
+    triangulator.triangulate();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(8));
+
+    Real r2p2o6 = (std::sqrt(Real(2))+2)/6;
+    Real r2p4o6 = (std::sqrt(Real(2))+4)/6;
+
+    std::vector <Point> expected_centers
+    { {r2p2o6,r2p2o6}, {r2p2o6,-r2p2o6},
+      {-r2p2o6,r2p2o6}, {-r2p2o6,-r2p2o6},
+      {0,r2p4o6}, {r2p4o6, 0},
+      {0,-r2p4o6}, {-r2p4o6, 0}
+    };
+
+    std::vector<bool> found_centers(expected_centers.size(), false);
+
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
+
+        Point center = elem->vertex_average();
+
+        bool found_mine = false;
+        for (auto i : index_range(expected_centers))
+          {
+            Point possible = expected_centers[i];
+
+            if (possible.absolute_fuzzy_equals(center, TOLERANCE*TOLERANCE))
+              {
+                found_mine = true;
+                found_centers[i] = true;
+              }
+          }
+        CPPUNIT_ASSERT(found_mine);
+      }
+
+    mesh.comm().max(found_centers);
+
+    for (auto found_it : found_centers)
+      CPPUNIT_ASSERT(found_it);
+  }
+
+
   void testTriangle()
   {
 #ifdef LIBMESH_HAVE_TRIANGLE
     Mesh mesh(*TestCommWorld);
-
     TriangleInterface triangle(mesh);
-
     testTriangulator(mesh, triangle);
+#endif
+  }
+
+
+  void testTriangleHoles()
+  {
+#ifdef LIBMESH_HAVE_TRIANGLE
+    Mesh mesh(*TestCommWorld);
+    TriangleInterface triangle(mesh);
+    testTriangulatorHoles(mesh, triangle);
 #endif
   }
 
@@ -163,10 +242,18 @@ public:
   {
 #ifdef LIBMESH_HAVE_POLY2TRI
     Mesh mesh(*TestCommWorld);
-
     Poly2TriTriangulator p2t_tri(mesh);
-
     testTriangulator(mesh, p2t_tri);
+#endif
+  }
+
+
+  void testPoly2TriHoles()
+  {
+#ifdef LIBMESH_HAVE_POLY2TRI
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator p2t_tri(mesh);
+    testTriangulatorHoles(mesh, p2t_tri);
 #endif
   }
 
