@@ -84,6 +84,6 @@ void NonlinearSolver<T>::set_solver_configuration(SolverConfiguration & solver_c
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class NonlinearSolver<Number>;
+template class LIBMESH_EXPORT NonlinearSolver<Number>;
 
 } // namespace libMesh

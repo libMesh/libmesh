@@ -160,9 +160,9 @@ void QComposite<QSubCell>::add_subelem_values (const std::vector<Elem const *> &
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template class QComposite<QGauss>;
-template class QComposite<QTrap>;
-template class QComposite<QSimpson>;
+template class LIBMESH_EXPORT QComposite<QGauss>;
+template class LIBMESH_EXPORT QComposite<QTrap>;
+template class LIBMESH_EXPORT QComposite<QSimpson>;
 
 } // namespace libMesh
 

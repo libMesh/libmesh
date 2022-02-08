@@ -324,8 +324,8 @@ void InverseDistanceInterpolation<KDDim>::interpolate (const Point              
 
 // ------------------------------------------------------------
 // Explicit Instantiations
-template class InverseDistanceInterpolation<1>;
-template class InverseDistanceInterpolation<2>;
-template class InverseDistanceInterpolation<3>;
+template class LIBMESH_EXPORT InverseDistanceInterpolation<1>;
+template class LIBMESH_EXPORT InverseDistanceInterpolation<2>;
+template class LIBMESH_EXPORT InverseDistanceInterpolation<3>;
 
 } // namespace libMesh

@@ -84,6 +84,6 @@ OptimizationSolver<T>::build(sys_type & s, const SolverPackage solver_package)
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class OptimizationSolver<Number>;
+template class LIBMESH_EXPORT OptimizationSolver<Number>;
 
 } // namespace libMesh

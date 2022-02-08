@@ -174,8 +174,8 @@ void MeshOutput<MT>::write_nodal_data (const std::string & fname,
 
 // Instantiate for our Mesh types.  If this becomes too cumbersome later,
 // move any functions in this file to the header file instead.
-template class MeshOutput<MeshBase>;
-template class MeshOutput<UnstructuredMesh>;
-template class MeshOutput<DistributedMesh>;
+template class LIBMESH_EXPORT MeshOutput<MeshBase>;
+template class LIBMESH_EXPORT MeshOutput<UnstructuredMesh>;
+template class LIBMESH_EXPORT MeshOutput<DistributedMesh>;
 
 } // namespace libMesh

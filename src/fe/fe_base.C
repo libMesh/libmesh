@@ -2578,7 +2578,7 @@ compute_periodic_constraints (DofConstraints & constraints,
 
 // ------------------------------------------------------------
 // Explicit instantiations
-template class FEGenericBase<Real>;
-template class FEGenericBase<RealGradient>;
+template class LIBMESH_EXPORT FEGenericBase<Real>;
+template class LIBMESH_EXPORT FEGenericBase<RealGradient>;
 
 } // namespace libMesh

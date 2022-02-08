@@ -579,13 +579,13 @@ void EquationSystems::write(const std::string & name,
 
 // template specialization
 
-template void EquationSystems::read<Number> (const std::string & name, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::read<Number> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::_read_impl<Number> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template LIBMESH_EXPORT void EquationSystems::read<Number> (const std::string & name, const unsigned int read_flags, bool partition_agnostic);
+template LIBMESH_EXPORT void EquationSystems::read<Number> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template LIBMESH_EXPORT void EquationSystems::_read_impl<Number> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template void EquationSystems::read<Real> (const std::string & name, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::read<Real> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::_read_impl<Real> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template LIBMESH_EXPORT void EquationSystems::read<Real> (const std::string & name, const unsigned int read_flags, bool partition_agnostic);
+template LIBMESH_EXPORT void EquationSystems::read<Real> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template LIBMESH_EXPORT void EquationSystems::_read_impl<Real> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
 #endif
 
 } // namespace libMesh

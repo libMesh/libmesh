@@ -714,8 +714,8 @@ void TreeNode<N>::find_elements_in_children (const Point & p,
 
 // ------------------------------------------------------------
 // Explicit Instantiations
-template class TreeNode<2>;
-template class TreeNode<4>;
-template class TreeNode<8>;
+template class LIBMESH_EXPORT TreeNode<2>;
+template class LIBMESH_EXPORT TreeNode<4>;
+template class LIBMESH_EXPORT TreeNode<8>;
 
 } // namespace libMesh

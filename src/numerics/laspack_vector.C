@@ -477,7 +477,7 @@ Real LaspackVector<T>::min () const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class LaspackVector<Number>;
+template class LIBMESH_EXPORT LaspackVector<Number>;
 
 } // namespace libMesh
 

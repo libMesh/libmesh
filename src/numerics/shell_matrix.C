@@ -51,6 +51,6 @@ namespace libMesh
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class ShellMatrix<Number>;
+template class LIBMESH_EXPORT ShellMatrix<Number>;
 
 } // namespace libMesh

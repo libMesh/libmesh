@@ -25,18 +25,18 @@ namespace libMesh
 //--------------------------------------------------------------
 // Explicit instantiations
 #define LIBMESH_VMA_INSTANTIATE(T1,T2,T3)               \
-  template void DenseMatrix<T1>::vector_mult_add        \
+  template LIBMESH_EXPORT void DenseMatrix<T1>::vector_mult_add \
   (DenseVector<                                         \
    CompareTypes<T1,                                     \
    CompareTypes<T2,T3>::supertype>::supertype> & dest,  \
    const T2 factor,                                     \
    const DenseVector<T3> & arg) const
 
-template class DenseMatrix<Real>;
-template void DenseMatrix<Real>::cholesky_solve(const DenseVector<Real> &, DenseVector<Real> &);
-template void DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<Real> &, DenseVector<Real> &) const;
-template void DenseMatrix<Real>::cholesky_solve(const DenseVector<Complex> &, DenseVector<Complex> &);
-template void DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<Complex> &, DenseVector<Complex> &) const;
+template class LIBMESH_EXPORT DenseMatrix<Real>;
+template LIBMESH_EXPORT void DenseMatrix<Real>::cholesky_solve(const DenseVector<Real> &, DenseVector<Real> &);
+template LIBMESH_EXPORT void DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<Real> &, DenseVector<Real> &) const;
+template LIBMESH_EXPORT void DenseMatrix<Real>::cholesky_solve(const DenseVector<Complex> &, DenseVector<Complex> &);
+template LIBMESH_EXPORT void DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<Complex> &, DenseVector<Complex> &) const;
 LIBMESH_VMA_INSTANTIATE(Real,int,Real);
 #ifndef LIBMESH_DEFAULT_SINGLE_PRECISION
 LIBMESH_VMA_INSTANTIATE(Real,float,Real);
@@ -46,12 +46,12 @@ LIBMESH_VMA_INSTANTIATE(Real,double,Real);
 #endif
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template class DenseMatrix<Complex>;
-template void DenseMatrix<Complex>::cholesky_solve(const DenseVector<Complex> &,DenseVector<Complex> &);
-template void DenseMatrix<Complex>::_cholesky_back_substitute(const DenseVector<Complex> &, DenseVector<Complex> &) const;
-template void DenseMatrix<Real>::vector_mult (DenseVector<CompareTypes<Real,Complex>::supertype> & dest,
+template class LIBMESH_EXPORT DenseMatrix<Complex>;
+template LIBMESH_EXPORT void DenseMatrix<Complex>::cholesky_solve(const DenseVector<Complex> &,DenseVector<Complex> &);
+template LIBMESH_EXPORT void DenseMatrix<Complex>::_cholesky_back_substitute(const DenseVector<Complex> &, DenseVector<Complex> &) const;
+template LIBMESH_EXPORT void DenseMatrix<Real>::vector_mult (DenseVector<CompareTypes<Real,Complex>::supertype> & dest,
                                               const DenseVector<Complex> & arg) const;
-template void DenseMatrix<Real>::vector_mult_transpose (DenseVector<CompareTypes<Real,Complex>::supertype> & dest,
+template LIBMESH_EXPORT void DenseMatrix<Real>::vector_mult_transpose (DenseVector<CompareTypes<Real,Complex>::supertype> & dest,
                                                         const DenseVector<Complex> & arg) const;
 LIBMESH_VMA_INSTANTIATE(Real,int,Complex);
 LIBMESH_VMA_INSTANTIATE(Complex,int,Complex);

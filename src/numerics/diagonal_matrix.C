@@ -297,5 +297,5 @@ DiagonalMatrix<T>::diagonal() const
   return *_diagonal;
 }
 
-template class DiagonalMatrix<Number>;
+template class LIBMESH_EXPORT DiagonalMatrix<Number>;
 }

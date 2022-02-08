@@ -543,7 +543,7 @@ LinearConvergenceReason LaspackLinearSolver<T>::get_converged_reason() const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class LaspackLinearSolver<Number>;
+template class LIBMESH_EXPORT LaspackLinearSolver<Number>;
 
 } // namespace libMesh
 

@@ -59,10 +59,10 @@ void DenseVectorBase<T>::print (std::ostream & os) const
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template class DenseVectorBase<Real>;
+template class LIBMESH_EXPORT DenseVectorBase<Real>;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template class DenseVectorBase<Complex>;
+template class LIBMESH_EXPORT DenseVectorBase<Complex>;
 #endif
 
 } // namespace libMesh

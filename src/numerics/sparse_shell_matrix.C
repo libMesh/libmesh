@@ -43,6 +43,6 @@ void SparseShellMatrix<T>::vector_mult_add (NumericVector<T> & dest,
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class SparseShellMatrix<Number>;
+template class LIBMESH_EXPORT SparseShellMatrix<Number>;
 
 } // namespace libMesh

@@ -450,7 +450,7 @@ int NloptOptimizationSolver<T>::get_converged_reason()
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class NloptOptimizationSolver<Number>;
+template class LIBMESH_EXPORT NloptOptimizationSolver<Number>;
 
 } // namespace libMesh
 

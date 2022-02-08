@@ -1559,7 +1559,7 @@ PetscLinearSolver<T>::restrict_solve_to_is_local_size() const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class PetscLinearSolver<Number>;
+template class LIBMESH_EXPORT PetscLinearSolver<Number>;
 
 } // namespace libMesh
 

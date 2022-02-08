@@ -276,7 +276,7 @@ void AztecLinearSolver<T>::set_solver_type()
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class AztecLinearSolver<Number>;
+template class LIBMESH_EXPORT AztecLinearSolver<Number>;
 
 } // namespace libMesh
 

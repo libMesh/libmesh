@@ -438,7 +438,7 @@ NoxNonlinearSolver<T>::get_total_linear_iterations()
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class NoxNonlinearSolver<Number>;
+template class LIBMESH_EXPORT NoxNonlinearSolver<Number>;
 
 } // namespace libMesh
 

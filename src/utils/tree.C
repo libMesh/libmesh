@@ -169,8 +169,8 @@ Tree<N>::operator() (const Point & p,
 
 // ------------------------------------------------------------
 // Explicit Instantiations
-template class Tree<2>;
-template class Tree<4>;
-template class Tree<8>;
+template class LIBMESH_EXPORT Tree<2>;
+template class LIBMESH_EXPORT Tree<4>;
+template class LIBMESH_EXPORT Tree<8>;
 
 } // namespace libMesh

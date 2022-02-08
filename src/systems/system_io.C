@@ -2363,15 +2363,15 @@ std::size_t System::write_serialized_vectors (Xdr & io,
 
 
 
-template void System::read_parallel_data<Number> (Xdr & io, const bool read_additional_data);
-template void System::read_serialized_data<Number> (Xdr & io, const bool read_additional_data);
-template numeric_index_type System::read_serialized_vector<Number> (Xdr & io, NumericVector<Number> * vec);
-template std::size_t System::read_serialized_vectors<Number> (Xdr & io, const std::vector<NumericVector<Number> *> & vectors) const;
+template LIBMESH_EXPORT void System::read_parallel_data<Number> (Xdr & io, const bool read_additional_data);
+template LIBMESH_EXPORT void System::read_serialized_data<Number> (Xdr & io, const bool read_additional_data);
+template LIBMESH_EXPORT numeric_index_type System::read_serialized_vector<Number> (Xdr & io, NumericVector<Number> * vec);
+template LIBMESH_EXPORT std::size_t System::read_serialized_vectors<Number> (Xdr & io, const std::vector<NumericVector<Number> *> & vectors) const;
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template void System::read_parallel_data<Real> (Xdr & io, const bool read_additional_data);
-template void System::read_serialized_data<Real> (Xdr & io, const bool read_additional_data);
-template numeric_index_type System::read_serialized_vector<Real> (Xdr & io, NumericVector<Number> * vec);
-template std::size_t System::read_serialized_vectors<Real> (Xdr & io, const std::vector<NumericVector<Number> *> & vectors) const;
+template LIBMESH_EXPORT void System::read_parallel_data<Real> (Xdr & io, const bool read_additional_data);
+template LIBMESH_EXPORT void System::read_serialized_data<Real> (Xdr & io, const bool read_additional_data);
+template LIBMESH_EXPORT numeric_index_type System::read_serialized_vector<Real> (Xdr & io, NumericVector<Number> * vec);
+template LIBMESH_EXPORT std::size_t System::read_serialized_vectors<Real> (Xdr & io, const std::vector<NumericVector<Number> *> & vectors) const;
 #endif
 
 } // namespace libMesh

@@ -1063,7 +1063,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class SlepcEigenSolver<Number>;
+template class LIBMESH_EXPORT SlepcEigenSolver<Number>;
 
 } // namespace libMesh
 

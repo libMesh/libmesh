@@ -88,6 +88,6 @@ void SumShellMatrix<T>::get_diagonal (NumericVector<T> & dest) const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class SumShellMatrix<Number>;
+template class LIBMESH_EXPORT SumShellMatrix<Number>;
 
 } // namespace libMesh

@@ -623,6 +623,6 @@ void DistributedVector<T>::pointwise_mult (const NumericVector<T> &,
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template class DistributedVector<Number>;
+template class LIBMESH_EXPORT DistributedVector<Number>;
 
 } // namespace libMesh

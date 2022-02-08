@@ -257,7 +257,7 @@ TrilinosPreconditioner<T>::OperatorRangeMap() const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class TrilinosPreconditioner<Number>;
+template class LIBMESH_EXPORT TrilinosPreconditioner<Number>;
 
 } // namespace libMesh
 

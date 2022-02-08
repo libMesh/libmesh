@@ -928,7 +928,7 @@ void EpetraVector<T>::destroyNonlocalData()
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class EpetraVector<Number>;
+template class LIBMESH_EXPORT EpetraVector<Number>;
 
 } // namespace libMesh
 

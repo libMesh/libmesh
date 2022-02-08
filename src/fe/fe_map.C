@@ -2169,10 +2169,10 @@ Point FEMap::map_deriv (const unsigned int dim,
 
 
 // Explicit instantiation of FEMap member functions
-template void FEMap::init_reference_to_physical_map<0>( const std::vector<Point> &, const Elem *);
-template void FEMap::init_reference_to_physical_map<1>( const std::vector<Point> &, const Elem *);
-template void FEMap::init_reference_to_physical_map<2>( const std::vector<Point> &, const Elem *);
-template void FEMap::init_reference_to_physical_map<3>( const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_reference_to_physical_map<0>( const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_reference_to_physical_map<1>( const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_reference_to_physical_map<2>( const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_reference_to_physical_map<3>( const std::vector<Point> &, const Elem *);
 
 // subdivision elements are implemented only for 2D meshes & reimplement
 // the inverse_maps method separately

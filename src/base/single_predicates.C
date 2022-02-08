@@ -68,15 +68,15 @@ multi_evaluable<T>::operator()(const T & it) const
 
 
 // Instantiate with the useful values of T
-#define INSTANTIATE_NODAL_PREDICATES(IterType)                                \
-  template bool bid<IterType>::operator()(const IterType &) const;            \
-  template bool bnd<IterType>::operator()(const IterType &) const;            \
-  template bool evaluable<IterType>::operator()(const IterType &) const;      \
-  template bool multi_evaluable<IterType>::operator()(const IterType &) const
+#define INSTANTIATE_NODAL_PREDICATES(IterType)                                               \
+  template LIBMESH_EXPORT bool bid<IterType>::operator()(const IterType &) const;            \
+  template LIBMESH_EXPORT bool bnd<IterType>::operator()(const IterType &) const;            \
+  template LIBMESH_EXPORT bool evaluable<IterType>::operator()(const IterType &) const;      \
+  template LIBMESH_EXPORT bool multi_evaluable<IterType>::operator()(const IterType &) const
 
-#define INSTANTIATE_ELEM_PREDICATES(IterType)                                 \
-  template bool evaluable<IterType>::operator()(const IterType &) const;      \
-  template bool multi_evaluable<IterType>::operator()(const IterType &) const
+#define INSTANTIATE_ELEM_PREDICATES(IterType)                                                \
+  template LIBMESH_EXPORT bool evaluable<IterType>::operator()(const IterType &) const;      \
+  template LIBMESH_EXPORT bool multi_evaluable<IterType>::operator()(const IterType &) const
 
 // Handle commas in macro arguments
 #define LIBMESH_COMMA ,

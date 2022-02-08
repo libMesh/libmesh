@@ -276,10 +276,10 @@ const std::vector<KeyType> & Sort<KeyType,IdxType>::bin()
 
 
 // Explicitly instantiate for int, double
-template class Parallel::Sort<int, unsigned int>;
-template class Parallel::Sort<double, unsigned int>;
+template class LIBMESH_EXPORT Parallel::Sort<int, unsigned int>;
+template class LIBMESH_EXPORT Parallel::Sort<double, unsigned int>;
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
-template class Parallel::Sort<Parallel::DofObjectKey, unsigned int>;
+template class LIBMESH_EXPORT Parallel::Sort<Parallel::DofObjectKey, unsigned int>;
 #endif
 
 } // namespace libMesh

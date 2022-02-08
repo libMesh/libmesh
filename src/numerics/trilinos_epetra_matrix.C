@@ -552,7 +552,7 @@ void EpetraMatrix<T>::print_personal(std::ostream & os) const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class EpetraMatrix<Number>;
+template class LIBMESH_EXPORT EpetraMatrix<Number>;
 
 } // namespace libMesh
 
