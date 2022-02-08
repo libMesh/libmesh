@@ -557,17 +557,23 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
   // returned
 
   {
-    this->weight.resize  (n_qp);
-    this->dweight.resize (n_qp);
-    this->dphase.resize  (n_qp);
-
-    for (unsigned int p=0; p<n_qp; p++)
+    if (this->calculate_phi || this->calculate_dphi)
       {
-        this->weight[p] = 1.;
-        this->dweight[p].zero();
-        this->dphase[p].zero();
+        this->weight.resize  (n_qp);
+        for (unsigned int p=0; p<n_qp; p++)
+          this->weight[p] = 1.;
       }
 
+    if (this->calculate_dphi)
+      {
+        this->dweight.resize (n_qp);
+        this->dphase.resize  (n_qp);
+        for (unsigned int p=0; p<n_qp; p++)
+          {
+            this->dweight[p].zero();
+            this->dphase[p].zero();
+          }
+      }
   }
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

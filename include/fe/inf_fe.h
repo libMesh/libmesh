@@ -559,19 +559,25 @@ public:
   { libmesh_assert(radial_qrule); return _n_total_qp; }
 
 
-
+  /**
+   * \returns the \p xyz spatial locations of the quadrature
+   * points on the element.
+   */
   virtual const std::vector<Point> & get_xyz () const override
-  { calculate_map = true; return xyz; }
+  { libmesh_assert(!calculations_started || calculate_xyz);
+    calculate_xyz = true; return xyz; }
 
   /**
-   * Please use \p get_JxWxdecay_sq() instead!
-   *
-   * The Jacobian cannot be computed for Infinite elements!
-   *
+   * \returns the Jacobian times quadrature weight.
+   * Due to the divergence with increasing radial distance, this quantity
+   * is numerically unstable.
+   * Thus, it is safer to use \p get_JxWxdecay_sq() instead!
    */
   virtual const std::vector<Real> & get_JxW () const override
   {
-      return this->JxW;
+    libmesh_assert(!calculations_started || calculate_jxw);
+    calculate_jxw = true;
+    return this->JxW;
   }
 
   /**
@@ -583,7 +589,8 @@ public:
    * applied to obtain well-defined quantities.
    */
   virtual const std::vector<Real> & get_JxWxdecay_sq () const override
-  { calculate_map = true; return this->JxWxdecay;}
+  { libmesh_assert(!calculations_started || calculate_map_scaled);
+    calculate_map_scaled = true; return this->JxWxdecay;}
 
 
   /**
@@ -597,8 +604,8 @@ public:
    * (i.e. by using \p get_Sobolev_weightxR_sq())
    **/
   virtual const std::vector<std::vector<OutputShape>> & get_phi_over_decayxR () const override
-  { libmesh_assert(!calculations_started || calculate_phi);
-    calculate_phi = true; return phixr; }
+  { libmesh_assert(!calculations_started || calculate_phi_scaled);
+    calculate_phi_scaled = true; return phixr; }
 
 
   /**
@@ -607,8 +614,8 @@ public:
    * See \p  get_phi_over_decayxR() for details.
    */
   virtual const std::vector<std::vector<OutputGradient>> & get_dphi_over_decayxR () const override
-  { libmesh_assert(!calculations_started || calculate_dphi);
-    calculate_dphi = calculate_dphiref = true; return dphixr; }
+  { libmesh_assert(!calculations_started || calculate_dphi_scaled);
+    calculate_dphi_scaled = true; return dphixr; }
 
 
   /**
@@ -619,8 +626,8 @@ public:
    * when divided by the decay function.
    */
   virtual const std::vector<std::vector<OutputGradient>> & get_dphi_over_decay () const override
-  { libmesh_assert(!calculations_started || calculate_dphi);
-    calculate_dphi = calculate_dphiref = true; return dphixr_sq; }
+  { libmesh_assert(!calculations_started || calculate_dphi_scaled);
+    calculate_dphi_scaled = true; return dphixr_sq; }
 
 
   /**
@@ -629,12 +636,16 @@ public:
    */
   virtual const std::vector<RealGradient> & get_dxyzdxi() const override
   { calculate_map = true; libmesh_not_implemented();}
+
+
   /**
    * \returns The element tangents in eta-direction at the quadrature
    * points.
    */
   virtual const std::vector<RealGradient> & get_dxyzdeta() const override
   { calculate_map = true; libmesh_not_implemented();}
+
+
   /**
    * \returns The element tangents in zeta-direction at the quadrature
    * points.
@@ -680,55 +691,81 @@ public:
    * matrix from physical to local coordinates.
    */
   virtual const std::vector<Real> & get_dxidx() const override
-  { calculate_map = true; return dxidx_map;}
+  {libmesh_assert(!calculations_started || calculate_map);
+    calculate_map = true; return dxidx_map;}
+
+
   /**
    * \returns The dxi/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
   virtual const std::vector<Real> & get_dxidy() const override
-  { calculate_map = true; return dxidy_map;}
+  {libmesh_assert(!calculations_started || calculate_map);
+    calculate_map = true; return dxidy_map;}
+
+
   /**
    * \returns The dxi/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
   virtual const std::vector<Real> & get_dxidz() const override
-  { calculate_map = true; return dxidz_map;}
+  { libmesh_assert(!calculations_started || calculate_map);
+    calculate_map = true; return dxidz_map;}
+
+
   /**
    * \returns The deta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
   virtual const std::vector<Real> & get_detadx() const override
-  { calculate_map = true; return detadx_map;}
+  { libmesh_assert(!calculations_started || calculate_map);
+    calculate_map = true; return detadx_map;}
+
+
   /**
    * \returns The deta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
   virtual const std::vector<Real> & get_detady() const override
-  { calculate_map = true; return detady_map;}
+  { libmesh_assert(!calculations_started || calculate_map);
+    calculate_map = true; return detady_map;}
+
+
   /**
    * \returns The deta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
   virtual const std::vector<Real> & get_detadz() const override
-  { calculate_map = true; return detadz_map;}
+  { libmesh_assert(!calculations_started || calculate_map);
+    calculate_map = true; return detadz_map;}
+
+
   /**
    * \returns The dzeta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
   virtual const std::vector<Real> & get_dzetadx() const override
-  { calculate_map = true; return dzetadx_map;}
+  { libmesh_assert(!calculations_started || calculate_map);
+    calculate_map = true; return dzetadx_map;}
+
+
   /**
    * \returns The dzeta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
   virtual const std::vector<Real> & get_dzetady() const override
-  { calculate_map = true; return dzetady_map;}
+  { libmesh_assert(!calculations_started || calculate_map);
+    calculate_map = true; return dzetady_map;}
+
+
   /**
    * \returns The dzeta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
   virtual const std::vector<Real> & get_dzetadz() const override
-  { calculate_map = true; return dzetadz_map;}
+  { libmesh_assert(!calculations_started || calculate_map);
+    calculate_map = true; return dzetadz_map;}
+
 
   /**
    * \returns The multiplicative weight at each quadrature point.
@@ -738,22 +775,34 @@ public:
    * variational form easily computable.
    */
   virtual const std::vector<Real> & get_Sobolev_weight() const override
-  { calculate_map = true; return weight; }
+  { libmesh_assert(!calculations_started || calculate_phi);
+    calculate_phi = true; return weight; }
+
+
+  /**
+   * \returns The first global derivative of the multiplicative
+   * weight at each quadrature point. See \p get_Sobolev_weight()
+   * for details.  In case of \p FE initialized to all zero.
+   */
+  virtual const std::vector<RealGradient> & get_Sobolev_dweight() const
+  {libmesh_assert(!calculations_started || calculate_dphi);
+    calculate_dphi = true; return dweight; }
+
 
 
   /**
    * \returns The tangent vectors for face integration.
    */
   virtual const std::vector<std::vector<Point>> & get_tangents() const override
-  { libmesh_assert(!calculations_started || calculate_dxyz);
-    calculate_dxyz = true; return tangents; }
+  { libmesh_assert(!calculations_started || calculate_map);
+    calculate_map = true; return tangents; }
 
   /**
    * \returns The outward pointing normal vectors for face integration.
    */
   virtual const std::vector<Point> & get_normals() const override
-  { libmesh_assert(!calculations_started || calculate_dxyz);
-    calculate_dxyz = true; return normals; }
+  { libmesh_assert(!calculations_started || calculate_map);
+    calculate_map = true; return normals; }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -769,7 +818,8 @@ public:
    *
    */
   virtual const std::vector<Real> & get_Sobolev_weightxR_sq() const override
-  { calculate_map = true; return weightxr_sq; }
+  { libmesh_assert(!calculations_started || calculate_phi_scaled);
+    calculate_phi_scaled = true; return weightxr_sq; }
 
 
   /**
@@ -779,7 +829,8 @@ public:
    *
    */
   virtual const std::vector<RealGradient> & get_Sobolev_dweightxR_sq() const override
-  { calculate_map = true; return dweightxr_sq; }
+  {libmesh_assert(!calculations_started || calculate_dphi_scaled);
+    calculate_dphi_scaled = true; return dweightxr_sq; }
 
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -789,21 +840,19 @@ public:
    * non-conforming adapted meshes) corresponding to
    * variable number \p var_number, adapted to infinite elements.
    */
-static void inf_compute_constraints (DofConstraints & constraints,
-                                     DofMap & dof_map,
-                                     const unsigned int variable_number,
-                                     const Elem * child_elem);
+  static void inf_compute_constraints (DofConstraints & constraints,
+                                       DofMap & dof_map,
+                                       const unsigned int variable_number,
+                                       const Elem * child_elem);
 #endif
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   static void inf_compute_node_constraints (NodeConstraints & constraints,
-                                        const Elem * elem);
+                                            const Elem * elem);
 #endif
 
 
 protected:
-
-  mutable bool calculate_dxyz;
 
   // static members used by the workhorses
 
@@ -854,6 +903,12 @@ protected:
   { libmesh_not_implemented(); }
 
   /**
+   * Determine which values are to be calculated, for both the FE
+   * itself and for the FEMap.
+   */
+  virtual void determine_calculations() override;
+
+  /**
    * Some of the member data only depend on the radial part of the
    * infinite element.  The parts that only change when the radial
    * order changes, are initialized here.
@@ -888,11 +943,11 @@ protected:
    * still should be usable for children. Therefore, keep
    * it protected.
    */
-   void compute_shape_functions(const Elem * inf_elem,
-                                const std::vector<Point> & base_qp,
-                                const std::vector<Point> & radial_qp);
+  void compute_shape_functions(const Elem * inf_elem,
+                               const std::vector<Point> & base_qp,
+                               const std::vector<Point> & radial_qp);
 
-   void compute_face_functions();
+  void compute_face_functions();
 
   /**
    * Use \p compute_shape_functions(const Elem*, const std::vector<Point> &, const std::vector<Point> &)
@@ -900,11 +955,38 @@ protected:
    */
   virtual void compute_shape_functions(const Elem *, const std::vector<Point> & ) override
   {
-     //FIXME: it seems this function cannot be left out because
-     // it is pure virtual in \p FEBase
-     libmesh_not_implemented();
+    //FIXME: it seems this function cannot be left out because
+    // it is pure virtual in \p FEBase
+    libmesh_not_implemented();
   }
 
+  /**
+   * Are we calculating scaled mapping functions?
+   */
+  mutable bool calculate_map_scaled;
+
+  /**
+   * Are we calculating scaled shape functions?
+   */
+  mutable bool calculate_phi_scaled;
+
+  /**
+   * Are we calculating scaled shape function gradients?
+   */
+  mutable bool calculate_dphi_scaled;
+
+
+  /**
+   * Are we calculating the positions of quadrature points?
+   */
+  mutable bool calculate_xyz;
+
+
+  /**
+   * Are we calculating the unscaled jacobian?
+   * We avoid it if not requested explicitly; this has the worst stability.
+   */
+  mutable bool calculate_jxw;
 
   // Miscellaneous static members
 

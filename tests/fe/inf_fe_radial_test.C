@@ -557,6 +557,20 @@ public:
     const std::vector<std::vector<Real> >&         phi_w  = inf_fe->get_phi_over_decayxR();
     inf_fe->reinit(infinite_elem,&points);
 
+    // check that all quantities are sized correctly:
+    libmesh_assert_equal_to(q_point.size(), sob_w.size());
+    libmesh_assert_equal_to(q_point.size(), dsob_w.size());
+    libmesh_assert_equal_to(q_point.size(), sob_now.size());
+    libmesh_assert_equal_to(q_point.size(), dsob_now.size());
+    libmesh_assert_equal_to(q_point.size(), dphase.size());
+    libmesh_assert_equal_to(phi.size(), phi_w.size());
+    libmesh_assert_equal_to(phi.size(), dphi.size());
+    libmesh_assert_equal_to(phi.size(), dphi_w.size());
+    libmesh_assert_equal_to(q_point.size(), phi[0].size());
+    libmesh_assert_equal_to(q_point.size(), phi_w[0].size());
+    libmesh_assert_equal_to(q_point.size(), dphi[0].size());
+    libmesh_assert_equal_to(q_point.size(), dphi_w[0].size());
+
     for(unsigned int qp =0 ; qp < num_pt ; ++qp)
       {
         const Point dxyz(q_point[qp+num_pt]-q_point[qp]);

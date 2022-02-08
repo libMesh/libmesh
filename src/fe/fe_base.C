@@ -1537,17 +1537,6 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
   if (!elem->active())
     return;
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-   if (elem->infinite())
-   {
-      // this would require some generalisation:
-      //  - e.g. the 'my_fe'-object needs generalisation
-      //  - due to lack of one-to-one correspondence of DOFs and nodes,
-      //    this doesn't work easily.
-      libmesh_not_implemented();
-   }
-#endif
-
   const Variable & var = dof_map.variable(variable_number);
   const FEType & base_fe_type = var.type();
 
@@ -1561,6 +1550,17 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
     return;
   libmesh_assert (cont == C_ZERO || cont == C_ONE ||
                   cont == SIDE_DISCONTINUOUS);
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+   if (elem->infinite())
+   {
+      // this would require some generalisation:
+      //  - e.g. the 'my_fe'-object needs generalisation
+      //  - due to lack of one-to-one correspondence of DOFs and nodes,
+      //    this doesn't work easily.
+      libmesh_not_implemented();
+   }
+#endif
 
   std::unique_ptr<FEGenericBase<OutputShape>> neigh_fe
     (FEGenericBase<OutputShape>::build(Dim, base_fe_type));
