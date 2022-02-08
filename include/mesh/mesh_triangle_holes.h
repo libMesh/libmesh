@@ -20,11 +20,9 @@
 
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_TRIANGLE
-
 // Local includes
-#include "libmesh/mesh_triangle_interface.h"
 #include "libmesh/point.h"
+#include "libmesh/triangulator_interface.h"
 
 // C++ includes
 
@@ -45,7 +43,7 @@ namespace libMesh
  * \date 2011
  * \brief Class for parameterizing 2D holes to be meshed with Triangle.
  */
-class TriangleInterface::Hole
+class TriangulatorInterface::Hole
 {
 public:
   /**
@@ -74,6 +72,11 @@ public:
   virtual Point inside() const = 0;
 
   /**
+   * Return the area of the hole
+   */
+  Real area() const;
+
+  /**
    * Starting indices of points for a hole with multiple disconnected boundaries.
    */
   virtual std::vector<unsigned int> segment_indices() const
@@ -94,7 +97,7 @@ public:
  * A concrete instantiation of the Hole class that describes polygonal
  * (triangular, square, pentagonal, ...) holes.
  */
-class TriangleInterface::PolygonHole : public TriangleInterface::Hole
+class TriangulatorInterface::PolygonHole : public TriangulatorInterface::Hole
 {
 public:
   /**
@@ -139,7 +142,7 @@ private:
  * of Points which defines the hole (in order of connectivity) and
  * an arbitrary Point which lies inside the hole.
  */
-class TriangleInterface::ArbitraryHole : public TriangleInterface::Hole
+class TriangulatorInterface::ArbitraryHole : public TriangulatorInterface::Hole
 {
 public:
   /**
@@ -183,7 +186,7 @@ private:
 /**
  * A class for defining a 2-dimensional region for Triangle.
  */
-class TriangleInterface::Region
+class TriangulatorInterface::Region
 {
 public:
   /**
@@ -222,7 +225,5 @@ private:
 };
 
 } // namespace libMesh
-
-#endif // LIBMESH_HAVE_TRIANGLE
 
 #endif // LIBMESH_MESH_TRIANGLE_HOLES_H

@@ -204,12 +204,14 @@ BUILT_SOURCES = \
         off_io.h \
         parallel_mesh.h \
         patch.h \
+        poly2tri_triangulator.h \
         postscript_io.h \
         replicated_mesh.h \
         serial_mesh.h \
         sync_refinement_flags.h \
         tecplot_io.h \
         tetgen_io.h \
+        triangulator_interface.h \
         ucd_io.h \
         unstructured_mesh.h \
         unv_io.h \
@@ -1168,6 +1170,9 @@ parallel_mesh.h: $(top_srcdir)/include/mesh/parallel_mesh.h
 patch.h: $(top_srcdir)/include/mesh/patch.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+poly2tri_triangulator.h: $(top_srcdir)/include/mesh/poly2tri_triangulator.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 postscript_io.h: $(top_srcdir)/include/mesh/postscript_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1184,6 +1189,9 @@ tecplot_io.h: $(top_srcdir)/include/mesh/tecplot_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tetgen_io.h: $(top_srcdir)/include/mesh/tetgen_io.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+triangulator_interface.h: $(top_srcdir)/include/mesh/triangulator_interface.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ucd_io.h: $(top_srcdir)/include/mesh/ucd_io.h

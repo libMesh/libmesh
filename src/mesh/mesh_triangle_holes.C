@@ -18,8 +18,6 @@
 
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_TRIANGLE
-
 // Local includes
 #include "libmesh/mesh_triangle_holes.h"
 
@@ -27,23 +25,55 @@ namespace libMesh
 {
 
 //
+// Hole member functions
+//
+Real TriangulatorInterface::Hole::area() const
+{
+  const unsigned int np = this->n_points();
+
+  if (np < 3)
+    return 0;
+
+  const Point p0 = this->point(0);
+
+  // Every segment (p_{i-1},p_i) from i=2 on defines a triangle w.r.t.
+  // p_0.  Add up the cross products of those triangles.  We'll save
+  // the division by 2 and the norm for the end.
+  //
+  // Your hole points had best be coplanar, but this should work
+  // regardless of which plane they're in.
+
+  Point areavec = 0;
+
+  for (unsigned int i=2; i != np; ++i)
+    {
+      const Point e_0im = this->point(i-1) - p0,
+                  e_0i  = this->point(i) - p0;
+
+      areavec += e_0im.cross(e_0i);
+    }
+
+  return areavec.norm() / 2;
+}
+
+//
 // PolygonHole member functions
 //
-TriangleInterface::PolygonHole::PolygonHole(const Point & center,
-                                            Real radius,
-                                            unsigned int n_points_in) :
+TriangulatorInterface::PolygonHole::PolygonHole(const Point & center,
+                                                Real radius,
+                                                unsigned int n_points_in) :
   _center(center),
   _radius(radius),
   _n_points(n_points_in)
 {}
 
 
-unsigned int TriangleInterface::PolygonHole::n_points() const
+unsigned int TriangulatorInterface::PolygonHole::n_points() const
 {
   return _n_points;
 }
 
-Point TriangleInterface::PolygonHole::point(const unsigned int n) const
+Point TriangulatorInterface::PolygonHole::point(const unsigned int n) const
 {
   // The nth point lies at the angle theta = 2 * pi * n / _n_points
   const Real theta = static_cast<Real>(n) * 2.0 * libMesh::pi / static_cast<Real>(_n_points);
@@ -53,7 +83,7 @@ Point TriangleInterface::PolygonHole::point(const unsigned int n) const
                0.);
 }
 
-Point TriangleInterface::PolygonHole::inside() const
+Point TriangulatorInterface::PolygonHole::inside() const
 {
   // The center of the hole is definitely inside.
   return _center;
@@ -63,8 +93,8 @@ Point TriangleInterface::PolygonHole::inside() const
 //
 // ArbitraryHole member functions
 //
-TriangleInterface::ArbitraryHole::ArbitraryHole(const Point & center,
-                                                const std::vector<Point> & points)
+TriangulatorInterface::ArbitraryHole::ArbitraryHole(const Point & center,
+                                                    const std::vector<Point> & points)
   : _center(center),
     _points(points)
 {
@@ -72,38 +102,35 @@ TriangleInterface::ArbitraryHole::ArbitraryHole(const Point & center,
   _segment_indices.push_back(points.size());
 }
 
-TriangleInterface::ArbitraryHole::ArbitraryHole(const Point & center,
-                                                const std::vector<Point> & points,
-                                                const std::vector<unsigned int> & segment_indices)
+TriangulatorInterface::ArbitraryHole::ArbitraryHole(const Point & center,
+                                                    const std::vector<Point> & points,
+                                                    const std::vector<unsigned int> & segment_indices)
   : _center(center),
     _points(points),
     _segment_indices(segment_indices)
 {}
 
-unsigned int TriangleInterface::ArbitraryHole::n_points() const
+unsigned int TriangulatorInterface::ArbitraryHole::n_points() const
 {
   return _points.size();
 }
 
 
-Point TriangleInterface::ArbitraryHole::point(const unsigned int n) const
+Point TriangulatorInterface::ArbitraryHole::point(const unsigned int n) const
 {
   libmesh_assert_less (n, _points.size());
   return _points[n];
 }
 
 
-Point  TriangleInterface::ArbitraryHole::inside() const
+Point  TriangulatorInterface::ArbitraryHole::inside() const
 {
   return _center;
 }
 
-std::vector<unsigned int> TriangleInterface::ArbitraryHole::segment_indices() const
+std::vector<unsigned int> TriangulatorInterface::ArbitraryHole::segment_indices() const
 {
   return _segment_indices;
 }
 
 } // namespace libMesh
-
-
-#endif // LIBMESH_HAVE_TRIANGLE
