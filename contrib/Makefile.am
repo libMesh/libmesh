@@ -250,13 +250,16 @@ devel_libs += timpi/src/libtimpi_devel.la
 prof_libs  += timpi/src/libtimpi_prof.la
 oprof_libs += timpi/src/libtimpi_oprof.la
 
+
 ######################################################################
 # This must come *after* timpi - we now use TIMPI headers in
 # MetaPhysicL when they're available
 ######################################################################
 if LIBMESH_ENABLE_METAPHYSICL
+if BUILD_METAPHYSICL
   SUBDIRS += metaphysicl
   # header-only library for the parts we use - no library dependencies
+endif
 endif
 
 

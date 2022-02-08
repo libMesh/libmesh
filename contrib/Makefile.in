@@ -234,7 +234,7 @@ target_triplet = @target@
 # This must come *after* timpi - we now use TIMPI headers in
 # MetaPhysicL when they're available
 ######################################################################
-@LIBMESH_ENABLE_METAPHYSICL_TRUE@am__append_136 = metaphysicl
+@BUILD_METAPHYSICL_TRUE@@LIBMESH_ENABLE_METAPHYSICL_TRUE@am__append_136 = metaphysicl
 @LIBMESH_OPT_MODE_TRUE@am__append_137 = libcontrib_opt.la
 @LIBMESH_DBG_MODE_TRUE@am__append_138 = libcontrib_dbg.la
 @LIBMESH_DEVEL_MODE_TRUE@am__append_139 = libcontrib_devel.la
@@ -1318,7 +1318,7 @@ uninstall-am:
 @LIBMESH_ENABLE_FPARSER_TRUE@  # ATM always compile fparser with optimized flags,
 @LIBMESH_ENABLE_FPARSER_TRUE@  # and reuse in all methods
 @LIBMESH_ENABLE_NANOFLANN_TRUE@  # header-only library - no library dependencies
-@LIBMESH_ENABLE_METAPHYSICL_TRUE@  # header-only library for the parts we use - no library dependencies
+@BUILD_METAPHYSICL_TRUE@@LIBMESH_ENABLE_METAPHYSICL_TRUE@  # header-only library for the parts we use - no library dependencies
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
