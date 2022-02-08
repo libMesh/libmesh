@@ -91,6 +91,30 @@ Point TriangulatorInterface::PolygonHole::inside() const
 
 
 //
+// AffineHole member functions
+//
+Point TriangulatorInterface::AffineHole::point(const unsigned int n) const
+{
+  return this->transform(_underlying.point(n));
+}
+
+
+Point TriangulatorInterface::AffineHole::inside() const
+{
+  return this->transform(_underlying.inside());
+}
+
+
+Point TriangulatorInterface::AffineHole::transform(const Point & p) const
+{
+  const Real cos_a = std::cos(_angle);
+  const Real sin_a = std::sin(_angle);
+  return Point(p(0)*cos_a-p(1)*sin_a + _shift(0),
+               p(1)*cos_a+p(1)*sin_a + _shift(1));
+}
+
+
+//
 // ArbitraryHole member functions
 //
 TriangulatorInterface::ArbitraryHole::ArbitraryHole(const Point & center,

@@ -134,6 +134,54 @@ private:
 
 
 
+/**
+ * A way to translate and/or rotate an existing hole; perhaps to tile
+ * it in many places or to put it at an angle that the underlying hole
+ * doesn't support.
+ */
+class TriangulatorInterface::AffineHole : public TriangulatorInterface::Hole
+{
+public:
+  /**
+   * Constructor specifying the underlying hole, and the rotation
+   * angle (in radians, done first) and translation (done second) with
+   * which to transform it.
+   */
+  AffineHole(const Hole & underlying, Real angle, const Point & shift)
+    : _underlying(underlying), _angle(angle), _shift(shift) {}
+
+  virtual unsigned int n_points() const override
+  { return _underlying.n_points(); }
+
+  virtual Point point(const unsigned int n) const override;
+
+  virtual Point inside() const override;
+
+private:
+  /**
+   * Rotate-and-shift equations
+   */
+  Point transform(const Point & p) const;
+
+  /**
+   * Hole to transform
+   */
+  const Hole & _underlying;
+
+  /**
+   * Angle to rotate (counter-clockwise) by
+   */
+  Real _angle;
+
+  /**
+   * (x,y) location to shift (0,0) to
+   */
+  Point _shift;
+};
+
+
+
+
 
 /**
  * Another concrete instantiation of the hole, this one should
