@@ -3301,7 +3301,7 @@ void ExodusII_IO_Helper::
 write_nodeset_data (int timestep,
                     const std::vector<std::string> & var_names,
                     const std::vector<std::set<boundary_id_type>> & node_boundary_ids,
-                    std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
+                    const std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
