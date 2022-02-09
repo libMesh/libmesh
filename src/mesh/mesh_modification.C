@@ -249,10 +249,11 @@ void MeshTools::Modification::translate (MeshBase & mesh,
 
 
 
-void MeshTools::Modification::rotate (MeshBase & mesh,
-                                      const Real phi,
-                                      const Real theta,
-                                      const Real psi)
+RealTensorValue
+MeshTools::Modification::rotate (MeshBase & mesh,
+                                 const Real phi,
+                                 const Real theta,
+                                 const Real psi)
 {
 #if LIBMESH_DIM == 3
   const Real  p = -phi/180.*libMesh::pi;
@@ -266,19 +267,23 @@ void MeshTools::Modification::rotate (MeshBase & mesh,
   // (equations 6-14 give the entries of the composite transformation matrix).
   // The rotations are performed sequentially about the z, x, and z axes, in that order.
   // A positive angle yields a counter-clockwise rotation about the axis in question.
+  RealTensorValue R(cp*cs-sp*ct*ss,   sp*cs+cp*ct*ss, st*ss,
+                    -cp*ss-sp*ct*cs, -sp*ss+cp*ct*cs, st*cs,
+                    sp*st,           -cp*st,          ct);
+
   for (auto & node : mesh.node_ptr_range())
     {
-      const Point pt = *node;
-      const Real  x  = pt(0);
-      const Real  y  = pt(1);
-      const Real  z  = pt(2);
-      *node = Point(( cp*cs-sp*ct*ss)*x + ( sp*cs+cp*ct*ss)*y + (st*ss)*z,
-                    (-cp*ss-sp*ct*cs)*x + (-sp*ss+cp*ct*cs)*y + (st*cs)*z,
-                    ( sp*st)*x          + (-cp*st)*y          + (ct)*z   );
+      Point & pt = *node;
+      pt = R * pt;
     }
+
+  return R;
+
 #else
   libmesh_ignore(mesh, phi, theta, psi);
   libmesh_error_msg("MeshTools::Modification::rotate() requires libMesh to be compiled with LIBMESH_DIM==3");
+  // We'll never get here
+  return RealTensorValue();
 #endif
 }
 

@@ -23,6 +23,7 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/id_types.h" // for boundary_id_type, subdomain_id_type
+#include "libmesh/tensor_value.h"
 
 namespace libMesh
 {
@@ -106,9 +107,11 @@ void translate (MeshBase & mesh,
  * Here the standard Euler angles are adopted
  * (http://mathworld.wolfram.com/EulerAngles.html)
  * The angles are in degrees (360 make a full circle)
+ * \returns the 3x3 rotation matrix implied by (phi, theta, psi)
  */
-void rotate (MeshBase & mesh,
-             const Real phi, const Real theta=0., const Real psi=0.);
+RealTensorValue
+rotate (MeshBase & mesh,
+        const Real phi, const Real theta=0., const Real psi=0.);
 
 /**
  * Scales the mesh.  The grid points are scaled in the
