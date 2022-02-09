@@ -145,11 +145,6 @@ void Poly2TriTriangulator::triangulate()
   if (_triangulation_type != PSLG)
     libmesh_not_implemented();
 
-  // We currently require boundary nodes to be ordered by node id; we
-  // don't yet support explicit segments
-  if (this->segments.size())
-    libmesh_not_implemented();
-
   // We currently don't handle region specifications
   if (_regions)
     libmesh_not_implemented();
@@ -230,29 +225,94 @@ void Poly2TriTriangulator::triangulate_current_points()
                               _mesh.n_nodes());
 
   // Prepare poly2tri points for our nodes, sorted into outer boundary
-  // points and interior Steiner points
-  for (auto & node : _mesh.node_ptr_range())
+  // points and interior Steiner points.
+
+  // If we have no explicit segments defined, our nodal id ordering
+  // defines our outer polyline ordering:
+  if (this->segments.empty())
     {
-      p2t::Point * pt;
-
-      // If we're out of boundary nodes, the rest are going to be
-      // Steiner points
-      if (node->id() < _n_boundary_nodes)
+      for (auto & node : _mesh.node_ptr_range())
         {
+          p2t::Point * pt;
+
+          // If we're out of boundary nodes, the rest are going to be
+          // Steiner points
+          if (node->id() < _n_boundary_nodes)
+            {
+              outer_boundary_points.emplace_back((*node)(0), (*node)(1));
+              pt = &outer_boundary_points.back();
+            }
+          else
+            {
+              steiner_points.emplace_back((*node)(0), (*node)(1));
+              pt = &steiner_points.back();
+            }
+
+          // We're not going to support overlapping nodes on the boundary
+          if (point_node_map.count(*pt))
+            libmesh_not_implemented();
+
+          point_node_map.emplace(*pt, node);
+        }
+    }
+  // If we have explicit segments defined, that's our outer polyline
+  // ordering:
+  else
+    {
+      // Let's make sure our segments are in order
+      dof_id_type last_id = DofObject::invalid_id;
+
+      // Add nodes from every segment, in order, to the outer polyline
+      for (auto segment : this->segments)
+        {
+          const dof_id_type segment_start = segment.first,
+                            segment_end = segment.second;
+
+          libmesh_error_msg_if(segment_start == DofObject::invalid_id,
+                               "Bad triangulator segment start");
+          libmesh_error_msg_if(segment_end == DofObject::invalid_id,
+                               "Bad triangulator segment end");
+
+          if (last_id != DofObject::invalid_id)
+            libmesh_error_msg_if(segment_start != last_id,
+                                 "Disconnected triangulator segments");
+          last_id = segment_end;
+
+          Node * node = _mesh.query_node_ptr(segment_start);
+
+          libmesh_error_msg_if(!node,
+                               "Triangulator segments reference nonexistent node id " <<
+                               segment_start);
+
           outer_boundary_points.emplace_back((*node)(0), (*node)(1));
-          pt = &outer_boundary_points.back();
+          p2t::Point * pt = &outer_boundary_points.back();
+
+          // We're not going to support overlapping nodes on the boundary
+          if (point_node_map.count(*pt))
+            libmesh_not_implemented();
+
+          point_node_map.emplace(*pt, node);
         }
-      else
+
+        libmesh_error_msg_if(last_id != this->segments[0].first,
+                             "Non-closed-loop triangulator segments");
+
+      // If we have points that aren't in any segments, those will be
+      // Steiner points
+      for (auto & node : _mesh.node_ptr_range())
         {
-          steiner_points.emplace_back((*node)(0), (*node)(1));
-          pt = &steiner_points.back();
+          p2t::Point pt {(*node)(0), (*node)(1)};
+
+          auto it = point_node_map.find(pt);
+
+          if (it == point_node_map.end())
+            {
+              steiner_points.push_back(pt);
+              point_node_map.emplace(pt, node);
+            }
+          else
+            libmesh_assert_equal_to(it->second, node);
         }
-
-      // We're not going to support overlapping nodes on the boundary
-      if (point_node_map.count(*pt))
-        libmesh_not_implemented();
-
-      point_node_map.emplace(*pt, node);
     }
 
   // Create poly2tri triangulator with our mesh points
