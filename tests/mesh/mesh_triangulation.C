@@ -28,11 +28,13 @@ public:
 #ifdef LIBMESH_HAVE_POLY2TRI
   CPPUNIT_TEST( testPoly2Tri );
   CPPUNIT_TEST( testPoly2TriHoles );
+  CPPUNIT_TEST( testPoly2TriSegments );
 #endif
 
 #ifdef LIBMESH_HAVE_TRIANGLE
   CPPUNIT_TEST( testTriangle );
   CPPUNIT_TEST( testTriangleHoles );
+  CPPUNIT_TEST( testTriangleSegments );
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -87,16 +89,9 @@ public:
 #endif
   }
 
-  void testTriangulator(MeshBase & mesh,
-                        TriangulatorInterface & triangulator)
+  void testTriangulatorBase(MeshBase & mesh,
+                            TriangulatorInterface & triangulator)
   {
-    // A non-square quad, so we don't have ambiguity about which
-    // diagonal a Delaunay algorithm will pick.
-    mesh.add_point(Point(0,0));
-    mesh.add_point(Point(1,0));
-    mesh.add_point(Point(1,2));
-    mesh.add_point(Point(0,1));
-
     // Use the point order to define the boundary, because our
     // Poly2Tri implementation doesn't do convex hulls yet, even when
     // that would give the same answer.
@@ -148,6 +143,21 @@ public:
         CPPUNIT_ASSERT(found_triangle);
       }
   }
+
+
+  void testTriangulator(MeshBase & mesh,
+                        TriangulatorInterface & triangulator)
+  {
+    // A non-square quad, so we don't have ambiguity about which
+    // diagonal a Delaunay algorithm will pick.
+    mesh.add_point(Point(0,0));
+    mesh.add_point(Point(1,0));
+    mesh.add_point(Point(1,2));
+    mesh.add_point(Point(0,1));
+
+    this->testTriangulatorBase(mesh, triangulator);
+  }
+
 
 
   void testTriangulatorHoles(MeshBase & mesh,
@@ -218,6 +228,22 @@ public:
   }
 
 
+  void testTriangulatorSegments(MeshBase & mesh,
+                                TriangulatorInterface & triangulator)
+  {
+    // The same quad as testTriangulator, but out of order
+    mesh.add_point(Point(0,0));
+    mesh.add_point(Point(1,2));
+    mesh.add_point(Point(1,0));
+    mesh.add_point(Point(0,1));
+
+    // Segments to put them in order
+    triangulator.segments = {{0,2},{2,1},{1,3},{3,0}};
+
+    this->testTriangulatorBase(mesh, triangulator);
+  }
+
+
   void testTriangle()
   {
 #ifdef LIBMESH_HAVE_TRIANGLE
@@ -234,6 +260,16 @@ public:
     Mesh mesh(*TestCommWorld);
     TriangleInterface triangle(mesh);
     testTriangulatorHoles(mesh, triangle);
+#endif
+  }
+
+
+  void testTriangleSegments()
+  {
+#ifdef LIBMESH_HAVE_TRIANGLE
+    Mesh mesh(*TestCommWorld);
+    TriangleInterface triangle(mesh);
+    testTriangulatorSegments(mesh, triangle);
 #endif
   }
 
@@ -256,6 +292,17 @@ public:
     testTriangulatorHoles(mesh, p2t_tri);
 #endif
   }
+
+
+  void testPoly2TriSegments()
+  {
+#ifdef LIBMESH_HAVE_POLY2TRI
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator p2t_tri(mesh);
+    testTriangulatorSegments(mesh, p2t_tri);
+#endif
+  }
+
 
 };
 
