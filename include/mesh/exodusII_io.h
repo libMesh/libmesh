@@ -358,8 +358,8 @@ public:
   void
   write_nodeset_data (int timestep,
                       const std::vector<std::string> & var_names,
-                      std::vector<std::set<boundary_id_type>> & node_boundary_ids,
-                      std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals);
+                      const std::vector<std::set<boundary_id_type>> & node_boundary_ids,
+                      const std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals);
 
   /**
    * Read all the nodeset data at a particular timestep. TODO:
