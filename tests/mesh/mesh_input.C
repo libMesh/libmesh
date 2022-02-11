@@ -1023,11 +1023,13 @@ public:
       exii.write("exodus_file_mapping_out.e");
     }
 
+#ifdef LIBMESH_HAVE_VTK
     {
       VTKIO vtkout(mesh);
 
       vtkout.write("vtk_file_mapping_out.pvtu");
     }
+#endif
   }
 
   void testExodusFileMappingsPlateWithHole ()
