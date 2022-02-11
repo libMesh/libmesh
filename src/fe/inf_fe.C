@@ -355,15 +355,23 @@ void InfFE<Dim, T_radial, T_map>::determine_calculations()
         }
     }
 #else //LIBMESH_ENABLE_DEPRECATED
+  // ANSI C does not allow to embed the preprocessor-statement into the assert, so we
+  // make two statements, just different by 'calculate_d2phi'.
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  libmesh_assert (this->calculate_nothing || this->calculate_d2phi ||
+                  this->calculate_phi || this->calculate_dphi ||
+                  this->calculate_phi_scaled || this->calculate_dphi_scaled ||
+                  this->calculate_xyz || this->calculate_jxw ||
+                  this->calculate_map_scaled || this->calculate_map ||
+                  this->calculate_curl_phi || this->calculate_div_phi);
+#else
   libmesh_assert (this->calculate_nothing ||
                   this->calculate_phi || this->calculate_dphi ||
-                  !this->calculate_phi_scaled && !this->calculate_dphi_scaled &&
-                  !this->calculate_xyz && !this->calculate_jxw &&
-                  !this->calculate_map_scaled && !this->calculate_map &&
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                  this->calculate_d2phi ||
+                  this->calculate_phi_scaled || this->calculate_dphi_scaled ||
+                  this->calculate_xyz || this->calculate_jxw ||
+                  this->calculate_map_scaled || this->calculate_map ||
+                  this->calculate_curl_phi || this->calculate_div_phi);
 #endif
-                  this->calculate_curl_phi || this->calculate_div_phi)
 #endif // LIBMESH_ENABLE_DEPRECATED
 
   // set further terms necessary to do the requested task
