@@ -12,6 +12,7 @@
 #include <libmesh/dyna_io.h>
 #include <libmesh/exodusII_io.h>
 #include <libmesh/nemesis_io.h>
+#include <libmesh/vtk_io.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -1022,6 +1023,11 @@ public:
       exii.write("exodus_file_mapping_out.e");
     }
 
+    {
+      VTKIO vtkout(mesh);
+
+      vtkout.write("vtk_file_mapping_out.pvtu");
+    }
   }
 
   void testExodusFileMappingsPlateWithHole ()

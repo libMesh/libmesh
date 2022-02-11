@@ -115,14 +115,15 @@ void VTKIO::write (const std::string & name)
 // a couple of "stub" functions at the bottom.
 #ifdef LIBMESH_HAVE_VTK
 
-// Initialize the static _element_maps struct.
-VTKIO::ElementMaps VTKIO::_element_maps = VTKIO::build_element_maps();
+// Initialize the static _element_maps map.
+std::map<ElemMappingType, VTKIO::ElementMaps> VTKIO::_element_maps = VTKIO::build_element_maps();
 
 // Static function which constructs the ElementMaps object.
-VTKIO::ElementMaps VTKIO::build_element_maps()
+std::map<ElemMappingType, VTKIO::ElementMaps> VTKIO::build_element_maps()
 {
   // Object to be filled up
-  ElementMaps em;
+  std::map<ElemMappingType, VTKIO::ElementMaps> all_maps;
+  ElementMaps em; // Lagrange element maps
 
   em.associate(EDGE2, VTK_LINE);
   em.associate(EDGE3, VTK_QUADRATIC_EDGE);
@@ -147,8 +148,36 @@ VTKIO::ElementMaps VTKIO::build_element_maps()
 
   // TRI3SUBDIVISION is for writing only
   em.writing_map[TRI3SUBDIVISION] = VTK_TRIANGLE;
+  all_maps[ElemMappingType::LAGRANGE_MAP] = em;
 
-  return em;
+
+  // VTK_BEZIER_* types were introduced in VTK 9.0
+#if VTK_VERSION_LESS_THAN(9,0,0)
+  // Revert back to previous behavior when using an older version of VTK
+  all_maps[ElemMappingType::RATIONAL_BERNSTEIN_MAP] = em;
+#else
+  ElementMaps bem; // Rational Bernstein element maps
+  bem.associate(EDGE2, VTK_LINE);
+  bem.associate(EDGE3, VTK_BEZIER_CURVE);
+  bem.associate(TRI3, VTK_TRIANGLE);
+  bem.associate(TRI6, VTK_BEZIER_TRIANGLE);
+  bem.associate(QUAD4, VTK_QUAD);
+  bem.associate(QUAD8, VTK_QUADRATIC_QUAD);
+  bem.associate(QUAD9, VTK_BEZIER_QUADRILATERAL);
+  bem.associate(TET4, VTK_TETRA);
+  bem.associate(TET10, VTK_QUADRATIC_TETRA);
+  bem.associate(HEX8, VTK_HEXAHEDRON);
+  bem.associate(HEX20, VTK_QUADRATIC_HEXAHEDRON);
+  bem.associate(HEX27, VTK_BEZIER_HEXAHEDRON);
+  bem.associate(PRISM6, VTK_WEDGE);
+  bem.associate(PRISM15, VTK_QUADRATIC_WEDGE);
+  bem.associate(PRISM18, VTK_BEZIER_WEDGE);
+  bem.associate(PYRAMID5, VTK_PYRAMID);
+  bem.writing_map[TRI3SUBDIVISION] = VTK_TRIANGLE;
+  all_maps[ElemMappingType::RATIONAL_BERNSTEIN_MAP] = bem;
+#endif
+
+  return all_maps;
 }
 
 
@@ -200,13 +229,15 @@ void VTKIO::read (const std::string & name)
   // Get the number of cells from the _vtk_grid object
   const unsigned int vtk_num_cells = static_cast<unsigned int>(_vtk_grid->GetNumberOfCells());
 
+  auto& element_map = libmesh_map_find(_element_maps, mesh.default_mapping_type());
+
   vtkSmartPointer<vtkGenericCell> cell = vtkSmartPointer<vtkGenericCell>::New();
   for (unsigned int i=0; i<vtk_num_cells; ++i)
     {
       _vtk_grid->GetCell(i, cell);
 
       // Get the libMesh element type corresponding to this VTK element type.
-      ElemType libmesh_elem_type = _element_maps.find(cell->GetCellType());
+      ElemType libmesh_elem_type = element_map.find(cell->GetCellType());
       auto elem = Elem::build(libmesh_elem_type);
 
       // get the straightforward numbering from the VTK cells
@@ -393,6 +424,22 @@ void VTKIO::nodes_to_vtk()
   pcoords->Allocate(3*mesh.n_local_nodes());
   points->SetNumberOfPoints(mesh.n_local_nodes()); // it seems that it needs this to prevent a segfault
 
+  // SetRationalWeights() was introduced in VTK 9.0
+#if !VTK_VERSION_LESS_THAN(9,0,0)
+  bool have_weights = false;
+  int weight_index = 0;
+  vtkSmartPointer<vtkDoubleArray> rational_weights;
+
+  if (mesh.default_mapping_type() == ElemMappingType::RATIONAL_BERNSTEIN_MAP)
+  {
+    rational_weights = vtkSmartPointer<vtkDoubleArray>::New();
+    rational_weights->SetName("RationalWeights");
+    rational_weights->SetNumberOfComponents(1);
+    weight_index = static_cast<int>(mesh.default_mapping_data());
+    have_weights = true;
+  }
+#endif
+
   unsigned int local_node_counter = 0;
 
   for (const auto & node_ptr : mesh.local_node_ptr_range())
@@ -412,6 +459,14 @@ void VTKIO::nodes_to_vtk()
 #else
       pcoords->InsertNextTuple(pnt);
 #endif
+#if !VTK_VERSION_LESS_THAN(9,0,0)
+      if (have_weights)
+      {
+        Real weight = node.get_extra_datum<Real>(weight_index);
+        rational_weights->InsertTuple1(local_node_counter, weight);
+      }
+#endif
+
       ++local_node_counter;
     }
 
@@ -420,6 +475,11 @@ void VTKIO::nodes_to_vtk()
 
   // add points to grid
   _vtk_grid->SetPoints(points);
+#if !VTK_VERSION_LESS_THAN(9,0,0)
+  if (have_weights)
+    _vtk_grid->GetPointData()->SetRationalWeights(rational_weights);
+
+#endif
 }
 
 
@@ -428,6 +488,7 @@ void VTKIO::cells_to_vtk()
 {
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
+  auto& element_map = libmesh_map_find(_element_maps, mesh.default_mapping_type());
   vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkIdList> pts = vtkSmartPointer<vtkIdList>::New();
 
@@ -448,6 +509,10 @@ void VTKIO::cells_to_vtk()
   unsigned active_element_counter = 0;
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
+      // When using rational bernstein these hold the weights
+      if ( elem->type() == NODEELEM )
+        continue;
+
       pts->SetNumberOfIds(elem->n_nodes());
 
       // get the connectivity for this element
@@ -486,7 +551,7 @@ void VTKIO::cells_to_vtk()
         }
 
       vtkIdType vtkcellid = cells->InsertNextCell(pts);
-      types[active_element_counter] = cast_int<int>(_element_maps.find(elem->type()));
+      types[active_element_counter] = cast_int<int>(element_map.find(elem->type()));
 
       elem_id->InsertTuple1(vtkcellid, elem->id());
       subdomain_id->InsertTuple1(vtkcellid, elem->subdomain_id());
