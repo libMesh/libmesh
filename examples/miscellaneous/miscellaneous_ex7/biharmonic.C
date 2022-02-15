@@ -129,9 +129,6 @@ Biharmonic::Biharmonic(ReplicatedMesh & mesh) :
   _initialCenter = Point(icenter[0], icenter[1], icenter[2]);
   _initialWidth = command_line_value("initial_width", 0.125);
 
-  // Build the main equation encapsulated in the JR (Jacobian-Residual or J(R) "jet of R") object
-  _jr = &(add_system<Biharmonic::JR>(std::string("Biharmonic::JR")));
-
   // Output options
 #ifdef LIBMESH_HAVE_EXODUS_API
   if (on_command_line("output_base"))
@@ -212,6 +209,9 @@ void Biharmonic::viewParameters()
 
 void Biharmonic::init()
 {
+  // Build the main equation encapsulated in the JR (Jacobian-Residual or J(R) "jet of R") object
+  _jr = &(add_system<Biharmonic::JR>(std::string("Biharmonic::JR")));
+
   if (_verbose)
     libMesh::out << ">>> Initializing Biharmonic\n";
 
