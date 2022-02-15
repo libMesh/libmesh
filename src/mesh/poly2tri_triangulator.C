@@ -420,17 +420,30 @@ bool Poly2TriTriangulator::insert_refinement_points()
   if (area_target == 0)
     return false;
 
-  // We won't actually add these, lest we invalidate iterators on a
+  // We won't immediately add these, lest we invalidate iterators on a
   // ReplicatedMesh.  They'll still be in the mesh neighbor topology
   // for the purpose of doing Delaunay cavity stuff, so we need to
   // manage memory here, but there's no point in adding them to the
   // Mesh just to remove them again afterward when we hit up poly2tri.
-  std::vector<std::unique_ptr<Elem>> new_elems;
+
+  // We'll need to be able to remove new elems from new_elems, in
+  // cases where a later refinement insertion has a not-yet-added
+  // element in its cavity, so we'll use a map here to make searching
+  // possible.
+  std::unordered_map<Elem *, std::unique_ptr<Elem>> new_elems;
+
+  // Map of which points follow which in the outer polyline.  If we
+  // have to add new boundary points, we'll use this to construct an
+  // updated this->segments to retriangulate with.
+
+  // This map will just
+  std::unordered_map<Node *, Node *> next_boundary_node;
 
   for (auto & elem : mesh.element_ptr_range())
     {
       // element_ptr_range skips deleted elements ... right?
       libmesh_assert(elem);
+      libmesh_assert(elem->valid_id());
 
       // We only handle triangles in our triangulation
       libmesh_assert_equal_to(elem->level(), 0u);
@@ -446,10 +459,51 @@ bool Poly2TriTriangulator::insert_refinement_points()
       // circumcenter ...
       Point new_pt = elem->quasicircumcenter();
 
+      // And to give it a node;
+      Node * new_node = nullptr;
+
       // But that might be outside our triangle, or even outside the
-      // boundary.  Let's find a triangle containing it, moving it to
-      // the boundary if we have to.
-      Elem * cavity_elem = elem; // Maybe?  Start looking there anyway
+      // boundary.  We'll find a triangle that should contain our new
+      // point
+      Elem * cavity_elem = elem; // Start looking at elem anyway
+
+      // We'll refine the boundary if necessary.
+      auto boundary_refine = [this, &next_boundary_node,
+                              &cavity_elem, &new_node]
+        (unsigned int side)
+      {
+        libmesh_assert(new_node);
+        libmesh_assert(new_node->valid_id());
+
+        Node * old_segment_start = cavity_elem->node_ptr(side),
+             * old_segment_end   = cavity_elem->node_ptr((side+1)%3);
+        libmesh_assert(old_segment_start);
+        libmesh_assert(old_segment_start->valid_id());
+        libmesh_assert(old_segment_end);
+        libmesh_assert(old_segment_end->valid_id());
+
+        auto it = next_boundary_node.find(old_segment_start);
+        if (it != next_boundary_node.end())
+          {
+            libmesh_assert(it->second == old_segment_end);
+            it->second = new_node;
+          }
+        else
+          {
+            // This would be an O(N) sanity check if we already
+            // have a segments vector.  :-P
+            libmesh_assert(!this->segments.empty() ||
+                           (old_segment_end->id() ==
+                            old_segment_start->id() + 1));
+            next_boundary_node[old_segment_start] = new_node;
+          }
+
+        next_boundary_node[new_node] = old_segment_end;
+      };
+
+      // Let's find a triangle containing our new point, or at least
+      // containing the end of a ray leading from our current triangle
+      // to the new point.
       unsigned int side = invalid_uint;
       Point ray_start = elem->vertex_average();
       while (!cavity_elem->contains_point(new_pt))
@@ -459,15 +513,67 @@ bool Poly2TriTriangulator::insert_refinement_points()
           libmesh_assert_not_equal_to (side, invalid_uint);
 
           Elem * neigh = cavity_elem->neighbor_ptr(side);
+          // If we're on a boundary, stop there.
           if (!neigh)
             {
               new_pt = ray_start;
+              new_node = mesh.add_point(new_pt);
+              boundary_refine(side);
               break;
             }
 
           cavity_elem = neigh;
           side = invalid_uint;
         }
+
+      // If we're not on a boundary ... should we be?  We don't want
+      // to create any sliver elements or confuse poly2tri or
+      // anything.
+      if (side == invalid_uint)
+        {
+          libmesh_assert(!new_node);
+
+          unsigned int worst_side = libMesh::invalid_uint;
+          Real worst_cos = 1;
+          for (auto s : make_range(3u))
+            {
+              // We never snap to a non-domain-boundary
+              if (cavity_elem->neighbor_ptr(s))
+                continue;
+
+              Real ax = cavity_elem->point(s)(0) - new_pt(0),
+                   ay = cavity_elem->point(s)(1) - new_pt(1),
+                   bx = cavity_elem->point((s+1)%3)(0) - new_pt(0),
+                   by = cavity_elem->point((s+1)%3)(1) - new_pt(1);
+              const Real my_cos = (ax*bx+ay*by) /
+                                  std::sqrt(ax*ax+ay*ay) /
+                                  std::sqrt(bx*bx+by*by);
+
+              if (my_cos < worst_cos)
+                {
+                  worst_side = s;
+                  worst_cos = my_cos;
+                }
+            }
+
+          // If we'd create a sliver element on the side, let's just
+          // refine the side instead.
+          if (worst_cos < -0.6) // -0.5 is the best we could enforce?
+            {
+              side = worst_side;
+
+              // Let's just try bisecting for now
+              new_pt = (cavity_elem->point(side) +
+                        cavity_elem->point((side+1)%3)) / 2;
+              new_node = mesh.add_point(new_pt);
+              boundary_refine(side);
+            }
+          else
+            new_node = mesh.add_point(new_pt);
+        }
+      else
+        libmesh_assert(new_node);
+
 
       // Find the Delaunay cavity around the new point.
       std::set<Elem *> unchecked_cavity {cavity_elem};
@@ -509,7 +615,6 @@ bool Poly2TriTriangulator::insert_refinement_points()
       // Retriangulate the Delaunay cavity.
       // Each of our cavity triangle edges that are exterior to the
       // cavity will be a source of one new triangle.
-      Node * new_node = mesh.add_point(new_pt);
 
       // Keep maps for doing neighbor pointer assignment
       std::map<Node *, Elem *> neighbors_CCW, neighbors_CW;
@@ -519,66 +624,186 @@ bool Poly2TriTriangulator::insert_refinement_points()
           for (auto s : make_range(3u))
             {
               Elem * neigh = old_elem->neighbor_ptr(s);
-              if (neigh && !cavity.count(neigh))
+              if (!neigh || !cavity.count(neigh))
                 {
-                  auto new_elem = Elem::build(TRI3);
-                  new_elem->set_node(0) = new_node;
-                  Node * node_CW = old_elem->node_ptr(s);
-                  new_elem->set_node(1) = node_CW;
-                  Node * node_CCW = old_elem->node_ptr((s+1)%3);
-                  new_elem->set_node(2) = node_CCW;
+                  Node * node_CW = old_elem->node_ptr(s),
+                       * node_CCW = old_elem->node_ptr((s+1)%3);
 
-                  // Set neighbor pointers
-                  new_elem->set_neighbor(1, neigh);
-                  const unsigned int neigh_s =
-                    neigh->which_neighbor_am_i(old_elem);
-                  neigh->set_neighbor(neigh_s, new_elem.get());
-
-                  // Set clockwise neighbor and vice-versa if possible
+                  auto set_neighbors = [&neighbors_CW, &neighbors_CCW,
+                                        &node_CW, &node_CCW](Elem * new_neigh)
                   {
-                    auto it = neighbors_CW.find(node_CW);
-                    if (it == neighbors_CW.end())
+                    // Set clockwise neighbor and vice-versa if possible
+                    auto CW_it = neighbors_CW.find(node_CW);
+                    if (CW_it == neighbors_CW.end())
                       {
                         libmesh_assert(!neighbors_CCW.count(node_CW));
-                        neighbors_CCW[node_CW] = new_elem.get();
+                        neighbors_CCW[node_CW] = new_neigh;
                       }
                     else
                       {
-                        Elem * neigh_CW = it->second;
-                        new_elem->set_neighbor(0, neigh_CW);
-                        neigh_CW->set_neighbor(2, new_elem.get());
-                        neighbors_CW.erase(it);
+                        Elem * neigh_CW = CW_it->second;
+                        if (new_neigh)
+                          new_neigh->set_neighbor(0, neigh_CW);
+                        if (neigh_CW)
+                          neigh_CW->set_neighbor(2, new_neigh);
+                        neighbors_CW.erase(CW_it);
                       }
-                  }
 
-                  // Set counter-CW neighbor and vice-versa if possible
-                  {
-                    auto it = neighbors_CCW.find(node_CCW);
-                    if (it == neighbors_CCW.end())
+                    // Set counter-CW neighbor and vice-versa if possible
+                    auto CCW_it = neighbors_CCW.find(node_CCW);
+                    if (CCW_it == neighbors_CCW.end())
                       {
                         libmesh_assert(!neighbors_CW.count(node_CCW));
-                        neighbors_CW[node_CCW] = new_elem.get();
+                        neighbors_CW[node_CCW] = new_neigh;
                       }
                     else
                       {
-                        Elem * neigh_CCW = it->second;
-                        new_elem->set_neighbor(2, neigh_CCW);
-                        neigh_CCW->set_neighbor(0, new_elem.get());
-                        neighbors_CCW.erase(it);
+                        Elem * neigh_CCW = CCW_it->second;
+                        if (new_neigh)
+                          new_neigh->set_neighbor(2, neigh_CCW);
+                        if (neigh_CCW)
+                          neigh_CCW->set_neighbor(0, new_neigh);
+                        neighbors_CCW.erase(CCW_it);
                       }
+                  };
 
-                    new_elems.push_back(std::move(new_elem));
-                  }
+                  // We aren't going to try to add a sliver element if we
+                  // have a new boundary node here.  We do need to
+                  // keep track of other elements' neighbors, though.
+                  if (old_elem == cavity_elem &&
+                      s == side)
+                    {
+                      set_neighbors(nullptr);
+                      continue;
+                    }
+
+                  auto new_elem = Elem::build(TRI3);
+                  new_elem->set_node(0) = new_node;
+                  new_elem->set_node(1) = node_CW;
+                  new_elem->set_node(2) = node_CCW;
+
+                  // Set in-and-out-of-cavity neighbor pointers
+                  new_elem->set_neighbor(1, neigh);
+                  if (neigh)
+                    {
+                      const unsigned int neigh_s =
+                        neigh->which_neighbor_am_i(old_elem);
+                      neigh->set_neighbor(neigh_s, new_elem.get());
+                    }
+
+                  // Set in-cavity neighbors' neighbor pointers
+                  set_neighbors(new_elem.get());
+
+                  // C++ allows function argument evaluation in any
+                  // order, but we need get() to precede move
+                  Elem * new_elem_ptr = new_elem.get();
+                  new_elems.emplace(new_elem_ptr, std::move(new_elem));
                 }
             }
 
-          mesh.delete_elem(old_elem);
+          auto it = new_elems.find(old_elem);
+          if (it == new_elems.end())
+            mesh.delete_elem(old_elem);
+          else
+            new_elems.erase(it);
         }
 
       // Everybody found their match?
       libmesh_assert(neighbors_CW.empty());
       libmesh_assert(neighbors_CCW.empty());
     }
+
+  // If we added any new boundary nodes, we're going to need to keep
+  // track of the changes they made to the outer polyline and/or to
+  // any holes.
+  if (!next_boundary_node.empty())
+    {
+      // Keep track of the outer polyline
+      if (this->segments.empty())
+        {
+          dof_id_type last_id = DofObject::invalid_id;
+          for (const auto & node : _mesh.node_ptr_range())
+            {
+              const dof_id_type node_id = node->id();
+
+              // Don't add Steiner points
+              if (node_id >= _n_boundary_nodes)
+                break;
+
+              // Connect up the previous node, if we didn't already
+              // connect it after some newly inserted nodes
+              if (!this->segments.empty())
+                last_id = this->segments.back().second;
+
+              if (last_id != DofObject::invalid_id &&
+                  last_id != node_id)
+                this->segments.emplace_back (last_id, node_id);
+
+              last_id = node_id;
+
+              // Connect to any newly inserted nodes
+              Node * this_node = node;
+              auto it = next_boundary_node.find(this_node);
+              while (it != next_boundary_node.end())
+                {
+                  libmesh_assert(node->valid_id());
+                  Node * next_node = it->second;
+                  libmesh_assert(next_node->valid_id());
+
+                  this->segments.emplace_back
+                    (this_node->id(), next_node->id());
+
+                  this_node = next_node;
+                  it = next_boundary_node.find(this_node);
+                }
+            }
+
+          // We expect a closed loop here
+          this->segments.emplace_back(this->segments.back().second,
+                                      this->segments.front().first);
+        }
+      else
+        {
+          std::vector<std::pair<unsigned int, unsigned int>> old_segments;
+          old_segments.swap(this->segments);
+
+          auto old_it  = old_segments.begin();
+
+          Node * node = _mesh.node_ptr(old_it->first);
+          Node * const first_node = node;
+
+          do
+            {
+              const dof_id_type node_id = node->id();
+              auto it = next_boundary_node.find(node);
+              if (it == next_boundary_node.end())
+                {
+                  while (node_id != old_it->first)
+                    {
+                      ++old_it;
+                      libmesh_assert(old_it != old_segments.end());
+                    }
+                  node = mesh.node_ptr(old_it->second);
+                }
+              else
+                {
+                  node = it->second;
+                }
+
+              this->segments.emplace_back(node_id, node->id());
+            }
+          while (node != first_node);
+        }
+
+
+      // Keep track of any holes
+      if (this->_holes)
+        libmesh_not_implemented();
+    }
+
+  // Okay, *now* we can add the new elements.
+  for (auto & new_elem_pair : new_elems)
+    mesh.add_elem(std::move(new_elem_pair.second));
 
   // Did we add anything?
   return new_elems.empty();
