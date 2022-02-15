@@ -110,6 +110,13 @@ public:
       {
         CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
 
+        // Make sure we're not getting any inverted elements
+        auto cross_prod =
+          (elem->point(1) - elem->point(0)).cross
+            (elem->point(2) - elem->point(0));
+
+        CPPUNIT_ASSERT_GREATER(Real(0), cross_prod(2));
+
         bool found_triangle = false;
         for (const auto & node : elem->node_ref_range())
           {
@@ -190,6 +197,7 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(8));
 
+    // Center coordinates for all the elements we expect
     Real r2p2o6 = (std::sqrt(Real(2))+2)/6;
     Real r2p4o6 = (std::sqrt(Real(2))+4)/6;
 
@@ -206,6 +214,14 @@ public:
       {
         CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
 
+        // Make sure we're not getting any inverted elements
+        auto cross_prod =
+          (elem->point(1) - elem->point(0)).cross
+            (elem->point(2) - elem->point(0));
+
+        CPPUNIT_ASSERT_GREATER(Real(0), cross_prod(2));
+
+        // Make sure we're finding all the elements we expect
         Point center = elem->vertex_average();
 
         bool found_mine = false;
