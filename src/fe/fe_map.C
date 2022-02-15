@@ -493,6 +493,9 @@ void FEMap::compute_single_point_map(const unsigned int dim,
   libmesh_assert(!compute_second_derivatives);
 #endif
 
+  // this parameter is only accounted for if LIBMESH_DIM==2.
+  libmesh_ignore(compute_second_derivatives);
+
   if (calculate_xyz)
     libmesh_assert_equal_to(phi_map.size(), elem_nodes.size());
 
