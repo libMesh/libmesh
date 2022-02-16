@@ -267,7 +267,7 @@ protected:
   /**
    * Assign the computed partitioning to the mesh.
    */
-  void assign_partitioning (const MeshBase & mesh, const std::vector<dof_id_type> & parts);
+  void assign_partitioning (MeshBase & mesh, const std::vector<dof_id_type> & parts);
 
   /**
    * The weights that might be used for partitioning.

@@ -1237,7 +1237,7 @@ void Partitioner::build_graph (const MeshBase & mesh)
 
 }
 
-void Partitioner::assign_partitioning (const MeshBase & mesh, const std::vector<dof_id_type> & parts)
+void Partitioner::assign_partitioning (MeshBase & mesh, const std::vector<dof_id_type> & parts)
 {
   LOG_SCOPE("assign_partitioning()", "Partitioner");
 
