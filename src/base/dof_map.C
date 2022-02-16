@@ -1126,7 +1126,7 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
           // First get any new nodal DOFS
           for (unsigned int n=0; n<n_nodes; n++)
             {
-              Node & node = elem->node_ref(n);
+              const Node & node = elem->node_ref(n);
 
               if (node.processor_id() != this->processor_id())
                 continue;

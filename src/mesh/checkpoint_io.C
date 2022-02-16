@@ -376,7 +376,7 @@ void CheckpointIO::write (const std::string & name)
 
   // We're going to sort elements by pid in one pass, to avoid sending
   // predicated iterators through the whole mesh N_p times
-  std::unordered_map<processor_id_type, std::vector<Elem *>> elements_on_pid;
+  std::unordered_map<processor_id_type, std::vector<const Elem *>> elements_on_pid;
 
   if (_parallel)
     {
@@ -445,18 +445,18 @@ void CheckpointIO::write (const std::string & name)
               if (elements_vec_it != elements_on_pid.end())
                 {
                   const auto & p_elements = elements_vec_it->second;
-                  Elem * const * elempp = p_elements.data();
-                  Elem * const * elemend = elempp + p_elements.size();
+                  const Elem * const * elempp = p_elements.data();
+                  const Elem * const * elemend = elempp + p_elements.size();
 
                   const MeshBase::const_element_iterator
                     pid_elements_begin = MeshBase::const_element_iterator
-                      (elempp, elemend, Predicates::NotNull<Elem * const *>()),
+                      (elempp, elemend, Predicates::NotNull<const Elem * const *>()),
                     pid_elements_end = MeshBase::const_element_iterator
-                      (elemend, elemend, Predicates::NotNull<Elem * const *>()),
+                      (elemend, elemend, Predicates::NotNull<const Elem * const *>()),
                     active_pid_elements_begin = MeshBase::const_element_iterator
-                      (elempp, elemend, Predicates::Active<Elem * const *>()),
+                      (elempp, elemend, Predicates::Active<const Elem * const *>()),
                     active_pid_elements_end = MeshBase::const_element_iterator
-                      (elemend, elemend, Predicates::Active<Elem * const *>());
+                      (elemend, elemend, Predicates::Active<const Elem * const *>());
 
                   query_ghosting_functors
                     (mesh, p, active_pid_elements_begin,
