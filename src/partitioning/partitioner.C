@@ -1136,7 +1136,7 @@ void Partitioner::build_graph (const MeshBase & mesh)
       std::vector<dof_id_type> & graph_row = _dual_graph[local_index];
 
       // Save this off to make it easy to index later
-      _local_id_to_elem[local_index] = elem;
+      _local_id_to_elem[local_index] = const_cast<Elem*>(elem);
 
       // Loop over the element's neighbors.  An element
       // adjacency corresponds to a face neighbor
