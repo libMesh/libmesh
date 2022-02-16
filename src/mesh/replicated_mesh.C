@@ -987,7 +987,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
   std::map<dof_id_type, std::vector<dof_id_type>> node_to_elems_map;
 
   typedef dof_id_type                     key_type;
-  typedef std::pair<Elem *, unsigned char> val_type;
+  typedef std::pair<const Elem *, unsigned char> val_type;
   typedef std::pair<key_type, val_type>   key_val_pair;
   typedef std::unordered_multimap<key_type, val_type> map_type;
   // Mapping between all side keys in this mesh and elements+side numbers relevant to the boundary in this mesh as well.
@@ -1470,7 +1470,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
                               while (bounds.first != bounds.second)
                                 {
                                   // Get the potential element
-                                  Elem * neighbor = bounds.first->second.first;
+                                  Elem * neighbor = const_cast<Elem *>(bounds.first->second.first);
 
                                   // Get the side for the neighboring element
                                   const unsigned int ns = bounds.first->second.second;
