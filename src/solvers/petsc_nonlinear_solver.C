@@ -425,16 +425,26 @@ extern "C"
     libmesh_error_msg_if(solver->matvec && solver->residual_and_jacobian_object,
                          "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
-    // We already computed the Jacobian during the residual evaluation
-    if (solver->residual_and_jacobian_object)
-      return ierr;
-
     NonlinearImplicitSystem & sys = solver->system();
 
     PetscMatrix<Number> PC(pc, sys.comm());
     PetscMatrix<Number> Jac(jac, sys.comm());
     PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_global(x, sys.comm());
+
+    // We already computed the Jacobian during the residual evaluation
+    if (solver->residual_and_jacobian_object)
+    {
+      auto & sys_mat = static_cast<PetscMatrix<Number> &>(sys.get_system_matrix());
+
+      // We could be doing matrix-free
+      if (jac && jac != sys_mat.mat())
+        Jac.close();
+      if (pc && pc != sys_mat.mat())
+        PC.close();
+
+      return ierr;
+    }
 
     // Set the dof maps
     PC.attach_dof_map(sys.get_dof_map());
