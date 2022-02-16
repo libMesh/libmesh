@@ -82,7 +82,7 @@ PointLocatorNanoflann::init ()
       // data structure with active, local element vertex averages.
       if (we_are_master)
         {
-          _elems = std::make_shared<std::vector<Elem *>>();
+          _elems = std::make_shared<std::vector<const Elem *>>();
           _point_cloud = std::make_shared<std::vector<Point>>();
 
           // Make the KD-Tree out of active element vertex averages.
