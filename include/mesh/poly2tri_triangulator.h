@@ -25,6 +25,7 @@
 #ifdef LIBMESH_HAVE_POLY2TRI
 
 // Local Includes
+#include "libmesh/dof_object.h"
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/triangulator_interface.h"
 
