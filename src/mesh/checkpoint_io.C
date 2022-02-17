@@ -375,8 +375,13 @@ void CheckpointIO::write (const std::string & name)
   std::vector<processor_id_type> ids_to_write;
 
   // We're going to sort elements by pid in one pass, to avoid sending
-  // predicated iterators through the whole mesh N_p times
-  std::unordered_map<processor_id_type, std::vector<const Elem *>> elements_on_pid;
+  // predicated iterators through the whole mesh N_p times.
+  //
+  // The data type here needs to be a non-const-pointer to whatever
+  // our element_iterator is a const-pointer to, for compatibility
+  // later.
+  typedef std::remove_const<MeshBase::const_element_iterator::value_type>::type nc_v_t;
+  std::unordered_map<processor_id_type, std::vector<nc_v_t>> elements_on_pid;
 
   if (_parallel)
     {
@@ -444,19 +449,24 @@ void CheckpointIO::write (const std::string & name)
               const auto elements_vec_it = elements_on_pid.find(p);
               if (elements_vec_it != elements_on_pid.end())
                 {
-                  const auto & p_elements = elements_vec_it->second;
-                  const Elem * const * elempp = p_elements.data();
-                  const Elem * const * elemend = elempp + p_elements.size();
+                  auto & p_elements = elements_vec_it->second;
+
+                  // Be compatible with both deprecated and
+                  // corrected MeshBase iterator types
+                  typedef MeshBase::const_element_iterator::value_type v_t;
+
+                  v_t * elempp = p_elements.data();
+                  v_t * elemend = elempp + p_elements.size();
 
                   const MeshBase::const_element_iterator
                     pid_elements_begin = MeshBase::const_element_iterator
-                      (elempp, elemend, Predicates::NotNull<const Elem * const *>()),
+                      (elempp, elemend, Predicates::NotNull<v_t *>()),
                     pid_elements_end = MeshBase::const_element_iterator
-                      (elemend, elemend, Predicates::NotNull<const Elem * const *>()),
+                      (elemend, elemend, Predicates::NotNull<v_t *>()),
                     active_pid_elements_begin = MeshBase::const_element_iterator
-                      (elempp, elemend, Predicates::Active<const Elem * const *>()),
+                      (elempp, elemend, Predicates::Active<v_t *>()),
                     active_pid_elements_end = MeshBase::const_element_iterator
-                      (elemend, elemend, Predicates::Active<const Elem * const *>());
+                      (elemend, elemend, Predicates::Active<v_t *>());
 
                   query_ghosting_functors
                     (mesh, p, active_pid_elements_begin,
