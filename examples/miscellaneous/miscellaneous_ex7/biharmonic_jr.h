@@ -40,7 +40,7 @@ public:
      const std::string & name,
      const unsigned int number);
 
-  void initialize();
+  void initialize() override;
 
   /**
    * Static functions to be used for initialization

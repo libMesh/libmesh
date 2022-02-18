@@ -33,12 +33,12 @@ public:
 protected:
 
   // Context initialization
-  virtual void init_context (DiffContext & context);
+  virtual void init_context (DiffContext & context) override;
 
   // Element residual and jacobian calculations
   // Time dependent parts
   virtual bool element_time_derivative (bool request_jacobian,
-                                        DiffContext & context);
+                                        DiffContext & context) override;
 
   // The parameters to solve for
   Real _k;
