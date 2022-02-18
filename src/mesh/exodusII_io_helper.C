@@ -121,11 +121,13 @@ const std::vector<int> hex_inverse_edge_map =
   {
     // Reading Bezier Extraction from Exodus files requires ExodusII v8
 #if EX_API_VERS_NODOT < 800
+    libMesh::libmesh_ignore(elem_type_str);
     return false;
-#endif
+#else
     if (strlen(elem_type_str) <= 4)
       return false;
     return (std::string(elem_type_str, elem_type_str+4) == "BEX_");
+#endif
   }
 
 } // end anonymous namespace
