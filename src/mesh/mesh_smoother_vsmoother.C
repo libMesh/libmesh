@@ -860,9 +860,13 @@ void VariationalMeshSmoother::adp_renew(const Array2D<Real> & R,
     {
       for (dof_id_type i=0; i<_n_nodes; i++)
         {
+  // This was an unused variable since Derek's first import of
+  // Larisa's code!?  Could something have been miscopied?
+/*
           Real z = 0;
           for (unsigned j=0; j<_dim; j++)
             z += R[i][j];
+*/
 
           // adaptive function, node based
           afun[i] = 5*std::sin(R[i][0]);
