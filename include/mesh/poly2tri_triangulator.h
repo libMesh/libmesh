@@ -53,7 +53,7 @@ public:
   /**
    * Empty destructor.
    */
-  ~Poly2TriTriangulator() = default;
+  virtual ~Poly2TriTriangulator() = default;
 
   /**
    * Internally, this calls the poly2tri triangulation code in a loop,

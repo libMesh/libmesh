@@ -58,7 +58,7 @@ public:
   /**
    * Empty destructor.
    */
-  ~TriangulatorInterface() = default;
+  virtual ~TriangulatorInterface() = default;
 
   /**
    * The TriangulationType is used with the general triangulate function

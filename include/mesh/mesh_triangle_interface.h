@@ -53,7 +53,7 @@ public:
   /**
    * Empty destructor.
    */
-  ~TriangleInterface() = default;
+  virtual ~TriangleInterface() = default;
 
   /**
    * Internally, this calls Triangle's triangulate routine.

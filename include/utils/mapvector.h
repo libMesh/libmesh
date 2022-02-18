@@ -53,8 +53,6 @@ public:
     veclike_iterator(const typename maptype::iterator & i)
       : it(i) {}
 
-    veclike_iterator(const veclike_iterator & i) = default;
-
     Val & operator*() const { return it->second; }
 
     index_t index() const { return it->first; }
@@ -86,9 +84,6 @@ public:
   public:
     const_veclike_iterator(const typename maptype::const_iterator & i)
       : it(i) {}
-
-    const_veclike_iterator(const const_veclike_iterator & i)
-      : it(i.it) {}
 
     const_veclike_iterator(const veclike_iterator & i)
       : it(i.it) {}

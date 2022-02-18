@@ -53,7 +53,7 @@ protected:
     }
 
     // This test is hand-crafted for one interior element
-    libmesh_assert(n_interior_elems == 1);
+    CPPUNIT_ASSERT_EQUAL(n_interior_elems, 1u);
   }
 };
 
