@@ -202,7 +202,7 @@ public:
      */
     virtual ReferenceType operator*() const override
     {
-      return * iter_data;
+      return * this->iter_ptr();
     }
 
     /**
@@ -237,6 +237,15 @@ public:
      * This is the iterator passed by the user.
      */
     IterType iter_data;
+  private:
+    /**
+     * This seems to work around a bug in g++ prior to version 10 and
+     * clang++ prior to version 10
+     */
+    PointerType iter_ptr () const
+    {
+      return &*iter_data;
+    }
   };
 
 
