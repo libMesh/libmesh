@@ -784,7 +784,7 @@ public:
    * weight at each quadrature point. See \p get_Sobolev_weight()
    * for details.  In case of \p FE initialized to all zero.
    */
-  virtual const std::vector<RealGradient> & get_Sobolev_dweight() const
+  virtual const std::vector<RealGradient> & get_Sobolev_dweight() const override
   {libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dweight; }
 
