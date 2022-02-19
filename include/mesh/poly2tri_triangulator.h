@@ -25,6 +25,7 @@
 #ifdef LIBMESH_HAVE_POLY2TRI
 
 // Local Includes
+#include "libmesh/dof_object.h"
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/triangulator_interface.h"
 
@@ -43,12 +44,19 @@ class Poly2TriTriangulator : public TriangulatorInterface
 public:
   /**
    * The constructor.  A reference to the mesh containing the points
-   * which are to be triangulated must be provided.  Unless otherwise
-   * specified, a convex hull will be computed for the set of input points
-   * and the convex hull will be meshed.
+   * which are to be triangulated must be provided.  The first
+   * \p n_boundary_nodes are expected to form a closed loop around the
+   * mesh domain; any subsequent nodes are expected to be interior
+   * nodes or in the middle of (internal hole or external) boundary
+   * segments.
+   *
+   * If \p n_boundary_nodes is not supplied or is \p invalid_id then
+   * all mesh points are expected to be boundary polyline points.
    */
   explicit
-  Poly2TriTriangulator(UnstructuredMesh & mesh);
+  Poly2TriTriangulator(UnstructuredMesh & mesh,
+                       dof_id_type n_boundary_nodes =
+                         DofObject::invalid_id);
 
   /**
    * Empty destructor.
@@ -62,12 +70,29 @@ public:
    */
   virtual void triangulate() override;
 
+protected:
+  /**
+   * Triangulate the current mesh and hole points.
+   */
+  void triangulate_current_points();
+
+  /**
+   * Add Steiner points as new mesh nodes, as necessary to refine an
+   * existing trangulation.  Returns true iff new points were added.
+   */
+  bool insert_refinement_points();
+
 private:
 
   /**
    * We only operate on serialized meshes.
    */
   MeshSerializer _serializer;
+
+  /**
+   * Keep track of how many mesh nodes are boundary nodes.
+   */
+  dof_id_type _n_boundary_nodes;
 };
 
 } // namespace libMesh

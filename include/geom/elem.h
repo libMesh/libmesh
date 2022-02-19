@@ -941,6 +941,16 @@ public:
   Point vertex_average () const;
 
   /**
+   * \returns The "circumcenter of mass" (area-weighted average of
+   * triangulation circumcenters) of the element.
+   *
+   * Not implemented for infinite elements, not currently implemented
+   * for 3D elements, currently ignores curvature of element edges.
+   */
+  virtual Point quasicircumcenter () const
+  { libmesh_not_implemented(); }
+
+  /**
    * \returns The minimum vertex separation for the element.
    */
   virtual Real hmin () const;

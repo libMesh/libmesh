@@ -964,20 +964,14 @@ void DistributedMesh::clear ()
   MeshBase::clear();
 
   // Clear our elements and nodes
-  // There is no need to remove the elements from
+  // There is no need to remove them from
   // the BoundaryInfo data structure since we
   // already cleared it.
-  for (auto & elem : _elements)
-    delete elem;
+  this->clear_elems();
 
-  // clear the nodes data structure
-  // There is no need to remove the nodes from
-  // the BoundaryInfo data structure since we
-  // already cleared it.
   for (auto & node : _nodes)
     delete node;
 
-  _elements.clear();
   _nodes.clear();
 
   // We're no longer distributed if we were before
@@ -986,12 +980,24 @@ void DistributedMesh::clear ()
 
   // Correct our caches
   _n_nodes = 0;
-  _n_elem = 0;
   _max_node_id = 0;
-  _max_elem_id = 0;
   _next_free_local_node_id = this->processor_id();
-  _next_free_local_elem_id = this->processor_id();
   _next_free_unpartitioned_node_id = this->n_processors();
+}
+
+
+
+void DistributedMesh::clear_elems ()
+{
+  for (auto & elem : _elements)
+    delete elem;
+
+  _elements.clear();
+
+  // Correct our caches
+  _n_elem = 0;
+  _max_elem_id = 0;
+  _next_free_local_elem_id = this->processor_id();
   _next_free_unpartitioned_elem_id = this->n_processors();
 }
 

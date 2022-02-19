@@ -704,24 +704,27 @@ void ReplicatedMesh::clear ()
   MeshBase::clear();
 
   // Clear our elements and nodes
-  // There is no need to remove the elements from
+  // There is no need to remove them from
   // the BoundaryInfo data structure since we
   // already cleared it.
-  for (auto & elem : _elements)
-    delete elem;
+  this->clear_elems();
 
-  _n_elem = 0;
-  _elements.clear();
-
-  // clear the nodes data structure
-  // There is no need to remove the nodes from
-  // the BoundaryInfo data structure since we
-  // already cleared it.
   for (auto & node : _nodes)
     delete node;
 
   _n_nodes = 0;
   _nodes.clear();
+}
+
+
+
+void ReplicatedMesh::clear_elems ()
+{
+  for (auto & elem : _elements)
+    delete elem;
+
+  _n_elem = 0;
+  _elements.clear();
 }
 
 

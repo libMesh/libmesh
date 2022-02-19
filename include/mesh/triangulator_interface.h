@@ -97,6 +97,7 @@ public:
    * See mesh_triangle_holes.C/h for definitions.
    */
   class Hole;
+  class AffineHole;
   class PolygonHole;
   class ArbitraryHole;
 

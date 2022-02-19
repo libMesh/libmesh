@@ -124,6 +124,11 @@ public:
   virtual void clear() override;
 
   /**
+   * Clear internal Elem data.
+   */
+  virtual void clear_elems() override;
+
+  /**
    * Redistribute elements between processors.  This gets called
    * automatically by the Partitioner, and is a no-op in the case of a
    * serialized mesh.

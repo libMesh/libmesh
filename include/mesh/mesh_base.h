@@ -153,6 +153,19 @@ public:
   virtual void clear ();
 
   /**
+   * Deletes all the element data that is currently stored.
+   *
+   * No Node is removed from the mesh, however even NodeElem elements
+   * are deleted, so the remaining Nodes will be considered "unused"
+   * and cleared unless they are reconnected to new elements before
+   * the next \p prepare_for_use()
+   *
+   * This does not affect BoundaryInfo data; any boundary information
+   * associated elements should already be cleared.
+   */
+  virtual void clear_elems () = 0;
+
+  /**
    * \returns \p true if the mesh has been prepared via a call
    * to \p prepare_for_use, \p false otherwise.
    */
