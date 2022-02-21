@@ -125,7 +125,7 @@ public:
     for (auto p : make_range(comm_size))
       {
         CPPUNIT_ASSERT_EQUAL(vals[p*2].size(), std::size_t(1));
-        CPPUNIT_ASSERT_EQUAL(Real(p+1), vals[p*2][0](0));
+        CPPUNIT_ASSERT_EQUAL(Real(p+1), libmesh_real(vals[p*2][0](0)));
       }
   }
 
