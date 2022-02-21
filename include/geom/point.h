@@ -50,14 +50,12 @@ public:
   {}
 
   /**
-   * Copy-constructor.
+   * Trivial copy-constructor.
    */
-  Point (const Point & p) :
-    TypeVector<Real> (p)
-  {}
+  Point (const Point & p) = default;
 
   /**
-   * Copy-constructor.
+   * Copy-constructor from non-point Typevector.
    */
   Point (const TypeVector<Real> & p) :
     TypeVector<Real> (p)
