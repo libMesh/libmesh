@@ -118,6 +118,7 @@ int main (int argc, char ** argv)
 #else
 int main (int, char **)
 {
+  std::cout << "This libMesh was built with --disable-amr" << std::endl;
   return 1;
 }
 #endif // ENABLE_AMR

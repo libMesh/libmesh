@@ -66,6 +66,7 @@ T assert_argument (GetPot & cl,
 }
 
 
+#ifdef LIBMESH_ENABLE_AMR
 int main(int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
@@ -153,3 +154,10 @@ int main(int argc, char ** argv)
 
   return 0;
 }
+#else
+int main (int, char **)
+{
+  std::cout << "This libMesh was built with --disable-amr" << std::endl;
+  return 1;
+}
+#endif // ENABLE_AMR
