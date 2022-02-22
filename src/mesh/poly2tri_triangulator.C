@@ -199,8 +199,12 @@ void Poly2TriTriangulator::triangulate_current_points()
   std::vector<p2t::Point> outer_boundary_points;
   std::vector<std::vector<p2t::Point>> inner_hole_points(n_holes);
 
-  // We assume node ids are contiguous here.
-  libmesh_assert_equal_to(_mesh.n_nodes(), _mesh.max_node_id());
+  // Unless we're using an explicit segments list, we assume node ids
+  // are contiguous here.
+  if (this->segments.empty())
+    libmesh_error_msg_if
+      (_mesh.n_nodes() != _mesh.max_node_id(),
+       "Poly2TriTriangulator needs contiguous node ids or explicit segments!");
 
   // And if we have more nodes than boundary points, the rest will be
   // interior "Steiner points"
