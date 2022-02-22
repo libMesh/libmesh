@@ -131,6 +131,7 @@ public:
 
   void testBadVarNames()
   {
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
     Mesh mesh(*TestCommWorld);
     MeshTools::Generation::build_square(mesh, 1, 1);
     EquationSystems es(mesh);
@@ -154,6 +155,7 @@ public:
                                  es.build_variable_names(var_names,
                                                          &fe_type),
                                  libMesh::LogicError);
+#endif // LIBMESH_ENABLE_EXCEPTIONS
   }
 
   void testReinitWithNodeElem()
