@@ -435,8 +435,6 @@ bool Poly2TriTriangulator::insert_refinement_points()
   // Map of which points follow which in the outer polyline.  If we
   // have to add new boundary points, we'll use this to construct an
   // updated this->segments to retriangulate with.
-
-  // This map will just
   std::unordered_map<Node *, Node *> next_boundary_node;
 
   for (auto & elem : mesh.element_ptr_range())
