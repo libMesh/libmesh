@@ -46,6 +46,7 @@
 #include <map>
 #include <sstream>
 
+#ifdef LIBMESH_HAVE_EXODUS_API
 namespace
 {
   using namespace libMesh;
@@ -67,6 +68,7 @@ namespace
     libmesh_error_msg("Requested BEX coefficient vector " << i << " not found");
   }
 }
+#endif
 
 namespace libMesh
 {
