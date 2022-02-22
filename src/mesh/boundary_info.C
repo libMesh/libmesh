@@ -512,10 +512,8 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   unsigned int parent_side_index_tag = store_parent_side_ids ?
     boundary_mesh.add_elem_integer("parent_side_index") : libMesh::invalid_uint;
 
-  for (const auto & pr : sides_to_add)
+  for (const auto & [elem_id, s] : sides_to_add)
     {
-      const dof_id_type elem_id = pr.first;
-      const unsigned char s = pr.second;
       Elem * elem = _mesh->elem_ptr(elem_id);
 
       // Build the side - do not use a "proxy" element here:

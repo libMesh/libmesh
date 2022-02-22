@@ -463,11 +463,8 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
     unsigned int n_scalar_vars = 0;
     unsigned int n_vector_vars = 0;
 
-    for (const auto & pr : _systems)
+    for (const auto & [sys_name, sys_ptr] : _systems)
       {
-        const auto & sys_name = pr.first;
-        const auto & sys_ptr = pr.second;
-
         // Check current system is listed in system_names, and skip pos if not
         bool use_current_system = (system_names == nullptr);
         if (!use_current_system)
@@ -503,11 +500,8 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
     var_names.resize( nv );
   }
 
-  for (const auto & pr : _systems)
+  for (const auto & [sys_name, sys_ptr] : _systems)
     {
-      const auto & sys_name = pr.first;
-      const auto & sys_ptr = pr.second;
-
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == nullptr);
       if (!use_current_system)
@@ -608,11 +602,8 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
   {
     unsigned int n_scalar_vars = 0;
     unsigned int n_vector_vars = 0;
-    for (const auto & pr : _systems)
+    for (const auto & [sys_name, sys_ptr] : _systems)
       {
-        const auto & sys_name = pr.first;
-        const auto & sys_ptr = pr.second;
-
         // Check current system is listed in system_names, and skip pos if not
         bool use_current_system = (system_names == nullptr);
         if (!use_current_system)
@@ -672,11 +663,8 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
   // loop over the elements and build the nodal solution
   // from the element solution.  Then insert this nodal solution
   // into the vector passed to build_solution_vector.
-  for (const auto & pr : _systems)
+  for (const auto & [sys_name, sys_ptr] : _systems)
     {
-      const auto & sys_name = pr.first;
-      const auto & sys_ptr = pr.second;
-
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == nullptr);
       if (!use_current_system)
@@ -1116,11 +1104,8 @@ EquationSystems::build_discontinuous_solution_vector
   // in each system listed in system_names
   unsigned int nv = 0;
 
-  for (const auto & pr : _systems)
+  for (const auto & [sys_name, sys_ptr] : _systems)
     {
-      const auto & sys_name = pr.first;
-      const auto & sys_ptr = pr.second;
-
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == nullptr);
       if (!use_current_system)
@@ -1166,11 +1151,8 @@ EquationSystems::build_discontinuous_solution_vector
   // loop over the elements and build the nodal solution
   // from the element solution.  Then insert this nodal solution
   // into the vector passed to build_solution_vector.
-  for (const auto & pr : _systems)
+  for (const auto & [sys_name, system] : _systems)
     {
-      const auto & sys_name = pr.first;
-      const auto & system = pr.second;
-
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == nullptr);
       if (!use_current_system)
@@ -1296,11 +1278,8 @@ bool EquationSystems::compare (const EquationSystems & other_es,
   else
     {
       // start comparing each system
-      for (const auto & pr : _systems)
+      for (const auto & [sys_name, sys_ptr] : _systems)
         {
-          const auto & sys_name = pr.first;
-          const auto & sys_ptr = pr.second;
-
           // get the other system
           const System & other_system   = other_es.get_system (sys_name);
 

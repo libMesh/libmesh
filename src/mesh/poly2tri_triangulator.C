@@ -263,11 +263,8 @@ void Poly2TriTriangulator::triangulate_current_points()
       dof_id_type last_id = DofObject::invalid_id;
 
       // Add nodes from every segment, in order, to the outer polyline
-      for (auto segment : this->segments)
+      for (auto [segment_start, segment_end] : this->segments)
         {
-          const dof_id_type segment_start = segment.first,
-                            segment_end = segment.second;
-
           libmesh_error_msg_if(segment_start == DofObject::invalid_id,
                                "Bad triangulator segment start");
           libmesh_error_msg_if(segment_end == DofObject::invalid_id,

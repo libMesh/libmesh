@@ -386,11 +386,10 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
   // We know how many of our objects live on each processor, so
   // reserve() space for requests from each.
-  for (auto pair : ghost_objects_from_proc)
+  for (auto [p, size] : ghost_objects_from_proc)
     {
-      const processor_id_type p = pair.first;
       if (p != this->processor_id())
-        requested_ids[p].reserve(pair.second);
+        requested_ids[p].reserve(size);
     }
 
   for (it = objects_begin; it != objects_end; ++it)
@@ -1566,15 +1565,11 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
   std::map<const CouplingMatrix *, std::vector<unsigned int>>
     column_variable_lists;
 
-  for (auto & pr : elements_to_send)
+  for (const auto & [partner, ghost_coupling] : elements_to_send)
     {
-      const Elem * const partner = pr.first;
-
       // We asked ghosting functors not to give us local elements
       libmesh_assert_not_equal_to
         (partner->processor_id(), this->processor_id());
-
-      const CouplingMatrix * ghost_coupling = pr.second;
 
       // Loop over any present coupling matrix column variables if we
       // have a coupling matrix, or just add all variables to
@@ -2294,10 +2289,8 @@ void DofMap::_node_dof_indices (const Elem & elem,
   LOG_SCOPE("_node_dof_indices()", "DofMap");
 
   const unsigned int sys_num = this->sys_number();
-  const std::pair<unsigned int, unsigned int>
-    vg_and_offset = obj.var_to_vg_and_offset(sys_num,vn);
-  const unsigned int vg = vg_and_offset.first;
-  const unsigned int vig = vg_and_offset.second;
+  const auto [vg, vig] =
+    obj.var_to_vg_and_offset(sys_num,vn);
   const unsigned int n_comp = obj.n_comp_group(sys_num,vg);
 
   const VariableGroup & var = this->variable_group(vg);
@@ -2957,14 +2950,12 @@ std::string DofMap::get_info() const
     n_rhss = 0;
   long double avg_constraint_length = 0.;
 
-  for (const auto & pr : _dof_constraints)
+  for (const auto & [constrained_dof, row] : _dof_constraints)
     {
       // Only count local constraints, then sum later
-      const dof_id_type constrained_dof = pr.first;
       if (!this->local_index(constrained_dof))
         continue;
 
-      const DofConstraintRow & row = pr.second;
       std::size_t rowsize = row.size();
 
       max_constraint_length = std::max(max_constraint_length,
