@@ -30,23 +30,24 @@ public:
 #if LIBMESH_DIM > 1
     if (test_elem->infinite())
       {
-        _mesh->add_elem(std::move(test_elem));
+        Elem * elem = _mesh->add_elem(std::move(test_elem));
 
-        const auto add_point = [this](const unsigned int i,
-                                      const Real x,
-                                      const Real y,
-                                      const Real
+        const auto add_point =
+          [this, elem](const unsigned int i,
+                       const Real x,
+                       const Real y,
+                       const Real
 #if LIBMESH_DIM == 3
-                                      z
+                                  z
 #endif
-                                      )
+                      )
           {
 #if LIBMESH_DIM == 2
             auto node = _mesh->add_point(Point(x, y), i);
 #else
             auto node = _mesh->add_point(Point(x, y, z), i);
 #endif
-            _mesh->elem_ref(0).set_node(i) = node;
+            elem->set_node(i) = node;
           };
 
         const Real halfpos = (minpos + maxpos) / 2.;
