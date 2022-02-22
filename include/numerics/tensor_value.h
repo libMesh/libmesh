@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/type_tensor.h"
+#include "libmesh/libmesh.h" // for pi
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
 #include "metaphysicl/raw_type.h"
@@ -143,9 +144,26 @@ public:
     TensorValue &>::type
   operator = (const Scalar & libmesh_dbg_var(p) )
   { libmesh_assert_equal_to (p, Scalar(0)); this->zero(); return *this; }
+
+  /**
+   * Generate the rotation matrix associated with the provided Euler angles.  We follow the
+   * convention described at http://mathworld.wolfram.com/EulerAngles.html (equations 6-14 give the
+   * entries of the composite transformation matrix). The rotations are performed sequentially about
+   * the z, x', and z'' axes, in that order. A positive angle yields a counter-clockwise rotation
+   * about the axis in question. Note that angles should be provided in degrees
+   * @param phi rotation angle around original z-axis
+   * @param theta rotation angle around "current" x-axis (post phi), e.g. x'
+   * @param psi rotation angle around "current" z-axis (post phi and theta), e.g. z''
+   * @return The associated rotation matrix
+   */
+  static TensorValue<Real> rotation_matrix(Real phi, Real theta, Real psi);
+
+  /**
+   * Invert the rotation that would occur if the same angles were provided to \p rotation_matrix,
+   * e.g. return to the original starting point
+   */
+  static TensorValue<Real> inverse_rotation_matrix(Real phi, Real theta, Real psi);
 };
-
-
 
 /**
  * Useful typedefs to allow transparent switching
@@ -275,6 +293,66 @@ TensorValue<T>::TensorValue (const TypeTensor<Real> & p_re,
 }
 #endif
 
+template <typename T>
+TensorValue<Real>
+TensorValue<T>::rotation_matrix(const Real phi, const Real theta, const Real psi)
+{
+#if LIBMESH_DIM == 3
+  const Real p = -phi / 180. * pi;
+  const Real t = -theta / 180. * pi;
+  const Real s = -psi / 180. * pi;
+  const Real sp = std::sin(p), cp = std::cos(p);
+  const Real st = std::sin(t), ct = std::cos(t);
+  const Real ss = std::sin(s), cs = std::cos(s);
+
+  return TensorValue<Real>(cp * cs - sp * ct * ss,
+                           sp * cs + cp * ct * ss,
+                           st * ss,
+                           -cp * ss - sp * ct * cs,
+                           -sp * ss + cp * ct * cs,
+                           st * cs,
+                           sp * st,
+                           -cp * st,
+                           ct);
+#else
+  libmesh_ignore(phi, theta, psi);
+  libmesh_error_msg(
+      "TensorValue<T>::rotation_matrix() requires libMesh to be compiled with LIBMESH_DIM==3");
+  // We'll never get here
+  return TensorValue<Real>();
+#endif
+}
+
+template <typename T>
+TensorValue<Real>
+TensorValue<T>::inverse_rotation_matrix(const Real phi, const Real theta, const Real psi)
+{
+#if LIBMESH_DIM == 3
+  using namespace std;
+
+  const Real p = -phi / 180. * pi;
+  const Real t = -theta / 180. * pi;
+  const Real s = -psi / 180. * pi;
+
+  // These inverse matrices are constructed from equations 3, 4, and 5 at
+  // https://mathworld.wolfram.com/EulerAngles.html and combined using the knowledge that
+  // - We want to apply the matrices in the reverse order, e.g. D^{-1}C^{-1}B^{-1}(BCD)
+  // - We want to apply the negative of the original angle
+  // - cos(-foo) = cos(foo) and sin(-foo) = -sin(foo)
+  TensorValue<Real> Binv(cos(s), -sin(s), 0, sin(s), cos(s), 0, 0, 0, 1);
+  TensorValue<Real> Cinv(1, 0, 0, 0, cos(t), -sin(t), 0, sin(t), cos(t));
+  TensorValue<Real> Dinv(cos(p), -sin(p), 0, sin(p), cos(p), 0, 0, 0, 1);
+
+  return Dinv * Cinv * Binv;
+
+#else
+  libmesh_ignore(phi, theta, psi);
+  libmesh_error_msg(
+      "TensorValue<T>::rotation_matrix() requires libMesh to be compiled with LIBMESH_DIM==3");
+  // We'll never get here
+  return TensorValue<Real>();
+#endif
+}
 
 } // namespace libMesh
 

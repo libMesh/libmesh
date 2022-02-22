@@ -41,6 +41,7 @@
 #include "libmesh/enum_to_string.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/elem_side_builder.h"
+#include "libmesh/tensor_value.h"
 
 namespace
 {
@@ -256,20 +257,7 @@ MeshTools::Modification::rotate (MeshBase & mesh,
                                  const Real psi)
 {
 #if LIBMESH_DIM == 3
-  const Real  p = -phi/180.*libMesh::pi;
-  const Real  t = -theta/180.*libMesh::pi;
-  const Real  s = -psi/180.*libMesh::pi;
-  const Real sp = std::sin(p), cp = std::cos(p);
-  const Real st = std::sin(t), ct = std::cos(t);
-  const Real ss = std::sin(s), cs = std::cos(s);
-
-  // We follow the convention described at http://mathworld.wolfram.com/EulerAngles.html
-  // (equations 6-14 give the entries of the composite transformation matrix).
-  // The rotations are performed sequentially about the z, x, and z axes, in that order.
-  // A positive angle yields a counter-clockwise rotation about the axis in question.
-  RealTensorValue R(cp*cs-sp*ct*ss,   sp*cs+cp*ct*ss, st*ss,
-                    -cp*ss-sp*ct*cs, -sp*ss+cp*ct*cs, st*cs,
-                    sp*st,           -cp*st,          ct);
+  const auto R = RealTensorValue::rotation_matrix(phi, theta, psi);
 
   for (auto & node : mesh.node_ptr_range())
     {
