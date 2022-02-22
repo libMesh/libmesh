@@ -18,13 +18,15 @@
 
 
 
-// C++ includes
-
 // Local includes
-// #include "libmesh/point.h"
+#include "libmesh/point.h"
+
+// C++ includes
+#include <type_traits> // std::is_trivially_copyable
 
 
-
+static_assert(std::is_trivially_copyable<libMesh::TypeVector<libMesh::Point>>::value,
+              "Someone made Point non-TriviallyCopyable");
 
 // ------------------------------------------------------------
 // Point class member functions

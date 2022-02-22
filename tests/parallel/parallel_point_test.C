@@ -1,3 +1,4 @@
+#include <libmesh/int_range.h>
 #include <libmesh/parallel.h>
 #include <libmesh/parallel_algebra.h>
 
@@ -15,6 +16,8 @@ public:
   CPPUNIT_TEST( testAllGatherPoint );
   CPPUNIT_TEST( testAllGatherPairPointPoint );
   CPPUNIT_TEST( testAllGatherPairRealPoint );
+  CPPUNIT_TEST( testMapUnionGradient );
+  CPPUNIT_TEST( testMapUnionPoint );
 #endif
 
   CPPUNIT_TEST( testBroadcastVectorValueInt );
@@ -101,6 +104,42 @@ public:
       }
   }
 
+
+
+  template <typename VecType>
+  void testMapUnionVec()
+  {
+    // std::map<processor_id_type , std::vector<Point>> vals;
+    std::map<processor_id_type , std::vector<VecType>> vals;
+
+    const processor_id_type myrank = TestCommWorld->rank();
+
+    vals[myrank*2].resize(1);
+    vals[myrank*2][0](0) = myrank+1;
+
+    TestCommWorld->set_union(vals);
+
+    const processor_id_type comm_size = TestCommWorld->size();
+
+    CPPUNIT_ASSERT_EQUAL(vals.size(), std::size_t(comm_size));
+    for (auto p : make_range(comm_size))
+      {
+        CPPUNIT_ASSERT_EQUAL(vals[p*2].size(), std::size_t(1));
+        CPPUNIT_ASSERT_EQUAL(Real(p+1), libmesh_real(vals[p*2][0](0)));
+      }
+  }
+
+
+  void testMapUnionGradient()
+  {
+    testMapUnionVec<Gradient>();
+  }
+
+
+  void testMapUnionPoint()
+  {
+    testMapUnionVec<Point>();
+  }
 
 
   template <typename T>
