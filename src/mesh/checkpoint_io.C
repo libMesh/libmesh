@@ -49,6 +49,9 @@
 #ifdef LIBMESH_HAVE_DIRECT_H
 #include <direct.h> // rmdir() on Windows
 #endif
+#ifdef LIBMESH_HAVE_UNISTD_H
+#include <unistd.h>  // rmdir() on Unix
+#endif
 
 namespace
 {
