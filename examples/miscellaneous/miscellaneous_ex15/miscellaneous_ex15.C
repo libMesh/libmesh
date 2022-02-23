@@ -265,9 +265,9 @@ int main (int argc, char** argv)
   // Solve system. This function calls the assemble-functions.
   eig_sys.solve();
 
+#ifdef LIBMESH_ENABLE_AMR
   for (unsigned int i=0; i< 2; ++i)
     {
-
       ErrorVector error;
       MeshRefinement mesh_refinement(mesh);
       KellyErrorEstimator error_estimator;
@@ -301,6 +301,7 @@ int main (int argc, char** argv)
       // re-assemble and than solve again.
       eig_sys.solve();
     }
+#endif // LIBMESH_ENABLE_AMR
 
   // All done.
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
