@@ -117,7 +117,6 @@
 #include <iostream>
 #include <sys/time.h>
 #include <iomanip>
-#include <fenv.h>
 
 void write_output(EquationSystems & es,
                   unsigned int t_step,       // The current time step count
@@ -351,8 +350,6 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
 // The main program.
 int main (int argc, char ** argv)
 {
-  feenableexcept(FE_INVALID);
-
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_ignore(argc, argv);
