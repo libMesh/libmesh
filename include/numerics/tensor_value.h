@@ -147,22 +147,24 @@ public:
 
   /**
    * Generate the rotation matrix associated with the provided Euler angles.  We follow the
-   * convention described at http://mathworld.wolfram.com/EulerAngles.html (equations 6-14 give the
-   * entries of the composite transformation matrix). The rotations are performed sequentially about
-   * the z, x', and z'' axes, in that order. A positive angle yields a counter-clockwise rotation
-   * about the axis in question. Note that angles should be provided in degrees
-   * @param phi rotation angle around original z-axis
-   * @param theta rotation angle around "current" x-axis (post phi), e.g. x'
-   * @param psi rotation angle around "current" z-axis (post phi and theta), e.g. z''
+   * convention described at https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix and we use
+   * the matrix described by the 'Proper Euler Angles' column and Z1 X2 Z3 row, which indicates that
+   * the rotations are performed sequentially about the z, x', and z'' axes, in that order. A
+   * positive angle yields a counter-clockwise rotation about the axis in question. Note that angles
+   * should be provided in degrees
+   * @param angle1_deg rotation angle around original z-axis
+   * @param angle2_deg rotation angle around "current" x-axis (post angle1), e.g. x'
+   * @param angle3_deg rotation angle around "current" z-axis (post angle1 and angle2), e.g. z''
    * @return The associated rotation matrix
    */
-  static TensorValue<Real> rotation_matrix(Real phi, Real theta, Real psi);
+  static TensorValue<Real> rotation_matrix(Real angle1_deg, Real angle2_deg, Real angle3_deg);
 
   /**
    * Invert the rotation that would occur if the same angles were provided to \p rotation_matrix,
    * e.g. return to the original starting point
    */
-  static TensorValue<Real> inverse_rotation_matrix(Real phi, Real theta, Real psi);
+  static TensorValue<Real>
+  inverse_rotation_matrix(Real angle1_deg, Real angle2_deg, Real angle3_deg);
 };
 
 /**
@@ -295,29 +297,27 @@ TensorValue<T>::TensorValue (const TypeTensor<Real> & p_re,
 
 template <typename T>
 TensorValue<Real>
-TensorValue<T>::rotation_matrix(const Real phi, const Real theta, const Real psi)
+TensorValue<T>::rotation_matrix(const Real angle1_deg, const Real angle2_deg, const Real angle3_deg)
 {
 #if LIBMESH_DIM == 3
-  // We apply a negative sign here or else we don't get counter-clockwise/right-hand-rule rotation.
-  // Maybe there's an error/omission in https://mathworld.wolfram.com/EulerAngles.html ?
-  const Real p = -phi / 180. * pi;
-  const Real t = -theta / 180. * pi;
-  const Real s = -psi / 180. * pi;
-  const Real sp = std::sin(p), cp = std::cos(p);
-  const Real st = std::sin(t), ct = std::cos(t);
-  const Real ss = std::sin(s), cs = std::cos(s);
+  const auto angle1 = angle1_deg / 180. * pi;
+  const auto angle2 = angle2_deg / 180. * pi;
+  const auto angle3 = angle3_deg / 180. * pi;
+  const auto s1 = std::sin(angle1), c1 = std::cos(angle1);
+  const auto s2 = std::sin(angle2), c2 = std::cos(angle2);
+  const auto s3 = std::sin(angle3), c3 = std::cos(angle3);
 
-  return TensorValue<Real>(cp * cs - sp * ct * ss,
-                           sp * cs + cp * ct * ss,
-                           st * ss,
-                           -cp * ss - sp * ct * cs,
-                           -sp * ss + cp * ct * cs,
-                           st * cs,
-                           sp * st,
-                           -cp * st,
-                           ct);
+  return TensorValue<Real>(c1 * c3 - c2 * s1 * s3,
+                           -c1 * s3 - c2 * c3 * s1,
+                           s1 * s2,
+                           c3 * s1 + c1 * c2 * s3,
+                           c1 * c2 * c3 - s1 * s3,
+                           -c1 * s2,
+                           s2 * s3,
+                           c3 * s2,
+                           c2);
 #else
-  libmesh_ignore(phi, theta, psi);
+  libmesh_ignore(angle1_deg, angle2_deg, angle3_deg);
   libmesh_error_msg(
       "TensorValue<T>::rotation_matrix() requires libMesh to be compiled with LIBMESH_DIM==3");
   // We'll never get here
