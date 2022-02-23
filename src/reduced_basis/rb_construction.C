@@ -1567,6 +1567,8 @@ Real RBConstruction::truth_solve(int plot_solution)
       std::set<std::string> system_names = {this->name()};
       exo_io.write_equation_systems("truth.exo", this->get_equation_systems(), &system_names);
     }
+#else
+  libmesh_ignore(plot_solution);
 #endif
 
   // Get the X norm of the truth solution
