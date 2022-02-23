@@ -214,7 +214,7 @@ public:
    *
    * Trivial in 0D.
    */
-  virtual Point quasicircumcenter () const
+  virtual Point quasicircumcenter () const override
   { return this->point(0); }
 
   /**
