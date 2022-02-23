@@ -339,12 +339,15 @@ public:
     CPPUNIT_ASSERT(mesh.n_elem() > 2);
 
     Real area = 0;
-    for (const auto & elem : mesh.element_ptr_range())
+    for (const auto & elem : mesh.active_local_element_ptr_range())
       {
+        CPPUNIT_ASSERT_EQUAL(elem->level(), 0u);
         CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
 
         area += elem->volume();
       }
+
+    mesh.comm().sum(area);
 
     LIBMESH_ASSERT_FP_EQUAL(area, 1.5, TOLERANCE*TOLERANCE);
   }
