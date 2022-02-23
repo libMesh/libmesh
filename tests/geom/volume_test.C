@@ -129,6 +129,7 @@ public:
     // Test that Elem base class true_centroid() implementation works
     // for an elevated p_level HEX20
     {
+#ifdef LIBMESH_ENABLE_AMR
       ReplicatedMesh mesh(*TestCommWorld);
       MeshTools::Generation::build_cube(mesh,
                                         /*nelem=*/1, /*nelem=*/1, /*nelem=*/1,
@@ -142,6 +143,7 @@ public:
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(0), TOLERANCE*TOLERANCE);
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(1), TOLERANCE*TOLERANCE);
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(2), TOLERANCE*TOLERANCE);
+#endif // LIBMESH_ENABLE_AMR
     }
   }
 
