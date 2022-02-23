@@ -1364,8 +1364,8 @@ void BoundaryInfo::remove_edge (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Only level 0 elements unless the flag "_children_on_boundary" is on.
-  libmesh_assert(elem->level()==0 || _children_on_boundary);
+  // Only level 0 elements are stored in BoundaryInfo.
+  libmesh_assert_equal_to (elem->level(), 0);
 
   // Erase (elem, edge, *) entries from map.
   erase_if(_boundary_edge_id, elem,
@@ -1381,8 +1381,8 @@ void BoundaryInfo::remove_edge (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Only level 0 elements unless the flag "_children_on_boundary" is on.
-  libmesh_assert(elem->level() == 0 || _children_on_boundary);
+  // Only level 0 elements are stored in BoundaryInfo.
+  libmesh_assert_equal_to (elem->level(), 0);
 
   // Erase (elem, edge, id) entries from map.
   erase_if(_boundary_edge_id, elem,
@@ -1396,8 +1396,8 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Only level 0 elements unless the flag "_children_on_boundary" is on.
-  libmesh_assert(elem->level() == 0 || _children_on_boundary);
+  // Only level 0 elements are stored in BoundaryInfo.
+  libmesh_assert_equal_to (elem->level(), 0);
 
   // Shells only have 2 faces
   libmesh_assert_less(shellface, 2);
@@ -1416,8 +1416,8 @@ void BoundaryInfo::remove_shellface (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Only level 0 elements unless the flag "_children_on_boundary" is on.
-  libmesh_assert(elem->level() == 0 || _children_on_boundary);
+  // Only level 0 elements are stored in BoundaryInfo.
+  libmesh_assert_equal_to (elem->level(), 0);
 
   // Shells only have 2 faces
   libmesh_assert_less(shellface, 2);
@@ -1508,6 +1508,8 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
   // parent if any
   if (elem->level() != 0)
     searched_elem_vec.push_back(elem->top_parent());
+  else if (!_children_on_boundary)
+    searched_elem_vec.push_back(elem);
 
   for (auto it = searched_elem_vec.begin(); it != searched_elem_vec.end(); ++it)
   {
@@ -1567,6 +1569,8 @@ BoundaryInfo::sides_with_boundary_id(const Elem * const elem,
   // Return boundary information of its parent as well
   if (elem->level() != 0)
     searched_elem_vec.push_back(elem->top_parent());
+  else if (!_children_on_boundary)
+    searched_elem_vec.push_back(elem);
 
   for (auto it = searched_elem_vec.begin(); it != searched_elem_vec.end(); ++it)
   {

@@ -874,6 +874,18 @@ public:
   const std::multimap<const Elem *, std::pair<unsigned short int, boundary_id_type>> & get_sideset_map() const
   { return _boundary_side_id; }
 
+  /**
+   * \returns Whether or not there are some children on boundary sides
+   */
+  bool is_children_on_boundary_side() const
+  { return _children_on_boundary; }
+
+  /**
+   * Whether or not to allow set boundary sides on children elements
+   */
+  void allow_children_on_boundary_side(const bool children_on_boundary)
+  { _children_on_boundary = children_on_boundary; }
+
 private:
 
   /**
