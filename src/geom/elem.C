@@ -429,7 +429,7 @@ Point Elem::true_centroid() const
   // on that instead.  This workaround allows us to avoid issues with
   // calling FE::reinit() with a default_order() FEType, and then
   // having that order incorrectly boosted by p_level.
-  if (_p_level)
+  if (this->p_level())
     {
       auto elem_copy = Elem::build(this->type());
 
