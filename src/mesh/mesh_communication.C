@@ -1375,15 +1375,10 @@ void MeshCommunication::gather (const processor_id_type root_id, MeshBase & mesh
           serialized_rows.emplace(rowid, std::move(serialized_row));
         }
 
-      libmesh_not_implemented();
-
-      // TODO: THIS NEEDS TIMPI SUPPORT
-      /*
       if (root_id == DofObject::invalid_processor_id)
-        mesh.comm().allgather(serialized_rows);
+        mesh.comm().set_union(serialized_rows);
       else
-        mesh.comm().gather(serialized_rows, root_id);
-      */
+        mesh.comm().set_union(serialized_rows, root_id);
 
       if (root_id == DofObject::invalid_processor_id ||
           root_id == mesh.processor_id())
