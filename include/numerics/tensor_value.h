@@ -298,6 +298,8 @@ TensorValue<Real>
 TensorValue<T>::rotation_matrix(const Real phi, const Real theta, const Real psi)
 {
 #if LIBMESH_DIM == 3
+  // We apply a negative sign here or else we don't get counter-clockwise/right-hand-rule rotation.
+  // Maybe there's an error/omission in https://mathworld.wolfram.com/EulerAngles.html ?
   const Real p = -phi / 180. * pi;
   const Real t = -theta / 180. * pi;
   const Real s = -psi / 180. * pi;
@@ -327,31 +329,8 @@ template <typename T>
 TensorValue<Real>
 TensorValue<T>::inverse_rotation_matrix(const Real phi, const Real theta, const Real psi)
 {
-#if LIBMESH_DIM == 3
-  using namespace std;
-
-  const Real p = -phi / 180. * pi;
-  const Real t = -theta / 180. * pi;
-  const Real s = -psi / 180. * pi;
-
-  // These inverse matrices are constructed from equations 3, 4, and 5 at
-  // https://mathworld.wolfram.com/EulerAngles.html and combined using the knowledge that
-  // - We want to apply the matrices in the reverse order, e.g. D^{-1}C^{-1}B^{-1}(BCD)
-  // - We want to apply the negative of the original angle
-  // - cos(-foo) = cos(foo) and sin(-foo) = -sin(foo)
-  TensorValue<Real> Binv(cos(s), -sin(s), 0, sin(s), cos(s), 0, 0, 0, 1);
-  TensorValue<Real> Cinv(1, 0, 0, 0, cos(t), -sin(t), 0, sin(t), cos(t));
-  TensorValue<Real> Dinv(cos(p), -sin(p), 0, sin(p), cos(p), 0, 0, 0, 1);
-
-  return Dinv * Cinv * Binv;
-
-#else
-  libmesh_ignore(phi, theta, psi);
-  libmesh_error_msg(
-      "TensorValue<T>::rotation_matrix() requires libMesh to be compiled with LIBMESH_DIM==3");
-  // We'll never get here
-  return TensorValue<Real>();
-#endif
+  // The inverse of a rotation matrix is just the transpose
+  return TensorValue<T>::rotation_matrix(phi, theta, psi).transpose();
 }
 
 } // namespace libMesh
