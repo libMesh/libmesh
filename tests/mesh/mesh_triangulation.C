@@ -158,10 +158,12 @@ public:
   {
     // A non-square quad, so we don't have ambiguity about which
     // diagonal a Delaunay algorithm will pick.
-    mesh.add_point(Point(0,0));
-    mesh.add_point(Point(1,0));
-    mesh.add_point(Point(1,2));
-    mesh.add_point(Point(0,1));
+    // Manually-numbered points, so we can use the point numbering as
+    // a segment ordering even on DistributedMesh.
+    mesh.add_point(Point(0,0), 0);
+    mesh.add_point(Point(1,0), 1);
+    mesh.add_point(Point(1,2), 2);
+    mesh.add_point(Point(0,1), 3);
 
     this->testTriangulatorBase(mesh, triangulator);
   }
@@ -173,10 +175,10 @@ public:
   {
     // A square quad; we'll put a diamond hole in the middle to make
     // the Delaunay selection unambiguous.
-    mesh.add_point(Point(-1,-1));
-    mesh.add_point(Point(1,-1));
-    mesh.add_point(Point(1,1));
-    mesh.add_point(Point(-1,1));
+    mesh.add_point(Point(-1,-1), 0);
+    mesh.add_point(Point(1,-1), 1);
+    mesh.add_point(Point(1,1), 2);
+    mesh.add_point(Point(-1,1), 3);
 
     // Use the point order to define the boundary, because our
     // Poly2Tri implementation doesn't do convex hulls yet, even when
@@ -249,10 +251,10 @@ public:
                                 TriangulatorInterface & triangulator)
   {
     // The same quad as testTriangulator, but out of order
-    mesh.add_point(Point(0,0));
-    mesh.add_point(Point(1,2));
-    mesh.add_point(Point(1,0));
-    mesh.add_point(Point(0,1));
+    mesh.add_point(Point(0,0), 0);
+    mesh.add_point(Point(1,2), 1);
+    mesh.add_point(Point(1,0), 2);
+    mesh.add_point(Point(0,1), 3);
 
     // Segments to put them in order
     triangulator.segments = {{0,2},{2,1},{1,3},{3,0}};
@@ -315,10 +317,10 @@ public:
   void testPoly2TriRefined()
   {
     Mesh mesh(*TestCommWorld);
-    mesh.add_point(Point(0,0));
-    mesh.add_point(Point(1,0));
-    mesh.add_point(Point(1,2));
-    mesh.add_point(Point(0,1));
+    mesh.add_point(Point(0,0), 0);
+    mesh.add_point(Point(1,0), 1);
+    mesh.add_point(Point(1,2), 2);
+    mesh.add_point(Point(0,1), 3);
 
     Poly2TriTriangulator triangulator(mesh);
 
@@ -337,12 +339,15 @@ public:
     CPPUNIT_ASSERT(mesh.n_elem() > 2);
 
     Real area = 0;
-    for (const auto & elem : mesh.element_ptr_range())
+    for (const auto & elem : mesh.active_local_element_ptr_range())
       {
+        CPPUNIT_ASSERT_EQUAL(elem->level(), 0u);
         CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
 
         area += elem->volume();
       }
+
+    mesh.comm().sum(area);
 
     LIBMESH_ASSERT_FP_EQUAL(area, 1.5, TOLERANCE*TOLERANCE);
   }
