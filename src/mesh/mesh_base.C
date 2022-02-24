@@ -832,13 +832,11 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
         BoundingBox bbox;
       };
       std::map<boundary_id_type, NodesetInfo> nodeset_info_map;
-      for (const auto & pair : this->get_boundary_info().get_nodeset_map())
+      for (const auto & [node, id] : this->get_boundary_info().get_nodeset_map())
         {
-          const Node * node = pair.first;
           if (!include_object(*node))
             continue;
 
-          const auto id = pair.second;
           NodesetInfo & info = nodeset_info_map[id];
 
           ++info.num_nodes;

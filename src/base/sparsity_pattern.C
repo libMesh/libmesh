@@ -288,11 +288,8 @@ void Build::operator()(const ConstElemRange & range)
           this->sorted_connected_dofs(elem, element_dofs_i[vi], vi);
 
         for (unsigned int vi=0; vi<n_var; vi++)
-          for (const auto & pr : elements_to_couple)
+          for (const auto & [partner, ghost_coupling] : elements_to_couple)
             {
-              const Elem * const partner = pr.first;
-              const CouplingMatrix * ghost_coupling = pr.second;
-
               // Loop over coupling matrix row variables if we have a
               // coupling matrix, or all variables if not.
               if (ghost_coupling)

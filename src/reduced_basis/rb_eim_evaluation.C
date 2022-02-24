@@ -251,11 +251,8 @@ void RBEIMEvaluation::decrement_vector(QpDataMap & v,
   libmesh_error_msg_if(get_n_basis_functions() != coeffs.size(),
                        "Error: Number of coefficients should match number of basis functions");
 
-  for (auto & pr : v)
+  for (auto & [elem_id, v_comp_and_qp] : v)
     {
-      dof_id_type elem_id = pr.first;
-      auto & v_comp_and_qp = pr.second;
-
       for (const auto & comp : index_range(v_comp_and_qp))
         for (unsigned int qp : index_range(v_comp_and_qp[comp]))
           for (unsigned int i : index_range(_local_eim_basis_functions))
@@ -280,11 +277,8 @@ void RBEIMEvaluation::side_decrement_vector(SideQpDataMap & v,
   libmesh_error_msg_if(get_n_basis_functions() != coeffs.size(),
                        "Error: Number of coefficients should match number of basis functions");
 
-  for (auto & pr : v)
+  for (auto & [elem_and_side, v_comp_and_qp] : v)
     {
-      auto elem_and_side = pr.first;
-      auto & v_comp_and_qp = pr.second;
-
       for (const auto & comp : index_range(v_comp_and_qp))
         for (unsigned int qp : index_range(v_comp_and_qp[comp]))
           for (unsigned int i : index_range(_local_side_eim_basis_functions))
@@ -805,20 +799,17 @@ write_out_interior_basis_functions(const std::string & directory_name,
       std::vector<unsigned int> n_qp_per_elem;
       n_qp_per_elem.reserve(n_elem);
       dof_id_type expected_elem_id = 0;
-      for (const auto & pr : _local_eim_basis_functions[0])
+      for (const auto & [actual_elem_id, array] : _local_eim_basis_functions[0])
         {
           // Note: Currently we require that the Elems are numbered
           // contiguously from [0..n_elem).  This allows us to avoid
           // writing the Elem ids to the Xdr file, but if we need to
           // generalize this assumption later, we can.
-          const auto & actual_elem_id = pr.first;
-
           libmesh_error_msg_if(actual_elem_id != expected_elem_id++,
                                "RBEIMEvaluation currently assumes a contiguous Elem numbering starting from 0.");
 
           // array[n_vars][n_qp] per Elem. We get the number of QPs
           // for variable 0, assuming they are all the same.
-          const auto & array = pr.second;
           n_qp_per_elem.push_back(array[0].size());
         }
       xdr.data(n_qp_per_elem, "# Number of QPs per Elem");
@@ -926,15 +917,13 @@ write_out_side_basis_functions(const std::string & directory_name,
       elem_ids.reserve(n_elem);
       side_indices.reserve(n_elem);
       n_qp_per_elem_side.reserve(n_elem);
-      for (const auto & pr : _local_side_eim_basis_functions[0])
+      for (const auto & [elem_side_pair, array] : _local_side_eim_basis_functions[0])
         {
-          const auto & elem_side_pair = pr.first;
           elem_ids.push_back(elem_side_pair.first);
           side_indices.push_back(elem_side_pair.second);
 
           // array[n_vars][n_qp] per Elem. We get the number of QPs
           // for variable 0, assuming they are all the same.
-          const auto & array = pr.second;
           n_qp_per_elem_side.push_back(array[0].size());
         }
       xdr.data(elem_ids, "# Elem IDs");

@@ -417,9 +417,8 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   // If we don't have any just-coarsened elements to send to a
   // pid, then there won't be any nodes or any elements pulled
   // in by ghosting either, and we're done with this pid.
-  for (auto pair : send_to_pid)
+  for (const auto & [pid, p_elements] : send_to_pid)
     {
-      const processor_id_type pid = pair.first;
       // don't send to ourselves!!
       if (pid == mesh.processor_id())
         continue;
@@ -430,7 +429,6 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
       // to be ghosted and any nodes which are used by any of the
       // above.
 
-      const auto & p_elements = pair.second;
       libmesh_assert(!p_elements.empty());
 
       Elem * const * elempp = p_elements.data();

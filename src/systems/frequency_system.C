@@ -358,9 +358,7 @@ void FrequencySystem::solve (const unsigned int n_start,
       const std::pair<unsigned int, Real> rval =
         linear_solver->solve (*matrix, *solution, *rhs, tol, maxits);
 
-      _n_linear_iterations   = rval.first;
-      _final_linear_residual = rval.second;
-
+      std::tie(_n_linear_iterations, _final_linear_residual) = rval;
       vec_rval.push_back(rval);
 
       /**

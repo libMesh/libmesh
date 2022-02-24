@@ -2422,10 +2422,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
     (processor_id_type,
      const std::vector<std::pair<dof_id_type, processor_id_type>> & data)
     {
-      for (auto & p : data)
+      for (const auto & [id, pid] : data)
         {
-          const dof_id_type id = p.first;
-          const processor_id_type pid = p.second;
           const proc_id_map_type::iterator it = new_proc_ids.find(id);
           if (it == new_proc_ids.end())
             new_proc_ids.emplace(id, pid);

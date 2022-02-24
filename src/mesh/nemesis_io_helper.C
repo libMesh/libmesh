@@ -2460,11 +2460,8 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
   // FIXME - half this code might be replaceable with a call to
   // EquationSystems::build_parallel_solution_vector()...
 
-  for (auto & var_num : var_nums)
+  for (auto [sys_num, var] : var_nums)
     {
-      const unsigned int sys_num = var_num.first;
-      const unsigned int var = var_num.second;
-
       const System & sys = es.get_system(sys_num);
       const std::string & name = sys.variable_name(var);
 

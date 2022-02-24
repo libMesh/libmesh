@@ -1069,13 +1069,8 @@ void AbaqusIO::assign_sideset_ids()
         // Get a reference to the current vector of nodeset ID values
         std::vector<std::pair<dof_id_type,unsigned>> & sideset_ids = it->second;
 
-        for (const auto & id : sideset_ids)
+        for (const auto & [abaqus_elem_id, abaqus_side_number] : sideset_ids)
           {
-            // sideset_ids is a vector of pairs (elem id, side id).  Pull them out
-            // now to make the code below more readable.
-            dof_id_type  abaqus_elem_id = id.first;
-            unsigned abaqus_side_number = id.second;
-
             // Map the Abaqus element ID to LibMesh numbering
             dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ abaqus_elem_id ];
 

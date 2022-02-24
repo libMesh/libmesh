@@ -183,15 +183,12 @@ void NonlinearImplicitSystem::solve ()
       // nonlinear_solver->init_names(*this);
 
       // Solve the nonlinear system.
-      const std::pair<unsigned int, Real> rval =
+      // Store the number of nonlinear iterations required to
+      // solve and the final residual.
+      std::tie(_n_nonlinear_iterations, _final_nonlinear_residual) =
         nonlinear_solver->solve (*matrix, *solution, *rhs,
                                  nonlinear_solver->relative_residual_tolerance,
                                  nonlinear_solver->max_linear_iterations);
-
-      // Store the number of nonlinear iterations required to
-      // solve and the final residual.
-      _n_nonlinear_iterations   = rval.first;
-      _final_nonlinear_residual = rval.second;
     }
 
   // Update the system after the solve

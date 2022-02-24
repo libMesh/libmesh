@@ -248,11 +248,8 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
     }
 
   unsigned int counter = 0;
-  for (const auto & xyz_pair : all_xyz)
+  for (const auto & [elem_id, xyz_vec] : all_xyz)
     {
-      dof_id_type elem_id = xyz_pair.first;
-      const std::vector<Point> & xyz_vec = xyz_pair.second;
-
       subdomain_id_type subdomain_id = libmesh_map_find(sbd_ids, elem_id);
 
       // The amount of data to be stored for each component

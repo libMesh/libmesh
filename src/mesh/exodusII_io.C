@@ -1425,13 +1425,9 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   for (auto derived_var_id : index_range(derived_var_names))
     {
       const auto & derived_name = derived_var_names[derived_var_id];
-      const auto & name_and_id =
+      const auto & [orig_name, node_id] =
         libmesh_map_find (derived_name_to_orig_name_and_node_id,
                   derived_name);
-
-      // Convenience variables for the map entry's contents.
-      const std::string & orig_name = name_and_id.first;
-      const unsigned int node_id = name_and_id.second;
 
       // For each subdomain, determine whether the current variable
       // should be active on that subdomain.

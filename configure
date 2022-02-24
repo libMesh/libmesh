@@ -7852,7 +7852,7 @@ fi
 # one is found.  Exits if no acceptable flag is found.
 # --------------------------------------------------------------
 
-acsm_CXX_STD_MIN="2011"
+acsm_CXX_STD_MIN="2017"
 
 acsm_CXX_STD_MAX="2017"
 

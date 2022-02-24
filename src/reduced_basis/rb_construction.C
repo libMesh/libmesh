@@ -150,18 +150,15 @@ void RBConstruction::solve_for_matrix_and_rhs(LinearSolver<Number> & input_solve
   const unsigned int maxits =
     es.parameters.get<unsigned int>("linear solver maximum iterations");
 
-  // Solve the linear system.  Several cases:
-  std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
-
   // It's good practice to clear the solution vector first since it can
   // affect convergence of iterative solvers
   solution->zero();
-  rval = input_solver.solve (input_matrix, *solution, input_rhs, tol, maxits);
 
+  // Solve the linear system.
   // Store the number of linear iterations required to
   // solve and the final residual.
-  _n_linear_iterations   = rval.first;
-  _final_linear_residual = rval.second;
+  std::tie(_n_linear_iterations, _final_linear_residual) =
+    input_solver.solve (input_matrix, *solution, input_rhs, tol, maxits);
 
   get_dof_map().enforce_constraints_exactly(*this);
 

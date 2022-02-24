@@ -645,10 +645,8 @@ public:
       {
         libmesh_assert(old_elem.old_dof_object);
 
-        const std::pair<unsigned int, unsigned int>
-          vg_and_offset = elem.var_to_vg_and_offset(sys_num,var_num);
-        const unsigned int vg = vg_and_offset.first;
-        const unsigned int vig = vg_and_offset.second;
+        const auto [vg, vig] =
+          elem.var_to_vg_and_offset(sys_num,var_num);
 
         const unsigned int n_comp = elem.n_comp_group(sys_num,vg);
         libmesh_assert_greater(elem.n_systems(), sys_num);
