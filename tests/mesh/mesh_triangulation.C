@@ -261,63 +261,54 @@ public:
   }
 
 
+#ifdef LIBMESH_HAVE_TRIANGLE
   void testTriangle()
   {
-#ifdef LIBMESH_HAVE_TRIANGLE
     Mesh mesh(*TestCommWorld);
     TriangleInterface triangle(mesh);
     testTriangulator(mesh, triangle);
-#endif
   }
 
 
   void testTriangleHoles()
   {
-#ifdef LIBMESH_HAVE_TRIANGLE
     Mesh mesh(*TestCommWorld);
     TriangleInterface triangle(mesh);
     testTriangulatorHoles(mesh, triangle);
-#endif
   }
 
 
   void testTriangleSegments()
   {
-#ifdef LIBMESH_HAVE_TRIANGLE
     Mesh mesh(*TestCommWorld);
     TriangleInterface triangle(mesh);
     testTriangulatorSegments(mesh, triangle);
-#endif
   }
+#endif // LIBMESH_HAVE_TRIANGLE
 
 
+#ifdef LIBMESH_HAVE_POLY2TRI
   void testPoly2Tri()
   {
-#ifdef LIBMESH_HAVE_POLY2TRI
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulator(mesh, p2t_tri);
-#endif
   }
 
 
   void testPoly2TriHoles()
   {
-#ifdef LIBMESH_HAVE_POLY2TRI
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulatorHoles(mesh, p2t_tri);
-#endif
   }
 
 
   void testPoly2TriSegments()
   {
-#ifdef LIBMESH_HAVE_POLY2TRI
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulatorSegments(mesh, p2t_tri);
-#endif
   }
 
 
@@ -355,6 +346,7 @@ public:
 
     LIBMESH_ASSERT_FP_EQUAL(area, 1.5, TOLERANCE*TOLERANCE);
   }
+#endif // LIBMESH_HAVE_POLY2TRI
 
 };
 

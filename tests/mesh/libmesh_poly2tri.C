@@ -1,7 +1,9 @@
 
 #include "libmesh_cppunit.h"
 
-#include "poly2tri/poly2tri.h"
+#ifdef LIBMESH_HAVE_POLY2TRI
+#  include "poly2tri/poly2tri.h"
+#endif
 
 #include <numeric>
 
