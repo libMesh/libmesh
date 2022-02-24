@@ -30,6 +30,7 @@ public:
   CPPUNIT_TEST( testPoly2TriHoles );
   CPPUNIT_TEST( testPoly2TriSegments );
   CPPUNIT_TEST( testPoly2TriRefined );
+  CPPUNIT_TEST( testPoly2TriHolesRefined );
 #endif
 
 #ifdef LIBMESH_HAVE_TRIANGLE
@@ -350,6 +351,46 @@ public:
     mesh.comm().sum(area);
 
     LIBMESH_ASSERT_FP_EQUAL(area, 1.5, TOLERANCE*TOLERANCE);
+  }
+
+  void testPoly2TriHolesRefined()
+  {
+    Mesh mesh(*TestCommWorld);
+    mesh.add_point(Point(0,0));
+    mesh.add_point(Point(1,0));
+    mesh.add_point(Point(1,2));
+    mesh.add_point(Point(0,1));
+
+    Poly2TriTriangulator triangulator(mesh);
+
+    // Use the point order to define the boundary, because our
+    // Poly2Tri implementation doesn't do convex hulls yet, even when
+    // that would give the same answer.
+    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
+
+    // Add a diamond hole
+    TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
+    const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
+    triangulator.attach_hole_list(&holes);
+
+    // Try to insert points!
+    triangulator.desired_area() = 0.1;
+    triangulator.minimum_angle() = 0;
+    triangulator.smooth_after_generating() = false;
+
+    triangulator.triangulate();
+
+    CPPUNIT_ASSERT(mesh.n_elem() > 2);
+
+    Real area = 0;
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
+
+        area += elem->volume();
+      }
+
+    LIBMESH_ASSERT_FP_EQUAL(area, 1.25, TOLERANCE*TOLERANCE);
   }
 #endif // LIBMESH_HAVE_POLY2TRI
 
