@@ -257,7 +257,7 @@ MeshTools::Modification::rotate (MeshBase & mesh,
                                  const Real psi)
 {
 #if LIBMESH_DIM == 3
-  const auto R = RealTensorValue::rotation_matrix(phi, theta, psi);
+  const auto R = RealTensorValue::intrinsic_rotation_matrix(phi, theta, psi);
 
   for (auto & node : mesh.node_ptr_range())
     {

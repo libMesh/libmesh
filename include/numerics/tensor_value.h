@@ -146,25 +146,32 @@ public:
   { libmesh_assert_equal_to (p, Scalar(0)); this->zero(); return *this; }
 
   /**
-   * Generate the rotation matrix associated with the provided Euler angles.  We follow the
-   * convention described at https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix and we use
-   * the matrix described by the 'Proper Euler Angles' column and Z1 X2 Z3 row, which indicates that
-   * the rotations are performed sequentially about the z, x', and z'' axes, in that order. A
-   * positive angle yields a counter-clockwise rotation about the axis in question. Note that angles
-   * should be provided in degrees
-   * @param angle1_deg rotation angle around original z-axis
-   * @param angle2_deg rotation angle around "current" x-axis (post angle1), e.g. x'
-   * @param angle3_deg rotation angle around "current" z-axis (post angle1 and angle2), e.g. z''
+   * Generate the intrinsic rotation matrix associated with the provided Euler angles. An instrinsic
+   * rotation leaves bodies in the domain fixed while rotating the coordinate axes. We follow the
+   * convention described at http://mathworld.wolfram.com/EulerAngles.html (equations 6-14 give the
+   * entries of the composite transformation matrix). The rotations are performed sequentially about
+   * the z, x', and z'' axes, in that order. A positive angle for a given step in the rotation
+   * sequences gives the appearance of rotating an entity in the domain counter-clockwise around the
+   * rotation axis, although in fact it is the coordinate axes themselves that are rotating. In
+   * order to give the appearance of a body rotating counter-clockwise, we actually rotate the
+   * coordinate axes by the \emph negative of the angle passed into the method. All angles should be
+   * provided in degrees
+   * @param phi The \emph negative of the angle we will rotate the coordinate axes around the
+   * original z-axis
+   * @param theta The \emph negative of the angle we will rotate the coordinate axes around the
+   * "current" x-axis (post phi), e.g. x'
+   * @param psi The \emph negative of the angle we will rotate the coordinate axes around the
+   * "current" z-axis (post phi and theta), e.g. z''
    * @return The associated rotation matrix
    */
-  static TensorValue<Real> rotation_matrix(Real angle1_deg, Real angle2_deg, Real angle3_deg);
+  static TensorValue<Real> intrinsic_rotation_matrix(Real phi, Real theta, Real psi);
 
   /**
-   * Invert the rotation that would occur if the same angles were provided to \p rotation_matrix,
-   * e.g. return to the original starting point
+   * Invert the rotation that would occur if the same angles were provided to \p
+   * intrinsic_rotation_matrix, e.g. return to the original starting point. All angles should be
+   * provided in degrees
    */
-  static TensorValue<Real>
-  inverse_rotation_matrix(Real angle1_deg, Real angle2_deg, Real angle3_deg);
+  static TensorValue<Real> inverse_intrinsic_rotation_matrix(Real phi, Real theta, Real psi);
 
   /**
    * Generate the extrinsic rotation matrix associated with the provided Euler angles. An extrinsic
@@ -320,29 +327,33 @@ TensorValue<T>::TensorValue (const TypeTensor<Real> & p_re,
 
 template <typename T>
 TensorValue<Real>
-TensorValue<T>::rotation_matrix(const Real angle1_deg, const Real angle2_deg, const Real angle3_deg)
+TensorValue<T>::intrinsic_rotation_matrix(const Real phi, const Real theta, const Real psi)
 {
 #if LIBMESH_DIM == 3
-  const auto angle1 = angle1_deg / 180. * pi;
-  const auto angle2 = angle2_deg / 180. * pi;
-  const auto angle3 = angle3_deg / 180. * pi;
-  const auto s1 = std::sin(angle1), c1 = std::cos(angle1);
-  const auto s2 = std::sin(angle2), c2 = std::cos(angle2);
-  const auto s3 = std::sin(angle3), c3 = std::cos(angle3);
+  // We apply a negative sign here or else we don't get the appearance of
+  // counter-clockwise/right-hand-rule rotation of the bodies with respect to the coordinate axes
+  // (but as explained in the method doxygen we are *actually* rotating the coordinate axes while
+  // leaving the bodies fixed)
+  const Real p = -phi / 180. * pi;
+  const Real t = -theta / 180. * pi;
+  const Real s = -psi / 180. * pi;
+  const Real sp = std::sin(p), cp = std::cos(p);
+  const Real st = std::sin(t), ct = std::cos(t);
+  const Real ss = std::sin(s), cs = std::cos(s);
 
-  return TensorValue<Real>(c1 * c3 - c2 * s1 * s3,
-                           -c1 * s3 - c2 * c3 * s1,
-                           s1 * s2,
-                           c3 * s1 + c1 * c2 * s3,
-                           c1 * c2 * c3 - s1 * s3,
-                           -c1 * s2,
-                           s2 * s3,
-                           c3 * s2,
-                           c2);
+  return TensorValue<Real>(cp * cs - sp * ct * ss,
+                           sp * cs + cp * ct * ss,
+                           st * ss,
+                           -cp * ss - sp * ct * cs,
+                           -sp * ss + cp * ct * cs,
+                           st * cs,
+                           sp * st,
+                           -cp * st,
+                           ct);
 #else
-  libmesh_ignore(angle1_deg, angle2_deg, angle3_deg);
-  libmesh_error_msg(
-      "TensorValue<T>::rotation_matrix() requires libMesh to be compiled with LIBMESH_DIM==3");
+  libmesh_ignore(phi, theta, psi);
+  libmesh_error_msg("TensorValue<T>::intrinsic_rotation_matrix() requires libMesh to be compiled "
+                    "with LIBMESH_DIM==3");
   // We'll never get here
   return TensorValue<Real>();
 #endif
@@ -350,10 +361,10 @@ TensorValue<T>::rotation_matrix(const Real angle1_deg, const Real angle2_deg, co
 
 template <typename T>
 TensorValue<Real>
-TensorValue<T>::inverse_rotation_matrix(const Real phi, const Real theta, const Real psi)
+TensorValue<T>::inverse_intrinsic_rotation_matrix(const Real phi, const Real theta, const Real psi)
 {
   // The inverse of a rotation matrix is just the transpose
-  return TensorValue<T>::rotation_matrix(phi, theta, psi).transpose();
+  return TensorValue<T>::intrinsic_rotation_matrix(phi, theta, psi).transpose();
 }
 
 template <typename T>
@@ -390,10 +401,12 @@ TensorValue<T>::extrinsic_rotation_matrix(const Real angle1_deg,
 
 template <typename T>
 TensorValue<Real>
-TensorValue<T>::inverse_extrinsic_rotation_matrix(const Real phi, const Real theta, const Real psi)
+TensorValue<T>::inverse_extrinsic_rotation_matrix(const Real angle1_deg,
+                                                  const Real angle2_deg,
+                                                  const Real angle3_deg)
 {
   // The inverse of a rotation matrix is just the transpose
-  return TensorValue<T>::extrinsic_rotation_matrix(phi, theta, psi).transpose();
+  return TensorValue<T>::extrinsic_rotation_matrix(angle1_deg, angle2_deg, angle3_deg).transpose();
 }
 
 } // namespace libMesh

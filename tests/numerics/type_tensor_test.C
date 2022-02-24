@@ -97,14 +97,14 @@ private:
   {
     {
       Point x(1, 0, 0);
-      const auto R = RealTensorValue::rotation_matrix(90, 0, 0);
+      const auto R = RealTensorValue::extrinsic_rotation_matrix(90, 0, 0);
       auto rotated = R * x;
       constexpr auto tol = TOLERANCE * TOLERANCE;
       LIBMESH_ASSERT_FP_EQUAL(0, rotated(0), tol);
       LIBMESH_ASSERT_FP_EQUAL(1, rotated(1), tol);
       LIBMESH_ASSERT_FP_EQUAL(0, rotated(2), tol);
 
-      const auto invR = RealTensorValue::inverse_rotation_matrix(90, 0, 0);
+      const auto invR = RealTensorValue::inverse_extrinsic_rotation_matrix(90, 0, 0);
       rotated = invR * rotated;
       LIBMESH_ASSERT_FP_EQUAL(1, rotated(0), tol);
       LIBMESH_ASSERT_FP_EQUAL(0, rotated(1), tol);
@@ -113,7 +113,7 @@ private:
 
     {
       Point x(1, 1, 1);
-      const auto R = RealTensorValue::rotation_matrix(90, 90, 90);
+      const auto R = RealTensorValue::extrinsic_rotation_matrix(90, 90, 90);
       auto rotated = R * x;
 
       constexpr auto tol = TOLERANCE * TOLERANCE;
@@ -121,7 +121,7 @@ private:
       LIBMESH_ASSERT_FP_EQUAL(-1, rotated(1), tol);
       LIBMESH_ASSERT_FP_EQUAL(1, rotated(2), tol);
 
-      const auto invR = RealTensorValue::inverse_rotation_matrix(90, 90, 90);
+      const auto invR = RealTensorValue::inverse_extrinsic_rotation_matrix(90, 90, 90);
       rotated = invR * rotated;
       LIBMESH_ASSERT_FP_EQUAL(1, rotated(0), tol);
       LIBMESH_ASSERT_FP_EQUAL(1, rotated(1), tol);
