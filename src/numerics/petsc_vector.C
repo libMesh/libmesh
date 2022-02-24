@@ -189,6 +189,7 @@ void PetscVector<T>::add (const numeric_index_type i, const T value)
   PetscInt i_val = static_cast<PetscInt>(i);
   PetscScalar petsc_value = PS(value);
 
+  Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
   ierr = VecSetValues (_vec, 1, &i_val, &petsc_value, ADD_VALUES);
   LIBMESH_CHKERR(ierr);
 
@@ -211,6 +212,7 @@ void PetscVector<T>::add_vector (const T * v,
   const PetscInt * i_val = reinterpret_cast<const PetscInt *>(dof_indices.data());
   const PetscScalar * petsc_value = pPS(v);
 
+  Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
   ierr = VecSetValues (_vec, cast_int<PetscInt>(dof_indices.size()),
                        i_val, petsc_value, ADD_VALUES);
   LIBMESH_CHKERR(ierr);
@@ -1167,7 +1169,7 @@ void PetscVector<T>::_get_array(bool read_only) const
 
   if (!initially_array_is_present)
     {
-      std::lock_guard<std::mutex> do_once_lock(_petsc_vector_mutex);
+      Threads::spin_mutex::scoped_lock do_once_lock(_petsc_vector_mutex);
       if (!_array_is_present.load(std::memory_order_relaxed))
         {
           PetscErrorCode ierr=0;
@@ -1229,20 +1231,11 @@ void PetscVector<T>::_restore_array() const
   libmesh_error_msg_if(_values_manually_retrieved,
                        "PetscVector values were manually retrieved but are being automatically restored!");
 
-#ifdef LIBMESH_HAVE_CXX11_THREAD
-  std::atomic_thread_fence(std::memory_order_acquire);
-#else
-  Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
-#endif
-
   libmesh_assert (this->initialized());
-  if (_array_is_present)
+  if (_array_is_present.load(std::memory_order_acquire))
     {
-#ifdef LIBMESH_HAVE_CXX11_THREAD
-      std::lock_guard<std::mutex> lock(_petsc_vector_mutex);
-#endif
-
-      if (_array_is_present)
+      Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
+      if (_array_is_present.load(std::memory_order_relaxed))
         {
           PetscErrorCode ierr=0;
           if (this->type() != GHOSTED)
@@ -1269,12 +1262,7 @@ void PetscVector<T>::_restore_array() const
               _local_form = nullptr;
               _local_size = 0;
             }
-#ifdef LIBMESH_HAVE_CXX11_THREAD
-          std::atomic_thread_fence(std::memory_order_release);
-          _array_is_present.store(false, std::memory_order_relaxed);
-#else
-          _array_is_present = false;
-#endif
+          _array_is_present.store(false, std::memory_order_release);
         }
     }
 }
