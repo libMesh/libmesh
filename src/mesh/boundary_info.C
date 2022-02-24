@@ -1235,8 +1235,15 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
   // Clear out any previous contents
   vec_to_fill.clear();
 
-  // Only level-0 elements store BCs.  If this is not a level-0
-  // element get its level-0 parent and infer the BCs.
+  // Search BC on the current element. If we find anything, we should return
+  for (const auto & pr : as_range(_boundary_side_id.equal_range(elem)))
+    if (pr.second.first == side)
+      vec_to_fill.push_back(pr.second.second);
+
+  if (vec_to_fill.size())
+    return;
+
+  // We check the top parent now
   const Elem * searched_elem = elem;
   if (elem->level() != 0)
     {
@@ -1283,7 +1290,7 @@ void BoundaryInfo::raw_boundary_ids (const Elem * const elem,
   vec_to_fill.clear();
 
   // Only level-0 elements store BCs.
-  if (elem->parent())
+  if (elem->parent() && !_children_on_boundary)
     return;
 
   // Check each element in the range to see if its side matches the requested side.
