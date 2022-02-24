@@ -18,6 +18,11 @@
 #ifndef LIBMESH_FLOAT128_SHIMS_H
 #define LIBMESH_FLOAT128_SHIMS_H
 
+// The library configuration options
+#include "libmesh/libmesh_config.h"
+
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+
 # include <boost/multiprecision/float128.hpp>
 
 // Boost doesn't add float128 overloads to namespace std.  But, we
@@ -177,5 +182,7 @@ inline long long llround
 // LIBMESH_FLOAT128_BINARY(hypot)
 
 }
+
+#endif // LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 
 #endif // LIBMESH_FLOAT128_SHIMS_H
