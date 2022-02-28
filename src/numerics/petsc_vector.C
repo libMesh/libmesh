@@ -147,6 +147,7 @@ void PetscVector<T>::set (const numeric_index_type i, const T value)
   PetscInt i_val = static_cast<PetscInt>(i);
   PetscScalar petsc_value = PS(value);
 
+  std::scoped_lock lock(_petsc_vector_mutex);
   ierr = VecSetValues (_vec, 1, &i_val, &petsc_value, INSERT_VALUES);
   LIBMESH_CHKERR(ierr);
 
@@ -189,7 +190,7 @@ void PetscVector<T>::add (const numeric_index_type i, const T value)
   PetscInt i_val = static_cast<PetscInt>(i);
   PetscScalar petsc_value = PS(value);
 
-  Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
+  std::scoped_lock lock(_petsc_vector_mutex);
   ierr = VecSetValues (_vec, 1, &i_val, &petsc_value, ADD_VALUES);
   LIBMESH_CHKERR(ierr);
 
@@ -212,7 +213,7 @@ void PetscVector<T>::add_vector (const T * v,
   const PetscInt * i_val = reinterpret_cast<const PetscInt *>(dof_indices.data());
   const PetscScalar * petsc_value = pPS(v);
 
-  Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
+  std::scoped_lock lock(_petsc_vector_mutex);
   ierr = VecSetValues (_vec, cast_int<PetscInt>(dof_indices.size()),
                        i_val, petsc_value, ADD_VALUES);
   LIBMESH_CHKERR(ierr);
@@ -364,6 +365,7 @@ void PetscVector<T>::insert (const T * v,
 
   PetscErrorCode ierr=0;
   PetscInt * idx_values = numeric_petsc_cast(dof_indices.data());
+  std::scoped_lock lock(_petsc_vector_mutex);
   ierr = VecSetValues (_vec, cast_int<PetscInt>(dof_indices.size()),
                        idx_values, pPS(v), INSERT_VALUES);
   LIBMESH_CHKERR(ierr);
@@ -1169,7 +1171,7 @@ void PetscVector<T>::_get_array(bool read_only) const
 
   if (!initially_array_is_present)
     {
-      Threads::spin_mutex::scoped_lock do_once_lock(_petsc_vector_mutex);
+      std::scoped_lock do_once_lock(_petsc_vector_mutex);
       if (!_array_is_present.load(std::memory_order_relaxed))
         {
           PetscErrorCode ierr=0;
@@ -1234,7 +1236,7 @@ void PetscVector<T>::_restore_array() const
   libmesh_assert (this->initialized());
   if (_array_is_present.load(std::memory_order_acquire))
     {
-      Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
+      std::scoped_lock lock(_petsc_vector_mutex);
       if (_array_is_present.load(std::memory_order_relaxed))
         {
           PetscErrorCode ierr=0;
