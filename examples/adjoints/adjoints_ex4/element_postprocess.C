@@ -5,6 +5,7 @@
 #include "libmesh/fem_context.h"
 #include "libmesh/point.h"
 #include "libmesh/quadrature.h"
+#include "libmesh/threads.h"
 
 // Local includes
 #include "L-shaped.h"
@@ -51,6 +52,8 @@ void LaplaceSystem::element_postprocess (DiffContext & context)
         }
     }
 
+  static Threads::spin_mutex local_mtx;
+  Threads::spin_mutex::scoped_lock lock(local_mtx);
   // Update the computed value of the global functional R, by adding the contribution from this element
   computed_QoI[0] = computed_QoI[0] + dQoI_0;
 }

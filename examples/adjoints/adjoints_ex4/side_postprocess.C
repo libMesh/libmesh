@@ -5,6 +5,7 @@
 #include "libmesh/fem_context.h"
 #include "libmesh/point.h"
 #include "libmesh/quadrature.h"
+#include "libmesh/threads.h"
 
 // Local includes
 #include "L-shaped.h"
@@ -55,5 +56,7 @@ void LaplaceSystem::side_postprocess(DiffContext & context)
 
     } // end of the quadrature point qp-loop
 
+  static Threads::spin_mutex local_mtx;
+  Threads::spin_mutex::scoped_lock lock(local_mtx);
   computed_QoI[1] = computed_QoI[1] + dQoI_1;
 }
