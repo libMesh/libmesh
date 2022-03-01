@@ -748,6 +748,11 @@ protected:
    * Type of vector.
    */
   ParallelType _type;
+
+  /**
+   * Mutex for performing thread-safe operations
+   */
+  std::mutex _numeric_vector_mutex;
 };
 
 
