@@ -1,6 +1,7 @@
 // libmesh includes
 #include <libmesh/tensor_value.h>
 #include <libmesh/vector_value.h>
+#include <libmesh/point.h>
 
 #include "libmesh_cppunit.h"
 
@@ -19,6 +20,7 @@ public:
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST(testInverse);
   CPPUNIT_TEST(testLeftMultiply);
+  CPPUNIT_TEST(testRotation);
 #endif
   CPPUNIT_TEST(testIsZero);
 
@@ -88,6 +90,42 @@ private:
     {
       TensorValue<double> tensor(0,1,2,3,4,5,6,7,8);
       CPPUNIT_ASSERT(!tensor.is_zero());
+    }
+  }
+
+  void testRotation()
+  {
+    {
+      Point x(1, 0, 0);
+      const auto R = RealTensorValue::extrinsic_rotation_matrix(90, 0, 0);
+      auto rotated = R * x;
+      constexpr auto tol = TOLERANCE * TOLERANCE;
+      LIBMESH_ASSERT_FP_EQUAL(0, rotated(0), tol);
+      LIBMESH_ASSERT_FP_EQUAL(1, rotated(1), tol);
+      LIBMESH_ASSERT_FP_EQUAL(0, rotated(2), tol);
+
+      const auto invR = RealTensorValue::inverse_extrinsic_rotation_matrix(90, 0, 0);
+      rotated = invR * rotated;
+      LIBMESH_ASSERT_FP_EQUAL(1, rotated(0), tol);
+      LIBMESH_ASSERT_FP_EQUAL(0, rotated(1), tol);
+      LIBMESH_ASSERT_FP_EQUAL(0, rotated(2), tol);
+    }
+
+    {
+      Point x(1, 1, 1);
+      const auto R = RealTensorValue::extrinsic_rotation_matrix(90, 90, 90);
+      auto rotated = R * x;
+
+      constexpr auto tol = TOLERANCE * TOLERANCE;
+      LIBMESH_ASSERT_FP_EQUAL(1, rotated(0), tol);
+      LIBMESH_ASSERT_FP_EQUAL(-1, rotated(1), tol);
+      LIBMESH_ASSERT_FP_EQUAL(1, rotated(2), tol);
+
+      const auto invR = RealTensorValue::inverse_extrinsic_rotation_matrix(90, 90, 90);
+      rotated = invR * rotated;
+      LIBMESH_ASSERT_FP_EQUAL(1, rotated(0), tol);
+      LIBMESH_ASSERT_FP_EQUAL(1, rotated(1), tol);
+      LIBMESH_ASSERT_FP_EQUAL(1, rotated(2), tol);
     }
   }
 };
