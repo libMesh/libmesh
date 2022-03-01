@@ -33,6 +33,7 @@
 
 // C++ includes
 #include <limits>
+#include <mutex>
 
 namespace libMesh
 {
@@ -481,6 +482,7 @@ void EigenSparseVector<T>::set (const numeric_index_type i, const T value)
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->size());
 
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   _vec[static_cast<eigen_idx_type>(i)] = value;
 
   this->_is_closed = false;
@@ -495,6 +497,7 @@ void EigenSparseVector<T>::add (const numeric_index_type i, const T value)
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->size());
 
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   _vec[static_cast<eigen_idx_type>(i)] += value;
 
   this->_is_closed = false;
