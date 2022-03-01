@@ -80,7 +80,7 @@ function test_header()
     echo "int foo () { return 0; }" >> $source_file
 
     #echo $CXX $test_CXXFLAGS $source_file -o $app_file
-    if $CXX $test_CXXFLAGS $source_file -c -o $object_file >$errlog 2>&1 ; then
+    if $CXX $test_CXXFLAGS $CXXFLAGS $source_file -c -o $object_file >$errlog 2>&1 ; then
         # See color codes above.  We:
         # .) skip to column 65
         # .) print [ in white
@@ -96,7 +96,7 @@ function test_header()
         cat $source_file  >> $stdout
         echo ""  >> $stdout
         echo "Command line:" >> $stdout
-        echo $CXX $test_CXXFLAGS $source_file -c -o $object_file  >> $stdout
+        echo $CXX $test_CXXFLAGS $CXXFLAGS $source_file -c -o $object_file  >> $stdout
         echo ""  >> $stdout
         echo "Output:" >> $stdout
         cat $errlog >> $stdout

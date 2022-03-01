@@ -63,7 +63,7 @@ function test_example()
     printf '%s' "Testing example installation $exdir ... " > $stdout
     cd $examples_install_path/$exdir
 
-    if $CXX $installed_CXXFLAGS *.C -o $app_to_link $installed_LIBS > $errlog 2>&1 ; then
+    if $CXX $installed_CXXFLAGS $CXXFLAGS *.C -o $app_to_link $installed_LIBS > $errlog 2>&1 ; then
         # See color codes above.  We:
         # .) skip to column 65
         # .) print [ in white
@@ -76,7 +76,7 @@ function test_example()
         # See comment above for OK status
         printf '\e[65G\e[1;37m[\e[1;31m%s\e[1;37m]\e[m\e[m\n' " FAILED " >> $stdout
 	echo "Compile line:"  >> $stdout
-	echo $CXX $installed_CXXFLAGS *.C -o $app_to_link $installed_LIBS >> $stdout
+	echo $CXX $installed_CXXFLAGS $CXXFLAGS *.C -o $app_to_link $installed_LIBS >> $stdout
 	echo ""  >> $stdout
 	echo "Output:"  >> $stdout
 	cat $errlog  >> $stdout
