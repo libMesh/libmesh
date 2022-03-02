@@ -725,7 +725,7 @@ int main (int argc, char ** argv)
         libmesh_error_msg_if(std::abs(system.time - (1.0089)) >= 2.e-4,
                              "Mismatch in end time reached by adaptive timestepper!");
 
-        libmesh_error_msg_if(std::abs(total_sensitivity - 4.87767) >= 2.e-4,
+        libmesh_error_msg_if(std::abs(total_sensitivity - 4.87767) >= 3.e-3,
                              "Mismatch in sensitivity gold value!");
       }
       else
