@@ -220,6 +220,16 @@ public:
 
   virtual std::vector<unsigned int> segment_indices() const override;
 
+  const std::vector<Point> & get_points() const
+  {
+    return _points;
+  }
+
+  void set_points(std::vector<Point> points)
+  {
+    _points = std::move(points);
+  }
+
 private:
   /**
    * arbitrary (x,y) location inside the hole
@@ -230,7 +240,7 @@ private:
    * Reference to the vector of points which makes up
    * the hole.
    */
-  const std::vector<Point> _points;
+  std::vector<Point> _points;
 
   std::vector<unsigned int> _segment_indices;
 };
