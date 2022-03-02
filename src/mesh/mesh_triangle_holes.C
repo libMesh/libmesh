@@ -21,6 +21,8 @@
 // Local includes
 #include "libmesh/mesh_triangle_holes.h"
 
+#include "libmesh/int_range.h"
+
 namespace libMesh
 {
 
@@ -133,6 +135,16 @@ TriangulatorInterface::ArbitraryHole::ArbitraryHole(const Point & center,
     _points(points),
     _segment_indices(segment_indices)
 {}
+
+TriangulatorInterface::ArbitraryHole::ArbitraryHole(const Hole & orig)
+  : _center(orig.inside())
+{
+  const unsigned int np = orig.n_points();
+  _points.reserve(np);
+  for (auto i : make_range(np))
+    _points.push_back(orig.point(i));
+}
+
 
 unsigned int TriangulatorInterface::ArbitraryHole::n_points() const
 {
