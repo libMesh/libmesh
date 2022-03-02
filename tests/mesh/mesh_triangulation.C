@@ -315,7 +315,11 @@ public:
   }
 
 
-  void testPoly2TriRefined()
+  void testPoly2TriRefinementBase
+    (const std::vector<TriangulatorInterface::Hole*> * holes,
+     Real expected_total_area,
+     dof_id_type n_original_elem,
+     Real desired_area = 0.1)
   {
     Mesh mesh(*TestCommWorld);
     mesh.add_point(Point(0,0), 0);
@@ -330,14 +334,17 @@ public:
     // that would give the same answer.
     triangulator.triangulation_type() = TriangulatorInterface::PSLG;
 
+    if (holes)
+      triangulator.attach_hole_list(holes);
+
     // Try to insert points!
-    triangulator.desired_area() = 0.1;
+    triangulator.desired_area() = desired_area;
     triangulator.minimum_angle() = 0;
     triangulator.smooth_after_generating() = false;
 
     triangulator.triangulate();
 
-    CPPUNIT_ASSERT(mesh.n_elem() > 2);
+    CPPUNIT_ASSERT(mesh.n_elem() > n_original_elem);
 
     Real area = 0;
     for (const auto & elem : mesh.active_local_element_ptr_range())
@@ -350,47 +357,21 @@ public:
 
     mesh.comm().sum(area);
 
-    LIBMESH_ASSERT_FP_EQUAL(area, 1.5, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(area, expected_total_area, TOLERANCE*TOLERANCE);
+  }
+
+  void testPoly2TriRefined()
+  {
+    testPoly2TriRefinementBase(nullptr, 1.5, 2);
   }
 
   void testPoly2TriHolesRefined()
   {
-    Mesh mesh(*TestCommWorld);
-    mesh.add_point(Point(0,0));
-    mesh.add_point(Point(1,0));
-    mesh.add_point(Point(1,2));
-    mesh.add_point(Point(0,1));
-
-    Poly2TriTriangulator triangulator(mesh);
-
-    // Use the point order to define the boundary, because our
-    // Poly2Tri implementation doesn't do convex hulls yet, even when
-    // that would give the same answer.
-    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
-
     // Add a diamond hole
     TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
-    triangulator.attach_hole_list(&holes);
 
-    // Try to insert points!
-    triangulator.desired_area() = 0.1;
-    triangulator.minimum_angle() = 0;
-    triangulator.smooth_after_generating() = false;
-
-    triangulator.triangulate();
-
-    CPPUNIT_ASSERT(mesh.n_elem() > 2);
-
-    Real area = 0;
-    for (const auto & elem : mesh.element_ptr_range())
-      {
-        CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
-
-        area += elem->volume();
-      }
-
-    LIBMESH_ASSERT_FP_EQUAL(area, 1.25, TOLERANCE*TOLERANCE);
+    testPoly2TriRefinementBase(&holes, 1.25, 8);
   }
 #endif // LIBMESH_HAVE_POLY2TRI
 
