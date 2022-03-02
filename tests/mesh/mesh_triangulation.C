@@ -352,7 +352,12 @@ public:
         CPPUNIT_ASSERT_EQUAL(elem->level(), 0u);
         CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
 
-        area += elem->volume();
+        const Real my_area = elem->volume();
+
+        // my_area <= desired_area, wow this macro ordering hurts
+        CPPUNIT_ASSERT_LESSEQUAL(desired_area, my_area);
+
+        area += my_area;
       }
 
     mesh.comm().sum(area);
