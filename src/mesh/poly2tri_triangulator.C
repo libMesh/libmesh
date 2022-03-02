@@ -790,13 +790,17 @@ bool Poly2TriTriangulator::insert_refinement_points()
                   checked_emplace(this_node->id(), next_node->id());
 
                   this_node = next_node;
+                  if (this_node->id() == this->segments.front().first)
+                    break;
+
                   it = next_boundary_node.find(*this_node);
                 }
             }
 
           // We expect a closed loop here
-          checked_emplace(this->segments.back().second,
-                          this->segments.front().first);
+          if (this->segments.back().second != this->segments.front().first)
+            checked_emplace(this->segments.back().second,
+                            this->segments.front().first);
         }
       else
         {
