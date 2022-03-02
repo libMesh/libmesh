@@ -88,24 +88,24 @@ unsigned int segment_intersection(const libMesh::Elem & elem,
 
       const Real one_over_denom = 1 / denom;
 
-      const Real sourcesdx = source(0)-v0(0),
-                 sourcesdy = source(1)-v0(1);
+      const Real targetsdx = v1(0)-target(0),
+                 targetsdy = v1(1)-target(1);
 
-      const Real t_num = sourcesdx * raydy -
-                         sourcesdy * raydx;
+      const Real t_num = targetsdx * raydy -
+                         targetsdy * raydx;
       const Real t = t_num * one_over_denom;
 
       if (t < -TOLERANCE || t > 1 + TOLERANCE)
         continue;
 
-      const Real u_num = sourcesdx * edgedy - sourcesdy * raydx;
+      const Real u_num = targetsdx * edgedy - targetsdy * edgedx;
       const Real u = u_num * one_over_denom;
 
       if (u < -TOLERANCE || u > 1 + TOLERANCE)
         continue;
 
-      source(0) += raydx * u;
-      source(1) += raydy * u;
+      source(0) += raydx * (1-u);
+      source(1) += raydy * (1-u);
       return s;
     }
 
