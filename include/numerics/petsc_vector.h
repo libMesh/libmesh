@@ -413,7 +413,7 @@ private:
    * object to keep down thread contention when reading from multiple
    * PetscVectors simultaneously
    */
-  mutable std::mutex _petsc_vector_mutex;
+  mutable std::mutex _petsc_get_restore_array_mutex;
 
   /**
    * Queries the array (and the local form if the vector is ghosted)

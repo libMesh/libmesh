@@ -166,6 +166,7 @@ void EpetraVector<T>::set (const numeric_index_type i_in, const T value_in)
 
   libmesh_assert_less (i_in, this->size());
 
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   ReplaceGlobalValues(1, &i, &value);
 
   this->_is_closed = false;
@@ -217,6 +218,7 @@ void EpetraVector<T>::add (const numeric_index_type i_in, const T value_in)
 
   libmesh_assert_less (i_in, this->size());
 
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   SumIntoGlobalValues(1, &i, &value);
 
   this->_is_closed = false;
@@ -230,6 +232,7 @@ void EpetraVector<T>::add_vector (const T * v,
 {
   libmesh_assert_equal_to (sizeof(numeric_index_type), sizeof(int));
 
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   SumIntoGlobalValues (cast_int<numeric_index_type>(dof_indices.size()),
                        numeric_trilinos_cast(dof_indices.data()),
                        const_cast<T *>(v));
@@ -303,9 +306,11 @@ void EpetraVector<T>::insert (const T * v,
 {
   libmesh_assert_equal_to (sizeof(numeric_index_type), sizeof(int));
 
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   ReplaceGlobalValues (cast_int<numeric_index_type>(dof_indices.size()),
                        numeric_trilinos_cast(dof_indices.data()),
                        const_cast<T *>(v));
+  this->_is_closed = false;
 }
 
 

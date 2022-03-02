@@ -41,6 +41,7 @@
 #include <cstddef>
 #include <vector>
 #include <limits>
+#include <mutex>
 
 // Forward declarations
 class Epetra_IntSerialDenseVector;

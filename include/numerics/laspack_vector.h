@@ -37,6 +37,7 @@
 // C++ includes
 #include <cstdio> // for std::sprintf
 #include <limits>
+#include <mutex>
 
 namespace libMesh
 {
@@ -501,6 +502,7 @@ void LaspackVector<T>::set (const numeric_index_type i, const T value)
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->size());
 
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   V_SetCmp (&_vec, i+1, value);
 
 #ifndef NDEBUG
@@ -517,6 +519,7 @@ void LaspackVector<T>::add (const numeric_index_type i, const T value)
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->size());
 
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   V_AddCmp (&_vec, i+1, value);
 
 #ifndef NDEBUG
