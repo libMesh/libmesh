@@ -30,6 +30,8 @@ public:
   CPPUNIT_TEST( testPoly2TriHoles );
   CPPUNIT_TEST( testPoly2TriSegments );
   CPPUNIT_TEST( testPoly2TriRefined );
+  CPPUNIT_TEST( testPoly2TriExtraRefined );
+  CPPUNIT_TEST( testPoly2TriHolesRefined );
 #endif
 
 #ifdef LIBMESH_HAVE_TRIANGLE
@@ -314,7 +316,11 @@ public:
   }
 
 
-  void testPoly2TriRefined()
+  void testPoly2TriRefinementBase
+    (const std::vector<TriangulatorInterface::Hole*> * holes,
+     Real expected_total_area,
+     dof_id_type n_original_elem,
+     Real desired_area = 0.1)
   {
     Mesh mesh(*TestCommWorld);
     mesh.add_point(Point(0,0), 0);
@@ -329,14 +335,17 @@ public:
     // that would give the same answer.
     triangulator.triangulation_type() = TriangulatorInterface::PSLG;
 
+    if (holes)
+      triangulator.attach_hole_list(holes);
+
     // Try to insert points!
-    triangulator.desired_area() = 0.1;
+    triangulator.desired_area() = desired_area;
     triangulator.minimum_angle() = 0;
     triangulator.smooth_after_generating() = false;
 
     triangulator.triangulate();
 
-    CPPUNIT_ASSERT(mesh.n_elem() > 2);
+    CPPUNIT_ASSERT(mesh.n_elem() > n_original_elem);
 
     Real area = 0;
     for (const auto & elem : mesh.active_local_element_ptr_range())
@@ -344,12 +353,36 @@ public:
         CPPUNIT_ASSERT_EQUAL(elem->level(), 0u);
         CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
 
-        area += elem->volume();
+        const Real my_area = elem->volume();
+
+        // my_area <= desired_area, wow this macro ordering hurts
+        CPPUNIT_ASSERT_LESSEQUAL(desired_area, my_area);
+
+        area += my_area;
       }
 
     mesh.comm().sum(area);
 
-    LIBMESH_ASSERT_FP_EQUAL(area, 1.5, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(area, expected_total_area, TOLERANCE*TOLERANCE);
+  }
+
+  void testPoly2TriRefined()
+  {
+    testPoly2TriRefinementBase(nullptr, 1.5, 15);
+  }
+
+  void testPoly2TriExtraRefined()
+  {
+    testPoly2TriRefinementBase(nullptr, 1.5, 150, 0.01);
+  }
+
+  void testPoly2TriHolesRefined()
+  {
+    // Add a diamond hole
+    TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
+    const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
+
+    testPoly2TriRefinementBase(&holes, 1.25, 8);
   }
 #endif // LIBMESH_HAVE_POLY2TRI
 

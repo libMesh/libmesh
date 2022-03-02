@@ -204,6 +204,14 @@ public:
                 const std::vector<Point> & points,
                 const std::vector<unsigned int> & segment_indices);
 
+  /**
+   * We can also construct an ArbitraryHole which just copies
+   * a hole of any other type.
+   */
+  ArbitraryHole(const Hole & orig);
+
+  ArbitraryHole(const ArbitraryHole & orig) = default;
+
   virtual unsigned int n_points() const override;
 
   virtual Point point(const unsigned int n) const override;
@@ -211,6 +219,16 @@ public:
   virtual Point inside() const override;
 
   virtual std::vector<unsigned int> segment_indices() const override;
+
+  const std::vector<Point> & get_points() const
+  {
+    return _points;
+  }
+
+  void set_points(std::vector<Point> points)
+  {
+    _points = std::move(points);
+  }
 
 private:
   /**
@@ -222,7 +240,7 @@ private:
    * Reference to the vector of points which makes up
    * the hole.
    */
-  const std::vector<Point> _points;
+  std::vector<Point> _points;
 
   std::vector<unsigned int> _segment_indices;
 };

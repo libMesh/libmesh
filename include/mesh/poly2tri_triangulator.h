@@ -85,6 +85,12 @@ protected:
 private:
 
   /**
+   * We might have to replace the user-provided holes with refined
+   * versions
+   */
+  std::map<const Hole *, std::unique_ptr<ArbitraryHole>> replaced_holes;
+
+  /**
    * We only operate on serialized meshes.
    */
   MeshSerializer _serializer;
