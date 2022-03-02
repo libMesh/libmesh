@@ -30,6 +30,7 @@ public:
   CPPUNIT_TEST( testPoly2TriHoles );
   CPPUNIT_TEST( testPoly2TriSegments );
   CPPUNIT_TEST( testPoly2TriRefined );
+  CPPUNIT_TEST( testPoly2TriExtraRefined );
   CPPUNIT_TEST( testPoly2TriHolesRefined );
 #endif
 
@@ -367,7 +368,12 @@ public:
 
   void testPoly2TriRefined()
   {
-    testPoly2TriRefinementBase(nullptr, 1.5, 2);
+    testPoly2TriRefinementBase(nullptr, 1.5, 15);
+  }
+
+  void testPoly2TriExtraRefined()
+  {
+    testPoly2TriRefinementBase(nullptr, 1.5, 150, 0.01);
   }
 
   void testPoly2TriHolesRefined()
