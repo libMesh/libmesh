@@ -21,6 +21,7 @@
 #define LIBMESH_POINT_H
 
 // Local includes
+#include "libmesh/hashing.h"
 #include "libmesh/type_vector.h"
 
 namespace libMesh
@@ -90,5 +91,21 @@ protected:
 };
 
 } // namespace libMesh
+
+namespace std
+{
+template <>
+struct hash<libMesh::Point>
+{
+  std::size_t operator()(const libMesh::Point & p) const
+    {
+      std::size_t seed = 0;
+      for (int d=0; d != LIBMESH_DIM; ++d)
+        libMesh::boostcopy::hash_combine(seed, std::hash<libMesh::Real>()(p(d)));
+      return seed;
+    }
+};
+
+}
 
 #endif // LIBMESH_POINT_H
