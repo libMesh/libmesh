@@ -21,13 +21,15 @@
 #ifdef LIBMESH_HAVE_POLY2TRI
 
 // libmesh includes
+#include "libmesh/poly2tri_triangulator.h"
+
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/mesh_smoother_laplace.h"
 #include "libmesh/mesh_triangle_holes.h"
-#include "libmesh/poly2tri_triangulator.h"
 #include "libmesh/unstructured_mesh.h"
+#include "libmesh/utility.h"
 
 // poly2tri includes
 #include "poly2tri/poly2tri.h"
@@ -206,9 +208,11 @@ void Poly2TriTriangulator::triangulate_current_points()
       (_mesh.n_nodes() != _mesh.max_node_id(),
        "Poly2TriTriangulator needs contiguous node ids or explicit segments!");
 
-  // And if we have more nodes than boundary points, the rest will be
-  // interior "Steiner points"
-  std::vector<p2t::Point> steiner_points;
+  // And if we have more nodes than outer boundary points, the rest
+  // may be interior "Steiner points".  We use a set here so we can
+  // cheaply search and erase from it later, when we're identifying
+  // hole points.
+  std::set<p2t::Point, P2TPointCompare> steiner_points;
 
   // If we have any elements, we assume they come from a preceding
   // triangulation, and we clear them.
@@ -237,26 +241,20 @@ void Poly2TriTriangulator::triangulate_current_points()
     {
       for (auto & node : _mesh.node_ptr_range())
         {
-          p2t::Point * pt;
+          p2t::Point pt((*node)(0), (*node)(1));
 
           // If we're out of boundary nodes, the rest are going to be
-          // Steiner points
+          // Steiner points or hole points
           if (node->id() < _n_boundary_nodes)
-            {
-              outer_boundary_points.emplace_back((*node)(0), (*node)(1));
-              pt = &outer_boundary_points.back();
-            }
+            outer_boundary_points.push_back(pt);
           else
-            {
-              steiner_points.emplace_back((*node)(0), (*node)(1));
-              pt = &steiner_points.back();
-            }
+            steiner_points.insert(pt);
 
           // We're not going to support overlapping nodes on the boundary
-          if (point_node_map.count(*pt))
+          if (point_node_map.count(pt))
             libmesh_not_implemented();
 
-          point_node_map.emplace(*pt, node);
+          point_node_map.emplace(pt, node);
         }
     }
   // If we have explicit segments defined, that's our outer polyline
@@ -308,7 +306,7 @@ void Poly2TriTriangulator::triangulate_current_points()
 
           if (it == point_node_map.end())
             {
-              steiner_points.push_back(pt);
+              steiner_points.insert(pt);
               point_node_map.emplace(pt, node);
             }
           else
@@ -332,14 +330,14 @@ void Poly2TriTriangulator::triangulate_current_points()
 
   p2t::CDT cdt{outer_boundary_pointers};
 
-  // Add any steiner points.
-  for (auto & p : steiner_points)
-    cdt.AddPoint(&p);
-
   // Add any holes
   for (auto h : make_range(n_holes))
     {
-      const auto & our_hole = *((*_holes)[h]);
+      const Hole * initial_hole = (*_holes)[h];
+      auto it = replaced_holes.find(initial_hole);
+      const Hole & our_hole =
+        (it == replaced_holes.end()) ?
+        *initial_hole : *it->second;
       auto & poly2tri_hole = inner_hole_points[h];
       for (auto i : make_range(our_hole.n_points()))
         {
@@ -347,6 +345,9 @@ void Poly2TriTriangulator::triangulate_current_points()
           poly2tri_hole.emplace_back(p(0), p(1));
 
           const auto & pt = poly2tri_hole.back();
+
+          // This won't be a steiner point.
+          steiner_points.erase(pt);
 
           // If we see a hole point already in the mesh, we'll share
           // that node.  This might be a problem if it's a boundary
@@ -375,6 +376,16 @@ void Poly2TriTriangulator::triangulate_current_points()
 
       cdt.AddHole(poly2tri_ptrs);
     }
+
+  // Add any steiner points.  We had them in a set, but post-C++11
+  // that won't give us non-const element access (even if we
+  // pinky-promise not to change the elements in any way that affects
+  // our Comparator), and Poly2Tri wants non-const elements (to store
+  // edge data?), so we need to move them here.
+  std::vector<p2t::Point> steiner_vector(steiner_points.begin(), steiner_points.end());
+  steiner_points.clear();
+  for (auto & p : steiner_vector)
+    cdt.AddPoint(&p);
 
   // Triangulate!
   cdt.Triangulate();
@@ -436,7 +447,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
   // Map of which points follow which in the outer polyline.  If we
   // have to add new boundary points, we'll use this to construct an
   // updated this->segments to retriangulate with.
-  std::unordered_map<Node *, Node *> next_boundary_node;
+  std::unordered_map<Point, Node *> next_boundary_node;
 
   for (auto & elem : mesh.element_ptr_range())
     {
@@ -466,7 +477,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
       // point
       Elem * cavity_elem = elem; // Start looking at elem anyway
 
-      // We'll refine the boundary if necessary.
+      // We'll refine a boundary later if necessary.
       auto boundary_refine = [this, &next_boundary_node,
                               &cavity_elem, &new_node]
         (unsigned int side)
@@ -481,7 +492,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
         libmesh_assert(old_segment_end);
         libmesh_assert(old_segment_end->valid_id());
 
-        auto it = next_boundary_node.find(old_segment_start);
+        auto it = next_boundary_node.find(*old_segment_start);
         if (it != next_boundary_node.end())
           {
             libmesh_assert(it->second == old_segment_end);
@@ -490,14 +501,15 @@ bool Poly2TriTriangulator::insert_refinement_points()
         else
           {
             // This would be an O(N) sanity check if we already
-            // have a segments vector.  :-P
+            // have a segments vector or any holes.  :-P
             libmesh_assert(!this->segments.empty() ||
+                           (_holes && !_holes->empty()) ||
                            (old_segment_end->id() ==
                             old_segment_start->id() + 1));
-            next_boundary_node[old_segment_start] = new_node;
+            next_boundary_node[*old_segment_start] = new_node;
           }
 
-        next_boundary_node[new_node] = old_segment_end;
+        next_boundary_node[*new_node] = old_segment_end;
       };
 
       // Let's find a triangle containing our new point, or at least
@@ -717,13 +729,36 @@ bool Poly2TriTriangulator::insert_refinement_points()
   // any holes.
   if (!next_boundary_node.empty())
     {
+      auto checked_emplace = [this](dof_id_type new_first,
+                                    dof_id_type new_second)
+      {
+#ifdef DEBUG
+        for (auto [first, second] : this->segments)
+          {
+            libmesh_assert_not_equal_to(first, new_first);
+            libmesh_assert_not_equal_to(second, new_second);
+          }
+        if (!this->segments.empty())
+          libmesh_assert_equal_to(this->segments.back().second, new_first);
+#endif
+        libmesh_assert_not_equal_to(new_first, new_second);
+
+        this->segments.emplace_back (new_first, new_second);
+      };
+
       // Keep track of the outer polyline
       if (this->segments.empty())
         {
           dof_id_type last_id = DofObject::invalid_id;
-          for (const auto & node : _mesh.node_ptr_range())
+
+          // Custom loop because we increment node_it 1+ times inside
+          for (auto node_it = _mesh.nodes_begin();
+               node_it != _mesh.nodes_end();)
             {
-              const dof_id_type node_id = node->id();
+              Node & node = **node_it;
+              ++node_it;
+
+              const dof_id_type node_id = node.id();
 
               // Don't add Steiner points
               if (node_id >= _n_boundary_nodes)
@@ -736,30 +771,32 @@ bool Poly2TriTriangulator::insert_refinement_points()
 
               if (last_id != DofObject::invalid_id &&
                   last_id != node_id)
-                this->segments.emplace_back (last_id, node_id);
+                checked_emplace(last_id, node_id);
 
               last_id = node_id;
 
               // Connect to any newly inserted nodes
-              Node * this_node = node;
-              auto it = next_boundary_node.find(this_node);
+              Node * this_node = &node;
+              auto it = next_boundary_node.find(*this_node);
               while (it != next_boundary_node.end())
                 {
-                  libmesh_assert(node->valid_id());
+                  libmesh_assert(this_node->valid_id());
                   Node * next_node = it->second;
                   libmesh_assert(next_node->valid_id());
 
-                  this->segments.emplace_back
-                    (this_node->id(), next_node->id());
+                  if (next_node == *node_it)
+                    ++node_it;
+
+                  checked_emplace(this_node->id(), next_node->id());
 
                   this_node = next_node;
-                  it = next_boundary_node.find(this_node);
+                  it = next_boundary_node.find(*this_node);
                 }
             }
 
           // We expect a closed loop here
-          this->segments.emplace_back(this->segments.back().second,
-                                      this->segments.front().first);
+          checked_emplace(this->segments.back().second,
+                          this->segments.front().first);
         }
       else
         {
@@ -774,7 +811,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
           do
             {
               const dof_id_type node_id = node->id();
-              auto it = next_boundary_node.find(node);
+              auto it = next_boundary_node.find(*node);
               if (it == next_boundary_node.end())
                 {
                   while (node_id != old_it->first)
@@ -789,15 +826,71 @@ bool Poly2TriTriangulator::insert_refinement_points()
                   node = it->second;
                 }
 
-              this->segments.emplace_back(node_id, node->id());
+              checked_emplace(node_id, node->id());
             }
           while (node != first_node);
         }
 
-
       // Keep track of any holes
       if (this->_holes)
-        libmesh_not_implemented();
+        {
+          // Do we have any holes that need to be newly replaced?
+          for (const Hole * hole : *this->_holes)
+            {
+              if (this->replaced_holes.count(hole))
+                continue;
+
+              bool hole_point_insertion = false;
+                for (auto p : make_range(hole->n_points()))
+                  if (next_boundary_node.count(hole->point(p)))
+                    {
+                      hole_point_insertion = true;
+                      break;
+                    }
+              if (hole_point_insertion)
+                this->replaced_holes.emplace
+                  (hole, std::make_unique<ArbitraryHole>(*hole));
+            }
+
+          for (const Hole * hole : *this->_holes)
+            {
+              auto hole_it = replaced_holes.find(hole);
+              if (hole_it == replaced_holes.end())
+                continue;
+
+              ArbitraryHole & arb = *hole_it->second;
+
+              bool point_inserted = false;
+              for (const Point & point : arb.get_points())
+                if (next_boundary_node.count(point))
+                  {
+                    point_inserted = true;
+                    break;
+                  }
+
+              if (!point_inserted)
+                continue;
+
+              std::vector<Point> new_points;
+              for (Point point : arb.get_points())
+                {
+                  if (new_points.empty() ||
+                      (point != new_points.back() &&
+                       point != new_points.front()))
+                    new_points.push_back(point);
+
+                  auto it = next_boundary_node.find(point);
+                  while (it != next_boundary_node.end())
+                    {
+                      point = *it->second;
+                      new_points.push_back(point);
+                      it = next_boundary_node.find(point);
+                    }
+                }
+
+              arb.set_points(std::move(new_points));
+            }
+        }
     }
 
   // Okay, *now* we can add the new elements.
