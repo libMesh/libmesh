@@ -1,3 +1,16 @@
+
+## Branch status
+
+The `devel` branch extended testing status: [![Build
+status](https://civet.inl.gov/libMesh/libmesh/devel/branch_status.svg)](https://civet.inl.gov/repo/libMesh/libmesh/)
+
+Pull Requests merge new code into `devel`; the `master` git branch is
+automatically synced to each new `devel` commit that passes extended
+testing.
+
+Releases are created from branches from `master`, and also receive
+backported bugfix commits from subsequent development.
+
 ## IMPORTANT -- READ BEFORE BUILDING!
 Do not download a GitHub-generated "ZIP" archive. These do not contain the required submodules, and therefore cannot be used to build libmesh. Use only git clones or "release" tarballs when following these instructions.
 
