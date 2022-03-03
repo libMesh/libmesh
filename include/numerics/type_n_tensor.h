@@ -61,6 +61,10 @@ public:
 
   TypeNTensor (const TypeTensor<T> &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}
 
+  TypeNTensor (const TypeNTensor<N,T> &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}
+
+  TypeNTensor & operator = (const TypeNTensor<N,T> &) { libmesh_not_implemented(); return *this; }
+
   operator TypeVector<T> () const { libmesh_not_implemented(); return 0; }
   operator VectorValue<T> () const { libmesh_not_implemented(); return 0; }
 

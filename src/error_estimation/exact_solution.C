@@ -622,8 +622,12 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       // The value of the shape function second derivatives at the quadrature points
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> &
-        d2phi_values = fe->get_d2phi();
+      // Not computed for vector-valued elements
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> *
+        d2phi_values = nullptr;
+
+      if (FEInterface::field_type(fe_type) != TYPE_VECTOR)
+        d2phi_values = &fe->get_d2phi();
 #endif
 
       // The XYZ locations (in physical space) of the quadrature points
@@ -669,13 +673,16 @@ void ExactSolution::_compute_error(const std::string & sys_name,
               // Values from current solution.
               u_h      += phi_values[i][qp]*computed_system.current_solution  (dof_indices[i]);
               grad_u_h += dphi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-              grad2_u_h += d2phi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
-#endif
               if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
                 {
                   curl_u_h += (*curl_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
                   div_u_h += (*div_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
+                }
+              else
+                {
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+                  grad2_u_h += (*d2phi_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
+#endif
                 }
             }
 
