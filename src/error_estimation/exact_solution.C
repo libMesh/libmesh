@@ -795,6 +795,10 @@ void ExactSolution::_compute_error(const std::string & sys_name,
                     exact_hess_accessor(d + e*dim + c*dim*dim) =
                       _exact_hessians[sys_num]->
                       component(var_component+c, q_point[qp], time)(d,e);
+
+              // FIXME: operator- is not currently implemented for TypeNTensor
+              const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
+              error_vals[2] += JxW[qp]*grad2_error.norm_sq();
             }
           else if (_equation_systems_fine)
             {
@@ -802,12 +806,11 @@ void ExactSolution::_compute_error(const std::string & sys_name,
               std::vector<Tensor> output(1);
               coarse_values->hessian(q_point[qp],time,output,&subdomain_id);
               exact_hess = output[0];
+
+              // FIXME: operator- is not currently implemented for TypeNTensor
+              const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
+              error_vals[2] += JxW[qp]*grad2_error.norm_sq();
             }
-
-          const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
-
-          // FIXME: PB: Is this what we want for rank 3 tensors?
-          error_vals[2] += JxW[qp]*grad2_error.norm_sq();
 #endif
 
         } // end qp loop
