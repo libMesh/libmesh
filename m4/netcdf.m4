@@ -7,6 +7,8 @@ AC_DEFUN([CONFIGURE_NETCDF],
                 AS_HELP_STRING([--disable-netcdf],
                                [build without netCDF binary I/O]),
                 [AS_CASE("${enableval}",
+                  [system],     [enablenetcdf=yes
+                                 netcdfversion=system],
                   [yes|new|v4], [enablenetcdf=yes
                                  netcdfversion=4],
                   [old|v3],     [enablenetcdf=yes
@@ -27,6 +29,8 @@ AC_DEFUN([CONFIGURE_NETCDF],
         ])
 
   AS_CASE("${netcdfversion}",
+          [system], [PKG_CHECK_MODULES([NETCDF], [netcdf >= 4.2])],
+
           [3], [
                  dnl We shouldn't get here, see if test above.
                  AC_MSG_ERROR([>>> Error: netCDF3 is no longer distributed with libMesh <<<])

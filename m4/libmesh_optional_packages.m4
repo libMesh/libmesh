@@ -720,7 +720,15 @@ AM_CONDITIONAL(LIBMESH_ENABLE_HDF5, test x$enablehdf5 = xyes)
 # --------------------------------------------------------------
 CONFIGURE_NETCDF
 AS_IF([test $enablenetcdf = yes],
-      [libmesh_contrib_INCLUDES="$NETCDF_INCLUDE $libmesh_contrib_INCLUDES"])
+      [
+          AS_IF([test x$netcdfversion = xsystem],
+                [
+                  libmesh_optional_INCLUDES="$NETCDF_CFLAGS $libmesh_optional_INCLUDES"
+                  libmesh_optional_LIBS="$NETCDF_LIBS $libmesh_optional_LIBS"
+                ],
+                [
+                  libmesh_contrib_INCLUDES="$NETCDF_INCLUDE $libmesh_contrib_INCLUDES"])
+      ])
 
 AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF,    test x$enablenetcdf  = xyes)
 AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF_V4, test x$netcdfversion = x4)
