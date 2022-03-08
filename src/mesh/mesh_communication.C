@@ -393,9 +393,12 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   std::vector<Parallel::Request>
     node_send_requests, element_send_requests;
 
+  // Be compatible with both deprecated and corrected MeshBase iterator types
+  typedef std::remove_const<MeshBase::const_element_iterator::value_type>::type nc_v_t;
+
   // We're going to sort elements-to-send by pid in one pass, to avoid
   // sending predicated iterators through the whole mesh N_p times
-  std::unordered_map<processor_id_type, std::vector<Elem *>> send_to_pid;
+  std::unordered_map<processor_id_type, std::vector<nc_v_t>> send_to_pid;
 
   const MeshBase::const_element_iterator send_elems_begin =
 #ifdef LIBMESH_ENABLE_AMR
@@ -431,8 +434,12 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
 
       libmesh_assert(!p_elements.empty());
 
-      Elem * const * elempp = p_elements.data();
-      Elem * const * elemend = elempp + p_elements.size();
+      // Be compatible with both deprecated and
+      // corrected MeshBase iterator types
+      typedef MeshBase::const_element_iterator::value_type v_t;
+
+      v_t * elempp = p_elements.data();
+      v_t * elemend = elempp + p_elements.size();
 
 #ifndef LIBMESH_ENABLE_AMR
       // This parameter is not used when !LIBMESH_ENABLE_AMR.
@@ -442,11 +449,11 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
 
       MeshBase::const_element_iterator elem_it =
         MeshBase::const_element_iterator
-          (elempp, elemend, Predicates::NotNull<Elem * const *>());
+          (elempp, elemend, Predicates::NotNull<v_t *>());
 
       const MeshBase::const_element_iterator elem_end =
         MeshBase::const_element_iterator
-          (elemend, elemend, Predicates::NotNull<Elem * const *>());
+          (elemend, elemend, Predicates::NotNull<v_t *>());
 
       std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
 

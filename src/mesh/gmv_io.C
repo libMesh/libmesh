@@ -686,7 +686,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     {
                       std::unique_ptr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
                       for (auto i : lo_elem->node_index_range())
-                        lo_elem->set_node(i) = elem->node_ptr(i);
+                        lo_elem->set_node(i) = const_cast<Node*>(elem->node_ptr(i));
                       lo_elem->connectivity(0, TECPLOT, conn);
                     }
                   for (const auto & idx : conn)
@@ -756,7 +756,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     {
                       std::unique_ptr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
                       for (auto i : lo_elem->node_index_range())
-                        lo_elem->set_node(i) = elem->node_ptr(i);
+                        lo_elem->set_node(i) = const_cast<Node*>(elem->node_ptr(i));
                       lo_elem->connectivity(0, TECPLOT, conn);
                       out_stream << "quad 4\n";
                       for (const auto & idx : conn)
@@ -773,7 +773,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     {
                       std::unique_ptr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
                       for (auto i : lo_elem->node_index_range())
-                        lo_elem->set_node(i) = elem->node_ptr(i);
+                        lo_elem->set_node(i) = const_cast<Node*>(elem->node_ptr(i));
                       lo_elem->connectivity(0, TECPLOT, conn);
                       out_stream << "tri 3\n";
                       for (unsigned int i=0; i<3; i++)
@@ -946,7 +946,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                 {
                   std::unique_ptr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
                   for (auto i : lo_elem->node_index_range())
-                    lo_elem->set_node(i) = elem->node_ptr(i);
+                    lo_elem->set_node(i) = const_cast<Node*>(elem->node_ptr(i));
                   if ((lo_elem->type() == HEX8)
 #ifdef  LIBMESH_ENABLE_INFINITE_ELEMENTS
                       || (lo_elem->type() == HEX27)

@@ -610,12 +610,12 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
                   get_hilbert_coords(**nodej, bbox, jcoords);
                   libMesh::err <<
                     "node " << (*nodej)->id() << ", " <<
-                    *(Point *)(*nodej) << " has HilbertIndices " <<
+                    *(const Point *)(*nodej) << " has HilbertIndices " <<
                     node_keys[j] << std::endl;
                   get_hilbert_coords(**nodei, bbox, icoords);
                   libMesh::err <<
                     "node " << (*nodei)->id() << ", " <<
-                    *(Point *)(*nodei) << " has HilbertIndices " <<
+                    *(const Point *)(*nodei) << " has HilbertIndices " <<
                     node_keys[i] << std::endl;
                   libmesh_error_msg("Error: nodes with duplicate Hilbert keys!");
                 }

@@ -1079,7 +1079,7 @@ void Partitioner::_find_global_index_by_pid_map(const MeshBase & mesh)
 
 void Partitioner::build_graph (const MeshBase & mesh)
 {
-  LOG_SCOPE("build_graph()", "ParmetisPartitioner");
+  LOG_SCOPE("build_graph()", "Partitioner");
 
   const dof_id_type n_active_local_elem  = mesh.n_active_local_elem();
   // If we have boundary elements in this mesh, we want to account for
@@ -1136,7 +1136,7 @@ void Partitioner::build_graph (const MeshBase & mesh)
       std::vector<dof_id_type> & graph_row = _dual_graph[local_index];
 
       // Save this off to make it easy to index later
-      _local_id_to_elem[local_index] = elem;
+      _local_id_to_elem[local_index] = const_cast<Elem*>(elem);
 
       // Loop over the element's neighbors.  An element
       // adjacency corresponds to a face neighbor
@@ -1237,9 +1237,9 @@ void Partitioner::build_graph (const MeshBase & mesh)
 
 }
 
-void Partitioner::assign_partitioning (const MeshBase & mesh, const std::vector<dof_id_type> & parts)
+void Partitioner::assign_partitioning (MeshBase & mesh, const std::vector<dof_id_type> & parts)
 {
-  LOG_SCOPE("assign_partitioning()", "ParmetisPartitioner");
+  LOG_SCOPE("assign_partitioning()", "Partitioner");
 
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());

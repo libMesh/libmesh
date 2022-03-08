@@ -987,7 +987,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
   std::map<dof_id_type, std::vector<dof_id_type>> node_to_elems_map;
 
   typedef dof_id_type                     key_type;
-  typedef std::pair<Elem *, unsigned char> val_type;
+  typedef std::pair<const Elem *, unsigned char> val_type;
   typedef std::pair<key_type, val_type>   key_val_pair;
   typedef std::unordered_multimap<key_type, val_type> map_type;
   // Mapping between all side keys in this mesh and elements+side numbers relevant to the boundary in this mesh as well.
@@ -1014,7 +1014,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
       std::set<dof_id_type> this_boundary_node_ids, other_boundary_node_ids;
 
       // Pull objects out of the loop to reduce heap operations
-      std::unique_ptr<Elem> side;
+      std::unique_ptr<const Elem> side;
 
       {
         // Make temporary fixed-size arrays for loop
@@ -1117,7 +1117,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
 
                               if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                                 {
-                                  std::unique_ptr<Elem> edge (el->build_edge_ptr(edge_id));
+                                  std::unique_ptr<const Elem> edge (el->build_edge_ptr(edge_id));
                                   for (auto & n : edge->node_ref_range())
                                     set_array[i]->insert( n.id() );
 
@@ -1441,7 +1441,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
       LOG_SCOPE("stitch_meshes neighbor fixes", "ReplicatedMesh");
 
       // Pull objects out of the loop to reduce heap operations
-      std::unique_ptr<Elem> my_side, their_side;
+      std::unique_ptr<const Elem> my_side, their_side;
 
       std::set<dof_id_type> fixed_elems;
       for (const auto & pr : node_to_elems_map)
@@ -1470,7 +1470,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
                               while (bounds.first != bounds.second)
                                 {
                                   // Get the potential element
-                                  Elem * neighbor = bounds.first->second.first;
+                                  Elem * neighbor = const_cast<Elem *>(bounds.first->second.first);
 
                                   // Get the side for the neighboring element
                                   const unsigned int ns = bounds.first->second.second;
@@ -1576,7 +1576,7 @@ ReplicatedMesh::get_disconnected_subdomains(std::vector<subdomain_id_type> * sub
 
   // a stack for visiting elements, make its capacity sufficiently large to avoid
   // memory allocation and deallocation when the vector size changes
-  std::vector<Elem *> list;
+  std::vector<const Elem *> list;
   list.reserve(n_elem());
 
   // counter of visited elements
@@ -1598,13 +1598,13 @@ ReplicatedMesh::get_disconnected_subdomains(std::vector<subdomain_id_type> * sub
     while (list.size() > 0)
     {
       // pop up an element
-      Elem * elem = list.back(); list.pop_back(); ++visited;
+      const Elem * elem = list.back(); list.pop_back(); ++visited;
 
       min_id = std::min(elem->id(), min_id);
 
       for (auto s : elem->side_index_range())
       {
-        Elem * neighbor = elem->neighbor_ptr(s);
+        const Elem * neighbor = elem->neighbor_ptr(s);
         if (neighbor != nullptr && (*subdomain_ids)[neighbor->id()] == Elem::invalid_subdomain_id)
         {
           // neighbor must be active

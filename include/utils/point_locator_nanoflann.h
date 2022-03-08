@@ -219,7 +219,7 @@ protected:
    * These are shared_ptrs to vectors since, if we are not the "master"
    * PointLocator, they need to point at the master's vectors instead.
    */
-  std::shared_ptr<std::vector<Elem *>> _elems;
+  std::shared_ptr<std::vector<const Elem *>> _elems;
   std::shared_ptr<std::vector<Point>> _point_cloud;
 
   // kd_tree will be initialized during init() and then automatically

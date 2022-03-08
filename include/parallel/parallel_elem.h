@@ -90,6 +90,62 @@ inline const Elem*
 Packing<const Elem*>::unpack(BufferIter in, Context * ctx)
 { return Packing<Elem*>::unpack(in, ctx); }
 
+
+template <>
+class Packing<Elem * const>
+{
+public:
+  typedef largest_id_type buffer_type;
+
+  template <typename OutputIter, typename Context>
+  static void pack(Elem * const & object,
+                   OutputIter data_out,
+                   const Context * context)
+  { return Packing<const Elem *>::pack(object, data_out, context); }
+
+  template <typename Context>
+  static unsigned int packable_size(Elem * const & object,
+                                    const Context * context)
+  { return Packing<const Elem*>::packable_size(object, context); }
+
+  template <typename BufferIter>
+  static unsigned int packed_size(BufferIter iter)
+  { return Packing<const Elem *>::packed_size(iter); }
+
+  template <typename BufferIter, typename Context>
+  static Elem * unpack(BufferIter in, Context * ctx)
+  { return Packing<Elem *>::unpack(in, ctx); }
+};
+
+
+template <>
+class Packing<const Elem * const>
+{
+public:
+  typedef largest_id_type buffer_type;
+
+  template <typename OutputIter, typename Context>
+  static void pack(Elem * const & object,
+                   OutputIter data_out,
+                   const Context * context)
+  { return Packing<const Elem *>::pack(object, data_out, context); }
+
+  template <typename Context>
+  static unsigned int packable_size(Elem * const & object,
+                                    const Context * context)
+  { return Packing<const Elem*>::packable_size(object, context); }
+
+  template <typename BufferIter>
+  static unsigned int packed_size(BufferIter iter)
+  { return Packing<const Elem *>::packed_size(iter); }
+
+  template <typename BufferIter, typename Context>
+  static Elem * unpack(BufferIter in, Context * ctx)
+  { return Packing<Elem *>::unpack(in, ctx); }
+};
+
+
+
 } // namespace Parallel
 } // namespace libMesh
 

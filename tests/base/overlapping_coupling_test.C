@@ -202,7 +202,7 @@ protected:
       }
   }
 
-  void assign_proc_id_subdomain( const MeshBase & mesh,
+  void assign_proc_id_subdomain( MeshBase & mesh,
                                  const subdomain_id_type sid,
                                  const dof_id_type blksize,
                                  const unsigned int n_parts,

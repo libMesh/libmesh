@@ -2050,6 +2050,54 @@ protected:
    * it can directly broadcast *_integer_names
    */
   friend class MeshCommunication;
+
+
+  /**
+   * The original iterator classes weren't properly const-safe;
+   * relying on their const-incorrectness is now deprecated.
+   */
+#ifdef LIBMESH_ENABLE_DEPRECATED
+typedef variant_filter_iterator<MeshBase::Predicate, Elem *> elem_filter_iter;
+
+typedef variant_filter_iterator<MeshBase::Predicate,
+                                Elem * const,
+                                Elem * const &,
+                                Elem * const *> const_elem_filter_iter;
+
+typedef variant_filter_iterator<MeshBase::Predicate, Node *> node_filter_iter;
+
+typedef variant_filter_iterator<MeshBase::Predicate,
+                                Node * const,
+                                Node * const &,
+                                Node * const *> const_node_filter_iter;
+#else
+typedef variant_filter_iterator<MeshBase::Predicate,
+                                Elem * const,
+                                Elem * const &,
+                                Elem * const *,
+                                const Elem * const,
+                                const Elem * const &,
+                                const Elem * const *> elem_filter_iter;
+
+typedef variant_filter_iterator<MeshBase::Predicate,
+                                const Elem * const,
+                                const Elem * const &,
+                                const Elem * const *> const_elem_filter_iter;
+
+typedef variant_filter_iterator<MeshBase::Predicate,
+                                Node * const,
+                                Node * const &,
+                                Node * const *,
+                                const Node * const,
+                                const Node * const &,
+                                const Node * const *> node_filter_iter;
+
+typedef variant_filter_iterator<MeshBase::Predicate,
+                                const Node * const,
+                                const Node * const &,
+                                const Node * const *> const_node_filter_iter;
+#endif // LIBMESH_ENABLE_DEPRECATED
+
 };
 
 
@@ -2066,14 +2114,14 @@ protected:
  * The definition of the element_iterator struct.
  */
 struct
-MeshBase::element_iterator : variant_filter_iterator<MeshBase::Predicate, Elem *>
+MeshBase::element_iterator : MeshBase::elem_filter_iter
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
   element_iterator (const IterType & d,
                     const IterType & e,
                     const PredType & p ) :
-    variant_filter_iterator<MeshBase::Predicate, Elem *>(d,e,p) {}
+    elem_filter_iter(d,e,p) {}
 };
 
 
@@ -2084,10 +2132,7 @@ MeshBase::element_iterator : variant_filter_iterator<MeshBase::Predicate, Elem *
  * iterator above, but also provides an additional conversion-to-const ctor.
  */
 struct
-MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
-                                                           Elem * const,
-                                                           Elem * const &,
-                                                           Elem * const *>
+MeshBase::const_element_iterator : MeshBase::const_elem_filter_iter
 {
   /**
    * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
@@ -2096,7 +2141,7 @@ MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
   const_element_iterator (const IterType & d,
                           const IterType & e,
                           const PredType & p ) :
-    variant_filter_iterator<MeshBase::Predicate, Elem * const, Elem * const &, Elem * const *>(d,e,p)  {}
+    const_elem_filter_iter(d,e,p)  {}
 
   /**
    * The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
@@ -2105,7 +2150,7 @@ MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
    * \note This one is \e not templated!
    */
   const_element_iterator (const MeshBase::element_iterator & rhs) :
-    variant_filter_iterator<Predicate, Elem * const, Elem * const &, Elem * const *>(rhs) {}
+    const_elem_filter_iter(rhs) {}
 };
 
 
@@ -2118,7 +2163,7 @@ MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
  * The definition of the node_iterator struct.
  */
 struct
-MeshBase::node_iterator : variant_filter_iterator<MeshBase::Predicate, Node *>
+MeshBase::node_iterator : MeshBase::node_filter_iter
 {
   /**
    * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
@@ -2127,7 +2172,7 @@ MeshBase::node_iterator : variant_filter_iterator<MeshBase::Predicate, Node *>
   node_iterator (const IterType & d,
                  const IterType & e,
                  const PredType & p ) :
-    variant_filter_iterator<MeshBase::Predicate, Node *>(d,e,p) {}
+    node_filter_iter(d,e,p)  {}
 };
 
 
@@ -2138,10 +2183,7 @@ MeshBase::node_iterator : variant_filter_iterator<MeshBase::Predicate, Node *>
  * iterator above, but also provides an additional conversion-to-const ctor.
  */
 struct
-MeshBase::const_node_iterator : variant_filter_iterator<MeshBase::Predicate,
-                                                        Node * const,
-                                                        Node * const &,
-                                                        Node * const *>
+MeshBase::const_node_iterator : MeshBase::const_node_filter_iter
 {
   /**
    * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
@@ -2150,7 +2192,7 @@ MeshBase::const_node_iterator : variant_filter_iterator<MeshBase::Predicate,
   const_node_iterator (const IterType & d,
                        const IterType & e,
                        const PredType & p ) :
-    variant_filter_iterator<MeshBase::Predicate, Node * const, Node * const &, Node * const *>(d,e,p)  {}
+    const_node_filter_iter(d,e,p)  {}
 
   /**
    * The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
@@ -2159,7 +2201,7 @@ MeshBase::const_node_iterator : variant_filter_iterator<MeshBase::Predicate,
    * \note This one is *not* templated!
    */
   const_node_iterator (const MeshBase::node_iterator & rhs) :
-    variant_filter_iterator<Predicate, Node * const, Node * const &, Node * const *>(rhs) {}
+    const_node_filter_iter(rhs) {}
 };
 
 
