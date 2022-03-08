@@ -2118,6 +2118,21 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
   y.reserve(num_nodes);
   z.reserve(num_nodes);
 
+  auto push_node = [this](const Point & p) {
+    x.push_back(p(0) + _coordinate_offset(0));
+
+#if LIBMESH_DIM > 1
+    y.push_back(p(1) + _coordinate_offset(1));
+#else
+    y.push_back(0.);
+#endif
+#if LIBMESH_DIM > 2
+    z.push_back(p(2) + _coordinate_offset(2));
+#else
+    z.push_back(0.);
+#endif
+  };
+
   // And in the node_num_map - since the nodes aren't organized in
   // blocks, libmesh will always write out the identity map
   // here... unless there has been some refinement and coarsening, or
@@ -2135,18 +2150,8 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
         {
           const Node & node = *node_ptr;
 
-          x.push_back(node(0) + _coordinate_offset(0));
+          push_node(node);
 
-#if LIBMESH_DIM > 1
-          y.push_back(node(1) + _coordinate_offset(1));
-#else
-          y.push_back(0.);
-#endif
-#if LIBMESH_DIM > 2
-          z.push_back(node(2) + _coordinate_offset(2));
-#else
-          z.push_back(0.);
-#endif
 
           // Fill in node_num_map entry with the proper (1-based) node id
           node_num_map.push_back(node.id() + 1);
@@ -2162,17 +2167,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
       for (const auto & elem : mesh.active_element_ptr_range())
         for (const Node & node : elem->node_ref_range())
           {
-            x.push_back(node(0));
-#if LIBMESH_DIM > 1
-            y.push_back(node(1));
-#else
-            y.push_back(0.);
-#endif
-#if LIBMESH_DIM > 2
-            z.push_back(node(2));
-#else
-            z.push_back(0.);
-#endif
+            push_node(node);
 
             // Let's skip the node_num_map in the discontinuous
             // case, since we're effectively duplicating nodes for
