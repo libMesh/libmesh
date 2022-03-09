@@ -305,9 +305,20 @@ public:
 
   /**
    * Writes the elements contained in "mesh". FIXME: This only works
-   * for Meshes having a single type of element!
+   * for Meshes having a single type of element in each subdomain!
+   *
+   * If \p use_discontinuous is true, we break apart elements, so that
+   * shared nodes on faces/edges/vertices can take different values
+   * from different elements.  This is useful for plotting
+   * discontinuous underlying variables
+   *
+   * If \p _add_sides is true, we also output side elements, so that
+   * shared nodes on edges/vertices can take different values from
+   * different elements.  This is useful for plotting
+   * SIDE_DISCONTINUOUS representing e.g. inter-element fluxes.
    */
-  virtual void write_elements(const MeshBase & mesh, bool use_discontinuous=false);
+  virtual void write_elements(const MeshBase & mesh,
+                              bool use_discontinuous=false);
 
   /**
    * Writes the sidesets contained in "mesh"
