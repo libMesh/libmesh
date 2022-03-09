@@ -116,6 +116,12 @@ public:
   const char * get_elem_type() const;
 
   /**
+   * Sets whether or not to write extra "side" elements.  This is useful for
+   * plotting SIDE_DISCONTINUOUS data.
+   */
+  void set_add_sides(bool add_sides);
+
+  /**
    * Opens an \p ExodusII mesh file named \p filename.  If
    * read_only==true, the file will be opened with the EX_READ flag,
    * otherwise it will be opened with the EX_WRITE flag.
@@ -888,6 +894,11 @@ protected:
 protected:
 
   /**
+   * Set to true iff we want to write separate "side" elements too.
+   */
+  bool _add_sides = false;
+
+  /**
    * read_var_names() dispatches to this function.  We need to
    * override it slightly for Nemesis.
    */
@@ -1119,6 +1130,10 @@ private:
   size_t table_size;
 };
 
+
+inline void ExodusII_IO_Helper::set_add_sides(bool add_sides) {
+  _add_sides = add_sides;
+}
 
 
 inline int ExodusII_IO_Helper::end_elem_id() const {
