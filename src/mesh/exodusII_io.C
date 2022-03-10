@@ -373,7 +373,11 @@ void ExodusII_IO::read (const std::string & fname)
           // Assign the current subdomain to this Elem
           uelem->subdomain_id() = static_cast<subdomain_id_type>(subdomain_id);
 
-          // Use the elem_num_map to obtain the ID of this element in the Exodus file
+          // Use the elem_num_map to obtain the ID of this element in
+          // the Exodus file.  Make sure we aren't reading garbage if
+          // the file is corrupt.
+          libmesh_error_msg_if(std::size_t(j) >= exio_helper->elem_num_map.size(),
+                               "Error: Trying to read Exodus file with more elements than elem_num_map entries.\n");
           int exodus_id = exio_helper->elem_num_map[j];
 
           // Assign this element the same ID it had in the Exodus
