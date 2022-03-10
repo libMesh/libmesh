@@ -129,6 +129,18 @@ public:
   void write_complex_magnitude (bool val);
 
   /**
+   * By default, we only write out the elements physically stored in
+   * the mesh.  If we have any SIDE_DISCONTINUOUS variables, however,
+   * we cannot easily output them on elements with sides that share
+   * vertices (and in 3D, edges).  We can set this flag to instead
+   * create extra "side elements" on which to visualize such
+   * variables.
+   *
+   * By default this flag is set to false.
+   */
+  void write_added_sides (bool val);
+
+  /**
    * \returns An array containing the timesteps in the file.
    */
   const std::vector<Real> & get_time_steps();
