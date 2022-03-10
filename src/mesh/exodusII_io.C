@@ -785,6 +785,13 @@ void ExodusII_IO::write_complex_magnitude (bool val)
 
 
 
+void ExodusII_IO::write_added_sides (bool val)
+{
+  exio_helper->set_add_sides(val);
+}
+
+
+
 void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool val)
 {
   exio_helper->use_mesh_dimension_instead_of_spatial_dimension(val);
