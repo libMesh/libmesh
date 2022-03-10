@@ -118,9 +118,11 @@ public:
 #endif
         CPPUNIT_ASSERT_EQUAL(node->n_vars(0), 3*v2);
 
+        CPPUNIT_ASSERT_LESS(node_reordering.size(), std::size_t(node->id()));
         const dof_id_type gold_i_ux = node_reordering[node->id()] * 3;
         const dof_id_type gold_i_uy = gold_i_ux + 1;
         const dof_id_type gold_i_v  = gold_i_uy + 1;
+        CPPUNIT_ASSERT_LESS(gold_vector.size(), std::size_t(gold_i_v));
 
         LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,0,0))),
                                 gold_vector[gold_i_ux], tol);
