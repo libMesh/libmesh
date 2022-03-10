@@ -67,9 +67,11 @@ public:
   CPPUNIT_TEST( testExodusWriteElementDataFromDiscontinuousNodalData );
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
 
-  CPPUNIT_TEST( testExodusFileMappingsPlateWithHole);
-  CPPUNIT_TEST( testExodusFileMappingsTwoBlocks);
-  CPPUNIT_TEST( testExodusFileMappingsCyl3d);
+  CPPUNIT_TEST( testExodusWriteAddedSides );
+
+  CPPUNIT_TEST( testExodusFileMappingsPlateWithHole );
+  CPPUNIT_TEST( testExodusFileMappingsTwoBlocks );
+  CPPUNIT_TEST( testExodusFileMappingsCyl3d );
 #endif // LIBMESH_HAVE_EXODUS_API
 
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
@@ -674,6 +676,67 @@ public:
   } // end testExodusWriteElementDataFromDiscontinuousNodalData
 
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
+
+
+  void testExodusWriteAddedSides()
+  {
+    const unsigned int nx=2, ny=2, nz=2;
+
+    // first scope: write file
+    {
+      Mesh mesh(*TestCommWorld);
+
+      EquationSystems es(mesh);
+      System & sys = es.add_system<System> ("SimpleSystem");
+      sys.add_variable("u", FIRST, SIDE_HIERARCHIC);
+
+      // We need HEX27 to get a side node!
+      MeshTools::Generation::build_cube
+        (mesh, nx, ny, nz, 0., 1., 0., 1., 0., 1., HEX27);
+
+      es.init();
+
+      // Set solution u^e_i = i, for the ith vertex of a given element e.
+      const DofMap & dof_map = sys.get_dof_map();
+      std::vector<dof_id_type> dof_indices;
+      for (const auto & elem : mesh.element_ptr_range())
+        {
+          dof_map.dof_indices(elem, dof_indices, /*var_id=*/0);
+          for (unsigned int i=0; i<dof_indices.size(); ++i)
+            sys.solution->set(dof_indices[i], i);
+        }
+      sys.solution->close();
+
+      // Now write to file.
+      ExodusII_IO exii(mesh);
+      exii.write_added_sides(true);
+
+      exii.write_equation_systems("side_discontinuous.e", es);
+    } // end first scope
+
+    // second scope: read file, verify extra elements exist
+    {
+      Mesh mesh(*TestCommWorld);
+
+      ExodusII_IO exii(mesh);
+
+      if (mesh.processor_id() == 0)
+        exii.read("side_discontinuous.e");
+      MeshCommunication().broadcast(mesh);
+      mesh.prepare_for_use();
+
+      const dof_id_type n_expected_elems =
+        nx*ny*nz // real HEX27 elems in the mesh,
+        + (nx*ny*(nz+1) + nx*(ny+1)*nz + (nx+1)*ny*nz); // fake side QUAD9 elems
+      CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_expected_elems);
+
+      const dof_id_type n_expected_nodes =
+        (2*nx+1)*(2*ny+1)*(2*nz+1) // real nodes in the HEX27 mesh,
+        + ((nx*ny*(nz+1) + nx*(ny+1)*nz + (nx+1)*ny*nz))*9; // fake side nodes
+      CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), n_expected_nodes);
+    } // end second scope
+  } // end testExodusWriteAddedSides
+
 #endif // LIBMESH_HAVE_EXODUS_API
 
 
