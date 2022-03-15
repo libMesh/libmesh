@@ -65,6 +65,7 @@ void RBEIMEvaluation::clear()
   _interpolation_points_side_index.clear();
   _interpolation_points_qp.clear();
   _interpolation_points_phi_i_qp.clear();
+  _interpolation_points_spatial_indices.clear();
 
   _interpolation_matrix.resize(0,0);
 
@@ -84,6 +85,7 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
   _interpolation_points_side_index.clear();
   _interpolation_points_qp.clear();
   _interpolation_points_phi_i_qp.clear();
+  _interpolation_points_spatial_indices.clear();
 
   _interpolation_matrix.resize(Nmax,Nmax);
 }
@@ -225,6 +227,28 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
 
       interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[mu_index]);
     }
+}
+
+void RBEIMEvaluation::initialize_interpolation_points_spatial_indices()
+{
+  _interpolation_points_spatial_indices.clear();
+
+  get_parametrized_function().get_spatial_indices(_interpolation_points_spatial_indices,
+                                                  _interpolation_points_elem_id,
+                                                  _interpolation_points_side_index,
+                                                  _interpolation_points_qp,
+                                                  _interpolation_points_subdomain_id,
+                                                  _interpolation_points_boundary_id);
+}
+
+void RBEIMEvaluation::initialize_param_fn_spatial_indices()
+{
+  get_parametrized_function().initialize_spatial_indices(_interpolation_points_spatial_indices,
+                                                         _interpolation_points_elem_id,
+                                                         _interpolation_points_side_index,
+                                                         _interpolation_points_qp,
+                                                         _interpolation_points_subdomain_id,
+                                                         _interpolation_points_boundary_id);
 }
 
 unsigned int RBEIMEvaluation::get_n_basis_functions() const
@@ -560,6 +584,11 @@ void RBEIMEvaluation::add_interpolation_points_phi_i_qp(const std::vector<Real> 
   _interpolation_points_phi_i_qp.emplace_back(phi_i_qp);
 }
 
+void RBEIMEvaluation::add_interpolation_points_spatial_indices(const std::vector<unsigned int> & spatial_indices)
+{
+  _interpolation_points_spatial_indices.emplace_back(spatial_indices);
+}
+
 Point RBEIMEvaluation::get_interpolation_points_xyz(unsigned int index) const
 {
   libmesh_error_msg_if(index >= _interpolation_points_xyz.size(), "Error: Invalid index");
@@ -621,6 +650,18 @@ const std::vector<Real> & RBEIMEvaluation::get_interpolation_points_phi_i_qp(uns
   libmesh_error_msg_if(index >= _interpolation_points_phi_i_qp.size(), "Error: Invalid index");
 
   return _interpolation_points_phi_i_qp[index];
+}
+
+const std::vector<unsigned int> & RBEIMEvaluation::get_interpolation_points_spatial_indices(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _interpolation_points_spatial_indices.size(), "Error: Invalid index");
+
+  return _interpolation_points_spatial_indices[index];
+}
+
+unsigned int RBEIMEvaluation::get_n_interpolation_points_spatial_indices() const
+{
+  return _interpolation_points_spatial_indices.size();
 }
 
 void RBEIMEvaluation::set_interpolation_matrix_entry(unsigned int i, unsigned int j, Number value)

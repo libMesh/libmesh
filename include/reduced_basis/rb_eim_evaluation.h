@@ -122,6 +122,21 @@ public:
   void rb_eim_solves(const std::vector<RBParameters> & mus, unsigned int N);
 
   /**
+   * Initialize _interpolation_points_spatial_indices. Once this data is
+   * initialized, we can store it in the training data, and read it back
+   * in during the Online stage to be used in solves.
+   */
+  void initialize_interpolation_points_spatial_indices();
+
+  /**
+   * The Online counterpart of initialize_interpolation_points_spatial_indices().
+   * This is used to initalize the spatial indices data in _parametrized_function
+   * so that the _parametrized_function can be used in the Online stage without
+   * reconstructing the spatial indices on every element or node in the mesh.
+   */
+  void initialize_param_fn_spatial_indices();
+
+  /**
    * Return the current number of EIM basis functions.
    */
   unsigned int get_n_basis_functions() const;
@@ -293,6 +308,7 @@ public:
   void add_interpolation_points_side_index(unsigned int side_index);
   void add_interpolation_points_qp(unsigned int qp);
   void add_interpolation_points_phi_i_qp(const std::vector<Real> & phi_i_qp);
+  void add_interpolation_points_spatial_indices(const std::vector<unsigned int> & spatial_indices);
 
   /**
    * Get the data associated with EIM interpolation points.
@@ -306,6 +322,14 @@ public:
   unsigned int get_interpolation_points_side_index(unsigned int index) const;
   unsigned int get_interpolation_points_qp(unsigned int index) const;
   const std::vector<Real> & get_interpolation_points_phi_i_qp(unsigned int index) const;
+  const std::vector<unsigned int> & get_interpolation_points_spatial_indices(unsigned int index) const;
+
+  /**
+   * _interpolation_points_spatial_indices is optional data, so we need to be able to
+   * check how many _interpolation_points_spatial_indices values have actually been set
+   * since it may not match the number of interpolation points.
+   */
+  unsigned int get_n_interpolation_points_spatial_indices() const;
 
   /**
    * Set entry of the EIM interpolation matrix.
@@ -548,6 +572,14 @@ private:
    * data.
    */
   std::vector<std::vector<Real>> _interpolation_points_phi_i_qp;
+
+  /**
+   * Here we store the spatial indices that were initialized by
+   * initialize_spatial_indices_at_interp_pts(). These are relevant
+   * in the case that _parametrized_function is defined by indexing
+   * into separate data based on the mesh-based data.
+   */
+  std::vector<std::vector<unsigned int>> _interpolation_points_spatial_indices;
 
   /**
    * Store the parametrized function that will be approximated

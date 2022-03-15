@@ -571,6 +571,26 @@ std::vector<std::vector<Number>> RBParametrizedFunction::evaluate_at_observation
   return obs_pt_values[0];
 }
 
+void RBParametrizedFunction::get_spatial_indices(std::vector<std::vector<unsigned int>> & /*spatial_indices*/,
+                                                 const std::vector<dof_id_type> & /*elem_ids*/,
+                                                 const std::vector<unsigned int> & /*side_indices*/,
+                                                 const std::vector<unsigned int> & /*qps*/,
+                                                 const std::vector<subdomain_id_type> & /*sbd_ids*/,
+                                                 const std::vector<boundary_id_type> & /*boundary_ids*/)
+{
+  // No-op by default
+}
+
+void RBParametrizedFunction::initialize_spatial_indices(const std::vector<std::vector<unsigned int>> & /*spatial_indices*/,
+                                                        const std::vector<dof_id_type> & /*elem_ids*/,
+                                                        const std::vector<unsigned int> & /*side_indices*/,
+                                                        const std::vector<unsigned int> & /*qps*/,
+                                                        const std::vector<subdomain_id_type> & /*sbd_ids*/,
+                                                        const std::vector<boundary_id_type> & /*boundary_ids*/)
+{
+  // No-op by default
+}
+
 const std::set<boundary_id_type> & RBParametrizedFunction::get_parametrized_function_boundary_ids() const
 {
   return _parametrized_function_boundary_ids;
