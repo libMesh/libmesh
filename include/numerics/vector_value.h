@@ -26,6 +26,7 @@
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
 #include "metaphysicl/raw_type.h"
+#include "metaphysicl/ct_types.h"
 #endif
 
 // C++ includes
@@ -263,6 +264,12 @@ struct RawType<libMesh::VectorValue<T>>
 
       return ret;
     }
+};
+
+template <typename T, typename U>
+struct ReplaceAlgebraicType<libMesh::VectorValue<T>, U>
+{
+  typedef U type;
 };
 }
 #endif
