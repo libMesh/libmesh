@@ -63,7 +63,8 @@ bool in_circumcircle(const libMesh::Elem & elem,
 
 unsigned int segment_intersection(const libMesh::Elem & elem,
                                   libMesh::Point & source,
-                                  const libMesh::Point & target)
+                                  const libMesh::Point & target,
+                                  unsigned int source_side)
 {
   using namespace libMesh;
 
@@ -73,6 +74,10 @@ unsigned int segment_intersection(const libMesh::Elem & elem,
 
   for (auto s : make_range(ns))
     {
+      // Don't go backwards just because some FP roundoff said to
+      if (s == source_side)
+        continue;
+
       const Point v0 = elem.point(s);
       const Point v1 = elem.point((s+1)%ns);
 
@@ -527,11 +532,14 @@ bool Poly2TriTriangulator::insert_refinement_points()
       // Let's find a triangle containing our new point, or at least
       // containing the end of a ray leading from our current triangle
       // to the new point.
-      unsigned int side = invalid_uint;
       Point ray_start = elem->vertex_average();
+
+      // What side are we coming from, and what side are we going to?
+      unsigned int source_side = invalid_uint;
+      unsigned int side = invalid_uint;
       while (!cavity_elem->contains_point(new_pt))
         {
-          side = segment_intersection(*cavity_elem, ray_start, new_pt);
+          side = segment_intersection(*cavity_elem, ray_start, new_pt, source_side);
 
           libmesh_assert_not_equal_to (side, invalid_uint);
 
@@ -545,6 +553,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
               break;
             }
 
+          source_side = neigh->which_neighbor_am_i(cavity_elem);
           cavity_elem = neigh;
           side = invalid_uint;
         }
