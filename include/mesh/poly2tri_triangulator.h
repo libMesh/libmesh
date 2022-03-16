@@ -32,6 +32,9 @@
 namespace libMesh
 {
 
+// Forward Declarations
+class Elem;
+
 /**
  * A C++ interface between LibMesh and the poly2tri library, with
  * custom code for Steiner point insertion.
@@ -59,9 +62,10 @@ public:
                          DofObject::invalid_id);
 
   /**
-   * Empty destructor.
+   * Empty destructor.  Defaulted in the .C so we can forward declare
+   * unique_ptr contents.
    */
-  virtual ~Poly2TriTriangulator() = default;
+  virtual ~Poly2TriTriangulator();
 
   /**
    * Internally, this calls the poly2tri triangulation code in a loop,
@@ -69,6 +73,20 @@ public:
    * quality.
    */
   virtual void triangulate() override;
+
+  /**
+   * Set a function giving desired triangle area as a function of
+   * position.  Set this to nullptr to disable position-dependent area
+   * constraint (falling back on desired_area()).
+   */
+  virtual void set_desired_area_function (FunctionBase<Real> * desired);
+
+  /**
+   * Get the function giving desired triangle area as a function of
+   * position, or \p nullptr if no such function has been set.
+   */
+  virtual FunctionBase<Real> * get_desired_area_function ();
+
 
 protected:
   /**
@@ -81,6 +99,12 @@ protected:
    * existing trangulation.  Returns true iff new points were added.
    */
   bool insert_refinement_points();
+
+  /**
+   * Returns true if the given element ought to be refined according
+   * to current criteria.
+   */
+  bool should_refine_elem(Elem & elem);
 
 private:
 
@@ -99,6 +123,11 @@ private:
    * Keep track of how many mesh nodes are boundary nodes.
    */
   dof_id_type _n_boundary_nodes;
+
+  /**
+   * Location-dependent area requirements
+   */
+  std::unique_ptr<FunctionBase<Real>> _desired_area_func;
 };
 
 } // namespace libMesh

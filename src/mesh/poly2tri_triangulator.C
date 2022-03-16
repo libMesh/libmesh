@@ -26,6 +26,7 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/function_base.h"
 #include "libmesh/mesh_smoother_laplace.h"
 #include "libmesh/mesh_triangle_holes.h"
 #include "libmesh/unstructured_mesh.h"
@@ -148,6 +149,7 @@ Poly2TriTriangulator::Poly2TriTriangulator(UnstructuredMesh & mesh,
 }
 
 
+Poly2TriTriangulator::~Poly2TriTriangulator() = default;
 
 
 // Primary function responsible for performing the triangulation
@@ -197,6 +199,22 @@ void Poly2TriTriangulator::triangulate()
   // other things) that it is partitioned and therefore users can
   // iterate over local elements, etc.
   _mesh.prepare_for_use();
+}
+
+
+void Poly2TriTriangulator::set_desired_area_function
+  (FunctionBase<Real> * desired)
+{
+  if (desired)
+    _desired_area_func = desired->clone();
+  else
+    _desired_area_func.reset();
+}
+
+
+FunctionBase<Real> * Poly2TriTriangulator::get_desired_area_function ()
+{
+  return _desired_area_func.get();
 }
 
 
@@ -442,9 +460,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
   UnstructuredMesh & mesh = dynamic_cast<UnstructuredMesh &>(this->_mesh);
   mesh.find_neighbors();
 
-  const Real area_target = this->desired_area();
-
-  if (area_target == 0)
+  if (this->desired_area() == 0 &&
+      this->get_desired_area_function() == nullptr)
     return false;
 
   // We won't immediately add these, lest we invalidate iterators on a
@@ -476,10 +493,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
       libmesh_assert_equal_to(elem->level(), 0u);
       libmesh_assert_equal_to(elem->type(), TRI3);
 
-      const Real area = elem->volume();
-
       // If this triangle is as small as we desire, move along
-      if (area <= area_target)
+      if (!should_refine_elem(*elem))
         continue;
 
       // Otherwise add a Steiner point.  We'd like to add the
@@ -956,6 +971,48 @@ bool Poly2TriTriangulator::insert_refinement_points()
 
   // Did we add anything?
   return new_elems.empty();
+}
+
+
+bool Poly2TriTriangulator::should_refine_elem(Elem & elem)
+{
+  const Real min_area_target = this->desired_area();
+  FunctionBase<Real> * area_func = this->get_desired_area_function();
+
+  // If this isn't a question, why are we here?
+  libmesh_assert(min_area_target > 0 ||
+                 area_func != nullptr);
+
+  const Real area = elem.volume();
+
+  // If we don't have position-dependent area targets we can make a
+  // decision quickly
+  if (!area_func)
+    return (area > min_area_target);
+
+  // If we do?
+  //
+  // See if we're meeting the local area target at all the elem
+  // vertices first
+  Real local_area_target = (*area_func)(elem.point(0));
+  for (auto v : make_range(1u, elem.n_vertices()))
+    {
+      if (area > local_area_target)
+        return true;
+      local_area_target =
+        std::min(local_area_target,
+                 (*area_func)(elem.point(v)));
+    }
+
+  if (area > local_area_target)
+    return true;
+
+  // If our vertices are happy, it's still possible that our interior
+  // isn't.  Are we allowed not to bother checking it?
+  if (!min_area_target)
+    return false;
+
+  libmesh_not_implemented();
 }
 
 
