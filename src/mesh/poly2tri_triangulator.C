@@ -106,8 +106,18 @@ unsigned int segment_intersection(const libMesh::Elem & elem,
       if (u < -TOLERANCE || u > 1 + TOLERANCE)
         continue;
 
-      source(0) += raydx * (1-u);
-      source(1) += raydy * (1-u);
+/*
+      // Partial workaround for an old poly2tri bug (issue #39): if we
+      // end up with boundary points that are nearly-collinear but
+      // infinitesimally concave, p2t::CDT::Triangulate throws a "null
+      // triangle" exception.  So let's try to be infinitesimally
+      // convex instead.
+      const Real ray_fraction = (1-u) * (1+TOLERANCE*TOLERANCE);
+*/
+      const Real ray_fraction = (1-u);
+
+      source(0) += raydx * ray_fraction;
+      source(1) += raydy * ray_fraction;
       return s;
     }
 
@@ -444,9 +454,11 @@ bool Poly2TriTriangulator::insert_refinement_points()
   // possible.
   std::unordered_map<Elem *, std::unique_ptr<Elem>> new_elems;
 
-  // Map of which points follow which in the outer polyline.  If we
-  // have to add new boundary points, we'll use this to construct an
-  // updated this->segments to retriangulate with.
+  // Map of which points follow which in the boundary polylines.  If
+  // we have to add new boundary points, we'll use this to construct
+  // an updated this->segments to retriangulate with.  If we have to
+  // add new hole points, we'll use this to insert points into an
+  // ArbitraryHole.
   std::unordered_map<Point, Node *> next_boundary_node;
 
   for (auto & elem : mesh.element_ptr_range())
@@ -752,8 +764,9 @@ bool Poly2TriTriangulator::insert_refinement_points()
           dof_id_type last_id = DofObject::invalid_id;
 
           // Custom loop because we increment node_it 1+ times inside
-          for (auto node_it = _mesh.nodes_begin();
-               node_it != _mesh.nodes_end();)
+          for (auto node_it = _mesh.nodes_begin(),
+               node_end = _mesh.nodes_end();
+               node_it != node_end;)
             {
               Node & node = **node_it;
               ++node_it;
@@ -784,7 +797,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
                   Node * next_node = it->second;
                   libmesh_assert(next_node->valid_id());
 
-                  if (next_node == *node_it)
+                  if (node_it != node_end &&
+                      next_node == *node_it)
                     ++node_it;
 
                   checked_emplace(this_node->id(), next_node->id());
@@ -856,6 +870,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
                   (hole, std::make_unique<ArbitraryHole>(*hole));
             }
 
+          // If we have any holes that are being replaced, make sure
+          // their replacements are up to date.
           for (const Hole * hole : *this->_holes)
             {
               auto hole_it = replaced_holes.find(hole);
@@ -864,6 +880,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
 
               ArbitraryHole & arb = *hole_it->second;
 
+              // We only need to update a replacement that's just had
+              // new points inserted
               bool point_inserted = false;
               for (const Point & point : arb.get_points())
                 if (next_boundary_node.count(point))
@@ -875,9 +893,28 @@ bool Poly2TriTriangulator::insert_refinement_points()
               if (!point_inserted)
                 continue;
 
+              // Find all points in the replacement hole
               std::vector<Point> new_points;
-              for (Point point : arb.get_points())
+
+              // Our outer polyline is expected to have points in
+              // counter-clockwise order, so it proceeds "to the left"
+              // from the point of view of rays inside the domain
+              // pointing outward, and our next_boundary_node ordering
+              // was filled accordingly.
+              //
+              // Our inner holes are expected to have points in
+              // counter-clockwise order, but for holes "to the left
+              // as viewed from the hole interior is the *opposite* of
+              // "to the left as viewed from the domain interior".  We
+              // need to build the updated hole ordering "backwards".
+
+              for (auto point_it = arb.get_points().rbegin(),
+                   point_end = arb.get_points().rend();
+                   point_it != point_end;)
                 {
+                  Point point = *point_it;
+                  ++point_it;
+
                   if (new_points.empty() ||
                       (point != new_points.back() &&
                        point != new_points.front()))
@@ -887,10 +924,17 @@ bool Poly2TriTriangulator::insert_refinement_points()
                   while (it != next_boundary_node.end())
                     {
                       point = *it->second;
+                      if (point == new_points.front())
+                        break;
+                      if (point_it != point_end &&
+                          point == *point_it)
+                        ++point_it;
                       new_points.push_back(point);
                       it = next_boundary_node.find(point);
                     }
                 }
+
+              std::reverse(new_points.begin(), new_points.end());
 
               arb.set_points(std::move(new_points));
             }
