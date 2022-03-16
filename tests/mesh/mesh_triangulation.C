@@ -382,7 +382,7 @@ public:
     TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
 
-    testPoly2TriRefinementBase(&holes, 1.25, 8);
+    testPoly2TriRefinementBase(&holes, 1.25, 13);
   }
 #endif // LIBMESH_HAVE_POLY2TRI
 
