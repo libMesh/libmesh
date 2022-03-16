@@ -32,6 +32,8 @@ public:
   CPPUNIT_TEST( testPoly2TriRefined );
   CPPUNIT_TEST( testPoly2TriExtraRefined );
   CPPUNIT_TEST( testPoly2TriHolesRefined );
+  // This covers an old poly2tri collinearity-tolerance bug
+  CPPUNIT_TEST( testPoly2TriHolesExtraRefined );
 #endif
 
 #ifdef LIBMESH_HAVE_TRIANGLE
@@ -383,6 +385,15 @@ public:
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
 
     testPoly2TriRefinementBase(&holes, 1.25, 13);
+  }
+
+  void testPoly2TriHolesExtraRefined()
+  {
+    // Add a diamond hole
+    TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
+    const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
+
+    testPoly2TriRefinementBase(&holes, 1.25, 125, 0.01);
   }
 #endif // LIBMESH_HAVE_POLY2TRI
 
