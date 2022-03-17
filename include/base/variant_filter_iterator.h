@@ -49,14 +49,15 @@
 template<class Predicate, class Type, class ReferenceType = Type &, class PointerType = Type *,
                           class ConstType = const Type, class ConstReferenceType = const Type &,
                           class ConstPointerType = const Type *>
-class variant_filter_iterator :
-#if defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER)
-  public std::forward_iterator<std::forward_iterator_tag, Type>
-#else
-  public std::iterator<std::forward_iterator_tag,  Type>
-#endif
+class variant_filter_iterator
 {
 public:
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = Type;
+  using difference_type = std::ptrdiff_t;
+  using pointer = PointerType;
+  using reference = ReferenceType;
+
   /**
    * Shortcut name for the fully-qualified typename.
    */
