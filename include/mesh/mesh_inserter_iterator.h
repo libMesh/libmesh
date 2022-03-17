@@ -47,8 +47,13 @@ class Point;
  */
 template <typename T>
 struct mesh_inserter_iterator
-  : std::iterator<std::output_iterator_tag, T>
 {
+  using iterator_category = std::output_iterator_tag;
+  using value_type = T;
+  using difference_type = std::ptrdiff_t;
+  using pointer = T*;
+  using reference = T&;
+
   mesh_inserter_iterator (MeshBase & m) : mesh(m) {}
 
   void operator=(Elem * e) { mesh.add_elem(e); }
