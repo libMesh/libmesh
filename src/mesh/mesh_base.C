@@ -853,7 +853,7 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
             oss << "  None\n";
         }
 
-      const auto & nodeset_name_map = this->get_boundary_info().get_sideset_name_map();
+      const auto & nodeset_name_map = this->get_boundary_info().get_nodeset_name_map();
       for (const auto id : nodeset_ids)
         {
           NodesetInfo & info = nodeset_info_map[id];
