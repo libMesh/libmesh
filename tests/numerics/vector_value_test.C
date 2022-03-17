@@ -102,6 +102,18 @@ public:
         bool assertion = std::is_same<decltype(temp), VectorValue<double>>::value;
         CPPUNIT_ASSERT(assertion);
       }
+#ifdef LIBMESH_HAVE_METAPHYSICL
+      {
+        typedef typename MetaPhysicL::ReplaceAlgebraicType<
+            std::vector<double>,
+            typename TensorTools::IncrementRank<
+                typename MetaPhysicL::ValueType<std::vector<double>>::type>::type>::type
+            ReplacedType;
+        constexpr bool assertion =
+            std::is_same<ReplacedType, std::vector<VectorValue<double>>>::value;
+        CPPUNIT_ASSERT(assertion);
+      }
+#endif
     }
 };
 
