@@ -26,6 +26,7 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/function_base.h"
 #include "libmesh/mesh_smoother_laplace.h"
 #include "libmesh/mesh_triangle_holes.h"
 #include "libmesh/unstructured_mesh.h"
@@ -63,7 +64,8 @@ bool in_circumcircle(const libMesh::Elem & elem,
 
 unsigned int segment_intersection(const libMesh::Elem & elem,
                                   libMesh::Point & source,
-                                  const libMesh::Point & target)
+                                  const libMesh::Point & target,
+                                  unsigned int source_side)
 {
   using namespace libMesh;
 
@@ -73,6 +75,10 @@ unsigned int segment_intersection(const libMesh::Elem & elem,
 
   for (auto s : make_range(ns))
     {
+      // Don't go backwards just because some FP roundoff said to
+      if (s == source_side)
+        continue;
+
       const Point v0 = elem.point(s);
       const Point v1 = elem.point((s+1)%ns);
 
@@ -106,8 +112,18 @@ unsigned int segment_intersection(const libMesh::Elem & elem,
       if (u < -TOLERANCE || u > 1 + TOLERANCE)
         continue;
 
-      source(0) += raydx * (1-u);
-      source(1) += raydy * (1-u);
+/*
+      // Partial workaround for an old poly2tri bug (issue #39): if we
+      // end up with boundary points that are nearly-collinear but
+      // infinitesimally concave, p2t::CDT::Triangulate throws a "null
+      // triangle" exception.  So let's try to be infinitesimally
+      // convex instead.
+      const Real ray_fraction = (1-u) * (1+TOLERANCE*TOLERANCE);
+*/
+      const Real ray_fraction = (1-u);
+
+      source(0) += raydx * ray_fraction;
+      source(1) += raydy * ray_fraction;
       return s;
     }
 
@@ -133,6 +149,7 @@ Poly2TriTriangulator::Poly2TriTriangulator(UnstructuredMesh & mesh,
 }
 
 
+Poly2TriTriangulator::~Poly2TriTriangulator() = default;
 
 
 // Primary function responsible for performing the triangulation
@@ -182,6 +199,22 @@ void Poly2TriTriangulator::triangulate()
   // other things) that it is partitioned and therefore users can
   // iterate over local elements, etc.
   _mesh.prepare_for_use();
+}
+
+
+void Poly2TriTriangulator::set_desired_area_function
+  (FunctionBase<Real> * desired)
+{
+  if (desired)
+    _desired_area_func = desired->clone();
+  else
+    _desired_area_func.reset();
+}
+
+
+FunctionBase<Real> * Poly2TriTriangulator::get_desired_area_function ()
+{
+  return _desired_area_func.get();
 }
 
 
@@ -427,9 +460,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
   UnstructuredMesh & mesh = dynamic_cast<UnstructuredMesh &>(this->_mesh);
   mesh.find_neighbors();
 
-  const Real area_target = this->desired_area();
-
-  if (area_target == 0)
+  if (this->desired_area() == 0 &&
+      this->get_desired_area_function() == nullptr)
     return false;
 
   // We won't immediately add these, lest we invalidate iterators on a
@@ -444,9 +476,11 @@ bool Poly2TriTriangulator::insert_refinement_points()
   // possible.
   std::unordered_map<Elem *, std::unique_ptr<Elem>> new_elems;
 
-  // Map of which points follow which in the outer polyline.  If we
-  // have to add new boundary points, we'll use this to construct an
-  // updated this->segments to retriangulate with.
+  // Map of which points follow which in the boundary polylines.  If
+  // we have to add new boundary points, we'll use this to construct
+  // an updated this->segments to retriangulate with.  If we have to
+  // add new hole points, we'll use this to insert points into an
+  // ArbitraryHole.
   std::unordered_map<Point, Node *> next_boundary_node;
 
   for (auto & elem : mesh.element_ptr_range())
@@ -459,10 +493,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
       libmesh_assert_equal_to(elem->level(), 0u);
       libmesh_assert_equal_to(elem->type(), TRI3);
 
-      const Real area = elem->volume();
-
       // If this triangle is as small as we desire, move along
-      if (area <= area_target)
+      if (!should_refine_elem(*elem))
         continue;
 
       // Otherwise add a Steiner point.  We'd like to add the
@@ -515,11 +547,14 @@ bool Poly2TriTriangulator::insert_refinement_points()
       // Let's find a triangle containing our new point, or at least
       // containing the end of a ray leading from our current triangle
       // to the new point.
-      unsigned int side = invalid_uint;
       Point ray_start = elem->vertex_average();
+
+      // What side are we coming from, and what side are we going to?
+      unsigned int source_side = invalid_uint;
+      unsigned int side = invalid_uint;
       while (!cavity_elem->contains_point(new_pt))
         {
-          side = segment_intersection(*cavity_elem, ray_start, new_pt);
+          side = segment_intersection(*cavity_elem, ray_start, new_pt, source_side);
 
           libmesh_assert_not_equal_to (side, invalid_uint);
 
@@ -533,6 +568,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
               break;
             }
 
+          source_side = neigh->which_neighbor_am_i(cavity_elem);
           cavity_elem = neigh;
           side = invalid_uint;
         }
@@ -752,8 +788,9 @@ bool Poly2TriTriangulator::insert_refinement_points()
           dof_id_type last_id = DofObject::invalid_id;
 
           // Custom loop because we increment node_it 1+ times inside
-          for (auto node_it = _mesh.nodes_begin();
-               node_it != _mesh.nodes_end();)
+          for (auto node_it = _mesh.nodes_begin(),
+               node_end = _mesh.nodes_end();
+               node_it != node_end;)
             {
               Node & node = **node_it;
               ++node_it;
@@ -784,19 +821,24 @@ bool Poly2TriTriangulator::insert_refinement_points()
                   Node * next_node = it->second;
                   libmesh_assert(next_node->valid_id());
 
-                  if (next_node == *node_it)
+                  if (node_it != node_end &&
+                      next_node == *node_it)
                     ++node_it;
 
                   checked_emplace(this_node->id(), next_node->id());
 
                   this_node = next_node;
+                  if (this_node->id() == this->segments.front().first)
+                    break;
+
                   it = next_boundary_node.find(*this_node);
                 }
             }
 
           // We expect a closed loop here
-          checked_emplace(this->segments.back().second,
-                          this->segments.front().first);
+          if (this->segments.back().second != this->segments.front().first)
+            checked_emplace(this->segments.back().second,
+                            this->segments.front().first);
         }
       else
         {
@@ -852,6 +894,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
                   (hole, std::make_unique<ArbitraryHole>(*hole));
             }
 
+          // If we have any holes that are being replaced, make sure
+          // their replacements are up to date.
           for (const Hole * hole : *this->_holes)
             {
               auto hole_it = replaced_holes.find(hole);
@@ -860,6 +904,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
 
               ArbitraryHole & arb = *hole_it->second;
 
+              // We only need to update a replacement that's just had
+              // new points inserted
               bool point_inserted = false;
               for (const Point & point : arb.get_points())
                 if (next_boundary_node.count(point))
@@ -871,9 +917,28 @@ bool Poly2TriTriangulator::insert_refinement_points()
               if (!point_inserted)
                 continue;
 
+              // Find all points in the replacement hole
               std::vector<Point> new_points;
-              for (Point point : arb.get_points())
+
+              // Our outer polyline is expected to have points in
+              // counter-clockwise order, so it proceeds "to the left"
+              // from the point of view of rays inside the domain
+              // pointing outward, and our next_boundary_node ordering
+              // was filled accordingly.
+              //
+              // Our inner holes are expected to have points in
+              // counter-clockwise order, but for holes "to the left
+              // as viewed from the hole interior is the *opposite* of
+              // "to the left as viewed from the domain interior".  We
+              // need to build the updated hole ordering "backwards".
+
+              for (auto point_it = arb.get_points().rbegin(),
+                   point_end = arb.get_points().rend();
+                   point_it != point_end;)
                 {
+                  Point point = *point_it;
+                  ++point_it;
+
                   if (new_points.empty() ||
                       (point != new_points.back() &&
                        point != new_points.front()))
@@ -883,10 +948,17 @@ bool Poly2TriTriangulator::insert_refinement_points()
                   while (it != next_boundary_node.end())
                     {
                       point = *it->second;
+                      if (point == new_points.front())
+                        break;
+                      if (point_it != point_end &&
+                          point == *point_it)
+                        ++point_it;
                       new_points.push_back(point);
                       it = next_boundary_node.find(point);
                     }
                 }
+
+              std::reverse(new_points.begin(), new_points.end());
 
               arb.set_points(std::move(new_points));
             }
@@ -899,6 +971,48 @@ bool Poly2TriTriangulator::insert_refinement_points()
 
   // Did we add anything?
   return new_elems.empty();
+}
+
+
+bool Poly2TriTriangulator::should_refine_elem(Elem & elem)
+{
+  const Real min_area_target = this->desired_area();
+  FunctionBase<Real> * area_func = this->get_desired_area_function();
+
+  // If this isn't a question, why are we here?
+  libmesh_assert(min_area_target > 0 ||
+                 area_func != nullptr);
+
+  const Real area = elem.volume();
+
+  // If we don't have position-dependent area targets we can make a
+  // decision quickly
+  if (!area_func)
+    return (area > min_area_target);
+
+  // If we do?
+  //
+  // See if we're meeting the local area target at all the elem
+  // vertices first
+  Real local_area_target = (*area_func)(elem.point(0));
+  for (auto v : make_range(1u, elem.n_vertices()))
+    {
+      if (area > local_area_target)
+        return true;
+      local_area_target =
+        std::min(local_area_target,
+                 (*area_func)(elem.point(v)));
+    }
+
+  if (area > local_area_target)
+    return true;
+
+  // If our vertices are happy, it's still possible that our interior
+  // isn't.  Are we allowed not to bother checking it?
+  if (!min_area_target)
+    return false;
+
+  libmesh_not_implemented();
 }
 
 

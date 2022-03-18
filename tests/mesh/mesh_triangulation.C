@@ -3,6 +3,7 @@
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_triangle_holes.h>
 #include <libmesh/mesh_triangle_interface.h>
+#include <libmesh/parsed_function.h>
 #include <libmesh/point.h>
 #include <libmesh/poly2tri_triangulator.h>
 
@@ -32,6 +33,11 @@ public:
   CPPUNIT_TEST( testPoly2TriRefined );
   CPPUNIT_TEST( testPoly2TriExtraRefined );
   CPPUNIT_TEST( testPoly2TriHolesRefined );
+  // This covers an old poly2tri collinearity-tolerance bug
+  CPPUNIT_TEST( testPoly2TriHolesExtraRefined );
+
+  CPPUNIT_TEST( testPoly2TriNonUniformRefined );
+  CPPUNIT_TEST( testPoly2TriHolesNonUniformRefined );
 #endif
 
 #ifdef LIBMESH_HAVE_TRIANGLE
@@ -320,7 +326,8 @@ public:
     (const std::vector<TriangulatorInterface::Hole*> * holes,
      Real expected_total_area,
      dof_id_type n_original_elem,
-     Real desired_area = 0.1)
+     Real desired_area = 0.1,
+     FunctionBase<Real> * area_func = nullptr)
   {
     Mesh mesh(*TestCommWorld);
     mesh.add_point(Point(0,0), 0);
@@ -340,6 +347,7 @@ public:
 
     // Try to insert points!
     triangulator.desired_area() = desired_area;
+    triangulator.set_desired_area_function(area_func);
     triangulator.minimum_angle() = 0;
     triangulator.smooth_after_generating() = false;
 
@@ -356,7 +364,16 @@ public:
         const Real my_area = elem->volume();
 
         // my_area <= desired_area, wow this macro ordering hurts
-        CPPUNIT_ASSERT_LESSEQUAL(desired_area, my_area);
+        if (desired_area != 0)
+          CPPUNIT_ASSERT_LESSEQUAL(desired_area, my_area);
+
+        if (area_func != nullptr)
+          for (auto v : make_range(elem->n_vertices()))
+            {
+              const Real local_desired_area =
+                (*area_func)(elem->point(v));
+              CPPUNIT_ASSERT_LESSEQUAL(local_desired_area, my_area);
+            }
 
         area += my_area;
       }
@@ -376,14 +393,41 @@ public:
     testPoly2TriRefinementBase(nullptr, 1.5, 150, 0.01);
   }
 
+  void testPoly2TriNonUniformRefined()
+  {
+    ParsedFunction<Real> var_area {"0.002*(1+2*x)*(1+2*y)"};
+    testPoly2TriRefinementBase(nullptr, 1.5, 150, 0, &var_area);
+  }
+
   void testPoly2TriHolesRefined()
   {
     // Add a diamond hole
     TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
 
-    testPoly2TriRefinementBase(&holes, 1.25, 8);
+    testPoly2TriRefinementBase(&holes, 1.25, 13);
   }
+
+  void testPoly2TriHolesExtraRefined()
+  {
+    // Add a diamond hole
+    TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
+    const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
+
+    testPoly2TriRefinementBase(&holes, 1.25, 125, 0.01);
+  }
+
+  void testPoly2TriHolesNonUniformRefined()
+  {
+    // Add a diamond hole
+    TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
+    const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
+
+    ParsedFunction<Real> var_area {"0.002*(0.25+2*x)*(0.25+2*y)"};
+    testPoly2TriRefinementBase(&holes, 1.25, 150, 0, &var_area);
+  }
+
+
 #endif // LIBMESH_HAVE_POLY2TRI
 
 };

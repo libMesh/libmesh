@@ -42,6 +42,7 @@ namespace libMesh
 
 // Forward Declarations
 class UnstructuredMesh;
+template <typename Output> class FunctionBase;
 
 class TriangulatorInterface
 {
@@ -121,8 +122,32 @@ public:
   /**
    * Sets and/or gets the desired triangle area. Set to zero to disable
    * area constraint.
+   *
+   * If a \p desired_area_function is set, then \p desired_area()
+   * should be used to set a *minimum* desired area; this will reduce
+   * "false negatives" by suggesting how finely to sample \p
+   * desired_area_function inside large triangles, where ideally the
+   * \p desired_area_function will be satisfied in the triangle
+   * interior and not just at the triangle vertices.
    */
   Real & desired_area() {return _desired_area;}
+
+  /**
+   * Set a function giving desired triangle area as a function of
+   * position.  Set this to nullptr to disable position-dependent area
+   * constraint (falling back on desired_area()).
+   *
+   * This may not be implemented in all subclasses.
+   */
+  virtual void set_desired_area_function (FunctionBase<Real> *)
+  { libmesh_not_implemented(); }
+
+  /**
+   * Get the function giving desired triangle area as a function of
+   * position, or \p nullptr if no such function has been set.
+   */
+  virtual FunctionBase<Real> * get_desired_area_function ()
+  { return nullptr; }
 
   /**
    * Sets and/or gets the minimum desired angle. Set to zero to
