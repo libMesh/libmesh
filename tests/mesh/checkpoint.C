@@ -16,7 +16,7 @@ class CheckpointIOTest : public CppUnit::TestCase {
    * This test verifies that we can write files with the CheckpointIO object.
    */
 public:
-  CPPUNIT_TEST_SUITE( CheckpointIOTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( CheckpointIOTest );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testAsciiDistRepSplitter );
@@ -120,41 +120,57 @@ public:
 
   void testAsciiDistRepSplitter()
   {
+    LOG_UNIT_TEST;
+
     testSplitter<DistributedMesh, ReplicatedMesh>(false, true);
   }
 
   void testBinaryDistRepSplitter()
   {
+    LOG_UNIT_TEST;
+
     testSplitter<DistributedMesh, ReplicatedMesh>(true, true);
   }
 
   void testAsciiRepDistSplitter()
   {
+    LOG_UNIT_TEST;
+
     testSplitter<ReplicatedMesh, DistributedMesh>(false, true);
   }
 
   void testBinaryRepDistSplitter()
   {
+    LOG_UNIT_TEST;
+
     testSplitter<ReplicatedMesh, DistributedMesh>(true, true);
   }
 
   void testAsciiRepRepSplitter()
   {
+    LOG_UNIT_TEST;
+
     testSplitter<ReplicatedMesh, ReplicatedMesh>(false, false);
   }
 
   void testBinaryRepRepSplitter()
   {
+    LOG_UNIT_TEST;
+
     testSplitter<ReplicatedMesh, ReplicatedMesh>(true, false);
   }
 
   void testAsciiDistDistSplitter()
   {
+    LOG_UNIT_TEST;
+
     testSplitter<DistributedMesh, DistributedMesh>(false, true);
   }
 
   void testBinaryDistDistSplitter()
   {
+    LOG_UNIT_TEST;
+
     testSplitter<DistributedMesh, DistributedMesh>(true, true);
   }
 

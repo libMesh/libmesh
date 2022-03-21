@@ -30,6 +30,9 @@ private:
   System * _sys;
   EquationSystems * _es;
 
+protected:
+  std::string libmesh_suite_name;
+
 public:
   void setUp()
   {
@@ -121,6 +124,8 @@ public:
 
   void testContainsPoint()
   {
+    LOG_UNIT_TEST;
+
     // Handle the "more processors than elements" case
     if (!_elem)
       return;
@@ -158,6 +163,10 @@ public:
 #define INSTANTIATE_RATIONALMAP_TEST(elemtype)                          \
   class RationalMapTest_##elemtype : public RationalMapTest<elemtype> { \
   public:                                                               \
+  RationalMapTest_##elemtype() :                                        \
+    RationalMapTest<elemtype>() {                                       \
+    this->libmesh_suite_name = "RationalMapTest_" #elemtype;            \
+  }                                                                     \
   CPPUNIT_TEST_SUITE( RationalMapTest_##elemtype );                     \
   CPPUNIT_TEST( testContainsPoint );                                    \
   CPPUNIT_TEST_SUITE_END();                                             \

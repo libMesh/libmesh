@@ -21,7 +21,7 @@ class NodalNeighborsTest : public CppUnit::TestCase
    * here to match the hard-coded numbering.
    */
 public:
-  CPPUNIT_TEST_SUITE( NodalNeighborsTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( NodalNeighborsTest );
 
   CPPUNIT_TEST( testEdge2 );
   CPPUNIT_TEST( testEdge3 );
@@ -83,6 +83,8 @@ public:
 
   void testEdge2()
   {
+    LOG_UNIT_TEST;
+
     // 11 nodes, 2 neighbor entries per node
     dof_id_type validation_data[22] =
       {
@@ -105,6 +107,8 @@ public:
 
   void testEdge3()
   {
+    LOG_UNIT_TEST;
+
     // 11 nodes, 2 neighbor entries per node
     dof_id_type validation_data[22] =
       {
@@ -127,6 +131,8 @@ public:
 
   void testEdge4()
   {
+    LOG_UNIT_TEST;
+
     // 10 nodes, 2 neighbor entries per node
     dof_id_type validation_data[20] =
       {

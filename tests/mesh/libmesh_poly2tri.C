@@ -9,7 +9,7 @@
 
 class LibMeshPoly2TriTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( LibMeshPoly2TriTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( LibMeshPoly2TriTest );
 
 #ifdef LIBMESH_HAVE_POLY2TRI
   CPPUNIT_TEST( testLibMeshPoly2Tri );
@@ -29,6 +29,8 @@ public:
 #ifdef LIBMESH_HAVE_POLY2TRI
   void testLibMeshPoly2Tri ()
   {
+    LOG_UNIT_TEST;
+
     std::vector<p2t::Point> pentagon {{0,0},{1,0},{1,1},{.5,1.5},{0,1}};
 
     std::vector<p2t::Point *> api_shim(pentagon.size());

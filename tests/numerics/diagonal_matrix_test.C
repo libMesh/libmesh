@@ -29,7 +29,7 @@ termial(T n)
 class DiagonalMatrixTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE(DiagonalMatrixTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(DiagonalMatrixTest);
 
   CPPUNIT_TEST(testSizes);
   CPPUNIT_TEST(testNumerics);
@@ -62,6 +62,8 @@ public:
 
   void testSizes()
   {
+    LOG_UNIT_TEST;
+
     CPPUNIT_ASSERT_EQUAL(_global_size, _matrix->m());
     CPPUNIT_ASSERT_EQUAL(_global_size, _matrix->n());
     CPPUNIT_ASSERT_EQUAL(_i[_comm->rank()], _matrix->row_start());
@@ -70,6 +72,8 @@ public:
 
   void testNumerics()
   {
+    LOG_UNIT_TEST;
+
     numeric_index_type beginning_index = _matrix->row_start();
     numeric_index_type end_index = _matrix->row_stop();
 
@@ -210,6 +214,8 @@ public:
 
   void testClone()
   {
+    LOG_UNIT_TEST;
+
     {
       // Create copy, test that it can go out of scope
       auto copy = _matrix->clone();

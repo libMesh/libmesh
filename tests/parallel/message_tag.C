@@ -12,7 +12,7 @@ using namespace libMesh;
 
 class MessageTagTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( MessageTagTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( MessageTagTest );
 
   CPPUNIT_TEST( testGetUniqueTagAuto );
   CPPUNIT_TEST( testGetUniqueTagManual );
@@ -33,6 +33,8 @@ public:
 
   void testGetUniqueTagAuto()
   {
+    LOG_UNIT_TEST;
+
     // We need to explicitly duplicate the communicator first, because
     // the original might already have tags used by other unit tests
 
@@ -73,6 +75,8 @@ public:
 
   void testGetUniqueTagManual()
   {
+    LOG_UNIT_TEST;
+
     // Here we'll use the standard communicator, because even if it
     // used these tags in other contexts it should have freed them for
     // reuse later.

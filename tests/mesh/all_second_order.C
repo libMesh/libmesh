@@ -10,7 +10,7 @@ using namespace libMesh;
 class AllSecondOrderTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE( AllSecondOrderTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( AllSecondOrderTest );
 
   CPPUNIT_TEST( allSecondOrder );
 
@@ -23,6 +23,8 @@ public:
 
   void allSecondOrder()
   {
+    LOG_UNIT_TEST;
+
     DistributedMesh mesh(*TestCommWorld, /*dim=*/2);
 
     mesh.allow_remote_element_removal(false);

@@ -13,7 +13,7 @@ public:
 
   void tearDown() {}
 
-  CPPUNIT_TEST_SUITE(CouplingMatrixTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(CouplingMatrixTest);
 
   CPPUNIT_TEST(testSimpleAPI);
 
@@ -25,6 +25,8 @@ public:
 private:
   void testSimpleAPI()
   {
+    LOG_UNIT_TEST;
+
     CouplingMatrix cm(2);
 
     // Use a constant reference to make sure we test both const and
@@ -116,6 +118,8 @@ private:
 
   void testIteratorAPI()
   {
+    LOG_UNIT_TEST;
+
     CouplingMatrix cm(8);
 
     // Set some elements true, in a weird order.

@@ -19,7 +19,7 @@ using namespace libMesh;
 class DualShapeTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE( DualShapeTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( DualShapeTest );
   CPPUNIT_TEST( testEdge2Lagrange );
   CPPUNIT_TEST_SUITE_END();
 
@@ -33,6 +33,7 @@ public:
 
   void testEdge2Lagrange ()
   {
+    LOG_UNIT_TEST;
     if (!_elem)
       return;
 

@@ -47,7 +47,7 @@ Number sin_x_plus_cos_y (const Point& p,
 
 class MeshInputTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( MeshInputTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( MeshInputTest );
 
 #if LIBMESH_DIM > 1
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -114,6 +114,8 @@ public:
 #ifdef LIBMESH_HAVE_EXODUS_API
   void testExodusReadHeader ()
   {
+    LOG_UNIT_TEST;
+
     // first scope: write file
     {
       ReplicatedMesh mesh(*TestCommWorld);
@@ -150,6 +152,8 @@ public:
 
   void testExodusIGASidesets ()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
 
     // Block here so we trigger exii destructor early; I thought I
@@ -307,17 +311,17 @@ public:
 
 
   void testExodusCopyNodalSolutionReplicated ()
-  { testCopyNodalSolutionImpl<ReplicatedMesh,ExodusII_IO>("repl_with_nodal_soln.e"); }
+  { LOG_UNIT_TEST; testCopyNodalSolutionImpl<ReplicatedMesh,ExodusII_IO>("repl_with_nodal_soln.e"); }
 
   void testExodusCopyNodalSolutionDistributed ()
-  { testCopyNodalSolutionImpl<DistributedMesh,ExodusII_IO>("dist_with_nodal_soln.e"); }
+  { LOG_UNIT_TEST; testCopyNodalSolutionImpl<DistributedMesh,ExodusII_IO>("dist_with_nodal_soln.e"); }
 
 #if defined(LIBMESH_HAVE_NEMESIS_API)
   void testNemesisCopyNodalSolutionReplicated ()
-  { testCopyNodalSolutionImpl<ReplicatedMesh,Nemesis_IO>("repl_with_nodal_soln.nem"); }
+  { LOG_UNIT_TEST; testCopyNodalSolutionImpl<ReplicatedMesh,Nemesis_IO>("repl_with_nodal_soln.nem"); }
 
   void testNemesisCopyNodalSolutionDistributed ()
-  { testCopyNodalSolutionImpl<DistributedMesh,Nemesis_IO>("dist_with_nodal_soln.nem"); }
+  { LOG_UNIT_TEST; testCopyNodalSolutionImpl<DistributedMesh,Nemesis_IO>("dist_with_nodal_soln.nem"); }
 #endif
 
 
@@ -397,17 +401,17 @@ public:
 
 
   void testExodusCopyElementSolutionReplicated ()
-  { testCopyElementSolutionImpl<ReplicatedMesh,ExodusII_IO>("repl_with_elem_soln.e"); }
+  { LOG_UNIT_TEST; testCopyElementSolutionImpl<ReplicatedMesh,ExodusII_IO>("repl_with_elem_soln.e"); }
 
   void testExodusCopyElementSolutionDistributed ()
-  { testCopyElementSolutionImpl<DistributedMesh,ExodusII_IO>("dist_with_elem_soln.e"); }
+  { LOG_UNIT_TEST; testCopyElementSolutionImpl<DistributedMesh,ExodusII_IO>("dist_with_elem_soln.e"); }
 
 #if defined(LIBMESH_HAVE_NEMESIS_API)
   void testNemesisCopyElementSolutionReplicated ()
-  { testCopyElementSolutionImpl<ReplicatedMesh,Nemesis_IO>("repl_with_elem_soln.nem"); }
+  { LOG_UNIT_TEST; testCopyElementSolutionImpl<ReplicatedMesh,Nemesis_IO>("repl_with_elem_soln.nem"); }
 
   void testNemesisCopyElementSolutionDistributed ()
-  { testCopyElementSolutionImpl<DistributedMesh,Nemesis_IO>("dist_with_elem_soln.nem"); }
+  { LOG_UNIT_TEST; testCopyElementSolutionImpl<DistributedMesh,Nemesis_IO>("dist_with_elem_soln.nem"); }
 
 
   // This tests that a single-element mesh solution makes it through all of the API to write out a
@@ -465,10 +469,10 @@ public:
 
 
   void testNemesisSingleElementReplicated ()
-  { testSingleElementImpl<ReplicatedMesh,Nemesis_IO>("repl_with_single_elem.nem"); }
+  { LOG_UNIT_TEST; testSingleElementImpl<ReplicatedMesh,Nemesis_IO>("repl_with_single_elem.nem"); }
 
   void testNemesisSingleElementDistributed ()
-  { testSingleElementImpl<DistributedMesh,Nemesis_IO>("dist_with_single_elem.nem"); }
+  { LOG_UNIT_TEST; testSingleElementImpl<DistributedMesh,Nemesis_IO>("dist_with_single_elem.nem"); }
 #endif //defined(LIBMESH_HAVE_NEMESIS_API)
 
 
@@ -578,22 +582,24 @@ public:
   }
 
   void testExodusCopyElementVectorReplicated ()
-  { testCopyElementVectorImpl<ReplicatedMesh, ExodusII_IO>("repl_with_elem_vec.e"); }
+  { LOG_UNIT_TEST; testCopyElementVectorImpl<ReplicatedMesh, ExodusII_IO>("repl_with_elem_vec.e"); }
 
   void testExodusCopyElementVectorDistributed ()
-  { testCopyElementVectorImpl<DistributedMesh,ExodusII_IO>("dist_with_elem_vec.e"); }
+  { LOG_UNIT_TEST; testCopyElementVectorImpl<DistributedMesh,ExodusII_IO>("dist_with_elem_vec.e"); }
 
 #if defined(LIBMESH_HAVE_NEMESIS_API)
   void testNemesisCopyElementVectorReplicated ()
-  { testCopyElementVectorImpl<ReplicatedMesh,Nemesis_IO>("repl_with_elem_vec.nem"); }
+  { LOG_UNIT_TEST; testCopyElementVectorImpl<ReplicatedMesh,Nemesis_IO>("repl_with_elem_vec.nem"); }
 
   void testNemesisCopyElementVectorDistributed ()
-  { testCopyElementVectorImpl<DistributedMesh,Nemesis_IO>("dist_with_elem_vec.nem"); }
+  { LOG_UNIT_TEST; testCopyElementVectorImpl<DistributedMesh,Nemesis_IO>("dist_with_elem_vec.nem"); }
 #endif
 
 
   void testExodusWriteElementDataFromDiscontinuousNodalData()
   {
+    LOG_UNIT_TEST;
+
     // first scope: write file
     {
       Mesh mesh(*TestCommWorld);
@@ -704,10 +710,10 @@ public:
   }
 
   void testNemesisReadReplicated ()
-  { testNemesisReadImpl<ReplicatedMesh>(); }
+  { LOG_UNIT_TEST; testNemesisReadImpl<ReplicatedMesh>(); }
 
   void testNemesisReadDistributed ()
-  { testNemesisReadImpl<DistributedMesh>(); }
+  { LOG_UNIT_TEST; testNemesisReadImpl<DistributedMesh>(); }
 #endif
 
 
@@ -796,6 +802,8 @@ public:
 
   void testDynaReadElem ()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
 
     DynaIO dyna(mesh);
@@ -817,6 +825,8 @@ public:
 
   void testDynaNoSplines ()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
 
     DynaIO dyna(mesh, /* keep_spline_nodes = */ false);
@@ -837,6 +847,8 @@ public:
 
   void testDynaReadPatch ()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
 
     DynaIO dyna(mesh);
@@ -963,6 +975,8 @@ public:
 
   void testDynaFileMappingsFEMEx5 ()
   {
+    LOG_UNIT_TEST;
+
     testDynaFileMappings("meshes/PressurizedCyl_Patch6_256Elem.bxt.gz",
     // Regression values for sin_x_plus_cos_y
                          {0.9639857809698268, 1.839870171669186,
@@ -971,6 +985,8 @@ public:
 
   void testDynaFileMappingsBlockWithHole ()
   {
+    LOG_UNIT_TEST;
+
     testDynaFileMappings("meshes/BlockWithHole_Patch9.bxt.gz",
     // Regression values for sin_x_plus_cos_y
                          {3.22612556930183, 1.97405365384733,
@@ -979,6 +995,8 @@ public:
 
   void testDynaFileMappingsPlateWithHole ()
   {
+    LOG_UNIT_TEST;
+
     testDynaFileMappings("meshes/PlateWithHole_Patch8.bxt.gz",
     // Regression values for sin_x_plus_cos_y
                          {2.2812154374012, 1.974049990211937,
@@ -987,6 +1005,8 @@ public:
 
   void testDynaFileMappingsCyl3d ()
   {
+    LOG_UNIT_TEST;
+
     testDynaFileMappings("meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz",
     // Regression values for sin_x_plus_cos_y
                          {0.963612880188165, 1.82329452603503,
@@ -1034,6 +1054,8 @@ public:
 
   void testExodusFileMappingsPlateWithHole ()
   {
+    LOG_UNIT_TEST;
+
     testExodusFileMappings("meshes/PlateWithHole_Patch8.e",
     // Regression values for sin_x_plus_cos_y
                            {2.2812154374012, 1.974049990211937,
@@ -1042,6 +1064,8 @@ public:
 
   void testExodusFileMappingsTwoBlocks ()
   {
+    LOG_UNIT_TEST;
+
     testExodusFileMappings("meshes/two_quads_two_blocks.e",
     // Regression values for sin_x_plus_cos_y
                            {2.03496953073072, 1.97996853164955,
@@ -1050,6 +1074,8 @@ public:
 
   void testExodusFileMappingsCyl3d ()
   {
+    LOG_UNIT_TEST;
+
     testExodusFileMappings("meshes/PressurizedCyl3d_Patch1_8Elem.e",
                            {0.963612880188165, 1.82329452603503,
                             0.707998701597943, 1.31399222566683});

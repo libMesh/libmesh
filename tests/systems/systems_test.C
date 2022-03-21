@@ -434,7 +434,7 @@ struct TripleFunction : public FunctionBase<Number>
 
 class SystemsTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( SystemsTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( SystemsTest );
 
   CPPUNIT_TEST( testProjectHierarchicEdge3 );
 #if LIBMESH_DIM > 1
@@ -879,6 +879,8 @@ public:
 
   void testBoundaryProjectCube()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
 
     // const boundary_id_type BOUNDARY_ID_MIN_Z  = 0;
@@ -1022,6 +1024,8 @@ public:
 
   void testDofCouplingWithVarGroups()
   {
+    LOG_UNIT_TEST;
+
     ReplicatedMesh mesh(*TestCommWorld);
 
     MeshTools::Generation::build_cube (mesh,
@@ -1090,6 +1094,8 @@ public:
 
   void testAssemblyWithDgFemContext()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
 
     EquationSystems es(mesh);
@@ -1114,6 +1120,8 @@ public:
 
   void testBlockRestrictedVarNDofs()
   {
+    LOG_UNIT_TEST;
+
     ReplicatedMesh mesh(*TestCommWorld);
 
     MeshTools::Generation::build_cube (mesh,
@@ -1634,34 +1642,34 @@ public:
 #endif // LIBMESH_ENABLE_AMR
 
 
-  void testProjectHierarchicEdge3() { testProjectLine(EDGE3); }
-  void testProjectHierarchicQuad9() { testProjectSquare(QUAD9); }
-  void testProjectHierarchicTri6()  { testProjectSquare(TRI6); }
-  void testProjectHierarchicTri7()  { testProjectSquare(TRI7); }
-  void testProjectHierarchicHex27() { testProjectCube(HEX27); }
-  void testProjectMeshFunctionHex27() { testProjectCubeWithMeshFunction(HEX27); }
-  void test2DProjectVectorFETri3() { test2DProjectVectorFE(TRI3); }
-  void test2DProjectVectorFEQuad4() { test2DProjectVectorFE(QUAD4); }
-  void test2DProjectVectorFETri6() { test2DProjectVectorFE(TRI6); }
-  void test2DProjectVectorFETri7() { test2DProjectVectorFE(TRI7); }
-  void test2DProjectVectorFEQuad8() { test2DProjectVectorFE(QUAD8); }
-  void test2DProjectVectorFEQuad9() { test2DProjectVectorFE(QUAD9); }
-  void test3DProjectVectorFETet4() { test3DProjectVectorFE(TET4); }
-  void test3DProjectVectorFEHex8() { test3DProjectVectorFE(HEX8); }
-  void test3DProjectVectorFETet10() { test3DProjectVectorFE(TET10); }
-  void test3DProjectVectorFETet14() { test3DProjectVectorFE(TET14); }
-  void test3DProjectVectorFEHex20() { test3DProjectVectorFE(HEX20); }
-  void test3DProjectVectorFEHex27() { test3DProjectVectorFE(HEX27); }
+  void testProjectHierarchicEdge3() { LOG_UNIT_TEST; testProjectLine(EDGE3); }
+  void testProjectHierarchicQuad9() { LOG_UNIT_TEST; testProjectSquare(QUAD9); }
+  void testProjectHierarchicTri6()  { LOG_UNIT_TEST; testProjectSquare(TRI6); }
+  void testProjectHierarchicTri7()  { LOG_UNIT_TEST; testProjectSquare(TRI7); }
+  void testProjectHierarchicHex27() { LOG_UNIT_TEST; testProjectCube(HEX27); }
+  void testProjectMeshFunctionHex27() { LOG_UNIT_TEST; testProjectCubeWithMeshFunction(HEX27); }
+  void test2DProjectVectorFETri3() { LOG_UNIT_TEST; test2DProjectVectorFE(TRI3); }
+  void test2DProjectVectorFEQuad4() { LOG_UNIT_TEST; test2DProjectVectorFE(QUAD4); }
+  void test2DProjectVectorFETri6() { LOG_UNIT_TEST; test2DProjectVectorFE(TRI6); }
+  void test2DProjectVectorFETri7() { LOG_UNIT_TEST; test2DProjectVectorFE(TRI7); }
+  void test2DProjectVectorFEQuad8() { LOG_UNIT_TEST; test2DProjectVectorFE(QUAD8); }
+  void test2DProjectVectorFEQuad9() { LOG_UNIT_TEST; test2DProjectVectorFE(QUAD9); }
+  void test3DProjectVectorFETet4() { LOG_UNIT_TEST; test3DProjectVectorFE(TET4); }
+  void test3DProjectVectorFEHex8() { LOG_UNIT_TEST; test3DProjectVectorFE(HEX8); }
+  void test3DProjectVectorFETet10() { LOG_UNIT_TEST; test3DProjectVectorFE(TET10); }
+  void test3DProjectVectorFETet14() { LOG_UNIT_TEST; test3DProjectVectorFE(TET14); }
+  void test3DProjectVectorFEHex20() { LOG_UNIT_TEST; test3DProjectVectorFE(HEX20); }
+  void test3DProjectVectorFEHex27() { LOG_UNIT_TEST; test3DProjectVectorFE(HEX27); }
 
 #ifdef LIBMESH_ENABLE_AMR
 #ifdef LIBMESH_HAVE_METAPHYSICL
 #ifdef LIBMESH_HAVE_PETSC
   // projection matrix tests
-  void testProjectMatrixEdge2() { testProjectMatrix1D(EDGE2); }
-  void testProjectMatrixQuad4() { testProjectMatrix2D(QUAD4); }
-  void testProjectMatrixTri3() { testProjectMatrix2D(TRI3); }
-  void testProjectMatrixHex8() { testProjectMatrix3D(HEX8); }
-  void testProjectMatrixTet4() { testProjectMatrix3D(TET4); }
+  void testProjectMatrixEdge2() { LOG_UNIT_TEST; testProjectMatrix1D(EDGE2); }
+  void testProjectMatrixQuad4() { LOG_UNIT_TEST; testProjectMatrix2D(QUAD4); }
+  void testProjectMatrixTri3() { LOG_UNIT_TEST; testProjectMatrix2D(TRI3); }
+  void testProjectMatrixHex8() { LOG_UNIT_TEST; testProjectMatrix3D(HEX8); }
+  void testProjectMatrixTet4() { LOG_UNIT_TEST; testProjectMatrix3D(TET4); }
 #endif // LIBMESH_HAVE_PETSC
 #endif // LIBMESH_HAVE_METAPHYSICL
 #endif // LIBMESH_ENABLE_AMR

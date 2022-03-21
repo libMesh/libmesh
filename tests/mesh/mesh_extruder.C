@@ -18,7 +18,7 @@ class MeshExtruderTest : public CppUnit::TestCase
    * ID and the current layer and assert the proper values.
    */
 public:
-  CPPUNIT_TEST_SUITE( MeshExtruderTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( MeshExtruderTest );
 
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testExtruder );
@@ -45,6 +45,8 @@ public:
 
   void testExtruder()
   {
+    LOG_UNIT_TEST;
+
     ReplicatedMesh src_mesh(*TestCommWorld, /*dim=*/2);
 
     const unsigned int n_elems_per_side = 4;

@@ -30,7 +30,7 @@ Number cubic_default_coupling_test (const Point& p,
 
 class DefaultCouplingTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( DefaultCouplingTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( DefaultCouplingTest );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testCouplingOnEdge3 );
@@ -54,6 +54,8 @@ public:
 
   void testCoupling(const ElemType elem_type)
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
 
     EquationSystems es(mesh);
@@ -145,10 +147,10 @@ public:
 
 
 
-  void testCouplingOnEdge3() { testCoupling(EDGE3); }
-  void testCouplingOnQuad9() { testCoupling(QUAD9); }
-  void testCouplingOnTri6()  { testCoupling(TRI6); }
-  void testCouplingOnHex27() { testCoupling(HEX27); }
+  void testCouplingOnEdge3() { LOG_UNIT_TEST; testCoupling(EDGE3); }
+  void testCouplingOnQuad9() { LOG_UNIT_TEST; testCoupling(QUAD9); }
+  void testCouplingOnTri6()  { LOG_UNIT_TEST; testCoupling(TRI6); }
+  void testCouplingOnHex27() { LOG_UNIT_TEST; testCoupling(HEX27); }
 
 };
 

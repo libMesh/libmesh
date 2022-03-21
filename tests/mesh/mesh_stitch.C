@@ -15,7 +15,7 @@ using namespace libMesh;
 
 class MeshStitchTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( MeshStitchTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( MeshStitchTest );
 
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testMeshStitch );
@@ -52,6 +52,8 @@ public:
 
   void testBoundaryInfo()
   {
+    LOG_UNIT_TEST;
+
     ReplicatedMesh mesh0(*TestCommWorld), mesh1(*TestCommWorld);
 
     int ps = 2;
@@ -106,6 +108,8 @@ public:
 
   void testMeshStitch ()
   {
+    LOG_UNIT_TEST;
+
     // Generate four meshes to be stitched together
     ReplicatedMesh mesh0(*TestCommWorld),
                    mesh1(*TestCommWorld),

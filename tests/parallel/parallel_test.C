@@ -8,7 +8,7 @@ using namespace libMesh;
 
 class ParallelTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( ParallelTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( ParallelTest );
 
   CPPUNIT_TEST( testGather );
   CPPUNIT_TEST( testAllGather );
@@ -65,6 +65,8 @@ public:
 
   void testGather()
   {
+    LOG_UNIT_TEST;
+
     std::vector<processor_id_type> vals;
     TestCommWorld->gather(0,cast_int<processor_id_type>(TestCommWorld->rank()),vals);
 
@@ -77,6 +79,8 @@ public:
 
   void testGatherString()
   {
+    LOG_UNIT_TEST;
+
     std::vector<std::string> vals;
     TestCommWorld->gather(0, "Processor" + _number[TestCommWorld->rank() % 10], vals);
 
@@ -89,6 +93,8 @@ public:
 
   void testAllGather()
   {
+    LOG_UNIT_TEST;
+
     std::vector<processor_id_type> vals;
     TestCommWorld->allgather(cast_int<processor_id_type>(TestCommWorld->rank()),vals);
 
@@ -100,6 +106,8 @@ public:
 
   void testAllGatherString()
   {
+    LOG_UNIT_TEST;
+
     std::vector<std::string> vals;
     TestCommWorld->gather(0, "Processor" + _number[TestCommWorld->rank() % 10], vals);
 
@@ -111,6 +119,8 @@ public:
 
   void testAllGatherVectorString()
   {
+    LOG_UNIT_TEST;
+
     std::vector<std::string> vals;
     vals.push_back("Processor" + _number[TestCommWorld->rank() % 10] + "A");
     vals.push_back("Processor" + _number[TestCommWorld->rank() % 10] + "B");
@@ -127,6 +137,8 @@ public:
 
   void testAllGatherEmptyVectorString()
   {
+    LOG_UNIT_TEST;
+
     std::vector<std::string> vals;
     TestCommWorld->allgather(vals);
 
@@ -137,6 +149,8 @@ public:
 
   void testAllGatherHalfEmptyVectorString()
   {
+    LOG_UNIT_TEST;
+
     std::vector<std::string> vals;
 
     if (!TestCommWorld->rank())
@@ -151,6 +165,8 @@ public:
 
   void testBroadcast()
   {
+    LOG_UNIT_TEST;
+
     // Workaround for spurious warning from operator=
     // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100366
     std::vector<unsigned int> src{0,1,2}, dest(3,0);
@@ -168,6 +184,8 @@ public:
 
   void testBroadcastNestedType()
   {
+    LOG_UNIT_TEST;
+
     using std::pair;
     typedef pair<pair<pair<pair<int, int>, int>, int>, int> pppp;
     std::vector<pppp> src(3), dest(3);
@@ -209,6 +227,8 @@ public:
 
   void testScatter()
   {
+    LOG_UNIT_TEST;
+
     // Test Scalar scatter
     {
       std::vector<processor_id_type> src;
@@ -300,6 +320,8 @@ public:
 
   void testBarrier()
   {
+    LOG_UNIT_TEST;
+
     TestCommWorld->barrier();
   }
 
@@ -307,6 +329,8 @@ public:
 
   void testMin ()
   {
+    LOG_UNIT_TEST;
+
     unsigned int min = TestCommWorld->rank();
 
     TestCommWorld->min(min);
@@ -318,6 +342,8 @@ public:
 
   void testMax ()
   {
+    LOG_UNIT_TEST;
+
     processor_id_type max = TestCommWorld->rank();
 
     TestCommWorld->max(max);
@@ -330,6 +356,8 @@ public:
 
   void testMinloc ()
   {
+    LOG_UNIT_TEST;
+
     int min = (TestCommWorld->rank() + 1) % TestCommWorld->size();
     unsigned int minid = 0;
 
@@ -343,6 +371,8 @@ public:
 
   void testMaxloc ()
   {
+    LOG_UNIT_TEST;
+
     int max = TestCommWorld->rank();
     unsigned int maxid = 0;
 
@@ -357,6 +387,8 @@ public:
 
   void testMinlocReal ()
   {
+    LOG_UNIT_TEST;
+
     Real min = (TestCommWorld->rank() + 1) % TestCommWorld->size();
     unsigned int minid = 0;
 
@@ -370,6 +402,8 @@ public:
 
   void testMaxlocReal ()
   {
+    LOG_UNIT_TEST;
+
     Real max = TestCommWorld->rank();
     unsigned int maxid = 0;
 
@@ -384,6 +418,8 @@ public:
 
   void testInfinityMin ()
   {
+    LOG_UNIT_TEST;
+
     double min = std::numeric_limits<double>::infinity();
 
     TestCommWorld->min(min);
@@ -401,6 +437,8 @@ public:
 
   void testInfinityMax ()
   {
+    LOG_UNIT_TEST;
+
     double max = std::numeric_limits<double>::infinity();
 
     TestCommWorld->max(max);
@@ -418,6 +456,8 @@ public:
 
   void testIsendRecv ()
   {
+    LOG_UNIT_TEST;
+
     unsigned int procup = (TestCommWorld->rank() + 1) %
       TestCommWorld->size();
     unsigned int procdown = (TestCommWorld->size() +
@@ -479,6 +519,8 @@ public:
 
   void testIrecvSend ()
   {
+    LOG_UNIT_TEST;
+
     unsigned int procup = (TestCommWorld->rank() + 1) %
       TestCommWorld->size();
     unsigned int procdown = (TestCommWorld->size() +
@@ -539,6 +581,8 @@ public:
 
   void testRecvIsendSets ()
   {
+    LOG_UNIT_TEST;
+
     unsigned int procup = (TestCommWorld->rank() + 1) %
       TestCommWorld->size();
     unsigned int procdown = (TestCommWorld->size() +
@@ -577,6 +621,8 @@ public:
 
   void testRecvIsendVecVecs ()
   {
+    LOG_UNIT_TEST;
+
     unsigned int procup = (TestCommWorld->rank() + 1) %
       TestCommWorld->size();
     unsigned int procdown = (TestCommWorld->size() +
@@ -616,6 +662,8 @@ public:
 
   void testSendRecvVecVecs ()
   {
+    LOG_UNIT_TEST;
+
     unsigned int procup = (TestCommWorld->rank() + 1) %
       TestCommWorld->size();
     unsigned int procdown = (TestCommWorld->size() +
@@ -658,6 +706,8 @@ public:
 
   void testSemiVerify ()
   {
+    LOG_UNIT_TEST;
+
     double inf = std::numeric_limits<double>::infinity();
 
     double *infptr = TestCommWorld->rank()%2 ? NULL : &inf;
@@ -672,6 +722,8 @@ public:
 
   void testSplit ()
   {
+    LOG_UNIT_TEST;
+
     Parallel::Communicator subcomm;
     unsigned int rank = TestCommWorld->rank();
     unsigned int color = rank % 2;
@@ -685,6 +737,8 @@ public:
 
   void testSplitByType ()
   {
+    LOG_UNIT_TEST;
+
     Parallel::Communicator subcomm;
     unsigned int rank = TestCommWorld->rank();
     Parallel::info i = 0;

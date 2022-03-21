@@ -160,7 +160,7 @@ const boundary_id_type side_id   = 70;
 
 class PeriodicBCTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( PeriodicBCTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( PeriodicBCTest );
 
 #if LIBMESH_DIM > 1
 #if defined(LIBMESH_HAVE_SOLVER) && defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_GZSTREAM)
@@ -250,7 +250,7 @@ private:
   }
 
 
-  void testPeriodicLagrange2() { testPeriodicBC(FEType(SECOND, LAGRANGE)); }
+  void testPeriodicLagrange2() { LOG_UNIT_TEST; testPeriodicBC(FEType(SECOND, LAGRANGE)); }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( PeriodicBCTest );

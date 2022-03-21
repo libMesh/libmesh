@@ -9,7 +9,7 @@ using namespace libMesh;
 
 class ParametersTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( ParametersTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( ParametersTest );
 
   CPPUNIT_TEST( testInt );
   CPPUNIT_TEST( testFloat );
@@ -47,6 +47,8 @@ public:
 
   void testMap ()
   {
+    LOG_UNIT_TEST;
+
     Parameters param;
 
     std::map<int, std::string> m;
@@ -61,9 +63,9 @@ public:
     CPPUNIT_ASSERT_EQUAL(gotten.at(4), std::string("four"));
   }
 
-  void testInt () { testScalar<int>(); }
-  void testFloat () { testScalar<float>(); }
-  void testDouble () { testScalar<double>(); }
+  void testInt () { LOG_UNIT_TEST; testScalar<int>(); }
+  void testFloat () { LOG_UNIT_TEST; testScalar<float>(); }
+  void testDouble () { LOG_UNIT_TEST; testScalar<double>(); }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( ParametersTest );

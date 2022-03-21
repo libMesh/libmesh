@@ -114,7 +114,7 @@ public:
     mesh.reset();
   }
 
-  CPPUNIT_TEST_SUITE(ParsedFEMFunctionTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(ParsedFEMFunctionTest);
 
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST(testValues);
@@ -138,6 +138,8 @@ private:
 
   void testValues()
   {
+    LOG_UNIT_TEST;
+
     if (c->has_elem() &&
         c->get_elem().processor_id() == TestCommWorld->rank())
       {
@@ -165,6 +167,8 @@ private:
 
   void testGradients()
   {
+    LOG_UNIT_TEST;
+
     if (c->has_elem() &&
         c->get_elem().processor_id() == TestCommWorld->rank())
       {
@@ -194,6 +198,8 @@ private:
 
   void testHessians()
   {
+    LOG_UNIT_TEST;
+
     if (c->has_elem() &&
         c->get_elem().processor_id() == TestCommWorld->rank())
       {
@@ -216,6 +222,8 @@ private:
 
   void testInlineGetter()
   {
+    LOG_UNIT_TEST;
+
     if (c->has_elem() &&
         c->get_elem().processor_id() == TestCommWorld->rank())
       {
@@ -243,6 +251,8 @@ private:
 
   void testInlineSetter()
   {
+    LOG_UNIT_TEST;
+
     if (c->has_elem() &&
         c->get_elem().processor_id() == TestCommWorld->rank())
       {
@@ -274,6 +284,8 @@ private:
 
   void testNormals()
   {
+    LOG_UNIT_TEST;
+
     if (s->has_elem() &&
         s->get_elem().processor_id() == TestCommWorld->rank())
       {

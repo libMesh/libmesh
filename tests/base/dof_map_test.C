@@ -45,7 +45,7 @@ public:
 
 class DofMapTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( DofMapTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( DofMapTest );
 
   CPPUNIT_TEST( testDofOwnerOnEdge3 );
 #if LIBMESH_DIM > 1
@@ -108,14 +108,15 @@ public:
 
 
 
-  void testDofOwnerOnEdge3() { testDofOwner(EDGE3); }
-  void testDofOwnerOnQuad9() { testDofOwner(QUAD9); }
-  void testDofOwnerOnTri6()  { testDofOwner(TRI6); }
-  void testDofOwnerOnHex27() { testDofOwner(HEX27); }
+  void testDofOwnerOnEdge3() { LOG_UNIT_TEST; testDofOwner(EDGE3); }
+  void testDofOwnerOnQuad9() { LOG_UNIT_TEST; testDofOwner(QUAD9); }
+  void testDofOwnerOnTri6()  { LOG_UNIT_TEST; testDofOwner(TRI6); }
+  void testDofOwnerOnHex27() { LOG_UNIT_TEST; testDofOwner(HEX27); }
 
 #if defined(LIBMESH_ENABLE_CONSTRAINTS) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   void testConstraintLoopDetection()
   {
+    LOG_UNIT_TEST;
     Mesh mesh(*TestCommWorld);
 
     EquationSystems es(mesh);

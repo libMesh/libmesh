@@ -13,6 +13,11 @@ using namespace libMesh;
 
 class RealVectorValueTest : public TypeVectorTestBase<VectorValue<Real>> {
 public:
+  RealVectorValueTest() :
+    TypeVectorTestBase<VectorValue<Real>>() {
+    this->libmesh_suite_name = "RealVectorValueTest";
+  }
+
   CPPUNIT_TEST_SUITE( RealVectorValueTest );
 
   VECTORVALUETEST
@@ -22,6 +27,11 @@ public:
 
 class NumberVectorValueTest : public TypeVectorTestBase<VectorValue<Number>> {
 public:
+  NumberVectorValueTest() :
+    TypeVectorTestBase<VectorValue<Number>>() {
+    this->libmesh_suite_name = "NumberVectorValueTest";
+  }
+
   CPPUNIT_TEST_SUITE( NumberVectorValueTest );
 
   VECTORVALUETEST
@@ -31,7 +41,12 @@ public:
 
 class ComplexVectorValueTest : public TypeVectorTestBase<VectorValue<Complex>> {
 public:
-  CPPUNIT_TEST_SUITE( NumberVectorValueTest );
+  ComplexVectorValueTest() :
+    TypeVectorTestBase<VectorValue<Complex>>() {
+    this->libmesh_suite_name = "ComplexVectorValueTest";
+  }
+
+  LIBMESH_CPPUNIT_TEST_SUITE( NumberVectorValueTest );
 
   VECTORVALUETEST
 
@@ -40,7 +55,7 @@ public:
 
 class VectorCompareTypesTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( VectorCompareTypesTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( VectorCompareTypesTest );
 
   CPPUNIT_TEST( testCompareTypes );
 
@@ -58,6 +73,8 @@ public:
   void
   testCompareTypes()
     {
+    LOG_UNIT_TEST;
+
       VectorValue<float> fvec;
       VectorValue<double> dvec;
 

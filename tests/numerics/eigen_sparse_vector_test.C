@@ -21,6 +21,11 @@ public:
     delete my_comm;
   }
 
+  EigenSparseVectorTest() :
+    NumericVectorTest<EigenSparseVector<Number>>() {
+    this->libmesh_suite_name = "EigenSparseVectorTest";
+  }
+
   CPPUNIT_TEST_SUITE( EigenSparseVectorTest );
 
   NUMERICVECTORTEST

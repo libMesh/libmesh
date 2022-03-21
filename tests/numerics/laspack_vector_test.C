@@ -22,6 +22,11 @@ public:
     delete my_comm;
   }
 
+  LaspackVectorTest() :
+    NumericVectorTest<LaspackVector<Number>>() {
+    this->libmesh_suite_name = "LaspackVectorTest";
+  }
+
   CPPUNIT_TEST_SUITE( LaspackVectorTest );
 
   NUMERICVECTORTEST

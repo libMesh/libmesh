@@ -21,7 +21,7 @@ class WriteEdgesetData : public CppUnit::TestCase
    * This test ensures you can write both vector and scalar variables
    */
 public:
-  CPPUNIT_TEST_SUITE(WriteEdgesetData);
+  LIBMESH_CPPUNIT_TEST_SUITE(WriteEdgesetData);
 
 #if LIBMESH_DIM > 1
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -106,11 +106,15 @@ public:
 
   void testWriteExodus()
   {
+    LOG_UNIT_TEST;
+
     testWriteImpl<ExodusII_IO>("write_edgeset_data.e");
   }
 
   void testWriteNemesis()
   {
+    // LOG_UNIT_TEST;
+
     // FIXME: Not yet implemented
     // testWriteImpl<Nemesis_IO>("write_edgeset_data.n");
   }

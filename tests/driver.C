@@ -6,6 +6,8 @@
 
 // libMesh includes
 #include <libmesh/libmesh.h>
+
+#include "libmesh_cppunit.h"
 #include "test_comm.h"
 
 #ifdef LIBMESH_HAVE_CXX11_REGEX
@@ -113,11 +115,19 @@ int main(int argc, char ** argv)
   runner.addTest(registry.makeTest());
 #endif
 
-  // Finally, run the matching tests.
-  if (runner.run())
-    return 0;
+  // See how long each of our tests are taking to run.  This should be
+  // coarse-grained enough to enable even if we're not performance
+  // logging inside the library itself.
+  libMesh::PerfLog driver_unitlog ("Unit Tests");
+  unitlog = &driver_unitlog;
 
-  return 1;
+  // Actually run all the requested tests.
+  bool succeeded = runner.run();
+
+  // 1 for failure, 0 for success
+  return !succeeded;
 }
 
-libMesh::Parallel::Communicator *TestCommWorld;
+libMesh::Parallel::Communicator * TestCommWorld;
+
+libMesh::PerfLog * unitlog;

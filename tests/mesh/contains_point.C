@@ -15,7 +15,7 @@ class ContainsPointTest : public CppUnit::TestCase
    * the specializes contains_point implementation in TRI3.
    */
 public:
-  CPPUNIT_TEST_SUITE( ContainsPointTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( ContainsPointTest );
 
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testContainsPointTri3 );
@@ -32,6 +32,8 @@ public:
   // TRI3 test
   void testContainsPointTri3()
   {
+    LOG_UNIT_TEST;
+
     Point a(3,1,2), b(1,2,3), c(2,3,1);
     containsPointTri3Helper(a, b, c, a);
 
@@ -50,6 +52,8 @@ public:
   // TET4 test
   void testContainsPointTet4()
   {
+    LOG_UNIT_TEST;
+
     // Construct unit Tet.
     {
       Node zero  (0., 0., 0., 0);

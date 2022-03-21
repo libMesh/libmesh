@@ -1,8 +1,14 @@
+
+#ifndef LIBMESH_LIBMESH_CPPUNIT_H
+#define LIBMESH_LIBMESH_CPPUNIT_H
+
 // Ignore unused parameter warnings coming from cppunit headers
 #include <libmesh/ignore_warnings.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 #include <libmesh/restore_warnings.h>
+
+#include <libmesh/libmesh_logging.h>
 
 #if defined(LIBMESH_DEFAULT_QUADRUPLE_PRECISION) || \
     defined(LIBMESH_DEFAULT_TRIPLE_PRECISION)
@@ -31,3 +37,46 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif // GCC > 4.5
 #endif // __GNUC__ && !__INTEL_COMPILER
+
+
+extern libMesh::PerfLog * unitlog;
+
+// Our regular libMesh::PerfItem uses fast_push/pop, so doesn't work
+// well with strings like TestCase::getName() that get destructed
+// before we're done printing logs.  Per-unit-test timings are
+// coarse-grained so we can enable them regardless of --enable-perflog
+// setting.
+class UnitPerfItem
+{
+public:
+  UnitPerfItem(std::string label,
+               std::string header,
+               libMesh::PerfLog & my_perflog) :
+    _label(std::move(label)),
+    _header(std::move(header)),
+    _perflog(my_perflog)
+  {
+    _perflog.push(_label, _header);
+  }
+
+  ~UnitPerfItem()
+  {
+    _perflog.pop(_label, _header);
+  }
+
+private:
+  const std::string _label;
+  const std::string _header;
+  libMesh::PerfLog & _perflog;
+};
+
+#define LIBMESH_CPPUNIT_TEST_SUITE(ATestFixtureType) \
+  protected: \
+  std::string libmesh_suite_name = #ATestFixtureType; \
+  CPPUNIT_TEST_SUITE(ATestFixtureType)
+
+
+#define LOG_UNIT_TEST UnitPerfItem TOKENPASTE2(perf_item_, __LINE__)(__func__,this->libmesh_suite_name,*unitlog)
+
+
+#endif // LIBMESH_LIBMESH_CPPUNIT_H

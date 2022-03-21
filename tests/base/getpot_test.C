@@ -11,7 +11,7 @@ using namespace libMesh;
 class GetPotTest : public CppUnit::TestCase {
 
 public:
-  CPPUNIT_TEST_SUITE( GetPotTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( GetPotTest );
 
   CPPUNIT_TEST( testVariables );
   CPPUNIT_TEST( testSections );
@@ -75,6 +75,7 @@ public:
 
   void testVariables()
   {
+    LOG_UNIT_TEST;
     CPPUNIT_ASSERT( input.have_variable("Section1/var1") );
     Real var1 = input("Section1/var1", 1.0);
     CPPUNIT_ASSERT_EQUAL( var1, Real(5));
@@ -108,6 +109,7 @@ public:
 
   void testSections()
   {
+    LOG_UNIT_TEST;
     // GetPot stores the '/' at the end of each section name
     CPPUNIT_ASSERT(input.have_section("Section1/"));
     CPPUNIT_ASSERT(input.have_section("Section1/SubSection1/"));
@@ -127,6 +129,7 @@ public:
 
   void testSubSections()
   {
+    LOG_UNIT_TEST;
     typedef std::vector<std::string>::size_type sz;
     typedef std::string str;
 
@@ -167,6 +170,7 @@ public:
 
   void testCommandLine()
   {
+    LOG_UNIT_TEST;
     // Test whether the new dash/underscore agnosticism works
     //
     // This means the unit_tests-foo executable *must* be run with

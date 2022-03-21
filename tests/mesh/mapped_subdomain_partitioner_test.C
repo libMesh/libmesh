@@ -18,7 +18,7 @@ class MappedSubdomainPartitionerTest : public CppUnit::TestCase
    * MappedSubdomainPartitioner on different numbers of processors.
    */
 public:
-  CPPUNIT_TEST_SUITE( MappedSubdomainPartitionerTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( MappedSubdomainPartitionerTest );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMappedSubdomainPartitioner );
@@ -37,6 +37,8 @@ public:
 
   void testMappedSubdomainPartitioner()
   {
+    LOG_UNIT_TEST;
+
     ReplicatedMesh mesh(*TestCommWorld, /*dim=*/2);
 
     Real

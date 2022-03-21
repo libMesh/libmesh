@@ -14,7 +14,7 @@ using namespace libMesh;
 
 class PointLocatorTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( PointLocatorTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( PointLocatorTest );
 
   CPPUNIT_TEST( testLocatorOnEdge3 );
 #if LIBMESH_DIM > 1
@@ -109,6 +109,8 @@ public:
 
   void testPlanar()
   {
+    LOG_UNIT_TEST;
+
     // Here we test locating points in a Mesh which lies slightly above the z-axis
     Mesh mesh(*TestCommWorld);
 
@@ -147,10 +149,10 @@ public:
       CPPUNIT_ASSERT(elem->contains_point(p));
   }
 
-  void testLocatorOnEdge3() { testLocator(EDGE3); }
-  void testLocatorOnQuad9() { testLocator(QUAD9); }
-  void testLocatorOnTri6()  { testLocator(TRI6); }
-  void testLocatorOnHex27() { testLocator(HEX27); }
+  void testLocatorOnEdge3() { LOG_UNIT_TEST; testLocator(EDGE3); }
+  void testLocatorOnQuad9() { LOG_UNIT_TEST; testLocator(QUAD9); }
+  void testLocatorOnTri6()  { LOG_UNIT_TEST; testLocator(TRI6); }
+  void testLocatorOnHex27() { LOG_UNIT_TEST; testLocator(HEX27); }
 
 };
 

@@ -19,7 +19,7 @@ using namespace libMesh;
 class WriteNodesetData : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE(WriteNodesetData);
+  LIBMESH_CPPUNIT_TEST_SUITE(WriteNodesetData);
 
 #if LIBMESH_DIM > 1
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -183,11 +183,15 @@ public:
 
   void testWriteExodus()
   {
+    LOG_UNIT_TEST;
+
     testWriteImpl<ExodusII_IO>("write_nodeset_data.e");
   }
 
   void testWriteNemesis()
   {
+    LOG_UNIT_TEST;
+
     // FIXME: Not yet implemented
     // testWriteImpl<Nemesis_IO>("write_nodeset_data.n");
   }

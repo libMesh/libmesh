@@ -10,7 +10,7 @@ using namespace libMesh;
 
 class ParallelPointTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( ParallelPointTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( ParallelPointTest );
 
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testAllGatherPoint );
@@ -41,6 +41,8 @@ public:
 
   void testAllGatherPoint()
   {
+    LOG_UNIT_TEST;
+
     std::vector<Point> vals;
     Real myrank = TestCommWorld->rank();
     TestCommWorld->allgather(Point(myrank, myrank+0.25, myrank+0.5),vals);
@@ -61,6 +63,8 @@ public:
 
   void testAllGatherPairPointPoint()
   {
+    LOG_UNIT_TEST;
+
     std::vector<std::pair<Point, Point>> vals;
     Real myrank = TestCommWorld->rank();
     TestCommWorld->allgather
@@ -85,6 +89,8 @@ public:
 
   void testAllGatherPairRealPoint()
   {
+    LOG_UNIT_TEST;
+
     std::vector<std::pair<Real, Point>> vals;
     Real myrank = TestCommWorld->rank();
     TestCommWorld->allgather
@@ -132,12 +138,16 @@ public:
 
   void testMapUnionGradient()
   {
+    LOG_UNIT_TEST;
+
     testMapUnionVec<Gradient>();
   }
 
 
   void testMapUnionPoint()
   {
+    LOG_UNIT_TEST;
+
     testMapUnionVec<Point>();
   }
 
@@ -168,6 +178,8 @@ public:
 
   void testBroadcastVectorValueInt()
   {
+    LOG_UNIT_TEST;
+
     this->testBroadcastVectorValue<int>();
   }
 
@@ -175,6 +187,8 @@ public:
 
   void testBroadcastVectorValueReal()
   {
+    LOG_UNIT_TEST;
+
     this->testBroadcastVectorValue<Real>();
   }
 
@@ -182,6 +196,8 @@ public:
 
   void testBroadcastPoint()
   {
+    LOG_UNIT_TEST;
+
     std::vector<Point> src(3), dest(3);
 
     {
@@ -205,6 +221,8 @@ public:
 
   void testIsendRecv ()
   {
+    LOG_UNIT_TEST;
+
     unsigned int procup = (TestCommWorld->rank() + 1) %
       TestCommWorld->size();
     unsigned int procdown = (TestCommWorld->size() +
@@ -266,6 +284,8 @@ public:
 
   void testIrecvSend ()
   {
+    LOG_UNIT_TEST;
+
     unsigned int procup = (TestCommWorld->rank() + 1) %
       TestCommWorld->size();
     unsigned int procdown = (TestCommWorld->size() +

@@ -9,6 +9,11 @@ using namespace libMesh;
 
 class PetscVectorTest : public NumericVectorTest<PetscVector<Number>> {
 public:
+  PetscVectorTest() :
+    NumericVectorTest<PetscVector<Number>>() {
+    this->libmesh_suite_name = "PetscVectorTest";
+  }
+
   CPPUNIT_TEST_SUITE( PetscVectorTest );
 
   NUMERICVECTORTEST
@@ -19,6 +24,8 @@ public:
 
   void testGetArray()
   {
+    LOG_UNIT_TEST;
+
     unsigned int min_block_size  = 2;
 
     // a different size on each processor.
