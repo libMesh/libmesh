@@ -202,7 +202,10 @@ public:
   public:                                                                              \
   SideTest_##elemclass##_##sidetype##_##indexbegin##_##indexend() :                    \
     SideTest<elemclass,sidetype,indexbegin,indexend>() {                               \
-    this->libmesh_suite_name = "SideTest_" #elemclass"_" #sidetype "_" #indexbegin "_" #indexend; \
+    if (unitlog->summarized_logs_enabled())                                            \
+      this->libmesh_suite_name = "SideTest";                                           \
+    else                                                                               \
+      this->libmesh_suite_name = "SideTest_" #elemclass"_" #sidetype "_" #indexbegin "_" #indexend; \
   }                                                                                    \
   CPPUNIT_TEST_SUITE( SideTest_##elemclass##_##sidetype##_##indexbegin##_##indexend ); \
   SIDETEST                                                                             \

@@ -940,7 +940,10 @@ public:
   public:                                                               \
   FETest_##order##_##family##_##elemtype() :                            \
     FETest<order,family,elemtype>() {                                   \
-    this->libmesh_suite_name = "FETest_" #order "_" #family "_" #elemtype; \
+    if (unitlog->summarized_logs_enabled())                             \
+      this->libmesh_suite_name = "FETest";                              \
+    else                                                                \
+      this->libmesh_suite_name = "FETest_" #order "_" #family "_" #elemtype; \
   }                                                                     \
   CPPUNIT_TEST_SUITE( FETest_##order##_##family##_##elemtype );         \
   FETEST                                                                \

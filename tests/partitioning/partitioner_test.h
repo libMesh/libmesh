@@ -135,7 +135,10 @@ public:
   public:                                                                   \
   PartitionerTest_##partitionersubclass##_##meshclass() :                   \
     PartitionerTest<partitionersubclass,meshclass>() {                      \
-    this->libmesh_suite_name = "PartitionerTest_" #partitionersubclass "_" #meshclass; \
+    if (unitlog->summarized_logs_enabled())                                 \
+      this->libmesh_suite_name = "PartitionerTest";                         \
+    else                                                                    \
+      this->libmesh_suite_name = "PartitionerTest_" #partitionersubclass "_" #meshclass; \
   }                                                                         \
   CPPUNIT_TEST_SUITE( PartitionerTest_##partitionersubclass##_##meshclass); \
   PARTITIONERTEST                                                           \

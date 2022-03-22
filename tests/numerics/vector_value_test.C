@@ -15,7 +15,10 @@ class RealVectorValueTest : public TypeVectorTestBase<VectorValue<Real>> {
 public:
   RealVectorValueTest() :
     TypeVectorTestBase<VectorValue<Real>>() {
-    this->libmesh_suite_name = "RealVectorValueTest";
+    if (unitlog->summarized_logs_enabled())
+      this->libmesh_suite_name = "TypeVectorTest";
+    else
+      this->libmesh_suite_name = "RealVectorValueTest";
   }
 
   CPPUNIT_TEST_SUITE( RealVectorValueTest );

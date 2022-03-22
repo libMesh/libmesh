@@ -66,6 +66,18 @@ int main(int argc, char ** argv)
   libMesh::LibMeshInit init(argc, argv);
   TestCommWorld = &init.comm();
 
+  // See how long each of our tests are taking to run.  This should be
+  // coarse-grained enough to enable even if we're not performance
+  // logging inside the library itself.  We need to do this early, so
+  // we can query unitlog when first initializing tests.
+  libMesh::PerfLog driver_unitlog ("Unit Tests");
+  unitlog = &driver_unitlog;
+
+  // Print just logs summarized by test suite, not every test
+  // individually
+  if (!libMesh::on_command_line("--full-logs"))
+    driver_unitlog.enable_summarized_logs();
+
   // We can now run all tests that match a regular expression, for
   // example, "--re PartitionerTest" will match all the Partitioner
   // unit tests.  If the user does not specify a regex, we run all the
@@ -115,19 +127,8 @@ int main(int argc, char ** argv)
   runner.addTest(registry.makeTest());
 #endif
 
-  // See how long each of our tests are taking to run.  This should be
-  // coarse-grained enough to enable even if we're not performance
-  // logging inside the library itself.
-  libMesh::PerfLog driver_unitlog ("Unit Tests");
-  unitlog = &driver_unitlog;
-
   // Actually run all the requested tests.
   bool succeeded = runner.run();
-
-  // Print just logs summarized by test suite, not every test
-  // individually
-  if (!libMesh::on_command_line("--full-logs"))
-    driver_unitlog.enable_summarized_logs();
 
   // 1 for failure, 0 for success
   return !succeeded;

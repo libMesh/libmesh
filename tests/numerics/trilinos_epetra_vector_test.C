@@ -11,7 +11,10 @@ class EpetraVectorTest : public NumericVectorTest<EpetraVector<Real>> {
 public:
   EpetraVectorTest() :
     NumericVectorTest<EpetraVector<Number>>() {
-    this->libmesh_suite_name = "EpetraVectorTest";
+    if (unitlog->summarized_logs_enabled())
+      this->libmesh_suite_name = "NumericVectorTest";
+    else
+      this->libmesh_suite_name = "EpetraVectorTest";
   }
 
   CPPUNIT_TEST_SUITE( EpetraVectorTest );

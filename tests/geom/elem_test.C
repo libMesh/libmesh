@@ -331,7 +331,10 @@ public:
   public:                                                       \
   ElemTest_##elemtype() :                                       \
     ElemTest<elemtype>() {                                      \
-    this->libmesh_suite_name = "ElemTest_" #elemtype;           \
+    if (unitlog->summarized_logs_enabled())                     \
+      this->libmesh_suite_name = "ElemTest";                    \
+    else                                                        \
+      this->libmesh_suite_name = "ElemTest_" #elemtype;         \
   }                                                             \
   CPPUNIT_TEST_SUITE( ElemTest_##elemtype );                    \
   ELEMTEST;                                                     \

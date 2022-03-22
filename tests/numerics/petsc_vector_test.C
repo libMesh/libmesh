@@ -11,7 +11,10 @@ class PetscVectorTest : public NumericVectorTest<PetscVector<Number>> {
 public:
   PetscVectorTest() :
     NumericVectorTest<PetscVector<Number>>() {
-    this->libmesh_suite_name = "PetscVectorTest";
+    if (unitlog->summarized_logs_enabled())
+      this->libmesh_suite_name = "NumericVectorTest";
+    else
+      this->libmesh_suite_name = "PetscVectorTest";
   }
 
   CPPUNIT_TEST_SUITE( PetscVectorTest );

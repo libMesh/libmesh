@@ -789,7 +789,10 @@ public:
   public:                                                               \
   FESideTest_##order##_##family##_##elemtype() :                        \
     FESideTest<order,family,elemtype>() {                               \
-    this->libmesh_suite_name = "FESideTest_" #order "_" #family "_" #elemtype; \
+    if (unitlog->summarized_logs_enabled())                             \
+      this->libmesh_suite_name = "FESideTest";                          \
+    else                                                                \
+      this->libmesh_suite_name = "FESideTest_" #order "_" #family "_" #elemtype; \
   }                                                                     \
   CPPUNIT_TEST_SUITE( FESideTest_##order##_##family##_##elemtype );     \
   SIDEFETEST                                                            \

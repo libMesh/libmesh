@@ -165,7 +165,10 @@ public:
   public:                                                               \
   RationalMapTest_##elemtype() :                                        \
     RationalMapTest<elemtype>() {                                       \
-    this->libmesh_suite_name = "RationalMapTest_" #elemtype;            \
+    if (unitlog->summarized_logs_enabled())                             \
+      this->libmesh_suite_name = "RationalMapTest";                     \
+    else                                                                \
+      this->libmesh_suite_name = "RationalMapTest_" #elemtype;          \
   }                                                                     \
   CPPUNIT_TEST_SUITE( RationalMapTest_##elemtype );                     \
   CPPUNIT_TEST( testContainsPoint );                                    \

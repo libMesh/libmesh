@@ -24,7 +24,10 @@ public:
 
   LaspackVectorTest() :
     NumericVectorTest<LaspackVector<Number>>() {
-    this->libmesh_suite_name = "LaspackVectorTest";
+    if (unitlog->summarized_logs_enabled())
+      this->libmesh_suite_name = "NumericVectorTest";
+    else
+      this->libmesh_suite_name = "LaspackVectorTest";
   }
 
   CPPUNIT_TEST_SUITE( LaspackVectorTest );

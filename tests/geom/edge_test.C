@@ -154,7 +154,10 @@ public:
   public:                                                                              \
   EdgeTest_##elemclass##_##edgetype##_##indexbegin##_##indexend() :                    \
     EdgeTest<elemclass,edgetype,indexbegin,indexend>() {                               \
-    this->libmesh_suite_name = "EdgeTest_" #elemclass"_" #edgetype "_" #indexbegin "_" #indexend; \
+    if (unitlog->summarized_logs_enabled())                                            \
+      this->libmesh_suite_name = "EdgeTest";                                           \
+    else                                                                               \
+      this->libmesh_suite_name = "EdgeTest_" #elemclass"_" #edgetype "_" #indexbegin "_" #indexend; \
   }                                                                                    \
   CPPUNIT_TEST_SUITE( EdgeTest_##elemclass##_##edgetype##_##indexbegin##_##indexend ); \
   EDGETEST                                                                             \
