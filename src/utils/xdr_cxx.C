@@ -45,7 +45,7 @@
 namespace {
 
 // Nasty hacks for reading/writing zipped files
-void bzip_file (const std::string & unzipped_name)
+void bzip_file (std::string_view unzipped_name)
 {
 #ifdef LIBMESH_HAVE_BZIP
   LOG_SCOPE("system(bzip2)", "XdrIO");
@@ -59,7 +59,7 @@ void bzip_file (const std::string & unzipped_name)
 #endif
 }
 
-void xzip_file (const std::string & unzipped_name)
+void xzip_file (std::string_view unzipped_name)
 {
 #ifdef LIBMESH_HAVE_XZ
   LOG_SCOPE("system(xz)", "XdrIO");
@@ -75,7 +75,7 @@ void xzip_file (const std::string & unzipped_name)
 
 
 // remove an unzipped file
-void remove_unzipped_file (const std::string & name)
+void remove_unzipped_file (std::string_view name)
 {
   std::ostringstream pid_suffix;
   pid_suffix << '_' << getpid();
