@@ -485,7 +485,7 @@ std::string PerfLog::get_perf_info() const
   for (auto char_data : log)
     if (summarize_logs)
       {
-        string_log[std::make_pair(char_data.first.first,std::string())] +=
+        string_log[std::make_pair(std::string(), char_data.first.first)] +=
           char_data.second;
       }
     else
