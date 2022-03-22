@@ -37,7 +37,7 @@
 #include <sstream>
 #include <iomanip>
 #include <unordered_map>
-
+#include <algorithm> // std::all_of
 
 namespace {
 
@@ -1246,18 +1246,20 @@ UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & 
   if (!this->n_elem())
     return;
 
-  /*
-   * If the mesh is already second order
-   * then we have nothing to do.
-   * We have to test for this in a round-about way to avoid
-   * a bug on distributed parallel meshes with more processors
-   * than elements.
-   */
-  bool already_second_order = false;
-  if (range.begin() != range.end() &&
-      (*(range.begin()))->default_order() != FIRST)
-    already_second_order = true;
-  this->comm().max(already_second_order);
+  // If every element in the range _on every proc_ is already second
+  // order then we have nothing to do. However, if any proc has some
+  // first-order elements in the range, then _all_ processors need to
+  // continue this function because it is parallel_only().  Note:
+  // std::all_of() returns true for an empty range, which can happen
+  // for example in the DistributedMesh case when there are more
+  // processors than elements. In the case of an empty range we
+  // therefore set already_second_order to true on that proc.
+  bool already_second_order =
+    std::all_of(range.begin(), range.end(),
+                [](const auto & elem){ return elem->default_order() == SECOND; });
+
+  // Check with other processors and possibly return early
+  this->comm().min(already_second_order);
   if (already_second_order)
     return;
 
