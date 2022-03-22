@@ -96,7 +96,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // System class implementation
 void System::read_header (Xdr & io,
-                          const std::string & version,
+                          std::string_view version,
                           const bool read_header_in,
                           const bool read_additional_data,
                           const bool read_legacy_format)
@@ -1301,7 +1301,7 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
 
 
 void System::write_header (Xdr & io,
-                           const std::string & /* version is currently unused */,
+                           std::string_view /* version is currently unused */,
                            const bool write_additional_data) const
 {
   /**
