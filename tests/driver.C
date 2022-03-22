@@ -124,6 +124,11 @@ int main(int argc, char ** argv)
   // Actually run all the requested tests.
   bool succeeded = runner.run();
 
+  // Print just logs summarized by test suite, not every test
+  // individually
+  if (!libMesh::on_command_line("--full-logs"))
+    driver_unitlog.enable_summarized_logs();
+
   // 1 for failure, 0 for success
   return !succeeded;
 }
