@@ -297,8 +297,8 @@ public:
    * a very limited window of opportunity - after the user specifies variables
    * but before the system is initialized.
    */
-  void append (const std::string & var_name)
-  { _names.push_back (var_name); }
+  void append (std::string var_name)
+  { _names.push_back (std::move(var_name)); }
 
 protected:
   std::vector<std::string> _names;
