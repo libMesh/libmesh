@@ -216,8 +216,8 @@ void ExactSolution::attach_exact_hessian (unsigned int sys_num,
 }
 
 
-std::vector<Real> & ExactSolution::_check_inputs(const std::string & sys_name,
-                                                 const std::string & unknown_name)
+std::vector<Real> & ExactSolution::_check_inputs(std::string_view sys_name,
+                                                 std::string_view unknown_name)
 {
   // Return a reference to the proper error entry, or throw an error
   // if it doesn't exist.
@@ -227,8 +227,8 @@ std::vector<Real> & ExactSolution::_check_inputs(const std::string & sys_name,
 
 
 
-void ExactSolution::compute_error(const std::string & sys_name,
-                                  const std::string & unknown_name)
+void ExactSolution::compute_error(std::string_view sys_name,
+                                  std::string_view unknown_name)
 {
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
@@ -264,8 +264,8 @@ void ExactSolution::compute_error(const std::string & sys_name,
 
 
 
-Real ExactSolution::error_norm(const std::string & sys_name,
-                               const std::string & unknown_name,
+Real ExactSolution::error_norm(std::string_view sys_name,
+                               std::string_view unknown_name,
                                const FEMNormType & norm)
 {
   // Check the inputs for validity, and get a reference
@@ -333,8 +333,8 @@ Real ExactSolution::error_norm(const std::string & sys_name,
 
 
 
-Real ExactSolution::l2_error(const std::string & sys_name,
-                             const std::string & unknown_name)
+Real ExactSolution::l2_error(std::string_view sys_name,
+                             std::string_view unknown_name)
 {
 
   // Check the inputs for validity, and get a reference
@@ -353,8 +353,8 @@ Real ExactSolution::l2_error(const std::string & sys_name,
 
 
 
-Real ExactSolution::l1_error(const std::string & sys_name,
-                             const std::string & unknown_name)
+Real ExactSolution::l1_error(std::string_view sys_name,
+                             std::string_view unknown_name)
 {
 
   // Check the inputs for validity, and get a reference
@@ -373,8 +373,8 @@ Real ExactSolution::l1_error(const std::string & sys_name,
 
 
 
-Real ExactSolution::l_inf_error(const std::string & sys_name,
-                                const std::string & unknown_name)
+Real ExactSolution::l_inf_error(std::string_view sys_name,
+                                std::string_view unknown_name)
 {
 
   // Check the inputs for validity, and get a reference
@@ -393,8 +393,8 @@ Real ExactSolution::l_inf_error(const std::string & sys_name,
 
 
 
-Real ExactSolution::h1_error(const std::string & sys_name,
-                             const std::string & unknown_name)
+Real ExactSolution::h1_error(std::string_view sys_name,
+                             std::string_view unknown_name)
 {
   // If the user has supplied no exact derivative function, we
   // just integrate the H1 norm of the solution; i.e. its
@@ -410,23 +410,23 @@ Real ExactSolution::h1_error(const std::string & sys_name,
 }
 
 
-Real ExactSolution::hcurl_error(const std::string & sys_name,
-                                const std::string & unknown_name)
+Real ExactSolution::hcurl_error(std::string_view sys_name,
+                                std::string_view unknown_name)
 {
   return this->error_norm(sys_name,unknown_name,HCURL);
 }
 
 
-Real ExactSolution::hdiv_error(const std::string & sys_name,
-                               const std::string & unknown_name)
+Real ExactSolution::hdiv_error(std::string_view sys_name,
+                               std::string_view unknown_name)
 {
   return this->error_norm(sys_name,unknown_name,HDIV);
 }
 
 
 
-Real ExactSolution::h2_error(const std::string & sys_name,
-                             const std::string & unknown_name)
+Real ExactSolution::h2_error(std::string_view sys_name,
+                             std::string_view unknown_name)
 {
   // If the user has supplied no exact derivative functions, we
   // just integrate the H2 norm of the solution; i.e. its
@@ -448,8 +448,8 @@ Real ExactSolution::h2_error(const std::string & sys_name,
 
 
 template<typename OutputShape>
-void ExactSolution::_compute_error(const std::string & sys_name,
-                                   const std::string & unknown_name,
+void ExactSolution::_compute_error(std::string_view sys_name,
+                                   std::string_view unknown_name,
                                    std::vector<Real> & error_vals)
 {
   // Make sure we aren't "overconfigured"
@@ -828,7 +828,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 }
 
 // Explicit instantiations of templated member functions
-template LIBMESH_EXPORT void ExactSolution::_compute_error<Real>(const std::string &, const std::string &, std::vector<Real> &);
-template LIBMESH_EXPORT void ExactSolution::_compute_error<RealGradient>(const std::string &, const std::string &, std::vector<Real> &);
+template LIBMESH_EXPORT void ExactSolution::_compute_error<Real>(std::string_view, std::string_view, std::vector<Real> &);
+template LIBMESH_EXPORT void ExactSolution::_compute_error<RealGradient>(std::string_view, std::string_view, std::vector<Real> &);
 
 } // namespace libMesh
