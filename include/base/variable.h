@@ -56,12 +56,12 @@ public:
    * all subdomains.
    */
   Variable (System * sys,
-            const std::string & var_name,
+            std::string var_name,
             const unsigned int var_number,
             const unsigned int first_scalar_num,
             const FEType & var_type) :
     _sys(sys),
-    _name(var_name),
+    _name(std::move(var_name)),
     _active_subdomains(),
     _number(var_number),
     _first_scalar_number(first_scalar_num),
@@ -73,13 +73,13 @@ public:
    * indices for which this variable is active.
    */
   Variable (System * sys,
-            const std::string & var_name,
+            std::string var_name,
             const unsigned int var_number,
             const unsigned int first_scalar_num,
             const FEType & var_type,
             const std::set<subdomain_id_type> & var_active_subdomains) :
     _sys(sys),
-    _name(var_name),
+    _name(std::move(var_name)),
     _active_subdomains(var_active_subdomains),
     _number(var_number),
     _first_scalar_number(first_scalar_num),
@@ -190,7 +190,7 @@ public:
    * all subdomains.
    */
   VariableGroup (System * sys,
-                 const std::vector<std::string> & var_names,
+                 std::vector<std::string> var_names,
                  const unsigned int var_number,
                  const unsigned int first_scalar_num,
                  const FEType & var_type) :
@@ -199,7 +199,7 @@ public:
               var_number,
               first_scalar_num,
               var_type),
-    _names(var_names)
+    _names(std::move(var_names))
   {}
 
 
@@ -208,7 +208,7 @@ public:
    * indices for which this variable is active.
    */
   VariableGroup (System * sys,
-                 const std::vector<std::string> & var_names,
+                 std::vector<std::string> var_names,
                  const unsigned int var_number,
                  const unsigned int first_scalar_num,
                  const FEType & var_type,
@@ -220,7 +220,7 @@ public:
               first_scalar_num,
               var_type,
               var_active_subdomains),
-    _names(var_names)
+    _names(std::move(var_names))
   {}
 
   /**
