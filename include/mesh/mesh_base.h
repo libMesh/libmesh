@@ -1273,19 +1273,6 @@ public:
 
   /**
    * Converts a (conforming, non-refined) mesh with linear elements
-   * into a mesh with second-order elements.  For example, a mesh
-   * consisting of \p Tet4 will be converted to a mesh with \p Tet10
-   * etc.
-   *
-   * \note For some elements like \p Hex8 there exist two higher order
-   * equivalents, \p Hex20 and \p Hex27.  When \p full_ordered is \p
-   * true (default), then \p Hex27 is built.  Otherwise, \p Hex20 is
-   * built.  The same holds obviously for \p Quad4, \p Prism6, etc.
-   */
-  virtual void all_second_order (const bool full_ordered=true) = 0;
-
-  /**
-   * Converts a (conforming, non-refined) mesh with linear elements
    * into a mesh with "complete" order elements, i.e. elements which
    * can store degrees of freedom on any vertex, edge, or face.  For
    * example, a mesh consisting of \p Tet4 or \p Tet10 will be
@@ -1318,6 +1305,26 @@ public:
    */
   struct node_iterator;
   struct const_node_iterator;
+
+  /**
+   * Converts a set of this Mesh's elements defined by \p range from
+   * FIRST order to SECOND order. Must be called on conforming,
+   * non-refined meshes. For example, a mesh consisting of \p Tet4
+   * will be converted to a mesh with \p Tet10 etc.
+   *
+   * \note For some elements like \p Hex8 there exist two higher order
+   * equivalents, \p Hex20 and \p Hex27.  When \p full_ordered is \p
+   * true (default), then \p Hex27 is built.  Otherwise, \p Hex20 is
+   * built.  The same holds obviously for \p Quad4, \p Prism6, etc.
+   */
+  virtual void all_second_order_range(const SimpleRange<element_iterator> & range,
+                                      const bool full_ordered = true) = 0;
+
+  /**
+   * Calls the range-based version of this function with a range
+   * consisting of all elements in the mesh.
+   */
+  void all_second_order (const bool full_ordered = true);
 
   /**
    * In a few (very rare) cases, the user may have manually tagged the

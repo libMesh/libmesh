@@ -1221,12 +1221,14 @@ void UnstructuredMesh::all_first_order ()
 
 
 
-void UnstructuredMesh::all_second_order (const bool full_ordered)
+void
+UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & range,
+                                          const bool full_ordered)
 {
   // This function must be run on all processors at once
   parallel_object_only();
 
-  LOG_SCOPE("all_second_order()", "Mesh");
+  LOG_SCOPE("all_second_order_range()", "Mesh");
 
   /*
    * when the mesh is not prepared,
@@ -1252,8 +1254,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
    * than elements.
    */
   bool already_second_order = false;
-  if (this->elements_begin() != this->elements_end() &&
-      (*(this->elements_begin()))->default_order() != FIRST)
+  if (range.begin() != range.end() &&
+      (*(range.begin()))->default_order() != FIRST)
     already_second_order = true;
   this->comm().max(already_second_order);
   if (already_second_order)
@@ -1290,9 +1292,10 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 #endif
 
   /*
-   * for speed-up of the \p add_point() method, we
+   * For speed-up of the \p add_point() method, we
    * can reserve memory.  Guess the number of additional
-   * nodes for different dimensions
+   * nodes based on the element spatial dimensions and the
+   * total number of nodes in the mesh as an upper bound.
    */
   switch (this->mesh_dimension())
     {
@@ -1361,7 +1364,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
    * them with an equivalent second-order element.  Don't
    * forget to delete the low-order element, or else it will leak!
    */
-  for (auto & lo_elem : element_ptr_range())
+  for (auto & lo_elem : range)
     {
       // make sure it is linear order
       libmesh_error_msg_if(lo_elem->default_order() != FIRST,

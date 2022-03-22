@@ -137,7 +137,8 @@ public:
    * true (default), then \p Hex27 is built.  Otherwise, \p Hex20 is
    * built.  The same holds obviously for \p Quad4, \p Prism6, etc.
    */
-  virtual void all_second_order (const bool full_ordered=true) override;
+  virtual void all_second_order_range (const SimpleRange<element_iterator> & range,
+                                       const bool full_ordered=true) override;
 
   /**
    * Converts a (conforming, non-refined) mesh with linear elements
