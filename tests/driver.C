@@ -130,6 +130,12 @@ int main(int argc, char ** argv)
   // Actually run all the requested tests.
   bool succeeded = runner.run();
 
+  // Many users won't care at all about the PerfLog
+#ifndef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+  if (!libMesh::on_command_line("--full-logs"))
+    driver_unitlog.clear();
+#endif
+
   // 1 for failure, 0 for success
   return !succeeded;
 }
