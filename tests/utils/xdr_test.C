@@ -15,7 +15,7 @@ using namespace libMesh;
 
 class XdrTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( XdrTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( XdrTest );
 
   CPPUNIT_TEST( testDataVec );
   CPPUNIT_TEST( testDataStream );
@@ -33,6 +33,8 @@ public:
 
   void testDataVec ()
   {
+    LOG_UNIT_TEST;
+
     std::vector<Real> vec = {libMesh::pi, 2*libMesh::pi, 3*libMesh::pi};
 
     // There was once a weird bug mutating our TestCommWorld in
@@ -68,6 +70,8 @@ public:
 
   void testDataStream ()
   {
+    LOG_UNIT_TEST;
+
     std::vector<Real> vec(100);
     for (auto i : index_range(vec))
       vec[i] = static_cast<Real>(i+1) / vec.size();

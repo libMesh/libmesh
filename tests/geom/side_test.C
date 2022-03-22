@@ -53,6 +53,9 @@ private:
   ElemClass elem;
   std::vector<std::unique_ptr<Node>> nodes;
 
+protected:
+  std::string libmesh_suite_name;
+
 public:
   void setUp() {
     elem.set_id() = 0;
@@ -74,6 +77,8 @@ public:
 
   void testIsNodeOnSide()
   {
+    LOG_UNIT_TEST;
+
     for (auto s : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> side = elem.build_side_ptr(s);
@@ -102,6 +107,8 @@ public:
 
   void testNodesOnSide()
   {
+    LOG_UNIT_TEST;
+
     for (auto s : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> side = elem.build_side_ptr(s);
@@ -126,6 +133,8 @@ public:
 
   void testSidePtr()
   {
+    LOG_UNIT_TEST;
+
     for (auto s : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> side = elem.side_ptr(s);
@@ -137,6 +146,8 @@ public:
 
   void testSidePtrFill()
   {
+    LOG_UNIT_TEST;
+
     std::unique_ptr<Elem> side;
 
     for (auto s : make_range(indexbegin, indexend))
@@ -150,6 +161,8 @@ public:
 
   void testBuildSidePtr()
   {
+    LOG_UNIT_TEST;
+
     for (auto s : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> side = elem.build_side_ptr(s);
@@ -166,6 +179,8 @@ public:
 
   void testBuildSidePtrFill()
   {
+    LOG_UNIT_TEST;
+
     std::unique_ptr<Elem> side;
 
     for (auto s : make_range(indexbegin, indexend))
@@ -185,6 +200,13 @@ public:
   class SideTest_##elemclass##_##sidetype##_##indexbegin##_##indexend :                \
     public SideTest<elemclass, sidetype, indexbegin, indexend> {                       \
   public:                                                                              \
+  SideTest_##elemclass##_##sidetype##_##indexbegin##_##indexend() :                    \
+    SideTest<elemclass,sidetype,indexbegin,indexend>() {                               \
+    if (unitlog->summarized_logs_enabled())                                            \
+      this->libmesh_suite_name = "SideTest";                                           \
+    else                                                                               \
+      this->libmesh_suite_name = "SideTest_" #elemclass"_" #sidetype "_" #indexbegin "_" #indexend; \
+  }                                                                                    \
   CPPUNIT_TEST_SUITE( SideTest_##elemclass##_##sidetype##_##indexbegin##_##indexend ); \
   SIDETEST                                                                             \
   CPPUNIT_TEST_SUITE_END();                                                            \

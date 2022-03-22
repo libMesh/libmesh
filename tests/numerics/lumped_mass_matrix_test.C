@@ -16,7 +16,7 @@ using namespace libMesh;
 class LumpedMassMatrixTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE(LumpedMassMatrixTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(LumpedMassMatrixTest);
 
   CPPUNIT_TEST(testNumerics);
 
@@ -45,6 +45,8 @@ public:
 
   void testNumerics()
   {
+    LOG_UNIT_TEST;
+
     numeric_index_type beginning_index = _matrix->row_start();
     numeric_index_type end_index = _matrix->row_stop();
 

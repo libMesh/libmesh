@@ -16,7 +16,7 @@ class MeshSpatialDimensionTest : public CppUnit::TestCase
    * Mesh::spatial_dimension() implementation.
    */
 public:
-  CPPUNIT_TEST_SUITE( MeshSpatialDimensionTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( MeshSpatialDimensionTest );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( test1D );
@@ -38,6 +38,8 @@ public:
 
   void test1D()
   {
+    LOG_UNIT_TEST;
+
     // 1.) Test that build_line() produces a Mesh with spatial_dimension==1
     ReplicatedMesh mesh(*TestCommWorld);
     MeshTools::Generation::build_line (mesh, /*n_elem=*/2, /*xmin=*/0., /*xmax=*/1., EDGE2);
@@ -78,6 +80,8 @@ public:
 
   void test2D()
   {
+    LOG_UNIT_TEST;
+
     // 1.) Test that build_cube() produces a Mesh with spatial_dimension==2
     ReplicatedMesh mesh(*TestCommWorld);
     MeshTools::Generation::build_square (mesh,

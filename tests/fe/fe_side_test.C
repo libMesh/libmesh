@@ -123,6 +123,8 @@ public:
 
   void testU()
   {
+    LOG_UNIT_TEST;
+
     auto f = [this]() {
       Parameters dummy;
 
@@ -176,6 +178,8 @@ public:
 
   void testGradU()
   {
+    LOG_UNIT_TEST;
+
     auto f = [this]() {
       Parameters dummy;
 
@@ -308,6 +312,8 @@ public:
 
   void testGradUComp()
   {
+    LOG_UNIT_TEST;
+
     auto f = [this]() {
       Parameters dummy;
 
@@ -458,6 +464,8 @@ public:
 
   void testHessU()
   {
+    LOG_UNIT_TEST;
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     // Szabab elements don't have second derivatives yet
     if (family == SZABAB)
@@ -609,6 +617,8 @@ public:
 
   void testHessUComp()
   {
+    LOG_UNIT_TEST;
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     // Szabab elements don't have second derivatives yet
     if (family == SZABAB)
@@ -774,9 +784,16 @@ public:
 };
 
 
-#define INSTANTIATE_FESIDETEST(order, family, elemtype)                     \
+#define INSTANTIATE_FESIDETEST(order, family, elemtype)                 \
   class FESideTest_##order##_##family##_##elemtype : public FESideTest<order, family, elemtype> { \
   public:                                                               \
+  FESideTest_##order##_##family##_##elemtype() :                        \
+    FESideTest<order,family,elemtype>() {                               \
+    if (unitlog->summarized_logs_enabled())                             \
+      this->libmesh_suite_name = "FESideTest";                          \
+    else                                                                \
+      this->libmesh_suite_name = "FESideTest_" #order "_" #family "_" #elemtype; \
+  }                                                                     \
   CPPUNIT_TEST_SUITE( FESideTest_##order##_##family##_##elemtype );     \
   SIDEFETEST                                                            \
   CPPUNIT_TEST_SUITE_END();                                             \

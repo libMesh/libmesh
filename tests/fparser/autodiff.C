@@ -5,7 +5,7 @@
 class FParserAutodiffTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE ( FParserAutodiffTest );
+  LIBMESH_CPPUNIT_TEST_SUITE ( FParserAutodiffTest );
 
   CPPUNIT_TEST ( runTests );
   CPPUNIT_TEST ( registerDerivativeTest );
@@ -120,6 +120,8 @@ public:
 
   void runTests()
   {
+    LOG_UNIT_TEST;
+
     const unsigned int ntests = tests.size();
 
     unsigned int passed = 0;
@@ -131,6 +133,8 @@ public:
 
   void registerDerivativeTest()
   {
+    LOG_UNIT_TEST;
+
     FunctionParserAD R;
     std::string func = "x*a";
     R.SetADFlags(FunctionParserAD::ADCacheDerivatives, true);
@@ -171,6 +175,8 @@ public:
 
   void registerDerivativeRepeatTest()
   {
+    LOG_UNIT_TEST;
+
     // now do the same functional form but with a different mapping to see if the cache
     // signature was correctly updated
     FunctionParserAD R;

@@ -29,6 +29,8 @@ class NumericVectorTest : public CppUnit::TestCase {
 protected:
   libMesh::Parallel::Communicator *my_comm;
 
+  std::string libmesh_suite_name;
+
 public:
   void setUp()
   {
@@ -159,31 +161,43 @@ public:
 
   void testLocalize()
   {
+    LOG_UNIT_TEST;
+
     Localize<DerivedClass,DerivedClass>();
   }
 
   void testLocalizeBase()
   {
+    LOG_UNIT_TEST;
+
     Localize<libMesh::NumericVector<libMesh::Number>,DerivedClass>();
   }
 
   void testLocalizeToOne()
   {
+    LOG_UNIT_TEST;
+
     Localize<DerivedClass,DerivedClass >(true);
   }
 
   void testLocalizeToOneBase()
   {
+    LOG_UNIT_TEST;
+
     Localize<libMesh::NumericVector<libMesh::Number>,DerivedClass>(true);
   }
 
   void testLocalizeIndices()
   {
+    LOG_UNIT_TEST;
+
     LocalizeIndices<DerivedClass,DerivedClass >();
   }
 
   void testLocalizeIndicesBase()
   {
+    LOG_UNIT_TEST;
+
     LocalizeIndices<libMesh::NumericVector<libMesh::Number>,DerivedClass>();
   }
 };

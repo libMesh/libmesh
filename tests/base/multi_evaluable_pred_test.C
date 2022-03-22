@@ -60,7 +60,7 @@ protected:
 class MultiEvaluablePredTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE(MultiEvaluablePredTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(MultiEvaluablePredTest);
 
   CPPUNIT_TEST(test);
 
@@ -73,6 +73,7 @@ public:
 
   void test()
   {
+    LOG_UNIT_TEST;
     const auto rank = TestCommWorld->rank();
     Mesh mesh(*TestCommWorld);
     mesh.partitioner() = libmesh_make_unique<ContrivedPartitioner>();

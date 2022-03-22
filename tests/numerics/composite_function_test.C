@@ -18,7 +18,7 @@ public:
 
   void tearDown() {}
 
-  CPPUNIT_TEST_SUITE(CompositeFunctionTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(CompositeFunctionTest);
 
   CPPUNIT_TEST(testRemap);
 #if LIBMESH_DIM > 2
@@ -31,6 +31,8 @@ public:
 private:
   void testRemap()
   {
+    LOG_UNIT_TEST;
+
     std::vector<std::vector<unsigned int>> index_sets(4);
     index_sets[0].resize(2);
     index_sets[0][0] = 3;
@@ -111,6 +113,8 @@ private:
   void testTimeDependence()
   {
 #ifdef LIBMESH_HAVE_FPARSER
+    LOG_UNIT_TEST;
+
     // We'll test the order of adding these functions to
     // make sure time dependence gets detected/updated correctly
     // for each

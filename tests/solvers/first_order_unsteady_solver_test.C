@@ -73,7 +73,7 @@ class EulerSolverTest : public CppUnit::TestCase,
                         public ThetaSolverTestBase<EulerSolver>
 {
 public:
-  CPPUNIT_TEST_SUITE( EulerSolverTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( EulerSolverTest );
 
 #ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testEulerSolverConstantFirstOrderODE );
@@ -86,6 +86,8 @@ public:
 
   void testEulerSolverConstantFirstOrderODE()
   {
+    LOG_UNIT_TEST;
+
     this->set_theta(1.0);
     this->run_test_with_exact_soln<ConstantFirstOrderODE>(0.5,10);
 
@@ -95,6 +97,8 @@ public:
 
   void testEulerSolverLinearTimeFirstOrderODE()
   {
+    LOG_UNIT_TEST;
+
     // Need \theta = 0.5 since this has t in F.
     this->set_theta(0.5);
     this->run_test_with_exact_soln<LinearTimeFirstOrderODE>(0.5,10);
@@ -106,7 +110,7 @@ class Euler2SolverTest : public CppUnit::TestCase,
                          public ThetaSolverTestBase<Euler2Solver>
 {
 public:
-  CPPUNIT_TEST_SUITE( Euler2SolverTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( Euler2SolverTest );
 
 #ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testEuler2SolverConstantFirstOrderODE );
@@ -118,6 +122,8 @@ public:
 public:
   void testEuler2SolverConstantFirstOrderODE()
   {
+    LOG_UNIT_TEST;
+
     this->set_theta(1.0);
     this->run_test_with_exact_soln<ConstantFirstOrderODE>(0.5,10);
 
@@ -127,6 +133,8 @@ public:
 
   void testEuler2SolverLinearTimeFirstOrderODE()
   {
+    LOG_UNIT_TEST;
+
     // Need \theta = 0.5 since this has t in F.
     this->set_theta(0.5);
     this->run_test_with_exact_soln<LinearTimeFirstOrderODE>(0.5,10);

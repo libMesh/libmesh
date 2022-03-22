@@ -31,7 +31,7 @@ Number cubic_point_neighbor_coupling_test (const Point& p,
 
 class PointNeighborCouplingTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( PointNeighborCouplingTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( PointNeighborCouplingTest );
 
   CPPUNIT_TEST( testCouplingOnEdge3 );
 #if LIBMESH_DIM > 1
@@ -142,10 +142,10 @@ public:
 
 
 
-  void testCouplingOnEdge3() { testCoupling(EDGE3); }
-  void testCouplingOnQuad9() { testCoupling(QUAD9); }
-  void testCouplingOnTri6()  { testCoupling(TRI6); }
-  void testCouplingOnHex27() { testCoupling(HEX27); }
+  void testCouplingOnEdge3() { LOG_UNIT_TEST; testCoupling(EDGE3); }
+  void testCouplingOnQuad9() { LOG_UNIT_TEST; testCoupling(QUAD9); }
+  void testCouplingOnTri6()  { LOG_UNIT_TEST; testCoupling(TRI6); }
+  void testCouplingOnHex27() { LOG_UNIT_TEST; testCoupling(HEX27); }
 
 };
 

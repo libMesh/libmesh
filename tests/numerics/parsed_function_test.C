@@ -23,7 +23,7 @@ public:
 
   void tearDown() {}
 
-  CPPUNIT_TEST_SUITE(ParsedFunctionTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(ParsedFunctionTest);
 
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST(testValues);
@@ -39,6 +39,8 @@ private:
 
   void testValues()
   {
+    LOG_UNIT_TEST;
+
     // Test that we can copy these into vectors
     std::vector<ParsedFunction<Number>> pfvec;
 
@@ -59,6 +61,8 @@ private:
 
   void testInlineGetter()
   {
+    LOG_UNIT_TEST;
+
     ParsedFunction<Number> ax2("a:=4.5;a*x*2");
 
     // Test whether move assignment works.
@@ -86,6 +90,8 @@ private:
 
   void testInlineSetter()
   {
+    LOG_UNIT_TEST;
+
     ParsedFunction<Number> ax2("a:=4.5;a*x*2");
     ax2.set_inline_value("a", 2.5);
 
@@ -111,6 +117,8 @@ private:
 
   void testTimeDependence()
   {
+    LOG_UNIT_TEST;
+
     ParsedFunction<Number> no_t("x*2+y^2-tanh(z)+atan(x-y)");
     CPPUNIT_ASSERT(!no_t.is_time_dependent());
 

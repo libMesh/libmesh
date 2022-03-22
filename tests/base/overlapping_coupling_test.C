@@ -354,7 +354,7 @@ class OverlappingFunctorTest : public CppUnit::TestCase,
 {
 public:
 
-  CPPUNIT_TEST_SUITE( OverlappingFunctorTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( OverlappingFunctorTest );
 
 #ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( checkCouplingFunctorQuad );
@@ -503,7 +503,7 @@ class OverlappingAlgebraicGhostingTest : public CppUnit::TestCase,
                                          public OverlappingTestBase
 {
 public:
-  CPPUNIT_TEST_SUITE( OverlappingAlgebraicGhostingTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( OverlappingAlgebraicGhostingTest );
 
   CPPUNIT_TEST( testGhostingCouplingMatrix );
   CPPUNIT_TEST( testGhostingNullCouplingMatrix );
@@ -521,16 +521,19 @@ public:
 
   void testGhostingCouplingMatrix()
   {
+    LOG_UNIT_TEST;
     this->run_ghosting_test(0, true);
   }
 
   void testGhostingNullCouplingMatrix()
   {
+    LOG_UNIT_TEST;
     this->run_ghosting_test(0, false);
   }
 
   void testGhostingNullCouplingMatrixUnifRef()
   {
+    LOG_UNIT_TEST;
     std::unique_ptr<CouplingMatrix> coupling_matrix;
 
     this->run_ghosting_test(2, false);
@@ -620,7 +623,7 @@ class OverlappingCouplingGhostingTest : public CppUnit::TestCase,
                                         public OverlappingTestBase
 {
 public:
-  CPPUNIT_TEST_SUITE( OverlappingCouplingGhostingTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( OverlappingCouplingGhostingTest );
 
   CPPUNIT_TEST( testSparsityCouplingMatrix );
   CPPUNIT_TEST( testSparsityNullCouplingMatrix );
@@ -638,16 +641,19 @@ public:
 
   void testSparsityCouplingMatrix()
   {
+    LOG_UNIT_TEST;
     this->run_sparsity_pattern_test(0, true);
   }
 
   void testSparsityNullCouplingMatrix()
   {
+    LOG_UNIT_TEST;
     this->run_sparsity_pattern_test(0, false);
   }
 
   void testSparsityNullCouplingMatrixUnifRef()
   {
+    LOG_UNIT_TEST;
     this->run_sparsity_pattern_test(1, false);
   }
 

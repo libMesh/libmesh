@@ -15,7 +15,7 @@ public:
 
   void tearDown() {}
 
-  CPPUNIT_TEST_SUITE(TypeTensorTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(TypeTensorTest);
 
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST(testInverse);
@@ -30,6 +30,8 @@ public:
 private:
   void testInverse()
   {
+    LOG_UNIT_TEST;
+
     // This random input tensor and its inverse came from Octave/Matlab:
     // > format long e
     // > A = rand(3)
@@ -54,6 +56,8 @@ private:
 
   void testLeftMultiply()
   {
+    LOG_UNIT_TEST;
+
     TensorValue<Real> tensor(1, 2, 0, 3, 4, 0);
     VectorValue<Real> vector(5, 6, 0);
     auto left_mult = vector * tensor;
@@ -66,6 +70,8 @@ private:
 
   void testOuterProduct()
   {
+    LOG_UNIT_TEST;
+
     auto tol = TOLERANCE * TOLERANCE;
     VectorValue<Real> a(2, 3, 4);
     VectorValue<Real> b(5, 6, 7);
@@ -83,6 +89,8 @@ private:
 
   void testIsZero()
   {
+    LOG_UNIT_TEST;
+
     {
       TensorValue<double> tensor;
       CPPUNIT_ASSERT(tensor.is_zero());
@@ -95,6 +103,8 @@ private:
 
   void testRotation()
   {
+    LOG_UNIT_TEST;
+
     {
       Point x(1, 0, 0);
       const auto R = RealTensorValue::extrinsic_rotation_matrix(90, 0, 0);

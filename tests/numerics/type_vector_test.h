@@ -60,6 +60,8 @@ class TypeVectorTestBase : public CppUnit::TestCase {
 protected:
   typedef typename DerivedClass::value_type T;
 
+  std::string libmesh_suite_name;
+
 private:
   DerivedClass *m_1_1_1, *m_n1_1_n1;
   TypeVector<T>   *basem_1_1_1, *basem_n1_1_n1;
@@ -92,6 +94,8 @@ public:
 
   void testValue()
   {
+    LOG_UNIT_TEST;
+
     CPPUNIT_ASSERT_EQUAL( T(1), (*m_1_1_1)(0));
     CPPUNIT_ASSERT_EQUAL( T(-1), (*m_n1_1_n1)(0));
 
@@ -108,6 +112,8 @@ public:
 
   void testZero()
   {
+    LOG_UNIT_TEST;
+
 #if LIBMESH_DIM > 2
     DerivedClass avector(1,1,1);
 #elif LIBMESH_DIM > 1
@@ -123,16 +129,22 @@ public:
 
   void testNorm()
   {
+    LOG_UNIT_TEST;
+
     LIBMESH_ASSERT_FP_EQUAL(m_1_1_1->norm() ,  std::sqrt(Real(LIBMESH_DIM)) , TOLERANCE*TOLERANCE );
   }
 
   void testNormSq()
   {
+    LOG_UNIT_TEST;
+
     LIBMESH_ASSERT_FP_EQUAL(m_1_1_1->norm_sq() ,  Real(LIBMESH_DIM) , TOLERANCE*TOLERANCE );
   }
 
   void testEquality()
   {
+    LOG_UNIT_TEST;
+
     CPPUNIT_ASSERT( (*m_1_1_1) == (*m_1_1_1) );
 #if LIBMESH_DIM > 1
     CPPUNIT_ASSERT( !((*m_1_1_1) == (*m_n1_1_n1)) );
@@ -141,6 +153,8 @@ public:
 
   void testInEquality()
   {
+    LOG_UNIT_TEST;
+
     CPPUNIT_ASSERT( !((*m_1_1_1) != (*m_1_1_1)) );
 #if LIBMESH_DIM > 1
     CPPUNIT_ASSERT( (*m_1_1_1) != (*m_n1_1_n1) );
@@ -149,6 +163,8 @@ public:
 
   void testAssignment()
   {
+    LOG_UNIT_TEST;
+
     DerivedClass avector {*basem_1_1_1};
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
@@ -157,6 +173,8 @@ public:
 
   void testScalarInit()  // Not valid for all derived classes!
   {
+    LOG_UNIT_TEST;
+
     DerivedClass avector = 0;
     for (int i = 0; i != LIBMESH_DIM; ++i)
       LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
@@ -169,6 +187,8 @@ public:
 
   void testScalarMult()
   {
+    LOG_UNIT_TEST;
+
     for (int i = 0; i != LIBMESH_DIM; ++i)
     {
       LIBMESH_ASSERT_FP_EQUAL( 5.0 , libmesh_real(((*m_1_1_1)*5.0)(i)) , TOLERANCE*TOLERANCE );
@@ -179,12 +199,16 @@ public:
 
   void testScalarDiv()
   {
+    LOG_UNIT_TEST;
+
     for (int i = 0; i != LIBMESH_DIM; ++i)
       LIBMESH_ASSERT_FP_EQUAL( 1/Real(5) , libmesh_real(((*m_1_1_1)/5.0)(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarMultAssign()
   {
+    LOG_UNIT_TEST;
+
     DerivedClass avector {*basem_1_1_1};
     avector*=5.0;
 
@@ -194,6 +218,8 @@ public:
 
   void testScalarDivAssign()
   {
+    LOG_UNIT_TEST;
+
     DerivedClass avector {*basem_1_1_1};
     avector/=5.0;
 
@@ -203,6 +229,8 @@ public:
 
   void testVectorAdd()
   {
+    LOG_UNIT_TEST;
+
     LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(((*m_1_1_1)+(*m_n1_1_n1))(0)) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
       LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(((*m_1_1_1)+(*m_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
@@ -212,6 +240,8 @@ public:
 
   void testVectorAddScaled()
   {
+    LOG_UNIT_TEST;
+
     DerivedClass avector {*basem_1_1_1};
     avector.add_scaled((*m_1_1_1),0.5);
 
@@ -221,6 +251,8 @@ public:
 
   void testVectorSub()
   {
+    LOG_UNIT_TEST;
+
     LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(((*m_1_1_1)-(*m_n1_1_n1))(0)) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
       LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(((*m_1_1_1)-(*m_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
@@ -230,6 +262,8 @@ public:
 
   void testVectorMult()
   {
+    LOG_UNIT_TEST;
+
     if (LIBMESH_DIM == 2)
       LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real((*m_1_1_1)*(*m_n1_1_n1)) , TOLERANCE*TOLERANCE );
     else
@@ -238,6 +272,8 @@ public:
 
   void testVectorAddAssign()
   {
+    LOG_UNIT_TEST;
+
     DerivedClass avector {*basem_1_1_1};
     avector+=(*m_1_1_1);
 
@@ -247,6 +283,8 @@ public:
 
   void testVectorSubAssign()
   {
+    LOG_UNIT_TEST;
+
     DerivedClass avector {*basem_1_1_1};
     avector-=(*m_n1_1_n1);
 
@@ -259,6 +297,8 @@ public:
 
   void testValueBase()
   {
+    LOG_UNIT_TEST;
+
     for (int i = 0; i != LIBMESH_DIM; ++i)
       CPPUNIT_ASSERT_EQUAL( T(1), (*basem_1_1_1)(i));
 
@@ -271,6 +311,8 @@ public:
 
   void testZeroBase()
   {
+    LOG_UNIT_TEST;
+
     TypeVector<T> avector((*basem_1_1_1));
     avector.zero();
 
@@ -280,6 +322,8 @@ public:
 
   void testIsZero()
   {
+    LOG_UNIT_TEST;
+
     {
 #if LIBMESH_DIM > 2
       DerivedClass avector(0,0,0);
@@ -304,28 +348,38 @@ public:
 
   void testNormBase()
   {
+    LOG_UNIT_TEST;
+
     LIBMESH_ASSERT_FP_EQUAL( std::sqrt(Real(LIBMESH_DIM)) , basem_1_1_1->norm() , TOLERANCE*TOLERANCE );
   }
 
   void testNormSqBase()
   {
+    LOG_UNIT_TEST;
+
     LIBMESH_ASSERT_FP_EQUAL( Real(LIBMESH_DIM) , basem_1_1_1->norm_sq() , TOLERANCE*TOLERANCE );
   }
 
   void testEqualityBase()
   {
+    LOG_UNIT_TEST;
+
     CPPUNIT_ASSERT( (*basem_1_1_1) == (*basem_1_1_1) );
     CPPUNIT_ASSERT( !((*basem_1_1_1) == (*basem_n1_1_n1)) );
   }
 
   void testInEqualityBase()
   {
+    LOG_UNIT_TEST;
+
     CPPUNIT_ASSERT( !((*basem_1_1_1) != (*basem_1_1_1)) );
     CPPUNIT_ASSERT( (*basem_1_1_1) != (*basem_n1_1_n1) );
   }
 
   void testAssignmentBase()
   {
+    LOG_UNIT_TEST;
+
     TypeVector<T> avector = (*basem_1_1_1);
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
@@ -334,18 +388,24 @@ public:
 
   void testScalarMultBase()
   {
+    LOG_UNIT_TEST;
+
     for (int i = 0; i != LIBMESH_DIM; ++i)
       LIBMESH_ASSERT_FP_EQUAL( 5.0 , libmesh_real(((*basem_1_1_1)*5.0)(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarDivBase()
   {
+    LOG_UNIT_TEST;
+
     for (int i = 0; i != LIBMESH_DIM; ++i)
       LIBMESH_ASSERT_FP_EQUAL( 1/Real(5) , libmesh_real(((*basem_1_1_1)/5.0)(i)) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarMultAssignBase()
   {
+    LOG_UNIT_TEST;
+
     TypeVector<T> avector(*m_1_1_1);
     avector*=5.0;
 
@@ -355,6 +415,8 @@ public:
 
   void testScalarDivAssignBase()
   {
+    LOG_UNIT_TEST;
+
     TypeVector<T> avector(*m_1_1_1);
     avector/=5.0;
 
@@ -364,6 +426,8 @@ public:
 
   void testVectorAddBase()
   {
+    LOG_UNIT_TEST;
+
     LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(((*basem_1_1_1)+(*basem_n1_1_n1))(0)) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
       LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(((*basem_1_1_1)+(*basem_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
@@ -373,6 +437,8 @@ public:
 
   void testVectorAddScaledBase()
   {
+    LOG_UNIT_TEST;
+
     TypeVector<T> avector(*m_1_1_1);
     avector.add_scaled((*basem_1_1_1),0.5);
 
@@ -382,6 +448,8 @@ public:
 
   void testVectorSubBase()
   {
+    LOG_UNIT_TEST;
+
     LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(((*basem_1_1_1)-(*basem_n1_1_n1))(0)) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
       LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(((*basem_1_1_1)-(*basem_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
@@ -391,6 +459,8 @@ public:
 
   void testVectorMultBase()
   {
+    LOG_UNIT_TEST;
+
     if (LIBMESH_DIM == 2)
       LIBMESH_ASSERT_FP_EQUAL(  0.0 , libmesh_real((*basem_1_1_1)*(*basem_n1_1_n1)) , TOLERANCE*TOLERANCE );
     else
@@ -399,6 +469,8 @@ public:
 
   void testVectorAddAssignBase()
   {
+    LOG_UNIT_TEST;
+
     TypeVector<T> avector(*m_1_1_1);
     avector+=(*basem_1_1_1);
 
@@ -408,6 +480,8 @@ public:
 
   void testVectorSubAssignBase()
   {
+    LOG_UNIT_TEST;
+
     TypeVector<T> avector(*m_1_1_1);
     avector-=(*basem_n1_1_n1);
 

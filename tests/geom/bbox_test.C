@@ -10,7 +10,7 @@ using namespace libMesh;
 class BBoxTest : public CppUnit::TestCase {
 
 public:
-  CPPUNIT_TEST_SUITE( BBoxTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( BBoxTest );
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( test_one_degenerate );
   CPPUNIT_TEST( test_two_degenerate );
@@ -26,6 +26,8 @@ public:
 
   void test_one_degenerate()
   {
+    LOG_UNIT_TEST;
+
     // Degenerate + Non-degenerate BBox tests: A unit square bounding
     // box is intersected with the following degenerate (planar)
     // bounding boxes:
@@ -80,6 +82,8 @@ public:
 
   void test_two_degenerate()
   {
+    LOG_UNIT_TEST;
+
     // Degenerate + Degenerate BBox tests: test intersections of unit
     // square degenerate (planar) bounding boxes in the x, y, and z
     // directions in the following cases:
@@ -148,6 +152,8 @@ public:
 
   void test_no_degenerate()
   {
+    LOG_UNIT_TEST;
+
     // The smallest number for which 1 and 1 + epsilon compare unequal.
     const Real eps = std::numeric_limits<Real>::epsilon();
 
@@ -215,6 +221,8 @@ public:
 
   void test_signed_distance()
   {
+    LOG_UNIT_TEST;
+
     // A "unit" size bounding box for making distance comparisons.
     BoundingBox unit(Point(0.,0.,0.), Point(1.,1.,1.));
 

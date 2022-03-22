@@ -39,7 +39,7 @@ class MeshFunctionTest : public CppUnit::TestCase
    * Tests for general MeshFunction capability.
    */
 public:
-  CPPUNIT_TEST_SUITE( MeshFunctionTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( MeshFunctionTest );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( test_subdomain_id_sets );
@@ -62,6 +62,8 @@ public:
   // test that mesh function works correctly with subdomain id sets.
   void test_subdomain_id_sets()
   {
+    LOG_UNIT_TEST;
+
     ReplicatedMesh mesh(*TestCommWorld);
 
     MeshTools::Generation::build_square (mesh,
@@ -151,6 +153,8 @@ public:
 #ifdef LIBMESH_ENABLE_AMR
   void test_p_level()
   {
+    LOG_UNIT_TEST;
+
     ReplicatedMesh mesh(*TestCommWorld);
 
     MeshTools::Generation::build_cube (mesh,

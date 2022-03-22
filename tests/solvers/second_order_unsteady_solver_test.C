@@ -83,7 +83,7 @@ class NewmarkSolverTest : public CppUnit::TestCase,
                           public NewmarkSolverTestBase
 {
 public:
-  CPPUNIT_TEST_SUITE( NewmarkSolverTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( NewmarkSolverTest );
 
 #ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testNewmarkSolverConstantSecondOrderODESecondOrderStyle );
@@ -98,11 +98,15 @@ public:
 
   void testNewmarkSolverConstantSecondOrderODESecondOrderStyle()
   {
+    LOG_UNIT_TEST;
+
     this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemSecondOrderTimeSolverBase>>(0.5,10);
   }
 
   void testNewmarkSolverLinearTimeSecondOrderODESecondOrderStyle()
   {
+    LOG_UNIT_TEST;
+
     // For \beta = 1/6, we have the "linear acceleration method" for which
     // we should be able to exactly integrate linear (in time) acceleration
     // functions.
@@ -112,11 +116,15 @@ public:
 
   void testNewmarkSolverConstantSecondOrderODEFirstOrderStyle()
   {
+    LOG_UNIT_TEST;
+
     this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase>>(0.5,10);
   }
 
   void testNewmarkSolverLinearTimeSecondOrderODEFirstOrderStyle()
   {
+    LOG_UNIT_TEST;
+
     // For \beta = 1/6, we have the "linear acceleration method" for which
     // we should be able to exactly integrate linear (in time) acceleration
     // functions.
@@ -150,7 +158,7 @@ class EulerSolverSecondOrderTest : public CppUnit::TestCase,
                                    public ThetaSolverTestBase<EulerSolver>
 {
 public:
-  CPPUNIT_TEST_SUITE( EulerSolverSecondOrderTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( EulerSolverSecondOrderTest );
 
 #ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testEulerSolverConstantSecondOrderODE );
@@ -162,6 +170,8 @@ public:
 
   void testEulerSolverConstantSecondOrderODE()
   {
+    LOG_UNIT_TEST;
+
     this->set_theta(0.5);
     this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase>>(0.5,10);
   }
@@ -172,7 +182,7 @@ class Euler2SolverSecondOrderTest : public CppUnit::TestCase,
                                     public ThetaSolverTestBase<Euler2Solver>
 {
 public:
-  CPPUNIT_TEST_SUITE( Euler2SolverSecondOrderTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( Euler2SolverSecondOrderTest );
 
 #ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testEuler2SolverConstantSecondOrderODE );
@@ -183,6 +193,8 @@ public:
 public:
   void testEuler2SolverConstantSecondOrderODE()
   {
+    LOG_UNIT_TEST;
+
     this->set_theta(0.5);
     this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase>>(0.5,10);
   }

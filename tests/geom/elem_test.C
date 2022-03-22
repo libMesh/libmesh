@@ -17,6 +17,9 @@ class ElemTest : public CppUnit::TestCase {
 private:
   std::unique_ptr<Mesh> _mesh;
 
+protected:
+  std::string libmesh_suite_name;
+
 public:
   void setUp()
   {
@@ -131,6 +134,8 @@ public:
 
   void test_bounding_box()
   {
+    LOG_UNIT_TEST;
+
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       {
         const BoundingBox bbox = elem->loose_bounding_box();
@@ -170,6 +175,8 @@ public:
 
   void test_maps()
   {
+    LOG_UNIT_TEST;
+
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       {
         for (const auto edge : elem->edge_index_range())
@@ -193,6 +200,8 @@ public:
 
   void test_contains_point_node()
   {
+    LOG_UNIT_TEST;
+
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -216,6 +225,8 @@ public:
 
   void test_permute()
   {
+    LOG_UNIT_TEST;
+
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -252,6 +263,8 @@ public:
 
   void test_center_node_on_side()
   {
+    LOG_UNIT_TEST;
+
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       for (const auto s : elem->side_index_range())
         {
@@ -274,6 +287,8 @@ public:
 
   void test_side_type()
   {
+    LOG_UNIT_TEST;
+
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       for (const auto s : elem->side_index_range())
         CPPUNIT_ASSERT_EQUAL(elem->build_side_ptr(s)->type(), elem->side_type(s));
@@ -281,6 +296,8 @@ public:
 
   void test_elem_side_builder()
   {
+    LOG_UNIT_TEST;
+
     ElemSideBuilder cache;
     for (auto & elem : _mesh->active_local_element_ptr_range())
       for (const auto s : elem->side_index_range())
@@ -312,6 +329,13 @@ public:
 #define INSTANTIATE_ELEMTEST(elemtype)                          \
   class ElemTest_##elemtype : public ElemTest<elemtype> {       \
   public:                                                       \
+  ElemTest_##elemtype() :                                       \
+    ElemTest<elemtype>() {                                      \
+    if (unitlog->summarized_logs_enabled())                     \
+      this->libmesh_suite_name = "ElemTest";                    \
+    else                                                        \
+      this->libmesh_suite_name = "ElemTest_" #elemtype;         \
+  }                                                             \
   CPPUNIT_TEST_SUITE( ElemTest_##elemtype );                    \
   ELEMTEST;                                                     \
   CPPUNIT_TEST_SUITE_END();                                     \

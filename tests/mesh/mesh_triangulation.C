@@ -22,7 +22,7 @@ class MeshTriangulationTest : public CppUnit::TestCase
    * interfaces to triangulation libraries
    */
 public:
-  CPPUNIT_TEST_SUITE( MeshTriangulationTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( MeshTriangulationTest );
 
   CPPUNIT_TEST( testTriangleHoleArea );
 
@@ -55,6 +55,8 @@ public:
 
   void testTriangleHoleArea()
   {
+    LOG_UNIT_TEST;
+
     // Using center=(1,0), radius=2 for the heck of it
     Point center{1};
     Real radius = 2;
@@ -274,6 +276,8 @@ public:
 #ifdef LIBMESH_HAVE_TRIANGLE
   void testTriangle()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
     TriangleInterface triangle(mesh);
     testTriangulator(mesh, triangle);
@@ -282,6 +286,8 @@ public:
 
   void testTriangleHoles()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
     TriangleInterface triangle(mesh);
     testTriangulatorHoles(mesh, triangle);
@@ -290,6 +296,8 @@ public:
 
   void testTriangleSegments()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
     TriangleInterface triangle(mesh);
     testTriangulatorSegments(mesh, triangle);
@@ -300,6 +308,8 @@ public:
 #ifdef LIBMESH_HAVE_POLY2TRI
   void testPoly2Tri()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulator(mesh, p2t_tri);
@@ -308,6 +318,8 @@ public:
 
   void testPoly2TriHoles()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulatorHoles(mesh, p2t_tri);
@@ -316,6 +328,8 @@ public:
 
   void testPoly2TriSegments()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulatorSegments(mesh, p2t_tri);
@@ -385,11 +399,15 @@ public:
 
   void testPoly2TriRefined()
   {
+    LOG_UNIT_TEST;
+
     testPoly2TriRefinementBase(nullptr, 1.5, 15);
   }
 
   void testPoly2TriExtraRefined()
   {
+    LOG_UNIT_TEST;
+
     testPoly2TriRefinementBase(nullptr, 1.5, 150, 0.01);
   }
 
@@ -401,6 +419,8 @@ public:
 
   void testPoly2TriHolesRefined()
   {
+    LOG_UNIT_TEST;
+
     // Add a diamond hole
     TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };

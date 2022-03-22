@@ -20,7 +20,7 @@ class AllTriTest : public CppUnit::TestCase
    * ID and the current layer and assert the proper values.
    */
 public:
-  CPPUNIT_TEST_SUITE( AllTriTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( AllTriTest );
 
   // 2D tests
 #if LIBMESH_DIM > 1
@@ -94,22 +94,22 @@ public:
   void tearDown() {}
 
   // 4 TRIs no-op
-  void testAllTriTri() { test_helper_2D(TRI3, /*nelem=*/4, /*nbcs=*/6); }
+  void testAllTriTri() { LOG_UNIT_TEST; test_helper_2D(TRI3, /*nelem=*/4, /*nbcs=*/6); }
 
   // 2 quads split into 4 TRIs.
-  void testAllTriQuad() { test_helper_2D(QUAD4, /*nelem=*/4, /*nbcs=*/6); }
+  void testAllTriQuad() { LOG_UNIT_TEST; test_helper_2D(QUAD4, /*nelem=*/4, /*nbcs=*/6); }
 
   // 2 QUAD8s split into 4 TRIs.
-  void testAllTriQuad8() { test_helper_2D(QUAD8, /*nelem=*/4, /*nbcs=*/6); }
+  void testAllTriQuad8() { LOG_UNIT_TEST; test_helper_2D(QUAD8, /*nelem=*/4, /*nbcs=*/6); }
 
   // 2 QUAD9s split into 4 TRIs.
-  void testAllTriQuad9() { test_helper_2D(QUAD9, /*nelem=*/4, /*nbcs=*/6); }
+  void testAllTriQuad9() { LOG_UNIT_TEST; test_helper_2D(QUAD9, /*nelem=*/4, /*nbcs=*/6); }
 
   // 2 PRISM6s split into 6 TETs with 2 boundary faces per side.
-  void testAllTriPrism6() { test_helper_3D(PRISM6, /*nelem=*/6, /*nbcs=*/12); }
+  void testAllTriPrism6() { LOG_UNIT_TEST; test_helper_3D(PRISM6, /*nelem=*/6, /*nbcs=*/12); }
 
   // 2 PRISM6s split into 6 TETs with 2 boundary faces per side.
-  void testAllTriPrism18() { test_helper_3D(PRISM18, /*nelem=*/6, /*nbcs=*/12); }
+  void testAllTriPrism18() { LOG_UNIT_TEST; test_helper_3D(PRISM18, /*nelem=*/6, /*nbcs=*/12); }
 };
 
 

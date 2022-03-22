@@ -108,6 +108,18 @@ public:
   double pause_for(PerfData & other);
   double stopit ();
 
+  /**
+   * Sums timing results from \p other
+   */
+  PerfData & operator += (const PerfData & other) {
+    libmesh_assert(!open);
+    tot_time += other.tot_time;
+    tot_time_incl_sub += other.tot_time_incl_sub;
+    count += other.count;
+
+    return *this;
+  }
+
   int called_recursively;
 
 protected:
@@ -170,6 +182,22 @@ public:
    * \returns \p true iff performance logging is enabled
    */
   bool logging_enabled() const { return log_events; }
+
+  /**
+   * Tells the PerfLog to only print log results summarized by header
+   */
+  void enable_summarized_logs() { summarize_logs = true; }
+
+  /**
+   * Tells the PerfLog to print detailed log results (this is the
+   * default behavior)
+   */
+  void disable_summarized_logs() { summarize_logs = false; }
+
+  /**
+   * \returns \p true iff log results will be summarized by header
+   */
+  bool summarized_logs_enabled() { return summarize_logs; }
 
   /**
    * Push the event \p label onto the stack, pausing any active event.
@@ -314,6 +342,11 @@ private:
    * Flag to optionally disable all logging.
    */
   bool log_events;
+
+  /**
+   * Flag to optionally summarize logs
+   */
+  bool summarize_logs;
 
   /**
    * The total running time for recorded events.

@@ -19,7 +19,7 @@ using namespace libMesh;
 class EigenSparseMatrixTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE(EigenSparseMatrixTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(EigenSparseMatrixTest);
 
   CPPUNIT_TEST(testGetAndSet);
   CPPUNIT_TEST(testClone);
@@ -46,6 +46,8 @@ public:
 
   void testGetAndSet()
   {
+    LOG_UNIT_TEST;
+
     // EigenSparseMatrix is serial, so we simply test inserting the
     // same values on all procs.
     std::vector<numeric_index_type> rows = {0, 1, 2};
@@ -64,6 +66,8 @@ public:
 
   void testClone()
   {
+    LOG_UNIT_TEST;
+
     {
       // Create copy, test that it can go out of scope
       auto copy = _matrix->clone();

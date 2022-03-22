@@ -15,7 +15,7 @@ class GetBoundaryPointsTest : public CppUnit::TestCase {
    * a vector of boundary points enclosing the domain
    */
 public:
-  CPPUNIT_TEST_SUITE( GetBoundaryPointsTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( GetBoundaryPointsTest );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
@@ -182,6 +182,8 @@ public:
 
   void testMesh()
   {
+    LOG_UNIT_TEST;
+
     const auto points = _mesh->get_boundary_points();
 
     // There'd better be two disconnected subdomains
@@ -237,7 +239,7 @@ class GetBoundaryPointsSecondTest : public GetBoundaryPointsTest {
    * use the second order mesh.
    */
 public:
-  CPPUNIT_TEST_SUITE( GetBoundaryPointsSecondTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( GetBoundaryPointsSecondTest );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
@@ -258,6 +260,8 @@ public:
 
   void testMesh()
   {
+    LOG_UNIT_TEST;
+
     const auto points = _mesh->get_boundary_points();
 
     // There'd better be two disconnected subdomains
