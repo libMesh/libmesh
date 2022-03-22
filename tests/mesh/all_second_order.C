@@ -18,6 +18,7 @@ public:
 
   CPPUNIT_TEST( allSecondOrder );
   CPPUNIT_TEST( allSecondOrderRange );
+  CPPUNIT_TEST( allSecondOrderDoNothing );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -78,6 +79,31 @@ public:
     // Make sure that the other elements are now Edge3s
     for (dof_id_type e=1; e<5; ++e)
       CPPUNIT_ASSERT_EQUAL(EDGE3, mesh.elem_ptr(e)->type());
+  }
+
+  void allSecondOrderDoNothing()
+  {
+    DistributedMesh mesh(*TestCommWorld, /*dim=*/2);
+
+    mesh.allow_remote_element_removal(false);
+
+    MeshTools::Generation::build_square(mesh,
+                                        /*nx=*/2, /*ny=*/2,
+                                        /*xmin=*/0., /*xmax=*/1.,
+                                        /*ymin=*/0., /*ymax=*/1.,
+                                        QUAD9);
+
+    // Test that all_second_order_range() correctly "does nothing" in
+    // parallel when passed ranges of local elements. Here we should
+    // hit one of the "early return" cases for this function.
+    mesh.all_second_order_range(mesh.active_local_element_ptr_range(),
+                                /*full_ordered=*/true);
+
+    // Make sure we still have the same number of elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(4), mesh.n_elem());
+
+    // Make sure we still have the same number of nodes
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(25), mesh.n_nodes());
   }
 };
 
