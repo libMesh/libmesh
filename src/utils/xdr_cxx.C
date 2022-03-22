@@ -102,10 +102,10 @@ namespace libMesh
 
 //-------------------------------------------------------------
 // Xdr class implementation
-Xdr::Xdr (const std::string & name,
+Xdr::Xdr (std::string name,
           const XdrMODE m) :
   mode(m),
-  file_name(name),
+  file_name(std::move(name)),
 #ifdef LIBMESH_HAVE_XDR
   fp(nullptr),
 #endif
@@ -117,7 +117,7 @@ Xdr::Xdr (const std::string & name,
   xzipped_file(false),
   version_number(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION, LIBMESH_MINOR_VERSION, LIBMESH_MICRO_VERSION))
 {
-  this->open(name);
+  this->open(file_name);
 }
 
 
@@ -129,11 +129,11 @@ Xdr::~Xdr()
 
 
 
-void Xdr::open (const std::string & name)
+void Xdr::open (std::string name)
 {
-  file_name = name;
+  file_name = std::move(name);
 
-  if (name == "")
+  if (file_name == "")
     return;
 
   switch (mode)
@@ -143,9 +143,9 @@ void Xdr::open (const std::string & name)
       {
 #ifdef LIBMESH_HAVE_XDR
 
-        fp = fopen(name.c_str(), (mode == ENCODE) ? "w" : "r");
+        fp = fopen(file_name.c_str(), (mode == ENCODE) ? "w" : "r");
         if (!fp)
-          libmesh_file_error(name.c_str());
+          libmesh_file_error(file_name.c_str());
         xdrs = std::make_unique<XDR>();
         xdrstdio_create (xdrs.get(), fp, (mode == ENCODE) ? XDR_ENCODE : XDR_DECODE);
 #else
@@ -161,9 +161,9 @@ void Xdr::open (const std::string & name)
 
     case READ:
       {
-        gzipped_file = (name.size() - name.rfind(".gz")  == 3);
-        bzipped_file = (name.size() - name.rfind(".bz2") == 4);
-        xzipped_file = (name.size() - name.rfind(".xz") == 3);
+        gzipped_file = (file_name.size() - file_name.rfind(".gz")  == 3);
+        bzipped_file = (file_name.size() - file_name.rfind(".bz2") == 4);
+        xzipped_file = (file_name.size() - file_name.rfind(".xz") == 3);
 
         if (gzipped_file)
           {
@@ -171,7 +171,7 @@ void Xdr::open (const std::string & name)
             igzstream * inf = new igzstream;
             libmesh_assert(inf);
             in.reset(inf);
-            inf->open(name.c_str(), std::ios::in);
+            inf->open(file_name.c_str(), std::ios::in);
 #else
             libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
 #endif
@@ -182,7 +182,7 @@ void Xdr::open (const std::string & name)
             libmesh_assert(inf);
             in.reset(inf);
 
-            std::string new_name = Utility::unzip_file(name);
+            std::string new_name = Utility::unzip_file(file_name);
 
             inf->open(new_name.c_str(), std::ios::in);
           }
@@ -190,15 +190,15 @@ void Xdr::open (const std::string & name)
         libmesh_assert(in.get());
 
         if (!in->good())
-          libmesh_file_error(name);
+          libmesh_file_error(file_name);
         return;
       }
 
     case WRITE:
       {
-        gzipped_file = (name.size() - name.rfind(".gz")  == 3);
-        bzipped_file = (name.size() - name.rfind(".bz2") == 4);
-        xzipped_file = (name.size() - name.rfind(".xz")  == 3);
+        gzipped_file = (file_name.size() - file_name.rfind(".gz")  == 3);
+        bzipped_file = (file_name.size() - file_name.rfind(".bz2") == 4);
+        xzipped_file = (file_name.size() - file_name.rfind(".xz")  == 3);
 
         if (gzipped_file)
           {
@@ -206,7 +206,7 @@ void Xdr::open (const std::string & name)
             ogzstream * outf = new ogzstream;
             libmesh_assert(outf);
             out.reset(outf);
-            outf->open(name.c_str(), std::ios::out);
+            outf->open(file_name.c_str(), std::ios::out);
 #else
             libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
 #endif
@@ -217,7 +217,7 @@ void Xdr::open (const std::string & name)
             libmesh_assert(outf);
             out.reset(outf);
 
-            std::string new_name = name;
+            std::string new_name = file_name;
 
             if (bzipped_file)
               new_name.erase(new_name.end() - 4, new_name.end());

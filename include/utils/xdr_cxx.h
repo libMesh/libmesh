@@ -74,7 +74,7 @@ public:
    * Constructor.  Takes the filename and the mode.
    * Valid modes are ENCODE, DECODE, READ, and WRITE.
    */
-  Xdr (const std::string & name="", const XdrMODE m=UNKNOWN);
+  Xdr (std::string name="", const XdrMODE m=UNKNOWN);
 
   /**
    * Destructor.  Closes the file if it is open.
@@ -84,7 +84,7 @@ public:
   /**
    * Opens the file.
    */
-  void open (const std::string & name);
+  void open (std::string name);
 
   /**
    * Closes the file if it is open.
