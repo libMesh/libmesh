@@ -65,6 +65,19 @@ public:
     // SECOND-order.
     mesh.all_second_order_range(mesh.active_subdomain_elements_ptr_range(1),
                                 /*full_ordered=*/true);
+
+    // Make sure we still have the expected total number of elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(5), mesh.n_elem());
+
+    // Make sure we added the right number of nodes
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(12), mesh.n_nodes());
+
+    // Make sure that the type of the Quad4 is unchanged
+    CPPUNIT_ASSERT_EQUAL(QUAD4, mesh.elem_ptr(0)->type());
+
+    // Make sure that the other elements are now Edge3s
+    for (dof_id_type e=1; e<5; ++e)
+      CPPUNIT_ASSERT_EQUAL(EDGE3, mesh.elem_ptr(e)->type());
   }
 };
 
