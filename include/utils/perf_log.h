@@ -189,6 +189,12 @@ public:
   void enable_summarized_logs() { summarize_logs = true; }
 
   /**
+   * Tells the PerfLog to print detailed log results (this is the
+   * default behavior)
+   */
+  void disable_summarized_logs() { summarize_logs = false; }
+
+  /**
    * \returns \p true iff log results will be summarized by header
    */
   bool summarized_logs_enabled() { return summarize_logs; }
