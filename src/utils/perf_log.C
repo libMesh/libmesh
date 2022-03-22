@@ -56,6 +56,7 @@ PerfLog::PerfLog(const std::string & ln,
                  const bool le) :
   label_name(ln),
   log_events(le),
+  summarize_logs(false),
   total_time(0.)
 {
   gettimeofday (&tstart, nullptr);
@@ -482,9 +483,17 @@ std::string PerfLog::get_perf_info() const
   std::map<std::pair<std::string, std::string>, PerfData> string_log;
 
   for (auto char_data : log)
-    string_log[std::make_pair(char_data.first.first,
-                              char_data.first.second)] =
-      char_data.second;
+    if (summarize_logs)
+      {
+        string_log[std::make_pair(char_data.first.first,std::string())] +=
+          char_data.second;
+      }
+    else
+      {
+        string_log[std::make_pair(char_data.first.first,
+                                  char_data.first.second)] =
+          char_data.second;
+      }
 
   for (auto pos : string_log)
     {
