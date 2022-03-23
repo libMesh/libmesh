@@ -22,7 +22,9 @@
 
 // Local Includes
 #include "libmesh/partitioner.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -57,7 +59,7 @@ public:
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<LinearPartitioner>(*this);
+    return std::make_unique<LinearPartitioner>(*this);
   }
 
   /**

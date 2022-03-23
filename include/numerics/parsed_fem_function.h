@@ -27,7 +27,6 @@
 #include "libmesh/int_range.h"
 #include "libmesh/point.h"
 #include "libmesh/system.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #ifdef LIBMESH_HAVE_FPARSER
 // FParser includes
@@ -425,7 +424,7 @@ inline
 std::unique_ptr<FEMFunctionBase<Output>>
 ParsedFEMFunction<Output>::clone () const
 {
-  return libmesh_make_unique<ParsedFEMFunction>
+  return std::make_unique<ParsedFEMFunction>
     (_sys, _expression, &_additional_vars, &_initial_vals);
 }
 
@@ -516,7 +515,7 @@ ParsedFEMFunction<Output>::get_inline_value(const std::string & inline_var_name)
 #ifdef LIBMESH_HAVE_FPARSER
       // Parse and evaluate the new subexpression.
       // Add the same constants as we used originally.
-      auto fp = libmesh_make_unique<FunctionParserBase<Output>>();
+      auto fp = std::make_unique<FunctionParserBase<Output>>();
       fp->AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
       fp->AddConstant("pi", std::acos(Real(-1)));
       fp->AddConstant("e", std::exp(Real(1)));
@@ -658,7 +657,7 @@ ParsedFEMFunction<Output>::partial_reparse (const std::string & expression)
 #ifdef LIBMESH_HAVE_FPARSER
       // Parse (and optimize if possible) the subexpression.
       // Add some basic constants, to Real precision.
-      auto fp = libmesh_make_unique<FunctionParserBase<Output>>();
+      auto fp = std::make_unique<FunctionParserBase<Output>>();
       fp->AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
       fp->AddConstant("pi", std::acos(Real(-1)));
       fp->AddConstant("e", std::exp(Real(1)));

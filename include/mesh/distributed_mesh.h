@@ -30,10 +30,10 @@
 #endif
 
 #include "libmesh/unstructured_mesh.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ Includes
 #include <cstddef>
+#include <memory>
 #include <set>
 
 namespace libMesh
@@ -111,7 +111,7 @@ public:
    * Virtual copy-constructor, creates a copy of this mesh
    */
   virtual std::unique_ptr<MeshBase> clone () const override
-  { return libmesh_make_unique<DistributedMesh>(*this); }
+  { return std::make_unique<DistributedMesh>(*this); }
 
   /**
    * Destructor.

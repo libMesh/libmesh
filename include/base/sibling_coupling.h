@@ -23,6 +23,9 @@
 // Local Includes
 #include "libmesh/ghosting_functor.h"
 
+// C++ Includes
+#include <memory>
+
 namespace libMesh
 {
 
@@ -70,7 +73,7 @@ public:
     * different meshes. The operations in  GhostingFunctor are mesh dependent.
     */
    virtual std::unique_ptr<GhostingFunctor> clone () const override
-   { return libmesh_make_unique<SiblingCoupling>(*this); }
+   { return std::make_unique<SiblingCoupling>(*this); }
 
 private:
 

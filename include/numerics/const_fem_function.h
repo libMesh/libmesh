@@ -22,9 +22,9 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/fem_function_base.h"
 #include "libmesh/int_range.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
+#include <memory>
 #include <string>
 
 namespace libMesh
@@ -57,7 +57,7 @@ public:
   virtual ~ConstFEMFunction () = default;
 
   virtual std::unique_ptr<FEMFunctionBase<Output>> clone () const override
-  {return libmesh_make_unique<ConstFEMFunction>(*this); }
+  {return std::make_unique<ConstFEMFunction>(*this); }
 
   virtual Output operator() (const FEMContext &,
                              const Point &,

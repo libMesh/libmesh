@@ -22,7 +22,9 @@
 
 // Local Includes
 #include "libmesh/partitioner.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -83,7 +85,7 @@ public:
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<SubdomainPartitioner>(*this);
+    return std::make_unique<SubdomainPartitioner>(*this);
   }
 
   /**
@@ -105,7 +107,7 @@ public:
    *
    * \code
    * SubdomainPartitioner sp;
-   * sp.internal_partitioner() = libmesh_make_unique<SFCPartitioner>();
+   * sp.internal_partitioner() = std::make_unique<SFCPartitioner>();
    * \endcode
    */
   std::unique_ptr<Partitioner> & internal_partitioner() { return _internal_partitioner; }

@@ -21,7 +21,6 @@
 #define LIBMESH_SYSTEM_H
 
 // Local Includes
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/elem_range.h"
 #include "libmesh/enum_subset_solve_mode.h" // SUBSET_ZERO
 #include "libmesh/enum_parallel_type.h" // PARALLEL
@@ -2566,7 +2565,7 @@ System::add_matrix (const std::string & mat_name,
     return *(_matrices[mat_name]);
 
   // Otherwise build the matrix to return.
-  auto pr = _matrices.emplace(mat_name, libmesh_make_unique<MatrixType<Number>>(this->comm()));
+  auto pr = _matrices.emplace(mat_name, std::make_unique<MatrixType<Number>>(this->comm()));
   _matrix_types.emplace(mat_name, type);
 
   SparseMatrix<Number> & mat = *(pr.first->second);

@@ -20,7 +20,6 @@
 
 #include "libmesh/libmesh_config.h"
 #include "libmesh/function_base.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #ifdef LIBMESH_HAVE_FPARSER
 
@@ -40,6 +39,7 @@
 #include <cstddef>
 #include <iomanip>
 #include <limits>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -374,9 +374,9 @@ inline
 std::unique_ptr<FunctionBase<Output>>
 ParsedFunction<Output,OutputGradient>::clone() const
 {
-  return libmesh_make_unique<ParsedFunction>(_expression,
-                                             &_additional_vars,
-                                             &_initial_vals);
+  return std::make_unique<ParsedFunction>(_expression,
+                                          &_additional_vars,
+                                          &_initial_vals);
 }
 
 template <typename Output, typename OutputGradient>
@@ -558,7 +558,7 @@ ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string & expr
 
       // Parse (and optimize if possible) the subexpression.
       // Add some basic constants, to Real precision.
-      auto fp = libmesh_make_unique<FunctionParserADBase<Output>>();
+      auto fp = std::make_unique<FunctionParserADBase<Output>>();
       fp->AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
       fp->AddConstant("pi", std::acos(Real(-1)));
       fp->AddConstant("e", std::exp(Real(1)));
@@ -577,23 +577,23 @@ ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string & expr
       fp->Optimize();
 
       // generate derivatives through automatic differentiation
-      auto dx_fp = libmesh_make_unique<FunctionParserADBase<Output>>(*fp);
+      auto dx_fp = std::make_unique<FunctionParserADBase<Output>>(*fp);
       if (dx_fp->AutoDiff("x") != -1) // -1 for success
         _valid_derivatives = false;
       dx_parsers.push_back(std::move(dx_fp));
 #if LIBMESH_DIM > 1
-      auto dy_fp = libmesh_make_unique<FunctionParserADBase<Output>>(*fp);
+      auto dy_fp = std::make_unique<FunctionParserADBase<Output>>(*fp);
       if (dy_fp->AutoDiff("y") != -1) // -1 for success
         _valid_derivatives = false;
       dy_parsers.push_back(std::move(dy_fp));
 #endif
 #if LIBMESH_DIM > 2
-      auto dz_fp = libmesh_make_unique<FunctionParserADBase<Output>>(*fp);
+      auto dz_fp = std::make_unique<FunctionParserADBase<Output>>(*fp);
       if (dz_fp->AutoDiff("z") != -1) // -1 for success
         _valid_derivatives = false;
       dz_parsers.push_back(std::move(dz_fp));
 #endif
-      auto dt_fp = libmesh_make_unique<FunctionParserADBase<Output>>(*fp);
+      auto dt_fp = std::make_unique<FunctionParserADBase<Output>>(*fp);
       if (dt_fp->AutoDiff("t") != -1) // -1 for success
         _valid_derivatives = false;
       dt_parsers.push_back(std::move(dt_fp));
@@ -764,7 +764,7 @@ public:
   virtual Output & getVarAddress(const std::string & /*variable_name*/) { return _dummy; }
   virtual std::unique_ptr<FunctionBase<Output>> clone() const
   {
-    return libmesh_make_unique<ParsedFunction<Output>>("");
+    return std::make_unique<ParsedFunction<Output>>("");
   }
 private:
   Output _dummy;

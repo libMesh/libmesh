@@ -27,10 +27,10 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/point.h"
 #include "libmesh/system.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <cstddef>
+#include <memory>
 
 namespace libMesh
 {
@@ -136,7 +136,7 @@ inline
 std::unique_ptr<FunctionBase<Output>>
 WrappedFunction<Output>::clone () const
 {
-  return libmesh_make_unique<WrappedFunction<Output>>
+  return std::make_unique<WrappedFunction<Output>>
     (_sys, _fptr, _parameters, _varnum);
 }
 

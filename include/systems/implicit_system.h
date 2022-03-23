@@ -22,10 +22,10 @@
 
 // Local Includes
 #include "libmesh/explicit_system.h"
-#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #include <cstddef>
+#include <memory>
 
 namespace libMesh
 {
