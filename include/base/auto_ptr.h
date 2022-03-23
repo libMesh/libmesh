@@ -35,24 +35,12 @@ template<typename T>
 using UniquePtr = std::unique_ptr<T>;
 }
 
-#endif
-
-// Set up the libmesh_make_unique macro. We don't yet require C++14, so this is a C++11 based workaround.
-#ifdef LIBMESH_HAVE_CXX14_MAKE_UNIQUE
+// Set up the libmesh_make_unique macro, for backwards compatibility.
+// We require C++17 now; users should just use std::make_unique
+// directly.
 
 #define libmesh_make_unique std::make_unique
 
-#else
-namespace libMesh
-{
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args &&... args)
-{
-  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-}
-#define libmesh_make_unique libMesh::make_unique
-
-#endif
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 #endif // LIBMESH_AUTO_PTR_H
