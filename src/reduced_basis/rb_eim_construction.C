@@ -1126,18 +1126,6 @@ void RBEIMConstruction::initialize_qp_data()
       libmesh_error_msg_if (parametrized_function_boundary_ids.empty(),
                             "Need to have non-empty boundary IDs to initialize side data");
 
-      // elem_fe is used for shellface data
-      FEBase * elem_fe = nullptr;
-      context.get_element_fe( 0, elem_fe );
-      const std::vector<Real> & JxW = elem_fe->get_JxW();
-      const std::vector<Point> & xyz = elem_fe->get_xyz();
-
-      // side_fe is used for element side data
-      FEBase* side_fe = nullptr;
-      context.get_side_fe( 0, side_fe );
-      const std::vector<Real> & JxW_side = side_fe->get_JxW();
-      const std::vector< Point > & xyz_side = side_fe->get_xyz();
-
       _local_side_quad_point_locations.clear();
       _local_side_quad_point_subdomain_ids.clear();
       _local_side_quad_point_boundary_ids.clear();
@@ -1155,6 +1143,16 @@ void RBEIMConstruction::initialize_qp_data()
           dof_id_type elem_id = elem->id();
 
           context.pre_fe_reinit(*this, elem);
+
+          // elem_fe is used for shellface data
+          auto elem_fe = context.get_element_fe(/*var=*/0, elem->dim());
+          const std::vector<Real> & JxW = elem_fe->get_JxW();
+          const std::vector<Point> & xyz = elem_fe->get_xyz();
+
+          // side_fe is used for element side data
+          auto side_fe = context.get_side_fe(/*var=*/0, elem->dim());
+          const std::vector<Real> & JxW_side = side_fe->get_JxW();
+          const std::vector< Point > & xyz_side = side_fe->get_xyz();
 
           for (context.side = 0;
                context.side != context.get_elem().n_sides();
@@ -1354,11 +1352,6 @@ void RBEIMConstruction::initialize_qp_data()
     }
   else
     {
-      FEBase * elem_fe = nullptr;
-      context.get_element_fe( 0, elem_fe );
-      const std::vector<Real> & JxW = elem_fe->get_JxW();
-      const std::vector<Point> & xyz = elem_fe->get_xyz();
-
       _local_quad_point_locations.clear();
       _local_quad_point_subdomain_ids.clear();
       _local_quad_point_JxW.clear();
@@ -1367,6 +1360,10 @@ void RBEIMConstruction::initialize_qp_data()
 
       for (const auto & elem : mesh.active_local_element_ptr_range())
         {
+          auto elem_fe = context.get_element_fe(/*var=*/0, elem->dim());
+          const std::vector<Real> & JxW = elem_fe->get_JxW();
+          const std::vector<Point> & xyz = elem_fe->get_xyz();
+
           dof_id_type elem_id = elem->id();
 
           context.pre_fe_reinit(*this, elem);
