@@ -108,18 +108,16 @@ std::string Utility::system_info()
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
-std::string Utility::complex_filename (const std::string & basename,
+std::string Utility::complex_filename (std::string basename,
                                        const unsigned int r_o_c)
 {
-  std::string name(basename);
-
   if (r_o_c == 0)
-    name.append(".real");
+    basename.append(".real");
 
   else
-    name.append(".imag");
+    basename.append(".imag");
 
-  return name;
+  return basename;
 }
 
 
@@ -155,12 +153,12 @@ int Utility::mkdir(const char* pathname) {
 }
 
 
-std::string Utility::unzip_file (const std::string & name)
+std::string Utility::unzip_file (std::string_view name)
 {
   std::ostringstream pid_suffix;
   pid_suffix << '_' << getpid();
 
-  std::string new_name = name;
+  std::string new_name { name };
   if (name.size() - name.rfind(".bz2") == 4)
     {
 #ifdef LIBMESH_HAVE_BZIP
@@ -168,7 +166,8 @@ std::string Utility::unzip_file (const std::string & name)
       new_name += pid_suffix.str();
       LOG_SCOPE("system(bunzip2)", "Utility");
       std::string system_string = "bunzip2 -f -k -c ";
-      system_string += name + " > " + new_name;
+      system_string.append(name);
+      system_string += " > " + new_name;
       if (std::system(system_string.c_str()))
         libmesh_file_error(system_string);
 #else
@@ -182,7 +181,8 @@ std::string Utility::unzip_file (const std::string & name)
       new_name += pid_suffix.str();
       LOG_SCOPE("system(xz -d)", "Utility");
       std::string system_string = "xz -f -d -k -c ";
-      system_string += name + " > " + new_name;
+      system_string.append(name);
+      system_string += " > " + new_name;
       if (std::system(system_string.c_str()))
         libmesh_file_error(system_string);
 #else

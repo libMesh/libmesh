@@ -407,7 +407,7 @@ void deallocate (std::vector<T> & vec)
  * of complex data, and for  \p r_o_c = 1 the filename for the imaginary
  * part.
  */
-std::string complex_filename (const std::string & basename,
+std::string complex_filename (std::string basename,
                               unsigned int r_o_c=0);
 
 /**
@@ -433,7 +433,7 @@ int mkdir(const char* pathname);
  * This is a hack because we don't have a neat bz2/xz equivalent to
  * gzstreams.
  */
-std::string unzip_file (const std::string & name);
+std::string unzip_file (std::string_view name);
 
 
 /**
