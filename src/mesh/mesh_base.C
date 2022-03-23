@@ -235,7 +235,7 @@ void MeshBase::set_spatial_dimension(unsigned char d)
 
 
 
-unsigned int MeshBase::add_elem_integer(const std::string & name,
+unsigned int MeshBase::add_elem_integer(std::string name,
                                         bool allocate_data,
                                         dof_id_type default_value)
 {
@@ -249,7 +249,7 @@ unsigned int MeshBase::add_elem_integer(const std::string & name,
 
   libmesh_assert_equal_to(_elem_integer_names.size(),
                           _elem_integer_default_values.size());
-  _elem_integer_names.push_back(name);
+  _elem_integer_names.push_back(std::move(name));
   _elem_integer_default_values.push_back(default_value);
   if (allocate_data)
     this->size_elem_extra_integers();
@@ -301,7 +301,7 @@ std::vector<unsigned int> MeshBase::add_elem_integers(const std::vector<std::str
 
 
 
-unsigned int MeshBase::get_elem_integer_index(const std::string & name) const
+unsigned int MeshBase::get_elem_integer_index(std::string_view name) const
 {
   for (auto i : index_range(_elem_integer_names))
     if (_elem_integer_names[i] == name)
@@ -313,7 +313,7 @@ unsigned int MeshBase::get_elem_integer_index(const std::string & name) const
 
 
 
-bool MeshBase::has_elem_integer(const std::string & name) const
+bool MeshBase::has_elem_integer(std::string_view name) const
 {
   for (auto & entry : _elem_integer_names)
     if (entry == name)
@@ -324,7 +324,7 @@ bool MeshBase::has_elem_integer(const std::string & name) const
 
 
 
-unsigned int MeshBase::add_node_integer(const std::string & name,
+unsigned int MeshBase::add_node_integer(std::string name,
                                         bool allocate_data,
                                         dof_id_type default_value)
 {
@@ -338,7 +338,7 @@ unsigned int MeshBase::add_node_integer(const std::string & name,
 
   libmesh_assert_equal_to(_node_integer_names.size(),
                           _node_integer_default_values.size());
-  _node_integer_names.push_back(name);
+  _node_integer_names.push_back(std::move(name));
   _node_integer_default_values.push_back(default_value);
   if (allocate_data)
     this->size_node_extra_integers();
@@ -390,7 +390,7 @@ std::vector<unsigned int> MeshBase::add_node_integers(const std::vector<std::str
 
 
 
-unsigned int MeshBase::get_node_integer_index(const std::string & name) const
+unsigned int MeshBase::get_node_integer_index(std::string_view name) const
 {
   for (auto i : index_range(_node_integer_names))
     if (_node_integer_names[i] == name)
@@ -402,7 +402,7 @@ unsigned int MeshBase::get_node_integer_index(const std::string & name) const
 
 
 
-bool MeshBase::has_node_integer(const std::string & name) const
+bool MeshBase::has_node_integer(std::string_view name) const
 {
   for (auto & entry : _node_integer_names)
     if (entry == name)
@@ -1335,7 +1335,7 @@ const std::string & MeshBase::subdomain_name(subdomain_id_type id) const
 
 
 
-subdomain_id_type MeshBase::get_id_by_name(const std::string & name) const
+subdomain_id_type MeshBase::get_id_by_name(std::string_view name) const
 {
   // Linear search over the map values.
   std::map<subdomain_id_type, std::string>::const_iterator
