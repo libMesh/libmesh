@@ -60,8 +60,8 @@ public:
    * remain at their previous values.
    */
   ParsedFunctionParameter(ParsedFunction<T> & func_ref,
-                          const std::string & param_name) :
-    _func(func_ref), _name(param_name) {}
+                          std::string param_name) :
+    _func(func_ref), _name(std::move(param_name)) {}
 
   /**
    * A simple reseater won't work with a parsed function
