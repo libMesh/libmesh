@@ -1200,8 +1200,9 @@ public:
   second_order_child_vertex (const unsigned int n) const;
 
   /**
-   * \returns The element type of the associated second-order element,
-   * or INVALID_ELEM for second-order or other elements that cannot be
+   * \returns The ElemType of the associated second-order element
+   * (which will be the same as the input if the input is already a
+   * second-order ElemType) or INVALID_ELEM for elements that cannot be
    * converted into higher order equivalents.
    *
    * For example, when \p this is a \p TET4, then \p TET10 is returned.

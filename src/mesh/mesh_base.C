@@ -1236,6 +1236,11 @@ void MeshBase::partition (const unsigned int n_parts)
     }
 }
 
+void MeshBase::all_second_order (const bool full_ordered)
+{
+  this->all_second_order_range(this->element_ptr_range(), full_ordered);
+}
+
 unsigned int MeshBase::recalculate_n_partitions()
 {
   // This requires an inspection on every processor
