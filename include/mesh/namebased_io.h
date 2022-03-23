@@ -99,7 +99,7 @@ public:
 
   // Certain mesh formats can support parallel I/O, including the
   // "new" Xdr format and the Nemesis format.
-  bool is_parallel_file_format (const std::string & filename);
+  bool is_parallel_file_format (std::string_view filename);
 };
 
 
@@ -121,7 +121,7 @@ NameBasedIO::NameBasedIO (MeshBase & mesh) :
 
 inline
 bool
-NameBasedIO::is_parallel_file_format (const std::string & name)
+NameBasedIO::is_parallel_file_format (std::string_view name)
 {
   return ((name.rfind(".xda") < name.size()) ||
           (name.rfind(".xdr") < name.size()) ||

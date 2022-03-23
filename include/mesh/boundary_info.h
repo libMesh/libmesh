@@ -824,7 +824,7 @@ public:
    * \returns The id of the named boundary if it exists, \p invalid_id
    * otherwise.
    */
-  boundary_id_type get_id_by_name(const std::string & name) const;
+  boundary_id_type get_id_by_name(std::string_view name) const;
 
   /**
    * \returns A writable reference to the sideset name map.

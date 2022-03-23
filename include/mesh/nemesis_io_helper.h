@@ -371,7 +371,7 @@ public:
    * Given base_filename, foo.e, constructs the Nemesis filename
    * foo.e.X.Y, where X=n. CPUs and Y=processor ID
    */
-  std::string construct_nemesis_filename(const std::string & base_filename);
+  std::string construct_nemesis_filename(std::string_view base_filename);
 
   /**
    * Member data

@@ -80,9 +80,9 @@ EnsightIO::EnsightIO (const std::string & filename,
 
 
 void EnsightIO::add_vector (const std::string & system_name,
-                            const std::string & vec_description,
-                            const std::string & u,
-                            const std::string & v)
+                            std::string_view vec_description,
+                            std::string u,
+                            std::string v)
 {
   libmesh_assert (_equation_systems.has_system(system_name));
   libmesh_assert (_equation_systems.get_system(system_name).has_variable(u));
@@ -90,19 +90,19 @@ void EnsightIO::add_vector (const std::string & system_name,
 
   Vectors vec;
   vec.description = vec_description;
-  vec.components.push_back(u);
-  vec.components.push_back(v);
+  vec.components.push_back(std::move(u));
+  vec.components.push_back(std::move(v));
 
-  _system_vars_map[system_name].EnsightVectors.push_back(vec);
+  _system_vars_map[system_name].EnsightVectors.push_back(std::move(vec));
 }
 
 
 
 void EnsightIO::add_vector (const std::string & system_name,
-                            const std::string & vec_name,
-                            const std::string & u,
-                            const std::string & v,
-                            const std::string & w)
+                            std::string_view vec_name,
+                            std::string u,
+                            std::string v,
+                            std::string w)
 {
   libmesh_assert(_equation_systems.has_system(system_name));
   libmesh_assert(_equation_systems.get_system(system_name).has_variable(u));
@@ -111,17 +111,17 @@ void EnsightIO::add_vector (const std::string & system_name,
 
   Vectors vec;
   vec.description = vec_name;
-  vec.components.push_back(u);
-  vec.components.push_back(v);
-  vec.components.push_back(w);
-  _system_vars_map[system_name].EnsightVectors.push_back(vec);
+  vec.components.push_back(std::move(u));
+  vec.components.push_back(std::move(v));
+  vec.components.push_back(std::move(w));
+  _system_vars_map[system_name].EnsightVectors.push_back(std::move(vec));
 }
 
 
 
 void EnsightIO::add_scalar(const std::string & system_name,
-                           const std::string & scl_description,
-                           const std::string & s)
+                           std::string_view scl_description,
+                           std::string_view s)
 {
   libmesh_assert(_equation_systems.has_system(system_name));
   libmesh_assert(_equation_systems.get_system(system_name).has_variable(s));
@@ -130,7 +130,7 @@ void EnsightIO::add_scalar(const std::string & system_name,
   scl.description = scl_description;
   scl.scalar_name = s;
 
-  _system_vars_map[system_name].EnsightScalars.push_back(scl);
+  _system_vars_map[system_name].EnsightScalars.push_back(std::move(scl));
 }
 
 
@@ -333,8 +333,8 @@ void EnsightIO::write_solution_ascii()
 }
 
 
-void EnsightIO::write_scalar_ascii(const std::string & sys,
-                                   const std::string & var_name)
+void EnsightIO::write_scalar_ascii(std::string_view sys,
+                                   std::string_view var_name)
 {
   // Construct scalar variable filename
   std::ostringstream scl_file;
@@ -404,9 +404,9 @@ void EnsightIO::write_scalar_ascii(const std::string & sys,
 }
 
 
-void EnsightIO::write_vector_ascii(const std::string & sys,
+void EnsightIO::write_vector_ascii(std::string_view sys,
                                    const std::vector<std::string> & vec,
-                                   const std::string & var_name)
+                                   std::string_view var_name)
 {
   // Construct vector variable filename
   std::ostringstream vec_file;

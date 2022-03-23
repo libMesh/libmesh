@@ -2791,7 +2791,7 @@ void Nemesis_IO_Helper::read_var_names_impl(const char * var_type,
 
 
 
-std::string Nemesis_IO_Helper::construct_nemesis_filename(const std::string & base_filename)
+std::string Nemesis_IO_Helper::construct_nemesis_filename(std::string_view base_filename)
 {
   // Build a filename for this processor.  This code is cut-n-pasted from the read function
   // and should probably be put into a separate function...

@@ -69,7 +69,7 @@ public:
   /**
    * Method to set switches to tetgen, allowing for different behaviours
    */
-  void set_switches(const std::string &);
+  void set_switches(std::string new_switches);
 
   /**
    * Method invokes TetGen library to compute a Delaunay tetrahedralization
