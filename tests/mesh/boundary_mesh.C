@@ -3,12 +3,12 @@
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/remote_elem.h>
 #include <libmesh/replicated_mesh.h>
-#include <libmesh/auto_ptr.h> // libmesh_make_unique
 #include <libmesh/boundary_info.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <memory>
 
 using namespace libMesh;
 
@@ -35,10 +35,10 @@ protected:
 
   void build_mesh()
   {
-    _mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
-    _all_boundary_mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
-    _left_boundary_mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
-    _internal_boundary_mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
+    _mesh = std::make_unique<Mesh>(*TestCommWorld);
+    _all_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
+    _left_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
+    _internal_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
 
     MeshTools::Generation::build_square(*_mesh, 3, 5,
                                         0.2, 0.8, 0.2, 0.7, QUAD9);

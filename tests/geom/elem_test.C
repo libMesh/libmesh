@@ -5,9 +5,10 @@
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/elem_side_builder.h>
-#include <libmesh/auto_ptr.h>
 
 #include "libmesh_cppunit.h"
+
+#include <memory>
 
 using namespace libMesh;
 
@@ -26,7 +27,7 @@ public:
     const Real minpos = 1.5, maxpos = 5.5;
     const unsigned int N = 2;
 
-    _mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
+    _mesh = std::make_unique<Mesh>(*TestCommWorld);
     std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

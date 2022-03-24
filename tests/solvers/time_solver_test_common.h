@@ -1,4 +1,3 @@
-#include <libmesh/auto_ptr.h> // libmesh_make_unique
 #include <libmesh/dof_map.h>
 #include <libmesh/enum_solver_type.h>
 #include <libmesh/enum_preconditioner_type.h>
@@ -10,6 +9,7 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <memory>
 
 using namespace libMesh;
 
@@ -32,7 +32,7 @@ protected:
     EquationSystems es(mesh);
     SystemType & system = es.add_system<SystemType>("ScalarSystem");
 
-    system.time_solver = libmesh_make_unique<TimeSolverType>(system);
+    system.time_solver = std::make_unique<TimeSolverType>(system);
 
     es.init();
 

@@ -32,7 +32,7 @@ public:
   {
     LOG_UNIT_TEST;
 
-    std::unique_ptr<UnstructuredMesh> mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
+    std::unique_ptr<UnstructuredMesh> mesh = std::make_unique<Mesh>(*TestCommWorld);
 
     mesh->add_point(Point(0, 0, 0), 0);
     mesh->add_point(Point(1, 0, 0), 1);
@@ -53,7 +53,7 @@ public:
   {
     LOG_UNIT_TEST;
 
-    std::unique_ptr<UnstructuredMesh> mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
+    std::unique_ptr<UnstructuredMesh> mesh = std::make_unique<Mesh>(*TestCommWorld);
 
     MeshTools::Generation::build_line(*mesh, 5, 0.0, 1.0, EDGE2);
 

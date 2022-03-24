@@ -390,7 +390,7 @@ struct TripleFunction : public FunctionBase<Number>
   TripleFunction(Number _offset = 0) : offset(_offset) {}
 
   virtual std::unique_ptr<FunctionBase<Number>> clone () const
-  { return libmesh_make_unique<TripleFunction>(offset); }
+  { return std::make_unique<TripleFunction>(offset); }
 
   // We only really need the vector-valued output for projections
   virtual Number operator() (const Point &,

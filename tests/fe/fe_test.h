@@ -35,7 +35,7 @@ using namespace libMesh;
 class SkewFunc : public FunctionBase<Real>
 {
   std::unique_ptr<FunctionBase<Real>> clone () const override
-  { return libmesh_make_unique<SkewFunc>(); }
+  { return std::make_unique<SkewFunc>(); }
 
   Real operator() (const Point & p,
                      const Real time = 0.) override

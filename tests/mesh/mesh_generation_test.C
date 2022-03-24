@@ -76,8 +76,8 @@ protected:
   std::unique_ptr<UnstructuredMesh> new_mesh (bool is_replicated)
   {
     if (is_replicated)
-      return libmesh_make_unique<ReplicatedMesh>(*TestCommWorld);
-    return libmesh_make_unique<DistributedMesh>(*TestCommWorld);
+      return std::make_unique<ReplicatedMesh>(*TestCommWorld);
+    return std::make_unique<DistributedMesh>(*TestCommWorld);
   }
 
 public:
