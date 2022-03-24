@@ -1220,10 +1220,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
   {
     ProjectVertices project_vertices(*this);
     Threads::parallel_reduce (node_range(&vertices), project_vertices);
-    ids_to_push.insert(project_vertices.new_ids_to_push.begin(),
-                       project_vertices.new_ids_to_push.end());
-    ids_to_save.insert(project_vertices.new_ids_to_save.begin(),
-                       project_vertices.new_ids_to_save.end());
+    ids_to_push.merge(std::move(project_vertices.new_ids_to_push));
+    ids_to_save.merge(std::move(project_vertices.new_ids_to_save));
   }
 
   done_saving_ids = sort_work.sides.empty() && sort_work.interiors.empty();
@@ -1234,10 +1232,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
     std::vector<node_projection> edges(sort_work.edges.begin(), sort_work.edges.end());
     ProjectEdges project_edges(*this);
     Threads::parallel_reduce (node_range(&edges), project_edges);
-    ids_to_push.insert(project_edges.new_ids_to_push.begin(),
-                       project_edges.new_ids_to_push.end());
-    ids_to_save.insert(project_edges.new_ids_to_save.begin(),
-                       project_edges.new_ids_to_save.end());
+    ids_to_push.merge(std::move(project_edges.new_ids_to_push));
+    ids_to_save.merge(std::move(project_edges.new_ids_to_save));
   }
 
   done_saving_ids = sort_work.interiors.empty();
@@ -1248,10 +1244,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
     std::vector<node_projection> sides(sort_work.sides.begin(), sort_work.sides.end());
     ProjectSides project_sides(*this);
     Threads::parallel_reduce (node_range(&sides), project_sides);
-    ids_to_push.insert(project_sides.new_ids_to_push.begin(),
-                       project_sides.new_ids_to_push.end());
-    ids_to_save.insert(project_sides.new_ids_to_save.begin(),
-                       project_sides.new_ids_to_save.end());
+    ids_to_push.merge(std::move(project_sides.new_ids_to_push));
+    ids_to_save.merge(std::move(project_sides.new_ids_to_save));
   }
 
   done_saving_ids = true;
