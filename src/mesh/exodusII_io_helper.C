@@ -1175,6 +1175,10 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
               const int * as_int = static_cast<int *>(attr.values);
               std::copy(as_int, as_int+attr.value_count, bex_elem_degrees.begin());
 
+              // ex_get_attributes did a values=calloc(); free() is our job.
+              if (attr.values)
+                free(attr.values);
+
               // Right now Bezier extraction elements aren't possible
               // for p>2 and aren't useful for p<2, and we don't
               // support anisotropic p...
