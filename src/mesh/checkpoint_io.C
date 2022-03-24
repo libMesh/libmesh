@@ -149,7 +149,7 @@ std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, processor_id_type nspl
   processor_id_type my_first_chunk = 0;
   chunking(mesh.comm().size(), mesh.comm().rank(), nsplits, my_num_chunks, my_first_chunk);
 
-  auto cpr = libmesh_make_unique<CheckpointIO>(mesh);
+  auto cpr = std::make_unique<CheckpointIO>(mesh);
   cpr->current_processor_ids().clear();
   for (processor_id_type i = my_first_chunk; i < my_first_chunk + my_num_chunks; i++)
     cpr->current_processor_ids().push_back(i);

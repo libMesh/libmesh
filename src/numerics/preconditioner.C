@@ -19,12 +19,16 @@
 
 // Local Includes
 #include "libmesh/preconditioner.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/eigen_preconditioner.h"
 #include "libmesh/petsc_preconditioner.h"
 #include "libmesh/trilinos_preconditioner.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_preconditioner_type.h"
+
+
+// C++ Includes
+#include <memory>
+
 
 namespace libMesh
 {
@@ -56,18 +60,18 @@ Preconditioner<T>::build_preconditioner(const libMesh::Parallel::Communicator & 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
-        return libmesh_make_unique<PetscPreconditioner<T>>(comm);
+        return std::make_unique<PetscPreconditioner<T>>(comm);
       }
 #endif
 
 #ifdef LIBMESH_TRILINOS_HAVE_EPETRA
     case TRILINOS_SOLVERS:
-      return libmesh_make_unique<TrilinosPreconditioner<T>>(comm);
+      return std::make_unique<TrilinosPreconditioner<T>>(comm);
 #endif
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      return libmesh_make_unique<EigenPreconditioner<T>>(comm);
+      return std::make_unique<EigenPreconditioner<T>>(comm);
 #endif
 
     default:

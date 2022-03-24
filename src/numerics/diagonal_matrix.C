@@ -20,7 +20,11 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+
+// C++ Includes
+#include <memory>
+
 
 namespace libMesh
 {
@@ -108,7 +112,7 @@ template <typename T>
 std::unique_ptr<SparseMatrix<T>> DiagonalMatrix<T>::zero_clone () const
 {
   // Make empty copy with matching comm
-  auto mat_copy = libmesh_make_unique<DiagonalMatrix<T>>(this->comm());
+  auto mat_copy = std::make_unique<DiagonalMatrix<T>>(this->comm());
 
   // Initialize copy with our same nonzero structure, and explicitly
   // zero values using fast == false.
@@ -125,7 +129,7 @@ template <typename T>
 std::unique_ptr<SparseMatrix<T>> DiagonalMatrix<T>::clone () const
 {
   // Make empty copy with matching comm
-  auto mat_copy = libmesh_make_unique<DiagonalMatrix<T>>(this->comm());
+  auto mat_copy = std::make_unique<DiagonalMatrix<T>>(this->comm());
 
   // Make copy of our diagonal
   auto diag_copy = _diagonal->clone();

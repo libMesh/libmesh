@@ -181,14 +181,14 @@ std::unique_ptr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
         {
         case 0:
           {
-            edge = libmesh_make_unique<Side<Edge3,InfQuad6>>(this,i);
+            edge = std::make_unique<Side<Edge3,InfQuad6>>(this,i);
             break;
           }
 
         case 1:
         case 2:
           {
-            edge = libmesh_make_unique<Side<InfEdge2,InfQuad6>>(this,i);
+            edge = std::make_unique<Side<InfEdge2,InfQuad6>>(this,i);
             break;
           }
 
@@ -205,7 +205,7 @@ std::unique_ptr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
         {
         case 0:
           {
-            edge = libmesh_make_unique<Edge3>();
+            edge = std::make_unique<Edge3>();
             break;
           }
 
@@ -213,7 +213,7 @@ std::unique_ptr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
         case 1:
         case 2:
           {
-            edge = libmesh_make_unique<InfEdge2>();
+            edge = std::make_unique<InfEdge2>();
             break;
           }
 

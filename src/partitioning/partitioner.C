@@ -152,23 +152,23 @@ Partitioner::build (const PartitionerType partitioner_type)
   switch (partitioner_type)
   {
     case CENTROID_PARTITIONER:
-      return libmesh_make_unique<CentroidPartitioner>();
+      return std::make_unique<CentroidPartitioner>();
     case LINEAR_PARTITIONER:
-      return libmesh_make_unique<LinearPartitioner>();
+      return std::make_unique<LinearPartitioner>();
     case MAPPED_SUBDOMAIN_PARTITIONER:
-      return libmesh_make_unique<MappedSubdomainPartitioner>();
+      return std::make_unique<MappedSubdomainPartitioner>();
     case METIS_PARTITIONER:
-      return libmesh_make_unique<MetisPartitioner>();
+      return std::make_unique<MetisPartitioner>();
     case PARMETIS_PARTITIONER:
-      return libmesh_make_unique<ParmetisPartitioner>();
+      return std::make_unique<ParmetisPartitioner>();
     case HILBERT_SFC_PARTITIONER:
-      return libmesh_make_unique<HilbertSFCPartitioner>();
+      return std::make_unique<HilbertSFCPartitioner>();
     case MORTON_SFC_PARTITIONER:
-      return libmesh_make_unique<MortonSFCPartitioner>();
+      return std::make_unique<MortonSFCPartitioner>();
     case SFC_PARTITIONER:
-      return libmesh_make_unique<SFCPartitioner>();
+      return std::make_unique<SFCPartitioner>();
     case SUBDOMAIN_PARTITIONER:
-      return libmesh_make_unique<SubdomainPartitioner>();
+      return std::make_unique<SubdomainPartitioner>();
     default:
       libmesh_error_msg("Invalid partitioner type: " <<
                         Utility::enum_to_string(partitioner_type));

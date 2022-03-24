@@ -142,7 +142,7 @@ std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i,
           // base
         case 0:
           {
-            face = libmesh_make_unique<Side<Quad4,InfHex8>>(this,i);
+            face = std::make_unique<Side<Quad4,InfHex8>>(this,i);
             break;
           }
 
@@ -152,7 +152,7 @@ std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i,
         case 3:
         case 4:
           {
-            face = libmesh_make_unique<Side<InfQuad4,InfHex8>>(this,i);
+            face = std::make_unique<Side<InfQuad4,InfHex8>>(this,i);
             break;
           }
 
@@ -170,7 +170,7 @@ std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i,
         {
         case 0: // the base face
           {
-            face = libmesh_make_unique<Quad4>();
+            face = std::make_unique<Quad4>();
             break;
           }
 
@@ -180,7 +180,7 @@ std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i,
         case 3:
         case 4:
           {
-            face = libmesh_make_unique<InfQuad4>();
+            face = std::make_unique<InfQuad4>();
             break;
           }
 

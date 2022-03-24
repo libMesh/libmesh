@@ -18,7 +18,6 @@
 
 
 // Local Includes
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/laspack_linear_solver.h"
@@ -32,6 +31,9 @@
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/enum_solver_type.h"
+
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -65,25 +67,25 @@ LinearSolver<T>::build(const libMesh::Parallel::Communicator & comm,
     {
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
-      return libmesh_make_unique<LaspackLinearSolver<T>>(comm);
+      return std::make_unique<LaspackLinearSolver<T>>(comm);
 #endif
 
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      return libmesh_make_unique<PetscLinearSolver<T>>(comm);
+      return std::make_unique<PetscLinearSolver<T>>(comm);
 #endif
 
 
 #ifdef LIBMESH_TRILINOS_HAVE_AZTECOO
     case TRILINOS_SOLVERS:
-      return libmesh_make_unique<AztecLinearSolver<T>>(comm);
+      return std::make_unique<AztecLinearSolver<T>>(comm);
 #endif
 
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      return libmesh_make_unique<EigenSparseLinearSolver<T>>(comm);
+      return std::make_unique<EigenSparseLinearSolver<T>>(comm);
 #endif
 
     default:

@@ -28,7 +28,7 @@ namespace libMesh
 {
 
 SubdomainPartitioner::SubdomainPartitioner () :
-  _internal_partitioner(libmesh_make_unique<MetisPartitioner>())
+  _internal_partitioner(std::make_unique<MetisPartitioner>())
 {}
 
 

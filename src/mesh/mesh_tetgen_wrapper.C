@@ -18,19 +18,19 @@
 #include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_TETGEN
 
-// C++ includes
-#include <iostream>
-
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_tetgen_wrapper.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ includes
+#include <iostream>
+#include <memory>
 
 namespace libMesh
 {
 
 TetGenWrapper::TetGenWrapper() :
-  tetgen_output(libmesh_make_unique<tetgenio>())
+  tetgen_output(std::make_unique<tetgenio>())
 {
   this->tetgen_data.mesh_dim                = 3;
   this->tetgen_data.numberofpointattributes = 0;

@@ -20,7 +20,9 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/newton_solver.h"
 #include "libmesh/implicit_system.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -52,7 +54,7 @@ DiffSolver::DiffSolver (sys_type & s) :
 
 std::unique_ptr<DiffSolver> DiffSolver::build (sys_type & s)
 {
-  return libmesh_make_unique<NewtonSolver>(s);
+  return std::make_unique<NewtonSolver>(s);
 }
 
 

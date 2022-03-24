@@ -20,6 +20,7 @@
 #include <cstring>
 #include <limits>
 #include <iomanip>
+#include <memory>
 #include <sstream>
 #include <fstream>
 
@@ -31,7 +32,6 @@
 # include "gzstream.h" // For reading/writing compressed streams
 # include "libmesh/restore_warnings.h"
 #endif
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/utility.h" // unzip_file
 
 #ifdef LIBMESH_HAVE_UNISTD_H
@@ -146,7 +146,7 @@ void Xdr::open (const std::string & name)
         fp = fopen(name.c_str(), (mode == ENCODE) ? "w" : "r");
         if (!fp)
           libmesh_file_error(name.c_str());
-        xdrs = libmesh_make_unique<XDR>();
+        xdrs = std::make_unique<XDR>();
         xdrstdio_create (xdrs.get(), fp, (mode == ENCODE) ? XDR_ENCODE : XDR_DECODE);
 #else
 

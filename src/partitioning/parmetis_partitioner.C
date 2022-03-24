@@ -71,7 +71,7 @@ const unsigned int MIN_ELEM_PER_PROC = 4;
 // ParmetisPartitioner implementation
 ParmetisPartitioner::ParmetisPartitioner()
 #ifdef LIBMESH_HAVE_PARMETIS
-  :  _pmetis(libmesh_make_unique<ParmetisHelper>())
+  :  _pmetis(std::make_unique<ParmetisHelper>())
 #endif
 {}
 
@@ -80,7 +80,7 @@ ParmetisPartitioner::ParmetisPartitioner()
 ParmetisPartitioner::ParmetisPartitioner (const ParmetisPartitioner & other)
   : Partitioner(other)
 #ifdef LIBMESH_HAVE_PARMETIS
-  , _pmetis(libmesh_make_unique<ParmetisHelper>(*(other._pmetis)))
+  , _pmetis(std::make_unique<ParmetisHelper>(*(other._pmetis)))
 #endif
 {
 }

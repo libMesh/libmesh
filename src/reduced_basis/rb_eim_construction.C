@@ -41,7 +41,6 @@
 #include "libmesh/fem_context.h"
 #include "libmesh/elem.h"
 #include "libmesh/int_range.h"
-#include "libmesh/auto_ptr.h"
 
 // rbOOmit includes
 #include "libmesh/rb_eim_construction.h"
@@ -50,6 +49,7 @@
 
 // C++ include
 #include <limits>
+#include <memory>
 
 namespace libMesh
 {

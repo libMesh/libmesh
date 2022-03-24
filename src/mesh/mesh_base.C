@@ -20,12 +20,6 @@
 // library configuration
 #include "libmesh/libmesh_config.h"
 
-// C++ includes
-#include <algorithm> // for std::min
-#include <map>       // for std::multimap
-#include <sstream>   // for std::ostringstream
-#include <unordered_map>
-
 // Local includes
 #include "libmesh/boundary_info.h"
 #include "libmesh/libmesh_logging.h"
@@ -42,9 +36,15 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_point_locator_type.h"
 #include "libmesh/enum_to_string.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/point_locator_nanoflann.h"
 #include "libmesh/elem_side_builder.h"
+
+// C++ includes
+#include <algorithm> // for std::min
+#include <map>       // for std::multimap
+#include <memory>
+#include <sstream>   // for std::ostringstream
+#include <unordered_map>
 
 namespace libMesh
 {
@@ -73,7 +73,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _skip_find_neighbors(false),
   _allow_remote_element_removal(true),
   _spatial_dimension(d),
-  _default_ghosting(libmesh_make_unique<GhostPointNeighbors>(*this)),
+  _default_ghosting(std::make_unique<GhostPointNeighbors>(*this)),
   _point_locator_close_to_point_tol(0.)
 {
   _elem_dims.insert(d);
@@ -105,7 +105,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
   _elem_dims(other_mesh._elem_dims),
   _spatial_dimension(other_mesh._spatial_dimension),
-  _default_ghosting(libmesh_make_unique<GhostPointNeighbors>(*this)),
+  _default_ghosting(std::make_unique<GhostPointNeighbors>(*this)),
   _point_locator_close_to_point_tol(other_mesh._point_locator_close_to_point_tol)
 {
   const GhostingFunctor * const other_default_ghosting = other_mesh._default_ghosting.get();

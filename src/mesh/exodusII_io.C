@@ -33,7 +33,6 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/parallel.h"
 #include "libmesh/utility.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/dyna_io.h"  // ElementDefinition for BEX
 
 // TIMPI includes
@@ -44,6 +43,7 @@
 #include <cstring>
 #include <fstream>
 #include <map>
+#include <memory>
 #include <sstream>
 
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -88,7 +88,7 @@ ExodusII_IO::ExodusII_IO (MeshBase & mesh,
                         /* serial_only_needed_on_proc_0 = */ true),
   ParallelObject(mesh),
 #ifdef LIBMESH_HAVE_EXODUS_API
-  exio_helper(libmesh_make_unique<ExodusII_IO_Helper>(*this, false, true, single_precision)),
+  exio_helper(std::make_unique<ExodusII_IO_Helper>(*this, false, true, single_precision)),
   _timestep(1),
   _verbose(false),
   _append(false),

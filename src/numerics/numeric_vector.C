@@ -16,12 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-
-// C++ includes
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath> // for std::abs
-#include <limits>
-
 // Local Includes
 #include "libmesh/numeric_vector.h"
 #include "libmesh/distributed_vector.h"
@@ -31,9 +25,16 @@
 #include "libmesh/trilinos_epetra_vector.h"
 #include "libmesh/shell_matrix.h"
 #include "libmesh/tensor_tools.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/int_range.h"
+
+
+// C++ includes
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath> // for std::abs
+#include <limits>
+#include <memory>
+
 
 namespace libMesh
 {
@@ -54,26 +55,26 @@ NumericVector<T>::build(const Parallel::Communicator & comm, const SolverPackage
 
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
-      return libmesh_make_unique<LaspackVector<T>>(comm, AUTOMATIC);
+      return std::make_unique<LaspackVector<T>>(comm, AUTOMATIC);
 #endif
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      return libmesh_make_unique<PetscVector<T>>(comm, AUTOMATIC);
+      return std::make_unique<PetscVector<T>>(comm, AUTOMATIC);
 #endif
 
 #ifdef LIBMESH_TRILINOS_HAVE_EPETRA
     case TRILINOS_SOLVERS:
-      return libmesh_make_unique<EpetraVector<T>>(comm, AUTOMATIC);
+      return std::make_unique<EpetraVector<T>>(comm, AUTOMATIC);
 #endif
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      return libmesh_make_unique<EigenSparseVector<T>>(comm, AUTOMATIC);
+      return std::make_unique<EigenSparseVector<T>>(comm, AUTOMATIC);
 #endif
 
     default:
-      return libmesh_make_unique<DistributedVector<T>>(comm, AUTOMATIC);
+      return std::make_unique<DistributedVector<T>>(comm, AUTOMATIC);
     }
 }
 

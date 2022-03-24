@@ -210,7 +210,7 @@ std::unique_ptr<SparseMatrix<T>> EpetraMatrix<T>::zero_clone () const
   libmesh_not_implemented();
 
   // Make empty copy with matching comm, initialize, and return.
-  auto mat_copy = libmesh_make_unique<EpetraMatrix<T>>(this->comm());
+  auto mat_copy = std::make_unique<EpetraMatrix<T>>(this->comm());
   mat_copy->init();
   mat_copy->zero();
 

@@ -93,7 +93,7 @@ MeshFunction::MeshFunction (const MeshFunction & mf):
 
   if (mf._subdomain_ids)
     _subdomain_ids =
-      libmesh_make_unique<std::set<subdomain_id_type>>
+      std::make_unique<std::set<subdomain_id_type>>
         (*mf._subdomain_ids);
 }
 
@@ -150,7 +150,7 @@ MeshFunction::clear ()
 
 std::unique_ptr<FunctionBase<Number>> MeshFunction::clone () const
 {
-  return libmesh_make_unique<MeshFunction>(*this);
+  return std::make_unique<MeshFunction>(*this);
 }
 
 
@@ -867,7 +867,7 @@ void MeshFunction::set_subdomain_ids(const std::set<subdomain_id_type> * subdoma
   if (subdomain_ids)
     _subdomain_ids.reset();
   else
-    _subdomain_ids = libmesh_make_unique<std::set<subdomain_id_type>>(*subdomain_ids);
+    _subdomain_ids = std::make_unique<std::set<subdomain_id_type>>(*subdomain_ids);
 }
 
 } // namespace libMesh

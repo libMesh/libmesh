@@ -71,17 +71,17 @@ std::unique_ptr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
   switch (t)
     {
     case TREE:
-      return libmesh_make_unique<PointLocatorTree>(mesh, /*Trees::NODES,*/ master);
+      return std::make_unique<PointLocatorTree>(mesh, /*Trees::NODES,*/ master);
 
     case TREE_ELEMENTS:
-      return libmesh_make_unique<PointLocatorTree>(mesh, Trees::ELEMENTS, master);
+      return std::make_unique<PointLocatorTree>(mesh, Trees::ELEMENTS, master);
 
     case TREE_LOCAL_ELEMENTS:
-      return libmesh_make_unique<PointLocatorTree>(mesh, Trees::LOCAL_ELEMENTS, master);
+      return std::make_unique<PointLocatorTree>(mesh, Trees::LOCAL_ELEMENTS, master);
 
 #ifdef LIBMESH_HAVE_NANOFLANN
     case NANOFLANN:
-      return libmesh_make_unique<PointLocatorNanoflann>(mesh, master);
+      return std::make_unique<PointLocatorNanoflann>(mesh, master);
 #endif
 
     default:

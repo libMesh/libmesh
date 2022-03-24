@@ -33,7 +33,10 @@
 #include "libmesh/tensor_tools.h"
 #include "libmesh/enum_norm_type.h"
 #include "libmesh/utility.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
+
 
 namespace libMesh
 {
@@ -101,7 +104,7 @@ void ExactSolution::attach_exact_value (ValueFunctionPointer fptr)
   for (auto sys : make_range(_equation_systems.n_systems()))
     {
       const System & system = _equation_systems.get_system(sys);
-      _exact_values.emplace_back(libmesh_make_unique<WrappedFunction<Number>>(system, fptr, &_equation_systems.parameters));
+      _exact_values.emplace_back(std::make_unique<WrappedFunction<Number>>(system, fptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -142,7 +145,7 @@ void ExactSolution::attach_exact_deriv (GradientFunctionPointer gptr)
   for (auto sys : make_range(_equation_systems.n_systems()))
     {
       const System & system = _equation_systems.get_system(sys);
-      _exact_derivs.emplace_back(libmesh_make_unique<WrappedFunction<Gradient>>(system, gptr, &_equation_systems.parameters));
+      _exact_derivs.emplace_back(std::make_unique<WrappedFunction<Gradient>>(system, gptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -183,7 +186,7 @@ void ExactSolution::attach_exact_hessian (HessianFunctionPointer hptr)
   for (auto sys : make_range(_equation_systems.n_systems()))
     {
       const System & system = _equation_systems.get_system(sys);
-      _exact_hessians.emplace_back(libmesh_make_unique<WrappedFunction<Tensor>>(system, hptr, &_equation_systems.parameters));
+      _exact_hessians.emplace_back(std::make_unique<WrappedFunction<Tensor>>(system, hptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -485,7 +488,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
       comparison_soln->init(comparison_system.solution->size(), true, SERIAL);
       (*comparison_soln) = global_soln;
 
-      coarse_values = libmesh_make_unique<MeshFunction>
+      coarse_values = std::make_unique<MeshFunction>
         (_equation_systems,
          *comparison_soln,
          comparison_system.get_dof_map(),

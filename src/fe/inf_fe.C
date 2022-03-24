@@ -28,10 +28,10 @@
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/int_range.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/type_tensor.h"
 #include "libmesh/fe_interface.h"
 
+#include <memory>
 
 namespace libMesh
 {
@@ -94,7 +94,7 @@ void InfFE<Dim,T_radial,T_map>::attach_quadrature_rule (QBase * q)
     }
 
   // in radial direction, always use Gauss quadrature
-  radial_qrule = libmesh_make_unique<QGauss>(1, radial_int_order);
+  radial_qrule = std::make_unique<QGauss>(1, radial_int_order);
 
   // Maybe helpful to store the QBase *
   // with which we initialized our own quadrature rules.

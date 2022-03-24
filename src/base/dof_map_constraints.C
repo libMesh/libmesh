@@ -62,6 +62,7 @@
 #include <sstream>
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
+#include <memory>
 #include <numeric>
 #include <unordered_set>
 
@@ -637,7 +638,7 @@ private:
         libmesh_assert(f_system);
         if (f_system->current_local_solution->initialized())
           {
-            context = libmesh_make_unique<FEMContext>(*f_system);
+            context = std::make_unique<FEMContext>(*f_system);
             f_fem->init_context(*context);
           }
       }
@@ -817,7 +818,7 @@ private:
         libmesh_assert(f_system);
         if (f_system->current_local_solution->initialized())
           {
-            context = libmesh_make_unique<FEMContext>(*f_system);
+            context = std::make_unique<FEMContext>(*f_system);
             f_fem->init_context(*context);
             if (g_fem)
               g_fem->init_context(*context);
@@ -1608,7 +1609,7 @@ public:
     // Construct a FEMContext object for the System on which the
     // Variables in our DirichletBoundary objects are defined. This
     // will be used in the apply_dirichlet_impl() function.
-    auto fem_context = libmesh_make_unique<FEMContext>(*system);
+    auto fem_context = std::make_unique<FEMContext>(*system);
 
     // At the time we are using this FEMContext, the current_local_solution
     // vector is not initialized, but also we don't need it, so set

@@ -18,7 +18,6 @@
 
 #include "libmesh/twostep_time_solver.h"
 
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/diff_system.h"
 #include "libmesh/enum_norm_type.h"
 #include "libmesh/euler_solver.h"
@@ -30,6 +29,9 @@
 #include "libmesh/adjoint_refinement_estimator.h"
 #include "libmesh/error_vector.h"
 
+// C++ includes
+#include <memory>
+
 namespace libMesh
 {
 
@@ -40,7 +42,7 @@ TwostepTimeSolver::TwostepTimeSolver (sys_type & s)
 
 {
   // We start with a reasonable time solver: implicit Euler
-  core_time_solver = libmesh_make_unique<EulerSolver>(s);
+  core_time_solver = std::make_unique<EulerSolver>(s);
 }
 
 

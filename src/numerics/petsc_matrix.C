@@ -596,7 +596,7 @@ std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::zero_clone () const
 
   // Call wrapping PetscMatrix constructor, have it take over
   // ownership.
-  auto ret = libmesh_make_unique<PetscMatrix<T>>(copy, this->comm());
+  auto ret = std::make_unique<PetscMatrix<T>>(copy, this->comm());
   ret->set_destroy_mat_on_exit(true);
 
   // Work around an issue on older compilers.  We are able to simply
@@ -618,7 +618,7 @@ std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::clone () const
 
   // Call wrapping PetscMatrix constructor, have it take over
   // ownership.
-  auto ret = libmesh_make_unique<PetscMatrix<T>>(copy, this->comm());
+  auto ret = std::make_unique<PetscMatrix<T>>(copy, this->comm());
   ret->set_destroy_mat_on_exit(true);
 
   // Work around an issue on older compilers.  We are able to simply

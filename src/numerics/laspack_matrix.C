@@ -26,7 +26,11 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/sparsity_pattern.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+
+// C++ Includes
+#include <memory>
+
 
 namespace libMesh
 {
@@ -300,7 +304,7 @@ std::unique_ptr<SparseMatrix<T>> LaspackMatrix<T>::zero_clone () const
   libmesh_not_implemented();
 
   // Make empty copy with matching comm, initialize, zero, and return.
-  auto mat_copy = libmesh_make_unique<LaspackMatrix<T>>(this->comm());
+  auto mat_copy = std::make_unique<LaspackMatrix<T>>(this->comm());
   mat_copy->init();
   mat_copy->zero();
 

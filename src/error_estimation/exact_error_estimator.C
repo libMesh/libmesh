@@ -16,11 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <algorithm> // for std::fill
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath>    // for sqrt
-
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -39,7 +34,12 @@
 #include "libmesh/tensor_tools.h"
 #include "libmesh/enum_error_estimator_type.h"
 #include "libmesh/enum_norm_type.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ includes
+#include <algorithm> // for std::fill
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath>    // for sqrt
+#include <memory>
 
 namespace libMesh
 {
@@ -259,7 +259,7 @@ void ExactErrorEstimator::estimate_error (const System & system,
              SERIAL);
           (*fine_soln) = global_soln;
 
-          fine_values = libmesh_make_unique<MeshFunction>
+          fine_values = std::make_unique<MeshFunction>
             (*_equation_systems_fine,
              *fine_soln,
              fine_system.get_dof_map(),

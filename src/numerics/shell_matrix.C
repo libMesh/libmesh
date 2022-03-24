@@ -41,7 +41,7 @@ namespace libMesh
       {
   #ifdef LIBMESH_HAVE_PETSC
       case PETSC_SOLVERS:
-        return libmesh_make_unique<PetscShellMatrix<T>>(comm);
+        return std::make_unique<PetscShellMatrix<T>>(comm);
   #endif
 
       default:

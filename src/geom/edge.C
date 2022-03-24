@@ -45,7 +45,7 @@ unsigned int Edge::local_edge_node(unsigned int /*edge*/,
 std::unique_ptr<Elem> Edge::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, 2);
-  std::unique_ptr<Elem> nodeelem = libmesh_make_unique<NodeElem>(this);
+  std::unique_ptr<Elem> nodeelem = std::make_unique<NodeElem>(this);
   nodeelem->set_node(0) = this->node_ptr(i);
   return nodeelem;
 }
@@ -73,7 +73,7 @@ void Edge::side_ptr (std::unique_ptr<Elem> & side,
 std::unique_ptr<Elem> Edge::build_side_ptr (const unsigned int i, bool)
 {
   libmesh_assert_less (i, 2);
-  std::unique_ptr<Elem> nodeelem = libmesh_make_unique<NodeElem>(this);
+  std::unique_ptr<Elem> nodeelem = std::make_unique<NodeElem>(this);
   nodeelem->set_node(0) = this->node_ptr(i);
 
 #ifndef LIBMESH_ENABLE_DEPRECATED

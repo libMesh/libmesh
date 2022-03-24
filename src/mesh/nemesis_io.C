@@ -16,9 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <numeric> // std::accumulate
-
 // LibMesh includes
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/dof_map.h" // local_index
@@ -36,7 +33,10 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/int_range.h"
-#include "libmesh/auto_ptr.h"
+
+// C++ includes
+#include <memory>
+#include <numeric> // std::accumulate
 
 namespace libMesh
 {
@@ -99,7 +99,7 @@ Nemesis_IO::Nemesis_IO (MeshBase & mesh,
   MeshOutput<MeshBase> (mesh, /*is_parallel_format=*/true),
   ParallelObject (mesh),
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-  nemhelper(libmesh_make_unique<Nemesis_IO_Helper>(*this, false, single_precision)),
+  nemhelper(std::make_unique<Nemesis_IO_Helper>(*this, false, single_precision)),
   _timestep(1),
 #endif
   _verbose (false),

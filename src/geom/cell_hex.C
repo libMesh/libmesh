@@ -125,7 +125,7 @@ std::unique_ptr<Elem> Hex::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
-  std::unique_ptr<Elem> face = libmesh_make_unique<Quad4>();
+  std::unique_ptr<Elem> face = std::make_unique<Quad4>();
 
   for (auto n : face->node_index_range())
     face->set_node(n) = this->node_ptr(Hex8::side_nodes_map[i][n]);

@@ -17,11 +17,6 @@
 
 
 
-// C++ includes
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath> // for std::sqrt, std::abs
-
-
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
@@ -35,9 +30,13 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/tensor_value.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/int_range.h"
+
+// C++ includes
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath> // for std::sqrt, std::abs
+#include <memory>
 
 namespace libMesh
 {
@@ -77,10 +76,10 @@ std::unique_ptr<FEMap> FEMap::build( FEType fe_type )
   switch( fe_type.family )
     {
     case XYZ:
-      return libmesh_make_unique<FEXYZMap>();
+      return std::make_unique<FEXYZMap>();
 
     default:
-      return libmesh_make_unique<FEMap>();
+      return std::make_unique<FEMap>();
     }
 }
 

@@ -43,15 +43,15 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/threads.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
 #include "timpi/parallel_sync.h"
 
 // C++ Includes
-#include <set>
 #include <algorithm> // for std::fill, std::equal_range, std::max, std::lower_bound, etc.
+#include <memory>
+#include <set>
 #include <sstream>
 #include <unordered_map>
 
@@ -89,7 +89,7 @@ DofMap::build_sparsity (const MeshBase & mesh,
   // Even better, if the full sparsity pattern is not needed then
   // the number of nonzeros per row can be estimated from the
   // sparsity patterns created on each thread.
-  auto sp = libmesh_make_unique<SparsityPattern::Build>
+  auto sp = std::make_unique<SparsityPattern::Build>
     (*this,
      this->_dof_coupling,
      this->_coupling_functors,
@@ -153,8 +153,8 @@ DofMap::DofMap(const unsigned int number,
   _augment_send_list(nullptr),
   _extra_send_list_function(nullptr),
   _extra_send_list_context(nullptr),
-  _default_coupling(libmesh_make_unique<DefaultCoupling>()),
-  _default_evaluating(libmesh_make_unique<DefaultCoupling>()),
+  _default_coupling(std::make_unique<DefaultCoupling>()),
+  _default_evaluating(std::make_unique<DefaultCoupling>()),
   need_full_sparsity_pattern(false),
   _n_dfs(0),
   _n_SCALAR_dofs(0)
@@ -174,10 +174,10 @@ DofMap::DofMap(const unsigned int number,
   , _node_constraints()
 #endif
 #ifdef LIBMESH_ENABLE_PERIODIC
-  , _periodic_boundaries(libmesh_make_unique<PeriodicBoundaries>())
+  , _periodic_boundaries(std::make_unique<PeriodicBoundaries>())
 #endif
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  , _dirichlet_boundaries(libmesh_make_unique<DirichletBoundaries>())
+  , _dirichlet_boundaries(std::make_unique<DirichletBoundaries>())
   , _adjoint_dirichlet_boundaries()
 #endif
   , _implicit_neighbor_dofs_initialized(false),
