@@ -4,10 +4,12 @@
 // libMesh includes
 #include "libmesh/rb_eim_construction.h"
 #include "libmesh/rb_eim_evaluation.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // Example includes
 #include "assembly.h"
+
+// C++ includes
+#include <memory>
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
@@ -25,7 +27,7 @@ public:
   SimpleEIMEvaluation(const libMesh::Parallel::Communicator & comm) :
     RBEIMEvaluation(comm)
   {
-    set_parametrized_function(libmesh_make_unique<ShiftedGaussian>());
+    set_parametrized_function(std::make_unique<ShiftedGaussian>());
   }
 };
 
@@ -59,7 +61,7 @@ public:
    */
   virtual std::unique_ptr<ElemAssembly> build_eim_assembly(unsigned int index)
   {
-    return libmesh_make_unique<EIM_F>(*this, index);
+    return std::make_unique<EIM_F>(*this, index);
   }
 };
 

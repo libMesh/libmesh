@@ -24,10 +24,12 @@
 #include "libmesh/rb_construction.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/rb_evaluation.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // local include
 #include "assembly.h"
+
+// C++ includes
+#include <memory>
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
@@ -110,7 +112,7 @@ public:
     Parent::init_data();
 
     acoustics_rb_assembly_expansion =
-      libmesh_make_unique<AcousticsRBAssemblyExpansion>();
+      std::make_unique<AcousticsRBAssemblyExpansion>();
 
     // Set the rb_assembly_expansion for this Construction object.
     // The theta expansion comes from the RBEvaluation object.

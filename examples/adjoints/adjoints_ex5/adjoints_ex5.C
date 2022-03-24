@@ -87,7 +87,6 @@
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/system_norm.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_solver_package.h"
 
 #include "libmesh/mesh.h"
@@ -117,6 +116,7 @@
 #include <iostream>
 #include <sys/time.h>
 #include <iomanip>
+#include <memory>
 
 void write_output(EquationSystems & es,
                   unsigned int t_step,       // The current time step count
@@ -390,7 +390,7 @@ int main (int argc, char ** argv)
   Mesh mesh(init.comm(), cast_int<unsigned char>(param.dimension));
 
   // And an object to refine it
-  auto mesh_refinement = libmesh_make_unique<MeshRefinement>(mesh);
+  auto mesh_refinement = std::make_unique<MeshRefinement>(mesh);
 
   // And an EquationSystems to run on it
   EquationSystems equation_systems (mesh);

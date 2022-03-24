@@ -28,6 +28,7 @@
 
 // C++ includes
 #include <iomanip>
+#include <memory>
 
 // Basic include files
 #include "libmesh/elem.h"
@@ -43,7 +44,6 @@
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/parsed_function.h"
 #include "libmesh/uniform_refinement_estimator.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_norm_type.h"
 
@@ -173,7 +173,7 @@ int main (int argc, char ** argv)
     equation_systems.add_system<HeatSystem> ("Heat");
 
   // Solve this as a steady system
-  system.time_solver = libmesh_make_unique<SteadySolver>(system);
+  system.time_solver = std::make_unique<SteadySolver>(system);
 
   // Initialize the system
   equation_systems.init ();
@@ -236,7 +236,7 @@ int main (int argc, char ** argv)
           // not in H1 - if we were doing more than a few
           // timesteps we'd need to turn off or limit the
           // maximum level of our adaptivity eventually
-          error_estimator = libmesh_make_unique<KellyErrorEstimator>();
+          error_estimator = std::make_unique<KellyErrorEstimator>();
         }
 
       error_estimator->estimate_error(system, error);

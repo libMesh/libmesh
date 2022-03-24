@@ -55,6 +55,7 @@
 // C++ includes
 #include <iostream>
 #include <iomanip>
+#include <memory>
 
 // General libMesh includes
 #include "libmesh/equation_systems.h"
@@ -68,7 +69,6 @@
 #include "libmesh/partitioner.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/system_norm.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_solver_package.h"
 
 // Error Estimator includes
@@ -181,7 +181,7 @@ void set_system_parameters(LaplaceSystem & system,
   system.print_jacobians      = param.print_jacobians;
 
   // No transient time solver
-  system.time_solver = libmesh_make_unique<SteadySolver>(system);
+  system.time_solver = std::make_unique<SteadySolver>(system);
 
   // Nonlinear solver options
   {
@@ -243,7 +243,7 @@ std::unique_ptr<ErrorEstimator> build_error_estimator(FEMParameters & param,
     {
       libMesh::out << "Using Kelly Error Estimator" << std::endl;
 
-      return libmesh_make_unique<KellyErrorEstimator>();
+      return std::make_unique<KellyErrorEstimator>();
     }
   else if (param.indicator_type == "adjoint_residual")
     {

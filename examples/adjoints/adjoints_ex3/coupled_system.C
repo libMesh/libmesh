@@ -31,10 +31,10 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/zero_function.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <functional> // std::reference_wrapper
+#include <memory>
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -68,7 +68,7 @@ public:
   }
 
   virtual std::unique_ptr<FunctionBase<Number>> clone() const
-  { return libmesh_make_unique<BdyFunction>(_u_var, _v_var, int(_sign)); }
+  { return std::make_unique<BdyFunction>(_u_var, _v_var, int(_sign)); }
 
 private:
   const unsigned int _u_var, _v_var;

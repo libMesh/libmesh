@@ -17,10 +17,12 @@
 
 // libMesh includes
 #include "libmesh/function_base.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // Example includes
 #include "curl_curl_exact_solution.h"
+
+// C++ includes
+#include <memory>
 
 using namespace libMesh;
 
@@ -61,7 +63,7 @@ public:
   }
 
   virtual std::unique_ptr<FunctionBase<Number>> clone() const
-  { return libmesh_make_unique<SolutionFunction>(_u_var); }
+  { return std::make_unique<SolutionFunction>(_u_var); }
 
 private:
 
@@ -99,7 +101,7 @@ public:
   }
 
   virtual std::unique_ptr<FunctionBase<Gradient>> clone() const
-  { return libmesh_make_unique<SolutionGradient>(_u_var); }
+  { return std::make_unique<SolutionGradient>(_u_var); }
 
 private:
 

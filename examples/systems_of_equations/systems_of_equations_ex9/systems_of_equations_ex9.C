@@ -175,7 +175,7 @@ public:
    */
   virtual std::unique_ptr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const override
   {
-    return libmesh_make_unique<AzimuthalPeriodicBoundary>(*this, t);
+    return std::make_unique<AzimuthalPeriodicBoundary>(*this, t);
   }
 
 private:

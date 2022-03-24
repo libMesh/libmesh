@@ -3,8 +3,8 @@
 
 #include "libmesh/parsed_function.h"
 #include "libmesh/zero_function.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
+#include <memory>
 #include <unordered_set>
 
 using namespace libMesh;
@@ -142,9 +142,9 @@ std::unique_ptr<FunctionBase<Number>> new_function_base(const std::string & func
                                                         const std::string & func_value)
 {
   if (func_type == "parsed")
-    return libmesh_make_unique<ParsedFunction<Number>>(func_value);
+    return std::make_unique<ParsedFunction<Number>>(func_value);
   else if (func_type == "zero")
-    return libmesh_make_unique<ZeroFunction<Number>>();
+    return std::make_unique<ZeroFunction<Number>>();
   else
     libmesh_not_implemented();
 
