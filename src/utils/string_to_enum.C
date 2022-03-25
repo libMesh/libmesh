@@ -668,7 +668,7 @@ namespace Utility {
 
 #define INSTANTIATE_STRING_TO_ENUM(ENUM_NAME,VAR_NAME)                  \
   template <>                                                           \
-  ENUM_NAME string_to_enum<ENUM_NAME> (const std::string & s)           \
+  ENUM_NAME string_to_enum<ENUM_NAME> (std::string_view s)              \
   {                                                                     \
     init_##VAR_NAME##_to_enum();                                        \
                                                                         \
@@ -677,10 +677,22 @@ namespace Utility {
                                                                         \
     if (!VAR_NAME##_to_enum.count(upper))                               \
       {                                                                 \
-        libmesh_error_msg("No " #ENUM_NAME " named " + s + " found.");  \
+        libmesh_error_msg("No " #ENUM_NAME " named " << s << " found.");  \
       }                                                                 \
                                                                         \
     return VAR_NAME##_to_enum[upper];                                   \
+  }                                                                     \
+                                                                        \
+  template <>                                                           \
+  ENUM_NAME string_to_enum<ENUM_NAME> (const std::string & s)           \
+  {                                                                     \
+    return string_to_enum<ENUM_NAME>(std::string_view(s));              \
+  }                                                                     \
+                                                                        \
+  template <>                                                           \
+  ENUM_NAME string_to_enum<ENUM_NAME> (const char * s)                  \
+  {                                                                     \
+    return string_to_enum<ENUM_NAME>(std::string_view(s));              \
   }                                                                     \
                                                                         \
   template <>                                                           \
@@ -693,6 +705,7 @@ namespace Utility {
                                                                         \
     return enum_to_##VAR_NAME [e];                                      \
   }
+
 
 
 INSTANTIATE_STRING_TO_ENUM(ElemType,elem_type)
