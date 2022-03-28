@@ -589,6 +589,23 @@ struct casting_compare {
 template<class ...Args> inline void libmesh_ignore( const Args&... ) { }
 
 
+// A workaround for the lack of C++17 merge() support in some
+// compilers
+
+#ifdef LIBMESH_HAVE_CXX17_SPLICING
+template <typename T>
+void libmesh_merge_move(T & target, T & source) {
+  target.merge(std::move(source));
+}
+#else
+template <typename T>
+void libmesh_merge_move(T & target, T & source) {
+  target.insert(source.begin(), source.end());
+  source.clear(); // Avoid forwards-incompatibility
+}
+#endif // LIBMESH_HAVE_CXX17_SPLICING
+
+
 // cast_ref and cast_ptr do a dynamic cast and assert
 // the result, if we have RTTI enabled and we're in debug or
 // development modes, but they just do a faster static cast if we're
