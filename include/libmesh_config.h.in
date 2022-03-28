@@ -344,6 +344,9 @@
 /* Compiler supports fallthrough attribute, but it is disabled in libmesh */
 #undef HAVE_CXX17_FALLTHROUGH_ATTRIBUTE_BUT_DISABLED
 
+/* Flag indicating whether compiler supports std::*::merge */
+#undef HAVE_CXX17_SPLICING
+
 /* Define to 1 if you have the declaration of `sigaction', and to 0 if you
    don't. */
 #undef HAVE_DECL_SIGACTION
