@@ -167,7 +167,53 @@ AC_DEFUN([ACSM_TEST_CXX_ALL],
     AS_IF([test "x$have_cxx11_isinf" != "xyes"],
           [AC_MSG_WARN([libMesh requires C++11 support for std::isinf])
            have_cxx_all=no])
+
+dnl Optional test here - requiring it would force us to bump up clang
+dnl requirements too high for now.
+    LIBMESH_TEST_CXX17_SPLICING
+    AS_IF([test "x$have_cxx17_splicing" != "xyes"],
+          [AC_MSG_WARN([libMesh prefers C++17 support for set/map merge])])
   ])
+
+
+dnl Test C++17 std::set/map/etc. "splicing" and "merging"
+AC_DEFUN([LIBMESH_TEST_CXX17_SPLICING],
+  [
+    have_cxx17_splicing=no
+
+    AC_LANG_PUSH([C++])
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
+
+    AC_MSG_CHECKING(for C++17 std::*::merge)
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <map>
+    @%:@include <set>
+    @%:@include <unordered_map>
+    @%:@include <unordered_set>
+    ]], [[
+    std::set<int> s1{1}, s2{2};
+    std::unordered_set<int> us1{3}, us2{4};
+    std::map<int,int> m1{{5,6}}, m2{{7,8}};
+    std::unordered_map<int,int> um1{{9,10}}, um2{{11,12}};
+    s1.merge(std::move(s2));
+    us1.merge(std::move(us2));
+    m1.merge(std::move(m2));
+    um1.merge(std::move(um2));
+    ]])],[
+        AC_MSG_RESULT(yes)
+        have_cxx17_splicing=yes
+        AC_DEFINE(HAVE_CXX17_SPLICING, 1, [Flag indicating whether compiler supports std::*::merge])
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    dnl Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+  ])
+
 
 dnl Test C++11 std::isnan, std::isinf
 AC_DEFUN([LIBMESH_TEST_CXX11_ISNAN_ISINF],
