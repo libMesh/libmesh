@@ -1722,6 +1722,40 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
 #endif
         }
 
+      // If we're adding extra sides, we need to add their data too.
+      {
+        dof_id_type global_idx = mesh.max_node_id() * num_vars + c;
+        if (exio_helper->get_add_sides())
+          {
+            for (const auto & elem : mesh.active_element_ptr_range())
+              {
+                for (auto s : elem->side_index_range())
+                  {
+                    if (exio_helper->redundant_added_side(*elem,s))
+                      continue;
+
+                    const std::vector<unsigned int> side_nodes =
+                      elem->nodes_on_side(s);
+
+                    for (auto n : index_range(side_nodes))
+                      {
+                        libmesh_ignore(n);
+                        libmesh_assert_less(global_idx, soln.size());
+#ifdef LIBMESH_USE_REAL_NUMBERS
+                        cur_soln.push_back(soln[global_idx]);
+#else
+                        real_parts.push_back(soln[global_idx].real());
+                        imag_parts.push_back(soln[global_idx].imag());
+                        if (_write_complex_abs)
+                          magnitudes.push_back(std::abs(soln[global_idx]));
+#endif
+                        global_idx += num_vars;
+                      }
+                  }
+              }
+          }
+      }
+
       // Finally, actually call the Exodus API to write to file.
 #ifdef LIBMESH_USE_REAL_NUMBERS
       exio_helper->write_nodal_values(variable_name_position+1, cur_soln, _timestep);
