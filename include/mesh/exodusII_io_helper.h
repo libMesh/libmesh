@@ -907,11 +907,6 @@ protected:
 protected:
 
   /**
-   * Set to true iff we want to write separate "side" elements too.
-   */
-  bool _add_sides = false;
-
-  /**
    * read_var_names() dispatches to this function.  We need to
    * override it slightly for Nemesis.
    */
@@ -920,6 +915,11 @@ protected:
                                    std::vector<std::string> & result);
 
 private:
+
+  /**
+   * Set to true iff we want to write separate "side" elements too.
+   */
+  bool _add_sides = false;
 
   /**
    * write_var_names() dispatches to this function.
