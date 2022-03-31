@@ -140,6 +140,8 @@ public:
    */
   void write_added_sides (bool val);
 
+  virtual bool get_add_sides () override;
+
   /**
    * \returns An array containing the timesteps in the file.
    */
