@@ -165,6 +165,14 @@ protected:
 
 
   /**
+   * \returns Whether or not added sides are expected to be output,
+   * to plot SIDE_DISCONTINUOUS data.  Subclasses should override this
+   * if they are capable of plotting such data.
+   */
+  virtual bool get_add_sides() { return false; }
+
+
+  /**
    * Flag specifying whether this format is parallel-capable.
    * If this is false (default) I/O is only permitted when the mesh
    * has been serialized.

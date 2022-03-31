@@ -795,6 +795,11 @@ void ExodusII_IO::write_added_sides (bool val)
 }
 
 
+bool ExodusII_IO::get_add_sides ()
+{
+  return exio_helper->get_add_sides();
+}
+
 
 void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool val)
 {

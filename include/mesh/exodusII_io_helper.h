@@ -121,6 +121,8 @@ public:
    */
   void set_add_sides(bool add_sides);
 
+  bool get_add_sides();
+
   /**
    * Opens an \p ExodusII mesh file named \p filename.  If
    * read_only==true, the file will be opened with the EX_READ flag,
@@ -1144,6 +1146,11 @@ private:
 
 inline void ExodusII_IO_Helper::set_add_sides(bool add_sides) {
   _add_sides = add_sides;
+}
+
+
+inline bool ExodusII_IO_Helper::get_add_sides() {
+  return _add_sides;
 }
 
 
