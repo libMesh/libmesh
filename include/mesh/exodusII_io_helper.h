@@ -803,6 +803,14 @@ public:
   const ExodusII_IO_Helper::Conversion &
   get_conversion(std::string type_str) const;
 
+  /*
+   * Returns true iff the given side of the given element is *not*
+   * added to output from that element, because it is considered to be
+   * redundant with respect to the same data added from the
+   * neighboring element sharing that side.
+   */
+  static bool redundant_added_side(const Elem & elem, unsigned int side);
+
 protected:
   /**
    * When appending: during initialization, check that variable names

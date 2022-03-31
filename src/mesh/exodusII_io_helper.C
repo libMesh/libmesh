@@ -134,30 +134,6 @@ const std::vector<int> hex_inverse_edge_map =
   }
 
 
-  bool skip_side(const Elem & elem, unsigned int side)
-  {
-    libmesh_assert(elem.active());
-
-    const Elem * neigh = elem.neighbor_ptr(side);
-
-    // Write boundary sides.
-    if (!neigh)
-      return false;
-
-    // Write ghost sides in Nemesis
-    if (neigh == remote_elem)
-      return false;
-
-    // Don't write a coarser side if a finer side exists
-    if (!neigh->active())
-      return true;
-
-    // Don't write a side redundantly from both of the
-    // elements sharing it.  We'll disambiguate with id().
-    return (neigh->id() < elem.id());
-  }
-
-
   std::map<subdomain_id_type, std::vector<unsigned int>>
   build_subdomain_map(const MeshBase & mesh, bool add_sides, subdomain_id_type & subdomain_id_end)
   {
@@ -193,7 +169,7 @@ const std::vector<int> hex_inverse_edge_map =
         if (add_sides)
           for (auto s : elem->side_index_range())
             {
-              if (skip_side(*elem,s))
+              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
                 continue;
 
               auto & marker =
@@ -2092,7 +2068,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 
         for (auto s : elem->side_index_range())
           {
-            if (skip_side(*elem,s))
+            if (redundant_added_side(*elem,s))
               continue;
 
             num_elem++;
@@ -2277,7 +2253,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
       for (const auto & elem : mesh.active_element_ptr_range())
         for (auto s : elem->side_index_range())
           {
-            if (skip_side(*elem,s))
+            if (redundant_added_side(*elem,s))
               continue;
 
             const std::vector<unsigned int> side_nodes =
@@ -2417,7 +2393,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
           for (auto s : elem->side_index_range())
             {
-              if (skip_side(*elem,s))
+              if (redundant_added_side(*elem,s))
                 continue;
 
               const std::vector<unsigned int> side_nodes =
@@ -2692,7 +2668,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
             for (auto s : elem->side_index_range())
               {
-                if (skip_side(*elem,s))
+                if (redundant_added_side(*elem,s))
                   continue;
 
                 if (elem->side_type(s) != elem_t)
@@ -3991,6 +3967,8 @@ ExodusII_IO_Helper::write_nodal_values(int var_id,
 
   if (!values.empty())
     {
+      libmesh_assert_equal_to(values.size(), std::size_t(num_nodes));
+
       ex_err = exII::ex_put_nodal_var
         (ex_id, timestep, var_id, num_nodes,
          MappedOutputVector(values, _single_precision).data());
@@ -4333,6 +4311,31 @@ char * ExodusII_IO_Helper::NamesData::get_char_star(int i)
 
   return data_table[i].data();
 }
+
+
+bool ExodusII_IO_Helper::redundant_added_side(const Elem & elem, unsigned int side)
+{
+  libmesh_assert(elem.active());
+
+  const Elem * neigh = elem.neighbor_ptr(side);
+
+  // Write boundary sides.
+  if (!neigh)
+    return false;
+
+  // Write ghost sides in Nemesis
+  if (neigh == remote_elem)
+    return false;
+
+  // Don't write a coarser side if a finer side exists
+  if (!neigh->active())
+    return true;
+
+  // Don't write a side redundantly from both of the
+  // elements sharing it.  We'll disambiguate with id().
+  return (neigh->id() < elem.id());
+}
+
 
 
 } // namespace libMesh
