@@ -75,7 +75,7 @@ void UnsteadySolver::init_adjoints ()
   {
     std::string old_adjoint_solution_name = "_old_adjoint_solution";
     old_adjoint_solution_name+= std::to_string(i);
-    _system.add_vector(old_adjoint_solution_name);
+    _system.add_vector(old_adjoint_solution_name, false, GHOSTED);
 
     std::string adjoint_rhs_name = "adjoint_rhs";
     adjoint_rhs_name+= std::to_string(i);
