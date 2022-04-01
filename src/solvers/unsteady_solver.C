@@ -64,6 +64,26 @@ void UnsteadySolver::init ()
 }
 
 
+void UnsteadySolver::init_adjoints ()
+{
+  TimeSolver::init_adjoints();
+
+  // Add old adjoint solutions
+  // To keep the number of vectors consistent between the primal and adjoint
+  // time loops, we will also add the adjoint rhs vector during initialization
+  for(auto i : make_range(_system.n_qois()))
+  {
+    std::string old_adjoint_solution_name = "_old_adjoint_solution";
+    old_adjoint_solution_name+= std::to_string(i);
+    _system.add_vector(old_adjoint_solution_name);
+
+    std::string adjoint_rhs_name = "adjoint_rhs";
+    adjoint_rhs_name+= std::to_string(i);
+    _system.add_vector(adjoint_rhs_name, false, GHOSTED);
+  }
+
+}
+
 
 void UnsteadySolver::init_data()
 {

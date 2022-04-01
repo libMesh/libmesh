@@ -69,6 +69,12 @@ public:
   virtual void init () override;
 
   /**
+   * @brief Add adjoint vectors and old_adjoint_vectors
+   * as per the indices of QoISet
+   */
+  virtual void init_adjoints () override;
+
+  /**
    * The data initialization function.  This method is used to
    * initialize internal data structures after the underlying System
    * has been initialized
