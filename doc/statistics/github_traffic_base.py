@@ -169,10 +169,8 @@ class PlotData(object):
     ax1.plot(x_axis, monthly_column2, color=muted_dark_blue, marker='o', linestyle='-')
     ax1.set_ylabel(self.left_axis_label + ' (blue circles)')
 
-    # Place an x-axis tick mark every x_step months.  As we get more data,
-    # we'll have to increase x_step.
-    x_step = 8
-    x_axis_ticks = range(0, len(x_axis), x_step)
+    # Create N evenly spaced x-axis tick marks.
+    x_axis_ticks = np.linspace(0, len(x_axis)-1, num=10).astype(int)
 
     # Set tick labels and positions
     ax1.set_xticks([x_axis[i] for i in x_axis_ticks])
