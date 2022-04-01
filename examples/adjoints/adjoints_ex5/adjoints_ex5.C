@@ -444,23 +444,11 @@ int main (int argc, char ** argv)
                << std::endl
                << std::endl;
 
-  // Add an adjoint vector, this will be computed after the forward
-  // time stepping is complete
-  //
-  // Tell the library not to save adjoint solutions during the forward
-  // solve
-  //
-  // Tell the library not to project this vector, and hence, memory/file
-  // solution history to not save it.
-  //
-  // Make this vector ghosted so we can localize it to each element
-  // later.
-  const std::string & adjoint_solution_name = "adjoint_solution0";
-  system.add_vector("adjoint_solution0", false, GHOSTED);
+  // Tell system that we have two qois
+  system.init_qois(1);
 
-  // To keep the number of vectors consistent between the primal and adjoint
-  // loops, we will also pre-add the adjoint rhs vector
-  system.add_vector("adjoint_rhs0", false, GHOSTED);
+  // Add the adjoint vectors (and the old adjoint vectors) to system
+  system.time_solver->init_adjoints();
 
   // Close up any resources initial.C needed
   finish_initialization();
@@ -519,9 +507,12 @@ int main (int argc, char ** argv)
       // We need to tell the library that it needs to project the adjoint, so
       // MemorySolutionHistory knows it has to save it
 
+      const std::string & adjoint_solution_name0 = "adjoint_solution0";
+      const std::string & old_adjoint_solution_name0 = "old_adjoint_solution0";
       // Tell the library to project the adjoint vector, and hence, memory solution history to
       // save it
-      system.set_vector_preservation(adjoint_solution_name, true);
+      system.set_vector_preservation(adjoint_solution_name0, true);
+      system.set_vector_preservation(old_adjoint_solution_name0, true);
 
       libMesh::out << "Setting adjoint initial conditions Z("
                    << system.time

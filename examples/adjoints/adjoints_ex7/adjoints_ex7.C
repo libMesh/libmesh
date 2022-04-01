@@ -435,26 +435,8 @@ int main (int argc, char ** argv)
   // Tell system that we have two qois
   system.init_qois(2);
 
-  // Add two adjoint vectors, these will be computed after the forward
-  // and QoI calculation time stepping loops are complete
-  //
-  // Tell the library not to save adjoint solutions during the forward
-  // solve
-  //
-  // Tell the library not to project this vector, and hence, memory/file
-  // solution history to not save it during the forward run.
-  //
-  // Make this vector ghosted so we can localize it to each element
-  // later.
-  const std::string & adjoint_solution_name0 = "adjoint_solution0";
-  const std::string & adjoint_solution_name1 = "adjoint_solution1";
-  system.add_vector("adjoint_solution0", false, GHOSTED);
-  system.add_vector("adjoint_solution1", false, GHOSTED);
-
-  // To keep the number of vectors consistent between the primal and adjoint
-  // loops, we will also pre-add the adjoint rhs vector
-  system.add_vector("adjoint_rhs0", false, GHOSTED);
-  system.add_vector("adjoint_rhs1", false, GHOSTED);
+  // Add the adjoint vectors (and the old adjoint vectors) to system
+  system.time_solver->init_adjoints();
 
   // Plot the initial conditions
   write_output(equation_systems, 0, "primal", param);
@@ -537,8 +519,15 @@ int main (int argc, char ** argv)
 
       // Tell the library to project the adjoint vectors, and hence, solution history to
       // save them.
+      const std::string & adjoint_solution_name0 = "adjoint_solution0";
+      const std::string & adjoint_solution_name1 = "adjoint_solution1";
+      const std::string & old_adjoint_solution_name0 = "old_adjoint_solution0";
+      const std::string & old_adjoint_solution_name1 = "old_adjoint_solution1";
+
       system.set_vector_preservation(adjoint_solution_name0, true);
       system.set_vector_preservation(adjoint_solution_name1, true);
+      system.set_vector_preservation(old_adjoint_solution_name0, true);
+      system.set_vector_preservation(old_adjoint_solution_name1, true);
 
       libMesh::out << "Setting adjoint initial conditions Z("
                    << system.time
