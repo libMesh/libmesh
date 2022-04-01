@@ -432,6 +432,9 @@ int main (int argc, char ** argv)
                << std::endl
                << std::endl;
 
+  // Tell system that we have two qois
+  system.init_qois(2);
+
   // Add two adjoint vectors, these will be computed after the forward
   // and QoI calculation time stepping loops are complete
   //
@@ -518,10 +521,10 @@ int main (int argc, char ** argv)
         {
           system.time_solver->integrate_qoi_timestep();
 
-          QoI_1_accumulated += (system.qoi)[1];
+          QoI_1_accumulated += system.get_qoi_value(1);
         }
 
-      std::cout<< "The computed QoI 0 is " << std::setprecision(17) << (system.qoi)[0] << std::endl;
+      std::cout<< "The computed QoI 0 is " << std::setprecision(17) << system.get_qoi_value(0) << std::endl;
       std::cout<< "The computed QoI 1 is " << std::setprecision(17) << QoI_1_accumulated << std::endl;
 
       ///////////////// Now for the Adjoint Solution //////////////////////////////////////
@@ -811,7 +814,7 @@ int main (int argc, char ** argv)
             // Skip this QoI if not in the QoI Set
             if ((adjoint_refinement_error_estimator->qoi_set()).has_index(j))
             {
-              accumulated_QoI_spatially_integrated_error[j] += (system.qoi_error_estimates)[j];
+              accumulated_QoI_spatially_integrated_error[j] += system.get_qoi_error_estimate_value(j);
             }
           }
         }
