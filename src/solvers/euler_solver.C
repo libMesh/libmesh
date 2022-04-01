@@ -199,13 +199,13 @@ void EulerSolver::integrate_qoi_timestep()
   // Zero out the system.qoi vector
   for (auto j : make_range(_system.n_qois()))
   {
-    (_system.qoi)[j] = 0.0;
+    _system.fill_qoi(j, 0.0);
   }
 
   // Left and right side contributions
-  std::vector<Number> left_contribution(_system.qoi.size(), 0.0);
+  std::vector<Number> left_contribution(_system.n_qois(), 0.0);
   Number time_left = 0.0;
-  std::vector<Number> right_contribution(_system.qoi.size(), 0.0);
+  std::vector<Number> right_contribution(_system.n_qois(), 0.0);
   Number time_right = 0.0;
 
   time_left = _system.time;
@@ -216,7 +216,7 @@ void EulerSolver::integrate_qoi_timestep()
   // Also get the spatially integrated errors for all the QoIs in the QoI set
   for (auto j : make_range(_system.n_qois()))
   {
-    left_contribution[j] = (_system.qoi)[j];
+    left_contribution[j] = _system.get_qoi_value(j);
   }
 
   // Advance to t_j+1
@@ -230,7 +230,7 @@ void EulerSolver::integrate_qoi_timestep()
   // Zero out the system.qoi vector
   for (auto j : make_range(_system.n_qois()))
   {
-    (_system.qoi)[j] = 0.0;
+    _system.fill_qoi(j, 0.0);
   }
 
   // Base class assumes a direct steady evaluation
@@ -238,14 +238,14 @@ void EulerSolver::integrate_qoi_timestep()
 
   for(auto j : make_range(_system.n_qois()))
   {
-    right_contribution[j] = (_system.qoi)[j];
+    right_contribution[j] = _system.get_qoi_value(j);
   }
 
   // Combine the left and right side contributions as per the specified theta
   // theta = 0.5 (Crank-Nicholson) gives the trapezoidal rule.
   for (auto j : make_range(_system.n_qois()))
   {
-    (_system.qoi)[j] = ( ((1.0 - theta)*left_contribution[j]) + (theta*right_contribution[j]) )*(time_right - time_left);
+    _system.fill_qoi(j, ( ((1.0 - theta)*left_contribution[j]) + (theta*right_contribution[j]) )*(time_right - time_left));
   }
 }
 
@@ -256,16 +256,12 @@ void EulerSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementE
   if (theta != 1.0)
   libmesh_not_implemented();
 
-  // Make sure the system::qoi_error_estimates vector is of the same size as system::qoi
-  if(_system.qoi_error_estimates.size() != _system.qoi.size())
-    _system.qoi_error_estimates.resize(_system.qoi.size());
-
   // There are two possibilities regarding the integration rule we need to use for time integration.
   // If we have a instantaneous QoI, then we need to use a left sided Riemann sum, otherwise the trapezoidal rule for temporally smooth QoIs.
 
   // Create left and right error estimate vectors of the right size
-  std::vector<Number> qoi_error_estimates_left(_system.qoi.size());
-  std::vector<Number> qoi_error_estimates_right(_system.qoi.size());
+  std::vector<Number> qoi_error_estimates_left(_system.n_qois());
+  std::vector<Number> qoi_error_estimates_right(_system.n_qois());
 
   // Get t_j
   Real time_left = _system.time;
@@ -408,7 +404,7 @@ void EulerSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementE
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      (_system.qoi_error_estimates)[j] = ( (1.0 - theta)*qoi_error_estimates_left[j] + theta*qoi_error_estimates_right[j] )*last_step_deltat;
+      _system.fill_qoi_error_estimate(j, ( (1.0 - theta)*qoi_error_estimates_left[j] + theta*qoi_error_estimates_right[j] )*last_step_deltat);
     }
   }
 
