@@ -22,9 +22,9 @@
 // Local includes
 #include "libmesh/partitioner.h"
 #include "libmesh/point.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
+#include <memory>
 #include <utility> // pair
 #include <vector>
 
@@ -87,7 +87,7 @@ public:
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<CentroidPartitioner>(*this);
+    return std::make_unique<CentroidPartitioner>(*this);
   }
 
   /**

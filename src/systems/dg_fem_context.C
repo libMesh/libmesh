@@ -43,7 +43,7 @@ DGFEMContext::DGFEMContext (const System & sys)
 
   for (unsigned int i=0; i != nv; ++i)
     {
-      _neighbor_subresiduals.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_neighbor_residual));
+      _neighbor_subresiduals.emplace_back(std::make_unique<DenseSubVector<Number>>(_neighbor_residual));
       _elem_elem_subjacobians[i].reserve(nv);
       _elem_neighbor_subjacobians[i].reserve(nv);
       _neighbor_elem_subjacobians[i].reserve(nv);
@@ -51,10 +51,10 @@ DGFEMContext::DGFEMContext (const System & sys)
 
       for (unsigned int j=0; j != nv; ++j)
         {
-          _elem_elem_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_elem_elem_jacobian));
-          _elem_neighbor_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_elem_neighbor_jacobian));
-          _neighbor_elem_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_neighbor_elem_jacobian));
-          _neighbor_neighbor_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_neighbor_neighbor_jacobian));
+          _elem_elem_subjacobians[i].emplace_back(std::make_unique<DenseSubMatrix<Number>>(_elem_elem_jacobian));
+          _elem_neighbor_subjacobians[i].emplace_back(std::make_unique<DenseSubMatrix<Number>>(_elem_neighbor_jacobian));
+          _neighbor_elem_subjacobians[i].emplace_back(std::make_unique<DenseSubMatrix<Number>>(_neighbor_elem_jacobian));
+          _neighbor_neighbor_subjacobians[i].emplace_back(std::make_unique<DenseSubMatrix<Number>>(_neighbor_neighbor_jacobian));
         }
     }
 

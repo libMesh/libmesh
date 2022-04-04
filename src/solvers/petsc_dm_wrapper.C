@@ -1074,9 +1074,9 @@ namespace libMesh
     for( unsigned int i = 0; i < n_levels; i++ )
       {
         // Call C++ object constructors
-        _pmtx_vec[i] = libmesh_make_unique<PetscMatrix<Number>>(comm);
-        _subpmtx_vec[i] = libmesh_make_unique<PetscMatrix<Number>>(comm);
-        _vec_vec[i] = libmesh_make_unique<PetscVector<Number>>(comm);
+        _pmtx_vec[i] = std::make_unique<PetscMatrix<Number>>(comm);
+        _subpmtx_vec[i] = std::make_unique<PetscMatrix<Number>>(comm);
+        _vec_vec[i] = std::make_unique<PetscVector<Number>>(comm);
       }
   }
 

@@ -8,10 +8,10 @@
 
 // libMesh includes
 #include <libmesh/eigen_sparse_matrix.h>
-#include <libmesh/auto_ptr.h> // libmesh_make_unique
 #include <libmesh/dense_matrix.h>
 
 // C++ includes
+#include <memory>
 #include <vector>
 
 using namespace libMesh;
@@ -32,7 +32,7 @@ public:
     // EigenSparseMatrix is serial, but its constructor takes a comm
     // for consistency with other SparseMatrix types.
     _comm = TestCommWorld;
-    _matrix = libmesh_make_unique<EigenSparseMatrix<Number>>(*_comm);
+    _matrix = std::make_unique<EigenSparseMatrix<Number>>(*_comm);
 
     // All parameters are ignored except the number of global rows and colums and nnz.
     _matrix->init(/*m*/10,

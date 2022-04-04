@@ -16,10 +16,12 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/fem_context.h"
 #include "libmesh/zero_function.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // Local includes
 #include "poisson.h"
+
+// C++ includes
+#include <memory>
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -47,7 +49,7 @@ public:
   }
 
   virtual std::unique_ptr<FunctionBase<Number>> clone() const
-  { return libmesh_make_unique<BdyFunction>(_T_var); }
+  { return std::make_unique<BdyFunction>(_T_var); }
 
 private:
   const unsigned int _T_var;

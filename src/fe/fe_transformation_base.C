@@ -19,8 +19,10 @@
 #include "libmesh/h1_fe_transformation.h"
 #include "libmesh/hcurl_fe_transformation.h"
 #include "libmesh/fe_type.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_to_string.h"
+
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -48,11 +50,11 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
     case L2_LAGRANGE: // PB: Shouldn't this be L2 conforming?
     case JACOBI_20_00: // PB: For infinite elements...
     case JACOBI_30_00: // PB: For infinite elements...
-      return libmesh_make_unique<H1FETransformation<OutputShape>>();
+      return std::make_unique<H1FETransformation<OutputShape>>();
 
       // HCurl Conforming Elements
     case NEDELEC_ONE:
-      return libmesh_make_unique<HCurlFETransformation<OutputShape>>();
+      return std::make_unique<HCurlFETransformation<OutputShape>>();
 
       // HDiv Conforming Elements
       // L2 Conforming Elements
@@ -60,7 +62,7 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
       // Other...
     case SCALAR:
       // Should never need this for SCALARs
-      return libmesh_make_unique<H1FETransformation<OutputShape>>();
+      return std::make_unique<H1FETransformation<OutputShape>>();
 
     default:
       libmesh_error_msg("Unknown family = " << Utility::enum_to_string(fe_type.family));

@@ -168,7 +168,7 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
           // base
         case 0:
           {
-            face = libmesh_make_unique<Side<Tri6,InfPrism12>>(this,i);
+            face = std::make_unique<Side<Tri6,InfPrism12>>(this,i);
             break;
           }
 
@@ -177,7 +177,7 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
         case 2:
         case 3:
           {
-            face = libmesh_make_unique<Side<InfQuad6,InfPrism12>>(this,i);
+            face = std::make_unique<Side<InfQuad6,InfPrism12>>(this,i);
             break;
           }
 
@@ -195,7 +195,7 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
         {
         case 0: // the triangular face at z=-1, base face
           {
-            face = libmesh_make_unique<Tri6>();
+            face = std::make_unique<Tri6>();
             break;
           }
 
@@ -203,7 +203,7 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
         case 2: // the other quad face
         case 3: // the quad face at x=0
           {
-            face = libmesh_make_unique<InfQuad6>();
+            face = std::make_unique<InfQuad6>();
             break;
           }
 

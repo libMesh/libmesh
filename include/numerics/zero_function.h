@@ -20,7 +20,9 @@
 
 // Local includes
 #include "libmesh/const_function.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -49,7 +51,7 @@ public:
 
   virtual std::unique_ptr<FunctionBase<Output>> clone() const override
   {
-    return libmesh_make_unique<ZeroFunction<Output>>();
+    return std::make_unique<ZeroFunction<Output>>();
   }
 };
 

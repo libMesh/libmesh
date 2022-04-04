@@ -30,7 +30,7 @@ public:
   void setUp()
   {
     _comm = TestCommWorld;
-    _matrix = libmesh_make_unique<PetscMatrix<Number>>(*_comm);
+    _matrix = std::make_unique<PetscMatrix<Number>>(*_comm);
 
     numeric_index_type root_block_size = 2;
     _local_size = root_block_size + static_cast<numeric_index_type>(_comm->rank());

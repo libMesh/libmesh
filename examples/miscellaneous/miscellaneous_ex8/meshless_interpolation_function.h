@@ -24,10 +24,10 @@
 #include "libmesh/function_base.h"
 #include "libmesh/meshfree_interpolation.h"
 #include "libmesh/threads.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <cstddef>
+#include <memory>
 
 namespace libMesh
 {
@@ -144,7 +144,7 @@ inline
 std::unique_ptr<FunctionBase<Number>>
 MeshlessInterpolationFunction::clone () const
 {
-  return libmesh_make_unique<MeshlessInterpolationFunction>(_mfi, _mutex);
+  return std::make_unique<MeshlessInterpolationFunction>(_mfi, _mutex);
 }
 
 

@@ -2520,7 +2520,7 @@ Elem::simple_build_side_ptr (const unsigned int i,
   if (proxy)
     {
 #ifdef LIBMESH_ENABLE_DEPRECATED
-      face = libmesh_make_unique<Side<Sideclass,Subclass>>(this,i);
+      face = std::make_unique<Side<Sideclass,Subclass>>(this,i);
       libmesh_deprecated();
 #else
       libmesh_error();
@@ -2528,7 +2528,7 @@ Elem::simple_build_side_ptr (const unsigned int i,
     }
   else
     {
-      face = libmesh_make_unique<Sideclass>(this);
+      face = std::make_unique<Sideclass>(this);
       for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(Subclass::side_nodes_map[i][n]);
     }
@@ -2636,7 +2636,7 @@ Elem::simple_build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 
-  std::unique_ptr<Elem> edge = libmesh_make_unique<Edgeclass>(this);
+  std::unique_ptr<Elem> edge = std::make_unique<Edgeclass>(this);
 
   for (auto n : edge->node_index_range())
     edge->set_node(n) = this->node_ptr(Subclass::edge_nodes_map[i][n]);

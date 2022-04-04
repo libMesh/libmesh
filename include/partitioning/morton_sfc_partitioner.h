@@ -23,6 +23,8 @@
 // Local Includes
 #include "libmesh/sfc_partitioner.h"
 
+// C++ Includes
+
 namespace libMesh
 {
 
@@ -61,7 +63,7 @@ public:
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<MortonSFCPartitioner>(*this);
+    return std::make_unique<MortonSFCPartitioner>(*this);
   }
 
 protected:

@@ -20,9 +20,6 @@
 // arguments, parse the function specified in a command line argument,
 // L2-project its value onto the mesh, and output the new solution.
 
-// C++ includes
-#include <map>
-#include <string>
 
 // libMesh includes
 #include "L2system.h"
@@ -41,6 +38,11 @@
 #include "libmesh/elem.h"
 #include "libmesh/parallel_implementation.h"
 #include "libmesh/string_to_enum.h"
+
+
+// C++ includes
+#include <memory>
+#include <string>
 
 
 using namespace libMesh;
@@ -203,7 +205,7 @@ int main(int argc, char ** argv)
       current_sys_name = old_sys.name();
 
       goal_function =
-        libmesh_make_unique<ParsedFEMFunction<Number>>(old_sys, calcfunc);
+        std::make_unique<ParsedFEMFunction<Number>>(old_sys, calcfunc);
     }
   else
     {
@@ -221,7 +223,7 @@ int main(int argc, char ** argv)
       old_es.init();
 
       goal_function =
-        libmesh_make_unique<WrappedFunctor<Number>>(ParsedFunction<Number>(calcfunc));
+        std::make_unique<WrappedFunctor<Number>>(ParsedFunction<Number>(calcfunc));
     }
 
   libMesh::out << "Calculating with system " << current_sys_name << std::endl;
@@ -256,7 +258,7 @@ int main(int argc, char ** argv)
       new_sys.subdomains_list() = std::move(subdomains_list);
 
       new_sys.time_solver =
-        libmesh_make_unique<SteadySolver>(new_sys);
+        std::make_unique<SteadySolver>(new_sys);
 
       new_sys.fe_family() = family;
       new_sys.fe_order() = order;

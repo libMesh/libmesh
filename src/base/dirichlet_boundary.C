@@ -25,7 +25,9 @@
 #include "libmesh/composite_fem_function.h"
 #include "libmesh/composite_function.h"
 #include "libmesh/vector_value.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -61,7 +63,7 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
 {
   if (type == LOCAL_VARIABLE_ORDER)
     {
-      auto c = libmesh_make_unique<CompositeFunction<Number>>();
+      auto c = std::make_unique<CompositeFunction<Number>>();
       c->attach_subfunction(f_in, variables_in);
       f = std::move(c);
     }
@@ -85,11 +87,11 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
 {
   if (type == LOCAL_VARIABLE_ORDER)
     {
-      auto cf = libmesh_make_unique<CompositeFunction<Number>>();
+      auto cf = std::make_unique<CompositeFunction<Number>>();
       cf->attach_subfunction(f_in, variables_in);
       f = std::move(cf);
 
-      auto cg = libmesh_make_unique<CompositeFunction<Gradient>>();
+      auto cg = std::make_unique<CompositeFunction<Gradient>>();
       cg->attach_subfunction(g_in, variables_in);
       g = std::move(cg);
     }
@@ -134,7 +136,7 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
 {
   if (type == LOCAL_VARIABLE_ORDER)
     {
-      auto c = libmesh_make_unique<CompositeFEMFunction<Number>>();
+      auto c = std::make_unique<CompositeFEMFunction<Number>>();
       c->attach_subfunction(f_in, variables_in);
       f_fem = std::move(c);
     }
@@ -157,11 +159,11 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
 {
   if (type == LOCAL_VARIABLE_ORDER)
     {
-      auto cf = libmesh_make_unique<CompositeFEMFunction<Number>>();
+      auto cf = std::make_unique<CompositeFEMFunction<Number>>();
       cf->attach_subfunction(f_in, variables_in);
       f_fem = std::move(cf);
 
-      auto cg = libmesh_make_unique<CompositeFEMFunction<Gradient>>();
+      auto cg = std::make_unique<CompositeFEMFunction<Gradient>>();
       cg->attach_subfunction(g_in, variables_in);
       g_fem = std::move(cg);
     }

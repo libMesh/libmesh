@@ -31,7 +31,6 @@
 #include "libmesh/time_solver.h"
 #include "libmesh/transient_system.h"
 #include "libmesh/vtk_io.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_solver_package.h"
 
 #include <cstdio>
@@ -39,6 +38,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -97,7 +97,7 @@ void run_timestepping(EquationSystems & systems, GetPot & args)
   SolidSystem & solid_system = systems.get_system<SolidSystem>("solid");
 
 #ifdef LIBMESH_HAVE_VTK
-  std::unique_ptr<VTKIO> io = libmesh_make_unique<VTKIO>(systems.get_mesh());
+  std::unique_ptr<VTKIO> io = std::make_unique<VTKIO>(systems.get_mesh());
 #endif
 
   Real duration = args("duration", 1.0);

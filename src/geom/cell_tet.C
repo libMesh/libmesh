@@ -94,7 +94,7 @@ std::unique_ptr<Elem> Tet::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
-  std::unique_ptr<Elem> face = libmesh_make_unique<Tri3>();
+  std::unique_ptr<Elem> face = std::make_unique<Tri3>();
 
   for (auto n : face->node_index_range())
     face->set_node(n) = this->node_ptr(Tet4::side_nodes_map[i][n]);

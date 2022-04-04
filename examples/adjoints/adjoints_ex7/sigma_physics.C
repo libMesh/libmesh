@@ -178,5 +178,5 @@ F(i) += JxW[qp] * ( ( -sigma * (grad_T * dphi[i][qp]) ) + (f * phi[i][qp]) );
 
 std::unique_ptr<DifferentiablePhysics> SigmaPhysics::clone_physics()
 {
-  return libmesh_make_unique<SigmaPhysics>(*this);
+  return std::make_unique<SigmaPhysics>(*this);
 }

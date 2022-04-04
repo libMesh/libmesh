@@ -92,7 +92,7 @@ void RBEvaluationDeserialization::read_from_file(const std::string & path,
   std::unique_ptr<capnp::StreamFdMessageReader> message;
   libmesh_try
     {
-      message = libmesh_make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+      message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
     }
   libmesh_catch(...)
     {
@@ -140,7 +140,7 @@ void TransientRBEvaluationDeserialization::read_from_file(const std::string & pa
   std::unique_ptr<capnp::StreamFdMessageReader> message;
   libmesh_try
     {
-      message = libmesh_make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+      message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
     }
   libmesh_catch(...)
     {
@@ -194,7 +194,7 @@ void RBEIMEvaluationDeserialization::read_from_file(const std::string & path)
   std::unique_ptr<capnp::StreamFdMessageReader> message;
   libmesh_try
     {
-      message = libmesh_make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+      message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
     }
   libmesh_catch(...)
     {
@@ -246,7 +246,7 @@ void RBSCMEvaluationDeserialization::read_from_file(const std::string & path)
   std::unique_ptr<capnp::StreamFdMessageReader> message;
   libmesh_try
     {
-      message = libmesh_make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+      message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
     }
   libmesh_catch(...)
     {

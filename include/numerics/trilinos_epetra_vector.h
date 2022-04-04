@@ -26,7 +26,6 @@
 // Local includes
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parallel.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // Trilinos includes
 #include "libmesh/ignore_warnings.h"
@@ -39,9 +38,10 @@
 
 // C++ includes
 #include <cstddef>
-#include <vector>
 #include <limits>
+#include <memory>
 #include <mutex>
+#include <vector>
 
 // Forward declarations
 class Epetra_IntSerialDenseVector;
@@ -506,7 +506,7 @@ EpetraVector<T>::EpetraVector(Epetra_Vector & v,
   myFirstID_ = _vec->Map().MinMyGID();
   myNumIDs_ = _vec->Map().NumMyElements();
 
-  _map = libmesh_make_unique<Epetra_Map>
+  _map = std::make_unique<Epetra_Map>
     (_vec->GlobalLength(),
      _vec->MyLength(),
      0, // IndexBase = 0 for C/C++, 1 for Fortran.
@@ -599,7 +599,7 @@ void EpetraVector<T>::init (const numeric_index_type n,
   libmesh_assert ((this->_type==SERIAL && n==my_n_local) ||
                   this->_type==PARALLEL);
 
-  _map = libmesh_make_unique<Epetra_Map>
+  _map = std::make_unique<Epetra_Map>
     (static_cast<int>(n),
      my_n_local,
      0,

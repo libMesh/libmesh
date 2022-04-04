@@ -23,11 +23,11 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <cstddef>
 #include <map>
+#include <memory> // make_unique
 #include <string>
 
 namespace libMesh
@@ -151,7 +151,7 @@ template <class Derived, class Base>
 inline
 std::unique_ptr<Base> FactoryImp<Derived,Base>::create ()
 {
-  return libmesh_make_unique<Derived>();
+  return std::make_unique<Derived>();
 }
 
 

@@ -25,7 +25,9 @@
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/mesh_triangle_interface.h"
 #include "libmesh/mesh_tetgen_interface.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
 
 namespace
 {
@@ -36,14 +38,14 @@ namespace libMesh
 {
 
 ElemCutter::ElemCutter() :
-  _inside_mesh_2D(libmesh_make_unique<ReplicatedMesh>(_comm_self,2)),
-  _triangle_inside(libmesh_make_unique<TriangleInterface>(*_inside_mesh_2D)),
-  _outside_mesh_2D(libmesh_make_unique<ReplicatedMesh>(_comm_self,2)),
-  _triangle_outside(libmesh_make_unique<TriangleInterface>(*_outside_mesh_2D)),
-  _inside_mesh_3D(libmesh_make_unique<ReplicatedMesh>(_comm_self,3)),
-  _tetgen_inside(libmesh_make_unique<TetGenMeshInterface>(*_inside_mesh_3D)),
-  _outside_mesh_3D(libmesh_make_unique<ReplicatedMesh>(_comm_self,3)),
-  _tetgen_outside(libmesh_make_unique<TetGenMeshInterface>(*_outside_mesh_3D))
+  _inside_mesh_2D(std::make_unique<ReplicatedMesh>(_comm_self,2)),
+  _triangle_inside(std::make_unique<TriangleInterface>(*_inside_mesh_2D)),
+  _outside_mesh_2D(std::make_unique<ReplicatedMesh>(_comm_self,2)),
+  _triangle_outside(std::make_unique<TriangleInterface>(*_outside_mesh_2D)),
+  _inside_mesh_3D(std::make_unique<ReplicatedMesh>(_comm_self,3)),
+  _tetgen_inside(std::make_unique<TetGenMeshInterface>(*_inside_mesh_3D)),
+  _outside_mesh_3D(std::make_unique<ReplicatedMesh>(_comm_self,3)),
+  _tetgen_outside(std::make_unique<TetGenMeshInterface>(*_outside_mesh_3D))
 {
   cut_cntr = 0;
 }

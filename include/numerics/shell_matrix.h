@@ -29,7 +29,6 @@
 #include "libmesh/parallel_object.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/enum_solver_package.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/parallel.h"
 
 namespace libMesh

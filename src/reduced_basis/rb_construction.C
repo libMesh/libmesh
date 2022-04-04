@@ -599,7 +599,7 @@ void RBConstruction::allocate_data_structures()
 
 std::unique_ptr<DGFEMContext> RBConstruction::build_context ()
 {
-  return libmesh_make_unique<DGFEMContext>(*this);
+  return std::make_unique<DGFEMContext>(*this);
 }
 
 void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
@@ -2386,7 +2386,7 @@ std::unique_ptr<DirichletBoundary> RBConstruction::build_zero_dirichlet_boundary
   std::vector<unsigned int> variables;
 
   // The DirichletBoundary constructor clones zf, so it's OK that zf is only in local scope
-  return libmesh_make_unique<DirichletBoundary>(dirichlet_ids, variables, &zf);
+  return std::make_unique<DirichletBoundary>(dirichlet_ids, variables, &zf);
 }
 
 #endif

@@ -194,7 +194,7 @@ public:
     variables[0] = u_var;
 
     auto mesh_function =
-      libmesh_make_unique<MeshFunction>(sys.get_equation_systems(),
+      std::make_unique<MeshFunction>(sys.get_equation_systems(),
                                         *mesh_function_vector,
                                         sys.get_dof_map(),
                                         variables);

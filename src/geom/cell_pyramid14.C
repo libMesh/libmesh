@@ -209,13 +209,13 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
         case 2:
         case 3:
           {
-            face = libmesh_make_unique<Side<Tri6,Pyramid14>>(this,i);
+            face = std::make_unique<Side<Tri6,Pyramid14>>(this,i);
             break;
           }
 
         case 4:
           {
-            face = libmesh_make_unique<Side<Quad9,Pyramid14>>(this,i);
+            face = std::make_unique<Side<Quad9,Pyramid14>>(this,i);
             break;
           }
 
@@ -236,12 +236,12 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
         case 2: // triangular face 3
         case 3: // triangular face 4
           {
-            face = libmesh_make_unique<Tri6>();
+            face = std::make_unique<Tri6>();
             break;
           }
         case 4: // the quad face at z=0
           {
-            face = libmesh_make_unique<Quad9>();
+            face = std::make_unique<Quad9>();
             break;
           }
         default:

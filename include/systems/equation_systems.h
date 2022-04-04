@@ -25,7 +25,6 @@
 #include "libmesh/parameters.h"
 #include "libmesh/system.h"
 #include "libmesh/parallel_object.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
 namespace libMesh
@@ -675,7 +674,7 @@ T_sys & EquationSystems::add_system (const std::string & name)
       const unsigned int sys_num = this->n_systems();
 
       auto result =
-        _systems.emplace(name, libmesh_make_unique<T_sys>(*this, name, sys_num));
+        _systems.emplace(name, std::make_unique<T_sys>(*this, name, sys_num));
 
       if (!_enable_default_ghosting)
         this->_remove_default_ghosting(sys_num);

@@ -334,7 +334,7 @@ std::vector<std::unique_ptr<RBTheta>> & RBEIMEvaluation::get_eim_theta_objects()
 
 std::unique_ptr<RBTheta> RBEIMEvaluation::build_eim_theta(unsigned int index)
 {
-  return libmesh_make_unique<RBEIMTheta>(*this, index);
+  return std::make_unique<RBEIMTheta>(*this, index);
 }
 
 void RBEIMEvaluation::get_parametrized_function_values_at_qps(

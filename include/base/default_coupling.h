@@ -22,7 +22,9 @@
 
 // Local Includes
 #include "libmesh/ghosting_functor.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ includes
+#include <memory>
 
 namespace libMesh
 {
@@ -71,7 +73,7 @@ public:
    * different meshes. The operations in  GhostingFunctor are mesh dependent.
    */
   virtual std::unique_ptr<GhostingFunctor> clone () const override
-  { return libmesh_make_unique<DefaultCoupling>(*this); }
+  { return std::make_unique<DefaultCoupling>(*this); }
 
   // Change coupling matrix after construction
   void set_dof_coupling(const CouplingMatrix * dof_coupling);

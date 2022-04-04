@@ -21,7 +21,8 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/factory.h"
 #include "libmesh/function_base.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+#include <memory>
 
 using namespace libMesh;
 
@@ -47,7 +48,7 @@ class ExampleOneFunction : public FunctionBase<Number>
   virtual void clear() {}
   virtual std::unique_ptr<FunctionBase<Number>> clone() const
   {
-    return libmesh_make_unique<ExampleOneFunction>();
+    return std::make_unique<ExampleOneFunction>();
   }
 };
 

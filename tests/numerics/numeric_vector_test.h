@@ -6,10 +6,10 @@
 
 // libMesh includes
 #include <libmesh/parallel.h>
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #include "libmesh_cppunit.h"
 
+#include <memory>
 
 #define NUMERICVECTORTEST                       \
   CPPUNIT_TEST( testLocalize );                 \
@@ -19,9 +19,6 @@
   CPPUNIT_TEST( testLocalizeToOne );            \
   CPPUNIT_TEST( testLocalizeToOneBase );
 
-#ifndef LIBMESH_HAVE_CXX14_MAKE_UNIQUE
-using libMesh::make_unique;
-#endif
 
 template <class DerivedClass>
 class NumericVectorTest : public CppUnit::TestCase {
@@ -58,7 +55,7 @@ public:
       global_size += (block_size + static_cast<unsigned int>(p));
 
     {
-      auto v_ptr = libmesh_make_unique<Derived>(*my_comm, global_size, local_size);
+      auto v_ptr = std::make_unique<Derived>(*my_comm, global_size, local_size);
       Base & v = *v_ptr;
       std::vector<libMesh::Number> l(global_size);
 
@@ -121,7 +118,7 @@ public:
       global_size += (block_size + static_cast<unsigned int>(p));
 
     {
-      auto v_ptr = libmesh_make_unique<Derived>(*my_comm, global_size, local_size);
+      auto v_ptr = std::make_unique<Derived>(*my_comm, global_size, local_size);
       Base & v = *v_ptr;
 
       // Let's try pulling the same number of entries from each processor

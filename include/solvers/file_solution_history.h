@@ -27,10 +27,10 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/diff_system.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <list>
+#include <memory>
 
 namespace libMesh
 {
@@ -72,7 +72,7 @@ public:
    */
   virtual std::unique_ptr<SolutionHistory > clone() const override
   {
-    return libmesh_make_unique<FileSolutionHistory>(_system);
+    return std::make_unique<FileSolutionHistory>(_system);
   }
 
 private:

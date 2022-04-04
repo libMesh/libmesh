@@ -83,51 +83,51 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            return libmesh_make_unique<FE<0,CLOUGH>>(fet);
+            return std::make_unique<FE<0,CLOUGH>>(fet);
 
           case HERMITE:
-            return libmesh_make_unique<FE<0,HERMITE>>(fet);
+            return std::make_unique<FE<0,HERMITE>>(fet);
 
           case LAGRANGE:
-            return libmesh_make_unique<FE<0,LAGRANGE>>(fet);
+            return std::make_unique<FE<0,LAGRANGE>>(fet);
 
           case LAGRANGE_VEC:
-            return libmesh_make_unique<FE<0,LAGRANGE_VEC>>(fet);
+            return std::make_unique<FE<0,LAGRANGE_VEC>>(fet);
 
           case L2_LAGRANGE:
-            return libmesh_make_unique<FE<0,L2_LAGRANGE>>(fet);
+            return std::make_unique<FE<0,L2_LAGRANGE>>(fet);
 
           case HIERARCHIC:
-            return libmesh_make_unique<FE<0,HIERARCHIC>>(fet);
+            return std::make_unique<FE<0,HIERARCHIC>>(fet);
 
           case L2_HIERARCHIC:
-            return libmesh_make_unique<FE<0,L2_HIERARCHIC>>(fet);
+            return std::make_unique<FE<0,L2_HIERARCHIC>>(fet);
 
           case SIDE_HIERARCHIC:
-            return libmesh_make_unique<FE<0,SIDE_HIERARCHIC>>(fet);
+            return std::make_unique<FE<0,SIDE_HIERARCHIC>>(fet);
 
           case MONOMIAL:
-            return libmesh_make_unique<FE<0,MONOMIAL>>(fet);
+            return std::make_unique<FE<0,MONOMIAL>>(fet);
 
           case MONOMIAL_VEC:
-            return libmesh_make_unique<FE<0,MONOMIAL_VEC>>(fet);
+            return std::make_unique<FE<0,MONOMIAL_VEC>>(fet);
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            return libmesh_make_unique<FE<0,SZABAB>>(fet);
+            return std::make_unique<FE<0,SZABAB>>(fet);
 
           case BERNSTEIN:
-            return libmesh_make_unique<FE<0,BERNSTEIN>>(fet);
+            return std::make_unique<FE<0,BERNSTEIN>>(fet);
 
           case RATIONAL_BERNSTEIN:
-            return libmesh_make_unique<FE<0,RATIONAL_BERNSTEIN>>(fet);
+            return std::make_unique<FE<0,RATIONAL_BERNSTEIN>>(fet);
 #endif
 
           case XYZ:
-            return libmesh_make_unique<FEXYZ<0>>(fet);
+            return std::make_unique<FEXYZ<0>>(fet);
 
           case SCALAR:
-            return libmesh_make_unique<FEScalar<0>>(fet);
+            return std::make_unique<FEScalar<0>>(fet);
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << Utility::enum_to_string(fet.family));
@@ -139,51 +139,51 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            return libmesh_make_unique<FE<1,CLOUGH>>(fet);
+            return std::make_unique<FE<1,CLOUGH>>(fet);
 
           case HERMITE:
-            return libmesh_make_unique<FE<1,HERMITE>>(fet);
+            return std::make_unique<FE<1,HERMITE>>(fet);
 
           case LAGRANGE:
-            return libmesh_make_unique<FE<1,LAGRANGE>>(fet);
+            return std::make_unique<FE<1,LAGRANGE>>(fet);
 
           case LAGRANGE_VEC:
-            return libmesh_make_unique<FE<1,LAGRANGE_VEC>>(fet);
+            return std::make_unique<FE<1,LAGRANGE_VEC>>(fet);
 
           case L2_LAGRANGE:
-            return libmesh_make_unique<FE<1,L2_LAGRANGE>>(fet);
+            return std::make_unique<FE<1,L2_LAGRANGE>>(fet);
 
           case HIERARCHIC:
-            return libmesh_make_unique<FE<1,HIERARCHIC>>(fet);
+            return std::make_unique<FE<1,HIERARCHIC>>(fet);
 
           case L2_HIERARCHIC:
-            return libmesh_make_unique<FE<1,L2_HIERARCHIC>>(fet);
+            return std::make_unique<FE<1,L2_HIERARCHIC>>(fet);
 
           case SIDE_HIERARCHIC:
-            return libmesh_make_unique<FE<1,SIDE_HIERARCHIC>>(fet);
+            return std::make_unique<FE<1,SIDE_HIERARCHIC>>(fet);
 
           case MONOMIAL:
-            return libmesh_make_unique<FE<1,MONOMIAL>>(fet);
+            return std::make_unique<FE<1,MONOMIAL>>(fet);
 
           case MONOMIAL_VEC:
-            return libmesh_make_unique<FE<1,MONOMIAL_VEC>>(fet);
+            return std::make_unique<FE<1,MONOMIAL_VEC>>(fet);
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            return libmesh_make_unique<FE<1,SZABAB>>(fet);
+            return std::make_unique<FE<1,SZABAB>>(fet);
 
           case BERNSTEIN:
-            return libmesh_make_unique<FE<1,BERNSTEIN>>(fet);
+            return std::make_unique<FE<1,BERNSTEIN>>(fet);
 
           case RATIONAL_BERNSTEIN:
-            return libmesh_make_unique<FE<1,RATIONAL_BERNSTEIN>>(fet);
+            return std::make_unique<FE<1,RATIONAL_BERNSTEIN>>(fet);
 #endif
 
           case XYZ:
-            return libmesh_make_unique<FEXYZ<1>>(fet);
+            return std::make_unique<FEXYZ<1>>(fet);
 
           case SCALAR:
-            return libmesh_make_unique<FEScalar<1>>(fet);
+            return std::make_unique<FEScalar<1>>(fet);
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << Utility::enum_to_string(fet.family));
@@ -197,57 +197,57 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            return libmesh_make_unique<FE<2,CLOUGH>>(fet);
+            return std::make_unique<FE<2,CLOUGH>>(fet);
 
           case HERMITE:
-            return libmesh_make_unique<FE<2,HERMITE>>(fet);
+            return std::make_unique<FE<2,HERMITE>>(fet);
 
           case LAGRANGE:
-            return libmesh_make_unique<FE<2,LAGRANGE>>(fet);
+            return std::make_unique<FE<2,LAGRANGE>>(fet);
 
           case LAGRANGE_VEC:
-            return libmesh_make_unique<FE<2,LAGRANGE_VEC>>(fet);
+            return std::make_unique<FE<2,LAGRANGE_VEC>>(fet);
 
           case L2_LAGRANGE:
-            return libmesh_make_unique<FE<2,L2_LAGRANGE>>(fet);
+            return std::make_unique<FE<2,L2_LAGRANGE>>(fet);
 
           case HIERARCHIC:
-            return libmesh_make_unique<FE<2,HIERARCHIC>>(fet);
+            return std::make_unique<FE<2,HIERARCHIC>>(fet);
 
           case L2_HIERARCHIC:
-            return libmesh_make_unique<FE<2,L2_HIERARCHIC>>(fet);
+            return std::make_unique<FE<2,L2_HIERARCHIC>>(fet);
 
           case SIDE_HIERARCHIC:
-            return libmesh_make_unique<FE<2,SIDE_HIERARCHIC>>(fet);
+            return std::make_unique<FE<2,SIDE_HIERARCHIC>>(fet);
 
           case MONOMIAL:
-            return libmesh_make_unique<FE<2,MONOMIAL>>(fet);
+            return std::make_unique<FE<2,MONOMIAL>>(fet);
 
           case MONOMIAL_VEC:
-            return libmesh_make_unique<FE<2,MONOMIAL_VEC>>(fet);
+            return std::make_unique<FE<2,MONOMIAL_VEC>>(fet);
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            return libmesh_make_unique<FE<2,SZABAB>>(fet);
+            return std::make_unique<FE<2,SZABAB>>(fet);
 
           case BERNSTEIN:
-            return libmesh_make_unique<FE<2,BERNSTEIN>>(fet);
+            return std::make_unique<FE<2,BERNSTEIN>>(fet);
 
           case RATIONAL_BERNSTEIN:
-            return libmesh_make_unique<FE<2,RATIONAL_BERNSTEIN>>(fet);
+            return std::make_unique<FE<2,RATIONAL_BERNSTEIN>>(fet);
 #endif
 
           case XYZ:
-            return libmesh_make_unique<FEXYZ<2>>(fet);
+            return std::make_unique<FEXYZ<2>>(fet);
 
           case SCALAR:
-            return libmesh_make_unique<FEScalar<2>>(fet);
+            return std::make_unique<FEScalar<2>>(fet);
 
           case NEDELEC_ONE:
-            return libmesh_make_unique<FENedelecOne<2>>(fet);
+            return std::make_unique<FENedelecOne<2>>(fet);
 
           case SUBDIVISION:
-            return libmesh_make_unique<FESubdivision>(fet);
+            return std::make_unique<FESubdivision>(fet);
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << Utility::enum_to_string(fet.family));
@@ -264,51 +264,51 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
             libmesh_error_msg("ERROR: Clough-Tocher elements currently only support 1D and 2D");
 
           case HERMITE:
-            return libmesh_make_unique<FE<3,HERMITE>>(fet);
+            return std::make_unique<FE<3,HERMITE>>(fet);
 
           case LAGRANGE:
-            return libmesh_make_unique<FE<3,LAGRANGE>>(fet);
+            return std::make_unique<FE<3,LAGRANGE>>(fet);
 
           case LAGRANGE_VEC:
-            return libmesh_make_unique<FE<3,LAGRANGE_VEC>>(fet);
+            return std::make_unique<FE<3,LAGRANGE_VEC>>(fet);
 
           case L2_LAGRANGE:
-            return libmesh_make_unique<FE<3,L2_LAGRANGE>>(fet);
+            return std::make_unique<FE<3,L2_LAGRANGE>>(fet);
 
           case HIERARCHIC:
-            return libmesh_make_unique<FE<3,HIERARCHIC>>(fet);
+            return std::make_unique<FE<3,HIERARCHIC>>(fet);
 
           case L2_HIERARCHIC:
-            return libmesh_make_unique<FE<3,L2_HIERARCHIC>>(fet);
+            return std::make_unique<FE<3,L2_HIERARCHIC>>(fet);
 
           case SIDE_HIERARCHIC:
-            return libmesh_make_unique<FE<3,SIDE_HIERARCHIC>>(fet);
+            return std::make_unique<FE<3,SIDE_HIERARCHIC>>(fet);
 
           case MONOMIAL:
-            return libmesh_make_unique<FE<3,MONOMIAL>>(fet);
+            return std::make_unique<FE<3,MONOMIAL>>(fet);
 
           case MONOMIAL_VEC:
-            return libmesh_make_unique<FE<3,MONOMIAL_VEC>>(fet);
+            return std::make_unique<FE<3,MONOMIAL_VEC>>(fet);
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            return libmesh_make_unique<FE<3,SZABAB>>(fet);
+            return std::make_unique<FE<3,SZABAB>>(fet);
 
           case BERNSTEIN:
-            return libmesh_make_unique<FE<3,BERNSTEIN>>(fet);
+            return std::make_unique<FE<3,BERNSTEIN>>(fet);
 
           case RATIONAL_BERNSTEIN:
-            return libmesh_make_unique<FE<3,RATIONAL_BERNSTEIN>>(fet);
+            return std::make_unique<FE<3,RATIONAL_BERNSTEIN>>(fet);
 #endif
 
           case XYZ:
-            return libmesh_make_unique<FEXYZ<3>>(fet);
+            return std::make_unique<FEXYZ<3>>(fet);
 
           case SCALAR:
-            return libmesh_make_unique<FEScalar<3>>(fet);
+            return std::make_unique<FEScalar<3>>(fet);
 
           case NEDELEC_ONE:
-            return libmesh_make_unique<FENedelecOne<3>>(fet);
+            return std::make_unique<FENedelecOne<3>>(fet);
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << Utility::enum_to_string(fet.family));

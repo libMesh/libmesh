@@ -21,7 +21,7 @@
 namespace libMesh
 {
 GradientMeshFunction::GradientMeshFunction(const MeshFunction & _mesh_function):
-  mesh_function(libmesh_make_unique<MeshFunction>(_mesh_function))
+  mesh_function(std::make_unique<MeshFunction>(_mesh_function))
 {
   libmesh_experimental();
 }

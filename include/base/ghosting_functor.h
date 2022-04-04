@@ -25,7 +25,6 @@
 #include "libmesh/id_types.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/reference_counted_object.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ Includes
 #include <unordered_map>

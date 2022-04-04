@@ -42,7 +42,7 @@ public:
   SerialMesh (const UnstructuredMesh & other_mesh) : ReplicatedMesh(other_mesh) {}
 
   virtual std::unique_ptr<MeshBase> clone () const override
-  { return libmesh_make_unique<SerialMesh>(*this); }
+  { return std::make_unique<SerialMesh>(*this); }
 
   ~SerialMesh() = default;
 };

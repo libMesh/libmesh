@@ -149,7 +149,7 @@ public:
                                               QUAD4);
 
           // Uniformly refine mesh_two
-          std::unique_ptr<MeshRefinement> mesh_refinement(libmesh_make_unique<MeshRefinement>(*mesh_two));
+          std::unique_ptr<MeshRefinement> mesh_refinement(std::make_unique<MeshRefinement>(*mesh_two));
 
           mesh_refinement->uniformly_refine(1);
 

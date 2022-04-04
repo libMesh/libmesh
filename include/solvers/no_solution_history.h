@@ -20,7 +20,9 @@
 
 // Local includes
 #include "libmesh/solution_history.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -61,7 +63,7 @@ public:
    */
   virtual std::unique_ptr<SolutionHistory > clone() const override
   {
-    return libmesh_make_unique<NoSolutionHistory>();
+    return std::make_unique<NoSolutionHistory>();
   }
 };
 

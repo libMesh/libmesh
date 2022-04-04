@@ -56,6 +56,7 @@
 // C++ includes
 #include <iostream>
 #include <iomanip>
+#include <memory>
 
 // General libMesh includes
 #include "libmesh/equation_systems.h"
@@ -70,7 +71,6 @@
 #include "libmesh/steady_solver.h"
 #include "libmesh/system_norm.h"
 #include "libmesh/petsc_vector.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_solver_package.h"
 
 // Adjoint Related includes
@@ -136,7 +136,7 @@ void set_system_parameters(PoissonSystem & system, FEMParameters & param)
   system.print_jacobians      = param.print_jacobians;
 
   // No transient time solver
-  system.time_solver = libmesh_make_unique<SteadySolver>(system);
+  system.time_solver = std::make_unique<SteadySolver>(system);
 
   // Nonlinear solver options
   {

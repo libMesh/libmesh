@@ -1,7 +1,6 @@
 // libmesh includes
 #include <libmesh/diagonal_matrix.h>
 #include <libmesh/parallel.h>
-#include <libmesh/auto_ptr.h>
 #include <libmesh/dense_matrix.h>
 #include <libmesh/id_types.h>
 #include <libmesh/numeric_vector.h>
@@ -41,7 +40,7 @@ public:
   void setUp()
   {
     _comm = TestCommWorld;
-    _matrix = libmesh_make_unique<DiagonalMatrix<Number>>(*_comm);
+    _matrix = std::make_unique<DiagonalMatrix<Number>>(*_comm);
 
     numeric_index_type root_block_size = 2;
     _local_size = root_block_size + static_cast<numeric_index_type>(_comm->rank());

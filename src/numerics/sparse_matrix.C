@@ -17,8 +17,6 @@
 
 
 
-// C++ includes
-
 // Local Includes
 #include "libmesh/dof_map.h"
 #include "libmesh/dense_matrix.h"
@@ -30,8 +28,12 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/trilinos_epetra_matrix.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_solver_package.h"
+
+
+// C++ includes
+#include <memory>
+
 
 namespace libMesh
 {
@@ -154,7 +156,7 @@ SparseMatrix<T>::build(const Parallel::Communicator & comm,
   libmesh_ignore(comm);
 
   if (matrix_build_type == MatrixBuildType::DIAGONAL)
-    return libmesh_make_unique<DiagonalMatrix<T>>(comm);
+    return std::make_unique<DiagonalMatrix<T>>(comm);
 
   // Build the appropriate vector
   switch (solver_package)
@@ -162,25 +164,25 @@ SparseMatrix<T>::build(const Parallel::Communicator & comm,
 
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
-      return libmesh_make_unique<LaspackMatrix<T>>(comm);
+      return std::make_unique<LaspackMatrix<T>>(comm);
 #endif
 
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      return libmesh_make_unique<PetscMatrix<T>>(comm);
+      return std::make_unique<PetscMatrix<T>>(comm);
 #endif
 
 
 #ifdef LIBMESH_TRILINOS_HAVE_EPETRA
     case TRILINOS_SOLVERS:
-      return libmesh_make_unique<EpetraMatrix<T>>(comm);
+      return std::make_unique<EpetraMatrix<T>>(comm);
 #endif
 
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      return libmesh_make_unique<EigenSparseMatrix<T>>(comm);
+      return std::make_unique<EigenSparseMatrix<T>>(comm);
 #endif
 
     default:

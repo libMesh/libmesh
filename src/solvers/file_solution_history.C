@@ -56,7 +56,7 @@ void FileSolutionHistory::store(bool is_adjoint_solve, Real time)
   // In an empty history we create the first entry
   if (stored_data.begin() == stored_data.end())
     {
-      stored_data[time] = libmesh_make_unique<FileHistoryData>(_system);
+      stored_data[time] = std::make_unique<FileHistoryData>(_system);
       stored_datum = stored_data.begin();
     }
 
@@ -67,7 +67,7 @@ void FileSolutionHistory::store(bool is_adjoint_solve, Real time)
       ++stored_datum;
       libmesh_assert (stored_datum == stored_data.end());
 #endif
-      stored_data[time] = libmesh_make_unique<FileHistoryData>(_system);
+      stored_data[time] = std::make_unique<FileHistoryData>(_system);
       stored_datum = stored_data.end();
       --stored_datum;
     }
@@ -76,7 +76,7 @@ void FileSolutionHistory::store(bool is_adjoint_solve, Real time)
   else if (stored_datum->first - time > TOLERANCE)
     {
       libmesh_assert (stored_datum == stored_data.begin());
-      stored_data[time] = libmesh_make_unique<FileHistoryData>(_system);
+      stored_data[time] = std::make_unique<FileHistoryData>(_system);
       stored_datum = stored_data.begin();
     }
 

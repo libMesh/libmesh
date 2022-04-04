@@ -32,7 +32,6 @@
 #include "libmesh/mesh_generation.h"
 #include "libmesh/exact_solution.h"
 #include "libmesh/string_to_enum.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_norm_type.h"
 
@@ -41,6 +40,9 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/steady_solver.h"
 #include "solution_function.h"
+
+// C++ includes
+#include <memory>
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -113,7 +115,7 @@ int main (int argc, char ** argv)
     equation_systems.add_system<CurlCurlSystem> ("CurlCurl");
 
   // This example only implements the steady-state problem
-  system.time_solver = libmesh_make_unique<SteadySolver>(system);
+  system.time_solver = std::make_unique<SteadySolver>(system);
 
   // Initialize the system
   equation_systems.init();

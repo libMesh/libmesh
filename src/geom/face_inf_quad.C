@@ -91,14 +91,14 @@ std::unique_ptr<Elem> InfQuad::side_ptr (const unsigned int i)
     {
     case 0: // base face
       {
-        edge = libmesh_make_unique<Edge2>();
+        edge = std::make_unique<Edge2>();
         break;
       }
 
     case 1: // adjacent to another infinite element
     case 2: // adjacent to another infinite element
       {
-        edge = libmesh_make_unique<InfEdge2>();
+        edge = std::make_unique<InfEdge2>();
         break;
       }
 

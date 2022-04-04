@@ -16,11 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <algorithm> // for std::fill
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath>    // for sqrt
-
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/jump_error_estimator.h"
@@ -37,7 +32,13 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/int_range.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <algorithm> // for std::fill
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath>    // for sqrt
+#include <memory>
+
 
 namespace libMesh
 {
@@ -141,8 +142,8 @@ void JumpErrorEstimator::estimate_error (const System & system,
       sys.update();
     }
 
-  fine_context = libmesh_make_unique<FEMContext>(system);
-  coarse_context = libmesh_make_unique<FEMContext>(system);
+  fine_context = std::make_unique<FEMContext>(system);
+  coarse_context = std::make_unique<FEMContext>(system);
 
   // Don't overintegrate - we're evaluating differences of FE values,
   // not products of them.

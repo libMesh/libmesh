@@ -21,7 +21,7 @@
 #include "libmesh/fe.h"
 #include "libmesh/inf_fe.h"
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
 // For projection code:
 #include "libmesh/boundary_info.h"
 #include "libmesh/mesh_base.h"
@@ -39,6 +39,9 @@
 #include "libmesh/threads.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/enum_to_string.h"
+
+// C++ Includes
+#include <memory>
 
 // Anonymous namespace, for a helper function for periodic boundary
 // constraint calculations
@@ -195,45 +198,45 @@ FEGenericBase<Real>::build (const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            return libmesh_make_unique<FE<0,CLOUGH>>(fet);
+            return std::make_unique<FE<0,CLOUGH>>(fet);
 
           case HERMITE:
-            return libmesh_make_unique<FE<0,HERMITE>>(fet);
+            return std::make_unique<FE<0,HERMITE>>(fet);
 
           case LAGRANGE:
-            return libmesh_make_unique<FE<0,LAGRANGE>>(fet);
+            return std::make_unique<FE<0,LAGRANGE>>(fet);
 
           case L2_LAGRANGE:
-            return libmesh_make_unique<FE<0,L2_LAGRANGE>>(fet);
+            return std::make_unique<FE<0,L2_LAGRANGE>>(fet);
 
           case HIERARCHIC:
-            return libmesh_make_unique<FE<0,HIERARCHIC>>(fet);
+            return std::make_unique<FE<0,HIERARCHIC>>(fet);
 
           case L2_HIERARCHIC:
-            return libmesh_make_unique<FE<0,L2_HIERARCHIC>>(fet);
+            return std::make_unique<FE<0,L2_HIERARCHIC>>(fet);
 
           case SIDE_HIERARCHIC:
-            return libmesh_make_unique<FE<0,SIDE_HIERARCHIC>>(fet);
+            return std::make_unique<FE<0,SIDE_HIERARCHIC>>(fet);
 
           case MONOMIAL:
-            return libmesh_make_unique<FE<0,MONOMIAL>>(fet);
+            return std::make_unique<FE<0,MONOMIAL>>(fet);
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            return libmesh_make_unique<FE<0,SZABAB>>(fet);
+            return std::make_unique<FE<0,SZABAB>>(fet);
 
           case BERNSTEIN:
-            return libmesh_make_unique<FE<0,BERNSTEIN>>(fet);
+            return std::make_unique<FE<0,BERNSTEIN>>(fet);
 
           case RATIONAL_BERNSTEIN:
-            return libmesh_make_unique<FE<0,RATIONAL_BERNSTEIN>>(fet);
+            return std::make_unique<FE<0,RATIONAL_BERNSTEIN>>(fet);
 #endif
 
           case XYZ:
-            return libmesh_make_unique<FEXYZ<0>>(fet);
+            return std::make_unique<FEXYZ<0>>(fet);
 
           case SCALAR:
-            return libmesh_make_unique<FEScalar<0>>(fet);
+            return std::make_unique<FEScalar<0>>(fet);
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
@@ -245,45 +248,45 @@ FEGenericBase<Real>::build (const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            return libmesh_make_unique<FE<1,CLOUGH>>(fet);
+            return std::make_unique<FE<1,CLOUGH>>(fet);
 
           case HERMITE:
-            return libmesh_make_unique<FE<1,HERMITE>>(fet);
+            return std::make_unique<FE<1,HERMITE>>(fet);
 
           case LAGRANGE:
-            return libmesh_make_unique<FE<1,LAGRANGE>>(fet);
+            return std::make_unique<FE<1,LAGRANGE>>(fet);
 
           case L2_LAGRANGE:
-            return libmesh_make_unique<FE<1,L2_LAGRANGE>>(fet);
+            return std::make_unique<FE<1,L2_LAGRANGE>>(fet);
 
           case HIERARCHIC:
-            return libmesh_make_unique<FE<1,HIERARCHIC>>(fet);
+            return std::make_unique<FE<1,HIERARCHIC>>(fet);
 
           case L2_HIERARCHIC:
-            return libmesh_make_unique<FE<1,L2_HIERARCHIC>>(fet);
+            return std::make_unique<FE<1,L2_HIERARCHIC>>(fet);
 
           case SIDE_HIERARCHIC:
-            return libmesh_make_unique<FE<1,SIDE_HIERARCHIC>>(fet);
+            return std::make_unique<FE<1,SIDE_HIERARCHIC>>(fet);
 
           case MONOMIAL:
-            return libmesh_make_unique<FE<1,MONOMIAL>>(fet);
+            return std::make_unique<FE<1,MONOMIAL>>(fet);
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            return libmesh_make_unique<FE<1,SZABAB>>(fet);
+            return std::make_unique<FE<1,SZABAB>>(fet);
 
           case BERNSTEIN:
-            return libmesh_make_unique<FE<1,BERNSTEIN>>(fet);
+            return std::make_unique<FE<1,BERNSTEIN>>(fet);
 
           case RATIONAL_BERNSTEIN:
-            return libmesh_make_unique<FE<1,RATIONAL_BERNSTEIN>>(fet);
+            return std::make_unique<FE<1,RATIONAL_BERNSTEIN>>(fet);
 #endif
 
           case XYZ:
-            return libmesh_make_unique<FEXYZ<1>>(fet);
+            return std::make_unique<FEXYZ<1>>(fet);
 
           case SCALAR:
-            return libmesh_make_unique<FEScalar<1>>(fet);
+            return std::make_unique<FEScalar<1>>(fet);
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
@@ -297,48 +300,48 @@ FEGenericBase<Real>::build (const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            return libmesh_make_unique<FE<2,CLOUGH>>(fet);
+            return std::make_unique<FE<2,CLOUGH>>(fet);
 
           case HERMITE:
-            return libmesh_make_unique<FE<2,HERMITE>>(fet);
+            return std::make_unique<FE<2,HERMITE>>(fet);
 
           case LAGRANGE:
-            return libmesh_make_unique<FE<2,LAGRANGE>>(fet);
+            return std::make_unique<FE<2,LAGRANGE>>(fet);
 
           case L2_LAGRANGE:
-            return libmesh_make_unique<FE<2,L2_LAGRANGE>>(fet);
+            return std::make_unique<FE<2,L2_LAGRANGE>>(fet);
 
           case HIERARCHIC:
-            return libmesh_make_unique<FE<2,HIERARCHIC>>(fet);
+            return std::make_unique<FE<2,HIERARCHIC>>(fet);
 
           case L2_HIERARCHIC:
-            return libmesh_make_unique<FE<2,L2_HIERARCHIC>>(fet);
+            return std::make_unique<FE<2,L2_HIERARCHIC>>(fet);
 
           case SIDE_HIERARCHIC:
-            return libmesh_make_unique<FE<2,SIDE_HIERARCHIC>>(fet);
+            return std::make_unique<FE<2,SIDE_HIERARCHIC>>(fet);
 
           case MONOMIAL:
-            return libmesh_make_unique<FE<2,MONOMIAL>>(fet);
+            return std::make_unique<FE<2,MONOMIAL>>(fet);
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            return libmesh_make_unique<FE<2,SZABAB>>(fet);
+            return std::make_unique<FE<2,SZABAB>>(fet);
 
           case BERNSTEIN:
-            return libmesh_make_unique<FE<2,BERNSTEIN>>(fet);
+            return std::make_unique<FE<2,BERNSTEIN>>(fet);
 
           case RATIONAL_BERNSTEIN:
-            return libmesh_make_unique<FE<2,RATIONAL_BERNSTEIN>>(fet);
+            return std::make_unique<FE<2,RATIONAL_BERNSTEIN>>(fet);
 #endif
 
           case XYZ:
-            return libmesh_make_unique<FEXYZ<2>>(fet);
+            return std::make_unique<FEXYZ<2>>(fet);
 
           case SCALAR:
-            return libmesh_make_unique<FEScalar<2>>(fet);
+            return std::make_unique<FEScalar<2>>(fet);
 
           case SUBDIVISION:
-            return libmesh_make_unique<FESubdivision>(fet);
+            return std::make_unique<FESubdivision>(fet);
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
@@ -355,42 +358,42 @@ FEGenericBase<Real>::build (const unsigned int dim,
             libmesh_error_msg("ERROR: Clough-Tocher elements currently only support 1D and 2D");
 
           case HERMITE:
-            return libmesh_make_unique<FE<3,HERMITE>>(fet);
+            return std::make_unique<FE<3,HERMITE>>(fet);
 
           case LAGRANGE:
-            return libmesh_make_unique<FE<3,LAGRANGE>>(fet);
+            return std::make_unique<FE<3,LAGRANGE>>(fet);
 
           case L2_LAGRANGE:
-            return libmesh_make_unique<FE<3,L2_LAGRANGE>>(fet);
+            return std::make_unique<FE<3,L2_LAGRANGE>>(fet);
 
           case HIERARCHIC:
-            return libmesh_make_unique<FE<3,HIERARCHIC>>(fet);
+            return std::make_unique<FE<3,HIERARCHIC>>(fet);
 
           case L2_HIERARCHIC:
-            return libmesh_make_unique<FE<3,L2_HIERARCHIC>>(fet);
+            return std::make_unique<FE<3,L2_HIERARCHIC>>(fet);
 
           case SIDE_HIERARCHIC:
-            return libmesh_make_unique<FE<3,SIDE_HIERARCHIC>>(fet);
+            return std::make_unique<FE<3,SIDE_HIERARCHIC>>(fet);
 
           case MONOMIAL:
-            return libmesh_make_unique<FE<3,MONOMIAL>>(fet);
+            return std::make_unique<FE<3,MONOMIAL>>(fet);
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            return libmesh_make_unique<FE<3,SZABAB>>(fet);
+            return std::make_unique<FE<3,SZABAB>>(fet);
 
           case BERNSTEIN:
-            return libmesh_make_unique<FE<3,BERNSTEIN>>(fet);
+            return std::make_unique<FE<3,BERNSTEIN>>(fet);
 
           case RATIONAL_BERNSTEIN:
-            return libmesh_make_unique<FE<3,RATIONAL_BERNSTEIN>>(fet);
+            return std::make_unique<FE<3,RATIONAL_BERNSTEIN>>(fet);
 #endif
 
           case XYZ:
-            return libmesh_make_unique<FEXYZ<3>>(fet);
+            return std::make_unique<FEXYZ<3>>(fet);
 
           case SCALAR:
-            return libmesh_make_unique<FEScalar<3>>(fet);
+            return std::make_unique<FEScalar<3>>(fet);
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
@@ -417,10 +420,10 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
         switch (fet.family)
           {
           case LAGRANGE_VEC:
-            return libmesh_make_unique<FELagrangeVec<0>>(fet);
+            return std::make_unique<FELagrangeVec<0>>(fet);
 
           case MONOMIAL_VEC:
-            return libmesh_make_unique<FEMonomialVec<0>>(fet);
+            return std::make_unique<FEMonomialVec<0>>(fet);
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
@@ -431,10 +434,10 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
         switch (fet.family)
           {
           case LAGRANGE_VEC:
-            return libmesh_make_unique<FELagrangeVec<1>>(fet);
+            return std::make_unique<FELagrangeVec<1>>(fet);
 
           case MONOMIAL_VEC:
-            return libmesh_make_unique<FEMonomialVec<1>>(fet);
+            return std::make_unique<FEMonomialVec<1>>(fet);
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
@@ -445,13 +448,13 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
         switch (fet.family)
           {
           case LAGRANGE_VEC:
-            return libmesh_make_unique<FELagrangeVec<2>>(fet);
+            return std::make_unique<FELagrangeVec<2>>(fet);
 
           case MONOMIAL_VEC:
-            return libmesh_make_unique<FEMonomialVec<2>>(fet);
+            return std::make_unique<FEMonomialVec<2>>(fet);
 
           case NEDELEC_ONE:
-            return libmesh_make_unique<FENedelecOne<2>>(fet);
+            return std::make_unique<FENedelecOne<2>>(fet);
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
@@ -462,13 +465,13 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
         switch (fet.family)
           {
           case LAGRANGE_VEC:
-            return libmesh_make_unique<FELagrangeVec<3>>(fet);
+            return std::make_unique<FELagrangeVec<3>>(fet);
 
           case MONOMIAL_VEC:
-            return libmesh_make_unique<FEMonomialVec<3>>(fet);
+            return std::make_unique<FEMonomialVec<3>>(fet);
 
           case NEDELEC_ONE:
-            return libmesh_make_unique<FENedelecOne<3>>(fet);
+            return std::make_unique<FENedelecOne<3>>(fet);
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family == " << Utility::enum_to_string(fet.family));
@@ -510,7 +513,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  return libmesh_make_unique<InfFE<1,JACOBI_20_00,CARTESIAN>>(fet);
+                  return std::make_unique<InfFE<1,JACOBI_20_00,CARTESIAN>>(fet);
 
                 default:
                   libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
@@ -522,7 +525,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  return libmesh_make_unique<InfFE<1,JACOBI_30_00,CARTESIAN>>(fet);
+                  return std::make_unique<InfFE<1,JACOBI_30_00,CARTESIAN>>(fet);
 
                 default:
                   libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
@@ -534,7 +537,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  return libmesh_make_unique<InfFE<1,LEGENDRE,CARTESIAN>>(fet);
+                  return std::make_unique<InfFE<1,LEGENDRE,CARTESIAN>>(fet);
 
                 default:
                   libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
@@ -546,7 +549,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  return libmesh_make_unique<InfFE<1,LAGRANGE,CARTESIAN>>(fet);
+                  return std::make_unique<InfFE<1,LAGRANGE,CARTESIAN>>(fet);
 
                 default:
                   libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
@@ -574,7 +577,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  return libmesh_make_unique<InfFE<2,JACOBI_20_00,CARTESIAN>>(fet);
+                  return std::make_unique<InfFE<2,JACOBI_20_00,CARTESIAN>>(fet);
 
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
@@ -586,7 +589,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  return libmesh_make_unique<InfFE<2,JACOBI_30_00,CARTESIAN>>(fet);
+                  return std::make_unique<InfFE<2,JACOBI_30_00,CARTESIAN>>(fet);
 
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
@@ -598,7 +601,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  return libmesh_make_unique<InfFE<2,LEGENDRE,CARTESIAN>>(fet);
+                  return std::make_unique<InfFE<2,LEGENDRE,CARTESIAN>>(fet);
 
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
@@ -610,7 +613,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  return libmesh_make_unique<InfFE<2,LAGRANGE,CARTESIAN>>(fet);
+                  return std::make_unique<InfFE<2,LAGRANGE,CARTESIAN>>(fet);
 
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
@@ -638,7 +641,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  return libmesh_make_unique<InfFE<3,JACOBI_20_00,CARTESIAN>>(fet);
+                  return std::make_unique<InfFE<3,JACOBI_20_00,CARTESIAN>>(fet);
 
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
@@ -650,7 +653,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  return libmesh_make_unique<InfFE<3,JACOBI_30_00,CARTESIAN>>(fet);
+                  return std::make_unique<InfFE<3,JACOBI_30_00,CARTESIAN>>(fet);
 
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
@@ -662,7 +665,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  return libmesh_make_unique<InfFE<3,LEGENDRE,CARTESIAN>>(fet);
+                  return std::make_unique<InfFE<3,LEGENDRE,CARTESIAN>>(fet);
 
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));
@@ -674,7 +677,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  return libmesh_make_unique<InfFE<3,LAGRANGE,CARTESIAN>>(fet);
+                  return std::make_unique<InfFE<3,LAGRANGE,CARTESIAN>>(fet);
 
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << Utility::enum_to_string(fet.inf_map));

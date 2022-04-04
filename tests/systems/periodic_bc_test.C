@@ -39,7 +39,7 @@ struct PeriodicQuadFunction : public FunctionBase<Number>
   PeriodicQuadFunction() = default;
 
   virtual std::unique_ptr<FunctionBase<Number>> clone () const
-  { return libmesh_make_unique<PeriodicQuadFunction>(); }
+  { return std::make_unique<PeriodicQuadFunction>(); }
 
   // We only really need the vector-valued output for projections
   virtual Number operator() (const Point &,

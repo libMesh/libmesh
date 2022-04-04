@@ -27,7 +27,10 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/sparsity_pattern.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
+
 
 namespace libMesh
 {
@@ -197,7 +200,7 @@ std::unique_ptr<SparseMatrix<T>> EigenSparseMatrix<T>::zero_clone () const
 {
   // TODO: If there is a more efficient way to make a zeroed-out copy
   // of an EigenSM, we should call that instead.
-  auto ret = libmesh_make_unique<EigenSparseMatrix<T>>(*this);
+  auto ret = std::make_unique<EigenSparseMatrix<T>>(*this);
   ret->zero();
 
   // Work around an issue on older compilers.  We are able to simply
@@ -210,7 +213,7 @@ std::unique_ptr<SparseMatrix<T>> EigenSparseMatrix<T>::zero_clone () const
 template <typename T>
 std::unique_ptr<SparseMatrix<T>> EigenSparseMatrix<T>::clone () const
 {
-  return libmesh_make_unique<EigenSparseMatrix<T>>(*this);
+  return std::make_unique<EigenSparseMatrix<T>>(*this);
 }
 
 

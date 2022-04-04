@@ -30,11 +30,11 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/zero_function.h"
 #include "libmesh/elem.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <array>
 #include <functional> // std::reference_wrapper
+#include <memory>
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -66,7 +66,7 @@ public:
   }
 
   virtual std::unique_ptr<FunctionBase<Number>> clone() const
-  { return libmesh_make_unique<BdyFunction>(_u_var, _v_var, _w_var, _Re); }
+  { return std::make_unique<BdyFunction>(_u_var, _v_var, _w_var, _Re); }
 
 private:
   const unsigned int _u_var, _v_var, _w_var;

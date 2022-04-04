@@ -66,7 +66,7 @@ FEMContext::FEMContext (const System & sys,
   if (active_vars)
     {
       auto vars_copy =
-        libmesh_make_unique<std::vector<unsigned int>>(*active_vars);
+        std::make_unique<std::vector<unsigned int>>(*active_vars);
 
       // We want to do quick binary_search later
       std::sort(vars_copy->begin(), vars_copy->end());

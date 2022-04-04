@@ -21,10 +21,14 @@
 #include "libmesh/diff_system.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/no_solution_history.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #include "libmesh/adjoint_refinement_estimator.h"
 #include "libmesh/error_vector.h"
+
+
+// C++ includes
+#include <memory>
+
 
 namespace libMesh
 {
@@ -35,7 +39,7 @@ TimeSolver::TimeSolver (sys_type & s)
     _diff_solver (),
     _linear_solver (),
     _system (s),
-    solution_history(libmesh_make_unique<NoSolutionHistory>()),
+    solution_history(std::make_unique<NoSolutionHistory>()),
     last_deltat (s.deltat),
     _is_adjoint (false)
 {

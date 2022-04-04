@@ -54,7 +54,7 @@ public:
 
     // The MappedSubdomainPartitioner partitions based on user-defined
     // assignment of subdomains to processors.
-    mesh.partitioner() = libmesh_make_unique<MappedSubdomainPartitioner>();
+    mesh.partitioner() = std::make_unique<MappedSubdomainPartitioner>();
 
     // Get a pointer to the MappedSubdomainPartitioner so we can call its
     // API specifically.
