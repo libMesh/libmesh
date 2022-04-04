@@ -40,6 +40,19 @@ namespace Utility
 template <typename T>
 T string_to_enum (const std::string & s);
 
+/**
+ * \returns the enumeration of type \p T which matches the string_view \p s.
+ */
+template <typename T>
+T string_to_enum (std::string_view s);
+
+/**
+ * \returns the enumeration of type \p T which matches the C-style
+ * string \p s.
+ */
+template <typename T>
+T string_to_enum (const char * s);
+
 } // namespace Utility
 } // namespace libMesh
 

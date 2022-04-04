@@ -2464,7 +2464,7 @@ std::string & BoundaryInfo::edgeset_name(boundary_id_type id)
   return _es_id_to_name[id];
 }
 
-boundary_id_type BoundaryInfo::get_id_by_name(const std::string & name) const
+boundary_id_type BoundaryInfo::get_id_by_name(std::string_view name) const
 {
   // Search sidesets
   for (const auto & pr : _ss_id_to_name)

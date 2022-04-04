@@ -83,7 +83,7 @@ public:
   /**
    * Set title of plot
    */
-  void set_title(const std::string & title) { _title = title; }
+  void set_title(std::string title) { _title = std::move(title); }
 
   /**
    * Turn grid on or off.

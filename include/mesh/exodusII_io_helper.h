@@ -539,14 +539,14 @@ public:
    * Prints the message defined in \p msg. Can be turned off if
    * verbosity is set to 0.
    */
-  void message(const std::string & msg);
+  void message(std::string_view msg);
 
   /**
    * Prints the message defined in \p msg, and appends the number \p i
    * to the end of the message.  Useful for printing messages in
    * loops.  Can be turned off if verbosity is set to 0.
    */
-  void message(const std::string & msg, int i);
+  void message(std::string_view msg, int i);
 
   // File identification flag
   int ex_id;

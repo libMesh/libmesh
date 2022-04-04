@@ -151,7 +151,7 @@ public:
    * disable logging.  You can use this flag to turn off
    * logging without touching any other code.
    */
-  PerfLog(const std::string & label_name="",
+  PerfLog(std::string label_name="",
           const bool log_events=true);
 
   /**

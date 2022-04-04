@@ -88,7 +88,7 @@ public:
    * -v Prints the version information.
    * -h Help: A brief instruction for using TetGen.
    */
-  void set_switches(const std::string & s);
+  void set_switches(std::string_view s);
 
   /**
    * Starts the triangulation.

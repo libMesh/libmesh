@@ -782,7 +782,7 @@ public:
    * \returns The index number for the new datum, or for the existing
    * datum if one by the same name has already been added.
    */
-  unsigned int add_elem_integer(const std::string & name,
+  unsigned int add_elem_integer(std::string name,
                                 bool allocate_data = true,
                                 dof_id_type default_value = DofObject::invalid_id);
 
@@ -808,12 +808,12 @@ public:
    * \returns The index number for the named extra element integer
    * datum, which must have already been added.
    */
-  unsigned int get_elem_integer_index(const std::string & name) const;
+  unsigned int get_elem_integer_index(std::string_view name) const;
 
   /*
    * \returns Whether or not the mesh has an element integer with its name.
    */
-  bool has_elem_integer(const std::string & name) const;
+  bool has_elem_integer(std::string_view name) const;
 
   /*
    * \returns The name for the indexed extra element integer
@@ -904,7 +904,7 @@ public:
    * \returns The index number for the new datum, or for the existing
    * datum if one by the same name has already been added.
    */
-  unsigned int add_node_integer(const std::string & name,
+  unsigned int add_node_integer(std::string name,
                                 bool allocate_data = true,
                                 dof_id_type default_value = DofObject::invalid_id);
 
@@ -930,12 +930,12 @@ public:
    * \returns The index number for the named extra node integer
    * datum, which must have already been added.
    */
-  unsigned int get_node_integer_index(const std::string & name) const;
+  unsigned int get_node_integer_index(std::string_view name) const;
 
   /*
    * \returns Whether or not the mesh has a node integer with its name.
    */
-  bool has_node_integer(const std::string & name) const;
+  bool has_node_integer(std::string_view name) const;
 
   /*
    * \returns The name for the indexed extra node integer
@@ -1395,7 +1395,7 @@ public:
    * \returns The id of the named subdomain if it exists,
    * \p Elem::invalid_subdomain_id otherwise.
    */
-  subdomain_id_type get_id_by_name(const std::string & name) const;
+  subdomain_id_type get_id_by_name(std::string_view name) const;
 
   //
   // element_iterator accessors

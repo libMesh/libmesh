@@ -333,8 +333,8 @@ void EquationSystems::update ()
 
 
 
-System & EquationSystems::add_system (const std::string & sys_type,
-                                      const std::string & name)
+System & EquationSystems::add_system (std::string_view sys_type,
+                                      std::string_view name)
 {
   // If the user already built a system with this name, we'll
   // trust them and we'll use it.  That way they can pre-add
@@ -564,8 +564,8 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
 
 
 void EquationSystems::build_solution_vector (std::vector<Number> &,
-                                             const std::string &,
-                                             const std::string &) const
+                                             std::string_view,
+                                             std::string_view) const
 {
   // TODO:[BSK] re-implement this from the method below
   libmesh_not_implemented();

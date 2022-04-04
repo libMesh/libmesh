@@ -150,7 +150,7 @@ void TetGenWrapper::allocate_pointlist(int numofpoints)
 
 
 
-void TetGenWrapper::set_switches(const std::string & s)
+void TetGenWrapper::set_switches(std::string_view s)
 {
   // A temporary buffer for passing to the C API, it requires
   // a char *, not a const char *...

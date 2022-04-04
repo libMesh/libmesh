@@ -52,9 +52,9 @@ namespace libMesh
 bool PerfLog::called = false;
 
 
-PerfLog::PerfLog(const std::string & ln,
+PerfLog::PerfLog(std::string ln,
                  const bool le) :
-  label_name(ln),
+  label_name(std::move(ln)),
   log_events(le),
   summarize_logs(false),
   total_time(0.)

@@ -84,7 +84,7 @@ void chunking(libMesh::processor_id_type size, libMesh::processor_id_type rank, 
     }
 }
 
-std::string extension(const std::string & s)
+std::string_view extension(std::string_view s)
 {
   auto pos = s.rfind(".");
   if (pos == std::string::npos)
@@ -100,16 +100,16 @@ std::string split_dir(const std::string & input_name, libMesh::processor_id_type
 
 std::string header_file(const std::string & input_name, libMesh::processor_id_type n_procs)
 {
-  return split_dir(input_name, n_procs) + "/header" + extension(input_name);
+  return (split_dir(input_name, n_procs) + "/header").append(extension(input_name));
 }
 
 std::string
 split_file(const std::string & input_name,
-                        libMesh::processor_id_type n_procs,
-                        libMesh::processor_id_type proc_id)
+           libMesh::processor_id_type n_procs,
+           libMesh::processor_id_type proc_id)
 {
-  return split_dir(input_name, n_procs) + "/split-" + std::to_string(n_procs) + "-" +
-         std::to_string(proc_id) + extension(input_name);
+  return (split_dir(input_name, n_procs) + "/split-" + std::to_string(n_procs) + "-" +
+         std::to_string(proc_id)).append(extension(input_name));
 }
 
 void make_dir(const std::string & input_name, libMesh::processor_id_type n_procs)

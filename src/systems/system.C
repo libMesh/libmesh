@@ -727,13 +727,14 @@ void System::update_global_solution (std::vector<Number> & global_soln,
 
 
 
-NumericVector<Number> & System::add_vector (const std::string & vec_name,
+NumericVector<Number> & System::add_vector (std::string_view vec_name,
                                             const bool projections,
                                             const ParallelType type)
 {
   // Return the vector if it is already there.
-  if (this->have_vector(vec_name))
-    return *(_vectors[vec_name]);
+  auto it = this->_vectors.find(vec_name);
+  if (it != this->_vectors.end())
+    return *it->second;
 
   // Otherwise build the vector
   auto pr = _vectors.emplace(vec_name, NumericVector<Number>::build(this->comm()));
@@ -764,7 +765,7 @@ NumericVector<Number> & System::add_vector (const std::string & vec_name,
   return *buf;
 }
 
-void System::remove_vector (const std::string & vec_name)
+void System::remove_vector (std::string_view vec_name)
 {
   vectors_iterator pos = _vectors.find(vec_name);
 
@@ -773,12 +774,20 @@ void System::remove_vector (const std::string & vec_name)
     return;
 
   _vectors.erase(pos);
-  _vector_projections.erase(vec_name);
-  _vector_is_adjoint.erase(vec_name);
-  _vector_types.erase(vec_name);
+  auto proj_it = _vector_projections.find(vec_name);
+  libmesh_assert(proj_it != _vector_projections.end());
+  _vector_projections.erase(proj_it);
+
+  auto adj_it = _vector_is_adjoint.find(vec_name);
+  libmesh_assert(adj_it != _vector_is_adjoint.end());
+  _vector_is_adjoint.erase(adj_it);
+
+  auto type_it = _vector_types.find(vec_name);
+  libmesh_assert(type_it != _vector_types.end());
+  _vector_types.erase(type_it);
 }
 
-const NumericVector<Number> * System::request_vector (const std::string & vec_name) const
+const NumericVector<Number> * System::request_vector (std::string_view vec_name) const
 {
   const_vectors_iterator pos = _vectors.find(vec_name);
 
@@ -790,7 +799,7 @@ const NumericVector<Number> * System::request_vector (const std::string & vec_na
 
 
 
-NumericVector<Number> * System::request_vector (const std::string & vec_name)
+NumericVector<Number> * System::request_vector (std::string_view vec_name)
 {
   vectors_iterator pos = _vectors.find(vec_name);
 
@@ -830,14 +839,14 @@ NumericVector<Number> * System::request_vector (const unsigned int vec_num)
 
 
 
-const NumericVector<Number> & System::get_vector (const std::string & vec_name) const
+const NumericVector<Number> & System::get_vector (std::string_view vec_name) const
 {
   return *(libmesh_map_find(_vectors, vec_name));
 }
 
 
 
-NumericVector<Number> & System::get_vector (const std::string & vec_name)
+NumericVector<Number> & System::get_vector (std::string_view vec_name)
 {
   return *(libmesh_map_find(_vectors, vec_name));
 }
@@ -897,13 +906,14 @@ const std::string & System::vector_name (const NumericVector<Number> & vec_refer
 
 
 
-SparseMatrix<Number> & System::add_matrix (const std::string & mat_name,
+SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
                                            const ParallelType type,
                                            const MatrixBuildType mat_build_type)
 {
   // Return the matrix if it is already there.
-  if (this->have_matrix(mat_name))
-    return *(_matrices[mat_name]);
+  auto it = this->_matrices.find(mat_name);
+  if (it != this->_matrices.end())
+    return *it->second;
 
   // Otherwise build the matrix to return.
   auto pr = _matrices.emplace
@@ -937,7 +947,7 @@ void System::late_matrix_init(SparseMatrix<Number> & mat,
 
 
 
-void System::remove_matrix (const std::string & mat_name)
+void System::remove_matrix (std::string_view mat_name)
 {
   matrices_iterator pos = _matrices.find(mat_name);
 
@@ -950,7 +960,7 @@ void System::remove_matrix (const std::string & mat_name)
 
 
 
-const SparseMatrix<Number> * System::request_matrix (const std::string & mat_name) const
+const SparseMatrix<Number> * System::request_matrix (std::string_view mat_name) const
 {
   // Make sure the matrix exists
   const_matrices_iterator pos = _matrices.find(mat_name);
@@ -963,7 +973,7 @@ const SparseMatrix<Number> * System::request_matrix (const std::string & mat_nam
 
 
 
-SparseMatrix<Number> * System::request_matrix (const std::string & mat_name)
+SparseMatrix<Number> * System::request_matrix (std::string_view mat_name)
 {
   // Make sure the matrix exists
   matrices_iterator pos = _matrices.find(mat_name);
@@ -976,14 +986,14 @@ SparseMatrix<Number> * System::request_matrix (const std::string & mat_name)
 
 
 
-const SparseMatrix<Number> & System::get_matrix (const std::string & mat_name) const
+const SparseMatrix<Number> & System::get_matrix (std::string_view mat_name) const
 {
   return *libmesh_map_find(_matrices, mat_name);
 }
 
 
 
-SparseMatrix<Number> & System::get_matrix (const std::string & mat_name)
+SparseMatrix<Number> & System::get_matrix (std::string_view mat_name)
 {
   return *libmesh_map_find(_matrices, mat_name);
 }
@@ -998,7 +1008,7 @@ void System::set_vector_preservation (const std::string & vec_name,
 
 
 
-bool System::vector_preservation (const std::string & vec_name) const
+bool System::vector_preservation (std::string_view vec_name) const
 {
   if (_vector_projections.find(vec_name) == _vector_projections.end())
     return false;
@@ -1019,7 +1029,7 @@ void System::set_vector_as_adjoint (const std::string & vec_name,
 
 
 
-int System::vector_is_adjoint (const std::string & vec_name) const
+int System::vector_is_adjoint (std::string_view vec_name) const
 {
   libmesh_assert(_vector_is_adjoint.find(vec_name) !=
                  _vector_is_adjoint.end());
@@ -1204,7 +1214,7 @@ const NumericVector<Number> & System::get_sensitivity_rhs (unsigned int i) const
 
 
 
-unsigned int System::add_variable (const std::string & var,
+unsigned int System::add_variable (std::string_view var,
                                    const FEType & type,
                                    const std::set<subdomain_id_type> * const active_subdomains)
 {
@@ -1267,23 +1277,25 @@ unsigned int System::add_variable (const std::string & var,
           const unsigned short curr_n_vars = cast_int<unsigned short>
             (this->n_vars());
 
-          vg.append (var);
+          std::string varstr(var);
 
+          _variable_numbers[varstr] = curr_n_vars;
+          vg.append (std::move(varstr));
           _variables.push_back(vg(vg.n_variables()-1));
-          _variable_numbers[var] = curr_n_vars;
+
           return curr_n_vars;
         }
     }
 
   // otherwise, fall back to adding a single variable group
-  return this->add_variables (std::vector<std::string>(1, var),
+  return this->add_variables (std::vector<std::string>(1, std::string(var)),
                               type,
                               active_subdomains);
 }
 
 
 
-unsigned int System::add_variable (const std::string & var,
+unsigned int System::add_variable (std::string_view var,
                                    const Order order,
                                    const FEFamily family,
                                    const std::set<subdomain_id_type> * const active_subdomains)
@@ -1419,14 +1431,14 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
 
 
 
-bool System::has_variable (const std::string & var) const
+bool System::has_variable (std::string_view var) const
 {
   return _variable_numbers.count(var);
 }
 
 
 
-unsigned short int System::variable_number (const std::string & var) const
+unsigned short int System::variable_number (std::string_view var) const
 {
   auto var_num = libmesh_map_find(_variable_numbers, var);
   libmesh_assert_equal_to (_variables[var_num].name(), var);

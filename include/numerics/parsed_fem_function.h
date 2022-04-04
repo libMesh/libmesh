@@ -63,7 +63,7 @@ public:
    */
   explicit
   ParsedFEMFunction (const System & sys,
-                     const std::string & expression,
+                     std::string expression,
                      const std::vector<std::string> * additional_vars=nullptr,
                      const std::vector<Output> * initial_vals=nullptr);
 
@@ -84,7 +84,7 @@ public:
   /**
    * Re-parse with new expression.
    */
-  void reparse (const std::string & expression);
+  void reparse (std::string expression);
 
   virtual void init_context (const FEMContext & c) override;
 
@@ -114,7 +114,7 @@ public:
    * redefined within any subexpression, and if the inline variable
    * takes the same value within any subexpressions where it appears.
    */
-  Output get_inline_value(const std::string & inline_var_name) const;
+  Output get_inline_value(std::string_view inline_var_name) const;
 
   /**
    * Changes the value of an inline variable.
@@ -126,16 +126,16 @@ public:
    * \note Currently only works if the inline variable is not redefined
    * within any one subexpression.
    */
-  void set_inline_value(const std::string & inline_var_name,
+  void set_inline_value(std::string_view inline_var_name,
                         Output newval);
 
 protected:
   // Helper function for reparsing minor changes to expression
-  void partial_reparse (const std::string & expression);
+  void partial_reparse (std::string expression);
 
   // Helper function for parsing out variable names
-  std::size_t find_name (const std::string & varname,
-                         const std::string & expr) const;
+  std::size_t find_name (std::string_view varname,
+                         std::string_view expr) const;
 
   // Helper function for evaluating function arguments
   void eval_args(const FEMContext & c,
@@ -145,11 +145,11 @@ protected:
   // Evaluate the ith FunctionParser and check the result
 #ifdef LIBMESH_HAVE_FPARSER
   inline Output eval(FunctionParserBase<Output> & parser,
-                     const std::string & libmesh_dbg_var(function_name),
+                     std::string_view libmesh_dbg_var(function_name),
                      unsigned int libmesh_dbg_var(component_idx)) const;
 #else // LIBMESH_HAVE_FPARSER
   inline Output eval(char & libmesh_dbg_var(parser),
-                     const std::string & libmesh_dbg_var(function_name),
+                     std::string_view libmesh_dbg_var(function_name),
                      unsigned int libmesh_dbg_var(component_idx)) const;
 #endif
 
@@ -195,7 +195,7 @@ private:
 template <typename Output>
 inline
 ParsedFEMFunction<Output>::ParsedFEMFunction (const System & sys,
-                                              const std::string & expression,
+                                              std::string expression,
                                               const std::vector<std::string> * additional_vars,
                                               const std::vector<Output> * initial_vals) :
   _sys(sys),
@@ -213,7 +213,7 @@ ParsedFEMFunction<Output>::ParsedFEMFunction (const System & sys,
   _additional_vars (additional_vars ? *additional_vars : std::vector<std::string>()),
   _initial_vals (initial_vals ? *initial_vals : std::vector<Output>())
 {
-  this->reparse(expression);
+  this->reparse(std::move(expression));
 }
 
 
@@ -261,7 +261,7 @@ ParsedFEMFunction<Output>::operator= (const ParsedFEMFunction<Output> & other)
 template <typename Output>
 inline
 void
-ParsedFEMFunction<Output>::reparse (const std::string & expression)
+ParsedFEMFunction<Output>::reparse (std::string expression)
 {
   variables = "x";
 #if LIBMESH_DIM > 1
@@ -384,7 +384,7 @@ ParsedFEMFunction<Output>::reparse (const std::string & expression)
         (i < _initial_vals.size()) ? _initial_vals[i] : 0;
     }
 
-  this->partial_reparse(expression);
+  this->partial_reparse(std::move(expression));
 }
 
 template <typename Output>
@@ -478,7 +478,7 @@ ParsedFEMFunction<Output>::component (const FEMContext & c,
 template <typename Output>
 inline
 Output
-ParsedFEMFunction<Output>::get_inline_value(const std::string & inline_var_name) const
+ParsedFEMFunction<Output>::get_inline_value(std::string_view inline_var_name) const
 {
   libmesh_assert_greater (_subexpressions.size(), 0);
 
@@ -509,8 +509,8 @@ ParsedFEMFunction<Output>::get_inline_value(const std::string & inline_var_name)
       libmesh_assert_not_equal_to(end_assignment_i, std::string::npos);
 
       std::string new_subexpression =
-        subexpression.substr(0, end_assignment_i+1) +
-        inline_var_name;
+        subexpression.substr(0, end_assignment_i+1).
+         append(inline_var_name);
 
 #ifdef LIBMESH_HAVE_FPARSER
       // Parse and evaluate the new subexpression.
@@ -551,7 +551,7 @@ ParsedFEMFunction<Output>::get_inline_value(const std::string & inline_var_name)
 template <typename Output>
 inline
 void
-ParsedFEMFunction<Output>::set_inline_value (const std::string & inline_var_name,
+ParsedFEMFunction<Output>::set_inline_value (std::string_view inline_var_name,
                                              Output newval)
 {
   libmesh_assert_greater (_subexpressions.size(), 0);
@@ -617,9 +617,9 @@ ParsedFEMFunction<Output>::set_inline_value (const std::string & inline_var_name
 template <typename Output>
 inline
 void
-ParsedFEMFunction<Output>::partial_reparse (const std::string & expression)
+ParsedFEMFunction<Output>::partial_reparse (std::string expression)
 {
-  _expression = expression;
+  _expression = std::move(expression);
   _subexpressions.clear();
   parsers.clear();
 
@@ -629,15 +629,15 @@ ParsedFEMFunction<Output>::partial_reparse (const std::string & expression)
     {
       // If we're past the end of the string, we can't make any more
       // subparsers
-      if (nextstart >= expression.size())
+      if (nextstart >= _expression.size())
         break;
 
       // If we're at the start of a brace delimited section, then we
       // parse just that section:
-      if (expression[nextstart] == '{')
+      if (_expression[nextstart] == '{')
         {
           nextstart++;
-          end = expression.find('}', nextstart);
+          end = _expression.find('}', nextstart);
         }
       // otherwise we parse the whole thing
       else
@@ -646,7 +646,7 @@ ParsedFEMFunction<Output>::partial_reparse (const std::string & expression)
       // We either want the whole end of the string (end == npos) or
       // a substring in the middle.
       _subexpressions.push_back
-        (expression.substr(nextstart, (end == std::string::npos) ?
+        (_expression.substr(nextstart, (end == std::string::npos) ?
                            std::string::npos : end - nextstart));
 
       // fparser can crash on empty expressions
@@ -681,8 +681,8 @@ ParsedFEMFunction<Output>::partial_reparse (const std::string & expression)
 template <typename Output>
 inline
 std::size_t
-ParsedFEMFunction<Output>::find_name (const std::string & varname,
-                                      const std::string & expr) const
+ParsedFEMFunction<Output>::find_name (std::string_view varname,
+                                      std::string_view expr) const
 {
   const std::size_t namesize = varname.size();
   std::size_t varname_i = expr.find(varname);
@@ -837,7 +837,7 @@ template <typename Output>
 inline
 Output
 ParsedFEMFunction<Output>::eval (FunctionParserBase<Output> & parser,
-                                 const std::string & libmesh_dbg_var(function_name),
+                                 std::string_view libmesh_dbg_var(function_name),
                                  unsigned int libmesh_dbg_var(component_idx)) const
 {
 #ifndef NDEBUG
@@ -891,7 +891,7 @@ template <typename Output>
 inline
 Output
 ParsedFEMFunction<Output>::eval (char & /*parser*/,
-                                 const std::string & /*function_name*/,
+                                 std::string_view /*function_name*/,
                                  unsigned int /*component_idx*/) const
 {
   libmesh_error_msg("ERROR: This functionality requires fparser!");
