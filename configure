@@ -15236,6 +15236,76 @@ $as_echo "$as_me: WARNING: libMesh requires C++11 support for std::isinf" >&2;}
            have_cxx_all=no
 fi
 
+
+    have_cxx17_splicing=no
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++17 std::*::merge" >&5
+$as_echo_n "checking for C++17 std::*::merge... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <map>
+    #include <set>
+    #include <unordered_map>
+    #include <unordered_set>
+
+int
+main ()
+{
+
+    std::set<int> s1{1}, s2{2};
+    std::unordered_set<int> us1{3}, us2{4};
+    std::map<int,int> m1{{5,6}}, m2{{7,8}};
+    std::unordered_map<int,int> um1{{9,10}}, um2{{11,12}};
+    s1.merge(std::move(s2));
+    us1.merge(std::move(us2));
+    m1.merge(std::move(m2));
+    um1.merge(std::move(um2));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+        have_cxx17_splicing=yes
+
+$as_echo "#define HAVE_CXX17_SPLICING 1" >>confdefs.h
+
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+        CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    if test "x$have_cxx17_splicing" != "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: libMesh prefers C++17 support for set/map merge" >&5
+$as_echo "$as_me: WARNING: libMesh prefers C++17 support for set/map merge" >&2;}
+fi
+
 fi
     if test "$HAVE_CXX17" = "1" -a "x$have_cxx_all" = xyes; then :
 
@@ -20302,6 +20372,76 @@ $as_echo "$as_me: WARNING: libMesh requires C++11 support for std::isinf" >&2;}
            have_cxx_all=no
 fi
 
+
+    have_cxx17_splicing=no
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++17 std::*::merge" >&5
+$as_echo_n "checking for C++17 std::*::merge... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <map>
+    #include <set>
+    #include <unordered_map>
+    #include <unordered_set>
+
+int
+main ()
+{
+
+    std::set<int> s1{1}, s2{2};
+    std::unordered_set<int> us1{3}, us2{4};
+    std::map<int,int> m1{{5,6}}, m2{{7,8}};
+    std::unordered_map<int,int> um1{{9,10}}, um2{{11,12}};
+    s1.merge(std::move(s2));
+    us1.merge(std::move(us2));
+    m1.merge(std::move(m2));
+    um1.merge(std::move(um2));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+        have_cxx17_splicing=yes
+
+$as_echo "#define HAVE_CXX17_SPLICING 1" >>confdefs.h
+
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+        CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    if test "x$have_cxx17_splicing" != "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: libMesh prefers C++17 support for set/map merge" >&5
+$as_echo "$as_me: WARNING: libMesh prefers C++17 support for set/map merge" >&2;}
+fi
+
 fi
     if test "$HAVE_CXX14" = "1" -a "x$have_cxx_all" = xyes; then :
 
@@ -24646,6 +24786,76 @@ fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: libMesh requires C++11 support for std::isinf" >&5
 $as_echo "$as_me: WARNING: libMesh requires C++11 support for std::isinf" >&2;}
            have_cxx_all=no
+fi
+
+
+    have_cxx17_splicing=no
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++17 std::*::merge" >&5
+$as_echo_n "checking for C++17 std::*::merge... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <map>
+    #include <set>
+    #include <unordered_map>
+    #include <unordered_set>
+
+int
+main ()
+{
+
+    std::set<int> s1{1}, s2{2};
+    std::unordered_set<int> us1{3}, us2{4};
+    std::map<int,int> m1{{5,6}}, m2{{7,8}};
+    std::unordered_map<int,int> um1{{9,10}}, um2{{11,12}};
+    s1.merge(std::move(s2));
+    us1.merge(std::move(us2));
+    m1.merge(std::move(m2));
+    um1.merge(std::move(um2));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+        have_cxx17_splicing=yes
+
+$as_echo "#define HAVE_CXX17_SPLICING 1" >>confdefs.h
+
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+        CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    if test "x$have_cxx17_splicing" != "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: libMesh prefers C++17 support for set/map merge" >&5
+$as_echo "$as_me: WARNING: libMesh prefers C++17 support for set/map merge" >&2;}
 fi
 
 fi

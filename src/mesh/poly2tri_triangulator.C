@@ -655,8 +655,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                 }
             }
 
-          cavity.insert(checking_cavity.begin(),
-                        checking_cavity.end());
+          libmesh_merge_move(cavity, checking_cavity);
         }
 
       // Retriangulate the Delaunay cavity.
