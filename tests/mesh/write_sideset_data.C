@@ -36,7 +36,8 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
   template <typename IOClass>
-  void testWriteImpl(const std::string & filename)
+  void testWriteImpl(const std::string & filename,
+                     bool write_vars)
   {
     Mesh mesh(*TestCommWorld);
 
@@ -52,13 +53,20 @@ public:
     // Add an empty sideset
     mesh.get_boundary_info().sideset_name(4) = "empty";
 
+    // Only used if write_vars == true
+    std::vector<std::string> var_names;
+    std::vector<std::set<boundary_id_type>> side_ids;
+    std::vector<std::map<BoundaryInfo::BCTuple, Real>> bc_vals;
+
+    if (write_vars)
+    {
     // Get list of all (elem, side, id) tuples
     std::vector<BoundaryInfo::BCTuple> all_bc_tuples =
       mesh.get_boundary_info().build_side_list();
 
     // Data structures to be passed to ExodusII_IO::write_sideset_data
-    std::vector<std::string> var_names = {"var1", "var2", "var3"};
-    std::vector<std::set<boundary_id_type>> side_ids =
+    var_names = {"var1", "var2", "var3"};
+    side_ids =
       {
         {0, 2}, // var1 is defined on sidesets 0 and 2
         {1, 3}, // var2 is defined on sidesets 1 and 3
@@ -67,7 +75,7 @@ public:
 
     // Data structure mapping (elem, side, id) tuples to Real values that
     // will be passed to Exodus.
-    std::vector<std::map<BoundaryInfo::BCTuple, Real>> bc_vals(var_names.size());
+    bc_vals.resize(var_names.size());
 
     // For each var_names[i], construct bc_vals[i]
     for (unsigned int i=0; i<var_names.size(); ++i)
@@ -105,6 +113,7 @@ public:
       writer.write(filename);
       writer.write_sideset_data (/*timestep=*/1, var_names, side_ids, bc_vals);
     }
+    } // if (write_vars)
 
     // Make sure that the writing is done before the reading starts.
     TestCommWorld->barrier();
@@ -114,6 +123,8 @@ public:
     IOClass reader(read_mesh);
     reader.read(filename);
 
+    if (write_vars)
+    {
     std::vector<std::string> read_in_var_names;
     std::vector<std::set<boundary_id_type>> read_in_side_ids;
     std::vector<std::map<BoundaryInfo::BCTuple, Real>> read_in_bc_vals;
@@ -124,6 +135,7 @@ public:
     CPPUNIT_ASSERT(read_in_var_names == var_names);
     CPPUNIT_ASSERT(read_in_side_ids == side_ids);
     CPPUNIT_ASSERT(read_in_bc_vals == bc_vals);
+    } // if (write_vars)
 
     // Also check that the flat indices match those in the file
     std::map<BoundaryInfo::BCTuple, unsigned int> bc_array_indices;
@@ -207,7 +219,8 @@ public:
   {
     LOG_UNIT_TEST;
 
-    testWriteImpl<ExodusII_IO>("write_sideset_data.e");
+    testWriteImpl<ExodusII_IO>("write_sideset_data.e", /*write_vars=*/true);
+    testWriteImpl<ExodusII_IO>("write_sideset_data.e", /*write_vars=*/false);
   }
 
   void testWriteNemesis()
@@ -215,9 +228,8 @@ public:
     // LOG_UNIT_TEST;
 
     // FIXME: Not yet implemented
-    // testWriteImpl<Nemesis_IO>("write_sideset_data.n");
+    // testWriteImpl<Nemesis_IO>("write_sideset_data.n", /*write_vars=*/true);
   }
-
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(WriteSidesetData);
