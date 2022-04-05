@@ -461,12 +461,10 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
   // optionally write cell-centered data
   if (!(this->_cell_centered_data.empty()))
     {
-      for (auto & pr : this->_cell_centered_data)
+      for (const auto & [var_name, the_array] : this->_cell_centered_data)
         {
           // write out the variable name, followed by a zero.
-          out_stream << pr.first << " 0\n";
-
-          const std::vector<Real> * the_array = pr.second;
+          out_stream << var_name << " 0\n";
 
           // Loop over active elements, write out cell data.  If second-order cells
           // are split into sub-elements, the sub-elements inherit their parent's
@@ -475,7 +473,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
             {
               // Use the element's ID to find the value.
               libmesh_assert_less (elem->id(), the_array->size());
-              const Real the_value = the_array->operator[](elem->id());
+              const Real the_value = (*the_array)[elem->id()];
 
               if (this->subdivide_second_order())
                 for (unsigned int se=0, nse=elem->n_sub_elem(); se<nse; se++)
@@ -1115,12 +1113,10 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
   // optionally write cell-centered data
   if (!(this->_cell_centered_data.empty()))
     {
-      for (const auto & pr : this->_cell_centered_data)
+      for (const auto & [var_name, the_array] : this->_cell_centered_data)
         {
           // write out the variable name, followed by a zero.
-          out_stream << pr.first << " 0\n";
-
-          const std::vector<Real> * the_array = pr.second;
+          out_stream << var_name << " 0\n";
 
           // Loop over active elements, write out cell data.  If second-order cells
           // are split into sub-elements, the sub-elements inherit their parent's
@@ -2176,15 +2172,13 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
 
       // For each var entry in the _nodal_data map, try to find
       // that var in the system
-      for (const auto & pr : _nodal_data)
+      for (const auto & [var_name, vec] : _nodal_data)
         {
-          const std::string & var_name = pr.first;
-
           if (system.has_variable(var_name))
             {
               // Check if there are as many nodes in the mesh as there are entries
               // in the stored nodal data vector
-              libmesh_assert_equal_to (pr.second.size(), MeshInput<MeshBase>::mesh().n_nodes());
+              libmesh_assert_equal_to (vec.size(), MeshInput<MeshBase>::mesh().n_nodes());
 
               const unsigned int var_num = system.variable_number(var_name);
 
@@ -2202,7 +2196,7 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
               // Loop over the stored vector's entries, inserting them into
               // the System's solution if appropriate.
               for (dof_id_type i=0,
-                   sz = cast_int<dof_id_type>(pr.second.size());
+                   sz = cast_int<dof_id_type>(vec.size());
                    i != sz; ++i)
                 {
                   // Since this var came from a GMV file, the index i corresponds to
@@ -2215,7 +2209,7 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
                   // If the dof_index is local to this processor, set the value
                   if ((dof_index >= system.solution->first_local_index()) &&
                       (dof_index <  system.solution->last_local_index()))
-                    system.solution->set (dof_index, pr.second [i]);
+                    system.solution->set (dof_index, vec[i]);
                 } // end loop over my GMVIO's copy of the solution
 
               // Add the most recently copied var to the set of copied vars
