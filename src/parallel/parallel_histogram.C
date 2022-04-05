@@ -17,7 +17,7 @@
 
 
 // C++ includes
-#include <algorithm>  // std::lower_bound
+#include <algorithm>  // is_sorted, lower_bound
 
 // Local includes
 #include "libmesh/parallel_histogram.h"
@@ -37,7 +37,7 @@ Histogram<KeyType,IdxType>::Histogram (const Parallel::Communicator & comm_in,
   ParallelObject(comm_in),
   data(d)
 {
-  libmesh_assert (Parallel::Utils::is_sorted (data));
+  libmesh_assert (std::is_sorted (data.begin(), data.end()));
 }
 
 

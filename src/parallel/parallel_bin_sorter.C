@@ -17,7 +17,7 @@
 
 
 // C++ includes
-#include <algorithm>  // std::lower_bound
+#include <algorithm>  // is_sorted, lower_bound
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -40,13 +40,7 @@ BinSorter<KeyType,IdxType>::BinSorter (const Parallel::Communicator & comm_in,
   ParallelObject(comm_in),
   data(d)
 {
-  // Assume (& libmesh_assert) we are working with a sorted range
-
-  // Ah...  is_sorted is an STL extension!
-  //libmesh_assert (std::is_sorted (data.begin(), data.end()));
-
-  // Home-grown is_sorted
-  libmesh_assert (Parallel::Utils::is_sorted (data));
+  libmesh_assert (std::is_sorted (data.begin(), data.end()));
 }
 
 

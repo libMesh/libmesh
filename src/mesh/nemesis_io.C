@@ -26,7 +26,7 @@
 #include "libmesh/nemesis_io_helper.h"
 #include "libmesh/node.h"
 #include "libmesh/parallel.h"
-#include "libmesh/utility.h" // is_sorted, deallocate
+#include "libmesh/utility.h" // deallocate
 #include "libmesh/boundary_info.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/fe_type.h"

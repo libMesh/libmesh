@@ -43,23 +43,18 @@ namespace Utils {
 /**
  * \returns \p true if the vector \p v is sorted, \p false otherwise.
  *
- * Requires O(N) comparisons, where N is the length of the vector.
  * This was implemented because std::is_sorted() was an STL extension
  * at the time.
  */
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <typename KeyType>
 inline
 bool is_sorted (const std::vector<KeyType> & v)
 {
-  if (v.empty())
-    return true;
-
-  for (auto i : IntRange<std::size_t>(1, v.size()))
-    if (v[i] < v[i-1])
-      return false;
-
-  return true;
+  libmesh_deprecated();
+  return std::is_sorted(v.begin(), v.end());
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 /**
  * A utility function which converts whatever \p KeyType is to
