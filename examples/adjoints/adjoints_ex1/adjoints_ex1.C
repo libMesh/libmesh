@@ -214,7 +214,7 @@ void set_system_parameters(LaplaceSystem & system,
 #ifdef LIBMESH_ENABLE_AMR
 
 std::unique_ptr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
-                                                      FEMParameters & param)
+                                                      const FEMParameters & param)
 {
   MeshRefinement * mesh_refinement = new MeshRefinement(mesh);
   mesh_refinement->coarsen_by_parents() = true;
@@ -236,8 +236,8 @@ std::unique_ptr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
 // forward and adjoint weights. The H1 seminorm component of the error is used
 // as dictated by the weak form the Laplace equation.
 
-std::unique_ptr<ErrorEstimator> build_error_estimator(FEMParameters & param,
-                                                      QoISet & qois)
+std::unique_ptr<ErrorEstimator> build_error_estimator(const FEMParameters & param,
+                                                      const QoISet & qois)
 {
   if (param.indicator_type == "kelly")
     {
