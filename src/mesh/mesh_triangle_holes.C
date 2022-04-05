@@ -120,20 +120,20 @@ Point TriangulatorInterface::AffineHole::transform(const Point & p) const
 // ArbitraryHole member functions
 //
 TriangulatorInterface::ArbitraryHole::ArbitraryHole(const Point & center,
-                                                    const std::vector<Point> & points)
+                                                    std::vector<Point> points)
   : _center(center),
-    _points(points)
+    _points(std::move(points))
 {
   _segment_indices.push_back(0);
-  _segment_indices.push_back(points.size());
+  _segment_indices.push_back(_points.size());
 }
 
 TriangulatorInterface::ArbitraryHole::ArbitraryHole(const Point & center,
-                                                    const std::vector<Point> & points,
-                                                    const std::vector<unsigned int> & segment_indices)
+                                                    std::vector<Point> points,
+                                                    std::vector<unsigned int> segment_indices)
   : _center(center),
-    _points(points),
-    _segment_indices(segment_indices)
+    _points(std::move(points)),
+    _segment_indices(std::move(segment_indices))
 {}
 
 TriangulatorInterface::ArbitraryHole::ArbitraryHole(const Hole & orig)

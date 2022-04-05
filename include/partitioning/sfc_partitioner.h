@@ -72,12 +72,12 @@ public:
    * Sets the type of space-filling curve to use.  Valid types are
    * "Hilbert" (the default) and "Morton".
    */
-  void set_sfc_type (const std::string & sfc_type)
+  void set_sfc_type (std::string sfc_type)
   {
     libmesh_assert ((sfc_type == "Hilbert") ||
                     (sfc_type == "Morton"));
 
-    _sfc_type = sfc_type;
+    _sfc_type = std::move(sfc_type);
   }
 
   /**

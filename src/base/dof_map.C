@@ -252,14 +252,14 @@ void DofMap::set_error_on_constraint_loop(bool error_on_constraint_loop)
 
 
 
-void DofMap::add_variable_group (const VariableGroup & var_group)
+void DofMap::add_variable_group (VariableGroup var_group)
 {
   // Ensure that we are not duplicating an existing entry in _variable_groups
   if (std::find(_variable_groups.begin(), _variable_groups.end(), var_group) == _variable_groups.end())
   {
    const unsigned int vg = cast_int<unsigned int>(_variable_groups.size());
 
-   _variable_groups.push_back(var_group);
+   _variable_groups.push_back(std::move(var_group));
 
     VariableGroup & new_var_group = _variable_groups.back();
 

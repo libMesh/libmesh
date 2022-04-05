@@ -198,11 +198,11 @@ public:
    * and a reference to a vector of Points defining the hole.
    */
   ArbitraryHole(const Point & center,
-                const std::vector<Point> & points);
+                std::vector<Point> points);
 
   ArbitraryHole(const Point & center,
-                const std::vector<Point> & points,
-                const std::vector<unsigned int> & segment_indices);
+                std::vector<Point> points,
+                std::vector<unsigned int> segment_indices);
 
   /**
    * We can also construct an ArbitraryHole which just copies

@@ -107,8 +107,8 @@ public:
    * Defines the field variable(s) we are responsible for,
    * and importantly their assumed ordering.
    */
-  void set_field_variables (const std::vector<std::string> & names)
-  { _names = names; }
+  void set_field_variables (std::vector<std::string> names)
+  { _names = std::move(names); }
 
   /**
    *\returns The field variables as a read-only reference.

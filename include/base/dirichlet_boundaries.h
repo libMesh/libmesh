@@ -93,8 +93,8 @@ public:
    * Constructor for a system-variable-order boundary using
    * pointers-to-functors.
    */
-  DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                    const std::vector<unsigned int> & variables_in,
+  DirichletBoundary(std::set<boundary_id_type> b_in,
+                    std::vector<unsigned int> variables_in,
                     const FunctionBase<Number> * f_in,
                     const FunctionBase<Gradient> * g_in = nullptr);
 
@@ -104,8 +104,8 @@ public:
    * Defaults to system variable indexing for backwards compatibility,
    * but most users will prefer local indexing.
    */
-  DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                    const std::vector<unsigned int> & variables_in,
+  DirichletBoundary(std::set<boundary_id_type> b_in,
+                    std::vector<unsigned int> variables_in,
                     const FunctionBase<Number> & f_in,
                     VariableIndexing type = SYSTEM_VARIABLE_ORDER);
 
@@ -116,8 +116,8 @@ public:
    * Defaults to system variable indexing for backwards compatibility,
    * but most users will prefer local indexing.
    */
-  DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                    const std::vector<unsigned int> & variables_in,
+  DirichletBoundary(std::set<boundary_id_type> b_in,
+                    std::vector<unsigned int> variables_in,
                     const FunctionBase<Number> & f_in,
                     const FunctionBase<Gradient> & g_in,
                     VariableIndexing type = SYSTEM_VARIABLE_ORDER);
@@ -126,8 +126,8 @@ public:
    * Constructor for a system-variable-order boundary from
    * pointers-to-fem-functors.
    */
-  DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                    const std::vector<unsigned int> & variables_in,
+  DirichletBoundary(std::set<boundary_id_type> b_in,
+                    std::vector<unsigned int> variables_in,
                     const System & f_sys_in,
                     const FEMFunctionBase<Number> * f_in,
                     const FEMFunctionBase<Gradient> * g_in = nullptr);
@@ -139,8 +139,8 @@ public:
    * Defaults to system variable indexing for backwards compatibility,
    * but most users will prefer local indexing.
    */
-  DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                    const std::vector<unsigned int> & variables_in,
+  DirichletBoundary(std::set<boundary_id_type> b_in,
+                    std::vector<unsigned int> variables_in,
                     const System & f_sys_in,
                     const FEMFunctionBase<Number> & f_in,
                     VariableIndexing type = SYSTEM_VARIABLE_ORDER);
@@ -152,8 +152,8 @@ public:
    * Defaults to system variable indexing for backwards compatibility,
    * but most users will prefer local indexing.
    */
-  DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                    const std::vector<unsigned int> & variables_in,
+  DirichletBoundary(std::set<boundary_id_type> b_in,
+                    std::vector<unsigned int> variables_in,
                     const System & f_sys_in,
                     const FEMFunctionBase<Number> & f_in,
                     const FEMFunctionBase<Gradient> & g_in,

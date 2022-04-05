@@ -108,8 +108,8 @@ public:
    * \p indices[q] is true"
    */
   explicit
-  QoISet(const std::vector<bool> & indices) :
-    _indices(indices), _weights() {}
+  QoISet(std::vector<bool> indices) :
+    _indices(std::move(indices)), _weights() {}
 
   /**
    * Constructor-from-vector: "calculate the listed QoIs", "give every

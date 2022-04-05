@@ -75,7 +75,7 @@ public:
    * n-vector of the norms in each variable.
    */
   explicit
-  SystemNorm(const std::vector<FEMNormType> & norms);
+  SystemNorm(std::vector<FEMNormType> norms);
 
   /**
    * Constructor, for weighted sobolev norms on systems with multiple
@@ -84,7 +84,7 @@ public:
    * For a system with n variables, the final norm will be the l2 norm of the
    * n-vector of the norms in each variable, each multiplied by weight.
    */
-  SystemNorm(const std::vector<FEMNormType> & norms,
+  SystemNorm(std::vector<FEMNormType> norms,
              std::vector<Real> & weights);
 
   /**
@@ -94,7 +94,7 @@ public:
    * For a system with n variables, the final norm computed will be of the form
    * norm_u^T*R*norm_z where R is a scaling matrix
    */
-  SystemNorm(const std::vector<FEMNormType> & norms,
+  SystemNorm(std::vector<FEMNormType> norms,
              std::vector<std::vector<Real>> & weights);
 
   /**
