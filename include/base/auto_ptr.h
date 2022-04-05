@@ -24,16 +24,7 @@
 // C++ includes
 #include <memory>
 
-// We still provide the UniquePtr alias for backwards compatibility,
-// but it should now be considered deprecated and users should just
-// use std::unique_ptr instead.
 #ifdef LIBMESH_ENABLE_DEPRECATED
-
-namespace libMesh
-{
-template<typename T>
-using UniquePtr = std::unique_ptr<T>;
-}
 
 // Set up the libmesh_make_unique macro, for backwards compatibility.
 // We require C++17 now; users should just use std::make_unique
