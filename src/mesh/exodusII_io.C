@@ -2110,6 +2110,13 @@ ExodusII_IO_Helper & ExodusII_IO::get_exio_helper()
 }
 
 
+void ExodusII_IO::set_hdf5_writing(bool write_hdf5)
+{
+  exio_helper->set_hdf5_writing(write_hdf5);
+}
+
+
+
 // LIBMESH_HAVE_EXODUS_API is not defined, declare error() versions of functions...
 #else
 
@@ -2326,6 +2333,8 @@ const std::vector<std::string> & ExodusII_IO::get_global_var_names()
 {
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
 }
+
+void ExodusII_IO::set_hdf5_writing(bool) {}
 
 #endif // LIBMESH_HAVE_EXODUS_API
 } // namespace libMesh
