@@ -76,6 +76,7 @@ unit_tests_sources = \
   mesh/slit_mesh_test.C \
   mesh/spatial_dimension_test.C \
   mesh/mapped_subdomain_partitioner_test.C \
+  mesh/write_elemset_data.C \
   mesh/write_sideset_data.C \
   mesh/write_nodeset_data.C \
   mesh/write_edgeset_data.C \
@@ -270,6 +271,7 @@ CLEANFILES = cube_mesh.xda \
 	     out.e \
 	     mesh_with_soln.e \
 	     elemental_from_nodal.e \
+             write_elemset_data.e \
              write_sideset_data.e \
              write_nodeset_data.e \
              write_edgeset_data.e \
