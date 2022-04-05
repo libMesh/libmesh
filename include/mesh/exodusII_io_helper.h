@@ -335,6 +335,11 @@ public:
   void write_timestep(int timestep, Real time);
 
   /**
+   * Writes one elemset per map entry to the exo file.
+   */
+  void write_elemsets(const std::map<boundary_id_type, std::vector<dof_id_type>> & elemsets);
+
+  /**
    * Write sideset data for the requested timestep.
    */
   void

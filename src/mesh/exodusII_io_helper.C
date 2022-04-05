@@ -2984,6 +2984,56 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 
 void
 ExodusII_IO_Helper::
+write_elemsets(const std::map<boundary_id_type, std::vector<dof_id_type>> & elemsets)
+{
+  // TODO: Add support for named sidesets
+  // NamesData names_table(elemsets.size(), MAX_STR_LENGTH);
+
+  // Convert input elem ids to Exodus numbering, integers
+  std::map<boundary_id_type, std::vector<int>> exodus_elemsets;
+  for (const auto & [elem_set_id, ids_vec] : elemsets)
+    {
+      // Get reference to vector of converted elem ids for this set
+      auto & exodus_ids_vec = exodus_elemsets[elem_set_id];
+      exodus_ids_vec.reserve(ids_vec.size());
+      for (const auto & id : ids_vec)
+        exodus_ids_vec.push_back(libmesh_elem_num_to_exodus[id]);
+    }
+
+  // Reserve space, loop over newly-created map, construct
+  // exII::ex_set objects to be passed to exII::ex_put_sets(). Note:
+  // we do non-const iteration since Exodus requires non-const pointers
+  // to be passed to its APIs.
+  std::vector<exII::ex_set> sets;
+  sets.reserve(exodus_elemsets.size());
+
+  for (auto & [elem_set_id, ids_vec] : exodus_elemsets)
+    {
+      // TODO: Add support for named sidesets
+      // names_table.push_back_entry(mesh.get_boundary_info().get_sideset_name(ss_id));
+
+      exII::ex_set & current_set = sets.emplace_back();
+      current_set.id = elem_set_id;
+      current_set.type = exII::EX_ELEM_SET;
+      current_set.num_entry = ids_vec.size();
+      current_set.num_distribution_factor = 0;
+      current_set.entry_list = ids_vec.data();
+      current_set.extra_list = nullptr; // extra_list is used for sidesets, not needed for elemsets
+      current_set.distribution_factor_list = nullptr; // not used for elemsets
+    }
+
+  ex_err = exII::ex_put_sets(ex_id, elemsets.size(), sets.data());
+  EX_CHECK_ERR(ex_err, "Error writing elemsets");
+
+  // TODO: Add support for named sidesets
+  // ex_err = exII::ex_put_names(ex_id, exII::EX_ELEM_SET, names_table.get_char_star_star());
+  // EX_CHECK_ERR(ex_err, "Error writing elemset names");
+}
+
+
+
+void
+ExodusII_IO_Helper::
 write_sideset_data(const MeshBase & mesh,
                    int timestep,
                    const std::vector<std::string> & var_names,

@@ -1811,6 +1811,14 @@ void ExodusII_IO::write_timestep (const std::string & fname,
 }
 
 
+void ExodusII_IO::write_elemsets(const std::map<boundary_id_type, std::vector<dof_id_type>> & elemsets)
+{
+  libmesh_error_msg_if(!exio_helper->opened_for_writing,
+                       "ERROR, ExodusII file must be opened for writing "
+                       "before calling ExodusII_IO::write_elemset()!");
+
+  exio_helper->write_elemsets(elemsets);
+}
 
 void
 ExodusII_IO::
@@ -2263,6 +2271,11 @@ void ExodusII_IO::write_timestep (const std::string &,
 }
 
 
+
+void ExodusII_IO::write_elemsets(const std::map<boundary_id_type, std::vector<dof_id_type>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
 
 void
 ExodusII_IO::
