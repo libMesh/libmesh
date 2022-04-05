@@ -2162,8 +2162,8 @@ BoundaryInfo::build_active_side_list () const
 #endif
 
       // Populate the list items
-      for (const auto & elem : family)
-        bc_triples.emplace_back(elem->id(), id_pair.first, id_pair.second);
+      for (const auto & f : family)
+        bc_triples.emplace_back(f->id(), id_pair.first, id_pair.second);
     }
 
   // This list is currently in memory address (arbitrary) order, so
