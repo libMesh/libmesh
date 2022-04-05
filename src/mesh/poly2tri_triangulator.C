@@ -509,6 +509,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                               &cavity_elem, &new_node]
         (unsigned int side)
       {
+        libmesh_ignore(this); // Only used in dbg/devel
         libmesh_assert(new_node);
         libmesh_assert(new_node->valid_id());
 
