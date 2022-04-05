@@ -89,11 +89,10 @@ public:
     es.init();
     sys.project_solution(trilinear_function, nullptr, es.parameters);
 
-    const std::vector<unsigned int> variables(1,u_var);
     MeshFunction mesh_function (sys.get_equation_systems(),
                                 *sys.current_local_solution,
                                 sys.get_dof_map(),
-                                variables);
+                                {u_var});
 
     // Checkerboard pattern
     const std::set<subdomain_id_type> sbdids1 {0,2,11,13,20,22,31,33};
@@ -189,9 +188,10 @@ public:
     sys.solution->localize(*mesh_function_vector,
                            sys.get_dof_map().get_send_list());
 
+
     // So the MeshFunction knows which variables to compute values for.
-    std::vector<unsigned int> variables(1);
-    variables[0] = u_var;
+    // std::make_unique doesn't like if we try to use {u_var} in-place?
+    std::vector<unsigned int> variables {u_var};
 
     auto mesh_function =
       std::make_unique<MeshFunction>(sys.get_equation_systems(),
