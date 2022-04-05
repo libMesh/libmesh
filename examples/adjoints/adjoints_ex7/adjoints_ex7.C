@@ -707,10 +707,7 @@ int main (int argc, char ** argv)
       // the Backward-Euler (theta = 0.5) time integration method.
       QoISet qois;
 
-      std::vector<unsigned int> qoi_indices;
-      qoi_indices.push_back(0);
-      qoi_indices.push_back(1);
-      qois.add_indices(qoi_indices);
+      qois.add_indices({0,1});
       qois.set_weight(0, 0.5);
       qois.set_weight(1, 0.5);
 

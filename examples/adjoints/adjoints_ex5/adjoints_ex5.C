@@ -633,9 +633,7 @@ int main (int argc, char ** argv)
       // Prepare the quantities we need to pass to TimeSolver::integrate_adjoint_sensitivity
       QoISet qois;
 
-      std::vector<unsigned int> qoi_indices;
-      qoi_indices.push_back(0);
-      qois.add_indices(qoi_indices);
+      qois.add_indices({0});
       qois.set_weight(0, 1.0);
 
       // A SensitivityData object

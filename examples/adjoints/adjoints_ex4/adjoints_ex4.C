@@ -347,10 +347,7 @@ int main (int argc, char** argv)
         QoISet qois;
 
         // Declare a qoi_indices vector, each index will correspond to a QoI
-        std::vector<unsigned int> qoi_indices;
-        qoi_indices.push_back(0);
-        qoi_indices.push_back(1);
-        qois.add_indices(qoi_indices);
+        qois.add_indices({0,1});
 
         // Set weights for each index, these will weight the contribution of each QoI in the final error
         // estimate to be used for flagging elements for refinement
@@ -514,11 +511,7 @@ int main (int argc, char** argv)
         NumericVector<Number> & primal_solution = *system.solution;
 
         QoISet qois;
-        std::vector<unsigned int> qoi_indices;
-
-        qoi_indices.push_back(0);
-        qoi_indices.push_back(1);
-        qois.add_indices(qoi_indices);
+        qois.add_indices({0,1});
 
         qois.set_weight(0, 0.5);
         qois.set_weight(1, 0.5);

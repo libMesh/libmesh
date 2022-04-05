@@ -319,10 +319,8 @@ int main (int argc, char ** argv)
         // Declare a QoISet object, we need this object to set weights for our QoI error contributions
         QoISet qois;
 
-        // Declare a qoi_indices vector, each index will correspond to a QoI
-        std::vector<unsigned int> qoi_indices;
-        qoi_indices.push_back(0);
-        qois.add_indices(qoi_indices);
+        // Each index will correspond to a QoI
+        qois.add_indices({0});
 
         // Set weights for each index, these will weight the contribution of each QoI in the final error
         // estimate to be used for flagging elements for refinement

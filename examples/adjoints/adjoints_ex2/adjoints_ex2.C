@@ -335,9 +335,7 @@ int main (int argc, char ** argv)
 
   QoISet qois;
 
-  std::vector<unsigned int> qoi_indices;
-  qoi_indices.push_back(0);
-  qois.add_indices(qoi_indices);
+  qois.add_indices({0});
 
   qois.set_weight(0, 0.5);
 
