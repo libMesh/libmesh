@@ -33,7 +33,8 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
   template <typename IOClass>
-  void testWriteImpl(const std::string & filename)
+  void testWriteImpl(const std::string & filename,
+                     bool write_vars)
   {
     Mesh mesh(*TestCommWorld);
     mesh.allow_renumbering(false);
@@ -46,6 +47,13 @@ public:
     // Add an empty nodeset
     mesh.get_boundary_info().nodeset_name(4) = "empty";
 
+    // Only used if write_vars == true
+    std::vector<std::string> var_names;
+    std::vector<std::set<boundary_id_type>> node_boundary_ids;
+    std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> bc_vals;
+
+    if (write_vars)
+    {
     BoundaryInfo & bi = mesh.get_boundary_info();
 
     // Meshes created via build_square() don't have any nodesets
@@ -58,8 +66,8 @@ public:
     std::vector<BoundaryInfo::NodeBCTuple> all_bc_tuples = bi.build_node_list();
 
     // Data structures to be passed to ExodusII_IO::write_nodeset_data()
-    std::vector<std::string> var_names = {"var1", "var2", "var3"};
-    std::vector<std::set<boundary_id_type>> node_boundary_ids =
+    var_names = {"var1", "var2", "var3"};
+    node_boundary_ids =
       {
         {0, 2}, // var1 is defined on nodesets 0 and 2
         {1, 3}, // var2 is defined on nodesets 1 and 3
@@ -68,7 +76,7 @@ public:
 
     // Data structure mapping (node, id) tuples to Real values that
     // will be passed to Exodus.
-    std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> bc_vals(var_names.size());
+    bc_vals.resize(var_names.size());
 
     // For each var_names[i], construct bc_vals[i]
     for (unsigned int i=0; i<var_names.size(); ++i)
@@ -106,6 +114,7 @@ public:
       writer.write(filename);
       writer.write_nodeset_data (/*timestep=*/1, var_names, node_boundary_ids, bc_vals);
     }
+    }
 
     // Make sure that the writing is done before the reading starts.
     TestCommWorld->barrier();
@@ -115,6 +124,8 @@ public:
     IOClass reader(read_mesh);
     reader.read(filename);
 
+    if (write_vars)
+    {
     std::vector<std::string> read_in_var_names;
     std::vector<std::set<boundary_id_type>> read_in_node_boundary_ids;
     std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> read_in_bc_vals;
@@ -125,6 +136,7 @@ public:
     CPPUNIT_ASSERT(read_in_var_names == var_names);
     CPPUNIT_ASSERT(read_in_node_boundary_ids == node_boundary_ids);
     CPPUNIT_ASSERT(read_in_bc_vals == bc_vals);
+    } // if (write_vars)
 
     // Also check that the flat indices match those in the file
     std::map<BoundaryInfo::NodeBCTuple, unsigned int> bc_array_indices;
@@ -185,7 +197,8 @@ public:
   {
     LOG_UNIT_TEST;
 
-    testWriteImpl<ExodusII_IO>("write_nodeset_data.e");
+    testWriteImpl<ExodusII_IO>("write_nodeset_data.e", /*write_vars=*/true);
+    testWriteImpl<ExodusII_IO>("write_nodeset_data.e", /*write_vars=*/false);
   }
 
   void testWriteNemesis()
