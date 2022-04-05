@@ -3223,6 +3223,9 @@ ExodusII_IO_Helper::
 get_sideset_data_indices (const MeshBase & mesh,
                           std::map<BoundaryInfo::BCTuple, unsigned int> & bc_array_indices)
 {
+  // Clear any existing data, we are going to build this data structure from scratch
+  bc_array_indices.clear();
+
   // Store the sideset data array indices.
   //
   // Note: we assume that read_sideset() has already been called
