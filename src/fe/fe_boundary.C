@@ -1083,7 +1083,7 @@ void FEMap::compute_edge_map(int dim,
   if (calculate_dxyz)
     for (unsigned int p=0; p<n_qp; p++)
       {
-        const Point n  = this->dxyzdxi_map[p].cross(this->dxyzdeta_map[p]);
+        // const Point n  = this->dxyzdxi_map[p].cross(this->dxyzdeta_map[p]);
         this->tangents[p][0] = this->dxyzdxi_map[p].unit();
 
         // compute the jacobian at the quadrature points
