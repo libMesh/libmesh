@@ -3468,73 +3468,43 @@ get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> & bc
   // Clear existing data, we are going to build these data structures from scratch
   bc_array_indices.clear();
 
-  // This reads the nodeset variable names into the local
-  // nodeset_var_names data structure.
-  this->read_var_names(NODESET);
-
-  if (num_nodeset_vars)
+  // Read the nodeset data.
+  //
+  // Note: we assume that the functions
+  // 1.) this->read_nodeset_info() and
+  // 2.) this->read_all_nodesets()
+  // have already been called, so that we already know e.g. how
+  // many nodes are in each set, their ids, etc.
+  int offset=0;
+  for (int ns=0; ns<num_node_sets; ++ns)
     {
-      // Read the nodeset data truth table
-      std::vector<int> nset_var_tab(num_node_sets * num_nodeset_vars);
-      ex_err = exII::ex_get_nset_var_tab
-        (ex_id,
-         num_node_sets,
-         num_nodeset_vars,
-         nset_var_tab.data());
-      EX_CHECK_ERR(ex_err, "Error reading nodeset variable truth table.");
-
-      // Read the nodeset data.
-      //
-      // Note: we assume that the functions
-      // 1.) this->read_nodeset_info() and
-      // 2.) this->read_all_nodesets()
-      // have already been called, so that we already know e.g. how
-      // many nodes are in each set, their ids, etc.
-      int offset=0;
-      for (int ns=0; ns<num_node_sets; ++ns)
+      offset += (ns > 0 ? num_nodes_per_set[ns-1] : 0);
+      // Note: we don't actually call exII::ex_get_nset_var() here because
+      // we don't need the values. We only need the indices into that vector
+      // for each (node_id, boundary_id) tuple.
+      for (int i=0; i<num_nodes_per_set[ns]; ++i)
         {
-          offset += (ns > 0 ? num_nodes_per_set[ns-1] : 0);
-          for (int var=0; var<num_nodeset_vars; ++var)
-            {
-              int is_present = nset_var_tab[num_nodeset_vars*ns + var];
+          // The read_all_nodesets() function now reads all the node ids into the
+          // node_sets_node_list vector, which is of length "total_nodes_in_all_sets"
+          // The old read_nodset() function is no longer called as far as I can tell,
+          // and should probably be removed? The "offset" that we are using only
+          // depends on the current nodeset index and the num_nodes_per_set vector,
+          // which gets filled in by the call to read_all_nodesets().
+          dof_id_type exodus_node_id = node_sets_node_list[i + offset];
 
-              if (is_present)
-                {
-                  // Note: we don't actually call exII::ex_get_nset_var() here because
-                  // we don't need the values. We only need the indices into that vector
-                  // for each (node_id, boundary_id) tuple.
-                  for (int i=0; i<num_nodes_per_set[ns]; ++i)
-                    {
-                      // The read_all_nodesets() function now reads all the node ids into the
-                      // node_sets_node_list vector, which is of length "total_nodes_in_all_sets"
-                      // The old read_nodset() function is no longer called as far as I can tell,
-                      // and should probably be removed? The "offset" that we are using only
-                      // depends on the current nodeset index and the num_nodes_per_set vector,
-                      // which gets filled in by the call to read_all_nodesets().
-                      dof_id_type exodus_node_id = node_sets_node_list[i + offset];
+          // FIXME: We should use exodus_node_num_to_libmesh for this,
+          // but it apparently is never set up, so just
+          // subtract 1 from the Exodus node id.
+          dof_id_type converted_node_id = exodus_node_id - 1;
 
-                      // FIXME: We should use exodus_node_num_to_libmesh for this,
-                      // but it apparently is never set up, so just
-                      // subtract 1 from the Exodus node id.
-                      dof_id_type converted_node_id = exodus_node_id - 1;
+          // Make a NodeBCTuple key from the converted information.
+          BoundaryInfo::NodeBCTuple key = std::make_tuple
+            (converted_node_id, nodeset_ids[ns]);
 
-                      // Make a NodeBCTuple key from the converted information.
-                      BoundaryInfo::NodeBCTuple key = std::make_tuple
-                        (converted_node_id, nodeset_ids[ns]);
-
-                      // Store the array index of this (node, b_id) tuple
-                      bc_array_indices.emplace(key, cast_int<unsigned int>(i));
-                    } // end for (i)
-
-                  // We only need to get the indices once per nodeset
-                  // (not once per variable defined on this nodeset)
-                  // so we can break out of this var loop as soon as
-                  // any variable is_present.
-                  break; // out of var loop
-                } // end if (present)
-            } // end for (var)
-        } // end for (ns)
-    } // end if (num_nodeset_vars)
+          // Store the array index of this (node, b_id) tuple
+          bc_array_indices.emplace(key, cast_int<unsigned int>(i));
+        } // end for (i)
+    } // end for (ns)
 }
 
 void ExodusII_IO_Helper::write_element_values
