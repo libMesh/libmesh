@@ -74,7 +74,7 @@ T assert_argument (GetPot & cl,
 // TODO: libMesh needs functor-based alternatives to these types of
 // function arguments
 std::string current_sys_name;
-std::map<std::string, MeshFunction *> mesh_functions;
+std::map<std::string, std::unique_ptr<MeshFunction>> mesh_functions;
 
 // Return the function value on the old mesh and solution
 Number fptr(const Point & p,
@@ -201,19 +201,15 @@ int main(int argc, char ** argv)
         {
           libMesh::out << " with variable " << old_sys.variable_name(j) << std::endl;
 
-          MeshFunction * mesh_func =
-            new MeshFunction(old_es, *comparison_soln,
-                             old_sys.get_dof_map(), j);
+          auto mesh_func =
+            std::make_unique<MeshFunction>(old_es, *comparison_soln,
+                                           old_sys.get_dof_map(), j);
           mesh_func->init();
-          mesh_functions[old_sys.variable_name(j)] = mesh_func;
+          mesh_functions[old_sys.variable_name(j)] = std::move(mesh_func);
         }
 
       // Project all variables to the new system
       new_sys.project_solution(fptr, gptr, old_es.parameters);
-
-      // Clean up the MeshFunctions here so we don't bloat memory
-      for (unsigned int j = 0; j != n_vars; ++j)
-        delete mesh_functions[old_sys.variable_name(j)];
     }
 
   // Write out the new solution file
