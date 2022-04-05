@@ -122,8 +122,6 @@ void CoupledSystem::init_data ()
 
   // Set Dirichlet boundary conditions
   const boundary_id_type left_inlet_id = 0;
-  std::set<boundary_id_type> left_inlet_bdy;
-  left_inlet_bdy.insert(left_inlet_id);
 
   const boundary_id_type right_inlet_id = 1;
   std::set<boundary_id_type> right_inlet_bdy;
@@ -134,14 +132,6 @@ void CoupledSystem::init_data ()
   outlets_bdy.insert(outlets_id);
 
   const boundary_id_type wall_id = 3;
-  std::set<boundary_id_type> wall_bdy;
-  wall_bdy.insert(wall_id);
-
-  // The uv identifier for the setting the inlet and wall velocity boundary conditions
-  std::vector<unsigned int> uv(1, u_var);
-  uv.push_back(v_var);
-  // The C_only identifier for setting the concentrations at the inlets
-  std::vector<unsigned int> C_only(1, C_var);
 
   // The zero and constant functions
   ZeroFunction<Number> zero;
@@ -156,21 +146,21 @@ void CoupledSystem::init_data ()
 #ifdef LIBMESH_ENABLE_DIRICHLET
   // On the walls we will apply the no slip and no penetration boundary condition, u=0, v=0
   this->get_dof_map().add_dirichlet_boundary
-    (DirichletBoundary (wall_bdy, uv, &zero));
+    (DirichletBoundary ({wall_id}, {u_var,v_var}, &zero));
 
   // On the inlet (left), we apply parabolic inflow boundary conditions for the velocity, u = - (y-2)*(y-3), v=0
   // and set C = 1
   this->get_dof_map().add_dirichlet_boundary
-    (DirichletBoundary (left_inlet_bdy, uv, &inflow_left));
+    (DirichletBoundary ({left_inlet_id}, {u_var,v_var}, &inflow_left));
   this->get_dof_map().add_dirichlet_boundary
-    (DirichletBoundary (left_inlet_bdy, C_only, &one));
+    (DirichletBoundary ({left_inlet_id}, {C_var}, &one));
 
   // On the inlet (right), we apply parabolic inflow boundary conditions for the velocity, u = (y-2)*(y-3), v=0
   // and set C = 0
   this->get_dof_map().add_dirichlet_boundary
-    (DirichletBoundary (right_inlet_bdy, uv, &inflow_right));
+    (DirichletBoundary (right_inlet_bdy, {u_var,v_var}, &inflow_right));
   this->get_dof_map().add_dirichlet_boundary
-    (DirichletBoundary (right_inlet_bdy, C_only, &zero));
+    (DirichletBoundary (right_inlet_bdy, {C_var}, &zero));
 #endif // LIBMESH_ENABLE_DIRICHLET
 
   // Note that the remaining boundary conditions are the natural boundary conditions for the concentration

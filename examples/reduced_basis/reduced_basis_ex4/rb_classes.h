@@ -91,10 +91,7 @@ public:
 
     // Set the Dirichlet boundary IDs
     // and the Dirichlet boundary variable numbers
-    dirichlet_bc->b.insert(0);
-    dirichlet_bc->b.insert(1);
-    dirichlet_bc->b.insert(2);
-    dirichlet_bc->b.insert(3);
+    dirichlet_bc->b = {0,1,2,3};
     dirichlet_bc->variables.push_back(u_var);
 
     // Attach dirichlet_bc (must do this _before_ Parent::init_data)

@@ -253,9 +253,8 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
     {
       boundary_id_type b = i->first;
       FunctionBase<Number> *f = i->second;
-      std::set<boundary_id_type> bdys; bdys.insert(b);
 
-      system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(bdys,
+      system.get_dof_map().add_dirichlet_boundary(DirichletBoundary({b},
                                                                     param.dirichlet_condition_variables[b],
                                                                     f));
 

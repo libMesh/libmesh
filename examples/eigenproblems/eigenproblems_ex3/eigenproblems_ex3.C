@@ -211,18 +211,12 @@ int main (int argc, char ** argv)
   eigen_system.get_eigen_solver().set_position_of_spectrum(0., TARGET_REAL);
 
   {
-    std::set<boundary_id_type> boundary_ids;
-    boundary_ids.insert(BOUNDARY_ID);
-
-    std::vector<unsigned int> variables;
-    variables.push_back(0);
-
     ZeroFunction<> zf;
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
     // Most DirichletBoundary users will want to supply a "locally
     // indexed" functor
-    DirichletBoundary dirichlet_bc(boundary_ids, variables, zf,
+    DirichletBoundary dirichlet_bc({BOUNDARY_ID}, {0}, zf,
                                    LOCAL_VARIABLE_ORDER);
 
     eigen_system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
