@@ -26,6 +26,8 @@
 
 #ifdef LIBMESH_HAVE_PARMETIS
 
+#include "libmesh/id_types.h"
+
 // Before we include a header wrapped in a namespace, we'd better make
 // sure none of its dependencies end up in that namespace
 #include <mpi.h>
