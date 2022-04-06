@@ -1231,20 +1231,16 @@ unsigned int System::add_variable (std::string_view var,
 
   libmesh_assert(!this->is_initialized());
 
-  // Optimize for VariableGroups here - if the user is adding multiple
-  // variables of the same FEType and subdomain restriction, catch
-  // that here and add them as members of the same VariableGroup.
-  //
-  // start by setting this flag to whatever the user has requested
-  // and then consider the conditions which should negate it.
-  bool should_be_in_vg = this->identify_variable_groups();
-
-  // No variable groups, nothing to add to
-  if (!this->n_variable_groups())
-    should_be_in_vg = false;
-
-  else
+  if (this->n_variable_groups())
     {
+      // Optimize for VariableGroups here - if the user is adding multiple
+      // variables of the same FEType and subdomain restriction, catch
+      // that here and add them as members of the same VariableGroup.
+      //
+      // start by setting this flag to whatever the user has requested
+      // and then consider the conditions which should negate it.
+      bool should_be_in_vg = this->identify_variable_groups();
+
       VariableGroup & vg(_variable_groups.back());
 
       // get a pointer to their subdomain restriction, if any.
@@ -1325,19 +1321,16 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
           libmesh_error_msg("ERROR: incompatible variable " << ovar << " has already been added for this system!");
         }
 
-  // Optimize for VariableGroups here - if the user is adding multiple
-  // variables of the same FEType and subdomain restriction, catch
-  // that here and add them as members of the same VariableGroup.
-  //
-  // start by setting this flag to whatever the user has requested
-  // and then consider the conditions which should negate it.
-  bool should_be_in_vg = this->identify_variable_groups();
-
-  // No variable groups, nothing to add to
-  if (!this->n_variable_groups())
-    should_be_in_vg = false;
-  else
+  if (this->n_variable_groups())
     {
+      // Optimize for VariableGroups here - if the user is adding multiple
+      // variables of the same FEType and subdomain restriction, catch
+      // that here and add them as members of the same VariableGroup.
+      //
+      // start by setting this flag to whatever the user has requested
+      // and then consider the conditions which should negate it.
+      bool should_be_in_vg = this->identify_variable_groups();
+
       VariableGroup & vg(_variable_groups.back());
 
       // get a pointer to their subdomain restriction, if any.
