@@ -169,7 +169,7 @@ public:
 private:
   RawAccessor();
 
-  ScalarType dummy;
+  ScalarType dummy = 0;
 
   FieldType & _data;
   const unsigned int _dim;
