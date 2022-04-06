@@ -92,7 +92,7 @@ public:
     MeshFunction mesh_function (sys.get_equation_systems(),
                                 *sys.current_local_solution,
                                 sys.get_dof_map(),
-                                {u_var});
+                                u_var);
 
     // Checkerboard pattern
     const std::set<subdomain_id_type> sbdids1 {0,2,11,13,20,22,31,33};
