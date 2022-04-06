@@ -25,8 +25,9 @@
 #include "libmesh/parallel_object.h"
 
 // C++ includes
-#include <vector>
+#include <algorithm> // is_sorted
 #include <unordered_set>
+#include <vector>
 
 namespace libMesh
 {
@@ -283,18 +284,7 @@ void SparsityPattern::sort_row (const BidirectionalIterator begin,
 
   // Assure the algorithm worked if we are in DEBUG mode
 #ifdef DEBUG
-  {
-    // SGI STL extension!
-    // libmesh_assert (std::is_sorted(begin,end));
-
-    BidirectionalIterator
-      prev  = begin,
-      first = begin;
-
-    for (++first; first != end; prev=first, ++first)
-      if (*first < *prev)
-        libmesh_assert(false);
-  }
+  libmesh_assert (std::is_sorted(begin,end));
 #endif
 
   // Make sure the two ranges did not contain any common elements
