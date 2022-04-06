@@ -305,7 +305,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
         // for all the elements on the mortar segment mesh by setting `calculate_default_dual_coeff' = false
         // in MOOSE (in `Assembly::reinitDual`) and use the customized QRule for calculating the dual shape coefficients
         // This is to be improved in the future
-        if (this->calculate_default_dual_coeff)
+        if (elem && this->calculate_default_dual_coeff)
           this->reinit_default_dual_shape_coeffs(elem);
         // The dual shape functions relies on the customized shape functions
         // and the coefficient matrix, \p dual_coeff
@@ -339,6 +339,8 @@ void FE<Dim,T>::reinit_dual_shape_coeffs(const Elem * elem,
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::reinit_default_dual_shape_coeffs (const Elem * elem)
 {
+  libmesh_assert(elem);
+
   FEType default_fe_type(this->get_order(), T);
   QGauss default_qrule(elem->dim(), default_fe_type.default_quadrature_order());
   default_qrule.init(elem->type(), elem->p_level());
