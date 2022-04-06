@@ -39,12 +39,13 @@ public:
     Mesh mesh(*TestCommWorld);
 
     // Allocate space for an extra integer on each element to store a "code" which
-    // determines which sets an Elem belongs to. We do this before building the Mesh
-    // extra_integer val & sets elem belongs to
-    // 0                 & elem belongs to no sets
-    // 1                 & elem belongs to set A only
-    // 2                 & elem belongs to set B only
-    // 3                 & elem belongs to sets A and B
+    // determines which sets an Elem belongs to. We do this before building the Mesh.
+    //
+    // extra_integer val               & sets elem belongs to
+    // DofObject::invalid_id (default) & elem belongs to no sets
+    // 1                               & elem belongs to set A only
+    // 2                               & elem belongs to set B only
+    // 3                               & elem belongs to sets A and B
     unsigned int elemset_index =
       mesh.add_elem_integer("elemset_code",
                             /*allocate_data=*/true,
@@ -71,7 +72,7 @@ public:
           inA = setA.count(elem->id()),
           inB = setB.count(elem->id());
 
-        dof_id_type val = 0;
+        dof_id_type val = DofObject::invalid_id;
         if (inA)
           val = 1;
         if (inB)
@@ -82,21 +83,23 @@ public:
         elem->set_extra_integer(elemset_index, val);
       }
 
-    // Debugging: print non-zero elemset_codes values
+    // Debugging: print valid elemset_codes values
     for (const auto & elem : mesh.element_ptr_range())
       {
-        dof_id_type elemset_code = elem->get_extra_integer(elemset_index);
+        dof_id_type elemset_code =
+          elem->get_extra_integer(elemset_index);
 
-        if (elemset_code)
+        if (elemset_code != DofObject::invalid_id)
           libMesh::out << "Elem " << elem->id() << ", elemset_code = " << elemset_code << std::endl;
       }
 
     // Write the file in the ExodusII format, including the element set information.
-    // Note: elemsets are written during ExodusII_IO::write(), which
-    // matches the behavior of sidesets and nodesets
+    // Note: elemsets should eventually be written during ExodusII_IO::write(), this
+    // would match the behavior of sidesets and nodesets.
     {
       IOClass writer(mesh);
       writer.write(filename);
+      writer.write_elemsets();
     }
 
    // Make sure that the writing is done before the reading starts.

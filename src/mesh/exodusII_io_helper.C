@@ -157,6 +157,7 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   num_edge_blk(header_info.num_edge_blk),
   num_node_sets(header_info.num_node_sets),
   num_side_sets(header_info.num_side_sets),
+  num_elem_sets(header_info.num_elem_sets),
   num_global_vars(0),
   num_sideset_vars(0),
   num_elem_this_blk(0),
@@ -676,6 +677,7 @@ ExodusII_IO_Helper::read_header() const
   h.num_elem_blk = params.num_elem_blk;
   h.num_node_sets = params.num_node_sets;
   h.num_side_sets = params.num_side_sets;
+  h.num_elem_sets = params.num_elem_sets;
   h.num_edge_blk = params.num_edge_blk;
   h.num_edge = params.num_edge;
 
@@ -772,7 +774,8 @@ void ExodusII_IO_Helper::print_header()
                  << "Number of elements: \t" << num_elem << std::endl
                  << "Number of elt blocks: \t" << num_elem_blk << std::endl
                  << "Number of node sets: \t" << num_node_sets << std::endl
-                 << "Number of side sets: \t" << num_side_sets << std::endl;
+                 << "Number of side sets: \t" << num_side_sets << std::endl
+                 << "Number of elem sets: \t" << num_elem_sets << std::endl;
 }
 
 
@@ -2076,6 +2079,24 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   // we have.
   num_edge_blk = bi.get_edge_boundary_ids().size();
 
+  // Check whether the mesh has an elem integer called "elemset_code".
+  // If so, this means that the mesh defines elemsets via the
+  // extra_integers capability of Elems.
+  if (mesh.has_elem_integer("elemset_code"))
+    {
+      unsigned int elemset_index =
+        mesh.get_elem_integer_index("elemset_code");
+
+      // Debugging
+      libMesh::out << "Mesh defines an elemset_code at index " << elemset_index << std::endl;
+
+      // TODO: Set the value of num_elem_sets based on the mapping from
+      // elemset_code -> {elemset ids}
+      // which is defined on the Mesh. For now we just hard-code this value
+      // to 1 for testing.
+      num_elem_sets = 1;
+    }
+
   // Build an ex_init_params() structure that is to be passed to the
   // newer ex_put_init_ext() API. The new API will eventually allow us
   // to store edge and face data in the Exodus file.
@@ -2095,6 +2116,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   params.num_elem_blk = num_elem_blk;
   params.num_node_sets = num_node_sets;
   params.num_side_sets = num_side_sets;
+  params.num_elem_sets = num_elem_sets;
   params.num_edge_blk = num_edge_blk;
   params.num_edge = num_edge;
 
@@ -2983,21 +3005,34 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 
 
 void
-ExodusII_IO_Helper::
-write_elemsets(const std::map<boundary_id_type, std::vector<dof_id_type>> & elemsets)
+ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
 {
-  // TODO: Add support for named sidesets
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
+    return;
+
+  // TODO: Add support for named elemsets
   // NamesData names_table(elemsets.size(), MAX_STR_LENGTH);
 
-  // Convert input elem ids to Exodus numbering, integers
+  // Loop over mesh, write Elems with elemset_code == 1.
+  // TODO: support decoding Elems which live in multiple sets.
+
+  // Convert input elem ids to Exodus numbering, store in std::vector
+  // whose data() that can be passed to Exodus API.
   std::map<boundary_id_type, std::vector<int>> exodus_elemsets;
-  for (const auto & [elem_set_id, ids_vec] : elemsets)
+  if (mesh.has_elem_integer("elemset_code"))
     {
-      // Get reference to vector of converted elem ids for this set
-      auto & exodus_ids_vec = exodus_elemsets[elem_set_id];
-      exodus_ids_vec.reserve(ids_vec.size());
-      for (const auto & id : ids_vec)
-        exodus_ids_vec.push_back(libmesh_elem_num_to_exodus[id]);
+      unsigned int elemset_index =
+        mesh.get_elem_integer_index("elemset_code");
+
+      for (const auto & elem : mesh.element_ptr_range())
+        {
+          dof_id_type elemset_code =
+            elem->get_extra_integer(elemset_index);
+
+          // TODO: Add support for all elemset_code values
+          if (elemset_code == 1)
+            exodus_elemsets[elemset_code].push_back(libmesh_elem_num_to_exodus[elem->id()]);
+        }
     }
 
   // Reserve space, loop over newly-created map, construct
@@ -3022,7 +3057,7 @@ write_elemsets(const std::map<boundary_id_type, std::vector<dof_id_type>> & elem
       current_set.distribution_factor_list = nullptr; // not used for elemsets
     }
 
-  ex_err = exII::ex_put_sets(ex_id, elemsets.size(), sets.data());
+  ex_err = exII::ex_put_sets(ex_id, exodus_elemsets.size(), sets.data());
   EX_CHECK_ERR(ex_err, "Error writing elemsets");
 
   // TODO: Add support for named sidesets

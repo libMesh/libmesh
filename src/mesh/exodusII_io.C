@@ -1811,13 +1811,14 @@ void ExodusII_IO::write_timestep (const std::string & fname,
 }
 
 
-void ExodusII_IO::write_elemsets(const std::map<boundary_id_type, std::vector<dof_id_type>> & elemsets)
+void ExodusII_IO::write_elemsets()
 {
   libmesh_error_msg_if(!exio_helper->opened_for_writing,
                        "ERROR, ExodusII file must be opened for writing "
                        "before calling ExodusII_IO::write_elemset()!");
 
-  exio_helper->write_elemsets(elemsets);
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  exio_helper->write_elemsets(mesh);
 }
 
 void

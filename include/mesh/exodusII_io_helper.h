@@ -337,7 +337,7 @@ public:
   /**
    * Writes one elemset per map entry to the exo file.
    */
-  void write_elemsets(const std::map<boundary_id_type, std::vector<dof_id_type>> & elemsets);
+  void write_elemsets(const MeshBase & mesh);
 
   /**
    * Write sideset data for the requested timestep.
@@ -591,8 +591,11 @@ public:
   // Total number of node sets
   int & num_node_sets;
 
-  // Total number of element sets
+  // Total number of side sets
   int & num_side_sets;
+
+  // Total number of element sets
+  int & num_elem_sets;
 
   // Number of global variables
   int num_global_vars;

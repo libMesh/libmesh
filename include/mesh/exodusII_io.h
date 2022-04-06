@@ -298,13 +298,13 @@ public:
   /**
    * Write elemsets with the specified ids and set ids.
    *
-   * \note An elemset is a concept which is related to but distinct
-   * from both elem blocks and sidesets/nodesets. Elems in an elemset
+   * \note An elemset is a concept which is related to (but distinct
+   * from) both elem blocks and sidesets/nodesets. Elems in an elemset
    * can be from multiple different blocks. In addition, one can
    * define an elemset variable, which is like an elemental variable
    * but exists only on the elements defined in the set.
    */
-  void write_elemsets(const std::map<boundary_id_type, std::vector<dof_id_type>> & elemsets);
+  void write_elemsets();
 
   /**
    * The Exodus format can also store values on sidesets. This can be
