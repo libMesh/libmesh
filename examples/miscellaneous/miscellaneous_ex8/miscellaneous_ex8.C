@@ -142,10 +142,7 @@ int main(int argc, char ** argv)
     {
       std::vector<Point>       tgt_pts;
       std::vector<Number>      tgt_data_idi, tgt_data_rbi;
-      std::vector<std::string> field_vars;
-
-      field_vars.push_back("u");
-      field_vars.push_back("v");
+      std::vector<std::string> field_vars {"u", "v"};
 
       InverseDistanceInterpolation<3> idi (init.comm(),
                                            /* n_interp_pts = */ 8,
@@ -276,9 +273,7 @@ int main(int argc, char ** argv)
 
       std::vector<Point> & src_pts  (idi.get_source_points());
       std::vector<Number> & src_vals (idi.get_source_vals());
-      std::vector<std::string> field_vars;
-      field_vars.push_back("Cp");
-      idi.set_field_variables(field_vars);
+      idi.set_field_variables({"Cp"});
 
       // We now will loop over every node in the source mesh
       // and add it to a source point list, along with the solution
@@ -288,7 +283,7 @@ int main(int argc, char ** argv)
           src_vals.push_back(sys_a.current_solution(node->dof_number(0, 0, 0)));
         }
 
-      rbi.set_field_variables(field_vars);
+      rbi.set_field_variables({"Cp"});
       rbi.get_source_points() = idi.get_source_points();
       rbi.get_source_vals()   = idi.get_source_vals();
 

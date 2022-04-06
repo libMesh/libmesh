@@ -56,18 +56,13 @@ void HeatSystem::init_data ()
   // The temperature is evolving, with a first order time derivative
   this->time_evolving(T_var, 1);
 
-  const boundary_id_type all_ids[4] = {0, 1, 2, 3};
-  std::set<boundary_id_type> all_bdys(all_ids, all_ids+(2*2));
-
-  std::vector<unsigned int> T_only(1, T_var);
-
   ZeroFunction<Number> zero;
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
   // Most DirichletBoundary users will want to supply a "locally
   // indexed" functor
   this->get_dof_map().add_dirichlet_boundary
-    (DirichletBoundary (all_bdys, T_only, zero,
+    (DirichletBoundary ({0,1,2,3}, {T_var}, zero,
                         LOCAL_VARIABLE_ORDER));
 #endif
 

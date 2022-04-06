@@ -567,7 +567,7 @@ public:
    * Add a group of unknowns of order \p order and finite element type
    * \p type to the system of equations.
    */
-  void add_variable_group (const VariableGroup & var_group);
+  void add_variable_group (VariableGroup var_group);
 
   /**
    * Specify whether or not we perform an extra (opt-mode enabled) check

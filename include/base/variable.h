@@ -87,6 +87,14 @@ public:
   {}
 
   /**
+   * Standard constructors.
+   */
+  Variable (const Variable &) = default;
+  Variable & operator= (const Variable &) = default;
+  Variable (Variable &&) = default;
+  Variable & operator= (Variable &&) = default;
+
+  /**
    * \returns true iff the \p other Variable has the same
    * characteristics and system numbering as this one.
    */
@@ -222,6 +230,14 @@ public:
               var_active_subdomains),
     _names(std::move(var_names))
   {}
+
+  /**
+   * Standard constructors.
+   */
+  VariableGroup (const VariableGroup &) = default;
+  VariableGroup & operator= (const VariableGroup &) = default;
+  VariableGroup (VariableGroup &&) = default;
+  VariableGroup & operator= (VariableGroup &&) = default;
 
   /**
    * \returns true iff the \p other VariableGroup has exactly the same

@@ -64,12 +64,6 @@ void LaplaceSystem::init_data ()
 void LaplaceSystem::init_dirichlet_bcs()
 {
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  const boundary_id_type all_ids[6] = {0, 1, 2, 3, 4, 5};
-  std::set<boundary_id_type> boundary_ids(all_ids, all_ids+6);
-
-  std::vector<unsigned int> vars;
-  vars.push_back(u_var);
-
   // Note that for vector-valued variables, it is assumed each
   // component is stored contiguously.  For 2-D elements in 3-D space,
   // only two components should be returned.
@@ -81,7 +75,7 @@ void LaplaceSystem::init_dirichlet_bcs()
   // though, we have only one (vector-valued!) variable, so system-
   // and local- orderings are the same.
   this->get_dof_map().add_dirichlet_boundary
-    (libMesh::DirichletBoundary(boundary_ids, vars, func));
+    (libMesh::DirichletBoundary({0,1,2,3,4,5}, {u_var}, func));
 #endif // LIBMESH_ENABLE_DIRICHLET
 }
 

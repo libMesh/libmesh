@@ -271,11 +271,9 @@ int main(int argc, char ** argv)
   system.attach_assemble_function (assemble_laplace);
 
   // Add Dirichlet boundary conditions
-  std::set<boundary_id_type> all_bdys { 0 };
-
   WrappedFunction<Number> exact_val(system, exact_solution);
   WrappedFunction<Gradient> exact_grad(system, exact_derivative);
-  DirichletBoundary exact_bc(all_bdys, all_vars, exact_val, exact_grad);
+  DirichletBoundary exact_bc({0} , all_vars, exact_val, exact_grad);
   system.get_dof_map().add_dirichlet_boundary(exact_bc);
 
   // Initialize the data structures for the equation system.

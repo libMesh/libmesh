@@ -28,13 +28,12 @@ void HeatSystem::init_data ()
   const boundary_id_type yplus_id = (dim == 3) ? 3 : 2;
   nonyplus_bdys.erase(yplus_id);
 
-  std::vector<unsigned int> T_only(1, T_var);
   ZeroFunction<Number> zero;
 
   // Most DirichletBoundary users will want to supply a "locally
   // indexed" functor
   this->get_dof_map().add_dirichlet_boundary
-    (DirichletBoundary (nonyplus_bdys, T_only, zero, LOCAL_VARIABLE_ORDER));
+    (DirichletBoundary (nonyplus_bdys, {T_var}, zero, LOCAL_VARIABLE_ORDER));
 #endif // LIBMESH_ENABLE_DIRICHLET
 
   // Do the parent's initialization after variables are defined

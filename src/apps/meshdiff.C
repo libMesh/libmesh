@@ -157,7 +157,7 @@ int main(int argc, char ** argv)
 
           MeshFunction coarse_solution
             (coarse_es, *coarse_sys.solution,
-             coarse_sys.get_dof_map(), var_remapping);
+             coarse_sys.get_dof_map(), std::move(var_remapping));
           coarse_solution.init();
           const DenseVector<Number> oom_value(fine_sys.n_vars(), 0);
           coarse_solution.enable_out_of_mesh_mode(oom_value);

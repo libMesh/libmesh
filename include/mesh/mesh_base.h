@@ -261,7 +261,7 @@ public:
    * and simply specify the element dimensions manually, which is why this
    * setter exists.
    */
-  void set_elem_dimensions(const std::set<unsigned char> & elem_dims);
+  void set_elem_dimensions(std::set<unsigned char> elem_dims);
 
   /**
    * \returns The "spatial dimension" of the mesh.

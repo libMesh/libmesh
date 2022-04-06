@@ -67,7 +67,7 @@ public:
   MeshFunction (const EquationSystems & eqn_systems,
                 const NumericVector<Number> & vec,
                 const DofMap & dof_map,
-                const std::vector<unsigned int> & vars,
+                std::vector<unsigned int> vars,
                 const FunctionBase<Number> * master=nullptr);
 
   /**

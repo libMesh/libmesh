@@ -334,18 +334,11 @@ int main (int argc, char ** argv)
 
   // Apply Dirichlet constraints. This will be used to apply constraints
   // to the objective function, gradient and Hessian.
-  std::set<boundary_id_type> boundary_ids;
-  boundary_ids.insert(0);
-  boundary_ids.insert(1);
-  boundary_ids.insert(2);
-  boundary_ids.insert(3);
-  std::vector<unsigned int> variables;
-  variables.push_back(u_var);
   ZeroFunction<> zf;
 
   // Most DirichletBoundary users will want to supply a "locally
   // indexed" functor
-  DirichletBoundary dirichlet_bc(boundary_ids, variables, zf,
+  DirichletBoundary dirichlet_bc({0,1,2,3}, {u_var}, zf,
                                  LOCAL_VARIABLE_ORDER);
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
 #endif // LIBMESH_ENABLE_DIRICHLET

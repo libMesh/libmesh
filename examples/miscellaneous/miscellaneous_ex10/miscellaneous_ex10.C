@@ -189,20 +189,13 @@ void assemble_and_solve(MeshBase & mesh,
 
   system.attach_assemble_function (assemble_poisson);
 
-  // the cube has boundaries IDs 0, 1, 2, 3, 4 and 5
-  std::set<boundary_id_type> boundary_ids;
-  for (int j = 0; j<6; ++j)
-    boundary_ids.insert(j);
-
-  // Create a vector storing the variable numbers which the BC applies to
-  std::vector<unsigned int> variables(1);
-  variables[0] = u_var;
-
   ZeroFunction<> zf;
+
+  // the cube has boundaries IDs 0, 1, 2, 3, 4 and 5
 
   // Most DirichletBoundary users will want to supply a "locally
   // indexed" functor
-  DirichletBoundary dirichlet_bc(boundary_ids, variables, zf,
+  DirichletBoundary dirichlet_bc({0,1,2,3,4,5}, {u_var}, zf,
                                  LOCAL_VARIABLE_ORDER);
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
 #endif // LIBMESH_ENABLE_DIRICHLET

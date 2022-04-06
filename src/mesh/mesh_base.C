@@ -203,7 +203,7 @@ unsigned int MeshBase::mesh_dimension() const
 
 
 
-void MeshBase::set_elem_dimensions(const std::set<unsigned char> & elem_dims)
+void MeshBase::set_elem_dimensions(std::set<unsigned char> elem_dims)
 {
 #ifdef DEBUG
   // In debug mode, we call cache_elem_data() and then make sure
@@ -215,7 +215,7 @@ void MeshBase::set_elem_dimensions(const std::set<unsigned char> & elem_dims)
                      "Specified element dimensions does not match true element dimensions!");
 #endif
 
-  _elem_dims = elem_dims;
+  _elem_dims = std::move(elem_dims);
 }
 
 unsigned int MeshBase::spatial_dimension () const

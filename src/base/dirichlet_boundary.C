@@ -33,12 +33,12 @@ namespace libMesh
 {
 
 DirichletBoundary::
-DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                  const std::vector<unsigned int> & variables_in,
+DirichletBoundary(std::set<boundary_id_type> b_in,
+                  std::vector<unsigned int> variables_in,
                   const FunctionBase<Number> * f_in,
                   const FunctionBase<Gradient> * g_in) :
-  b(b_in),
-  variables(variables_in),
+  b(std::move(b_in)),
+  variables(std::move(variables_in)),
   f(f_in ? f_in->clone() : nullptr),
   g(g_in ? g_in->clone() : nullptr),
   f_system(nullptr),
@@ -52,19 +52,19 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
 
 
 DirichletBoundary::
-DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                  const std::vector<unsigned int> & variables_in,
+DirichletBoundary(std::set<boundary_id_type> b_in,
+                  std::vector<unsigned int> variables_in,
                   const FunctionBase<Number> & f_in,
                   VariableIndexing type) :
-  b(b_in),
-  variables(variables_in),
+  b(std::move(b_in)),
+  variables(std::move(variables_in)),
   f_system(nullptr),
   jacobian_tolerance(0.)
 {
   if (type == LOCAL_VARIABLE_ORDER)
     {
       auto c = std::make_unique<CompositeFunction<Number>>();
-      c->attach_subfunction(f_in, variables_in);
+      c->attach_subfunction(f_in, variables);
       f = std::move(c);
     }
   else
@@ -75,24 +75,24 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
 
 
 DirichletBoundary::
-DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                  const std::vector<unsigned int> & variables_in,
+DirichletBoundary(std::set<boundary_id_type> b_in,
+                  std::vector<unsigned int> variables_in,
                   const FunctionBase<Number> & f_in,
                   const FunctionBase<Gradient> & g_in,
                   VariableIndexing type) :
-  b(b_in),
-  variables(variables_in),
+  b(std::move(b_in)),
+  variables(std::move(variables_in)),
   f_system(nullptr),
   jacobian_tolerance(0.)
 {
   if (type == LOCAL_VARIABLE_ORDER)
     {
       auto cf = std::make_unique<CompositeFunction<Number>>();
-      cf->attach_subfunction(f_in, variables_in);
+      cf->attach_subfunction(f_in, variables);
       f = std::move(cf);
 
       auto cg = std::make_unique<CompositeFunction<Gradient>>();
-      cg->attach_subfunction(g_in, variables_in);
+      cg->attach_subfunction(g_in, variables);
       g = std::move(cg);
     }
   else
@@ -107,13 +107,13 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
 
 
 DirichletBoundary::
-DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                  const std::vector<unsigned int> & variables_in,
+DirichletBoundary(std::set<boundary_id_type> b_in,
+                  std::vector<unsigned int> variables_in,
                   const System & f_sys_in,
                   const FEMFunctionBase<Number> * f_in,
                   const FEMFunctionBase<Gradient> * g_in) :
-  b(b_in),
-  variables(variables_in),
+  b(std::move(b_in)),
+  variables(std::move(variables_in)),
   f_fem(f_in ? f_in->clone() : nullptr),
   g_fem(g_in ? g_in->clone() : nullptr),
   f_system(&f_sys_in),
@@ -124,20 +124,20 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
 
 
 DirichletBoundary::
-DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                  const std::vector<unsigned int> & variables_in,
+DirichletBoundary(std::set<boundary_id_type> b_in,
+                  std::vector<unsigned int> variables_in,
                   const System & f_sys_in,
                   const FEMFunctionBase<Number> & f_in,
                   VariableIndexing type) :
-  b(b_in),
-  variables(variables_in),
+  b(std::move(b_in)),
+  variables(std::move(variables_in)),
   f_system(&f_sys_in),
   jacobian_tolerance(0.)
 {
   if (type == LOCAL_VARIABLE_ORDER)
     {
       auto c = std::make_unique<CompositeFEMFunction<Number>>();
-      c->attach_subfunction(f_in, variables_in);
+      c->attach_subfunction(f_in, variables);
       f_fem = std::move(c);
     }
   else
@@ -146,25 +146,25 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
 
 
 DirichletBoundary::
-DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                  const std::vector<unsigned int> & variables_in,
+DirichletBoundary(std::set<boundary_id_type> b_in,
+                  std::vector<unsigned int> variables_in,
                   const System & f_sys_in,
                   const FEMFunctionBase<Number> & f_in,
                   const FEMFunctionBase<Gradient> & g_in,
                   VariableIndexing type) :
-  b(b_in),
-  variables(variables_in),
+  b(std::move(b_in)),
+  variables(std::move(variables_in)),
   f_system(&f_sys_in),
   jacobian_tolerance(0.)
 {
   if (type == LOCAL_VARIABLE_ORDER)
     {
       auto cf = std::make_unique<CompositeFEMFunction<Number>>();
-      cf->attach_subfunction(f_in, variables_in);
+      cf->attach_subfunction(f_in, variables);
       f_fem = std::move(cf);
 
       auto cg = std::make_unique<CompositeFEMFunction<Gradient>>();
-      cg->attach_subfunction(g_in, variables_in);
+      cg->attach_subfunction(g_in, variables);
       g_fem = std::move(cg);
     }
   else
