@@ -276,7 +276,7 @@ void System::read_header (Xdr & io,
       this->comm().broadcast(vec_name);
       if (io.version() >= LIBMESH_VERSION_ID(1,7,0))
         {
-          int vec_projection;
+          int vec_projection = 0;
           if (this->processor_id() == 0)
             io.data (vec_projection);
           this->comm().broadcast(vec_projection);
