@@ -2164,13 +2164,13 @@ Elem::Elem(const unsigned int nn,
   // Initialize the neighbors/parent data structure
   // _elemlinks = new Elem *[ns+1];
 
-  if (_elemlinks)
-    {
-      _elemlinks[0] = p;
+  // We now require that we get allocated data from a subclass
+  libmesh_assert (_elemlinks);
 
-      for (unsigned int n=1; n<ns+1; n++)
-        _elemlinks[n] = nullptr;
-    }
+  _elemlinks[0] = p;
+
+  for (unsigned int n=1; n<ns+1; n++)
+    _elemlinks[n] = nullptr;
 
   // Optionally initialize data from the parent
   if (this->parent() != nullptr)
