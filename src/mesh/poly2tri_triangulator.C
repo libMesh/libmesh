@@ -300,11 +300,6 @@ void Poly2TriTriangulator::triangulate_current_points()
       // Add nodes from every segment, in order, to the outer polyline
       for (auto [segment_start, segment_end] : this->segments)
         {
-          libmesh_error_msg_if(segment_start == DofObject::invalid_id,
-                               "Bad triangulator segment start");
-          libmesh_error_msg_if(segment_end == DofObject::invalid_id,
-                               "Bad triangulator segment end");
-
           if (last_id != DofObject::invalid_id)
             libmesh_error_msg_if(segment_start != last_id,
                                  "Disconnected triangulator segments");
@@ -514,6 +509,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                               &cavity_elem, &new_node]
         (unsigned int side)
       {
+        libmesh_ignore(this); // Only used in dbg/devel
         libmesh_assert(new_node);
         libmesh_assert(new_node->valid_id());
 

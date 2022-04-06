@@ -79,13 +79,13 @@ public:
    * position.  Set this to nullptr to disable position-dependent area
    * constraint (falling back on desired_area()).
    */
-  virtual void set_desired_area_function (FunctionBase<Real> * desired);
+  virtual void set_desired_area_function (FunctionBase<Real> * desired) override;
 
   /**
    * Get the function giving desired triangle area as a function of
    * position, or \p nullptr if no such function has been set.
    */
-  virtual FunctionBase<Real> * get_desired_area_function ();
+  virtual FunctionBase<Real> * get_desired_area_function () override;
 
 
 protected:
