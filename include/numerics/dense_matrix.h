@@ -113,7 +113,7 @@ public:
    * flag which may have been previously set.  This allows e.g. a new
    * LU decomposition to be computed while reusing the same storage.
    */
-  virtual void zero() override;
+  virtual void zero() override final;
 
   /**
    * Get submatrix with the smallest row and column indices and the submatrix size.
@@ -134,14 +134,14 @@ public:
                   const unsigned int j);
 
   virtual T el(const unsigned int i,
-               const unsigned int j) const override
+               const unsigned int j) const override final
   { return (*this)(i,j); }
 
   virtual T & el(const unsigned int i,
-                 const unsigned int j) override
+                 const unsigned int j) override final
   { return (*this)(i,j); }
 
-  virtual void left_multiply (const DenseMatrixBase<T> & M2) override;
+  virtual void left_multiply (const DenseMatrixBase<T> & M2) override final;
 
   /**
    * Left multiplies by the matrix \p M2 of different type
@@ -149,7 +149,7 @@ public:
   template <typename T2>
   void left_multiply (const DenseMatrixBase<T2> & M2);
 
-  virtual void right_multiply (const DenseMatrixBase<T> & M2) override;
+  virtual void right_multiply (const DenseMatrixBase<T> & M2) override final;
 
   /**
    * Right multiplies by the matrix \p M2 of different type
