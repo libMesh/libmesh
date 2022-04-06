@@ -471,6 +471,14 @@ public:
   void use_mesh_dimension_instead_of_spatial_dimension(bool val);
 
   /**
+   * Set to true (the default) to write files in an HDF5-based file
+   * format (when HDF5 is available), or to false to write files in
+   * the old NetCDF3-based format.  If HDF5 is unavailable, this
+   * setting does nothing.
+   */
+  void set_hdf5_writing(bool write_hdf5);
+
+  /**
    * Sets the value of _write_as_dimension.
    *
    * This directly controls the num_dim which is written to the Exodus
@@ -817,6 +825,10 @@ protected:
   // of the elements comprising the mesh) instead of the mesh's
   // spatial dimension, when writing.  By default this is false.
   bool _use_mesh_dimension_instead_of_spatial_dimension;
+
+  // If true, write an HDF5 file when available.  If false, write the
+  // old format.
+  bool _write_hdf5;
 
   // Set once the elem num map has been read
   int _end_elem_id;

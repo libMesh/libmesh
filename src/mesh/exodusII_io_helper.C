@@ -176,6 +176,7 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   _global_vars_initialized(false),
   _nodal_vars_initialized(false),
   _use_mesh_dimension_instead_of_spatial_dimension(false),
+  _write_hdf5(true),
   _end_elem_id(0),
   _write_as_dimension(0),
   _single_precision(single_precision)
@@ -1948,8 +1949,11 @@ void ExodusII_IO_Helper::create(std::string filename)
       // in a more modern NETCDF4-compatible format. For this file
       // type, "ncdump -k" will report "netCDF-4".
 #ifdef LIBMESH_HAVE_HDF5
-      mode |= EX_NETCDF4;
-      mode |= EX_NOCLASSIC;
+      if (this->_write_hdf5)
+        {
+          mode |= EX_NETCDF4;
+          mode |= EX_NOCLASSIC;
+        }
 #endif
 
       ex_id = exII::ex_create(filename.c_str(), mode, &comp_ws, &io_ws);
@@ -3828,6 +3832,13 @@ void ExodusII_IO_Helper::use_mesh_dimension_instead_of_spatial_dimension(bool va
 {
   _use_mesh_dimension_instead_of_spatial_dimension = val;
 }
+
+
+void ExodusII_IO_Helper::set_hdf5_writing(bool write_hdf5)
+{
+  _write_hdf5 = write_hdf5;
+}
+
 
 
 

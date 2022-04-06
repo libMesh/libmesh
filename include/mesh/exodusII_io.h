@@ -495,6 +495,14 @@ public:
 #endif
 
   /**
+   * Set to true (the default) to write files in an HDF5-based file
+   * format (when HDF5 is available), or to false to write files in
+   * the old NetCDF3-based format.  If HDF5 is unavailable, this
+   * setting does nothing.
+   */
+  void set_hdf5_writing(bool write_hdf5);
+
+  /**
    * This function factors out a bunch of code which is common to the
    * write_nodal_data() and write_nodal_data_discontinuous() functions
    */
