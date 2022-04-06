@@ -124,15 +124,6 @@ void build_nodes_to_elem_map (const MeshBase & mesh,
 //    */
 //   void all_tri (MeshBase & mesh);
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-/**
- * Fills the vector "on_boundary" with flags that tell whether each node
- * is on the domain boundary (true)) or not (false).
- */
-void find_boundary_nodes (const MeshBase & mesh,
-                          std::vector<bool> & on_boundary);
-#endif
-
 /**
  * Returns a std::set containing Node IDs for all of the boundary nodes
  */
