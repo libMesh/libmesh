@@ -1954,17 +1954,17 @@ void DofMap::process_mesh_constraint_rows(const MeshBase & mesh)
 
           const dof_id_type constrained_id =
             node->dof_number(sys_num, var_num, 0);
-          for (auto pr : node_row.second)
+          for (const auto & [pr, val] : node_row.second)
             {
-              const Elem * spline_elem = pr.first.first;
+              const Elem * spline_elem = pr.first;
               libmesh_assert(spline_elem == mesh.elem_ptr(spline_elem->id()));
 
               const Node & spline_node =
-                spline_elem->node_ref(pr.first.second);
+                spline_elem->node_ref(pr.second);
 
               const dof_id_type spline_dof_id =
                 spline_node.dof_number(sys_num, var_num, 0);
-              dc_row[spline_dof_id] = pr.second;
+              dc_row[spline_dof_id] = val;
             }
 
           // See if we already have a constraint here.
@@ -2218,8 +2218,8 @@ void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
       // if (!constraint_row.empty())
       //   {
       //     DofConstraintRow row = _dof_constraints[dof_number];
-      //     for (const auto & pr : row)
-      //       libmesh_assert(constraint_row.find(pr.first)->second == pr.second);
+      //     for (const auto & [dof, val] : row)
+      //       libmesh_assert(constraint_row.find(dof)->second == val);
       //   }
       //
       // if (_adjoint_constraint_values[qoi_index].find(dof_number) !=
@@ -2281,23 +2281,21 @@ std::string DofMap::get_local_constraints(bool print_nonlocal) const
   os << "Node Constraints:"
      << std::endl;
 
-  for (const auto & pr : _node_constraints)
+  for (const auto & [node, pr] : _node_constraints)
     {
-      const Node * node = pr.first;
-
       // Skip non-local nodes if requested
       if (!print_nonlocal &&
           node->processor_id() != this->processor_id())
         continue;
 
-      const NodeConstraintRow & row = pr.second.first;
-      const Point & offset = pr.second.second;
+      const NodeConstraintRow & row = pr.first;
+      const Point & offset = pr.second;
 
       os << "Constraints for Node id " << node->id()
          << ": \t";
 
-      for (const auto & item : row)
-        os << " (" << item.first->id() << "," << item.second << ")\t";
+      for (const auto & [cnode, val] : row)
+        os << " (" << cnode->id() << "," << val << ")\t";
 
       os << "rhs: " << offset;
 
@@ -2954,13 +2952,10 @@ void DofMap::enforce_constraints_exactly (const System & system,
   libmesh_assert(v_global);
   libmesh_assert_equal_to (this, &(system.get_dof_map()));
 
-  for (const auto & pr : _dof_constraints)
+  for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
     {
-      dof_id_type constrained_dof = pr.first;
       if (!this->local_index(constrained_dof))
         continue;
-
-      const DofConstraintRow constraint_row = pr.second;
 
       Number exact_value = 0;
       if (!homogeneous)
@@ -2970,8 +2965,8 @@ void DofMap::enforce_constraints_exactly (const System & system,
           if (rhsit != _primal_constraint_values.end())
             exact_value = rhsit->second;
         }
-      for (const auto & j : constraint_row)
-        exact_value += j.second * (*v_local)(j.first);
+      for (const auto & [dof, val] : constraint_row)
+        exact_value += val * (*v_local)(dof);
 
       v_global->set(constrained_dof, exact_value);
     }
@@ -3024,17 +3019,14 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
   libmesh_assert(solution_local);
   libmesh_assert_equal_to (this, &(system.get_dof_map()));
 
-  for (const auto & pr : _dof_constraints)
+  for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
     {
-      dof_id_type constrained_dof = pr.first;
       if (!this->local_index(constrained_dof))
         continue;
 
-      const DofConstraintRow constraint_row = pr.second;
-
       Number exact_value = 0;
-      for (const auto & j : constraint_row)
-        exact_value -= j.second * (*solution_local)(j.first);
+      for (const auto & [dof, val] : constraint_row)
+        exact_value -= val * (*solution_local)(dof);
       exact_value += (*solution_local)(constrained_dof);
       if (!homogeneous)
         {
