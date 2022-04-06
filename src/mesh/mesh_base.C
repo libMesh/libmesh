@@ -187,7 +187,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
 
 MeshBase::~MeshBase()
 {
-  this->clear();
+  this->MeshBase::clear();
 
   libmesh_exceptionless_assert (!libMesh::closed());
 }

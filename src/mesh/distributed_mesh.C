@@ -90,7 +90,7 @@ MeshBase & DistributedMesh::assign(MeshBase && other_mesh)
 
 DistributedMesh::~DistributedMesh ()
 {
-  this->clear();  // Free nodes and elements
+  this->DistributedMesh::clear();  // Free nodes and elements
 }
 
 
@@ -967,7 +967,7 @@ void DistributedMesh::clear ()
   // There is no need to remove them from
   // the BoundaryInfo data structure since we
   // already cleared it.
-  this->clear_elems();
+  this->DistributedMesh::clear_elems();
 
   for (auto & node : _nodes)
     delete node;
