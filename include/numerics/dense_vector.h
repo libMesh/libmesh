@@ -100,15 +100,15 @@ public:
   DenseVector & operator= (DenseVector &&) = default;
   virtual ~DenseVector() = default;
 
-  virtual unsigned int size() const override
+  virtual unsigned int size() const override final
   {
     return cast_int<unsigned int>(_val.size());
   }
 
-  virtual bool empty() const override
+  virtual bool empty() const override final
   { return _val.empty(); }
 
-  virtual void zero() override;
+  virtual void zero() override final;
 
   /**
    * \returns Entry \p i of the vector as a const reference.
@@ -120,10 +120,10 @@ public:
    */
   T & operator() (const unsigned int i);
 
-  virtual T el(const unsigned int i) const override
+  virtual T el(const unsigned int i) const override final
   { return (*this)(i); }
 
-  virtual T & el(const unsigned int i) override
+  virtual T & el(const unsigned int i) override final
   { return (*this)(i); }
 
   /**
