@@ -89,13 +89,13 @@ public:
   /**
    * Restore to PointLocator to a just-constructed state.
    */
-  virtual void clear() override;
+  virtual void clear() override final;
 
   /**
    * Initializes the locator, so that the \p operator() methods can
    * be used. This function allocates dynamic memory with "new".
    */
-  virtual void init() override;
+  virtual void init() override final;
 
   /**
    * Locates the element in which the point with global coordinates \p
@@ -103,7 +103,7 @@ public:
    * subdomains.
    */
   virtual const Elem * operator() (const Point & p,
-                                   const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const override;
+                                   const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const override final;
 
   /**
    * Locates a set of elements in proximity to the point with global
@@ -116,19 +116,19 @@ public:
    */
   virtual void operator() (const Point & p,
                            std::set<const Elem *> & candidate_elements,
-                           const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const override;
+                           const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const override final;
 
   /**
    * Enables out-of-mesh mode. In this mode, if a searched-for Point
    * is not contained in any element of the Mesh, return nullptr
    * instead of throwing an error. By default, this mode is off.
    */
-  virtual void enable_out_of_mesh_mode () override;
+  virtual void enable_out_of_mesh_mode () override final;
 
   /**
    * Disables out-of-mesh mode (default). See above.
    */
-  virtual void disable_out_of_mesh_mode () override;
+  virtual void disable_out_of_mesh_mode () override final;
 
   /**
    * Set/get the number of results returned by each Nanoflann
