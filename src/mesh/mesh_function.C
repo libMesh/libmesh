@@ -84,7 +84,7 @@ MeshFunction::MeshFunction (const MeshFunction & mf):
   // input mf had done so.
   if(mf.initialized())
   {
-    this->init();
+    this->MeshFunction::init();
 
     if(mf.get_point_locator().initialized())
       this->set_point_locator_tolerance(mf.get_point_locator().get_close_to_point_tol());
@@ -865,9 +865,9 @@ void MeshFunction::unset_point_locator_tolerance()
 void MeshFunction::set_subdomain_ids(const std::set<subdomain_id_type> * subdomain_ids)
 {
   if (subdomain_ids)
-    _subdomain_ids.reset();
-  else
     _subdomain_ids = std::make_unique<std::set<subdomain_id_type>>(*subdomain_ids);
+  else
+    _subdomain_ids.reset();
 }
 
 } // namespace libMesh
