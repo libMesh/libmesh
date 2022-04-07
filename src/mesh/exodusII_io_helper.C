@@ -3010,14 +3010,12 @@ ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
   // TODO: Add support for named elemsets
   // NamesData names_table(elemsets.size(), MAX_STR_LENGTH);
 
-  // Loop over mesh, write Elems with elemset_code == 1.
-  // TODO: support decoding Elems which live in multiple sets.
-
-  // Convert input elem ids to Exodus numbering, store in std::vector
-  // whose data() that can be passed to Exodus API.
-  std::map<subdomain_id_type, std::vector<int>> exodus_elemsets;
+  // We only need to write elemsets if the Mesh has an extra elem
+  // integer called "elemset_code" defined on it.
   if (mesh.has_elem_integer("elemset_code"))
     {
+      std::map<subdomain_id_type, std::vector<int>> exodus_elemsets;
+
       unsigned int elemset_index =
         mesh.get_elem_integer_index("elemset_code");
 
@@ -3041,45 +3039,49 @@ ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
           for (const auto & set_id : set_ids)
             exodus_elemsets[set_id].push_back(libmesh_elem_num_to_exodus[elem->id()]);
         }
-    }
 
-  // Debugging: print contents of exodus_elemsets map
-  // for (const auto & [set_id, elem_ids] : exodus_elemsets)
-  //   {
-  //     libMesh::out << "elemset " << set_id << ": ";
-  //     for (const auto & elem_id : elem_ids)
-  //       libMesh::out << elem_id << " ";
-  //     libMesh::out << std::endl;
-  //   }
+      // Debugging: print contents of exodus_elemsets map
+      // for (const auto & [set_id, elem_ids] : exodus_elemsets)
+      //   {
+      //     libMesh::out << "elemset " << set_id << ": ";
+      //     for (const auto & elem_id : elem_ids)
+      //       libMesh::out << elem_id << " ";
+      //     libMesh::out << std::endl;
+      //   }
 
-  // Reserve space, loop over newly-created map, construct
-  // exII::ex_set objects to be passed to exII::ex_put_sets(). Note:
-  // we do non-const iteration since Exodus requires non-const pointers
-  // to be passed to its APIs.
-  std::vector<exII::ex_set> sets;
-  sets.reserve(exodus_elemsets.size());
+      // Only continue if we actually had some elements in sets
+      if (!exodus_elemsets.empty())
+        {
+          // Reserve space, loop over newly-created map, construct
+          // exII::ex_set objects to be passed to exII::ex_put_sets(). Note:
+          // we do non-const iteration since Exodus requires non-const pointers
+          // to be passed to its APIs.
+          std::vector<exII::ex_set> sets;
+          sets.reserve(exodus_elemsets.size());
 
-  for (auto & [elem_set_id, ids_vec] : exodus_elemsets)
-    {
-      // TODO: Add support for named sidesets
-      // names_table.push_back_entry(mesh.get_boundary_info().get_sideset_name(ss_id));
+          for (auto & [elem_set_id, ids_vec] : exodus_elemsets)
+            {
+              // TODO: Add support for named sidesets
+              // names_table.push_back_entry(mesh.get_boundary_info().get_sideset_name(ss_id));
 
-      exII::ex_set & current_set = sets.emplace_back();
-      current_set.id = elem_set_id;
-      current_set.type = exII::EX_ELEM_SET;
-      current_set.num_entry = ids_vec.size();
-      current_set.num_distribution_factor = 0;
-      current_set.entry_list = ids_vec.data();
-      current_set.extra_list = nullptr; // extra_list is used for sidesets, not needed for elemsets
-      current_set.distribution_factor_list = nullptr; // not used for elemsets
-    }
+              exII::ex_set & current_set = sets.emplace_back();
+              current_set.id = elem_set_id;
+              current_set.type = exII::EX_ELEM_SET;
+              current_set.num_entry = ids_vec.size();
+              current_set.num_distribution_factor = 0;
+              current_set.entry_list = ids_vec.data();
+              current_set.extra_list = nullptr; // extra_list is used for sidesets, not needed for elemsets
+              current_set.distribution_factor_list = nullptr; // not used for elemsets
+            }
 
-  ex_err = exII::ex_put_sets(ex_id, exodus_elemsets.size(), sets.data());
-  EX_CHECK_ERR(ex_err, "Error writing elemsets");
+          ex_err = exII::ex_put_sets(ex_id, exodus_elemsets.size(), sets.data());
+          EX_CHECK_ERR(ex_err, "Error writing elemsets");
 
-  // TODO: Add support for named sidesets
-  // ex_err = exII::ex_put_names(ex_id, exII::EX_ELEM_SET, names_table.get_char_star_star());
-  // EX_CHECK_ERR(ex_err, "Error writing elemset names");
+          // TODO: Add support for named sidesets
+          // ex_err = exII::ex_put_names(ex_id, exII::EX_ELEM_SET, names_table.get_char_star_star());
+          // EX_CHECK_ERR(ex_err, "Error writing elemset names");
+        } // end if (!exodus_elemsets.empty())
+    } // end if (mesh.has_elem_integer("elemset_code"))
 }
 
 
