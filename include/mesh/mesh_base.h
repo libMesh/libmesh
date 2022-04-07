@@ -271,6 +271,13 @@ public:
   void add_elemset_code(dof_id_type code, const std::set<subdomain_id_type> & id_set);
 
   /**
+   * Determines the number of unique elemset ids which have been added
+   * via add_elemset_code() calls by looping over the
+   * _elemset_codes_inverse_map and counting them.
+   */
+  unsigned int n_elemsets() const;
+
+  /**
    * Look up the element sets for a given elemset code and
    * vice-versa. The elemset must have been previously stored by
    * calling add_elemset_code(). If no such code/set is found, returns

@@ -2084,18 +2084,14 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   // extra_integers capability of Elems.
   if (mesh.has_elem_integer("elemset_code"))
     {
-      unsigned int elemset_index =
-        mesh.get_elem_integer_index("elemset_code");
+      // unsigned int elemset_index =
+      //   mesh.get_elem_integer_index("elemset_code");
 
       // Debugging
-      libMesh::out << "Mesh defines an elemset_code at index " << elemset_index << std::endl;
+      // libMesh::out << "Mesh defines an elemset_code at index " << elemset_index << std::endl;
 
-      // TODO: Add an API on the Mesh which returns the total number
-      // of element sets.  We can obtain this by looping over the
-      // _elemset_codes map stored on the Mesh and counting the number
-      // of unique elemset ids. For now we just hard-code this value
-      // for testing.
-      num_elem_sets = 2;
+      // Store the number of elemsets in the exo file header.
+      num_elem_sets = mesh.n_elemsets();
     }
 
   // Build an ex_init_params() structure that is to be passed to the

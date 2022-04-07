@@ -233,6 +233,14 @@ void MeshBase::add_elemset_code(dof_id_type code, const std::set<subdomain_id_ty
 
 
 
+unsigned int MeshBase::n_elemsets() const
+{
+  std::set<subdomain_id_type> all_elemset_ids;
+  for (const auto & pr : _elemset_codes_inverse_map)
+    all_elemset_ids.insert(pr.first.begin(), pr.first.end());
+  return all_elemset_ids.size();
+}
+
 std::set<subdomain_id_type> MeshBase::get_elemsets(dof_id_type elemset_code) const
 {
   auto it = _elemset_codes.find(elemset_code);
