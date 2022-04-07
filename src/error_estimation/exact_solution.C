@@ -529,6 +529,7 @@ void ExactSolution::_compute_error(std::string_view sys_name,
 
   // Construct Quadrature rule based on default quadrature order
   const FEType & fe_type  = computed_dof_map.variable_type(var);
+  const auto field_type = FEInterface::field_type(fe_type);
 
   unsigned int n_vec_dim = FEInterface::n_vec_dim( mesh, fe_type );
 
@@ -617,7 +618,7 @@ void ExactSolution::_compute_error(std::string_view sys_name,
       // Only computed for vector-valued elements
       const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence>> * div_values = nullptr;
 
-      if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
+      if (field_type == TYPE_VECTOR)
         {
           curl_values = &fe->get_curl_phi();
           div_values = &fe->get_div_phi();
@@ -629,7 +630,7 @@ void ExactSolution::_compute_error(std::string_view sys_name,
       const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> *
         d2phi_values = nullptr;
 
-      if (FEInterface::field_type(fe_type) != TYPE_VECTOR)
+      if (field_type != TYPE_VECTOR)
         d2phi_values = &fe->get_d2phi();
 #endif
 
@@ -676,7 +677,7 @@ void ExactSolution::_compute_error(std::string_view sys_name,
               // Values from current solution.
               u_h      += phi_values[i][qp]*computed_system.current_solution  (dof_indices[i]);
               grad_u_h += dphi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
-              if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
+              if (field_type == TYPE_VECTOR)
                 {
                   curl_u_h += (*curl_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
                   div_u_h += (*div_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
@@ -742,7 +743,7 @@ void ExactSolution::_compute_error(std::string_view sys_name,
           error_vals[1] += JxW[qp]*grad_error.norm_sq();
 
 
-          if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
+          if (field_type == TYPE_VECTOR)
             {
               // Compute the value of the error in the curl at this
               // quadrature point
@@ -789,7 +790,7 @@ void ExactSolution::_compute_error(std::string_view sys_name,
               //FIXME: This needs to be implemented to support rank 3 tensors
               //       which can't happen until type_n_tensor is fully implemented
               //       and a RawAccessor<TypeNTensor> is fully implemented
-              if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
+              if (field_type == TYPE_VECTOR)
                 libmesh_not_implemented();
 
               for (unsigned int c = 0; c < n_vec_dim; c++)

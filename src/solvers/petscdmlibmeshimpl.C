@@ -99,6 +99,7 @@ PetscErrorCode DMlibMeshSetSystem_libMesh(DM dm, NonlinearImplicitSystem & sys)
   PetscValidHeaderSpecific(dm,DM_CLASSID,1);
   PetscBool islibmesh;
   ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH,&islibmesh);
+  CHKERRQ(ierr);
   if (!islibmesh) SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM of type %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
 
   if (dm->setupcalled) SETERRQ(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONGSTATE, "Cannot reset the libMesh system after DM has been set up.");
@@ -176,6 +177,7 @@ PetscErrorCode DMlibMeshGetBlocks(DM dm, PetscInt * n, char *** blocknames)
   PetscValidHeaderSpecific(dm,DM_CLASSID,1);
   PetscBool islibmesh;
   ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH,&islibmesh);
+  CHKERRQ(ierr);
   if (!islibmesh) SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM of type %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
   DM_libMesh * dlm = (DM_libMesh *)(dm->data);
   PetscValidPointer(n,2);
@@ -201,6 +203,7 @@ PetscErrorCode DMlibMeshGetVariables(DM dm, PetscInt * n, char *** varnames)
   PetscBool islibmesh;
   PetscInt i;
   ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH,&islibmesh);
+  CHKERRQ(ierr);
   if (!islibmesh) SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM of type %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
   DM_libMesh * dlm = (DM_libMesh *)(dm->data);
   PetscValidPointer(n,2);
@@ -487,6 +490,7 @@ PetscErrorCode DMlibMeshCreateFieldDecompositionDM(DM dm, PetscInt dnumber, Pets
   PetscFunctionBegin;
   PetscValidHeaderSpecific(dm,DM_CLASSID,1);
   ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH,&islibmesh);
+  CHKERRQ(ierr);
   if (!islibmesh) SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM of type %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
   if (dnumber < 0) SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Negative number %D of decomposition parts", dnumber);
   PetscValidPointer(ddm,5);
@@ -539,6 +543,7 @@ PetscErrorCode DMlibMeshCreateDomainDecompositionDM(DM dm, PetscInt dnumber, Pet
   PetscFunctionBegin;
   PetscValidHeaderSpecific(dm,DM_CLASSID,1);
   ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH,&islibmesh);
+  CHKERRQ(ierr);
   if (!islibmesh) SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM of type %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
   if (dnumber < 0) SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Negative number %D of decomposition parts", dnumber);
   PetscValidPointer(ddm,5);

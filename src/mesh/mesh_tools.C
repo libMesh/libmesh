@@ -1118,9 +1118,8 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
                   else // If it wasn't node1 then it must be node2!
                     hanging_node=node2;
 
-                  // Reset these for reuse
+                  // Reset for reuse
                   local_node1=0;
-                  local_node2=0;
 
                   // Find the first node that makes up the side in the neighbor (these should be the parent nodes)
                   while (!neigh->is_node_on_side(local_node1++,s_neigh)) { }

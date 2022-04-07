@@ -331,7 +331,7 @@ void Parameters::clear () // since this is inline we must define it
 inline
 Parameters & Parameters::operator= (const Parameters & source)
 {
-  this->clear();
+  this->Parameters::clear();
   *this += source;
 
   return *this;
@@ -361,7 +361,7 @@ Parameters::Parameters (const Parameters & p)
 inline
 Parameters::~Parameters ()
 {
-  this->clear ();
+  this->Parameters::clear ();
 }
 
 

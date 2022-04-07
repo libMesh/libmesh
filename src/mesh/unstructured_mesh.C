@@ -1280,16 +1280,11 @@ UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & 
   /*
    * The maximum number of new second order nodes we might be adding,
    * for use when picking unique unique_id values later. This variable
-   * is not used unless unique ids are enabled, so libmesh_ignore() it
-   * to avoid warnings in that case.
+   * is not used unless unique ids are enabled.
    */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
   unsigned int max_new_nodes_per_elem;
 
-#ifndef LIBMESH_ENABLE_UNIQUE_ID
-  libmesh_ignore(max_new_nodes_per_elem);
-#endif
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
   unique_id_type max_unique_id = this->parallel_max_unique_id();
 #endif
 
@@ -1307,7 +1302,9 @@ UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & 
        * to Edge3.  Something like 1/2 of n_nodes() have
        * to be added
        */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 3 - 2;
+#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (1.5*static_cast<double>(this->n_nodes())));
       break;
@@ -1317,7 +1314,9 @@ UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & 
        * in 2D, either refine from Tri3 to Tri6 (double the nodes)
        * or from Quad4 to Quad8 (again, double) or Quad9 (2.25 that much)
        */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 9 - 4;
+#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (2*static_cast<double>(this->n_nodes())));
       break;
@@ -1330,7 +1329,9 @@ UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & 
        * quite some nodes, and since we do not want to overburden the memory by
        * a too conservative guess, use the lower bound
        */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 27 - 8;
+#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (2.5*static_cast<double>(this->n_nodes())));
       break;

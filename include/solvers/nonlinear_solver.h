@@ -436,7 +436,7 @@ template <typename T>
 inline
 NonlinearSolver<T>::~NonlinearSolver ()
 {
-  this->clear ();
+  this->NonlinearSolver::clear ();
 }
 
 

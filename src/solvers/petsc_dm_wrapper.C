@@ -115,6 +115,8 @@ namespace libMesh
 #else
           PetscErrorCode (*refine)(DM,MPI_Comm,DM*) = nullptr;
           ierr = DMShellGetRefine(dm, &refine);
+          CHKERRQ(ierr);
+
           if (refine)
             {
               ierr = DMShellSetRefine(*subdm, refine);

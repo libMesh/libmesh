@@ -313,7 +313,7 @@ template <typename T>
 inline
 LinearSolver<T>::~LinearSolver ()
 {
-  this->clear ();
+  this->LinearSolver::clear ();
 }
 
 template <typename T>

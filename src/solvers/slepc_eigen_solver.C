@@ -59,7 +59,7 @@ SlepcEigenSolver<T>::SlepcEigenSolver (const Parallel::Communicator & comm_in) :
 template <typename T>
 SlepcEigenSolver<T>::~SlepcEigenSolver ()
 {
-  this->clear ();
+  this->SlepcEigenSolver::clear ();
 }
 
 

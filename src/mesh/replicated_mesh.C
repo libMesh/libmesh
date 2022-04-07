@@ -106,7 +106,7 @@ ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
 
 ReplicatedMesh::~ReplicatedMesh ()
 {
-  this->clear();  // Free nodes and elements
+  this->ReplicatedMesh::clear();  // Free nodes and elements
 }
 
 
@@ -707,7 +707,7 @@ void ReplicatedMesh::clear ()
   // There is no need to remove them from
   // the BoundaryInfo data structure since we
   // already cleared it.
-  this->clear_elems();
+  this->ReplicatedMesh::clear_elems();
 
   for (auto & node : _nodes)
     delete node;

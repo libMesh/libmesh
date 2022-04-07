@@ -421,7 +421,7 @@ TaoOptimizationSolver<T>::TaoOptimizationSolver (OptimizationSystem & system_in)
 template <typename T>
 TaoOptimizationSolver<T>::~TaoOptimizationSolver ()
 {
-  this->clear ();
+  this->TaoOptimizationSolver::clear ();
 }
 
 

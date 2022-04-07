@@ -84,7 +84,7 @@ public:
   /**
    * Clears the locator.  This function frees dynamic memory with "delete".
    */
-  virtual void clear() override;
+  virtual void clear() override final;
 
   /**
    * Initializes the locator, so that the \p operator() methods can
@@ -96,7 +96,7 @@ public:
    * Initializes the locator, so that the \p operator() methods can
    * be used.  This function allocates dynamic memory with "new".
    */
-  virtual void init() override;
+  virtual void init() override final;
 
   /**
    * Locates the element in which the point with global coordinates
@@ -106,7 +106,7 @@ public:
    * operator().
    */
   virtual const Elem * operator() (const Point & p,
-                                   const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const override;
+                                   const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const override final;
 
   /**
    * Locates a set of elements in proximity to the point with global coordinates
@@ -114,7 +114,7 @@ public:
    */
   virtual void operator() (const Point & p,
                            std::set<const Elem *> & candidate_elements,
-                           const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const override;
+                           const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const override final;
 
   /**
    * As a fallback option, it's helpful to be able to do a linear
@@ -144,14 +144,14 @@ public:
    * return nullptr instead of crashing.  Per default, this
    * mode is off.
    */
-  virtual void enable_out_of_mesh_mode () override;
+  virtual void enable_out_of_mesh_mode () override final;
 
   /**
    * Disables out-of-mesh mode (default).  If asked to find a point
    * that is contained in no mesh at all, the point locator will now
    * crash.
    */
-  virtual void disable_out_of_mesh_mode () override;
+  virtual void disable_out_of_mesh_mode () override final;
 
   /**
    * Set the target bin size.
