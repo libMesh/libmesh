@@ -335,7 +335,7 @@ public:
   void write_timestep(int timestep, Real time);
 
   /**
-   * Writes one elemset per map entry to the exo file.
+   * Write elemsets stored on the Mesh to the exo file.
    */
   void write_elemsets(const MeshBase & mesh);
 

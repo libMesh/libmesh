@@ -296,10 +296,10 @@ public:
                        const std::set<std::string> * system_names=nullptr);
 
   /**
-   * Write elemsets with the specified ids and set ids.
+   * Write elemsets stored on the Mesh to file.
    *
    * \note An elemset is a concept which is related to (but distinct
-   * from) both elem blocks and sidesets/nodesets. Elems in an elemset
+   * from) both elem blocks and sidesets/nodesets. Elements in an elemset
    * can be from multiple different blocks. In addition, one can
    * define an elemset variable, which is like an elemental variable
    * but exists only on the elements defined in the set.

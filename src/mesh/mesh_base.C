@@ -241,10 +241,14 @@ unsigned int MeshBase::n_elemsets() const
   return all_elemset_ids.size();
 }
 
-std::set<subdomain_id_type> MeshBase::get_elemsets(dof_id_type elemset_code) const
+void MeshBase::get_elemsets(dof_id_type elemset_code, std::set<subdomain_id_type> & id_set_to_fill) const
 {
+  // If we don't recognize this elemset_code, hand back an empty set
+  id_set_to_fill.clear();
+
   auto it = _elemset_codes.find(elemset_code);
-  return (it == _elemset_codes.end()) ? std::set<subdomain_id_type>() : it->second;
+  if (it != _elemset_codes.end())
+    id_set_to_fill = it->second;
 }
 
 dof_id_type MeshBase::get_elemset_code(const std::set<subdomain_id_type> & id_set) const

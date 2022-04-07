@@ -283,7 +283,7 @@ public:
    * calling add_elemset_code(). If no such code/set is found, returns
    * the empty set or DofObject::invalid_id, respectively.
    */
-  std::set<subdomain_id_type> get_elemsets(dof_id_type elemset_code) const;
+  void get_elemsets(dof_id_type elemset_code, std::set<subdomain_id_type> & id_set_to_fill) const;
   dof_id_type get_elemset_code(const std::set<subdomain_id_type> & id_set) const;
 
   /**
