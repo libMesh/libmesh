@@ -224,7 +224,7 @@ void MeshBase::set_elem_dimensions(const std::set<unsigned char> & elem_dims)
 
 
 
-void MeshBase::add_elemset_code(dof_id_type code, const std::set<subdomain_id_type> & id_set)
+void MeshBase::add_elemset_code(dof_id_type code, const std::set<elemset_id_type> & id_set)
 {
   // TODO: Throw an error if this code exists with a different set of ids
   _elemset_codes.emplace(code, id_set);
@@ -235,13 +235,13 @@ void MeshBase::add_elemset_code(dof_id_type code, const std::set<subdomain_id_ty
 
 unsigned int MeshBase::n_elemsets() const
 {
-  std::set<subdomain_id_type> all_elemset_ids;
+  std::set<elemset_id_type> all_elemset_ids;
   for (const auto & pr : _elemset_codes_inverse_map)
     all_elemset_ids.insert(pr.first.begin(), pr.first.end());
   return all_elemset_ids.size();
 }
 
-void MeshBase::get_elemsets(dof_id_type elemset_code, std::set<subdomain_id_type> & id_set_to_fill) const
+void MeshBase::get_elemsets(dof_id_type elemset_code, std::set<elemset_id_type> & id_set_to_fill) const
 {
   // If we don't recognize this elemset_code, hand back an empty set
   id_set_to_fill.clear();
@@ -251,7 +251,7 @@ void MeshBase::get_elemsets(dof_id_type elemset_code, std::set<subdomain_id_type
     id_set_to_fill = it->second;
 }
 
-dof_id_type MeshBase::get_elemset_code(const std::set<subdomain_id_type> & id_set) const
+dof_id_type MeshBase::get_elemset_code(const std::set<elemset_id_type> & id_set) const
 {
   auto it = _elemset_codes_inverse_map.find(id_set);
   return (it == _elemset_codes_inverse_map.end()) ? DofObject::invalid_id : it->second;

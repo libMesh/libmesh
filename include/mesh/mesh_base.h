@@ -268,7 +268,7 @@ public:
    * specified in \p id_set. Also sets up the inverse mapping, so that if one knows
    * all the element sets an Elem belongs to, one can look up the corresponding code.
    */
-  void add_elemset_code(dof_id_type code, const std::set<subdomain_id_type> & id_set);
+  void add_elemset_code(dof_id_type code, const std::set<elemset_id_type> & id_set);
 
   /**
    * Determines the number of unique elemset ids which have been added
@@ -283,8 +283,8 @@ public:
    * calling add_elemset_code(). If no such code/set is found, returns
    * the empty set or DofObject::invalid_id, respectively.
    */
-  void get_elemsets(dof_id_type elemset_code, std::set<subdomain_id_type> & id_set_to_fill) const;
-  dof_id_type get_elemset_code(const std::set<subdomain_id_type> & id_set) const;
+  void get_elemsets(dof_id_type elemset_code, std::set<elemset_id_type> & id_set_to_fill) const;
+  dof_id_type get_elemset_code(const std::set<elemset_id_type> & id_set) const;
 
   /**
    * \returns The "spatial dimension" of the mesh.
@@ -1975,8 +1975,7 @@ protected:
    * stored as an extra_integer (named "elemset_code") on all elements,
    * and extra_integers are of type dof_id_type. Elements which do not
    * belong to any set should be assigned an elemset code of DofObject::invalid_id.
-   * 2.) We use subdomain_id_type for the element set id type since
-   * element sets can be thought of as a generalization of the concept
+   * 2.) Element sets can be thought of as a generalization of the concept
    * of a subdomain. Subdomains have the following restrictions:
    *   a.) A given element can only belong to a single subdomain
    *   b.) When using Exodus file input/output, subdomains are (unfortunately)
@@ -1989,8 +1988,8 @@ protected:
    * with the one requirement that elements which belong to no sets
    * should have a set code of DofObject::invalid_id.
    */
-  std::map<dof_id_type, std::set<subdomain_id_type>> _elemset_codes;
-  std::map<std::set<subdomain_id_type>, dof_id_type> _elemset_codes_inverse_map;
+  std::map<dof_id_type, std::set<elemset_id_type>> _elemset_codes;
+  std::map<std::set<elemset_id_type>, dof_id_type> _elemset_codes_inverse_map;
 
   /**
    * The "spatial dimension" of the Mesh.  See the documentation for

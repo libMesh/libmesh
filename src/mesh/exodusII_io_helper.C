@@ -3014,13 +3014,13 @@ ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
   // integer called "elemset_code" defined on it.
   if (mesh.has_elem_integer("elemset_code"))
     {
-      std::map<subdomain_id_type, std::vector<int>> exodus_elemsets;
+      std::map<elemset_id_type, std::vector<int>> exodus_elemsets;
 
       unsigned int elemset_index =
         mesh.get_elem_integer_index("elemset_code");
 
       // Catch ids returned from MeshBase::get_elemsets() calls
-      std::set<subdomain_id_type> set_ids;
+      std::set<elemset_id_type> set_ids;
       for (const auto & elem : mesh.element_ptr_range())
         {
           dof_id_type elemset_code =
