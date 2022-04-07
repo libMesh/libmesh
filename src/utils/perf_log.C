@@ -113,7 +113,7 @@ void PerfLog::push (const std::string & label,
     {
       const std::size_t labelsizep1 = label.size()+1;
       char * newcopy = new char [labelsizep1];
-      strncpy(newcopy, label.c_str(), labelsizep1);
+      std::strncpy(newcopy, label.c_str(), labelsizep1);
       label_c_str = newcopy;
       non_temporary_strings[label] = label_c_str;
     }
@@ -124,7 +124,7 @@ void PerfLog::push (const std::string & label,
     {
       const std::size_t headersizep1 = header.size()+1;
       char * newcopy = new char [headersizep1];
-      strncpy(newcopy, header.c_str(), headersizep1);
+      std::strncpy(newcopy, header.c_str(), headersizep1);
       header_c_str = newcopy;
       non_temporary_strings[header] = header_c_str;
     }
