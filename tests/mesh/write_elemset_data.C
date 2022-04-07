@@ -61,27 +61,32 @@ public:
                                         -1., 1.,
                                         QUAD4);
 
-    // Set ids for elements in elemsets A, B
-    std::set<dof_id_type> setA = {3, 8, 14, 24};
-    std::set<dof_id_type> setB = {3, 9, 15, 24};
+    // Set ids for elements in elemsets 1, 2
+    std::set<dof_id_type> set1 = {3, 8, 14, 24};
+    std::set<dof_id_type> set2 = {3, 9, 15, 24};
 
     // Loop over Elems and set "elemset_code" values
     for (const auto & elem : mesh.element_ptr_range())
       {
         bool
-          inA = setA.count(elem->id()),
-          inB = setB.count(elem->id());
+          in1 = set1.count(elem->id()),
+          in2 = set2.count(elem->id());
 
         dof_id_type val = DofObject::invalid_id;
-        if (inA)
+        if (in1)
           val = 1;
-        if (inB)
+        if (in2)
           val = 2;
-        if (inA && inB)
+        if (in1 && in2)
           val = 3;
 
         elem->set_extra_integer(elemset_index, val);
       }
+
+    // Tell the Mesh about these elemsets
+    mesh.add_elemset_code(1, {1});
+    mesh.add_elemset_code(2, {2});
+    mesh.add_elemset_code(3, {1,2});
 
     // Debugging: print valid elemset_codes values
     for (const auto & elem : mesh.element_ptr_range())
