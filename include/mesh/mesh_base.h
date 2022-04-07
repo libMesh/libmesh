@@ -264,6 +264,22 @@ public:
   void set_elem_dimensions(const std::set<unsigned char> & elem_dims);
 
   /**
+   * Tabulate a user-defined "code" for elements which belong to the element sets
+   * specified in \p id_set. Also sets up the inverse mapping, so that if one knows
+   * all the element sets an Elem belongs to, one can look up the corresponding code.
+   */
+  void add_elemset_code(dof_id_type code, const std::set<subdomain_id_type> & id_set);
+
+  /**
+   * Look up the element sets for a given elemset code and
+   * vice-versa. The elemset must have been previously stored by
+   * calling add_elemset_code(). If no such code/set is found, returns
+   * the empty set or DofObject::invalid_id, respectively.
+   */
+  std::set<subdomain_id_type> get_elemsets(dof_id_type elemset_code) const;
+  dof_id_type get_elemset_code(const std::set<subdomain_id_type> & id_set) const;
+
+  /**
    * \returns The "spatial dimension" of the mesh.
    *
    * The spatial dimension is defined as:
@@ -1944,6 +1960,30 @@ protected:
    * We cache the subdomain ids of the elements present in the mesh.
    */
   std::set<subdomain_id_type> _mesh_subdomains;
+
+  /**
+   * Map from "element set code" to list of set ids to which that element
+   * belongs (and vice-versa). Remarks:
+   * 1.) The elemset code is a dof_id_type because (if used) it is
+   * stored as an extra_integer (named "elemset_code") on all elements,
+   * and extra_integers are of type dof_id_type. Elements which do not
+   * belong to any set should be assigned an elemset code of DofObject::invalid_id.
+   * 2.) We use subdomain_id_type for the element set id type since
+   * element sets can be thought of as a generalization of the concept
+   * of a subdomain. Subdomains have the following restrictions:
+   *   a.) A given element can only belong to a single subdomain
+   *   b.) When using Exodus file input/output, subdomains are (unfortunately)
+   *   tied to the concept of exodus element blocks, which consist of a single
+   *   geometric element type, somewhat limiting their generality.
+   * 3.) The user is responsible for filling in the values of this map
+   * in a consistent manner, unless the elemsets are read in from an
+   * Exodus file, in which case the elemset codes will be set up
+   * automatically. The codes can basically be chosen arbitrarily,
+   * with the one requirement that elements which belong to no sets
+   * should have a set code of DofObject::invalid_id.
+   */
+  std::map<dof_id_type, std::set<subdomain_id_type>> _elemset_codes;
+  std::map<std::set<subdomain_id_type>, dof_id_type> _elemset_codes_inverse_map;
 
   /**
    * The "spatial dimension" of the Mesh.  See the documentation for

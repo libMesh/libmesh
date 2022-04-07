@@ -104,6 +104,8 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _skip_find_neighbors(other_mesh._skip_find_neighbors),
   _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
   _elem_dims(other_mesh._elem_dims),
+  _elemset_codes(other_mesh._elemset_codes),
+  _elemset_codes_inverse_map(other_mesh._elemset_codes_inverse_map),
   _spatial_dimension(other_mesh._spatial_dimension),
   _default_ghosting(std::make_unique<GhostPointNeighbors>(*this)),
   _point_locator_close_to_point_tol(other_mesh._point_locator_close_to_point_tol)
@@ -164,6 +166,8 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _allow_remote_element_removal = other_mesh.allow_remote_element_removal();
   _block_id_to_name = std::move(other_mesh._block_id_to_name);
   _elem_dims = std::move(other_mesh.elem_dimensions());
+  _elemset_codes = std::move(other_mesh._elemset_codes);
+  _elemset_codes_inverse_map = std::move(other_mesh._elemset_codes_inverse_map);
   _spatial_dimension = other_mesh.spatial_dimension();
   _elem_integer_names = std::move(other_mesh._elem_integer_names);
   _elem_integer_default_values = std::move(other_mesh._elem_integer_default_values);
@@ -217,6 +221,31 @@ void MeshBase::set_elem_dimensions(const std::set<unsigned char> & elem_dims)
 
   _elem_dims = elem_dims;
 }
+
+
+
+void MeshBase::add_elemset_code(dof_id_type code, const std::set<subdomain_id_type> & id_set)
+{
+  // TODO: Throw an error if this code exists with a different set of ids
+  _elemset_codes.emplace(code, id_set);
+  _elemset_codes_inverse_map.emplace(id_set, code);
+}
+
+
+
+std::set<subdomain_id_type> MeshBase::get_elemsets(dof_id_type elemset_code) const
+{
+  auto it = _elemset_codes.find(elemset_code);
+  return (it == _elemset_codes.end()) ? std::set<subdomain_id_type>() : it->second;
+}
+
+dof_id_type MeshBase::get_elemset_code(const std::set<subdomain_id_type> & id_set) const
+{
+  auto it = _elemset_codes_inverse_map.find(id_set);
+  return (it == _elemset_codes_inverse_map.end()) ? DofObject::invalid_id : it->second;
+}
+
+
 
 unsigned int MeshBase::spatial_dimension () const
 {
@@ -594,6 +623,9 @@ void MeshBase::clear ()
   // Clear element dimensions
   _elem_dims.clear();
 
+  _elemset_codes.clear();
+  _elemset_codes_inverse_map.clear();
+
   _constraint_rows.clear();
 
   // Clear our point locator.
@@ -738,6 +770,22 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
                 --_elem_dims.end(), // --end() is valid if the set is non-empty
                 std::ostream_iterator<unsigned int>(oss, ", "));
       oss << cast_int<unsigned int>(*_elem_dims.rbegin());
+      oss << "}\n";
+    }
+
+  if (!_elemset_codes.empty())
+    {
+      // We don't print the inverse map since that is maintained as an
+      // internal implementation detail for fast lookups and is not
+      // really user-facing information.
+      oss << "  elemset_codes()={";
+      for (const auto & [set_code, id_set] : _elemset_codes)
+        {
+          oss << set_code << ": ";
+          for (const auto & id : id_set)
+            oss << id << " ";
+          oss << "\n";
+        }
       oss << "}\n";
     }
 
