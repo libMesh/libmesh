@@ -2079,7 +2079,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   // we have.
   num_edge_blk = bi.get_edge_boundary_ids().size();
 
-  // Check whether the mesh has an elem integer called "elemset_code".
+  // Check whether the Mesh Elems have an extra_integer called "elemset_code".
   // If so, this means that the mesh defines elemsets via the
   // extra_integers capability of Elems.
   if (mesh.has_elem_integer("elemset_code"))
@@ -2090,11 +2090,12 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
       // Debugging
       libMesh::out << "Mesh defines an elemset_code at index " << elemset_index << std::endl;
 
-      // TODO: Set the value of num_elem_sets based on the mapping from
-      // elemset_code -> {elemset ids}
-      // which is defined on the Mesh. For now we just hard-code this value
-      // to 1 for testing.
-      num_elem_sets = 1;
+      // TODO: Add an API on the Mesh which returns the total number
+      // of element sets.  We can obtain this by looping over the
+      // _elemset_codes map stored on the Mesh and counting the number
+      // of unique elemset ids. For now we just hard-code this value
+      // for testing.
+      num_elem_sets = 2;
     }
 
   // Build an ex_init_params() structure that is to be passed to the
@@ -3018,7 +3019,7 @@ ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
 
   // Convert input elem ids to Exodus numbering, store in std::vector
   // whose data() that can be passed to Exodus API.
-  std::map<boundary_id_type, std::vector<int>> exodus_elemsets;
+  std::map<subdomain_id_type, std::vector<int>> exodus_elemsets;
   if (mesh.has_elem_integer("elemset_code"))
     {
       unsigned int elemset_index =
@@ -3029,11 +3030,29 @@ ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
           dof_id_type elemset_code =
             elem->get_extra_integer(elemset_index);
 
-          // TODO: Add support for all elemset_code values
-          if (elemset_code == 1)
-            exodus_elemsets[elemset_code].push_back(libmesh_elem_num_to_exodus[elem->id()]);
+          // Look up which element set ids this elemset_code corresponds to.
+          std::set<subdomain_id_type> set_ids = mesh.get_elemsets(elemset_code);
+
+          // Debugging
+          // libMesh::out << "elemset_code = " << elemset_code << std::endl;
+          // for (const auto & set_id : set_ids)
+          //   libMesh::out << set_id << " ";
+          // libMesh::out << std::endl;
+
+          // Store this Elem id in every set to which it belongs.
+          for (const auto & set_id : set_ids)
+            exodus_elemsets[set_id].push_back(libmesh_elem_num_to_exodus[elem->id()]);
         }
     }
+
+  // Debugging: print contents of exodus_elemsets map
+  // for (const auto & [set_id, elem_ids] : exodus_elemsets)
+  //   {
+  //     libMesh::out << "elemset " << set_id << ": ";
+  //     for (const auto & elem_id : elem_ids)
+  //       libMesh::out << elem_id << " ";
+  //     libMesh::out << std::endl;
+  //   }
 
   // Reserve space, loop over newly-created map, construct
   // exII::ex_set objects to be passed to exII::ex_put_sets(). Note:
