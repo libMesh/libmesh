@@ -1492,7 +1492,7 @@ void ExodusII_IO_Helper::read_elemset_info()
       elemset_id_list.resize(num_elem_all_elemsets);
 
       // Debugging
-      libMesh::out << "num_elem_all_elemsets = " << num_elem_all_elemsets << std::endl;
+      // libMesh::out << "num_elem_all_elemsets = " << num_elem_all_elemsets << std::endl;
     }
 
   char name_buffer[MAX_STR_LENGTH+1];

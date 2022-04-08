@@ -693,10 +693,10 @@ void ExodusII_IO::read (const std::string & fname)
       }
 
     // Debugging: print the concatenated list of elemset ids
-    libMesh::out << "Concatenated list of elemset Elem ids (Exodus numbering):" << std::endl;
-    for (const auto & id : exio_helper->elemset_list)
-      libMesh::out << id << " ";
-    libMesh::out << std::endl;
+    // libMesh::out << "Concatenated list of elemset Elem ids (Exodus numbering):" << std::endl;
+    // for (const auto & id : exio_helper->elemset_list)
+    //   libMesh::out << id << " ";
+    // libMesh::out << std::endl;
 
     // Next we need to assign the elemset ids to the mesh using the
     // Elem's "extra_integers" support, if we have any.
@@ -720,7 +720,7 @@ void ExodusII_IO::read (const std::string & fname)
             Elem * elem = mesh.elem_ptr(libmesh_elem_id);
 
             // Debugging:
-            libMesh::out << "Elem " << elem->id() << " is in elemset " << exio_helper->elemset_id_list[e] << std::endl;
+            // libMesh::out << "Elem " << elem->id() << " is in elemset " << exio_helper->elemset_id_list[e] << std::endl;
 
             // Store elemset id in the map
             elem_to_elemsets[elem].insert(exio_helper->elemset_id_list[e]);
@@ -732,13 +732,13 @@ void ExodusII_IO::read (const std::string & fname)
           unique_elemsets.insert(pr.second);
 
         // Debugging: print the unique elemsets
-        libMesh::out << "The set of unique elemsets which exist on the Mesh:" << std::endl;
-        for (const auto & s : unique_elemsets)
-          {
-            for (const auto & elemset_id : s)
-              libMesh::out << elemset_id << " ";
-            libMesh::out << std::endl;
-          }
+        // libMesh::out << "The set of unique elemsets which exist on the Mesh:" << std::endl;
+        // for (const auto & s : unique_elemsets)
+        //   {
+        //     for (const auto & elemset_id : s)
+        //       libMesh::out << elemset_id << " ";
+        //     libMesh::out << std::endl;
+        //   }
 
         // Enumerate the unique_elemsets and tell the mesh about them
         dof_id_type code = 0;
@@ -1899,7 +1899,7 @@ void ExodusII_IO::write_elemsets()
 {
   libmesh_error_msg_if(!exio_helper->opened_for_writing,
                        "ERROR, ExodusII file must be opened for writing "
-                       "before calling ExodusII_IO::write_elemset()!");
+                       "before calling ExodusII_IO::write_elemsets()!");
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
   exio_helper->write_elemsets(mesh);
