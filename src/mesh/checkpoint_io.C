@@ -517,12 +517,12 @@ void CheckpointIO::write_subdomain_names(Xdr & io) const
     // return writable references in mesh_base, it's possible for the user to leave some entity names
     // blank.  We can't write those to the XDA file.
     largest_id_type n_subdomain_names = 0;
-    for (const auto & pr : subdomain_map)
-      if (!pr.second.empty())
+    for (const auto & [id, name] : subdomain_map)
+      if (!name.empty())
         {
           n_subdomain_names++;
-          subdomain_ids.push_back(pr.first);
-          subdomain_names.push_back(pr.second);
+          subdomain_ids.push_back(id);
+          subdomain_names.push_back(name);
         }
 
     io.data(n_subdomain_names, "# subdomain id to name map");
@@ -791,12 +791,12 @@ void CheckpointIO::write_bc_names (Xdr & io, const BoundaryInfo & info, bool is_
   // return writable references in boundary_info, it's possible for the user to leave some entity names
   // blank.  We can't write those to the XDA file.
   largest_id_type n_boundary_names = 0;
-  for (const auto & pr : boundary_map)
-    if (!pr.second.empty())
+  for (const auto & [id, name] : boundary_map)
+    if (!name.empty())
       {
         n_boundary_names++;
-        boundary_ids.push_back(pr.first);
-        boundary_names.push_back(pr.second);
+        boundary_ids.push_back(id);
+        boundary_names.push_back(name);
       }
 
   if (is_sideset)
