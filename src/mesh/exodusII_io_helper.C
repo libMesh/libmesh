@@ -164,6 +164,7 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   num_nodes_per_elem(0),
   num_attr(0),
   num_elem_all_sidesets(0),
+  num_elem_all_elemsets(0),
   bex_num_elem_cvs(0),
   num_time_steps(0),
   num_nodal_vars(0),
@@ -1479,8 +1480,19 @@ void ExodusII_IO_Helper::read_elemset_info()
       message("All elemset information retrieved successfully.");
 
       // Resize appropriate data structures -- only do this once outside the loop
-      // num_nodes_per_set.resize(num_elem_sets);
-      // num_node_df_per_set.resize(num_elem_sets);
+      num_elems_per_set.resize(num_elem_sets);
+      num_elem_df_per_set.resize(num_elem_sets);
+
+      // Inquire about the length of the concatenated elemset list
+      num_elem_all_elemsets =
+        inquire(*this, exII::EX_INQ_ELS_LEN,
+                "Error retrieving length of the concatenated elem sets element list!");
+
+      elemset_list.resize(num_elem_all_elemsets);
+      elemset_id_list.resize(num_elem_all_elemsets);
+
+      // Debugging
+      libMesh::out << "num_elem_all_elemsets = " << num_elem_all_elemsets << std::endl;
     }
 
   char name_buffer[MAX_STR_LENGTH+1];
@@ -1536,6 +1548,51 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
 
       for (int i=0; i<num_sides_per_set[id]; i++)
         id_list[i+offset] = ss_ids[id];
+    }
+}
+
+
+
+void ExodusII_IO_Helper::read_elemset(int id, int offset)
+{
+  libmesh_assert_less (id, elemset_ids.size());
+  libmesh_assert_less (id, num_elems_per_set.size());
+  libmesh_assert_less (id, num_elem_df_per_set.size());
+  // libmesh_assert_less_equal (offset, elem_list.size());
+  // libmesh_assert_less_equal (offset, side_list.size());
+
+  ex_err = exII::ex_get_set_param(ex_id,
+                                  exII::EX_ELEM_SET,
+                                  elemset_ids[id],
+                                  &num_elems_per_set[id],
+                                  &num_elem_df_per_set[id]);
+  EX_CHECK_ERR(ex_err, "Error retrieving elemset parameters.");
+  message("Parameters retrieved successfully for elemset: ", id);
+
+
+  // It's OK for offset==elem_list.size() as long as num_sides_per_set[id]==0
+  // because in that case we don't actually read anything...
+// #ifdef DEBUG
+//   if (static_cast<unsigned int>(offset) == elem_list.size() ||
+//       static_cast<unsigned int>(offset) == side_list.size() )
+//     libmesh_assert_equal_to (num_elems_per_set[id], 0);
+// #endif
+
+  // Don't call ex_get_set() unless there are actually elems there to get.
+  // Exodus prints an annoying warning in DEBUG mode otherwise...
+  if (num_elems_per_set[id] > 0)
+    {
+      ex_err = exII::ex_get_set(ex_id,
+                                exII::EX_ELEM_SET,
+                                elemset_ids[id],
+                                &elemset_list[offset],
+                                /*set_extra_list=*/nullptr);
+      EX_CHECK_ERR(ex_err, "Error retrieving elemset data.");
+      message("Data retrieved successfully for elemset: ", id);
+
+      // Create vector containing elemset ids for each element in the set
+      for (int i=0; i<num_elems_per_set[id]; i++)
+        elemset_id_list[i+offset] = elemset_ids[id];
     }
 }
 

@@ -676,6 +676,21 @@ void ExodusII_IO::read (const std::string & fname)
   // Read in elemset information and apply to Mesh elements if present
   {
     exio_helper->read_elemset_info();
+
+    // Mimic behavior of sideset case where we store all the set
+    // information in a single array with offsets.
+    int offset=0;
+    for (int i=0; i<exio_helper->num_elem_sets; i++)
+      {
+        // Compute new offset
+        offset += (i > 0 ? exio_helper->num_elems_per_set[i-1] : 0);
+        exio_helper->read_elemset (i, offset);
+
+        // TODO: add support for elemset names
+        // std::string elemset_name = exio_helper->get_elem_set_name(i);
+        // if (!elemset_name.empty())
+        //   mesh.get_boundary_info().elemset_name(cast_int<boundary_id_type>(exio_helper->get_elem_set_id(i))) = elemset_name;
+      }
   }
 
   // Read nodeset info
