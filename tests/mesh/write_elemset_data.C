@@ -110,11 +110,12 @@ public:
    // Make sure that the writing is done before the reading starts.
    TestCommWorld->barrier();
 
-//    // Now read it back in
-//    Mesh read_mesh(*TestCommWorld);
-//    IOClass reader(read_mesh);
-//    reader.read(filename);
-//
+   // Now read it back in
+   Mesh read_mesh(*TestCommWorld);
+   IOClass reader(read_mesh);
+   reader.verbose(true); // additional messages while debugging
+   reader.read(filename);
+
 //    if (write_vars)
 //      {
 //        std::vector<std::string> read_in_var_names;
