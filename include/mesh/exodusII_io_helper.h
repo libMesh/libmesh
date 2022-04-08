@@ -240,6 +240,12 @@ public:
   void read_nodeset_info();
 
   /**
+   * Reads information about all of the elemsets in the \p ExodusII
+   * mesh file.
+   */
+  void read_elemset_info();
+
+  /**
    * Reads information about sideset \p id and inserts it into the
    * global sideset array at the position \p offset.
    */
@@ -632,6 +638,9 @@ public:
 
   // Vector of the nodeset IDs
   std::vector<int> nodeset_ids;
+
+  // Vector of the elemset IDs
+  std::vector<int> elemset_ids;
 
   // Number of sides (edges/faces) in current set
   std::vector<int> num_sides_per_set;

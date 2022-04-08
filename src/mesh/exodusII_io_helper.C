@@ -1449,7 +1449,7 @@ void ExodusII_IO_Helper::read_nodeset_info()
       EX_CHECK_ERR(ex_err, "Error retrieving nodeset information.");
       message("All nodeset information retrieved successfully.");
 
-      // Resize appropriate data structures -- only do this once outnode the loop
+      // Resize appropriate data structures -- only do this once outside the loop
       num_nodes_per_set.resize(num_node_sets);
       num_node_df_per_set.resize(num_node_sets);
     }
@@ -1463,6 +1463,35 @@ void ExodusII_IO_Helper::read_nodeset_info()
       id_to_ns_names[nodeset_ids[i]] = name_buffer;
     }
   message("All node set names retrieved successfully.");
+}
+
+
+
+void ExodusII_IO_Helper::read_elemset_info()
+{
+  elemset_ids.resize(num_elem_sets);
+  if (num_elem_sets > 0)
+    {
+      ex_err = exII::ex_get_ids(ex_id,
+                                exII::EX_ELEM_SET,
+                                elemset_ids.data());
+      EX_CHECK_ERR(ex_err, "Error retrieving elemset information.");
+      message("All elemset information retrieved successfully.");
+
+      // Resize appropriate data structures -- only do this once outside the loop
+      // num_nodes_per_set.resize(num_elem_sets);
+      // num_node_df_per_set.resize(num_elem_sets);
+    }
+
+  char name_buffer[MAX_STR_LENGTH+1];
+  for (int i=0; i<num_elem_sets; ++i)
+    {
+      ex_err = exII::ex_get_name(ex_id, exII::EX_ELEM_SET,
+                                 elemset_ids[i], name_buffer);
+      EX_CHECK_ERR(ex_err, "Error getting node set name.");
+      id_to_ns_names[elemset_ids[i]] = name_buffer;
+    }
+  message("All elem set names retrieved successfully.");
 }
 
 

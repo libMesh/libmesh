@@ -673,6 +673,11 @@ void ExodusII_IO::read (const std::string & fname)
       } // end for (elem_list)
   } // end read sideset info
 
+  // Read in elemset information and apply to Mesh elements if present
+  {
+    exio_helper->read_elemset_info();
+  }
+
   // Read nodeset info
   {
     // This fills in the following fields of the helper for later use:
