@@ -1390,16 +1390,15 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
     // Container to catch boundary IDs passed back from BoundaryInfo.
     std::vector<boundary_id_type> bc_ids;
 
-    for (const auto & pr : node_to_elems_map)
+    for (const auto & [target_node_id, elem_vec] : node_to_elems_map)
       {
-        dof_id_type target_node_id = pr.first;
         dof_id_type other_node_id = node_to_node_map[target_node_id];
         Node & target_node = this->node_ref(target_node_id);
 
-        std::size_t n_elems = pr.second.size();
+        std::size_t n_elems = elem_vec.size();
         for (std::size_t i=0; i<n_elems; i++)
           {
-            dof_id_type elem_id = pr.second[i];
+            dof_id_type elem_id = elem_vec[i];
             Elem * el = this->elem_ptr(elem_id);
 
             // find the local node index that we want to update
@@ -1417,14 +1416,13 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
 
   {
     LOG_SCOPE("stitch_meshes node deletion", "ReplicatedMesh");
-    for (const auto & pr : node_to_node_map)
+    for (const auto & [other_node_id, this_node_id] : node_to_node_map)
       {
         // In the case that this==other_mesh, the two nodes might be the same (e.g. if
         // we're stitching a "sliver"), hence we need to skip node deletion in that case.
-        if ((this == other_mesh) && (pr.second == pr.first))
+        if ((this == other_mesh) && (this_node_id == other_node_id))
           continue;
 
-        dof_id_type this_node_id = pr.second;
         this->delete_node( this->node_ptr(this_node_id) );
       }
   }
