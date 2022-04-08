@@ -1558,8 +1558,7 @@ void ExodusII_IO_Helper::read_elemset(int id, int offset)
   libmesh_assert_less (id, elemset_ids.size());
   libmesh_assert_less (id, num_elems_per_set.size());
   libmesh_assert_less (id, num_elem_df_per_set.size());
-  // libmesh_assert_less_equal (offset, elem_list.size());
-  // libmesh_assert_less_equal (offset, side_list.size());
+  libmesh_assert_less_equal (offset, elemset_list.size());
 
   ex_err = exII::ex_get_set_param(ex_id,
                                   exII::EX_ELEM_SET,
@@ -1570,13 +1569,12 @@ void ExodusII_IO_Helper::read_elemset(int id, int offset)
   message("Parameters retrieved successfully for elemset: ", id);
 
 
-  // It's OK for offset==elem_list.size() as long as num_sides_per_set[id]==0
+  // It's OK for offset==elemset_list.size() as long as num_elems_per_set[id]==0
   // because in that case we don't actually read anything...
-// #ifdef DEBUG
-//   if (static_cast<unsigned int>(offset) == elem_list.size() ||
-//       static_cast<unsigned int>(offset) == side_list.size() )
-//     libmesh_assert_equal_to (num_elems_per_set[id], 0);
-// #endif
+  #ifdef DEBUG
+  if (static_cast<unsigned int>(offset) == elemset_list.size())
+    libmesh_assert_equal_to (num_elems_per_set[id], 0);
+  #endif
 
   // Don't call ex_get_set() unless there are actually elems there to get.
   // Exodus prints an annoying warning in DEBUG mode otherwise...

@@ -48,8 +48,7 @@ public:
     // 3                               & elem belongs to sets A and B
     unsigned int elemset_index =
       mesh.add_elem_integer("elemset_code",
-                            /*allocate_data=*/true,
-                            /*default_value=*/0);
+                            /*allocate_data=*/true);
 
     // We are generating this mesh, so it should not be renumbered.
     // No harm in being explicit about it, however.
