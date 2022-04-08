@@ -75,19 +75,13 @@ void AugmentSparsityOnInterface::mesh_reinit ()
   // We do an N^2 search to find elements with matching vertex averages. This could be optimized,
   // e.g. by first sorting the vertex averages based on their (x,y,z) location.
   {
-    for (const auto & lower_pr : lower)
+    for (const auto & [lower_key, lower_val] : lower)
       {
-        const auto & lower_key = lower_pr.first;
-        const Point & lower_val = lower_pr.second;
-
         // find closest vertex average in upper
         Real min_distance = std::numeric_limits<Real>::max();
 
-        for (const auto & upper_pr : upper)
+        for (const auto & [upper_key, upper_val] : upper)
           {
-            const auto & upper_key = upper_pr.first;
-            const Point & upper_val = upper_pr.second;
-
             Real distance = (upper_val - lower_val).norm();
             if (distance < min_distance)
               {
