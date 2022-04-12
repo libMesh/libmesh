@@ -160,6 +160,8 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   num_elem_sets(header_info.num_elem_sets),
   num_global_vars(0),
   num_sideset_vars(0),
+  num_nodeset_vars(0),
+  num_elemset_vars(0),
   num_elem_this_blk(0),
   num_nodes_per_elem(0),
   num_attr(0),
@@ -710,6 +712,12 @@ void ExodusII_IO_Helper::read_and_store_header_info()
 
   ex_err = exII::ex_get_var_param(ex_id, "s", &num_sideset_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of sideset variables.");
+
+  ex_err = exII::ex_get_var_param(ex_id, "m", &num_nodeset_vars);
+  EX_CHECK_ERR(ex_err, "Error reading number of nodeset variables.");
+
+  ex_err = exII::ex_get_var_param(ex_id, "t", &num_elemset_vars);
+  EX_CHECK_ERR(ex_err, "Error reading number of elemset variables.");
 
   message("Exodus header info retrieved successfully.");
 }
@@ -1505,7 +1513,7 @@ void ExodusII_IO_Helper::read_elemset_info()
       ex_err = exII::ex_get_name(ex_id, exII::EX_ELEM_SET,
                                  elemset_ids[i], name_buffer);
       EX_CHECK_ERR(ex_err, "Error getting node set name.");
-      id_to_ns_names[elemset_ids[i]] = name_buffer;
+      id_to_elemset_names[elemset_ids[i]] = name_buffer;
     }
   message("All elem set names retrieved successfully.");
 }
@@ -1796,6 +1804,9 @@ void ExodusII_IO_Helper::read_var_names(ExodusVarType type)
     case NODESET:
       this->read_var_names_impl("m", num_nodeset_vars, nodeset_var_names);
       break;
+    case ELEMSET:
+      this->read_var_names_impl("t", num_elemset_vars, elemset_var_names);
+      break;
     default:
       libmesh_error_msg("Unrecognized ExodusVarType " << type);
     }
@@ -1869,6 +1880,11 @@ ExodusII_IO_Helper::write_var_names(ExodusVarType type,
     case NODESET:
       {
         this->write_var_names_impl("m", num_nodeset_vars, names);
+        break;
+      }
+    case ELEMSET:
+      {
+        this->write_var_names_impl("t", num_elemset_vars, names);
         break;
       }
     default:
@@ -3558,6 +3574,131 @@ write_nodeset_data (int timestep,
                               cast_int<int>(var_names.size()),
                               nset_var_tab.data());
   EX_CHECK_ERR(ex_err, "Error writing nodeset var truth table.");
+}
+
+
+
+void
+ExodusII_IO_Helper::
+write_elemset_data (int timestep,
+                    const std::vector<std::string> & var_names,
+                    const std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                    const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals)
+{
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
+    return;
+
+  // Write the elemset variable names to file. This function should
+  // only be called once for ELEMSET variables, repeated calls to
+  // write_var_names() overwrites/changes the order of names that were
+  // there previously, and will mess up any data that has already been
+  // written.
+  this->write_var_names(ELEMSET, var_names);
+
+  // We now call the API to read the elemset info even though we are
+  // in the middle of writing. This is a bit counter-intuitive, but it
+  // seems to work provided that you have already written the mesh
+  // itself... read_elemset_info() fills in the following data
+  // members:
+  // .) id_to_elemset_names
+  // .) num_elems_per_set
+  // .) num_elem_df_per_set
+  // .) elemset_list
+  // .) elemset_id_list
+  // .) id_to_elemset_names
+  this->read_elemset_info();
+
+  // The "truth" table for elemset variables. elemset_var_tab is a
+  // logically (num_elem_sets x num_elemset_vars) integer array of 0s and
+  // 1s indicating which elemsets a given elemset variable is defined
+  // on.
+  std::vector<int> elemset_var_tab(num_elem_sets * var_names.size());
+
+  int offset=0;
+  for (int es=0; es<num_elem_sets; ++es)
+    {
+      // Debugging
+      // libMesh::out << "Writing elemset variable values for elemset "
+      //              << es << ", elemset_id = " << elemset_ids[es]
+      //              << std::endl;
+
+      // We know num_elems_per_set because we called read_elemset_info() above.
+      offset += (es > 0 ? num_elems_per_set[es-1] : 0);
+      this->read_elemset(es, offset);
+
+      // For each variable in var_names, write the values for the
+      // current elemset, if any.
+      for (auto var : index_range(var_names))
+        {
+          // Debugging
+          // libMesh::out << "Writing elemset variable values for var " << var << std::endl;
+
+          // If this var has no values on this elemset, go to the next one.
+          if (!elemset_ids_in[var].count(elemset_ids[es]))
+            continue;
+
+          // Otherwise, fill in this entry of the nodeset truth table.
+          elemset_var_tab[es*var_names.size() + var] = 1;
+
+          // Data vector that will eventually be passed to exII::ex_put_var().
+          std::vector<Real> elemset_var_vals(num_elems_per_set[es]);
+
+          // Get reference to the (elem_id, elemset_id) -> Real map for this variable.
+          const auto & data_map = elemset_vals[var];
+
+          // Loop over entries in current elemset.
+          for (int i=0; i<num_elems_per_set[es]; ++i)
+            {
+              // Here we convert Exodus elem ids to libMesh node ids
+              // simply by subtracting 1.  We should probably use the
+              // exodus_elem_num_to_libmesh data structure for this,
+              // but I don't think it is set up at the time when this
+              // function is normally called.
+              dof_id_type libmesh_elem_id = elemset_list[i + offset] - 1;
+
+              // Construct a key to look up values in data_map.
+              std::pair<dof_id_type, elemset_id_type> key =
+                std::make_pair(libmesh_elem_id, elemset_ids[es]);
+
+              // Debugging:
+              // libMesh::out << "Searching for key = (" << key.first << ", " << key.second << ")" << std::endl;
+
+              // We require that the user provided either no values for
+              // this (var, elemset) combination (in which case we don't
+              // reach this point) or a value for _every_ elem in this
+              // elemset for this var, so we use the libmesh_map_find()
+              // macro to check for this.
+              elemset_var_vals[i] = libmesh_map_find(data_map, key);
+            } // end for (node in nodeset[ns])
+
+          // Write elemset values to Exodus file
+          if (elemset_var_vals.size() > 0)
+            {
+              ex_err = exII::ex_put_var
+                (ex_id,
+                 timestep,
+                 exII::EX_ELEM_SET,
+                 var + 1, // 1-based variable index of current variable
+                 elemset_ids[es],
+                 num_elems_per_set[es],
+                 MappedOutputVector(elemset_var_vals, _single_precision).data());
+              EX_CHECK_ERR(ex_err, "Error writing elemset vars.");
+            }
+        } // end for (var in var_names)
+    } // end for (ns)
+
+  // Finally, write the elemset truth table to file.
+  // Note: We are using the version of ex_put_var_tab() that takes a var_type
+  // argument (which we set to "t" for elemset variables) but that appears to
+  // be deprecated in Exodus v8.11, so we should look into updating this at
+  // some point.
+  ex_err =
+    exII::ex_put_var_tab(ex_id,
+                         "t",
+                         num_elem_sets,
+                         cast_int<int>(var_names.size()),
+                         elemset_var_tab.data());
+  EX_CHECK_ERR(ex_err, "Error writing elemset var truth table.");
 }
 
 

@@ -97,6 +97,52 @@ public:
     //       libMesh::out << "Elem " << elem->id() << ", elemset_code = " << elemset_code << std::endl;
     //   }
 
+    // Set up variables defined on these elemsets
+    std::vector<std::string> var_names = {"var1", "var2", "var3"};
+    std::vector<std::set<elemset_id_type>> elemset_ids =
+      {
+        {1},  // var1 is defined on elemset 1
+        {2},  // var2 is defined on elemset 2
+        {1,2} // var3 is defined on elemsets 1 and 2
+      };
+    std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> elemset_vals(var_names.size());
+
+    // To catch values handed back by MeshBase::get_elemsets()
+    std::set<elemset_id_type> id_set_to_fill;
+
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        // Get list of elemset ids to which this element belongs
+        mesh.get_elemsets(elem->get_extra_integer(elemset_index), id_set_to_fill);
+
+        bool
+          in1 = id_set_to_fill.count(1),
+          in2 = id_set_to_fill.count(2);
+
+        // Set the value for var1 == 1.0 on all elements in elemset 1
+        if (in1)
+          elemset_vals[/*var1 index=*/0].emplace( std::make_pair(elem->id(), /*elemset_id=*/1), 1.0);
+
+        // Set the value of var2 == 2.0 on all elements in elemset 2
+        if (in2)
+          elemset_vals[/*var2 index=*/1].emplace( std::make_pair(elem->id(), /*elemset_id=*/2), 2.0);
+
+        // Set the value of var3 == 3.0 on elements in the union of sets 1 and 2
+        if (in1 || in2)
+          {
+            elemset_vals[/*var3 index=*/2].emplace( std::make_pair(elem->id(), /*elemset_id=*/1), 3.0);
+            elemset_vals[/*var3 index=*/2].emplace( std::make_pair(elem->id(), /*elemset_id=*/2), 3.0);
+          }
+      }
+
+    // Debugging: print the elemset_vals struct we just built
+    // for (auto i : index_range(var_names))
+    //   {
+    //     libMesh::out << "var_name = " << var_names[i] << std::endl;
+    //     for (const auto & [pr, val] : elemset_vals[i])
+    //       libMesh::out << "Elem id = " << pr.first << ", elemset id = " << pr.second << ", value = " << val << std::endl;
+    //   }
+
     // Write the file in the ExodusII format, including the element set information.
     // Note: elemsets should eventually be written during ExodusII_IO::write(), this
     // would match the behavior of sidesets and nodesets.
@@ -104,6 +150,7 @@ public:
       IOClass writer(mesh);
       writer.write(filename);
       writer.write_elemsets();
+      writer.write_elemset_data(/*timestep=*/1, var_names, elemset_ids, elemset_vals);
     }
 
     // Make sure that the writing is done before the reading starts.
