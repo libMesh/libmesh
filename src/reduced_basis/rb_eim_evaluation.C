@@ -1238,10 +1238,9 @@ void RBEIMEvaluation::print_local_eim_basis_functions() const
   for (auto bf : index_range(_local_eim_basis_functions))
     {
       libMesh::out << "Interior basis function " << bf << std::endl;
-      for (const auto & pr : _local_eim_basis_functions[bf])
+      for (const auto & [elem_id, array] : _local_eim_basis_functions[bf])
         {
-          libMesh::out << "Elem " << pr.first << std::endl;
-          const auto & array = pr.second;
+          libMesh::out << "Elem " << elem_id << std::endl;
           for (auto var : index_range(array))
             {
               libMesh::out << "Variable " << var << std::endl;
@@ -1255,12 +1254,11 @@ void RBEIMEvaluation::print_local_eim_basis_functions() const
   for (auto bf : index_range(_local_side_eim_basis_functions))
     {
       libMesh::out << "Side basis function " << bf << std::endl;
-      for (const auto & pr : _local_side_eim_basis_functions[bf])
+      for (const auto & [pr, array] : _local_side_eim_basis_functions[bf])
         {
-          const auto & elem_id = pr.first.first;
-          const auto & side_index = pr.first.second;
+          const auto & elem_id = pr.first;
+          const auto & side_index = pr.second;
           libMesh::out << "Elem " << elem_id << ", Side " << side_index << std::endl;
-          const auto & array = pr.second;
           for (auto var : index_range(array))
             {
               libMesh::out << "Variable " << var << std::endl;
