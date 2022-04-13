@@ -162,8 +162,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
               std::vector<Real> weights(n_vars, 0.0);
               for (unsigned int v = 0; v != n_vars; ++v)
                 {
-                  if (errors_per_cell->find(std::make_pair(&sys, v)) ==
-                      errors_per_cell->end())
+                  if (!errors_per_cell->count(std::make_pair(&sys, v)))
                     continue;
 
                   weights[v] = 1.0;
@@ -208,7 +207,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
       libmesh_assert(errors_per_cell);
       for (const auto & pr : *errors_per_cell)
         {
-          ErrorVector * e = pr.second;
+          ErrorVector * e = pr.second.get();
           e->clear();
           e->resize(mesh.max_elem_id(), 0.);
         }
@@ -501,7 +500,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
             {
               libmesh_assert(errors_per_cell);
               err_vec =
-                (*errors_per_cell)[std::make_pair(&system,var)];
+                (*errors_per_cell)[std::make_pair(&system,var)].get();
             }
 
           // The type of finite element to use for this variable

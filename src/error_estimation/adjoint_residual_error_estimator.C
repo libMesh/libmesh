@@ -100,9 +100,9 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
   if (!error_norm_is_identity)
     for (unsigned int v = 0; v < n_vars; v++)
       {
-        primal_errors_per_cell[std::make_pair(&_system, v)] = new ErrorVector;
-        dual_errors_per_cell[std::make_pair(&_system, v)] = new ErrorVector;
-        total_dual_errors_per_cell[std::make_pair(&_system, v)] = new ErrorVector;
+        primal_errors_per_cell[std::make_pair(&_system, v)] = std::make_unique<ErrorVector>();
+        dual_errors_per_cell[std::make_pair(&_system, v)] = std::make_unique<ErrorVector>();
+        total_dual_errors_per_cell[std::make_pair(&_system, v)] = std::make_unique<ErrorVector>();
       }
   ErrorVector primal_error_per_cell;
   ErrorVector dual_error_per_cell;
@@ -227,8 +227,8 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
                        << std::right
                        << v;
 
-              (*primal_errors_per_cell[std::make_pair(&_system, v)]).plot_error(primal_out.str(), _system.get_mesh());
-              (*total_dual_errors_per_cell[std::make_pair(&_system, v)]).plot_error(dual_out.str(), _system.get_mesh());
+              primal_errors_per_cell[std::make_pair(&_system, v)]->plot_error(primal_out.str(), _system.get_mesh());
+              total_dual_errors_per_cell[std::make_pair(&_system, v)]->plot_error(dual_out.str(), _system.get_mesh());
 
               primal_out.clear();
               dual_out.clear();
@@ -275,15 +275,6 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
           error_per_cell[i] = primal_error_per_cell[i]*total_dual_error_per_cell[i];
         }
     }
-
-  // Deallocate the ErrorMap contents if we allocated them earlier
-  if (!error_norm_is_identity)
-    for (unsigned int v = 0; v < n_vars; v++)
-      {
-        delete primal_errors_per_cell[std::make_pair(&_system, v)];
-        delete dual_errors_per_cell[std::make_pair(&_system, v)];
-        delete total_dual_errors_per_cell[std::make_pair(&_system, v)];
-      }
 }
 
 } // namespace libMesh

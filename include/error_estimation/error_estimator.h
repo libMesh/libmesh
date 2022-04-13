@@ -38,6 +38,7 @@ enum ErrorEstimatorType : int;
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
@@ -124,7 +125,7 @@ public:
    * When calculating many error vectors at once, we need a data structure to
    * hold them all
    */
-  typedef std::map<std::pair<const System *, unsigned int>, ErrorVector *> ErrorMap;
+  typedef std::map<std::pair<const System *, unsigned int>, std::unique_ptr<ErrorVector>> ErrorMap;
 
   /**
    * This virtual function can be redefined

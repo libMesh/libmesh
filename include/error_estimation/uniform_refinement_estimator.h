@@ -128,7 +128,7 @@ protected:
   virtual void _estimate_error (const EquationSystems * equation_systems,
                                 const System * system,
                                 ErrorVector * error_per_cell,
-                                std::map<std::pair<const System *, unsigned int>, ErrorVector *> * errors_per_cell,
+                                ErrorMap * errors_per_cell,
                                 const std::map<const System *, SystemNorm > * error_norms,
                                 const std::map<const System *, const NumericVector<Number> *> * solution_vectors = nullptr,
                                 bool estimate_parent_error = false);

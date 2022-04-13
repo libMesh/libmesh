@@ -107,8 +107,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems & equation_systems,
       for (unsigned int v = 0; v != n_vars; ++v)
         {
           // Only fill in ErrorVectors the user asks for
-          if (errors_per_cell.find(std::make_pair(&sys, v)) ==
-              errors_per_cell.end())
+          if (!errors_per_cell.count(std::make_pair(&sys, v)))
             continue;
 
           // Calculate error in only one variable
