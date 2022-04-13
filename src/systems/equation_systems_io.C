@@ -513,28 +513,30 @@ void EquationSystems::write(std::string_view name,
         // Write the number of equation systems
         io.data (n_sys, "# No. of Equation Systems");
 
-        for (auto & pr : _systems)
+        for (auto & [sys_name, sys] : _systems)
           {
             // Ignore this system if it has been marked as hidden
-            if (pr.second->hide_output()) continue;
+            if (sys->hide_output()) continue;
 
             // 3.)
             // Write the name of the sys_num-th system
             {
-              const unsigned int sys_num = pr.second->number();
-              std::string sys_name       = pr.first;
+              const unsigned int sys_num = sys->number();
 
               comment =  "# Name, System No. ";
               comment += std::to_string(sys_num);
 
-              io.data (sys_name, comment.c_str());
+              // Note: There is no Xdr::data overload taking a "const
+              // std::string &" so we need to make a copy.
+              std::string copy = sys_name;
+              io.data (copy, comment.c_str());
             }
 
             // 4.)
             // Write the type of system handled
             {
-              const unsigned int sys_num = pr.second->number();
-              std::string sys_type       = pr.second->system_type();
+              const unsigned int sys_num = sys->number();
+              std::string sys_type       = sys->system_type();
 
               comment =  "# Type, System No. ";
               comment += std::to_string(sys_num);
@@ -544,7 +546,7 @@ void EquationSystems::write(std::string_view name,
 
             // 5.) - 9.)
             // Let System::write_header() do the job
-            pr.second->write_header (io, version, write_additional_data);
+            sys->write_header (io, version, write_additional_data);
           }
       }
 
