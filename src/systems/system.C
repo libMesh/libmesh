@@ -258,14 +258,14 @@ void System::init_data ()
   _is_initialized = true;
 
   // initialize & zero other vectors, if necessary
-  for (auto & pr : _vectors)
+  for (auto & [vec_name, vec] : _vectors)
     {
-      ParallelType type = _vector_types[pr.first];
+      ParallelType type = _vector_types[vec_name];
 
       if (type == GHOSTED)
         {
 #ifdef LIBMESH_ENABLE_GHOSTED
-          pr.second->init (this->n_dofs(), this->n_local_dofs(),
+          vec->init (this->n_dofs(), this->n_local_dofs(),
                            _dof_map->get_send_list(), false,
                            GHOSTED);
 #else
@@ -274,12 +274,12 @@ void System::init_data ()
         }
       else if (type == SERIAL)
         {
-          pr.second->init (this->n_dofs(), false, type);
+          vec->init (this->n_dofs(), false, type);
         }
       else
         {
           libmesh_assert_equal_to(type, PARALLEL);
-          pr.second->init (this->n_dofs(), this->n_local_dofs(), false, type);
+          vec->init (this->n_dofs(), this->n_local_dofs(), false, type);
         }
     }
 
@@ -369,22 +369,22 @@ void System::restrict_vectors ()
 {
 #ifdef LIBMESH_ENABLE_AMR
   // Restrict the _vectors on the coarsened cells
-  for (auto & pr : _vectors)
+  for (auto & [vec_name, vec] : _vectors)
     {
-      NumericVector<Number> * v = pr.second.get();
+      NumericVector<Number> * v = vec.get();
 
-      if (_vector_projections[pr.first])
+      if (_vector_projections[vec_name])
         {
-          this->project_vector (*v, this->vector_is_adjoint(pr.first));
+          this->project_vector (*v, this->vector_is_adjoint(vec_name));
         }
       else
         {
-          ParallelType type = _vector_types[pr.first];
+          ParallelType type = _vector_types[vec_name];
 
           if (type == GHOSTED)
             {
 #ifdef LIBMESH_ENABLE_GHOSTED
-              pr.second->init (this->n_dofs(), this->n_local_dofs(),
+              vec->init (this->n_dofs(), this->n_local_dofs(),
                                _dof_map->get_send_list(), false,
                                GHOSTED);
 #else
@@ -392,7 +392,7 @@ void System::restrict_vectors ()
 #endif
             }
           else
-            pr.second->init (this->n_dofs(), this->n_local_dofs(), false, type);
+            vec->init (this->n_dofs(), this->n_local_dofs(), false, type);
         }
     }
 
@@ -646,18 +646,17 @@ bool System::compare (const System & other_system,
   else
     {
       // compare other vectors
-      for (auto & pr : _vectors)
+      for (auto & [vec_name, vec] : _vectors)
         {
           if (verbose)
             libMesh::out << "   comparing vector \""
-                         << pr.first << "\" ...";
+                         << vec_name << "\" ...";
 
           // assume they have the same name
           const NumericVector<Number> & other_system_vector =
-            other_system.get_vector(pr.first);
+            other_system.get_vector(vec_name);
 
-          ov_result.push_back(pr.second->compare (other_system_vector,
-                                                  threshold));
+          ov_result.push_back(vec->compare(other_system_vector, threshold));
 
           if (verbose)
             {
