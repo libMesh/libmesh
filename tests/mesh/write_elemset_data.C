@@ -129,19 +129,30 @@ public:
 
         // Set the value of var3 == 3.0 on elements in the union of sets 1 and 2
         if (in1 || in2)
-          {
-            elemset_vals[/*var3 index=*/2].emplace( std::make_pair(elem->id(), /*elemset_id=*/1), 3.0);
-            elemset_vals[/*var3 index=*/2].emplace( std::make_pair(elem->id(), /*elemset_id=*/2), 3.0);
-          }
+          for (const auto & id : id_set_to_fill)
+            elemset_vals[/*var3 index=*/2].emplace( std::make_pair(elem->id(), /*elemset_id=*/id), 3.0);
       }
 
-    // Debugging: print the elemset_vals struct we just built
-    // for (auto i : index_range(var_names))
+    // Sanity check: we should have 8 total elements in set1 and set2 combined
+    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), elemset_vals[/*var3 index=*/2].size());
+
+    // Lambda to help with debugging
+    // auto print_map = [](const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & input)
     //   {
-    //     libMesh::out << "var_name = " << var_names[i] << std::endl;
-    //     for (const auto & [pr, val] : elemset_vals[i])
-    //       libMesh::out << "Elem id = " << pr.first << ", elemset id = " << pr.second << ", value = " << val << std::endl;
-    //   }
+    //     for (auto i : index_range(input))
+    //       {
+    //         libMesh::out << "Map " << i << " = " << std::endl;
+    //         for (const auto & [pr, val] : input[i])
+    //           {
+    //             const auto & elem_id = pr.first;
+    //             const auto & elemset_id = pr.second;
+    //             libMesh::out << "(" << elem_id << ", " << elemset_id << ") = " << val << std::endl;
+    //           }
+    //       }
+    //   };
+
+    // Debugging: print the elemset_vals struct we just built
+    // print_map(elemset_vals);
 
     // Write the file in the ExodusII format, including the element set information.
     // Note: elemsets should eventually be written during ExodusII_IO::write(), this
@@ -197,6 +208,21 @@ public:
     // Elements 9, 15 are in set2 which has code 2
     CPPUNIT_ASSERT(read_mesh.elem_ptr(9)->get_extra_integer(elemset_index) == 2);
     CPPUNIT_ASSERT(read_mesh.elem_ptr(15)->get_extra_integer(elemset_index) == 2);
+
+    // Read in the elemset variables from file
+    std::vector<std::string> read_in_var_names;
+    std::vector<std::set<elemset_id_type>> read_in_elemset_ids;
+    std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> read_in_elemset_vals;
+    reader.read_elemset_data(/*timestep=*/1, read_in_var_names, read_in_elemset_ids, read_in_elemset_vals);
+
+    // Debugging
+    // print_map(read_in_elemset_vals);
+
+    // Assert that the data we read in matches what we wrote out
+    CPPUNIT_ASSERT(read_in_var_names == var_names);
+    CPPUNIT_ASSERT(read_in_elemset_ids == elemset_ids);
+    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), read_in_elemset_vals[/*var3 index=*/2].size());
+    CPPUNIT_ASSERT(read_in_elemset_vals == elemset_vals);
   }
 
   void testWriteExodus()

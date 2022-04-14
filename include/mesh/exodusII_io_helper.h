@@ -423,6 +423,15 @@ public:
                       const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals);
 
   /**
+   * Read elemset variables, if any, into the provided data structures.
+   */
+  void
+  read_elemset_data (int timestep,
+                     std::vector<std::string> & var_names,
+                     std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                     std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals);
+
+  /**
    * Writes the vector of values to the element variables.
    *
    * The 'values' vector is assumed to be in the order:

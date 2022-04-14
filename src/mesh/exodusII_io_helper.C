@@ -3168,8 +3168,8 @@ ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
 
           for (auto & [elem_set_id, ids_vec] : exodus_elemsets)
             {
-              // TODO: Add support for named sidesets
-              // names_table.push_back_entry(mesh.get_boundary_info().get_sideset_name(ss_id));
+              // TODO: Add support for named elemsets
+              // names_table.push_back_entry(mesh.get_elemset_name(elem_set_id));
 
               exII::ex_set & current_set = sets.emplace_back();
               current_set.id = elem_set_id;
@@ -3184,7 +3184,7 @@ ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
           ex_err = exII::ex_put_sets(ex_id, exodus_elemsets.size(), sets.data());
           EX_CHECK_ERR(ex_err, "Error writing elemsets");
 
-          // TODO: Add support for named sidesets
+          // TODO: Add support for named elemsets
           // ex_err = exII::ex_put_names(ex_id, exII::EX_ELEM_SET, names_table.get_char_star_star());
           // EX_CHECK_ERR(ex_err, "Error writing elemset names");
         } // end if (!exodus_elemsets.empty())
@@ -3688,17 +3688,122 @@ write_elemset_data (int timestep,
     } // end for (ns)
 
   // Finally, write the elemset truth table to file.
-  // Note: We are using the version of ex_put_var_tab() that takes a var_type
-  // argument (which we set to "t" for elemset variables) but that appears to
-  // be deprecated in Exodus v8.11, so we should look into updating this at
-  // some point.
   ex_err =
-    exII::ex_put_var_tab(ex_id,
-                         "t",
-                         num_elem_sets,
-                         cast_int<int>(var_names.size()),
-                         elemset_var_tab.data());
+    exII::ex_put_truth_table(ex_id,
+                             exII::EX_ELEM_SET, // exII::ex_entity_type
+                             num_elem_sets,
+                             cast_int<int>(var_names.size()),
+                             elemset_var_tab.data());
   EX_CHECK_ERR(ex_err, "Error writing elemset var truth table.");
+}
+
+
+
+void
+ExodusII_IO_Helper::
+read_elemset_data (int timestep,
+                   std::vector<std::string> & var_names,
+                   std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                   std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals)
+{
+  // This reads the elemset variable names into the local
+  // elemset_var_names data structure.
+  this->read_var_names(ELEMSET);
+
+  // Debugging
+  // libMesh::out << "elmeset variable names:" << std::endl;
+  // for (const auto & name : elemset_var_names)
+  //   libMesh::out << name << " ";
+  // libMesh::out << std::endl;
+
+  if (num_elemset_vars)
+    {
+      // Debugging
+      // std::cout << "Reading " << num_elem_sets
+      //           << " elemsets and " << num_elemset_vars
+      //           << " elemset variables." << std::endl;
+
+      // Read the elemset data truth table. Note: I tried calling exII::ex_get_var_tab
+      // but it did not work and I also noticed that it is deprecated.
+      std::vector<int> elemset_var_tab(num_elem_sets * num_elemset_vars, /*debugging initial value*/1);
+      exII::ex_get_truth_table(ex_id,
+                               exII::EX_ELEM_SET, // exII::ex_entity_type
+                               num_elem_sets,
+                               num_elemset_vars,
+                               elemset_var_tab.data());
+      EX_CHECK_ERR(ex_err, "Error reading elemset variable truth table.");
+
+      // Debugging
+      // libMesh::out << "Elemset variable truth table:" << std::endl;
+      // for (const auto & val : elemset_var_tab)
+      //   libMesh::out << val << " ";
+      // libMesh::out << std::endl;
+
+      // Debugging
+      // for (auto i : make_range(num_elem_sets))
+      //   {
+      //     for (auto j : make_range(num_elemset_vars))
+      //       libMesh::out << elemset_var_tab[num_elemset_vars*i + j] << " ";
+      //     libMesh::out << std::endl;
+      //   }
+
+      // Set up/allocate space in incoming data structures. All vectors are
+      // num_elemset_vars in length.
+      var_names = elemset_var_names;
+      elemset_ids_in.resize(num_elemset_vars);
+      elemset_vals.resize(num_elemset_vars);
+
+      // Read the elemset data
+      int offset=0;
+      for (int es=0; es<num_elem_sets; ++es)
+        {
+          offset += (es > 0 ? num_elems_per_set[es-1] : 0);
+          for (int var=0; var<num_elemset_vars; ++var)
+            {
+              int is_present = elemset_var_tab[num_elemset_vars*es + var];
+
+              if (is_present)
+                {
+                  // Debugging
+                  // libMesh::out << "Variable " << var << " is present on elemset " << es << std::endl;
+
+                  // Record the fact that this variable is defined on this elemset.
+                  elemset_ids_in[var].insert(elemset_ids[es]);
+
+                  // Note: the assumption here is that a previous call
+                  // to this->read_elemset_info() has already set the
+                  // values of num_elems_per_set, so we just use those values here.
+                  std::vector<Real> elemset_var_vals(num_elems_per_set[es]);
+                  ex_err = exII::ex_get_var
+                    (ex_id,
+                     timestep,
+                     exII::EX_ELEM_SET, // exII::ex_entity_type
+                     var + 1, // 1-based sideset variable index!
+                     elemset_ids[es],
+                     num_elems_per_set[es],
+                     MappedInputVector(elemset_var_vals, _single_precision).data());
+                  EX_CHECK_ERR(ex_err, "Error reading elemset variable.");
+
+                  for (int i=0; i<num_elems_per_set[es]; ++i)
+                    {
+                      dof_id_type exodus_elem_id = elemset_list[i + offset];
+
+                      // FIXME: We should use exodus_elem_num_to_libmesh for this,
+                      // but it apparently is never set up, so just
+                      // subtract 1 from the Exodus elem id.
+                      dof_id_type converted_elem_id = exodus_elem_id - 1;
+
+                      // Make key based on the elem and set ids
+                      auto key = std::make_pair(converted_elem_id,
+                                                static_cast<elemset_id_type>(elemset_ids[es]));
+
+                      // Store value in the map
+                      elemset_vals[var].emplace(key, elemset_var_vals[i]);
+                    } // end for (i)
+                } // end if (present)
+            } // end for (var)
+        } // end for (es)
+    } // end if (num_elemset_vars)
 }
 
 

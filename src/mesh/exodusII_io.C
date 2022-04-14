@@ -2004,6 +2004,16 @@ write_elemset_data (int timestep,
 
 
 
+void
+ExodusII_IO::
+read_elemset_data (int timestep,
+                   std::vector<std::string> & var_names,
+                   std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                   std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals)
+{
+  exio_helper->read_elemset_data(timestep, var_names, elemset_ids_in, elemset_vals);
+}
+
 void ExodusII_IO::write (const std::string & fname)
 {
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
@@ -2440,7 +2450,7 @@ get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> &)
 
 void
 ExodusII_IO::
-write_elemset_data (int timestep,
+write_elemset_data (int,
                     const std::vector<std::string> &,
                     const std::vector<std::set<elemset_id_type>> &,
                     const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> &)
@@ -2448,6 +2458,15 @@ write_elemset_data (int timestep,
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
 }
 
+void
+ExodusII_IO::
+read_elemset_data (int,
+                   std::vector<std::string> &,
+                   std::vector<std::set<elemset_id_type>> &,
+                   std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
 
 void ExodusII_IO::write (const std::string &)
 {

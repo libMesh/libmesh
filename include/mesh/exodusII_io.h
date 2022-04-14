@@ -416,6 +416,15 @@ public:
                       const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals);
 
   /**
+   * Read all the elemset data at a particular timestep.
+   */
+  void
+  read_elemset_data (int timestep,
+                     std::vector<std::string> & var_names,
+                     std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                     std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals);
+
+  /**
    * Set the elemental variables in the Exodus file to be read into extra
    * element integers. The names of these elemental variables will be used to
    * name the extra element integers.
