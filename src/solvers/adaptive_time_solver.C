@@ -21,6 +21,10 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/no_solution_history.h"
 
+// Debug
+#include "libmesh/system_norm.h"
+#include "libmesh/enum_norm_type.h"
+
 namespace libMesh
 {
 
@@ -129,6 +133,16 @@ void AdaptiveTimeSolver::adjoint_advance_timestep ()
   {
     _system.deltat = dynamic_cast<DifferentiableSystem &>(_system).time_solver->TimeSolver::last_completed_timestep_size();
     first_adjoint_step = false;
+  }
+
+  // Before moving to the next time instant, copy over the current adjoint solutions into _old_adjoint_solutions
+  for(auto i : make_range(_system.n_qois()))
+  {
+   std::string old_adjoint_solution_name = "_old_adjoint_solution";
+   old_adjoint_solution_name+= std::to_string(i);
+   NumericVector<Number> & old_adjoint_solution_i = _system.get_vector(old_adjoint_solution_name);
+   NumericVector<Number> & adjoint_solution_i = _system.get_adjoint_solution(i);
+   old_adjoint_solution_i = adjoint_solution_i;
   }
 
   _system.time -= _system.deltat;

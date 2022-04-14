@@ -242,6 +242,16 @@ void UnsteadySolver::adjoint_advance_timestep ()
   // time step for the time instance.
   solution_history->store(true, _system.time);
 
+  // Before moving to the next time instant, copy over the current adjoint solutions into _old_adjoint_solutions
+  for(auto i : make_range(_system.n_qois()))
+  {
+   std::string old_adjoint_solution_name = "_old_adjoint_solution";
+   old_adjoint_solution_name+= std::to_string(i);
+   NumericVector<Number> & old_adjoint_solution_i = _system.get_vector(old_adjoint_solution_name);
+   NumericVector<Number> & adjoint_solution_i = _system.get_adjoint_solution(i);
+   old_adjoint_solution_i = adjoint_solution_i;
+  }
+
   _system.time -= _system.deltat;
 
   // Retrieve the primal solution vectors at this new (or for
