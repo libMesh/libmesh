@@ -3104,7 +3104,7 @@ ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
         mesh.get_elem_integer_index("elemset_code");
 
       // Catch ids returned from MeshBase::get_elemsets() calls
-      std::set<elemset_id_type> set_ids;
+      MeshBase::elemset_type set_ids;
       for (const auto & elem : mesh.element_ptr_range())
         {
           dof_id_type elemset_code =

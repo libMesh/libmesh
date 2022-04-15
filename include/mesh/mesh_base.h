@@ -264,11 +264,19 @@ public:
   void set_elem_dimensions(const std::set<unsigned char> & elem_dims);
 
   /**
+   * Typedef for the "set" container used to store elemset ids. The
+   * main requirements are that the entries be sorted and unique, so
+   * std::set works for this, but there may be more efficient
+   * alternatives.
+   */
+  typedef std::set<elemset_id_type> elemset_type;
+
+  /**
    * Tabulate a user-defined "code" for elements which belong to the element sets
    * specified in \p id_set. Also sets up the inverse mapping, so that if one knows
    * all the element sets an Elem belongs to, one can look up the corresponding code.
    */
-  void add_elemset_code(dof_id_type code, const std::set<elemset_id_type> & id_set);
+  void add_elemset_code(dof_id_type code, const MeshBase::elemset_type & id_set);
 
   /**
    * Determines the number of unique elemset ids which have been added
@@ -283,8 +291,8 @@ public:
    * calling add_elemset_code(). If no such code/set is found, returns
    * the empty set or DofObject::invalid_id, respectively.
    */
-  void get_elemsets(dof_id_type elemset_code, std::set<elemset_id_type> & id_set_to_fill) const;
-  dof_id_type get_elemset_code(const std::set<elemset_id_type> & id_set) const;
+  void get_elemsets(dof_id_type elemset_code, MeshBase::elemset_type & id_set_to_fill) const;
+  dof_id_type get_elemset_code(const MeshBase::elemset_type & id_set) const;
 
   /**
    * \returns The "spatial dimension" of the mesh.
@@ -1990,9 +1998,9 @@ protected:
    * 4.) We also keep a list of all the elemset ids which have been added in
    * order to support O(1) performance behavior in n_elemsets() calls.
    */
-  std::map<dof_id_type, std::set<elemset_id_type>> _elemset_codes;
-  std::map<std::set<elemset_id_type>, dof_id_type> _elemset_codes_inverse_map;
-  std::set<elemset_id_type> _all_elemset_ids;
+  std::map<dof_id_type, MeshBase::elemset_type> _elemset_codes;
+  std::map<MeshBase::elemset_type, dof_id_type> _elemset_codes_inverse_map;
+  MeshBase::elemset_type _all_elemset_ids;
 
   /**
    * The "spatial dimension" of the Mesh.  See the documentation for

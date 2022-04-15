@@ -704,7 +704,7 @@ void ExodusII_IO::read (const std::string & fname)
       {
         // Build map from Elem -> {elemsets}. This is needed only
         // temporarily to determine a unique set of elemset codes.
-        std::map<Elem *, std::set<elemset_id_type>> elem_to_elemsets;
+        std::map<Elem *, MeshBase::elemset_type> elem_to_elemsets;
         for (auto e : index_range(exio_helper->elemset_list))
           {
             // Follow standard (see sideset case above) approach for
@@ -727,7 +727,7 @@ void ExodusII_IO::read (const std::string & fname)
           }
 
         // Create a set of unique elemsets
-        std::set<std::set<elemset_id_type>> unique_elemsets;
+        std::set<MeshBase::elemset_type> unique_elemsets;
         for (const auto & pr : elem_to_elemsets)
           unique_elemsets.insert(pr.second);
 
