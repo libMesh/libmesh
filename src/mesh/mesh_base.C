@@ -226,16 +226,26 @@ void MeshBase::set_elem_dimensions(const std::set<unsigned char> & elem_dims)
 
 void MeshBase::add_elemset_code(dof_id_type code, MeshBase::elemset_type id_set)
 {
-  auto [it, inserted] = _elemset_codes.emplace(code, id_set); // copy id_set
+  // Populate inverse map, stealing id_set's resources
+  auto [it1, inserted1] = _elemset_codes_inverse_map.emplace(std::move(id_set), code);
 
-  // Throw an error if this code already exists with a different set of ids
-  libmesh_error_msg_if(!inserted && it->second != id_set,
+  // Reference to the newly inserted (or previously existing) id_set
+  const auto & inserted_id_set = it1->first;
+
+  // Keep track of all elemset ids ever added for O(1) n_elemsets()
+  // performance. Only need to do this if we didn't know about this
+  // id_set before...
+  if (inserted1)
+    _all_elemset_ids.insert(inserted_id_set.begin(), inserted_id_set.end());
+
+  // Take the address of the newly emplaced set to use in
+  // _elemset_codes, avoid duplicating std::set storage
+  auto [it2, inserted2] = _elemset_codes.emplace(code, &inserted_id_set);
+
+  // Throw an error if this code already exists with a pointer to a
+  // different set of ids.
+  libmesh_error_msg_if(!inserted2 && it2->second != &inserted_id_set,
                        "The elemset code " << code << " already exists with a different id_set.");
-
-  // Keep track of all elemset ids ever added for O(1) n_elemsets() behavior
-  _all_elemset_ids.insert(id_set.begin(), id_set.end());
-
-  _elemset_codes_inverse_map.emplace(std::move(id_set), code); // steal id_set
 }
 
 
@@ -252,7 +262,7 @@ void MeshBase::get_elemsets(dof_id_type elemset_code, MeshBase::elemset_type & i
 
   auto it = _elemset_codes.find(elemset_code);
   if (it != _elemset_codes.end())
-    id_set_to_fill = it->second;
+    id_set_to_fill.insert(it->second->begin(), it->second->end());
 }
 
 dof_id_type MeshBase::get_elemset_code(const MeshBase::elemset_type & id_set) const
@@ -798,7 +808,7 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
       for (const auto & [set_code, id_set] : _elemset_codes)
         {
           oss << set_code << ": ";
-          for (const auto & id : id_set)
+          for (const auto & id : *id_set)
             oss << id << " ";
           oss << "\n";
         }

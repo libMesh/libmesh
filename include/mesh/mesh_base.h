@@ -273,8 +273,24 @@ public:
 
   /**
    * Tabulate a user-defined "code" for elements which belong to the element sets
-   * specified in \p id_set. Also sets up the inverse mapping, so that if one knows
-   * all the element sets an Elem belongs to, one can look up the corresponding code.
+   * specified in \p id_set. For example, suppose that we have two elemsets A and
+   * B with the following Elem ids:
+   * Elemset A = {1, 3}
+   * Elemset B = {2, 3}
+   *
+   * This implies the following mapping from elem id to elemset id:
+   * Elem 1 -> {A}
+   * Elem 2 -> {B}
+   * Elem 3 -> {A,B}
+   *
+   * In this case, we would need to tabulate three different elemset codes, e.g.:
+   * 0 -> {A}
+   * 1 -> {B}
+   * 2 -> {A,B}
+   *
+   * Also sets up the inverse mapping, so that if one knows all the
+   * element sets an Elem belongs to, one can look up the
+   * corresponding elemset code.
    */
   void add_elemset_code(dof_id_type code, MeshBase::elemset_type id_set);
 
@@ -1998,7 +2014,7 @@ protected:
    * 4.) We also keep a list of all the elemset ids which have been added in
    * order to support O(1) performance behavior in n_elemsets() calls.
    */
-  std::map<dof_id_type, MeshBase::elemset_type> _elemset_codes;
+  std::map<dof_id_type, const MeshBase::elemset_type *> _elemset_codes;
   std::map<MeshBase::elemset_type, dof_id_type> _elemset_codes_inverse_map;
   MeshBase::elemset_type _all_elemset_ids;
 
