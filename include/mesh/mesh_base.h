@@ -264,6 +264,53 @@ public:
   void set_elem_dimensions(std::set<unsigned char> elem_dims);
 
   /**
+   * Typedef for the "set" container used to store elemset ids. The
+   * main requirements are that the entries be sorted and unique, so
+   * std::set works for this, but there may be more efficient
+   * alternatives.
+   */
+  typedef std::set<elemset_id_type> elemset_type;
+
+  /**
+   * Tabulate a user-defined "code" for elements which belong to the element sets
+   * specified in \p id_set. For example, suppose that we have two elemsets A and
+   * B with the following Elem ids:
+   * Elemset A = {1, 3}
+   * Elemset B = {2, 3}
+   *
+   * This implies the following mapping from elem id to elemset id:
+   * Elem 1 -> {A}
+   * Elem 2 -> {B}
+   * Elem 3 -> {A,B}
+   *
+   * In this case, we would need to tabulate three different elemset codes, e.g.:
+   * 0 -> {A}
+   * 1 -> {B}
+   * 2 -> {A,B}
+   *
+   * Also sets up the inverse mapping, so that if one knows all the
+   * element sets an Elem belongs to, one can look up the
+   * corresponding elemset code.
+   */
+  void add_elemset_code(dof_id_type code, MeshBase::elemset_type id_set);
+
+  /**
+   * Determines the number of unique elemset ids which have been added
+   * via add_elemset_code() calls by looping over the
+   * _elemset_codes_inverse_map and counting them.
+   */
+  unsigned int n_elemsets() const;
+
+  /**
+   * Look up the element sets for a given elemset code and
+   * vice-versa. The elemset must have been previously stored by
+   * calling add_elemset_code(). If no such code/set is found, returns
+   * the empty set or DofObject::invalid_id, respectively.
+   */
+  void get_elemsets(dof_id_type elemset_code, MeshBase::elemset_type & id_set_to_fill) const;
+  dof_id_type get_elemset_code(const MeshBase::elemset_type & id_set) const;
+
+  /**
    * \returns The "spatial dimension" of the mesh.
    *
    * The spatial dimension is defined as:
@@ -1944,6 +1991,32 @@ protected:
    * We cache the subdomain ids of the elements present in the mesh.
    */
   std::set<subdomain_id_type> _mesh_subdomains;
+
+  /**
+   * Map from "element set code" to list of set ids to which that element
+   * belongs (and vice-versa). Remarks:
+   * 1.) The elemset code is a dof_id_type because (if used) it is
+   * stored as an extra_integer (named "elemset_code") on all elements,
+   * and extra_integers are of type dof_id_type. Elements which do not
+   * belong to any set should be assigned an elemset code of DofObject::invalid_id.
+   * 2.) Element sets can be thought of as a generalization of the concept
+   * of a subdomain. Subdomains have the following restrictions:
+   *   a.) A given element can only belong to a single subdomain
+   *   b.) When using Exodus file input/output, subdomains are (unfortunately)
+   *   tied to the concept of exodus element blocks, which consist of a single
+   *   geometric element type, somewhat limiting their generality.
+   * 3.) The user is responsible for filling in the values of this map
+   * in a consistent manner, unless the elemsets are read in from an
+   * Exodus file, in which case the elemset codes will be set up
+   * automatically. The codes can basically be chosen arbitrarily,
+   * with the one requirement that elements which belong to no sets
+   * should have a set code of DofObject::invalid_id.
+   * 4.) We also keep a list of all the elemset ids which have been added in
+   * order to support O(1) performance behavior in n_elemsets() calls.
+   */
+  std::map<dof_id_type, const MeshBase::elemset_type *> _elemset_codes;
+  std::map<MeshBase::elemset_type, dof_id_type> _elemset_codes_inverse_map;
+  MeshBase::elemset_type _all_elemset_ids;
 
   /**
    * The "spatial dimension" of the Mesh.  See the documentation for

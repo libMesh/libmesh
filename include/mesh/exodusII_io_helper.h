@@ -240,10 +240,22 @@ public:
   void read_nodeset_info();
 
   /**
+   * Reads information about all of the elemsets in the \p ExodusII
+   * mesh file.
+   */
+  void read_elemset_info();
+
+  /**
    * Reads information about sideset \p id and inserts it into the
    * global sideset array at the position \p offset.
    */
   void read_sideset(int id, int offset);
+
+  /**
+   * Reads information about elemset \p id and inserts it into the
+   * global elemset array at the position \p offset.
+   */
+  void read_elemset(int id, int offset);
 
   /**
    * New API that reads all nodesets simultaneously. This may be slightly
@@ -333,6 +345,11 @@ public:
    * Writes the time for the timestep
    */
   void write_timestep(int timestep, Real time);
+
+  /**
+   * Write elemsets stored on the Mesh to the exo file.
+   */
+  void write_elemsets(const MeshBase & mesh);
 
   /**
    * Write sideset data for the requested timestep.
@@ -594,8 +611,11 @@ public:
   // Total number of node sets
   int & num_node_sets;
 
-  // Total number of element sets
+  // Total number of side sets
   int & num_side_sets;
+
+  // Total number of element sets
+  int & num_elem_sets;
 
   // Number of global variables
   int num_global_vars;
@@ -618,6 +638,9 @@ public:
   // Total number of elements in all side sets
   int num_elem_all_sidesets;
 
+  // Total number of elements in all elem sets
+  int num_elem_all_elemsets;
+
   // Vector of element block identification numbers
   std::vector<int> block_ids;
 
@@ -633,17 +656,26 @@ public:
   // Vector of the nodeset IDs
   std::vector<int> nodeset_ids;
 
-  // Number of sides (edges/faces) in current set
+  // Vector of the elemset IDs
+  std::vector<int> elemset_ids;
+
+  // Number of sides in each sideset
   std::vector<int> num_sides_per_set;
 
-  // Number of nodes in current set
+  // Number of nodes in each nodeset
   std::vector<int> num_nodes_per_set;
 
-  // Number of distribution factors per set
+  // Number of elems in each elemset
+  std::vector<int> num_elems_per_set;
+
+  // Number of distribution factors per sideset
   std::vector<int> num_df_per_set;
 
-  // Number of distribution factors per set
+  // Number of distribution factors per nodeset
   std::vector<int> num_node_df_per_set;
+
+  // Number of distribution factors per elemset
+  std::vector<int> num_elem_df_per_set;
 
   // Starting indices for each nodeset in the node_sets_node_list vector.
   // Used in the calls to ex_{put,get}_concat_node_sets().
@@ -669,6 +701,12 @@ public:
 
   // Side (face/edge) id number
   std::vector<int> id_list;
+
+  // List of element numbers in all elemsets
+  std::vector<int> elemset_list;
+
+  // List of elemset ids for all elements in elemsets
+  std::vector<int> elemset_id_list;
 
   // Optional mapping from internal [0,num_nodes) to arbitrary indices
   std::vector<int> node_num_map;

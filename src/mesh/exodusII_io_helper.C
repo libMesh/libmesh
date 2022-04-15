@@ -157,12 +157,14 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   num_edge_blk(header_info.num_edge_blk),
   num_node_sets(header_info.num_node_sets),
   num_side_sets(header_info.num_side_sets),
+  num_elem_sets(header_info.num_elem_sets),
   num_global_vars(0),
   num_sideset_vars(0),
   num_elem_this_blk(0),
   num_nodes_per_elem(0),
   num_attr(0),
   num_elem_all_sidesets(0),
+  num_elem_all_elemsets(0),
   bex_num_elem_cvs(0),
   num_time_steps(0),
   num_nodal_vars(0),
@@ -677,6 +679,7 @@ ExodusII_IO_Helper::read_header() const
   h.num_elem_blk = params.num_elem_blk;
   h.num_node_sets = params.num_node_sets;
   h.num_side_sets = params.num_side_sets;
+  h.num_elem_sets = params.num_elem_sets;
   h.num_edge_blk = params.num_edge_blk;
   h.num_edge = params.num_edge;
 
@@ -773,7 +776,8 @@ void ExodusII_IO_Helper::print_header()
                  << "Number of elements: \t" << num_elem << std::endl
                  << "Number of elt blocks: \t" << num_elem_blk << std::endl
                  << "Number of node sets: \t" << num_node_sets << std::endl
-                 << "Number of side sets: \t" << num_side_sets << std::endl;
+                 << "Number of side sets: \t" << num_side_sets << std::endl
+                 << "Number of elem sets: \t" << num_elem_sets << std::endl;
 }
 
 
@@ -1447,7 +1451,7 @@ void ExodusII_IO_Helper::read_nodeset_info()
       EX_CHECK_ERR(ex_err, "Error retrieving nodeset information.");
       message("All nodeset information retrieved successfully.");
 
-      // Resize appropriate data structures -- only do this once outnode the loop
+      // Resize appropriate data structures -- only do this once outside the loop
       num_nodes_per_set.resize(num_node_sets);
       num_node_df_per_set.resize(num_node_sets);
     }
@@ -1461,6 +1465,46 @@ void ExodusII_IO_Helper::read_nodeset_info()
       id_to_ns_names[nodeset_ids[i]] = name_buffer;
     }
   message("All node set names retrieved successfully.");
+}
+
+
+
+void ExodusII_IO_Helper::read_elemset_info()
+{
+  elemset_ids.resize(num_elem_sets);
+  if (num_elem_sets > 0)
+    {
+      ex_err = exII::ex_get_ids(ex_id,
+                                exII::EX_ELEM_SET,
+                                elemset_ids.data());
+      EX_CHECK_ERR(ex_err, "Error retrieving elemset information.");
+      message("All elemset information retrieved successfully.");
+
+      // Resize appropriate data structures -- only do this once outside the loop
+      num_elems_per_set.resize(num_elem_sets);
+      num_elem_df_per_set.resize(num_elem_sets);
+
+      // Inquire about the length of the concatenated elemset list
+      num_elem_all_elemsets =
+        inquire(*this, exII::EX_INQ_ELS_LEN,
+                "Error retrieving length of the concatenated elem sets element list!");
+
+      elemset_list.resize(num_elem_all_elemsets);
+      elemset_id_list.resize(num_elem_all_elemsets);
+
+      // Debugging
+      // libMesh::out << "num_elem_all_elemsets = " << num_elem_all_elemsets << std::endl;
+    }
+
+  char name_buffer[MAX_STR_LENGTH+1];
+  for (int i=0; i<num_elem_sets; ++i)
+    {
+      ex_err = exII::ex_get_name(ex_id, exII::EX_ELEM_SET,
+                                 elemset_ids[i], name_buffer);
+      EX_CHECK_ERR(ex_err, "Error getting node set name.");
+      id_to_ns_names[elemset_ids[i]] = name_buffer;
+    }
+  message("All elem set names retrieved successfully.");
 }
 
 
@@ -1505,6 +1549,49 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
 
       for (int i=0; i<num_sides_per_set[id]; i++)
         id_list[i+offset] = ss_ids[id];
+    }
+}
+
+
+
+void ExodusII_IO_Helper::read_elemset(int id, int offset)
+{
+  libmesh_assert_less (id, elemset_ids.size());
+  libmesh_assert_less (id, num_elems_per_set.size());
+  libmesh_assert_less (id, num_elem_df_per_set.size());
+  libmesh_assert_less_equal (offset, elemset_list.size());
+
+  ex_err = exII::ex_get_set_param(ex_id,
+                                  exII::EX_ELEM_SET,
+                                  elemset_ids[id],
+                                  &num_elems_per_set[id],
+                                  &num_elem_df_per_set[id]);
+  EX_CHECK_ERR(ex_err, "Error retrieving elemset parameters.");
+  message("Parameters retrieved successfully for elemset: ", id);
+
+
+  // It's OK for offset==elemset_list.size() as long as num_elems_per_set[id]==0
+  // because in that case we don't actually read anything...
+  #ifdef DEBUG
+  if (static_cast<unsigned int>(offset) == elemset_list.size())
+    libmesh_assert_equal_to (num_elems_per_set[id], 0);
+  #endif
+
+  // Don't call ex_get_set() unless there are actually elems there to get.
+  // Exodus prints an annoying warning in DEBUG mode otherwise...
+  if (num_elems_per_set[id] > 0)
+    {
+      ex_err = exII::ex_get_set(ex_id,
+                                exII::EX_ELEM_SET,
+                                elemset_ids[id],
+                                &elemset_list[offset],
+                                /*set_extra_list=*/nullptr);
+      EX_CHECK_ERR(ex_err, "Error retrieving elemset data.");
+      message("Data retrieved successfully for elemset: ", id);
+
+      // Create vector containing elemset ids for each element in the set
+      for (int i=0; i<num_elems_per_set[id]; i++)
+        elemset_id_list[i+offset] = elemset_ids[id];
     }
 }
 
@@ -2080,6 +2167,21 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   // we have.
   num_edge_blk = bi.get_edge_boundary_ids().size();
 
+  // Check whether the Mesh Elems have an extra_integer called "elemset_code".
+  // If so, this means that the mesh defines elemsets via the
+  // extra_integers capability of Elems.
+  if (mesh.has_elem_integer("elemset_code"))
+    {
+      // unsigned int elemset_index =
+      //   mesh.get_elem_integer_index("elemset_code");
+
+      // Debugging
+      // libMesh::out << "Mesh defines an elemset_code at index " << elemset_index << std::endl;
+
+      // Store the number of elemsets in the exo file header.
+      num_elem_sets = mesh.n_elemsets();
+    }
+
   // Build an ex_init_params() structure that is to be passed to the
   // newer ex_put_init_ext() API. The new API will eventually allow us
   // to store edge and face data in the Exodus file.
@@ -2099,6 +2201,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   params.num_elem_blk = num_elem_blk;
   params.num_node_sets = num_node_sets;
   params.num_side_sets = num_side_sets;
+  params.num_elem_sets = num_elem_sets;
   params.num_edge_blk = num_edge_blk;
   params.num_edge = num_edge;
 
@@ -2982,6 +3085,91 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
   EX_CHECK_ERR(ex_err, "Error writing timestep.");
 
   this->update();
+}
+
+
+
+void
+ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
+{
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
+    return;
+
+  // TODO: Add support for named elemsets
+  // NamesData names_table(elemsets.size(), MAX_STR_LENGTH);
+
+  // We only need to write elemsets if the Mesh has an extra elem
+  // integer called "elemset_code" defined on it.
+  if (mesh.has_elem_integer("elemset_code"))
+    {
+      std::map<elemset_id_type, std::vector<int>> exodus_elemsets;
+
+      unsigned int elemset_index =
+        mesh.get_elem_integer_index("elemset_code");
+
+      // Catch ids returned from MeshBase::get_elemsets() calls
+      MeshBase::elemset_type set_ids;
+      for (const auto & elem : mesh.element_ptr_range())
+        {
+          dof_id_type elemset_code =
+            elem->get_extra_integer(elemset_index);
+
+          // Look up which element set ids (if any) this elemset_code corresponds to.
+          mesh.get_elemsets(elemset_code, set_ids);
+
+          // Debugging
+          // libMesh::out << "elemset_code = " << elemset_code << std::endl;
+          // for (const auto & set_id : set_ids)
+          //   libMesh::out << set_id << " ";
+          // libMesh::out << std::endl;
+
+          // Store this Elem id in every set to which it belongs.
+          for (const auto & set_id : set_ids)
+            exodus_elemsets[set_id].push_back(libmesh_elem_num_to_exodus[elem->id()]);
+        }
+
+      // Debugging: print contents of exodus_elemsets map
+      // for (const auto & [set_id, elem_ids] : exodus_elemsets)
+      //   {
+      //     libMesh::out << "elemset " << set_id << ": ";
+      //     for (const auto & elem_id : elem_ids)
+      //       libMesh::out << elem_id << " ";
+      //     libMesh::out << std::endl;
+      //   }
+
+      // Only continue if we actually had some elements in sets
+      if (!exodus_elemsets.empty())
+        {
+          // Reserve space, loop over newly-created map, construct
+          // exII::ex_set objects to be passed to exII::ex_put_sets(). Note:
+          // we do non-const iteration since Exodus requires non-const pointers
+          // to be passed to its APIs.
+          std::vector<exII::ex_set> sets;
+          sets.reserve(exodus_elemsets.size());
+
+          for (auto & [elem_set_id, ids_vec] : exodus_elemsets)
+            {
+              // TODO: Add support for named sidesets
+              // names_table.push_back_entry(mesh.get_boundary_info().get_sideset_name(ss_id));
+
+              exII::ex_set & current_set = sets.emplace_back();
+              current_set.id = elem_set_id;
+              current_set.type = exII::EX_ELEM_SET;
+              current_set.num_entry = ids_vec.size();
+              current_set.num_distribution_factor = 0;
+              current_set.entry_list = ids_vec.data();
+              current_set.extra_list = nullptr; // extra_list is used for sidesets, not needed for elemsets
+              current_set.distribution_factor_list = nullptr; // not used for elemsets
+            }
+
+          ex_err = exII::ex_put_sets(ex_id, exodus_elemsets.size(), sets.data());
+          EX_CHECK_ERR(ex_err, "Error writing elemsets");
+
+          // TODO: Add support for named sidesets
+          // ex_err = exII::ex_put_names(ex_id, exII::EX_ELEM_SET, names_table.get_char_star_star());
+          // EX_CHECK_ERR(ex_err, "Error writing elemset names");
+        } // end if (!exodus_elemsets.empty())
+    } // end if (mesh.has_elem_integer("elemset_code"))
 }
 
 

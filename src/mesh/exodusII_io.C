@@ -673,6 +673,90 @@ void ExodusII_IO::read (const std::string & fname)
       } // end for (elem_list)
   } // end read sideset info
 
+  // Read in elemset information and apply to Mesh elements if present
+  {
+    exio_helper->read_elemset_info();
+
+    // Mimic behavior of sideset case where we store all the set
+    // information in a single array with offsets.
+    int offset=0;
+    for (int i=0; i<exio_helper->num_elem_sets; i++)
+      {
+        // Compute new offset
+        offset += (i > 0 ? exio_helper->num_elems_per_set[i-1] : 0);
+        exio_helper->read_elemset (i, offset);
+
+        // TODO: add support for elemset names
+        // std::string elemset_name = exio_helper->get_elem_set_name(i);
+        // if (!elemset_name.empty())
+        //   mesh.get_boundary_info().elemset_name(cast_int<boundary_id_type>(exio_helper->get_elem_set_id(i))) = elemset_name;
+      }
+
+    // Debugging: print the concatenated list of elemset ids
+    // libMesh::out << "Concatenated list of elemset Elem ids (Exodus numbering):" << std::endl;
+    // for (const auto & id : exio_helper->elemset_list)
+    //   libMesh::out << id << " ";
+    // libMesh::out << std::endl;
+
+    // Next we need to assign the elemset ids to the mesh using the
+    // Elem's "extra_integers" support, if we have any.
+    if (exio_helper->num_elem_all_elemsets)
+      {
+        // Build map from Elem -> {elemsets}. This is needed only
+        // temporarily to determine a unique set of elemset codes.
+        std::map<Elem *, MeshBase::elemset_type> elem_to_elemsets;
+        for (auto e : index_range(exio_helper->elemset_list))
+          {
+            // Follow standard (see sideset case above) approach for
+            // converting the ids stored in the elemset_list to
+            // libmesh Elem ids.
+            //
+            // TODO: this should be moved to a helper function so we
+            // don't duplicate the code.
+            dof_id_type libmesh_elem_id =
+              cast_int<dof_id_type>(exio_helper->elem_num_map[exio_helper->elemset_list[e] - 1] - 1);
+
+            // Get a pointer to this Elem
+            Elem * elem = mesh.elem_ptr(libmesh_elem_id);
+
+            // Debugging:
+            // libMesh::out << "Elem " << elem->id() << " is in elemset " << exio_helper->elemset_id_list[e] << std::endl;
+
+            // Store elemset id in the map
+            elem_to_elemsets[elem].insert(exio_helper->elemset_id_list[e]);
+          }
+
+        // Create a set of unique elemsets
+        std::set<MeshBase::elemset_type> unique_elemsets;
+        for (const auto & pr : elem_to_elemsets)
+          unique_elemsets.insert(pr.second);
+
+        // Debugging: print the unique elemsets
+        // libMesh::out << "The set of unique elemsets which exist on the Mesh:" << std::endl;
+        // for (const auto & s : unique_elemsets)
+        //   {
+        //     for (const auto & elemset_id : s)
+        //       libMesh::out << elemset_id << " ";
+        //     libMesh::out << std::endl;
+        //   }
+
+        // Enumerate the unique_elemsets and tell the mesh about them
+        dof_id_type code = 0;
+        for (const auto & s : unique_elemsets)
+          mesh.add_elemset_code(code++, s);
+
+        // Create storage for the extra integer on all Elems. Elems which
+        // are not in any set will use the default value of DofObject::invalid_id
+        unsigned int elemset_index =
+          mesh.add_elem_integer("elemset_code",
+                                /*allocate_data=*/true);
+
+        // Store the appropriate extra_integer value on all Elems that need it.
+        for (const auto & [elem, s] : elem_to_elemsets)
+          elem->set_extra_integer(elemset_index, mesh.get_elemset_code(s));
+      }
+  } // done reading elemset info
+
   // Read nodeset info
   {
     // This fills in the following fields of the helper for later use:
@@ -1811,6 +1895,15 @@ void ExodusII_IO::write_timestep (const std::string & fname,
 }
 
 
+void ExodusII_IO::write_elemsets()
+{
+  libmesh_error_msg_if(!exio_helper->opened_for_writing,
+                       "ERROR, ExodusII file must be opened for writing "
+                       "before calling ExodusII_IO::write_elemsets()!");
+
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  exio_helper->write_elemsets(mesh);
+}
 
 void
 ExodusII_IO::
@@ -2270,6 +2363,11 @@ void ExodusII_IO::write_timestep (const std::string &,
 }
 
 
+
+void ExodusII_IO::write_elemsets(const std::map<boundary_id_type, std::vector<dof_id_type>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
 
 void
 ExodusII_IO::

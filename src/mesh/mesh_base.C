@@ -104,6 +104,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _skip_find_neighbors(other_mesh._skip_find_neighbors),
   _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
   _elem_dims(other_mesh._elem_dims),
+  _elemset_codes_inverse_map(other_mesh._elemset_codes_inverse_map),
   _spatial_dimension(other_mesh._spatial_dimension),
   _default_ghosting(std::make_unique<GhostPointNeighbors>(*this)),
   _point_locator_close_to_point_tol(other_mesh._point_locator_close_to_point_tol)
@@ -141,6 +142,11 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 
   if (other_mesh._partitioner.get())
     _partitioner = other_mesh._partitioner->clone();
+
+  // _elemset_codes stores pointers to entries in _elemset_codes_inverse_map,
+  // so it is not possible to simply copy it directly from other_mesh
+  for (const auto & [set, code] : _elemset_codes_inverse_map)
+    _elemset_codes.emplace(code, &set);
 }
 
 MeshBase& MeshBase::operator= (MeshBase && other_mesh)
@@ -164,6 +170,8 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _allow_remote_element_removal = other_mesh.allow_remote_element_removal();
   _block_id_to_name = std::move(other_mesh._block_id_to_name);
   _elem_dims = std::move(other_mesh.elem_dimensions());
+  _elemset_codes = std::move(other_mesh._elemset_codes);
+  _elemset_codes_inverse_map = std::move(other_mesh._elemset_codes_inverse_map);
   _spatial_dimension = other_mesh.spatial_dimension();
   _elem_integer_names = std::move(other_mesh._elem_integer_names);
   _elem_integer_default_values = std::move(other_mesh._elem_integer_default_values);
@@ -175,6 +183,17 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   // do their portion of the move assignment later!
   boundary_info = std::move(other_mesh.boundary_info);
   boundary_info->set_mesh(*this);
+
+#ifdef DEBUG
+  // Make sure that move assignment worked for pointers
+  for (const auto & [set, code] : _elemset_codes_inverse_map)
+    {
+      auto it = _elemset_codes.find(code);
+      libmesh_assert_msg(it != _elemset_codes.end(),
+                         "Elemset code " << code << " not found in _elmset_codes container.");
+      libmesh_assert_equal_to(it->second, &set);
+    }
+#endif
 
   // We're *not* really done at this point, but we have the problem
   // that some of our data movement might be expecting subclasses data
@@ -217,6 +236,59 @@ void MeshBase::set_elem_dimensions(std::set<unsigned char> elem_dims)
 
   _elem_dims = std::move(elem_dims);
 }
+
+
+
+void MeshBase::add_elemset_code(dof_id_type code, MeshBase::elemset_type id_set)
+{
+  libmesh_experimental();
+
+  // Populate inverse map, stealing id_set's resources
+  auto [it1, inserted1] = _elemset_codes_inverse_map.emplace(std::move(id_set), code);
+
+  // Reference to the newly inserted (or previously existing) id_set
+  const auto & inserted_id_set = it1->first;
+
+  // Keep track of all elemset ids ever added for O(1) n_elemsets()
+  // performance. Only need to do this if we didn't know about this
+  // id_set before...
+  if (inserted1)
+    _all_elemset_ids.insert(inserted_id_set.begin(), inserted_id_set.end());
+
+  // Take the address of the newly emplaced set to use in
+  // _elemset_codes, avoid duplicating std::set storage
+  auto [it2, inserted2] = _elemset_codes.emplace(code, &inserted_id_set);
+
+  // Throw an error if this code already exists with a pointer to a
+  // different set of ids.
+  libmesh_error_msg_if(!inserted2 && it2->second != &inserted_id_set,
+                       "The elemset code " << code << " already exists with a different id_set.");
+}
+
+
+
+unsigned int MeshBase::n_elemsets() const
+{
+  return _all_elemset_ids.size();
+}
+
+void MeshBase::get_elemsets(dof_id_type elemset_code, MeshBase::elemset_type & id_set_to_fill) const
+{
+  // If we don't recognize this elemset_code, hand back an empty set
+  id_set_to_fill.clear();
+
+  auto it = _elemset_codes.find(elemset_code);
+  if (it != _elemset_codes.end())
+    id_set_to_fill.insert(it->second->begin(), it->second->end());
+}
+
+dof_id_type MeshBase::get_elemset_code(const MeshBase::elemset_type & id_set) const
+{
+  auto it = _elemset_codes_inverse_map.find(id_set);
+  return (it == _elemset_codes_inverse_map.end()) ? DofObject::invalid_id : it->second;
+}
+
+
 
 unsigned int MeshBase::spatial_dimension () const
 {
@@ -594,6 +666,9 @@ void MeshBase::clear ()
   // Clear element dimensions
   _elem_dims.clear();
 
+  _elemset_codes.clear();
+  _elemset_codes_inverse_map.clear();
+
   _constraint_rows.clear();
 
   // Clear our point locator.
@@ -738,6 +813,22 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
                 --_elem_dims.end(), // --end() is valid if the set is non-empty
                 std::ostream_iterator<unsigned int>(oss, ", "));
       oss << cast_int<unsigned int>(*_elem_dims.rbegin());
+      oss << "}\n";
+    }
+
+  if (!_elemset_codes.empty())
+    {
+      // We don't print the inverse map since that is maintained as an
+      // internal implementation detail for fast lookups and is not
+      // really user-facing information.
+      oss << "  elemset_codes()={";
+      for (const auto & [set_code, id_set] : _elemset_codes)
+        {
+          oss << set_code << ": ";
+          for (const auto & id : *id_set)
+            oss << id << " ";
+          oss << "\n";
+        }
       oss << "}\n";
     }
 
