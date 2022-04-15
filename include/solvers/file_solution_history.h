@@ -81,9 +81,11 @@ private:
   DifferentiableSystem & _system ;
 
   /**
-   * A vector of pointers to vectors holding the adjoint solution at the last time step
+   * A vector of pointers to adjoint and old adjoint solutions at the last time step.
+   * These are used to prevent the zeroing of the adjoint and old adjoint by es::read.
    */
   std::vector< std::unique_ptr<NumericVector<Number>> > dual_solution_copies;
+  std::vector< std::unique_ptr<NumericVector<Number>> > old_dual_solution_copies;
 };
 
 } // end namespace libMesh

@@ -37,6 +37,7 @@ namespace libMesh
   : SolutionHistory(), _system(system_)
   {
     dual_solution_copies.resize(system_.n_qois());
+    old_dual_solution_copies.resize(system_.n_qois());
 
     libmesh_experimental();
 
@@ -164,19 +165,27 @@ void FileSolutionHistory::retrieve(bool is_adjoint_solve, Real time)
   if(is_adjoint_solve)
   {
     // Reading in the primal xdas overwrites the adjoint solution with zero
-    // So swap to retain the old adjoint solution
+    // So swap to retain the adjoint and old adjoint vectors
     for (auto j : make_range(_system.n_qois()))
     {
       dual_solution_copies[j] = _system.get_adjoint_solution(j).clone();
+
+      std::string old_adjoint_solution_name = "_old_adjoint_solution";
+      old_adjoint_solution_name+= std::to_string(j);
+      old_dual_solution_copies[j] = _system.get_vector(old_adjoint_solution_name).clone();
     }
 
     // Read in the primal solution stored at the current recovery time from the disk
     (stored_datum->second)->retrieve_primal_solution();
 
-    // Swap back the copy of the last adjoint solution back in place
+    // Swap back the copy of adjoint and old adjoint vectors back in place
     for (auto j : make_range(_system.n_qois()))
     {
       (_system.get_adjoint_solution(j)).swap(*dual_solution_copies[j]);
+
+      std::string old_adjoint_solution_name = "_old_adjoint_solution";
+      old_adjoint_solution_name+= std::to_string(j);
+      (_system.get_vector(old_adjoint_solution_name)).swap(*old_dual_solution_copies[j]);
     }
   }
   else
