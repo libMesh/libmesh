@@ -226,6 +226,8 @@ void MeshBase::set_elem_dimensions(const std::set<unsigned char> & elem_dims)
 
 void MeshBase::add_elemset_code(dof_id_type code, MeshBase::elemset_type id_set)
 {
+  libmesh_experimental();
+
   // Populate inverse map, stealing id_set's resources
   auto [it1, inserted1] = _elemset_codes_inverse_map.emplace(std::move(id_set), code);
 
