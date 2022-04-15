@@ -1196,24 +1196,27 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
   if (is_bezier)
     {
       // We'd better have the number of cvs we expect
-      bex_num_elem_cvs = num_node_data_per_elem - num_nodes_per_elem;
+      if( num_node_data_per_elem > num_nodes_per_elem )
+        bex_num_elem_cvs = num_node_data_per_elem / 2;
+      else
+        bex_num_elem_cvs = num_nodes_per_elem;
       libmesh_assert_greater_equal(bex_num_elem_cvs, 0);
 
       // The old connect vector is currently a mix of the expected
       // connectivity and any Bezier extraction connectivity;
       // disentangle that, if necessary.
       bex_cv_conn.resize(num_elem_this_blk);
-      if (bex_num_elem_cvs)
+      if (num_node_data_per_elem > num_nodes_per_elem)
         {
-          std::vector<int> old_connect(num_nodes_per_elem * num_elem_this_blk);
+          std::vector<int> old_connect(bex_num_elem_cvs * num_elem_this_blk);
           old_connect.swap(connect);
           auto src = old_connect.data();
           auto dst = connect.data();
           for (auto e : IntRange<std::size_t>(0, num_elem_this_blk))
             {
-              std::copy(src, src + num_nodes_per_elem, dst);
-              src += num_nodes_per_elem;
-              dst += num_nodes_per_elem;
+              std::copy(src, src + bex_num_elem_cvs, dst);
+              src += bex_num_elem_cvs;
+              dst += bex_num_elem_cvs;
 
               bex_cv_conn[e].resize(bex_num_elem_cvs);
               std::copy(src, src + bex_num_elem_cvs,
