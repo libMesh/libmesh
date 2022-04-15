@@ -224,14 +224,15 @@ void MeshBase::set_elem_dimensions(const std::set<unsigned char> & elem_dims)
 
 
 
-void MeshBase::add_elemset_code(dof_id_type code, const MeshBase::elemset_type & id_set)
+void MeshBase::add_elemset_code(dof_id_type code, MeshBase::elemset_type id_set)
 {
   // TODO: Throw an error if this code exists with a different set of ids
-  _elemset_codes.emplace(code, id_set);
-  _elemset_codes_inverse_map.emplace(id_set, code);
+  _elemset_codes.emplace(code, id_set); // copy id_set
 
   // Keep track of all elemset ids ever added for O(1) n_elemsets() behavior
   _all_elemset_ids.insert(id_set.begin(), id_set.end());
+
+  _elemset_codes_inverse_map.emplace(std::move(id_set), code); // steal id_set
 }
 
 

@@ -276,7 +276,7 @@ public:
    * specified in \p id_set. Also sets up the inverse mapping, so that if one knows
    * all the element sets an Elem belongs to, one can look up the corresponding code.
    */
-  void add_elemset_code(dof_id_type code, const MeshBase::elemset_type & id_set);
+  void add_elemset_code(dof_id_type code, MeshBase::elemset_type id_set);
 
   /**
    * Determines the number of unique elemset ids which have been added
