@@ -184,6 +184,17 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   boundary_info = std::move(other_mesh.boundary_info);
   boundary_info->set_mesh(*this);
 
+#ifdef DEBUG
+  // Make sure that move assignment worked for pointers
+  for (const auto & [set, code] : _elemset_codes_inverse_map)
+    {
+      auto it = _elemset_codes.find(code);
+      libmesh_assert_msg(it != _elemset_codes.end(),
+                         "Elemset code " << code << " not found in _elmset_codes container.");
+      libmesh_assert_equal_to(it->second, &set);
+    }
+#endif
+
   // We're *not* really done at this point, but we have the problem
   // that some of our data movement might be expecting subclasses data
   // movement to happen first.  We'll let subclasses handle that by
