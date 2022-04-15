@@ -104,7 +104,6 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _skip_find_neighbors(other_mesh._skip_find_neighbors),
   _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
   _elem_dims(other_mesh._elem_dims),
-  _elemset_codes(other_mesh._elemset_codes),
   _elemset_codes_inverse_map(other_mesh._elemset_codes_inverse_map),
   _spatial_dimension(other_mesh._spatial_dimension),
   _default_ghosting(std::make_unique<GhostPointNeighbors>(*this)),
@@ -143,6 +142,11 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 
   if (other_mesh._partitioner.get())
     _partitioner = other_mesh._partitioner->clone();
+
+  // _elemset_codes stores pointers to entries in _elemset_codes_inverse_map,
+  // so it is not possible to simply copy it directly from other_mesh
+  for (const auto & [set, code] : _elemset_codes_inverse_map)
+    _elemset_codes.emplace(code, &set);
 }
 
 MeshBase& MeshBase::operator= (MeshBase && other_mesh)
