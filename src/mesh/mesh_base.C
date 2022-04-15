@@ -229,16 +229,16 @@ void MeshBase::add_elemset_code(dof_id_type code, const std::set<elemset_id_type
   // TODO: Throw an error if this code exists with a different set of ids
   _elemset_codes.emplace(code, id_set);
   _elemset_codes_inverse_map.emplace(id_set, code);
+
+  // Keep track of all elemset ids ever added for O(1) n_elemsets() behavior
+  _all_elemset_ids.insert(id_set.begin(), id_set.end());
 }
 
 
 
 unsigned int MeshBase::n_elemsets() const
 {
-  std::set<elemset_id_type> all_elemset_ids;
-  for (const auto & pr : _elemset_codes_inverse_map)
-    all_elemset_ids.insert(pr.first.begin(), pr.first.end());
-  return all_elemset_ids.size();
+  return _all_elemset_ids.size();
 }
 
 void MeshBase::get_elemsets(dof_id_type elemset_code, std::set<elemset_id_type> & id_set_to_fill) const

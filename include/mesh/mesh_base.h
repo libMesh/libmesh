@@ -1987,9 +1987,12 @@ protected:
    * automatically. The codes can basically be chosen arbitrarily,
    * with the one requirement that elements which belong to no sets
    * should have a set code of DofObject::invalid_id.
+   * 4.) We also keep a list of all the elemset ids which have been added in
+   * order to support O(1) performance behavior in n_elemsets() calls.
    */
   std::map<dof_id_type, std::set<elemset_id_type>> _elemset_codes;
   std::map<std::set<elemset_id_type>, dof_id_type> _elemset_codes_inverse_map;
+  std::set<elemset_id_type> _all_elemset_ids;
 
   /**
    * The "spatial dimension" of the Mesh.  See the documentation for
