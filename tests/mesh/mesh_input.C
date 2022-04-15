@@ -69,6 +69,7 @@ public:
 
   CPPUNIT_TEST( testExodusFileMappingsPlateWithHole);
   CPPUNIT_TEST( testExodusFileMappingsTwoBlocks);
+  CPPUNIT_TEST( testExodusFileMappingsTwoElemIGA);
   CPPUNIT_TEST( testExodusFileMappingsCyl3d);
 #endif // LIBMESH_HAVE_EXODUS_API
 
@@ -1070,6 +1071,15 @@ public:
     // Regression values for sin_x_plus_cos_y
                            {2.03496953073072, 1.97996853164955,
                             1.18462134113435, 1.03085301158959});
+  }
+  void testExodusFileMappingsTwoElemIGA()
+  {
+    LOG_UNIT_TEST;
+
+    testExodusFileMappings("meshes/two_element_iga_in.e",
+    // Regression values for sin_x_plus_cos_y
+                           {1.26865962862531, 1.42562070158386,
+                            1.54905363492342, 1.29782906548366});
   }
 
   void testExodusFileMappingsCyl3d ()

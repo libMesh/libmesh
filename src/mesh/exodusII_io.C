@@ -512,7 +512,7 @@ void ExodusII_IO::read (const std::string & fname)
                       const Real coef =
                         libmesh_vector_at(coef_vec, elem_node_index);
 
-                      const int gi = (elem_num)*exio_helper->num_nodes_per_elem +
+                      const int gi = (elem_num)*exio_helper->bex_num_elem_cvs +
                         spline_node_index;
                       const dof_id_type libmesh_node_id =
                         exio_helper->node_num_map[exio_helper->connect[gi] - 1] - 1;
@@ -536,7 +536,7 @@ void ExodusII_IO::read (const std::string & fname)
                            make_range(exio_helper->bex_num_elem_cvs))
                         {
                           // global => libMesh index, with crazy 1-based data - see comments above
-                          const int gi = (elem_num)*exio_helper->num_nodes_per_elem +
+                          const int gi = (elem_num)*exio_helper->bex_num_elem_cvs +
                             spline_node_index;
                           const dof_id_type libmesh_node_id =
                             exio_helper->node_num_map[exio_helper->connect[gi] - 1] - 1;
