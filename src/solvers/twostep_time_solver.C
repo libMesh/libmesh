@@ -298,6 +298,15 @@ std::pair<unsigned int, Real> TwostepTimeSolver::adjoint_solve (const QoISet & q
   // Take the first adjoint 'half timestep'
   core_time_solver->adjoint_solve(qoi_indices);
 
+  // We print the forward 'half solution' norms and we will do so for the adjoints if running in dbg.
+  #ifdef DEBUG
+    for(auto i : make_range(_system.n_qois()))
+    {
+      for(auto j : make_range(_system.n_vars()))
+        libMesh::out<<"||Z_"<<"("<<_system.time<<";"<<i<<","<<j<<")||_H1: "<<_system.calculate_norm(_system.get_adjoint_solution(i), j,H1)<<std::endl;
+    }
+  #endif
+
   // Record the sub step deltat we used for the last adjoint solve.
   last_deltat = _system.deltat;
 
