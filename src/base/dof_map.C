@@ -1455,7 +1455,7 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
 void
 DofMap::
 merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
-                            std::set<CouplingMatrix *> & temporary_coupling_matrices,
+                            CouplingMatricesSet & temporary_coupling_matrices,
                             const std::set<GhostingFunctor *>::iterator & gf_begin,
                             const std::set<GhostingFunctor *>::iterator & gf_end,
                             const MeshBase::const_element_iterator & elems_begin,
@@ -1473,6 +1473,7 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
         {
           GhostingFunctor::map_type::iterator existing_it =
             elements_to_ghost.find (elem);
+
           if (existing_it == elements_to_ghost.end())
             elements_to_ghost.emplace(elem, elem_cm);
           else
@@ -1485,15 +1486,20 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
                       // then we need to make one so we'll
                       // have a non-const matrix to merge
                       if (temporary_coupling_matrices.empty() ||
-                          temporary_coupling_matrices.find(const_cast<CouplingMatrix *>(existing_it->second)) == temporary_coupling_matrices.end())
+                          !temporary_coupling_matrices.count(existing_it->second))
                         {
-                          CouplingMatrix * cm = new CouplingMatrix(*existing_it->second);
-                          temporary_coupling_matrices.insert(cm);
-                          existing_it->second = cm;
+                          // Make copy. This just calls the
+                          // compiler-generated copy constructor
+                          // because the CouplingMatrix class does not
+                          // define a custom copy constructor.
+                          auto result_pr = temporary_coupling_matrices.insert(std::make_unique<CouplingMatrix>(*existing_it->second));
+                          existing_it->second = result_pr.first->get();
                         }
+
+                      // Merge elem_cm into existing CouplingMatrix
                       const_cast<CouplingMatrix &>(*existing_it->second) &= *elem_cm;
                     }
-                  else
+                  else // elem_cm == nullptr
                     {
                       // Any existing_it matrix merged with a full
                       // matrix (symbolized as nullptr) gives another
@@ -1503,13 +1509,9 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
                       // we don't need it anymore; we might as well
                       // remove it to keep the set of temporaries
                       // small.
-                      std::set<CouplingMatrix *>::iterator temp_it =
-                        temporary_coupling_matrices.find(const_cast<CouplingMatrix *>(existing_it->second));
+                      auto temp_it = temporary_coupling_matrices.find(existing_it->second);
                       if (temp_it != temporary_coupling_matrices.end())
-                      {
-                        delete *temp_it;
                         temporary_coupling_matrices.erase(temp_it);
-                      }
 
                       existing_it->second = nullptr;
                     }
@@ -1540,9 +1542,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
     = mesh.active_local_elements_end();
 
   GhostingFunctor::map_type elements_to_send;
-
-  // Man, I wish we had guaranteed unique_ptr availability...
-  std::set<CouplingMatrix *> temporary_coupling_matrices;
+  DofMap::CouplingMatricesSet temporary_coupling_matrices;
 
   // We need to add dofs to the send list if they've been directly
   // requested by an algebraic ghosting functor or they've been
@@ -1644,8 +1644,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
     }
 
   // We're now done with any merged coupling matrices we had to create.
-  for (auto & mat : temporary_coupling_matrices)
-    delete mat;
+  temporary_coupling_matrices.clear();
 
   //-------------------------------------------------------------------------
   // Our coupling functors added dofs from neighboring elements to the

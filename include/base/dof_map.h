@@ -32,6 +32,7 @@
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/point.h"
+#include "libmesh/utility.h"
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
 namespace libMesh
@@ -1595,9 +1596,10 @@ private:
    * A utility method for obtaining a set of elements to ghost along
    * with merged coupling matrices.
    */
+  typedef std::set<std::unique_ptr<CouplingMatrix>, Utility::CompareUnderlying<CouplingMatrix>> CouplingMatricesSet;
   static void
   merge_ghost_functor_outputs (GhostingFunctor::map_type & elements_to_ghost,
-                               std::set<CouplingMatrix *> & temporary_coupling_matrices,
+                               CouplingMatricesSet & temporary_coupling_matrices,
                                const std::set<GhostingFunctor *>::iterator & gf_begin,
                                const std::set<GhostingFunctor *>::iterator & gf_end,
                                const MeshBase::const_element_iterator & elems_begin,
