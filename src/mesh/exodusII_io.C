@@ -2357,7 +2357,7 @@ void ExodusII_IO::write_timestep (const std::string &,
 
 
 
-void ExodusII_IO::write_elemsets(const std::map<boundary_id_type, std::vector<dof_id_type>> &)
+void ExodusII_IO::write_elemsets()
 {
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
 }
