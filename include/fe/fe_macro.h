@@ -106,4 +106,20 @@
 
 #endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
+
+#define LIBMESH_FE_NODAL_SOLN_DIM(_fetype, _funcname, _dim)             \
+template <>                                                             \
+void FE<_dim,_fetype>::nodal_soln(const Elem * elem,                    \
+                                  const Order order,                    \
+                                  const std::vector<Number> & elem_soln,\
+                                  std::vector<Number> & nodal_soln)     \
+{ _funcname(elem, order, elem_soln, nodal_soln); }
+
+#define LIBMESH_FE_NODAL_SOLN(fetype, _funcname)                        \
+LIBMESH_FE_NODAL_SOLN_DIM(fetype, _funcname, 0)                         \
+LIBMESH_FE_NODAL_SOLN_DIM(fetype, _funcname, 1)                         \
+LIBMESH_FE_NODAL_SOLN_DIM(fetype, _funcname, 2)                         \
+LIBMESH_FE_NODAL_SOLN_DIM(fetype, _funcname, 3)
+
+
 #endif // LIBMESH_FE_MACRO_H

@@ -20,8 +20,9 @@
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
-#include "libmesh/fe_interface.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_macro.h"
 
 namespace libMesh
 {
@@ -346,39 +347,8 @@ void monomial_nodal_soln(const Elem * elem,
 } // anonymous namespace
 
 
-
-
-
-  // Do full-specialization for every dimension, instead
-  // of explicit instantiation at the end of this file.
-  // This could be macro-ified so that it fits on one line...
-template <>
-void FE<0,MONOMIAL>::nodal_soln(const Elem * elem,
-                                const Order order,
-                                const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
-{ monomial_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<1,MONOMIAL>::nodal_soln(const Elem * elem,
-                                const Order order,
-                                const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
-{ monomial_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<2,MONOMIAL>::nodal_soln(const Elem * elem,
-                                const Order order,
-                                const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
-{ monomial_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<3,MONOMIAL>::nodal_soln(const Elem * elem,
-                                const Order order,
-                                const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
-{ monomial_nodal_soln(elem, order, elem_soln, nodal_soln); }
+// Instantiate nodal_soln() function for every dimension
+LIBMESH_FE_NODAL_SOLN(MONOMIAL, monomial_nodal_soln)
 
 
 // Full specialization of n_dofs() function for every dimension

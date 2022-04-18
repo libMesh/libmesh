@@ -19,9 +19,10 @@
 
 // Local includes
 #include "libmesh/elem.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
-#include "libmesh/enum_to_string.h"
+#include "libmesh/fe_macro.h"
 
 namespace libMesh
 {
@@ -370,39 +371,8 @@ unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
 } // anonymous namespace
 
 
-
-
-  // Do full-specialization of nodal_soln() function for every
-  // dimension, instead of explicit instantiation at the end of this
-  // file.
-  // This could be macro-ified so that it fits on one line...
-template <>
-void FE<0,HIERARCHIC>::nodal_soln(const Elem * elem,
-                                  const Order order,
-                                  const std::vector<Number> & elem_soln,
-                                  std::vector<Number> & nodal_soln)
-{ hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<1,HIERARCHIC>::nodal_soln(const Elem * elem,
-                                  const Order order,
-                                  const std::vector<Number> & elem_soln,
-                                  std::vector<Number> & nodal_soln)
-{ hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<2,HIERARCHIC>::nodal_soln(const Elem * elem,
-                                  const Order order,
-                                  const std::vector<Number> & elem_soln,
-                                  std::vector<Number> & nodal_soln)
-{ hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<3,HIERARCHIC>::nodal_soln(const Elem * elem,
-                                  const Order order,
-                                  const std::vector<Number> & elem_soln,
-                                  std::vector<Number> & nodal_soln)
-{ hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln); }
+// Instantiate nodal_soln() function for every dimension
+LIBMESH_FE_NODAL_SOLN(HIERARCHIC, hierarchic_nodal_soln)
 
 
 // Full specialization of n_dofs() function for every dimension
