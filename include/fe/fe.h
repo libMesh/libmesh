@@ -684,6 +684,14 @@ protected:
     }
 
   /**
+   * A default implementation for side_nodal_soln
+   */
+  static void default_side_nodal_soln(const Elem * elem, const Order o,
+                                      const unsigned int side,
+                                      const std::vector<Number> & elem_soln,
+                                      std::vector<Number> & nodal_soln_on_side);
+
+  /**
    * An array of the node locations on the last
    * element we computed on
    */

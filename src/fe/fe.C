@@ -690,6 +690,27 @@ FE<Dim,T>::default_all_shape_derivs (const Elem * elem,
 }
 
 
+template <unsigned int Dim, FEFamily T>
+void
+FE<Dim,T>::default_side_nodal_soln(const Elem * elem, const Order o,
+                                   const unsigned int side,
+                                   const std::vector<Number> & elem_soln,
+                                   std::vector<Number> & nodal_soln_on_side)
+{
+  std::vector<Number> full_nodal_soln;
+  nodal_soln(elem, o, elem_soln, full_nodal_soln);
+  const std::vector<unsigned int> side_nodes =
+    elem->nodes_on_side(side);
+
+  std::size_t n_side_nodes = side_nodes.size();
+  nodal_soln_on_side.resize(n_side_nodes);
+  for (auto n : make_range(n_side_nodes))
+    nodal_soln_on_side[n] = full_nodal_soln[side_nodes[n]];
+}
+
+
+
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 template <unsigned int Dim, FEFamily T>
