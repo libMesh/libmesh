@@ -425,6 +425,20 @@ public:
                      std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals);
 
   /**
+   * Similar to read_elemset_data(), but instead of creating one
+   * std::map per nodeset per variable, creates a single map of
+   * (elem_id, elemset_id) pairs -> exo file array indices
+   * for any/all variables on that elemset (they are all the
+   * same). In cases where there are hundreds of elemset variables on
+   * a single elemset, it is more efficient to store the array indices
+   * in a quickly searchable data structure than to repeat the
+   * indexing once per variable as is done in the read_elemset_data()
+   * case.
+   */
+  void
+  get_elemset_data_indices (std::map<std::pair<dof_id_type, elemset_id_type>, unsigned int> & elemset_array_indices);
+
+  /**
    * Set the elemental variables in the Exodus file to be read into extra
    * element integers. The names of these elemental variables will be used to
    * name the extra element integers.

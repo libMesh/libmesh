@@ -223,6 +223,24 @@ public:
     CPPUNIT_ASSERT(read_in_elemset_ids == elemset_ids);
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), read_in_elemset_vals[/*var3 index=*/2].size());
     CPPUNIT_ASSERT(read_in_elemset_vals == elemset_vals);
+
+    // Also check that the flat indices match those in the file
+    std::map<std::pair<dof_id_type, elemset_id_type>, unsigned int> elemset_array_indices;
+    reader.get_elemset_data_indices(elemset_array_indices);
+
+    // Verify that we have the following (Exodus-based) elem ids in the following indices.
+    // These indices were copied from an ncdump of the exo file.
+    std::vector<dof_id_type> elem_els1 = {4, 9, 15, 25};
+    std::vector<dof_id_type> elem_els2 = {4, 10, 16, 25};
+
+    for (auto i : index_range(elem_els1))
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i),
+                           elemset_array_indices[std::make_pair(/*elem id=*/elem_els1[i] - 1, // convert to libmesh id
+                                                                /*set id*/1)]);
+    for (auto i : index_range(elem_els2))
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i),
+                           elemset_array_indices[std::make_pair(/*elem id=*/elem_els2[i] - 1, // convert to libmesh id
+                                                                /*set id*/2)]);
   }
 
   void testWriteExodus()

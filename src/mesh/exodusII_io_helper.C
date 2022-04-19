@@ -3725,7 +3725,7 @@ read_elemset_data (int timestep,
 
       // Read the elemset data truth table. Note: I tried calling exII::ex_get_var_tab
       // but it did not work and I also noticed that it is deprecated.
-      std::vector<int> elemset_var_tab(num_elem_sets * num_elemset_vars, /*debugging initial value*/1);
+      std::vector<int> elemset_var_tab(num_elem_sets * num_elemset_vars);
       exII::ex_get_truth_table(ex_id,
                                exII::EX_ELEM_SET, // exII::ex_entity_type
                                num_elem_sets,
@@ -3804,6 +3804,49 @@ read_elemset_data (int timestep,
             } // end for (var)
         } // end for (es)
     } // end if (num_elemset_vars)
+}
+
+
+
+void ExodusII_IO_Helper::
+get_elemset_data_indices (std::map<std::pair<dof_id_type, elemset_id_type>, unsigned int> & elemset_array_indices)
+{
+  // Clear existing data, we are going to build these data structures from scratch
+  elemset_array_indices.clear();
+
+  // Read the elemset data.
+  //
+  // Note: we assume that the functions
+  // 1.) this->read_elemset_info() and
+  // 2.) this->read_elemset()
+  // have already been called, so that we already know e.g. how
+  // many elems are in each set, their ids, etc.
+  int offset=0;
+  for (int es=0; es<num_elem_sets; ++es)
+    {
+      offset += (es > 0 ? num_elems_per_set[es-1] : 0);
+
+      // Note: we don't actually call exII::ex_get_var() here because
+      // we don't need the values. We only need the indices into that vector
+      // for each (elem_id, elemset_id) tuple.
+      for (int i=0; i<num_elems_per_set[es]; ++i)
+        {
+          dof_id_type exodus_elem_id = elemset_list[i + offset];
+
+          // FIXME: We should use exodus_elem_num_to_libmesh for this,
+          // but it apparently is never set up, so just
+          // subtract 1 from the Exodus elem id.
+          dof_id_type converted_elem_id = exodus_elem_id - 1;
+
+          // Make key based on the elem and set ids
+          // Make a NodeBCTuple key from the converted information.
+          auto key = std::make_pair(converted_elem_id,
+                                    static_cast<elemset_id_type>(elemset_ids[es]));
+
+          // Store the array index of this (node, b_id) tuple
+          elemset_array_indices.emplace(key, cast_int<unsigned int>(i));
+        } // end for (i)
+    } // end for (es)
 }
 
 

@@ -432,6 +432,16 @@ public:
                      std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals);
 
   /**
+   * Similar to read_elemset_data(), but instead of creating one
+   * std::map per elemset per variable, creates a single map of
+   * (elem_id, elemset_id) tuples, and stores the exo file array
+   * indexing for any/all elemset variables on that elemset (they are
+   * all the same).
+   */
+  void
+  get_elemset_data_indices (std::map<std::pair<dof_id_type, elemset_id_type>, unsigned int> & elemset_array_indices);
+
+  /**
    * Writes the vector of values to the element variables.
    *
    * The 'values' vector is assumed to be in the order:
