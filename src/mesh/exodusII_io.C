@@ -133,7 +133,7 @@ void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
   std::vector<Number>      v;
 
   es.build_variable_names  (solution_names, nullptr, system_names);
-  es.build_discontinuous_solution_vector (v, system_names);
+  es.build_discontinuous_solution_vector (v, system_names, nullptr, this->get_add_sides());
   this->write_nodal_data_discontinuous(name, v, solution_names);
 }
 
@@ -2174,11 +2174,6 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string & fname,
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  int num_vars = cast_int<int>(names.size());
-  int num_nodes = 0;
-  for (const auto & elem : mesh.active_element_ptr_range())
-    num_nodes += elem->n_nodes();
-
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
   std::vector<std::string> complex_names =
@@ -2195,6 +2190,20 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string & fname,
 
   if (mesh.processor_id())
     return;
+
+  int num_vars = cast_int<int>(names.size());
+  libmesh_assert_equal_to(soln.size() % num_vars, 0);
+  int num_nodes = soln.size() / num_vars;
+
+#ifndef NDEBUG
+  if (!this->get_add_sides())
+    {
+      int num_real_nodes = 0;
+      for (const auto & elem : mesh.active_element_ptr_range())
+        num_real_nodes += elem->n_nodes();
+      libmesh_assert_equal_to(num_real_nodes, num_nodes);
+    }
+#endif
 
   for (int c=0; c<num_vars; c++)
     {
