@@ -1603,10 +1603,10 @@ public:
    */
   void init_qois(unsigned int n_qois);
 
-  void fill_qoi(unsigned int qoi_index, Real qoi_value);
+  void fill_qoi(unsigned int qoi_index, Number qoi_value);
   Real get_qoi_value(unsigned int qoi_index);
 
-  void fill_qoi_error_estimate(unsigned int qoi_index, Real qoi_error_estimate);
+  void fill_qoi_error_estimate(unsigned int qoi_index, Number qoi_error_estimate);
   Real get_qoi_error_estimate_value(unsigned int qoi_index);
 
   /**
