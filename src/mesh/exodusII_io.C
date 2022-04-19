@@ -1812,13 +1812,18 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
         magnitudes.reserve(num_nodes);
 #endif
 
-      // There could be gaps in "soln", but it will always be in the
-      // order of [num_vars * node_id + var_id]. We now copy the
-      // proper solution values contiguously into "cur_soln",
-      // removing the gaps.
+      // There could be gaps in soln based on node numbering, but in
+      // serial the empty numbers are left empty.
+      // There could also be offsets in soln based on "fake" nodes
+      // inserted on each processor (because NumericVector indices
+      // have to be contiguous); the helper keeps track of those.
+      // We now copy the proper solution values contiguously into
+      // "cur_soln", removing the gaps.
       for (const auto & node : mesh.node_ptr_range())
         {
-          dof_id_type idx = node->id()*num_vars + c;
+          const dof_id_type idx =
+            (exio_helper->node_id_to_vec_id(node->id()))
+            * num_vars + c;
 #ifdef LIBMESH_USE_REAL_NUMBERS
           cur_soln.push_back(soln[idx]);
 #else
@@ -1830,12 +1835,28 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
         }
 
       // If we're adding extra sides, we need to add their data too.
+      //
+      // Because soln was created from a parallel NumericVector, its
+      // numbering was contiguous on each processor; we need to use
+      // the same offsets here.
       {
-        dof_id_type global_idx = mesh.max_node_id() * num_vars + c;
+        processor_id_type current_pid = 0;
+        dof_id_type global_idx =
+          exio_helper->added_node_offset_on(current_pid) * num_vars + c;
         if (exio_helper->get_add_sides())
           {
             for (const auto & elem : mesh.active_element_ptr_range())
               {
+                if (current_pid != elem->processor_id())
+                  {
+                    libmesh_assert_less(current_pid,
+                                        elem->processor_id());
+                    current_pid = elem->processor_id();
+                    global_idx =
+                      exio_helper->added_node_offset_on(current_pid)
+                      * num_vars + c;
+                  }
+
                 for (auto s : elem->side_index_range())
                   {
                     if (exio_helper->redundant_added_side(*elem,s))
