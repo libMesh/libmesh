@@ -392,8 +392,9 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
 } // anonymous namespace
 
 
-// Instantiate nodal_soln() function for every dimension
+// Instantiate (side_) nodal_soln() function for every dimension
 LIBMESH_FE_NODAL_SOLN(BERNSTEIN, bernstein_nodal_soln)
+LIBMESH_FE_SIDE_NODAL_SOLN(BERNSTEIN)
 
 
 // Full specialization of n_dofs() function for every dimension

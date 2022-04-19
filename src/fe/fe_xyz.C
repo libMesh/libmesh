@@ -368,8 +368,9 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem * elem,
 }
 
 
-// Instantiate nodal_soln() function for every dimension
+// Instantiate (side_) nodal_soln() function for every dimension
 LIBMESH_FE_NODAL_SOLN(XYZ, xyz_nodal_soln)
+LIBMESH_FE_SIDE_NODAL_SOLN(XYZ)
 
 
 // Full specialization of n_dofs() function for every dimension

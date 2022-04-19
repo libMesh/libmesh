@@ -371,8 +371,9 @@ unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
 } // anonymous namespace
 
 
-// Instantiate nodal_soln() function for every dimension
+// Instantiate (side_) nodal_soln() function for every dimension
 LIBMESH_FE_NODAL_SOLN(HIERARCHIC, hierarchic_nodal_soln)
+LIBMESH_FE_SIDE_NODAL_SOLN(HIERARCHIC)
 
 
 // Full specialization of n_dofs() function for every dimension

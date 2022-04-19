@@ -19,11 +19,12 @@
 
 // Local includes
 #include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
-#include "libmesh/elem.h"
+#include "libmesh/fe_macro.h"
 #include "libmesh/tensor_value.h"
-#include "libmesh/enum_to_string.h"
 
 
 namespace libMesh
@@ -430,6 +431,8 @@ void FE<3,NEDELEC_ONE>::nodal_soln(const Elem * elem,
                                    const std::vector<Number> & elem_soln,
                                    std::vector<Number> & nodal_soln)
 { nedelec_one_nodal_soln(elem, order, elem_soln, 3 /*dim*/, nodal_soln); }
+
+LIBMESH_FE_SIDE_NODAL_SOLN(NEDELEC_ONE)
 
 
 // Do full-specialization for every dimension, instead

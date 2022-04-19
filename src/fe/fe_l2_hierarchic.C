@@ -134,8 +134,9 @@ unsigned int l2_hierarchic_n_dofs(const ElemType t, const Order o)
 } // anonymous namespace
 
 
-// Instantiate nodal_soln() function for every dimension
+// Instantiate (side_) nodal_soln() function for every dimension
 LIBMESH_FE_NODAL_SOLN(L2_HIERARCHIC, l2_hierarchic_nodal_soln)
+LIBMESH_FE_SIDE_NODAL_SOLN(L2_HIERARCHIC)
 
 
 // Full specialization of n_dofs() function for every dimension

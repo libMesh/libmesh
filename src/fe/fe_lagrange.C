@@ -918,8 +918,9 @@ void lagrange_compute_constraints (DofConstraints & constraints,
 } // anonymous namespace
 
 
-// Instantiate nodal_soln() function for every dimension
+// Instantiate (side_) nodal_soln() function for every dimension
 LIBMESH_FE_NODAL_SOLN(LAGRANGE, lagrange_nodal_soln)
+LIBMESH_FE_SIDE_NODAL_SOLN(LAGRANGE)
 
 
 // Do full-specialization for every dimension, instead

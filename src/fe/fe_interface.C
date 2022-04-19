@@ -834,6 +834,29 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
 
 
+void FEInterface::side_nodal_soln(const FEType & fe_t,
+                                  const Elem * elem,
+                                  const unsigned int side,
+                                  const std::vector<Number> & elem_soln,
+                                  std::vector<Number> &       nodal_soln)
+{
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if (is_InfFE_elem(elem->type()))
+    {
+      libmesh_not_implemented();
+      return;
+    }
+
+#endif
+
+  const Order order = fe_t.order;
+  const unsigned int dim = elem->dim();
+
+  void_fe_with_vec_switch(side_nodal_soln(elem, order, side, elem_soln, nodal_soln));
+}
+
+
 
 Point FEInterface::map(unsigned int dim,
                        const FEType & fe_t,

@@ -287,6 +287,21 @@ public:
                          const std::vector<Number> & elem_soln,
                          std::vector<Number> & nodal_soln);
 
+
+  /**
+   * Build the nodal soln on one side from the (full) element soln.
+   * This is the solution that will be plotted on side-elements.
+   *
+   * \note On a p-refined element, \p fe_t.order should be the base
+   * order of the element. The Elem::p_level(), if any, is accounted
+   * for internally by this routine.
+   */
+  static void side_nodal_soln(const FEType & fe_t,
+                              const Elem * elem,
+                              const unsigned int side,
+                              const std::vector<Number> & elem_soln,
+                              std::vector<Number> & nodal_soln);
+
   /**
    * This is now deprecated; use FEMap::map instead.
    */

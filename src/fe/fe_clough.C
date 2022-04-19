@@ -239,8 +239,9 @@ unsigned int clough_n_dofs_per_elem(const ElemType t, const Order o)
 
 
 
-// Instantiate nodal_soln() function for every dimension
+// Instantiate (side_) nodal_soln() function for every dimension
 LIBMESH_FE_NODAL_SOLN(CLOUGH, clough_nodal_soln)
+LIBMESH_FE_SIDE_NODAL_SOLN(CLOUGH)
 
 
 // Full specialization of n_dofs() function for every dimension

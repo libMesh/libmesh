@@ -979,4 +979,6 @@ template <> bool FE<2,SUBDIVISION>::is_hierarchic() const { return false; }
 // Subdivision FEM shapes need reinit
 template <> bool FE<2,SUBDIVISION>::shapes_need_reinit() const { return true; }
 
+LIBMESH_FE_SIDE_NODAL_SOLN_DIM(SUBDIVISION, 2)
+
 } // namespace libMesh

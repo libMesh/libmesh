@@ -273,8 +273,9 @@ unsigned int hermite_n_dofs_per_elem(const ElemType t,
 } // anonymous namespace
 
 
-// Instantiate nodal_soln() function for every dimension
+// Instantiate (side_) nodal_soln() function for every dimension
 LIBMESH_FE_NODAL_SOLN(HERMITE, hermite_nodal_soln)
+LIBMESH_FE_SIDE_NODAL_SOLN(HERMITE)
 
 
 // Do full-specialization for every dimension, instead

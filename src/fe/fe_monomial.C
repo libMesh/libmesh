@@ -347,8 +347,9 @@ void monomial_nodal_soln(const Elem * elem,
 } // anonymous namespace
 
 
-// Instantiate nodal_soln() function for every dimension
+// Instantiate (side_) nodal_soln() function for every dimension
 LIBMESH_FE_NODAL_SOLN(MONOMIAL, monomial_nodal_soln)
+LIBMESH_FE_SIDE_NODAL_SOLN(MONOMIAL)
 
 
 // Full specialization of n_dofs() function for every dimension

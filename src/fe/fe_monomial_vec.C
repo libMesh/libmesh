@@ -17,9 +17,10 @@
 
 // Local includes
 #include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
-#include "libmesh/elem.h"
+#include "libmesh/fe_macro.h"
 #include "libmesh/tensor_value.h"
 
 
@@ -163,6 +164,9 @@ FE<3, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
 {
   monomial_vec_nodal_soln(elem, order, elem_soln, 3 /*dimension*/, nodal_soln);
 }
+
+LIBMESH_FE_SIDE_NODAL_SOLN(MONOMIAL_VEC)
+
 
 // Specialize for shape function routines by leveraging scalar MONOMIAL elements
 

@@ -187,8 +187,9 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
 } // anonymous namespace
 
 
-// Instantiate nodal_soln() function for every dimension
+// Instantiate (side_) nodal_soln() function for every dimension
 LIBMESH_FE_NODAL_SOLN(L2_LAGRANGE, lagrange_nodal_soln)
+LIBMESH_FE_SIDE_NODAL_SOLN(L2_LAGRANGE)
 
 
 // Do full-specialization for every dimension, instead

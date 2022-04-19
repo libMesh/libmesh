@@ -124,4 +124,20 @@ LIBMESH_FE_NODAL_SOLN_DIM(fetype, _funcname, 2)                         \
 LIBMESH_FE_NODAL_SOLN_DIM(fetype, _funcname, 3)
 
 
+#define LIBMESH_FE_SIDE_NODAL_SOLN_DIM(_fetype, _dim)                   \
+template <>                                                             \
+void FE<_dim,_fetype>::side_nodal_soln(const Elem * elem,               \
+                                       const Order order,               \
+                                       const unsigned int side,         \
+                                       const std::vector<Number> & elem_soln,\
+                                       std::vector<Number> & nodal_soln)\
+{ default_side_nodal_soln(elem, order, side, elem_soln, nodal_soln); }
+
+#define LIBMESH_FE_SIDE_NODAL_SOLN(fetype)                              \
+LIBMESH_FE_SIDE_NODAL_SOLN_DIM(fetype, 0)                               \
+LIBMESH_FE_SIDE_NODAL_SOLN_DIM(fetype, 1)                               \
+LIBMESH_FE_SIDE_NODAL_SOLN_DIM(fetype, 2)                               \
+LIBMESH_FE_SIDE_NODAL_SOLN_DIM(fetype, 3)
+
+
 #endif // LIBMESH_FE_MACRO_H
