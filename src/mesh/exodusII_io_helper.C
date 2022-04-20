@@ -4067,9 +4067,10 @@ void ExodusII_IO_Helper::write_element_values
           for (unsigned int k=0; k<num_elems_this_block; ++k)
             data[k] = values[var_id*n_elem + elem_nums[k]];
 
-          ex_err = exII::ex_put_elem_var
+          ex_err = exII::ex_put_var
             (ex_id,
              timestep,
+             exII::EX_ELEM_BLOCK,
              var_id+1,
              this->get_block_id(j),
              num_elems_this_block,
@@ -4203,8 +4204,13 @@ void ExodusII_IO_Helper::write_element_values_element_major
         // Now write 'data' to Exodus file, in single precision if requested.
         if (!data.empty())
           {
-            ex_err = exII::ex_put_elem_var
-              (ex_id, timestep, var_id+1, this->get_block_id(sbd_idx), data.size(),
+            ex_err = exII::ex_put_var
+              (ex_id,
+               timestep,
+               exII::EX_ELEM_BLOCK,
+               var_id+1,
+               this->get_block_id(sbd_idx),
+               data.size(),
                MappedOutputVector(data, _single_precision).data());
 
             EX_CHECK_ERR(ex_err, "Error writing element values.");
