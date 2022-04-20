@@ -3351,8 +3351,9 @@ read_sideset_data(const MeshBase & mesh,
     {
       // Read the sideset data truth table
       std::vector<int> sset_var_tab(num_side_sets * num_sideset_vars);
-      ex_err = exII::ex_get_sset_var_tab
+      ex_err = exII::ex_get_truth_table
         (ex_id,
+         exII::EX_SIDE_SET,
          num_side_sets,
          num_sideset_vars,
          sset_var_tab.data());
