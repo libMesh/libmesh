@@ -3392,9 +3392,10 @@ read_sideset_data(const MeshBase & mesh,
                   // to this->read_sideset_info() has already set the
                   // values of num_sides_per_set, so we just use those values here.
                   std::vector<Real> sset_var_vals(num_sides_per_set[ss]);
-                  ex_err = exII::ex_get_sset_var
+                  ex_err = exII::ex_get_var
                     (ex_id,
                      timestep,
+                     exII::EX_SIDE_SET,
                      var + 1, // 1-based sideset variable index!
                      ss_ids[ss],
                      num_sides_per_set[ss],
