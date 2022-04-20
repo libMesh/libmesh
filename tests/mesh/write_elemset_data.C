@@ -97,6 +97,63 @@ public:
     //       libMesh::out << "Elem " << elem->id() << ", elemset_code = " << elemset_code << std::endl;
     //   }
 
+    // Set up variables defined on these elemsets
+    std::vector<std::string> var_names = {"var1", "var2", "var3"};
+    std::vector<std::set<elemset_id_type>> elemset_ids =
+      {
+        {1},  // var1 is defined on elemset 1
+        {2},  // var2 is defined on elemset 2
+        {1,2} // var3 is defined on elemsets 1 and 2
+      };
+    std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> elemset_vals(var_names.size());
+
+    // To catch values handed back by MeshBase::get_elemsets()
+    std::set<elemset_id_type> id_set_to_fill;
+
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        // Get list of elemset ids to which this element belongs
+        mesh.get_elemsets(elem->get_extra_integer(elemset_index), id_set_to_fill);
+
+        bool
+          in1 = id_set_to_fill.count(1),
+          in2 = id_set_to_fill.count(2);
+
+        // Set the value for var1 == 1.0 on all elements in elemset 1
+        if (in1)
+          elemset_vals[/*var1 index=*/0].emplace( std::make_pair(elem->id(), /*elemset_id=*/1), 1.0);
+
+        // Set the value of var2 == 2.0 on all elements in elemset 2
+        if (in2)
+          elemset_vals[/*var2 index=*/1].emplace( std::make_pair(elem->id(), /*elemset_id=*/2), 2.0);
+
+        // Set the value of var3 == 3.0 on elements in the union of sets 1 and 2
+        if (in1 || in2)
+          for (const auto & id : id_set_to_fill)
+            elemset_vals[/*var3 index=*/2].emplace( std::make_pair(elem->id(), /*elemset_id=*/id), 3.0);
+      }
+
+    // Sanity check: we should have 8 total elements in set1 and set2 combined
+    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), elemset_vals[/*var3 index=*/2].size());
+
+    // Lambda to help with debugging
+    // auto print_map = [](const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & input)
+    //   {
+    //     for (auto i : index_range(input))
+    //       {
+    //         libMesh::out << "Map " << i << " = " << std::endl;
+    //         for (const auto & [pr, val] : input[i])
+    //           {
+    //             const auto & elem_id = pr.first;
+    //             const auto & elemset_id = pr.second;
+    //             libMesh::out << "(" << elem_id << ", " << elemset_id << ") = " << val << std::endl;
+    //           }
+    //       }
+    //   };
+
+    // Debugging: print the elemset_vals struct we just built
+    // print_map(elemset_vals);
+
     // Write the file in the ExodusII format, including the element set information.
     // Note: elemsets should eventually be written during ExodusII_IO::write(), this
     // would match the behavior of sidesets and nodesets.
@@ -104,6 +161,7 @@ public:
       IOClass writer(mesh);
       writer.write(filename);
       writer.write_elemsets();
+      writer.write_elemset_data(/*timestep=*/1, var_names, elemset_ids, elemset_vals);
     }
 
     // Make sure that the writing is done before the reading starts.
@@ -150,6 +208,39 @@ public:
     // Elements 9, 15 are in set2 which has code 2
     CPPUNIT_ASSERT(read_mesh.elem_ptr(9)->get_extra_integer(elemset_index) == 2);
     CPPUNIT_ASSERT(read_mesh.elem_ptr(15)->get_extra_integer(elemset_index) == 2);
+
+    // Read in the elemset variables from file
+    std::vector<std::string> read_in_var_names;
+    std::vector<std::set<elemset_id_type>> read_in_elemset_ids;
+    std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> read_in_elemset_vals;
+    reader.read_elemset_data(/*timestep=*/1, read_in_var_names, read_in_elemset_ids, read_in_elemset_vals);
+
+    // Debugging
+    // print_map(read_in_elemset_vals);
+
+    // Assert that the data we read in matches what we wrote out
+    CPPUNIT_ASSERT(read_in_var_names == var_names);
+    CPPUNIT_ASSERT(read_in_elemset_ids == elemset_ids);
+    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), read_in_elemset_vals[/*var3 index=*/2].size());
+    CPPUNIT_ASSERT(read_in_elemset_vals == elemset_vals);
+
+    // Also check that the flat indices match those in the file
+    std::map<std::pair<dof_id_type, elemset_id_type>, unsigned int> elemset_array_indices;
+    reader.get_elemset_data_indices(elemset_array_indices);
+
+    // Verify that we have the following (Exodus-based) elem ids in the following indices.
+    // These indices were copied from an ncdump of the exo file.
+    std::vector<dof_id_type> elem_els1 = {4, 9, 15, 25};
+    std::vector<dof_id_type> elem_els2 = {4, 10, 16, 25};
+
+    for (auto i : index_range(elem_els1))
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i),
+                           elemset_array_indices[std::make_pair(/*elem id=*/elem_els1[i] - 1, // convert to libmesh id
+                                                                /*set id*/1)]);
+    for (auto i : index_range(elem_els2))
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i),
+                           elemset_array_indices[std::make_pair(/*elem id=*/elem_els2[i] - 1, // convert to libmesh id
+                                                                /*set id*/2)]);
   }
 
   void testWriteExodus()

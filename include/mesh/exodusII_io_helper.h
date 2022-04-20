@@ -414,6 +414,34 @@ public:
   get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> & bc_array_indices);
 
   /**
+   * Write elemset data for the requested timestep.
+   */
+  void
+  write_elemset_data (int timestep,
+                      const std::vector<std::string> & var_names,
+                      const std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                      const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals);
+
+  /**
+   * Read elemset variables, if any, into the provided data structures.
+   */
+  void
+  read_elemset_data (int timestep,
+                     std::vector<std::string> & var_names,
+                     std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                     std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals);
+
+  /**
+   * Similar to read_elemset_data(), but instead of creating one
+   * std::map per elemset per variable, creates a single map of
+   * (elem_id, elemset_id) tuples, and stores the exo file array
+   * indexing for any/all elemset variables on that elemset (they are
+   * all the same).
+   */
+  void
+  get_elemset_data_indices (std::map<std::pair<dof_id_type, elemset_id_type>, unsigned int> & elemset_array_indices);
+
+  /**
    * Writes the vector of values to the element variables.
    *
    * The 'values' vector is assumed to be in the order:
@@ -626,6 +654,9 @@ public:
   // Number of nodeset variables
   int num_nodeset_vars;
 
+  // Number of elemset variables
+  int num_elemset_vars;
+
   // Number of elements in this block
   int num_elem_this_blk;
 
@@ -784,11 +815,15 @@ public:
   // The names of the nodeset variables stored in the Exodus file
   std::vector<std::string> nodeset_var_names;
 
+  // The names of the elemset variables stored in the Exodus file
+  std::vector<std::string> elemset_var_names;
+
   // Maps of Ids to named entities
   std::map<int, std::string> id_to_block_names;
   std::map<int, std::string> id_to_edge_block_names;
   std::map<int, std::string> id_to_ss_names;
   std::map<int, std::string> id_to_ns_names;
+  std::map<int, std::string> id_to_elemset_names;
 
   // On/Off message flag
   bool verbose;
@@ -821,7 +856,7 @@ public:
    * SIDESET:   num_sideset_vars sideset_var_names
    * NODESET:   num_nodeset_vars nodeset_var_names
    */
-  enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2, SIDESET=3, NODESET=4};
+  enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2, SIDESET=3, NODESET=4, ELEMSET=5};
   void read_var_names(ExodusVarType type);
 
   const ExodusII_IO_Helper::Conversion &

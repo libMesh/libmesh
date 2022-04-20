@@ -1986,10 +1986,52 @@ read_nodeset_data (int timestep,
                    std::vector<std::set<boundary_id_type>> & node_boundary_ids,
                    std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
 {
+  libmesh_error_msg_if(!exio_helper->opened_for_reading,
+                       "ERROR, ExodusII file must be opened for reading "
+                       "before calling ExodusII_IO::read_nodeset_data()!");
+
   exio_helper->read_nodeset_data(timestep, var_names, node_boundary_ids, bc_vals);
 }
 
+void
+ExodusII_IO::
+write_elemset_data (int timestep,
+                    const std::vector<std::string> & var_names,
+                    const std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                    const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals)
+{
+  libmesh_error_msg_if(!exio_helper->opened_for_writing,
+                       "ERROR, ExodusII file must be opened for writing "
+                       "before calling ExodusII_IO::write_elemset_data()!");
 
+  exio_helper->write_elemset_data(timestep, var_names, elemset_ids_in, elemset_vals);
+}
+
+
+
+void
+ExodusII_IO::
+read_elemset_data (int timestep,
+                   std::vector<std::string> & var_names,
+                   std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                   std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals)
+{
+  libmesh_error_msg_if(!exio_helper->opened_for_reading,
+                       "ERROR, ExodusII file must be opened for reading "
+                       "before calling ExodusII_IO::read_elemset_data()!");
+
+  exio_helper->read_elemset_data(timestep, var_names, elemset_ids_in, elemset_vals);
+}
+
+void
+ExodusII_IO::get_elemset_data_indices (std::map<std::pair<dof_id_type, elemset_id_type>, unsigned int> & elemset_array_indices)
+{
+  libmesh_error_msg_if(!exio_helper->opened_for_reading,
+                       "ERROR, ExodusII file must be opened for reading "
+                       "before calling ExodusII_IO::get_elemset_data_indices()!");
+
+  exio_helper->get_elemset_data_indices(elemset_array_indices);
+}
 
 
 void ExodusII_IO::write (const std::string & fname)
@@ -2391,7 +2433,67 @@ read_sideset_data (int,
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
 }
 
+void
+ExodusII_IO::
+get_sideset_data_indices (std::map<BoundaryInfo::BCTuple, unsigned int> &)
 
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+void
+ExodusII_IO::
+write_nodeset_data (int,
+                    const std::vector<std::string> &,
+                    const std::vector<std::set<boundary_id_type>> &,
+                    const std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+void
+ExodusII_IO::
+read_nodeset_data (int,
+                   std::vector<std::string> &,
+                   std::vector<std::set<boundary_id_type>> &,
+                   std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+void
+ExodusII_IO::
+get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+void
+ExodusII_IO::
+write_elemset_data (int,
+                    const std::vector<std::string> &,
+                    const std::vector<std::set<elemset_id_type>> &,
+                    const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+void
+ExodusII_IO::
+read_elemset_data (int,
+                   std::vector<std::string> &,
+                   std::vector<std::set<elemset_id_type>> &,
+                   std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+void
+ExodusII_IO::
+get_elemset_data_indices (std::map<std::pair<dof_id_type, elemset_id_type>, unsigned int> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
 
 void ExodusII_IO::write (const std::string &)
 {
