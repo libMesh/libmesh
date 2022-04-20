@@ -3874,8 +3874,9 @@ read_nodeset_data (int timestep,
     {
       // Read the nodeset data truth table
       std::vector<int> nset_var_tab(num_node_sets * num_nodeset_vars);
-      ex_err = exII::ex_get_nset_var_tab
+      ex_err = exII::ex_get_truth_table
         (ex_id,
+         exII::EX_NODE_SET,
          num_node_sets,
          num_nodeset_vars,
          nset_var_tab.data());
