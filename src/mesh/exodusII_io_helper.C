@@ -2993,10 +2993,12 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
         }
     }
 
-  ex_err = exII::ex_put_elem_var_tab(ex_id,
-                                     num_elem_blk,
-                                     num_elem_vars,
-                                     truth_tab.data());
+  ex_err = exII::ex_put_truth_table
+    (ex_id,
+     exII::EX_ELEM_BLOCK,
+     num_elem_blk,
+     num_elem_vars,
+     truth_tab.data());
   EX_CHECK_ERR(ex_err, "Error writing element truth table.");
 }
 
