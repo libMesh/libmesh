@@ -1760,10 +1760,12 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
   std::vector<Real> unmapped_nodal_var_values(num_nodes);
 
   // Call the Exodus API to read the nodal variable values
-  ex_err = exII::ex_get_nodal_var
+  ex_err = exII::ex_get_var
     (ex_id,
      time_step,
+     exII::EX_NODAL,
      var_index+1,
+     1, // exII::ex_entity_id, not sure exactly what this is but in the ex_get_nodal_var.c shim, they pass 1
      num_nodes,
      MappedInputVector(unmapped_nodal_var_values, _single_precision).data());
   EX_CHECK_ERR(ex_err, "Error reading nodal variable values!");
