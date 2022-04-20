@@ -3578,10 +3578,11 @@ write_nodeset_data (int timestep,
 
   // Finally, write the nodeset truth table.
   ex_err =
-    exII::ex_put_nset_var_tab(ex_id,
-                              num_node_sets,
-                              cast_int<int>(var_names.size()),
-                              nset_var_tab.data());
+    exII::ex_put_truth_table(ex_id,
+                             exII::EX_NODE_SET,
+                             num_node_sets,
+                             cast_int<int>(var_names.size()),
+                             nset_var_tab.data());
   EX_CHECK_ERR(ex_err, "Error writing nodeset var truth table.");
 }
 
