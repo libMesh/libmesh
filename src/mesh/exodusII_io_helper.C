@@ -1643,17 +1643,21 @@ void ExodusII_IO_Helper::read_all_nodesets()
   node_sets_node_list.clear();  node_sets_node_list.resize(total_nodes_in_all_sets);
   node_sets_dist_fact.clear();  node_sets_dist_fact.resize(total_df_in_all_sets);
 
-  ex_err = exII::ex_get_concat_node_sets
-    (ex_id,
-     nodeset_ids.data(),
-     num_nodes_per_set.data(),
-     num_node_df_per_set.data(),
-     node_sets_node_index.data(),
-     node_sets_dist_index.data(),
-     node_sets_node_list.data(),
-     total_df_in_all_sets ?
-     MappedInputVector(node_sets_dist_fact, _single_precision).data() : nullptr);
+  // Handle single-precision files
+  MappedInputVector mapped_node_sets_dist_fact(node_sets_dist_fact, _single_precision);
 
+  // Build exII::ex_set_spec struct
+  exII::ex_set_specs set_specs = {};
+  set_specs.sets_ids            = nodeset_ids.data();
+  set_specs.num_entries_per_set = num_nodes_per_set.data();
+  set_specs.num_dist_per_set    = num_node_df_per_set.data();
+  set_specs.sets_entry_index    = node_sets_node_index.data();
+  set_specs.sets_dist_index     = node_sets_dist_index.data();
+  set_specs.sets_entry_list     = node_sets_node_list.data();
+  set_specs.sets_extra_list     = nullptr;
+  set_specs.sets_dist_fact      = total_df_in_all_sets ? mapped_node_sets_dist_fact.data() : nullptr;
+
+  ex_err = exII::ex_get_concat_sets(ex_id, exII::EX_NODE_SET, &set_specs);
   EX_CHECK_ERR(ex_err, "Error reading concatenated nodesets");
 
   // Read the nodeset names from file!
