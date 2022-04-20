@@ -28,6 +28,8 @@ public:
 
 #ifdef LIBMESH_HAVE_POLY2TRI
   CPPUNIT_TEST( testPoly2Tri );
+  CPPUNIT_TEST( testPoly2TriInterp );
+  CPPUNIT_TEST( testPoly2TriInterp3 );
   CPPUNIT_TEST( testPoly2TriHoles );
   CPPUNIT_TEST( testPoly2TriSegments );
   CPPUNIT_TEST( testPoly2TriRefined );
@@ -42,6 +44,8 @@ public:
 
 #ifdef LIBMESH_HAVE_TRIANGLE
   CPPUNIT_TEST( testTriangle );
+  CPPUNIT_TEST( testTriangleInterp );
+  CPPUNIT_TEST( testTriangleInterp3 );
   CPPUNIT_TEST( testTriangleHoles );
   CPPUNIT_TEST( testTriangleSegments );
 #endif
@@ -99,6 +103,7 @@ public:
     LIBMESH_ASSERT_FP_EQUAL(square.area(), 2*radius*radius, TOLERANCE*TOLERANCE);
 #endif
   }
+
 
   void testTriangulatorBase(MeshBase & mesh,
                             TriangulatorInterface & triangulator)
@@ -178,6 +183,54 @@ public:
     this->testTriangulatorBase(mesh, triangulator);
   }
 
+
+
+  void testTriangulatorInterp(MeshBase & mesh,
+                              TriangulatorInterface & triangulator,
+                              int interpolate_boundary_points,
+                              dof_id_type n_expected_elem)
+  {
+    // Use the point order to define the boundary, because our
+    // Poly2Tri implementation doesn't do convex hulls yet, even when
+    // that would give the same answer.
+    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
+
+    // A non-square quad, so we don't have ambiguity about which
+    // diagonal a Delaunay algorithm will pick.
+    // Manually-numbered points, so we can use the point numbering as
+    // a segment ordering even on DistributedMesh.
+    mesh.add_point(Point(0,0), 0);
+    mesh.add_point(Point(1,0), 1);
+    mesh.add_point(Point(1,2), 2);
+    mesh.add_point(Point(0,1), 3);
+
+    const Real expected_total_area = 1.5;
+
+    // Interpolate points!
+    triangulator.set_interpolate_boundary_points(interpolate_boundary_points);
+
+    // Try to insert points!
+    triangulator.desired_area() = 1000;
+    triangulator.minimum_angle() = 0;
+    triangulator.smooth_after_generating() = false;
+
+    triangulator.triangulate();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_expected_elem);
+
+    Real area = 0;
+    for (const auto & elem : mesh.active_local_element_ptr_range())
+      {
+        CPPUNIT_ASSERT_EQUAL(elem->level(), 0u);
+        CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
+
+        area += elem->volume();
+      }
+
+    mesh.comm().sum(area);
+
+    LIBMESH_ASSERT_FP_EQUAL(area, expected_total_area, TOLERANCE*TOLERANCE);
+  }
 
 
   void testTriangulatorHoles(MeshBase & mesh,
@@ -284,6 +337,26 @@ public:
   }
 
 
+  void testTriangleInterp()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    TriangleInterface triangle(mesh);
+    testTriangulatorInterp(mesh, triangle, 2, 6);
+  }
+
+
+  void testTriangleInterp3()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    TriangleInterface triangle(mesh);
+    testTriangulatorInterp(mesh, triangle, 3, 10);
+  }
+
+
   void testTriangleHoles()
   {
     LOG_UNIT_TEST;
@@ -313,6 +386,26 @@ public:
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulator(mesh, p2t_tri);
+  }
+
+
+  void testPoly2TriInterp()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator p2t_tri(mesh);
+    testTriangulatorInterp(mesh, p2t_tri, 2, 6);
+  }
+
+
+  void testPoly2TriInterp3()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator p2t_tri(mesh);
+    testTriangulatorInterp(mesh, p2t_tri, 3, 10);
   }
 
 
