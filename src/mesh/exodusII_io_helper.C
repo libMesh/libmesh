@@ -1976,12 +1976,15 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
   for (unsigned i=0; i<static_cast<unsigned>(num_elem_blk); i++)
     {
-      ex_err = exII::ex_get_elem_block(ex_id,
-                                       block_ids[i],
-                                       nullptr,
-                                       &num_elem_this_blk,
-                                       nullptr,
-                                       nullptr);
+      ex_err = exII::ex_get_block(ex_id,
+                                  exII::EX_ELEM_BLOCK,
+                                  block_ids[i],
+                                  /*elem_type=*/nullptr,
+                                  &num_elem_this_blk,
+                                  /*num_nodes_per_entry=*/nullptr,
+                                  /*num_edges_per_entry=*/nullptr,
+                                  /*num_faces_per_entry=*/nullptr,
+                                  /*num_attr=*/nullptr);
       EX_CHECK_ERR(ex_err, "Error getting number of elements in block.");
 
       // If the current variable isn't active on this subdomain, advance
