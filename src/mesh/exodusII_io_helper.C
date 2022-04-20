@@ -701,22 +701,22 @@ void ExodusII_IO_Helper::read_and_store_header_info()
   // Read the number of timesteps which are present in the file
   this->read_num_time_steps();
 
-  ex_err = exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_NODAL, &num_nodal_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of nodal variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_ELEM_BLOCK, &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "g", &num_global_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_GLOBAL, &num_global_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of global variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "s", &num_sideset_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_SIDE_SET, &num_sideset_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of sideset variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "m", &num_nodeset_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_NODE_SET, &num_nodeset_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of nodeset variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "t", &num_elemset_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_ELEM_SET, &num_elemset_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemset variables.");
 
   message("Exodus header info retrieved successfully.");
@@ -4001,7 +4001,7 @@ void ExodusII_IO_Helper::write_element_values
     return;
 
   // Ask the file how many element vars it has, store it in the num_elem_vars variable.
-  ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_ELEM_BLOCK, &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
   // We will eventually loop over the element blocks (subdomains) and
@@ -4085,7 +4085,7 @@ void ExodusII_IO_Helper::write_element_values_element_major
     return;
 
   // Ask the file how many element vars it has, store it in the num_elem_vars variable.
-  ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_ELEM_BLOCK, &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
   // We will eventually loop over the element blocks (subdomains) and
