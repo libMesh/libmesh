@@ -1998,9 +1998,10 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
       std::vector<Real> block_elem_var_values(num_elem_this_blk);
 
-      ex_err = exII::ex_get_elem_var
+      ex_err = exII::ex_get_var
         (ex_id,
          time_step,
+         exII::EX_ELEM_BLOCK,
          var_index+1,
          block_ids[i],
          num_elem_this_blk,
