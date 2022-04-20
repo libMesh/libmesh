@@ -4294,8 +4294,13 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Real> & values, i
 
   if (!values.empty())
     {
-      ex_err = exII::ex_put_glob_vars
-        (ex_id, timestep, num_global_vars,
+      ex_err = exII::ex_put_var
+        (ex_id,
+         timestep,
+         exII::EX_GLOBAL,
+         1, // var index
+         0, // obj_id (not used)
+         num_global_vars,
          MappedOutputVector(values, _single_precision).data());
 
       EX_CHECK_ERR(ex_err, "Error writing global values.");
