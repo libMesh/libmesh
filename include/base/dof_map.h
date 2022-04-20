@@ -1596,7 +1596,7 @@ private:
    * A utility method for obtaining a set of elements to ghost along
    * with merged coupling matrices.
    */
-  typedef std::set<std::unique_ptr<CouplingMatrix>, Utility::CompareUnderlying<CouplingMatrix>> CouplingMatricesSet;
+  typedef std::set<std::unique_ptr<CouplingMatrix>, Utility::CompareUnderlying> CouplingMatricesSet;
   static void
   merge_ghost_functor_outputs (GhostingFunctor::map_type & elements_to_ghost,
                                CouplingMatricesSet & temporary_coupling_matrices,

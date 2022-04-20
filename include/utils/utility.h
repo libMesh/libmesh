@@ -470,7 +470,6 @@ T ReverseBytes::operator() (T & data) const
  * Struct which defines a custom comparison object that
  * can be used with std::sets of std::unique_ptrs
  */
-template <class T>
 struct CompareUnderlying
 {
   /**
@@ -484,6 +483,7 @@ struct CompareUnderlying
    * This is already what the default operator< comparison for std::unique_ptrs does,
    * we are not adding anything here.
    */
+  template <class T>
   bool operator()(const std::unique_ptr<T> & a, const std::unique_ptr<T> & b) const
   {
     return a.get() < b.get();
@@ -492,6 +492,7 @@ struct CompareUnderlying
   /**
    * operator< comparison when rhs is a dumb pointer
    */
+  template <class T>
   bool operator()(const std::unique_ptr<T> & a, const T * const & b) const
   {
     return a.get() < b;
@@ -500,6 +501,7 @@ struct CompareUnderlying
   /**
    * operator< comparison when lhs is a dumb pointer
    */
+  template <class T>
   bool operator()(const T * const & a, const std::unique_ptr<T> & b) const
   {
     return a < b.get();
