@@ -3916,9 +3916,10 @@ read_nodeset_data (int timestep,
                   // to this->read_nodeset_info() has already set the
                   // values of num_nodes_per_set, so we just use those values here.
                   std::vector<Real> nset_var_vals(num_nodes_per_set[ns]);
-                  ex_err = exII::ex_get_nset_var
+                  ex_err = exII::ex_get_var
                     (ex_id,
                      timestep,
+                     exII::EX_NODE_SET,
                      var + 1, // 1-based nodeset variable index!
                      nodeset_ids[ns],
                      num_nodes_per_set[ns],
@@ -3973,7 +3974,7 @@ get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> & bc
   for (int ns=0; ns<num_node_sets; ++ns)
     {
       offset += (ns > 0 ? num_nodes_per_set[ns-1] : 0);
-      // Note: we don't actually call exII::ex_get_nset_var() here because
+      // Note: we don't actually call exII::ex_get_var() here because
       // we don't need the values. We only need the indices into that vector
       // for each (node_id, boundary_id) tuple.
       for (int i=0; i<num_nodes_per_set[ns]; ++i)
