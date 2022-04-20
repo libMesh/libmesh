@@ -4232,8 +4232,13 @@ ExodusII_IO_Helper::write_nodal_values(int var_id,
 
   if (!values.empty())
     {
-      ex_err = exII::ex_put_nodal_var
-        (ex_id, timestep, var_id, num_nodes,
+      ex_err = exII::ex_put_var
+        (ex_id,
+         timestep,
+         exII::EX_NODAL,
+         var_id,
+         1, // exII::ex_entity_id, not sure exactly what this is but in the ex_put_nodal_var.c shim, they pass 1
+         num_nodes,
          MappedOutputVector(values, _single_precision).data());
 
       EX_CHECK_ERR(ex_err, "Error writing nodal values.");
