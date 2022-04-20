@@ -29,11 +29,7 @@
 
 using namespace libMesh;
 
-L2System::~L2System ()
-{
-  for (auto & pr : input_contexts)
-    delete pr.second;
-}
+L2System::~L2System () = default;
 
 void L2System::init_data ()
 {
@@ -73,10 +69,10 @@ void L2System::init_context(DiffContext & context)
 
   // Build a corresponding context for the input system if we haven't
   // already
-  FEMContext *& input_context = input_contexts[&c];
+  auto & input_context = input_contexts[&c];
   if (input_system && !input_context)
     {
-      input_context = new FEMContext(*input_system);
+      input_context = std::make_unique<FEMContext>(*input_system);
 
       libmesh_assert(goal_func.get());
       goal_func->init_context(*input_context);

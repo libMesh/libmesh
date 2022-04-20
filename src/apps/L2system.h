@@ -15,11 +15,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// libMesh includes
 #include "libmesh/enum_fe_family.h"
 #include "libmesh/fem_function_base.h"
 #include "libmesh/fem_system.h"
 
+// C++ includes
 #include <map>
+#include <memory>
 
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
 // but we must specify element residuals
@@ -52,7 +55,7 @@ public:
 
   libMesh::System * input_system;
 
-  std::map<libMesh::FEMContext *, libMesh::FEMContext *>
+  std::map<libMesh::FEMContext *, std::unique_ptr<libMesh::FEMContext>>
     input_contexts;
 
 protected:
