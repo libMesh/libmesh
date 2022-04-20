@@ -3333,10 +3333,11 @@ write_sideset_data(const MeshBase & mesh,
 
   // Finally, write the sideset truth table.
   ex_err =
-    exII::ex_put_sset_var_tab(ex_id,
-                              num_side_sets,
-                              cast_int<int>(var_names.size()),
-                              sset_var_tab.data());
+    exII::ex_put_truth_table(ex_id,
+                             exII::EX_SIDE_SET,
+                             num_side_sets,
+                             cast_int<int>(var_names.size()),
+                             sset_var_tab.data());
   EX_CHECK_ERR(ex_err, "Error writing sideset var truth table.");
 }
 
