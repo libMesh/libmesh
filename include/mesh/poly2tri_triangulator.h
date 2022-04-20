@@ -87,6 +87,24 @@ public:
    */
   virtual FunctionBase<Real> * get_desired_area_function () override;
 
+  /**
+   * Set whether or not the triangulation is allowed to refine the
+   * mesh boundary when refining the interior.  This is true by
+   * default, but may be set to false to make the mesh boundary more
+   * predictable (and so easier to stitch to other meshes) later.
+   *
+   * This may not be implemented in all subclasses.
+   */
+  virtual void set_refine_boundary_allowed (bool refine_bdy_allowed)
+  { _refine_bdy_allowed = refine_bdy_allowed; }
+
+  /**
+   * Get whether or not the triangulation is allowed to refine the
+   * mesh boundary when refining the interior.  True by default.
+   */
+  virtual bool refine_boundary_allowed ()
+  { return _refine_bdy_allowed; }
+
 
 protected:
   /**
@@ -128,6 +146,11 @@ private:
    * Location-dependent area requirements
    */
   std::unique_ptr<FunctionBase<Real>> _desired_area_func;
+
+  /**
+   * Whether to allow boundary refinement
+   */
+  bool _refine_bdy_allowed;
 };
 
 } // namespace libMesh

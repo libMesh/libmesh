@@ -144,7 +144,8 @@ Poly2TriTriangulator::Poly2TriTriangulator(UnstructuredMesh & mesh,
                                            dof_id_type n_boundary_nodes)
   : TriangulatorInterface(mesh),
     _serializer(_mesh),
-    _n_boundary_nodes(n_boundary_nodes)
+    _n_boundary_nodes(n_boundary_nodes),
+    _refine_bdy_allowed(true)
 {
 }
 
@@ -555,12 +556,22 @@ bool Poly2TriTriangulator::insert_refinement_points()
           libmesh_assert_not_equal_to (side, invalid_uint);
 
           Elem * neigh = cavity_elem->neighbor_ptr(side);
-          // If we're on a boundary, stop there.
+          // If we're on a boundary, stop there.  Refine the boundary
+          // if we're allowed, the boundary element otherwise.
           if (!neigh)
             {
-              new_pt = ray_start;
-              new_node = mesh.add_point(new_pt);
-              boundary_refine(side);
+              if (this->refine_boundary_allowed())
+                {
+                  new_pt = ray_start;
+                  new_node = mesh.add_point(new_pt);
+                  boundary_refine(side);
+                }
+              else
+                {
+                  new_pt = cavity_elem->vertex_average();
+                  new_node = mesh.add_point(new_pt);
+                }
+
               break;
             }
 
@@ -600,16 +611,24 @@ bool Poly2TriTriangulator::insert_refinement_points()
             }
 
           // If we'd create a sliver element on the side, let's just
-          // refine the side instead.
+          // refine the side instead, if we're allowed.
           if (worst_cos < -0.6) // -0.5 is the best we could enforce?
             {
               side = worst_side;
 
-              // Let's just try bisecting for now
-              new_pt = (cavity_elem->point(side) +
-                        cavity_elem->point((side+1)%3)) / 2;
-              new_node = mesh.add_point(new_pt);
-              boundary_refine(side);
+              if (this->refine_boundary_allowed())
+                {
+                  // Let's just try bisecting for now
+                  new_pt = (cavity_elem->point(side) +
+                            cavity_elem->point((side+1)%3)) / 2;
+                  new_node = mesh.add_point(new_pt);
+                  boundary_refine(side);
+                }
+              else // Do the best we can under these restrictions
+                {
+                  new_pt = cavity_elem->vertex_average();
+                  new_node = mesh.add_point(new_pt);
+                }
             }
           else
             new_node = mesh.add_point(new_pt);
