@@ -3232,8 +3232,8 @@ write_sideset_data(const MeshBase & mesh,
   this->read_sideset_info();
 
   // Write "truth" table for sideset variables.  The function
-  // exII::ex_put_var_param() must be called before
-  // exII::ex_put_sset_var_tab(). For us, this happens during the call
+  // exII::ex_put_variable_param() must be called before
+  // exII::ex_put_truth_table(). For us, this happens during the call
   // to ExodusII_IO_Helper::write_var_names(). sset_var_tab is a logically
   // (num_side_sets x num_sset_var) integer array of 0s and 1s
   // indicating which sidesets a given sideset variable is defined on.
@@ -3262,7 +3262,7 @@ write_sideset_data(const MeshBase & mesh,
           // Otherwise, fill in this entry of the sideset truth table.
           sset_var_tab[ss*var_names.size() + var] = 1;
 
-          // Data vector that will eventually be passed to exII::ex_put_sset_var().
+          // Data vector that will eventually be passed to exII::ex_put_var().
           std::vector<Real> sset_var_vals(num_sides_per_set[ss]);
 
           // Get reference to the BCTuple -> Real map for this variable.
@@ -3318,9 +3318,10 @@ write_sideset_data(const MeshBase & mesh,
           // sideset) pair.
           if (sset_var_vals.size() > 0)
             {
-              ex_err = exII::ex_put_sset_var
+              ex_err = exII::ex_put_var
                 (ex_id,
                  timestep,
+                 exII::EX_SIDE_SET,
                  var + 1, // 1-based variable index of current variable
                  ss_ids[ss],
                  num_sides_per_set[ss],
