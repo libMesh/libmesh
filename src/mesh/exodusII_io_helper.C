@@ -3563,9 +3563,10 @@ write_nodeset_data (int timestep,
         // Write nodeset values to Exodus file
         if (nset_var_vals.size() > 0)
           {
-            ex_err = exII::ex_put_nset_var
+            ex_err = exII::ex_put_var
               (ex_id,
                timestep,
+               exII::EX_NODE_SET,
                var + 1, // 1-based variable index of current variable
                nodeset_ids[ns],
                num_nodes_per_set[ns],
