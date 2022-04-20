@@ -1970,7 +1970,7 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
   // Element variable truth table
   std::vector<int> var_table(block_ids.size() * elem_var_names.size());
-  exII::ex_get_var_tab(ex_id, "e", block_ids.size(), elem_var_names.size(), var_table.data());
+  exII::ex_get_truth_table(ex_id, exII::EX_ELEM_BLOCK, block_ids.size(), elem_var_names.size(), var_table.data());
 
   for (unsigned i=0; i<static_cast<unsigned>(num_elem_blk); i++)
     {
@@ -3723,8 +3723,7 @@ read_elemset_data (int timestep,
       //           << " elemsets and " << num_elemset_vars
       //           << " elemset variables." << std::endl;
 
-      // Read the elemset data truth table. Note: I tried calling exII::ex_get_var_tab
-      // but it did not work and I also noticed that it is deprecated.
+      // Read the elemset data truth table.
       std::vector<int> elemset_var_tab(num_elem_sets * num_elemset_vars);
       exII::ex_get_truth_table(ex_id,
                                exII::EX_ELEM_SET, // exII::ex_entity_type
