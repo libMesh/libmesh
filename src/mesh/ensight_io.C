@@ -216,27 +216,25 @@ void EnsightIO::write_geometry_ascii()
   for (unsigned direction=0; direction<3; ++direction)
     {
       int i = 1;
-      for (const auto & pr : mesh_nodes_map)
+      for (const auto & [idx, pt] : mesh_nodes_map)
         {
           mesh_stream << std::setw(12)
                       << std::setprecision(5)
                       << std::scientific
-                      << pr.second(direction)
+                      << pt(direction)
                       << "\n";
-          ensight_node_index[pr.first] = i++;
+          ensight_node_index[idx] = i++;
         }
     }
 
   // Write parts
-  for (const auto & pr : ensight_parts_map)
+  for (const auto & [elem_type, elem_ref] : ensight_parts_map)
     {
       // Look up this ElemType in the map, error if not present.
-      std::string name = libmesh_map_find(_element_map, pr.first);
+      std::string name = libmesh_map_find(_element_map, elem_type);
 
       // Write element type
       mesh_stream << "\n" << name << "\n";
-
-      const std::vector<const Elem *> & elem_ref = pr.second;
 
       // Write number of element
       mesh_stream << std::setw(10) << elem_ref.size() << "\n";
@@ -251,11 +249,11 @@ void EnsightIO::write_geometry_ascii()
           for (const auto & node : elem_ref[i]->node_ref_range())
             {
               // tests!
-              if (pr.first == QUAD9 && i==4)
+              if (elem_type == QUAD9 && i==4)
                 continue;
 
               // tests!
-              if (pr.first == HEX27 &&
+              if (elem_type == HEX27 &&
                   (i==4    || i ==10 || i == 12 ||
                    i == 13 || i ==14 || i == 16 || i == 22))
                 continue;
@@ -319,14 +317,14 @@ void EnsightIO::write_case()
 // Write scalar and vector solution
 void EnsightIO::write_solution_ascii()
 {
-  for (const auto & pr : _system_vars_map)
+  for (const auto & [sys_name, sys_vars] : _system_vars_map)
     {
-      for (const auto & scalar : pr.second.EnsightScalars)
-        this->write_scalar_ascii(pr.first,
+      for (const auto & scalar : sys_vars.EnsightScalars)
+        this->write_scalar_ascii(sys_name,
                                  scalar.scalar_name);
 
-      for (const auto & vec : pr.second.EnsightVectors)
-        this->write_vector_ascii(pr.first,
+      for (const auto & vec : sys_vars.EnsightVectors)
+        this->write_vector_ascii(sys_name,
                                  vec.components,
                                  vec.description);
     }

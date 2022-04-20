@@ -64,18 +64,18 @@ void RBParametrized::initialize_parameters(const RBParameters & mu_min_in,
   parameters_max = mu_max_in;
 
   // Add in min/max values due to the discrete parameters
-    for (const auto & pr : discrete_parameter_values)
-      {
-        libmesh_error_msg_if(pr.second.empty(), "Error: List of discrete parameters for " << pr.first << " is empty.");
+  for (const auto & [name, vals] : discrete_parameter_values)
+    {
+      libmesh_error_msg_if(vals.empty(), "Error: List of discrete parameters for " << name << " is empty.");
 
-        Real min_val = *std::min_element(pr.second.begin(), pr.second.end());
-        Real max_val = *std::max_element(pr.second.begin(), pr.second.end());
+      Real min_val = *std::min_element(vals.begin(), vals.end());
+      Real max_val = *std::max_element(vals.begin(), vals.end());
 
-        libmesh_assert_less_equal(min_val,max_val);
+      libmesh_assert_less_equal(min_val, max_val);
 
-        parameters_min.set_value(pr.first, min_val);
-        parameters_max.set_value(pr.first, max_val);
-      }
+      parameters_min.set_value(name, min_val);
+      parameters_max.set_value(name, max_val);
+    }
 
     _discrete_parameter_values = discrete_parameter_values;
 
@@ -202,6 +202,10 @@ void RBParametrized::write_parameter_ranges_to_file(const std::string & file_nam
   unsigned int n_continuous_params = get_n_continuous_params();
   parameter_ranges_out << n_continuous_params;
 
+  // Note: the following loops are not candidates for structured
+  // bindings syntax because the Xdr APIs which they call are not
+  // defined for const references. We must therefore make copies to
+  // call these functions.
   for (const auto & pr : get_parameters_min())
     {
       std::string param_name = pr.first;
@@ -211,7 +215,6 @@ void RBParametrized::write_parameter_ranges_to_file(const std::string & file_nam
           parameter_ranges_out << param_name << param_value;
         }
     }
-
   for (const auto & pr : get_parameters_max())
     {
       std::string param_name = pr.first;
@@ -221,6 +224,7 @@ void RBParametrized::write_parameter_ranges_to_file(const std::string & file_nam
           parameter_ranges_out << param_name << param_value;
         }
     }
+
   parameter_ranges_out.close();
 }
 
@@ -237,11 +241,14 @@ void RBParametrized::write_discrete_parameter_values_to_file(const std::string &
       unsigned int n_discrete_params = get_n_discrete_params();
       discrete_parameters_out << n_discrete_params;
 
+      // Note: the following loops are not candidates for structured
+      // bindings syntax because the Xdr APIs which they call are not
+      // defined for const references. We must therefore make copies
+      // to call these functions.
       for (const auto & pr : get_discrete_parameter_values())
         {
           std::string param_name = pr.first;
-          unsigned int n_discrete_values = cast_int<unsigned int>
-            (pr.second.size());
+          auto n_discrete_values = cast_int<unsigned int>(pr.second.size());
           discrete_parameters_out << param_name << n_discrete_values;
 
           for (unsigned int i=0; i<n_discrete_values; i++)
@@ -358,11 +365,10 @@ const std::map<std::string, std::vector<Real>> & RBParametrized::get_discrete_pa
 
 void RBParametrized::print_discrete_parameter_values() const
 {
-  for (const auto & pr : get_discrete_parameter_values())
+  for (const auto & [name, values] : get_discrete_parameter_values())
     {
-      libMesh::out << "Discrete parameter " << pr.first << ", values: ";
+      libMesh::out << "Discrete parameter " << name << ", values: ";
 
-      const std::vector<Real> & values = pr.second;
       for (const auto & value : values)
         libMesh::out << value << " ";
       libMesh::out << std::endl;

@@ -97,8 +97,8 @@ void petsc_auto_fieldsplit (PC my_pc,
         }
     }
 
-  for (const auto & pr : group_indices)
-    indices_to_fieldsplit(sys.comm(), pr.second, my_pc, pr.first);
+  for (const auto & [field_name, indices] : group_indices)
+    indices_to_fieldsplit(sys.comm(), indices, my_pc, field_name);
 }
 
 } // namespace libMesh

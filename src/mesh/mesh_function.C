@@ -173,8 +173,8 @@ std::map<const Elem *, Number> MeshFunction::discontinuous_value (const Point & 
   std::map<const Elem *, DenseVector<Number>> buffer;
   this->discontinuous_value (p, time, buffer);
   std::map<const Elem *, Number> return_value;
-  for (const auto & pr : buffer)
-    return_value[pr.first] = pr.second(0);
+  for (const auto & [elem, vec] : buffer)
+    return_value[elem] = vec(0);
   // NOTE: If no suitable element is found, then the map return_value is empty. This
   // puts burden on the user of this function but I don't really see a better way.
   return return_value;
@@ -198,8 +198,8 @@ std::map<const Elem *, Gradient> MeshFunction::discontinuous_gradient (const Poi
   std::map<const Elem *, std::vector<Gradient>> buffer;
   this->discontinuous_gradient (p, time, buffer);
   std::map<const Elem *, Gradient> return_value;
-  for (const auto & pr : buffer)
-    return_value[pr.first] = pr.second[0];
+  for (const auto & [elem, vec] : buffer)
+    return_value[elem] = vec[0];
   // NOTE: If no suitable element is found, then the map return_value is empty. This
   // puts burden on the user of this function but I don't really see a better way.
   return return_value;

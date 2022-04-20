@@ -143,14 +143,13 @@ public:
     reader.get_nodeset_data_indices(bc_array_indices);
 
     // Debugging
-    // for (const auto & pr : bc_array_indices)
+    // for (const auto & [t, index] : bc_array_indices)
     //   {
-    //     const auto & t = pr.first;
     //     const auto & node_id = std::get<0>(t);
     //     const auto & boundary_id = std::get<1>(t);
     //     libMesh::out << "(node, boundary_id) = "
     //                  << "(" << node_id << ", " << boundary_id << ")"
-    //                  << " is at array index " << pr.second
+    //                  << " is at array index " << index
     //                  << std::endl;
     //   }
 

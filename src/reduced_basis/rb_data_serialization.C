@@ -258,12 +258,12 @@ void add_parameter_ranges_to_builder(const RBParametrized & rb_evaluation,
 
     // We could loop over either parameters_min or parameters_max, they should have the same keys.
     unsigned int count = 0;
-    for (const auto & pr : parameters_min.get_parameters_map())
-      if (!rb_evaluation.is_discrete_parameter(pr.first))
+    for (const auto & [key, val] : parameters_min.get_parameters_map())
+      if (!rb_evaluation.is_discrete_parameter(key))
         {
-          names.set(count, pr.first);
-          mins.set(count, pr.second);
-          maxs.set(count, parameters_max.get_value(pr.first));
+          names.set(count, key);
+          mins.set(count, val);
+          maxs.set(count, parameters_max.get_value(key));
           ++count;
         }
 
@@ -840,10 +840,10 @@ void add_rb_scm_evaluation_data_to_builder(RBSCMEvaluation & rb_scm_eval,
           cj_parameters_outer.init(i, rb_scm_eval.C_J[i].n_parameters());
 
         unsigned int count = 0;
-        for (const auto & pr : rb_scm_eval.C_J[i])
+        for (const auto & [key, val] : rb_scm_eval.C_J[i])
           {
-            cj_parameters_inner[count].setName( pr.first );
-            cj_parameters_inner[count].setValue( pr.second );
+            cj_parameters_inner[count].setName(key);
+            cj_parameters_inner[count].setValue(val);
             count++;
           }
 

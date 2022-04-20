@@ -142,15 +142,14 @@ public:
     reader.get_sideset_data_indices(bc_array_indices);
 
     // Debugging
-    // for (const auto & pr : bc_array_indices)
+    // for (const auto & [t, index] : bc_array_indices)
     //   {
-    //     const auto & t = pr.first;
     //     const auto & elem_id = std::get<0>(t);
     //     const auto & side_id = std::get<1>(t);
     //     const auto & boundary_id = std::get<2>(t);
     //     libMesh::out << "(elem, side, boundary_id) = "
-    //                  << "(" << elem_id << ", " << side_id << ", " << boundary_id << ")"
-    //                  << std::endl;
+    //                  << "(" << elem_id << ", " << side_id << ", " << boundary_id << ") at index "
+    //                  << index << std::endl;
     //   }
 
     // For this test case, the sideset arrays are ordered as follows:

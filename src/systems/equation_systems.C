@@ -1327,13 +1327,13 @@ std::string EquationSystems::get_info () const
   //       oss << "  n_parameters()=" << this->n_parameters() << '\n';
   //       oss << "   Parameters:\n";
 
-  //       for (const auto & pr : _parameters)
+  //       for (const auto & [key, val] : _parameters)
   //         oss << "    "
   //             << "\""
-  //             << pr.first
+  //             << key
   //             << "\""
   //             << "="
-  //             << pr.second
+  //             << val
   //             << '\n';
   //     }
 

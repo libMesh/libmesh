@@ -1634,10 +1634,10 @@ void System::write_parallel_data (Xdr & io,
   // Only write additional vectors if wanted
   if (write_additional_data)
     {
-      for (auto & pr : _vectors)
+      for (auto & [vec_name, vec] : _vectors)
         {
           io_buffer.clear();
-          io_buffer.reserve(pr.second->local_size());
+          io_buffer.reserve(vec->local_size());
 
           // Loop over each non-SCALAR variable and each node, and write out the value.
           for (unsigned int var=0; var<nv; var++)
@@ -1650,7 +1650,7 @@ void System::write_parallel_data (Xdr & io,
                       libmesh_assert_not_equal_to (node->dof_number(sys_num, var, comp),
                                                    DofObject::invalid_id);
 
-                      io_buffer.push_back((*pr.second)(node->dof_number(sys_num, var, comp)));
+                      io_buffer.push_back((*vec)(node->dof_number(sys_num, var, comp)));
                     }
 
                 // Then write the element DOF values
@@ -1660,7 +1660,7 @@ void System::write_parallel_data (Xdr & io,
                       libmesh_assert_not_equal_to (elem->dof_number(sys_num, var, comp),
                                                    DofObject::invalid_id);
 
-                      io_buffer.push_back((*pr.second)(elem->dof_number(sys_num, var, comp)));
+                      io_buffer.push_back((*vec)(elem->dof_number(sys_num, var, comp)));
                     }
               }
 
@@ -1675,7 +1675,7 @@ void System::write_parallel_data (Xdr & io,
                     dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
 
                     for (auto dof : SCALAR_dofs)
-                      io_buffer.push_back((*pr.second)(dof));
+                      io_buffer.push_back((*vec)(dof));
                   }
               }
 
@@ -1689,7 +1689,7 @@ void System::write_parallel_data (Xdr & io,
             comment = "# System \"";
             comment += this->name();
             comment += "\" Additional Vector \"";
-            comment += pr.first;
+            comment += vec_name;
             comment += "\"";
           }
 

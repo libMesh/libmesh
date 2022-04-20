@@ -1469,17 +1469,17 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
       libmesh_assert(gf);
       (*gf)(elems_begin, elems_end, p, more_elements_to_ghost);
 
-      for (const auto & pr : more_elements_to_ghost)
+      for (const auto & [elem, elem_cm] : more_elements_to_ghost)
         {
           GhostingFunctor::map_type::iterator existing_it =
-            elements_to_ghost.find (pr.first);
+            elements_to_ghost.find (elem);
           if (existing_it == elements_to_ghost.end())
-            elements_to_ghost.insert(pr);
+            elements_to_ghost.emplace(elem, elem_cm);
           else
             {
               if (existing_it->second)
                 {
-                  if (pr.second)
+                  if (elem_cm)
                     {
                       // If this isn't already a temporary
                       // then we need to make one so we'll
@@ -1491,7 +1491,7 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
                           temporary_coupling_matrices.insert(cm);
                           existing_it->second = cm;
                         }
-                      const_cast<CouplingMatrix &>(*existing_it->second) &= *pr.second;
+                      const_cast<CouplingMatrix &>(*existing_it->second) &= *elem_cm;
                     }
                   else
                     {
@@ -2990,14 +2990,13 @@ std::string DofMap::get_info() const
     n_node_rhss = 0;
   long double avg_node_constraint_length = 0.;
 
-  for (const auto & pr : _node_constraints)
+  for (const auto & [node, pr] : _node_constraints)
     {
       // Only count local constraints, then sum later
-      const Node * node = pr.first;
       if (node->processor_id() != this->processor_id())
         continue;
 
-      const NodeConstraintRow & row = pr.second.first;
+      const NodeConstraintRow & row = pr.first;
       std::size_t rowsize = row.size();
 
       max_node_constraint_length = std::max(max_node_constraint_length,
@@ -3005,7 +3004,7 @@ std::string DofMap::get_info() const
       avg_node_constraint_length += rowsize;
       n_node_constraints++;
 
-      if (pr.second.second != Point(0))
+      if (pr.second != Point(0))
         n_node_rhss++;
     }
 

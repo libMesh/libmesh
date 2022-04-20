@@ -210,11 +210,8 @@ void LinearElasticityWithContact::add_contact_edge_elements()
 {
   MeshBase & mesh = _sys.get_mesh();
 
-  for (const auto & pr : _contact_node_map)
+  for (const auto & [master_node_id, slave_node_id] : _contact_node_map)
     {
-      dof_id_type master_node_id = pr.first;
-      dof_id_type slave_node_id = pr.second;
-
       Node & master_node = mesh.node_ref(master_node_id);
       Node & slave_node = mesh.node_ref(slave_node_id);
 
@@ -362,11 +359,8 @@ void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Num
   // one processor.
   _lambda_plus_penalty_values.clear();
 
-  for (const auto & pr : _contact_node_map)
+  for (const auto & [lower_point_id, upper_point_id] : _contact_node_map)
     {
-      dof_id_type lower_point_id = pr.first;
-      dof_id_type upper_point_id = pr.second;
-
       Point upper_to_lower;
       {
         Point lower_node_moved = mesh_clone->point(lower_point_id);
@@ -606,17 +600,15 @@ std::pair<Real, Real> LinearElasticityWithContact::update_lambdas()
   Real max_delta_lambda = 0.;
   Real max_new_lambda = 0.;
 
-  for (auto & pr : _lambdas)
+  for (auto & [upper_node_id, lambda_val] : _lambdas)
     {
-      dof_id_type upper_node_id = pr.first;
-
       auto new_lambda_it = _lambda_plus_penalty_values.find(upper_node_id);
       libmesh_error_msg_if(new_lambda_it == _lambda_plus_penalty_values.end(), "New lambda value not found");
 
       Real new_lambda = new_lambda_it->second;
-      Real old_lambda = pr.second;
+      Real old_lambda = lambda_val;
 
-      pr.second = new_lambda;
+      lambda_val = new_lambda;
 
       Real delta_lambda = std::abs(new_lambda-old_lambda);
       if (delta_lambda > max_delta_lambda)
@@ -637,11 +629,8 @@ std::pair<Real, Real> LinearElasticityWithContact::get_least_and_max_gap_functio
   Real least_value = std::numeric_limits<Real>::max();
   Real max_value = std::numeric_limits<Real>::min();
 
-  for (const auto & pr : _contact_node_map)
+  for (const auto & [lower_point_id, upper_point_id] : _contact_node_map)
     {
-      dof_id_type lower_point_id = pr.first;
-      dof_id_type upper_point_id = pr.second;
-
       Point upper_to_lower;
       {
         Point lower_node_moved = mesh_clone->point(lower_point_id);
