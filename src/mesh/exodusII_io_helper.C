@@ -3540,7 +3540,7 @@ write_nodeset_data (int timestep,
         // Otherwise, fill in this entry of the nodeset truth table.
         nset_var_tab[ns*var_names.size() + var] = 1;
 
-        // Data vector that will eventually be passed to exII::ex_put_nset_var().
+        // Data vector that will eventually be passed to exII::ex_put_var().
         std::vector<Real> nset_var_vals(num_nodes_per_set[ns]);
 
         // Get reference to the NodeBCTuple -> Real map for this variable.
