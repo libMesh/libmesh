@@ -4326,8 +4326,13 @@ void ExodusII_IO_Helper::read_global_values(std::vector<Real> & values, int time
 
   values.clear();
   values.resize(num_global_vars);
-  ex_err = exII::ex_get_glob_vars
-    (ex_id, timestep, num_global_vars,
+  ex_err = exII::ex_get_var
+    (ex_id,
+     timestep,
+     exII::EX_GLOBAL,
+     1, // var_index
+     1, // obj_id
+     num_global_vars,
      MappedInputVector(values, _single_precision).data());
 
   EX_CHECK_ERR(ex_err, "Error reading global values.");
