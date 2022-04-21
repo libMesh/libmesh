@@ -220,6 +220,28 @@ FunctionBase<Real> * Poly2TriTriangulator::get_desired_area_function ()
 }
 
 
+bool Poly2TriTriangulator::is_refine_boundary_allowed
+  (const BoundaryInfo & boundary_info,
+   const Elem & elem,
+   unsigned int side)
+{
+  // We should only be calling this on a boundary side
+  libmesh_assert(!elem.neighbor_ptr(side));
+
+  std::vector<boundary_id_type> bcids;
+  boundary_info.boundary_ids(&elem, side, bcids);
+
+  // We should have one bcid on every boundary side.
+  libmesh_assert_equal_to(bcids.size(), 1);
+
+  if (bcids[0] == 0)
+    return this->refine_boundary_allowed();
+  else
+    // We'll query holes in a future upgrade
+    return true;
+}
+
+
 void Poly2TriTriangulator::triangulate_current_points()
 {
   // Will the triangulation have holes?
@@ -534,6 +556,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
   // ArbitraryHole.
   std::unordered_map<Point, Node *> next_boundary_node;
 
+  BoundaryInfo & boundary_info = _mesh.get_boundary_info();
+
   for (auto & elem : mesh.element_ptr_range())
     {
       // element_ptr_range skips deleted elements ... right?
@@ -615,7 +639,9 @@ bool Poly2TriTriangulator::insert_refinement_points()
           // if we're allowed, the boundary element otherwise.
           if (!neigh)
             {
-              if (this->refine_boundary_allowed())
+              if (this->is_refine_boundary_allowed(boundary_info,
+                                                   *cavity_elem,
+                                                   side))
                 {
                   new_pt = ray_start;
                   new_node = mesh.add_point(new_pt);
@@ -671,7 +697,9 @@ bool Poly2TriTriangulator::insert_refinement_points()
             {
               side = worst_side;
 
-              if (this->refine_boundary_allowed())
+              if (this->is_refine_boundary_allowed(boundary_info,
+                                                   *cavity_elem,
+                                                   side))
                 {
                   // Let's just try bisecting for now
                   new_pt = (cavity_elem->point(side) +

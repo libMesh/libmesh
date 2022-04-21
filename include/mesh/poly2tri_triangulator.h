@@ -109,6 +109,13 @@ public:
 
 protected:
   /**
+   * Is refining this element's boundary side allowed?
+   */
+  bool is_refine_boundary_allowed(const BoundaryInfo & boundary_info,
+                                  const Elem & elem,
+                                  unsigned int side);
+
+  /**
    * Triangulate the current mesh and hole points.
    */
   void triangulate_current_points();
