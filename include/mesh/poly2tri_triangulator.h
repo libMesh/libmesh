@@ -33,6 +33,7 @@ namespace libMesh
 {
 
 // Forward Declarations
+class BoundaryInfo;
 class Elem;
 
 /**

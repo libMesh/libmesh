@@ -27,6 +27,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/function_base.h"
+#include "libmesh/hashing.h"
 #include "libmesh/mesh_smoother_laplace.h"
 #include "libmesh/mesh_triangle_holes.h"
 #include "libmesh/unstructured_mesh.h"
@@ -343,13 +344,35 @@ void Poly2TriTriangulator::triangulate_current_points()
         }
     }
 
+  // Keep track of what boundary ids we want to assign to each new
+  // triangle.  We'll give the outer boundary BC 0, and give holes ids
+  // starting from 1.  We've already got the point_node_map to find
+  // nodes, so we can just key on pairs of node ids to identify a side.
+  std::unordered_map<std::pair<dof_id_type,dof_id_type>,
+                     boundary_id_type, libMesh::hash> side_boundary_id;
+
+  const boundary_id_type outer_bcid = 0;
+  const std::size_t n_outer = outer_boundary_points.size();
+
+  for (auto i : make_range(n_outer))
+    {
+      const Node * node1 =
+        libmesh_map_find(point_node_map, outer_boundary_points[i]),
+                 * node2 =
+        libmesh_map_find(point_node_map, outer_boundary_points[(i+1)%n_outer]);
+
+      side_boundary_id.emplace(std::make_pair(node1->id(),
+                                              node2->id()),
+                               outer_bcid);
+    }
+
   // Create poly2tri triangulator with our mesh points
-  std::vector<p2t::Point *>
-    outer_boundary_pointers(outer_boundary_points.size());
+  std::vector<p2t::Point *> outer_boundary_pointers(n_outer);
   std::transform(outer_boundary_points.begin(),
                  outer_boundary_points.end(),
                  outer_boundary_pointers.begin(),
                  [](p2t::Point & p) { return &p; });
+
 
   // Make sure shims for holes last as long as the CDT does; the
   // poly2tri headers don't make clear whether or not they're hanging
@@ -368,6 +391,7 @@ void Poly2TriTriangulator::triangulate_current_points()
         (it == replaced_holes.end()) ?
         *initial_hole : *it->second;
       auto & poly2tri_hole = inner_hole_points[h];
+
       for (auto i : make_range(our_hole.n_points()))
         {
           Point p = our_hole.point(i);
@@ -395,8 +419,23 @@ void Poly2TriTriangulator::triangulate_current_points()
             }
         }
 
+      const boundary_id_type inner_bcid = h+1;
+      const std::size_t n_inner = poly2tri_hole.size();
+
+      for (auto i : make_range(n_inner))
+        {
+          const Node * node1 =
+            libmesh_map_find(point_node_map, poly2tri_hole[i]),
+                     * node2 =
+            libmesh_map_find(point_node_map, poly2tri_hole[(i+1)%n_inner]);
+
+          side_boundary_id.emplace(std::make_pair(node1->id(),
+                                                  node2->id()),
+                                   inner_bcid);
+        }
+
       auto & poly2tri_ptrs = inner_hole_pointers[h];
-      poly2tri_ptrs.resize(poly2tri_hole.size());
+      poly2tri_ptrs.resize(n_inner);
 
       std::transform(poly2tri_hole.begin(),
                      poly2tri_hole.end(),
@@ -425,6 +464,10 @@ void Poly2TriTriangulator::triangulate_current_points()
   // Do our own numbering, even on DistributedMesh
   dof_id_type next_id = 0;
 
+  BoundaryInfo & boundary_info = _mesh.get_boundary_info();
+  boundary_info.clear();
+
+  // Add the triangles to our Mesh data structure.
   for (auto ptri_ptr : triangles)
     {
       p2t::Triangle & ptri = *ptri_ptr;
@@ -441,7 +484,19 @@ void Poly2TriTriangulator::triangulate_current_points()
           elem->set_node(v) = node;
         }
 
-      _mesh.add_elem(std::move(elem));
+      Elem * added_elem = _mesh.add_elem(std::move(elem));
+
+      for (auto v : make_range(3))
+        {
+          const Node & node1 = added_elem->node_ref(v),
+                     & node2 = added_elem->node_ref((v+1)%3);
+
+          auto it = side_boundary_id.find(std::make_pair(node1.id(), node2.id()));
+          if (it == side_boundary_id.end())
+            it = side_boundary_id.find(std::make_pair(node2.id(), node1.id()));
+          if (it != side_boundary_id.end())
+            boundary_info.add_side(added_elem, v, it->second);
+        }
     }
 }
 
