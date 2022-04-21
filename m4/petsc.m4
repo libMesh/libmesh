@@ -19,20 +19,12 @@ AC_DEFUN([CONFIGURE_PETSC],
     # that it has been called.
     AC_REQUIRE([AC_PROG_F77])
 
-
-    # Let's use a C compiler for the AC_CHECK_HEADER test, although this is
-    # not strictly necessary...
-    AC_LANG_PUSH(C)
-    AC_CHECK_HEADER(${PETSC_DIR}/${PETSC_ARCH}/include/petscversion.h,
-                    [enablepetsc=yes; enablepetsc_mpi=yes
-                     petsc_version_h_file=${PETSC_DIR}/${PETSC_ARCH}/include/petscversion.h],
-                    [
-      AC_CHECK_HEADER(${PETSC_DIR}/include/petscversion.h,
-                      [enablepetsc=yes; enablepetsc_mpi=yes
-                       petsc_version_h_file=${PETSC_DIR}/include/petscversion.h],
-                      [enablepetsc=no; enablepetsc_mpi=no])
-                    ])
-    AC_LANG_POP
+    # Find petscversion.h
+    AS_IF([test -r ${PETSC_DIR}/${PETSC_ARCH}/include/petscversion.h], [enablepetsc=yes; enablepetsc_mpi=yes
+                                                                        petsc_version_h_file=${PETSC_DIR}/${PETSC_ARCH}/include/petscversion.h],
+          [test -r ${PETSC_DIR}/include/petscversion.h], [enablepetsc=yes; enablepetsc_mpi=yes
+                                                          petsc_version_h_file=${PETSC_DIR}/include/petscversion.h],
+          [enablepetsc=no; enablepetsc_mpi=no])
 
     dnl We now have a -gt check for this that occurs at the end of the file, so make sure
     dnl it is initialized to some sensible value to avoid syntax errors.
