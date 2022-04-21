@@ -51,6 +51,7 @@
 #include "libmesh/tensor_tools.h"
 #include "libmesh/threads.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/coupling_matrix.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -4810,9 +4811,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
   // element's owner.
 
   GhostingFunctor::map_type elements_to_couple;
-
-  // Man, I wish we had guaranteed unique_ptr availability...
-  std::set<CouplingMatrix*> temporary_coupling_matrices;
+  DofMap::CouplingMatricesSet temporary_coupling_matrices;
 
   this->merge_ghost_functor_outputs
     (elements_to_couple,

@@ -273,9 +273,7 @@ void Build::operator()(const ConstElemRange & range)
                                            Predicates::NotNull<Elem * const *>());
 
         GhostingFunctor::map_type elements_to_couple;
-
-        // Man, I wish we had guaranteed unique_ptr availability...
-        std::set<CouplingMatrix *> temporary_coupling_matrices;
+        DofMap::CouplingMatricesSet temporary_coupling_matrices;
 
         dof_map.merge_ghost_functor_outputs(elements_to_couple,
                                             temporary_coupling_matrices,
@@ -324,10 +322,6 @@ void Build::operator()(const ConstElemRange & range)
                     }
                 }
             } // End ghosted element loop
-
-        for (auto & mat : temporary_coupling_matrices)
-          delete mat;
-
       } // End range element loop
   } // End ghosting functor section
 

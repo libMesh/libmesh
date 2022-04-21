@@ -122,6 +122,7 @@ unit_tests_sources = \
   systems/systems_test.C \
   utils/parameters_test.C \
   utils/point_locator_test.C \
+  utils/transparent_comparator.C \
   utils/vectormap_test.C \
   utils/xdr_test.C
 

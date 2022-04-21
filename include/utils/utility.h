@@ -19,13 +19,14 @@
 #ifndef LIBMESH_UTILITY_H
 #define LIBMESH_UTILITY_H
 
-// Local includes
+// LibMesh includes
 #include "libmesh/libmesh_common.h" // for Real
 
-// System includes
+// C++ includes
 #include <string>
 #include <vector>
 #include <algorithm> // is_sorted, lower_bound
+#include <memory> // unique_ptr
 
 namespace libMesh
 {
@@ -462,6 +463,50 @@ T ReverseBytes::operator() (T & data) const
 
   return data;
 }
+
+
+
+/**
+ * Struct which defines a custom comparison object that
+ * can be used with std::sets of std::unique_ptrs
+ */
+struct CompareUnderlying
+{
+  /**
+   * As of C++14, std::set::find() can be a templated overload.
+   * https://en.cppreference.com/w/cpp/container/set/find
+   * We enable this by defining is_transparent as a type.
+   */
+  using is_transparent = void;
+
+  /**
+   * This is already what the default operator< comparison for std::unique_ptrs does,
+   * we are not adding anything here.
+   */
+  template <class T>
+  bool operator()(const std::unique_ptr<T> & a, const std::unique_ptr<T> & b) const
+  {
+    return a.get() < b.get();
+  }
+
+  /**
+   * operator< comparison when rhs is a dumb pointer
+   */
+  template <class T>
+  bool operator()(const std::unique_ptr<T> & a, const T * const & b) const
+  {
+    return a.get() < b;
+  }
+
+  /**
+   * operator< comparison when lhs is a dumb pointer
+   */
+  template <class T>
+  bool operator()(const T * const & a, const std::unique_ptr<T> & b) const
+  {
+    return a < b.get();
+  }
+};
 
 
 }
