@@ -166,6 +166,16 @@ public:
   bool & insert_extra_points() {return _insert_extra_points;}
 
   /**
+   * Complicated setter, for compatibility with insert_extra_points()
+   */
+  void set_interpolate_boundary_points (int n_points);
+
+  /**
+   * Complicated getter, for compatibility with insert_extra_points()
+   */
+  int get_interpolate_boundary_points () const;
+
+  /**
    * Sets/gets flag which tells whether to do two steps of Laplace
    * mesh smoothing after generating the grid.
    */
@@ -271,8 +281,17 @@ protected:
    * Flag which tells whether or not to insert additional nodes
    * before triangulation.  This can sometimes be used to "de-regularize"
    * the resulting triangulation.
+   *
+   * This flag is supported for backwards compatibility; setting
+   * _interpolate_boundary_points = 1 is equivalent.
    */
   bool _insert_extra_points;
+
+  /**
+   * Flag which tells how many additional nodes should be inserted
+   * between each pair of original mesh points.
+   */
+  int _interpolate_boundary_points;
 
   /**
    * Flag which tells whether we should smooth the mesh after

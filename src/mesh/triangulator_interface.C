@@ -57,6 +57,32 @@ TriangulatorInterface::TriangulatorInterface(UnstructuredMesh & mesh)
 {}
 
 
+void TriangulatorInterface::set_interpolate_boundary_points (int n_points)
+{
+  // Maybe we'll reserve a meaning for negatives later?
+  libmesh_assert(n_points >= 0);
+
+  _interpolate_boundary_points = n_points;
+
+  // backwards compatibility - someone (including us) might want to
+  // query this via the old API.
+  _insert_extra_points = n_points;
+}
+
+
+
+int TriangulatorInterface::get_interpolate_boundary_points () const
+{
+  // backwards compatibility - someone might have turned this off via
+  // the old API
+  if (!_insert_extra_points)
+    return 0;
+
+  return _interpolate_boundary_points;
+}
+
+
+
 void TriangulatorInterface::insert_any_extra_boundary_points()
 {
   // If the initial PSLG is really simple, e.g. an L-shaped domain or
@@ -67,7 +93,8 @@ void TriangulatorInterface::insert_any_extra_boundary_points()
   // into the original PSLG.  Inserting additional points into a
   // set of points meant to be a convex hull usually makes less sense.
 
-  if ((_triangulation_type==PSLG) && (_insert_extra_points))
+  const int n_interpolated = this->get_interpolate_boundary_points();
+  if ((_triangulation_type==PSLG) && n_interpolated)
     {
       // Make a copy of the original points from the Mesh
       std::vector<Point> original_points;
@@ -81,17 +108,27 @@ void TriangulatorInterface::insert_any_extra_boundary_points()
       // Make sure the new Mesh will be 2D
       _mesh.set_mesh_dimension(2);
 
-      // Insert a new point on each PSLG at some random location
+      // Insert a new point on each PSLG at evenly spaced locations
+      // between existing boundary points.
       // np=index into new points vector
       // n =index into original points vector
-      for (std::size_t np=0, n=0, tops=2*original_points.size(); np<tops; ++np)
+      for (std::size_t np=0, n=0, tops=n_interpolated*original_points.size(); np<tops; ++np)
         {
-          // the even entries are the original points
-          if (np%2==0)
+          int offset = np % n_interpolated;
+
+          // Some entries are the original points
+          if (!offset)
             _mesh.add_point(original_points[n++]);
 
-          else // the odd entries are the midpoints of the original PSLG segments
-            _mesh.add_point ((original_points[n] + original_points[n-1])/2);
+          else // the odd entries are equispaced along the original PSLG segments
+            {
+              libmesh_assert_less(n-1, original_points.size());
+              const std::size_t next_n = n % original_points.size();
+              const Point new_point =
+                (offset*original_points[next_n] +
+                 (n_interpolated-offset)*original_points[n-1])/n_interpolated;
+              _mesh.add_point(new_point);
+            }
         }
     }
 }
