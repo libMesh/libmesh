@@ -701,22 +701,22 @@ void ExodusII_IO_Helper::read_and_store_header_info()
   // Read the number of timesteps which are present in the file
   this->read_num_time_steps();
 
-  ex_err = exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_NODAL, &num_nodal_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of nodal variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_ELEM_BLOCK, &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "g", &num_global_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_GLOBAL, &num_global_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of global variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "s", &num_sideset_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_SIDE_SET, &num_sideset_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of sideset variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "m", &num_nodeset_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_NODE_SET, &num_nodeset_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of nodeset variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "t", &num_elemset_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_ELEM_SET, &num_elemset_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemset variables.");
 
   message("Exodus header info retrieved successfully.");
@@ -1643,17 +1643,21 @@ void ExodusII_IO_Helper::read_all_nodesets()
   node_sets_node_list.clear();  node_sets_node_list.resize(total_nodes_in_all_sets);
   node_sets_dist_fact.clear();  node_sets_dist_fact.resize(total_df_in_all_sets);
 
-  ex_err = exII::ex_get_concat_node_sets
-    (ex_id,
-     nodeset_ids.data(),
-     num_nodes_per_set.data(),
-     num_node_df_per_set.data(),
-     node_sets_node_index.data(),
-     node_sets_dist_index.data(),
-     node_sets_node_list.data(),
-     total_df_in_all_sets ?
-     MappedInputVector(node_sets_dist_fact, _single_precision).data() : nullptr);
+  // Handle single-precision files
+  MappedInputVector mapped_node_sets_dist_fact(node_sets_dist_fact, _single_precision);
 
+  // Build exII::ex_set_spec struct
+  exII::ex_set_specs set_specs = {};
+  set_specs.sets_ids            = nodeset_ids.data();
+  set_specs.num_entries_per_set = num_nodes_per_set.data();
+  set_specs.num_dist_per_set    = num_node_df_per_set.data();
+  set_specs.sets_entry_index    = node_sets_node_index.data();
+  set_specs.sets_dist_index     = node_sets_dist_index.data();
+  set_specs.sets_entry_list     = node_sets_node_list.data();
+  set_specs.sets_extra_list     = nullptr;
+  set_specs.sets_dist_fact      = total_df_in_all_sets ? mapped_node_sets_dist_fact.data() : nullptr;
+
+  ex_err = exII::ex_get_concat_sets(ex_id, exII::EX_NODE_SET, &set_specs);
   EX_CHECK_ERR(ex_err, "Error reading concatenated nodesets");
 
   // Read the nodeset names from file!
@@ -1760,10 +1764,12 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
   std::vector<Real> unmapped_nodal_var_values(num_nodes);
 
   // Call the Exodus API to read the nodal variable values
-  ex_err = exII::ex_get_nodal_var
+  ex_err = exII::ex_get_var
     (ex_id,
      time_step,
+     exII::EX_NODAL,
      var_index+1,
+     1, // exII::ex_entity_id, not sure exactly what this is but in the ex_get_nodal_var.c shim, they pass 1
      num_nodes,
      MappedInputVector(unmapped_nodal_var_values, _single_precision).data());
   EX_CHECK_ERR(ex_err, "Error reading nodal variable values!");
@@ -1970,16 +1976,19 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
   // Element variable truth table
   std::vector<int> var_table(block_ids.size() * elem_var_names.size());
-  exII::ex_get_var_tab(ex_id, "e", block_ids.size(), elem_var_names.size(), var_table.data());
+  exII::ex_get_truth_table(ex_id, exII::EX_ELEM_BLOCK, block_ids.size(), elem_var_names.size(), var_table.data());
 
   for (unsigned i=0; i<static_cast<unsigned>(num_elem_blk); i++)
     {
-      ex_err = exII::ex_get_elem_block(ex_id,
-                                       block_ids[i],
-                                       nullptr,
-                                       &num_elem_this_blk,
-                                       nullptr,
-                                       nullptr);
+      ex_err = exII::ex_get_block(ex_id,
+                                  exII::EX_ELEM_BLOCK,
+                                  block_ids[i],
+                                  /*elem_type=*/nullptr,
+                                  &num_elem_this_blk,
+                                  /*num_nodes_per_entry=*/nullptr,
+                                  /*num_edges_per_entry=*/nullptr,
+                                  /*num_faces_per_entry=*/nullptr,
+                                  /*num_attr=*/nullptr);
       EX_CHECK_ERR(ex_err, "Error getting number of elements in block.");
 
       // If the current variable isn't active on this subdomain, advance
@@ -1993,9 +2002,10 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
       std::vector<Real> block_elem_var_values(num_elem_this_blk);
 
-      ex_err = exII::ex_get_elem_var
+      ex_err = exII::ex_get_var
         (ex_id,
          time_step,
+         exII::EX_ELEM_BLOCK,
          var_index+1,
          block_ids[i],
          num_elem_this_blk,
@@ -2983,10 +2993,12 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
         }
     }
 
-  ex_err = exII::ex_put_elem_var_tab(ex_id,
-                                     num_elem_blk,
-                                     num_elem_vars,
-                                     truth_tab.data());
+  ex_err = exII::ex_put_truth_table
+    (ex_id,
+     exII::EX_ELEM_BLOCK,
+     num_elem_blk,
+     num_elem_vars,
+     truth_tab.data());
   EX_CHECK_ERR(ex_err, "Error writing element truth table.");
 }
 
@@ -3220,8 +3232,8 @@ write_sideset_data(const MeshBase & mesh,
   this->read_sideset_info();
 
   // Write "truth" table for sideset variables.  The function
-  // exII::ex_put_var_param() must be called before
-  // exII::ex_put_sset_var_tab(). For us, this happens during the call
+  // exII::ex_put_variable_param() must be called before
+  // exII::ex_put_truth_table(). For us, this happens during the call
   // to ExodusII_IO_Helper::write_var_names(). sset_var_tab is a logically
   // (num_side_sets x num_sset_var) integer array of 0s and 1s
   // indicating which sidesets a given sideset variable is defined on.
@@ -3250,7 +3262,7 @@ write_sideset_data(const MeshBase & mesh,
           // Otherwise, fill in this entry of the sideset truth table.
           sset_var_tab[ss*var_names.size() + var] = 1;
 
-          // Data vector that will eventually be passed to exII::ex_put_sset_var().
+          // Data vector that will eventually be passed to exII::ex_put_var().
           std::vector<Real> sset_var_vals(num_sides_per_set[ss]);
 
           // Get reference to the BCTuple -> Real map for this variable.
@@ -3306,9 +3318,10 @@ write_sideset_data(const MeshBase & mesh,
           // sideset) pair.
           if (sset_var_vals.size() > 0)
             {
-              ex_err = exII::ex_put_sset_var
+              ex_err = exII::ex_put_var
                 (ex_id,
                  timestep,
+                 exII::EX_SIDE_SET,
                  var + 1, // 1-based variable index of current variable
                  ss_ids[ss],
                  num_sides_per_set[ss],
@@ -3320,10 +3333,11 @@ write_sideset_data(const MeshBase & mesh,
 
   // Finally, write the sideset truth table.
   ex_err =
-    exII::ex_put_sset_var_tab(ex_id,
-                              num_side_sets,
-                              cast_int<int>(var_names.size()),
-                              sset_var_tab.data());
+    exII::ex_put_truth_table(ex_id,
+                             exII::EX_SIDE_SET,
+                             num_side_sets,
+                             cast_int<int>(var_names.size()),
+                             sset_var_tab.data());
   EX_CHECK_ERR(ex_err, "Error writing sideset var truth table.");
 }
 
@@ -3345,8 +3359,9 @@ read_sideset_data(const MeshBase & mesh,
     {
       // Read the sideset data truth table
       std::vector<int> sset_var_tab(num_side_sets * num_sideset_vars);
-      ex_err = exII::ex_get_sset_var_tab
+      ex_err = exII::ex_get_truth_table
         (ex_id,
+         exII::EX_SIDE_SET,
          num_side_sets,
          num_sideset_vars,
          sset_var_tab.data());
@@ -3385,9 +3400,10 @@ read_sideset_data(const MeshBase & mesh,
                   // to this->read_sideset_info() has already set the
                   // values of num_sides_per_set, so we just use those values here.
                   std::vector<Real> sset_var_vals(num_sides_per_set[ss]);
-                  ex_err = exII::ex_get_sset_var
+                  ex_err = exII::ex_get_var
                     (ex_id,
                      timestep,
+                     exII::EX_SIDE_SET,
                      var + 1, // 1-based sideset variable index!
                      ss_ids[ss],
                      num_sides_per_set[ss],
@@ -3524,7 +3540,7 @@ write_nodeset_data (int timestep,
         // Otherwise, fill in this entry of the nodeset truth table.
         nset_var_tab[ns*var_names.size() + var] = 1;
 
-        // Data vector that will eventually be passed to exII::ex_put_nset_var().
+        // Data vector that will eventually be passed to exII::ex_put_var().
         std::vector<Real> nset_var_vals(num_nodes_per_set[ns]);
 
         // Get reference to the NodeBCTuple -> Real map for this variable.
@@ -3555,9 +3571,10 @@ write_nodeset_data (int timestep,
         // Write nodeset values to Exodus file
         if (nset_var_vals.size() > 0)
           {
-            ex_err = exII::ex_put_nset_var
+            ex_err = exII::ex_put_var
               (ex_id,
                timestep,
+               exII::EX_NODE_SET,
                var + 1, // 1-based variable index of current variable
                nodeset_ids[ns],
                num_nodes_per_set[ns],
@@ -3569,10 +3586,11 @@ write_nodeset_data (int timestep,
 
   // Finally, write the nodeset truth table.
   ex_err =
-    exII::ex_put_nset_var_tab(ex_id,
-                              num_node_sets,
-                              cast_int<int>(var_names.size()),
-                              nset_var_tab.data());
+    exII::ex_put_truth_table(ex_id,
+                             exII::EX_NODE_SET,
+                             num_node_sets,
+                             cast_int<int>(var_names.size()),
+                             nset_var_tab.data());
   EX_CHECK_ERR(ex_err, "Error writing nodeset var truth table.");
 }
 
@@ -3723,8 +3741,7 @@ read_elemset_data (int timestep,
       //           << " elemsets and " << num_elemset_vars
       //           << " elemset variables." << std::endl;
 
-      // Read the elemset data truth table. Note: I tried calling exII::ex_get_var_tab
-      // but it did not work and I also noticed that it is deprecated.
+      // Read the elemset data truth table.
       std::vector<int> elemset_var_tab(num_elem_sets * num_elemset_vars);
       exII::ex_get_truth_table(ex_id,
                                exII::EX_ELEM_SET, // exII::ex_entity_type
@@ -3865,8 +3882,9 @@ read_nodeset_data (int timestep,
     {
       // Read the nodeset data truth table
       std::vector<int> nset_var_tab(num_node_sets * num_nodeset_vars);
-      ex_err = exII::ex_get_nset_var_tab
+      ex_err = exII::ex_get_truth_table
         (ex_id,
+         exII::EX_NODE_SET,
          num_node_sets,
          num_nodeset_vars,
          nset_var_tab.data());
@@ -3906,9 +3924,10 @@ read_nodeset_data (int timestep,
                   // to this->read_nodeset_info() has already set the
                   // values of num_nodes_per_set, so we just use those values here.
                   std::vector<Real> nset_var_vals(num_nodes_per_set[ns]);
-                  ex_err = exII::ex_get_nset_var
+                  ex_err = exII::ex_get_var
                     (ex_id,
                      timestep,
+                     exII::EX_NODE_SET,
                      var + 1, // 1-based nodeset variable index!
                      nodeset_ids[ns],
                      num_nodes_per_set[ns],
@@ -3963,7 +3982,7 @@ get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> & bc
   for (int ns=0; ns<num_node_sets; ++ns)
     {
       offset += (ns > 0 ? num_nodes_per_set[ns-1] : 0);
-      // Note: we don't actually call exII::ex_get_nset_var() here because
+      // Note: we don't actually call exII::ex_get_var() here because
       // we don't need the values. We only need the indices into that vector
       // for each (node_id, boundary_id) tuple.
       for (int i=0; i<num_nodes_per_set[ns]; ++i)
@@ -4001,7 +4020,7 @@ void ExodusII_IO_Helper::write_element_values
     return;
 
   // Ask the file how many element vars it has, store it in the num_elem_vars variable.
-  ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_ELEM_BLOCK, &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
   // We will eventually loop over the element blocks (subdomains) and
@@ -4056,9 +4075,10 @@ void ExodusII_IO_Helper::write_element_values
           for (unsigned int k=0; k<num_elems_this_block; ++k)
             data[k] = values[var_id*n_elem + elem_nums[k]];
 
-          ex_err = exII::ex_put_elem_var
+          ex_err = exII::ex_put_var
             (ex_id,
              timestep,
+             exII::EX_ELEM_BLOCK,
              var_id+1,
              this->get_block_id(j),
              num_elems_this_block,
@@ -4085,7 +4105,7 @@ void ExodusII_IO_Helper::write_element_values_element_major
     return;
 
   // Ask the file how many element vars it has, store it in the num_elem_vars variable.
-  ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_ELEM_BLOCK, &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
   // We will eventually loop over the element blocks (subdomains) and
@@ -4192,8 +4212,13 @@ void ExodusII_IO_Helper::write_element_values_element_major
         // Now write 'data' to Exodus file, in single precision if requested.
         if (!data.empty())
           {
-            ex_err = exII::ex_put_elem_var
-              (ex_id, timestep, var_id+1, this->get_block_id(sbd_idx), data.size(),
+            ex_err = exII::ex_put_var
+              (ex_id,
+               timestep,
+               exII::EX_ELEM_BLOCK,
+               var_id+1,
+               this->get_block_id(sbd_idx),
+               data.size(),
                MappedOutputVector(data, _single_precision).data());
 
             EX_CHECK_ERR(ex_err, "Error writing element values.");
@@ -4215,8 +4240,13 @@ ExodusII_IO_Helper::write_nodal_values(int var_id,
 
   if (!values.empty())
     {
-      ex_err = exII::ex_put_nodal_var
-        (ex_id, timestep, var_id, num_nodes,
+      ex_err = exII::ex_put_var
+        (ex_id,
+         timestep,
+         exII::EX_NODAL,
+         var_id,
+         1, // exII::ex_entity_id, not sure exactly what this is but in the ex_put_nodal_var.c shim, they pass 1
+         num_nodes,
          MappedOutputVector(values, _single_precision).data());
 
       EX_CHECK_ERR(ex_err, "Error writing nodal values.");
@@ -4272,8 +4302,13 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Real> & values, i
 
   if (!values.empty())
     {
-      ex_err = exII::ex_put_glob_vars
-        (ex_id, timestep, num_global_vars,
+      ex_err = exII::ex_put_var
+        (ex_id,
+         timestep,
+         exII::EX_GLOBAL,
+         1, // var index
+         0, // obj_id (not used)
+         num_global_vars,
          MappedOutputVector(values, _single_precision).data());
 
       EX_CHECK_ERR(ex_err, "Error writing global values.");
@@ -4299,8 +4334,13 @@ void ExodusII_IO_Helper::read_global_values(std::vector<Real> & values, int time
 
   values.clear();
   values.resize(num_global_vars);
-  ex_err = exII::ex_get_glob_vars
-    (ex_id, timestep, num_global_vars,
+  ex_err = exII::ex_get_var
+    (ex_id,
+     timestep,
+     exII::EX_GLOBAL,
+     1, // var_index
+     1, // obj_id
+     num_global_vars,
      MappedInputVector(values, _single_precision).data());
 
   EX_CHECK_ERR(ex_err, "Error reading global values.");
