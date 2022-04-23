@@ -85,6 +85,8 @@ public:
    */
   virtual void retrieve_timestep () override;
 
+  virtual void advance_postprocessing_timestep(std::vector<std::function<void(Real, System &)>> integration_operations) override = 0;
+
   /**
    * Specify non-zero initial velocity. Should be called before solve().
    * The function value f and its gradient g are user-provided cloneable functors.

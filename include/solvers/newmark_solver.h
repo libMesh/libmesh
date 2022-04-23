@@ -78,6 +78,8 @@ public:
    */
   virtual void adjoint_advance_timestep () override;
 
+  virtual void advance_postprocessing_timestep(std::vector<std::function<void(Real, System &)>> integration_operations) override;
+
   /**
    * This method uses the specified initial displacement and velocity
    * to compute the initial acceleration \f$a_0\f$.
