@@ -415,4 +415,43 @@ void EulerSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementE
 }
 #endif // LIBMESH_ENABLE_AMR
 
+void EulerSolver::advance_postprocessing_timestep(std::vector<std::function<void(Real, System &)>> integration_operations)
+{
+  // // For EulerSolver: \int_{t_i}^{t_(i+1)} f(u(t)) dt \approx f(theta u_i + (1-theta)u_i+1) (t_i+1 - t_i)
+
+  // Currently, we only support this functionality when Backward-Euler time integration is used.
+  if (theta != 1.0)
+  libmesh_not_implemented();
+
+  // u_i will be provided by the old nonlinear solution after we advance to the next time instant.
+
+  // Advance to t_j+1
+  _system.time = _system.time + _system.deltat;
+
+  // Retrieve the state and adjoint vectors for the next time instant
+  retrieve_timestep();
+
+  // Create a new weighted solution vector (1 - theta)*u_i-1 + theta*u_i
+  std::unique_ptr<NumericVector<Number>> weighted_vector = NumericVector<Number>::build(_system.comm());
+  weighted_vector->init(_system.get_vector("_old_nonlinear_solution"));
+
+  weighted_vector->add(1.0 - theta, _system.get_vector("_old_nonlinear_solution"));
+
+  weighted_vector->add(theta, *(_system.solution));
+
+  _system.solution->swap(*weighted_vector);
+
+  // Mesh and solution read in. Ready to call the user's integration operations.
+  // Since we have already weighted the solution and old solution, we just pass 1.0
+  // as the time quadrature weight.
+  for (auto integration_operations_iterator:integration_operations)
+   integration_operations_iterator(1.0, dynamic_cast<System&>(_system));
+
+  // Swap back
+  _system.solution->swap(*weighted_vector);
+
+  return;
+}
+
+
 } // namespace libMesh
