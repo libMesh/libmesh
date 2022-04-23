@@ -438,4 +438,14 @@ void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefin
 }
 #endif // LIBMESH_ENABLE_AMR
 
+void TwostepTimeSolver::advance_postprocessing_timestep(std::vector<std::function<void(Real, System &)>> integration_operations)
+{
+  // First half timestep
+  core_time_solver->advance_postprocessing_timestep(integration_operations);
+
+  // Second half timestep
+  core_time_solver->advance_postprocessing_timestep(integration_operations);
+}
+
+
 } // namespace libMesh
