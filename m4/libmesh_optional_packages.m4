@@ -614,7 +614,7 @@ AS_IF([test "x$enableeigen" = xyes],
               dnl path, which gets exported during install
               [libmesh_optional_INCLUDES="$EIGEN_INCLUDE $libmesh_optional_INCLUDES"])
       ])
-AC_CONFIG_FILES([contrib/eigen/eigen/Makefile])
+AC_CONFIG_FILES([contrib/eigen/Makefile])
 AM_CONDITIONAL(LIBMESH_ENABLE_EIGEN, test x$enableeigen = xyes)
 AM_CONDITIONAL(LIBMESH_INSTALL_INTERNAL_EIGEN, test x$install_internal_eigen = xyes)
 #--------------------------------------------------------------

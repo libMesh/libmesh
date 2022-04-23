@@ -54016,7 +54016,7 @@ else
 fi
 
 fi
-ac_config_files="$ac_config_files contrib/eigen/eigen/Makefile"
+ac_config_files="$ac_config_files contrib/eigen/Makefile"
 
  if test x$enableeigen = xyes; then
   LIBMESH_ENABLE_EIGEN_TRUE=
@@ -59017,7 +59017,7 @@ do
     "contrib/triangle/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/triangle/Makefile" ;;
     "contrib/qhull/qhull/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/qhull/qhull/Makefile" ;;
     "contrib/gmv/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/gmv/Makefile" ;;
-    "contrib/eigen/eigen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/eigen/eigen/Makefile" ;;
+    "contrib/eigen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/eigen/Makefile" ;;
     "contrib/capnproto/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/capnproto/Makefile" ;;
     "contrib/exodusii/v5.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.09/Makefile" ;;
     "contrib/exodusii/v5.22/exodus/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.22/exodus/Makefile" ;;
