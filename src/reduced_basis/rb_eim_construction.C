@@ -760,6 +760,40 @@ const RBEIMEvaluation::QpDataMap & RBEIMConstruction::get_parametrized_function_
   return _local_parametrized_functions_for_training[training_index];
 }
 
+const RBEIMEvaluation::SideQpDataMap & RBEIMConstruction::get_side_parametrized_function_from_training_set(unsigned int training_index) const
+{
+  libmesh_error_msg_if(training_index >= _local_side_parametrized_functions_for_training.size(),
+                       "Invalid index: " << training_index);
+  return _local_side_parametrized_functions_for_training[training_index];
+}
+
+const std::unordered_map<dof_id_type, std::vector<Real> > & RBEIMConstruction::get_local_quad_point_JxW()
+{
+  return _local_quad_point_JxW;
+}
+
+const std::map<std::pair<dof_id_type,unsigned int>, std::vector<Real> > & RBEIMConstruction::get_local_side_quad_point_JxW()
+{
+  return _local_side_quad_point_JxW;
+}
+
+unsigned int RBEIMConstruction::get_n_parametrized_functions_for_training() const 
+{
+  if (get_rb_eim_evaluation().get_parametrized_function().on_mesh_sides())
+  {
+    return _local_side_parametrized_functions_for_training.size();
+  }
+  else
+  {
+    return _local_parametrized_functions_for_training.size(); 
+  }
+}
+
+void RBEIMConstruction::reinit_eim_projection_matrix()
+{
+  _eim_projection_matrix.resize(get_Nmax(),get_Nmax());
+}
+
 std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
 {
   LOG_SCOPE("compute_max_eim_error()", "RBEIMConstruction");
