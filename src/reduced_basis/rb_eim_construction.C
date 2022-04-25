@@ -777,7 +777,7 @@ const std::map<std::pair<dof_id_type,unsigned int>, std::vector<Real> > & RBEIMC
   return _local_side_quad_point_JxW;
 }
 
-unsigned int RBEIMConstruction::get_n_parametrized_functions_for_training() const 
+unsigned int RBEIMConstruction::get_n_parametrized_functions_for_training() const
 {
   if (get_rb_eim_evaluation().get_parametrized_function().on_mesh_sides())
   {
@@ -785,7 +785,7 @@ unsigned int RBEIMConstruction::get_n_parametrized_functions_for_training() cons
   }
   else
   {
-    return _local_parametrized_functions_for_training.size(); 
+    return _local_parametrized_functions_for_training.size();
   }
 }
 
