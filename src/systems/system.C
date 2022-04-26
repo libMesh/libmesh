@@ -2150,7 +2150,7 @@ void System::init_qois(unsigned int n_qois)
   qoi_error_estimates.resize(n_qois);
 }
 
-void System::fill_qoi(unsigned int qoi_index, Number qoi_value)
+void System::set_qoi(unsigned int qoi_index, Number qoi_value)
 {
   libmesh_assert(qoi_index < qoi.size());
 
@@ -2163,7 +2163,7 @@ Number System::get_qoi_value(unsigned int qoi_index)
   return qoi[qoi_index];
 }
 
-void System::fill_qoi_error_estimate(unsigned int qoi_index, Number qoi_error_estimate)
+void System::set_qoi_error_estimate(unsigned int qoi_index, Number qoi_error_estimate)
 {
   libmesh_assert(qoi_index < qoi_error_estimates.size());
 

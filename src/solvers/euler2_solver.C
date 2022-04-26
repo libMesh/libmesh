@@ -266,7 +266,7 @@ void Euler2Solver::integrate_qoi_timestep()
   // Zero out the system.qoi vector
   for (auto j : make_range(_system.n_qois()))
   {
-    _system.fill_qoi(j, 0.0);
+    _system.set_qoi(j, 0.0);
   }
 
   // Left and right side contributions
@@ -297,7 +297,7 @@ void Euler2Solver::integrate_qoi_timestep()
   // Zero out the system.qoi vector
   for (auto j : make_range(_system.n_qois()))
   {
-    _system.fill_qoi(j, 0.0);
+    _system.set_qoi(j, 0.0);
   }
 
   // Base class assumes a direct steady evaluation
@@ -312,7 +312,7 @@ void Euler2Solver::integrate_qoi_timestep()
   // theta = 0.5 (Crank-Nicholson) gives the trapezoidal rule.
   for (auto j : make_range(_system.n_qois()))
   {
-    _system.fill_qoi(j, ( ( ((1.0 - theta)*left_contribution[j]) + (theta*right_contribution[j]) )/2.0 )*(time_right - time_left));
+    _system.set_qoi(j, ( ( ((1.0 - theta)*left_contribution[j]) + (theta*right_contribution[j]) )/2.0 )*(time_right - time_left));
   }
 }
 
@@ -471,7 +471,7 @@ void Euler2Solver::integrate_adjoint_refinement_error_estimate(AdjointRefinement
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      _system.fill_qoi_error_estimate(j, ( (1.0 - theta)*qoi_error_estimates_left[j] + theta*qoi_error_estimates_right[j] )*last_step_deltat);
+      _system.set_qoi_error_estimate(j, ( (1.0 - theta)*qoi_error_estimates_left[j] + theta*qoi_error_estimates_right[j] )*last_step_deltat);
     }
   }
 

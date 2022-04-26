@@ -361,14 +361,14 @@ void TwostepTimeSolver::integrate_qoi_timestep()
   // Zero out the system.qoi vector
   for (auto j : make_range(_system.n_qois()))
   {
-    _system.fill_qoi(j, 0.0);
+    _system.set_qoi(j, 0.0);
   }
 
   // Add the contributions from the two halftimesteps to get the full QoI
   // contribution from this timestep
   for (auto j : make_range(_system.n_qois()))
   {
-    _system.fill_qoi(j, qois_first_half[j] + qois_second_half[j]);
+    _system.set_qoi(j, qois_first_half[j] + qois_second_half[j]);
   }
 }
 
@@ -441,7 +441,7 @@ void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefin
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      _system.fill_qoi_error_estimate(j, qoi_error_estimates_first_half[j] + qoi_error_estimates_second_half[j]);
+      _system.set_qoi_error_estimate(j, qoi_error_estimates_first_half[j] + qoi_error_estimates_second_half[j]);
     }
   }
 }

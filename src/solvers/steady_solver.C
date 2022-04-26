@@ -121,7 +121,7 @@ void SteadySolver::integrate_adjoint_refinement_error_estimate
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      _system.fill_qoi_error_estimate(j, adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j));
+      _system.set_qoi_error_estimate(j, adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j));
     }
   }
 
