@@ -802,6 +802,25 @@ int main (int argc, char ** argv)
                    << std::endl
                    << std::endl;
 
+      Z0_old_norm = system.calculate_norm(system.get_vector(old_adjoint_solution_name0), 0, H1);
+      Z1_old_norm = system.calculate_norm(system.get_vector(old_adjoint_solution_name1), 0, H1);
+
+      // Assert that the old adjoint values match hard coded numbers for 1st timestep or 1st half time step from the adjoint solve
+      if(param.timesolver_tolerance)
+      {
+        libmesh_error_msg_if(std::abs(Z0_old_norm - (4.3523242593920151e-06)) >= 2.e-10,
+                             "Mismatch in expected Z0_old norm for the 1st half timestep!");
+        libmesh_error_msg_if(std::abs(Z1_old_norm - (0.3118758855352407)) >= 2.e-5,
+                             "Mismatch in expected Z1_old norm for the 1st half timestep!");
+      }
+      else
+      {
+        libmesh_error_msg_if(std::abs(Z0_old_norm - (0.0030758523361801263)) >= 2.e-7,
+                             "Mismatch in expected Z0_old norm for the 1st timestep!");
+        libmesh_error_msg_if(std::abs(Z1_old_norm - (0.31162043809579365)) >= 2.e-5,
+                             "Mismatch in expected Z1_old norm for the 1st timestep!");
+      }
+
       libMesh::out << "|Z0_old("
                        << system.time + (system.time_solver->last_completed_timestep_size())/((param.timesolver_tolerance) ? 2.0 : 1.0)
                        << ")|= "

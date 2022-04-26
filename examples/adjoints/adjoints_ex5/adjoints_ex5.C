@@ -667,6 +667,20 @@ int main (int argc, char ** argv)
       // Retrieve the primal and adjoint solutions at the current timestep
       system.time_solver->retrieve_timestep();
 
+      Z_old_norm = system.calculate_norm(system.get_vector(old_adjoint_solution_name0), 0, H1);
+
+      // Assert that the old adjoint values match hard coded numbers for 1st timestep or 1st half time step from the adjoint solve
+      if(param.timesolver_tolerance)
+      {
+        libmesh_error_msg_if(std::abs(Z_old_norm - (2.23366)) >= 2.e-4,
+                             "Mismatch in expected Z0_old norm for the 1st half timestep!");
+       }
+      else
+      {
+        libmesh_error_msg_if(std::abs(Z_old_norm - (2.23627)) >= 2.e-4,
+                             "Mismatch in expected Z0_old norm for the 1st timestep!");
+      }
+
       // A pretty update message
       libMesh::out << "Retrieved, "
                << "time = "
