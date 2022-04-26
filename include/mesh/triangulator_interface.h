@@ -190,7 +190,7 @@ public:
    * Get whether or not the triangulation is allowed to refine the
    * mesh boundary when refining the interior.  True by default.
    */
-  virtual bool refine_boundary_allowed ()
+  virtual bool refine_boundary_allowed () const
   { return true; }
 
   /**
