@@ -236,9 +236,15 @@ bool Poly2TriTriangulator::is_refine_boundary_allowed
 
   if (bcids[0] == 0)
     return this->refine_boundary_allowed();
-  else
-    // We'll query holes in a future upgrade
-    return true;
+
+  // If we're not on an outer boundary side we'd better be on a hole
+  // side
+  libmesh_assert(this->_holes);
+
+  const boundary_id_type hole_num = bcids[0]-1;
+  libmesh_assert_less(hole_num, this->_holes->size());
+  const Hole * hole = (*this->_holes)[hole_num];
+  return hole->refine_boundary_allowed();
 }
 
 
