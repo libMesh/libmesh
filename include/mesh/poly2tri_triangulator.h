@@ -93,8 +93,6 @@ public:
    * mesh boundary when refining the interior.  This is true by
    * default, but may be set to false to make the mesh boundary more
    * predictable (and so easier to stitch to other meshes) later.
-   *
-   * This may not be implemented in all subclasses.
    */
   virtual void set_refine_boundary_allowed (bool refine_bdy_allowed)
   { _refine_bdy_allowed = refine_bdy_allowed; }
