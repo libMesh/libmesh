@@ -32,10 +32,6 @@ namespace
 {
 using namespace libMesh;
 
-// Mutex object for required locking
-typedef Threads::spin_mutex SingletonMutex;
-SingletonMutex singleton_mtx, setup_mtx;
-
 // global list of runtime Singleton objects - created dynamically,
 // cleaned up in reverse order.
 typedef std::vector<Singleton *> SingletonList;
@@ -64,8 +60,6 @@ namespace libMesh
 
 Singleton::Singleton ()
 {
-  SingletonMutex::scoped_lock lock(singleton_mtx);
-
   get_singleton_cache().push_back (this);
 }
 
@@ -73,8 +67,6 @@ Singleton::Singleton ()
 
 Singleton::Setup::Setup ()
 {
-  SingletonMutex::scoped_lock lock(setup_mtx);
-
   get_setup_cache().push_back (this);
 }
 
@@ -82,8 +74,6 @@ Singleton::Setup::Setup ()
 
 void Singleton::setup ()
 {
-  SingletonMutex::scoped_lock lock(setup_mtx);
-
   SetupList & setup_cache = get_setup_cache();
 
   for (auto & item : setup_cache)
@@ -97,8 +87,6 @@ void Singleton::setup ()
 
 void Singleton::cleanup ()
 {
-  SingletonMutex::scoped_lock lock(singleton_mtx);
-
   SingletonList & singleton_cache = get_singleton_cache();
 
   for (auto & item : as_range(singleton_cache.rbegin(),
