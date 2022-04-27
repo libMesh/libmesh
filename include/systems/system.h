@@ -1582,7 +1582,9 @@ public:
    */
   unsigned int n_qois() const;
 
-  #ifdef LIBMESH_ENABLE_DEPRECATED
+#ifndef LIBMESH_ENABLE_DEPRECATED // We use accessors for these now
+private:
+#endif
   /**
    * Values of the quantities of interest.  This vector needs
    * to be both resized and filled by the user before any quantity of
@@ -1598,9 +1600,12 @@ public:
    * User code can use this for accumulating error estimates for example.
    */
   std::vector<Number> qoi_error_estimates;
-  #endif
+#ifndef LIBMESH_ENABLE_DEPRECATED
+public:
+#endif
 
-  /** Accessors for qoi and qoi_error_estimates vectors
+  /**
+   * Accessors for qoi and qoi_error_estimates vectors
    */
   void init_qois(unsigned int n_qois);
 
@@ -2227,24 +2232,6 @@ private:
    * Do we want to apply constraints while projecting vectors ?
    */
   bool project_with_constraints;
-
-  #ifndef LIBMESH_ENABLE_DEPRECATED
-  /**
-   * Values of the quantities of interest.  This vector needs
-   * to be both resized and filled by the user before any quantity of
-   * interest assembly is done and before any sensitivities are
-   * calculated.
-   */
-  std::vector<Number> qoi;
-
-  /**
-   * Vector to hold error estimates for qois, either from a steady
-   * state calculation, or from a single unsteady solver timestep. Used
-   * by the library after resizing to match the size of the qoi vector.
-   * User code can use this for accumulating error estimates for example.
-   */
-  std::vector<Number> qoi_error_estimates;
-  #endif
 };
 
 
