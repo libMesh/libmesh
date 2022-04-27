@@ -240,6 +240,15 @@ public:
     unsigned int qp);
 
   /**
+   * Same as get_parametrized_function_value() except for node data.
+   */
+  static Number get_parametrized_function_node_value(
+    const Parallel::Communicator & comm,
+    const NodeDataMap & pf,
+    dof_id_type node_id,
+    unsigned int comp);
+
+  /**
    * Fill up \p values with the basis function values for basis function
    * \p basis_function_index and variable \p var, at all quadrature points
    * on element \p elem_id. Each processor stores data for only the
@@ -263,9 +272,9 @@ public:
   /**
    * Same as get_eim_basis_function_values_at_qps() except for node data.
    */
-  Number get_eim_basis_function_node_values(unsigned int basis_function_index,
-                                            dof_id_type node_id,
-                                            unsigned int var) const;
+  Number get_eim_basis_function_node_value(unsigned int basis_function_index,
+                                           dof_id_type node_id,
+                                           unsigned int var) const;
 
   /**
    * Same as above, except that we just return the value at the qp^th
@@ -410,9 +419,7 @@ public:
     Point p,
     unsigned int comp,
     dof_id_type node_id,
-    subdomain_id_type subdomain_id,
-    boundary_id_type boundary_id,
-    const std::vector<Point> & perturbs);
+    boundary_id_type boundary_id);
 
   /**
    * Set the observation points and components.

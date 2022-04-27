@@ -62,6 +62,13 @@ void RBEIMAssembly::evaluate_side_basis_function(dof_id_type elem_id,
   libmesh_error_msg_if(values.empty(), "Error: EIM basis function has no entries on this element for this processor");
 }
 
+Number RBEIMAssembly::evaluate_node_basis_function(dof_id_type node_id,
+                                                   unsigned int comp)
+{
+  return get_rb_eim_construction().get_rb_eim_evaluation().get_eim_basis_function_node_value(
+    _basis_function_index, node_id, comp);
+}
+
 RBEIMConstruction & RBEIMAssembly::get_rb_eim_construction()
 {
   return _rb_eim_con;

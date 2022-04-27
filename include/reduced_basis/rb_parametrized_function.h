@@ -111,9 +111,7 @@ public:
                                     unsigned int comp,
                                     const Point & xyz,
                                     dof_id_type node_id,
-                                    subdomain_id_type subdomain_id,
-                                    boundary_id_type boundary_id,
-                                    const std::vector<Point> & xyz_perturb);
+                                    boundary_id_type boundary_id);
 
   /**
    * Evaluate the parametrized function at the specified point for
@@ -149,9 +147,7 @@ public:
   virtual std::vector<Number> node_evaluate(const RBParameters & mu,
                                             const Point & xyz,
                                             dof_id_type node_id,
-                                            subdomain_id_type subdomain_id,
-                                            boundary_id_type boundary_id,
-                                            const std::vector<Point> & xyz_perturb);
+                                            boundary_id_type boundary_id);
 
   /**
    * Vectorized version of evaluate. If requires_xyz_perturbations==false, then all_xyz_perturb will not be used.
@@ -185,9 +181,7 @@ public:
   virtual void node_vectorized_evaluate(const std::vector<RBParameters> & mus,
                                         const std::vector<Point> & all_xyz,
                                         const std::vector<dof_id_type> & node_ids,
-                                        const std::vector<subdomain_id_type> & sbd_ids,
                                         const std::vector<boundary_id_type> & boundary_ids,
-                                        const std::vector<std::vector<Point>> & all_xyz_perturb,
                                         std::vector<std::vector<std::vector<Number>>> & output);
 
   /**
@@ -217,9 +211,7 @@ public:
    */
   virtual void preevaluate_parametrized_function_on_mesh_nodes(const RBParameters & mu,
                                                                const std::unordered_map<dof_id_type, Point> & all_xyz,
-                                                               const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
                                                                const std::unordered_map<dof_id_type, boundary_id_type> & node_boundary_ids,
-                                                               const std::unordered_map<dof_id_type, std::vector<Point> > & all_xyz_perturb,
                                                                const System & sys);
 
   /**

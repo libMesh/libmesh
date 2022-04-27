@@ -195,9 +195,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
     get_parametrized_function().node_vectorized_evaluate(mus,
                                                          _interpolation_points_xyz,
                                                          _interpolation_points_node_id,
-                                                         _interpolation_points_subdomain_id,
                                                          _interpolation_points_boundary_id,
-                                                         _interpolation_points_xyz_perturbations,
                                                          output_all_comps);
   else
     get_parametrized_function().vectorized_evaluate(mus,
@@ -421,7 +419,15 @@ Number RBEIMEvaluation::get_parametrized_function_node_value(
 {
   LOG_SCOPE("get_parametrized_function_node_value()", "RBEIMConstruction");
 
-  return libmesh_map_find(pf, node_id)[comp];
+  auto it = pf.find(node_id);
+  if (it != pf.end())
+    {
+      const std::vector<Number> & vec = it->second;
+      libmesh_error_msg_if (comp >= vec.size(), "Error: Invalid comp index");
+      return vec[comp];
+    }
+  else
+    return 0.;
 }
 
 Number RBEIMEvaluation::get_parametrized_function_value(
@@ -471,6 +477,20 @@ Number RBEIMEvaluation::get_parametrized_function_side_value(
   return value;
 }
 
+Number RBEIMEvaluation::get_parametrized_function_node_value(
+  const Parallel::Communicator & comm,
+  const NodeDataMap & pf,
+  dof_id_type node_id,
+  unsigned int comp)
+{
+  LOG_SCOPE("get_parametrized_function_node_value()", "RBEIMConstruction");
+
+  Number value = get_parametrized_function_node_value(pf, node_id, comp);
+  comm.sum(value);
+
+  return value;
+}
+
 void RBEIMEvaluation::get_eim_basis_function_values_at_qps(unsigned int basis_function_index,
                                                            dof_id_type elem_id,
                                                            unsigned int comp,
@@ -503,9 +523,9 @@ void RBEIMEvaluation::get_eim_basis_function_side_values_at_qps(unsigned int bas
     values);
 }
 
-Number RBEIMEvaluation::get_eim_basis_function_node_values(unsigned int basis_function_index,
-                                                         dof_id_type node_id,
-                                                         unsigned int comp) const
+Number RBEIMEvaluation::get_eim_basis_function_node_value(unsigned int basis_function_index,
+                                                          dof_id_type node_id,
+                                                          unsigned int comp) const
 {
   libmesh_error_msg_if(basis_function_index >= _local_node_eim_basis_functions.size(),
                        "Invalid basis function index: " << basis_function_index);
@@ -851,18 +871,14 @@ void RBEIMEvaluation::add_node_basis_function_and_interpolation_data(
   Point p,
   unsigned int comp,
   dof_id_type node_id,
-  subdomain_id_type subdomain_id,
-  boundary_id_type boundary_id,
-  const std::vector<Point> & perturbs)
+  boundary_id_type boundary_id)
 {
   _local_node_eim_basis_functions.emplace_back(node_bf);
 
   _interpolation_points_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
   _interpolation_points_node_id.emplace_back(node_id);
-  _interpolation_points_subdomain_id.emplace_back(subdomain_id);
   _interpolation_points_boundary_id.emplace_back(boundary_id);
-  _interpolation_points_xyz_perturbations.emplace_back(perturbs);
 }
 
 void RBEIMEvaluation::

@@ -82,11 +82,9 @@ RBParametrizedFunction::node_evaluate_comp(const RBParameters & mu,
                                            unsigned int comp,
                                            const Point & xyz,
                                            dof_id_type node_id,
-                                           subdomain_id_type subdomain_id,
-                                           boundary_id_type boundary_id,
-                                           const std::vector<Point> & xyz_perturb)
+                                           boundary_id_type boundary_id)
 {
-  std::vector<Number> values = node_evaluate(mu, xyz, node_id, subdomain_id, boundary_id, xyz_perturb);
+  std::vector<Number> values = node_evaluate(mu, xyz, node_id, boundary_id);
 
   libmesh_error_msg_if(comp >= values.size(), "Error: Invalid value of comp");
 
@@ -129,9 +127,7 @@ std::vector<Number>
 RBParametrizedFunction::node_evaluate(const RBParameters & /*mu*/,
                                       const Point & /*xyz*/,
                                       dof_id_type /*node_id*/,
-                                      subdomain_id_type /*subdomain_id*/,
-                                      boundary_id_type /*boundary_id*/,
-                                      const std::vector<Point> & /*xyz_perturb*/)
+                                      boundary_id_type /*boundary_id*/)
 {
   // This method should be overridden in subclasses, so we just give a not implemented error message here
   libmesh_not_implemented();
@@ -248,9 +244,7 @@ void RBParametrizedFunction::side_vectorized_evaluate(const std::vector<RBParame
 void RBParametrizedFunction::node_vectorized_evaluate(const std::vector<RBParameters> & mus,
                                                       const std::vector<Point> & all_xyz,
                                                       const std::vector<dof_id_type> & node_ids,
-                                                      const std::vector<subdomain_id_type> & sbd_ids,
                                                       const std::vector<boundary_id_type> & boundary_ids,
-                                                      const std::vector<std::vector<Point>> & all_xyz_perturb,
                                                       std::vector<std::vector<std::vector<Number>>> & output)
 {
   LOG_SCOPE("node_vectorized_evaluate()", "RBParametrizedFunction");
@@ -258,36 +252,16 @@ void RBParametrizedFunction::node_vectorized_evaluate(const std::vector<RBParame
   output.clear();
   unsigned int n_points = all_xyz.size();
 
-  libmesh_error_msg_if(sbd_ids.size() != n_points, "Error: invalid vector sizes");
-  libmesh_error_msg_if(requires_xyz_perturbations && (all_xyz_perturb.size() != n_points), "Error: invalid vector sizes");
-
-  // Dummy vector to be used when xyz perturbations are not required
-  std::vector<Point> empty_perturbs;
-
   output.resize(mus.size());
   for ( unsigned int mu_index : index_range(mus))
     {
       output[mu_index].resize(n_points);
       for (unsigned int point_index=0; point_index<n_points; point_index++)
         {
-          if (requires_xyz_perturbations)
-            {
-              output[mu_index][point_index] = node_evaluate(mus[mu_index],
-                                                            all_xyz[point_index],
-                                                            node_ids[point_index],
-                                                            sbd_ids[point_index],
-                                                            boundary_ids[point_index],
-                                                            all_xyz_perturb[point_index]);
-            }
-          else
-            {
-              output[mu_index][point_index] = node_evaluate(mus[mu_index],
-                                                            all_xyz[point_index],
-                                                            node_ids[point_index],
-                                                            sbd_ids[point_index],
-                                                            boundary_ids[point_index],
-                                                            empty_perturbs);
-            }
+          output[mu_index][point_index] = node_evaluate(mus[mu_index],
+                                                        all_xyz[point_index],
+                                                        node_ids[point_index],
+                                                        boundary_ids[point_index]);
         }
     }
 }
@@ -541,9 +515,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
 
 void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_nodes(const RBParameters & mu,
                                                                              const std::unordered_map<dof_id_type, Point> & all_xyz,
-                                                                             const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
                                                                              const std::unordered_map<dof_id_type, boundary_id_type> & node_boundary_ids,
-                                                                             const std::unordered_map<dof_id_type, std::vector<Point> > & all_xyz_perturb,
                                                                              const System & sys)
 {
   mesh_to_preevaluated_node_values_map.clear();
@@ -552,9 +524,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_nodes(con
 
   std::vector<Point> all_xyz_vec(n_points);
   std::vector<dof_id_type> node_ids_vec(n_points);
-  std::vector<subdomain_id_type> sbd_ids_vec(n_points);
   std::vector<boundary_id_type> boundary_ids_vec(n_points);
-  std::vector<std::vector<Point>> all_xyz_perturb_vec(n_points);
 
   // Empty vector to be used when xyz perturbations are not required
   std::vector<Point> empty_perturbs;
@@ -562,24 +532,13 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_nodes(con
   unsigned int counter = 0;
   for (const auto & [node_id, p] : all_xyz)
     {
-      subdomain_id_type subdomain_id = libmesh_map_find(sbd_ids, node_id);
       boundary_id_type boundary_id = libmesh_map_find(node_boundary_ids, node_id);
 
       mesh_to_preevaluated_node_values_map[node_id] = counter;
 
       all_xyz_vec[counter] = p;
       node_ids_vec[counter] = node_id;
-      sbd_ids_vec[counter] = subdomain_id;
       boundary_ids_vec[counter] = boundary_id;
-
-      if (requires_xyz_perturbations)
-        {
-          all_xyz_perturb_vec[counter] = libmesh_map_find(all_xyz_perturb, node_id);
-        }
-      else
-        {
-          all_xyz_perturb_vec[counter] = empty_perturbs;
-        }
 
       counter++;
     }
@@ -588,9 +547,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_nodes(con
   node_vectorized_evaluate(mus,
                            all_xyz_vec,
                            node_ids_vec,
-                           sbd_ids_vec,
                            boundary_ids_vec,
-                           all_xyz_perturb_vec,
                            preevaluated_values);
 }
 
