@@ -87,7 +87,7 @@ public:
     // We mostly wanted to make sure this compiled, but might as well
     // make sure it gave us the expected triangle count while we're at
     // it.
-    CPPUNIT_ASSERT_EQUAL(tris.size(), std::size_t(3));
+    CPPUNIT_ASSERT_EQUAL(tris.size(), std::size_t(18));
   }
 
   void testLibMeshPoly2TriSlivers()
