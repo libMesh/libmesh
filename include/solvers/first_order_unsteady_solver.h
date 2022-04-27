@@ -96,6 +96,8 @@ public:
   virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error) override = 0;
 #endif // LIBMESH_ENABLE_AMR
 
+  virtual void advance_postprocessing_timestep(std::vector<std::function<void(Real, System &)>> integration_operations) override = 0;
+
 protected:
 
   /**

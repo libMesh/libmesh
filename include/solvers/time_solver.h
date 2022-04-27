@@ -34,6 +34,7 @@ namespace libMesh
 class DiffContext;
 class DiffSolver;
 class DifferentiablePhysics;
+class System;
 class DifferentiableSystem;
 class ParameterVector;
 class SensitivityData;
@@ -155,6 +156,16 @@ public:
    */
   virtual void integrate_adjoint_refinement_error_estimate(AdjointRefinementEstimator & adjoint_refinement_error_estimator, ErrorVector & QoI_elementwise_error);
 #endif // LIBMESH_ENABLE_AMR
+
+
+  /**
+   * A method to evaluate generic integrals of the form:
+   * int_{0}^{T} f(u,z;p) dt ~ (sum_{i=1}^{N_outer_timesteps} sum_{k=1}^{K} ( sum_{j=1}^{N_inner_steps} w_ij f_k(u^j,z^j; p^j) )
+   * The library will supply the weights w_ij and current time t_ij to the user supplied function integration_operations.
+   * Also provided will be the primal and adjoint solution(s) values, u^j, u^j-1 and z^j, z^j+1
+   * The user defined integration_operations function will evaluate w_ij * f_k(u^j,z^j; p^j).
+   */
+  virtual void advance_postprocessing_timestep(std::vector<std::function<void(Real, System &)>> integration_operations) = 0;
 
   /**
    * This method uses the DifferentiablePhysics

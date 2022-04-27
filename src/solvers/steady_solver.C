@@ -133,4 +133,17 @@ void SteadySolver::integrate_adjoint_refinement_error_estimate
 }
 #endif // LIBMESH_ENABLE_AMR
 
+void SteadySolver::advance_postprocessing_timestep(std::vector<std::function<void(Real, System &)>> integration_operations)
+{
+  // For a steady state solve, time quadrature weight is simply 1.0
+  Real time_quadrature_weight = 1.0;
+  for(auto integration_operations_iterator:integration_operations)
+  {
+    auto f = integration_operations_iterator;
+    f(time_quadrature_weight, dynamic_cast<System&>(_system));
+  }
+
+return;
+}
+
 } // namespace libMesh

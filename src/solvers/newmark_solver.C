@@ -104,6 +104,11 @@ void NewmarkSolver::adjoint_advance_timestep ()
   libmesh_not_implemented();
 }
 
+void NewmarkSolver::advance_postprocessing_timestep(std::vector<std::function<void(Real, System &)>> /* integration_operations */)
+{
+  libmesh_not_implemented();
+}
+
 void NewmarkSolver::compute_initial_accel()
 {
   // We need to compute the initial acceleration based off of
