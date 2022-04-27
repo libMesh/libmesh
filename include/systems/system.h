@@ -1612,6 +1612,13 @@ public:
   void set_qoi(unsigned int qoi_index, Number qoi_value);
   Number get_qoi_value(unsigned int qoi_index) const;
 
+  void set_qoi(std::vector<Number> new_qoi);
+
+  /**
+   * Returns a *copy* of qoi, not a reference
+   */
+  std::vector<Number> get_qoi_values() const;
+
   void set_qoi_error_estimate(unsigned int qoi_index, Number qoi_error_estimate);
   Number get_qoi_error_estimate_value(unsigned int qoi_index) const;
 

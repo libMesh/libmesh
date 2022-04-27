@@ -2168,6 +2168,20 @@ Number System::get_qoi_value(unsigned int qoi_index) const
   return qoi[qoi_index];
 }
 
+
+std::vector<Number> System::get_qoi_values() const
+{
+  return this->qoi;
+}
+
+
+void System::set_qoi(std::vector<Number> new_qoi)
+{
+  libmesh_assert_equal_to(this->qoi.size(), new_qoi.size());
+  this->qoi = std::move(new_qoi);
+}
+
+
 void System::set_qoi_error_estimate(unsigned int qoi_index, Number qoi_error_estimate)
 {
   libmesh_assert(qoi_index < qoi_error_estimates.size());
