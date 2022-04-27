@@ -7,10 +7,10 @@
 
 using namespace libMesh;
 
-void CoupledSystemQoI::init_qoi(std::vector<Number> & sys_qoi)
+void CoupledSystemQoI::init_qoi(System & sys)
 {
   //Only 1 qoi to worry about
-  sys_qoi.resize(1);
+  sys.init_qois(1);
 }
 
 void CoupledSystemQoI::init_context(DiffContext & context)
