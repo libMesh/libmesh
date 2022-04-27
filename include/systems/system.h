@@ -1408,6 +1408,11 @@ public:
   void attach_constraint_object (Constraint & constrain);
 
   /**
+   * Return the user object for imposing constraints.
+   */
+  Constraint& get_constraint_object ();
+
+  /**
    * Register a user function for evaluating the quantities of interest,
    * whose values should be placed in \p System::qoi
    */
