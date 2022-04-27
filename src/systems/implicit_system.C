@@ -567,13 +567,13 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity (const QoISet & qoi_indic
 
       *parameters[j] = old_parameter - delta_p;
       this->assemble_qoi(qoi_indices);
-      std::vector<Number> qoi_minus = this->qoi;
+      const std::vector<Number> qoi_minus = this->get_qoi_values();
 
       NumericVector<Number> & neg_partialR_partialp = this->get_sensitivity_rhs(j);
 
       *parameters[j] = old_parameter + delta_p;
       this->assemble_qoi(qoi_indices);
-      std::vector<Number> & qoi_plus = this->qoi;
+      const std::vector<Number> qoi_plus = this->get_qoi_values();
 
       std::vector<Number> partialq_partialp(Nq, 0);
       for (unsigned int i=0; i != Nq; ++i)
@@ -655,11 +655,11 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity (const QoISet & qoi_indic
 
       *parameters[j] = old_parameter - delta_p;
       this->assemble_qoi(qoi_indices);
-      std::vector<Number> qoi_minus = this->qoi;
+      const std::vector<Number> qoi_minus = this->get_qoi_values();
 
       *parameters[j] = old_parameter + delta_p;
       this->assemble_qoi(qoi_indices);
-      std::vector<Number> & qoi_plus = this->qoi;
+      const std::vector<Number> qoi_plus = this->get_qoi_values();
 
       std::vector<Number> partialq_partialp(Nq, 0);
       for (unsigned int i=0; i != Nq; ++i)
@@ -769,7 +769,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
       this->assemble_qoi(qoi_indices);
       this->assembly(true, false, true);
       this->rhs->close();
-      std::vector<Number> partial2q_term = this->qoi;
+      std::vector<Number> partial2q_term = this->get_qoi_values();
       std::vector<Number> partial2R_term(this->n_qois());
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
@@ -782,7 +782,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           {
-            partial2q_term[i] -= this->qoi[i];
+            partial2q_term[i] -= this->get_qoi_value(i);
             partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
           }
 
@@ -800,7 +800,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           {
-            partial2q_term[i] -= this->qoi[i];
+            partial2q_term[i] -= this->get_qoi_value(i);
             partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
           }
 
@@ -811,7 +811,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           {
-            partial2q_term[i] += this->qoi[i];
+            partial2q_term[i] += this->get_qoi_value(i);
             partial2R_term[i] += this->rhs->dot(this->get_adjoint_solution(i));
           }
 
@@ -971,7 +971,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
           this->assemble_qoi(qoi_indices);
           this->assembly(true, false, true);
           this->rhs->close();
-          std::vector<Number> partial2q_term = this->qoi;
+          std::vector<Number> partial2q_term = this->get_qoi_values();
           std::vector<Number> partial2R_term(this->n_qois());
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
@@ -984,7 +984,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
               {
-                partial2q_term[i] -= this->qoi[i];
+                partial2q_term[i] -= this->get_qoi_value(i);
                 partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
               }
 
@@ -995,7 +995,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
               {
-                partial2q_term[i] += this->qoi[i];
+                partial2q_term[i] += this->get_qoi_value(i);
                 partial2R_term[i] += this->rhs->dot(this->get_adjoint_solution(i));
               }
 
@@ -1006,7 +1006,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
               {
-                partial2q_term[i] -= this->qoi[i];
+                partial2q_term[i] -= this->get_qoi_value(i);
                 partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
                 partial2q_term[i] /= (4. * delta_p * delta_p);
                 partial2R_term[i] /= (4. * delta_p * delta_p);

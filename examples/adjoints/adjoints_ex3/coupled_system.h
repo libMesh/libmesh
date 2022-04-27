@@ -39,7 +39,7 @@ public:
   CoupledSystem(EquationSystems & es,
                 const std::string & name_in,
                 const unsigned int number_in)
-    : FEMSystem(es, name_in, number_in), Peclet(1.) {qoi.resize(1);}
+    : FEMSystem(es, name_in, number_in), Peclet(1.) {this->init_qois(1);}
 
   // Function to get computed QoI values
 

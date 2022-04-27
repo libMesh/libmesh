@@ -38,7 +38,7 @@ public:
       _fe_family("LAGRANGE"),
       _fe_order(1),
       _analytic_jacobians(true)
-  { qoi.resize(2); QoI_time_instant.resize(2);}
+  { this->init_qois(2); QoI_time_instant.resize(2);}
 
   Real & k() { return _k; }
   bool & analytic_jacobians() { return _analytic_jacobians; }

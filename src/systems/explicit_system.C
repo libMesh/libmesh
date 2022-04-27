@@ -57,7 +57,7 @@ void ExplicitSystem::assemble_qoi (const QoISet & qoi_indices)
   // accumulate on initially zero values
   for (auto i : make_range(this->n_qois()))
     if (qoi_indices.has_index(i))
-      qoi[i] = 0;
+      this->set_qoi(i, 0);
 
   Parent::assemble_qoi (qoi_indices);
 }
