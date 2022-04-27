@@ -2148,11 +2148,13 @@ void System::user_QOI_derivative(const QoISet & qoi_indices,
       (qoi_indices, include_liftfunc, apply_constraints);
 }
 
+
 void System::init_qois(unsigned int n_qois)
 {
   qoi.resize(n_qois);
   qoi_error_estimates.resize(n_qois);
 }
+
 
 void System::set_qoi(unsigned int qoi_index, Number qoi_value)
 {
