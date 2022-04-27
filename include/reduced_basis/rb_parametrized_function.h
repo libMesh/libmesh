@@ -105,6 +105,17 @@ public:
                                     const std::vector<Real> & phi_i_qp);
 
   /**
+   * Same as evaluate_comp() but for element nodes.
+   */
+  virtual Number node_evaluate_comp(const RBParameters & mu,
+                                    unsigned int comp,
+                                    const Point & xyz,
+                                    dof_id_type node_id,
+                                    subdomain_id_type subdomain_id,
+                                    boundary_id_type boundary_id,
+                                    const std::vector<Point> & xyz_perturb);
+
+  /**
    * Evaluate the parametrized function at the specified point for
    * parameter \p mu.  If requires_xyz_perturbations==false, then
    * xyz_perturb will not be used.
@@ -133,6 +144,16 @@ public:
                                             const std::vector<Real> & phi_i_qp);
 
   /**
+   * Same as evaluate() but for element nodes.
+   */
+  virtual std::vector<Number> node_evaluate(const RBParameters & mu,
+                                            const Point & xyz,
+                                            dof_id_type node_id,
+                                            subdomain_id_type subdomain_id,
+                                            boundary_id_type boundary_id,
+                                            const std::vector<Point> & xyz_perturb);
+
+  /**
    * Vectorized version of evaluate. If requires_xyz_perturbations==false, then all_xyz_perturb will not be used.
    */
   virtual void vectorized_evaluate(const std::vector<RBParameters> & mus,
@@ -159,6 +180,17 @@ public:
                                         std::vector<std::vector<std::vector<Number>>> & output);
 
   /**
+   * Same as vectorized_evaluate() but on element nodes.
+   */
+  virtual void node_vectorized_evaluate(const std::vector<RBParameters> & mus,
+                                        const std::vector<Point> & all_xyz,
+                                        const std::vector<dof_id_type> & node_ids,
+                                        const std::vector<subdomain_id_type> & sbd_ids,
+                                        const std::vector<boundary_id_type> & boundary_ids,
+                                        const std::vector<std::vector<Point>> & all_xyz_perturb,
+                                        std::vector<std::vector<std::vector<Number>>> & output);
+
+  /**
    * Store the result of vectorized_evaluate. This is helpful during EIM training,
    * since we can pre-evaluate and store the parameterized function for each training
    * sample. If requires_xyz_perturbations==false, then all_xyz_perturb will not be used.
@@ -181,6 +213,16 @@ public:
                                                                const System & sys);
 
   /**
+   * Same as preevaluate_parametrized_function_on_mesh() except for mesh nodes.
+   */
+  virtual void preevaluate_parametrized_function_on_mesh_nodes(const RBParameters & mu,
+                                                               const std::unordered_map<dof_id_type, Point> & all_xyz,
+                                                               const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
+                                                               const std::unordered_map<dof_id_type, boundary_id_type> & node_boundary_ids,
+                                                               const std::unordered_map<dof_id_type, std::vector<Point> > & all_xyz_perturb,
+                                                               const System & sys);
+
+  /**
    * Look up the preevaluate values of the parametrized function for
    * component \p comp, element \p elem_id, and quadrature point \p qp.
    */
@@ -198,6 +240,13 @@ public:
                                                         unsigned int qp) const;
 
   /**
+   * Look up the preevaluate values of the parametrized function for
+   * component \p comp, node \p node_id.
+   */
+  virtual Number lookup_preevaluated_node_value_on_mesh(unsigned int comp,
+                                                        dof_id_type node_id) const;
+
+  /**
    * If this parametrized function is defined based on a lookup table then
    * we can call this function to initialize the table. This is a no-op by
    * default, but it can be overridden in subclasses as needed.
@@ -212,16 +261,21 @@ public:
                                         subdomain_id_type sbd_id) const;
 
   /**
-   * For RBParametrizedFunctions defined on element sides, we get/set the boundary
+   * For RBParametrizedFunctions defined on element sides or nodes, we get/set the boundary
    * IDs that this parametrized function is defined on.
    */
   const std::set<boundary_id_type> & get_parametrized_function_boundary_ids() const;
-  void set_parametrized_function_boundary_ids(const std::set<boundary_id_type> & boundary_ids);
+  void set_parametrized_function_boundary_ids(const std::set<boundary_id_type> & boundary_ids, bool is_nodal_boundary);
 
   /**
    * @return true if this parametrized function is defined on mesh sides.
    */
   bool on_mesh_sides() const;
+
+  /**
+   * @return true if this parametrized function is defined on mesh nodes.
+   */
+  bool on_mesh_nodes() const;
 
   /**
    * Evaluate the parametrized function for the parameter \p mu at the set of
@@ -300,6 +354,14 @@ public:
   std::map<std::pair<dof_id_type,unsigned int>, std::vector<unsigned int>> mesh_to_preevaluated_side_values_map;
 
   /**
+   * Indexing into preevaluated_values for the case where the preevaluated values
+   * were obtained from evaluations at elements/quadrature points on a mesh.
+   * The indexing here is:
+   *   node_id --> point_index
+   */
+  std::unordered_map<dof_id_type, unsigned int> mesh_to_preevaluated_node_values_map;
+
+  /**
    * Boolean to indicate whether this parametrized function requires xyz perturbations
    * in order to evaluate function values. An example of where perturbations are
    * required is when the parametrized function is based on finite difference
@@ -342,6 +404,13 @@ protected:
    * the set of boundary IDs that the function is defined on.
    */
   std::set<boundary_id_type> _parametrized_function_boundary_ids;
+
+  /**
+   * In the case that _parametrized_function_boundary_ids is not empty, then this
+   * parametrized function is defined on a mesh boundary. This boolean inidicates
+   * if the mesh boundary under consideration is a set of sides, or a set of nodes.
+   */
+  bool _is_nodal_boundary;
 
 };
 

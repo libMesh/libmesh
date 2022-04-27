@@ -81,6 +81,11 @@ public:
   typedef std::map<std::pair<dof_id_type,unsigned int>, std::vector<std::vector<Number>>> SideQpDataMap;
 
   /**
+   * Type of the data structure used to map from (node id) -> [n_vars] data.
+   */
+  typedef std::map<dof_id_type, std::vector<Number>> NodeDataMap;
+
+  /**
    * Clear this object.
    */
   virtual void clear() override;
@@ -160,6 +165,12 @@ public:
                              const DenseVector<Number> & coeffs);
 
   /**
+   * Same as decrement_vector() except for node data.
+   */
+  void node_decrement_vector(NodeDataMap & v,
+                             const DenseVector<Number> & coeffs);
+
+  /**
    * Build a vector of RBTheta objects that accesses the components
    * of the RB_solution member variable of this RBEvaluation.
    * Store these objects in the member vector rb_theta_objects.
@@ -197,6 +208,14 @@ public:
     unsigned int side_index,
     unsigned int comp,
     std::vector<Number> & values);
+
+  /**
+   * Same as get_parametrized_function_values_at_qps() except for node data.
+   */
+  static Number get_parametrized_function_node_value(
+    const NodeDataMap & pf,
+    dof_id_type node_id,
+    unsigned int comp);
 
   /**
    * Same as above, except that we just return the value at the qp^th
@@ -242,6 +261,13 @@ public:
                                                  std::vector<Number> & values) const;
 
   /**
+   * Same as get_eim_basis_function_values_at_qps() except for node data.
+   */
+  Number get_eim_basis_function_node_values(unsigned int basis_function_index,
+                                            dof_id_type node_id,
+                                            unsigned int var) const;
+
+  /**
    * Same as above, except that we just return the value at the qp^th
    * quadrature point.
    */
@@ -268,6 +294,11 @@ public:
    * Get a reference to the i^th side basis function.
    */
   const SideQpDataMap & get_side_basis_function(unsigned int i) const;
+
+  /**
+   * Get a reference to the i^th node basis function.
+   */
+  const NodeDataMap & get_node_basis_function(unsigned int i) const;
 
   /**
    * Set _rb_eim_solutions. Normally we update _rb_eim_solutions by performing
@@ -306,6 +337,7 @@ public:
   void add_interpolation_points_xyz_perturbations(const std::vector<Point> & perturbs);
   void add_interpolation_points_elem_id(dof_id_type elem_id);
   void add_interpolation_points_side_index(unsigned int side_index);
+  void add_interpolation_points_node_id(dof_id_type node_id);
   void add_interpolation_points_qp(unsigned int qp);
   void add_interpolation_points_phi_i_qp(const std::vector<Real> & phi_i_qp);
   void add_interpolation_points_spatial_indices(const std::vector<unsigned int> & spatial_indices);
@@ -320,6 +352,7 @@ public:
   const std::vector<Point> & get_interpolation_points_xyz_perturbations(unsigned int index) const;
   dof_id_type get_interpolation_points_elem_id(unsigned int index) const;
   unsigned int get_interpolation_points_side_index(unsigned int index) const;
+  dof_id_type get_interpolation_points_node_id(unsigned int index) const;
   unsigned int get_interpolation_points_qp(unsigned int index) const;
   const std::vector<Real> & get_interpolation_points_phi_i_qp(unsigned int index) const;
   const std::vector<unsigned int> & get_interpolation_points_spatial_indices(unsigned int index) const;
@@ -368,6 +401,18 @@ public:
     unsigned int qp,
     const std::vector<Point> & perturbs,
     const std::vector<Real> & phi_i_qp);
+
+  /**
+   * Add \p node_bf to our EIM basis.
+   */
+  void add_node_basis_function_and_interpolation_data(
+    const NodeDataMap & node_bf,
+    Point p,
+    unsigned int comp,
+    dof_id_type node_id,
+    subdomain_id_type subdomain_id,
+    boundary_id_type boundary_id,
+    const std::vector<Point> & perturbs);
 
   /**
    * Set the observation points and components.
@@ -567,6 +612,13 @@ private:
   std::vector<boundary_id_type> _interpolation_points_boundary_id;
 
   /**
+   * If the EIM approximation applies to element nodes (e.g. from a nodeset),
+   * then we need to store the ID for each node. We also store the associated
+   * boundary ID in this case, using _interpolation_points_boundary_id.
+   */
+  std::vector<dof_id_type> _interpolation_points_node_id;
+
+  /**
    * We store the shape function values at the qp as well. These values
    * allows us to evaluate parametrized functions that depend on nodal
    * data.
@@ -614,6 +666,16 @@ private:
    * general will not start at zero.
    */
   std::vector<SideQpDataMap> _local_side_eim_basis_functions;
+
+  /**
+   * The EIM basis functions on element nodes (e.g. on a nodeset). We store values at nodes
+   * that are local to this processor. The indexing
+   * is as follows:
+   *   basis function index --> node ID --> variable --> value
+   * We use a map to index the node ID, since the IDs on this processor in
+   * general will not start at zero.
+   */
+  std::vector<NodeDataMap> _local_node_eim_basis_functions;
 
   /**
    * Print the contents of _local_eim_basis_functions to libMesh::out.

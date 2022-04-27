@@ -35,7 +35,8 @@ RBParametrizedFunction::RBParametrizedFunction()
 :
 requires_xyz_perturbations(false),
 is_lookup_table(false),
-fd_delta(1.e-6)
+fd_delta(1.e-6),
+_is_nodal_boundary(false)
 {}
 
 RBParametrizedFunction::~RBParametrizedFunction() = default;
@@ -76,6 +77,22 @@ RBParametrizedFunction::side_evaluate_comp(const RBParameters & mu,
   return values[comp];
 }
 
+Number
+RBParametrizedFunction::node_evaluate_comp(const RBParameters & mu,
+                                           unsigned int comp,
+                                           const Point & xyz,
+                                           dof_id_type node_id,
+                                           subdomain_id_type subdomain_id,
+                                           boundary_id_type boundary_id,
+                                           const std::vector<Point> & xyz_perturb)
+{
+  std::vector<Number> values = node_evaluate(mu, xyz, node_id, subdomain_id, boundary_id, xyz_perturb);
+
+  libmesh_error_msg_if(comp >= values.size(), "Error: Invalid value of comp");
+
+  return values[comp];
+}
+
 std::vector<Number>
 RBParametrizedFunction::evaluate(const RBParameters & /*mu*/,
                                  const Point & /*xyz*/,
@@ -101,6 +118,20 @@ RBParametrizedFunction::side_evaluate(const RBParameters & /*mu*/,
                                       boundary_id_type /*boundary_id*/,
                                       const std::vector<Point> & /*xyz_perturb*/,
                                       const std::vector<Real> & /*phi_i_qp*/)
+{
+  // This method should be overridden in subclasses, so we just give a not implemented error message here
+  libmesh_not_implemented();
+
+  return std::vector<Number>();
+}
+
+std::vector<Number>
+RBParametrizedFunction::node_evaluate(const RBParameters & /*mu*/,
+                                      const Point & /*xyz*/,
+                                      dof_id_type /*node_id*/,
+                                      subdomain_id_type /*subdomain_id*/,
+                                      boundary_id_type /*boundary_id*/,
+                                      const std::vector<Point> & /*xyz_perturb*/)
 {
   // This method should be overridden in subclasses, so we just give a not implemented error message here
   libmesh_not_implemented();
@@ -169,7 +200,7 @@ void RBParametrizedFunction::side_vectorized_evaluate(const std::vector<RBParame
                                                       const std::vector<std::vector<Real>> & phi_i_qp,
                                                       std::vector<std::vector<std::vector<Number>>> & output)
 {
-  LOG_SCOPE("vectorized_evaluate()", "RBParametrizedFunction");
+  LOG_SCOPE("side_vectorized_evaluate()", "RBParametrizedFunction");
 
   output.clear();
   unsigned int n_points = all_xyz.size();
@@ -209,6 +240,53 @@ void RBParametrizedFunction::side_vectorized_evaluate(const std::vector<RBParame
                                                             boundary_ids[point_index],
                                                             empty_perturbs,
                                                             phi_i_qp[point_index]);
+            }
+        }
+    }
+}
+
+void RBParametrizedFunction::node_vectorized_evaluate(const std::vector<RBParameters> & mus,
+                                                      const std::vector<Point> & all_xyz,
+                                                      const std::vector<dof_id_type> & node_ids,
+                                                      const std::vector<subdomain_id_type> & sbd_ids,
+                                                      const std::vector<boundary_id_type> & boundary_ids,
+                                                      const std::vector<std::vector<Point>> & all_xyz_perturb,
+                                                      std::vector<std::vector<std::vector<Number>>> & output)
+{
+  LOG_SCOPE("node_vectorized_evaluate()", "RBParametrizedFunction");
+
+  output.clear();
+  unsigned int n_points = all_xyz.size();
+
+  libmesh_error_msg_if(sbd_ids.size() != n_points, "Error: invalid vector sizes");
+  libmesh_error_msg_if(requires_xyz_perturbations && (all_xyz_perturb.size() != n_points), "Error: invalid vector sizes");
+
+  // Dummy vector to be used when xyz perturbations are not required
+  std::vector<Point> empty_perturbs;
+
+  output.resize(mus.size());
+  for ( unsigned int mu_index : index_range(mus))
+    {
+      output[mu_index].resize(n_points);
+      for (unsigned int point_index=0; point_index<n_points; point_index++)
+        {
+          if (requires_xyz_perturbations)
+            {
+              output[mu_index][point_index] = node_evaluate(mus[mu_index],
+                                                            all_xyz[point_index],
+                                                            node_ids[point_index],
+                                                            sbd_ids[point_index],
+                                                            boundary_ids[point_index],
+                                                            all_xyz_perturb[point_index]);
+            }
+          else
+            {
+              output[mu_index][point_index] = node_evaluate(mus[mu_index],
+                                                            all_xyz[point_index],
+                                                            node_ids[point_index],
+                                                            sbd_ids[point_index],
+                                                            boundary_ids[point_index],
+                                                            empty_perturbs);
             }
         }
     }
@@ -461,6 +539,61 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
                            preevaluated_values);
 }
 
+void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_nodes(const RBParameters & mu,
+                                                                             const std::unordered_map<dof_id_type, Point> & all_xyz,
+                                                                             const std::unordered_map<dof_id_type, subdomain_id_type> & sbd_ids,
+                                                                             const std::unordered_map<dof_id_type, boundary_id_type> & node_boundary_ids,
+                                                                             const std::unordered_map<dof_id_type, std::vector<Point> > & all_xyz_perturb,
+                                                                             const System & sys)
+{
+  mesh_to_preevaluated_node_values_map.clear();
+
+  unsigned int n_points = all_xyz.size();
+
+  std::vector<Point> all_xyz_vec(n_points);
+  std::vector<dof_id_type> node_ids_vec(n_points);
+  std::vector<subdomain_id_type> sbd_ids_vec(n_points);
+  std::vector<boundary_id_type> boundary_ids_vec(n_points);
+  std::vector<std::vector<Point>> all_xyz_perturb_vec(n_points);
+
+  // Empty vector to be used when xyz perturbations are not required
+  std::vector<Point> empty_perturbs;
+
+  unsigned int counter = 0;
+  for (const auto & [node_id, p] : all_xyz)
+    {
+      subdomain_id_type subdomain_id = libmesh_map_find(sbd_ids, node_id);
+      boundary_id_type boundary_id = libmesh_map_find(node_boundary_ids, node_id);
+
+      mesh_to_preevaluated_node_values_map[node_id] = counter;
+
+      all_xyz_vec[counter] = p;
+      node_ids_vec[counter] = node_id;
+      sbd_ids_vec[counter] = subdomain_id;
+      boundary_ids_vec[counter] = boundary_id;
+
+      if (requires_xyz_perturbations)
+        {
+          all_xyz_perturb_vec[counter] = libmesh_map_find(all_xyz_perturb, node_id);
+        }
+      else
+        {
+          all_xyz_perturb_vec[counter] = empty_perturbs;
+        }
+
+      counter++;
+    }
+
+  std::vector<RBParameters> mus {mu};
+  node_vectorized_evaluate(mus,
+                           all_xyz_vec,
+                           node_ids_vec,
+                           sbd_ids_vec,
+                           boundary_ids_vec,
+                           all_xyz_perturb_vec,
+                           preevaluated_values);
+}
+
 Number RBParametrizedFunction::lookup_preevaluated_value_on_mesh(unsigned int comp,
                                                                  dof_id_type elem_id,
                                                                  unsigned int qp) const
@@ -488,6 +621,18 @@ Number RBParametrizedFunction::lookup_preevaluated_side_value_on_mesh(unsigned i
   libmesh_error_msg_if(qp >= indices_at_qps.size(), "Error: invalid qp");
 
   unsigned int index = indices_at_qps[qp];
+  libmesh_error_msg_if(preevaluated_values.size() != 1, "Error: we expect only one parameter index");
+  libmesh_error_msg_if(index >= preevaluated_values[0].size(), "Error: invalid index");
+
+  return preevaluated_values[0][index][comp];
+}
+
+Number RBParametrizedFunction::lookup_preevaluated_node_value_on_mesh(unsigned int comp,
+                                                                      dof_id_type node_id) const
+{
+  unsigned int index =
+    libmesh_map_find(mesh_to_preevaluated_node_values_map, node_id);
+
   libmesh_error_msg_if(preevaluated_values.size() != 1, "Error: we expect only one parameter index");
   libmesh_error_msg_if(index >= preevaluated_values[0].size(), "Error: invalid index");
 
@@ -596,14 +741,20 @@ const std::set<boundary_id_type> & RBParametrizedFunction::get_parametrized_func
   return _parametrized_function_boundary_ids;
 }
 
-void RBParametrizedFunction::set_parametrized_function_boundary_ids(const std::set<boundary_id_type> & boundary_ids)
+void RBParametrizedFunction::set_parametrized_function_boundary_ids(const std::set<boundary_id_type> & boundary_ids, bool is_nodal_boundary)
 {
   _parametrized_function_boundary_ids = boundary_ids;
+  _is_nodal_boundary = is_nodal_boundary;
 }
 
 bool RBParametrizedFunction::on_mesh_sides() const
 {
-  return !get_parametrized_function_boundary_ids().empty();
+  return !get_parametrized_function_boundary_ids().empty() && !_is_nodal_boundary;
+}
+
+bool RBParametrizedFunction::on_mesh_nodes() const
+{
+  return !get_parametrized_function_boundary_ids().empty() && _is_nodal_boundary;
 }
 
 }

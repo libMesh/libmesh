@@ -63,6 +63,7 @@ void RBEIMEvaluation::clear()
   _interpolation_points_xyz_perturbations.clear();
   _interpolation_points_elem_id.clear();
   _interpolation_points_side_index.clear();
+  _interpolation_points_node_id.clear();
   _interpolation_points_qp.clear();
   _interpolation_points_phi_i_qp.clear();
   _interpolation_points_spatial_indices.clear();
@@ -83,6 +84,7 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
   _interpolation_points_xyz_perturbations.clear();
   _interpolation_points_elem_id.clear();
   _interpolation_points_side_index.clear();
+  _interpolation_points_node_id.clear();
   _interpolation_points_qp.clear();
   _interpolation_points_phi_i_qp.clear();
   _interpolation_points_spatial_indices.clear();
@@ -188,6 +190,14 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
                                                          _interpolation_points_boundary_id,
                                                          _interpolation_points_xyz_perturbations,
                                                          _interpolation_points_phi_i_qp,
+                                                         output_all_comps);
+  else if (get_parametrized_function().on_mesh_nodes())
+    get_parametrized_function().node_vectorized_evaluate(mus,
+                                                         _interpolation_points_xyz,
+                                                         _interpolation_points_node_id,
+                                                         _interpolation_points_subdomain_id,
+                                                         _interpolation_points_boundary_id,
+                                                         _interpolation_points_xyz_perturbations,
                                                          output_all_comps);
   else
     get_parametrized_function().vectorized_evaluate(mus,
@@ -319,6 +329,30 @@ void RBEIMEvaluation::side_decrement_vector(SideQpDataMap & v,
     }
 }
 
+void RBEIMEvaluation::node_decrement_vector(NodeDataMap & v,
+                                            const DenseVector<Number> & coeffs)
+{
+  LOG_SCOPE("node_decrement_vector()", "RBEIMEvaluation");
+
+  libmesh_error_msg_if(get_n_basis_functions() != coeffs.size(),
+                       "Error: Number of coefficients should match number of basis functions");
+
+  for (auto & [node_id, v_comps] : v)
+    {
+      for (const auto & comp : index_range(v_comps))
+        for (unsigned int i : index_range(_local_node_eim_basis_functions))
+          {
+            // Check that entry (node_id,comp) exists in _local_node_eim_basis_functions so that
+            // we get a clear error message if there is any missing data
+            const auto & basis_comp = libmesh_map_find(_local_node_eim_basis_functions[i], node_id);
+
+            libmesh_error_msg_if(comp >= basis_comp.size(), "Error: Invalid comp");
+
+            v_comps[comp] -= coeffs(i) * basis_comp[comp];
+          }
+    }
+}
+
 void RBEIMEvaluation::initialize_eim_theta_objects()
 {
   // Initialize the rb_theta objects that access the solution from this rb_eim_evaluation
@@ -378,6 +412,16 @@ void RBEIMEvaluation::get_parametrized_function_side_values_at_qps(
 
     values = comps_and_qps_on_elem[comp];
   }
+}
+
+Number RBEIMEvaluation::get_parametrized_function_node_value(
+  const NodeDataMap & pf,
+  dof_id_type node_id,
+  unsigned int comp)
+{
+  LOG_SCOPE("get_parametrized_function_node_value()", "RBEIMConstruction");
+
+  return libmesh_map_find(pf, node_id)[comp];
 }
 
 Number RBEIMEvaluation::get_parametrized_function_value(
@@ -459,6 +503,19 @@ void RBEIMEvaluation::get_eim_basis_function_side_values_at_qps(unsigned int bas
     values);
 }
 
+Number RBEIMEvaluation::get_eim_basis_function_node_values(unsigned int basis_function_index,
+                                                         dof_id_type node_id,
+                                                         unsigned int comp) const
+{
+  libmesh_error_msg_if(basis_function_index >= _local_node_eim_basis_functions.size(),
+                       "Invalid basis function index: " << basis_function_index);
+
+  return get_parametrized_function_node_value(
+    _local_node_eim_basis_functions[basis_function_index],
+    node_id,
+    comp);
+}
+
 Number RBEIMEvaluation::get_eim_basis_function_value(unsigned int basis_function_index,
                                                      dof_id_type elem_id,
                                                      unsigned int comp,
@@ -503,6 +560,12 @@ const RBEIMEvaluation::SideQpDataMap &
 RBEIMEvaluation::get_side_basis_function(unsigned int i) const
 {
   return _local_side_eim_basis_functions[i];
+}
+
+const RBEIMEvaluation::NodeDataMap &
+RBEIMEvaluation::get_node_basis_function(unsigned int i) const
+{
+  return _local_node_eim_basis_functions[i];
 }
 
 void RBEIMEvaluation::set_rb_eim_solutions(const std::vector<DenseVector<Number>> & rb_eim_solutions)
@@ -574,6 +637,11 @@ void RBEIMEvaluation::add_interpolation_points_side_index(unsigned int side_inde
   _interpolation_points_side_index.emplace_back(side_index);
 }
 
+void RBEIMEvaluation::add_interpolation_points_node_id(dof_id_type node_id)
+{
+  _interpolation_points_node_id.emplace_back(node_id);
+}
+
 void RBEIMEvaluation::add_interpolation_points_qp(unsigned int qp)
 {
   _interpolation_points_qp.emplace_back(qp);
@@ -636,6 +704,13 @@ unsigned int RBEIMEvaluation::get_interpolation_points_side_index(unsigned int i
   libmesh_error_msg_if(index >= _interpolation_points_side_index.size(), "Error: Invalid index");
 
   return _interpolation_points_side_index[index];
+}
+
+dof_id_type RBEIMEvaluation::get_interpolation_points_node_id(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _interpolation_points_node_id.size(), "Error: Invalid index");
+
+  return _interpolation_points_node_id[index];
 }
 
 unsigned int RBEIMEvaluation::get_interpolation_points_qp(unsigned int index) const
@@ -769,6 +844,25 @@ void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
   _interpolation_points_qp.emplace_back(qp);
   _interpolation_points_xyz_perturbations.emplace_back(perturbs);
   _interpolation_points_phi_i_qp.emplace_back(phi_i_qp);
+}
+
+void RBEIMEvaluation::add_node_basis_function_and_interpolation_data(
+  const NodeDataMap & node_bf,
+  Point p,
+  unsigned int comp,
+  dof_id_type node_id,
+  subdomain_id_type subdomain_id,
+  boundary_id_type boundary_id,
+  const std::vector<Point> & perturbs)
+{
+  _local_node_eim_basis_functions.emplace_back(node_bf);
+
+  _interpolation_points_xyz.emplace_back(p);
+  _interpolation_points_comp.emplace_back(comp);
+  _interpolation_points_node_id.emplace_back(node_id);
+  _interpolation_points_subdomain_id.emplace_back(subdomain_id);
+  _interpolation_points_boundary_id.emplace_back(boundary_id);
+  _interpolation_points_xyz_perturbations.emplace_back(perturbs);
 }
 
 void RBEIMEvaluation::
@@ -1266,6 +1360,20 @@ void RBEIMEvaluation::print_local_eim_basis_functions() const
                 libMesh::out << array[var][qp] << " ";
               libMesh::out << std::endl;
             }
+        }
+    }
+
+  for (auto bf : index_range(_local_node_eim_basis_functions))
+    {
+      libMesh::out << "Node basis function " << bf << std::endl;
+      for (const auto & [node_id, array] : _local_node_eim_basis_functions[bf])
+        {
+          libMesh::out << "Node " << node_id << std::endl;
+          for (auto var : index_range(array))
+            {
+              libMesh::out << "Variable " << var << ": " << array[var] << std::endl;
+            }
+          libMesh::out << std::endl;
         }
     }
 }
