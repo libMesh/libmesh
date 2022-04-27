@@ -1610,10 +1610,10 @@ public:
   void init_qois(unsigned int n_qois);
 
   void set_qoi(unsigned int qoi_index, Number qoi_value);
-  Number get_qoi_value(unsigned int qoi_index);
+  Number get_qoi_value(unsigned int qoi_index) const;
 
   void set_qoi_error_estimate(unsigned int qoi_index, Number qoi_error_estimate);
-  Number get_qoi_error_estimate_value(unsigned int qoi_index);
+  Number get_qoi_error_estimate_value(unsigned int qoi_index) const;
 
   /**
    * \returns The value of the solution variable \p var at the physical
