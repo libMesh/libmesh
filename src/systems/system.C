@@ -2010,6 +2010,12 @@ void System::attach_constraint_object (System::Constraint & constrain)
   _constrain_system_object = &constrain;
 }
 
+System::Constraint& System::get_constraint_object ()
+{
+  libmesh_assert_msg(_constrain_system_object,"No constraint object available.");
+  return *_constrain_system_object;
+}
+
 
 
 void System::attach_QOI_function(void fptr(EquationSystems &,
