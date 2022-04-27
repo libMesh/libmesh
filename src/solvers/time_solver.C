@@ -80,7 +80,19 @@ void TimeSolver::init ()
     this->linear_solver() = LinearSolver<Number>::build(_system.comm());
 }
 
+void TimeSolver::init_adjoints ()
+{
+  libmesh_assert_msg(_system.n_qois() != 0, "System qois have to be initialized before initializing adjoints.");
 
+  // Add adjoint vectors
+  for(auto i : make_range(_system.n_qois()))
+  {
+    std::string adjoint_solution_name = "adjoint_solution";
+    adjoint_solution_name+= std::to_string(i);
+    _system.add_vector(adjoint_solution_name, false, GHOSTED);
+  }
+
+}
 
 void TimeSolver::init_data ()
 {

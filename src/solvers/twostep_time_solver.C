@@ -300,6 +300,15 @@ std::pair<unsigned int, Real> TwostepTimeSolver::adjoint_solve (const QoISet & q
   // Take the first adjoint 'half timestep'
   core_time_solver->adjoint_solve(qoi_indices);
 
+  // We print the forward 'half solution' norms and we will do so for the adjoints if running in dbg.
+  #ifdef DEBUG
+    for(auto i : make_range(_system.n_qois()))
+    {
+      for(auto j : make_range(_system.n_vars()))
+        libMesh::out<<"||Z_"<<"("<<_system.time<<";"<<i<<","<<j<<")||_H1: "<<_system.calculate_norm(_system.get_adjoint_solution(i), j,H1)<<std::endl;
+    }
+  #endif
+
   // Record the sub step deltat we used for the last adjoint solve.
   last_deltat = _system.deltat;
 
@@ -332,15 +341,15 @@ std::pair<unsigned int, Real> TwostepTimeSolver::adjoint_solve (const QoISet & q
 void TwostepTimeSolver::integrate_qoi_timestep()
 {
   // Vectors to hold qoi contributions from the first and second half timesteps
-  std::vector<Number> qois_first_half(_system.qoi.size(), 0.0);
-  std::vector<Number> qois_second_half(_system.qoi.size(), 0.0);
+  std::vector<Number> qois_first_half(_system.n_qois(), 0.0);
+  std::vector<Number> qois_second_half(_system.n_qois(), 0.0);
 
   // First half contribution
   core_time_solver->integrate_qoi_timestep();
 
   for (auto j : make_range(_system.n_qois()))
   {
-    qois_first_half[j] = (_system.qoi)[j];
+    qois_first_half[j] = _system.get_qoi_value(j);
   }
 
   // Second half contribution
@@ -348,20 +357,20 @@ void TwostepTimeSolver::integrate_qoi_timestep()
 
   for (auto j : make_range(_system.n_qois()))
   {
-    qois_second_half[j] = (_system.qoi)[j];
+    qois_second_half[j] = _system.get_qoi_value(j);
   }
 
   // Zero out the system.qoi vector
   for (auto j : make_range(_system.n_qois()))
   {
-    (_system.qoi)[j] = 0.0;
+    _system.set_qoi(j, 0.0);
   }
 
   // Add the contributions from the two halftimesteps to get the full QoI
   // contribution from this timestep
   for (auto j : make_range(_system.n_qois()))
   {
-    (_system.qoi)[j] = qois_first_half[j] + qois_second_half[j];
+    _system.set_qoi(j, qois_first_half[j] + qois_second_half[j]);
   }
 }
 
@@ -392,8 +401,8 @@ void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefin
   // We use a numerical integration scheme consistent with the theta used for the timesolver.
 
   // Create first and second half error estimate vectors of the right size
-  std::vector<Number> qoi_error_estimates_first_half(_system.qoi.size());
-  std::vector<Number> qoi_error_estimates_second_half(_system.qoi.size());
+  std::vector<Number> qoi_error_estimates_first_half(_system.n_qois());
+  std::vector<Number> qoi_error_estimates_second_half(_system.n_qois());
 
   // First half timestep
   ErrorVector QoI_elementwise_error_first_half;
@@ -406,7 +415,7 @@ void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefin
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      qoi_error_estimates_first_half[j] = (_system.qoi_error_estimates)[j];
+      qoi_error_estimates_first_half[j] = _system.get_qoi_error_estimate_value(j);
     }
   }
 
@@ -421,7 +430,7 @@ void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefin
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      qoi_error_estimates_second_half[j] = (_system.qoi_error_estimates)[j];
+      qoi_error_estimates_second_half[j] = _system.get_qoi_error_estimate_value(j);
     }
   }
 
@@ -434,7 +443,7 @@ void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefin
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      (_system.qoi_error_estimates)[j] = qoi_error_estimates_first_half[j] + qoi_error_estimates_second_half[j];
+      _system.set_qoi_error_estimate(j, qoi_error_estimates_first_half[j] + qoi_error_estimates_second_half[j]);
     }
   }
 }

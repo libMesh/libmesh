@@ -87,6 +87,12 @@ public:
   virtual void init ();
 
   /**
+   * Initialize any adjoint related data structures, based on the number
+   * of qois.
+   */
+  virtual void init_adjoints ();
+
+  /**
    * The data initialization function.  This method is used to
    * initialize internal data structures after the underlying System
    * has been initialized

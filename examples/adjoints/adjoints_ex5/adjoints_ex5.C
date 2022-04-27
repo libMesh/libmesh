@@ -443,23 +443,11 @@ int main (int argc, char ** argv)
                << std::endl
                << std::endl;
 
-  // Add an adjoint vector, this will be computed after the forward
-  // time stepping is complete
-  //
-  // Tell the library not to save adjoint solutions during the forward
-  // solve
-  //
-  // Tell the library not to project this vector, and hence, memory/file
-  // solution history to not save it.
-  //
-  // Make this vector ghosted so we can localize it to each element
-  // later.
-  const std::string & adjoint_solution_name = "adjoint_solution0";
-  system.add_vector("adjoint_solution0", false, GHOSTED);
+  // Tell system that we have two qois
+  system.init_qois(1);
 
-  // To keep the number of vectors consistent between the primal and adjoint
-  // loops, we will also pre-add the adjoint rhs vector
-  system.add_vector("adjoint_rhs0", false, GHOSTED);
+  // Add the adjoint vectors (and the old adjoint vectors) to system
+  system.time_solver->init_adjoints();
 
   // Close up any resources initial.C needed
   finish_initialization();
@@ -518,9 +506,12 @@ int main (int argc, char ** argv)
       // We need to tell the library that it needs to project the adjoint, so
       // MemorySolutionHistory knows it has to save it
 
+      const std::string & adjoint_solution_name0 = "adjoint_solution0";
+      const std::string & old_adjoint_solution_name0 = "_old_adjoint_solution0";
       // Tell the library to project the adjoint vector, and hence, memory solution history to
       // save it
-      system.set_vector_preservation(adjoint_solution_name, true);
+      system.set_vector_preservation(adjoint_solution_name0, true);
+      system.set_vector_preservation(old_adjoint_solution_name0, true);
 
       libMesh::out << "Setting adjoint initial conditions Z("
                    << system.time
@@ -540,16 +531,30 @@ int main (int argc, char ** argv)
       // we dont solve unnecessarily in the adjoint sensitivity method
       system.set_adjoint_already_solved(true);
 
+      Real Z_norm = system.calculate_norm(system.get_adjoint_solution(), 0, H1);
+
       libMesh::out << "|Z("
                    << system.time
                    << ")|= "
-                   << system.calculate_norm(system.get_adjoint_solution(), 0, H1)
+                   << Z_norm
                    << std::endl
                    << std::endl;
 
       // Call the adjoint advance timestep here to save the adjoint
       // initial conditions to disk
       system.time_solver->adjoint_advance_timestep();
+
+      Real Z_old_norm = system.calculate_norm(system.get_vector(old_adjoint_solution_name0), 0, H1);
+
+      // Make sure that we have copied the old adjoint solution properly
+      libmesh_assert(Z_norm == Z_old_norm);
+
+      libMesh::out << "|Z_old("
+                       << system.time + (system.time_solver->last_completed_timestep_size())/((param.timesolver_tolerance) ? 2.0 : 1.0)
+                       << ")|= "
+                       << Z_old_norm
+                       << std::endl
+                       << std::endl;
 
       write_output(equation_systems, param.n_timesteps, "dual", param);
 
@@ -585,6 +590,15 @@ int main (int argc, char ** argv)
 
           system.adjoint_solve();
 
+          Z_norm = system.calculate_norm(system.get_adjoint_solution(), 0, H1);
+
+          libMesh::out << "|Z("
+                       << system.time
+                       << ")|= "
+                       << Z_norm
+                       << std::endl
+                       << std::endl;
+
           // Now that we have solved the adjoint, set the
           // adjoint_already_solved boolean to true, so we dont solve
           // unnecessarily in the error estimator
@@ -599,10 +613,15 @@ int main (int argc, char ** argv)
           // values at the current time instance.
           system.time_solver->adjoint_advance_timestep();
 
-          libMesh::out << "|Z("
-                       << system.time
+          Z_old_norm = system.calculate_norm(system.get_vector(old_adjoint_solution_name0), 0, H1);
+
+          // Make sure that we have copied the old adjoint solution properly
+          libmesh_assert(Z_norm == Z_old_norm);
+
+          libMesh::out << "|Z_old("
+                       << system.time + (system.time_solver->last_completed_timestep_size())/((param.timesolver_tolerance) ? 2.0 : 1.0)
                        << ")|= "
-                       << system.calculate_norm(system.get_adjoint_solution(), 0, H1)
+                       << Z_old_norm
                        << std::endl
                        << std::endl;
 
@@ -645,6 +664,20 @@ int main (int argc, char ** argv)
       // Retrieve the primal and adjoint solutions at the current timestep
       system.time_solver->retrieve_timestep();
 
+      Z_old_norm = system.calculate_norm(system.get_vector(old_adjoint_solution_name0), 0, H1);
+
+      // Assert that the old adjoint values match hard coded numbers for 1st timestep or 1st half time step from the adjoint solve
+      if(param.timesolver_tolerance)
+      {
+        libmesh_error_msg_if(std::abs(Z_old_norm - (2.23366)) >= 2.e-4,
+                             "Mismatch in expected Z0_old norm for the 1st half timestep!");
+       }
+      else
+      {
+        libmesh_error_msg_if(std::abs(Z_old_norm - (2.23627)) >= 2.e-4,
+                             "Mismatch in expected Z0_old norm for the 1st timestep!");
+      }
+
       // A pretty update message
       libMesh::out << "Retrieved, "
                << "time = "
@@ -669,6 +702,13 @@ int main (int argc, char ** argv)
                    << system.calculate_norm(system.get_adjoint_solution(0), 0, H1)
                    << std::endl
                    << std::endl;
+
+      libMesh::out << "|Z_old("
+                       << system.time + (system.time_solver->last_completed_timestep_size())/((param.timesolver_tolerance) ? 2.0 : 1.0)
+                       << ")|= "
+                       << system.calculate_norm(system.get_vector(old_adjoint_solution_name0), 0, H1)
+                       << std::endl
+                       << std::endl;
 
       // Now we begin the timestep loop to compute the time-accurate
       // adjoint sensitivities
@@ -701,6 +741,13 @@ int main (int argc, char ** argv)
                    << system.time
                    << ")|= "
                    << system.calculate_norm(system.get_adjoint_solution(0), 0, H1)
+                   << std::endl
+                   << std::endl;
+
+          libMesh::out << "|Z_old("
+                   << system.time
+                   << ")|= "
+                   << system.calculate_norm(system.get_vector(old_adjoint_solution_name0), 0, H1)
                    << std::endl
                    << std::endl;
 
