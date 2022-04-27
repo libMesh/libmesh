@@ -2503,6 +2503,10 @@ void System::disable_cache () { assemble_before_solve = true; }
 inline
 unsigned int System::n_qois() const
 {
+#ifndef LIBMESH_ENABLE_DEPRECATED
+  libmesh_assert_equal_to(this->qoi.size(), this->qoi_error_estimates.size());
+#endif
+
   return cast_int<unsigned int>(this->qoi.size());
 }
 
