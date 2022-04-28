@@ -315,7 +315,7 @@ void DifferentiableSystem::attach_qoi( DifferentiableQoI * qoi_in )
   this->diff_qoi->init_qoi( this->qoi );
 
   // Then the new API for forwards compatibility
-  this->diff_qoi->init_qoi( *this );
+  this->diff_qoi->init_qoi_count( *this );
 #else
 #ifndef NDEBUG
   // Make sure the user has updated their QoI subclass - call the old
@@ -326,7 +326,7 @@ void DifferentiableSystem::attach_qoi( DifferentiableQoI * qoi_in )
 #endif
 
   // Then the new API
-  this->diff_qoi->init_qoi( *this );
+  this->diff_qoi->init_qoi_count( *this );
 #endif
 }
 

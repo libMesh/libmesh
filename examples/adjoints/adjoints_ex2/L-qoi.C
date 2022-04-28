@@ -4,7 +4,7 @@
 
 using namespace libMesh;
 
-void LaplaceQoI::init_qoi(System & sys)
+void LaplaceQoI::init_qoi_count(System & sys)
 {
   // Only 1 qoi to worry about
   sys.init_qois(1);

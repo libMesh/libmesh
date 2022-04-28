@@ -82,7 +82,7 @@ public:
    * Initialize system qoi.  Often this will just call
    * sys.init_qois(some_desired_number_of_qois)
    */
-  virtual void init_qoi( System & /*sys*/){}
+  virtual void init_qoi_count( System & /*sys*/){}
 
   /**
    * Clear all the data structures associated with

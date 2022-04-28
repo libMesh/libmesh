@@ -21,7 +21,7 @@ public:
   LaplaceQoI() = default;
   virtual ~LaplaceQoI() = default;
 
-  virtual void init_qoi(System & sys);
+  virtual void init_qoi_count(System & sys);
 
   // Context initialization
   virtual void init_context (DiffContext & context);
