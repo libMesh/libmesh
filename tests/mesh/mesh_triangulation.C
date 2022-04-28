@@ -433,14 +433,14 @@ public:
   }
 
 
-  Mesh testPoly2TriRefinementBase
-    (const std::vector<TriangulatorInterface::Hole*> * holes,
+  void testPoly2TriRefinementBase
+    (UnstructuredMesh & mesh,
+     const std::vector<TriangulatorInterface::Hole*> * holes,
      Real expected_total_area,
      dof_id_type n_original_elem,
      Real desired_area = 0.1,
      FunctionBase<Real> * area_func = nullptr)
   {
-    Mesh mesh(*TestCommWorld);
     mesh.add_point(Point(0,0), 0);
     mesh.add_point(Point(1,0), 1);
     mesh.add_point(Point(1,2), 2);
@@ -494,28 +494,29 @@ public:
     mesh.write("poly2tri_holes.e");
 
     LIBMESH_ASSERT_FP_EQUAL(area, expected_total_area, TOLERANCE*TOLERANCE);
-
-    return mesh; // Copy elision, yay C++17
   }
 
   void testPoly2TriRefined()
   {
     LOG_UNIT_TEST;
 
-    testPoly2TriRefinementBase(nullptr, 1.5, 15);
+    Mesh mesh(*TestCommWorld);
+    testPoly2TriRefinementBase(mesh, nullptr, 1.5, 15);
   }
 
   void testPoly2TriExtraRefined()
   {
     LOG_UNIT_TEST;
 
-    testPoly2TriRefinementBase(nullptr, 1.5, 150, 0.01);
+    Mesh mesh(*TestCommWorld);
+    testPoly2TriRefinementBase(mesh, nullptr, 1.5, 150, 0.01);
   }
 
   void testPoly2TriNonUniformRefined()
   {
     ParsedFunction<Real> var_area {"0.002*(1+2*x)*(1+2*y)"};
-    testPoly2TriRefinementBase(nullptr, 1.5, 150, 0, &var_area);
+    Mesh mesh(*TestCommWorld);
+    testPoly2TriRefinementBase(mesh, nullptr, 1.5, 150, 0, &var_area);
   }
 
   void testPoly2TriHolesRefined()
@@ -526,7 +527,8 @@ public:
     TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
 
-    testPoly2TriRefinementBase(&holes, 1.25, 13);
+    Mesh mesh(*TestCommWorld);
+    testPoly2TriRefinementBase(mesh, &holes, 1.25, 13);
   }
 
   void testPoly2TriHolesInteriorRefinedBase
@@ -544,7 +546,8 @@ public:
 
     // Doing extra refinement here to ensure that we had the
     // *opportunity* to refine the hole boundaries.
-    Mesh mesh = testPoly2TriRefinementBase(&holes, 1.25, n_original_elem, desired_area);
+    Mesh mesh(*TestCommWorld);
+    testPoly2TriRefinementBase(mesh, &holes, 1.25, n_original_elem, desired_area);
 
     // Checking that we have more outer boundary sides than we started
     // with, and exactly the 4 hole boundary sides we started with.
@@ -580,7 +583,8 @@ public:
     TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
 
-    testPoly2TriRefinementBase(&holes, 1.25, 125, 0.01);
+    Mesh mesh(*TestCommWorld);
+    testPoly2TriRefinementBase(mesh, &holes, 1.25, 125, 0.01);
   }
 
   void testPoly2TriHolesNonUniformRefined()
@@ -590,7 +594,8 @@ public:
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
 
     ParsedFunction<Real> var_area {"0.002*(0.25+2*x)*(0.25+2*y)"};
-    testPoly2TriRefinementBase(&holes, 1.25, 150, 0, &var_area);
+    Mesh mesh(*TestCommWorld);
+    testPoly2TriRefinementBase(mesh, &holes, 1.25, 150, 0, &var_area);
   }
 
 
