@@ -460,9 +460,6 @@ int main (int argc, char ** argv)
   mesh.print_info();
   equation_systems.print_info();
 
-  // Accumulated integrated QoIs
-  Number QoI_1_accumulated = 0.0;
-
   // In optimized mode we catch any solver errors, so that we can
   // write the proper footers before closing.  In debug mode we just
   // let the exception throw so that gdb can grab it.
@@ -511,18 +508,41 @@ int main (int argc, char ** argv)
 
       system.time_solver->retrieve_timestep();
 
-      QoI_1_accumulated = 0.0;
+      std::vector<Number> QoI_accumulated(system.n_qois(), 0.0);
+
+      // Create a lambda to integrate a qoi across a timestep
+      auto integrate_qoi_timestep = [&QoI_accumulated] (Real time_quadrature_weight, System & system)
+      {
+        // Zero out the system.qoi vector
+        for (auto j : make_range(system.n_qois()))
+        {
+         (system.qoi)[j] = 0.0;
+        }
+
+        system.assemble_qoi();
+
+        for (auto j : make_range(system.n_qois()))
+        {
+          QoI_accumulated[j] += time_quadrature_weight*((system.qoi)[j]);
+        }
+
+        return;
+      };
+
+      std::vector<std::function<void(Real, System &)>> integration_operations;
+
+      integration_operations.push_back(integrate_qoi_timestep);
 
       for (unsigned int t_step=param.initial_timestep;
            t_step != param.initial_timestep + param.n_timesteps; ++t_step)
         {
-          system.time_solver->integrate_qoi_timestep();
-
-          QoI_1_accumulated += (system.qoi)[1];
+          //system.time_solver->integrate_qoi_timestep();
+          system.time_solver->advance_postprocessing_timestep(integration_operations);
+          //QoI_1_accumulated += (system.qoi)[1];
         }
 
-      std::cout<< "The computed QoI 0 is " << std::setprecision(17) << (system.qoi)[0] << std::endl;
-      std::cout<< "The computed QoI 1 is " << std::setprecision(17) << QoI_1_accumulated << std::endl;
+      std::cout<< "The computed QoI 0 is " << std::setprecision(17) << QoI_accumulated[0] << std::endl;
+      std::cout<< "The computed QoI 1 is " << std::setprecision(17) << QoI_accumulated[1] << std::endl;
 
       ///////////////// Now for the Adjoint Solution //////////////////////////////////////
 
