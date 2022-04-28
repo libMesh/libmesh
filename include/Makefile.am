@@ -69,3 +69,10 @@ installcheck-local:
 	  PKG_CONFIG_PATH=$(pkgconfigdir) \
 	  LIBMESH_CONFIG_PATH=$(bindir) \
 	  $(top_srcdir)/contrib/bin/test_installed_headers.sh
+
+clang-tidy:
+	@echo " "
+	@echo "Checking clang-tidy on headers ..."
+	@echo " "
+	cd $(top_srcdir) && \
+	clang-tidy $(headers_to_test) -- $(libmesh_contrib_INCLUDES) $(libmesh_optional_INCLUDES) $(CPPFLAGS_DBG) $(CXXFLAGS_DBG) -I$(top_builddir)/include -x c++

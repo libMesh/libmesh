@@ -710,6 +710,12 @@ coverage: lcov-reset check lcov-report
 	$(MAKE) check
 	$(MAKE) lcov-report
 
+clang-tidy:
+	@echo " "
+	@echo "Checking clang-tidy on sources ..."
+	@echo " "
+	clang-tidy $(libmesh_SOURCES) -- $(libmesh_contrib_INCLUDES) $(libmesh_optional_INCLUDES) $(CPPFLAGS_DBG) $(CXXFLAGS_DBG) -I$(top_builddir)/include -x c++
+
 CLEANFILES += src/apps/*.gcda src/apps/*.gcno
 
 endif
