@@ -1177,12 +1177,13 @@ write_out_node_basis_functions(const std::string & directory_name,
       // We assume that the list of nodes for each basis function
       // is the same as basis function 0.
       dof_id_type expected_node_id = 0;
-      for (const auto & [actual_node_id, array] : _local_node_eim_basis_functions[0])
+      for (const auto & pr : _local_node_eim_basis_functions[0])
         {
           // Note: Currently we require that the Nodes are numbered
           // contiguously from [0..n_nodes).  This allows us to avoid
           // writing the Node ids to the Xdr file, but if we need to
           // generalize this assumption later, we can.
+          auto actual_node_id = pr.first;
           libmesh_error_msg_if(actual_node_id != expected_node_id++,
                                "RBEIMEvaluation currently assumes a contiguous Node numbering starting from 0.");
         }
@@ -2545,12 +2546,10 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
         binfo.boundary_ids(node, node_boundary_ids);
 
         bool has_node_boundary_id = false;
-        boundary_id_type matching_boundary_id = BoundaryInfo::invalid_id;
         for(boundary_id_type node_boundary_id : node_boundary_ids)
           if(parametrized_function_boundary_ids.count(node_boundary_id))
             {
               has_node_boundary_id = true;
-              matching_boundary_id = node_boundary_id;
               break;
             }
 
