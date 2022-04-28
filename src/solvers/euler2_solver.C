@@ -493,17 +493,21 @@ void Euler2Solver::advance_postprocessing_timestep(std::vector<std::function<voi
   // The mesh and solutions (primal, adjoint) are already read in.
   // So we are ready to call the user's integration operations.
   for (auto integration_operations_iterator:integration_operations)
-    integration_operations_iterator(1.0 - theta, dynamic_cast<System&>(_system));
+    integration_operations_iterator((1.0 - theta)*_system.deltat, dynamic_cast<System&>(_system));
+
+  Real time_left = _system.time;
 
   // Advance to t_j+1
   _system.time = _system.time + _system.deltat;
+
+  Real time_right = _system.time;
 
   // Retrieve the state and adjoint vectors for the next time instant
   retrieve_timestep();
 
   // Mesh and solution read in. Ready to call the user's integration operations.
   for (auto integration_operations_iterator:integration_operations)
-   integration_operations_iterator(theta, dynamic_cast<System&>(_system));
+   integration_operations_iterator(theta*(time_right - time_left), dynamic_cast<System&>(_system));
 
   return;
 

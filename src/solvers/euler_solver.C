@@ -425,8 +425,12 @@ void EulerSolver::advance_postprocessing_timestep(std::vector<std::function<void
 
   // u_i will be provided by the old nonlinear solution after we advance to the next time instant.
 
+  Real time_left = _system.time;
+
   // Advance to t_j+1
   _system.time = _system.time + _system.deltat;
+
+  Real time_right = _system.time;
 
   // Retrieve the state and adjoint vectors for the next time instant
   retrieve_timestep();
@@ -435,9 +439,9 @@ void EulerSolver::advance_postprocessing_timestep(std::vector<std::function<void
   std::unique_ptr<NumericVector<Number>> weighted_vector = NumericVector<Number>::build(_system.comm());
   weighted_vector->init(_system.get_vector("_old_nonlinear_solution"));
 
-  weighted_vector->add(1.0 - theta, _system.get_vector("_old_nonlinear_solution"));
+  weighted_vector->add((1.0 - theta)*(time_right - time_left), _system.get_vector("_old_nonlinear_solution"));
 
-  weighted_vector->add(theta, *(_system.solution));
+  weighted_vector->add(theta*(time_right - time_left), *(_system.solution));
 
   _system.solution->swap(*weighted_vector);
 
