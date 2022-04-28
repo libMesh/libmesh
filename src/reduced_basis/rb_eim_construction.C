@@ -99,6 +99,33 @@ void scale(DataMap & u, const Number k)
     }
 }
 
+void add_node_data_map(RBEIMConstruction::NodeDataMap & u, const Number k, const RBEIMConstruction::NodeDataMap & v)
+{
+  for (auto & [key, vec_u] : u)
+    {
+      const std::vector<Number> & vec_v = libmesh_map_find(v, key);
+
+      libmesh_error_msg_if (vec_u.size() != vec_v.size(), "Size mismatch");
+
+      for (auto i : index_range(vec_u))
+        {
+          vec_u[i] += k*vec_v[i];
+        }
+    }
+}
+
+void scale_node_data_map(RBEIMConstruction::NodeDataMap & u, const Number k)
+{
+  for (auto & it : u)
+    {
+      std::vector<Number> & vec = it.second;
+      for (auto & value : vec)
+        {
+          value *= k;
+        }
+    }
+}
+
 }
 
 RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
@@ -609,13 +636,13 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
         {
           // Make a "zero clone" by copying to get the same data layout, and then scaling by zero
           NodeDataMap v = _local_node_parametrized_functions_for_training[j];
-          scale(v, 0.);
+          scale_node_data_map(v, 0.);
 
           for ( unsigned int i=0; i<n_snapshots; ++i )
-            add(v, U.el(i, j), _local_node_parametrized_functions_for_training[i] );
+            add_node_data_map(v, U.el(i, j), _local_node_parametrized_functions_for_training[i] );
 
           Real norm_v = std::sqrt(sigma(j));
-          scale(v, 1./norm_v);
+          scale_node_data_map(v, 1./norm_v);
 
           enrich_eim_approximation_on_nodes(v);
           update_eim_matrices();
@@ -920,7 +947,7 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
               RB_inner_product_matrix_N.lu_solve(best_fit_rhs, best_fit_coeffs);
 
               get_rb_eim_evaluation().node_decrement_vector(solution_copy, best_fit_coeffs);
-              Real best_fit_error = get_max_abs_value(solution_copy);
+              Real best_fit_error = get_node_max_abs_value(solution_copy);
 
               if (best_fit_error > max_err)
                 {
@@ -994,7 +1021,7 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
             {
               NodeDataMap solution_copy = _local_node_parametrized_functions_for_training[training_index];
               get_rb_eim_evaluation().node_decrement_vector(solution_copy, best_fit_coeffs);
-              Real best_fit_error = get_max_abs_value(solution_copy);
+              Real best_fit_error = get_node_max_abs_value(solution_copy);
 
               if (best_fit_error > max_err)
                 {
@@ -1815,6 +1842,37 @@ RBEIMConstruction::node_inner_product(const NodeDataMap & v, const NodeDataMap &
   return val;
 }
 
+Real RBEIMConstruction::get_node_max_abs_value(const NodeDataMap & v) const
+{
+  Real max_value = 0.;
+
+  for (const auto & pr : v)
+    {
+      const auto & values = pr.second;
+      for (const auto & comp : index_range(values))
+        {
+          const auto & value = values[comp];
+
+          // If scale_components_in_enrichment() returns true then we
+          // apply a scaling to give an approximately uniform scaling
+          // for all components.
+          Real comp_scaling = 1.;
+          if (get_rb_eim_evaluation().scale_components_in_enrichment())
+            {
+              // Make sure that _component_scaling_in_training_set is initialized
+              libmesh_error_msg_if(comp >= _component_scaling_in_training_set.size(),
+                                  "Invalid vector index");
+              comp_scaling = _component_scaling_in_training_set[comp];
+            }
+
+          max_value = std::max(max_value, std::abs(value * comp_scaling));
+        }
+    }
+
+  comm().max(max_value);
+  return max_value;
+}
+
 void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
 {
   LOG_SCOPE("enrich_eim_approximation()", "RBEIMConstruction");
@@ -2095,7 +2153,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & no
   libmesh_error_msg_if(optimal_value == 0., "New EIM basis function should not be zero");
 
   // Scale local_pf so that its largest value is 1.0
-  scale_parametrized_function(local_pf, 1./optimal_value);
+  scale_node_parametrized_function(local_pf, 1./optimal_value);
 
   // Add local_pf as the new basis function and store data
   // associated with the interpolation point.
@@ -2387,6 +2445,17 @@ void RBEIMConstruction::update_eim_matrices()
                                                   eim_eval.get_interpolation_points_qp(RB_size-1));
           eim_eval.set_interpolation_matrix_entry(RB_size-1, j, value);
         }
+    }
+}
+
+void RBEIMConstruction::scale_node_parametrized_function(NodeDataMap & local_pf,
+                                                         Number scaling_factor)
+{
+  for (auto & pr : local_pf)
+    {
+      auto & values = pr.second;
+      for ( auto & value : values)
+        value *= scaling_factor;
     }
 }
 

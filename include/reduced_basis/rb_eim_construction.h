@@ -374,18 +374,15 @@ private:
   }
 
   /**
+   * Get the maximum absolute value from a vector stored in the format that we use
+   * for basis functions. This case handles NodeDataMap.
+   */
+  Real get_node_max_abs_value(const NodeDataMap & v) const;
+
+  /**
    * Add a new basis function to the EIM approximation.
    */
   void enrich_eim_approximation(unsigned int training_index);
-
-  /**
-   * We compute the best fit of parametrized_function
-   * into the EIM space and then evaluate the error
-   * in the norm defined by inner_product_matrix.
-   *
-   * \returns The error in the best fit
-   */
-  Real compute_best_fit_error();
 
   /**
    * Scale all values in \p pf by \p scaling_factor
@@ -409,6 +406,14 @@ private:
           }
       }
   }
+
+  /**
+   * Scale all values in \p pf by \p scaling_factor
+   * The templated function above handles the elem and side cases,
+   * and this separate case handles the node case.
+   */
+  static void scale_node_parametrized_function(NodeDataMap & local_pf,
+                                               Number scaling_factor);
 
   /**
    * Maximum number of EIM basis functions we are willing to use.
