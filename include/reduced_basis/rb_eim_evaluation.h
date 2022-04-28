@@ -541,6 +541,13 @@ private:
                                       bool write_binary_basis_functions);
 
   /**
+   * Method that writes out element node EIM basis functions. This may be called by
+   * write_out_basis_functions().
+   */
+  void write_out_node_basis_functions(const std::string & directory_name,
+                                      bool write_binary_basis_functions);
+
+  /**
    * Method that reads in element interior EIM basis functions. This may be called by
    * read_in_basis_functions().
    */
@@ -553,6 +560,14 @@ private:
    * read_in_basis_functions().
    */
   void read_in_side_basis_functions(const System & sys,
+                                    const std::string & directory_name,
+                                    bool read_binary_basis_functions);
+
+  /**
+   * Method that reads in element node EIM basis functions. This may be called by
+   * read_in_basis_functions().
+   */
+  void read_in_node_basis_functions(const System & sys,
                                     const std::string & directory_name,
                                     bool read_binary_basis_functions);
 
@@ -703,6 +718,11 @@ private:
   void side_gather_bfs();
 
   /**
+   * Same as gather_bfs() except for node data.
+   */
+  void node_gather_bfs();
+
+  /**
    * Helper function that distributes the entries of
    * _local_eim_basis_functions to their respective processors after
    * they are read in on processor 0.
@@ -713,6 +733,11 @@ private:
    * Same as distribute_bfs() except for side data.
    */
   void side_distribute_bfs(const System & sys);
+
+  /**
+   * Same as distribute_bfs() except for node data.
+   */
+  void node_distribute_bfs(const System & sys);
 
   /**
    * Let {p_1,...,p_n} be a set of n "observation points", where we can
