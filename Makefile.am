@@ -679,6 +679,24 @@ test_headers:
 	@$(MAKE) -C $(top_builddir)/include/libmesh
 	@cd $(top_builddir)/include && $(MAKE) test_headers
 
+#
+# run clang-tidy static analysis
+clang-tidy:
+	@echo " "
+	@echo "Checking clang-tidy on sources ..."
+	@echo " "
+	@export MPICH_FLAGS=`$(CXX) -cxx= -compile_info 2>/dev/null`; \
+	export OPENMPI_FLAGS=`$(CXX) -showme:compile 2>/dev/null`; \
+	for word in $(CXX); do \
+	  if printf "%s\n" $$word | grep -- -std=; then \
+	    export STD_FLAG=$$word; \
+	  fi; \
+	done; \
+	for file in $(libmesh_SOURCES); do \
+	  echo "clang-tidy $(top_srcdir)/$$file:"; \
+	  clang-tidy "$(top_srcdir)/$$file" -- $$STD_FLAG $$MPICH_FLAGS $$OPENMPI_FLAGS $(libmesh_contrib_INCLUDES) $(libmesh_optional_INCLUDES) $(CPPFLAGS_DBG) $(CXXFLAGS_DBG) $(CPPFLAGS) -I$(top_builddir)/include -x c++; \
+	done
+
 # -------------------------------------------
 # Optional support for code coverage analysis
 # -------------------------------------------
@@ -709,12 +727,6 @@ coverage: lcov-reset check lcov-report
 	$(MAKE) lcov-reset
 	$(MAKE) check
 	$(MAKE) lcov-report
-
-clang-tidy:
-	@echo " "
-	@echo "Checking clang-tidy on sources ..."
-	@echo " "
-	clang-tidy $(libmesh_SOURCES) -- $(libmesh_contrib_INCLUDES) $(libmesh_optional_INCLUDES) $(CPPFLAGS_DBG) $(CXXFLAGS_DBG) -I$(top_builddir)/include -x c++
 
 CLEANFILES += src/apps/*.gcda src/apps/*.gcno
 

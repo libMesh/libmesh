@@ -74,5 +74,14 @@ clang-tidy:
 	@echo " "
 	@echo "Checking clang-tidy on headers ..."
 	@echo " "
-	cd $(top_srcdir) && \
-	clang-tidy $(headers_to_test) -- $(libmesh_contrib_INCLUDES) $(libmesh_optional_INCLUDES) $(CPPFLAGS_DBG) $(CXXFLAGS_DBG) -I$(top_builddir)/include -x c++
+	@export MPICH_FLAGS=`$(CXX) -cxx= -compile_info 2>/dev/null`; \
+	export OPENMPI_FLAGS=`$(CXX) -showme:compile 2>/dev/null`; \
+	for word in $(CXX); do \
+	  if printf "%s\n" $$word | grep -- -std=; then \
+	    export STD_FLAG=$$word; \
+	  fi; \
+	done; \
+	for file in $(headers_to_test); do \
+	  echo "clang-tidy $(top_srcdir)/$(file):"; \
+	  echo clang-tidy $(top_srcdir)/$(file) -- $$STD_FLAG $$MPICH_FLAGS $$OPENMPI_FLAGS $(libmesh_contrib_INCLUDES) $(libmesh_optional_INCLUDES) $(CPPFLAGS_DBG) $(CXXFLAGS_DBG) $(CPPFLAGS) -I$(top_builddir)/include -x c++; \
+	done
