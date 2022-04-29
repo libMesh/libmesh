@@ -54,7 +54,7 @@ DiffContext::DiffContext (const System & sys) :
 
   // If the user resizes sys.qoi, it will invalidate us
 
-  std::size_t n_qoi = sys.qoi.size();
+  std::size_t n_qoi = sys.n_qois();
   _elem_qoi.resize(n_qoi);
   _elem_qoi_derivative.resize(n_qoi);
   _elem_qoi_subderivatives.resize(n_qoi);

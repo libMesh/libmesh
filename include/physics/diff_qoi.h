@@ -64,11 +64,25 @@ public:
    */
   virtual ~DifferentiableQoI () = default;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
-   * Initialize system qoi. By default, does nothing in order to maintain backward
-   * compatibility for FEMSystem applications that control qoi.
+   * Initialize system qoi.  This version of the function required
+   * direct vector access, and is now deprecated.
    */
   virtual void init_qoi( std::vector<Number> & /*sys_qoi*/){}
+#else
+  /**
+   * Non-virtual, to try to help deprecated user code catch this
+   * change at compile time (if they specified override)
+   */
+  void init_qoi( std::vector<Number> & /*sys_qoi*/){}
+#endif
+
+  /**
+   * Initialize system qoi.  Often this will just call
+   * sys.init_qois(some_desired_number_of_qois)
+   */
+  virtual void init_qoi_count( System & /*sys*/){}
 
   /**
    * Clear all the data structures associated with

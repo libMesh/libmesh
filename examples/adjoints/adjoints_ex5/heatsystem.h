@@ -41,7 +41,7 @@ public:
       _fe_order(1),
       _analytic_jacobians(true),
       dp(1.e-6)
-  { qoi.resize(1); }
+  { this->init_qois(1); }
 
   std::string & fe_family() { return _fe_family; }
   unsigned int & fe_order() { return _fe_order; }

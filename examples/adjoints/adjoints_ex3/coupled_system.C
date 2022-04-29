@@ -429,7 +429,7 @@ void CoupledSystem::postprocess()
   // We need to overload the postprocess function to set the
   // computed_QoI variable of the CoupledSystem class to the qoi value
   // stored in System::qoi[0]
-  computed_QoI = System::qoi[0];
+  computed_QoI = this->get_qoi_value(0);
 }
 
 // These functions supply the nonlinear weighting for the adjoint residual error estimate which
