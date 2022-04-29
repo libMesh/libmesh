@@ -20,6 +20,10 @@
 #ifndef LIBMESH_MESH_INSERTER_ITERATOR_H
 #define LIBMESH_MESH_INSERTER_ITERATOR_H
 
+#include "libmesh/libmesh_config.h"
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+
 // Local includes
 #include "libmesh/mesh_base.h"
 
@@ -39,11 +43,13 @@ class Point;
  * arguments, which adds objects to the Mesh.
  * Although any mesh_inserter_iterator can add any object, we
  * template it around object type so that type inference and
- * iterator_traits will work.
+ * iterator_traits will work. This class used to be intended
+ * for use with packed range methods in TIMPI. However, our
+ * packing routines now automatically add elements and nodes
+ * to the mesh, so this class is deprecated
  *
  * \author Roy Stogner
  * \date 2012
- * \brief An output iterator for use with packed_range functions.
  */
 template <typename T>
 struct mesh_inserter_iterator
@@ -54,7 +60,7 @@ struct mesh_inserter_iterator
   using pointer = T*;
   using reference = T&;
 
-  mesh_inserter_iterator (MeshBase & m) : mesh(m) {}
+  mesh_inserter_iterator (MeshBase & m) : mesh(m) { libmesh_deprecated(); }
 
   void operator=(Elem * e) { mesh.add_elem(e); }
 
@@ -82,5 +88,5 @@ private:
 
 } // namespace libMesh
 
-
+#endif // LIBMESH_ENABLE_DEPRECATED
 #endif // LIBMESH_MESH_INSERTER_ITERATOR_H

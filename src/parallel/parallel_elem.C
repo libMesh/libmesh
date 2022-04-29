@@ -770,6 +770,8 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
         }
 
       elem->unpack_indexing(in);
+
+      mesh->add_elem(elem);
     }
 
   in += elem->packed_indexing_size();

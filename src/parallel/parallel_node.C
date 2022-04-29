@@ -261,6 +261,8 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
       libmesh_assert_equal_to (DofObject::unpackable_indexing_size(in),
                                node->packed_indexing_size());
       in += node->packed_indexing_size();
+
+      mesh->add_node(node);
     }
 
   // FIXME: We should add some debug mode tests to ensure that the
