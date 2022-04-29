@@ -27,6 +27,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/function_base.h"
+#include "libmesh/hashing.h"
 #include "libmesh/mesh_smoother_laplace.h"
 #include "libmesh/mesh_triangle_holes.h"
 #include "libmesh/unstructured_mesh.h"
@@ -144,7 +145,8 @@ Poly2TriTriangulator::Poly2TriTriangulator(UnstructuredMesh & mesh,
                                            dof_id_type n_boundary_nodes)
   : TriangulatorInterface(mesh),
     _serializer(_mesh),
-    _n_boundary_nodes(n_boundary_nodes)
+    _n_boundary_nodes(n_boundary_nodes),
+    _refine_bdy_allowed(true)
 {
 }
 
@@ -215,6 +217,34 @@ void Poly2TriTriangulator::set_desired_area_function
 FunctionBase<Real> * Poly2TriTriangulator::get_desired_area_function ()
 {
   return _desired_area_func.get();
+}
+
+
+bool Poly2TriTriangulator::is_refine_boundary_allowed
+  (const BoundaryInfo & boundary_info,
+   const Elem & elem,
+   unsigned int side)
+{
+  // We should only be calling this on a boundary side
+  libmesh_assert(!elem.neighbor_ptr(side));
+
+  std::vector<boundary_id_type> bcids;
+  boundary_info.boundary_ids(&elem, side, bcids);
+
+  // We should have one bcid on every boundary side.
+  libmesh_assert_equal_to(bcids.size(), 1);
+
+  if (bcids[0] == 0)
+    return this->refine_boundary_allowed();
+
+  // If we're not on an outer boundary side we'd better be on a hole
+  // side
+  libmesh_assert(this->_holes);
+
+  const boundary_id_type hole_num = bcids[0]-1;
+  libmesh_assert_less(hole_num, this->_holes->size());
+  const Hole * hole = (*this->_holes)[hole_num];
+  return hole->refine_boundary_allowed();
 }
 
 
@@ -342,13 +372,35 @@ void Poly2TriTriangulator::triangulate_current_points()
         }
     }
 
+  // Keep track of what boundary ids we want to assign to each new
+  // triangle.  We'll give the outer boundary BC 0, and give holes ids
+  // starting from 1.  We've already got the point_node_map to find
+  // nodes, so we can just key on pairs of node ids to identify a side.
+  std::unordered_map<std::pair<dof_id_type,dof_id_type>,
+                     boundary_id_type, libMesh::hash> side_boundary_id;
+
+  const boundary_id_type outer_bcid = 0;
+  const std::size_t n_outer = outer_boundary_points.size();
+
+  for (auto i : make_range(n_outer))
+    {
+      const Node * node1 =
+        libmesh_map_find(point_node_map, outer_boundary_points[i]),
+                 * node2 =
+        libmesh_map_find(point_node_map, outer_boundary_points[(i+1)%n_outer]);
+
+      side_boundary_id.emplace(std::make_pair(node1->id(),
+                                              node2->id()),
+                               outer_bcid);
+    }
+
   // Create poly2tri triangulator with our mesh points
-  std::vector<p2t::Point *>
-    outer_boundary_pointers(outer_boundary_points.size());
+  std::vector<p2t::Point *> outer_boundary_pointers(n_outer);
   std::transform(outer_boundary_points.begin(),
                  outer_boundary_points.end(),
                  outer_boundary_pointers.begin(),
                  [](p2t::Point & p) { return &p; });
+
 
   // Make sure shims for holes last as long as the CDT does; the
   // poly2tri headers don't make clear whether or not they're hanging
@@ -367,6 +419,7 @@ void Poly2TriTriangulator::triangulate_current_points()
         (it == replaced_holes.end()) ?
         *initial_hole : *it->second;
       auto & poly2tri_hole = inner_hole_points[h];
+
       for (auto i : make_range(our_hole.n_points()))
         {
           Point p = our_hole.point(i);
@@ -394,8 +447,23 @@ void Poly2TriTriangulator::triangulate_current_points()
             }
         }
 
+      const boundary_id_type inner_bcid = h+1;
+      const std::size_t n_inner = poly2tri_hole.size();
+
+      for (auto i : make_range(n_inner))
+        {
+          const Node * node1 =
+            libmesh_map_find(point_node_map, poly2tri_hole[i]),
+                     * node2 =
+            libmesh_map_find(point_node_map, poly2tri_hole[(i+1)%n_inner]);
+
+          side_boundary_id.emplace(std::make_pair(node1->id(),
+                                                  node2->id()),
+                                   inner_bcid);
+        }
+
       auto & poly2tri_ptrs = inner_hole_pointers[h];
-      poly2tri_ptrs.resize(poly2tri_hole.size());
+      poly2tri_ptrs.resize(n_inner);
 
       std::transform(poly2tri_hole.begin(),
                      poly2tri_hole.end(),
@@ -424,6 +492,10 @@ void Poly2TriTriangulator::triangulate_current_points()
   // Do our own numbering, even on DistributedMesh
   dof_id_type next_id = 0;
 
+  BoundaryInfo & boundary_info = _mesh.get_boundary_info();
+  boundary_info.clear();
+
+  // Add the triangles to our Mesh data structure.
   for (auto ptri_ptr : triangles)
     {
       p2t::Triangle & ptri = *ptri_ptr;
@@ -440,7 +512,19 @@ void Poly2TriTriangulator::triangulate_current_points()
           elem->set_node(v) = node;
         }
 
-      _mesh.add_elem(std::move(elem));
+      Elem * added_elem = _mesh.add_elem(std::move(elem));
+
+      for (auto v : make_range(3))
+        {
+          const Node & node1 = added_elem->node_ref(v),
+                     & node2 = added_elem->node_ref((v+1)%3);
+
+          auto it = side_boundary_id.find(std::make_pair(node1.id(), node2.id()));
+          if (it == side_boundary_id.end())
+            it = side_boundary_id.find(std::make_pair(node2.id(), node1.id()));
+          if (it != side_boundary_id.end())
+            boundary_info.add_side(added_elem, v, it->second);
+        }
     }
 }
 
@@ -477,6 +561,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
   // add new hole points, we'll use this to insert points into an
   // ArbitraryHole.
   std::unordered_map<Point, Node *> next_boundary_node;
+
+  BoundaryInfo & boundary_info = _mesh.get_boundary_info();
 
   for (auto & elem : mesh.element_ptr_range())
     {
@@ -555,12 +641,24 @@ bool Poly2TriTriangulator::insert_refinement_points()
           libmesh_assert_not_equal_to (side, invalid_uint);
 
           Elem * neigh = cavity_elem->neighbor_ptr(side);
-          // If we're on a boundary, stop there.
+          // If we're on a boundary, stop there.  Refine the boundary
+          // if we're allowed, the boundary element otherwise.
           if (!neigh)
             {
-              new_pt = ray_start;
-              new_node = mesh.add_point(new_pt);
-              boundary_refine(side);
+              if (this->is_refine_boundary_allowed(boundary_info,
+                                                   *cavity_elem,
+                                                   side))
+                {
+                  new_pt = ray_start;
+                  new_node = mesh.add_point(new_pt);
+                  boundary_refine(side);
+                }
+              else
+                {
+                  new_pt = cavity_elem->vertex_average();
+                  new_node = mesh.add_point(new_pt);
+                }
+
               break;
             }
 
@@ -600,16 +698,26 @@ bool Poly2TriTriangulator::insert_refinement_points()
             }
 
           // If we'd create a sliver element on the side, let's just
-          // refine the side instead.
+          // refine the side instead, if we're allowed.
           if (worst_cos < -0.6) // -0.5 is the best we could enforce?
             {
               side = worst_side;
 
-              // Let's just try bisecting for now
-              new_pt = (cavity_elem->point(side) +
-                        cavity_elem->point((side+1)%3)) / 2;
-              new_node = mesh.add_point(new_pt);
-              boundary_refine(side);
+              if (this->is_refine_boundary_allowed(boundary_info,
+                                                   *cavity_elem,
+                                                   side))
+                {
+                  // Let's just try bisecting for now
+                  new_pt = (cavity_elem->point(side) +
+                            cavity_elem->point((side+1)%3)) / 2;
+                  new_node = mesh.add_point(new_pt);
+                  boundary_refine(side);
+                }
+              else // Do the best we can under these restrictions
+                {
+                  new_pt = cavity_elem->vertex_average();
+                  new_node = mesh.add_point(new_pt);
+                }
             }
           else
             new_node = mesh.add_point(new_pt);

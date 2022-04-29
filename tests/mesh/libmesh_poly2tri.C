@@ -14,6 +14,7 @@ public:
 #ifdef LIBMESH_HAVE_POLY2TRI
   CPPUNIT_TEST( testLibMeshPoly2Tri );
   CPPUNIT_TEST( testLibMeshPoly2TriHole );
+  CPPUNIT_TEST( testLibMeshPoly2TriSlivers );
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -86,7 +87,38 @@ public:
     // We mostly wanted to make sure this compiled, but might as well
     // make sure it gave us the expected triangle count while we're at
     // it.
-//    CPPUNIT_ASSERT_EQUAL(tris.size(), std::size_t(3));
+    CPPUNIT_ASSERT_EQUAL(tris.size(), std::size_t(18));
+  }
+
+  void testLibMeshPoly2TriSlivers()
+  {
+    // Points from a libMesh Poly2TriTriangulator failure case
+    std::vector<p2t::Point> outer_boundary
+    {{0, 0}, {1, 0}, {1, 2}, {0, 1}};
+
+    std::vector<p2t::Point *> api_shim(outer_boundary.size());
+    std::iota(api_shim.begin(), api_shim.end(), outer_boundary.data());
+
+    const double r2o4 = std::sqrt(2.)/4;
+    std::vector<p2t::Point> hole_boundary
+      {{0.5,0.5+r2o4},{0.5-r2o4,0.5},{0.5,0.5}};
+
+    std::vector<p2t::Point *> hole_shim(hole_boundary.size());
+    std::iota(hole_shim.begin(), hole_shim.end(), hole_boundary.data());
+
+    p2t::CDT cdt(api_shim);
+    cdt.AddHole(hole_shim);
+
+    // const double eps = 1e-12; // fails
+    const double eps = 1e-11; // succeeds
+
+    std::vector<p2t::Point> interior_points
+    {{0.5-(r2o4/2)-eps, 0.5+(r2o4/2)+eps}};
+
+    for (auto & p : interior_points)
+      cdt.AddPoint(&p);
+
+    cdt.Triangulate();
   }
 
 #endif

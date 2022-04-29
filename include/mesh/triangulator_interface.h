@@ -176,6 +176,24 @@ public:
   int get_interpolate_boundary_points () const;
 
   /**
+   * Set whether or not the triangulation is allowed to refine the
+   * mesh boundary when refining the interior.  This is true by
+   * default, but may be set to false to make the mesh boundary more
+   * predictable (and so easier to stitch to other meshes) later.
+   *
+   * This may not be implemented in all subclasses.
+   */
+  virtual void set_refine_boundary_allowed (bool)
+  { libmesh_not_implemented(); }
+
+  /**
+   * Get whether or not the triangulation is allowed to refine the
+   * mesh boundary when refining the interior.  True by default.
+   */
+  virtual bool refine_boundary_allowed () const
+  { return true; }
+
+  /**
    * Sets/gets flag which tells whether to do two steps of Laplace
    * mesh smoothing after generating the grid.
    */

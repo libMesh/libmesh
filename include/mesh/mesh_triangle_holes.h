@@ -87,6 +87,30 @@ public:
     seg.push_back(n_points());
     return seg;
   }
+
+  /**
+   * Set whether or not a triangulator is allowed to refine the
+   * hole boundary when refining the mesh interior.  This is true by
+   * default, but may be set to false to make the hole boundary more
+   * predictable (and so easier to stitch to other meshes) later.
+   */
+  virtual void set_refine_boundary_allowed (bool refine_bdy_allowed)
+  { _refine_bdy_allowed = refine_bdy_allowed; }
+
+  /**
+   * Get whether or not the triangulation is allowed to refine the
+   * mesh boundary when refining the interior.  True by default.
+   */
+  virtual bool refine_boundary_allowed () const
+  { return _refine_bdy_allowed; }
+
+protected:
+
+  /**
+   * Whether to allow boundary refinement.  True by default; specified
+   * here so we can use the default constructor.
+   */
+  bool _refine_bdy_allowed = true;
 };
 
 
