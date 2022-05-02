@@ -774,7 +774,8 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
-  // Interpolation points node IDs
+  // Interpolation points node IDs, relevant if the parametrized function is defined on mesh sides
+  if (rb_eim_evaluation.get_parametrized_function().on_mesh_nodes())
   {
     auto interpolation_points_node_id_list =
       rb_eim_evaluation_reader.getInterpolationNodeId();
