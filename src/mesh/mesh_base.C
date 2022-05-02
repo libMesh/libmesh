@@ -56,7 +56,7 @@ namespace libMesh
 MeshBase::MeshBase (const Parallel::Communicator & comm_in,
                     unsigned char d) :
   ParallelObject (comm_in),
-  boundary_info  (new BoundaryInfo(*this)),
+  boundary_info  (new BoundaryInfo(*this)), // BoundaryInfo has protected ctor, can't use std::make_unique
   _n_parts       (1),
   _default_mapping_type(LAGRANGE_MAP),
   _default_mapping_data(0),
@@ -87,7 +87,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
 
 MeshBase::MeshBase (const MeshBase & other_mesh) :
   ParallelObject (other_mesh),
-  boundary_info  (new BoundaryInfo(*this)),
+  boundary_info  (new BoundaryInfo(*this)), // BoundaryInfo has protected ctor, can't use std::make_unique
   _n_parts       (other_mesh._n_parts),
   _default_mapping_type(other_mesh._default_mapping_type),
   _default_mapping_data(other_mesh._default_mapping_data),
