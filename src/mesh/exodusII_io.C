@@ -745,6 +745,13 @@ void ExodusII_IO::read (const std::string & fname)
         for (const auto & s : unique_elemsets)
           mesh.add_elemset_code(code++, s);
 
+        // Sanity check: make sure that MeshBase::n_elemsets() reports
+        // the expected value after calling MeshBase::add_elemset_code()
+        // one or more times.
+        libmesh_assert_msg(exio_helper->num_elem_sets == cast_int<int>(mesh.n_elemsets()),
+                           "Error: mesh.n_elemsets() is " << mesh.n_elemsets()
+                           << ", but mesh should have " << exio_helper->num_elem_sets << " elemsets.");
+
         // Create storage for the extra integer on all Elems. Elems which
         // are not in any set will use the default value of DofObject::invalid_id
         unsigned int elemset_index =
