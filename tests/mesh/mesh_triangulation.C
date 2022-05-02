@@ -491,8 +491,6 @@ public:
 
     mesh.comm().sum(area);
 
-    mesh.write("poly2tri_holes.e");
-
     LIBMESH_ASSERT_FP_EQUAL(area, expected_total_area, TOLERANCE*TOLERANCE);
   }
 
