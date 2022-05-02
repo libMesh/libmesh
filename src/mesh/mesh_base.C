@@ -105,6 +105,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
   _elem_dims(other_mesh._elem_dims),
   _elemset_codes_inverse_map(other_mesh._elemset_codes_inverse_map),
+  _all_elemset_ids(other_mesh._all_elemset_ids),
   _spatial_dimension(other_mesh._spatial_dimension),
   _default_ghosting(std::make_unique<GhostPointNeighbors>(*this)),
   _point_locator_close_to_point_tol(other_mesh._point_locator_close_to_point_tol)
@@ -172,6 +173,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _elem_dims = std::move(other_mesh.elem_dimensions());
   _elemset_codes = std::move(other_mesh._elemset_codes);
   _elemset_codes_inverse_map = std::move(other_mesh._elemset_codes_inverse_map);
+  _all_elemset_ids = std::move(other_mesh._all_elemset_ids),
   _spatial_dimension = other_mesh.spatial_dimension();
   _elem_integer_names = std::move(other_mesh._elem_integer_names);
   _elem_integer_default_values = std::move(other_mesh._elem_integer_default_values);
