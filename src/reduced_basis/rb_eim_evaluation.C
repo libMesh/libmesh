@@ -244,6 +244,7 @@ void RBEIMEvaluation::initialize_interpolation_points_spatial_indices()
   get_parametrized_function().get_spatial_indices(_interpolation_points_spatial_indices,
                                                   _interpolation_points_elem_id,
                                                   _interpolation_points_side_index,
+                                                  _interpolation_points_node_id,
                                                   _interpolation_points_qp,
                                                   _interpolation_points_subdomain_id,
                                                   _interpolation_points_boundary_id);
@@ -254,6 +255,7 @@ void RBEIMEvaluation::initialize_param_fn_spatial_indices()
   get_parametrized_function().initialize_spatial_indices(_interpolation_points_spatial_indices,
                                                          _interpolation_points_elem_id,
                                                          _interpolation_points_side_index,
+                                                         _interpolation_points_node_id,
                                                          _interpolation_points_qp,
                                                          _interpolation_points_subdomain_id,
                                                          _interpolation_points_boundary_id);

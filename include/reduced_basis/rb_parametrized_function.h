@@ -306,6 +306,7 @@ public:
   virtual void get_spatial_indices(std::vector<std::vector<unsigned int>> & spatial_indices,
                                    const std::vector<dof_id_type> & elem_ids,
                                    const std::vector<unsigned int> & side_indices,
+                                   const std::vector<dof_id_type> & node_ids,
                                    const std::vector<unsigned int> & qps,
                                    const std::vector<subdomain_id_type> & sbd_ids,
                                    const std::vector<boundary_id_type> & boundary_ids);
@@ -318,6 +319,7 @@ public:
   virtual void initialize_spatial_indices(const std::vector<std::vector<unsigned int>> & spatial_indices,
                                           const std::vector<dof_id_type> & elem_ids,
                                           const std::vector<unsigned int> & side_indices,
+                                          const std::vector<dof_id_type> & node_ids,
                                           const std::vector<unsigned int> & qps,
                                           const std::vector<subdomain_id_type> & sbd_ids,
                                           const std::vector<boundary_id_type> & boundary_ids);
