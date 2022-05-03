@@ -2192,6 +2192,7 @@ void ExodusII_IO::write_nodal_data_common(std::string fname,
 
           exio_helper->write_sidesets(mesh);
           exio_helper->write_nodesets(mesh);
+          exio_helper->write_elemsets(mesh);
 
           exio_helper->initialize_nodal_variables(names);
         }
