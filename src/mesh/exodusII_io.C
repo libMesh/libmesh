@@ -2066,6 +2066,7 @@ void ExodusII_IO::write (const std::string & fname)
   exio_helper->write_elements(mesh);
   exio_helper->write_sidesets(mesh);
   exio_helper->write_nodesets(mesh);
+  exio_helper->write_elemsets(mesh);
 
   if ((mesh.get_boundary_info().n_edge_conds() > 0) && _verbose)
     libmesh_warning("Warning: Mesh contains edge boundary IDs, but these "
@@ -2191,6 +2192,7 @@ void ExodusII_IO::write_nodal_data_common(std::string fname,
 
           exio_helper->write_sidesets(mesh);
           exio_helper->write_nodesets(mesh);
+          exio_helper->write_elemsets(mesh);
 
           exio_helper->initialize_nodal_variables(names);
         }

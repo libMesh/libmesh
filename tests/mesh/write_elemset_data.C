@@ -160,7 +160,6 @@ public:
     {
       IOClass writer(mesh);
       writer.write(filename);
-      writer.write_elemsets();
       writer.write_elemset_data(/*timestep=*/1, var_names, elemset_ids, elemset_vals);
     }
 
