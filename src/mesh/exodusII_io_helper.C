@@ -3193,6 +3193,15 @@ ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
               current_set.distribution_factor_list = nullptr; // not used for elemsets
             }
 
+          // Sanity check: make sure the number of elemsets we already wrote to the header
+          // matches the number of elemsets we just constructed by looping over the Mesh.
+          libmesh_assert_msg(num_elem_sets == cast_int<int>(exodus_elemsets.size()),
+                             "Mesh has " << exodus_elemsets.size()
+                             << " elemsets, but header was written with num_elem_sets == " << num_elem_sets);
+          libmesh_assert_msg(num_elem_sets == cast_int<int>(mesh.n_elemsets()),
+                             "mesh.n_elemsets() == " << mesh.n_elemsets()
+                             << ", but header was written with num_elem_sets == " << num_elem_sets);
+
           ex_err = exII::ex_put_sets(ex_id, exodus_elemsets.size(), sets.data());
           EX_CHECK_ERR(ex_err, "Error writing elemsets");
 
