@@ -28,6 +28,9 @@
 #include "libmesh/node.h"
 #include "libmesh/simple_range.h"
 
+// C++ includes
+#include <numeric> // reduce
+
 namespace
 {
   using namespace libMesh;
