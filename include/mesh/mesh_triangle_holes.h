@@ -21,6 +21,7 @@
 #include "libmesh/libmesh_config.h"
 
 // Local includes
+#include "libmesh/boundary_info.h" // invalid_id
 #include "libmesh/point.h"
 #include "libmesh/triangulator_interface.h"
 
@@ -268,6 +269,54 @@ private:
 
   std::vector<unsigned int> _segment_indices;
 };
+
+
+
+/**
+ * Another concrete instantiation of the hole, as general as
+ * ArbitraryHole, but based on an existing 1D or 2D mesh.
+ *
+ * If ids are given, 2D edges on a boundary with a listed id or 1D
+ * edges in a subdomain with a listed id will define the hole.
+ *
+ * If no ids are given, the hole will be defined by all 1D Edge
+ * elements and all 2D boundary edges.
+ *
+ * In either case the, hole definition should give a single connected
+ * boundary, topologically a circle.  The hole is defined when the
+ * MeshedHole is constructed, and ignores any subsequent changes to
+ * the input mesh.
+ */
+class TriangulatorInterface::MeshedHole : public TriangulatorInterface::Hole
+{
+public:
+  /**
+   * The constructor requires a mesh defining the hole, and optionally
+   * boundary+subdomain ids restricting the definition.
+   */
+  MeshedHole(const MeshBase & mesh,
+             std::set<std::size_t> ids = {});
+
+  virtual unsigned int n_points() const override;
+
+  virtual Point point(const unsigned int n) const override;
+
+  virtual Point inside() const override;
+
+private:
+  /**
+   * An (x,y) location inside the hole.  Cached because this is too
+   * expensive to compute for an arbitrary input mesh unless we need
+   * it for Triangle.
+   */
+  mutable Point _center;
+
+  /**
+   * The sorted vector of points which makes up the hole.
+   */
+  std::vector<Point> _points;
+};
+
 
 
 
