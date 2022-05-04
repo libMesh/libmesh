@@ -101,6 +101,7 @@ public:
   class AffineHole;
   class PolygonHole;
   class ArbitraryHole;
+  class MeshedHole;
 
   /**
    * The region class defines the interface

@@ -1,6 +1,7 @@
 #include <libmesh/boundary_info.h>
 #include <libmesh/elem.h>
 #include <libmesh/mesh.h>
+#include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_triangle_holes.h>
 #include <libmesh/mesh_triangle_interface.h>
 #include <libmesh/parallel_implementation.h> // max()
@@ -33,6 +34,7 @@ public:
   CPPUNIT_TEST( testPoly2TriInterp );
   CPPUNIT_TEST( testPoly2TriInterp3 );
   CPPUNIT_TEST( testPoly2TriHoles );
+  CPPUNIT_TEST( testPoly2TriMeshedHoles );
   CPPUNIT_TEST( testPoly2TriSegments );
   CPPUNIT_TEST( testPoly2TriRefined );
   CPPUNIT_TEST( testPoly2TriExtraRefined );
@@ -51,6 +53,7 @@ public:
   CPPUNIT_TEST( testTriangleInterp );
   CPPUNIT_TEST( testTriangleInterp3 );
   CPPUNIT_TEST( testTriangleHoles );
+  CPPUNIT_TEST( testTriangleMeshedHoles );
   CPPUNIT_TEST( testTriangleSegments );
 #endif
 
@@ -237,6 +240,46 @@ public:
   }
 
 
+  void testFoundCenters(const MeshBase & mesh,
+                        const std::vector<Point> & expected_centers)
+  {
+    std::vector<bool> found_centers(expected_centers.size(), false);
+
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
+
+        // Make sure we're not getting any inverted elements
+        auto cross_prod =
+          (elem->point(1) - elem->point(0)).cross
+            (elem->point(2) - elem->point(0));
+
+        CPPUNIT_ASSERT_GREATER(Real(0), cross_prod(2));
+
+        // Make sure we're finding all the elements we expect
+        Point center = elem->vertex_average();
+
+        bool found_mine = false;
+        for (auto i : index_range(expected_centers))
+          {
+            Point possible = expected_centers[i];
+
+            if (possible.absolute_fuzzy_equals(center, TOLERANCE*TOLERANCE))
+              {
+                found_mine = true;
+                found_centers[i] = true;
+              }
+          }
+        CPPUNIT_ASSERT(found_mine);
+      }
+
+    mesh.comm().max(found_centers);
+
+    for (auto found_it : found_centers)
+      CPPUNIT_ASSERT(found_it);
+  }
+
+
   void testTriangulatorHoles(MeshBase & mesh,
                              TriangulatorInterface & triangulator)
   {
@@ -277,40 +320,65 @@ public:
       {0,-r2p4o6}, {-r2p4o6, 0}
     };
 
-    std::vector<bool> found_centers(expected_centers.size(), false);
+    testFoundCenters(mesh, expected_centers);
+  }
 
-    for (const auto & elem : mesh.element_ptr_range())
-      {
-        CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
 
-        // Make sure we're not getting any inverted elements
-        auto cross_prod =
-          (elem->point(1) - elem->point(0)).cross
-            (elem->point(2) - elem->point(0));
+  void testTriangulatorMeshedHoles(MeshBase & mesh,
+                                   TriangulatorInterface & triangulator)
+  {
+    // A square quad; we'll put a square hole in the middle.  Offset
+    // this to catch a potential bug I missed on the first try.
+    mesh.add_point(Point(19,19), 0);
+    mesh.add_point(Point(21,19), 1);
+    mesh.add_point(Point(21,21), 2);
+    mesh.add_point(Point(19,21), 3);
 
-        CPPUNIT_ASSERT_GREATER(Real(0), cross_prod(2));
+    // Use the point order to define the boundary, because our
+    // Poly2Tri implementation doesn't do convex hulls yet, even when
+    // that would give the same answer.
+    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
 
-        // Make sure we're finding all the elements we expect
-        Point center = elem->vertex_average();
+    // Add a square meshed hole in the center
+    Mesh centermesh { mesh.comm() };
+    MeshTools::Generation::build_square (centermesh, 2, 2, 19.5, 20.5, 19.5, 20.5, QUAD4);
 
-        bool found_mine = false;
-        for (auto i : index_range(expected_centers))
-          {
-            Point possible = expected_centers[i];
+    TriangulatorInterface::MeshedHole centerhole { centermesh };
 
-            if (possible.absolute_fuzzy_equals(center, TOLERANCE*TOLERANCE))
-              {
-                found_mine = true;
-                found_centers[i] = true;
-              }
-          }
-        CPPUNIT_ASSERT(found_mine);
-      }
+    CPPUNIT_ASSERT_EQUAL(centerhole.n_points(), 8u);
+    CPPUNIT_ASSERT_EQUAL(centerhole.area(), Real(1));
+    Point inside = centerhole.inside();
+    CPPUNIT_ASSERT_EQUAL(inside(0), Real(20));
+    CPPUNIT_ASSERT_EQUAL(inside(1), Real(20));
 
-    mesh.comm().max(found_centers);
+    const std::vector<TriangulatorInterface::Hole*> holes { &centerhole };
+    triangulator.attach_hole_list(&holes);
 
-    for (auto found_it : found_centers)
-      CPPUNIT_ASSERT(found_it);
+    // Don't try to insert points yet
+    triangulator.desired_area() = 1000;
+    triangulator.minimum_angle() = 0;
+    triangulator.smooth_after_generating() = false;
+
+    triangulator.triangulate();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(12));
+
+    // Center coordinates for all the elements we expect
+    std::vector <Point> expected_centers
+      { {-0.5, Real(2)/3}, {0, Real(5)/6},
+        {0.5, Real(2)/3},
+        {Real(2)/3, -0.5}, {Real(5)/6, 0},
+        {Real(2)/3, 0.5},
+        {-0.5, -Real(2)/3}, {0, -Real(5)/6},
+        {0.5, -Real(2)/3},
+        {-Real(2)/3, -0.5}, {-Real(5)/6, 0},
+        {-Real(2)/3, 0.5} };
+
+    // With the same offset
+    for (auto & p : expected_centers)
+      p += Point(20,20);
+
+    testFoundCenters(mesh, expected_centers);
   }
 
 
@@ -371,6 +439,16 @@ public:
   }
 
 
+  void testTriangleMeshedHoles()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    TriangleInterface triangle(mesh);
+    testTriangulatorMeshedHoles(mesh, triangle);
+  }
+
+
   void testTriangleSegments()
   {
     LOG_UNIT_TEST;
@@ -420,6 +498,16 @@ public:
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulatorHoles(mesh, p2t_tri);
+  }
+
+
+  void testPoly2TriMeshedHoles()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator p2t_tri(mesh);
+    testTriangulatorMeshedHoles(mesh, p2t_tri);
   }
 
 
