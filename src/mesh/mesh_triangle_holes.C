@@ -32,9 +32,6 @@
 // TIMPI includes
 #include "timpi/parallel_implementation.h" // broadcast
 
-// C++ includes
-#include <numeric> // reduce
-
 namespace
 {
   using namespace libMesh;
@@ -385,7 +382,15 @@ Point TriangulatorInterface::MeshedHole::inside() const
   if (_center(0) == std::numeric_limits<Real>::max())
     {
       // Start with the vertex average
-      _center = std::reduce(_points.begin(), _points.end());
+
+      // Turns out "I'm a fully compliant C++17 compiler!" doesn't
+      // mean "I have a full C++17 standard library!"
+      // _center = std::reduce(_points.begin(), _points.end());
+      _center = 0;
+      for (auto p : _points)
+        _center += p;
+
+      _center /= _points.size();
 
       // Count the number of intersections with a ray to the right,
       // keep track of how far they are
