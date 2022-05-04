@@ -94,14 +94,14 @@ public:
    * default, but may be set to false to make the mesh boundary more
    * predictable (and so easier to stitch to other meshes) later.
    */
-  virtual void set_refine_boundary_allowed (bool refine_bdy_allowed)
+  virtual void set_refine_boundary_allowed (bool refine_bdy_allowed) override
   { _refine_bdy_allowed = refine_bdy_allowed; }
 
   /**
    * Get whether or not the triangulation is allowed to refine the
    * mesh boundary when refining the interior.  True by default.
    */
-  virtual bool refine_boundary_allowed () const
+  virtual bool refine_boundary_allowed () const override
   { return _refine_bdy_allowed; }
 
 
