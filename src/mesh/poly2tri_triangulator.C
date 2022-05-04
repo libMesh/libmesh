@@ -298,27 +298,63 @@ void Poly2TriTriangulator::triangulate_current_points()
   // Prepare poly2tri points for our nodes, sorted into outer boundary
   // points and interior Steiner points.
 
-  // If we have no explicit segments defined, our nodal id ordering
+  // If we have no explicit segments defined, our Mesh itself
   // defines our outer polyline ordering:
   if (this->segments.empty())
     {
-      for (auto & node : _mesh.node_ptr_range())
+      // If we have segments, they should form the polyline with the
+      // ordering we want.
+      if (_mesh.n_elem())
         {
-          p2t::Point pt((*node)(0), (*node)(1));
+          for (auto & node : _mesh.node_ptr_range())
+            {
+              const p2t::Point pt((*node)(0), (*node)(1));
 
-          // If we're out of boundary nodes, the rest are going to be
-          // Steiner points or hole points
-          if (node->id() < _n_boundary_nodes)
-            outer_boundary_points.push_back(pt);
-          else
-            steiner_points.insert(pt);
+              // We're not going to support overlapping nodes on the boundary
+              if (point_node_map.count(pt))
+                libmesh_not_implemented();
 
-          // We're not going to support overlapping nodes on the boundary
-          if (point_node_map.count(pt))
-            libmesh_not_implemented();
+              point_node_map.emplace(pt, node);
+            }
 
-          point_node_map.emplace(pt, node);
+          // We'll steal the ordering calculation from
+          // the MeshedHole code, but reverse the ordering since it's
+          // an outer rather than an inner boundary.
+          const TriangulatorInterface::MeshedHole mh { _mesh };
+
+          const std::size_t np = mh.n_points();
+          for (auto i : make_range(np))
+            {
+              const Point p = mh.point(np-i-1);
+              libmesh_assert_equal_to(p(2),0);
+              const p2t::Point pt(p(0), p(1));
+              outer_boundary_points.push_back(pt);
+            }
+
+          // But we're getting rid of these elements now, to replace
+          // them with our triangulation.
+          _mesh.clear_elems();
         }
+      // If we have no segments or edges, the nodal id ordering
+      // defines our outer polyline ordering
+      else
+        for (auto & node : _mesh.node_ptr_range())
+          {
+            p2t::Point pt((*node)(0), (*node)(1));
+
+            // If we're out of boundary nodes, the rest are going to be
+            // Steiner points or hole points
+            if (node->id() < _n_boundary_nodes)
+              outer_boundary_points.push_back(pt);
+            else
+              steiner_points.insert(pt);
+
+            // We're not going to support overlapping nodes on the boundary
+            if (point_node_map.count(pt))
+              libmesh_not_implemented();
+
+            point_node_map.emplace(pt, node);
+          }
     }
   // If we have explicit segments defined, that's our outer polyline
   // ordering:
