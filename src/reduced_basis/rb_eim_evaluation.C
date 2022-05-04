@@ -1526,10 +1526,10 @@ read_in_node_basis_functions(const System & sys,
               // parameter of data_stream() is ignored while reading.
               xdr.data_stream(node_value.data(), node_value.size());
 
-              for (auto node_id : node_ids)
+              for (unsigned int node_counter=0; node_counter<n_node; node_counter++)
                 {
-                  auto & array = bf_map[node_id];
-                  array[var] = node_value[node_id];
+                  auto & array = bf_map[node_ids[node_counter]];
+                  array[var] = node_value[node_counter];
                 }
             } // end for (var)
         } // end for (i)
