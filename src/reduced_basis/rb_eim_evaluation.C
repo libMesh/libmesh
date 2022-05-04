@@ -1157,7 +1157,7 @@ write_out_node_basis_functions(const std::string & directory_name,
     return;
 
   // Gather basis function data from other procs, storing it in
-  // _local_eim_basis_functions, so that we can then print everything
+  // _local_node_eim_basis_functions, so that we can then print everything
   // from processor 0.
   this->node_gather_bfs();
 
@@ -1184,42 +1184,37 @@ write_out_node_basis_functions(const std::string & directory_name,
       // We assume that each basis function has data for the same
       // number of elements as basis function 0, which is equal to the
       // size of the map.
-      auto n_elem = _local_node_eim_basis_functions[0].size();
-      xdr.data(n_elem, "# Number of nodes");
+      auto n_node = _local_node_eim_basis_functions[0].size();
+      xdr.data(n_node, "# Number of nodes");
 
       // We assume that each element has the same number of variables,
       // and we get the number of vars from the first element of the
       // first basis function.
-      auto n_vars = _local_eim_basis_functions[0].begin()->second.size();
+      auto n_vars = _local_node_eim_basis_functions[0].begin()->second.size();
       xdr.data(n_vars, "# Number of variables");
 
-      // We assume that the list of nodes for each basis function
-      // is the same as basis function 0.
-      dof_id_type expected_node_id = 0;
+      // We write out the following arrays:
+      // - node IDs
+      std::vector<unsigned int> node_ids;
+      node_ids.reserve(n_node);
       for (const auto & pr : _local_node_eim_basis_functions[0])
         {
-          // Note: Currently we require that the Nodes are numbered
-          // contiguously from [0..n_nodes).  This allows us to avoid
-          // writing the Node ids to the Xdr file, but if we need to
-          // generalize this assumption later, we can.
-          auto actual_node_id = pr.first;
-          libmesh_error_msg_if(actual_node_id != expected_node_id++,
-                               "RBEIMEvaluation currently assumes a contiguous Node numbering starting from 0.");
+          node_ids.push_back(pr.first);
         }
+      xdr.data(node_ids, "# Node IDs");
 
       // Now we construct a vector for each basis function, for each
       // variable which is ordered according to:
       // [ [val for Node 0], [val for Node 1], ... [val for Node N] ]
       // and write it to file.
 
-      // After the loop above expected_node_id holds the total number of nodes,
-      // so we resize the vectors to this size.
       std::vector<std::vector<Number>> var_data(n_vars);
       for (unsigned int var=0; var<n_vars; var++)
-        var_data[var].resize(expected_node_id);
+        var_data[var].resize(n_node);
 
       for (auto bf : index_range(_local_node_eim_basis_functions))
         {
+          unsigned int node_counter = 0;
           for (const auto & [node_id, array] : _local_node_eim_basis_functions[bf])
             {
               // array[n_vars] per Node
@@ -1228,8 +1223,10 @@ write_out_node_basis_functions(const std::string & directory_name,
                   // Based on the error check above, we know that node_id is numbered
                   // contiguously from [0..nodes], so we can use it as the vector
                   // index here.
-                  var_data[var][node_id] = array[var];
+                  var_data[var][node_counter] = array[var];
                 }
+
+              node_counter++;
             }
 
           // Write all the var values for this bf
@@ -1492,6 +1489,9 @@ read_in_node_basis_functions(const System & sys,
       std::size_t n_vars;
       xdr.data(n_vars);
 
+      std::vector<unsigned int> node_ids(n_node);
+      xdr.data(node_ids);
+
       // Allocate space to store all required basis functions,
       // clearing any data that may have been there previously.
       //
@@ -1501,7 +1501,7 @@ read_in_node_basis_functions(const System & sys,
       _local_node_eim_basis_functions.clear();
       _local_node_eim_basis_functions.resize(n_bf);
       for (auto i : index_range(_local_node_eim_basis_functions))
-        for (std::size_t node_id=0; node_id<n_node; ++node_id)
+        for (auto node_id : node_ids)
           {
             auto & array = _local_node_eim_basis_functions[i][node_id];
             array.resize(n_vars);
