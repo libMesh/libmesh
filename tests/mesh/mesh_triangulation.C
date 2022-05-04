@@ -327,11 +327,12 @@ public:
   void testTriangulatorMeshedHoles(MeshBase & mesh,
                                    TriangulatorInterface & triangulator)
   {
-    // A square quad; we'll put a square hole in the middle
-    mesh.add_point(Point(-1,-1), 0);
-    mesh.add_point(Point(1,-1), 1);
-    mesh.add_point(Point(1,1), 2);
-    mesh.add_point(Point(-1,1), 3);
+    // A square quad; we'll put a square hole in the middle.  Offset
+    // this to catch a potential bug I missed on the first try.
+    mesh.add_point(Point(19,19), 0);
+    mesh.add_point(Point(21,19), 1);
+    mesh.add_point(Point(21,21), 2);
+    mesh.add_point(Point(19,21), 3);
 
     // Use the point order to define the boundary, because our
     // Poly2Tri implementation doesn't do convex hulls yet, even when
@@ -340,15 +341,15 @@ public:
 
     // Add a square meshed hole in the center
     Mesh centermesh { mesh.comm() };
-    MeshTools::Generation::build_square (centermesh, 2, 2, -0.5, 0.5, -0.5, 0.5, QUAD4);
+    MeshTools::Generation::build_square (centermesh, 2, 2, 19.5, 20.5, 19.5, 20.5, QUAD4);
 
     TriangulatorInterface::MeshedHole centerhole { centermesh };
 
     CPPUNIT_ASSERT_EQUAL(centerhole.n_points(), 8u);
     CPPUNIT_ASSERT_EQUAL(centerhole.area(), Real(1));
     Point inside = centerhole.inside();
-    CPPUNIT_ASSERT_EQUAL(inside(0), Real(0));
-    CPPUNIT_ASSERT_EQUAL(inside(1), Real(0));
+    CPPUNIT_ASSERT_EQUAL(inside(0), Real(20));
+    CPPUNIT_ASSERT_EQUAL(inside(1), Real(20));
 
     const std::vector<TriangulatorInterface::Hole*> holes { &centerhole };
     triangulator.attach_hole_list(&holes);
@@ -372,6 +373,10 @@ public:
         {0.5, -Real(2)/3},
         {-Real(2)/3, -0.5}, {-Real(5)/6, 0},
         {-Real(2)/3, 0.5} };
+
+    // With the same offset
+    for (auto & p : expected_centers)
+      p += Point(20,20);
 
     testFoundCenters(mesh, expected_centers);
   }
