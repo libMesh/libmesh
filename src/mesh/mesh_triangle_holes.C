@@ -32,6 +32,9 @@
 // TIMPI includes
 #include "timpi/parallel_implementation.h" // broadcast
 
+// C++ includes
+#include <algorithm>
+
 namespace
 {
   using namespace libMesh;
@@ -386,9 +389,7 @@ Point TriangulatorInterface::MeshedHole::inside() const
       // Turns out "I'm a fully compliant C++17 compiler!" doesn't
       // mean "I have a full C++17 standard library!"
       // _center = std::reduce(_points.begin(), _points.end());
-      _center = 0;
-      for (auto p : _points)
-        _center += p;
+      _center = std::accumulate(_points.begin(), _points.end(), Point());
 
       _center /= _points.size();
 
