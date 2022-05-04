@@ -26,7 +26,11 @@
 #include "libmesh/int_range.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/node.h"
+#include "libmesh/parallel_algebra.h" // Packing<Point>
 #include "libmesh/simple_range.h"
+
+// TIMPI includes
+#include "timpi/parallel_implementation.h" // broadcast
 
 // C++ includes
 #include <numeric> // reduce
@@ -247,6 +251,18 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
                                               std::set<std::size_t> ids)
   : _center(std::numeric_limits<Real>::max())
 {
+  // We'll want to do this on one processor and broadcast to the rest;
+  // otherwise we can get out of sync by doing things like using
+  // pointers as keys.
+  libmesh_parallel_only(mesh.comm());
+
+  if (mesh.processor_id() != 0)
+    {
+      // Receive what proc 0 will send later
+      mesh.comm().broadcast(_points);
+      return;
+    }
+
   // We'll find all the line segments first, then stitch them together
   // afterward
   std::multimap<const Node *, const Node *> hole_edge_map;
@@ -345,6 +361,8 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
   // We ordered ourselves backwards?  Whoops, fix that.
   if (current_area < 0)
     std::reverse(_points.begin(), _points.end());
+
+  mesh.comm().broadcast(_points);
 }
 
 
