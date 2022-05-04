@@ -906,6 +906,8 @@ write_out_basis_functions(const std::string & directory_name,
 
   if (get_parametrized_function().on_mesh_sides())
     write_out_side_basis_functions(directory_name, write_binary_basis_functions);
+  else if (get_parametrized_function().on_mesh_nodes())
+    write_out_node_basis_functions(directory_name, write_binary_basis_functions);
   else
     write_out_interior_basis_functions(directory_name, write_binary_basis_functions);
 }
