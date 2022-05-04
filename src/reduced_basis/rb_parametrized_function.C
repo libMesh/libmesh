@@ -516,7 +516,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
 void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_nodes(const RBParameters & mu,
                                                                              const std::unordered_map<dof_id_type, Point> & all_xyz,
                                                                              const std::unordered_map<dof_id_type, boundary_id_type> & node_boundary_ids,
-                                                                             const System & sys)
+                                                                             const System & /*sys*/)
 {
   mesh_to_preevaluated_node_values_map.clear();
 

@@ -2635,8 +2635,6 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
               // Throws an error if the required elem_id is not found.
               const auto & array = libmesh_map_find(bf_map, node_id);
 
-              auto n_vars = array.size();
-
               // Accumulate the count for this proc
               counts[p] += n_vars;
             } // end for (e)
