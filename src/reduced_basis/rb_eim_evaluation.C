@@ -265,6 +265,8 @@ unsigned int RBEIMEvaluation::get_n_basis_functions() const
 {
   if (get_parametrized_function().on_mesh_sides())
     return _local_side_eim_basis_functions.size();
+  else if (get_parametrized_function().on_mesh_nodes())
+    return _local_node_eim_basis_functions.size();
   else
     return _local_eim_basis_functions.size();
 }
@@ -273,6 +275,8 @@ void RBEIMEvaluation::set_n_basis_functions(unsigned int n_bfs)
 {
   if (get_parametrized_function().on_mesh_sides())
     _local_side_eim_basis_functions.resize(n_bfs);
+  else if (get_parametrized_function().on_mesh_nodes())
+    _local_node_eim_basis_functions.resize(n_bfs);
   else
     _local_eim_basis_functions.resize(n_bfs);
 }
