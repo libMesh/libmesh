@@ -48,19 +48,17 @@ DifferentiableSystem::DifferentiableSystem(EquationSystems & es,
   print_element_solutions(false),
   print_element_residuals(false),
   print_element_jacobians(false),
-  _diff_physics(this),
+  _diff_physics_is_shallow_copy(true), // initially a shallow copy of ourself
+  _diff_physics(nullptr), // see below
   diff_qoi(this)
 {
+  set_pointer(this);
 }
 
 
 
 DifferentiableSystem::~DifferentiableSystem ()
 {
-  // If we had an attached Physics object, delete it.
-  if (this->_diff_physics != this)
-    delete this->_diff_physics;
-
   // If we had an attached QoI object, delete it.
   if (this->diff_qoi != this)
     delete this->diff_qoi;
@@ -71,10 +69,11 @@ DifferentiableSystem::~DifferentiableSystem ()
 void DifferentiableSystem::clear ()
 {
   // If we had an attached Physics object, delete it.
-  if (this->_diff_physics != this)
+  if (this->get_physics() != this)
     {
-      delete this->_diff_physics;
-      this->_diff_physics = this;
+      // Let's hold a shallow copy to ourselves again
+      this->set_pointer(this);
+      _diff_physics_is_shallow_copy = true;
     }
   // If we had no attached Physics object, clear our own Physics data
   else
@@ -111,7 +110,7 @@ void DifferentiableSystem::init_data ()
 {
   // If it isn't a separate initialized-upon-attachment object, do any
   // initialization our physics needs.
-  if (this->_diff_physics == this)
+  if (this->get_physics() == this)
     this->init_physics(*this);
 
   // Do any initialization our solvers need
@@ -357,16 +356,100 @@ bool DifferentiableSystem::have_second_order_scalar_vars() const
   return have_second_order_scalar_vars;
 }
 
-
-
-void DifferentiableSystem::swap_physics ( DifferentiablePhysics * & swap_physics )
+const DifferentiablePhysics * DifferentiableSystem::get_physics() const
 {
-  std::swap(this->_diff_physics, swap_physics);
+  return this->_diff_physics.get();
+}
+
+DifferentiablePhysics * DifferentiableSystem::get_physics()
+{
+  return this->_diff_physics.get();
+}
+
+void DifferentiableSystem::attach_physics( DifferentiablePhysics * physics_in )
+{
+  // Make copy and assume ownership. We are now responsible for deleting this.
+  auto clone = physics_in->clone_physics();
+  this->set_pointer(clone.release());
+  _diff_physics_is_shallow_copy = false;
+
+  // Initialize
+  this->_diff_physics->init_physics(*this);
+}
+
+void DifferentiableSystem::swap_physics ( std::unique_ptr<DifferentiablePhysics> & input )
+{
+  if (!_diff_physics_is_shallow_copy)
+    {
+      // The "input" unique_ptr does not have the same deleter as we do, so they cannot be
+      // std::swapped directly
+
+      // Release ownership of both (does not call deleter)
+      DifferentiablePhysics * ours = _diff_physics.release();
+      DifferentiablePhysics * theirs = input.release();
+
+      // Swap.
+      this->set_pointer(theirs);
+      input.reset(ours);
+
+      // We still aren't a shallow copy
+      // _diff_physics_is_shallow_copy = false;
+    }
+  else
+    {
+      // Since "input" is an "owning" pointer, if we are currently a
+      // shallow copy we don't want "input" to own the pointer we are
+      // currently holding, since in that case it might be
+      // double-deleted by both input and from its original scope.
+      libmesh_error_msg("Can't swap with unique_ptr, currently a shallow copy.");
+    }
 
   // If the physics has been swapped, we will reassemble
   // the matrix from scratch before doing an adjoint solve
   // rather than just transposing
   this->disable_cache();
+}
+
+void DifferentiableSystem::swap_physics ( DifferentiablePhysics * & input )
+{
+  if (_diff_physics_is_shallow_copy)
+    {
+      // We either already are a shallow copy or we can become one.
+
+      // Release "ownership" of our shallow copy
+      DifferentiablePhysics * ours = _diff_physics.release();
+
+      // Swap.
+      this->set_pointer(input);
+      input = ours;
+
+      // We are still a shallow copy
+      // _diff_physics_is_shallow_copy = true;
+    }
+  else // !_diff_physics_is_shallow_copy and _diff_physics is set
+    {
+      // If we are not a shallow copy, then we do not want to give
+      // away our ownership to a dumb pointer, because it may be leaked.
+      libmesh_error_msg("Can't swap with dumb pointer, currently a deep copy.");
+    }
+
+  // If the physics has been swapped, we will reassemble
+  // the matrix from scratch before doing an adjoint solve
+  // rather than just transposing
+  this->disable_cache();
+}
+
+void DifferentiableSystem::deleter(DifferentiablePhysics * p)
+{
+  if (!_diff_physics_is_shallow_copy)
+    delete p;
+}
+
+void DifferentiableSystem::set_pointer(DifferentiablePhysics * input)
+{
+  _diff_physics =
+    std::unique_ptr<DifferentiablePhysics, std::function<void(DifferentiablePhysics*)>>
+    (input, std::bind(&DifferentiableSystem::deleter, this, std::placeholders::_1));
 }
 
 

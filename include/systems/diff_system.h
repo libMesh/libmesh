@@ -29,6 +29,7 @@
 
 // C++ includes
 #include <memory>
+#include <functional> // std::bind
 
 namespace libMesh
 {
@@ -181,8 +182,7 @@ public:
    * \note If no external Physics object is attached, the default is
    * \p this.
    */
-  const DifferentiablePhysics * get_physics() const
-  { return this->_diff_physics; }
+  const DifferentiablePhysics * get_physics() const;
 
   /**
    * \returns A reference to a DifferentiablePhysics object.
@@ -190,20 +190,29 @@ public:
    * \note If no external Physics object is attached, the default is
    * \p this.
    */
-  DifferentiablePhysics * get_physics()
-  { return this->_diff_physics; }
+  DifferentiablePhysics * get_physics();
 
   /**
-   * Attach external Physics object.
+   * Attach external Physics object. Makes a copy of physics_in and
+   * takes ownership of it, becomes responsible for deleting it, etc.
+   * Also calls init_physics() on the attached object.
    */
-  void attach_physics( DifferentiablePhysics * physics_in )
-  { this->_diff_physics = (physics_in->clone_physics()).release();
-    this->_diff_physics->init_physics(*this);}
+  void attach_physics( DifferentiablePhysics * physics_in );
 
   /**
-   * Swap current physics object with external object
+   * Swap current physics object with external object. This class
+   * takes ownership of the incoming DifferentiablePhysics object and will
+   * be responsible for deleting it. swap_physics takes ownership of the
+   * current DifferentiablePhysics (if any).
    */
-  void swap_physics ( DifferentiablePhysics * & swap_physics );
+  void swap_physics ( std::unique_ptr<DifferentiablePhysics> & input );
+
+  /**
+   * Swap current physics object with external object. This class
+   * is not responsible for deleting the swapped in physics because it is
+   * assumed to be owned by someone else.
+   */
+  void swap_physics ( DifferentiablePhysics * & input );
 
   /**
    * \returns A const reference to a DifferentiableQoI object.
@@ -363,11 +372,31 @@ public:
 protected:
 
   /**
+   * If true, then we should _not_ delete the _diff_physics pointer
+   * when it goes out of scope because we are just temporarily
+   * borrowing it. If false, we should delete it. See also: the
+   * protected deleter() function.
+   */
+  bool _diff_physics_is_shallow_copy;
+
+  /**
    * Pointer to object to use for physics assembly evaluations.
    * Defaults to \p this for backwards compatibility; in the future
    * users should create separate physics objects.
    */
-  DifferentiablePhysics * _diff_physics;
+  std::unique_ptr<DifferentiablePhysics, std::function<void (DifferentiablePhysics *)>> _diff_physics;
+
+  /**
+   * Deletes the _diff_physics pointer or doesn't depending on the value of
+   * the _is_shallow_copy flag.
+   */
+  void deleter(DifferentiablePhysics * p);
+
+  /**
+   * Called internally by swap_physics() routines, isolates the
+   * complexity of std::bind call to a single location.
+   */
+  void set_pointer(DifferentiablePhysics * input);
 
   /**
    * Pointer to object to use for quantity of interest assembly
