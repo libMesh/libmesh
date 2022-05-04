@@ -308,60 +308,10 @@ void Quad9::connectivity(const unsigned int sf,
 
     case VTK:
       {
-        conn.resize(9);
-        conn[0] = this->node_id(0);
-        conn[1] = this->node_id(1);
-        conn[2] = this->node_id(2);
-        conn[3] = this->node_id(3);
-        conn[4] = this->node_id(4);
-        conn[5] = this->node_id(5);
-        conn[6] = this->node_id(6);
-        conn[7] = this->node_id(7);
-        conn[8] = this->node_id(8);
+        conn.resize(Quad9::num_nodes);
+        for (auto i : index_range(conn))
+          conn[i] = this->node_id(i);
         return;
-
-        /*
-          switch(sf)
-          {
-          case 0:
-          // linear sub-quad 0
-          conn[0] = this->node_id(0);
-          conn[1] = this->node_id(4);
-          conn[2] = this->node_id(8);
-          conn[3] = this->node_id(7);
-
-          return;
-
-          case 1:
-          // linear sub-quad 1
-          conn[0] = this->node_id(4);
-          conn[1] = this->node_id(1);
-          conn[2] = this->node_id(5);
-          conn[3] = this->node_id(8);
-
-          return;
-
-          case 2:
-          // linear sub-quad 2
-          conn[0] = this->node_id(7);
-          conn[1] = this->node_id(8);
-          conn[2] = this->node_id(6);
-          conn[3] = this->node_id(3);
-
-          return;
-
-          case 3:
-          // linear sub-quad 3
-          conn[0] = this->node_id(8);
-          conn[1] = this->node_id(5);
-          conn[2] = this->node_id(2);
-          conn[3] = this->node_id(6);
-
-          return;
-
-          default:
-          libmesh_error_msg("Invalid sf = " << sf);
-          }*/
       }
 
     default:

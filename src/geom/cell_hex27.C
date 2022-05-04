@@ -416,13 +416,13 @@ void Hex27::connectivity(const unsigned int sc,
         conn[8] = this->node_id(8);
         conn[9] = this->node_id(9);
         conn[10] = this->node_id(10);
-        conn[11] = this->node_id(11); //
+        conn[11] = this->node_id(11);
         conn[12] = this->node_id(16);
         conn[13] = this->node_id(17);
         conn[14] = this->node_id(18);
         conn[15] = this->node_id(19);
         conn[16] = this->node_id(12);
-        conn[17] = this->node_id(13); //
+        conn[17] = this->node_id(13);
         conn[18] = this->node_id(14);
         conn[19] = this->node_id(15);
         conn[20] = this->node_id(24);
@@ -434,118 +434,6 @@ void Hex27::connectivity(const unsigned int sc,
         conn[26] = this->node_id(26);
 
         return;
-
-        /*
-          switch (sc)
-          {
-          case 0:
-
-          conn[0] = this->node_id(0);
-          conn[1] = this->node_id(8);
-          conn[2] = this->node_id(20);
-          conn[3] = this->node_id(11);
-          conn[4] = this->node_id(12);
-          conn[5] = this->node_id(21);
-          conn[6] = this->node_id(26);
-          conn[7] = this->node_id(24);
-
-          return;
-
-          case 1:
-
-          conn[0] = this->node_id(8);
-          conn[1] = this->node_id(1);
-          conn[2] = this->node_id(9);
-          conn[3] = this->node_id(20);
-          conn[4] = this->node_id(21);
-          conn[5] = this->node_id(13);
-          conn[6] = this->node_id(22);
-          conn[7] = this->node_id(26);
-
-          return;
-
-          case 2:
-
-          conn[0] = this->node_id(11);
-          conn[1] = this->node_id(20);
-          conn[2] = this->node_id(10);
-          conn[3] = this->node_id(3);
-          conn[4] = this->node_id(24);
-          conn[5] = this->node_id(26);
-          conn[6] = this->node_id(23);
-          conn[7] = this->node_id(15);
-
-          return;
-
-          case 3:
-
-          conn[0] = this->node_id(20);
-          conn[1] = this->node_id(9);
-          conn[2] = this->node_id(2);
-          conn[3] = this->node_id(10);
-          conn[4] = this->node_id(26);
-          conn[5] = this->node_id(22);
-          conn[6] = this->node_id(14);
-          conn[7] = this->node_id(23);
-
-          return;
-
-          case 4:
-
-          conn[0] = this->node_id(12);
-          conn[1] = this->node_id(21);
-          conn[2] = this->node_id(26);
-          conn[3] = this->node_id(24);
-          conn[4] = this->node_id(4);
-          conn[5] = this->node_id(16);
-          conn[6] = this->node_id(25);
-          conn[7] = this->node_id(19);
-
-          return;
-
-          case 5:
-
-          conn[0] = this->node_id(21);
-          conn[1] = this->node_id(13);
-          conn[2] = this->node_id(22);
-          conn[3] = this->node_id(26);
-          conn[4] = this->node_id(16);
-          conn[5] = this->node_id(5);
-          conn[6] = this->node_id(17);
-          conn[7] = this->node_id(25);
-
-          return;
-
-          case 6:
-
-          conn[0] = this->node_id(24);
-          conn[1] = this->node_id(26);
-          conn[2] = this->node_id(23);
-          conn[3] = this->node_id(15);
-          conn[4] = this->node_id(19);
-          conn[5] = this->node_id(25);
-          conn[6] = this->node_id(18);
-          conn[7] = this->node_id(7);
-
-          return;
-
-          case 7:
-
-          conn[0] = this->node_id(26);
-          conn[1] = this->node_id(22);
-          conn[2] = this->node_id(14);
-          conn[3] = this->node_id(23);
-          conn[4] = this->node_id(25);
-          conn[5] = this->node_id(17);
-          conn[6] = this->node_id(6);
-          conn[7] = this->node_id(18);
-
-          return;
-
-          default:
-          libmesh_error_msg("Invalid sc = " << sc);
-          }
-        */
       }
 
     default:

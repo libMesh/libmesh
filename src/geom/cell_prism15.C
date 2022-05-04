@@ -342,16 +342,6 @@ void Prism15::connectivity(const unsigned int libmesh_dbg_var(sc),
 
     case VTK:
       {
-        /*
-          conn.resize(6);
-          conn[0] = this->node_id(0);
-          conn[1] = this->node_id(2);
-          conn[2] = this->node_id(1);
-          conn[3] = this->node_id(3);
-          conn[4] = this->node_id(5);
-          conn[5] = this->node_id(4);
-        */
-
         // VTK's VTK_QUADRATIC_WEDGE first 9 nodes match, then their
         // middle and top layers of mid-edge nodes are reversed from
         // LibMesh's.
@@ -368,7 +358,6 @@ void Prism15::connectivity(const unsigned int libmesh_dbg_var(sc),
         conn[12] = this->node_id(9);
         conn[13] = this->node_id(10);
         conn[14] = this->node_id(11);
-
 
         return;
       }
