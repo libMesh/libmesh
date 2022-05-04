@@ -1923,7 +1923,14 @@ ExodusII_IO_Helper::write_var_names_impl(const char * var_type,
 
       // Store the input names in the format required by Exodus.
       for (int i=0; i != count; ++i)
-        names_table.push_back_entry(names[i]);
+        {
+          if(names[i].length() > MAX_STR_LENGTH)
+            libmesh_warning(
+              "*** Warning, Exodus variable name \""
+              << names[i] << "\" too long (max " << MAX_STR_LENGTH
+              << " characters). Name will be truncated. ");
+          names_table.push_back_entry(names[i]);
+        }
 
       if (verbose)
         {
