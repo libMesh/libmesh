@@ -37,7 +37,7 @@
 
 // libMesh includes
 #include "libmesh/libmesh.h"
-#include "libmesh/replicated_mesh.h"
+#include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/equation_systems.h"
@@ -62,8 +62,8 @@
 
 using namespace libMesh;
 
-bool compare_elements(const ReplicatedMesh & mesh1,
-                      const ReplicatedMesh & mesh2);
+bool compare_elements(const UnstructuredMesh & mesh1,
+                      const UnstructuredMesh & mesh2);
 void assemble_poisson(EquationSystems & es,
                       const std::string & system_name);
 void assemble_and_solve(MeshBase &,
@@ -109,15 +109,15 @@ int main (int argc, char ** argv)
     ps = command_line.next(ps);
 
   // Generate eight meshes that will be stitched
-  ReplicatedMesh mesh (init.comm());
-  ReplicatedMesh mesh1(init.comm());
-  ReplicatedMesh mesh2(init.comm());
-  ReplicatedMesh mesh3(init.comm());
-  ReplicatedMesh mesh4(init.comm());
-  ReplicatedMesh mesh5(init.comm());
-  ReplicatedMesh mesh6(init.comm());
-  ReplicatedMesh mesh7(init.comm());
-  ReplicatedMesh nostitch_mesh(init.comm());
+  Mesh mesh (init.comm());
+  Mesh mesh1(init.comm());
+  Mesh mesh2(init.comm());
+  Mesh mesh3(init.comm());
+  Mesh mesh4(init.comm());
+  Mesh mesh5(init.comm());
+  Mesh mesh6(init.comm());
+  Mesh mesh7(init.comm());
+  Mesh nostitch_mesh(init.comm());
   {
     LOG_SCOPE("Initialize and create cubes", "main");
     MeshTools::Generation::build_cube (mesh, ps, ps, ps, -1,    0,    0,  1,  0, 1, HEX8);
