@@ -1526,10 +1526,8 @@ read_in_node_basis_functions(const System & sys,
               // parameter of data_stream() is ignored while reading.
               xdr.data_stream(node_value.data(), node_value.size());
 
-              for (std::size_t node_id=0; node_id<n_node; ++node_id)
+              for (auto node_id : node_ids)
                 {
-                  // Get reference to the [n_vars] array for this Node. We assign() into the vector of
-                  // values, which allocates space if it doesn't already exist.
                   auto & array = bf_map[node_id];
                   array[var] = node_value[node_id];
                 }
