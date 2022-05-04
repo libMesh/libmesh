@@ -2316,9 +2316,12 @@ void UnstructuredMesh::stitching_helper (const UnstructuredMesh * other_mesh,
     }
 
   const bool old_allow_find_neighbors = this->allow_find_neighbors();
+  const bool old_allow_remote_element_removal = this->allow_remote_element_removal();
   this->allow_find_neighbors(!skip_find_neighbors);
+  this->allow_remote_element_removal(false);
   this->prepare_for_use();
   this->allow_find_neighbors(old_allow_find_neighbors);
+  this->allow_remote_element_removal(old_allow_remote_element_removal);
 
   // After the stitching, we may want to clear boundary IDs from element
   // faces that are now internal to the mesh
