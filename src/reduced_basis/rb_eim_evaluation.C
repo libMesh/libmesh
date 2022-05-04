@@ -885,6 +885,17 @@ void RBEIMEvaluation::add_node_basis_function_and_interpolation_data(
   _interpolation_points_comp.emplace_back(comp);
   _interpolation_points_node_id.emplace_back(node_id);
   _interpolation_points_boundary_id.emplace_back(boundary_id);
+
+  // Add dummy values for the other properties, which are unused in the
+  // node case.
+  std::vector<Point> empty_perturbs;
+  std::vector<Real> empty_phi_i_qp;
+  _interpolation_points_elem_id.emplace_back(0);
+  _interpolation_points_side_index.emplace_back(0);
+  _interpolation_points_subdomain_id.emplace_back(0);
+  _interpolation_points_qp.emplace_back(0);
+  _interpolation_points_xyz_perturbations.emplace_back(empty_perturbs);
+  _interpolation_points_phi_i_qp.emplace_back(empty_phi_i_qp);
 }
 
 void RBEIMEvaluation::
