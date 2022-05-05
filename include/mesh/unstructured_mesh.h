@@ -167,6 +167,51 @@ public:
                        const const_element_iterator & it,
                        const const_element_iterator & it_end) const;
 
+  /**
+   * Stitch \p other_mesh to this mesh so that this mesh is the union of the two meshes.
+   * \p this_mesh_boundary and \p other_mesh_boundary are used to specify a dim-1 dimensional
+   * surface on which we seek to merge any "overlapping" nodes, where we use the parameter
+   * \p tol as a relative tolerance (relative to the smallest edge length on the surfaces
+   * being stitched) to determine whether or not nodes are overlapping.
+   * If \p clear_stitched_boundary_ids==true, this function clears boundary_info IDs in this
+   * mesh associated \p this_mesh_boundary and \p other_mesh_boundary.
+   * If \p use_binary_search is true, we use an optimized "sort then binary search" algorithm
+   * for finding matching nodes. Otherwise we use a N^2 algorithm (which can be more reliable
+   * at dealing with slightly misaligned meshes).
+   * If \p enforce_all_nodes_match_on_boundaries is true, we throw an error if the number of
+   * nodes on the specified boundaries don't match the number of nodes that were merged.
+   * This is a helpful error check in some cases.
+   * If \p skip_find_neighbors is true, a faster stitching method is used, where the lists of
+   * neighbors for each elements are copied as well and patched, without calling the time-consuming
+   * find_neighbors() function.
+   *
+   * Note that the element IDs for elements in the stitched mesh corresponding to "this" mesh
+   * will be unchanged. The IDs for elements corresponding to \p other_mesh will be incremented
+   * by this->max_elem_id().
+   *
+   * There is no simple a priori relationship between node IDs in "this" mesh
+   * and other_mesh and node IDs in the stitched mesh because the number of nodes (and hence
+   * the node IDs) in the stitched mesh depend on how many nodes are stitched.
+   */
+  void stitch_meshes (const UnstructuredMesh & other_mesh,
+                      boundary_id_type this_mesh_boundary,
+                      boundary_id_type other_mesh_boundary,
+                      Real tol=TOLERANCE,
+                      bool clear_stitched_boundary_ids=false,
+                      bool verbose=true,
+                      bool use_binary_search=true,
+                      bool enforce_all_nodes_match_on_boundaries=false);
+
+  /**
+   * Similar to stitch_meshes, except that we stitch two adjacent surfaces within this mesh.
+   */
+  void stitch_surfaces (boundary_id_type boundary_id_1,
+                        boundary_id_type boundary_id_2,
+                        Real tol=TOLERANCE,
+                        bool clear_stitched_boundary_ids=false,
+                        bool verbose=true,
+                        bool use_binary_search=true,
+                        bool enforce_all_nodes_match_on_boundaries=false);
 
   /**
    * Deep copy of nodes and elements from another unstructured mesh
@@ -206,6 +251,21 @@ public:
   virtual bool contract () override;
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
+private:
+
+  /**
+   * Helper function for stitch_meshes and stitch_surfaces
+   * that does the mesh stitching.
+   */
+  void stitching_helper (const UnstructuredMesh * other_mesh,
+                         boundary_id_type boundary_id_1,
+                         boundary_id_type boundary_id_2,
+                         Real tol,
+                         bool clear_stitched_boundary_ids,
+                         bool verbose,
+                         bool use_binary_search,
+                         bool enforce_all_nodes_match_on_boundaries,
+                         bool skip_find_neighbors);
 };
 
 

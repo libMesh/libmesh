@@ -1,9 +1,10 @@
+#include <libmesh/boundary_info.h>
+#include <libmesh/distributed_mesh.h>
 #include <libmesh/elem.h>
 #include <libmesh/mesh_generation.h>
+#include <libmesh/mesh_modification.h>
 #include <libmesh/node.h>
 #include <libmesh/replicated_mesh.h>
-#include <libmesh/mesh_modification.h>
-#include <libmesh/boundary_info.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -18,8 +19,10 @@ public:
   LIBMESH_CPPUNIT_TEST_SUITE( MeshStitchTest );
 
 #if LIBMESH_DIM > 2
-  CPPUNIT_TEST( testMeshStitch );
-  CPPUNIT_TEST( testBoundaryInfo );
+  CPPUNIT_TEST( testReplicatedMeshStitch );
+  CPPUNIT_TEST( testDistributedMeshStitch );
+  CPPUNIT_TEST( testReplicatedBoundaryInfo );
+  CPPUNIT_TEST( testDistributedBoundaryInfo );
 #endif // LIBMESH_DIM > 2
 
   CPPUNIT_TEST_SUITE_END();
@@ -33,7 +36,7 @@ public:
   void tearDown()
   {}
 
-  void renameAndShift(ReplicatedMesh & mesh,
+  void renameAndShift(UnstructuredMesh & mesh,
                       const boundary_id_type boundary_id_offset,
                       const std::string & boundary_name_prefix)
   {
@@ -50,11 +53,13 @@ public:
     }
   }
 
+
+  template <typename MeshType>
   void testBoundaryInfo()
   {
     LOG_UNIT_TEST;
 
-    ReplicatedMesh mesh0(*TestCommWorld), mesh1(*TestCommWorld);
+    MeshType mesh0(*TestCommWorld), mesh1(*TestCommWorld);
 
     int ps = 2;
     MeshTools::Generation::build_cube(mesh0, ps, ps, ps, -1, 0, 0, 1, 0, 1, HEX8);
@@ -106,15 +111,29 @@ public:
     CPPUNIT_ASSERT(ns_names == expected_names);
   }
 
+
+  void testReplicatedBoundaryInfo()
+  {
+    testBoundaryInfo<ReplicatedMesh>();
+  }
+
+
+  void testDistributedBoundaryInfo()
+  {
+    testBoundaryInfo<DistributedMesh>();
+  }
+
+
+  template <typename MeshType>
   void testMeshStitch ()
   {
     LOG_UNIT_TEST;
 
     // Generate four meshes to be stitched together
-    ReplicatedMesh mesh0(*TestCommWorld),
-                   mesh1(*TestCommWorld),
-                   mesh2(*TestCommWorld),
-                   mesh3(*TestCommWorld);
+    MeshType mesh0(*TestCommWorld),
+             mesh1(*TestCommWorld),
+             mesh2(*TestCommWorld),
+             mesh3(*TestCommWorld);
 
     // Give the meshes different extra integers to make sure those
     // merge.  Reuse names between nodes and elements to make sure
@@ -140,15 +159,15 @@ public:
 
     mesh0.add_node_integer("baz");
     unsigned int foo1e_idx = mesh1.add_elem_integer("foo");
-    mesh2.add_elem_datum<trivially_copyable_pair>("qux");
-    unsigned int qux2n_idx = mesh2.add_node_datum<trivially_copyable_pair>("qux");
+    mesh2.template add_elem_datum<trivially_copyable_pair>("qux");
+    unsigned int qux2n_idx = mesh2.template add_node_datum<trivially_copyable_pair>("qux");
     mesh3.add_node_integers(names3);
 
     for (const auto & elem : mesh1.element_ptr_range())
       elem->set_extra_integer(foo1e_idx, 2);
 
     for (const auto & node : mesh2.node_ptr_range())
-      node->set_extra_datum<trivially_copyable_pair>
+      node->template set_extra_datum<trivially_copyable_pair>
         (qux2n_idx, {3, 4});
 
     // We stitch the meshes in a hierarchical way.
@@ -186,7 +205,7 @@ public:
       {
         CPPUNIT_ASSERT_EQUAL(node->n_extra_integers(), 5u);
         trivially_copyable_pair datum =
-          node->get_extra_datum<trivially_copyable_pair>(qux0n_idx);
+          node->template get_extra_datum<trivially_copyable_pair>(qux0n_idx);
         if ((*node)(0) <= 0 && (*node)(1) < 0) // this came from mesh2
           {
             CPPUNIT_ASSERT_EQUAL(datum.first, dof_id_type(3));
@@ -198,6 +217,16 @@ public:
             CPPUNIT_ASSERT_EQUAL(datum.second, DofObject::invalid_id);
           }
       }
+  }
+
+  void testReplicatedMeshStitch ()
+  {
+    testMeshStitch<ReplicatedMesh>();
+  }
+
+  void testDistributedMeshStitch ()
+  {
+    testMeshStitch<DistributedMesh>();
   }
 };
 
