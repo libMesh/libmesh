@@ -47,6 +47,13 @@ struct P2TPointCompare
   }
 };
 
+p2t::Point to_p2t(const libMesh::Point & p)
+{
+  libmesh_assert_equal_to(p(2), 0);
+
+  return {p(0), p(1)};
+}
+
 bool in_circumcircle(const libMesh::Elem & elem,
                      const libMesh::Point & p)
 {
@@ -308,7 +315,7 @@ void Poly2TriTriangulator::triangulate_current_points()
         {
           for (auto & node : _mesh.node_ptr_range())
             {
-              const p2t::Point pt((*node)(0), (*node)(1));
+              const p2t::Point pt = to_p2t(*node);
 
               // We're not going to support overlapping nodes on the boundary
               if (point_node_map.count(pt))
@@ -325,9 +332,7 @@ void Poly2TriTriangulator::triangulate_current_points()
           const std::size_t np = mh.n_points();
           for (auto i : make_range(np))
             {
-              const Point p = mh.point(np-i-1);
-              libmesh_assert_equal_to(p(2),0);
-              const p2t::Point pt(p(0), p(1));
+              const p2t::Point pt = to_p2t(mh.point(np-i-1));
               outer_boundary_points.push_back(pt);
             }
 
@@ -340,7 +345,7 @@ void Poly2TriTriangulator::triangulate_current_points()
       else
         for (auto & node : _mesh.node_ptr_range())
           {
-            p2t::Point pt((*node)(0), (*node)(1));
+            const p2t::Point pt = to_p2t(*node);
 
             // If we're out of boundary nodes, the rest are going to be
             // Steiner points or hole points
@@ -394,7 +399,7 @@ void Poly2TriTriangulator::triangulate_current_points()
       // Steiner points
       for (auto & node : _mesh.node_ptr_range())
         {
-          p2t::Point pt {(*node)(0), (*node)(1)};
+          const p2t::Point pt = to_p2t(*node);
 
           auto it = point_node_map.find(pt);
 
@@ -459,7 +464,7 @@ void Poly2TriTriangulator::triangulate_current_points()
       for (auto i : make_range(our_hole.n_points()))
         {
           Point p = our_hole.point(i);
-          poly2tri_hole.emplace_back(p(0), p(1));
+          poly2tri_hole.emplace_back(to_p2t(p));
 
           const auto & pt = poly2tri_hole.back();
 
