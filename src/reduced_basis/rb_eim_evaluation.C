@@ -537,6 +537,7 @@ Number RBEIMEvaluation::get_eim_basis_function_node_value(unsigned int basis_fun
                        "Invalid basis function index: " << basis_function_index);
 
   return get_parametrized_function_node_value(
+    comm(),
     _local_node_eim_basis_functions[basis_function_index],
     node_id,
     comp);
