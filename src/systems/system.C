@@ -1269,8 +1269,7 @@ unsigned int System::add_variable (std::string_view var,
       // were violated
       if (should_be_in_vg)
         {
-          const unsigned short curr_n_vars = cast_int<unsigned short>
-            (this->n_vars());
+          const unsigned int curr_n_vars = this->n_vars();
 
           std::string varstr(var);
 
@@ -1359,12 +1358,11 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
       // append the variables to the vg and we're done
       if (should_be_in_vg)
         {
-          unsigned short curr_n_vars = cast_int<unsigned short>
-            (this->n_vars());
+          unsigned int curr_n_vars = this->n_vars();
 
           for (auto ovar : vars)
             {
-              curr_n_vars = cast_int<unsigned short> (this->n_vars());
+              curr_n_vars = this->n_vars();
 
               vg.append (ovar);
 
@@ -1375,8 +1373,7 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
         }
     }
 
-  const unsigned short curr_n_vars = cast_int<unsigned short>
-    (this->n_vars());
+  const unsigned int curr_n_vars = this->n_vars();
 
   const unsigned int next_first_component = this->n_components();
 
@@ -1394,8 +1391,7 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
   for (auto v : make_range(vars.size()))
     {
       _variables.push_back (vg(v));
-      _variable_numbers[vars[v]] = cast_int<unsigned short>
-        (curr_n_vars+v);
+      _variable_numbers[vars[v]] = curr_n_vars+v;
     }
 
   libmesh_assert_equal_to ((curr_n_vars+vars.size()), this->n_vars());
@@ -1430,7 +1426,7 @@ bool System::has_variable (std::string_view var) const
 
 
 
-unsigned short int System::variable_number (std::string_view var) const
+unsigned int System::variable_number (std::string_view var) const
 {
   auto var_num = libmesh_map_find(_variable_numbers, var);
   libmesh_assert_equal_to (_variables[var_num].name(), var);
@@ -1442,18 +1438,9 @@ void System::get_all_variable_numbers(std::vector<unsigned int> & all_variable_n
 {
   all_variable_numbers.resize(n_vars());
 
-  // Make sure the variable exists
-  std::map<std::string, unsigned short int>::const_iterator
-    it = _variable_numbers.begin();
-  std::map<std::string, unsigned short int>::const_iterator
-    it_end = _variable_numbers.end();
-
   unsigned int count = 0;
-  for ( ; it != it_end; ++it)
-    {
-      all_variable_numbers[count] = it->second;
-      count++;
-    }
+  for (auto vn : _variable_numbers)
+    all_variable_numbers[count++] = vn.second;
 }
 
 
