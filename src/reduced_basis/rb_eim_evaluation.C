@@ -2630,9 +2630,13 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
           auto node_ids_range = (end_node_ids_index[p] - start_node_ids_index[p]);
 
           // Accumulate the count for this proc
-          counts[p] += node_ids_range*n_vars;
+          counts[p] += node_ids_range;
         } // end for proc_id
     } // if (rank == 0)
+
+  // The recv_node_data vector will be used on the receiving end of all
+  // the scatters below.
+  std::vector<Number> recv_node_data;
 
   // For each basis function and each variable, build a vector
   // data in the Node ordering given by the
@@ -2640,22 +2644,6 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
   //
   // sys.comm().scatter(data, counts, recv, /*root_id=*/0);
   std::vector<std::vector<Number>> node_data(n_vars);
-  if (rank == 0)
-    {
-      // The total amount of node data is given by summing the entries
-      // of the "counts" vector.
-      auto n_node_data =
-        std::accumulate(counts.begin(), counts.end(), 0u);
-
-      // On processor 0, reserve enough space to hold all the qp
-      // data for a single basis function for each var.
-      for (auto var : index_range(node_data))
-        node_data[var].reserve(n_node_data);
-    }
-
-  // The recv_node_data vector will be used on the receiving end of all
-  // the scatters below.
-  std::vector<Number> recv_node_data;
 
   // Loop from 0..n_bf on _all_ procs, since the scatters inside this
   // loop are collective.
@@ -2669,7 +2657,9 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
 
           // Clear any data from previous bf
           for (auto var : index_range(node_data))
-            node_data[var].clear();
+            {
+              node_data[var].clear();
+            }
 
           for (processor_id_type p=0; p<n_procs; ++p)
             {
@@ -2683,7 +2673,7 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
 
                   for (auto var : index_range(array))
                     {
-                      node_data[var][node_id] = array[var];
+                      node_data[var].emplace_back(array[var]);
                     } // end for (var)
                 } // end for (n)
             } // end for proc_id
