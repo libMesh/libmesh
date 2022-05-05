@@ -242,7 +242,7 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
       // We need to cache the DBCs to be added so that we add them
       // after looping over the existing DBCs. Otherwise, we're polluting
       // the thing we're looping over.
-      std::vector<DirichletBoundary *> new_dbcs;
+      std::vector<DirichletBoundary> new_dbcs;
 
       for (const auto & dbc : *all_dbcs)
         {
@@ -278,29 +278,15 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
                 libmesh_error_msg("Could not find valid boundary function!");
 
               libmesh_error_msg_if(is_time_evolving_bc, "Cannot currently support time-dependent Dirichlet BC for dot variables!");
+              libmesh_error_msg_if(!dbc->f, "Expected valid DirichletBoundary function");
 
-
-              DirichletBoundary * new_dbc;
-
-              if (dbc->f)
-                {
-                  ZeroFunction<Number> zf;
-
-                  new_dbc = new DirichletBoundary(dbc->b, vars_to_add, zf);
-                }
-              else
-                libmesh_error();
-
-              new_dbcs.push_back(new_dbc);
+              new_dbcs.emplace_back(dbc->b, vars_to_add, ZeroFunction<Number>());
             }
         }
 
-      // Let the DofMap make its own deep copy of the DirichletBC objects and delete our copy.
+      // Let the DofMap make its own deep copy of the DirichletBC objects
       for (const auto & dbc : new_dbcs)
-        {
-          this->get_dof_map().add_dirichlet_boundary(*dbc);
-          delete dbc;
-        }
+        this->get_dof_map().add_dirichlet_boundary(dbc);
 
     } // if (all_dbcs)
 }
