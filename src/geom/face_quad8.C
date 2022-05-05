@@ -309,73 +309,14 @@ void Quad8::connectivity(const unsigned int sf,
       }
 
 
-      // Note: VTK connectivity is output as four triangles with
-      // a central quadrilateral.  Therefore most of the connectivity
-      // arrays have length three.
+      // VTK connectivity for this element matches libmesh's own.
     case VTK:
       {
-        // Create storage
-        conn.resize(8);
-        conn[0] = this->node_id(0);
-        conn[1] = this->node_id(1);
-        conn[2] = this->node_id(2);
-        conn[3] = this->node_id(3);
-        conn[4] = this->node_id(4);
-        conn[5] = this->node_id(5);
-        conn[6] = this->node_id(6);
-        conn[7] = this->node_id(7);
+        conn.resize(Quad8::num_nodes);
+        for (auto i : index_range(conn))
+          conn[i] = this->node_id(i);
+
         return;
-        /*
-          conn.resize(3);
-
-          switch (sf)
-          {
-          case 0:
-          // linear sub-tri 0
-          conn[0] = this->node_id(0);
-          conn[1] = this->node_id(4);
-          conn[2] = this->node_id(7);
-
-          return;
-
-          case 1:
-          // linear sub-tri 1
-          conn[0] = this->node_id(4);
-          conn[1] = this->node_id(1);
-          conn[2] = this->node_id(5);
-
-          return;
-
-          case 2:
-          // linear sub-tri 2
-          conn[0] = this->node_id(5);
-          conn[1] = this->node_id(2);
-          conn[2] = this->node_id(6);
-
-          return;
-
-          case 3:
-          // linear sub-tri 3
-          conn[0] = this->node_id(7);
-          conn[1] = this->node_id(6);
-          conn[2] = this->node_id(3);
-
-          return;
-
-          case 4:
-          conn.resize(4);
-
-          // linear sub-quad
-          conn[0] = this->node_id(4);
-          conn[1] = this->node_id(5);
-          conn[2] = this->node_id(6);
-          conn[3] = this->node_id(7);
-        */
-        //        return;
-
-        //      default:
-        //        libmesh_error_msg("Invalid sf = " << sf);
-        //      }
       }
 
     default:

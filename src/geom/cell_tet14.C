@@ -395,108 +395,14 @@ void Tet14::connectivity(const unsigned int sc,
 
     case VTK:
       {
-        conn.resize(10);
-        conn[0] = this->node_id(0);
-        conn[1] = this->node_id(1);
-        conn[2] = this->node_id(2);
-        conn[3] = this->node_id(3);
-        conn[4] = this->node_id(4);
-        conn[5] = this->node_id(5);
-        conn[6] = this->node_id(6);
-        conn[7] = this->node_id(7);
-        conn[8] = this->node_id(8);
-        conn[9] = this->node_id(9);
+        // VTK has vtkHigherOrderTetra which might have the same
+        // connectivity as our Tet14, but this has not been tested
+        // yet.
+        libmesh_experimental();
+        conn.resize(Tet14::num_nodes);
+        for (auto i : index_range(conn))
+          conn[i] = this->node_id(i);
         return;
-        /*
-          conn.resize(4);
-          switch (sc)
-          {
-          // Linear sub-tet 0
-          case 0:
-
-          conn[0] = this->node_id(0);
-          conn[1] = this->node_id(4);
-          conn[2] = this->node_id(6);
-          conn[3] = this->node_id(7);
-
-          return;
-
-          // Linear sub-tet 1
-          case 1:
-
-          conn[0] = this->node_id(4);
-          conn[1] = this->node_id(1);
-          conn[2] = this->node_id(5);
-          conn[3] = this->node_id(8);
-
-          return;
-
-          // Linear sub-tet 2
-          case 2:
-
-          conn[0] = this->node_id(5);
-          conn[1] = this->node_id(2);
-          conn[2] = this->node_id(6);
-          conn[3] = this->node_id(9);
-
-          return;
-
-          // Linear sub-tet 3
-          case 3:
-
-          conn[0] = this->node_id(7);
-          conn[1] = this->node_id(8);
-          conn[2] = this->node_id(9);
-          conn[3] = this->node_id(3);
-
-          return;
-
-          // Linear sub-tet 4
-          case 4:
-
-          conn[0] = this->node_id(4);
-          conn[1] = this->node_id(8);
-          conn[2] = this->node_id(6);
-          conn[3] = this->node_id(7);
-
-          return;
-
-          // Linear sub-tet 5
-          case 5:
-
-          conn[0] = this->node_id(4);
-          conn[1] = this->node_id(5);
-          conn[2] = this->node_id(6);
-          conn[3] = this->node_id(8);
-
-          return;
-
-          // Linear sub-tet 6
-          case 6:
-
-          conn[0] = this->node_id(5);
-          conn[1] = this->node_id(9);
-          conn[2] = this->node_id(6);
-          conn[3] = this->node_id(8);
-
-          return;
-
-          // Linear sub-tet 7
-          case 7:
-
-          conn[0] = this->node_id(7);
-          conn[1] = this->node_id(6);
-          conn[2] = this->node_id(9);
-          conn[3] = this->node_id(8);
-
-          return;
-
-
-          default:
-
-          libmesh_error_msg("Invalid sc = " << sc);
-          }
-        */
       }
 
     default:

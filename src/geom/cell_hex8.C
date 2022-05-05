@@ -203,14 +203,8 @@ void Hex8::connectivity(const unsigned int libmesh_dbg_var(sc),
 
     case VTK:
       {
-        conn[0] = this->node_id(0);
-        conn[1] = this->node_id(1);
-        conn[2] = this->node_id(2);
-        conn[3] = this->node_id(3);
-        conn[4] = this->node_id(4);
-        conn[5] = this->node_id(5);
-        conn[6] = this->node_id(6);
-        conn[7] = this->node_id(7);
+        for (auto i : index_range(conn))
+          conn[i] = this->node_id(i);
         return;
       }
 
