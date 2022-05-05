@@ -1215,9 +1215,10 @@ write_out_node_basis_functions(const std::string & directory_name,
       for (auto bf : index_range(_local_node_eim_basis_functions))
         {
           unsigned int node_counter = 0;
-          for (const auto & [node_id, array] : _local_node_eim_basis_functions[bf])
+          for (const auto & pr : _local_node_eim_basis_functions[bf])
             {
               // array[n_vars] per Node
+              const auto & array = pr.second;
               for (auto var : index_range(array))
                 {
                   // Based on the error check above, we know that node_id is numbered
@@ -2623,21 +2624,12 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
     {
       counts.resize(n_procs);
 
-      auto & bf_map = _local_node_eim_basis_functions[0];
-
       for (processor_id_type p=0; p<n_procs; ++p)
         {
-          for (auto n : make_range(start_node_ids_index[p], end_node_ids_index[p]))
-            {
-              auto node_id = gathered_local_node_ids[n];
+          auto node_ids_range = (end_node_ids_index[p] - start_node_ids_index[p]);
 
-              // Get reference to array[n_vars] for current Node.
-              // Throws an error if the required elem_id is not found.
-              const auto & array = libmesh_map_find(bf_map, node_id);
-
-              // Accumulate the count for this proc
-              counts[p] += n_vars;
-            } // end for (e)
+          // Accumulate the count for this proc
+          counts[p] += node_ids_range*n_vars;
         } // end for proc_id
     } // if (rank == 0)
 
