@@ -2658,6 +2658,11 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
   // sys.comm().scatter(data, counts, recv, /*root_id=*/0);
   std::vector<std::vector<Number>> node_data(n_vars);
 
+  // We also reserve space in node_data, since we will push_back into it below.
+  int count_sum = std::accumulate(counts.begin(), counts.end(), 0);
+  for (auto var : index_range(node_data))
+    node_data[var].reserve(count_sum);
+
   // Loop from 0..n_bf on _all_ procs, since the scatters inside this
   // loop are collective.
   for (auto bf : make_range(n_bf))
@@ -2668,11 +2673,10 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
           // Reference to the data map for the current basis function.
           auto & bf_map = _local_node_eim_basis_functions[bf];
 
-          // Clear any data from previous bf
+          // Clear any data from previous bf (this does not change the capacity
+          // that was reserved above).
           for (auto var : index_range(node_data))
-            {
               node_data[var].clear();
-            }
 
           for (processor_id_type p=0; p<n_procs; ++p)
             {
@@ -2685,9 +2689,7 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
                   const auto & array = libmesh_map_find(bf_map, node_id);
 
                   for (auto var : index_range(array))
-                    {
-                      node_data[var].emplace_back(array[var]);
-                    } // end for (var)
+                    node_data[var].push_back(array[var]);
                 } // end for (n)
             } // end for proc_id
         } // end if rank==0
