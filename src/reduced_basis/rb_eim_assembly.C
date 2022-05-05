@@ -65,7 +65,7 @@ void RBEIMAssembly::evaluate_side_basis_function(dof_id_type elem_id,
 Number RBEIMAssembly::evaluate_node_basis_function(dof_id_type node_id,
                                                    unsigned int comp)
 {
-  return get_rb_eim_construction().get_rb_eim_evaluation().get_eim_basis_function_node_value(
+  return get_rb_eim_construction().get_rb_eim_evaluation().get_eim_basis_function_node_local_value(
     _basis_function_index, node_id, comp);
 }
 

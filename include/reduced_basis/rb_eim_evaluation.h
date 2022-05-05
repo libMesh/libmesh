@@ -211,8 +211,10 @@ public:
 
   /**
    * Same as get_parametrized_function_values_at_qps() except for node data.
+   * Note that this does not do any parallel communication, so it is only
+   * applicable to looking up local values.
    */
-  static Number get_parametrized_function_node_value(
+  static Number get_parametrized_function_node_local_value(
     const NodeDataMap & pf,
     dof_id_type node_id,
     unsigned int comp);
@@ -241,6 +243,9 @@ public:
 
   /**
    * Same as get_parametrized_function_value() except for node data.
+   * Unlike get_parametrized_function_node_local_value(), this does
+   * parallel communication, and therefore if can be used to look up
+   * values regardless of whether or not \p node_id is local.
    */
   static Number get_parametrized_function_node_value(
     const Parallel::Communicator & comm,
@@ -271,10 +276,12 @@ public:
 
   /**
    * Same as get_eim_basis_function_values_at_qps() except for node data.
+   * Note that this does not do any parallel communication, it just looks
+   * up the value from _local_node_eim_basis_functions.
    */
-  Number get_eim_basis_function_node_value(unsigned int basis_function_index,
-                                           dof_id_type node_id,
-                                           unsigned int var) const;
+  Number get_eim_basis_function_node_local_value(unsigned int basis_function_index,
+                                                 dof_id_type node_id,
+                                                 unsigned int var) const;
 
   /**
    * Same as above, except that we just return the value at the qp^th
@@ -293,6 +300,16 @@ public:
                                           unsigned int side_index,
                                           unsigned int comp,
                                           unsigned int qp) const;
+
+  /**
+   * Same as get_eim_basis_function_value() except for node data.
+   * Note that unlike get_eim_basis_function_node_local_value(),
+   * this does do parallel communication so that it can be called
+   * on any processor regardless of whether \p node_id is local or not.
+   */
+  Number get_eim_basis_function_node_value(unsigned int basis_function_index,
+                                           dof_id_type node_id,
+                                           unsigned int var) const;
 
   /**
    * Get a reference to the i^th basis function.

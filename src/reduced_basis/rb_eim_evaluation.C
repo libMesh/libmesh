@@ -418,12 +418,12 @@ void RBEIMEvaluation::get_parametrized_function_side_values_at_qps(
   }
 }
 
-Number RBEIMEvaluation::get_parametrized_function_node_value(
+Number RBEIMEvaluation::get_parametrized_function_node_local_value(
   const NodeDataMap & pf,
   dof_id_type node_id,
   unsigned int comp)
 {
-  LOG_SCOPE("get_parametrized_function_node_value()", "RBEIMConstruction");
+  LOG_SCOPE("get_parametrized_function_node_local_value()", "RBEIMConstruction");
 
   auto it = pf.find(node_id);
   if (it != pf.end())
@@ -491,7 +491,7 @@ Number RBEIMEvaluation::get_parametrized_function_node_value(
 {
   LOG_SCOPE("get_parametrized_function_node_value()", "RBEIMConstruction");
 
-  Number value = get_parametrized_function_node_value(pf, node_id, comp);
+  Number value = get_parametrized_function_node_local_value(pf, node_id, comp);
   comm.sum(value);
 
   return value;
@@ -527,6 +527,19 @@ void RBEIMEvaluation::get_eim_basis_function_side_values_at_qps(unsigned int bas
     side_index,
     comp,
     values);
+}
+
+Number RBEIMEvaluation::get_eim_basis_function_node_local_value(unsigned int basis_function_index,
+                                                                dof_id_type node_id,
+                                                                unsigned int comp) const
+{
+  libmesh_error_msg_if(basis_function_index >= _local_node_eim_basis_functions.size(),
+                       "Invalid basis function index: " << basis_function_index);
+
+  return get_parametrized_function_node_local_value(
+    _local_node_eim_basis_functions[basis_function_index],
+    node_id,
+    comp);
 }
 
 Number RBEIMEvaluation::get_eim_basis_function_node_value(unsigned int basis_function_index,
