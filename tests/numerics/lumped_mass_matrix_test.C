@@ -1,13 +1,14 @@
 // libmesh includes
 #include <libmesh/lumped_mass_matrix.h>
 #include <libmesh/parallel.h>
-#include <libmesh/auto_ptr.h>
 #include <libmesh/id_types.h>
 #include <libmesh/int_range.h>
 #include <libmesh/numeric_vector.h>
 
 #include "libmesh_cppunit.h"
 #include "test_comm.h"
+
+#include <memory>
 
 #define UNUSED 0
 
@@ -16,7 +17,7 @@ using namespace libMesh;
 class LumpedMassMatrixTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE(LumpedMassMatrixTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(LumpedMassMatrixTest);
 
   CPPUNIT_TEST(testNumerics);
 
@@ -26,7 +27,7 @@ public:
   void setUp()
   {
     _comm = TestCommWorld;
-    _matrix = libmesh_make_unique<LumpedMassMatrix<Number>>(*_comm);
+    _matrix = std::make_unique<LumpedMassMatrix<Number>>(*_comm);
 
     numeric_index_type root_block_size = 2;
     _local_size = root_block_size + static_cast<numeric_index_type>(_comm->rank());
@@ -45,6 +46,8 @@ public:
 
   void testNumerics()
   {
+    LOG_UNIT_TEST;
+
     numeric_index_type beginning_index = _matrix->row_start();
     numeric_index_type end_index = _matrix->row_stop();
 

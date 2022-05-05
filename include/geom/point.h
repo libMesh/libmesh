@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,7 @@
 #define LIBMESH_POINT_H
 
 // Local includes
+#include "libmesh/hashing.h"
 #include "libmesh/type_vector.h"
 
 namespace libMesh
@@ -50,14 +51,12 @@ public:
   {}
 
   /**
-   * Copy-constructor.
+   * Trivial copy-constructor.
    */
-  Point (const Point & p) :
-    TypeVector<Real> (p)
-  {}
+  Point (const Point & p) = default;
 
   /**
-   * Copy-constructor.
+   * Copy-constructor from non-point Typevector.
    */
   Point (const TypeVector<Real> & p) :
     TypeVector<Real> (p)
@@ -92,5 +91,21 @@ protected:
 };
 
 } // namespace libMesh
+
+namespace std
+{
+template <>
+struct hash<libMesh::Point>
+{
+  std::size_t operator()(const libMesh::Point & p) const
+    {
+      std::size_t seed = 0;
+      for (int d=0; d != LIBMESH_DIM; ++d)
+        libMesh::boostcopy::hash_combine(seed, std::hash<libMesh::Real>()(p(d)));
+      return seed;
+    }
+};
+
+}
 
 #endif // LIBMESH_POINT_H

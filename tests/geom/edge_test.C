@@ -50,6 +50,9 @@ private:
   ElemClass elem;
   std::vector<std::unique_ptr<Node>> nodes;
 
+protected:
+  std::string libmesh_suite_name;
+
 public:
   void setUp() {
     elem.set_id() = 0;
@@ -62,7 +65,7 @@ public:
     Point dummy;
     for (auto i : elem.node_index_range())
       {
-        nodes.push_back(libmesh_make_unique<Node>(dummy, /*id=*/i));
+        nodes.push_back(std::make_unique<Node>(dummy, /*id=*/i));
         elem.set_node(i) = nodes[i].get();
       }
   }
@@ -71,6 +74,8 @@ public:
 
   void testIsNodeOnEdge()
   {
+    LOG_UNIT_TEST;
+
     for (auto e : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> edge = elem.build_edge_ptr(e);
@@ -99,6 +104,8 @@ public:
 
   void testNodesOnEdge()
   {
+    LOG_UNIT_TEST;
+
     for (auto e : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> edge = elem.build_edge_ptr(e);
@@ -123,6 +130,8 @@ public:
 
   void testBuildEdgePtr()
   {
+    LOG_UNIT_TEST;
+
     for (auto e : make_range(indexbegin, indexend))
       {
         std::unique_ptr<Elem> edge = elem.build_edge_ptr(e);
@@ -143,6 +152,13 @@ public:
   class EdgeTest_##elemclass##_##edgetype##_##indexbegin##_##indexend :                \
     public EdgeTest<elemclass, edgetype, indexbegin, indexend> {                       \
   public:                                                                              \
+  EdgeTest_##elemclass##_##edgetype##_##indexbegin##_##indexend() :                    \
+    EdgeTest<elemclass,edgetype,indexbegin,indexend>() {                               \
+    if (unitlog->summarized_logs_enabled())                                            \
+      this->libmesh_suite_name = "EdgeTest";                                           \
+    else                                                                               \
+      this->libmesh_suite_name = "EdgeTest_" #elemclass"_" #edgetype "_" #indexbegin "_" #indexend; \
+  }                                                                                    \
   CPPUNIT_TEST_SUITE( EdgeTest_##elemclass##_##edgetype##_##indexbegin##_##indexend ); \
   EDGETEST                                                                             \
   CPPUNIT_TEST_SUITE_END();                                                            \

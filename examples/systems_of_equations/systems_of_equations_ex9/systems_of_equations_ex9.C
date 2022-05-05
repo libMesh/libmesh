@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -175,7 +175,7 @@ public:
    */
   virtual std::unique_ptr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const override
   {
-    return libmesh_make_unique<AzimuthalPeriodicBoundary>(*this, t);
+    return std::make_unique<AzimuthalPeriodicBoundary>(*this, t);
   }
 
 private:
@@ -429,17 +429,10 @@ int main (int argc, char ** argv)
   LinearElasticity le(equation_systems);
   system.attach_assemble_object(le);
 
-  std::vector<unsigned int> variables;
-  variables.push_back(u_var);
-  variables.push_back(v_var);
-  variables.push_back(w_var);
   ZeroFunction<> zf;
-  std::set<boundary_id_type> clamped_boundary_ids;
-  clamped_boundary_ids.insert(300);
-  clamped_boundary_ids.insert(400);
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  DirichletBoundary clamped_bc(clamped_boundary_ids, variables, zf);
+  DirichletBoundary clamped_bc({300,400}, {u_var,v_var,w_var}, zf);
   system.get_dof_map().add_dirichlet_boundary(clamped_bc);
 #endif
 

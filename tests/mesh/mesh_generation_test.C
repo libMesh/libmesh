@@ -19,7 +19,7 @@ class MeshGenerationTest : public CppUnit::TestCase
    * MeshBase functions they rely on.
    */
 public:
-  CPPUNIT_TEST_SUITE( MeshGenerationTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( MeshGenerationTest );
 
   CPPUNIT_TEST( buildLineEdge2 );
   CPPUNIT_TEST( buildLineEdge3 );
@@ -76,8 +76,8 @@ protected:
   std::unique_ptr<UnstructuredMesh> new_mesh (bool is_replicated)
   {
     if (is_replicated)
-      return libmesh_make_unique<ReplicatedMesh>(*TestCommWorld);
-    return libmesh_make_unique<DistributedMesh>(*TestCommWorld);
+      return std::make_unique<ReplicatedMesh>(*TestCommWorld);
+    return std::make_unique<DistributedMesh>(*TestCommWorld);
   }
 
 public:
@@ -268,44 +268,44 @@ public:
       }
   }
 
-  void buildLineEdge2 ()     { tester(&MeshGenerationTest::testBuildLine, 5, EDGE2); }
-  void buildLineEdge3 ()     { tester(&MeshGenerationTest::testBuildLine, 5, EDGE3); }
-  void buildLineEdge4 ()     { tester(&MeshGenerationTest::testBuildLine, 5, EDGE4); }
+  void buildLineEdge2 ()     { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildLine, 5, EDGE2); }
+  void buildLineEdge3 ()     { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildLine, 5, EDGE3); }
+  void buildLineEdge4 ()     { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildLine, 5, EDGE4); }
 
-  void buildSphereEdge2 ()     { testBuildSphere(2, EDGE2); }
-  void buildSphereEdge3 ()     { testBuildSphere(2, EDGE3); }
-  void buildSphereEdge4 ()     { testBuildSphere(2, EDGE4); }
+  void buildSphereEdge2 ()     { LOG_UNIT_TEST; testBuildSphere(2, EDGE2); }
+  void buildSphereEdge3 ()     { LOG_UNIT_TEST; testBuildSphere(2, EDGE3); }
+  void buildSphereEdge4 ()     { LOG_UNIT_TEST; testBuildSphere(2, EDGE4); }
 
-  void buildSquareTri3 ()    { tester(&MeshGenerationTest::testBuildSquare, 3, TRI3); }
-  void buildSquareTri6 ()    { tester(&MeshGenerationTest::testBuildSquare, 4, TRI6); }
-  void buildSquareTri7 ()    { tester(&MeshGenerationTest::testBuildSquare, 4, TRI7); }
-  void buildSquareQuad4 ()   { tester(&MeshGenerationTest::testBuildSquare, 4, QUAD4); }
-  void buildSquareQuad8 ()   { tester(&MeshGenerationTest::testBuildSquare, 4, QUAD8); }
-  void buildSquareQuad9 ()   { tester(&MeshGenerationTest::testBuildSquare, 4, QUAD9); }
+  void buildSquareTri3 ()    { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildSquare, 3, TRI3); }
+  void buildSquareTri6 ()    { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildSquare, 4, TRI6); }
+  void buildSquareTri7 ()    { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildSquare, 4, TRI7); }
+  void buildSquareQuad4 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildSquare, 4, QUAD4); }
+  void buildSquareQuad8 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildSquare, 4, QUAD8); }
+  void buildSquareQuad9 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildSquare, 4, QUAD9); }
 
-  void buildSphereTri3 ()     { testBuildSphere(2, TRI3); }
-  void buildSphereQuad4 ()     { testBuildSphere(2, QUAD4); }
+  void buildSphereTri3 ()     { LOG_UNIT_TEST; testBuildSphere(2, TRI3); }
+  void buildSphereQuad4 ()     { LOG_UNIT_TEST; testBuildSphere(2, QUAD4); }
 
-  void buildCubeTet4 ()      { tester(&MeshGenerationTest::testBuildCube, 2, TET4); }
-  void buildCubeTet10 ()     { tester(&MeshGenerationTest::testBuildCube, 2, TET10); }
-  void buildCubeTet14 ()     { tester(&MeshGenerationTest::testBuildCube, 2, TET14); }
-  void buildCubeHex8 ()      { tester(&MeshGenerationTest::testBuildCube, 2, HEX8); }
-  void buildCubeHex20 ()     { tester(&MeshGenerationTest::testBuildCube, 2, HEX20); }
-  void buildCubeHex27 ()     { tester(&MeshGenerationTest::testBuildCube, 2, HEX27); }
-  void buildCubePrism6 ()    { tester(&MeshGenerationTest::testBuildCube, 2, PRISM6); }
-  void buildCubePrism15 ()   { tester(&MeshGenerationTest::testBuildCube, 2, PRISM15); }
-  void buildCubePrism18 ()   { tester(&MeshGenerationTest::testBuildCube, 2, PRISM18); }
+  void buildCubeTet4 ()      { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, TET4); }
+  void buildCubeTet10 ()     { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, TET10); }
+  void buildCubeTet14 ()     { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, TET14); }
+  void buildCubeHex8 ()      { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, HEX8); }
+  void buildCubeHex20 ()     { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, HEX20); }
+  void buildCubeHex27 ()     { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, HEX27); }
+  void buildCubePrism6 ()    { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM6); }
+  void buildCubePrism15 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM15); }
+  void buildCubePrism18 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM18); }
 
   // These tests throw an exception from contains_point() calls, and
   // this simply aborts() when exceptions are not enabled.
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
-  void buildCubePyramid5 ()  { tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID5); }
-  void buildCubePyramid13 () { tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID13); }
-  void buildCubePyramid14 () { tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID14); }
+  void buildCubePyramid5 ()  { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID5); }
+  void buildCubePyramid13 () { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID13); }
+  void buildCubePyramid14 () { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PYRAMID14); }
 #endif
 
-  void buildSphereHex8 ()     { testBuildSphere(2, HEX8); }
-  void buildSphereHex27 ()     { testBuildSphere(2, HEX27); }
+  void buildSphereHex8 ()     { LOG_UNIT_TEST; testBuildSphere(2, HEX8); }
+  void buildSphereHex27 ()     { LOG_UNIT_TEST; testBuildSphere(2, HEX27); }
 };
 
 

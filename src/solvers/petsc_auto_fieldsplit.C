@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -97,8 +97,8 @@ void petsc_auto_fieldsplit (PC my_pc,
         }
     }
 
-  for (const auto & pr : group_indices)
-    indices_to_fieldsplit(sys.comm(), pr.second, my_pc, pr.first);
+  for (const auto & [field_name, indices] : group_indices)
+    indices_to_fieldsplit(sys.comm(), indices, my_pc, field_name);
 }
 
 } // namespace libMesh

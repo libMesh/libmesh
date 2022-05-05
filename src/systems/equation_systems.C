@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -333,8 +333,8 @@ void EquationSystems::update ()
 
 
 
-System & EquationSystems::add_system (const std::string & sys_type,
-                                      const std::string & name)
+System & EquationSystems::add_system (std::string_view sys_type,
+                                      std::string_view name)
 {
   // If the user already built a system with this name, we'll
   // trust them and we'll use it.  That way they can pre-add
@@ -463,11 +463,8 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
     unsigned int n_scalar_vars = 0;
     unsigned int n_vector_vars = 0;
 
-    for (const auto & pr : _systems)
+    for (const auto & [sys_name, sys_ptr] : _systems)
       {
-        const auto & sys_name = pr.first;
-        const auto & sys_ptr = pr.second;
-
         // Check current system is listed in system_names, and skip pos if not
         bool use_current_system = (system_names == nullptr);
         if (!use_current_system)
@@ -503,11 +500,8 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
     var_names.resize( nv );
   }
 
-  for (const auto & pr : _systems)
+  for (const auto & [sys_name, sys_ptr] : _systems)
     {
-      const auto & sys_name = pr.first;
-      const auto & sys_ptr = pr.second;
-
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == nullptr);
       if (!use_current_system)
@@ -570,8 +564,8 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
 
 
 void EquationSystems::build_solution_vector (std::vector<Number> &,
-                                             const std::string &,
-                                             const std::string &) const
+                                             std::string_view,
+                                             std::string_view) const
 {
   // TODO:[BSK] re-implement this from the method below
   libmesh_not_implemented();
@@ -608,11 +602,8 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
   {
     unsigned int n_scalar_vars = 0;
     unsigned int n_vector_vars = 0;
-    for (const auto & pr : _systems)
+    for (const auto & [sys_name, sys_ptr] : _systems)
       {
-        const auto & sys_name = pr.first;
-        const auto & sys_ptr = pr.second;
-
         // Check current system is listed in system_names, and skip pos if not
         bool use_current_system = (system_names == nullptr);
         if (!use_current_system)
@@ -672,11 +663,8 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
   // loop over the elements and build the nodal solution
   // from the element solution.  Then insert this nodal solution
   // into the vector passed to build_solution_vector.
-  for (const auto & pr : _systems)
+  for (const auto & [sys_name, sys_ptr] : _systems)
     {
-      const auto & sys_name = pr.first;
-      const auto & sys_ptr = pr.second;
-
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == nullptr);
       if (!use_current_system)
@@ -1116,11 +1104,8 @@ EquationSystems::build_discontinuous_solution_vector
   // in each system listed in system_names
   unsigned int nv = 0;
 
-  for (const auto & pr : _systems)
+  for (const auto & [sys_name, sys_ptr] : _systems)
     {
-      const auto & sys_name = pr.first;
-      const auto & sys_ptr = pr.second;
-
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == nullptr);
       if (!use_current_system)
@@ -1166,11 +1151,8 @@ EquationSystems::build_discontinuous_solution_vector
   // loop over the elements and build the nodal solution
   // from the element solution.  Then insert this nodal solution
   // into the vector passed to build_solution_vector.
-  for (const auto & pr : _systems)
+  for (const auto & [sys_name, system] : _systems)
     {
-      const auto & sys_name = pr.first;
-      const auto & system = pr.second;
-
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == nullptr);
       if (!use_current_system)
@@ -1296,11 +1278,8 @@ bool EquationSystems::compare (const EquationSystems & other_es,
   else
     {
       // start comparing each system
-      for (const auto & pr : _systems)
+      for (const auto & [sys_name, sys_ptr] : _systems)
         {
-          const auto & sys_name = pr.first;
-          const auto & sys_ptr = pr.second;
-
           // get the other system
           const System & other_system   = other_es.get_system (sys_name);
 
@@ -1348,13 +1327,13 @@ std::string EquationSystems::get_info () const
   //       oss << "  n_parameters()=" << this->n_parameters() << '\n';
   //       oss << "   Parameters:\n";
 
-  //       for (const auto & pr : _parameters)
+  //       for (const auto & [key, val] : _parameters)
   //         oss << "    "
   //             << "\""
-  //             << pr.first
+  //             << key
   //             << "\""
   //             << "="
-  //             << pr.second
+  //             << val
   //             << '\n';
   //     }
 

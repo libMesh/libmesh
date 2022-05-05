@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,10 +23,10 @@
 // Local Includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/hashing.h"
 
 // C++ Includes
 #include <unordered_map>
-#include <functional> // std::hash
 #include <vector>
 
 namespace libMesh
@@ -36,18 +36,6 @@ namespace libMesh
 class Elem;
 class MeshBase;
 class Node;
-
-// Fix for STL laziness
-struct myhash {
-public:
-  template <typename T1, typename T2>
-  std::size_t operator()(const std::pair<T1, T2> & x) const
-  {
-    // recommendation from
-    // http://stackoverflow.com/questions/5889238/why-is-xor-the-default-way-to-combine-hashes
-    return 3 * std::hash<T1>()(x.first) + std::hash<T2>()(x.second);
-  }
-};
 
 /**
  * Data structures that enable topology-based lookups of nodes created
@@ -69,7 +57,7 @@ public:
 class TopologyMap
 {
   // We need to supply our own hash function.
-  typedef std::unordered_map<std::pair<dof_id_type, dof_id_type>, dof_id_type, myhash> map_type;
+  typedef std::unordered_map<std::pair<dof_id_type, dof_id_type>, dof_id_type, libMesh::hash> map_type;
 public:
   void init(MeshBase &);
 

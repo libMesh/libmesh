@@ -56,7 +56,7 @@ using namespace libMesh;
 
 class QuadratureTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( QuadratureTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( QuadratureTest );
 
   TEST_ALL_ORDERS(QGAUSS, 9999);
   TEST_ONE_ORDER(QSIMPSON, FIRST,  3);
@@ -126,6 +126,8 @@ public:
 
   void testMonomialQuadrature ()
   {
+    LOG_UNIT_TEST;
+
     ElemType elem_type[2] = {QUAD4, HEX8};
     int dims[2]           = {2, 3};
 
@@ -188,6 +190,8 @@ public:
 
   void testTetQuadrature ()
   {
+    LOG_UNIT_TEST;
+
     // There are 3 different families of quadrature rules for tetrahedra
     QuadratureType qtype[3] = {QCONICAL, QGRUNDMANN_MOLLER, QGAUSS};
 
@@ -275,6 +279,8 @@ public:
 
   void testTriQuadrature ()
   {
+    LOG_UNIT_TEST;
+
     QuadratureType qtype[4] = {QCONICAL, QCLOUGH, QGAUSS, QGRUNDMANN_MOLLER};
 
     for (int qt=0; qt<4; ++qt)
@@ -348,6 +354,8 @@ public:
 
   void testJacobi ()
   {
+    LOG_UNIT_TEST;
+
     // LibMesh supports two different types of Jacobi quadrature
     QuadratureType qtype[2] = {QJACOBI_1_0, QJACOBI_2_0};
 
@@ -422,6 +430,8 @@ public:
   template <QuadratureType qtype, Order order>
   void testBuild ()
   {
+    LOG_UNIT_TEST;
+
     std::unique_ptr<QBase> qrule1D = QBase::build (qtype, 1, order);
     std::unique_ptr<QBase> qrule2D = QBase::build (qtype, 2, order);
     std::unique_ptr<QBase> qrule3D = QBase::build (qtype, 3, order);
@@ -442,6 +452,8 @@ public:
   template <QuadratureType qtype, Order order, unsigned int exactorder>
   void test1DWeights ()
   {
+    LOG_UNIT_TEST;
+
     std::unique_ptr<QBase> qrule = QBase::build(qtype , 1, order);
     qrule->init (EDGE3);
 
@@ -476,6 +488,8 @@ public:
   template <QuadratureType qtype, Order order, unsigned int exactorder>
   void test2DWeights ()
   {
+    LOG_UNIT_TEST;
+
     std::unique_ptr<QBase> qrule = QBase::build(qtype, 2, order);
     qrule->init (QUAD8);
 
@@ -521,6 +535,8 @@ public:
   template <QuadratureType qtype, Order order, unsigned int exactorder>
   void test3DWeights ()
   {
+    LOG_UNIT_TEST;
+
     std::unique_ptr<QBase> qrule = QBase::build(qtype, 3, order);
     qrule->init (HEX20);
 

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,10 @@
 #include "libmesh/optimization_solver.h"
 #include "libmesh/tao_optimization_solver.h"
 #include "libmesh/nlopt_optimization_solver.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_solver_package.h"
+
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -68,12 +70,12 @@ OptimizationSolver<T>::build(sys_type & s, const SolverPackage solver_package)
 
 #if defined(LIBMESH_HAVE_PETSC_TAO) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
     case PETSC_SOLVERS:
-      return libmesh_make_unique<TaoOptimizationSolver<T>>(s);
+      return std::make_unique<TaoOptimizationSolver<T>>(s);
 #endif // #if defined(LIBMESH_HAVE_PETSC_TAO) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
 #if defined(LIBMESH_HAVE_NLOPT) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
     case NLOPT_SOLVERS:
-      return libmesh_make_unique<NloptOptimizationSolver<T>>(s);
+      return std::make_unique<NloptOptimizationSolver<T>>(s);
 #endif // #if defined(LIBMESH_HAVE_NLOPT) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
     default:
@@ -84,6 +86,6 @@ OptimizationSolver<T>::build(sys_type & s, const SolverPackage solver_package)
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class OptimizationSolver<Number>;
+template class LIBMESH_EXPORT OptimizationSolver<Number>;
 
 } // namespace libMesh

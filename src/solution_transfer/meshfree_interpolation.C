@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -17,16 +17,16 @@
 
 
 
-// C++ includes
-#include <iomanip>
-
 // Local includes
 #include "libmesh/point.h"
 #include "libmesh/meshfree_interpolation.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_algebra.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ includes
+#include <iomanip>
+#include <memory>
 
 namespace libMesh
 {
@@ -159,7 +159,7 @@ void InverseDistanceInterpolation<KDDim>::construct_kd_tree ()
 
   // Initialize underlying KD tree
   if (_kd_tree.get() == nullptr)
-    _kd_tree = libmesh_make_unique<kd_tree_t>
+    _kd_tree = std::make_unique<kd_tree_t>
       (KDDim,
        _point_list_adaptor,
        nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
@@ -324,8 +324,8 @@ void InverseDistanceInterpolation<KDDim>::interpolate (const Point              
 
 // ------------------------------------------------------------
 // Explicit Instantiations
-template class InverseDistanceInterpolation<1>;
-template class InverseDistanceInterpolation<2>;
-template class InverseDistanceInterpolation<3>;
+template class LIBMESH_EXPORT InverseDistanceInterpolation<1>;
+template class LIBMESH_EXPORT InverseDistanceInterpolation<2>;
+template class LIBMESH_EXPORT InverseDistanceInterpolation<3>;
 
 } // namespace libMesh

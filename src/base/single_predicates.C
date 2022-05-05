@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -68,15 +68,15 @@ multi_evaluable<T>::operator()(const T & it) const
 
 
 // Instantiate with the useful values of T
-#define INSTANTIATE_NODAL_PREDICATES(IterType)                                \
-  template bool bid<IterType>::operator()(const IterType &) const;            \
-  template bool bnd<IterType>::operator()(const IterType &) const;            \
-  template bool evaluable<IterType>::operator()(const IterType &) const;      \
-  template bool multi_evaluable<IterType>::operator()(const IterType &) const
+#define INSTANTIATE_NODAL_PREDICATES(IterType)                                               \
+  template LIBMESH_EXPORT bool bid<IterType>::operator()(const IterType &) const;            \
+  template LIBMESH_EXPORT bool bnd<IterType>::operator()(const IterType &) const;            \
+  template LIBMESH_EXPORT bool evaluable<IterType>::operator()(const IterType &) const;      \
+  template LIBMESH_EXPORT bool multi_evaluable<IterType>::operator()(const IterType &) const
 
-#define INSTANTIATE_ELEM_PREDICATES(IterType)                                 \
-  template bool evaluable<IterType>::operator()(const IterType &) const;      \
-  template bool multi_evaluable<IterType>::operator()(const IterType &) const
+#define INSTANTIATE_ELEM_PREDICATES(IterType)                                                \
+  template LIBMESH_EXPORT bool evaluable<IterType>::operator()(const IterType &) const;      \
+  template LIBMESH_EXPORT bool multi_evaluable<IterType>::operator()(const IterType &) const
 
 // Handle commas in macro arguments
 #define LIBMESH_COMMA ,

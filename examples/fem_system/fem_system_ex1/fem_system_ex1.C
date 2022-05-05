@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,7 @@
 
 // C++ includes
 #include <iomanip>
+#include <memory>
 
 // Basic include files
 #include "libmesh/equation_systems.h"
@@ -41,7 +42,6 @@
 #include "libmesh/mesh_generation.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/uniform_refinement_estimator.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_norm_type.h"
 
@@ -178,10 +178,10 @@ int main (int argc, char ** argv)
 
   // Solve this as a time-dependent or steady system
   if (transient)
-    system.time_solver = libmesh_make_unique<EulerSolver>(system);
+    system.time_solver = std::make_unique<EulerSolver>(system);
   else
     {
-      system.time_solver = libmesh_make_unique<SteadySolver>(system);
+      system.time_solver = std::make_unique<SteadySolver>(system);
       libmesh_assert_equal_to (n_timesteps, 1);
     }
 
@@ -193,10 +193,10 @@ int main (int argc, char ** argv)
 
   // And the nonlinear solver options
   if (slvr_type == "newton")
-    system.time_solver->diff_solver() = libmesh_make_unique<NewtonSolver>(system);
+    system.time_solver->diff_solver() = std::make_unique<NewtonSolver>(system);
   else if (slvr_type == "petscdiff")
 #if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_HAVE_METAPHYSICL)
-    system.time_solver->diff_solver() = libmesh_make_unique<PetscDiffSolver>(system);
+    system.time_solver->diff_solver() = std::make_unique<PetscDiffSolver>(system);
 #else
   libmesh_example_requires(false, "--enable-petsc --enable-metaphysicl-required");
 #endif
@@ -257,7 +257,7 @@ int main (int argc, char ** argv)
               // size at once
               libmesh_assert_equal_to (nelem_target, 0);
 
-              error_estimator = libmesh_make_unique<UniformRefinementEstimator>();
+              error_estimator = std::make_unique<UniformRefinementEstimator>();
 
               // The lid-driven cavity problem isn't in H1, so
               // lets estimate L2 error
@@ -273,7 +273,7 @@ int main (int argc, char ** argv)
               // not in H1 - if we were doing more than a few
               // timesteps we'd need to turn off or limit the
               // maximum level of our adaptivity eventually
-              error_estimator = libmesh_make_unique<KellyErrorEstimator>();
+              error_estimator = std::make_unique<KellyErrorEstimator>();
             }
 
           // Calculate error based on u and v (and w?) but not p

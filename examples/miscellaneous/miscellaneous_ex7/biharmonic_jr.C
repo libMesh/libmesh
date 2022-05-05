@@ -80,8 +80,11 @@ Biharmonic::JR::JR(EquationSystems & eqSys,
   // Give the system an object to compute the initial state.
   attach_init_object(*this);
 
-  // Attache the R & J calculation object
+  // Attach the R & J calculation object
   nonlinear_solver->residual_and_jacobian_object = this;
+
+  // And the R object for matrix-free evaluations
+  nonlinear_solver->mffd_residual_object = this;
 
   // Attach the bounds calculation object
   nonlinear_solver->bounds_object = this;
@@ -180,8 +183,12 @@ Gradient Biharmonic::JR::InitialGradientZero(const Point &,
   return Gradient(0.0, 0.0, 0.0);
 }
 
-
-
+void Biharmonic::JR::residual(const NumericVector<Number> & u,
+                              NumericVector<Number> & R,
+                              NonlinearImplicitSystem & sys)
+{
+  residual_and_jacobian(u, &R, nullptr, sys);
+}
 
 void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
                                            NumericVector<Number> * R,
@@ -191,9 +198,6 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
   libmesh_ignore(u, R, J);  // if we don't use --enable-second
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (!R && !J)
-    return;
-
   // Declare a performance log.  Give it a descriptive
   // string to identify what part of the code we are
   // logging, since there may be many PerfLogs in an

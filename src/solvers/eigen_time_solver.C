@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -109,16 +109,13 @@ void EigenTimeSolver::solve ()
   //libmesh_here();
   if (!this->quiet)
     libMesh::out << "Calling the EigenSolver." << std::endl;
-  std::pair<unsigned int, unsigned int> solve_data =
+  std::tie(this->n_converged_eigenpairs, this->n_iterations_reqd) =
     eigen_solver->solve_generalized (_system.get_system_matrix(),
                                      _system.get_matrix ("B"),
                                      n_eigenpairs_to_compute,
                                      n_basis_vectors_to_use,
                                      tol,
                                      maxits);
-
-  this->n_converged_eigenpairs = solve_data.first;
-  this->n_iterations_reqd      = solve_data.second;
 }
 
 

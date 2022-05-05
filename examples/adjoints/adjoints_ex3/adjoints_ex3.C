@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -63,10 +63,10 @@
 #include <iostream>
 #include <sys/time.h>
 #include <iomanip>
+#include <memory>
 
 // Libmesh includes
 #include "libmesh/equation_systems.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/twostep_time_solver.h"
 #include "libmesh/euler_solver.h"
 #include "libmesh/euler2_solver.h"
@@ -538,7 +538,7 @@ void set_system_parameters(FEMSystem & system,
         system.time_solver.reset(innersolver);
     }
   else
-    system.time_solver = libmesh_make_unique<SteadySolver>(system);
+    system.time_solver = std::make_unique<SteadySolver>(system);
 
   system.time_solver->reduce_deltat_on_diffsolver_failure =
     param.deltat_reductions;
@@ -609,7 +609,7 @@ std::unique_ptr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
 // for comparisons of adjoint and non-adjoint based error indicators
 std::unique_ptr<ErrorEstimator> build_error_estimator(FEMParameters & /* param */)
 {
-  return libmesh_make_unique<KellyErrorEstimator>();
+  return std::make_unique<KellyErrorEstimator>();
 }
 
 // Functions to build the adjoint based error indicators

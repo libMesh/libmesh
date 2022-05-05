@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -36,10 +36,11 @@
 #include "libmesh/transient_system.h"
 #include "libmesh/node.h"
 #include "libmesh/elem.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #include "nonlinear_neohooke_cc.h"
 #include "solid_system.h"
+
+#include <memory>
 
 // Solaris Studio has no NAN
 #ifdef __SUNPRO_CC
@@ -56,7 +57,7 @@ SolidSystem::SolidSystem(EquationSystems & es,
 {
 
   // Add a time solver. We are just looking at a steady state problem here.
-  this->time_solver = libmesh_make_unique<SteadySolver>(*this);
+  this->time_solver = std::make_unique<SteadySolver>(*this);
 }
 
 void SolidSystem::save_initial_mesh()

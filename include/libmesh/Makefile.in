@@ -568,10 +568,11 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	mesh_tetgen_wrapper.h mesh_tools.h mesh_triangle_holes.h \
 	mesh_triangle_interface.h mesh_triangle_wrapper.h \
 	namebased_io.h nemesis_io.h nemesis_io_helper.h off_io.h \
-	parallel_mesh.h patch.h postscript_io.h replicated_mesh.h \
-	serial_mesh.h sync_refinement_flags.h tecplot_io.h tetgen_io.h \
-	ucd_io.h unstructured_mesh.h unv_io.h vtk_io.h xdr_io.h \
-	analytic_function.h composite_fem_function.h \
+	parallel_mesh.h patch.h poly2tri_triangulator.h \
+	postscript_io.h replicated_mesh.h serial_mesh.h \
+	sync_refinement_flags.h tecplot_io.h tetgen_io.h \
+	triangulator_interface.h ucd_io.h unstructured_mesh.h unv_io.h \
+	vtk_io.h xdr_io.h analytic_function.h composite_fem_function.h \
 	composite_function.h const_fem_function.h const_function.h \
 	coupling_matrix.h dense_matrix.h dense_matrix_base.h \
 	dense_matrix_base_impl.h dense_matrix_impl.h dense_submatrix.h \
@@ -666,10 +667,11 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	pointer_to_pointer_iter.h pool_allocator.h restore_warnings.h \
 	simple_range.h statistics.h string_to_enum.h timestamp.h \
 	topology_map.h tree.h tree_base.h tree_node.h utility.h \
-	vectormap.h xdr_cxx.h parallel_communicator_specializations \
-	$(am__append_1) $(am__append_3) $(am__append_5) \
-	$(am__append_7) $(am__append_9) $(am__append_11) \
-	$(am__append_13) libmesh_config.h
+	vectormap.h win_gettimeofday.h xdr_cxx.h \
+	parallel_communicator_specializations $(am__append_1) \
+	$(am__append_3) $(am__append_5) $(am__append_7) \
+	$(am__append_9) $(am__append_11) $(am__append_13) \
+	libmesh_config.h
 DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) $(am__append_4) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
 	$(am__append_12) $(am__append_14) libmesh_config.h
@@ -1505,6 +1507,9 @@ parallel_mesh.h: $(top_srcdir)/include/mesh/parallel_mesh.h
 patch.h: $(top_srcdir)/include/mesh/patch.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+poly2tri_triangulator.h: $(top_srcdir)/include/mesh/poly2tri_triangulator.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 postscript_io.h: $(top_srcdir)/include/mesh/postscript_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1521,6 +1526,9 @@ tecplot_io.h: $(top_srcdir)/include/mesh/tecplot_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tetgen_io.h: $(top_srcdir)/include/mesh/tetgen_io.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+triangulator_interface.h: $(top_srcdir)/include/mesh/triangulator_interface.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ucd_io.h: $(top_srcdir)/include/mesh/ucd_io.h
@@ -2319,6 +2327,9 @@ utility.h: $(top_srcdir)/include/utils/utility.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 vectormap.h: $(top_srcdir)/include/utils/vectormap.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+win_gettimeofday.h: $(top_srcdir)/include/utils/win_gettimeofday.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 xdr_cxx.h: $(top_srcdir)/include/utils/xdr_cxx.h

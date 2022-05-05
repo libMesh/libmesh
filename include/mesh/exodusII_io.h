@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -296,6 +296,17 @@ public:
                        const std::set<std::string> * system_names=nullptr);
 
   /**
+   * Write elemsets stored on the Mesh to file.
+   *
+   * \note An elemset is a concept which is related to (but distinct
+   * from) both elem blocks and sidesets/nodesets. Elements in an elemset
+   * can be from multiple different blocks. In addition, one can
+   * define an elemset variable, which is like an elemental variable
+   * but exists only on the elements defined in the set.
+   */
+  void write_elemsets();
+
+  /**
    * The Exodus format can also store values on sidesets. This can be
    * thought of as an alternative to defining an elemental variable
    * field on lower-dimensional elements making up a part of the
@@ -358,8 +369,8 @@ public:
   void
   write_nodeset_data (int timestep,
                       const std::vector<std::string> & var_names,
-                      std::vector<std::set<boundary_id_type>> & node_boundary_ids,
-                      std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals);
+                      const std::vector<std::set<boundary_id_type>> & node_boundary_ids,
+                      const std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals);
 
   /**
    * Read all the nodeset data at a particular timestep. TODO:
@@ -385,6 +396,47 @@ public:
    */
   void
   get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> & bc_array_indices);
+
+  /**
+   * The Exodus format can also store values on elemsets. The inputs to the function are:
+   * .) var_names[i] is the name of the ith elemset variable to be written to file.
+   * .) elemset_ids_in[i] is a set of elemset ids where var_names[i] is active.
+   * .) elemset_vals[i] is a map from (elem-id, elemset-id) pairs to the
+   *    corresponding real-valued data.
+   *
+   * \note You must have already written the mesh by calling
+   * e.g. write() (and write_elemsets()) before calling this function,
+   * because it uses the ordering of the elemsets that have already
+   * been written to the Exodus file.
+   */
+  void
+  write_elemset_data (int timestep,
+                      const std::vector<std::string> & var_names,
+                      const std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                      const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals);
+
+  /**
+   * Read all the elemset data at a particular timestep.
+   */
+  void
+  read_elemset_data (int timestep,
+                     std::vector<std::string> & var_names,
+                     std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                     std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals);
+
+  /**
+   * Similar to read_elemset_data(), but instead of creating one
+   * std::map per nodeset per variable, creates a single map of
+   * (elem_id, elemset_id) pairs -> exo file array indices
+   * for any/all variables on that elemset (they are all the
+   * same). In cases where there are hundreds of elemset variables on
+   * a single elemset, it is more efficient to store the array indices
+   * in a quickly searchable data structure than to repeat the
+   * indexing once per variable as is done in the read_elemset_data()
+   * case.
+   */
+  void
+  get_elemset_data_indices (std::map<std::pair<dof_id_type, elemset_id_type>, unsigned int> & elemset_array_indices);
 
   /**
    * Set the elemental variables in the Exodus file to be read into extra
@@ -493,6 +545,14 @@ public:
    */
   ExodusII_IO_Helper & get_exio_helper();
 #endif
+
+  /**
+   * Set to true (the default) to write files in an HDF5-based file
+   * format (when HDF5 is available), or to false to write files in
+   * the old NetCDF3-based format.  If HDF5 is unavailable, this
+   * setting does nothing.
+   */
+  void set_hdf5_writing(bool write_hdf5);
 
   /**
    * This function factors out a bunch of code which is common to the

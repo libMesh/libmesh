@@ -1,7 +1,6 @@
 // libmesh includes
 #include <libmesh/diagonal_matrix.h>
 #include <libmesh/parallel.h>
-#include <libmesh/auto_ptr.h>
 #include <libmesh/dense_matrix.h>
 #include <libmesh/id_types.h>
 #include <libmesh/numeric_vector.h>
@@ -29,7 +28,7 @@ termial(T n)
 class DiagonalMatrixTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE(DiagonalMatrixTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(DiagonalMatrixTest);
 
   CPPUNIT_TEST(testSizes);
   CPPUNIT_TEST(testNumerics);
@@ -41,7 +40,7 @@ public:
   void setUp()
   {
     _comm = TestCommWorld;
-    _matrix = libmesh_make_unique<DiagonalMatrix<Number>>(*_comm);
+    _matrix = std::make_unique<DiagonalMatrix<Number>>(*_comm);
 
     numeric_index_type root_block_size = 2;
     _local_size = root_block_size + static_cast<numeric_index_type>(_comm->rank());
@@ -62,6 +61,8 @@ public:
 
   void testSizes()
   {
+    LOG_UNIT_TEST;
+
     CPPUNIT_ASSERT_EQUAL(_global_size, _matrix->m());
     CPPUNIT_ASSERT_EQUAL(_global_size, _matrix->n());
     CPPUNIT_ASSERT_EQUAL(_i[_comm->rank()], _matrix->row_start());
@@ -70,6 +71,8 @@ public:
 
   void testNumerics()
   {
+    LOG_UNIT_TEST;
+
     numeric_index_type beginning_index = _matrix->row_start();
     numeric_index_type end_index = _matrix->row_stop();
 
@@ -210,6 +213,8 @@ public:
 
   void testClone()
   {
+    LOG_UNIT_TEST;
+
     {
       // Create copy, test that it can go out of scope
       auto copy = _matrix->clone();

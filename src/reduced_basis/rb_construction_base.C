@@ -174,17 +174,16 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
                   (index < this->get_last_local_training_index()) );
 
   RBParameters params;
-  for (const auto & pr : training_parameters)
+  for (const auto & [param_name, vec_ptr] : training_parameters)
     {
-      const std::string & param_name = pr.first;
-      Real param_value = libmesh_real((*(pr.second))(index));
+      Real param_value = libmesh_real((*vec_ptr)(index));
       params.set_value(param_name, param_value);
     }
 
   // Add potential extra values
   const auto & mine = get_parameters();
-  for (const auto & pr : as_range(mine.extra_begin(), mine.extra_end()))
-    params.set_extra_value(pr.first, pr.second);
+  for (const auto & [key, val] : as_range(mine.extra_begin(), mine.extra_end()))
+    params.set_extra_value(key, val);
 
   return params;
 }
@@ -732,10 +731,10 @@ void RBConstructionBase<Base>::set_training_random_seed(unsigned int seed)
 
 // EigenSystem is only defined if we have SLEPc
 #if defined(LIBMESH_HAVE_SLEPC)
-template class RBConstructionBase<CondensedEigenSystem>;
+template class LIBMESH_EXPORT RBConstructionBase<CondensedEigenSystem>;
 #endif
 
-template class RBConstructionBase<LinearImplicitSystem>;
-template class RBConstructionBase<System>;
+template class LIBMESH_EXPORT RBConstructionBase<LinearImplicitSystem>;
+template class LIBMESH_EXPORT RBConstructionBase<System>;
 
 } // namespace libMesh

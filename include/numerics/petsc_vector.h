@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -413,20 +413,7 @@ private:
    * object to keep down thread contention when reading from multiple
    * PetscVectors simultaneously
    */
-  mutable std::mutex _petsc_vector_mutex;
-
-  /**
-   * Condition variable for _get_array and _restore_array.  This is part of the
-   * object to keep down thread contention when reading from multiple
-   * PetscVectors simultaneously
-   */
-  mutable std::condition_variable _petsc_vector_cv;
-
-  /**
-   * Mutex that helps enforce a call_once idiom within a method, where
-   * once means call for only one thread
-   */
-  mutable std::mutex _petsc_vector_do_once_mutex;
+  mutable std::mutex _petsc_get_restore_array_mutex;
 
   /**
    * Queries the array (and the local form if the vector is ghosted)
@@ -468,7 +455,7 @@ private:
   /**
    * Whether or not the data array is for read only access
    */
-  mutable std::atomic<bool> _values_read_only;
+  mutable bool _values_read_only;
 };
 
 
@@ -671,9 +658,8 @@ void PetscVector<T>::init (const numeric_index_type n,
   // create a sequential vector if on only 1 processor
   if (this->_type == SERIAL)
     {
-      ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &_vec);
-      CHKERRABORT(PETSC_COMM_SELF,ierr);
-
+      ierr = VecCreate(PETSC_COMM_SELF, &_vec);CHKERRABORT(PETSC_COMM_SELF,ierr);
+      ierr = VecSetSizes(_vec, petsc_n, petsc_n); CHKERRABORT(PETSC_COMM_SELF,ierr);
       ierr = VecSetFromOptions (_vec);
       CHKERRABORT(PETSC_COMM_SELF,ierr);
     }
@@ -683,15 +669,14 @@ void PetscVector<T>::init (const numeric_index_type n,
 #ifdef LIBMESH_HAVE_MPI
       PetscInt petsc_n_local=cast_int<PetscInt>(n_local);
       libmesh_assert_less_equal (n_local, n);
-      ierr = VecCreateMPI (this->comm().get(), petsc_n_local, petsc_n,
-                           &_vec);
-      LIBMESH_CHKERR(ierr);
+      // Use more generic function instead of VecCreateSeq/MPI
+      ierr = VecCreate(this->comm().get(), &_vec);LIBMESH_CHKERR(ierr);
+      ierr = VecSetSizes(_vec, petsc_n_local, petsc_n); LIBMESH_CHKERR(ierr);
 #else
       libmesh_assert_equal_to (n_local, n);
-      ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &_vec);
-      CHKERRABORT(PETSC_COMM_SELF,ierr);
+      ierr = VecCreate(PETSC_COMM_SELF, &_vec);CHKERRABORT(PETSC_COMM_SELF,ierr);
+      ierr = VecSetSizes(_vec, petsc_n, petsc_n); CHKERRABORT(PETSC_COMM_SELF,ierr);
 #endif
-
       ierr = VecSetFromOptions (_vec);
       LIBMESH_CHKERR(ierr);
     }
@@ -767,6 +752,13 @@ void PetscVector<T>::init (const numeric_index_type n,
   ierr = VecCreateGhost (this->comm().get(), petsc_n_local, petsc_n,
                          petsc_n_ghost, petsc_ghost,
                          &_vec);
+  LIBMESH_CHKERR(ierr);
+
+  // Add a prefix so that we can at least distinguish a ghosted vector from a
+  // nonghosted vector when using a petsc option.
+  // PETSc does not fully support VecGhost on GPU yet. This change allows us to
+  // trigger a nonghosted vector to use GPU without bothering the ghosted vectors.
+  ierr = PetscObjectAppendOptionsPrefix((PetscObject)_vec,"ghost_");
   LIBMESH_CHKERR(ierr);
 
   ierr = VecSetFromOptions (_vec);
@@ -1097,11 +1089,6 @@ void PetscVector<T>::get(const std::vector<numeric_index_type> & index,
 
   const std::size_t num = index.size();
 
-  std::unique_lock<std::mutex> read_lock(_petsc_vector_mutex);
-  _petsc_vector_cv.wait(read_lock, [this](){ return _array_is_present.load(); });
-  // When wait exits it means we've acquired and locked the mutex, but all we are doing now
-  // is reading, so it's safe to unlock and let other threads continue
-  read_lock.unlock();
   for (std::size_t i=0; i<num; i++)
     {
       const numeric_index_type local_index = this->map_global_to_local_index(index[i]);

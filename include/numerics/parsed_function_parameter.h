@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,9 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameter_accessor.h"
 #include "libmesh/parsed_function.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -58,8 +60,8 @@ public:
    * remain at their previous values.
    */
   ParsedFunctionParameter(ParsedFunction<T> & func_ref,
-                          const std::string & param_name) :
-    _func(func_ref), _name(param_name) {}
+                          std::string param_name) :
+    _func(func_ref), _name(std::move(param_name)) {}
 
   /**
    * A simple reseater won't work with a parsed function
@@ -86,7 +88,7 @@ public:
    * \returns A new copy of the accessor.
    */
   virtual std::unique_ptr<ParameterAccessor<T>> clone() const override {
-    return libmesh_make_unique<ParsedFunctionParameter<T>>(_func, _name);
+    return std::make_unique<ParsedFunctionParameter<T>>(_func, _name);
   }
 
 private:

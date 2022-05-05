@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,10 @@
 #include "libmesh/eigen_solver.h"
 #include "libmesh/slepc_eigen_solver.h"
 #include "libmesh/solver_configuration.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_eigen_solver_type.h"
+
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -62,7 +64,7 @@ EigenSolver<T>::build(const Parallel::Communicator & comm,
 
 #ifdef LIBMESH_HAVE_SLEPC
     case SLEPC_SOLVERS:
-      return libmesh_make_unique<SlepcEigenSolver<T>>(comm);
+      return std::make_unique<SlepcEigenSolver<T>>(comm);
 #endif
 
     default:
@@ -101,7 +103,7 @@ void EigenSolver<T>::set_position_of_spectrum (Real pos, PositionOfSpectrum targ
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class EigenSolver<Number>;
+template class LIBMESH_EXPORT EigenSolver<Number>;
 
 } // namespace libMesh
 

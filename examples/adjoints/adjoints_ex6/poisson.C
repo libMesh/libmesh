@@ -16,10 +16,12 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/fem_context.h"
 #include "libmesh/zero_function.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // Local includes
 #include "poisson.h"
+
+// C++ includes
+#include <memory>
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -47,7 +49,7 @@ public:
   }
 
   virtual std::unique_ptr<FunctionBase<Number>> clone() const
-  { return libmesh_make_unique<BdyFunction>(_T_var); }
+  { return std::make_unique<BdyFunction>(_T_var); }
 
 private:
   const unsigned int _T_var;
@@ -69,26 +71,17 @@ void PoissonSystem::init_data ()
 #ifdef LIBMESH_ENABLE_DIRICHLET
   // Now we will set the Dirichlet boundary conditions
 
-  // Get boundary ids for all the boundaries
-  const boundary_id_type all_bdry_id[4] = {0, 1, 2, 3};
-  std::set<boundary_id_type> all_bdy(all_bdry_id, all_bdry_id+4);
-
   // For the adjoint problem, we will only set the bottom boundary to a non-zero value
   const boundary_id_type bottom_bdry_id = 0;
-  std::set<boundary_id_type> bottom_bdry;
-  bottom_bdry.insert(bottom_bdry_id);
-
-  // The T_only identifier for setting the boundary conditions for T
-  std::vector<unsigned int> T_only(1, T_var);
 
   // The zero function pointer for the primal all bdry bcs
   ZeroFunction<Number> zero;
   // Boundary function for bottom bdry adjoint condition
   BdyFunction bottom_adjoint(T_var);
 
-  this->get_dof_map().add_dirichlet_boundary(DirichletBoundary (all_bdy, T_only, &zero));
+  this->get_dof_map().add_dirichlet_boundary(DirichletBoundary ({0,1,2,3}, {T_var}, &zero));
 
-  this->get_dof_map().add_adjoint_dirichlet_boundary(DirichletBoundary (bottom_bdry, T_only, &bottom_adjoint), 0);
+  this->get_dof_map().add_adjoint_dirichlet_boundary(DirichletBoundary ({bottom_bdry_id}, {T_var}, &bottom_adjoint), 0);
 #endif // LIBMESH_ENABLE_DIRICHLET
 
   // Do the parent's initialization after variables are defined

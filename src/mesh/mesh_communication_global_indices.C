@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -610,12 +610,12 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
                   get_hilbert_coords(**nodej, bbox, jcoords);
                   libMesh::err <<
                     "node " << (*nodej)->id() << ", " <<
-                    *(Point *)(*nodej) << " has HilbertIndices " <<
+                    *(const Point *)(*nodej) << " has HilbertIndices " <<
                     node_keys[j] << std::endl;
                   get_hilbert_coords(**nodei, bbox, icoords);
                   libMesh::err <<
                     "node " << (*nodei)->id() << ", " <<
-                    *(Point *)(*nodei) << " has HilbertIndices " <<
+                    *(const Point *)(*nodei) << " has HilbertIndices " <<
                     node_keys[i] << std::endl;
                   libmesh_error_msg("Error: nodes with duplicate Hilbert keys!");
                 }
@@ -993,29 +993,29 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &,
 
 
 //------------------------------------------------------------------
-template void MeshCommunication::find_global_indices<MeshBase::const_node_iterator> (const Parallel::Communicator &,
+template LIBMESH_EXPORT void MeshCommunication::find_global_indices<MeshBase::const_node_iterator> (const Parallel::Communicator &,
                                                                                      const libMesh::BoundingBox &,
                                                                                      const MeshBase::const_node_iterator &,
                                                                                      const MeshBase::const_node_iterator &,
                                                                                      std::vector<dof_id_type> &) const;
 
-template void MeshCommunication::find_global_indices<MeshBase::const_element_iterator> (const Parallel::Communicator &,
+template LIBMESH_EXPORT void MeshCommunication::find_global_indices<MeshBase::const_element_iterator> (const Parallel::Communicator &,
                                                                                         const libMesh::BoundingBox &,
                                                                                         const MeshBase::const_element_iterator &,
                                                                                         const MeshBase::const_element_iterator &,
                                                                                         std::vector<dof_id_type> &) const;
-template void MeshCommunication::find_global_indices<MeshBase::node_iterator> (const Parallel::Communicator &,
+template LIBMESH_EXPORT void MeshCommunication::find_global_indices<MeshBase::node_iterator> (const Parallel::Communicator &,
                                                                                const libMesh::BoundingBox &,
                                                                                const MeshBase::node_iterator &,
                                                                                const MeshBase::node_iterator &,
                                                                                std::vector<dof_id_type> &) const;
 
-template void MeshCommunication::find_global_indices<MeshBase::element_iterator> (const Parallel::Communicator &,
+template LIBMESH_EXPORT void MeshCommunication::find_global_indices<MeshBase::element_iterator> (const Parallel::Communicator &,
                                                                                   const libMesh::BoundingBox &,
                                                                                   const MeshBase::element_iterator &,
                                                                                   const MeshBase::element_iterator &,
                                                                                   std::vector<dof_id_type> &) const;
-template void MeshCommunication::find_local_indices<MeshBase::const_element_iterator> (const libMesh::BoundingBox &,
+template LIBMESH_EXPORT void MeshCommunication::find_local_indices<MeshBase::const_element_iterator> (const libMesh::BoundingBox &,
                                                                                        const MeshBase::const_element_iterator &,
                                                                                        const MeshBase::const_element_iterator &,
                                                                                        std::unordered_map<dof_id_type, dof_id_type> &) const;

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -93,7 +93,7 @@ std::unique_ptr<Elem> Tri::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
-  std::unique_ptr<Elem> edge = libmesh_make_unique<Edge2>();
+  std::unique_ptr<Elem> edge = std::make_unique<Edge2>();
 
   for (auto n : edge->node_index_range())
     edge->set_node(n) = this->node_ptr(Tri3::side_nodes_map[i][n]);

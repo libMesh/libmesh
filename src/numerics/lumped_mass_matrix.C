@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,9 +16,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "libmesh/lumped_mass_matrix.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/numeric_vector.h"
+
+// C++ Includes
 #include <cmath>
+#include <memory>
 
 namespace libMesh
 {
@@ -34,7 +36,7 @@ std::unique_ptr<SparseMatrix<T>>
 LumpedMassMatrix<T>::zero_clone() const
 {
   // Make empty copy with matching comm
-  auto mat_copy = libmesh_make_unique<LumpedMassMatrix<T>>(this->comm());
+  auto mat_copy = std::make_unique<LumpedMassMatrix<T>>(this->comm());
 
   // Initialize copy with our same nonzero structure, and explicitly
   // zero values using fast == false.
@@ -50,7 +52,7 @@ std::unique_ptr<SparseMatrix<T>>
 LumpedMassMatrix<T>::clone() const
 {
   // Make empty copy with matching comm
-  auto mat_copy = libmesh_make_unique<LumpedMassMatrix<T>>(this->comm());
+  auto mat_copy = std::make_unique<LumpedMassMatrix<T>>(this->comm());
 
   // Make copy of our diagonal
   auto diag_copy = this->_diagonal->clone();
@@ -110,6 +112,6 @@ LumpedMassMatrix<T>::operator=(NumericVector<T> && vec)
   return *this;
 }
 
-template class LumpedMassMatrix<Number>;
+template class LIBMESH_EXPORT LumpedMassMatrix<Number>;
 
 } // namespace libMesh

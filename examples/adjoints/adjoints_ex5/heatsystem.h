@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,8 @@
 #include "libmesh/fem_system.h"
 #include "libmesh/parameter_pointer.h"
 #include "libmesh/parameter_vector.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+#include <memory>
 
 using namespace libMesh;
 
@@ -40,7 +41,7 @@ public:
       _fe_order(1),
       _analytic_jacobians(true),
       dp(1.e-6)
-  { qoi.resize(1); }
+  { this->init_qois(1); }
 
   std::string & fe_family() { return _fe_family; }
   unsigned int & fe_order() { return _fe_order; }
@@ -76,7 +77,7 @@ public:
   {
     if (!parameter_vector.size())
       for (std::size_t i = 0; i != parameters.size(); ++i)
-        parameter_vector.push_back(libmesh_make_unique<ParameterPointer<Number>>(&parameters[i]));
+        parameter_vector.push_back(std::make_unique<ParameterPointer<Number>>(&parameters[i]));
 
     return parameter_vector;
   }

@@ -11,7 +11,7 @@ using namespace libMesh;
 
 class ParallelSortTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( ParallelSortTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( ParallelSortTest );
 
   CPPUNIT_TEST( testSort );
 
@@ -26,6 +26,8 @@ public:
 
   void testSort()
   {
+    LOG_UNIT_TEST;
+
     const int size = TestCommWorld->size(),
               rank = TestCommWorld->rank();
     const int n_vals = size - rank;

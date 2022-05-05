@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -637,10 +637,7 @@ void DofObject::unpack_indexing(std::vector<largest_id_type>::const_iterator beg
           libmesh_assert_less_equal (_idx_buf[i], _idx_buf.size());
         }
       if (hdr < 0 && ns > 0)
-        {
-          libmesh_assert_greater_equal(_idx_buf[ns], _idx_buf[ns-1]);
-          libmesh_assert_less_equal(_idx_buf[ns], _idx_buf.size());
-        }
+        libmesh_assert_less_equal(_idx_buf[ns], _idx_buf.size());
     }
 #endif
 

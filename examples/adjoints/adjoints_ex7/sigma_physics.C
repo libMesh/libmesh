@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -47,21 +47,16 @@ void SigmaPhysics::init_data (System & sys)
   // The temperature is evolving, with a first order time derivative
   this->time_evolving(T_var, 1);
 
-  const boundary_id_type all_ids[4] = {0, 1, 2, 3};
-  std::set<boundary_id_type> all_bdys(all_ids, all_ids+(4));
-
-  std::vector<unsigned int> T_only(1, T_var);
-
   ZeroFunction<Number> zero;
 
   ConstFunction<Number> one(1.0);
 
   // Dirichlet boundary conditions for the primal.
-  sys.get_dof_map().add_dirichlet_boundary(DirichletBoundary (all_bdys, T_only, &one));
+  sys.get_dof_map().add_dirichlet_boundary(DirichletBoundary ({0,1,2,3}, {T_var}, &one));
 
   // Set adjoint boundary conditions.
-  sys.get_dof_map().add_adjoint_dirichlet_boundary(DirichletBoundary (all_bdys, T_only, &zero), 0);
-  sys.get_dof_map().add_adjoint_dirichlet_boundary(DirichletBoundary (all_bdys, T_only, &zero), 1);
+  sys.get_dof_map().add_adjoint_dirichlet_boundary(DirichletBoundary ({0,1,2,3}, {T_var}, &zero), 0);
+  sys.get_dof_map().add_adjoint_dirichlet_boundary(DirichletBoundary ({0,1,2,3}, {T_var}, &zero), 1);
 
 }
 
@@ -178,5 +173,5 @@ F(i) += JxW[qp] * ( ( -sigma * (grad_T * dphi[i][qp]) ) + (f * phi[i][qp]) );
 
 std::unique_ptr<DifferentiablePhysics> SigmaPhysics::clone_physics()
 {
-  return libmesh_make_unique<SigmaPhysics>(*this);
+  return std::make_unique<SigmaPhysics>(*this);
 }

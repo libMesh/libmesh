@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -107,8 +107,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems & equation_systems,
       for (unsigned int v = 0; v != n_vars; ++v)
         {
           // Only fill in ErrorVectors the user asks for
-          if (errors_per_cell.find(std::make_pair(&sys, v)) ==
-              errors_per_cell.end())
+          if (!errors_per_cell.count(std::make_pair(&sys, v)))
             continue;
 
           // Calculate error in only one variable

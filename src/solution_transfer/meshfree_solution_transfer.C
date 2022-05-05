@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -65,7 +65,7 @@ public:
 
   virtual std::unique_ptr<FunctionBase<Number>> clone () const
   {
-    return libmesh_make_unique<MeshlessInterpolationFunction>(_mfi, _mutex);
+    return std::make_unique<MeshlessInterpolationFunction>(_mfi, _mutex);
   }
 
   Number operator() (const Point & p,

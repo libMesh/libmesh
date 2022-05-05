@@ -9,6 +9,11 @@ using namespace libMesh;
 
 class NodeTest : public PointTestBase<Node>, public DofObjectTest<Node> {
 public:
+  NodeTest() :
+    PointTestBase<Node>(), DofObjectTest<Node>() {
+    this->PointTestBase<Node>::libmesh_suite_name = "NodeTest";
+    this->DofObjectTest<Node>::libmesh_suite_name = "NodeTest";
+  }
   CPPUNIT_TEST_SUITE( NodeTest );
 
   POINTTEST

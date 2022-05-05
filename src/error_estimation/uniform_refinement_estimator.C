@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -15,11 +15,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ includes
-#include <algorithm> // for std::fill
-#include <sstream>
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath>    // for sqrt
 
 // Local Includes
 #include "libmesh/dof_map.h"
@@ -40,7 +35,13 @@
 #include "libmesh/enum_error_estimator_type.h"
 #include "libmesh/enum_norm_type.h"
 #include "libmesh/int_range.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ includes
+#include <algorithm> // for std::fill
+#include <sstream>
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath>    // for sqrt
+#include <memory>
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -125,7 +126,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
   // Get a vector of the Systems we're going to work on,
   // and set up a error_norms map if necessary
   std::vector<System *> system_list;
-  auto error_norms = libmesh_make_unique<std::map<const System *, SystemNorm>>();
+  auto error_norms = std::make_unique<std::map<const System *, SystemNorm>>();
 
   if (_es)
     {
@@ -161,8 +162,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
               std::vector<Real> weights(n_vars, 0.0);
               for (unsigned int v = 0; v != n_vars; ++v)
                 {
-                  if (errors_per_cell->find(std::make_pair(&sys, v)) ==
-                      errors_per_cell->end())
+                  if (!errors_per_cell->count(std::make_pair(&sys, v)))
                     continue;
 
                   weights[v] = 1.0;
@@ -207,7 +207,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
       libmesh_assert(errors_per_cell);
       for (const auto & pr : *errors_per_cell)
         {
-          ErrorVector * e = pr.second;
+          ErrorVector * e = pr.second.get();
           e->clear();
           e->resize(mesh.max_elem_id(), 0.);
         }
@@ -500,7 +500,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
             {
               libmesh_assert(errors_per_cell);
               err_vec =
-                (*errors_per_cell)[std::make_pair(&system,var)];
+                (*errors_per_cell)[std::make_pair(&system,var)].get();
             }
 
           // The type of finite element to use for this variable

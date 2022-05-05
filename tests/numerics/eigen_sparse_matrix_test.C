@@ -8,10 +8,10 @@
 
 // libMesh includes
 #include <libmesh/eigen_sparse_matrix.h>
-#include <libmesh/auto_ptr.h> // libmesh_make_unique
 #include <libmesh/dense_matrix.h>
 
 // C++ includes
+#include <memory>
 #include <vector>
 
 using namespace libMesh;
@@ -19,7 +19,7 @@ using namespace libMesh;
 class EigenSparseMatrixTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE(EigenSparseMatrixTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(EigenSparseMatrixTest);
 
   CPPUNIT_TEST(testGetAndSet);
   CPPUNIT_TEST(testClone);
@@ -32,7 +32,7 @@ public:
     // EigenSparseMatrix is serial, but its constructor takes a comm
     // for consistency with other SparseMatrix types.
     _comm = TestCommWorld;
-    _matrix = libmesh_make_unique<EigenSparseMatrix<Number>>(*_comm);
+    _matrix = std::make_unique<EigenSparseMatrix<Number>>(*_comm);
 
     // All parameters are ignored except the number of global rows and colums and nnz.
     _matrix->init(/*m*/10,
@@ -46,6 +46,8 @@ public:
 
   void testGetAndSet()
   {
+    LOG_UNIT_TEST;
+
     // EigenSparseMatrix is serial, so we simply test inserting the
     // same values on all procs.
     std::vector<numeric_index_type> rows = {0, 1, 2};
@@ -64,6 +66,8 @@ public:
 
   void testClone()
   {
+    LOG_UNIT_TEST;
+
     {
       // Create copy, test that it can go out of scope
       auto copy = _matrix->clone();

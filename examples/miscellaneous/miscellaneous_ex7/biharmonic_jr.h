@@ -27,6 +27,7 @@ using libMesh::TransientNonlinearImplicitSystem;
  * Biharmonic's friend class definition
  */
 class Biharmonic::JR : public TransientNonlinearImplicitSystem,
+                       public NonlinearImplicitSystem::ComputeResidual,
                        public NonlinearImplicitSystem::ComputeResidualandJacobian,
                        public NonlinearImplicitSystem::ComputeBounds,
                        public System::Initialization
@@ -39,7 +40,7 @@ public:
      const std::string & name,
      const unsigned int number);
 
-  void initialize();
+  void initialize() override;
 
   /**
    * Static functions to be used for initialization
@@ -65,19 +66,26 @@ public:
                                       const std::string &);
 
   /**
+   * The residual assembly function for the Biharmonic system
+   */
+  void residual(const NumericVector<Number> & u,
+                NumericVector<Number> & R,
+                NonlinearImplicitSystem & sys) override;
+
+  /**
    * The residual and Jacobian assembly function for the Biharmonic system.
    */
   void residual_and_jacobian(const NumericVector<Number> & u,
                              NumericVector<Number> * R,
                              SparseMatrix<Number> * J,
-                             NonlinearImplicitSystem &);
+                             NonlinearImplicitSystem &) override;
 
   /**
    * Function defining the bounds of the Biharmonic system.
    */
   void bounds(NumericVector<Number> & XL,
               NumericVector<Number> & XU,
-              NonlinearImplicitSystem &);
+              NonlinearImplicitSystem &) override;
 
 private:
   Biharmonic & _biharmonic;

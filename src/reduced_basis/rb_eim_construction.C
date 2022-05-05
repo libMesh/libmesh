@@ -41,7 +41,6 @@
 #include "libmesh/fem_context.h"
 #include "libmesh/elem.h"
 #include "libmesh/int_range.h"
-#include "libmesh/auto_ptr.h"
 
 // rbOOmit includes
 #include "libmesh/rb_eim_construction.h"
@@ -50,6 +49,7 @@
 
 // C++ include
 #include <limits>
+#include <memory>
 
 namespace libMesh
 {
@@ -67,12 +67,8 @@ namespace
 template <typename DataMap>
 void add(DataMap & u, const Number k, const DataMap & v)
 {
-  for (auto & pr : u)
+  for (auto & [key, vec_vec_u] : u)
     {
-      const auto & key = pr.first;
-      auto & val = pr.second;
-
-      std::vector<std::vector<Number>> & vec_vec_u = val;
       const std::vector<std::vector<Number>> & vec_vec_v = libmesh_map_find(v, key);
 
       libmesh_error_msg_if (vec_vec_u.size() != vec_vec_v.size(), "Size mismatch");
@@ -434,9 +430,7 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
         }
 
       libMesh::out << "Computing EIM error on training set" << std::endl;
-      std::pair<Real,unsigned int> max_error_pair = compute_max_eim_error();
-      greedy_error = max_error_pair.first;
-      current_training_index = max_error_pair.second;
+      std::tie(greedy_error, current_training_index) = compute_max_eim_error();
       set_params_from_training_set(current_training_index);
 
       libMesh::out << "Maximum EIM error is " << greedy_error << std::endl << std::endl;
@@ -766,6 +760,40 @@ const RBEIMEvaluation::QpDataMap & RBEIMConstruction::get_parametrized_function_
   return _local_parametrized_functions_for_training[training_index];
 }
 
+const RBEIMEvaluation::SideQpDataMap & RBEIMConstruction::get_side_parametrized_function_from_training_set(unsigned int training_index) const
+{
+  libmesh_error_msg_if(training_index >= _local_side_parametrized_functions_for_training.size(),
+                       "Invalid index: " << training_index);
+  return _local_side_parametrized_functions_for_training[training_index];
+}
+
+const std::unordered_map<dof_id_type, std::vector<Real> > & RBEIMConstruction::get_local_quad_point_JxW()
+{
+  return _local_quad_point_JxW;
+}
+
+const std::map<std::pair<dof_id_type,unsigned int>, std::vector<Real> > & RBEIMConstruction::get_local_side_quad_point_JxW()
+{
+  return _local_side_quad_point_JxW;
+}
+
+unsigned int RBEIMConstruction::get_n_parametrized_functions_for_training() const
+{
+  if (get_rb_eim_evaluation().get_parametrized_function().on_mesh_sides())
+  {
+    return _local_side_parametrized_functions_for_training.size();
+  }
+  else
+  {
+    return _local_parametrized_functions_for_training.size();
+  }
+}
+
+void RBEIMConstruction::reinit_eim_projection_matrix()
+{
+  _eim_projection_matrix.resize(get_Nmax(),get_Nmax());
+}
+
 std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
 {
   LOG_SCOPE("compute_max_eim_error()", "RBEIMConstruction");
@@ -953,11 +981,8 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
                                                                                                _local_side_quad_point_locations_perturbations,
                                                                                                *this);
 
-          for (const auto & pr : _local_side_quad_point_locations)
+          for (const auto & [elem_side_pair, xyz_vector] : _local_side_quad_point_locations)
           {
-            auto elem_side_pair = pr.first;
-            const auto & xyz_vector = pr.second;
-
             std::vector<std::vector<Number>> comps_and_qps(n_comps);
             for (unsigned int comp=0; comp<n_comps; comp++)
               {
@@ -1027,11 +1052,8 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
                                                                                         _local_quad_point_locations_perturbations,
                                                                                         *this);
 
-          for (const auto & pr : _local_quad_point_locations)
+          for (const auto & [elem_id, xyz_vector] : _local_quad_point_locations)
           {
-            dof_id_type elem_id = pr.first;
-            const auto & xyz_vector = pr.second;
-
             std::vector<std::vector<Number>> comps_and_qps(n_comps);
             for (unsigned int comp=0; comp<n_comps; comp++)
               {
@@ -1138,18 +1160,6 @@ void RBEIMConstruction::initialize_qp_data()
       libmesh_error_msg_if (parametrized_function_boundary_ids.empty(),
                             "Need to have non-empty boundary IDs to initialize side data");
 
-      // elem_fe is used for shellface data
-      FEBase * elem_fe = nullptr;
-      context.get_element_fe( 0, elem_fe );
-      const std::vector<Real> & JxW = elem_fe->get_JxW();
-      const std::vector<Point> & xyz = elem_fe->get_xyz();
-
-      // side_fe is used for element side data
-      FEBase* side_fe = nullptr;
-      context.get_side_fe( 0, side_fe );
-      const std::vector<Real> & JxW_side = side_fe->get_JxW();
-      const std::vector< Point > & xyz_side = side_fe->get_xyz();
-
       _local_side_quad_point_locations.clear();
       _local_side_quad_point_subdomain_ids.clear();
       _local_side_quad_point_boundary_ids.clear();
@@ -1167,6 +1177,16 @@ void RBEIMConstruction::initialize_qp_data()
           dof_id_type elem_id = elem->id();
 
           context.pre_fe_reinit(*this, elem);
+
+          // elem_fe is used for shellface data
+          auto elem_fe = context.get_element_fe(/*var=*/0, elem->dim());
+          const std::vector<Real> & JxW = elem_fe->get_JxW();
+          const std::vector<Point> & xyz = elem_fe->get_xyz();
+
+          // side_fe is used for element side data
+          auto side_fe = context.get_side_fe(/*var=*/0, elem->dim());
+          const std::vector<Real> & JxW_side = side_fe->get_JxW();
+          const std::vector< Point > & xyz_side = side_fe->get_xyz();
 
           for (context.side = 0;
                context.side != context.get_elem().n_sides();
@@ -1366,11 +1386,6 @@ void RBEIMConstruction::initialize_qp_data()
     }
   else
     {
-      FEBase * elem_fe = nullptr;
-      context.get_element_fe( 0, elem_fe );
-      const std::vector<Real> & JxW = elem_fe->get_JxW();
-      const std::vector<Point> & xyz = elem_fe->get_xyz();
-
       _local_quad_point_locations.clear();
       _local_quad_point_subdomain_ids.clear();
       _local_quad_point_JxW.clear();
@@ -1379,6 +1394,10 @@ void RBEIMConstruction::initialize_qp_data()
 
       for (const auto & elem : mesh.active_local_element_ptr_range())
         {
+          auto elem_fe = context.get_element_fe(/*var=*/0, elem->dim());
+          const std::vector<Real> & JxW = elem_fe->get_JxW();
+          const std::vector<Point> & xyz = elem_fe->get_xyz();
+
           dof_id_type elem_id = elem->id();
 
           context.pre_fe_reinit(*this, elem);
@@ -1520,11 +1539,8 @@ RBEIMConstruction::inner_product(const QpDataMap & v, const QpDataMap & w)
 
   Number val = 0.;
 
-  for (const auto & pr : v)
+  for (const auto & [elem_id, v_comp_and_qp] : v)
     {
-      dof_id_type elem_id = pr.first;
-      const auto & v_comp_and_qp = pr.second;
-
       const auto & w_comp_and_qp = libmesh_map_find(w, elem_id);
       const auto & JxW = libmesh_map_find(_local_quad_point_JxW, elem_id);
 
@@ -1549,11 +1565,8 @@ RBEIMConstruction::side_inner_product(const SideQpDataMap & v, const SideQpDataM
 
   Number val = 0.;
 
-  for (const auto & pr : v)
+  for (const auto & [elem_and_side, v_comp_and_qp] : v)
     {
-      auto elem_and_side = pr.first;
-      const auto & v_comp_and_qp = pr.second;
-
       const auto & w_comp_and_qp = libmesh_map_find(w, elem_and_side);
       const auto & JxW = libmesh_map_find(_local_side_quad_point_JxW, elem_and_side);
 
@@ -1651,12 +1664,10 @@ void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & 
   FEMContext con(*this);
   init_context(con);
 
-  for (const auto & pr : local_pf)
+  for (const auto & [elem_and_side, comp_and_qp] : local_pf)
     {
-      auto elem_and_side = pr.first;
       dof_id_type elem_id = elem_and_side.first;
       unsigned int side_index = elem_and_side.second;
-      const auto & comp_and_qp = pr.second;
 
       const Elem & elem_ref = get_mesh().elem_ref(elem_id);
       con.pre_fe_reinit(*this, &elem_ref);
@@ -1843,11 +1854,8 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
       fe->get_phi();
     }
 
-  for (const auto & pr : local_pf)
+  for (const auto & [elem_id, comp_and_qp] : local_pf)
     {
-      dof_id_type elem_id = pr.first;
-      const auto & comp_and_qp = pr.second;
-
       // Also initialize phi in order to compute phi_i_qp
       const Elem & elem_ref = get_mesh().elem_ref(elem_id);
       con.pre_fe_reinit(*this, &elem_ref);

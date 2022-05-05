@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -35,10 +35,30 @@ inline void hash_combine_impl(std::size_t & seed, std::size_t value)
 template <typename T>
 inline void hash_combine(std::size_t & seed, const T & value)
 {
-  hash_combine_impl(seed, std::hash<T>{}(value));
+  using std::hash;
+  hash_combine_impl(seed, hash<T>{}(value));
 }
 
 }
+
+
+// Fix for STL laziness
+struct hash {
+public:
+  template <typename T1, typename T2>
+  std::size_t operator()(const std::pair<T1, T2> & x) const
+  {
+    // Hopefully argument-based lookup lets us recurse with this
+    using std::hash;
+
+    std::size_t returnval = hash<T1>()(x.first);
+    boostcopy::hash_combine(returnval, x.second);
+
+    return returnval;
+  }
+};
+
+
 }
 
 #endif // LIBMESH_HASHING_H

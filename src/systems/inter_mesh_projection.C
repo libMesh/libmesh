@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2020 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@
 namespace libMesh
 {
 GradientMeshFunction::GradientMeshFunction(const MeshFunction & _mesh_function):
-  mesh_function(libmesh_make_unique<MeshFunction>(_mesh_function))
+  mesh_function(std::make_unique<MeshFunction>(_mesh_function))
 {
   libmesh_experimental();
 }

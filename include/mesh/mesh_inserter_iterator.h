@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -47,8 +47,13 @@ class Point;
  */
 template <typename T>
 struct mesh_inserter_iterator
-  : std::iterator<std::output_iterator_tag, T>
 {
+  using iterator_category = std::output_iterator_tag;
+  using value_type = T;
+  using difference_type = std::ptrdiff_t;
+  using pointer = T*;
+  using reference = T&;
+
   mesh_inserter_iterator (MeshBase & m) : mesh(m) {}
 
   void operator=(Elem * e) { mesh.add_elem(e); }

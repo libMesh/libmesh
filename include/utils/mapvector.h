@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -53,8 +53,6 @@ public:
     veclike_iterator(const typename maptype::iterator & i)
       : it(i) {}
 
-    veclike_iterator(const veclike_iterator & i) = default;
-
     Val & operator*() const { return it->second; }
 
     index_t index() const { return it->first; }
@@ -86,9 +84,6 @@ public:
   public:
     const_veclike_iterator(const typename maptype::const_iterator & i)
       : it(i) {}
-
-    const_veclike_iterator(const const_veclike_iterator & i)
-      : it(i.it) {}
 
     const_veclike_iterator(const veclike_iterator & i)
       : it(i.it) {}

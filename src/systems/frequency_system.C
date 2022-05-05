@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -358,9 +358,7 @@ void FrequencySystem::solve (const unsigned int n_start,
       const std::pair<unsigned int, Real> rval =
         linear_solver->solve (*matrix, *solution, *rhs, tol, maxits);
 
-      _n_linear_iterations   = rval.first;
-      _final_linear_residual = rval.second;
-
+      std::tie(_n_linear_iterations, _final_linear_residual) = rval;
       vec_rval.push_back(rval);
 
       /**

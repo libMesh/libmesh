@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -371,7 +371,7 @@ public:
    * Given base_filename, foo.e, constructs the Nemesis filename
    * foo.e.X.Y, where X=n. CPUs and Y=processor ID
    */
-  std::string construct_nemesis_filename(const std::string & base_filename);
+  std::string construct_nemesis_filename(std::string_view base_filename);
 
   /**
    * Member data

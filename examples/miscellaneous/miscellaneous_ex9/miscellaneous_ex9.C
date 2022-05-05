@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -133,15 +133,11 @@ int main (int argc, char ** argv)
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
   // Impose zero Dirichlet boundary condition on MAX_Z_BOUNDARY
-  std::set<boundary_id_type> boundary_ids;
-  boundary_ids.insert(MAX_Z_BOUNDARY);
-  std::vector<unsigned int> variables;
-  variables.push_back(0);
   ZeroFunction<> zf;
 
   // Most DirichletBoundary users will want to supply a "locally
   // indexed" functor
-  DirichletBoundary dirichlet_bc(boundary_ids, variables, zf,
+  DirichletBoundary dirichlet_bc({MAX_Z_BOUNDARY}, {0}, zf,
                                  LOCAL_VARIABLE_ORDER);
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
 #endif // LIBMESH_ENABLE_DIRICHLET

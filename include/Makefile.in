@@ -804,12 +804,14 @@ include_HEADERS = \
         mesh/off_io.h \
         mesh/parallel_mesh.h \
         mesh/patch.h \
+        mesh/poly2tri_triangulator.h \
         mesh/postscript_io.h \
         mesh/replicated_mesh.h \
         mesh/serial_mesh.h \
         mesh/sync_refinement_flags.h \
         mesh/tecplot_io.h \
         mesh/tetgen_io.h \
+        mesh/triangulator_interface.h \
         mesh/ucd_io.h \
         mesh/unstructured_mesh.h \
         mesh/unv_io.h \
@@ -1488,6 +1490,17 @@ installcheck-local:
 	  PKG_CONFIG_PATH=$(pkgconfigdir) \
 	  LIBMESH_CONFIG_PATH=$(bindir) \
 	  $(top_srcdir)/contrib/bin/test_installed_headers.sh
+
+clang-tidy:
+	@echo " "
+	@echo "Checking clang-tidy on headers ..."
+	@echo " "
+	@export MPICH_FLAGS=`$(CXX) -cxx= -compile_info 2>/dev/null`; \
+	export OPENMPI_FLAGS=`$(CXX) -showme:compile 2>/dev/null`; \
+	for file in $(headers_to_test); do \
+	  echo "clang-tidy $(top_srcdir)/$(file):"; \
+	  echo clang-tidy $(top_srcdir)/$(file) -- $$MPICH_FLAGS $$OPENMPI_FLAGS $(libmesh_contrib_INCLUDES) $(libmesh_optional_INCLUDES) $(CPPFLAGS_DBG) $(CXXFLAGS_DBG) -I$(top_builddir)/include -x c++; \
+	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

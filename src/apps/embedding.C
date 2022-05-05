@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -66,6 +66,7 @@ T assert_argument (GetPot & cl,
 }
 
 
+#ifdef LIBMESH_ENABLE_AMR
 int main(int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
@@ -153,3 +154,10 @@ int main(int argc, char ** argv)
 
   return 0;
 }
+#else
+int main (int, char **)
+{
+  std::cout << "This libMesh was built with --disable-amr" << std::endl;
+  return 1;
+}
+#endif // ENABLE_AMR

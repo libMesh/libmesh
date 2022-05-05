@@ -10,7 +10,7 @@ using namespace libMesh;
 
 class PackedRangeTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( PackedRangeTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( PackedRangeTest );
 
   CPPUNIT_TEST( testNullAllGather );
   CPPUNIT_TEST( testNullSendReceive );
@@ -33,6 +33,8 @@ public:
 
   void testNullAllGather()
   {
+    LOG_UNIT_TEST;
+
     std::vector<processor_id_type> vals;
 
     std::vector<std::string> send(1);
@@ -49,6 +51,8 @@ public:
 
   void testNullSendReceive()
   {
+    LOG_UNIT_TEST;
+
     std::vector<processor_id_type> vals;
 
     std::vector<std::string> send(1);
@@ -74,6 +78,8 @@ public:
 
   void testContainerSendReceive()
   {
+    LOG_UNIT_TEST;
+
     std::vector<processor_id_type> vals;
 
     std::vector<std::string> send(1), recv;

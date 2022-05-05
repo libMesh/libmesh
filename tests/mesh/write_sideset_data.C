@@ -22,7 +22,7 @@ class WriteSidesetData : public CppUnit::TestCase
    * This test ensures you can write both vector and scalar variables
    */
 public:
-  CPPUNIT_TEST_SUITE(WriteSidesetData);
+  LIBMESH_CPPUNIT_TEST_SUITE(WriteSidesetData);
 
 #if LIBMESH_DIM > 1
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -36,7 +36,8 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
   template <typename IOClass>
-  void testWriteImpl(const std::string & filename)
+  void testWriteImpl(const std::string & filename,
+                     bool write_vars)
   {
     Mesh mesh(*TestCommWorld);
 
@@ -52,59 +53,67 @@ public:
     // Add an empty sideset
     mesh.get_boundary_info().sideset_name(4) = "empty";
 
-    // Get list of all (elem, side, id) tuples
-    std::vector<BoundaryInfo::BCTuple> all_bc_tuples =
-      mesh.get_boundary_info().build_side_list();
+    // Only used if write_vars == true
+    std::vector<std::string> var_names;
+    std::vector<std::set<boundary_id_type>> side_ids;
+    std::vector<std::map<BoundaryInfo::BCTuple, Real>> bc_vals;
 
-    // Data structures to be passed to ExodusII_IO::write_sideset_data
-    std::vector<std::string> var_names = {"var1", "var2", "var3"};
-    std::vector<std::set<boundary_id_type>> side_ids =
+    if (write_vars)
       {
-        {0, 2}, // var1 is defined on sidesets 0 and 2
-        {1, 3}, // var2 is defined on sidesets 1 and 3
-        {4}     // var3 is only defined on the empty sideset 4
-      };
+        // Get list of all (elem, side, id) tuples
+        std::vector<BoundaryInfo::BCTuple> all_bc_tuples =
+          mesh.get_boundary_info().build_side_list();
 
-    // Data structure mapping (elem, side, id) tuples to Real values that
-    // will be passed to Exodus.
-    std::vector<std::map<BoundaryInfo::BCTuple, Real>> bc_vals(var_names.size());
-
-    // For each var_names[i], construct bc_vals[i]
-    for (unsigned int i=0; i<var_names.size(); ++i)
-      {
-        // const auto & var_name = var_names[i];
-        auto & vals = bc_vals[i];
-
-        for (const auto & t : all_bc_tuples)
+        // Data structures to be passed to ExodusII_IO::write_sideset_data
+        var_names = {"var1", "var2", "var3"};
+        side_ids =
           {
-            // dof_id_type elem_id = std::get<0>(t);
-            // unsigned int side_id = std::get<1>(t);
-            boundary_id_type b_id = std::get<2>(t);
+            {0, 2}, // var1 is defined on sidesets 0 and 2
+            {1, 3}, // var2 is defined on sidesets 1 and 3
+            {4}     // var3 is only defined on the empty sideset 4
+          };
 
-            if (side_ids[i].count(b_id))
+        // Data structure mapping (elem, side, id) tuples to Real values that
+        // will be passed to Exodus.
+        bc_vals.resize(var_names.size());
+
+        // For each var_names[i], construct bc_vals[i]
+        for (unsigned int i=0; i<var_names.size(); ++i)
+          {
+            // const auto & var_name = var_names[i];
+            auto & vals = bc_vals[i];
+
+            for (const auto & t : all_bc_tuples)
               {
-                // Compute a value. This could in theory depend on
-                // var_name, elem_id, side_id, and/or b_id.
-                Real val = static_cast<Real>(b_id);
+                // dof_id_type elem_id = std::get<0>(t);
+                // unsigned int side_id = std::get<1>(t);
+                boundary_id_type b_id = std::get<2>(t);
 
-                // Insert into the vals map.
-                vals.emplace(t, val);
+                if (side_ids[i].count(b_id))
+                  {
+                    // Compute a value. This could in theory depend on
+                    // var_name, elem_id, side_id, and/or b_id.
+                    Real val = static_cast<Real>(b_id);
+
+                    // Insert into the vals map.
+                    vals.emplace(t, val);
+                  }
               }
-          }
 
-        // If we have a distributed mesh, write_sideset_data wants our
-        // ghost data too; we'll just serialize everything here.
-        if (!mesh.is_serial())
-          TestCommWorld->set_union(vals);
+            // If we have a distributed mesh, write_sideset_data wants our
+            // ghost data too; we'll just serialize everything here.
+            if (!mesh.is_serial())
+              TestCommWorld->set_union(vals);
 
-      } // done constructing bc_vals
+          } // done constructing bc_vals
 
-    // We write the file in the ExodusII format.
-    {
-      IOClass writer(mesh);
-      writer.write(filename);
-      writer.write_sideset_data (/*timestep=*/1, var_names, side_ids, bc_vals);
-    }
+        // We write the file in the ExodusII format.
+        {
+          IOClass writer(mesh);
+          writer.write(filename);
+          writer.write_sideset_data (/*timestep=*/1, var_names, side_ids, bc_vals);
+        }
+      } // if (write_vars)
 
     // Make sure that the writing is done before the reading starts.
     TestCommWorld->barrier();
@@ -114,31 +123,33 @@ public:
     IOClass reader(read_mesh);
     reader.read(filename);
 
-    std::vector<std::string> read_in_var_names;
-    std::vector<std::set<boundary_id_type>> read_in_side_ids;
-    std::vector<std::map<BoundaryInfo::BCTuple, Real>> read_in_bc_vals;
-    reader.read_sideset_data
-      (/*timestep=*/1, read_in_var_names, read_in_side_ids, read_in_bc_vals);
+    if (write_vars)
+      {
+        std::vector<std::string> read_in_var_names;
+        std::vector<std::set<boundary_id_type>> read_in_side_ids;
+        std::vector<std::map<BoundaryInfo::BCTuple, Real>> read_in_bc_vals;
+        reader.read_sideset_data
+          (/*timestep=*/1, read_in_var_names, read_in_side_ids, read_in_bc_vals);
 
-    // Assert that we got back out what we put in.
-    CPPUNIT_ASSERT(read_in_var_names == var_names);
-    CPPUNIT_ASSERT(read_in_side_ids == side_ids);
-    CPPUNIT_ASSERT(read_in_bc_vals == bc_vals);
+        // Assert that we got back out what we put in.
+        CPPUNIT_ASSERT(read_in_var_names == var_names);
+        CPPUNIT_ASSERT(read_in_side_ids == side_ids);
+        CPPUNIT_ASSERT(read_in_bc_vals == bc_vals);
+      } // if (write_vars)
 
     // Also check that the flat indices match those in the file
     std::map<BoundaryInfo::BCTuple, unsigned int> bc_array_indices;
     reader.get_sideset_data_indices(bc_array_indices);
 
     // Debugging
-    // for (const auto & pr : bc_array_indices)
+    // for (const auto & [t, index] : bc_array_indices)
     //   {
-    //     const auto & t = pr.first;
     //     const auto & elem_id = std::get<0>(t);
     //     const auto & side_id = std::get<1>(t);
     //     const auto & boundary_id = std::get<2>(t);
     //     libMesh::out << "(elem, side, boundary_id) = "
-    //                  << "(" << elem_id << ", " << side_id << ", " << boundary_id << ")"
-    //                  << std::endl;
+    //                  << "(" << elem_id << ", " << side_id << ", " << boundary_id << ") at index "
+    //                  << index << std::endl;
     //   }
 
     // For this test case, the sideset arrays are ordered as follows:
@@ -205,15 +216,19 @@ public:
 
   void testWriteExodus()
   {
-    testWriteImpl<ExodusII_IO>("write_sideset_data.e");
+    LOG_UNIT_TEST;
+
+    testWriteImpl<ExodusII_IO>("write_sideset_data.e", /*write_vars=*/true);
+    testWriteImpl<ExodusII_IO>("write_sideset_data.e", /*write_vars=*/false);
   }
 
   void testWriteNemesis()
   {
-    // FIXME: Not yet implemented
-    // testWriteImpl<Nemesis_IO>("write_sideset_data.n");
-  }
+    // LOG_UNIT_TEST;
 
+    // FIXME: Not yet implemented
+    // testWriteImpl<Nemesis_IO>("write_sideset_data.n", /*write_vars=*/true);
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(WriteSidesetData);

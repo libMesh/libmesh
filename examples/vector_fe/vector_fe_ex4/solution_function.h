@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -17,10 +17,12 @@
 
 // libMesh includes
 #include "libmesh/function_base.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // Example includes
 #include "curl_curl_exact_solution.h"
+
+// C++ includes
+#include <memory>
 
 using namespace libMesh;
 
@@ -61,7 +63,7 @@ public:
   }
 
   virtual std::unique_ptr<FunctionBase<Number>> clone() const
-  { return libmesh_make_unique<SolutionFunction>(_u_var); }
+  { return std::make_unique<SolutionFunction>(_u_var); }
 
 private:
 
@@ -101,7 +103,7 @@ public:
   }
 
   virtual std::unique_ptr<FunctionBase<Gradient>> clone() const
-  { return libmesh_make_unique<SolutionGradient>(_u_var); }
+  { return std::make_unique<SolutionGradient>(_u_var); }
 
 private:
 

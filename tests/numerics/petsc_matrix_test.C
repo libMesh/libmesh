@@ -19,7 +19,7 @@ using namespace libMesh;
 class PetscMatrixTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE(PetscMatrixTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(PetscMatrixTest);
 
   CPPUNIT_TEST(testGetAndSet);
   CPPUNIT_TEST(testClone);
@@ -30,7 +30,7 @@ public:
   void setUp()
   {
     _comm = TestCommWorld;
-    _matrix = libmesh_make_unique<PetscMatrix<Number>>(*_comm);
+    _matrix = std::make_unique<PetscMatrix<Number>>(*_comm);
 
     numeric_index_type root_block_size = 2;
     _local_size = root_block_size + static_cast<numeric_index_type>(_comm->rank());
@@ -56,6 +56,8 @@ public:
 
   void testGetAndSet()
   {
+    LOG_UNIT_TEST;
+
     std::vector<numeric_index_type> rows(_local_size);
     std::vector<numeric_index_type> cols(_local_size);
     DenseMatrix<Number> local(_local_size, _local_size);
@@ -109,6 +111,8 @@ public:
 
   void testClone()
   {
+    LOG_UNIT_TEST;
+
     // Matrix must be closed before it can be cloned.
     _matrix->close();
 

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -157,54 +157,26 @@ int main (int argc, char ** argv)
   equation_systems.parameters.set<Real>("poisson_ratio") = poisson_ratio;
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  // Attach Dirichlet boundary conditions
-  {
-    std::set<boundary_id_type> clamped_boundaries;
-    clamped_boundaries.insert(MIN_Z_BOUNDARY);
+  // Attach Dirichlet (Clamped) boundary conditions
+  ZeroFunction<Number> zero;
 
-    std::vector<unsigned int> uvw;
-    uvw.push_back(u_var);
-    uvw.push_back(v_var);
-    uvw.push_back(w_var);
+  // Most DirichletBoundary users will want to supply a "locally
+  // indexed" functor
+  system.get_dof_map().add_dirichlet_boundary
+    (DirichletBoundary ({MIN_Z_BOUNDARY}, {u_var, v_var, w_var},
+                        zero, LOCAL_VARIABLE_ORDER));
 
-    ZeroFunction<Number> zero;
+  system.get_dof_map().add_dirichlet_boundary
+    (DirichletBoundary ({MAX_Z_BOUNDARY}, {u_var, v_var}, zero,
+                        LOCAL_VARIABLE_ORDER));
 
-    // Most DirichletBoundary users will want to supply a "locally
-    // indexed" functor
-    system.get_dof_map().add_dirichlet_boundary
-      (DirichletBoundary (clamped_boundaries, uvw, zero,
-                          LOCAL_VARIABLE_ORDER));
-  }
-  {
-    std::set<boundary_id_type> clamped_boundaries;
-    clamped_boundaries.insert(MAX_Z_BOUNDARY);
+  ConstFunction<Number> neg_one(-1.);
 
-    std::vector<unsigned int> uv;
-    uv.push_back(u_var);
-    uv.push_back(v_var);
-
-    ZeroFunction<Number> zero;
-
-    system.get_dof_map().add_dirichlet_boundary
-      (DirichletBoundary (clamped_boundaries, uv, zero,
-                          LOCAL_VARIABLE_ORDER));
-  }
-  {
-    std::set<boundary_id_type> clamped_boundaries;
-    clamped_boundaries.insert(MAX_Z_BOUNDARY);
-
-    std::vector<unsigned int> w;
-    w.push_back(w_var);
-
-    ConstFunction<Number> neg_one(-1.);
-
-    system.get_dof_map().add_dirichlet_boundary
-      (DirichletBoundary (clamped_boundaries, w, neg_one,
-                          LOCAL_VARIABLE_ORDER));
-  }
-#else
-  libmesh_ignore(u_var, v_var, w_var);
+  system.get_dof_map().add_dirichlet_boundary
+    (DirichletBoundary ({MAX_Z_BOUNDARY}, {w_var}, neg_one,
+                        LOCAL_VARIABLE_ORDER));
 #endif // LIBMESH_ENABLE_DIRICHLET
+  libmesh_ignore(u_var, v_var, w_var);
 
   le.initialize_contact_load_paths();
 

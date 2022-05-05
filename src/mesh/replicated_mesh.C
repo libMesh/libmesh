@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -106,7 +106,7 @@ ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
 
 ReplicatedMesh::~ReplicatedMesh ()
 {
-  this->clear();  // Free nodes and elements
+  this->ReplicatedMesh::clear();  // Free nodes and elements
 }
 
 
@@ -704,24 +704,27 @@ void ReplicatedMesh::clear ()
   MeshBase::clear();
 
   // Clear our elements and nodes
-  // There is no need to remove the elements from
+  // There is no need to remove them from
   // the BoundaryInfo data structure since we
   // already cleared it.
-  for (auto & elem : _elements)
-    delete elem;
+  this->ReplicatedMesh::clear_elems();
 
-  _n_elem = 0;
-  _elements.clear();
-
-  // clear the nodes data structure
-  // There is no need to remove the nodes from
-  // the BoundaryInfo data structure since we
-  // already cleared it.
   for (auto & node : _nodes)
     delete node;
 
   _n_nodes = 0;
   _nodes.clear();
+}
+
+
+
+void ReplicatedMesh::clear_elems ()
+{
+  for (auto & elem : _elements)
+    delete elem;
+
+  _n_elem = 0;
+  _elements.clear();
 }
 
 
@@ -984,7 +987,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
   std::map<dof_id_type, std::vector<dof_id_type>> node_to_elems_map;
 
   typedef dof_id_type                     key_type;
-  typedef std::pair<Elem *, unsigned char> val_type;
+  typedef std::pair<const Elem *, unsigned char> val_type;
   typedef std::pair<key_type, val_type>   key_val_pair;
   typedef std::unordered_multimap<key_type, val_type> map_type;
   // Mapping between all side keys in this mesh and elements+side numbers relevant to the boundary in this mesh as well.
@@ -1011,7 +1014,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
       std::set<dof_id_type> this_boundary_node_ids, other_boundary_node_ids;
 
       // Pull objects out of the loop to reduce heap operations
-      std::unique_ptr<Elem> side;
+      std::unique_ptr<const Elem> side;
 
       {
         // Make temporary fixed-size arrays for loop
@@ -1114,7 +1117,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
 
                               if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                                 {
-                                  std::unique_ptr<Elem> edge (el->build_edge_ptr(edge_id));
+                                  std::unique_ptr<const Elem> edge (el->build_edge_ptr(edge_id));
                                   for (auto & n : edge->node_ref_range())
                                     set_array[i]->insert( n.id() );
 
@@ -1387,16 +1390,15 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
     // Container to catch boundary IDs passed back from BoundaryInfo.
     std::vector<boundary_id_type> bc_ids;
 
-    for (const auto & pr : node_to_elems_map)
+    for (const auto & [target_node_id, elem_vec] : node_to_elems_map)
       {
-        dof_id_type target_node_id = pr.first;
         dof_id_type other_node_id = node_to_node_map[target_node_id];
         Node & target_node = this->node_ref(target_node_id);
 
-        std::size_t n_elems = pr.second.size();
+        std::size_t n_elems = elem_vec.size();
         for (std::size_t i=0; i<n_elems; i++)
           {
-            dof_id_type elem_id = pr.second[i];
+            dof_id_type elem_id = elem_vec[i];
             Elem * el = this->elem_ptr(elem_id);
 
             // find the local node index that we want to update
@@ -1414,14 +1416,13 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
 
   {
     LOG_SCOPE("stitch_meshes node deletion", "ReplicatedMesh");
-    for (const auto & pr : node_to_node_map)
+    for (const auto & [other_node_id, this_node_id] : node_to_node_map)
       {
         // In the case that this==other_mesh, the two nodes might be the same (e.g. if
         // we're stitching a "sliver"), hence we need to skip node deletion in that case.
-        if ((this == other_mesh) && (pr.second == pr.first))
+        if ((this == other_mesh) && (this_node_id == other_node_id))
           continue;
 
-        dof_id_type this_node_id = pr.second;
         this->delete_node( this->node_ptr(this_node_id) );
       }
   }
@@ -1438,7 +1439,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
       LOG_SCOPE("stitch_meshes neighbor fixes", "ReplicatedMesh");
 
       // Pull objects out of the loop to reduce heap operations
-      std::unique_ptr<Elem> my_side, their_side;
+      std::unique_ptr<const Elem> my_side, their_side;
 
       std::set<dof_id_type> fixed_elems;
       for (const auto & pr : node_to_elems_map)
@@ -1467,7 +1468,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
                               while (bounds.first != bounds.second)
                                 {
                                   // Get the potential element
-                                  Elem * neighbor = bounds.first->second.first;
+                                  Elem * neighbor = const_cast<Elem *>(bounds.first->second.first);
 
                                   // Get the side for the neighboring element
                                   const unsigned int ns = bounds.first->second.second;
@@ -1573,7 +1574,7 @@ ReplicatedMesh::get_disconnected_subdomains(std::vector<subdomain_id_type> * sub
 
   // a stack for visiting elements, make its capacity sufficiently large to avoid
   // memory allocation and deallocation when the vector size changes
-  std::vector<Elem *> list;
+  std::vector<const Elem *> list;
   list.reserve(n_elem());
 
   // counter of visited elements
@@ -1595,13 +1596,13 @@ ReplicatedMesh::get_disconnected_subdomains(std::vector<subdomain_id_type> * sub
     while (list.size() > 0)
     {
       // pop up an element
-      Elem * elem = list.back(); list.pop_back(); ++visited;
+      const Elem * elem = list.back(); list.pop_back(); ++visited;
 
       min_id = std::min(elem->id(), min_id);
 
       for (auto s : elem->side_index_range())
       {
-        Elem * neighbor = elem->neighbor_ptr(s);
+        const Elem * neighbor = elem->neighbor_ptr(s);
         if (neighbor != nullptr && (*subdomain_ids)[neighbor->id()] == Elem::invalid_subdomain_id)
         {
           // neighbor must be active

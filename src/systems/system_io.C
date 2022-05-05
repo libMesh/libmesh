@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,10 +19,6 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parallel.h"
 
-// C++ Includes
-#include <cstdio> // for std::sprintf
-#include <set>
-#include <numeric> // for std::partial_sum
 
 // Local Include
 #include "libmesh/libmesh_version.h"
@@ -32,7 +28,13 @@
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/dof_map.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+
+// C++ Includes
+#include <cstdio> // for std::sprintf
+#include <memory>
+#include <numeric> // for std::partial_sum
+#include <set>
 
 
 // Anonymous namespace for implementation details.
@@ -94,7 +96,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // System class implementation
 void System::read_header (Xdr & io,
-                          const std::string & version,
+                          std::string_view version,
                           const bool read_header_in,
                           const bool read_additional_data,
                           const bool read_legacy_format)
@@ -274,7 +276,7 @@ void System::read_header (Xdr & io,
       this->comm().broadcast(vec_name);
       if (io.version() >= LIBMESH_VERSION_ID(1,7,0))
         {
-          int vec_projection;
+          int vec_projection = 0;
           if (this->processor_id() == 0)
             io.data (vec_projection);
           this->comm().broadcast(vec_projection);
@@ -1299,7 +1301,7 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
 
 
 void System::write_header (Xdr & io,
-                           const std::string & /* version is currently unused */,
+                           std::string_view /* version is currently unused */,
                            const bool write_additional_data) const
 {
   /**
@@ -1632,10 +1634,10 @@ void System::write_parallel_data (Xdr & io,
   // Only write additional vectors if wanted
   if (write_additional_data)
     {
-      for (auto & pr : _vectors)
+      for (auto & [vec_name, vec] : _vectors)
         {
           io_buffer.clear();
-          io_buffer.reserve(pr.second->local_size());
+          io_buffer.reserve(vec->local_size());
 
           // Loop over each non-SCALAR variable and each node, and write out the value.
           for (unsigned int var=0; var<nv; var++)
@@ -1648,7 +1650,7 @@ void System::write_parallel_data (Xdr & io,
                       libmesh_assert_not_equal_to (node->dof_number(sys_num, var, comp),
                                                    DofObject::invalid_id);
 
-                      io_buffer.push_back((*pr.second)(node->dof_number(sys_num, var, comp)));
+                      io_buffer.push_back((*vec)(node->dof_number(sys_num, var, comp)));
                     }
 
                 // Then write the element DOF values
@@ -1658,7 +1660,7 @@ void System::write_parallel_data (Xdr & io,
                       libmesh_assert_not_equal_to (elem->dof_number(sys_num, var, comp),
                                                    DofObject::invalid_id);
 
-                      io_buffer.push_back((*pr.second)(elem->dof_number(sys_num, var, comp)));
+                      io_buffer.push_back((*vec)(elem->dof_number(sys_num, var, comp)));
                     }
               }
 
@@ -1673,7 +1675,7 @@ void System::write_parallel_data (Xdr & io,
                     dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
 
                     for (auto dof : SCALAR_dofs)
-                      io_buffer.push_back((*pr.second)(dof));
+                      io_buffer.push_back((*vec)(dof));
                   }
               }
 
@@ -1687,7 +1689,7 @@ void System::write_parallel_data (Xdr & io,
             comment = "# System \"";
             comment += this->name();
             comment += "\" Additional Vector \"";
-            comment += pr.first;
+            comment += vec_name;
             comment += "\"";
           }
 
@@ -2078,7 +2080,7 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
 
           // output_vals buffer is now filled for this block.
           // write it to disk
-          async_io = libmesh_make_unique<Threads::Thread>(threaded_io);
+          async_io = std::make_unique<Threads::Thread>(threaded_io);
           written_length += output_vals.size();
         }
 
@@ -2363,15 +2365,15 @@ std::size_t System::write_serialized_vectors (Xdr & io,
 
 
 
-template void System::read_parallel_data<Number> (Xdr & io, const bool read_additional_data);
-template void System::read_serialized_data<Number> (Xdr & io, const bool read_additional_data);
-template numeric_index_type System::read_serialized_vector<Number> (Xdr & io, NumericVector<Number> * vec);
-template std::size_t System::read_serialized_vectors<Number> (Xdr & io, const std::vector<NumericVector<Number> *> & vectors) const;
+template LIBMESH_EXPORT void System::read_parallel_data<Number> (Xdr & io, const bool read_additional_data);
+template LIBMESH_EXPORT void System::read_serialized_data<Number> (Xdr & io, const bool read_additional_data);
+template LIBMESH_EXPORT numeric_index_type System::read_serialized_vector<Number> (Xdr & io, NumericVector<Number> * vec);
+template LIBMESH_EXPORT std::size_t System::read_serialized_vectors<Number> (Xdr & io, const std::vector<NumericVector<Number> *> & vectors) const;
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template void System::read_parallel_data<Real> (Xdr & io, const bool read_additional_data);
-template void System::read_serialized_data<Real> (Xdr & io, const bool read_additional_data);
-template numeric_index_type System::read_serialized_vector<Real> (Xdr & io, NumericVector<Number> * vec);
-template std::size_t System::read_serialized_vectors<Real> (Xdr & io, const std::vector<NumericVector<Number> *> & vectors) const;
+template LIBMESH_EXPORT void System::read_parallel_data<Real> (Xdr & io, const bool read_additional_data);
+template LIBMESH_EXPORT void System::read_serialized_data<Real> (Xdr & io, const bool read_additional_data);
+template LIBMESH_EXPORT numeric_index_type System::read_serialized_vector<Real> (Xdr & io, NumericVector<Number> * vec);
+template LIBMESH_EXPORT std::size_t System::read_serialized_vectors<Real> (Xdr & io, const std::vector<NumericVector<Number> *> & vectors) const;
 #endif
 
 } // namespace libMesh

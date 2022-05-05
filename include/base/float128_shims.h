@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,11 @@
 
 #ifndef LIBMESH_FLOAT128_SHIMS_H
 #define LIBMESH_FLOAT128_SHIMS_H
+
+// The library configuration options
+#include "libmesh/libmesh_config.h"
+
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 
 # include <boost/multiprecision/float128.hpp>
 
@@ -177,5 +182,7 @@ inline long long llround
 // LIBMESH_FLOAT128_BINARY(hypot)
 
 }
+
+#endif // LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 
 #endif // LIBMESH_FLOAT128_SHIMS_H

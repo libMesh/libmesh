@@ -654,6 +654,8 @@ libmesh_optional_INCLUDES
 LIBMESH_ENABLE_METAPHYSICL_FALSE
 LIBMESH_ENABLE_METAPHYSICL_TRUE
 METAPHYSICL_INCLUDE
+BUILD_METAPHYSICL_FALSE
+BUILD_METAPHYSICL_TRUE
 LIBMESH_ENABLE_NANOFLANN_FALSE
 LIBMESH_ENABLE_NANOFLANN_TRUE
 NANOFLANN_INCLUDE
@@ -1291,6 +1293,8 @@ with_cppunit_lib
 enable_nanoflann
 enable_nanoflann_pointlocator
 enable_metaphysicl
+with_metaphysicl
+with_metaphysicl_include
 enable_metaphysicl_required
 '
       ac_precious_vars='build_alias
@@ -2190,6 +2194,10 @@ Optional Packages:
   --with-cppunit-include=PATH
                           Specify a path for cppunit header files
   --with-cppunit-lib=PATH Specify a path for cppunit libs
+  --with-metaphysicl=<internal,/some/dir>
+                          internal: build from contrib
+  --with-metaphysicl-include=</some/includedir>
+
 
 Some influential environment variables:
   PETSC_DIR   path to PETSc installation
@@ -3225,6 +3233,104 @@ $as_echo "$ac_res" >&6; }
 
 } # ac_fn_cxx_check_decl
 
+# ac_fn_cxx_check_func LINENO FUNC VAR
+# ------------------------------------
+# Tests whether FUNC exists, setting the cache variable VAR accordingly
+ac_fn_cxx_check_func ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+/* Define $2 to an innocuous variant, in case <limits.h> declares $2.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define $2 innocuous_$2
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char $2 (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef $2
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char $2 ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined __stub_$2 || defined __stub___$2
+choke me
+#endif
+
+int
+main ()
+{
+return $2 ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  eval "$3=yes"
+else
+  eval "$3=no"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_cxx_check_func
+
+# ac_fn_cxx_check_header_compile LINENO HEADER VAR INCLUDES
+# ---------------------------------------------------------
+# Tests whether HEADER exists and can be compiled using the include files in
+# INCLUDES, setting the cache variable VAR accordingly.
+ac_fn_cxx_check_header_compile ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+#include <$2>
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  eval "$3=yes"
+else
+  eval "$3=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_cxx_check_header_compile
+
 # ac_fn_c_check_header_mongrel LINENO HEADER VAR INCLUDES
 # -------------------------------------------------------
 # Tests whether HEADER exists, giving a warning if it cannot be compiled using
@@ -3315,37 +3421,6 @@ fi
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_check_header_mongrel
-
-# ac_fn_cxx_check_header_compile LINENO HEADER VAR INCLUDES
-# ---------------------------------------------------------
-# Tests whether HEADER exists and can be compiled using the include files in
-# INCLUDES, setting the cache variable VAR accordingly.
-ac_fn_cxx_check_header_compile ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
-$as_echo_n "checking for $2... " >&6; }
-if eval \${$3+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-#include <$2>
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  eval "$3=yes"
-else
-  eval "$3=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-eval ac_res=\$$3
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_cxx_check_header_compile
 cat >config.log <<_ACEOF
 This file contains any messages produced by compilers while
 running configure, to aid debugging if configure makes a mistake.
@@ -7777,7 +7852,7 @@ fi
 # one is found.  Exits if no acceptable flag is found.
 # --------------------------------------------------------------
 
-acsm_CXX_STD_MIN="2011"
+acsm_CXX_STD_MIN="2017"
 
 acsm_CXX_STD_MAX="2017"
 
@@ -15161,6 +15236,76 @@ $as_echo "$as_me: WARNING: libMesh requires C++11 support for std::isinf" >&2;}
            have_cxx_all=no
 fi
 
+
+    have_cxx17_splicing=no
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++17 std::*::merge" >&5
+$as_echo_n "checking for C++17 std::*::merge... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <map>
+    #include <set>
+    #include <unordered_map>
+    #include <unordered_set>
+
+int
+main ()
+{
+
+    std::set<int> s1{1}, s2{2};
+    std::unordered_set<int> us1{3}, us2{4};
+    std::map<int,int> m1{{5,6}}, m2{{7,8}};
+    std::unordered_map<int,int> um1{{9,10}}, um2{{11,12}};
+    s1.merge(std::move(s2));
+    us1.merge(std::move(us2));
+    m1.merge(std::move(m2));
+    um1.merge(std::move(um2));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+        have_cxx17_splicing=yes
+
+$as_echo "#define HAVE_CXX17_SPLICING 1" >>confdefs.h
+
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+        CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    if test "x$have_cxx17_splicing" != "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: libMesh prefers C++17 support for set/map merge" >&5
+$as_echo "$as_me: WARNING: libMesh prefers C++17 support for set/map merge" >&2;}
+fi
+
 fi
     if test "$HAVE_CXX17" = "1" -a "x$have_cxx_all" = xyes; then :
 
@@ -20227,6 +20372,76 @@ $as_echo "$as_me: WARNING: libMesh requires C++11 support for std::isinf" >&2;}
            have_cxx_all=no
 fi
 
+
+    have_cxx17_splicing=no
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++17 std::*::merge" >&5
+$as_echo_n "checking for C++17 std::*::merge... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <map>
+    #include <set>
+    #include <unordered_map>
+    #include <unordered_set>
+
+int
+main ()
+{
+
+    std::set<int> s1{1}, s2{2};
+    std::unordered_set<int> us1{3}, us2{4};
+    std::map<int,int> m1{{5,6}}, m2{{7,8}};
+    std::unordered_map<int,int> um1{{9,10}}, um2{{11,12}};
+    s1.merge(std::move(s2));
+    us1.merge(std::move(us2));
+    m1.merge(std::move(m2));
+    um1.merge(std::move(um2));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+        have_cxx17_splicing=yes
+
+$as_echo "#define HAVE_CXX17_SPLICING 1" >>confdefs.h
+
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+        CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    if test "x$have_cxx17_splicing" != "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: libMesh prefers C++17 support for set/map merge" >&5
+$as_echo "$as_me: WARNING: libMesh prefers C++17 support for set/map merge" >&2;}
+fi
+
 fi
     if test "$HAVE_CXX14" = "1" -a "x$have_cxx_all" = xyes; then :
 
@@ -24571,6 +24786,76 @@ fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: libMesh requires C++11 support for std::isinf" >&5
 $as_echo "$as_me: WARNING: libMesh requires C++11 support for std::isinf" >&2;}
            have_cxx_all=no
+fi
+
+
+    have_cxx17_splicing=no
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++17 std::*::merge" >&5
+$as_echo_n "checking for C++17 std::*::merge... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <map>
+    #include <set>
+    #include <unordered_map>
+    #include <unordered_set>
+
+int
+main ()
+{
+
+    std::set<int> s1{1}, s2{2};
+    std::unordered_set<int> us1{3}, us2{4};
+    std::map<int,int> m1{{5,6}}, m2{{7,8}};
+    std::unordered_map<int,int> um1{{9,10}}, um2{{11,12}};
+    s1.merge(std::move(s2));
+    us1.merge(std::move(us2));
+    m1.merge(std::move(m2));
+    um1.merge(std::move(um2));
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+        have_cxx17_splicing=yes
+
+$as_echo "#define HAVE_CXX17_SPLICING 1" >>confdefs.h
+
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+        CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    if test "x$have_cxx17_splicing" != "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: libMesh prefers C++17 support for set/map merge" >&5
+$as_echo "$as_me: WARNING: libMesh prefers C++17 support for set/map merge" >&2;}
 fi
 
 fi
@@ -44964,6 +45249,30 @@ fi
 
 done
 
+for ac_header in sys/time.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "sys/time.h" "ac_cv_header_sys_time_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_time_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SYS_TIME_H 1
+_ACEOF
+
+fi
+
+done
+
+for ac_header in process.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "process.h" "ac_cv_header_process_h" "$ac_includes_default"
+if test "x$ac_cv_header_process_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PROCESS_H 1
+_ACEOF
+
+fi
+
+done
+
 for ac_header in csignal
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "csignal" "ac_cv_header_csignal" "$ac_includes_default"
@@ -45310,6 +45619,19 @@ fi
 cat >>confdefs.h <<_ACEOF
 #define HAVE_DECL__MKDIR $ac_have_decl
 _ACEOF
+
+
+for ac_func in mkstemp gettimeofday
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_cxx_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+done
 
 
 # Check for uname header.
@@ -49063,42 +49385,16 @@ if test "x$enablepetsc" != "xno"; then :
     # that it has been called.
 
 
-
-    # Let's use a C compiler for the AC_CHECK_HEADER test, although this is
-    # not strictly necessary...
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    as_ac_Header=`$as_echo "ac_cv_header_${PETSC_DIR}/${PETSC_ARCH}/include/petscversion.h" | $as_tr_sh`
-ac_fn_c_check_header_mongrel "$LINENO" "${PETSC_DIR}/${PETSC_ARCH}/include/petscversion.h" "$as_ac_Header" "$ac_includes_default"
-if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+    # Find petscversion.h
+    if test -r ${PETSC_DIR}/${PETSC_ARCH}/include/petscversion.h; then :
   enablepetsc=yes; enablepetsc_mpi=yes
-                     petsc_version_h_file=${PETSC_DIR}/${PETSC_ARCH}/include/petscversion.h
-else
-
-      as_ac_Header=`$as_echo "ac_cv_header_${PETSC_DIR}/include/petscversion.h" | $as_tr_sh`
-ac_fn_c_check_header_mongrel "$LINENO" "${PETSC_DIR}/include/petscversion.h" "$as_ac_Header" "$ac_includes_default"
-if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+                                                                        petsc_version_h_file=${PETSC_DIR}/${PETSC_ARCH}/include/petscversion.h
+elif test -r ${PETSC_DIR}/include/petscversion.h; then :
   enablepetsc=yes; enablepetsc_mpi=yes
-                       petsc_version_h_file=${PETSC_DIR}/include/petscversion.h
+                                                          petsc_version_h_file=${PETSC_DIR}/include/petscversion.h
 else
   enablepetsc=no; enablepetsc_mpi=no
 fi
-
-
-
-fi
-
-
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
 
             petsc_have_hypre=0
 
@@ -54563,8 +54859,24 @@ fi
 
 
 # --------------------------------------------------------------
-# HDF5 -- enabled by default
+# HDF5 -- disabled by default
 # --------------------------------------------------------------
+
+# PETSc configure can --download-hdf5, and that's a really convenient
+# feature for users ... but libMesh --enable-hdf5 will only detect it
+# if we add PETSc include and lib directory flags *here*; if we wait
+# until build time it's too late.
+
+ac_PETSCHDF5_save_CPPFLAGS="$CPPFLAGS"
+ac_PETSCHDF5_save_LDFLAGS="$LDFLAGS"
+
+if test "x$enablepetsc" != "xno"; then :
+
+        CPPFLAGS="$PETSCINCLUDEDIRS $CPPFLAGS"
+        LDFLAGS="$PETSCLINKLIBS $LDFLAGS"
+
+fi
+
 
   # Check whether --enable-hdf5 was given.
 if test "${enable_hdf5+set}" = set; then :
@@ -54928,6 +55240,10 @@ $as_echo "<<< Configuring library with HDF5 support >>>" >&6; }
 fi
 
 fi
+
+
+CPPFLAGS="$ac_PETSCHDF5_save_CPPFLAGS"
+LDFLAGS="$ac_PETSCHDF5_save_LDFLAGS"
 
 if test $enablehdf5 = yes; then :
 
@@ -56115,6 +56431,44 @@ else
 fi
 
 
+
+# Check whether --with-metaphysicl was given.
+if test "${with_metaphysicl+set}" = set; then :
+  withval=$with_metaphysicl; case "${withval}" in #(
+  internal) :
+    build_metaphysicl=yes ;; #(
+  yes) :
+    build_metaphysicl=yes ;; #(
+  *) :
+    METAPHYSICL_DIR="${withval}"
+                        build_metaphysicl=no ;;
+esac
+               enablemetaphysicl=yes
+else
+  build_metaphysicl=yes
+fi
+
+
+
+# Check whether --with-metaphysicl-include was given.
+if test "${with_metaphysicl_include+set}" = set; then :
+  withval=$with_metaphysicl_include; METAPHYSICL_INCLUDE="-I${withval}"
+               METAPHYSICL_INC="-I${withval}"
+               enablemetaphysicl=yes
+               build_metaphysicl=no
+else
+  if test "x$build_metaphysicl" = "xyes"; then :
+  METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/src/numerics/include -I\$(top_srcdir)/contrib/metaphysicl/src/core/include -I\$(top_srcdir)/contrib/metaphysicl/src/utilities/include"
+                      METAPHYSICL_INC="-I$top_srcdir/contrib/metaphysicl/src/numerics/include -I$top_srcdir/contrib/metaphysicl/src/core/include -I$top_srcdir/contrib/metaphysicl/src/utilities/include"
+else
+  METAPHYSICL_INCLUDE="-I$METAPHYSICL_DIR/include"
+                      METAPHYSICL_INC="-I$METAPHYSICL_DIR/include"
+fi
+
+fi
+
+
+
                 # Check whether --enable-metaphysicl-required was given.
 if test "${enable_metaphysicl_required+set}" = set; then :
   enableval=$enable_metaphysicl_required; case "${enableval}" in #(
@@ -56134,13 +56488,64 @@ fi
   enablemetaphysicl=yes
 fi
 
-    if test "x$enablemetaphysicl" = "xyes" && test -r $top_srcdir/contrib/metaphysicl/README; then :
-  enablemetaphysicl=yes
+    if test "x$enablemetaphysicl" = "xyes"; then :
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MetaPhysicL NumberArray support" >&5
+$as_echo_n "checking for MetaPhysicL NumberArray support... " >&6; }
+          ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+          old_CXXFLAGS="$CXXFLAGS"
+          CXXFLAGS="$CXXFLAGS $METAPHYSICL_INC"
+
+          cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+          #include "metaphysicl/numberarray.h"
+
+int
+main ()
+{
+
+              MetaPhysicL::NumberArray<4, double> x;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+              enablemetaphysicl=yes
+              { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
 else
 
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Configuring metaphysicl failed, you may need to run 'git submodule update --init' first <<<" >&5
-$as_echo ">>> Configuring metaphysicl failed, you may need to run 'git submodule update --init' first <<<" >&6; }
-          enablemetaphysicl=no
+              enablemetaphysicl=no
+              { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+              if test "x$build_metaphysicl" = "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Metaphysicl not found, you may need to run 'git submodule update --init' first <<<" >&5
+$as_echo ">>> Metaphysicl not found, you may need to run 'git submodule update --init' first <<<" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Metaphysicl not found in specified location <<<" >&5
+$as_echo ">>> Metaphysicl not found in specified location <<<" >&6; }
+fi
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+                    CXXFLAGS="$old_CXXFLAGS"
+          ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
 
 fi
 
@@ -56148,9 +56553,8 @@ fi
   as_fn_error 5 "*** MetaPhysicL was not found, but --enable-metaphysicl-required was specified." "$LINENO" 5
 fi
 
-        if test "x$enablemetaphysicl" = "xyes"; then :
+  if test "x$enablemetaphysicl" = "xyes"; then :
 
-          METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/src/numerics/include -I\$(top_srcdir)/contrib/metaphysicl/src/core/include -I\$(top_srcdir)/contrib/metaphysicl/src/utilities/include"
 
 $as_echo "#define HAVE_METAPHYSICL 1" >>confdefs.h
 
@@ -56174,6 +56578,10 @@ fi
                               my_top_srcdir="$(cd $srcdir && pwd)"
 
 
+          if test "x$build_metaphysicl" = "xyes"; then :
+
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with built-in MetaPhysicL support >>>" >&5
+$as_echo "<<< Configuring library with built-in MetaPhysicL support >>>" >&6; }
 
 
   # Various preliminary checks.
@@ -56293,11 +56701,24 @@ $as_echo "$as_me: WARNING: could not find source tree for $ax_dir" >&2;}
 
 
 else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with external MetaPhysicL support >>>" >&5
+$as_echo "<<< Configuring library with external MetaPhysicL support >>>" >&6; }
+fi
+
+else
 
           METAPHYSICL_INCLUDE=""
-          enablemetaphysicl=no
 
 fi
+
+   if test x$build_metaphysicl = xyes; then
+  BUILD_METAPHYSICL_TRUE=
+  BUILD_METAPHYSICL_FALSE='#'
+else
+  BUILD_METAPHYSICL_TRUE='#'
+  BUILD_METAPHYSICL_FALSE=
+fi
+
 
 
 
@@ -56493,10 +56914,30 @@ fi
 # additional arguments to be passed to those packages, do that here.
 # Specifically, we append libmesh_subpackage_arguments to ac_configure_args
 # before AC_OUTPUT recurses into our subpackages
+
+# We need our netcdf subpackage to be able to use whatever HDF5 we've
+# detected.  That means using whatever $HDF5_CPPFLAGS and $HDF5_LIBS
+# we've determined work - but if we're using PETSc it also means
+# passing along PETSc's directories in case we want to link to a
+# --download-hdf5 build there.
+SUB_CPPFLAGS="$CPPFLAGS"
+SUB_LIBS="$LIBS"
+if test $enablehdf5 = yes; then :
+
+       SUB_CPPFLAGS="$HDF5_CPPFLAGS $SUB_CPPFLAGS"
+       SUB_LIBS="$HDF5_LIBS $SUB_LIBS"
+       if test "x$enablepetsc" != "xno"; then :
+
+              SUB_CPPFLAGS="$PETSCINCLUDEDIRS $SUB_CPPFLAGS"
+              SUB_LIBS="$PETSCLINKLIBS $SUB_LIBS"
+
+fi
+fi
+
 if test "x$enablenested" = "xyes"; then :
 
         ac_configure_args_SAVE="$ac_configure_args"
-        ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC' CPPFLAGS='$HDF5_CPPFLAGS $CPPFLAGS' LIBS='$HDF5_LIBS $LIBS'"
+        ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC' CPPFLAGS='$SUB_CPPFLAGS' LIBS='$SUB_LIBS'"
 
 fi
 
@@ -57380,6 +57821,10 @@ $as_echo "$as_me: running $SHELL $ax_sub_configure $ax_sub_configure_args --cach
         cd "$ax_popdir"
       fi
 
+if test -z "${BUILD_METAPHYSICL_TRUE}" && test -z "${BUILD_METAPHYSICL_FALSE}"; then
+  as_fn_error $? "conditional \"BUILD_METAPHYSICL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${LIBMESH_ENABLE_METAPHYSICL_TRUE}" && test -z "${LIBMESH_ENABLE_METAPHYSICL_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_METAPHYSICL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5

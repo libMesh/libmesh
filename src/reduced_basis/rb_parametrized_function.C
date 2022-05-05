@@ -248,11 +248,8 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
     }
 
   unsigned int counter = 0;
-  for (const auto & xyz_pair : all_xyz)
+  for (const auto & [elem_id, xyz_vec] : all_xyz)
     {
-      dof_id_type elem_id = xyz_pair.first;
-      const std::vector<Point> & xyz_vec = xyz_pair.second;
-
       subdomain_id_type subdomain_id = libmesh_map_find(sbd_ids, elem_id);
 
       // The amount of data to be stored for each component
@@ -572,6 +569,26 @@ std::vector<std::vector<Number>> RBParametrizedFunction::evaluate_at_observation
                       obs_pt_values);
 
   return obs_pt_values[0];
+}
+
+void RBParametrizedFunction::get_spatial_indices(std::vector<std::vector<unsigned int>> & /*spatial_indices*/,
+                                                 const std::vector<dof_id_type> & /*elem_ids*/,
+                                                 const std::vector<unsigned int> & /*side_indices*/,
+                                                 const std::vector<unsigned int> & /*qps*/,
+                                                 const std::vector<subdomain_id_type> & /*sbd_ids*/,
+                                                 const std::vector<boundary_id_type> & /*boundary_ids*/)
+{
+  // No-op by default
+}
+
+void RBParametrizedFunction::initialize_spatial_indices(const std::vector<std::vector<unsigned int>> & /*spatial_indices*/,
+                                                        const std::vector<dof_id_type> & /*elem_ids*/,
+                                                        const std::vector<unsigned int> & /*side_indices*/,
+                                                        const std::vector<unsigned int> & /*qps*/,
+                                                        const std::vector<subdomain_id_type> & /*sbd_ids*/,
+                                                        const std::vector<boundary_id_type> & /*boundary_ids*/)
+{
+  // No-op by default
 }
 
 const std::set<boundary_id_type> & RBParametrizedFunction::get_parametrized_function_boundary_ids() const

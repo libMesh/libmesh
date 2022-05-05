@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -197,8 +197,8 @@ public:
    * any value.  For that you need to call the l2_error(), h1_error()
    * or h2_error() functions respectively.
    */
-  void compute_error(const std::string & sys_name,
-                     const std::string & unknown_name);
+  void compute_error(std::string_view sys_name,
+                     std::string_view unknown_name);
 
   /**
    * \returns The integrated L2 error for the system \p sys_name for the
@@ -207,8 +207,8 @@ public:
    * \note No error computations are actually performed, you must call
    * \p compute_error() for that.
    */
-  Real l2_error(const std::string & sys_name,
-                const std::string & unknown_name);
+  Real l2_error(std::string_view sys_name,
+                std::string_view unknown_name);
 
   /**
    * \returns The integrated L1 error for the system \p sys_name for
@@ -217,8 +217,8 @@ public:
    * \note No error computations are actually performed, you must call
    * \p compute_error() for that.
    */
-  Real l1_error(const std::string & sys_name,
-                const std::string & unknown_name);
+  Real l1_error(std::string_view sys_name,
+                std::string_view unknown_name);
 
   /**
    * \returns The L_INF error for the system \p sys_name for
@@ -232,8 +232,8 @@ public:
    * compute it, we take the max of the absolute value of the error
    * over all the quadrature points.
    */
-  Real l_inf_error(const std::string & sys_name,
-                   const std::string & unknown_name);
+  Real l_inf_error(std::string_view sys_name,
+                   std::string_view unknown_name);
 
   /**
    * \returns The H1 error for the system \p sys_name for the unknown
@@ -242,8 +242,8 @@ public:
    * \note No error computations are actually performed, you must call
    * \p compute_error() for that.
    */
-  Real h1_error(const std::string & sys_name,
-                const std::string & unknown_name);
+  Real h1_error(std::string_view sys_name,
+                std::string_view unknown_name);
 
   /**
    * \returns The H(curl) error for the system \p sys_name for the
@@ -255,8 +255,8 @@ public:
    * \note This is only valid for vector-valued elements. An error is
    * thrown if requested for scalar-valued elements.
    */
-  Real hcurl_error(const std::string & sys_name,
-                   const std::string & unknown_name);
+  Real hcurl_error(std::string_view sys_name,
+                   std::string_view unknown_name);
 
   /**
    * \returns The H(div) error for the system \p sys_name for the
@@ -268,8 +268,8 @@ public:
    * \note This is only valid for vector-valued elements. An error is
    * thrown if requested for scalar-valued elements.
    */
-  Real hdiv_error(const std::string & sys_name,
-                  const std::string & unknown_name);
+  Real hdiv_error(std::string_view sys_name,
+                  std::string_view unknown_name);
 
   /**
    * \returns The H2 error for the system \p sys_name for the unknown
@@ -278,8 +278,8 @@ public:
    * \note No error computations are actually performed, you must call
    * \p compute_error() for that.
    */
-  Real h2_error(const std::string & sys_name,
-                const std::string & unknown_name);
+  Real h2_error(std::string_view sys_name,
+                std::string_view unknown_name);
 
   /**
    * \returns The error in the requested norm for the system \p
@@ -291,8 +291,8 @@ public:
    * \note The result is not exact, but an approximation based on the
    * chosen quadrature rule.
    */
-  Real error_norm(const std::string & sys_name,
-                  const std::string & unknown_name,
+  Real error_norm(std::string_view sys_name,
+                  std::string_view unknown_name,
                   const FEMNormType & norm);
 private:
 
@@ -303,8 +303,8 @@ private:
    * solving for several unknowns in several systems.
    */
   template<typename OutputShape>
-  void _compute_error(const std::string & sys_name,
-                      const std::string & unknown_name,
+  void _compute_error(std::string_view sys_name,
+                      std::string_view unknown_name,
                       std::vector<Real> & error_vals);
 
   /**
@@ -313,8 +313,8 @@ private:
    *
    * \returns A reference to the proper vector for storing the values.
    */
-  std::vector<Real> & _check_inputs(const std::string & sys_name,
-                                    const std::string & unknown_name);
+  std::vector<Real> & _check_inputs(std::string_view sys_name,
+                                    std::string_view unknown_name);
 
   /**
    * User-provided functors which compute the exact value of the
@@ -342,7 +342,8 @@ private:
    * The name of the unknown is
    * the key for the map.
    */
-  typedef std::map<std::string, std::vector<Real>> SystemErrorMap;
+  typedef std::map<std::string, std::vector<Real>, std::less<>>
+    SystemErrorMap;
 
   /**
    * A map of SystemErrorMaps, which contains entries
@@ -350,7 +351,7 @@ private:
    * This is required, since it is possible for two
    * systems to have unknowns with the *same name*.
    */
-  std::map<std::string, SystemErrorMap> _errors;
+  std::map<std::string, SystemErrorMap, std::less<>> _errors;
 
   /**
    * Constant reference to the \p EquationSystems object

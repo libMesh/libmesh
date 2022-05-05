@@ -23,7 +23,7 @@ class MeshAssignTest : public CppUnit::TestCase {
    * derived classes. Future extensions can include copy assignment, move and copy constructors.
    */
 public:
-  CPPUNIT_TEST_SUITE( MeshAssignTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( MeshAssignTest );
 
 /* Tests need a 2d mesh and Dirichlet boundary conditions */
 #if LIBMESH_DIM > 1
@@ -53,7 +53,6 @@ public:
   void testMeshMoveAssign(const std::string & mesh_type,
                           const std::string & mesh_creation_type)
   {
-
     // Create two mesh ptrs.
     std::shared_ptr<UnstructuredMesh> mesh_one;
     std::shared_ptr<UnstructuredMesh> mesh_two;
@@ -150,7 +149,7 @@ public:
                                               QUAD4);
 
           // Uniformly refine mesh_two
-          std::unique_ptr<MeshRefinement> mesh_refinement(libmesh_make_unique<MeshRefinement>(*mesh_two));
+          std::unique_ptr<MeshRefinement> mesh_refinement(std::make_unique<MeshRefinement>(*mesh_two));
 
           mesh_refinement->uniformly_refine(1);
 
@@ -204,22 +203,22 @@ public:
   }
 
   void testMeshMoveAssignFromMemory()
-  { testMeshMoveAssign("Mesh", "from_memory"); }
+  { LOG_UNIT_TEST; testMeshMoveAssign("Mesh", "from_memory"); }
 
   void testReplicatedMeshMoveAssignFromMemory()
-  { testMeshMoveAssign("replicated", "from_memory"); }
+  { LOG_UNIT_TEST; testMeshMoveAssign("replicated", "from_memory"); }
 
   void testDistributedMeshMoveAssignFromMemory()
-  { testMeshMoveAssign("distributed", "from_memory"); }
+  { LOG_UNIT_TEST; testMeshMoveAssign("distributed", "from_memory"); }
 
   void testMeshMoveAssignFromFile()
-  { testMeshMoveAssign("Mesh", "from_file"); }
+  { LOG_UNIT_TEST; testMeshMoveAssign("Mesh", "from_file"); }
 
   void testReplicatedMeshMoveAssignFromFile()
-  { testMeshMoveAssign("replicated", "from_file"); }
+  { LOG_UNIT_TEST; testMeshMoveAssign("replicated", "from_file"); }
 
   void testDistributedMeshMoveAssignFromFile()
-  { testMeshMoveAssign("distributed", "from_file"); }
+  { LOG_UNIT_TEST; testMeshMoveAssign("distributed", "from_file"); }
 
 }; // End definition of class MeshAssignTest
 

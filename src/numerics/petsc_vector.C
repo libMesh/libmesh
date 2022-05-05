@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -147,6 +147,7 @@ void PetscVector<T>::set (const numeric_index_type i, const T value)
   PetscInt i_val = static_cast<PetscInt>(i);
   PetscScalar petsc_value = PS(value);
 
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   ierr = VecSetValues (_vec, 1, &i_val, &petsc_value, INSERT_VALUES);
   LIBMESH_CHKERR(ierr);
 
@@ -189,6 +190,7 @@ void PetscVector<T>::add (const numeric_index_type i, const T value)
   PetscInt i_val = static_cast<PetscInt>(i);
   PetscScalar petsc_value = PS(value);
 
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   ierr = VecSetValues (_vec, 1, &i_val, &petsc_value, ADD_VALUES);
   LIBMESH_CHKERR(ierr);
 
@@ -211,6 +213,7 @@ void PetscVector<T>::add_vector (const T * v,
   const PetscInt * i_val = reinterpret_cast<const PetscInt *>(dof_indices.data());
   const PetscScalar * petsc_value = pPS(v);
 
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   ierr = VecSetValues (_vec, cast_int<PetscInt>(dof_indices.size()),
                        i_val, petsc_value, ADD_VALUES);
   LIBMESH_CHKERR(ierr);
@@ -362,6 +365,7 @@ void PetscVector<T>::insert (const T * v,
 
   PetscErrorCode ierr=0;
   PetscInt * idx_values = numeric_petsc_cast(dof_indices.data());
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   ierr = VecSetValues (_vec, cast_int<PetscInt>(dof_indices.size()),
                        idx_values, pPS(v), INSERT_VALUES);
   LIBMESH_CHKERR(ierr);
@@ -1151,22 +1155,24 @@ void PetscVector<T>::_get_array(bool read_only) const
 {
   libmesh_assert (this->initialized());
 
+  const bool initially_array_is_present = _array_is_present.load(std::memory_order_acquire);
+
   // If the values have already been retrieved and we're currently
   // trying to get a non-read only view (ie read/write) and the
   // values are currently read only... then we need to restore
   // the array first... and then retrieve it again.
-  if (_array_is_present && !read_only && _values_read_only)
+  if (initially_array_is_present && !read_only && _values_read_only)
     _restore_array();
 
   // If we already have a read/write array - and we're trying
   // to get a read only array - let's just use the read write
-  if (_array_is_present && read_only && !_values_read_only)
+  if (initially_array_is_present && read_only && !_values_read_only)
     _read_only_values = _values;
 
-  if (!_array_is_present)
+  if (!initially_array_is_present)
     {
-      std::lock_guard<std::mutex> do_once_lock(_petsc_vector_do_once_mutex);
-      if (!_array_is_present)
+      std::scoped_lock lock(_petsc_get_restore_array_mutex);
+      if (!_array_is_present.load(std::memory_order_relaxed))
         {
           PetscErrorCode ierr=0;
           if (this->type() != GHOSTED)
@@ -1214,8 +1220,7 @@ void PetscVector<T>::_get_array(bool read_only) const
             _first = static_cast<numeric_index_type>(petsc_first);
             _last = static_cast<numeric_index_type>(petsc_last);
           }
-          _array_is_present = true;
-          _petsc_vector_cv.notify_all();
+          _array_is_present.store(true, std::memory_order_release);
         }
     }
 }
@@ -1228,20 +1233,11 @@ void PetscVector<T>::_restore_array() const
   libmesh_error_msg_if(_values_manually_retrieved,
                        "PetscVector values were manually retrieved but are being automatically restored!");
 
-#ifdef LIBMESH_HAVE_CXX11_THREAD
-  std::atomic_thread_fence(std::memory_order_acquire);
-#else
-  Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
-#endif
-
   libmesh_assert (this->initialized());
-  if (_array_is_present)
+  if (_array_is_present.load(std::memory_order_acquire))
     {
-#ifdef LIBMESH_HAVE_CXX11_THREAD
-      std::lock_guard<std::mutex> lock(_petsc_vector_mutex);
-#endif
-
-      if (_array_is_present)
+      std::scoped_lock lock(_petsc_get_restore_array_mutex);
+      if (_array_is_present.load(std::memory_order_relaxed))
         {
           PetscErrorCode ierr=0;
           if (this->type() != GHOSTED)
@@ -1268,12 +1264,7 @@ void PetscVector<T>::_restore_array() const
               _local_form = nullptr;
               _local_size = 0;
             }
-#ifdef LIBMESH_HAVE_CXX11_THREAD
-          std::atomic_thread_fence(std::memory_order_release);
-          _array_is_present.store(false, std::memory_order_relaxed);
-#else
-          _array_is_present = false;
-#endif
+          _array_is_present.store(false, std::memory_order_release);
         }
     }
 }
@@ -1283,7 +1274,7 @@ void PetscVector<T>::_restore_array() const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class PetscVector<Number>;
+template class LIBMESH_EXPORT PetscVector<Number>;
 
 } // namespace libMesh
 

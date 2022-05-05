@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -46,19 +46,23 @@
  * \author John W. Peterson
  * \date 2004
  */
-template<class Predicate, class Type, class ReferenceType = Type &, class PointerType = Type *>
-class variant_filter_iterator :
-#if defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER)
-  public std::forward_iterator<std::forward_iterator_tag, Type>
-#else
-  public std::iterator<std::forward_iterator_tag,  Type>
-#endif
+template<class Predicate, class Type, class ReferenceType = Type &, class PointerType = Type *,
+                          class ConstType = const Type, class ConstReferenceType = const Type &,
+                          class ConstPointerType = const Type *>
+class variant_filter_iterator
 {
 public:
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = Type;
+  using difference_type = std::ptrdiff_t;
+  using pointer = PointerType;
+  using reference = ReferenceType;
+
   /**
    * Shortcut name for the fully-qualified typename.
    */
-  typedef variant_filter_iterator<Predicate, Type, ReferenceType, PointerType> Iterator;
+  typedef variant_filter_iterator<Predicate, Type, ReferenceType, PointerType,
+                                  ConstType, ConstReferenceType, ConstPointerType> Iterator;
 
 
 
@@ -87,7 +91,7 @@ public:
     virtual bool equal(const IterBase * other) const = 0;
 
     // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::IterBase const_IterBase;
-    typedef typename variant_filter_iterator<Predicate, Type const, Type const & , Type const *>::IterBase const_IterBase;
+    typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::IterBase const_IterBase;
 
     /**
      * Similar to the \p clone() function.
@@ -113,7 +117,7 @@ public:
     virtual bool operator()(const IterBase * in) const = 0;
 
     // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::PredBase const_PredBase;
-    typedef typename variant_filter_iterator<Predicate, Type const, Type const &, Type const *>::PredBase const_PredBase;
+    typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::PredBase const_PredBase;
 
     /**
      * Similar to the \p clone() function.
@@ -186,7 +190,7 @@ public:
        * Important typedef for const_iterators.  Notice the weird syntax!  Does it compile everywhere?
        */
       // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::template Iter<IterType> const_Iter;
-      typedef typename variant_filter_iterator<Predicate, Type const, Type const &,  Type const *>::template Iter<IterType> const_Iter;
+      typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::template Iter<IterType> const_Iter;
 
       typename IterBase::const_IterBase * copy =
         new const_Iter(iter_data);
@@ -199,7 +203,7 @@ public:
      */
     virtual ReferenceType operator*() const override
     {
-      return * iter_data;
+      return * this->iter_ptr();
     }
 
     /**
@@ -234,6 +238,15 @@ public:
      * This is the iterator passed by the user.
      */
     IterType iter_data;
+  private:
+    /**
+     * This seems to work around a bug in g++ prior to version 10 and
+     * clang++ prior to version 10
+     */
+    PointerType iter_ptr () const
+    {
+      return &*iter_data;
+    }
   };
 
 
@@ -284,7 +297,7 @@ public:
        * Important typedef for const_iterators.
        */
       //      typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::template Pred<IterType, PredType> const_Pred;
-      typedef typename variant_filter_iterator<Predicate, Type const, Type const &,  Type const *>::template Pred<IterType, PredType> const_Pred;
+      typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::template Pred<IterType, PredType> const_Pred;
 
 
       typename PredBase::const_PredBase * copy =
@@ -401,8 +414,10 @@ public:
    * you have:
    * Type=int * const, ReferenceType=int * const & , PointerType=int * const *
    */
-  template <class OtherType, class OtherReferenceType, class OtherPointerType>
-  variant_filter_iterator (const variant_filter_iterator<Predicate, OtherType, OtherReferenceType, OtherPointerType> & rhs)
+  template <class OtherType, class OtherReferenceType, class OtherPointerType,
+            class OtherConstType, class OtherConstReferenceType, class OtherConstPointerType>
+  variant_filter_iterator (const variant_filter_iterator<Predicate, OtherType, OtherReferenceType, OtherPointerType,
+                                                         OtherConstType, OtherConstReferenceType, OtherConstPointerType> & rhs)
     : data (rhs.data != nullptr ? rhs.data->const_clone() : nullptr),
       end  (rhs.end  != nullptr ? rhs.end->const_clone()  : nullptr),
       pred (rhs.pred != nullptr ? rhs.pred->const_clone() : nullptr)
@@ -518,10 +533,13 @@ private:
 
 
 // op==
-template<class Predicate, class Type, class ReferenceType, class PointerType>
+template<class Predicate, class Type, class ReferenceType, class PointerType,
+         class OtherConstType, class OtherConstReferenceType, class OtherConstPointerType>
 inline
-bool operator==(const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType> & x,
-                const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType> & y)
+bool operator==(const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType,
+                                              OtherConstType, OtherConstReferenceType, OtherConstPointerType> & x,
+                const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType,
+                                              OtherConstType, OtherConstReferenceType, OtherConstPointerType> & y)
 {
   return x.equal(y);
 }
@@ -529,10 +547,13 @@ bool operator==(const variant_filter_iterator<Predicate, Type, ReferenceType, Po
 
 
 // op!=
-template<class Predicate, class Type, class ReferenceType, class PointerType>
+template<class Predicate, class Type, class ReferenceType, class PointerType,
+         class OtherConstType, class OtherConstReferenceType, class OtherConstPointerType>
 inline
-bool operator!=(const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType> & x,
-                const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType> & y)
+bool operator!=(const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType,
+                                              OtherConstType, OtherConstReferenceType, OtherConstPointerType> & x,
+                const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType,
+                                              OtherConstType, OtherConstReferenceType, OtherConstPointerType> & y)
 {
   return !(x == y);
 }

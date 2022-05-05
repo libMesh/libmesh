@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -378,7 +378,7 @@ void sync_dofobject_data_by_id(const Communicator & comm,
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
-      DofObject * obj = *it;
+      const DofObject * obj = *it;
       libmesh_assert (obj);
 
       // We may want to pass Elem* or Node* to the check function, not
@@ -406,7 +406,7 @@ void sync_dofobject_data_by_id(const Communicator & comm,
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
-      DofObject * obj = *it;
+      const DofObject * obj = *it;
 
       if (!dofobj_check(*it))
         continue;

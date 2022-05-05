@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -438,7 +438,7 @@ NoxNonlinearSolver<T>::get_total_linear_iterations()
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class NoxNonlinearSolver<Number>;
+template class LIBMESH_EXPORT NoxNonlinearSolver<Number>;
 
 } // namespace libMesh
 

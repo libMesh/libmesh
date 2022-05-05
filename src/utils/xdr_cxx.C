@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,12 +20,9 @@
 #include <cstring>
 #include <limits>
 #include <iomanip>
+#include <memory>
 #include <sstream>
 #include <fstream>
-
-#ifdef LIBMESH_HAVE_UNISTD_H
-#include <unistd.h> // for getpid()
-#endif
 
 // Local includes
 #include "libmesh/xdr_cxx.h"
@@ -35,14 +32,20 @@
 # include "gzstream.h" // For reading/writing compressed streams
 # include "libmesh/restore_warnings.h"
 #endif
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/utility.h" // unzip_file
+
+#ifdef LIBMESH_HAVE_UNISTD_H
+#include <unistd.h> // for getpid() on Unix
+#endif
+#ifdef LIBMESH_HAVE_PROCESS_H
+#include <process.h> // for getpid() on Windows
+#endif
 
 // Anonymous namespace for implementation details.
 namespace {
 
 // Nasty hacks for reading/writing zipped files
-void bzip_file (const std::string & unzipped_name)
+void bzip_file (std::string_view unzipped_name)
 {
 #ifdef LIBMESH_HAVE_BZIP
   LOG_SCOPE("system(bzip2)", "XdrIO");
@@ -56,7 +59,7 @@ void bzip_file (const std::string & unzipped_name)
 #endif
 }
 
-void xzip_file (const std::string & unzipped_name)
+void xzip_file (std::string_view unzipped_name)
 {
 #ifdef LIBMESH_HAVE_XZ
   LOG_SCOPE("system(xz)", "XdrIO");
@@ -72,7 +75,7 @@ void xzip_file (const std::string & unzipped_name)
 
 
 // remove an unzipped file
-void remove_unzipped_file (const std::string & name)
+void remove_unzipped_file (std::string_view name)
 {
   std::ostringstream pid_suffix;
   pid_suffix << '_' << getpid();
@@ -99,10 +102,10 @@ namespace libMesh
 
 //-------------------------------------------------------------
 // Xdr class implementation
-Xdr::Xdr (const std::string & name,
+Xdr::Xdr (std::string name,
           const XdrMODE m) :
   mode(m),
-  file_name(name),
+  file_name(std::move(name)),
 #ifdef LIBMESH_HAVE_XDR
   fp(nullptr),
 #endif
@@ -114,7 +117,7 @@ Xdr::Xdr (const std::string & name,
   xzipped_file(false),
   version_number(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION, LIBMESH_MINOR_VERSION, LIBMESH_MICRO_VERSION))
 {
-  this->open(name);
+  this->open(file_name);
 }
 
 
@@ -126,11 +129,11 @@ Xdr::~Xdr()
 
 
 
-void Xdr::open (const std::string & name)
+void Xdr::open (std::string name)
 {
-  file_name = name;
+  file_name = std::move(name);
 
-  if (name == "")
+  if (file_name == "")
     return;
 
   switch (mode)
@@ -140,10 +143,10 @@ void Xdr::open (const std::string & name)
       {
 #ifdef LIBMESH_HAVE_XDR
 
-        fp = fopen(name.c_str(), (mode == ENCODE) ? "w" : "r");
+        fp = fopen(file_name.c_str(), (mode == ENCODE) ? "w" : "r");
         if (!fp)
-          libmesh_file_error(name.c_str());
-        xdrs = libmesh_make_unique<XDR>();
+          libmesh_file_error(file_name.c_str());
+        xdrs = std::make_unique<XDR>();
         xdrstdio_create (xdrs.get(), fp, (mode == ENCODE) ? XDR_ENCODE : XDR_DECODE);
 #else
 
@@ -158,9 +161,9 @@ void Xdr::open (const std::string & name)
 
     case READ:
       {
-        gzipped_file = (name.size() - name.rfind(".gz")  == 3);
-        bzipped_file = (name.size() - name.rfind(".bz2") == 4);
-        xzipped_file = (name.size() - name.rfind(".xz") == 3);
+        gzipped_file = (file_name.size() - file_name.rfind(".gz")  == 3);
+        bzipped_file = (file_name.size() - file_name.rfind(".bz2") == 4);
+        xzipped_file = (file_name.size() - file_name.rfind(".xz") == 3);
 
         if (gzipped_file)
           {
@@ -168,7 +171,7 @@ void Xdr::open (const std::string & name)
             igzstream * inf = new igzstream;
             libmesh_assert(inf);
             in.reset(inf);
-            inf->open(name.c_str(), std::ios::in);
+            inf->open(file_name.c_str(), std::ios::in);
 #else
             libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
 #endif
@@ -179,7 +182,7 @@ void Xdr::open (const std::string & name)
             libmesh_assert(inf);
             in.reset(inf);
 
-            std::string new_name = Utility::unzip_file(name);
+            std::string new_name = Utility::unzip_file(file_name);
 
             inf->open(new_name.c_str(), std::ios::in);
           }
@@ -187,15 +190,15 @@ void Xdr::open (const std::string & name)
         libmesh_assert(in.get());
 
         if (!in->good())
-          libmesh_file_error(name);
+          libmesh_file_error(file_name);
         return;
       }
 
     case WRITE:
       {
-        gzipped_file = (name.size() - name.rfind(".gz")  == 3);
-        bzipped_file = (name.size() - name.rfind(".bz2") == 4);
-        xzipped_file = (name.size() - name.rfind(".xz")  == 3);
+        gzipped_file = (file_name.size() - file_name.rfind(".gz")  == 3);
+        bzipped_file = (file_name.size() - file_name.rfind(".bz2") == 4);
+        xzipped_file = (file_name.size() - file_name.rfind(".xz")  == 3);
 
         if (gzipped_file)
           {
@@ -203,7 +206,7 @@ void Xdr::open (const std::string & name)
             ogzstream * outf = new ogzstream;
             libmesh_assert(outf);
             out.reset(outf);
-            outf->open(name.c_str(), std::ios::out);
+            outf->open(file_name.c_str(), std::ios::out);
 #else
             libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
 #endif
@@ -214,7 +217,7 @@ void Xdr::open (const std::string & name)
             libmesh_assert(outf);
             out.reset(outf);
 
-            std::string new_name = name;
+            std::string new_name = file_name;
 
             if (bzipped_file)
               new_name.erase(new_name.end() - 4, new_name.end());
@@ -1669,56 +1672,56 @@ void Xdr::comment (std::string & comment_in)
 
 
 //
-template void Xdr::data<int>                              (int &,                             const char *);
-template void Xdr::data<unsigned int>                     (unsigned int &,                    const char *);
-template void Xdr::data<unsigned short int>               (unsigned short int &,              const char *);
-template void Xdr::data<short int>                        (short int &,                       const char *);
-template void Xdr::data<unsigned long int>                (unsigned long int &,               const char *);
-template void Xdr::data<unsigned long long>               (unsigned long long &,              const char *);
-template void Xdr::data<long int>                         (long int &,                        const char *);
-template void Xdr::data<long long>                        (long long &,                       const char *);
-template void Xdr::data<char>                             (char &,                            const char *);
-template void Xdr::data<signed char>                      (signed char &,                     const char *);
-template void Xdr::data<unsigned char>                    (unsigned char &,                   const char *);
-template void Xdr::data<float>                            (float &,                           const char *);
-template void Xdr::data<double>                           (double &,                          const char *);
-template void Xdr::data<long double>                      (long double &,                     const char *);
-template void Xdr::data<std::complex<float>>              (std::complex<float> &,             const char *);
-template void Xdr::data<std::complex<double>>             (std::complex<double> &,            const char *);
-template void Xdr::data<std::complex<long double>>        (std::complex<long double> &,       const char *);
-template void Xdr::data<std::string>                      (std::string &,                     const char *);
-template void Xdr::data<std::vector<int>>                 (std::vector<int> &,                const char *);
-template void Xdr::data<std::vector<unsigned int>>        (std::vector<unsigned int> &,       const char *);
-template void Xdr::data<std::vector<short int>>           (std::vector<short int> &,          const char *);
-template void Xdr::data<std::vector<unsigned short int>>  (std::vector<unsigned short int> &, const char *);
-template void Xdr::data<std::vector<long int>>            (std::vector<long int> &,           const char *);
-template void Xdr::data<std::vector<long long>>           (std::vector<long long> &,          const char *);
-template void Xdr::data<std::vector<unsigned long int>>   (std::vector<unsigned long int> &,  const char *);
-template void Xdr::data<std::vector<unsigned long long>>  (std::vector<unsigned long long> &, const char *);
-template void Xdr::data<std::vector<char>>                (std::vector<char> &,               const char *);
-template void Xdr::data<std::vector<signed char>>         (std::vector<signed char> &,        const char *);
-template void Xdr::data<std::vector<unsigned char>>       (std::vector<unsigned char> &,      const char *);
-template void Xdr::data<std::vector<float>>               (std::vector<float> &,              const char *);
-template void Xdr::data<std::vector<double>>              (std::vector<double> &,             const char *);
-template void Xdr::data<std::vector<long double>>         (std::vector<long double> &,        const char *);
-template void Xdr::data<std::vector<std::complex<float>>>  (std::vector<std::complex<float>> &,  const char *);
-template void Xdr::data<std::vector<std::complex<double>>> (std::vector<std::complex<double>> &, const char *);
-template void Xdr::data<std::vector<std::complex<long double>>> (std::vector<std::complex<long double>> &, const char *);
-template void Xdr::data<std::vector<std::string>>        (std::vector<std::string> &,        const char *);
-template void Xdr::data_stream<unsigned char>      (unsigned char * val,      const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<short int>          (short int * val,          const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<int>                (int * val,                const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<long long>          (long long * val,          const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<unsigned short int> (unsigned short int * val, const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<unsigned int>       (unsigned int * val,       const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<unsigned long int>  (unsigned long int * val,  const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<unsigned long long> (unsigned long long * val, const unsigned int len, const unsigned int line_break);
+template LIBMESH_EXPORT void Xdr::data<int>                              (int &,                             const char *);
+template LIBMESH_EXPORT void Xdr::data<unsigned int>                     (unsigned int &,                    const char *);
+template LIBMESH_EXPORT void Xdr::data<unsigned short int>               (unsigned short int &,              const char *);
+template LIBMESH_EXPORT void Xdr::data<short int>                        (short int &,                       const char *);
+template LIBMESH_EXPORT void Xdr::data<unsigned long int>                (unsigned long int &,               const char *);
+template LIBMESH_EXPORT void Xdr::data<unsigned long long>               (unsigned long long &,              const char *);
+template LIBMESH_EXPORT void Xdr::data<long int>                         (long int &,                        const char *);
+template LIBMESH_EXPORT void Xdr::data<long long>                        (long long &,                       const char *);
+template LIBMESH_EXPORT void Xdr::data<char>                             (char &,                            const char *);
+template LIBMESH_EXPORT void Xdr::data<signed char>                      (signed char &,                     const char *);
+template LIBMESH_EXPORT void Xdr::data<unsigned char>                    (unsigned char &,                   const char *);
+template LIBMESH_EXPORT void Xdr::data<float>                            (float &,                           const char *);
+template LIBMESH_EXPORT void Xdr::data<double>                           (double &,                          const char *);
+template LIBMESH_EXPORT void Xdr::data<long double>                      (long double &,                     const char *);
+template LIBMESH_EXPORT void Xdr::data<std::complex<float>>              (std::complex<float> &,             const char *);
+template LIBMESH_EXPORT void Xdr::data<std::complex<double>>             (std::complex<double> &,            const char *);
+template LIBMESH_EXPORT void Xdr::data<std::complex<long double>>        (std::complex<long double> &,       const char *);
+template LIBMESH_EXPORT void Xdr::data<std::string>                      (std::string &,                     const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<int>>                 (std::vector<int> &,                const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned int>>        (std::vector<unsigned int> &,       const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<short int>>           (std::vector<short int> &,          const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned short int>>  (std::vector<unsigned short int> &, const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<long int>>            (std::vector<long int> &,           const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<long long>>           (std::vector<long long> &,          const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned long int>>   (std::vector<unsigned long int> &,  const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned long long>>  (std::vector<unsigned long long> &, const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<char>>                (std::vector<char> &,               const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<signed char>>         (std::vector<signed char> &,        const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned char>>       (std::vector<unsigned char> &,      const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<float>>               (std::vector<float> &,              const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<double>>              (std::vector<double> &,             const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<long double>>         (std::vector<long double> &,        const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<std::complex<float>>>  (std::vector<std::complex<float>> &,  const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<std::complex<double>>> (std::vector<std::complex<double>> &, const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<std::complex<long double>>> (std::vector<std::complex<long double>> &, const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<std::string>>        (std::vector<std::string> &,        const char *);
+template LIBMESH_EXPORT void Xdr::data_stream<unsigned char>      (unsigned char * val,      const unsigned int len, const unsigned int line_break);
+template LIBMESH_EXPORT void Xdr::data_stream<short int>          (short int * val,          const unsigned int len, const unsigned int line_break);
+template LIBMESH_EXPORT void Xdr::data_stream<int>                (int * val,                const unsigned int len, const unsigned int line_break);
+template LIBMESH_EXPORT void Xdr::data_stream<long long>          (long long * val,          const unsigned int len, const unsigned int line_break);
+template LIBMESH_EXPORT void Xdr::data_stream<unsigned short int> (unsigned short int * val, const unsigned int len, const unsigned int line_break);
+template LIBMESH_EXPORT void Xdr::data_stream<unsigned int>       (unsigned int * val,       const unsigned int len, const unsigned int line_break);
+template LIBMESH_EXPORT void Xdr::data_stream<unsigned long int>  (unsigned long int * val,  const unsigned int len, const unsigned int line_break);
+template LIBMESH_EXPORT void Xdr::data_stream<unsigned long long> (unsigned long long * val, const unsigned int len, const unsigned int line_break);
 
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-template void Xdr::data<Real>                             (Real &,                            const char *);
-template void Xdr::data<std::complex<Real>>               (std::complex<Real> &,              const char *);
-template void Xdr::data<std::vector<Real>>                (std::vector<Real> &,               const char *);
-template void Xdr::data<std::vector<std::complex<Real>>>  (std::vector<std::complex<Real>> &, const char *);
+template LIBMESH_EXPORT void Xdr::data<Real>                             (Real &,                            const char *);
+template LIBMESH_EXPORT void Xdr::data<std::complex<Real>>               (std::complex<Real> &,              const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<Real>>                (std::vector<Real> &,               const char *);
+template LIBMESH_EXPORT void Xdr::data<std::vector<std::complex<Real>>>  (std::vector<std::complex<Real>> &, const char *);
 #endif
 
 } // namespace libMesh

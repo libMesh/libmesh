@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,10 +24,10 @@
 #include "libmesh/point.h"
 #include "libmesh/dof_object.h"
 #include "libmesh/reference_counted_object.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <iostream>
+#include <memory>
 #include <vector>
 
 namespace libMesh
@@ -315,7 +315,7 @@ inline
 std::unique_ptr<Node> Node::build(const Node & n)
 {
   libmesh_deprecated();
-  return libmesh_make_unique<Node>(n);
+  return std::make_unique<Node>(n);
 }
 #endif
 
@@ -325,7 +325,7 @@ inline
 std::unique_ptr<Node> Node::build(const Point & p,
                                   const dof_id_type id)
 {
-  return libmesh_make_unique<Node>(p,id);
+  return std::make_unique<Node>(p,id);
 }
 
 
@@ -336,7 +336,7 @@ std::unique_ptr<Node> Node::build(const Real x,
                                   const Real z,
                                   const dof_id_type id)
 {
-  return libmesh_make_unique<Node>(x,y,z,id);
+  return std::make_unique<Node>(x,y,z,id);
 }
 
 

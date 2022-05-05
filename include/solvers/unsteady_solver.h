@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -67,6 +67,12 @@ public:
    * initialize internal data structures before a simulation begins.
    */
   virtual void init () override;
+
+  /**
+   * @brief Add adjoint vectors and old_adjoint_vectors
+   * as per the indices of QoISet
+   */
+  virtual void init_adjoints () override;
 
   /**
    * The data initialization function.  This method is used to

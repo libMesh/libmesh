@@ -12,11 +12,11 @@
 #include <libmesh/mesh_modification.h>
 #include <libmesh/partitioner.h>
 #include <libmesh/sparse_matrix.h>
-#include <libmesh/auto_ptr.h> // libmesh_make_unique
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <memory>
 
 using namespace libMesh;
 
@@ -141,7 +141,7 @@ public:
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<OverlappingTestPartitioner>(*this);
+    return std::make_unique<OverlappingTestPartitioner>(*this);
   }
 
 protected:
@@ -202,7 +202,7 @@ protected:
       }
   }
 
-  void assign_proc_id_subdomain( const MeshBase & mesh,
+  void assign_proc_id_subdomain( MeshBase & mesh,
                                  const subdomain_id_type sid,
                                  const dof_id_type blksize,
                                  const unsigned int n_parts,
@@ -240,7 +240,7 @@ protected:
     // We are making assumptions in various places about the presence
     // of the elements on the current processor so we're restricting to
     // ReplicatedMesh for now.
-    _mesh = libmesh_make_unique<ReplicatedMesh>(*TestCommWorld);
+    _mesh = std::make_unique<ReplicatedMesh>(*TestCommWorld);
 
     _mesh->set_mesh_dimension(2);
 
@@ -285,7 +285,7 @@ protected:
       elem->set_node(3) = _mesh->node_ptr(9);
     }
 
-    _mesh->partitioner() = libmesh_make_unique<OverlappingTestPartitioner>();
+    _mesh->partitioner() = std::make_unique<OverlappingTestPartitioner>();
 
     _mesh->prepare_for_use();
 
@@ -300,7 +300,7 @@ protected:
 
   void init(MeshBase & mesh)
   {
-    _es = libmesh_make_unique<EquationSystems>(*_mesh);
+    _es = std::make_unique<EquationSystems>(*_mesh);
     LinearImplicitSystem & sys = _es->add_system<LinearImplicitSystem> ("SimpleSystem");
 
     std::set<subdomain_id_type> sub_one;
@@ -328,7 +328,7 @@ protected:
   {
     System & system = _es->get_system("SimpleSystem");
 
-    coupling = libmesh_make_unique<CouplingMatrix>(system.n_vars());
+    coupling = std::make_unique<CouplingMatrix>(system.n_vars());
 
     const unsigned int u_var = system.variable_number("U");
     const unsigned int l_var = system.variable_number("L");
@@ -354,7 +354,7 @@ class OverlappingFunctorTest : public CppUnit::TestCase,
 {
 public:
 
-  CPPUNIT_TEST_SUITE( OverlappingFunctorTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( OverlappingFunctorTest );
 
 #ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( checkCouplingFunctorQuad );
@@ -503,7 +503,7 @@ class OverlappingAlgebraicGhostingTest : public CppUnit::TestCase,
                                          public OverlappingTestBase
 {
 public:
-  CPPUNIT_TEST_SUITE( OverlappingAlgebraicGhostingTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( OverlappingAlgebraicGhostingTest );
 
   CPPUNIT_TEST( testGhostingCouplingMatrix );
   CPPUNIT_TEST( testGhostingNullCouplingMatrix );
@@ -521,16 +521,19 @@ public:
 
   void testGhostingCouplingMatrix()
   {
+    LOG_UNIT_TEST;
     this->run_ghosting_test(0, true);
   }
 
   void testGhostingNullCouplingMatrix()
   {
+    LOG_UNIT_TEST;
     this->run_ghosting_test(0, false);
   }
 
   void testGhostingNullCouplingMatrixUnifRef()
   {
+    LOG_UNIT_TEST;
     std::unique_ptr<CouplingMatrix> coupling_matrix;
 
     this->run_ghosting_test(2, false);
@@ -620,7 +623,7 @@ class OverlappingCouplingGhostingTest : public CppUnit::TestCase,
                                         public OverlappingTestBase
 {
 public:
-  CPPUNIT_TEST_SUITE( OverlappingCouplingGhostingTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( OverlappingCouplingGhostingTest );
 
   CPPUNIT_TEST( testSparsityCouplingMatrix );
   CPPUNIT_TEST( testSparsityNullCouplingMatrix );
@@ -638,16 +641,19 @@ public:
 
   void testSparsityCouplingMatrix()
   {
+    LOG_UNIT_TEST;
     this->run_sparsity_pattern_test(0, true);
   }
 
   void testSparsityNullCouplingMatrix()
   {
+    LOG_UNIT_TEST;
     this->run_sparsity_pattern_test(0, false);
   }
 
   void testSparsityNullCouplingMatrixUnifRef()
   {
+    LOG_UNIT_TEST;
     this->run_sparsity_pattern_test(1, false);
   }
 

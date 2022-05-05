@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -174,8 +174,8 @@ void MeshOutput<MT>::write_nodal_data (const std::string & fname,
 
 // Instantiate for our Mesh types.  If this becomes too cumbersome later,
 // move any functions in this file to the header file instead.
-template class MeshOutput<MeshBase>;
-template class MeshOutput<UnstructuredMesh>;
-template class MeshOutput<DistributedMesh>;
+template class LIBMESH_EXPORT MeshOutput<MeshBase>;
+template class LIBMESH_EXPORT MeshOutput<UnstructuredMesh>;
+template class LIBMESH_EXPORT MeshOutput<DistributedMesh>;
 
 } // namespace libMesh

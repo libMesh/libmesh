@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,12 +20,6 @@
 // library configuration
 #include "libmesh/libmesh_config.h"
 
-// C++ includes
-#include <algorithm> // for std::min
-#include <map>       // for std::multimap
-#include <sstream>   // for std::ostringstream
-#include <unordered_map>
-
 // Local includes
 #include "libmesh/boundary_info.h"
 #include "libmesh/libmesh_logging.h"
@@ -42,9 +36,15 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_point_locator_type.h"
 #include "libmesh/enum_to_string.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/point_locator_nanoflann.h"
 #include "libmesh/elem_side_builder.h"
+
+// C++ includes
+#include <algorithm> // for std::min
+#include <map>       // for std::multimap
+#include <memory>
+#include <sstream>   // for std::ostringstream
+#include <unordered_map>
 
 namespace libMesh
 {
@@ -56,7 +56,7 @@ namespace libMesh
 MeshBase::MeshBase (const Parallel::Communicator & comm_in,
                     unsigned char d) :
   ParallelObject (comm_in),
-  boundary_info  (new BoundaryInfo(*this)),
+  boundary_info  (new BoundaryInfo(*this)), // BoundaryInfo has protected ctor, can't use std::make_unique
   _n_parts       (1),
   _default_mapping_type(LAGRANGE_MAP),
   _default_mapping_data(0),
@@ -73,7 +73,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _skip_find_neighbors(false),
   _allow_remote_element_removal(true),
   _spatial_dimension(d),
-  _default_ghosting(libmesh_make_unique<GhostPointNeighbors>(*this)),
+  _default_ghosting(std::make_unique<GhostPointNeighbors>(*this)),
   _point_locator_close_to_point_tol(0.)
 {
   _elem_dims.insert(d);
@@ -87,7 +87,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
 
 MeshBase::MeshBase (const MeshBase & other_mesh) :
   ParallelObject (other_mesh),
-  boundary_info  (new BoundaryInfo(*this)),
+  boundary_info  (new BoundaryInfo(*this)), // BoundaryInfo has protected ctor, can't use std::make_unique
   _n_parts       (other_mesh._n_parts),
   _default_mapping_type(other_mesh._default_mapping_type),
   _default_mapping_data(other_mesh._default_mapping_data),
@@ -104,8 +104,10 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _skip_find_neighbors(other_mesh._skip_find_neighbors),
   _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
   _elem_dims(other_mesh._elem_dims),
+  _elemset_codes_inverse_map(other_mesh._elemset_codes_inverse_map),
+  _all_elemset_ids(other_mesh._all_elemset_ids),
   _spatial_dimension(other_mesh._spatial_dimension),
-  _default_ghosting(libmesh_make_unique<GhostPointNeighbors>(*this)),
+  _default_ghosting(std::make_unique<GhostPointNeighbors>(*this)),
   _point_locator_close_to_point_tol(other_mesh._point_locator_close_to_point_tol)
 {
   const GhostingFunctor * const other_default_ghosting = other_mesh._default_ghosting.get();
@@ -141,6 +143,11 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 
   if (other_mesh._partitioner.get())
     _partitioner = other_mesh._partitioner->clone();
+
+  // _elemset_codes stores pointers to entries in _elemset_codes_inverse_map,
+  // so it is not possible to simply copy it directly from other_mesh
+  for (const auto & [set, code] : _elemset_codes_inverse_map)
+    _elemset_codes.emplace(code, &set);
 }
 
 MeshBase& MeshBase::operator= (MeshBase && other_mesh)
@@ -164,6 +171,9 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _allow_remote_element_removal = other_mesh.allow_remote_element_removal();
   _block_id_to_name = std::move(other_mesh._block_id_to_name);
   _elem_dims = std::move(other_mesh.elem_dimensions());
+  _elemset_codes = std::move(other_mesh._elemset_codes);
+  _elemset_codes_inverse_map = std::move(other_mesh._elemset_codes_inverse_map);
+  _all_elemset_ids = std::move(other_mesh._all_elemset_ids),
   _spatial_dimension = other_mesh.spatial_dimension();
   _elem_integer_names = std::move(other_mesh._elem_integer_names);
   _elem_integer_default_values = std::move(other_mesh._elem_integer_default_values);
@@ -176,6 +186,17 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   boundary_info = std::move(other_mesh.boundary_info);
   boundary_info->set_mesh(*this);
 
+#ifdef DEBUG
+  // Make sure that move assignment worked for pointers
+  for (const auto & [set, code] : _elemset_codes_inverse_map)
+    {
+      auto it = _elemset_codes.find(code);
+      libmesh_assert_msg(it != _elemset_codes.end(),
+                         "Elemset code " << code << " not found in _elmset_codes container.");
+      libmesh_assert_equal_to(it->second, &set);
+    }
+#endif
+
   // We're *not* really done at this point, but we have the problem
   // that some of our data movement might be expecting subclasses data
   // movement to happen first.  We'll let subclasses handle that by
@@ -187,7 +208,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
 
 MeshBase::~MeshBase()
 {
-  this->clear();
+  this->MeshBase::clear();
 
   libmesh_exceptionless_assert (!libMesh::closed());
 }
@@ -203,7 +224,7 @@ unsigned int MeshBase::mesh_dimension() const
 
 
 
-void MeshBase::set_elem_dimensions(const std::set<unsigned char> & elem_dims)
+void MeshBase::set_elem_dimensions(std::set<unsigned char> elem_dims)
 {
 #ifdef DEBUG
   // In debug mode, we call cache_elem_data() and then make sure
@@ -215,8 +236,61 @@ void MeshBase::set_elem_dimensions(const std::set<unsigned char> & elem_dims)
                      "Specified element dimensions does not match true element dimensions!");
 #endif
 
-  _elem_dims = elem_dims;
+  _elem_dims = std::move(elem_dims);
 }
+
+
+
+void MeshBase::add_elemset_code(dof_id_type code, MeshBase::elemset_type id_set)
+{
+  libmesh_experimental();
+
+  // Populate inverse map, stealing id_set's resources
+  auto [it1, inserted1] = _elemset_codes_inverse_map.emplace(std::move(id_set), code);
+
+  // Reference to the newly inserted (or previously existing) id_set
+  const auto & inserted_id_set = it1->first;
+
+  // Keep track of all elemset ids ever added for O(1) n_elemsets()
+  // performance. Only need to do this if we didn't know about this
+  // id_set before...
+  if (inserted1)
+    _all_elemset_ids.insert(inserted_id_set.begin(), inserted_id_set.end());
+
+  // Take the address of the newly emplaced set to use in
+  // _elemset_codes, avoid duplicating std::set storage
+  auto [it2, inserted2] = _elemset_codes.emplace(code, &inserted_id_set);
+
+  // Throw an error if this code already exists with a pointer to a
+  // different set of ids.
+  libmesh_error_msg_if(!inserted2 && it2->second != &inserted_id_set,
+                       "The elemset code " << code << " already exists with a different id_set.");
+}
+
+
+
+unsigned int MeshBase::n_elemsets() const
+{
+  return _all_elemset_ids.size();
+}
+
+void MeshBase::get_elemsets(dof_id_type elemset_code, MeshBase::elemset_type & id_set_to_fill) const
+{
+  // If we don't recognize this elemset_code, hand back an empty set
+  id_set_to_fill.clear();
+
+  auto it = _elemset_codes.find(elemset_code);
+  if (it != _elemset_codes.end())
+    id_set_to_fill.insert(it->second->begin(), it->second->end());
+}
+
+dof_id_type MeshBase::get_elemset_code(const MeshBase::elemset_type & id_set) const
+{
+  auto it = _elemset_codes_inverse_map.find(id_set);
+  return (it == _elemset_codes_inverse_map.end()) ? DofObject::invalid_id : it->second;
+}
+
+
 
 unsigned int MeshBase::spatial_dimension () const
 {
@@ -235,7 +309,7 @@ void MeshBase::set_spatial_dimension(unsigned char d)
 
 
 
-unsigned int MeshBase::add_elem_integer(const std::string & name,
+unsigned int MeshBase::add_elem_integer(std::string name,
                                         bool allocate_data,
                                         dof_id_type default_value)
 {
@@ -249,7 +323,7 @@ unsigned int MeshBase::add_elem_integer(const std::string & name,
 
   libmesh_assert_equal_to(_elem_integer_names.size(),
                           _elem_integer_default_values.size());
-  _elem_integer_names.push_back(name);
+  _elem_integer_names.push_back(std::move(name));
   _elem_integer_default_values.push_back(default_value);
   if (allocate_data)
     this->size_elem_extra_integers();
@@ -301,7 +375,7 @@ std::vector<unsigned int> MeshBase::add_elem_integers(const std::vector<std::str
 
 
 
-unsigned int MeshBase::get_elem_integer_index(const std::string & name) const
+unsigned int MeshBase::get_elem_integer_index(std::string_view name) const
 {
   for (auto i : index_range(_elem_integer_names))
     if (_elem_integer_names[i] == name)
@@ -313,7 +387,7 @@ unsigned int MeshBase::get_elem_integer_index(const std::string & name) const
 
 
 
-bool MeshBase::has_elem_integer(const std::string & name) const
+bool MeshBase::has_elem_integer(std::string_view name) const
 {
   for (auto & entry : _elem_integer_names)
     if (entry == name)
@@ -324,7 +398,7 @@ bool MeshBase::has_elem_integer(const std::string & name) const
 
 
 
-unsigned int MeshBase::add_node_integer(const std::string & name,
+unsigned int MeshBase::add_node_integer(std::string name,
                                         bool allocate_data,
                                         dof_id_type default_value)
 {
@@ -338,7 +412,7 @@ unsigned int MeshBase::add_node_integer(const std::string & name,
 
   libmesh_assert_equal_to(_node_integer_names.size(),
                           _node_integer_default_values.size());
-  _node_integer_names.push_back(name);
+  _node_integer_names.push_back(std::move(name));
   _node_integer_default_values.push_back(default_value);
   if (allocate_data)
     this->size_node_extra_integers();
@@ -390,7 +464,7 @@ std::vector<unsigned int> MeshBase::add_node_integers(const std::vector<std::str
 
 
 
-unsigned int MeshBase::get_node_integer_index(const std::string & name) const
+unsigned int MeshBase::get_node_integer_index(std::string_view name) const
 {
   for (auto i : index_range(_node_integer_names))
     if (_node_integer_names[i] == name)
@@ -402,7 +476,7 @@ unsigned int MeshBase::get_node_integer_index(const std::string & name) const
 
 
 
-bool MeshBase::has_node_integer(const std::string & name) const
+bool MeshBase::has_node_integer(std::string_view name) const
 {
   for (auto & entry : _node_integer_names)
     if (entry == name)
@@ -594,6 +668,9 @@ void MeshBase::clear ()
   // Clear element dimensions
   _elem_dims.clear();
 
+  _elemset_codes.clear();
+  _elemset_codes_inverse_map.clear();
+
   _constraint_rows.clear();
 
   // Clear our point locator.
@@ -741,6 +818,22 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
       oss << "}\n";
     }
 
+  if (!_elemset_codes.empty())
+    {
+      // We don't print the inverse map since that is maintained as an
+      // internal implementation detail for fast lookups and is not
+      // really user-facing information.
+      oss << "  elemset_codes()={";
+      for (const auto & [set_code, id_set] : _elemset_codes)
+        {
+          oss << set_code << ": ";
+          for (const auto & id : *id_set)
+            oss << id << " ";
+          oss << "\n";
+        }
+      oss << "}\n";
+    }
+
   oss << "  spatial_dimension()="     << this->spatial_dimension()                            << '\n'
       << "  n_nodes()="               << this->n_nodes()                                      << '\n'
       << "    n_local_nodes()="       << this->n_local_nodes()                                << '\n'
@@ -832,13 +925,11 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
         BoundingBox bbox;
       };
       std::map<boundary_id_type, NodesetInfo> nodeset_info_map;
-      for (const auto & pair : this->get_boundary_info().get_nodeset_map())
+      for (const auto & [node, id] : this->get_boundary_info().get_nodeset_map())
         {
-          const Node * node = pair.first;
           if (!include_object(*node))
             continue;
 
-          const auto id = pair.second;
           NodesetInfo & info = nodeset_info_map[id];
 
           ++info.num_nodes;
@@ -855,7 +946,7 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
             oss << "  None\n";
         }
 
-      const auto & nodeset_name_map = this->get_boundary_info().get_sideset_name_map();
+      const auto & nodeset_name_map = this->get_boundary_info().get_nodeset_name_map();
       for (const auto id : nodeset_ids)
         {
           NodesetInfo & info = nodeset_info_map[id];
@@ -1238,6 +1329,11 @@ void MeshBase::partition (const unsigned int n_parts)
     }
 }
 
+void MeshBase::all_second_order (const bool full_ordered)
+{
+  this->all_second_order_range(this->element_ptr_range(), full_ordered);
+}
+
 unsigned int MeshBase::recalculate_n_partitions()
 {
   // This requires an inspection on every processor
@@ -1332,7 +1428,7 @@ const std::string & MeshBase::subdomain_name(subdomain_id_type id) const
 
 
 
-subdomain_id_type MeshBase::get_id_by_name(const std::string & name) const
+subdomain_id_type MeshBase::get_id_by_name(std::string_view name) const
 {
   // Linear search over the map values.
   std::map<subdomain_id_type, std::string>::const_iterator

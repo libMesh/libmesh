@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,6 @@
 #include "libmesh/fem_system.h"
 #include "libmesh/parameter_pointer.h"
 #include "libmesh/parameter_vector.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 using namespace libMesh;
 
@@ -39,7 +38,7 @@ public:
       _fe_family("LAGRANGE"),
       _fe_order(1),
       _analytic_jacobians(true)
-  { qoi.resize(2); QoI_time_instant.resize(2);}
+  { this->init_qois(2); QoI_time_instant.resize(2);}
 
   Real & k() { return _k; }
   bool & analytic_jacobians() { return _analytic_jacobians; }

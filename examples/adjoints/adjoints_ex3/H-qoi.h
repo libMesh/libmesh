@@ -18,7 +18,7 @@ public:
   CoupledSystemQoI() = default;
   virtual ~CoupledSystemQoI() = default;
 
-  virtual void init_qoi(std::vector<Number> & sys_qoi);
+  virtual void init_qoi_count(System & sys);
   virtual void init_context(DiffContext &);
 
   virtual void postprocess(){}

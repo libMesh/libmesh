@@ -7,6 +7,13 @@ using namespace libMesh;
 
 class DistributedVectorTest : public NumericVectorTest<DistributedVector<Number>> {
 public:
+  DistributedVectorTest() :
+    NumericVectorTest<DistributedVector<Number>>() {
+    if (unitlog->summarized_logs_enabled())
+      this->libmesh_suite_name = "NumericVectorTest";
+    else
+      this->libmesh_suite_name = "DistributedVectorTest";
+  }
   CPPUNIT_TEST_SUITE( DistributedVectorTest );
 
   NUMERICVECTORTEST

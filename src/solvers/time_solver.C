@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,10 +21,14 @@
 #include "libmesh/diff_system.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/no_solution_history.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #include "libmesh/adjoint_refinement_estimator.h"
 #include "libmesh/error_vector.h"
+
+
+// C++ includes
+#include <memory>
+
 
 namespace libMesh
 {
@@ -35,7 +39,7 @@ TimeSolver::TimeSolver (sys_type & s)
     _diff_solver (),
     _linear_solver (),
     _system (s),
-    solution_history(libmesh_make_unique<NoSolutionHistory>()),
+    solution_history(std::make_unique<NoSolutionHistory>()),
     last_deltat (s.deltat),
     _is_adjoint (false)
 {
@@ -76,7 +80,19 @@ void TimeSolver::init ()
     this->linear_solver() = LinearSolver<Number>::build(_system.comm());
 }
 
+void TimeSolver::init_adjoints ()
+{
+  libmesh_assert_msg(_system.n_qois() != 0, "System qois have to be initialized before initializing adjoints.");
 
+  // Add adjoint vectors
+  for(auto i : make_range(_system.n_qois()))
+  {
+    std::string adjoint_solution_name = "adjoint_solution";
+    adjoint_solution_name+= std::to_string(i);
+    _system.add_vector(adjoint_solution_name, false, GHOSTED);
+  }
+
+}
 
 void TimeSolver::init_data ()
 {

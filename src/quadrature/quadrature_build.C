@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,8 +29,10 @@
 #include "libmesh/quadrature_conical.h"
 #include "libmesh/quadrature_nodal.h"
 #include "libmesh/string_to_enum.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_quadrature_type.h"
+
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -38,7 +40,7 @@ namespace libMesh
 
 
 //---------------------------------------------------------------
-std::unique_ptr<QBase> QBase::build (const std::string & type,
+std::unique_ptr<QBase> QBase::build (std::string_view type,
                                      const unsigned int _dim,
                                      const Order _order)
 {
@@ -66,7 +68,7 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
           }
 #endif
 
-        return libmesh_make_unique<QClough>(_dim, _order);
+        return std::make_unique<QClough>(_dim, _order);
       }
 
     case QGAUSS:
@@ -80,7 +82,7 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
           }
 #endif
 
-        return libmesh_make_unique<QGauss>(_dim, _order);
+        return std::make_unique<QGauss>(_dim, _order);
       }
 
     case QJACOBI_1_0:
@@ -100,7 +102,7 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
           }
 #endif
 
-        return libmesh_make_unique<QJacobi>(_dim, _order, 1, 0);
+        return std::make_unique<QJacobi>(_dim, _order, 1, 0);
       }
 
     case QJACOBI_2_0:
@@ -120,7 +122,7 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
           }
 #endif
 
-        return libmesh_make_unique<QJacobi>(_dim, _order, 2, 0);
+        return std::make_unique<QJacobi>(_dim, _order, 2, 0);
       }
 
     case QSIMPSON:
@@ -134,7 +136,7 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
           }
 #endif
 
-        return libmesh_make_unique<QSimpson>(_dim);
+        return std::make_unique<QSimpson>(_dim);
       }
 
     case QTRAP:
@@ -148,26 +150,26 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
           }
 #endif
 
-        return libmesh_make_unique<QTrap>(_dim);
+        return std::make_unique<QTrap>(_dim);
       }
 
     case QGRID:
-      return libmesh_make_unique<QGrid>(_dim, _order);
+      return std::make_unique<QGrid>(_dim, _order);
 
     case QGRUNDMANN_MOLLER:
-      return libmesh_make_unique<QGrundmann_Moller>(_dim, _order);
+      return std::make_unique<QGrundmann_Moller>(_dim, _order);
 
     case QMONOMIAL:
-      return libmesh_make_unique<QMonomial>(_dim, _order);
+      return std::make_unique<QMonomial>(_dim, _order);
 
     case QGAUSS_LOBATTO:
-      return libmesh_make_unique<QGaussLobatto>(_dim, _order);
+      return std::make_unique<QGaussLobatto>(_dim, _order);
 
     case QCONICAL:
-      return libmesh_make_unique<QConical>(_dim, _order);
+      return std::make_unique<QConical>(_dim, _order);
 
     case QNODAL:
-      return libmesh_make_unique<QNodal>(_dim, _order);
+      return std::make_unique<QNodal>(_dim, _order);
 
     default:
       libmesh_error_msg("ERROR: Bad qt=" << _qt);

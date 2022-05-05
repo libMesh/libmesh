@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -191,55 +191,39 @@ int main (int argc, char ** argv)
 #ifdef LIBMESH_ENABLE_DIRICHLET
   // AB w, theta_x, theta_y
   {
-    std::set<boundary_id_type> boundary_ids;
-    boundary_ids.insert(7);
-    unsigned int variables[] = {2, 3, 4};
     ZeroFunction<> zf;
 
     // Most DirichletBoundary users will want to supply a "locally
     // indexed" functor
     DirichletBoundary dirichlet_bc
-      (boundary_ids,
-       std::vector<unsigned int>(variables, variables+3), zf,
+      (/*boundary_ids =*/{7},/*variables =*/{2,3,4}, zf,
        LOCAL_VARIABLE_ORDER);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
   // BC v, theta_x, theta_z
   {
-    std::set<boundary_id_type> boundary_ids;
-    boundary_ids.insert(8);
-    unsigned int variables[] = {1, 3, 5};
     ZeroFunction<> zf;
 
     DirichletBoundary dirichlet_bc
-      (boundary_ids,
-       std::vector<unsigned int>(variables, variables+3), zf,
+      (/*boundary_ids =*/{8}, /*variables =*/{1,3,5}, zf,
        LOCAL_VARIABLE_ORDER);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
   // CD u, theta_y, theta_z
   {
-    std::set<boundary_id_type> boundary_ids;
-    boundary_ids.insert(9);
-    unsigned int variables[] = {0, 4, 5};
     ZeroFunction<> zf;
 
     DirichletBoundary dirichlet_bc
-      (boundary_ids,
-       std::vector<unsigned int>(variables, variables+3), zf,
+      (/*boundary_ids =*/{9}, /*variables =*/{0,4,5}, zf,
        LOCAL_VARIABLE_ORDER);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
   // AD u, w, theta_y
   {
-    std::set<boundary_id_type> boundary_ids;
-    boundary_ids.insert(10);
-    unsigned int variables[] = {0, 2, 4};
     ZeroFunction<> zf;
 
     DirichletBoundary dirichlet_bc
-      (boundary_ids,
-       std::vector<unsigned int>(variables, variables+3), zf,
+      (/*boundary_ids =*/{10}, /*variables =*/{0,2,4}, zf,
        LOCAL_VARIABLE_ORDER);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }

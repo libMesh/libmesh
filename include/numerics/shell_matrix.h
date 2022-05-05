@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,6 @@
 #include "libmesh/parallel_object.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/enum_solver_package.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/parallel.h"
 
 namespace libMesh

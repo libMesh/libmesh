@@ -25,6 +25,10 @@ using namespace libMesh;
 
 template <typename PartitionerSubclass, typename MeshClass>
 class PartitionerTest : public CppUnit::TestCase {
+protected:
+
+  std::string libmesh_suite_name;
+
 public:
   void setUp()
   {}
@@ -93,6 +97,8 @@ public:
 
   void testPartitionEmpty()
   {
+    LOG_UNIT_TEST;
+
     MeshClass mesh(*TestCommWorld);
     PartitionerSubclass newpart;
 
@@ -103,16 +109,22 @@ public:
 
   void testPartition1()
   {
+    LOG_UNIT_TEST;
+
     this->testPartition(1);
   }
 
   void testPartition2()
   {
+    LOG_UNIT_TEST;
+
     this->testPartition(2);
   }
 
   void testPartitionNProc()
   {
+    LOG_UNIT_TEST;
+
     this->testPartition(TestCommWorld->size());
   }
 };
@@ -121,6 +133,13 @@ public:
   class PartitionerTest_##partitionersubclass##_##meshclass :               \
     public PartitionerTest<partitionersubclass, meshclass> {                \
   public:                                                                   \
+  PartitionerTest_##partitionersubclass##_##meshclass() :                   \
+    PartitionerTest<partitionersubclass,meshclass>() {                      \
+    if (unitlog->summarized_logs_enabled())                                 \
+      this->libmesh_suite_name = "PartitionerTest";                         \
+    else                                                                    \
+      this->libmesh_suite_name = "PartitionerTest_" #partitionersubclass "_" #meshclass; \
+  }                                                                         \
   CPPUNIT_TEST_SUITE( PartitionerTest_##partitionersubclass##_##meshclass); \
   PARTITIONERTEST                                                           \
   CPPUNIT_TEST_SUITE_END();                                                 \

@@ -27,6 +27,9 @@ class DofObjectTest {
 private:
   DerivedClass * instance;
 
+protected:
+  std::string libmesh_suite_name;
+
 public:
   void setUp(DerivedClass * derived_instance)
   {
@@ -35,6 +38,8 @@ public:
 
   void testSetId()
   {
+    LOG_UNIT_TEST;
+
     DofObject & aobject(*instance);
 
     aobject.set_id(1);
@@ -43,6 +48,8 @@ public:
 
   void testValidId()
   {
+    LOG_UNIT_TEST;
+
     DofObject & aobject(*instance);
 
     aobject.set_id(1);
@@ -54,6 +61,8 @@ public:
 
   void testInvalidateId()
   {
+    LOG_UNIT_TEST;
+
     DofObject & aobject(*instance);
 
     aobject.set_id(1);
@@ -64,6 +73,8 @@ public:
 
   void testSetProcId()
   {
+    LOG_UNIT_TEST;
+
     DofObject & aobject(*instance);
 
     aobject.processor_id(libMesh::global_processor_id());
@@ -72,6 +83,8 @@ public:
 
   void testValidProcId()
   {
+    LOG_UNIT_TEST;
+
     DofObject & aobject(*instance);
 
     aobject.processor_id(libMesh::global_processor_id());
@@ -83,6 +96,8 @@ public:
 
   void testInvalidateProcId()
   {
+    LOG_UNIT_TEST;
+
     DofObject & aobject(*instance);
 
     aobject.processor_id(libMesh::global_processor_id());
@@ -93,6 +108,8 @@ public:
 
   void testSetNSystems()
   {
+    LOG_UNIT_TEST;
+
     DofObject & aobject(*instance);
 
     aobject.set_n_systems (10);
@@ -102,6 +119,8 @@ public:
 
   void testSetNVariableGroups()
   {
+    LOG_UNIT_TEST;
+
     DofObject & aobject(*instance);
 
     aobject.set_n_systems (2);
@@ -127,6 +146,8 @@ public:
 
   void testAddExtraData()
   {
+    LOG_UNIT_TEST;
+
     DofObject & aobject(*instance);
 
     aobject.add_extra_integers (9);
@@ -174,6 +195,8 @@ public:
 
   void testAddSystemExtraInts()
   {
+    LOG_UNIT_TEST;
+
     DofObject & aobject(*instance);
 
     aobject.add_extra_integers (1);
@@ -242,6 +265,8 @@ public:
 
   void testSetNSystemsExtraInts()
   {
+    LOG_UNIT_TEST;
+
     DofObject & aobject(*instance);
 
     aobject.add_extra_integers (5);
@@ -291,6 +316,8 @@ public:
 
   void testSetNVariableGroupsExtraInts()
   {
+    LOG_UNIT_TEST;
+
     DofObject & aobject(*instance);
 
     aobject.set_n_systems (2);
@@ -331,6 +358,8 @@ public:
 
   void testManualDofCalculation()
   {
+    LOG_UNIT_TEST;
+
     DofObject & aobject(*instance);
 
     aobject.set_n_systems (2);
@@ -373,6 +402,8 @@ public:
 
   void testJensEftangBug()
   {
+    LOG_UNIT_TEST;
+
     // For more information on this bug, see the following email thread:
     // https://sourceforge.net/p/libmesh/mailman/libmesh-users/thread/50C8EE7C.8090405@gmail.com/
     DofObject & aobject(*instance);

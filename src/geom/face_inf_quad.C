@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -91,14 +91,14 @@ std::unique_ptr<Elem> InfQuad::side_ptr (const unsigned int i)
     {
     case 0: // base face
       {
-        edge = libmesh_make_unique<Edge2>();
+        edge = std::make_unique<Edge2>();
         break;
       }
 
     case 1: // adjacent to another infinite element
     case 2: // adjacent to another infinite element
       {
-        edge = libmesh_make_unique<InfEdge2>();
+        edge = std::make_unique<InfEdge2>();
         break;
       }
 

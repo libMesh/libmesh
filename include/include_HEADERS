@@ -213,12 +213,14 @@ include_HEADERS =  \
         mesh/off_io.h \
         mesh/parallel_mesh.h \
         mesh/patch.h \
+        mesh/poly2tri_triangulator.h \
         mesh/postscript_io.h \
         mesh/replicated_mesh.h \
         mesh/serial_mesh.h \
         mesh/sync_refinement_flags.h \
         mesh/tecplot_io.h \
         mesh/tetgen_io.h \
+        mesh/triangulator_interface.h \
         mesh/ucd_io.h \
         mesh/unstructured_mesh.h \
         mesh/unv_io.h \

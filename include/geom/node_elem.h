@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -207,6 +207,15 @@ public:
   virtual bool is_edge_on_side(const unsigned int,
                                const unsigned int) const override
   { libmesh_not_implemented(); return false; }
+
+  /**
+   * \returns The "circumcenter of mass" (area-weighted average of
+   * triangulation circumcenters) of the element.
+   *
+   * Trivial in 0D.
+   */
+  virtual Point quasicircumcenter () const override
+  { return this->point(0); }
 
   /**
    * \returns \p true if the element map is definitely affine within

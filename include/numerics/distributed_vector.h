@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -33,6 +33,7 @@
 #include <vector>
 #include <algorithm>
 #include <limits>
+#include <mutex>
 
 namespace libMesh
 {
@@ -576,6 +577,7 @@ void DistributedVector<T>::set (const numeric_index_type i, const T value)
   libmesh_assert_less (i, size());
   libmesh_assert_less (i-first_local_index(), local_size());
 
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   _values[i - _first_local_index] = value;
 
 
@@ -595,6 +597,7 @@ void DistributedVector<T>::add (const numeric_index_type i, const T value)
   libmesh_assert_less (i, size());
   libmesh_assert_less (i-first_local_index(), local_size());
 
+  std::scoped_lock lock(this->_numeric_vector_mutex);
   _values[i - _first_local_index] += value;
 
 

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,6 @@
 #include "libmesh/time_solver.h"
 #include "libmesh/transient_system.h"
 #include "libmesh/vtk_io.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_solver_package.h"
 
 #include <cstdio>
@@ -39,6 +38,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -97,7 +97,7 @@ void run_timestepping(EquationSystems & systems, GetPot & args)
   SolidSystem & solid_system = systems.get_system<SolidSystem>("solid");
 
 #ifdef LIBMESH_HAVE_VTK
-  std::unique_ptr<VTKIO> io = libmesh_make_unique<VTKIO>(systems.get_mesh());
+  std::unique_ptr<VTKIO> io = std::make_unique<VTKIO>(systems.get_mesh());
 #endif
 
   Real duration = args("duration", 1.0);

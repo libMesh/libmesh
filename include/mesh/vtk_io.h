@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -209,15 +209,15 @@ private:
   };
 
   /**
-   * ElementMaps object that is built statically and used by
+   * ElementMaps objects that are built statically and used by
    * all instances of this class.
    */
-  static ElementMaps _element_maps;
+  static std::map<ElemMappingType, ElementMaps> _element_maps;
 
   /**
-   * Static function used to construct the _element_maps struct.
+   * Static function used to construct _element_maps.
    */
-  static ElementMaps build_element_maps();
+  static std::map<ElemMappingType, ElementMaps> build_element_maps();
 
 #endif
 };

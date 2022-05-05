@@ -138,7 +138,7 @@ public:
    * Specify which type of "best fit" we use to guide the EIM
    * greedy algorithm.
    */
-  void set_best_fit_type_flag (const std::string & best_fit_type_string);
+  virtual void set_best_fit_type_flag (const std::string & best_fit_type_string);
 
   /**
    * Print out info that describes the current setup of this RBConstruction.
@@ -149,7 +149,7 @@ public:
    * Generate the EIM approximation for the specified parametrized function
    * using either POD or the Greedy Algorithm. Return the final tolerance.
    */
-  Real train_eim_approximation();
+  virtual Real train_eim_approximation();
 
   /**
    * Generate the EIM approximation for the specified parametrized function
@@ -233,6 +233,23 @@ public:
    * the training set.
    */
   const QpDataMap & get_parametrized_function_from_training_set(unsigned int training_index) const;
+  const SideQpDataMap & get_side_parametrized_function_from_training_set(unsigned int training_index) const;
+
+  /**
+   * Get the interior and side quadrature weights.
+   */
+  const std::unordered_map<dof_id_type, std::vector<Real> > & get_local_quad_point_JxW();
+  const std::map<std::pair<dof_id_type,unsigned int>, std::vector<Real> > & get_local_side_quad_point_JxW();
+
+  /**
+   * Get the number of parametrized functions used for training.
+   */
+  unsigned int get_n_parametrized_functions_for_training() const;
+
+  /**
+   * Zero the _eim_projection_matrix and resize it to be get_Nmax() x get_Nmax().
+   */
+  void reinit_eim_projection_matrix();
 
   /**
    * Enum that indicates which type of "best fit" algorithm
@@ -241,6 +258,24 @@ public:
    * b) eim: Use empirical interpolation to find a "best fit"
    */
   BEST_FIT_TYPE best_fit_type_flag;
+
+protected:
+
+  /**
+   * Implementation of enrich_eim_approximation() for the case of element sides.
+   */
+  void enrich_eim_approximation_on_sides(const SideQpDataMap & side_pf);
+
+  /**
+   * Implementation of enrich_eim_approximation() for the case of element interiors.
+   */
+  void enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
+                                             const std::vector<std::vector<Number>> & interior_pf_obs_values);
+
+  /**
+   * Update the matrices used in training the EIM approximation.
+   */
+  void update_eim_matrices();
 
 private:
 
@@ -332,22 +367,6 @@ private:
    * Add a new basis function to the EIM approximation.
    */
   void enrich_eim_approximation(unsigned int training_index);
-
-  /**
-   * Implementation of enrich_eim_approximation() for the case of element sides.
-   */
-  void enrich_eim_approximation_on_sides(const SideQpDataMap & interior_pf);
-
-  /**
-   * Implementation of enrich_eim_approximation() for the case of element interiors.
-   */
-  void enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
-                                             const std::vector<std::vector<Number>> & interior_pf_obs_values);
-
-  /**
-   * Update the matrices used in training the EIM approximation.
-   */
-  void update_eim_matrices();
 
   /**
    * We compute the best fit of parametrized_function

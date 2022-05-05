@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -240,10 +240,22 @@ public:
   void read_nodeset_info();
 
   /**
+   * Reads information about all of the elemsets in the \p ExodusII
+   * mesh file.
+   */
+  void read_elemset_info();
+
+  /**
    * Reads information about sideset \p id and inserts it into the
    * global sideset array at the position \p offset.
    */
   void read_sideset(int id, int offset);
+
+  /**
+   * Reads information about elemset \p id and inserts it into the
+   * global elemset array at the position \p offset.
+   */
+  void read_elemset(int id, int offset);
 
   /**
    * New API that reads all nodesets simultaneously. This may be slightly
@@ -335,6 +347,11 @@ public:
   void write_timestep(int timestep, Real time);
 
   /**
+   * Write elemsets stored on the Mesh to the exo file.
+   */
+  void write_elemsets(const MeshBase & mesh);
+
+  /**
    * Write sideset data for the requested timestep.
    */
   void
@@ -375,7 +392,7 @@ public:
   write_nodeset_data (int timestep,
                       const std::vector<std::string> & var_names,
                       const std::vector<std::set<boundary_id_type>> & node_boundary_ids,
-                      std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals);
+                      const std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals);
 
   /**
    * Read nodeset variables, if any, into the provided data structures.
@@ -395,6 +412,34 @@ public:
    */
   void
   get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> & bc_array_indices);
+
+  /**
+   * Write elemset data for the requested timestep.
+   */
+  void
+  write_elemset_data (int timestep,
+                      const std::vector<std::string> & var_names,
+                      const std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                      const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals);
+
+  /**
+   * Read elemset variables, if any, into the provided data structures.
+   */
+  void
+  read_elemset_data (int timestep,
+                     std::vector<std::string> & var_names,
+                     std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                     std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals);
+
+  /**
+   * Similar to read_elemset_data(), but instead of creating one
+   * std::map per elemset per variable, creates a single map of
+   * (elem_id, elemset_id) tuples, and stores the exo file array
+   * indexing for any/all elemset variables on that elemset (they are
+   * all the same).
+   */
+  void
+  get_elemset_data_indices (std::map<std::pair<dof_id_type, elemset_id_type>, unsigned int> & elemset_array_indices);
 
   /**
    * Writes the vector of values to the element variables.
@@ -471,6 +516,14 @@ public:
   void use_mesh_dimension_instead_of_spatial_dimension(bool val);
 
   /**
+   * Set to true (the default) to write files in an HDF5-based file
+   * format (when HDF5 is available), or to false to write files in
+   * the old NetCDF3-based format.  If HDF5 is unavailable, this
+   * setting does nothing.
+   */
+  void set_hdf5_writing(bool write_hdf5);
+
+  /**
    * Sets the value of _write_as_dimension.
    *
    * This directly controls the num_dim which is written to the Exodus
@@ -539,14 +592,14 @@ public:
    * Prints the message defined in \p msg. Can be turned off if
    * verbosity is set to 0.
    */
-  void message(const std::string & msg);
+  void message(std::string_view msg);
 
   /**
    * Prints the message defined in \p msg, and appends the number \p i
    * to the end of the message.  Useful for printing messages in
    * loops.  Can be turned off if verbosity is set to 0.
    */
-  void message(const std::string & msg, int i);
+  void message(std::string_view msg, int i);
 
   // File identification flag
   int ex_id;
@@ -586,8 +639,11 @@ public:
   // Total number of node sets
   int & num_node_sets;
 
-  // Total number of element sets
+  // Total number of side sets
   int & num_side_sets;
+
+  // Total number of element sets
+  int & num_elem_sets;
 
   // Number of global variables
   int num_global_vars;
@@ -597,6 +653,9 @@ public:
 
   // Number of nodeset variables
   int num_nodeset_vars;
+
+  // Number of elemset variables
+  int num_elemset_vars;
 
   // Number of elements in this block
   int num_elem_this_blk;
@@ -609,6 +668,9 @@ public:
 
   // Total number of elements in all side sets
   int num_elem_all_sidesets;
+
+  // Total number of elements in all elem sets
+  int num_elem_all_elemsets;
 
   // Vector of element block identification numbers
   std::vector<int> block_ids;
@@ -625,17 +687,26 @@ public:
   // Vector of the nodeset IDs
   std::vector<int> nodeset_ids;
 
-  // Number of sides (edges/faces) in current set
+  // Vector of the elemset IDs
+  std::vector<int> elemset_ids;
+
+  // Number of sides in each sideset
   std::vector<int> num_sides_per_set;
 
-  // Number of nodes in current set
+  // Number of nodes in each nodeset
   std::vector<int> num_nodes_per_set;
 
-  // Number of distribution factors per set
+  // Number of elems in each elemset
+  std::vector<int> num_elems_per_set;
+
+  // Number of distribution factors per sideset
   std::vector<int> num_df_per_set;
 
-  // Number of distribution factors per set
+  // Number of distribution factors per nodeset
   std::vector<int> num_node_df_per_set;
+
+  // Number of distribution factors per elemset
+  std::vector<int> num_elem_df_per_set;
 
   // Starting indices for each nodeset in the node_sets_node_list vector.
   // Used in the calls to ex_{put,get}_concat_node_sets().
@@ -661,6 +732,12 @@ public:
 
   // Side (face/edge) id number
   std::vector<int> id_list;
+
+  // List of element numbers in all elemsets
+  std::vector<int> elemset_list;
+
+  // List of elemset ids for all elements in elemsets
+  std::vector<int> elemset_id_list;
 
   // Optional mapping from internal [0,num_nodes) to arbitrary indices
   std::vector<int> node_num_map;
@@ -738,11 +815,15 @@ public:
   // The names of the nodeset variables stored in the Exodus file
   std::vector<std::string> nodeset_var_names;
 
+  // The names of the elemset variables stored in the Exodus file
+  std::vector<std::string> elemset_var_names;
+
   // Maps of Ids to named entities
   std::map<int, std::string> id_to_block_names;
   std::map<int, std::string> id_to_edge_block_names;
   std::map<int, std::string> id_to_ss_names;
   std::map<int, std::string> id_to_ns_names;
+  std::map<int, std::string> id_to_elemset_names;
 
   // On/Off message flag
   bool verbose;
@@ -775,7 +856,7 @@ public:
    * SIDESET:   num_sideset_vars sideset_var_names
    * NODESET:   num_nodeset_vars nodeset_var_names
    */
-  enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2, SIDESET=3, NODESET=4};
+  enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2, SIDESET=3, NODESET=4, ELEMSET=5};
   void read_var_names(ExodusVarType type);
 
   const ExodusII_IO_Helper::Conversion &
@@ -817,6 +898,10 @@ protected:
   // of the elements comprising the mesh) instead of the mesh's
   // spatial dimension, when writing.  By default this is false.
   bool _use_mesh_dimension_instead_of_spatial_dimension;
+
+  // If true, write an HDF5 file when available.  If false, write the
+  // old format.
+  bool _write_hdf5;
 
   // Set once the elem num map has been read
   int _end_elem_id;

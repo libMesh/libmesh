@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,10 +20,6 @@
 #include "libmesh/libmesh_logging.h"
 
 
-// C++ Includes
-#include <cstdio> // for std::sprintf
-#include <sstream>
-
 // Local Includes
 #include "libmesh/libmesh_version.h"
 #include "libmesh/equation_systems.h"
@@ -33,6 +29,11 @@
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/mesh_refinement.h"
 
+// C++ Includes
+#include <iomanip> // setfill
+#include <sstream>
+#include <string>
+
 namespace libMesh
 {
 
@@ -41,25 +42,28 @@ namespace libMesh
 // Anonymous namespace for implementation details.
 namespace {
 std::string local_file_name (const unsigned int processor_id,
-                             const std::string & name)
+                             std::string_view basename)
 {
-  std::string basename(name);
-  char buf[256];
+  std::ostringstream returnval;
 
+  std::string_view suffix;
   if (basename.size() - basename.rfind(".bz2") == 4)
     {
-      basename.erase(basename.end()-4, basename.end());
-      std::sprintf(buf, "%s.%04u.bz2", basename.c_str(), processor_id);
+      basename.remove_suffix(4);
+      suffix = ".bz2";
     }
   else if (basename.size() - basename.rfind(".gz") == 3)
     {
-      basename.erase(basename.end()-3, basename.end());
-      std::sprintf(buf, "%s.%04u.gz", basename.c_str(), processor_id);
+      basename.remove_suffix(3);
+      suffix = ".gz";
     }
-  else
-    std::sprintf(buf, "%s.%04u", basename.c_str(), processor_id);
 
-  return std::string(buf);
+  returnval << basename << '.';
+  returnval << std::setfill('0') << std::setw(4);
+  returnval << processor_id;
+  returnval << suffix;
+
+  return returnval.str();
 }
 }
 
@@ -69,7 +73,7 @@ std::string local_file_name (const unsigned int processor_id,
 // ------------------------------------------------------------
 // EquationSystem class implementation
 template <typename InValType>
-void EquationSystems::read (const std::string & name,
+void EquationSystems::read (std::string_view name,
                             const unsigned int read_flags,
                             bool partition_agnostic)
 {
@@ -87,7 +91,7 @@ void EquationSystems::read (const std::string & name,
 
 
 template <typename InValType>
-void EquationSystems::read (const std::string & name,
+void EquationSystems::read (std::string_view name,
                             const XdrMODE mode,
                             const unsigned int read_flags,
                             bool partition_agnostic)
@@ -140,7 +144,7 @@ void EquationSystems::read (const std::string & name,
 
 
 template <typename InValType>
-void EquationSystems::_read_impl (const std::string & name,
+void EquationSystems::_read_impl (std::string_view name,
                                   const XdrMODE mode,
                                   const unsigned int read_flags,
                                   bool partition_agnostic)
@@ -221,7 +225,7 @@ void EquationSystems::_read_impl (const std::string & name,
 
   // This will unzip a file with .bz2 as the extension, otherwise it
   // simply returns the name if the file need not be unzipped.
-  Xdr io ((this->processor_id() == 0) ? name : "", mode);
+  Xdr io ((this->processor_id() == 0) ? std::string(name) : "", mode);
   libmesh_assert (io.reading());
 
   {
@@ -361,7 +365,7 @@ void EquationSystems::_read_impl (const std::string & name,
 
 
 
-void EquationSystems::write(const std::string & name,
+void EquationSystems::write(std::string_view name,
                             const unsigned int write_flags,
                             bool partition_agnostic) const
 {
@@ -373,7 +377,7 @@ void EquationSystems::write(const std::string & name,
 
 
 
-void EquationSystems::write(const std::string & name,
+void EquationSystems::write(std::string_view name,
                             const XdrMODE mode,
                             const unsigned int write_flags,
                             bool partition_agnostic) const
@@ -472,7 +476,7 @@ void EquationSystems::write(const std::string & name,
 
   // New scope so that io will close before we try to zip the file
   {
-    Xdr io((this->processor_id()==0) ? name : "", mode);
+    Xdr io((this->processor_id()==0) ? std::string(name) : "", mode);
     libmesh_assert (io.writing());
 
     LOG_SCOPE("write()", "EquationSystems");
@@ -494,7 +498,6 @@ void EquationSystems::write(const std::string & name,
     if (proc_id == 0)
       {
         std::string comment;
-        char buf[256];
 
         // 1.)
         // Write the version header
@@ -510,40 +513,40 @@ void EquationSystems::write(const std::string & name,
         // Write the number of equation systems
         io.data (n_sys, "# No. of Equation Systems");
 
-        for (auto & pr : _systems)
+        for (auto & [sys_name, sys] : _systems)
           {
             // Ignore this system if it has been marked as hidden
-            if (pr.second->hide_output()) continue;
+            if (sys->hide_output()) continue;
 
             // 3.)
             // Write the name of the sys_num-th system
             {
-              const unsigned int sys_num = pr.second->number();
-              std::string sys_name       = pr.first;
+              const unsigned int sys_num = sys->number();
 
               comment =  "# Name, System No. ";
-              std::sprintf(buf, "%u", sys_num);
-              comment += buf;
+              comment += std::to_string(sys_num);
 
-              io.data (sys_name, comment.c_str());
+              // Note: There is no Xdr::data overload taking a "const
+              // std::string &" so we need to make a copy.
+              std::string copy = sys_name;
+              io.data (copy, comment.c_str());
             }
 
             // 4.)
             // Write the type of system handled
             {
-              const unsigned int sys_num = pr.second->number();
-              std::string sys_type       = pr.second->system_type();
+              const unsigned int sys_num = sys->number();
+              std::string sys_type       = sys->system_type();
 
               comment =  "# Type, System No. ";
-              std::sprintf(buf, "%u", sys_num);
-              comment += buf;
+              comment += std::to_string(sys_num);
 
               io.data (sys_type, comment.c_str());
             }
 
             // 5.) - 9.)
             // Let System::write_header() do the job
-            pr.second->write_header (io, version, write_additional_data);
+            sys->write_header (io, version, write_additional_data);
           }
       }
 
@@ -579,13 +582,13 @@ void EquationSystems::write(const std::string & name,
 
 // template specialization
 
-template void EquationSystems::read<Number> (const std::string & name, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::read<Number> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::_read_impl<Number> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template LIBMESH_EXPORT void EquationSystems::read<Number> (std::string_view name, const unsigned int read_flags, bool partition_agnostic);
+template LIBMESH_EXPORT void EquationSystems::read<Number> (std::string_view name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template LIBMESH_EXPORT void EquationSystems::_read_impl<Number> (std::string_view name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template void EquationSystems::read<Real> (const std::string & name, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::read<Real> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::_read_impl<Real> (const std::string & name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template LIBMESH_EXPORT void EquationSystems::read<Real> (std::string_view name, const unsigned int read_flags, bool partition_agnostic);
+template LIBMESH_EXPORT void EquationSystems::read<Real> (std::string_view name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template LIBMESH_EXPORT void EquationSystems::_read_impl<Real> (std::string_view name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
 #endif
 
 } // namespace libMesh

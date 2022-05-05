@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -201,7 +201,7 @@ std::unique_ptr<Elem> InfHex18::build_side_ptr (const unsigned int i,
           // base
         case 0:
           {
-            face = libmesh_make_unique<Side<Quad9,InfHex18>>(this,i);
+            face = std::make_unique<Side<Quad9,InfHex18>>(this,i);
             break;
           }
 
@@ -211,7 +211,7 @@ std::unique_ptr<Elem> InfHex18::build_side_ptr (const unsigned int i,
         case 3:
         case 4:
           {
-            face = libmesh_make_unique<Side<InfQuad6,InfHex18>>(this,i);
+            face = std::make_unique<Side<InfQuad6,InfHex18>>(this,i);
             break;
           }
 
@@ -230,7 +230,7 @@ std::unique_ptr<Elem> InfHex18::build_side_ptr (const unsigned int i,
           // the base face
         case 0:
           {
-            face = libmesh_make_unique<Quad9>(this);
+            face = std::make_unique<Quad9>(this);
             break;
           }
 
@@ -240,7 +240,7 @@ std::unique_ptr<Elem> InfHex18::build_side_ptr (const unsigned int i,
         case 3:
         case 4:
           {
-            face = libmesh_make_unique<InfQuad6>(this);
+            face = std::make_unique<InfQuad6>(this);
             break;
           }
 

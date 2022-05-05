@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -136,14 +136,14 @@ std::unique_ptr<Elem> Prism::side_ptr (const unsigned int i)
     case 0: // the triangular face at z=0
     case 4: // the triangular face at z=1
       {
-        face = libmesh_make_unique<Tri3>();
+        face = std::make_unique<Tri3>();
         break;
       }
     case 1: // the quad face at y=0
     case 2: // the other quad face
     case 3: // the quad face at x=0
       {
-        face = libmesh_make_unique<Quad4>();
+        face = std::make_unique<Quad4>();
         break;
       }
     default:

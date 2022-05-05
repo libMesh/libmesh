@@ -6,7 +6,6 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parsed_fem_function.h"
 #include "libmesh/system.h"
-#include <libmesh/auto_ptr.h> // libmesh_make_unique
 
 #ifdef LIBMESH_HAVE_FPARSER
 
@@ -25,9 +24,9 @@ class ParsedFEMFunctionTest : public CppUnit::TestCase
 public:
   void setUp() {
 #if LIBMESH_DIM > 2
-    mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
+    mesh = std::make_unique<Mesh>(*TestCommWorld);
     MeshTools::Generation::build_cube(*mesh, 1, 1, 1);
-    es = libmesh_make_unique<EquationSystems>(*mesh);
+    es = std::make_unique<EquationSystems>(*mesh);
     sys = &(es->add_system<System> ("SimpleSystem"));
     sys->add_variable("x2");
     sys->add_variable("x3");
@@ -87,8 +86,8 @@ public:
     sol.close();
     sys->update();
 
-    c = libmesh_make_unique<FEMContext>(*sys);
-    s = libmesh_make_unique<FEMContext>(*sys);
+    c = std::make_unique<FEMContext>(*sys);
+    s = std::make_unique<FEMContext>(*sys);
     if (elem && elem->processor_id() == TestCommWorld->rank())
       {
         c->get_element_fe(0)->get_phi();
@@ -114,7 +113,7 @@ public:
     mesh.reset();
   }
 
-  CPPUNIT_TEST_SUITE(ParsedFEMFunctionTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(ParsedFEMFunctionTest);
 
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST(testValues);
@@ -138,6 +137,8 @@ private:
 
   void testValues()
   {
+    LOG_UNIT_TEST;
+
     if (c->has_elem() &&
         c->get_elem().processor_id() == TestCommWorld->rank())
       {
@@ -165,6 +166,8 @@ private:
 
   void testGradients()
   {
+    LOG_UNIT_TEST;
+
     if (c->has_elem() &&
         c->get_elem().processor_id() == TestCommWorld->rank())
       {
@@ -194,6 +197,8 @@ private:
 
   void testHessians()
   {
+    LOG_UNIT_TEST;
+
     if (c->has_elem() &&
         c->get_elem().processor_id() == TestCommWorld->rank())
       {
@@ -216,6 +221,8 @@ private:
 
   void testInlineGetter()
   {
+    LOG_UNIT_TEST;
+
     if (c->has_elem() &&
         c->get_elem().processor_id() == TestCommWorld->rank())
       {
@@ -243,6 +250,8 @@ private:
 
   void testInlineSetter()
   {
+    LOG_UNIT_TEST;
+
     if (c->has_elem() &&
         c->get_elem().processor_id() == TestCommWorld->rank())
       {
@@ -274,6 +283,8 @@ private:
 
   void testNormals()
   {
+    LOG_UNIT_TEST;
+
     if (s->has_elem() &&
         s->get_elem().processor_id() == TestCommWorld->rank())
       {

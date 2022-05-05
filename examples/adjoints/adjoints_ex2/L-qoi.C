@@ -1,11 +1,13 @@
 #include "L-qoi.h"
 
+#include "libmesh/system.h"
+
 using namespace libMesh;
 
-void LaplaceQoI::init_qoi(std::vector<Number> & sys_qoi)
+void LaplaceQoI::init_qoi_count(System & sys)
 {
   // Only 1 qoi to worry about
-  sys_qoi.resize(1);
+  sys.init_qois(1);
 }
 
 void LaplaceQoI::init_context(DiffContext & context)

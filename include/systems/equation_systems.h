@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,6 @@
 #include "libmesh/parameters.h"
 #include "libmesh/system.h"
 #include "libmesh/parallel_object.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
 namespace libMesh
@@ -49,6 +48,7 @@ enum XdrMODE : int;
 #include <map>
 #include <set>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <memory>
 
@@ -158,7 +158,7 @@ public:
    * \returns \p true if the system named \p name exists within
    * this EquationSystems object.
    */
-  bool has_system (const std::string & name) const;
+  bool has_system (std::string_view name) const;
 
   /**
    * \returns A constant reference to the system named \p name.
@@ -167,7 +167,7 @@ public:
    * is an example of how the method might be used
    */
   template <typename T_sys>
-  const T_sys & get_system (const std::string & name) const;
+  const T_sys & get_system (std::string_view name) const;
 
   /**
    * \returns A writable reference to the system named \p name.
@@ -176,7 +176,7 @@ public:
    * is an example of how the method might be used
    */
   template <typename T_sys>
-  T_sys & get_system (const std::string & name);
+  T_sys & get_system (std::string_view name);
 
   /**
    * \returns A constant reference to system number \p num.
@@ -199,12 +199,12 @@ public:
   /**
    * \returns A constant reference to the system named \p name.
    */
-  const System & get_system (const std::string & name) const;
+  const System & get_system (std::string_view name) const;
 
   /**
    * \returns A writable reference to the system named \p name.
    */
-  System & get_system (const std::string & name);
+  System & get_system (std::string_view name);
 
   /**
    * \returns A constant reference to system number \p num.
@@ -220,14 +220,14 @@ public:
    * Add the system of type \p system_type named \p name to the
    * systems array.
    */
-  virtual System & add_system (const std::string & system_type,
-                               const std::string & name);
+  virtual System & add_system (std::string_view system_type,
+                               std::string_view name);
 
   /**
    * Add the system named \p name to the systems array.
    */
   template <typename T_sys>
-  T_sys & add_system (const std::string & name);
+  T_sys & add_system (std::string_view name);
 
   /**
    * \returns The total number of variables in all
@@ -297,8 +297,8 @@ public:
    * files from processor 0.
    */
   void build_solution_vector (std::vector<Number> & soln,
-                              const std::string & system_name,
-                              const std::string & variable_name = "all_vars") const;
+                              std::string_view system_name,
+                              std::string_view variable_name = "all_vars") const;
 
   /**
    * Fill the input vector \p soln with solution values.  The
@@ -443,23 +443,23 @@ public:
    * that have two nodes in exactly the same position!
    */
   template <typename InValType>
-  void read (const std::string & name,
+  void read (std::string_view name,
              const XdrMODE,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true);
 
-  void read (const std::string & name,
+  void read (std::string_view name,
              const XdrMODE mode,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true)
   { read<Number>(name, mode, read_flags, partition_agnostic); }
 
   template <typename InValType>
-  void read (const std::string & name,
+  void read (std::string_view name,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true);
 
-  void read (const std::string & name,
+  void read (std::string_view name,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true)
   { read<Number>(name, read_flags, partition_agnostic); }
@@ -489,12 +489,12 @@ public:
    * processes.  This renumbering is not compatible with meshes
    * that have two nodes in exactly the same position!
    */
-  void write (const std::string & name,
+  void write (std::string_view name,
               const XdrMODE,
               const unsigned int write_flags=(WRITE_DATA),
               bool partition_agnostic = true) const;
 
-  void write (const std::string & name,
+  void write (std::string_view name,
               const unsigned int write_flags=(WRITE_DATA),
               bool partition_agnostic = true) const;
 
@@ -587,7 +587,7 @@ protected:
   /**
    * Data structure holding the systems.
    */
-  std::map<std::string, std::unique_ptr<System>> _systems;
+  std::map<std::string, std::unique_ptr<System>, std::less<>> _systems;
 
   /**
    * Flag for whether to call coarsen/refine in reinit().
@@ -618,7 +618,7 @@ private:
    * two nodes in exactly the same position!
    */
   template <typename InValType>
-  void _read_impl (const std::string & name,
+  void _read_impl (std::string_view name,
                    const XdrMODE,
                    const unsigned int read_flags,
                    bool partition_agnostic = true);
@@ -668,14 +668,15 @@ unsigned int EquationSystems::n_systems () const
 
 template <typename T_sys>
 inline
-T_sys & EquationSystems::add_system (const std::string & name)
+T_sys & EquationSystems::add_system (std::string_view name)
 {
   if (!_systems.count(name))
     {
       const unsigned int sys_num = this->n_systems();
 
-      auto result =
-        _systems.emplace(name, libmesh_make_unique<T_sys>(*this, name, sys_num));
+      auto result = _systems.emplace
+        (name, std::make_unique<T_sys>(*this, std::string(name),
+                                       sys_num));
 
       if (!_enable_default_ghosting)
         this->_remove_default_ghosting(sys_num);
@@ -700,7 +701,7 @@ T_sys & EquationSystems::add_system (const std::string & name)
 
 
 inline
-bool EquationSystems::has_system (const std::string & name) const
+bool EquationSystems::has_system (std::string_view name) const
 {
   if (_systems.find(name) == _systems.end())
     return false;
@@ -753,7 +754,7 @@ T_sys & EquationSystems::get_system (const unsigned int num)
 
 template <typename T_sys>
 inline
-const T_sys & EquationSystems::get_system (const std::string & name) const
+const T_sys & EquationSystems::get_system (std::string_view name) const
 {
   auto pos = _systems.find(name);
 
@@ -772,7 +773,7 @@ const T_sys & EquationSystems::get_system (const std::string & name) const
 
 template <typename T_sys>
 inline
-T_sys & EquationSystems::get_system (const std::string & name)
+T_sys & EquationSystems::get_system (std::string_view name)
 {
   auto pos = _systems.find(name);
 
@@ -791,7 +792,7 @@ T_sys & EquationSystems::get_system (const std::string & name)
 
 
 inline
-const System & EquationSystems::get_system (const std::string & name) const
+const System & EquationSystems::get_system (std::string_view name) const
 {
   return this->get_system<System>(name);
 }
@@ -799,7 +800,7 @@ const System & EquationSystems::get_system (const std::string & name) const
 
 
 inline
-System & EquationSystems::get_system (const std::string & name)
+System & EquationSystems::get_system (std::string_view name)
 {
   return this->get_system<System>(name);
 }

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,13 +19,14 @@
 #ifndef LIBMESH_UTILITY_H
 #define LIBMESH_UTILITY_H
 
-// Local includes
+// LibMesh includes
 #include "libmesh/libmesh_common.h" // for Real
 
-// System includes
+// C++ includes
 #include <string>
 #include <vector>
-#include <algorithm> // for std::lower_bound
+#include <algorithm> // is_sorted, lower_bound
+#include <memory> // unique_ptr
 
 namespace libMesh
 {
@@ -194,12 +195,11 @@ vector_at(const Vector & vec,
   return vec[i];
 }
 
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
 /**
- * \p Utility::iota is a duplication of the SGI STL extension
- * \p std::iota.  It simply assigns sequentially increasing values
- * to a range. That is, it assigns \p value to \p *first, \p value + 1
- * to \p *(first + 1) and so on. In general, each iterator \p i in the
- * range [first, last) is assigned \p value + (i - \p first).
+ * Utility::iota was created back when std::iota was just an
+ * SGI STL extension.
  */
 template <typename ForwardIter, typename T>
 void iota (ForwardIter first, ForwardIter last, T value)
@@ -216,58 +216,16 @@ void iota (ForwardIter first, ForwardIter last, T value)
 
 
 /**
- * Utility::is_sorted mimics the behavior of the SGI STL extension
- * std::is_sorted.  Checks to see if the range [first,last) is
- * sorted in non-decreasing order, ie. for each "i" in
- * [first,last) *i <= *(i+1).
+ * Utility::is_sorted was created back when std::is_sorted was just an
+ * SGI STL extension.
  */
 template<class InputIterator >
 bool is_sorted(InputIterator first, InputIterator last)
 {
-  if (first == last)
-    return true;
-
-  // "prev" always points to the entry just to the left of "first"
-  //  [-    -    -    -    -    -]
-  //   ^    ^
-  // prev first
-  //
-  //  [-    -    -    -    -    -]
-  //        ^    ^
-  //      prev first
-  //
-  //  [-    -    -    -    -    -]
-  //             ^    ^
-  //           prev first
-  InputIterator prev( first );
-  for (++first; first != last; ++prev, ++first)
-    if (*first < *prev)    // Note: this is the same as *prev > *first,
-      return false;        // but we only require op< to be defined.
-
-  // If we haven't returned yet, it's sorted!
-  return true;
-
-
-  // A one-liner version using adjacent_find.  This doesn't work for
-  // C-style arrays, since their pointers do not have a value_type.
-  //
-  // Works by checking to see if adjacent entries satisfy *i >
-  // *(i+1) and returns the first one which does.  If "last" is
-  // returned, no such pair was found, and therefore the range must
-  // be in non-decreasing order.
-  //
-  // return (last ==
-  // std::adjacent_find(first, last,
-  // std::greater<typename InputIterator::value_type >()));
-
-  // A second one-linear attempt.  This one checks for a **strictly
-  // increasing** (no duplicate entries) range.  Also doesn't work
-  // with C-style arrays.
-  //
-  // return (last ==
-  // std::adjacent_find(first, last,
-  // std::not2(std::less<typename InputIterator::value_type>())));
+  libmesh_deprecated();
+  return std::is_sorted(first, last);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 /**
@@ -407,7 +365,7 @@ void deallocate (std::vector<T> & vec)
  * of complex data, and for  \p r_o_c = 1 the filename for the imaginary
  * part.
  */
-std::string complex_filename (const std::string & basename,
+std::string complex_filename (std::string basename,
                               unsigned int r_o_c=0);
 
 /**
@@ -433,7 +391,7 @@ int mkdir(const char* pathname);
  * This is a hack because we don't have a neat bz2/xz equivalent to
  * gzstreams.
  */
-std::string unzip_file (const std::string & name);
+std::string unzip_file (std::string_view name);
 
 
 /**
@@ -505,6 +463,50 @@ T ReverseBytes::operator() (T & data) const
 
   return data;
 }
+
+
+
+/**
+ * Struct which defines a custom comparison object that
+ * can be used with std::sets of std::unique_ptrs
+ */
+struct CompareUnderlying
+{
+  /**
+   * As of C++14, std::set::find() can be a templated overload.
+   * https://en.cppreference.com/w/cpp/container/set/find
+   * We enable this by defining is_transparent as a type.
+   */
+  using is_transparent = void;
+
+  /**
+   * This is already what the default operator< comparison for std::unique_ptrs does,
+   * we are not adding anything here.
+   */
+  template <class T>
+  bool operator()(const std::unique_ptr<T> & a, const std::unique_ptr<T> & b) const
+  {
+    return a.get() < b.get();
+  }
+
+  /**
+   * operator< comparison when rhs is a dumb pointer
+   */
+  template <class T>
+  bool operator()(const std::unique_ptr<T> & a, const T * const & b) const
+  {
+    return a.get() < b;
+  }
+
+  /**
+   * operator< comparison when lhs is a dumb pointer
+   */
+  template <class T>
+  bool operator()(const T * const & a, const std::unique_ptr<T> & b) const
+  {
+    return a < b.get();
+  }
+};
 
 
 }

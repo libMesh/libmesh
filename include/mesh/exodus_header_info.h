@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -57,19 +57,21 @@ public:
     // Pack individual integers into vector
     std::vector<int> buffer =
       {num_dim, num_elem, num_elem_blk, num_node_sets,
-       num_side_sets, num_edge_blk, num_edge};
+       num_side_sets, num_elem_sets, num_edge_blk, num_edge};
 
     // broadcast integers
     comm.broadcast(buffer);
 
     // unpack
-    num_dim       = buffer[0];
-    num_elem      = buffer[1];
-    num_elem_blk  = buffer[2];
-    num_node_sets = buffer[3];
-    num_side_sets = buffer[4];
-    num_edge_blk  = buffer[5];
-    num_edge      = buffer[6];
+    unsigned int ctr = 0;
+    num_dim       = buffer[ctr++];
+    num_elem      = buffer[ctr++];
+    num_elem_blk  = buffer[ctr++];
+    num_node_sets = buffer[ctr++];
+    num_side_sets = buffer[ctr++];
+    num_elem_sets = buffer[ctr++];
+    num_edge_blk  = buffer[ctr++];
+    num_edge      = buffer[ctr++];
   }
 
   std::vector<char> title;
@@ -79,6 +81,7 @@ public:
   int num_elem_blk;
   int num_node_sets;
   int num_side_sets;
+  int num_elem_sets;
   int num_edge_blk;
   int num_edge;
 };

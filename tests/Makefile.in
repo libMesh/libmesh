@@ -221,9 +221,9 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/libmesh_poly2tri.C mesh/slit_mesh_test.C \
 	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
-	mesh/write_sideset_data.C mesh/write_nodeset_data.C \
-	mesh/write_edgeset_data.C mesh/write_vec_and_scalar.C \
-	numerics/composite_function_test.C \
+	mesh/write_elemset_data.C mesh/write_sideset_data.C \
+	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
+	mesh/write_vec_and_scalar.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -251,9 +251,9 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
 	systems/systems_test.C utils/parameters_test.C \
-	utils/point_locator_test.C utils/vectormap_test.C \
-	utils/xdr_test.C meshes/1_quad.bxt.gz meshes/25_quad.bxt.gz \
-	meshes/BlockWithHole_Patch9.bxt.gz \
+	utils/point_locator_test.C utils/transparent_comparator.C \
+	utils/vectormap_test.C utils/xdr_test.C meshes/1_quad.bxt.gz \
+	meshes/25_quad.bxt.gz meshes/BlockWithHole_Patch9.bxt.gz \
 	meshes/PlateWithHole_Patch8.bxt.gz \
 	meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz \
 	meshes/PressurizedCyl_Patch6_256Elem.bxt.gz \
@@ -320,6 +320,7 @@ am__objects_3 = unit_tests_dbg-driver.$(OBJEXT) \
 	mesh/unit_tests_dbg-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-spatial_dimension_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.$(OBJEXT) \
+	mesh/unit_tests_dbg-write_elemset_data.$(OBJEXT) \
 	mesh/unit_tests_dbg-write_sideset_data.$(OBJEXT) \
 	mesh/unit_tests_dbg-write_nodeset_data.$(OBJEXT) \
 	mesh/unit_tests_dbg-write_edgeset_data.$(OBJEXT) \
@@ -361,6 +362,7 @@ am__objects_3 = unit_tests_dbg-driver.$(OBJEXT) \
 	systems/unit_tests_dbg-systems_test.$(OBJEXT) \
 	utils/unit_tests_dbg-parameters_test.$(OBJEXT) \
 	utils/unit_tests_dbg-point_locator_test.$(OBJEXT) \
+	utils/unit_tests_dbg-transparent_comparator.$(OBJEXT) \
 	utils/unit_tests_dbg-vectormap_test.$(OBJEXT) \
 	utils/unit_tests_dbg-xdr_test.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2)
@@ -403,9 +405,9 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/libmesh_poly2tri.C mesh/slit_mesh_test.C \
 	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
-	mesh/write_sideset_data.C mesh/write_nodeset_data.C \
-	mesh/write_edgeset_data.C mesh/write_vec_and_scalar.C \
-	numerics/composite_function_test.C \
+	mesh/write_elemset_data.C mesh/write_sideset_data.C \
+	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
+	mesh/write_vec_and_scalar.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -433,9 +435,9 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
 	systems/systems_test.C utils/parameters_test.C \
-	utils/point_locator_test.C utils/vectormap_test.C \
-	utils/xdr_test.C meshes/1_quad.bxt.gz meshes/25_quad.bxt.gz \
-	meshes/BlockWithHole_Patch9.bxt.gz \
+	utils/point_locator_test.C utils/transparent_comparator.C \
+	utils/vectormap_test.C utils/xdr_test.C meshes/1_quad.bxt.gz \
+	meshes/25_quad.bxt.gz meshes/BlockWithHole_Patch9.bxt.gz \
 	meshes/PlateWithHole_Patch8.bxt.gz \
 	meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz \
 	meshes/PressurizedCyl_Patch6_256Elem.bxt.gz \
@@ -500,6 +502,7 @@ am__objects_5 = unit_tests_devel-driver.$(OBJEXT) \
 	mesh/unit_tests_devel-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_devel-spatial_dimension_test.$(OBJEXT) \
 	mesh/unit_tests_devel-mapped_subdomain_partitioner_test.$(OBJEXT) \
+	mesh/unit_tests_devel-write_elemset_data.$(OBJEXT) \
 	mesh/unit_tests_devel-write_sideset_data.$(OBJEXT) \
 	mesh/unit_tests_devel-write_nodeset_data.$(OBJEXT) \
 	mesh/unit_tests_devel-write_edgeset_data.$(OBJEXT) \
@@ -541,6 +544,7 @@ am__objects_5 = unit_tests_devel-driver.$(OBJEXT) \
 	systems/unit_tests_devel-systems_test.$(OBJEXT) \
 	utils/unit_tests_devel-parameters_test.$(OBJEXT) \
 	utils/unit_tests_devel-point_locator_test.$(OBJEXT) \
+	utils/unit_tests_devel-transparent_comparator.$(OBJEXT) \
 	utils/unit_tests_devel-vectormap_test.$(OBJEXT) \
 	utils/unit_tests_devel-xdr_test.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_4)
@@ -579,9 +583,9 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/libmesh_poly2tri.C mesh/slit_mesh_test.C \
 	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
-	mesh/write_sideset_data.C mesh/write_nodeset_data.C \
-	mesh/write_edgeset_data.C mesh/write_vec_and_scalar.C \
-	numerics/composite_function_test.C \
+	mesh/write_elemset_data.C mesh/write_sideset_data.C \
+	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
+	mesh/write_vec_and_scalar.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -609,9 +613,9 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
 	systems/systems_test.C utils/parameters_test.C \
-	utils/point_locator_test.C utils/vectormap_test.C \
-	utils/xdr_test.C meshes/1_quad.bxt.gz meshes/25_quad.bxt.gz \
-	meshes/BlockWithHole_Patch9.bxt.gz \
+	utils/point_locator_test.C utils/transparent_comparator.C \
+	utils/vectormap_test.C utils/xdr_test.C meshes/1_quad.bxt.gz \
+	meshes/25_quad.bxt.gz meshes/BlockWithHole_Patch9.bxt.gz \
 	meshes/PlateWithHole_Patch8.bxt.gz \
 	meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz \
 	meshes/PressurizedCyl_Patch6_256Elem.bxt.gz \
@@ -676,6 +680,7 @@ am__objects_7 = unit_tests_oprof-driver.$(OBJEXT) \
 	mesh/unit_tests_oprof-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-spatial_dimension_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.$(OBJEXT) \
+	mesh/unit_tests_oprof-write_elemset_data.$(OBJEXT) \
 	mesh/unit_tests_oprof-write_sideset_data.$(OBJEXT) \
 	mesh/unit_tests_oprof-write_nodeset_data.$(OBJEXT) \
 	mesh/unit_tests_oprof-write_edgeset_data.$(OBJEXT) \
@@ -717,6 +722,7 @@ am__objects_7 = unit_tests_oprof-driver.$(OBJEXT) \
 	systems/unit_tests_oprof-systems_test.$(OBJEXT) \
 	utils/unit_tests_oprof-parameters_test.$(OBJEXT) \
 	utils/unit_tests_oprof-point_locator_test.$(OBJEXT) \
+	utils/unit_tests_oprof-transparent_comparator.$(OBJEXT) \
 	utils/unit_tests_oprof-vectormap_test.$(OBJEXT) \
 	utils/unit_tests_oprof-xdr_test.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_6)
@@ -755,9 +761,9 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/libmesh_poly2tri.C mesh/slit_mesh_test.C \
 	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
-	mesh/write_sideset_data.C mesh/write_nodeset_data.C \
-	mesh/write_edgeset_data.C mesh/write_vec_and_scalar.C \
-	numerics/composite_function_test.C \
+	mesh/write_elemset_data.C mesh/write_sideset_data.C \
+	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
+	mesh/write_vec_and_scalar.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -785,9 +791,9 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
 	systems/systems_test.C utils/parameters_test.C \
-	utils/point_locator_test.C utils/vectormap_test.C \
-	utils/xdr_test.C meshes/1_quad.bxt.gz meshes/25_quad.bxt.gz \
-	meshes/BlockWithHole_Patch9.bxt.gz \
+	utils/point_locator_test.C utils/transparent_comparator.C \
+	utils/vectormap_test.C utils/xdr_test.C meshes/1_quad.bxt.gz \
+	meshes/25_quad.bxt.gz meshes/BlockWithHole_Patch9.bxt.gz \
 	meshes/PlateWithHole_Patch8.bxt.gz \
 	meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz \
 	meshes/PressurizedCyl_Patch6_256Elem.bxt.gz \
@@ -852,6 +858,7 @@ am__objects_9 = unit_tests_opt-driver.$(OBJEXT) \
 	mesh/unit_tests_opt-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_opt-spatial_dimension_test.$(OBJEXT) \
 	mesh/unit_tests_opt-mapped_subdomain_partitioner_test.$(OBJEXT) \
+	mesh/unit_tests_opt-write_elemset_data.$(OBJEXT) \
 	mesh/unit_tests_opt-write_sideset_data.$(OBJEXT) \
 	mesh/unit_tests_opt-write_nodeset_data.$(OBJEXT) \
 	mesh/unit_tests_opt-write_edgeset_data.$(OBJEXT) \
@@ -893,6 +900,7 @@ am__objects_9 = unit_tests_opt-driver.$(OBJEXT) \
 	systems/unit_tests_opt-systems_test.$(OBJEXT) \
 	utils/unit_tests_opt-parameters_test.$(OBJEXT) \
 	utils/unit_tests_opt-point_locator_test.$(OBJEXT) \
+	utils/unit_tests_opt-transparent_comparator.$(OBJEXT) \
 	utils/unit_tests_opt-vectormap_test.$(OBJEXT) \
 	utils/unit_tests_opt-xdr_test.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_8)
@@ -931,9 +939,9 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/libmesh_poly2tri.C mesh/slit_mesh_test.C \
 	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
-	mesh/write_sideset_data.C mesh/write_nodeset_data.C \
-	mesh/write_edgeset_data.C mesh/write_vec_and_scalar.C \
-	numerics/composite_function_test.C \
+	mesh/write_elemset_data.C mesh/write_sideset_data.C \
+	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
+	mesh/write_vec_and_scalar.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -961,9 +969,9 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
 	systems/systems_test.C utils/parameters_test.C \
-	utils/point_locator_test.C utils/vectormap_test.C \
-	utils/xdr_test.C meshes/1_quad.bxt.gz meshes/25_quad.bxt.gz \
-	meshes/BlockWithHole_Patch9.bxt.gz \
+	utils/point_locator_test.C utils/transparent_comparator.C \
+	utils/vectormap_test.C utils/xdr_test.C meshes/1_quad.bxt.gz \
+	meshes/25_quad.bxt.gz meshes/BlockWithHole_Patch9.bxt.gz \
 	meshes/PlateWithHole_Patch8.bxt.gz \
 	meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz \
 	meshes/PressurizedCyl_Patch6_256Elem.bxt.gz \
@@ -1028,6 +1036,7 @@ am__objects_11 = unit_tests_prof-driver.$(OBJEXT) \
 	mesh/unit_tests_prof-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_prof-spatial_dimension_test.$(OBJEXT) \
 	mesh/unit_tests_prof-mapped_subdomain_partitioner_test.$(OBJEXT) \
+	mesh/unit_tests_prof-write_elemset_data.$(OBJEXT) \
 	mesh/unit_tests_prof-write_sideset_data.$(OBJEXT) \
 	mesh/unit_tests_prof-write_nodeset_data.$(OBJEXT) \
 	mesh/unit_tests_prof-write_edgeset_data.$(OBJEXT) \
@@ -1069,6 +1078,7 @@ am__objects_11 = unit_tests_prof-driver.$(OBJEXT) \
 	systems/unit_tests_prof-systems_test.$(OBJEXT) \
 	utils/unit_tests_prof-parameters_test.$(OBJEXT) \
 	utils/unit_tests_prof-point_locator_test.$(OBJEXT) \
+	utils/unit_tests_prof-transparent_comparator.$(OBJEXT) \
 	utils/unit_tests_prof-vectormap_test.$(OBJEXT) \
 	utils/unit_tests_prof-xdr_test.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_10)
@@ -1274,6 +1284,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-slit_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-spatial_dimension_test.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-write_edgeset_data.Po \
+	mesh/$(DEPDIR)/unit_tests_dbg-write_elemset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-write_nodeset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-write_sideset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-write_vec_and_scalar.Po \
@@ -1302,6 +1313,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-slit_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-spatial_dimension_test.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-write_edgeset_data.Po \
+	mesh/$(DEPDIR)/unit_tests_devel-write_elemset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-write_nodeset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-write_sideset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-write_vec_and_scalar.Po \
@@ -1330,6 +1342,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-slit_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-spatial_dimension_test.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-write_edgeset_data.Po \
+	mesh/$(DEPDIR)/unit_tests_oprof-write_elemset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-write_nodeset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-write_sideset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-write_vec_and_scalar.Po \
@@ -1358,6 +1371,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-slit_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-spatial_dimension_test.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-write_edgeset_data.Po \
+	mesh/$(DEPDIR)/unit_tests_opt-write_elemset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-write_nodeset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-write_sideset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-write_vec_and_scalar.Po \
@@ -1386,6 +1400,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-slit_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-spatial_dimension_test.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-write_edgeset_data.Po \
+	mesh/$(DEPDIR)/unit_tests_prof-write_elemset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-write_nodeset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-write_sideset_data.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-write_vec_and_scalar.Po \
@@ -1566,22 +1581,27 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	systems/$(DEPDIR)/unit_tests_prof-systems_test.Po \
 	utils/$(DEPDIR)/unit_tests_dbg-parameters_test.Po \
 	utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Po \
+	utils/$(DEPDIR)/unit_tests_dbg-transparent_comparator.Po \
 	utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Po \
 	utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Po \
 	utils/$(DEPDIR)/unit_tests_devel-parameters_test.Po \
 	utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Po \
+	utils/$(DEPDIR)/unit_tests_devel-transparent_comparator.Po \
 	utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Po \
 	utils/$(DEPDIR)/unit_tests_devel-xdr_test.Po \
 	utils/$(DEPDIR)/unit_tests_oprof-parameters_test.Po \
 	utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Po \
+	utils/$(DEPDIR)/unit_tests_oprof-transparent_comparator.Po \
 	utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Po \
 	utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Po \
 	utils/$(DEPDIR)/unit_tests_opt-parameters_test.Po \
 	utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Po \
+	utils/$(DEPDIR)/unit_tests_opt-transparent_comparator.Po \
 	utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Po \
 	utils/$(DEPDIR)/unit_tests_opt-xdr_test.Po \
 	utils/$(DEPDIR)/unit_tests_prof-parameters_test.Po \
 	utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Po \
+	utils/$(DEPDIR)/unit_tests_prof-transparent_comparator.Po \
 	utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Po \
 	utils/$(DEPDIR)/unit_tests_prof-xdr_test.Po
 am__mv = mv -f
@@ -2067,9 +2087,9 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	mesh/libmesh_poly2tri.C mesh/slit_mesh_test.C \
 	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
-	mesh/write_sideset_data.C mesh/write_nodeset_data.C \
-	mesh/write_edgeset_data.C mesh/write_vec_and_scalar.C \
-	numerics/composite_function_test.C \
+	mesh/write_elemset_data.C mesh/write_sideset_data.C \
+	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
+	mesh/write_vec_and_scalar.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -2097,8 +2117,9 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
 	systems/systems_test.C utils/parameters_test.C \
-	utils/point_locator_test.C utils/vectormap_test.C \
-	utils/xdr_test.C $(data) $(am__append_1)
+	utils/point_locator_test.C utils/transparent_comparator.C \
+	utils/vectormap_test.C utils/xdr_test.C $(data) \
+	$(am__append_1)
 data = meshes/1_quad.bxt.gz \
        meshes/25_quad.bxt.gz \
        meshes/BlockWithHole_Patch9.bxt.gz \
@@ -2145,18 +2166,19 @@ data = meshes/1_quad.bxt.gz \
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_DATA = $(data)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@TESTS = run_unit_tests.sh
 CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
-	mesh_with_soln.e elemental_from_nodal.e write_sideset_data.e \
-	write_nodeset_data.e write_edgeset_data.e read_header_test.e \
-	output.dat periodic.e mesh.out.memory.moved.xda \
-	mesh.out.file.moved.xda repl_with_nodal_soln.nem.1.0 \
-	dist_with_elem_soln.e dist.e dist_with_nodal_soln.e \
-	dist_with_nodal_soln.nem.1.0 dist_with_elem_vec.e \
-	dist_with_single_elem.nem.1.0 dist_with_elem_soln.nem.1.0 \
-	rep.nem.1.0 repl_with_elem_soln.nem.1.0 \
-	repl_with_single_elem.nem.1.0 dist_with_elem_vec.nem.1.0 \
-	repl_with_elem_vec.nem.1.0 dist.nem.1.0 repl_with_elem_soln.e \
-	test_nemesis_read.nem.1.0 rep.e repl_with_nodal_soln.e \
-	repl_with_elem_vec.e $(am__append_12) $(am__append_13)
+	mesh_with_soln.e elemental_from_nodal.e write_elemset_data.e \
+	write_sideset_data.e write_nodeset_data.e write_edgeset_data.e \
+	read_header_test.e output.dat periodic.e \
+	mesh.out.memory.moved.xda mesh.out.file.moved.xda \
+	repl_with_nodal_soln.nem.1.0 dist_with_elem_soln.e dist.e \
+	dist_with_nodal_soln.e dist_with_nodal_soln.nem.1.0 \
+	dist_with_elem_vec.e dist_with_single_elem.nem.1.0 \
+	dist_with_elem_soln.nem.1.0 rep.nem.1.0 \
+	repl_with_elem_soln.nem.1.0 repl_with_single_elem.nem.1.0 \
+	dist_with_elem_vec.nem.1.0 repl_with_elem_vec.nem.1.0 \
+	dist.nem.1.0 repl_with_elem_soln.e test_nemesis_read.nem.1.0 \
+	rep.e repl_with_nodal_soln.e repl_with_elem_vec.e \
+	$(am__append_12) $(am__append_13)
 
 # need to link any data files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
@@ -2344,6 +2366,8 @@ mesh/unit_tests_dbg-spatial_dimension_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_dbg-write_elemset_data.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-write_sideset_data.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-write_nodeset_data.$(OBJEXT):  \
@@ -2476,6 +2500,8 @@ utils/unit_tests_dbg-parameters_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_dbg-point_locator_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_dbg-transparent_comparator.$(OBJEXT):  \
+	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_dbg-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_dbg-xdr_test.$(OBJEXT): utils/$(am__dirstamp) \
@@ -2598,6 +2624,8 @@ mesh/unit_tests_devel-spatial_dimension_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-mapped_subdomain_partitioner_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_devel-write_elemset_data.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-write_sideset_data.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-write_nodeset_data.$(OBJEXT):  \
@@ -2687,6 +2715,8 @@ systems/unit_tests_devel-systems_test.$(OBJEXT):  \
 utils/unit_tests_devel-parameters_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_devel-point_locator_test.$(OBJEXT):  \
+	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_devel-transparent_comparator.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_devel-vectormap_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
@@ -2804,6 +2834,8 @@ mesh/unit_tests_oprof-spatial_dimension_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_oprof-write_elemset_data.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-write_sideset_data.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-write_nodeset_data.$(OBJEXT):  \
@@ -2893,6 +2925,8 @@ systems/unit_tests_oprof-systems_test.$(OBJEXT):  \
 utils/unit_tests_oprof-parameters_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_oprof-point_locator_test.$(OBJEXT):  \
+	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_oprof-transparent_comparator.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_oprof-vectormap_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
@@ -3010,6 +3044,8 @@ mesh/unit_tests_opt-spatial_dimension_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-mapped_subdomain_partitioner_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_opt-write_elemset_data.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-write_sideset_data.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-write_nodeset_data.$(OBJEXT):  \
@@ -3099,6 +3135,8 @@ systems/unit_tests_opt-systems_test.$(OBJEXT):  \
 utils/unit_tests_opt-parameters_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_opt-point_locator_test.$(OBJEXT):  \
+	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_opt-transparent_comparator.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_opt-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
@@ -3216,6 +3254,8 @@ mesh/unit_tests_prof-spatial_dimension_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-mapped_subdomain_partitioner_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_prof-write_elemset_data.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-write_sideset_data.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-write_nodeset_data.$(OBJEXT):  \
@@ -3305,6 +3345,8 @@ systems/unit_tests_prof-systems_test.$(OBJEXT):  \
 utils/unit_tests_prof-parameters_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_prof-point_locator_test.$(OBJEXT):  \
+	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_prof-transparent_comparator.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_prof-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
@@ -3515,6 +3557,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-slit_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-spatial_dimension_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-write_edgeset_data.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-write_elemset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-write_nodeset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-write_sideset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-write_vec_and_scalar.Po@am__quote@ # am--include-marker
@@ -3543,6 +3586,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-slit_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-spatial_dimension_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-write_edgeset_data.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-write_elemset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-write_nodeset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-write_sideset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-write_vec_and_scalar.Po@am__quote@ # am--include-marker
@@ -3571,6 +3615,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-slit_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-spatial_dimension_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-write_edgeset_data.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-write_elemset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-write_nodeset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-write_sideset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-write_vec_and_scalar.Po@am__quote@ # am--include-marker
@@ -3599,6 +3644,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-slit_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-spatial_dimension_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-write_edgeset_data.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-write_elemset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-write_nodeset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-write_sideset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-write_vec_and_scalar.Po@am__quote@ # am--include-marker
@@ -3627,6 +3673,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-slit_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-spatial_dimension_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-write_edgeset_data.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-write_elemset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-write_nodeset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-write_sideset_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-write_vec_and_scalar.Po@am__quote@ # am--include-marker
@@ -3807,22 +3854,27 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_dbg-parameters_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_dbg-transparent_comparator.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_devel-parameters_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_devel-transparent_comparator.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_devel-xdr_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_oprof-parameters_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_oprof-transparent_comparator.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_opt-parameters_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_opt-transparent_comparator.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_opt-xdr_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_prof-parameters_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_prof-transparent_comparator.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_prof-xdr_test.Po@am__quote@ # am--include-marker
 
@@ -4612,6 +4664,20 @@ mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.obj: mesh/mapped_subdomain
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
 
+mesh/unit_tests_dbg-write_elemset_data.o: mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-write_elemset_data.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-write_elemset_data.Tpo -c -o mesh/unit_tests_dbg-write_elemset_data.o `test -f 'mesh/write_elemset_data.C' || echo '$(srcdir)/'`mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-write_elemset_data.Tpo mesh/$(DEPDIR)/unit_tests_dbg-write_elemset_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_elemset_data.C' object='mesh/unit_tests_dbg-write_elemset_data.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-write_elemset_data.o `test -f 'mesh/write_elemset_data.C' || echo '$(srcdir)/'`mesh/write_elemset_data.C
+
+mesh/unit_tests_dbg-write_elemset_data.obj: mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-write_elemset_data.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-write_elemset_data.Tpo -c -o mesh/unit_tests_dbg-write_elemset_data.obj `if test -f 'mesh/write_elemset_data.C'; then $(CYGPATH_W) 'mesh/write_elemset_data.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_elemset_data.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-write_elemset_data.Tpo mesh/$(DEPDIR)/unit_tests_dbg-write_elemset_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_elemset_data.C' object='mesh/unit_tests_dbg-write_elemset_data.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-write_elemset_data.obj `if test -f 'mesh/write_elemset_data.C'; then $(CYGPATH_W) 'mesh/write_elemset_data.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_elemset_data.C'; fi`
+
 mesh/unit_tests_dbg-write_sideset_data.o: mesh/write_sideset_data.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-write_sideset_data.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-write_sideset_data.Tpo -c -o mesh/unit_tests_dbg-write_sideset_data.o `test -f 'mesh/write_sideset_data.C' || echo '$(srcdir)/'`mesh/write_sideset_data.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-write_sideset_data.Tpo mesh/$(DEPDIR)/unit_tests_dbg-write_sideset_data.Po
@@ -5185,6 +5251,20 @@ utils/unit_tests_dbg-point_locator_test.obj: utils/point_locator_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_dbg-point_locator_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_dbg-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
+
+utils/unit_tests_dbg-transparent_comparator.o: utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_dbg-transparent_comparator.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_dbg-transparent_comparator.Tpo -c -o utils/unit_tests_dbg-transparent_comparator.o `test -f 'utils/transparent_comparator.C' || echo '$(srcdir)/'`utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_dbg-transparent_comparator.Tpo utils/$(DEPDIR)/unit_tests_dbg-transparent_comparator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/transparent_comparator.C' object='utils/unit_tests_dbg-transparent_comparator.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_dbg-transparent_comparator.o `test -f 'utils/transparent_comparator.C' || echo '$(srcdir)/'`utils/transparent_comparator.C
+
+utils/unit_tests_dbg-transparent_comparator.obj: utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_dbg-transparent_comparator.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_dbg-transparent_comparator.Tpo -c -o utils/unit_tests_dbg-transparent_comparator.obj `if test -f 'utils/transparent_comparator.C'; then $(CYGPATH_W) 'utils/transparent_comparator.C'; else $(CYGPATH_W) '$(srcdir)/utils/transparent_comparator.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_dbg-transparent_comparator.Tpo utils/$(DEPDIR)/unit_tests_dbg-transparent_comparator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/transparent_comparator.C' object='utils/unit_tests_dbg-transparent_comparator.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_dbg-transparent_comparator.obj `if test -f 'utils/transparent_comparator.C'; then $(CYGPATH_W) 'utils/transparent_comparator.C'; else $(CYGPATH_W) '$(srcdir)/utils/transparent_comparator.C'; fi`
 
 utils/unit_tests_dbg-vectormap_test.o: utils/vectormap_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_dbg-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Tpo -c -o utils/unit_tests_dbg-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
@@ -5984,6 +6064,20 @@ mesh/unit_tests_devel-mapped_subdomain_partitioner_test.obj: mesh/mapped_subdoma
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
 
+mesh/unit_tests_devel-write_elemset_data.o: mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-write_elemset_data.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-write_elemset_data.Tpo -c -o mesh/unit_tests_devel-write_elemset_data.o `test -f 'mesh/write_elemset_data.C' || echo '$(srcdir)/'`mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-write_elemset_data.Tpo mesh/$(DEPDIR)/unit_tests_devel-write_elemset_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_elemset_data.C' object='mesh/unit_tests_devel-write_elemset_data.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-write_elemset_data.o `test -f 'mesh/write_elemset_data.C' || echo '$(srcdir)/'`mesh/write_elemset_data.C
+
+mesh/unit_tests_devel-write_elemset_data.obj: mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-write_elemset_data.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-write_elemset_data.Tpo -c -o mesh/unit_tests_devel-write_elemset_data.obj `if test -f 'mesh/write_elemset_data.C'; then $(CYGPATH_W) 'mesh/write_elemset_data.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_elemset_data.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-write_elemset_data.Tpo mesh/$(DEPDIR)/unit_tests_devel-write_elemset_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_elemset_data.C' object='mesh/unit_tests_devel-write_elemset_data.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-write_elemset_data.obj `if test -f 'mesh/write_elemset_data.C'; then $(CYGPATH_W) 'mesh/write_elemset_data.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_elemset_data.C'; fi`
+
 mesh/unit_tests_devel-write_sideset_data.o: mesh/write_sideset_data.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-write_sideset_data.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-write_sideset_data.Tpo -c -o mesh/unit_tests_devel-write_sideset_data.o `test -f 'mesh/write_sideset_data.C' || echo '$(srcdir)/'`mesh/write_sideset_data.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-write_sideset_data.Tpo mesh/$(DEPDIR)/unit_tests_devel-write_sideset_data.Po
@@ -6557,6 +6651,20 @@ utils/unit_tests_devel-point_locator_test.obj: utils/point_locator_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_devel-point_locator_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_devel-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
+
+utils/unit_tests_devel-transparent_comparator.o: utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_devel-transparent_comparator.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_devel-transparent_comparator.Tpo -c -o utils/unit_tests_devel-transparent_comparator.o `test -f 'utils/transparent_comparator.C' || echo '$(srcdir)/'`utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_devel-transparent_comparator.Tpo utils/$(DEPDIR)/unit_tests_devel-transparent_comparator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/transparent_comparator.C' object='utils/unit_tests_devel-transparent_comparator.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_devel-transparent_comparator.o `test -f 'utils/transparent_comparator.C' || echo '$(srcdir)/'`utils/transparent_comparator.C
+
+utils/unit_tests_devel-transparent_comparator.obj: utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_devel-transparent_comparator.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_devel-transparent_comparator.Tpo -c -o utils/unit_tests_devel-transparent_comparator.obj `if test -f 'utils/transparent_comparator.C'; then $(CYGPATH_W) 'utils/transparent_comparator.C'; else $(CYGPATH_W) '$(srcdir)/utils/transparent_comparator.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_devel-transparent_comparator.Tpo utils/$(DEPDIR)/unit_tests_devel-transparent_comparator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/transparent_comparator.C' object='utils/unit_tests_devel-transparent_comparator.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_devel-transparent_comparator.obj `if test -f 'utils/transparent_comparator.C'; then $(CYGPATH_W) 'utils/transparent_comparator.C'; else $(CYGPATH_W) '$(srcdir)/utils/transparent_comparator.C'; fi`
 
 utils/unit_tests_devel-vectormap_test.o: utils/vectormap_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_devel-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Tpo -c -o utils/unit_tests_devel-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
@@ -7356,6 +7464,20 @@ mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.obj: mesh/mapped_subdoma
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
 
+mesh/unit_tests_oprof-write_elemset_data.o: mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-write_elemset_data.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-write_elemset_data.Tpo -c -o mesh/unit_tests_oprof-write_elemset_data.o `test -f 'mesh/write_elemset_data.C' || echo '$(srcdir)/'`mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-write_elemset_data.Tpo mesh/$(DEPDIR)/unit_tests_oprof-write_elemset_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_elemset_data.C' object='mesh/unit_tests_oprof-write_elemset_data.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-write_elemset_data.o `test -f 'mesh/write_elemset_data.C' || echo '$(srcdir)/'`mesh/write_elemset_data.C
+
+mesh/unit_tests_oprof-write_elemset_data.obj: mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-write_elemset_data.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-write_elemset_data.Tpo -c -o mesh/unit_tests_oprof-write_elemset_data.obj `if test -f 'mesh/write_elemset_data.C'; then $(CYGPATH_W) 'mesh/write_elemset_data.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_elemset_data.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-write_elemset_data.Tpo mesh/$(DEPDIR)/unit_tests_oprof-write_elemset_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_elemset_data.C' object='mesh/unit_tests_oprof-write_elemset_data.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-write_elemset_data.obj `if test -f 'mesh/write_elemset_data.C'; then $(CYGPATH_W) 'mesh/write_elemset_data.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_elemset_data.C'; fi`
+
 mesh/unit_tests_oprof-write_sideset_data.o: mesh/write_sideset_data.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-write_sideset_data.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-write_sideset_data.Tpo -c -o mesh/unit_tests_oprof-write_sideset_data.o `test -f 'mesh/write_sideset_data.C' || echo '$(srcdir)/'`mesh/write_sideset_data.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-write_sideset_data.Tpo mesh/$(DEPDIR)/unit_tests_oprof-write_sideset_data.Po
@@ -7929,6 +8051,20 @@ utils/unit_tests_oprof-point_locator_test.obj: utils/point_locator_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_oprof-point_locator_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_oprof-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
+
+utils/unit_tests_oprof-transparent_comparator.o: utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_oprof-transparent_comparator.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_oprof-transparent_comparator.Tpo -c -o utils/unit_tests_oprof-transparent_comparator.o `test -f 'utils/transparent_comparator.C' || echo '$(srcdir)/'`utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_oprof-transparent_comparator.Tpo utils/$(DEPDIR)/unit_tests_oprof-transparent_comparator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/transparent_comparator.C' object='utils/unit_tests_oprof-transparent_comparator.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_oprof-transparent_comparator.o `test -f 'utils/transparent_comparator.C' || echo '$(srcdir)/'`utils/transparent_comparator.C
+
+utils/unit_tests_oprof-transparent_comparator.obj: utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_oprof-transparent_comparator.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_oprof-transparent_comparator.Tpo -c -o utils/unit_tests_oprof-transparent_comparator.obj `if test -f 'utils/transparent_comparator.C'; then $(CYGPATH_W) 'utils/transparent_comparator.C'; else $(CYGPATH_W) '$(srcdir)/utils/transparent_comparator.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_oprof-transparent_comparator.Tpo utils/$(DEPDIR)/unit_tests_oprof-transparent_comparator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/transparent_comparator.C' object='utils/unit_tests_oprof-transparent_comparator.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_oprof-transparent_comparator.obj `if test -f 'utils/transparent_comparator.C'; then $(CYGPATH_W) 'utils/transparent_comparator.C'; else $(CYGPATH_W) '$(srcdir)/utils/transparent_comparator.C'; fi`
 
 utils/unit_tests_oprof-vectormap_test.o: utils/vectormap_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_oprof-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Tpo -c -o utils/unit_tests_oprof-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
@@ -8728,6 +8864,20 @@ mesh/unit_tests_opt-mapped_subdomain_partitioner_test.obj: mesh/mapped_subdomain
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
 
+mesh/unit_tests_opt-write_elemset_data.o: mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-write_elemset_data.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-write_elemset_data.Tpo -c -o mesh/unit_tests_opt-write_elemset_data.o `test -f 'mesh/write_elemset_data.C' || echo '$(srcdir)/'`mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-write_elemset_data.Tpo mesh/$(DEPDIR)/unit_tests_opt-write_elemset_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_elemset_data.C' object='mesh/unit_tests_opt-write_elemset_data.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-write_elemset_data.o `test -f 'mesh/write_elemset_data.C' || echo '$(srcdir)/'`mesh/write_elemset_data.C
+
+mesh/unit_tests_opt-write_elemset_data.obj: mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-write_elemset_data.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-write_elemset_data.Tpo -c -o mesh/unit_tests_opt-write_elemset_data.obj `if test -f 'mesh/write_elemset_data.C'; then $(CYGPATH_W) 'mesh/write_elemset_data.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_elemset_data.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-write_elemset_data.Tpo mesh/$(DEPDIR)/unit_tests_opt-write_elemset_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_elemset_data.C' object='mesh/unit_tests_opt-write_elemset_data.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-write_elemset_data.obj `if test -f 'mesh/write_elemset_data.C'; then $(CYGPATH_W) 'mesh/write_elemset_data.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_elemset_data.C'; fi`
+
 mesh/unit_tests_opt-write_sideset_data.o: mesh/write_sideset_data.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-write_sideset_data.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-write_sideset_data.Tpo -c -o mesh/unit_tests_opt-write_sideset_data.o `test -f 'mesh/write_sideset_data.C' || echo '$(srcdir)/'`mesh/write_sideset_data.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-write_sideset_data.Tpo mesh/$(DEPDIR)/unit_tests_opt-write_sideset_data.Po
@@ -9301,6 +9451,20 @@ utils/unit_tests_opt-point_locator_test.obj: utils/point_locator_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_opt-point_locator_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_opt-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
+
+utils/unit_tests_opt-transparent_comparator.o: utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_opt-transparent_comparator.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_opt-transparent_comparator.Tpo -c -o utils/unit_tests_opt-transparent_comparator.o `test -f 'utils/transparent_comparator.C' || echo '$(srcdir)/'`utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_opt-transparent_comparator.Tpo utils/$(DEPDIR)/unit_tests_opt-transparent_comparator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/transparent_comparator.C' object='utils/unit_tests_opt-transparent_comparator.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_opt-transparent_comparator.o `test -f 'utils/transparent_comparator.C' || echo '$(srcdir)/'`utils/transparent_comparator.C
+
+utils/unit_tests_opt-transparent_comparator.obj: utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_opt-transparent_comparator.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_opt-transparent_comparator.Tpo -c -o utils/unit_tests_opt-transparent_comparator.obj `if test -f 'utils/transparent_comparator.C'; then $(CYGPATH_W) 'utils/transparent_comparator.C'; else $(CYGPATH_W) '$(srcdir)/utils/transparent_comparator.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_opt-transparent_comparator.Tpo utils/$(DEPDIR)/unit_tests_opt-transparent_comparator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/transparent_comparator.C' object='utils/unit_tests_opt-transparent_comparator.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_opt-transparent_comparator.obj `if test -f 'utils/transparent_comparator.C'; then $(CYGPATH_W) 'utils/transparent_comparator.C'; else $(CYGPATH_W) '$(srcdir)/utils/transparent_comparator.C'; fi`
 
 utils/unit_tests_opt-vectormap_test.o: utils/vectormap_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_opt-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Tpo -c -o utils/unit_tests_opt-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
@@ -10100,6 +10264,20 @@ mesh/unit_tests_prof-mapped_subdomain_partitioner_test.obj: mesh/mapped_subdomai
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
 
+mesh/unit_tests_prof-write_elemset_data.o: mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-write_elemset_data.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-write_elemset_data.Tpo -c -o mesh/unit_tests_prof-write_elemset_data.o `test -f 'mesh/write_elemset_data.C' || echo '$(srcdir)/'`mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-write_elemset_data.Tpo mesh/$(DEPDIR)/unit_tests_prof-write_elemset_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_elemset_data.C' object='mesh/unit_tests_prof-write_elemset_data.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-write_elemset_data.o `test -f 'mesh/write_elemset_data.C' || echo '$(srcdir)/'`mesh/write_elemset_data.C
+
+mesh/unit_tests_prof-write_elemset_data.obj: mesh/write_elemset_data.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-write_elemset_data.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-write_elemset_data.Tpo -c -o mesh/unit_tests_prof-write_elemset_data.obj `if test -f 'mesh/write_elemset_data.C'; then $(CYGPATH_W) 'mesh/write_elemset_data.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_elemset_data.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-write_elemset_data.Tpo mesh/$(DEPDIR)/unit_tests_prof-write_elemset_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_elemset_data.C' object='mesh/unit_tests_prof-write_elemset_data.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-write_elemset_data.obj `if test -f 'mesh/write_elemset_data.C'; then $(CYGPATH_W) 'mesh/write_elemset_data.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_elemset_data.C'; fi`
+
 mesh/unit_tests_prof-write_sideset_data.o: mesh/write_sideset_data.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-write_sideset_data.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-write_sideset_data.Tpo -c -o mesh/unit_tests_prof-write_sideset_data.o `test -f 'mesh/write_sideset_data.C' || echo '$(srcdir)/'`mesh/write_sideset_data.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-write_sideset_data.Tpo mesh/$(DEPDIR)/unit_tests_prof-write_sideset_data.Po
@@ -10673,6 +10851,20 @@ utils/unit_tests_prof-point_locator_test.obj: utils/point_locator_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_prof-point_locator_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_prof-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
+
+utils/unit_tests_prof-transparent_comparator.o: utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_prof-transparent_comparator.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_prof-transparent_comparator.Tpo -c -o utils/unit_tests_prof-transparent_comparator.o `test -f 'utils/transparent_comparator.C' || echo '$(srcdir)/'`utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_prof-transparent_comparator.Tpo utils/$(DEPDIR)/unit_tests_prof-transparent_comparator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/transparent_comparator.C' object='utils/unit_tests_prof-transparent_comparator.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_prof-transparent_comparator.o `test -f 'utils/transparent_comparator.C' || echo '$(srcdir)/'`utils/transparent_comparator.C
+
+utils/unit_tests_prof-transparent_comparator.obj: utils/transparent_comparator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_prof-transparent_comparator.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_prof-transparent_comparator.Tpo -c -o utils/unit_tests_prof-transparent_comparator.obj `if test -f 'utils/transparent_comparator.C'; then $(CYGPATH_W) 'utils/transparent_comparator.C'; else $(CYGPATH_W) '$(srcdir)/utils/transparent_comparator.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_prof-transparent_comparator.Tpo utils/$(DEPDIR)/unit_tests_prof-transparent_comparator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/transparent_comparator.C' object='utils/unit_tests_prof-transparent_comparator.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_prof-transparent_comparator.obj `if test -f 'utils/transparent_comparator.C'; then $(CYGPATH_W) 'utils/transparent_comparator.C'; else $(CYGPATH_W) '$(srcdir)/utils/transparent_comparator.C'; fi`
 
 utils/unit_tests_prof-vectormap_test.o: utils/vectormap_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_prof-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Tpo -c -o utils/unit_tests_prof-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
@@ -11258,6 +11450,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-write_edgeset_data.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-write_elemset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-write_nodeset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-write_sideset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-write_vec_and_scalar.Po
@@ -11286,6 +11479,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-write_edgeset_data.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_devel-write_elemset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-write_nodeset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-write_sideset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-write_vec_and_scalar.Po
@@ -11314,6 +11508,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-write_edgeset_data.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-write_elemset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-write_nodeset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-write_sideset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-write_vec_and_scalar.Po
@@ -11342,6 +11537,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-write_edgeset_data.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_opt-write_elemset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-write_nodeset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-write_sideset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-write_vec_and_scalar.Po
@@ -11370,6 +11566,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-write_edgeset_data.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_prof-write_elemset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-write_nodeset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-write_sideset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-write_vec_and_scalar.Po
@@ -11550,22 +11747,27 @@ distclean: distclean-am
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-systems_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_dbg-transparent_comparator.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_devel-transparent_comparator.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_oprof-transparent_comparator.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_opt-transparent_comparator.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_prof-transparent_comparator.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-xdr_test.Po
 	-rm -f Makefile
@@ -11795,6 +11997,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-write_edgeset_data.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-write_elemset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-write_nodeset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-write_sideset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-write_vec_and_scalar.Po
@@ -11823,6 +12026,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-write_edgeset_data.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_devel-write_elemset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-write_nodeset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-write_sideset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-write_vec_and_scalar.Po
@@ -11851,6 +12055,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-write_edgeset_data.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-write_elemset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-write_nodeset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-write_sideset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-write_vec_and_scalar.Po
@@ -11879,6 +12084,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-write_edgeset_data.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_opt-write_elemset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-write_nodeset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-write_sideset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-write_vec_and_scalar.Po
@@ -11907,6 +12113,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-write_edgeset_data.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_prof-write_elemset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-write_nodeset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-write_sideset_data.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-write_vec_and_scalar.Po
@@ -12087,22 +12294,27 @@ maintainer-clean: maintainer-clean-am
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-systems_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_dbg-transparent_comparator.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_dbg-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_devel-transparent_comparator.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_devel-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_oprof-transparent_comparator.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_oprof-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_opt-transparent_comparator.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_opt-xdr_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-parameters_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Po
+	-rm -f utils/$(DEPDIR)/unit_tests_prof-transparent_comparator.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Po
 	-rm -f utils/$(DEPDIR)/unit_tests_prof-xdr_test.Po
 	-rm -f Makefile

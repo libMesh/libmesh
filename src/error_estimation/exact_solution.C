@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,10 @@
 #include "libmesh/tensor_tools.h"
 #include "libmesh/enum_norm_type.h"
 #include "libmesh/utility.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
+
 
 namespace libMesh
 {
@@ -101,7 +104,7 @@ void ExactSolution::attach_exact_value (ValueFunctionPointer fptr)
   for (auto sys : make_range(_equation_systems.n_systems()))
     {
       const System & system = _equation_systems.get_system(sys);
-      _exact_values.emplace_back(libmesh_make_unique<WrappedFunction<Number>>(system, fptr, &_equation_systems.parameters));
+      _exact_values.emplace_back(std::make_unique<WrappedFunction<Number>>(system, fptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -142,7 +145,7 @@ void ExactSolution::attach_exact_deriv (GradientFunctionPointer gptr)
   for (auto sys : make_range(_equation_systems.n_systems()))
     {
       const System & system = _equation_systems.get_system(sys);
-      _exact_derivs.emplace_back(libmesh_make_unique<WrappedFunction<Gradient>>(system, gptr, &_equation_systems.parameters));
+      _exact_derivs.emplace_back(std::make_unique<WrappedFunction<Gradient>>(system, gptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -183,7 +186,7 @@ void ExactSolution::attach_exact_hessian (HessianFunctionPointer hptr)
   for (auto sys : make_range(_equation_systems.n_systems()))
     {
       const System & system = _equation_systems.get_system(sys);
-      _exact_hessians.emplace_back(libmesh_make_unique<WrappedFunction<Tensor>>(system, hptr, &_equation_systems.parameters));
+      _exact_hessians.emplace_back(std::make_unique<WrappedFunction<Tensor>>(system, hptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -213,8 +216,8 @@ void ExactSolution::attach_exact_hessian (unsigned int sys_num,
 }
 
 
-std::vector<Real> & ExactSolution::_check_inputs(const std::string & sys_name,
-                                                 const std::string & unknown_name)
+std::vector<Real> & ExactSolution::_check_inputs(std::string_view sys_name,
+                                                 std::string_view unknown_name)
 {
   // Return a reference to the proper error entry, or throw an error
   // if it doesn't exist.
@@ -224,8 +227,8 @@ std::vector<Real> & ExactSolution::_check_inputs(const std::string & sys_name,
 
 
 
-void ExactSolution::compute_error(const std::string & sys_name,
-                                  const std::string & unknown_name)
+void ExactSolution::compute_error(std::string_view sys_name,
+                                  std::string_view unknown_name)
 {
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
@@ -261,8 +264,8 @@ void ExactSolution::compute_error(const std::string & sys_name,
 
 
 
-Real ExactSolution::error_norm(const std::string & sys_name,
-                               const std::string & unknown_name,
+Real ExactSolution::error_norm(std::string_view sys_name,
+                               std::string_view unknown_name,
                                const FEMNormType & norm)
 {
   // Check the inputs for validity, and get a reference
@@ -330,8 +333,8 @@ Real ExactSolution::error_norm(const std::string & sys_name,
 
 
 
-Real ExactSolution::l2_error(const std::string & sys_name,
-                             const std::string & unknown_name)
+Real ExactSolution::l2_error(std::string_view sys_name,
+                             std::string_view unknown_name)
 {
 
   // Check the inputs for validity, and get a reference
@@ -350,8 +353,8 @@ Real ExactSolution::l2_error(const std::string & sys_name,
 
 
 
-Real ExactSolution::l1_error(const std::string & sys_name,
-                             const std::string & unknown_name)
+Real ExactSolution::l1_error(std::string_view sys_name,
+                             std::string_view unknown_name)
 {
 
   // Check the inputs for validity, and get a reference
@@ -370,8 +373,8 @@ Real ExactSolution::l1_error(const std::string & sys_name,
 
 
 
-Real ExactSolution::l_inf_error(const std::string & sys_name,
-                                const std::string & unknown_name)
+Real ExactSolution::l_inf_error(std::string_view sys_name,
+                                std::string_view unknown_name)
 {
 
   // Check the inputs for validity, and get a reference
@@ -390,8 +393,8 @@ Real ExactSolution::l_inf_error(const std::string & sys_name,
 
 
 
-Real ExactSolution::h1_error(const std::string & sys_name,
-                             const std::string & unknown_name)
+Real ExactSolution::h1_error(std::string_view sys_name,
+                             std::string_view unknown_name)
 {
   // If the user has supplied no exact derivative function, we
   // just integrate the H1 norm of the solution; i.e. its
@@ -407,23 +410,23 @@ Real ExactSolution::h1_error(const std::string & sys_name,
 }
 
 
-Real ExactSolution::hcurl_error(const std::string & sys_name,
-                                const std::string & unknown_name)
+Real ExactSolution::hcurl_error(std::string_view sys_name,
+                                std::string_view unknown_name)
 {
   return this->error_norm(sys_name,unknown_name,HCURL);
 }
 
 
-Real ExactSolution::hdiv_error(const std::string & sys_name,
-                               const std::string & unknown_name)
+Real ExactSolution::hdiv_error(std::string_view sys_name,
+                               std::string_view unknown_name)
 {
   return this->error_norm(sys_name,unknown_name,HDIV);
 }
 
 
 
-Real ExactSolution::h2_error(const std::string & sys_name,
-                             const std::string & unknown_name)
+Real ExactSolution::h2_error(std::string_view sys_name,
+                             std::string_view unknown_name)
 {
   // If the user has supplied no exact derivative functions, we
   // just integrate the H2 norm of the solution; i.e. its
@@ -445,8 +448,8 @@ Real ExactSolution::h2_error(const std::string & sys_name,
 
 
 template<typename OutputShape>
-void ExactSolution::_compute_error(const std::string & sys_name,
-                                   const std::string & unknown_name,
+void ExactSolution::_compute_error(std::string_view sys_name,
+                                   std::string_view unknown_name,
                                    std::vector<Real> & error_vals)
 {
   // Make sure we aren't "overconfigured"
@@ -485,7 +488,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
       comparison_soln->init(comparison_system.solution->size(), true, SERIAL);
       (*comparison_soln) = global_soln;
 
-      coarse_values = libmesh_make_unique<MeshFunction>
+      coarse_values = std::make_unique<MeshFunction>
         (_equation_systems,
          *comparison_soln,
          comparison_system.get_dof_map(),
@@ -526,6 +529,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 
   // Construct Quadrature rule based on default quadrature order
   const FEType & fe_type  = computed_dof_map.variable_type(var);
+  const auto field_type = FEInterface::field_type(fe_type);
 
   unsigned int n_vec_dim = FEInterface::n_vec_dim( mesh, fe_type );
 
@@ -614,7 +618,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
       // Only computed for vector-valued elements
       const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence>> * div_values = nullptr;
 
-      if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
+      if (field_type == TYPE_VECTOR)
         {
           curl_values = &fe->get_curl_phi();
           div_values = &fe->get_div_phi();
@@ -622,8 +626,12 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       // The value of the shape function second derivatives at the quadrature points
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> &
-        d2phi_values = fe->get_d2phi();
+      // Not computed for vector-valued elements
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> *
+        d2phi_values = nullptr;
+
+      if (field_type != TYPE_VECTOR)
+        d2phi_values = &fe->get_d2phi();
 #endif
 
       // The XYZ locations (in physical space) of the quadrature points
@@ -669,13 +677,16 @@ void ExactSolution::_compute_error(const std::string & sys_name,
               // Values from current solution.
               u_h      += phi_values[i][qp]*computed_system.current_solution  (dof_indices[i]);
               grad_u_h += dphi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-              grad2_u_h += d2phi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
-#endif
-              if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
+              if (field_type == TYPE_VECTOR)
                 {
                   curl_u_h += (*curl_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
                   div_u_h += (*div_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
+                }
+              else
+                {
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+                  grad2_u_h += (*d2phi_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
+#endif
                 }
             }
 
@@ -732,7 +743,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
           error_vals[1] += JxW[qp]*grad_error.norm_sq();
 
 
-          if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
+          if (field_type == TYPE_VECTOR)
             {
               // Compute the value of the error in the curl at this
               // quadrature point
@@ -779,7 +790,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
               //FIXME: This needs to be implemented to support rank 3 tensors
               //       which can't happen until type_n_tensor is fully implemented
               //       and a RawAccessor<TypeNTensor> is fully implemented
-              if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
+              if (field_type == TYPE_VECTOR)
                 libmesh_not_implemented();
 
               for (unsigned int c = 0; c < n_vec_dim; c++)
@@ -788,6 +799,10 @@ void ExactSolution::_compute_error(const std::string & sys_name,
                     exact_hess_accessor(d + e*dim + c*dim*dim) =
                       _exact_hessians[sys_num]->
                       component(var_component+c, q_point[qp], time)(d,e);
+
+              // FIXME: operator- is not currently implemented for TypeNTensor
+              const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
+              error_vals[2] += JxW[qp]*grad2_error.norm_sq();
             }
           else if (_equation_systems_fine)
             {
@@ -795,12 +810,11 @@ void ExactSolution::_compute_error(const std::string & sys_name,
               std::vector<Tensor> output(1);
               coarse_values->hessian(q_point[qp],time,output,&subdomain_id);
               exact_hess = output[0];
+
+              // FIXME: operator- is not currently implemented for TypeNTensor
+              const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
+              error_vals[2] += JxW[qp]*grad2_error.norm_sq();
             }
-
-          const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
-
-          // FIXME: PB: Is this what we want for rank 3 tensors?
-          error_vals[2] += JxW[qp]*grad2_error.norm_sq();
 #endif
 
         } // end qp loop
@@ -815,7 +829,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 }
 
 // Explicit instantiations of templated member functions
-template void ExactSolution::_compute_error<Real>(const std::string &, const std::string &, std::vector<Real> &);
-template void ExactSolution::_compute_error<RealGradient>(const std::string &, const std::string &, std::vector<Real> &);
+template LIBMESH_EXPORT void ExactSolution::_compute_error<Real>(std::string_view, std::string_view, std::vector<Real> &);
+template LIBMESH_EXPORT void ExactSolution::_compute_error<RealGradient>(std::string_view, std::string_view, std::vector<Real> &);
 
 } // namespace libMesh

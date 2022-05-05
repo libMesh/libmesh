@@ -11,7 +11,7 @@ class WhichNodeAmITest : public CppUnit::TestCase
 {
 
 public:
-  CPPUNIT_TEST_SUITE( WhichNodeAmITest );
+  LIBMESH_CPPUNIT_TEST_SUITE( WhichNodeAmITest );
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testPyramids );
   CPPUNIT_TEST( testPrisms );
@@ -24,6 +24,8 @@ public:
 
   void testPyramids()
   {
+    LOG_UNIT_TEST;
+
     const Elem & pyr5 = ReferenceElem::get(PYRAMID5);
     // The last node on the right side (1) should be node 4 (apex node).
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4), pyr5.local_side_node(/*side=*/1, /*node=*/2));
@@ -80,6 +82,8 @@ public:
 
   void testPrisms()
   {
+    LOG_UNIT_TEST;
+
     // A PRISM6 has four nodes on some sides and three nodes on others
     const Elem & prism6 = ReferenceElem::get(PRISM6);
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4), prism6.local_side_node(/*side=*/4, /*node=*/1));
@@ -137,6 +141,8 @@ public:
 
   void testTets()
   {
+    LOG_UNIT_TEST;
+
     const Elem & tet4 = ReferenceElem::get(TET4);
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(0), tet4.local_side_node(/*side=*/0, /*node=*/0));
 
@@ -158,6 +164,8 @@ public:
 
   void testHexes()
   {
+    LOG_UNIT_TEST;
+
     // Top left node on back side.
     const Elem & hex8 = ReferenceElem::get(HEX8);
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(7), hex8.local_side_node(/*side=*/3, /*node=*/2));

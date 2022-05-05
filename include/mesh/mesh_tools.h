@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -123,15 +123,6 @@ void build_nodes_to_elem_map (const MeshBase & mesh,
 //    * and \p QUAD9s will be converted to \p TRI6s.
 //    */
 //   void all_tri (MeshBase & mesh);
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-/**
- * Fills the vector "on_boundary" with flags that tell whether each node
- * is on the domain boundary (true)) or not (false).
- */
-void find_boundary_nodes (const MeshBase & mesh,
-                          std::vector<bool> & on_boundary);
-#endif
 
 /**
  * Returns a std::set containing Node IDs for all of the boundary nodes

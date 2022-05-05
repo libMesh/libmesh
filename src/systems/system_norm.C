@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -36,17 +36,18 @@ SystemNorm::SystemNorm(const FEMNormType & t) :
 }
 
 
-SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms) :
-  _norms(norms), _weights(1, 1.0), _weights_sq(1, 1.0)
+SystemNorm::SystemNorm(std::vector<FEMNormType> norms) :
+  _norms(std::move(norms)), _weights(1, 1.0), _weights_sq(1, 1.0)
 {
   if (_norms.empty())
     _norms.push_back(DISCRETE_L2);
 }
 
 
-SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms,
+SystemNorm::SystemNorm(std::vector<FEMNormType> norms,
                        std::vector<Real> & weights) :
-  _norms(norms), _weights(weights), _weights_sq(_weights.size(), 0.0)
+  _norms(std::move(norms)), _weights(weights),
+  _weights_sq(_weights.size(), 0.0)
 {
   if (_norms.empty())
     _norms.push_back(DISCRETE_L2);
@@ -61,9 +62,9 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms,
       _weights_sq[i] = _weights[i] * _weights[i];
 }
 
-SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms,
+SystemNorm::SystemNorm(std::vector<FEMNormType> norms,
                        std::vector<std::vector<Real>> & weights):
-  _norms(norms),
+  _norms(std::move(norms)),
   _weights(weights.size()),
   _weights_sq(weights.size()),
   _off_diagonal_weights(weights)

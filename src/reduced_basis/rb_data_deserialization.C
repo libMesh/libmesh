@@ -92,7 +92,7 @@ void RBEvaluationDeserialization::read_from_file(const std::string & path,
   std::unique_ptr<capnp::StreamFdMessageReader> message;
   libmesh_try
     {
-      message = libmesh_make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+      message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
     }
   libmesh_catch(...)
     {
@@ -140,7 +140,7 @@ void TransientRBEvaluationDeserialization::read_from_file(const std::string & pa
   std::unique_ptr<capnp::StreamFdMessageReader> message;
   libmesh_try
     {
-      message = libmesh_make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+      message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
     }
   libmesh_catch(...)
     {
@@ -194,7 +194,7 @@ void RBEIMEvaluationDeserialization::read_from_file(const std::string & path)
   std::unique_ptr<capnp::StreamFdMessageReader> message;
   libmesh_try
     {
-      message = libmesh_make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+      message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
     }
   libmesh_catch(...)
     {
@@ -246,7 +246,7 @@ void RBSCMEvaluationDeserialization::read_from_file(const std::string & path)
   std::unique_ptr<capnp::StreamFdMessageReader> message;
   libmesh_try
     {
-      message = libmesh_make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+      message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
     }
   libmesh_catch(...)
     {
@@ -912,6 +912,27 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
           }
         rb_eim_evaluation.add_interpolation_points_phi_i_qp(phi_i_qp);
       }
+  }
+
+  // Read in the spatial indices at interpolation points. This data is optional
+  // so this may be empty.
+  {
+    auto interpolation_points_list_outer =
+      rb_eim_evaluation_reader.getInterpolationSpatialIndices();
+
+    for (unsigned int i=0; i<interpolation_points_list_outer.size(); ++i)
+      {
+        auto interpolation_points_list_inner = interpolation_points_list_outer[i];
+
+        std::vector<unsigned int> spatial_indices(interpolation_points_list_inner.size());
+        for (unsigned int j=0; j<spatial_indices.size(); j++)
+          {
+            spatial_indices[j] = interpolation_points_list_inner[j];
+          }
+        rb_eim_evaluation.add_interpolation_points_spatial_indices(spatial_indices);
+      }
+
+    rb_eim_evaluation.initialize_param_fn_spatial_indices();
   }
 }
 

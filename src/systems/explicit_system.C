@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -57,7 +57,7 @@ void ExplicitSystem::assemble_qoi (const QoISet & qoi_indices)
   // accumulate on initially zero values
   for (auto i : make_range(this->n_qois()))
     if (qoi_indices.has_index(i))
-      qoi[i] = 0;
+      this->set_qoi(i, 0);
 
   Parent::assemble_qoi (qoi_indices);
 }

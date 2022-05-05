@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -188,10 +188,10 @@ bool TypeTensor<Complex>::operator > (const TypeTensor<Complex> & rhs) const
 
 // ------------------------------------------------------------
 // Explicit instantiations
-template class TypeTensor<Real>;
+template class LIBMESH_EXPORT TypeTensor<Real>;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template class TypeTensor<Complex>;
+template class LIBMESH_EXPORT TypeTensor<Complex>;
 #endif
 
 } // namespace libMesh

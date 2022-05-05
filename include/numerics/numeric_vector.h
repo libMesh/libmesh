@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -45,6 +45,7 @@ enum SolverPackage : int;
 #include <set>
 #include <vector>
 #include <memory>
+#include <mutex>
 
 namespace libMesh
 {
@@ -434,12 +435,14 @@ public:
   virtual void conjugate() = 0;
 
   /**
-   * Sets v(i) = \p value.
+   * Sets v(i) = \p value. Note that library implementations of this method are
+   * thread safe, e.g. we will lock \p _numeric_vector_mutex before writing to the vector
    */
   virtual void set (const numeric_index_type i, const T value) = 0;
 
   /**
-   * Adds \p value to each entry of the vector.
+   * Adds \p value to the vector entry specified by \p i. Note that library implementations of this
+   * method are thread safe, e.g. we will lock \p _numeric_vector_mutex before writing to the vector
    */
   virtual void add (const numeric_index_type i, const T value) = 0;
 
@@ -467,7 +470,8 @@ public:
    * Computes \f$ \vec{u} \leftarrow \vec{u} + \vec{v} \f$,
    * where \p v is a pointer and each \p dof_indices[i] specifies where
    * to add value \p v[i].  This should be overridden in subclasses
-   * for efficiency.
+   * for efficiency. Note that library implementations of this
+   * method are thread safe
    */
   virtual void add_vector (const T * v,
                            const std::vector<numeric_index_type> & dof_indices);
@@ -475,7 +479,8 @@ public:
   /**
    * Computes \f$ \vec{u} \leftarrow \vec{u} + \vec{v} \f$,
    * where \p v is a std::vector and each \p dof_indices[i] specifies
-   * where to add value \p v[i].
+   * where to add value \p v[i]. This method is guaranteed to be thread safe as long as library
+   * implementations of \p NumericVector are used
    */
   void add_vector (const std::vector<T> & v,
                    const std::vector<numeric_index_type> & dof_indices);
@@ -483,15 +488,17 @@ public:
   /**
    * Computes \f$ \vec{u} \leftarrow \vec{u} + \vec{v} \f$,
    * where \p v is a NumericVector and each \p dof_indices[i]
-   * specifies where to add value \p v(i).
+   * specifies where to add value \p v(i). This method is
+   * guaranteed to be thread-safe as long as library implementations of \p NumericVector are used
    */
-  virtual void add_vector (const NumericVector<T> & v,
-                           const std::vector<numeric_index_type> & dof_indices);
+  void add_vector (const NumericVector<T> & v,
+                   const std::vector<numeric_index_type> & dof_indices);
 
   /**
    * Computes \f$ \vec{u} \leftarrow \vec{u} + \vec{v} \f$,
    * where \p v is a DenseVector and each \p dof_indices[i] specifies
-   * where to add value \p v(i).
+   * where to add value \p v(i). This method is guaranteed to be thread safe as long as library
+   * implementations of \p NumericVector are used
    */
   void add_vector (const DenseVector<T> & v,
                    const std::vector<numeric_index_type> & dof_indices);
@@ -521,31 +528,36 @@ public:
                                      const SparseMatrix<T> & A) = 0;
 
   /**
-   * Inserts the entries of \p v in *this at the locations specified by \p v.
+   * Inserts the entries of \p v in *this at the locations specified by \p v. Note that library
+   * implementations of this method are thread safe
    */
   virtual void insert (const T * v,
                        const std::vector<numeric_index_type> & dof_indices);
 
   /**
-   * Inserts the entries of \p v in *this at the locations specified by \p v.
+   * Inserts the entries of \p v in *this at the locations specified by \p v. This method is
+   * guaranteed to be thread-safe as long as library implementations of \p NumericVector are used
    */
   void insert (const std::vector<T> & v,
                const std::vector<numeric_index_type> & dof_indices);
 
   /**
-   * Inserts the entries of \p v in *this at the locations specified by \p v.
+   * Inserts the entries of \p v in *this at the locations specified by \p v. This method is
+   * guaranteed to be thread-safe as long as library implementations of \p NumericVector are used
    */
-  virtual void insert (const NumericVector<T> & v,
-                       const std::vector<numeric_index_type> & dof_indices);
+  void insert (const NumericVector<T> & v,
+               const std::vector<numeric_index_type> & dof_indices);
 
   /**
-   * Inserts the entries of \p v in *this at the locations specified by \p v.
+   * Inserts the entries of \p v in *this at the locations specified by \p v. This method is
+   * guaranteed to be thread-safe as long as library implementations of \p NumericVector are used
    */
   void insert (const DenseVector<T> & v,
                const std::vector<numeric_index_type> & dof_indices);
 
   /**
-   * Inserts the entries of \p v in *this at the locations specified by \p v.
+   * Inserts the entries of \p v in *this at the locations specified by \p v. This method is
+   * guaranteed to be thread-safe as long as library implementations of \p NumericVector are used
    */
   void insert (const DenseSubVector<T> & v,
                const std::vector<numeric_index_type> & dof_indices);
@@ -748,6 +760,11 @@ protected:
    * Type of vector.
    */
   ParallelType _type;
+
+  /**
+   * Mutex for performing thread-safe operations
+   */
+  std::mutex _numeric_vector_mutex;
 };
 
 

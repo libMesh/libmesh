@@ -16,7 +16,7 @@ using namespace libMesh;
 
 class ParallelSyncTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( ParallelSyncTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( ParallelSyncTest );
 
   // Our sync functions are most typically used with a map of
   // processor ids that *only* includes ranks currently running.
@@ -197,12 +197,16 @@ public:
 
   void testPush()
   {
+    LOG_UNIT_TEST;
+
     testPushImpl(TestCommWorld->size());
   }
 
 
   void testPushOversized()
   {
+    LOG_UNIT_TEST;
+
     testPushImpl((TestCommWorld->size() + 4) * 2);
   }
 
@@ -258,12 +262,16 @@ public:
 
   void testPull()
   {
+    LOG_UNIT_TEST;
+
     testPullImpl(TestCommWorld->size());
   }
 
 
   void testPullOversized()
   {
+    LOG_UNIT_TEST;
+
     testPullImpl((TestCommWorld->size() + 4) * 2);
   }
 
@@ -323,12 +331,16 @@ public:
 
   void testPushVecVec()
   {
+    LOG_UNIT_TEST;
+
     testPushVecVecImpl(TestCommWorld->size());
   }
 
 
   void testPushVecVecOversized()
   {
+    LOG_UNIT_TEST;
+
     testPushVecVecImpl((TestCommWorld->size() + 4) * 2);
   }
 
@@ -398,12 +410,16 @@ public:
 
   void testPullVecVec()
   {
+    LOG_UNIT_TEST;
+
     testPullVecVecImpl(TestCommWorld->size());
   }
 
 
   void testPullVecVecOversized()
   {
+    LOG_UNIT_TEST;
+
     testPushVecVecImpl((TestCommWorld->size() + 4) * 2);
   }
 
@@ -477,12 +493,16 @@ public:
 
   void testPushMultimap()
   {
+    LOG_UNIT_TEST;
+
     testPushMultimapImpl(TestCommWorld->size());
   }
 
 
   void testPushMultimapOversized()
   {
+    LOG_UNIT_TEST;
+
     testPushMultimapImpl((TestCommWorld->size() + 4) * 2);
   }
 
@@ -566,12 +586,16 @@ public:
 
   void testPushMultimapVecVec()
   {
+    LOG_UNIT_TEST;
+
     testPushMultimapVecVecImpl(TestCommWorld->size());
   }
 
 
   void testPushMultimapVecVecOversized()
   {
+    LOG_UNIT_TEST;
+
     testPushMultimapVecVecImpl((TestCommWorld->size() + 4) * 2);
   }
 

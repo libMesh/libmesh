@@ -9,7 +9,8 @@
 #include "libmesh/point.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/diff_qoi.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+#include <memory>
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -20,7 +21,7 @@ public:
   LaplaceQoI() = default;
   virtual ~LaplaceQoI() = default;
 
-  virtual void init_qoi(std::vector<Number> & sys_qoi);
+  virtual void init_qoi_count(System & sys);
 
   // Context initialization
   virtual void init_context (DiffContext & context);
@@ -33,7 +34,7 @@ public:
 
   virtual std::unique_ptr<DifferentiableQoI> clone()
   {
-    return libmesh_make_unique<LaplaceQoI>(*this);
+    return std::make_unique<LaplaceQoI>(*this);
   }
 
 };

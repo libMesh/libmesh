@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -18,12 +18,15 @@
 
 
 // Local Includes
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/nonlinear_solver.h"
 #include "libmesh/petsc_nonlinear_solver.h"
 #include "libmesh/trilinos_nox_nonlinear_solver.h"
 #include "libmesh/solver_configuration.h"
 #include "libmesh/enum_solver_package.h"
+
+// C++ Includes
+#include <memory>
+
 
 namespace libMesh
 {
@@ -42,12 +45,12 @@ NonlinearSolver<T>::build(sys_type & s, const SolverPackage solver_package)
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      return libmesh_make_unique<PetscNonlinearSolver<T>>(s);
+      return std::make_unique<PetscNonlinearSolver<T>>(s);
 #endif // LIBMESH_HAVE_PETSC
 
 #if defined(LIBMESH_TRILINOS_HAVE_NOX) && defined(LIBMESH_TRILINOS_HAVE_EPETRA)
     case TRILINOS_SOLVERS:
-      return libmesh_make_unique<NoxNonlinearSolver<T>>(s);
+      return std::make_unique<NoxNonlinearSolver<T>>(s);
 #endif
 
     default:
@@ -84,6 +87,6 @@ void NonlinearSolver<T>::set_solver_configuration(SolverConfiguration & solver_c
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class NonlinearSolver<Number>;
+template class LIBMESH_EXPORT NonlinearSolver<Number>;
 
 } // namespace libMesh

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -66,7 +66,7 @@ FEMContext::FEMContext (const System & sys,
   if (active_vars)
     {
       auto vars_copy =
-        libmesh_make_unique<std::vector<unsigned int>>(*active_vars);
+        std::make_unique<std::vector<unsigned int>>(*active_vars);
 
       // We want to do quick binary_search later
       std::sort(vars_copy->begin(), vars_copy->end());
@@ -2076,132 +2076,132 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
 
 
 // Instantiate member function templates
-template void FEMContext::interior_value<Number>(unsigned int, unsigned int, Number &) const;
-template void FEMContext::interior_values<Number>(unsigned int, const NumericVector<Number> &,
+template LIBMESH_EXPORT void FEMContext::interior_value<Number>(unsigned int, unsigned int, Number &) const;
+template LIBMESH_EXPORT void FEMContext::interior_values<Number>(unsigned int, const NumericVector<Number> &,
                                                   std::vector<Number> &) const;
-template void FEMContext::interior_value<Gradient>(unsigned int, unsigned int, Gradient &) const;
-template void FEMContext::interior_values<Gradient>(unsigned int, const NumericVector<Number> &,
+template LIBMESH_EXPORT void FEMContext::interior_value<Gradient>(unsigned int, unsigned int, Gradient &) const;
+template LIBMESH_EXPORT void FEMContext::interior_values<Gradient>(unsigned int, const NumericVector<Number> &,
                                                     std::vector<Gradient> &) const;
 
-template void FEMContext::interior_gradient<Gradient>(unsigned int, unsigned int, Gradient &) const;
-template void FEMContext::interior_gradients<Gradient>(unsigned int, const NumericVector<Number> &,
+template LIBMESH_EXPORT void FEMContext::interior_gradient<Gradient>(unsigned int, unsigned int, Gradient &) const;
+template LIBMESH_EXPORT void FEMContext::interior_gradients<Gradient>(unsigned int, const NumericVector<Number> &,
                                                        std::vector<Gradient> &) const;
-template void FEMContext::interior_gradient<Tensor>(unsigned int, unsigned int, Tensor &) const;
-template void FEMContext::interior_gradients<Tensor>(unsigned int, const NumericVector<Number> &,
+template LIBMESH_EXPORT void FEMContext::interior_gradient<Tensor>(unsigned int, unsigned int, Tensor &) const;
+template LIBMESH_EXPORT void FEMContext::interior_gradients<Tensor>(unsigned int, const NumericVector<Number> &,
                                                      std::vector<Tensor> &) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-template void FEMContext::interior_hessian<Tensor>(unsigned int, unsigned int, Tensor &) const;
-template void FEMContext::interior_hessians<Tensor>(unsigned int, const NumericVector<Number> &,
+template LIBMESH_EXPORT void FEMContext::interior_hessian<Tensor>(unsigned int, unsigned int, Tensor &) const;
+template LIBMESH_EXPORT void FEMContext::interior_hessians<Tensor>(unsigned int, const NumericVector<Number> &,
                                                     std::vector<Tensor> &) const;
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
-//template void FEMContext::interior_hessian<??>(unsigned int, unsigned int, ??&) const;
-//template void FEMContext::interior_hessians<??>(unsigned int, const NumericVector<Number> &,
+//template LIBMESH_EXPORT void FEMContext::interior_hessian<??>(unsigned int, unsigned int, ??&) const;
+//template LIBMESH_EXPORT void FEMContext::interior_hessians<??>(unsigned int, const NumericVector<Number> &,
 //                                                std::vector<??> &) const;
 #endif
 
-template void FEMContext::interior_curl<Gradient>(unsigned int, unsigned int, Gradient &) const;
+template LIBMESH_EXPORT void FEMContext::interior_curl<Gradient>(unsigned int, unsigned int, Gradient &) const;
 
-template void FEMContext::interior_div<Number>(unsigned int, unsigned int, Number &) const;
+template LIBMESH_EXPORT void FEMContext::interior_div<Number>(unsigned int, unsigned int, Number &) const;
 
-template void FEMContext::side_value<Number>(unsigned int, unsigned int, Number &) const;
-template void FEMContext::side_value<Gradient>(unsigned int, unsigned int, Gradient &) const;
-template void FEMContext::side_values<Number>(unsigned int, const NumericVector<Number> &,
+template LIBMESH_EXPORT void FEMContext::side_value<Number>(unsigned int, unsigned int, Number &) const;
+template LIBMESH_EXPORT void FEMContext::side_value<Gradient>(unsigned int, unsigned int, Gradient &) const;
+template LIBMESH_EXPORT void FEMContext::side_values<Number>(unsigned int, const NumericVector<Number> &,
                                               std::vector<Number> &) const;
-template void FEMContext::side_values<Gradient>(unsigned int, const NumericVector<Number> &,
+template LIBMESH_EXPORT void FEMContext::side_values<Gradient>(unsigned int, const NumericVector<Number> &,
                                                 std::vector<Gradient> &) const;
 
-template void FEMContext::side_gradient<Gradient>(unsigned int, unsigned int, Gradient &) const;
-template void FEMContext::side_gradients<Gradient>(unsigned int, const NumericVector<Number> &,
+template LIBMESH_EXPORT void FEMContext::side_gradient<Gradient>(unsigned int, unsigned int, Gradient &) const;
+template LIBMESH_EXPORT void FEMContext::side_gradients<Gradient>(unsigned int, const NumericVector<Number> &,
                                                    std::vector<Gradient> &) const;
-template void FEMContext::side_gradient<Tensor>(unsigned int, unsigned int, Tensor &) const;
-template void FEMContext::side_gradients<Tensor>(unsigned int, const NumericVector<Number> &,
+template LIBMESH_EXPORT void FEMContext::side_gradient<Tensor>(unsigned int, unsigned int, Tensor &) const;
+template LIBMESH_EXPORT void FEMContext::side_gradients<Tensor>(unsigned int, const NumericVector<Number> &,
                                                  std::vector<Tensor> &) const;
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-template void FEMContext::side_hessian<Tensor>(unsigned int, unsigned int, Tensor &) const;
-template void FEMContext::side_hessians<Tensor>(unsigned int, const NumericVector<Number> &,
+template LIBMESH_EXPORT void FEMContext::side_hessian<Tensor>(unsigned int, unsigned int, Tensor &) const;
+template LIBMESH_EXPORT void FEMContext::side_hessians<Tensor>(unsigned int, const NumericVector<Number> &,
                                                 std::vector<Tensor> &) const;
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
-//template void FEMContext::side_hessian<??>(unsigned int, unsigned int,
+//template LIBMESH_EXPORT void FEMContext::side_hessian<??>(unsigned int, unsigned int,
 //                                           ??&) const;
-//template void FEMContext::side_hessians<??>(unsigned int, const NumericVector<Number> &,
+//template LIBMESH_EXPORT void FEMContext::side_hessians<??>(unsigned int, const NumericVector<Number> &,
 //                                            std::vector<??> &) const;
 #endif
 
-template void FEMContext::point_value<Number>(unsigned int, const Point &, Number &, const Real) const;
-template void FEMContext::point_value<Gradient>(unsigned int, const Point &, Gradient &, const Real) const;
+template LIBMESH_EXPORT void FEMContext::point_value<Number>(unsigned int, const Point &, Number &, const Real) const;
+template LIBMESH_EXPORT void FEMContext::point_value<Gradient>(unsigned int, const Point &, Gradient &, const Real) const;
 
-template void FEMContext::point_gradient<Gradient>(unsigned int, const Point &, Gradient &, const Real) const;
-template void FEMContext::point_gradient<Tensor>(unsigned int, const Point &, Tensor &, const Real) const;
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-template void FEMContext::point_hessian<Tensor>(unsigned int, const Point &, Tensor &, const Real) const;
-//FIXME: Not everything is implemented yet for second derivatives of RealGradients
-//template void FEMContext::point_hessian<??>(unsigned int, const Point &, ??&) const;
-#endif
-
-template void FEMContext::point_curl<Gradient>(unsigned int, const Point &, Gradient &, const Real) const;
-
-template void FEMContext::fixed_interior_value<Number>(unsigned int, unsigned int, Number &) const;
-template void FEMContext::fixed_interior_value<Gradient>(unsigned int, unsigned int, Gradient &) const;
-
-template void FEMContext::fixed_interior_gradient<Gradient>(unsigned int, unsigned int, Gradient &) const;
-template void FEMContext::fixed_interior_gradient<Tensor>(unsigned int, unsigned int, Tensor &) const;
+template LIBMESH_EXPORT void FEMContext::point_gradient<Gradient>(unsigned int, const Point &, Gradient &, const Real) const;
+template LIBMESH_EXPORT void FEMContext::point_gradient<Tensor>(unsigned int, const Point &, Tensor &, const Real) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-template void FEMContext::fixed_interior_hessian<Tensor>(unsigned int, unsigned int, Tensor &) const;
+template LIBMESH_EXPORT void FEMContext::point_hessian<Tensor>(unsigned int, const Point &, Tensor &, const Real) const;
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
-//template void FEMContext::fixed_interior_hessian<??>(unsigned int, unsigned int, ??&) const;
+//template LIBMESH_EXPORT void FEMContext::point_hessian<??>(unsigned int, const Point &, ??&) const;
 #endif
 
-template void FEMContext::fixed_side_value<Number>(unsigned int, unsigned int, Number &) const;
-template void FEMContext::fixed_side_value<Gradient>(unsigned int, unsigned int, Gradient &) const;
+template LIBMESH_EXPORT void FEMContext::point_curl<Gradient>(unsigned int, const Point &, Gradient &, const Real) const;
 
-template void FEMContext::fixed_side_gradient<Gradient>(unsigned int, unsigned int, Gradient &) const;
-template void FEMContext::fixed_side_gradient<Tensor>(unsigned int, unsigned int, Tensor &) const;
+template LIBMESH_EXPORT void FEMContext::fixed_interior_value<Number>(unsigned int, unsigned int, Number &) const;
+template LIBMESH_EXPORT void FEMContext::fixed_interior_value<Gradient>(unsigned int, unsigned int, Gradient &) const;
+
+template LIBMESH_EXPORT void FEMContext::fixed_interior_gradient<Gradient>(unsigned int, unsigned int, Gradient &) const;
+template LIBMESH_EXPORT void FEMContext::fixed_interior_gradient<Tensor>(unsigned int, unsigned int, Tensor &) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-template void FEMContext::fixed_side_hessian<Tensor>(unsigned int, unsigned int, Tensor &) const;
+template LIBMESH_EXPORT void FEMContext::fixed_interior_hessian<Tensor>(unsigned int, unsigned int, Tensor &) const;
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
-//template void FEMContext::fixed_side_hessian<??>(unsigned int, unsigned int, ??&) const;
+//template LIBMESH_EXPORT void FEMContext::fixed_interior_hessian<??>(unsigned int, unsigned int, ??&) const;
 #endif
 
-template void FEMContext::fixed_point_value<Number>(unsigned int, const Point &, Number &, const Real) const;
-template void FEMContext::fixed_point_value<Gradient>(unsigned int, const Point &, Gradient &, const Real) const;
+template LIBMESH_EXPORT void FEMContext::fixed_side_value<Number>(unsigned int, unsigned int, Number &) const;
+template LIBMESH_EXPORT void FEMContext::fixed_side_value<Gradient>(unsigned int, unsigned int, Gradient &) const;
 
-template void FEMContext::fixed_point_gradient<Gradient>(unsigned int, const Point &, Gradient &, const Real) const;
-template void FEMContext::fixed_point_gradient<Tensor>(unsigned int, const Point &, Tensor &, const Real) const;
+template LIBMESH_EXPORT void FEMContext::fixed_side_gradient<Gradient>(unsigned int, unsigned int, Gradient &) const;
+template LIBMESH_EXPORT void FEMContext::fixed_side_gradient<Tensor>(unsigned int, unsigned int, Tensor &) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-template void FEMContext::fixed_point_hessian<Tensor>(unsigned int, const Point &, Tensor &, const Real) const;
+template LIBMESH_EXPORT void FEMContext::fixed_side_hessian<Tensor>(unsigned int, unsigned int, Tensor &) const;
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
-//template void FEMContext::fixed_point_hessian<??>(unsigned int, const Point &, ??&) const;
+//template LIBMESH_EXPORT void FEMContext::fixed_side_hessian<??>(unsigned int, unsigned int, ??&) const;
 #endif
 
-template void FEMContext::interior_rate<Number>(unsigned int, unsigned int, Number &) const;
-template void FEMContext::interior_rate<Gradient>(unsigned int, unsigned int, Gradient &) const;
+template LIBMESH_EXPORT void FEMContext::fixed_point_value<Number>(unsigned int, const Point &, Number &, const Real) const;
+template LIBMESH_EXPORT void FEMContext::fixed_point_value<Gradient>(unsigned int, const Point &, Gradient &, const Real) const;
 
-template void FEMContext::interior_rate_gradient<Gradient>(unsigned int, unsigned int, Gradient &) const;
-template void FEMContext::interior_rate_gradient<Tensor>(unsigned int, unsigned int, Tensor &) const;
+template LIBMESH_EXPORT void FEMContext::fixed_point_gradient<Gradient>(unsigned int, const Point &, Gradient &, const Real) const;
+template LIBMESH_EXPORT void FEMContext::fixed_point_gradient<Tensor>(unsigned int, const Point &, Tensor &, const Real) const;
 
-template void FEMContext::side_rate<Number>(unsigned int, unsigned int, Number &) const;
-template void FEMContext::side_rate<Gradient>(unsigned int, unsigned int, Gradient &) const;
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+template LIBMESH_EXPORT void FEMContext::fixed_point_hessian<Tensor>(unsigned int, const Point &, Tensor &, const Real) const;
+//FIXME: Not everything is implemented yet for second derivatives of RealGradients
+//template LIBMESH_EXPORT void FEMContext::fixed_point_hessian<??>(unsigned int, const Point &, ??&) const;
+#endif
 
-template void FEMContext::interior_accel<Number>(unsigned int, unsigned int, Number &) const;
-template void FEMContext::interior_accel<Gradient>(unsigned int, unsigned int, Gradient &) const;
+template LIBMESH_EXPORT void FEMContext::interior_rate<Number>(unsigned int, unsigned int, Number &) const;
+template LIBMESH_EXPORT void FEMContext::interior_rate<Gradient>(unsigned int, unsigned int, Gradient &) const;
 
-template void FEMContext::side_accel<Number>(unsigned int, unsigned int, Number &) const;
-template void FEMContext::side_accel<Gradient>(unsigned int, unsigned int, Gradient &) const;
+template LIBMESH_EXPORT void FEMContext::interior_rate_gradient<Gradient>(unsigned int, unsigned int, Gradient &) const;
+template LIBMESH_EXPORT void FEMContext::interior_rate_gradient<Tensor>(unsigned int, unsigned int, Tensor &) const;
 
-template FEGenericBase<Real> *
+template LIBMESH_EXPORT void FEMContext::side_rate<Number>(unsigned int, unsigned int, Number &) const;
+template LIBMESH_EXPORT void FEMContext::side_rate<Gradient>(unsigned int, unsigned int, Gradient &) const;
+
+template LIBMESH_EXPORT void FEMContext::interior_accel<Number>(unsigned int, unsigned int, Number &) const;
+template LIBMESH_EXPORT void FEMContext::interior_accel<Gradient>(unsigned int, unsigned int, Gradient &) const;
+
+template LIBMESH_EXPORT void FEMContext::side_accel<Number>(unsigned int, unsigned int, Number &) const;
+template LIBMESH_EXPORT void FEMContext::side_accel<Gradient>(unsigned int, unsigned int, Gradient &) const;
+
+template LIBMESH_EXPORT FEGenericBase<Real> *
 FEMContext::build_new_fe(const FEGenericBase<Real>*,
                          const Point &,
                          const Real,
                          const int) const;
 
-template FEGenericBase<RealGradient> *
+template LIBMESH_EXPORT FEGenericBase<RealGradient> *
 FEMContext::build_new_fe(const FEGenericBase<RealGradient>*,
                          const Point &,
                          const Real,

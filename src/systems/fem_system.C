@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -1126,7 +1126,7 @@ void FEMSystem::assemble_qoi (const QoISet & qoi_indices)
   // side terms
   for (unsigned int i=0; i != Nq; ++i)
     if (qoi_indices.has_index(i))
-      qoi[i] = 0;
+      this->set_qoi(i, 0);
 
   // Create a non-temporary qoi_contributions object, so we can query
   // its results after the reduction
@@ -1137,7 +1137,9 @@ void FEMSystem::assemble_qoi (const QoISet & qoi_indices)
                                             mesh.active_local_elements_end()),
                            qoi_contributions);
 
-  this->diff_qoi->parallel_op( this->comm(), this->qoi, qoi_contributions.qoi, qoi_indices );
+  std::vector<Number> global_qoi = this->get_qoi_values();
+  this->diff_qoi->parallel_op( this->comm(), global_qoi, qoi_contributions.qoi, qoi_indices );
+  this->set_qoi(std::move(global_qoi));
 }
 
 

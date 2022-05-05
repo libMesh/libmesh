@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -133,12 +133,12 @@ std::unique_ptr<Elem> Pyramid::side_ptr (const unsigned int i)
     case 2: // triangular face 3
     case 3: // triangular face 4
       {
-        face = libmesh_make_unique<Tri3>();
+        face = std::make_unique<Tri3>();
         break;
       }
     case 4:  // the quad face at z=0
       {
-        face = libmesh_make_unique<Quad4>();
+        face = std::make_unique<Quad4>();
         break;
       }
     default:

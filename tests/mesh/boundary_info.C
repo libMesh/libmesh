@@ -20,7 +20,7 @@ class BoundaryInfoTest : public CppUnit::TestCase {
    * This test ensures various aspects of the BoundaryInfo class work as expected.
    */
 public:
-  CPPUNIT_TEST_SUITE( BoundaryInfoTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( BoundaryInfoTest );
 
   CPPUNIT_TEST( testNameCopying );
 
@@ -49,6 +49,8 @@ public:
 
   void testMesh()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
 
     MeshTools::Generation::build_square(mesh,
@@ -169,6 +171,8 @@ public:
 
   void testEdgeBoundaryConditions()
   {
+    LOG_UNIT_TEST;
+
     const unsigned int n_elem = 5;
     const std::string mesh_filename = "cube_mesh.xda";
 
@@ -244,6 +248,8 @@ public:
 
   void testNameCopying()
   {
+    LOG_UNIT_TEST;
+
       Mesh mesh(*TestCommWorld);
       MeshTools::Generation::build_line(mesh,
                                         8,
@@ -281,6 +287,8 @@ public:
 #ifdef LIBMESH_ENABLE_DIRICHLET
   void testShellFaceConstraints()
   {
+    LOG_UNIT_TEST;
+
     // Make a simple two element mesh that we can use to test constraints
     Mesh mesh(*TestCommWorld);
 

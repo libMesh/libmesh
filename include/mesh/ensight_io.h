@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -75,8 +75,8 @@ public:
    * least once, otherwise only the Mesh will be written out.
    */
   void add_scalar (const std::string & system,
-                   const std::string & scalar_description,
-                   const std::string & s);
+                   std::string_view scalar_description,
+                   std::string_view s);
 
   /**
    * Tell the EnsightIO interface that the variables (u,v) constitute
@@ -86,9 +86,9 @@ public:
    * the same system.
    */
   void add_vector (const std::string & system,
-                   const std::string & vec_description,
-                   const std::string & u,
-                   const std::string & v);
+                   std::string_view vec_description,
+                   std::string u,
+                   std::string v);
 
   /**
    * Tell the EnsightIO interface that the variables (u, v, w)
@@ -98,10 +98,10 @@ public:
    * FEType, and must be defined in the same system.
    */
   void add_vector (const std::string & system,
-                   const std::string & vec_description,
-                   const std::string & u,
-                   const std::string & v,
-                   const std::string & w);
+                   std::string_view vec_description,
+                   std::string u,
+                   std::string v,
+                   std::string w);
   /**
    * Calls write_ascii() and write_case().
    * Writes case, mesh, and solution files named:
@@ -142,8 +142,8 @@ private:
   // private methods
   // write solution in ascii format file
   void write_ascii (Real time = 0);
-  void write_scalar_ascii (const std::string & sys, const std::string & var);
-  void write_vector_ascii (const std::string & sys, const std::vector<std::string> & vec, const std::string & var_name);
+  void write_scalar_ascii (std::string_view sys, std::string_view var);
+  void write_vector_ascii (std::string_view sys, const std::vector<std::string> & vec, std::string_view var_name);
   void write_solution_ascii ();
   void write_geometry_ascii ();
   void write_case();

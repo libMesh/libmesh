@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -142,7 +142,7 @@ std::unique_ptr<Elem> InfHex::side_ptr (const unsigned int i)
         // Why is that? - In agreement with build_side_ptr(),
         // which in turn _has_ to build the face in this
         // way as to enable the cool way \p InfFE re-uses \p FE.
-        face = libmesh_make_unique<Quad4>();
+        face = std::make_unique<Quad4>();
         break;
       }
 
@@ -152,7 +152,7 @@ std::unique_ptr<Elem> InfHex::side_ptr (const unsigned int i)
     case 3: // the face at y = 1
     case 4: // the face at x = -1
       {
-        face = libmesh_make_unique<InfQuad4>();
+        face = std::make_unique<InfQuad4>();
         break;
       }
 

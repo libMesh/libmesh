@@ -35,7 +35,7 @@ using namespace libMesh;
 class SkewFunc : public FunctionBase<Real>
 {
   std::unique_ptr<FunctionBase<Real>> clone () const override
-  { return libmesh_make_unique<SkewFunc>(); }
+  { return std::make_unique<SkewFunc>(); }
 
   Real operator() (const Point & p,
                      const Real time = 0.) override
@@ -226,6 +226,8 @@ template <Order order, FEFamily family, ElemType elem_type, unsigned int build_n
 class FETestBase : public CppUnit::TestCase {
 
 protected:
+  std::string libmesh_suite_name;
+
   unsigned int _dim, _nx, _ny, _nz;
   Elem *_elem;
   std::vector<dof_id_type> _dof_indices;
@@ -463,6 +465,8 @@ public:
 
   void testU()
   {
+    LOG_UNIT_TEST;
+
     auto f = [this](Point p, Real x, Real y, Real z)
       {
         Parameters dummy;
@@ -499,6 +503,8 @@ public:
 
   void testDualDoesntScreamAndDie()
   {
+    LOG_UNIT_TEST;
+
     // Handle the "more processors than elements" case
     if (!this->_elem)
       return;
@@ -513,6 +519,8 @@ public:
 
   void testGradU()
   {
+    LOG_UNIT_TEST;
+
     auto f = [this](Point p, Real x, Real y, Real z)
       {
         Parameters dummy;
@@ -588,6 +596,8 @@ public:
 
   void testGradUComp()
   {
+    LOG_UNIT_TEST;
+
     auto f = [this](Point p, Real x, Real y, Real z)
       {
         Parameters dummy;
@@ -672,6 +682,8 @@ public:
 
   void testHessU()
   {
+    LOG_UNIT_TEST;
+
     // Szabab elements don't have second derivatives yet
     if (family == SZABAB)
       return;
@@ -787,6 +799,8 @@ public:
   void testHessUComp()
   {
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+    LOG_UNIT_TEST;
+
     // Szabab elements don't have second derivatives yet
     if (family == SZABAB)
       return;
@@ -894,6 +908,8 @@ public:
 
   void testCustomReinit()
   {
+    LOG_UNIT_TEST;
+
     std::vector<Point> q_points;
     std::vector<Real> weights;
     q_points.resize(3); weights.resize(3);
@@ -922,6 +938,13 @@ public:
 #define INSTANTIATE_FETEST(order, family, elemtype)                     \
   class FETest_##order##_##family##_##elemtype : public FETest<order, family, elemtype> { \
   public:                                                               \
+  FETest_##order##_##family##_##elemtype() :                            \
+    FETest<order,family,elemtype>() {                                   \
+    if (unitlog->summarized_logs_enabled())                             \
+      this->libmesh_suite_name = "FETest";                              \
+    else                                                                \
+      this->libmesh_suite_name = "FETest_" #order "_" #family "_" #elemtype; \
+  }                                                                     \
   CPPUNIT_TEST_SUITE( FETest_##order##_##family##_##elemtype );         \
   FETEST                                                                \
   CPPUNIT_TEST_SUITE_END();                                             \

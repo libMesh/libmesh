@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -34,18 +34,19 @@
  * file(s) \p inf_fe_instantiate_1D.h, \p inf_fe_instantiate_2D.h,
  * and \p inf_fe_instantiate_3D.h for 1D, 2D and 3D, respectively.
  */
-#define INSTANTIATE_INF_FE(_dim,_map_type) template  class InfFE< _dim, INFINITE_MAP, _map_type >; \
-  template  class InfFE< _dim, JACOBI_20_00, _map_type >;               \
-  template  class InfFE< _dim, JACOBI_30_00, _map_type >;               \
-  template  class InfFE< _dim, LEGENDRE,     _map_type >;               \
-  template  class InfFE< _dim, LAGRANGE,     _map_type >
+#define INSTANTIATE_INF_FE(_dim,_map_type)                               \
+  template  class LIBMESH_EXPORT InfFE< _dim, INFINITE_MAP, _map_type >; \
+  template  class LIBMESH_EXPORT InfFE< _dim, JACOBI_20_00, _map_type >; \
+  template  class LIBMESH_EXPORT InfFE< _dim, JACOBI_30_00, _map_type >; \
+  template  class LIBMESH_EXPORT InfFE< _dim, LEGENDRE,     _map_type >; \
+  template  class LIBMESH_EXPORT InfFE< _dim, LAGRANGE,     _map_type >
 
-#define INSTANTIATE_INF_FE_MBRF(_dim,_map_type,_return,_function)       \
-  template _return InfFE< _dim,INFINITE_MAP,_map_type>::_function;      \
-  template _return InfFE< _dim,JACOBI_20_00,_map_type>::_function;      \
-  template _return InfFE< _dim,JACOBI_30_00,_map_type>::_function;      \
-  template _return InfFE< _dim,LEGENDRE,_map_type>::_function;          \
-  template _return InfFE< _dim,LAGRANGE,_map_type>::_function
+#define INSTANTIATE_INF_FE_MBRF(_dim,_map_type,_return,_function)                 \
+  template _return LIBMESH_EXPORT InfFE< _dim,INFINITE_MAP,_map_type>::_function; \
+  template _return LIBMESH_EXPORT InfFE< _dim,JACOBI_20_00,_map_type>::_function; \
+  template _return LIBMESH_EXPORT InfFE< _dim,JACOBI_30_00,_map_type>::_function; \
+  template _return LIBMESH_EXPORT InfFE< _dim,LEGENDRE,_map_type>::_function;     \
+  template _return LIBMESH_EXPORT InfFE< _dim,LAGRANGE,_map_type>::_function
 
 #else
 

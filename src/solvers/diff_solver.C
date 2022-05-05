@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,9 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/newton_solver.h"
 #include "libmesh/implicit_system.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -52,7 +54,7 @@ DiffSolver::DiffSolver (sys_type & s) :
 
 std::unique_ptr<DiffSolver> DiffSolver::build (sys_type & s)
 {
-  return libmesh_make_unique<NewtonSolver>(s);
+  return std::make_unique<NewtonSolver>(s);
 }
 
 

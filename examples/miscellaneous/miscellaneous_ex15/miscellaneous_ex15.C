@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2020 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -81,12 +81,8 @@ void assemble_func(EquationSystems & es, const std::string & system_name)
 
   // Now we will loop over all the elements in the mesh that
   // live on the local processor.
-  //for (const auto & elem : mesh.active_local_element_ptr_range()){
-  MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
-  for (; elem_it != elem_end; ++elem_it)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      Elem* elem = *elem_it;
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
       // matrix and right-hand-side this element will
@@ -201,8 +197,6 @@ int main (int argc, char** argv)
                                      );
 
   mesh.print_info();
-  MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
   // The infinite elements are attached to all elements that build the outer surface of the FEM-region.
   InfElemBuilder builder(mesh);
@@ -271,9 +265,9 @@ int main (int argc, char** argv)
   // Solve system. This function calls the assemble-functions.
   eig_sys.solve();
 
+#ifdef LIBMESH_ENABLE_AMR
   for (unsigned int i=0; i< 2; ++i)
     {
-
       ErrorVector error;
       MeshRefinement mesh_refinement(mesh);
       KellyErrorEstimator error_estimator;
@@ -307,6 +301,7 @@ int main (int argc, char** argv)
       // re-assemble and than solve again.
       eig_sys.solve();
     }
+#endif // LIBMESH_ENABLE_AMR
 
   // All done.
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS

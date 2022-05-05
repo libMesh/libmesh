@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,6 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/parallel.h"
 #include "libmesh/utility.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/dyna_io.h"  // ElementDefinition for BEX
 
 // TIMPI includes
@@ -44,8 +43,10 @@
 #include <cstring>
 #include <fstream>
 #include <map>
+#include <memory>
 #include <sstream>
 
+#ifdef LIBMESH_HAVE_EXODUS_API
 namespace
 {
   using namespace libMesh;
@@ -67,6 +68,7 @@ namespace
     libmesh_error_msg("Requested BEX coefficient vector " << i << " not found");
   }
 }
+#endif
 
 namespace libMesh
 {
@@ -86,7 +88,7 @@ ExodusII_IO::ExodusII_IO (MeshBase & mesh,
                         /* serial_only_needed_on_proc_0 = */ true),
   ParallelObject(mesh),
 #ifdef LIBMESH_HAVE_EXODUS_API
-  exio_helper(libmesh_make_unique<ExodusII_IO_Helper>(*this, false, true, single_precision)),
+  exio_helper(std::make_unique<ExodusII_IO_Helper>(*this, false, true, single_precision)),
   _timestep(1),
   _verbose(false),
   _append(false),
@@ -510,7 +512,7 @@ void ExodusII_IO::read (const std::string & fname)
                       const Real coef =
                         libmesh_vector_at(coef_vec, elem_node_index);
 
-                      const int gi = (elem_num)*exio_helper->num_nodes_per_elem +
+                      const int gi = (elem_num)*exio_helper->bex_num_elem_cvs +
                         spline_node_index;
                       const dof_id_type libmesh_node_id =
                         exio_helper->node_num_map[exio_helper->connect[gi] - 1] - 1;
@@ -534,7 +536,7 @@ void ExodusII_IO::read (const std::string & fname)
                            make_range(exio_helper->bex_num_elem_cvs))
                         {
                           // global => libMesh index, with crazy 1-based data - see comments above
-                          const int gi = (elem_num)*exio_helper->num_nodes_per_elem +
+                          const int gi = (elem_num)*exio_helper->bex_num_elem_cvs +
                             spline_node_index;
                           const dof_id_type libmesh_node_id =
                             exio_helper->node_num_map[exio_helper->connect[gi] - 1] - 1;
@@ -670,6 +672,97 @@ void ExodusII_IO::read (const std::string & fname)
           }
       } // end for (elem_list)
   } // end read sideset info
+
+  // Read in elemset information and apply to Mesh elements if present
+  {
+    exio_helper->read_elemset_info();
+
+    // Mimic behavior of sideset case where we store all the set
+    // information in a single array with offsets.
+    int offset=0;
+    for (int i=0; i<exio_helper->num_elem_sets; i++)
+      {
+        // Compute new offset
+        offset += (i > 0 ? exio_helper->num_elems_per_set[i-1] : 0);
+        exio_helper->read_elemset (i, offset);
+
+        // TODO: add support for elemset names
+        // std::string elemset_name = exio_helper->get_elem_set_name(i);
+        // if (!elemset_name.empty())
+        //   mesh.get_boundary_info().elemset_name(cast_int<boundary_id_type>(exio_helper->get_elem_set_id(i))) = elemset_name;
+      }
+
+    // Debugging: print the concatenated list of elemset ids
+    // libMesh::out << "Concatenated list of elemset Elem ids (Exodus numbering):" << std::endl;
+    // for (const auto & id : exio_helper->elemset_list)
+    //   libMesh::out << id << " ";
+    // libMesh::out << std::endl;
+
+    // Next we need to assign the elemset ids to the mesh using the
+    // Elem's "extra_integers" support, if we have any.
+    if (exio_helper->num_elem_all_elemsets)
+      {
+        // Build map from Elem -> {elemsets}. This is needed only
+        // temporarily to determine a unique set of elemset codes.
+        std::map<Elem *, MeshBase::elemset_type> elem_to_elemsets;
+        for (auto e : index_range(exio_helper->elemset_list))
+          {
+            // Follow standard (see sideset case above) approach for
+            // converting the ids stored in the elemset_list to
+            // libmesh Elem ids.
+            //
+            // TODO: this should be moved to a helper function so we
+            // don't duplicate the code.
+            dof_id_type libmesh_elem_id =
+              cast_int<dof_id_type>(exio_helper->elem_num_map[exio_helper->elemset_list[e] - 1] - 1);
+
+            // Get a pointer to this Elem
+            Elem * elem = mesh.elem_ptr(libmesh_elem_id);
+
+            // Debugging:
+            // libMesh::out << "Elem " << elem->id() << " is in elemset " << exio_helper->elemset_id_list[e] << std::endl;
+
+            // Store elemset id in the map
+            elem_to_elemsets[elem].insert(exio_helper->elemset_id_list[e]);
+          }
+
+        // Create a set of unique elemsets
+        std::set<MeshBase::elemset_type> unique_elemsets;
+        for (const auto & pr : elem_to_elemsets)
+          unique_elemsets.insert(pr.second);
+
+        // Debugging: print the unique elemsets
+        // libMesh::out << "The set of unique elemsets which exist on the Mesh:" << std::endl;
+        // for (const auto & s : unique_elemsets)
+        //   {
+        //     for (const auto & elemset_id : s)
+        //       libMesh::out << elemset_id << " ";
+        //     libMesh::out << std::endl;
+        //   }
+
+        // Enumerate the unique_elemsets and tell the mesh about them
+        dof_id_type code = 0;
+        for (const auto & s : unique_elemsets)
+          mesh.add_elemset_code(code++, s);
+
+        // Sanity check: make sure that MeshBase::n_elemsets() reports
+        // the expected value after calling MeshBase::add_elemset_code()
+        // one or more times.
+        libmesh_assert_msg(exio_helper->num_elem_sets == cast_int<int>(mesh.n_elemsets()),
+                           "Error: mesh.n_elemsets() is " << mesh.n_elemsets()
+                           << ", but mesh should have " << exio_helper->num_elem_sets << " elemsets.");
+
+        // Create storage for the extra integer on all Elems. Elems which
+        // are not in any set will use the default value of DofObject::invalid_id
+        unsigned int elemset_index =
+          mesh.add_elem_integer("elemset_code",
+                                /*allocate_data=*/true);
+
+        // Store the appropriate extra_integer value on all Elems that need it.
+        for (const auto & [elem, s] : elem_to_elemsets)
+          elem->set_extra_integer(elemset_index, mesh.get_elemset_code(s));
+      }
+  } // done reading elemset info
 
   // Read nodeset info
   {
@@ -1423,13 +1516,9 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   for (auto derived_var_id : index_range(derived_var_names))
     {
       const auto & derived_name = derived_var_names[derived_var_id];
-      const auto & name_and_id =
+      const auto & [orig_name, node_id] =
         libmesh_map_find (derived_name_to_orig_name_and_node_id,
                   derived_name);
-
-      // Convenience variables for the map entry's contents.
-      const std::string & orig_name = name_and_id.first;
-      const unsigned int node_id = name_and_id.second;
 
       // For each subdomain, determine whether the current variable
       // should be active on that subdomain.
@@ -1813,6 +1902,15 @@ void ExodusII_IO::write_timestep (const std::string & fname,
 }
 
 
+void ExodusII_IO::write_elemsets()
+{
+  libmesh_error_msg_if(!exio_helper->opened_for_writing,
+                       "ERROR, ExodusII file must be opened for writing "
+                       "before calling ExodusII_IO::write_elemsets()!");
+
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  exio_helper->write_elemsets(mesh);
+}
 
 void
 ExodusII_IO::
@@ -1876,8 +1974,8 @@ void
 ExodusII_IO::
 write_nodeset_data (int timestep,
                     const std::vector<std::string> & var_names,
-                    std::vector<std::set<boundary_id_type>> & node_boundary_ids,
-                    std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
+                    const std::vector<std::set<boundary_id_type>> & node_boundary_ids,
+                    const std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
 {
   libmesh_error_msg_if(!exio_helper->opened_for_writing,
                        "ERROR, ExodusII file must be opened for writing "
@@ -1895,10 +1993,52 @@ read_nodeset_data (int timestep,
                    std::vector<std::set<boundary_id_type>> & node_boundary_ids,
                    std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
 {
+  libmesh_error_msg_if(!exio_helper->opened_for_reading,
+                       "ERROR, ExodusII file must be opened for reading "
+                       "before calling ExodusII_IO::read_nodeset_data()!");
+
   exio_helper->read_nodeset_data(timestep, var_names, node_boundary_ids, bc_vals);
 }
 
+void
+ExodusII_IO::
+write_elemset_data (int timestep,
+                    const std::vector<std::string> & var_names,
+                    const std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                    const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals)
+{
+  libmesh_error_msg_if(!exio_helper->opened_for_writing,
+                       "ERROR, ExodusII file must be opened for writing "
+                       "before calling ExodusII_IO::write_elemset_data()!");
 
+  exio_helper->write_elemset_data(timestep, var_names, elemset_ids_in, elemset_vals);
+}
+
+
+
+void
+ExodusII_IO::
+read_elemset_data (int timestep,
+                   std::vector<std::string> & var_names,
+                   std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                   std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals)
+{
+  libmesh_error_msg_if(!exio_helper->opened_for_reading,
+                       "ERROR, ExodusII file must be opened for reading "
+                       "before calling ExodusII_IO::read_elemset_data()!");
+
+  exio_helper->read_elemset_data(timestep, var_names, elemset_ids_in, elemset_vals);
+}
+
+void
+ExodusII_IO::get_elemset_data_indices (std::map<std::pair<dof_id_type, elemset_id_type>, unsigned int> & elemset_array_indices)
+{
+  libmesh_error_msg_if(!exio_helper->opened_for_reading,
+                       "ERROR, ExodusII file must be opened for reading "
+                       "before calling ExodusII_IO::get_elemset_data_indices()!");
+
+  exio_helper->get_elemset_data_indices(elemset_array_indices);
+}
 
 
 void ExodusII_IO::write (const std::string & fname)
@@ -1926,6 +2066,7 @@ void ExodusII_IO::write (const std::string & fname)
   exio_helper->write_elements(mesh);
   exio_helper->write_sidesets(mesh);
   exio_helper->write_nodesets(mesh);
+  exio_helper->write_elemsets(mesh);
 
   if ((mesh.get_boundary_info().n_edge_conds() > 0) && _verbose)
     libmesh_warning("Warning: Mesh contains edge boundary IDs, but these "
@@ -2051,6 +2192,7 @@ void ExodusII_IO::write_nodal_data_common(std::string fname,
 
           exio_helper->write_sidesets(mesh);
           exio_helper->write_nodesets(mesh);
+          exio_helper->write_elemsets(mesh);
 
           exio_helper->initialize_nodal_variables(names);
         }
@@ -2110,6 +2252,13 @@ ExodusII_IO_Helper & ExodusII_IO::get_exio_helper()
 
   return *exio_helper;
 }
+
+
+void ExodusII_IO::set_hdf5_writing(bool write_hdf5)
+{
+  exio_helper->set_hdf5_writing(write_hdf5);
+}
+
 
 
 // LIBMESH_HAVE_EXODUS_API is not defined, declare error() versions of functions...
@@ -2266,6 +2415,11 @@ void ExodusII_IO::write_timestep (const std::string &,
 
 
 
+void ExodusII_IO::write_elemsets()
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
 void
 ExodusII_IO::
 write_sideset_data (int,
@@ -2288,7 +2442,67 @@ read_sideset_data (int,
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
 }
 
+void
+ExodusII_IO::
+get_sideset_data_indices (std::map<BoundaryInfo::BCTuple, unsigned int> &)
 
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+void
+ExodusII_IO::
+write_nodeset_data (int,
+                    const std::vector<std::string> &,
+                    const std::vector<std::set<boundary_id_type>> &,
+                    const std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+void
+ExodusII_IO::
+read_nodeset_data (int,
+                   std::vector<std::string> &,
+                   std::vector<std::set<boundary_id_type>> &,
+                   std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+void
+ExodusII_IO::
+get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+void
+ExodusII_IO::
+write_elemset_data (int,
+                    const std::vector<std::string> &,
+                    const std::vector<std::set<elemset_id_type>> &,
+                    const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+void
+ExodusII_IO::
+read_elemset_data (int,
+                   std::vector<std::string> &,
+                   std::vector<std::set<elemset_id_type>> &,
+                   std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+void
+ExodusII_IO::
+get_elemset_data_indices (std::map<std::pair<dof_id_type, elemset_id_type>, unsigned int> &)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
 
 void ExodusII_IO::write (const std::string &)
 {
@@ -2328,6 +2542,8 @@ const std::vector<std::string> & ExodusII_IO::get_global_var_names()
 {
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
 }
+
+void ExodusII_IO::set_hdf5_writing(bool) {}
 
 #endif // LIBMESH_HAVE_EXODUS_API
 } // namespace libMesh

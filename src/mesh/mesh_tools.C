@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -347,32 +347,6 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 }
 
 
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void MeshTools::find_boundary_nodes (const MeshBase & mesh,
-                                     std::vector<bool> & on_boundary)
-{
-  libmesh_deprecated();
-
-  // Resize the vector which holds boundary nodes and fill with false.
-  on_boundary.resize(mesh.max_node_id());
-  std::fill(on_boundary.begin(),
-            on_boundary.end(),
-            false);
-
-  // Loop over elements, find those on boundary, and
-  // mark them as true in on_boundary.
-  for (const auto & elem : mesh.active_element_ptr_range())
-    for (auto s : elem->side_index_range())
-      if (elem->neighbor_ptr(s) == nullptr) // on the boundary
-        {
-          const auto nodes_on_side = elem->nodes_on_side(s);
-
-          for (auto & node_id : nodes_on_side)
-            on_boundary[node_id] = true;
-        }
-}
-#endif
 
 std::unordered_set<dof_id_type>
 MeshTools::find_boundary_nodes(const MeshBase & mesh)
@@ -1144,9 +1118,8 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
                   else // If it wasn't node1 then it must be node2!
                     hanging_node=node2;
 
-                  // Reset these for reuse
+                  // Reset for reuse
                   local_node1=0;
-                  local_node2=0;
 
                   // Find the first node that makes up the side in the neighbor (these should be the parent nodes)
                   while (!neigh->is_node_on_side(local_node1++,s_neigh)) { }
@@ -2422,10 +2395,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
     (processor_id_type,
      const std::vector<std::pair<dof_id_type, processor_id_type>> & data)
     {
-      for (auto & p : data)
+      for (const auto & [id, pid] : data)
         {
-          const dof_id_type id = p.first;
-          const processor_id_type pid = p.second;
           const proc_id_map_type::iterator it = new_proc_ids.find(id);
           if (it == new_proc_ids.end())
             new_proc_ids.emplace(id, pid);

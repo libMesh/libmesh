@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -156,7 +156,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
   // so update the fe_base.
   if (inf_side->infinite())
     {
-      base_fe = FEBase::build(1, this->fe_type);
+      base_fe = FEBase::build(Dim-2, this->fe_type);
       base_fe->attach_quadrature_rule(base_qrule.get());
     }
   else
@@ -165,21 +165,26 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
       base_fe->attach_quadrature_rule(base_qrule.get());
     }
 
-  //before initializing, we should say what to compute:
-  base_fe->_fe_map->get_xyz();
-  base_fe->_fe_map->get_JxW();
+  if (this->calculate_map || this->calculate_map_scaled)
+    {
+      //before initializing, we should say what to compute:
+      base_fe->_fe_map->get_xyz();
+      base_fe->_fe_map->get_JxW();
+    }
 
-  // initialize the shape functions on the base
-  base_fe->init_base_shape_functions(base_fe->qrule->get_points(),
-                                     base_elem.get());
+  if (calculate_phi || calculate_dphi || calculate_phi_scaled || calculate_dphi_scaled)
+    // initialize the shape functions on the base
+    base_fe->init_base_shape_functions(base_fe->qrule->get_points(),
+                                       base_elem.get());
 
   // the number of quadrature points
-  const unsigned int n_radial_qp =
-    cast_int<unsigned int>(som.size());
+  const unsigned int n_radial_qp = radial_qrule->n_points();
   const unsigned int n_base_qp   = base_qrule->n_points();
   const unsigned int n_total_qp  = n_radial_qp * n_base_qp;
 
 #ifdef DEBUG
+  if (som.size() > 0)
+    libmesh_assert_equal_to(n_radial_qp, som.size());
   // when evaluating the base side, there should be only one radial point.
   if (!inf_side->infinite())
     libmesh_assert_equal_to (n_radial_qp, 1);
@@ -229,24 +234,28 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::compute_face_functions()
 {
 
-  const unsigned int n_qp = cast_int<unsigned int>(_total_qrule_weights.size());
-  if (calculate_dxyz)
-    {
-      this->normals.resize(n_qp);
+  if (!calculate_map && !calculate_map_scaled)
+    return; // we didn't ask for any quantity computed here.
 
-      if (Dim > 1)
-        {
-          this->tangents.resize(n_qp);
-          for (unsigned int p=0; p<n_qp; ++p)
-            this->tangents[p].resize(LIBMESH_DIM-1);
-        }
-      else
-        {
-          libMesh::err << "tangents have no sense in 1-dimensional elements!"<<std::endl;
-          libmesh_error_msg("Exiting...");
-        }
+  const unsigned int n_qp = cast_int<unsigned int>(_total_qrule_weights.size());
+  this->normals.resize(n_qp);
+
+  if (Dim > 1)
+    {
+      this->tangents.resize(n_qp);
+      for (unsigned int p=0; p<n_qp; ++p)
+        this->tangents[p].resize(LIBMESH_DIM-1);
+    }
+  else
+    {
+      libMesh::err << "tangents have no sense in 1-dimensional elements!"<<std::endl;
+      libmesh_error_msg("Exiting...");
     }
 
+  // the dimension of base indicates which side we have:
+  // if base_dim == Dim -1 : base
+  //    base_dim == Dim -2 : one of the other sides.
+  unsigned int base_dim =base_fe->dim;
   // If we have no quadrature points, there's nothing else to do
   if (!n_qp)
     return;
@@ -261,67 +270,74 @@ void InfFE<Dim,T_radial,T_base>::compute_face_functions()
       }
     case 3:
       {
-        for (unsigned int p=0; p<n_qp; ++p)
-          {
+        // Below, we assume a 2D base, i.e. we compute the side s=0.
+        if (base_dim==Dim-1)
+          for (unsigned int p=0; p<n_qp; ++p)
+            {
+              //
+              // seeking dxyzdx, dxyzdeta means to compute
+              //        / dx/dxi    dy/dxi   dz/dxi \.
+              // J^-1= |                             |
+              //       \ dx/deta  dy/deta   dz/deta /.
+              // which is the psudo-inverse of J, i.e.
+              //
+              // J^-1 = (J^T J)^-1 J^T
+              //
+              // where J^T T is the 2x2 matrix 'g' used to compute the
+              // Jacobian determinant; thus
+              //
+              // J^-1 = ________1________   / g22  -g21 \  / dxi/dx  dxi/dy   dxi/dz \.
+              //        g11*g22 - g21*g12   \-g12  g11  /  \ deta/dx deta/dy deta/dz /.
+              const std::vector<Real> & base_dxidx = base_fe->get_dxidx();
+              const std::vector<Real> & base_dxidy = base_fe->get_dxidy();
+              const std::vector<Real> & base_dxidz = base_fe->get_dxidz();
+              const std::vector<Real> & base_detadx = base_fe->get_detadx();
+              const std::vector<Real> & base_detady = base_fe->get_detady();
+              const std::vector<Real> & base_detadz = base_fe->get_detadz();
 
-            if (calculate_dxyz)
-              {
-                //
-                // seeking dxyzdx, dxyzdeta means to compute
-                //        / dx/dxi    dy/dxi   dz/dxi \.
-                // J^-1= |                             |
-                //       \ dx/deta  dy/deta   dz/deta /.
-                // which is the psudo-inverse of J, i.e.
-                //
-                // J^-1 = (J^T J)^-1 J^T
-                //
-                // where J^T T is the 2x2 matrix 'g' used to compute the
-                // Jacobian determinant; thus
-                //
-                // J^-1 = ________1________   / g22  -g21 \  / dxi/dx  dxi/dy   dxi/dz \.
-                //        g11*g22 - g21*g12   \-g12  g11  /  \ deta/dx deta/dy deta/dz /.
-                const std::vector<Real> & base_dxidx = base_fe->get_dxidx();
-                const std::vector<Real> & base_dxidy = base_fe->get_dxidy();
-                const std::vector<Real> & base_dxidz = base_fe->get_dxidz();
-                const std::vector<Real> & base_detadx = base_fe->get_detadx();
-                const std::vector<Real> & base_detady = base_fe->get_detady();
-                const std::vector<Real> & base_detadz = base_fe->get_detadz();
+              const Real g11 = (base_dxidx[p]*base_dxidx[p] +
+                                base_dxidy[p]*base_dxidy[p] +
+                                base_dxidz[p]*base_dxidz[p]);
+              const Real g12 = (base_dxidx[p]*base_detadx[p] +
+                                base_dxidy[p]*base_detady[p] +
+                                base_dxidz[p]*base_detadz[p]);
+              const Real g21 = g12;
+              const Real g22 = (base_detadx[p]*base_detadx[p] +
+                                base_detady[p]*base_detady[p] +
+                                base_detadz[p]*base_detadz[p]);
 
-                const Real g11 = (base_dxidx[p]*base_dxidx[p] +
-                                  base_dxidy[p]*base_dxidy[p] +
-                                  base_dxidz[p]*base_dxidz[p]);
-                const Real g12 = (base_dxidx[p]*base_detadx[p] +
-                                  base_dxidy[p]*base_detady[p] +
-                                  base_dxidz[p]*base_detadz[p]);
-                const Real g21 = g12;
-                const Real g22 = (base_detadx[p]*base_detadx[p] +
-                                  base_detady[p]*base_detady[p] +
-                                  base_detadz[p]*base_detadz[p]);
+              const Real det = (g11*g22 - g12*g21);
 
-                // det is scaled by r^6
-                const Real det = (g11*g22 - g12*g21);
+              Point dxyzdxi_map((g22*base_dxidx[p]-g21*base_detadx[p])/det,
+                                (g22*base_dxidy[p]-g21*base_detady[p])/det,
+                                (g22*base_dxidz[p]-g21*base_detadz[p])/det);
 
-                // scaled by r^-3
-                Point dxyzdxi_map((g22*base_dxidx[p]-g21*base_detadx[p])/det,
-                                  (g22*base_dxidy[p]-g21*base_detady[p])/det,
-                                  (g22*base_dxidz[p]-g21*base_detadz[p])/det);
+              Point dxyzdeta_map((g11*base_detadx[p] - g12*base_dxidx[p])/det,
+                                 (g11*base_detady[p] - g12*base_dxidy[p])/det,
+                                 (g11*base_detadz[p] - g12*base_dxidz[p])/det);
 
-                Point dxyzdeta_map((g11*base_detadx[p] - g12*base_dxidx[p])/det,
-                                   (g11*base_detady[p] - g12*base_dxidy[p])/det,
-                                   (g11*base_detadz[p] - g12*base_dxidz[p])/det);
-                // scaled by r^-2
+              this->tangents[p][0] = dxyzdxi_map.unit();
 
-                this->tangents[p][0] = dxyzdxi_map.unit();
+              this->tangents[p][1] = (dxyzdeta_map - (dxyzdeta_map*tangents[p][0])*tangents[p][0] ).unit();
 
-                this->tangents[p][1] = (dxyzdeta_map - (dxyzdeta_map*tangents[p][0])*tangents[p][0] ).unit();
+              this->normals[p]     = tangents[p][0].cross(tangents[p][1]).unit();
+              // recompute JxW using the 2D Jacobian:
+              // Since we are at the base, there is no difference between scaled and unscaled jacobian
+              if (calculate_jxw)
+                this->JxW[p] = _total_qrule_weights[p]/std::sqrt(det);
 
-                this->normals[p]     = tangents[p][0].cross(tangents[p][1]).unit();
-                // recompute JxW using the 2D Jacobian:
+              if (calculate_map_scaled)
                 this->JxWxdecay[p] = _total_qrule_weights[p]/std::sqrt(det);
-                this->JxW[p] = JxWxdecay[p];
-              }
 
-
+            }
+        else if (base_dim == Dim -2)
+          {
+            libmesh_not_implemented();
+          }
+        else
+          {
+            // in this case something went completely wrong.
+            libmesh_not_implemented();
           }
         break;
       }

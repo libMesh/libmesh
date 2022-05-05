@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,11 +20,10 @@
 
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_TRIANGLE
-
 // Local includes
-#include "libmesh/mesh_triangle_interface.h"
+#include "libmesh/boundary_info.h" // invalid_id
 #include "libmesh/point.h"
+#include "libmesh/triangulator_interface.h"
 
 // C++ includes
 
@@ -45,7 +44,7 @@ namespace libMesh
  * \date 2011
  * \brief Class for parameterizing 2D holes to be meshed with Triangle.
  */
-class TriangleInterface::Hole
+class TriangulatorInterface::Hole
 {
 public:
   /**
@@ -74,6 +73,11 @@ public:
   virtual Point inside() const = 0;
 
   /**
+   * Return the area of the hole
+   */
+  Real area() const;
+
+  /**
    * Starting indices of points for a hole with multiple disconnected boundaries.
    */
   virtual std::vector<unsigned int> segment_indices() const
@@ -84,6 +88,30 @@ public:
     seg.push_back(n_points());
     return seg;
   }
+
+  /**
+   * Set whether or not a triangulator is allowed to refine the
+   * hole boundary when refining the mesh interior.  This is true by
+   * default, but may be set to false to make the hole boundary more
+   * predictable (and so easier to stitch to other meshes) later.
+   */
+  virtual void set_refine_boundary_allowed (bool refine_bdy_allowed)
+  { _refine_bdy_allowed = refine_bdy_allowed; }
+
+  /**
+   * Get whether or not the triangulation is allowed to refine the
+   * mesh boundary when refining the interior.  True by default.
+   */
+  virtual bool refine_boundary_allowed () const
+  { return _refine_bdy_allowed; }
+
+protected:
+
+  /**
+   * Whether to allow boundary refinement.  True by default; specified
+   * here so we can use the default constructor.
+   */
+  bool _refine_bdy_allowed = true;
 };
 
 
@@ -94,7 +122,7 @@ public:
  * A concrete instantiation of the Hole class that describes polygonal
  * (triangular, square, pentagonal, ...) holes.
  */
-class TriangleInterface::PolygonHole : public TriangleInterface::Hole
+class TriangulatorInterface::PolygonHole : public TriangulatorInterface::Hole
 {
 public:
   /**
@@ -131,6 +159,54 @@ private:
 
 
 
+/**
+ * A way to translate and/or rotate an existing hole; perhaps to tile
+ * it in many places or to put it at an angle that the underlying hole
+ * doesn't support.
+ */
+class TriangulatorInterface::AffineHole : public TriangulatorInterface::Hole
+{
+public:
+  /**
+   * Constructor specifying the underlying hole, and the rotation
+   * angle (in radians, done first) and translation (done second) with
+   * which to transform it.
+   */
+  AffineHole(const Hole & underlying, Real angle, const Point & shift)
+    : _underlying(underlying), _angle(angle), _shift(shift) {}
+
+  virtual unsigned int n_points() const override
+  { return _underlying.n_points(); }
+
+  virtual Point point(const unsigned int n) const override;
+
+  virtual Point inside() const override;
+
+private:
+  /**
+   * Rotate-and-shift equations
+   */
+  Point transform(const Point & p) const;
+
+  /**
+   * Hole to transform
+   */
+  const Hole & _underlying;
+
+  /**
+   * Angle to rotate (counter-clockwise) by
+   */
+  Real _angle;
+
+  /**
+   * (x,y) location to shift (0,0) to
+   */
+  Point _shift;
+};
+
+
+
+
 
 /**
  * Another concrete instantiation of the hole, this one should
@@ -139,7 +215,7 @@ private:
  * of Points which defines the hole (in order of connectivity) and
  * an arbitrary Point which lies inside the hole.
  */
-class TriangleInterface::ArbitraryHole : public TriangleInterface::Hole
+class TriangulatorInterface::ArbitraryHole : public TriangulatorInterface::Hole
 {
 public:
   /**
@@ -147,11 +223,19 @@ public:
    * and a reference to a vector of Points defining the hole.
    */
   ArbitraryHole(const Point & center,
-                const std::vector<Point> & points);
+                std::vector<Point> points);
 
   ArbitraryHole(const Point & center,
-                const std::vector<Point> & points,
-                const std::vector<unsigned int> & segment_indices);
+                std::vector<Point> points,
+                std::vector<unsigned int> segment_indices);
+
+  /**
+   * We can also construct an ArbitraryHole which just copies
+   * a hole of any other type.
+   */
+  ArbitraryHole(const Hole & orig);
+
+  ArbitraryHole(const ArbitraryHole & orig) = default;
 
   virtual unsigned int n_points() const override;
 
@@ -160,6 +244,16 @@ public:
   virtual Point inside() const override;
 
   virtual std::vector<unsigned int> segment_indices() const override;
+
+  const std::vector<Point> & get_points() const
+  {
+    return _points;
+  }
+
+  void set_points(std::vector<Point> points)
+  {
+    _points = std::move(points);
+  }
 
 private:
   /**
@@ -171,10 +265,58 @@ private:
    * Reference to the vector of points which makes up
    * the hole.
    */
-  const std::vector<Point> _points;
+  std::vector<Point> _points;
 
   std::vector<unsigned int> _segment_indices;
 };
+
+
+
+/**
+ * Another concrete instantiation of the hole, as general as
+ * ArbitraryHole, but based on an existing 1D or 2D mesh.
+ *
+ * If ids are given, 2D edges on a boundary with a listed id or 1D
+ * edges in a subdomain with a listed id will define the hole.
+ *
+ * If no ids are given, the hole will be defined by all 1D Edge
+ * elements and all 2D boundary edges.
+ *
+ * In either case the, hole definition should give a single connected
+ * boundary, topologically a circle.  The hole is defined when the
+ * MeshedHole is constructed, and ignores any subsequent changes to
+ * the input mesh.
+ */
+class TriangulatorInterface::MeshedHole : public TriangulatorInterface::Hole
+{
+public:
+  /**
+   * The constructor requires a mesh defining the hole, and optionally
+   * boundary+subdomain ids restricting the definition.
+   */
+  MeshedHole(const MeshBase & mesh,
+             std::set<std::size_t> ids = {});
+
+  virtual unsigned int n_points() const override;
+
+  virtual Point point(const unsigned int n) const override;
+
+  virtual Point inside() const override;
+
+private:
+  /**
+   * An (x,y) location inside the hole.  Cached because this is too
+   * expensive to compute for an arbitrary input mesh unless we need
+   * it for Triangle.
+   */
+  mutable Point _center;
+
+  /**
+   * The sorted vector of points which makes up the hole.
+   */
+  std::vector<Point> _points;
+};
+
 
 
 
@@ -183,7 +325,7 @@ private:
 /**
  * A class for defining a 2-dimensional region for Triangle.
  */
-class TriangleInterface::Region
+class TriangulatorInterface::Region
 {
 public:
   /**
@@ -222,7 +364,5 @@ private:
 };
 
 } // namespace libMesh
-
-#endif // LIBMESH_HAVE_TRIANGLE
 
 #endif // LIBMESH_MESH_TRIANGLE_HOLES_H

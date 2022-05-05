@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -43,15 +43,15 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/threads.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
 #include "timpi/parallel_sync.h"
 
 // C++ Includes
-#include <set>
 #include <algorithm> // for std::fill, std::equal_range, std::max, std::lower_bound, etc.
+#include <memory>
+#include <set>
 #include <sstream>
 #include <unordered_map>
 
@@ -89,7 +89,7 @@ DofMap::build_sparsity (const MeshBase & mesh,
   // Even better, if the full sparsity pattern is not needed then
   // the number of nonzeros per row can be estimated from the
   // sparsity patterns created on each thread.
-  auto sp = libmesh_make_unique<SparsityPattern::Build>
+  auto sp = std::make_unique<SparsityPattern::Build>
     (*this,
      this->_dof_coupling,
      this->_coupling_functors,
@@ -153,8 +153,8 @@ DofMap::DofMap(const unsigned int number,
   _augment_send_list(nullptr),
   _extra_send_list_function(nullptr),
   _extra_send_list_context(nullptr),
-  _default_coupling(libmesh_make_unique<DefaultCoupling>()),
-  _default_evaluating(libmesh_make_unique<DefaultCoupling>()),
+  _default_coupling(std::make_unique<DefaultCoupling>()),
+  _default_evaluating(std::make_unique<DefaultCoupling>()),
   need_full_sparsity_pattern(false),
   _n_dfs(0),
   _n_SCALAR_dofs(0)
@@ -174,10 +174,10 @@ DofMap::DofMap(const unsigned int number,
   , _node_constraints()
 #endif
 #ifdef LIBMESH_ENABLE_PERIODIC
-  , _periodic_boundaries(libmesh_make_unique<PeriodicBoundaries>())
+  , _periodic_boundaries(std::make_unique<PeriodicBoundaries>())
 #endif
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  , _dirichlet_boundaries(libmesh_make_unique<DirichletBoundaries>())
+  , _dirichlet_boundaries(std::make_unique<DirichletBoundaries>())
   , _adjoint_dirichlet_boundaries()
 #endif
   , _implicit_neighbor_dofs_initialized(false),
@@ -252,14 +252,14 @@ void DofMap::set_error_on_constraint_loop(bool error_on_constraint_loop)
 
 
 
-void DofMap::add_variable_group (const VariableGroup & var_group)
+void DofMap::add_variable_group (VariableGroup var_group)
 {
   // Ensure that we are not duplicating an existing entry in _variable_groups
   if (std::find(_variable_groups.begin(), _variable_groups.end(), var_group) == _variable_groups.end())
   {
    const unsigned int vg = cast_int<unsigned int>(_variable_groups.size());
 
-   _variable_groups.push_back(var_group);
+   _variable_groups.push_back(std::move(var_group));
 
     VariableGroup & new_var_group = _variable_groups.back();
 
@@ -386,11 +386,10 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
   // We know how many of our objects live on each processor, so
   // reserve() space for requests from each.
-  for (auto pair : ghost_objects_from_proc)
+  for (auto [p, size] : ghost_objects_from_proc)
     {
-      const processor_id_type p = pair.first;
       if (p != this->processor_id())
-        requested_ids[p].reserve(pair.second);
+        requested_ids[p].reserve(size);
     }
 
   for (it = objects_begin; it != objects_end; ++it)
@@ -1127,7 +1126,7 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
           // First get any new nodal DOFS
           for (unsigned int n=0; n<n_nodes; n++)
             {
-              Node & node = elem->node_ref(n);
+              const Node & node = elem->node_ref(n);
 
               if (node.processor_id() != this->processor_id())
                 continue;
@@ -1456,7 +1455,7 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
 void
 DofMap::
 merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
-                            std::set<CouplingMatrix *> & temporary_coupling_matrices,
+                            CouplingMatricesSet & temporary_coupling_matrices,
                             const std::set<GhostingFunctor *>::iterator & gf_begin,
                             const std::set<GhostingFunctor *>::iterator & gf_end,
                             const MeshBase::const_element_iterator & elems_begin,
@@ -1470,31 +1469,37 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
       libmesh_assert(gf);
       (*gf)(elems_begin, elems_end, p, more_elements_to_ghost);
 
-      for (const auto & pr : more_elements_to_ghost)
+      for (const auto & [elem, elem_cm] : more_elements_to_ghost)
         {
           GhostingFunctor::map_type::iterator existing_it =
-            elements_to_ghost.find (pr.first);
+            elements_to_ghost.find (elem);
+
           if (existing_it == elements_to_ghost.end())
-            elements_to_ghost.insert(pr);
+            elements_to_ghost.emplace(elem, elem_cm);
           else
             {
               if (existing_it->second)
                 {
-                  if (pr.second)
+                  if (elem_cm)
                     {
                       // If this isn't already a temporary
                       // then we need to make one so we'll
                       // have a non-const matrix to merge
                       if (temporary_coupling_matrices.empty() ||
-                          temporary_coupling_matrices.find(const_cast<CouplingMatrix *>(existing_it->second)) == temporary_coupling_matrices.end())
+                          !temporary_coupling_matrices.count(existing_it->second))
                         {
-                          CouplingMatrix * cm = new CouplingMatrix(*existing_it->second);
-                          temporary_coupling_matrices.insert(cm);
-                          existing_it->second = cm;
+                          // Make copy. This just calls the
+                          // compiler-generated copy constructor
+                          // because the CouplingMatrix class does not
+                          // define a custom copy constructor.
+                          auto result_pr = temporary_coupling_matrices.insert(std::make_unique<CouplingMatrix>(*existing_it->second));
+                          existing_it->second = result_pr.first->get();
                         }
-                      const_cast<CouplingMatrix &>(*existing_it->second) &= *pr.second;
+
+                      // Merge elem_cm into existing CouplingMatrix
+                      const_cast<CouplingMatrix &>(*existing_it->second) &= *elem_cm;
                     }
-                  else
+                  else // elem_cm == nullptr
                     {
                       // Any existing_it matrix merged with a full
                       // matrix (symbolized as nullptr) gives another
@@ -1504,13 +1509,9 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
                       // we don't need it anymore; we might as well
                       // remove it to keep the set of temporaries
                       // small.
-                      std::set<CouplingMatrix *>::iterator temp_it =
-                        temporary_coupling_matrices.find(const_cast<CouplingMatrix *>(existing_it->second));
+                      auto temp_it = temporary_coupling_matrices.find(existing_it->second);
                       if (temp_it != temporary_coupling_matrices.end())
-                      {
-                        delete *temp_it;
                         temporary_coupling_matrices.erase(temp_it);
-                      }
 
                       existing_it->second = nullptr;
                     }
@@ -1541,9 +1542,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
     = mesh.active_local_elements_end();
 
   GhostingFunctor::map_type elements_to_send;
-
-  // Man, I wish we had guaranteed unique_ptr availability...
-  std::set<CouplingMatrix *> temporary_coupling_matrices;
+  DofMap::CouplingMatricesSet temporary_coupling_matrices;
 
   // We need to add dofs to the send list if they've been directly
   // requested by an algebraic ghosting functor or they've been
@@ -1566,15 +1565,11 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
   std::map<const CouplingMatrix *, std::vector<unsigned int>>
     column_variable_lists;
 
-  for (auto & pr : elements_to_send)
+  for (const auto & [partner, ghost_coupling] : elements_to_send)
     {
-      const Elem * const partner = pr.first;
-
       // We asked ghosting functors not to give us local elements
       libmesh_assert_not_equal_to
         (partner->processor_id(), this->processor_id());
-
-      const CouplingMatrix * ghost_coupling = pr.second;
 
       // Loop over any present coupling matrix column variables if we
       // have a coupling matrix, or just add all variables to
@@ -1649,8 +1644,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
     }
 
   // We're now done with any merged coupling matrices we had to create.
-  for (auto & mat : temporary_coupling_matrices)
-    delete mat;
+  temporary_coupling_matrices.clear();
 
   //-------------------------------------------------------------------------
   // Our coupling functors added dofs from neighboring elements to the
@@ -2294,10 +2288,8 @@ void DofMap::_node_dof_indices (const Elem & elem,
   LOG_SCOPE("_node_dof_indices()", "DofMap");
 
   const unsigned int sys_num = this->sys_number();
-  const std::pair<unsigned int, unsigned int>
-    vg_and_offset = obj.var_to_vg_and_offset(sys_num,vn);
-  const unsigned int vg = vg_and_offset.first;
-  const unsigned int vig = vg_and_offset.second;
+  const auto [vg, vig] =
+    obj.var_to_vg_and_offset(sys_num,vn);
   const unsigned int n_comp = obj.n_comp_group(sys_num,vg);
 
   const VariableGroup & var = this->variable_group(vg);
@@ -2957,14 +2949,12 @@ std::string DofMap::get_info() const
     n_rhss = 0;
   long double avg_constraint_length = 0.;
 
-  for (const auto & pr : _dof_constraints)
+  for (const auto & [constrained_dof, row] : _dof_constraints)
     {
       // Only count local constraints, then sum later
-      const dof_id_type constrained_dof = pr.first;
       if (!this->local_index(constrained_dof))
         continue;
 
-      const DofConstraintRow & row = pr.second;
       std::size_t rowsize = row.size();
 
       max_constraint_length = std::max(max_constraint_length,
@@ -2999,14 +2989,13 @@ std::string DofMap::get_info() const
     n_node_rhss = 0;
   long double avg_node_constraint_length = 0.;
 
-  for (const auto & pr : _node_constraints)
+  for (const auto & [node, pr] : _node_constraints)
     {
       // Only count local constraints, then sum later
-      const Node * node = pr.first;
       if (node->processor_id() != this->processor_id())
         continue;
 
-      const NodeConstraintRow & row = pr.second.first;
+      const NodeConstraintRow & row = pr.first;
       std::size_t rowsize = row.size();
 
       max_node_constraint_length = std::max(max_node_constraint_length,
@@ -3014,7 +3003,7 @@ std::string DofMap::get_info() const
       avg_node_constraint_length += rowsize;
       n_node_constraints++;
 
-      if (pr.second.second != Point(0))
+      if (pr.second != Point(0))
         n_node_rhss++;
     }
 
@@ -3044,7 +3033,7 @@ std::string DofMap::get_info() const
 }
 
 
-template bool DofMap::is_evaluable<Elem>(const Elem &, unsigned int) const;
-template bool DofMap::is_evaluable<Node>(const Node &, unsigned int) const;
+template LIBMESH_EXPORT bool DofMap::is_evaluable<Elem>(const Elem &, unsigned int) const;
+template LIBMESH_EXPORT bool DofMap::is_evaluable<Node>(const Node &, unsigned int) const;
 
 } // namespace libMesh

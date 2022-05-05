@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,11 +27,11 @@
 #include "libmesh/qoi_set.h"
 #include "libmesh/enum_error_estimator_type.h"
 #include "libmesh/int_range.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <iostream>
 #include <iomanip>
+#include <memory>
 #include <sstream>
 
 namespace libMesh
@@ -42,8 +42,8 @@ namespace libMesh
 AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
   ErrorEstimator(),
   error_plot_suffix(),
-  _primal_error_estimator(libmesh_make_unique<PatchRecoveryErrorEstimator>()),
-  _dual_error_estimator(libmesh_make_unique<PatchRecoveryErrorEstimator>()),
+  _primal_error_estimator(std::make_unique<PatchRecoveryErrorEstimator>()),
+  _dual_error_estimator(std::make_unique<PatchRecoveryErrorEstimator>()),
   _qoi_set(QoISet())
 {
 }
@@ -100,9 +100,9 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
   if (!error_norm_is_identity)
     for (unsigned int v = 0; v < n_vars; v++)
       {
-        primal_errors_per_cell[std::make_pair(&_system, v)] = new ErrorVector;
-        dual_errors_per_cell[std::make_pair(&_system, v)] = new ErrorVector;
-        total_dual_errors_per_cell[std::make_pair(&_system, v)] = new ErrorVector;
+        primal_errors_per_cell[std::make_pair(&_system, v)] = std::make_unique<ErrorVector>();
+        dual_errors_per_cell[std::make_pair(&_system, v)] = std::make_unique<ErrorVector>();
+        total_dual_errors_per_cell[std::make_pair(&_system, v)] = std::make_unique<ErrorVector>();
       }
   ErrorVector primal_error_per_cell;
   ErrorVector dual_error_per_cell;
@@ -227,8 +227,8 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
                        << std::right
                        << v;
 
-              (*primal_errors_per_cell[std::make_pair(&_system, v)]).plot_error(primal_out.str(), _system.get_mesh());
-              (*total_dual_errors_per_cell[std::make_pair(&_system, v)]).plot_error(dual_out.str(), _system.get_mesh());
+              primal_errors_per_cell[std::make_pair(&_system, v)]->plot_error(primal_out.str(), _system.get_mesh());
+              total_dual_errors_per_cell[std::make_pair(&_system, v)]->plot_error(dual_out.str(), _system.get_mesh());
 
               primal_out.clear();
               dual_out.clear();
@@ -275,15 +275,6 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
           error_per_cell[i] = primal_error_per_cell[i]*total_dual_error_per_cell[i];
         }
     }
-
-  // Deallocate the ErrorMap contents if we allocated them earlier
-  if (!error_norm_is_identity)
-    for (unsigned int v = 0; v < n_vars; v++)
-      {
-        delete primal_errors_per_cell[std::make_pair(&_system, v)];
-        delete dual_errors_per_cell[std::make_pair(&_system, v)];
-        delete total_dual_errors_per_cell[std::make_pair(&_system, v)];
-      }
 }
 
 } // namespace libMesh

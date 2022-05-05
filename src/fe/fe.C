@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -305,7 +305,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
         // for all the elements on the mortar segment mesh by setting `calculate_default_dual_coeff' = false
         // in MOOSE (in `Assembly::reinitDual`) and use the customized QRule for calculating the dual shape coefficients
         // This is to be improved in the future
-        if (this->calculate_default_dual_coeff)
+        if (elem && this->calculate_default_dual_coeff)
           this->reinit_default_dual_shape_coeffs(elem);
         // The dual shape functions relies on the customized shape functions
         // and the coefficient matrix, \p dual_coeff
@@ -339,6 +339,8 @@ void FE<Dim,T>::reinit_dual_shape_coeffs(const Elem * elem,
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::reinit_default_dual_shape_coeffs (const Elem * elem)
 {
+  libmesh_assert(elem);
+
   FEType default_fe_type(this->get_order(), T);
   QGauss default_qrule(elem->dim(), default_fe_type.default_quadrature_order());
   default_qrule.init(elem->type(), elem->p_level());
@@ -557,17 +559,23 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
   // returned
 
   {
-    this->weight.resize  (n_qp);
-    this->dweight.resize (n_qp);
-    this->dphase.resize  (n_qp);
-
-    for (unsigned int p=0; p<n_qp; p++)
+    if (this->calculate_phi || this->calculate_dphi)
       {
-        this->weight[p] = 1.;
-        this->dweight[p].zero();
-        this->dphase[p].zero();
+        this->weight.resize  (n_qp);
+        for (unsigned int p=0; p<n_qp; p++)
+          this->weight[p] = 1.;
       }
 
+    if (this->calculate_dphi)
+      {
+        this->dweight.resize (n_qp);
+        this->dphase.resize  (n_qp);
+        for (unsigned int p=0; p<n_qp; p++)
+          {
+            this->dweight[p].zero();
+            this->dphase[p].zero();
+          }
+      }
   }
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

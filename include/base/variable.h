@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -56,12 +56,12 @@ public:
    * all subdomains.
    */
   Variable (System * sys,
-            const std::string & var_name,
+            std::string var_name,
             const unsigned int var_number,
             const unsigned int first_scalar_num,
             const FEType & var_type) :
     _sys(sys),
-    _name(var_name),
+    _name(std::move(var_name)),
     _active_subdomains(),
     _number(var_number),
     _first_scalar_number(first_scalar_num),
@@ -73,18 +73,26 @@ public:
    * indices for which this variable is active.
    */
   Variable (System * sys,
-            const std::string & var_name,
+            std::string var_name,
             const unsigned int var_number,
             const unsigned int first_scalar_num,
             const FEType & var_type,
             const std::set<subdomain_id_type> & var_active_subdomains) :
     _sys(sys),
-    _name(var_name),
+    _name(std::move(var_name)),
     _active_subdomains(var_active_subdomains),
     _number(var_number),
     _first_scalar_number(first_scalar_num),
     _type(var_type)
   {}
+
+  /**
+   * Standard constructors.
+   */
+  Variable (const Variable &) = default;
+  Variable & operator= (const Variable &) = default;
+  Variable (Variable &&) = default;
+  Variable & operator= (Variable &&) = default;
 
   /**
    * \returns true iff the \p other Variable has the same
@@ -190,7 +198,7 @@ public:
    * all subdomains.
    */
   VariableGroup (System * sys,
-                 const std::vector<std::string> & var_names,
+                 std::vector<std::string> var_names,
                  const unsigned int var_number,
                  const unsigned int first_scalar_num,
                  const FEType & var_type) :
@@ -199,7 +207,7 @@ public:
               var_number,
               first_scalar_num,
               var_type),
-    _names(var_names)
+    _names(std::move(var_names))
   {}
 
 
@@ -208,7 +216,7 @@ public:
    * indices for which this variable is active.
    */
   VariableGroup (System * sys,
-                 const std::vector<std::string> & var_names,
+                 std::vector<std::string> var_names,
                  const unsigned int var_number,
                  const unsigned int first_scalar_num,
                  const FEType & var_type,
@@ -220,8 +228,16 @@ public:
               first_scalar_num,
               var_type,
               var_active_subdomains),
-    _names(var_names)
+    _names(std::move(var_names))
   {}
+
+  /**
+   * Standard constructors.
+   */
+  VariableGroup (const VariableGroup &) = default;
+  VariableGroup & operator= (const VariableGroup &) = default;
+  VariableGroup (VariableGroup &&) = default;
+  VariableGroup & operator= (VariableGroup &&) = default;
 
   /**
    * \returns true iff the \p other VariableGroup has exactly the same
@@ -297,8 +313,8 @@ public:
    * a very limited window of opportunity - after the user specifies variables
    * but before the system is initialized.
    */
-  void append (const std::string & var_name)
-  { _names.push_back (var_name); }
+  void append (std::string var_name)
+  { _names.push_back (std::move(var_name)); }
 
 protected:
   std::vector<std::string> _names;

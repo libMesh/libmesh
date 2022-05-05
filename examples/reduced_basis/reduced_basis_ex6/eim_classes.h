@@ -4,10 +4,12 @@
 // libMesh includes
 #include "libmesh/rb_eim_construction.h"
 #include "libmesh/rb_eim_evaluation.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // Example includes
 #include "assembly.h"
+
+// C++ includes
+#include <memory>
 
 using libMesh::RBEIMConstruction;
 
@@ -21,7 +23,7 @@ public:
   SimpleEIMEvaluation(const libMesh::Parallel::Communicator & comm)
     : RBEIMEvaluation(comm)
   {
-    set_parametrized_function(libmesh_make_unique<Gxyz>());
+    set_parametrized_function(std::make_unique<Gxyz>());
   }
 
   /**
@@ -29,7 +31,7 @@ public:
    */
   virtual std::unique_ptr<RBTheta> build_eim_theta(unsigned int index)
   {
-    return libmesh_make_unique<ThetaEIM>(*this, index);
+    return std::make_unique<ThetaEIM>(*this, index);
   }
 };
 
@@ -53,7 +55,7 @@ public:
    */
   virtual std::unique_ptr<ElemAssembly> build_eim_assembly(unsigned int index)
   {
-    return libmesh_make_unique<AssemblyEIM>(*this, index);
+    return std::make_unique<AssemblyEIM>(*this, index);
   }
 
   /**

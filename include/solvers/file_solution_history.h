@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,10 +27,10 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/diff_system.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <list>
+#include <memory>
 
 namespace libMesh
 {
@@ -72,7 +72,7 @@ public:
    */
   virtual std::unique_ptr<SolutionHistory > clone() const override
   {
-    return libmesh_make_unique<FileSolutionHistory>(_system);
+    return std::make_unique<FileSolutionHistory>(_system);
   }
 
 private:
@@ -81,9 +81,11 @@ private:
   DifferentiableSystem & _system ;
 
   /**
-   * A vector of pointers to vectors holding the adjoint solution at the last time step
+   * A vector of pointers to adjoint and old adjoint solutions at the last time step.
+   * These are used to prevent the zeroing of the adjoint and old adjoint by es::read.
    */
   std::vector< std::unique_ptr<NumericVector<Number>> > dual_solution_copies;
+  std::vector< std::unique_ptr<NumericVector<Number>> > old_dual_solution_copies;
 };
 
 } // end namespace libMesh

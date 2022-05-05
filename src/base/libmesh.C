@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,6 @@
 #include "libmesh/print_trace.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/perf_log.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // TIMPI includes
 #include "timpi/communicator.h"
@@ -336,7 +335,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   libmesh_assert (!libMesh::initialized());
 
   // Build a command-line parser.
-  command_line = libmesh_make_unique<GetPot>(argc, argv);
+  command_line = std::make_unique<GetPot>(argc, argv);
 
   // Disable performance logging upon request
   {
@@ -381,7 +380,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     omp_set_num_threads(libMesh::libMeshPrivateData::_n_threads);
 #endif
 
-    task_scheduler = libmesh_make_unique<Threads::task_scheduler_init>(libMesh::n_threads());
+    task_scheduler = std::make_unique<Threads::task_scheduler_init>(libMesh::n_threads());
   }
 
   // Construct singletons who may be at risk of the
@@ -514,7 +513,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // plus we were doing it wrong for many years and not clearing the
   // existing GetPot object before re-parsing the command line, so all
   // the command line arguments appeared twice in the GetPot object...
-  command_line = libmesh_make_unique<GetPot>(argc, argv);
+  command_line = std::make_unique<GetPot>(argc, argv);
 
   // The following line is an optimization when simultaneous
   // C and C++ style access to output streams is not required.
@@ -577,7 +576,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 
       std::ostringstream filename;
       filename << basename << ".processor." << libMesh::global_processor_id();
-      _ofstream = libmesh_make_unique<std::ofstream>(filename.str().c_str());
+      _ofstream = std::make_unique<std::ofstream>(filename.str().c_str());
 
       // Redirect, saving the original streambufs!
       out_buf = libMesh::out.rdbuf (_ofstream->rdbuf());
@@ -1013,54 +1012,54 @@ SolverPackage default_solver_package ()
 
 
 //-------------------------------------------------------------------------------
-template unsigned char  command_line_value<unsigned char>  (const std::string &, unsigned char);
-template unsigned short command_line_value<unsigned short> (const std::string &, unsigned short);
-template unsigned int   command_line_value<unsigned int>   (const std::string &, unsigned int);
-template char           command_line_value<char>           (const std::string &, char);
-template short          command_line_value<short>          (const std::string &, short);
-template int            command_line_value<int>            (const std::string &, int);
-template float          command_line_value<float>          (const std::string &, float);
-template double         command_line_value<double>         (const std::string &, double);
-template long double    command_line_value<long double>    (const std::string &, long double);
-template std::string    command_line_value<std::string>    (const std::string &, std::string);
+template LIBMESH_EXPORT unsigned char  command_line_value<unsigned char>  (const std::string &, unsigned char);
+template LIBMESH_EXPORT unsigned short command_line_value<unsigned short> (const std::string &, unsigned short);
+template LIBMESH_EXPORT unsigned int   command_line_value<unsigned int>   (const std::string &, unsigned int);
+template LIBMESH_EXPORT char           command_line_value<char>           (const std::string &, char);
+template LIBMESH_EXPORT short          command_line_value<short>          (const std::string &, short);
+template LIBMESH_EXPORT int            command_line_value<int>            (const std::string &, int);
+template LIBMESH_EXPORT float          command_line_value<float>          (const std::string &, float);
+template LIBMESH_EXPORT double         command_line_value<double>         (const std::string &, double);
+template LIBMESH_EXPORT long double    command_line_value<long double>    (const std::string &, long double);
+template LIBMESH_EXPORT std::string    command_line_value<std::string>    (const std::string &, std::string);
 
-template unsigned char  command_line_value<unsigned char>  (const std::vector<std::string> &, unsigned char);
-template unsigned short command_line_value<unsigned short> (const std::vector<std::string> &, unsigned short);
-template unsigned int   command_line_value<unsigned int>   (const std::vector<std::string> &, unsigned int);
-template char           command_line_value<char>           (const std::vector<std::string> &, char);
-template short          command_line_value<short>          (const std::vector<std::string> &, short);
-template int            command_line_value<int>            (const std::vector<std::string> &, int);
-template float          command_line_value<float>          (const std::vector<std::string> &, float);
-template double         command_line_value<double>         (const std::vector<std::string> &, double);
-template long double    command_line_value<long double>    (const std::vector<std::string> &, long double);
-template std::string    command_line_value<std::string>    (const std::vector<std::string> &, std::string);
+template LIBMESH_EXPORT unsigned char  command_line_value<unsigned char>  (const std::vector<std::string> &, unsigned char);
+template LIBMESH_EXPORT unsigned short command_line_value<unsigned short> (const std::vector<std::string> &, unsigned short);
+template LIBMESH_EXPORT unsigned int   command_line_value<unsigned int>   (const std::vector<std::string> &, unsigned int);
+template LIBMESH_EXPORT char           command_line_value<char>           (const std::vector<std::string> &, char);
+template LIBMESH_EXPORT short          command_line_value<short>          (const std::vector<std::string> &, short);
+template LIBMESH_EXPORT int            command_line_value<int>            (const std::vector<std::string> &, int);
+template LIBMESH_EXPORT float          command_line_value<float>          (const std::vector<std::string> &, float);
+template LIBMESH_EXPORT double         command_line_value<double>         (const std::vector<std::string> &, double);
+template LIBMESH_EXPORT long double    command_line_value<long double>    (const std::vector<std::string> &, long double);
+template LIBMESH_EXPORT std::string    command_line_value<std::string>    (const std::vector<std::string> &, std::string);
 
-template unsigned char  command_line_next<unsigned char>   (std::string, unsigned char);
-template unsigned short command_line_next<unsigned short>  (std::string, unsigned short);
-template unsigned int   command_line_next<unsigned int>    (std::string, unsigned int);
-template char           command_line_next<char>            (std::string, char);
-template short          command_line_next<short>           (std::string, short);
-template int            command_line_next<int>             (std::string, int);
-template float          command_line_next<float>           (std::string, float);
-template double         command_line_next<double>          (std::string, double);
-template long double    command_line_next<long double>     (std::string, long double);
-template std::string    command_line_next<std::string>     (std::string, std::string);
+template LIBMESH_EXPORT unsigned char  command_line_next<unsigned char>   (std::string, unsigned char);
+template LIBMESH_EXPORT unsigned short command_line_next<unsigned short>  (std::string, unsigned short);
+template LIBMESH_EXPORT unsigned int   command_line_next<unsigned int>    (std::string, unsigned int);
+template LIBMESH_EXPORT char           command_line_next<char>            (std::string, char);
+template LIBMESH_EXPORT short          command_line_next<short>           (std::string, short);
+template LIBMESH_EXPORT int            command_line_next<int>             (std::string, int);
+template LIBMESH_EXPORT float          command_line_next<float>           (std::string, float);
+template LIBMESH_EXPORT double         command_line_next<double>          (std::string, double);
+template LIBMESH_EXPORT long double    command_line_next<long double>     (std::string, long double);
+template LIBMESH_EXPORT std::string    command_line_next<std::string>     (std::string, std::string);
 
-template void           command_line_vector<unsigned char> (const std::string &, std::vector<unsigned char> &);
-template void           command_line_vector<unsigned short>(const std::string &, std::vector<unsigned short> &);
-template void           command_line_vector<unsigned int>  (const std::string &, std::vector<unsigned int> &);
-template void           command_line_vector<char>          (const std::string &, std::vector<char> &);
-template void           command_line_vector<short>         (const std::string &, std::vector<short> &);
-template void           command_line_vector<int>           (const std::string &, std::vector<int> &);
-template void           command_line_vector<float>         (const std::string &, std::vector<float> &);
-template void           command_line_vector<double>        (const std::string &, std::vector<double> &);
-template void           command_line_vector<long double>   (const std::string &, std::vector<long double> &);
+template LIBMESH_EXPORT void           command_line_vector<unsigned char> (const std::string &, std::vector<unsigned char> &);
+template LIBMESH_EXPORT void           command_line_vector<unsigned short>(const std::string &, std::vector<unsigned short> &);
+template LIBMESH_EXPORT void           command_line_vector<unsigned int>  (const std::string &, std::vector<unsigned int> &);
+template LIBMESH_EXPORT void           command_line_vector<char>          (const std::string &, std::vector<char> &);
+template LIBMESH_EXPORT void           command_line_vector<short>         (const std::string &, std::vector<short> &);
+template LIBMESH_EXPORT void           command_line_vector<int>           (const std::string &, std::vector<int> &);
+template LIBMESH_EXPORT void           command_line_vector<float>         (const std::string &, std::vector<float> &);
+template LIBMESH_EXPORT void           command_line_vector<double>        (const std::string &, std::vector<double> &);
+template LIBMESH_EXPORT void           command_line_vector<long double>   (const std::string &, std::vector<long double> &);
 
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-template Real           command_line_value<Real>           (const std::string &, Real);
-template Real           command_line_value<Real>           (const std::vector<std::string> &, Real);
-template Real           command_line_next<Real>            (std::string, Real);
-template void           command_line_vector<Real>          (const std::string &, std::vector<Real> &);
+template LIBMESH_EXPORT Real           command_line_value<Real>           (const std::string &, Real);
+template LIBMESH_EXPORT Real           command_line_value<Real>           (const std::vector<std::string> &, Real);
+template LIBMESH_EXPORT Real           command_line_next<Real>            (std::string, Real);
+template LIBMESH_EXPORT void           command_line_vector<Real>          (const std::string &, std::vector<Real> &);
 #endif
 
 } // namespace libMesh

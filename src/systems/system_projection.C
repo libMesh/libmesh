@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -136,10 +136,10 @@ void convert_from_receive (SendT & received,
 namespace libMesh {
 typedef DynamicSparseNumberArray<Real, dof_id_type> DSNAN;
 
-template void
+template LIBMESH_EXPORT void
 DenseMatrix<Real>::cholesky_solve(const DenseVector<DSNAN> &,
                                   DenseVector<DSNAN> &);
-template void
+template LIBMESH_EXPORT void
 DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<DSNAN> &,
                                              DenseVector<DSNAN> &) const;
 }
@@ -645,10 +645,8 @@ public:
       {
         libmesh_assert(old_elem.old_dof_object);
 
-        const std::pair<unsigned int, unsigned int>
-          vg_and_offset = elem.var_to_vg_and_offset(sys_num,var_num);
-        const unsigned int vg = vg_and_offset.first;
-        const unsigned int vig = vg_and_offset.second;
+        const auto [vg, vig] =
+          elem.var_to_vg_and_offset(sys_num,var_num);
 
         const unsigned int n_comp = elem.n_comp_group(sys_num,vg);
         libmesh_assert_greater(elem.n_systems(), sys_num);

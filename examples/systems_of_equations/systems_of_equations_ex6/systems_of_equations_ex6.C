@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -544,23 +544,14 @@ int main (int argc, char ** argv)
   unsigned int v_var = system.add_variable("v", FIRST, LAGRANGE);
   unsigned int w_var = system.add_variable("w", FIRST, LAGRANGE);
 
-  std::set<boundary_id_type> boundary_ids;
-  boundary_ids.insert(BOUNDARY_ID_MIN_X);
-  boundary_ids.insert(NODE_BOUNDARY_ID);
-  boundary_ids.insert(EDGE_BOUNDARY_ID);
-
-  // Create a vector storing the variable numbers which the BC applies to
-  std::vector<unsigned int> variables;
-  variables.push_back(u_var);
-  variables.push_back(v_var);
-  variables.push_back(w_var);
-
   // Create a ZeroFunction to initialize dirichlet_bc
   ZeroFunction<> zf;
 
   // Most DirichletBoundary users will want to supply a "locally
   // indexed" functor
-  DirichletBoundary dirichlet_bc(boundary_ids, variables, zf,
+  DirichletBoundary dirichlet_bc({BOUNDARY_ID_MIN_X, NODE_BOUNDARY_ID,
+                                 EDGE_BOUNDARY_ID},
+                                 {u_var, v_var, w_var}, zf,
                                  LOCAL_VARIABLE_ORDER);
 
   // We must add the Dirichlet boundary condition _before_

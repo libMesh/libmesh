@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -263,10 +263,6 @@ int main (int argc, char ** argv)
       boundary_ids.insert(5);
     }
 
-  // Create a vector storing the variable numbers which the BC applies to
-  std::vector<unsigned int> variables(1);
-  variables[0] = u_var;
-
   // Create an AnalyticFunction object that we use to project the BC
   // This function just calls the function exact_solution via exact_solution_wrapper
   AnalyticFunction<> exact_solution_object(exact_solution_wrapper);
@@ -278,7 +274,7 @@ int main (int argc, char ** argv)
   // though, we have only one variable, so system- and local-
   // orderings are the same.
   DirichletBoundary dirichlet_bc
-    (boundary_ids, variables, exact_solution_object);
+    (boundary_ids, {u_var}, exact_solution_object);
 
   // We must add the Dirichlet boundary condition _before_
   // we call equation_systems.init()

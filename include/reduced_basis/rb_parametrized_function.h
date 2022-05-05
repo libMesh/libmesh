@@ -237,6 +237,46 @@ public:
                                                                           const System & sys);
 
   /**
+   * In some cases a parametrized function is defined based on array data that
+   * we index into based on the spatial data from the mesh (e.g. element, node,
+   * or side indices). We refer to the indices that we use to index into this
+   * array data as "spatial indices". This method sets \p spatial_indices based
+   * on the provided mesh-based indices.
+   *
+   * Note that \p spatial_indices is defined as a doubly-nested vector so that we
+   * can handle the case where the spatial function evaluation requires us to have
+   * indices from all nodes of an element, since in that case we need a vector of
+   * indices (one per node) for each point. Other cases, such as when we define
+   * the paramtrized function based on the element index only, only require a
+   * singly-nested vector which we handle as a special case of the doubly-nested
+   * vector.
+   *
+   * This method is typically used in the Offline stage in order to generate
+   * and store the relevant spatial indices.
+   *
+   * This method is a no-op by default, but it can be overridden in subclasses
+   * to provide the relevant behavior.
+   */
+  virtual void get_spatial_indices(std::vector<std::vector<unsigned int>> & spatial_indices,
+                                   const std::vector<dof_id_type> & elem_ids,
+                                   const std::vector<unsigned int> & side_indices,
+                                   const std::vector<unsigned int> & qps,
+                                   const std::vector<subdomain_id_type> & sbd_ids,
+                                   const std::vector<boundary_id_type> & boundary_ids);
+
+  /**
+   * The Online stage counterpart of get_spatial_indices(). This method
+   * is used to initialize the spatial index data in this object so that
+   * we can evaluate it during an Online solve.
+   */
+  virtual void initialize_spatial_indices(const std::vector<std::vector<unsigned int>> & spatial_indices,
+                                          const std::vector<dof_id_type> & elem_ids,
+                                          const std::vector<unsigned int> & side_indices,
+                                          const std::vector<unsigned int> & qps,
+                                          const std::vector<subdomain_id_type> & sbd_ids,
+                                          const std::vector<boundary_id_type> & boundary_ids);
+
+  /**
    * Storage for pre-evaluated values. The indexing is given by:
    *   parameter index --> point index --> component index --> value.
    */

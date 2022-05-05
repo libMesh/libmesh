@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,10 +26,10 @@ namespace libMesh
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template class DenseVector<Real>;
+template class LIBMESH_EXPORT DenseVector<Real>;
 
 //#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template class DenseVector<Complex>;
+template class LIBMESH_EXPORT DenseVector<Complex>;
 //#endif
 
 } // namespace libMesh

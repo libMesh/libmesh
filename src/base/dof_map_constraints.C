@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -51,6 +51,7 @@
 #include "libmesh/tensor_tools.h"
 #include "libmesh/threads.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/coupling_matrix.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -62,6 +63,7 @@
 #include <sstream>
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
+#include <memory>
 #include <numeric>
 #include <unordered_set>
 
@@ -637,7 +639,7 @@ private:
         libmesh_assert(f_system);
         if (f_system->current_local_solution->initialized())
           {
-            context = libmesh_make_unique<FEMContext>(*f_system);
+            context = std::make_unique<FEMContext>(*f_system);
             f_fem->init_context(*context);
           }
       }
@@ -817,7 +819,7 @@ private:
         libmesh_assert(f_system);
         if (f_system->current_local_solution->initialized())
           {
-            context = libmesh_make_unique<FEMContext>(*f_system);
+            context = std::make_unique<FEMContext>(*f_system);
             f_fem->init_context(*context);
             if (g_fem)
               g_fem->init_context(*context);
@@ -1608,7 +1610,7 @@ public:
     // Construct a FEMContext object for the System on which the
     // Variables in our DirichletBoundary objects are defined. This
     // will be used in the apply_dirichlet_impl() function.
-    auto fem_context = libmesh_make_unique<FEMContext>(*system);
+    auto fem_context = std::make_unique<FEMContext>(*system);
 
     // At the time we are using this FEMContext, the current_local_solution
     // vector is not initialized, but also we don't need it, so set
@@ -1953,17 +1955,17 @@ void DofMap::process_mesh_constraint_rows(const MeshBase & mesh)
 
           const dof_id_type constrained_id =
             node->dof_number(sys_num, var_num, 0);
-          for (auto pr : node_row.second)
+          for (const auto & [pr, val] : node_row.second)
             {
-              const Elem * spline_elem = pr.first.first;
+              const Elem * spline_elem = pr.first;
               libmesh_assert(spline_elem == mesh.elem_ptr(spline_elem->id()));
 
               const Node & spline_node =
-                spline_elem->node_ref(pr.first.second);
+                spline_elem->node_ref(pr.second);
 
               const dof_id_type spline_dof_id =
                 spline_node.dof_number(sys_num, var_num, 0);
-              dc_row[spline_dof_id] = pr.second;
+              dc_row[spline_dof_id] = val;
             }
 
           // See if we already have a constraint here.
@@ -2217,8 +2219,8 @@ void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
       // if (!constraint_row.empty())
       //   {
       //     DofConstraintRow row = _dof_constraints[dof_number];
-      //     for (const auto & pr : row)
-      //       libmesh_assert(constraint_row.find(pr.first)->second == pr.second);
+      //     for (const auto & [dof, val] : row)
+      //       libmesh_assert(constraint_row.find(dof)->second == val);
       //   }
       //
       // if (_adjoint_constraint_values[qoi_index].find(dof_number) !=
@@ -2280,23 +2282,21 @@ std::string DofMap::get_local_constraints(bool print_nonlocal) const
   os << "Node Constraints:"
      << std::endl;
 
-  for (const auto & pr : _node_constraints)
+  for (const auto & [node, pr] : _node_constraints)
     {
-      const Node * node = pr.first;
-
       // Skip non-local nodes if requested
       if (!print_nonlocal &&
           node->processor_id() != this->processor_id())
         continue;
 
-      const NodeConstraintRow & row = pr.second.first;
-      const Point & offset = pr.second.second;
+      const NodeConstraintRow & row = pr.first;
+      const Point & offset = pr.second;
 
       os << "Constraints for Node id " << node->id()
          << ": \t";
 
-      for (const auto & item : row)
-        os << " (" << item.first->id() << "," << item.second << ")\t";
+      for (const auto & [cnode, val] : row)
+        os << " (" << cnode->id() << "," << val << ")\t";
 
       os << "rhs: " << offset;
 
@@ -2312,15 +2312,12 @@ std::string DofMap::get_local_constraints(bool print_nonlocal) const
   os << "DoF Constraints:"
      << std::endl;
 
-  for (const auto & pr : _dof_constraints)
+  for (const auto & [i, row] : _dof_constraints)
     {
-      const dof_id_type i = pr.first;
-
       // Skip non-local dofs if requested
       if (!print_nonlocal && !this->local_index(i))
         continue;
 
-      const DofConstraintRow & row = pr.second;
       DofConstraintValueMap::const_iterator rhsit =
         _primal_constraint_values.find(i);
       const Number rhs = (rhsit == _primal_constraint_values.end()) ?
@@ -2347,15 +2344,11 @@ std::string DofMap::get_local_constraints(bool print_nonlocal) const
         _adjoint_constraint_values.find(qoi_index);
 
       if (adjoint_map_it != _adjoint_constraint_values.end())
-        for (const auto & pr : adjoint_map_it->second)
+        for (const auto [i, rhs] : adjoint_map_it->second)
           {
-            const dof_id_type i = pr.first;
-
             // Skip non-local dofs if requested
             if (!print_nonlocal && !this->local_index(i))
               continue;
-
-            const Number rhs = pr.second;
 
             os << "RHS for DoF " << i
                << ": " << rhs;
@@ -2960,13 +2953,10 @@ void DofMap::enforce_constraints_exactly (const System & system,
   libmesh_assert(v_global);
   libmesh_assert_equal_to (this, &(system.get_dof_map()));
 
-  for (const auto & pr : _dof_constraints)
+  for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
     {
-      dof_id_type constrained_dof = pr.first;
       if (!this->local_index(constrained_dof))
         continue;
-
-      const DofConstraintRow constraint_row = pr.second;
 
       Number exact_value = 0;
       if (!homogeneous)
@@ -2976,8 +2966,8 @@ void DofMap::enforce_constraints_exactly (const System & system,
           if (rhsit != _primal_constraint_values.end())
             exact_value = rhsit->second;
         }
-      for (const auto & j : constraint_row)
-        exact_value += j.second * (*v_local)(j.first);
+      for (const auto & [dof, val] : constraint_row)
+        exact_value += val * (*v_local)(dof);
 
       v_global->set(constrained_dof, exact_value);
     }
@@ -3030,17 +3020,14 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
   libmesh_assert(solution_local);
   libmesh_assert_equal_to (this, &(system.get_dof_map()));
 
-  for (const auto & pr : _dof_constraints)
+  for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
     {
-      dof_id_type constrained_dof = pr.first;
       if (!this->local_index(constrained_dof))
         continue;
 
-      const DofConstraintRow constraint_row = pr.second;
-
       Number exact_value = 0;
-      for (const auto & j : constraint_row)
-        exact_value -= j.second * (*solution_local)(j.first);
+      for (const auto & [dof, val] : constraint_row)
+        exact_value -= val * (*solution_local)(dof);
       exact_value += (*solution_local)(constrained_dof);
       if (!homogeneous)
         {
@@ -3067,13 +3054,10 @@ void DofMap::enforce_constraints_on_jacobian (const NonlinearImplicitSystem & sy
 
   libmesh_assert_equal_to (this, &(system.get_dof_map()));
 
-  for (const auto & pr : _dof_constraints)
+  for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
     {
-      dof_id_type constrained_dof = pr.first;
       if (!this->local_index(constrained_dof))
         continue;
-
-      const DofConstraintRow constraint_row = pr.second;
 
       for (const auto & j : constraint_row)
         jac->set(constrained_dof, j.first, -j.second);
@@ -3142,13 +3126,10 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
     (adjoint_constraint_map_it == _adjoint_constraint_values.end()) ?
     nullptr : &adjoint_constraint_map_it->second;
 
-  for (const auto & pr : _dof_constraints)
+  for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
     {
-      dof_id_type constrained_dof = pr.first;
       if (!this->local_index(constrained_dof))
         continue;
-
-      const DofConstraintRow constraint_row = pr.second;
 
       Number exact_value = 0;
       if (constraint_map)
@@ -3797,10 +3778,8 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
 #endif
 
     // Add all the dof constraints that I've been sent
-    for (auto & p : received_id_vecs)
+    for (auto & [pid, pushed_ids_to_me] : received_id_vecs)
       {
-        const processor_id_type pid = p.first;
-        const auto & pushed_ids_to_me = p.second;
         libmesh_assert(received_keys_vals.count(pid));
         libmesh_assert(received_rhss.count(pid));
         const auto & pushed_keys_vals_to_me = received_keys_vals.at(pid);
@@ -3865,10 +3844,8 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
     // Add all the node constraints that I've been sent
-    for (auto & p : received_node_id_vecs)
+    for (auto & [pid, pushed_node_ids_to_me] : received_node_id_vecs)
       {
-        const processor_id_type pid = p.first;
-
         // Before we act on any new constraint rows, we may need to
         // make sure we have all the nodes involved!
         if (dist_mesh)
@@ -3876,7 +3853,6 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
             (pid, &mesh, mesh_inserter_iterator<Node>(mesh),
              (Node**)nullptr, range_tag);
 
-        const auto & pushed_node_ids_to_me = p.second;
         libmesh_assert(received_node_keys_vals.count(pid));
         libmesh_assert(received_offsets.count(pid));
         const auto & pushed_node_keys_vals_to_me = received_node_keys_vals.at(pid);
@@ -4484,16 +4460,14 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 
   // Collect the dof constraints I need to push to each processor
   dof_id_type constrained_proc_id = 0;
-  for (auto & i : _dof_constraints)
+  for (const auto & [constrained, row] : _dof_constraints)
     {
-      const dof_id_type constrained = i.first;
       while (constrained >= _end_df[constrained_proc_id])
         constrained_proc_id++;
 
       if (constrained_proc_id != this->processor_id())
         continue;
 
-      DofConstraintRow & row = i.second;
       for (auto & j : row)
         {
           const dof_id_type constraining = j.first;
@@ -4524,12 +4498,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
      & pushed_ids_rhss]
     ()
     {
-      for (auto & pid_id_pair : pushed_ids)
+      for (const auto & [pid, pid_ids] : pushed_ids)
         {
-          const processor_id_type pid = pid_id_pair.first;
-          const std::set<dof_id_type>
-            & pid_ids = pid_id_pair.second;
-
           const std::size_t ids_size = pid_ids.size();
           std::vector<std::vector<std::pair<dof_id_type, Real>>> &
             keys_vals = pushed_keys_vals[pid];
@@ -4587,10 +4557,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
      & pushed_keys_vals_to_me]
     ()
     {
-      for (auto & pid_id_pair : pushed_ids_rhss_to_me)
+      for (const auto & [pid, ids_rhss] : pushed_ids_rhss_to_me)
         {
-          const processor_id_type pid = pid_id_pair.first;
-          const auto & ids_rhss = pid_id_pair.second;
           const auto & keys_vals = pushed_keys_vals_to_me[pid];
 
           libmesh_assert_equal_to
@@ -4651,12 +4619,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
     pushed_node_ids_offsets, pushed_node_ids_offsets_to_me;
   std::map<processor_id_type, std::set<Node *>> pushed_node_sets;
 
-  for (auto & pid_id_pair : pushed_node_ids)
+  for (const auto & [pid, pid_ids]: pushed_node_ids)
     {
-      const processor_id_type pid = pid_id_pair.first;
-      const std::set<dof_id_type>
-        & pid_ids = pid_id_pair.second;
-
       const std::size_t ids_size = pid_ids.size();
       std::vector<std::vector<std::pair<dof_id_type,Real>>> &
         keys_vals = pushed_node_keys_vals[pid];
@@ -4737,10 +4701,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
     Parallel::push_parallel_packed_range
       (this->comm(), pushed_node_sets, &mesh, insert_nodes_functor);
 
-  for (auto & pid_id_pair : pushed_node_ids_offsets_to_me)
+  for (const auto & [pid, ids_offsets] : pushed_node_ids_offsets_to_me)
     {
-      const processor_id_type pid = pid_id_pair.first;
-      const auto & ids_offsets = pid_id_pair.second;
       const auto & keys_vals = pushed_node_keys_vals_to_me[pid];
 
       libmesh_assert_equal_to
@@ -4783,10 +4745,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
   typedef std::map<dof_id_type, std::set<dof_id_type>> DofConstrainsMap;
   DofConstrainsMap dof_id_constrains;
 
-  for (auto & i : _dof_constraints)
+  for (const auto & [constrained, row] : _dof_constraints)
     {
-      const dof_id_type constrained = i.first;
-      DofConstraintRow & row = i.second;
       for (const auto & j : row)
         {
           const dof_id_type constraining = j.first;
@@ -4851,9 +4811,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
   // element's owner.
 
   GhostingFunctor::map_type elements_to_couple;
-
-  // Man, I wish we had guaranteed unique_ptr availability...
-  std::set<CouplingMatrix*> temporary_coupling_matrices;
+  DofMap::CouplingMatricesSet temporary_coupling_matrices;
 
   this->merge_ghost_functor_outputs
     (elements_to_couple,
@@ -5193,15 +5151,12 @@ void DofMap::add_constraints_to_send_list()
   if (!has_constraints)
     return;
 
-  for (const auto & i : _dof_constraints)
+  for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
     {
-      dof_id_type constrained_dof = i.first;
-
       // We only need the dependencies of our own constrained dofs
       if (!this->local_index(constrained_dof))
         continue;
 
-      const DofConstraintRow & constraint_row = i.second;
       for (const auto & j : constraint_row)
         {
           dof_id_type constraint_dependency = j.first;

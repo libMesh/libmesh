@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -55,6 +55,7 @@
 // C++ includes
 #include <iostream>
 #include <iomanip>
+#include <memory>
 
 // General libMesh includes
 #include "libmesh/equation_systems.h"
@@ -68,7 +69,6 @@
 #include "libmesh/partitioner.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/system_norm.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_solver_package.h"
 
 // Error Estimator includes
@@ -181,7 +181,7 @@ void set_system_parameters(LaplaceSystem & system,
   system.print_jacobians      = param.print_jacobians;
 
   // No transient time solver
-  system.time_solver = libmesh_make_unique<SteadySolver>(system);
+  system.time_solver = std::make_unique<SteadySolver>(system);
 
   // Nonlinear solver options
   {
@@ -214,7 +214,7 @@ void set_system_parameters(LaplaceSystem & system,
 #ifdef LIBMESH_ENABLE_AMR
 
 std::unique_ptr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
-                                                      FEMParameters & param)
+                                                      const FEMParameters & param)
 {
   MeshRefinement * mesh_refinement = new MeshRefinement(mesh);
   mesh_refinement->coarsen_by_parents() = true;
@@ -236,14 +236,14 @@ std::unique_ptr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
 // forward and adjoint weights. The H1 seminorm component of the error is used
 // as dictated by the weak form the Laplace equation.
 
-std::unique_ptr<ErrorEstimator> build_error_estimator(FEMParameters & param,
-                                                      QoISet & qois)
+std::unique_ptr<ErrorEstimator> build_error_estimator(const FEMParameters & param,
+                                                      const QoISet & qois)
 {
   if (param.indicator_type == "kelly")
     {
       libMesh::out << "Using Kelly Error Estimator" << std::endl;
 
-      return libmesh_make_unique<KellyErrorEstimator>();
+      return std::make_unique<KellyErrorEstimator>();
     }
   else if (param.indicator_type == "adjoint_residual")
     {
@@ -417,11 +417,8 @@ int main (int argc, char ** argv)
         // Declare a QoISet object, we need this object to set weights for our QoI error contributions
         QoISet qois;
 
-        // Declare a qoi_indices vector, each index will correspond to a QoI
-        std::vector<unsigned int> qoi_indices;
-        qoi_indices.push_back(0);
-        qoi_indices.push_back(1);
-        qois.add_indices(qoi_indices);
+        // Each index will correspond to a QoI
+        qois.add_indices({0,1});
 
         // Set weights for each index, these will weight the contribution of each QoI in the final error
         // estimate to be used for flagging elements for refinement

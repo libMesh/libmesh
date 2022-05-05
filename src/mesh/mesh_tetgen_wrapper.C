@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -18,19 +18,19 @@
 #include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_TETGEN
 
-// C++ includes
-#include <iostream>
-
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_tetgen_wrapper.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ includes
+#include <iostream>
+#include <memory>
 
 namespace libMesh
 {
 
 TetGenWrapper::TetGenWrapper() :
-  tetgen_output(libmesh_make_unique<tetgenio>())
+  tetgen_output(std::make_unique<tetgenio>())
 {
   this->tetgen_data.mesh_dim                = 3;
   this->tetgen_data.numberofpointattributes = 0;
@@ -150,7 +150,7 @@ void TetGenWrapper::allocate_pointlist(int numofpoints)
 
 
 
-void TetGenWrapper::set_switches(const std::string & s)
+void TetGenWrapper::set_switches(std::string_view s)
 {
   // A temporary buffer for passing to the C API, it requires
   // a char *, not a const char *...

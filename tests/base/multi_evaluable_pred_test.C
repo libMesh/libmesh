@@ -1,6 +1,5 @@
 #include <libmesh/partitioner.h>
 #include <libmesh/mesh.h>
-#include <libmesh/auto_ptr.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/equation_systems.h>
 #include <libmesh/elem.h>
@@ -10,6 +9,8 @@
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
+
+#include <memory>
 
 using namespace libMesh;
 
@@ -25,7 +26,7 @@ public:
 
   std::unique_ptr<Partitioner> clone() const override
   {
-    return libmesh_make_unique<ContrivedPartitioner>(*this);
+    return std::make_unique<ContrivedPartitioner>(*this);
   }
 
 protected:
@@ -53,14 +54,14 @@ protected:
     }
 
     // This test is hand-crafted for one interior element
-    libmesh_assert(n_interior_elems == 1);
+    CPPUNIT_ASSERT_EQUAL(n_interior_elems, 1u);
   }
 };
 
 class MultiEvaluablePredTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE(MultiEvaluablePredTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(MultiEvaluablePredTest);
 
   CPPUNIT_TEST(test);
 
@@ -73,9 +74,10 @@ public:
 
   void test()
   {
+    LOG_UNIT_TEST;
     const auto rank = TestCommWorld->rank();
     Mesh mesh(*TestCommWorld);
-    mesh.partitioner() = libmesh_make_unique<ContrivedPartitioner>();
+    mesh.partitioner() = std::make_unique<ContrivedPartitioner>();
     MeshTools::Generation::build_square(mesh, 3, 3, 0, 3, 0, 3, QUAD4);
 
     EquationSystems es(mesh);

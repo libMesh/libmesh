@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -35,9 +35,9 @@
 #include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/enum_solver_type.h"
 #include "libmesh/enum_convergence_flags.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
+#include <memory>
 #include <string.h>
 
 namespace libMesh
@@ -486,7 +486,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
 
       if (this->_preconditioner)
         {
-          subprecond_matrix = libmesh_make_unique<PetscMatrix<Number>>(subprecond, this->comm());
+          subprecond_matrix = std::make_unique<PetscMatrix<Number>>(subprecond, this->comm());
           this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
         }
@@ -702,7 +702,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
 
       if (this->_preconditioner)
         {
-          subprecond_matrix = libmesh_make_unique<PetscMatrix<Number>>(subprecond, this->comm());
+          subprecond_matrix = std::make_unique<PetscMatrix<Number>>(subprecond, this->comm());
           this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
         }
@@ -1157,7 +1157,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
 
       if (this->_preconditioner)
         {
-          subprecond_matrix = libmesh_make_unique<PetscMatrix<Number>>(subprecond, this->comm());
+          subprecond_matrix = std::make_unique<PetscMatrix<Number>>(subprecond, this->comm());
           this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
         }
@@ -1559,7 +1559,7 @@ PetscLinearSolver<T>::restrict_solve_to_is_local_size() const
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class PetscLinearSolver<Number>;
+template class LIBMESH_EXPORT PetscLinearSolver<Number>;
 
 } // namespace libMesh
 

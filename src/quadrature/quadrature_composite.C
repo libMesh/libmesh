@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -160,9 +160,9 @@ void QComposite<QSubCell>::add_subelem_values (const std::vector<Elem const *> &
 
 //--------------------------------------------------------------
 // Explicit instantiations
-template class QComposite<QGauss>;
-template class QComposite<QTrap>;
-template class QComposite<QSimpson>;
+template class LIBMESH_EXPORT QComposite<QGauss>;
+template class LIBMESH_EXPORT QComposite<QTrap>;
+template class LIBMESH_EXPORT QComposite<QSimpson>;
 
 } // namespace libMesh
 

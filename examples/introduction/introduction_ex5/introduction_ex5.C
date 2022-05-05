@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -161,19 +161,8 @@ int main (int argc, char ** argv)
 
   // Indicate which boundary IDs we impose the BC on
   // We either build a line, a square or a cube, and
-  // here we indicate the boundaries IDs in each case
-  std::set<boundary_id_type> boundary_ids;
-  // the dim==1 mesh has two boundaries with IDs 0 and 1
-  boundary_ids.insert(0);
-  boundary_ids.insert(1);
-  boundary_ids.insert(2);
-  boundary_ids.insert(3);
-  boundary_ids.insert(4);
-  boundary_ids.insert(5);
-
-  // Create a vector storing the variable numbers which the BC applies to
-  std::vector<unsigned int> variables(1);
-  variables[0] = u_var;
+  // here we indicate boundaries covering each case
+  std::set<boundary_id_type> boundary_ids {0,1,2,3,4,5};
 
   // Create an AnalyticFunction object that we use to project the BC
   // This function just calls the function exact_solution via exact_solution_wrapper
@@ -186,7 +175,7 @@ int main (int argc, char ** argv)
   // though, we have only one variable, so system- and local-
   // orderings are the same.
   DirichletBoundary dirichlet_bc
-    (boundary_ids, variables, exact_solution_object);
+    (boundary_ids, {u_var}, exact_solution_object);
 
   // We must add the Dirichlet boundary condition _before_
   // we call equation_systems.init()

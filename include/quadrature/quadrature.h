@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -95,7 +95,7 @@ public:
    * This function allocates memory, therefore a \p std::unique_ptr<QBase>
    * is returned so that the user does not accidentally leak it.
    */
-  static std::unique_ptr<QBase> build (const std::string & name,
+  static std::unique_ptr<QBase> build (std::string_view name,
                                        const unsigned int dim,
                                        const Order order=INVALID_ORDER);
 

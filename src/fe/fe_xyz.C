@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -974,14 +974,14 @@ template <> bool FE<3,XYZ>::shapes_need_reinit() const { return true; }
 // 2.) There is (IMHO) less chance of the linker calling the
 // wrong version of one of these member functions, since there is
 // only one FEXYZ.
-template void  FEXYZ<0>::init_shape_functions(const std::vector<Point> &, const Elem *);
-template void  FEXYZ<1>::init_shape_functions(const std::vector<Point> &, const Elem *);
-template void  FEXYZ<2>::init_shape_functions(const std::vector<Point> &, const Elem *);
-template void  FEXYZ<3>::init_shape_functions(const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void  FEXYZ<0>::init_shape_functions(const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void  FEXYZ<1>::init_shape_functions(const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void  FEXYZ<2>::init_shape_functions(const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void  FEXYZ<3>::init_shape_functions(const std::vector<Point> &, const Elem *);
 
-template void  FEXYZ<0>::compute_shape_functions(const Elem *,const std::vector<Point> &);
-template void  FEXYZ<1>::compute_shape_functions(const Elem *,const std::vector<Point> &);
-template void  FEXYZ<2>::compute_shape_functions(const Elem *,const std::vector<Point> &);
-template void  FEXYZ<3>::compute_shape_functions(const Elem *,const std::vector<Point> &);
+template LIBMESH_EXPORT void  FEXYZ<0>::compute_shape_functions(const Elem *,const std::vector<Point> &);
+template LIBMESH_EXPORT void  FEXYZ<1>::compute_shape_functions(const Elem *,const std::vector<Point> &);
+template LIBMESH_EXPORT void  FEXYZ<2>::compute_shape_functions(const Elem *,const std::vector<Point> &);
+template LIBMESH_EXPORT void  FEXYZ<3>::compute_shape_functions(const Elem *,const std::vector<Point> &);
 
 } // namespace libMesh

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -115,6 +115,8 @@ namespace libMesh
 #else
           PetscErrorCode (*refine)(DM,MPI_Comm,DM*) = nullptr;
           ierr = DMShellGetRefine(dm, &refine);
+          CHKERRQ(ierr);
+
           if (refine)
             {
               ierr = DMShellSetRefine(*subdm, refine);
@@ -960,11 +962,8 @@ namespace libMesh
     // geometric nodes. So can we loop over the nodes we cached in the node_map and
     // the DoFs for each field for that node. We need to give PETSc the local id
     // we built up in the node map.
-    for (const auto & nmap : node_map )
+    for (const auto [global_node_id, local_node_id] : node_map )
       {
-        const dof_id_type global_node_id = nmap.first;
-        const dof_id_type local_node_id = nmap.second;
-
         libmesh_assert( mesh.query_node_ptr(global_node_id) );
 
         const Node & node = mesh.node_ref(global_node_id);
@@ -975,11 +974,8 @@ namespace libMesh
     // Some finite element types associate dofs with the element. So now we go through
     // any of those with the Elem as the point we add to the PetscSection with accompanying
     // dofs
-    for (const auto & emap : elem_map )
+    for (const auto [global_elem_id, local_elem_id] : elem_map )
       {
-        const dof_id_type global_elem_id = emap.first;
-        const dof_id_type local_elem_id = emap.second;
-
         libmesh_assert( mesh.query_elem_ptr(global_elem_id) );
 
         const Elem & elem = mesh.elem_ref(global_elem_id);
@@ -991,11 +987,8 @@ namespace libMesh
     // SCALAR dofs live on the "last" processor, so only work there if there are any
     if (system.processor_id() == (system.n_processors()-1))
       {
-        for (const auto & smap : scalar_map )
+        for (const auto [local_id, scalar_var] : scalar_map )
           {
-            const dof_id_type local_id = smap.first;
-            const unsigned int scalar_var = smap.second;
-
             // The number of SCALAR dofs comes from the variable order
             const int n_dofs = system.variable(scalar_var).type().order.get_order();
 
@@ -1083,9 +1076,9 @@ namespace libMesh
     for( unsigned int i = 0; i < n_levels; i++ )
       {
         // Call C++ object constructors
-        _pmtx_vec[i] = libmesh_make_unique<PetscMatrix<Number>>(comm);
-        _subpmtx_vec[i] = libmesh_make_unique<PetscMatrix<Number>>(comm);
-        _vec_vec[i] = libmesh_make_unique<PetscVector<Number>>(comm);
+        _pmtx_vec[i] = std::make_unique<PetscMatrix<Number>>(comm);
+        _subpmtx_vec[i] = std::make_unique<PetscMatrix<Number>>(comm);
+        _vec_vec[i] = std::make_unique<PetscVector<Number>>(comm);
       }
   }
 

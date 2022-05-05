@@ -22,7 +22,7 @@ class ExtraIntegersTest : public CppUnit::TestCase
    * integers in the objects within the mesh.
    */
 public:
-  CPPUNIT_TEST_SUITE( ExtraIntegersTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( ExtraIntegersTest );
 
   CPPUNIT_TEST( testExtraIntegersEdge2 );
   CPPUNIT_TEST( testExtraIntegersTri6 );
@@ -208,17 +208,19 @@ public:
 
   void tearDown() {}
 
-  void testExtraIntegersEdge2() { test_helper(EDGE2, 5); }
+  void testExtraIntegersEdge2() { LOG_UNIT_TEST; test_helper(EDGE2, 5); }
 
-  void testExtraIntegersTri6() { test_helper(TRI6, 4); }
+  void testExtraIntegersTri6() { LOG_UNIT_TEST; test_helper(TRI6, 4); }
 
-  void testExtraIntegersCheckpointEdge3() { checkpoint_helper(EDGE3, 5, false); }
+  void testExtraIntegersCheckpointEdge3() { LOG_UNIT_TEST; checkpoint_helper(EDGE3, 5, false); }
 
-  void testExtraIntegersCheckpointHex8() { checkpoint_helper(HEX8, 2, true); }
+  void testExtraIntegersCheckpointHex8() { LOG_UNIT_TEST; checkpoint_helper(HEX8, 2, true); }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   void testExtraIntegersExodusReading()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
     mesh.allow_renumbering(false);
 
@@ -264,6 +266,8 @@ public:
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   void testBadExtraIntegersExodusReading()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
     /*
      This 3-by-3 mesh contains the following element integers:

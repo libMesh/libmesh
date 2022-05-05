@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,7 @@
 
 // C++ includes
 #include <iomanip>
+#include <memory>
 
 // Basic include files
 #include "libmesh/equation_systems.h"
@@ -39,7 +40,6 @@
 #include "libmesh/mesh_generation.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_solver_type.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/numeric_vector.h"
 
 // The systems and solvers we may use
@@ -200,26 +200,26 @@ int main (int argc, char ** argv)
       a_system->add_variable("v_accel", FIRST, LAGRANGE);
       a_system->add_variable("w_accel", FIRST, LAGRANGE);
 
-      system.time_solver = libmesh_make_unique<NewmarkSolver>(system);
+      system.time_solver = std::make_unique<NewmarkSolver>(system);
     }
 
   else if( time_solver == std::string("euler") )
     {
-      system.time_solver = libmesh_make_unique<EulerSolver>(system);
+      system.time_solver = std::make_unique<EulerSolver>(system);
       EulerSolver & euler_solver = cast_ref<EulerSolver &>(*(system.time_solver.get()));
       euler_solver.theta = infile("theta", 1.0);
     }
 
   else if( time_solver == std::string("euler2") )
     {
-      system.time_solver = libmesh_make_unique<Euler2Solver>(system);
+      system.time_solver = std::make_unique<Euler2Solver>(system);
       Euler2Solver & euler_solver = cast_ref<Euler2Solver &>(*(system.time_solver.get()));
       euler_solver.theta = infile("theta", 1.0);
     }
 
   else if( time_solver == std::string("steady"))
     {
-      system.time_solver = libmesh_make_unique<SteadySolver>(system);
+      system.time_solver = std::make_unique<SteadySolver>(system);
       libmesh_assert_equal_to (n_timesteps, 1);
     }
   else

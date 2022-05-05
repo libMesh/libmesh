@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -382,15 +382,15 @@ std::vector<dof_id_type> StatisticsVector<T>::cut_above(Real cut) const
 
 //------------------------------------------------------------
 // Explicit Instantiations
-template class StatisticsVector<float>;
-template class StatisticsVector<double>;
+template class LIBMESH_EXPORT StatisticsVector<float>;
+template class LIBMESH_EXPORT StatisticsVector<double>;
 #ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
-template class StatisticsVector<long double>;
+template class LIBMESH_EXPORT StatisticsVector<long double>;
 #endif
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-template class StatisticsVector<Real>;
+template class LIBMESH_EXPORT StatisticsVector<Real>;
 #endif
-template class StatisticsVector<int>;
-template class StatisticsVector<unsigned int>;
+template class LIBMESH_EXPORT StatisticsVector<int>;
+template class LIBMESH_EXPORT StatisticsVector<unsigned int>;
 
 } // namespace libMesh

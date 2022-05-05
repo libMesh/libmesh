@@ -22,7 +22,7 @@ class MixedDimensionMeshTest : public CppUnit::TestCase {
    * the same dof numbers for a variable.
    */
 public:
-  CPPUNIT_TEST_SUITE( MixedDimensionMeshTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( MixedDimensionMeshTest );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
@@ -107,6 +107,8 @@ public:
 
   void testMesh()
   {
+    LOG_UNIT_TEST;
+
     // There'd better be 3 elements
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)3, _mesh->n_elem() );
 
@@ -135,6 +137,8 @@ public:
 
   void testDofOrdering()
   {
+    LOG_UNIT_TEST;
+
     EquationSystems es(*_mesh);
     es.add_system<LinearImplicitSystem>("TestDofSystem");
     es.get_system("TestDofSystem").add_variable("u",FIRST);
@@ -166,6 +170,8 @@ public:
 
   void testPointLocatorTree()
   {
+    LOG_UNIT_TEST;
+
     std::unique_ptr<PointLocatorBase> locator = _mesh->sub_point_locator();
 
     Point top_point(0.5, 0.5);
@@ -204,7 +210,7 @@ class MixedDimensionRefinedMeshTest : public MixedDimensionMeshTest {
    * shared on the underlying quads, and so on.
    */
 public:
-  CPPUNIT_TEST_SUITE( MixedDimensionRefinedMeshTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( MixedDimensionRefinedMeshTest );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
@@ -245,6 +251,8 @@ public:
   void testMesh()
   {
 #ifdef LIBMESH_ENABLE_AMR
+    LOG_UNIT_TEST;
+
     // We should have 13 total and 10 active elements.
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)13, _mesh->n_elem() );
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)10, _mesh->n_active_elem() );
@@ -297,6 +305,8 @@ public:
   void testDofOrdering()
   {
 #ifdef LIBMESH_ENABLE_AMR
+    LOG_UNIT_TEST;
+
     EquationSystems es(*_mesh);
     es.add_system<LinearImplicitSystem>("TestDofSystem");
     es.get_system("TestDofSystem").add_variable("u",FIRST);
@@ -347,7 +357,7 @@ class MixedDimensionNonUniformRefinement : public CppUnit::TestCase {
    * of 0 (default).
    */
 public:
-  CPPUNIT_TEST_SUITE( MixedDimensionNonUniformRefinement );
+  LIBMESH_CPPUNIT_TEST_SUITE( MixedDimensionNonUniformRefinement );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
@@ -504,6 +514,8 @@ public:
   void testMesh()
   {
 #ifdef LIBMESH_ENABLE_AMR
+    LOG_UNIT_TEST;
+
     // We should have 13 total and 10 active elements.
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)15, _mesh->n_elem() );
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)12, _mesh->n_active_elem() );
@@ -556,6 +568,8 @@ public:
   void testDofOrdering()
   {
 #ifdef LIBMESH_ENABLE_AMR
+    LOG_UNIT_TEST;
+
     EquationSystems es(*_mesh);
     es.add_system<LinearImplicitSystem>("TestDofSystem");
     es.get_system("TestDofSystem").add_variable("u",FIRST);
@@ -605,7 +619,7 @@ class MixedDimensionNonUniformRefinementTriangle : public CppUnit::TestCase {
    * of 0 (default).
    */
 public:
-  CPPUNIT_TEST_SUITE( MixedDimensionNonUniformRefinementTriangle );
+  LIBMESH_CPPUNIT_TEST_SUITE( MixedDimensionNonUniformRefinementTriangle );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
@@ -731,6 +745,8 @@ public:
   void testMesh()
   {
 #ifdef LIBMESH_ENABLE_AMR
+    LOG_UNIT_TEST;
+
     // We should have 15 total and 12 active elements.
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)15, _mesh->n_elem() );
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)12, _mesh->n_active_elem() );
@@ -796,6 +812,8 @@ public:
   void testDofOrdering()
   {
 #ifdef LIBMESH_ENABLE_AMR
+    LOG_UNIT_TEST;
+
     EquationSystems es(*_mesh);
     es.add_system<LinearImplicitSystem>("TestDofSystem");
     es.get_system("TestDofSystem").add_variable("u",FIRST);
@@ -866,7 +884,7 @@ class MixedDimensionNonUniformRefinement3D : public CppUnit::TestCase {
    * to the QUAD4 element) will also refined due to an overrefined_boundary_limit of 0 (default).
    */
 public:
-  CPPUNIT_TEST_SUITE( MixedDimensionNonUniformRefinement3D );
+  LIBMESH_CPPUNIT_TEST_SUITE( MixedDimensionNonUniformRefinement3D );
 
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testMesh );
@@ -959,6 +977,8 @@ public:
   void testMesh()
   {
 #ifdef LIBMESH_ENABLE_AMR
+    LOG_UNIT_TEST;
+
     // We should have 57 total and 54 active elements.
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)57, _mesh->n_elem() );
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)54, _mesh->n_active_elem() );
@@ -1090,6 +1110,8 @@ public:
   void testDofOrdering()
   {
 #ifdef LIBMESH_ENABLE_AMR
+    LOG_UNIT_TEST;
+
     EquationSystems es(*_mesh);
     es.add_system<LinearImplicitSystem>("TestDofSystem");
     es.get_system("TestDofSystem").add_variable("u",FIRST);

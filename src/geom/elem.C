@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,17 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-
-// C++ includes
-#include <algorithm> // for std::sort
-#include <array>
-#include <iterator>  // for std::ostream_iterator
-#include <sstream>
-#include <limits>    // for std::numeric_limits<>
-#include <cmath>     // for std::sqrt()
-
 // Local includes
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/elem.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_interface.h"
@@ -82,6 +72,17 @@
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/boundary_info.h"
 #endif
+
+
+// C++ includes
+#include <algorithm> // for std::sort
+#include <array>
+#include <iterator>  // for std::ostream_iterator
+#include <sstream>
+#include <limits>    // for std::numeric_limits<>
+#include <cmath>     // for std::sqrt()
+#include <memory>
+
 
 namespace libMesh
 {
@@ -268,86 +269,86 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
     {
       // 0D elements
     case NODEELEM:
-      return libmesh_make_unique<NodeElem>(p);
+      return std::make_unique<NodeElem>(p);
 
       // 1D elements
     case EDGE2:
-      return libmesh_make_unique<Edge2>(p);
+      return std::make_unique<Edge2>(p);
     case EDGE3:
-      return libmesh_make_unique<Edge3>(p);
+      return std::make_unique<Edge3>(p);
     case EDGE4:
-      return libmesh_make_unique<Edge4>(p);
+      return std::make_unique<Edge4>(p);
 
       // 2D elements
     case TRI3:
-      return libmesh_make_unique<Tri3>(p);
+      return std::make_unique<Tri3>(p);
     case TRISHELL3:
-      return libmesh_make_unique<TriShell3>(p);
+      return std::make_unique<TriShell3>(p);
     case TRI3SUBDIVISION:
-      return libmesh_make_unique<Tri3Subdivision>(p);
+      return std::make_unique<Tri3Subdivision>(p);
     case TRI6:
-      return libmesh_make_unique<Tri6>(p);
+      return std::make_unique<Tri6>(p);
     case TRI7:
-      return libmesh_make_unique<Tri7>(p);
+      return std::make_unique<Tri7>(p);
     case QUAD4:
-      return libmesh_make_unique<Quad4>(p);
+      return std::make_unique<Quad4>(p);
     case QUADSHELL4:
-      return libmesh_make_unique<QuadShell4>(p);
+      return std::make_unique<QuadShell4>(p);
     case QUAD8:
-      return libmesh_make_unique<Quad8>(p);
+      return std::make_unique<Quad8>(p);
     case QUADSHELL8:
-      return libmesh_make_unique<QuadShell8>(p);
+      return std::make_unique<QuadShell8>(p);
     case QUAD9:
-      return libmesh_make_unique<Quad9>(p);
+      return std::make_unique<Quad9>(p);
 
       // 3D elements
     case TET4:
-      return libmesh_make_unique<Tet4>(p);
+      return std::make_unique<Tet4>(p);
     case TET10:
-      return libmesh_make_unique<Tet10>(p);
+      return std::make_unique<Tet10>(p);
     case TET14:
-      return libmesh_make_unique<Tet14>(p);
+      return std::make_unique<Tet14>(p);
     case HEX8:
-      return libmesh_make_unique<Hex8>(p);
+      return std::make_unique<Hex8>(p);
     case HEX20:
-      return libmesh_make_unique<Hex20>(p);
+      return std::make_unique<Hex20>(p);
     case HEX27:
-      return libmesh_make_unique<Hex27>(p);
+      return std::make_unique<Hex27>(p);
     case PRISM6:
-      return libmesh_make_unique<Prism6>(p);
+      return std::make_unique<Prism6>(p);
     case PRISM15:
-      return libmesh_make_unique<Prism15>(p);
+      return std::make_unique<Prism15>(p);
     case PRISM18:
-      return libmesh_make_unique<Prism18>(p);
+      return std::make_unique<Prism18>(p);
     case PYRAMID5:
-      return libmesh_make_unique<Pyramid5>(p);
+      return std::make_unique<Pyramid5>(p);
     case PYRAMID13:
-      return libmesh_make_unique<Pyramid13>(p);
+      return std::make_unique<Pyramid13>(p);
     case PYRAMID14:
-      return libmesh_make_unique<Pyramid14>(p);
+      return std::make_unique<Pyramid14>(p);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       // 1D infinite elements
     case INFEDGE2:
-      return libmesh_make_unique<InfEdge2>(p);
+      return std::make_unique<InfEdge2>(p);
 
       // 2D infinite elements
     case INFQUAD4:
-      return libmesh_make_unique<InfQuad4>(p);
+      return std::make_unique<InfQuad4>(p);
     case INFQUAD6:
-      return libmesh_make_unique<InfQuad6>(p);
+      return std::make_unique<InfQuad6>(p);
 
       // 3D infinite elements
     case INFHEX8:
-      return libmesh_make_unique<InfHex8>(p);
+      return std::make_unique<InfHex8>(p);
     case INFHEX16:
-      return libmesh_make_unique<InfHex16>(p);
+      return std::make_unique<InfHex16>(p);
     case INFHEX18:
-      return libmesh_make_unique<InfHex18>(p);
+      return std::make_unique<InfHex18>(p);
     case INFPRISM6:
-      return libmesh_make_unique<InfPrism6>(p);
+      return std::make_unique<InfPrism6>(p);
     case INFPRISM12:
-      return libmesh_make_unique<InfPrism12>(p);
+      return std::make_unique<InfPrism12>(p);
 #endif
 
     default:
@@ -429,7 +430,7 @@ Point Elem::true_centroid() const
   // on that instead.  This workaround allows us to avoid issues with
   // calling FE::reinit() with a default_order() FEType, and then
   // having that order incorrectly boosted by p_level.
-  if (_p_level)
+  if (this->p_level())
     {
       auto elem_copy = Elem::build(this->type());
 

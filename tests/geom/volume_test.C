@@ -23,7 +23,7 @@ class VolumeTest : public CppUnit::TestCase
 {
 
 public:
-  CPPUNIT_TEST_SUITE( VolumeTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( VolumeTest );
   CPPUNIT_TEST( testEdge3Volume );
   CPPUNIT_TEST( testEdge3Invertible );
   CPPUNIT_TEST( testEdge4Invertible );
@@ -47,6 +47,8 @@ public:
 
   void testTri3TrueCentroid()
   {
+    LOG_UNIT_TEST;
+
     // The true_centroid() == vertex_average() == (1/3, 1/3) for reference Tri3
     {
       const Elem & tri3 = ReferenceElem::get(TRI3);
@@ -58,6 +60,8 @@ public:
 
   void testQuad4TrueCentroid()
   {
+    LOG_UNIT_TEST;
+
     // Test Quad4::true_centroid() override
     {
       const Elem & quad4 = ReferenceElem::get(QUAD4);
@@ -108,6 +112,8 @@ public:
 
   void testPyramid5TrueCentroid()
   {
+    LOG_UNIT_TEST;
+
     // Test Pyramid5::true_centroid() gives the correct result for a reference element
     {
       const Elem & pyr5 = ReferenceElem::get(PYRAMID5);
@@ -121,14 +127,17 @@ public:
     test_true_centroid_and_volume(PYRAMID5);
   }
 
-  void testHex8TrueCentroid() { test_true_centroid_and_volume(HEX8); }
-  void testPrism6TrueCentroid() { test_true_centroid_and_volume(PRISM6); }
+  void testHex8TrueCentroid() { LOG_UNIT_TEST; test_true_centroid_and_volume(HEX8); }
+  void testPrism6TrueCentroid() { LOG_UNIT_TEST; test_true_centroid_and_volume(PRISM6); }
 
   void testHex20PLevelTrueCentroid()
   {
+    LOG_UNIT_TEST;
+
     // Test that Elem base class true_centroid() implementation works
     // for an elevated p_level HEX20
     {
+#ifdef LIBMESH_ENABLE_AMR
       ReplicatedMesh mesh(*TestCommWorld);
       MeshTools::Generation::build_cube(mesh,
                                         /*nelem=*/1, /*nelem=*/1, /*nelem=*/1,
@@ -142,11 +151,14 @@ public:
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(0), TOLERANCE*TOLERANCE);
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(1), TOLERANCE*TOLERANCE);
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(2), TOLERANCE*TOLERANCE);
+#endif // LIBMESH_ENABLE_AMR
     }
   }
 
   void testEdge3Volume()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
     MeshTools::Generation::build_line (mesh, /*nelem=*/1, 0., 1., EDGE3);
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(3), mesh.n_nodes());
@@ -189,6 +201,8 @@ public:
 
   void testEdge3Invertible()
   {
+    LOG_UNIT_TEST;
+
     // 1.) This is the original test which started the investigation
     // of determining invertibility.  In this test, the actual
     // midpoint of nodes 0 and 1 is 0.5*(1.100328e2 + 1.176528e2) =
@@ -217,6 +231,8 @@ public:
 
   void testEdge4Invertible()
   {
+    LOG_UNIT_TEST;
+
     // Reference Elem should be invertible
     {
       const Elem & edge4 = ReferenceElem::get(EDGE4);
@@ -256,6 +272,8 @@ public:
 
   void testQuad4Invertible()
   {
+    LOG_UNIT_TEST;
+
     // Case 1: Test that rigid body rotations have no effect on the
     // invertibility of the reference element
     {

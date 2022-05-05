@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -46,6 +46,12 @@
 #include <sstream> // for ostringstream
 #include <unordered_map>
 #include <unordered_set>
+#ifdef LIBMESH_HAVE_DIRECT_H
+#include <direct.h> // rmdir() on Windows
+#endif
+#ifdef LIBMESH_HAVE_UNISTD_H
+#include <unistd.h>  // rmdir() on Unix
+#endif
 
 namespace
 {
@@ -78,7 +84,7 @@ void chunking(libMesh::processor_id_type size, libMesh::processor_id_type rank, 
     }
 }
 
-std::string extension(const std::string & s)
+std::string_view extension(std::string_view s)
 {
   auto pos = s.rfind(".");
   if (pos == std::string::npos)
@@ -94,16 +100,16 @@ std::string split_dir(const std::string & input_name, libMesh::processor_id_type
 
 std::string header_file(const std::string & input_name, libMesh::processor_id_type n_procs)
 {
-  return split_dir(input_name, n_procs) + "/header" + extension(input_name);
+  return (split_dir(input_name, n_procs) + "/header").append(extension(input_name));
 }
 
 std::string
 split_file(const std::string & input_name,
-                        libMesh::processor_id_type n_procs,
-                        libMesh::processor_id_type proc_id)
+           libMesh::processor_id_type n_procs,
+           libMesh::processor_id_type proc_id)
 {
-  return split_dir(input_name, n_procs) + "/split-" + std::to_string(n_procs) + "-" +
-         std::to_string(proc_id) + extension(input_name);
+  return (split_dir(input_name, n_procs) + "/split-" + std::to_string(n_procs) + "-" +
+         std::to_string(proc_id)).append(extension(input_name));
 }
 
 void make_dir(const std::string & input_name, libMesh::processor_id_type n_procs)
@@ -143,7 +149,7 @@ std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, processor_id_type nspl
   processor_id_type my_first_chunk = 0;
   chunking(mesh.comm().size(), mesh.comm().rank(), nsplits, my_num_chunks, my_first_chunk);
 
-  auto cpr = libmesh_make_unique<CheckpointIO>(mesh);
+  auto cpr = std::make_unique<CheckpointIO>(mesh);
   cpr->current_processor_ids().clear();
   for (processor_id_type i = my_first_chunk; i < my_first_chunk + my_num_chunks; i++)
     cpr->current_processor_ids().push_back(i);
@@ -369,8 +375,13 @@ void CheckpointIO::write (const std::string & name)
   std::vector<processor_id_type> ids_to_write;
 
   // We're going to sort elements by pid in one pass, to avoid sending
-  // predicated iterators through the whole mesh N_p times
-  std::unordered_map<processor_id_type, std::vector<Elem *>> elements_on_pid;
+  // predicated iterators through the whole mesh N_p times.
+  //
+  // The data type here needs to be a non-const-pointer to whatever
+  // our element_iterator is a const-pointer to, for compatibility
+  // later.
+  typedef std::remove_const<MeshBase::const_element_iterator::value_type>::type nc_v_t;
+  std::unordered_map<processor_id_type, std::vector<nc_v_t>> elements_on_pid;
 
   if (_parallel)
     {
@@ -438,19 +449,24 @@ void CheckpointIO::write (const std::string & name)
               const auto elements_vec_it = elements_on_pid.find(p);
               if (elements_vec_it != elements_on_pid.end())
                 {
-                  const auto & p_elements = elements_vec_it->second;
-                  Elem * const * elempp = p_elements.data();
-                  Elem * const * elemend = elempp + p_elements.size();
+                  auto & p_elements = elements_vec_it->second;
+
+                  // Be compatible with both deprecated and
+                  // corrected MeshBase iterator types
+                  typedef MeshBase::const_element_iterator::value_type v_t;
+
+                  v_t * elempp = p_elements.data();
+                  v_t * elemend = elempp + p_elements.size();
 
                   const MeshBase::const_element_iterator
                     pid_elements_begin = MeshBase::const_element_iterator
-                      (elempp, elemend, Predicates::NotNull<Elem * const *>()),
+                      (elempp, elemend, Predicates::NotNull<v_t *>()),
                     pid_elements_end = MeshBase::const_element_iterator
-                      (elemend, elemend, Predicates::NotNull<Elem * const *>()),
+                      (elemend, elemend, Predicates::NotNull<v_t *>()),
                     active_pid_elements_begin = MeshBase::const_element_iterator
-                      (elempp, elemend, Predicates::Active<Elem * const *>()),
+                      (elempp, elemend, Predicates::Active<v_t *>()),
                     active_pid_elements_end = MeshBase::const_element_iterator
-                      (elemend, elemend, Predicates::Active<Elem * const *>());
+                      (elemend, elemend, Predicates::Active<v_t *>());
 
                   query_ghosting_functors
                     (mesh, p, active_pid_elements_begin,
@@ -501,12 +517,12 @@ void CheckpointIO::write_subdomain_names(Xdr & io) const
     // return writable references in mesh_base, it's possible for the user to leave some entity names
     // blank.  We can't write those to the XDA file.
     largest_id_type n_subdomain_names = 0;
-    for (const auto & pr : subdomain_map)
-      if (!pr.second.empty())
+    for (const auto & [id, name] : subdomain_map)
+      if (!name.empty())
         {
           n_subdomain_names++;
-          subdomain_ids.push_back(pr.first);
-          subdomain_names.push_back(pr.second);
+          subdomain_ids.push_back(id);
+          subdomain_names.push_back(name);
         }
 
     io.data(n_subdomain_names, "# subdomain id to name map");
@@ -775,12 +791,12 @@ void CheckpointIO::write_bc_names (Xdr & io, const BoundaryInfo & info, bool is_
   // return writable references in boundary_info, it's possible for the user to leave some entity names
   // blank.  We can't write those to the XDA file.
   largest_id_type n_boundary_names = 0;
-  for (const auto & pr : boundary_map)
-    if (!pr.second.empty())
+  for (const auto & [id, name] : boundary_map)
+    if (!name.empty())
       {
         n_boundary_names++;
-        boundary_ids.push_back(pr.first);
-        boundary_names.push_back(pr.second);
+        boundary_ids.push_back(id);
+        boundary_names.push_back(name);
       }
 
   if (is_sideset)

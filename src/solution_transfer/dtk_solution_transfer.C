@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -54,14 +54,7 @@ DTKSolutionTransfer::DTKSolutionTransfer(const libMesh::Parallel::Communicator &
   comm_default = Teuchos::rcp(new Teuchos::MpiComm<int>(Teuchos::rcp(new Teuchos::OpaqueWrapper<MPI_Comm>(comm.get()))));
 }
 
-DTKSolutionTransfer::~DTKSolutionTransfer()
-{
-  for (auto & pr : adapters)
-    delete pr.second;
-
-  for (auto & pr : dtk_maps)
-    delete pr.second;
-}
+DTKSolutionTransfer::~DTKSolutionTransfer() = default;
 
 void
 DTKSolutionTransfer::transfer(const Variable & from_var,
@@ -73,15 +66,15 @@ DTKSolutionTransfer::transfer(const Variable & from_var,
   EquationSystems * to_es = &to_var.system()->get_equation_systems();
 
   // Possibly make an Adapter for from_es
-  if (adapters.find(from_es) == adapters.end())
-    adapters[from_es] = new DTKAdapter(comm_default, *from_es);
+  if (!adapters.count(from_es))
+    adapters[from_es] = std::make_unique<DTKAdapter>(comm_default, *from_es);
 
   // Possibly make an Adapter for to_es
-  if (adapters.find(to_es) == adapters.end())
-    adapters[to_es] = new DTKAdapter(comm_default, *to_es);
+  if (!adapters.count(to_es))
+    adapters[to_es] = std::make_unique<DTKAdapter>(comm_default, *to_es);
 
-  DTKAdapter * from_adapter = adapters[from_es];
-  DTKAdapter * to_adapter = adapters[to_es];
+  DTKAdapter * from_adapter = adapters[from_es].get();
+  DTKAdapter * to_adapter = adapters[to_es].get();
 
   std::pair<EquationSystems *, EquationSystems *> from_to(from_es, to_es);
 
@@ -90,11 +83,10 @@ DTKSolutionTransfer::transfer(const Variable & from_var,
     {
       libmesh_assert(from_es->get_mesh().mesh_dimension() == to_es->get_mesh().mesh_dimension());
 
-      shared_domain_map_type * map = new shared_domain_map_type(comm_default, from_es->get_mesh().mesh_dimension(), true);
-      dtk_maps[from_to] = map;
+      dtk_maps[from_to] = std::make_unique<shared_domain_map_type>(comm_default, from_es->get_mesh().mesh_dimension(), true);
 
       // The tolerance here is for the "contains_point()" implementation in DTK.  Set a larger value for a looser tolerance...
-      map->setup(from_adapter->get_mesh_manager(), to_adapter->get_target_coords(), 30*Teuchos::ScalarTraits<double>::eps());
+      dtk_maps[from_to]->setup(from_adapter->get_mesh_manager(), to_adapter->get_target_coords(), 30*Teuchos::ScalarTraits<double>::eps());
     }
 
   DTKAdapter::RCP_Evaluator from_evaluator = from_adapter->get_variable_evaluator(from_var.name());
@@ -103,7 +95,7 @@ DTKSolutionTransfer::transfer(const Variable & from_var,
   dtk_maps[from_to]->apply(from_evaluator, to_values);
 
   if (dtk_maps[from_to]->getMissedTargetPoints().size())
-    libMesh::out<<"Warning: Some points were missed in the transfer of "<<from_var.name()<<" to "<<to_var.name()<<"!"<<std::endl;
+    libMesh::out << "Warning: Some points were missed in the transfer of " << from_var.name() << " to " << to_var.name() << "!" << std::endl;
 
   to_adapter->update_variable_values(to_var.name());
 }

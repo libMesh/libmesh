@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,11 +23,15 @@
 
 namespace libMesh
 {
-
+namespace Threads
+{
 //-------------------------------------------------------------------------
-// Threads:: object instantiation
-Threads::spin_mutex Threads::spin_mtx;
-Threads::recursive_mutex Threads::recursive_mtx;
-bool Threads::in_threads = false;
+// object instantiation
+spin_mutex spin_mtx;
+recursive_mutex recursive_mtx;
+bool in_threads = false;
 
+void lock_singleton_spin_mutex() { spin_mtx.lock(); }
+void unlock_singleton_spin_mutex() { spin_mtx.unlock(); }
+}
 } // namespace libMesh

@@ -5,9 +5,10 @@
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/elem_side_builder.h>
-#include <libmesh/auto_ptr.h>
 
 #include "libmesh_cppunit.h"
+
+#include <memory>
 
 using namespace libMesh;
 
@@ -17,36 +18,40 @@ class ElemTest : public CppUnit::TestCase {
 private:
   std::unique_ptr<Mesh> _mesh;
 
+protected:
+  std::string libmesh_suite_name;
+
 public:
   void setUp()
   {
     const Real minpos = 1.5, maxpos = 5.5;
     const unsigned int N = 2;
 
-    _mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
+    _mesh = std::make_unique<Mesh>(*TestCommWorld);
     std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #if LIBMESH_DIM > 1
     if (test_elem->infinite())
       {
-        _mesh->add_elem(std::move(test_elem));
+        Elem * elem = _mesh->add_elem(std::move(test_elem));
 
-        const auto add_point = [this](const unsigned int i,
-                                      const Real x,
-                                      const Real y,
-                                      const Real
+        const auto add_point =
+          [this, elem](const unsigned int i,
+                       const Real x,
+                       const Real y,
+                       const Real
 #if LIBMESH_DIM == 3
-                                      z
+                                  z
 #endif
-                                      )
+                      )
           {
 #if LIBMESH_DIM == 2
             auto node = _mesh->add_point(Point(x, y), i);
 #else
             auto node = _mesh->add_point(Point(x, y, z), i);
 #endif
-            _mesh->elem_ref(0).set_node(i) = node;
+            elem->set_node(i) = node;
           };
 
         const Real halfpos = (minpos + maxpos) / 2.;
@@ -130,6 +135,8 @@ public:
 
   void test_bounding_box()
   {
+    LOG_UNIT_TEST;
+
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       {
         const BoundingBox bbox = elem->loose_bounding_box();
@@ -169,6 +176,8 @@ public:
 
   void test_maps()
   {
+    LOG_UNIT_TEST;
+
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       {
         for (const auto edge : elem->edge_index_range())
@@ -192,6 +201,8 @@ public:
 
   void test_contains_point_node()
   {
+    LOG_UNIT_TEST;
+
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -215,23 +226,46 @@ public:
 
   void test_permute()
   {
+    LOG_UNIT_TEST;
+
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         if (elem->infinite())
           continue;
 #endif
+        const Point centroid = elem->true_centroid();
+        const Point vertex_avg = elem->vertex_average();
+        Point quasicc;
+        if (elem->dim() < 3)
+          quasicc = elem->quasicircumcenter();
 
         for (const auto p : IntRange<unsigned int>(0, elem->n_permutations()))
           {
             elem->permute(p);
             CPPUNIT_ASSERT(elem->has_invertible_map());
+            const Point new_centroid = elem->true_centroid();
+            const Point new_vertex_avg = elem->vertex_average();
+            Point new_quasicc;
+            if (elem->dim() < 3)
+              new_quasicc = elem->quasicircumcenter();
+            for (const auto d : make_range(LIBMESH_DIM))
+              {
+                LIBMESH_ASSERT_FP_EQUAL(centroid(d), new_centroid(d),
+                                        TOLERANCE*TOLERANCE);
+                LIBMESH_ASSERT_FP_EQUAL(vertex_avg(d), new_vertex_avg(d),
+                                        TOLERANCE*TOLERANCE);
+                LIBMESH_ASSERT_FP_EQUAL(quasicc(d), new_quasicc(d),
+                                        TOLERANCE*TOLERANCE);
+              }
           }
       }
   }
 
   void test_center_node_on_side()
   {
+    LOG_UNIT_TEST;
+
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       for (const auto s : elem->side_index_range())
         {
@@ -254,6 +288,8 @@ public:
 
   void test_side_type()
   {
+    LOG_UNIT_TEST;
+
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       for (const auto s : elem->side_index_range())
         CPPUNIT_ASSERT_EQUAL(elem->build_side_ptr(s)->type(), elem->side_type(s));
@@ -261,6 +297,8 @@ public:
 
   void test_elem_side_builder()
   {
+    LOG_UNIT_TEST;
+
     ElemSideBuilder cache;
     for (auto & elem : _mesh->active_local_element_ptr_range())
       for (const auto s : elem->side_index_range())
@@ -292,6 +330,13 @@ public:
 #define INSTANTIATE_ELEMTEST(elemtype)                          \
   class ElemTest_##elemtype : public ElemTest<elemtype> {       \
   public:                                                       \
+  ElemTest_##elemtype() :                                       \
+    ElemTest<elemtype>() {                                      \
+    if (unitlog->summarized_logs_enabled())                     \
+      this->libmesh_suite_name = "ElemTest";                    \
+    else                                                        \
+      this->libmesh_suite_name = "ElemTest_" #elemtype;         \
+  }                                                             \
   CPPUNIT_TEST_SUITE( ElemTest_##elemtype );                    \
   ELEMTEST;                                                     \
   CPPUNIT_TEST_SUITE_END();                                     \

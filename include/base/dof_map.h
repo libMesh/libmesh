@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,7 @@
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/point.h"
+#include "libmesh/utility.h"
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
 namespace libMesh
@@ -567,7 +568,7 @@ public:
    * Add a group of unknowns of order \p order and finite element type
    * \p type to the system of equations.
    */
-  void add_variable_group (const VariableGroup & var_group);
+  void add_variable_group (VariableGroup var_group);
 
   /**
    * Specify whether or not we perform an extra (opt-mode enabled) check
@@ -1595,9 +1596,10 @@ private:
    * A utility method for obtaining a set of elements to ghost along
    * with merged coupling matrices.
    */
+  typedef std::set<std::unique_ptr<CouplingMatrix>, Utility::CompareUnderlying> CouplingMatricesSet;
   static void
   merge_ghost_functor_outputs (GhostingFunctor::map_type & elements_to_ghost,
-                               std::set<CouplingMatrix *> & temporary_coupling_matrices,
+                               CouplingMatricesSet & temporary_coupling_matrices,
                                const std::set<GhostingFunctor *>::iterator & gf_begin,
                                const std::set<GhostingFunctor *>::iterator & gf_end,
                                const MeshBase::const_element_iterator & elems_begin,

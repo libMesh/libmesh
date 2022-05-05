@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -601,25 +601,16 @@ int main (int argc, char ** argv)
   equation_systems.parameters.set<Real>("forcing_magnitude") = forcing_magnitude;
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  // Attach Dirichlet boundary conditions
-  std::set<boundary_id_type> clamped_boundaries;
-  clamped_boundaries.insert(BOUNDARY_ID_MIN_X);
-
-  std::vector<unsigned int> uvw;
-  uvw.push_back(u_var);
-  uvw.push_back(v_var);
-  uvw.push_back(w_var);
-
+  // Attach Dirichlet (Clamped) boundary conditions
   ZeroFunction<Number> zero;
 
   // Most DirichletBoundary users will want to supply a "locally
   // indexed" functor
   system.get_dof_map().add_dirichlet_boundary
-    (DirichletBoundary (clamped_boundaries, uvw, zero,
-                        LOCAL_VARIABLE_ORDER));
-#else
-  libmesh_ignore(u_var, v_var, w_var);
+    (DirichletBoundary ({BOUNDARY_ID_MIN_X}, {u_var, v_var, w_var},
+                        zero, LOCAL_VARIABLE_ORDER));
 #endif // LIBMESH_ENABLE_DIRICHLET
+  libmesh_ignore(u_var, v_var, w_var);
 
   equation_systems.init();
   equation_systems.print_info();

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -204,10 +204,10 @@ void init_ref_elem_table()
   }
 
   // Read'em
-  for (const auto & pr : ref_elem_file)
+  for (const auto & [elem_type, filename] : ref_elem_file)
     {
-      std::istringstream stream(pr.second);
-      read_ref_elem(pr.first, stream);
+      std::istringstream stream(filename);
+      read_ref_elem(elem_type, stream);
     }
 }
 

@@ -12,7 +12,7 @@ using namespace libMesh;
 class CopyNodesAndElementsTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE( CopyNodesAndElementsTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( CopyNodesAndElementsTest );
 
   CPPUNIT_TEST( replicatedCopy );
   CPPUNIT_TEST( distributedCopy );
@@ -61,9 +61,9 @@ public:
 
   void tearDown() {}
 
-  void replicatedCopy() { collectMeshes<ReplicatedMesh>(); }
+  void replicatedCopy() { LOG_UNIT_TEST; collectMeshes<ReplicatedMesh>(); }
 
-  void distributedCopy() { collectMeshes<DistributedMesh>(); }
+  void distributedCopy() { LOG_UNIT_TEST; collectMeshes<DistributedMesh>(); }
 };
 
 

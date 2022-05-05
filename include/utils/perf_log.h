@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,12 @@
 #include <string>
 #include <vector>
 #include <deque>
-#include <sys/time.h>
+#ifdef LIBMESH_HAVE_SYS_TIME_H
+#include <sys/time.h> // gettimeofday() on Unix
+#endif
+#ifndef LIBMESH_HAVE_GETTIMEOFDAY
+#include "libmesh/win_gettimeofday.h" // gettimeofday() on Windows
+#endif
 
 namespace libMesh
 {
@@ -103,6 +108,18 @@ public:
   double pause_for(PerfData & other);
   double stopit ();
 
+  /**
+   * Sums timing results from \p other
+   */
+  PerfData & operator += (const PerfData & other) {
+    libmesh_assert(!open);
+    tot_time += other.tot_time;
+    tot_time_incl_sub += other.tot_time_incl_sub;
+    count += other.count;
+
+    return *this;
+  }
+
   int called_recursively;
 
 protected:
@@ -134,7 +151,7 @@ public:
    * disable logging.  You can use this flag to turn off
    * logging without touching any other code.
    */
-  PerfLog(const std::string & label_name="",
+  PerfLog(std::string label_name="",
           const bool log_events=true);
 
   /**
@@ -165,6 +182,22 @@ public:
    * \returns \p true iff performance logging is enabled
    */
   bool logging_enabled() const { return log_events; }
+
+  /**
+   * Tells the PerfLog to only print log results summarized by header
+   */
+  void enable_summarized_logs() { summarize_logs = true; }
+
+  /**
+   * Tells the PerfLog to print detailed log results (this is the
+   * default behavior)
+   */
+  void disable_summarized_logs() { summarize_logs = false; }
+
+  /**
+   * \returns \p true iff log results will be summarized by header
+   */
+  bool summarized_logs_enabled() { return summarize_logs; }
 
   /**
    * Push the event \p label onto the stack, pausing any active event.
@@ -309,6 +342,11 @@ private:
    * Flag to optionally disable all logging.
    */
   bool log_events;
+
+  /**
+   * Flag to optionally summarize logs
+   */
+  bool summarize_logs;
 
   /**
    * The total running time for recorded events.

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -153,6 +153,19 @@ public:
   virtual void clear ();
 
   /**
+   * Deletes all the element data that is currently stored.
+   *
+   * No Node is removed from the mesh, however even NodeElem elements
+   * are deleted, so the remaining Nodes will be considered "unused"
+   * and cleared unless they are reconnected to new elements before
+   * the next \p prepare_for_use()
+   *
+   * This does not affect BoundaryInfo data; any boundary information
+   * associated elements should already be cleared.
+   */
+  virtual void clear_elems () = 0;
+
+  /**
    * \returns \p true if the mesh has been prepared via a call
    * to \p prepare_for_use, \p false otherwise.
    */
@@ -248,7 +261,54 @@ public:
    * and simply specify the element dimensions manually, which is why this
    * setter exists.
    */
-  void set_elem_dimensions(const std::set<unsigned char> & elem_dims);
+  void set_elem_dimensions(std::set<unsigned char> elem_dims);
+
+  /**
+   * Typedef for the "set" container used to store elemset ids. The
+   * main requirements are that the entries be sorted and unique, so
+   * std::set works for this, but there may be more efficient
+   * alternatives.
+   */
+  typedef std::set<elemset_id_type> elemset_type;
+
+  /**
+   * Tabulate a user-defined "code" for elements which belong to the element sets
+   * specified in \p id_set. For example, suppose that we have two elemsets A and
+   * B with the following Elem ids:
+   * Elemset A = {1, 3}
+   * Elemset B = {2, 3}
+   *
+   * This implies the following mapping from elem id to elemset id:
+   * Elem 1 -> {A}
+   * Elem 2 -> {B}
+   * Elem 3 -> {A,B}
+   *
+   * In this case, we would need to tabulate three different elemset codes, e.g.:
+   * 0 -> {A}
+   * 1 -> {B}
+   * 2 -> {A,B}
+   *
+   * Also sets up the inverse mapping, so that if one knows all the
+   * element sets an Elem belongs to, one can look up the
+   * corresponding elemset code.
+   */
+  void add_elemset_code(dof_id_type code, MeshBase::elemset_type id_set);
+
+  /**
+   * Determines the number of unique elemset ids which have been added
+   * via add_elemset_code() calls by looping over the
+   * _elemset_codes_inverse_map and counting them.
+   */
+  unsigned int n_elemsets() const;
+
+  /**
+   * Look up the element sets for a given elemset code and
+   * vice-versa. The elemset must have been previously stored by
+   * calling add_elemset_code(). If no such code/set is found, returns
+   * the empty set or DofObject::invalid_id, respectively.
+   */
+  void get_elemsets(dof_id_type elemset_code, MeshBase::elemset_type & id_set_to_fill) const;
+  dof_id_type get_elemset_code(const MeshBase::elemset_type & id_set) const;
 
   /**
    * \returns The "spatial dimension" of the mesh.
@@ -769,7 +829,7 @@ public:
    * \returns The index number for the new datum, or for the existing
    * datum if one by the same name has already been added.
    */
-  unsigned int add_elem_integer(const std::string & name,
+  unsigned int add_elem_integer(std::string name,
                                 bool allocate_data = true,
                                 dof_id_type default_value = DofObject::invalid_id);
 
@@ -795,12 +855,12 @@ public:
    * \returns The index number for the named extra element integer
    * datum, which must have already been added.
    */
-  unsigned int get_elem_integer_index(const std::string & name) const;
+  unsigned int get_elem_integer_index(std::string_view name) const;
 
   /*
    * \returns Whether or not the mesh has an element integer with its name.
    */
-  bool has_elem_integer(const std::string & name) const;
+  bool has_elem_integer(std::string_view name) const;
 
   /*
    * \returns The name for the indexed extra element integer
@@ -891,7 +951,7 @@ public:
    * \returns The index number for the new datum, or for the existing
    * datum if one by the same name has already been added.
    */
-  unsigned int add_node_integer(const std::string & name,
+  unsigned int add_node_integer(std::string name,
                                 bool allocate_data = true,
                                 dof_id_type default_value = DofObject::invalid_id);
 
@@ -917,12 +977,12 @@ public:
    * \returns The index number for the named extra node integer
    * datum, which must have already been added.
    */
-  unsigned int get_node_integer_index(const std::string & name) const;
+  unsigned int get_node_integer_index(std::string_view name) const;
 
   /*
    * \returns Whether or not the mesh has a node integer with its name.
    */
-  bool has_node_integer(const std::string & name) const;
+  bool has_node_integer(std::string_view name) const;
 
   /*
    * \returns The name for the indexed extra node integer
@@ -1260,19 +1320,6 @@ public:
 
   /**
    * Converts a (conforming, non-refined) mesh with linear elements
-   * into a mesh with second-order elements.  For example, a mesh
-   * consisting of \p Tet4 will be converted to a mesh with \p Tet10
-   * etc.
-   *
-   * \note For some elements like \p Hex8 there exist two higher order
-   * equivalents, \p Hex20 and \p Hex27.  When \p full_ordered is \p
-   * true (default), then \p Hex27 is built.  Otherwise, \p Hex20 is
-   * built.  The same holds obviously for \p Quad4, \p Prism6, etc.
-   */
-  virtual void all_second_order (const bool full_ordered=true) = 0;
-
-  /**
-   * Converts a (conforming, non-refined) mesh with linear elements
    * into a mesh with "complete" order elements, i.e. elements which
    * can store degrees of freedom on any vertex, edge, or face.  For
    * example, a mesh consisting of \p Tet4 or \p Tet10 will be
@@ -1305,6 +1352,26 @@ public:
    */
   struct node_iterator;
   struct const_node_iterator;
+
+  /**
+   * Converts a set of this Mesh's elements defined by \p range from
+   * FIRST order to SECOND order. Must be called on conforming,
+   * non-refined meshes. For example, a mesh consisting of \p Tet4
+   * will be converted to a mesh with \p Tet10 etc.
+   *
+   * \note For some elements like \p Hex8 there exist two higher order
+   * equivalents, \p Hex20 and \p Hex27.  When \p full_ordered is \p
+   * true (default), then \p Hex27 is built.  Otherwise, \p Hex20 is
+   * built.  The same holds obviously for \p Quad4, \p Prism6, etc.
+   */
+  virtual void all_second_order_range(const SimpleRange<element_iterator> & range,
+                                      const bool full_ordered = true) = 0;
+
+  /**
+   * Calls the range-based version of this function with a range
+   * consisting of all elements in the mesh.
+   */
+  void all_second_order (const bool full_ordered = true);
 
   /**
    * In a few (very rare) cases, the user may have manually tagged the
@@ -1375,7 +1442,7 @@ public:
    * \returns The id of the named subdomain if it exists,
    * \p Elem::invalid_subdomain_id otherwise.
    */
-  subdomain_id_type get_id_by_name(const std::string & name) const;
+  subdomain_id_type get_id_by_name(std::string_view name) const;
 
   //
   // element_iterator accessors
@@ -1926,6 +1993,32 @@ protected:
   std::set<subdomain_id_type> _mesh_subdomains;
 
   /**
+   * Map from "element set code" to list of set ids to which that element
+   * belongs (and vice-versa). Remarks:
+   * 1.) The elemset code is a dof_id_type because (if used) it is
+   * stored as an extra_integer (named "elemset_code") on all elements,
+   * and extra_integers are of type dof_id_type. Elements which do not
+   * belong to any set should be assigned an elemset code of DofObject::invalid_id.
+   * 2.) Element sets can be thought of as a generalization of the concept
+   * of a subdomain. Subdomains have the following restrictions:
+   *   a.) A given element can only belong to a single subdomain
+   *   b.) When using Exodus file input/output, subdomains are (unfortunately)
+   *   tied to the concept of exodus element blocks, which consist of a single
+   *   geometric element type, somewhat limiting their generality.
+   * 3.) The user is responsible for filling in the values of this map
+   * in a consistent manner, unless the elemsets are read in from an
+   * Exodus file, in which case the elemset codes will be set up
+   * automatically. The codes can basically be chosen arbitrarily,
+   * with the one requirement that elements which belong to no sets
+   * should have a set code of DofObject::invalid_id.
+   * 4.) We also keep a list of all the elemset ids which have been added in
+   * order to support O(1) performance behavior in n_elemsets() calls.
+   */
+  std::map<dof_id_type, const MeshBase::elemset_type *> _elemset_codes;
+  std::map<MeshBase::elemset_type, dof_id_type> _elemset_codes_inverse_map;
+  MeshBase::elemset_type _all_elemset_ids;
+
+  /**
    * The "spatial dimension" of the Mesh.  See the documentation for
    * Mesh::spatial_dimension() for more information.
    */
@@ -2037,6 +2130,54 @@ protected:
    * it can directly broadcast *_integer_names
    */
   friend class MeshCommunication;
+
+
+  /**
+   * The original iterator classes weren't properly const-safe;
+   * relying on their const-incorrectness is now deprecated.
+   */
+#ifdef LIBMESH_ENABLE_DEPRECATED
+typedef variant_filter_iterator<MeshBase::Predicate, Elem *> elem_filter_iter;
+
+typedef variant_filter_iterator<MeshBase::Predicate,
+                                Elem * const,
+                                Elem * const &,
+                                Elem * const *> const_elem_filter_iter;
+
+typedef variant_filter_iterator<MeshBase::Predicate, Node *> node_filter_iter;
+
+typedef variant_filter_iterator<MeshBase::Predicate,
+                                Node * const,
+                                Node * const &,
+                                Node * const *> const_node_filter_iter;
+#else
+typedef variant_filter_iterator<MeshBase::Predicate,
+                                Elem * const,
+                                Elem * const &,
+                                Elem * const *,
+                                const Elem * const,
+                                const Elem * const &,
+                                const Elem * const *> elem_filter_iter;
+
+typedef variant_filter_iterator<MeshBase::Predicate,
+                                const Elem * const,
+                                const Elem * const &,
+                                const Elem * const *> const_elem_filter_iter;
+
+typedef variant_filter_iterator<MeshBase::Predicate,
+                                Node * const,
+                                Node * const &,
+                                Node * const *,
+                                const Node * const,
+                                const Node * const &,
+                                const Node * const *> node_filter_iter;
+
+typedef variant_filter_iterator<MeshBase::Predicate,
+                                const Node * const,
+                                const Node * const &,
+                                const Node * const *> const_node_filter_iter;
+#endif // LIBMESH_ENABLE_DEPRECATED
+
 };
 
 
@@ -2053,14 +2194,14 @@ protected:
  * The definition of the element_iterator struct.
  */
 struct
-MeshBase::element_iterator : variant_filter_iterator<MeshBase::Predicate, Elem *>
+MeshBase::element_iterator : MeshBase::elem_filter_iter
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
   element_iterator (const IterType & d,
                     const IterType & e,
                     const PredType & p ) :
-    variant_filter_iterator<MeshBase::Predicate, Elem *>(d,e,p) {}
+    elem_filter_iter(d,e,p) {}
 };
 
 
@@ -2071,10 +2212,7 @@ MeshBase::element_iterator : variant_filter_iterator<MeshBase::Predicate, Elem *
  * iterator above, but also provides an additional conversion-to-const ctor.
  */
 struct
-MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
-                                                           Elem * const,
-                                                           Elem * const &,
-                                                           Elem * const *>
+MeshBase::const_element_iterator : MeshBase::const_elem_filter_iter
 {
   /**
    * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
@@ -2083,7 +2221,7 @@ MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
   const_element_iterator (const IterType & d,
                           const IterType & e,
                           const PredType & p ) :
-    variant_filter_iterator<MeshBase::Predicate, Elem * const, Elem * const &, Elem * const *>(d,e,p)  {}
+    const_elem_filter_iter(d,e,p)  {}
 
   /**
    * The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
@@ -2092,7 +2230,7 @@ MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
    * \note This one is \e not templated!
    */
   const_element_iterator (const MeshBase::element_iterator & rhs) :
-    variant_filter_iterator<Predicate, Elem * const, Elem * const &, Elem * const *>(rhs) {}
+    const_elem_filter_iter(rhs) {}
 };
 
 
@@ -2105,7 +2243,7 @@ MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
  * The definition of the node_iterator struct.
  */
 struct
-MeshBase::node_iterator : variant_filter_iterator<MeshBase::Predicate, Node *>
+MeshBase::node_iterator : MeshBase::node_filter_iter
 {
   /**
    * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
@@ -2114,7 +2252,7 @@ MeshBase::node_iterator : variant_filter_iterator<MeshBase::Predicate, Node *>
   node_iterator (const IterType & d,
                  const IterType & e,
                  const PredType & p ) :
-    variant_filter_iterator<MeshBase::Predicate, Node *>(d,e,p) {}
+    node_filter_iter(d,e,p)  {}
 };
 
 
@@ -2125,10 +2263,7 @@ MeshBase::node_iterator : variant_filter_iterator<MeshBase::Predicate, Node *>
  * iterator above, but also provides an additional conversion-to-const ctor.
  */
 struct
-MeshBase::const_node_iterator : variant_filter_iterator<MeshBase::Predicate,
-                                                        Node * const,
-                                                        Node * const &,
-                                                        Node * const *>
+MeshBase::const_node_iterator : MeshBase::const_node_filter_iter
 {
   /**
    * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
@@ -2137,7 +2272,7 @@ MeshBase::const_node_iterator : variant_filter_iterator<MeshBase::Predicate,
   const_node_iterator (const IterType & d,
                        const IterType & e,
                        const PredType & p ) :
-    variant_filter_iterator<MeshBase::Predicate, Node * const, Node * const &, Node * const *>(d,e,p)  {}
+    const_node_filter_iter(d,e,p)  {}
 
   /**
    * The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
@@ -2146,7 +2281,7 @@ MeshBase::const_node_iterator : variant_filter_iterator<MeshBase::Predicate,
    * \note This one is *not* templated!
    */
   const_node_iterator (const MeshBase::node_iterator & rhs) :
-    variant_filter_iterator<Predicate, Node * const, Node * const &, Node * const *>(rhs) {}
+    const_node_filter_iter(rhs) {}
 };
 
 

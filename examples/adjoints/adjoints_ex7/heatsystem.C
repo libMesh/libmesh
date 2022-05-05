@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -50,11 +50,6 @@ void HeatSystem::init_data ()
   // The temperature is evolving, with a first order time derivative
   this->time_evolving(0, 1);
 
-  const boundary_id_type all_ids[4] = {0, 1, 2, 3};
-  std::set<boundary_id_type> all_bdys(all_ids, all_ids+(4));
-
-  std::vector<unsigned int> T_only(1, 0);
-
   ZeroFunction<Number> zero;
 
   ConstFunction<Number> one(1.0);
@@ -63,12 +58,12 @@ void HeatSystem::init_data ()
   // Most DirichletBoundary users will want to supply a "locally
   // indexed" functor
   this->get_dof_map().add_dirichlet_boundary
-    (DirichletBoundary (all_bdys, T_only, one,
+    (DirichletBoundary ({0,1,2,3}, { /* T_var = */ 0 }, one,
                         LOCAL_VARIABLE_ORDER));
 #endif
 
-  this->get_dof_map().add_adjoint_dirichlet_boundary(DirichletBoundary (all_bdys, T_only, &zero), 0);
-  this->get_dof_map().add_adjoint_dirichlet_boundary(DirichletBoundary (all_bdys, T_only, &zero), 1);
+  this->get_dof_map().add_adjoint_dirichlet_boundary(DirichletBoundary ({0,1,2,3}, {0}, &zero), 0);
+  this->get_dof_map().add_adjoint_dirichlet_boundary(DirichletBoundary ({0,1,2,3}, {0}, &zero), 1);
 
   FEMSystem::init_data();
 }

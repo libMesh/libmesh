@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -42,14 +42,14 @@ namespace libMesh
 MeshFunction::MeshFunction (const EquationSystems & eqn_systems,
                             const NumericVector<Number> & vec,
                             const DofMap & dof_map,
-                            const std::vector<unsigned int> & vars,
+                            std::vector<unsigned int> vars,
                             const FunctionBase<Number> * master) :
   FunctionBase<Number> (master),
   ParallelObject       (eqn_systems),
   _eqn_systems         (eqn_systems),
   _vector              (vec),
   _dof_map             (dof_map),
-  _system_vars         (vars),
+  _system_vars         (std::move(vars)),
   _out_of_mesh_mode    (false)
 {
 }
@@ -84,7 +84,7 @@ MeshFunction::MeshFunction (const MeshFunction & mf):
   // input mf had done so.
   if(mf.initialized())
   {
-    this->init();
+    this->MeshFunction::init();
 
     if(mf.get_point_locator().initialized())
       this->set_point_locator_tolerance(mf.get_point_locator().get_close_to_point_tol());
@@ -93,7 +93,7 @@ MeshFunction::MeshFunction (const MeshFunction & mf):
 
   if (mf._subdomain_ids)
     _subdomain_ids =
-      libmesh_make_unique<std::set<subdomain_id_type>>
+      std::make_unique<std::set<subdomain_id_type>>
         (*mf._subdomain_ids);
 }
 
@@ -150,7 +150,7 @@ MeshFunction::clear ()
 
 std::unique_ptr<FunctionBase<Number>> MeshFunction::clone () const
 {
-  return libmesh_make_unique<MeshFunction>(*this);
+  return std::make_unique<MeshFunction>(*this);
 }
 
 
@@ -173,8 +173,8 @@ std::map<const Elem *, Number> MeshFunction::discontinuous_value (const Point & 
   std::map<const Elem *, DenseVector<Number>> buffer;
   this->discontinuous_value (p, time, buffer);
   std::map<const Elem *, Number> return_value;
-  for (const auto & pr : buffer)
-    return_value[pr.first] = pr.second(0);
+  for (const auto & [elem, vec] : buffer)
+    return_value[elem] = vec(0);
   // NOTE: If no suitable element is found, then the map return_value is empty. This
   // puts burden on the user of this function but I don't really see a better way.
   return return_value;
@@ -198,8 +198,8 @@ std::map<const Elem *, Gradient> MeshFunction::discontinuous_gradient (const Poi
   std::map<const Elem *, std::vector<Gradient>> buffer;
   this->discontinuous_gradient (p, time, buffer);
   std::map<const Elem *, Gradient> return_value;
-  for (const auto & pr : buffer)
-    return_value[pr.first] = pr.second[0];
+  for (const auto & [elem, vec] : buffer)
+    return_value[elem] = vec[0];
   // NOTE: If no suitable element is found, then the map return_value is empty. This
   // puts burden on the user of this function but I don't really see a better way.
   return return_value;
@@ -865,9 +865,9 @@ void MeshFunction::unset_point_locator_tolerance()
 void MeshFunction::set_subdomain_ids(const std::set<subdomain_id_type> * subdomain_ids)
 {
   if (subdomain_ids)
-    _subdomain_ids.reset();
+    _subdomain_ids = std::make_unique<std::set<subdomain_id_type>>(*subdomain_ids);
   else
-    _subdomain_ids = libmesh_make_unique<std::set<subdomain_id_type>>(*subdomain_ids);
+    _subdomain_ids.reset();
 }
 
 } // namespace libMesh

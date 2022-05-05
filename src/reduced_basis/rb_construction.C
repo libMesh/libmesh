@@ -150,18 +150,15 @@ void RBConstruction::solve_for_matrix_and_rhs(LinearSolver<Number> & input_solve
   const unsigned int maxits =
     es.parameters.get<unsigned int>("linear solver maximum iterations");
 
-  // Solve the linear system.  Several cases:
-  std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
-
   // It's good practice to clear the solution vector first since it can
   // affect convergence of iterative solvers
   solution->zero();
-  rval = input_solver.solve (input_matrix, *solution, input_rhs, tol, maxits);
 
+  // Solve the linear system.
   // Store the number of linear iterations required to
   // solve and the final residual.
-  _n_linear_iterations   = rval.first;
-  _final_linear_residual = rval.second;
+  std::tie(_n_linear_iterations, _final_linear_residual) =
+    input_solver.solve (input_matrix, *solution, input_rhs, tol, maxits);
 
   get_dof_map().enforce_constraints_exactly(*this);
 
@@ -602,7 +599,7 @@ void RBConstruction::allocate_data_structures()
 
 std::unique_ptr<DGFEMContext> RBConstruction::build_context ()
 {
-  return libmesh_make_unique<DGFEMContext>(*this);
+  return std::make_unique<DGFEMContext>(*this);
 }
 
 void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
@@ -1567,6 +1564,8 @@ Real RBConstruction::truth_solve(int plot_solution)
       std::set<std::string> system_names = {this->name()};
       exo_io.write_equation_systems("truth.exo", this->get_equation_systems(), &system_names);
     }
+#else
+  libmesh_ignore(plot_solution);
 #endif
 
   // Get the X norm of the truth solution
@@ -2387,7 +2386,7 @@ std::unique_ptr<DirichletBoundary> RBConstruction::build_zero_dirichlet_boundary
   std::vector<unsigned int> variables;
 
   // The DirichletBoundary constructor clones zf, so it's OK that zf is only in local scope
-  return libmesh_make_unique<DirichletBoundary>(dirichlet_ids, variables, &zf);
+  return std::make_unique<DirichletBoundary>(dirichlet_ids, variables, &zf);
 }
 
 #endif

@@ -23,7 +23,7 @@ class WriteVecAndScalar : public CppUnit::TestCase
    * This test ensures you can write both vector and scalar variables
    */
 public:
-  CPPUNIT_TEST_SUITE(WriteVecAndScalar);
+  LIBMESH_CPPUNIT_TEST_SUITE(WriteVecAndScalar);
 
 #if LIBMESH_DIM > 1
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
@@ -190,8 +190,8 @@ public:
   }
 
 
-  void testWriteExodusReplicated() { testWriteExodus<ReplicatedMesh>("rep.e"); }
-  void testWriteExodusDistributed() { testWriteExodus<DistributedMesh>("dist.e"); }
+  void testWriteExodusReplicated() { LOG_UNIT_TEST; testWriteExodus<ReplicatedMesh>("rep.e"); }
+  void testWriteExodusDistributed() { LOG_UNIT_TEST; testWriteExodus<DistributedMesh>("dist.e"); }
 
 
   template <typename MeshType>
@@ -236,8 +236,8 @@ public:
 #endif // #ifdef LIBMESH_HAVE_NEMESIS_API
   }
 
-  void testWriteNemesisReplicated() { testWriteNemesis<ReplicatedMesh>("rep.nem"); }
-  void testWriteNemesisDistributed() { testWriteNemesis<DistributedMesh>("dist.nem"); }
+  void testWriteNemesisReplicated() { LOG_UNIT_TEST; testWriteNemesis<ReplicatedMesh>("rep.nem"); }
+  void testWriteNemesisDistributed() { LOG_UNIT_TEST; testWriteNemesis<DistributedMesh>("dist.nem"); }
 
 };
 

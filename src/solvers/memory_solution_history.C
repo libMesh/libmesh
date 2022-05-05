@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ void MemorySolutionHistory::store(bool /* is_adjoint_solve */, Real time)
   // In an empty history we create the first entry
   if (stored_data.begin() == stored_data.end())
     {
-      stored_data[time] = libmesh_make_unique<MemoryHistoryData>(_system);
+      stored_data[time] = std::make_unique<MemoryHistoryData>(_system);
       stored_datum = stored_data.begin();
     }
 
@@ -51,7 +51,7 @@ void MemorySolutionHistory::store(bool /* is_adjoint_solve */, Real time)
       ++stored_datum;
       libmesh_assert (stored_datum == stored_data.end());
 #endif
-      stored_data[time] = libmesh_make_unique<MemoryHistoryData>(_system);
+      stored_data[time] = std::make_unique<MemoryHistoryData>(_system);
       stored_datum = stored_data.end();
       --stored_datum;
     }
@@ -60,7 +60,7 @@ void MemorySolutionHistory::store(bool /* is_adjoint_solve */, Real time)
   else if (stored_datum->first - time > TOLERANCE)
     {
       libmesh_assert (stored_datum == stored_data.begin());
-      stored_data[time] = libmesh_make_unique<MemoryHistoryData>(_system);
+      stored_data[time] = std::make_unique<MemoryHistoryData>(_system);
       stored_datum = stored_data.begin();
     }
 

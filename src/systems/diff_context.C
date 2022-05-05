@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,9 @@
 #include "libmesh/diff_system.h"
 #include "libmesh/diff_system.h"
 #include "libmesh/unsteady_solver.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ includes
+#include <memory>
 
 namespace libMesh
 {
@@ -52,7 +54,7 @@ DiffContext::DiffContext (const System & sys) :
 
   // If the user resizes sys.qoi, it will invalidate us
 
-  std::size_t n_qoi = sys.qoi.size();
+  std::size_t n_qoi = sys.n_qois();
   _elem_qoi.resize(n_qoi);
   _elem_qoi_derivative.resize(n_qoi);
   _elem_qoi_subderivatives.resize(n_qoi);
@@ -61,10 +63,10 @@ DiffContext::DiffContext (const System & sys) :
 
   for (unsigned int i=0; i != nv; ++i)
     {
-      _elem_subsolutions.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_elem_solution));
-      _elem_subresiduals.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_elem_residual));
+      _elem_subsolutions.emplace_back(std::make_unique<DenseSubVector<Number>>(_elem_solution));
+      _elem_subresiduals.emplace_back(std::make_unique<DenseSubVector<Number>>(_elem_residual));
       for (std::size_t q=0; q != n_qoi; ++q)
-        _elem_qoi_subderivatives[q].emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_elem_qoi_derivative[q]));
+        _elem_qoi_subderivatives[q].emplace_back(std::make_unique<DenseSubVector<Number>>(_elem_qoi_derivative[q]));
       _elem_subjacobians[i].reserve(nv);
 
       // Only make space for these if we're using DiffSystem
@@ -75,21 +77,21 @@ DiffContext::DiffContext (const System & sys) :
           // Now, we only need these if the solver is unsteady
           if (!diff_system->get_time_solver().is_steady())
             {
-              _elem_subsolution_rates.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_elem_solution_rate));
+              _elem_subsolution_rates.emplace_back(std::make_unique<DenseSubVector<Number>>(_elem_solution_rate));
 
               // We only need accel space if the TimeSolver is second order
               const UnsteadySolver & time_solver = cast_ref<const UnsteadySolver &>(diff_system->get_time_solver());
 
               if (time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty())
-                _elem_subsolution_accels.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_elem_solution_accel));
+                _elem_subsolution_accels.emplace_back(std::make_unique<DenseSubVector<Number>>(_elem_solution_accel));
             }
         }
 
       if (sys.use_fixed_solution)
-        _elem_fixed_subsolutions.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_elem_fixed_solution));
+        _elem_fixed_subsolutions.emplace_back(std::make_unique<DenseSubVector<Number>>(_elem_fixed_solution));
 
       for (unsigned int j=0; j != nv; ++j)
-        _elem_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_elem_jacobian));
+        _elem_subjacobians[i].emplace_back(std::make_unique<DenseSubMatrix<Number>>(_elem_jacobian));
     }
 }
 
@@ -125,7 +127,7 @@ void DiffContext::add_localized_vector (NumericVector<Number> & localized_vector
 
   // Fill the DenseSubVector with nv copies of DenseVector
   for (unsigned int i=0; i != nv; ++i)
-    _localized_vectors[&localized_vector].second.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_localized_vectors[&localized_vector].first));
+    _localized_vectors[&localized_vector].second.emplace_back(std::make_unique<DenseSubVector<Number>>(_localized_vectors[&localized_vector].first));
 }
 
 

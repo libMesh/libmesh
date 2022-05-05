@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -68,7 +68,7 @@ public:
    */
   DenseVector<T> & parent () { return _parent_vector; }
 
-  virtual void zero() override;
+  virtual void zero() override final;
 
   /**
    * \returns The \p (i,j) element of the subvector as a const
@@ -81,16 +81,16 @@ public:
    */
   T & operator() (const unsigned int i);
 
-  virtual T el(const unsigned int i) const override
+  virtual T el(const unsigned int i) const override final
   { return (*this)(i); }
 
-  virtual T & el(const unsigned int i) override
+  virtual T & el(const unsigned int i) override final
   { return (*this)(i); }
 
-  virtual unsigned int size() const override
+  virtual unsigned int size() const override final
   { return _n; }
 
-  virtual bool empty() const override
+  virtual bool empty() const override final
   { return (_n == 0); }
 
   /**

@@ -258,12 +258,12 @@ void add_parameter_ranges_to_builder(const RBParametrized & rb_evaluation,
 
     // We could loop over either parameters_min or parameters_max, they should have the same keys.
     unsigned int count = 0;
-    for (const auto & pr : parameters_min.get_parameters_map())
-      if (!rb_evaluation.is_discrete_parameter(pr.first))
+    for (const auto & [key, val] : parameters_min.get_parameters_map())
+      if (!rb_evaluation.is_discrete_parameter(key))
         {
-          names.set(count, pr.first);
-          mins.set(count, pr.second);
-          maxs.set(count, parameters_max.get_value(pr.first));
+          names.set(count, key);
+          mins.set(count, val);
+          maxs.set(count, parameters_max.get_value(key));
           ++count;
         }
 
@@ -766,6 +766,32 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
           }
       }
   }
+
+  // Initialize EIM spatial indices for the interpolation points, and if there are
+  // any spatial indices then we store them in the buffer.
+  rb_eim_evaluation.initialize_interpolation_points_spatial_indices();
+  if (rb_eim_evaluation.get_n_interpolation_points_spatial_indices() > 0)
+  {
+    libmesh_error_msg_if(n_bfs != rb_eim_evaluation.get_n_interpolation_points_spatial_indices(),
+                         "Error: Number of spatial indices should match number of EIM basis functions");
+
+    auto interpolation_points_spatial_indices_builder =
+      rb_eim_evaluation_builder.initInterpolationSpatialIndices(n_bfs);
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        const std::vector<unsigned int> & spatial_indices =
+          rb_eim_evaluation.get_interpolation_points_spatial_indices(i);
+        unsigned int n_spatial_indices = spatial_indices.size();
+
+        auto spatial_indices_builder =
+          interpolation_points_spatial_indices_builder.init(i, n_spatial_indices);
+
+        for (auto j : make_range(n_spatial_indices))
+          {
+            spatial_indices_builder.set(j, spatial_indices[j]);
+          }
+      }
+  }
 }
 
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
@@ -814,10 +840,10 @@ void add_rb_scm_evaluation_data_to_builder(RBSCMEvaluation & rb_scm_eval,
           cj_parameters_outer.init(i, rb_scm_eval.C_J[i].n_parameters());
 
         unsigned int count = 0;
-        for (const auto & pr : rb_scm_eval.C_J[i])
+        for (const auto & [key, val] : rb_scm_eval.C_J[i])
           {
-            cj_parameters_inner[count].setName( pr.first );
-            cj_parameters_inner[count].setValue( pr.second );
+            cj_parameters_inner[count].setName(key);
+            cj_parameters_inner[count].setValue(val);
             count++;
           }
 

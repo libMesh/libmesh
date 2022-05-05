@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -38,6 +38,7 @@ enum ErrorEstimatorType : int;
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
@@ -124,7 +125,7 @@ public:
    * When calculating many error vectors at once, we need a data structure to
    * hold them all
    */
-  typedef std::map<std::pair<const System *, unsigned int>, ErrorVector *> ErrorMap;
+  typedef std::map<std::pair<const System *, unsigned int>, std::unique_ptr<ErrorVector>> ErrorMap;
 
   /**
    * This virtual function can be redefined

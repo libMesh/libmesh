@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,12 @@ namespace Papi {
 // C++ includes
 #include <cstddef>
 #include <string>
-#include <sys/time.h>
+#ifdef LIBMESH_HAVE_SYS_TIME_H
+#include <sys/time.h> // gettimeofday() on Unix
+#endif
+#ifndef LIBMESH_HAVE_GETTIMEOFDAY
+#include "libmesh/win_gettimeofday.h" // gettimeofday() on Windows
+#endif
 
 namespace libMesh
 {

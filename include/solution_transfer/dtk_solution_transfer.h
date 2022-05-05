@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,21 +24,24 @@
 
 #ifdef LIBMESH_TRILINOS_HAVE_DTK
 
+// libMesh includes
 #include "libmesh/solution_transfer.h"
 #include "libmesh/dtk_adapter.h"
 
 #include "libmesh/ignore_warnings.h"
 
-// Trilinos
+// Trilinos includes
 #include <Teuchos_CommHelpers.hpp>
 #include <Teuchos_DefaultComm.hpp>
 
-// DTK
+// DTK includes
 #include <DTK_SharedDomainMap.hpp>
 
 #include "libmesh/restore_warnings.h"
 
+// C++ includes
 #include <string>
+#include <memory>
 
 namespace libMesh
 {
@@ -77,10 +80,10 @@ protected:
   Teuchos::RCP<const Teuchos::Comm<int>> comm_default;
 
   /// The DTKAdapter associated with each EquationSystems
-  std::map<EquationSystems *, DTKAdapter *> adapters;
+  std::map<EquationSystems *, std::unique_ptr<DTKAdapter>> adapters;
 
   /// The dtk shared domain maps for pairs of EquationSystems (from, to)
-  std::map<std::pair<EquationSystems *, EquationSystems *>, shared_domain_map_type * > dtk_maps;
+  std::map<std::pair<EquationSystems *, EquationSystems *>, std::unique_ptr<shared_domain_map_type>> dtk_maps;
 };
 
 } // namespace libMesh

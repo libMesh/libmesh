@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,7 @@
 
 
 // C++ includes
-#include <algorithm>  // std::lower_bound
+#include <algorithm>  // is_sorted, lower_bound
 
 // Local includes
 #include "libmesh/parallel_histogram.h"
@@ -37,7 +37,7 @@ Histogram<KeyType,IdxType>::Histogram (const Parallel::Communicator & comm_in,
   ParallelObject(comm_in),
   data(d)
 {
-  libmesh_assert (Parallel::Utils::is_sorted (data));
+  libmesh_assert (std::is_sorted (data.begin(), data.end()));
 }
 
 
@@ -107,10 +107,10 @@ void Histogram<KeyType,IdxType>::build_histogram ()
 
 
 // Explicitly instantiate for int, double
-template class Parallel::Histogram<int,    unsigned int>;
-template class Parallel::Histogram<double, unsigned int>;
+template class LIBMESH_EXPORT Parallel::Histogram<int,    unsigned int>;
+template class LIBMESH_EXPORT Parallel::Histogram<double, unsigned int>;
 #ifdef LIBMESH_HAVE_LIBHILBERT
-template class Parallel::Histogram<Parallel::DofObjectKey, unsigned int>;
+template class LIBMESH_EXPORT Parallel::Histogram<Parallel::DofObjectKey, unsigned int>;
 #endif
 
 } // namespace libMesh

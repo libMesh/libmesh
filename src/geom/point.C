@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -18,13 +18,15 @@
 
 
 
-// C++ includes
-
 // Local includes
-// #include "libmesh/point.h"
+#include "libmesh/point.h"
+
+// C++ includes
+#include <type_traits> // std::is_trivially_copyable
 
 
-
+static_assert(std::is_trivially_copyable<libMesh::TypeVector<libMesh::Point>>::value,
+              "Someone made Point non-TriviallyCopyable");
 
 // ------------------------------------------------------------
 // Point class member functions

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -305,6 +305,30 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
     } // if (all_dbcs)
 }
 #endif // LIBMESH_ENABLE_DIRICHLET
+
+void DifferentiableSystem::attach_qoi( DifferentiableQoI * qoi_in )
+{
+  this->diff_qoi = (qoi_in->clone()).release();
+  // User needs to resize qoi system qoi accordingly
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  // Call the old API for backwards compatibility
+  this->diff_qoi->init_qoi( this->qoi );
+
+  // Then the new API for forwards compatibility
+  this->diff_qoi->init_qoi_count( *this );
+#else
+#ifndef NDEBUG
+  // Make sure the user has updated their QoI subclass - call the old
+  // API and make sure it does nothing
+  std::vector<Number> deprecated_vector;
+  this->diff_qoi->init_qoi( deprecated_vector );
+  libmesh_assert(deprecated_vector.empty());
+#endif
+
+  // Then the new API
+  this->diff_qoi->init_qoi_count( *this );
+#endif
+}
 
 unsigned int DifferentiableSystem::get_second_order_dot_var( unsigned int var ) const
 {

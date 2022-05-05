@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -41,6 +41,7 @@
 #include "libmesh/enum_to_string.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/elem_side_builder.h"
+#include "libmesh/tensor_value.h"
 
 namespace
 {
@@ -249,36 +250,28 @@ void MeshTools::Modification::translate (MeshBase & mesh,
 
 
 
-void MeshTools::Modification::rotate (MeshBase & mesh,
-                                      const Real phi,
-                                      const Real theta,
-                                      const Real psi)
+RealTensorValue
+MeshTools::Modification::rotate (MeshBase & mesh,
+                                 const Real phi,
+                                 const Real theta,
+                                 const Real psi)
 {
 #if LIBMESH_DIM == 3
-  const Real  p = -phi/180.*libMesh::pi;
-  const Real  t = -theta/180.*libMesh::pi;
-  const Real  s = -psi/180.*libMesh::pi;
-  const Real sp = std::sin(p), cp = std::cos(p);
-  const Real st = std::sin(t), ct = std::cos(t);
-  const Real ss = std::sin(s), cs = std::cos(s);
+  const auto R = RealTensorValue::intrinsic_rotation_matrix(phi, theta, psi);
 
-  // We follow the convention described at http://mathworld.wolfram.com/EulerAngles.html
-  // (equations 6-14 give the entries of the composite transformation matrix).
-  // The rotations are performed sequentially about the z, x, and z axes, in that order.
-  // A positive angle yields a counter-clockwise rotation about the axis in question.
   for (auto & node : mesh.node_ptr_range())
     {
-      const Point pt = *node;
-      const Real  x  = pt(0);
-      const Real  y  = pt(1);
-      const Real  z  = pt(2);
-      *node = Point(( cp*cs-sp*ct*ss)*x + ( sp*cs+cp*ct*ss)*y + (st*ss)*z,
-                    (-cp*ss-sp*ct*cs)*x + (-sp*ss+cp*ct*cs)*y + (st*cs)*z,
-                    ( sp*st)*x          + (-cp*st)*y          + (ct)*z   );
+      Point & pt = *node;
+      pt = R * pt;
     }
+
+  return R;
+
 #else
   libmesh_ignore(mesh, phi, theta, psi);
   libmesh_error_msg("MeshTools::Modification::rotate() requires libMesh to be compiled with LIBMESH_DIM==3");
+  // We'll never get here
+  return RealTensorValue();
 #endif
 }
 

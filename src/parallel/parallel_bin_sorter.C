@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,7 @@
 
 
 // C++ includes
-#include <algorithm>  // std::lower_bound
+#include <algorithm>  // is_sorted, lower_bound
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -40,13 +40,7 @@ BinSorter<KeyType,IdxType>::BinSorter (const Parallel::Communicator & comm_in,
   ParallelObject(comm_in),
   data(d)
 {
-  // Assume (& libmesh_assert) we are working with a sorted range
-
-  // Ah...  is_sorted is an STL extension!
-  //libmesh_assert (std::is_sorted (data.begin(), data.end()));
-
-  // Home-grown is_sorted
-  libmesh_assert (Parallel::Utils::is_sorted (data));
+  libmesh_assert (std::is_sorted (data.begin(), data.end()));
 }
 
 
@@ -141,10 +135,10 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
 
 
 // Explicitly instantiate for int, double
-template class Parallel::BinSorter<int, unsigned int>;
-template class Parallel::BinSorter<double, unsigned int>;
+template class LIBMESH_EXPORT Parallel::BinSorter<int, unsigned int>;
+template class LIBMESH_EXPORT Parallel::BinSorter<double, unsigned int>;
 #ifdef LIBMESH_HAVE_LIBHILBERT
-template class Parallel::BinSorter<Parallel::DofObjectKey, unsigned int>;
+template class LIBMESH_EXPORT Parallel::BinSorter<Parallel::DofObjectKey, unsigned int>;
 #endif
 
 } // namespace libMesh

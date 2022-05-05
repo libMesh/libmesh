@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -128,7 +128,7 @@ protected:
   virtual void _estimate_error (const EquationSystems * equation_systems,
                                 const System * system,
                                 ErrorVector * error_per_cell,
-                                std::map<std::pair<const System *, unsigned int>, ErrorVector *> * errors_per_cell,
+                                ErrorMap * errors_per_cell,
                                 const std::map<const System *, SystemNorm > * error_norms,
                                 const std::map<const System *, const NumericVector<Number> *> * solution_vectors = nullptr,
                                 bool estimate_parent_error = false);

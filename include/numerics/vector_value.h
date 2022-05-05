@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,6 +26,7 @@
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
 #include "metaphysicl/raw_type.h"
+#include "metaphysicl/ct_types.h"
 #endif
 
 // C++ includes
@@ -263,6 +264,12 @@ struct RawType<libMesh::VectorValue<T>>
 
       return ret;
     }
+};
+
+template <typename T, typename U>
+struct ReplaceAlgebraicType<libMesh::VectorValue<T>, U>
+{
+  typedef U type;
 };
 }
 #endif

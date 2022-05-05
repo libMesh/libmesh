@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -226,8 +226,8 @@ void FEXYZ<Dim>::compute_face_values(const Elem * elem,
 //--------------------------------------------------------------
 // Explicit instantiations (doesn't make sense in 1D!) using fe_macro.h's macro
 
-template class FEXYZ<2>;
-template class FEXYZ<3>;
+template class LIBMESH_EXPORT FEXYZ<2>;
+template class LIBMESH_EXPORT FEXYZ<3>;
 
 
 } // namespace libMesh

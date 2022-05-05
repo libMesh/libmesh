@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -78,10 +78,7 @@ void ElasticitySystem::init_data()
   if (all_boundary_ids.count(fixed_v_boundary_id))
     dirichlet_v_boundary_ids.insert(fixed_v_boundary_id);
 
-  std::vector<unsigned int> variables, u_variable, v_variable;
-  u_variable.push_back(_u_var);
-  v_variable.push_back(_v_var);
-  variables.push_back(_u_var);
+  std::vector<unsigned int> variables {_u_var};
   if (_dim > 1)
     variables.push_back(_v_var);
   if (_dim > 2)
@@ -98,7 +95,7 @@ void ElasticitySystem::init_data()
   if (!dirichlet_u_boundary_ids.empty())
     {
       DirichletBoundary dirichlet_u_bc(dirichlet_u_boundary_ids,
-                                       u_variable, zf,
+                                       {_u_var}, zf,
                                        LOCAL_VARIABLE_ORDER);
       this->get_dof_map().add_dirichlet_boundary(dirichlet_u_bc);
     }
@@ -106,7 +103,7 @@ void ElasticitySystem::init_data()
   if (!dirichlet_v_boundary_ids.empty())
     {
       DirichletBoundary dirichlet_v_bc(dirichlet_v_boundary_ids,
-                                       v_variable, zf,
+                                       {_v_var}, zf,
                                        LOCAL_VARIABLE_ORDER);
       this->get_dof_map().add_dirichlet_boundary(dirichlet_v_bc);
     }

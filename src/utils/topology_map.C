@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -57,10 +57,8 @@ void TopologyMap::add_node(const Node & mid_node,
 
   libmesh_assert_not_equal_to(mid_node_id, DofObject::invalid_id);
 
-  for (auto pair : bracketing_nodes)
+  for (auto [id1, id2] : bracketing_nodes)
     {
-      const dof_id_type id1 = pair.first;
-      const dof_id_type id2 = pair.second;
       const dof_id_type lower_id = std::min(id1, id2);
       const dof_id_type upper_id = std::max(id1, id2);
 

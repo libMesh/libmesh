@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,8 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameter_pointer.h"
 #include "libmesh/parameter_vector.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+#include <memory>
 
 using namespace libMesh;
 
@@ -38,7 +39,7 @@ public:
   CoupledSystem(EquationSystems & es,
                 const std::string & name_in,
                 const unsigned int number_in)
-    : FEMSystem(es, name_in, number_in), Peclet(1.) {qoi.resize(1);}
+    : FEMSystem(es, name_in, number_in), Peclet(1.) {this->init_qois(1);}
 
   // Function to get computed QoI values
 
@@ -56,7 +57,7 @@ public:
   {
     if (!parameter_vector.size())
       for (std::size_t i = 0; i != parameters.size(); ++i)
-        parameter_vector.push_back(libmesh_make_unique<ParameterPointer<Number>>(&parameters[i]));
+        parameter_vector.push_back(std::make_unique<ParameterPointer<Number>>(&parameters[i]));
 
     return parameter_vector;
   }
@@ -117,7 +118,7 @@ public:
 
   virtual std::unique_ptr<FEMFunctionBase<Number>> clone () const
   {
-    return libmesh_make_unique<CoupledFEMFunctionsx>(*this);
+    return std::make_unique<CoupledFEMFunctionsx>(*this);
   }
 
   virtual void operator() (const FEMContext &,
@@ -148,7 +149,7 @@ public:
 
   virtual std::unique_ptr<FEMFunctionBase<Number>> clone () const
   {
-    return libmesh_make_unique<CoupledFEMFunctionsy>(*this);
+    return std::make_unique<CoupledFEMFunctionsy>(*this);
   }
 
   virtual void operator() (const FEMContext &,

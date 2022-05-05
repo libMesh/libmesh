@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -168,9 +168,14 @@ public:
   TypeVector (const TypeVector<T2> & p);
 
   /**
+   * Copy-constructor for the trivial case.
+   */
+  TypeVector (const TypeVector & p) = default;
+
+  /**
    * Destructor.
    */
-  ~TypeVector ();
+  ~TypeVector () = default;
 
   /**
    * Assign to this vector without creating a temporary.
@@ -554,14 +559,6 @@ TypeVector<T>::TypeVector (const TypeVector<T2> & p)
   // copy the nodes from vector p to me
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
     _coords[i] = p._coords[i];
-}
-
-
-
-template <typename T>
-inline
-TypeVector<T>::~TypeVector ()
-{
 }
 
 

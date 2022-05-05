@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -71,14 +71,13 @@ public:
    * (*this)(index_map[i]) will return f(i).
    */
   void attach_subfunction (const FEMFunctionBase<Output> & f,
-                           const std::vector<unsigned int> & index_map)
+                           std::vector<unsigned int> index_map)
   {
     const unsigned int subfunction_index =
       cast_int<unsigned int>(subfunctions.size());
     libmesh_assert_equal_to(subfunctions.size(), index_maps.size());
 
     subfunctions.push_back(f.clone());
-    index_maps.push_back(index_map);
 
     unsigned int max_index =
       *std::max_element(index_map.begin(), index_map.end());
@@ -98,6 +97,8 @@ public:
         reverse_index_map[index_map[j]] =
           std::make_pair(subfunction_index, j);
       }
+
+    index_maps.push_back(std::move(index_map));
   }
 
   virtual Output operator() (const FEMContext & c,

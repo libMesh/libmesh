@@ -3,12 +3,12 @@
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/remote_elem.h>
 #include <libmesh/replicated_mesh.h>
-#include <libmesh/auto_ptr.h> // libmesh_make_unique
 #include <libmesh/boundary_info.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <memory>
 
 using namespace libMesh;
 
@@ -18,7 +18,7 @@ class BoundaryMeshTest : public CppUnit::TestCase {
    * boundary meshes correctly.
    */
 public:
-  CPPUNIT_TEST_SUITE( BoundaryMeshTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( BoundaryMeshTest );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
@@ -35,10 +35,10 @@ protected:
 
   void build_mesh()
   {
-    _mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
-    _all_boundary_mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
-    _left_boundary_mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
-    _internal_boundary_mesh = libmesh_make_unique<Mesh>(*TestCommWorld);
+    _mesh = std::make_unique<Mesh>(*TestCommWorld);
+    _all_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
+    _left_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
+    _internal_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
 
     MeshTools::Generation::build_square(*_mesh, 3, 5,
                                         0.2, 0.8, 0.2, 0.7, QUAD9);
@@ -167,6 +167,8 @@ public:
 
   void testMesh()
   {
+    LOG_UNIT_TEST;
+
     // There'd better be 3*5 + 5 elements in the interior plus right
     // boundary
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(20),
@@ -307,7 +309,7 @@ class BoundaryRefinedMeshTest : public BoundaryMeshTest {
    * shared on the underlying quads, and so on.
    */
 public:
-  CPPUNIT_TEST_SUITE( BoundaryRefinedMeshTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( BoundaryRefinedMeshTest );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
@@ -333,6 +335,8 @@ public:
 
   void testMesh()
   {
+    LOG_UNIT_TEST;
+
     // There'd better be 3*5*4 + 5*2 active elements in the interior
     // plus right boundary
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(70),

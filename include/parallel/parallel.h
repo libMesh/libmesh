@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,10 +20,13 @@
 #define LIBMESH_PARALLEL_H
 
 // libMesh Includes
-#include "libmesh/auto_ptr.h" // for backwards compatibility, not internal use
 #include "libmesh/libmesh_call_mpi.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parallel_only.h"
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+#include "libmesh/auto_ptr.h" // for backwards compatibility, not internal use
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 // TIMPI includes
 #include "timpi/attributes.h"

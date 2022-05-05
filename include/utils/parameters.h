@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -99,14 +99,14 @@ public:
    * if a parameter of specified name exists regardless of its type.
    */
   template <typename T>
-  bool have_parameter (const std::string &) const;
+  bool have_parameter (std::string_view) const;
 
   /**
    * \returns A constant reference to the specified parameter
    * value.  Requires, of course, that the parameter exists.
    */
   template <typename T>
-  const T & get (const std::string &) const;
+  const T & get (std::string_view) const;
 
   /**
    * Inserts a new Parameter into the object but does not return
@@ -134,7 +134,7 @@ public:
   /**
    * Removes the specified parameter from the list, if it exists.
    */
-  void remove (const std::string &);
+  void remove (std::string_view);
 
   /**
    * \returns The total number of parameters.
@@ -270,7 +270,7 @@ protected:
   /**
    * Data structure to map names with values.
    */
-  std::map<std::string, Value *> _values;
+  std::map<std::string, Value *, std::less<>> _values;
 
 };
 
@@ -331,7 +331,7 @@ void Parameters::clear () // since this is inline we must define it
 inline
 Parameters & Parameters::operator= (const Parameters & source)
 {
-  this->clear();
+  this->Parameters::clear();
   *this += source;
 
   return *this;
@@ -361,7 +361,7 @@ Parameters::Parameters (const Parameters & p)
 inline
 Parameters::~Parameters ()
 {
-  this->clear ();
+  this->Parameters::clear ();
 }
 
 
@@ -402,7 +402,7 @@ std::ostream & operator << (std::ostream & os, const Parameters & p)
 
 template <typename T>
 inline
-bool Parameters::have_parameter (const std::string & name) const
+bool Parameters::have_parameter (std::string_view name) const
 {
   Parameters::const_iterator it = _values.find(name);
 
@@ -421,7 +421,7 @@ bool Parameters::have_parameter (const std::string & name) const
 
 template <typename T>
 inline
-const T & Parameters::get (const std::string & name) const
+const T & Parameters::get (std::string_view name) const
 {
   if (!this->have_parameter<T>(name))
     {
@@ -471,7 +471,7 @@ T & Parameters::set (const std::string & name)
 }
 
 inline
-void Parameters::remove (const std::string & name)
+void Parameters::remove (std::string_view name)
 {
   Parameters::iterator it = _values.find(name);
 

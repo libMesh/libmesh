@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -37,7 +37,7 @@
 #include <sstream>
 #include <iomanip>
 #include <unordered_map>
-
+#include <algorithm> // std::all_of
 
 namespace {
 
@@ -1221,12 +1221,14 @@ void UnstructuredMesh::all_first_order ()
 
 
 
-void UnstructuredMesh::all_second_order (const bool full_ordered)
+void
+UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & range,
+                                          const bool full_ordered)
 {
   // This function must be run on all processors at once
   parallel_object_only();
 
-  LOG_SCOPE("all_second_order()", "Mesh");
+  LOG_SCOPE("all_second_order_range()", "Mesh");
 
   /*
    * when the mesh is not prepared,
@@ -1244,18 +1246,20 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   if (!this->n_elem())
     return;
 
-  /*
-   * If the mesh is already second order
-   * then we have nothing to do.
-   * We have to test for this in a round-about way to avoid
-   * a bug on distributed parallel meshes with more processors
-   * than elements.
-   */
-  bool already_second_order = false;
-  if (this->elements_begin() != this->elements_end() &&
-      (*(this->elements_begin()))->default_order() != FIRST)
-    already_second_order = true;
-  this->comm().max(already_second_order);
+  // If every element in the range _on every proc_ is already second
+  // order then we have nothing to do. However, if any proc has some
+  // first-order elements in the range, then _all_ processors need to
+  // continue this function because it is parallel_only().  Note:
+  // std::all_of() returns true for an empty range, which can happen
+  // for example in the DistributedMesh case when there are more
+  // processors than elements. In the case of an empty range we
+  // therefore set already_second_order to true on that proc.
+  bool already_second_order =
+    std::all_of(range.begin(), range.end(),
+                [](const auto & elem){ return elem->default_order() == SECOND; });
+
+  // Check with other processors and possibly return early
+  this->comm().min(already_second_order);
   if (already_second_order)
     return;
 
@@ -1276,23 +1280,19 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   /*
    * The maximum number of new second order nodes we might be adding,
    * for use when picking unique unique_id values later. This variable
-   * is not used unless unique ids are enabled, so libmesh_ignore() it
-   * to avoid warnings in that case.
+   * is not used unless unique ids are enabled.
    */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
   unsigned int max_new_nodes_per_elem;
 
-#ifndef LIBMESH_ENABLE_UNIQUE_ID
-  libmesh_ignore(max_new_nodes_per_elem);
-#endif
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
   unique_id_type max_unique_id = this->parallel_max_unique_id();
 #endif
 
   /*
-   * for speed-up of the \p add_point() method, we
+   * For speed-up of the \p add_point() method, we
    * can reserve memory.  Guess the number of additional
-   * nodes for different dimensions
+   * nodes based on the element spatial dimensions and the
+   * total number of nodes in the mesh as an upper bound.
    */
   switch (this->mesh_dimension())
     {
@@ -1302,7 +1302,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * to Edge3.  Something like 1/2 of n_nodes() have
        * to be added
        */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 3 - 2;
+#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (1.5*static_cast<double>(this->n_nodes())));
       break;
@@ -1312,7 +1314,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * in 2D, either refine from Tri3 to Tri6 (double the nodes)
        * or from Quad4 to Quad8 (again, double) or Quad9 (2.25 that much)
        */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 9 - 4;
+#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (2*static_cast<double>(this->n_nodes())));
       break;
@@ -1325,7 +1329,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * quite some nodes, and since we do not want to overburden the memory by
        * a too conservative guess, use the lower bound
        */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 27 - 8;
+#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (2.5*static_cast<double>(this->n_nodes())));
       break;
@@ -1361,7 +1367,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
    * them with an equivalent second-order element.  Don't
    * forget to delete the low-order element, or else it will leak!
    */
-  for (auto & lo_elem : element_ptr_range())
+  for (auto & lo_elem : range)
     {
       // make sure it is linear order
       libmesh_error_msg_if(lo_elem->default_order() != FIRST,

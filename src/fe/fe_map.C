@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -17,11 +17,6 @@
 
 
 
-// C++ includes
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath> // for std::sqrt, std::abs
-
-
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
@@ -35,9 +30,13 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/tensor_value.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/int_range.h"
+
+// C++ includes
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath> // for std::sqrt, std::abs
+#include <memory>
 
 namespace libMesh
 {
@@ -77,10 +76,10 @@ std::unique_ptr<FEMap> FEMap::build( FEType fe_type )
   switch( fe_type.family )
     {
     case XYZ:
-      return libmesh_make_unique<FEXYZMap>();
+      return std::make_unique<FEXYZMap>();
 
     default:
-      return libmesh_make_unique<FEMap>();
+      return std::make_unique<FEMap>();
     }
 }
 
@@ -492,6 +491,9 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 #ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
   libmesh_assert(!compute_second_derivatives);
 #endif
+
+  // this parameter is only accounted for if LIBMESH_DIM==2.
+  libmesh_ignore(compute_second_derivatives);
 
   if (calculate_xyz)
     libmesh_assert_equal_to(phi_map.size(), elem_nodes.size());
@@ -2169,10 +2171,10 @@ Point FEMap::map_deriv (const unsigned int dim,
 
 
 // Explicit instantiation of FEMap member functions
-template void FEMap::init_reference_to_physical_map<0>( const std::vector<Point> &, const Elem *);
-template void FEMap::init_reference_to_physical_map<1>( const std::vector<Point> &, const Elem *);
-template void FEMap::init_reference_to_physical_map<2>( const std::vector<Point> &, const Elem *);
-template void FEMap::init_reference_to_physical_map<3>( const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_reference_to_physical_map<0>( const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_reference_to_physical_map<1>( const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_reference_to_physical_map<2>( const std::vector<Point> &, const Elem *);
+template LIBMESH_EXPORT void FEMap::init_reference_to_physical_map<3>( const std::vector<Point> &, const Elem *);
 
 // subdivision elements are implemented only for 2D meshes & reimplement
 // the inverse_maps method separately

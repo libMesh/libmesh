@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -59,7 +59,7 @@ SlepcEigenSolver<T>::SlepcEigenSolver (const Parallel::Communicator & comm_in) :
 template <typename T>
 SlepcEigenSolver<T>::~SlepcEigenSolver ()
 {
-  this->clear ();
+  this->SlepcEigenSolver::clear ();
 }
 
 
@@ -1063,7 +1063,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
 
 //------------------------------------------------------------------
 // Explicit instantiations
-template class SlepcEigenSolver<Number>;
+template class LIBMESH_EXPORT SlepcEigenSolver<Number>;
 
 } // namespace libMesh
 

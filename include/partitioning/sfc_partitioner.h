@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,9 +22,9 @@
 
 // Local Includes
 #include "libmesh/partitioner.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ Includes
+#include <memory>
 #include <string>
 
 namespace libMesh
@@ -65,19 +65,19 @@ public:
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<SFCPartitioner>(*this);
+    return std::make_unique<SFCPartitioner>(*this);
   }
 
   /**
    * Sets the type of space-filling curve to use.  Valid types are
    * "Hilbert" (the default) and "Morton".
    */
-  void set_sfc_type (const std::string & sfc_type)
+  void set_sfc_type (std::string sfc_type)
   {
     libmesh_assert ((sfc_type == "Hilbert") ||
                     (sfc_type == "Morton"));
 
-    _sfc_type = sfc_type;
+    _sfc_type = std::move(sfc_type);
   }
 
   /**

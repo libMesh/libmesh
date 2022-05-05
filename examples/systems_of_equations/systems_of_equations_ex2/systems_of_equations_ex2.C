@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -687,45 +687,16 @@ void set_lid_driven_bcs(TransientLinearImplicitSystem & system)
   // Get a convenient reference to the System's DofMap
   DofMap & dof_map = system.get_dof_map();
 
-  {
-    // u=v=0 on bottom, left, right
-    std::set<boundary_id_type> boundary_ids;
-    boundary_ids.insert(0);
-    boundary_ids.insert(1);
-    boundary_ids.insert(3);
-
-    std::vector<unsigned int> variables;
-    variables.push_back(u_var);
-    variables.push_back(v_var);
-
-    dof_map.add_dirichlet_boundary(DirichletBoundary(boundary_ids,
-                                                     variables,
-                                                     ZeroFunction<Number>()));
-  }
-  {
-    // u=1 on top
-    std::set<boundary_id_type> boundary_ids;
-    boundary_ids.insert(2);
-
-    std::vector<unsigned int> variables;
-    variables.push_back(u_var);
-
-    dof_map.add_dirichlet_boundary(DirichletBoundary(boundary_ids,
-                                                     variables,
-                                                     ConstFunction<Number>(1.)));
-  }
-  {
-    // v=0 on top
-    std::set<boundary_id_type> boundary_ids;
-    boundary_ids.insert(2);
-
-    std::vector<unsigned int> variables;
-    variables.push_back(v_var);
-
-    dof_map.add_dirichlet_boundary(DirichletBoundary(boundary_ids,
-                                                     variables,
-                                                     ZeroFunction<Number>()));
-  }
+  // u=v=0 on bottom, left, right
+  dof_map.add_dirichlet_boundary(DirichletBoundary({0,1,3},
+                                                   {u_var, v_var},
+                                                   ZeroFunction<Number>()));
+  // u=1 on top
+  dof_map.add_dirichlet_boundary(DirichletBoundary({2}, {u_var},
+                                                   ConstFunction<Number>(1.)));
+  // v=0 on top
+  dof_map.add_dirichlet_boundary(DirichletBoundary({2}, {v_var},
+                                                   ZeroFunction<Number>()));
 #endif // LIBMESH_ENABLE_DIRICHLET
 }
 
@@ -745,70 +716,35 @@ void set_stagnation_bcs(TransientLinearImplicitSystem & system)
   // Get a convenient reference to the System's DofMap
   DofMap & dof_map = system.get_dof_map();
 
+  // u=v=0 on bottom (boundary 0)
+  dof_map.add_dirichlet_boundary(DirichletBoundary({0}, {u_var, v_var},
+                                                   ZeroFunction<Number>()));
+  // u=0 on left (boundary 3) (symmetry)
+  dof_map.add_dirichlet_boundary(DirichletBoundary({3}, {u_var},
+                                                   ZeroFunction<Number>()));
   {
-    // u=v=0 on bottom
-    std::set<boundary_id_type> boundary_ids;
-    boundary_ids.insert(0);
-
-    std::vector<unsigned int> variables;
-    variables.push_back(u_var);
-    variables.push_back(v_var);
-
-    dof_map.add_dirichlet_boundary(DirichletBoundary(boundary_ids,
-                                                     variables,
-                                                     ZeroFunction<Number>()));
-  }
-  {
-    // u=0 on left (symmetry)
-    std::set<boundary_id_type> boundary_ids;
-    boundary_ids.insert(3);
-
-    std::vector<unsigned int> variables;
-    variables.push_back(u_var);
-
-    dof_map.add_dirichlet_boundary(DirichletBoundary(boundary_ids,
-                                                     variables,
-                                                     ZeroFunction<Number>()));
-  }
-  {
-    // u = k*x on top
-    std::set<boundary_id_type> boundary_ids;
-    boundary_ids.insert(2);
-
-    std::vector<unsigned int> variables;
-    variables.push_back(u_var);
+    // u = k*x on top (boundary 2)
 
     // Set up ParsedFunction parameters
-    std::vector<std::string> additional_vars;
-    additional_vars.push_back("k");
-    std::vector<Number> initial_vals;
-    initial_vals.push_back(1.);
+    std::vector<std::string> additional_vars {"k"};
+    std::vector<Number> initial_vals {1.};
 
-    dof_map.add_dirichlet_boundary(DirichletBoundary(boundary_ids,
-                                                     variables,
+    dof_map.add_dirichlet_boundary(DirichletBoundary({2}, {u_var},
                                                      ParsedFunction<Number>("k*x",
                                                                             &additional_vars,
                                                                             &initial_vals)));
   }
   {
-    // v = -k*y on top
-    std::set<boundary_id_type> boundary_ids;
-    boundary_ids.insert(2);
-
-    std::vector<unsigned int> variables;
-    variables.push_back(v_var);
+    // v = -k*y on top (boundary 2)
 
     // Set up ParsedFunction parameters
-    std::vector<std::string> additional_vars;
-    additional_vars.push_back("k");
-    std::vector<Number> initial_vals;
-    initial_vals.push_back(1.);
+    std::vector<std::string> additional_vars {"k"};
+    std::vector<Number> initial_vals {1.};
 
     // Note: we have to specify LOCAL_VARIABLE_ORDER here, since we're
     // using a ParsedFunction to set the value of v_var, which is
     // actually the second variable in the system.
-    dof_map.add_dirichlet_boundary(DirichletBoundary(boundary_ids,
-                                                     variables,
+    dof_map.add_dirichlet_boundary(DirichletBoundary({2}, {v_var},
                                                      ParsedFunction<Number>("-k*y",
                                                                             &additional_vars,
                                                                             &initial_vals),

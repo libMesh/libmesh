@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -152,23 +152,23 @@ Partitioner::build (const PartitionerType partitioner_type)
   switch (partitioner_type)
   {
     case CENTROID_PARTITIONER:
-      return libmesh_make_unique<CentroidPartitioner>();
+      return std::make_unique<CentroidPartitioner>();
     case LINEAR_PARTITIONER:
-      return libmesh_make_unique<LinearPartitioner>();
+      return std::make_unique<LinearPartitioner>();
     case MAPPED_SUBDOMAIN_PARTITIONER:
-      return libmesh_make_unique<MappedSubdomainPartitioner>();
+      return std::make_unique<MappedSubdomainPartitioner>();
     case METIS_PARTITIONER:
-      return libmesh_make_unique<MetisPartitioner>();
+      return std::make_unique<MetisPartitioner>();
     case PARMETIS_PARTITIONER:
-      return libmesh_make_unique<ParmetisPartitioner>();
+      return std::make_unique<ParmetisPartitioner>();
     case HILBERT_SFC_PARTITIONER:
-      return libmesh_make_unique<HilbertSFCPartitioner>();
+      return std::make_unique<HilbertSFCPartitioner>();
     case MORTON_SFC_PARTITIONER:
-      return libmesh_make_unique<MortonSFCPartitioner>();
+      return std::make_unique<MortonSFCPartitioner>();
     case SFC_PARTITIONER:
-      return libmesh_make_unique<SFCPartitioner>();
+      return std::make_unique<SFCPartitioner>();
     case SUBDOMAIN_PARTITIONER:
-      return libmesh_make_unique<SubdomainPartitioner>();
+      return std::make_unique<SubdomainPartitioner>();
     default:
       libmesh_error_msg("Invalid partitioner type: " <<
                         Utility::enum_to_string(partitioner_type));
@@ -1079,7 +1079,7 @@ void Partitioner::_find_global_index_by_pid_map(const MeshBase & mesh)
 
 void Partitioner::build_graph (const MeshBase & mesh)
 {
-  LOG_SCOPE("build_graph()", "ParmetisPartitioner");
+  LOG_SCOPE("build_graph()", "Partitioner");
 
   const dof_id_type n_active_local_elem  = mesh.n_active_local_elem();
   // If we have boundary elements in this mesh, we want to account for
@@ -1136,7 +1136,7 @@ void Partitioner::build_graph (const MeshBase & mesh)
       std::vector<dof_id_type> & graph_row = _dual_graph[local_index];
 
       // Save this off to make it easy to index later
-      _local_id_to_elem[local_index] = elem;
+      _local_id_to_elem[local_index] = const_cast<Elem*>(elem);
 
       // Loop over the element's neighbors.  An element
       // adjacency corresponds to a face neighbor
@@ -1237,9 +1237,9 @@ void Partitioner::build_graph (const MeshBase & mesh)
 
 }
 
-void Partitioner::assign_partitioning (const MeshBase & mesh, const std::vector<dof_id_type> & parts)
+void Partitioner::assign_partitioning (MeshBase & mesh, const std::vector<dof_id_type> & parts)
 {
-  LOG_SCOPE("assign_partitioning()", "ParmetisPartitioner");
+  LOG_SCOPE("assign_partitioning()", "Partitioner");
 
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());

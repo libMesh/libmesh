@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -941,6 +941,16 @@ public:
   Point vertex_average () const;
 
   /**
+   * \returns The "circumcenter of mass" (area-weighted average of
+   * triangulation circumcenters) of the element.
+   *
+   * Not implemented for infinite elements, not currently implemented
+   * for 3D elements, currently ignores curvature of element edges.
+   */
+  virtual Point quasicircumcenter () const
+  { libmesh_not_implemented(); }
+
+  /**
    * \returns The minimum vertex separation for the element.
    */
   virtual Real hmin () const;
@@ -1190,8 +1200,9 @@ public:
   second_order_child_vertex (const unsigned int n) const;
 
   /**
-   * \returns The element type of the associated second-order element,
-   * or INVALID_ELEM for second-order or other elements that cannot be
+   * \returns The ElemType of the associated second-order element
+   * (which will be the same as the input if the input is already a
+   * second-order ElemType) or INVALID_ELEM for elements that cannot be
    * converted into higher order equivalents.
    *
    * For example, when \p this is a \p TET4, then \p TET10 is returned.
@@ -2153,13 +2164,13 @@ Elem::Elem(const unsigned int nn,
   // Initialize the neighbors/parent data structure
   // _elemlinks = new Elem *[ns+1];
 
-  if (_elemlinks)
-    {
-      _elemlinks[0] = p;
+  // We now require that we get allocated data from a subclass
+  libmesh_assert (_elemlinks);
 
-      for (unsigned int n=1; n<ns+1; n++)
-        _elemlinks[n] = nullptr;
-    }
+  _elemlinks[0] = p;
+
+  for (unsigned int n=1; n<ns+1; n++)
+    _elemlinks[n] = nullptr;
 
   // Optionally initialize data from the parent
   if (this->parent() != nullptr)
@@ -2509,7 +2520,7 @@ Elem::simple_build_side_ptr (const unsigned int i,
   if (proxy)
     {
 #ifdef LIBMESH_ENABLE_DEPRECATED
-      face = libmesh_make_unique<Side<Sideclass,Subclass>>(this,i);
+      face = std::make_unique<Side<Sideclass,Subclass>>(this,i);
       libmesh_deprecated();
 #else
       libmesh_error();
@@ -2517,7 +2528,7 @@ Elem::simple_build_side_ptr (const unsigned int i,
     }
   else
     {
-      face = libmesh_make_unique<Sideclass>(this);
+      face = std::make_unique<Sideclass>(this);
       for (auto n : face->node_index_range())
         face->set_node(n) = this->node_ptr(Subclass::side_nodes_map[i][n]);
     }
@@ -2625,7 +2636,7 @@ Elem::simple_build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 
-  std::unique_ptr<Elem> edge = libmesh_make_unique<Edgeclass>(this);
+  std::unique_ptr<Elem> edge = std::make_unique<Edgeclass>(this);
 
   for (auto n : edge->node_index_range())
     edge->set_node(n) = this->node_ptr(Subclass::edge_nodes_map[i][n]);

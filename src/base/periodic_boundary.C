@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,10 @@
 
 #include "libmesh/libmesh.h" // libMesh::invalid_uint
 #include "libmesh/periodic_boundary.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
+
 
 namespace libMesh
 {
@@ -65,7 +68,7 @@ Point PeriodicBoundary::get_corresponding_pos(const Point & pt) const
 
 std::unique_ptr<PeriodicBoundaryBase> PeriodicBoundary::clone(TransformationType t) const
 {
-  return libmesh_make_unique<PeriodicBoundary>(*this, t);
+  return std::make_unique<PeriodicBoundary>(*this, t);
 }
 
 

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,11 +30,11 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/zero_function.h"
 #include "libmesh/elem.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <array>
 #include <functional> // std::reference_wrapper
+#include <memory>
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -66,7 +66,7 @@ public:
   }
 
   virtual std::unique_ptr<FunctionBase<Number>> clone() const
-  { return libmesh_make_unique<BdyFunction>(_u_var, _v_var, _w_var, _Re); }
+  { return std::make_unique<BdyFunction>(_u_var, _v_var, _w_var, _Re); }
 
 private:
   const unsigned int _u_var, _v_var, _w_var;
@@ -132,8 +132,7 @@ void NavierSystem::init_data ()
 #ifdef LIBMESH_ENABLE_DIRICHLET
   const boundary_id_type top_id = (dim==3) ? 5 : 2;
 
-  std::set<boundary_id_type> top_bdys;
-  top_bdys.insert(top_id);
+  std::set<boundary_id_type> top_bdys { top_id };
 
   const boundary_id_type all_ids[6] = {0, 1, 2, 3, 4, 5};
   std::set<boundary_id_type> all_bdys(all_ids, all_ids+(dim*2));
@@ -141,14 +140,7 @@ void NavierSystem::init_data ()
   std::set<boundary_id_type> nontop_bdys = all_bdys;
   nontop_bdys.erase(top_id);
 
-  std::vector<unsigned int> u_only(1, u_var);
-  std::vector<unsigned int> vw(1, v_var), uvw(1, u_var);
-  uvw.push_back(v_var);
-  if (dim == 3)
-    {
-      vw.push_back(w_var);
-      uvw.push_back(w_var);
-    }
+  std::vector<unsigned int> uvw {u_var, v_var, w_var};
 
   ZeroFunction<Number> zero;
   ConstFunction<Number> one(1);
@@ -156,9 +148,9 @@ void NavierSystem::init_data ()
   if (application == 0)
     {
       this->get_dof_map().add_dirichlet_boundary
-        (DirichletBoundary (top_bdys, u_only, &one));
+        (DirichletBoundary (top_bdys, {u_var}, &one));
       this->get_dof_map().add_dirichlet_boundary
-        (DirichletBoundary (top_bdys, vw, &zero));
+        (DirichletBoundary (top_bdys, {v_var,w_var}, &zero));
       this->get_dof_map().add_dirichlet_boundary
         (DirichletBoundary (nontop_bdys, uvw, &zero));
     }

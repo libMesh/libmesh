@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,27 +25,11 @@
 #ifdef LIBMESH_HAVE_TRIANGLE
 
 // Local Includes
-#include "libmesh/libmesh.h"
 #include "libmesh/mesh_serializer.h"
-
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum ElemType : int;
-}
-#else
-#include "libmesh/enum_elem_type.h"
-#endif
-
-// C++ includes
-#include <cstddef>
-#include <vector>
+#include "libmesh/triangulator_interface.h"
 
 namespace libMesh
 {
-
-// Forward Declarations
-class UnstructuredMesh;
 
 /**
  * A C++ interface between LibMesh and the Triangle library written by
@@ -54,7 +38,7 @@ class UnstructuredMesh;
  * \author John W. Peterson
  * \date 2011
  */
-class TriangleInterface
+class TriangleInterface : public TriangulatorInterface
 {
 public:
   /**
@@ -69,204 +53,23 @@ public:
   /**
    * Empty destructor.
    */
-  ~TriangleInterface() = default;
+  virtual ~TriangleInterface() = default;
 
   /**
-   * The TriangulationType is used with the general triangulate function
-   * defined below.
+   * Internally, this calls Triangle's triangulate routine.
    */
-  enum TriangulationType
-    {
-      /**
-       * Uses the triangle library to first generate a convex hull from the set
-       * of points passed in, and then triangulate this set of points.  This
-       * is probably the most common type of usage.
-       */
-      GENERATE_CONVEX_HULL = 0,
-
-      /**
-       * Use the triangle library to triangulate a Planar Straight Line
-       * Graph which is defined implicitly by the order of the "points" vector:
-       * a straight line is assumed to lie between each successive pair of
-       * points, with an additional line joining the final and first points.
-       * In case your triangulation is a little too "structured" looking
-       * (which can happen when the initial PSLG is really simple) you can try to
-       * make the resulting triangulation a little more "unstructured" looking
-       * by setting insert_points to true in the triangulate() function.
-       */
-      PSLG = 1,
-
-      /**
-       * Does nothing, used as a default value.
-       */
-      INVALID_TRIANGULATION_TYPE
-    };
-
-  /**
-   * The hole class and its several subclasses define the interface
-   * and functionality of a "hole" which appears in a 2D mesh.
-   * See mesh_triangle_holes.C/h for definitions.
-   */
-  class Hole;
-  class PolygonHole;
-  class ArbitraryHole;
-
-  /**
-   * The region class defines the interface
-   * and functionality of a "region" which appears in a 2D mesh.
-   * See mesh_triangle_holes.C/h for definitions.
-   */
-  class Region;
-
-  /**
-   * This is the main public interface for this function.
-   * Internally, it calls Triangle's triangulate routine.
-   */
-  void triangulate();
-
-  /**
-   * Sets and/or gets the desired element type.
-   */
-  ElemType & elem_type() {return _elem_type;}
-
-  /**
-   * Sets and/or gets the desired triangle area. Set to zero to disable
-   * area constraint.
-   */
-  Real & desired_area() {return _desired_area;}
-
-  /**
-   * Sets and/or gets the minimum angle. Set to zero to disable area
-   * constraint.
-   */
-  Real & minimum_angle() {return _minimum_angle;}
+  virtual void triangulate() override;
 
   /**
    * Sets and/or gets additional flags to be passed to triangle
    */
   std::string & extra_flags() {return _extra_flags;}
 
-  /**
-   * Sets and/or gets the desired triangulation type.
-   */
-  TriangulationType & triangulation_type() {return _triangulation_type;}
-
-  /**
-   * Sets and/or gets the flag for inserting add'l points.
-   */
-  bool & insert_extra_points() {return _insert_extra_points;}
-
-  /**
-   * Sets/gets flag which tells whether to do Delaunay mesh
-   * smoothing after generating the grid.
-   */
-  bool & smooth_after_generating() {return _smooth_after_generating;}
-
-  /**
-   * Whether or not to make Triangle quiet
-   */
-  bool & quiet() {return _quiet;}
-
-  /**
-   * Attaches a vector of Hole* pointers which will be
-   * meshed around.
-   */
-  void attach_hole_list(const std::vector<Hole*> * holes) {_holes = holes;}
-
-  /**
-   * When constructing a PSLG, it is often not possible to do
-   * so implicitly through the ordering of the points.  You
-   * can use the segments vector to specify the segments explicitly,
-   * Ex: unit square numbered counter-clockwise starting from origin
-   * segments[0] = (0,1)
-   * segments[1] = (1,2)
-   * segments[2] = (2,3)
-   * segments[3] = (3,0)
-   * For this case you could actually use the implicit ordering!
-   */
-  std::vector<std::pair<unsigned int, unsigned int>> segments;
-
-  /**
-   * Attaches boundary markers.
-   * If segments is set, the number of markers must be equal to the size of segments,
-   * otherwise, it is equal to the number of points.
-   */
-  void attach_boundary_marker(const std::vector<int> * markers) { _markers = markers; }
-
-  /**
-   * Attaches regions for using attribute to set subdomain IDs and better
-   * controlling the triangle sizes within the regions.
-   */
-  void attach_region_list(const std::vector<Region*> * regions) { _regions = regions; }
-
 private:
-  /**
-   * Reference to the mesh which is to be created by triangle.
-   */
-  UnstructuredMesh & _mesh;
-
-  /**
-   * A pointer to a vector of Hole*s.  If this is nullptr, there
-   * are no holes!
-   */
-  const std::vector<Hole*> * _holes;
-
-  /**
-   * Boundary markers
-   */
-  const std::vector<int> * _markers;
-
-  /**
-   * A pointer to a vector of Regions*s.  If this is nullptr, there
-   * are no regions!
-   */
-  const std::vector<Region*> * _regions;
-
-  /**
-   * The type of elements to generate.  (Defaults to
-   * TRI3).
-   */
-  ElemType _elem_type;
-
-  /**
-   * The desired area for the elements in the resulting mesh.
-   */
-  Real _desired_area;
-
-  /**
-   * Minimum angle in triangles
-   */
-  Real _minimum_angle;
-
   /**
    * Additional flags to be passed to triangle
    */
   std::string _extra_flags;
-
-  /**
-   * The type of triangulation to perform: choices are:
-   * convex hull
-   * PSLG
-   */
-  TriangulationType _triangulation_type;
-
-  /**
-   * Flag which tells whether or not to insert additional nodes
-   * before triangulation.  This can sometimes be used to "de-regularize"
-   * the resulting triangulation.
-   */
-  bool _insert_extra_points;
-
-  /**
-   * Flag which tells whether we should smooth the mesh after
-   * it is generated.  True by default.
-   */
-  bool _smooth_after_generating;
-
-  /**
-   * Flag which tells if we want to suppress Triangle outputs
-   */
-  bool _quiet;
 
   /**
    * Triangle only operates on serial meshes.
@@ -275,8 +78,6 @@ private:
 };
 
 } // namespace libMesh
-
-
 
 #endif // LIBMESH_HAVE_TRIANGLE
 

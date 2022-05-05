@@ -2,11 +2,13 @@
 #include "libmesh/mesh_generation.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/replicated_mesh.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // Example includes
 #include "biharmonic.h"
 #include "biharmonic_jr.h"
+
+// C++ includes
+#include <memory>
 
 using namespace libMesh;
 
@@ -129,9 +131,6 @@ Biharmonic::Biharmonic(ReplicatedMesh & mesh) :
   _initialCenter = Point(icenter[0], icenter[1], icenter[2]);
   _initialWidth = command_line_value("initial_width", 0.125);
 
-  // Build the main equation encapsulated in the JR (Jacobian-Residual or J(R) "jet of R") object
-  _jr = &(add_system<Biharmonic::JR>(std::string("Biharmonic::JR")));
-
   // Output options
 #ifdef LIBMESH_HAVE_EXODUS_API
   if (on_command_line("output_base"))
@@ -156,7 +155,7 @@ Biharmonic::Biharmonic(ReplicatedMesh & mesh) :
         }
     }
   _ofile = _ofile_base + ".e";
-  _exio = libmesh_make_unique<ExodusII_IO>(_mesh);
+  _exio = std::make_unique<ExodusII_IO>(_mesh);
   _o_dt = command_line_value("output_dt", 0.0);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 } // constructor
@@ -212,6 +211,9 @@ void Biharmonic::viewParameters()
 
 void Biharmonic::init()
 {
+  // Build the main equation encapsulated in the JR (Jacobian-Residual or J(R) "jet of R") object
+  _jr = &(add_system<Biharmonic::JR>(std::string("Biharmonic::JR")));
+
   if (_verbose)
     libMesh::out << ">>> Initializing Biharmonic\n";
 

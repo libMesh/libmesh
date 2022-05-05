@@ -39,7 +39,7 @@ struct PeriodicQuadFunction : public FunctionBase<Number>
   PeriodicQuadFunction() = default;
 
   virtual std::unique_ptr<FunctionBase<Number>> clone () const
-  { return libmesh_make_unique<PeriodicQuadFunction>(); }
+  { return std::make_unique<PeriodicQuadFunction>(); }
 
   // We only really need the vector-valued output for projections
   virtual Number operator() (const Point &,
@@ -160,7 +160,7 @@ const boundary_id_type side_id   = 70;
 
 class PeriodicBCTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( PeriodicBCTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( PeriodicBCTest );
 
 #if LIBMESH_DIM > 1
 #if defined(LIBMESH_HAVE_SOLVER) && defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_GZSTREAM)
@@ -250,7 +250,7 @@ private:
   }
 
 
-  void testPeriodicLagrange2() { testPeriodicBC(FEType(SECOND, LAGRANGE)); }
+  void testPeriodicLagrange2() { LOG_UNIT_TEST; testPeriodicBC(FEType(SECOND, LAGRANGE)); }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( PeriodicBCTest );

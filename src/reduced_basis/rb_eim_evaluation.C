@@ -65,6 +65,7 @@ void RBEIMEvaluation::clear()
   _interpolation_points_side_index.clear();
   _interpolation_points_qp.clear();
   _interpolation_points_phi_i_qp.clear();
+  _interpolation_points_spatial_indices.clear();
 
   _interpolation_matrix.resize(0,0);
 
@@ -84,6 +85,7 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
   _interpolation_points_side_index.clear();
   _interpolation_points_qp.clear();
   _interpolation_points_phi_i_qp.clear();
+  _interpolation_points_spatial_indices.clear();
 
   _interpolation_matrix.resize(Nmax,Nmax);
 }
@@ -227,6 +229,28 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
     }
 }
 
+void RBEIMEvaluation::initialize_interpolation_points_spatial_indices()
+{
+  _interpolation_points_spatial_indices.clear();
+
+  get_parametrized_function().get_spatial_indices(_interpolation_points_spatial_indices,
+                                                  _interpolation_points_elem_id,
+                                                  _interpolation_points_side_index,
+                                                  _interpolation_points_qp,
+                                                  _interpolation_points_subdomain_id,
+                                                  _interpolation_points_boundary_id);
+}
+
+void RBEIMEvaluation::initialize_param_fn_spatial_indices()
+{
+  get_parametrized_function().initialize_spatial_indices(_interpolation_points_spatial_indices,
+                                                         _interpolation_points_elem_id,
+                                                         _interpolation_points_side_index,
+                                                         _interpolation_points_qp,
+                                                         _interpolation_points_subdomain_id,
+                                                         _interpolation_points_boundary_id);
+}
+
 unsigned int RBEIMEvaluation::get_n_basis_functions() const
 {
   if (get_parametrized_function().on_mesh_sides())
@@ -251,11 +275,8 @@ void RBEIMEvaluation::decrement_vector(QpDataMap & v,
   libmesh_error_msg_if(get_n_basis_functions() != coeffs.size(),
                        "Error: Number of coefficients should match number of basis functions");
 
-  for (auto & pr : v)
+  for (auto & [elem_id, v_comp_and_qp] : v)
     {
-      dof_id_type elem_id = pr.first;
-      auto & v_comp_and_qp = pr.second;
-
       for (const auto & comp : index_range(v_comp_and_qp))
         for (unsigned int qp : index_range(v_comp_and_qp[comp]))
           for (unsigned int i : index_range(_local_eim_basis_functions))
@@ -280,11 +301,8 @@ void RBEIMEvaluation::side_decrement_vector(SideQpDataMap & v,
   libmesh_error_msg_if(get_n_basis_functions() != coeffs.size(),
                        "Error: Number of coefficients should match number of basis functions");
 
-  for (auto & pr : v)
+  for (auto & [elem_and_side, v_comp_and_qp] : v)
     {
-      auto elem_and_side = pr.first;
-      auto & v_comp_and_qp = pr.second;
-
       for (const auto & comp : index_range(v_comp_and_qp))
         for (unsigned int qp : index_range(v_comp_and_qp[comp]))
           for (unsigned int i : index_range(_local_side_eim_basis_functions))
@@ -316,7 +334,7 @@ std::vector<std::unique_ptr<RBTheta>> & RBEIMEvaluation::get_eim_theta_objects()
 
 std::unique_ptr<RBTheta> RBEIMEvaluation::build_eim_theta(unsigned int index)
 {
-  return libmesh_make_unique<RBEIMTheta>(*this, index);
+  return std::make_unique<RBEIMTheta>(*this, index);
 }
 
 void RBEIMEvaluation::get_parametrized_function_values_at_qps(
@@ -566,6 +584,11 @@ void RBEIMEvaluation::add_interpolation_points_phi_i_qp(const std::vector<Real> 
   _interpolation_points_phi_i_qp.emplace_back(phi_i_qp);
 }
 
+void RBEIMEvaluation::add_interpolation_points_spatial_indices(const std::vector<unsigned int> & spatial_indices)
+{
+  _interpolation_points_spatial_indices.emplace_back(spatial_indices);
+}
+
 Point RBEIMEvaluation::get_interpolation_points_xyz(unsigned int index) const
 {
   libmesh_error_msg_if(index >= _interpolation_points_xyz.size(), "Error: Invalid index");
@@ -627,6 +650,18 @@ const std::vector<Real> & RBEIMEvaluation::get_interpolation_points_phi_i_qp(uns
   libmesh_error_msg_if(index >= _interpolation_points_phi_i_qp.size(), "Error: Invalid index");
 
   return _interpolation_points_phi_i_qp[index];
+}
+
+const std::vector<unsigned int> & RBEIMEvaluation::get_interpolation_points_spatial_indices(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _interpolation_points_spatial_indices.size(), "Error: Invalid index");
+
+  return _interpolation_points_spatial_indices[index];
+}
+
+unsigned int RBEIMEvaluation::get_n_interpolation_points_spatial_indices() const
+{
+  return _interpolation_points_spatial_indices.size();
 }
 
 void RBEIMEvaluation::set_interpolation_matrix_entry(unsigned int i, unsigned int j, Number value)
@@ -805,20 +840,17 @@ write_out_interior_basis_functions(const std::string & directory_name,
       std::vector<unsigned int> n_qp_per_elem;
       n_qp_per_elem.reserve(n_elem);
       dof_id_type expected_elem_id = 0;
-      for (const auto & pr : _local_eim_basis_functions[0])
+      for (const auto & [actual_elem_id, array] : _local_eim_basis_functions[0])
         {
           // Note: Currently we require that the Elems are numbered
           // contiguously from [0..n_elem).  This allows us to avoid
           // writing the Elem ids to the Xdr file, but if we need to
           // generalize this assumption later, we can.
-          const auto & actual_elem_id = pr.first;
-
           libmesh_error_msg_if(actual_elem_id != expected_elem_id++,
                                "RBEIMEvaluation currently assumes a contiguous Elem numbering starting from 0.");
 
           // array[n_vars][n_qp] per Elem. We get the number of QPs
           // for variable 0, assuming they are all the same.
-          const auto & array = pr.second;
           n_qp_per_elem.push_back(array[0].size());
         }
       xdr.data(n_qp_per_elem, "# Number of QPs per Elem");
@@ -926,15 +958,13 @@ write_out_side_basis_functions(const std::string & directory_name,
       elem_ids.reserve(n_elem);
       side_indices.reserve(n_elem);
       n_qp_per_elem_side.reserve(n_elem);
-      for (const auto & pr : _local_side_eim_basis_functions[0])
+      for (const auto & [elem_side_pair, array] : _local_side_eim_basis_functions[0])
         {
-          const auto & elem_side_pair = pr.first;
           elem_ids.push_back(elem_side_pair.first);
           side_indices.push_back(elem_side_pair.second);
 
           // array[n_vars][n_qp] per Elem. We get the number of QPs
           // for variable 0, assuming they are all the same.
-          const auto & array = pr.second;
           n_qp_per_elem_side.push_back(array[0].size());
         }
       xdr.data(elem_ids, "# Elem IDs");
@@ -1208,10 +1238,9 @@ void RBEIMEvaluation::print_local_eim_basis_functions() const
   for (auto bf : index_range(_local_eim_basis_functions))
     {
       libMesh::out << "Interior basis function " << bf << std::endl;
-      for (const auto & pr : _local_eim_basis_functions[bf])
+      for (const auto & [elem_id, array] : _local_eim_basis_functions[bf])
         {
-          libMesh::out << "Elem " << pr.first << std::endl;
-          const auto & array = pr.second;
+          libMesh::out << "Elem " << elem_id << std::endl;
           for (auto var : index_range(array))
             {
               libMesh::out << "Variable " << var << std::endl;
@@ -1225,12 +1254,11 @@ void RBEIMEvaluation::print_local_eim_basis_functions() const
   for (auto bf : index_range(_local_side_eim_basis_functions))
     {
       libMesh::out << "Side basis function " << bf << std::endl;
-      for (const auto & pr : _local_side_eim_basis_functions[bf])
+      for (const auto & [pr, array] : _local_side_eim_basis_functions[bf])
         {
-          const auto & elem_id = pr.first.first;
-          const auto & side_index = pr.first.second;
+          const auto & elem_id = pr.first;
+          const auto & side_index = pr.second;
           libMesh::out << "Elem " << elem_id << ", Side " << side_index << std::endl;
-          const auto & array = pr.second;
           for (auto var : index_range(array))
             {
               libMesh::out << "Variable " << var << std::endl;

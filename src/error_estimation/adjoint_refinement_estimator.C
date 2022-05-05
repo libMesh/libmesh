@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -189,13 +189,8 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
   // We'll want to back up all coarse grid vectors
   std::map<std::string, std::unique_ptr<NumericVector<Number>>> coarse_vectors;
-  for (const auto & pr : as_range(system.vectors_begin(), system.vectors_end()))
-    {
-      // The (string) name of this vector
-      const std::string & var_name = pr.first;
-
-      coarse_vectors[var_name] = pr.second->clone();
-    }
+  for (const auto & [var_name, vec] : as_range(system.vectors_begin(), system.vectors_end()))
+    coarse_vectors[var_name] = vec->clone();
 
   // Back up the coarse solution and coarse local solution
   std::unique_ptr<NumericVector<Number>> coarse_solution = system.solution->clone();

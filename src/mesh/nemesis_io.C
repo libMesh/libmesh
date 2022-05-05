@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,9 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <numeric> // std::accumulate
-
 // LibMesh includes
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/dof_map.h" // local_index
@@ -29,14 +26,17 @@
 #include "libmesh/nemesis_io_helper.h"
 #include "libmesh/node.h"
 #include "libmesh/parallel.h"
-#include "libmesh/utility.h" // is_sorted, deallocate
+#include "libmesh/utility.h" // deallocate
 #include "libmesh/boundary_info.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/int_range.h"
-#include "libmesh/auto_ptr.h"
+
+// C++ includes
+#include <memory>
+#include <numeric> // std::accumulate
 
 namespace libMesh
 {
@@ -99,7 +99,7 @@ Nemesis_IO::Nemesis_IO (MeshBase & mesh,
   MeshOutput<MeshBase> (mesh, /*is_parallel_format=*/true),
   ParallelObject (mesh),
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-  nemhelper(libmesh_make_unique<Nemesis_IO_Helper>(*this, false, single_precision)),
+  nemhelper(std::make_unique<Nemesis_IO_Helper>(*this, false, single_precision)),
   _timestep(1),
 #endif
   _verbose (false),
@@ -976,8 +976,8 @@ void Nemesis_IO::read (const std::string & base_filename)
       if (nemhelper->num_side_sets > 0)
         {
           libMesh::out << "Sideset names are: ";
-          for (const auto & pr : nemhelper->id_to_ss_names)
-            libMesh::out << "(" << pr.first << "," << pr.second << ") ";
+          for (const auto & [id, name] : nemhelper->id_to_ss_names)
+            libMesh::out << "(" << id << "," << name << ") ";
           libMesh::out << std::endl;
         }
     }
@@ -1086,8 +1086,8 @@ void Nemesis_IO::read (const std::string & base_filename)
       if (nemhelper->num_node_sets > 0)
         {
           libMesh::out << "Nodeset names are: ";
-          for (const auto & pr : nemhelper->id_to_ns_names)
-            libMesh::out << "(" << pr.first << "," << pr.second << ") ";
+          for (const auto & [id, name] : nemhelper->id_to_ns_names)
+            libMesh::out << "(" << id << "," << name << ") ";
           libMesh::out << std::endl;
         }
     }

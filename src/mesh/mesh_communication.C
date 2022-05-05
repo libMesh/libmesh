@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -393,9 +393,12 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   std::vector<Parallel::Request>
     node_send_requests, element_send_requests;
 
+  // Be compatible with both deprecated and corrected MeshBase iterator types
+  typedef std::remove_const<MeshBase::const_element_iterator::value_type>::type nc_v_t;
+
   // We're going to sort elements-to-send by pid in one pass, to avoid
   // sending predicated iterators through the whole mesh N_p times
-  std::unordered_map<processor_id_type, std::vector<Elem *>> send_to_pid;
+  std::unordered_map<processor_id_type, std::vector<nc_v_t>> send_to_pid;
 
   const MeshBase::const_element_iterator send_elems_begin =
 #ifdef LIBMESH_ENABLE_AMR
@@ -417,9 +420,8 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   // If we don't have any just-coarsened elements to send to a
   // pid, then there won't be any nodes or any elements pulled
   // in by ghosting either, and we're done with this pid.
-  for (auto pair : send_to_pid)
+  for (const auto & [pid, p_elements] : send_to_pid)
     {
-      const processor_id_type pid = pair.first;
       // don't send to ourselves!!
       if (pid == mesh.processor_id())
         continue;
@@ -430,11 +432,14 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
       // to be ghosted and any nodes which are used by any of the
       // above.
 
-      const auto & p_elements = pair.second;
       libmesh_assert(!p_elements.empty());
 
-      Elem * const * elempp = p_elements.data();
-      Elem * const * elemend = elempp + p_elements.size();
+      // Be compatible with both deprecated and
+      // corrected MeshBase iterator types
+      typedef MeshBase::const_element_iterator::value_type v_t;
+
+      v_t * elempp = p_elements.data();
+      v_t * elemend = elempp + p_elements.size();
 
 #ifndef LIBMESH_ENABLE_AMR
       // This parameter is not used when !LIBMESH_ENABLE_AMR.
@@ -444,11 +449,11 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
 
       MeshBase::const_element_iterator elem_it =
         MeshBase::const_element_iterator
-          (elempp, elemend, Predicates::NotNull<Elem * const *>());
+          (elempp, elemend, Predicates::NotNull<v_t *>());
 
       const MeshBase::const_element_iterator elem_end =
         MeshBase::const_element_iterator
-          (elemend, elemend, Predicates::NotNull<Elem * const *>());
+          (elemend, elemend, Predicates::NotNull<v_t *>());
 
       std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
 
@@ -1375,15 +1380,10 @@ void MeshCommunication::gather (const processor_id_type root_id, MeshBase & mesh
           serialized_rows.emplace(rowid, std::move(serialized_row));
         }
 
-      libmesh_not_implemented();
-
-      // TODO: THIS NEEDS TIMPI SUPPORT
-      /*
       if (root_id == DofObject::invalid_processor_id)
-        mesh.comm().allgather(serialized_rows);
+        mesh.comm().set_union(serialized_rows);
       else
-        mesh.comm().gather(serialized_rows, root_id);
-      */
+        mesh.comm().set_union(serialized_rows, root_id);
 
       if (root_id == DofObject::invalid_processor_id ||
           root_id == mesh.processor_id())

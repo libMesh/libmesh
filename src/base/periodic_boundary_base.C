@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,11 @@
 
 #include "libmesh/periodic_boundary_base.h"
 
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/boundary_info.h" // BoundaryInfo::invalid_id
+
+// C++ Includes
+#include <memory>
+
 
 namespace libMesh
 {
@@ -44,7 +47,7 @@ PeriodicBoundaryBase::PeriodicBoundaryBase(const PeriodicBoundaryBase & o) :
   // Make a deep copy of _transformation_matrix, if it's not null
   if(o._transformation_matrix)
   {
-    this->_transformation_matrix = libmesh_make_unique<DenseMatrix<Real>>();
+    this->_transformation_matrix = std::make_unique<DenseMatrix<Real>>();
     *(this->_transformation_matrix) = *(o._transformation_matrix);
   }
 }
@@ -93,7 +96,7 @@ const DenseMatrix<Real> & PeriodicBoundaryBase::get_transformation_matrix() cons
 void PeriodicBoundaryBase::set_transformation_matrix(const DenseMatrix<Real> & matrix)
 {
   // Make a deep copy of matrix
-  this->_transformation_matrix = libmesh_make_unique<DenseMatrix<Real>>();
+  this->_transformation_matrix = std::make_unique<DenseMatrix<Real>>();
   *(this->_transformation_matrix) = matrix;
 
   // if _transformation_matrix is defined then it must be the same sie as variables.

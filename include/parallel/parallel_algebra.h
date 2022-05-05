@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,6 @@
 #include "libmesh/point.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/vector_value.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // TIMPI includes
 #include "timpi/op_function.h"
@@ -68,7 +67,7 @@ public:
       ex = const_cast<TypeVector<T> *>(example);
     else
       {
-        temp = libmesh_make_unique<TypeVector<T>>();
+        temp = std::make_unique<TypeVector<T>>();
         ex = temp.get();
       }
 
@@ -134,7 +133,7 @@ public:
       ex = const_cast<VectorValue<T> *>(example);
     else
       {
-        temp = libmesh_make_unique<VectorValue<T>>();
+        temp = std::make_unique<VectorValue<T>>();
         ex = temp.get();
       }
 
@@ -207,7 +206,7 @@ public:
       ex = const_cast<Point *>(example);
     else
       {
-        temp = libmesh_make_unique<Point>();
+        temp = std::make_unique<Point>();
         ex = temp.get();
       }
 

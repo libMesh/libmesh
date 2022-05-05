@@ -22,7 +22,7 @@ class DistortTest : public CppUnit::TestCase
    * restricted during distortion.
    */
 public:
-  CPPUNIT_TEST_SUITE( DistortTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( DistortTest );
 
   // 2D tests
 #if LIBMESH_DIM > 1
@@ -93,8 +93,8 @@ protected:
 public:
   void setUp() {}
   void tearDown() {}
-  void testDistortQuad() { test_helper_2D(QUAD4); }
-  void testDistortHex() { test_helper_3D(HEX8); }
+  void testDistortQuad() { LOG_UNIT_TEST; test_helper_2D(QUAD4); }
+  void testDistortHex() { LOG_UNIT_TEST; test_helper_3D(HEX8); }
 };
 
 

@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -52,10 +52,11 @@ namespace libMesh
 bool PerfLog::called = false;
 
 
-PerfLog::PerfLog(const std::string & ln,
+PerfLog::PerfLog(std::string ln,
                  const bool le) :
-  label_name(ln),
+  label_name(std::move(ln)),
   log_events(le),
+  summarize_logs(false),
   total_time(0.)
 {
   gettimeofday (&tstart, nullptr);
@@ -110,8 +111,9 @@ void PerfLog::push (const std::string & label,
     label_c_str = non_temporary_strings[label];
   else
     {
-      char * newcopy = new char [label.size()+1];
-      strcpy(newcopy, label.c_str());
+      const std::size_t labelsizep1 = label.size()+1;
+      char * newcopy = new char [labelsizep1];
+      std::strncpy(newcopy, label.c_str(), labelsizep1);
       label_c_str = newcopy;
       non_temporary_strings[label] = label_c_str;
     }
@@ -120,8 +122,9 @@ void PerfLog::push (const std::string & label,
     header_c_str = non_temporary_strings[header];
   else
     {
-      char * newcopy = new char [header.size()+1];
-      strcpy(newcopy, header.c_str());
+      const std::size_t headersizep1 = header.size()+1;
+      char * newcopy = new char [headersizep1];
+      std::strncpy(newcopy, header.c_str(), headersizep1);
       header_c_str = newcopy;
       non_temporary_strings[header] = header_c_str;
     }
@@ -341,316 +344,324 @@ std::string PerfLog::get_perf_info() const
 {
   std::ostringstream oss;
 
-  if (log_events && !log.empty())
-    {
-      // Stop timing for this event.
-      struct timeval tstop;
+  if (!log_events || log.empty())
+    return oss.str();
 
-      gettimeofday (&tstop, nullptr);
+  // Stop timing for this event.
+  struct timeval tstop;
 
-      const double elapsed_time = (static_cast<double>(tstop.tv_sec  - tstart.tv_sec) +
-                                   static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);
+  gettimeofday (&tstop, nullptr);
 
-      // Figure out the formatting required based on the event names
-      // Unsigned ints for each of the column widths
-      unsigned int event_col_width            = 30;
-      const unsigned int ncalls_col_width     = 11;
-      const unsigned int tot_time_col_width   = 12;
-      const unsigned int avg_time_col_width   = 12;
-      const unsigned int tot_time_incl_sub_col_width   = 12;
-      const unsigned int avg_time_incl_sub_col_width   = 12;
-      const unsigned int pct_active_col_width = 9;
-      const unsigned int pct_active_incl_sub_col_width = 9;
+  const double elapsed_time = (static_cast<double>(tstop.tv_sec  - tstart.tv_sec) +
+                               static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);
 
-      // Reset the event column width based on the longest event name plus
-      // a possible 2-character indentation, plus a space.
-      for (auto pos : log)
-        if (std::strlen(pos.first.second)+3 > event_col_width)
-          event_col_width = cast_int<unsigned int>
-            (std::strlen(pos.first.second)+3);
+  // Figure out the formatting required based on the event names
+  // Unsigned ints for each of the column widths
+  unsigned int event_col_width            = 30;
+  const unsigned int ncalls_col_width     = 11;
+  const unsigned int tot_time_col_width   = 12;
+  const unsigned int avg_time_col_width   = 12;
+  const unsigned int tot_time_incl_sub_col_width   = 12;
+  const unsigned int avg_time_incl_sub_col_width   = 12;
+  const unsigned int pct_active_col_width = 9;
+  const unsigned int pct_active_incl_sub_col_width = 9;
 
-      // Set the total width of the column
-      const unsigned int total_col_width =
-        event_col_width     +
-        ncalls_col_width    +
-        tot_time_col_width  +
-        avg_time_col_width  +
-        tot_time_incl_sub_col_width  +
-        avg_time_incl_sub_col_width  +
-        pct_active_col_width+
-        pct_active_incl_sub_col_width+1;
+  // Reset the event column width based on the longest event name plus
+  // a possible 2-character indentation, plus a space.
+  for (auto pos : log)
+    if (std::strlen(pos.first.second)+3 > event_col_width)
+      event_col_width = cast_int<unsigned int>
+        (std::strlen(pos.first.second)+3);
 
-      // Print dashed line
-      oss << ' '
-          << std::string(total_col_width, '-')
-          << '\n';
+  // Set the total width of the column
+  const unsigned int total_col_width =
+    event_col_width     +
+    ncalls_col_width    +
+    tot_time_col_width  +
+    avg_time_col_width  +
+    tot_time_incl_sub_col_width  +
+    avg_time_incl_sub_col_width  +
+    pct_active_col_width+
+    pct_active_incl_sub_col_width+1;
 
+  // Print dashed line
+  oss << ' '
+      << std::string(total_col_width, '-')
+      << '\n';
+
+  {
+    // Construct temporary message string
+    std::ostringstream temp;
+    temp << "| " << label_name << " Performance: Alive time=" << elapsed_time
+         << ", Active time=" << total_time;
+
+    // Get the size of the temporary string
+    const unsigned int temp_size = cast_int<unsigned int>
+      (temp.str().size());
+
+    // Send the temporary message to the output
+    oss << temp.str();
+
+    // If this string is longer than the previously computed total
+    // column width, skip the additional formatting... this shouldn't
+    // happen often, hopefully.  Add two additional characters for a
+    // space and a "|" character at the end.
+    if (temp_size < total_col_width+2)
+      oss << std::setw(total_col_width - temp_size + 2)
+          << std::right
+          << "|";
+
+    oss << '\n';
+  }
+
+  // Print dashed line
+  oss << ' '
+      << std::string(total_col_width, '-')
+      << '\n';
+
+
+  // Write out the header for the events listing
+  oss << "| "
+      << std::setw(event_col_width)
+      << std::left
+      << "Event"
+      << std::setw(ncalls_col_width)
+      << std::left
+      << "nCalls"
+      << std::setw(tot_time_col_width)
+      << std::left
+      << "Total Time"
+      << std::setw(avg_time_col_width)
+      << std::left
+      << "Avg Time"
+      << std::setw(tot_time_incl_sub_col_width)
+      << std::left
+      << "Total Time"
+      << std::setw(avg_time_incl_sub_col_width)
+      << std::left
+      << "Avg Time"
+      << std::setw(pct_active_col_width+pct_active_incl_sub_col_width)
+      << std::left
+      << "% of Active Time"
+      << "|\n"
+      << "| "
+      << std::setw(event_col_width)
+      << std::left
+      << ""
+      << std::setw(ncalls_col_width)
+      << std::left
+      << ""
+      << std::setw(tot_time_col_width)
+      << std::left
+      << "w/o Sub"
+      << std::setw(avg_time_col_width)
+          << std::left
+      << "w/o Sub"
+      << std::setw(tot_time_incl_sub_col_width)
+      << std::left
+      << "With Sub"
+      << std::setw(avg_time_incl_sub_col_width)
+      << std::left
+      << "With Sub"
+      << std::setw(pct_active_col_width)
+      << std::left
+      << "w/o S"
+      << std::setw(pct_active_incl_sub_col_width)
+      << std::left
+      << "With S"
+      << "|\n|"
+      << std::string(total_col_width, '-')
+      << "|\n|"
+      << std::string(total_col_width, ' ')
+      << "|\n";
+
+  unsigned int summed_function_calls = 0;
+  double       summed_total_time     = 0;
+  double       summed_percentage     = 0;
+
+  std::string last_header("");
+
+  // Make a new log to sort entries alphabetically
+  std::map<std::pair<std::string, std::string>, PerfData> string_log;
+
+  for (auto char_data : log)
+    if (summarize_logs)
       {
-        // Construct temporary message string
-        std::ostringstream temp;
-        temp << "| " << label_name << " Performance: Alive time=" << elapsed_time
-             << ", Active time=" << total_time;
-
-        // Get the size of the temporary string
-        const unsigned int temp_size = cast_int<unsigned int>
-          (temp.str().size());
-
-        // Send the temporary message to the output
-        oss << temp.str();
-
-        // If this string is longer than the previously computed total
-        // column width, skip the additional formatting... this shouldn't
-        // happen often, hopefully.  Add two additional characters for a
-        // space and a "|" character at the end.
-        if (temp_size < total_col_width+2)
-          oss << std::setw(total_col_width - temp_size + 2)
-              << std::right
-              << "|";
-
-        oss << '\n';
+        string_log[std::make_pair(std::string(), char_data.first.first)] +=
+          char_data.second;
       }
-
-      // Print dashed line
-      oss << ' '
-          << std::string(total_col_width, '-')
-          << '\n';
-
-
-      // Write out the header for the events listing
-      oss << "| "
-          << std::setw(event_col_width)
-          << std::left
-          << "Event"
-          << std::setw(ncalls_col_width)
-          << std::left
-          << "nCalls"
-          << std::setw(tot_time_col_width)
-          << std::left
-          << "Total Time"
-          << std::setw(avg_time_col_width)
-          << std::left
-          << "Avg Time"
-          << std::setw(tot_time_incl_sub_col_width)
-          << std::left
-          << "Total Time"
-          << std::setw(avg_time_incl_sub_col_width)
-          << std::left
-          << "Avg Time"
-          << std::setw(pct_active_col_width+pct_active_incl_sub_col_width)
-          << std::left
-          << "% of Active Time"
-          << "|\n"
-          << "| "
-          << std::setw(event_col_width)
-          << std::left
-          << ""
-          << std::setw(ncalls_col_width)
-          << std::left
-          << ""
-          << std::setw(tot_time_col_width)
-          << std::left
-          << "w/o Sub"
-          << std::setw(avg_time_col_width)
-          << std::left
-          << "w/o Sub"
-          << std::setw(tot_time_incl_sub_col_width)
-          << std::left
-          << "With Sub"
-          << std::setw(avg_time_incl_sub_col_width)
-          << std::left
-          << "With Sub"
-          << std::setw(pct_active_col_width)
-          << std::left
-          << "w/o S"
-          << std::setw(pct_active_incl_sub_col_width)
-          << std::left
-          << "With S"
-          << "|\n|"
-          << std::string(total_col_width, '-')
-          << "|\n|"
-          << std::string(total_col_width, ' ')
-          << "|\n";
-
-      unsigned int summed_function_calls = 0;
-      double       summed_total_time     = 0;
-      double       summed_percentage     = 0;
-
-      std::string last_header("");
-
-      // Make a new log to sort entries alphabetically
-      std::map<std::pair<std::string, std::string>, PerfData> string_log;
-
-      for (auto char_data : log)
+    else
+      {
         string_log[std::make_pair(char_data.first.first,
                                   char_data.first.second)] =
           char_data.second;
+      }
 
-      for (auto pos : string_log)
+  for (auto pos : string_log)
+    {
+      const PerfData & perf_data = pos.second;
+
+      // Only print the event if the count is non-zero.
+      if (perf_data.count != 0)
         {
-          const PerfData & perf_data = pos.second;
+          const unsigned int perf_count    = perf_data.count;
+          const double       perf_time     = perf_data.tot_time;
+          const double       perf_avg_time = perf_time / static_cast<double>(perf_count);
+          const double       perf_time_incl_sub     = perf_data.tot_time_incl_sub;
+          const double       perf_avg_time_incl_sub = perf_time_incl_sub / static_cast<double>(perf_count);
+          const double       perf_percent  = (total_time != 0.) ? perf_time / total_time * 100. : 0.;
+          const double       perf_percent_incl_sub  = (total_time != 0.) ? perf_time_incl_sub / total_time * 100. : 0.;
 
-          // Only print the event if the count is non-zero.
-          if (perf_data.count != 0)
+          summed_function_calls += perf_count;
+          summed_total_time     += perf_time;
+          summed_percentage     += perf_percent;
+
+          // Print the event name
+          if (pos.first.first == "")
+            oss << "| "
+                << std::setw(event_col_width)
+                << std::left
+                << pos.first.second;
+
+          else
             {
-              const unsigned int perf_count    = perf_data.count;
-              const double       perf_time     = perf_data.tot_time;
-              const double       perf_avg_time = perf_time / static_cast<double>(perf_count);
-              const double       perf_time_incl_sub     = perf_data.tot_time_incl_sub;
-              const double       perf_avg_time_incl_sub = perf_time_incl_sub / static_cast<double>(perf_count);
-              const double       perf_percent  = (total_time != 0.) ? perf_time / total_time * 100. : 0.;
-              const double       perf_percent_incl_sub  = (total_time != 0.) ? perf_time_incl_sub / total_time * 100. : 0.;
-
-              summed_function_calls += perf_count;
-              summed_total_time     += perf_time;
-              summed_percentage     += perf_percent;
-
-              // Print the event name
-              if (pos.first.first == "")
-                oss << "| "
-                    << std::setw(event_col_width)
-                    << std::left
-                    << pos.first.second;
-
-              else
+              if (last_header != pos.first.first)
                 {
-                  if (last_header != pos.first.first)
-                    {
-                      last_header = pos.first.first;
+                  last_header = pos.first.first;
 
-                      // print blank line followed by header name
-                      // (account for additional space before the
-                      // header)
-                      oss << "|"
-                          << std::string(total_col_width, ' ')
-                          << "|\n| "
-                          << std::setw(total_col_width-1)
-                          << std::left
-                          << pos.first.first
-                          << "|\n";
-                    }
-
-                  oss << "|   "
-                      << std::setw(event_col_width-2)
+                  // print blank line followed by header name
+                  // (account for additional space before the
+                  // header)
+                  oss << "|"
+                      << std::string(total_col_width, ' ')
+                      << "|\n| "
+                      << std::setw(total_col_width-1)
                       << std::left
-                      << pos.first.second;
+                      << pos.first.first
+                      << "|\n";
                 }
 
-
-              // Print the number of calls to the event.
-              oss << std::setw(ncalls_col_width)
-                  << perf_count;
-
-              // Save the original stream flags
-              std::ios_base::fmtflags out_flags = oss.flags();
-
-              // Print the total time spent in the event
-              oss << std::fixed
-                  << std::setprecision(4)
-                  << std::setw(tot_time_col_width)
+              oss << "|   "
+                  << std::setw(event_col_width-2)
                   << std::left
-                  << perf_time;
-
-
-              // Print the average time per function call
-              oss << std::fixed
-                  << std::setprecision(6)
-                  << std::setw(avg_time_col_width)
-                  << std::left
-                  << perf_avg_time;
-
-              // Print the total time spent in the event incl. sub-events
-              oss << std::fixed
-                  << std::setprecision(4)
-                  << std::setw(tot_time_incl_sub_col_width)
-                  << std::left
-                  << perf_time_incl_sub;
-
-              // Print the average time per function call incl. sub-events
-              oss << std::fixed
-                  << std::setprecision(6)
-                  << std::setw(avg_time_incl_sub_col_width)
-                  << std::left
-                  << perf_avg_time_incl_sub;
-
-              // Print the percentage of the time spent in the event
-              oss << std::fixed
-                  << std::setprecision(2)
-                  << std::setw(pct_active_col_width)
-                  << std::left
-                  << perf_percent;
-
-              // Print the percentage of the time spent in the event incl. sub-events
-              oss << std::fixed
-                  << std::setprecision(2)
-                  << std::setw(pct_active_incl_sub_col_width)
-                  << std::left
-                  << perf_percent_incl_sub;
-
-              // Reset the stream flags
-              oss.flags(out_flags);
-
-              oss << "|\n";
+                  << pos.first.second;
             }
-        }
 
-      oss << ' '
-          << std::string(total_col_width, '-')
-          << "\n| "
-          << std::setw(event_col_width)
-          << std::left
-          << "Totals:";
 
-      // Print the total number of logged function calls
-      // For routines which are called many times, summed_function_calls may
-      // exceed 7 digits.  If this happens use, scientific notation.
-      if (summed_function_calls < 9999999)
-        oss << std::setw(ncalls_col_width)
-            << summed_function_calls;
+          // Print the number of calls to the event.
+          oss << std::setw(ncalls_col_width)
+              << perf_count;
 
-      else
-        {
           // Save the original stream flags
           std::ios_base::fmtflags out_flags = oss.flags();
 
-          oss << std::scientific
-              << std::setprecision(3)
-              << std::setw(ncalls_col_width)
+          // Print the total time spent in the event
+          oss << std::fixed
+              << std::setprecision(4)
+              << std::setw(tot_time_col_width)
               << std::left
-              << static_cast<Real>(summed_function_calls);
+              << perf_time;
+
+
+          // Print the average time per function call
+          oss << std::fixed
+              << std::setprecision(6)
+              << std::setw(avg_time_col_width)
+              << std::left
+              << perf_avg_time;
+
+          // Print the total time spent in the event incl. sub-events
+          oss << std::fixed
+              << std::setprecision(4)
+              << std::setw(tot_time_incl_sub_col_width)
+              << std::left
+              << perf_time_incl_sub;
+
+          // Print the average time per function call incl. sub-events
+          oss << std::fixed
+              << std::setprecision(6)
+              << std::setw(avg_time_incl_sub_col_width)
+              << std::left
+              << perf_avg_time_incl_sub;
+
+          // Print the percentage of the time spent in the event
+          oss << std::fixed
+              << std::setprecision(2)
+              << std::setw(pct_active_col_width)
+              << std::left
+              << perf_percent;
+
+          // Print the percentage of the time spent in the event incl. sub-events
+          oss << std::fixed
+              << std::setprecision(2)
+              << std::setw(pct_active_incl_sub_col_width)
+              << std::left
+              << perf_percent_incl_sub;
 
           // Reset the stream flags
           oss.flags(out_flags);
+
+          oss << "|\n";
         }
-
-      // Print the total time spent in logged function calls.  Don't bother saving/restoring
-      // the flags here since we are almost done with this stream anyway...
-      oss << std::fixed
-          << std::setprecision(4)
-          << std::setw(tot_time_col_width)
-          << std::left
-          << summed_total_time;
-
-      // Null, the average time doesn't make sense as a total
-      oss << std::setw(avg_time_col_width) << "";
-
-      // Same for times that include sub-events
-      oss << std::setw(tot_time_incl_sub_col_width)
-          << ""
-          << std::setw(avg_time_incl_sub_col_width)
-          << "";
-
-      // Print the total percentage followed by dashed line
-      oss << std::fixed
-          << std::setprecision(2)
-          << std::setw(pct_active_col_width)
-          << std::left
-          << summed_percentage
-          << std::setw(pct_active_incl_sub_col_width)
-          << ""
-          << "|\n "
-          << std::string(total_col_width, '-')
-          << '\n';
     }
+
+  oss << ' '
+      << std::string(total_col_width, '-')
+      << "\n| "
+      << std::setw(event_col_width)
+      << std::left
+      << "Totals:";
+
+  // Print the total number of logged function calls
+  // For routines which are called many times, summed_function_calls may
+  // exceed 7 digits.  If this happens use, scientific notation.
+  if (summed_function_calls < 9999999)
+    oss << std::setw(ncalls_col_width)
+        << summed_function_calls;
+
+  else
+    {
+      // Save the original stream flags
+      std::ios_base::fmtflags out_flags = oss.flags();
+
+      oss << std::scientific
+          << std::setprecision(3)
+          << std::setw(ncalls_col_width)
+          << std::left
+          << static_cast<Real>(summed_function_calls);
+
+      // Reset the stream flags
+      oss.flags(out_flags);
+    }
+
+  // Print the total time spent in logged function calls.  Don't bother saving/restoring
+  // the flags here since we are almost done with this stream anyway...
+  oss << std::fixed
+      << std::setprecision(4)
+      << std::setw(tot_time_col_width)
+      << std::left
+      << summed_total_time;
+
+  // Null, the average time doesn't make sense as a total
+  oss << std::setw(avg_time_col_width) << "";
+
+  // Same for times that include sub-events
+  oss << std::setw(tot_time_incl_sub_col_width)
+      << ""
+      << std::setw(avg_time_incl_sub_col_width)
+      << "";
+
+  // Print the total percentage followed by dashed line
+  oss << std::fixed
+      << std::setprecision(2)
+      << std::setw(pct_active_col_width)
+      << std::left
+      << summed_percentage
+      << std::setw(pct_active_incl_sub_col_width)
+      << ""
+      << "|\n "
+      << std::string(total_col_width, '-')
+      << '\n';
 
   return oss.str();
 }

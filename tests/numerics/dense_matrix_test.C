@@ -18,7 +18,7 @@ public:
 
   void tearDown() {}
 
-  CPPUNIT_TEST_SUITE(DenseMatrixTest);
+  LIBMESH_CPPUNIT_TEST_SUITE(DenseMatrixTest);
 
   CPPUNIT_TEST(testOuterProduct);
   CPPUNIT_TEST(testSVD);
@@ -34,6 +34,8 @@ private:
 
   void testOuterProduct()
   {
+    LOG_UNIT_TEST;
+
     DenseVector<Real> a = {1.0, 2.0};
     DenseVector<Real> b = {3.0, 4.0, 5.0};
 
@@ -51,6 +53,8 @@ private:
 
   void testSVD()
   {
+    LOG_UNIT_TEST;
+
     DenseMatrix<Number> U, VT;
     DenseVector<Real> sigma;
     DenseMatrix<Number> A(3, 2, {
@@ -285,6 +289,8 @@ private:
 
   void testEVDreal()
   {
+    LOG_UNIT_TEST;
+
     // This is an example from Matlab's gallery(3) which is a
     // non-symmetric 3x3 matrix with eigen values lambda = 1, 2, 3.
     DenseMatrix<Real> A(3, 3);
@@ -304,6 +310,8 @@ private:
 
   void testEVDcomplex()
   {
+    LOG_UNIT_TEST;
+
     // This test is also from a Matlab example, and has complex eigenvalues.
     // http://www.mathworks.com/help/matlab/math/eigenvalues.html?s_tid=gn_loc_drop
     DenseMatrix<Real> A(3, 3);
@@ -331,6 +339,8 @@ private:
   void testComplexSVD()
   {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
+    LOG_UNIT_TEST;
+
     DenseMatrix<Complex> A(3,3);
 
     A(0,0) = Complex(2.18904,4.44523e-18); A(0,1) = Complex(-3.20491,-0.136699);   A(0,2) = Complex(0.716316,-0.964802);
@@ -352,6 +362,8 @@ private:
 
   void testSubMatrix()
   {
+    LOG_UNIT_TEST;
+
     DenseMatrix<Number> A(4, 3);
     A(0,0) = 1.0; A(0,1) = 2.0; A(0,2) = 3.0;
     A(1,0) = 4.0; A(1,1) = 5.0; A(1,2) = 6.0;

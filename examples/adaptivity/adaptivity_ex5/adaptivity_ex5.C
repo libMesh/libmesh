@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
+#include <memory>
 
 // libMesh includes
 #include "libmesh/libmesh.h"
@@ -53,7 +54,6 @@
 #include "libmesh/mesh_generation.h"
 #include "libmesh/parsed_function.h"
 #include "libmesh/getpot.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_xdr_mode.h"
 #include "libmesh/enum_norm_type.h"
@@ -219,7 +219,7 @@ int main (int argc, char ** argv)
   const bool have_expression = false;
 #endif
   if (have_expression)
-    parsed_solution = libmesh_make_unique<ParsedFunction<Number>>(command_line.next(std::string()));
+    parsed_solution = std::make_unique<ParsedFunction<Number>>(command_line.next(std::string()));
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");

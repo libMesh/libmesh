@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,6 @@
 
 #include "libmesh/libmesh_config.h"
 #include "libmesh/function_base.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #ifdef LIBMESH_HAVE_FPARSER
 
@@ -40,6 +39,7 @@
 #include <cstddef>
 #include <iomanip>
 #include <limits>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -61,7 +61,7 @@ class ParsedFunction : public FunctionBase<Output>
 {
 public:
   explicit
-  ParsedFunction (const std::string & expression,
+  ParsedFunction (std::string expression,
                   const std::vector<std::string> * additional_vars=nullptr,
                   const std::vector<Output> * initial_vals=nullptr);
 
@@ -80,7 +80,7 @@ public:
   /**
    * Re-parse with new expression.
    */
-  void reparse (const std::string & expression);
+  void reparse (std::string expression);
 
   virtual Output operator() (const Point & p,
                              const Real time = 0) override;
@@ -109,7 +109,7 @@ public:
   /**
    * \returns The address of a parsed variable so you can supply a parameterized value.
    */
-  virtual Output & getVarAddress(const std::string & variable_name);
+  virtual Output & getVarAddress(std::string_view variable_name);
 
   virtual std::unique_ptr<FunctionBase<Output>> clone() const override;
 
@@ -121,7 +121,7 @@ public:
    * redefined within any subexpression, and if the inline variable
    * takes the same value within any subexpressions where it appears.
    */
-  Output get_inline_value(const std::string & inline_var_name) const;
+  Output get_inline_value(std::string_view inline_var_name) const;
 
   /**
    * Changes the value of an inline variable.
@@ -133,25 +133,25 @@ public:
    * \note Currently only works if the inline variable is not
    * redefined within any one subexpression.
    */
-  void set_inline_value(const std::string & inline_var_name,
+  void set_inline_value(std::string_view inline_var_name,
                         Output newval);
 
 protected:
   /**
    * Re-parse with minor changes to expression.
    */
-  void partial_reparse (const std::string & expression);
+  void partial_reparse (std::string expression);
 
   /**
    * Helper function for parsing out variable names.
    */
-  std::size_t find_name (const std::string & varname,
-                         const std::string & expr) const;
+  std::size_t find_name (std::string_view varname,
+                         std::string_view expr) const;
 
   /**
    * \returns \p true if the expression is time-dependent, false otherwise.
    */
-  bool expression_is_time_dependent( const std::string & expression ) const;
+  bool expression_is_time_dependent( std::string_view expression ) const;
 
 private:
   /**
@@ -164,7 +164,7 @@ private:
    * Evaluate the ith FunctionParser and check the result.
    */
   inline Output eval(FunctionParserADBase<Output> & parser,
-                     const std::string & libmesh_dbg_var(function_name),
+                     std::string_view libmesh_dbg_var(function_name),
                      unsigned int libmesh_dbg_var(component_idx)) const;
 
   std::string _expression;
@@ -194,7 +194,7 @@ private:
 
 template <typename Output, typename OutputGradient>
 inline
-ParsedFunction<Output,OutputGradient>::ParsedFunction (const std::string & expression,
+ParsedFunction<Output,OutputGradient>::ParsedFunction (std::string expression,
                                                        const std::vector<std::string> * additional_vars,
                                                        const std::vector<Output> * initial_vals) :
   _expression (), // overridden by parse()
@@ -206,7 +206,7 @@ ParsedFunction<Output,OutputGradient>::ParsedFunction (const std::string & expre
   _initial_vals (initial_vals ? *initial_vals : std::vector<Output>())
 {
   // time-dependence established in reparse function
-  this->reparse(expression);
+  this->reparse(std::move(expression));
   this->_initialized = true;
 }
 
@@ -245,7 +245,7 @@ ParsedFunction<Output,OutputGradient>::operator= (const ParsedFunction<Output,Ou
 template <typename Output, typename OutputGradient>
 inline
 void
-ParsedFunction<Output,OutputGradient>::reparse (const std::string & expression)
+ParsedFunction<Output,OutputGradient>::reparse (std::string expression)
 {
   variables = "x";
 #if LIBMESH_DIM > 1
@@ -268,9 +268,9 @@ ParsedFunction<Output,OutputGradient>::reparse (const std::string & expression)
         (i < _initial_vals.size()) ? _initial_vals[i] : 0;
     }
 
-  this->partial_reparse(expression);
-
   this->_is_time_dependent = this->expression_is_time_dependent(expression);
+
+  this->partial_reparse(std::move(expression));
 }
 
 template <typename Output, typename OutputGradient>
@@ -356,7 +356,7 @@ ParsedFunction<Output,OutputGradient>::component (unsigned int i,
 template <typename Output, typename OutputGradient>
 inline
 Output &
-ParsedFunction<Output,OutputGradient>::getVarAddress (const std::string & variable_name)
+ParsedFunction<Output,OutputGradient>::getVarAddress (std::string_view variable_name)
 {
   const std::vector<std::string>::iterator it =
     std::find(_additional_vars.begin(), _additional_vars.end(), variable_name);
@@ -374,15 +374,15 @@ inline
 std::unique_ptr<FunctionBase<Output>>
 ParsedFunction<Output,OutputGradient>::clone() const
 {
-  return libmesh_make_unique<ParsedFunction>(_expression,
-                                             &_additional_vars,
-                                             &_initial_vals);
+  return std::make_unique<ParsedFunction>(_expression,
+                                          &_additional_vars,
+                                          &_initial_vals);
 }
 
 template <typename Output, typename OutputGradient>
 inline
 Output
-ParsedFunction<Output,OutputGradient>::get_inline_value (const std::string & inline_var_name) const
+ParsedFunction<Output,OutputGradient>::get_inline_value (std::string_view inline_var_name) const
 {
   libmesh_assert_greater (_subexpressions.size(), 0);
 
@@ -413,8 +413,7 @@ ParsedFunction<Output,OutputGradient>::get_inline_value (const std::string & inl
       libmesh_assert_not_equal_to(end_assignment_i, std::string::npos);
 
       std::string new_subexpression =
-        subexpression.substr(0, end_assignment_i+1) +
-        inline_var_name;
+        subexpression.substr(0, end_assignment_i+1).append(inline_var_name);
 
 #ifdef LIBMESH_HAVE_FPARSER
       // Parse and evaluate the new subexpression.
@@ -456,7 +455,7 @@ ParsedFunction<Output,OutputGradient>::get_inline_value (const std::string & inl
 template <typename Output, typename OutputGradient>
 inline
 void
-ParsedFunction<Output,OutputGradient>::set_inline_value (const std::string & inline_var_name,
+ParsedFunction<Output,OutputGradient>::set_inline_value (std::string_view inline_var_name,
                                                          Output newval)
 {
   libmesh_assert_greater (_subexpressions.size(), 0);
@@ -520,9 +519,9 @@ ParsedFunction<Output,OutputGradient>::set_inline_value (const std::string & inl
 template <typename Output, typename OutputGradient>
 inline
 void
-ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string & expression)
+ParsedFunction<Output,OutputGradient>::partial_reparse (std::string expression)
 {
-  _expression = expression;
+  _expression = std::move(expression);
   _subexpressions.clear();
   parsers.clear();
 
@@ -532,15 +531,15 @@ ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string & expr
     {
       // If we're past the end of the string, we can't make any more
       // subparsers
-      if (nextstart >= expression.size())
+      if (nextstart >= _expression.size())
         break;
 
       // If we're at the start of a brace delimited section, then we
       // parse just that section:
-      if (expression[nextstart] == '{')
+      if (_expression[nextstart] == '{')
         {
           nextstart++;
-          end = expression.find('}', nextstart);
+          end = _expression.find('}', nextstart);
         }
       // otherwise we parse the whole thing
       else
@@ -549,7 +548,7 @@ ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string & expr
       // We either want the whole end of the string (end == npos) or
       // a substring in the middle.
       _subexpressions.push_back
-        (expression.substr(nextstart, (end == std::string::npos) ?
+        (_expression.substr(nextstart, (end == std::string::npos) ?
                            std::string::npos : end - nextstart));
 
       // fparser can crash on empty expressions
@@ -558,7 +557,7 @@ ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string & expr
 
       // Parse (and optimize if possible) the subexpression.
       // Add some basic constants, to Real precision.
-      auto fp = libmesh_make_unique<FunctionParserADBase<Output>>();
+      auto fp = std::make_unique<FunctionParserADBase<Output>>();
       fp->AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
       fp->AddConstant("pi", std::acos(Real(-1)));
       fp->AddConstant("e", std::exp(Real(1)));
@@ -577,23 +576,23 @@ ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string & expr
       fp->Optimize();
 
       // generate derivatives through automatic differentiation
-      auto dx_fp = libmesh_make_unique<FunctionParserADBase<Output>>(*fp);
+      auto dx_fp = std::make_unique<FunctionParserADBase<Output>>(*fp);
       if (dx_fp->AutoDiff("x") != -1) // -1 for success
         _valid_derivatives = false;
       dx_parsers.push_back(std::move(dx_fp));
 #if LIBMESH_DIM > 1
-      auto dy_fp = libmesh_make_unique<FunctionParserADBase<Output>>(*fp);
+      auto dy_fp = std::make_unique<FunctionParserADBase<Output>>(*fp);
       if (dy_fp->AutoDiff("y") != -1) // -1 for success
         _valid_derivatives = false;
       dy_parsers.push_back(std::move(dy_fp));
 #endif
 #if LIBMESH_DIM > 2
-      auto dz_fp = libmesh_make_unique<FunctionParserADBase<Output>>(*fp);
+      auto dz_fp = std::make_unique<FunctionParserADBase<Output>>(*fp);
       if (dz_fp->AutoDiff("z") != -1) // -1 for success
         _valid_derivatives = false;
       dz_parsers.push_back(std::move(dz_fp));
 #endif
-      auto dt_fp = libmesh_make_unique<FunctionParserADBase<Output>>(*fp);
+      auto dt_fp = std::make_unique<FunctionParserADBase<Output>>(*fp);
       if (dt_fp->AutoDiff("t") != -1) // -1 for success
         _valid_derivatives = false;
       dt_parsers.push_back(std::move(dt_fp));
@@ -612,8 +611,8 @@ ParsedFunction<Output,OutputGradient>::partial_reparse (const std::string & expr
 template <typename Output, typename OutputGradient>
 inline
 std::size_t
-ParsedFunction<Output,OutputGradient>::find_name (const std::string & varname,
-                                                  const std::string & expr) const
+ParsedFunction<Output,OutputGradient>::find_name (std::string_view varname,
+                                                  std::string_view expr) const
 {
   const std::size_t namesize = varname.size();
   std::size_t varname_i = expr.find(varname);
@@ -634,7 +633,7 @@ ParsedFunction<Output,OutputGradient>::find_name (const std::string & varname,
 template <typename Output, typename OutputGradient>
 inline
 bool
-ParsedFunction<Output,OutputGradient>::expression_is_time_dependent( const std::string & expression ) const
+ParsedFunction<Output,OutputGradient>::expression_is_time_dependent( std::string_view expression ) const
 {
   bool is_time_dependent = false;
 
@@ -671,7 +670,7 @@ template <typename Output, typename OutputGradient>
 inline
 Output
 ParsedFunction<Output,OutputGradient>::eval (FunctionParserADBase<Output> & parser,
-                                             const std::string & libmesh_dbg_var(function_name),
+                                             std::string_view libmesh_dbg_var(function_name),
                                              unsigned int libmesh_dbg_var(component_idx)) const
 {
 #ifndef NDEBUG
@@ -734,7 +733,7 @@ template <typename Output=Number>
 class ParsedFunction : public FunctionBase<Output>
 {
 public:
-  ParsedFunction (const std::string & /* expression */,
+  ParsedFunction (std::string /* expression */,
                   const std::vector<std::string> * = nullptr,
                   const std::vector<Output> * = nullptr) : _dummy(0)
   {
@@ -761,10 +760,10 @@ public:
 
   virtual void init() {}
   virtual void clear() {}
-  virtual Output & getVarAddress(const std::string & /*variable_name*/) { return _dummy; }
+  virtual Output & getVarAddress(std::string_view /*variable_name*/) { return _dummy; }
   virtual std::unique_ptr<FunctionBase<Output>> clone() const
   {
-    return libmesh_make_unique<ParsedFunction<Output>>("");
+    return std::make_unique<ParsedFunction<Output>>("");
   }
 private:
   Output _dummy;

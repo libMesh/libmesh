@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -138,23 +138,16 @@ int main (int argc, char ** argv)
 
   system.attach_assemble_function (assemble_elasticity);
 
-  // Construct a Dirichlet boundary condition object
-  // We impose a "clamped" boundary condition on the
-  // "left" boundary, i.e. bc_id = 3
-  std::set<boundary_id_type> boundary_ids;
-  boundary_ids.insert(3);
-
-  // Create a vector storing the variable numbers which the BC applies to
-  std::vector<unsigned int> variables(2);
-  variables[0] = u_var;
-  variables[1] = v_var;
-
   // Create a ZeroFunction to initialize dirichlet_bc
   ZeroFunction<> zf;
 
+  // Construct a Dirichlet boundary condition object
+  // We impose a "clamped" boundary condition on the
+  // "left" boundary, i.e. bc_id = 3
+
   // Most DirichletBoundary users will want to supply a "locally
   // indexed" functor
-  DirichletBoundary dirichlet_bc(boundary_ids, variables, zf,
+  DirichletBoundary dirichlet_bc({3}, {u_var, v_var}, zf,
                                  LOCAL_VARIABLE_ORDER);
 
   // We must add the Dirichlet boundary condition _before_

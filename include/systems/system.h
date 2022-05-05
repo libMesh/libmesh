@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,6 @@
 #define LIBMESH_SYSTEM_H
 
 // Local Includes
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/elem_range.h"
 #include "libmesh/enum_subset_solve_mode.h" // SUBSET_ZERO
 #include "libmesh/enum_parallel_type.h" // PARALLEL
@@ -46,6 +45,8 @@ enum FEMNormType : int;
 // C++ includes
 #include <cstddef>
 #include <set>
+#include <string>
+#include <string_view>
 #include <vector>
 #include <memory>
 
@@ -770,8 +771,8 @@ public:
   /**
    * Vector iterator typedefs.
    */
-  typedef std::map<std::string, std::unique_ptr<NumericVector<Number>>>::iterator       vectors_iterator;
-  typedef std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator const_vectors_iterator;
+  typedef std::map<std::string, std::unique_ptr<NumericVector<Number>>, std::less<>>::iterator       vectors_iterator;
+  typedef std::map<std::string, std::unique_ptr<NumericVector<Number>>, std::less<>>::const_iterator const_vectors_iterator;
 
   /**
    * Beginning of vectors container
@@ -802,14 +803,14 @@ public:
    * reinit().  To zero them instead (more efficient), pass "false" as the
    * second argument
    */
-  NumericVector<Number> & add_vector (const std::string & vec_name,
+  NumericVector<Number> & add_vector (std::string_view vec_name,
                                       const bool projections=true,
                                       const ParallelType type = PARALLEL);
 
   /**
    * Removes the additional vector \p vec_name from this system
    */
-  void remove_vector(const std::string & vec_name);
+  void remove_vector(std::string_view vec_name);
 
   /**
    * Tells the System whether or not to project the solution vector onto new
@@ -823,19 +824,19 @@ public:
    * \returns \p true if this \p System has a vector associated with the
    * given name, \p false otherwise.
    */
-  bool have_vector (const std::string & vec_name) const;
+  bool have_vector (std::string_view vec_name) const;
 
   /**
    * \returns A const pointer to the vector if this \p System has a
    * vector associated with the given name, \p nullptr otherwise.
    */
-  const NumericVector<Number> * request_vector (const std::string & vec_name) const;
+  const NumericVector<Number> * request_vector (std::string_view vec_name) const;
 
   /**
    * \returns A pointer to the vector if this \p System has a
    * vector associated with the given name, \p nullptr otherwise.
    */
-  NumericVector<Number> * request_vector (const std::string & vec_name);
+  NumericVector<Number> * request_vector (std::string_view vec_name);
 
   /**
    * \returns A const pointer to this system's additional vector
@@ -856,14 +857,14 @@ public:
    * named \p vec_name.  Access is only granted when the vector is already
    * properly initialized.
    */
-  const NumericVector<Number> & get_vector (const std::string & vec_name) const;
+  const NumericVector<Number> & get_vector (std::string_view vec_name) const;
 
   /**
    * \returns A writable reference to this system's additional vector
    * named \p vec_name.  Access is only granted when the vector is already
    * properly initialized.
    */
-  NumericVector<Number> & get_vector (const std::string & vec_name);
+  NumericVector<Number> & get_vector (std::string_view vec_name);
 
   /**
    * \returns A const reference to this system's additional vector
@@ -907,7 +908,7 @@ public:
    * vec_name represents a solution from an adjoint (non-negative) or
    * the primal (-1) space.
    */
-  int vector_is_adjoint (const std::string & vec_name) const;
+  int vector_is_adjoint (std::string_view vec_name) const;
 
   /**
    * Allows one to set the boolean controlling whether the vector
@@ -921,7 +922,7 @@ public:
    * vec_name should be "preserved": projected to new meshes, saved,
    * etc.
    */
-  bool vector_preservation (const std::string & vec_name) const;
+  bool vector_preservation (std::string_view vec_name) const;
 
   /**
    * \returns A reference to one of the system's adjoint solution
@@ -1115,7 +1116,7 @@ public:
    *
    * \returns The index number for the new variable.
    */
-  unsigned int add_variable (const std::string & var,
+  unsigned int add_variable (std::string_view var,
                              const FEType & type,
                              const std::set<subdomain_id_type> * const active_subdomains = nullptr);
 
@@ -1126,7 +1127,7 @@ public:
    * \p nullptr (the default) or points to an empty set, then it will be assumed
    * that \p var has no subdomain restrictions
    */
-  unsigned int add_variable (const std::string & var,
+  unsigned int add_variable (std::string_view var,
                              const Order order = FIRST,
                              const FEFamily = LAGRANGE,
                              const std::set<subdomain_id_type> * const active_subdomains = nullptr);
@@ -1168,7 +1169,7 @@ public:
   /**
    * \returns \p true if a variable named \p var exists in this System
    */
-  bool has_variable(const std::string & var) const;
+  bool has_variable(std::string_view var) const;
 
   /**
    * \returns The name of variable \p i.
@@ -1179,7 +1180,7 @@ public:
    * \returns The variable number associated with
    * the user-specified variable named \p var.
    */
-  unsigned short int variable_number (const std::string & var) const;
+  unsigned short int variable_number (std::string_view var) const;
 
   /**
    * Fills \p all_variable_numbers with all the variable numbers for the
@@ -1197,7 +1198,7 @@ public:
    * Irony: currently our only non-scalar-valued variable type is
    * SCALAR.
    */
-  unsigned int variable_scalar_number (const std::string & var,
+  unsigned int variable_scalar_number (std::string_view var,
                                        unsigned int component) const;
 
   /**
@@ -1222,7 +1223,7 @@ public:
   /**
    * \returns The finite element type for variable \p var.
    */
-  const FEType & variable_type (const std::string & var) const;
+  const FEType & variable_type (std::string_view var) const;
 
   /**
    * \returns \p true when \p VariableGroup structures should be
@@ -1256,7 +1257,7 @@ public:
    * Reads the basic data header for this System.
    */
   void read_header (Xdr & io,
-                    const std::string & version,
+                    std::string_view version,
                     const bool read_header=true,
                     const bool read_additional_data=true,
                     const bool read_legacy_format=false);
@@ -1336,7 +1337,7 @@ public:
    * Writes the basic data header for this System.
    */
   void write_header (Xdr & io,
-                     const std::string & version,
+                     std::string_view version,
                      const bool write_additional_data) const;
 
   /**
@@ -1405,6 +1406,11 @@ public:
    * Register a user object for imposing constraints.
    */
   void attach_constraint_object (Constraint & constrain);
+
+  /**
+   * Return the user object for imposing constraints.
+   */
+  Constraint& get_constraint_object ();
 
   /**
    * Register a user function for evaluating the quantities of interest,
@@ -1581,6 +1587,9 @@ public:
    */
   unsigned int n_qois() const;
 
+#ifndef LIBMESH_ENABLE_DEPRECATED // We use accessors for these now
+private:
+#endif
   /**
    * Values of the quantities of interest.  This vector needs
    * to be both resized and filled by the user before any quantity of
@@ -1596,6 +1605,27 @@ public:
    * User code can use this for accumulating error estimates for example.
    */
   std::vector<Number> qoi_error_estimates;
+#ifndef LIBMESH_ENABLE_DEPRECATED
+public:
+#endif
+
+  /**
+   * Accessors for qoi and qoi_error_estimates vectors
+   */
+  void init_qois(unsigned int n_qois);
+
+  void set_qoi(unsigned int qoi_index, Number qoi_value);
+  Number get_qoi_value(unsigned int qoi_index) const;
+
+  void set_qoi(std::vector<Number> new_qoi);
+
+  /**
+   * Returns a *copy* of qoi, not a reference
+   */
+  std::vector<Number> get_qoi_values() const;
+
+  void set_qoi_error_estimate(unsigned int qoi_index, Number qoi_error_estimate);
+  Number get_qoi_error_estimate_value(unsigned int qoi_index) const;
 
   /**
    * \returns The value of the solution variable \p var at the physical
@@ -1764,8 +1794,8 @@ public:
   /**
    * Matrix iterator typedefs.
    */
-  typedef std::map<std::string, std::unique_ptr<SparseMatrix<Number>>>::iterator        matrices_iterator;
-  typedef std::map<std::string, std::unique_ptr<SparseMatrix<Number>>>::const_iterator  const_matrices_iterator;
+  typedef std::map<std::string, std::unique_ptr<SparseMatrix<Number>>, std::less<>>::iterator        matrices_iterator;
+  typedef std::map<std::string, std::unique_ptr<SparseMatrix<Number>>, std::less<>>::const_iterator  const_matrices_iterator;
 
   /**
    * Adds the additional matrix \p mat_name to this system.  Only
@@ -1784,7 +1814,7 @@ public:
    * @param mat_build_type The matrix type to build
    *
    */
-  SparseMatrix<Number> & add_matrix (const std::string & mat_name,
+  SparseMatrix<Number> & add_matrix (std::string_view mat_name,
                                      ParallelType type = PARALLEL,
                                      MatrixBuildType mat_build_type = MatrixBuildType::AUTOMATIC);
 
@@ -1804,44 +1834,44 @@ public:
   * @param type The serial/parallel/ghosted type of the matrix
   */
   template <template <typename> class>
-  SparseMatrix<Number> & add_matrix (const std::string & mat_name, ParallelType = PARALLEL);
+  SparseMatrix<Number> & add_matrix (std::string_view mat_name, ParallelType = PARALLEL);
 
   /**
    * Removes the additional matrix \p mat_name from this system
    */
-  void remove_matrix(const std::string & mat_name);
+  void remove_matrix(std::string_view mat_name);
 
   /**
    * \returns \p true if this \p System has a matrix associated with the
    * given name, \p false otherwise.
    */
-  inline bool have_matrix (const std::string & mat_name) const { return _matrices.count(mat_name); };
+  inline bool have_matrix (std::string_view mat_name) const { return _matrices.count(mat_name); };
 
   /**
    * \returns A const pointer to this system's additional matrix
    * named \p mat_name, or \p nullptr if no matrix by that name
    * exists.
    */
-  const SparseMatrix<Number> * request_matrix (const std::string & mat_name) const;
+  const SparseMatrix<Number> * request_matrix (std::string_view mat_name) const;
 
   /**
    * \returns A writable pointer to this system's additional matrix
    * named \p mat_name, or \p nullptr if no matrix by that name
    * exists.
    */
-  SparseMatrix<Number> * request_matrix (const std::string & mat_name);
+  SparseMatrix<Number> * request_matrix (std::string_view mat_name);
 
   /**
    * \returns A const reference to this system's matrix
    * named \p mat_name.
    */
-  const SparseMatrix<Number> & get_matrix (const std::string & mat_name) const;
+  const SparseMatrix<Number> & get_matrix (std::string_view mat_name) const;
 
   /**
    * \returns A writable reference to this system's matrix
    * named \p mat_name.
    */
-  SparseMatrix<Number> & get_matrix (const std::string & mat_name);
+  SparseMatrix<Number> & get_matrix (std::string_view mat_name);
 
 
 protected:
@@ -2106,7 +2136,7 @@ private:
    * The variable numbers corresponding to user-specified
    * names, useful for name-based lookups.
    */
-  std::map<std::string, unsigned short int> _variable_numbers;
+  std::map<std::string, unsigned short int, std::less<>> _variable_numbers;
 
   /**
    * Flag stating if the system is active or not.
@@ -2119,34 +2149,34 @@ private:
    * vectors.  All the vectors in this map will be distributed
    * in the same way as the solution vector.
    */
-  std::map<std::string, std::unique_ptr<NumericVector<Number>>> _vectors;
+  std::map<std::string, std::unique_ptr<NumericVector<Number>>, std::less<>> _vectors;
 
   /**
    * Holds true if a vector by that name should be projected
    * onto a changed grid, false if it should be zeroed.
    */
-  std::map<std::string, bool> _vector_projections;
+  std::map<std::string, bool, std::less<>> _vector_projections;
 
   /**
    * Holds non-negative if a vector by that name should be projected
    * using adjoint constraints/BCs, -1 if primal
    */
-  std::map<std::string, int> _vector_is_adjoint;
+  std::map<std::string, int, std::less<>> _vector_is_adjoint;
 
   /**
    * Holds the type of a vector
    */
-  std::map<std::string, ParallelType> _vector_types;
+  std::map<std::string, ParallelType, std::less<>> _vector_types;
 
   /**
    * Some systems need an arbitrary number of matrices.
    */
-  std::map<std::string, std::unique_ptr<SparseMatrix<Number>>> _matrices;
+  std::map<std::string, std::unique_ptr<SparseMatrix<Number>>, std::less<>> _matrices;
 
   /**
    * Holds the types of the matrices
    */
-  std::map<std::string, ParallelType> _matrix_types;
+  std::map<std::string, ParallelType, std::less<>> _matrix_types;
 
   /**
    * \p false when additional matrices being added require initialization, \p true otherwise.
@@ -2368,7 +2398,7 @@ const std::string & System::variable_name (const unsigned int i) const
 
 inline
 unsigned int
-System::variable_scalar_number (const std::string & var,
+System::variable_scalar_number (std::string_view var,
                                 unsigned int component) const
 {
   return variable_scalar_number(this->variable_number(var), component);
@@ -2397,7 +2427,7 @@ const FEType & System::variable_type (const unsigned int i) const
 
 
 inline
-const FEType & System::variable_type (const std::string & var) const
+const FEType & System::variable_type (std::string_view var) const
 {
   return _variables[this->variable_number(var)].type();
 }
@@ -2429,7 +2459,7 @@ dof_id_type System::n_active_dofs() const
 
 
 inline
-bool System::have_vector (const std::string & vec_name) const
+bool System::have_vector (std::string_view vec_name) const
 {
   return (_vectors.count(vec_name));
 }
@@ -2478,6 +2508,10 @@ void System::disable_cache () { assemble_before_solve = true; }
 inline
 unsigned int System::n_qois() const
 {
+#ifndef LIBMESH_ENABLE_DEPRECATED
+  libmesh_assert_equal_to(this->qoi.size(), this->qoi_error_estimates.size());
+#endif
+
   return cast_int<unsigned int>(this->qoi.size());
 }
 
@@ -2558,15 +2592,16 @@ unsigned int System::n_matrices () const
 template <template <typename> class MatrixType>
 inline
 SparseMatrix<Number> &
-System::add_matrix (const std::string & mat_name,
+System::add_matrix (std::string_view mat_name,
                     const ParallelType type)
 {
   // Return the matrix if it is already there.
-  if (this->have_matrix(mat_name))
-    return *(_matrices[mat_name]);
+  auto it = this->_matrices.find(mat_name);
+  if (it != this->_matrices.end())
+    return *it->second;
 
   // Otherwise build the matrix to return.
-  auto pr = _matrices.emplace(mat_name, libmesh_make_unique<MatrixType<Number>>(this->comm()));
+  auto pr = _matrices.emplace(mat_name, std::make_unique<MatrixType<Number>>(this->comm()));
   _matrix_types.emplace(mat_name, type);
 
   SparseMatrix<Number> & mat = *(pr.first->second);

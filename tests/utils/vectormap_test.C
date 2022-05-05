@@ -11,7 +11,7 @@ using namespace libMesh;
 class VectormapTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE ( VectormapTest );
+  LIBMESH_CPPUNIT_TEST_SUITE ( VectormapTest );
 
   CPPUNIT_TEST( testCreate );
   CPPUNIT_TEST( testInsert );
@@ -90,6 +90,8 @@ public:
 
   void testCreate()
   {
+    LOG_UNIT_TEST;
+
     create<int, int> ();
     create<int*,int> ();
     create<int*,int*>();
@@ -98,6 +100,8 @@ public:
 
   void testInsert()
   {
+    LOG_UNIT_TEST;
+
     insert<int, int> ();
     insert<char,int> ();
     insert<long,int*>();
@@ -106,6 +110,8 @@ public:
 
   void testEmplace()
   {
+    LOG_UNIT_TEST;
+
     emplace<int, int> ();
     emplace<char,int> ();
     emplace<long,int*>();
@@ -114,6 +120,8 @@ public:
 
   void testIterate()
   {
+    LOG_UNIT_TEST;
+
     iterate<int, int> ();
     iterate<char,int> ();
     iterate<long,int*>();
@@ -122,6 +130,8 @@ public:
 
   void testFind()
   {
+    LOG_UNIT_TEST;
+
     vectormap<int, int> vm;
     for (int i=16; i<32; ++i)
       vm.insert(std::make_pair(i,i));

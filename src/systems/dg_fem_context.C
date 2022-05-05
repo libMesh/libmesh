@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,7 @@ DGFEMContext::DGFEMContext (const System & sys)
 
   for (unsigned int i=0; i != nv; ++i)
     {
-      _neighbor_subresiduals.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_neighbor_residual));
+      _neighbor_subresiduals.emplace_back(std::make_unique<DenseSubVector<Number>>(_neighbor_residual));
       _elem_elem_subjacobians[i].reserve(nv);
       _elem_neighbor_subjacobians[i].reserve(nv);
       _neighbor_elem_subjacobians[i].reserve(nv);
@@ -51,10 +51,10 @@ DGFEMContext::DGFEMContext (const System & sys)
 
       for (unsigned int j=0; j != nv; ++j)
         {
-          _elem_elem_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_elem_elem_jacobian));
-          _elem_neighbor_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_elem_neighbor_jacobian));
-          _neighbor_elem_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_neighbor_elem_jacobian));
-          _neighbor_neighbor_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_neighbor_neighbor_jacobian));
+          _elem_elem_subjacobians[i].emplace_back(std::make_unique<DenseSubMatrix<Number>>(_elem_elem_jacobian));
+          _elem_neighbor_subjacobians[i].emplace_back(std::make_unique<DenseSubMatrix<Number>>(_elem_neighbor_jacobian));
+          _neighbor_elem_subjacobians[i].emplace_back(std::make_unique<DenseSubMatrix<Number>>(_neighbor_elem_jacobian));
+          _neighbor_neighbor_subjacobians[i].emplace_back(std::make_unique<DenseSubMatrix<Number>>(_neighbor_neighbor_jacobian));
         }
     }
 
@@ -89,16 +89,15 @@ void DGFEMContext::neighbor_side_fe_reinit ()
   // the quadrature points on the current side
   std::vector<Point> qface_side_points;
   std::vector<Point> qface_neighbor_points;
-  for (auto & pr : _neighbor_side_fe)
+  for (auto & [neighbor_side_fe_type, fe] : _neighbor_side_fe)
     {
-      FEType neighbor_side_fe_type = pr.first;
       FEAbstract * side_fe = _side_fe[this->get_dim()][neighbor_side_fe_type].get();
       qface_side_points = side_fe->get_xyz();
 
       FEMap::inverse_map (this->get_dim(), &get_neighbor(),
                           qface_side_points, qface_neighbor_points);
 
-      pr.second->reinit(&get_neighbor(), &qface_neighbor_points);
+      fe->reinit(&get_neighbor(), &qface_neighbor_points);
     }
 
   // Set boolean flag to indicate that the DG terms are active on this element

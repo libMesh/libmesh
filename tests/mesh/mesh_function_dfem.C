@@ -46,7 +46,7 @@ class MeshfunctionDFEM : public CppUnit::TestCase
    * for discontinuous shape functions and points close to the boundary
    */
 public:
-  CPPUNIT_TEST_SUITE( MeshfunctionDFEM );
+  LIBMESH_CPPUNIT_TEST_SUITE( MeshfunctionDFEM );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( test_point_locator_dfem );
@@ -130,6 +130,8 @@ public:
   // test that point locator works correctly
   void test_point_locator_dfem()
   {
+    LOG_UNIT_TEST;
+
     // this point is in bottom element only
     Point interior(0.5, -0.5, 0.0);
 
@@ -161,6 +163,8 @@ public:
   // test that mesh function works correctly
   void test_mesh_function_dfem()
   {
+    LOG_UNIT_TEST;
+
     // this point is in top element only
     Point top(0.5, 0.5, 0.0);
 
@@ -229,6 +233,8 @@ public:
   // test that gradient function works correctly
   void test_mesh_function_dfem_grad()
   {
+    LOG_UNIT_TEST;
+
     // this point is in top element only
     Point top(0.5, 0.5, 0.0);
 

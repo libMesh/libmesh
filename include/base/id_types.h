@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -157,6 +157,13 @@ typedef uint16_t largest_id_type;
 #else
 typedef uint8_t largest_id_type;
 #endif
+
+// elemset ids have something in common with both boundary ids and
+// subdomain ids, but are not used for exactly the purposes as
+// either. To try and avoid confusion, we define here a custom type
+// for elemset ids, but for simplicity we just typedef it to be the
+// same as whatever the subdomain_id_type is.
+typedef subdomain_id_type elemset_id_type;
 
 } // namespace libMesh
 

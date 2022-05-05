@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -273,9 +273,7 @@ void Build::operator()(const ConstElemRange & range)
                                            Predicates::NotNull<Elem * const *>());
 
         GhostingFunctor::map_type elements_to_couple;
-
-        // Man, I wish we had guaranteed unique_ptr availability...
-        std::set<CouplingMatrix *> temporary_coupling_matrices;
+        DofMap::CouplingMatricesSet temporary_coupling_matrices;
 
         dof_map.merge_ghost_functor_outputs(elements_to_couple,
                                             temporary_coupling_matrices,
@@ -288,11 +286,8 @@ void Build::operator()(const ConstElemRange & range)
           this->sorted_connected_dofs(elem, element_dofs_i[vi], vi);
 
         for (unsigned int vi=0; vi<n_var; vi++)
-          for (const auto & pr : elements_to_couple)
+          for (const auto & [partner, ghost_coupling] : elements_to_couple)
             {
-              const Elem * const partner = pr.first;
-              const CouplingMatrix * ghost_coupling = pr.second;
-
               // Loop over coupling matrix row variables if we have a
               // coupling matrix, or all variables if not.
               if (ghost_coupling)
@@ -327,10 +322,6 @@ void Build::operator()(const ConstElemRange & range)
                     }
                 }
             } // End ghosted element loop
-
-        for (auto & mat : temporary_coupling_matrices)
-          delete mat;
-
       } // End range element loop
   } // End ghosting functor section
 

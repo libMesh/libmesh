@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,10 @@
 #include "libmesh/fe_type.h"
 #include "libmesh/quadrature_clough.h"
 #include "libmesh/quadrature_gauss.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ Includes
+#include <memory>
+
 
 namespace libMesh
 {
@@ -36,13 +39,13 @@ FEType::default_quadrature_rule (const unsigned int dim,
     {
       Order o = static_cast<Order>(std::max(static_cast<unsigned int>(this->default_quadrature_order()),
                                             static_cast<unsigned int>(7 + extraorder)));
-      return libmesh_make_unique<QClough>(dim, o);
+      return std::make_unique<QClough>(dim, o);
     }
 
   if (family == SUBDIVISION)
-    return libmesh_make_unique<QGauss>(dim, static_cast<Order>(1 + extraorder));
+    return std::make_unique<QGauss>(dim, static_cast<Order>(1 + extraorder));
 
-  return libmesh_make_unique<QGauss>(dim, static_cast<Order>(this->default_quadrature_order() + extraorder));
+  return std::make_unique<QGauss>(dim, static_cast<Order>(this->default_quadrature_order() + extraorder));
 }
 
 
@@ -55,13 +58,13 @@ FEType::unweighted_quadrature_rule (const unsigned int dim,
     {
       Order o = static_cast<Order>(std::max(static_cast<unsigned int>(this->unweighted_quadrature_order()),
                                             static_cast<unsigned int>(3 + extraorder)));
-      return libmesh_make_unique<QClough>(dim, o);
+      return std::make_unique<QClough>(dim, o);
     }
 
   if (family == SUBDIVISION)
-    return libmesh_make_unique<QGauss>(dim, static_cast<Order>(1 + extraorder));
+    return std::make_unique<QGauss>(dim, static_cast<Order>(1 + extraorder));
 
-  return libmesh_make_unique<QGauss>(dim, static_cast<Order>(this->unweighted_quadrature_order() + extraorder));
+  return std::make_unique<QGauss>(dim, static_cast<Order>(this->unweighted_quadrature_order() + extraorder));
 }
 
 } // namespace libMesh

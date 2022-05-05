@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -112,10 +112,6 @@ void SteadySolver::integrate_adjoint_refinement_error_estimate
   (AdjointRefinementEstimator & adjoint_refinement_error_estimator,
    ErrorVector & QoI_elementwise_error)
 {
-  // Make sure the system::qoi_error_estimates vector is of the same size as system::qoi
-  if(_system.qoi_error_estimates.size() != _system.qoi.size())
-      _system.qoi_error_estimates.resize(_system.qoi.size());
-
   // Base class assumes a direct steady state error estimate
   adjoint_refinement_error_estimator.estimate_error(_system, QoI_elementwise_error);
 
@@ -125,7 +121,7 @@ void SteadySolver::integrate_adjoint_refinement_error_estimate
     // Skip this QoI if not in the QoI Set
     if (adjoint_refinement_error_estimator.qoi_set().has_index(j))
     {
-      (_system.qoi_error_estimates)[j] = adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j);
+      _system.set_qoi_error_estimate(j, adjoint_refinement_error_estimator.get_global_QoI_error_estimate(j));
     }
   }
 

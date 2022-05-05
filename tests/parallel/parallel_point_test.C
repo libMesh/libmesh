@@ -1,3 +1,4 @@
+#include <libmesh/int_range.h>
 #include <libmesh/parallel.h>
 #include <libmesh/parallel_algebra.h>
 
@@ -9,12 +10,14 @@ using namespace libMesh;
 
 class ParallelPointTest : public CppUnit::TestCase {
 public:
-  CPPUNIT_TEST_SUITE( ParallelPointTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( ParallelPointTest );
 
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testAllGatherPoint );
   CPPUNIT_TEST( testAllGatherPairPointPoint );
   CPPUNIT_TEST( testAllGatherPairRealPoint );
+  CPPUNIT_TEST( testMapUnionGradient );
+  CPPUNIT_TEST( testMapUnionPoint );
 #endif
 
   CPPUNIT_TEST( testBroadcastVectorValueInt );
@@ -38,6 +41,8 @@ public:
 
   void testAllGatherPoint()
   {
+    LOG_UNIT_TEST;
+
     std::vector<Point> vals;
     Real myrank = TestCommWorld->rank();
     TestCommWorld->allgather(Point(myrank, myrank+0.25, myrank+0.5),vals);
@@ -58,6 +63,8 @@ public:
 
   void testAllGatherPairPointPoint()
   {
+    LOG_UNIT_TEST;
+
     std::vector<std::pair<Point, Point>> vals;
     Real myrank = TestCommWorld->rank();
     TestCommWorld->allgather
@@ -82,6 +89,8 @@ public:
 
   void testAllGatherPairRealPoint()
   {
+    LOG_UNIT_TEST;
+
     std::vector<std::pair<Real, Point>> vals;
     Real myrank = TestCommWorld->rank();
     TestCommWorld->allgather
@@ -101,6 +110,46 @@ public:
       }
   }
 
+
+
+  template <typename VecType>
+  void testMapUnionVec()
+  {
+    // std::map<processor_id_type , std::vector<Point>> vals;
+    std::map<processor_id_type , std::vector<VecType>> vals;
+
+    const processor_id_type myrank = TestCommWorld->rank();
+
+    vals[myrank*2].resize(1);
+    vals[myrank*2][0](0) = myrank+1;
+
+    TestCommWorld->set_union(vals);
+
+    const processor_id_type comm_size = TestCommWorld->size();
+
+    CPPUNIT_ASSERT_EQUAL(vals.size(), std::size_t(comm_size));
+    for (auto p : make_range(comm_size))
+      {
+        CPPUNIT_ASSERT_EQUAL(vals[p*2].size(), std::size_t(1));
+        CPPUNIT_ASSERT_EQUAL(Real(p+1), libmesh_real(vals[p*2][0](0)));
+      }
+  }
+
+
+  void testMapUnionGradient()
+  {
+    LOG_UNIT_TEST;
+
+    testMapUnionVec<Gradient>();
+  }
+
+
+  void testMapUnionPoint()
+  {
+    LOG_UNIT_TEST;
+
+    testMapUnionVec<Point>();
+  }
 
 
   template <typename T>
@@ -129,6 +178,8 @@ public:
 
   void testBroadcastVectorValueInt()
   {
+    LOG_UNIT_TEST;
+
     this->testBroadcastVectorValue<int>();
   }
 
@@ -136,6 +187,8 @@ public:
 
   void testBroadcastVectorValueReal()
   {
+    LOG_UNIT_TEST;
+
     this->testBroadcastVectorValue<Real>();
   }
 
@@ -143,6 +196,8 @@ public:
 
   void testBroadcastPoint()
   {
+    LOG_UNIT_TEST;
+
     std::vector<Point> src(3), dest(3);
 
     {
@@ -166,6 +221,8 @@ public:
 
   void testIsendRecv ()
   {
+    LOG_UNIT_TEST;
+
     unsigned int procup = (TestCommWorld->rank() + 1) %
       TestCommWorld->size();
     unsigned int procdown = (TestCommWorld->size() +
@@ -227,6 +284,8 @@ public:
 
   void testIrecvSend ()
   {
+    LOG_UNIT_TEST;
+
     unsigned int procup = (TestCommWorld->rank() + 1) %
       TestCommWorld->size();
     unsigned int procdown = (TestCommWorld->size() +

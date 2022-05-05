@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -121,11 +121,13 @@ const std::vector<int> hex_inverse_edge_map =
   {
     // Reading Bezier Extraction from Exodus files requires ExodusII v8
 #if EX_API_VERS_NODOT < 800
+    libMesh::libmesh_ignore(elem_type_str);
     return false;
-#endif
+#else
     if (strlen(elem_type_str) <= 4)
       return false;
     return (std::string(elem_type_str, elem_type_str+4) == "BEX_");
+#endif
   }
 
 } // end anonymous namespace
@@ -155,12 +157,16 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   num_edge_blk(header_info.num_edge_blk),
   num_node_sets(header_info.num_node_sets),
   num_side_sets(header_info.num_side_sets),
+  num_elem_sets(header_info.num_elem_sets),
   num_global_vars(0),
   num_sideset_vars(0),
+  num_nodeset_vars(0),
+  num_elemset_vars(0),
   num_elem_this_blk(0),
   num_nodes_per_elem(0),
   num_attr(0),
   num_elem_all_sidesets(0),
+  num_elem_all_elemsets(0),
   bex_num_elem_cvs(0),
   num_time_steps(0),
   num_nodal_vars(0),
@@ -174,6 +180,7 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   _global_vars_initialized(false),
   _nodal_vars_initialized(false),
   _use_mesh_dimension_instead_of_spatial_dimension(false),
+  _write_hdf5(true),
   _end_elem_id(0),
   _write_as_dimension(0),
   _single_precision(single_precision)
@@ -514,14 +521,14 @@ const char * ExodusII_IO_Helper::get_elem_type() const
 
 
 
-void ExodusII_IO_Helper::message(const std::string & msg)
+void ExodusII_IO_Helper::message(std::string_view msg)
 {
   if (verbose) libMesh::out << msg << std::endl;
 }
 
 
 
-void ExodusII_IO_Helper::message(const std::string & msg, int i)
+void ExodusII_IO_Helper::message(std::string_view msg, int i)
 {
   if (verbose) libMesh::out << msg << i << "." << std::endl;
 }
@@ -674,6 +681,7 @@ ExodusII_IO_Helper::read_header() const
   h.num_elem_blk = params.num_elem_blk;
   h.num_node_sets = params.num_node_sets;
   h.num_side_sets = params.num_side_sets;
+  h.num_elem_sets = params.num_elem_sets;
   h.num_edge_blk = params.num_edge_blk;
   h.num_edge = params.num_edge;
 
@@ -693,17 +701,23 @@ void ExodusII_IO_Helper::read_and_store_header_info()
   // Read the number of timesteps which are present in the file
   this->read_num_time_steps();
 
-  ex_err = exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_NODAL, &num_nodal_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of nodal variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_ELEM_BLOCK, &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "g", &num_global_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_GLOBAL, &num_global_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of global variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "s", &num_sideset_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_SIDE_SET, &num_sideset_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of sideset variables.");
+
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_NODE_SET, &num_nodeset_vars);
+  EX_CHECK_ERR(ex_err, "Error reading number of nodeset variables.");
+
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_ELEM_SET, &num_elemset_vars);
+  EX_CHECK_ERR(ex_err, "Error reading number of elemset variables.");
 
   message("Exodus header info retrieved successfully.");
 }
@@ -770,7 +784,8 @@ void ExodusII_IO_Helper::print_header()
                  << "Number of elements: \t" << num_elem << std::endl
                  << "Number of elt blocks: \t" << num_elem_blk << std::endl
                  << "Number of node sets: \t" << num_node_sets << std::endl
-                 << "Number of side sets: \t" << num_side_sets << std::endl;
+                 << "Number of side sets: \t" << num_side_sets << std::endl
+                 << "Number of elem sets: \t" << num_elem_sets << std::endl;
 }
 
 
@@ -1173,6 +1188,7 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
               const int * as_int = static_cast<int *>(attr.values);
               std::copy(as_int, as_int+attr.value_count, bex_elem_degrees.begin());
 
+
               // Right now Bezier extraction elements aren't possible
               // for p>2 and aren't useful for p<2, and we don't
               // support anisotropic p...
@@ -1183,30 +1199,36 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
                 libmesh_assert_equal_to(bex_elem_degrees[d], 2);
 #endif
             }
+            // ex_get_attributes did a values=calloc(); free() is our job.
+            if (attr.values)
+              free(attr.values);
         }
     }
 
   if (is_bezier)
     {
       // We'd better have the number of cvs we expect
-      bex_num_elem_cvs = num_node_data_per_elem - num_nodes_per_elem;
+      if( num_node_data_per_elem > num_nodes_per_elem )
+        bex_num_elem_cvs = num_node_data_per_elem / 2;
+      else
+        bex_num_elem_cvs = num_nodes_per_elem;
       libmesh_assert_greater_equal(bex_num_elem_cvs, 0);
 
       // The old connect vector is currently a mix of the expected
       // connectivity and any Bezier extraction connectivity;
       // disentangle that, if necessary.
       bex_cv_conn.resize(num_elem_this_blk);
-      if (bex_num_elem_cvs)
+      if (num_node_data_per_elem > num_nodes_per_elem)
         {
-          std::vector<int> old_connect(num_nodes_per_elem * num_elem_this_blk);
+          std::vector<int> old_connect(bex_num_elem_cvs * num_elem_this_blk);
           old_connect.swap(connect);
           auto src = old_connect.data();
           auto dst = connect.data();
           for (auto e : IntRange<std::size_t>(0, num_elem_this_blk))
             {
-              std::copy(src, src + num_nodes_per_elem, dst);
-              src += num_nodes_per_elem;
-              dst += num_nodes_per_elem;
+              std::copy(src, src + bex_num_elem_cvs, dst);
+              src += bex_num_elem_cvs;
+              dst += bex_num_elem_cvs;
 
               bex_cv_conn[e].resize(bex_num_elem_cvs);
               std::copy(src, src + bex_num_elem_cvs,
@@ -1440,7 +1462,7 @@ void ExodusII_IO_Helper::read_nodeset_info()
       EX_CHECK_ERR(ex_err, "Error retrieving nodeset information.");
       message("All nodeset information retrieved successfully.");
 
-      // Resize appropriate data structures -- only do this once outnode the loop
+      // Resize appropriate data structures -- only do this once outside the loop
       num_nodes_per_set.resize(num_node_sets);
       num_node_df_per_set.resize(num_node_sets);
     }
@@ -1454,6 +1476,46 @@ void ExodusII_IO_Helper::read_nodeset_info()
       id_to_ns_names[nodeset_ids[i]] = name_buffer;
     }
   message("All node set names retrieved successfully.");
+}
+
+
+
+void ExodusII_IO_Helper::read_elemset_info()
+{
+  elemset_ids.resize(num_elem_sets);
+  if (num_elem_sets > 0)
+    {
+      ex_err = exII::ex_get_ids(ex_id,
+                                exII::EX_ELEM_SET,
+                                elemset_ids.data());
+      EX_CHECK_ERR(ex_err, "Error retrieving elemset information.");
+      message("All elemset information retrieved successfully.");
+
+      // Resize appropriate data structures -- only do this once outside the loop
+      num_elems_per_set.resize(num_elem_sets);
+      num_elem_df_per_set.resize(num_elem_sets);
+
+      // Inquire about the length of the concatenated elemset list
+      num_elem_all_elemsets =
+        inquire(*this, exII::EX_INQ_ELS_LEN,
+                "Error retrieving length of the concatenated elem sets element list!");
+
+      elemset_list.resize(num_elem_all_elemsets);
+      elemset_id_list.resize(num_elem_all_elemsets);
+
+      // Debugging
+      // libMesh::out << "num_elem_all_elemsets = " << num_elem_all_elemsets << std::endl;
+    }
+
+  char name_buffer[MAX_STR_LENGTH+1];
+  for (int i=0; i<num_elem_sets; ++i)
+    {
+      ex_err = exII::ex_get_name(ex_id, exII::EX_ELEM_SET,
+                                 elemset_ids[i], name_buffer);
+      EX_CHECK_ERR(ex_err, "Error getting node set name.");
+      id_to_elemset_names[elemset_ids[i]] = name_buffer;
+    }
+  message("All elem set names retrieved successfully.");
 }
 
 
@@ -1503,6 +1565,49 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
 
 
 
+void ExodusII_IO_Helper::read_elemset(int id, int offset)
+{
+  libmesh_assert_less (id, elemset_ids.size());
+  libmesh_assert_less (id, num_elems_per_set.size());
+  libmesh_assert_less (id, num_elem_df_per_set.size());
+  libmesh_assert_less_equal (offset, elemset_list.size());
+
+  ex_err = exII::ex_get_set_param(ex_id,
+                                  exII::EX_ELEM_SET,
+                                  elemset_ids[id],
+                                  &num_elems_per_set[id],
+                                  &num_elem_df_per_set[id]);
+  EX_CHECK_ERR(ex_err, "Error retrieving elemset parameters.");
+  message("Parameters retrieved successfully for elemset: ", id);
+
+
+  // It's OK for offset==elemset_list.size() as long as num_elems_per_set[id]==0
+  // because in that case we don't actually read anything...
+  #ifdef DEBUG
+  if (static_cast<unsigned int>(offset) == elemset_list.size())
+    libmesh_assert_equal_to (num_elems_per_set[id], 0);
+  #endif
+
+  // Don't call ex_get_set() unless there are actually elems there to get.
+  // Exodus prints an annoying warning in DEBUG mode otherwise...
+  if (num_elems_per_set[id] > 0)
+    {
+      ex_err = exII::ex_get_set(ex_id,
+                                exII::EX_ELEM_SET,
+                                elemset_ids[id],
+                                &elemset_list[offset],
+                                /*set_extra_list=*/nullptr);
+      EX_CHECK_ERR(ex_err, "Error retrieving elemset data.");
+      message("Data retrieved successfully for elemset: ", id);
+
+      // Create vector containing elemset ids for each element in the set
+      for (int i=0; i<num_elems_per_set[id]; i++)
+        elemset_id_list[i+offset] = elemset_ids[id];
+    }
+}
+
+
+
 void ExodusII_IO_Helper::read_all_nodesets()
 {
   // Figure out how many nodesets there are in the file so we can
@@ -1538,17 +1643,21 @@ void ExodusII_IO_Helper::read_all_nodesets()
   node_sets_node_list.clear();  node_sets_node_list.resize(total_nodes_in_all_sets);
   node_sets_dist_fact.clear();  node_sets_dist_fact.resize(total_df_in_all_sets);
 
-  ex_err = exII::ex_get_concat_node_sets
-    (ex_id,
-     nodeset_ids.data(),
-     num_nodes_per_set.data(),
-     num_node_df_per_set.data(),
-     node_sets_node_index.data(),
-     node_sets_dist_index.data(),
-     node_sets_node_list.data(),
-     total_df_in_all_sets ?
-     MappedInputVector(node_sets_dist_fact, _single_precision).data() : nullptr);
+  // Handle single-precision files
+  MappedInputVector mapped_node_sets_dist_fact(node_sets_dist_fact, _single_precision);
 
+  // Build exII::ex_set_spec struct
+  exII::ex_set_specs set_specs = {};
+  set_specs.sets_ids            = nodeset_ids.data();
+  set_specs.num_entries_per_set = num_nodes_per_set.data();
+  set_specs.num_dist_per_set    = num_node_df_per_set.data();
+  set_specs.sets_entry_index    = node_sets_node_index.data();
+  set_specs.sets_dist_index     = node_sets_dist_index.data();
+  set_specs.sets_entry_list     = node_sets_node_list.data();
+  set_specs.sets_extra_list     = nullptr;
+  set_specs.sets_dist_fact      = total_df_in_all_sets ? mapped_node_sets_dist_fact.data() : nullptr;
+
+  ex_err = exII::ex_get_concat_sets(ex_id, exII::EX_NODE_SET, &set_specs);
   EX_CHECK_ERR(ex_err, "Error reading concatenated nodesets");
 
   // Read the nodeset names from file!
@@ -1655,10 +1764,12 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
   std::vector<Real> unmapped_nodal_var_values(num_nodes);
 
   // Call the Exodus API to read the nodal variable values
-  ex_err = exII::ex_get_nodal_var
+  ex_err = exII::ex_get_var
     (ex_id,
      time_step,
+     exII::EX_NODAL,
      var_index+1,
+     1, // exII::ex_entity_id, not sure exactly what this is but in the ex_get_nodal_var.c shim, they pass 1
      num_nodes,
      MappedInputVector(unmapped_nodal_var_values, _single_precision).data());
   EX_CHECK_ERR(ex_err, "Error reading nodal variable values!");
@@ -1698,6 +1809,9 @@ void ExodusII_IO_Helper::read_var_names(ExodusVarType type)
       break;
     case NODESET:
       this->read_var_names_impl("m", num_nodeset_vars, nodeset_var_names);
+      break;
+    case ELEMSET:
+      this->read_var_names_impl("t", num_elemset_vars, elemset_var_names);
       break;
     default:
       libmesh_error_msg("Unrecognized ExodusVarType " << type);
@@ -1774,6 +1888,11 @@ ExodusII_IO_Helper::write_var_names(ExodusVarType type,
         this->write_var_names_impl("m", num_nodeset_vars, names);
         break;
       }
+    case ELEMSET:
+      {
+        this->write_var_names_impl("t", num_elemset_vars, names);
+        break;
+      }
     default:
       libmesh_error_msg("Unrecognized ExodusVarType " << type);
     }
@@ -1804,7 +1923,14 @@ ExodusII_IO_Helper::write_var_names_impl(const char * var_type,
 
       // Store the input names in the format required by Exodus.
       for (int i=0; i != count; ++i)
-        names_table.push_back_entry(names[i]);
+        {
+          if(names[i].length() > MAX_STR_LENGTH)
+            libmesh_warning(
+              "*** Warning, Exodus variable name \""
+              << names[i] << "\" too long (max " << MAX_STR_LENGTH
+              << " characters). Name will be truncated. ");
+          names_table.push_back_entry(names[i]);
+        }
 
       if (verbose)
         {
@@ -1857,16 +1983,19 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
   // Element variable truth table
   std::vector<int> var_table(block_ids.size() * elem_var_names.size());
-  exII::ex_get_var_tab(ex_id, "e", block_ids.size(), elem_var_names.size(), var_table.data());
+  exII::ex_get_truth_table(ex_id, exII::EX_ELEM_BLOCK, block_ids.size(), elem_var_names.size(), var_table.data());
 
   for (unsigned i=0; i<static_cast<unsigned>(num_elem_blk); i++)
     {
-      ex_err = exII::ex_get_elem_block(ex_id,
-                                       block_ids[i],
-                                       nullptr,
-                                       &num_elem_this_blk,
-                                       nullptr,
-                                       nullptr);
+      ex_err = exII::ex_get_block(ex_id,
+                                  exII::EX_ELEM_BLOCK,
+                                  block_ids[i],
+                                  /*elem_type=*/nullptr,
+                                  &num_elem_this_blk,
+                                  /*num_nodes_per_entry=*/nullptr,
+                                  /*num_edges_per_entry=*/nullptr,
+                                  /*num_faces_per_entry=*/nullptr,
+                                  /*num_attr=*/nullptr);
       EX_CHECK_ERR(ex_err, "Error getting number of elements in block.");
 
       // If the current variable isn't active on this subdomain, advance
@@ -1880,9 +2009,10 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
       std::vector<Real> block_elem_var_values(num_elem_this_blk);
 
-      ex_err = exII::ex_get_elem_var
+      ex_err = exII::ex_get_var
         (ex_id,
          time_step,
+         exII::EX_ELEM_BLOCK,
          var_index+1,
          block_ids[i],
          num_elem_this_blk,
@@ -1942,8 +2072,11 @@ void ExodusII_IO_Helper::create(std::string filename)
       // in a more modern NETCDF4-compatible format. For this file
       // type, "ncdump -k" will report "netCDF-4".
 #ifdef LIBMESH_HAVE_HDF5
-      mode |= EX_NETCDF4;
-      mode |= EX_NOCLASSIC;
+      if (this->_write_hdf5)
+        {
+          mode |= EX_NETCDF4;
+          mode |= EX_NOCLASSIC;
+        }
 #endif
 
       ex_id = exII::ex_create(filename.c_str(), mode, &comp_ws, &io_ws);
@@ -2070,6 +2203,21 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   // we have.
   num_edge_blk = bi.get_edge_boundary_ids().size();
 
+  // Check whether the Mesh Elems have an extra_integer called "elemset_code".
+  // If so, this means that the mesh defines elemsets via the
+  // extra_integers capability of Elems.
+  if (mesh.has_elem_integer("elemset_code"))
+    {
+      // unsigned int elemset_index =
+      //   mesh.get_elem_integer_index("elemset_code");
+
+      // Debugging
+      // libMesh::out << "Mesh defines an elemset_code at index " << elemset_index << std::endl;
+
+      // Store the number of elemsets in the exo file header.
+      num_elem_sets = mesh.n_elemsets();
+    }
+
   // Build an ex_init_params() structure that is to be passed to the
   // newer ex_put_init_ext() API. The new API will eventually allow us
   // to store edge and face data in the Exodus file.
@@ -2089,6 +2237,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   params.num_elem_blk = num_elem_blk;
   params.num_node_sets = num_node_sets;
   params.num_side_sets = num_side_sets;
+  params.num_elem_sets = num_elem_sets;
   params.num_edge_blk = num_edge_blk;
   params.num_edge = num_edge;
 
@@ -2116,6 +2265,21 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
   y.reserve(num_nodes);
   z.reserve(num_nodes);
 
+  auto push_node = [this](const Point & p) {
+    x.push_back(p(0) + _coordinate_offset(0));
+
+#if LIBMESH_DIM > 1
+    y.push_back(p(1) + _coordinate_offset(1));
+#else
+    y.push_back(0.);
+#endif
+#if LIBMESH_DIM > 2
+    z.push_back(p(2) + _coordinate_offset(2));
+#else
+    z.push_back(0.);
+#endif
+  };
+
   // And in the node_num_map - since the nodes aren't organized in
   // blocks, libmesh will always write out the identity map
   // here... unless there has been some refinement and coarsening, or
@@ -2133,18 +2297,8 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
         {
           const Node & node = *node_ptr;
 
-          x.push_back(node(0) + _coordinate_offset(0));
+          push_node(node);
 
-#if LIBMESH_DIM > 1
-          y.push_back(node(1) + _coordinate_offset(1));
-#else
-          y.push_back(0.);
-#endif
-#if LIBMESH_DIM > 2
-          z.push_back(node(2) + _coordinate_offset(2));
-#else
-          z.push_back(0.);
-#endif
 
           // Fill in node_num_map entry with the proper (1-based) node id
           node_num_map.push_back(node.id() + 1);
@@ -2160,17 +2314,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
       for (const auto & elem : mesh.active_element_ptr_range())
         for (const Node & node : elem->node_ref_range())
           {
-            x.push_back(node(0));
-#if LIBMESH_DIM > 1
-            y.push_back(node(1));
-#else
-            y.push_back(0.);
-#endif
-#if LIBMESH_DIM > 2
-            z.push_back(node(2));
-#else
-            z.push_back(0.);
-#endif
+            push_node(node);
 
             // Let's skip the node_num_map in the discontinuous
             // case, since we're effectively duplicating nodes for
@@ -2856,10 +3000,12 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
         }
     }
 
-  ex_err = exII::ex_put_elem_var_tab(ex_id,
-                                     num_elem_blk,
-                                     num_elem_vars,
-                                     truth_tab.data());
+  ex_err = exII::ex_put_truth_table
+    (ex_id,
+     exII::EX_ELEM_BLOCK,
+     num_elem_blk,
+     num_elem_vars,
+     truth_tab.data());
   EX_CHECK_ERR(ex_err, "Error writing element truth table.");
 }
 
@@ -2982,6 +3128,100 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 
 
 void
+ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
+{
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
+    return;
+
+  // TODO: Add support for named elemsets
+  // NamesData names_table(elemsets.size(), MAX_STR_LENGTH);
+
+  // We only need to write elemsets if the Mesh has an extra elem
+  // integer called "elemset_code" defined on it.
+  if (mesh.has_elem_integer("elemset_code"))
+    {
+      std::map<elemset_id_type, std::vector<int>> exodus_elemsets;
+
+      unsigned int elemset_index =
+        mesh.get_elem_integer_index("elemset_code");
+
+      // Catch ids returned from MeshBase::get_elemsets() calls
+      MeshBase::elemset_type set_ids;
+      for (const auto & elem : mesh.element_ptr_range())
+        {
+          dof_id_type elemset_code =
+            elem->get_extra_integer(elemset_index);
+
+          // Look up which element set ids (if any) this elemset_code corresponds to.
+          mesh.get_elemsets(elemset_code, set_ids);
+
+          // Debugging
+          // libMesh::out << "elemset_code = " << elemset_code << std::endl;
+          // for (const auto & set_id : set_ids)
+          //   libMesh::out << set_id << " ";
+          // libMesh::out << std::endl;
+
+          // Store this Elem id in every set to which it belongs.
+          for (const auto & set_id : set_ids)
+            exodus_elemsets[set_id].push_back(libmesh_elem_num_to_exodus[elem->id()]);
+        }
+
+      // Debugging: print contents of exodus_elemsets map
+      // for (const auto & [set_id, elem_ids] : exodus_elemsets)
+      //   {
+      //     libMesh::out << "elemset " << set_id << ": ";
+      //     for (const auto & elem_id : elem_ids)
+      //       libMesh::out << elem_id << " ";
+      //     libMesh::out << std::endl;
+      //   }
+
+      // Only continue if we actually had some elements in sets
+      if (!exodus_elemsets.empty())
+        {
+          // Reserve space, loop over newly-created map, construct
+          // exII::ex_set objects to be passed to exII::ex_put_sets(). Note:
+          // we do non-const iteration since Exodus requires non-const pointers
+          // to be passed to its APIs.
+          std::vector<exII::ex_set> sets;
+          sets.reserve(exodus_elemsets.size());
+
+          for (auto & [elem_set_id, ids_vec] : exodus_elemsets)
+            {
+              // TODO: Add support for named elemsets
+              // names_table.push_back_entry(mesh.get_elemset_name(elem_set_id));
+
+              exII::ex_set & current_set = sets.emplace_back();
+              current_set.id = elem_set_id;
+              current_set.type = exII::EX_ELEM_SET;
+              current_set.num_entry = ids_vec.size();
+              current_set.num_distribution_factor = 0;
+              current_set.entry_list = ids_vec.data();
+              current_set.extra_list = nullptr; // extra_list is used for sidesets, not needed for elemsets
+              current_set.distribution_factor_list = nullptr; // not used for elemsets
+            }
+
+          // Sanity check: make sure the number of elemsets we already wrote to the header
+          // matches the number of elemsets we just constructed by looping over the Mesh.
+          libmesh_assert_msg(num_elem_sets == cast_int<int>(exodus_elemsets.size()),
+                             "Mesh has " << exodus_elemsets.size()
+                             << " elemsets, but header was written with num_elem_sets == " << num_elem_sets);
+          libmesh_assert_msg(num_elem_sets == cast_int<int>(mesh.n_elemsets()),
+                             "mesh.n_elemsets() == " << mesh.n_elemsets()
+                             << ", but header was written with num_elem_sets == " << num_elem_sets);
+
+          ex_err = exII::ex_put_sets(ex_id, exodus_elemsets.size(), sets.data());
+          EX_CHECK_ERR(ex_err, "Error writing elemsets");
+
+          // TODO: Add support for named elemsets
+          // ex_err = exII::ex_put_names(ex_id, exII::EX_ELEM_SET, names_table.get_char_star_star());
+          // EX_CHECK_ERR(ex_err, "Error writing elemset names");
+        } // end if (!exodus_elemsets.empty())
+    } // end if (mesh.has_elem_integer("elemset_code"))
+}
+
+
+
+void
 ExodusII_IO_Helper::
 write_sideset_data(const MeshBase & mesh,
                    int timestep,
@@ -3008,8 +3248,8 @@ write_sideset_data(const MeshBase & mesh,
   this->read_sideset_info();
 
   // Write "truth" table for sideset variables.  The function
-  // exII::ex_put_var_param() must be called before
-  // exII::ex_put_sset_var_tab(). For us, this happens during the call
+  // exII::ex_put_variable_param() must be called before
+  // exII::ex_put_truth_table(). For us, this happens during the call
   // to ExodusII_IO_Helper::write_var_names(). sset_var_tab is a logically
   // (num_side_sets x num_sset_var) integer array of 0s and 1s
   // indicating which sidesets a given sideset variable is defined on.
@@ -3038,7 +3278,7 @@ write_sideset_data(const MeshBase & mesh,
           // Otherwise, fill in this entry of the sideset truth table.
           sset_var_tab[ss*var_names.size() + var] = 1;
 
-          // Data vector that will eventually be passed to exII::ex_put_sset_var().
+          // Data vector that will eventually be passed to exII::ex_put_var().
           std::vector<Real> sset_var_vals(num_sides_per_set[ss]);
 
           // Get reference to the BCTuple -> Real map for this variable.
@@ -3094,9 +3334,10 @@ write_sideset_data(const MeshBase & mesh,
           // sideset) pair.
           if (sset_var_vals.size() > 0)
             {
-              ex_err = exII::ex_put_sset_var
+              ex_err = exII::ex_put_var
                 (ex_id,
                  timestep,
+                 exII::EX_SIDE_SET,
                  var + 1, // 1-based variable index of current variable
                  ss_ids[ss],
                  num_sides_per_set[ss],
@@ -3108,10 +3349,11 @@ write_sideset_data(const MeshBase & mesh,
 
   // Finally, write the sideset truth table.
   ex_err =
-    exII::ex_put_sset_var_tab(ex_id,
-                              num_side_sets,
-                              cast_int<int>(var_names.size()),
-                              sset_var_tab.data());
+    exII::ex_put_truth_table(ex_id,
+                             exII::EX_SIDE_SET,
+                             num_side_sets,
+                             cast_int<int>(var_names.size()),
+                             sset_var_tab.data());
   EX_CHECK_ERR(ex_err, "Error writing sideset var truth table.");
 }
 
@@ -3133,8 +3375,9 @@ read_sideset_data(const MeshBase & mesh,
     {
       // Read the sideset data truth table
       std::vector<int> sset_var_tab(num_side_sets * num_sideset_vars);
-      ex_err = exII::ex_get_sset_var_tab
+      ex_err = exII::ex_get_truth_table
         (ex_id,
+         exII::EX_SIDE_SET,
          num_side_sets,
          num_sideset_vars,
          sset_var_tab.data());
@@ -3173,9 +3416,10 @@ read_sideset_data(const MeshBase & mesh,
                   // to this->read_sideset_info() has already set the
                   // values of num_sides_per_set, so we just use those values here.
                   std::vector<Real> sset_var_vals(num_sides_per_set[ss]);
-                  ex_err = exII::ex_get_sset_var
+                  ex_err = exII::ex_get_var
                     (ex_id,
                      timestep,
+                     exII::EX_SIDE_SET,
                      var + 1, // 1-based sideset variable index!
                      ss_ids[ss],
                      num_sides_per_set[ss],
@@ -3222,77 +3466,46 @@ ExodusII_IO_Helper::
 get_sideset_data_indices (const MeshBase & mesh,
                           std::map<BoundaryInfo::BCTuple, unsigned int> & bc_array_indices)
 {
-  // This reads the sideset variable names into the local
-  // sideset_var_names data structure.
-  this->read_var_names(SIDESET);
+  // Clear any existing data, we are going to build this data structure from scratch
+  bc_array_indices.clear();
 
-  if (num_sideset_vars)
+  // Store the sideset data array indices.
+  //
+  // Note: we assume that read_sideset() has already been called
+  // for each sideset, so the required values in elem_list and
+  // side_list are already present.
+  int offset=0;
+  for (int ss=0; ss<num_side_sets; ++ss)
     {
-      // Read the sideset data truth table
-      std::vector<int> sset_var_tab(num_side_sets * num_sideset_vars);
-      ex_err = exII::ex_get_sset_var_tab
-        (ex_id,
-         num_side_sets,
-         num_sideset_vars,
-         sset_var_tab.data());
-      EX_CHECK_ERR(ex_err, "Error reading sideset variable truth table.");
-
-      // Store the sideset data array indices.
-      //
-      // Note: we assume that read_sideset() has already been called
-      // for each sideset, so the required values in elem_list and
-      // side_list are already present.
-      int offset=0;
-      for (int ss=0; ss<num_side_sets; ++ss)
+      offset += (ss > 0 ? num_sides_per_set[ss-1] : 0);
+      for (int i=0; i<num_sides_per_set[ss]; ++i)
         {
-          offset += (ss > 0 ? num_sides_per_set[ss-1] : 0);
-          for (int var=0; var<num_sideset_vars; ++var)
-            {
-              int is_present = sset_var_tab[num_sideset_vars*ss + var];
+          dof_id_type exodus_elem_id = elem_list[i + offset];
+          unsigned int exodus_side_id = side_list[i + offset];
 
-              if (is_present)
-                {
-                  // Note: we don't actually call exII::ex_get_sset_var() here because
-                  // we don't need the values. We only need the indices into that vector
-                  // for each (elem, side, boundary_id) tuple.
-                  for (int i=0; i<num_sides_per_set[ss]; ++i)
-                    {
-                      dof_id_type exodus_elem_id = elem_list[i + offset];
-                      unsigned int exodus_side_id = side_list[i + offset];
+          // FIXME: We should use exodus_elem_num_to_libmesh for this,
+          // but it apparently is never set up, so just
+          // subtract 1 from the Exodus elem id.
+          dof_id_type converted_elem_id = exodus_elem_id - 1;
 
-                      // FIXME: We should use exodus_elem_num_to_libmesh for this,
-                      // but it apparently is never set up, so just
-                      // subtract 1 from the Exodus elem id.
-                      dof_id_type converted_elem_id = exodus_elem_id - 1;
+          // Conversion operator for this Elem type
+          const auto & conv = get_conversion(mesh.elem_ptr(converted_elem_id)->type());
 
-                      // Map Exodus side id to libmesh side id.
-                      // Map from Exodus side ids to libmesh side ids.
-                      const auto & conv = get_conversion(mesh.elem_ptr(converted_elem_id)->type());
+          // Map from Exodus side id to libmesh side id.
+          // Note: the mapping is defined on 0-based indices, so subtract
+          // 1 before doing the mapping.
+          unsigned int converted_side_id = conv.get_side_map(exodus_side_id - 1);
 
-                      // Map from Exodus side id to libmesh side id.
-                      // Note: the mapping is defined on 0-based indices, so subtract
-                      // 1 before doing the mapping.
-                      unsigned int converted_side_id = conv.get_side_map(exodus_side_id - 1);
+          // Make a BCTuple key from the converted information.
+          BoundaryInfo::BCTuple key = std::make_tuple
+            (converted_elem_id,
+             converted_side_id,
+             ss_ids[ss]);
 
-                      // Make a BCTuple key from the converted information.
-                      BoundaryInfo::BCTuple key = std::make_tuple
-                        (converted_elem_id,
-                         converted_side_id,
-                         ss_ids[ss]);
-
-                      // Store (elem, side, b_id) tuple with corresponding array index
-                      bc_array_indices.emplace(key, cast_int<unsigned int>(i));
-                    } // end for (i)
-
-                  // We only need to get the indices once per sideset
-                  // (not once per variable defined on this sideset)
-                  // so we can break out of this var loop as soon as
-                  // any variable is_present.
-                  break; // out of var loop
-                } // end if (present)
-            } // end for (var)
-        } // end for (ss)
-    } // end if (num_sideset_vars)
+          // Store (elem, side, b_id) tuple with corresponding array index
+          bc_array_indices.emplace(key, cast_int<unsigned int>(i));
+        } // end for (i)
+    } // end for (ss)
 }
 
 
@@ -3301,7 +3514,7 @@ void ExodusII_IO_Helper::
 write_nodeset_data (int timestep,
                     const std::vector<std::string> & var_names,
                     const std::vector<std::set<boundary_id_type>> & node_boundary_ids,
-                    std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
+                    const std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
@@ -3343,7 +3556,7 @@ write_nodeset_data (int timestep,
         // Otherwise, fill in this entry of the nodeset truth table.
         nset_var_tab[ns*var_names.size() + var] = 1;
 
-        // Data vector that will eventually be passed to exII::ex_put_nset_var().
+        // Data vector that will eventually be passed to exII::ex_put_var().
         std::vector<Real> nset_var_vals(num_nodes_per_set[ns]);
 
         // Get reference to the NodeBCTuple -> Real map for this variable.
@@ -3374,9 +3587,10 @@ write_nodeset_data (int timestep,
         // Write nodeset values to Exodus file
         if (nset_var_vals.size() > 0)
           {
-            ex_err = exII::ex_put_nset_var
+            ex_err = exII::ex_put_var
               (ex_id,
                timestep,
+               exII::EX_NODE_SET,
                var + 1, // 1-based variable index of current variable
                nodeset_ids[ns],
                num_nodes_per_set[ns],
@@ -3388,11 +3602,284 @@ write_nodeset_data (int timestep,
 
   // Finally, write the nodeset truth table.
   ex_err =
-    exII::ex_put_nset_var_tab(ex_id,
-                              num_node_sets,
-                              cast_int<int>(var_names.size()),
-                              nset_var_tab.data());
+    exII::ex_put_truth_table(ex_id,
+                             exII::EX_NODE_SET,
+                             num_node_sets,
+                             cast_int<int>(var_names.size()),
+                             nset_var_tab.data());
   EX_CHECK_ERR(ex_err, "Error writing nodeset var truth table.");
+}
+
+
+
+void
+ExodusII_IO_Helper::
+write_elemset_data (int timestep,
+                    const std::vector<std::string> & var_names,
+                    const std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                    const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals)
+{
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
+    return;
+
+  // Write the elemset variable names to file. This function should
+  // only be called once for ELEMSET variables, repeated calls to
+  // write_var_names() overwrites/changes the order of names that were
+  // there previously, and will mess up any data that has already been
+  // written.
+  this->write_var_names(ELEMSET, var_names);
+
+  // We now call the API to read the elemset info even though we are
+  // in the middle of writing. This is a bit counter-intuitive, but it
+  // seems to work provided that you have already written the mesh
+  // itself... read_elemset_info() fills in the following data
+  // members:
+  // .) id_to_elemset_names
+  // .) num_elems_per_set
+  // .) num_elem_df_per_set
+  // .) elemset_list
+  // .) elemset_id_list
+  // .) id_to_elemset_names
+  this->read_elemset_info();
+
+  // The "truth" table for elemset variables. elemset_var_tab is a
+  // logically (num_elem_sets x num_elemset_vars) integer array of 0s and
+  // 1s indicating which elemsets a given elemset variable is defined
+  // on.
+  std::vector<int> elemset_var_tab(num_elem_sets * var_names.size());
+
+  int offset=0;
+  for (int es=0; es<num_elem_sets; ++es)
+    {
+      // Debugging
+      // libMesh::out << "Writing elemset variable values for elemset "
+      //              << es << ", elemset_id = " << elemset_ids[es]
+      //              << std::endl;
+
+      // We know num_elems_per_set because we called read_elemset_info() above.
+      offset += (es > 0 ? num_elems_per_set[es-1] : 0);
+      this->read_elemset(es, offset);
+
+      // For each variable in var_names, write the values for the
+      // current elemset, if any.
+      for (auto var : index_range(var_names))
+        {
+          // Debugging
+          // libMesh::out << "Writing elemset variable values for var " << var << std::endl;
+
+          // If this var has no values on this elemset, go to the next one.
+          if (!elemset_ids_in[var].count(elemset_ids[es]))
+            continue;
+
+          // Otherwise, fill in this entry of the nodeset truth table.
+          elemset_var_tab[es*var_names.size() + var] = 1;
+
+          // Data vector that will eventually be passed to exII::ex_put_var().
+          std::vector<Real> elemset_var_vals(num_elems_per_set[es]);
+
+          // Get reference to the (elem_id, elemset_id) -> Real map for this variable.
+          const auto & data_map = elemset_vals[var];
+
+          // Loop over entries in current elemset.
+          for (int i=0; i<num_elems_per_set[es]; ++i)
+            {
+              // Here we convert Exodus elem ids to libMesh node ids
+              // simply by subtracting 1.  We should probably use the
+              // exodus_elem_num_to_libmesh data structure for this,
+              // but I don't think it is set up at the time when this
+              // function is normally called.
+              dof_id_type libmesh_elem_id = elemset_list[i + offset] - 1;
+
+              // Construct a key to look up values in data_map.
+              std::pair<dof_id_type, elemset_id_type> key =
+                std::make_pair(libmesh_elem_id, elemset_ids[es]);
+
+              // Debugging:
+              // libMesh::out << "Searching for key = (" << key.first << ", " << key.second << ")" << std::endl;
+
+              // We require that the user provided either no values for
+              // this (var, elemset) combination (in which case we don't
+              // reach this point) or a value for _every_ elem in this
+              // elemset for this var, so we use the libmesh_map_find()
+              // macro to check for this.
+              elemset_var_vals[i] = libmesh_map_find(data_map, key);
+            } // end for (node in nodeset[ns])
+
+          // Write elemset values to Exodus file
+          if (elemset_var_vals.size() > 0)
+            {
+              ex_err = exII::ex_put_var
+                (ex_id,
+                 timestep,
+                 exII::EX_ELEM_SET,
+                 var + 1, // 1-based variable index of current variable
+                 elemset_ids[es],
+                 num_elems_per_set[es],
+                 MappedOutputVector(elemset_var_vals, _single_precision).data());
+              EX_CHECK_ERR(ex_err, "Error writing elemset vars.");
+            }
+        } // end for (var in var_names)
+    } // end for (ns)
+
+  // Finally, write the elemset truth table to file.
+  ex_err =
+    exII::ex_put_truth_table(ex_id,
+                             exII::EX_ELEM_SET, // exII::ex_entity_type
+                             num_elem_sets,
+                             cast_int<int>(var_names.size()),
+                             elemset_var_tab.data());
+  EX_CHECK_ERR(ex_err, "Error writing elemset var truth table.");
+}
+
+
+
+void
+ExodusII_IO_Helper::
+read_elemset_data (int timestep,
+                   std::vector<std::string> & var_names,
+                   std::vector<std::set<elemset_id_type>> & elemset_ids_in,
+                   std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals)
+{
+  // This reads the elemset variable names into the local
+  // elemset_var_names data structure.
+  this->read_var_names(ELEMSET);
+
+  // Debugging
+  // libMesh::out << "elmeset variable names:" << std::endl;
+  // for (const auto & name : elemset_var_names)
+  //   libMesh::out << name << " ";
+  // libMesh::out << std::endl;
+
+  if (num_elemset_vars)
+    {
+      // Debugging
+      // std::cout << "Reading " << num_elem_sets
+      //           << " elemsets and " << num_elemset_vars
+      //           << " elemset variables." << std::endl;
+
+      // Read the elemset data truth table.
+      std::vector<int> elemset_var_tab(num_elem_sets * num_elemset_vars);
+      exII::ex_get_truth_table(ex_id,
+                               exII::EX_ELEM_SET, // exII::ex_entity_type
+                               num_elem_sets,
+                               num_elemset_vars,
+                               elemset_var_tab.data());
+      EX_CHECK_ERR(ex_err, "Error reading elemset variable truth table.");
+
+      // Debugging
+      // libMesh::out << "Elemset variable truth table:" << std::endl;
+      // for (const auto & val : elemset_var_tab)
+      //   libMesh::out << val << " ";
+      // libMesh::out << std::endl;
+
+      // Debugging
+      // for (auto i : make_range(num_elem_sets))
+      //   {
+      //     for (auto j : make_range(num_elemset_vars))
+      //       libMesh::out << elemset_var_tab[num_elemset_vars*i + j] << " ";
+      //     libMesh::out << std::endl;
+      //   }
+
+      // Set up/allocate space in incoming data structures. All vectors are
+      // num_elemset_vars in length.
+      var_names = elemset_var_names;
+      elemset_ids_in.resize(num_elemset_vars);
+      elemset_vals.resize(num_elemset_vars);
+
+      // Read the elemset data
+      int offset=0;
+      for (int es=0; es<num_elem_sets; ++es)
+        {
+          offset += (es > 0 ? num_elems_per_set[es-1] : 0);
+          for (int var=0; var<num_elemset_vars; ++var)
+            {
+              int is_present = elemset_var_tab[num_elemset_vars*es + var];
+
+              if (is_present)
+                {
+                  // Debugging
+                  // libMesh::out << "Variable " << var << " is present on elemset " << es << std::endl;
+
+                  // Record the fact that this variable is defined on this elemset.
+                  elemset_ids_in[var].insert(elemset_ids[es]);
+
+                  // Note: the assumption here is that a previous call
+                  // to this->read_elemset_info() has already set the
+                  // values of num_elems_per_set, so we just use those values here.
+                  std::vector<Real> elemset_var_vals(num_elems_per_set[es]);
+                  ex_err = exII::ex_get_var
+                    (ex_id,
+                     timestep,
+                     exII::EX_ELEM_SET, // exII::ex_entity_type
+                     var + 1, // 1-based sideset variable index!
+                     elemset_ids[es],
+                     num_elems_per_set[es],
+                     MappedInputVector(elemset_var_vals, _single_precision).data());
+                  EX_CHECK_ERR(ex_err, "Error reading elemset variable.");
+
+                  for (int i=0; i<num_elems_per_set[es]; ++i)
+                    {
+                      dof_id_type exodus_elem_id = elemset_list[i + offset];
+
+                      // FIXME: We should use exodus_elem_num_to_libmesh for this,
+                      // but it apparently is never set up, so just
+                      // subtract 1 from the Exodus elem id.
+                      dof_id_type converted_elem_id = exodus_elem_id - 1;
+
+                      // Make key based on the elem and set ids
+                      auto key = std::make_pair(converted_elem_id,
+                                                static_cast<elemset_id_type>(elemset_ids[es]));
+
+                      // Store value in the map
+                      elemset_vals[var].emplace(key, elemset_var_vals[i]);
+                    } // end for (i)
+                } // end if (present)
+            } // end for (var)
+        } // end for (es)
+    } // end if (num_elemset_vars)
+}
+
+
+
+void ExodusII_IO_Helper::
+get_elemset_data_indices (std::map<std::pair<dof_id_type, elemset_id_type>, unsigned int> & elemset_array_indices)
+{
+  // Clear existing data, we are going to build these data structures from scratch
+  elemset_array_indices.clear();
+
+  // Read the elemset data.
+  //
+  // Note: we assume that the functions
+  // 1.) this->read_elemset_info() and
+  // 2.) this->read_elemset()
+  // have already been called, so that we already know e.g. how
+  // many elems are in each set, their ids, etc.
+  int offset=0;
+  for (int es=0; es<num_elem_sets; ++es)
+    {
+      offset += (es > 0 ? num_elems_per_set[es-1] : 0);
+
+      // Note: we don't actually call exII::ex_get_var() here because
+      // we don't need the values. We only need the indices into that vector
+      // for each (elem_id, elemset_id) tuple.
+      for (int i=0; i<num_elems_per_set[es]; ++i)
+        {
+          dof_id_type exodus_elem_id = elemset_list[i + offset];
+
+          // FIXME: We should use exodus_elem_num_to_libmesh for this,
+          // but it apparently is never set up, so just
+          // subtract 1 from the Exodus elem id.
+          dof_id_type converted_elem_id = exodus_elem_id - 1;
+
+          // Make key based on the elem and set ids
+          // Make a NodeBCTuple key from the converted information.
+          auto key = std::make_pair(converted_elem_id,
+                                    static_cast<elemset_id_type>(elemset_ids[es]));
+
+          // Store the array index of this (node, b_id) tuple
+          elemset_array_indices.emplace(key, cast_int<unsigned int>(i));
+        } // end for (i)
+    } // end for (es)
 }
 
 
@@ -3411,8 +3898,9 @@ read_nodeset_data (int timestep,
     {
       // Read the nodeset data truth table
       std::vector<int> nset_var_tab(num_node_sets * num_nodeset_vars);
-      ex_err = exII::ex_get_nset_var_tab
+      ex_err = exII::ex_get_truth_table
         (ex_id,
+         exII::EX_NODE_SET,
          num_node_sets,
          num_nodeset_vars,
          nset_var_tab.data());
@@ -3452,9 +3940,10 @@ read_nodeset_data (int timestep,
                   // to this->read_nodeset_info() has already set the
                   // values of num_nodes_per_set, so we just use those values here.
                   std::vector<Real> nset_var_vals(num_nodes_per_set[ns]);
-                  ex_err = exII::ex_get_nset_var
+                  ex_err = exII::ex_get_var
                     (ex_id,
                      timestep,
+                     exII::EX_NODE_SET,
                      var + 1, // 1-based nodeset variable index!
                      nodeset_ids[ns],
                      num_nodes_per_set[ns],
@@ -3498,73 +3987,43 @@ get_nodeset_data_indices (std::map<BoundaryInfo::NodeBCTuple, unsigned int> & bc
   // Clear existing data, we are going to build these data structures from scratch
   bc_array_indices.clear();
 
-  // This reads the nodeset variable names into the local
-  // nodeset_var_names data structure.
-  this->read_var_names(NODESET);
-
-  if (num_nodeset_vars)
+  // Read the nodeset data.
+  //
+  // Note: we assume that the functions
+  // 1.) this->read_nodeset_info() and
+  // 2.) this->read_all_nodesets()
+  // have already been called, so that we already know e.g. how
+  // many nodes are in each set, their ids, etc.
+  int offset=0;
+  for (int ns=0; ns<num_node_sets; ++ns)
     {
-      // Read the nodeset data truth table
-      std::vector<int> nset_var_tab(num_node_sets * num_nodeset_vars);
-      ex_err = exII::ex_get_nset_var_tab
-        (ex_id,
-         num_node_sets,
-         num_nodeset_vars,
-         nset_var_tab.data());
-      EX_CHECK_ERR(ex_err, "Error reading nodeset variable truth table.");
-
-      // Read the nodeset data.
-      //
-      // Note: we assume that the functions
-      // 1.) this->read_nodeset_info() and
-      // 2.) this->read_all_nodesets()
-      // have already been called, so that we already know e.g. how
-      // many nodes are in each set, their ids, etc.
-      int offset=0;
-      for (int ns=0; ns<num_node_sets; ++ns)
+      offset += (ns > 0 ? num_nodes_per_set[ns-1] : 0);
+      // Note: we don't actually call exII::ex_get_var() here because
+      // we don't need the values. We only need the indices into that vector
+      // for each (node_id, boundary_id) tuple.
+      for (int i=0; i<num_nodes_per_set[ns]; ++i)
         {
-          offset += (ns > 0 ? num_nodes_per_set[ns-1] : 0);
-          for (int var=0; var<num_nodeset_vars; ++var)
-            {
-              int is_present = nset_var_tab[num_nodeset_vars*ns + var];
+          // The read_all_nodesets() function now reads all the node ids into the
+          // node_sets_node_list vector, which is of length "total_nodes_in_all_sets"
+          // The old read_nodset() function is no longer called as far as I can tell,
+          // and should probably be removed? The "offset" that we are using only
+          // depends on the current nodeset index and the num_nodes_per_set vector,
+          // which gets filled in by the call to read_all_nodesets().
+          dof_id_type exodus_node_id = node_sets_node_list[i + offset];
 
-              if (is_present)
-                {
-                  // Note: we don't actually call exII::ex_get_nset_var() here because
-                  // we don't need the values. We only need the indices into that vector
-                  // for each (node_id, boundary_id) tuple.
-                  for (int i=0; i<num_nodes_per_set[ns]; ++i)
-                    {
-                      // The read_all_nodesets() function now reads all the node ids into the
-                      // node_sets_node_list vector, which is of length "total_nodes_in_all_sets"
-                      // The old read_nodset() function is no longer called as far as I can tell,
-                      // and should probably be removed? The "offset" that we are using only
-                      // depends on the current nodeset index and the num_nodes_per_set vector,
-                      // which gets filled in by the call to read_all_nodesets().
-                      dof_id_type exodus_node_id = node_sets_node_list[i + offset];
+          // FIXME: We should use exodus_node_num_to_libmesh for this,
+          // but it apparently is never set up, so just
+          // subtract 1 from the Exodus node id.
+          dof_id_type converted_node_id = exodus_node_id - 1;
 
-                      // FIXME: We should use exodus_node_num_to_libmesh for this,
-                      // but it apparently is never set up, so just
-                      // subtract 1 from the Exodus node id.
-                      dof_id_type converted_node_id = exodus_node_id - 1;
+          // Make a NodeBCTuple key from the converted information.
+          BoundaryInfo::NodeBCTuple key = std::make_tuple
+            (converted_node_id, nodeset_ids[ns]);
 
-                      // Make a NodeBCTuple key from the converted information.
-                      BoundaryInfo::NodeBCTuple key = std::make_tuple
-                        (converted_node_id, nodeset_ids[ns]);
-
-                      // Store the array index of this (node, b_id) tuple
-                      bc_array_indices.emplace(key, cast_int<unsigned int>(i));
-                    } // end for (i)
-
-                  // We only need to get the indices once per nodeset
-                  // (not once per variable defined on this nodeset)
-                  // so we can break out of this var loop as soon as
-                  // any variable is_present.
-                  break; // out of var loop
-                } // end if (present)
-            } // end for (var)
-        } // end for (ns)
-    } // end if (num_nodeset_vars)
+          // Store the array index of this (node, b_id) tuple
+          bc_array_indices.emplace(key, cast_int<unsigned int>(i));
+        } // end for (i)
+    } // end for (ns)
 }
 
 void ExodusII_IO_Helper::write_element_values
@@ -3577,7 +4036,7 @@ void ExodusII_IO_Helper::write_element_values
     return;
 
   // Ask the file how many element vars it has, store it in the num_elem_vars variable.
-  ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_ELEM_BLOCK, &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
   // We will eventually loop over the element blocks (subdomains) and
@@ -3632,9 +4091,10 @@ void ExodusII_IO_Helper::write_element_values
           for (unsigned int k=0; k<num_elems_this_block; ++k)
             data[k] = values[var_id*n_elem + elem_nums[k]];
 
-          ex_err = exII::ex_put_elem_var
+          ex_err = exII::ex_put_var
             (ex_id,
              timestep,
+             exII::EX_ELEM_BLOCK,
              var_id+1,
              this->get_block_id(j),
              num_elems_this_block,
@@ -3661,7 +4121,7 @@ void ExodusII_IO_Helper::write_element_values_element_major
     return;
 
   // Ask the file how many element vars it has, store it in the num_elem_vars variable.
-  ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
+  ex_err = exII::ex_get_variable_param(ex_id, exII::EX_ELEM_BLOCK, &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
   // We will eventually loop over the element blocks (subdomains) and
@@ -3768,8 +4228,13 @@ void ExodusII_IO_Helper::write_element_values_element_major
         // Now write 'data' to Exodus file, in single precision if requested.
         if (!data.empty())
           {
-            ex_err = exII::ex_put_elem_var
-              (ex_id, timestep, var_id+1, this->get_block_id(sbd_idx), data.size(),
+            ex_err = exII::ex_put_var
+              (ex_id,
+               timestep,
+               exII::EX_ELEM_BLOCK,
+               var_id+1,
+               this->get_block_id(sbd_idx),
+               data.size(),
                MappedOutputVector(data, _single_precision).data());
 
             EX_CHECK_ERR(ex_err, "Error writing element values.");
@@ -3791,8 +4256,13 @@ ExodusII_IO_Helper::write_nodal_values(int var_id,
 
   if (!values.empty())
     {
-      ex_err = exII::ex_put_nodal_var
-        (ex_id, timestep, var_id, num_nodes,
+      ex_err = exII::ex_put_var
+        (ex_id,
+         timestep,
+         exII::EX_NODAL,
+         var_id,
+         1, // exII::ex_entity_id, not sure exactly what this is but in the ex_put_nodal_var.c shim, they pass 1
+         num_nodes,
          MappedOutputVector(values, _single_precision).data());
 
       EX_CHECK_ERR(ex_err, "Error writing nodal values.");
@@ -3848,8 +4318,13 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Real> & values, i
 
   if (!values.empty())
     {
-      ex_err = exII::ex_put_glob_vars
-        (ex_id, timestep, num_global_vars,
+      ex_err = exII::ex_put_var
+        (ex_id,
+         timestep,
+         exII::EX_GLOBAL,
+         1, // var index
+         0, // obj_id (not used)
+         num_global_vars,
          MappedOutputVector(values, _single_precision).data());
 
       EX_CHECK_ERR(ex_err, "Error writing global values.");
@@ -3875,8 +4350,13 @@ void ExodusII_IO_Helper::read_global_values(std::vector<Real> & values, int time
 
   values.clear();
   values.resize(num_global_vars);
-  ex_err = exII::ex_get_glob_vars
-    (ex_id, timestep, num_global_vars,
+  ex_err = exII::ex_get_var
+    (ex_id,
+     timestep,
+     exII::EX_GLOBAL,
+     1, // var_index
+     1, // obj_id
+     num_global_vars,
      MappedInputVector(values, _single_precision).data());
 
   EX_CHECK_ERR(ex_err, "Error reading global values.");
@@ -3888,6 +4368,13 @@ void ExodusII_IO_Helper::use_mesh_dimension_instead_of_spatial_dimension(bool va
 {
   _use_mesh_dimension_instead_of_spatial_dimension = val;
 }
+
+
+void ExodusII_IO_Helper::set_hdf5_writing(bool write_hdf5)
+{
+  _write_hdf5 = write_hdf5;
+}
+
 
 
 

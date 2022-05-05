@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -37,13 +37,14 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/system.h"
 #include "libmesh/threads.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/tensor_tools.h"
 #include "libmesh/libmesh_common.h"
 
 // TIMPI includes
 #include "timpi/parallel_sync.h"
 
+// C++ Includes
+#include <memory>
 
 namespace libMesh
 {
@@ -1220,10 +1221,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
   {
     ProjectVertices project_vertices(*this);
     Threads::parallel_reduce (node_range(&vertices), project_vertices);
-    ids_to_push.insert(project_vertices.new_ids_to_push.begin(),
-                       project_vertices.new_ids_to_push.end());
-    ids_to_save.insert(project_vertices.new_ids_to_save.begin(),
-                       project_vertices.new_ids_to_save.end());
+    libmesh_merge_move(ids_to_push, project_vertices.new_ids_to_push);
+    libmesh_merge_move(ids_to_save, project_vertices.new_ids_to_save);
   }
 
   done_saving_ids = sort_work.sides.empty() && sort_work.interiors.empty();
@@ -1234,10 +1233,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
     std::vector<node_projection> edges(sort_work.edges.begin(), sort_work.edges.end());
     ProjectEdges project_edges(*this);
     Threads::parallel_reduce (node_range(&edges), project_edges);
-    ids_to_push.insert(project_edges.new_ids_to_push.begin(),
-                       project_edges.new_ids_to_push.end());
-    ids_to_save.insert(project_edges.new_ids_to_save.begin(),
-                       project_edges.new_ids_to_save.end());
+    libmesh_merge_move(ids_to_push, project_edges.new_ids_to_push);
+    libmesh_merge_move(ids_to_save, project_edges.new_ids_to_save);
   }
 
   done_saving_ids = sort_work.interiors.empty();
@@ -1248,10 +1245,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::project
     std::vector<node_projection> sides(sort_work.sides.begin(), sort_work.sides.end());
     ProjectSides project_sides(*this);
     Threads::parallel_reduce (node_range(&sides), project_sides);
-    ids_to_push.insert(project_sides.new_ids_to_push.begin(),
-                       project_sides.new_ids_to_push.end());
-    ids_to_save.insert(project_sides.new_ids_to_save.begin(),
-                       project_sides.new_ids_to_save.end());
+    libmesh_merge_move(ids_to_push, project_sides.new_ids_to_push);
+    libmesh_merge_move(ids_to_save, project_sides.new_ids_to_save);
   }
 
   done_saving_ids = true;
@@ -1340,7 +1335,7 @@ GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::Su
   SubFunctor(p)
 {
   if (p.master_g)
-    g = libmesh_make_unique<GFunctor>(*p.master_g);
+    g = std::make_unique<GFunctor>(*p.master_g);
 
 #ifndef NDEBUG
   // Our C1 elements need gradient information

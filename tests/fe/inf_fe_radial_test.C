@@ -46,7 +46,7 @@ using namespace libMesh;
 class InfFERadialTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE( InfFERadialTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( InfFERadialTest );
   CPPUNIT_TEST( testDifferentOrders );
   CPPUNIT_TEST( testInfQuants );
   CPPUNIT_TEST( testSides );
@@ -220,6 +220,7 @@ public:
   void testSides()
   {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+    LOG_UNIT_TEST;
 
     ReplicatedMesh mesh(*TestCommWorld);
     MeshTools::Generation::build_cube
@@ -355,6 +356,8 @@ public:
   void testInfQuants ()
   {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+    LOG_UNIT_TEST;
+
     // std::cout << "Called testSingleOrder with radial_order = "
     //           << radial_order
     //           << std::endl;
@@ -480,6 +483,8 @@ public:
   {
     // We use AMR internally to build_sphere
 #if defined(LIBMESH_ENABLE_INFINITE_ELEMENTS) && defined(LIBMESH_ENABLE_AMR)
+    LOG_UNIT_TEST;
+
     ReplicatedMesh mesh(*TestCommWorld);
     MeshTools::Generation::build_sphere
       (mesh, /*rad*/ 1,
@@ -556,6 +561,20 @@ public:
     const std::vector<std::vector<RealGradient> >& dphi_w = inf_fe->get_dphi_over_decayxR();
     const std::vector<std::vector<Real> >&         phi_w  = inf_fe->get_phi_over_decayxR();
     inf_fe->reinit(infinite_elem,&points);
+
+    // check that all quantities are sized correctly:
+    libmesh_assert_equal_to(q_point.size(), sob_w.size());
+    libmesh_assert_equal_to(q_point.size(), dsob_w.size());
+    libmesh_assert_equal_to(q_point.size(), sob_now.size());
+    libmesh_assert_equal_to(q_point.size(), dsob_now.size());
+    libmesh_assert_equal_to(q_point.size(), dphase.size());
+    libmesh_assert_equal_to(phi.size(), phi_w.size());
+    libmesh_assert_equal_to(phi.size(), dphi.size());
+    libmesh_assert_equal_to(phi.size(), dphi_w.size());
+    libmesh_assert_equal_to(q_point.size(), phi[0].size());
+    libmesh_assert_equal_to(q_point.size(), phi_w[0].size());
+    libmesh_assert_equal_to(q_point.size(), dphi[0].size());
+    libmesh_assert_equal_to(q_point.size(), dphi_w[0].size());
 
     for(unsigned int qp =0 ; qp < num_pt ; ++qp)
       {
@@ -665,6 +684,8 @@ public:
 
   void testDifferentOrders ()
   {
+    LOG_UNIT_TEST;
+
     testSingleOrder(FIRST, LEGENDRE);
     testSingleOrder(SECOND, LEGENDRE);
     testSingleOrder(THIRD, LEGENDRE);
@@ -791,6 +812,8 @@ public:
   void testRefinement()
   {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+    LOG_UNIT_TEST;
+
     // 1. create a mesh with one finite element, add an infinite element at each side
     ReplicatedMesh mesh(*TestCommWorld);
 

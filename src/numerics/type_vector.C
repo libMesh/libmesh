@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -18,12 +18,22 @@
 
 
 
+// Local includes
+#include "libmesh/type_vector.h"
+
 // C++ includes
 #include <iostream>
 #include <iomanip> // for std::setw, std::setiosflags
+#include <type_traits> // std::is_trivially_copyable
 
-// Local includes
-#include "libmesh/type_vector.h"
+
+static_assert(std::is_trivially_copyable<libMesh::TypeVector<libMesh::Real>>::value,
+              "Someone made TypeVector non-TriviallyCopyable");
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+static_assert(std::is_trivially_copyable<libMesh::TypeVector<libMesh::Complex>>::value,
+              "Someone made TypeVector non-TriviallyCopyable");
+#endif
+
 
 namespace libMesh
 {
@@ -214,10 +224,10 @@ bool TypeVector<Complex>::operator >= (const TypeVector<Complex> & rhs) const
 
 // ------------------------------------------------------------
 // Explicit instantiations
-template class TypeVector<Real>;
+template class LIBMESH_EXPORT TypeVector<Real>;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template class TypeVector<Complex>;
+template class LIBMESH_EXPORT TypeVector<Complex>;
 #endif
 
 } // namespace libMesh

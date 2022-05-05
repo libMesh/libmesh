@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2021 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2022 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -63,6 +63,26 @@ void UnsteadySolver::init ()
   _system.add_vector("_old_nonlinear_solution");
 }
 
+
+void UnsteadySolver::init_adjoints ()
+{
+  TimeSolver::init_adjoints();
+
+  // Add old adjoint solutions
+  // To keep the number of vectors consistent between the primal and adjoint
+  // time loops, we will also add the adjoint rhs vector during initialization
+  for(auto i : make_range(_system.n_qois()))
+  {
+    std::string old_adjoint_solution_name = "_old_adjoint_solution";
+    old_adjoint_solution_name+= std::to_string(i);
+    _system.add_vector(old_adjoint_solution_name, false, GHOSTED);
+
+    std::string adjoint_rhs_name = "adjoint_rhs";
+    adjoint_rhs_name+= std::to_string(i);
+    _system.add_vector(adjoint_rhs_name, false, GHOSTED);
+  }
+
+}
 
 
 void UnsteadySolver::init_data()
@@ -221,6 +241,16 @@ void UnsteadySolver::adjoint_advance_timestep ()
   // for first_adjoint_step, the adjoint initial condition) in this
   // time step for the time instance.
   solution_history->store(true, _system.time);
+
+  // Before moving to the next time instant, copy over the current adjoint solutions into _old_adjoint_solutions
+  for(auto i : make_range(_system.n_qois()))
+  {
+   std::string old_adjoint_solution_name = "_old_adjoint_solution";
+   old_adjoint_solution_name+= std::to_string(i);
+   NumericVector<Number> & old_adjoint_solution_i = _system.get_vector(old_adjoint_solution_name);
+   NumericVector<Number> & adjoint_solution_i = _system.get_adjoint_solution(i);
+   old_adjoint_solution_i = adjoint_solution_i;
+  }
 
   _system.time -= _system.deltat;
 
