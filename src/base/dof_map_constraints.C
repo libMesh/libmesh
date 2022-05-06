@@ -1585,7 +1585,7 @@ public:
 
         // Construct mapping from boundary_id -> (dirichlet_id, DirichletBoundary)
         for (const auto & b_id : dirichlet->b)
-          boundary_id_to_ordered_dirichlet_boundaries[b_id].emplace(dirichlet_id, dirichlet);
+          boundary_id_to_ordered_dirichlet_boundaries[b_id].emplace(dirichlet_id, dirichlet.get());
 
         for (const auto & var : dirichlet->variables)
           {
@@ -5238,7 +5238,7 @@ void DofMap::constrain_p_dofs (unsigned int var,
 #ifdef LIBMESH_ENABLE_DIRICHLET
 void DofMap::add_dirichlet_boundary (const DirichletBoundary & dirichlet_boundary)
 {
-  _dirichlet_boundaries->push_back(new DirichletBoundary(dirichlet_boundary));
+  _dirichlet_boundaries->push_back(std::make_unique<DirichletBoundary>(dirichlet_boundary));
 }
 
 
@@ -5250,8 +5250,9 @@ void DofMap::add_adjoint_dirichlet_boundary (const DirichletBoundary & dirichlet
   for (unsigned int i = old_size; i <= qoi_index; ++i)
     _adjoint_dirichlet_boundaries.push_back(new DirichletBoundaries());
 
+  // Make copy of DirichletBoundary, owned by _adjoint_dirichlet_boundaries
   _adjoint_dirichlet_boundaries[qoi_index]->push_back
-    (new DirichletBoundary(dirichlet_boundary));
+    (std::make_unique<DirichletBoundary>(dirichlet_boundary));
 }
 
 
@@ -5287,14 +5288,13 @@ DofMap::get_adjoint_dirichlet_boundaries(unsigned int q)
 void DofMap::remove_dirichlet_boundary (const DirichletBoundary & boundary_to_remove)
 {
   // Find a boundary condition matching the one to be removed
-  auto lam = [&boundary_to_remove](const DirichletBoundary * bdy)
+  auto lam = [&boundary_to_remove](const auto & bdy)
     {return bdy->b == boundary_to_remove.b && bdy->variables == boundary_to_remove.variables;};
 
   auto it = std::find_if(_dirichlet_boundaries->begin(), _dirichlet_boundaries->end(), lam);
 
-  // Delete it and remove it
+  // Assert it was actually found and remove it from the vector
   libmesh_assert (it != _dirichlet_boundaries->end());
-  delete *it;
   _dirichlet_boundaries->erase(it);
 }
 
@@ -5305,25 +5305,18 @@ void DofMap::remove_adjoint_dirichlet_boundary (const DirichletBoundary & bounda
   libmesh_assert_greater(_adjoint_dirichlet_boundaries.size(),
                          qoi_index);
 
-  auto lam = [&boundary_to_remove](const DirichletBoundary * bdy)
+  auto lam = [&boundary_to_remove](const auto & bdy)
     {return bdy->b == boundary_to_remove.b && bdy->variables == boundary_to_remove.variables;};
 
   auto it = std::find_if(_adjoint_dirichlet_boundaries[qoi_index]->begin(),
                          _adjoint_dirichlet_boundaries[qoi_index]->end(),
                          lam);
 
-  // Delete it and remove it
+  // Assert it was actually found and remove it from the vector
   libmesh_assert (it != _adjoint_dirichlet_boundaries[qoi_index]->end());
-  delete *it;
   _adjoint_dirichlet_boundaries[qoi_index]->erase(it);
 }
 
-
-DirichletBoundaries::~DirichletBoundaries()
-{
-  for (auto & item : *this)
-    delete item;
-}
 
 void DofMap::check_dirichlet_bcid_consistency (const MeshBase & mesh,
                                                const DirichletBoundary & boundary) const
