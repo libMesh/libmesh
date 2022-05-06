@@ -647,6 +647,20 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
                                           *this,
                                           node);
 
+          if (apply_dof_constraints)
+            {
+              // Apply constraints, e.g. Dirichlet and periodic constraints
+              this->get_dof_map().constrain_element_matrix_and_vector(
+                nodal_matrix,
+                nodal_rhs,
+                nodal_dof_indices,
+                /*asymmetric_constraint_rows*/ false);
+            }
+
+          // Scale and add to global matrix and/or vector
+          nodal_matrix *= scalar;
+          nodal_rhs    *= scalar;
+
           // Perform any required user-defined postprocessing on
           // the matrix and rhs.
           //
