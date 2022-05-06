@@ -63,6 +63,7 @@ void RBEIMEvaluation::clear()
   _interpolation_points_xyz_perturbations.clear();
   _interpolation_points_elem_id.clear();
   _interpolation_points_side_index.clear();
+  _interpolation_points_node_id.clear();
   _interpolation_points_qp.clear();
   _interpolation_points_phi_i_qp.clear();
   _interpolation_points_spatial_indices.clear();
@@ -83,6 +84,7 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
   _interpolation_points_xyz_perturbations.clear();
   _interpolation_points_elem_id.clear();
   _interpolation_points_side_index.clear();
+  _interpolation_points_node_id.clear();
   _interpolation_points_qp.clear();
   _interpolation_points_phi_i_qp.clear();
   _interpolation_points_spatial_indices.clear();
@@ -189,6 +191,12 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
                                                          _interpolation_points_xyz_perturbations,
                                                          _interpolation_points_phi_i_qp,
                                                          output_all_comps);
+  else if (get_parametrized_function().on_mesh_nodes())
+    get_parametrized_function().node_vectorized_evaluate(mus,
+                                                         _interpolation_points_xyz,
+                                                         _interpolation_points_node_id,
+                                                         _interpolation_points_boundary_id,
+                                                         output_all_comps);
   else
     get_parametrized_function().vectorized_evaluate(mus,
                                                     _interpolation_points_xyz,
@@ -236,6 +244,7 @@ void RBEIMEvaluation::initialize_interpolation_points_spatial_indices()
   get_parametrized_function().get_spatial_indices(_interpolation_points_spatial_indices,
                                                   _interpolation_points_elem_id,
                                                   _interpolation_points_side_index,
+                                                  _interpolation_points_node_id,
                                                   _interpolation_points_qp,
                                                   _interpolation_points_subdomain_id,
                                                   _interpolation_points_boundary_id);
@@ -246,6 +255,7 @@ void RBEIMEvaluation::initialize_param_fn_spatial_indices()
   get_parametrized_function().initialize_spatial_indices(_interpolation_points_spatial_indices,
                                                          _interpolation_points_elem_id,
                                                          _interpolation_points_side_index,
+                                                         _interpolation_points_node_id,
                                                          _interpolation_points_qp,
                                                          _interpolation_points_subdomain_id,
                                                          _interpolation_points_boundary_id);
@@ -255,6 +265,8 @@ unsigned int RBEIMEvaluation::get_n_basis_functions() const
 {
   if (get_parametrized_function().on_mesh_sides())
     return _local_side_eim_basis_functions.size();
+  else if (get_parametrized_function().on_mesh_nodes())
+    return _local_node_eim_basis_functions.size();
   else
     return _local_eim_basis_functions.size();
 }
@@ -263,6 +275,8 @@ void RBEIMEvaluation::set_n_basis_functions(unsigned int n_bfs)
 {
   if (get_parametrized_function().on_mesh_sides())
     _local_side_eim_basis_functions.resize(n_bfs);
+  else if (get_parametrized_function().on_mesh_nodes())
+    _local_node_eim_basis_functions.resize(n_bfs);
   else
     _local_eim_basis_functions.resize(n_bfs);
 }
@@ -316,6 +330,30 @@ void RBEIMEvaluation::side_decrement_vector(SideQpDataMap & v,
 
               v_comp_and_qp[comp][qp] -= coeffs(i) * basis_comp_and_qp[comp][qp];
             }
+    }
+}
+
+void RBEIMEvaluation::node_decrement_vector(NodeDataMap & v,
+                                            const DenseVector<Number> & coeffs)
+{
+  LOG_SCOPE("node_decrement_vector()", "RBEIMEvaluation");
+
+  libmesh_error_msg_if(get_n_basis_functions() != coeffs.size(),
+                       "Error: Number of coefficients should match number of basis functions");
+
+  for (auto & [node_id, v_comps] : v)
+    {
+      for (const auto & comp : index_range(v_comps))
+        for (unsigned int i : index_range(_local_node_eim_basis_functions))
+          {
+            // Check that entry (node_id,comp) exists in _local_node_eim_basis_functions so that
+            // we get a clear error message if there is any missing data
+            const auto & basis_comp = libmesh_map_find(_local_node_eim_basis_functions[i], node_id);
+
+            libmesh_error_msg_if(comp >= basis_comp.size(), "Error: Invalid comp");
+
+            v_comps[comp] -= coeffs(i) * basis_comp[comp];
+          }
     }
 }
 
@@ -380,6 +418,24 @@ void RBEIMEvaluation::get_parametrized_function_side_values_at_qps(
   }
 }
 
+Number RBEIMEvaluation::get_parametrized_function_node_local_value(
+  const NodeDataMap & pf,
+  dof_id_type node_id,
+  unsigned int comp)
+{
+  LOG_SCOPE("get_parametrized_function_node_local_value()", "RBEIMConstruction");
+
+  auto it = pf.find(node_id);
+  if (it != pf.end())
+    {
+      const std::vector<Number> & vec = it->second;
+      libmesh_error_msg_if (comp >= vec.size(), "Error: Invalid comp index");
+      return vec[comp];
+    }
+  else
+    return 0.;
+}
+
 Number RBEIMEvaluation::get_parametrized_function_value(
   const Parallel::Communicator & comm,
   const QpDataMap & pf,
@@ -427,6 +483,20 @@ Number RBEIMEvaluation::get_parametrized_function_side_value(
   return value;
 }
 
+Number RBEIMEvaluation::get_parametrized_function_node_value(
+  const Parallel::Communicator & comm,
+  const NodeDataMap & pf,
+  dof_id_type node_id,
+  unsigned int comp)
+{
+  LOG_SCOPE("get_parametrized_function_node_value()", "RBEIMConstruction");
+
+  Number value = get_parametrized_function_node_local_value(pf, node_id, comp);
+  comm.sum(value);
+
+  return value;
+}
+
 void RBEIMEvaluation::get_eim_basis_function_values_at_qps(unsigned int basis_function_index,
                                                            dof_id_type elem_id,
                                                            unsigned int comp,
@@ -457,6 +527,33 @@ void RBEIMEvaluation::get_eim_basis_function_side_values_at_qps(unsigned int bas
     side_index,
     comp,
     values);
+}
+
+Number RBEIMEvaluation::get_eim_basis_function_node_local_value(unsigned int basis_function_index,
+                                                                dof_id_type node_id,
+                                                                unsigned int comp) const
+{
+  libmesh_error_msg_if(basis_function_index >= _local_node_eim_basis_functions.size(),
+                       "Invalid basis function index: " << basis_function_index);
+
+  return get_parametrized_function_node_local_value(
+    _local_node_eim_basis_functions[basis_function_index],
+    node_id,
+    comp);
+}
+
+Number RBEIMEvaluation::get_eim_basis_function_node_value(unsigned int basis_function_index,
+                                                          dof_id_type node_id,
+                                                          unsigned int comp) const
+{
+  libmesh_error_msg_if(basis_function_index >= _local_node_eim_basis_functions.size(),
+                       "Invalid basis function index: " << basis_function_index);
+
+  return get_parametrized_function_node_value(
+    comm(),
+    _local_node_eim_basis_functions[basis_function_index],
+    node_id,
+    comp);
 }
 
 Number RBEIMEvaluation::get_eim_basis_function_value(unsigned int basis_function_index,
@@ -503,6 +600,12 @@ const RBEIMEvaluation::SideQpDataMap &
 RBEIMEvaluation::get_side_basis_function(unsigned int i) const
 {
   return _local_side_eim_basis_functions[i];
+}
+
+const RBEIMEvaluation::NodeDataMap &
+RBEIMEvaluation::get_node_basis_function(unsigned int i) const
+{
+  return _local_node_eim_basis_functions[i];
 }
 
 void RBEIMEvaluation::set_rb_eim_solutions(const std::vector<DenseVector<Number>> & rb_eim_solutions)
@@ -574,6 +677,11 @@ void RBEIMEvaluation::add_interpolation_points_side_index(unsigned int side_inde
   _interpolation_points_side_index.emplace_back(side_index);
 }
 
+void RBEIMEvaluation::add_interpolation_points_node_id(dof_id_type node_id)
+{
+  _interpolation_points_node_id.emplace_back(node_id);
+}
+
 void RBEIMEvaluation::add_interpolation_points_qp(unsigned int qp)
 {
   _interpolation_points_qp.emplace_back(qp);
@@ -636,6 +744,13 @@ unsigned int RBEIMEvaluation::get_interpolation_points_side_index(unsigned int i
   libmesh_error_msg_if(index >= _interpolation_points_side_index.size(), "Error: Invalid index");
 
   return _interpolation_points_side_index[index];
+}
+
+dof_id_type RBEIMEvaluation::get_interpolation_points_node_id(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _interpolation_points_node_id.size(), "Error: Invalid index");
+
+  return _interpolation_points_node_id[index];
 }
 
 unsigned int RBEIMEvaluation::get_interpolation_points_qp(unsigned int index) const
@@ -771,6 +886,32 @@ void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
   _interpolation_points_phi_i_qp.emplace_back(phi_i_qp);
 }
 
+void RBEIMEvaluation::add_node_basis_function_and_interpolation_data(
+  const NodeDataMap & node_bf,
+  Point p,
+  unsigned int comp,
+  dof_id_type node_id,
+  boundary_id_type boundary_id)
+{
+  _local_node_eim_basis_functions.emplace_back(node_bf);
+
+  _interpolation_points_xyz.emplace_back(p);
+  _interpolation_points_comp.emplace_back(comp);
+  _interpolation_points_node_id.emplace_back(node_id);
+  _interpolation_points_boundary_id.emplace_back(boundary_id);
+
+  // Add dummy values for the other properties, which are unused in the
+  // node case.
+  std::vector<Point> empty_perturbs;
+  std::vector<Real> empty_phi_i_qp;
+  _interpolation_points_elem_id.emplace_back(0);
+  _interpolation_points_side_index.emplace_back(0);
+  _interpolation_points_subdomain_id.emplace_back(0);
+  _interpolation_points_qp.emplace_back(0);
+  _interpolation_points_xyz_perturbations.emplace_back(empty_perturbs);
+  _interpolation_points_phi_i_qp.emplace_back(empty_phi_i_qp);
+}
+
 void RBEIMEvaluation::
 write_out_basis_functions(const std::string & directory_name,
                           bool write_binary_basis_functions)
@@ -779,6 +920,8 @@ write_out_basis_functions(const std::string & directory_name,
 
   if (get_parametrized_function().on_mesh_sides())
     write_out_side_basis_functions(directory_name, write_binary_basis_functions);
+  else if (get_parametrized_function().on_mesh_nodes())
+    write_out_node_basis_functions(directory_name, write_binary_basis_functions);
   else
     write_out_interior_basis_functions(directory_name, write_binary_basis_functions);
 }
@@ -1014,6 +1157,101 @@ write_out_side_basis_functions(const std::string & directory_name,
 }
 
 void RBEIMEvaluation::
+write_out_node_basis_functions(const std::string & directory_name,
+                               bool write_binary_basis_functions)
+{
+  LOG_SCOPE("write_out_node_basis_functions()", "RBEIMEvaluation");
+
+  // Quick return if there is no work to do. Note: make sure all procs
+  // agree there is no work to do.
+  bool is_empty = _local_node_eim_basis_functions.empty();
+  this->comm().verify(is_empty);
+
+  if (is_empty)
+    return;
+
+  // Gather basis function data from other procs, storing it in
+  // _local_node_eim_basis_functions, so that we can then print everything
+  // from processor 0.
+  this->node_gather_bfs();
+
+  // Write values from processor 0 only.
+  if (this->processor_id() == 0)
+    {
+      // Make a directory to store all the data files
+      Utility::mkdir(directory_name.c_str());
+
+      // Create filename
+      std::ostringstream file_name;
+      const std::string basis_function_suffix = (write_binary_basis_functions ? ".xdr" : ".dat");
+      file_name << directory_name << "/" << "bf_data" << basis_function_suffix;
+
+      // Create XDR writer object
+      Xdr xdr(file_name.str(), write_binary_basis_functions ? ENCODE : WRITE);
+
+      // Write number of basis functions to file. Note: the
+      // Xdr::data() function takes non-const references, so you can't
+      // pass e.g. vec.size() to that interface.
+      auto n_bf = _local_node_eim_basis_functions.size();
+      xdr.data(n_bf, "# Number of basis functions");
+
+      // We assume that each basis function has data for the same
+      // number of elements as basis function 0, which is equal to the
+      // size of the map.
+      auto n_node = _local_node_eim_basis_functions[0].size();
+      xdr.data(n_node, "# Number of nodes");
+
+      // We assume that each element has the same number of variables,
+      // and we get the number of vars from the first element of the
+      // first basis function.
+      auto n_vars = _local_node_eim_basis_functions[0].begin()->second.size();
+      xdr.data(n_vars, "# Number of variables");
+
+      // We write out the following arrays:
+      // - node IDs
+      std::vector<unsigned int> node_ids;
+      node_ids.reserve(n_node);
+      for (const auto & pr : _local_node_eim_basis_functions[0])
+        {
+          node_ids.push_back(pr.first);
+        }
+      xdr.data(node_ids, "# Node IDs");
+
+      // Now we construct a vector for each basis function, for each
+      // variable which is ordered according to:
+      // [ [val for Node 0], [val for Node 1], ... [val for Node N] ]
+      // and write it to file.
+
+      std::vector<std::vector<Number>> var_data(n_vars);
+      for (unsigned int var=0; var<n_vars; var++)
+        var_data[var].resize(n_node);
+
+      for (auto bf : index_range(_local_node_eim_basis_functions))
+        {
+          unsigned int node_counter = 0;
+          for (const auto & pr : _local_node_eim_basis_functions[bf])
+            {
+              // array[n_vars] per Node
+              const auto & array = pr.second;
+              for (auto var : index_range(array))
+                {
+                  // Based on the error check above, we know that node_id is numbered
+                  // contiguously from [0..nodes], so we can use it as the vector
+                  // index here.
+                  var_data[var][node_counter] = array[var];
+                }
+
+              node_counter++;
+            }
+
+          // Write all the var values for this bf
+          for (auto var : index_range(var_data))
+            xdr.data_stream(var_data[var].data(), var_data[var].size(), /*line_break=*/var_data[var].size());
+        }
+    }
+}
+
+void RBEIMEvaluation::
 read_in_basis_functions(const System & sys,
                         const std::string & directory_name,
                         bool read_binary_basis_functions)
@@ -1022,6 +1260,8 @@ read_in_basis_functions(const System & sys,
 
   if (get_parametrized_function().on_mesh_sides())
     read_in_side_basis_functions(sys, directory_name, read_binary_basis_functions);
+  else if (get_parametrized_function().on_mesh_nodes())
+    read_in_node_basis_functions(sys, directory_name, read_binary_basis_functions);
   else
     read_in_interior_basis_functions(sys, directory_name, read_binary_basis_functions);
 }
@@ -1233,6 +1473,87 @@ read_in_side_basis_functions(const System & sys,
   this->side_distribute_bfs(sys);
 }
 
+void RBEIMEvaluation::
+read_in_node_basis_functions(const System & sys,
+                             const std::string & directory_name,
+                             bool read_binary_basis_functions)
+{
+  LOG_SCOPE("read_in_node_basis_functions()", "RBEIMEvaluation");
+
+  // Read values on processor 0 only.
+  if (sys.comm().rank() == 0)
+    {
+      // Create filename
+      std::ostringstream file_name;
+      const std::string basis_function_suffix = (read_binary_basis_functions ? ".xdr" : ".dat");
+      file_name << directory_name << "/" << "bf_data" << basis_function_suffix;
+
+      // Create XDR reader object
+      Xdr xdr(file_name.str(), read_binary_basis_functions ? DECODE : READ);
+
+      // Read in the number of basis functions. The comment parameter
+      // is ignored when reading.
+      std::size_t n_bf;
+      xdr.data(n_bf);
+
+      // Read in the number of nodes
+      std::size_t n_node;
+      xdr.data(n_node);
+
+      // Read in the number of variables.
+      std::size_t n_vars;
+      xdr.data(n_vars);
+
+      std::vector<unsigned int> node_ids(n_node);
+      xdr.data(node_ids);
+
+      // Allocate space to store all required basis functions,
+      // clearing any data that may have been there previously.
+      //
+      // TODO: Do we need to also write out/read in Node ids?
+      // Or can we assume they will always be contiguously
+      // numbered (at least on proc 0)?
+      _local_node_eim_basis_functions.clear();
+      _local_node_eim_basis_functions.resize(n_bf);
+      for (auto i : index_range(_local_node_eim_basis_functions))
+        for (auto node_id : node_ids)
+          {
+            auto & array = _local_node_eim_basis_functions[i][node_id];
+            array.resize(n_vars);
+          }
+
+      // Read data into node_value from xdr
+      std::vector<Number> node_value;
+
+      // Read in data for each basis function
+      for (auto i : index_range(_local_node_eim_basis_functions))
+        {
+          // Reference to the data map for the current basis function.
+          auto & bf_map = _local_node_eim_basis_functions[i];
+
+          for (std::size_t var=0; var<n_vars; ++var)
+            {
+              node_value.clear();
+              node_value.resize(n_node);
+
+              // Read data using data_stream() since that is
+              // (currently) how we write it out. The "line_break"
+              // parameter of data_stream() is ignored while reading.
+              xdr.data_stream(node_value.data(), node_value.size());
+
+              for (unsigned int node_counter=0; node_counter<n_node; node_counter++)
+                {
+                  auto & array = bf_map[node_ids[node_counter]];
+                  array[var] = node_value[node_counter];
+                }
+            } // end for (var)
+        } // end for (i)
+    } // end if processor 0
+
+  // Distribute the basis function information to the processors that require it
+  this->node_distribute_bfs(sys);
+}
+
 void RBEIMEvaluation::print_local_eim_basis_functions() const
 {
   for (auto bf : index_range(_local_eim_basis_functions))
@@ -1266,6 +1587,20 @@ void RBEIMEvaluation::print_local_eim_basis_functions() const
                 libMesh::out << array[var][qp] << " ";
               libMesh::out << std::endl;
             }
+        }
+    }
+
+  for (auto bf : index_range(_local_node_eim_basis_functions))
+    {
+      libMesh::out << "Node basis function " << bf << std::endl;
+      for (const auto & [node_id, array] : _local_node_eim_basis_functions[bf])
+        {
+          libMesh::out << "Node " << node_id << std::endl;
+          for (auto var : index_range(array))
+            {
+              libMesh::out << "Variable " << var << ": " << array[var] << std::endl;
+            }
+          libMesh::out << std::endl;
         }
     }
 }
@@ -1560,6 +1895,127 @@ void RBEIMEvaluation::side_gather_bfs()
 
                   array[var].assign(cursor, cursor + n_qp_this_elem_side);
                   std::advance(cursor, n_qp_this_elem_side);
+                }
+            }
+        }
+    } // end loop over basis functions
+}
+
+void RBEIMEvaluation::node_gather_bfs()
+{
+  // We need to gather _local_node_eim_basis_functions data from other
+  // procs for printing.
+  //
+  // Ideally, this could be accomplished by simply calling:
+  // this->comm().gather(/*root_id=*/0, _local_node_eim_basis_functions);
+  //
+  // but the data structure seems to be too complicated for this to
+  // work automatically. (I get some error about the function called
+  // being "private within this context".) Therefore, we have to
+  // gather the information manually.
+
+  // So we can avoid calling this many times below
+  auto n_procs = this->n_processors();
+
+  // In serial there's nothing to gather
+  if (n_procs == 1)
+    return;
+
+  // Current assumption is that the number of basis functions stored on
+  // each processor is the same, the only thing that differs is the number
+  // of elements, so make sure that is the case now.
+  auto n_bf = _local_node_eim_basis_functions.size();
+  this->comm().verify(n_bf);
+
+  // This function should never be called if there are no basis
+  // functions, so if it was, something went wrong.
+  libmesh_error_msg_if(!n_bf, "RBEIMEvaluation::gather_bfs() should not be called with 0 basis functions.");
+
+  // The number of variables should be the same on all processors
+  // and we can get this from _local_eim_basis_functions. However,
+  // it may be that some processors have no local elements, so on
+  // those processors we cannot look up the size from
+  // _local_eim_basis_functions. As a result we use comm().max(n_vars)
+  // to make sure all processors agree on the final value.
+  std::size_t n_vars =
+    _local_node_eim_basis_functions[0].empty() ? 0 : _local_node_eim_basis_functions[0].begin()->second.size();
+  this->comm().max(n_vars);
+
+  // Gather list of Node ids stored on each processor to proc 0.  We
+  // use basis function 0 as an example and assume all the basis
+  // functions are distributed similarly.
+  unsigned int n_local_nodes = _local_node_eim_basis_functions[0].size();
+  std::vector<dof_id_type> node_ids;
+  node_ids.reserve(n_local_nodes);
+  for (const auto & pr : _local_node_eim_basis_functions[0])
+    node_ids.push_back(pr.first);
+  this->comm().gather(/*root_id=*/0, node_ids);
+
+  // Now we construct a vector for each basis function, for each
+  // variable, which is ordered according to:
+  // [ [val for Node 0], [val for Node 1], ... [val for Node N] ]
+  // and gather it to processor 0.
+  std::vector<std::vector<Number>> gathered_node_data(n_vars);
+  for (auto bf : index_range(_local_node_eim_basis_functions))
+    {
+      // Clear any data from previous bf
+      for (auto var : index_range(gathered_node_data))
+        {
+          gathered_node_data[var].clear();
+          gathered_node_data[var].resize(n_local_nodes);
+        }
+
+      unsigned int local_node_idx = 0;
+      for (const auto & pr : _local_node_eim_basis_functions[bf])
+        {
+          // array[n_vars] per Node
+          const auto & array = pr.second;
+          for (auto var : index_range(array))
+            {
+              gathered_node_data[var][local_node_idx] = array[var];
+            }
+
+          local_node_idx++;
+        }
+
+      // Reference to the data map for the current basis function.
+      auto & bf_map = _local_node_eim_basis_functions[bf];
+
+      for (auto var : index_range(gathered_node_data))
+        {
+          // For each var, gather gathered_qp_data[var] onto processor
+          // 0. There apparently is not a gather overload for
+          // vector-of-vectors...
+          this->comm().gather(/*root_id=*/0, gathered_node_data[var]);
+
+          // On processor 0, iterate over the gathered_qp_data[var]
+          // vector we just gathered, filling in the "small" vectors
+          // for each Elem. Note: here we ignore the fact that we
+          // already have the data on processor 0 and just overwrite
+          // it, this makes the indexing logic a bit simpler.
+          if (this->processor_id() == 0)
+            {
+              auto cursor = gathered_node_data[var].begin();
+              for (auto i : index_range(node_ids))
+                {
+                  auto node_id = node_ids[i];
+
+                  // Get reference to the [n_vars] array for
+                  // this Node. We assign() into the vector of
+                  // node values, which allocates space if
+                  // it doesn't already exist.
+                  auto & array = bf_map[node_id];
+
+                  // Possibly allocate space if this is data for a new
+                  // node we haven't seen before.
+                  if (array.empty())
+                    array.resize(n_vars);
+
+                  // There is only one value per variable per node, so
+                  // we set the value by de-referencing cursor, and
+                  // then advance the cursor by 1.
+                  array[var] = *cursor;
+                  std::advance(cursor, 1);
                 }
             }
         }
@@ -2062,6 +2518,228 @@ void RBEIMEvaluation::side_distribute_bfs(const System & sys)
               for (auto & bf_map : _local_side_eim_basis_functions)
                 bf_map.erase(std::make_pair(elem_id, side_index));
             } // end for (e)
+        } // end for proc_id
+    } // if (rank == 0)
+}
+
+void RBEIMEvaluation::node_distribute_bfs(const System & sys)
+{
+  // So we can avoid calling these many times below
+  auto n_procs = sys.comm().size();
+  auto rank = sys.comm().rank();
+
+  // In serial there's nothing to distribute
+  if (n_procs == 1)
+    return;
+
+  // Broadcast the number of basis functions from proc 0. After
+  // distributing, all procs should have the same number of basis
+  // functions.
+  auto n_bf = _local_node_eim_basis_functions.size();
+  sys.comm().broadcast(n_bf);
+
+  // Allocate enough space to store n_bf basis functions on non-zero ranks
+  if (rank != 0)
+    _local_node_eim_basis_functions.resize(n_bf);
+
+  // Broadcast the number of variables from proc 0. After
+  // distributing, all procs should have the same number of variables.
+  auto n_vars = _local_node_eim_basis_functions[0].begin()->second.size();
+  sys.comm().broadcast(n_vars);
+
+  // Construct lists of elem ids owned by different processors
+  const MeshBase & mesh = sys.get_mesh();
+
+  std::vector<dof_id_type> gathered_local_node_ids;
+  {
+    const std::set<boundary_id_type> & parametrized_function_boundary_ids =
+      get_parametrized_function().get_parametrized_function_boundary_ids();
+
+    const auto & binfo = mesh.get_boundary_info();
+
+    // Make a set with all the nodes that have nodesets. Use
+    // a set so that we don't have any duplicate entries. We
+    // deal with duplicate entries below by getting all boundary
+    // IDs on each node.
+    std::set<dof_id_type> nodes_with_nodesets;
+    for (const auto & t : binfo.build_node_list())
+      nodes_with_nodesets.insert(std::get<0>(t));
+
+    // To be filled in by BoundaryInfo calls in loop below
+    std::vector<boundary_id_type> node_boundary_ids;
+
+    for(dof_id_type node_id : nodes_with_nodesets)
+      {
+        const Node * node = mesh.node_ptr(node_id);
+
+        if (node->processor_id() != mesh.comm().rank())
+          continue;
+
+        binfo.boundary_ids(node, node_boundary_ids);
+
+        bool has_node_boundary_id = false;
+        for(boundary_id_type node_boundary_id : node_boundary_ids)
+          if(parametrized_function_boundary_ids.count(node_boundary_id))
+            {
+              has_node_boundary_id = true;
+              break;
+            }
+
+        if(has_node_boundary_id)
+          {
+            gathered_local_node_ids.push_back(node_id);
+          }
+      }
+  }
+
+  // I _think_ the local node ids are likely to already be sorted in
+  // ascending order, since that is how they are stored on the Mesh,
+  // but we can always just guarantee this to be on the safe side as
+  // well.
+  std::sort(gathered_local_node_ids.begin(), gathered_local_node_ids.end());
+
+  // Gather the number of local nodes from all procs to proc 0
+  auto n_local_nodes = gathered_local_node_ids.size();
+  std::vector<std::size_t> gathered_n_local_nodes = {n_local_nodes};
+  sys.comm().gather(/*root_id=*/0, gathered_n_local_nodes);
+
+  // Gather the node ids owned by each processor onto processor 0.
+  sys.comm().gather(/*root_id=*/0, gathered_local_node_ids);
+
+  // Construct vectors of "start" and "one-past-the-end" indices into
+  // the gathered_local_node_ids vector for each proc. Only valid on
+  // processor 0.
+  std::vector<std::size_t> start_node_ids_index, end_node_ids_index;
+
+  if (rank == 0)
+    {
+      start_node_ids_index.resize(n_procs);
+      start_node_ids_index[0] = 0;
+      for (processor_id_type p=1; p<n_procs; ++p)
+        start_node_ids_index[p] = start_node_ids_index[p-1] + gathered_n_local_nodes[p-1];
+
+      end_node_ids_index.resize(n_procs);
+      end_node_ids_index[n_procs - 1] = gathered_local_node_ids.size();
+      for (processor_id_type p=0; p<n_procs - 1; ++p)
+        end_node_ids_index[p] = start_node_ids_index[p+1];
+    }
+
+  // On processor 0, using basis function 0 and variable 0, prepare a
+  // vector with the nodes.  Then scatter this vector
+  // out to the processors that require it. The order of this vector
+  // matches the gathered_local_node_ids ordering. The counts will be
+  // gathered_n_local_nodes.
+
+  // On rank 0, the "counts" vector holds the number of floating point values that
+  // are to be scattered to each proc. It is only required on proc 0.
+  std::vector<int> counts;
+
+  if (rank == 0)
+    {
+      counts.resize(n_procs);
+
+      for (processor_id_type p=0; p<n_procs; ++p)
+        {
+          auto node_ids_range = (end_node_ids_index[p] - start_node_ids_index[p]);
+
+          // Accumulate the count for this proc
+          counts[p] += node_ids_range;
+        } // end for proc_id
+    } // if (rank == 0)
+
+  // The recv_node_data vector will be used on the receiving end of all
+  // the scatters below.
+  std::vector<Number> recv_node_data;
+
+  // For each basis function and each variable, build a vector
+  // data in the Node ordering given by the
+  // gathered_local_node_ids, then call
+  //
+  // sys.comm().scatter(data, counts, recv, /*root_id=*/0);
+  std::vector<std::vector<Number>> node_data(n_vars);
+
+  // We also reserve space in node_data, since we will push_back into it below.
+  int count_sum = std::accumulate(counts.begin(), counts.end(), 0);
+  for (auto var : index_range(node_data))
+    node_data[var].reserve(count_sum);
+
+  // Loop from 0..n_bf on _all_ procs, since the scatters inside this
+  // loop are collective.
+  for (auto bf : make_range(n_bf))
+    {
+      // Prepare data for scattering (only on proc 0)
+      if (rank == 0)
+        {
+          // Reference to the data map for the current basis function.
+          auto & bf_map = _local_node_eim_basis_functions[bf];
+
+          // Clear any data from previous bf (this does not change the capacity
+          // that was reserved above).
+          for (auto var : index_range(node_data))
+              node_data[var].clear();
+
+          for (processor_id_type p=0; p<n_procs; ++p)
+            {
+              for (auto n : make_range(start_node_ids_index[p], end_node_ids_index[p]))
+                {
+                  auto node_id = gathered_local_node_ids[n];
+
+                  // Get reference to array[n_vars] for current Node.
+                  // Throws an error if the required node_id is not found.
+                  const auto & array = libmesh_map_find(bf_map, node_id);
+
+                  for (auto var : index_range(array))
+                    node_data[var].push_back(array[var]);
+                } // end for (n)
+            } // end for proc_id
+        } // end if rank==0
+
+      // Perform the scatters (all procs)
+      for (auto var : make_range(n_vars))
+        {
+          // Do the scatter for the current var
+          sys.comm().scatter(node_data[var], counts, recv_node_data, /*root_id=*/0);
+
+          if (rank != 0)
+            {
+              // Store the scattered data we received in _local_eim_basis_functions[bf]
+              auto & bf_map = _local_node_eim_basis_functions[bf];
+              auto cursor = recv_node_data.begin();
+
+              for (auto i : index_range(gathered_local_node_ids))
+                {
+                  auto node_id = gathered_local_node_ids[i];
+                  auto & array = bf_map[node_id];
+
+                  // Create space to store the data if it doesn't already exist.
+                  if (array.empty())
+                    array.resize(n_vars);
+
+                  // There is only one value per variable per node, so
+                  // we set the value by de-referencing cursor, and
+                  // then advance the cursor by 1.
+                  array[var] = *cursor;
+                  std::advance(cursor, 1);
+                }
+            } // if (rank != 0)
+        } // end for (var)
+    } // end for (bf)
+
+  // Now that the scattering is done, delete non-local Elem
+  // information from processor 0's _local_eim_basis_functions data
+  // structure.
+  if (rank == 0)
+    {
+      for (processor_id_type p=1; p<n_procs; ++p)
+        {
+          for (auto n : make_range(start_node_ids_index[p], end_node_ids_index[p]))
+            {
+              auto node_id = gathered_local_node_ids[n];
+
+              // Delete this Node's information from every basis function.
+              for (auto & bf_map : _local_node_eim_basis_functions)
+                bf_map.erase(node_id);
+            } // end for (n)
         } // end for proc_id
     } // if (rank == 0)
 }

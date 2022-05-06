@@ -655,6 +655,16 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
                                             rb_eim_evaluation.get_interpolation_points_elem_id(i));
   }
 
+  // Interpolation points node IDs, relevant if the parametrized function is defined on mesh sides
+  if (rb_eim_evaluation.get_parametrized_function().on_mesh_nodes())
+  {
+    auto interpolation_points_node_id_list =
+      rb_eim_evaluation_builder.initInterpolationNodeId(n_bfs);
+    for (unsigned int i=0; i<n_bfs; ++i)
+      interpolation_points_node_id_list.set(i,
+                                            rb_eim_evaluation.get_interpolation_points_node_id(i));
+  }
+
   // Interpolation points side indices, relevant if the parametrized function is defined on mesh sides
   if (rb_eim_evaluation.get_parametrized_function().on_mesh_sides())
   {

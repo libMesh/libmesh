@@ -99,6 +99,33 @@ void scale(DataMap & u, const Number k)
     }
 }
 
+void add_node_data_map(RBEIMConstruction::NodeDataMap & u, const Number k, const RBEIMConstruction::NodeDataMap & v)
+{
+  for (auto & [key, vec_u] : u)
+    {
+      const std::vector<Number> & vec_v = libmesh_map_find(v, key);
+
+      libmesh_error_msg_if (vec_u.size() != vec_v.size(), "Size mismatch");
+
+      for (auto i : index_range(vec_u))
+        {
+          vec_u[i] += k*vec_v[i];
+        }
+    }
+}
+
+void scale_node_data_map(RBEIMConstruction::NodeDataMap & u, const Number k)
+{
+  for (auto & it : u)
+    {
+      std::vector<Number> & vec = it.second;
+      for (auto & value : vec)
+        {
+          value *= k;
+        }
+    }
+}
+
 }
 
 RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
@@ -136,6 +163,10 @@ void RBEIMConstruction::clear()
   _local_side_quad_point_subdomain_ids.clear();
   _local_side_quad_point_boundary_ids.clear();
   _local_side_quad_point_side_types.clear();
+
+  _local_node_parametrized_functions_for_training.clear();
+  _local_node_locations.clear();
+  _local_node_boundary_ids.clear();
 
   _eim_projection_matrix.resize(0,0);
 }
@@ -526,6 +557,12 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
                 _local_side_parametrized_functions_for_training[i],
                 _local_side_parametrized_functions_for_training[j]);
             }
+          else if (rbe.get_parametrized_function().on_mesh_nodes())
+            {
+              inner_prod = node_inner_product(
+                _local_node_parametrized_functions_for_training[i],
+                _local_node_parametrized_functions_for_training[j]);
+            }
           else
             {
               inner_prod = inner_product(
@@ -593,6 +630,21 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           scale(v, 1./norm_v);
 
           enrich_eim_approximation_on_sides(v);
+          update_eim_matrices();
+        }
+      else if (rbe.get_parametrized_function().on_mesh_nodes())
+        {
+          // Make a "zero clone" by copying to get the same data layout, and then scaling by zero
+          NodeDataMap v = _local_node_parametrized_functions_for_training[j];
+          scale_node_data_map(v, 0.);
+
+          for ( unsigned int i=0; i<n_snapshots; ++i )
+            add_node_data_map(v, U.el(i, j), _local_node_parametrized_functions_for_training[i] );
+
+          Real norm_v = std::sqrt(sigma(j));
+          scale_node_data_map(v, 1./norm_v);
+
+          enrich_eim_approximation_on_nodes(v);
           update_eim_matrices();
         }
       else
@@ -728,6 +780,27 @@ void RBEIMConstruction::store_eim_solutions_for_training_set()
               eim_solutions[i] = eim_eval.rb_eim_solve(EIM_rhs);
             }
         }
+      else if (eim_eval.get_parametrized_function().on_mesh_nodes())
+        {
+          const auto & local_node_pf = _local_node_parametrized_functions_for_training[i];
+
+          if (RB_size > 0)
+            {
+              // Get the right-hand side vector for the EIM approximation
+              // by sampling the parametrized function (stored in solution)
+              // at the interpolation points.
+              DenseVector<Number> EIM_rhs(RB_size);
+              for (unsigned int j=0; j<RB_size; j++)
+                {
+                  EIM_rhs(j) =
+                    RBEIMEvaluation::get_parametrized_function_node_value(comm(),
+                                                                          local_node_pf,
+                                                                          eim_eval.get_interpolation_points_node_id(j),
+                                                                          eim_eval.get_interpolation_points_comp(j));
+                }
+              eim_solutions[i] = eim_eval.rb_eim_solve(EIM_rhs);
+            }
+        }
       else
         {
           const auto & local_pf = _local_parametrized_functions_for_training[i];
@@ -767,6 +840,13 @@ const RBEIMEvaluation::SideQpDataMap & RBEIMConstruction::get_side_parametrized_
   return _local_side_parametrized_functions_for_training[training_index];
 }
 
+const RBEIMEvaluation::NodeDataMap & RBEIMConstruction::get_node_parametrized_function_from_training_set(unsigned int training_index) const
+{
+  libmesh_error_msg_if(training_index >= _local_node_parametrized_functions_for_training.size(),
+                       "Invalid index: " << training_index);
+  return _local_node_parametrized_functions_for_training[training_index];
+}
+
 const std::unordered_map<dof_id_type, std::vector<Real> > & RBEIMConstruction::get_local_quad_point_JxW()
 {
   return _local_quad_point_JxW;
@@ -780,13 +860,11 @@ const std::map<std::pair<dof_id_type,unsigned int>, std::vector<Real> > & RBEIMC
 unsigned int RBEIMConstruction::get_n_parametrized_functions_for_training() const
 {
   if (get_rb_eim_evaluation().get_parametrized_function().on_mesh_sides())
-  {
     return _local_side_parametrized_functions_for_training.size();
-  }
+  else if (get_rb_eim_evaluation().get_parametrized_function().on_mesh_nodes())
+    return _local_node_parametrized_functions_for_training.size();
   else
-  {
     return _local_parametrized_functions_for_training.size();
-  }
 }
 
 void RBEIMConstruction::reinit_eim_projection_matrix()
@@ -840,6 +918,36 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
 
               get_rb_eim_evaluation().side_decrement_vector(solution_copy, best_fit_coeffs);
               Real best_fit_error = get_max_abs_value(solution_copy);
+
+              if (best_fit_error > max_err)
+                {
+                  max_err_index = training_index;
+                  max_err = best_fit_error;
+                }
+            }
+          else if (get_rb_eim_evaluation().get_parametrized_function().on_mesh_nodes())
+            {
+              // Make a copy of the pre-computed solution for the specified training sample
+              // since we will modify it below to compute the best fit error.
+              NodeDataMap solution_copy = _local_node_parametrized_functions_for_training[training_index];
+
+              // Perform an L2 projection in order to find the best approximation to
+              // the parametrized function from the current EIM space.
+              DenseVector<Number> best_fit_rhs(RB_size);
+              for (unsigned int i=0; i<RB_size; i++)
+                {
+                  best_fit_rhs(i) = node_inner_product(solution_copy, get_rb_eim_evaluation().get_node_basis_function(i));
+                }
+
+              // Now compute the best fit by an LU solve
+              DenseMatrix<Number> RB_inner_product_matrix_N(RB_size);
+              _eim_projection_matrix.get_principal_submatrix(RB_size, RB_inner_product_matrix_N);
+
+              DenseVector<Number> best_fit_coeffs;
+              RB_inner_product_matrix_N.lu_solve(best_fit_rhs, best_fit_coeffs);
+
+              get_rb_eim_evaluation().node_decrement_vector(solution_copy, best_fit_coeffs);
+              Real best_fit_error = get_node_max_abs_value(solution_copy);
 
               if (best_fit_error > max_err)
                 {
@@ -902,6 +1010,18 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
               SideQpDataMap solution_copy = _local_side_parametrized_functions_for_training[training_index];
               get_rb_eim_evaluation().side_decrement_vector(solution_copy, best_fit_coeffs);
               Real best_fit_error = get_max_abs_value(solution_copy);
+
+              if (best_fit_error > max_err)
+                {
+                  max_err_index = training_index;
+                  max_err = best_fit_error;
+                }
+            }
+          else if (get_rb_eim_evaluation().get_parametrized_function().on_mesh_nodes())
+            {
+              NodeDataMap solution_copy = _local_node_parametrized_functions_for_training[training_index];
+              get_rb_eim_evaluation().node_decrement_vector(solution_copy, best_fit_coeffs);
+              Real best_fit_error = get_node_max_abs_value(solution_copy);
 
               if (best_fit_error > max_err)
                 {
@@ -1009,6 +1129,72 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
               }
 
             _local_side_parametrized_functions_for_training[i][elem_side_pair] = comps_and_qps;
+          }
+        }
+
+      libMesh::out << "Parametrized functions in training set initialized" << std::endl;
+
+      unsigned int max_id = 0;
+      comm().maxloc(_max_abs_value_in_training_set, max_id);
+      comm().broadcast(_max_abs_value_in_training_set_index, max_id);
+      libMesh::out << "Maximum absolute value in the training set: "
+        << _max_abs_value_in_training_set << std::endl << std::endl;
+
+      // Calculate the maximum value for each component in the training set
+      // across all components
+      comm().max(max_abs_value_per_component_in_training_set);
+
+      // We store the maximum value across all components divided by the maximum value for this component
+      // so that when we scale using these factors all components should have a magnitude on the same
+      // order as the maximum component.
+      _component_scaling_in_training_set.resize(n_comps);
+      for(unsigned int i : make_range(n_comps))
+        {
+          if (max_abs_value_per_component_in_training_set[i] == 0.)
+            _component_scaling_in_training_set[i] = 1.;
+          else
+            _component_scaling_in_training_set[i] = _max_abs_value_in_training_set / max_abs_value_per_component_in_training_set[i];
+        }
+    }
+  else if (eim_eval.get_parametrized_function().on_mesh_nodes())
+    {
+      _local_node_parametrized_functions_for_training.resize( get_n_training_samples() );
+      for (auto i : make_range(get_n_training_samples()))
+        {
+          libMesh::out << "Initializing parametrized function for training sample "
+            << (i+1) << " of " << get_n_training_samples() << std::endl;
+
+          set_params_from_training_set(i);
+
+          eim_eval.get_parametrized_function().preevaluate_parametrized_function_on_mesh_nodes(get_parameters(),
+                                                                                               _local_node_locations,
+                                                                                               _local_node_boundary_ids,
+                                                                                               *this);
+
+          for (const auto & pr : _local_node_locations)
+          {
+            const auto & node_id = pr.first;
+
+            std::vector<Number> comps(n_comps);
+            for (unsigned int comp=0; comp<n_comps; comp++)
+              {
+                Number value =
+                  eim_eval.get_parametrized_function().lookup_preevaluated_node_value_on_mesh(comp,
+                                                                                              node_id);
+                comps[comp] = value;
+
+                Real abs_value = std::abs(value);
+                if (abs_value > _max_abs_value_in_training_set)
+                  {
+                    _max_abs_value_in_training_set = abs_value;
+                    _max_abs_value_in_training_set_index = i;
+                  }
+
+                if (abs_value > max_abs_value_per_component_in_training_set[comp])
+                  max_abs_value_per_component_in_training_set[comp] = abs_value;
+              }
+
+            _local_node_parametrized_functions_for_training[i][node_id] = comps;
           }
         }
 
@@ -1384,6 +1570,55 @@ void RBEIMConstruction::initialize_qp_data()
                 }
         }
     }
+  else if (get_rb_eim_evaluation().get_parametrized_function().on_mesh_nodes())
+    {
+      const std::set<boundary_id_type> & parametrized_function_boundary_ids =
+        get_rb_eim_evaluation().get_parametrized_function().get_parametrized_function_boundary_ids();
+      libmesh_error_msg_if (parametrized_function_boundary_ids.empty(),
+                            "Need to have non-empty boundary IDs to initialize node data");
+
+      _local_node_locations.clear();
+      _local_node_boundary_ids.clear();
+
+      const auto & binfo = mesh.get_boundary_info();
+
+      // Make a set with all the nodes that have nodesets. Use
+      // a set so that we don't have any duplicate entries. We
+      // deal with duplicate entries below by getting all boundary
+      // IDs on each node.
+      std::set<dof_id_type> nodes_with_nodesets;
+      for (const auto & t : binfo.build_node_list())
+        nodes_with_nodesets.insert(std::get<0>(t));
+
+      // To be filled in by BoundaryInfo calls in loop below
+      std::vector<boundary_id_type> node_boundary_ids;
+
+      for(dof_id_type node_id : nodes_with_nodesets)
+        {
+          const Node * node = mesh.node_ptr(node_id);
+
+          if (node->processor_id() != mesh.comm().rank())
+            continue;
+
+          binfo.boundary_ids(node, node_boundary_ids);
+
+          bool has_node_boundary_id = false;
+          boundary_id_type matching_boundary_id = BoundaryInfo::invalid_id;
+          for(boundary_id_type node_boundary_id : node_boundary_ids)
+            if(parametrized_function_boundary_ids.count(node_boundary_id))
+              {
+                has_node_boundary_id = true;
+                matching_boundary_id = node_boundary_id;
+                break;
+              }
+
+          if(has_node_boundary_id)
+            {
+              _local_node_locations[node_id] = *node;
+              _local_node_boundary_ids[node_id] = matching_boundary_id;
+            }
+        }
+    }
   else
     {
       _local_quad_point_locations.clear();
@@ -1584,6 +1819,60 @@ RBEIMConstruction::side_inner_product(const SideQpDataMap & v, const SideQpDataM
   return val;
 }
 
+Number
+RBEIMConstruction::node_inner_product(const NodeDataMap & v, const NodeDataMap & w)
+{
+  LOG_SCOPE("node_inner_product()", "RBEIMConstruction");
+
+  Number val = 0.;
+
+  for (const auto & [node_id, v_comps] : v)
+    {
+      const auto & w_comps = libmesh_map_find(w, node_id);
+
+      for (const auto & comp : index_range(v_comps))
+        {
+          // There is no quadrature rule on nodes, so we just multiply the values directly.
+          // Hence we effectively work with the Euclidean inner product in this case.
+          val += v_comps[comp] * libmesh_conj(w_comps[comp]);
+        }
+    }
+
+  comm().sum(val);
+  return val;
+}
+
+Real RBEIMConstruction::get_node_max_abs_value(const NodeDataMap & v) const
+{
+  Real max_value = 0.;
+
+  for (const auto & pr : v)
+    {
+      const auto & values = pr.second;
+      for (const auto & comp : index_range(values))
+        {
+          const auto & value = values[comp];
+
+          // If scale_components_in_enrichment() returns true then we
+          // apply a scaling to give an approximately uniform scaling
+          // for all components.
+          Real comp_scaling = 1.;
+          if (get_rb_eim_evaluation().scale_components_in_enrichment())
+            {
+              // Make sure that _component_scaling_in_training_set is initialized
+              libmesh_error_msg_if(comp >= _component_scaling_in_training_set.size(),
+                                  "Invalid vector index");
+              comp_scaling = _component_scaling_in_training_set[comp];
+            }
+
+          max_value = std::max(max_value, std::abs(value * comp_scaling));
+        }
+    }
+
+  comm().max(max_value);
+  return max_value;
+}
+
 void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
 {
   LOG_SCOPE("enrich_eim_approximation()", "RBEIMConstruction");
@@ -1594,6 +1883,8 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
 
   if (eim_eval.get_parametrized_function().on_mesh_sides())
     enrich_eim_approximation_on_sides(_local_side_parametrized_functions_for_training[training_index]);
+  else if (eim_eval.get_parametrized_function().on_mesh_nodes())
+    enrich_eim_approximation_on_nodes(_local_node_parametrized_functions_for_training[training_index]);
   else
     {
       bool has_obs_vals = (eim_eval.get_n_observation_points() > 0);
@@ -1777,6 +2068,100 @@ void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & 
                                                           optimal_qp,
                                                           optimal_point_perturbs,
                                                           optimal_point_phi_i_qp);
+}
+
+void RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & node_pf)
+{
+  // Make a copy of the input parametrized function, since we will modify this below
+  // to give us a new basis function.
+  NodeDataMap local_pf = node_pf;
+
+  RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
+
+  // If we have at least one basis function, then we need to use
+  // rb_eim_solve() to find the EIM interpolation error. Otherwise,
+  // just use solution as is.
+  if (eim_eval.get_n_basis_functions() > 0)
+    {
+      // Get the right-hand side vector for the EIM approximation
+      // by sampling the parametrized function (stored in solution)
+      // at the interpolation points.
+      unsigned int RB_size = eim_eval.get_n_basis_functions();
+      DenseVector<Number> EIM_rhs(RB_size);
+      for (unsigned int i=0; i<RB_size; i++)
+        {
+          EIM_rhs(i) =
+            RBEIMEvaluation::get_parametrized_function_node_value(comm(),
+                                                                  local_pf,
+                                                                  eim_eval.get_interpolation_points_node_id(i),
+                                                                  eim_eval.get_interpolation_points_comp(i));
+        }
+
+      eim_eval.set_parameters( get_parameters() );
+      DenseVector<Number> rb_eim_solution = eim_eval.rb_eim_solve(EIM_rhs);
+
+      // Load the "EIM residual" into solution by subtracting
+      // the EIM approximation
+      eim_eval.node_decrement_vector(local_pf, rb_eim_solution);
+    }
+
+  // Find the quadrature point at which local_pf (which now stores
+  // the "EIM residual") has maximum absolute value
+  Number optimal_value = 0.;
+  Point optimal_point;
+  unsigned int optimal_comp = 0;
+  dof_id_type optimal_node_id = DofObject::invalid_id;
+  boundary_id_type optimal_boundary_id = 0;
+
+  // Initialize largest_abs_value to be negative so that it definitely gets updated.
+  Real largest_abs_value = -1.;
+
+  for (const auto & [node_id, values] : local_pf)
+    {
+      for (unsigned int comp : index_range(values))
+        {
+          Number value = values[comp];
+          Real abs_value = std::abs(value);
+
+          if (abs_value > largest_abs_value)
+            {
+              largest_abs_value = abs_value;
+              optimal_value = value;
+              optimal_comp = comp;
+              optimal_node_id = node_id;
+
+              optimal_point = libmesh_map_find(_local_node_locations, node_id);
+
+              optimal_boundary_id = libmesh_map_find(_local_node_boundary_ids, node_id);
+            }
+        }
+    }
+
+  // Find out which processor has the largest of the abs values
+  // and broadcast from that processor.
+  unsigned int proc_ID_index;
+  this->comm().maxloc(largest_abs_value, proc_ID_index);
+
+  this->comm().broadcast(optimal_value, proc_ID_index);
+  this->comm().broadcast(optimal_point, proc_ID_index);
+  this->comm().broadcast(optimal_comp, proc_ID_index);
+  this->comm().broadcast(optimal_node_id, proc_ID_index);
+  this->comm().broadcast(optimal_boundary_id, proc_ID_index);
+
+  libmesh_error_msg_if(optimal_node_id == DofObject::invalid_id, "Error: Invalid node ID");
+
+  libmesh_error_msg_if(optimal_value == 0., "New EIM basis function should not be zero");
+
+  // Scale local_pf so that its largest value is 1.0
+  scale_node_parametrized_function(local_pf, 1./optimal_value);
+
+  // Add local_pf as the new basis function and store data
+  // associated with the interpolation point.
+  eim_eval.add_node_basis_function_and_interpolation_data(local_pf,
+                                                          optimal_point,
+                                                          optimal_comp,
+                                                          optimal_node_id,
+                                                          optimal_boundary_id);
 }
 
 void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
@@ -1996,6 +2381,38 @@ void RBEIMConstruction::update_eim_matrices()
           eim_eval.set_interpolation_matrix_entry(RB_size-1, j, value);
         }
     }
+  else if (eim_eval.get_parametrized_function().on_mesh_nodes())
+    {
+      // update the matrix that is used to evaluate L2 projections
+      // into the EIM approximation space
+      for (unsigned int i=(RB_size-1); i<RB_size; i++)
+        {
+          for (unsigned int j=0; j<RB_size; j++)
+            {
+              Number value = node_inner_product(eim_eval.get_node_basis_function(j),
+                                                eim_eval.get_node_basis_function(i));
+
+              _eim_projection_matrix(i,j) = value;
+              if (i!=j)
+                {
+                  // The inner product matrix is assumed to be hermitian
+                  _eim_projection_matrix(j,i) = libmesh_conj(value);
+                }
+            }
+        }
+
+      // update the EIM interpolation matrix
+      for (unsigned int j=0; j<RB_size; j++)
+        {
+          // Evaluate the basis functions at the new interpolation point in order
+          // to update the interpolation matrix
+          Number value =
+            eim_eval.get_eim_basis_function_node_value(j,
+                                                       eim_eval.get_interpolation_points_node_id(RB_size-1),
+                                                       eim_eval.get_interpolation_points_comp(RB_size-1));
+          eim_eval.set_interpolation_matrix_entry(RB_size-1, j, value);
+        }
+    }
   else
     {
       // update the matrix that is used to evaluate L2 projections
@@ -2028,6 +2445,17 @@ void RBEIMConstruction::update_eim_matrices()
                                                   eim_eval.get_interpolation_points_qp(RB_size-1));
           eim_eval.set_interpolation_matrix_entry(RB_size-1, j, value);
         }
+    }
+}
+
+void RBEIMConstruction::scale_node_parametrized_function(NodeDataMap & local_pf,
+                                                         Number scaling_factor)
+{
+  for (auto & pr : local_pf)
+    {
+      auto & values = pr.second;
+      for ( auto & value : values)
+        value *= scaling_factor;
     }
 }
 

@@ -86,6 +86,11 @@ public:
   typedef RBEIMEvaluation::SideQpDataMap SideQpDataMap;
 
   /**
+   * Type of the data structure used to map from node id -> [n_vars] data.
+   */
+  typedef RBEIMEvaluation::NodeDataMap NodeDataMap;
+
+  /**
    * Clear this object.
    */
   virtual void clear() override;
@@ -234,6 +239,7 @@ public:
    */
   const QpDataMap & get_parametrized_function_from_training_set(unsigned int training_index) const;
   const SideQpDataMap & get_side_parametrized_function_from_training_set(unsigned int training_index) const;
+  const NodeDataMap & get_node_parametrized_function_from_training_set(unsigned int training_index) const;
 
   /**
    * Get the interior and side quadrature weights.
@@ -265,6 +271,11 @@ protected:
    * Implementation of enrich_eim_approximation() for the case of element sides.
    */
   void enrich_eim_approximation_on_sides(const SideQpDataMap & side_pf);
+
+  /**
+   * Implementation of enrich_eim_approximation() for the case of element nodes.
+   */
+  void enrich_eim_approximation_on_nodes(const NodeDataMap & node_pf);
 
   /**
    * Implementation of enrich_eim_approximation() for the case of element interiors.
@@ -321,6 +332,11 @@ private:
   Number side_inner_product(const SideQpDataMap & v, const SideQpDataMap & w);
 
   /**
+   * Same as inner_product() except for node data.
+   */
+  Number node_inner_product(const NodeDataMap & v, const NodeDataMap & w);
+
+  /**
    * Get the maximum absolute value from a vector stored in the format that we use
    * for basis functions.
    */
@@ -357,25 +373,16 @@ private:
     return max_value;
   }
 
-
   /**
-   * Same as get_max_abs_value() except for side data.
+   * Get the maximum absolute value from a vector stored in the format that we use
+   * for basis functions. This case handles NodeDataMap.
    */
-  Real get_side_max_abs_value(const SideQpDataMap & v) const;
+  Real get_node_max_abs_value(const NodeDataMap & v) const;
 
   /**
    * Add a new basis function to the EIM approximation.
    */
   void enrich_eim_approximation(unsigned int training_index);
-
-  /**
-   * We compute the best fit of parametrized_function
-   * into the EIM space and then evaluate the error
-   * in the norm defined by inner_product_matrix.
-   *
-   * \returns The error in the best fit
-   */
-  Real compute_best_fit_error();
 
   /**
    * Scale all values in \p pf by \p scaling_factor
@@ -401,11 +408,12 @@ private:
   }
 
   /**
-   * Same as scale_parametrized_function() excecpt for side data.
+   * Scale all values in \p pf by \p scaling_factor
+   * The templated function above handles the elem and side cases,
+   * and this separate case handles the node case.
    */
-  static void scale_side_parametrized_function(
-    SideQpDataMap & local_pf,
-    Number scaling_factor);
+  static void scale_node_parametrized_function(NodeDataMap & local_pf,
+                                               Number scaling_factor);
 
   /**
    * Maximum number of EIM basis functions we are willing to use.
@@ -454,6 +462,13 @@ private:
    *   basis function index --> (element ID,side index) --> variable --> quadrature point --> value
    */
   std::vector<SideQpDataMap> _local_side_parametrized_functions_for_training;
+
+  /**
+   * Same as _local_parametrized_functions_for_training except for node data.
+   * The indexing is as follows:
+   *   basis function index --> node ID --> variable --> value
+   */
+  std::vector<NodeDataMap> _local_node_parametrized_functions_for_training;
 
   /**
    * Maximum value in _local_parametrized_functions_for_training across all processors.
@@ -507,6 +522,12 @@ private:
   std::map<std::pair<dof_id_type,unsigned int>, subdomain_id_type > _local_side_quad_point_subdomain_ids;
   std::map<std::pair<dof_id_type,unsigned int>, boundary_id_type > _local_side_quad_point_boundary_ids;
   std::map<std::pair<dof_id_type,unsigned int>, std::vector<std::vector<Point>> > _local_side_quad_point_locations_perturbations;
+
+  /**
+   * Same as above except for node data.
+   */
+  std::unordered_map<dof_id_type, Point > _local_node_locations;
+  std::unordered_map<dof_id_type, boundary_id_type > _local_node_boundary_ids;
 
   /**
    * For side data, we also store "side type" info. This is used to distinguish between

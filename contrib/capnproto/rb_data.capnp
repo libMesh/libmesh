@@ -121,6 +121,7 @@ struct RBEIMEvaluationReal @0xf8121d2237427a80 {
   interpolationSideIndex      @14 :List(Integer);
   interpolationBoundaryId     @15 :List(Integer);
   interpolationSpatialIndices @16 :List(List(Integer));
+  interpolationNodeId         @17 :List(Integer);
 }
 struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   nBfs                        @0  :Integer;
@@ -140,4 +141,5 @@ struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   interpolationSideIndex      @14 :List(Integer);
   interpolationBoundaryId     @15 :List(Integer);
   interpolationSpatialIndices @16 :List(List(Integer));
+  interpolationNodeId         @17 :List(Integer);
 }

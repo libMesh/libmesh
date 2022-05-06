@@ -774,6 +774,21 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
+  // Interpolation points node IDs, relevant if the parametrized function is defined on mesh sides
+  if (rb_eim_evaluation.get_parametrized_function().on_mesh_nodes())
+  {
+    auto interpolation_points_node_id_list =
+      rb_eim_evaluation_reader.getInterpolationNodeId();
+
+    libmesh_error_msg_if(interpolation_points_node_id_list.size() != n_bfs,
+                         "Size error while reading the eim interpolation node IDs.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        rb_eim_evaluation.add_interpolation_points_node_id(interpolation_points_node_id_list[i]);
+      }
+  }
+
   // Interpolation points side indices, relevant if the parametrized function is defined on mesh sides
   if (rb_eim_evaluation.get_parametrized_function().on_mesh_sides())
   {
