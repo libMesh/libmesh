@@ -1180,7 +1180,7 @@ public:
    * \returns The variable number associated with
    * the user-specified variable named \p var.
    */
-  unsigned short int variable_number (std::string_view var) const;
+  unsigned int variable_number (std::string_view var) const;
 
   /**
    * Fills \p all_variable_numbers with all the variable numbers for the
@@ -2136,7 +2136,7 @@ private:
    * The variable numbers corresponding to user-specified
    * names, useful for name-based lookups.
    */
-  std::map<std::string, unsigned short int, std::less<>> _variable_numbers;
+  std::map<std::string, unsigned int, std::less<>> _variable_numbers;
 
   /**
    * Flag stating if the system is active or not.

@@ -1,4 +1,5 @@
 #include <libmesh/equation_systems.h>
+#include <libmesh/int_range.h>
 #include <libmesh/mesh.h>
 #include <libmesh/node.h>
 #include <libmesh/dof_map.h>
@@ -37,6 +38,7 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <string>
 
 using namespace libMesh;
 
@@ -436,6 +438,8 @@ class SystemsTest : public CppUnit::TestCase {
 public:
   LIBMESH_CPPUNIT_TEST_SUITE( SystemsTest );
 
+  CPPUNIT_TEST( test100KVariables );
+
   CPPUNIT_TEST( testProjectHierarchicEdge3 );
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testProjectHierarchicQuad9 );
@@ -544,6 +548,39 @@ public:
 
   void tearDown()
   {}
+
+  void test100KVariables()
+  {
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    ExplicitSystem &sys =
+      es.add_system<ExplicitSystem> ("100KVars");
+
+    dof_id_type n_dofs = 100000;
+
+    // This takes 16 seconds in opt mode for me, 200 in dbg!?
+    /*
+    for (auto i : make_range(n_dofs))
+      sys.add_variable(std::to_string(i), FIRST);
+    */
+
+    std::vector<std::string> var_names(n_dofs);
+    for (auto i : make_range(n_dofs))
+      var_names[i] = std::to_string(i);
+
+    sys.add_variables(var_names, FIRST);
+
+    MeshTools::Generation::build_line (mesh,
+                                       1,
+                                       0., 1.,
+                                       EDGE3);
+
+    es.init();
+
+    CPPUNIT_ASSERT_EQUAL(sys.n_dofs(), n_dofs*2);
+    for (const Node * node : mesh.node_ptr_range())
+      CPPUNIT_ASSERT_EQUAL(dof_id_type(node->n_vars(0)), n_dofs);
+  }
 
   void testProjectLine(const ElemType elem_type)
   {
