@@ -23,6 +23,10 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/adjoint_refinement_estimator.h"
 
+// Remove before committing
+#include "libmesh/system_norm.h"
+#include "libmesh/enum_norm_type.h"
+
 namespace libMesh
 {
 
@@ -284,7 +288,7 @@ void EulerSolver::integrate_adjoint_refinement_error_estimate(AdjointRefinementE
     next_step_deltat = _system.deltat;
     _system.deltat = last_step_deltat;
 
-    // The adjoint error estimate expression for a backwards facing step
+    // The adjoint error estimate expression for a backward Euler
     // scheme needs the adjoint for the last time instant, so save the current adjoint for future use
     for (auto j : make_range(_system.n_qois()))
     {
@@ -439,17 +443,21 @@ void EulerSolver::advance_postprocessing_timestep(std::vector<std::function<void
   std::unique_ptr<NumericVector<Number>> weighted_vector = NumericVector<Number>::build(_system.comm());
   weighted_vector->init(_system.get_vector("_old_nonlinear_solution"));
 
-  weighted_vector->add((1.0 - theta)*(time_right - time_left), _system.get_vector("_old_nonlinear_solution"));
+  weighted_vector->add((1.0 - theta), _system.get_vector("_old_nonlinear_solution"));
 
-  weighted_vector->add(theta*(time_right - time_left), *(_system.solution));
+  weighted_vector->add(theta, *(_system.solution));
 
   _system.solution->swap(*weighted_vector);
+
+  std::cout<<"Weighted solution norm: "<<_system.calculate_norm(*_system.solution, 0, H1)<<std::endl;
+
+  _system.update();
 
   // Mesh and solution read in. Ready to call the user's integration operations.
   // Since we have already weighted the solution and old solution, we just pass 1.0
   // as the time quadrature weight.
   for (auto integration_operations_iterator:integration_operations)
-   integration_operations_iterator(1.0, dynamic_cast<System&>(_system));
+   integration_operations_iterator(1.0*(time_right - time_left), dynamic_cast<System&>(_system));
 
   // Swap back
   _system.solution->swap(*weighted_vector);
