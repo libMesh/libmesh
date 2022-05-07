@@ -23,10 +23,6 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/adjoint_refinement_estimator.h"
 
-// Remove before committing
-#include "libmesh/system_norm.h"
-#include "libmesh/enum_norm_type.h"
-
 namespace libMesh
 {
 
