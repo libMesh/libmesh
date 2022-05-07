@@ -237,6 +237,8 @@ void UnsteadySolver::adjoint_advance_timestep ()
 
 void UnsteadySolver::retrieve_timestep()
 {
+  last_deltat = _system.deltat;
+
   // Retrieve all the stored vectors at the current time
   solution_history->retrieve(false, _system.time);
 
