@@ -642,9 +642,6 @@ int main (int argc, char ** argv)
       // A SensitivityData object
       SensitivityData sensitivities(qois, system, system.get_parameter_vector());
 
-      // Accumulator for the time integrated total sensitivity
-      Number total_sensitivity = 0.0;
-
       // Retrieve the primal and adjoint solutions at the current timestep
       system.time_solver->retrieve_timestep();
 
@@ -673,6 +670,26 @@ int main (int argc, char ** argv)
                    << std::endl
                    << std::endl;
 
+      ParameterVector & parameter_vector = system.get_parameter_vector();
+
+      auto integrate_adjoint_sensitivity = [&qois, &parameter_vector, &sensitivities](Real time_quadrature_weight, System & system)
+      {
+        SensitivityData sensitivity_contributions(qois, system, parameter_vector);
+
+        system.adjoint_qoi_parameter_sensitivity(qois, parameter_vector, sensitivity_contributions);
+
+        // Remove the sensitivity rhs vector from system since we did not write it to file and it cannot be retrieved
+        system.remove_vector("sensitivity_rhs0");
+
+        // Get the contributions for each sensitivity from this timestep
+        for(unsigned int i = 0; i != qois.size(system); i++)
+          for(unsigned int j = 0; j != parameter_vector.size(); j++)
+            sensitivities[i][j] += ( sensitivity_contributions[i][j] )*(time_quadrature_weight);
+      };
+
+      std::vector<std::function<void(Real, System &)>> sensitivity_operations;
+      sensitivity_operations.push_back(integrate_adjoint_sensitivity);
+
       // Now we begin the timestep loop to compute the time-accurate
       // adjoint sensitivities
       for (unsigned int t_step=param.initial_timestep;
@@ -680,7 +697,7 @@ int main (int argc, char ** argv)
         {
           // Call the postprocess function which we have overloaded to compute
           // accumulate the perturbed residuals
-          system.time_solver->integrate_adjoint_sensitivity(qois, system.get_parameter_vector(), sensitivities);
+          system.time_solver->advance_postprocessing_timestep(sensitivity_operations);
 
           // A pretty update message
           libMesh::out << "Retrieved, "
@@ -706,14 +723,11 @@ int main (int argc, char ** argv)
                    << system.calculate_norm(system.get_adjoint_solution(0), 0, H1)
                    << std::endl
                    << std::endl;
-
-          // Add the contribution of the current timestep to the total sensitivity
-          total_sensitivity += sensitivities[0][0];
         }
 
       // Print it out
       libMesh::out << "Sensitivity of QoI 0 w.r.t parameter 0 is: "
-                   << total_sensitivity
+                   << sensitivities[0][0]
                    << std::endl;
 
       // Hard coded test to ensure that the actual numbers we are
@@ -725,12 +739,12 @@ int main (int argc, char ** argv)
         libmesh_error_msg_if(std::abs(system.time - (1.0089)) >= 2.e-4,
                              "Mismatch in end time reached by adaptive timestepper!");
 
-        libmesh_error_msg_if(std::abs(total_sensitivity - 4.87767) >= 3.e-3,
+        libmesh_error_msg_if(std::abs(sensitivities[0][0] - 4.87767) >= 3.e-3,
                              "Mismatch in sensitivity gold value!");
       }
       else
       {
-        libmesh_error_msg_if(std::abs(total_sensitivity - 4.83551) >= 2.e-4,
+        libmesh_error_msg_if(std::abs(sensitivities[0][0] - 4.83551) >= 2.e-4,
                              "Mismatch in sensitivity gold value!");
       }
 #ifdef NDEBUG

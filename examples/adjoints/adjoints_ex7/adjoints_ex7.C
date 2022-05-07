@@ -536,9 +536,7 @@ int main (int argc, char ** argv)
       for (unsigned int t_step=param.initial_timestep;
            t_step != param.initial_timestep + param.n_timesteps; ++t_step)
         {
-          //system.time_solver->integrate_qoi_timestep();
           system.time_solver->advance_postprocessing_timestep(integration_operations);
-          //QoI_1_accumulated += (system.qoi)[1];
         }
 
       std::cout<< "The computed QoI 0 is " << std::setprecision(17) << QoI_accumulated[0] << std::endl;
@@ -666,15 +664,6 @@ int main (int argc, char ** argv)
           // unnecessarily in the error estimator
           system.set_adjoint_already_solved(true);
 
-          libMesh::out << "Saving adjoint and retrieving primal solutions at time t=" << system.time - system.deltat << std::endl;
-
-          // The adjoint_advance_timestep function calls the retrieve and store
-          // function of the memory_solution_history class via the
-          // memory_solution_history object we declared earlier.  The
-          // retrieve function sets the system primal vectors to their
-          // values at the current time instance.
-          system.time_solver->adjoint_advance_timestep();
-
           libMesh::out << "|Z0("
                        << system.time
                        << ")|= "
@@ -688,6 +677,15 @@ int main (int argc, char ** argv)
                        << system.calculate_norm(system.get_adjoint_solution(1), 0, H1)
                        << std::endl
                        << std::endl;
+
+          libMesh::out << "Saving adjoint and retrieving primal solutions at time t=" << system.time << std::endl;
+
+          // The adjoint_advance_timestep function calls the retrieve and store
+          // function of the memory_solution_history class via the
+          // memory_solution_history object we declared earlier.  The
+          // retrieve function sets the system primal vectors to their
+          // values at the current time instance.
+          system.time_solver->adjoint_advance_timestep();
 
           // Get a pointer to the primal solution vector
           primal_solution = *system.solution;
@@ -724,8 +722,8 @@ int main (int argc, char ** argv)
       // as we did for the adjoint solve. This object will now define the residual for the dual weighted error evaluation at
       // each timestep.
       // For adjoint consistency, it is important that we maintain the same integration method for the error estimation integral
-      // as we did for the primal and QoI integration. This is ensured within the library, but is currently ONLY supported for
-      // the Backward-Euler (theta = 0.5) time integration method.
+      // as we did for the primal and QoI integration. This is ensured within the library, but is currently only supported for
+      // the Backward-Euler (theta = 1.0) time integration method.
       QoISet qois;
 
       std::vector<unsigned int> qoi_indices;
@@ -739,55 +737,94 @@ int main (int argc, char ** argv)
       auto adjoint_refinement_error_estimator =
         build_adjoint_refinement_error_estimator(qois, dynamic_cast<FEMPhysics *>(sigma_physics), param);
 
-      // Error Vector to be filled by the error estimator at each timestep
+      std::vector<Number> time_integrated_QoI_error(system.n_qois(), 0.0);
+      system.qoi_error_estimates.resize(system.n_qois());
+      std::vector< std::unique_ptr<NumericVector<Number>> > old_adjoints;
       ErrorVector QoI_elementwise_error;
-      std::vector<Number> QoI_spatially_integrated_error(system.n_qois());
 
-      // Error Vector to hold the total accumulated error
-      ErrorVector accumulated_QoI_elementwise_error;
-      std::vector<Number> accumulated_QoI_spatially_integrated_error(system.n_qois());
+      old_adjoints.resize(system.n_qois());
 
-      // Retrieve the primal and adjoint solutions at the current timestep
-      system.time_solver->retrieve_timestep();
+      // Initialize old adjoints
+      for(auto j : make_range(system.n_qois()))
+      {
+       old_adjoints[j] = system.get_adjoint_solution(j).clone();
+      }
 
-      // A pretty update message
-      libMesh::out << "Retrieved, "
-               << "time = "
-               << system.time
-               << std::endl;
+      auto integrate_adjoint_refinement_error_estimate = [&QoI_elementwise_error, &time_integrated_QoI_error, &old_adjoints, &adjoint_refinement_error_estimator] (Real time_quadrature_weight, System & system)
+      {
+        // We will need to move the system.time around to ensure that residuals
+        // are built with the right deltat and the right time.
+        Real next_step_deltat;
 
-      libMesh::out << "|U("
-                   << system.time
-                   << ")|= "
-                   << system.calculate_norm(*system.solution, 0, H1)
-                   << std::endl;
+        // Reset the elementwise QoI error vector
+        QoI_elementwise_error.clear();
 
-      libMesh::out << "|U_old("
-                   << system.time
-                   << ")|= "
-                   << system.calculate_norm(system.get_vector("_old_nonlinear_solution"), 0, H1)
-                   << std::endl;
+        // Zero out the system.qoi vector
+        for (auto j : make_range(system.n_qois()))
+        {
+         (system.qoi_error_estimates)[j] = 0.0;
+        }
 
-      libMesh::out << "|Z0("
-                   << system.time
-                   << ")|= "
-                   << system.calculate_norm(system.get_adjoint_solution(0), 0, H1)
-                   << std::endl
-                   << std::endl;
+        // For evaluating the residual, we need to use the deltat that was used
+        // to get us to this solution, so we save the current deltat as next_step_deltat
+        // and set _system.deltat to the last completed deltat.
+        next_step_deltat = dynamic_cast<HeatSystem &>(system).deltat;
+        dynamic_cast<HeatSystem &>(system).deltat = dynamic_cast<HeatSystem &>(system).get_time_solver().get_last_deltat();
 
-      libMesh::out << "|Z1("
-                   << system.time
-                   << ")|= "
-                   << system.calculate_norm(system.get_adjoint_solution(1), 0, H1)
-                   << std::endl
-                   << std::endl;
+        // The adjoint error estimate expression for a backward Euler
+        // scheme needs the adjoint for the last time instant, so save the current adjoint for future use
+        for (auto j : make_range(system.n_qois()))
+        {
+          // Swap for residual weighting
+          system.get_adjoint_solution(j).swap(*old_adjoints[j]);
+        }
+
+        system.update();
+
+        // The residual has to be evaluated at the last time
+        system.time = system.time - dynamic_cast<HeatSystem &>(system).get_time_solver().get_last_deltat();
+
+        adjoint_refinement_error_estimator->estimate_error(system, QoI_elementwise_error);
+
+        for (auto j : make_range(system.n_qois()))
+        {
+          (system.qoi_error_estimates)[j] += adjoint_refinement_error_estimator->get_global_QoI_error_estimate(j);
+          //std::cout<<"Error est: "<<(system.qoi_error_estimates)[j]<<std::endl;
+          time_integrated_QoI_error[j] += time_quadrature_weight*((system.qoi_error_estimates)[j]);
+        }
+
+        // Shift the time back
+        system.time = system.time + dynamic_cast<HeatSystem &>(system).get_time_solver().get_last_deltat();
+
+        // Swap back the current and old adjoints
+        for (auto j : make_range(system.n_qois()))
+        {
+          system.get_adjoint_solution(j).swap(*old_adjoints[j]);
+        }
+
+        system.update();
+
+        // Set the system deltat back to what it should be to march to the next time
+        dynamic_cast<HeatSystem &>(system).deltat = next_step_deltat;
+
+        // The adjoint error estimate expression for a backwards Euler
+        // scheme needs the adjoint for the last time instant, so save the current adjoint for future use
+        for (auto j : make_range(system.n_qois()))
+        {
+          old_adjoints[j] = system.get_adjoint_solution(j).clone();
+        }
+      };
+
+      std::vector<std::function<void(Real, System &)>> error_estimation_operations;
+
+      error_estimation_operations.push_back(integrate_adjoint_refinement_error_estimate);
 
       // Now we begin the timestep loop to compute the time-accurate
       // adjoint sensitivities
       for (unsigned int t_step=param.initial_timestep;
            t_step != param.initial_timestep + param.n_timesteps; ++t_step)
         {
-          system.time_solver->integrate_adjoint_refinement_error_estimate(*adjoint_refinement_error_estimator, QoI_elementwise_error);
+          system.time_solver->advance_postprocessing_timestep(error_estimation_operations);
 
           // A pretty update message
           libMesh::out << "Retrieved, "
@@ -821,23 +858,10 @@ int main (int argc, char ** argv)
                    << std::endl
                    << std::endl;
 
-          // Error contribution from this timestep
-          for(unsigned int i = 0; i < QoI_elementwise_error.size(); i++)
-            accumulated_QoI_elementwise_error[i] += QoI_elementwise_error[i];
-
-          // QoI wise error contribution from this timestep
-          for (auto j : make_range(system.n_qois()))
-          {
-            // Skip this QoI if not in the QoI Set
-            if ((adjoint_refinement_error_estimator->qoi_set()).has_index(j))
-            {
-              accumulated_QoI_spatially_integrated_error[j] += (system.qoi_error_estimates)[j];
-            }
-          }
         }
 
-      std::cout<<"Time integrated error estimate for QoI 0: "<<std::setprecision(17)<<accumulated_QoI_spatially_integrated_error[0]<<std::endl;
-      std::cout<<"Time integrated error estimate for QoI 1: "<<std::setprecision(17)<<accumulated_QoI_spatially_integrated_error[1]<<std::endl;
+      std::cout<<"Time integrated error estimate for QoI 0: "<<std::setprecision(17)<<time_integrated_QoI_error[0]<<std::endl;
+      std::cout<<"Time integrated error estimate for QoI 1: "<<std::setprecision(17)<<time_integrated_QoI_error[1]<<std::endl;
 
       // Hard coded test to ensure that the actual numbers we are
       // getting are what they should be
@@ -848,18 +872,18 @@ int main (int argc, char ** argv)
         libmesh_error_msg_if(std::abs(system.time - (1.7548735069535084)) >= 2.e-4,
                              "Mismatch in end time reached by adaptive timestepper!");
 
-        libmesh_error_msg_if(std::abs(accumulated_QoI_spatially_integrated_error[0] - (-0.75139371165754232)) >= 2.e-4,
+        libmesh_error_msg_if(std::abs(time_integrated_QoI_error[0] - (-0.75139371165754232)) >= 2.e-4,
                              "Error Estimator identity not satisfied!");
 
-        libmesh_error_msg_if(std::abs(accumulated_QoI_spatially_integrated_error[1] - (-0.70905030091469889)) >= 2.e-4,
+        libmesh_error_msg_if(std::abs(time_integrated_QoI_error[1] - (-0.70905030091469889)) >= 2.e-4,
                              "Error Estimator identity not satisfied!");
       }
       else
       {
-        libmesh_error_msg_if(std::abs(accumulated_QoI_spatially_integrated_error[0] - (-0.44809323880671958)) >= 2.e-4,
+        libmesh_error_msg_if(std::abs(time_integrated_QoI_error[0] - (-0.44809323880671958)) >= 2.e-4,
                              "Error Estimator identity not satisfied!");
 
-        libmesh_error_msg_if(std::abs(accumulated_QoI_spatially_integrated_error[1] - (-0.23895256319278346)) >= 2.e-4,
+        libmesh_error_msg_if(std::abs(time_integrated_QoI_error[1] - (-0.23895256319278346)) >= 2.e-4,
                              "Error Estimator identity not satisfied!");
       }
 #ifdef NDEBUG
