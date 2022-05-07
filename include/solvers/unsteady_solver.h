@@ -207,6 +207,8 @@ public:
     first_solve = first_solve_setting;
   }
 
+  virtual Real get_last_deltat() override {return last_deltat;};
+
 protected:
 
   /**

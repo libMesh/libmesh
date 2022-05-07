@@ -135,6 +135,8 @@ public:
 
   virtual void advance_postprocessing_timestep(std::vector<std::function<void(Real, System &)>> integration_operations) override;
 
+  virtual Real get_last_deltat() override {libmesh_error_msg("Error: A steady solver is asking for a timestep size.");}
+
 protected:
 
   /**

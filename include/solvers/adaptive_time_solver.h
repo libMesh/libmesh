@@ -92,6 +92,7 @@ public:
 
   virtual Real last_completed_timestep_size() override { return completed_timestep_size; };
 
+  virtual Real get_last_deltat() override {return core_time_solver->get_last_deltat(); };
   /**
    * This method is passed on to the core_time_solver
    */

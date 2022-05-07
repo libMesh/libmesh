@@ -80,6 +80,8 @@ public:
 
   virtual void advance_postprocessing_timestep(std::vector<std::function<void(Real, System &)>> integration_operations) override;
 
+  virtual Real get_last_deltat() override {libmesh_not_implemented();};
+
   /**
    * This method uses the specified initial displacement and velocity
    * to compute the initial acceleration \f$a_0\f$.

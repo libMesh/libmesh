@@ -299,6 +299,12 @@ public:
    */
   virtual Real last_completed_timestep_size();
 
+  /**
+   * Return the size of the last timestep taken to get to the current time.
+   *
+   */
+  virtual Real get_last_deltat() = 0;
+
 protected:
 
   /**
