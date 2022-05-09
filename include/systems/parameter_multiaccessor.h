@@ -50,7 +50,7 @@ public:
   /**
    * Constructor: no parameters attached yet
    */
-  ParameterMultiAccessor() {}
+  ParameterMultiAccessor() = default;
 
   /**
    * Constructor: take the first sub-accessor for the parameter
@@ -59,12 +59,9 @@ public:
     _accessors(1, param_accessor.clone()) {}
 
   /*
-   * Destructor: delete our clones of sub-accessors
+   * Destructor
    */
-  ~ParameterMultiAccessor() {
-    for (auto & accessor : _accessors)
-      delete accessor;
-  }
+  ~ParameterMultiAccessor() = default;
 
   /**
    * Setter: change the value of the parameter we access.
@@ -108,7 +105,7 @@ public:
   {
     auto pmp = std::make_unique<ParameterMultiAccessor<T>>();
     for (auto & accessor : _accessors)
-      pmp->_accessors.push_back(accessor->clone().release());
+      pmp->_accessors.push_back(accessor->clone());
 
     return pmp;
   }
@@ -126,7 +123,7 @@ public:
   std::size_t size() const { return _accessors.size(); }
 
 private:
-  std::vector<ParameterAccessor<T> *> _accessors;
+  std::vector<std::unique_ptr<ParameterAccessor<T>>> _accessors;
 };
 
 } // namespace libMesh
