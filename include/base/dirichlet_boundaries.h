@@ -211,12 +211,11 @@ public:
  * \note \p std::map has no virtual destructor, so downcasting here
  * would be dangerous.
  */
-class DirichletBoundaries : public std::vector<DirichletBoundary *>
+class DirichletBoundaries : public std::vector<std::unique_ptr<DirichletBoundary>>
 {
 public:
-  DirichletBoundaries() {}
-
-  ~DirichletBoundaries();
+  DirichletBoundaries() = default;
+  ~DirichletBoundaries() = default;
 };
 
 } // namespace libMesh
