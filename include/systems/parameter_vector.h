@@ -47,7 +47,7 @@ public:
   /**
    * Default constructor: "no parameters"
    */
-  ParameterVector() : _is_shallow_copy(false) {}
+  ParameterVector() = default;
 
   /**
    * Constructor-from-vector-of-Number*: each points to a parameter
@@ -58,7 +58,7 @@ public:
   /**
    * Destructor - deletes ParameterAccessor objects
    */
-  ~ParameterVector();
+  ~ParameterVector() = default;
 
   /**
    * Deep copy constructor: the \p target will now own new copies of
@@ -139,18 +139,19 @@ private:
   /**
    * Pointers to parameters which may exist elsewhere
    */
-  std::vector<ParameterAccessor<Number> *> _params;
+  std::vector<std::unique_ptr<ParameterAccessor<Number>>> _params;
 
   /**
    * Parameters which I own; e.g. as the result of a deep copy
    */
   std::vector<Number> _my_data;
 
+#ifndef NDEBUG
   /**
-   * Am I a shallow copy?  If so then I shouldn't be deleting my
-   * ParameterAccessors.
+   * Am I a shallow copy?  If so then resizing me would be a bug.
    */
-  bool _is_shallow_copy;
+  bool _is_shallow_copy = false;
+#endif
 };
 
 
@@ -158,21 +159,11 @@ private:
 // ------------------------------------------------------------
 // ParameterVector inline methods
 
-inline
-ParameterVector::~ParameterVector()
-{
-  this->clear();
-}
-
 
 inline
 void
 ParameterVector::clear()
 {
-  if (!_is_shallow_copy)
-    for (auto & param : _params)
-      delete param;
-
   _params.clear();
   _my_data.clear();
 }
@@ -185,7 +176,7 @@ void ParameterVector::push_back(std::unique_ptr<ParameterAccessor<Number>> new_a
   // Can't append stuff we are responsible for if we're already a shallow copy.
   libmesh_assert(!_is_shallow_copy);
   libmesh_assert(new_accessor.get());
-  _params.push_back(new_accessor.release());
+  _params.push_back(std::move(new_accessor));
 }
 
 

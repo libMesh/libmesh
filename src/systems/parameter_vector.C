@@ -18,19 +18,23 @@
 
 
 // Local Includes
-#include "libmesh/parameter_pointer.h"
 #include "libmesh/parameter_vector.h"
+
+#include "libmesh/int_range.h"
+#include "libmesh/parameter_pointer.h"
 
 namespace libMesh
 {
 
 ParameterVector::ParameterVector(const std::vector<Number *> &params)
+#ifndef NDEBUG
   : _is_shallow_copy(false)
+#endif
 {
   _params.reserve(params.size());
 
   for (auto p : params)
-    _params.push_back(new ParameterPointer<Number>(p));
+    _params.push_back(std::make_unique<ParameterPointer<Number>>(p));
 }
 
 
@@ -44,7 +48,8 @@ void ParameterVector::deep_copy(ParameterVector & target) const
   for (std::size_t i=0; i != Np; ++i)
     {
       target._params[i] =
-        new ParameterPointer<Number>(&target._my_data[i]);
+        std::make_unique<ParameterPointer<Number>>
+          (&target._my_data[i]);
       target._my_data[i] = *(*this)[i];
     }
 }
@@ -54,8 +59,12 @@ void ParameterVector::deep_copy(ParameterVector & target) const
 void ParameterVector::shallow_copy(ParameterVector & target) const
 {
   target._my_data.clear();
-  target._params = this->_params;
+  target._params.resize(this->_params.size());
+  for (auto i : index_range(this->_params))
+    target._params[i] = this->_params[i]->clone();
+#ifndef NDEBUG
   target._is_shallow_copy = true;
+#endif
 }
 
 
@@ -75,19 +84,11 @@ void ParameterVector::resize(std::size_t s)
 {
   libmesh_assert(!_is_shallow_copy);
 
-  const std::size_t old_size = this->_params.size();
-
-  // If we're shrinking the vector, we don't want to leak memory.
-  // Note that we're using < in these for loops, not !=
-  // We don't know a priori if we're shrinking or growing
-  for (std::size_t i=s; i < old_size; ++i)
-    delete _params[i];
-
   this->_params.resize(s);
 
-  for (std::size_t i=old_size; i < s; ++i)
-    this->_params[i] =
-      new ParameterPointer<Number>(nullptr);
+  // We used to make nullptr ParameterPointers here, but that was just
+  // to keep our destructor happy; users couldn't reseat them so
+  // shouldn't have code depending on them
 }
 
 
@@ -100,7 +101,7 @@ void ParameterVector::deep_resize(std::size_t s)
   this->_my_data.resize(s);
   for (std::size_t i=0; i != s; ++i)
     this->_params[i] =
-      new ParameterPointer<Number>(&this->_my_data[i]);
+      std::make_unique<ParameterPointer<Number>>(&this->_my_data[i]);
 }
 
 
