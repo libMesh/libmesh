@@ -23,6 +23,7 @@ public:
   CPPUNIT_TEST( testDistributedMeshStitch );
   CPPUNIT_TEST( testReplicatedBoundaryInfo );
   CPPUNIT_TEST( testDistributedBoundaryInfo );
+  CPPUNIT_TEST( testReplicatedMeshStitchElemsets );
 #endif // LIBMESH_DIM > 2
 
   CPPUNIT_TEST_SUITE_END();
@@ -220,6 +221,72 @@ public:
   {
     testMeshStitch<DistributedMesh>();
   }
+
+  template <typename MeshType>
+  void testMeshStitchElemsets ()
+  {
+    LOG_UNIT_TEST;
+
+    // Generate meshes to be stitched together. We are going to clone
+    // these so work with unique_ptrs directly.
+    auto mesh0 = std::make_unique<MeshType>(*TestCommWorld);
+
+    // If the user tries to stitch meshes with overlapping codes, we
+    // allow this as long as the codes refer to the same underlying
+    // set ids.
+
+    // Build two meshes on unit cube, shift one to the right by 1 unit
+    int ps = 2;
+    MeshTools::Generation::build_cube (*mesh0, ps, ps, ps,
+                                       /*xmin=*/0., /*xmax=*/1.,
+                                       /*ymin=*/0., /*ymax=*/1.,
+                                       /*zmin=*/0., /*zmax=*/1.,
+                                       HEX27);
+
+    auto mesh1 = mesh0->clone();
+    MeshTools::Modification::translate(*mesh1, /*x-dir*/1.0);
+
+    // For both meshes:
+    // .) Put odd-numbered Elems in elmset 1
+    // .) Put even-numbered Elems in elemset 2
+    // We use the trivial encoding: elemset id == elemset code for simplicity
+    auto place_elems = [](MeshBase & mesh)
+      {
+        unsigned int elemset_index =
+          mesh.add_elem_integer("elemset_code", /*allocate_data=*/true);
+
+        mesh.add_elemset_code(/*code=*/1, /*set_ids*/{1});
+        mesh.add_elemset_code(/*code=*/2, /*set_ids*/{2});
+
+        for (const auto & elem : mesh.element_ptr_range())
+          {
+            if (elem->id() % 2) // odd
+              elem->set_extra_integer(elemset_index, 1);
+            else // even
+              elem->set_extra_integer(elemset_index, 2);
+          }
+      };
+
+    place_elems(*mesh0);
+    place_elems(*mesh1);
+
+    // Stitch the meshes together at the indicated boundary ids
+    mesh0->stitch_meshes(dynamic_cast<UnstructuredMesh &>(*mesh1),
+                         /*this boundary=*/2,
+                         /*other boundary=*/4,
+                         TOLERANCE,
+                         /*clear_stitched_boundary_ids=*/true,
+                         /*verbose=*/true,
+                         /*use_binary_search=*/false,
+                         /*enforce_all_nodes_match_on_boundaries=*/false);
+  }
+
+  void testReplicatedMeshStitchElemsets ()
+  {
+    testMeshStitchElemsets<ReplicatedMesh>();
+  }
+
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( MeshStitchTest );
