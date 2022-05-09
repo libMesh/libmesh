@@ -82,13 +82,6 @@ public:
     const auto & nbi = bi.get_node_boundary_ids();
     CPPUNIT_ASSERT_EQUAL(expected_size, nbi.size());
 
-    const auto & ss_id_to_name = bi.get_sideset_name_map();
-    std::set<std::string> ss_names;
-    std::for_each(ss_id_to_name.begin(),
-                  ss_id_to_name.end(),
-                  [&ss_names](const std::pair<boundary_id_type, std::string> & map_pr) {
-                    ss_names.insert(map_pr.second);
-                  });
     std::set<std::string> expected_names = {{"zero_left",
                                              "zero_top",
                                              "zero_front",
@@ -99,15 +92,14 @@ public:
                                              "one_front",
                                              "one_back",
                                              "one_bottom"}};
+    std::set<std::string> ss_names;
+    for (const auto & pr : bi.get_sideset_name_map())
+      ss_names.insert(pr.second);
     CPPUNIT_ASSERT(ss_names == expected_names);
 
-    const auto & ns_id_to_name = bi.get_nodeset_name_map();
     std::set<std::string> ns_names;
-    std::for_each(ns_id_to_name.begin(),
-                  ns_id_to_name.end(),
-                  [&ns_names](const std::pair<boundary_id_type, std::string> & map_pr) {
-                    ns_names.insert(map_pr.second);
-                  });
+    for (const auto & pr : bi.get_nodeset_name_map())
+      ns_names.insert(pr.second);
     CPPUNIT_ASSERT(ns_names == expected_names);
   }
 
