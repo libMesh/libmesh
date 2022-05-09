@@ -1909,7 +1909,7 @@ private:
    * Data structure containing Dirichlet functions.  The ith
    * entry is the constraint matrix row for boundaryid i.
    */
-  std::vector<DirichletBoundaries *> _adjoint_dirichlet_boundaries;
+  std::vector<std::unique_ptr<DirichletBoundaries>> _adjoint_dirichlet_boundaries;
 #endif
 
   friend class SparsityPattern::Build;

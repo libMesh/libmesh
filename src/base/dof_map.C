@@ -209,11 +209,6 @@ DofMap::~DofMap()
   // need to remove those from the mesh too before we die.
   _mesh.remove_ghosting_functor(*_default_coupling);
   _mesh.remove_ghosting_functor(*_default_evaluating);
-
-#ifdef LIBMESH_ENABLE_DIRICHLET
-  for (auto & bnd : _adjoint_dirichlet_boundaries)
-    delete bnd;
-#endif
 }
 
 
