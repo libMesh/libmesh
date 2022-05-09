@@ -45,6 +45,9 @@ void ParameterVector::deep_copy(ParameterVector & target) const
   target.clear();
   target._params.resize(Np);
   target._my_data.resize(Np);
+#ifndef NDEBUG
+  target._is_shallow_copy = false;
+#endif
   for (std::size_t i=0; i != Np; ++i)
     {
       target._params[i] =
