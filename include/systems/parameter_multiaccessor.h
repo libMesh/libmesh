@@ -106,11 +106,11 @@ public:
    */
   virtual std::unique_ptr<ParameterAccessor<T>> clone() const override
   {
-    ParameterMultiAccessor * pmp = new ParameterMultiAccessor<T>();
+    auto pmp = std::make_unique<ParameterMultiAccessor<T>>();
     for (auto & accessor : _accessors)
       pmp->_accessors.push_back(accessor->clone().release());
 
-    return std::unique_ptr<ParameterAccessor<T>>(pmp);
+    return pmp;
   }
 
 
