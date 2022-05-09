@@ -136,10 +136,24 @@ void init_eletypes ()
       }
 
       {
+        // TRI6
+        const unsigned int   node_map[] = {0,1,2,3,4,5}; // identity
+        const unsigned short side_map[] = {0,1,2}; // identity
+        add_eletype_entry(TRI6, node_map, 6, side_map, 3);
+      }
+
+      {
         // QUAD4
         const unsigned int   node_map[] = {0,1,2,3}; // identity
         const unsigned short side_map[] = {0,1,2,3}; // identity
         add_eletype_entry(QUAD4, node_map, 4, side_map, 4);
+      }
+
+      {
+        // QUAD8
+        const unsigned int   node_map[] = {0,1,2,3,4,5,6,7}; // identity
+        const unsigned short side_map[] = {0,1,2,3}; // identity
+        add_eletype_entry(QUAD8, node_map, 8, side_map, 4);
       }
 
       {
