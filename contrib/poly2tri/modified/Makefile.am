@@ -1,8 +1,8 @@
-pkg_sources = ../poly2tri/poly2tri/common/shapes.cc \
-              ../poly2tri/poly2tri/sweep/advancing_front.cc \
-              ../poly2tri/poly2tri/sweep/cdt.cc \
-              ../poly2tri/poly2tri/sweep/sweep.cc \
-              ../poly2tri/poly2tri/sweep/sweep_context.cc
+pkg_sources = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
 pkg_libs    =
 
 # import as much commonality as possible
