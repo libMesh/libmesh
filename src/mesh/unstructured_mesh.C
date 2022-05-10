@@ -32,6 +32,7 @@
 #include "libmesh/mesh_communication.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/mesh_serializer.h"
+#include "libmesh/utility.h"
 
 #ifdef LIBMESH_HAVE_NANOFLANN
 #include "libmesh/nanoflann.hpp"
@@ -2163,19 +2164,39 @@ void UnstructuredMesh::stitching_helper (const UnstructuredMesh * other_mesh,
       // Merge other_mesh's elemset information with ours. Throw an
       // error if this and other_mesh have overlapping elemset codes
       // that refer to different elemset ids.
-      // std::vector<dof_id_type> elemset_codes = this->get_elemset_codes();
-      MeshBase::elemset_type id_set_to_fill;
+      std::vector<dof_id_type> this_elemset_codes = this->get_elemset_codes();
+      MeshBase::elemset_type this_id_set_to_fill, other_id_set_to_fill;
       for (const auto & elemset_code : other_mesh->get_elemset_codes())
         {
           // Get the elemset ids for this elemset_code on other_mesh
-          other_mesh->get_elemsets(elemset_code, id_set_to_fill);
+          other_mesh->get_elemsets(elemset_code, other_id_set_to_fill);
 
-          // TODO: check that this elemset code does not already exist
+          // Check that this elemset code does not already exist
           // in this mesh, or if it does, that it has the same elemset
           // ids associated with it.
+          //
+          // Note: get_elemset_codes() is guaranteed to return a
+          // sorted vector, so we can binary search in it.
+          auto it = Utility::binary_find(this_elemset_codes.begin(),
+                                         this_elemset_codes.end(),
+                                         elemset_code);
 
-          // Add it to this mesh
-          this->add_elemset_code(elemset_code, id_set_to_fill);
+          if (it != this_elemset_codes.end())
+            {
+              // This mesh has the same elemset code. Does it refer to
+              // the same elemset ids?
+              this->get_elemsets(elemset_code, this_id_set_to_fill);
+
+              // Throw an error if they don't match, otherwise we
+              // don't need to do anything
+              libmesh_error_msg_if(other_id_set_to_fill != this_id_set_to_fill,
+                                   "Attempted to stitch together meshes with conflicting elemset codes.");
+            }
+          else
+            {
+              // Add other_mesh's elemset code to this mesh
+              this->add_elemset_code(elemset_code, other_id_set_to_fill);
+            }
         }
     } // end if (other_mesh)
 
