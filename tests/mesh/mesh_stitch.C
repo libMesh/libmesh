@@ -280,6 +280,11 @@ public:
     mesh1->change_elemset_code(/*old*/1, /*new*/3); // 1 -> 3
     mesh1->change_elemset_code(/*old*/2, /*new*/4); // 2 -> 4
 
+    // Before stitching, change the elemset ids on mesh1 so they
+    // don't overlap with the elemset ids on mesh0.
+    mesh1->change_elemset_id(/*old*/1, /*new*/100);
+    mesh1->change_elemset_id(/*old*/2, /*new*/200);
+
     // Stitch the meshes together at the indicated boundary ids
     mesh0->stitch_meshes(dynamic_cast<UnstructuredMesh &>(*mesh1),
                          /*this boundary=*/2,
