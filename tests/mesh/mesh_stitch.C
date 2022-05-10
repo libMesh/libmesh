@@ -347,12 +347,36 @@ public:
           }
       }
 
+    bool ps_odd = ps % 2;
+
     for (const auto & elem : mesh0->element_ptr_range())
       {
         dof_id_type elemset_code = elem->get_extra_integer(elemset_index);
+        bool elem_id_odd = elem->id() % 2;
 
         // Debugging
-        libMesh::out << "Elem " << elem->id() << " in stitched mesh has elemset_code = " << elemset_code << std::endl;
+        // libMesh::out << "Elem " << elem->id() << " in stitched mesh has elemset_code = " << elemset_code << std::endl;
+
+        // Verify that the stitched mesh elemset codes match their pre-stitched values
+        if (elem->id() < n_elem_prestitch) // lower half id
+          {
+            if (elem_id_odd)
+              CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(1), elemset_code);
+            else
+              CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2), elemset_code);
+          }
+        else // upper half id
+          {
+            // i.) If ps == odd, then n_elem_prestitch == odd, and even mesh1
+            // elem ids will become odd, and odd mesh1 elem ids will become
+            // even..
+            // ii.) If ps == even, then n_elem_prestitch == even, and even mesh1
+            // elem ids will remain even, odd mesh1 elem ids will remain odd.
+            if (elem_id_odd)
+              CPPUNIT_ASSERT_EQUAL(ps_odd ? static_cast<dof_id_type>(4) : static_cast<dof_id_type>(3), elemset_code);
+            else
+              CPPUNIT_ASSERT_EQUAL(ps_odd ? static_cast<dof_id_type>(3) : static_cast<dof_id_type>(4), elemset_code);
+          }
       }
   }
 
