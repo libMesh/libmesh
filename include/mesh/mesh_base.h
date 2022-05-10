@@ -311,6 +311,13 @@ public:
   dof_id_type get_elemset_code(const MeshBase::elemset_type & id_set) const;
 
   /**
+   * Replace elemset code "old_code" with "new_code". This function loops over
+   * all elements and changes the extra integer corresponding to the "elemset_code"
+   * label, and updates the _elemset_codes and _elemset_codes_inverse_map members.
+   */
+  void change_elemset_code(dof_id_type old_code, dof_id_type new_code);
+
+  /**
    * \returns The "spatial dimension" of the mesh.
    *
    * The spatial dimension is defined as:

@@ -290,6 +290,54 @@ dof_id_type MeshBase::get_elemset_code(const MeshBase::elemset_type & id_set) co
   return (it == _elemset_codes_inverse_map.end()) ? DofObject::invalid_id : it->second;
 }
 
+void MeshBase::change_elemset_code(dof_id_type old_code, dof_id_type new_code)
+{
+  // Look up elemset ids for old_code
+  auto it = _elemset_codes.find(old_code);
+
+  // If we don't have the old_code, then do nothing. Alternatively, we
+  // could throw an error since trying to change an elemset code you
+  // don't have could indicate there's a problem...
+  if (it == _elemset_codes.end())
+    return;
+
+  // Make copy of the set of elemset ids. We are not changing these,
+  // only updating the elemset code it corresponds to.
+  elemset_type id_set_copy = *(it->second);
+
+  // Look up the corresponding entry in the inverse map. Note: we want
+  // the iterator because we are going to remove it.
+  auto inverse_it = _elemset_codes_inverse_map.find(id_set_copy);
+  libmesh_error_msg_if(inverse_it == _elemset_codes_inverse_map.end(),
+                       "Expected _elemset_codes_inverse_map entry for elemset code " << old_code);
+
+  // Erase entry from inverse map and re-add with new elemset code
+  _elemset_codes_inverse_map.erase(inverse_it);
+  auto [new_inverse_it, inserted1] = _elemset_codes_inverse_map.emplace(id_set_copy, new_code);
+  libmesh_error_msg_if(!inserted1, "Error inserting new elemset code: " << new_code);
+
+  // Erase entry from forward map and re-add with new pointer
+  _elemset_codes.erase(it);
+  auto [new_it, inserted2] = _elemset_codes.emplace(new_code, &new_inverse_it->first);
+  libmesh_error_msg_if(!inserted2, "Error inserting new elemset code: " << new_code);
+
+  // We can't update any actual elemset codes if there is no extra integer defined for it.
+  if (!this->has_elem_integer("elemset_code"))
+    return;
+
+  // Get index of elemset_code extra integer
+  unsigned int elemset_index = this->get_elem_integer_index("elemset_code");
+
+  // Loop over all elems and update code
+  for (auto & elem : this->element_ptr_range())
+    {
+      dof_id_type elemset_code =
+        elem->get_extra_integer(elemset_index);
+
+      if (elemset_code == old_code)
+        elem->set_extra_integer(elemset_index, new_code);
+    }
+}
 
 
 unsigned int MeshBase::spatial_dimension () const
