@@ -338,6 +338,46 @@ void MeshBase::change_elemset_code(dof_id_type old_code, dof_id_type new_code)
     }
 }
 
+void MeshBase::change_elemset_id(elemset_id_type old_id, elemset_id_type new_id)
+{
+  // Early return if we don't have old_id
+  if (!_all_elemset_ids.count(old_id))
+    return;
+
+  // Throw an error if the new_id is already used
+  libmesh_error_msg_if(_all_elemset_ids.count(new_id),
+                       "Cannot change elemset id " << old_id <<
+                       " to " << new_id << ", " << new_id << " already exists.");
+
+  // We will build up a new version of the inverse map so we can iterate over
+  // the current one without invalidating anything.
+  std::map<MeshBase::elemset_type, dof_id_type> new_elemset_codes_inverse_map;
+  for (const auto & [id_set, elemset_code] : _elemset_codes_inverse_map)
+    {
+      auto id_set_copy = id_set;
+      if (id_set_copy.count(old_id))
+        {
+          // Remove old_id, insert new_id
+          id_set_copy.erase(old_id);
+          id_set_copy.insert(new_id);
+        }
+
+      // Store in new version of map
+      new_elemset_codes_inverse_map.emplace(id_set_copy, elemset_code);
+    }
+
+  // Swap existing map with newly-built one
+  _elemset_codes_inverse_map.swap(new_elemset_codes_inverse_map);
+
+  // Reconstruct _elemset_codes map
+  _elemset_codes.clear();
+  for (const auto & [id_set, elemset_code] : _elemset_codes_inverse_map)
+    _elemset_codes.emplace(elemset_code, &id_set);
+
+  // Update _all_elemset_ids
+  _all_elemset_ids.erase(old_id);
+  _all_elemset_ids.insert(new_id);
+}
 
 unsigned int MeshBase::spatial_dimension () const
 {

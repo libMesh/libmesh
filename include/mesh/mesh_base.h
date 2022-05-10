@@ -314,8 +314,15 @@ public:
    * Replace elemset code "old_code" with "new_code". This function loops over
    * all elements and changes the extra integer corresponding to the "elemset_code"
    * label, and updates the _elemset_codes and _elemset_codes_inverse_map members.
+   * Does not change the elemset ids of any of the sets.
    */
   void change_elemset_code(dof_id_type old_code, dof_id_type new_code);
+
+  /**
+   * Replace elemset id "old_id" with "new_id". Does not change any of the
+   * elemset codes, so does not need to loop over the elements themselves.
+   */
+  void change_elemset_id(elemset_id_type old_id, elemset_id_type new_id);
 
   /**
    * \returns The "spatial dimension" of the mesh.
