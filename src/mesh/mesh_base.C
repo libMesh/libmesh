@@ -290,6 +290,15 @@ dof_id_type MeshBase::get_elemset_code(const MeshBase::elemset_type & id_set) co
   return (it == _elemset_codes_inverse_map.end()) ? DofObject::invalid_id : it->second;
 }
 
+std::vector<dof_id_type> MeshBase::get_elemset_codes() const
+{
+  std::vector<dof_id_type> ret;
+  ret.reserve(_elemset_codes.size());
+  for (const auto & pr : _elemset_codes)
+    ret.push_back(pr.first);
+  return ret;
+}
+
 void MeshBase::change_elemset_code(dof_id_type old_code, dof_id_type new_code)
 {
   // Look up elemset ids for old_code

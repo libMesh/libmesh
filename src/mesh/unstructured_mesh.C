@@ -2159,6 +2159,24 @@ void UnstructuredMesh::stitching_helper (const UnstructuredMesh * other_mesh,
       const auto & other_es_id_to_name = other_boundary.get_edgeset_name_map();
       auto & es_id_to_name = boundary.set_edgeset_name_map();
       es_id_to_name.insert(other_es_id_to_name.begin(), other_es_id_to_name.end());
+
+      // Merge other_mesh's elemset information with ours. Throw an
+      // error if this and other_mesh have overlapping elemset codes
+      // that refer to different elemset ids.
+      // std::vector<dof_id_type> elemset_codes = this->get_elemset_codes();
+      MeshBase::elemset_type id_set_to_fill;
+      for (const auto & elemset_code : other_mesh->get_elemset_codes())
+        {
+          // Get the elemset ids for this elemset_code on other_mesh
+          other_mesh->get_elemsets(elemset_code, id_set_to_fill);
+
+          // TODO: check that this elemset code does not already exist
+          // in this mesh, or if it does, that it has the same elemset
+          // ids associated with it.
+
+          // Add it to this mesh
+          this->add_elemset_code(elemset_code, id_set_to_fill);
+        }
     } // end if (other_mesh)
 
   // Finally, we need to "merge" the overlapping nodes

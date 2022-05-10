@@ -295,9 +295,9 @@ public:
   void add_elemset_code(dof_id_type code, MeshBase::elemset_type id_set);
 
   /**
-   * Determines the number of unique elemset ids which have been added
-   * via add_elemset_code() calls by looping over the
-   * _elemset_codes_inverse_map and counting them.
+   * Returns the number of unique elemset ids which have been added
+   * via add_elemset_code(), which is the size of the _all_elemset_ids
+   * set.
    */
   unsigned int n_elemsets() const;
 
@@ -309,6 +309,12 @@ public:
    */
   void get_elemsets(dof_id_type elemset_code, MeshBase::elemset_type & id_set_to_fill) const;
   dof_id_type get_elemset_code(const MeshBase::elemset_type & id_set) const;
+
+  /**
+   * Return a vector of all elemset codes defined on the mesh. We get
+   * this by looping over the _elemset_codes map.
+   */
+  std::vector<dof_id_type> get_elemset_codes() const;
 
   /**
    * Replace elemset code "old_code" with "new_code". This function loops over
