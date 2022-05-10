@@ -275,6 +275,11 @@ public:
     place_elems(*mesh0);
     place_elems(*mesh1);
 
+    // Before stitching, change the elemset codes on mesh1 so they
+    // don't overlap with the codes on mesh0.
+    mesh1->change_elemset_code(/*old*/1, /*new*/3); // 1 -> 3
+    mesh1->change_elemset_code(/*old*/2, /*new*/4); // 2 -> 4
+
     // Stitch the meshes together at the indicated boundary ids
     mesh0->stitch_meshes(dynamic_cast<UnstructuredMesh &>(*mesh1),
                          /*this boundary=*/2,
@@ -296,60 +301,72 @@ public:
     unsigned int elemset_index = mesh0->get_elem_integer_index("elemset_code");
     CPPUNIT_ASSERT_EQUAL(0u, elemset_index);
 
-    // There should still be 2 elemset ids, 1 and 2, on the stitched mesh
-    CPPUNIT_ASSERT_EQUAL(2u, mesh0->n_elemsets());
-
-    MeshBase::elemset_type id_set_to_fill;
-
-    // Make sure that elemset_code 1 == {1} and 2 == {2} on the new mesh
-    for (int i=1; i<3; ++i)
-      {
-        mesh0->get_elemsets(static_cast<dof_id_type>(i), id_set_to_fill);
-        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), id_set_to_fill.size());
-        CPPUNIT_ASSERT_EQUAL(static_cast<elemset_id_type>(i), *id_set_to_fill.begin());
-      }
-
-    // Debugging
-    // libMesh::out << "In stitched mesh, elemset_index = " << elemset_index << std::endl;
-
-    // The elems from mesh1 will all have n_elem_prestitch added to their ids.
     for (const auto & elem : mesh0->element_ptr_range())
       {
         dof_id_type elemset_code = elem->get_extra_integer(elemset_index);
 
         // Debugging
-        // libMesh::out << "Elem " << elem->id() << " in stitched mesh has elemset_code = " << elemset_code << std::endl;
-
-        if (ps % 2) // ps == odd
-          {
-            // i.) If ps == odd, then n_elem_prestitch == odd, and even mesh1
-            // elem ids will become odd, and odd mesh1 elem ids will become
-            // even..
-            if (elem->id() < n_elem_prestitch) // lower half id
-              {
-                if (elem->id() % 2) // id odd
-                  CPPUNIT_ASSERT_EQUAL(1u, elemset_code);
-                else // id even
-                  CPPUNIT_ASSERT_EQUAL(2u, elemset_code);
-              }
-            else // upper half id (sets reversed)
-              {
-                if (elem->id() % 2) // id odd
-                  CPPUNIT_ASSERT_EQUAL(2u, elemset_code);
-                else // id even
-                  CPPUNIT_ASSERT_EQUAL(1u, elemset_code);
-              }
-          }
-        else // ps == even
-          {
-            // ii.) If ps == even, then n_elem_prestitch == even, and even mesh1
-            // elem ids will remain even, odd mesh1 elem ids will remain odd.
-            if (elem->id() % 2) // id odd
-              CPPUNIT_ASSERT_EQUAL(1u, elemset_code);
-            else // id even
-              CPPUNIT_ASSERT_EQUAL(2u, elemset_code);
-          }
+        libMesh::out << "Elem " << elem->id() << " in stitched mesh has elemset_code = " << elemset_code << std::endl;
       }
+
+    /**
+     * The following checks only apply if we don't call MeshBase::change_elemset_code()...
+     */
+
+    // // There should still be 2 elemset ids, 1 and 2, on the stitched mesh
+    // CPPUNIT_ASSERT_EQUAL(2u, mesh0->n_elemsets());
+    //
+    // MeshBase::elemset_type id_set_to_fill;
+    //
+    // // Make sure that elemset_code 1 == {1} and 2 == {2} on the new mesh
+    // for (int i=1; i<3; ++i)
+    //   {
+    //     mesh0->get_elemsets(static_cast<dof_id_type>(i), id_set_to_fill);
+    //     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), id_set_to_fill.size());
+    //     CPPUNIT_ASSERT_EQUAL(static_cast<elemset_id_type>(i), *id_set_to_fill.begin());
+    //   }
+    //
+    // // Debugging
+    // // libMesh::out << "In stitched mesh, elemset_index = " << elemset_index << std::endl;
+    //
+    // // The elems from mesh1 will all have n_elem_prestitch added to their ids.
+    // for (const auto & elem : mesh0->element_ptr_range())
+    //   {
+    //     dof_id_type elemset_code = elem->get_extra_integer(elemset_index);
+    //
+    //     // Debugging
+    //     // libMesh::out << "Elem " << elem->id() << " in stitched mesh has elemset_code = " << elemset_code << std::endl;
+    //
+    //     if (ps % 2) // ps == odd
+    //       {
+    //         // i.) If ps == odd, then n_elem_prestitch == odd, and even mesh1
+    //         // elem ids will become odd, and odd mesh1 elem ids will become
+    //         // even..
+    //         if (elem->id() < n_elem_prestitch) // lower half id
+    //           {
+    //             if (elem->id() % 2) // id odd
+    //               CPPUNIT_ASSERT_EQUAL(1u, elemset_code);
+    //             else // id even
+    //               CPPUNIT_ASSERT_EQUAL(2u, elemset_code);
+    //           }
+    //         else // upper half id (sets reversed)
+    //           {
+    //             if (elem->id() % 2) // id odd
+    //               CPPUNIT_ASSERT_EQUAL(2u, elemset_code);
+    //             else // id even
+    //               CPPUNIT_ASSERT_EQUAL(1u, elemset_code);
+    //           }
+    //       }
+    //     else // ps == even
+    //       {
+    //         // ii.) If ps == even, then n_elem_prestitch == even, and even mesh1
+    //         // elem ids will remain even, odd mesh1 elem ids will remain odd.
+    //         if (elem->id() % 2) // id odd
+    //           CPPUNIT_ASSERT_EQUAL(1u, elemset_code);
+    //         else // id even
+    //           CPPUNIT_ASSERT_EQUAL(2u, elemset_code);
+    //       }
+    //   }
   }
 
   void testReplicatedMeshStitchElemsets ()
