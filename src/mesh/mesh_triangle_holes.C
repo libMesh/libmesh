@@ -331,6 +331,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
       for (auto [key, val] : as_range(next_it_begin, next_it_end))
         {
           libmesh_assert_equal_to(key, n);
+          libmesh_ignore(key);
           libmesh_assert_not_equal_to(val, n);
           if (val == last)
             continue;
