@@ -282,8 +282,8 @@ public:
 
     // Before stitching, change the elemset ids on mesh1 so they
     // don't overlap with the elemset ids on mesh0.
-    mesh1->change_elemset_id(/*old*/1, /*new*/100);
-    mesh1->change_elemset_id(/*old*/2, /*new*/200);
+    mesh1->change_elemset_id(/*old*/1, /*new*/100); // 1 -> 100
+    mesh1->change_elemset_id(/*old*/2, /*new*/200); // 2 -> 200
 
     // Stitch the meshes together at the indicated boundary ids
     mesh0->stitch_meshes(dynamic_cast<UnstructuredMesh &>(*mesh1),
@@ -305,6 +305,47 @@ public:
     // same index (0) as it was before the meshes were stitched.
     unsigned int elemset_index = mesh0->get_elem_integer_index("elemset_code");
     CPPUNIT_ASSERT_EQUAL(0u, elemset_index);
+
+    // Check that the stitched mesh has merged elemset codes and ids as expected
+    MeshBase::elemset_type id_set_to_fill;
+    for (const auto elemset_code : {1, 2, 3, 4})
+      {
+        mesh0->get_elemsets(elemset_code, id_set_to_fill);
+
+        // Should be one elemset id in each set
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), id_set_to_fill.size());
+
+        switch (elemset_code)
+          {
+          case 1:
+            {
+              CPPUNIT_ASSERT(id_set_to_fill.count(1));
+              break;
+            }
+
+          case 2:
+            {
+              CPPUNIT_ASSERT(id_set_to_fill.count(2));
+              break;
+            }
+
+          case 3:
+            {
+              CPPUNIT_ASSERT(id_set_to_fill.count(100));
+              break;
+            }
+
+          case 4:
+            {
+              CPPUNIT_ASSERT(id_set_to_fill.count(200));
+              break;
+            }
+
+          default:
+            // Unrecognized elemset_code
+            CPPUNIT_ASSERT(false);
+          }
+      }
 
     for (const auto & elem : mesh0->element_ptr_range())
       {
