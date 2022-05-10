@@ -311,15 +311,14 @@ void MeshBase::change_elemset_code(dof_id_type old_code, dof_id_type new_code)
   libmesh_error_msg_if(inverse_it == _elemset_codes_inverse_map.end(),
                        "Expected _elemset_codes_inverse_map entry for elemset code " << old_code);
 
-  // Erase entry from inverse map and re-add with new elemset code
+  // Erase entry from inverse map
   _elemset_codes_inverse_map.erase(inverse_it);
-  auto [new_inverse_it, inserted1] = _elemset_codes_inverse_map.emplace(id_set_copy, new_code);
-  libmesh_error_msg_if(!inserted1, "Error inserting new elemset code: " << new_code);
 
-  // Erase entry from forward map and re-add with new pointer
+  // Erase entry from forward map
   _elemset_codes.erase(it);
-  auto [new_it, inserted2] = _elemset_codes.emplace(new_code, &new_inverse_it->first);
-  libmesh_error_msg_if(!inserted2, "Error inserting new elemset code: " << new_code);
+
+  // Add new code with original set of ids.
+  this->add_elemset_code(new_code, id_set_copy);
 
   // We can't update any actual elemset codes if there is no extra integer defined for it.
   if (!this->has_elem_integer("elemset_code"))
