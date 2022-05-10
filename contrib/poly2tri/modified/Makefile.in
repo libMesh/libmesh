@@ -165,17 +165,17 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am__libdbg_la_SOURCES_DIST = ../poly2tri/poly2tri/common/shapes.cc \
-	../poly2tri/poly2tri/sweep/advancing_front.cc \
-	../poly2tri/poly2tri/sweep/cdt.cc \
-	../poly2tri/poly2tri/sweep/sweep.cc \
-	../poly2tri/poly2tri/sweep/sweep_context.cc
+am__libdbg_la_SOURCES_DIST = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
 am__dirstamp = $(am__leading_dot)dirstamp
-am__objects_1 = ../poly2tri/poly2tri/common/libdbg_la-shapes.lo \
-	../poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo \
-	../poly2tri/poly2tri/sweep/libdbg_la-cdt.lo \
-	../poly2tri/poly2tri/sweep/libdbg_la-sweep.lo \
-	../poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo
+am__objects_1 = $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdbg_la-shapes.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-cdt.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo
 @LIBMESH_DBG_MODE_TRUE@am_libdbg_la_OBJECTS = $(am__objects_1)
 libdbg_la_OBJECTS = $(am_libdbg_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -188,16 +188,16 @@ libdbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @LIBMESH_DBG_MODE_TRUE@am_libdbg_la_rpath =
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_DEPENDENCIES =  \
 @LIBMESH_DEVEL_MODE_TRUE@	$(am__DEPENDENCIES_1)
-am__libdevel_la_SOURCES_DIST = ../poly2tri/poly2tri/common/shapes.cc \
-	../poly2tri/poly2tri/sweep/advancing_front.cc \
-	../poly2tri/poly2tri/sweep/cdt.cc \
-	../poly2tri/poly2tri/sweep/sweep.cc \
-	../poly2tri/poly2tri/sweep/sweep_context.cc
-am__objects_2 = ../poly2tri/poly2tri/common/libdevel_la-shapes.lo \
-	../poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo \
-	../poly2tri/poly2tri/sweep/libdevel_la-cdt.lo \
-	../poly2tri/poly2tri/sweep/libdevel_la-sweep.lo \
-	../poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo
+am__libdevel_la_SOURCES_DIST = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+am__objects_2 = $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdevel_la-shapes.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-cdt.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo
 @LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_OBJECTS = $(am__objects_2)
 libdevel_la_OBJECTS = $(am_libdevel_la_OBJECTS)
 libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -206,16 +206,16 @@ libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_rpath =
 @LIBMESH_OPROF_MODE_TRUE@liboprof_la_DEPENDENCIES =  \
 @LIBMESH_OPROF_MODE_TRUE@	$(am__DEPENDENCIES_1)
-am__liboprof_la_SOURCES_DIST = ../poly2tri/poly2tri/common/shapes.cc \
-	../poly2tri/poly2tri/sweep/advancing_front.cc \
-	../poly2tri/poly2tri/sweep/cdt.cc \
-	../poly2tri/poly2tri/sweep/sweep.cc \
-	../poly2tri/poly2tri/sweep/sweep_context.cc
-am__objects_3 = ../poly2tri/poly2tri/common/liboprof_la-shapes.lo \
-	../poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo \
-	../poly2tri/poly2tri/sweep/liboprof_la-cdt.lo \
-	../poly2tri/poly2tri/sweep/liboprof_la-sweep.lo \
-	../poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo
+am__liboprof_la_SOURCES_DIST = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+am__objects_3 = $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/liboprof_la-shapes.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-cdt.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo
 @LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_OBJECTS = $(am__objects_3)
 liboprof_la_OBJECTS = $(am_liboprof_la_OBJECTS)
 liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -223,16 +223,16 @@ liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_rpath =
 @LIBMESH_OPT_MODE_TRUE@libopt_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am__libopt_la_SOURCES_DIST = ../poly2tri/poly2tri/common/shapes.cc \
-	../poly2tri/poly2tri/sweep/advancing_front.cc \
-	../poly2tri/poly2tri/sweep/cdt.cc \
-	../poly2tri/poly2tri/sweep/sweep.cc \
-	../poly2tri/poly2tri/sweep/sweep_context.cc
-am__objects_4 = ../poly2tri/poly2tri/common/libopt_la-shapes.lo \
-	../poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo \
-	../poly2tri/poly2tri/sweep/libopt_la-cdt.lo \
-	../poly2tri/poly2tri/sweep/libopt_la-sweep.lo \
-	../poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo
+am__libopt_la_SOURCES_DIST = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+am__objects_4 = $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libopt_la-shapes.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-cdt.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo
 @LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_4)
 libopt_la_OBJECTS = $(am_libopt_la_OBJECTS)
 libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -241,16 +241,16 @@ libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @LIBMESH_OPT_MODE_TRUE@am_libopt_la_rpath =
 @LIBMESH_PROF_MODE_TRUE@libprof_la_DEPENDENCIES =  \
 @LIBMESH_PROF_MODE_TRUE@	$(am__DEPENDENCIES_1)
-am__libprof_la_SOURCES_DIST = ../poly2tri/poly2tri/common/shapes.cc \
-	../poly2tri/poly2tri/sweep/advancing_front.cc \
-	../poly2tri/poly2tri/sweep/cdt.cc \
-	../poly2tri/poly2tri/sweep/sweep.cc \
-	../poly2tri/poly2tri/sweep/sweep_context.cc
-am__objects_5 = ../poly2tri/poly2tri/common/libprof_la-shapes.lo \
-	../poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo \
-	../poly2tri/poly2tri/sweep/libprof_la-cdt.lo \
-	../poly2tri/poly2tri/sweep/libprof_la-sweep.lo \
-	../poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo
+am__libprof_la_SOURCES_DIST = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+am__objects_5 = $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libprof_la-shapes.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-cdt.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep.lo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo
 @LIBMESH_PROF_MODE_TRUE@am_libprof_la_OBJECTS = $(am__objects_5)
 libprof_la_OBJECTS = $(am_libprof_la_OBJECTS)
 libprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -272,32 +272,31 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade =  \
-	../poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Plo \
-	../poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Plo \
-	../poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Plo \
-	../poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Plo \
-	../poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Plo \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Plo
+am__depfiles_remade = $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Plo \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Plo
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -688,11 +687,11 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-pkg_sources = ../poly2tri/poly2tri/common/shapes.cc \
-              ../poly2tri/poly2tri/sweep/advancing_front.cc \
-              ../poly2tri/poly2tri/sweep/cdt.cc \
-              ../poly2tri/poly2tri/sweep/sweep.cc \
-              ../poly2tri/poly2tri/sweep/sweep_context.cc
+pkg_sources = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
 
 pkg_libs = 
 
@@ -796,144 +795,119 @@ clean-noinstLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
-../poly2tri/poly2tri/common/$(am__dirstamp):
-	@$(MKDIR_P) ../poly2tri/poly2tri/common
-	@: > ../poly2tri/poly2tri/common/$(am__dirstamp)
-../poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) ../poly2tri/poly2tri/common/$(DEPDIR)
-	@: > ../poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/common/libdbg_la-shapes.lo:  \
-	../poly2tri/poly2tri/common/$(am__dirstamp) \
-	../poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/$(am__dirstamp):
-	@$(MKDIR_P) ../poly2tri/poly2tri/sweep
-	@: > ../poly2tri/poly2tri/sweep/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) ../poly2tri/poly2tri/sweep/$(DEPDIR)
-	@: > ../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libdbg_la-cdt.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libdbg_la-sweep.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(am__dirstamp):
+	@$(MKDIR_P) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common
+	@: > $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)
+	@: > $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdbg_la-shapes.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp):
+	@$(MKDIR_P) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep
+	@: > $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)
+	@: > $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-cdt.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
 
 libdbg.la: $(libdbg_la_OBJECTS) $(libdbg_la_DEPENDENCIES) $(EXTRA_libdbg_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libdbg_la_LINK) $(am_libdbg_la_rpath) $(libdbg_la_OBJECTS) $(libdbg_la_LIBADD) $(LIBS)
-../poly2tri/poly2tri/common/libdevel_la-shapes.lo:  \
-	../poly2tri/poly2tri/common/$(am__dirstamp) \
-	../poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libdevel_la-cdt.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libdevel_la-sweep.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdevel_la-shapes.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-cdt.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
 
 libdevel.la: $(libdevel_la_OBJECTS) $(libdevel_la_DEPENDENCIES) $(EXTRA_libdevel_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libdevel_la_LINK) $(am_libdevel_la_rpath) $(libdevel_la_OBJECTS) $(libdevel_la_LIBADD) $(LIBS)
-../poly2tri/poly2tri/common/liboprof_la-shapes.lo:  \
-	../poly2tri/poly2tri/common/$(am__dirstamp) \
-	../poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/liboprof_la-cdt.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/liboprof_la-sweep.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/liboprof_la-shapes.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-cdt.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
 
 liboprof.la: $(liboprof_la_OBJECTS) $(liboprof_la_DEPENDENCIES) $(EXTRA_liboprof_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(liboprof_la_LINK) $(am_liboprof_la_rpath) $(liboprof_la_OBJECTS) $(liboprof_la_LIBADD) $(LIBS)
-../poly2tri/poly2tri/common/libopt_la-shapes.lo:  \
-	../poly2tri/poly2tri/common/$(am__dirstamp) \
-	../poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libopt_la-cdt.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libopt_la-sweep.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libopt_la-shapes.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-cdt.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
 
 libopt.la: $(libopt_la_OBJECTS) $(libopt_la_DEPENDENCIES) $(EXTRA_libopt_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libopt_la_LINK) $(am_libopt_la_rpath) $(libopt_la_OBJECTS) $(libopt_la_LIBADD) $(LIBS)
-../poly2tri/poly2tri/common/libprof_la-shapes.lo:  \
-	../poly2tri/poly2tri/common/$(am__dirstamp) \
-	../poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libprof_la-cdt.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libprof_la-sweep.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-../poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo:  \
-	../poly2tri/poly2tri/sweep/$(am__dirstamp) \
-	../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libprof_la-shapes.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-cdt.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp) \
+	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
 
 libprof.la: $(libprof_la_OBJECTS) $(libprof_la_DEPENDENCIES) $(EXTRA_libprof_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libprof_la_LINK) $(am_libprof_la_rpath) $(libprof_la_OBJECTS) $(libprof_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f ../poly2tri/poly2tri/common/*.$(OBJEXT)
-	-rm -f ../poly2tri/poly2tri/common/*.lo
-	-rm -f ../poly2tri/poly2tri/sweep/*.$(OBJEXT)
-	-rm -f ../poly2tri/poly2tri/sweep/*.lo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/*.$(OBJEXT)
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/*.lo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/*.$(OBJEXT)
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/*.lo
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Plo@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -965,188 +939,188 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
 
-../poly2tri/poly2tri/common/libdbg_la-shapes.lo: ../poly2tri/poly2tri/common/shapes.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/common/libdbg_la-shapes.lo -MD -MP -MF ../poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Tpo -c -o ../poly2tri/poly2tri/common/libdbg_la-shapes.lo `test -f '../poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/common/shapes.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Tpo ../poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/common/shapes.cc' object='../poly2tri/poly2tri/common/libdbg_la-shapes.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdbg_la-shapes.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdbg_la-shapes.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdbg_la-shapes.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdbg_la-shapes.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/common/libdbg_la-shapes.lo `test -f '../poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdbg_la-shapes.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
 
-../poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo: ../poly2tri/poly2tri/sweep/advancing_front.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Tpo -c -o ../poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo `test -f '../poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/advancing_front.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/advancing_front.cc' object='../poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo `test -f '../poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
 
-../poly2tri/poly2tri/sweep/libdbg_la-cdt.lo: ../poly2tri/poly2tri/sweep/cdt.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libdbg_la-cdt.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Tpo -c -o ../poly2tri/poly2tri/sweep/libdbg_la-cdt.lo `test -f '../poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/cdt.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/cdt.cc' object='../poly2tri/poly2tri/sweep/libdbg_la-cdt.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-cdt.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-cdt.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-cdt.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-cdt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libdbg_la-cdt.lo `test -f '../poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-cdt.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
 
-../poly2tri/poly2tri/sweep/libdbg_la-sweep.lo: ../poly2tri/poly2tri/sweep/sweep.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libdbg_la-sweep.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Tpo -c -o ../poly2tri/poly2tri/sweep/libdbg_la-sweep.lo `test -f '../poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/sweep.cc' object='../poly2tri/poly2tri/sweep/libdbg_la-sweep.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libdbg_la-sweep.lo `test -f '../poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
 
-../poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo: ../poly2tri/poly2tri/sweep/sweep_context.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Tpo -c -o ../poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo `test -f '../poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep_context.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/sweep_context.cc' object='../poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo `test -f '../poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-sweep_context.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
 
-../poly2tri/poly2tri/common/libdevel_la-shapes.lo: ../poly2tri/poly2tri/common/shapes.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/common/libdevel_la-shapes.lo -MD -MP -MF ../poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Tpo -c -o ../poly2tri/poly2tri/common/libdevel_la-shapes.lo `test -f '../poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/common/shapes.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Tpo ../poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/common/shapes.cc' object='../poly2tri/poly2tri/common/libdevel_la-shapes.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdevel_la-shapes.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdevel_la-shapes.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdevel_la-shapes.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdevel_la-shapes.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/common/libdevel_la-shapes.lo `test -f '../poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdevel_la-shapes.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
 
-../poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo: ../poly2tri/poly2tri/sweep/advancing_front.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Tpo -c -o ../poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo `test -f '../poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/advancing_front.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/advancing_front.cc' object='../poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo `test -f '../poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
 
-../poly2tri/poly2tri/sweep/libdevel_la-cdt.lo: ../poly2tri/poly2tri/sweep/cdt.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libdevel_la-cdt.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Tpo -c -o ../poly2tri/poly2tri/sweep/libdevel_la-cdt.lo `test -f '../poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/cdt.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/cdt.cc' object='../poly2tri/poly2tri/sweep/libdevel_la-cdt.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-cdt.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-cdt.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-cdt.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-cdt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libdevel_la-cdt.lo `test -f '../poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-cdt.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
 
-../poly2tri/poly2tri/sweep/libdevel_la-sweep.lo: ../poly2tri/poly2tri/sweep/sweep.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libdevel_la-sweep.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Tpo -c -o ../poly2tri/poly2tri/sweep/libdevel_la-sweep.lo `test -f '../poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/sweep.cc' object='../poly2tri/poly2tri/sweep/libdevel_la-sweep.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libdevel_la-sweep.lo `test -f '../poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
 
-../poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo: ../poly2tri/poly2tri/sweep/sweep_context.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Tpo -c -o ../poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo `test -f '../poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep_context.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/sweep_context.cc' object='../poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo `test -f '../poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-sweep_context.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
 
-../poly2tri/poly2tri/common/liboprof_la-shapes.lo: ../poly2tri/poly2tri/common/shapes.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/common/liboprof_la-shapes.lo -MD -MP -MF ../poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Tpo -c -o ../poly2tri/poly2tri/common/liboprof_la-shapes.lo `test -f '../poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/common/shapes.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Tpo ../poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/common/shapes.cc' object='../poly2tri/poly2tri/common/liboprof_la-shapes.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/liboprof_la-shapes.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/liboprof_la-shapes.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/liboprof_la-shapes.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/liboprof_la-shapes.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/common/liboprof_la-shapes.lo `test -f '../poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/liboprof_la-shapes.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
 
-../poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo: ../poly2tri/poly2tri/sweep/advancing_front.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Tpo -c -o ../poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo `test -f '../poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/advancing_front.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/advancing_front.cc' object='../poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo `test -f '../poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
 
-../poly2tri/poly2tri/sweep/liboprof_la-cdt.lo: ../poly2tri/poly2tri/sweep/cdt.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/liboprof_la-cdt.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Tpo -c -o ../poly2tri/poly2tri/sweep/liboprof_la-cdt.lo `test -f '../poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/cdt.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/cdt.cc' object='../poly2tri/poly2tri/sweep/liboprof_la-cdt.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-cdt.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-cdt.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-cdt.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-cdt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/liboprof_la-cdt.lo `test -f '../poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-cdt.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
 
-../poly2tri/poly2tri/sweep/liboprof_la-sweep.lo: ../poly2tri/poly2tri/sweep/sweep.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/liboprof_la-sweep.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Tpo -c -o ../poly2tri/poly2tri/sweep/liboprof_la-sweep.lo `test -f '../poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/sweep.cc' object='../poly2tri/poly2tri/sweep/liboprof_la-sweep.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/liboprof_la-sweep.lo `test -f '../poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
 
-../poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo: ../poly2tri/poly2tri/sweep/sweep_context.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Tpo -c -o ../poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo `test -f '../poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep_context.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/sweep_context.cc' object='../poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo `test -f '../poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-sweep_context.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
 
-../poly2tri/poly2tri/common/libopt_la-shapes.lo: ../poly2tri/poly2tri/common/shapes.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/common/libopt_la-shapes.lo -MD -MP -MF ../poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Tpo -c -o ../poly2tri/poly2tri/common/libopt_la-shapes.lo `test -f '../poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/common/shapes.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Tpo ../poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/common/shapes.cc' object='../poly2tri/poly2tri/common/libopt_la-shapes.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libopt_la-shapes.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libopt_la-shapes.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libopt_la-shapes.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libopt_la-shapes.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/common/libopt_la-shapes.lo `test -f '../poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libopt_la-shapes.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
 
-../poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo: ../poly2tri/poly2tri/sweep/advancing_front.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Tpo -c -o ../poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo `test -f '../poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/advancing_front.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/advancing_front.cc' object='../poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo `test -f '../poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
 
-../poly2tri/poly2tri/sweep/libopt_la-cdt.lo: ../poly2tri/poly2tri/sweep/cdt.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libopt_la-cdt.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Tpo -c -o ../poly2tri/poly2tri/sweep/libopt_la-cdt.lo `test -f '../poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/cdt.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/cdt.cc' object='../poly2tri/poly2tri/sweep/libopt_la-cdt.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-cdt.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-cdt.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-cdt.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-cdt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libopt_la-cdt.lo `test -f '../poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-cdt.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
 
-../poly2tri/poly2tri/sweep/libopt_la-sweep.lo: ../poly2tri/poly2tri/sweep/sweep.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libopt_la-sweep.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Tpo -c -o ../poly2tri/poly2tri/sweep/libopt_la-sweep.lo `test -f '../poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/sweep.cc' object='../poly2tri/poly2tri/sweep/libopt_la-sweep.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libopt_la-sweep.lo `test -f '../poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
 
-../poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo: ../poly2tri/poly2tri/sweep/sweep_context.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Tpo -c -o ../poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo `test -f '../poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep_context.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/sweep_context.cc' object='../poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo `test -f '../poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-sweep_context.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
 
-../poly2tri/poly2tri/common/libprof_la-shapes.lo: ../poly2tri/poly2tri/common/shapes.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/common/libprof_la-shapes.lo -MD -MP -MF ../poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Tpo -c -o ../poly2tri/poly2tri/common/libprof_la-shapes.lo `test -f '../poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/common/shapes.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Tpo ../poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/common/shapes.cc' object='../poly2tri/poly2tri/common/libprof_la-shapes.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libprof_la-shapes.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libprof_la-shapes.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libprof_la-shapes.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libprof_la-shapes.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/common/libprof_la-shapes.lo `test -f '../poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/common/shapes.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libprof_la-shapes.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc
 
-../poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo: ../poly2tri/poly2tri/sweep/advancing_front.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Tpo -c -o ../poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo `test -f '../poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/advancing_front.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/advancing_front.cc' object='../poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo `test -f '../poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/advancing_front.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc
 
-../poly2tri/poly2tri/sweep/libprof_la-cdt.lo: ../poly2tri/poly2tri/sweep/cdt.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libprof_la-cdt.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Tpo -c -o ../poly2tri/poly2tri/sweep/libprof_la-cdt.lo `test -f '../poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/cdt.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/cdt.cc' object='../poly2tri/poly2tri/sweep/libprof_la-cdt.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-cdt.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-cdt.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-cdt.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-cdt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libprof_la-cdt.lo `test -f '../poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/cdt.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-cdt.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc
 
-../poly2tri/poly2tri/sweep/libprof_la-sweep.lo: ../poly2tri/poly2tri/sweep/sweep.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libprof_la-sweep.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Tpo -c -o ../poly2tri/poly2tri/sweep/libprof_la-sweep.lo `test -f '../poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/sweep.cc' object='../poly2tri/poly2tri/sweep/libprof_la-sweep.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libprof_la-sweep.lo `test -f '../poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc
 
-../poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo: ../poly2tri/poly2tri/sweep/sweep_context.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT ../poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo -MD -MP -MF ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Tpo -c -o ../poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo `test -f '../poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep_context.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Tpo ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../poly2tri/poly2tri/sweep/sweep_context.cc' object='../poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo' libtool=yes @AMDEPBACKSLASH@
+$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo: $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo -MD -MP -MF $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Tpo -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Tpo $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' object='$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o ../poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo `test -f '../poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`../poly2tri/poly2tri/sweep/sweep_context.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-sweep_context.lo `test -f '$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc' || echo '$(srcdir)/'`$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
+	-rm -rf $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/.libs $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/_libs
+	-rm -rf $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/.libs $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/_libs
 	-rm -rf .libs _libs
-	-rm -rf ../poly2tri/poly2tri/common/.libs ../poly2tri/poly2tri/common/_libs
-	-rm -rf ../poly2tri/poly2tri/sweep/.libs ../poly2tri/poly2tri/sweep/_libs
 install-nobase_includeHEADERS: $(nobase_include_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \
@@ -1290,10 +1264,10 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f ../poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
-	-rm -f ../poly2tri/poly2tri/common/$(am__dirstamp)
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
-	-rm -f ../poly2tri/poly2tri/sweep/$(am__dirstamp)
+	-test -z "$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)" || rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/$(am__dirstamp)
+	-test -z "$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(am__dirstamp)" || rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(am__dirstamp)
+	-test -z "$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)" || rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/$(am__dirstamp)
+	-test -z "$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp)" || rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1304,31 +1278,31 @@ clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ../poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Plo
-	-rm -f ../poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Plo
-	-rm -f ../poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Plo
-	-rm -f ../poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Plo
-	-rm -f ../poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Plo
+		-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Plo
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1374,31 +1348,31 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ../poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Plo
-	-rm -f ../poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Plo
-	-rm -f ../poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Plo
-	-rm -f ../poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Plo
-	-rm -f ../poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Plo
-	-rm -f ../poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Plo
+		-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdevel_la-shapes.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/liboprof_la-shapes.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libopt_la-shapes.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libprof_la-shapes.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-advancing_front.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-cdt.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdbg_la-sweep_context.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-advancing_front.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-cdt.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libdevel_la-sweep_context.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-advancing_front.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-cdt.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/liboprof_la-sweep_context.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-advancing_front.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-cdt.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libopt_la-sweep_context.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-advancing_front.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-cdt.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep.Plo
+	-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/$(DEPDIR)/libprof_la-sweep_context.Plo
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
