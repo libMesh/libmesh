@@ -980,8 +980,8 @@ public:
 
     testDynaFileMappings("meshes/PressurizedCyl_Patch6_256Elem.bxt.gz",
     // Regression values for sin_x_plus_cos_y
-                         {0.9639857809698268, 1.839870171669186,
-                          0.7089812562241862, 1.306121188539059});
+                         {{0.9639857809698268, 1.839870171669186,
+                           0.7089812562241862, 1.306121188539059}});
   }
 
   void testDynaFileMappingsBlockWithHole ()
@@ -990,8 +990,8 @@ public:
 
     testDynaFileMappings("meshes/BlockWithHole_Patch9.bxt.gz",
     // Regression values for sin_x_plus_cos_y
-                         {3.22612556930183, 1.97405365384733,
-                          2.53376235803176, 1.41374070517223});
+                         {{3.22612556930183, 1.97405365384733,
+                           2.53376235803176, 1.41374070517223}});
   }
 
   void testDynaFileMappingsPlateWithHole ()
@@ -1000,8 +1000,8 @@ public:
 
     testDynaFileMappings("meshes/PlateWithHole_Patch8.bxt.gz",
     // Regression values for sin_x_plus_cos_y
-                         {2.2812154374012, 1.974049990211937,
-                          1.791640772215248, 1.413679237529376});
+                         {{2.2812154374012, 1.974049990211937,
+                           1.791640772215248, 1.413679237529376}});
   }
 
   void testDynaFileMappingsCyl3d ()
@@ -1010,8 +1010,8 @@ public:
 
     testDynaFileMappings("meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz",
     // Regression values for sin_x_plus_cos_y
-                         {0.963612880188165, 1.82329452603503,
-                          0.707998701597943, 1.31399222566683});
+                         {{0.963612880188165, 1.82329452603503,
+                           0.707998701597943, 1.31399222566683}});
   }
 
   void testExodusFileMappings (const std::string & filename, std::array<Real, 4> expected_norms)
@@ -1059,8 +1059,8 @@ public:
 
     testExodusFileMappings("meshes/PlateWithHole_Patch8.e",
     // Regression values for sin_x_plus_cos_y
-                           {2.2812154374012, 1.974049990211937,
-                            1.791640772215248, 1.413679237529376});
+                           {{2.2812154374012, 1.974049990211937,
+                             1.791640772215248, 1.413679237529376}});
   }
 
   void testExodusFileMappingsTwoBlocks ()
@@ -1069,8 +1069,8 @@ public:
 
     testExodusFileMappings("meshes/two_quads_two_blocks.e",
     // Regression values for sin_x_plus_cos_y
-                           {2.03496953073072, 1.97996853164955,
-                            1.18462134113435, 1.03085301158959});
+                           {{2.03496953073072, 1.97996853164955,
+                             1.18462134113435, 1.03085301158959}});
   }
   void testExodusFileMappingsTwoElemIGA()
   {
@@ -1078,8 +1078,8 @@ public:
 
     testExodusFileMappings("meshes/two_element_iga_in.e",
     // Regression values for sin_x_plus_cos_y
-                           {1.26865962862531, 1.42562070158386,
-                            1.54905363492342, 1.29782906548366});
+                           {{1.26865962862531, 1.42562070158386,
+                             1.54905363492342, 1.29782906548366}});
   }
 
   void testExodusFileMappingsCyl3d ()
@@ -1087,8 +1087,8 @@ public:
     LOG_UNIT_TEST;
 
     testExodusFileMappings("meshes/PressurizedCyl3d_Patch1_8Elem.e",
-                           {0.963612880188165, 1.82329452603503,
-                            0.707998701597943, 1.31399222566683});
+                           {{0.963612880188165, 1.82329452603503,
+                             0.707998701597943, 1.31399222566683}});
   }
 };
 

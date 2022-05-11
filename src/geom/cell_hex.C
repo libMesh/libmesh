@@ -396,7 +396,7 @@ Real Hex::quality (const ElemQuality q) const
         // it's OK because we are only interested in determinants and
         // products which are not affected by taking the transpose.
         std::array<RealTensor, 8> A =
-          {
+          {{
             RealTensor(d1, d2, d3),
             RealTensor(d1, b2 + d2, b3 + d3),
             RealTensor(b1 + d1, b2 + d2, a3 + b3 + c3 + d3),
@@ -405,7 +405,7 @@ Real Hex::quality (const ElemQuality q) const
             RealTensor(c1 + d1, a2 + b2 + c2 + d2, b3 + d3),
             RealTensor(a1 + b1 + c1 + d1, a2 + b2 + c2 + d2, a3 + b3 + c3 + d3),
             RealTensor(a1 + b1 + c1 + d1, c2 + d2, c3 + d3)
-          };
+          }};
 
         // Compute Nodal areas, alpha_k = det(A_k).
         // If any of these are zero or negative, we return zero

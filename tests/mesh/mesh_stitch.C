@@ -1,3 +1,4 @@
+// libmesh includes
 #include <libmesh/boundary_info.h>
 #include <libmesh/distributed_mesh.h>
 #include <libmesh/elem.h>
@@ -5,7 +6,9 @@
 #include <libmesh/mesh_modification.h>
 #include <libmesh/node.h>
 #include <libmesh/replicated_mesh.h>
+#include <libmesh/utility.h>
 
+// cppunit includes
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
@@ -23,6 +26,7 @@ public:
   CPPUNIT_TEST( testDistributedMeshStitch );
   CPPUNIT_TEST( testReplicatedBoundaryInfo );
   CPPUNIT_TEST( testDistributedBoundaryInfo );
+  CPPUNIT_TEST( testReplicatedMeshStitchElemsets );
 #endif // LIBMESH_DIM > 2
 
   CPPUNIT_TEST_SUITE_END();
@@ -82,13 +86,6 @@ public:
     const auto & nbi = bi.get_node_boundary_ids();
     CPPUNIT_ASSERT_EQUAL(expected_size, nbi.size());
 
-    const auto & ss_id_to_name = bi.get_sideset_name_map();
-    std::set<std::string> ss_names;
-    std::for_each(ss_id_to_name.begin(),
-                  ss_id_to_name.end(),
-                  [&ss_names](const std::pair<boundary_id_type, std::string> & map_pr) {
-                    ss_names.insert(map_pr.second);
-                  });
     std::set<std::string> expected_names = {{"zero_left",
                                              "zero_top",
                                              "zero_front",
@@ -99,15 +96,14 @@ public:
                                              "one_front",
                                              "one_back",
                                              "one_bottom"}};
+    std::set<std::string> ss_names;
+    for (const auto & pr : bi.get_sideset_name_map())
+      ss_names.insert(pr.second);
     CPPUNIT_ASSERT(ss_names == expected_names);
 
-    const auto & ns_id_to_name = bi.get_nodeset_name_map();
     std::set<std::string> ns_names;
-    std::for_each(ns_id_to_name.begin(),
-                  ns_id_to_name.end(),
-                  [&ns_names](const std::pair<boundary_id_type, std::string> & map_pr) {
-                    ns_names.insert(map_pr.second);
-                  });
+    for (const auto & pr : bi.get_nodeset_name_map())
+      ns_names.insert(pr.second);
     CPPUNIT_ASSERT(ns_names == expected_names);
   }
 
@@ -228,6 +224,140 @@ public:
   {
     testMeshStitch<DistributedMesh>();
   }
+
+  template <typename MeshType>
+  void testMeshStitchElemsets (unsigned int ps)
+  {
+    LOG_UNIT_TEST;
+
+    // Generate meshes to be stitched together. We are going to clone
+    // these so work with unique_ptrs directly.
+    auto mesh0 = std::make_unique<MeshType>(*TestCommWorld);
+
+    // If the user tries to stitch meshes with overlapping codes, we
+    // allow this as long as the codes refer to the same underlying
+    // set ids.
+
+    // Build a mesh on the unit cube
+    MeshTools::Generation::build_cube (*mesh0, ps, ps, ps,
+                                       /*xmin=*/0., /*xmax=*/1.,
+                                       /*ymin=*/0., /*ymax=*/1.,
+                                       /*zmin=*/0., /*zmax=*/1.,
+                                       HEX27);
+
+    // Make a copy
+    auto mesh1 = mesh0->clone();
+
+    // Shift copy one unit to the right
+    MeshTools::Modification::translate(*mesh1, /*x-dir*/1.0);
+
+    // For both meshes:
+    // .) Put odd-numbered Elems in elmset 1
+    // .) Put even-numbered Elems in elemset 2
+    // We use the trivial encoding: elemset id == elemset code for simplicity
+    auto place_elems = [](MeshBase & mesh)
+      {
+        unsigned int elemset_index =
+          mesh.add_elem_integer("elemset_code", /*allocate_data=*/true);
+
+        mesh.add_elemset_code(/*code=*/1, /*set_ids*/{1});
+        mesh.add_elemset_code(/*code=*/2, /*set_ids*/{2});
+
+        for (const auto & elem : mesh.element_ptr_range())
+          {
+            if (elem->id() % 2) // id odd
+              elem->set_extra_integer(elemset_index, 1);
+            else // id even
+              elem->set_extra_integer(elemset_index, 2);
+          }
+      };
+
+    place_elems(*mesh0);
+    place_elems(*mesh1);
+
+    // Before stitching, change the elemset codes on mesh1 so they
+    // don't overlap with the codes on mesh0.
+    mesh1->change_elemset_code(/*old*/1, /*new*/3); // 1 -> 3
+    mesh1->change_elemset_code(/*old*/2, /*new*/4); // 2 -> 4
+
+    // Before stitching, change the elemset ids on mesh1 so they
+    // don't overlap with the elemset ids on mesh0.
+    mesh1->change_elemset_id(/*old*/1, /*new*/100); // 1 -> 100
+    mesh1->change_elemset_id(/*old*/2, /*new*/200); // 2 -> 200
+
+    // Stitch the meshes together at the indicated boundary ids
+    mesh0->stitch_meshes(dynamic_cast<UnstructuredMesh &>(*mesh1),
+                         /*this boundary=*/2,
+                         /*other boundary=*/4,
+                         TOLERANCE,
+                         /*clear_stitched_boundary_ids=*/true,
+                         /*verbose=*/true,
+                         /*use_binary_search=*/false,
+                         /*enforce_all_nodes_match_on_boundaries=*/false);
+
+    // Number of elements in each mesh pre-stitch
+    dof_id_type n_elem_prestitch = Utility::pow<3>(ps);
+
+    // mesh0 should contain 2 * ps**3 total elements after stitching
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2 * n_elem_prestitch), mesh0->n_elem());
+
+    // Check that the stitched mesh still stores "elemset_code" in the
+    // same index (0) as it was before the meshes were stitched.
+    unsigned int elemset_index = mesh0->get_elem_integer_index("elemset_code");
+    CPPUNIT_ASSERT_EQUAL(0u, elemset_index);
+
+    // Check that the stitched mesh has merged elemset codes and ids as expected
+    MeshBase::elemset_type id_set_to_fill;
+    const elemset_id_type code_to_type[] = {0,1,2,100,200};
+    for (dof_id_type elemset_code=1; elemset_code<5; ++elemset_code)
+      {
+        mesh0->get_elemsets(elemset_code, id_set_to_fill);
+
+        // Assert one elemset id in each set, and that set contains the correct id
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), id_set_to_fill.size());
+        CPPUNIT_ASSERT(id_set_to_fill.count(code_to_type[elemset_code]));
+      }
+
+    bool ps_odd = ps % 2;
+
+    for (const auto & elem : mesh0->element_ptr_range())
+      {
+        dof_id_type elemset_code = elem->get_extra_integer(elemset_index);
+        bool elem_id_odd = elem->id() % 2;
+
+        // Debugging
+        // libMesh::out << "Elem " << elem->id() << " in stitched mesh has elemset_code = " << elemset_code << std::endl;
+
+        // Verify that the stitched mesh elemset codes match their pre-stitched values
+        if (elem->id() < n_elem_prestitch) // lower half id
+          {
+            if (elem_id_odd)
+              CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(1), elemset_code);
+            else
+              CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2), elemset_code);
+          }
+        else // upper half id
+          {
+            // i.) If ps == odd, then n_elem_prestitch == odd, and even mesh1
+            // elem ids will become odd, and odd mesh1 elem ids will become
+            // even..
+            // ii.) If ps == even, then n_elem_prestitch == even, and even mesh1
+            // elem ids will remain even, odd mesh1 elem ids will remain odd.
+            if (elem_id_odd)
+              CPPUNIT_ASSERT_EQUAL(ps_odd ? static_cast<dof_id_type>(4) : static_cast<dof_id_type>(3), elemset_code);
+            else
+              CPPUNIT_ASSERT_EQUAL(ps_odd ? static_cast<dof_id_type>(3) : static_cast<dof_id_type>(4), elemset_code);
+          }
+      }
+  }
+
+  void testReplicatedMeshStitchElemsets ()
+  {
+    testMeshStitchElemsets<ReplicatedMesh>(/*ps=*/2);
+    testMeshStitchElemsets<ReplicatedMesh>(/*ps=*/3);
+  }
+
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( MeshStitchTest );

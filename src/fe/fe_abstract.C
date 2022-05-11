@@ -1167,13 +1167,6 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
 
                       const Node * my_node = my_nodes[my_side_n];
 
-                      // Figure out where my node lies on their reference element.
-                      const Point neigh_point = periodic->get_corresponding_pos(*my_node);
-
-                      const Point mapped_point =
-                        FEMap::inverse_map(Dim-1, neigh_side.get(),
-                                           neigh_point);
-
                       // If we've already got a constraint on this
                       // node, then the periodic constraint is
                       // redundant
