@@ -308,43 +308,14 @@ public:
 
     // Check that the stitched mesh has merged elemset codes and ids as expected
     MeshBase::elemset_type id_set_to_fill;
-    for (const auto elemset_code : {1, 2, 3, 4})
+    const elemset_id_type code_to_type[] = {0,1,2,100,200};
+    for (dof_id_type elemset_code=1; elemset_code<5; ++elemset_code)
       {
         mesh0->get_elemsets(elemset_code, id_set_to_fill);
 
-        // Should be one elemset id in each set
+        // Assert one elemset id in each set, and that set contains the correct id
         CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), id_set_to_fill.size());
-
-        switch (elemset_code)
-          {
-          case 1:
-            {
-              CPPUNIT_ASSERT(id_set_to_fill.count(1));
-              break;
-            }
-
-          case 2:
-            {
-              CPPUNIT_ASSERT(id_set_to_fill.count(2));
-              break;
-            }
-
-          case 3:
-            {
-              CPPUNIT_ASSERT(id_set_to_fill.count(100));
-              break;
-            }
-
-          case 4:
-            {
-              CPPUNIT_ASSERT(id_set_to_fill.count(200));
-              break;
-            }
-
-          default:
-            // Unrecognized elemset_code
-            CPPUNIT_ASSERT(false);
-          }
+        CPPUNIT_ASSERT(id_set_to_fill.count(code_to_type[elemset_code]));
       }
 
     bool ps_odd = ps % 2;
