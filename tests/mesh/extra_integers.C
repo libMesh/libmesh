@@ -68,7 +68,7 @@ protected:
                                        0., ymax,
                                        0., zmax,
                                        elem_type);
-    return {i1, r1, ni1, ni2, nr1, nr2};
+    return {{i1, r1, ni1, ni2, nr1, nr2}};
   }
 
 
