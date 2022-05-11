@@ -656,7 +656,9 @@ public:
    */
   virtual Node * add_node (std::unique_ptr<Node> n) = 0;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
+   * This method is deprecated. Please use \p add_node instead
    * Insert \p Node \p n into the Mesh at a location consistent with
    * n->id(), allocating extra storage if necessary.  Will error
    * rather than overwriting an existing Node. Only use if you know what
@@ -665,14 +667,14 @@ public:
   virtual Node * insert_node(Node * n) = 0;
 
   /**
-   * Version of insert_node() taking a std::unique_ptr by value. The version
-   * taking a dumb pointer will eventually be deprecated in favor of this
-   * version. This API is intended to indicate that ownership of the Node
-   * is transferred to the Mesh when this function is called, and it should
-   * play more nicely with the Node::build() API which has always returned
-   * a std::unique_ptr.
+   * This method is deprecated. Please use \p add_node instead
+   * Version of insert_node() taking a std::unique_ptr by value. This API is
+   * intended to indicate that ownership of the Node is transferred to the Mesh
+   * when this function is called, and it should play more nicely with the
+   * Node::build() API which has always returned a std::unique_ptr.
    */
   virtual Node * insert_node(std::unique_ptr<Node> n) = 0;
+#endif
 
   /**
    * Removes the Node n from the mesh.

@@ -880,18 +880,21 @@ Node * DistributedMesh::add_node (std::unique_ptr<Node> n)
   return add_node(n.release());
 }
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 
 Node * DistributedMesh::insert_node(Node * n)
 {
+  libmesh_deprecated();
   return DistributedMesh::add_node(n);
 }
 
 Node * DistributedMesh::insert_node(std::unique_ptr<Node> n)
 {
+  libmesh_deprecated();
   return insert_node(n.release());
 }
 
-
+#endif
 
 void DistributedMesh::delete_node(Node * n)
 {
