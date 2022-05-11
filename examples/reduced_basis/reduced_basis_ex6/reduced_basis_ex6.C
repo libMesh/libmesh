@@ -338,6 +338,9 @@ void transform_mesh_and_plot(EquationSystems & es,
 #ifdef LIBMESH_HAVE_EXODUS_API
   ExodusII_IO(mesh).write_equation_systems(filename, es);
 #endif
+
+  // Avoid unused variable warnings in the --disable-exodus case
+  libmesh_ignore(filename, es);
 }
 
 #endif // LIBMESH_ENABLE_DIRICHLET

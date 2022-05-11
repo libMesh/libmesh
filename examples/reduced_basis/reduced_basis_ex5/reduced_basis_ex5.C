@@ -401,6 +401,9 @@ void scale_mesh_and_plot(EquationSystems & es,
 #endif
 #endif
 
+  // Avoid unused variable warnings when Exodus is not enabled
+  libmesh_ignore(file_basename);
+
   // Loop over the mesh nodes and move them!
   for (auto & node : mesh.node_ptr_range())
     (*node)(0) /= mu.get_value("x_scaling");
