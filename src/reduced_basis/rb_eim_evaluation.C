@@ -1258,6 +1258,10 @@ read_in_basis_functions(const System & sys,
 {
   LOG_SCOPE("read_in_basis_functions()", "RBEIMEvaluation");
 
+  // Return early without reading in anything if there are no basis functions
+  if (get_n_basis_functions() == 0)
+    return;
+
   if (get_parametrized_function().on_mesh_sides())
     read_in_side_basis_functions(sys, directory_name, read_binary_basis_functions);
   else if (get_parametrized_function().on_mesh_nodes())
