@@ -284,10 +284,6 @@ void Poly2TriTriangulator::triangulate_current_points()
   // hole points.
   std::set<p2t::Point, P2TPointCompare> steiner_points;
 
-  // If we have any elements, we assume they come from a preceding
-  // triangulation, and we clear them.
-  _mesh.clear_elems();
-
   // If we were asked to use all mesh nodes as boundary nodes, now's
   // the time to see how many that is.
   if (_n_boundary_nodes == DofObject::invalid_id)
@@ -335,10 +331,6 @@ void Poly2TriTriangulator::triangulate_current_points()
               const p2t::Point pt = to_p2t(mh.point(np-i-1));
               outer_boundary_points.push_back(pt);
             }
-
-          // But we're getting rid of these elements now, to replace
-          // them with our triangulation.
-          _mesh.clear_elems();
         }
       // If we have no segments or edges, the nodal id ordering
       // defines our outer polyline ordering
@@ -412,6 +404,12 @@ void Poly2TriTriangulator::triangulate_current_points()
             libmesh_assert_equal_to(it->second, node);
         }
     }
+
+  // If we have any elements from a previous triangulation, we're
+  // going to replace them with our own.  If we have any elements that
+  // were used to create our segments, we're done creating and we no
+  // longer need them.
+  _mesh.clear_elems();
 
   // Keep track of what boundary ids we want to assign to each new
   // triangle.  We'll give the outer boundary BC 0, and give holes ids
