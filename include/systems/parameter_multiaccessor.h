@@ -112,7 +112,7 @@ public:
 
 
   void push_back (const ParameterAccessor<T> & new_accessor) {
-    _accessors.push_back(new_accessor.clone().release());
+    _accessors.push_back(new_accessor.clone());
   }
 
   /**
