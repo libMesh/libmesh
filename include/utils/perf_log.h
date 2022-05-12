@@ -31,6 +31,7 @@
 #include <string>
 #include <vector>
 #include <deque>
+#include <memory>
 #ifdef LIBMESH_HAVE_SYS_TIME_H
 #include <sys/time.h> // gettimeofday() on Unix
 #endif
@@ -394,7 +395,7 @@ private:
    * their c_str() pointers... but I can't prove it from the standards
    * doc, so let's be safe.
    */
-  std::map<std::string, const char *> non_temporary_strings;
+  std::map<std::string, std::unique_ptr<const char[]>> non_temporary_strings;
 };
 
 

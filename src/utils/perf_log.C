@@ -71,9 +71,6 @@ PerfLog::~PerfLog()
 {
   if (log_events)
     this->print_log();
-
-  for (const auto & pos : non_temporary_strings)
-    delete [] pos.second;
 }
 
 
@@ -107,26 +104,29 @@ void PerfLog::push (const std::string & label,
 {
   const char * label_c_str;
   const char * header_c_str;
-  if (non_temporary_strings.count(label))
-    label_c_str = non_temporary_strings[label];
+
+  auto label_it = non_temporary_strings.find(label);
+  if (label_it != non_temporary_strings.end())
+    label_c_str = label_it->second.get();
   else
     {
       const std::size_t labelsizep1 = label.size()+1;
-      char * newcopy = new char [labelsizep1];
-      std::strncpy(newcopy, label.c_str(), labelsizep1);
-      label_c_str = newcopy;
-      non_temporary_strings[label] = label_c_str;
+      auto newcopy = std::make_unique<char[]>(labelsizep1);
+      std::strncpy(newcopy.get(), label.c_str(), labelsizep1);
+      label_c_str = newcopy.get();
+      non_temporary_strings[label] = std::move(newcopy);
     }
 
-  if (non_temporary_strings.count(header))
-    header_c_str = non_temporary_strings[header];
+  auto header_it = non_temporary_strings.find(header);
+  if (header_it != non_temporary_strings.end())
+    header_c_str = header_it->second.get();
   else
     {
       const std::size_t headersizep1 = header.size()+1;
-      char * newcopy = new char [headersizep1];
-      std::strncpy(newcopy, header.c_str(), headersizep1);
-      header_c_str = newcopy;
-      non_temporary_strings[header] = header_c_str;
+      auto newcopy = std::make_unique<char[]>(headersizep1);
+      std::strncpy(newcopy.get(), header.c_str(), headersizep1);
+      header_c_str = newcopy.get();
+      non_temporary_strings[header] = std::move(newcopy);
     }
 
   if (this->log_events)
@@ -149,8 +149,8 @@ void PerfLog::pop (const std::string & label,
                    const std::string & header)
 {
 
-  const char * label_c_str = non_temporary_strings[label];
-  const char * header_c_str = non_temporary_strings[header];
+  const char * label_c_str = non_temporary_strings[label].get();
+  const char * header_c_str = non_temporary_strings[header].get();
 
   // This could happen if users are *mixing* string and char* APIs for
   // the same label/header combination.  For perfect backwards
@@ -711,8 +711,8 @@ PerfData PerfLog::get_perf_data(const std::string & label, const std::string & h
   if (non_temporary_strings.count(label) &&
       non_temporary_strings.count(header))
     {
-      const char * label_c_str = non_temporary_strings[label];
-      const char * header_c_str = non_temporary_strings[header];
+      const char * label_c_str = non_temporary_strings[label].get();
+      const char * header_c_str = non_temporary_strings[header].get();
       return log[std::make_pair(header_c_str, label_c_str)];
     }
 
