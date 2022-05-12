@@ -30,6 +30,7 @@
 #include "libmesh/mesh_triangle_wrapper.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/utility.h"
 
 // C/C++ includes
 #include <sstream>
@@ -79,6 +80,50 @@ int TriangulatorInterface::get_interpolate_boundary_points () const
     return 0;
 
   return _interpolate_boundary_points;
+}
+
+
+
+void TriangulatorInterface::elems_to_segments()
+{
+  // Don't try to override manually specified segments
+  if (!this->segments.empty())
+    return;
+
+  // If we have edges, they should form the polyline with the ordering
+  // we want.  Let's turn them into segments for later use, because
+  // we're going to delete the original elements to replace with our
+  // triangulation.
+  if (_mesh.n_elem())
+    {
+      // Mapping from points to node ids, to back those out from
+      // MeshedHole results later
+      std::map<Point, dof_id_type> point_id_map;
+
+      for (auto & node : _mesh.node_ptr_range())
+        {
+          // We're not going to support overlapping nodes on the boundary
+          if (point_id_map.count(*node))
+            libmesh_not_implemented();
+
+          point_id_map.emplace(*node, node->id());
+        }
+
+      // We'll steal the ordering calculation from
+      // the MeshedHole code, but reverse the ordering since it's
+      // an outer rather than an inner boundary.
+      const TriangulatorInterface::MeshedHole mh { _mesh };
+
+      const std::size_t np = mh.n_points();
+      for (auto i : make_range(np))
+        {
+          const Point pt = mh.point(np-i-1);
+          const dof_id_type id0 = libmesh_map_find(point_id_map, pt);
+          const Point next_pt = mh.point((2*np-i-2)%np);
+          const dof_id_type id1 = libmesh_map_find(point_id_map, next_pt);
+          this->segments.emplace_back(id0, id1);
+        }
+    }
 }
 
 

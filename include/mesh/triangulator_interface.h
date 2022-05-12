@@ -241,6 +241,13 @@ public:
 
 protected:
   /**
+   * Helper function to create PSLG segments from our other
+   * boundary-defining options (nodal ordering, 1D mesh edges, 2D mesh
+   * boundary sides), if no segments already exist.
+   */
+  void elems_to_segments();
+
+  /**
    * Helper function to add extra points (midpoints of initial
    * segments) to a PSLG triangulation
    */

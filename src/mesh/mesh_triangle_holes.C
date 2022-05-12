@@ -97,6 +97,12 @@ namespace libMesh
 //
 Real TriangulatorInterface::Hole::area() const
 {
+  return this->areavec().norm() / 2;
+}
+
+
+RealGradient TriangulatorInterface::Hole::areavec() const
+{
   const unsigned int np = this->n_points();
 
   if (np < 3)
@@ -111,7 +117,7 @@ Real TriangulatorInterface::Hole::area() const
   // Your hole points had best be coplanar, but this should work
   // regardless of which plane they're in.
 
-  Point areavec = 0;
+  RealGradient areavec = 0;
 
   for (unsigned int i=2; i != np; ++i)
     {
@@ -121,7 +127,7 @@ Real TriangulatorInterface::Hole::area() const
       areavec += e_0im.cross(e_0i);
     }
 
-  return areavec.norm() / 2;
+  return areavec;
 }
 
 
@@ -292,16 +298,22 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
             {
               boundary_info.boundary_ids(elem, s, bcids);
 
-              for (auto b : bcids)
+              bool add_edge = false;
+              if (!elem->neighbor_ptr(s) && ids.empty())
+                add_edge = true;
+
+              if (!add_edge)
+                for (auto b : bcids)
+                  if (ids.count(b))
+                    add_edge = true;
+
+              if (add_edge)
                 {
-                  if (ids.empty() || ids.count(b))
-                    {
-                      hole_edge_map.emplace(elem->node_ptr(s),
-                                            elem->node_ptr((s+1)%ns));
-                      hole_edge_map.emplace(elem->node_ptr((s+1)%ns),
-                                            elem->node_ptr(s));
-                      break;
-                    }
+                  hole_edge_map.emplace(elem->node_ptr(s),
+                                        elem->node_ptr((s+1)%ns));
+                  hole_edge_map.emplace(elem->node_ptr((s+1)%ns),
+                                        elem->node_ptr(s));
+                  continue;
                 }
             }
         }
@@ -353,14 +365,15 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
                  _points.begin(),
                  [](const Node * n){ return Point(*n); });
 
-  Real current_area = this->area();
+  RealGradient current_areavec = this->areavec();
 
   libmesh_error_msg_if
-    (!current_area,
+    (!current_areavec.norm(),
      "Zero-area MeshedHoles are not currently supported");
 
-  // We ordered ourselves backwards?  Whoops, fix that.
-  if (current_area < 0)
+  // We ordered ourselves counter-clockwise?  But a hole is expected
+  // to be clockwise, so use the reverse order.
+  if (current_areavec(2) > 0)
     std::reverse(_points.begin(), _points.end());
 
   mesh.comm().broadcast(_points);

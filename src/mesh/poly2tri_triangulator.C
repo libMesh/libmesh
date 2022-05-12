@@ -284,10 +284,6 @@ void Poly2TriTriangulator::triangulate_current_points()
   // hole points.
   std::set<p2t::Point, P2TPointCompare> steiner_points;
 
-  // If we have any elements, we assume they come from a preceding
-  // triangulation, and we clear them.
-  _mesh.clear_elems();
-
   // If we were asked to use all mesh nodes as boundary nodes, now's
   // the time to see how many that is.
   if (_n_boundary_nodes == DofObject::invalid_id)
@@ -305,61 +301,31 @@ void Poly2TriTriangulator::triangulate_current_points()
   // Prepare poly2tri points for our nodes, sorted into outer boundary
   // points and interior Steiner points.
 
-  // If we have no explicit segments defined, our Mesh itself
-  // defines our outer polyline ordering:
+  // If we have no explicit segments defined, we may get them from
+  // mesh elements
+  this->elems_to_segments();
+
   if (this->segments.empty())
     {
-      // If we have segments, they should form the polyline with the
-      // ordering we want.
-      if (_mesh.n_elem())
+      // If we have no segments even after taking elems into account,
+      // the nodal id ordering defines our outer polyline ordering
+      for (auto & node : _mesh.node_ptr_range())
         {
-          for (auto & node : _mesh.node_ptr_range())
-            {
-              const p2t::Point pt = to_p2t(*node);
+          const p2t::Point pt = to_p2t(*node);
 
-              // We're not going to support overlapping nodes on the boundary
-              if (point_node_map.count(pt))
-                libmesh_not_implemented();
+          // If we're out of boundary nodes, the rest are going to be
+          // Steiner points or hole points
+          if (node->id() < _n_boundary_nodes)
+            outer_boundary_points.push_back(pt);
+          else
+            steiner_points.insert(pt);
 
-              point_node_map.emplace(pt, node);
-            }
+          // We're not going to support overlapping nodes on the boundary
+          if (point_node_map.count(pt))
+            libmesh_not_implemented();
 
-          // We'll steal the ordering calculation from
-          // the MeshedHole code, but reverse the ordering since it's
-          // an outer rather than an inner boundary.
-          const TriangulatorInterface::MeshedHole mh { _mesh };
-
-          const std::size_t np = mh.n_points();
-          for (auto i : make_range(np))
-            {
-              const p2t::Point pt = to_p2t(mh.point(np-i-1));
-              outer_boundary_points.push_back(pt);
-            }
-
-          // But we're getting rid of these elements now, to replace
-          // them with our triangulation.
-          _mesh.clear_elems();
+          point_node_map.emplace(pt, node);
         }
-      // If we have no segments or edges, the nodal id ordering
-      // defines our outer polyline ordering
-      else
-        for (auto & node : _mesh.node_ptr_range())
-          {
-            const p2t::Point pt = to_p2t(*node);
-
-            // If we're out of boundary nodes, the rest are going to be
-            // Steiner points or hole points
-            if (node->id() < _n_boundary_nodes)
-              outer_boundary_points.push_back(pt);
-            else
-              steiner_points.insert(pt);
-
-            // We're not going to support overlapping nodes on the boundary
-            if (point_node_map.count(pt))
-              libmesh_not_implemented();
-
-            point_node_map.emplace(pt, node);
-          }
     }
   // If we have explicit segments defined, that's our outer polyline
   // ordering:
@@ -412,6 +378,12 @@ void Poly2TriTriangulator::triangulate_current_points()
             libmesh_assert_equal_to(it->second, node);
         }
     }
+
+  // If we have any elements from a previous triangulation, we're
+  // going to replace them with our own.  If we have any elements that
+  // were used to create our segments, we're done creating and we no
+  // longer need them.
+  _mesh.clear_elems();
 
   // Keep track of what boundary ids we want to assign to each new
   // triangle.  We'll give the outer boundary BC 0, and give holes ids

@@ -24,6 +24,7 @@
 #include "libmesh/boundary_info.h" // invalid_id
 #include "libmesh/point.h"
 #include "libmesh/triangulator_interface.h"
+#include "libmesh/vector_value.h"
 
 // C++ includes
 
@@ -76,6 +77,13 @@ public:
    * Return the area of the hole
    */
   Real area() const;
+
+  /**
+   * Return a vector with right-hand-rule orientation and length of
+   * twice area() squared.  This is useful for determining
+   * orientation of non-planar or non-counter-clockwise holes.
+   */
+  RealGradient areavec() const;
 
   /**
    * Starting indices of points for a hole with multiple disconnected boundaries.
