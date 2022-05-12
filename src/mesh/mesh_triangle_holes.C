@@ -97,6 +97,12 @@ namespace libMesh
 //
 Real TriangulatorInterface::Hole::area() const
 {
+  return this->areavec().norm() / 2;
+}
+
+
+RealGradient TriangulatorInterface::Hole::areavec() const
+{
   const unsigned int np = this->n_points();
 
   if (np < 3)
@@ -111,7 +117,7 @@ Real TriangulatorInterface::Hole::area() const
   // Your hole points had best be coplanar, but this should work
   // regardless of which plane they're in.
 
-  Point areavec = 0;
+  RealGradient areavec = 0;
 
   for (unsigned int i=2; i != np; ++i)
     {
@@ -121,7 +127,7 @@ Real TriangulatorInterface::Hole::area() const
       areavec += e_0im.cross(e_0i);
     }
 
-  return areavec.norm() / 2;
+  return areavec;
 }
 
 
