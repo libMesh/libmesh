@@ -36,6 +36,7 @@ public:
   CPPUNIT_TEST( testPoly2TriHoles );
   CPPUNIT_TEST( testPoly2TriMeshedHoles );
   CPPUNIT_TEST( testPoly2TriEdges );
+  CPPUNIT_TEST( testPoly2TriEdgesRefined );
   CPPUNIT_TEST( testPoly2TriSegments );
   CPPUNIT_TEST( testPoly2TriRefined );
   CPPUNIT_TEST( testPoly2TriExtraRefined );
@@ -512,13 +513,8 @@ public:
   }
 
 
-  void testPoly2TriEdges()
+  void testPoly2TriEdgesMesh(MeshBase & mesh)
   {
-    LOG_UNIT_TEST;
-
-    Mesh mesh(*TestCommWorld);
-    Poly2TriTriangulator triangulator(mesh);
-
     // The same quad as testTriangulator, but out of order
     auto node0 = mesh.add_point(Point(0,0), 0);
     auto node1 = mesh.add_point(Point(1,2), 1);
@@ -540,10 +536,30 @@ public:
     edge21->set_node(1) = node1;
 
     mesh.prepare_for_use();
+  }
+
+
+  void testPoly2TriEdges()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator triangulator(mesh);
+    testPoly2TriEdgesMesh(mesh);
 
     this->testTriangulatorBase(mesh, triangulator);
   }
 
+
+  void testPoly2TriEdgesRefined()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator triangulator(mesh);
+    testPoly2TriEdgesMesh(mesh);
+    testPoly2TriRefinementBase(mesh, nullptr, 1.5, 14);
+  }
 
 
   void testPoly2TriSegments()
@@ -556,6 +572,14 @@ public:
   }
 
 
+  void testPoly2TriTrapMesh (UnstructuredMesh & mesh)
+  {
+    mesh.add_point(Point(0,0), 0);
+    mesh.add_point(Point(1,0), 1);
+    mesh.add_point(Point(1,2), 2);
+    mesh.add_point(Point(0,1), 3);
+  }
+
   void testPoly2TriRefinementBase
     (UnstructuredMesh & mesh,
      const std::vector<TriangulatorInterface::Hole*> * holes,
@@ -564,11 +588,6 @@ public:
      Real desired_area = 0.1,
      FunctionBase<Real> * area_func = nullptr)
   {
-    mesh.add_point(Point(0,0), 0);
-    mesh.add_point(Point(1,0), 1);
-    mesh.add_point(Point(1,2), 2);
-    mesh.add_point(Point(0,1), 3);
-
     Poly2TriTriangulator triangulator(mesh);
 
     // Use the point order to define the boundary, because our
@@ -622,6 +641,7 @@ public:
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld);
+    testPoly2TriTrapMesh(mesh);
     testPoly2TriRefinementBase(mesh, nullptr, 1.5, 15);
   }
 
@@ -630,6 +650,7 @@ public:
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld);
+    testPoly2TriTrapMesh(mesh);
     testPoly2TriRefinementBase(mesh, nullptr, 1.5, 150, 0.01);
   }
 
@@ -637,6 +658,7 @@ public:
   {
     ParsedFunction<Real> var_area {"0.002*(1+2*x)*(1+2*y)"};
     Mesh mesh(*TestCommWorld);
+    testPoly2TriTrapMesh(mesh);
     testPoly2TriRefinementBase(mesh, nullptr, 1.5, 150, 0, &var_area);
   }
 
@@ -649,6 +671,7 @@ public:
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
 
     Mesh mesh(*TestCommWorld);
+    testPoly2TriTrapMesh(mesh);
     testPoly2TriRefinementBase(mesh, &holes, 1.25, 13);
   }
 
@@ -668,6 +691,7 @@ public:
     // Doing extra refinement here to ensure that we had the
     // *opportunity* to refine the hole boundaries.
     Mesh mesh(*TestCommWorld);
+    testPoly2TriTrapMesh(mesh);
     testPoly2TriRefinementBase(mesh, &holes, 1.25, n_original_elem, desired_area);
 
     // Checking that we have more outer boundary sides than we started
@@ -705,6 +729,7 @@ public:
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
 
     Mesh mesh(*TestCommWorld);
+    testPoly2TriTrapMesh(mesh);
     testPoly2TriRefinementBase(mesh, &holes, 1.25, 125, 0.01);
   }
 
@@ -716,6 +741,7 @@ public:
 
     ParsedFunction<Real> var_area {"0.002*(0.25+2*x)*(0.25+2*y)"};
     Mesh mesh(*TestCommWorld);
+    testPoly2TriTrapMesh(mesh);
     testPoly2TriRefinementBase(mesh, &holes, 1.25, 150, 0, &var_area);
   }
 
