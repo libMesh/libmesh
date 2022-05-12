@@ -97,10 +97,9 @@ public:
    */
   virtual std::unique_ptr<ParameterAccessor<T>> clone() const override
   {
-    ParameterMultiPointer * pmp = new ParameterMultiPointer<T>();
+    auto pmp = std::make_unique<ParameterMultiPointer<T>>();
     pmp->_ptrs = _ptrs;
-
-    return std::unique_ptr<ParameterAccessor<T>>(pmp);
+    return pmp;
   }
 
   void push_back (T * new_ptr) { _ptrs.push_back(new_ptr); }
