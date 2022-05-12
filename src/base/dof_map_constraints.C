@@ -33,7 +33,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/linear_solver.h" // for spline Dirichlet projection solves
 #include "libmesh/mesh_base.h"
-#include "libmesh/mesh_inserter_iterator.h"
+#include "libmesh/null_output_iterator.h"
 #include "libmesh/mesh_tools.h" // for libmesh_assert_valid_boundary_ids()
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/numeric_vector.h" // for enforce_constraints_exactly()
@@ -3850,7 +3850,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
         // make sure we have all the nodes involved!
         if (dist_mesh)
           this->comm().receive_packed_range
-            (pid, &mesh, mesh_inserter_iterator<Node>(mesh),
+            (pid, &mesh, null_output_iterator<Node>(),
              (Node**)nullptr, range_tag);
 
         libmesh_assert(received_node_keys_vals.count(pid));
@@ -4070,7 +4070,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
           // make sure we have all the nodes involved!
           if (dist_mesh)
             this->comm().receive_packed_range
-              (pid, &mesh, mesh_inserter_iterator<Node>(mesh),
+              (pid, &mesh, null_output_iterator<Node>(),
                (Node**)nullptr, range_tag);
 
           // Add any new constraint rows we've found

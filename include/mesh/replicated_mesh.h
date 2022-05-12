@@ -175,7 +175,9 @@ public:
   virtual Node * add_node (Node * n) override final;
   virtual Node * add_node (std::unique_ptr<Node> n) override final;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
+   * These methods are deprecated. Please use \p add_node instead
    * Insert \p Node \p n into the Mesh at a location consistent with
    * n->id(), allocating extra storage if necessary.  Throws an error if:
    * .) n==nullptr
@@ -188,6 +190,7 @@ public:
    */
   virtual Node * insert_node(Node * n) override final;
   virtual Node * insert_node(std::unique_ptr<Node> n) override final;
+#endif
 
   virtual void delete_node (Node * n) override final;
   virtual void renumber_node (dof_id_type old_id, dof_id_type new_id) override final;

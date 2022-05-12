@@ -27,7 +27,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
-#include "libmesh/mesh_inserter_iterator.h"
+#include "libmesh/null_output_iterator.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_elem.h"
@@ -556,7 +556,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
     // just process whatever message is available next.
     mesh.comm().receive_packed_range (Parallel::any_source,
                                       &mesh,
-                                      mesh_inserter_iterator<Node>(mesh),
+                                      null_output_iterator<Node>(),
                                       (Node**)nullptr,
                                       nodestag);
 
@@ -566,7 +566,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   for (unsigned int elem_comm_step=0; elem_comm_step<n_recv_elem_pairs; elem_comm_step++)
     mesh.comm().receive_packed_range (Parallel::any_source,
                                       &mesh,
-                                      mesh_inserter_iterator<Elem>(mesh),
+                                      null_output_iterator<Elem>(),
                                       (Elem**)nullptr,
                                       elemstag);
 
@@ -931,7 +931,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
 
           mesh.comm().receive_packed_range (source_pid_idx,
                                             &mesh,
-                                            mesh_inserter_iterator<Node>(mesh),
+                                            null_output_iterator<Node>(),
                                             (Node**)nullptr,
                                             element_neighbors_tag);
         }
@@ -943,7 +943,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
 
           mesh.comm().receive_packed_range (source_pid_idx,
                                             &mesh,
-                                            mesh_inserter_iterator<Elem>(mesh),
+                                            null_output_iterator<Elem>(),
                                             (Elem**)nullptr,
                                             element_neighbors_tag);
         }
@@ -1127,7 +1127,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
       mesh.comm().receive_packed_range
         (Parallel::any_source,
          &mesh,
-         mesh_inserter_iterator<Node>(mesh),
+         null_output_iterator<Node>(),
          (Node**)nullptr,
          nodestag);
     }
@@ -1137,7 +1137,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
       mesh.comm().receive_packed_range
         (Parallel::any_source,
          &mesh,
-         mesh_inserter_iterator<Elem>(mesh),
+         null_output_iterator<Elem>(),
          (Elem**)nullptr,
          elemstag);
     }
@@ -1193,7 +1193,7 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
                                      mesh.nodes_begin(),
                                      mesh.nodes_end(),
                                      &mesh,
-                                     mesh_inserter_iterator<Node>(mesh));
+                                     null_output_iterator<Node>());
 
   // Broadcast elements from coarsest to finest, so that child
   // elements will see their parents already in place.
@@ -1209,7 +1209,7 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
                                        mesh.level_elements_begin(l),
                                        mesh.level_elements_end(l),
                                        &mesh,
-                                       mesh_inserter_iterator<Elem>(mesh));
+                                       null_output_iterator<Elem>());
 
   // Make sure mesh_dimension and elem_dimensions are consistent.
   mesh.cache_elem_data();
@@ -1317,14 +1317,14 @@ void MeshCommunication::gather (const processor_id_type root_id, MeshBase & mesh
     mesh.comm().allgather_packed_range (&mesh,
                                         mesh.nodes_begin(),
                                         mesh.nodes_end(),
-                                        mesh_inserter_iterator<Node>(mesh),
+                                        null_output_iterator<Node>(),
                                         approx_each_buffer_size) :
 
     mesh.comm().gather_packed_range (root_id,
                                      &mesh,
                                      mesh.nodes_begin(),
                                      mesh.nodes_end(),
-                                     mesh_inserter_iterator<Node>(mesh),
+                                     null_output_iterator<Node>(),
                                      approx_each_buffer_size);
 
   // Gather elements from coarsest to finest, so that child
@@ -1337,14 +1337,14 @@ void MeshCommunication::gather (const processor_id_type root_id, MeshBase & mesh
       mesh.comm().allgather_packed_range (&mesh,
                                           mesh.level_elements_begin(l),
                                           mesh.level_elements_end(l),
-                                          mesh_inserter_iterator<Elem>(mesh),
+                                          null_output_iterator<Elem>(),
                                           approx_each_buffer_size) :
 
       mesh.comm().gather_packed_range (root_id,
                                        &mesh,
                                        mesh.level_elements_begin(l),
                                        mesh.level_elements_end(l),
-                                       mesh_inserter_iterator<Elem>(mesh),
+                                       null_output_iterator<Elem>(),
                                        approx_each_buffer_size);
 
   // If we had a point locator, it's invalid now that there are new
