@@ -629,25 +629,25 @@ void DofMap::reinit(MeshBase & mesh)
 
           FEType fe_type = base_fe_type;
 
-#ifdef LIBMESH_ENABLE_AMR
           const ElemType type = elem->type();
 
+          libmesh_error_msg_if(base_fe_type.order.get_order() >
+                               int(FEInterface::max_order(base_fe_type,type)),
+                               "ERROR: Finite element "
+                               << Utility::enum_to_string(base_fe_type.family)
+                               << " on geometric element "
+                               << Utility::enum_to_string(type)
+                               << "\nonly supports FEInterface::max_order = "
+                               << FEInterface::max_order(base_fe_type,type)
+                               << ", not fe_type.order = "
+                               << base_fe_type.order);
+
+#ifdef LIBMESH_ENABLE_AMR
           // Make sure we haven't done more p refinement than we can
           // handle
           if (elem->p_level() + base_fe_type.order >
               FEInterface::max_order(base_fe_type, type))
             {
-              libmesh_assert_less_msg(base_fe_type.order.get_order(),
-                                      FEInterface::max_order(base_fe_type,type),
-                                      "ERROR: Finite element "
-                                      << Utility::enum_to_string(base_fe_type.family)
-                                      << " on geometric element "
-                                      << Utility::enum_to_string(type)
-                                      << "\nonly supports FEInterface::max_order = "
-                                      << FEInterface::max_order(base_fe_type,type)
-                                      << ", not fe_type.order = "
-                                      << base_fe_type.order);
-
 #  ifdef DEBUG
               libMesh::err << "WARNING: Finite element "
                            << Utility::enum_to_string(base_fe_type.family)
