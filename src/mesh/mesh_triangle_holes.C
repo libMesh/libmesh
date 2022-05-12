@@ -365,14 +365,15 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
                  _points.begin(),
                  [](const Node * n){ return Point(*n); });
 
-  Real current_area = this->area();
+  RealGradient current_areavec = this->areavec();
 
   libmesh_error_msg_if
-    (!current_area,
+    (!current_areavec.norm(),
      "Zero-area MeshedHoles are not currently supported");
 
-  // We ordered ourselves backwards?  Whoops, fix that.
-  if (current_area < 0)
+  // We ordered ourselves counter-clockwise?  But a hole is expected
+  // to be clockwise, so use the reverse order.
+  if (current_areavec(2) > 0)
     std::reverse(_points.begin(), _points.end());
 
   mesh.comm().broadcast(_points);
