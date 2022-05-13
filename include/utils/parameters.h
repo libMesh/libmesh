@@ -32,6 +32,7 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
@@ -64,19 +65,20 @@ class Parameters
 public:
 
   /**
-   * Default constructor.  Does nothing.
+   * Default constructor.
    */
-  Parameters () {}
+  Parameters () = default;
 
   /**
-   * Copy constructor.
+   * Copy constructor. Makes an independent copy by cloning the
+   * contents of the passed-in Parameters object.
    */
   Parameters (const Parameters &);
 
   /**
-   * Destructor.  Clears any allocated memory.
+   * Destructor.
    */
-  virtual ~Parameters ();
+  virtual ~Parameters () = default;
 
   /**
    * Assignment operator.  Removes all parameters in \p this
@@ -189,7 +191,7 @@ public:
      * Clone this value.  Useful in copy-construction.
      * Must be reimplemented in derived classes.
      */
-    virtual Value * clone () const = 0;
+    virtual std::unique_ptr<Value> clone () const = 0;
   };
 
   /**
@@ -226,7 +228,7 @@ public:
     /**
      * Clone this value.  Useful in copy-construction.
      */
-    virtual Value * clone () const override;
+    virtual std::unique_ptr<Value> clone () const override;
 
   private:
     /**
@@ -236,14 +238,19 @@ public:
   };
 
   /**
+   * The type of the map that we store internally.
+   */
+  typedef std::map<std::string, std::unique_ptr<Value>, std::less<>> map_type;
+
+  /**
    * Parameter map iterator.
    */
-  typedef std::map<std::string, Value *>::iterator iterator;
+  typedef map_type::iterator iterator;
 
   /**
    * Constant parameter map iterator.
    */
-  typedef std::map<std::string, Value *>::const_iterator const_iterator;
+  typedef map_type::const_iterator const_iterator;
 
   /**
    * Iterator pointing to the beginning of the set of parameters.
@@ -270,8 +277,7 @@ protected:
   /**
    * Data structure to map names with values.
    */
-  std::map<std::string, Value *, std::less<>> _values;
-
+  map_type _values;
 };
 
 // ------------------------------------------------------------
@@ -298,32 +304,22 @@ void Parameters::Parameter<T>::print (std::ostream & os) const
 
 template <typename T>
 inline
-Parameters::Value * Parameters::Parameter<T>::clone () const
+std::unique_ptr<Parameters::Value> Parameters::Parameter<T>::clone () const
 {
-  Parameter<T> * copy = new Parameter<T>;
+  auto copy = std::make_unique<Parameter<T>>();
 
-  libmesh_assert(copy);
+  copy->_value = this->_value; // assign value
 
-  copy->_value = _value;
-
-  return copy;
+  return copy; // as unique_ptr to base class
 }
 
 
 // ------------------------------------------------------------
 // Parameters class inline methods
 inline
-void Parameters::clear () // since this is inline we must define it
-{                         // before its first use (for some compilers)
-  while (!_values.empty())
-    {
-      Parameters::iterator it = _values.begin();
-
-      delete it->second;
-      it->second = nullptr;
-
-      _values.erase(it);
-    }
+void Parameters::clear ()
+{
+  _values.clear();
 }
 
 
@@ -340,12 +336,9 @@ Parameters & Parameters::operator= (const Parameters & source)
 inline
 Parameters & Parameters::operator+= (const Parameters & source)
 {
-  for (const auto & pr : source._values)
-    {
-      if (_values.find(pr.first) != _values.end())
-        delete _values[pr.first];
-      _values[pr.first] = pr.second->clone();
-    }
+  // Overwrite each value (if it exists) or create a new entry
+  for (const auto & [key, value] : source._values)
+    _values[key] = value->clone();
 
   return *this;
 }
@@ -353,15 +346,8 @@ Parameters & Parameters::operator+= (const Parameters & source)
 inline
 Parameters::Parameters (const Parameters & p)
 {
+  // calls assignment operator
   *this = p;
-}
-
-
-
-inline
-Parameters::~Parameters ()
-{
-  this->Parameters::clear ();
 }
 
 
@@ -407,12 +393,24 @@ bool Parameters::have_parameter (std::string_view name) const
   Parameters::const_iterator it = _values.find(name);
 
   if (it != _values.end())
+    {
 #ifdef LIBMESH_HAVE_RTTI
-    if (dynamic_cast<const Parameter<T> *>(it->second) != nullptr)
-#else // LIBMESH_HAVE_RTTI
-      if (cast_ptr<const Parameter<T> *>(it->second) != nullptr)
-#endif // LIBMESH_HAVE_RTTI
+
+      if (dynamic_cast<const Parameter<T> *>(it->second.get()))
         return true;
+
+#else // !LIBMESH_HAVE_RTTI
+
+      // cast_ptr will simply do a static_cast here when RTTI is not
+      // enabled, and it will return a non-nullptr regardless of
+      // whether or not the cast actually succeeds.
+      libmesh_warning("Parameters::have_parameter() may return false positives when RTTI is not enabled.");
+
+      if (cast_ptr<const Parameter<T> *>(it->second.get()))
+        return true;
+
+#endif
+    }
 
   return false;
 }
@@ -444,7 +442,11 @@ const T & Parameters::get (std::string_view name) const
   libmesh_assert(it != _values.end());
   libmesh_assert(it->second);
 
-  return cast_ptr<Parameter<T> *>(it->second)->get();
+  // Get pointer to derived type
+  auto ptr = cast_ptr<Parameter<T> *>(it->second.get());
+
+  // Return const reference
+  return ptr->get();
 }
 
 template <typename T>
@@ -452,7 +454,7 @@ inline
 void Parameters::insert (const std::string & name)
 {
   if (!this->have_parameter<T>(name))
-    _values[name] = new Parameter<T>;
+    _values[name] = std::make_unique<Parameter<T>>();
 
   set_attributes(name, true);
 }
@@ -463,11 +465,15 @@ inline
 T & Parameters::set (const std::string & name)
 {
   if (!this->have_parameter<T>(name))
-    _values[name] = new Parameter<T>;
+    _values[name] = std::make_unique<Parameter<T>>();
 
   set_attributes(name, false);
 
-  return cast_ptr<Parameter<T> *>(_values[name])->set();
+  // Get pointer to exsiting or just-added entry
+  auto ptr = cast_ptr<Parameter<T> *>(_values[name].get());
+
+  // Return writeable reference
+  return ptr->set();
 }
 
 inline
@@ -476,12 +482,7 @@ void Parameters::remove (std::string_view name)
   Parameters::iterator it = _values.find(name);
 
   if (it != _values.end())
-    {
-      delete it->second;
-      it->second = nullptr;
-
-      _values.erase(it);
-    }
+    _values.erase(it);
 }
 
 
@@ -493,11 +494,8 @@ unsigned int Parameters::n_parameters () const
 {
   unsigned int cnt = 0;
 
-  Parameters::const_iterator       it  = _values.begin();
-  const Parameters::const_iterator vals_end = _values.end();
-
-  for (; it != vals_end; ++it)
-    if (dynamic_cast<Parameter<T> *>(it->second) != nullptr)
+  for (const auto & pr : _values)
+    if (dynamic_cast<Parameter<T> *>(pr.second.get()))
       cnt++;
 
   return cnt;
