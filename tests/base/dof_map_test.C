@@ -7,6 +7,8 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <regex>
+#include <string>
 
 using namespace libMesh;
 
@@ -55,6 +57,8 @@ public:
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testDofOwnerOnHex27 );
 #endif
+
+  CPPUNIT_TEST( testBadElemFECombo );
 
 #if defined(LIBMESH_ENABLE_CONSTRAINTS) && defined(LIBMESH_ENABLE_EXCEPTIONS) && LIBMESH_DIM > 1
   CPPUNIT_TEST( testConstraintLoopDetection );
@@ -112,6 +116,39 @@ public:
   void testDofOwnerOnQuad9() { LOG_UNIT_TEST; testDofOwner(QUAD9); }
   void testDofOwnerOnTri6()  { LOG_UNIT_TEST; testDofOwner(TRI6); }
   void testDofOwnerOnHex27() { LOG_UNIT_TEST; testDofOwner(HEX27); }
+
+  void testBadElemFECombo()
+  {
+    LOG_UNIT_TEST;
+    Mesh mesh(*TestCommWorld);
+
+    EquationSystems es(mesh);
+    System & sys = es.add_system<System> ("SimpleSystem");
+    sys.add_variable("u", SECOND);
+
+    MeshTools::Generation::build_square (mesh,4,4,-1., 1.,-1., 1., QUAD4);
+
+    // We can't just CPPUNIT_ASSERT_THROW, because we want to make
+    // sure we were thrown from the right place with the right error
+    // message!
+    bool threw_desired_exception = false;
+    try {
+      es.init();
+    }
+    catch (libMesh::LogicError & e) {
+      std::regex msg_regex("only supports FEInterface::max_order");
+      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+      threw_desired_exception = true;
+    }
+    catch (...) {
+      CPPUNIT_ASSERT(false);
+    }
+
+    CPPUNIT_ASSERT(threw_desired_exception);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("Incompatible Elem/FE combo not detected", es.init(), libMesh::LogicError);
+  }
+
 
 #if defined(LIBMESH_ENABLE_CONSTRAINTS) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   void testConstraintLoopDetection()
