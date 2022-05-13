@@ -30,6 +30,7 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
@@ -63,11 +64,16 @@ public:
             const TreeNode<N> * p = nullptr);
 
   /**
+   * Class contains unique_ptrs and cannot be default copied.
+   */
+  TreeNode (const TreeNode<N> &) = delete;
+
+  /**
    * Destructor.  Deletes all children, if any.  Thus
    * to delete a tree it is sufficient to explicitly
    * delete the root node.
    */
-  ~TreeNode ();
+  ~TreeNode () = default;
 
   /**
    * \returns \p true if this node is the root node, false
@@ -209,7 +215,7 @@ private:
    * Pointers to our children.  This vector
    * is empty if the node is active.
    */
-  std::vector<TreeNode<N> * > children;
+  std::vector<std::unique_ptr<TreeNode<N>>> children;
 
   /**
    * The Cartesian bounding box for the node.
@@ -271,19 +277,6 @@ TreeNode<N>::TreeNode (const MeshBase & m,
   // Reserve space for the nodes & elements
   nodes.reserve    (tgt_bin_size);
   elements.reserve (tgt_bin_size);
-}
-
-
-
-template <unsigned int N>
-inline
-TreeNode<N>::~TreeNode ()
-{
-  // When we are destructed we must delete all of our
-  // children.  They will thus delete their children,
-  // All the way down the line...
-  for (auto c : children)
-    delete c;
 }
 
 
