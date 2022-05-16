@@ -779,7 +779,7 @@ LibMeshInit::~LibMeshInit()
  */
 void enableFPE(bool on)
 {
-#if !defined(LIBMESH_HAVE_FEENABLEEXCEPT) && defined(LIBMESH_HAVE_XMMINTRIN_H) && !defined(__SUNPRO_CC)
+#if !defined(LIBMESH_HAVE_FEENABLEEXCEPT) && defined(LIBMESH_HAVE_XMMINTRIN_H)
   static int flags = 0;
 #endif
 
@@ -788,10 +788,8 @@ void enableFPE(bool on)
 #ifdef LIBMESH_HAVE_FEENABLEEXCEPT
       feenableexcept(FE_DIVBYZERO | FE_INVALID);
 #elif  LIBMESH_HAVE_XMMINTRIN_H
-#  ifndef __SUNPRO_CC
       flags = _MM_GET_EXCEPTION_MASK();           // store the flags
       _MM_SET_EXCEPTION_MASK(flags & ~_MM_MASK_INVALID);
-#  endif
 #endif
 
 #if LIBMESH_HAVE_DECL_SIGACTION
@@ -812,9 +810,7 @@ void enableFPE(bool on)
 #ifdef LIBMESH_HAVE_FEDISABLEEXCEPT
       fedisableexcept(FE_DIVBYZERO | FE_INVALID);
 #elif  LIBMESH_HAVE_XMMINTRIN_H
-#  ifndef __SUNPRO_CC
       _MM_SET_EXCEPTION_MASK(flags);
-#  endif
 #endif
       signal(SIGFPE, SIG_DFL);
     }

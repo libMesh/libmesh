@@ -47,16 +47,9 @@ LIBMESH_DEFINE_BOTH_MAX_MIN(libMesh::Real, float)
 #endif
 
 // fix for std::abs() overload ambiguity
-#if defined (__SUNPRO_CC) || defined(__PGI)
+#if defined(__PGI)
 inline double abs(double a)
 { return ::fabs(a); }
-
-#endif
-
-// fix for std::pow() overload ambiguity
-#if defined (__SUNPRO_CC)
-inline double pow(double a, int b)
-{ return std::pow(a, static_cast<double>(b)); }
 #endif
 }
 

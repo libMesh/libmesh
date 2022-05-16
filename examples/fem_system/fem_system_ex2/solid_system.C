@@ -42,11 +42,6 @@
 
 #include <memory>
 
-// Solaris Studio has no NAN
-#ifdef __SUNPRO_CC
-#define NAN (1.0/0.0)
-#endif
-
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
