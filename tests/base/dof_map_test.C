@@ -58,7 +58,9 @@ public:
   CPPUNIT_TEST( testDofOwnerOnHex27 );
 #endif
 
+#if defined(LIBMESH_ENABLE_EXCEPTIONS)
   CPPUNIT_TEST( testBadElemFECombo );
+#endif
 
 #if defined(LIBMESH_ENABLE_CONSTRAINTS) && defined(LIBMESH_ENABLE_EXCEPTIONS) && LIBMESH_DIM > 1
   CPPUNIT_TEST( testConstraintLoopDetection );
@@ -117,6 +119,7 @@ public:
   void testDofOwnerOnTri6()  { LOG_UNIT_TEST; testDofOwner(TRI6); }
   void testDofOwnerOnHex27() { LOG_UNIT_TEST; testDofOwner(HEX27); }
 
+#if defined(LIBMESH_ENABLE_EXCEPTIONS)
   void testBadElemFECombo()
   {
     LOG_UNIT_TEST;
@@ -148,7 +151,7 @@ public:
 
     CPPUNIT_ASSERT_THROW_MESSAGE("Incompatible Elem/FE combo not detected", es.init(), libMesh::LogicError);
   }
-
+#endif
 
 #if defined(LIBMESH_ENABLE_CONSTRAINTS) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   void testConstraintLoopDetection()
