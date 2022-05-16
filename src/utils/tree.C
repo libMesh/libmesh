@@ -101,21 +101,6 @@ Tree<N>::Tree (const MeshBase & m,
 
 
 
-// copy-constructor is not implemented
-template <unsigned int N>
-Tree<N>::Tree (const Tree<N> & other_tree) :
-  TreeBase   (other_tree),
-  root       (other_tree.root),
-  build_type (other_tree.build_type)
-{
-  libmesh_not_implemented();
-}
-
-
-
-
-
-
 template <unsigned int N>
 void Tree<N>::print_nodes(std::ostream & my_out) const
 {

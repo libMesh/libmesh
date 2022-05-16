@@ -52,9 +52,10 @@ public:
         Trees::BuildType bt = Trees::NODES);
 
   /**
-   * Copy-constructor.  Not currently implemented.
+   * Copy-constructor. Class cannot be default copy constructed
+   * because TreeNode cannot be default copy constructed.
    */
-  Tree (const Tree<N> & other_tree);
+  Tree (const Tree<N> &) = delete;
 
   /**
    * Destructor.

@@ -219,7 +219,7 @@ void TreeNode<N>::refine ()
   for (unsigned int c=0; c<N; c++)
     {
       // Create the child and set its bounding box.
-      children[c] = new TreeNode<N> (mesh, new_target_bin_size, this);
+      children[c] = std::make_unique<TreeNode<N>>(mesh, new_target_bin_size, this);
       children[c]->set_bounding_box(this->create_bounding_box(c));
 
       // Pass off our nodes to our children
@@ -419,7 +419,7 @@ void TreeNode<N>::print_nodes(std::ostream & out_stream) const
       out_stream << std::endl << std::endl;
     }
   else
-    for (TreeNode<N> * child : children)
+    for (const auto & child : children)
       child->print_nodes();
 }
 
@@ -438,7 +438,7 @@ void TreeNode<N>::print_elements(std::ostream & out_stream) const
       out_stream << std::endl << std::endl;
     }
   else
-    for (TreeNode<N> * child : children)
+    for (const auto & child : children)
       child->print_elements();
 }
 
@@ -493,7 +493,7 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
         }
     }
   else
-    for (TreeNode<N> * child : children)
+    for (auto & child : children)
       child->transform_nodes_to_elements (nodes_to_elem);
 }
 
@@ -547,7 +547,7 @@ void TreeNode<N>::transform_nodes_to_elements (std::unordered_map<dof_id_type, s
         }
     }
   else
-    for (TreeNode<N> * child : children)
+    for (auto & child : children)
       child->transform_nodes_to_elements (nodes_to_elem);
 }
 
@@ -563,7 +563,7 @@ unsigned int TreeNode<N>::n_active_bins() const
     {
       unsigned int sum=0;
 
-      for (TreeNode<N> * child : children)
+      for (const auto & child : children)
         sum += child->n_active_bins();
 
       return sum;
