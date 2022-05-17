@@ -670,10 +670,9 @@ template <typename Output, typename OutputGradient>
 inline
 Output
 ParsedFunction<Output,OutputGradient>::eval (FunctionParserADBase<Output> & parser,
-                                             std::string_view libmesh_dbg_var(function_name),
-                                             unsigned int libmesh_dbg_var(component_idx)) const
+                                             std::string_view function_name,
+                                             unsigned int component_idx) const
 {
-#ifndef NDEBUG
   Output result = parser.Eval(_spacetime.data());
   int error_code = parser.EvalError();
   if (error_code)
@@ -715,9 +714,6 @@ ParsedFunction<Output,OutputGradient>::eval (FunctionParserADBase<Output> & pars
     }
 
   return result;
-#else
-  return parser.Eval(_spacetime.data());
-#endif
 }
 
 } // namespace libMesh
