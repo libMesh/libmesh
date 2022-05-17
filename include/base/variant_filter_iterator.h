@@ -169,13 +169,8 @@ public:
      */
     virtual IterBase * clone() const override
     {
-#ifdef __SUNPRO_CC
-      variant_filter_iterator::Iter<IterType> * copy =
-        new variant_filter_iterator::Iter<IterType>(iter_data);
-#else
       Iter<IterType> * copy =
         new Iter<IterType>(iter_data);
-#endif
 
       return copy;
     }
@@ -223,13 +218,8 @@ public:
      */
     virtual bool equal(const IterBase * other) const override
     {
-#if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
-      const variant_filter_iterator::Iter<IterType> * p =
-        libMesh::cast_ptr<const variant_filter_iterator::Iter<IterType> *>(other);
-#else
       const Iter<IterType> * p =
         libMesh::cast_ptr<const Iter<IterType> *>(other);
-#endif
 
       return (iter_data == p->iter_data);
     }
@@ -276,13 +266,8 @@ public:
      */
     virtual PredBase * clone() const override
     {
-#ifdef __SUNPRO_CC
-      variant_filter_iterator::Pred<IterType,PredType> * copy =
-        new variant_filter_iterator::Pred<IterType,PredType>(pred_data);
-#else
       Pred<IterType,PredType> * copy =
         new Pred<IterType,PredType>(pred_data);
-#endif
 
       return copy;
     }
@@ -317,13 +302,8 @@ public:
       libmesh_assert(in);
 
       // Attempt downcast
-#if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
-      const variant_filter_iterator::Iter<IterType> * p =
-        libMesh::cast_ptr<const variant_filter_iterator::Iter<IterType> * >(in);
-#else
       const Iter<IterType> * p =
         libMesh::cast_ptr<const Iter<IterType> *>(in);
-#endif
 
       // Return result of op() for the user's predicate.
       return pred_data(p->iter_data);
