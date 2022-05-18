@@ -77,7 +77,7 @@ public:
   struct IterBase
   {
     virtual ~IterBase() = default;
-    virtual  IterBase * clone() const = 0;
+    virtual std::unique_ptr<IterBase> clone() const = 0;
 
     /**
      * Dereferences the iterator.
@@ -168,12 +168,9 @@ public:
      * \returns A copy of this object as a pointer to
      * the base (non-templated) class.
      */
-    virtual IterBase * clone() const override
+    virtual std::unique_ptr<IterBase> clone() const override
     {
-      Iter<IterType> * copy =
-        new Iter<IterType>(iter_data);
-
-      return copy;
+      return std::make_unique<Iter<IterType>>(iter_data);
     }
 
     /**
