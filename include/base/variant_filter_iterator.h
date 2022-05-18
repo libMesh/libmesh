@@ -91,7 +91,6 @@ public:
 
     virtual bool equal(const IterBase * other) const = 0;
 
-    // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::IterBase const_IterBase;
     typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::IterBase const_IterBase;
 
     /**
@@ -99,7 +98,7 @@ public:
      *
      * \returns A pointer to a copy of a different type.
      */
-    virtual const_IterBase * const_clone() const = 0;
+    virtual std::unique_ptr<const_IterBase> const_clone() const = 0;
   };
 
 
@@ -177,18 +176,13 @@ public:
      * \returns A copy of this object as a pointer to a
      * different type of object.
      */
-    virtual typename IterBase::const_IterBase * const_clone() const override
+    virtual std::unique_ptr<typename IterBase::const_IterBase> const_clone() const override
     {
       /**
-       * Important typedef for const_iterators.  Notice the weird syntax!  Does it compile everywhere?
+       * Important typedef for const_iterators.
        */
-      // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::template Iter<IterType> const_Iter;
       typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::template Iter<IterType> const_Iter;
-
-      typename IterBase::const_IterBase * copy =
-        new const_Iter(iter_data);
-
-      return copy;
+      return std::make_unique<const_Iter>(iter_data);
     }
 
     /**
