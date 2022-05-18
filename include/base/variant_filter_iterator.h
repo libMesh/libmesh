@@ -24,6 +24,7 @@
 #include <cstddef>
 #include <cstdlib>   // for std::abort()
 #include <iterator>
+#include <memory>
 
 #if defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER)
 #include <typeinfo>
@@ -327,24 +328,21 @@ public:
    * Polymorphic pointer to the object.  Don't confuse
    * with the data pointer located in the \p Iter!
    */
-  IterBase * data;
+  std::unique_ptr<IterBase> data;
 
   /**
    * Also have a polymorphic pointer to the end object,
    * this prevents iterating past the end.
    */
-  IterBase * end;
+  std::unique_ptr<IterBase> end;
 
   /**
    * The predicate object.  Must have op() capable of
    * operating on IterBase * pointers.  Therefore it has
    * to follow the same paradigm as \p IterBase.
    */
-  PredBase * pred;
+  std::unique_ptr<PredBase> pred;
 
-
-
-public:
   /**
    * Templated Constructor.  Allows you to construct the iterator
    * and predicate from any types.  Also advances the data pointer
@@ -357,9 +355,9 @@ public:
   variant_filter_iterator (const IterType & d,
                            const IterType & e,
                            const PredType & p ):
-    data ( new Iter<IterType>(d) ),
-    end  ( new Iter<IterType>(e) ),
-    pred ( new Pred<IterType,PredType>(p) )
+    data ( std::make_unique<Iter<IterType>>(d) ),
+    end  ( std::make_unique<Iter<IterType>>(e) ),
+    pred ( std::make_unique<Pred<IterType,PredType>>(p) )
   {
     this->satisfy_predicate();
   }
@@ -367,19 +365,16 @@ public:
   /**
    * Default Constructor.
    */
-  variant_filter_iterator () :
-    data(nullptr),
-    end(nullptr),
-    pred(nullptr) {}
+  variant_filter_iterator () = default;
 
   /**
    * Copy Constructor.
    * Copy the internal data instead of sharing it.
    */
   variant_filter_iterator (const Iterator & rhs) :
-    data (rhs.data != nullptr ? rhs.data->clone() : nullptr),
-    end  (rhs.end  != nullptr ? rhs.end->clone()  : nullptr),
-    pred (rhs.pred != nullptr ? rhs.pred->clone() : nullptr) {}
+    data (rhs.data ? rhs.data->clone() : nullptr),
+    end  (rhs.end  ? rhs.end->clone()  : nullptr),
+    pred (rhs.pred ? rhs.pred->clone() : nullptr) {}
 
 
 
@@ -398,9 +393,9 @@ public:
             class OtherConstType, class OtherConstReferenceType, class OtherConstPointerType>
   variant_filter_iterator (const variant_filter_iterator<Predicate, OtherType, OtherReferenceType, OtherPointerType,
                                                          OtherConstType, OtherConstReferenceType, OtherConstPointerType> & rhs)
-    : data (rhs.data != nullptr ? rhs.data->const_clone() : nullptr),
-      end  (rhs.end  != nullptr ? rhs.end->const_clone()  : nullptr),
-      pred (rhs.pred != nullptr ? rhs.pred->const_clone() : nullptr)
+    : data (rhs.data ? rhs.data->const_clone() : nullptr),
+      end  (rhs.end  ? rhs.end->const_clone()  : nullptr),
+      pred (rhs.pred ? rhs.pred->const_clone() : nullptr)
   {
     // libMesh::out << "Called templated copy constructor for variant_filter_iterator" << std::endl;
   }
@@ -413,12 +408,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~variant_filter_iterator()
-  {
-    delete data; data = nullptr;
-    delete end;  end  = nullptr;
-    delete pred; pred = nullptr;
-  }
+  virtual ~variant_filter_iterator() = default;
 
   /**
    * unary op*() forwards on to \p Iter::op*()
@@ -464,7 +454,7 @@ public:
    */
   bool equal(const variant_filter_iterator & other) const
   {
-    return data->equal(other.data);
+    return data->equal(other.data.get());
   }
 
   /**
@@ -502,7 +492,7 @@ private:
    */
   void satisfy_predicate()
   {
-    while ( !data->equal(end) && !(*pred)(data) )
+    while ( !data->equal(end.get()) && !(*pred)(data.get()) )
       ++(*data);
   }
 };
