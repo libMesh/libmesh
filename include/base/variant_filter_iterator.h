@@ -124,7 +124,7 @@ public:
      *
      * \returns A pointer to a copy of a different type.
      */
-    virtual const_PredBase * const_clone() const = 0;
+    virtual std::unique_ptr<const_PredBase> const_clone() const = 0;
   };
 
 
@@ -265,19 +265,10 @@ public:
     /**
      * The redefinition of the const_clone function for the Pred class.
      */
-    virtual typename PredBase::const_PredBase * const_clone() const override
+    virtual std::unique_ptr<typename PredBase::const_PredBase> const_clone() const override
     {
-      /**
-       * Important typedef for const_iterators.
-       */
-      //      typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::template Pred<IterType, PredType> const_Pred;
       typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::template Pred<IterType, PredType> const_Pred;
-
-
-      typename PredBase::const_PredBase * copy =
-        new const_Pred(pred_data);
-
-      return copy;
+      return std::make_unique<const_Pred>(pred_data);
     }
 
 
