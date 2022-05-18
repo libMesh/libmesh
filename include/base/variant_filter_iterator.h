@@ -114,7 +114,7 @@ public:
   {
     virtual ~PredBase() = default;
     virtual std::unique_ptr<PredBase> clone() const = 0;
-    virtual bool operator()(const IterBase * in) const = 0;
+    virtual bool operator()(const std::unique_ptr<IterBase> & in) const = 0;
 
     // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::PredBase const_PredBase;
     typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::PredBase const_PredBase;
@@ -277,13 +277,13 @@ public:
     /**
      * Re-implementation of op()
      */
-    virtual bool operator() (const IterBase * in) const override
+    virtual bool operator() (const std::unique_ptr<IterBase> & in) const override
     {
       libmesh_assert(in);
 
       // Attempt downcast
       const Iter<IterType> * p =
-        libMesh::cast_ptr<const Iter<IterType> *>(in);
+        libMesh::cast_ptr<const Iter<IterType> *>(in.get());
 
       // Return result of op() for the user's predicate.
       return pred_data(p->iter_data);
@@ -471,7 +471,7 @@ private:
    */
   void satisfy_predicate()
   {
-    while ( !data->equal(end) && !(*pred)(data.get()) )
+    while ( !data->equal(end) && !(*pred)(data) )
       ++(*data);
   }
 };
