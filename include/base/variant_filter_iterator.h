@@ -114,7 +114,7 @@ public:
   struct PredBase
   {
     virtual ~PredBase() = default;
-    virtual PredBase * clone() const = 0;
+    virtual std::unique_ptr<PredBase> clone() const = 0;
     virtual bool operator()(const IterBase * in) const = 0;
 
     // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::PredBase const_PredBase;
@@ -262,12 +262,9 @@ public:
     /**
      * \returns A copy of this object as a pointer to the base class.
      */
-    virtual PredBase * clone() const override
+    virtual std::unique_ptr<PredBase> clone() const override
     {
-      Pred<IterType,PredType> * copy =
-        new Pred<IterType,PredType>(pred_data);
-
-      return copy;
+      return std::make_unique<Pred<IterType,PredType>>(pred_data);
     }
 
 
