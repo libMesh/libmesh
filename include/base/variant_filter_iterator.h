@@ -89,7 +89,7 @@ public:
      */
     virtual IterBase & operator++() = 0;
 
-    virtual bool equal(const IterBase * other) const = 0;
+    virtual bool equal(const std::unique_ptr<IterBase> & other) const = 0;
 
     typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::IterBase const_IterBase;
 
@@ -208,10 +208,10 @@ public:
      * fails it means you compared two different derived
      * classes.
      */
-    virtual bool equal(const IterBase * other) const override
+    virtual bool equal(const std::unique_ptr<IterBase> & other) const override
     {
       const Iter<IterType> * p =
-        libMesh::cast_ptr<const Iter<IterType> *>(other);
+        libMesh::cast_ptr<const Iter<IterType> *>(other.get());
 
       return (iter_data == p->iter_data);
     }
@@ -433,7 +433,7 @@ public:
    */
   bool equal(const variant_filter_iterator & other) const
   {
-    return data->equal(other.data.get());
+    return data->equal(other.data);
   }
 
   /**
@@ -471,7 +471,7 @@ private:
    */
   void satisfy_predicate()
   {
-    while ( !data->equal(end.get()) && !(*pred)(data.get()) )
+    while ( !data->equal(end) && !(*pred)(data.get()) )
       ++(*data);
   }
 };
