@@ -22,7 +22,6 @@
 // C++ includes
 #include <algorithm> // for std::swap
 #include <cstddef>
-#include <cstdlib>   // for std::abort()
 #include <iterator>
 #include <memory>
 
@@ -71,7 +70,7 @@ public:
   /**
    * Abstract base class for the iterator type.  Ideally these mixin classes would be protected,
    * but due to the fact that different templated versions of the same class (which are not related
-   * by inheritance) need to be able to see each other's IterBase and PredBase members.  Thus, the
+   * by inheritance) need to be able to see each other's IterBase and PredBase members, the
    * mixin classes are in the public interface.
    */
   struct IterBase
@@ -116,7 +115,6 @@ public:
     virtual std::unique_ptr<PredBase> clone() const = 0;
     virtual bool operator()(const std::unique_ptr<IterBase> & in) const = 0;
 
-    // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::PredBase const_PredBase;
     typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::PredBase const_PredBase;
 
     /**
@@ -139,16 +137,12 @@ public:
   template<typename IterType>
   struct Iter : IterBase
   {
-
     /**
      * Constructor
      */
     Iter (const IterType & v) :
       iter_data (v)
-    {
-      // libMesh::out << "In Iter<IterType>::Iter(const IterType & v)" << std::endl;
-    }
-
+    {}
 
     /**
      * Copy Constructor.
@@ -156,7 +150,6 @@ public:
     Iter (const Iter & other) :
       iter_data(other.iter_data)
     {}
-
 
     /**
      * Destructor
@@ -220,7 +213,9 @@ public:
      * This is the iterator passed by the user.
      */
     IterType iter_data;
+
   private:
+
     /**
      * This seems to work around a bug in g++ prior to version 10 and
      * clang++ prior to version 10
@@ -261,7 +256,6 @@ public:
       return std::make_unique<Pred<IterType,PredType>>(pred_data);
     }
 
-
     /**
      * The redefinition of the const_clone function for the Pred class.
      */
@@ -270,9 +264,6 @@ public:
       typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::template Pred<IterType, PredType> const_Pred;
       return std::make_unique<const_Pred>(pred_data);
     }
-
-
-
 
     /**
      * Re-implementation of op()
@@ -355,8 +346,6 @@ public:
     end  (rhs.end  ? rhs.end->clone()  : nullptr),
     pred (rhs.pred ? rhs.pred->clone() : nullptr) {}
 
-
-
   /**
    * Copy construct from another (similar) variant_filter_iterator.
    * The Predicate is the same, but the Type, ReferenceType and
@@ -376,13 +365,7 @@ public:
       end  (rhs.end  ? rhs.end->const_clone()  : nullptr),
       pred (rhs.pred ? rhs.pred->const_clone() : nullptr)
   {
-    // libMesh::out << "Called templated copy constructor for variant_filter_iterator" << std::endl;
   }
-
-
-
-
-
 
   /**
    * Destructor
@@ -397,13 +380,12 @@ public:
     return **data;
   }
 
-
   /**
    * op->()
    */
   PointerType operator->() const
   {
-    return (&**this);
+    return &**this;
   }
 
   /**
@@ -413,7 +395,7 @@ public:
   {
     ++*data;
     this->satisfy_predicate();
-    return (*this);
+    return *this;
   }
 
   /**
