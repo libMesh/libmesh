@@ -352,7 +352,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
            "Bad edge topology in MeshedHole");
 
         const Node * next = nullptr;
-        for (auto [key, val] : as_range(next_it_begin, next_it_end))
+        for (const auto [key, val] : as_range(next_it_begin, next_it_end))
           {
             libmesh_assert_equal_to(key, n);
             libmesh_ignore(key);
