@@ -519,25 +519,41 @@ void TaoOptimizationSolver<T>::solve ()
   // LIBMESH_CHKERR(ierr);
 
   // Set solution vec and an initial guess
+#if PETSC_VERSION_LESS_THAN(3,17,0)
   ierr = TaoSetInitialVector(_tao, x->vec());
+#else
+  ierr = TaoSetSolution(_tao, x->vec());
+#endif
   LIBMESH_CHKERR(ierr);
 
   // We have to have an objective function
   libmesh_assert( this->objective_object );
 
   // Set routines for objective, gradient, hessian evaluation
+#if PETSC_VERSION_LESS_THAN(3,17,0)
   ierr = TaoSetObjectiveRoutine(_tao, __libmesh_tao_objective, this);
+#else
+  ierr = TaoSetObjective(_tao, __libmesh_tao_objective, this);
+#endif
   LIBMESH_CHKERR(ierr);
 
   if (this->gradient_object)
     {
+#if PETSC_VERSION_LESS_THAN(3,17,0)
       ierr = TaoSetGradientRoutine(_tao, __libmesh_tao_gradient, this);
+#else
+      ierr = TaoSetGradient(_tao, NULL, __libmesh_tao_gradient, this);
+#endif
       LIBMESH_CHKERR(ierr);
     }
 
   if (this->hessian_object)
     {
+#if PETSC_VERSION_LESS_THAN(3,17,0)
       ierr = TaoSetHessianRoutine(_tao, hessian->mat(), hessian->mat(), __libmesh_tao_hessian, this);
+#else
+      ierr = TaoSetHessian(_tao, hessian->mat(), hessian->mat(), __libmesh_tao_hessian, this);
+#endif
       LIBMESH_CHKERR(ierr);
     }
 
