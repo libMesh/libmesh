@@ -199,21 +199,14 @@ public:
 
 
 
-  void testTriangulatorInterp(MeshBase & mesh,
+  void testTriangulatorInterp(UnstructuredMesh & mesh,
                               TriangulatorInterface & triangulator,
                               int interpolate_boundary_points,
                               dof_id_type n_expected_elem)
   {
     commonSettings(triangulator);
 
-    // A non-square quad, so we don't have ambiguity about which
-    // diagonal a Delaunay algorithm will pick.
-    // Manually-numbered points, so we can use the point numbering as
-    // a segment ordering even on DistributedMesh.
-    mesh.add_point(Point(0,0), 0);
-    mesh.add_point(Point(1,0), 1);
-    mesh.add_point(Point(1,2), 2);
-    mesh.add_point(Point(0,1), 3);
+    testPoly2TriTrapMesh(mesh);
 
     const Real expected_total_area = 1.5;
 
@@ -556,6 +549,10 @@ public:
 
   void testPoly2TriTrapMesh (UnstructuredMesh & mesh)
   {
+    // A non-square quad, so we don't have ambiguity about which
+    // diagonal a Delaunay algorithm will pick.
+    // Manually-numbered points, so we can use the point numbering as
+    // a segment ordering even on DistributedMesh.
     mesh.add_point(Point(0,0), 0);
     mesh.add_point(Point(1,0), 1);
     mesh.add_point(Point(1,2), 2);
