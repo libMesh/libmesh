@@ -66,6 +66,19 @@ public:
 
   void tearDown() {}
 
+  void commonSettings (TriangulatorInterface & triangulator)
+  {
+    // Use the point order to define the boundary, because our
+    // Poly2Tri implementation doesn't do convex hulls yet, even when
+    // that would give the same answer.
+    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
+
+    // Don't try to insert points unless we're requested to later
+    triangulator.desired_area() = 1000;
+    triangulator.minimum_angle() = 0;
+    triangulator.smooth_after_generating() = false;
+  }
+
   void testTriangleHoleArea()
   {
     LOG_UNIT_TEST;
@@ -117,15 +130,7 @@ public:
   void testTriangulatorBase(MeshBase & mesh,
                             TriangulatorInterface & triangulator)
   {
-    // Use the point order to define the boundary, because our
-    // Poly2Tri implementation doesn't do convex hulls yet, even when
-    // that would give the same answer.
-    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
-
-    // Don't try to insert points yet
-    triangulator.desired_area() = 1000;
-    triangulator.minimum_angle() = 0;
-    triangulator.smooth_after_generating() = false;
+    commonSettings(triangulator);
 
     triangulator.triangulate();
 
@@ -199,10 +204,7 @@ public:
                               int interpolate_boundary_points,
                               dof_id_type n_expected_elem)
   {
-    // Use the point order to define the boundary, because our
-    // Poly2Tri implementation doesn't do convex hulls yet, even when
-    // that would give the same answer.
-    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
+    commonSettings(triangulator);
 
     // A non-square quad, so we don't have ambiguity about which
     // diagonal a Delaunay algorithm will pick.
@@ -218,10 +220,6 @@ public:
     // Interpolate points!
     triangulator.set_interpolate_boundary_points(interpolate_boundary_points);
 
-    // Try to insert points!
-    triangulator.desired_area() = 1000;
-    triangulator.minimum_angle() = 0;
-    triangulator.smooth_after_generating() = false;
 
     triangulator.triangulate();
 
@@ -292,20 +290,12 @@ public:
     mesh.add_point(Point(1,1), 2);
     mesh.add_point(Point(-1,1), 3);
 
-    // Use the point order to define the boundary, because our
-    // Poly2Tri implementation doesn't do convex hulls yet, even when
-    // that would give the same answer.
-    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
+    commonSettings(triangulator);
 
     // Add a diamond hole in the center
     TriangulatorInterface::PolygonHole diamond(Point(0), std::sqrt(2)/2, 4);
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
     triangulator.attach_hole_list(&holes);
-
-    // Don't try to insert points yet
-    triangulator.desired_area() = 1000;
-    triangulator.minimum_angle() = 0;
-    triangulator.smooth_after_generating() = false;
 
     triangulator.triangulate();
 
@@ -336,10 +326,7 @@ public:
     mesh.add_point(Point(21,21), 2);
     mesh.add_point(Point(19,21), 3);
 
-    // Use the point order to define the boundary, because our
-    // Poly2Tri implementation doesn't do convex hulls yet, even when
-    // that would give the same answer.
-    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
+    commonSettings(triangulator);
 
     // Add a square meshed hole in the center
     Mesh centermesh { mesh.comm() };
@@ -355,11 +342,6 @@ public:
 
     const std::vector<TriangulatorInterface::Hole*> holes { &centerhole };
     triangulator.attach_hole_list(&holes);
-
-    // Don't try to insert points yet
-    triangulator.desired_area() = 1000;
-    triangulator.minimum_angle() = 0;
-    triangulator.smooth_after_generating() = false;
 
     triangulator.triangulate();
 
@@ -590,10 +572,7 @@ public:
   {
     Poly2TriTriangulator triangulator(mesh);
 
-    // Use the point order to define the boundary, because our
-    // Poly2Tri implementation doesn't do convex hulls yet, even when
-    // that would give the same answer.
-    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
+    commonSettings(triangulator);
 
     if (holes)
       triangulator.attach_hole_list(holes);
@@ -601,8 +580,6 @@ public:
     // Try to insert points!
     triangulator.desired_area() = desired_area;
     triangulator.set_desired_area_function(area_func);
-    triangulator.minimum_angle() = 0;
-    triangulator.smooth_after_generating() = false;
 
     triangulator.triangulate();
 
