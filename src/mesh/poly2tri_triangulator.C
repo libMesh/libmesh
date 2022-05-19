@@ -670,6 +670,9 @@ bool Poly2TriTriangulator::insert_refinement_points()
                 {
                   new_pt = cavity_elem->vertex_average();
                   new_node = mesh.add_point(new_pt);
+                  // This was going to be a side refinement but it's
+                  // now an internal refinement
+                  side = invalid_uint;
                 }
 
               break;
@@ -680,13 +683,11 @@ bool Poly2TriTriangulator::insert_refinement_points()
           side = invalid_uint;
         }
 
-      // If we're not on a boundary ... should we be?  We don't want
-      // to create any sliver elements or confuse poly2tri or
-      // anything.
-      if (side == invalid_uint)
+      // If we're ready to create a new node and we're not on a
+      // boundary ... should we be?  We don't want to create any
+      // sliver elements or confuse poly2tri or anything.
+      if (side == invalid_uint && !new_node)
         {
-          libmesh_assert(!new_node);
-
           unsigned int worst_side = libMesh::invalid_uint;
           Real worst_cos = 1;
           for (auto s : make_range(3u))
@@ -730,6 +731,10 @@ bool Poly2TriTriangulator::insert_refinement_points()
                 {
                   new_pt = cavity_elem->vertex_average();
                   new_node = mesh.add_point(new_pt);
+
+                  // This was going to be a side refinement but it's
+                  // now an internal refinement
+                  side = invalid_uint;
                 }
             }
           else

@@ -41,6 +41,7 @@ public:
   CPPUNIT_TEST( testPoly2TriRefined );
   CPPUNIT_TEST( testPoly2TriExtraRefined );
   CPPUNIT_TEST( testPoly2TriHolesRefined );
+  CPPUNIT_TEST( testPoly2TriHolesInterpRefined );
   CPPUNIT_TEST( testPoly2TriHolesInteriorRefined );
   CPPUNIT_TEST( testPoly2TriHolesInteriorExtraRefined );
   // This covers an old poly2tri collinearity-tolerance bug
@@ -65,6 +66,19 @@ public:
   void setUp() {}
 
   void tearDown() {}
+
+  void commonSettings (TriangulatorInterface & triangulator)
+  {
+    // Use the point order to define the boundary, because our
+    // Poly2Tri implementation doesn't do convex hulls yet, even when
+    // that would give the same answer.
+    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
+
+    // Don't try to insert points unless we're requested to later
+    triangulator.desired_area() = 1000;
+    triangulator.minimum_angle() = 0;
+    triangulator.smooth_after_generating() = false;
+  }
 
   void testTriangleHoleArea()
   {
@@ -117,15 +131,7 @@ public:
   void testTriangulatorBase(MeshBase & mesh,
                             TriangulatorInterface & triangulator)
   {
-    // Use the point order to define the boundary, because our
-    // Poly2Tri implementation doesn't do convex hulls yet, even when
-    // that would give the same answer.
-    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
-
-    // Don't try to insert points yet
-    triangulator.desired_area() = 1000;
-    triangulator.minimum_angle() = 0;
-    triangulator.smooth_after_generating() = false;
+    commonSettings(triangulator);
 
     triangulator.triangulate();
 
@@ -194,38 +200,28 @@ public:
 
 
 
-  void testTriangulatorInterp(MeshBase & mesh,
+  void testTriangulatorInterp(UnstructuredMesh & mesh,
                               TriangulatorInterface & triangulator,
                               int interpolate_boundary_points,
-                              dof_id_type n_expected_elem)
+                              dof_id_type n_expected_elem,
+                              Real expected_total_area = 1.5,
+                              Real desired_area = 1000)
   {
-    // Use the point order to define the boundary, because our
-    // Poly2Tri implementation doesn't do convex hulls yet, even when
-    // that would give the same answer.
-    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
+    commonSettings(triangulator);
 
-    // A non-square quad, so we don't have ambiguity about which
-    // diagonal a Delaunay algorithm will pick.
-    // Manually-numbered points, so we can use the point numbering as
-    // a segment ordering even on DistributedMesh.
-    mesh.add_point(Point(0,0), 0);
-    mesh.add_point(Point(1,0), 1);
-    mesh.add_point(Point(1,2), 2);
-    mesh.add_point(Point(0,1), 3);
-
-    const Real expected_total_area = 1.5;
+    if (!mesh.n_nodes())
+      testPoly2TriTrapMesh(mesh);
 
     // Interpolate points!
     triangulator.set_interpolate_boundary_points(interpolate_boundary_points);
 
-    // Try to insert points!
-    triangulator.desired_area() = 1000;
-    triangulator.minimum_angle() = 0;
-    triangulator.smooth_after_generating() = false;
+    // Try to insert points?
+    triangulator.desired_area() = desired_area;
 
     triangulator.triangulate();
 
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_expected_elem);
+    if (n_expected_elem)
+      CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_expected_elem);
 
     Real area = 0;
     for (const auto & elem : mesh.active_local_element_ptr_range())
@@ -292,20 +288,12 @@ public:
     mesh.add_point(Point(1,1), 2);
     mesh.add_point(Point(-1,1), 3);
 
-    // Use the point order to define the boundary, because our
-    // Poly2Tri implementation doesn't do convex hulls yet, even when
-    // that would give the same answer.
-    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
+    commonSettings(triangulator);
 
     // Add a diamond hole in the center
     TriangulatorInterface::PolygonHole diamond(Point(0), std::sqrt(2)/2, 4);
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
     triangulator.attach_hole_list(&holes);
-
-    // Don't try to insert points yet
-    triangulator.desired_area() = 1000;
-    triangulator.minimum_angle() = 0;
-    triangulator.smooth_after_generating() = false;
 
     triangulator.triangulate();
 
@@ -336,10 +324,7 @@ public:
     mesh.add_point(Point(21,21), 2);
     mesh.add_point(Point(19,21), 3);
 
-    // Use the point order to define the boundary, because our
-    // Poly2Tri implementation doesn't do convex hulls yet, even when
-    // that would give the same answer.
-    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
+    commonSettings(triangulator);
 
     // Add a square meshed hole in the center
     Mesh centermesh { mesh.comm() };
@@ -355,11 +340,6 @@ public:
 
     const std::vector<TriangulatorInterface::Hole*> holes { &centerhole };
     triangulator.attach_hole_list(&holes);
-
-    // Don't try to insert points yet
-    triangulator.desired_area() = 1000;
-    triangulator.minimum_angle() = 0;
-    triangulator.smooth_after_generating() = false;
 
     triangulator.triangulate();
 
@@ -574,6 +554,10 @@ public:
 
   void testPoly2TriTrapMesh (UnstructuredMesh & mesh)
   {
+    // A non-square quad, so we don't have ambiguity about which
+    // diagonal a Delaunay algorithm will pick.
+    // Manually-numbered points, so we can use the point numbering as
+    // a segment ordering even on DistributedMesh.
     mesh.add_point(Point(0,0), 0);
     mesh.add_point(Point(1,0), 1);
     mesh.add_point(Point(1,2), 2);
@@ -590,10 +574,7 @@ public:
   {
     Poly2TriTriangulator triangulator(mesh);
 
-    // Use the point order to define the boundary, because our
-    // Poly2Tri implementation doesn't do convex hulls yet, even when
-    // that would give the same answer.
-    triangulator.triangulation_type() = TriangulatorInterface::PSLG;
+    commonSettings(triangulator);
 
     if (holes)
       triangulator.attach_hole_list(holes);
@@ -601,8 +582,6 @@ public:
     // Try to insert points!
     triangulator.desired_area() = desired_area;
     triangulator.set_desired_area_function(area_func);
-    triangulator.minimum_angle() = 0;
-    triangulator.smooth_after_generating() = false;
 
     triangulator.triangulate();
 
@@ -673,6 +652,44 @@ public:
     Mesh mesh(*TestCommWorld);
     testPoly2TriTrapMesh(mesh);
     testPoly2TriRefinementBase(mesh, &holes, 1.25, 13);
+  }
+
+  void testPoly2TriHolesInterpRefined()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    testPoly2TriTrapMesh(mesh);
+    Poly2TriTriangulator p2t_tri(mesh);
+
+    Real total_area = 1.5;
+
+    // Try a narrower point
+    mesh.node_ref(2)(1) = 3;
+    total_area += 0.5;
+
+    // Add a bunch of tiny diamond holes
+    const int N=3, M=3;
+    TriangulatorInterface::PolygonHole diamond(Point(), std::sqrt(2)/20, 4);
+
+    std::vector<TriangulatorInterface::AffineHole> hole_data;
+    // Reserve so we don't invalidate pointers
+    hole_data.reserve(M*N);
+    std::vector<TriangulatorInterface::Hole*> holes;
+    for (int i : make_range(M))
+      for (int j : make_range(N))
+        {
+          Point shift(Real(i+1)/(M+1),Real(j+1)/(N+1));
+          hole_data.emplace_back(diamond, 0, shift);
+          holes.push_back(&hole_data.back());
+          total_area -= hole_data.back().area();
+        }
+
+    p2t_tri.attach_hole_list(&holes);
+
+    p2t_tri.set_refine_boundary_allowed(false);
+
+    testTriangulatorInterp(mesh, p2t_tri, 4, 0, total_area, 0.03);
   }
 
   void testPoly2TriHolesInteriorRefinedBase
