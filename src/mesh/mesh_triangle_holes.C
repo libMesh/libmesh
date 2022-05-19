@@ -311,6 +311,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
                 {
                   hole_edge_map.emplace(elem->node_ptr(s),
                                         elem->node_ptr((s+1)%ns));
+                  // Do we really need to support flipped 2D elements?
                   hole_edge_map.emplace(elem->node_ptr((s+1)%ns),
                                         elem->node_ptr(s));
                   continue;
@@ -323,57 +324,94 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
     (hole_edge_map.empty(),
      "No valid hole edges found in mesh!");
 
-  std::vector<const Node *> hole_points
-    {hole_edge_map.begin()->first, hole_edge_map.begin()->second};
+  // Function to pull a vector of points out of the map; a loop of
+  // edges connecting these points defines a hole boundary.  If the
+  // mesh has multiple boundaries (e.g. because it had holes itself),
+  // then a random vector will be extracted; this function will be
+  // called multiple times so that the various options can be
+  // compared.
+  auto extract_edge_vector = [&hole_edge_map]() {
+    // Start with any edge
+    std::vector<const Node *> hole_points
+      {hole_edge_map.begin()->first, hole_edge_map.begin()->second};
 
-  // Sort the edges into a connected order
-  for (const Node * last = hole_points.front(),
-                  *    n = hole_points.back();
-                       n != hole_points.front();
-                    last = n,
-                       n = hole_points.back())
-    {
-      auto [next_it_begin, next_it_end] = hole_edge_map.equal_range(n);
+    // We won't be needing to search for this edge
+    hole_edge_map.erase(hole_points.front());
 
-      libmesh_error_msg_if
-        (std::distance(next_it_begin, next_it_end) != 2,
-         "Bad edge topology in MeshedHole");
+    // Sort the remaining edges into a connected order
+    for (const Node * last = hole_points.front(),
+                    *    n = hole_points.back();
+                         n != hole_points.front();
+                      last = n,
+                         n = hole_points.back())
+      {
+        auto [next_it_begin, next_it_end] = hole_edge_map.equal_range(n);
 
-      const Node * next = nullptr;
-      for (auto [key, val] : as_range(next_it_begin, next_it_end))
-        {
-          libmesh_assert_equal_to(key, n);
-          libmesh_ignore(key);
-          libmesh_assert_not_equal_to(val, n);
-          if (val == last)
-            continue;
-          next = val;
-        }
+        libmesh_error_msg_if
+          (std::distance(next_it_begin, next_it_end) != 2,
+           "Bad edge topology in MeshedHole");
 
-      hole_points.push_back(next);
-    }
+        const Node * next = nullptr;
+        for (auto [key, val] : as_range(next_it_begin, next_it_end))
+          {
+            libmesh_assert_equal_to(key, n);
+            libmesh_ignore(key);
+            libmesh_assert_not_equal_to(val, n);
+            if (val == last)
+              continue;
+            next = val;
+          }
 
-  hole_points.pop_back();
+        // We should never hit the same n twice!
+        hole_edge_map.erase(next_it_begin, next_it_end);
 
-  libmesh_error_msg_if
-    (hole_points.size() < 3,
-     "Only " << hole_points.size() << " hole edges found in mesh!");
+        hole_points.push_back(next);
+      }
 
-  _points.resize(hole_points.size());
-  std::transform(hole_points.begin(),
-                 hole_points.end(),
+    hole_points.pop_back();
+
+    return hole_points;
+  };
+
+  std::vector<const Node *> outer_hole_points;
+  Real twice_outer_area = 0;
+  while (!hole_edge_map.empty()) {
+    std::vector<const Node *> hole_points = extract_edge_vector();
+    const std::size_t n_hole_points = hole_points.size();
+    libmesh_error_msg_if
+      (n_hole_points < 3, "Loop with only " << n_hole_points <<
+       " hole edges found in mesh!");
+
+    Real twice_this_area = 0;
+    const Point p0 = *hole_points[0];
+    for (unsigned int i=2; i != n_hole_points; ++i)
+      {
+        const Point e_0im = *hole_points[i-1] - p0,
+                    e_0i  = *hole_points[i] - p0;
+
+        twice_this_area += e_0im.cross(e_0i)(2);
+      }
+
+    if (std::abs(twice_this_area) > std::abs(twice_outer_area))
+      {
+        twice_outer_area = twice_this_area;
+        outer_hole_points = std::move(hole_points);
+      }
+  }
+
+  _points.resize(outer_hole_points.size());
+  std::transform(outer_hole_points.begin(),
+                 outer_hole_points.end(),
                  _points.begin(),
                  [](const Node * n){ return Point(*n); });
 
-  RealGradient current_areavec = this->areavec();
-
   libmesh_error_msg_if
-    (!current_areavec.norm(),
+    (!twice_outer_area,
      "Zero-area MeshedHoles are not currently supported");
 
   // We ordered ourselves counter-clockwise?  But a hole is expected
   // to be clockwise, so use the reverse order.
-  if (current_areavec(2) > 0)
+  if (twice_outer_area > 0)
     std::reverse(_points.begin(), _points.end());
 
   mesh.comm().broadcast(_points);
