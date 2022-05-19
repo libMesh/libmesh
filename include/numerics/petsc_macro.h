@@ -94,6 +94,18 @@
 # define LibMeshCreateSubMatrix MatCreateSubMatrix
 #endif
 
+// As of release 3.17.0, SETERRQ was made to use __VA_ARGS__ and
+// SETERRQ1, SETERRQ2, etc. were deprecated
+#if PETSC_VERSION_LESS_THAN(3,17,0)
+# define LIBMESH_SETERRQ1 SETERRQ1
+# define LIBMESH_SETERRQ2 SETERRQ2
+# define LIBMESH_SETERRQ3 SETERRQ3
+#else
+# define LIBMESH_SETERRQ1 SETERRQ
+# define LIBMESH_SETERRQ2 SETERRQ
+# define LIBMESH_SETERRQ3 SETERRQ
+#endif
+
 // If we're using quad precision, we need to disambiguate std
 // operations on PetscScalar
 
