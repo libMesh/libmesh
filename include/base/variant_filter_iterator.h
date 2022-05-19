@@ -22,8 +22,8 @@
 // C++ includes
 #include <algorithm> // for std::swap
 #include <cstddef>
-#include <cstdlib>   // for std::abort()
 #include <iterator>
+#include <memory>
 
 #if defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER)
 #include <typeinfo>
@@ -70,13 +70,13 @@ public:
   /**
    * Abstract base class for the iterator type.  Ideally these mixin classes would be protected,
    * but due to the fact that different templated versions of the same class (which are not related
-   * by inheritance) need to be able to see each other's IterBase and PredBase members.  Thus, the
+   * by inheritance) need to be able to see each other's IterBase and PredBase members, the
    * mixin classes are in the public interface.
    */
   struct IterBase
   {
     virtual ~IterBase() = default;
-    virtual  IterBase * clone() const = 0;
+    virtual std::unique_ptr<IterBase> clone() const = 0;
 
     /**
      * Dereferences the iterator.
@@ -88,9 +88,8 @@ public:
      */
     virtual IterBase & operator++() = 0;
 
-    virtual bool equal(const IterBase * other) const = 0;
+    virtual bool equal(const std::unique_ptr<IterBase> & other) const = 0;
 
-    // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::IterBase const_IterBase;
     typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::IterBase const_IterBase;
 
     /**
@@ -98,7 +97,7 @@ public:
      *
      * \returns A pointer to a copy of a different type.
      */
-    virtual const_IterBase * const_clone() const = 0;
+    virtual std::unique_ptr<const_IterBase> const_clone() const = 0;
   };
 
 
@@ -113,10 +112,9 @@ public:
   struct PredBase
   {
     virtual ~PredBase() = default;
-    virtual PredBase * clone() const = 0;
-    virtual bool operator()(const IterBase * in) const = 0;
+    virtual std::unique_ptr<PredBase> clone() const = 0;
+    virtual bool operator()(const std::unique_ptr<IterBase> & in) const = 0;
 
-    // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::PredBase const_PredBase;
     typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::PredBase const_PredBase;
 
     /**
@@ -124,7 +122,7 @@ public:
      *
      * \returns A pointer to a copy of a different type.
      */
-    virtual const_PredBase * const_clone() const = 0;
+    virtual std::unique_ptr<const_PredBase> const_clone() const = 0;
   };
 
 
@@ -139,16 +137,12 @@ public:
   template<typename IterType>
   struct Iter : IterBase
   {
-
     /**
      * Constructor
      */
     Iter (const IterType & v) :
       iter_data (v)
-    {
-      // libMesh::out << "In Iter<IterType>::Iter(const IterType & v)" << std::endl;
-    }
-
+    {}
 
     /**
      * Copy Constructor.
@@ -156,7 +150,6 @@ public:
     Iter (const Iter & other) :
       iter_data(other.iter_data)
     {}
-
 
     /**
      * Destructor
@@ -167,30 +160,22 @@ public:
      * \returns A copy of this object as a pointer to
      * the base (non-templated) class.
      */
-    virtual IterBase * clone() const override
+    virtual std::unique_ptr<IterBase> clone() const override
     {
-      Iter<IterType> * copy =
-        new Iter<IterType>(iter_data);
-
-      return copy;
+      return std::make_unique<Iter<IterType>>(iter_data);
     }
 
     /**
      * \returns A copy of this object as a pointer to a
      * different type of object.
      */
-    virtual typename IterBase::const_IterBase * const_clone() const override
+    virtual std::unique_ptr<typename IterBase::const_IterBase> const_clone() const override
     {
       /**
-       * Important typedef for const_iterators.  Notice the weird syntax!  Does it compile everywhere?
+       * Important typedef for const_iterators.
        */
-      // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::template Iter<IterType> const_Iter;
       typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::template Iter<IterType> const_Iter;
-
-      typename IterBase::const_IterBase * copy =
-        new const_Iter(iter_data);
-
-      return copy;
+      return std::make_unique<const_Iter>(iter_data);
     }
 
     /**
@@ -216,10 +201,10 @@ public:
      * fails it means you compared two different derived
      * classes.
      */
-    virtual bool equal(const IterBase * other) const override
+    virtual bool equal(const std::unique_ptr<IterBase> & other) const override
     {
       const Iter<IterType> * p =
-        libMesh::cast_ptr<const Iter<IterType> *>(other);
+        libMesh::cast_ptr<const Iter<IterType> *>(other.get());
 
       return (iter_data == p->iter_data);
     }
@@ -228,7 +213,9 @@ public:
      * This is the iterator passed by the user.
      */
     IterType iter_data;
+
   private:
+
     /**
      * This seems to work around a bug in g++ prior to version 10 and
      * clang++ prior to version 10
@@ -264,46 +251,30 @@ public:
     /**
      * \returns A copy of this object as a pointer to the base class.
      */
-    virtual PredBase * clone() const override
+    virtual std::unique_ptr<PredBase> clone() const override
     {
-      Pred<IterType,PredType> * copy =
-        new Pred<IterType,PredType>(pred_data);
-
-      return copy;
+      return std::make_unique<Pred<IterType,PredType>>(pred_data);
     }
-
 
     /**
      * The redefinition of the const_clone function for the Pred class.
      */
-    virtual typename PredBase::const_PredBase * const_clone() const override
+    virtual std::unique_ptr<typename PredBase::const_PredBase> const_clone() const override
     {
-      /**
-       * Important typedef for const_iterators.
-       */
-      //      typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::template Pred<IterType, PredType> const_Pred;
       typedef typename variant_filter_iterator<Predicate, ConstType, ConstReferenceType, ConstPointerType>::template Pred<IterType, PredType> const_Pred;
-
-
-      typename PredBase::const_PredBase * copy =
-        new const_Pred(pred_data);
-
-      return copy;
+      return std::make_unique<const_Pred>(pred_data);
     }
-
-
-
 
     /**
      * Re-implementation of op()
      */
-    virtual bool operator() (const IterBase * in) const override
+    virtual bool operator() (const std::unique_ptr<IterBase> & in) const override
     {
       libmesh_assert(in);
 
       // Attempt downcast
       const Iter<IterType> * p =
-        libMesh::cast_ptr<const Iter<IterType> *>(in);
+        libMesh::cast_ptr<const Iter<IterType> *>(in.get());
 
       // Return result of op() for the user's predicate.
       return pred_data(p->iter_data);
@@ -327,24 +298,21 @@ public:
    * Polymorphic pointer to the object.  Don't confuse
    * with the data pointer located in the \p Iter!
    */
-  IterBase * data;
+  std::unique_ptr<IterBase> data;
 
   /**
    * Also have a polymorphic pointer to the end object,
    * this prevents iterating past the end.
    */
-  IterBase * end;
+  std::unique_ptr<IterBase> end;
 
   /**
    * The predicate object.  Must have op() capable of
    * operating on IterBase * pointers.  Therefore it has
    * to follow the same paradigm as \p IterBase.
    */
-  PredBase * pred;
+  std::unique_ptr<PredBase> pred;
 
-
-
-public:
   /**
    * Templated Constructor.  Allows you to construct the iterator
    * and predicate from any types.  Also advances the data pointer
@@ -357,9 +325,9 @@ public:
   variant_filter_iterator (const IterType & d,
                            const IterType & e,
                            const PredType & p ):
-    data ( new Iter<IterType>(d) ),
-    end  ( new Iter<IterType>(e) ),
-    pred ( new Pred<IterType,PredType>(p) )
+    data ( std::make_unique<Iter<IterType>>(d) ),
+    end  ( std::make_unique<Iter<IterType>>(e) ),
+    pred ( std::make_unique<Pred<IterType,PredType>>(p) )
   {
     this->satisfy_predicate();
   }
@@ -367,21 +335,16 @@ public:
   /**
    * Default Constructor.
    */
-  variant_filter_iterator () :
-    data(nullptr),
-    end(nullptr),
-    pred(nullptr) {}
+  variant_filter_iterator () = default;
 
   /**
    * Copy Constructor.
    * Copy the internal data instead of sharing it.
    */
   variant_filter_iterator (const Iterator & rhs) :
-    data (rhs.data != nullptr ? rhs.data->clone() : nullptr),
-    end  (rhs.end  != nullptr ? rhs.end->clone()  : nullptr),
-    pred (rhs.pred != nullptr ? rhs.pred->clone() : nullptr) {}
-
-
+    data (rhs.data ? rhs.data->clone() : nullptr),
+    end  (rhs.end  ? rhs.end->clone()  : nullptr),
+    pred (rhs.pred ? rhs.pred->clone() : nullptr) {}
 
   /**
    * Copy construct from another (similar) variant_filter_iterator.
@@ -398,27 +361,16 @@ public:
             class OtherConstType, class OtherConstReferenceType, class OtherConstPointerType>
   variant_filter_iterator (const variant_filter_iterator<Predicate, OtherType, OtherReferenceType, OtherPointerType,
                                                          OtherConstType, OtherConstReferenceType, OtherConstPointerType> & rhs)
-    : data (rhs.data != nullptr ? rhs.data->const_clone() : nullptr),
-      end  (rhs.end  != nullptr ? rhs.end->const_clone()  : nullptr),
-      pred (rhs.pred != nullptr ? rhs.pred->const_clone() : nullptr)
+    : data (rhs.data ? rhs.data->const_clone() : nullptr),
+      end  (rhs.end  ? rhs.end->const_clone()  : nullptr),
+      pred (rhs.pred ? rhs.pred->const_clone() : nullptr)
   {
-    // libMesh::out << "Called templated copy constructor for variant_filter_iterator" << std::endl;
   }
-
-
-
-
-
 
   /**
    * Destructor
    */
-  virtual ~variant_filter_iterator()
-  {
-    delete data; data = nullptr;
-    delete end;  end  = nullptr;
-    delete pred; pred = nullptr;
-  }
+  virtual ~variant_filter_iterator() = default;
 
   /**
    * unary op*() forwards on to \p Iter::op*()
@@ -428,13 +380,12 @@ public:
     return **data;
   }
 
-
   /**
    * op->()
    */
   PointerType operator->() const
   {
-    return (&**this);
+    return &**this;
   }
 
   /**
@@ -444,7 +395,7 @@ public:
   {
     ++*data;
     this->satisfy_predicate();
-    return (*this);
+    return *this;
   }
 
   /**
