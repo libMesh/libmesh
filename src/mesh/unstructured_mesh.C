@@ -308,7 +308,7 @@ UnstructuredMesh::UnstructuredMesh (const Parallel::Communicator & comm_in,
 
 
 
-void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_mesh,
+void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
                                                const bool skip_find_neighbors,
                                                dof_id_type element_id_offset,
                                                dof_id_type node_id_offset,
@@ -332,10 +332,12 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
   // then we need to "wrap" the other Mesh's processor ids to fit
   // within our range. This can happen, for example, while stitching
   // meshes with small numbers of elements in parallel...
-  bool wrap_proc_ids = (_n_parts < other_mesh._n_parts);
+  bool wrap_proc_ids = (this->n_partitions() <
+                        other_mesh.n_partitions());
 
   // We're assuming our subclass data needs no copy
-  libmesh_assert_equal_to (_is_prepared, other_mesh._is_prepared);
+  libmesh_assert_equal_to (this->is_prepared(),
+                           other_mesh.is_prepared());
 
   // We're assuming the other mesh has proper element number ordering,
   // so that we add parents before their children, and that the other
@@ -504,8 +506,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
   this->allow_find_neighbors(other_mesh.allow_find_neighbors());
   this->allow_renumbering(other_mesh.allow_renumbering());
   this->allow_remote_element_removal(other_mesh.allow_remote_element_removal());
-  this->skip_partitioning(other_mesh._skip_all_partitioning);
-  this->skip_noncritical_partitioning(other_mesh._skip_noncritical_partitioning);
+  this->skip_partitioning(other_mesh.skip_partitioning());
+  this->skip_noncritical_partitioning(other_mesh.skip_noncritical_partitioning());
 }
 
 
@@ -1706,7 +1708,7 @@ void UnstructuredMesh::all_complete_order ()
 }
 
 
-void UnstructuredMesh::stitch_meshes (const UnstructuredMesh & other_mesh,
+void UnstructuredMesh::stitch_meshes (const MeshBase & other_mesh,
                                       boundary_id_type this_mesh_boundary_id,
                                       boundary_id_type other_mesh_boundary_id,
                                       Real tol,
@@ -1748,7 +1750,7 @@ void UnstructuredMesh::stitch_surfaces (boundary_id_type boundary_id_1,
 }
 
 
-void UnstructuredMesh::stitching_helper (const UnstructuredMesh * other_mesh,
+void UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                                          boundary_id_type this_mesh_boundary_id,
                                          boundary_id_type other_mesh_boundary_id,
                                          Real tol,
@@ -1766,7 +1768,7 @@ void UnstructuredMesh::stitching_helper (const UnstructuredMesh * other_mesh,
   std::unique_ptr<MeshSerializer> serialize_other;
   if (other_mesh)
     serialize_other = std::make_unique<MeshSerializer>
-      (*const_cast<UnstructuredMesh *>(other_mesh));
+      (*const_cast<MeshBase *>(other_mesh));
 
   std::map<dof_id_type, dof_id_type> node_to_node_map, other_to_this_node_map; // The second is the inverse map of the first
   std::map<dof_id_type, std::vector<dof_id_type>> node_to_elems_map;
@@ -1805,7 +1807,7 @@ void UnstructuredMesh::stitching_helper (const UnstructuredMesh * other_mesh,
         // Make temporary fixed-size arrays for loop
         boundary_id_type id_array[2]         = {this_mesh_boundary_id, other_mesh_boundary_id};
         std::set<dof_id_type> * set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
-        const UnstructuredMesh * mesh_array[2] = {this, other_mesh};
+        const MeshBase * mesh_array[2] = {this, other_mesh};
 
         for (unsigned i=0; i<2; ++i)
           {
