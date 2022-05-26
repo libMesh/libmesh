@@ -463,6 +463,8 @@ public:
   virtual element_iterator active_unpartitioned_elements_end () override final;
   virtual const_element_iterator active_unpartitioned_elements_begin () const override final;
   virtual const_element_iterator active_unpartitioned_elements_end () const override final;
+  virtual SimpleRange<element_iterator> active_unpartitioned_element_ptr_range() override final { return {active_unpartitioned_elements_begin(), active_unpartitioned_elements_end()}; }
+  virtual SimpleRange<const_element_iterator> active_unpartitioned_element_ptr_range() const override final  { return {active_unpartitioned_elements_begin(), active_unpartitioned_elements_end()}; }
 
   virtual element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) override final;
   virtual element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) override final;
