@@ -679,9 +679,15 @@ ParsedFunction<Output,OutputGradient>::eval (FunctionParserADBase<Output> & pars
     {
       libMesh::err << "ERROR: FunctionParser is unable to evaluate component "
                    << component_idx
-                   << " of expression '"
-                   << function_name
-                   << "' with arguments:\n";
+                   << " for '"
+                   << function_name;
+
+      for (auto i : index_range(parsers))
+        if (parsers[i].get() == &parser)
+          libMesh::err << "' of expression '"
+                       << _subexpressions[i];
+
+      libMesh::err << "' with arguments:\n";
       for (const auto & item : _spacetime)
         libMesh::err << '\t' << item << '\n';
       libMesh::err << '\n';
