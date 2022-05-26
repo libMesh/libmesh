@@ -1550,6 +1550,8 @@ public:
   virtual element_iterator active_unpartitioned_elements_end () = 0;
   virtual const_element_iterator active_unpartitioned_elements_begin () const = 0;
   virtual const_element_iterator active_unpartitioned_elements_end () const = 0;
+  virtual SimpleRange<element_iterator> active_unpartitioned_element_ptr_range() = 0;
+  virtual SimpleRange<const_element_iterator> active_unpartitioned_element_ptr_range() const = 0;
 
   /**
    * Iterate over "ghost" elements in the Mesh.  A ghost element is
