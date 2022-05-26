@@ -170,21 +170,31 @@ void LaplaceMeshSmoother::init()
         // nodes via edges.
         _graph.resize(_mesh.max_node_id());
 
-        for (auto & elem : _mesh.active_local_element_ptr_range())
-          for (auto s : elem->side_index_range())
+        auto elem_to_graph =
+          [this, &side_builder](const Elem & elem) {
+          for (auto s : elem.side_index_range())
             {
               // Only operate on sides which are on the
               // boundary or for which the current element's
               // id is greater than its neighbor's.
               // Sides get only built once.
-              if ((elem->neighbor_ptr(s) == nullptr) ||
-                  (elem->id() > elem->neighbor_ptr(s)->id()))
+              if ((elem.neighbor_ptr(s) == nullptr) ||
+                  (elem.id() > elem.neighbor_ptr(s)->id()))
                 {
-                  const Elem & side = side_builder(*elem, s);
+                  const Elem & side = side_builder(elem, s);
                   _graph[side.node_id(0)].push_back(side.node_id(1));
                   _graph[side.node_id(1)].push_back(side.node_id(0));
                 }
             }
+        };
+
+        for (auto & elem : _mesh.active_local_element_ptr_range())
+          elem_to_graph(*elem);
+
+        if (!_mesh.processor_id())
+          for (auto & elem : _mesh.active_unpartitioned_element_ptr_range())
+            elem_to_graph(*elem);
+
         _initialized = true;
         break;
       } // case 2
@@ -197,12 +207,13 @@ void LaplaceMeshSmoother::init()
         // Initialize space in the graph.
         _graph.resize(_mesh.max_node_id());
 
-        for (auto & elem : _mesh.active_local_element_ptr_range())
-          for (auto f : elem->side_index_range()) // Loop over faces
-            if ((elem->neighbor_ptr(f) == nullptr) ||
-                (elem->id() > elem->neighbor_ptr(f)->id()))
+        auto elem_to_graph =
+          [this, &side_builder, &face_builder](const Elem & elem) {
+          for (auto f : elem.side_index_range()) // Loop over faces
+            if ((elem.neighbor_ptr(f) == nullptr) ||
+                (elem.id() > elem.neighbor_ptr(f)->id()))
               {
-                const Elem & face = face_builder(*elem, f);
+                const Elem & face = face_builder(elem, f);
 
                 for (auto s : face.side_index_range()) // Loop over face's edges
                   {
@@ -215,6 +226,14 @@ void LaplaceMeshSmoother::init()
                     _graph[side.node_id(1)].push_back(side.node_id(0));
                   }
               }
+        };
+
+        for (auto & elem : _mesh.active_local_element_ptr_range())
+          elem_to_graph(*elem);
+
+        if (!_mesh.processor_id())
+          for (auto & elem : _mesh.active_unpartitioned_element_ptr_range())
+            elem_to_graph(*elem);
 
         _initialized = true;
         break;
@@ -224,9 +243,9 @@ void LaplaceMeshSmoother::init()
       libmesh_error_msg("At this time it is not possible to smooth a dimension " << _mesh.mesh_dimension() << "mesh.  Aborting...");
     }
 
-  // Done building graph from local elements.  Let's now allgather the
-  // graph so that it is available on all processors for the actual
-  // smoothing operation?
+  // Done building graph from local and/or unpartitioned elements.
+  // Let's now allgather the graph so that it is available on all
+  // processors for the actual smoothing operation.
   this->allgather_graph();
 
   // In 3D, it's possible for > 2 processor partitions to meet
