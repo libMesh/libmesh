@@ -193,7 +193,7 @@ public:
    * and other_mesh and node IDs in the stitched mesh because the number of nodes (and hence
    * the node IDs) in the stitched mesh depend on how many nodes are stitched.
    */
-  void stitch_meshes (const UnstructuredMesh & other_mesh,
+  void stitch_meshes (const MeshBase & other_mesh,
                       boundary_id_type this_mesh_boundary,
                       boundary_id_type other_mesh_boundary,
                       Real tol=TOLERANCE,
@@ -214,9 +214,8 @@ public:
                         bool enforce_all_nodes_match_on_boundaries=false);
 
   /**
-   * Deep copy of nodes and elements from another unstructured mesh
-   * class (used by subclass copy constructors and by mesh merging
-   * operations)
+   * Deep copy of nodes and elements from another mesh object (used by
+   * subclass copy constructors and by mesh merging operations)
    *
    * This will not copy most "high level" data in the mesh; that is
    * done separately by constructors.  An exception is that, if the
@@ -224,7 +223,7 @@ public:
    * for that data which do not already exist on \p this mesh are
    * added so that all such data can be copied.
    */
-  virtual void copy_nodes_and_elements (const UnstructuredMesh & other_mesh,
+  virtual void copy_nodes_and_elements (const MeshBase & other_mesh,
                                         const bool skip_find_neighbors = false,
                                         dof_id_type element_id_offset = 0,
                                         dof_id_type node_id_offset = 0,
@@ -257,7 +256,7 @@ private:
    * Helper function for stitch_meshes and stitch_surfaces
    * that does the mesh stitching.
    */
-  void stitching_helper (const UnstructuredMesh * other_mesh,
+  void stitching_helper (const MeshBase * other_mesh,
                          boundary_id_type boundary_id_1,
                          boundary_id_type boundary_id_2,
                          Real tol,
