@@ -62,10 +62,7 @@ struct abstract_multi_predicate : multi_predicate
   // operator= (perform deep copy of entries in _predicates vector
   abstract_multi_predicate & operator=(const abstract_multi_predicate & rhs)
   {
-    // First clear out the predicates vector
-    _predicates.clear();
-
-    // Now copy over the information from the rhs.
+    // Copy over the information from the rhs.
     this->deep_copy(rhs);
 
     return *this;
@@ -100,6 +97,9 @@ protected:
   // copy constructor for the predicate class.
   void deep_copy(const abstract_multi_predicate & rhs)
   {
+    // First clear out the predicates vector
+    _predicates.clear();
+
     for (const auto & p : rhs._predicates)
       _predicates.push_back(p->clone());
   }
