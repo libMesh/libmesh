@@ -48,46 +48,28 @@ DifferentiableSystem::DifferentiableSystem(EquationSystems & es,
   print_element_solutions(false),
   print_element_residuals(false),
   print_element_jacobians(false),
-  _diff_physics(this),
-  diff_qoi(this)
+  _diff_physics(),
+  _diff_qoi()
 {
 }
 
 
 
-DifferentiableSystem::~DifferentiableSystem ()
-{
-  // If we had an attached Physics object, delete it.
-  if (this->_diff_physics != this)
-    delete this->_diff_physics;
-
-  // If we had an attached QoI object, delete it.
-  if (this->diff_qoi != this)
-    delete this->diff_qoi;
-}
+DifferentiableSystem::~DifferentiableSystem () = default;
 
 
 
 void DifferentiableSystem::clear ()
 {
-  // If we had an attached Physics object, delete it.
-  if (this->_diff_physics != this)
-    {
-      delete this->_diff_physics;
-      this->_diff_physics = this;
-    }
   // If we had no attached Physics object, clear our own Physics data
-  else
+  if (this->_diff_physics.empty())
     this->clear_physics();
 
-  // If we had an attached QoI object, delete it.
-  if (this->diff_qoi != this)
-    {
-      delete this->diff_qoi;
-      this->diff_qoi = this;
-    }
+  this->_diff_physics.clear();
+  this->_diff_qoi.clear();
+
   // If we had no attached QoI object, clear our own QoI data
-  else
+  if (this->_diff_qoi.empty())
     this->clear_qoi();
 
   use_fixed_solution = false;
@@ -111,7 +93,7 @@ void DifferentiableSystem::init_data ()
 {
   // If it isn't a separate initialized-upon-attachment object, do any
   // initialization our physics needs.
-  if (this->_diff_physics == this)
+  if (this->_diff_physics.empty())
     this->init_physics(*this);
 
   // Do any initialization our solvers need
@@ -294,25 +276,28 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
 
 void DifferentiableSystem::attach_qoi( DifferentiableQoI * qoi_in )
 {
-  this->diff_qoi = (qoi_in->clone()).release();
+  this->_diff_qoi.clear();
+  this->_diff_qoi.push_back(qoi_in->clone());
+
+  auto & dq = this->_diff_qoi.back();
   // User needs to resize qoi system qoi accordingly
 #ifdef LIBMESH_ENABLE_DEPRECATED
   // Call the old API for backwards compatibility
-  this->diff_qoi->init_qoi( this->qoi );
+  dq->init_qoi( this->qoi );
 
   // Then the new API for forwards compatibility
-  this->diff_qoi->init_qoi_count( *this );
+  dq->init_qoi_count( *this );
 #else
 #ifndef NDEBUG
   // Make sure the user has updated their QoI subclass - call the old
   // API and make sure it does nothing
   std::vector<Number> deprecated_vector;
-  this->diff_qoi->init_qoi( deprecated_vector );
+  dq->init_qoi( deprecated_vector );
   libmesh_assert(deprecated_vector.empty());
 #endif
 
   // Then the new API
-  this->diff_qoi->init_qoi_count( *this );
+  dq->init_qoi_count( *this );
 #endif
 }
 
@@ -361,13 +346,77 @@ bool DifferentiableSystem::have_second_order_scalar_vars() const
 
 void DifferentiableSystem::swap_physics ( DifferentiablePhysics * & swap_physics )
 {
-  std::swap(this->_diff_physics, swap_physics);
+  // This isn't safe if users aren't very careful about memory
+  // management and they don't (or aren't able to due to an exception)
+  // swap back.
+  libmesh_deprecated();
+
+  // A mess of code for backwards compatibility
+  if (this->_diff_physics.empty())
+    {
+      // Swap-something-else-for-self
+      std::unique_ptr<DifferentiablePhysics> scary_hack(swap_physics);
+      this->_diff_physics.push_back(std::move(scary_hack));
+      swap_physics = this;
+    }
+  else if (swap_physics == this)
+    {
+      // The user must be cleaning up after a previous
+      // swap-something-else-for-self
+      libmesh_assert(!this->_diff_physics.empty());
+
+      // So we don't want to delete what got swapped in, but we do
+      // want to put it back into their pointer
+      DifferentiablePhysics * old_p = this->_diff_physics.back().release();
+      this->_diff_physics.pop_back();
+      swap_physics = old_p;
+
+      // And if the user is doing anything more sophisticated than
+      // that then the user is sophisticated enough to upgrade to
+      // push/pop.
+      libmesh_assert(this->_diff_physics.empty());
+    }
+  else
+    {
+      // Swapping one external physics for another
+      DifferentiablePhysics * old_p = this->_diff_physics.back().release();
+      std::swap(old_p, swap_physics);
+      this->_diff_physics.back().reset(old_p);
+    }
 
   // If the physics has been swapped, we will reassemble
   // the matrix from scratch before doing an adjoint solve
   // rather than just transposing
   this->disable_cache();
 }
+
+
+
+void DifferentiableSystem::push_physics ( DifferentiablePhysics & new_physics )
+{
+  this->_diff_physics.push_back(new_physics.clone_physics());
+
+  // If the physics has been changed, we will reassemble
+  // the matrix from scratch before doing an adjoint solve
+  // rather than just transposing
+  this->disable_cache();
+}
+
+
+
+void DifferentiableSystem::pop_physics ()
+{
+  libmesh_assert(!this->_diff_physics.empty());
+
+  this->_diff_physics.pop_back();
+
+  // If the physics has been changed, we will reassemble
+  // the matrix from scratch before doing an adjoint solve
+  // rather than just transposing
+  this->disable_cache();
+}
+
+
 
 
 } // namespace libMesh

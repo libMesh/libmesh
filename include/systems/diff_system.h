@@ -66,15 +66,11 @@ public:
   /**
    * Special functions.
    * - This class has the same restrictions as its base class.
-   * - This class also can't be default move constructed because it
-   *   manually manages the memory of the _diff_physics and diff_qoi
-   *   objects.
-   * - The destructor potentially cleans up the _diff_physics and
-   *   diff_qoi objects.
+   * - The destructor is defaulted out-of-line.
    */
   DifferentiableSystem (const DifferentiableSystem &) = delete;
   DifferentiableSystem & operator= (const DifferentiableSystem &) = delete;
-  DifferentiableSystem (DifferentiableSystem &&) = delete;
+  DifferentiableSystem (DifferentiableSystem &&) = default;
   DifferentiableSystem & operator= (DifferentiableSystem &&) = delete;
   virtual ~DifferentiableSystem ();
 
@@ -178,11 +174,13 @@ public:
   /**
    * \returns A const reference to a DifferentiablePhysics object.
    *
-   * \note If no external Physics object is attached, the default is
+   * \note If no external Physics objects have been attached, the default is
    * \p this.
    */
   const DifferentiablePhysics * get_physics() const
-  { return this->_diff_physics; }
+  { if (this->_diff_physics.empty())
+      return this;
+    return this->_diff_physics.back().get(); }
 
   /**
    * \returns A reference to a DifferentiablePhysics object.
@@ -191,19 +189,34 @@ public:
    * \p this.
    */
   DifferentiablePhysics * get_physics()
-  { return this->_diff_physics; }
+  { if (this->_diff_physics.empty())
+      return this;
+    return this->_diff_physics.back().get(); }
 
   /**
    * Attach external Physics object.
    */
   void attach_physics( DifferentiablePhysics * physics_in )
-  { this->_diff_physics = (physics_in->clone_physics()).release();
-    this->_diff_physics->init_physics(*this);}
+  { this->_diff_physics.push_back(physics_in->clone_physics());
+    this->_diff_physics.back()->init_physics(*this);}
 
   /**
-   * Swap current physics object with external object
+   * Swap current physics object with external object.  This is
+   * deprecated.
    */
   void swap_physics ( DifferentiablePhysics * & swap_physics );
+
+  /**
+   * Push a clone of a new physics object onto our stack, overriding
+   * the current physics until the new physics is popped off again (or
+   * until something else is pushed on top of it).
+   */
+  void push_physics ( DifferentiablePhysics & new_physics );
+
+  /**
+   * Pop a physics object off of our stack.
+   */
+  void pop_physics ();
 
   /**
    * \returns A const reference to a DifferentiableQoI object.
@@ -211,7 +224,9 @@ public:
    * \note If no external QoI object is attached, the default is \p this.
    */
   const DifferentiableQoI * get_qoi() const
-  { return this->diff_qoi; }
+  { if (this->_diff_qoi.empty())
+      return this;
+    return this->_diff_qoi.back().get(); }
 
   /**
    * \returns A reference to a DifferentiableQoI object.
@@ -219,7 +234,9 @@ public:
    * \note If no external QoI object is attached, the default is this.
    */
   DifferentiableQoI * get_qoi()
-  { return this->diff_qoi; }
+  { if (this->_diff_qoi.empty())
+      return this;
+    return this->_diff_qoi.back().get(); }
 
   /**
    * Attach external QoI object.
@@ -363,20 +380,6 @@ public:
 protected:
 
   /**
-   * Pointer to object to use for physics assembly evaluations.
-   * Defaults to \p this for backwards compatibility; in the future
-   * users should create separate physics objects.
-   */
-  DifferentiablePhysics * _diff_physics;
-
-  /**
-   * Pointer to object to use for quantity of interest assembly
-   * evaluations.  Defaults to \p this for backwards compatibility; in
-   * the future users should create separate physics objects.
-   */
-  DifferentiableQoI * diff_qoi;
-
-  /**
    * Initializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    *
@@ -408,6 +411,21 @@ protected:
   void add_dot_var_dirichlet_bcs( unsigned int var_idx, unsigned int dot_var_idx);
 #endif
 
+private:
+  /**
+   * Stack of pointers to objects to use for physics assembly
+   * evaluations.  Physics assembly defaults to \p this for backwards
+   * compatibility if the stack is empty; for the most flexibility
+   * users should create separate physics objects.
+   */
+  std::vector<std::unique_ptr<DifferentiablePhysics>> _diff_physics;
+
+  /**
+   * Pointer to object to use for quantity of interest assembly
+   * evaluations.  Defaults to \p this for backwards compatibility; in
+   * the future users should create separate physics objects.
+   */
+  std::vector<std::unique_ptr<DifferentiableQoI>> _diff_qoi;
 };
 
 // --------------------------------------------------------------
