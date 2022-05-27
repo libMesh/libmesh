@@ -180,7 +180,7 @@ public:
   const DifferentiablePhysics * get_physics() const
   { if (this->_diff_physics.empty())
       return this;
-    return this->_diff_physics.back().get(); }
+    return this->_diff_physics.top().get(); }
 
   /**
    * \returns A reference to a DifferentiablePhysics object.
@@ -191,14 +191,14 @@ public:
   DifferentiablePhysics * get_physics()
   { if (this->_diff_physics.empty())
       return this;
-    return this->_diff_physics.back().get(); }
+    return this->_diff_physics.top().get(); }
 
   /**
    * Attach external Physics object.
    */
   void attach_physics( DifferentiablePhysics * physics_in )
-  { this->_diff_physics.push_back(physics_in->clone_physics());
-    this->_diff_physics.back()->init_physics(*this);}
+  { this->_diff_physics.push(physics_in->clone_physics());
+    this->_diff_physics.top()->init_physics(*this);}
 
   /**
    * Swap current physics object with external object.  This is
@@ -226,7 +226,7 @@ public:
   const DifferentiableQoI * get_qoi() const
   { if (this->_diff_qoi.empty())
       return this;
-    return this->_diff_qoi.back().get(); }
+    return this->_diff_qoi.top().get(); }
 
   /**
    * \returns A reference to a DifferentiableQoI object.
@@ -236,7 +236,7 @@ public:
   DifferentiableQoI * get_qoi()
   { if (this->_diff_qoi.empty())
       return this;
-    return this->_diff_qoi.back().get(); }
+    return this->_diff_qoi.top().get(); }
 
   /**
    * Attach external QoI object.
@@ -418,14 +418,16 @@ private:
    * compatibility if the stack is empty; for the most flexibility
    * users should create separate physics objects.
    */
-  std::vector<std::unique_ptr<DifferentiablePhysics>> _diff_physics;
+  std::stack<std::unique_ptr<DifferentiablePhysics>,
+    std::vector<std::unique_ptr<DifferentiablePhysics>>> _diff_physics;
 
   /**
    * Pointer to object to use for quantity of interest assembly
    * evaluations.  Defaults to \p this for backwards compatibility; in
    * the future users should create separate physics objects.
    */
-  std::vector<std::unique_ptr<DifferentiableQoI>> _diff_qoi;
+  std::stack<std::unique_ptr<DifferentiableQoI>,
+    std::vector<std::unique_ptr<DifferentiableQoI>>> _diff_qoi;
 };
 
 // --------------------------------------------------------------

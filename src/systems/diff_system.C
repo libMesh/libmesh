@@ -65,8 +65,8 @@ void DifferentiableSystem::clear ()
   if (this->_diff_physics.empty())
     this->clear_physics();
 
-  this->_diff_physics.clear();
-  this->_diff_qoi.clear();
+  this->_diff_physics = {}; // No stack::clear
+  this->_diff_qoi = {};
 
   // If we had no attached QoI object, clear our own QoI data
   if (this->_diff_qoi.empty())
@@ -276,10 +276,10 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
 
 void DifferentiableSystem::attach_qoi( DifferentiableQoI * qoi_in )
 {
-  this->_diff_qoi.clear();
-  this->_diff_qoi.push_back(qoi_in->clone());
+  this->_diff_qoi = {};
+  this->_diff_qoi.push(qoi_in->clone());
 
-  auto & dq = this->_diff_qoi.back();
+  auto & dq = this->_diff_qoi.top();
   // User needs to resize qoi system qoi accordingly
 #ifdef LIBMESH_ENABLE_DEPRECATED
   // Call the old API for backwards compatibility
@@ -356,7 +356,7 @@ void DifferentiableSystem::swap_physics ( DifferentiablePhysics * & swap_physics
     {
       // Swap-something-else-for-self
       std::unique_ptr<DifferentiablePhysics> scary_hack(swap_physics);
-      this->_diff_physics.push_back(std::move(scary_hack));
+      this->_diff_physics.push(std::move(scary_hack));
       swap_physics = this;
     }
   else if (swap_physics == this)
@@ -367,8 +367,8 @@ void DifferentiableSystem::swap_physics ( DifferentiablePhysics * & swap_physics
 
       // So we don't want to delete what got swapped in, but we do
       // want to put it back into their pointer
-      DifferentiablePhysics * old_p = this->_diff_physics.back().release();
-      this->_diff_physics.pop_back();
+      DifferentiablePhysics * old_p = this->_diff_physics.top().release();
+      this->_diff_physics.pop();
       swap_physics = old_p;
 
       // And if the user is doing anything more sophisticated than
@@ -379,9 +379,9 @@ void DifferentiableSystem::swap_physics ( DifferentiablePhysics * & swap_physics
   else
     {
       // Swapping one external physics for another
-      DifferentiablePhysics * old_p = this->_diff_physics.back().release();
+      DifferentiablePhysics * old_p = this->_diff_physics.top().release();
       std::swap(old_p, swap_physics);
-      this->_diff_physics.back().reset(old_p);
+      this->_diff_physics.top().reset(old_p);
     }
 
   // If the physics has been swapped, we will reassemble
@@ -394,7 +394,7 @@ void DifferentiableSystem::swap_physics ( DifferentiablePhysics * & swap_physics
 
 void DifferentiableSystem::push_physics ( DifferentiablePhysics & new_physics )
 {
-  this->_diff_physics.push_back(new_physics.clone_physics());
+  this->_diff_physics.push(new_physics.clone_physics());
 
   // If the physics has been changed, we will reassemble
   // the matrix from scratch before doing an adjoint solve
@@ -408,7 +408,7 @@ void DifferentiableSystem::pop_physics ()
 {
   libmesh_assert(!this->_diff_physics.empty());
 
-  this->_diff_physics.pop_back();
+  this->_diff_physics.pop();
 
   // If the physics has been changed, we will reassemble
   // the matrix from scratch before doing an adjoint solve
