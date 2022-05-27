@@ -1130,7 +1130,7 @@ void FEMSystem::assemble_qoi (const QoISet & qoi_indices)
 
   // Create a non-temporary qoi_contributions object, so we can query
   // its results after the reduction
-  QoIContributions qoi_contributions(*this, *(this->diff_qoi), qoi_indices);
+  QoIContributions qoi_contributions(*this, *(this->get_qoi()), qoi_indices);
 
   // Loop over every active mesh element on this processor
   Threads::parallel_reduce(elem_range.reset(mesh.active_local_elements_begin(),
@@ -1138,7 +1138,7 @@ void FEMSystem::assemble_qoi (const QoISet & qoi_indices)
                            qoi_contributions);
 
   std::vector<Number> global_qoi = this->get_qoi_values();
-  this->diff_qoi->parallel_op( this->comm(), global_qoi, qoi_contributions.qoi, qoi_indices );
+  this->get_qoi()->parallel_op( this->comm(), global_qoi, qoi_contributions.qoi, qoi_indices );
   this->set_qoi(std::move(global_qoi));
 }
 
@@ -1164,13 +1164,13 @@ void FEMSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
   Threads::parallel_for (elem_range.reset(mesh.active_local_elements_begin(),
                                           mesh.active_local_elements_end()),
                          QoIDerivativeContributions(*this, qoi_indices,
-                                                    *(this->diff_qoi),
+                                                    *(this->get_qoi()),
                                                     include_liftfunc,
                                                     apply_constraints));
 
   for (auto i : make_range(this->n_qois()))
     if (qoi_indices.has_index(i))
-      this->diff_qoi->finalize_derivative(this->get_adjoint_rhs(i),i);
+      this->get_qoi()->finalize_derivative(this->get_adjoint_rhs(i),i);
 }
 
 
