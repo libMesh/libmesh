@@ -37,6 +37,7 @@ enum ElemType : int;
 // C++ includes
 #include <vector>
 #include <set>
+#include <memory>
 
 namespace libMesh
 {
@@ -73,7 +74,7 @@ struct predicate
 
 protected:
   friend struct abstract_multi_predicate<T>;
-  virtual predicate * clone() const = 0;
+  virtual std::unique_ptr<predicate> clone() const = 0;
 };
 
 
@@ -87,7 +88,7 @@ struct is_null : predicate<T>
   virtual bool operator()(const T & it) const override { return *it == nullptr; }
 
 protected:
-  virtual predicate<T> * clone() const override { return new is_null<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<is_null<T>>(*this); }
 };
 
 /**
@@ -99,7 +100,7 @@ struct not_null : is_null<T>
   virtual bool operator()(const T & it) const override { return !is_null<T>::operator()(it); }
 
 protected:
-  virtual predicate<T> * clone() const override { return new not_null<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<not_null<T>>(*this); }
 };
 
 
@@ -113,7 +114,7 @@ struct active : predicate<T>
   virtual bool operator()(const T & it) const override { return (*it)->active(); }
 
 protected:
-  virtual predicate<T> * clone() const override { return new active<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<active<T>>(*this); }
 };
 
 /**
@@ -125,7 +126,7 @@ struct not_active : active<T>
   virtual bool operator()(const T & it) const override { return !active<T>::operator()(it); }
 
 protected:
-  virtual predicate<T> * clone() const override { return new not_active<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<not_active<T>>(*this); }
 };
 
 
@@ -139,7 +140,7 @@ struct ancestor : predicate<T>
   virtual bool operator()(const T & it) const override { return (*it)->ancestor(); }
 
 protected:
-  virtual predicate<T> * clone() const override { return new ancestor<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<ancestor<T>>(*this); }
 };
 
 /**
@@ -151,7 +152,7 @@ struct not_ancestor : ancestor<T>
   virtual bool operator()(const T & it) const override { return !ancestor<T>::operator()(it); }
 
 protected:
-  virtual predicate<T> * clone() const override { return new not_ancestor<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<not_ancestor<T>>(*this); }
 };
 
 
@@ -165,7 +166,7 @@ struct subactive : predicate<T>
   virtual bool operator()(const T & it) const override { return (*it)->subactive(); }
 
 protected:
-  virtual predicate<T> * clone() const override { return new subactive<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<subactive<T>>(*this); }
 };
 
 /**
@@ -177,7 +178,7 @@ struct not_subactive : subactive<T>
   virtual bool operator()(const T & it) const override { return !subactive<T>::operator()(it); }
 
 protected:
-  virtual predicate<T> * clone() const override { return new not_subactive<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<not_subactive<T>>(*this); }
 };
 
 
@@ -195,7 +196,7 @@ struct pid : predicate<T>
   virtual bool operator()(const T & it) const override { return (*it)->processor_id() == _pid; }
 
 protected:
-  virtual predicate<T> * clone() const override { return new pid<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<pid<T>>(*this); }
   const processor_id_type _pid;
 };
 
@@ -218,7 +219,7 @@ struct bid : predicate<T>
   virtual bool operator()(const T & it) const override;
 
 protected:
-  virtual predicate<T> * clone() const override { return new bid<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<bid<T>>(*this); }
   const boundary_id_type _bid;
   const BoundaryInfo & _bndry_info;
 };
@@ -240,7 +241,7 @@ struct bnd : predicate<T>
   virtual bool operator()(const T & it) const override;
 
 protected:
-  virtual predicate<T> * clone() const override { return new bnd<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<bnd<T>>(*this); }
   const BoundaryInfo & _bndry_info;
 };
 
@@ -260,7 +261,7 @@ struct semilocal_pid : predicate<T>
   virtual bool operator()(const T & it) const override { return (*it)->is_semilocal(_pid); }
 
 protected:
-  virtual predicate<T> * clone() const override { return new semilocal_pid<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<semilocal_pid<T>>(*this); }
   const processor_id_type _pid;
 };
 
@@ -288,7 +289,7 @@ struct facelocal_pid : predicate<T>
   }
 
 protected:
-  virtual predicate<T> * clone() const override { return new facelocal_pid<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<facelocal_pid<T>>(*this); }
   const processor_id_type _pid;
 };
 
@@ -305,7 +306,7 @@ struct not_pid : pid<T>
   virtual bool operator()(const T & it) const override { return !pid<T>::operator()(it); }
 
 protected:
-  virtual predicate<T> * clone() const override { return new not_pid<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<not_pid<T>>(*this); }
 };
 
 
@@ -323,7 +324,7 @@ struct elem_type : predicate<T>
   virtual bool operator()(const T & it) const override { return (*it)->type() == _elem_type; }
 
 protected:
-  virtual predicate<T> * clone() const override { return new elem_type<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<elem_type<T>>(*this); }
   const ElemType _elem_type;
 };
 
@@ -344,7 +345,7 @@ struct flagged : predicate<T>
   virtual bool operator()(const T & it) const override { return (*it)->refinement_flag() == _rflag; }
 
 protected:
-  virtual predicate<T> * clone() const override { return new flagged<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<flagged<T>>(*this); }
   const unsigned char _rflag;
 };
 #endif // LIBMESH_ENABLE_AMR
@@ -366,7 +367,7 @@ struct level : predicate<T>
   virtual bool operator()(const T & it) const override { return (*it)->level() == _level; }
 
 protected:
-  virtual predicate<T> * clone() const override { return new level<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<level<T>>(*this); }
   const unsigned int _level;
 };
 
@@ -384,7 +385,7 @@ struct not_level : level<T>
   virtual bool operator()(const T & it) const override { return !level<T>::operator()(it); }
 
 protected:
-  virtual predicate<T> * clone() const override { return new not_level<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<not_level<T>>(*this); }
 };
 
 
@@ -403,7 +404,7 @@ struct null_neighbor : predicate<T>
   }
 
 protected:
-  virtual predicate<T> * clone() const override { return new null_neighbor<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<null_neighbor<T>>(*this); }
 };
 
 
@@ -425,7 +426,7 @@ struct boundary_side : predicate<T>
   }
 
 protected:
-  virtual predicate<T> * clone() const override { return new boundary_side<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<boundary_side<T>>(*this); }
 };
 
 /**
@@ -442,7 +443,7 @@ struct subdomain : predicate<T>
   virtual bool operator()(const T & it) const override { return (*it)->subdomain_id() == _subdomain; }
 
 protected:
-  virtual predicate<T> * clone() const override { return new subdomain<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<subdomain<T>>(*this); }
   const subdomain_id_type _subdomain;
 };
 
@@ -461,7 +462,7 @@ struct subdomain_set : predicate<T>
   virtual bool operator()(const T & it) const override { return _subdomain_set.count((*it)->subdomain_id()); }
 
 protected:
-  virtual predicate<T> * clone() const override { return new subdomain_set<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<subdomain_set<T>>(*this); }
   const std::set<subdomain_id_type> _subdomain_set;
 };
 
@@ -483,7 +484,7 @@ struct evaluable : predicate<T>
   virtual bool operator()(const T & it) const override;
 
 protected:
-  virtual predicate<T> * clone() const override { return new evaluable<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<evaluable<T>>(*this); }
   const DofMap & _dof_map;
   unsigned int _var_num;
 };
@@ -504,7 +505,7 @@ struct multi_evaluable : predicate<T>
   virtual bool operator()(const T & it) const override;
 
 protected:
-  virtual predicate<T> * clone() const override { return new multi_evaluable<T>(*this); }
+  virtual std::unique_ptr<predicate<T>> clone() const override { return std::make_unique<multi_evaluable<T>>(*this); }
   std::vector<const DofMap *> _dof_maps;
 };
 
