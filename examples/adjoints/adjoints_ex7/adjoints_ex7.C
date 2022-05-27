@@ -647,9 +647,8 @@ int main (int argc, char ** argv)
 
           system.set_adjoint_already_solved(false);
 
-          // Swap in the physics we want to be used for the adjoint evaluation
-          DifferentiablePhysics * adjoint_evaluation_physics = dynamic_cast<DifferentiablePhysics *>(sigma_physics);
-          dynamic_cast<DifferentiableSystem &>(system).swap_physics(adjoint_evaluation_physics);
+          // Temporarily enable the physics we want to be used for the adjoint evaluation
+          system.push_physics(*sigma_physics);
 
           system.adjoint_solve();
 
@@ -670,8 +669,8 @@ int main (int argc, char ** argv)
                        << std::endl
                        << std::endl;
 
-          // Swap back the physics
-          dynamic_cast<DifferentiableSystem &>(system).swap_physics(adjoint_evaluation_physics);
+          // Return to the original physics
+          system.pop_physics();
 
           // Now that we have solved the adjoint, set the
           // adjoint_already_solved boolean to true, so we dont solve
