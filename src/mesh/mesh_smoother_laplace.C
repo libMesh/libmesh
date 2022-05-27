@@ -67,44 +67,49 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
     {
       new_positions.resize(_mesh.max_node_id());
 
-      for (auto & node : _mesh.local_node_ptr_range())
-        {
-          libmesh_error_msg_if(node == nullptr,
-                               "[" << _mesh.processor_id() << "]: Node iterator returned nullptr.");
-
-          // leave the boundary intact
-          // Only relocate the nodes which are vertices of an element
-          // All other entries of _graph (the secondary nodes) are empty
-          if (!on_boundary.count(node->id()) && (_graph[node->id()].size() > 0))
-            {
-              Point avg_position(0.,0.,0.);
-
-              for (const auto & connected_id : _graph[node->id()])
-                {
-                  // Will these nodal positions always be available
-                  // or will they refer to remote nodes?  This will
-                  // fail an assertion in the latter case, which
-                  // shouldn't occur if DistributedMesh is working
-                  // correctly.
-                  const Point & connected_node = _mesh.point(connected_id);
-
-                  avg_position.add( connected_node );
-                } // end for (j)
-
-              // Compute the average, store in the new_positions vector
-              new_positions[node->id()] = avg_position / static_cast<Real>(_graph[node->id()].size());
-            } // end if
-        } // end for
-
-
-      // now update the node positions (local node positions only)
-      for (auto & node : _mesh.local_node_ptr_range())
+      auto calculate_new_position = [this, &on_boundary, &new_positions](const Node * node) {
+        // leave the boundary intact
+        // Only relocate the nodes which are vertices of an element
+        // All other entries of _graph (the secondary nodes) are empty
         if (!on_boundary.count(node->id()) && (_graph[node->id()].size() > 0))
           {
-            // Should call Point::op=
-            // libMesh::out << "Setting node id " << node->id() << " to position " << new_positions[node->id()];
-            _mesh.node_ref(node->id()) = new_positions[node->id()];
-          }
+            Point avg_position(0.,0.,0.);
+
+            for (const auto & connected_id : _graph[node->id()])
+              {
+                // Will these nodal positions always be available
+                // or will they refer to remote nodes?  This will
+                // fail an assertion in the latter case, which
+                // shouldn't occur if DistributedMesh is working
+                // correctly.
+                const Point & connected_node = _mesh.point(connected_id);
+
+                avg_position.add( connected_node );
+              } // end for (j)
+
+            // Compute the average, store in the new_positions vector
+            new_positions[node->id()] = avg_position / static_cast<Real>(_graph[node->id()].size());
+          } // end if
+      };
+
+      // calculate new node positions (local and unpartitioned nodes only)
+      for (auto & node : _mesh.local_node_ptr_range())
+        calculate_new_position(node);
+
+      for (auto & node : as_range(_mesh.pid_nodes_begin(DofObject::invalid_processor_id),
+                                  _mesh.pid_nodes_end(DofObject::invalid_processor_id)))
+        calculate_new_position(node);
+
+
+      // now update the node positions (local and unpartitioned nodes only)
+      for (auto & node : _mesh.local_node_ptr_range())
+        if (!on_boundary.count(node->id()) && (_graph[node->id()].size() > 0))
+          *node = new_positions[node->id()];
+
+      for (auto & node : as_range(_mesh.pid_nodes_begin(DofObject::invalid_processor_id),
+                                  _mesh.pid_nodes_end(DofObject::invalid_processor_id)))
+        if (!on_boundary.count(node->id()) && (_graph[node->id()].size() > 0))
+          *node = new_positions[node->id()];
 
       // Now the nodes which are ghosts on this processor may have been moved on
       // the processors which own them.  So we need to synchronize with our neighbors
