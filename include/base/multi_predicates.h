@@ -116,7 +116,6 @@ protected:
 template <typename T>
 struct IsNull : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back a single predicate
   IsNull()
   {
     this->_predicates.push_back(std::make_unique<is_null<T>>());
@@ -131,7 +130,6 @@ struct IsNull : abstract_multi_predicate<T>
 template <typename T>
 struct NotNull : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back a single predicate
   NotNull()
   {
     this->_predicates.push_back(std::make_unique<not_null<T>>());
@@ -146,7 +144,6 @@ struct NotNull : abstract_multi_predicate<T>
 template <typename T>
 struct Active : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   Active()
   {
     this->_predicates.push_back(std::make_unique<not_null<T>>());
@@ -162,7 +159,6 @@ struct Active : abstract_multi_predicate<T>
 template <typename T>
 struct NotActive : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   NotActive()
   {
     this->_predicates.push_back(std::make_unique<not_null<T>>());
@@ -180,7 +176,6 @@ struct NotActive : abstract_multi_predicate<T>
 template <typename T>
 struct Ancestor : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   Ancestor()
   {
     this->_predicates.push_back(std::make_unique<not_null<T>>());
@@ -198,7 +193,6 @@ struct Ancestor : abstract_multi_predicate<T>
 template <typename T>
 struct NotAncestor : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   NotAncestor()
   {
     this->_predicates.push_back(std::make_unique<not_null<T>>());
@@ -216,7 +210,6 @@ struct NotAncestor : abstract_multi_predicate<T>
 template <typename T>
 struct SubActive : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   SubActive()
   {
     this->_predicates.push_back(std::make_unique<not_null<T>>());
@@ -234,7 +227,6 @@ struct SubActive : abstract_multi_predicate<T>
 template <typename T>
 struct NotSubActive : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   NotSubActive()
   {
     this->_predicates.push_back(std::make_unique<not_null<T>>());
@@ -251,7 +243,6 @@ struct NotSubActive : abstract_multi_predicate<T>
 template <typename T>
 struct Local : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   Local(processor_id_type my_pid)
   {
     this->_predicates.push_back(std::make_unique<not_null<T>>());
@@ -272,7 +263,6 @@ struct Local : abstract_multi_predicate<T>
 // template <typename T>
 // struct SemiLocal : abstract_multi_predicate<T>
 // {
-//   // Constructor, pushes back two single predicates
 //   SemiLocal(processor_id_type my_pid)
 //   {
 //     this->_predicates.push_back(std::make_unique<not_null<T>>());
@@ -289,7 +279,6 @@ struct Local : abstract_multi_predicate<T>
 template <typename T>
 struct ActiveSemiLocal : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   ActiveSemiLocal(processor_id_type my_pid)
   {
     this->_predicates.push_back(std::make_unique<not_null<T>>());
@@ -308,7 +297,6 @@ struct ActiveSemiLocal : abstract_multi_predicate<T>
 template <typename T>
 struct FaceLocal : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   FaceLocal(processor_id_type my_pid)
   {
     this->_predicates.push_back(std::make_unique<not_null<T>>());
@@ -326,7 +314,6 @@ struct FaceLocal : abstract_multi_predicate<T>
 template <typename T>
 struct NotLocal : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   NotLocal(processor_id_type my_pid)
   {
     this->_predicates.push_back(std::make_unique<not_null<T>>());
@@ -342,7 +329,6 @@ struct NotLocal : abstract_multi_predicate<T>
 template <typename T>
 struct ActiveNotLocal : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   ActiveNotLocal(processor_id_type my_pid)
   {
     this->_predicates.push_back(std::make_unique<not_null<T>>());
