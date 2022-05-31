@@ -24,6 +24,7 @@
 
 // C++ includes
 #include <vector>
+#include <memory>
 
 namespace libMesh {
 class Elem;
@@ -56,21 +57,12 @@ template <typename T>
 struct abstract_multi_predicate : multi_predicate
 {
   // virtual destructor.
-  virtual ~abstract_multi_predicate()
-  {
-    // Clean-up vector
-    for (auto p : _predicates)
-      delete p;
-  }
+  virtual ~abstract_multi_predicate() = default;
 
   // operator= (perform deep copy of entries in _predicates vector
   abstract_multi_predicate & operator=(const abstract_multi_predicate & rhs)
   {
-    // First clear out the predicates vector
-    for (auto p : _predicates)
-      delete p;
-
-    // Now copy over the information from the rhs.
+    // Copy over the information from the rhs.
     this->deep_copy(rhs);
 
     return *this;
@@ -79,7 +71,7 @@ struct abstract_multi_predicate : multi_predicate
   // operator() checks all the predicates in the vector.
   virtual bool operator()(const T & it) const
   {
-    for (const auto pred : _predicates)
+    for (const auto & pred : _predicates)
       {
         libmesh_assert (pred);
 
@@ -92,7 +84,7 @@ struct abstract_multi_predicate : multi_predicate
 
 protected:
   // Do not instantiate the base class.
-  abstract_multi_predicate() {}
+  abstract_multi_predicate() = default;
 
   // Copy constructor.
   abstract_multi_predicate(const abstract_multi_predicate & rhs)
@@ -105,12 +97,15 @@ protected:
   // copy constructor for the predicate class.
   void deep_copy(const abstract_multi_predicate & rhs)
   {
-    for (auto p : rhs._predicates)
+    // First clear out the predicates vector
+    _predicates.clear();
+
+    for (const auto & p : rhs._predicates)
       _predicates.push_back(p->clone());
   }
 
   // Predicates to be evaluated.
-  std::vector<predicate<T> *> _predicates;
+  std::vector<std::unique_ptr<predicate<T>>> _predicates;
 };
 
 
@@ -121,10 +116,9 @@ protected:
 template <typename T>
 struct IsNull : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back a single predicate
   IsNull()
   {
-    this->_predicates.push_back(new is_null<T>);
+    this->_predicates.push_back(std::make_unique<is_null<T>>());
   }
 };
 
@@ -136,10 +130,9 @@ struct IsNull : abstract_multi_predicate<T>
 template <typename T>
 struct NotNull : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back a single predicate
   NotNull()
   {
-    this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
   }
 };
 
@@ -151,11 +144,10 @@ struct NotNull : abstract_multi_predicate<T>
 template <typename T>
 struct Active : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   Active()
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
   }
 };
 
@@ -167,11 +159,10 @@ struct Active : abstract_multi_predicate<T>
 template <typename T>
 struct NotActive : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   NotActive()
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_active<T>);
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<not_active<T>>());
   }
 };
 
@@ -185,11 +176,10 @@ struct NotActive : abstract_multi_predicate<T>
 template <typename T>
 struct Ancestor : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   Ancestor()
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new ancestor<T>);
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<ancestor<T>>());
   }
 };
 
@@ -203,11 +193,10 @@ struct Ancestor : abstract_multi_predicate<T>
 template <typename T>
 struct NotAncestor : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   NotAncestor()
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_ancestor<T>);
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<not_ancestor<T>>());
   }
 };
 
@@ -221,11 +210,10 @@ struct NotAncestor : abstract_multi_predicate<T>
 template <typename T>
 struct SubActive : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   SubActive()
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new subactive<T>);
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<subactive<T>>());
   }
 };
 
@@ -239,11 +227,10 @@ struct SubActive : abstract_multi_predicate<T>
 template <typename T>
 struct NotSubActive : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   NotSubActive()
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_subactive<T>);
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<not_subactive<T>>());
   }
 };
 
@@ -256,11 +243,10 @@ struct NotSubActive : abstract_multi_predicate<T>
 template <typename T>
 struct Local : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   Local(processor_id_type my_pid)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new pid<T>(my_pid));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<pid<T>>(my_pid));
   }
 };
 
@@ -277,12 +263,11 @@ struct Local : abstract_multi_predicate<T>
 // template <typename T>
 // struct SemiLocal : abstract_multi_predicate<T>
 // {
-//   // Constructor, pushes back two single predicates
 //   SemiLocal(processor_id_type my_pid)
 //   {
-//     this->_predicates.push_back(new not_null<T>);
-//     this->_predicates.push_back(new not_subactive<T>);
-//     this->_predicates.push_back(new semilocal_pid<T>(my_pid));
+//     this->_predicates.push_back(std::make_unique<not_null<T>>());
+//     this->_predicates.push_back(std::make_unique<not_subactive<T>>());
+//     this->_predicates.push_back(std::make_unique<semilocal_pid<T>>(my_pid));
 //   }
 // };
 
@@ -294,13 +279,12 @@ struct Local : abstract_multi_predicate<T>
 template <typename T>
 struct ActiveSemiLocal : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   ActiveSemiLocal(processor_id_type my_pid)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new not_subactive<T>);
-    this->_predicates.push_back(new semilocal_pid<T>(my_pid));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
+    this->_predicates.push_back(std::make_unique<not_subactive<T>>());
+    this->_predicates.push_back(std::make_unique<semilocal_pid<T>>(my_pid));
   }
 };
 
@@ -313,12 +297,11 @@ struct ActiveSemiLocal : abstract_multi_predicate<T>
 template <typename T>
 struct FaceLocal : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   FaceLocal(processor_id_type my_pid)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_subactive<T>);
-    this->_predicates.push_back(new facelocal_pid<T>(my_pid));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<not_subactive<T>>());
+    this->_predicates.push_back(std::make_unique<facelocal_pid<T>>(my_pid));
   }
 };
 
@@ -331,11 +314,10 @@ struct FaceLocal : abstract_multi_predicate<T>
 template <typename T>
 struct NotLocal : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   NotLocal(processor_id_type my_pid)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_pid<T>(my_pid));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<not_pid<T>>(my_pid));
   }
 };
 
@@ -347,12 +329,11 @@ struct NotLocal : abstract_multi_predicate<T>
 template <typename T>
 struct ActiveNotLocal : abstract_multi_predicate<T>
 {
-  // Constructor, pushes back two single predicates
   ActiveNotLocal(processor_id_type my_pid)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new not_pid<T>(my_pid));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
+    this->_predicates.push_back(std::make_unique<not_pid<T>>(my_pid));
   }
 };
 
@@ -365,8 +346,8 @@ struct Type : abstract_multi_predicate<T>
 {
   Type(ElemType type)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new elem_type<T>(type));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<elem_type<T>>(type));
   }
 };
 
@@ -380,9 +361,9 @@ struct ActiveType : abstract_multi_predicate<T>
 {
   ActiveType(ElemType type)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new elem_type<T>(type));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
+    this->_predicates.push_back(std::make_unique<elem_type<T>>(type));
   }
 };
 
@@ -398,8 +379,8 @@ struct Flagged : abstract_multi_predicate<T>
 {
   Flagged(unsigned char rflag)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new flagged<T>(rflag));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<flagged<T>>(rflag));
   }
 };
 
@@ -414,9 +395,9 @@ struct FlaggedPID : abstract_multi_predicate<T>
 {
   FlaggedPID(unsigned char rflag, processor_id_type proc_id)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new flagged<T>(rflag));
-    this->_predicates.push_back(new pid<T>(proc_id));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<flagged<T>>(rflag));
+    this->_predicates.push_back(std::make_unique<pid<T>>(proc_id));
   }
 };
 
@@ -434,9 +415,9 @@ struct ActivePID : abstract_multi_predicate<T>
 {
   ActivePID(processor_id_type proc_id)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new pid<T>(proc_id));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
+    this->_predicates.push_back(std::make_unique<pid<T>>(proc_id));
   }
 };
 
@@ -453,9 +434,9 @@ struct ActiveLocal : abstract_multi_predicate<T>
 {
   ActiveLocal(processor_id_type my_pid)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new pid<T>(my_pid));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
+    this->_predicates.push_back(std::make_unique<pid<T>>(my_pid));
   }
 };
 
@@ -471,8 +452,8 @@ struct PID : abstract_multi_predicate<T>
 {
   PID(processor_id_type proc_id)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new pid<T>(proc_id));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<pid<T>>(proc_id));
   }
 };
 
@@ -487,8 +468,8 @@ struct BID : abstract_multi_predicate<T>
 {
   BID(boundary_id_type bndry_id, const BoundaryInfo & bndry_info)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new bid<T>(bndry_id, bndry_info));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<bid<T>>(bndry_id, bndry_info));
   }
 };
 
@@ -502,8 +483,8 @@ struct BND : abstract_multi_predicate<T>
 {
   BND(const BoundaryInfo & bndry_info)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new bnd<T>(bndry_info));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<bnd<T>>(bndry_info));
   }
 };
 
@@ -518,8 +499,8 @@ struct NotPID : abstract_multi_predicate<T>
 {
   NotPID(processor_id_type proc_id)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_pid<T>(proc_id));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<not_pid<T>>(proc_id));
   }
 };
 
@@ -533,8 +514,8 @@ struct Level : abstract_multi_predicate<T>
 {
   Level(unsigned int l)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new level<T>(l));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<level<T>>(l));
   }
 };
 
@@ -549,8 +530,8 @@ struct NotLevel : abstract_multi_predicate<T>
 {
   NotLevel(unsigned int l)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_level<T>(l));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<not_level<T>>(l));
   }
 };
 
@@ -566,9 +547,9 @@ struct LocalLevel : abstract_multi_predicate<T>
   LocalLevel(processor_id_type my_pid,
              unsigned int l)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new pid<T>(my_pid));
-    this->_predicates.push_back(new level<T>(l));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<pid<T>>(my_pid));
+    this->_predicates.push_back(std::make_unique<level<T>>(l));
   }
 };
 
@@ -584,9 +565,9 @@ struct LocalNotLevel : abstract_multi_predicate<T>
   LocalNotLevel(processor_id_type my_pid,
                 unsigned int l)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new pid<T>(my_pid));
-    this->_predicates.push_back(new not_level<T>(l));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<pid<T>>(my_pid));
+    this->_predicates.push_back(std::make_unique<not_level<T>>(l));
   }
 };
 
@@ -601,9 +582,9 @@ struct ActiveOnBoundary : abstract_multi_predicate<T>
 {
   ActiveOnBoundary()
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new null_neighbor<T>);
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
+    this->_predicates.push_back(std::make_unique<null_neighbor<T>>());
   }
 };
 
@@ -618,7 +599,7 @@ struct BoundarySide : abstract_multi_predicate<T>
 {
   BoundarySide()
   {
-    this->_predicates.push_back(new boundary_side<T>);
+    this->_predicates.push_back(std::make_unique<boundary_side<T>>());
   }
 };
 
@@ -634,10 +615,10 @@ struct ActiveLocalSubdomain : abstract_multi_predicate<T>
   ActiveLocalSubdomain(processor_id_type my_pid,
                        subdomain_id_type subdomain_id)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new pid<T>(my_pid));
-    this->_predicates.push_back(new subdomain<T>(subdomain_id));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
+    this->_predicates.push_back(std::make_unique<pid<T>>(my_pid));
+    this->_predicates.push_back(std::make_unique<subdomain<T>>(subdomain_id));
   }
 };
 
@@ -652,9 +633,9 @@ struct ActiveSubdomain : abstract_multi_predicate<T>
 {
   ActiveSubdomain(subdomain_id_type subdomain_id)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new subdomain<T>(subdomain_id));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
+    this->_predicates.push_back(std::make_unique<subdomain<T>>(subdomain_id));
   }
 };
 
@@ -669,9 +650,9 @@ struct ActiveSubdomainSet : abstract_multi_predicate<T>
 {
   ActiveSubdomainSet(std::set<subdomain_id_type> sset)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new subdomain_set<T>(sset));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
+    this->_predicates.push_back(std::make_unique<subdomain_set<T>>(sset));
   }
 };
 
@@ -687,10 +668,10 @@ struct ActiveLocalSubdomainSet : abstract_multi_predicate<T>
   ActiveLocalSubdomainSet(processor_id_type my_pid,
                           std::set<subdomain_id_type> sset)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new pid<T>(my_pid));
-    this->_predicates.push_back(new subdomain_set<T>(sset));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
+    this->_predicates.push_back(std::make_unique<pid<T>>(my_pid));
+    this->_predicates.push_back(std::make_unique<subdomain_set<T>>(sset));
   }
 };
 
@@ -708,10 +689,10 @@ struct Ghost : abstract_multi_predicate<T>
 {
   Ghost(processor_id_type my_pid)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new not_pid<T>(my_pid));
-    this->_predicates.push_back(new semilocal_pid<T>(my_pid));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
+    this->_predicates.push_back(std::make_unique<not_pid<T>>(my_pid));
+    this->_predicates.push_back(std::make_unique<semilocal_pid<T>>(my_pid));
   }
 };
 
@@ -727,9 +708,9 @@ struct Evaluable: abstract_multi_predicate<T>
   Evaluable(const DofMap & dof_map,
             unsigned int var_num = libMesh::invalid_uint)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new evaluable<T>(dof_map, var_num));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
+    this->_predicates.push_back(std::make_unique<evaluable<T>>(dof_map, var_num));
   }
 };
 
@@ -744,9 +725,9 @@ struct MultiEvaluable: abstract_multi_predicate<T>
 {
   MultiEvaluable(const std::vector<const DofMap *> & dof_maps)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new multi_evaluable<T>(dof_maps));
+    this->_predicates.push_back(std::make_unique<not_null<T>>());
+    this->_predicates.push_back(std::make_unique<active<T>>());
+    this->_predicates.push_back(std::make_unique<multi_evaluable<T>>(dof_maps));
   }
 };
 
