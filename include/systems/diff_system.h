@@ -29,6 +29,7 @@
 
 // C++ includes
 #include <memory>
+#include <stack>
 
 namespace libMesh
 {
