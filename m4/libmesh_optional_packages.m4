@@ -105,6 +105,21 @@ AC_ARG_ENABLE(nested,
 # XDR headers to be in different places, so it's more convenient
 # to test for it here.
 # --------------------------------------------------------------
+
+dnl Setting --enable-xdr-required causes an error to be emitted
+dnl during configure if XDR headers are not detected successfully during
+dnl configure.  This is useful for app codes which require XDR (like
+dnl MOOSE-based apps).
+AC_ARG_ENABLE(xdr-required,
+              AC_HELP_STRING([--enable-xdr-required],
+                             [Error if XDR is not detected by configure]),
+              [AS_CASE("${enableval}",
+                       [yes], [xdrrequired=yes],
+                       [no],  [xdrrequired=no],
+                       [AC_MSG_ERROR(bad value ${enableval} for --enable-xdr-required)])],
+                   [xdrrequired=no])
+
+
 AC_ARG_ENABLE(xdr,
               AS_HELP_STRING([--disable-xdr],
                              [build without XDR platform-independent binary I/O]),
@@ -140,6 +155,9 @@ AS_IF([test "$enablexdr" != no],
               LIBS="$old_LIBS"
            ])
       ])
+AS_IF([test "x$enablexdr" = "xno" && test "x$xdrrequired" = "xyes"],
+      [AC_MSG_ERROR([*** XDR was not found, but --enable-xdr-required was specified.], 4)])
+
 # -------------------------------------------------------------
 
 

@@ -1219,6 +1219,7 @@ enable_perflog
 enable_examples
 enable_strict_lgpl
 enable_nested
+enable_xdr_required
 enable_xdr
 enable_boost
 with_boost
@@ -2032,6 +2033,7 @@ Optional Features:
   --disable-strict-lgpl   Compile libmesh with even non-LGPL-compatible
                           contrib libraries
   --disable-nested        Do not use nested autoconf subpackages
+  --enable-xdr-required   Error if XDR is not detected by configure
   --disable-xdr           build without XDR platform-independent binary I/O
   --disable-boost         build without either external or built-in BOOST
                           support
@@ -47829,6 +47831,23 @@ fi
 # XDR headers to be in different places, so it's more convenient
 # to test for it here.
 # --------------------------------------------------------------
+
+# Check whether --enable-xdr-required was given.
+if test "${enable_xdr_required+set}" = set; then :
+  enableval=$enable_xdr_required; case "${enableval}" in #(
+  yes) :
+    xdrrequired=yes ;; #(
+  no) :
+    xdrrequired=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-xdr-required" "$LINENO" 5 ;;
+esac
+else
+  xdrrequired=no
+fi
+
+
+
 # Check whether --enable-xdr was given.
 if test "${enable_xdr+set}" = set; then :
   enableval=$enable_xdr; enablexdr=$enableval
@@ -47939,6 +47958,10 @@ fi
 fi
 
 fi
+if test "x$enablexdr" = "xno" && test "x$xdrrequired" = "xyes"; then :
+  as_fn_error 4 "*** XDR was not found, but --enable-xdr-required was specified." "$LINENO" 5
+fi
+
 # -------------------------------------------------------------
 
 
