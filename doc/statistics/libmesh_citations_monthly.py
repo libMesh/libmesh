@@ -184,6 +184,7 @@ pub_2022 = [
   '2022-03-01', 47,
   '2022-04-01', 66,
   '2022-05-01', 78,
+  '2022-06-01', 101,
 ]
 
 """
@@ -220,7 +221,7 @@ plot_one_year(2018, pub_2018, muted_light_blue)
 plot_one_year(2019, pub_2019, muted_green)
 plot_one_year(2020, pub_2020, muted_red)
 plot_one_year(2021, pub_2021, muted_pink)
-plot_one_year(2022, pub_2022, muted_orange)
+plot_one_year(2022, pub_2022, 'k')
 
 # Label beginning and end of year.
 ax1.set_xticks([0, 12])
