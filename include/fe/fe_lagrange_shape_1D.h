@@ -20,8 +20,7 @@
 #define LIBMESH_FE_LAGRANGE_SHAPE_1D_H
 
 // Local includes
-#include "libmesh/enum_elem_type.h"
-#include "libmesh/enum_order.h"
+#include "libmesh/enum_order.h" // FIRST, SECOND, etc.
 #include "libmesh/point.h"
 
 // Inline functions useful to inline on tensor elements.

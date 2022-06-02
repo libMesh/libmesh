@@ -22,7 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/enum_parallel_type.h"
+#include "libmesh/enum_parallel_type.h" // AUTOMATIC
 #include "libmesh/id_types.h"
 #include "libmesh/int_range.h"
 #include "libmesh/reference_counted_object.h"

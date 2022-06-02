@@ -31,7 +31,7 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/tensor_value.h" // For point_hessian
 #include "libmesh/variable.h"
-#include "libmesh/enum_matrix_build_type.h"
+#include "libmesh/enum_matrix_build_type.h" // AUTOMATIC
 
 // C++ includes
 #include <cstddef>

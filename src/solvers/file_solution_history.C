@@ -15,14 +15,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ include files that we need
-#include <iostream>
-// Local includes
+// libMesh includes
 #include "libmesh/file_solution_history.h"
 #include "libmesh/file_history_data.h"
-
 #include "libmesh/diff_system.h"
+#include "libmesh/numeric_vector.h"
 
+// C++ includes
+#include <iostream>
 #include <cmath>
 #include <iterator>
 
@@ -30,22 +30,25 @@ namespace libMesh
 {
 
 /**
-   * Constructor, reference to system to be passed by user, set the
-   * stored_datum iterator to some initial value
-   */
-  FileSolutionHistory::FileSolutionHistory(DifferentiableSystem & system_)
-  : SolutionHistory(), _system(system_)
-  {
-    dual_solution_copies.resize(system_.n_qois());
-    old_dual_solution_copies.resize(system_.n_qois());
-
-    libmesh_experimental();
-
-  }
-
-
-FileSolutionHistory::~FileSolutionHistory ()
+ * Constructor, reference to system to be passed by user, set the
+ * stored_datum iterator to some initial value
+ */
+FileSolutionHistory::FileSolutionHistory(DifferentiableSystem & system)
+  : SolutionHistory(), _system(system)
 {
+  dual_solution_copies.resize(_system.n_qois());
+  old_dual_solution_copies.resize(_system.n_qois());
+
+  libmesh_experimental();
+}
+
+
+FileSolutionHistory::~FileSolutionHistory () = default;
+
+std::unique_ptr<SolutionHistory>
+FileSolutionHistory::clone() const
+{
+  return std::make_unique<FileSolutionHistory>(_system);
 }
 
 // This functions writes the solution at the current system time to disk

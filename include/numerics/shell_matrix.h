@@ -28,7 +28,6 @@
 #include "libmesh/id_types.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/dof_map.h"
-#include "libmesh/enum_solver_package.h"
 #include "libmesh/parallel.h"
 
 namespace libMesh
@@ -36,7 +35,7 @@ namespace libMesh
 
 // forward declarations
 template <typename T> class NumericVector;
-
+enum SolverPackage : int;
 
 /**
  * Generic shell matrix, i.e. a matrix that does not define anything

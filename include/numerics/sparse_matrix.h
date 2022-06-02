@@ -27,8 +27,8 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/id_types.h"
 #include "libmesh/parallel_object.h"
-#include "libmesh/enum_parallel_type.h"
-#include "libmesh/enum_matrix_build_type.h"
+#include "libmesh/enum_parallel_type.h" // PARALLEL
+#include "libmesh/enum_matrix_build_type.h" // AUTOMATIC
 
 // C++ includes
 #include <cstddef>

@@ -23,7 +23,7 @@
 // Local includes
 #include "libmesh/compare_types.h"
 #include "libmesh/libmesh_config.h"
-#include "libmesh/enum_order.h"
+#include "libmesh/enum_order.h" // return Order objects
 #include "libmesh/enum_fe_family.h" // LAGRANGE
 #include "libmesh/enum_inf_map_type.h" // CARTESIAN
 #include "libmesh/hashing.h"
