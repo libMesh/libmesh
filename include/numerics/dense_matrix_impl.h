@@ -30,17 +30,7 @@
 #include "libmesh/libmesh.h"
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
-#include "metaphysicl/dualnumber_forward.h"
-
-namespace std
-{
-// When instantiating a DenseMatrix<DualNumber> we need these declarations visible
-// in order to compile the DenseMatrix<T>::_cholesky_decompose method
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> sqrt(const MetaPhysicL::DualNumber<T, D, asd> & in);
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> sqrt(MetaPhysicL::DualNumber<T, D, asd> && in);
-}
+#include "metaphysicl/dualnumber_decl.h"
 #endif
 
 namespace libMesh
