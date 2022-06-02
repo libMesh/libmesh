@@ -30,23 +30,7 @@
 #include <tuple>
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
-#include "metaphysicl/dualnumber_forward.h"
-
-namespace std
-{
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> norm(const MetaPhysicL::DualNumber<T, D, asd> & in);
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> norm(MetaPhysicL::DualNumber<T, D, asd> && in);
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> sqrt(const MetaPhysicL::DualNumber<T, D, asd> & in);
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> sqrt(MetaPhysicL::DualNumber<T, D, asd> && in);
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> abs(const MetaPhysicL::DualNumber<T, D, asd> & in);
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> abs(MetaPhysicL::DualNumber<T, D, asd> && in);
-}
+#include "metaphysicl/dualnumber_decl.h"
 #endif
 
 namespace libMesh
