@@ -27,18 +27,6 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
 
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum SolverPackage : int;
-enum PreconditionerType : int;
-}
-#else
-#include "libmesh/enum_solver_package.h"
-#include "libmesh/enum_preconditioner_type.h"
-#endif
-
-
 // C++ includes
 #include <cstddef>
 
@@ -49,6 +37,8 @@ namespace libMesh
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
+enum SolverPackage : int;
+enum PreconditionerType : int;
 
 /**
  * This class provides a uniform interface for preconditioners.  This base

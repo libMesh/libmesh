@@ -23,20 +23,12 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum ElemType : int;
-}
-#else
-#include "libmesh/enum_elem_type.h"
-#endif
-
 namespace libMesh
 {
 
 // forward declarations
 class Elem;
+enum ElemType : int;
 
 /**
  * This namespace implements singleton reference elements for each

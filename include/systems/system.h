@@ -33,15 +33,6 @@
 #include "libmesh/variable.h"
 #include "libmesh/enum_matrix_build_type.h"
 
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum FEMNormType : int;
-}
-#else
-#include "libmesh/enum_norm_type.h"
-#endif
-
 // C++ includes
 #include <cstddef>
 #include <set>
@@ -82,6 +73,7 @@ typedef NumberVectorValue Gradient;
 class SystemSubset;
 class FEType;
 class SystemNorm;
+enum FEMNormType : int;
 
 /**
  * \brief Manages consistently variables, degrees of freedom, and coefficient

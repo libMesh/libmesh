@@ -32,15 +32,6 @@
 #include "libmesh/petsc_macro.h"
 #include "libmesh/wrapped_petsc.h"
 
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum PreconditionerType : int;
-}
-#else
-#include "libmesh/enum_preconditioner_type.h"
-#endif
-
 // Petsc includes
 #include "petscpc.h"
 
@@ -51,6 +42,7 @@ namespace libMesh
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
+enum PreconditionerType : int;
 
 /**
  * This class provides an interface to the suite of preconditioners

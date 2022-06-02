@@ -27,15 +27,6 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
 
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum SolverPackage : int;
-}
-#else
-#include "libmesh/enum_solver_package.h"
-#endif
-
 // C++ includes
 #include <cstddef>
 #include <memory>
@@ -48,6 +39,7 @@ template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class Preconditioner;
 class SolverConfiguration;
+enum SolverPackage : int;
 
 /**
  * This base class can be inherited from to provide interfaces to

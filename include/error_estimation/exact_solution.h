@@ -22,15 +22,6 @@
 // Local Includes
 #include "libmesh/libmesh_common.h" // for Number
 
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum FEMNormType : int;
-}
-#else
-#include "libmesh/enum_norm_type.h"
-#endif
-
 // C++ includes
 #include <map>
 #include <vector>
@@ -47,6 +38,7 @@ class EquationSystems;
 class Parameters;
 class Mesh;
 template <typename Output> class FunctionBase;
+enum FEMNormType : int;
 
 // Is there any way to simplify this?
 // All we need are Tensor and Gradient. - RHS

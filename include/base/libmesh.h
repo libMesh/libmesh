@@ -25,21 +25,11 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh_base.h"
 
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum SolverPackage : int;
-}
-#else
-#include "libmesh/enum_solver_package.h"
-#endif
-
 // C++ includes
 #include <string>
 #include <vector>
 
 // Forward declarations
-
 // For dealing with MPI stuff in VTK.
 #if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
 class vtkMPIController;
@@ -65,6 +55,7 @@ namespace libMesh
 namespace Parallel {
   class Communicator;
 }
+enum SolverPackage : int;
 
 /**
  * The \p LibMeshInit class, when constructed, initializes
