@@ -85,7 +85,7 @@ XdrIO::XdrIO (MeshBase & mesh, const bool binary_in) :
   _write_unique_id    (false),
 #endif
   _field_width        (4),   // In 0.7.0, all fields are 4 bytes, in 0.9.2+ they can vary
-  _version            ("libMesh-1.3.0"),
+  _version            ("libMesh-1.8.0"),
   _bc_file_name       ("n/a"),
   _partition_map_file ("n/a"),
   _subdomain_map_file ("n/a"),
@@ -127,6 +127,8 @@ void XdrIO::write (const std::string & name)
   new_header_id_type n_shellface_bcs = mesh.get_boundary_info().n_shellface_conds();
   new_header_id_type n_nodesets = mesh.get_boundary_info().n_nodeset_conds();
   unsigned int n_p_levels = MeshTools::n_p_levels (mesh);
+  new_header_id_type n_elem_integers = mesh.n_elem_integers();
+  new_header_id_type n_node_integers = mesh.n_node_integers();
 
   bool write_parallel_files = this->write_parallel();
 
@@ -186,6 +188,24 @@ void XdrIO::write (const std::string & name)
       io.data (write_bcs          ? write_size : zero_size, "# eid size");   // elem id
       io.data (write_bcs          ? write_size : zero_size, "# side size");  // side number
       io.data (write_bcs          ? write_size : zero_size, "# bid size");   // boundary id
+
+      // Write the data size for extra integers stored on the mesh. Like
+      // everything else in the header, they will be of size write_size.
+      io.data((n_elem_integers || n_node_integers) ? write_size : zero_size, "# extra integer size");
+
+      // Write the total number and names of the extra node integers (see also: CheckpointIO).
+      std::vector<std::string> node_integer_names;
+      for (unsigned int i=0; i != n_node_integers; ++i)
+        node_integer_names.push_back(mesh.get_node_integer_name(i));
+      io.data(n_node_integers, "# n_extra_integers per node");
+      io.data(node_integer_names);
+
+      // Write the total number and names of the extra elem integers (see also: CheckpointIO).
+      std::vector<std::string> elem_integer_names;
+      for (unsigned int i=0; i != n_elem_integers; ++i)
+        elem_integer_names.push_back(mesh.get_elem_integer_name(i));
+      io.data(n_elem_integers, "# n_extra_integers per elem");
+      io.data(elem_integer_names);
     }
 
   if (write_parallel_files)
@@ -1226,14 +1246,17 @@ void XdrIO::read (const std::string & name)
 
   // Read headers with the old id type if they're pre-1.3.0, or with
   // the new id type if they're post-1.3.0
-  std::vector<new_header_id_type> meta_data(10, sizeof(xdr_id_type));
+  const unsigned int n_header_metadata_values = 11;
+  std::vector<new_header_id_type> meta_data(n_header_metadata_values, sizeof(xdr_id_type));
   if (this->version_at_least_1_3_0())
     {
       this->read_header(io, meta_data);
     }
   else
     {
-      std::vector<old_header_id_type> old_data(10, sizeof(xdr_id_type));
+      // In pre-1.3.0 format there were only 10 metadata values in the header, but
+      // in newer versions there are more. The unread values will be set to 0.
+      std::vector<old_header_id_type> old_data(n_header_metadata_values, sizeof(xdr_id_type));
 
       this->read_header(io, old_data);
 
@@ -1338,10 +1361,8 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
 
   if (this->processor_id() == 0)
     {
-      unsigned int pos=0;
-
-      io.data (meta_data[pos++]);
-      io.data (meta_data[pos++]);
+      io.data (meta_data[0]);
+      io.data (meta_data[1]);
       io.data (this->boundary_condition_file_name()); // libMesh::out << "bc_file="  << this->boundary_condition_file_name() << std::endl;
       io.data (this->subdomain_map_file_name());      // libMesh::out << "sid_file=" << this->subdomain_map_file_name()      << std::endl;
       io.data (this->partition_map_file_name());      // libMesh::out << "pid_file=" << this->partition_map_file_name()      << std::endl;
@@ -1349,15 +1370,55 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
 
       if (version_at_least_0_9_2())
         {
-          io.data (meta_data[pos++], "# type size");
-          io.data (meta_data[pos++], "# uid size");
-          io.data (meta_data[pos++], "# pid size");
-          io.data (meta_data[pos++], "# sid size");
-          io.data (meta_data[pos++], "# p-level size");
+          // Make sure there's enough room in meta_data
+          libmesh_assert_greater_equal(meta_data.size(), 10);
+
+          io.data (meta_data[2], "# type size");
+          io.data (meta_data[3], "# uid size");
+          io.data (meta_data[4], "# pid size");
+          io.data (meta_data[5], "# sid size");
+          io.data (meta_data[6], "# p-level size");
           // Boundary Condition sizes
-          io.data (meta_data[pos++], "# eid size");   // elem id
-          io.data (meta_data[pos++], "# side size");  // side number
-          io.data (meta_data[pos++], "# bid size");   // boundary id
+          io.data (meta_data[7], "# eid size");   // elem id
+          io.data (meta_data[8], "# side size");  // side number
+          io.data (meta_data[9], "# bid size");   // boundary id
+        }
+
+      if (version_at_least_1_8_0())
+        {
+          // Make sure there's enough room in meta_data
+          libmesh_assert_greater_equal(meta_data.size(), 11);
+
+          io.data (meta_data[10], "# extra integer size");   // extra integer size
+
+          // Debugging:
+          libMesh::out << "Read in extra integer size = " << meta_data[10] << std::endl;
+
+          // Read in number of node extra integers and names
+          new_header_id_type n_node_integers;
+          std::vector<std::string> node_integer_names;
+          io.data(n_node_integers, "# n_extra_integers per node");
+          io.data(node_integer_names);
+
+          // Read in number of elem extra integers and names
+          new_header_id_type n_elem_integers;
+          std::vector<std::string> elem_integer_names;
+          io.data(n_elem_integers, "# n_extra_integers per elem");
+          io.data(elem_integer_names);
+
+          // Debugging
+          libMesh::out << "Read in n_node_integers = " << n_node_integers << std::endl;
+          libMesh::out << "Read in node_integer_names = ";
+          for (const auto & name : node_integer_names)
+            libMesh::out << name << " ";
+          libMesh::out << std::endl;
+
+          // Debugging
+          libMesh::out << "Read in n_elem_integers = " << n_elem_integers << std::endl;
+          libMesh::out << "Read in elem_integer_names = ";
+          for (const auto & name : elem_integer_names)
+            libMesh::out << name << " ";
+          libMesh::out << std::endl;
         }
     }
 
@@ -2095,7 +2156,8 @@ bool XdrIO::version_at_least_0_9_2() const
     (this->version().find("0.9.2") != std::string::npos) ||
     (this->version().find("0.9.6") != std::string::npos) ||
     (this->version().find("1.1.0") != std::string::npos) ||
-    (this->version().find("1.3.0") != std::string::npos);
+    (this->version().find("1.3.0") != std::string::npos) ||
+    (this->version().find("1.8.0") != std::string::npos);
 }
 
 bool XdrIO::version_at_least_0_9_6() const
@@ -2103,20 +2165,29 @@ bool XdrIO::version_at_least_0_9_6() const
   return
     (this->version().find("0.9.6") != std::string::npos) ||
     (this->version().find("1.1.0") != std::string::npos) ||
-    (this->version().find("1.3.0") != std::string::npos);
+    (this->version().find("1.3.0") != std::string::npos) ||
+    (this->version().find("1.8.0") != std::string::npos);
 }
 
 bool XdrIO::version_at_least_1_1_0() const
 {
   return
     (this->version().find("1.1.0") != std::string::npos) ||
-    (this->version().find("1.3.0") != std::string::npos);
+    (this->version().find("1.3.0") != std::string::npos) ||
+    (this->version().find("1.8.0") != std::string::npos);
 }
 
 bool XdrIO::version_at_least_1_3_0() const
 {
   return
-    (this->version().find("1.3.0") != std::string::npos);
+    (this->version().find("1.3.0") != std::string::npos) ||
+    (this->version().find("1.8.0") != std::string::npos);
+}
+
+bool XdrIO::version_at_least_1_8_0() const
+{
+  return
+    (this->version().find("1.8.0") != std::string::npos);
 }
 
 } // namespace libMesh

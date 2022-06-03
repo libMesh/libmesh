@@ -201,6 +201,15 @@ public:
    */
   bool version_at_least_1_3_0() const;
 
+  /**
+   * \returns \p true if the current file has an XDR/XDA version that
+   * matches or exceeds 1.8.0.
+   *
+   * In this version we added support for writing the Mesh's "extra"
+   * integer fields to the file.
+   */
+  bool version_at_least_1_8_0() const;
+
 private:
 
 

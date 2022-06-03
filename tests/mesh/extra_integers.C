@@ -201,6 +201,16 @@ protected:
 
     // Make sure we didn't screw up any extra integers thereby.
     test_final_integers(mesh2, i1);
+
+    // Also test that we can successfully write extra integers to XDR/XDA files
+    libMesh::out << "Test writing extra integers to xdr/xda file" << std::endl;
+    const std::string xdr_filename =
+      std::string("extra_integers.xd") + (binary ? "r" : "a");
+    mesh.write(xdr_filename);
+    TestCommWorld->barrier();
+
+    // And test that we can read extra integers from XDR/XDA files
+    // mesh2.read(xdr_filename);
   }
 
 public:
@@ -212,9 +222,9 @@ public:
 
   void testExtraIntegersTri6() { LOG_UNIT_TEST; test_helper(TRI6, 4); }
 
-  void testExtraIntegersCheckpointEdge3() { LOG_UNIT_TEST; checkpoint_helper(EDGE3, 5, false); }
+  void testExtraIntegersCheckpointEdge3() { LOG_UNIT_TEST; checkpoint_helper(EDGE3, 5, /*binary=*/false); }
 
-  void testExtraIntegersCheckpointHex8() { LOG_UNIT_TEST; checkpoint_helper(HEX8, 2, true); }
+  void testExtraIntegersCheckpointHex8() { LOG_UNIT_TEST; checkpoint_helper(HEX8, 2, /*binary=*/true); }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   void testExtraIntegersExodusReading()
