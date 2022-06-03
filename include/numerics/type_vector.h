@@ -37,23 +37,10 @@
 #endif
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
-#include "metaphysicl/dualnumber_forward.h"
+#include "metaphysicl/dualnumber_decl.h"
 
 namespace std
 {
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> norm(const MetaPhysicL::DualNumber<T, D, asd> & in);
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> norm(MetaPhysicL::DualNumber<T, D, asd> && in);
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> sqrt(const MetaPhysicL::DualNumber<T, D, asd> & in);
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> sqrt(MetaPhysicL::DualNumber<T, D, asd> && in);
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> abs(const MetaPhysicL::DualNumber<T, D, asd> & in);
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> abs(MetaPhysicL::DualNumber<T, D, asd> && in);
-
 #ifdef LIBMESH_HAVE_EIGEN
 template <typename T, typename D, bool asd>
 using ADRealEigenVector = Eigen::Matrix<MetaPhysicL::DualNumber<T, D, asd>, Eigen::Dynamic, 1>;

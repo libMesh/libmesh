@@ -25,15 +25,7 @@
 #include "libmesh/compare_types.h"
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
-#include "metaphysicl/dualnumber_forward.h"
-
-namespace std
-{
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> norm(const MetaPhysicL::DualNumber<T, D, asd> & in);
-template <typename T, typename D, bool asd>
-MetaPhysicL::DualNumber<T, D, asd> norm(MetaPhysicL::DualNumber<T, D, asd> && in);
-}
+#include "metaphysicl/dualnumber_decl.h"
 #endif
 
 namespace libMesh
