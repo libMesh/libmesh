@@ -1999,8 +1999,7 @@ Optional Features:
   --disable-deprecated    Deprecated code use gives errors rather than
                           warnings
   --disable-forward-declare-enums
-                          Directly include enumeration headers rather than
-                          forward declaring them
+                          Avoid forward declaring enums (no longer supported)
   --enable-blocked-storage
                           Support for blocked matrix/vector storage
   --enable-legacy-include-paths
@@ -46663,37 +46662,23 @@ fi
 
 
 # --------------------------------------------------------------
-# forward declared enumerations - enable by default
-# We want to prevent new library code from being added that
-# depends on including enum headers, but still give downstream
-# apps the ability to compile with the old headers for a
-# period of deprecation.
+# forward declared enumerations - this is now required
 # --------------------------------------------------------------
 # Check whether --enable-forward-declare-enums was given.
 if test "${enable_forward_declare_enums+set}" = set; then :
   enableval=$enable_forward_declare_enums; enablefwdenums=$enableval
 else
-  enablefwdenums=yes
+  enablefwdenums=irrelevant
 fi
 
 
-
-if test "$enablefwdenums" != yes; then :
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> INFO: Forward declared enumerations are disabled <<<" >&5
-$as_echo ">>> INFO: Forward declared enumerations are disabled <<<" >&6; }
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Enumeration headers will be included directly <<<" >&5
-$as_echo ">>> Enumeration headers will be included directly <<<" >&6; }
-
-else
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with forward declared enumerations >>>" >&5
-$as_echo "<<< Configuring library with forward declared enumerations >>>" >&6; }
-
-$as_echo "#define FORWARD_DECLARE_ENUMS 1" >>confdefs.h
-
-
+if test "$enablefwdenums" != irrelevant; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: --enable/disable-forward-declare-enums is now deprecated" >&5
+$as_echo "$as_me: WARNING: --enable/disable-forward-declare-enums is now deprecated" >&2;}
 fi
+
+$enablefwdenums=yes
+
 # --------------------------------------------------------------
 
 

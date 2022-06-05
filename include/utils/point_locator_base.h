@@ -24,15 +24,6 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh_common.h"
 
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum PointLocatorType : int;
-}
-#else
-#include "libmesh/enum_point_locator_type.h"
-#endif
-
 // C++ includes
 #include <cstddef>
 #include <memory>
@@ -49,6 +40,7 @@ class Point;
 class TreeBase;
 class Elem;
 class Node;
+enum PointLocatorType : int;
 
 
 /**

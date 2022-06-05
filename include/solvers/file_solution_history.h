@@ -21,19 +21,19 @@
 #define LIBMESH_FILE_SOLUTION_HISTORY_H
 
 // Local includes
-#include "libmesh/numeric_vector.h"
 #include "libmesh/solution_history.h"
-#include "libmesh/enum_xdr_mode.h"
-#include "libmesh/equation_systems.h"
 #include "libmesh/libmesh.h"
-#include "libmesh/diff_system.h"
 
 // C++ includes
-#include <list>
+#include <vector>
 #include <memory>
 
 namespace libMesh
 {
+
+// Forward declarations
+template <typename T> class NumericVector;
+class DifferentiableSystem;
 
 /**
  * Subclass of Solution History that stores the solutions
@@ -51,9 +51,10 @@ public:
    * Constructor, reference to system to be passed by user, set the
    * stored_sols iterator to some initial value
    */
-  FileSolutionHistory(DifferentiableSystem & system_);
+  FileSolutionHistory(DifferentiableSystem & system);
+
   /**
-   * Destructor
+   * Destructor, defaulted out-of-line.
    */
   ~FileSolutionHistory();
 
@@ -70,15 +71,12 @@ public:
   /**
    * Definition of the clone function needed for the setter function
    */
-  virtual std::unique_ptr<SolutionHistory > clone() const override
-  {
-    return std::make_unique<FileSolutionHistory>(_system);
-  }
+  virtual std::unique_ptr<SolutionHistory> clone() const override;
 
 private:
 
   // A system reference
-  DifferentiableSystem & _system ;
+  DifferentiableSystem & _system;
 
   /**
    * A vector of pointers to adjoint and old adjoint solutions at the last time step.

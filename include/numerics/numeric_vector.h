@@ -22,7 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/enum_parallel_type.h"
+#include "libmesh/enum_parallel_type.h" // AUTOMATIC
 #include "libmesh/id_types.h"
 #include "libmesh/int_range.h"
 #include "libmesh/reference_counted_object.h"
@@ -30,15 +30,6 @@
 #include "libmesh/parallel_object.h"
 #include "libmesh/dense_subvector.h"
 #include "libmesh/dense_vector.h"
-
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum SolverPackage : int;
-}
-#else
-#include "libmesh/enum_solver_package.h"
-#endif
 
 // C++ includes
 #include <cstddef>
@@ -57,6 +48,7 @@ template <typename T> class DenseVector;
 template <typename T> class DenseSubVector;
 template <typename T> class SparseMatrix;
 template <typename T> class ShellMatrix;
+enum SolverPackage : int;
 
 /**
  * \brief Provides a uniform interface to vector storage schemes for different

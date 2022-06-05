@@ -24,17 +24,6 @@
 
 // C++ includes
 #include <cstddef>
-
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum ElemType : int;
-}
-#else
-#include "libmesh/enum_elem_type.h"
-#endif
-
-// C++ includes
 #include <vector>
 #include <set>
 #include <memory>
@@ -45,6 +34,7 @@ namespace libMesh
 // Forward declarations
 class BoundaryInfo;
 class DofMap;
+enum ElemType : int;
 
 /**
  * This file declares several predicates in the Predicates namespace.  They

@@ -38,15 +38,6 @@
 #include "Teuchos_ParameterList.hpp"
 #include "libmesh/restore_warnings.h"
 
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum PreconditionerType : int;
-}
-#else
-#include "libmesh/enum_preconditioner_type.h"
-#endif
-
 // C++ includes
 #include <cstddef>
 
@@ -57,6 +48,7 @@ namespace libMesh
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
+enum PreconditionerType : int;
 
 /**
  * This class provides an interface to the suite of preconditioners

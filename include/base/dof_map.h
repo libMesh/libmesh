@@ -34,15 +34,6 @@
 #include "libmesh/point.h"
 #include "libmesh/utility.h"
 
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum Order : int;
-}
-#else
-#include "libmesh/enum_order.h"
-#endif
-
 // C++ Includes
 #include <algorithm>
 #include <cstddef>
@@ -74,6 +65,7 @@ template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
+enum Order : int;
 
 
 

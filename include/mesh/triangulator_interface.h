@@ -25,15 +25,6 @@
 // Local Includes
 #include "libmesh/libmesh.h"
 
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum ElemType : int;
-}
-#else
-#include "libmesh/enum_elem_type.h"
-#endif
-
 // C++ includes
 #include <vector>
 
@@ -43,6 +34,7 @@ namespace libMesh
 // Forward Declarations
 class UnstructuredMesh;
 template <typename Output> class FunctionBase;
+enum ElemType : int;
 
 class TriangulatorInterface
 {

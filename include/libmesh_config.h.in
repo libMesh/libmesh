@@ -196,9 +196,6 @@
 /* Flag indicating if the library should have warnings enabled */
 #undef ENABLE_WARNINGS
 
-/* Flag indicating if the library uses forward declared enumerations */
-#undef FORWARD_DECLARE_ENUMS
-
 /* Enable fparser debugging functions */
 #undef FPARSER_SUPPORT_DEBUGGING
 

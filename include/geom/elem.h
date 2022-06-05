@@ -35,19 +35,6 @@
 #include "libmesh/variant_filter_iterator.h"
 #include "libmesh/hashword.h" // Used in compute_key() functions
 
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum ElemQuality : int;
-enum IOPackage : int;
-enum Order : int;
-}
-#else
-#include "libmesh/enum_elem_quality.h"
-#include "libmesh/enum_io_package.h"
-#include "libmesh/enum_order.h"
-#endif
-
 // C++ includes
 #include <algorithm>
 #include <cstddef>
@@ -71,6 +58,9 @@ class PointLocatorBase;
 #endif
 template <class SideType, class ParentType>
 class Side;
+enum ElemQuality : int;
+enum IOPackage : int;
+enum Order : int;
 
 
 /**

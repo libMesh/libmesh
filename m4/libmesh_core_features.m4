@@ -89,27 +89,18 @@ AS_IF([test "$enabledeprecated" != yes],
 
 
 # --------------------------------------------------------------
-# forward declared enumerations - enable by default
-# We want to prevent new library code from being added that
-# depends on including enum headers, but still give downstream
-# apps the ability to compile with the old headers for a
-# period of deprecation.
+# forward declared enumerations - this is now required
 # --------------------------------------------------------------
 AC_ARG_ENABLE(forward-declare-enums,
-              [AS_HELP_STRING([--disable-forward-declare-enums],[Directly include enumeration headers rather than forward declaring them])],
+              [AS_HELP_STRING([--disable-forward-declare-enums],[Avoid forward declaring enums (no longer supported)])],
               enablefwdenums=$enableval,
-              enablefwdenums=yes)
+              enablefwdenums=irrelevant)
 
+AS_IF([test "$enablefwdenums" != irrelevant],
+      [AC_MSG_WARN([--enable/disable-forward-declare-enums is now deprecated])])
+
+$enablefwdenums=yes
 AC_SUBST(enablefwdenums)
-AS_IF([test "$enablefwdenums" != yes],
-      [
-        AC_MSG_RESULT([>>> INFO: Forward declared enumerations are disabled <<<])
-        AC_MSG_RESULT([>>> Enumeration headers will be included directly <<<])
-      ],
-      [
-        AC_MSG_RESULT([<<< Configuring library with forward declared enumerations >>>])
-        AC_DEFINE(FORWARD_DECLARE_ENUMS, 1, [Flag indicating if the library uses forward declared enumerations])
-      ])
 # --------------------------------------------------------------
 
 

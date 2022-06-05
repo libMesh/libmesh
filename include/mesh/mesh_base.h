@@ -30,16 +30,6 @@
 #include "libmesh/parallel_object.h"
 #include "libmesh/simple_range.h"
 
-#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
-namespace libMesh
-{
-enum ElemType : int;
-enum ElemMappingType : unsigned char;
-}
-#else
-#include "libmesh/enum_elem_type.h"
-#endif
-
 // C++ Includes
 #include <cstddef>
 #include <string>
@@ -55,6 +45,8 @@ class Node;
 class Point;
 class Partitioner;
 class BoundaryInfo;
+enum ElemType : int;
+enum ElemMappingType : unsigned char;
 
 template <class MT>
 class MeshInput;
