@@ -219,7 +219,7 @@ void XdrIO::write (const std::string & name)
       this->write_serialized_subdomain_names(io);
 
       // write connectivity
-      this->write_serialized_connectivity (io, cast_int<dof_id_type>(n_elem));
+      this->write_serialized_connectivity (io, cast_int<dof_id_type>(n_elem), n_elem_integers);
 
       // write the nodal locations
       this->write_serialized_nodes (io, cast_int<dof_id_type>(max_node_id));
@@ -242,7 +242,7 @@ void XdrIO::write (const std::string & name)
       this->write_serialized_subdomain_names(io);
 
       // write connectivity
-      this->write_serialized_connectivity (io, cast_int<dof_id_type>(n_elem));
+      this->write_serialized_connectivity (io, cast_int<dof_id_type>(n_elem), n_elem_integers);
 
       // write the nodal locations
       this->write_serialized_nodes (io, cast_int<dof_id_type>(max_node_id));
@@ -308,7 +308,10 @@ void XdrIO::write_serialized_subdomain_names(Xdr & io) const
 
 
 
-void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_dbg_var(n_elem)) const
+void
+XdrIO::write_serialized_connectivity (Xdr & io,
+                                      const dof_id_type libmesh_dbg_var(n_elem),
+                                      const new_header_id_type n_elem_integers) const
 {
   libmesh_assert (io.writing());
 
@@ -363,7 +366,10 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
   for (const auto & elem : as_range(mesh.local_level_elements_begin(0),
                                     mesh.local_level_elements_end(0)))
     {
-      pack_element (xfer_conn, elem);
+      pack_element (xfer_conn, elem,
+                    /*parent_id=*/DofObject::invalid_id,
+                    /*parent_pid=*/DofObject::invalid_id,
+                    n_elem_integers);
 #ifdef LIBMESH_ENABLE_AMR
       parent_id_map[elem->id()] = std::make_pair(this->processor_id(),
                                                  my_next_elem);
@@ -452,6 +458,10 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
                 for (dof_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
                   output_buffer.push_back(*recv_conn_iter);
 
+                // Write out the elem extra integers after the connectivity
+                for (dof_id_type n=0; n<n_elem_integers; n++, ++recv_conn_iter)
+                  output_buffer.push_back(*recv_conn_iter);
+
                 io.data_stream
                   (output_buffer.data(),
                    cast_int<unsigned int>(output_buffer.size()),
@@ -485,7 +495,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
 
             for (auto & child : parent->child_ref_range())
               {
-                pack_element (xfer_conn, &child, parent_id, parent_pid);
+                pack_element (xfer_conn, &child, parent_id, parent_pid, n_elem_integers);
 
                 // this aproach introduces the possibility that we write
                 // non-local elements.  These elements may well be parents
@@ -1359,6 +1369,11 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
   // convenient reference to our mesh
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
+  // Header information to be read on processor 0 and broadcast to
+  // other procs.
+  std::vector<std::string> node_integer_names;
+  std::vector<std::string> elem_integer_names;
+
   if (this->processor_id() == 0)
     {
       io.data (meta_data[0]);
@@ -1396,13 +1411,11 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
 
           // Read in number of node extra integers and names
           new_header_id_type n_node_integers;
-          std::vector<std::string> node_integer_names;
           io.data(n_node_integers, "# n_extra_integers per node");
           io.data(node_integer_names);
 
           // Read in number of elem extra integers and names
           new_header_id_type n_elem_integers;
-          std::vector<std::string> elem_integer_names;
           io.data(n_elem_integers, "# n_extra_integers per elem");
           io.data(elem_integer_names);
 
@@ -1429,6 +1442,8 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
   this->comm().broadcast (this->subdomain_map_file_name());
   this->comm().broadcast (this->partition_map_file_name());
   this->comm().broadcast (this->polynomial_level_file_name());
+  this->comm().broadcast(node_integer_names);
+  this->comm().broadcast(elem_integer_names);
 
   // Tell the mesh how many nodes/elements to expect. Depending on the mesh type,
   // this may allow for efficient adding of nodes/elements.
@@ -1448,6 +1463,14 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
    */
   if (version_at_least_0_9_2())
     _field_width = cast_int<unsigned int>(meta_data[2]);
+
+  // Add extra node and elem integers on all procs. Note that adding
+  // an extra node/elem "datum" of type T is implemented via repeated
+  // calls to MeshBase::add_elem_integer(), so we only need to call
+  // MeshBase::add_node/elem_integers() here in order to restore the
+  // the data that we had on the Mesh previously.
+  mesh.add_node_integers(node_integer_names);
+  mesh.add_elem_integers(elem_integer_names);
 }
 
 
@@ -2117,8 +2140,11 @@ void XdrIO::read_serialized_bc_names(Xdr & io, BoundaryInfo & info, bool is_side
 
 
 
-void XdrIO::pack_element (std::vector<xdr_id_type> & conn, const Elem * elem,
-                          const dof_id_type parent_id, const dof_id_type parent_pid) const
+void XdrIO::pack_element (std::vector<xdr_id_type> & conn,
+                          const Elem * elem,
+                          const dof_id_type parent_id,
+                          const dof_id_type parent_pid,
+                          const new_header_id_type n_elem_integers) const
 {
   libmesh_assert(elem);
   libmesh_assert_equal_to (elem->n_nodes(), Elem::type_to_n_nodes_map[elem->type()]);
@@ -2127,7 +2153,7 @@ void XdrIO::pack_element (std::vector<xdr_id_type> & conn, const Elem * elem,
 
   conn.push_back (elem->type());
 
-  // In version 0.7.0+ "id" is stored but it not used.  In version 0.9.2+
+  // In version 0.7.0+ "id" is stored but is not used.  In version 0.9.2+
   // we will store unique_id instead, therefore there is no need to
   // check for the older version when writing the unique_id.
   conn.push_back (elem->unique_id());
@@ -2148,6 +2174,10 @@ void XdrIO::pack_element (std::vector<xdr_id_type> & conn, const Elem * elem,
 
   for (auto n : elem->node_index_range())
     conn.push_back (elem->node_id(n));
+
+  // Write extra elem integers to connectivity array
+  for (unsigned int i=0; i != n_elem_integers; ++i)
+    conn.push_back(elem->get_extra_integer(i));
 }
 
 bool XdrIO::version_at_least_0_9_2() const

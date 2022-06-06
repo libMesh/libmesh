@@ -209,8 +209,12 @@ protected:
     mesh.write(xdr_filename);
     TestCommWorld->barrier();
 
-    // And test that we can read extra integers from XDR/XDA files
-    // mesh2.read(xdr_filename);
+    // And test that we can read extra integers from XDR/XDA
+    // files. Use a freshly constructed Mesh for this, so we don't
+    // conflict with any information just read in from the
+    // CheckpointIO file.
+    Mesh mesh3(*TestCommWorld);
+    mesh3.read(xdr_filename);
   }
 
 public:

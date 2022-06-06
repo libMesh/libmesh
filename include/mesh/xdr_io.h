@@ -223,7 +223,8 @@ private:
   /**
    * Write the connectivity for a parallel, distributed mesh
    */
-  void write_serialized_connectivity (Xdr & io, const dof_id_type n_elem) const;
+  void write_serialized_connectivity (Xdr & io, const dof_id_type n_elem,
+                                      const new_header_id_type n_elem_integers) const;
 
   /**
    * Write the nodal locations for a parallel, distributed mesh
@@ -338,8 +339,9 @@ private:
    */
   void pack_element (std::vector<xdr_id_type> & conn,
                      const Elem * elem,
-                     const dof_id_type parent_id  = DofObject::invalid_id,
-                     const dof_id_type parent_pid = DofObject::invalid_id) const;
+                     const dof_id_type parent_id,
+                     const dof_id_type parent_pid,
+                     const new_header_id_type n_elem_integers) const;
 
   bool _binary;
   bool _legacy;
