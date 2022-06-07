@@ -1256,7 +1256,7 @@ void XdrIO::read (const std::string & name)
 
   // Read headers with the old id type if they're pre-1.3.0, or with
   // the new id type if they're post-1.3.0
-  const unsigned int n_header_metadata_values = 11;
+  const unsigned int n_header_metadata_values = 13;
   std::vector<new_header_id_type> meta_data(n_header_metadata_values, sizeof(xdr_id_type));
   if (this->version_at_least_1_3_0())
     {
@@ -1402,7 +1402,7 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
       if (version_at_least_1_8_0())
         {
           // Make sure there's enough room in meta_data
-          libmesh_assert_greater_equal(meta_data.size(), 11);
+          libmesh_assert_greater_equal(meta_data.size(), 13);
 
           io.data (meta_data[10], "# extra integer size");   // extra integer size
 
@@ -1410,24 +1410,22 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
           libMesh::out << "Read in extra integer size = " << meta_data[10] << std::endl;
 
           // Read in number of node extra integers and names
-          new_header_id_type n_node_integers;
-          io.data(n_node_integers, "# n_extra_integers per node");
+          io.data(meta_data[11], "# n_extra_integers per node");
           io.data(node_integer_names);
 
           // Read in number of elem extra integers and names
-          new_header_id_type n_elem_integers;
-          io.data(n_elem_integers, "# n_extra_integers per elem");
+          io.data(meta_data[12], "# n_extra_integers per elem");
           io.data(elem_integer_names);
 
           // Debugging
-          libMesh::out << "Read in n_node_integers = " << n_node_integers << std::endl;
+          libMesh::out << "Read in n_node_integers = " << meta_data[11] << std::endl;
           libMesh::out << "Read in node_integer_names = ";
           for (const auto & name : node_integer_names)
             libMesh::out << name << " ";
           libMesh::out << std::endl;
 
           // Debugging
-          libMesh::out << "Read in n_elem_integers = " << n_elem_integers << std::endl;
+          libMesh::out << "Read in n_elem_integers = " << meta_data[12] << std::endl;
           libMesh::out << "Read in elem_integer_names = ";
           for (const auto & name : elem_integer_names)
             libMesh::out << name << " ";
@@ -1566,6 +1564,14 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
     (version_at_least_0_9_2()) &&
     sizes[unique_id_size_index];
 
+  // In older versions of the file format, there were no extra elem integers
+  new_header_id_type n_elem_integers = 0;
+  if (version_at_least_1_8_0())
+    {
+      libmesh_assert_greater_equal(sizes.size(), 13);
+      n_elem_integers = sizes[12];
+    }
+
   T n_elem_at_level=0, n_processed_at_level=0;
   for (dof_id_type blk=0, first_elem=0, last_elem=0;
        last_elem<n_elem; blk++)
@@ -1587,7 +1593,9 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
                 level++;
               }
 
+            // "pos" is a cursor into input_buffer
             unsigned int pos = 0;
+
             // get the element type,
             io.data_stream (&input_buffer[pos++], 1);
 
@@ -1624,9 +1632,19 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
             // and all the nodes
             libmesh_assert_less (pos+Elem::type_to_n_nodes_map[input_buffer[0]], input_buffer.size());
             io.data_stream (&input_buffer[pos], Elem::type_to_n_nodes_map[input_buffer[0]]);
-            conn.insert (conn.end(),
-                         input_buffer.begin(),
-                         input_buffer.begin() + pos + Elem::type_to_n_nodes_map[input_buffer[0]]);
+
+            // Advance input_buffer cursor by number of nodes in this element
+            pos += Elem::type_to_n_nodes_map[input_buffer[0]];
+
+            // and all the elem "extra" integers
+            libmesh_assert_less (pos + n_elem_integers, input_buffer.size());
+            io.data_stream (&input_buffer[pos], n_elem_integers);
+
+            // Advance input_buffer cursor by number of extra integers read
+            pos += n_elem_integers;
+
+            // Insert input_buffer at end of "conn"
+            conn.insert (conn.end(), input_buffer.begin(), input_buffer.begin() + pos);
           }
 
       std::size_t conn_size = conn.size();
@@ -1692,6 +1710,7 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
             }
 #endif
 
+          // Node ids for this Elem
           for (unsigned int n=0, n_n = elem->n_nodes(); n != n_n;
                n++, ++it)
             {
@@ -1714,7 +1733,21 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
             }
 
           elems_of_dimension[elem->dim()] = true;
-          mesh.add_elem(std::move(elem));
+          Elem * added_elem = mesh.add_elem(std::move(elem));
+
+          // Make sure that the Elem we just added to the Mesh has
+          // space for the required number of extra integers. Note
+          // that we have to add the Elem to the Mesh prior to
+          // accessing any of its extra integers, since otherwise the
+          // Elem does not know that it should have extra integers...
+          libmesh_assert_equal_to(n_elem_integers, added_elem->n_extra_integers());
+
+          // Extra integers for this Elem
+          for (unsigned int ei=0; ei<n_elem_integers; ++ei)
+            {
+              auto extra_int = cast_int<dof_id_type>(*it++);
+              added_elem->set_extra_integer(ei, extra_int);
+            }
         }
     }
 
