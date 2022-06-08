@@ -691,12 +691,6 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
   std::vector<std::vector<dof_id_type>> recv_ids   (this->n_processors());
   std::vector<std::vector<Real>>         recv_coords(this->n_processors());
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  std::vector<xdr_id_type> xfer_unique_ids;
-  std::vector<xdr_id_type> & unique_ids=xfer_unique_ids;
-  std::vector<std::vector<xdr_id_type>> recv_unique_ids (this->n_processors());
-#endif // LIBMESH_ENABLE_UNIQUE_ID
-
   std::size_t n_written=0;
 
   MeshBase::const_node_iterator       node_iter = mesh.local_nodes_begin();
@@ -850,10 +844,17 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
 #else
   unsigned short write_unique_ids = 0;
 #endif
+
   if (this->processor_id() == 0)
     io.data (write_unique_ids, "# presence of unique ids");
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
+{
+  std::vector<xdr_id_type> xfer_unique_ids;
+  std::vector<xdr_id_type> & unique_ids=xfer_unique_ids;
+  std::vector<std::vector<xdr_id_type>> recv_unique_ids (this->n_processors());
+
+  // Reset write counter
   n_written = 0;
 
   // Return node iterator to the beginning
@@ -975,15 +976,18 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
 
   if (this->processor_id() == 0)
     libmesh_assert_less_equal (n_written, max_node_id);
-
+}
 #endif // LIBMESH_ENABLE_UNIQUE_ID
-
-  // Return node iterator to the beginning
-  node_iter = mesh.local_nodes_begin();
 
   // Next: do "block"-based I/O for the extra node integers (if necessary)
   if (n_node_integers)
     {
+      // Reset write counter
+      n_written = 0;
+
+      // Return node iterator to the beginning
+      node_iter = mesh.local_nodes_begin();
+
       // Data structures for writing "extra" node integers
       std::vector<dof_id_type> xfer_node_integers;
       std::vector<dof_id_type> & node_integers = xfer_node_integers;
@@ -1079,7 +1083,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
 #ifndef NDEBUG
               for (auto pid : make_range(this->n_processors()))
                 libmesh_assert_equal_to
-                  (recv_ids[pid].size(), recv_unique_ids[pid].size());
+                  (recv_ids[pid].size(), recv_node_integers[pid].size() / n_node_integers);
 #endif
 
               libmesh_assert_less_equal
@@ -1093,7 +1097,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
               // is so that we can handle discontiguous node numberings:
               // we do not actually write the node ids themselves anywhere
               // in the xdr file. We do write the unique ids to file, if
-              // enabled (see next section).
+              // enabled (see previous section).
 
               // Note: we initialize the node_integers array with invalid values,
               // so any indices which don't get written to in the loop below will
@@ -1106,7 +1110,9 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
                   {
                     libmesh_assert_less_equal(first_node, recv_ids[pid][idx]);
                     const std::size_t local_idx = recv_ids[pid][idx] - first_node;
-                    libmesh_assert_less (local_idx, unique_ids.size());
+
+                    // Assert that we won't index past the end of the node_integers array
+                    libmesh_assert_less (local_idx, tot_id_size);
 
                     for (unsigned int i=0; i != n_node_integers; ++i)
                       node_integers[n_node_integers*local_idx + i] = recv_node_integers[pid][n_node_integers*idx + i];
