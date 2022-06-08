@@ -222,7 +222,7 @@ void XdrIO::write (const std::string & name)
       this->write_serialized_connectivity (io, cast_int<dof_id_type>(n_elem), n_elem_integers);
 
       // write the nodal locations
-      this->write_serialized_nodes (io, cast_int<dof_id_type>(max_node_id));
+      this->write_serialized_nodes (io, cast_int<dof_id_type>(max_node_id), n_node_integers);
 
       // write the side boundary condition information
       this->write_serialized_side_bcs (io, n_side_bcs);
@@ -245,7 +245,7 @@ void XdrIO::write (const std::string & name)
       this->write_serialized_connectivity (io, cast_int<dof_id_type>(n_elem), n_elem_integers);
 
       // write the nodal locations
-      this->write_serialized_nodes (io, cast_int<dof_id_type>(max_node_id));
+      this->write_serialized_nodes (io, cast_int<dof_id_type>(max_node_id), n_node_integers);
 
       // write the side boundary condition information
       this->write_serialized_side_bcs (io, n_side_bcs);
@@ -677,7 +677,8 @@ XdrIO::write_serialized_connectivity (Xdr & io,
 
 
 
-void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) const
+void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
+                                    const new_header_id_type n_node_integers) const
 {
   // convenient reference to our mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
@@ -799,6 +800,12 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
           // Some of these coordinates may correspond to ids for which
           // no node exists, if we have a discontiguous node
           // numbering!
+          //
+          // The purpose of communicating the xfer_ids/recv_ids buffer
+          // is so that we can handle discontiguous node numberings:
+          // we do not actually write the node ids themselves anywhere
+          // in the xdr file. We do write the unique ids to file, if
+          // enabled (see next section).
 
           // Write invalid values for unused node ids
           coords.clear();
@@ -830,9 +837,9 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
               }
 
           io.data_stream (coords.empty() ? nullptr : coords.data(),
-                          cast_int<unsigned int>(coords.size()), 3);
+                          cast_int<unsigned int>(coords.size()), /*line_break=*/3);
         }
-    }
+    } // end for (block-based coord writes)
 
   if (this->processor_id() == 0)
     libmesh_assert_less_equal (n_written, max_node_id);
@@ -849,6 +856,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   n_written = 0;
 
+  // Return node iterator to the beginning
   node_iter = mesh.local_nodes_begin();
 
   for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
@@ -961,14 +969,160 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
               }
 
           io.data_stream (unique_ids.empty() ? nullptr : unique_ids.data(),
-                          cast_int<unsigned int>(unique_ids.size()), 1);
+                          cast_int<unsigned int>(unique_ids.size()), /*line_break=*/1);
         }
-    }
+    } // end for (block-based unique_id writes)
 
   if (this->processor_id() == 0)
     libmesh_assert_less_equal (n_written, max_node_id);
 
 #endif // LIBMESH_ENABLE_UNIQUE_ID
+
+  // Return node iterator to the beginning
+  node_iter = mesh.local_nodes_begin();
+
+  // Next: do "block"-based I/O for the extra node integers (if necessary)
+  if (n_node_integers)
+    {
+      // Data structures for writing "extra" node integers
+      std::vector<dof_id_type> xfer_node_integers;
+      std::vector<dof_id_type> & node_integers = xfer_node_integers;
+      std::vector<std::vector<dof_id_type>> recv_node_integers(this->n_processors());
+
+      for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
+        {
+          const std::size_t first_node = blk*io_blksize;
+          last_node = std::min((blk+1)*io_blksize, std::size_t(max_node_id));
+
+          const std::size_t tot_id_size = last_node - first_node;
+
+          // Build up the xfer buffers on each processor
+          xfer_ids.clear();
+          xfer_ids.reserve(tot_id_size);
+          xfer_node_integers.clear();
+          xfer_node_integers.reserve(tot_id_size * n_node_integers);
+
+          for (; node_iter != nodes_end; ++node_iter)
+            {
+              const Node & node = **node_iter;
+              libmesh_assert_greater_equal(node.id(), first_node);
+              if (node.id() >= last_node)
+                break;
+
+              xfer_ids.push_back(node.id());
+
+              // Append current node's node integers to xfer buffer
+              for (unsigned int i=0; i != n_node_integers; ++i)
+                xfer_node_integers.push_back(node.get_extra_integer(i));
+            }
+
+          //-------------------------------------
+          // Send the xfer buffers to processor 0
+          std::vector<std::size_t> ids_size;
+
+          const std::size_t my_ids_size = xfer_ids.size();
+
+          // explicitly gather ids_size
+          this->comm().gather (0, my_ids_size, ids_size);
+
+          // We will have lots of simultaneous receives if we are
+          // processor 0, so let's use nonblocking receives.
+          std::vector<Parallel::Request>
+            node_integers_request_handles(this->n_processors()-1),
+            id_request_handles(this->n_processors()-1);
+
+          Parallel::MessageTag
+            node_integers_tag = mesh.comm().get_unique_tag(),
+            id_tag    = mesh.comm().get_unique_tag();
+
+          // Post the receives -- do this on processor 0 only.
+          if (this->processor_id() == 0)
+            {
+              for (auto pid : make_range(this->n_processors()))
+                {
+                  recv_ids[pid].resize(ids_size[pid]);
+                  recv_node_integers[pid].resize(n_node_integers * ids_size[pid]);
+
+                  if (pid == 0)
+                    {
+                      recv_ids[0] = xfer_ids;
+                      recv_node_integers[0] = xfer_node_integers;
+                    }
+                  else
+                    {
+                      this->comm().receive (pid, recv_ids[pid],
+                                            id_request_handles[pid-1],
+                                            id_tag);
+                      this->comm().receive (pid, recv_node_integers[pid],
+                                            node_integers_request_handles[pid-1],
+                                            node_integers_tag);
+                    }
+                }
+            }
+          else
+            {
+              // Send -- do this on all other processors.
+              this->comm().send(0, xfer_ids,    id_tag);
+              this->comm().send(0, xfer_node_integers, node_integers_tag);
+            }
+
+          // -------------------------------------------------------
+          // Receive the messages and write the output on processor 0.
+          if (this->processor_id() == 0)
+            {
+              // Wait for all the receives to complete. We have no
+              // need for the statuses since we already know the
+              // buffer sizes.
+              Parallel::wait (id_request_handles);
+              Parallel::wait (node_integers_request_handles);
+
+#ifndef NDEBUG
+              for (auto pid : make_range(this->n_processors()))
+                libmesh_assert_equal_to
+                  (recv_ids[pid].size(), recv_unique_ids[pid].size());
+#endif
+
+              libmesh_assert_less_equal
+                (tot_id_size, std::min(io_blksize, std::size_t(max_node_id)));
+
+              // Write the node integers in this block.  We will write
+              // invalid node integers if no node exists, i.e. if we
+              // have a discontiguous node numbering!
+              //
+              // The purpose of communicating the xfer_ids/recv_ids buffer
+              // is so that we can handle discontiguous node numberings:
+              // we do not actually write the node ids themselves anywhere
+              // in the xdr file. We do write the unique ids to file, if
+              // enabled (see next section).
+
+              // Note: we initialize the node_integers array with invalid values,
+              // so any indices which don't get written to in the loop below will
+              // just contain invalid values.
+              node_integers.clear();
+              node_integers.resize (n_node_integers*tot_id_size, static_cast<dof_id_type>(-1));
+
+              for (auto pid : make_range(this->n_processors()))
+                for (auto idx : index_range(recv_ids[pid]))
+                  {
+                    libmesh_assert_less_equal(first_node, recv_ids[pid][idx]);
+                    const std::size_t local_idx = recv_ids[pid][idx] - first_node;
+                    libmesh_assert_less (local_idx, unique_ids.size());
+
+                    for (unsigned int i=0; i != n_node_integers; ++i)
+                      node_integers[n_node_integers*local_idx + i] = recv_node_integers[pid][n_node_integers*idx + i];
+
+                    n_written++;
+                  }
+
+              io.data_stream (node_integers.empty() ? nullptr : node_integers.data(),
+                              cast_int<unsigned int>(node_integers.size()), /*line_break=*/n_node_integers);
+            }
+        } // end for (block-based unique_id writes)
+
+      if (this->processor_id() == 0)
+        libmesh_assert_less_equal (n_written, max_node_id);
+
+    } // end if (n_node_integers)
 }
 
 

@@ -229,7 +229,8 @@ private:
   /**
    * Write the nodal locations for a parallel, distributed mesh
    */
-  void write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const;
+  void write_serialized_nodes (Xdr & io, const dof_id_type n_nodes,
+                               const new_header_id_type n_node_integers) const;
 
   /**
    * Helper function used in write_serialized_side_bcs, write_serialized_edge_bcs, and
