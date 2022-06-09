@@ -268,6 +268,11 @@ private:
 
   //---------------------------------------------------------------------------
   // Read Implementation
+  //
+  // In the function templates below, the "T type_size" argument is only
+  // used for template argument deduction purposes. The value of this
+  // parameter can be arbitary because it will not be used within the
+  // function.
 
   /**
    * Read header information - templated to handle old (4-byte) or new
@@ -282,10 +287,13 @@ private:
   void read_serialized_subdomain_names(Xdr & io);
 
   /**
-   * Read the connectivity for a parallel, distributed mesh
+   * Read the connectivity for a parallel, distributed mesh.
    */
   template <typename T>
-  void read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, std::vector<new_header_id_type> & sizes, T);
+  void read_serialized_connectivity (Xdr & io,
+                                     const dof_id_type n_elem,
+                                     const std::vector<new_header_id_type> & meta_data,
+                                     T type_size);
 
   /**
    * Read the nodal locations for a parallel, distributed mesh
@@ -297,14 +305,14 @@ private:
    * read_serialized_shellface_bcs.
    */
   template <typename T>
-  void read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type);
+  void read_serialized_bcs_helper (Xdr & io, T type_size, const std::string bc_type);
 
   /**
    * Read the side boundary conditions for a parallel, distributed mesh
    * \returns The number of bcs read
    */
   template <typename T>
-  void read_serialized_side_bcs (Xdr & io, T);
+  void read_serialized_side_bcs (Xdr & io, T type_size);
 
   /**
    * Read the edge boundary conditions for a parallel, distributed mesh.
@@ -312,7 +320,7 @@ private:
    * \returns The number of bcs read
    */
   template <typename T>
-  void read_serialized_edge_bcs (Xdr & io, T);
+  void read_serialized_edge_bcs (Xdr & io, T type_size);
 
   /**
    * Read the "shell face" boundary conditions for a parallel, distributed mesh.
@@ -320,14 +328,14 @@ private:
    * \returns The number of bcs read
    */
   template <typename T>
-  void read_serialized_shellface_bcs (Xdr & io, T);
+  void read_serialized_shellface_bcs (Xdr & io, T type_size);
 
   /**
    * Read the nodeset conditions for a parallel, distributed mesh
    * \returns The number of nodesets read
    */
   template <typename T>
-  void read_serialized_nodesets (Xdr & io, T);
+  void read_serialized_nodesets (Xdr & io, T type_size);
 
   /**
    * Read boundary names information (sideset and nodeset) - NEW in 0.9.2 format

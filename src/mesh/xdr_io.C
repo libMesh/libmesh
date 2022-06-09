@@ -1695,7 +1695,11 @@ void XdrIO::read_serialized_subdomain_names(Xdr & io)
 
 
 template <typename T>
-void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, std::vector<new_header_id_type> & sizes, T)
+void
+XdrIO::read_serialized_connectivity (Xdr & io,
+                                     const dof_id_type n_elem,
+                                     const std::vector<new_header_id_type> & meta_data,
+                                     T /*type_size*/)
 {
   libmesh_assert (io.reading());
 
@@ -1722,14 +1726,14 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
 
   const bool read_unique_id =
     (version_at_least_0_9_2()) &&
-    sizes[unique_id_size_index];
+    meta_data[unique_id_size_index];
 
   // In older versions of the file format, there were no extra elem integers
   new_header_id_type n_elem_integers = 0;
   if (version_at_least_1_8_0())
     {
-      libmesh_assert_greater_equal(sizes.size(), 13);
-      n_elem_integers = sizes[12];
+      libmesh_assert_greater_equal(meta_data.size(), 13);
+      n_elem_integers = meta_data[12];
     }
 
   T n_elem_at_level=0, n_processed_at_level=0;
@@ -2095,7 +2099,7 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
 
 
 template <typename T>
-void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
+void XdrIO::read_serialized_bcs_helper (Xdr & io, T /*type_size*/, const std::string bc_type)
 {
   if (this->boundary_condition_file_name() == "n/a") return;
 
@@ -2186,31 +2190,31 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
 
 
 template <typename T>
-void XdrIO::read_serialized_side_bcs (Xdr & io, T value)
+void XdrIO::read_serialized_side_bcs (Xdr & io, T type_size)
 {
-  read_serialized_bcs_helper(io, value, "side");
+  read_serialized_bcs_helper(io, type_size, "side");
 }
 
 
 
 template <typename T>
-void XdrIO::read_serialized_edge_bcs (Xdr & io, T value)
+void XdrIO::read_serialized_edge_bcs (Xdr & io, T type_size)
 {
-  read_serialized_bcs_helper(io, value, "edge");
+  read_serialized_bcs_helper(io, type_size, "edge");
 }
 
 
 
 template <typename T>
-void XdrIO::read_serialized_shellface_bcs (Xdr & io, T value)
+void XdrIO::read_serialized_shellface_bcs (Xdr & io, T type_size)
 {
-  read_serialized_bcs_helper(io, value, "shellface");
+  read_serialized_bcs_helper(io, type_size, "shellface");
 }
 
 
 
 template <typename T>
-void XdrIO::read_serialized_nodesets (Xdr & io, T)
+void XdrIO::read_serialized_nodesets (Xdr & io, T /*type_size*/)
 {
   if (this->boundary_condition_file_name() == "n/a") return;
 
