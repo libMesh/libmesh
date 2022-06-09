@@ -176,6 +176,10 @@ public:
     // reader.verbose(true); // additional messages while debugging
     reader.read(filename);
 
+    // When reading in a Mesh using an "IOClass" object, it is not
+    // automatically prepared for use, so do that now.
+    read_mesh.prepare_for_use();
+
     // Check that the elements in read_mesh are in the correct elemsets.
     // The elemset_codes will not in general match because they are
     // created by a generic algorithm in the Exodus reader while above
@@ -240,6 +244,10 @@ public:
       CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i),
                            elemset_array_indices[std::make_pair(/*elem id=*/elem_els2[i] - 1, // convert to libmesh id
                                                                 /*set id*/2)]);
+
+    // Now write an xda file so that we can test that elemset codes
+    // are preserved when reading the Mesh back in.
+    read_mesh.write("write_elemset_data.xda");
   }
 
   void testWriteExodus()

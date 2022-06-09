@@ -193,19 +193,17 @@ void XdrIO::write (const std::string & name)
       // everything else in the header, they will be of size write_size.
       io.data((n_elem_integers || n_node_integers) ? write_size : zero_size, "# extra integer size");
 
-      // Write the total number and names of the extra node integers (see also: CheckpointIO).
+      // Write the names of the extra node integers (see also: CheckpointIO).
       std::vector<std::string> node_integer_names;
       for (unsigned int i=0; i != n_node_integers; ++i)
         node_integer_names.push_back(mesh.get_node_integer_name(i));
-      io.data(n_node_integers, "# n_extra_integers per node");
-      io.data(node_integer_names);
+      io.data(node_integer_names, "# node integer names");
 
-      // Write the total number and names of the extra elem integers (see also: CheckpointIO).
+      // Write the names of the extra elem integers (see also: CheckpointIO).
       std::vector<std::string> elem_integer_names;
       for (unsigned int i=0; i != n_elem_integers; ++i)
         elem_integer_names.push_back(mesh.get_elem_integer_name(i));
-      io.data(n_elem_integers, "# n_extra_integers per elem");
-      io.data(elem_integer_names);
+      io.data(elem_integer_names, "# elem integer names");
     }
 
   if (write_parallel_files)
@@ -1569,13 +1567,13 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
           // Debugging:
           libMesh::out << "Read in extra integer size = " << meta_data[10] << std::endl;
 
-          // Read in number of node extra integers and names
-          io.data(meta_data[11], "# n_extra_integers per node");
-          io.data(node_integer_names);
+          // Read in the node integer names and store the count in meta_data
+          io.data(node_integer_names, "# node integer names");
+          meta_data[11] = node_integer_names.size();
 
-          // Read in number of elem extra integers and names
-          io.data(meta_data[12], "# n_extra_integers per elem");
-          io.data(elem_integer_names);
+          // Read in the elem integer names and store the count in meta_data
+          io.data(elem_integer_names, "# elem integer names");
+          meta_data[12] = elem_integer_names.size();
 
           // Debugging
           libMesh::out << "Read in n_node_integers = " << meta_data[11] << std::endl;
