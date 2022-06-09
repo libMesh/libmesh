@@ -298,7 +298,8 @@ private:
   /**
    * Read the nodal locations for a parallel, distributed mesh
    */
-  void read_serialized_nodes (Xdr & io, const dof_id_type n_nodes);
+  void read_serialized_nodes (Xdr & io, const dof_id_type n_nodes,
+                              const std::vector<new_header_id_type> & meta_data);
 
   /**
    * Helper function used in read_serialized_side_bcs, read_serialized_edge_bcs, and

@@ -203,60 +203,67 @@ protected:
     test_final_integers(mesh2, i1);
 
     // Also test that we can successfully write extra integers to XDR/XDA files
-    libMesh::out << "Test writing extra integers to xdr/xda file" << std::endl;
     const std::string xdr_filename =
       std::string("extra_integers.xd") + (binary ? "r" : "a");
     mesh.write(xdr_filename);
     TestCommWorld->barrier();
 
-//    // And test that we can read extra integers from XDR/XDA
-//    // files. Use a freshly constructed Mesh for this, so we don't
-//    // conflict with any information just read in from the
-//    // CheckpointIO file.
-//    Mesh mesh3(*TestCommWorld);
-//    mesh3.read(xdr_filename);
-//
-//    // Make sure mesh3 has the same Elem integer and Real values
-//    // defined as the original. Note: extra data that are added via
-//    // MeshBase::add_elem_datum<T>() calls are still checked for
-//    // via MeshBase::has_elem_integer() calls; there is no
-//    // MeshBase::has_elem_datum() or DofObject::has_extra_datum()
-//    // function...
-//    CPPUNIT_ASSERT(mesh3.has_elem_integer("i1"));
-//    CPPUNIT_ASSERT(mesh3.has_node_integer("ni1"));
-//    CPPUNIT_ASSERT(mesh3.has_node_integer("ni2"));
-//
-//    // These values are *not* integers, but the "has" functions still
-//    // return true for them because all extra Node/Elem data names are
-//    // stored together. Real-valued data take up multiple indices in
-//    // the nodal storage, and have mangled names for each index they
-//    // occupy beyond the first.
-//    CPPUNIT_ASSERT(mesh3.has_elem_integer("r1"));
-//    CPPUNIT_ASSERT(mesh3.has_node_integer("nr1"));
-//    CPPUNIT_ASSERT(mesh3.has_node_integer("nr2"));
-//
-//    // TODO: We don't currently write/read node integers to/from file,
-//    // but this check still passes because it only looks at element
-//    // integer values and not node integer values.
-//    test_final_integers(mesh3, i1);
-//
-//    // Loop over mesh3 Elems, check that values of the r1 datum match
-//    // the expected values. The test_final_integers() helper function is
-//    // specific to integers and e.g. calls Elem::get_extra_integer()
-//    // so we can't use it to check the value of the r1 datum.
-//    for (const auto & elem : mesh3.element_ptr_range())
-//      {
-//        auto r1_actual = elem->get_extra_datum<Real>(/*r1=*/ini[1]);
-//        CPPUNIT_ASSERT_EQUAL(r1_actual, elem->point(0)(0)*1000);
-//      }
-//
-//    // TODO: this does not yet work because we don't yet write/read
-//    // extra node integers to/from the Xdr file.
-//    // for (const auto & node : mesh3.node_ptr_range())
-//    //   {
-//    //     auto nr1_actual = node->get_extra_datum<Real>(/*nr1=*/ini[4]);
-//    //     CPPUNIT_ASSERT_EQUAL(nr1_actual, (*node)(0)*1000);
-//    //   }
+   // And test that we can read extra integers from XDR/XDA
+   // files. Use a freshly constructed Mesh for this, so we don't
+   // conflict with any information just read in from the
+   // CheckpointIO file.
+   Mesh mesh3(*TestCommWorld);
+   mesh3.read(xdr_filename);
+
+   // Make sure mesh3 has the same Elem integer and Real values
+   // defined as the original. Note: Elem/Node data that are added via
+   // MeshBase::add_{elem,node}_datum<T>() calls can still be checked
+   // for via MeshBase::has_{elem,node}_integer() calls; there is no
+   // MeshBase::has_elem_datum() or DofObject::has_extra_datum()
+   // function...
+   CPPUNIT_ASSERT(mesh3.has_elem_integer("i1"));
+   CPPUNIT_ASSERT(mesh3.has_node_integer("ni1"));
+   CPPUNIT_ASSERT(mesh3.has_node_integer("ni2"));
+
+   // These values are *not* integers, but the "has_" functions should
+   // still return true for them because all extra Node/Elem data
+   // names are stored together, regardless of type. Real-valued data
+   // take up multiple indices in the integer storage, and have mangled
+   // names for each index they occupy beyond the first.
+   CPPUNIT_ASSERT(mesh3.has_elem_integer("r1"));
+   CPPUNIT_ASSERT(mesh3.has_node_integer("nr1"));
+   CPPUNIT_ASSERT(mesh3.has_node_integer("nr2"));
+
+   // This function only compares element integer values, not node
+   // integer values.
+   test_final_integers(mesh3, i1);
+
+   // Loop over mesh3 Elems, check that values of the r1 datum match
+   // the expected values. The test_final_integers() helper function is
+   // specific to integers and does not check the value of the r1 datum.
+   for (const auto & elem : mesh3.element_ptr_range())
+     {
+       auto r1_actual = elem->get_extra_datum<Real>(/*r1=*/ini[1]);
+       CPPUNIT_ASSERT_EQUAL(r1_actual, elem->point(0)(0)*1000);
+     }
+
+   // Loop over mesh3 Nodes, check that the Real-valued data match the
+   // expected values.
+   for (const auto & node : mesh3.node_ptr_range())
+     {
+       auto nr1_actual = node->get_extra_datum<Real>(/*nr1=*/ini[4]);
+       CPPUNIT_ASSERT_EQUAL(/*expected=*/(*node)(0)*1000, /*actual=*/nr1_actual);
+
+       // Note: nr2 is never set to anything and there is no default
+       // value provided, so the datum values get set to 2 copies
+       // (when sizeof(Real)==8 and sizeof(dof_id_type)==4) of
+       // DofObject::invalid_id. Therefore in order to test that this
+       // survived the write/read process, we treat nr2 as an extra
+       // integer here.
+       // auto nr2_actual = node->get_extra_datum<Real>(/*nr2=*/ini[5]); // NaN
+       auto nr2_actual = node->get_extra_integer(/*nr2=*/ini[5]);
+       CPPUNIT_ASSERT_EQUAL(/*expected=*/DofObject::invalid_id, /*actual=*/nr2_actual);
+     }
   }
 
 public:

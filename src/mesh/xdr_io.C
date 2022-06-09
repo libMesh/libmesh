@@ -1467,7 +1467,7 @@ void XdrIO::read (const std::string & name)
       this->read_serialized_connectivity (io, cast_int<dof_id_type>(n_elem), meta_data, type_size);
 
       // read the nodal locations
-      this->read_serialized_nodes (io, cast_int<dof_id_type>(n_nodes));
+      this->read_serialized_nodes (io, cast_int<dof_id_type>(n_nodes), meta_data);
 
       // read the side boundary conditions
       this->read_serialized_side_bcs (io, type_size);
@@ -1496,7 +1496,7 @@ void XdrIO::read (const std::string & name)
       this->read_serialized_connectivity (io, cast_int<dof_id_type>(n_elem), meta_data, type_size);
 
       // read the nodal locations
-      this->read_serialized_nodes (io, cast_int<dof_id_type>(n_nodes));
+      this->read_serialized_nodes (io, cast_int<dof_id_type>(n_nodes), meta_data);
 
       // read the boundary conditions
       this->read_serialized_side_bcs (io, type_size);
@@ -1728,12 +1728,13 @@ XdrIO::read_serialized_connectivity (Xdr & io,
     (version_at_least_0_9_2()) &&
     meta_data[unique_id_size_index];
 
-  // In older versions of the file format, there were no extra elem integers
+  // Version 1.8.0+ introduces elem integers
+  const std::size_t n_elem_integers_index = 12;
   new_header_id_type n_elem_integers = 0;
   if (version_at_least_1_8_0())
     {
       libmesh_assert_greater_equal(meta_data.size(), 13);
-      n_elem_integers = meta_data[12];
+      n_elem_integers = meta_data[n_elem_integers_index];
     }
 
   T n_elem_at_level=0, n_processed_at_level=0;
@@ -1932,7 +1933,10 @@ XdrIO::read_serialized_connectivity (Xdr & io,
 
 
 
-void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
+void
+XdrIO::read_serialized_nodes (Xdr & io,
+                              const dof_id_type n_nodes,
+                              const std::vector<new_header_id_type> & meta_data)
 {
   libmesh_assert (io.reading());
 
@@ -1963,6 +1967,18 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
     // We should not have any duplicate node->id()s
     libmesh_assert (std::unique(needed_nodes.begin(), needed_nodes.end()) == needed_nodes.end());
   }
+
+  // Version 1.8.0+ introduces node integers
+  const std::size_t n_node_integers_index = 11;
+  new_header_id_type n_node_integers = 0;
+  if (version_at_least_1_8_0())
+    {
+      libmesh_assert_greater_equal(meta_data.size(), 13);
+      n_node_integers = meta_data[n_node_integers_index];
+    }
+
+  // Debugging
+  libMesh::out << "Reading " << n_node_integers << " extra node integers per Node." << std::endl;
 
   // Get the nodes in blocks.
   std::vector<Real> coords;
@@ -2094,6 +2110,51 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
 #endif // LIBMESH_ENABLE_UNIQUE_ID
         }
     }
+
+  // Read extra node integers (if present) in chunks on processor 0 and broadcast to
+  // all other procs. For a ReplicatedMesh, all procs need to know about all Nodes'
+  // extra integers. For a DistributedMesh, this broadcasting will transmit some
+  // redundant information.
+  if (n_node_integers)
+    {
+      std::vector<dof_id_type> extra_integers;
+
+      // We're starting over from node 0 again
+      pos.first = needed_nodes.begin();
+
+      for (std::size_t blk=0, first_node=0, last_node=0; last_node<n_nodes; blk++)
+        {
+          first_node = blk*io_blksize;
+          last_node  = std::min((blk+1)*io_blksize, std::size_t(n_nodes));
+
+          extra_integers.resize((last_node - first_node) * n_node_integers);
+
+          // Read in block of node integers on proc 0 only...
+          if (this->processor_id() == 0)
+            io.data_stream (extra_integers.empty() ? nullptr : extra_integers.data(),
+                            cast_int<unsigned int>(extra_integers.size()));
+
+          // ... and broadcast it to all other procs.
+          this->comm().broadcast (extra_integers);
+
+          for (std::size_t n=first_node, idx=0; n<last_node; n++, idx++)
+            {
+              // first see if we need this node.  use pos.first as a smart lower
+              // bound, this will ensure that the size of the searched range
+              // decreases as we match nodes.
+              pos = std::equal_range (pos.first, needed_nodes.end(), n);
+
+              if (pos.first != pos.second) // we need this node.
+                {
+                  libmesh_assert_equal_to (*pos.first, n);
+
+                  Node & node_ref = mesh.node_ref(cast_int<dof_id_type>(n));
+                  for (unsigned int i=0; i != n_node_integers; ++i)
+                    node_ref.set_extra_integer(i, extra_integers[n_node_integers*idx + i]);
+                }
+            }
+        } // end for (block-based extra integer reads)
+    } // end if (n_node_integers)
 }
 
 
