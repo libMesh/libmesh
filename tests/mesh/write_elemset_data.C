@@ -51,6 +51,10 @@ public:
     CPPUNIT_ASSERT_EQUAL(/*expected=*/static_cast<dof_id_type>(1), /*actual=*/mesh.get_elemset_code({1,2}));
     CPPUNIT_ASSERT_EQUAL(/*expected=*/static_cast<dof_id_type>(2), /*actual=*/mesh.get_elemset_code({2}));
 
+    // Debugging: print vertex_average() for some elements. Perhaps we can use this to uniquely identify
+    // elements for the test...
+    libMesh::out << "Elem 8, vertex average = " << mesh.elem_ptr(8)->vertex_average() << std::endl;
+
     // Assert that the elemset_codes for particular elements are set as expected
 
     // Elements 8, 14 are in set1 which has code 0
@@ -268,9 +272,11 @@ public:
 
     // Now read it back in and do generic checks that are independent of IOClass.
     Mesh read_mesh2(*TestCommWorld);
+    // XDR files implicitly renumber mesh files in parallel, so setting this flag
+    // does not have the desired effect of preventing renumbering in that case.
     read_mesh2.allow_renumbering(false);
     read_mesh2.read("write_elemset_data.xda");
-    // checkElemsetCodes(read_mesh2);
+    checkElemsetCodes(read_mesh2);
 
 #endif // LIBMESH_HAVE_XDR
   }
