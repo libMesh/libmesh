@@ -2178,7 +2178,8 @@ CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	dist_with_elem_vec.nem.1.0 repl_with_elem_vec.nem.1.0 \
 	dist.nem.1.0 repl_with_elem_soln.e test_nemesis_read.nem.1.0 \
 	rep.e repl_with_nodal_soln.e repl_with_elem_vec.e \
-	$(am__append_12) $(am__append_13)
+	extra_integers.xda extra_integers.xdr write_elemset_data.xda \
+	write_elemset_data.xdr $(am__append_12) $(am__append_13)
 
 # need to link any data files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
