@@ -1584,9 +1584,6 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
 
           io.data (meta_data[10], "# extra integer size");   // extra integer size
 
-          // Debugging:
-          libMesh::out << "Read in extra integer size = " << meta_data[10] << std::endl;
-
           // Read in the node integer names and store the count in meta_data
           io.data(node_integer_names, "# node integer names");
           meta_data[11] = node_integer_names.size();
@@ -1595,28 +1592,9 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
           io.data(elem_integer_names, "# elem integer names");
           meta_data[12] = elem_integer_names.size();
 
-          // Debugging
-          libMesh::out << "Read in n_node_integers = " << meta_data[11] << std::endl;
-          libMesh::out << "Read in node_integer_names = ";
-          for (const auto & name : node_integer_names)
-            libMesh::out << name << " ";
-          libMesh::out << std::endl;
-
-          // Debugging
-          libMesh::out << "Read in n_elem_integers = " << meta_data[12] << std::endl;
-          libMesh::out << "Read in elem_integer_names = ";
-          for (const auto & name : elem_integer_names)
-            libMesh::out << name << " ";
-          libMesh::out << std::endl;
-
           // Read in vector of elemset codes from file
           std::vector<dof_id_type> elemset_codes;
           io.data(elemset_codes, "# elemset codes");
-          // Debugging
-          libMesh::out << "elemset codes = ";
-          for (const auto & code : elemset_codes)
-            libMesh::out << code << " ";
-          libMesh::out << std::endl;
 
           // For each elemset code, read in the associated elemset ids
           // and call MeshBase::add_elemset_code()
@@ -2016,9 +1994,6 @@ XdrIO::read_serialized_nodes (Xdr & io,
       libmesh_assert_greater_equal(meta_data.size(), 13);
       n_node_integers = meta_data[n_node_integers_index];
     }
-
-  // Debugging
-  libMesh::out << "Reading " << n_node_integers << " extra node integers per Node." << std::endl;
 
   // Get the nodes in blocks.
   std::vector<Real> coords;
