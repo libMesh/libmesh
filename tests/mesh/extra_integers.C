@@ -202,7 +202,13 @@ protected:
     // Make sure we didn't screw up any extra integers thereby.
     test_final_integers(mesh2, i1);
 
-    // Also test that we can successfully write extra integers to XDR/XDA files
+#ifdef LIBMESH_HAVE_XDR
+    // Also test that we can successfully write extra integers to
+    // XDR/XDA files. Only do this if XDR is enabled. In theory, we
+    // could still test that the ASCII (xda) file writing capability
+    // still works even when the binary (xdr) file writing capability
+    // is disabled; in practice this is probably not worth the extra
+    // hassle.
     const std::string xdr_filename =
       std::string("extra_integers.xd") + (binary ? "r" : "a");
     mesh.write(xdr_filename);
@@ -264,6 +270,7 @@ protected:
        auto nr2_actual = node->get_extra_integer(/*nr2=*/ini[5]);
        CPPUNIT_ASSERT_EQUAL(/*expected=*/DofObject::invalid_id, /*actual=*/nr2_actual);
      }
+#endif // LIBMESH_HAVE_XDR
   }
 
 public:

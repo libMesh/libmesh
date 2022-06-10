@@ -33,6 +33,39 @@ public:
 
   CPPUNIT_TEST_SUITE_END();
 
+  void checkElemsetCodes(const MeshBase & mesh)
+  {
+    // Make sure that the mesh actually has an extra_integer for "elemset_code"
+    CPPUNIT_ASSERT(mesh.has_elem_integer("elemset_code"));
+
+    // Check that the elements in mesh are in the correct elemsets.
+    // The elemset_codes will not in general match because they are
+    // created by a generic algorithm in the Exodus reader while above
+    // they were hard-coded.
+    unsigned int elemset_index = mesh.get_elem_integer_index("elemset_code");
+
+    // Make sure the elemset_codes match what we are expecting.
+    // The Exodus reader assigns the codes based on operator<
+    // for std::sets, which gives us the ordering {1}, {1,2}, {2}
+    CPPUNIT_ASSERT(mesh.get_elemset_code({1}) == 0);
+    CPPUNIT_ASSERT(mesh.get_elemset_code({1,2}) == 1);
+    CPPUNIT_ASSERT(mesh.get_elemset_code({2}) == 2);
+
+    // Assert that the elemset_codes for particular elements are set as expected
+
+    // Elements 8, 14 are in set1 which has code 0
+    CPPUNIT_ASSERT(mesh.elem_ptr(8)->get_extra_integer(elemset_index) == 0);
+    CPPUNIT_ASSERT(mesh.elem_ptr(14)->get_extra_integer(elemset_index) == 0);
+
+    // Elements 3, 24 are in both set1 and set2, which has code 1
+    CPPUNIT_ASSERT(mesh.elem_ptr(3)->get_extra_integer(elemset_index) == 1);
+    CPPUNIT_ASSERT(mesh.elem_ptr(24)->get_extra_integer(elemset_index) == 1);
+
+    // Elements 9, 15 are in set2 which has code 2
+    CPPUNIT_ASSERT(mesh.elem_ptr(9)->get_extra_integer(elemset_index) == 2);
+    CPPUNIT_ASSERT(mesh.elem_ptr(15)->get_extra_integer(elemset_index) == 2);
+  }
+
   template <typename IOClass>
   void testWriteImpl(const std::string & filename)
   {
@@ -180,39 +213,12 @@ public:
     // automatically prepared for use, so do that now.
     read_mesh.prepare_for_use();
 
-    // Check that the elements in read_mesh are in the correct elemsets.
-    // The elemset_codes will not in general match because they are
-    // created by a generic algorithm in the Exodus reader while above
-    // they were hard-coded.
+    // Do generic checks that are independent of IOClass
+    checkElemsetCodes(read_mesh);
 
-    // Make sure that the mesh actually has an extra_integer for "elemset_code"
-    CPPUNIT_ASSERT(read_mesh.has_elem_integer("elemset_code"));
-
-    // Make sure the extra integer is in the same index as before
-    CPPUNIT_ASSERT(read_mesh.get_elem_integer_index("elemset_code") == elemset_index);
-
-    // Make sure the elemset_codes match what we are expecting.
-    // The Exodus reader assigns the codes based on operator<
-    // for std::sets, which gives us the ordering {1}, {1,2}, {2}
-    CPPUNIT_ASSERT(read_mesh.get_elemset_code({1}) == 0);
-    CPPUNIT_ASSERT(read_mesh.get_elemset_code({1,2}) == 1);
-    CPPUNIT_ASSERT(read_mesh.get_elemset_code({2}) == 2);
-
-    // Assert that the elemset_codes for particular elements are set as expected
-
-    // Elements 8, 14 are in set1 which has code 0
-    CPPUNIT_ASSERT(read_mesh.elem_ptr(8)->get_extra_integer(elemset_index) == 0);
-    CPPUNIT_ASSERT(read_mesh.elem_ptr(14)->get_extra_integer(elemset_index) == 0);
-
-    // Elements 3, 24 are in both set1 and set2, which has code 1
-    CPPUNIT_ASSERT(read_mesh.elem_ptr(3)->get_extra_integer(elemset_index) == 1);
-    CPPUNIT_ASSERT(read_mesh.elem_ptr(24)->get_extra_integer(elemset_index) == 1);
-
-    // Elements 9, 15 are in set2 which has code 2
-    CPPUNIT_ASSERT(read_mesh.elem_ptr(9)->get_extra_integer(elemset_index) == 2);
-    CPPUNIT_ASSERT(read_mesh.elem_ptr(15)->get_extra_integer(elemset_index) == 2);
-
-    // Read in the elemset variables from file
+    // Read in the elemset variables from file. This is currently a
+    // feature that is only supported by the Exodus IOClass, so it is
+    // not part of the checkElemsetCodes() function.
     std::vector<std::string> read_in_var_names;
     std::vector<std::set<elemset_id_type>> read_in_elemset_ids;
     std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> read_in_elemset_vals;
@@ -245,9 +251,27 @@ public:
                            elemset_array_indices[std::make_pair(/*elem id=*/elem_els2[i] - 1, // convert to libmesh id
                                                                 /*set id*/2)]);
 
+#ifdef LIBMESH_HAVE_XDR
+    // Also test that we can successfully write elemset codes to
+    // XDR/XDA files. Only do this if XDR is enabled. In theory, we
+    // could still test that the ASCII (xda) file writing capability
+    // still works even when the binary (xdr) file writing capability
+    // is disabled; in practice this is probably not worth the extra
+    // hassle.
+
     // Now write an xda file so that we can test that elemset codes
     // are preserved when reading the Mesh back in.
     read_mesh.write("write_elemset_data.xda");
+
+    // Make sure that the writing is done before the reading starts.
+    TestCommWorld->barrier();
+
+    // Now read it back in and do generic checks that are independent of IOClass.
+    Mesh read_mesh2(*TestCommWorld);
+    read_mesh2.allow_renumbering(false);
+    read_mesh2.read("write_elemset_data.xda");
+    checkElemsetCodes(read_mesh2);
+#endif // LIBMESH_HAVE_XDR
   }
 
   void testWriteExodus()
