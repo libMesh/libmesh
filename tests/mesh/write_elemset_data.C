@@ -33,6 +33,21 @@ public:
 
   CPPUNIT_TEST_SUITE_END();
 
+  void checkByCentroid(const PointLocatorBase & pl,
+                       const Point & centroid,
+                       unsigned int elemset_index,
+                       dof_id_type expected_elemset_code)
+  {
+    const Elem * elem = pl(centroid);
+
+    // For ReplicatedMesh, this Elem should be found on all procs, but
+    // in case this test is ever run with a DistributedMesh, the Elem
+    // won't be found on all procs, so we only test it on procs where
+    // it is found.
+    if (elem)
+      CPPUNIT_ASSERT_EQUAL(/*expected=*/expected_elemset_code, /*actual=*/elem->get_extra_integer(elemset_index));
+  }
+
   void checkElemsetCodes(const MeshBase & mesh)
   {
     // Make sure that the mesh actually has an extra_integer for "elemset_code"
@@ -53,21 +68,21 @@ public:
 
     // Debugging: print vertex_average() for some elements. Perhaps we can use this to uniquely identify
     // elements for the test...
-    libMesh::out << "Elem 8, vertex average = " << mesh.elem_ptr(8)->vertex_average() << std::endl;
+    // for (auto id : {8,14,3,24,9,15})
+    //   libMesh::out << "Elem " << id
+    //                << ", vertex average = " << mesh.elem_ptr(id)->vertex_average()
+    //                << std::endl;
 
-    // Assert that the elemset_codes for particular elements are set as expected
+    // We'll use a PointLocator to quickly find elements by centroid
+    auto pl = mesh.sub_point_locator();
 
-    // Elements 8, 14 are in set1 which has code 0
-    CPPUNIT_ASSERT_EQUAL(/*expected=*/static_cast<dof_id_type>(0), /*actual=*/mesh.elem_ptr(8)->get_extra_integer(elemset_index));
-    CPPUNIT_ASSERT_EQUAL(/*expected=*/static_cast<dof_id_type>(0), /*actual=*/mesh.elem_ptr(14)->get_extra_integer(elemset_index));
-
-    // Elements 3, 24 are in both set1 and set2, which has code 1
-    CPPUNIT_ASSERT_EQUAL(/*expected=*/static_cast<dof_id_type>(1), /*actual=*/mesh.elem_ptr(3)->get_extra_integer(elemset_index));
-    CPPUNIT_ASSERT_EQUAL(/*expected=*/static_cast<dof_id_type>(1), /*actual=*/mesh.elem_ptr(24)->get_extra_integer(elemset_index));
-
-    // Elements 9, 15 are in set2 which has code 2
-    CPPUNIT_ASSERT_EQUAL(/*expected=*/static_cast<dof_id_type>(2), /*actual=*/mesh.elem_ptr(9)->get_extra_integer(elemset_index));
-    CPPUNIT_ASSERT_EQUAL(/*expected=*/static_cast<dof_id_type>(2), /*actual=*/mesh.elem_ptr(15)->get_extra_integer(elemset_index));
+    // Test that elements have the same elemset codes they did prior to being written to file.
+    checkByCentroid(*pl, Point(0.4, -0.4, 0), elemset_index, /*expected_elemset_code=*/0); // original Elem 8
+    checkByCentroid(*pl, Point(0.8, 0, 0),    elemset_index, /*expected_elemset_code=*/0); // original Elem 14
+    checkByCentroid(*pl, Point(0.4, -0.8, 0), elemset_index, /*expected_elemset_code=*/1); // original Elem 3
+    checkByCentroid(*pl, Point(0.8, 0.8, 0),  elemset_index, /*expected_elemset_code=*/1); // original Elem 24
+    checkByCentroid(*pl, Point(0.8, -0.4, 0), elemset_index, /*expected_elemset_code=*/2); // original Elem 9
+    checkByCentroid(*pl, Point(-0.8, 0.4, 0), elemset_index, /*expected_elemset_code=*/2); // original Elem 15
   }
 
   template <typename IOClass>
