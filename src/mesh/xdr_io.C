@@ -129,6 +129,7 @@ void XdrIO::write (const std::string & name)
   unsigned int n_p_levels = MeshTools::n_p_levels (mesh);
   new_header_id_type n_elem_integers = mesh.n_elem_integers();
   new_header_id_type n_node_integers = mesh.n_node_integers();
+  std::vector<dof_id_type> elemset_codes = mesh.get_elemset_codes();
 
   bool write_parallel_files = this->write_parallel();
 
@@ -204,6 +205,25 @@ void XdrIO::write (const std::string & name)
       for (unsigned int i=0; i != n_elem_integers; ++i)
         elem_integer_names.push_back(mesh.get_elem_integer_name(i));
       io.data(elem_integer_names, "# elem integer names");
+
+      // Write the vector of elemset codes to the header (this will
+      // also write the size of the vector, which is the number of
+      // elemset codes).
+      io.data(elemset_codes, "# elemset codes");
+
+      // For each elemset code, write out the associated elemset ids
+      MeshBase::elemset_type id_set_to_fill;
+      for (const auto & elemset_code : elemset_codes)
+        {
+          mesh.get_elemsets(elemset_code, id_set_to_fill);
+
+          // Transfer elemset ids to vector for writing
+          std::vector<dof_id_type> elemset_id_vec(id_set_to_fill.begin(), id_set_to_fill.end());
+
+          // Write vector of elemset ids to file with comment
+          std::string comment_string = "# elemset ids for elemset code " + std::to_string(elemset_code);
+          io.data(elemset_id_vec, comment_string.c_str());
+        }
     }
 
   if (write_parallel_files)
@@ -1588,6 +1608,28 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
           for (const auto & name : elem_integer_names)
             libMesh::out << name << " ";
           libMesh::out << std::endl;
+
+          // Read in vector of elemset codes from file
+          std::vector<dof_id_type> elemset_codes;
+          io.data(elemset_codes, "# elemset codes");
+          // Debugging
+          libMesh::out << "elemset codes = ";
+          for (const auto & code : elemset_codes)
+            libMesh::out << code << " ";
+          libMesh::out << std::endl;
+
+          // For each elemset code, read in the associated elemset ids
+          // and call MeshBase::add_elemset_code()
+          for (const auto & elemset_code : elemset_codes)
+            {
+              // Read vector of elemset ids for this elemset code
+              std::vector<dof_id_type> elemset_id_vec;
+              io.data(elemset_id_vec);
+
+              // And add to mesh
+              MeshBase::elemset_type id_set(elemset_id_vec.begin(), elemset_id_vec.end());
+              mesh.add_elemset_code(elemset_code, id_set);
+            }
         }
     }
 
