@@ -76,6 +76,11 @@ public:
     // We'll use a PointLocator to quickly find elements by centroid
     auto pl = mesh.sub_point_locator();
 
+    // Return nullptr when Points are not located in any element
+    // rather than crashing. When running in parallel, this happens
+    // quite often.
+    pl->enable_out_of_mesh_mode();
+
     // Test that elements have the same elemset codes they did prior to being written to file.
     checkByCentroid(*pl, Point(0.4, -0.4, 0), elemset_index, /*expected_elemset_code=*/0); // original Elem 8
     checkByCentroid(*pl, Point(0.8, 0, 0),    elemset_index, /*expected_elemset_code=*/0); // original Elem 14
