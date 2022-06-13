@@ -299,7 +299,11 @@ CLEANFILES = cube_mesh.xda \
              test_nemesis_read.nem.1.0 \
              rep.e \
              repl_with_nodal_soln.e \
-             repl_with_elem_vec.e
+             repl_with_elem_vec.e \
+             extra_integers.xda \
+             extra_integers.xdr \
+             write_elemset_data.xda \
+             write_elemset_data.xdr
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD

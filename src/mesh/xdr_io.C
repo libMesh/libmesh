@@ -85,7 +85,7 @@ XdrIO::XdrIO (MeshBase & mesh, const bool binary_in) :
   _write_unique_id    (false),
 #endif
   _field_width        (4),   // In 0.7.0, all fields are 4 bytes, in 0.9.2+ they can vary
-  _version            ("libMesh-1.3.0"),
+  _version            ("libMesh-1.8.0"),
   _bc_file_name       ("n/a"),
   _partition_map_file ("n/a"),
   _subdomain_map_file ("n/a"),
@@ -127,6 +127,9 @@ void XdrIO::write (const std::string & name)
   new_header_id_type n_shellface_bcs = mesh.get_boundary_info().n_shellface_conds();
   new_header_id_type n_nodesets = mesh.get_boundary_info().n_nodeset_conds();
   unsigned int n_p_levels = MeshTools::n_p_levels (mesh);
+  new_header_id_type n_elem_integers = mesh.n_elem_integers();
+  new_header_id_type n_node_integers = mesh.n_node_integers();
+  std::vector<dof_id_type> elemset_codes = mesh.get_elemset_codes();
 
   bool write_parallel_files = this->write_parallel();
 
@@ -186,6 +189,41 @@ void XdrIO::write (const std::string & name)
       io.data (write_bcs          ? write_size : zero_size, "# eid size");   // elem id
       io.data (write_bcs          ? write_size : zero_size, "# side size");  // side number
       io.data (write_bcs          ? write_size : zero_size, "# bid size");   // boundary id
+
+      // Write the data size for extra integers stored on the mesh. Like
+      // everything else in the header, they will be of size write_size.
+      io.data((n_elem_integers || n_node_integers) ? write_size : zero_size, "# extra integer size");
+
+      // Write the names of the extra node integers (see also: CheckpointIO).
+      std::vector<std::string> node_integer_names;
+      for (unsigned int i=0; i != n_node_integers; ++i)
+        node_integer_names.push_back(mesh.get_node_integer_name(i));
+      io.data(node_integer_names, "# node integer names");
+
+      // Write the names of the extra elem integers (see also: CheckpointIO).
+      std::vector<std::string> elem_integer_names;
+      for (unsigned int i=0; i != n_elem_integers; ++i)
+        elem_integer_names.push_back(mesh.get_elem_integer_name(i));
+      io.data(elem_integer_names, "# elem integer names");
+
+      // Write the vector of elemset codes to the header (this will
+      // also write the size of the vector, which is the number of
+      // elemset codes).
+      io.data(elemset_codes, "# elemset codes");
+
+      // For each elemset code, write out the associated elemset ids
+      MeshBase::elemset_type id_set_to_fill;
+      for (const auto & elemset_code : elemset_codes)
+        {
+          mesh.get_elemsets(elemset_code, id_set_to_fill);
+
+          // Transfer elemset ids to vector for writing
+          std::vector<dof_id_type> elemset_id_vec(id_set_to_fill.begin(), id_set_to_fill.end());
+
+          // Write vector of elemset ids to file with comment
+          std::string comment_string = "# elemset ids for elemset code " + std::to_string(elemset_code);
+          io.data(elemset_id_vec, comment_string.c_str());
+        }
     }
 
   if (write_parallel_files)
@@ -199,10 +237,10 @@ void XdrIO::write (const std::string & name)
       this->write_serialized_subdomain_names(io);
 
       // write connectivity
-      this->write_serialized_connectivity (io, cast_int<dof_id_type>(n_elem));
+      this->write_serialized_connectivity (io, cast_int<dof_id_type>(n_elem), n_elem_integers);
 
       // write the nodal locations
-      this->write_serialized_nodes (io, cast_int<dof_id_type>(max_node_id));
+      this->write_serialized_nodes (io, cast_int<dof_id_type>(max_node_id), n_node_integers);
 
       // write the side boundary condition information
       this->write_serialized_side_bcs (io, n_side_bcs);
@@ -222,10 +260,10 @@ void XdrIO::write (const std::string & name)
       this->write_serialized_subdomain_names(io);
 
       // write connectivity
-      this->write_serialized_connectivity (io, cast_int<dof_id_type>(n_elem));
+      this->write_serialized_connectivity (io, cast_int<dof_id_type>(n_elem), n_elem_integers);
 
       // write the nodal locations
-      this->write_serialized_nodes (io, cast_int<dof_id_type>(max_node_id));
+      this->write_serialized_nodes (io, cast_int<dof_id_type>(max_node_id), n_node_integers);
 
       // write the side boundary condition information
       this->write_serialized_side_bcs (io, n_side_bcs);
@@ -288,7 +326,10 @@ void XdrIO::write_serialized_subdomain_names(Xdr & io) const
 
 
 
-void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_dbg_var(n_elem)) const
+void
+XdrIO::write_serialized_connectivity (Xdr & io,
+                                      const dof_id_type libmesh_dbg_var(n_elem),
+                                      const new_header_id_type n_elem_integers) const
 {
   libmesh_assert (io.writing());
 
@@ -343,7 +384,10 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
   for (const auto & elem : as_range(mesh.local_level_elements_begin(0),
                                     mesh.local_level_elements_end(0)))
     {
-      pack_element (xfer_conn, elem);
+      pack_element (xfer_conn, elem,
+                    /*parent_id=*/DofObject::invalid_id,
+                    /*parent_pid=*/DofObject::invalid_id,
+                    n_elem_integers);
 #ifdef LIBMESH_ENABLE_AMR
       parent_id_map[elem->id()] = std::make_pair(this->processor_id(),
                                                  my_next_elem);
@@ -432,6 +476,10 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
                 for (dof_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
                   output_buffer.push_back(*recv_conn_iter);
 
+                // Write out the elem extra integers after the connectivity
+                for (dof_id_type n=0; n<n_elem_integers; n++, ++recv_conn_iter)
+                  output_buffer.push_back(*recv_conn_iter);
+
                 io.data_stream
                   (output_buffer.data(),
                    cast_int<unsigned int>(output_buffer.size()),
@@ -465,7 +513,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
 
             for (auto & child : parent->child_ref_range())
               {
-                pack_element (xfer_conn, &child, parent_id, parent_pid);
+                pack_element (xfer_conn, &child, parent_id, parent_pid, n_elem_integers);
 
                 // this aproach introduces the possibility that we write
                 // non-local elements.  These elements may well be parents
@@ -647,7 +695,8 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
 
 
 
-void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) const
+void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
+                                    const new_header_id_type n_node_integers) const
 {
   // convenient reference to our mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
@@ -659,12 +708,6 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
 
   std::vector<std::vector<dof_id_type>> recv_ids   (this->n_processors());
   std::vector<std::vector<Real>>         recv_coords(this->n_processors());
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  std::vector<xdr_id_type> xfer_unique_ids;
-  std::vector<xdr_id_type> & unique_ids=xfer_unique_ids;
-  std::vector<std::vector<xdr_id_type>> recv_unique_ids (this->n_processors());
-#endif // LIBMESH_ENABLE_UNIQUE_ID
 
   std::size_t n_written=0;
 
@@ -769,6 +812,12 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
           // Some of these coordinates may correspond to ids for which
           // no node exists, if we have a discontiguous node
           // numbering!
+          //
+          // The purpose of communicating the xfer_ids/recv_ids buffer
+          // is so that we can handle discontiguous node numberings:
+          // we do not actually write the node ids themselves anywhere
+          // in the xdr file. We do write the unique ids to file, if
+          // enabled (see next section).
 
           // Write invalid values for unused node ids
           coords.clear();
@@ -800,9 +849,9 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
               }
 
           io.data_stream (coords.empty() ? nullptr : coords.data(),
-                          cast_int<unsigned int>(coords.size()), 3);
+                          cast_int<unsigned int>(coords.size()), /*line_break=*/3);
         }
-    }
+    } // end for (block-based coord writes)
 
   if (this->processor_id() == 0)
     libmesh_assert_less_equal (n_written, max_node_id);
@@ -813,12 +862,20 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
 #else
   unsigned short write_unique_ids = 0;
 #endif
+
   if (this->processor_id() == 0)
     io.data (write_unique_ids, "# presence of unique ids");
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
+{
+  std::vector<xdr_id_type> xfer_unique_ids;
+  std::vector<xdr_id_type> & unique_ids=xfer_unique_ids;
+  std::vector<std::vector<xdr_id_type>> recv_unique_ids (this->n_processors());
+
+  // Reset write counter
   n_written = 0;
 
+  // Return node iterator to the beginning
   node_iter = mesh.local_nodes_begin();
 
   for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
@@ -931,14 +988,165 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) con
               }
 
           io.data_stream (unique_ids.empty() ? nullptr : unique_ids.data(),
-                          cast_int<unsigned int>(unique_ids.size()), 1);
+                          cast_int<unsigned int>(unique_ids.size()), /*line_break=*/1);
         }
-    }
+    } // end for (block-based unique_id writes)
 
   if (this->processor_id() == 0)
     libmesh_assert_less_equal (n_written, max_node_id);
-
+}
 #endif // LIBMESH_ENABLE_UNIQUE_ID
+
+  // Next: do "block"-based I/O for the extra node integers (if necessary)
+  if (n_node_integers)
+    {
+      // Reset write counter
+      n_written = 0;
+
+      // Return node iterator to the beginning
+      node_iter = mesh.local_nodes_begin();
+
+      // Data structures for writing "extra" node integers
+      std::vector<dof_id_type> xfer_node_integers;
+      std::vector<dof_id_type> & node_integers = xfer_node_integers;
+      std::vector<std::vector<dof_id_type>> recv_node_integers(this->n_processors());
+
+      for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
+        {
+          const std::size_t first_node = blk*io_blksize;
+          last_node = std::min((blk+1)*io_blksize, std::size_t(max_node_id));
+
+          const std::size_t tot_id_size = last_node - first_node;
+
+          // Build up the xfer buffers on each processor
+          xfer_ids.clear();
+          xfer_ids.reserve(tot_id_size);
+          xfer_node_integers.clear();
+          xfer_node_integers.reserve(tot_id_size * n_node_integers);
+
+          for (; node_iter != nodes_end; ++node_iter)
+            {
+              const Node & node = **node_iter;
+              libmesh_assert_greater_equal(node.id(), first_node);
+              if (node.id() >= last_node)
+                break;
+
+              xfer_ids.push_back(node.id());
+
+              // Append current node's node integers to xfer buffer
+              for (unsigned int i=0; i != n_node_integers; ++i)
+                xfer_node_integers.push_back(node.get_extra_integer(i));
+            }
+
+          //-------------------------------------
+          // Send the xfer buffers to processor 0
+          std::vector<std::size_t> ids_size;
+
+          const std::size_t my_ids_size = xfer_ids.size();
+
+          // explicitly gather ids_size
+          this->comm().gather (0, my_ids_size, ids_size);
+
+          // We will have lots of simultaneous receives if we are
+          // processor 0, so let's use nonblocking receives.
+          std::vector<Parallel::Request>
+            node_integers_request_handles(this->n_processors()-1),
+            id_request_handles(this->n_processors()-1);
+
+          Parallel::MessageTag
+            node_integers_tag = mesh.comm().get_unique_tag(),
+            id_tag    = mesh.comm().get_unique_tag();
+
+          // Post the receives -- do this on processor 0 only.
+          if (this->processor_id() == 0)
+            {
+              for (auto pid : make_range(this->n_processors()))
+                {
+                  recv_ids[pid].resize(ids_size[pid]);
+                  recv_node_integers[pid].resize(n_node_integers * ids_size[pid]);
+
+                  if (pid == 0)
+                    {
+                      recv_ids[0] = xfer_ids;
+                      recv_node_integers[0] = xfer_node_integers;
+                    }
+                  else
+                    {
+                      this->comm().receive (pid, recv_ids[pid],
+                                            id_request_handles[pid-1],
+                                            id_tag);
+                      this->comm().receive (pid, recv_node_integers[pid],
+                                            node_integers_request_handles[pid-1],
+                                            node_integers_tag);
+                    }
+                }
+            }
+          else
+            {
+              // Send -- do this on all other processors.
+              this->comm().send(0, xfer_ids,    id_tag);
+              this->comm().send(0, xfer_node_integers, node_integers_tag);
+            }
+
+          // -------------------------------------------------------
+          // Receive the messages and write the output on processor 0.
+          if (this->processor_id() == 0)
+            {
+              // Wait for all the receives to complete. We have no
+              // need for the statuses since we already know the
+              // buffer sizes.
+              Parallel::wait (id_request_handles);
+              Parallel::wait (node_integers_request_handles);
+
+#ifndef NDEBUG
+              for (auto pid : make_range(this->n_processors()))
+                libmesh_assert_equal_to
+                  (recv_ids[pid].size(), recv_node_integers[pid].size() / n_node_integers);
+#endif
+
+              libmesh_assert_less_equal
+                (tot_id_size, std::min(io_blksize, std::size_t(max_node_id)));
+
+              // Write the node integers in this block.  We will write
+              // invalid node integers if no node exists, i.e. if we
+              // have a discontiguous node numbering!
+              //
+              // The purpose of communicating the xfer_ids/recv_ids buffer
+              // is so that we can handle discontiguous node numberings:
+              // we do not actually write the node ids themselves anywhere
+              // in the xdr file. We do write the unique ids to file, if
+              // enabled (see previous section).
+
+              // Note: we initialize the node_integers array with invalid values,
+              // so any indices which don't get written to in the loop below will
+              // just contain invalid values.
+              node_integers.clear();
+              node_integers.resize (n_node_integers*tot_id_size, static_cast<dof_id_type>(-1));
+
+              for (auto pid : make_range(this->n_processors()))
+                for (auto idx : index_range(recv_ids[pid]))
+                  {
+                    libmesh_assert_less_equal(first_node, recv_ids[pid][idx]);
+                    const std::size_t local_idx = recv_ids[pid][idx] - first_node;
+
+                    // Assert that we won't index past the end of the node_integers array
+                    libmesh_assert_less (local_idx, tot_id_size);
+
+                    for (unsigned int i=0; i != n_node_integers; ++i)
+                      node_integers[n_node_integers*local_idx + i] = recv_node_integers[pid][n_node_integers*idx + i];
+
+                    n_written++;
+                  }
+
+              io.data_stream (node_integers.empty() ? nullptr : node_integers.data(),
+                              cast_int<unsigned int>(node_integers.size()), /*line_break=*/n_node_integers);
+            }
+        } // end for (block-based unique_id writes)
+
+      if (this->processor_id() == 0)
+        libmesh_assert_less_equal (n_written, max_node_id);
+
+    } // end if (n_node_integers)
 }
 
 
@@ -1226,14 +1434,17 @@ void XdrIO::read (const std::string & name)
 
   // Read headers with the old id type if they're pre-1.3.0, or with
   // the new id type if they're post-1.3.0
-  std::vector<new_header_id_type> meta_data(10, sizeof(xdr_id_type));
+  const unsigned int n_header_metadata_values = 13;
+  std::vector<new_header_id_type> meta_data(n_header_metadata_values, sizeof(xdr_id_type));
   if (this->version_at_least_1_3_0())
     {
       this->read_header(io, meta_data);
     }
   else
     {
-      std::vector<old_header_id_type> old_data(10, sizeof(xdr_id_type));
+      // In pre-1.3.0 format there were only 10 metadata values in the header, but
+      // in newer versions there are more. The unread values will be set to 0.
+      std::vector<old_header_id_type> old_data(n_header_metadata_values, sizeof(xdr_id_type));
 
       this->read_header(io, old_data);
 
@@ -1274,7 +1485,7 @@ void XdrIO::read (const std::string & name)
       this->read_serialized_connectivity (io, cast_int<dof_id_type>(n_elem), meta_data, type_size);
 
       // read the nodal locations
-      this->read_serialized_nodes (io, cast_int<dof_id_type>(n_nodes));
+      this->read_serialized_nodes (io, cast_int<dof_id_type>(n_nodes), meta_data);
 
       // read the side boundary conditions
       this->read_serialized_side_bcs (io, type_size);
@@ -1303,7 +1514,7 @@ void XdrIO::read (const std::string & name)
       this->read_serialized_connectivity (io, cast_int<dof_id_type>(n_elem), meta_data, type_size);
 
       // read the nodal locations
-      this->read_serialized_nodes (io, cast_int<dof_id_type>(n_nodes));
+      this->read_serialized_nodes (io, cast_int<dof_id_type>(n_nodes), meta_data);
 
       // read the boundary conditions
       this->read_serialized_side_bcs (io, type_size);
@@ -1336,12 +1547,17 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
   // convenient reference to our mesh
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
+  // Header information to be read on processor 0 and broadcast to
+  // other procs.
+  std::vector<std::string> node_integer_names;
+  std::vector<std::string> elem_integer_names;
+  std::vector<dof_id_type> elemset_codes;
+  std::vector<std::vector<dof_id_type>> elemset_id_vecs;
+
   if (this->processor_id() == 0)
     {
-      unsigned int pos=0;
-
-      io.data (meta_data[pos++]);
-      io.data (meta_data[pos++]);
+      io.data (meta_data[0]);
+      io.data (meta_data[1]);
       io.data (this->boundary_condition_file_name()); // libMesh::out << "bc_file="  << this->boundary_condition_file_name() << std::endl;
       io.data (this->subdomain_map_file_name());      // libMesh::out << "sid_file=" << this->subdomain_map_file_name()      << std::endl;
       io.data (this->partition_map_file_name());      // libMesh::out << "pid_file=" << this->partition_map_file_name()      << std::endl;
@@ -1349,15 +1565,42 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
 
       if (version_at_least_0_9_2())
         {
-          io.data (meta_data[pos++], "# type size");
-          io.data (meta_data[pos++], "# uid size");
-          io.data (meta_data[pos++], "# pid size");
-          io.data (meta_data[pos++], "# sid size");
-          io.data (meta_data[pos++], "# p-level size");
+          // Make sure there's enough room in meta_data
+          libmesh_assert_greater_equal(meta_data.size(), 10);
+
+          io.data (meta_data[2], "# type size");
+          io.data (meta_data[3], "# uid size");
+          io.data (meta_data[4], "# pid size");
+          io.data (meta_data[5], "# sid size");
+          io.data (meta_data[6], "# p-level size");
           // Boundary Condition sizes
-          io.data (meta_data[pos++], "# eid size");   // elem id
-          io.data (meta_data[pos++], "# side size");  // side number
-          io.data (meta_data[pos++], "# bid size");   // boundary id
+          io.data (meta_data[7], "# eid size");   // elem id
+          io.data (meta_data[8], "# side size");  // side number
+          io.data (meta_data[9], "# bid size");   // boundary id
+        }
+
+      if (version_at_least_1_8_0())
+        {
+          // Make sure there's enough room in meta_data
+          libmesh_assert_greater_equal(meta_data.size(), 13);
+
+          io.data (meta_data[10], "# extra integer size");   // extra integer size
+
+          // Read in the node integer names and store the count in meta_data
+          io.data(node_integer_names, "# node integer names");
+          meta_data[11] = node_integer_names.size();
+
+          // Read in the elem integer names and store the count in meta_data
+          io.data(elem_integer_names, "# elem integer names");
+          meta_data[12] = elem_integer_names.size();
+
+          // Read in vector of elemset codes from file
+          io.data(elemset_codes, "# elemset codes");
+
+          // For each elemset code, read in the associated elemset ids from file
+          elemset_id_vecs.resize(elemset_codes.size());
+          for (auto i : index_range(elemset_codes))
+            io.data(elemset_id_vecs[i]);
         }
     }
 
@@ -1368,6 +1611,10 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
   this->comm().broadcast (this->subdomain_map_file_name());
   this->comm().broadcast (this->partition_map_file_name());
   this->comm().broadcast (this->polynomial_level_file_name());
+  this->comm().broadcast(node_integer_names);
+  this->comm().broadcast(elem_integer_names);
+  this->comm().broadcast(elemset_codes);
+  this->comm().broadcast(elemset_id_vecs);
 
   // Tell the mesh how many nodes/elements to expect. Depending on the mesh type,
   // this may allow for efficient adding of nodes/elements.
@@ -1387,6 +1634,20 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
    */
   if (version_at_least_0_9_2())
     _field_width = cast_int<unsigned int>(meta_data[2]);
+
+  // Add extra node and elem integers on all procs. Note that adding
+  // an extra node/elem "datum" of type T is implemented via repeated
+  // calls to MeshBase::add_elem_integer(), so we only need to call
+  // MeshBase::add_node/elem_integers() here in order to restore the
+  // the data that we had on the Mesh previously.
+  mesh.add_node_integers(node_integer_names);
+  mesh.add_elem_integers(elem_integer_names);
+
+  // Store the elemset_code -> {elemset ids} mapping on the Mesh
+  for (auto i : index_range(elemset_codes))
+    mesh.add_elemset_code(elemset_codes[i],
+                          MeshBase::elemset_type(elemset_id_vecs[i].begin(),
+                                                 elemset_id_vecs[i].end()));
 }
 
 
@@ -1453,7 +1714,11 @@ void XdrIO::read_serialized_subdomain_names(Xdr & io)
 
 
 template <typename T>
-void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, std::vector<new_header_id_type> & sizes, T)
+void
+XdrIO::read_serialized_connectivity (Xdr & io,
+                                     const dof_id_type n_elem,
+                                     const std::vector<new_header_id_type> & meta_data,
+                                     T /*type_size*/)
 {
   libmesh_assert (io.reading());
 
@@ -1480,7 +1745,16 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
 
   const bool read_unique_id =
     (version_at_least_0_9_2()) &&
-    sizes[unique_id_size_index];
+    meta_data[unique_id_size_index];
+
+  // Version 1.8.0+ introduces elem integers
+  const std::size_t n_elem_integers_index = 12;
+  new_header_id_type n_elem_integers = 0;
+  if (version_at_least_1_8_0())
+    {
+      libmesh_assert_greater_equal(meta_data.size(), 13);
+      n_elem_integers = meta_data[n_elem_integers_index];
+    }
 
   T n_elem_at_level=0, n_processed_at_level=0;
   for (dof_id_type blk=0, first_elem=0, last_elem=0;
@@ -1503,7 +1777,9 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
                 level++;
               }
 
+            // "pos" is a cursor into input_buffer
             unsigned int pos = 0;
+
             // get the element type,
             io.data_stream (&input_buffer[pos++], 1);
 
@@ -1540,9 +1816,19 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
             // and all the nodes
             libmesh_assert_less (pos+Elem::type_to_n_nodes_map[input_buffer[0]], input_buffer.size());
             io.data_stream (&input_buffer[pos], Elem::type_to_n_nodes_map[input_buffer[0]]);
-            conn.insert (conn.end(),
-                         input_buffer.begin(),
-                         input_buffer.begin() + pos + Elem::type_to_n_nodes_map[input_buffer[0]]);
+
+            // Advance input_buffer cursor by number of nodes in this element
+            pos += Elem::type_to_n_nodes_map[input_buffer[0]];
+
+            // and all the elem "extra" integers
+            libmesh_assert_less (pos + n_elem_integers, input_buffer.size());
+            io.data_stream (&input_buffer[pos], n_elem_integers);
+
+            // Advance input_buffer cursor by number of extra integers read
+            pos += n_elem_integers;
+
+            // Insert input_buffer at end of "conn"
+            conn.insert (conn.end(), input_buffer.begin(), input_buffer.begin() + pos);
           }
 
       std::size_t conn_size = conn.size();
@@ -1608,6 +1894,7 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
             }
 #endif
 
+          // Node ids for this Elem
           for (unsigned int n=0, n_n = elem->n_nodes(); n != n_n;
                n++, ++it)
             {
@@ -1630,7 +1917,21 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
             }
 
           elems_of_dimension[elem->dim()] = true;
-          mesh.add_elem(std::move(elem));
+          Elem * added_elem = mesh.add_elem(std::move(elem));
+
+          // Make sure that the Elem we just added to the Mesh has
+          // space for the required number of extra integers. Note
+          // that we have to add the Elem to the Mesh prior to
+          // accessing any of its extra integers, since otherwise the
+          // Elem does not know that it should have extra integers...
+          libmesh_assert_equal_to(n_elem_integers, added_elem->n_extra_integers());
+
+          // Extra integers for this Elem
+          for (unsigned int ei=0; ei<n_elem_integers; ++ei)
+            {
+              auto extra_int = cast_int<dof_id_type>(*it++);
+              added_elem->set_extra_integer(ei, extra_int);
+            }
         }
     }
 
@@ -1651,7 +1952,10 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
 
 
 
-void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
+void
+XdrIO::read_serialized_nodes (Xdr & io,
+                              const dof_id_type n_nodes,
+                              const std::vector<new_header_id_type> & meta_data)
 {
   libmesh_assert (io.reading());
 
@@ -1682,6 +1986,15 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
     // We should not have any duplicate node->id()s
     libmesh_assert (std::unique(needed_nodes.begin(), needed_nodes.end()) == needed_nodes.end());
   }
+
+  // Version 1.8.0+ introduces node integers
+  const std::size_t n_node_integers_index = 11;
+  new_header_id_type n_node_integers = 0;
+  if (version_at_least_1_8_0())
+    {
+      libmesh_assert_greater_equal(meta_data.size(), 13);
+      n_node_integers = meta_data[n_node_integers_index];
+    }
 
   // Get the nodes in blocks.
   std::vector<Real> coords;
@@ -1813,12 +2126,57 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
 #endif // LIBMESH_ENABLE_UNIQUE_ID
         }
     }
+
+  // Read extra node integers (if present) in chunks on processor 0 and broadcast to
+  // all other procs. For a ReplicatedMesh, all procs need to know about all Nodes'
+  // extra integers. For a DistributedMesh, this broadcasting will transmit some
+  // redundant information.
+  if (n_node_integers)
+    {
+      std::vector<dof_id_type> extra_integers;
+
+      // We're starting over from node 0 again
+      pos.first = needed_nodes.begin();
+
+      for (std::size_t blk=0, first_node=0, last_node=0; last_node<n_nodes; blk++)
+        {
+          first_node = blk*io_blksize;
+          last_node  = std::min((blk+1)*io_blksize, std::size_t(n_nodes));
+
+          extra_integers.resize((last_node - first_node) * n_node_integers);
+
+          // Read in block of node integers on proc 0 only...
+          if (this->processor_id() == 0)
+            io.data_stream (extra_integers.empty() ? nullptr : extra_integers.data(),
+                            cast_int<unsigned int>(extra_integers.size()));
+
+          // ... and broadcast it to all other procs.
+          this->comm().broadcast (extra_integers);
+
+          for (std::size_t n=first_node, idx=0; n<last_node; n++, idx++)
+            {
+              // first see if we need this node.  use pos.first as a smart lower
+              // bound, this will ensure that the size of the searched range
+              // decreases as we match nodes.
+              pos = std::equal_range (pos.first, needed_nodes.end(), n);
+
+              if (pos.first != pos.second) // we need this node.
+                {
+                  libmesh_assert_equal_to (*pos.first, n);
+
+                  Node & node_ref = mesh.node_ref(cast_int<dof_id_type>(n));
+                  for (unsigned int i=0; i != n_node_integers; ++i)
+                    node_ref.set_extra_integer(i, extra_integers[n_node_integers*idx + i]);
+                }
+            }
+        } // end for (block-based extra integer reads)
+    } // end if (n_node_integers)
 }
 
 
 
 template <typename T>
-void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
+void XdrIO::read_serialized_bcs_helper (Xdr & io, T /*type_size*/, const std::string bc_type)
 {
   if (this->boundary_condition_file_name() == "n/a") return;
 
@@ -1909,31 +2267,31 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
 
 
 template <typename T>
-void XdrIO::read_serialized_side_bcs (Xdr & io, T value)
+void XdrIO::read_serialized_side_bcs (Xdr & io, T type_size)
 {
-  read_serialized_bcs_helper(io, value, "side");
+  read_serialized_bcs_helper(io, type_size, "side");
 }
 
 
 
 template <typename T>
-void XdrIO::read_serialized_edge_bcs (Xdr & io, T value)
+void XdrIO::read_serialized_edge_bcs (Xdr & io, T type_size)
 {
-  read_serialized_bcs_helper(io, value, "edge");
+  read_serialized_bcs_helper(io, type_size, "edge");
 }
 
 
 
 template <typename T>
-void XdrIO::read_serialized_shellface_bcs (Xdr & io, T value)
+void XdrIO::read_serialized_shellface_bcs (Xdr & io, T type_size)
 {
-  read_serialized_bcs_helper(io, value, "shellface");
+  read_serialized_bcs_helper(io, type_size, "shellface");
 }
 
 
 
 template <typename T>
-void XdrIO::read_serialized_nodesets (Xdr & io, T)
+void XdrIO::read_serialized_nodesets (Xdr & io, T /*type_size*/)
 {
   if (this->boundary_condition_file_name() == "n/a") return;
 
@@ -2056,8 +2414,11 @@ void XdrIO::read_serialized_bc_names(Xdr & io, BoundaryInfo & info, bool is_side
 
 
 
-void XdrIO::pack_element (std::vector<xdr_id_type> & conn, const Elem * elem,
-                          const dof_id_type parent_id, const dof_id_type parent_pid) const
+void XdrIO::pack_element (std::vector<xdr_id_type> & conn,
+                          const Elem * elem,
+                          const dof_id_type parent_id,
+                          const dof_id_type parent_pid,
+                          const new_header_id_type n_elem_integers) const
 {
   libmesh_assert(elem);
   libmesh_assert_equal_to (elem->n_nodes(), Elem::type_to_n_nodes_map[elem->type()]);
@@ -2066,7 +2427,7 @@ void XdrIO::pack_element (std::vector<xdr_id_type> & conn, const Elem * elem,
 
   conn.push_back (elem->type());
 
-  // In version 0.7.0+ "id" is stored but it not used.  In version 0.9.2+
+  // In version 0.7.0+ "id" is stored but is not used.  In version 0.9.2+
   // we will store unique_id instead, therefore there is no need to
   // check for the older version when writing the unique_id.
   conn.push_back (elem->unique_id());
@@ -2087,6 +2448,10 @@ void XdrIO::pack_element (std::vector<xdr_id_type> & conn, const Elem * elem,
 
   for (auto n : elem->node_index_range())
     conn.push_back (elem->node_id(n));
+
+  // Write extra elem integers to connectivity array
+  for (unsigned int i=0; i != n_elem_integers; ++i)
+    conn.push_back(elem->get_extra_integer(i));
 }
 
 bool XdrIO::version_at_least_0_9_2() const
@@ -2095,7 +2460,8 @@ bool XdrIO::version_at_least_0_9_2() const
     (this->version().find("0.9.2") != std::string::npos) ||
     (this->version().find("0.9.6") != std::string::npos) ||
     (this->version().find("1.1.0") != std::string::npos) ||
-    (this->version().find("1.3.0") != std::string::npos);
+    (this->version().find("1.3.0") != std::string::npos) ||
+    (this->version().find("1.8.0") != std::string::npos);
 }
 
 bool XdrIO::version_at_least_0_9_6() const
@@ -2103,20 +2469,29 @@ bool XdrIO::version_at_least_0_9_6() const
   return
     (this->version().find("0.9.6") != std::string::npos) ||
     (this->version().find("1.1.0") != std::string::npos) ||
-    (this->version().find("1.3.0") != std::string::npos);
+    (this->version().find("1.3.0") != std::string::npos) ||
+    (this->version().find("1.8.0") != std::string::npos);
 }
 
 bool XdrIO::version_at_least_1_1_0() const
 {
   return
     (this->version().find("1.1.0") != std::string::npos) ||
-    (this->version().find("1.3.0") != std::string::npos);
+    (this->version().find("1.3.0") != std::string::npos) ||
+    (this->version().find("1.8.0") != std::string::npos);
 }
 
 bool XdrIO::version_at_least_1_3_0() const
 {
   return
-    (this->version().find("1.3.0") != std::string::npos);
+    (this->version().find("1.3.0") != std::string::npos) ||
+    (this->version().find("1.8.0") != std::string::npos);
+}
+
+bool XdrIO::version_at_least_1_8_0() const
+{
+  return
+    (this->version().find("1.8.0") != std::string::npos);
 }
 
 } // namespace libMesh

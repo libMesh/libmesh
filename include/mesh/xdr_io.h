@@ -201,6 +201,15 @@ public:
    */
   bool version_at_least_1_3_0() const;
 
+  /**
+   * \returns \p true if the current file has an XDR/XDA version that
+   * matches or exceeds 1.8.0.
+   *
+   * In this version we added support for writing the Mesh's "extra"
+   * integer fields to the file.
+   */
+  bool version_at_least_1_8_0() const;
+
 private:
 
 
@@ -214,12 +223,14 @@ private:
   /**
    * Write the connectivity for a parallel, distributed mesh
    */
-  void write_serialized_connectivity (Xdr & io, const dof_id_type n_elem) const;
+  void write_serialized_connectivity (Xdr & io, const dof_id_type n_elem,
+                                      const new_header_id_type n_elem_integers) const;
 
   /**
    * Write the nodal locations for a parallel, distributed mesh
    */
-  void write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const;
+  void write_serialized_nodes (Xdr & io, const dof_id_type n_nodes,
+                               const new_header_id_type n_node_integers) const;
 
   /**
    * Helper function used in write_serialized_side_bcs, write_serialized_edge_bcs, and
@@ -257,6 +268,11 @@ private:
 
   //---------------------------------------------------------------------------
   // Read Implementation
+  //
+  // In the function templates below, the "T type_size" argument is only
+  // used for template argument deduction purposes. The value of this
+  // parameter can be arbitary because it will not be used within the
+  // function.
 
   /**
    * Read header information - templated to handle old (4-byte) or new
@@ -271,29 +287,33 @@ private:
   void read_serialized_subdomain_names(Xdr & io);
 
   /**
-   * Read the connectivity for a parallel, distributed mesh
+   * Read the connectivity for a parallel, distributed mesh.
    */
   template <typename T>
-  void read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, std::vector<new_header_id_type> & sizes, T);
+  void read_serialized_connectivity (Xdr & io,
+                                     const dof_id_type n_elem,
+                                     const std::vector<new_header_id_type> & meta_data,
+                                     T type_size);
 
   /**
    * Read the nodal locations for a parallel, distributed mesh
    */
-  void read_serialized_nodes (Xdr & io, const dof_id_type n_nodes);
+  void read_serialized_nodes (Xdr & io, const dof_id_type n_nodes,
+                              const std::vector<new_header_id_type> & meta_data);
 
   /**
    * Helper function used in read_serialized_side_bcs, read_serialized_edge_bcs, and
    * read_serialized_shellface_bcs.
    */
   template <typename T>
-  void read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type);
+  void read_serialized_bcs_helper (Xdr & io, T type_size, const std::string bc_type);
 
   /**
    * Read the side boundary conditions for a parallel, distributed mesh
    * \returns The number of bcs read
    */
   template <typename T>
-  void read_serialized_side_bcs (Xdr & io, T);
+  void read_serialized_side_bcs (Xdr & io, T type_size);
 
   /**
    * Read the edge boundary conditions for a parallel, distributed mesh.
@@ -301,7 +321,7 @@ private:
    * \returns The number of bcs read
    */
   template <typename T>
-  void read_serialized_edge_bcs (Xdr & io, T);
+  void read_serialized_edge_bcs (Xdr & io, T type_size);
 
   /**
    * Read the "shell face" boundary conditions for a parallel, distributed mesh.
@@ -309,14 +329,14 @@ private:
    * \returns The number of bcs read
    */
   template <typename T>
-  void read_serialized_shellface_bcs (Xdr & io, T);
+  void read_serialized_shellface_bcs (Xdr & io, T type_size);
 
   /**
    * Read the nodeset conditions for a parallel, distributed mesh
    * \returns The number of nodesets read
    */
   template <typename T>
-  void read_serialized_nodesets (Xdr & io, T);
+  void read_serialized_nodesets (Xdr & io, T type_size);
 
   /**
    * Read boundary names information (sideset and nodeset) - NEW in 0.9.2 format
@@ -329,8 +349,9 @@ private:
    */
   void pack_element (std::vector<xdr_id_type> & conn,
                      const Elem * elem,
-                     const dof_id_type parent_id  = DofObject::invalid_id,
-                     const dof_id_type parent_pid = DofObject::invalid_id) const;
+                     const dof_id_type parent_id,
+                     const dof_id_type parent_pid,
+                     const new_header_id_type n_elem_integers) const;
 
   bool _binary;
   bool _legacy;

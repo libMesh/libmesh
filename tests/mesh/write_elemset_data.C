@@ -33,6 +33,63 @@ public:
 
   CPPUNIT_TEST_SUITE_END();
 
+  void checkByCentroid(const PointLocatorBase & pl,
+                       const Point & centroid,
+                       unsigned int elemset_index,
+                       dof_id_type expected_elemset_code)
+  {
+    const Elem * elem = pl(centroid);
+
+    // For ReplicatedMesh, this Elem should be found on all procs, but
+    // in case this test is ever run with a DistributedMesh, the Elem
+    // won't be found on all procs, so we only test it on procs where
+    // it is found.
+    if (elem)
+      CPPUNIT_ASSERT_EQUAL(/*expected=*/expected_elemset_code, /*actual=*/elem->get_extra_integer(elemset_index));
+  }
+
+  void checkElemsetCodes(const MeshBase & mesh)
+  {
+    // Make sure that the mesh actually has an extra_integer for "elemset_code"
+    CPPUNIT_ASSERT(mesh.has_elem_integer("elemset_code"));
+
+    // Check that the elements in mesh are in the correct elemsets.
+    // The elemset_codes will not in general match because they are
+    // created by a generic algorithm in the Exodus reader while above
+    // they were hard-coded.
+    unsigned int elemset_index = mesh.get_elem_integer_index("elemset_code");
+
+    // Make sure the elemset_codes match what we are expecting.
+    // The Exodus reader assigns the codes based on operator<
+    // for std::sets, which gives us the ordering {1}, {1,2}, {2}
+    CPPUNIT_ASSERT_EQUAL(/*expected=*/static_cast<dof_id_type>(0), /*actual=*/mesh.get_elemset_code({1}));
+    CPPUNIT_ASSERT_EQUAL(/*expected=*/static_cast<dof_id_type>(1), /*actual=*/mesh.get_elemset_code({1,2}));
+    CPPUNIT_ASSERT_EQUAL(/*expected=*/static_cast<dof_id_type>(2), /*actual=*/mesh.get_elemset_code({2}));
+
+    // Debugging: print vertex_average() for some elements. Perhaps we can use this to uniquely identify
+    // elements for the test...
+    // for (auto id : {8,14,3,24,9,15})
+    //   libMesh::out << "Elem " << id
+    //                << ", vertex average = " << mesh.elem_ptr(id)->vertex_average()
+    //                << std::endl;
+
+    // We'll use a PointLocator to quickly find elements by centroid
+    auto pl = mesh.sub_point_locator();
+
+    // Return nullptr when Points are not located in any element
+    // rather than crashing. When running in parallel, this happens
+    // quite often.
+    pl->enable_out_of_mesh_mode();
+
+    // Test that elements have the same elemset codes they did prior to being written to file.
+    checkByCentroid(*pl, Point(0.4, -0.4, 0), elemset_index, /*expected_elemset_code=*/0); // original Elem 8
+    checkByCentroid(*pl, Point(0.8, 0, 0),    elemset_index, /*expected_elemset_code=*/0); // original Elem 14
+    checkByCentroid(*pl, Point(0.4, -0.8, 0), elemset_index, /*expected_elemset_code=*/1); // original Elem 3
+    checkByCentroid(*pl, Point(0.8, 0.8, 0),  elemset_index, /*expected_elemset_code=*/1); // original Elem 24
+    checkByCentroid(*pl, Point(0.8, -0.4, 0), elemset_index, /*expected_elemset_code=*/2); // original Elem 9
+    checkByCentroid(*pl, Point(-0.8, 0.4, 0), elemset_index, /*expected_elemset_code=*/2); // original Elem 15
+  }
+
   template <typename IOClass>
   void testWriteImpl(const std::string & filename)
   {
@@ -176,39 +233,16 @@ public:
     // reader.verbose(true); // additional messages while debugging
     reader.read(filename);
 
-    // Check that the elements in read_mesh are in the correct elemsets.
-    // The elemset_codes will not in general match because they are
-    // created by a generic algorithm in the Exodus reader while above
-    // they were hard-coded.
+    // When reading in a Mesh using an "IOClass" object, it is not
+    // automatically prepared for use, so do that now.
+    read_mesh.prepare_for_use();
 
-    // Make sure that the mesh actually has an extra_integer for "elemset_code"
-    CPPUNIT_ASSERT(read_mesh.has_elem_integer("elemset_code"));
+    // Do generic checks that are independent of IOClass
+    checkElemsetCodes(read_mesh);
 
-    // Make sure the extra integer is in the same index as before
-    CPPUNIT_ASSERT(read_mesh.get_elem_integer_index("elemset_code") == elemset_index);
-
-    // Make sure the elemset_codes match what we are expecting.
-    // The Exodus reader assigns the codes based on operator<
-    // for std::sets, which gives us the ordering {1}, {1,2}, {2}
-    CPPUNIT_ASSERT(read_mesh.get_elemset_code({1}) == 0);
-    CPPUNIT_ASSERT(read_mesh.get_elemset_code({1,2}) == 1);
-    CPPUNIT_ASSERT(read_mesh.get_elemset_code({2}) == 2);
-
-    // Assert that the elemset_codes for particular elements are set as expected
-
-    // Elements 8, 14 are in set1 which has code 0
-    CPPUNIT_ASSERT(read_mesh.elem_ptr(8)->get_extra_integer(elemset_index) == 0);
-    CPPUNIT_ASSERT(read_mesh.elem_ptr(14)->get_extra_integer(elemset_index) == 0);
-
-    // Elements 3, 24 are in both set1 and set2, which has code 1
-    CPPUNIT_ASSERT(read_mesh.elem_ptr(3)->get_extra_integer(elemset_index) == 1);
-    CPPUNIT_ASSERT(read_mesh.elem_ptr(24)->get_extra_integer(elemset_index) == 1);
-
-    // Elements 9, 15 are in set2 which has code 2
-    CPPUNIT_ASSERT(read_mesh.elem_ptr(9)->get_extra_integer(elemset_index) == 2);
-    CPPUNIT_ASSERT(read_mesh.elem_ptr(15)->get_extra_integer(elemset_index) == 2);
-
-    // Read in the elemset variables from file
+    // Read in the elemset variables from file. This is currently a
+    // feature that is only supported by the Exodus IOClass, so it is
+    // not part of the checkElemsetCodes() function.
     std::vector<std::string> read_in_var_names;
     std::vector<std::set<elemset_id_type>> read_in_elemset_ids;
     std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> read_in_elemset_vals;
@@ -240,6 +274,31 @@ public:
       CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i),
                            elemset_array_indices[std::make_pair(/*elem id=*/elem_els2[i] - 1, // convert to libmesh id
                                                                 /*set id*/2)]);
+
+#ifdef LIBMESH_HAVE_XDR
+    // Also test that we can successfully write elemset codes to
+    // XDR/XDA files. Only do this if XDR is enabled. In theory, we
+    // could still test that the ASCII (xda) file writing capability
+    // still works even when the binary (xdr) file writing capability
+    // is disabled; in practice this is probably not worth the extra
+    // hassle.
+
+    // Now write an xda file so that we can test that elemset codes
+    // are preserved when reading the Mesh back in.
+    read_mesh.write("write_elemset_data.xda");
+
+    // Make sure that the writing is done before the reading starts.
+    TestCommWorld->barrier();
+
+    // Now read it back in and do generic checks that are independent of IOClass.
+    Mesh read_mesh2(*TestCommWorld);
+    // XDR files implicitly renumber mesh files in parallel, so setting this flag
+    // does not have the desired effect of preventing renumbering in that case.
+    read_mesh2.allow_renumbering(false);
+    read_mesh2.read("write_elemset_data.xda");
+    checkElemsetCodes(read_mesh2);
+
+#endif // LIBMESH_HAVE_XDR
   }
 
   void testWriteExodus()
