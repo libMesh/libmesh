@@ -1551,6 +1551,8 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
   // other procs.
   std::vector<std::string> node_integer_names;
   std::vector<std::string> elem_integer_names;
+  std::vector<dof_id_type> elemset_codes;
+  std::vector<std::vector<dof_id_type>> elemset_id_vecs;
 
   if (this->processor_id() == 0)
     {
@@ -1593,21 +1595,12 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
           meta_data[12] = elem_integer_names.size();
 
           // Read in vector of elemset codes from file
-          std::vector<dof_id_type> elemset_codes;
           io.data(elemset_codes, "# elemset codes");
 
-          // For each elemset code, read in the associated elemset ids
-          // and call MeshBase::add_elemset_code()
-          for (const auto & elemset_code : elemset_codes)
-            {
-              // Read vector of elemset ids for this elemset code
-              std::vector<dof_id_type> elemset_id_vec;
-              io.data(elemset_id_vec);
-
-              // And add to mesh
-              MeshBase::elemset_type id_set(elemset_id_vec.begin(), elemset_id_vec.end());
-              mesh.add_elemset_code(elemset_code, id_set);
-            }
+          // For each elemset code, read in the associated elemset ids from file
+          elemset_id_vecs.resize(elemset_codes.size());
+          for (auto i : index_range(elemset_codes))
+            io.data(elemset_id_vecs[i]);
         }
     }
 
@@ -1620,6 +1613,8 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
   this->comm().broadcast (this->polynomial_level_file_name());
   this->comm().broadcast(node_integer_names);
   this->comm().broadcast(elem_integer_names);
+  this->comm().broadcast(elemset_codes);
+  this->comm().broadcast(elemset_id_vecs);
 
   // Tell the mesh how many nodes/elements to expect. Depending on the mesh type,
   // this may allow for efficient adding of nodes/elements.
@@ -1647,6 +1642,12 @@ void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
   // the data that we had on the Mesh previously.
   mesh.add_node_integers(node_integer_names);
   mesh.add_elem_integers(elem_integer_names);
+
+  // Store the elemset_code -> {elemset ids} mapping on the Mesh
+  for (auto i : index_range(elemset_codes))
+    mesh.add_elemset_code(elemset_codes[i],
+                          MeshBase::elemset_type(elemset_id_vecs[i].begin(),
+                                                 elemset_id_vecs[i].end()));
 }
 
 
