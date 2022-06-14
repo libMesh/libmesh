@@ -47,6 +47,7 @@ class ResidualContext;
 // need access to these most of the time as they are used internally by this object.
 extern "C"
 {
+  PetscErrorCode libmesh_petsc_recalculate_monitor(SNES snes, PetscInt it, PetscReal norm, void* mctx);
   PetscErrorCode libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *);
   PetscErrorCode libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void * ctx);
   PetscErrorCode libmesh_petsc_snes_fd_residual (SNES, Vec x, Vec r, void * ctx);
@@ -201,6 +202,11 @@ public:
    */
   std::unique_ptr<ComputeLineSearchObject> linesearch_object;
 
+  /**
+    * Setup the default monitor if required
+    */
+  void setup_default_monitor();
+
 protected:
 
   /**
@@ -261,6 +267,11 @@ protected:
    */
   bool _computing_base_vector;
 
+  /**
+    * Whether we've triggered the preconditioner reuse
+    */
+  bool _setup_reuse;
+
 private:
   friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx);
@@ -268,8 +279,6 @@ private:
   friend PetscErrorCode libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat jac, Mat pc, void * ctx);
 };
-
-
 
 } // namespace libMesh
 

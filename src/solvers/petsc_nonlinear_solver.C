@@ -105,6 +105,33 @@ libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx)
 // Give them an obscure name to avoid namespace pollution.
 extern "C"
 {
+  // -----------------------------------------------------------------
+  // this function monitors the nonlinear solve and checks to see
+  // if we want to recalculate the preconditioner.  It only gets
+  // added to the SNES instance if we're reusing the preconditioner
+  PetscErrorCode
+  libmesh_petsc_recalculate_monitor(SNES snes, PetscInt, PetscReal, void* mctx)
+  {
+    unsigned int * max_iters = (unsigned int *) mctx;
+    PetscErrorCode ierr = 0;
+
+    KSP ksp;
+    ierr = SNESGetKSP(snes, &ksp);
+    LIBMESH_CHKERR(ierr);
+
+    PetscInt niter;
+    ierr = KSPGetIterationNumber(ksp, &niter);
+    LIBMESH_CHKERR(ierr);
+
+    if (niter > *max_iters)
+    {
+      // -2 is a magic number for "recalculate next time you need it
+      // and then not again"
+      ierr = SNESSetLagPreconditioner(snes, -2);
+      LIBMESH_CHKERR(ierr);
+    }
+    return 0;
+  }
 
   //-------------------------------------------------------------------
   // this function is called by PETSc at the end of each nonlinear step
@@ -615,15 +642,22 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   _zero_out_jacobian(true),
   _default_monitor(true),
   _snesmf_reuse_base(true),
-  _computing_base_vector(true)
+  _computing_base_vector(true),
+  _setup_reuse(false)
 {
 }
 
 
 
 template <typename T>
-PetscNonlinearSolver<T>::~PetscNonlinearSolver () = default;
-
+PetscNonlinearSolver<T>::~PetscNonlinearSolver ()
+{
+  // Take care of the SNES instance, if it was allocated
+  if (_snes)
+    {
+    _snes.destroy();
+    }
+}
 
 
 template <typename T>
@@ -633,8 +667,15 @@ void PetscNonlinearSolver<T>::clear ()
     {
       this->_is_initialized = false;
 
-      // Calls custom deleter
-      _snes.destroy();
+      // If we don't need the preconditioner next time
+      // retain the original behavior of clearing the data
+      // between solves.
+      if (!(this->reuse_preconditioner))
+        {
+        PetscErrorCode ierr=0;
+        ierr = SNESReset(_snes);
+        LIBMESH_CHKERR(ierr);
+        }
 
       // Reset the nonlinear iteration counter.  This information is only relevant
       // *during* the solve().  After the solve is completed it should return to
@@ -655,8 +696,15 @@ void PetscNonlinearSolver<T>::init (const char * name)
 
       PetscErrorCode ierr=0;
 
-      ierr = SNESCreate(this->comm().get(), _snes.get());
-      LIBMESH_CHKERR(ierr);
+      // Make only if we don't already have a retained snes
+      // hanging around from the last solve
+      if (!_snes) {
+        ierr = SNESCreate(this->comm().get(), _snes.get());
+        LIBMESH_CHKERR(ierr);
+      }
+
+      // I believe all of the following can be safely repeated
+      // even on an old snes instance from the last solve
 
       if (name)
         {
@@ -680,12 +728,7 @@ void PetscNonlinearSolver<T>::init (const char * name)
         // SNES now owns the reference to dm.
       }
 
-      if (_default_monitor)
-        {
-          ierr = SNESMonitorSet (_snes, libmesh_petsc_snes_monitor,
-                                 this, PETSC_NULL);
-          LIBMESH_CHKERR(ierr);
-        }
+      setup_default_monitor();
 
       // If the SolverConfiguration object is provided, use it to set
       // options during solver initialization.
@@ -729,7 +772,6 @@ void PetscNonlinearSolver<T>::init (const char * name)
       LIBMESH_CHKERR(ierr);
     }
 }
-
 
 
 template <typename T>
@@ -815,6 +857,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   LOG_SCOPE("solve()", "PetscNonlinearSolver");
   this->init ();
 
+
   // Make sure the data passed in are really of Petsc types
   PetscMatrix<T> * pre = cast_ptr<PetscMatrix<T> *>(&pre_in);
   PetscVector<T> * x   = cast_ptr<PetscVector<T> *>(&x_in);
@@ -824,6 +867,40 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   PetscInt n_iterations =0;
   // Should actually be a PetscReal, but I don't know which version of PETSc first introduced PetscReal
   Real final_residual_norm=0.;
+
+  // We don't want to do this twice because it resets
+  // SNESSetLagPreconditioner
+  if ((this->reuse_preconditioner) && (!_setup_reuse))
+    {
+      _setup_reuse = true;
+      ierr = SNESSetLagPreconditionerPersists(_snes, PETSC_TRUE);
+      LIBMESH_CHKERR(ierr);
+      // According to the PETSC 3.16.5 docs -2 is a magic number which
+      // means "recalculate the next time you need it and then not again"
+      ierr = SNESSetLagPreconditioner(_snes, -2);
+      LIBMESH_CHKERR(ierr);
+      // Add in our callback which will trigger recalculating
+      // the preconditioner when we hit reuse_preconditioner_max_its
+      ierr = SNESMonitorSet(_snes, &libmesh_petsc_recalculate_monitor,
+                            (void*)
+                            &(this->reuse_preconditioner_max_its),
+                            NULL);
+      LIBMESH_CHKERR(ierr);
+    }
+  else if (!(this->reuse_preconditioner))
+    // This covers the case where it was enabled but was then disabled
+    {
+      ierr = SNESSetLagPreconditionerPersists(_snes, PETSC_FALSE);
+      LIBMESH_CHKERR(ierr);
+      if (_setup_reuse)
+        {
+          _setup_reuse = false;
+          ierr = SNESMonitorCancel(_snes);
+          LIBMESH_CHKERR(ierr);
+          // Readd default monitor
+          setup_default_monitor();
+        }
+    }
 
   ierr = SNESSetFunction (_snes, r->vec(), libmesh_petsc_snes_residual, this);
   LIBMESH_CHKERR(ierr);
@@ -998,6 +1075,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   //Based on Petsc 2.3.3 documentation all diverged reasons are negative
   this->converged = (_reason >= 0);
 
+  // Reset data structure
   this->clear();
 
   // return the # of its. and the final residual norm.
@@ -1034,6 +1112,17 @@ template <typename T>
 int PetscNonlinearSolver<T>::get_total_linear_iterations()
 {
   return _n_linear_iterations;
+}
+
+template <typename T>
+void PetscNonlinearSolver<T>::setup_default_monitor()
+{
+  if (_default_monitor)
+    {
+      PetscErrorCode ierr = SNESMonitorSet (_snes, libmesh_petsc_snes_monitor,
+                                            this, PETSC_NULL);
+      LIBMESH_CHKERR(ierr);
+    }
 }
 
 
