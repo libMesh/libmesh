@@ -672,9 +672,10 @@ void PetscNonlinearSolver<T>::clear ()
       // between solves.
       if (!(this->reuse_preconditioner))
         {
-        PetscErrorCode ierr=0;
-        ierr = SNESReset(_snes);
-        LIBMESH_CHKERR(ierr);
+        // SNESReset really ought to work but replacing destory() with
+        // SNESReset causes a very slight change in behavior that
+        // manifests as two failed MOOSE tests...
+        _snes.destroy();
         }
 
       // Reset the nonlinear iteration counter.  This information is only relevant
