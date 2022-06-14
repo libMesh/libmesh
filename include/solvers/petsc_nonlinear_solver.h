@@ -207,6 +207,16 @@ public:
     */
   void setup_default_monitor();
 
+  /**
+   * Getter for preconditioner reuse
+   */
+  virtual bool reuse_preconditioner() const override;
+
+  /**
+   *  Getter for the maximum iterations flag for preconditioner reuse
+   */
+  virtual unsigned int reuse_preconditioner_max_its() const override;
+
 protected:
 
   /**

@@ -350,21 +350,42 @@ public:
   bool converged;
 
   /**
-   * Whether we should reuse the linear preconditioner
-   */
-  bool reuse_preconditioner;
-
-  /**
-   * Number of linear iterations to retain the preconditioner
-   */
-  unsigned int reuse_preconditioner_max_its;
-
-  /**
    * Set the solver configuration object.
    */
   void set_solver_configuration(SolverConfiguration & solver_configuration);
 
+  /**
+   *  Get the reuse_preconditioner flag
+   */
+  virtual bool reuse_preconditioner() const;
+
+  /**
+   *  Set the reuse preconditioner flag
+   */
+  virtual void set_reuse_preconditioner(bool reuse);
+
+  /**
+   *  Get the reuse_preconditioner_max_its parameter
+   */
+  virtual unsigned int reuse_preconditioner_max_its() const;
+
+  /**
+   *  Set the reuse_preconditioner_max_its parameter
+   */
+  virtual void set_reuse_preconditioner_max_its(unsigned int i);
+
+
 protected:
+  /**
+   * Whether we should reuse the linear preconditioner
+   */
+  bool _reuse_preconditioner;
+
+  /**
+   * Number of linear iterations to retain the preconditioner
+   */
+  unsigned int _reuse_preconditioner_max_its;
+
   /**
    * A reference to the system we are solving.
    */
@@ -425,8 +446,8 @@ NonlinearSolver<T>::NonlinearSolver (sys_type & s) :
   initial_linear_tolerance(0),
   minimum_linear_tolerance(0),
   converged(false),
-  reuse_preconditioner(false),
-  reuse_preconditioner_max_its(0),
+  _reuse_preconditioner(false),
+  _reuse_preconditioner_max_its(0),
   _system(s),
   _is_initialized (false),
   _preconditioner (nullptr),

@@ -148,8 +148,8 @@ void NonlinearImplicitSystem::set_solver_parameters ()
   nonlinear_solver->max_linear_iterations = maxlinearits;
   nonlinear_solver->initial_linear_tolerance = linear_tol;
   nonlinear_solver->minimum_linear_tolerance = linear_min_tol;
-  nonlinear_solver->reuse_preconditioner =  reuse_preconditioner;
-  nonlinear_solver->reuse_preconditioner_max_its = reuse_preconditioner_max_its;
+  nonlinear_solver->set_reuse_preconditioner(reuse_preconditioner);
+  nonlinear_solver->set_reuse_preconditioner_max_its(reuse_preconditioner_max_its);
 
   if (diff_solver.get())
     {

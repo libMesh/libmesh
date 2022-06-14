@@ -670,7 +670,7 @@ void PetscNonlinearSolver<T>::clear ()
       // If we don't need the preconditioner next time
       // retain the original behavior of clearing the data
       // between solves.
-      if (!(this->reuse_preconditioner))
+      if (!(reuse_preconditioner()))
         {
         // SNESReset really ought to work but replacing destory() with
         // SNESReset causes a very slight change in behavior that
@@ -871,7 +871,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
 
   // We don't want to do this twice because it resets
   // SNESSetLagPreconditioner
-  if ((this->reuse_preconditioner) && (!_setup_reuse))
+  if ((reuse_preconditioner()) && (!_setup_reuse))
     {
       _setup_reuse = true;
       ierr = SNESSetLagPreconditionerPersists(_snes, PETSC_TRUE);
@@ -882,13 +882,14 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
       LIBMESH_CHKERR(ierr);
       // Add in our callback which will trigger recalculating
       // the preconditioner when we hit reuse_preconditioner_max_its
+      unsigned int max_its = reuse_preconditioner_max_its();
       ierr = SNESMonitorSet(_snes, &libmesh_petsc_recalculate_monitor,
                             (void*)
-                            &(this->reuse_preconditioner_max_its),
+                            &max_its,
                             NULL);
       LIBMESH_CHKERR(ierr);
     }
-  else if (!(this->reuse_preconditioner))
+  else if (!(reuse_preconditioner()))
     // This covers the case where it was enabled but was then disabled
     {
       ierr = SNESSetLagPreconditionerPersists(_snes, PETSC_FALSE);
@@ -1124,6 +1125,18 @@ void PetscNonlinearSolver<T>::setup_default_monitor()
                                             this, PETSC_NULL);
       LIBMESH_CHKERR(ierr);
     }
+}
+
+template <typename T>
+bool PetscNonlinearSolver<T>::reuse_preconditioner() const
+{
+  return this->_reuse_preconditioner;
+}
+
+template <typename T>
+unsigned int PetscNonlinearSolver<T>::reuse_preconditioner_max_its() const
+{
+  return this->_reuse_preconditioner_max_its;
 }
 
 
