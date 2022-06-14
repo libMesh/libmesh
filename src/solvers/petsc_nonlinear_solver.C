@@ -643,7 +643,8 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   _default_monitor(true),
   _snesmf_reuse_base(true),
   _computing_base_vector(true),
-  _setup_reuse(false)
+  _setup_reuse(false),
+  _max_its(0)
 {
 }
 
@@ -882,10 +883,10 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
       LIBMESH_CHKERR(ierr);
       // Add in our callback which will trigger recalculating
       // the preconditioner when we hit reuse_preconditioner_max_its
-      unsigned int max_its = reuse_preconditioner_max_its();
+      _max_its = reuse_preconditioner_max_its();
       ierr = SNESMonitorSet(_snes, &libmesh_petsc_recalculate_monitor,
                             (void*)
-                            &max_its,
+                            &_max_its,
                             NULL);
       LIBMESH_CHKERR(ierr);
     }
