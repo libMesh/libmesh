@@ -596,15 +596,13 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
                         // If found a match with my side
                         //
-                        // We need special tests here for 1D:
-                        // since parents and children have an equal
-                        // side (i.e. a node), we need to check
-                        // ns != ms, and we also check level() to
-                        // avoid setting our neighbor pointer to
-                        // any of our neighbor's descendants
+                        // In 1D, since parents and children have an
+                        // equal side (i.e. a node) we need to check
+                        // for matching level() to avoid setting our
+                        // neighbor pointer to any of our neighbor's
+                        // descendants.
                         if ((*my_side == *their_side) &&
-                            (element->level() == neighbor->level()) &&
-                            ((element->dim() != 1) || (ns != ms)))
+                            (element->level() == neighbor->level()))
                           {
                             // So share a side.  Is this a mixed pair
                             // of subactive and active/ancestor
