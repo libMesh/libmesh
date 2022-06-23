@@ -2042,7 +2042,6 @@ psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
-subdirs = @subdirs@
 subdirs_extra = @subdirs_extra@
 sysconfdir = @sysconfdir@
 target = @target@
