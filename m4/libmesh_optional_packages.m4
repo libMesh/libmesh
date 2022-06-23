@@ -21,9 +21,6 @@ AC_REQUIRE([LIBMESH_SET_COMPILERS])
 # source tree for building contributed packages that do not
 # need to be exported as part of the installation environment.
 #
-# libmesh_subpackage_arguments is a list of configure arguments
-# that will be passed down to any subpackages that we are nesting.
-#
 # libmesh_pkgconfig_requires is a list of pkgconfig requirements
 # we will add
 #
@@ -33,7 +30,6 @@ AC_REQUIRE([LIBMESH_SET_COMPILERS])
 libmesh_optional_INCLUDES=""
 libmesh_optional_LIBS=""
 libmesh_contrib_INCLUDES=""
-libmesh_subpackage_arguments=""
 libmesh_pkgconfig_requires=""
 libmesh_installed_LIBS=""
 

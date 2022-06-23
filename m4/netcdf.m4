@@ -50,13 +50,28 @@ AC_DEFUN([CONFIGURE_NETCDF],
   dnl allow opt-out for nested subpackages
   AS_IF([test "x$enablenested" = "xyes"],
         [
+          dnl We need our netcdf subpackage to be able to use whatever HDF5 we've
+          dnl detected.  That means using whatever $HDF5_CPPFLAGS and $HDF5_LIBS
+          dnl we've determined work - but if we're using PETSc it also means
+          dnl passing along PETSc's directories in case we want to link to a
+          dnl --download-hdf5 build there.
+          SUB_CPPFLAGS="$CPPFLAGS"
+          SUB_LIBS="$LIBS"
+          AS_IF([test $enablehdf5 = yes],
+                [
+                 SUB_CPPFLAGS="$HDF5_CPPFLAGS $SUB_CPPFLAGS"
+                 SUB_LIBS="$HDF5_LIBS $SUB_LIBS"
+                 AS_IF([test "x$enablepetsc" != "xno"],
+                       [
+                        SUB_CPPFLAGS="$PETSCINCLUDEDIRS $SUB_CPPFLAGS"
+                        SUB_LIBS="$PETSCLINKLIBS $SUB_LIBS"
+                       ])])
+
           dnl ensure that the configuration is consistent
-          AS_IF([test "x$enablecurl" = "xyes"],
-                [libmesh_subpackage_arguments="$libmesh_subpackage_arguments --enable-dap" ],
-                [libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-dap --disable-curl"])
           dnl pass --disable-testsets to the netcdf subpackage to disable the most rigorous tests
-          libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-testsets"
-          AC_CONFIG_SUBDIRS([contrib/netcdf/v4])
+          AS_IF([test "x$enablecurl" = "xyes"],
+                [AX_SUBDIRS_CONFIGURE([contrib/netcdf/v4],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[--enable-dap],[--disable-testsets]])],
+                [AX_SUBDIRS_CONFIGURE([contrib/netcdf/v4],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[--disable-dap],[--disable-curl],[--disable-testsets]])])
         ])
 
   AC_SUBST(NETCDF_INCLUDE)
