@@ -155,7 +155,8 @@ void TriangulatorInterface::insert_any_extra_boundary_points()
 
       // Insert a new point on each PSLG at evenly spaced locations
       // between existing boundary points.
-      // np=index into new points vector
+      // np=index into new points vector, also an explicit node index
+      // (to avoid the stride in automatic DistributedMesh indexing)
       // n =index into original points vector
       for (std::size_t np=0, n=0, tops=n_interpolated*original_points.size(); np<tops; ++np)
         {
@@ -163,7 +164,7 @@ void TriangulatorInterface::insert_any_extra_boundary_points()
 
           // Some entries are the original points
           if (!offset)
-            _mesh.add_point(original_points[n++]);
+            _mesh.add_point(original_points[n++], np);
 
           else // the odd entries are equispaced along the original PSLG segments
             {
@@ -172,7 +173,7 @@ void TriangulatorInterface::insert_any_extra_boundary_points()
               const Point new_point =
                 (offset*original_points[next_n] +
                  (n_interpolated-offset)*original_points[n-1])/n_interpolated;
-              _mesh.add_point(new_point);
+              _mesh.add_point(new_point, np);
             }
         }
     }
