@@ -93,7 +93,13 @@ public:
   template <typename IOClass>
   void testWriteImpl(const std::string & filename)
   {
-    Mesh mesh(*TestCommWorld);
+    // TODO: Currently this test only works for ReplicatedMesh. It
+    // should be updated so that it works for DistributedMesh as well,
+    // and then we can just set MeshType == Mesh.
+    typedef ReplicatedMesh MeshType;
+
+    // Construct mesh for writing
+    MeshType mesh(*TestCommWorld);
 
     // Allocate space for an extra integer on each element to store a "code" which
     // determines which sets an Elem belongs to. We do this before building the Mesh.
@@ -224,7 +230,7 @@ public:
     TestCommWorld->barrier();
 
     // Now read it back in
-    Mesh read_mesh(*TestCommWorld);
+    MeshType read_mesh(*TestCommWorld);
 
     // Do not allow renumbering on this mesh either.
     read_mesh.allow_renumbering(false);
