@@ -28,6 +28,7 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/function_base.h"
 #include "libmesh/hashing.h"
+#include "libmesh/mesh_serializer.h"
 #include "libmesh/mesh_smoother_laplace.h"
 #include "libmesh/mesh_triangle_holes.h"
 #include "libmesh/unstructured_mesh.h"
@@ -151,7 +152,6 @@ namespace libMesh
 Poly2TriTriangulator::Poly2TriTriangulator(UnstructuredMesh & mesh,
                                            dof_id_type n_boundary_nodes)
   : TriangulatorInterface(mesh),
-    _serializer(_mesh),
     _n_boundary_nodes(n_boundary_nodes),
     _refine_bdy_allowed(true)
 {
@@ -164,6 +164,11 @@ Poly2TriTriangulator::~Poly2TriTriangulator() = default;
 // Primary function responsible for performing the triangulation
 void Poly2TriTriangulator::triangulate()
 {
+  // We only operate on serialized meshes.  And it's not safe to
+  // serialize earlier, because it would then be possible for the user
+  // to re-parallelize the mesh in between there and here.
+  MeshSerializer serializer(_mesh);
+
   // We don't yet support every set of Triangulator options in the
   // poly2tri implementation
 
