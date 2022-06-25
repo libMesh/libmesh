@@ -278,9 +278,10 @@ void Poly2TriTriangulator::triangulate_current_points()
 
   // Unless we're using an explicit segments list, we assume node ids
   // are contiguous here.
+  dof_id_type nn = _mesh.max_node_id();
   if (this->segments.empty())
     libmesh_error_msg_if
-      (_mesh.n_nodes() != _mesh.max_node_id(),
+      (_mesh.n_nodes() != nn,
        "Poly2TriTriangulator needs contiguous node ids or explicit segments!");
 
   // And if we have more nodes than outer boundary points, the rest
@@ -460,7 +461,7 @@ void Poly2TriTriangulator::triangulate_current_points()
             }
           else
             {
-              Node * node = _mesh.add_point(p);
+              Node * node = _mesh.add_point(p, nn++);
               point_node_map[pt] = node;
             }
         }
@@ -582,6 +583,10 @@ bool Poly2TriTriangulator::insert_refinement_points()
 
   BoundaryInfo & boundary_info = _mesh.get_boundary_info();
 
+  // In cases where we've been working with contiguous node id ranges;
+  // let's keep it that way.
+  dof_id_type nn = _mesh.max_node_id();
+
   for (auto & elem : mesh.element_ptr_range())
     {
       // element_ptr_range skips deleted elements ... right?
@@ -668,13 +673,13 @@ bool Poly2TriTriangulator::insert_refinement_points()
                                                    side))
                 {
                   new_pt = ray_start;
-                  new_node = mesh.add_point(new_pt);
+                  new_node = mesh.add_point(new_pt, nn++);
                   boundary_refine(side);
                 }
               else
                 {
                   new_pt = cavity_elem->vertex_average();
-                  new_node = mesh.add_point(new_pt);
+                  new_node = mesh.add_point(new_pt, nn++);
                   // This was going to be a side refinement but it's
                   // now an internal refinement
                   side = invalid_uint;
@@ -729,13 +734,13 @@ bool Poly2TriTriangulator::insert_refinement_points()
                   // Let's just try bisecting for now
                   new_pt = (cavity_elem->point(side) +
                             cavity_elem->point((side+1)%3)) / 2;
-                  new_node = mesh.add_point(new_pt);
+                  new_node = mesh.add_point(new_pt, nn++);
                   boundary_refine(side);
                 }
               else // Do the best we can under these restrictions
                 {
                   new_pt = cavity_elem->vertex_average();
-                  new_node = mesh.add_point(new_pt);
+                  new_node = mesh.add_point(new_pt, nn++);
 
                   // This was going to be a side refinement but it's
                   // now an internal refinement
@@ -743,7 +748,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                 }
             }
           else
-            new_node = mesh.add_point(new_pt);
+            new_node = mesh.add_point(new_pt, nn++);
         }
       else
         libmesh_assert(new_node);
