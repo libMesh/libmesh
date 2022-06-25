@@ -30,13 +30,26 @@ namespace libMesh
 class MeshBase;
 
 /**
- * Temporarily serialize a DistributedMesh for output; a distributed
- * mesh is allgathered by the MeshSerializer constructor if
- * need_serial is true, then remote elements are deleted again by the
- * destructor.
+ * Temporarily serialize a DistributedMesh for non-distributed-mesh
+ * capable code paths.  A distributed mesh is allgathered by the
+ * MeshSerializer constructor if need_serial is true, in which case
+ * remote elements are deleted again by the destructor.
+ *
+ * Serialization to processor 0 alone (e.g. for serial output from
+ * that processor) can be selected in the constructor.
+ *
+ * If allow_remote_element_removal() is set to true, that will also be
+ * temporarily disabled by the serializer, to be reenabled after
+ * serializer distruction if so; this allows prepare_for_use() to be
+ * called safely from within serialized code.
+ *
+ * If a mesh is explicitly distributed by a `delete_remote_elements()`
+ * call within serialized code, or if allow_remote_element_removal()
+ * is explicitly set to true within serialized code, the behavior is
+ * undefined.
  *
  * \author Roy Stogner
- * \date 2011
+ * \date 2011-2022
  * \brief Temporarily serializes a DistributedMesh for output.
  */
 class MeshSerializer
@@ -47,8 +60,24 @@ public:
   ~MeshSerializer();
 
 private:
+  /*
+   * The mesh which should remain serialized while this serializer
+   * exists
+   */
   MeshBase & _mesh;
+
+  /*
+   * Whether to delete remote elements on the mesh (returning it to a
+   * distributed state) when the serializer is destroyed
+   */
   bool reparallelize;
+
+  /*
+   * Whether to again allow `prepare_for_use` to delete remote
+   * elements on the mesh (returning it to a distributed state) after
+   * the serializer is destroyed
+   */
+  bool resume_allow_remote_element_removal;
 };
 
 } // namespace libMesh
