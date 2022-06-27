@@ -445,40 +445,39 @@ XdrIO::write_serialized_connectivity (Xdr & io,
                 output_buffer.clear();
 
                 // n. nodes
-                const xdr_id_type n_nodes = *recv_conn_iter;
-                ++recv_conn_iter;
+                const xdr_id_type n_nodes = *recv_conn_iter++;
 
                 // type
-                output_buffer.push_back(*recv_conn_iter);
-                ++recv_conn_iter;
+                output_buffer.push_back(*recv_conn_iter++);
 
                 // unique_id
+                xdr_id_type tmp = *recv_conn_iter++;
                 if (_write_unique_id)
-                  output_buffer.push_back(*recv_conn_iter);
-                ++recv_conn_iter;
+                  output_buffer.push_back(tmp);
 
                 // processor id
+                tmp = *recv_conn_iter++;
                 if (write_partitioning)
-                  output_buffer.push_back(*recv_conn_iter);
-                ++recv_conn_iter;
+                  output_buffer.push_back(tmp);
 
                 // subdomain id
+                tmp = *recv_conn_iter++;
                 if (write_subdomain_id)
-                  output_buffer.push_back(*recv_conn_iter);
-                ++recv_conn_iter;
+                  output_buffer.push_back(tmp);
 
 #ifdef LIBMESH_ENABLE_AMR
                 // p level
+                tmp = *recv_conn_iter++;
                 if (write_p_level)
-                  output_buffer.push_back(*recv_conn_iter);
-                ++recv_conn_iter;
+                  output_buffer.push_back(tmp);
 #endif
-                for (dof_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
-                  output_buffer.push_back(*recv_conn_iter);
+
+                for (dof_id_type node=0; node<n_nodes; node++)
+                  output_buffer.push_back(*recv_conn_iter++);
 
                 // Write out the elem extra integers after the connectivity
-                for (dof_id_type n=0; n<n_elem_integers; n++, ++recv_conn_iter)
-                  output_buffer.push_back(*recv_conn_iter);
+                for (dof_id_type n=0; n<n_elem_integers; n++)
+                  output_buffer.push_back(*recv_conn_iter++);
 
                 io.data_stream
                   (output_buffer.data(),
@@ -571,45 +570,41 @@ XdrIO::write_serialized_connectivity (Xdr & io,
                     output_buffer.clear();
 
                     // n. nodes
-                    const xdr_id_type n_nodes = *recv_conn_iter;
-                    ++recv_conn_iter;
+                    const xdr_id_type n_nodes = *recv_conn_iter++;
 
                     // type
-                    output_buffer.push_back(*recv_conn_iter);
-                    ++recv_conn_iter;
+                    output_buffer.push_back(*recv_conn_iter++);
 
                     // unique_id
+                    xdr_id_type tmp = *recv_conn_iter++;
                     if (_write_unique_id)
-                      output_buffer.push_back(*recv_conn_iter);
-                    ++recv_conn_iter;
+                      output_buffer.push_back(tmp);
 
                     // parent local id
-                    const xdr_id_type parent_local_id = *recv_conn_iter;
-                    ++recv_conn_iter;
+                    const xdr_id_type parent_local_id = *recv_conn_iter++;
 
                     // parent processor id
-                    const xdr_id_type parent_pid = *recv_conn_iter;
-                    ++recv_conn_iter;
+                    const xdr_id_type parent_pid = *recv_conn_iter++;
 
                     output_buffer.push_back (parent_local_id+processor_offsets[parent_pid]);
 
                     // processor id
+                    tmp = *recv_conn_iter++;
                     if (write_partitioning)
-                      output_buffer.push_back(*recv_conn_iter);
-                    ++recv_conn_iter;
+                      output_buffer.push_back(tmp);
 
                     // subdomain id
+                    tmp = *recv_conn_iter++;
                     if (write_subdomain_id)
-                      output_buffer.push_back(*recv_conn_iter);
-                    ++recv_conn_iter;
+                      output_buffer.push_back(tmp);
 
                     // p level
+                    tmp = *recv_conn_iter++;
                     if (write_p_level)
-                      output_buffer.push_back(*recv_conn_iter);
-                    ++recv_conn_iter;
+                      output_buffer.push_back(tmp);
 
-                    for (xdr_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
-                      output_buffer.push_back(*recv_conn_iter);
+                    for (xdr_id_type node=0; node<n_nodes; node++)
+                      output_buffer.push_back(*recv_conn_iter++);
 
                     io.data_stream
                       (output_buffer.data(),
@@ -1840,7 +1835,11 @@ XdrIO::read_serialized_connectivity (Xdr & io,
       typename std::vector<T>::const_iterator it = conn.begin();
       for (dof_id_type e=first_elem; e<last_elem; e++)
         {
-          const ElemType elem_type        = static_cast<ElemType>(*it); ++it;
+          // Temporary variable for reading connectivity array
+          // entries.
+          T tmp;
+
+          const ElemType elem_type = static_cast<ElemType>(*it++);
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
           // We are on all processors here, so the mesh can easily
           // assign consistent unique ids if the file doesn't specify
@@ -1850,27 +1849,27 @@ XdrIO::read_serialized_connectivity (Xdr & io,
 #endif
           if (read_unique_id)
             {
+              tmp = *it++;
+
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              unique_id  = cast_int<unique_id_type>(*it);
+              unique_id  = cast_int<unique_id_type>(tmp);
 #endif
-              ++it;
             }
+
+          tmp = *it++;
           const dof_id_type parent_id =
-            (*it == static_cast<T>(-1)) ?
-            DofObject::invalid_id :
-            cast_int<dof_id_type>(*it);
-          ++it;
+            (tmp == static_cast<T>(-1)) ? DofObject::invalid_id : cast_int<dof_id_type>(tmp);
+
           const processor_id_type proc_id =
-            cast_int<processor_id_type>(*it);
-          ++it;
+            cast_int<processor_id_type>(*it++);
+
           const subdomain_id_type subdomain_id =
-            cast_int<subdomain_id_type>(*it);
-          ++it;
+            cast_int<subdomain_id_type>(*it++);
+
+          tmp = *it++;
 #ifdef LIBMESH_ENABLE_AMR
-          const unsigned int p_level =
-            cast_int<unsigned int>(*it);
+          const unsigned int p_level = cast_int<unsigned int>(tmp);
 #endif
-          ++it;
 
           Elem * parent = (parent_id == DofObject::invalid_id) ?
             nullptr : mesh.elem_ptr(parent_id);
