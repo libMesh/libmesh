@@ -1976,7 +1976,8 @@ XdrIO::read_serialized_nodes (Xdr & io,
   // build up a list of the nodes contained in our local mesh.  These are the nodes
   // stored on the local processor whose (x,y,z) and unique_id values
   // need to be corrected.
-  std::vector<dof_id_type> needed_nodes; needed_nodes.reserve (mesh.n_nodes());
+  std::vector<dof_id_type> needed_nodes;
+  needed_nodes.reserve (mesh.n_nodes());
   {
     for (auto & node : mesh.node_ptr_range())
       needed_nodes.push_back(node->id());
