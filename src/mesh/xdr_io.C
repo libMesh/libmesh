@@ -528,22 +528,21 @@ XdrIO::write_serialized_connectivity (Xdr & io,
         {
           // Write the number of elements at this level.
           {
-            char buf[80];
-            std::sprintf(buf, "# n_elem at level %u", level);
-            std::string comment(buf), legend  = ", [ type ";
+            std::ostringstream buf;
+            buf << "# n_elem at level " << level << ", [ type ";
 
             if (_write_unique_id)
-              legend += "uid ";
-            legend += "parent ";
+              buf << "uid ";
+            buf << "parent ";
             if (write_partitioning)
-              legend += "pid ";
+              buf << "pid ";
             if (write_subdomain_id)
-              legend += "sid ";
+              buf << "sid ";
             if (write_p_level)
-              legend += "p_level ";
-            legend += "(n0 ... nN-1) ]";
-            comment += legend;
-            io.data (n_global_elem_at_level[level], comment.c_str());
+              buf << "p_level ";
+            buf << "(n0 ... nN-1) ]";
+
+            io.data (n_global_elem_at_level[level], buf.str().c_str());
           }
 
           for (auto pid : make_range(this->n_processors()))
