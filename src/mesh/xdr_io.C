@@ -40,7 +40,7 @@
 #include <cstdio>
 #include <vector>
 #include <string>
-
+#include <tuple>
 
 namespace libMesh
 {
@@ -436,11 +436,9 @@ XdrIO::write_serialized_connectivity (Xdr & io,
           // which could be 0.
           libmesh_assert (!recv_conn.empty());
 
-          {
-            const xdr_id_type n_elem_received = recv_conn.back();
-            std::vector<xdr_id_type>::const_iterator recv_conn_iter = recv_conn.begin();
-
-            for (xdr_id_type elem=0; elem<n_elem_received; elem++, next_global_elem++)
+            for (auto [elem, recv_conn_iter, n_elem_received] =
+                   std::tuple{xdr_id_type(0), recv_conn.begin(), recv_conn.back()};
+                 elem<n_elem_received; elem++, next_global_elem++)
               {
                 output_buffer.clear();
 
@@ -484,7 +482,6 @@ XdrIO::write_serialized_connectivity (Xdr & io,
                    cast_int<unsigned int>(output_buffer.size()),
                    cast_int<unsigned int>(output_buffer.size()));
               }
-          }
         }
     }
   else
@@ -561,11 +558,10 @@ XdrIO::write_serialized_connectivity (Xdr & io,
               // which could be 0.
               libmesh_assert (!recv_conn.empty());
 
-              {
-                const xdr_id_type n_elem_received = recv_conn.back();
-                std::vector<xdr_id_type>::const_iterator recv_conn_iter = recv_conn.begin();
-
-                for (xdr_id_type elem=0; elem<n_elem_received; elem++, next_global_elem++)
+                for (auto [elem, recv_conn_iter, n_elem_received] =
+                       std::tuple{xdr_id_type(0), recv_conn.begin(), recv_conn.back()};
+                     elem<n_elem_received;
+                     elem++, next_global_elem++)
                   {
                     output_buffer.clear();
 
@@ -611,7 +607,6 @@ XdrIO::write_serialized_connectivity (Xdr & io,
                        cast_int<unsigned int>(output_buffer.size()),
                        cast_int<unsigned int>(output_buffer.size()));
                   }
-              }
             }
         }
       else
@@ -1832,8 +1827,7 @@ XdrIO::read_serialized_connectivity (Xdr & io,
       this->comm().broadcast (conn);
 
       // All processors now have the connectivity for this block.
-      typename std::vector<T>::const_iterator it = conn.begin();
-      for (dof_id_type e=first_elem; e<last_elem; e++)
+      for (auto [e, it] = std::tuple{first_elem, conn.begin()}; e<last_elem; e++)
         {
           // Temporary variable for reading connectivity array
           // entries.
