@@ -5,6 +5,7 @@
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/parallel.h" // set_union
+#include "libmesh/replicated_mesh.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/utility.h" // libmesh_map_find
