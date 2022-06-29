@@ -40,7 +40,7 @@
 #include <cstdio>
 #include <vector>
 #include <string>
-
+#include <tuple>
 
 namespace libMesh
 {
@@ -436,56 +436,52 @@ XdrIO::write_serialized_connectivity (Xdr & io,
           // which could be 0.
           libmesh_assert (!recv_conn.empty());
 
-          {
-            const xdr_id_type n_elem_received = recv_conn.back();
-            std::vector<xdr_id_type>::const_iterator recv_conn_iter = recv_conn.begin();
-
-            for (xdr_id_type elem=0; elem<n_elem_received; elem++, next_global_elem++)
+            for (auto [elem, recv_conn_iter, n_elem_received] =
+                   std::tuple{xdr_id_type(0), recv_conn.begin(), recv_conn.back()};
+                 elem<n_elem_received; elem++, next_global_elem++)
               {
                 output_buffer.clear();
 
                 // n. nodes
-                const xdr_id_type n_nodes = *recv_conn_iter;
-                ++recv_conn_iter;
+                const xdr_id_type n_nodes = *recv_conn_iter++;
 
                 // type
-                output_buffer.push_back(*recv_conn_iter);
-                ++recv_conn_iter;
+                output_buffer.push_back(*recv_conn_iter++);
 
                 // unique_id
+                xdr_id_type tmp = *recv_conn_iter++;
                 if (_write_unique_id)
-                  output_buffer.push_back(*recv_conn_iter);
-                ++recv_conn_iter;
+                  output_buffer.push_back(tmp);
 
                 // processor id
+                tmp = *recv_conn_iter++;
                 if (write_partitioning)
-                  output_buffer.push_back(*recv_conn_iter);
-                ++recv_conn_iter;
+                  output_buffer.push_back(tmp);
 
                 // subdomain id
+                tmp = *recv_conn_iter++;
                 if (write_subdomain_id)
-                  output_buffer.push_back(*recv_conn_iter);
-                ++recv_conn_iter;
+                  output_buffer.push_back(tmp);
 
 #ifdef LIBMESH_ENABLE_AMR
                 // p level
+                tmp = *recv_conn_iter++;
                 if (write_p_level)
-                  output_buffer.push_back(*recv_conn_iter);
-                ++recv_conn_iter;
+                  output_buffer.push_back(tmp);
 #endif
-                for (dof_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
-                  output_buffer.push_back(*recv_conn_iter);
+
+                for (dof_id_type node=0; node<n_nodes; node++)
+                  output_buffer.push_back(*recv_conn_iter++);
 
                 // Write out the elem extra integers after the connectivity
-                for (dof_id_type n=0; n<n_elem_integers; n++, ++recv_conn_iter)
-                  output_buffer.push_back(*recv_conn_iter);
+                for (dof_id_type n=0; n<n_elem_integers; n++)
+                  output_buffer.push_back(*recv_conn_iter++);
 
                 io.data_stream
                   (output_buffer.data(),
                    cast_int<unsigned int>(output_buffer.size()),
                    cast_int<unsigned int>(output_buffer.size()));
               }
-          }
         }
     }
   else
@@ -532,22 +528,21 @@ XdrIO::write_serialized_connectivity (Xdr & io,
         {
           // Write the number of elements at this level.
           {
-            char buf[80];
-            std::sprintf(buf, "# n_elem at level %u", level);
-            std::string comment(buf), legend  = ", [ type ";
+            std::ostringstream buf;
+            buf << "# n_elem at level " << level << ", [ type ";
 
             if (_write_unique_id)
-              legend += "uid ";
-            legend += "parent ";
+              buf << "uid ";
+            buf << "parent ";
             if (write_partitioning)
-              legend += "pid ";
+              buf << "pid ";
             if (write_subdomain_id)
-              legend += "sid ";
+              buf << "sid ";
             if (write_p_level)
-              legend += "p_level ";
-            legend += "(n0 ... nN-1) ]";
-            comment += legend;
-            io.data (n_global_elem_at_level[level], comment.c_str());
+              buf << "p_level ";
+            buf << "(n0 ... nN-1) ]";
+
+            io.data (n_global_elem_at_level[level], buf.str().c_str());
           }
 
           for (auto pid : make_range(this->n_processors()))
@@ -562,61 +557,55 @@ XdrIO::write_serialized_connectivity (Xdr & io,
               // which could be 0.
               libmesh_assert (!recv_conn.empty());
 
-              {
-                const xdr_id_type n_elem_received = recv_conn.back();
-                std::vector<xdr_id_type>::const_iterator recv_conn_iter = recv_conn.begin();
-
-                for (xdr_id_type elem=0; elem<n_elem_received; elem++, next_global_elem++)
+                for (auto [elem, recv_conn_iter, n_elem_received] =
+                       std::tuple{xdr_id_type(0), recv_conn.begin(), recv_conn.back()};
+                     elem<n_elem_received;
+                     elem++, next_global_elem++)
                   {
                     output_buffer.clear();
 
                     // n. nodes
-                    const xdr_id_type n_nodes = *recv_conn_iter;
-                    ++recv_conn_iter;
+                    const xdr_id_type n_nodes = *recv_conn_iter++;
 
                     // type
-                    output_buffer.push_back(*recv_conn_iter);
-                    ++recv_conn_iter;
+                    output_buffer.push_back(*recv_conn_iter++);
 
                     // unique_id
+                    xdr_id_type tmp = *recv_conn_iter++;
                     if (_write_unique_id)
-                      output_buffer.push_back(*recv_conn_iter);
-                    ++recv_conn_iter;
+                      output_buffer.push_back(tmp);
 
                     // parent local id
-                    const xdr_id_type parent_local_id = *recv_conn_iter;
-                    ++recv_conn_iter;
+                    const xdr_id_type parent_local_id = *recv_conn_iter++;
 
                     // parent processor id
-                    const xdr_id_type parent_pid = *recv_conn_iter;
-                    ++recv_conn_iter;
+                    const xdr_id_type parent_pid = *recv_conn_iter++;
 
                     output_buffer.push_back (parent_local_id+processor_offsets[parent_pid]);
 
                     // processor id
+                    tmp = *recv_conn_iter++;
                     if (write_partitioning)
-                      output_buffer.push_back(*recv_conn_iter);
-                    ++recv_conn_iter;
+                      output_buffer.push_back(tmp);
 
                     // subdomain id
+                    tmp = *recv_conn_iter++;
                     if (write_subdomain_id)
-                      output_buffer.push_back(*recv_conn_iter);
-                    ++recv_conn_iter;
+                      output_buffer.push_back(tmp);
 
                     // p level
+                    tmp = *recv_conn_iter++;
                     if (write_p_level)
-                      output_buffer.push_back(*recv_conn_iter);
-                    ++recv_conn_iter;
+                      output_buffer.push_back(tmp);
 
-                    for (xdr_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
-                      output_buffer.push_back(*recv_conn_iter);
+                    for (xdr_id_type node=0; node<n_nodes; node++)
+                      output_buffer.push_back(*recv_conn_iter++);
 
                     io.data_stream
                       (output_buffer.data(),
                        cast_int<unsigned int>(output_buffer.size()),
                        cast_int<unsigned int>(output_buffer.size()));
                   }
-              }
             }
         }
       else
@@ -711,9 +700,6 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
 
   std::size_t n_written=0;
 
-  MeshBase::const_node_iterator       node_iter = mesh.local_nodes_begin();
-  const MeshBase::const_node_iterator nodes_end = mesh.local_nodes_end();
-
   for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
     {
       const std::size_t first_node = blk*io_blksize;
@@ -725,20 +711,19 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
       xfer_ids.clear();
       xfer_coords.clear();
 
-      for (; node_iter != nodes_end; ++node_iter)
+      for (const auto & node : mesh.local_node_ptr_range())
         {
-          const Node & node = **node_iter;
-          libmesh_assert_greater_equal(node.id(), first_node);
-          if (node.id() >= last_node)
+          libmesh_assert_greater_equal(node->id(), first_node);
+          if (node->id() >= last_node)
             break;
 
-          xfer_ids.push_back(node.id());
-          xfer_coords.push_back(node(0));
+          xfer_ids.push_back(node->id());
+          xfer_coords.push_back((*node)(0));
 #if LIBMESH_DIM > 1
-          xfer_coords.push_back(node(1));
+          xfer_coords.push_back((*node)(1));
 #endif
 #if LIBMESH_DIM > 2
-          xfer_coords.push_back(node(2));
+          xfer_coords.push_back((*node)(2));
 #endif
         }
 
@@ -875,9 +860,6 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
   // Reset write counter
   n_written = 0;
 
-  // Return node iterator to the beginning
-  node_iter = mesh.local_nodes_begin();
-
   for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
     {
       const std::size_t first_node = blk*io_blksize;
@@ -891,15 +873,14 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
       xfer_unique_ids.clear();
       xfer_unique_ids.reserve(tot_id_size);
 
-      for (; node_iter != nodes_end; ++node_iter)
+      for (const auto & node : mesh.local_node_ptr_range())
         {
-          const Node & node = **node_iter;
-          libmesh_assert_greater_equal(node.id(), first_node);
-          if (node.id() >= last_node)
+          libmesh_assert_greater_equal(node->id(), first_node);
+          if (node->id() >= last_node)
             break;
 
-          xfer_ids.push_back(node.id());
-          xfer_unique_ids.push_back(node.unique_id());
+          xfer_ids.push_back(node->id());
+          xfer_unique_ids.push_back(node->unique_id());
         }
 
       //-------------------------------------
@@ -1003,9 +984,6 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
       // Reset write counter
       n_written = 0;
 
-      // Return node iterator to the beginning
-      node_iter = mesh.local_nodes_begin();
-
       // Data structures for writing "extra" node integers
       std::vector<dof_id_type> xfer_node_integers;
       std::vector<dof_id_type> & node_integers = xfer_node_integers;
@@ -1024,18 +1002,17 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
           xfer_node_integers.clear();
           xfer_node_integers.reserve(tot_id_size * n_node_integers);
 
-          for (; node_iter != nodes_end; ++node_iter)
+          for (const auto & node : mesh.local_node_ptr_range())
             {
-              const Node & node = **node_iter;
-              libmesh_assert_greater_equal(node.id(), first_node);
-              if (node.id() >= last_node)
+              libmesh_assert_greater_equal(node->id(), first_node);
+              if (node->id() >= last_node)
                 break;
 
-              xfer_ids.push_back(node.id());
+              xfer_ids.push_back(node->id());
 
               // Append current node's node integers to xfer buffer
               for (unsigned int i=0; i != n_node_integers; ++i)
-                xfer_node_integers.push_back(node.get_extra_integer(i));
+                xfer_node_integers.push_back(node->get_extra_integer(i));
             }
 
           //-------------------------------------
@@ -1837,10 +1814,13 @@ XdrIO::read_serialized_connectivity (Xdr & io,
       this->comm().broadcast (conn);
 
       // All processors now have the connectivity for this block.
-      typename std::vector<T>::const_iterator it = conn.begin();
-      for (dof_id_type e=first_elem; e<last_elem; e++)
+      for (auto [e, it] = std::tuple{first_elem, conn.begin()}; e<last_elem; e++)
         {
-          const ElemType elem_type        = static_cast<ElemType>(*it); ++it;
+          // Temporary variable for reading connectivity array
+          // entries.
+          T tmp;
+
+          const ElemType elem_type = static_cast<ElemType>(*it++);
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
           // We are on all processors here, so the mesh can easily
           // assign consistent unique ids if the file doesn't specify
@@ -1850,27 +1830,27 @@ XdrIO::read_serialized_connectivity (Xdr & io,
 #endif
           if (read_unique_id)
             {
+              tmp = *it++;
+
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              unique_id  = cast_int<unique_id_type>(*it);
+              unique_id  = cast_int<unique_id_type>(tmp);
 #endif
-              ++it;
             }
+
+          tmp = *it++;
           const dof_id_type parent_id =
-            (*it == static_cast<T>(-1)) ?
-            DofObject::invalid_id :
-            cast_int<dof_id_type>(*it);
-          ++it;
+            (tmp == static_cast<T>(-1)) ? DofObject::invalid_id : cast_int<dof_id_type>(tmp);
+
           const processor_id_type proc_id =
-            cast_int<processor_id_type>(*it);
-          ++it;
+            cast_int<processor_id_type>(*it++);
+
           const subdomain_id_type subdomain_id =
-            cast_int<subdomain_id_type>(*it);
-          ++it;
+            cast_int<subdomain_id_type>(*it++);
+
+          tmp = *it++;
 #ifdef LIBMESH_ENABLE_AMR
-          const unsigned int p_level =
-            cast_int<unsigned int>(*it);
+          const unsigned int p_level = cast_int<unsigned int>(tmp);
 #endif
-          ++it;
 
           Elem * parent = (parent_id == DofObject::invalid_id) ?
             nullptr : mesh.elem_ptr(parent_id);
@@ -1976,7 +1956,8 @@ XdrIO::read_serialized_nodes (Xdr & io,
   // build up a list of the nodes contained in our local mesh.  These are the nodes
   // stored on the local processor whose (x,y,z) and unique_id values
   // need to be corrected.
-  std::vector<dof_id_type> needed_nodes; needed_nodes.reserve (mesh.n_nodes());
+  std::vector<dof_id_type> needed_nodes;
+  needed_nodes.reserve (mesh.n_nodes());
   {
     for (auto & node : mesh.node_ptr_range())
       needed_nodes.push_back(node->id());
