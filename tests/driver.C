@@ -17,15 +17,18 @@
 
 // Add Tests to runner that match user-provided regex.
 int add_matching_tests_to_runner(CppUnit::Test * test,
-                                 const std::string & r_str,
-                                 const std::regex & r,
+                                 const std::string & allow_r_str,
+                                 const std::regex & allow_r,
+                                 const std::string & deny_r_str,
+                                 const std::regex & deny_r,
                                  CppUnit::TextUi::TestRunner & runner,
                                  CppUnit::TestSuite & rejects)
 {
   int n_tests_added = 0;
 
-  // If we running all tests we just add the "All Tests" test and then return
-  if (test->getName() == "All Tests" && r_str == "All Tests")
+  // If running all tests, just add the "All Tests" test and return
+  if (test->getName() == "All Tests" && allow_r_str == "All Tests" &&
+      deny_r_str == "^$")
   {
     libMesh::out << test->getName() << std::endl;
     runner.addTest(test);
@@ -35,7 +38,9 @@ int add_matching_tests_to_runner(CppUnit::Test * test,
   if (test->getChildTestCount() == 0)
   {
     // Add the test to the runner
-    if (std::regex_search(test->getName(), r))
+    if ((allow_r_str == "All Tests" ||
+         std::regex_search(test->getName(), allow_r)) &&
+        !std::regex_search(test->getName(), deny_r))
     {
       libMesh::out << test->getName() << std::endl;
       n_tests_added ++;
@@ -49,8 +54,8 @@ int add_matching_tests_to_runner(CppUnit::Test * test,
   // Call this recursively on each of our children, if any.
   for (int i = 0; i < test->getChildTestCount(); i++)
     n_tests_added +=
-      add_matching_tests_to_runner(test->getChildTestAt(i), r_str, r,
-                                   runner, rejects);
+      add_matching_tests_to_runner(test->getChildTestAt(i), allow_r_str, allow_r,
+                                   deny_r_str, deny_r, runner, rejects);
 
   return n_tests_added;
 }
@@ -97,9 +102,17 @@ int main(int argc, char ** argv)
   // If the user does not provide a a regex, the default re is "All Tests",
   // which runs all the unit tests.
 
-  // Read command line argument specifying the regular expression.
-  std::string regex_string = "All Tests";
-  regex_string = libMesh::command_line_next("--re", regex_string);
+  // We can also skip tests that match a regular expression, with e.g.
+  // "--deny_re PartitionerTest" to skip all the Partitioner unit
+  // tests (even if a "--re" option would have included them.)
+
+  // Read command line argument specifying the allowlist regular expression.
+  std::string allow_regex_string = "All Tests";
+  allow_regex_string = libMesh::command_line_next("--re", allow_regex_string);
+
+  // Read command line argument specifying the allowlist regular expression.
+  std::string deny_regex_string = "^$";
+  deny_regex_string = libMesh::command_line_next("--deny_re", deny_regex_string);
 
   // Recursively add tests matching the regex tothe runner object.
   CppUnit::TextUi::TestRunner runner;
@@ -112,14 +125,17 @@ int main(int argc, char ** argv)
   CppUnit::TestSuite rejects("rejects");
 
 #ifdef LIBMESH_HAVE_CXX11_REGEX
-  // Make regex object from user's input.
-  std::regex the_regex(regex_string);
+  // Make regex objects from user's input.
+  const std::regex allow_regex(allow_regex_string);
+  const std::regex deny_regex(deny_regex_string);
 
   // Add all tests which match the re to the runner object.
   libMesh::out << "Will run the following tests:" << std::endl;
   const int n_tests_added =
-    add_matching_tests_to_runner(registry.makeTest(), regex_string,
-                                 the_regex, runner, rejects);
+    add_matching_tests_to_runner(registry.makeTest(),
+                                 allow_regex_string, allow_regex,
+                                 deny_regex_string, deny_regex,
+                                 runner, rejects);
   if (n_tests_added >= 0)
     libMesh::out << "--- Running " << n_tests_added << " tests in total." << std::endl;
 #else
