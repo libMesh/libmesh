@@ -25,6 +25,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/int_range.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/mesh_serializer.h"
 #include "libmesh/node.h"
 #include "libmesh/parallel_algebra.h" // Packing<Point>
 #include "libmesh/simple_range.h"
@@ -261,6 +262,9 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
   // otherwise we can get out of sync by doing things like using
   // pointers as keys.
   libmesh_parallel_only(mesh.comm());
+
+  MeshSerializer serial(const_cast<MeshBase &>(mesh),
+                        /* serial */ true, /* only proc 0 */ true);
 
   if (mesh.processor_id() != 0)
     {
