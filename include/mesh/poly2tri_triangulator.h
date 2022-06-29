@@ -19,6 +19,7 @@
 #ifndef LIBMESH_POLY2TRI_TRIANGULATOR_H
 #define LIBMESH_POLY2TRI_TRIANGULATOR_H
 
+#include <memory>
 
 #include "libmesh/libmesh_config.h"
 
