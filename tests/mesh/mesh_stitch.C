@@ -86,6 +86,8 @@ public:
     const auto & nbi = bi.get_node_boundary_ids();
     CPPUNIT_ASSERT_EQUAL(expected_size, nbi.size());
 
+    // We expect that the "zero_right" and "one_left" boundaries have
+    // disappeared after being stitched together.
     std::set<std::string> expected_names = {{"zero_left",
                                              "zero_top",
                                              "zero_front",
