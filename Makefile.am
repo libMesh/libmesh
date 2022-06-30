@@ -52,11 +52,14 @@ EXTRA_DIST = reference_elements \
              include/rebuild_include_HEADERS.sh \
              src/libmesh_SOURCES \
              src/rebuild_libmesh_SOURCES.sh \
+	     contrib/eigen/git/README.md \
+	     contrib/poly2tri/poly2tri/README.md \
              contrib/tecplot/README \
              contrib/bin/strip_dup_incl_paths.pl \
              contrib/bin/strip_dup_libs.pl \
              CITATION \
              contrib/metaphysicl/README \
+             contrib/timpi/README \
              m4/autoconf-submodule/ax_split_version.m4 \
              contrib/timpi/m4/autoconf-submodule/ax_split_version.m4 \
              contrib/metaphysicl/m4/autoconf-submodule/ax_split_version.m4
@@ -68,25 +71,50 @@ EXTRA_DIST = reference_elements \
 # too complicated.
 contrib/metaphysicl/README:
 	@echo ""
-	@echo "Error: You must run git submodule update --init --recursive first"
+	@echo "Error: MetaPhysicL submodule not found in contrib/"
+	@echo "You must run git submodule update --init --recursive first"
+	@echo ""
+	@exit 1
+
+contrib/timpi/README:
+	@echo ""
+	@echo "Error: TIMPI submodule not found in contrib/"
+	@echo "You must run git submodule update --init --recursive first"
+	@echo ""
+	@exit 1
+
+contrib/eigen/git/README.md:
+	@echo ""
+	@echo "Error: Eigen submodule not found in contrib/eigen/"
+	@echo "You must run git submodule update --init --recursive first"
+	@echo ""
+	@exit 1
+
+contrib/poly2tri/poly2tri/README.md:
+	@echo ""
+	@echo "Error: Poly2Tri submodule not found in contrib/poly2tri/"
+	@echo "You must run git submodule update --init --recursive first"
 	@echo ""
 	@exit 1
 
 m4/autoconf-submodule/ax_split_version.m4:
 	@echo ""
-	@echo "Error: You must run git submodule update --init --recursive first"
+	@echo "Error: ACSM submodule not found in m4/"
+	@echo "You must run git submodule update --init --recursive first"
 	@echo ""
 	@exit 1
 
 contrib/timpi/m4/autoconf-submodule/ax_split_version.m4:
 	@echo ""
-	@echo "Error: You must run git submodule update --init --recursive first"
+	@echo "Error: ACSM submodule not found in contrib/timpi/m4/"
+	@echo "You must run git submodule update --init --recursive first"
 	@echo ""
 	@exit 1
 
 contrib/metaphysicl/m4/autoconf-submodule/ax_split_version.m4:
 	@echo ""
-	@echo "Error: You must run git submodule update --init --recursive first"
+	@echo "Error: ACSM submodule not found in contrib/metaphysicl/m4/"
+	@echo "You must run git submodule update --init --recursive first"
 	@echo ""
 	@exit 1
 
