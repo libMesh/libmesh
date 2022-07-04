@@ -25,6 +25,8 @@
 
 // C++ includes
 #include <vector>
+#include <memory> // std::unique_ptr
+#include <functional> // std::function
 
 namespace libMesh
 {
@@ -55,7 +57,9 @@ public:
   /**
    * Allows an \p StoredRange to behave like an STL container.
    */
-  typedef typename std::vector<object_type>::const_iterator const_iterator;
+  typedef typename std::vector<object_type> vec_type;
+  typedef typename vec_type::const_iterator const_iterator;
+  typedef typename std::unique_ptr<vec_type, std::function<void (vec_type *)>> ptr_type;
 
   /**
    * Constructor. Optionally takes the \p grainsize parameter, which is the
@@ -68,8 +72,7 @@ public:
     _last(),
     _first(),
     _grainsize(new_grainsize),
-    _objs(new std::vector<object_type>()),
-    _should_release(true)
+    _objs(ptr_type(new vec_type(), [](vec_type * p){delete p;}))
   {}
 
   /**
@@ -86,8 +89,7 @@ public:
     _last(),
     _first(),
     _grainsize(new_grainsize),
-    _objs(new std::vector<object_type>()),
-    _should_release(true)
+    _objs(ptr_type(new vec_type(), [](vec_type * p){delete p;}))
   {
     this->reset(first, last);
   }
@@ -99,19 +101,17 @@ public:
    * execution.
    *
    * \note The std::vector passed in here MUST live for the
-   * lifetime of this StoredRange!
-   *
-   * \todo This should be a std::shared_ptr in the future!
+   * lifetime of this StoredRange! We are not responsible for
+   * deleting this pointer.
    */
-  StoredRange (std::vector<object_type> * objs,
+  StoredRange (vec_type * objs,
                const unsigned int new_grainsize = 1000) :
     _end(objs->end()),
     _begin(objs->begin()),
     _last(objs->size()),
     _first(0),
     _grainsize(new_grainsize),
-    _objs(objs),
-    _should_release(false)
+    _objs(ptr_type(objs, [](vec_type *){/*don't delete*/}))
   {
   }
 
@@ -134,8 +134,7 @@ public:
     _last(er._last),
     _first(er._first),
     _grainsize(er._grainsize),
-    _objs(nullptr),
-    _should_release(false)
+    _objs(nullptr)
   {
     // specifically, do *not* copy the vector
   }
@@ -165,8 +164,7 @@ public:
     _last(0), // Initialize these in a moment
     _first(0),
     _grainsize(er._grainsize),
-    _objs(nullptr),
-    _should_release(false)
+    _objs(nullptr)
   {
     // specifically, do *not* copy the vector
 
@@ -185,8 +183,7 @@ public:
     _last(r._last),
     _first(r._first),
     _grainsize(r._grainsize),
-    _objs(nullptr),
-    _should_release(false)
+    _objs(nullptr)
   {
     const_iterator
       beginning = r._begin,
@@ -206,11 +203,7 @@ public:
   /**
    * Destructor.  Releases the object array if we created it.
    */
-  ~StoredRange ()
-  {
-    if (_should_release)
-      delete _objs;
-  }
+  ~StoredRange () = default;
 
   /**
    * Resets the \p StoredRange to contain [first,last).
@@ -222,6 +215,9 @@ public:
   reset (const iterator_type & first,
          const iterator_type & last)
   {
+    // _objs must be initialized in order to call reset()
+    libmesh_assert(_objs);
+
     _objs->clear();
 
     for (iterator_type it=first; it!=last; ++it)
@@ -246,6 +242,9 @@ public:
    */
   StoredRange<iterator_type, object_type> & reset ()
   {
+    // _objs must be initialized in order to call reset()
+    libmesh_assert(_objs);
+
     _begin = _objs->begin();
     _end   = _objs->end();
 
@@ -313,9 +312,7 @@ private:
   std::size_t _first;
   std::size_t _grainsize;
 
-  // TODO: Make this a std::shared_ptr in the future!
-  std::vector<object_type> * _objs;
-  bool _should_release;
+  ptr_type _objs;
 };
 
 } // namespace libMesh
