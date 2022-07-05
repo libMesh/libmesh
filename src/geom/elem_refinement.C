@@ -94,7 +94,7 @@ void Elem::refine (MeshRefinement & mesh_refinement)
   // Create my children if necessary
   if (!_children)
     {
-      _children = new Elem *[nc];
+      _children = std::make_unique<Elem *[]>(nc);
 
       unsigned int parent_p_level = this->p_level();
       const unsigned int nei = this->n_extra_integers();
@@ -166,8 +166,6 @@ void Elem::coarsen()
   libmesh_assert (!this->active());
 
   // We no longer delete children until MeshRefinement::contract()
-  // delete [] _children;
-  // _children = nullptr;
 
   unsigned int parent_p_level = 0;
 
@@ -233,8 +231,7 @@ void Elem::contract()
   libmesh_assert (this->active());
 
   // Active contracted elements no longer can have children
-  delete [] _children;
-  _children = nullptr;
+  _children.reset(nullptr);
 
   if (this->refinement_flag() == Elem::JUST_COARSENED)
     this->set_refinement_flag(Elem::DO_NOTHING);

@@ -1574,9 +1574,9 @@ void Elem::add_child (Elem * elem)
 {
   const unsigned int nc = this->n_children();
 
-  if (_children == nullptr)
+  if (!_children)
     {
-      _children = new Elem *[nc];
+      _children = std::make_unique<Elem *[]>(nc);
 
       for (unsigned int c = 0; c != nc; c++)
         this->set_child(c, nullptr);
@@ -1602,7 +1602,7 @@ void Elem::add_child (Elem * elem, unsigned int c)
   if (!this->has_children())
     {
       const unsigned int nc = this->n_children();
-      _children = new Elem *[nc];
+      _children = std::make_unique<Elem *[]>(nc);
 
       for (unsigned int i = 0; i != nc; i++)
         this->set_child(i, nullptr);

@@ -110,13 +110,13 @@ protected:
 public:
 
   /**
-   * Elems are responsible for allocating and deleting their children
-   * during refinement, so they cannot be (default) copied or
-   * assigned. We therefore explicitly delete these operations.  Note
-   * that because _children is a C-style array, an Elem cannot even be
-   * safely default move-constructed (we would have to maintain a
-   * custom move constructor that explicitly sets _children to nullptr
-   * to do this safely).
+   * Elems are responsible for allocating and deleting space for
+   * storing pointers to their children during refinement, so they
+   * cannot currently be (default) copy-constructed or copy-
+   * assigned. We therefore explicitly delete these operations. In
+   * addition, the DofObject base class currently has private copy
+   * construction and assignment operators, so that prevents us from
+   * copying Elems as well.
    */
   Elem (Elem &&) = delete;
   Elem (const Elem &) = delete;
@@ -124,9 +124,9 @@ public:
   Elem & operator= (Elem &&) = delete;
 
   /**
-   * Destructor.  Frees all the memory associated with the element.
+   * Destructor.
    */
-  virtual ~Elem();
+  virtual ~Elem() = default;
 
   /**
    * \returns The \p Point associated with local \p Node \p i.
@@ -2002,9 +2002,13 @@ protected:
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
-   * Pointers to this element's children.
+   * unique_ptr to array of this element's children.
+   *
+   * A Mesh ultimately owns the child Elems so we are not responsible
+   * for deleting them, but we are responsible for cleaning up the
+   * array allocated to hold those Elems, hence the unique_ptr.
    */
-  Elem ** _children;
+  std::unique_ptr<Elem *[]> _children;
 #endif
 
   /**
@@ -2087,11 +2091,12 @@ public:
 };
 
 
+
 inline
 SimpleRange<Elem::ChildRefIter> Elem::child_ref_range()
 {
   libmesh_assert(_children);
-  return {_children, _children + this->n_children()};
+  return {_children.get(), _children.get() + this->n_children()};
 }
 
 
@@ -2099,7 +2104,7 @@ inline
 SimpleRange<Elem::ConstChildRefIter> Elem::child_ref_range() const
 {
   libmesh_assert(_children);
-  return {_children, _children + this->n_children()};
+  return {_children.get(), _children.get() + this->n_children()};
 }
 #endif // LIBMESH_ENABLE_AMR
 
@@ -2127,9 +2132,6 @@ Elem::Elem(const unsigned int nn,
            Node ** nodelinkdata) :
   _nodes(nodelinkdata),
   _elemlinks(elemlinkdata),
-#ifdef LIBMESH_ENABLE_AMR
-  _children(nullptr),
-#endif
   _sbd_id(0),
 #ifdef LIBMESH_ENABLE_AMR
   _rflag(Elem::DO_NOTHING),
@@ -2174,30 +2176,6 @@ Elem::Elem(const unsigned int nn,
 #ifdef LIBMESH_ENABLE_AMR
   if (this->parent())
     this->set_p_level(this->parent()->p_level());
-#endif
-}
-
-
-
-inline
-Elem::~Elem()
-{
-  // Deleting my parent/neighbor/nodes storage isn't necessary since it's
-  // handled by the subclass
-
-  // if (_nodes != nullptr)
-  //   delete [] _nodes;
-  // _nodes = nullptr;
-
-  // delete [] _elemlinks;
-
-#ifdef LIBMESH_ENABLE_AMR
-
-  // Delete my children's storage
-  if (_children != nullptr)
-    delete [] _children;
-  _children = nullptr;
-
 #endif
 }
 
@@ -2746,7 +2724,7 @@ inline
 bool Elem::has_children() const
 {
 #ifdef LIBMESH_ENABLE_AMR
-  if (_children == nullptr)
+  if (!_children)
     return false;
   else
     return true;
@@ -2760,7 +2738,7 @@ inline
 bool Elem::has_ancestor_children() const
 {
 #ifdef LIBMESH_ENABLE_AMR
-  if (_children == nullptr)
+  if (!_children)
     return false;
   else
     for (auto & c : child_ref_range())
