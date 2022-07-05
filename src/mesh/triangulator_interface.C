@@ -170,6 +170,10 @@ void TriangulatorInterface::insert_any_extra_boundary_points()
   const int n_interpolated = this->get_interpolate_boundary_points();
   if ((_triangulation_type==PSLG) && n_interpolated)
     {
+      // If we were lucky enough to start with contiguous node ids,
+      // let's keep them that way.
+      dof_id_type nn = _mesh.max_node_id();
+
       std::vector<std::pair<unsigned int, unsigned int>> old_segments =
         std::move(this->segments);
 
@@ -195,7 +199,7 @@ void TriangulatorInterface::insert_any_extra_boundary_points()
                 ((n_interpolated-i) * *(Point *)(begin_node) +
                  (i+1) * *(Point *)(end_node)) /
                 (n_interpolated + 1);
-              Node * next_node = _mesh.add_point(new_point);
+              Node * next_node = _mesh.add_point(new_point, nn++);
               this->segments.emplace_back(current_id,
                                           next_node->id());
               current_id = next_node->id();
