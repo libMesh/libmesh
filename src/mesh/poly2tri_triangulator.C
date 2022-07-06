@@ -189,6 +189,14 @@ void Poly2TriTriangulator::triangulate()
       _elem_type != TRI7)
     libmesh_not_implemented();
 
+  // If we have no explicit segments defined, we may get them from
+  // mesh elements
+  this->elems_to_segments();
+
+  // If we *still* have no explicit segments defined, we get them from
+  // the order of nodes.
+  this->nodes_to_segments(_n_boundary_nodes);
+
   // Insert additional new points in between existing boundary points,
   // if that is requested and reasonable
   this->insert_any_extra_boundary_points();
@@ -203,6 +211,8 @@ void Poly2TriTriangulator::triangulate()
   // don't yet
   if (_markers)
     libmesh_not_implemented();
+
+  _mesh.set_mesh_dimension(2);
 
   // To the naked eye, a few smoothing iterations usually looks better,
   // so we do this by default unless the user says not to.
@@ -306,10 +316,6 @@ void Poly2TriTriangulator::triangulate_current_points()
 
   // Prepare poly2tri points for our nodes, sorted into outer boundary
   // points and interior Steiner points.
-
-  // If we have no explicit segments defined, we may get them from
-  // mesh elements
-  this->elems_to_segments();
 
   if (this->segments.empty())
     {
@@ -586,6 +592,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
   // In cases where we've been working with contiguous node id ranges;
   // let's keep it that way.
   dof_id_type nn = _mesh.max_node_id();
+  dof_id_type ne = _mesh.max_elem_id();
 
   for (auto & elem : mesh.element_ptr_range())
     {
@@ -855,7 +862,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                       continue;
                     }
 
-                  auto new_elem = Elem::build(TRI3);
+                  auto new_elem = Elem::build_with_id(TRI3, ne++);
                   new_elem->set_node(0) = new_node;
                   new_elem->set_node(1) = node_CW;
                   new_elem->set_node(2) = node_CCW;

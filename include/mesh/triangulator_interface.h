@@ -234,10 +234,16 @@ public:
 protected:
   /**
    * Helper function to create PSLG segments from our other
-   * boundary-defining options (nodal ordering, 1D mesh edges, 2D mesh
+   * boundary-defining options (1D mesh edges, 2D mesh
    * boundary sides), if no segments already exist.
    */
   void elems_to_segments();
+
+  /**
+   * Helper function to create PSLG segments from our node ordering,
+   * up to the maximum node id, if no segments already exist.
+   */
+  void nodes_to_segments(dof_id_type max_node_id);
 
   /**
    * Helper function to add extra points (midpoints of initial
