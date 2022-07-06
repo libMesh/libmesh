@@ -32,7 +32,7 @@ public:
 #ifdef LIBMESH_HAVE_POLY2TRI
   CPPUNIT_TEST( testPoly2Tri );
   CPPUNIT_TEST( testPoly2TriInterp );
-  CPPUNIT_TEST( testPoly2TriInterp3 );
+  CPPUNIT_TEST( testPoly2TriInterp2 );
   CPPUNIT_TEST( testPoly2TriHoles );
   CPPUNIT_TEST( testPoly2TriMeshedHoles );
   CPPUNIT_TEST( testPoly2TriEdges );
@@ -54,7 +54,7 @@ public:
 #ifdef LIBMESH_HAVE_TRIANGLE
   CPPUNIT_TEST( testTriangle );
   CPPUNIT_TEST( testTriangleInterp );
-  CPPUNIT_TEST( testTriangleInterp3 );
+  CPPUNIT_TEST( testTriangleInterp2 );
   CPPUNIT_TEST( testTriangleHoles );
   CPPUNIT_TEST( testTriangleMeshedHoles );
   CPPUNIT_TEST( testTriangleSegments );
@@ -397,17 +397,17 @@ public:
 
     Mesh mesh(*TestCommWorld);
     TriangleInterface triangle(mesh);
-    testTriangulatorInterp(mesh, triangle, 2, 6);
+    testTriangulatorInterp(mesh, triangle, 1, 6);
   }
 
 
-  void testTriangleInterp3()
+  void testTriangleInterp2()
   {
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld);
     TriangleInterface triangle(mesh);
-    testTriangulatorInterp(mesh, triangle, 3, 10);
+    testTriangulatorInterp(mesh, triangle, 2, 10);
   }
 
 
@@ -459,17 +459,17 @@ public:
 
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
-    testTriangulatorInterp(mesh, p2t_tri, 2, 6);
+    testTriangulatorInterp(mesh, p2t_tri, 1, 6);
   }
 
 
-  void testPoly2TriInterp3()
+  void testPoly2TriInterp2()
   {
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
-    testTriangulatorInterp(mesh, p2t_tri, 3, 10);
+    testTriangulatorInterp(mesh, p2t_tri, 2, 10);
   }
 
 

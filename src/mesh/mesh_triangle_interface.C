@@ -60,11 +60,15 @@ void TriangleInterface::triangulate()
   // Will the triangulation have holes?
   const bool have_holes = ((_holes != nullptr) && (!_holes->empty()));
 
+  unsigned int n_hole_points = this->total_hole_points();
+
+  // If we're doing PSLG without segments, construct them from all our
+  // mesh nodes
+  this->nodes_to_segments(_mesh.max_node_id());
+
   // Insert additional new points in between existing boundary points,
   // if that is requested and reasonable
   this->insert_any_extra_boundary_points();
-
-  unsigned int n_hole_points = this->total_hole_points();
 
   // Regardless of whether we added additional points, the set of points to
   // triangulate is now sitting in the mesh.
@@ -338,6 +342,8 @@ void TriangleInterface::triangulate()
                                       _elem_type);
   }
 
+
+  _mesh.set_mesh_dimension(2);
 
 
   // To the naked eye, a few smoothing iterations usually looks better,

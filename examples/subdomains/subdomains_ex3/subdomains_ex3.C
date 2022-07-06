@@ -90,7 +90,7 @@ int main (int argc, char ** argv)
 
     if (argc == 3 && std::atoi(argv[2]) == 3)
       {
-        libmesh_here();
+        std::cout << "Running in 3D" << std::endl;
         dim=3;
       }
 

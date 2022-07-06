@@ -4,6 +4,8 @@
 #include <libmesh/elem.h>
 #include <libmesh/dof_map.h>
 
+#include <timpi/parallel_implementation.h>
+
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
@@ -123,6 +125,7 @@ public:
   void testBadElemFECombo()
   {
     LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld);
 
     EquationSystems es(mesh);
@@ -130,6 +133,15 @@ public:
     sys.add_variable("u", SECOND);
 
     MeshTools::Generation::build_square (mesh,4,4,-1., 1.,-1., 1., QUAD4);
+
+    // We need at least one element per processor to make sure
+    // everyone throws and we don't get out of sync before going on to
+    // future tests.
+    dof_id_type min_local_elem = mesh.n_local_elem();
+    mesh.comm().min(min_local_elem);
+
+    if (!min_local_elem)
+      return;
 
     // We can't just CPPUNIT_ASSERT_THROW, because we want to make
     // sure we were thrown from the right place with the right error
@@ -144,12 +156,14 @@ public:
       threw_desired_exception = true;
     }
     catch (...) {
-      CPPUNIT_ASSERT(false);
+      CPPUNIT_ASSERT_MESSAGE("Unexpected exception type thrown", false);
     }
 
-    CPPUNIT_ASSERT(threw_desired_exception);
+    // If we have more than 4*4 processors, or a poor partitioner, we
+    // might not get an exception on every processor
+    mesh.comm().max(threw_desired_exception);
 
-    CPPUNIT_ASSERT_THROW_MESSAGE("Incompatible Elem/FE combo not detected", es.init(), libMesh::LogicError);
+    CPPUNIT_ASSERT(threw_desired_exception);
   }
 #endif
 

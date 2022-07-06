@@ -26,7 +26,8 @@ namespace libMesh
 
 MeshSerializer::MeshSerializer(MeshBase & mesh, bool need_serial, bool serial_only_needed_on_proc_0) :
   _mesh(mesh),
-  reparallelize(false)
+  reparallelize(false),
+  resume_allow_remote_element_removal(false)
 {
   libmesh_parallel_only(mesh.comm());
   if (need_serial && !_mesh.is_serial() && !serial_only_needed_on_proc_0) {
@@ -38,6 +39,12 @@ MeshSerializer::MeshSerializer(MeshBase & mesh, bool need_serial, bool serial_on
     // Just waste a bit of space on processor 0 to speed things up
     _mesh.gather_to_zero();
   }
+
+  if (_mesh.allow_remote_element_removal())
+    {
+      resume_allow_remote_element_removal = true;
+      _mesh.allow_remote_element_removal(false);
+    }
 }
 
 
@@ -46,6 +53,9 @@ MeshSerializer::~MeshSerializer()
 {
   if (reparallelize)
     _mesh.delete_remote_elements();
+
+  if (resume_allow_remote_element_removal)
+    _mesh.allow_remote_element_removal(true);
 }
 
 } // namespace libMesh

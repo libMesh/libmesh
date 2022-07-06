@@ -24,6 +24,7 @@
 #include "libmesh/function_base.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_function.h"
+#include "libmesh/mesh_serializer.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parallel.h"
 #include "libmesh/quadrature.h"
@@ -475,9 +476,14 @@ void ExactSolution::_compute_error(std::string_view sys_name,
   const unsigned int var_component =
     computed_system.variable_scalar_number(var, 0);
 
-  // Prepare a global solution and a MeshFunction of the coarse system if we need one
+  // Prepare a global solution, a serialized mesh, and a MeshFunction
+  // of the coarse system, if we need them for fine-system integration
   std::unique_ptr<MeshFunction> coarse_values;
-  std::unique_ptr<NumericVector<Number>> comparison_soln = NumericVector<Number>::build(_equation_systems.comm());
+  std::unique_ptr<NumericVector<Number>> comparison_soln =
+    NumericVector<Number>::build(_equation_systems.comm());
+  MeshSerializer
+    serial(const_cast<MeshBase&>(_equation_systems.get_mesh()),
+           _equation_systems_fine);
   if (_equation_systems_fine)
     {
       const System & comparison_system
