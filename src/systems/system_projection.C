@@ -566,12 +566,13 @@ public:
 
     // Be sure to handle cases where the variable wasn't defined on
     // this node (e.g. due to changing subdomain support)
-    if (n.old_dof_object &&
-        n.old_dof_object->n_vars(this->sys.number()) &&
-        n.old_dof_object->n_comp(this->sys.number(), var))
+    const DofObject * old_dof_object = n.get_old_dof_object();
+    if (old_dof_object &&
+        old_dof_object->n_vars(this->sys.number()) &&
+        old_dof_object->n_comp(this->sys.number(), var))
       {
         const dof_id_type first_old_id =
-          n.old_dof_object->dof_number(this->sys.number(), var, dim);
+          old_dof_object->dof_number(this->sys.number(), var, dim);
         std::vector<dof_id_type> old_ids(n_mixed);
         std::iota(old_ids.begin(), old_ids.end(), first_old_id);
 
@@ -643,7 +644,7 @@ public:
     // and we should never need those indices
     if (nc != 0)
       {
-        libmesh_assert(old_elem.old_dof_object);
+        const DofObject & old_dof_object = old_elem.get_old_dof_object_ref();
 
         const auto [vg, vig] =
           elem.var_to_vg_and_offset(sys_num,var_num);
@@ -655,7 +656,7 @@ public:
         for (unsigned int i=0; i<nc; i++)
           {
             const dof_id_type d_old =
-              old_elem.old_dof_object->dof_number(sys_num, vg, vig, i, n_comp);
+              old_dof_object.dof_number(sys_num, vg, vig, i, n_comp);
             const dof_id_type d_new =
               elem.dof_number(sys_num, vg, vig, i, n_comp);
             libmesh_assert_not_equal_to (d_old, DofObject::invalid_id);
@@ -800,16 +801,17 @@ eval_at_node(const FEMContext & c,
 
   const Elem::RefinementState flag = c.get_elem().refinement_flag();
 
-  if (n.old_dof_object &&
+  const DofObject * old_dof_object = n.get_old_dof_object();
+  if (old_dof_object &&
       (!extra_hanging_dofs ||
        flag == Elem::JUST_COARSENED ||
        flag == Elem::DO_NOTHING) &&
-      n.old_dof_object->n_vars(sys.number()) &&
-      n.old_dof_object->n_comp(sys.number(), i))
+      old_dof_object->n_vars(sys.number()) &&
+      old_dof_object->n_comp(sys.number(), i))
     {
       DynamicSparseNumberArray<Real, dof_id_type> returnval;
       const dof_id_type old_id =
-        n.old_dof_object->dof_number(sys.number(), i, 0);
+        old_dof_object->dof_number(sys.number(), i, 0);
       returnval.resize(1);
       returnval.raw_at(0) = 1;
       returnval.raw_index(0) = old_id;
@@ -846,18 +848,19 @@ eval_at_node(const FEMContext & c,
 
   const Elem::RefinementState flag = c.get_elem().refinement_flag();
 
-  if (n.old_dof_object &&
+  const DofObject * old_dof_object = n.get_old_dof_object();
+  if (old_dof_object &&
       (!extra_hanging_dofs ||
        flag == Elem::JUST_COARSENED ||
        flag == Elem::DO_NOTHING) &&
-      n.old_dof_object->n_vars(sys.number()) &&
-      n.old_dof_object->n_comp(sys.number(), i))
+      old_dof_object->n_vars(sys.number()) &&
+      old_dof_object->n_comp(sys.number(), i))
     {
       VectorValue<DynamicSparseNumberArray<Real, dof_id_type> > g;
       for (unsigned int d = 0; d != elem_dim; ++d)
         {
           const dof_id_type old_id =
-            n.old_dof_object->dof_number(sys.number(), i, d+1);
+            old_dof_object->dof_number(sys.number(), i, d+1);
           g(d).resize(1);
           g(d).raw_at(0) = 1;
           g(d).raw_index(0) = old_id;
@@ -1354,13 +1357,14 @@ void BuildProjectionList::operator()(const ConstElemRange & range)
       // ... but we need a better way to test for that; the code
       // below breaks on any FE type for which the elem stores no
       // dofs.
-      // if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
+      // if (!elem->get_old_dof_object() || !elem->get_old_dof_object()->has_dofs(system.number()))
       //  continue;
 
       // Examining refinement flags instead should distinguish
       // between refinement-added and user-added elements lacking
       // old_dof_object
-      if (!elem->old_dof_object &&
+      const DofObject * old_dof_object = elem->get_old_dof_object();
+      if (!old_dof_object &&
           elem->refinement_flag() != Elem::JUST_REFINED &&
           elem->refinement_flag() != Elem::JUST_COARSENED)
         continue;

@@ -546,13 +546,13 @@ void DofMap::reinit(MeshBase & mesh)
   for (auto & node : mesh.node_ptr_range())
     {
       node->clear_old_dof_object();
-      libmesh_assert (!node->old_dof_object);
+      libmesh_assert (!node->get_old_dof_object());
     }
 
   for (auto & elem : mesh.element_ptr_range())
     {
       elem->clear_old_dof_object();
-      libmesh_assert (!elem->old_dof_object);
+      libmesh_assert (!elem->get_old_dof_object());
     }
 
 
@@ -567,11 +567,11 @@ void DofMap::reinit(MeshBase & mesh)
         continue;
 
       for (Node & node : elem->node_ref_range())
-        if (node.old_dof_object == nullptr)
+        if (node.get_old_dof_object() == nullptr)
           if (node.has_dofs(sys_num))
             node.set_old_dof_object();
 
-      libmesh_assert (!elem->old_dof_object);
+      libmesh_assert (!elem->get_old_dof_object());
 
       if (elem->has_dofs(sys_num))
         elem->set_old_dof_object();
@@ -2608,7 +2608,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
   // then we should have old dof indices too.
   libmesh_assert(!elem->has_dofs(sys_num) ||
                  elem->p_refinement_flag() == Elem::JUST_REFINED ||
-                 elem->old_dof_object);
+                 elem->get_old_dof_object());
 
   // Clear the DOF indices vector.
   di.clear();
