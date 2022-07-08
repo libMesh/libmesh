@@ -77,8 +77,14 @@ public:
   /**
    * This object on the last mesh.  Useful for projecting
    * solutions from one mesh to another.
+   *
+   * Public access to old_dof_object is now officially deprecated and will
+   * be removed in future libMesh versions.  Use the \p get_old_dof_object()
+   * accessor instead.
    */
+#ifndef LIBMESH_ENABLE_DEPRECATED
 protected:
+#endif
   std::unique_ptr<DofObject> old_dof_object;
 
 public:
