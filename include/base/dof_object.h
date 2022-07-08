@@ -502,6 +502,17 @@ private:
   DofObject (const DofObject &);
 
   /**
+   * Convenient factory function that calls either the (deep) copy
+   * constructor or the default constructor depending on the input
+   * arg. Like the copy constructor, this function is also private. We
+   * can't use std::make_unique to construct a DofObject since the
+   * copy constructor is private, but we can at least encapsulate the
+   * code which calls "new" directly.
+   */
+  std::unique_ptr<DofObject>
+  construct(const DofObject * other = nullptr);
+
+  /**
    * Deep-copying assignment operator
    */
   DofObject & operator= (const DofObject & dof_obj);
@@ -686,6 +697,15 @@ DofObject::DofObject () :
 }
 
 
+
+inline
+std::unique_ptr<DofObject>
+DofObject::construct(const DofObject * other)
+{
+  return other
+    ? std::unique_ptr<DofObject>(new DofObject(*other))
+    : std::unique_ptr<DofObject>(new DofObject());
+}
 
 
 

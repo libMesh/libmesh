@@ -81,11 +81,7 @@ DofObject & DofObject::operator= (const DofObject & dof_obj)
 
 #ifdef LIBMESH_ENABLE_AMR
   this->clear_old_dof_object();
-
-  // Note: we can't use std::make_unique here because the DofObject
-  // copy constructor is private, and std::make_unique effectively
-  // calls "placement new" which requires a public constructor.
-  this->old_dof_object = std::unique_ptr<DofObject>(new DofObject(*dof_obj.old_dof_object));
+  this->old_dof_object = this->construct(dof_obj.old_dof_object.get());
 #endif
 
   _id           = dof_obj._id;
@@ -142,10 +138,9 @@ void DofObject::set_old_dof_object ()
 
   libmesh_assert (!this->old_dof_object);
 
-  // Note: we can't use std::make_unique here because the DofObject
-  // copy constructor is private, and std::make_unique effectively
-  // calls "placement new" which requires a public constructor.
-  this->old_dof_object = std::unique_ptr<DofObject>(new DofObject(*this));
+  // Make a new DofObject, assign a copy of \p this.
+  // Make sure the copy ctor for DofObject works!!
+  this->old_dof_object = this->construct(this);
 }
 
 #endif
@@ -634,7 +629,7 @@ void DofObject::unpack_indexing(std::vector<largest_id_type>::const_iterator beg
 #ifdef LIBMESH_ENABLE_AMR
   if (has_old_dof_object)
     {
-      this->old_dof_object = std::unique_ptr<DofObject>(new DofObject());
+      this->old_dof_object = this->construct();
       this->old_dof_object->unpack_indexing(begin+size);
     }
 #endif
