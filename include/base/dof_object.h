@@ -78,8 +78,10 @@ public:
    * This object on the last mesh.  Useful for projecting
    * solutions from one mesh to another.
    */
+protected:
   std::unique_ptr<DofObject> old_dof_object;
 
+public:
   /**
    * Pointer accessor for previously public old_dof_object. If you
    * want to assert that the old_dof_object pointer is valid as well,
