@@ -17,16 +17,11 @@
 
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/dof_object.h"
 
-
 namespace libMesh
 {
-
-
 
 // ------------------------------------------------------------
 // DofObject class static member -now initialized in header
@@ -36,14 +31,9 @@ const processor_id_type DofObject::invalid_processor_id;
 
 
 
-// ------------------------------------------------------------
-// DofObject class members
 // Copy Constructor
 DofObject::DofObject (const DofObject & dof_obj) :
   ReferenceCountedObject<DofObject>(),
-#ifdef LIBMESH_ENABLE_AMR
-  old_dof_object (nullptr),
-#endif
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _unique_id     (dof_obj._unique_id),
 #endif
@@ -56,9 +46,6 @@ DofObject::DofObject (const DofObject & dof_obj) :
   // is intended to be used solely for internal construction of
   // old_dof_object, never for a true deep copy where the newly
   // created object really matches the source object.
-  //
-  // if (dof_obj.old_dof_object)
-  //  this->old_dof_object = new DofObject(*(dof_obj.old_dof_object));
 
   // Check that everything worked
 #ifdef DEBUG
@@ -95,7 +82,10 @@ DofObject & DofObject::operator= (const DofObject & dof_obj)
 #ifdef LIBMESH_ENABLE_AMR
   this->clear_old_dof_object();
 
-  this->old_dof_object = new DofObject(*(dof_obj.old_dof_object));
+  // Note: we can't use std::make_unique here because the DofObject
+  // copy constructor is private, and std::make_unique effectively
+  // calls "placement new" which requires a public constructor.
+  this->old_dof_object = std::unique_ptr<DofObject>(new DofObject(*dof_obj.old_dof_object));
 #endif
 
   _id           = dof_obj._id;
@@ -141,8 +131,7 @@ DofObject & DofObject::operator= (const DofObject & dof_obj)
 
 void  DofObject::clear_old_dof_object ()
 {
-  delete this->old_dof_object;
-  this->old_dof_object = nullptr;
+  this->old_dof_object.reset(nullptr);
 }
 
 
@@ -153,9 +142,10 @@ void DofObject::set_old_dof_object ()
 
   libmesh_assert (!this->old_dof_object);
 
-  // Make a new DofObject, assign a copy of \p this.
-  // Make sure the copy ctor for DofObject works!!
-  this->old_dof_object = new DofObject(*this);
+  // Note: we can't use std::make_unique here because the DofObject
+  // copy constructor is private, and std::make_unique effectively
+  // calls "placement new" which requires a public constructor.
+  this->old_dof_object = std::unique_ptr<DofObject>(new DofObject(*this));
 }
 
 #endif
@@ -644,7 +634,7 @@ void DofObject::unpack_indexing(std::vector<largest_id_type>::const_iterator beg
 #ifdef LIBMESH_ENABLE_AMR
   if (has_old_dof_object)
     {
-      this->old_dof_object = new DofObject();
+      this->old_dof_object = std::unique_ptr<DofObject>(new DofObject());
       this->old_dof_object->unpack_indexing(begin+size);
     }
 #endif

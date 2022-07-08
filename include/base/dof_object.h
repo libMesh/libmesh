@@ -32,6 +32,7 @@
 #include <cstddef>
 #include <cstring>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
@@ -64,13 +65,12 @@ protected:
    */
   DofObject ();
 
-  /**
-   * Destructor. Protected so that you can't destroy one of these
-   * except as a part of a Node or Elem.
-   */
-  ~DofObject ();
-
 public:
+
+  /**
+   * Destructor.
+   */
+  ~DofObject () = default;
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -78,7 +78,7 @@ public:
    * This object on the last mesh.  Useful for projecting
    * solutions from one mesh to another.
    */
-  DofObject * old_dof_object;
+  std::unique_ptr<DofObject> old_dof_object;
 
   /**
    * Sets the \p old_dof_object to nullptr
@@ -676,9 +676,6 @@ public:
 // Inline functions
 inline
 DofObject::DofObject () :
-#ifdef LIBMESH_ENABLE_AMR
-  old_dof_object(nullptr),
-#endif
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _unique_id (invalid_unique_id),
 #endif
@@ -689,18 +686,6 @@ DofObject::DofObject () :
 }
 
 
-
-
-
-inline
-DofObject::~DofObject ()
-{
-  // Free all memory.
-#ifdef LIBMESH_ENABLE_AMR
-  this->clear_old_dof_object ();
-#endif
-  this->clear_dofs ();
-}
 
 
 
