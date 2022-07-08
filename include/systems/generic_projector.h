@@ -887,7 +887,7 @@ public:
     // zero.
     if (nc != 0)
       {
-        const DofObject *old_dof_object = old_elem.old_dof_object;
+        const DofObject *old_dof_object = old_elem.old_dof_object.get();
         libmesh_assert(old_dof_object);
         libmesh_assert_greater(elem.n_systems(), sys_num);
 

@@ -2260,7 +2260,7 @@ void DofMap::old_dof_indices (const Elem & elem,
                               std::vector<dof_id_type> & di,
                               const unsigned int vn) const
 {
-  const DofObject * old_obj = elem.node_ref(n).old_dof_object;
+  const DofObject * old_obj = elem.node_ref(n).old_dof_object.get();
   libmesh_assert(old_obj);
   this->_node_dof_indices(elem, n, *old_obj, di, vn);
 }
@@ -2687,7 +2687,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                     for (unsigned int n=0; n<n_nodes; n++)
                       {
                         const Node * node = nodes_ptr[n];
-                        const DofObject * old_dof_obj = node->old_dof_object;
+                        const DofObject * old_dof_obj = node->old_dof_object.get();
                         libmesh_assert(old_dof_obj);
 
                         // There is a potential problem with h refinement.  Imagine a
@@ -2765,7 +2765,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
 
                     if (nc != 0)
                       {
-                        const DofObject * old_dof_obj = elem->old_dof_object;
+                        const DofObject * old_dof_obj = elem->old_dof_object.get();
                         libmesh_assert(old_dof_obj);
 
                         const unsigned int n_comp =
