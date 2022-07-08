@@ -81,7 +81,7 @@ DofObject & DofObject::operator= (const DofObject & dof_obj)
 
 #ifdef LIBMESH_ENABLE_AMR
   this->clear_old_dof_object();
-  this->old_dof_object = this->construct(dof_obj.old_dof_object.get());
+  this->old_dof_object = this->construct(dof_obj.get_old_dof_object());
 #endif
 
   _id           = dof_obj._id;

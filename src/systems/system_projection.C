@@ -1379,7 +1379,7 @@ void BuildProjectionList::operator()(const ConstElemRange & range)
 
           for (auto & node : elem->node_ref_range())
             {
-              const DofObject * old_dofs = node.old_dof_object.get();
+              const DofObject * old_dofs = node.get_old_dof_object();
 
               if (old_dofs)
                 {

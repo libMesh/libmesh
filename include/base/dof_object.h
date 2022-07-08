@@ -81,6 +81,31 @@ public:
   std::unique_ptr<DofObject> old_dof_object;
 
   /**
+   * Pointer accessor for previously public old_dof_object. If you
+   * want to assert that the old_dof_object pointer is valid as well,
+   * consider using the get_old_dof_object_ref() accessor instead.
+   */
+  DofObject * get_old_dof_object() { return old_dof_object.get(); }
+  const DofObject * get_old_dof_object() const  { return old_dof_object.get(); }
+
+  /**
+   * As above, but do not use in situations where the old_dof_object
+   * may be nullptr, since this function asserts that the
+   * old_dof_object is valid before returning a reference to it.
+   */
+  DofObject & get_old_dof_object_ref()
+  {
+    libmesh_assert(old_dof_object);
+    return *old_dof_object;
+  }
+
+  const DofObject & get_old_dof_object_ref() const
+  {
+    libmesh_assert(old_dof_object);
+    return *old_dof_object;
+  }
+
+  /**
    * Sets the \p old_dof_object to nullptr
    */
   void clear_old_dof_object ();

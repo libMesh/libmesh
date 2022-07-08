@@ -887,8 +887,7 @@ public:
     // zero.
     if (nc != 0)
       {
-        const DofObject *old_dof_object = old_elem.old_dof_object.get();
-        libmesh_assert(old_dof_object);
+        const DofObject & old_dof_object = old_elem.get_old_dof_object_ref();
         libmesh_assert_greater(elem.n_systems(), sys_num);
 
         const std::pair<unsigned int, unsigned int>
@@ -896,7 +895,7 @@ public:
         const unsigned int vg = vg_and_offset.first;
         const unsigned int vig = vg_and_offset.second;
 
-        unsigned int n_comp = old_dof_object->n_comp_group(sys_num,vg);
+        unsigned int n_comp = old_dof_object.n_comp_group(sys_num,vg);
         n_comp = std::min(n_comp, nc);
 
         std::vector<dof_id_type> old_dof_indices(n_comp);
@@ -904,7 +903,7 @@ public:
         for (unsigned int i=0; i != n_comp; ++i)
           {
             const dof_id_type d_old =
-              old_dof_object->dof_number(sys_num, vg, vig, i, n_comp);
+              old_dof_object.dof_number(sys_num, vg, vig, i, n_comp);
             const dof_id_type d_new =
               elem.dof_number(sys_num, vg, vig, i, n_comp);
             libmesh_assert_not_equal_to (d_old, DofObject::invalid_id);
