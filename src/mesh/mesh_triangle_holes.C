@@ -353,7 +353,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
 
         libmesh_error_msg_if
           (std::distance(next_it_begin, next_it_end) != 2,
-           "Bad edge topology in MeshedHole");
+           "Bad edge topology found by MeshedHole");
 
         const Node * next = nullptr;
         for (const auto [key, val] : as_range(next_it_begin, next_it_end))
