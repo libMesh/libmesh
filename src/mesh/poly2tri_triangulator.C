@@ -1136,18 +1136,15 @@ bool Poly2TriTriangulator::should_refine_elem(Elem & elem)
   //
   // See if we're meeting the local area target at all the elem
   // vertices first
-  Real local_area_target = (*area_func)(elem.point(0));
-  for (auto v : make_range(1u, elem.n_vertices()))
+  for (auto v : make_range(elem.n_vertices()))
     {
+      const Real local_area_target = (*area_func)(elem.point(v));
+      libmesh_error_msg_if
+        (local_area_target <= 0,
+         "Non-positive desired element areas are unachievable");
       if (area > local_area_target)
         return true;
-      local_area_target =
-        std::min(local_area_target,
-                 (*area_func)(elem.point(v)));
     }
-
-  if (area > local_area_target)
-    return true;
 
   // If our vertices are happy, it's still possible that our interior
   // isn't.  Are we allowed not to bother checking it?
