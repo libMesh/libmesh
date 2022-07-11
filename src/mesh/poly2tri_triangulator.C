@@ -50,7 +50,11 @@ struct P2TPointCompare
 
 p2t::Point to_p2t(const libMesh::Point & p)
 {
-  libmesh_assert_equal_to(p(2), 0);
+#if LIBMESH_DIM > 2
+  libmesh_error_msg_if
+    (p(2) != 0,
+     "Poly2TriTriangulator only supports point sets in the XY plane");
+#endif
 
   return {p(0), p(1)};
 }
