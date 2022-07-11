@@ -103,8 +103,10 @@ void TriangulatorInterface::elems_to_segments()
       for (auto & node : _mesh.node_ptr_range())
         {
           // We're not going to support overlapping nodes on the boundary
-          if (point_id_map.count(*node))
-            libmesh_not_implemented();
+          libmesh_error_msg_if
+            (point_id_map.count(*node),
+             "TriangulatorInterface does not support overlapping nodes found at "
+             << static_cast<Point&>(*node));
 
           point_id_map.emplace(*node, node->id());
         }
