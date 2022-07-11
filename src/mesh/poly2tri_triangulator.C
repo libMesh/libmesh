@@ -1151,7 +1151,8 @@ bool Poly2TriTriangulator::should_refine_elem(Elem & elem)
   if (!min_area_target)
     return false;
 
-  libmesh_not_implemented();
+  libmesh_not_implemented_msg
+    ("Combining a minimum desired_area with an area function isn't yet supported.");
 }
 
 
