@@ -32,6 +32,7 @@
 #include <cstddef>
 #include <cstring>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
@@ -64,21 +65,53 @@ protected:
    */
   DofObject ();
 
-  /**
-   * Destructor. Protected so that you can't destroy one of these
-   * except as a part of a Node or Elem.
-   */
-  ~DofObject ();
-
 public:
+
+  /**
+   * Destructor.
+   */
+  ~DofObject () = default;
 
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
    * This object on the last mesh.  Useful for projecting
    * solutions from one mesh to another.
+   *
+   * Public access to old_dof_object is now officially deprecated and will
+   * be removed in future libMesh versions.  Use the \p get_old_dof_object()
+   * accessor instead.
    */
-  DofObject * old_dof_object;
+#ifndef LIBMESH_ENABLE_DEPRECATED
+protected:
+#endif
+  std::unique_ptr<DofObject> old_dof_object;
+
+public:
+  /**
+   * Pointer accessor for previously public old_dof_object. If you
+   * want to assert that the old_dof_object pointer is valid as well,
+   * consider using the get_old_dof_object_ref() accessor instead.
+   */
+  DofObject * get_old_dof_object() { return old_dof_object.get(); }
+  const DofObject * get_old_dof_object() const  { return old_dof_object.get(); }
+
+  /**
+   * As above, but do not use in situations where the old_dof_object
+   * may be nullptr, since this function asserts that the
+   * old_dof_object is valid before returning a reference to it.
+   */
+  DofObject & get_old_dof_object_ref()
+  {
+    libmesh_assert(old_dof_object);
+    return *old_dof_object;
+  }
+
+  const DofObject & get_old_dof_object_ref() const
+  {
+    libmesh_assert(old_dof_object);
+    return *old_dof_object;
+  }
 
   /**
    * Sets the \p old_dof_object to nullptr
@@ -502,6 +535,17 @@ private:
   DofObject (const DofObject &);
 
   /**
+   * Convenient factory function that calls either the (deep) copy
+   * constructor or the default constructor depending on the input
+   * arg. Like the copy constructor, this function is also private. We
+   * can't use std::make_unique to construct a DofObject since the
+   * copy constructor is private, but we can at least encapsulate the
+   * code which calls "new" directly.
+   */
+  std::unique_ptr<DofObject>
+  construct(const DofObject * other = nullptr);
+
+  /**
    * Deep-copying assignment operator
    */
   DofObject & operator= (const DofObject & dof_obj);
@@ -676,9 +720,6 @@ public:
 // Inline functions
 inline
 DofObject::DofObject () :
-#ifdef LIBMESH_ENABLE_AMR
-  old_dof_object(nullptr),
-#endif
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _unique_id (invalid_unique_id),
 #endif
@@ -690,16 +731,13 @@ DofObject::DofObject () :
 
 
 
-
-
 inline
-DofObject::~DofObject ()
+std::unique_ptr<DofObject>
+DofObject::construct(const DofObject * other)
 {
-  // Free all memory.
-#ifdef LIBMESH_ENABLE_AMR
-  this->clear_old_dof_object ();
-#endif
-  this->clear_dofs ();
+  return other
+    ? std::unique_ptr<DofObject>(new DofObject(*other))
+    : std::unique_ptr<DofObject>(new DofObject());
 }
 
 

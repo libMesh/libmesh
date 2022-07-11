@@ -609,7 +609,7 @@ protected:
           }
         else
           {
-            if (!elem.old_dof_object)
+            if (!elem.get_old_dof_object())
               {
                 libmesh_error();
               }
@@ -659,7 +659,7 @@ protected:
           }
         else
           {
-            if (!elem.old_dof_object)
+            if (!elem.get_old_dof_object())
               return false;
 
             old_context.pre_fe_reinit(sys, &elem);
@@ -795,12 +795,13 @@ public:
 
     // Be sure to handle cases where the variable wasn't defined on
     // this node (e.g. due to changing subdomain support)
-    if (n.old_dof_object &&
-        n.old_dof_object->n_vars(this->sys.number()) &&
-        n.old_dof_object->n_comp(this->sys.number(), var))
+    const DofObject * old_dof_object = n.get_old_dof_object();
+    if (old_dof_object &&
+        old_dof_object->n_vars(this->sys.number()) &&
+        old_dof_object->n_comp(this->sys.number(), var))
       {
         const dof_id_type first_old_id =
-          n.old_dof_object->dof_number(this->sys.number(), var, dim);
+          old_dof_object->dof_number(this->sys.number(), var, dim);
         std::vector<dof_id_type> old_ids(n_mixed);
         std::iota(old_ids.begin(), old_ids.end(), first_old_id);
         old_solution.get(old_ids, derivs);
@@ -887,8 +888,7 @@ public:
     // zero.
     if (nc != 0)
       {
-        const DofObject *old_dof_object = old_elem.old_dof_object;
-        libmesh_assert(old_dof_object);
+        const DofObject & old_dof_object = old_elem.get_old_dof_object_ref();
         libmesh_assert_greater(elem.n_systems(), sys_num);
 
         const std::pair<unsigned int, unsigned int>
@@ -896,7 +896,7 @@ public:
         const unsigned int vg = vg_and_offset.first;
         const unsigned int vig = vg_and_offset.second;
 
-        unsigned int n_comp = old_dof_object->n_comp_group(sys_num,vg);
+        unsigned int n_comp = old_dof_object.n_comp_group(sys_num,vg);
         n_comp = std::min(n_comp, nc);
 
         std::vector<dof_id_type> old_dof_indices(n_comp);
@@ -904,7 +904,7 @@ public:
         for (unsigned int i=0; i != n_comp; ++i)
           {
             const dof_id_type d_old =
-              old_dof_object->dof_number(sys_num, vg, vig, i, n_comp);
+              old_dof_object.dof_number(sys_num, vg, vig, i, n_comp);
             const dof_id_type d_new =
               elem.dof_number(sys_num, vg, vig, i, n_comp);
             libmesh_assert_not_equal_to (d_old, DofObject::invalid_id);
@@ -1032,15 +1032,16 @@ eval_at_node(const FEMContext & c,
 
   const Elem::RefinementState flag = c.get_elem().refinement_flag();
 
-  if (n.old_dof_object &&
+  const DofObject * old_dof_object = n.get_old_dof_object();
+  if (old_dof_object &&
       (!extra_hanging_dofs ||
        flag == Elem::JUST_COARSENED ||
        flag == Elem::DO_NOTHING) &&
-      n.old_dof_object->n_vars(sys.number()) &&
-      n.old_dof_object->n_comp(sys.number(), var))
+      old_dof_object->n_vars(sys.number()) &&
+      old_dof_object->n_comp(sys.number(), var))
     {
       const dof_id_type old_id =
-        n.old_dof_object->dof_number(sys.number(), var, 0);
+        old_dof_object->dof_number(sys.number(), var, 0);
       return old_solution(old_id);
     }
 
@@ -1082,19 +1083,20 @@ eval_at_node(const FEMContext & c,
 
   const Elem::RefinementState flag = elem.refinement_flag();
 
-  if (n.old_dof_object &&
+  const DofObject * old_dof_object = n.get_old_dof_object();
+  if (old_dof_object &&
       (!extra_hanging_dofs ||
        flag == Elem::JUST_COARSENED ||
        flag == Elem::DO_NOTHING) &&
-      n.old_dof_object->n_vars(sys.number()) &&
-      n.old_dof_object->n_comp(sys.number(), var))
+      old_dof_object->n_vars(sys.number()) &&
+      old_dof_object->n_comp(sys.number(), var))
     {
       Gradient return_val;
 
       for (unsigned int dim = 0; dim < elem.dim(); ++dim)
       {
         const dof_id_type old_id =
-          n.old_dof_object->dof_number(sys.number(), var, dim);
+          old_dof_object->dof_number(sys.number(), var, dim);
         return_val(dim) = old_solution(old_id);
       }
 
@@ -1139,18 +1141,19 @@ eval_at_node(const FEMContext & c,
 
   const Elem::RefinementState flag = c.get_elem().refinement_flag();
 
-  if (n.old_dof_object &&
+  const DofObject * old_dof_object = n.get_old_dof_object();
+  if (old_dof_object &&
       (!extra_hanging_dofs ||
        flag == Elem::JUST_COARSENED ||
        flag == Elem::DO_NOTHING) &&
-      n.old_dof_object->n_vars(sys.number()) &&
-      n.old_dof_object->n_comp(sys.number(), var))
+      old_dof_object->n_vars(sys.number()) &&
+      old_dof_object->n_comp(sys.number(), var))
     {
       Gradient g;
       for (unsigned int d = 0; d != elem_dim; ++d)
         {
           const dof_id_type old_id =
-            n.old_dof_object->dof_number(sys.number(), var, d+1);
+            old_dof_object->dof_number(sys.number(), var, d+1);
           g(d) = old_solution(old_id);
         }
       return g;
@@ -1517,7 +1520,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
           // wasn't just refined or just coarsened into activity, then
           // it must be newly added, so the user is responsible for
           // setting the new dofs on it during a grid projection.
-          if (!elem->old_dof_object &&
+          const DofObject * old_dof_object = elem->get_old_dof_object();
+          if (!old_dof_object &&
               elem->refinement_flag() != Elem::JUST_REFINED &&
               elem->refinement_flag() != Elem::JUST_COARSENED)
             continue;

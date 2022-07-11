@@ -546,13 +546,13 @@ void DofMap::reinit(MeshBase & mesh)
   for (auto & node : mesh.node_ptr_range())
     {
       node->clear_old_dof_object();
-      libmesh_assert (!node->old_dof_object);
+      libmesh_assert (!node->get_old_dof_object());
     }
 
   for (auto & elem : mesh.element_ptr_range())
     {
       elem->clear_old_dof_object();
-      libmesh_assert (!elem->old_dof_object);
+      libmesh_assert (!elem->get_old_dof_object());
     }
 
 
@@ -567,11 +567,11 @@ void DofMap::reinit(MeshBase & mesh)
         continue;
 
       for (Node & node : elem->node_ref_range())
-        if (node.old_dof_object == nullptr)
+        if (node.get_old_dof_object() == nullptr)
           if (node.has_dofs(sys_num))
             node.set_old_dof_object();
 
-      libmesh_assert (!elem->old_dof_object);
+      libmesh_assert (!elem->get_old_dof_object());
 
       if (elem->has_dofs(sys_num))
         elem->set_old_dof_object();
@@ -2260,9 +2260,8 @@ void DofMap::old_dof_indices (const Elem & elem,
                               std::vector<dof_id_type> & di,
                               const unsigned int vn) const
 {
-  const DofObject * old_obj = elem.node_ref(n).old_dof_object;
-  libmesh_assert(old_obj);
-  this->_node_dof_indices(elem, n, *old_obj, di, vn);
+  const DofObject & old_obj = elem.node_ref(n).get_old_dof_object_ref();
+  this->_node_dof_indices(elem, n, old_obj, di, vn);
 }
 
 #endif // LIBMESH_ENABLE_AMR
@@ -2609,7 +2608,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
   // then we should have old dof indices too.
   libmesh_assert(!elem->has_dofs(sys_num) ||
                  elem->p_refinement_flag() == Elem::JUST_REFINED ||
-                 elem->old_dof_object);
+                 elem->get_old_dof_object());
 
   // Clear the DOF indices vector.
   di.clear();
@@ -2687,8 +2686,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                     for (unsigned int n=0; n<n_nodes; n++)
                       {
                         const Node * node = nodes_ptr[n];
-                        const DofObject * old_dof_obj = node->old_dof_object;
-                        libmesh_assert(old_dof_obj);
+                        const DofObject & old_dof_obj = node->get_old_dof_object_ref();
 
                         // There is a potential problem with h refinement.  Imagine a
                         // quad9 that has a linear FE on it.  Then, on the hanging side,
@@ -2701,7 +2699,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
 #endif
                           ndan (type, static_cast<Order>(var.type().order + extra_order), n);
 
-                        const int n_comp = old_dof_obj->n_comp_group(sys_num,vg);
+                        const int n_comp = old_dof_obj.n_comp_group(sys_num,vg);
 
                         // If this is a non-vertex on a hanging node with extra
                         // degrees of freedom, we use the non-vertex dofs (which
@@ -2724,7 +2722,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                               for (int i=n_comp-1; i>=dof_offset; i--)
                                 {
                                   const dof_id_type d =
-                                    old_dof_obj->dof_number(sys_num, vg, vig, i, n_comp);
+                                    old_dof_obj.dof_number(sys_num, vg, vig, i, n_comp);
 
                                   // On a newly-expanded subdomain, we
                                   // may have some DoFs that didn't
@@ -2748,7 +2746,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                             for (unsigned int i=0; i != old_nc; ++i)
                               {
                                 const dof_id_type d =
-                                  old_dof_obj->dof_number(sys_num, vg, vig, i, n_comp);
+                                  old_dof_obj.dof_number(sys_num, vg, vig, i, n_comp);
 
                                 libmesh_assert_not_equal_to (d, DofObject::invalid_id);
 
@@ -2765,20 +2763,19 @@ void DofMap::old_dof_indices (const Elem * const elem,
 
                     if (nc != 0)
                       {
-                        const DofObject * old_dof_obj = elem->old_dof_object;
-                        libmesh_assert(old_dof_obj);
+                        const DofObject & old_dof_obj = elem->get_old_dof_object_ref();
 
                         const unsigned int n_comp =
-                          old_dof_obj->n_comp_group(sys_num,vg);
+                          old_dof_obj.n_comp_group(sys_num,vg);
 
-                        if (old_dof_obj->n_systems() > sys_num &&
+                        if (old_dof_obj.n_systems() > sys_num &&
                             nc <= n_comp)
                           {
 
                             for (unsigned int i=0; i<nc; i++)
                               {
                                 const dof_id_type d =
-                                  old_dof_obj->dof_number(sys_num, vg, vig, i, n_comp);
+                                  old_dof_obj.dof_number(sys_num, vg, vig, i, n_comp);
 
                                 di.push_back(d);
                               }

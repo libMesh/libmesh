@@ -1217,11 +1217,11 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase & mesh)
         continue;
 
       if (elem->has_dofs())
-        libmesh_assert(elem->old_dof_object);
+        libmesh_assert(elem->get_old_dof_object());
 
       for (auto & node : elem->node_ref_range())
         if (node.has_dofs())
-          libmesh_assert(node.old_dof_object);
+          libmesh_assert(node.get_old_dof_object());
     }
 }
 #else
