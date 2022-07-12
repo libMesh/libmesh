@@ -274,8 +274,11 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
     }
 
   // We'll find all the line segments first, then stitch them together
-  // afterward
-  std::multimap<const Node *, const Node *> hole_edge_map;
+  // afterward.  If the line segments come from 2D element sides then
+  // we'll label them "1" for clockwise orientation around the element
+  // or "2" for CCW, to make it easier to detect and scream about
+  // cases where we have a disconnected outer boundary.
+  std::multimap<const Node *, std::pair<const Node *, int>> hole_edge_map;
 
   std::vector<boundary_id_type> bcids;
 
@@ -288,9 +291,11 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
           if (ids.empty() || ids.count(elem->subdomain_id()))
             {
               hole_edge_map.emplace(elem->node_ptr(0),
-                                    elem->node_ptr(1));
+                                    std::make_pair(elem->node_ptr(1),
+                                                   /*edge*/ 0));
               hole_edge_map.emplace(elem->node_ptr(1),
-                                    elem->node_ptr(0));
+                                    std::make_pair(elem->node_ptr(0),
+                                                   /*edge*/ 0));
             }
           continue;
         }
@@ -314,10 +319,12 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
               if (add_edge)
                 {
                   hole_edge_map.emplace(elem->node_ptr(s),
-                                        elem->node_ptr((s+1)%ns));
+                                        std::make_pair(elem->node_ptr((s+1)%ns),
+                                                       /*counter-CW*/ 2));
                   // Do we really need to support flipped 2D elements?
                   hole_edge_map.emplace(elem->node_ptr((s+1)%ns),
-                                        elem->node_ptr(s));
+                                        std::make_pair(elem->node_ptr(s),
+                                                       /*clockwise*/ 1));
                   continue;
                 }
             }
@@ -337,7 +344,9 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
   auto extract_edge_vector = [&hole_edge_map]() {
     // Start with any edge
     std::vector<const Node *> hole_points
-      {hole_edge_map.begin()->first, hole_edge_map.begin()->second};
+      {hole_edge_map.begin()->first, hole_edge_map.begin()->second.first};
+
+    int edge_type = hole_edge_map.begin()->second.second;
 
     // We won't be needing to search for this edge
     hole_edge_map.erase(hole_points.front());
@@ -356,14 +365,27 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
            "Bad edge topology found by MeshedHole");
 
         const Node * next = nullptr;
-        for (const auto [key, val] : as_range(next_it_begin, next_it_end))
+        for (const auto & [key, val] : as_range(next_it_begin, next_it_end))
           {
             libmesh_assert_equal_to(key, n);
             libmesh_ignore(key);
-            libmesh_assert_not_equal_to(val, n);
-            if (val == last)
+            libmesh_assert_not_equal_to(val.first, n);
+
+            // Don't go backwards on the edge we just traversed
+            if (val.first == last)
               continue;
-            next = val;
+
+            // We can support mixes of Edge and Tri-side edges, but we
+            // can't do proper error detection on flipped triangles.
+            if (val.second != edge_type &&
+                val.second != 0)
+              {
+                if (!edge_type)
+                  edge_type = val.second;
+                else
+                  libmesh_error_msg("MeshedHole sees inconsistent triangle orientations on boundary");
+              }
+            next = val.first;
           }
 
         // We should never hit the same n twice!
