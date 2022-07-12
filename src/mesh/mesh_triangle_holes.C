@@ -333,7 +333,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
   // mesh has multiple boundaries (e.g. because it had holes itself),
   // then a random vector will be extracted; this function will be
   // called multiple times so that the various options can be
-  // compared.
+  // compared.  We choose the largest option.
   auto extract_edge_vector = [&hole_edge_map]() {
     // Start with any edge
     std::vector<const Node *> hole_points
