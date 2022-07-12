@@ -26,6 +26,7 @@
 #include "libmesh/libmesh.h"
 
 // C++ includes
+#include <set>
 #include <vector>
 
 namespace libMesh
@@ -231,6 +232,15 @@ public:
    */
   void attach_region_list(const std::vector<Region*> * regions) { _regions = regions; }
 
+  /**
+   * A set of ids to allow on the outer boundary loop: interpreted as
+   * boundary ids of 2D elements and/or subdomain ids of 1D edges.  If
+   * this is empty, then the outer boundary may be constructed from
+   * boundary edges of any id!
+   */
+  void set_outer_boundary_ids(std::set<std::size_t> bdy_ids) { _bdy_ids = std::move(bdy_ids); }
+  const std::set<std::size_t> & get_outer_boundary_ids() const { return _bdy_ids; }
+
 protected:
   /**
    * Helper function to create PSLG segments from our other
@@ -277,6 +287,11 @@ protected:
    * are no regions!
    */
   const std::vector<Region*> * _regions;
+
+  /**
+   * A set of ids to allow on the outer boundary loop.
+   */
+  std::set<std::size_t> _bdy_ids;
 
   /**
    * The type of elements to generate.  (Defaults to

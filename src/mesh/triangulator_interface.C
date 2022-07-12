@@ -113,8 +113,8 @@ void TriangulatorInterface::elems_to_segments()
 
       // We'll steal the ordering calculation from
       // the MeshedHole code, but reverse the ordering since it's
-      // an outer rather than an inner boundary.
-      const TriangulatorInterface::MeshedHole mh { _mesh };
+      // to be used as an outer rather than an inner boundary.
+      const TriangulatorInterface::MeshedHole mh { _mesh, this->_bdy_ids };
 
       const std::size_t np = mh.n_points();
       for (auto i : make_range(np))
