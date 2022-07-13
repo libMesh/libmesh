@@ -357,10 +357,12 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
   // compared.  We choose the largest option.
   auto extract_edge_vector = [&report_error, &hole_edge_map]() {
     // Start with any edge
-    std::vector<const Node *> hole_points
-      {hole_edge_map.begin()->first, hole_edge_map.begin()->second.first};
+    std::pair<std::vector<const Node *>, int> hole_points_and_edge_type
+    {{hole_edge_map.begin()->first, hole_edge_map.begin()->second.first},
+     hole_edge_map.begin()->second.second};
 
-    int edge_type = hole_edge_map.begin()->second.second;
+    int & edge_type = hole_points_and_edge_type.second;
+    auto & hole_points = hole_points_and_edge_type.first;
 
     // We won't be needing to search for this edge
     hole_edge_map.erase(hole_points.front());
@@ -409,13 +411,34 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
 
     hole_points.pop_back();
 
-    return hole_points;
+    return hole_points_and_edge_type;
   };
 
+  /*
+   * If it's not obvious which loop we find is really the loop we
+   * want, then we should die with a nice error message.
+   */
+  int n_negative_areas = 0,
+      n_positive_areas = 0,
+      n_edgeelem_loops = 0;
+
   std::vector<const Node *> outer_hole_points;
-  Real twice_outer_area = 0;
+  int outer_edge_type = -1;
+  Real twice_outer_area = 0,
+       abs_twice_outer_area = 0;
+
   while (!hole_edge_map.empty()) {
-    std::vector<const Node *> hole_points = extract_edge_vector();
+    auto [hole_points, edge_type] = extract_edge_vector();
+
+    if (edge_type == 0)
+    {
+      ++n_edgeelem_loops;
+      if (n_edgeelem_loops > 1)
+        report_error("MeshedHole is confused by multiple loops of Edge elements");
+      if (n_positive_areas || n_negative_areas)
+        report_error("MeshedHole is confused by meshes with both Edge and 2D-side boundaries");
+    }
+
     const std::size_t n_hole_points = hole_points.size();
     if (n_hole_points < 3)
       report_error("Loop with only " + std::to_string(n_hole_points) +
@@ -431,10 +454,20 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
         twice_this_area += e_0im.cross(e_0i)(2);
       }
 
-    if (std::abs(twice_this_area) > std::abs(twice_outer_area))
+    auto abs_twice_this_area = std::abs(twice_this_area);
+
+    if (((abs_twice_this_area == twice_this_area) && edge_type == 2) ||
+        (edge_type == 1))
+      ++n_positive_areas;
+    else
+      ++n_negative_areas;
+
+    if (abs_twice_this_area > abs_twice_outer_area)
       {
         twice_outer_area = twice_this_area;
+        abs_twice_outer_area = abs_twice_this_area;
         outer_hole_points = std::move(hole_points);
+        outer_edge_type = edge_type;
       }
   }
 
@@ -451,6 +484,24 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
   // to be clockwise, so use the reverse order.
   if (twice_outer_area > 0)
     std::reverse(_points.begin(), _points.end());
+
+  if (((twice_outer_area > 0) && outer_edge_type == 2) ||
+      outer_edge_type == 1)
+    {
+      if (n_positive_areas > 1)
+        report_error("MeshedHole found " +
+                     std::to_string(n_positive_areas) +
+                     " counter-clockwise boundaries and cannot choose one!");
+
+    }
+  else if (outer_edge_type != 0)
+    {
+      if (n_negative_areas > 1)
+        report_error("MeshedHole found " +
+                     std::to_string(n_positive_areas) +
+                     " clockwise boundaries and cannot choose one!");
+
+    }
 
   // Hey, no errors!  Broadcast that empty string.
   mesh.comm().broadcast(error_reported);
