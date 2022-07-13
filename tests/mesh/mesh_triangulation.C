@@ -38,6 +38,7 @@ public:
   CPPUNIT_TEST( testPoly2TriMeshedHoles );
   CPPUNIT_TEST( testPoly2TriEdges );
   CPPUNIT_TEST( testPoly2TriBadEdges );
+  CPPUNIT_TEST( testPoly2TriBadMultiBoundary );
   CPPUNIT_TEST( testPoly2TriEdgesRefined );
   CPPUNIT_TEST( testPoly2TriSegments );
   CPPUNIT_TEST( testPoly2TriRefined );
@@ -569,6 +570,65 @@ public:
     }
     catch (libMesh::LogicError & e) {
       std::regex msg_regex("Bad edge topology");
+      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+      threw_desired_exception = true;
+    }
+    catch (...) {
+      CPPUNIT_ASSERT_MESSAGE("Unexpected exception type thrown", false);
+    }
+    CPPUNIT_ASSERT(threw_desired_exception);
+#endif
+  }
+
+
+  void testPoly2TriBadMultiBoundary()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator triangulator(mesh);
+
+    // Two separate triangles
+    auto node0 = mesh.add_point(Point(0,0), 0);
+    auto node1 = mesh.add_point(Point(0,1), 1);
+    auto node2 = mesh.add_point(Point(1,0), 2);
+
+    auto node3 = mesh.add_point(Point(2,0), 3);
+    auto node4 = mesh.add_point(Point(2,1), 4);
+    auto node5 = mesh.add_point(Point(3,0), 5);
+
+    auto edge01 = mesh.add_elem(Elem::build(EDGE2));
+    edge01->set_node(0) = node0;
+    edge01->set_node(1) = node1;
+    auto edge12 = mesh.add_elem(Elem::build(EDGE2));
+    edge12->set_node(0) = node1;
+    edge12->set_node(1) = node2;
+    auto edge20 = mesh.add_elem(Elem::build(EDGE2));
+    edge20->set_node(0) = node2;
+    edge20->set_node(1) = node0;
+
+    auto edge34 = mesh.add_elem(Elem::build(EDGE2));
+    edge34->set_node(0) = node3;
+    edge34->set_node(1) = node4;
+    auto edge45 = mesh.add_elem(Elem::build(EDGE2));
+    edge45->set_node(0) = node4;
+    edge45->set_node(1) = node5;
+    auto edge53 = mesh.add_elem(Elem::build(EDGE2));
+    edge53->set_node(0) = node5;
+    edge53->set_node(1) = node3;
+
+    mesh.prepare_for_use();
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    // We can't just CPPUNIT_ASSERT_THROW, because we want to make
+    // sure we were thrown from the right place with the right error
+    // message!
+    bool threw_desired_exception = false;
+    try {
+      this->testTriangulatorBase(mesh, triangulator);
+    }
+    catch (libMesh::LogicError & e) {
+      std::regex msg_regex("multiple loops of Edge");
       CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
       threw_desired_exception = true;
     }
