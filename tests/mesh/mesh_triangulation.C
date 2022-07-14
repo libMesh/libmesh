@@ -38,7 +38,8 @@ public:
   CPPUNIT_TEST( testPoly2TriMeshedHoles );
   CPPUNIT_TEST( testPoly2TriEdges );
   CPPUNIT_TEST( testPoly2TriBadEdges );
-  CPPUNIT_TEST( testPoly2TriBadMultiBoundary );
+  CPPUNIT_TEST( testPoly2TriBad1DMultiBoundary );
+  CPPUNIT_TEST( testPoly2TriBad2DMultiBoundary );
   CPPUNIT_TEST( testPoly2TriEdgesRefined );
   CPPUNIT_TEST( testPoly2TriSegments );
   CPPUNIT_TEST( testPoly2TriRefined );
@@ -581,7 +582,7 @@ public:
   }
 
 
-  void testPoly2TriBadMultiBoundary()
+  void testPoly2TriBad1DMultiBoundary()
   {
     LOG_UNIT_TEST;
 
@@ -639,6 +640,55 @@ public:
 #endif
   }
 
+  void testPoly2TriBad2DMultiBoundary()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator triangulator(mesh);
+
+    // Two separate triangles
+    auto node0 = mesh.add_point(Point(0,0), 0);
+    auto node1 = mesh.add_point(Point(1,0), 1);
+    auto node2 = mesh.add_point(Point(0,1), 2);
+
+    auto node3 = mesh.add_point(Point(2,0), 3);
+    auto node4 = mesh.add_point(Point(3,0), 4);
+    auto node5 = mesh.add_point(Point(2,1), 5);
+
+    auto tri012 = mesh.add_elem(Elem::build(TRI3));
+    tri012->set_node(0) = node0;
+    tri012->set_node(1) = node1;
+    tri012->set_node(2) = node2;
+    auto tri345 = mesh.add_elem(Elem::build(TRI3));
+    tri345->set_node(0) = node3;
+    tri345->set_node(1) = node4;
+    tri345->set_node(2) = node5;
+
+    mesh.prepare_for_use();
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    // We can't just CPPUNIT_ASSERT_THROW, because we want to make
+    // sure we were thrown from the right place with the right error
+    // message!
+    bool threw_desired_exception = false;
+    try {
+      this->testTriangulatorBase(mesh, triangulator);
+    }
+    catch (libMesh::LogicError & e) {
+      std::regex msg_regex("cannot choose one");
+      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+      threw_desired_exception = true;
+    }
+    catch (CppUnit::Exception & e) {
+      throw e;
+    }
+    catch (...) {
+      CPPUNIT_ASSERT_MESSAGE("Unexpected exception type thrown", false);
+    }
+    CPPUNIT_ASSERT(threw_desired_exception);
+#endif
+  }
 
 
   void testPoly2TriEdgesRefined()
