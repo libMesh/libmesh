@@ -84,6 +84,33 @@ public:
     triangulator.smooth_after_generating() = false;
   }
 
+  void testExceptionBase(MeshBase & mesh,
+                         TriangulatorInterface & triangulator,
+                         const char * re)
+  {
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    // We can't just CPPUNIT_ASSERT_THROW, because we want to make
+    // sure we were thrown from the right place with the right error
+    // message!
+    bool threw_desired_exception = false;
+    try {
+      this->testTriangulatorBase(mesh, triangulator);
+    }
+    catch (libMesh::LogicError & e) {
+      std::regex msg_regex(re);
+      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+      threw_desired_exception = true;
+    }
+    catch (CppUnit::Exception & e) {
+      throw e;
+    }
+    catch (...) {
+      CPPUNIT_ASSERT_MESSAGE("Unexpected exception type thrown", false);
+    }
+    CPPUNIT_ASSERT(threw_desired_exception);
+#endif
+}
+
   void testTriangleHoleArea()
   {
     LOG_UNIT_TEST;
@@ -561,24 +588,7 @@ public:
 
     mesh.prepare_for_use();
 
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-    // We can't just CPPUNIT_ASSERT_THROW, because we want to make
-    // sure we were thrown from the right place with the right error
-    // message!
-    bool threw_desired_exception = false;
-    try {
-      this->testTriangulatorBase(mesh, triangulator);
-    }
-    catch (libMesh::LogicError & e) {
-      std::regex msg_regex("Bad edge topology");
-      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
-      threw_desired_exception = true;
-    }
-    catch (...) {
-      CPPUNIT_ASSERT_MESSAGE("Unexpected exception type thrown", false);
-    }
-    CPPUNIT_ASSERT(threw_desired_exception);
-#endif
+    testExceptionBase(mesh, triangulator, "Bad edge topology");
   }
 
 
@@ -620,24 +630,7 @@ public:
 
     mesh.prepare_for_use();
 
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-    // We can't just CPPUNIT_ASSERT_THROW, because we want to make
-    // sure we were thrown from the right place with the right error
-    // message!
-    bool threw_desired_exception = false;
-    try {
-      this->testTriangulatorBase(mesh, triangulator);
-    }
-    catch (libMesh::LogicError & e) {
-      std::regex msg_regex("multiple loops of Edge");
-      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
-      threw_desired_exception = true;
-    }
-    catch (...) {
-      CPPUNIT_ASSERT_MESSAGE("Unexpected exception type thrown", false);
-    }
-    CPPUNIT_ASSERT(threw_desired_exception);
-#endif
+    testExceptionBase(mesh, triangulator, "multiple loops of Edge");
   }
 
   void testPoly2TriBad2DMultiBoundary()
@@ -667,27 +660,7 @@ public:
 
     mesh.prepare_for_use();
 
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-    // We can't just CPPUNIT_ASSERT_THROW, because we want to make
-    // sure we were thrown from the right place with the right error
-    // message!
-    bool threw_desired_exception = false;
-    try {
-      this->testTriangulatorBase(mesh, triangulator);
-    }
-    catch (libMesh::LogicError & e) {
-      std::regex msg_regex("cannot choose one");
-      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
-      threw_desired_exception = true;
-    }
-    catch (CppUnit::Exception & e) {
-      throw e;
-    }
-    catch (...) {
-      CPPUNIT_ASSERT_MESSAGE("Unexpected exception type thrown", false);
-    }
-    CPPUNIT_ASSERT(threw_desired_exception);
-#endif
+    testExceptionBase(mesh, triangulator, "cannot choose one");
   }
 
 
