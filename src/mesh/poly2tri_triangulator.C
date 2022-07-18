@@ -530,8 +530,8 @@ void Poly2TriTriangulator::triangulate_current_points()
       p2t::Triangle & ptri = *ptri_ptr;
 
       // We always use TRI3 here, since that's what we have nodes for;
-      // if we need a higher order we'll convert at the end.
-      auto elem = Elem::build_with_id(_elem_type, next_id++);
+      // if we need a higher order we can convert at the end.
+      auto elem = Elem::build_with_id(TRI3, next_id++);
       for (auto v : make_range(3))
         {
           const p2t::Point & vertex = *ptri.GetPoint(v);
