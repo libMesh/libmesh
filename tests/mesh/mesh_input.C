@@ -13,6 +13,7 @@
 #include <libmesh/exodusII_io.h>
 #include <libmesh/nemesis_io.h>
 #include <libmesh/vtk_io.h>
+#include <libmesh/tetgen_io.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -100,6 +101,10 @@ public:
   CPPUNIT_TEST( testDynaFileMappingsCyl3d);
 #endif // LIBMESH_HAVE_GZSTREAM
 #endif // LIBMESH_DIM > 1
+
+#ifdef LIBMESH_HAVE_TETGEN
+  CPPUNIT_TEST( testTetgenIO );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -823,6 +828,30 @@ public:
     helperTestingDynaQuad(mesh);
   }
 
+  void testTetgenIO ()
+  {
+#ifdef LIBMESH_HAVE_TETGEN
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    TetGenIO tetgen_io(mesh);
+
+    if (mesh.processor_id() == 0)
+      tetgen_io.read("meshes/tetgen_one_tet10.ele");
+    MeshCommunication().broadcast(mesh);
+
+    mesh.prepare_for_use();
+
+    // Mesh should contain 1 TET10 finite element
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(1));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(10));
+
+    // Element should have TET10 reference element volume
+    Real vol = mesh.elem_ptr(0)->volume();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(vol, 1./6, TOLERANCE*TOLERANCE);
+#endif
+  }
 
   void testDynaNoSplines ()
   {
