@@ -1489,6 +1489,12 @@ void BoundaryInfo::remove_id (boundary_id_type id)
 void BoundaryInfo::renumber_id (boundary_id_type old_id,
                                 boundary_id_type new_id)
 {
+  if (old_id == new_id)
+    {
+      // If the IDs are the same, this is a no-op.
+      return;
+    }
+
   bool found_node = false;
   for (auto & p : _boundary_node_id)
     if (p.second == old_id)
