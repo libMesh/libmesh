@@ -266,16 +266,34 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
   MeshSerializer serial(const_cast<MeshBase &>(mesh),
                         /* serial */ true, /* only proc 0 */ true);
 
+  // Try to keep in sync even if we throw an error on proc 0, so we
+  // can examine errors in our unit tests in parallel too.
+  std::string error_reported;
+
+  auto report_error = [&mesh, &error_reported](std::string er) {
+    error_reported = std::move(er);
+    mesh.comm().broadcast(error_reported);
+    libmesh_error_msg(error_reported);
+  };
+
   if (mesh.processor_id() != 0)
     {
-      // Receive what proc 0 will send later
+      // Make sure proc 0 didn't just fail
+      mesh.comm().broadcast(error_reported);
+      libmesh_error_msg_if(!error_reported.empty(), error_reported);
+
+      // Receive the points proc 0 will send later
       mesh.comm().broadcast(_points);
       return;
     }
 
   // We'll find all the line segments first, then stitch them together
-  // afterward
-  std::multimap<const Node *, const Node *> hole_edge_map;
+  // afterward.  If the line segments come from 2D element sides then
+  // we'll label their edge_type as "1" for clockwise orientation
+  // around the element or "2" for CCW, to make it easier to detect
+  // and scream about cases where we have a disconnected outer
+  // boundary.
+  std::multimap<const Node *, std::pair<const Node *, int>> hole_edge_map;
 
   std::vector<boundary_id_type> bcids;
 
@@ -288,9 +306,11 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
           if (ids.empty() || ids.count(elem->subdomain_id()))
             {
               hole_edge_map.emplace(elem->node_ptr(0),
-                                    elem->node_ptr(1));
+                                    std::make_pair(elem->node_ptr(1),
+                                                   /*edge*/ 0));
               hole_edge_map.emplace(elem->node_ptr(1),
-                                    elem->node_ptr(0));
+                                    std::make_pair(elem->node_ptr(0),
+                                                   /*edge*/ 0));
             }
           continue;
         }
@@ -314,30 +334,35 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
               if (add_edge)
                 {
                   hole_edge_map.emplace(elem->node_ptr(s),
-                                        elem->node_ptr((s+1)%ns));
+                                        std::make_pair(elem->node_ptr((s+1)%ns),
+                                                       /*counter-CW*/ 2));
                   // Do we really need to support flipped 2D elements?
                   hole_edge_map.emplace(elem->node_ptr((s+1)%ns),
-                                        elem->node_ptr(s));
+                                        std::make_pair(elem->node_ptr(s),
+                                                       /*clockwise*/ 1));
                   continue;
                 }
             }
         }
     }
 
-  libmesh_error_msg_if
-    (hole_edge_map.empty(),
-     "No valid hole edges found in mesh!");
+  if (hole_edge_map.empty())
+    report_error("No valid hole edges found in mesh!");
 
   // Function to pull a vector of points out of the map; a loop of
   // edges connecting these points defines a hole boundary.  If the
   // mesh has multiple boundaries (e.g. because it had holes itself),
   // then a random vector will be extracted; this function will be
   // called multiple times so that the various options can be
-  // compared.
-  auto extract_edge_vector = [&hole_edge_map]() {
+  // compared.  We choose the largest option.
+  auto extract_edge_vector = [&report_error, &hole_edge_map]() {
     // Start with any edge
-    std::vector<const Node *> hole_points
-      {hole_edge_map.begin()->first, hole_edge_map.begin()->second};
+    std::pair<std::vector<const Node *>, int> hole_points_and_edge_type
+    {{hole_edge_map.begin()->first, hole_edge_map.begin()->second.first},
+     hole_edge_map.begin()->second.second};
+
+    int & edge_type = hole_points_and_edge_type.second;
+    auto & hole_points = hole_points_and_edge_type.first;
 
     // We won't be needing to search for this edge
     hole_edge_map.erase(hole_points.front());
@@ -351,19 +376,31 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
       {
         auto [next_it_begin, next_it_end] = hole_edge_map.equal_range(n);
 
-        libmesh_error_msg_if
-          (std::distance(next_it_begin, next_it_end) != 2,
-           "Bad edge topology in MeshedHole");
+        if (std::distance(next_it_begin, next_it_end) != 2)
+          report_error("Bad edge topology found by MeshedHole");
 
         const Node * next = nullptr;
-        for (const auto [key, val] : as_range(next_it_begin, next_it_end))
+        for (const auto & [key, val] : as_range(next_it_begin, next_it_end))
           {
             libmesh_assert_equal_to(key, n);
             libmesh_ignore(key);
-            libmesh_assert_not_equal_to(val, n);
-            if (val == last)
+            libmesh_assert_not_equal_to(val.first, n);
+
+            // Don't go backwards on the edge we just traversed
+            if (val.first == last)
               continue;
-            next = val;
+
+            // We can support mixes of Edge and Tri-side edges, but we
+            // can't do proper error detection on flipped triangles.
+            if (val.second != edge_type &&
+                val.second != 0)
+              {
+                if (!edge_type)
+                  edge_type = val.second;
+                else
+                  report_error("MeshedHole sees inconsistent triangle orientations on boundary");
+              }
+            next = val.first;
           }
 
         // We should never hit the same n twice!
@@ -374,17 +411,38 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
 
     hole_points.pop_back();
 
-    return hole_points;
+    return hole_points_and_edge_type;
   };
 
+  /*
+   * If it's not obvious which loop we find is really the loop we
+   * want, then we should die with a nice error message.
+   */
+  int n_negative_areas = 0,
+      n_positive_areas = 0,
+      n_edgeelem_loops = 0;
+
   std::vector<const Node *> outer_hole_points;
-  Real twice_outer_area = 0;
+  int outer_edge_type = -1;
+  Real twice_outer_area = 0,
+       abs_twice_outer_area = 0;
+
   while (!hole_edge_map.empty()) {
-    std::vector<const Node *> hole_points = extract_edge_vector();
+    auto [hole_points, edge_type] = extract_edge_vector();
+
+    if (edge_type == 0)
+    {
+      ++n_edgeelem_loops;
+      if (n_edgeelem_loops > 1)
+        report_error("MeshedHole is confused by multiple loops of Edge elements");
+      if (n_positive_areas || n_negative_areas)
+        report_error("MeshedHole is confused by meshes with both Edge and 2D-side boundaries");
+    }
+
     const std::size_t n_hole_points = hole_points.size();
-    libmesh_error_msg_if
-      (n_hole_points < 3, "Loop with only " << n_hole_points <<
-       " hole edges found in mesh!");
+    if (n_hole_points < 3)
+      report_error("Loop with only " + std::to_string(n_hole_points) +
+                   " hole edges found in mesh!");
 
     Real twice_this_area = 0;
     const Point p0 = *hole_points[0];
@@ -396,10 +454,20 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
         twice_this_area += e_0im.cross(e_0i)(2);
       }
 
-    if (std::abs(twice_this_area) > std::abs(twice_outer_area))
+    auto abs_twice_this_area = std::abs(twice_this_area);
+
+    if (((abs_twice_this_area == twice_this_area) && edge_type == 2) ||
+        (edge_type == 1))
+      ++n_positive_areas;
+    else
+      ++n_negative_areas;
+
+    if (abs_twice_this_area > abs_twice_outer_area)
       {
         twice_outer_area = twice_this_area;
+        abs_twice_outer_area = abs_twice_this_area;
         outer_hole_points = std::move(hole_points);
+        outer_edge_type = edge_type;
       }
   }
 
@@ -409,15 +477,34 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
                  _points.begin(),
                  [](const Node * n){ return Point(*n); });
 
-  libmesh_error_msg_if
-    (!twice_outer_area,
-     "Zero-area MeshedHoles are not currently supported");
+  if (!twice_outer_area)
+    report_error("Zero-area MeshedHoles are not currently supported");
 
   // We ordered ourselves counter-clockwise?  But a hole is expected
   // to be clockwise, so use the reverse order.
   if (twice_outer_area > 0)
     std::reverse(_points.begin(), _points.end());
 
+  if (((twice_outer_area > 0) && outer_edge_type == 2) ||
+      outer_edge_type == 1)
+    {
+      if (n_positive_areas > 1)
+        report_error("MeshedHole found " +
+                     std::to_string(n_positive_areas) +
+                     " counter-clockwise boundaries and cannot choose one!");
+
+    }
+  else if (outer_edge_type != 0)
+    {
+      if (n_negative_areas > 1)
+        report_error("MeshedHole found " +
+                     std::to_string(n_positive_areas) +
+                     " clockwise boundaries and cannot choose one!");
+
+    }
+
+  // Hey, no errors!  Broadcast that empty string.
+  mesh.comm().broadcast(error_reported);
   mesh.comm().broadcast(_points);
 }
 
