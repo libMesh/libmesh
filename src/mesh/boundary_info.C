@@ -1486,6 +1486,100 @@ void BoundaryInfo::remove_id (boundary_id_type id)
 
 
 
+void BoundaryInfo::renumber_id (boundary_id_type old_id,
+                                boundary_id_type new_id)
+{
+  bool found_node = false;
+  for (auto & p : _boundary_node_id)
+    if (p.second == old_id)
+      {
+        p.second = new_id;
+        found_node = true;
+      }
+  if (found_node)
+    {
+      _node_boundary_ids.erase(old_id);
+      _node_boundary_ids.insert(new_id);
+    }
+
+  bool found_edge = false;
+  for (auto & p : _boundary_edge_id)
+    if (p.second.second == old_id)
+      {
+        p.second.second = new_id;
+        found_edge = true;
+      }
+  if (found_edge)
+    {
+      _edge_boundary_ids.erase(old_id);
+      _edge_boundary_ids.insert(new_id);
+    }
+
+  bool found_shellface = false;
+  for (auto & p : _boundary_shellface_id)
+    if (p.second.second == old_id)
+      {
+        p.second.second = new_id;
+        found_shellface = true;
+      }
+  if (found_shellface)
+    {
+      _shellface_boundary_ids.erase(old_id);
+      _shellface_boundary_ids.insert(new_id);
+    }
+
+  bool found_side = false;
+  for (auto & p : _boundary_side_id)
+    if (p.second.second == old_id)
+      {
+        p.second.second = new_id;
+        found_side = true;
+      }
+  if (found_side)
+    {
+      _side_boundary_ids.erase(old_id);
+      _side_boundary_ids.insert(new_id);
+    }
+
+  if (found_node || found_edge || found_shellface || found_side)
+    {
+      _boundary_ids.erase(old_id);
+      _boundary_ids.insert(new_id);
+    }
+
+  {
+    std::map<boundary_id_type, std::string>::const_iterator it =
+      _ss_id_to_name.find(old_id);
+    if (it != _ss_id_to_name.end())
+    {
+      _ss_id_to_name[new_id] = it->second;
+      _ss_id_to_name.erase(it);
+    }
+  }
+
+  {
+    std::map<boundary_id_type, std::string>::const_iterator it =
+      _ns_id_to_name.find(old_id);
+    if (it != _ns_id_to_name.end())
+    {
+      _ns_id_to_name[new_id] = it->second;
+      _ns_id_to_name.erase(it);
+    }
+  }
+
+  {
+    std::map<boundary_id_type, std::string>::const_iterator it =
+      _es_id_to_name.find(old_id);
+    if (it != _es_id_to_name.end())
+    {
+      _es_id_to_name[new_id] = it->second;
+      _es_id_to_name.erase(it);
+    }
+  }
+}
+
+
+
 unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
                                                  const boundary_id_type boundary_id_in) const
 {
