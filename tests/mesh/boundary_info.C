@@ -199,6 +199,9 @@ public:
     bi.renumber_id(2, 6);
     bi.renumber_id(3, 6);
 
+    const std::map<boundary_id_type, std::string> expected_names =
+      {{4,"bottom"}, {5,"right"}, {6,"left"}};
+
     // On a ReplicatedMesh, we should see ids 4,5,6 on each processor
     if (mesh.is_serial())
       CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(3), bi.n_boundary_ids());
@@ -216,8 +219,22 @@ public:
       for (boundary_id_type i = 4 ; i != 7; ++i)
         {
           bool has_bcid = bc_ids.count(i);
+
+          bool bad_name = false;
+          if (has_bcid)
+          {
+            const std::string & current_name = bi.sideset_name(i);
+
+            bad_name = (current_name != libmesh_map_find(expected_names, i));
+          }
+
+          // At least one proc should have each of these BCs
           mesh.comm().max(has_bcid);
           CPPUNIT_ASSERT(has_bcid);
+
+          // No proc should have the wrong name for a BC it has
+          mesh.comm().max(bad_name);
+          CPPUNIT_ASSERT(!bad_name);
         }
     }
 
