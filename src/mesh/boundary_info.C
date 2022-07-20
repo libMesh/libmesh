@@ -72,6 +72,18 @@ void erase_if(std::multimap<Key,T> & map, Pred pred)
     }
 }
 
+// Helper func for renumber_id
+template <typename Map, typename T>
+void renumber_name(Map & m, T old_id, T new_id)
+{
+  const typename Map::const_iterator it = m.find(old_id);
+  if (it != m.end())
+    {
+      m[new_id] = it->second;
+      m.erase(it);
+    }
+}
+
 }
 
 namespace libMesh
@@ -1553,35 +1565,9 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
       _boundary_ids.insert(new_id);
     }
 
-  {
-    std::map<boundary_id_type, std::string>::const_iterator it =
-      _ss_id_to_name.find(old_id);
-    if (it != _ss_id_to_name.end())
-    {
-      _ss_id_to_name[new_id] = it->second;
-      _ss_id_to_name.erase(it);
-    }
-  }
-
-  {
-    std::map<boundary_id_type, std::string>::const_iterator it =
-      _ns_id_to_name.find(old_id);
-    if (it != _ns_id_to_name.end())
-    {
-      _ns_id_to_name[new_id] = it->second;
-      _ns_id_to_name.erase(it);
-    }
-  }
-
-  {
-    std::map<boundary_id_type, std::string>::const_iterator it =
-      _es_id_to_name.find(old_id);
-    if (it != _es_id_to_name.end())
-    {
-      _es_id_to_name[new_id] = it->second;
-      _es_id_to_name.erase(it);
-    }
-  }
+  renumber_name(_ss_id_to_name, old_id, new_id);
+  renumber_name(_ns_id_to_name, old_id, new_id);
+  renumber_name(_es_id_to_name, old_id, new_id);
 }
 
 
