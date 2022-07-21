@@ -157,6 +157,21 @@ TriangulatorInterface::Hole::find_ray_intersections(Point ray_start,
 
 
 
+bool TriangulatorInterface::Hole::contains(Point p) const
+{
+  // Count the number of intersections with a ray to the right,
+  // keep track of how far they are
+  Point ray_target = p + Point(1);
+  std::vector<Real> intersection_distances =
+    this->find_ray_intersections(p, ray_target);
+
+  // Odd number of intersections == we're inside
+  // Even number == we're outside
+  return intersection_distances.size() % 2;
+}
+
+
+
 //
 // PolygonHole member functions
 //

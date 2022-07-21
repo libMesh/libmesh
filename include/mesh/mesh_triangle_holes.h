@@ -74,6 +74,11 @@ public:
   virtual Point inside() const = 0;
 
   /**
+   * Return true iff \p p lies inside the hole.
+   */
+  bool contains(Point p) const;
+
+  /**
    * Return the area of the hole
    */
   Real area() const;
