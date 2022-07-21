@@ -116,6 +116,12 @@ public:
 protected:
 
   /**
+   * Helper function for contains(), also useful for MeshedHole::inside()
+   */
+  std::vector<Real> find_ray_intersections(Point ray_start,
+                                           Point ray_target) const;
+
+  /**
    * Whether to allow boundary refinement.  True by default; specified
    * here so we can use the default constructor.
    */
