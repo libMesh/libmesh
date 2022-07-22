@@ -33,6 +33,7 @@ public:
 
 #ifdef LIBMESH_HAVE_POLY2TRI
   CPPUNIT_TEST( testPoly2Tri );
+  CPPUNIT_TEST( testPoly2TriHalfDomain );
   CPPUNIT_TEST( testPoly2TriInterp );
   CPPUNIT_TEST( testPoly2TriInterp2 );
   CPPUNIT_TEST( testPoly2TriHoles );
@@ -58,6 +59,7 @@ public:
 
 #ifdef LIBMESH_HAVE_TRIANGLE
   CPPUNIT_TEST( testTriangle );
+  CPPUNIT_TEST( testTriangleHalfDomain );
   CPPUNIT_TEST( testTriangleInterp );
   CPPUNIT_TEST( testTriangleInterp2 );
   CPPUNIT_TEST( testTriangleHoles );
@@ -490,6 +492,46 @@ public:
   }
 
 
+  void testHalfDomain(MeshBase & mesh,
+                      TriangulatorInterface & triangulator)
+  {
+    // A pentagon we'll avoid via subdomain ids
+    auto node4 = mesh.add_point(Point(2,0), 4);
+    auto node5 = mesh.add_point(Point(3,0), 5);
+    auto node6 = mesh.add_point(Point(3,2), 6);
+    auto node7 = mesh.add_point(Point(2,2), 7);
+    auto node8 = mesh.add_point(Point(2,1), 8);
+
+    auto edge45 = mesh.add_elem(Elem::build(EDGE2));
+    edge45->set_node(0) = node4;
+    edge45->set_node(1) = node5;
+    edge45->subdomain_id() = 1;
+    auto edge56 = mesh.add_elem(Elem::build(EDGE2));
+    edge56->set_node(0) = node5;
+    edge56->set_node(1) = node6;
+    edge56->subdomain_id() = 1;
+    auto edge67 = mesh.add_elem(Elem::build(EDGE2));
+    edge67->set_node(0) = node6;
+    edge67->set_node(1) = node7;
+    edge67->subdomain_id() = 1;
+    auto edge78 = mesh.add_elem(Elem::build(EDGE2));
+    edge78->set_node(0) = node7;
+    edge78->set_node(1) = node8;
+    edge78->subdomain_id() = 1;
+    auto edge84 = mesh.add_elem(Elem::build(EDGE2));
+    edge84->set_node(0) = node8;
+    edge84->set_node(1) = node4;
+    edge84->subdomain_id() = 1;
+
+    testEdgesMesh(mesh);
+
+    std::set<std::size_t> bdy_ids {0};
+    triangulator.set_outer_boundary_ids(bdy_ids);
+
+    this->testTriangulatorBase(mesh, triangulator);
+  }
+
+
 #ifdef LIBMESH_HAVE_TRIANGLE
   void testTriangle()
   {
@@ -498,6 +540,16 @@ public:
     Mesh mesh(*TestCommWorld);
     TriangleInterface triangle(mesh);
     testTriangulator(mesh, triangle);
+  }
+
+
+  void testTriangleHalfDomain()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    TriangleInterface triangle(mesh);
+    testHalfDomain(mesh, triangle);
   }
 
 
@@ -572,6 +624,16 @@ public:
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulator(mesh, p2t_tri);
+  }
+
+
+  void testPoly2TriHalfDomain()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator p2t_tri(mesh);
+    testHalfDomain(mesh, p2t_tri);
   }
 
 
