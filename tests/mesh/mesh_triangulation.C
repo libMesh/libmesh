@@ -29,6 +29,7 @@ public:
   LIBMESH_CPPUNIT_TEST_SUITE( MeshTriangulationTest );
 
   CPPUNIT_TEST( testTriangleHoleArea );
+  CPPUNIT_TEST( testTriangleHoleContains );
 
 #ifdef LIBMESH_HAVE_POLY2TRI
   CPPUNIT_TEST( testPoly2Tri );
@@ -109,7 +110,8 @@ public:
     }
     CPPUNIT_ASSERT(threw_desired_exception);
 #endif
-}
+  }
+
 
   void testTriangleHoleArea()
   {
@@ -156,6 +158,53 @@ public:
     TriangleInterface::PolygonHole square(center, radius, 4);
     LIBMESH_ASSERT_FP_EQUAL(square.area(), 2*radius*radius, TOLERANCE*TOLERANCE);
 #endif
+  }
+
+
+  void testTriangleHoleContains()
+  {
+    LOG_UNIT_TEST;
+
+    // Using center=(1,2), radius=2 for the heck of it
+    Point center{1,2};
+    Real radius = 2;
+    std::vector<TriangulatorInterface::PolygonHole> polyholes;
+
+    auto check_corners = [center, radius]
+      (const TriangulatorInterface::Hole & hole,
+       unsigned int np)
+      {
+        CPPUNIT_ASSERT_EQUAL(np, hole.n_points());
+        for (auto i : make_range(np))
+          {
+            const Real theta = i * 2 * libMesh::pi / np;
+            const Real xin = center(0) + radius * .99 * std::cos(theta);
+            const Real xout = center(0) + radius * 1.01 * std::cos(theta);
+            const Real yin = center(1) + radius * .99 * std::sin(theta);
+            const Real yout = center(1) + radius * 1.01 * std::sin(theta);
+
+            CPPUNIT_ASSERT(hole.contains(Point(xin, yin)));
+            CPPUNIT_ASSERT(!hole.contains(Point(xout, yout)));
+          }
+      };
+
+    const TriangulatorInterface::PolygonHole triangle(center, radius, 3);
+    check_corners(triangle, 3);
+    const TriangulatorInterface::PolygonHole diamond(center, radius, 4);
+    check_corners(diamond, 4);
+    const TriangulatorInterface::PolygonHole hexagon(center, radius, 6);
+    check_corners(hexagon, 6);
+
+    TriangulatorInterface::ArbitraryHole jaggy
+    {{1,0}, {{0,-1},{2,-1},{2,1},{1.75,-.5},{1.5,1},{1.25,-.5},{1,1},{.75,-.5},{.5,1},{.25,-.5},{0,1}}};
+
+    CPPUNIT_ASSERT(jaggy.contains({.1,-.3}));
+    CPPUNIT_ASSERT(jaggy.contains({.5,.9}));
+    CPPUNIT_ASSERT(jaggy.contains({.9,-.3}));
+    CPPUNIT_ASSERT(jaggy.contains({1,0}));
+    CPPUNIT_ASSERT(jaggy.contains({1.1,-.4}));
+    CPPUNIT_ASSERT(jaggy.contains({1.5,.9}));
+    CPPUNIT_ASSERT(jaggy.contains({1.9,-.3}));
   }
 
 

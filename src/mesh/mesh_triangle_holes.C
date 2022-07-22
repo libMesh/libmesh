@@ -132,6 +132,46 @@ RealGradient TriangulatorInterface::Hole::areavec() const
 }
 
 
+
+std::vector<Real>
+TriangulatorInterface::Hole::find_ray_intersections(Point ray_start,
+                                                    Point ray_target) const
+{
+  const auto np = this->n_points();
+
+  std::vector<Real> intersection_distances;
+
+  for (auto i : make_range(np))
+    {
+      const Point & p0 = this->point(i),
+                  & p1 = this->point((i+1)%np);
+      const Real intersection_distance =
+        find_intersection(ray_start, ray_target, p0, p1);
+      if (intersection_distance >= 0)
+        intersection_distances.push_back
+          (intersection_distance);
+    }
+
+  return intersection_distances;
+}
+
+
+
+bool TriangulatorInterface::Hole::contains(Point p) const
+{
+  // Count the number of intersections with a ray to the right,
+  // keep track of how far they are
+  Point ray_target = p + Point(1);
+  std::vector<Real> intersection_distances =
+    this->find_ray_intersections(p, ray_target);
+
+  // Odd number of intersections == we're inside
+  // Even number == we're outside
+  return intersection_distances.size() % 2;
+}
+
+
+
 //
 // PolygonHole member functions
 //
@@ -539,29 +579,16 @@ Point TriangulatorInterface::MeshedHole::inside() const
       // Count the number of intersections with a ray to the right,
       // keep track of how far they are
       Point ray_target = _center + Point(1);
-      const std::size_t ps = _points.size();
-      std::vector<Real> intersection_distances;
-      auto find_ray_intersections = [this, ps, &intersection_distances, &ray_target]() {
-        for (auto i : make_range(ps))
-          {
-            const Point & p0 = _points[i],
-                        & p1 = _points[(i+1)%ps];
-            const Real intersection_distance =
-              find_intersection(_center, ray_target, p0, p1);
-            if (intersection_distance >= 0)
-              intersection_distances.push_back
-                (intersection_distance);
-          }
-      };
-
-      find_ray_intersections();
+      std::vector<Real> intersection_distances =
+        this->find_ray_intersections(_center, ray_target);
 
       // The vertex average isn't on the interior, and we found no
       // intersections to the right?  Try looking to the left.
       if (!intersection_distances.size())
         {
           ray_target = _center - Point(1);
-          find_ray_intersections();
+          intersection_distances =
+            this->find_ray_intersections(_center, ray_target);
         }
 
       // I'd make this an assert, but I'm not 100% confident we can't
@@ -589,6 +616,7 @@ Point TriangulatorInterface::MeshedHole::inside() const
           _center += ray * (min_distance + second_distance)/2;
         }
     }
+
   return _center;
 }
 

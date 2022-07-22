@@ -74,6 +74,11 @@ public:
   virtual Point inside() const = 0;
 
   /**
+   * Return true iff \p p lies inside the hole.
+   */
+  bool contains(Point p) const;
+
+  /**
    * Return the area of the hole
    */
   Real area() const;
@@ -114,6 +119,12 @@ public:
   { return _refine_bdy_allowed; }
 
 protected:
+
+  /**
+   * Helper function for contains(), also useful for MeshedHole::inside()
+   */
+  std::vector<Real> find_ray_intersections(Point ray_start,
+                                           Point ray_target) const;
 
   /**
    * Whether to allow boundary refinement.  True by default; specified
