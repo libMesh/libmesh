@@ -53513,13 +53513,13 @@ else
                                            -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
                                            -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor \
                                            -lvtkParallelMPI-$vtkmajorminor -lvtkParallelCore-$vtkmajorminor \
-                                           -lvtkCommonExecutionModel-$vtkmajorminor"
+                                           -lvtkCommonExecutionModel-$vtkmajorminor -lvtksys-$vtkmajorminor"
 
                                                                     VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
                                          -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
                                          -lvtkIOImage -lvtkImagingMath -lvtkIOParallelXML \
                                          -lvtkParallelMPI -lvtkParallelCore \
-                                         -lvtkCommonExecutionModel"
+                                         -lvtkCommonExecutionModel -lvtksys"
 
 fi
 
