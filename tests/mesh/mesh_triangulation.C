@@ -62,6 +62,7 @@ public:
   CPPUNIT_TEST( testTriangleInterp2 );
   CPPUNIT_TEST( testTriangleHoles );
   CPPUNIT_TEST( testTriangleMeshedHoles );
+  CPPUNIT_TEST( testTriangleEdges );
   CPPUNIT_TEST( testTriangleSegments );
 #endif
 
@@ -463,6 +464,32 @@ public:
   }
 
 
+  void testEdgesMesh(MeshBase & mesh)
+  {
+    // The same quad as testTriangulator, but out of order
+    auto node0 = mesh.add_point(Point(0,0), 0);
+    auto node1 = mesh.add_point(Point(1,2), 1);
+    auto node2 = mesh.add_point(Point(1,0), 2);
+    auto node3 = mesh.add_point(Point(0,1), 3);
+
+    // Edges, also out of order, but enough to put them in order
+    auto edge13 = mesh.add_elem(Elem::build(EDGE2));
+    edge13->set_node(0) = node1;
+    edge13->set_node(1) = node3;
+    auto edge02 = mesh.add_elem(Elem::build(EDGE2));
+    edge02->set_node(0) = node0;
+    edge02->set_node(1) = node2;
+    auto edge30 = mesh.add_elem(Elem::build(EDGE2));
+    edge30->set_node(0) = node3;
+    edge30->set_node(1) = node0;
+    auto edge21 = mesh.add_elem(Elem::build(EDGE2));
+    edge21->set_node(0) = node2;
+    edge21->set_node(1) = node1;
+
+    mesh.prepare_for_use();
+  }
+
+
 #ifdef LIBMESH_HAVE_TRIANGLE
   void testTriangle()
   {
@@ -511,6 +538,18 @@ public:
     Mesh mesh(*TestCommWorld);
     TriangleInterface triangle(mesh);
     testTriangulatorMeshedHoles(mesh, triangle);
+  }
+
+
+  void testTriangleEdges()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    TriangleInterface triangulator(mesh);
+    testEdgesMesh(mesh);
+
+    this->testTriangulatorBase(mesh, triangulator);
   }
 
 
@@ -576,39 +615,13 @@ public:
   }
 
 
-  void testPoly2TriEdgesMesh(MeshBase & mesh)
-  {
-    // The same quad as testTriangulator, but out of order
-    auto node0 = mesh.add_point(Point(0,0), 0);
-    auto node1 = mesh.add_point(Point(1,2), 1);
-    auto node2 = mesh.add_point(Point(1,0), 2);
-    auto node3 = mesh.add_point(Point(0,1), 3);
-
-    // Edges, also out of order, but enough to put them in order
-    auto edge13 = mesh.add_elem(Elem::build(EDGE2));
-    edge13->set_node(0) = node1;
-    edge13->set_node(1) = node3;
-    auto edge02 = mesh.add_elem(Elem::build(EDGE2));
-    edge02->set_node(0) = node0;
-    edge02->set_node(1) = node2;
-    auto edge30 = mesh.add_elem(Elem::build(EDGE2));
-    edge30->set_node(0) = node3;
-    edge30->set_node(1) = node0;
-    auto edge21 = mesh.add_elem(Elem::build(EDGE2));
-    edge21->set_node(0) = node2;
-    edge21->set_node(1) = node1;
-
-    mesh.prepare_for_use();
-  }
-
-
   void testPoly2TriEdges()
   {
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator triangulator(mesh);
-    testPoly2TriEdgesMesh(mesh);
+    testEdgesMesh(mesh);
 
     this->testTriangulatorBase(mesh, triangulator);
   }
@@ -722,7 +735,7 @@ public:
 
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator triangulator(mesh);
-    testPoly2TriEdgesMesh(mesh);
+    testEdgesMesh(mesh);
     testPoly2TriRefinementBase(mesh, nullptr, 1.5, 14);
   }
 
