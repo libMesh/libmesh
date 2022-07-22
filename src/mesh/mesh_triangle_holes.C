@@ -40,12 +40,17 @@ namespace
 {
   using namespace libMesh;
 
+  int signof(Real val) {
+    return (0 < val) - (val < 0);
+  }
+
   // Returns a positive distance iff the ray from source in the
   // direction of ray_target intersects the given edge, -1 otherwise
   Real find_intersection(const Point & source,
                          const Point & ray_target,
                          const Point & edge_pt0,
-                         const Point & edge_pt1)
+                         const Point & edge_pt1,
+                         const Point & edge_pt2)
   {
     // Calculate intersection parameters (fractions of the distance
     // along each segment)
@@ -71,6 +76,25 @@ namespace
     // There's an intersection between the ray line and the edge?
     if (t >= 0 && t < 1)
       {
+        // There's an intersection right on a vertex?  We'll count it
+        // if and only if it isn't a "double-intersection", if the
+        // *next* edge in line is on the other side of our ray.
+        if (!t)
+          {
+            const Real prevdx = edge_pt0(0)-ray_target(0),
+                       prevdy = edge_pt0(1)-ray_target(1);
+            const Real p_num = prevdx * raydy -
+                               prevdy * raydx;
+
+            const Real nextdx = edge_pt2(0)-ray_target(0),
+                       nextdy = edge_pt2(1)-ray_target(1);
+            const Real n_num = nextdx * raydy -
+                               nextdy * raydx;
+
+            if (signof(p_num) == signof(n_num))
+              return -1;
+          }
+
         const Real u_num = targetsdx * edgedy - targetsdy * edgedx;
         const Real u = u_num * one_over_denom;
         const Real ray_fraction = (1-u);
@@ -144,9 +168,10 @@ TriangulatorInterface::Hole::find_ray_intersections(Point ray_start,
   for (auto i : make_range(np))
     {
       const Point & p0 = this->point(i),
-                  & p1 = this->point((i+1)%np);
+                  & p1 = this->point((i+1)%np),
+                  & p2 = this->point((i+2)%np);
       const Real intersection_distance =
-        find_intersection(ray_start, ray_target, p0, p1);
+        find_intersection(ray_start, ray_target, p0, p1, p2);
       if (intersection_distance >= 0)
         intersection_distances.push_back
           (intersection_distance);
