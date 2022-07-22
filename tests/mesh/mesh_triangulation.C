@@ -205,6 +205,9 @@ public:
     CPPUNIT_ASSERT(jaggy.contains({1.1,-.4}));
     CPPUNIT_ASSERT(jaggy.contains({1.5,.9}));
     CPPUNIT_ASSERT(jaggy.contains({1.9,-.3}));
+
+    // Extra corner case
+    CPPUNIT_ASSERT(jaggy.contains({.5,-.5}));
   }
 
 
