@@ -62,6 +62,10 @@ void TriangleInterface::triangulate()
 
   unsigned int n_hole_points = this->total_hole_points();
 
+  // If we have no explicit segments defined, we may get them from
+  // mesh elements
+  this->elems_to_segments();
+
   // If we're doing PSLG without segments, construct them from all our
   // mesh nodes
   this->nodes_to_segments(_mesh.max_node_id());
