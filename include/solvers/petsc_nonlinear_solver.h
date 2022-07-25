@@ -93,7 +93,7 @@ public:
   /**
    * Destructor.
    */
-  ~PetscNonlinearSolver ();
+  ~PetscNonlinearSolver () = default;
 
   /**
    * Release all memory and clear data structures.

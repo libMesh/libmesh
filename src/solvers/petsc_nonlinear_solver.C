@@ -649,18 +649,6 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
 }
 
 
-
-template <typename T>
-PetscNonlinearSolver<T>::~PetscNonlinearSolver ()
-{
-  // Take care of the SNES instance, if it was allocated
-  if (_snes)
-    {
-    _snes.destroy();
-    }
-}
-
-
 template <typename T>
 void PetscNonlinearSolver<T>::clear ()
 {
