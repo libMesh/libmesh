@@ -692,10 +692,7 @@ void DistributedMesh::delete_elem(Elem * e)
   libmesh_assert (e);
 
   // Try to make the cached elem data more accurate
-  processor_id_type elem_procid = e->processor_id();
-  if (elem_procid == this->processor_id() ||
-      elem_procid == DofObject::invalid_processor_id)
-    _n_elem--;
+  _n_elem--;
 
   // Delete the element from the BoundaryInfo object
   this->get_boundary_info().remove(e);
@@ -902,10 +899,7 @@ void DistributedMesh::delete_node(Node * n)
   libmesh_assert(_nodes[n->id()]);
 
   // Try to make the cached elem data more accurate
-  processor_id_type node_procid = n->processor_id();
-  if (node_procid == this->processor_id() ||
-      node_procid == DofObject::invalid_processor_id)
-    _n_nodes--;
+  _n_nodes--;
 
   // Delete the node from the BoundaryInfo object
   this->get_boundary_info().remove(n);
