@@ -26,6 +26,7 @@ public:
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
+  CPPUNIT_TEST( testRenumber );
 # ifdef LIBMESH_ENABLE_DIRICHLET
   CPPUNIT_TEST( testShellFaceConstraints );
 # endif
@@ -168,6 +169,94 @@ public:
 #endif
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), bc_triples.size());
   }
+
+
+  void testRenumber()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_square(mesh,
+                                        2, 2,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    // Side lists should be cleared and refilled by each call
+#ifdef LIBMESH_ENABLE_DEPRECATED
+    std::vector<dof_id_type> element_id_list;
+    std::vector<unsigned short int> side_list;
+    std::vector<boundary_id_type> bc_id_list;
+#endif
+
+    // build_square adds boundary_ids 0,1,2,3 for the bottom, right,
+    // top, and left sides, respectively.  Let's remap those, not 1-1.
+    bi.renumber_id(0, 4);
+    bi.renumber_id(1, 5);
+    bi.renumber_id(2, 6);
+    bi.renumber_id(3, 6);
+
+    const std::map<boundary_id_type, std::string> expected_names =
+      {{4,"bottom"}, {5,"right"}, {6,"left"}};
+
+    // On a ReplicatedMesh, we should see ids 4,5,6 on each processor
+    if (mesh.is_serial())
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(3), bi.n_boundary_ids());
+
+    // On any mesh, we should see each new id on *some* processor, and
+    // shouldn't see old ids on *any* processor
+    {
+      const std::set<boundary_id_type> & bc_ids = bi.get_boundary_ids();
+      for (boundary_id_type i = 0 ; i != 4; ++i)
+        {
+          bool has_bcid = bc_ids.count(i);
+          mesh.comm().max(has_bcid);
+          CPPUNIT_ASSERT(!has_bcid);
+        }
+      for (boundary_id_type i = 4 ; i != 7; ++i)
+        {
+          bool has_bcid = bc_ids.count(i);
+
+          bool bad_name = false;
+          if (has_bcid)
+          {
+            const std::string & current_name = bi.sideset_name(i);
+
+            bad_name = (current_name != libmesh_map_find(expected_names, i));
+          }
+
+          // At least one proc should have each of these BCs
+          mesh.comm().max(has_bcid);
+          CPPUNIT_ASSERT(has_bcid);
+
+          // No proc should have the wrong name for a BC it has
+          mesh.comm().max(bad_name);
+          CPPUNIT_ASSERT(!bad_name);
+        }
+    }
+
+    // Check that there are still exactly 8 sides in the BoundaryInfo
+    // for a replicated mesh
+    auto bc_triples = bi.build_side_list();
+
+    if (mesh.is_serial())
+      {
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), bc_triples.size());
+      }
+
+    // Remove the new IDs, verify that we have no sides left
+    bi.remove_id(4);
+    bi.remove_id(5);
+    bi.remove_id(6);
+    bc_triples = bi.build_side_list();
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), bi.n_boundary_ids());
+    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), bc_triples.size());
+  }
+
 
   void testEdgeBoundaryConditions()
   {

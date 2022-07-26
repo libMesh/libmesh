@@ -369,6 +369,12 @@ public:
   void remove_id (boundary_id_type id);
 
   /**
+   * Changes all entities (nodes, sides, edges, shellfaces) with boundary
+   * id \p old_id to instead be labeled by boundary id \p new_id.
+   */
+  void renumber_id (boundary_id_type old_id, boundary_id_type new_id);
+
+  /**
    * \returns The number of user-specified boundary ids on the
    * semilocal part of the mesh.
    *

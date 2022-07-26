@@ -72,6 +72,18 @@ void erase_if(std::multimap<Key,T> & map, Pred pred)
     }
 }
 
+// Helper func for renumber_id
+template <typename Map, typename T>
+void renumber_name(Map & m, T old_id, T new_id)
+{
+  const typename Map::const_iterator it = m.find(old_id);
+  if (it != m.end())
+    {
+      m[new_id] = it->second;
+      m.erase(it);
+    }
+}
+
 }
 
 namespace libMesh
@@ -1482,6 +1494,80 @@ void BoundaryInfo::remove_id (boundary_id_type id)
   erase_if(_boundary_side_id,
            [id](decltype(_boundary_side_id)::mapped_type & pr)
            {return pr.second == id;});
+}
+
+
+
+void BoundaryInfo::renumber_id (boundary_id_type old_id,
+                                boundary_id_type new_id)
+{
+  if (old_id == new_id)
+    {
+      // If the IDs are the same, this is a no-op.
+      return;
+    }
+
+  bool found_node = false;
+  for (auto & p : _boundary_node_id)
+    if (p.second == old_id)
+      {
+        p.second = new_id;
+        found_node = true;
+      }
+  if (found_node)
+    {
+      _node_boundary_ids.erase(old_id);
+      _node_boundary_ids.insert(new_id);
+    }
+
+  bool found_edge = false;
+  for (auto & p : _boundary_edge_id)
+    if (p.second.second == old_id)
+      {
+        p.second.second = new_id;
+        found_edge = true;
+      }
+  if (found_edge)
+    {
+      _edge_boundary_ids.erase(old_id);
+      _edge_boundary_ids.insert(new_id);
+    }
+
+  bool found_shellface = false;
+  for (auto & p : _boundary_shellface_id)
+    if (p.second.second == old_id)
+      {
+        p.second.second = new_id;
+        found_shellface = true;
+      }
+  if (found_shellface)
+    {
+      _shellface_boundary_ids.erase(old_id);
+      _shellface_boundary_ids.insert(new_id);
+    }
+
+  bool found_side = false;
+  for (auto & p : _boundary_side_id)
+    if (p.second.second == old_id)
+      {
+        p.second.second = new_id;
+        found_side = true;
+      }
+  if (found_side)
+    {
+      _side_boundary_ids.erase(old_id);
+      _side_boundary_ids.insert(new_id);
+    }
+
+  if (found_node || found_edge || found_shellface || found_side)
+    {
+      _boundary_ids.erase(old_id);
+      _boundary_ids.insert(new_id);
+    }
+
+  renumber_name(_ss_id_to_name, old_id, new_id);
+  renumber_name(_ns_id_to_name, old_id, new_id);
+  renumber_name(_es_id_to_name, old_id, new_id);
 }
 
 
