@@ -123,7 +123,7 @@ extern "C"
     ierr = KSPGetIterationNumber(ksp, &niter);
     LIBMESH_CHKERR(ierr);
 
-    if (niter > *max_iters)
+    if (niter > cast_int<PetscInt>(*max_iters))
     {
       // -2 is a magic number for "recalculate next time you need it
       // and then not again"
