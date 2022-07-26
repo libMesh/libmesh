@@ -282,11 +282,6 @@ protected:
     */
   bool _setup_reuse;
 
-  /**
-   *  Persistent storage for the maximum iterations
-   */
-  unsigned int _max_its;
-
 private:
   friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx);
