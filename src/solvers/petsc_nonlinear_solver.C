@@ -649,6 +649,12 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
 }
 
 
+
+template <typename T>
+PetscNonlinearSolver<T>::~PetscNonlinearSolver () = default;
+
+
+
 template <typename T>
 void PetscNonlinearSolver<T>::clear ()
 {
