@@ -84,6 +84,29 @@ void NonlinearSolver<T>::set_solver_configuration(SolverConfiguration & solver_c
   _solver_configuration = &solver_configuration;
 }
 
+template <typename T>
+bool NonlinearSolver<T>::reuse_preconditioner() const
+{
+  libmesh_not_implemented();
+}
+
+template <typename T>
+void NonlinearSolver<T>::set_reuse_preconditioner(bool reuse)
+{
+  _reuse_preconditioner = reuse;
+}
+
+template <typename T>
+unsigned int NonlinearSolver<T>::reuse_preconditioner_max_its() const
+{
+  libmesh_not_implemented();
+}
+
+template <typename T>
+void NonlinearSolver<T>::set_reuse_preconditioner_max_its(unsigned int i)
+{
+  _reuse_preconditioner_max_its = i;
+}
 
 //------------------------------------------------------------------
 // Explicit instantiations
