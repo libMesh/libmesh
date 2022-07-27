@@ -70,7 +70,7 @@ libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx)
   {
     PetscInt n_iterations = 0;
     ierr = SNESGetIterationNumber(snes, &n_iterations);
-    CHKERRABORT(solver->comm().get(),ierr);
+    LIBMESH_CHKERR2(solver->comm(),ierr);
     solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
   }
 
@@ -110,25 +110,28 @@ extern "C"
   // if we want to recalculate the preconditioner.  It only gets
   // added to the SNES instance if we're reusing the preconditioner
   PetscErrorCode
-  libmesh_petsc_recalculate_monitor(SNES snes, PetscInt, PetscReal, void* mctx)
+  libmesh_petsc_recalculate_monitor(SNES snes, PetscInt, PetscReal, void* ctx)
   {
-    unsigned int * max_iters = (unsigned int *) mctx;
+    // No way to safety-check this cast, since we got a void *...
+    PetscNonlinearSolver<Number> * solver =
+      static_cast<PetscNonlinearSolver<Number> *> (ctx);
+
     PetscErrorCode ierr = 0;
 
     KSP ksp;
     ierr = SNESGetKSP(snes, &ksp);
-    LIBMESH_CHKERR(ierr);
+    LIBMESH_CHKERR2(solver->comm(),ierr);
 
     PetscInt niter;
     ierr = KSPGetIterationNumber(ksp, &niter);
-    LIBMESH_CHKERR(ierr);
+    LIBMESH_CHKERR2(solver->comm(),ierr);
 
-    if (niter > *max_iters)
+    if (niter > cast_int<PetscInt>(solver->reuse_preconditioner_max_its()))
     {
       // -2 is a magic number for "recalculate next time you need it
       // and then not again"
       ierr = SNESSetLagPreconditioner(snes, -2);
-      LIBMESH_CHKERR(ierr);
+      LIBMESH_CHKERR2(solver->comm(),ierr);
     }
     return 0;
   }
@@ -337,7 +340,7 @@ extern "C"
       static_cast<PetscNonlinearSolver<Number> *> (ctx);
 
     PetscErrorCode ierr = libmesh_petsc_snes_mffd_residual(solver->snes(), x, r, ctx);
-    CHKERRABORT(solver->comm().get(), ierr);
+    LIBMESH_CHKERR2(solver->comm(),ierr);
 
 #if !PETSC_VERSION_LESS_THAN(3,8,4)
 #ifndef NDEBUG
@@ -350,26 +353,26 @@ extern "C"
 
       KSP ksp;
       ierr = SNESGetKSP(snes, &ksp);
-      CHKERRABORT(solver->comm().get(), ierr);
+      LIBMESH_CHKERR2(solver->comm(),ierr);
 
       PetscInt ksp_it;
       ierr = KSPGetIterationNumber(ksp, &ksp_it);
-      CHKERRABORT(solver->comm().get(), ierr);
+      LIBMESH_CHKERR2(solver->comm(),ierr);
 
       SNESType snes_type;
       ierr = SNESGetType(snes, &snes_type);
-      CHKERRABORT(solver->comm().get(), ierr);
+      LIBMESH_CHKERR2(solver->comm(),ierr);
 
       libmesh_assert_msg(snes_type, "We're being called from SNES; snes_type should be non-null");
 
       Mat J;
       ierr = SNESGetJacobian(snes, &J, NULL, NULL, NULL);
-      CHKERRABORT(solver->comm().get(), ierr);
+      LIBMESH_CHKERR2(solver->comm(),ierr);
       libmesh_assert_msg(J, "We're being called from SNES; J should be non-null");
 
       MatType mat_type;
       ierr = MatGetType(J, &mat_type);
-      CHKERRABORT(solver->comm().get(), ierr);
+      LIBMESH_CHKERR2(solver->comm(),ierr);
       libmesh_assert_msg(mat_type, "We're being called from SNES; mat_type should be non-null");
 
       bool is_operator_mffd = strcmp(mat_type, MATMFFD) == 0;
@@ -383,11 +386,11 @@ extern "C"
           Vec nonlinear_residual;
 
           ierr = SNESGetFunction(snes, &nonlinear_residual, NULL, NULL);
-          CHKERRABORT(solver->comm().get(), ierr);
+          LIBMESH_CHKERR2(solver->comm(),ierr);
 
           PetscBool vecs_equal;
           ierr = VecEqual(r, nonlinear_residual, &vecs_equal);
-          CHKERRABORT(solver->comm().get(), ierr);
+          LIBMESH_CHKERR2(solver->comm(),ierr);
 
           libmesh_error_msg_if(!(vecs_equal == PETSC_TRUE),
                                "You requested to reuse the nonlinear residual vector as the base vector for "
@@ -439,7 +442,7 @@ extern "C"
     {
       PetscInt n_iterations = 0;
       ierr = SNESGetIterationNumber(snes, &n_iterations);
-      CHKERRABORT(solver->comm().get(),ierr);
+      LIBMESH_CHKERR2(solver->comm(),ierr);
       solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
     }
 
@@ -643,8 +646,7 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   _default_monitor(true),
   _snesmf_reuse_base(true),
   _computing_base_vector(true),
-  _setup_reuse(false),
-  _max_its(0)
+  _setup_reuse(false)
 {
 }
 
@@ -877,10 +879,8 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
       LIBMESH_CHKERR(ierr);
       // Add in our callback which will trigger recalculating
       // the preconditioner when we hit reuse_preconditioner_max_its
-      _max_its = reuse_preconditioner_max_its();
       ierr = SNESMonitorSet(_snes, &libmesh_petsc_recalculate_monitor,
-                            (void*)
-                            &_max_its,
+                            this,
                             NULL);
       LIBMESH_CHKERR(ierr);
     }
