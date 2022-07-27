@@ -277,24 +277,37 @@ protected:
   {
     Parameters dummy;
 
+    Gradient true_grad;
+    RealGradient returnval;
+
     if (family == RATIONAL_BERNSTEIN && order > 1)
-      return rational_test_grad(p, dummy, "", "");
+      true_grad = rational_test_grad(p, dummy, "", "");
     else if (order > 3)
-      return fe_quartic_test_grad(p, dummy, "", "");
+      true_grad = fe_quartic_test_grad(p, dummy, "", "");
     else if (FE_CAN_TEST_CUBIC)
-      return fe_cubic_test_grad(p, dummy, "", "");
+      true_grad = fe_cubic_test_grad(p, dummy, "", "");
     else if (order > 1)
       {
         const Real & x = p(0);
         const Real & y = (LIBMESH_DIM > 1) ? p(1) : 0;
         const Real & z = (LIBMESH_DIM > 2) ? p(2) : 0;
 
-        return Gradient(2*x+0.125*y+0.0625*z,
-                        y+0.125*x+0.03125*z,
-                        0.5*z+0.0625*x+0.03125*y);
+        true_grad = Gradient(2*x+0.125*y+0.0625*z,
+                             y+0.125*x+0.03125*z,
+                             0.5*z+0.0625*x+0.03125*y);
+      }
+    else
+      true_grad = Gradient(1.0, 0.25, 0.0625);
+
+    for (unsigned int d=0; d != LIBMESH_DIM; ++d)
+      {
+        CPPUNIT_ASSERT(true_grad(d) ==
+                       Number(libmesh_real(true_grad(d))));
+
+        returnval(d) = libmesh_real(true_grad(d));
       }
 
-    return Gradient(1.0, 0.25, 0.0625);
+    return returnval;
   }
 
 
