@@ -11,6 +11,7 @@ static const char* const kVersionNumber = "1.0.0.0";
 #include <assert.h>
 #include <map>
 #include <set>
+#include <memory>
 
 #include "../lib/crc32.hh"
 
@@ -47,7 +48,7 @@ namespace
     struct Node
     {
         Match opcode;
-        std::vector<Node*> predecessors;
+        std::vector<std::unique_ptr<Node>> predecessors;
     };
 
     Node global_head;
@@ -1276,16 +1277,17 @@ namespace
                 {
                     if(m == head->predecessors[a]->opcode)
                     {
-                        head = head->predecessors[a];
+                        head = head->predecessors[a].get();
                         dup = true;
                         break;
                     }
                 }
                 if(!dup)
                 {
-                    Node* newhead = new Node;
+                    auto newhead_unique = std::make_unique<Node>();
+                    auto * const newhead = newhead_unique.get();
                     newhead->opcode = m;
-                    head->predecessors.push_back(newhead);
+                    head->predecessors.push_back(std::move(newhead_unique));
                     head = newhead;
                 }
             }
