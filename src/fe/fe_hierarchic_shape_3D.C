@@ -22,6 +22,7 @@
 #include "libmesh/number_lookups.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/cell_tet4.h" // We need edge_nodes_map + side_nodes_map
+#include "libmesh/face_tri3.h" // Faster to construct these on the stack
 
 // Anonymous namespace for functions shared by HIERARCHIC and
 // L2_HIERARCHIC implementations. Implementations appear at the bottom
@@ -33,6 +34,9 @@ using namespace libMesh;
 unsigned int cube_side(const Point & p);
 
 Point cube_side_point(unsigned int sidenum, const Point & interior_point);
+
+std::array<unsigned int, 3> oriented_tet_nodes(const Elem & elem,
+                                               unsigned int face_num);
 
 template <FEFamily T>
 Real fe_hierarchic_3D_shape(const Elem * elem,
@@ -892,6 +896,68 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
         return FE<2,HIERARCHIC>::shape(side.get(), order, side_i, sidep, add_p_level);
       }
 
+    case TET14:
+      {
+        const unsigned int dofs_per_side = (totalorder+1u)*(totalorder+2u)/2u;
+        libmesh_assert_less(i, 4*dofs_per_side);
+
+        const Real zeta[4] = { 1. - p(0) - p(1) - p(2), p(0), p(1), p(2) };
+
+        unsigned int face_num = 0;
+        if (zeta[0] > zeta[3] &&
+            zeta[1] > zeta[3] &&
+            zeta[2] > zeta[3])
+          {
+            face_num = 0;
+          }
+        else if (zeta[0] > zeta[2] &&
+                 zeta[1] > zeta[2] &&
+                 zeta[3] > zeta[2])
+          {
+            face_num = 1;
+          }
+        else if (zeta[1] > zeta[0] &&
+                 zeta[2] > zeta[0] &&
+                 zeta[3] > zeta[0])
+          {
+            face_num = 2;
+          }
+        else
+          {
+            // We'd better not be right between two faces
+            libmesh_assert (zeta[0] > zeta[1] &&
+                            zeta[2] > zeta[1] &&
+                            zeta[3] > zeta[1]);
+            face_num = 3;
+          }
+
+        if (i < face_num * dofs_per_side ||
+            i >= (face_num+1) * dofs_per_side)
+          return 0;
+
+        if (totalorder == 0)
+          return 1;
+
+        const std::array<unsigned int, 3> face_vertex =
+          oriented_tet_nodes(*elem, face_num);
+
+        // We only need a Tri3 to evaluate L2_HIERARCHIC
+        Tri3 side;
+
+        // We pinky swear not to modify these nodes
+        Elem & e = const_cast<Elem &>(*elem);
+        side.set_node(0) = e.node_ptr(face_vertex[0]);
+        side.set_node(1) = e.node_ptr(face_vertex[1]);
+        side.set_node(2) = e.node_ptr(face_vertex[2]);
+
+        const unsigned int basisnum = i - face_num*dofs_per_side;
+
+        Point sidep {zeta[face_vertex[1]], zeta[face_vertex[2]]};
+
+        return FE<2,L2_HIERARCHIC>::shape(&side, totalorder,
+                                          basisnum, sidep, false);
+      }
+
     default:
       libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
     }
@@ -1133,6 +1199,11 @@ Real FE<3,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
         return f * FE<2,HIERARCHIC>::shape_deriv(side.get(), order,
                                                  side_i, sidej, sidep,
                                                  add_p_level);
+      }
+
+    case TET14:
+      {
+        return fe_fdm_deriv(elem, order, i, j, p, add_p_level, FE<3,SIDE_HIERARCHIC>::shape);
       }
 
     default:
@@ -1446,6 +1517,12 @@ Real FE<3,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
                                                         add_p_level);
       }
 
+    case TET14:
+      {
+        return fe_fdm_second_deriv(elem, order, i, j, p, add_p_level,
+                                   FE<3,SIDE_HIERARCHIC>::shape_deriv);
+      }
+
     default:
       libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
     }
@@ -1544,6 +1621,36 @@ Point cube_side_point(unsigned int sidenum, const Point & p)
   return sidep;
 }
 
+
+std::array<unsigned int, 3> oriented_tet_nodes(const Elem & elem,
+                                               unsigned int face_num)
+{
+  // Reorient nodes to account for flipping and rotation.
+  // We could try to identify indices with symmetric shape
+  // functions, to skip this in those cases, if we really
+  // need to optimize later.
+  std::array<unsigned int, 3> face_vertex
+    { Tet4::side_nodes_map[face_num][0],
+      Tet4::side_nodes_map[face_num][1],
+      Tet4::side_nodes_map[face_num][2] };
+
+  // With only 3 items, we should bubble sort!
+  // Programming-for-MechE's class pays off!
+  bool lastcheck = true;
+  if (elem.point(face_vertex[0]) > elem.point(face_vertex[1]))
+    {
+      std::swap(face_vertex[0], face_vertex[1]);
+      lastcheck = true;
+    }
+  if (elem.point(face_vertex[1]) > elem.point(face_vertex[2]))
+    std::swap(face_vertex[1], face_vertex[2]);
+  if (lastcheck && elem.point(face_vertex[0]) > elem.point(face_vertex[1]))
+    std::swap(face_vertex[0], face_vertex[1]);
+
+  return face_vertex;
+}
+
+
 template <FEFamily T>
 Real fe_hierarchic_3D_shape(const Elem * elem,
                             const Order order,
@@ -1636,30 +1743,11 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
             const int dofs_per_face = (totalorder - 1u) * (totalorder - 2u) / 2;
             const int face_num = (i - (6u*totalorder - 2u)) / dofs_per_face;
 
-            // Reorient nodes to account for flipping and rotation.
-            // We could try to identify indices with symmetric shape
-            // functions, to skip this in those cases, if we really
-            // need to optimize later.
-            unsigned int facevertex0 = Tet4::side_nodes_map[face_num][0],
-                         facevertex1 = Tet4::side_nodes_map[face_num][1],
-                         facevertex2 = Tet4::side_nodes_map[face_num][2];
-
-            // With only 3 items, we should bubble sort!
-            // Programming-for-MechE's class pays off!
-            bool lastcheck = true;
-            if (elem->point(facevertex0) > elem->point(facevertex1))
-              {
-                std::swap(facevertex0, facevertex1);
-                lastcheck = true;
-              }
-            if (elem->point(facevertex1) > elem->point(facevertex2))
-              std::swap(facevertex1, facevertex2);
-            if (lastcheck && elem->point(facevertex0) > elem->point(facevertex1))
-              std::swap(facevertex0, facevertex1);
-
-            const Real zeta0 = zeta[facevertex0],
-                       zeta1 = zeta[facevertex1],
-                       zeta2 = zeta[facevertex2];
+            const std::array<unsigned int, 3> face_vertex =
+              oriented_tet_nodes(*elem, face_num);
+            const Real zeta0 = zeta[face_vertex[0]],
+                       zeta1 = zeta[face_vertex[1]],
+                       zeta2 = zeta[face_vertex[2]];
 
             const unsigned int basisnum =
               i - 4 -

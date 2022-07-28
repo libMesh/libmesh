@@ -78,6 +78,11 @@ unsigned int side_hierarchic_n_dofs_at_node(const ElemType t,
         return o+1;
       else
         return 0;
+    case TET14:
+      if (n > 9)
+        return (o+1)*(o+2)/2;
+      else
+        return 0;
     case INVALID_ELEM:
       return 0;
     // Without side nodes on all sides we can't support side elements
@@ -107,6 +112,8 @@ unsigned int side_hierarchic_n_dofs(const ElemType t, const Order o)
     case TRI6:
     case TRI7:
       return ((o+1)*3); // o+1 per side
+    case TET14:
+      return (o+1)*(o+2)*2; // 4 sides, each (o+1)(o+2)/2
     case INVALID_ELEM:
       return 0;
     // Without side nodes on all sides we can't support side elements
