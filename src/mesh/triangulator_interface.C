@@ -100,7 +100,7 @@ void TriangulatorInterface::elems_to_segments()
       // MeshedHole results later
       std::map<Point, dof_id_type> point_id_map;
 
-      for (auto & node : _mesh.node_ptr_range())
+      for (Node * node : _mesh.node_ptr_range())
         {
           // We're not going to support overlapping nodes on the boundary
           libmesh_error_msg_if
@@ -116,15 +116,39 @@ void TriangulatorInterface::elems_to_segments()
       // to be used as an outer rather than an inner boundary.
       const TriangulatorInterface::MeshedHole mh { _mesh, this->_bdy_ids };
 
+      // And now we're done with elements.  Delete them lest they have
+      // dangling pointers to nodes we'll be deleting.
+      _mesh.clear_elems();
+
+      // If we've specified only a subset of the mesh as our outer
+      // boundary, then we may have nodes that don't actually fall
+      // inside that boundary.  Triangulator code doesn't like Steiner
+      // points that aren't inside the triangulation domain, so we
+      // need to get rid of them.
+
+      std::unordered_set<Node *> nodes_to_delete;
+      if (!this->_bdy_ids.empty())
+        {
+          for (auto & node : _mesh.node_ptr_range())
+            if (!mh.contains(*node))
+              nodes_to_delete.insert(node);
+        }
+
+      // Make segments from boundary nodes; also make sure we don't
+      // delete them.
       const std::size_t np = mh.n_points();
       for (auto i : make_range(np))
         {
           const Point pt = mh.point(np-i-1);
           const dof_id_type id0 = libmesh_map_find(point_id_map, pt);
+          nodes_to_delete.erase(_mesh.node_ptr(id0));
           const Point next_pt = mh.point((2*np-i-2)%np);
           const dof_id_type id1 = libmesh_map_find(point_id_map, next_pt);
           this->segments.emplace_back(id0, id1);
         }
+
+      for (Node * node : nodes_to_delete)
+        _mesh.delete_node(node);
     }
 }
 

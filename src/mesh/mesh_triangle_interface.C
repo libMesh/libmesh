@@ -62,6 +62,10 @@ void TriangleInterface::triangulate()
 
   unsigned int n_hole_points = this->total_hole_points();
 
+  // If we have no explicit segments defined, we may get them from
+  // mesh elements
+  this->elems_to_segments();
+
   // If we're doing PSLG without segments, construct them from all our
   // mesh nodes
   this->nodes_to_segments(_mesh.max_node_id());
@@ -149,6 +153,7 @@ void TriangleInterface::triangulate()
 
 
   // Copy all the non-hole points and segments into the triangle struct.
+  std::vector<unsigned int> libmesh_id_to_pointlist_index(_mesh.max_node_id());
   {
     dof_id_type ctr=0;
     for (auto & node : _mesh.node_ptr_range())
@@ -158,6 +163,7 @@ void TriangleInterface::triangulate()
         // Set x,y values in pointlist
         initial.pointlist[index] = (*node)(0);
         initial.pointlist[index+1] = (*node)(1);
+        libmesh_id_to_pointlist_index[node->id()] = ctr/2;
 
         // If the user requested a PSLG, the non-hole points are also segments
         if (_triangulation_type==PSLG)
@@ -184,8 +190,10 @@ void TriangleInterface::triangulate()
       const unsigned int index0 = 2*hole_offset+ctr;
       const unsigned int index1 = 2*hole_offset+ctr+1;
 
-      initial.segmentlist[index0] = hole_offset + this->segments[s].first;
-      initial.segmentlist[index1] = hole_offset + this->segments[s].second;
+      initial.segmentlist[index0] = hole_offset +
+        libmesh_id_to_pointlist_index[this->segments[s].first];
+      initial.segmentlist[index1] = hole_offset +
+        libmesh_id_to_pointlist_index[this->segments[s].second];
       if (_markers)
         initial.segmentmarkerlist[hole_offset + s] = (*_markers)[s];
     }
