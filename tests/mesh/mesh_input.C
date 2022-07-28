@@ -848,8 +848,23 @@ public:
     CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(10));
 
     // Element should have TET10 reference element volume
-    Real vol = mesh.elem_ptr(0)->volume();
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(vol, 1./6, TOLERANCE*TOLERANCE);
+    const Elem * const elem = mesh.query_elem_ptr(0);
+
+    // On a serial mesh we have every element everywhere
+    if (mesh.is_serial())
+      CPPUNIT_ASSERT(elem);
+    else
+      {
+        bool have_elem = elem;
+        mesh.comm().max(have_elem);
+        CPPUNIT_ASSERT(have_elem);
+      }
+
+    if (elem)
+      {
+        const Real vol = elem->volume();
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(vol, 1./6, TOLERANCE*TOLERANCE);
+      }
 #endif
   }
 
