@@ -219,6 +219,11 @@ public:
   virtual void delete_remote_elements () {}
 
   /**
+   * Loops over ghosting functors and calls mesh_reinit()
+   */
+  void reinit_ghosting_functors();
+
+  /**
    * \returns The logical dimension of the mesh; i.e. the manifold
    * dimension of the elements in the mesh.  If we ever support
    * multi-dimensional meshes (e.g. hexes and quads in the same mesh)
