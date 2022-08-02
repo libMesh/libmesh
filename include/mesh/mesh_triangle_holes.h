@@ -127,6 +127,11 @@ protected:
                                            Point ray_target) const;
 
   /**
+   * Calculate an inside point based on our boundary
+   */
+  Point calculate_inside_point() const;
+
+  /**
    * Whether to allow boundary refinement.  True by default; specified
    * here so we can use the default constructor.
    */

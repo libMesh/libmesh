@@ -182,6 +182,63 @@ TriangulatorInterface::Hole::find_ray_intersections(Point ray_start,
 
 
 
+Point TriangulatorInterface::Hole::calculate_inside_point() const
+{
+  // Start with the vertex average
+
+  // Turns out "I'm a fully compliant C++17 compiler!" doesn't
+  // mean "I have a full C++17 standard library!"
+  // inside = std::reduce(points.begin(), points.end());
+  Point inside = 0;
+  for (auto i : make_range(this->n_points()))
+    inside += this->point(i);
+
+  inside /= this->n_points();
+
+  // Count the number of intersections with a ray to the right,
+  // keep track of how far they are
+  Point ray_target = inside + Point(1);
+  std::vector<Real> intersection_distances =
+    this->find_ray_intersections(inside, ray_target);
+
+  // The vertex average isn't on the interior, and we found no
+  // intersections to the right?  Try looking to the left.
+  if (!intersection_distances.size())
+    {
+      ray_target = inside - Point(1);
+      intersection_distances =
+        this->find_ray_intersections(inside, ray_target);
+    }
+
+  // I'd make this an assert, but I'm not 100% confident we can't
+  // get here via some kind of FP error on a weird hole shape.
+  libmesh_error_msg_if
+    (!intersection_distances.size(),
+     "Can't find a center for a MeshedHole!");
+
+  if (intersection_distances.size() % 2)
+    return inside;
+
+  // The vertex average is outside.  So go from the vertex average to
+  // the closest edge intersection, then halfway to the next-closest.
+
+  // Find the nearest first.
+  Real min_distance    = std::numeric_limits<Real>::max(),
+       second_distance = std::numeric_limits<Real>::max();
+  for (Real d : intersection_distances)
+    if (d < min_distance)
+      {
+        second_distance = min_distance;
+        min_distance = d;
+      }
+
+  const Point ray = ray_target - inside;
+  inside += ray * (min_distance + second_distance)/2;
+
+  return inside;
+}
+
+
 bool TriangulatorInterface::Hole::contains(Point p) const
 {
   // Count the number of intersections with a ray to the right,
@@ -591,56 +648,7 @@ Point TriangulatorInterface::MeshedHole::inside() const
 {
   // This is expensive to compute, so only do it when we first need it
   if (_center(0) == std::numeric_limits<Real>::max())
-    {
-      // Start with the vertex average
-
-      // Turns out "I'm a fully compliant C++17 compiler!" doesn't
-      // mean "I have a full C++17 standard library!"
-      // _center = std::reduce(_points.begin(), _points.end());
-      _center = std::accumulate(_points.begin(), _points.end(), Point());
-
-      _center /= _points.size();
-
-      // Count the number of intersections with a ray to the right,
-      // keep track of how far they are
-      Point ray_target = _center + Point(1);
-      std::vector<Real> intersection_distances =
-        this->find_ray_intersections(_center, ray_target);
-
-      // The vertex average isn't on the interior, and we found no
-      // intersections to the right?  Try looking to the left.
-      if (!intersection_distances.size())
-        {
-          ray_target = _center - Point(1);
-          intersection_distances =
-            this->find_ray_intersections(_center, ray_target);
-        }
-
-      // I'd make this an assert, but I'm not 100% confident we can't
-      // get here via some kind of FP error on a weird hole shape.
-      libmesh_error_msg_if
-        (!intersection_distances.size(),
-         "Can't find a center for a MeshedHole!");
-
-      if (!(intersection_distances.size() % 2))
-        {
-          // Just go from the vertex average to the closest edge
-          // intersection, then halfway to the next-closest.
-
-          // Find the nearest first.
-          Real min_distance    = std::numeric_limits<Real>::max(),
-               second_distance = std::numeric_limits<Real>::max();
-          for (Real d : intersection_distances)
-            if (d < min_distance)
-              {
-                second_distance = min_distance;
-                min_distance = d;
-              }
-
-          const Point ray = ray_target - _center;
-          _center += ray * (min_distance + second_distance)/2;
-        }
-    }
+    _center = this->calculate_inside_point();
 
   return _center;
 }
