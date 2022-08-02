@@ -205,6 +205,15 @@ public:
   void attach_hole_list(const std::vector<Hole*> * holes) {_holes = holes;}
 
   /**
+   * Verifying that hole boundaries don't cross the outer boundary or
+   * each other is something like O(N_bdys^2*N_points_per_bdy^2), so
+   * we only do it if requested
+   */
+  void set_verify_hole_boundaries(bool v) {_verify_hole_boundaries = v;}
+
+  bool get_verify_hole_boundaries() const {return _verify_hole_boundaries;}
+
+  /**
    * When constructing a PSLG, if the node numbers do not define the
    * desired boundary segments implicitly through the ordering of the
    * points, you can use the segments vector to specify the segments
@@ -260,6 +269,11 @@ protected:
    * segments) to a PSLG triangulation
    */
   void insert_any_extra_boundary_points();
+
+  /**
+   * Helper function to check holes for intersections if requested.
+   */
+  void verify_holes(const Hole & outer_bdy);
 
   /**
    * Helper function to count points in and verify holes
@@ -342,6 +356,11 @@ protected:
    * Flag which tells if we want to suppress stdout outputs
    */
   bool _quiet;
+
+  /**
+   * Flag which tells if we want to check hole geometry
+   */
+  bool _verify_hole_boundaries;
 };
 
 } // namespace libMesh

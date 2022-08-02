@@ -149,6 +149,9 @@ void TriangulatorInterface::elems_to_segments()
 
       for (Node * node : nodes_to_delete)
         _mesh.delete_node(node);
+
+      if (this->_verify_hole_boundaries && _holes)
+        this->verify_holes(mh);
     }
 }
 
@@ -178,6 +181,16 @@ void TriangulatorInterface::nodes_to_segments(dof_id_type max_node_id)
         *_mesh.nodes_begin() : *node_it;
 
       this->segments.emplace_back(node->id(), next_node->id());
+    }
+
+  if (this->_verify_hole_boundaries && _holes)
+    {
+      std::vector<Point> outer_pts;
+      for (auto segment : this->segments)
+        outer_pts.push_back(_mesh.point(segment.first));
+
+      ArbitraryHole ah(outer_pts);
+      this->verify_holes(ah);
     }
 }
 
@@ -233,6 +246,31 @@ void TriangulatorInterface::insert_any_extra_boundary_points()
           this->segments.emplace_back(current_id,
                                       end_node->id());
         }
+    }
+}
+
+
+void TriangulatorInterface::verify_holes(const Hole & outer_bdy)
+{
+  for (const Hole * hole : *_holes)
+    {
+      for (const Hole * hole2 : *_holes)
+        {
+          if (hole == hole2)
+            continue;
+
+          for (auto i : make_range(hole2->n_points()))
+            if (hole->contains(hole2->point(i)))
+              libmesh_error_msg
+                ("Found point " << hole2->point(i) <<
+                 " on one hole boundary and another's interior");
+        }
+
+      for (auto i : make_range(hole->n_points()))
+        if (!outer_bdy.contains(hole->point(i)))
+          libmesh_error_msg
+            ("Found point " << hole->point(i) <<
+             " on hole boundary but outside outer boundary");
     }
 }
 
