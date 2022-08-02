@@ -336,6 +336,15 @@ TriangulatorInterface::ArbitraryHole::ArbitraryHole(const Point & center,
 {}
 
 
+TriangulatorInterface::ArbitraryHole::ArbitraryHole(std::vector<Point> points)
+  : _points(std::move(points))
+{
+  _segment_indices.push_back(0);
+  _segment_indices.push_back(_points.size());
+  _center = this->calculate_inside_point();
+}
+
+
 TriangulatorInterface::ArbitraryHole::ArbitraryHole(const Hole & orig)
   : _center(orig.inside())
 {
