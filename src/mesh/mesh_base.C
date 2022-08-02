@@ -711,11 +711,7 @@ void MeshBase::prepare_for_use ()
   // Allow our GhostingFunctor objects to reinit if necessary.
   // Do this before partitioning and redistributing, and before
   // deleting remote elements.
-  for (auto & gf : _ghosting_functors)
-    {
-      libmesh_assert(gf);
-      gf->mesh_reinit();
-    }
+  this->reinit_ghosting_functors();
 
   // Partition the mesh unless *all* partitioning is to be skipped.
   // If only noncritical partitioning is to be skipped, the
@@ -747,7 +743,15 @@ void MeshBase::prepare_for_use ()
 #endif
 }
 
-
+void
+MeshBase::reinit_ghosting_functors()
+{
+  for (auto & gf : _ghosting_functors)
+    {
+      libmesh_assert(gf);
+      gf->mesh_reinit();
+    }
+}
 
 void MeshBase::clear ()
 {
