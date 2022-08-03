@@ -310,7 +310,7 @@ void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_
 
 
 void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
-                      std::set<const Node *> & connected_nodes)
+                      std::unordered_set<const Node *> & connected_nodes)
 {
   // We're done using the nodes list for element decisions; now
   // let's reuse it for nodes of the elements we've decided on.
@@ -473,7 +473,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
       // elements with constraining nodes to remain present.
       connect_families(elements_to_send, &mesh);
 
-      std::set<const Node *> connected_nodes;
+      std::unordered_set<const Node *> connected_nodes;
       reconnect_nodes(elements_to_send, connected_nodes);
 
       // the number of nodes we will ship to pid
@@ -2113,7 +2113,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   connect_families(elements_to_keep, &mesh);
 
   // Don't delete nodes that our semilocal elements need
-  std::set<const Node *> connected_nodes;
+  std::unordered_set<const Node *> connected_nodes;
   reconnect_nodes(elements_to_keep, connected_nodes);
 
   // Delete all the elements we have no reason to save,
