@@ -44,14 +44,76 @@ namespace
     return (0 < val) - (val < 0);
   }
 
+  // Return 1 iff counter-clockwise turn
+  // Return -1 iff clockwise turn
+  // Return 0 iff collinear
+  int orientation(const Point & p0,
+                  const Point & p1,
+                  const Point & p2)
+  {
+    const double detleft  = (p0(0)-p2(0))*(p1(1)-p2(1));
+    const double detright = (p0(1)-p2(1))*(p1(0)-p2(0));
+
+    return signof(detleft - detright);
+  }
+
+  // Same, but for the ray target as it goes to infinity
+  int ray_orientation(const Point & p0,
+                      const Point & p1,
+                      const Point & source,
+                      const Point & ray_target)
+  {
+    const Point rayvec = ray_target - source;
+    const Point edgevec = p1 - p0;
+    const double det = edgevec(0)*rayvec(1)-edgevec(1)*rayvec(0);
+
+    return signof(det);
+  }
+
+  bool is_intersection(const Point & source,
+                       const Point & ray_target,
+                       const Point & edge_pt0,
+                       const Point & edge_pt1)
+  {
+    int orient_st0 = orientation(source, ray_target, edge_pt0);
+    int orient_st1 = orientation(source, ray_target, edge_pt1);
+    int orient_edge_s = orientation(edge_pt0, edge_pt1, source);
+    int orient_edge_t = ray_orientation(edge_pt0, edge_pt1, source, ray_target);
+
+    // Intersection on interior
+    if ((orient_st0 == -orient_st1) &&
+        (orient_edge_s != orient_edge_t))
+      return true;
+
+    // Ray intersects edge_pt1
+    if (orient_st1 == 0)
+      return true;
+
+    // Source is on line; we don't count that
+    // if (orient_edge_s == 0)
+    // Ray is parallel to edge; no intersection;
+    // if (orient_edge_t == 0)
+    // Ray intersects edge_pt0; we don't count that
+    // if (orient_st0 == 0)
+
+    return false;
+  }
+
   // Returns a positive distance iff the ray from source in the
-  // direction of ray_target intersects the given edge, -1 otherwise
+  // direction of ray_target intersects the edge from pt0
+  // (non-inclusive) to pt1 (inclusive), -1 otherwise.
+  //
+  // If the intersection is a "glancing" one at a corner, return -1.
   Real find_intersection(const Point & source,
                          const Point & ray_target,
                          const Point & edge_pt0,
                          const Point & edge_pt1,
                          const Point & edge_pt2)
   {
+    // Quick and more numerically stable check
+    if (!is_intersection(source, ray_target, edge_pt0, edge_pt1))
+      return -1;
+
     // Calculate intersection parameters (fractions of the distance
     // along each segment)
     const Real raydx = ray_target(0)-source(0),
@@ -110,7 +172,6 @@ namespace
 
     return -1;
   }
-
 }
 
 
