@@ -310,7 +310,7 @@ void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_
 
 
 void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
-                      std::set<const Node *> & connected_nodes)
+                      connected_node_set_type & connected_nodes)
 {
   // We're done using the nodes list for element decisions; now
   // let's reuse it for nodes of the elements we've decided on.
@@ -473,7 +473,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
       // elements with constraining nodes to remain present.
       connect_families(elements_to_send, &mesh);
 
-      std::set<const Node *> connected_nodes;
+      connected_node_set_type connected_nodes;
       reconnect_nodes(elements_to_send, connected_nodes);
 
       // the number of nodes we will ship to pid
@@ -823,7 +823,11 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
           // some of these nodes and elements may be replicated from
           // other processors, but that is OK.
           std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
-          std::set<const Node *> connected_nodes;
+
+          // Technically we're not doing reconnect_nodes on this, but
+          // we might as well use the same data structure since the
+          // performance questions ought to be similar
+          connected_node_set_type connected_nodes;
 
           // Check for quick return?
           if (common_interface_node_list.empty())
@@ -2113,7 +2117,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   connect_families(elements_to_keep, &mesh);
 
   // Don't delete nodes that our semilocal elements need
-  std::set<const Node *> connected_nodes;
+  connected_node_set_type connected_nodes;
   reconnect_nodes(elements_to_keep, connected_nodes);
 
   // Delete all the elements we have no reason to save,

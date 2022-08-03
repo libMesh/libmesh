@@ -271,9 +271,12 @@ void connect_children(const MeshBase & mesh,
 void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
                       const MeshBase * mesh = nullptr);
 
+// What to use to fill sets of connected nodes
+typedef std::set<const Node *> connected_node_set_type;
+
 // Take a set of elements and create a set of connected nodes.
 void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
-                      std::set<const Node *> & connected_nodes);
+                      connected_node_set_type & connected_nodes);
 
 
 
