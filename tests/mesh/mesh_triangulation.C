@@ -86,6 +86,7 @@ public:
     triangulator.desired_area() = 1000;
     triangulator.minimum_angle() = 0;
     triangulator.smooth_after_generating() = false;
+    triangulator.set_verify_hole_boundaries(true);
   }
 
   void testExceptionBase(MeshBase & mesh,
