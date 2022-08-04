@@ -44,14 +44,76 @@ namespace
     return (0 < val) - (val < 0);
   }
 
+  // Return 1 iff counter-clockwise turn
+  // Return -1 iff clockwise turn
+  // Return 0 iff collinear
+  int orientation(const Point & p0,
+                  const Point & p1,
+                  const Point & p2)
+  {
+    const double detleft  = (p0(0)-p2(0))*(p1(1)-p2(1));
+    const double detright = (p0(1)-p2(1))*(p1(0)-p2(0));
+
+    return signof(detleft - detright);
+  }
+
+  // Same, but for the ray target as it goes to infinity
+  int ray_orientation(const Point & p0,
+                      const Point & p1,
+                      const Point & source,
+                      const Point & ray_target)
+  {
+    const Point rayvec = ray_target - source;
+    const Point edgevec = p1 - p0;
+    const double det = edgevec(0)*rayvec(1)-edgevec(1)*rayvec(0);
+
+    return signof(det);
+  }
+
+  bool is_intersection(const Point & source,
+                       const Point & ray_target,
+                       const Point & edge_pt0,
+                       const Point & edge_pt1)
+  {
+    int orient_st0 = orientation(source, ray_target, edge_pt0);
+    int orient_st1 = orientation(source, ray_target, edge_pt1);
+    int orient_edge_s = orientation(edge_pt0, edge_pt1, source);
+    int orient_edge_t = ray_orientation(edge_pt0, edge_pt1, source, ray_target);
+
+    // Intersection on interior
+    if ((orient_st0 == -orient_st1) &&
+        (orient_edge_s != orient_edge_t))
+      return true;
+
+    // Ray intersects edge_pt1
+    if (orient_st1 == 0)
+      return true;
+
+    // Source is on line; we don't count that
+    // if (orient_edge_s == 0)
+    // Ray is parallel to edge; no intersection;
+    // if (orient_edge_t == 0)
+    // Ray intersects edge_pt0; we don't count that
+    // if (orient_st0 == 0)
+
+    return false;
+  }
+
   // Returns a positive distance iff the ray from source in the
-  // direction of ray_target intersects the given edge, -1 otherwise
+  // direction of ray_target intersects the edge from pt0
+  // (non-inclusive) to pt1 (inclusive), -1 otherwise.
+  //
+  // If the intersection is a "glancing" one at a corner, return -1.
   Real find_intersection(const Point & source,
                          const Point & ray_target,
                          const Point & edge_pt0,
                          const Point & edge_pt1,
                          const Point & edge_pt2)
   {
+    // Quick and more numerically stable check
+    if (!is_intersection(source, ray_target, edge_pt0, edge_pt1))
+      return -1;
+
     // Calculate intersection parameters (fractions of the distance
     // along each segment)
     const Real raydx = ray_target(0)-source(0),
@@ -91,7 +153,7 @@ namespace
             const Real n_num = nextdx * raydy -
                                nextdy * raydx;
 
-            if (signof(p_num) == signof(n_num))
+            if (signof(p_num) != -signof(n_num))
               return -1;
           }
 
@@ -110,7 +172,6 @@ namespace
 
     return -1;
   }
-
 }
 
 
@@ -180,6 +241,63 @@ TriangulatorInterface::Hole::find_ray_intersections(Point ray_start,
   return intersection_distances;
 }
 
+
+
+Point TriangulatorInterface::Hole::calculate_inside_point() const
+{
+  // Start with the vertex average
+
+  // Turns out "I'm a fully compliant C++17 compiler!" doesn't
+  // mean "I have a full C++17 standard library!"
+  // inside = std::reduce(points.begin(), points.end());
+  Point inside = 0;
+  for (auto i : make_range(this->n_points()))
+    inside += this->point(i);
+
+  inside /= this->n_points();
+
+  // Count the number of intersections with a ray to the right,
+  // keep track of how far they are
+  Point ray_target = inside + Point(1);
+  std::vector<Real> intersection_distances =
+    this->find_ray_intersections(inside, ray_target);
+
+  // The vertex average isn't on the interior, and we found no
+  // intersections to the right?  Try looking to the left.
+  if (!intersection_distances.size())
+    {
+      ray_target = inside - Point(1);
+      intersection_distances =
+        this->find_ray_intersections(inside, ray_target);
+    }
+
+  // I'd make this an assert, but I'm not 100% confident we can't
+  // get here via some kind of FP error on a weird hole shape.
+  libmesh_error_msg_if
+    (!intersection_distances.size(),
+     "Can't find a center for a MeshedHole!");
+
+  if (intersection_distances.size() % 2)
+    return inside;
+
+  // The vertex average is outside.  So go from the vertex average to
+  // the closest edge intersection, then halfway to the next-closest.
+
+  // Find the nearest first.
+  Real min_distance    = std::numeric_limits<Real>::max(),
+       second_distance = std::numeric_limits<Real>::max();
+  for (Real d : intersection_distances)
+    if (d < min_distance)
+      {
+        second_distance = min_distance;
+        min_distance = d;
+      }
+
+  const Point ray = ray_target - inside;
+  inside += ray * (min_distance + second_distance)/2;
+
+  return inside;
+}
 
 
 bool TriangulatorInterface::Hole::contains(Point p) const
@@ -277,6 +395,15 @@ TriangulatorInterface::ArbitraryHole::ArbitraryHole(const Point & center,
     _points(std::move(points)),
     _segment_indices(std::move(segment_indices))
 {}
+
+
+TriangulatorInterface::ArbitraryHole::ArbitraryHole(std::vector<Point> points)
+  : _points(std::move(points))
+{
+  _segment_indices.push_back(0);
+  _segment_indices.push_back(_points.size());
+  _center = this->calculate_inside_point();
+}
 
 
 TriangulatorInterface::ArbitraryHole::ArbitraryHole(const Hole & orig)
@@ -591,56 +718,7 @@ Point TriangulatorInterface::MeshedHole::inside() const
 {
   // This is expensive to compute, so only do it when we first need it
   if (_center(0) == std::numeric_limits<Real>::max())
-    {
-      // Start with the vertex average
-
-      // Turns out "I'm a fully compliant C++17 compiler!" doesn't
-      // mean "I have a full C++17 standard library!"
-      // _center = std::reduce(_points.begin(), _points.end());
-      _center = std::accumulate(_points.begin(), _points.end(), Point());
-
-      _center /= _points.size();
-
-      // Count the number of intersections with a ray to the right,
-      // keep track of how far they are
-      Point ray_target = _center + Point(1);
-      std::vector<Real> intersection_distances =
-        this->find_ray_intersections(_center, ray_target);
-
-      // The vertex average isn't on the interior, and we found no
-      // intersections to the right?  Try looking to the left.
-      if (!intersection_distances.size())
-        {
-          ray_target = _center - Point(1);
-          intersection_distances =
-            this->find_ray_intersections(_center, ray_target);
-        }
-
-      // I'd make this an assert, but I'm not 100% confident we can't
-      // get here via some kind of FP error on a weird hole shape.
-      libmesh_error_msg_if
-        (!intersection_distances.size(),
-         "Can't find a center for a MeshedHole!");
-
-      if (!(intersection_distances.size() % 2))
-        {
-          // Just go from the vertex average to the closest edge
-          // intersection, then halfway to the next-closest.
-
-          // Find the nearest first.
-          Real min_distance    = std::numeric_limits<Real>::max(),
-               second_distance = std::numeric_limits<Real>::max();
-          for (Real d : intersection_distances)
-            if (d < min_distance)
-              {
-                second_distance = min_distance;
-                min_distance = d;
-              }
-
-          const Point ray = ray_target - _center;
-          _center += ray * (min_distance + second_distance)/2;
-        }
-    }
+    _center = this->calculate_inside_point();
 
   return _center;
 }

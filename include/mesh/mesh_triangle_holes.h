@@ -127,6 +127,11 @@ protected:
                                            Point ray_target) const;
 
   /**
+   * Calculate an inside point based on our boundary
+   */
+  Point calculate_inside_point() const;
+
+  /**
    * Whether to allow boundary refinement.  True by default; specified
    * here so we can use the default constructor.
    */
@@ -238,8 +243,9 @@ class TriangulatorInterface::ArbitraryHole : public TriangulatorInterface::Hole
 {
 public:
   /**
-   * The constructor requires a point which lies in the interior of the hole
-   * and a reference to a vector of Points defining the hole.
+   * The fastest constructor requires a point which lies in the
+   * interior of the hole and a reference to a vector of Points
+   * defining the hole.
    */
   ArbitraryHole(const Point & center,
                 std::vector<Point> points);
@@ -247,6 +253,11 @@ public:
   ArbitraryHole(const Point & center,
                 std::vector<Point> points,
                 std::vector<unsigned int> segment_indices);
+
+  /**
+   * If we don't know a center a priori then we can calculate one
+   */
+  ArbitraryHole(std::vector<Point> points);
 
   /**
    * We can also construct an ArbitraryHole which just copies
@@ -272,13 +283,14 @@ public:
   void set_points(std::vector<Point> points)
   {
     _points = std::move(points);
+    _center = this->calculate_inside_point();
   }
 
 private:
   /**
    * arbitrary (x,y) location inside the hole
    */
-  const Point _center;
+  Point _center;
 
   /**
    * Reference to the vector of points which makes up
