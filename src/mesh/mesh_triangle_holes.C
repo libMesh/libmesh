@@ -153,7 +153,7 @@ namespace
             const Real n_num = nextdx * raydy -
                                nextdy * raydx;
 
-            if (signof(p_num) == signof(n_num))
+            if (signof(p_num) != -signof(n_num))
               return -1;
           }
 
