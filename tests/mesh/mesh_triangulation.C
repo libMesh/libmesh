@@ -200,7 +200,8 @@ public:
     check_corners(hexagon, 6);
 
     TriangulatorInterface::ArbitraryHole jaggy
-    {{1,0}, {{0,-1},{2,-1},{2,1},{1.75,-.5},{1.5,1},{1.25,-.5},{1,1},{.75,-.5},{.5,1},{.25,-.5},{0,1}}};
+    {{1,0}, {{0,-1},{2,-1},{2,1},{1.75,-.5},{1.5,1},{1.25,-.5},
+             {1,1},{.75,-.5},{.5,1},{.25,-.5},{0,1}}};
 
     CPPUNIT_ASSERT(jaggy.contains({.1,-.3}));
     CPPUNIT_ASSERT(jaggy.contains({.5,.9}));
@@ -210,8 +211,62 @@ public:
     CPPUNIT_ASSERT(jaggy.contains({1.5,.9}));
     CPPUNIT_ASSERT(jaggy.contains({1.9,-.3}));
 
-    // Extra corner case
+    CPPUNIT_ASSERT(jaggy.contains({1.9,-.5}));
+    CPPUNIT_ASSERT(jaggy.contains({1.6,-.5}));
+    CPPUNIT_ASSERT(jaggy.contains({1.1,-.5}));
     CPPUNIT_ASSERT(jaggy.contains({.5,-.5}));
+    CPPUNIT_ASSERT(jaggy.contains({.2,-.5}));
+
+    CPPUNIT_ASSERT(!jaggy.contains({.1,.7}));
+    CPPUNIT_ASSERT(!jaggy.contains({.5,1.1}));
+    CPPUNIT_ASSERT(!jaggy.contains({.9,.7}));
+    CPPUNIT_ASSERT(!jaggy.contains({1,-1.1}));
+    CPPUNIT_ASSERT(!jaggy.contains({1.1,.8}));
+    CPPUNIT_ASSERT(!jaggy.contains({1.5,1.1}));
+    CPPUNIT_ASSERT(!jaggy.contains({1.9,.9}));
+
+    CPPUNIT_ASSERT(!jaggy.contains({1.9,1}));
+    CPPUNIT_ASSERT(!jaggy.contains({1.4,1}));
+    CPPUNIT_ASSERT(!jaggy.contains({.9,1}));
+    CPPUNIT_ASSERT(!jaggy.contains({.4,1}));
+    CPPUNIT_ASSERT(!jaggy.contains({-.2,1}));
+    CPPUNIT_ASSERT(!jaggy.contains({-.2,0}));
+    CPPUNIT_ASSERT(!jaggy.contains({1.2,0}));
+
+    TriangulatorInterface::ArbitraryHole square_jaggy
+    {{1,0}, {{-.25,-1},{2,-1},{2,1},{1.75,1},{1.75,-.5},{1.5,-.5},
+             {1.5,1},{1.25,1},{1.25,-.5},{1,-.5},{1,1},{.75,1},
+             {.75,-.5},{.5,-.5},{.5,1},{.25,1},{.25,-.5},{0,-.5},
+             {0,1},{-.25,1}}};
+
+    CPPUNIT_ASSERT(square_jaggy.contains({-.1,-.3}));
+    CPPUNIT_ASSERT(square_jaggy.contains({.4,.9}));
+    CPPUNIT_ASSERT(square_jaggy.contains({.9,-.3}));
+    CPPUNIT_ASSERT(square_jaggy.contains({.9,0}));
+    CPPUNIT_ASSERT(square_jaggy.contains({1.1,-.6}));
+    CPPUNIT_ASSERT(square_jaggy.contains({1.4,.9}));
+    CPPUNIT_ASSERT(square_jaggy.contains({1.9,-.3}));
+
+    CPPUNIT_ASSERT(!square_jaggy.contains({.1,-.3}));
+    CPPUNIT_ASSERT(!square_jaggy.contains({.6,.9}));
+    CPPUNIT_ASSERT(!square_jaggy.contains({1.1,-.3}));
+    CPPUNIT_ASSERT(!square_jaggy.contains({1.1,0}));
+    CPPUNIT_ASSERT(!square_jaggy.contains({1.1,-1.6}));
+    CPPUNIT_ASSERT(!square_jaggy.contains({1.6,.9}));
+    CPPUNIT_ASSERT(!square_jaggy.contains({2.1,-.3}));
+
+    CPPUNIT_ASSERT(square_jaggy.contains({-.1,-.5}));
+    CPPUNIT_ASSERT(square_jaggy.contains({.3,-.5}));
+    CPPUNIT_ASSERT(square_jaggy.contains({.9,-.5}));
+    CPPUNIT_ASSERT(square_jaggy.contains({1.3,-.5}));
+    CPPUNIT_ASSERT(square_jaggy.contains({1.9,-.5}));
+
+    CPPUNIT_ASSERT(!square_jaggy.contains({-.3,1}));
+    CPPUNIT_ASSERT(!square_jaggy.contains({.2,1}));
+    CPPUNIT_ASSERT(!square_jaggy.contains({.6,1}));
+    CPPUNIT_ASSERT(!square_jaggy.contains({1.1,1}));
+    CPPUNIT_ASSERT(!square_jaggy.contains({1.6,1}));
+    CPPUNIT_ASSERT(!square_jaggy.contains({2.1,1}));
   }
 
 
