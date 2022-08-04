@@ -25,6 +25,7 @@
 #include "libmesh/compare_elems_by_level.h"
 #include "libmesh/mesh_input.h"
 #include "libmesh/mesh_output.h"
+#include "libmesh/mesh_communication.h"
 #include "libmesh/parallel_object.h"
 
 // C++ includes
@@ -217,7 +218,7 @@ private:
    * Write the nodal locations for part of a mesh
    */
   void write_nodes (Xdr & io,
-                    const std::set<const Node *> & nodeset) const;
+                    const connected_node_set_type & nodeset) const;
 
   /**
    * Write the side boundary conditions for part of a mesh
@@ -230,7 +231,7 @@ private:
    * Write the nodal boundary conditions for part of a mesh
    */
   void write_nodesets (Xdr & io,
-                       const std::set<const Node *> & nodeset,
+                       const connected_node_set_type & nodeset,
                        const std::vector<std::tuple<dof_id_type, boundary_id_type>> & bc_tuples) const;
 
   /**
