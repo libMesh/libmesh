@@ -199,13 +199,17 @@ int main (int argc, char ** argv)
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
-  // Do a uniform refinement
-  MeshRefinement mesh_refinement(mesh);
-  mesh_refinement.uniformly_refine(1);
-  equation_systems.reinit();
+  // Do uniform refinement if requested
+  const unsigned int nr = input("nr", 0);
+  if (nr)
+    {
+      MeshRefinement mesh_refinement(mesh);
+      mesh_refinement.uniformly_refine(nr);
+      equation_systems.reinit();
+      equation_systems.print_info();
+    }
 
   // Print and solve the refined sysem
-  equation_systems.print_info();
   equation_systems.get_system("Wave").solve();
 
   libMesh::out << "Wave system solved" << std::endl;
