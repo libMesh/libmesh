@@ -560,7 +560,7 @@ int main (int argc, char** argv)
   for (unsigned int rstep=0; rstep<uniform_refinement_steps; rstep++)
     mesh_refinement.uniformly_refine(1);
 
-  // Crate an equation system object
+  // Create an equation system object
   EquationSystems equation_system (mesh);
 
   // Set parameters for the equation system and the solver

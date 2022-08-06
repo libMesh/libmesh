@@ -84,7 +84,7 @@ enum SpectralTransform {SHIFT=0,
 
 /**
  * A class that interfaces the \p SolverConfiguration to add the SLEPC option SetST.
- * In case of dense eigenvalues, the application of SINVERT or CAYLEY is highly benefitial
+ * In case of dense eigenvalues, the application of SINVERT or CAYLEY is highly beneficial
  * see <a href='http://slepc.upv.es/documentation/'>the SLEPC-manual</a> for details.
  */
 class SlepcSolverConfiguration : public libMesh::SolverConfiguration
@@ -92,7 +92,7 @@ class SlepcSolverConfiguration : public libMesh::SolverConfiguration
 public:
 
   /**
-   * Constructur: get a reference to the \p SlepcEigenSolver variable to be able to manipulate it
+   * Constructor: get a reference to the \p SlepcEigenSolver variable to be able to manipulate it
    */
   SlepcSolverConfiguration( libMesh::SlepcEigenSolver<libMesh::Number> &slepc_eigen_solver):
     _slepc_solver(slepc_eigen_solver),
@@ -195,7 +195,7 @@ int main (int argc, char** argv)
     if (elem->infinite())
       {
         elem->subdomain_id() = 1;
-        // the base elements are always the 0-th neighor.
+        // the base elements are always the 0-th neighbor.
         elem->neighbor_ptr(0)->subdomain_id()=2;
       }
 
@@ -324,7 +324,7 @@ int main (int argc, char** argv)
 }
 
 /**
- * In this function, we assemble the actual system matrices. The inital equation is the eigen system \f$ H \Psi = \epsilon
+ * In this function, we assemble the actual system matrices. The initial equation is the eigen system \f$ H \Psi = \epsilon
  * \Psi \f$
  * where H is the Hamilton operator and Psi the eigen vector with corresponding eigen value \f$\epsilon\f$.
  * In the FEM-scheme, this becomes the generalised eigen problem  \f$ H \Psi = \epsilon M \Psi \f$ where M is the element mass matrix.
@@ -591,7 +591,7 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
 
             const Elem* relevant_neighbor=elem->neighbor_ptr(prev_neighbor);
 
-            // Get the correct face to the finite element; for thise, continue looping
+            // Get the correct face to the finite element; for this, continue looping
             // until a neighbor is an infinite element.
             // If none is found, we leave this loop
             for (; prev_neighbor<elem->n_neighbors(); prev_neighbor++){

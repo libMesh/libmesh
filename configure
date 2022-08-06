@@ -2089,7 +2089,7 @@ Optional Features:
   --disable-nanoflann     build without nanoflann KD-tree support
   --enable-nanoflann-pointlocator
                           use Nanoflann-based PointLocator (experimental)
-  --disable-metaphysicl   build without MetaPhysicL suppport
+  --disable-metaphysicl   build without MetaPhysicL support
   --enable-metaphysicl-required
                           Error if MetaPhysicL is not detected by configure
 
@@ -7302,7 +7302,7 @@ fi
 # on the current architecture. For the first argument:
 # [yes] = generate portable code (-mtune)
 # [no]  = generate architecture-specific code (-march)
-# This script is specifc to GCC; the flags it determines might not
+# This script is specific to GCC; the flags it determines might not
 # work for other compilers. There is also an optional third
 # argument which controls what happens when determining an arch flag
 # fails, we don't do anything in that case.
@@ -33823,7 +33823,7 @@ fi
   # before this can be enabled.
   hardcode_into_libs=yes
 
-  # Ideally, we could use ldconfig to report *all* directores which are
+  # Ideally, we could use ldconfig to report *all* directories which are
   # searched for libraries, however this is still not possible.  Aside from not
   # being certain /sbin/ldconfig is available, command
   # 'ldconfig -N -X -v | grep ^/' on 64bit Fedora does not report /usr/lib64,
@@ -37785,7 +37785,7 @@ fi
   # before this can be enabled.
   hardcode_into_libs=yes
 
-  # Ideally, we could use ldconfig to report *all* directores which are
+  # Ideally, we could use ldconfig to report *all* directories which are
   # searched for libraries, however this is still not possible.  Aside from not
   # being certain /sbin/ldconfig is available, command
   # 'ldconfig -N -X -v | grep ^/' on 64bit Fedora does not report /usr/lib64,
@@ -40735,7 +40735,7 @@ fi
   # before this can be enabled.
   hardcode_into_libs=yes
 
-  # Ideally, we could use ldconfig to report *all* directores which are
+  # Ideally, we could use ldconfig to report *all* directories which are
   # searched for libraries, however this is still not possible.  Aside from not
   # being certain /sbin/ldconfig is available, command
   # 'ldconfig -N -X -v | grep ^/' on 64bit Fedora does not report /usr/lib64,
@@ -43826,7 +43826,7 @@ fi
   # before this can be enabled.
   hardcode_into_libs=yes
 
-  # Ideally, we could use ldconfig to report *all* directores which are
+  # Ideally, we could use ldconfig to report *all* directories which are
   # searched for libraries, however this is still not possible.  Aside from not
   # being certain /sbin/ldconfig is available, command
   # 'ldconfig -N -X -v | grep ^/' on 64bit Fedora does not report /usr/lib64,
@@ -56761,7 +56761,7 @@ fi
 # clean up values, if we have perl.  This step is purely cosmetic, but
 # helps create readable (and easier to debug) compile and link lines
 # by stripping out repeated entries.  This can happen for example when
-# several optional packages all want to include and link agains the
+# several optional packages all want to include and link against the
 # same MPI.
 if test -x $PERL; then :
 

@@ -152,7 +152,7 @@ AC_ARG_ENABLE(march,
 # on the current architecture. For the first argument:
 # [yes] = generate portable code (-mtune)
 # [no]  = generate architecture-specific code (-march)
-# This script is specifc to GCC; the flags it determines might not
+# This script is specific to GCC; the flags it determines might not
 # work for other compilers. There is also an optional third
 # argument which controls what happens when determining an arch flag
 # fails, we don't do anything in that case.

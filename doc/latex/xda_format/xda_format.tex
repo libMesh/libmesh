@@ -66,7 +66,7 @@ The header of an XDR/XDA file looks something like this:
 \normalsize
 The header defines several important sizes that are used to enable efficient, block-reading of the data section. A line-by-line description of the header follows:
 
-The first line of the file is a string that defines what code wrote the file. There are three possibilies: MGF, DEAL and LIBM. The reason for this first line is backwards-compatibility. In this document we will mostly discuss the ``LIBM'' format. This is the newest and most flexible of the three formats; it allows hybrid meshes and adaptive mesh refinement information to be written out. The number following the string "LIBM" on the first line indicates the number of levels of refinement in the mesh. The mesh in the above example has no refinement structure, so this number is zero.
+The first line of the file is a string that defines what code wrote the file. There are three possibilities: MGF, DEAL and LIBM. The reason for this first line is backwards-compatibility. In this document we will mostly discuss the ``LIBM'' format. This is the newest and most flexible of the three formats; it allows hybrid meshes and adaptive mesh refinement information to be written out. The number following the string "LIBM" on the first line indicates the number of levels of refinement in the mesh. The mesh in the above example has no refinement structure, so this number is zero.
 
 The next line contains a single integer that defines the number of elements in the mesh.  Anything after the \# is ignored and may be used as a comment.
 
@@ -135,7 +135,7 @@ This is an example XDA hybrid-element mesh.
   LIBM 0
   10     # Num. Elements
   11     # Num. Nodes
-  52     # Length of conectivity array
+  52     # Length of connectivity array
   0      # Num. Boundary Conds.
   65536  # String Size (ignore)
   2      # Num. Element Blocks.

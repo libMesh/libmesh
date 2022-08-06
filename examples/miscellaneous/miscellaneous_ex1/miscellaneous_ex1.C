@@ -384,7 +384,7 @@ void assemble_wave(EquationSystems & es,
       //const std::vector<std::vector<Real>> & phi = cfe->get_phi();
 
       // The element shape function gradients evaluated at the quadrature
-      // points, devided by weight x rad
+      // points, divided by weight x rad
       const std::vector<std::vector<RealGradient>> & dphi = cfe->get_dphi_over_decayxR();
       //const std::vector<std::vector<RealGradient>> & dphi = cfe->get_dphi();
 
