@@ -855,7 +855,7 @@ AS_IF([test "$enableoptional" != no],
 # clean up values, if we have perl.  This step is purely cosmetic, but
 # helps create readable (and easier to debug) compile and link lines
 # by stripping out repeated entries.  This can happen for example when
-# several optional packages all want to include and link agains the
+# several optional packages all want to include and link against the
 # same MPI.
 AS_IF([test -x $PERL],
       [

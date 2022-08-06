@@ -5,7 +5,7 @@ AC_DEFUN([CONFIGURE_METAPHYSICL],
 [
   AC_ARG_ENABLE(metaphysicl,
                 AS_HELP_STRING([--disable-metaphysicl],
-                               [build without MetaPhysicL suppport]),
+                               [build without MetaPhysicL support]),
                 [AS_CASE("${enableval}",
                          [yes], [enablemetaphysicl=yes],
                          [no],  [enablemetaphysicl=no],
