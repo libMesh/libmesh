@@ -290,7 +290,7 @@ namespace libMesh
           libmesh_assert(ctx_c);
           PetscDMContext * p_ctx_c = static_cast<PetscDMContext*>(ctx_c);
 
-          // propogate subfield info to subDM
+          // propagate subfield info to subDM
           p_ctx_c->subfields = p_ctx_f->subfields;
 
           // return created subDM to PETSc
@@ -457,7 +457,7 @@ namespace libMesh
     MeshBase & mesh = system.get_mesh();   // Convenience
     MeshRefinement mesh_refinement(mesh); // Used for swapping between grids
 
-    // Theres no need for these code paths while traversing the hierarchy
+    // There's no need for these code paths while traversing the hierarchy
     mesh.allow_renumbering(false);
     mesh.allow_remote_element_removal(false);
     mesh.partitioner() = nullptr;
@@ -471,7 +471,7 @@ namespace libMesh
           n_levels = elem->level();
       }
     // On coarse grids some processors may have no active local elements,
-    // these processors shouldnt make projections
+    // these processors shouldn't make projections
     if (n_levels >= 1)
       n_levels += 1;
 */

@@ -2168,7 +2168,7 @@ void RBConstruction::load_rb_solution()
 
   libmesh_error_msg_if(get_rb_evaluation().RB_solution.size() > get_rb_evaluation().get_n_basis_functions(),
                        "ERROR: System contains " << get_rb_evaluation().get_n_basis_functions() << " basis functions."
-                       << " RB_solution vector constains " << get_rb_evaluation().RB_solution.size() << " entries."
+                       << " RB_solution vector contains " << get_rb_evaluation().RB_solution.size() << " entries."
                        << " RB_solution in RBConstruction::load_rb_solution is too long!");
 
   for (auto i : make_range(get_rb_evaluation().RB_solution.size()))

@@ -534,7 +534,7 @@ public:
   const std::vector<int> & get_elem_num_map() const;
 
   /**
-   * Idential to the behavior of get_elem_num_map(), but for the
+   * Identical to the behavior of get_elem_num_map(), but for the
    * node_num_map instead.
    */
   const std::vector<int> & get_node_num_map() const;

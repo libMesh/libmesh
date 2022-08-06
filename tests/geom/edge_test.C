@@ -59,7 +59,7 @@ public:
 #ifdef LIBMESH_ENABLE_AMR
     // Do tests with an Elem having a non-default p_level to ensure
     // that edges which are built have a matching p_level. p-refinement
-    // is only avaiable if LIBMESH_ENABLE_AMR is defined.
+    // is only available if LIBMESH_ENABLE_AMR is defined.
     elem.set_p_level(1);
 #endif
     Point dummy;
@@ -140,7 +140,7 @@ public:
         CPPUNIT_ASSERT(edge->subdomain_id() == elem.subdomain_id());
 
 #ifdef LIBMESH_ENABLE_AMR
-        // p-refinement is only avaiable if LIBMESH_ENABLE_AMR is defined.
+        // p-refinement is only available if LIBMESH_ENABLE_AMR is defined.
         CPPUNIT_ASSERT(edge->p_level() == elem.p_level());
 #endif
       }

@@ -356,7 +356,7 @@ public:
    * The EigenSolver, defining which interface, i.e solver
    * package to use.
    *
-   * Public access to this member variable will be depreacted in
+   * Public access to this member variable will be deprecated in
    * the future! Use get_eigen_solver instead.
    */
   std::unique_ptr<EigenSolver<Number>> eigen_solver;

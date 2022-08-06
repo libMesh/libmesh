@@ -85,7 +85,7 @@ namespace libMesh
     {
       return;
     }
-    else // If we are not storing, then we expected to find something but didnt, so we have a problem
+    else // If we are not storing, then we expected to find something but didn't, so we have a problem
     {
       libmesh_error_msg("Failed to set stored solutions iterator to a valid value.");
     }

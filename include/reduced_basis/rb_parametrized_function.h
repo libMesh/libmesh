@@ -401,7 +401,7 @@ protected:
 
   /**
    * In the case that _parametrized_function_boundary_ids is not empty, then this
-   * parametrized function is defined on a mesh boundary. This boolean inidicates
+   * parametrized function is defined on a mesh boundary. This boolean indicates
    * if the mesh boundary under consideration is a set of sides, or a set of nodes.
    */
   bool _is_nodal_boundary;

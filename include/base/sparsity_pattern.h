@@ -214,7 +214,7 @@ private:
   // element_dofs_j) pairs which have already been handled and not
   // repeat the computation. We use this data structure to keep track
   // of hashes of sets of dofs we have already seen, thus avoiding
-  // unnecessary caluclations.
+  // unnecessary calculations.
   std::unordered_set<dof_id_type> hashed_dof_sets;
 
   void handle_vi_vj(const std::vector<dof_id_type> & element_dofs_i,

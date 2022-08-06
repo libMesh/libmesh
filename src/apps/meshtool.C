@@ -168,7 +168,7 @@ int main (int argc, char ** argv)
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  // Add infinte elements
+  // Add infinite elements
   if (command_line.search(1, "-a"))
     addinfelems = true;
 

@@ -173,7 +173,7 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
 /**
  * Synchronize data about a range of ghost nodes uniquely identified
  * by an element id and local node id, iterating until data is
- * completely in sync and futher synchronization passes cause no
+ * completely in sync and further synchronization passes cause no
  * changes.
  *
  * Imagine a vertex surrounded by triangles, each on a different

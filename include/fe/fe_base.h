@@ -597,7 +597,7 @@ protected:
 
   /**
    * Compute \p dual_phi, \p dual_dphi, \p dual_d2phi
-   * It is only valid for this to be called after reinit has occured with a
+   * It is only valid for this to be called after reinit has occurred with a
    * quadrature rule
    */
   void compute_dual_shape_functions();

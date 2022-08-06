@@ -624,7 +624,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       if (elem->processor_id() != mesh->processor_id())
         {
           // Do this simultaneously; otherwise we can get a false
-          // positve when a hack_p_level or set_p_refineemnt_flag
+          // positive when a hack_p_level or set_p_refineemnt_flag
           // assertion sees inconsistency between an old flag and new
           // value or vice-versa
           elem->hack_p_level_and_refinement_flag(p_level, p_refinement_flag);

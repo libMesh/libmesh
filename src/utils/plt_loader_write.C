@@ -48,7 +48,7 @@ namespace libMesh
 //   const std::string gname = basename + ".g";
 //   const std::string qname = basename + ".q";
 
-//   // FORTAN file unit numbers
+//   // FORTRAN file unit numbers
 //   const int gunit = 25;
 //   const int qunit = 26;
 
@@ -266,7 +266,7 @@ namespace libMesh
 // }
 //     }
 
-//   // Close the FORTAN files
+//   // Close the FORTRAN files
 //   close_ (&gunit);
 
 //   if (!gridonly)

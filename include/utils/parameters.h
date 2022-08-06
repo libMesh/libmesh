@@ -469,7 +469,7 @@ T & Parameters::set (const std::string & name)
 
   set_attributes(name, false);
 
-  // Get pointer to exsiting or just-added entry
+  // Get pointer to existing or just-added entry
   auto ptr = cast_ptr<Parameter<T> *>(_values[name].get());
 
   // Return writeable reference

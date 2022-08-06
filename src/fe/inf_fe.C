@@ -208,7 +208,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       this->compute_shape_functions (inf_elem,
                                      base_fe->qrule->get_points(),
                                      radial_qrule->get_points()
-                                     /* weights are computed insid the function*/
+                                     /* weights are computed inside the function*/
                                      );
     }
 
@@ -809,7 +809,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
     libmesh_assert_equal_to(n_radial_qp, radial_qrule->n_points());
   if (base_qrule)
     libmesh_assert_equal_to(n_base_qp, base_qrule->n_points());
-  libmesh_assert_equal_to(_n_total_qp % n_radial_qp, 0); // "Error in the structure of quadrature pointes!");
+  libmesh_assert_equal_to(_n_total_qp % n_radial_qp, 0); // "Error in the structure of quadrature points!");
 #endif
 
 

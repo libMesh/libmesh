@@ -525,7 +525,7 @@ void PerfLog::fast_pop(const char * libmesh_dbg_var(label),
       // In debug mode, we carefully check that before popping the stack,
       // we have the correct event.
 
-      // Get pointer to corresonding PerfData, or nullptr if it does not exist.
+      // Get pointer to corresponding PerfData, or nullptr if it does not exist.
       auto it = log.find(std::make_pair(header, label));
       PerfData * perf_data = (it == log.end()) ? nullptr : &(it->second);
 

@@ -114,7 +114,7 @@ int main(int argc, char ** argv)
   std::string deny_regex_string = "^$";
   deny_regex_string = libMesh::command_line_next("--deny_re", deny_regex_string);
 
-  // Recursively add tests matching the regex tothe runner object.
+  // Recursively add tests matching the regex to the runner object.
   CppUnit::TextUi::TestRunner runner;
 
   // The Cppunit registry object that knows about all the tests.

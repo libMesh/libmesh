@@ -207,7 +207,7 @@ void System::read_header (Xdr & io,
         // changed for the monomial and xyz finite element families to
         // simplify extension to arbitrary p.  The consequence is that
         // old restart files will not be read correctly.  This is expected
-        // to be an unlikely occurence, but catch it anyway.
+        // to be an unlikely occurrence, but catch it anyway.
         if (read_legacy_format)
           if ((type.family == MONOMIAL || type.family == XYZ) &&
               ((type.order.get_order() > 2 && this->get_mesh().mesh_dimension() == 2) ||

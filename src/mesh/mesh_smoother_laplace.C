@@ -53,7 +53,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
   // is probably not something we want!
   auto on_boundary = MeshTools::find_boundary_nodes(_mesh);
 
-  // Also: don't smooth block bondary nodes
+  // Also: don't smooth block boundary nodes
   auto on_block_boundary = MeshTools::find_block_boundary_nodes(_mesh);
 
   // Merge them

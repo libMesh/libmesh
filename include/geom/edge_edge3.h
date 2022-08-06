@@ -32,7 +32,7 @@ namespace libMesh
  * like this:
  *
  * \verbatim
- *   EGDE3: o----o----o        o---> xi
+ *   EDGE3: o----o----o        o---> xi
  *          0    2    1
  * \endverbatim
  *

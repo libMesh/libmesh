@@ -40,7 +40,7 @@ class MeshBase;
  *
  * If allow_remote_element_removal() is set to true, that will also be
  * temporarily disabled by the serializer, to be reenabled after
- * serializer distruction if so; this allows prepare_for_use() to be
+ * serializer destruction if so; this allows prepare_for_use() to be
  * called safely from within serialized code.
  *
  * If a mesh is explicitly distributed by a `delete_remote_elements()`

@@ -6,7 +6,7 @@ set -e
 # there's a failure we get the most informative death possible
 ORDERED_METHODS="dbg debug devel profiling pro prof oprofile oprof optimized opt"
 
-# when run outside of the automake envionment make sure we get METHODS set
+# when run outside of the automake environment make sure we get METHODS set
 # to something useful
 if (test "x${METHODS}" = "x"); then
     if (test "x${METHOD}" = "x"); then

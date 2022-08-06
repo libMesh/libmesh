@@ -124,8 +124,8 @@ std::unordered_set<dof_id_type> find_boundary_nodes(const MeshBase & mesh);
 /**
  * Returns a std::set containing Node IDs for all of the block boundary nodes
  *
- * A "block boundary node" is a node that is connected to elemenents from 2
- * or more blockse
+ * A "block boundary node" is a node that is connected to elements from 2
+ * or more blocks
  */
 std::unordered_set<dof_id_type> find_block_boundary_nodes(const MeshBase & mesh);
 
@@ -483,7 +483,7 @@ void libmesh_assert_consistent_distributed_nodes(const MeshBase & mesh);
 /**
  * A function for verifying that processor assignment is parallel
  * consistent (every processor agrees on the processor id of each node
- * it can see) even on nodes which have not yet recieved consistent
+ * it can see) even on nodes which have not yet received consistent
  * DofObject::id(), using element topology to identify matching nodes.
  */
 void libmesh_assert_parallel_consistent_new_node_procids (const MeshBase & mesh);

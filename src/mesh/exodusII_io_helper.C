@@ -695,7 +695,7 @@ void ExodusII_IO_Helper::read_and_store_header_info()
 {
   // Read header params from file, storing them in this class's
   // ExodusHeaderInfo struct.  This automatically updates the local
-  // num_dim, num_elem, etc. referenes.
+  // num_dim, num_elem, etc. references.
   this->header_info = this->read_header();
 
   // Read the number of timesteps which are present in the file
