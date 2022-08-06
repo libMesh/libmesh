@@ -211,7 +211,7 @@ int main (int argc, char** argv)
     if (elem->infinite())
       {
         elem->subdomain_id() = 1;
-        // the base elements are always the 0-th neighor.
+        // the base elements are always the 0-th neighbor.
         elem->neighbor_ptr(0)->subdomain_id()=2;
       }
 

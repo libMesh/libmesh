@@ -21,7 +21,7 @@
 // \author Vikram Garg
 // \date 2020
 //
-// This example showcases the solution storage and retrival capabilities of libMesh, in the context of
+// This example showcases the solution storage and retrieval capabilities of libMesh, in the context of
 // unsteady adjoints. The primary motivation is adjoint sensitivity analysis for unsteady
 // problems. The PDE we are interested in is the simple 2-d heat
 // equation:

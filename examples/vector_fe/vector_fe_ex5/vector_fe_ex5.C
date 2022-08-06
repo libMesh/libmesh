@@ -105,7 +105,7 @@ main(int argc, char ** argv)
   // Use the MeshTools::Generation mesh generator to create a uniform
   // 2D grid on the square [-1,1]^2.  We instruct the mesh generator
   // to build a mesh of 15x15 QUAD4 elements. Note that at the end of this
-  // fuction call, the mesh will be prepared and remote elements will be deleted
+  // function call, the mesh will be prepared and remote elements will be deleted
   MeshTools::Generation::build_square(mesh, nx, ny, -1., 1., -1., 1., QUAD4);
 
   // Print information about the mesh to the screen.
@@ -149,7 +149,7 @@ main(int argc, char ** argv)
       std::vector<std::string> varnames;
       equation_systems.build_variable_names(varnames);
 
-      // Create ExodusII object with an unambigous filename (indicating this solution is special)
+      // Create ExodusII object with an unambiguous filename (indicating this solution is special)
       ExodusII_IO exo_ptr(mesh);
       exo_ptr.write("out_constant.e");
       exo_ptr.set_output_variables(varnames);

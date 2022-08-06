@@ -41,7 +41,7 @@ run_example() {
     shift
     options=$@
 
-    # when run outside of the automake envionment make sure we get METHODS set
+    # when run outside of the automake environment make sure we get METHODS set
     # to something useful
     if (test "x${METHODS}" = "x"); then
 	if (test "x${METHOD}" = "x"); then
