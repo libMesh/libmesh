@@ -186,6 +186,7 @@ pub_2022 = [
   '2022-05-01', 78,
   '2022-06-01', 101,
   '2022-07-01', 117,
+  '2022-08-01', 136,
 ]
 
 # 2023 monthly publication totals (first of each month)
