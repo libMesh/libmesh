@@ -26,6 +26,7 @@ AC_DEFUN([CONFIGURE_NETCDF],
           netcdfversion=4
         ])
 
+  netcdf_v4_arg=''
   AS_CASE("${netcdfversion}",
           [3], [
                  dnl We shouldn't get here, see if test above.
@@ -37,7 +38,7 @@ AC_DEFUN([CONFIGURE_NETCDF],
                 AS_IF([test "x$enablenested" = "xno"], [AC_MSG_ERROR([NetCDF v4 requires nested subpackages, try --enable-nested])])
 
                 dnl pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
-                AS_IF([test "x$enablehdf5" = "xno"], [libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"])
+                AS_IF([test "x$enablehdf5" = "xno"], [netcdf_v4_arg=--disable-netcdf-4])
 
                 dnl netcdf will install its own pkgconfig script, use this to get proper static linking
                 libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
@@ -70,8 +71,11 @@ AC_DEFUN([CONFIGURE_NETCDF],
           dnl ensure that the configuration is consistent
           dnl pass --disable-testsets to the netcdf subpackage to disable the most rigorous tests
           AS_IF([test "x$enablecurl" = "xyes"],
-                [AX_SUBDIRS_CONFIGURE([contrib/netcdf/v4],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[--enable-dap],[--disable-testsets]])],
-                [AX_SUBDIRS_CONFIGURE([contrib/netcdf/v4],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[--disable-dap],[--disable-curl],[--disable-testsets]])])
+                [netcdf_dap_arg=--enable-dap
+                 netcdf_curl_arg=''],
+                [netcdf_dap_arg=--disable-dap
+                 netcdf_curl_arg=--disable-curl])
+          AX_SUBDIRS_CONFIGURE([contrib/netcdf/v4],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[$netcdf_dap_arg],[$netcdf_curl_arg],[--disable-testsets],[$netcdf_v4_arg]])
         ])
 
   AC_SUBST(NETCDF_INCLUDE)
