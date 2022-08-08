@@ -948,7 +948,7 @@ protected:
   /**
    * This class facilitates reading in vectors from Exodus file that
    * may be of a different floating point type than Real. It employs
-   * basically the same approach as the MappedOuputVector, just going
+   * basically the same approach as the MappedOutputVector, just going
    * in the opposite direction. For more information, see the
    * MappedOutputVector class docs.
    */

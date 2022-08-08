@@ -1114,7 +1114,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
         vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
 
         // Actually read the header data. When we do this, set read_header=false
-        // so taht we do not reinit sys, since we assume that it has already been
+        // so that we do not reinit sys, since we assume that it has already been
         // set up properly (e.g. the appropriate variables have already been added).
         sys.read_header(vector_data, version, /*read_header=*/false, /*read_additional_data=*/false);
       }

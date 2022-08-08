@@ -135,7 +135,7 @@ public:
 
   /**
    * The Online counterpart of initialize_interpolation_points_spatial_indices().
-   * This is used to initalize the spatial indices data in _parametrized_function
+   * This is used to initialize the spatial indices data in _parametrized_function
    * so that the _parametrized_function can be used in the Online stage without
    * reconstructing the spatial indices on every element or node in the mesh.
    */

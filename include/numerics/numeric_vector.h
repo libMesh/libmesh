@@ -218,7 +218,7 @@ public:
                      const ParallelType ptype = AUTOMATIC) = 0;
 
   /**
-   * Create a vector that holds tha local indices plus those specified
+   * Create a vector that holds the local indices plus those specified
    * in the \p ghost argument.
    */
   virtual void init (const numeric_index_type n,

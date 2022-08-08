@@ -1005,7 +1005,7 @@ write_out_interior_basis_functions(const std::string & directory_name,
                         n_qp_per_elem.end(),
                         0u);
 
-      // Reserve space to store continguous vectors of qp data for each var
+      // Reserve space to store contiguous vectors of qp data for each var
       std::vector<std::vector<Number>> qp_data(n_vars);
       for (auto var : index_range(qp_data))
         qp_data[var].reserve(n_qp_data);
@@ -1121,7 +1121,7 @@ write_out_side_basis_functions(const std::string & directory_name,
                         n_qp_per_elem_side.end(),
                         0u);
 
-      // Reserve space to store continguous vectors of qp data for each var
+      // Reserve space to store contiguous vectors of qp data for each var
       std::vector<std::vector<Number>> qp_data(n_vars);
       for (auto var : index_range(qp_data))
         qp_data[var].reserve(n_qp_data);

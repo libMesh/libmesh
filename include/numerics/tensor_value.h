@@ -146,7 +146,7 @@ public:
   { libmesh_assert_equal_to (p, Scalar(0)); this->zero(); return *this; }
 
   /**
-   * Generate the intrinsic rotation matrix associated with the provided Euler angles. An instrinsic
+   * Generate the intrinsic rotation matrix associated with the provided Euler angles. An intrinsic
    * rotation leaves bodies in the domain fixed while rotating the coordinate axes. We follow the
    * convention described at http://mathworld.wolfram.com/EulerAngles.html (equations 6-14 give the
    * entries of the composite transformation matrix). The rotations are performed sequentially about

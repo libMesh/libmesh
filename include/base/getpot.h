@@ -666,7 +666,7 @@ private:
    *            my-variable   =    '007 J. B.'
    *      into
    *            my-variable='007 J. B.'
-   *    3) interprete sections like '[../my-section]' etc.
+   *    3) interpret sections like '[../my-section]' etc.
    */
   inline void _skip_whitespace(std::istream& istr);
   inline const std::string _get_next_token(std::istream& istr);
@@ -2681,7 +2681,7 @@ GetPot::_request_variable(const char* VarName) const
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// (*) ouput (basically for debugging reasons
+// (*) output (basically for debugging reasons
 //.............................................................................
 //
 inline int

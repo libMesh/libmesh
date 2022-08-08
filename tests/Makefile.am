@@ -160,7 +160,7 @@ noinst_PROGRAMS = # empty, append below
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
 # others segfault and/or hang.  By default we will not run
-# GLIBCXX-debugging builds with cppunit unless specificallly
+# GLIBCXX-debugging builds with cppunit unless specifically
 # configured to.
 if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_DBG_MODE

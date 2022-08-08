@@ -177,7 +177,7 @@ public:
 
   /**
    * For explicit systems, just assemble and solve the system A*x=b.
-   * Should be overridden in derrived systems to provide a solver for the
+   * Should be overridden in derived systems to provide a solver for the
    * system.
    */
   virtual void solve () override

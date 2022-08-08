@@ -1292,7 +1292,7 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
   //   the radial polynomials coincide on neighboring elements.
   //   Thus, if one constraines these DOFs at one (arbitrary) point correctly, they match for each point along the radial direction.
   //   Hence, we constrain them with the same values as those DOFs belonging to the first order polynomial, obtaining consistent
-  //   constraints that mimick constraints that are computed at the support points for each radial polynomial contribution.
+  //   constraints that mimic constraints that are computed at the support points for each radial polynomial contribution.
 
   FEType fe_type = dof_map.variable_type(variable_number);
 

@@ -895,7 +895,7 @@ void TransientRBConstruction::load_rb_solution()
   libmesh_error_msg_if(RB_solution_vector_k.size() > get_rb_evaluation().get_n_basis_functions(),
                        "ERROR: rb_eval object contains "
                        << get_rb_evaluation().get_n_basis_functions()
-                       << " basis functions. RB_solution vector constains "
+                       << " basis functions. RB_solution vector contains "
                        << RB_solution_vector_k.size()
                        << " entries. RB_solution in TransientRBConstruction::load_rb_solution is too long!");
 

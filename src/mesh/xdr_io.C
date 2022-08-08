@@ -511,7 +511,7 @@ XdrIO::write_serialized_connectivity (Xdr & io,
               {
                 pack_element (xfer_conn, &child, parent_id, parent_pid, n_elem_integers);
 
-                // this aproach introduces the possibility that we write
+                // this approach introduces the possibility that we write
                 // non-local elements.  These elements may well be parents
                 // at the next step
                 child_id_map[child.id()] = std::make_pair (child.processor_id(),

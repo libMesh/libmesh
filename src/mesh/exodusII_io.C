@@ -1501,7 +1501,7 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
     derived_vars_active_subdomains(derived_var_names.size());
 
   // A new data structure for keeping track of a list of variable names
-  // that are in the discontinous solution vector on each subdomain. Used
+  // that are in the discontinuous solution vector on each subdomain. Used
   // for indexing. Note: if a variable was inactive at the System level,
   // an entry for it will still be in the discontinuous solution vector,
   // but it will just have a value of zero. On the other hand, when we

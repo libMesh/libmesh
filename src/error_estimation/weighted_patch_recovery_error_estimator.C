@@ -140,7 +140,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
       if (this->error_estimator.patch_reuse && error_per_cell[e_id] != 0)
         continue;
 
-      // If we are not reusing patches or havent built one containing this element, we build one
+      // If we are not reusing patches or haven't built one containing this element, we build one
 
       // Use user specified patch size and growth strategy
       patch.build_around_element (elem, error_estimator.target_patch_size,

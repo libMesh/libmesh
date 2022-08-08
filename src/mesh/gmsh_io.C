@@ -625,7 +625,7 @@ void GmshIO::read_mesh(std::istream & in)
                     std::size_t gmsh_element_id;
                     in >> gmsh_element_id;
 
-                    // Get the remainer of the line that includes the nodes ids
+                    // Get the remainder of the line that includes the nodes ids
                     std::getline(in, s);
                     std::istringstream is(s);
                     std::size_t local_node_counter = 0, gmsh_node_id;

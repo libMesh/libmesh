@@ -339,7 +339,7 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
                     // Only try each pairing once
                     for (auto b : IntRange<std::size_t>(a+1, thetas.size()))
                       {
-                        // Find if the two neighbor nodes angles are 180 degrees (pi) off of each other (withing a tolerance)
+                        // Find if the two neighbor nodes angles are 180 degrees (pi) off of each other (within a tolerance)
                         // In order to make this a true movable boundary node... the two that forma  straight line with
                         // it must also be on the boundary
                         if (boundary_node_ids.count(neighbors[a]->id()) &&

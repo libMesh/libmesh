@@ -293,7 +293,7 @@ private:
   /**
    * Find the training sample that has the largest EIM approximation error
    * based on the current EIM approximation. Return the maximum error, and
-   * the training sample index at which it occured.
+   * the training sample index at which it occurred.
    */
   std::pair<Real, unsigned int> compute_max_eim_error();
 

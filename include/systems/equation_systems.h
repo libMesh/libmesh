@@ -400,7 +400,7 @@ public:
    * specified systems.
    * If vertices_only == true, then for higher-order elements only
    * the solution at the vertices is computed. This can be useful
-   * when plotting discontinous solutions on higher-order elements
+   * when plotting discontinuous solutions on higher-order elements
    * and only a lower-order representation is required.
    */
   void build_discontinuous_solution_vector

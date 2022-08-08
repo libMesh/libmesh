@@ -271,7 +271,7 @@ private:
   //
   // In the function templates below, the "T type_size" argument is only
   // used for template argument deduction purposes. The value of this
-  // parameter can be arbitary because it will not be used within the
+  // parameter can be arbitrary because it will not be used within the
   // function.
 
   /**

@@ -585,7 +585,7 @@ xdrproc_t xdr_translator<unsigned long int>()
 // for anything larger.
 // 2. You're on a system with sizeof(long long) > 8, and you want to
 // store n>2^64 in one.  Welcome, 22nd century programmers; sorry we
-// couldn't accomodate you.
+// couldn't accommodate you.
 template <>
 xdrproc_t xdr_translator<long long>() { return (xdrproc_t)(xdr_longlong_t); }
 

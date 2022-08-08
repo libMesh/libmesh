@@ -510,7 +510,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity (const QoISet & qoi_indic
 
   // We first do an adjoint solve:
   // J^T * z = (partial q / partial u)
-  // if we havent already or dont have an initial condition for the adjoint
+  // if we haven't already or dont have an initial condition for the adjoint
   if (!this->is_adjoint_already_solved())
     {
       this->adjoint_solve(qoi_indices);
@@ -723,7 +723,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
 
   // We first do an adjoint solve to get z for each quantity of
   // interest
-  // if we havent already or dont have an initial condition for the adjoint
+  // if we haven't already or dont have an initial condition for the adjoint
   if (!this->is_adjoint_already_solved())
     {
       this->adjoint_solve(qoi_indices);
@@ -931,7 +931,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
 
   // We first do an adjoint solve to get z for each quantity of
   // interest
-  // if we havent already or dont have an initial condition for the adjoint
+  // if we haven't already or dont have an initial condition for the adjoint
   if (!this->is_adjoint_already_solved())
     {
       this->adjoint_solve(qoi_indices);

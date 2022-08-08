@@ -1636,7 +1636,7 @@ public:
    * is not a node or is a node and does not have a singular Jacobian,
    * this will return invalid_uint.
    *
-   * The intention is for this to be overriden in derived element
+   * The intention is for this to be overridden in derived element
    * classes that do have nodes that have singular Jacobians. When
    * mapping failures are caught, we can check this to see if the
    * failed physical point is actually a singular point and

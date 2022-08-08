@@ -479,7 +479,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
         // Get the id of this node
         dof_id_type node_id = node.id();
 
-        // If we havent already processed this node, do so now
+        // If we haven't already processed this node, do so now
         if (processed_node_ids.find(node_id) == processed_node_ids.end())
           {
             // Declare a neighbor_set to be filled by the find_point_neighbors

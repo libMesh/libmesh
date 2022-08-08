@@ -175,7 +175,7 @@ void ElemCutter::find_intersection_points(const Elem & elem,
         d0 = vertex_distance_func[el0],
         d1 = vertex_distance_func[el1];
 
-      // if this egde has a 0 crossing
+      // if this edge has a 0 crossing
       if (d0*d1 < 0.)
         {
           libmesh_assert_not_equal_to (d0, d1);

@@ -138,7 +138,7 @@ protected:
    * boundary and the counterpart boundary. This is necessary for
    * periodic-boundaries with vector-valued quantities (e.g.
    * velocity or displacement) on a sector of a circular domain,
-   * for exaple, since in that case we must map each variable
+   * for example, since in that case we must map each variable
    * to a corresponding linear combination of all the variables.
    * We store the DenseMatrix via a unique_ptr, and an uninitialized
    * pointer is treated as equivalent to the identity matrix.

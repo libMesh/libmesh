@@ -48,7 +48,7 @@ public:
   {}
 
 
-  // Data to send/recieve with each processor rank.  For this test,
+  // Data to send/receive with each processor rank.  For this test,
   // processor p will send to destination d the integer d, in a vector
   // with sqrt(c)+1 copies, iff c := |p-d| is a square number.
   void fill_scalar_data
@@ -67,7 +67,7 @@ public:
   }
 
 
-  // Multimap data to send/recieve with each processor rank.  For this
+  // Multimap data to send/receive with each processor rank.  For this
   // test, processor p will send to destination d the integer d, in a
   // vector with sqrt(c)+1 copies followed by a vector with 1 copy,
   // iff c := |p-d| is a square number.
@@ -93,7 +93,7 @@ public:
   }
 
 
-  // Data to send/recieve with each processor rank.  For this test,
+  // Data to send/receive with each processor rank.  For this test,
   // processor p will send to destination d the integer d, in two
   // subvectors with sqrt(c) and 1 copies, iff c := |p-d| is a square
   // number.
@@ -118,7 +118,7 @@ public:
 
 
 
-  // Multimap data to send/recieve with each processor rank.  For this
+  // Multimap data to send/receive with each processor rank.  For this
   // test, processor p will send to destination d the integer d, in
   // two subvectors with sqrt(c) and 1 copies, followed by a vector
   // with 1 copy, iff c := |p-d| is a square number.

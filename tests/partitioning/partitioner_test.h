@@ -80,7 +80,7 @@ public:
 
     // Unfortunately, it turns out that our partitioners *do* suck:
     //
-    // * Metis and ParMetis can't reliabily give us more than
+    // * Metis and ParMetis can't reliably give us more than
     // 13 non-empty ranks on the above 27 element mesh.
     //
     // * Our SFC partitioners are suboptimal with 8 or more ranks for

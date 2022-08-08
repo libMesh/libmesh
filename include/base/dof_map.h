@@ -640,7 +640,7 @@ public:
    * for a system of PDEs, to construct an efficient multilevel preconditioner, we coarsen
    * the matrix of one single PDE instead of the entire huge matrix. In order to
    * accomplish this, we need to know many PDEs we have. Another use case,
-   * the fieldsplit preconditioner can be constructed in place with this info wihtout
+   * the fieldsplit preconditioner can be constructed in place with this info without
    * involving any user efforts.
    */
   unsigned int block_size() const
@@ -952,7 +952,7 @@ public:
    *
    * \note The original "cyclic constraint" terminology was
    * unfortunate since the word cyclic is used by some software to
-   * indicate an actual type of rotational/angular contraint and not
+   * indicate an actual type of rotational/angular constraint and not
    * (as here) a cyclic graph. The former nomenclature will eventually
    * be deprecated in favor of "constraint loop".
    */
@@ -1677,7 +1677,7 @@ private:
   bool _error_on_constraint_loop;
 
   /**
-   * This flag indicates whether or not we explicity take constraint
+   * This flag indicates whether or not we explicitly take constraint
    * equations into account when computing a sparsity pattern.
    */
   bool _constrained_sparsity_construction;

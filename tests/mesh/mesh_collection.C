@@ -26,7 +26,7 @@ private:
     // to trigger duplicate unique ids in the old code, you needed the following circumstances:
     // The single mesh generation routine (e.g. build_cube) *must* add a node after all the elements
     // such that it is not an element that has the largest unique id in the single mesh. (build_cube
-    // with TET10 adds a node after all the elements are added becuase it calls all_second_order
+    // with TET10 adds a node after all the elements are added because it calls all_second_order
     // after all the elements are created.) If an element has the highest unique id, then the final
     // value for _next_unique_id was (and still is) correct at the end of copy_nodes_and_elements
     // because we set the element unique ids before adding the elements into the original mesh, such

@@ -33,7 +33,7 @@ namespace libMesh
  * It is numbered like this:
  *
  * \verbatim
- *   EGDE4: o----o----o----o        o---> xi
+ *   EDGE4: o----o----o----o        o---> xi
  *          0    2    3    1
  * \endverbatim
  *

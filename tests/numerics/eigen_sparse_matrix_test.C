@@ -34,7 +34,7 @@ public:
     _comm = TestCommWorld;
     _matrix = std::make_unique<EigenSparseMatrix<Number>>(*_comm);
 
-    // All parameters are ignored except the number of global rows and colums and nnz.
+    // All parameters are ignored except the number of global rows and columns and nnz.
     _matrix->init(/*m*/10,
                   /*n*/10,
                   /*m_l==m*/10,

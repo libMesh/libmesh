@@ -101,7 +101,7 @@ noinst_PROGRAMS = $(am__EXEEXT_7) $(am__EXEEXT_3) $(am__EXEEXT_4) \
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
 # others segfault and/or hang.  By default we will not run
-# GLIBCXX-debugging builds with cppunit unless specificallly
+# GLIBCXX-debugging builds with cppunit unless specifically
 # configured to.
 @ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_2 = unit_tests-dbg
 @ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_3 = unit_tests-dbg

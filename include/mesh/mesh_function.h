@@ -91,7 +91,7 @@ public:
 
   /**
    * Special functions.
-   * - This class conains a unique_ptr so it can't be default copy constructed.
+   * - This class contains a unique_ptr so it can't be default copy constructed.
    * - This class contains const references so it can't be default copy/move assigned.
    * - The destructor is defaulted out-of-line.
    */

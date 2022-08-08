@@ -896,7 +896,7 @@ const std::string & System::vector_name (const NumericVector<Number> & vec_refer
                          [&vec_reference](const decltype(_vectors)::value_type & pr)
                          { return &vec_reference == pr.second.get(); });
 
-  // Before returning, make sure we didnt loop till the end and not find any match
+  // Before returning, make sure we didn't loop till the end and not find any match
   libmesh_assert (it != vectors_end());
 
   // Return the string associated with the current vector
@@ -2288,7 +2288,7 @@ Number System::point_value(unsigned int var,
   Point coor = FEMap::inverse_map(e.dim(), &e, p);
 
   // get the shape function value via the FEInterface to also handle the case
-  // of infinite elements correcly, the shape function is not fe->phi().
+  // of infinite elements correctly, the shape function is not fe->phi().
   FEComputeData fe_data(this->get_equation_systems(), coor);
   FEInterface::compute_data(e.dim(), fe_type, &e, fe_data);
 
@@ -2421,7 +2421,7 @@ Gradient System::point_gradient(unsigned int var,
   Point coor = FEMap::inverse_map(dim, &e, p);
 
   // get the shape function value via the FEInterface to also handle the case
-  // of infinite elements correcly, the shape function is not fe->phi().
+  // of infinite elements correctly, the shape function is not fe->phi().
   FEComputeData fe_data(this->get_equation_systems(), coor);
   fe_data.enable_derivative();
   FEInterface::compute_data(dim, fe_type, &e, fe_data);
@@ -2431,7 +2431,7 @@ Gradient System::point_gradient(unsigned int var,
 
   for (unsigned int l=0; l<num_dofs; l++)
     {
-      // Chartesian coordinates have allways LIBMESH_DIM entries,
+      // Chartesian coordinates have always LIBMESH_DIM entries,
       // local coordinates have as many coordinates as the element has.
       for (std::size_t v=0; v<dim; v++)
         for (std::size_t xyz=0; xyz<LIBMESH_DIM; xyz++)

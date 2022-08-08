@@ -669,7 +669,7 @@ void PetscNonlinearSolver<T>::clear ()
       // between solves.
       if (!(reuse_preconditioner()))
         {
-        // SNESReset really ought to work but replacing destory() with
+        // SNESReset really ought to work but replacing destroy() with
         // SNESReset causes a very slight change in behavior that
         // manifests as two failed MOOSE tests...
         _snes.destroy();
