@@ -240,7 +240,12 @@ endif
 # make already completed", which is an annoying bug; for the dbg
 # noinst case this means "you can't run make unless make already
 # completed", which is a devastating bug.
-
+#
+# Putting . in the top-level SUBDIRS works when make is invoked on the
+# top level, but can leave `make -C tests` runs linked (or failing to
+# link, if there have been ABI changes) against a non-up-to-date
+# library file.
+#
 # As a quick fix we'll ensure library dependencies are built manually:
 # http://lists.gnu.org/archive/html/automake/2009-03/msg00011.html
 

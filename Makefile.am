@@ -297,6 +297,8 @@ if LIBMESH_OPROF_MODE
   libmesh_oprof_la_LIBADD   = contrib/libcontrib_oprof.la $(LIBS)
 endif
 
+# Make sure we build the library before we test it
+SUBDIRS += .
 
 if LIBMESH_ENABLE_CPPUNIT
  SUBDIRS += tests
