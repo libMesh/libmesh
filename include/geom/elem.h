@@ -367,8 +367,13 @@ public:
   bool on_boundary () const;
 
   /**
-   * \returns \p true if this element is semilocal to the calling
+   * \returns \p true if this element is "semilocal" to the calling
    * processor, which must specify its rank.
+   *
+   * This method is discouraged, as it uses the *old* definition of
+   * semilocal (elements which are not local but which are point
+   * neighbors of something local) rather than any of the new
+   * definitions discussed in ghosting_functor.h
    */
   bool is_semilocal (const processor_id_type my_pid) const;
 

@@ -1551,8 +1551,11 @@ public:
   virtual SimpleRange<const_element_iterator> active_unpartitioned_element_ptr_range() const = 0;
 
   /**
-   * Iterate over "ghost" elements in the Mesh.  A ghost element is
-   * one which is *not* local, but *is* semilocal.
+   * Iterate over "ghost" elements in the Mesh.  This method is
+   * discouraged, as it iterates over ghost elements by the *old*
+   * definition (active elements which are not local but which are
+   * point neighbors of something local) rather than by any of the new
+   * definitions discussed in ghosting_functor.h
    */
   virtual element_iterator ghost_elements_begin () = 0;
   virtual element_iterator ghost_elements_end () = 0;
