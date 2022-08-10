@@ -82,6 +82,7 @@ unsigned int idx(const ElemType type,
     {
     case INVALID_ELEM:
     case QUAD4:
+    case QUADSHELL4:
     case TRI3:
       {
         return i + j*(nx+1);
@@ -586,6 +587,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           {
           case INVALID_ELEM:
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
           case QUAD9:
             {
@@ -613,6 +615,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           {
           case INVALID_ELEM:
           case QUAD4:
+          case QUADSHELL4:
           case TRI3:
             {
               mesh.reserve_nodes( (nx+1)*(ny+1) );
@@ -647,6 +650,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           {
           case INVALID_ELEM:
           case QUAD4:
+          case QUADSHELL4:
           case TRI3:
             {
               for (unsigned int j=0; j<=ny; j++)
@@ -731,11 +735,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
           case INVALID_ELEM:
           case QUAD4:
+          case QUADSHELL4:
             {
               for (unsigned int j=0; j<ny; j++)
                 for (unsigned int i=0; i<nx; i++)
                   {
-                    Elem * elem = mesh.add_elem(Elem::build_with_id(QUAD4, elem_id++));
+                    Elem * elem = mesh.add_elem(Elem::build_with_id(type == INVALID_ELEM ? QUAD4 : type, elem_id++));
                     elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
                     elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+1,j)  );
                     elem->set_node(2) = mesh.node_ptr(idx(type,nx,i+1,j+1));
