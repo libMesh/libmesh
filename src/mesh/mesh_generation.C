@@ -89,6 +89,7 @@ unsigned int idx(const ElemType type,
       }
 
     case QUAD8:
+    case QUADSHELL8:
     case QUAD9:
     case TRI6:
     case TRI7:
@@ -589,6 +590,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             {
               mesh.reserve_elem (nx*ny);
@@ -623,6 +625,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             }
 
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
           case TRI6:
             {
@@ -675,6 +678,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             }
 
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
           case TRI6:
           case TRI7:
@@ -797,6 +801,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             {
               for (unsigned int j=0; j<(2*ny); j += 2)
