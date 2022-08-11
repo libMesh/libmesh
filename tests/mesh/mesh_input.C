@@ -746,6 +746,17 @@ public:
         (2*nx+1)*(2*ny+1)*(2*nz+1) // real nodes in the HEX27 mesh,
         + ((nx*ny*(nz+1) + nx*(ny+1)*nz + (nx+1)*ny*nz))*9; // fake side nodes
       CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), n_expected_nodes);
+
+      EquationSystems es(mesh);
+      System & sys = es.add_system<System> ("SimpleSystem");
+      // Read back into a LAGRANGE variable for testing; we still
+      // can't use Exodus for a proper restart.
+      sys.add_variable("ul", SECOND);
+      es.init();
+
+#ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      exii.copy_nodal_solution(sys, "ul", "u");
+#endif
     } // end second scope
   } // end testExodusWriteAddedSides
 
