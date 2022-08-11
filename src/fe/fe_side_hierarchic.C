@@ -40,9 +40,13 @@ void side_hierarchic_nodal_soln(const Elem * elem,
 {
   const unsigned int n_nodes = elem->n_nodes();
 
-  nodal_soln.resize(n_nodes);
+  std::fill(nodal_soln.begin(), nodal_soln.end(), 0);
+  nodal_soln.resize(n_nodes, 0);
 
-  libmesh_warning("Nodal solution requested for a side element; this makes no sense.");
+  // We request nodal solutions when plotting, for consistency with
+  // other elements; plotting 0 on non-sides makes sense in that
+  // context.
+  // libmesh_warning("Nodal solution requested for a side element; this makes no sense.");
 } // side_hierarchic_nodal_soln()
 
 
