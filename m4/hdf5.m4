@@ -19,11 +19,16 @@ AC_DEFUN([CONFIGURE_HDF5],
   dnl libmesh is accidentally built without HDF5 support (which may
   dnl take a very long time), and then the read fails at runtime,
   dnl requiring you to redo everything.
+  dnl
+  dnl --enable-hdf5-required now implies --enable-hdf5, previously one had to pass both
+  dnl of those flags in order to both enable HDF5 and make it required, now the latter
+  dnl is no longer required if you provide the former.
   AC_ARG_ENABLE(hdf5-required,
                 AS_HELP_STRING([--enable-hdf5-required],
                                [Error if HDF5 is not detected by configure]),
                 [AS_CASE("${enableval}",
-                         [yes], [hdf5required=yes],
+                         [yes], [hdf5required=yes
+                                 enablehdf5=yes],
                          [no],  [hdf5required=no],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-hdf5-required)])],
                 [hdf5required=no])
