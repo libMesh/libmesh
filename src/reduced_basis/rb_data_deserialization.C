@@ -745,8 +745,10 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
-  // Interpolation points side indices, relevant if the parametrized function is defined on mesh sides
-  if (rb_eim_evaluation.get_parametrized_function().on_mesh_sides())
+  // Interpolation points side indices, relevant if the parametrized function is defined
+  // on mesh sides or nodesets
+  if (rb_eim_evaluation.get_parametrized_function().on_mesh_sides() ||
+      rb_eim_evaluation.get_parametrized_function().on_mesh_nodes())
   {
     auto interpolation_points_boundary_id_list =
       rb_eim_evaluation_reader.getInterpolationBoundaryId();
