@@ -45,6 +45,54 @@ Number sin_x_plus_cos_y (const Point& p,
   return sin(x) + cos(y);
 }
 
+constexpr unsigned int denominator_for_side_elems = 12;
+
+Number designed_for_side_elems (const Point & p,
+                                const Parameters & param,
+                                const std::string &,
+                                const std::string &)
+{
+  const Real & x = p(0);
+  const Real & y = p(1);
+  const Real & z = p(2);
+
+  short facedim = param.have_parameter<short>("face") ?
+    param.get<short>("face") : -1;
+
+  // What face are we on?
+  auto is_on_face = [facedim](Real r, short rdim) {
+    if (facedim == rdim)
+      return true;
+    if (facedim >= 0)
+      return false;
+    const Real numerator = r * denominator_for_side_elems;
+    return (std::abs(numerator - std::round(numerator)) <
+            TOLERANCE*TOLERANCE);
+  };
+
+
+
+  // x/y/z components of a div-free flux,
+  // curl([x^2yz, xy^2z, xyz])
+  if (is_on_face(x, 0))
+    {
+      libmesh_assert(!is_on_face(y, 1));
+      libmesh_assert(!is_on_face(z, 2));
+//      return (x*z-x*y*y);
+return 3000+100*x+10*y+z;
+    }
+  if (is_on_face(y, 1))
+    {
+      libmesh_assert(!is_on_face(z, 2));
+//      return (x*x*y-y*z);
+return 2000+100*x+10*y+z;
+    }
+
+  libmesh_assert(is_on_face(z, 2));
+//  return (y*y*z-x*x*z);
+return 1000+100*x+10*y+z;
+}
+
 
 class MeshInputTest : public CppUnit::TestCase {
 public:
@@ -68,7 +116,8 @@ public:
   CPPUNIT_TEST( testExodusWriteElementDataFromDiscontinuousNodalData );
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
 
-  CPPUNIT_TEST( testExodusWriteAddedSides );
+  CPPUNIT_TEST( testExodusWriteAddedSidesC0 );
+  CPPUNIT_TEST( testExodusWriteAddedSidesDisc );
 
   CPPUNIT_TEST( testExodusFileMappingsPlateWithHole);
   CPPUNIT_TEST( testExodusFileMappingsTwoBlocks);
@@ -690,9 +739,27 @@ public:
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
 
 
-  void testExodusWriteAddedSides()
+  void testExodusWriteAddedSides
+    (Number (*exact_sol)(const Point &, const Parameters &, const
+                           std::string &, const std::string &))
   {
-    const unsigned int nx=2, ny=2, nz=2;
+    constexpr unsigned int nx=1, ny=1, nz=1;
+    // We need these to be compatible with the designed_for_side_elems
+    // tests for facing
+    static_assert(!(denominator_for_side_elems%nx));
+    static_assert(!(denominator_for_side_elems%ny));
+    static_assert(!(denominator_for_side_elems%nz));
+
+    const ElemType elem_type = HEX27;
+
+    const unsigned int dim = Elem::build(elem_type)->dim();
+
+    // Figure out how many fake and true elements to expect
+    dof_id_type n_fake_elem = 0;
+    dof_id_type n_true_elem = 0;
+
+    dof_id_type n_fake_nodes = 0;
+    dof_id_type n_true_nodes = 0;
 
     // first scope: write file
     {
@@ -704,20 +771,34 @@ public:
 
       // We need HEX27 to get a side node!
       MeshTools::Generation::build_cube
-        (mesh, nx, ny, nz, 0., 1., 0., 1., 0., 1., HEX27);
+        (mesh, nx, ny, nz, 0., 1., 0., 1., 0., 1., elem_type);
+
+      n_true_elem = mesh.n_elem();
+      n_true_nodes = mesh.n_nodes();
+      CPPUNIT_ASSERT_LESS(n_true_nodes, n_true_elem); // Ne < Nn
+
+      dof_id_type min_n_elem = nx * (dim>1?ny:1) * (dim>2?nz:1);
+      CPPUNIT_ASSERT_LESSEQUAL(n_true_elem, min_n_elem); // "backwards" API...
+
+      for (const auto & elem : mesh.active_local_element_ptr_range())
+        {
+          for (auto s : make_range(elem->n_sides()))
+          if (!elem->neighbor_ptr(s) || elem->neighbor_ptr(s)->id() < elem->id())
+            {
+              ++n_fake_elem;
+              auto side = elem->build_side_ptr(s);
+              n_fake_nodes += side->n_nodes();
+            }
+        }
+      mesh.comm().sum(n_fake_elem);
+      mesh.comm().sum(n_fake_nodes);
+      CPPUNIT_ASSERT_LESS(n_fake_elem, n_true_elem*dim); // "backwards" API...
 
       es.init();
+      sys.project_solution(exact_sol, nullptr,
+                           es.parameters);
 
       // Set solution u^e_i = i, for the ith vertex of a given element e.
-      const DofMap & dof_map = sys.get_dof_map();
-      std::vector<dof_id_type> dof_indices;
-      for (const auto & elem : mesh.element_ptr_range())
-        {
-          dof_map.dof_indices(elem, dof_indices, /*var_id=*/0);
-          for (unsigned int i=0; i<dof_indices.size(); ++i)
-            sys.solution->set(dof_indices[i], i);
-        }
-      sys.solution->close();
 
       // Now write to file.
       ExodusII_IO exii(mesh);
@@ -729,6 +810,7 @@ public:
     // second scope: read file, verify extra elements exist
     {
       Mesh mesh(*TestCommWorld);
+      mesh.allow_renumbering(false);
 
       ExodusII_IO exii(mesh);
 
@@ -737,15 +819,8 @@ public:
       MeshCommunication().broadcast(mesh);
       mesh.prepare_for_use();
 
-      const dof_id_type n_expected_elems =
-        nx*ny*nz // real HEX27 elems in the mesh,
-        + (nx*ny*(nz+1) + nx*(ny+1)*nz + (nx+1)*ny*nz); // fake side QUAD9 elems
-      CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_expected_elems);
-
-      const dof_id_type n_expected_nodes =
-        (2*nx+1)*(2*ny+1)*(2*nz+1) // real nodes in the HEX27 mesh,
-        + ((nx*ny*(nz+1) + nx*(ny+1)*nz + (nx+1)*ny*nz))*9; // fake side nodes
-      CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), n_expected_nodes);
+      CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_true_elem + n_fake_elem);
+      CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), n_true_nodes + n_fake_nodes);
 
       EquationSystems es(mesh);
       System & sys = es.add_system<System> ("SimpleSystem");
@@ -754,11 +829,75 @@ public:
       sys.add_variable("ul", SECOND);
       es.init();
 
-#ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      const DofMap & dof_map = sys.get_dof_map();
+
       exii.copy_nodal_solution(sys, "ul", "u");
-#endif
+
+      dof_id_type n_side_nodes = 0;
+      const std::string nullstr;
+      const std::string facestr = "face";
+
+      for (const auto & elem : mesh.active_local_element_ptr_range())
+        {
+          if (elem->dim() > 2)
+            continue;
+          std::vector<dof_id_type> dof_indices;
+          dof_map.dof_indices(elem, dof_indices, 0);
+
+          // Find what face direction we're looking at, even though
+          // we're evaluating on nodes that overlap multiple faces
+          const Point normal = (elem->point(1) - elem->point(0)).cross
+                               (elem->point(2) - elem->point(0));
+          short faceval = -1;
+          if (std::abs(normal(0)) > TOLERANCE)
+            {
+              faceval = 0;
+              libmesh_assert_less(std::abs(normal(1)), TOLERANCE);
+              libmesh_assert_less(std::abs(normal(2)), TOLERANCE);
+            }
+          else if (std::abs(normal(1)) > TOLERANCE)
+            {
+              faceval = 1;
+              libmesh_assert_less(std::abs(normal(2)), TOLERANCE);
+            }
+          else
+            {
+              faceval = 2;
+              libmesh_assert_greater(std::abs(normal(2)), TOLERANCE);
+            }
+          libmesh_assert_greater_equal(faceval, 0);
+          es.parameters.set<short>(facestr) = faceval;
+
+          for (auto i : index_range(dof_indices))
+            {
+              const Point node_pt = elem->point(i);
+              const Real nodal_coef =
+                libmesh_real((*sys.current_local_solution)(dof_indices[i]));
+              const Number exact_val =
+                libmesh_real(exact_sol
+                             (node_pt, es.parameters, nullstr,
+                              nullstr));
+              LIBMESH_ASSERT_FP_EQUAL
+                (nodal_coef, exact_val,
+                 std::max(Real(2),nodal_coef+exact_val)*
+                 TOLERANCE*std::sqrt(TOLERANCE));
+              ++n_side_nodes;
+            }
+        }
+      TestCommWorld->sum(n_side_nodes);
+      CPPUNIT_ASSERT_EQUAL(n_side_nodes, n_fake_nodes);
     } // end second scope
   } // end testExodusWriteAddedSides
+
+  void testExodusWriteAddedSidesC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y);
+  }
+
+  void testExodusWriteAddedSidesDisc()
+  {
+    testExodusWriteAddedSides(designed_for_side_elems);
+  }
 
 #endif // LIBMESH_HAVE_EXODUS_API
 
