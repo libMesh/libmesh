@@ -82,7 +82,7 @@ void side_hierarchic_side_nodal_soln
       nodal_soln_on_side[i] = 0;
       for (auto j : make_range(n_sf))
         nodal_soln_on_side[i] += elem_soln[j] *
-          FEInterface::shape(FEType(o, SIDE_HIERARCHIC), elem, j, master_p);
+          FEInterface::shape(fe_type, elem, j, master_p);
     }
 }
 
