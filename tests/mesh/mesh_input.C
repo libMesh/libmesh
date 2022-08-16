@@ -116,8 +116,16 @@ public:
   CPPUNIT_TEST( testExodusWriteElementDataFromDiscontinuousNodalData );
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
 
-  CPPUNIT_TEST( testExodusWriteAddedSidesC0 );
-  CPPUNIT_TEST( testExodusWriteAddedSidesDisc );
+  CPPUNIT_TEST( testExodusWriteAddedSidesEdgeC0 );
+  // CPPUNIT_TEST( testExodusWriteAddedSidesEdgeDisc ); // need is_on_face fixes
+  CPPUNIT_TEST( testExodusWriteAddedSidesTriC0 );
+  // CPPUNIT_TEST( testExodusWriteAddedSidesTriDisc ); // Need aligned faces
+  CPPUNIT_TEST( testExodusWriteAddedSidesQuadC0 );
+  // CPPUNIT_TEST( testExodusWriteAddedSidesQuadDisc ); // need is_on_face fixes
+  // CPPUNIT_TEST( testExodusWriteAddedSidesTetC0 ); // BROKEN!?!  WHY!?!
+  // CPPUNIT_TEST( testExodusWriteAddedSidesTetDisc );
+  CPPUNIT_TEST( testExodusWriteAddedSidesHexC0 );
+  CPPUNIT_TEST( testExodusWriteAddedSidesHexDisc );
 
   CPPUNIT_TEST( testExodusFileMappingsPlateWithHole);
   CPPUNIT_TEST( testExodusFileMappingsTwoBlocks);
@@ -741,7 +749,8 @@ public:
 
   void testExodusWriteAddedSides
     (Number (*exact_sol)(const Point &, const Parameters &, const
-                           std::string &, const std::string &))
+                         std::string &, const std::string &),
+     const ElemType elem_type)
   {
     constexpr unsigned int nx=1, ny=1, nz=1;
     // We need these to be compatible with the designed_for_side_elems
@@ -750,9 +759,8 @@ public:
     static_assert(!(denominator_for_side_elems%ny));
     static_assert(!(denominator_for_side_elems%nz));
 
-    const ElemType elem_type = HEX27;
-
     const unsigned int dim = Elem::build(elem_type)->dim();
+    const bool is_tensor = (Elem::build(elem_type)->n_sides() == dim * 2);
 
     // Figure out how many fake and true elements to expect
     dof_id_type n_fake_elem = 0;
@@ -769,15 +777,24 @@ public:
       System & sys = es.add_system<System> ("SimpleSystem");
       sys.add_variable("u", FIRST, SIDE_HIERARCHIC);
 
-      // We need HEX27 to get a side node!
-      MeshTools::Generation::build_cube
-        (mesh, nx, ny, nz, 0., 1., 0., 1., 0., 1., elem_type);
+      if (dim == 3)
+        MeshTools::Generation::build_cube
+          (mesh, nx, ny, nz, 0., 1., 0., 1., 0., 1., elem_type);
+      else if (dim == 2)
+        MeshTools::Generation::build_square
+          (mesh, nx, ny, 0., 1., 0., 1., elem_type);
+      else
+        MeshTools::Generation::build_line
+          (mesh, nx, 0., 1., elem_type);
 
       n_true_elem = mesh.n_elem();
       n_true_nodes = mesh.n_nodes();
       CPPUNIT_ASSERT_LESS(n_true_nodes, n_true_elem); // Ne < Nn
 
-      dof_id_type min_n_elem = nx * (dim>1?ny:1) * (dim>2?nz:1);
+      const unsigned int our_ny = dim>1 ? ny : 1;
+      const unsigned int our_nz = dim>2 ? nz : 1;
+
+      dof_id_type min_n_elem = nx * our_ny * our_nz;
       CPPUNIT_ASSERT_LESSEQUAL(n_true_elem, min_n_elem); // "backwards" API...
 
       for (const auto & elem : mesh.active_local_element_ptr_range())
@@ -839,34 +856,51 @@ public:
 
       for (const auto & elem : mesh.active_local_element_ptr_range())
         {
-          if (elem->dim() > 2)
+          // Just look at side elements, not interiors
+          if (elem->dim() == dim)
             continue;
+
           std::vector<dof_id_type> dof_indices;
           dof_map.dof_indices(elem, dof_indices, 0);
 
-          // Find what face direction we're looking at, even though
-          // we're evaluating on nodes that overlap multiple faces
-          const Point normal = (elem->point(1) - elem->point(0)).cross
-                               (elem->point(2) - elem->point(0));
+          // Find what face direction we're looking at, to
+          // disambiguate when testing against a discontinuous
+          // function, since we're evaluating on nodes that overlap
+          // multiple faces
+          const Point normal = [elem](){
+            if (elem->dim() == 2)
+              return Point((elem->point(1) - elem->point(0)).cross
+                           (elem->point(2) - elem->point(0)));
+            else if (elem->dim() == 1)
+              return Point
+                (elem->point(1)(1)-elem->point(0)(1),
+                 elem->point(0)(0)-elem->point(1)(0));
+            else
+              return Point(1);
+          } (); // Invoke anonymous lambda
+
           short faceval = -1;
-          if (std::abs(normal(0)) > TOLERANCE)
+          if (is_tensor)
             {
-              faceval = 0;
-              libmesh_assert_less(std::abs(normal(1)), TOLERANCE);
-              libmesh_assert_less(std::abs(normal(2)), TOLERANCE);
+              if (std::abs(normal(0)) > TOLERANCE)
+                {
+                  faceval = 0;
+                  libmesh_assert_less(std::abs(normal(1)), TOLERANCE);
+                  libmesh_assert_less(std::abs(normal(2)), TOLERANCE);
+                }
+              else if (std::abs(normal(1)) > TOLERANCE)
+                {
+                  faceval = 1;
+                  libmesh_assert_less(std::abs(normal(2)), TOLERANCE);
+                }
+              else
+                {
+                  faceval = 2;
+                  libmesh_assert_greater(std::abs(normal(2)), TOLERANCE);
+                }
+              libmesh_assert_greater_equal(faceval, 0);
+              es.parameters.set<short>(facestr) = faceval;
             }
-          else if (std::abs(normal(1)) > TOLERANCE)
-            {
-              faceval = 1;
-              libmesh_assert_less(std::abs(normal(2)), TOLERANCE);
-            }
-          else
-            {
-              faceval = 2;
-              libmesh_assert_greater(std::abs(normal(2)), TOLERANCE);
-            }
-          libmesh_assert_greater_equal(faceval, 0);
-          es.parameters.set<short>(facestr) = faceval;
 
           for (auto i : index_range(dof_indices))
             {
@@ -889,14 +923,54 @@ public:
     } // end second scope
   } // end testExodusWriteAddedSides
 
-  void testExodusWriteAddedSidesC0()
+  void testExodusWriteAddedSidesEdgeC0()
   {
-    testExodusWriteAddedSides(six_x_plus_sixty_y);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3);
   }
 
-  void testExodusWriteAddedSidesDisc()
+  void testExodusWriteAddedSidesEdgeDisc()
   {
-    testExodusWriteAddedSides(designed_for_side_elems);
+    testExodusWriteAddedSides(designed_for_side_elems, EDGE3);
+  }
+
+  void testExodusWriteAddedSidesTriC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6);
+  }
+
+  void testExodusWriteAddedSidesTriDisc()
+  {
+    testExodusWriteAddedSides(designed_for_side_elems, TRI6);
+  }
+
+  void testExodusWriteAddedSidesQuadC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9);
+  }
+
+  void testExodusWriteAddedSidesQuadDisc()
+  {
+    testExodusWriteAddedSides(designed_for_side_elems, QUAD9);
+  }
+
+  void testExodusWriteAddedSidesTetC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TET14);
+  }
+
+  void testExodusWriteAddedSidesTetDisc()
+  {
+    testExodusWriteAddedSides(designed_for_side_elems, TET14);
+  }
+
+  void testExodusWriteAddedSidesHexC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27);
+  }
+
+  void testExodusWriteAddedSidesHexDisc()
+  {
+    testExodusWriteAddedSides(designed_for_side_elems, HEX27);
   }
 
 #endif // LIBMESH_HAVE_EXODUS_API
