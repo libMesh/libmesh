@@ -700,6 +700,9 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
 
   std::size_t n_written=0;
 
+  // Note: do not be tempted to replace the node loops below with
+  // range-based iterators, these iterators must be defined outside
+  // the blk loop since node_iter is updated at each iteration.
   MeshBase::const_node_iterator       node_iter = mesh.local_nodes_begin();
   const MeshBase::const_node_iterator nodes_end = mesh.local_nodes_end();
 
