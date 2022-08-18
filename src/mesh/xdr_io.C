@@ -700,6 +700,9 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
 
   std::size_t n_written=0;
 
+  MeshBase::const_node_iterator       node_iter = mesh.local_nodes_begin();
+  const MeshBase::const_node_iterator nodes_end = mesh.local_nodes_end();
+
   for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
     {
       const std::size_t first_node = blk*io_blksize;
@@ -711,19 +714,20 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
       xfer_ids.clear();
       xfer_coords.clear();
 
-      for (const auto & node : mesh.local_node_ptr_range())
+      for (; node_iter != nodes_end; ++node_iter)
         {
-          libmesh_assert_greater_equal(node->id(), first_node);
-          if (node->id() >= last_node)
+          const Node & node = **node_iter;
+          libmesh_assert_greater_equal(node.id(), first_node);
+          if (node.id() >= last_node)
             break;
 
-          xfer_ids.push_back(node->id());
-          xfer_coords.push_back((*node)(0));
+          xfer_ids.push_back(node.id());
+          xfer_coords.push_back(node(0));
 #if LIBMESH_DIM > 1
-          xfer_coords.push_back((*node)(1));
+          xfer_coords.push_back(node(1));
 #endif
 #if LIBMESH_DIM > 2
-          xfer_coords.push_back((*node)(2));
+          xfer_coords.push_back(node(2));
 #endif
         }
 
@@ -860,6 +864,9 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
   // Reset write counter
   n_written = 0;
 
+  // Return node iterator to the beginning
+  node_iter = mesh.local_nodes_begin();
+
   for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
     {
       const std::size_t first_node = blk*io_blksize;
@@ -873,14 +880,15 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
       xfer_unique_ids.clear();
       xfer_unique_ids.reserve(tot_id_size);
 
-      for (const auto & node : mesh.local_node_ptr_range())
+      for (; node_iter != nodes_end; ++node_iter)
         {
-          libmesh_assert_greater_equal(node->id(), first_node);
-          if (node->id() >= last_node)
+          const Node & node = **node_iter;
+          libmesh_assert_greater_equal(node.id(), first_node);
+          if (node.id() >= last_node)
             break;
 
-          xfer_ids.push_back(node->id());
-          xfer_unique_ids.push_back(node->unique_id());
+          xfer_ids.push_back(node.id());
+          xfer_unique_ids.push_back(node.unique_id());
         }
 
       //-------------------------------------
@@ -984,6 +992,9 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
       // Reset write counter
       n_written = 0;
 
+      // Return node iterator to the beginning
+      node_iter = mesh.local_nodes_begin();
+
       // Data structures for writing "extra" node integers
       std::vector<dof_id_type> xfer_node_integers;
       std::vector<dof_id_type> & node_integers = xfer_node_integers;
@@ -1002,17 +1013,18 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
           xfer_node_integers.clear();
           xfer_node_integers.reserve(tot_id_size * n_node_integers);
 
-          for (const auto & node : mesh.local_node_ptr_range())
+          for (; node_iter != nodes_end; ++node_iter)
             {
-              libmesh_assert_greater_equal(node->id(), first_node);
-              if (node->id() >= last_node)
+              const Node & node = **node_iter;
+              libmesh_assert_greater_equal(node.id(), first_node);
+              if (node.id() >= last_node)
                 break;
 
-              xfer_ids.push_back(node->id());
+              xfer_ids.push_back(node.id());
 
               // Append current node's node integers to xfer buffer
               for (unsigned int i=0; i != n_node_integers; ++i)
-                xfer_node_integers.push_back(node->get_extra_integer(i));
+                xfer_node_integers.push_back(node.get_extra_integer(i));
             }
 
           //-------------------------------------
