@@ -809,7 +809,27 @@ public:
         }
       mesh.comm().sum(n_fake_elem);
       mesh.comm().sum(n_fake_nodes);
-      CPPUNIT_ASSERT_LESS(n_fake_elem, n_true_elem*dim); // "backwards" API...
+
+      const dof_id_type expected_fakes = [elem_type]() {
+        switch (elem_type)
+        {
+          case EDGE3:
+            return nx+1;
+          case TRI6:
+            return 3*nx*ny + nx + ny;
+          case QUAD8:
+          case QUAD9:
+            return 2*nx*ny + nx + ny;
+          case TET14:
+            return 48*nx*ny*nz + 4*(nx*ny+nx*nz+ny*nz);
+          case HEX27:
+            return 3*nx*ny*nz + nx*ny + nx*nz + ny*nz;
+          default:
+            libmesh_error();
+        }
+      } (); // Invoke anonymous lambda
+
+      CPPUNIT_ASSERT_EQUAL(n_fake_elem, expected_fakes); // "backwards" API...
 
       es.init();
       sys.project_solution(exact_sol, nullptr,
