@@ -854,6 +854,12 @@ public:
       const std::string nullstr;
       const std::string facestr = "face";
 
+      // Debugging this in parallel is tricky.  Let's make sure that
+      // if we have a failure on one rank we see it on all the others
+      // and we can go on to other tests.
+      bool threw_exception = false;
+      try
+      {
       for (const auto & elem : mesh.active_local_element_ptr_range())
         {
           // Just look at side elements, not interiors
@@ -918,6 +924,17 @@ public:
               ++n_side_nodes;
             }
         }
+      }
+      catch (...)
+      {
+        threw_exception = true;
+        TestCommWorld->max(threw_exception);
+        throw;
+      }
+      if (!threw_exception)
+        TestCommWorld->max(threw_exception);
+      CPPUNIT_ASSERT(!threw_exception);
+
       TestCommWorld->sum(n_side_nodes);
       CPPUNIT_ASSERT_EQUAL(n_side_nodes, n_fake_nodes);
     } // end second scope
