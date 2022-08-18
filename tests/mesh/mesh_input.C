@@ -752,7 +752,7 @@ public:
                          std::string &, const std::string &),
      const ElemType elem_type)
   {
-    constexpr unsigned int nx=1, ny=1, nz=1;
+    constexpr unsigned int nx=2, ny=2, nz=2;
     // We need these to be compatible with the designed_for_side_elems
     // tests for facing
     static_assert(!(denominator_for_side_elems%nx));
