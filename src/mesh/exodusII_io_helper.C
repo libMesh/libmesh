@@ -65,8 +65,8 @@ const std::vector<int> trishell3_inverse_edge_map = {3, 4, 5};
 const std::vector<int> quadshell4_inverse_edge_map = {3, 4, 5, 6};
 
 // 3D node map definitions
-// The hex27 appears to be the only element without an identity mapping between its
-// node numbering and libmesh's.
+// The hex27 and tet14 appear to be the only elements without an
+// identity mapping between Exodus' node numbering and libmesh's.
 const std::vector<int> hex27_node_map = {
   // Vertex and mid-edge nodes
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -80,6 +80,21 @@ const std::vector<int> hex27_inverse_node_map = {
   // Mid-face nodes and center node
   26, 20, 25, 24, 22, 21, 23};
 //20  21  22  23  24  25  26
+
+const std::vector<int> tet14_node_map = {
+  // Vertex and mid-edge nodes
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+  // Mid-face nodes
+  10, 13, 11, 12};
+//10  11  12  13 // LibMesh indices
+
+const std::vector<int> tet14_inverse_node_map = {
+  // Vertex and mid-edge nodes
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+  // Mid-face nodes
+  10, 12, 13, 11};
+//10  11  12  13
+
 
 // 3D face map definitions
 const std::vector<int> tet_face_map = {1, 2, 3, 0};
@@ -355,6 +370,13 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.exodus_type = "TRI6";
   }
   {
+    auto & conv = conversion_map[TRI7];
+    conv.libmesh_type = TRI7;
+    conv.dim = 2;
+    conv.n_nodes = 7;
+    conv.exodus_type = "TRI7";
+  }
+  {
     auto & conv = conversion_map[HEX8];
     conv.side_map = &hex_face_map;
     conv.inverse_side_map = &hex_inverse_face_map;
@@ -400,6 +422,17 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.dim = 3;
     conv.n_nodes = 10;
     conv.exodus_type = "TETRA10";
+  }
+  {
+    auto & conv = conversion_map[TET14];
+    conv.node_map = &tet14_node_map;
+    conv.inverse_node_map = &tet14_inverse_node_map;
+    conv.side_map = &tet_face_map;
+    conv.inverse_side_map = &tet_inverse_face_map;
+    conv.libmesh_type = TET14;
+    conv.dim = 3;
+    conv.n_nodes = 14;
+    conv.exodus_type = "TETRA14";
   }
   {
     auto & conv = conversion_map[PRISM6];
@@ -515,6 +548,9 @@ void ExodusII_IO_Helper::init_element_equivalence_map()
   // This only supports p==2 IGA:
   element_equivalence_map["BEX_TRIANGLE"] = TRI6;
 
+  // TRI7 equivalences
+  element_equivalence_map["TRI7"]      = TRI7;
+
   // HEX8 equivalences
   element_equivalence_map["HEX"]  = HEX8;
   element_equivalence_map["HEX8"] = HEX8;
@@ -535,6 +571,9 @@ void ExodusII_IO_Helper::init_element_equivalence_map()
   element_equivalence_map["TETRA10"] = TET10;
   // This only supports p==2 IGA:
   element_equivalence_map["BEX_TETRA"] = TET10;
+
+  // TET14 (in Exodus 8) equivalence
+  element_equivalence_map["TETRA14"] = TET14;
 
   // PRISM6 equivalences
   element_equivalence_map["WEDGE"] = PRISM6;
