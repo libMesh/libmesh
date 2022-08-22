@@ -1838,51 +1838,48 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
       //
       // Because soln was created from a parallel NumericVector, its
       // numbering was contiguous on each processor; we need to use
-      // the same offsets here.
-      {
-        processor_id_type current_pid = 0;
-        dof_id_type global_idx =
-          exio_helper->added_node_offset_on(current_pid) * num_vars + c;
-        if (exio_helper->get_add_sides())
-          {
-            for (const auto & elem : mesh.active_element_ptr_range())
-              {
-                if (current_pid != elem->processor_id())
-                  {
-                    libmesh_assert_less(current_pid,
-                                        elem->processor_id());
-                    current_pid = elem->processor_id();
-                    global_idx =
-                      exio_helper->added_node_offset_on(current_pid)
-                      * num_vars + c;
-                  }
+      // the same offsets here, and we need to loop through elements
+      // from earlier ranks first.
+      if (exio_helper->get_add_sides())
+        {
+          std::vector<std::vector<const Elem *>>
+            elems_by_pid(mesh.n_processors());
 
-                for (auto s : elem->side_index_range())
-                  {
-                    if (exio_helper->redundant_added_side(*elem,s))
-                      continue;
+          for (const auto & elem : mesh.active_element_ptr_range())
+            elems_by_pid[elem->processor_id()].push_back(elem);
 
-                    const std::vector<unsigned int> side_nodes =
-                      elem->nodes_on_side(s);
+          for (auto p : index_range(elems_by_pid))
+            {
+              dof_id_type global_idx =
+                exio_helper->added_node_offset_on(p) * num_vars + c;
+              for (const Elem * elem : elems_by_pid[p])
+                {
+                  for (auto s : elem->side_index_range())
+                    {
+                      if (exio_helper->redundant_added_side(*elem,s))
+                        continue;
 
-                    for (auto n : index_range(side_nodes))
-                      {
-                        libmesh_ignore(n);
-                        libmesh_assert_less(global_idx, soln.size());
+                      const std::vector<unsigned int> side_nodes =
+                        elem->nodes_on_side(s);
+
+                      for (auto n : index_range(side_nodes))
+                        {
+                          libmesh_ignore(n);
+                          libmesh_assert_less(global_idx, soln.size());
 #ifdef LIBMESH_USE_REAL_NUMBERS
-                        cur_soln.push_back(soln[global_idx]);
+                          cur_soln.push_back(soln[global_idx]);
 #else
-                        real_parts.push_back(soln[global_idx].real());
-                        imag_parts.push_back(soln[global_idx].imag());
-                        if (_write_complex_abs)
-                          magnitudes.push_back(std::abs(soln[global_idx]));
+                          real_parts.push_back(soln[global_idx].real());
+                          imag_parts.push_back(soln[global_idx].imag());
+                          if (_write_complex_abs)
+                            magnitudes.push_back(std::abs(soln[global_idx]));
 #endif
-                        global_idx += num_vars;
-                      }
-                  }
-              }
-          }
-      }
+                          global_idx += num_vars;
+                        }
+                    }
+                }
+            }
+        }
 
       // Finally, actually call the Exodus API to write to file.
 #ifdef LIBMESH_USE_REAL_NUMBERS
