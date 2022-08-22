@@ -100,34 +100,14 @@ private:
 
 /**
  * Helper function that returns an IntRange<std::size_t> representing
- * all the indices of the passed-in vector.
+ * all the indices of the passed-in vector-like object (i.e. any type that
+ * has a size() member).
  */
 template <typename T>
-IntRange<std::size_t> index_range(const std::vector<T> & vec)
+auto index_range(const T & sizable)
 {
-  return IntRange<std::size_t>(0, vec.size());
+  return IntRange<decltype(sizable.size())>(0, sizable.size());
 }
-
-
-/**
- * Same thing but for DenseVector
- */
-template <typename T>
-IntRange<unsigned int> index_range(const DenseVector<T> & vec)
-{
-  return {0, vec.size()};
-}
-
-
-/**
- * Same thing but for DenseSubVector
- */
-template <typename T>
-IntRange<unsigned int> index_range(const DenseSubVector<T> & vec)
-{
-  return {0, vec.size()};
-}
-
 
 
 /**
