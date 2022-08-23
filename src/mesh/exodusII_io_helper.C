@@ -2414,18 +2414,28 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
 
   if (_add_sides)
     {
+      // To match the numbering of parallel-generated nodal solutions
+      // on fake side nodes, we need to loop through elements from
+      // earlier ranks first.
+      std::vector<std::vector<const Elem *>>
+        elems_by_pid(mesh.n_processors());
+
       for (const auto & elem : mesh.active_element_ptr_range())
-        for (auto s : elem->side_index_range())
-          {
-            if (redundant_added_side(*elem,s))
-              continue;
+        elems_by_pid[elem->processor_id()].push_back(elem);
 
-            const std::vector<unsigned int> side_nodes =
-              elem->nodes_on_side(s);
+      for (auto p : index_range(elems_by_pid))
+        for (const Elem * elem : elems_by_pid[p])
+          for (auto s : elem->side_index_range())
+            {
+              if (redundant_added_side(*elem,s))
+                continue;
 
-            for (auto n : side_nodes)
-              push_node(elem->point(n));
-          }
+              const std::vector<unsigned int> side_nodes =
+                elem->nodes_on_side(s);
+
+              for (auto n : side_nodes)
+                push_node(elem->point(n));
+            }
 
       // Node num maps just don't make sense if we're adding a bunch
       // of visualization nodes that are independent copies of the
