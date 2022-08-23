@@ -31,6 +31,7 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/int_range.h"
 #include "libmesh/utility.h"
+#include "libmesh/libmesh_logging.h"
 
 #ifdef DEBUG
 #include "libmesh/mesh_tools.h"  // for elem_types warning
@@ -792,6 +793,8 @@ void ExodusII_IO_Helper::print_header()
 
 void ExodusII_IO_Helper::read_nodes()
 {
+  LOG_SCOPE("read_nodes()", "ExodusII_IO_Helper");
+
   x.resize(num_nodes);
   y.resize(num_nodes);
   z.resize(num_nodes);
@@ -1089,6 +1092,8 @@ std::string ExodusII_IO_Helper::get_node_set_name(int index)
 
 void ExodusII_IO_Helper::read_elem_in_block(int block)
 {
+  LOG_SCOPE("read_elem_in_block()", "ExodusII_IO_Helper");
+
   libmesh_assert_less (block, block_ids.size());
 
   // Unlike the other "extended" APIs, this one does not use a parameter struct.
@@ -1245,6 +1250,8 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
 
 void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
 {
+  LOG_SCOPE("read_edge_blocks()", "ExodusII_IO_Helper");
+
   // Check for quick return if there are no edge blocks.
   if (num_edge_blk == 0)
     return;
@@ -1522,6 +1529,8 @@ void ExodusII_IO_Helper::read_elemset_info()
 
 void ExodusII_IO_Helper::read_sideset(int id, int offset)
 {
+  LOG_SCOPE("read_sideset()", "ExodusII_IO_Helper");
+
   libmesh_assert_less (id, ss_ids.size());
   libmesh_assert_less (id, num_sides_per_set.size());
   libmesh_assert_less (id, num_df_per_set.size());
@@ -1567,6 +1576,8 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
 
 void ExodusII_IO_Helper::read_elemset(int id, int offset)
 {
+  LOG_SCOPE("read_elemset()", "ExodusII_IO_Helper");
+
   libmesh_assert_less (id, elemset_ids.size());
   libmesh_assert_less (id, num_elems_per_set.size());
   libmesh_assert_less (id, num_elem_df_per_set.size());
@@ -1610,6 +1621,8 @@ void ExodusII_IO_Helper::read_elemset(int id, int offset)
 
 void ExodusII_IO_Helper::read_all_nodesets()
 {
+  LOG_SCOPE("read_all_nodesets()", "ExodusII_IO_Helper");
+
   // Figure out how many nodesets there are in the file so we can
   // properly resize storage as necessary.
   num_node_sets =
@@ -1734,6 +1747,8 @@ void ExodusII_IO_Helper::read_num_time_steps()
 
 void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int time_step)
 {
+  LOG_SCOPE("read_nodal_var_values()", "ExodusII_IO_Helper");
+
   // Read the nodal variable names from file, so we can see if we have the one we're looking for
   this->read_var_names(NODAL);
 
@@ -1955,6 +1970,8 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
                                                    int time_step,
                                                    std::map<dof_id_type, Real> & elem_var_value_map)
 {
+  LOG_SCOPE("read_elemental_var_values()", "ExodusII_IO_Helper");
+
   this->read_var_names(ELEMENTAL);
 
   // See if we can find the variable we are looking for
@@ -2345,6 +2362,8 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
 
 void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_discontinuous)
 {
+  LOG_SCOPE("write_elements()", "ExodusII_IO_Helper");
+
   // n_active_elem() is a parallel_only function
   libmesh_parallel_only(mesh.comm());
   unsigned int n_active_elem = mesh.n_active_elem();
@@ -2717,6 +2736,8 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
 void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 {
+  LOG_SCOPE("write_sidesets()", "ExodusII_IO_Helper");
+
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
@@ -2844,6 +2865,8 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
 void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 {
+  LOG_SCOPE("write_nodesets()", "ExodusII_IO_Helper");
+
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
@@ -3130,6 +3153,8 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 void
 ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
 {
+  LOG_SCOPE("write_elemsets()", "ExodusII_IO_Helper");
+
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
@@ -3229,6 +3254,8 @@ write_sideset_data(const MeshBase & mesh,
                    const std::vector<std::set<boundary_id_type>> & side_ids,
                    const std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals)
 {
+  LOG_SCOPE("write_sideset_data()", "ExodusII_IO_Helper");
+
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
@@ -3367,6 +3394,8 @@ read_sideset_data(const MeshBase & mesh,
                   std::vector<std::set<boundary_id_type>> & side_ids,
                   std::vector<std::map<BoundaryInfo::BCTuple, Real>> & bc_vals)
 {
+  LOG_SCOPE("read_sideset_data()", "ExodusII_IO_Helper");
+
   // This reads the sideset variable names into the local
   // sideset_var_names data structure.
   this->read_var_names(SIDESET);
@@ -3516,6 +3545,8 @@ write_nodeset_data (int timestep,
                     const std::vector<std::set<boundary_id_type>> & node_boundary_ids,
                     const std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
 {
+  LOG_SCOPE("write_nodeset_data()", "ExodusII_IO_Helper");
+
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
@@ -3619,6 +3650,8 @@ write_elemset_data (int timestep,
                     const std::vector<std::set<elemset_id_type>> & elemset_ids_in,
                     const std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals)
 {
+  LOG_SCOPE("write_elemset_data()", "ExodusII_IO_Helper");
+
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
@@ -3740,6 +3773,8 @@ read_elemset_data (int timestep,
                    std::vector<std::set<elemset_id_type>> & elemset_ids_in,
                    std::vector<std::map<std::pair<dof_id_type, elemset_id_type>, Real>> & elemset_vals)
 {
+  LOG_SCOPE("read_elemset_data()", "ExodusII_IO_Helper");
+
   // This reads the elemset variable names into the local
   // elemset_var_names data structure.
   this->read_var_names(ELEMSET);
@@ -3890,6 +3925,8 @@ read_nodeset_data (int timestep,
                    std::vector<std::set<boundary_id_type>> & node_boundary_ids,
                    std::vector<std::map<BoundaryInfo::NodeBCTuple, Real>> & bc_vals)
 {
+  LOG_SCOPE("read_nodeset_data()", "ExodusII_IO_Helper");
+
   // This reads the sideset variable names into the local
   // sideset_var_names data structure.
   this->read_var_names(NODESET);
@@ -4032,6 +4069,8 @@ void ExodusII_IO_Helper::write_element_values
  int timestep,
  const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
+  LOG_SCOPE("write_element_values()", "ExodusII_IO_Helper");
+
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
