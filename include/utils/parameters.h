@@ -37,7 +37,8 @@
 namespace libMesh
 {
 /**
- * Helper functions for printing scalar, vector and vector<vector> types.  Called from Parameters::Parameter<T>::print(...).
+ * Helper functions for printing scalar, vector, vector<vector> and vector<vector<vector>>
+ * types.  Called from Parameters::Parameter<T>::print(...).
  */
 template<typename P>
 void print_helper(std::ostream & os, const P * param);
@@ -47,6 +48,9 @@ void print_helper(std::ostream & os, const std::vector<P> * param);
 
 template<typename P>
 void print_helper(std::ostream & os, const std::vector<std::vector<P>> * param);
+
+template<typename P>
+void print_helper(std::ostream & os, const std::vector<std::vector<std::vector<P>>> * param);
 
 template<typename P1, typename P2, typename C, typename A>
 void print_helper(std::ostream & os, const std::map<P1, P2, C, A> * param);
@@ -564,6 +568,16 @@ void print_helper(std::ostream & os, const std::vector<std::vector<P>> * param)
   for (const auto & pv : *param)
     for (const auto & p : pv)
       os << p << " ";
+}
+
+//non-member vector<vector<vector>> print function
+template<typename P>
+void print_helper(std::ostream & os, const std::vector<std::vector<std::vector<P>>> * param)
+{
+  for (const auto & pvv : *param)
+    for (const auto & pv : pvv)
+      for (const auto & p : pv)
+        os << p << " ";
 }
 
 //non-member map print function
