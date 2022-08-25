@@ -176,6 +176,8 @@ ExodusII_IO::~ExodusII_IO ()
 
 void ExodusII_IO::read (const std::string & fname)
 {
+  LOG_SCOPE("read()", "ExodusII_IO");
+
   // Get a reference to the mesh we are reading
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
@@ -933,6 +935,8 @@ void ExodusII_IO::copy_nodal_solution(System & system,
                                       std::string exodus_var_name,
                                       unsigned int timestep)
 {
+  LOG_SCOPE("copy_nodal_solution()", "ExodusII_IO");
+
   const unsigned int var_num = system.variable_number(system_var_name);
 
   const MeshBase & mesh = MeshInput<MeshBase>::mesh();
@@ -1033,6 +1037,8 @@ void ExodusII_IO::copy_elemental_solution(System & system,
                                           std::string exodus_var_name,
                                           unsigned int timestep)
 {
+  LOG_SCOPE("copy_elemental_solution()", "ExodusII_IO");
+
   const unsigned int var_num = system.variable_number(system_var_name);
   // Assert that variable is an elemental one.
   //
@@ -1144,6 +1150,8 @@ void ExodusII_IO::copy_scalar_solution(System & system,
                                        std::vector<std::string> exodus_var_names,
                                        unsigned int timestep)
 {
+  LOG_SCOPE("copy_scalar_solution()", "ExodusII_IO");
+
   libmesh_error_msg_if(!exio_helper->opened_for_reading,
                        "ERROR, ExodusII file must be opened for reading before copying a scalar solution!");
 
@@ -1187,6 +1195,8 @@ void ExodusII_IO::read_elemental_variable(std::string elemental_var_name,
                                           unsigned int timestep,
                                           std::map<unsigned int, Real> & unique_id_to_value_map)
 {
+  LOG_SCOPE("read_elemental_variable()", "ExodusII_IO");
+
   // Note that this function MUST be called before renumbering
   std::map<dof_id_type, Real> elem_var_value_map;
 
@@ -1202,6 +1212,8 @@ void ExodusII_IO::read_global_variable(std::vector<std::string> global_var_names
                                        unsigned int timestep,
                                        std::vector<Real> & global_values)
 {
+  LOG_SCOPE("read_global_variable()", "ExodusII_IO");
+
   std::size_t size = global_var_names.size();
   libmesh_error_msg_if(size == 0, "ERROR, empty list of global variables to read from the Exodus file.");
 
@@ -1231,6 +1243,8 @@ void ExodusII_IO::read_global_variable(std::vector<std::string> global_var_names
 
 void ExodusII_IO::write_element_data (const EquationSystems & es)
 {
+  LOG_SCOPE("write_element_data()", "ExodusII_IO");
+
   // Be sure the file has been opened for writing!
   libmesh_error_msg_if(MeshOutput<MeshBase>::mesh().processor_id() == 0 && !exio_helper->opened_for_writing,
                        "ERROR, ExodusII file must be initialized before outputting element variables.");
@@ -1346,6 +1360,8 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
  const std::set<std::string> * system_names,
  const std::string & var_suffix)
 {
+  LOG_SCOPE("write_element_data_from_discontinuous_nodal_data()", "ExodusII_IO");
+
   // Be sure that some other function has already opened the file and prepared it
   // for writing. This is the same behavior as the write_element_data() function
   // which we are trying to mimic.
@@ -1830,6 +1846,8 @@ void ExodusII_IO::write_information_records (const std::vector<std::string> & re
 void ExodusII_IO::write_global_data (const std::vector<Number> & soln,
                                      const std::vector<std::string> & names)
 {
+  LOG_SCOPE("write_global_data()", "ExodusII_IO");
+
   if (MeshOutput<MeshBase>::mesh().processor_id())
     return;
 
@@ -2043,6 +2061,8 @@ ExodusII_IO::get_elemset_data_indices (std::map<std::pair<dof_id_type, elemset_i
 
 void ExodusII_IO::write (const std::string & fname)
 {
+  LOG_SCOPE("write()", "ExodusII_IO");
+
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // We may need to gather a DistributedMesh to output it, making that

@@ -917,22 +917,6 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
       oss << "}\n";
     }
 
-  if (!_elemset_codes.empty())
-    {
-      // We don't print the inverse map since that is maintained as an
-      // internal implementation detail for fast lookups and is not
-      // really user-facing information.
-      oss << "  elemset_codes()={";
-      for (const auto & [set_code, id_set] : _elemset_codes)
-        {
-          oss << set_code << ": ";
-          for (const auto & id : *id_set)
-            oss << id << " ";
-          oss << "\n";
-        }
-      oss << "}\n";
-    }
-
   oss << "  spatial_dimension()="     << this->spatial_dimension()                            << '\n'
       << "  n_nodes()="               << this->n_nodes()                                      << '\n'
       << "    n_local_nodes()="       << this->n_local_nodes()                                << '\n'
@@ -945,6 +929,9 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
     oss << "  n_subdomains()="        << static_cast<std::size_t>(this->n_subdomains())       << '\n';
   else
     oss << "  n_local_subdomains()= " << static_cast<std::size_t>(this->n_local_subdomains()) << '\n';
+  oss << "  n_elemsets()="            << static_cast<std::size_t>(this->n_elemsets())         << '\n';
+  if (!_elemset_codes.empty())
+    oss << "    n_elemset_codes="     << _elemset_codes.size()                                << '\n';
   oss << "  n_partitions()="          << static_cast<std::size_t>(this->n_partitions())       << '\n'
       << "  n_processors()="          << static_cast<std::size_t>(this->n_processors())       << '\n'
       << "  n_threads()="             << static_cast<std::size_t>(libMesh::n_threads())       << '\n'
