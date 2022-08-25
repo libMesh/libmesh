@@ -259,6 +259,20 @@ public:
 
 private:
 
+  typedef PetscErrorCode (*ksp_solve_func_type)(KSP,Vec,Vec);
+
+  /*
+   * Helper function to run solve() and adjoint_solve()
+   */
+  virtual std::pair<unsigned int, Real>
+  solve_common (SparseMatrix<T> & matrix_in,
+                SparseMatrix<T> & precond_in,
+                NumericVector<T> & solution_in,
+                NumericVector<T> & rhs_in,
+                const double tol,
+                const unsigned int m_its,
+                ksp_solve_func_type solve_func);
+
   /**
    * Tells PETSC to use the user-specified solver stored in
    * \p _solver_type

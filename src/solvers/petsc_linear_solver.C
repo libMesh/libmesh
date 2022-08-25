@@ -361,223 +361,8 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
 {
   LOG_SCOPE("solve()", "PetscLinearSolver");
 
-  // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T> * matrix   = cast_ptr<PetscMatrix<T> *>(&matrix_in);
-  PetscMatrix<T> * precond  = cast_ptr<PetscMatrix<T> *>(&precond_in);
-  PetscVector<T> * solution = cast_ptr<PetscVector<T> *>(&solution_in);
-  PetscVector<T> * rhs      = cast_ptr<PetscVector<T> *>(&rhs_in);
-
-  this->init (matrix);
-
-  PetscErrorCode ierr=0;
-  PetscInt its=0, max_its = static_cast<PetscInt>(m_its);
-  PetscReal final_resid=0.;
-
-  // Close the matrices and vectors in case this wasn't already done.
-  matrix->close ();
-  precond->close ();
-  solution->close ();
-  rhs->close ();
-
-  //   // If matrix != precond, then this means we have specified a
-  //   // special preconditioner, so reset preconditioner type to PCMAT.
-  //   if (matrix != precond)
-  //     {
-  //       this->_preconditioner_type = USER_PRECOND;
-  //       this->set_petsc_preconditioner_type ();
-  //     }
-
-  WrappedPetsc<Mat> submat;
-  WrappedPetsc<Mat> subprecond;
-  WrappedPetsc<Vec> subrhs;
-  WrappedPetsc<Vec> subsolution;
-  WrappedPetsc<VecScatter> scatter;
-  std::unique_ptr<PetscMatrix<Number>> subprecond_matrix;
-
-  // Set operators.  Also restrict rhs and solution vector to
-  // subdomain if necessary.
-  if (_restrict_solve_to_is)
-    {
-      PetscInt is_local_size = this->restrict_solve_to_is_local_size();
-
-      ierr = VecCreate(this->comm().get(), subrhs.get());
-      LIBMESH_CHKERR(ierr);
-      ierr = VecSetSizes(subrhs, is_local_size, PETSC_DECIDE);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecSetFromOptions(subrhs);
-      LIBMESH_CHKERR(ierr);
-
-      ierr = VecCreate(this->comm().get(), subsolution.get());
-      LIBMESH_CHKERR(ierr);
-      ierr = VecSetSizes(subsolution, is_local_size, PETSC_DECIDE);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecSetFromOptions(subsolution);
-      LIBMESH_CHKERR(ierr);
-
-      ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is, subrhs, nullptr, scatter.get());
-      LIBMESH_CHKERR(ierr);
-
-      VecScatterBeginEnd(this->comm(), scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
-      VecScatterBeginEnd(this->comm(), scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
-
-      ierr = LibMeshCreateSubMatrix(matrix->mat(),
-                                    _restrict_solve_to_is,
-                                    _restrict_solve_to_is,
-                                    MAT_INITIAL_MATRIX,
-                                    submat.get());
-      LIBMESH_CHKERR(ierr);
-
-      ierr = LibMeshCreateSubMatrix(precond->mat(),
-                                    _restrict_solve_to_is,
-                                    _restrict_solve_to_is,
-                                    MAT_INITIAL_MATRIX,
-                                    subprecond.get());
-      LIBMESH_CHKERR(ierr);
-
-      // Since removing columns of the matrix changes the equation
-      // system, we will now change the right hand side to compensate
-      // for this.  Note that this is not necessary if \p SUBSET_ZERO
-      // has been selected.
-      if (_subset_solve_mode!=SUBSET_ZERO)
-        {
-          this->create_complement_is(rhs_in);
-          PetscInt is_complement_local_size =
-            cast_int<PetscInt>(rhs_in.local_size() - is_local_size);
-
-          // Create Vec
-          WrappedPetsc<Vec> subvec1;
-          ierr = VecCreate(this->comm().get(), subvec1.get());
-          LIBMESH_CHKERR(ierr);
-          ierr = VecSetSizes(subvec1, is_complement_local_size, PETSC_DECIDE);
-          LIBMESH_CHKERR(ierr);
-          ierr = VecSetFromOptions(subvec1);
-          LIBMESH_CHKERR(ierr);
-
-          // Create VecScatter
-          WrappedPetsc<VecScatter> scatter1;
-          ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is_complement, subvec1, nullptr, scatter1.get());
-          LIBMESH_CHKERR(ierr);
-
-          // Scatter values into subvec1
-          VecScatterBeginEnd(this->comm(), scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
-
-          // Scale: v *= -1
-          ierr = VecScale(subvec1, -1.0);
-          LIBMESH_CHKERR(ierr);
-
-          // Create Mat
-          WrappedPetsc<Mat> submat1;
-          ierr = LibMeshCreateSubMatrix(matrix->mat(),
-                                        _restrict_solve_to_is,
-                                        _restrict_solve_to_is_complement,
-                                        MAT_INITIAL_MATRIX,
-                                        submat1.get());
-          LIBMESH_CHKERR(ierr);
-
-          // Compute subrhs = subrhs + (submat1 * subvec1)
-          ierr = MatMultAdd(submat1, subvec1, subrhs, subrhs);
-          LIBMESH_CHKERR(ierr);
-        }
-      ierr = KSPSetOperators(_ksp, submat, subprecond);
-
-      PetscBool ksp_reuse_preconditioner = this->same_preconditioner ? PETSC_TRUE : PETSC_FALSE;
-      ierr = KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner);
-      LIBMESH_CHKERR(ierr);
-
-      if (this->_preconditioner)
-        {
-          subprecond_matrix = std::make_unique<PetscMatrix<Number>>(subprecond, this->comm());
-          this->_preconditioner->set_matrix(*subprecond_matrix);
-          this->_preconditioner->init();
-        }
-    }
-  else
-    {
-      ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat());
-
-      PetscBool ksp_reuse_preconditioner = this->same_preconditioner ? PETSC_TRUE : PETSC_FALSE;
-      ierr = KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner);
-      LIBMESH_CHKERR(ierr);
-
-      if (this->_preconditioner)
-        {
-          this->_preconditioner->set_matrix(matrix_in);
-          this->_preconditioner->init();
-        }
-    }
-
-  // Set the tolerances for the iterative solver.  Use the user-supplied
-  // tolerance for the relative residual & leave the others at default values.
-  ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
-                           PETSC_DEFAULT, max_its);
-  LIBMESH_CHKERR(ierr);
-
-  // Allow command line options to override anything set programmatically.
-  ierr = KSPSetFromOptions(_ksp);
-  LIBMESH_CHKERR(ierr);
-
-  // If the SolverConfiguration object is provided, use it to override
-  // solver options.
-  if (this->_solver_configuration)
-    {
-      this->_solver_configuration->configure_solver();
-    }
-
-  // Solve the linear system
-  if (_restrict_solve_to_is)
-    {
-      ierr = KSPSolve (_ksp, subrhs, subsolution);
-      LIBMESH_CHKERR(ierr);
-    }
-  else
-    {
-      ierr = KSPSolve (_ksp, rhs->vec(), solution->vec());
-      LIBMESH_CHKERR(ierr);
-    }
-
-  // Get the number of iterations required for convergence
-  ierr = KSPGetIterationNumber (_ksp, &its);
-  LIBMESH_CHKERR(ierr);
-
-  // Get the norm of the final residual to return to the user.
-  ierr = KSPGetResidualNorm (_ksp, &final_resid);
-  LIBMESH_CHKERR(ierr);
-
-  if (_restrict_solve_to_is)
-    {
-      switch(_subset_solve_mode)
-        {
-        case SUBSET_ZERO:
-          ierr = VecZeroEntries(solution->vec());
-          LIBMESH_CHKERR(ierr);
-          break;
-
-        case SUBSET_COPY_RHS:
-          ierr = VecCopy(rhs->vec(),solution->vec());
-          LIBMESH_CHKERR(ierr);
-          break;
-
-        case SUBSET_DONT_TOUCH:
-          // Nothing to do here.
-          break;
-
-        default:
-          libmesh_error_msg("Invalid subset solve mode = " << _subset_solve_mode);
-        }
-
-      VecScatterBeginEnd(this->comm(), scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
-
-      if (this->_preconditioner)
-        {
-          // Before subprecond_matrix gets cleaned up, we should give
-          // the _preconditioner a different matrix.
-          this->_preconditioner->set_matrix(matrix_in);
-          this->_preconditioner->init();
-        }
-    }
-
-  // return the # of its. and the final residual norm.
-  return std::make_pair(its, final_resid);
+  return this->solve_common(matrix_in, precond_in, solution_in,
+                            rhs_in, tol, m_its, KSPSolve);
 }
 
 template <typename T>
@@ -588,12 +373,27 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
                                      const double tol,
                                      const unsigned int m_its)
 {
-  LOG_SCOPE("solve()", "PetscLinearSolver");
+  LOG_SCOPE("adjoint_solve()", "PetscLinearSolver");
 
+  // Note that the matrix and precond matrix are the same
+  return this->solve_common(matrix_in, matrix_in, solution_in,
+                            rhs_in, tol, m_its, KSPSolveTranspose);
+}
+
+
+template <typename T>
+std::pair<unsigned int, Real>
+PetscLinearSolver<T>::solve_common (SparseMatrix<T> &  matrix_in,
+                                    SparseMatrix<T> &  precond_in,
+                                    NumericVector<T> & solution_in,
+                                    NumericVector<T> & rhs_in,
+                                    const double tol,
+                                    const unsigned int m_its,
+                                    ksp_solve_func_type solve_func)
+{
   // Make sure the data passed in are really of Petsc types
   PetscMatrix<T> * matrix   = cast_ptr<PetscMatrix<T> *>(&matrix_in);
-  // Note that the matrix and precond matrix are the same
-  PetscMatrix<T> * precond  = cast_ptr<PetscMatrix<T> *>(&matrix_in);
+  PetscMatrix<T> * precond  = cast_ptr<PetscMatrix<T> *>(&precond_in);
   PetscVector<T> * solution = cast_ptr<PetscVector<T> *>(&solution_in);
   PetscVector<T> * rhs      = cast_ptr<PetscVector<T> *>(&rhs_in);
 
@@ -742,12 +542,12 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
   // Solve the linear system
   if (_restrict_solve_to_is)
     {
-      ierr = KSPSolveTranspose (_ksp, subrhs, subsolution);
+      ierr = solve_func(_ksp, subrhs, subsolution);
       LIBMESH_CHKERR(ierr);
     }
   else
     {
-      ierr = KSPSolveTranspose (_ksp, rhs->vec(), solution->vec());
+      ierr = solve_func(_ksp, rhs->vec(), solution->vec());
       LIBMESH_CHKERR(ierr);
     }
 
