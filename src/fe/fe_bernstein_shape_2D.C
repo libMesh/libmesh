@@ -27,6 +27,65 @@
 #include "libmesh/utility.h"
 #include "libmesh/enum_to_string.h"
 
+
+namespace {
+
+using namespace libMesh;
+
+/*
+ * Helper function for finding indices, when computing quad shape
+ * functions and derivatives via a tensor-product of 1D functions and
+ * derivatives.
+ */
+std::pair<unsigned int, unsigned int> quad_i0_i1 (const unsigned int i,
+                                                  const Order totalorder,
+                                                  const Elem & elem)
+{
+  libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
+
+  unsigned int i0, i1;
+
+  // Vertex DoFs
+  if (i == 0)
+    { i0 = 0; i1 = 0; }
+  else if (i == 1)
+    { i0 = 1; i1 = 0; }
+  else if (i == 2)
+    { i0 = 1; i1 = 1; }
+  else if (i == 3)
+    { i0 = 0; i1 = 1; }
+
+
+  // Edge DoFs
+  else if (i < totalorder + 3u)
+    { i0 = i - 2; i1 = 0; }
+  else if (i < 2u*totalorder + 2)
+    { i0 = 1; i1 = i - totalorder - 1; }
+  else if (i < 3u*totalorder + 1)
+    { i0 = i - 2u*totalorder; i1 = 1; }
+  else if (i < 4u*totalorder)
+    { i0 = 0; i1 = i - 3u*totalorder + 1; }
+  // Interior DoFs
+  else
+    {
+      unsigned int basisnum = i - 4*totalorder;
+      i0 = square_number_column[basisnum] + 2;
+      i1 = square_number_row[basisnum] + 2;
+    }
+
+
+  // Flip odd degree of freedom values if necessary
+  // to keep continuity on sides
+  if      ((i>= 4                 && i<= 4+  totalorder-2u) && elem.point(0) > elem.point(1)) i0=totalorder+2-i0;
+  else if ((i>= 4+  totalorder-1u && i<= 4+2*totalorder-3u) && elem.point(1) > elem.point(2)) i1=totalorder+2-i1;
+  else if ((i>= 4+2*totalorder-2u && i<= 4+3*totalorder-4u) && elem.point(3) > elem.point(2)) i0=totalorder+2-i0;
+  else if ((i>= 4+3*totalorder-3u && i<= 4+4*totalorder-5u) && elem.point(0) > elem.point(3)) i1=totalorder+2-i1;
+
+  return std::make_pair(i0, i1);
+}
+
+}
+
 namespace libMesh
 {
 
@@ -60,57 +119,10 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
     case QUAD9:
       {
         // Compute quad shape functions as a tensor-product
-        const Real xi  = p(0);
-        const Real eta = p(1);
+        auto [i0, i1] = quad_i0_i1(i, totalorder, *elem);
 
-        libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
-
-        // Example i, i0, i1 values for totalorder = 5:
-        //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
-        //  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 3, 2, 4, 4, 4, 3, 2, 5, 5, 5, 5, 4, 3, 2};
-        //  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 3, 3, 2, 3, 4, 4, 4, 2, 3, 4, 5, 5, 5, 5};
-
-        unsigned int i0, i1;
-
-        // Vertex DoFs
-        if (i == 0)
-          { i0 = 0; i1 = 0; }
-        else if (i == 1)
-          { i0 = 1; i1 = 0; }
-        else if (i == 2)
-          { i0 = 1; i1 = 1; }
-        else if (i == 3)
-          { i0 = 0; i1 = 1; }
-
-
-        // Edge DoFs
-        else if (i < totalorder + 3u)
-          { i0 = i - 2; i1 = 0; }
-        else if (i < 2u*totalorder + 2)
-          { i0 = 1; i1 = i - totalorder - 1; }
-        else if (i < 3u*totalorder + 1)
-          { i0 = i - 2u*totalorder; i1 = 1; }
-        else if (i < 4u*totalorder)
-          { i0 = 0; i1 = i - 3u*totalorder + 1; }
-        // Interior DoFs. Use Roy's number look up
-        else
-          {
-            unsigned int basisnum = i - 4*totalorder;
-            i0 = square_number_column[basisnum] + 2;
-            i1 = square_number_row[basisnum] + 2;
-          }
-
-
-        // Flip odd degree of freedom values if necessary
-        // to keep continuity on sides.
-        if     ((i>= 4                 && i<= 4+  totalorder-2u) && elem->point(0) > elem->point(1)) i0=totalorder+2-i0;//
-        else if ((i>= 4+  totalorder-1u && i<= 4+2*totalorder-3u) && elem->point(1) > elem->point(2)) i1=totalorder+2-i1;
-        else if ((i>= 4+2*totalorder-2u && i<= 4+3*totalorder-4u) && elem->point(3) > elem->point(2)) i0=totalorder+2-i0;
-        else if ((i>= 4+3*totalorder-3u && i<= 4+4*totalorder-5u) && elem->point(0) > elem->point(3)) i1=totalorder+2-i1;
-
-
-        return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0, xi)*
-                FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1, eta));
+        return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0, p(0))*
+                FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1, p(1)));
       }
       // handle serendipity QUAD8 element separately
     case QUAD8:
@@ -421,60 +433,19 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
     case QUAD9:
       {
         // Compute quad shape functions as a tensor-product
-        const Real xi  = p(0);
-        const Real eta = p(1);
-
-        libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
-
-        unsigned int i0, i1;
-
-        // Vertex DoFs
-        if (i == 0)
-          { i0 = 0; i1 = 0; }
-        else if (i == 1)
-          { i0 = 1; i1 = 0; }
-        else if (i == 2)
-          { i0 = 1; i1 = 1; }
-        else if (i == 3)
-          { i0 = 0; i1 = 1; }
-
-
-        // Edge DoFs
-        else if (i < totalorder + 3u)
-          { i0 = i - 2; i1 = 0; }
-        else if (i < 2u*totalorder + 2)
-          { i0 = 1; i1 = i - totalorder - 1; }
-        else if (i < 3u*totalorder + 1)
-          { i0 = i - 2u*totalorder; i1 = 1; }
-        else if (i < 4u*totalorder)
-          { i0 = 0; i1 = i - 3u*totalorder + 1; }
-        // Interior DoFs
-        else
-          {
-            unsigned int basisnum = i - 4*totalorder;
-            i0 = square_number_column[basisnum] + 2;
-            i1 = square_number_row[basisnum] + 2;
-          }
-
-
-        // Flip odd degree of freedom values if necessary
-        // to keep continuity on sides
-        if      ((i>= 4                 && i<= 4+  totalorder-2u) && elem->point(0) > elem->point(1)) i0=totalorder+2-i0;
-        else if ((i>= 4+  totalorder-1u && i<= 4+2*totalorder-3u) && elem->point(1) > elem->point(2)) i1=totalorder+2-i1;
-        else if ((i>= 4+2*totalorder-2u && i<= 4+3*totalorder-4u) && elem->point(3) > elem->point(2)) i0=totalorder+2-i0;
-        else if ((i>= 4+3*totalorder-3u && i<= 4+4*totalorder-5u) && elem->point(0) > elem->point(3)) i1=totalorder+2-i1;
+        auto [i0, i1] = quad_i0_i1(i, totalorder, *elem);
 
         switch (j)
           {
             // d()/dxi
           case 0:
-            return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0, 0, xi)*
-                    FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1,    eta));
+            return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0, 0, p(0))*
+                    FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1,    p(1)));
 
             // d()/deta
           case 1:
-            return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0,    xi)*
-                    FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
+            return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0,    p(0))*
+                    FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1, 0, p(1)));
 
           default:
             libmesh_error_msg("Invalid shape function derivative j = " << j);
@@ -589,65 +560,24 @@ Real FE<2,BERNSTEIN>::shape_second_deriv(const Elem * elem,
     case QUAD9:
       {
         // Compute quad shape functions as a tensor-product
-        const Real xi  = p(0);
-        const Real eta = p(1);
-
-        libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
-
-        unsigned int i0, i1;
-
-        // Vertex DoFs
-        if (i == 0)
-          { i0 = 0; i1 = 0; }
-        else if (i == 1)
-          { i0 = 1; i1 = 0; }
-        else if (i == 2)
-          { i0 = 1; i1 = 1; }
-        else if (i == 3)
-          { i0 = 0; i1 = 1; }
-
-
-        // Edge DoFs
-        else if (i < totalorder + 3u)
-          { i0 = i - 2; i1 = 0; }
-        else if (i < 2u*totalorder + 2)
-          { i0 = 1; i1 = i - totalorder - 1; }
-        else if (i < 3u*totalorder + 1)
-          { i0 = i - 2u*totalorder; i1 = 1; }
-        else if (i < 4u*totalorder)
-          { i0 = 0; i1 = i - 3u*totalorder + 1; }
-        // Interior DoFs
-        else
-          {
-            unsigned int basisnum = i - 4*totalorder;
-            i0 = square_number_column[basisnum] + 2;
-            i1 = square_number_row[basisnum] + 2;
-          }
-
-
-        // Flip odd degree of freedom values if necessary
-        // to keep continuity on sides
-        if      ((i>= 4                 && i<= 4+  totalorder-2u) && elem->point(0) > elem->point(1)) i0=totalorder+2-i0;
-        else if ((i>= 4+  totalorder-1u && i<= 4+2*totalorder-3u) && elem->point(1) > elem->point(2)) i1=totalorder+2-i1;
-        else if ((i>= 4+2*totalorder-2u && i<= 4+3*totalorder-4u) && elem->point(3) > elem->point(2)) i0=totalorder+2-i0;
-        else if ((i>= 4+3*totalorder-3u && i<= 4+4*totalorder-5u) && elem->point(0) > elem->point(3)) i1=totalorder+2-i1;
+        auto [i0, i1] = quad_i0_i1(i, totalorder, *elem);
 
         switch (j)
           {
             // d^2() / dxi^2
           case 0:
-            return (FE<1,BERNSTEIN>::shape_second_deriv(EDGE3, totalorder, i0, 0, xi)*
-                    FE<1,BERNSTEIN>::shape             (EDGE3, totalorder, i1,    eta));
+            return (FE<1,BERNSTEIN>::shape_second_deriv(EDGE3, totalorder, i0, 0, p(0))*
+                    FE<1,BERNSTEIN>::shape             (EDGE3, totalorder, i1,    p(1)));
 
             // d^2() / dxi deta
           case 1:
-            return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0, 0, xi)*
-                    FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
+            return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0, 0, p(0))*
+                    FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1, 0, p(1)));
 
             // d^2() / deta^2
           case 2:
-            return (FE<1,BERNSTEIN>::shape             (EDGE3, totalorder, i0,    xi)*
-                    FE<1,BERNSTEIN>::shape_second_deriv(EDGE3, totalorder, i1, 0, eta));
+            return (FE<1,BERNSTEIN>::shape             (EDGE3, totalorder, i0,    p(0))*
+                    FE<1,BERNSTEIN>::shape_second_deriv(EDGE3, totalorder, i1, 0, p(1)));
 
           default:
             libmesh_error_msg("Invalid shape function derivative j = " << j);
