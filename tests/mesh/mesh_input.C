@@ -868,7 +868,11 @@ public:
 
       const DofMap & dof_map = sys.get_dof_map();
 
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+      exii.copy_nodal_solution(sys, "ul", "r_u");
+#else
       exii.copy_nodal_solution(sys, "ul", "u");
+#endif
 
       dof_id_type n_side_nodes = 0;
       const std::string nullstr;
