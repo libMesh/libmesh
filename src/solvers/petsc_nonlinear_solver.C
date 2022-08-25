@@ -1153,15 +1153,22 @@ void PetscNonlinearSolver<T>::check_reuse_operator_sizes(numeric_index_type new_
   // preconditioner if the operator sizes has changed, regardless
   // of what libmesh itself knows about the problem
   //
-  if (!(this->_reuse_preconditioner) || !(this->_is_initialized))
+  if (!(this->_reuse_preconditioner) ||
+      !(this->_is_initialized) ||
+      !(_setup_reuse))
     return;
 
-  if (!_setup_reuse)
-    return;
 
   KSP ksp;
   PetscErrorCode ierr = SNESGetKSP(_snes, &ksp);
   LIBMESH_CHKERR(ierr);
+
+  PetscBool setup_A, setup_P;
+  ierr = KSPGetOperatorsSet(ksp, &setup_A, &setup_P);
+  LIBMESH_CHKERR(ierr);
+  if (!(setup_A && setup_P))
+    return;
+
   Mat A;
   Mat P;
   ierr = KSPGetOperators(ksp, &A, &P);
