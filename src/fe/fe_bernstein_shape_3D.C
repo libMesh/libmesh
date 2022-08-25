@@ -48,6 +48,503 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
   const Order totalorder =
     static_cast<Order>(order + add_p_level * elem->p_level());
 
+  auto hex_remap = [i, elem] (const Point & p_in,
+                              const unsigned int * hex_i0,
+                              const unsigned int * hex_i1,
+                              const unsigned int * hex_i2) {
+    // Compute hex shape functions as a tensor-product
+    const Real xi    = p_in(0);
+    const Real eta   = p_in(1);
+    const Real zeta  = p_in(2);
+    Point p_to_remap = p_in;
+    Real & xi_mapped = p_to_remap(0);
+    Real & eta_mapped = p_to_remap(1);
+    Real & zeta_mapped = p_to_remap(2);
+
+    // handle the edge orientation
+    {
+      // Edge 0
+      if ((hex_i0[i] >= 2) && (hex_i1[i] == 0) && (hex_i2[i] == 0))
+        {
+          if (elem->point(0) != std::min(elem->point(0), elem->point(1)))
+            xi_mapped = -xi;
+        }
+      // Edge 1
+      else if ((hex_i0[i] == 1) && (hex_i1[i] >= 2) && (hex_i2[i] == 0))
+        {
+          if (elem->point(1) != std::min(elem->point(1), elem->point(2)))
+            eta_mapped = -eta;
+        }
+      // edge 2
+      else if ((hex_i0[i] >= 2) && (hex_i1[i] == 1) && (hex_i2[i] == 0))
+        {
+          if (elem->point(3) != std::min(elem->point(3), elem->point(2)))
+            xi_mapped = -xi;
+        }
+      // edge 3
+      else if ((hex_i0[i] == 0) && (hex_i1[i] >= 2) && (hex_i2[i] == 0))
+        {
+          if (elem->point(0) != std::min(elem->point(0), elem->point(3)))
+            eta_mapped = -eta;
+        }
+      // edge 4
+      else if ((hex_i0[i] == 0) && (hex_i1[i] == 0) && (hex_i2[i] >=2 ))
+        {
+          if (elem->point(0) != std::min(elem->point(0), elem->point(4)))
+            zeta_mapped = -zeta;
+        }
+      // edge 5
+      else if ((hex_i0[i] == 1) && (hex_i1[i] == 0) && (hex_i2[i] >=2 ))
+        {
+          if (elem->point(1) != std::min(elem->point(1), elem->point(5)))
+            zeta_mapped = -zeta;
+        }
+      // edge 6
+      else if ((hex_i0[i] == 1) && (hex_i1[i] == 1) && (hex_i2[i] >=2 ))
+        {
+          if (elem->point(2) != std::min(elem->point(2), elem->point(6)))
+            zeta_mapped = -zeta;
+        }
+      // edge 7
+      else if ((hex_i0[i] == 0) && (hex_i1[i] == 1) && (hex_i2[i] >=2 ))
+        {
+          if (elem->point(3) != std::min(elem->point(3), elem->point(7)))
+            zeta_mapped = -zeta;
+        }
+      // edge 8
+      else if ((hex_i0[i] >=2 ) && (hex_i1[i] == 0) && (hex_i2[i] == 1))
+        {
+          if (elem->point(4) != std::min(elem->point(4), elem->point(5)))
+            xi_mapped = -xi;
+        }
+      // edge 9
+      else if ((hex_i0[i] == 1) && (hex_i1[i] >=2 ) && (hex_i2[i] == 1))
+        {
+          if (elem->point(5) != std::min(elem->point(5), elem->point(6)))
+            eta_mapped = -eta;
+        }
+      // edge 10
+      else if ((hex_i0[i] >=2 ) && (hex_i1[i] == 1) && (hex_i2[i] == 1))
+        {
+          if (elem->point(7) != std::min(elem->point(7), elem->point(6)))
+            xi_mapped = -xi;
+        }
+      // edge 11
+      else if ((hex_i0[i] == 0) && (hex_i1[i] >=2 ) && (hex_i2[i] == 1))
+        {
+          if (elem->point(4) != std::min(elem->point(4), elem->point(7)))
+            eta_mapped = -eta;
+        }
+    }
+
+
+    // handle the face orientation
+    {
+      // face 0
+      if ((hex_i2[i] == 0) && (hex_i0[i] >= 2) && (hex_i1[i] >= 2))
+        {
+          const Point min_point = std::min(elem->point(1),
+                                           std::min(elem->point(2),
+                                                    std::min(elem->point(0),
+                                                             elem->point(3))));
+          if (elem->point(0) == min_point)
+            if (elem->point(1) == std::min(elem->point(1), elem->point(3)))
+              {
+                // case 1
+                xi_mapped  = xi;
+                eta_mapped = eta;
+              }
+            else
+              {
+                // case 2
+                xi_mapped  = eta;
+                eta_mapped = xi;
+              }
+
+          else if (elem->point(3) == min_point)
+            if (elem->point(0) == std::min(elem->point(0), elem->point(2)))
+              {
+                // case 3
+                xi_mapped  = -eta;
+                eta_mapped = xi;
+              }
+            else
+              {
+                // case 4
+                xi_mapped  = xi;
+                eta_mapped = -eta;
+              }
+
+          else if (elem->point(2) == min_point)
+            if (elem->point(3) == std::min(elem->point(3), elem->point(1)))
+              {
+                // case 5
+                xi_mapped  = -xi;
+                eta_mapped = -eta;
+              }
+            else
+              {
+                // case 6
+                xi_mapped  = -eta;
+                eta_mapped = -xi;
+              }
+
+          else if (elem->point(1) == min_point)
+            {
+              if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
+                {
+                  // case 7
+                  xi_mapped  = eta;
+                  eta_mapped = -xi;
+                }
+              else
+                {
+                  // Case 8
+                  xi_mapped  = -xi;
+                  eta_mapped = eta;
+                }
+            }
+        }
+
+
+      // Face 1
+      else if ((hex_i1[i] == 0) && (hex_i0[i] >= 2) && (hex_i2[i] >= 2))
+        {
+          const Point min_point = std::min(elem->point(0),
+                                           std::min(elem->point(1),
+                                                    std::min(elem->point(5),
+                                                             elem->point(4))));
+          if (elem->point(0) == min_point)
+            if (elem->point(1) == std::min(elem->point(1), elem->point(4)))
+              {
+                // Case 1
+                xi_mapped   = xi;
+                zeta_mapped = zeta;
+              }
+            else
+              {
+                // Case 2
+                xi_mapped   = zeta;
+                zeta_mapped = xi;
+              }
+
+          else if (elem->point(1) == min_point)
+            if (elem->point(5) == std::min(elem->point(5), elem->point(0)))
+              {
+                // Case 3
+                xi_mapped   = zeta;
+                zeta_mapped = -xi;
+              }
+            else
+              {
+                // Case 4
+                xi_mapped   = -xi;
+                zeta_mapped = zeta;
+              }
+
+          else if (elem->point(5) == min_point)
+            if (elem->point(4) == std::min(elem->point(4), elem->point(1)))
+              {
+                // Case 5
+                xi_mapped   = -xi;
+                zeta_mapped = -zeta;
+              }
+            else
+              {
+                // Case 6
+                xi_mapped   = -zeta;
+                zeta_mapped = -xi;
+              }
+
+          else if (elem->point(4) == min_point)
+            {
+              if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
+                {
+                  // Case 7
+                  xi_mapped   = -xi;
+                  zeta_mapped = zeta;
+                }
+              else
+                {
+                  // Case 8
+                  xi_mapped   = xi;
+                  zeta_mapped = -zeta;
+                }
+            }
+        }
+
+
+      // Face 2
+      else if ((hex_i0[i] == 1) && (hex_i1[i] >= 2) && (hex_i2[i] >= 2))
+        {
+          const Point min_point = std::min(elem->point(1),
+                                           std::min(elem->point(2),
+                                                    std::min(elem->point(6),
+                                                             elem->point(5))));
+          if (elem->point(1) == min_point)
+            if (elem->point(2) == std::min(elem->point(2), elem->point(5)))
+              {
+                // Case 1
+                eta_mapped  = eta;
+                zeta_mapped = zeta;
+              }
+            else
+              {
+                // Case 2
+                eta_mapped  = zeta;
+                zeta_mapped = eta;
+              }
+
+          else if (elem->point(2) == min_point)
+            if (elem->point(6) == std::min(elem->point(6), elem->point(1)))
+              {
+                // Case 3
+                eta_mapped  = zeta;
+                zeta_mapped = -eta;
+              }
+            else
+              {
+                // Case 4
+                eta_mapped  = -eta;
+                zeta_mapped = zeta;
+              }
+
+          else if (elem->point(6) == min_point)
+            if (elem->point(5) == std::min(elem->point(5), elem->point(2)))
+              {
+                // Case 5
+                eta_mapped  = -eta;
+                zeta_mapped = -zeta;
+              }
+            else
+              {
+                // Case 6
+                eta_mapped  = -zeta;
+                zeta_mapped = -eta;
+              }
+
+          else if (elem->point(5) == min_point)
+            {
+              if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
+                {
+                  // Case 7
+                  eta_mapped  = -zeta;
+                  zeta_mapped = eta;
+                }
+              else
+                {
+                  // Case 8
+                  eta_mapped   = eta;
+                  zeta_mapped = -zeta;
+                }
+            }
+        }
+
+
+      // Face 3
+      else if ((hex_i1[i] == 1) && (hex_i0[i] >= 2) && (hex_i2[i] >= 2))
+        {
+          const Point min_point = std::min(elem->point(2),
+                                           std::min(elem->point(3),
+                                                    std::min(elem->point(7),
+                                                             elem->point(6))));
+          if (elem->point(3) == min_point)
+            if (elem->point(2) == std::min(elem->point(2), elem->point(7)))
+              {
+                // Case 1
+                xi_mapped   = xi;
+                zeta_mapped = zeta;
+              }
+            else
+              {
+                // Case 2
+                xi_mapped   = zeta;
+                zeta_mapped = xi;
+              }
+
+          else if (elem->point(7) == min_point)
+            if (elem->point(3) == std::min(elem->point(3), elem->point(6)))
+              {
+                // Case 3
+                xi_mapped   = -zeta;
+                zeta_mapped = xi;
+              }
+            else
+              {
+                // Case 4
+                xi_mapped   = xi;
+                zeta_mapped = -zeta;
+              }
+
+          else if (elem->point(6) == min_point)
+            if (elem->point(7) == std::min(elem->point(7), elem->point(2)))
+              {
+                // Case 5
+                xi_mapped   = -xi;
+                zeta_mapped = -zeta;
+              }
+            else
+              {
+                // Case 6
+                xi_mapped   = -zeta;
+                zeta_mapped = -xi;
+              }
+
+          else if (elem->point(2) == min_point)
+            {
+              if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
+                {
+                  // Case 7
+                  xi_mapped   = zeta;
+                  zeta_mapped = -xi;
+                }
+              else
+                {
+                  // Case 8
+                  xi_mapped   = -xi;
+                  zeta_mapped = zeta;
+                }
+            }
+        }
+
+
+      // Face 4
+      else if ((hex_i0[i] == 0) && (hex_i1[i] >= 2) && (hex_i2[i] >= 2))
+        {
+          const Point min_point = std::min(elem->point(3),
+                                           std::min(elem->point(0),
+                                                    std::min(elem->point(4),
+                                                             elem->point(7))));
+          if (elem->point(0) == min_point)
+            if (elem->point(3) == std::min(elem->point(3), elem->point(4)))
+              {
+                // Case 1
+                eta_mapped  = eta;
+                zeta_mapped = zeta;
+              }
+            else
+                        {
+                // Case 2
+                eta_mapped  = zeta;
+                zeta_mapped = eta;
+              }
+
+          else if (elem->point(4) == min_point)
+            if (elem->point(0) == std::min(elem->point(0), elem->point(7)))
+              {
+                // Case 3
+                eta_mapped  = -zeta;
+                zeta_mapped = eta;
+              }
+            else
+              {
+                // Case 4
+                eta_mapped  = eta;
+                zeta_mapped = -zeta;
+              }
+
+          else if (elem->point(7) == min_point)
+            if (elem->point(4) == std::min(elem->point(4), elem->point(3)))
+              {
+                // Case 5
+                eta_mapped  = -eta;
+                zeta_mapped = -zeta;
+              }
+            else
+              {
+                // Case 6
+                eta_mapped  = -zeta;
+                zeta_mapped = -eta;
+              }
+
+          else if (elem->point(3) == min_point)
+            {
+              if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
+                {
+                  // Case 7
+                  eta_mapped   = zeta;
+                  zeta_mapped = -eta;
+                }
+              else
+                {
+                  // Case 8
+                  eta_mapped  = -eta;
+                  zeta_mapped = zeta;
+                }
+            }
+        }
+
+
+      // Face 5
+      else if ((hex_i2[i] == 1) && (hex_i0[i] >= 2) && (hex_i1[i] >= 2))
+        {
+          const Point min_point = std::min(elem->point(4),
+                                           std::min(elem->point(5),
+                                                    std::min(elem->point(6),
+                                                             elem->point(7))));
+          if (elem->point(4) == min_point)
+            if (elem->point(5) == std::min(elem->point(5), elem->point(7)))
+                        {
+                // Case 1
+                xi_mapped  = xi;
+                eta_mapped = eta;
+              }
+            else
+              {
+                // Case 2
+                xi_mapped  = eta;
+                eta_mapped = xi;
+              }
+
+          else if (elem->point(5) == min_point)
+            if (elem->point(6) == std::min(elem->point(6), elem->point(4)))
+              {
+                // Case 3
+                xi_mapped  = eta;
+                eta_mapped = -xi;
+              }
+            else
+              {
+                          // Case 4
+                xi_mapped  = -xi;
+                eta_mapped = eta;
+              }
+
+          else if (elem->point(6) == min_point)
+            if (elem->point(7) == std::min(elem->point(7), elem->point(5)))
+              {
+                // Case 5
+                xi_mapped  = -xi;
+                eta_mapped = -eta;
+              }
+            else
+              {
+                // Case 6
+                xi_mapped  = -eta;
+                eta_mapped = -xi;
+              }
+
+          else if (elem->point(7) == min_point)
+            {
+                        if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
+                {
+                  // Case 7
+                  xi_mapped  = -eta;
+                  eta_mapped = xi;
+                }
+              else
+                {
+                  // Case 8
+                  xi_mapped  = xi;
+                  eta_mapped = eta;
+                }
+            }
+        }
+    }
+
+    return p_to_remap;
+  };
+
   switch (totalorder)
     {
       // 1st order Bernstein.
@@ -321,14 +818,6 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
             {
               libmesh_assert_less (i, 64);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi    = p(0);
-              const Real eta   = p(1);
-              const Real zeta  = p(2);
-              Real xi_mapped   = p(0);
-              Real eta_mapped  = p(1);
-              Real zeta_mapped = p(2);
-
               // The only way to make any sense of this
               // is to look at the mgflo/mg2/mgf documentation
               // and make the cut-out cube!
@@ -338,498 +827,15 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 2, 2, 3, 3, 0, 0, 0, 0, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3};
               static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
 
-
-
-              // handle the edge orientation
-              {
-                // Edge 0
-                if ((i0[i] >= 2) && (i1[i] == 0) && (i2[i] == 0))
-                  {
-                    if (elem->point(0) != std::min(elem->point(0), elem->point(1)))
-                      xi_mapped = -xi;
-                  }
-                // Edge 1
-                else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] == 0))
-                  {
-                    if (elem->point(1) != std::min(elem->point(1), elem->point(2)))
-                      eta_mapped = -eta;
-                  }
-                // Edge 2
-                else if ((i0[i] >= 2) && (i1[i] == 1) && (i2[i] == 0))
-                  {
-                    if (elem->point(3) != std::min(elem->point(3), elem->point(2)))
-                      xi_mapped = -xi;
-                  }
-                // Edge 3
-                else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] == 0))
-                  {
-                    if (elem->point(0) != std::min(elem->point(0), elem->point(3)))
-                      eta_mapped = -eta;
-                  }
-                // Edge 4
-                else if ((i0[i] == 0) && (i1[i] == 0) && (i2[i] >=2 ))
-                  {
-                    if (elem->point(0) != std::min(elem->point(0), elem->point(4)))
-                      zeta_mapped = -zeta;
-                  }
-                // Edge 5
-                else if ((i0[i] == 1) && (i1[i] == 0) && (i2[i] >=2 ))
-                  {
-                    if (elem->point(1) != std::min(elem->point(1), elem->point(5)))
-                      zeta_mapped = -zeta;
-                  }
-                // Edge 6
-                else if ((i0[i] == 1) && (i1[i] == 1) && (i2[i] >=2 ))
-                  {
-                    if (elem->point(2) != std::min(elem->point(2), elem->point(6)))
-                      zeta_mapped = -zeta;
-                  }
-                // Edge 7
-                else if ((i0[i] == 0) && (i1[i] == 1) && (i2[i] >=2 ))
-                  {
-                    if (elem->point(3) != std::min(elem->point(3), elem->point(7)))
-                      zeta_mapped = -zeta;
-                  }
-                // Edge 8
-                else if ((i0[i] >=2 ) && (i1[i] == 0) && (i2[i] == 1))
-                  {
-                    if (elem->point(4) != std::min(elem->point(4), elem->point(5)))
-                      xi_mapped = -xi;
-                  }
-                // Edge 9
-                else if ((i0[i] == 1) && (i1[i] >=2 ) && (i2[i] == 1))
-                  {
-                    if (elem->point(5) != std::min(elem->point(5), elem->point(6)))
-                      eta_mapped = -eta;
-                  }
-                // Edge 10
-                else if ((i0[i] >=2 ) && (i1[i] == 1) && (i2[i] == 1))
-                  {
-                    if (elem->point(7) != std::min(elem->point(7), elem->point(6)))
-                      xi_mapped = -xi;
-                  }
-                // Edge 11
-                else if ((i0[i] == 0) && (i1[i] >=2 ) && (i2[i] == 1))
-                  {
-                    if (elem->point(4) != std::min(elem->point(4), elem->point(7)))
-                      eta_mapped = -eta;
-                  }
-              }
-
-
-              // handle the face orientation
-              {
-                // Face 0
-                if ((i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
-                  {
-                    const Point min_point = std::min(elem->point(1),
-                                                     std::min(elem->point(2),
-                                                              std::min(elem->point(0),
-                                                                       elem->point(3))));
-                    if (elem->point(0) == min_point)
-                      if (elem->point(1) == std::min(elem->point(1), elem->point(3)))
-                        {
-                          // Case 1
-                          xi_mapped  = xi;
-                          eta_mapped = eta;
-                        }
-                      else
-                        {
-                          // Case 2
-                          xi_mapped  = eta;
-                          eta_mapped = xi;
-                        }
-
-                    else if (elem->point(3) == min_point)
-                      if (elem->point(0) == std::min(elem->point(0), elem->point(2)))
-                        {
-                          // Case 3
-                          xi_mapped  = -eta;
-                          eta_mapped = xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped  = xi;
-                          eta_mapped = -eta;
-                        }
-
-                    else if (elem->point(2) == min_point)
-                      if (elem->point(3) == std::min(elem->point(3), elem->point(1)))
-                        {
-                          // Case 5
-                          xi_mapped  = -xi;
-                          eta_mapped = -eta;
-                        }
-                      else
-                        {
-                          // Case 6
-                          xi_mapped  = -eta;
-                          eta_mapped = -xi;
-                        }
-
-                    else if (elem->point(1) == min_point)
-                      {
-                        if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
-                          {
-                            // Case 7
-                            xi_mapped  = eta;
-                            eta_mapped = -xi;
-                          }
-                        else
-                          {
-                            // Case 8
-                            xi_mapped  = -xi;
-                            eta_mapped = eta;
-                          }
-                      }
-                  }
-
-
-                // Face 1
-                else if ((i1[i] == 0) && (i0[i] >= 2) && (i2[i] >= 2))
-                  {
-                    const Point min_point = std::min(elem->point(0),
-                                                     std::min(elem->point(1),
-                                                              std::min(elem->point(5),
-                                                                       elem->point(4))));
-                    if (elem->point(0) == min_point)
-                      if (elem->point(1) == std::min(elem->point(1), elem->point(4)))
-                        {
-                          // Case 1
-                          xi_mapped   = xi;
-                          zeta_mapped = zeta;
-                        }
-                      else
-                        {
-                          // Case 2
-                          xi_mapped   = zeta;
-                          zeta_mapped = xi;
-                        }
-
-                    else if (elem->point(1) == min_point)
-                      if (elem->point(5) == std::min(elem->point(5), elem->point(0)))
-                        {
-                          // Case 3
-                          xi_mapped   = zeta;
-                          zeta_mapped = -xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped   = -xi;
-                          zeta_mapped = zeta;
-                        }
-
-                    else if (elem->point(5) == min_point)
-                      if (elem->point(4) == std::min(elem->point(4), elem->point(1)))
-                        {
-                          // Case 5
-                          xi_mapped   = -xi;
-                          zeta_mapped = -zeta;
-                        }
-                      else
-                        {
-                          // Case 6
-                          xi_mapped   = -zeta;
-                          zeta_mapped = -xi;
-                        }
-
-                    else if (elem->point(4) == min_point)
-                      {
-                        if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
-                          {
-                            // Case 7
-                            xi_mapped   = -xi;
-                            zeta_mapped = zeta;
-                          }
-                        else
-                          {
-                            // Case 8
-                            xi_mapped   = xi;
-                            zeta_mapped = -zeta;
-                          }
-                      }
-                  }
-
-
-                // Face 2
-                else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] >= 2))
-                  {
-                    const Point min_point = std::min(elem->point(1),
-                                                     std::min(elem->point(2),
-                                                              std::min(elem->point(6),
-                                                                       elem->point(5))));
-                    if (elem->point(1) == min_point)
-                      if (elem->point(2) == std::min(elem->point(2), elem->point(5)))
-                        {
-                          // Case 1
-                          eta_mapped  = eta;
-                          zeta_mapped = zeta;
-                        }
-                      else
-                        {
-                          // Case 2
-                          eta_mapped  = zeta;
-                          zeta_mapped = eta;
-                        }
-
-                    else if (elem->point(2) == min_point)
-                      if (elem->point(6) == std::min(elem->point(6), elem->point(1)))
-                        {
-                          // Case 3
-                          eta_mapped  = zeta;
-                          zeta_mapped = -eta;
-                        }
-                      else
-                        {
-                          // Case 4
-                          eta_mapped  = -eta;
-                          zeta_mapped = zeta;
-                        }
-
-                    else if (elem->point(6) == min_point)
-                      if (elem->point(5) == std::min(elem->point(5), elem->point(2)))
-                        {
-                          // Case 5
-                          eta_mapped  = -eta;
-                          zeta_mapped = -zeta;
-                        }
-                      else
-                        {
-                          // Case 6
-                          eta_mapped  = -zeta;
-                          zeta_mapped = -eta;
-                        }
-
-                    else if (elem->point(5) == min_point)
-                      {
-                        if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
-                          {
-                            // Case 7
-                            eta_mapped  = -zeta;
-                            zeta_mapped = eta;
-                          }
-                        else
-                          {
-                            // Case 8
-                            eta_mapped   = eta;
-                            zeta_mapped = -zeta;
-                          }
-                      }
-                  }
-
-
-                // Face 3
-                else if ((i1[i] == 1) && (i0[i] >= 2) && (i2[i] >= 2))
-                  {
-                    const Point min_point = std::min(elem->point(2),
-                                                     std::min(elem->point(3),
-                                                              std::min(elem->point(7),
-                                                                       elem->point(6))));
-                    if (elem->point(3) == min_point)
-                      if (elem->point(2) == std::min(elem->point(2), elem->point(7)))
-                        {
-                          // Case 1
-                          xi_mapped   = xi;
-                          zeta_mapped = zeta;
-                        }
-                      else
-                        {
-                          // Case 2
-                          xi_mapped   = zeta;
-                          zeta_mapped = xi;
-                        }
-
-                    else if (elem->point(7) == min_point)
-                      if (elem->point(3) == std::min(elem->point(3), elem->point(6)))
-                        {
-                          // Case 3
-                          xi_mapped   = -zeta;
-                          zeta_mapped = xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped   = xi;
-                          zeta_mapped = -zeta;
-                        }
-
-                    else if (elem->point(6) == min_point)
-                      if (elem->point(7) == std::min(elem->point(7), elem->point(2)))
-                        {
-                          // Case 5
-                          xi_mapped   = -xi;
-                          zeta_mapped = -zeta;
-                        }
-                      else
-                        {
-                          // Case 6
-                          xi_mapped   = -zeta;
-                          zeta_mapped = -xi;
-                        }
-
-                    else if (elem->point(2) == min_point)
-                      {
-                        if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
-                          {
-                            // Case 7
-                            xi_mapped   = zeta;
-                            zeta_mapped = -xi;
-                          }
-                        else
-                          {
-                            // Case 8
-                            xi_mapped   = -xi;
-                            zeta_mapped = zeta;
-                          }
-                      }
-                  }
-
-
-                // Face 4
-                else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] >= 2))
-                  {
-                    const Point min_point = std::min(elem->point(3),
-                                                     std::min(elem->point(0),
-                                                              std::min(elem->point(4),
-                                                                       elem->point(7))));
-                    if (elem->point(0) == min_point)
-                      if (elem->point(3) == std::min(elem->point(3), elem->point(4)))
-                        {
-                          // Case 1
-                          eta_mapped  = eta;
-                          zeta_mapped = zeta;
-                        }
-                      else
-                        {
-                          // Case 2
-                          eta_mapped  = zeta;
-                          zeta_mapped = eta;
-                        }
-
-                    else if (elem->point(4) == min_point)
-                      if (elem->point(0) == std::min(elem->point(0), elem->point(7)))
-                        {
-                          // Case 3
-                          eta_mapped  = -zeta;
-                          zeta_mapped = eta;
-                        }
-                      else
-                        {
-                          // Case 4
-                          eta_mapped  = eta;
-                          zeta_mapped = -zeta;
-                        }
-
-                    else if (elem->point(7) == min_point)
-                      if (elem->point(4) == std::min(elem->point(4), elem->point(3)))
-                        {
-                          // Case 5
-                          eta_mapped  = -eta;
-                          zeta_mapped = -zeta;
-                        }
-                      else
-                        {
-                          // Case 6
-                          eta_mapped  = -zeta;
-                          zeta_mapped = -eta;
-                        }
-
-                    else if (elem->point(3) == min_point)
-                      {
-                        if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
-                          {
-                            // Case 7
-                            eta_mapped   = zeta;
-                            zeta_mapped = -eta;
-                          }
-                        else
-                          {
-                            // Case 8
-                            eta_mapped  = -eta;
-                            zeta_mapped = zeta;
-                          }
-                      }
-                  }
-
-
-                // Face 5
-                else if ((i2[i] == 1) && (i0[i] >= 2) && (i1[i] >= 2))
-                  {
-                    const Point min_point = std::min(elem->point(4),
-                                                     std::min(elem->point(5),
-                                                              std::min(elem->point(6),
-                                                                       elem->point(7))));
-                    if (elem->point(4) == min_point)
-                      if (elem->point(5) == std::min(elem->point(5), elem->point(7)))
-                        {
-                          // Case 1
-                          xi_mapped  = xi;
-                          eta_mapped = eta;
-                        }
-                      else
-                        {
-                          // Case 2
-                          xi_mapped  = eta;
-                          eta_mapped = xi;
-                        }
-
-                    else if (elem->point(5) == min_point)
-                      if (elem->point(6) == std::min(elem->point(6), elem->point(4)))
-                        {
-                          // Case 3
-                          xi_mapped  = eta;
-                          eta_mapped = -xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped  = -xi;
-                          eta_mapped = eta;
-                        }
-
-                    else if (elem->point(6) == min_point)
-                      if (elem->point(7) == std::min(elem->point(7), elem->point(5)))
-                        {
-                          // Case 5
-                          xi_mapped  = -xi;
-                          eta_mapped = -eta;
-                        }
-                      else
-                        {
-                          // Case 6
-                          xi_mapped  = -eta;
-                          eta_mapped = -xi;
-                        }
-
-                    else if (elem->point(7) == min_point)
-                      {
-                        if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
-                          {
-                            // Case 7
-                            xi_mapped  = -eta;
-                            eta_mapped = xi;
-                          }
-                        else
-                          {
-                            // Case 8
-                            xi_mapped  = xi;
-                            eta_mapped = eta;
-                          }
-                      }
-                  }
-              }
-
-              return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi_mapped)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta_mapped)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], zeta_mapped));
+              const Point p_mapped = hex_remap(p, i0, i1, i2);
+              return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], p_mapped(0))*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], p_mapped(1))*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], p_mapped(2)));
             }
-
 
           default:
             libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
-          } //case HEX27
+          }
 
       }//case THIRD
 
@@ -845,14 +851,6 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
             {
               libmesh_assert_less (i, 125);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi    = p(0);
-              const Real eta   = p(1);
-              const Real zeta  = p(2);
-              Real xi_mapped   = p(0);
-              Real eta_mapped  = p(1);
-              Real zeta_mapped = p(2);
-
               // The only way to make any sense of this
               // is to look at the mgflo/mg2/mgf documentation
               // and make the cut-out cube!
@@ -862,495 +860,10 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4};
               static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4};
 
-
-
-              // handle the edge orientation
-              {
-                // Edge 0
-                if ((i0[i] >= 2) && (i1[i] == 0) && (i2[i] == 0))
-                  {
-                    if (elem->point(0) != std::min(elem->point(0), elem->point(1)))
-                      xi_mapped = -xi;
-                  }
-                // Edge 1
-                else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] == 0))
-                  {
-                    if (elem->point(1) != std::min(elem->point(1), elem->point(2)))
-                      eta_mapped = -eta;
-                  }
-                // Edge 2
-                else if ((i0[i] >= 2) && (i1[i] == 1) && (i2[i] == 0))
-                  {
-                    if (elem->point(3) != std::min(elem->point(3), elem->point(2)))
-                      xi_mapped = -xi;
-                  }
-                // Edge 3
-                else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] == 0))
-                  {
-                    if (elem->point(0) != std::min(elem->point(0), elem->point(3)))
-                      eta_mapped = -eta;
-                  }
-                // Edge 4
-                else if ((i0[i] == 0) && (i1[i] == 0) && (i2[i] >=2 ))
-                  {
-                    if (elem->point(0) != std::min(elem->point(0), elem->point(4)))
-                      zeta_mapped = -zeta;
-                  }
-                // Edge 5
-                else if ((i0[i] == 1) && (i1[i] == 0) && (i2[i] >=2 ))
-                  {
-                    if (elem->point(1) != std::min(elem->point(1), elem->point(5)))
-                      zeta_mapped = -zeta;
-                  }
-                // Edge 6
-                else if ((i0[i] == 1) && (i1[i] == 1) && (i2[i] >=2 ))
-                  {
-                    if (elem->point(2) != std::min(elem->point(2), elem->point(6)))
-                      zeta_mapped = -zeta;
-                  }
-                // Edge 7
-                else if ((i0[i] == 0) && (i1[i] == 1) && (i2[i] >=2 ))
-                  {
-                    if (elem->point(3) != std::min(elem->point(3), elem->point(7)))
-                      zeta_mapped = -zeta;
-                  }
-                // Edge 8
-                else if ((i0[i] >=2 ) && (i1[i] == 0) && (i2[i] == 1))
-                  {
-                    if (elem->point(4) != std::min(elem->point(4), elem->point(5)))
-                      xi_mapped = -xi;
-                  }
-                // Edge 9
-                else if ((i0[i] == 1) && (i1[i] >=2 ) && (i2[i] == 1))
-                  {
-                    if (elem->point(5) != std::min(elem->point(5), elem->point(6)))
-                      eta_mapped = -eta;
-                  }
-                // Edge 10
-                else if ((i0[i] >=2 ) && (i1[i] == 1) && (i2[i] == 1))
-                  {
-                    if (elem->point(7) != std::min(elem->point(7), elem->point(6)))
-                      xi_mapped = -xi;
-                  }
-                // Edge 11
-                else if ((i0[i] == 0) && (i1[i] >=2 ) && (i2[i] == 1))
-                  {
-                    if (elem->point(4) != std::min(elem->point(4), elem->point(7)))
-                      eta_mapped = -eta;
-                  }
-              }
-
-
-              // handle the face orientation
-              {
-                // Face 0
-                if ((i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
-                  {
-                    const Point min_point = std::min(elem->point(1),
-                                                     std::min(elem->point(2),
-                                                              std::min(elem->point(0),
-                                                                       elem->point(3))));
-                    if (elem->point(0) == min_point)
-                      if (elem->point(1) == std::min(elem->point(1), elem->point(3)))
-                        {
-                          // Case 1
-                          xi_mapped  = xi;
-                          eta_mapped = eta;
-                        }
-                      else
-                        {
-                          // Case 2
-                          xi_mapped  = eta;
-                          eta_mapped = xi;
-                        }
-
-                    else if (elem->point(3) == min_point)
-                      if (elem->point(0) == std::min(elem->point(0), elem->point(2)))
-                        {
-                          // Case 3
-                          xi_mapped  = -eta;
-                          eta_mapped = xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped  = xi;
-                          eta_mapped = -eta;
-                        }
-
-                    else if (elem->point(2) == min_point)
-                      if (elem->point(3) == std::min(elem->point(3), elem->point(1)))
-                        {
-                          // Case 5
-                          xi_mapped  = -xi;
-                          eta_mapped = -eta;
-                        }
-                      else
-                        {
-                          // Case 6
-                          xi_mapped  = -eta;
-                          eta_mapped = -xi;
-                        }
-
-                    else if (elem->point(1) == min_point)
-                      {
-                        if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
-                          {
-                            // Case 7
-                            xi_mapped  = eta;
-                            eta_mapped = -xi;
-                          }
-                        else
-                          {
-                            // Case 8
-                            xi_mapped  = -xi;
-                            eta_mapped = eta;
-                          }
-                      }
-                  }
-
-
-                // Face 1
-                else if ((i1[i] == 0) && (i0[i] >= 2) && (i2[i] >= 2))
-                  {
-                    const Point min_point = std::min(elem->point(0),
-                                                     std::min(elem->point(1),
-                                                              std::min(elem->point(5),
-                                                                       elem->point(4))));
-                    if (elem->point(0) == min_point)
-                      if (elem->point(1) == std::min(elem->point(1), elem->point(4)))
-                        {
-                          // Case 1
-                          xi_mapped   = xi;
-                          zeta_mapped = zeta;
-                        }
-                      else
-                        {
-                          // Case 2
-                          xi_mapped   = zeta;
-                          zeta_mapped = xi;
-                        }
-
-                    else if (elem->point(1) == min_point)
-                      if (elem->point(5) == std::min(elem->point(5), elem->point(0)))
-                        {
-                          // Case 3
-                          xi_mapped   = zeta;
-                          zeta_mapped = -xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped   = -xi;
-                          zeta_mapped = zeta;
-                        }
-
-                    else if (elem->point(5) == min_point)
-                      if (elem->point(4) == std::min(elem->point(4), elem->point(1)))
-                        {
-                          // Case 5
-                          xi_mapped   = -xi;
-                          zeta_mapped = -zeta;
-                        }
-                      else
-                        {
-                          // Case 6
-                          xi_mapped   = -zeta;
-                          zeta_mapped = -xi;
-                        }
-
-                    else if (elem->point(4) == min_point)
-                      {
-                        if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
-                          {
-                            // Case 7
-                            xi_mapped   = -xi;
-                            zeta_mapped = zeta;
-                          }
-                        else
-                          {
-                            // Case 8
-                            xi_mapped   = xi;
-                            zeta_mapped = -zeta;
-                          }
-                      }
-                  }
-
-
-                // Face 2
-                else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] >= 2))
-                  {
-                    const Point min_point = std::min(elem->point(1),
-                                                     std::min(elem->point(2),
-                                                              std::min(elem->point(6),
-                                                                       elem->point(5))));
-                    if (elem->point(1) == min_point)
-                      if (elem->point(2) == std::min(elem->point(2), elem->point(5)))
-                        {
-                          // Case 1
-                          eta_mapped  = eta;
-                          zeta_mapped = zeta;
-                        }
-                      else
-                        {
-                          // Case 2
-                          eta_mapped  = zeta;
-                          zeta_mapped = eta;
-                        }
-
-                    else if (elem->point(2) == min_point)
-                      if (elem->point(6) == std::min(elem->point(6), elem->point(1)))
-                        {
-                          // Case 3
-                          eta_mapped  = zeta;
-                          zeta_mapped = -eta;
-                        }
-                      else
-                        {
-                          // Case 4
-                          eta_mapped  = -eta;
-                          zeta_mapped = zeta;
-                        }
-
-                    else if (elem->point(6) == min_point)
-                      if (elem->point(5) == std::min(elem->point(5), elem->point(2)))
-                        {
-                          // Case 5
-                          eta_mapped  = -eta;
-                          zeta_mapped = -zeta;
-                        }
-                      else
-                        {
-                          // Case 6
-                          eta_mapped  = -zeta;
-                          zeta_mapped = -eta;
-                        }
-
-                    else if (elem->point(5) == min_point)
-                      {
-                        if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
-                          {
-                            // Case 7
-                            eta_mapped  = -zeta;
-                            zeta_mapped = eta;
-                          }
-                        else
-                          {
-                            // Case 8
-                            eta_mapped   = eta;
-                            zeta_mapped = -zeta;
-                          }
-                      }
-                  }
-
-
-                // Face 3
-                else if ((i1[i] == 1) && (i0[i] >= 2) && (i2[i] >= 2))
-                  {
-                    const Point min_point = std::min(elem->point(2),
-                                                     std::min(elem->point(3),
-                                                              std::min(elem->point(7),
-                                                                       elem->point(6))));
-                    if (elem->point(3) == min_point)
-                      if (elem->point(2) == std::min(elem->point(2), elem->point(7)))
-                        {
-                          // Case 1
-                          xi_mapped   = xi;
-                          zeta_mapped = zeta;
-                        }
-                      else
-                        {
-                          // Case 2
-                          xi_mapped   = zeta;
-                          zeta_mapped = xi;
-                        }
-
-                    else if (elem->point(7) == min_point)
-                      if (elem->point(3) == std::min(elem->point(3), elem->point(6)))
-                        {
-                          // Case 3
-                          xi_mapped   = -zeta;
-                          zeta_mapped = xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped   = xi;
-                          zeta_mapped = -zeta;
-                        }
-
-                    else if (elem->point(6) == min_point)
-                      if (elem->point(7) == std::min(elem->point(7), elem->point(2)))
-                        {
-                          // Case 5
-                          xi_mapped   = -xi;
-                          zeta_mapped = -zeta;
-                        }
-                      else
-                        {
-                          // Case 6
-                          xi_mapped   = -zeta;
-                          zeta_mapped = -xi;
-                        }
-
-                    else if (elem->point(2) == min_point)
-                      {
-                        if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
-                          {
-                            // Case 7
-                            xi_mapped   = zeta;
-                            zeta_mapped = -xi;
-                          }
-                        else
-                          {
-                            // Case 8
-                            xi_mapped   = -xi;
-                            zeta_mapped = zeta;
-                          }
-                      }
-                  }
-
-
-                // Face 4
-                else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] >= 2))
-                  {
-                    const Point min_point = std::min(elem->point(3),
-                                                     std::min(elem->point(0),
-                                                              std::min(elem->point(4),
-                                                                       elem->point(7))));
-                    if (elem->point(0) == min_point)
-                      if (elem->point(3) == std::min(elem->point(3), elem->point(4)))
-                        {
-                          // Case 1
-                          eta_mapped  = eta;
-                          zeta_mapped = zeta;
-                        }
-                      else
-                        {
-                          // Case 2
-                          eta_mapped  = zeta;
-                          zeta_mapped = eta;
-                        }
-
-                    else if (elem->point(4) == min_point)
-                      if (elem->point(0) == std::min(elem->point(0), elem->point(7)))
-                        {
-                          // Case 3
-                          eta_mapped  = -zeta;
-                          zeta_mapped = eta;
-                        }
-                      else
-                        {
-                          // Case 4
-                          eta_mapped  = eta;
-                          zeta_mapped = -zeta;
-                        }
-
-                    else if (elem->point(7) == min_point)
-                      if (elem->point(4) == std::min(elem->point(4), elem->point(3)))
-                        {
-                          // Case 5
-                          eta_mapped  = -eta;
-                          zeta_mapped = -zeta;
-                        }
-                      else
-                        {
-                          // Case 6
-                          eta_mapped  = -zeta;
-                          zeta_mapped = -eta;
-                        }
-
-                    else if (elem->point(3) == min_point)
-                      {
-                        if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
-                          {
-                            // Case 7
-                            eta_mapped   = zeta;
-                            zeta_mapped = -eta;
-                          }
-                        else
-                          {
-                            // Case 8
-                            eta_mapped  = -eta;
-                            zeta_mapped = zeta;
-                          }
-                      }
-                  }
-
-
-                // Face 5
-                else if ((i2[i] == 1) && (i0[i] >= 2) && (i1[i] >= 2))
-                  {
-                    const Point min_point = std::min(elem->point(4),
-                                                     std::min(elem->point(5),
-                                                              std::min(elem->point(6),
-                                                                       elem->point(7))));
-                    if (elem->point(4) == min_point)
-                      if (elem->point(5) == std::min(elem->point(5), elem->point(7)))
-                        {
-                          // Case 1
-                          xi_mapped  = xi;
-                          eta_mapped = eta;
-                        }
-                      else
-                        {
-                          // Case 2
-                          xi_mapped  = eta;
-                          eta_mapped = xi;
-                        }
-
-                    else if (elem->point(5) == min_point)
-                      if (elem->point(6) == std::min(elem->point(6), elem->point(4)))
-                        {
-                          // Case 3
-                          xi_mapped  = eta;
-                          eta_mapped = -xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped  = -xi;
-                          eta_mapped = eta;
-                        }
-
-                    else if (elem->point(6) == min_point)
-                      if (elem->point(7) == std::min(elem->point(7), elem->point(5)))
-                        {
-                          // Case 5
-                          xi_mapped  = -xi;
-                          eta_mapped = -eta;
-                        }
-                      else
-                        {
-                          // Case 6
-                          xi_mapped  = -eta;
-                          eta_mapped = -xi;
-                        }
-
-                    else if (elem->point(7) == min_point)
-                      {
-                        if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
-                          {
-                            // Case 7
-                            xi_mapped  = -eta;
-                            eta_mapped = xi;
-                          }
-                        else
-                          {
-                            // Case 8
-                            xi_mapped  = xi;
-                            eta_mapped = eta;
-                          }
-                      }
-                  }
-
-
-              }
-
-
-              return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi_mapped)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta_mapped)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], zeta_mapped));
+              const Point p_mapped = hex_remap(p, i0, i1, i2);
+              return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], p_mapped(0))*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], p_mapped(1))*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], p_mapped(2)));
             }
 
 
