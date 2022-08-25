@@ -217,6 +217,11 @@ public:
    */
   virtual unsigned int reuse_preconditioner_max_its() const override;
 
+  /**
+   *  Immediately force a new preconditioner, even if reuse is set
+   */
+  virtual void force_new_preconditioner() override;
+
 protected:
 
   /**
@@ -281,6 +286,11 @@ protected:
     * Whether we've triggered the preconditioner reuse
     */
   bool _setup_reuse;
+
+  /**
+   *  Check on operator sizes to see if we need to get a new preconditioner
+   */
+  void check_reuse_operator_sizes(numeric_index_type new_size);
 
 private:
   friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);

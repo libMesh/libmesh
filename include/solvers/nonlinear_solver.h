@@ -374,6 +374,11 @@ public:
    */
   virtual void set_reuse_preconditioner_max_its(unsigned int i);
 
+  /**
+   * Immediately force a new preconditioner
+   */
+  virtual void force_new_preconditioner() {};
+
 
 protected:
   /**

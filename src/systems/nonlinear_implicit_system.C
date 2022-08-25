@@ -82,6 +82,10 @@ void NonlinearImplicitSystem::reinit ()
   // re-initialize the nonlinear solver interface
   nonlinear_solver->clear();
 
+  // force the solver to get a new preconditioner, in
+  // case reuse was set
+  nonlinear_solver->force_new_preconditioner();
+
   // FIXME - this is necessary for petsc_auto_fieldsplit
   // nonlinear_solver->init_names(*this);
 
