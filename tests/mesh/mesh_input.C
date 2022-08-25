@@ -933,7 +933,7 @@ public:
               const Point node_pt = elem->point(i);
               const Real nodal_coef =
                 libmesh_real((*sys.current_local_solution)(dof_indices[i]));
-              const Number exact_val =
+              const Real exact_val =
                 libmesh_real(exact_sol
                              (node_pt, es.parameters, nullstr,
                               nullstr));
