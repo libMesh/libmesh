@@ -217,6 +217,8 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> & shell_matrix,
   return _solve_standard_helper(matrix->mat(), precond->mat(), nev, ncv, tol, m_its);
 }
 
+
+
 template <typename T>
 std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
@@ -228,141 +230,12 @@ SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
 {
   LOG_SCOPE("solve_standard()", "SlepcEigenSolver");
 
-  PetscErrorCode ierr=0;
-
-  // converged eigen pairs and number of iterations
-  PetscInt nconv=0;
-  PetscInt its=0;
-  ST st=nullptr;
-
-#ifdef  DEBUG
-  // The relative error.
-  PetscReal error, re, im;
-
-  // Pointer to vectors of the real parts, imaginary parts.
-  PetscScalar kr, ki;
-#endif
-
   // Set operators.
-  ierr = EPSSetOperators (_eps, mat, PETSC_NULL);
+  PetscErrorCode ierr = EPSSetOperators (_eps, mat, PETSC_NULL);
   LIBMESH_CHKERR(ierr);
 
-  //set the problem type and the position of the spectrum
-  set_slepc_problem_type();
-  set_slepc_position_of_spectrum();
-
-  // Set eigenvalues to be computed.
-#if SLEPC_VERSION_LESS_THAN(3,0,0)
-  ierr = EPSSetDimensions (_eps, nev, ncv);
-#else
-  ierr = EPSSetDimensions (_eps, nev, ncv, PETSC_DECIDE);
-#endif
-  LIBMESH_CHKERR(ierr);
-  // Set the tolerance and maximum iterations.
-  ierr = EPSSetTolerances (_eps, tol, m_its);
-  LIBMESH_CHKERR(ierr);
-
-  // Set runtime options, e.g.,
-  //      -eps_type <type>, -eps_nev <nev>, -eps_ncv <ncv>
-  // Similar to PETSc, these options will override those specified
-  // above as long as EPSSetFromOptions() is called _after_ any
-  // other customization routines.
-  ierr = EPSSetFromOptions (_eps);
-  LIBMESH_CHKERR(ierr);
-
-  // Set a preconditioning matrix to ST
-  if (precond) {
-    ierr = EPSGetST(_eps,&st);LIBMESH_CHKERR(ierr);
-#if SLEPC_VERSION_LESS_THAN(3,15,0)
-    ierr = STPrecondSetMatForPC(st, precond);
-#else
-    ierr = STSetPreconditionerMat(st, precond);
-#endif
-    LIBMESH_CHKERR(ierr);
-  }
-
-  // If the SolverConfiguration object is provided, use it to override
-  // solver options.
-  if (this->_solver_configuration)
-    {
-      this->_solver_configuration->configure_solver();
-    }
-
-  // If an initial space is provided, let us attach it to EPS
-  if (_initial_space) {
-    // Get a handle for the underlying Vec.
-    Vec initial_vector = _initial_space->vec();
-
-    ierr = EPSSetInitialSpace(_eps, 1, &initial_vector);
-    LIBMESH_CHKERR(ierr);
-  }
-
-  // Solve the eigenproblem.
-  ierr = EPSSolve (_eps);
-  LIBMESH_CHKERR(ierr);
-
-  // Get the number of iterations.
-  ierr = EPSGetIterationNumber (_eps, &its);
-  LIBMESH_CHKERR(ierr);
-
-  // Get number of converged eigenpairs.
-  ierr = EPSGetConverged(_eps,&nconv);
-  LIBMESH_CHKERR(ierr);
-
-
-#ifdef DEBUG
-  // ierr = PetscPrintf(this->comm().get(),
-  //         "\n Number of iterations: %d\n"
-  //         " Number of converged eigenpairs: %d\n\n", its, nconv);
-
-  // Display eigenvalues and relative errors.
-  ierr = PetscPrintf(this->comm().get(),
-                     "           k           ||Ax-kx||/|kx|\n"
-                     "   ----------------- -----------------\n" );
-  LIBMESH_CHKERR(ierr);
-
-  for (PetscInt i=0; i<nconv; i++ )
-    {
-      ierr = EPSGetEigenpair(_eps, i, &kr, &ki, PETSC_NULL, PETSC_NULL);
-      LIBMESH_CHKERR(ierr);
-
-#if SLEPC_VERSION_LESS_THAN(3,6,0)
-      ierr = EPSComputeRelativeError(_eps, i, &error);
-#else
-      ierr = EPSComputeError(_eps, i, EPS_ERROR_RELATIVE, &error);
-#endif
-      LIBMESH_CHKERR(ierr);
-
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-      re = PetscRealPart(kr);
-      im = PetscImaginaryPart(kr);
-#else
-      re = kr;
-      im = ki;
-#endif
-
-      if (im != .0)
-        {
-          ierr = PetscPrintf(this->comm().get()," %9f%+9f i %12f\n", re, im, error);
-          LIBMESH_CHKERR(ierr);
-        }
-      else
-        {
-          ierr = PetscPrintf(this->comm().get(),"   %12f       %12f\n", re, error);
-          LIBMESH_CHKERR(ierr);
-        }
-    }
-
-  ierr = PetscPrintf(this->comm().get(),"\n" );
-  LIBMESH_CHKERR(ierr);
-#endif // DEBUG
-
-  // return the number of converged eigenpairs
-  // and the number of iterations
-  return std::make_pair(nconv, its);
+  return this->_solve_helper(precond, nev, ncv, tol, m_its);
 }
-
-
 
 
 
@@ -611,12 +484,29 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 {
   LOG_SCOPE("solve_generalized()", "SlepcEigenSolver");
 
+  // Set operators.
+  PetscErrorCode ierr = EPSSetOperators (_eps, mat_A, mat_B);
+  LIBMESH_CHKERR(ierr);
+
+  return this->_solve_helper(precond, nev, ncv, tol, m_its);
+}
+
+
+
+template <typename T>
+std::pair<unsigned int, unsigned int>
+SlepcEigenSolver<T>::_solve_helper(Mat precond,
+                                   int nev,                  // number of requested eigenpairs
+                                   int ncv,                  // number of basis vectors
+                                   const double tol,         // solver tolerance
+                                   const unsigned int m_its) // maximum number of iterations
+{
   PetscErrorCode ierr=0;
 
   // converged eigen pairs and number of iterations
   PetscInt nconv=0;
   PetscInt its=0;
-  ST st;
+  ST st=nullptr;
 
 #ifdef  DEBUG
   // The relative error.
@@ -625,10 +515,6 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
   // Pointer to vectors of the real parts, imaginary parts.
   PetscScalar kr, ki;
 #endif
-
-  // Set operators.
-  ierr = EPSSetOperators (_eps, mat_A, mat_B);
-  LIBMESH_CHKERR(ierr);
 
   //set the problem type and the position of the spectrum
   set_slepc_problem_type();
@@ -641,8 +527,6 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
   ierr = EPSSetDimensions (_eps, nev, ncv, PETSC_DECIDE);
 #endif
   LIBMESH_CHKERR(ierr);
-
-
   // Set the tolerance and maximum iterations.
   ierr = EPSSetTolerances (_eps, tol, m_its);
   LIBMESH_CHKERR(ierr);
@@ -746,6 +630,7 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
   // and the number of iterations
   return std::make_pair(nconv, its);
 }
+
 
 
 
