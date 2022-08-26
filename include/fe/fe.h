@@ -1319,6 +1319,19 @@ fe_fdm_second_deriv(const Elem * elem,
                        const Point &, const bool));
 
 /**
+ * Helper functions for Lagrange-based basis functions.
+ */
+void lagrange_nodal_soln(const Elem * elem,
+                         const Order order,
+                         const std::vector<Number> & elem_soln,
+                         std::vector<Number> &       nodal_soln);
+
+/**
+ * Helper functions for Discontinuous-Pn type basis functions.
+ */
+unsigned int monomial_n_dofs(const ElemType t, const Order o);
+
+/**
  * Helper functions for rational basis functions.
  */
 // shapes[i][j] is shape function phi_i at point p[j]

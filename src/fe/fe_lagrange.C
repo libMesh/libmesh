@@ -38,8 +38,7 @@
 namespace libMesh
 {
 
-// Anonymous namespace for local helper functions
-namespace {
+// global helper function
 void lagrange_nodal_soln(const Elem * elem,
                          const Order order,
                          const std::vector<Number> & elem_soln,
@@ -356,9 +355,13 @@ void lagrange_nodal_soln(const Elem * elem,
 
           default:
             {
-              // By default the element solution _is_ nodal,
-              // so just copy it.
-              nodal_soln = elem_soln;
+              // By default the element solution _is_ nodal, so just
+              // copy the portion relevant to the nodal solution.
+              // (this is the whole nodal solution for true Lagrange
+              // elements, but a smaller part for "L2 Lagrange"
+              libmesh_assert_less_equal(nodal_soln.size(), elem_soln.size());
+              for (const auto i : index_range(nodal_soln))
+                nodal_soln[i] = elem_soln[i];
 
               return;
             }
@@ -370,9 +373,13 @@ void lagrange_nodal_soln(const Elem * elem,
 
     default:
       {
-        // By default the element solution _is_ nodal,
-        // so just copy it.
-        nodal_soln = elem_soln;
+        // By default the element solution _is_ nodal, so just copy
+        // the portion relevant to the nodal solution.  (this is the
+        // whole nodal solution for true Lagrange elements, but a
+        // smaller part for "L2 Lagrange"
+        libmesh_assert_less_equal(nodal_soln.size(), elem_soln.size());
+        for (const auto i : index_range(nodal_soln))
+          nodal_soln[i] = elem_soln[i];
 
         return;
       }
@@ -380,7 +387,8 @@ void lagrange_nodal_soln(const Elem * elem,
 }
 
 
-
+// Anonymous namespace for local helper functions
+namespace {
 unsigned int lagrange_n_dofs(const ElemType t, const Order o)
 {
   switch (o)

@@ -26,73 +26,6 @@
 namespace libMesh
 {
 
-// Anonymous namespace for local helper functions
-namespace {
-
-void monomial_nodal_soln(const Elem * elem,
-                         const Order order,
-                         const std::vector<Number> & elem_soln,
-                         std::vector<Number> & nodal_soln)
-{
-  const unsigned int n_nodes = elem->n_nodes();
-
-  const ElemType elem_type = elem->type();
-
-  nodal_soln.resize(n_nodes);
-
-  const Order totalorder = static_cast<Order>(order+elem->p_level());
-
-  switch (totalorder)
-    {
-      // Constant shape functions
-    case CONSTANT:
-      {
-        libmesh_assert_equal_to (elem_soln.size(), 1);
-
-        const Number val = elem_soln[0];
-
-        for (unsigned int n=0; n<n_nodes; n++)
-          nodal_soln[n] = val;
-
-        return;
-      }
-
-
-      // For other orders, do interpolation at the nodes
-      // explicitly.
-    default:
-      {
-        // FEType object to be passed to various FEInterface functions below.
-        FEType fe_type(order, MONOMIAL);
-
-        const unsigned int n_sf =
-          FEInterface::n_shape_functions(fe_type, elem);
-
-        std::vector<Point> refspace_nodes;
-        FEBase::get_refspace_nodes(elem_type,refspace_nodes);
-        libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
-
-        for (unsigned int n=0; n<n_nodes; n++)
-          {
-            libmesh_assert_equal_to (elem_soln.size(), n_sf);
-
-            // Zero before summation
-            nodal_soln[n] = 0;
-
-            // u_i = Sum (alpha_i phi_i)
-            for (unsigned int i=0; i<n_sf; i++)
-              nodal_soln[n] += elem_soln[i] *
-                FEInterface::shape(fe_type, elem, i, refspace_nodes[n]);
-          }
-
-        return;
-      } // default
-    } // switch
-} // monomial_nodal_soln()
-
-
-
-
 unsigned int monomial_n_dofs(const ElemType t, const Order o)
 {
   switch (o)
@@ -341,6 +274,73 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
       }
     }
 } // monomial_n_dofs()
+
+
+// Anonymous namespace for local helper functions
+namespace {
+
+void monomial_nodal_soln(const Elem * elem,
+                         const Order order,
+                         const std::vector<Number> & elem_soln,
+                         std::vector<Number> & nodal_soln)
+{
+  const unsigned int n_nodes = elem->n_nodes();
+
+  const ElemType elem_type = elem->type();
+
+  nodal_soln.resize(n_nodes);
+
+  const Order totalorder = static_cast<Order>(order+elem->p_level());
+
+  switch (totalorder)
+    {
+      // Constant shape functions
+    case CONSTANT:
+      {
+        libmesh_assert_equal_to (elem_soln.size(), 1);
+
+        const Number val = elem_soln[0];
+
+        for (unsigned int n=0; n<n_nodes; n++)
+          nodal_soln[n] = val;
+
+        return;
+      }
+
+
+      // For other orders, do interpolation at the nodes
+      // explicitly.
+    default:
+      {
+        // FEType object to be passed to various FEInterface functions below.
+        FEType fe_type(order, MONOMIAL);
+
+        const unsigned int n_sf =
+          FEInterface::n_shape_functions(fe_type, elem);
+
+        std::vector<Point> refspace_nodes;
+        FEBase::get_refspace_nodes(elem_type,refspace_nodes);
+        libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
+
+        for (unsigned int n=0; n<n_nodes; n++)
+          {
+            libmesh_assert_equal_to (elem_soln.size(), n_sf);
+
+            // Zero before summation
+            nodal_soln[n] = 0;
+
+            // u_i = Sum (alpha_i phi_i)
+            for (unsigned int i=0; i<n_sf; i++)
+              nodal_soln[n] += elem_soln[i] *
+                FEInterface::shape(fe_type, elem, i, refspace_nodes[n]);
+          }
+
+        return;
+      } // default
+    } // switch
+} // monomial_nodal_soln()
+
+
 
 
 } // anonymous namespace

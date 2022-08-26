@@ -280,6 +280,15 @@ private:
                                                                    const unsigned int m_its);
 
   /**
+   * Helper function that actually performs either eigensolve.
+   */
+  std::pair<unsigned int, unsigned int> _solve_helper (Mat precond,
+                                                       int nev,
+                                                       int ncv,
+                                                       const double tol,
+                                                       const unsigned int m_its);
+
+  /**
    * Tells Slepc to use the user-specified solver stored in
    * \p _eigen_solver_type
    */

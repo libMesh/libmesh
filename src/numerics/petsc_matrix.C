@@ -245,6 +245,8 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   // So compilers don't warn when !LIBMESH_ENABLE_BLOCKED_STORAGE
   libmesh_ignore(blocksize_in);
 
+  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
+
   // Clear initialized matrices
   if (this->initialized())
     this->clear();
@@ -265,7 +267,6 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   LIBMESH_CHKERR(ierr);
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
   LIBMESH_CHKERR(ierr);
-  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
   ierr = MatSetBlockSize(_mat,blocksize);
   LIBMESH_CHKERR(ierr);
 
@@ -379,143 +380,15 @@ void PetscMatrix<T>::init (const ParallelType)
 {
   libmesh_assert(this->_dof_map);
 
-  // Clear initialized matrices
-  if (this->initialized())
-    this->clear();
-
-  this->_is_initialized = true;
-
-
-  const numeric_index_type my_m = this->_dof_map->n_dofs();
-  const numeric_index_type my_n = my_m;
-  const numeric_index_type n_l  = this->_dof_map->n_dofs_on_processor(this->processor_id());
-  const numeric_index_type m_l  = n_l;
-
+  const numeric_index_type m_in = this->_dof_map->n_dofs();
+  const numeric_index_type m_l  = this->_dof_map->n_dofs_on_processor(this->processor_id());
 
   const std::vector<numeric_index_type> & n_nz = this->_sp->get_n_nz();
   const std::vector<numeric_index_type> & n_oz = this->_sp->get_n_oz();
 
-  // Make sure the sparsity pattern isn't empty unless the matrix is 0x0
-  libmesh_assert_equal_to (n_nz.size(), m_l);
-  libmesh_assert_equal_to (n_oz.size(), m_l);
-
-  PetscErrorCode ierr = 0;
-  PetscInt m_global   = static_cast<PetscInt>(my_m);
-  PetscInt n_global   = static_cast<PetscInt>(my_n);
-  PetscInt m_local    = static_cast<PetscInt>(m_l);
-  PetscInt n_local    = static_cast<PetscInt>(n_l);
-
-  ierr = MatCreate(this->comm().get(), &_mat);
-  LIBMESH_CHKERR(ierr);
-  ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
-  LIBMESH_CHKERR(ierr);
   PetscInt blocksize  = static_cast<PetscInt>(this->_dof_map->block_size());
-  ierr = MatSetBlockSize(_mat,blocksize);
-  LIBMESH_CHKERR(ierr);
 
-#ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
-  if (blocksize > 1)
-    {
-      // specified blocksize, bs>1.
-      // double check sizes.
-      libmesh_assert_equal_to (m_local  % blocksize, 0);
-      libmesh_assert_equal_to (n_local  % blocksize, 0);
-      libmesh_assert_equal_to (m_global % blocksize, 0);
-      libmesh_assert_equal_to (n_global % blocksize, 0);
-
-      ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
-      LIBMESH_CHKERR(ierr);
-
-      // MatSetFromOptions needs to happen before Preallocation routines
-      // since MatSetFromOptions can change matrix type and remove incompatible
-      // preallocation
-      LIBMESH_CHKERR(ierr);
-      ierr = MatSetOptionsPrefix(_mat, "");
-      LIBMESH_CHKERR(ierr);
-      ierr = MatSetFromOptions(_mat);
-      LIBMESH_CHKERR(ierr);
-
-      // transform the per-entry n_nz and n_oz arrays into their block counterparts.
-      std::vector<numeric_index_type> b_n_nz, b_n_oz;
-
-      transform_preallocation_arrays (blocksize,
-                                      n_nz, n_oz,
-                                      b_n_nz, b_n_oz);
-
-      ierr = MatSeqBAIJSetPreallocation (_mat,
-                                         blocksize,
-                                         0,
-                                         numeric_petsc_cast(b_n_nz.empty() ? nullptr : b_n_nz.data()));
-      LIBMESH_CHKERR(ierr);
-
-      ierr = MatMPIBAIJSetPreallocation (_mat,
-                                         blocksize,
-                                         0,
-                                         numeric_petsc_cast(b_n_nz.empty() ? nullptr : b_n_nz.data()),
-                                         0,
-                                         numeric_petsc_cast(b_n_oz.empty() ? nullptr : b_n_oz.data()));
-      LIBMESH_CHKERR(ierr);
-    }
-  else
-#endif
-    {
-      switch (_mat_type) {
-        case AIJ:
-          ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
-          LIBMESH_CHKERR(ierr);
-
-          // MatSetFromOptions needs to happen before Preallocation routines
-          // since MatSetFromOptions can change matrix type and remove incompatible
-          // preallocation
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSetOptionsPrefix(_mat, "");
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSetFromOptions(_mat);
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSeqAIJSetPreallocation (_mat,
-                                            0,
-                                            numeric_petsc_cast(n_nz.empty() ? nullptr : n_nz.data()));
-          LIBMESH_CHKERR(ierr);
-          ierr = MatMPIAIJSetPreallocation (_mat,
-                                            0,
-                                            numeric_petsc_cast(n_nz.empty() ? nullptr : n_nz.data()),
-                                            0,
-                                            numeric_petsc_cast(n_oz.empty() ? nullptr : n_oz.data()));
-          break;
-
-        case HYPRE:
-#if !PETSC_VERSION_LESS_THAN(3,9,4) && LIBMESH_HAVE_PETSC_HYPRE
-          ierr = MatSetType(_mat, MATHYPRE);
-          LIBMESH_CHKERR(ierr);
-
-          // MatSetFromOptions needs to happen before Preallocation routines
-          // since MatSetFromOptions can change matrix type and remove incompatible
-          // preallocation
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSetOptionsPrefix(_mat, "");
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSetFromOptions(_mat);
-          LIBMESH_CHKERR(ierr);
-          ierr = MatHYPRESetPreallocation (_mat,
-                                           0,
-                                           numeric_petsc_cast(n_nz.empty() ? nullptr : n_nz.data()),
-                                           0,
-                                           numeric_petsc_cast(n_oz.empty() ? nullptr : n_oz.data()));
-          LIBMESH_CHKERR(ierr);
-#else
-          libmesh_error_msg("PETSc 3.9.4 or higher with hypre is required for MatHypre");
-#endif
-          break;
-
-        default: libmesh_error_msg("Unsupported petsc matrix type");
-      }
-    }
-
-  // Make it an error for PETSc to allocate new nonzero entries during assembly
-  ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
-  LIBMESH_CHKERR(ierr);
-
-  this->zero();
+  this->init(m_in, m_in, m_l, m_l, n_nz, n_oz, blocksize);
 }
 
 
