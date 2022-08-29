@@ -778,6 +778,10 @@ PetscLinearSolver<T>::shell_solve_common (const ShellMatrix<T> & shell_matrix,
 
       LIBMESH_CHKERR(ierr);
 
+      PetscBool ksp_reuse_preconditioner = this->same_preconditioner ? PETSC_TRUE : PETSC_FALSE;
+      ierr = KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner);
+      LIBMESH_CHKERR(ierr);
+
       if (precond && this->_preconditioner)
         {
           subprecond_matrix = std::make_unique<PetscMatrix<Number>>(subprecond, this->comm());
@@ -787,13 +791,20 @@ PetscLinearSolver<T>::shell_solve_common (const ShellMatrix<T> & shell_matrix,
     }
   else
     {
-      ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T> *>(precond)->mat());
+      PetscBool ksp_reuse_preconditioner = this->same_preconditioner ? PETSC_TRUE : PETSC_FALSE;
+      ierr = KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner);
       LIBMESH_CHKERR(ierr);
 
-      if (precond && this->_preconditioner)
+      if (precond)
         {
-          this->_preconditioner->set_matrix(const_cast<PetscMatrix<Number> &>(*precond));
-          this->_preconditioner->init();
+          ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T> *>(precond)->mat());
+          LIBMESH_CHKERR(ierr);
+
+          if (this->_preconditioner)
+            {
+              this->_preconditioner->set_matrix(const_cast<PetscMatrix<Number> &>(*precond));
+              this->_preconditioner->init();
+            }
         }
     }
 
