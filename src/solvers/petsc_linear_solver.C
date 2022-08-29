@@ -532,7 +532,11 @@ PetscLinearSolver<T>::solve_common (SparseMatrix<T> &  matrix_in,
 
       if (this->_preconditioner)
         {
-          this->_preconditioner->set_matrix(matrix_in);
+          if (matrix)
+            this->_preconditioner->set_matrix(*matrix);
+          else if (precond)
+            this->_preconditioner->set_matrix(const_cast<PetscMatrix<Number> &>(*precond));
+
           this->_preconditioner->init();
         }
     }
@@ -598,11 +602,15 @@ PetscLinearSolver<T>::solve_common (SparseMatrix<T> &  matrix_in,
 
       VecScatterBeginEnd(this->comm(), scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
 
-      if (this->_preconditioner)
+      if (precond && this->_preconditioner)
         {
           // Before subprecond_matrix gets cleaned up, we should give
           // the _preconditioner a different matrix.
-          this->_preconditioner->set_matrix(matrix_in);
+          if (matrix)
+            this->_preconditioner->set_matrix(*matrix);
+          else
+            this->_preconditioner->set_matrix(*precond);
+
           this->_preconditioner->init();
         }
     }
@@ -811,12 +819,16 @@ PetscLinearSolver<T>::shell_solve_common (const ShellMatrix<T> & shell_matrix,
         {
           ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T> *>(precond)->mat());
           LIBMESH_CHKERR(ierr);
+        }
 
-          if (this->_preconditioner)
-            {
-              this->_preconditioner->set_matrix(const_cast<PetscMatrix<Number> &>(*precond));
-              this->_preconditioner->init();
-            }
+      if (this->_preconditioner)
+        {
+          if (matrix)
+            this->_preconditioner->set_matrix(*matrix);
+          else if (precond)
+            this->_preconditioner->set_matrix(const_cast<PetscMatrix<Number> &>(*precond));
+
+          this->_preconditioner->init();
         }
     }
 
@@ -885,7 +897,11 @@ PetscLinearSolver<T>::shell_solve_common (const ShellMatrix<T> & shell_matrix,
         {
           // Before subprecond_matrix gets cleaned up, we should give
           // the _preconditioner a different matrix.
-          this->_preconditioner->set_matrix(const_cast<PetscMatrix<Number> &>(*precond));
+          if (matrix)
+            this->_preconditioner->set_matrix(*matrix);
+          else
+            this->_preconditioner->set_matrix(*precond);
+
           this->_preconditioner->init();
         }
     }
