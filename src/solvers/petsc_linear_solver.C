@@ -414,7 +414,10 @@ PetscLinearSolver<T>::solve_common (SparseMatrix<T> &  matrix_in,
   WrappedPetsc<Vec> subrhs;
   WrappedPetsc<Vec> subsolution;
   WrappedPetsc<VecScatter> scatter;
+
   std::unique_ptr<PetscMatrix<Number>> subprecond_matrix;
+
+  auto & mat = matrix->mat();
 
   // Set operators.  Also restrict rhs and solution vector to
   // subdomain if necessary.
@@ -442,7 +445,7 @@ PetscLinearSolver<T>::solve_common (SparseMatrix<T> &  matrix_in,
       VecScatterBeginEnd(this->comm(), scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
       VecScatterBeginEnd(this->comm(), scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
 
-      ierr = LibMeshCreateSubMatrix(matrix->mat(),
+      ierr = LibMeshCreateSubMatrix(mat,
                                     _restrict_solve_to_is,
                                     _restrict_solve_to_is,
                                     MAT_INITIAL_MATRIX,
@@ -484,7 +487,7 @@ PetscLinearSolver<T>::solve_common (SparseMatrix<T> &  matrix_in,
           LIBMESH_CHKERR(ierr);
 
           WrappedPetsc<Mat> submat1;
-          ierr = LibMeshCreateSubMatrix(matrix->mat(),
+          ierr = LibMeshCreateSubMatrix(mat,
                                         _restrict_solve_to_is,
                                         _restrict_solve_to_is_complement,
                                         MAT_INITIAL_MATRIX,
