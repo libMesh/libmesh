@@ -202,6 +202,12 @@ private:
    */
   template <typename XFP>
   void _xfp_data_stream (XFP * val, const unsigned int len,
+#ifdef LIBMESH_HAVE_XDR
+                         xdrproc_t
+#else
+                         void *
+#endif
+                           xdr_proc,
                          const unsigned int line_break,
                          const int n_digits);
 
