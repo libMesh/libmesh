@@ -67,6 +67,47 @@ namespace
 
     libmesh_error_msg("Requested BEX coefficient vector " << i << " not found");
   }
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  std::vector<Real>
+  complex_soln_components (const std::vector<Number> & soln,
+                           const unsigned int num_vars,
+                           const bool write_complex_abs)
+  {
+    unsigned int num_values = soln.size();
+    unsigned int num_elems = num_values / num_vars;
+
+    // This will contain the real and imaginary parts and the magnitude
+    // of the values in soln
+    int nco = write_complex_abs ? 3 : 2;
+    std::vector<Real> complex_soln(nco * num_values);
+
+    for (unsigned i=0; i<num_vars; ++i)
+      {
+        for (unsigned int j=0; j<num_elems; ++j)
+          {
+            Number value = soln[i*num_vars + j];
+            complex_soln[nco*i*num_elems + j] = value.real();
+          }
+        for (unsigned int j=0; j<num_elems; ++j)
+          {
+            Number value = soln[i*num_vars + j];
+            complex_soln[nco*i*num_elems + num_elems + j] = value.imag();
+          }
+        if (write_complex_abs)
+          {
+            for (unsigned int j=0; j<num_elems; ++j)
+              {
+                Number value = soln[i*num_vars + j];
+                complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
+              }
+          }
+      }
+
+    return complex_soln;
+  }
+#endif // LIBMESH_USE_COMPLEX_NUMBERS
+
 }
 #endif
 
@@ -1313,36 +1354,8 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
                                                     _write_complex_abs);
   exio_helper->initialize_element_variables(complex_names, complex_vars_active_subdomains);
 
-  unsigned int num_values = soln.size();
-  unsigned int num_vars = names.size();
-  unsigned int num_elems = num_values / num_vars;
-
-  // This will contain the real and imaginary parts and the magnitude
-  // of the values in soln
-  int nco = _write_complex_abs ? 3 : 2;
-  std::vector<Real> complex_soln(nco * num_values);
-
-  for (unsigned i=0; i<num_vars; ++i)
-    {
-      for (unsigned int j=0; j<num_elems; ++j)
-        {
-          Number value = soln[i*num_vars + j];
-          complex_soln[nco*i*num_elems + j] = value.real();
-        }
-      for (unsigned int j=0; j<num_elems; ++j)
-        {
-          Number value = soln[i*num_vars + j];
-          complex_soln[nco*i*num_elems + num_elems + j] = value.imag();
-        }
-      if (_write_complex_abs)
-        {
-          for (unsigned int j=0; j<num_elems; ++j)
-            {
-              Number value = soln[i*num_vars + j];
-              complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
-            }
-        }
-    }
+  const std::vector<Real> complex_soln =
+    complex_soln_components(soln, names.size(), _write_complex_abs);
 
   exio_helper->write_element_values(mesh, complex_soln, _timestep, complex_vars_active_subdomains);
 
@@ -1862,37 +1875,8 @@ void ExodusII_IO::write_global_data (const std::vector<Number> & soln,
 
   exio_helper->initialize_global_variables(complex_names);
 
-  unsigned int num_values = soln.size();
-  unsigned int num_vars = names.size();
-  unsigned int num_elems = num_values / num_vars;
-
-  // This will contain the real and imaginary parts and the magnitude
-  // of the values in soln
-  int nco = _write_complex_abs ? 3 : 2;
-  std::vector<Real> complex_soln(nco * num_values);
-
-  for (unsigned i=0; i<num_vars; ++i)
-    {
-
-      for (unsigned int j=0; j<num_elems; ++j)
-        {
-          Number value = soln[i*num_vars + j];
-          complex_soln[nco*i*num_elems + j] = value.real();
-        }
-      for (unsigned int j=0; j<num_elems; ++j)
-        {
-          Number value = soln[i*num_vars + j];
-          complex_soln[nco*i*num_elems + num_elems + j] = value.imag();
-        }
-      if (_write_complex_abs)
-        {
-          for (unsigned int j=0; j<num_elems; ++j)
-            {
-              Number value = soln[i*num_vars + j];
-              complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
-            }
-        }
-    }
+  const std::vector<Real> complex_soln =
+    complex_soln_components(soln, names.size(), _write_complex_abs);
 
   exio_helper->write_global_values(complex_soln, _timestep);
 
