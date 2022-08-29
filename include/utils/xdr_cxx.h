@@ -198,6 +198,14 @@ private:
   void do_write(std::vector<std::complex<T>> & a);
 
   /**
+   * Helper method for extended FP types
+   */
+  template <typename XFP>
+  void _xfp_data_stream (XFP * val, const unsigned int len,
+                         const unsigned int line_break,
+                         const int n_digits);
+
+  /**
    * The mode used for accessing the file.
    */
   const XdrMODE mode;
