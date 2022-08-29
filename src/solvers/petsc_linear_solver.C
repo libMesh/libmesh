@@ -417,7 +417,7 @@ PetscLinearSolver<T>::solve_common (SparseMatrix<T> &  matrix_in,
 
   std::unique_ptr<PetscMatrix<Number>> subprecond_matrix;
 
-  auto & mat = matrix->mat();
+  auto mat = matrix->mat();
 
   // Set operators.  Also restrict rhs and solution vector to
   // subdomain if necessary.
