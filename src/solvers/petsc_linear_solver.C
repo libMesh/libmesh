@@ -823,6 +823,13 @@ PetscLinearSolver<T>::shell_solve_common (const ShellMatrix<T> & shell_matrix,
   ierr = KSPSetFromOptions(_ksp);
   LIBMESH_CHKERR(ierr);
 
+  // If the SolverConfiguration object is provided, use it to override
+  // solver options.
+  if (this->_solver_configuration)
+    {
+      this->_solver_configuration->configure_solver();
+    }
+
   // Solve the linear system
   if (_restrict_solve_to_is)
     {
