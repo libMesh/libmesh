@@ -452,12 +452,15 @@ PetscLinearSolver<T>::solve_common (SparseMatrix<T> &  matrix_in,
                                     submat.get());
       LIBMESH_CHKERR(ierr);
 
-      ierr = LibMeshCreateSubMatrix(precond->mat(),
-                                    _restrict_solve_to_is,
-                                    _restrict_solve_to_is,
-                                    MAT_INITIAL_MATRIX,
-                                    subprecond.get());
-      LIBMESH_CHKERR(ierr);
+      if (precond)
+        {
+          ierr = LibMeshCreateSubMatrix(const_cast<PetscMatrix<T> *>(precond)->mat(),
+                                        _restrict_solve_to_is,
+                                        _restrict_solve_to_is,
+                                        MAT_INITIAL_MATRIX,
+                                        subprecond.get());
+          LIBMESH_CHKERR(ierr);
+        }
 
       // Since removing columns of the matrix changes the equation
       // system, we will now change the right hand side to compensate
@@ -497,13 +500,18 @@ PetscLinearSolver<T>::solve_common (SparseMatrix<T> &  matrix_in,
           ierr = MatMultAdd(submat1, subvec1, subrhs, subrhs);
           LIBMESH_CHKERR(ierr);
         }
-      ierr = KSPSetOperators(_ksp, submat, subprecond);
+      if (precond)
+        ierr = KSPSetOperators(_ksp, submat, subprecond);
+      else
+        ierr = KSPSetOperators(_ksp, submat, submat);
+
+      LIBMESH_CHKERR(ierr);
 
       PetscBool ksp_reuse_preconditioner = this->same_preconditioner ? PETSC_TRUE : PETSC_FALSE;
       ierr = KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner);
       LIBMESH_CHKERR(ierr);
 
-      if (this->_preconditioner)
+      if (precond && this->_preconditioner)
         {
           subprecond_matrix = std::make_unique<PetscMatrix<Number>>(subprecond, this->comm());
           this->_preconditioner->set_matrix(*subprecond_matrix);
@@ -512,11 +520,15 @@ PetscLinearSolver<T>::solve_common (SparseMatrix<T> &  matrix_in,
     }
   else
     {
-      ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat());
-
       PetscBool ksp_reuse_preconditioner = this->same_preconditioner ? PETSC_TRUE : PETSC_FALSE;
       ierr = KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner);
       LIBMESH_CHKERR(ierr);
+
+      if (precond)
+        {
+          ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T> *>(precond)->mat());
+          LIBMESH_CHKERR(ierr);
+        }
 
       if (this->_preconditioner)
         {
