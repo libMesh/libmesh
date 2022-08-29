@@ -279,11 +279,25 @@ private:
    */
   virtual std::pair<unsigned int, Real>
   shell_solve_common (const ShellMatrix<T> & shell_matrix,
-                      const PetscMatrix<T> * precond_matrix,
+                      PetscMatrix<T> * precond_matrix,
                       NumericVector<T> & solution_in,
                       NumericVector<T> & rhs_in,
                       const double tol,
                       const unsigned int m_its);
+
+  /*
+   * Helper function for the helper functions
+   */
+  std::pair<unsigned int, Real>
+  solve_base (SparseMatrix<T> * matrix,
+              PetscMatrix<T> * precond,
+              Mat mat,
+              NumericVector<T> & solution_in,
+              NumericVector<T> & rhs_in,
+              const double tol,
+              const unsigned int m_its,
+              ksp_solve_func_type solve_func);
+
 
   /**
    * Tells PETSC to use the user-specified solver stored in
