@@ -767,26 +767,7 @@ PetscLinearSolver<T>::shell_solve_common (const ShellMatrix<T> & shell_matrix,
                                         submat1.get());
           LIBMESH_CHKERR(ierr);
 
-          // The following lines would be correct, but don't work
-          // correctly in PETSc up to 3.1.0-p5.  See discussion in
-          // petsc-users of Nov 9, 2010.
-          //
-          // ierr = MatMultAdd(submat1, subvec1, subrhs, subrhs);
-          // LIBMESH_CHKERR(ierr);
-          //
-          // We workaround by using a temporary vector.  Note that the
-          // fix in PETsc 3.1.0-p6 uses a temporary vector internally,
-          // so this is no effective performance loss.
-          WrappedPetsc<Vec> subvec2;
-          ierr = VecCreate(this->comm().get(), subvec2.get());
-          LIBMESH_CHKERR(ierr);
-          ierr = VecSetSizes(subvec2, is_local_size, PETSC_DECIDE);
-          LIBMESH_CHKERR(ierr);
-          ierr = VecSetFromOptions(subvec2);
-          LIBMESH_CHKERR(ierr);
-          ierr = MatMult(submat1, subvec1, subvec2);
-          LIBMESH_CHKERR(ierr);
-          ierr = VecAXPY(subrhs, 1.0, subvec2);
+          ierr = MatMultAdd(submat1, subvec1, subrhs, subrhs);
           LIBMESH_CHKERR(ierr);
         }
 
