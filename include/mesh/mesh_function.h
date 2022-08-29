@@ -354,6 +354,14 @@ protected:
                                        const std::set<subdomain_id_type> * subdomain_ids = nullptr) const;
 
   /**
+   * Helper function for finding a gradient as evaluated from a
+   * specific element
+   */
+  void _gradient_on_elem (const Point & p,
+                          const Elem * element,
+                          std::vector<Gradient> & output);
+
+  /**
    * The equation systems handler, from which
    * the data are gathered.
    */

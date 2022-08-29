@@ -420,99 +420,9 @@ void MeshFunction::gradient (const Point & p,
   const Elem * element = this->find_element(p,subdomain_ids);
 
   if (!element)
-    {
-      output.resize(0);
-      return;
-    }
+    output.resize(0);
   else
-    {
-      // resize the output vector to the number of output values
-      // that the user told us
-      output.resize (this->_system_vars.size());
-
-
-      {
-        const unsigned int dim = element->dim();
-
-
-        /*
-         * Get local coordinates to feed these into compute_data().
-         * Note that the fe_type can safely be used from the 0-variable,
-         * since the inverse mapping is the same for all FEFamilies
-         */
-        const Point mapped_point (FEMap::inverse_map (dim, element,
-                                                      p));
-
-        std::vector<Point> point_list (1, mapped_point);
-
-        // loop over all vars
-        for (auto index : index_range(this->_system_vars))
-          {
-            /*
-             * the data for this variable
-             */
-            const unsigned int var = _system_vars[index];
-
-            if (var == libMesh::invalid_uint)
-              {
-                libmesh_assert (_out_of_mesh_mode &&
-                                index < _out_of_mesh_value.size());
-                output[index] = Gradient(_out_of_mesh_value(index));
-                continue;
-              }
-
-            const FEType & fe_type = this->_dof_map.variable_type(var);
-
-            // where the solution values for the var-th variable are stored
-            std::vector<dof_id_type> dof_indices;
-            this->_dof_map.dof_indices (element, dof_indices, var);
-
-            // interpolate the solution
-            Gradient grad(0.);
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-            //The other algorithm works in case of finite elements as well,
-            //but this one is faster.
-            if (!element->infinite())
-              {
-#endif
-                std::unique_ptr<FEBase> point_fe (FEBase::build(dim, fe_type));
-                const std::vector<std::vector<RealGradient>> & dphi = point_fe->get_dphi();
-                point_fe->reinit(element, &point_list);
-
-                for (auto i : index_range(dof_indices))
-                  grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
-
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-              }
-            else
-              {
-                /**
-                 * Build an FEComputeData that contains both input and output data
-                 * for the specific compute_data method.
-                 */
-                FEComputeData data (this->_eqn_systems, mapped_point);
-                data.enable_derivative();
-                FEInterface::compute_data (dim, fe_type, element, data);
-                //grad [x] = data.dshape[i](v) * dv/dx  * dof_index [i]
-                // sum over all indices
-                for (auto i : index_range(dof_indices))
-                  {
-                    // local coordinates
-                    for (std::size_t v=0; v<dim; v++)
-                      for (std::size_t xyz=0; xyz<LIBMESH_DIM; xyz++)
-                        {
-                          // FIXME: this needs better syntax: It is matrix-vector multiplication.
-                          grad(xyz) += data.local_transform[v][xyz]
-                            * data.dshape[i](v)
-                            * this->_vector(dof_indices[i]);
-                        }
-                  }
-              }
-#endif
-            output[index] = grad;
-          }
-      }
-    }
+    this->_gradient_on_elem(p, element, output);
 }
 
 
@@ -542,96 +452,110 @@ void MeshFunction::discontinuous_gradient (const Point & p,
   // empty map
   for (const auto & element : candidate_element)
     {
-      const unsigned int dim = element->dim();
-
       // define a temporary vector to store all values
       std::vector<Gradient> temp_output (cast_int<unsigned int>(this->_system_vars.size()));
 
-      /*
-       * Get local coordinates to feed these into compute_data().
-       * Note that the fe_type can safely be used from the 0-variable,
-       * since the inverse mapping is the same for all FEFamilies
-       */
-      const Point mapped_point (FEMap::inverse_map (dim, element, p));
-
-
-      // loop over all vars
-      std::vector<Point> point_list (1, mapped_point);
-      for (auto index : index_range(this->_system_vars))
-        {
-          /*
-           * the data for this variable
-           */
-          const unsigned int var = _system_vars[index];
-
-          if (var == libMesh::invalid_uint)
-            {
-              libmesh_assert (_out_of_mesh_mode &&
-                              index < _out_of_mesh_value.size());
-              temp_output[index] = Gradient(_out_of_mesh_value(index));
-              continue;
-            }
-
-          const FEType & fe_type = this->_dof_map.variable_type(var);
-
-          // where the solution values for the var-th variable are stored
-          std::vector<dof_id_type> dof_indices;
-          this->_dof_map.dof_indices (element, dof_indices, var);
-
-          Gradient grad(0.);
-
-          // for performance-reasons, we use different algorithms now.
-          // TODO: Check that both give the same result for finite elements.
-          // Otherwive it is wrong...
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-          if (!element->infinite())
-            {
-#endif
-              std::unique_ptr<FEBase> point_fe (FEBase::build(dim, fe_type));
-              const std::vector<std::vector<RealGradient>> & dphi = point_fe->get_dphi();
-              point_fe->reinit(element, & point_list);
-
-              for (auto i : index_range(dof_indices))
-                grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-            }
-          else
-            {
-              /**
-               * Build an FEComputeData that contains both input and output data
-               * for the specific compute_data method.
-               */
-              //TODO: enable this for a vector of points as well...
-              FEComputeData data (this->_eqn_systems, mapped_point);
-              data.enable_derivative();
-              FEInterface::compute_data (dim, fe_type, element, data);
-
-              //grad [x] = data.dshape[i](v) * dv/dx  * dof_index [i]
-              // sum over all indices
-              for (auto i : index_range(dof_indices))
-                {
-                  // local coordinates.
-                  for (std::size_t v=0; v<dim; v++)
-                    for (std::size_t xyz=0; xyz<LIBMESH_DIM; xyz++)
-                      {
-                        // FIXME: this needs better syntax: It is matrix-vector multiplication.
-                        grad(xyz) += data.local_transform[v][xyz]
-                          * data.dshape[i](v)
-                          * this->_vector(dof_indices[i]);
-                      }
-                }
-            }
-#endif
-          temp_output[index] = grad;
-
-          // next variable
-        }
+      this->_gradient_on_elem(p, element, temp_output);
 
       // Insert temp_output into output
-      output[element] = temp_output;
+      output.emplace(element, std::move(temp_output));
     }
 }
 
+
+
+void MeshFunction::_gradient_on_elem (const Point & p,
+                                      const Elem * element,
+                                      std::vector<Gradient> & output)
+{
+  libmesh_assert(element);
+
+  // resize the output vector to the number of output values
+  // that the user told us
+  output.resize (this->_system_vars.size());
+
+  const unsigned int dim = element->dim();
+
+  /*
+   * Get local coordinates to feed these into compute_data().
+   * Note that the fe_type can safely be used from the 0-variable,
+   * since the inverse mapping is the same for all FEFamilies
+   */
+  const Point mapped_point (FEMap::inverse_map (dim, element,
+                                                p));
+
+  std::vector<Point> point_list (1, mapped_point);
+
+  // loop over all vars
+  for (auto index : index_range(this->_system_vars))
+    {
+      /*
+       * the data for this variable
+       */
+      const unsigned int var = _system_vars[index];
+
+      if (var == libMesh::invalid_uint)
+        {
+          libmesh_assert (_out_of_mesh_mode &&
+                          index < _out_of_mesh_value.size());
+          output[index] = Gradient(_out_of_mesh_value(index));
+          continue;
+        }
+
+      const FEType & fe_type = this->_dof_map.variable_type(var);
+
+      // where the solution values for the var-th variable are stored
+      std::vector<dof_id_type> dof_indices;
+      this->_dof_map.dof_indices (element, dof_indices, var);
+
+      // interpolate the solution
+      Gradient grad(0.);
+
+      // for performance-reasons, we use different algorithms now.
+      // TODO: Check that both give the same result for finite elements.
+      // Otherwive it is wrong...
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      if (!element->infinite())
+        {
+#endif
+          std::unique_ptr<FEBase> point_fe (FEBase::build(dim, fe_type));
+          const std::vector<std::vector<RealGradient>> & dphi = point_fe->get_dphi();
+          point_fe->reinit(element, &point_list);
+
+          for (auto i : index_range(dof_indices))
+            grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+        }
+      else
+        {
+          /**
+           * Build an FEComputeData that contains both input and output data
+           * for the specific compute_data method.
+           */
+          //TODO: enable this for a vector of points as well...
+          FEComputeData data (this->_eqn_systems, mapped_point);
+          data.enable_derivative();
+          FEInterface::compute_data (dim, fe_type, element, data);
+          //grad [x] = data.dshape[i](v) * dv/dx  * dof_index [i]
+          // sum over all indices
+          for (auto i : index_range(dof_indices))
+            {
+              // local coordinates
+              for (std::size_t v=0; v<dim; v++)
+                for (std::size_t xyz=0; xyz<LIBMESH_DIM; xyz++)
+                  {
+                    // FIXME: this needs better syntax: It is matrix-vector multiplication.
+                    grad(xyz) += data.local_transform[v][xyz]
+                      * data.dshape[i](v)
+                      * this->_vector(dof_indices[i]);
+                  }
+            }
+        }
+#endif
+      output[index] = grad;
+    }
+}
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
