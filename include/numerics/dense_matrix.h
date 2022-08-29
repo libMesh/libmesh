@@ -774,6 +774,13 @@ private:
    */
   template <typename T2>
   void _left_multiply_transpose (const DenseMatrix<T2> & A);
+
+  /**
+   * Right multiplies by the transpose of the matrix \p A which
+   * may contain a different numerical type.
+   */
+  template <typename T2>
+  void _right_multiply_transpose (const DenseMatrix<T2> & A);
 };
 
 
