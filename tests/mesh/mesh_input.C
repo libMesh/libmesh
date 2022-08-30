@@ -45,7 +45,7 @@ Number sin_x_plus_cos_y (const Point& p,
   return sin(x) + cos(y);
 }
 
-constexpr unsigned int denominator_for_side_elems = 12;
+constexpr int added_sides_nxyz[] = {2,2,2};
 
 Number designed_for_side_elems (const Point & p,
                                 const Parameters & param,
@@ -65,7 +65,7 @@ Number designed_for_side_elems (const Point & p,
       return true;
     if (facedim >= 0)
       return false;
-    const Real numerator = r * denominator_for_side_elems;
+    const Real numerator = r * added_sides_nxyz[rdim];
     return (std::abs(numerator - std::round(numerator)) <
             TOLERANCE*TOLERANCE);
   };
@@ -78,19 +78,16 @@ Number designed_for_side_elems (const Point & p,
     {
       libmesh_assert(!is_on_face(y, 1));
       libmesh_assert(!is_on_face(z, 2));
-//      return (x*z-x*y*y);
-return 3000+100*x+10*y+z;
+      return (x*z-x*y*y);
     }
   if (is_on_face(y, 1))
     {
       libmesh_assert(!is_on_face(z, 2));
-//      return (x*x*y-y*z);
-return 2000+100*x+10*y+z;
+      return (x*x*y-y*z);
     }
 
   libmesh_assert(is_on_face(z, 2));
-//  return (y*y*z-x*x*z);
-return 1000+100*x+10*y+z;
+  return (y*y*z-x*x*z);
 }
 
 
@@ -750,14 +747,12 @@ public:
   void testExodusWriteAddedSides
     (Number (*exact_sol)(const Point &, const Parameters &, const
                          std::string &, const std::string &),
-     const ElemType elem_type)
+     const ElemType elem_type,
+     const Order order)
   {
-    constexpr unsigned int nx=2, ny=2, nz=2;
-    // We need these to be compatible with the designed_for_side_elems
-    // tests for facing
-    static_assert(!(denominator_for_side_elems%nx));
-    static_assert(!(denominator_for_side_elems%ny));
-    static_assert(!(denominator_for_side_elems%nz));
+    constexpr unsigned int nx = added_sides_nxyz[0],
+                           ny = added_sides_nxyz[1],
+                           nz = added_sides_nxyz[2];
 
     const unsigned int dim = Elem::build(elem_type)->dim();
     const bool is_tensor = (Elem::build(elem_type)->n_sides() == dim * 2);
@@ -775,7 +770,7 @@ public:
 
       EquationSystems es(mesh);
       System & sys = es.add_system<System> ("SimpleSystem");
-      sys.add_variable("u", FIRST, SIDE_HIERARCHIC);
+      sys.add_variable("u", order, SIDE_HIERARCHIC);
 
       if (dim == 3)
         MeshTools::Generation::build_cube
@@ -966,52 +961,57 @@ public:
 
   void testExodusWriteAddedSidesEdgeC0()
   {
-    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, FIRST);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, SECOND);
   }
 
   void testExodusWriteAddedSidesEdgeDisc()
   {
-    testExodusWriteAddedSides(designed_for_side_elems, EDGE3);
+    testExodusWriteAddedSides(designed_for_side_elems, EDGE3, SECOND);
   }
 
   void testExodusWriteAddedSidesTriC0()
   {
-    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, FIRST);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, SECOND);
   }
 
   void testExodusWriteAddedSidesTriDisc()
   {
-    testExodusWriteAddedSides(designed_for_side_elems, TRI6);
+    testExodusWriteAddedSides(designed_for_side_elems, TRI6, SECOND);
   }
 
   void testExodusWriteAddedSidesQuadC0()
   {
-    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, FIRST);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, SECOND);
   }
 
   void testExodusWriteAddedSidesQuadDisc()
   {
-    testExodusWriteAddedSides(designed_for_side_elems, QUAD9);
+    testExodusWriteAddedSides(designed_for_side_elems, QUAD9, SECOND);
   }
 
   void testExodusWriteAddedSidesTetC0()
   {
-    testExodusWriteAddedSides(six_x_plus_sixty_y, TET14);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TET14, FIRST);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TET14, SECOND);
   }
 
   void testExodusWriteAddedSidesTetDisc()
   {
-    testExodusWriteAddedSides(designed_for_side_elems, TET14);
+    testExodusWriteAddedSides(designed_for_side_elems, TET14, SECOND);
   }
 
   void testExodusWriteAddedSidesHexC0()
   {
-    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, FIRST);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, SECOND);
   }
 
   void testExodusWriteAddedSidesHexDisc()
   {
-    testExodusWriteAddedSides(designed_for_side_elems, HEX27);
+    testExodusWriteAddedSides(designed_for_side_elems, HEX27, SECOND);
   }
 
 #endif // LIBMESH_HAVE_EXODUS_API
