@@ -21,10 +21,11 @@
 #include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
-#include "libmesh/fe.h"
 #include "libmesh/elem.h"
-#include "libmesh/fe_interface.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/fe.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_macro.h"
 
 namespace libMesh
 {
@@ -1266,39 +1267,9 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
 } // anonymous namespace
 
 
-
-
-  // Do full-specialization of nodal_soln() function for every
-  // dimension, instead of explicit instantiation at the end of this
-  // file.
-  // This could be macro-ified so that it fits on one line...
-template <>
-void FE<0,SZABAB>::nodal_soln(const Elem * elem,
-                              const Order order,
-                              const std::vector<Number> & elem_soln,
-                              std::vector<Number> & nodal_soln)
-{ szabab_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<1,SZABAB>::nodal_soln(const Elem * elem,
-                              const Order order,
-                              const std::vector<Number> & elem_soln,
-                              std::vector<Number> & nodal_soln)
-{ szabab_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<2,SZABAB>::nodal_soln(const Elem * elem,
-                              const Order order,
-                              const std::vector<Number> & elem_soln,
-                              std::vector<Number> & nodal_soln)
-{ szabab_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<3,SZABAB>::nodal_soln(const Elem * elem,
-                              const Order order,
-                              const std::vector<Number> & elem_soln,
-                              std::vector<Number> & nodal_soln)
-{ szabab_nodal_soln(elem, order, elem_soln, nodal_soln); }
+// Instantiate (side_) nodal_soln() function for every dimension
+LIBMESH_FE_NODAL_SOLN(SZABAB, szabab_nodal_soln)
+LIBMESH_FE_SIDE_NODAL_SOLN(SZABAB)
 
 
 // Full specialization of n_dofs() function for every dimension

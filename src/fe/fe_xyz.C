@@ -18,12 +18,13 @@
 
 
 // Local includes
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/fe.h"
 #include "libmesh/elem.h"
-#include "libmesh/fe_interface.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/fe.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_macro.h"
 #include "libmesh/int_range.h"
+#include "libmesh/libmesh_logging.h"
 
 namespace libMesh
 {
@@ -367,39 +368,9 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem * elem,
 }
 
 
-
-
-// Do full-specialization for every dimension, instead
-// of explicit instantiation at the end of this file.
-// This could be macro-ified so that it fits on one line...
-template <>
-void FE<0,XYZ>::nodal_soln(const Elem * elem,
-                           const Order order,
-                           const std::vector<Number> & elem_soln,
-                           std::vector<Number> & nodal_soln)
-{ xyz_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<1,XYZ>::nodal_soln(const Elem * elem,
-                           const Order order,
-                           const std::vector<Number> & elem_soln,
-                           std::vector<Number> & nodal_soln)
-{ xyz_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<2,XYZ>::nodal_soln(const Elem * elem,
-                           const Order order,
-                           const std::vector<Number> & elem_soln,
-                           std::vector<Number> & nodal_soln)
-{ xyz_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<3,XYZ>::nodal_soln(const Elem * elem,
-                           const Order order,
-                           const std::vector<Number> & elem_soln,
-                           std::vector<Number> & nodal_soln)
-{ xyz_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
+// Instantiate (side_) nodal_soln() function for every dimension
+LIBMESH_FE_NODAL_SOLN(XYZ, xyz_nodal_soln)
+LIBMESH_FE_SIDE_NODAL_SOLN(XYZ)
 
 
 // Full specialization of n_dofs() function for every dimension

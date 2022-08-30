@@ -23,6 +23,7 @@
 #include "libmesh/enum_to_string.h"
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/fe_macro.h"
 #include "libmesh/tensor_value.h"
 
 
@@ -632,6 +633,8 @@ void FE<3,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
                                     const std::vector<Number> & elem_soln,
                                     std::vector<Number> & nodal_soln)
 { lagrange_vec_nodal_soln(elem, order, elem_soln, 3 /*dimension*/, nodal_soln); }
+
+LIBMESH_FE_SIDE_NODAL_SOLN(LAGRANGE_VEC)
 
 
 // Specialize for shape function routines by leveraging scalar LAGRANGE elements

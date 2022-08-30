@@ -76,7 +76,8 @@ void MeshOutput<MT>::write_equation_systems (const std::string & fname,
       // Build the nodal solution values & get the variable
       // names from the EquationSystems object
       std::vector<Number> soln;
-      es.build_solution_vector (soln, system_names);
+      es.build_solution_vector (soln, system_names,
+                                this->get_add_sides());
 
       this->write_nodal_data (fname, soln, names);
     }

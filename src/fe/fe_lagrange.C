@@ -19,12 +19,13 @@
 
 // Local includes
 #include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
-#include "libmesh/elem.h"
+#include "libmesh/fe_macro.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/threads.h"
-#include "libmesh/enum_to_string.h"
 
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -917,36 +918,9 @@ void lagrange_compute_constraints (DofConstraints & constraints,
 } // anonymous namespace
 
 
-  // Do full-specialization for every dimension, instead
-  // of explicit instantiation at the end of this file.
-  // This could be macro-ified so that it fits on one line...
-template <>
-void FE<0,LAGRANGE>::nodal_soln(const Elem * elem,
-                                const Order order,
-                                const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
-{ lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<1,LAGRANGE>::nodal_soln(const Elem * elem,
-                                const Order order,
-                                const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
-{ lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<2,LAGRANGE>::nodal_soln(const Elem * elem,
-                                const Order order,
-                                const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
-{ lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<3,LAGRANGE>::nodal_soln(const Elem * elem,
-                                const Order order,
-                                const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
-{ lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
+// Instantiate (side_) nodal_soln() function for every dimension
+LIBMESH_FE_NODAL_SOLN(LAGRANGE, lagrange_nodal_soln)
+LIBMESH_FE_SIDE_NODAL_SOLN(LAGRANGE)
 
 
 // Do full-specialization for every dimension, instead

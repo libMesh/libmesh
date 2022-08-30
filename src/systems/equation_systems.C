@@ -16,9 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// System includes
-#include <sstream>
-
 // Local Includes
 #include "libmesh/default_coupling.h" // For downconversion
 #include "libmesh/explicit_system.h"
@@ -38,7 +35,12 @@
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
 
+#include "libmesh/exodusII_io_helper.h"
+
+// System includes
+#include <functional> // std::plus
 #include <numeric> // std::iota
+#include <sstream>
 
 // Include the systems before this one to avoid
 // overlapping forward declarations.
@@ -575,7 +577,8 @@ void EquationSystems::build_solution_vector (std::vector<Number> &,
 
 
 std::unique_ptr<NumericVector<Number>>
-EquationSystems::build_parallel_solution_vector(const std::set<std::string> * system_names) const
+EquationSystems::build_parallel_solution_vector(const std::set<std::string> * system_names,
+                                                bool add_sides) const
 {
   LOG_SCOPE("build_parallel_solution_vector()", "EquationSystems");
 
@@ -635,24 +638,134 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
   dof_id_type n_total_nodes = n_local_nodes;
   _mesh.comm().sum(n_total_nodes);
 
+  const processor_id_type n_proc = _mesh.comm().size();
+  const processor_id_type my_pid = _mesh.comm().rank();
   const dof_id_type n_gaps = max_nn - n_total_nodes;
-  const dof_id_type gaps_per_processor = n_gaps / _mesh.comm().size();
-  const dof_id_type remainder_gaps = n_gaps % _mesh.comm().size();
+  const dof_id_type gaps_per_processor = n_gaps / n_proc;
+  const dof_id_type remainder_gaps = n_gaps % n_proc;
 
   n_local_nodes = n_local_nodes +      // Actual nodes
                   gaps_per_processor + // Our even share of gaps
-                  (_mesh.comm().rank() < remainder_gaps); // Leftovers
+                  (my_pid < remainder_gaps); // Leftovers
+
+  // If we've been asked to build added sides' data, we need space to
+  // add it.  Keep track of how much space.
+  dof_id_type local_added_side_nodes = 0,
+              added_side_nodes = 0;
+
+  // others_added_side_nodes[p]: local_added_side_nodes on rank p
+  std::vector<dof_id_type> others_added_side_nodes;
+
+  // A map of (element_id, side, side_node) pairs to the corresponding
+  // added side node index.
+  std::map<std::tuple<dof_id_type, unsigned short, unsigned short>,
+           dof_id_type> discontinuous_node_indices;
+
+  // If we don't have any added side nodes, we'll have no offsets from
+  // them, and we won't care about which offsets apply to which node
+  // ids either.
+
+  // Number of true nodes on processors [0,p]
+  std::vector<dof_id_type> true_node_offsets;
+  // Number of added (fake) nodes on processors [0,p)
+  std::vector<dof_id_type> added_node_offsets;
+
+  auto node_id_to_vec_id =
+    [&true_node_offsets, &added_node_offsets]
+    (const dof_id_type node_id)
+    {
+      if (true_node_offsets.empty())
+        return node_id; // O(1) in the common !add_sides case
+
+      // Find the processor id that has node_id in the parallel vec
+      const auto lb = std::upper_bound(true_node_offsets.begin(),
+                                       true_node_offsets.end(), node_id);
+      libmesh_assert(lb != true_node_offsets.end());
+      const processor_id_type p = lb - true_node_offsets.begin();
+
+      return node_id + added_node_offsets[p];
+    };
+
+  if (add_sides)
+    {
+      true_node_offsets.resize(n_proc);
+      added_node_offsets.resize(n_proc);
+
+      // One loop to count everyone's new side nodes
+      for (const auto & elem : _mesh.active_element_ptr_range())
+        {
+          for (auto s : elem->side_index_range())
+            {
+              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
+                continue;
+
+              const std::vector<unsigned int> side_nodes =
+                elem->nodes_on_side(s);
+
+              if (elem->processor_id() == this->processor_id())
+                local_added_side_nodes += side_nodes.size();
+            }
+        }
+
+      others_added_side_nodes.resize(n_proc);
+      _mesh.comm().allgather(local_added_side_nodes,
+                             others_added_side_nodes);
+
+      added_side_nodes = std::accumulate(others_added_side_nodes.begin(),
+                                         others_added_side_nodes.end(), 0,
+                                         std::plus<>());
+
+      _mesh.comm().allgather(n_local_nodes, true_node_offsets);
+      for (auto p : make_range(n_proc-1))
+        true_node_offsets[p+1] += true_node_offsets[p];
+      libmesh_assert_equal_to(true_node_offsets[n_proc-1], _mesh.max_node_id());
+
+      // For nodes that exist in the mesh, we just need an offset to
+      // tell where to put their solutions.
+      added_node_offsets[0] = 0;
+      for (auto p : make_range(n_proc-1))
+        added_node_offsets[p+1] =
+          added_node_offsets[p] + others_added_side_nodes[p];
+
+      // For added side nodes, we need to fill a map.  Start after all
+      // the true node for our pid plus all the side nodes for
+      // previous pids
+      dof_id_type node_counter = true_node_offsets[my_pid];
+      for (auto p : make_range(my_pid))
+        node_counter += others_added_side_nodes[p];
+
+      // One loop to figure out whose added side nodes get which index
+      for (const auto & elem : _mesh.active_local_element_ptr_range())
+        {
+          for (auto s : elem->side_index_range())
+            {
+              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
+                continue;
+
+              const std::vector<unsigned int> side_nodes =
+                elem->nodes_on_side(s);
+
+              for (auto n : index_range(side_nodes))
+                discontinuous_node_indices
+                  [std::make_tuple(elem->id(),s,n)] = node_counter++;
+            }
+        }
+    }
+
+  const dof_id_type
+    n_global_vals = (max_nn + added_side_nodes) * nv,
+    n_local_vals = (n_local_nodes + local_added_side_nodes) * nv;
 
   // Create a NumericVector to hold the parallel solution
   std::unique_ptr<NumericVector<Number>> parallel_soln_ptr = NumericVector<Number>::build(_communicator);
   NumericVector<Number> & parallel_soln = *parallel_soln_ptr;
-  parallel_soln.init(max_nn*nv, n_local_nodes*nv, false, PARALLEL);
+  parallel_soln.init(n_global_vals, n_local_vals, false, PARALLEL);
 
   // Create a NumericVector to hold the "repeat_count" for each node - this is essentially
   // the number of elements contributing to that node's value
   std::unique_ptr<NumericVector<Number>> repeat_count_ptr = NumericVector<Number>::build(_communicator);
   NumericVector<Number> & repeat_count = *repeat_count_ptr;
-  repeat_count.init(max_nn*nv, n_local_nodes*nv, false, PARALLEL);
+  repeat_count.init(n_global_vals, n_local_vals, false, PARALLEL);
 
   repeat_count.close();
 
@@ -746,24 +859,77 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
 
                       for (auto n : elem->node_index_range())
                         {
+                          const Node & node = elem->node_ref(n);
+
+                          const dof_id_type node_idx =
+                            nv * node_id_to_vec_id(node.id());
+
                           for (unsigned int d=0; d < n_vec_dim; d++)
                             {
                               // For vector-valued elements, all components are in nodal_soln. For each
                               // node, the components are stored in order, i.e. node_0 -> s0_x, s0_y, s0_z
-                              parallel_soln.add(nv*(elem->node_id(n)) + (var_inc+d + var_num), nodal_soln[n_vec_dim*n+d]);
+                              parallel_soln.add(node_idx + (var_inc+d + var_num), nodal_soln[n_vec_dim*n+d]);
 
                               // Increment the repeat count for this position
-                              repeat_count.add(nv*(elem->node_id(n)) + (var_inc+d + var_num), 1);
+                              repeat_count.add(node_idx + (var_inc+d + var_num), 1);
+                            }
+                        }
+
+                      if (add_sides)
+                        {
+                          for (auto s : elem->side_index_range())
+                            {
+                              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
+                                continue;
+
+                              // Compute the FE solution at all the
+                              // side nodes
+                              FEInterface::side_nodal_soln
+                                (fe_type, elem, s, elem_soln,
+                                 nodal_soln);
+
+#ifdef DEBUG
+                              const std::vector<unsigned int> side_nodes =
+                                elem->nodes_on_side(s);
+
+                              libmesh_assert_equal_to
+                                  (nodal_soln.size(),
+                                   side_nodes.size());
+#endif
+
+                              for (auto n : index_range(nodal_soln))
+                                {
+                                  // Retrieve index into global solution vector.
+                                  std::size_t node_index =
+                                    libmesh_map_find(discontinuous_node_indices,
+                                                     std::make_tuple(elem->id(), s, n));
+
+                                  for (unsigned int d=0; d < n_vec_dim; d++)
+                                    {
+                                      parallel_soln.add(node_index*n_vec_dim+d, nodal_soln[n_vec_dim*n+d]);
+                                      repeat_count.add(node_index*n_vec_dim+d, 1);
+                                    }
+                                }
                             }
                         }
                     }
                 }
               else // If this variable doesn't exist on this subdomain we have to still increment repeat_count so that we won't divide by 0 later:
-                for (const Node & node : elem->node_ref_range())
-                  // Only do this if this variable has NO DoFs at this node... it might have some from an adjoining element...
-                  if (!node.n_dofs(sys_num, var))
-                    for (unsigned int d=0; d < n_vec_dim; d++)
-                      repeat_count.add(nv*node.id() + (var_inc+d + var_num), 1);
+                for (auto n : elem->node_index_range())
+                  {
+                    const Node & node = elem->node_ref(n);
+                    // Only do this if this variable has NO DoFs at
+                    // this node... it might have some from an
+                    // adjoining element...
+                    if (!node.n_dofs(sys_num, var))
+                      {
+                        const dof_id_type node_idx =
+                          nv * node_id_to_vec_id(node.id());
+
+                        for (unsigned int d=0; d < n_vec_dim; d++)
+                          repeat_count.add(node_idx + (var_inc+d + var_num), 1);
+                      }
+                  }
 
             } // end loop over elements
           var_inc += n_vec_dim;
@@ -806,13 +972,14 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
 
 
 void EquationSystems::build_solution_vector (std::vector<Number> & soln,
-                                             const std::set<std::string> * system_names) const
+                                             const std::set<std::string> * system_names,
+                                             bool add_sides) const
 {
   LOG_SCOPE("build_solution_vector()", "EquationSystems");
 
   // Call the parallel implementation
   std::unique_ptr<NumericVector<Number>> parallel_soln =
-    this->build_parallel_solution_vector(system_names);
+    this->build_parallel_solution_vector(system_names, add_sides);
 
   // Localize the NumericVector into the provided std::vector.
   parallel_soln->localize_to_one(soln);
@@ -1094,7 +1261,8 @@ EquationSystems::build_discontinuous_solution_vector
 (std::vector<Number> & soln,
  const std::set<std::string> * system_names,
  const std::vector<std::string> * var_names,
- bool vertices_only) const
+ bool vertices_only,
+ bool add_sides) const
 {
   LOG_SCOPE("build_discontinuous_solution_vector()", "EquationSystems");
 
@@ -1130,10 +1298,32 @@ EquationSystems::build_discontinuous_solution_vector
         }
     }
 
-  // get the total weight
+  // get the total "weight" - the number of nodal values to write for
+  // each variable.
   unsigned int tw=0;
   for (const auto & elem : _mesh.active_element_ptr_range())
-    tw += vertices_only ? elem->n_vertices() : elem->n_nodes();
+    {
+      tw += vertices_only ? elem->n_vertices() : elem->n_nodes();
+
+      if (add_sides)
+        {
+          for (auto s : elem->side_index_range())
+            {
+              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
+                continue;
+
+              const std::vector<unsigned int> side_nodes =
+                elem->nodes_on_side(s);
+
+              if (!vertices_only)
+                tw += side_nodes.size();
+              else
+                for (auto n : index_range(side_nodes))
+                  if (elem->is_vertex(side_nodes[n]))
+                    ++tw;
+            }
+        }
+    }
 
   // Only if we are on processor zero, allocate the storage
   // to hold (number_of_nodes)*(number_of_variables) entries.
@@ -1235,9 +1425,69 @@ EquationSystems::build_discontinuous_solution_vector
                               soln[index] += nodal_soln[n];
                             }
                         }
+
+                      if (add_sides)
+                        {
+                          for (auto s : elem->side_index_range())
+                            {
+                              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
+                                continue;
+
+                              const std::vector<unsigned int> side_nodes =
+                                elem->nodes_on_side(s);
+
+                              // Compute the FE solution at all the
+                              // side nodes, but only use those for
+                              // which is_vertex() == true if
+                              // vertices_only == true.
+                              FEInterface::side_nodal_soln
+                                (fe_type, elem, s, soln_coeffs,
+                                 nodal_soln);
+
+                              libmesh_assert_equal_to
+                                  (nodal_soln.size(),
+                                   side_nodes.size());
+
+                              for (auto n : index_range(side_nodes))
+                                {
+                                  if (vertices_only &&
+                                      !elem->is_vertex(n))
+                                    continue;
+
+                                  // Compute index into global solution vector.
+                                  std::size_t index =
+                                    nv * (nn++) + (n_vars_written_current_system + var_offset);
+
+                                  soln[index] += nodal_soln[n];
+                                }
+                            }
+                        }
                     }
                   else
-                    nn += vertices_only ? elem->n_vertices() : elem->n_nodes();
+                    {
+                      nn += vertices_only ? elem->n_vertices() : elem->n_nodes();
+
+                      if (add_sides)
+                        {
+                          for (auto s : elem->side_index_range())
+                            {
+                              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
+                                continue;
+
+                              const std::vector<unsigned int> side_nodes =
+                                elem->nodes_on_side(s);
+
+                              for (auto n : index_range(side_nodes))
+                                {
+                                  if (vertices_only &&
+                                      !elem->is_vertex(n))
+                                    continue;
+                                  nn++;
+                                }
+                            }
+                        }
+
+                    }
                 } // end loop over active elements
 
               // If we made it here, we actually wrote a variable, so increment

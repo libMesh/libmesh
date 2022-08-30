@@ -133,7 +133,7 @@ void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
   std::vector<Number>      v;
 
   es.build_variable_names  (solution_names, nullptr, system_names);
-  es.build_discontinuous_solution_vector (v, system_names);
+  es.build_discontinuous_solution_vector (v, system_names, nullptr, this->get_add_sides());
   this->write_nodal_data_discontinuous(name, v, solution_names);
 }
 
@@ -375,7 +375,11 @@ void ExodusII_IO::read (const std::string & fname)
           // Assign the current subdomain to this Elem
           uelem->subdomain_id() = static_cast<subdomain_id_type>(subdomain_id);
 
-          // Use the elem_num_map to obtain the ID of this element in the Exodus file
+          // Use the elem_num_map to obtain the ID of this element in
+          // the Exodus file.  Make sure we aren't reading garbage if
+          // the file is corrupt.
+          libmesh_error_msg_if(std::size_t(j) >= exio_helper->elem_num_map.size(),
+                               "Error: Trying to read Exodus file with more elements than elem_num_map entries.\n");
           int exodus_id = exio_helper->elem_num_map[j];
 
           // Assign this element the same ID it had in the Exodus
@@ -876,6 +880,18 @@ void ExodusII_IO::write_complex_magnitude (bool val)
   _write_complex_abs = val;
 }
 
+
+
+void ExodusII_IO::write_added_sides (bool val)
+{
+  exio_helper->set_add_sides(val);
+}
+
+
+bool ExodusII_IO::get_add_sides ()
+{
+  return exio_helper->get_add_sides();
+}
 
 
 void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool val)
@@ -1796,13 +1812,18 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
         magnitudes.reserve(num_nodes);
 #endif
 
-      // There could be gaps in "soln", but it will always be in the
-      // order of [num_vars * node_id + var_id]. We now copy the
-      // proper solution values contiguously into "cur_soln",
-      // removing the gaps.
+      // There could be gaps in soln based on node numbering, but in
+      // serial the empty numbers are left empty.
+      // There could also be offsets in soln based on "fake" nodes
+      // inserted on each processor (because NumericVector indices
+      // have to be contiguous); the helper keeps track of those.
+      // We now copy the proper solution values contiguously into
+      // "cur_soln", removing the gaps.
       for (const auto & node : mesh.node_ptr_range())
         {
-          dof_id_type idx = node->id()*num_vars + c;
+          const dof_id_type idx =
+            (exio_helper->node_id_to_vec_id(node->id()))
+            * num_vars + c;
 #ifdef LIBMESH_USE_REAL_NUMBERS
           cur_soln.push_back(soln[idx]);
 #else
@@ -1811,6 +1832,53 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
           if (_write_complex_abs)
             magnitudes.push_back(std::abs(soln[idx]));
 #endif
+        }
+
+      // If we're adding extra sides, we need to add their data too.
+      //
+      // Because soln was created from a parallel NumericVector, its
+      // numbering was contiguous on each processor; we need to use
+      // the same offsets here, and we need to loop through elements
+      // from earlier ranks first.
+      if (exio_helper->get_add_sides())
+        {
+          std::vector<std::vector<const Elem *>>
+            elems_by_pid(mesh.n_processors());
+
+          for (const auto & elem : mesh.active_element_ptr_range())
+            elems_by_pid[elem->processor_id()].push_back(elem);
+
+          for (auto p : index_range(elems_by_pid))
+            {
+              dof_id_type global_idx =
+                exio_helper->added_node_offset_on(p) * num_vars + c;
+              for (const Elem * elem : elems_by_pid[p])
+                {
+                  for (auto s : elem->side_index_range())
+                    {
+                      if (exio_helper->redundant_added_side(*elem,s))
+                        continue;
+
+                      const std::vector<unsigned int> side_nodes =
+                        elem->nodes_on_side(s);
+
+                      for (auto n : index_range(side_nodes))
+                        {
+                          libmesh_ignore(n);
+                          libmesh_assert_less(global_idx, soln.size());
+#ifdef LIBMESH_USE_REAL_NUMBERS
+                          cur_soln.push_back(soln[global_idx]);
+#else
+                          real_parts.push_back(soln[global_idx].real());
+                          imag_parts.push_back(soln[global_idx].imag());
+                          if (_write_complex_abs)
+                            magnitudes.push_back(std::abs(soln[global_idx]));
+#endif
+                          global_idx += num_vars;
+                        }
+                    }
+                }
+            }
         }
 
       // Finally, actually call the Exodus API to write to file.
@@ -2103,11 +2171,6 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string & fname,
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  int num_vars = cast_int<int>(names.size());
-  int num_nodes = 0;
-  for (const auto & elem : mesh.active_element_ptr_range())
-    num_nodes += elem->n_nodes();
-
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
   std::vector<std::string> complex_names =
@@ -2124,6 +2187,20 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string & fname,
 
   if (mesh.processor_id())
     return;
+
+  int num_vars = cast_int<int>(names.size());
+  libmesh_assert_equal_to(soln.size() % num_vars, 0);
+  int num_nodes = soln.size() / num_vars;
+
+#ifndef NDEBUG
+  if (!this->get_add_sides())
+    {
+      int num_real_nodes = 0;
+      for (const auto & elem : mesh.active_element_ptr_range())
+        num_real_nodes += elem->n_nodes();
+      libmesh_assert_equal_to(num_real_nodes, num_nodes);
+    }
+#endif
 
   for (int c=0; c<num_vars; c++)
     {

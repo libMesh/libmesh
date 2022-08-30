@@ -345,6 +345,17 @@ public:
                          std::vector<Number> & nodal_soln);
 
   /**
+   * Build the nodal soln on one side from the (full) element soln.
+   * This is the solution that will be plotted on side-elements.
+   *
+   * On a p-refined element, \p o should be the base order of the element.
+   */
+  static void side_nodal_soln(const Elem * elem, const Order o,
+                              const unsigned int side,
+                              const std::vector<Number> & elem_soln,
+                              std::vector<Number> & nodal_soln_on_side);
+
+  /**
    * \returns The number of shape functions associated with
    * this finite element.
    */
@@ -682,6 +693,14 @@ protected:
       for (auto vi : index_range(v))
         v[vi] = FE<Dim,T>::shape_deriv (elem, o, i, j, p[vi], add_p_level);
     }
+
+  /**
+   * A default implementation for side_nodal_soln
+   */
+  static void default_side_nodal_soln(const Elem * elem, const Order o,
+                                      const unsigned int side,
+                                      const std::vector<Number> & elem_soln,
+                                      std::vector<Number> & nodal_soln_on_side);
 
   /**
    * An array of the node locations on the last

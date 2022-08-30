@@ -296,11 +296,16 @@ public:
    * Fill the input vector \p soln with solution values.  The
    * entries will be in variable-major format (corresponding to
    * the names from \p build_variable_names()).
+   *
    * If systems_names!=nullptr, only include data from the
    * specified systems.
+   *
+   * If \p add_sides is true, append data for plotting on "side
+   * elements" too.
    */
   void build_solution_vector (std::vector<Number> & soln,
-                              const std::set<std::string> * system_names=nullptr) const;
+                              const std::set<std::string> * system_names=nullptr,
+                              bool add_sides=false) const;
 
   /**
    * A version of build_solution_vector which is appropriate for
@@ -311,7 +316,8 @@ public:
    * get the local values they need to write on each processor.
    */
   std::unique_ptr<NumericVector<Number>>
-  build_parallel_solution_vector(const std::set<std::string> * system_names=nullptr) const;
+  build_parallel_solution_vector(const std::set<std::string> * system_names=nullptr,
+                                 bool add_sides=false) const;
 
   /**
    * Retrieve \p vars_active_subdomains, which indicates the active
@@ -396,18 +402,24 @@ public:
    * Fill the input vector \p soln with solution values.  The
    * entries will be in variable-major format (corresponding to
    * the names from \p build_variable_names()).
+
    * If systems_names!=nullptr, only include data from the
    * specified systems.
+
    * If vertices_only == true, then for higher-order elements only
    * the solution at the vertices is computed. This can be useful
    * when plotting discontinuous solutions on higher-order elements
    * and only a lower-order representation is required.
+   *
+   * If add_sides == true, append data for plotting on "side
+   * elements" too.
    */
   void build_discontinuous_solution_vector
   (std::vector<Number> & soln,
    const std::set<std::string> * system_names = nullptr,
    const std::vector<std::string> * var_names = nullptr,
-   bool vertices_only = false) const;
+   bool vertices_only = false,
+   bool add_sides = false) const;
 
   /**
    * Read & initialize the systems from disk using the XDR data format.
