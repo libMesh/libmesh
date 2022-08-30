@@ -1274,46 +1274,10 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
             }
       }
 
-  // Finally, count up the SCALAR dofs
-  this->_n_SCALAR_dofs = 0;
-  for (unsigned vg=0; vg<n_var_groups; vg++)
-    {
-      const VariableGroup & vg_description(this->variable_group(vg));
-
-      if (vg_description.type().family == SCALAR)
-        {
-          this->_n_SCALAR_dofs += (vg_description.n_variables()*
-                                   vg_description.type().order.get_order());
-          continue;
-        }
-    }
-
-  // Only increment next_free_dof if we're on the processor
-  // that holds this SCALAR variable
-  if (this->processor_id() == (this->n_processors()-1))
-    next_free_dof += _n_SCALAR_dofs;
+  this->distribute_scalar_dofs(next_free_dof);
 
 #ifdef DEBUG
-  {
-    // libMesh::out << "next_free_dof=" << next_free_dof << std::endl
-    //       << "_n_SCALAR_dofs=" << _n_SCALAR_dofs << std::endl;
-
-    // Make sure we didn't miss any nodes
-    MeshTools::libmesh_assert_valid_procids<Node>(mesh);
-
-    for (auto & node : mesh.local_node_ptr_range())
-      {
-        unsigned int n_var_g = node->n_var_groups(this->sys_number());
-        for (unsigned int vg=0; vg != n_var_g; ++vg)
-          {
-            unsigned int n_comp_g =
-              node->n_comp_group(this->sys_number(), vg);
-            dof_id_type my_first_dof = n_comp_g ?
-              node->vg_dof_base(this->sys_number(), vg) : 0;
-            libmesh_assert_not_equal_to (my_first_dof, DofObject::invalid_id);
-          }
-      }
-  }
+  this->assert_no_nodes_missed(mesh);
 #endif // DEBUG
 }
 
@@ -1405,9 +1369,19 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
             }
     } // end loop on variable groups
 
-  // Finally, count up the SCALAR dofs
+  this->distribute_scalar_dofs(next_free_dof);
+
+#ifdef DEBUG
+  this->assert_no_nodes_missed(mesh);
+#endif
+}
+
+
+
+void DofMap::distribute_scalar_dofs(dof_id_type & next_free_dof)
+{
   this->_n_SCALAR_dofs = 0;
-  for (unsigned vg=0; vg<n_var_groups; vg++)
+  for (auto vg : make_range(this->n_variable_groups()))
     {
       const VariableGroup & vg_description(this->variable_group(vg));
 
@@ -1423,28 +1397,29 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
   // that holds this SCALAR variable
   if (this->processor_id() == (this->n_processors()-1))
     next_free_dof += _n_SCALAR_dofs;
-
-#ifdef DEBUG
-  {
-    // Make sure we didn't miss any nodes
-    MeshTools::libmesh_assert_valid_procids<Node>(mesh);
-
-    for (auto & node : mesh.local_node_ptr_range())
-      {
-        unsigned int n_var_g = node->n_var_groups(this->sys_number());
-        for (unsigned int vg=0; vg != n_var_g; ++vg)
-          {
-            unsigned int n_comp_g =
-              node->n_comp_group(this->sys_number(), vg);
-            dof_id_type my_first_dof = n_comp_g ?
-              node->vg_dof_base(this->sys_number(), vg) : 0;
-            libmesh_assert_not_equal_to (my_first_dof, DofObject::invalid_id);
-          }
-      }
-  }
-#endif // DEBUG
 }
 
+
+
+#ifdef DEBUG
+void DofMap::assert_no_nodes_missed(MeshBase & mesh)
+{
+  MeshTools::libmesh_assert_valid_procids<Node>(mesh);
+
+  for (auto & node : mesh.local_node_ptr_range())
+    {
+      unsigned int n_var_g = node->n_var_groups(this->sys_number());
+      for (unsigned int vg=0; vg != n_var_g; ++vg)
+        {
+          unsigned int n_comp_g =
+            node->n_comp_group(this->sys_number(), vg);
+          dof_id_type my_first_dof = n_comp_g ?
+            node->vg_dof_base(this->sys_number(), vg) : 0;
+          libmesh_assert_not_equal_to (my_first_dof, DofObject::invalid_id);
+        }
+    }
+}
+#endif // DEBUG
 
 
 void

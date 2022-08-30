@@ -1585,6 +1585,18 @@ private:
                                          MeshBase & mesh);
 
   /*
+   * Helper method for the above two to count + distriubte SCALAR dofs
+   */
+  void distribute_scalar_dofs (dof_id_type & next_free_dof);
+
+#ifdef DEBUG
+  /*
+   * Internal assertions for distribute_local_dofs_*
+   */
+  void assert_no_nodes_missed(MeshBase & mesh);
+#endif
+
+  /*
    * A utility method for obtaining a set of elements to ghost along
    * with merged coupling matrices.
    */
