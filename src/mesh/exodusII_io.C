@@ -882,18 +882,6 @@ void ExodusII_IO::write_complex_magnitude (bool val)
 
 
 
-void ExodusII_IO::write_added_sides (bool val)
-{
-  exio_helper->set_add_sides(val);
-}
-
-
-bool ExodusII_IO::get_add_sides ()
-{
-  return exio_helper->get_add_sides();
-}
-
-
 void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool val)
 {
   exio_helper->use_mesh_dimension_instead_of_spatial_dimension(val);
@@ -920,6 +908,21 @@ void ExodusII_IO::append(bool val)
 {
   _append = val;
 }
+
+
+
+void ExodusII_IO::write_added_sides (bool val)
+{
+  exio_helper->set_add_sides(val);
+}
+
+
+
+bool ExodusII_IO::get_add_sides ()
+{
+  return exio_helper->get_add_sides();
+}
+
 
 
 
@@ -1856,7 +1859,7 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
                 {
                   for (auto s : elem->side_index_range())
                     {
-                      if (exio_helper->redundant_added_side(*elem,s))
+                      if (EquationSystems::redundant_added_side(*elem,s))
                         continue;
 
                       const std::vector<unsigned int> side_nodes =
@@ -2412,6 +2415,21 @@ void ExodusII_IO::set_coordinate_offset(Point)
 void ExodusII_IO::append(bool)
 {
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+
+
+void ExodusII_IO::write_added_sides (bool)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+
+
+bool ExodusII_IO::get_add_sides ()
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+  return false;
 }
 
 
