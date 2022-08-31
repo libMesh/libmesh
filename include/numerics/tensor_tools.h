@@ -350,6 +350,51 @@ struct MakeBaseNumber<
   typedef typename MakeBaseNumber<T>::type type;
 };
 
+template <typename T, typename Enable = void>
+struct TensorTraits
+{
+  static_assert(always_false<T>,
+                "Instantiating the generic template of TensorTraits. You must specialize "
+                "TensorTraits for your type.");
+  static constexpr unsigned char rank = 0;
+};
+
+template <typename T>
+struct TensorTraits<T, typename std::enable_if<ScalarTraits<T>::value>::type>
+{
+  static constexpr unsigned char rank = 0;
+};
+
+template <typename T>
+struct TensorTraits<TypeVector<T>>
+{
+  static constexpr unsigned char rank = 1;
+};
+
+template <typename T>
+struct TensorTraits<VectorValue<T>>
+{
+  static constexpr unsigned char rank = 1;
+};
+
+template <typename T>
+struct TensorTraits<TypeTensor<T>>
+{
+  static constexpr unsigned char rank = 2;
+};
+
+template <typename T>
+struct TensorTraits<TensorValue<T>>
+{
+  static constexpr unsigned char rank = 2;
+};
+
+template <typename T, unsigned int N>
+struct TensorTraits<TypeNTensor<N, T>>
+{
+  static constexpr unsigned char rank = static_cast<unsigned char>(N);
+};
+
 }//namespace TensorTools
 
 }//namespace libMesh
