@@ -133,6 +133,16 @@ public:
             std::is_same<ReplacedType, std::vector<VectorValue<double>>>::value;
         CPPUNIT_ASSERT(assertion);
       }
+      {
+        typedef typename MetaPhysicL::ReplaceAlgebraicType<
+            std::vector<VectorValue<double>>,
+            typename TensorTools::IncrementRank<
+                typename MetaPhysicL::ValueType<std::vector<VectorValue<double>>>::type>::type>::type
+            ReplacedType;
+        constexpr bool assertion =
+            std::is_same<ReplacedType, std::vector<TensorValue<double>>>::value;
+        CPPUNIT_ASSERT(assertion);
+      }
 #endif
     }
 };
