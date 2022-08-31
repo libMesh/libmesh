@@ -885,14 +885,6 @@ public:
   get_conversion(std::string type_str) const;
 
   /*
-   * Returns true iff the given side of the given element is *not*
-   * added to output from that element, because it is considered to be
-   * redundant with respect to the same data added from the
-   * neighboring element sharing that side.
-   */
-  static bool redundant_added_side(const Elem & elem, unsigned int side);
-
-  /*
    * Returns the sum of node "offsets" that are to be expected from a
    * parallel nodal solution vector that has had "fake" nodes added on
    * each processor.  This plus a node id gives a valid nodal solution

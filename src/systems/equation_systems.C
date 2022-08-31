@@ -26,6 +26,7 @@
 #include "libmesh/newmark_system.h"
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/rb_construction.h"
+#include "libmesh/remote_elem.h"
 #include "libmesh/transient_rb_construction.h"
 #include "libmesh/eigen_system.h"
 #include "libmesh/parallel.h"
@@ -34,8 +35,6 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
-
-#include "libmesh/exodusII_io_helper.h"
 
 // System includes
 #include <functional> // std::plus
@@ -696,7 +695,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
         {
           for (auto s : elem->side_index_range())
             {
-              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
+              if (redundant_added_side(*elem,s))
                 continue;
 
               const std::vector<unsigned int> side_nodes =
@@ -739,7 +738,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
         {
           for (auto s : elem->side_index_range())
             {
-              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
+              if (redundant_added_side(*elem,s))
                 continue;
 
               const std::vector<unsigned int> side_nodes =
@@ -879,7 +878,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                         {
                           for (auto s : elem->side_index_range())
                             {
-                              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
+                              if (redundant_added_side(*elem,s))
                                 continue;
 
                               // Compute the FE solution at all the
@@ -1309,7 +1308,7 @@ EquationSystems::build_discontinuous_solution_vector
         {
           for (auto s : elem->side_index_range())
             {
-              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
+              if (redundant_added_side(*elem,s))
                 continue;
 
               const std::vector<unsigned int> side_nodes =
@@ -1430,7 +1429,7 @@ EquationSystems::build_discontinuous_solution_vector
                         {
                           for (auto s : elem->side_index_range())
                             {
-                              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
+                              if (redundant_added_side(*elem,s))
                                 continue;
 
                               const std::vector<unsigned int> side_nodes =
@@ -1471,7 +1470,7 @@ EquationSystems::build_discontinuous_solution_vector
                         {
                           for (auto s : elem->side_index_range())
                             {
-                              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
+                              if (redundant_added_side(*elem,s))
                                 continue;
 
                               const std::vector<unsigned int> side_nodes =
@@ -1500,6 +1499,31 @@ EquationSystems::build_discontinuous_solution_vector
       // Update offset for next loop iteration.
       var_offset += n_vars_written_current_system;
     } // end loop over systems
+}
+
+
+
+bool EquationSystems::redundant_added_side(const Elem & elem, unsigned int side)
+{
+  libmesh_assert(elem.active());
+
+  const Elem * neigh = elem.neighbor_ptr(side);
+
+  // Write boundary sides.
+  if (!neigh)
+    return false;
+
+  // Write ghost sides in Nemesis
+  if (neigh == remote_elem)
+    return false;
+
+  // Don't write a coarser side if a finer side exists
+  if (!neigh->active())
+    return true;
+
+  // Don't write a side redundantly from both of the
+  // elements sharing it.  We'll disambiguate with id().
+  return (neigh->id() < elem.id());
 }
 
 

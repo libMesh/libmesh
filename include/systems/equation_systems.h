@@ -421,6 +421,18 @@ public:
    bool vertices_only = false,
    bool add_sides = false) const;
 
+  /*
+   * Returns true iff the given side of the given element is *never*
+   * added to output from that element, because it is considered to be
+   * redundant with respect to the same data added from the
+   * neighboring element sharing that side.  This helper function is
+   * used with the add_sides option when building solution vectors
+   * here and when outputting solution vectors in MeshOutput
+   * (currently just Exodus) I/O.
+   */
+  static bool redundant_added_side(const Elem & elem, unsigned int side);
+
+
   /**
    * Read & initialize the systems from disk using the XDR data format.
    * This format allows for machine-independent binary output.

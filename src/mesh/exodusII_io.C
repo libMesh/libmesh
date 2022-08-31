@@ -1859,7 +1859,7 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
                 {
                   for (auto s : elem->side_index_range())
                     {
-                      if (exio_helper->redundant_added_side(*elem,s))
+                      if (EquationSystems::redundant_added_side(*elem,s))
                         continue;
 
                       const std::vector<unsigned int> side_nodes =

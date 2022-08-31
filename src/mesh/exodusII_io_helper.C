@@ -25,6 +25,7 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/elem.h"
+#include "libmesh/equation_systems.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/system.h"
 #include "libmesh/numeric_vector.h"
@@ -185,7 +186,7 @@ const std::vector<int> hex_inverse_edge_map =
         if (add_sides)
           for (auto s : elem->side_index_range())
             {
-              if (ExodusII_IO_Helper::redundant_added_side(*elem,s))
+              if (EquationSystems::redundant_added_side(*elem,s))
                 continue;
 
               auto & marker =
@@ -2239,7 +2240,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
         {
           for (auto s : elem->side_index_range())
             {
-              if (redundant_added_side(*elem,s))
+              if (EquationSystems::redundant_added_side(*elem,s))
                 continue;
 
               num_side_elem++;
@@ -2310,7 +2311,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 
         for (auto s : elem->side_index_range())
           {
-            if (redundant_added_side(*elem,s))
+            if (EquationSystems::redundant_added_side(*elem,s))
               continue;
 
             num_elem++;
@@ -2521,7 +2522,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
         for (const Elem * elem : elems_by_pid[p])
           for (auto s : elem->side_index_range())
             {
-              if (redundant_added_side(*elem,s))
+              if (EquationSystems::redundant_added_side(*elem,s))
                 continue;
 
               const std::vector<unsigned int> side_nodes =
@@ -2663,7 +2664,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
           for (auto s : elem->side_index_range())
             {
-              if (redundant_added_side(*elem,s))
+              if (EquationSystems::redundant_added_side(*elem,s))
                 continue;
 
               const std::vector<unsigned int> side_nodes =
@@ -2938,7 +2939,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
             for (auto s : elem->side_index_range())
               {
-                if (redundant_added_side(*elem,s))
+                if (EquationSystems::redundant_added_side(*elem,s))
                   continue;
 
                 if (elem->side_type(s) != elem_t)
@@ -4943,30 +4944,6 @@ char * ExodusII_IO_Helper::NamesData::get_char_star(int i)
                        "Requested char * " << i << " but only have " << table_size << "!");
 
   return data_table[i].data();
-}
-
-
-bool ExodusII_IO_Helper::redundant_added_side(const Elem & elem, unsigned int side)
-{
-  libmesh_assert(elem.active());
-
-  const Elem * neigh = elem.neighbor_ptr(side);
-
-  // Write boundary sides.
-  if (!neigh)
-    return false;
-
-  // Write ghost sides in Nemesis
-  if (neigh == remote_elem)
-    return false;
-
-  // Don't write a coarser side if a finer side exists
-  if (!neigh->active())
-    return true;
-
-  // Don't write a side redundantly from both of the
-  // elements sharing it.  We'll disambiguate with id().
-  return (neigh->id() < elem.id());
 }
 
 
