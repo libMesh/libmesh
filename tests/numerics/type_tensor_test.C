@@ -23,7 +23,9 @@ public:
   CPPUNIT_TEST(testRotation);
 #endif
   CPPUNIT_TEST(testIsZero);
-
+#ifdef LIBMESH_HAVE_METAPHYSICL
+  CPPUNIT_TEST(testReplaceAlgebraicType);
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 
@@ -138,6 +140,19 @@ private:
       LIBMESH_ASSERT_FP_EQUAL(1, rotated(2), tol);
     }
   }
+#ifdef LIBMESH_HAVE_METAPHYSICL
+  void testReplaceAlgebraicType()
+  {
+    typedef typename MetaPhysicL::ReplaceAlgebraicType<
+        std::vector<TypeTensor<double>>,
+        typename TensorTools::IncrementRank<
+            typename MetaPhysicL::ValueType<std::vector<TypeTensor<double>>>::type>::type>::type
+        ReplacedType;
+    constexpr bool assertion =
+        std::is_same<ReplacedType, std::vector<TypeNTensor<3,double>>>::value;
+    CPPUNIT_ASSERT(assertion);
+  }
+#endif
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TypeTensorTest);

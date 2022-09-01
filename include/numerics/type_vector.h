@@ -1186,4 +1186,30 @@ auto norm(const libMesh::TypeVector<T> & vector) -> decltype(std::norm(T()))
 }
 } // namespace std
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+namespace MetaPhysicL
+{
+template <typename T>
+struct RawType<libMesh::TypeVector<T>>
+{
+  typedef libMesh::TypeVector<typename RawType<T>::value_type> value_type;
+
+  static value_type value (const libMesh::TypeVector<T> & in)
+    {
+      value_type ret;
+      for (unsigned int i = 0; i < LIBMESH_DIM; ++i)
+        ret(i) = raw_value(in(i));
+
+      return ret;
+    }
+};
+
+template <typename T, typename U>
+struct ReplaceAlgebraicType<libMesh::TypeVector<T>, U>
+{
+  typedef U type;
+};
+}
+#endif
+
 #endif // LIBMESH_TYPE_VECTOR_H

@@ -429,6 +429,12 @@ struct RawType<libMesh::TensorValue<T>>
       return ret;
     }
 };
+
+template <typename T, typename U>
+struct ReplaceAlgebraicType<libMesh::TensorValue<T>, U>
+{
+  typedef U type;
+};
 }
 #endif
 

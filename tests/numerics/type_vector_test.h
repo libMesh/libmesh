@@ -49,7 +49,9 @@
   CPPUNIT_TEST( testVectorSubBase );            \
   CPPUNIT_TEST( testVectorMultBase );           \
   CPPUNIT_TEST( testVectorAddAssignBase );      \
-  CPPUNIT_TEST( testVectorSubAssignBase );
+  CPPUNIT_TEST( testVectorSubAssignBase );      \
+  if (LIBMESH_HAVE_METAPHYSICL)                 \
+    CPPUNIT_TEST( testReplaceAlgebraicType );
 
 
 using namespace libMesh;
@@ -491,6 +493,20 @@ public:
     if (LIBMESH_DIM > 2)
       LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
   }
+
+#ifdef LIBMESH_HAVE_METAPHYSICL
+  void testReplaceAlgebraicType()
+  {
+    typedef typename MetaPhysicL::ReplaceAlgebraicType<
+        std::vector<TypeVector<double>>,
+        typename TensorTools::IncrementRank<
+            typename MetaPhysicL::ValueType<std::vector<TypeVector<double>>>::type>::type>::type
+        ReplacedType;
+    constexpr bool assertion =
+        std::is_same<ReplacedType, std::vector<TensorValue<double>>>::value;
+    CPPUNIT_ASSERT(assertion);
+  }
+#endif
 };
 
 #endif // #ifdef __type_vector_test_h__

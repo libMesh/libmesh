@@ -1383,4 +1383,31 @@ outer_product(const TypeVector<T> & a, const TypeVector<T2> & b)
 
 } // namespace libMesh
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+namespace MetaPhysicL
+{
+template <typename T>
+struct RawType<libMesh::TypeTensor<T>>
+{
+  typedef libMesh::TypeTensor<typename RawType<T>::value_type> value_type;
+
+  static value_type value (const libMesh::TypeTensor<T> & in)
+  {
+    value_type ret;
+    for (unsigned int i = 0; i < LIBMESH_DIM; ++i)
+      for (unsigned int j = 0; j < LIBMESH_DIM; ++j)
+        ret(i,j) = raw_value(in(i,j));
+
+    return ret;
+  }
+};
+
+template <typename T, typename U>
+struct ReplaceAlgebraicType<libMesh::TypeTensor<T>, U>
+{
+  typedef U type;
+};
+}
+#endif
+
 #endif // LIBMESH_TYPE_TENSOR_H
