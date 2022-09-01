@@ -697,6 +697,13 @@ inline Tnew libmesh_cast_int (Told oldvar)
   return cast_int<Tnew>(oldvar);
 }
 
+/**
+ * This is a helper variable template for cases when we want to use a default compile-time
+ * error with constexpr-based if conditions. The templating delays the triggering
+ * of the static assertion until the template is instantiated.
+ */
+template <class T>
+constexpr std::false_type always_false{};
 
 // build a integer representation of version
 #define LIBMESH_VERSION_ID(major,minor,patch) (((major) << 16) | ((minor) << 8) | ((patch) & 0xFF))
