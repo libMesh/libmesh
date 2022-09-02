@@ -209,7 +209,7 @@ void Poly2TriTriangulator::triangulate()
     {
       this->triangulate_current_points();
     }
-  while (!this->insert_refinement_points());
+  while (this->insert_refinement_points());
 
   // Okay, we really do need to support boundary ids soon, but we
   // don't yet
@@ -1145,7 +1145,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
     mesh.add_elem(std::move(new_elem_pair.second));
 
   // Did we add anything?
-  return new_elems.empty();
+  return !new_elems.empty();
 }
 
 
