@@ -54,7 +54,7 @@ NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems & es,
   es.parameters.set<Real>("nonlinear solver relative step tolerance") = 1e-8;
 
   es.parameters.set<bool>("reuse preconditioner") = false;
-  es.parameters.set<unsigned int>("reuse preconditioner maximum iterations") = 1;
+  es.parameters.set<unsigned int>("reuse preconditioner maximum linear iterations") = 1;
 }
 
 
@@ -138,8 +138,8 @@ void NonlinearImplicitSystem::set_solver_parameters ()
 
   const bool reuse_preconditioner =
       es.parameters.get<bool>("reuse preconditioner");
-  const unsigned int reuse_preconditioner_max_its =
-      es.parameters.get<unsigned int>("reuse preconditioner maximum iterations");
+  const unsigned int reuse_preconditioner_max_linear_its =
+      es.parameters.get<unsigned int>("reuse preconditioner maximum linear iterations");
 
   // Set all the parameters on the NonlinearSolver
   nonlinear_solver->max_nonlinear_iterations = maxits;
@@ -153,7 +153,7 @@ void NonlinearImplicitSystem::set_solver_parameters ()
   nonlinear_solver->initial_linear_tolerance = linear_tol;
   nonlinear_solver->minimum_linear_tolerance = linear_min_tol;
   nonlinear_solver->set_reuse_preconditioner(reuse_preconditioner);
-  nonlinear_solver->set_reuse_preconditioner_max_its(reuse_preconditioner_max_its);
+  nonlinear_solver->set_reuse_preconditioner_max_linear_its(reuse_preconditioner_max_linear_its);
 
   if (diff_solver.get())
     {

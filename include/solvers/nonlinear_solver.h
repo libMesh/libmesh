@@ -365,14 +365,14 @@ public:
   virtual void set_reuse_preconditioner(bool reuse);
 
   /**
-   *  Get the reuse_preconditioner_max_its parameter
+   *  Get the reuse_preconditioner_max_linear_its parameter
    */
-  virtual unsigned int reuse_preconditioner_max_its() const;
+  virtual unsigned int reuse_preconditioner_max_linear_its() const;
 
   /**
-   *  Set the reuse_preconditioner_max_its parameter
+   *  Set the reuse_preconditioner_max_linear_its parameter
    */
-  virtual void set_reuse_preconditioner_max_its(unsigned int i);
+  virtual void set_reuse_preconditioner_max_linear_its(unsigned int i);
 
   /**
    * Immediately force a new preconditioner
@@ -389,7 +389,7 @@ protected:
   /**
    * Number of linear iterations to retain the preconditioner
    */
-  unsigned int _reuse_preconditioner_max_its;
+  unsigned int _reuse_preconditioner_max_linear_its;
 
   /**
    * A reference to the system we are solving.
@@ -452,7 +452,7 @@ NonlinearSolver<T>::NonlinearSolver (sys_type & s) :
   minimum_linear_tolerance(0),
   converged(false),
   _reuse_preconditioner(false),
-  _reuse_preconditioner_max_its(0),
+  _reuse_preconditioner_max_linear_its(0),
   _system(s),
   _is_initialized (false),
   _preconditioner (nullptr),
