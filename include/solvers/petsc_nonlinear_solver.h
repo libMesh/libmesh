@@ -287,11 +287,6 @@ protected:
     */
   bool _setup_reuse;
 
-  /**
-   *  Check on operator sizes to see if we need to get a new preconditioner
-   */
-  void check_reuse_operator_sizes(numeric_index_type new_size);
-
 private:
   friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx);

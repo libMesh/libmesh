@@ -853,10 +853,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   LOG_SCOPE("solve()", "PetscNonlinearSolver");
   this->init ();
 
-  // Backup check on the size of the stored preconditioner to see if the
-  // problem size has changed.  If so do not use the stored preconditioner.
-  check_reuse_operator_sizes(x_in.size());
-
   // Make sure the data passed in are really of Petsc types
   PetscMatrix<T> * pre = cast_ptr<PetscMatrix<T> *>(&pre_in);
   PetscVector<T> * x   = cast_ptr<PetscVector<T> *>(&x_in);
@@ -1142,47 +1138,6 @@ void PetscNonlinearSolver<T>::force_new_preconditioner()
   this->_is_initialized = false;
   _snes.destroy();
   _setup_reuse = false;
-}
-
-template <typename T>
-void PetscNonlinearSolver<T>::check_reuse_operator_sizes(numeric_index_type new_size)
-{
-  // There are some special cases where libmesh won't know the
-  // operator size has changed (for example, problems involving
-  // variational inequalities).  This check will force a new
-  // preconditioner if the operator sizes has changed, regardless
-  // of what libmesh itself knows about the problem
-  //
-  if (!(this->_reuse_preconditioner) ||
-      !(this->_is_initialized) ||
-      !(_setup_reuse))
-    return;
-
-
-  KSP ksp;
-  PetscErrorCode ierr = SNESGetKSP(_snes, &ksp);
-  LIBMESH_CHKERR(ierr);
-
-  PetscBool setup_A, setup_P;
-  ierr = KSPGetOperatorsSet(ksp, &setup_A, &setup_P);
-  LIBMESH_CHKERR(ierr);
-  if (!(setup_A && setup_P))
-    return;
-
-  Mat A;
-  Mat P;
-  ierr = KSPGetOperators(ksp, &A, &P);
-  LIBMESH_CHKERR(ierr);
-
-  PetscInt Pm, Pn;
-  ierr = MatGetSize(A, &Pm, &Pn);
-  LIBMESH_CHKERR(ierr);
-
-  if ((unsigned) Pn != new_size)
-    {
-      this->force_new_preconditioner();
-      this->init();
-    }
 }
 
 //------------------------------------------------------------------
