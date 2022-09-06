@@ -215,7 +215,12 @@ public:
   /**
    *  Getter for the maximum iterations flag for preconditioner reuse
    */
-  virtual unsigned int reuse_preconditioner_max_its() const override;
+  virtual unsigned int reuse_preconditioner_max_linear_its() const override;
+
+  /**
+   *  Immediately force a new preconditioner, even if reuse is set
+   */
+  virtual void force_new_preconditioner() override;
 
 protected:
 

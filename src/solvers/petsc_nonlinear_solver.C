@@ -126,7 +126,7 @@ extern "C"
     ierr = KSPGetIterationNumber(ksp, &niter);
     LIBMESH_CHKERR2(solver->comm(),ierr);
 
-    if (niter > cast_int<PetscInt>(solver->reuse_preconditioner_max_its()))
+    if (niter > cast_int<PetscInt>(solver->reuse_preconditioner_max_linear_its()))
     {
       // -2 is a magic number for "recalculate next time you need it
       // and then not again"
@@ -682,8 +682,6 @@ void PetscNonlinearSolver<T>::clear ()
     }
 }
 
-
-
 template <typename T>
 void PetscNonlinearSolver<T>::init (const char * name)
 {
@@ -855,7 +853,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   LOG_SCOPE("solve()", "PetscNonlinearSolver");
   this->init ();
 
-
   // Make sure the data passed in are really of Petsc types
   PetscMatrix<T> * pre = cast_ptr<PetscMatrix<T> *>(&pre_in);
   PetscVector<T> * x   = cast_ptr<PetscVector<T> *>(&x_in);
@@ -878,7 +875,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
       ierr = SNESSetLagPreconditioner(_snes, -2);
       LIBMESH_CHKERR(ierr);
       // Add in our callback which will trigger recalculating
-      // the preconditioner when we hit reuse_preconditioner_max_its
+      // the preconditioner when we hit reuse_preconditioner_max_linear_its
       ierr = SNESMonitorSet(_snes, &libmesh_petsc_recalculate_monitor,
                             this,
                             NULL);
@@ -1129,11 +1126,19 @@ bool PetscNonlinearSolver<T>::reuse_preconditioner() const
 }
 
 template <typename T>
-unsigned int PetscNonlinearSolver<T>::reuse_preconditioner_max_its() const
+unsigned int PetscNonlinearSolver<T>::reuse_preconditioner_max_linear_its() const
 {
-  return this->_reuse_preconditioner_max_its;
+  return this->_reuse_preconditioner_max_linear_its;
 }
 
+template <typename T>
+void PetscNonlinearSolver<T>::force_new_preconditioner()
+{
+  // Easiest way is just to clear everything out
+  this->_is_initialized = false;
+  _snes.destroy();
+  _setup_reuse = false;
+}
 
 //------------------------------------------------------------------
 // Explicit instantiations

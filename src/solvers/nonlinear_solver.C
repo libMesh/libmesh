@@ -97,15 +97,15 @@ void NonlinearSolver<T>::set_reuse_preconditioner(bool reuse)
 }
 
 template <typename T>
-unsigned int NonlinearSolver<T>::reuse_preconditioner_max_its() const
+unsigned int NonlinearSolver<T>::reuse_preconditioner_max_linear_its() const
 {
   libmesh_not_implemented();
 }
 
 template <typename T>
-void NonlinearSolver<T>::set_reuse_preconditioner_max_its(unsigned int i)
+void NonlinearSolver<T>::set_reuse_preconditioner_max_linear_its(unsigned int i)
 {
-  _reuse_preconditioner_max_its = i;
+  _reuse_preconditioner_max_linear_its = i;
 }
 
 //------------------------------------------------------------------
