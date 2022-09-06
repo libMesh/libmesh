@@ -45,6 +45,7 @@ public:
   CPPUNIT_TEST( testPoly2TriEdgesRefined );
   CPPUNIT_TEST( testPoly2TriSegments );
   CPPUNIT_TEST( testPoly2TriRefined );
+  CPPUNIT_TEST( testPoly2TriNonRefined );
   CPPUNIT_TEST( testPoly2TriExtraRefined );
   CPPUNIT_TEST( testPoly2TriHolesRefined );
   CPPUNIT_TEST( testPoly2TriHolesInterpRefined );
@@ -901,7 +902,11 @@ public:
 
     triangulator.triangulate();
 
-    CPPUNIT_ASSERT(mesh.n_elem() > n_original_elem);
+    // If refinement should have increased our element count, check it
+    if (desired_area || area_func)
+      CPPUNIT_ASSERT_LESS(mesh.n_elem(), n_original_elem); // n_elem+++
+    else
+      CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_original_elem);
 
     Real area = 0;
     for (const auto & elem : mesh.active_local_element_ptr_range())
@@ -939,6 +944,17 @@ public:
     testPoly2TriTrapMesh(mesh);
     testPoly2TriRefinementBase(mesh, nullptr, 1.5, 15);
   }
+
+  void testPoly2TriNonRefined()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    testPoly2TriTrapMesh(mesh);
+    // Make sure we see 0 as "don't refine", not "infinitely refine"
+    testPoly2TriRefinementBase(mesh, nullptr, 1.5, 2, 0);
+  }
+
 
   void testPoly2TriExtraRefined()
   {
