@@ -619,6 +619,11 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
   Real twice_outer_area = 0,
        abs_twice_outer_area = 0;
 
+#ifdef DEBUG
+  // Area and edge type, for error reporting
+  std::vector<std::pair<Real, int>> areas;
+#endif
+
   while (!hole_edge_map.empty()) {
     auto [hole_points, edge_type] = extract_edge_vector();
 
@@ -649,10 +654,14 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
     auto abs_twice_this_area = std::abs(twice_this_area);
 
     if (((abs_twice_this_area == twice_this_area) && edge_type == 2) ||
-        (edge_type == 1))
+        ((abs_twice_this_area != twice_this_area) && edge_type == 1))
       ++n_positive_areas;
     else
       ++n_negative_areas;
+
+#ifdef DEBUG
+    areas.push_back({twice_this_area/2,edge_type});
+#endif
 
     if (abs_twice_this_area > abs_twice_outer_area)
       {
@@ -677,21 +686,40 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
   if (twice_outer_area > 0)
     std::reverse(_points.begin(), _points.end());
 
+#ifdef DEBUG
+  auto print_areas = [areas](){
+    libMesh::out << "Found boundary areas:\n";
+    static const std::vector<std::string> edgenames {"E","CW","CCW"};
+    for (auto area : areas)
+      libMesh::out << '(' << edgenames[area.second] << ' ' <<
+        area.first << ')';
+    libMesh::out << std::endl;
+  };
+#else
+  auto print_areas = [](){};
+#endif
+
   if (((twice_outer_area > 0) && outer_edge_type == 2) ||
       outer_edge_type == 1)
     {
       if (n_positive_areas > 1)
-        report_error("MeshedHole found " +
-                     std::to_string(n_positive_areas) +
-                     " counter-clockwise boundaries and cannot choose one!");
+        {
+          print_areas();
+          report_error("MeshedHole found " +
+                       std::to_string(n_positive_areas) +
+                       " counter-clockwise boundaries and cannot choose one!");
+        }
 
     }
   else if (outer_edge_type != 0)
     {
       if (n_negative_areas > 1)
-        report_error("MeshedHole found " +
-                     std::to_string(n_positive_areas) +
-                     " clockwise boundaries and cannot choose one!");
+        {
+          print_areas();
+          report_error("MeshedHole found " +
+                       std::to_string(n_positive_areas) +
+                       " clockwise boundaries and cannot choose one!");
+        }
 
     }
 
