@@ -655,8 +655,8 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
 
     auto abs_twice_this_area = std::abs(twice_this_area);
 
-    if (((abs_twice_this_area == twice_this_area) && edge_type == 2) ||
-        ((abs_twice_this_area != twice_this_area) && edge_type == 1))
+    if (((twice_this_area > 0) && edge_type == 2) ||
+        ((twice_this_area < 0) && edge_type == 1))
       ++n_positive_areas;
     else
       ++n_negative_areas;
@@ -702,7 +702,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
 #endif
 
   if (((twice_outer_area > 0) && outer_edge_type == 2) ||
-      outer_edge_type == 1)
+      ((twice_outer_area < 0) && outer_edge_type == 1))
     {
       if (n_positive_areas > 1)
         {
