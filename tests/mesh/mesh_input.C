@@ -748,7 +748,9 @@ public:
     (Number (*exact_sol)(const Point &, const Parameters &, const
                          std::string &, const std::string &),
      const ElemType elem_type,
-     const Order order)
+     const Order order,
+     const std::vector<FEType> earlier_vars = {},
+     const std::vector<FEType> later_vars = {})
   {
     constexpr unsigned int nx = added_sides_nxyz[0],
                            ny = added_sides_nxyz[1],
@@ -770,7 +772,15 @@ public:
 
       EquationSystems es(mesh);
       System & sys = es.add_system<System> ("SimpleSystem");
+      int varnum = 1;
+      for (auto vartype : earlier_vars)
+        sys.add_variable("earlier_"+std::to_string(varnum++), vartype);
+
       sys.add_variable("u", order, SIDE_HIERARCHIC);
+
+      varnum = 1;
+      for (auto vartype : later_vars)
+        sys.add_variable("later_"+std::to_string(varnum++), vartype);
 
       if (dim == 3)
         MeshTools::Generation::build_cube
