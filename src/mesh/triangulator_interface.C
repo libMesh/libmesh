@@ -112,8 +112,7 @@ void TriangulatorInterface::elems_to_segments()
         }
 
       // We'll steal the ordering calculation from
-      // the MeshedHole code, but reverse the ordering since it's
-      // to be used as an outer rather than an inner boundary.
+      // the MeshedHole code
       const TriangulatorInterface::MeshedHole mh { _mesh, this->_bdy_ids };
 
       // And now we're done with elements.  Delete them lest they have
@@ -139,10 +138,10 @@ void TriangulatorInterface::elems_to_segments()
       const std::size_t np = mh.n_points();
       for (auto i : make_range(np))
         {
-          const Point pt = mh.point(np-i-1);
+          const Point pt = mh.point(i);
           const dof_id_type id0 = libmesh_map_find(point_id_map, pt);
           nodes_to_delete.erase(_mesh.node_ptr(id0));
-          const Point next_pt = mh.point((2*np-i-2)%np);
+          const Point next_pt = mh.point((np+i+1)%np);
           const dof_id_type id1 = libmesh_map_find(point_id_map, next_pt);
           this->segments.emplace_back(id0, id1);
         }

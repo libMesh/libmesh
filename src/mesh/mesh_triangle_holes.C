@@ -201,7 +201,9 @@ RealGradient TriangulatorInterface::Hole::areavec() const
   // the division by 2 and the norm for the end.
   //
   // Your hole points had best be coplanar, but this should work
-  // regardless of which plane they're in.
+  // regardless of which plane they're in.  If you're in the XY plane,
+  // then the standard counter-clockwise hole point ordering gives you
+  // a positive areavec(2);
 
   RealGradient areavec = 0;
 
@@ -210,7 +212,7 @@ RealGradient TriangulatorInterface::Hole::areavec() const
       const Point e_0im = this->point(i-1) - p0,
                   e_0i  = this->point(i) - p0;
 
-      areavec += e_0im.cross(e_0i);
+      areavec += e_0i.cross(e_0im);
     }
 
   return areavec;
@@ -648,7 +650,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
         const Point e_0im = *hole_points[i-1] - p0,
                     e_0i  = *hole_points[i] - p0;
 
-        twice_this_area += e_0im.cross(e_0i)(2);
+        twice_this_area += e_0i.cross(e_0im)(2);
       }
 
     auto abs_twice_this_area = std::abs(twice_this_area);
