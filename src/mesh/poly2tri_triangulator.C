@@ -1131,7 +1131,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                   if (new_points.empty() ||
                       (point != new_points.back() &&
                        point != new_points.front()))
-                    new_points.push_back(point);
+                    push_back_new_point(point);
 
                   auto it = next_boundary_node.find(point);
                   while (it != next_boundary_node.end())
@@ -1142,7 +1142,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                       if (point_it != point_end &&
                           point == *point_it)
                         ++point_it;
-                      new_points.push_back(point);
+                      push_back_new_point(point);
                       it = next_boundary_node.find(point);
                     }
                 }
