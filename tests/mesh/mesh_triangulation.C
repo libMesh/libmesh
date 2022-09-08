@@ -904,7 +904,7 @@ public:
 
     // If refinement should have increased our element count, check it
     if (desired_area || area_func)
-      CPPUNIT_ASSERT_LESS(mesh.n_elem(), n_original_elem); // n_elem+++
+      CPPUNIT_ASSERT_GREATER(n_original_elem, mesh.n_elem()); // n_elem+++
     else
       CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_original_elem);
 
