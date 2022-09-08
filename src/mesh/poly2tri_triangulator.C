@@ -1107,6 +1107,20 @@ bool Poly2TriTriangulator::insert_refinement_points()
               // "to the left as viewed from the domain interior".  We
               // need to build the updated hole ordering "backwards".
 
+              // We should never see duplicate points when we add one
+              // to a hole; if we do then we did something wrong.
+              auto push_back_new_point = [&new_points](const Point & p) {
+                // O(1) assert in devel
+                libmesh_assert(new_points.empty() ||
+                               new_points.back() != p);
+#ifdef DEBUG
+                // O(N) asserts in dbg
+                for (auto old_p : new_points)
+                  libmesh_assert_not_equal_to(old_p, p);
+#endif
+                new_points.push_back(p);
+              };
+
               for (auto point_it = arb.get_points().rbegin(),
                    point_end = arb.get_points().rend();
                    point_it != point_end;)
