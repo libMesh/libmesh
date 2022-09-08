@@ -117,12 +117,15 @@ public:
   CPPUNIT_TEST( testExodusWriteAddedSidesMixedEdgeC0 );
   // CPPUNIT_TEST( testExodusWriteAddedSidesEdgeDisc ); // need is_on_face fixes
   CPPUNIT_TEST( testExodusWriteAddedSidesTriC0 );
+  CPPUNIT_TEST( testExodusWriteAddedSidesMixedTriC0 );
   // CPPUNIT_TEST( testExodusWriteAddedSidesTriDisc ); // Need aligned faces
   CPPUNIT_TEST( testExodusWriteAddedSidesQuadC0 );
+  CPPUNIT_TEST( testExodusWriteAddedSidesMixedQuadC0 );
   // CPPUNIT_TEST( testExodusWriteAddedSidesQuadDisc ); // need is_on_face fixes
   // CPPUNIT_TEST( testExodusWriteAddedSidesTetC0 ); // BROKEN!?!  WHY!?!
   // CPPUNIT_TEST( testExodusWriteAddedSidesTetDisc );
   CPPUNIT_TEST( testExodusWriteAddedSidesHexC0 );
+  CPPUNIT_TEST( testExodusWriteAddedSidesMixedHexC0 );
   CPPUNIT_TEST( testExodusWriteAddedSidesHexDisc );
 
   CPPUNIT_TEST( testExodusFileMappingsPlateWithHole);
@@ -993,6 +996,12 @@ public:
     testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, SECOND);
   }
 
+  void testExodusWriteAddedSidesMixedTriC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, FIRST, {{SECOND, HIERARCHIC}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, SECOND, {}, {{SECOND, SZABAB}});
+  }
+
   void testExodusWriteAddedSidesTriDisc()
   {
     testExodusWriteAddedSides(designed_for_side_elems, TRI6, SECOND);
@@ -1002,6 +1011,12 @@ public:
   {
     testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, FIRST);
     testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, SECOND);
+  }
+
+  void testExodusWriteAddedSidesMixedQuadC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, FIRST, {{SECOND, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, SECOND, {}, {{FIRST, LAGRANGE}});
   }
 
   void testExodusWriteAddedSidesQuadDisc()
@@ -1024,6 +1039,12 @@ public:
   {
     testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, FIRST);
     testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, SECOND);
+  }
+
+  void testExodusWriteAddedSidesMixedHexC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, FIRST, {{FIRST, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, SECOND, {}, {{SECOND, HIERARCHIC}});
   }
 
   void testExodusWriteAddedSidesHexDisc()
