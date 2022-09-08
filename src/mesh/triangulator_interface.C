@@ -124,7 +124,6 @@ void TriangulatorInterface::elems_to_segments()
       // inside that boundary.  Triangulator code doesn't like Steiner
       // points that aren't inside the triangulation domain, so we
       // need to get rid of them.
-
       std::unordered_set<Node *> nodes_to_delete;
       if (!this->_bdy_ids.empty())
         {
