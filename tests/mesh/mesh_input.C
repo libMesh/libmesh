@@ -114,6 +114,7 @@ public:
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
 
   CPPUNIT_TEST( testExodusWriteAddedSidesEdgeC0 );
+  CPPUNIT_TEST( testExodusWriteAddedSidesMixedEdgeC0 );
   // CPPUNIT_TEST( testExodusWriteAddedSidesEdgeDisc ); // need is_on_face fixes
   CPPUNIT_TEST( testExodusWriteAddedSidesTriC0 );
   // CPPUNIT_TEST( testExodusWriteAddedSidesTriDisc ); // Need aligned faces
@@ -973,6 +974,12 @@ public:
   {
     testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, FIRST);
     testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, SECOND);
+  }
+
+  void testExodusWriteAddedSidesMixedEdgeC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, FIRST, {{FIRST, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, SECOND, {}, {{FIRST, LAGRANGE}});
   }
 
   void testExodusWriteAddedSidesEdgeDisc()
