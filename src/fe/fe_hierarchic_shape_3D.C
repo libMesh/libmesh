@@ -874,6 +874,9 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
         libmesh_assert_less(i, 6*dofs_per_side);
 
         const unsigned int sidenum = cube_side(p);
+        if (sidenum > 5)
+          return std::numeric_limits<Real>::quiet_NaN();
+
         const unsigned int dof_offset = sidenum * dofs_per_side;
 
         if (i < dof_offset) // i is on a previous side
@@ -1095,6 +1098,9 @@ Real FE<3,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
         libmesh_assert_less(i, 6*dofs_per_side);
 
         const unsigned int sidenum = cube_side(p);
+        if (sidenum > 5)
+          return std::numeric_limits<Real>::quiet_NaN();
+
         const unsigned int dof_offset = sidenum * dofs_per_side;
 
         if (i < dof_offset) // i is on a previous side
@@ -1346,6 +1352,9 @@ Real FE<3,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
         libmesh_assert_less(i, 6*dofs_per_side);
 
         const unsigned int sidenum = cube_side(p);
+        if (sidenum > 5)
+          return std::numeric_limits<Real>::quiet_NaN();
+
         const unsigned int dof_offset = sidenum * dofs_per_side;
 
         if (i < dof_offset) // i is on a previous side
@@ -1578,8 +1587,10 @@ unsigned int cube_side (const Point & p)
     return 4;
   else if (zeta > maxabs_xi_eta)
     return 5;
-  else
-    libmesh_error_msg("Cannot determine side to evaluate");
+
+  // We need to be able to return invalid values for cases where
+  // mixed FE are being evaluated together on edges and vertices
+  return 65535;
 }
 
 

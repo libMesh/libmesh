@@ -114,14 +114,18 @@ public:
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
 
   CPPUNIT_TEST( testExodusWriteAddedSidesEdgeC0 );
+  CPPUNIT_TEST( testExodusWriteAddedSidesMixedEdgeC0 );
   // CPPUNIT_TEST( testExodusWriteAddedSidesEdgeDisc ); // need is_on_face fixes
   CPPUNIT_TEST( testExodusWriteAddedSidesTriC0 );
+  CPPUNIT_TEST( testExodusWriteAddedSidesMixedTriC0 );
   // CPPUNIT_TEST( testExodusWriteAddedSidesTriDisc ); // Need aligned faces
   CPPUNIT_TEST( testExodusWriteAddedSidesQuadC0 );
+  CPPUNIT_TEST( testExodusWriteAddedSidesMixedQuadC0 );
   // CPPUNIT_TEST( testExodusWriteAddedSidesQuadDisc ); // need is_on_face fixes
   // CPPUNIT_TEST( testExodusWriteAddedSidesTetC0 ); // BROKEN!?!  WHY!?!
   // CPPUNIT_TEST( testExodusWriteAddedSidesTetDisc );
   CPPUNIT_TEST( testExodusWriteAddedSidesHexC0 );
+  CPPUNIT_TEST( testExodusWriteAddedSidesMixedHexC0 );
   CPPUNIT_TEST( testExodusWriteAddedSidesHexDisc );
 
   CPPUNIT_TEST( testExodusFileMappingsPlateWithHole);
@@ -748,7 +752,9 @@ public:
     (Number (*exact_sol)(const Point &, const Parameters &, const
                          std::string &, const std::string &),
      const ElemType elem_type,
-     const Order order)
+     const Order order,
+     const std::vector<FEType> earlier_vars = {},
+     const std::vector<FEType> later_vars = {})
   {
     constexpr unsigned int nx = added_sides_nxyz[0],
                            ny = added_sides_nxyz[1],
@@ -770,7 +776,15 @@ public:
 
       EquationSystems es(mesh);
       System & sys = es.add_system<System> ("SimpleSystem");
+      int varnum = 1;
+      for (auto vartype : earlier_vars)
+        sys.add_variable("earlier_"+std::to_string(varnum++), vartype);
+
       sys.add_variable("u", order, SIDE_HIERARCHIC);
+
+      varnum = 1;
+      for (auto vartype : later_vars)
+        sys.add_variable("later_"+std::to_string(varnum++), vartype);
 
       if (dim == 3)
         MeshTools::Generation::build_cube
@@ -965,6 +979,12 @@ public:
     testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, SECOND);
   }
 
+  void testExodusWriteAddedSidesMixedEdgeC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, FIRST, {{FIRST, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, SECOND, {}, {{FIRST, LAGRANGE}});
+  }
+
   void testExodusWriteAddedSidesEdgeDisc()
   {
     testExodusWriteAddedSides(designed_for_side_elems, EDGE3, SECOND);
@@ -976,6 +996,12 @@ public:
     testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, SECOND);
   }
 
+  void testExodusWriteAddedSidesMixedTriC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, FIRST, {{SECOND, HIERARCHIC}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, SECOND, {}, {{SECOND, SZABAB}});
+  }
+
   void testExodusWriteAddedSidesTriDisc()
   {
     testExodusWriteAddedSides(designed_for_side_elems, TRI6, SECOND);
@@ -985,6 +1011,12 @@ public:
   {
     testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, FIRST);
     testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, SECOND);
+  }
+
+  void testExodusWriteAddedSidesMixedQuadC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, FIRST, {{SECOND, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, SECOND, {}, {{FIRST, LAGRANGE}});
   }
 
   void testExodusWriteAddedSidesQuadDisc()
@@ -1007,6 +1039,12 @@ public:
   {
     testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, FIRST);
     testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, SECOND);
+  }
+
+  void testExodusWriteAddedSidesMixedHexC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, FIRST, {{FIRST, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, SECOND, {}, {{SECOND, HIERARCHIC}});
   }
 
   void testExodusWriteAddedSidesHexDisc()

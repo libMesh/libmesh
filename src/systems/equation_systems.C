@@ -900,13 +900,13 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                                 {
                                   // Retrieve index into global solution vector.
                                   std::size_t node_index =
-                                    libmesh_map_find(discontinuous_node_indices,
-                                                     std::make_tuple(elem->id(), s, n));
+                                    nv * libmesh_map_find(discontinuous_node_indices,
+                                                          std::make_tuple(elem->id(), s, n));
 
                                   for (unsigned int d=0; d < n_vec_dim; d++)
                                     {
-                                      parallel_soln.add(node_index*n_vec_dim+d, nodal_soln[n_vec_dim*n+d]);
-                                      repeat_count.add(node_index*n_vec_dim+d, 1);
+                                      parallel_soln.add(node_index + (var_inc+d + var_num), nodal_soln[n_vec_dim*n+d]);
+                                      repeat_count.add(node_index + (var_inc+d + var_num), 1);
                                     }
                                 }
                             }
