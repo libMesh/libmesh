@@ -22,6 +22,7 @@
 
 #define FETEST                                  \
   CPPUNIT_TEST( testU );                        \
+  CPPUNIT_TEST( testPartitionOfUnity );         \
   CPPUNIT_TEST( testGradU );                    \
   CPPUNIT_TEST( testGradUComp );                \
   CPPUNIT_TEST( testHessU );                    \
@@ -563,6 +564,81 @@ public:
           }
 #endif // LIBMESH_ENABLE_EXCEPTIONS
   }
+
+  void testPartitionOfUnity()
+    {
+      if (!this->_elem)
+        return;
+
+      this->_fe->reinit(this->_elem);
+
+      bool satisfies_partition_of_unity = true;
+      for (const auto qp : make_range(this->_qrule->n_points()))
+      {
+        Real phi_sum = 0;
+        for (std::size_t d = 0; d != this->_dof_indices.size(); ++d)
+          phi_sum += this->_fe->get_phi()[d][qp];
+        if (phi_sum < (1 - TOLERANCE) || phi_sum > (1 + TOLERANCE))
+        {
+          satisfies_partition_of_unity = false;
+          break;
+        }
+      }
+
+      switch (this->_fe->get_family())
+      {
+        case MONOMIAL:
+        {
+          switch (this->_fe->get_order())
+          {
+            case CONSTANT:
+              CPPUNIT_ASSERT(satisfies_partition_of_unity);
+              break;
+
+            default:
+              CPPUNIT_ASSERT(!satisfies_partition_of_unity);
+              break;
+          }
+          break;
+        }
+        case SZABAB:
+        case HIERARCHIC:
+        case L2_HIERARCHIC:
+        {
+          switch (this->_fe->get_order())
+          {
+            case FIRST:
+              CPPUNIT_ASSERT(satisfies_partition_of_unity);
+              break;
+
+            default:
+              CPPUNIT_ASSERT(!satisfies_partition_of_unity);
+              break;
+          }
+          break;
+        }
+
+        case XYZ:
+        case CLOUGH:
+        case HERMITE:
+        {
+          CPPUNIT_ASSERT(!satisfies_partition_of_unity);
+          break;
+        }
+
+        case LAGRANGE:
+        case L2_LAGRANGE:
+        case BERNSTEIN:
+        case RATIONAL_BERNSTEIN:
+        {
+          CPPUNIT_ASSERT(satisfies_partition_of_unity);
+          break;
+        }
+
+        default:
+          CPPUNIT_FAIL("Uncovered FEFamily");
+      }
+    }
 
 
   void testU()
