@@ -33,7 +33,7 @@
 // Anonymous namespace to hold static std::sqrt values
 namespace
 {
-using libMesh::Real;
+using namespace libMesh;
 
 static const Real sqrt2  = std::sqrt(2.);
 static const Real sqrt6  = std::sqrt(6.);
@@ -41,7 +41,39 @@ static const Real sqrt10 = std::sqrt(10.);
 static const Real sqrt14 = std::sqrt(14.);
 static const Real sqrt22 = std::sqrt(22.);
 static const Real sqrt26 = std::sqrt(26.);
+
+
+// Take care of edge orientation, this is needed at edge shapes with
+// (y=0)-asymmetric 1D shapes
+Real quad_flip(const Elem * elem,
+               const unsigned int totalorder,
+               const unsigned int i)
+{
+  libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
+
+  // vertex and interior shape functions don't flip
+  if (i < 4 || i >= 4*totalorder)
+    return 1;
+
+  const int edge = (i-4) / (totalorder-1);
+  libmesh_assert_less(edge, 4);
+  libmesh_assert_greater_equal(edge, 0);
+
+  const int edge_end = (edge+1)%4;
+
+  const int edge_i = i - 4 - edge*(totalorder-1);
+
+  // The "natural" orientation is p1>p0 on edge 0,
+  // p2>p1 on e1, p2>p3 on e2, p3>p0 on e3
+  if (edge_i%2 &&
+      ((elem->point(edge) > elem->point(edge_end)) ==
+       (edge < 2)))
+    return -1;
+
+  return 1;
 }
+
+} // anonymous namespace
 
 
 namespace libMesh
@@ -194,31 +226,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
               static const unsigned int i0[] = {0,  1,  1,  0,  2,  3,  1,  1,  2,  3,  0,  0,  2,  3,  2,  3};
               static const unsigned int i1[] = {0,  0,  1,  1,  0,  0,  2,  3,  1,  1,  2,  3,  2,  2,  3,  3};
 
-              Real f=1.;
-
-              // take care of edge orientation, this is needed at
-              // edge shapes with (y=0)-asymmetric 1D shapes, these have
-              // one 1D shape index being 0 or 1, the other one being odd and >=3
-
-              switch(i)
-                {
-                case  5: // edge 0 points
-                  if (elem->point(0) > elem->point(1))f = -1.;
-                  break;
-                case  7: // edge 1 points
-                  if (elem->point(1) > elem->point(2))f = -1.;
-                  break;
-                case  9: // edge 2 points
-                  if (elem->point(3) > elem->point(2))f = -1.;
-                  break;
-                case 11: // edge 3 points
-                  if (elem->point(0) > elem->point(3))f = -1.;
-                  break;
-
-                default:
-                  // Everything else keeps f=1
-                  break;
-                }
+              const Real f = quad_flip(elem, totalorder, i);
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
                         FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
@@ -301,27 +309,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
               static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4};
               static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4};
 
-              Real f=1.;
-
-              switch(i)
-                {
-                case  5: // edge 0 points
-                  if (elem->point(0) > elem->point(1))f = -1.;
-                  break;
-                case  8: // edge 1 points
-                  if (elem->point(1) > elem->point(2))f = -1.;
-                  break;
-                case 11: // edge 2 points
-                  if (elem->point(3) > elem->point(2))f = -1.;
-                  break;
-                case 14: // edge 3 points
-                  if (elem->point(0) > elem->point(3))f = -1.;
-                  break;
-
-                default:
-                  // Everything else keeps f=1
-                  break;
-                }
+              const Real f = quad_flip(elem, totalorder, i);
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
                         FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
@@ -413,31 +401,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
               static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
               static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
 
-              Real f=1.;
-
-              switch(i)
-                {
-                case  5: // edge 0 points
-                case  7:
-                  if (elem->point(0) > elem->point(1))f = -1.;
-                  break;
-                case  9: // edge 1 points
-                case 11:
-                  if (elem->point(1) > elem->point(2))f = -1.;
-                  break;
-                case 13: // edge 2 points
-                case 15:
-                  if (elem->point(3) > elem->point(2))f = -1.;
-                  break;
-                case 14: // edge 3 points
-                case 19:
-                  if (elem->point(0) > elem->point(3))f = -1.;
-                  break;
-
-                default:
-                  // Everything else keeps f=1
-                  break;
-                }
+              const Real f = quad_flip(elem, totalorder, i);
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
                         FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
@@ -539,31 +503,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
               static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6};
               static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6};
 
-              Real f=1.;
-
-              switch(i)
-                {
-                case  5: // edge 0 points
-                case  7:
-                  if (elem->point(0) > elem->point(1))f = -1.;
-                  break;
-                case 10: // edge 1 points
-                case 12:
-                  if (elem->point(1) > elem->point(2))f = -1.;
-                  break;
-                case 15: // edge 2 points
-                case 17:
-                  if (elem->point(3) > elem->point(2))f = -1.;
-                  break;
-                case 20: // edge 3 points
-                case 22:
-                  if (elem->point(0) > elem->point(3))f = -1.;
-                  break;
-
-                default:
-                  // Everything else keeps f=1
-                  break;
-                }
+              const Real f = quad_flip(elem, totalorder, i);
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
                         FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
@@ -677,35 +617,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
               static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7};
               static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7};
 
-              Real f=1.;
-
-              switch(i)
-                {
-                case  5: // edge 0 points
-                case  7:
-                case  9:
-                  if (elem->point(0) > elem->point(1))f = -1.;
-                  break;
-                case 11: // edge 1 points
-                case 13:
-                case 15:
-                  if (elem->point(1) > elem->point(2))f = -1.;
-                  break;
-                case 17: // edge 2 points
-                case 19:
-                case 21:
-                  if (elem->point(3) > elem->point(2))f = -1.;
-                  break;
-                case 23: // edge 3 points
-                case 25:
-                case 27:
-                  if (elem->point(0) > elem->point(3))f = -1.;
-                  break;
-
-                default:
-                  // Everything else keeps f=1
-                  break;
-                }
+              const Real f = quad_flip(elem, totalorder, i);
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
                         FE<1,SZABAB>::shape(EDGE3, totalorder, i1[i], eta));
@@ -855,28 +767,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
               static const unsigned int i0[] = {0,  1,  1,  0,  2,  3,  1,  1,  2,  3,  0,  0,  2,  3,  2,  3};
               static const unsigned int i1[] = {0,  0,  1,  1,  0,  0,  2,  3,  1,  1,  2,  3,  2,  2,  3,  3};
 
-              Real f=1.;
-
-              switch(i)
-                {
-                case  5: // edge 0 points
-                  if (elem->point(0) > elem->point(1))f = -1.;
-                  break;
-                case  7: // edge 1 points
-                  if (elem->point(1) > elem->point(2))f = -1.;
-                  break;
-                case  9: // edge 2 points
-                  if (elem->point(3) > elem->point(2))f = -1.;
-                  break;
-                case 11: // edge 3 points
-                  if (elem->point(0) > elem->point(3))f = -1.;
-                  break;
-
-                default:
-                  // Everything else keeps f=1
-                  break;
-                }
-
+              const Real f = quad_flip(elem, totalorder, i);
 
               switch (j)
                 {
@@ -931,28 +822,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
               static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4};
               static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4};
 
-              Real f=1.;
-
-              switch(i)
-                {
-                case  5: // edge 0 points
-                  if (elem->point(0) > elem->point(1))f = -1.;
-                  break;
-                case  8: // edge 1 points
-                  if (elem->point(1) > elem->point(2))f = -1.;
-                  break;
-                case 11: // edge 2 points
-                  if (elem->point(3) > elem->point(2))f = -1.;
-                  break;
-                case 14: // edge 3 points
-                  if (elem->point(0) > elem->point(3))f = -1.;
-                  break;
-
-                default:
-                  // Everything else keeps f=1
-                  break;
-                }
-
+              const Real f = quad_flip(elem, totalorder, i);
 
               switch (j)
                 {
@@ -1007,32 +877,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
               static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
               static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
 
-              Real f=1.;
-
-              switch(i)
-                {
-                case  5: // edge 0 points
-                case  7:
-                  if (elem->point(0) > elem->point(1))f = -1.;
-                  break;
-                case  9: // edge 1 points
-                case 11:
-                  if (elem->point(1) > elem->point(2))f = -1.;
-                  break;
-                case 13: // edge 2 points
-                case 15:
-                  if (elem->point(3) > elem->point(2))f = -1.;
-                  break;
-                case 14: // edge 3 points
-                case 19:
-                  if (elem->point(0) > elem->point(3))f = -1.;
-                  break;
-
-                default:
-                  // Everything else keeps f=1
-                  break;
-                }
-
+              const Real f = quad_flip(elem, totalorder, i);
 
               switch (j)
                 {
@@ -1085,32 +930,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
               static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6};
               static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6};
 
-              Real f=1.;
-
-              switch(i)
-                {
-                case  5: // edge 0 points
-                case  7:
-                  if (elem->point(0) > elem->point(1))f = -1.;
-                  break;
-                case 10: // edge 1 points
-                case 12:
-                  if (elem->point(1) > elem->point(2))f = -1.;
-                  break;
-                case 15: // edge 2 points
-                case 17:
-                  if (elem->point(3) > elem->point(2))f = -1.;
-                  break;
-                case 20: // edge 3 points
-                case 22:
-                  if (elem->point(0) > elem->point(3))f = -1.;
-                  break;
-
-                default:
-                  // Everything else keeps f=1
-                  break;
-                }
-
+              const Real f = quad_flip(elem, totalorder, i);
 
               switch (j)
                 {
@@ -1163,36 +983,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
               static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7};
               static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7};
 
-              Real f=1.;
-
-              switch(i)
-                {
-                case  5: // edge 0 points
-                case  7:
-                case  9:
-                  if (elem->point(0) > elem->point(1))f = -1.;
-                  break;
-                case 11: // edge 1 points
-                case 13:
-                case 15:
-                  if (elem->point(1) > elem->point(2))f = -1.;
-                  break;
-                case 17: // edge 2 points
-                case 19:
-                case 21:
-                  if (elem->point(3) > elem->point(2))f = -1.;
-                  break;
-                case 23: // edge 3 points
-                case 25:
-                case 27:
-                  if (elem->point(0) > elem->point(3))f = -1.;
-                  break;
-
-                default:
-                  // Everything else keeps f=1
-                  break;
-                }
-
+              const Real f = quad_flip(elem, totalorder, i);
 
               switch (j)
                 {

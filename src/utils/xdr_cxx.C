@@ -924,328 +924,29 @@ void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_
 template <>
 void Xdr::data_stream (double * val, const unsigned int len, const unsigned int line_break)
 {
-  switch (mode)
-    {
-    case ENCODE:
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-        libmesh_assert (this->is_open());
-
-        if (len > 0)
-          xdr_vector(xdrs.get(),
-                     (char *) val,
-                     len,
-                     sizeof(double),
-                     (xdrproc_t) xdr_double);
-
-#else
-
-        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
-
-#endif
-        return;
-      }
-
-    case READ:
-      {
-        libmesh_assert(in.get());
-        libmesh_assert (in->good());
-
-        for (unsigned int i=0; i<len; i++)
-          {
-            libmesh_assert(in.get());
-            libmesh_assert (in->good());
-            *in >> val[i];
-          }
-
-        return;
-      }
-
-    case WRITE:
-      {
-        libmesh_assert(out.get());
-        libmesh_assert (out->good());
-
-        // Save stream flags
-        std::ios_base::fmtflags out_flags = out->flags();
-
-        // We will use scientific notation sufficient to exactly
-        // represent our floating point precision in the following
-        // output.  The desired precision and format will
-        // automatically determine the width.
-        *out << std::scientific
-             << std::setprecision(std::numeric_limits<double>::max_digits10);
-
-        if (line_break == libMesh::invalid_uint)
-          for (unsigned int i=0; i<len; i++)
-            {
-              libmesh_assert(out.get());
-              libmesh_assert (out->good());
-              *out << val[i] << ' ';
-            }
-        else
-          {
-            const unsigned imax = std::min(line_break, len);
-            unsigned int cnt=0;
-            while (cnt < len)
-              {
-                for (unsigned int i=0; (i<imax && cnt<len); i++)
-                  {
-                    libmesh_assert(out.get());
-                    libmesh_assert (out->good());
-                    *out << val[cnt++];
-
-                    // Write a space unless this is the last character on the current line.
-                    if (i+1 != imax)
-                      *out << " ";
-                  }
-                libmesh_assert(out.get());
-                libmesh_assert (out->good());
-                *out << '\n';
-              }
-          }
-
-        // Restore stream flags
-        out->flags(out_flags);
-
-        return;
-      }
-
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
-    }
+  this->_xfp_data_stream
+    (val, len, (xdrproc_t)xdr_double, line_break,
+     std::numeric_limits<double>::max_digits10);
 }
+
 
 
 template <>
 void Xdr::data_stream (float * val, const unsigned int len, const unsigned int line_break)
 {
-  switch (mode)
-    {
-    case ENCODE:
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-        libmesh_assert (this->is_open());
-
-        if (len > 0)
-          xdr_vector(xdrs.get(),
-                     (char *) val,
-                     len,
-                     sizeof(float),
-                     (xdrproc_t) xdr_float);
-
-#else
-
-        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
-
-#endif
-        return;
-      }
-
-    case READ:
-      {
-        libmesh_assert(in.get());
-        libmesh_assert (in->good());
-
-        for (unsigned int i=0; i<len; i++)
-          {
-            libmesh_assert(in.get());
-            libmesh_assert (in->good());
-            *in >> val[i];
-          }
-
-        return;
-      }
-
-    case WRITE:
-      {
-        libmesh_assert(out.get());
-        libmesh_assert (out->good());
-
-        // Save stream flags
-        std::ios_base::fmtflags out_flags = out->flags();
-
-        // We will use scientific notation sufficient to exactly
-        // represent our floating point precision in the following
-        // output.  The desired precision and format will
-        // automatically determine the width.
-        *out << std::scientific
-             << std::setprecision(std::numeric_limits<float>::max_digits10);
-
-        if (line_break == libMesh::invalid_uint)
-          for (unsigned int i=0; i<len; i++)
-            {
-              libmesh_assert(out.get());
-              libmesh_assert (out->good());
-              *out << val[i] << ' ';
-            }
-        else
-          {
-            const unsigned imax = std::min(line_break, len);
-            unsigned int cnt=0;
-            while (cnt < len)
-              {
-                for (unsigned int i=0; (i<imax && cnt<len); i++)
-                  {
-                    libmesh_assert(out.get());
-                    libmesh_assert (out->good());
-                    *out << val[cnt++];
-
-                    // Write a space unless this is the last character on the current line.
-                    if (i+1 != imax)
-                      *out << " ";
-                  }
-                libmesh_assert(out.get());
-                libmesh_assert (out->good());
-                *out << '\n';
-              }
-          }
-
-        // Restore stream flags
-        out->flags(out_flags);
-
-        return;
-      }
-
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
-    }
+  this->_xfp_data_stream
+    (val, len, (xdrproc_t)xdr_float, line_break,
+     std::numeric_limits<float>::max_digits10);
 }
+
 
 
 template <>
 void Xdr::data_stream (long double * val, const unsigned int len, const unsigned int line_break)
 {
-  switch (mode)
-    {
-    case ENCODE:
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-        libmesh_assert (this->is_open());
-
-        // FIXME[JWP]: How to implement this for long double?  Mac OS
-        // X defines 'xdr_quadruple' but AFAICT, it does not exist for
-        // Linux... for now, reading/writing XDR files with long
-        // doubles drops back to double precision, but you can still
-        // write long double ASCII files of course.
-        // if (len > 0)
-        //   xdr_vector(xdrs.get(),
-        //      (char *) val,
-        //      len,
-        //      sizeof(double),
-        //      (xdrproc_t) xdr_quadruple);
-
-        if (len > 0)
-          {
-            std::vector<double> io_buffer (len);
-
-            // Fill io_buffer if we are writing.
-            if (mode == ENCODE)
-              for (unsigned int i=0, cnt=0; i<len; i++)
-                io_buffer[cnt++] = double(val[i]);
-
-            xdr_vector(xdrs.get(),
-                       reinterpret_cast<char *>(io_buffer.data()),
-                       len,
-                       sizeof(double),
-                       (xdrproc_t) xdr_double);
-
-            // Fill val array if we are reading.
-            if (mode == DECODE)
-              for (unsigned int i=0, cnt=0; i<len; i++)
-                {
-                  val[i] = io_buffer[cnt++];
-                }
-          }
-
-#else
-
-        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
-
-#endif
-        return;
-      }
-
-    case READ:
-      {
-        libmesh_assert(in.get());
-        libmesh_assert (in->good());
-
-        for (unsigned int i=0; i<len; i++)
-          {
-            libmesh_assert(in.get());
-            libmesh_assert (in->good());
-            *in >> val[i];
-          }
-
-        return;
-      }
-
-    case WRITE:
-      {
-        libmesh_assert(out.get());
-        libmesh_assert (out->good());
-
-        // Save stream flags
-        std::ios_base::fmtflags out_flags = out->flags();
-
-        // We will use scientific notation sufficient to exactly
-        // represent our floating point precision in the following
-        // output.  The desired precision and format will
-        // automatically determine the width.
-        *out << std::scientific
-             << std::setprecision(std::numeric_limits<long double>::max_digits10);
-
-        if (line_break == libMesh::invalid_uint)
-          for (unsigned int i=0; i<len; i++)
-            {
-              libmesh_assert(out.get());
-              libmesh_assert (out->good());
-              *out << val[i] << ' ';
-            }
-        else
-          {
-            const unsigned imax = std::min(line_break, len);
-            unsigned int cnt=0;
-            while (cnt < len)
-              {
-                for (unsigned int i=0; (i<imax && cnt<len); i++)
-                  {
-                    libmesh_assert(out.get());
-                    libmesh_assert (out->good());
-                    *out << val[cnt++];
-
-                    // Write a space unless this is the last character on the current line.
-                    if (i+1 != imax)
-                      *out << " ";
-                  }
-                libmesh_assert(out.get());
-                libmesh_assert (out->good());
-                *out << '\n';
-              }
-          }
-
-        // Restore stream flags
-        out->flags(out_flags);
-
-        return;
-      }
-
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
-    }
+  this->_xfp_data_stream
+    (val, len, nullptr, line_break,
+     std::numeric_limits<long double>::max_digits10);
 }
 
 
@@ -1253,28 +954,53 @@ void Xdr::data_stream (long double * val, const unsigned int len, const unsigned
 template <>
 void Xdr::data_stream (Real * val, const unsigned int len, const unsigned int line_break)
 {
+  this->_xfp_data_stream(val, len, nullptr, line_break, 36);
+}
+#endif // LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+
+
+
+template <typename XFP>
+void Xdr::_xfp_data_stream (XFP * val, const unsigned int len,
+#ifdef LIBMESH_HAVE_XDR
+                            xdrproc_t
+#else
+                            void *
+#endif
+                              xdr_proc,
+                            const unsigned int line_break,
+                            const int n_digits)
+{
   switch (mode)
     {
     case ENCODE:
     case DECODE:
       {
 #ifdef LIBMESH_HAVE_XDR
-
         libmesh_assert (this->is_open());
-
-        // FIXME[RHS]: This has the same "xdr_quadruple may not be
-        // defined" problem as long double, and the problem may be
-        // much worse since even _Quad/__float128 aren't standard
-        // either.
-        // if (len > 0)
-        //   xdr_vector(xdrs.get(),
-        //      (char *) val,
-        //      len,
-        //      sizeof(double),
-        //      (xdrproc_t) xdr_quadruple);
 
         if (len > 0)
           {
+            if (xdr_proc)
+              {
+                xdr_vector(xdrs.get(),
+                           (char *) val,
+                           len,
+                           sizeof(XFP),
+                           xdr_proc);
+                return;
+              }
+
+            // FIXME[JWP]: How to implement this for long double?  Mac
+            // OS X defines 'xdr_quadruple' but AFAICT, it does not
+            // exist for Linux... for now, reading/writing XDR files
+            // with long doubles drops back to double precision, but
+            // you can still write long double ASCII files of course.
+
+            // FIXME[RHS]: 128 bit FP has the same problem as long
+            // double, only much worse since even _Quad/__float128
+            // aren't standard either.
+
             std::vector<double> io_buffer (len);
 
             // Fill io_buffer if we are writing.
@@ -1329,11 +1055,11 @@ void Xdr::data_stream (Real * val, const unsigned int len, const unsigned int li
         // Save stream flags
         std::ios_base::fmtflags out_flags = out->flags();
 
-        // We will use scientific notation with a precision of 36
-        // digits in the following output.  The desired precision and
+        // We will use scientific notation with specified digit
+        // count in the following output.  The desired precision and
         // format will automatically determine the width.
         *out << std::scientific
-             << std::setprecision(36);
+             << std::setprecision(n_digits);
 
         if (line_break == libMesh::invalid_uint)
           for (unsigned int i=0; i<len; i++)
@@ -1374,138 +1100,27 @@ void Xdr::data_stream (Real * val, const unsigned int len, const unsigned int li
       libmesh_error_msg("Invalid mode = " << mode);
     }
 }
-#endif // LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 
 
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template <>
 void Xdr::data_stream (std::complex<double> * val, const unsigned int len, const unsigned int line_break)
 {
-  switch (mode)
-    {
-    case ENCODE:
-    case DECODE:
-      {
-#ifdef LIBMESH_HAVE_XDR
-
-        libmesh_assert (this->is_open());
-
-
-        if (len > 0)
-          {
-            std::vector<double> io_buffer (2*len);
-
-            // Fill io_buffer if we are writing.
-            if (mode == ENCODE)
-              for (unsigned int i=0, cnt=0; i<len; i++)
-                {
-                  io_buffer[cnt++] = val[i].real();
-                  io_buffer[cnt++] = val[i].imag();
-                }
-
-            xdr_vector(xdrs.get(),
-                       reinterpret_cast<char *>(io_buffer.data()),
-                       2*len,
-                       sizeof(double),
-                       (xdrproc_t) xdr_double);
-
-            // Fill val array if we are reading.
-            if (mode == DECODE)
-              for (unsigned int i=0, cnt=0; i<len; i++)
-                {
-                  double re = io_buffer[cnt++];
-                  double im = io_buffer[cnt++];
-                  val[i] = std::complex<double>(re,im);
-                }
-          }
-#else
-
-        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
-
-#endif
-        return;
-      }
-
-    case READ:
-      {
-        libmesh_assert(in.get());
-        libmesh_assert (in->good());
-
-        for (unsigned int i=0; i<len; i++)
-          {
-            libmesh_assert(in.get());
-            libmesh_assert (in->good());
-            double re, im;
-            *in >> re >> im;
-            val[i] = std::complex<double>(re,im);
-          }
-
-        return;
-      }
-
-    case WRITE:
-      {
-        libmesh_assert(out.get());
-        libmesh_assert (out->good());
-
-        // Save stream flags
-        std::ios_base::fmtflags out_flags = out->flags();
-
-        // We will use scientific notation sufficient to exactly
-        // represent our floating point precision in the following
-        // output.  The desired precision and format will
-        // automatically determine the width.
-        *out << std::scientific
-             << std::setprecision(std::numeric_limits<double>::max_digits10);
-
-        if (line_break == libMesh::invalid_uint)
-          for (unsigned int i=0; i<len; i++)
-            {
-              libmesh_assert(out.get());
-              libmesh_assert (out->good());
-              *out << val[i].real() << ' ';
-              *out << val[i].imag() << ' ';
-            }
-        else
-          {
-            const unsigned imax = std::min(line_break, len);
-            unsigned int cnt=0;
-            while (cnt < len)
-              {
-                for (unsigned int i=0; (i<imax && cnt<len); i++)
-                  {
-                    libmesh_assert(out.get());
-                    libmesh_assert (out->good());
-                    *out << val[cnt].real() << ' ';
-                    *out << val[cnt].imag();
-                    cnt++;
-
-                    // Write a space unless this is the last character on the current line.
-                    if (i+1 != imax)
-                      *out << " ";
-                  }
-                libmesh_assert(out.get());
-                libmesh_assert (out->good());
-                *out << '\n';
-              }
-          }
-
-        // Restore stream flags
-        out->flags(out_flags);
-
-        return;
-      }
-
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
-    }
+  this->_complex_data_stream(val, len, line_break);
 }
+
+
 
 template <>
 void Xdr::data_stream (std::complex<long double> * val, const unsigned int len, const unsigned int line_break)
+{
+  this->_complex_data_stream(val, len, line_break);
+}
+
+
+
+template <typename T>
+void Xdr::_complex_data_stream (std::complex<T> * val, const unsigned int len, const unsigned int line_break)
 {
   switch (mode)
     {
@@ -1546,7 +1161,7 @@ void Xdr::data_stream (std::complex<long double> * val, const unsigned int len, 
                 {
                   double re = io_buffer[cnt++];
                   double im = io_buffer[cnt++];
-                  val[i] = std::complex<long double>(re, im);
+                  val[i] = std::complex<T>(re, im);
                 }
           }
 #else
@@ -1568,9 +1183,9 @@ void Xdr::data_stream (std::complex<long double> * val, const unsigned int len, 
           {
             libmesh_assert(in.get());
             libmesh_assert (in->good());
-            long double re, im;
+            T re, im;
             *in >> re >> im;
-            val[i] = std::complex<long double>(re,im);
+            val[i] = std::complex<T>(re,im);
           }
 
         return;
@@ -1592,7 +1207,7 @@ void Xdr::data_stream (std::complex<long double> * val, const unsigned int len, 
         // base) that can be represented without change.  Equivalent
         // to FLT_DIG, DBL_DIG or LDBL_DIG for floating types.
         *out << std::scientific
-             << std::setprecision(std::numeric_limits<long double>::max_digits10);
+             << std::setprecision(std::numeric_limits<T>::max_digits10);
 
         if (line_break == libMesh::invalid_uint)
           for (unsigned int i=0; i<len; i++)
@@ -1634,7 +1249,8 @@ void Xdr::data_stream (std::complex<long double> * val, const unsigned int len, 
       libmesh_error_msg("Invalid mode = " << mode);
     }
 }
-#endif // # LIBMESH_USE_COMPLEX_NUMBERS
+
+
 
 void Xdr::comment (std::string & comment_in)
 {

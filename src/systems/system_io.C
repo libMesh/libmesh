@@ -318,16 +318,21 @@ void System::read_legacy_data (Xdr & io,
   //           node-major (More on this later.)
   libmesh_assert (io.reading());
 
-  // read and reordering buffers
+  // directly-read and reordered buffers, declared here for reuse
+  // without heap juggling.
   std::vector<Number> global_vector;
   std::vector<Number> reordered_vector;
 
-  // 10.)
-  // Read and set the solution vector
+  auto reorder_vector_into =
+    [this, &global_vector, &reordered_vector]
+    (NumericVector<Number> & vec)
   {
-    if (this->processor_id() == 0)
-      io.data (global_vector);
     this->comm().broadcast(global_vector);
+
+    // If we have been reading multiple vectors, they should all be
+    // the same size.
+    libmesh_assert (reordered_vector.empty() ||
+                    reordered_vector.size() == global_vector.size());
 
     // Remember that the stored vector is node-major.
     // We need to put it into whatever application-specific
@@ -377,8 +382,15 @@ void System::read_legacy_data (Xdr & io,
             }
       }
 
-    *(this->solution) = reordered_vector;
-  }
+    // use the overloaded operator=(std::vector) to assign the values
+    vec = reordered_vector;
+  };
+
+  // 10.)
+  // Read and set the solution vector
+  if (this->processor_id() == 0)
+    io.data (global_vector);
+  reorder_vector_into(*(this->solution));
 
   // For each additional vector, simply go through the list.
   // ONLY attempt to do this IF additional data was actually
@@ -416,58 +428,11 @@ void System::read_legacy_data (Xdr & io,
           // throw it away.
           if (read_additional_data && nvecs)
             {
-              this->comm().broadcast(global_vector);
-
-              // Remember that the stored vector is node-major.
-              // We need to put it into whatever application-specific
-              // ordering we may have using the dof_map.
               std::fill (reordered_vector.begin(),
                          reordered_vector.end(),
                          libMesh::zero);
 
-              reordered_vector.resize(global_vector.size());
-
-              libmesh_assert_equal_to (global_vector.size(), this->n_dofs());
-
-              dof_id_type cnt=0;
-
-              const unsigned int sys = this->number();
-              const unsigned int nv  = cast_int<unsigned int>
-                (this->_written_var_indices.size());
-              libmesh_assert_less_equal (nv, this->n_vars());
-
-              for (unsigned int data_var=0; data_var<nv; data_var++)
-                {
-                  const unsigned int var = _written_var_indices[data_var];
-                  // First reorder the nodal DOF values
-                  for (auto & node : this->get_mesh().node_ptr_range())
-                    for (auto index : make_range(node->n_comp(sys,var)))
-                      {
-                        libmesh_assert_not_equal_to (node->dof_number(sys, var, index),
-                                                     DofObject::invalid_id);
-
-                        libmesh_assert_less (cnt, global_vector.size());
-
-                        reordered_vector[node->dof_number(sys, var, index)] =
-                          global_vector[cnt++];
-                      }
-
-                  // Then reorder the element DOF values
-                  for (auto & elem : this->get_mesh().active_element_ptr_range())
-                    for (auto index : make_range(elem->n_comp(sys,var)))
-                      {
-                        libmesh_assert_not_equal_to (elem->dof_number(sys, var, index),
-                                                     DofObject::invalid_id);
-
-                        libmesh_assert_less (cnt, global_vector.size());
-
-                        reordered_vector[elem->dof_number(sys, var, index)] =
-                          global_vector[cnt++];
-                      }
-                }
-
-              // use the overloaded operator=(std::vector) to assign the values
-              *(pos->second) = reordered_vector;
+              reorder_vector_into(*(pos->second));
             }
 
           // If we've got vectors then we need to be iterating through

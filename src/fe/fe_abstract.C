@@ -322,212 +322,104 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
 
 void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> & nodes)
 {
+  nodes.resize(Elem::type_to_n_nodes_map[itemType]);
   switch(itemType)
     {
     case NODEELEM:
       {
-        nodes.resize(1);
         nodes[0] = Point (0.,0.,0.);
-        return;
-      }
-    case EDGE2:
-      {
-        nodes.resize(2);
-        nodes[0] = Point (-1.,0.,0.);
-        nodes[1] = Point (1.,0.,0.);
         return;
       }
     case EDGE3:
       {
-        nodes.resize(3);
+        nodes[2] = Point (0.,0.,0.);
+        libmesh_fallthrough();
+      }
+    case EDGE2:
+      {
         nodes[0] = Point (-1.,0.,0.);
         nodes[1] = Point (1.,0.,0.);
-        nodes[2] = Point (0.,0.,0.);
         return;
       }
-    case EDGE4:
+    case EDGE4: // not nested with EDGE3
       {
-        nodes.resize(4);
         nodes[0] = Point (-1.,0.,0.);
         nodes[1] = Point (1.,0.,0.);
         nodes[2] = Point (-1./3.,0.,0.);
         nodes[3] - Point (1./3.,0.,0.);
         return;
       }
-    case TRI3:
-    case TRISHELL3:
+    case TRI7:
       {
-        nodes.resize(3);
-        nodes[0] = Point (0.,0.,0.);
-        nodes[1] = Point (1.,0.,0.);
-        nodes[2] = Point (0.,1.,0.);
-        return;
+        nodes[6] = Point (1./3.,1./3.,0.);
+        libmesh_fallthrough();
       }
     case TRI6:
       {
-        nodes.resize(6);
-        nodes[0] = Point (0.,0.,0.);
-        nodes[1] = Point (1.,0.,0.);
-        nodes[2] = Point (0.,1.,0.);
         nodes[3] = Point (.5,0.,0.);
         nodes[4] = Point (.5,.5,0.);
         nodes[5] = Point (0.,.5,0.);
-        return;
+        libmesh_fallthrough();
       }
-    case TRI7:
+    case TRI3:
+    case TRISHELL3:
       {
-        nodes.resize(7);
         nodes[0] = Point (0.,0.,0.);
         nodes[1] = Point (1.,0.,0.);
         nodes[2] = Point (0.,1.,0.);
-        nodes[3] = Point (.5,0.,0.);
-        nodes[4] = Point (.5,.5,0.);
-        nodes[5] = Point (0.,.5,0.);
-        nodes[6] = Point (1./3.,1./3.,0.);
-        return;
-      }
-    case QUAD4:
-    case QUADSHELL4:
-      {
-        nodes.resize(4);
-        nodes[0] = Point (-1.,-1.,0.);
-        nodes[1] = Point (1.,-1.,0.);
-        nodes[2] = Point (1.,1.,0.);
-        nodes[3] = Point (-1.,1.,0.);
-        return;
-      }
-    case QUAD8:
-    case QUADSHELL8:
-      {
-        nodes.resize(8);
-        nodes[0] = Point (-1.,-1.,0.);
-        nodes[1] = Point (1.,-1.,0.);
-        nodes[2] = Point (1.,1.,0.);
-        nodes[3] = Point (-1.,1.,0.);
-        nodes[4] = Point (0.,-1.,0.);
-        nodes[5] = Point (1.,0.,0.);
-        nodes[6] = Point (0.,1.,0.);
-        nodes[7] = Point (-1.,0.,0.);
         return;
       }
     case QUAD9:
       {
-        nodes.resize(9);
-        nodes[0] = Point (-1.,-1.,0.);
-        nodes[1] = Point (1.,-1.,0.);
-        nodes[2] = Point (1.,1.,0.);
-        nodes[3] = Point (-1.,1.,0.);
+        nodes[8] = Point (0.,0.,0.);
+        libmesh_fallthrough();
+      }
+    case QUAD8:
+    case QUADSHELL8:
+      {
         nodes[4] = Point (0.,-1.,0.);
         nodes[5] = Point (1.,0.,0.);
         nodes[6] = Point (0.,1.,0.);
         nodes[7] = Point (-1.,0.,0.);
-        nodes[8] = Point (0.,0.,0.);
-        return;
+        libmesh_fallthrough();
       }
-    case TET4:
+    case QUAD4:
+    case QUADSHELL4:
       {
-        nodes.resize(4);
-        nodes[0] = Point (0.,0.,0.);
-        nodes[1] = Point (1.,0.,0.);
-        nodes[2] = Point (0.,1.,0.);
-        nodes[3] = Point (0.,0.,1.);
-        return;
-      }
-    case TET10:
-      {
-        nodes.resize(10);
-        nodes[0] = Point (0.,0.,0.);
-        nodes[1] = Point (1.,0.,0.);
-        nodes[2] = Point (0.,1.,0.);
-        nodes[3] = Point (0.,0.,1.);
-        nodes[4] = Point (.5,0.,0.);
-        nodes[5] = Point (.5,.5,0.);
-        nodes[6] = Point (0.,.5,0.);
-        nodes[7] = Point (0.,0.,.5);
-        nodes[8] = Point (.5,0.,.5);
-        nodes[9] = Point (0.,.5,.5);
+        nodes[0] = Point (-1.,-1.,0.);
+        nodes[1] = Point (1.,-1.,0.);
+        nodes[2] = Point (1.,1.,0.);
+        nodes[3] = Point (-1.,1.,0.);
         return;
       }
     case TET14:
       {
-        nodes.resize(14);
-        nodes[0] = Point (0.,0.,0.);
-        nodes[1] = Point (1.,0.,0.);
-        nodes[2] = Point (0.,1.,0.);
-        nodes[3] = Point (0.,0.,1.);
+        nodes[10] = Point (1/Real(3),1/Real(3),0.);
+        nodes[11] = Point (1/Real(3),0.,1/Real(3));
+        nodes[12] = Point (1/Real(3),1/Real(3),1/Real(3));
+        nodes[13] = Point (0.,1/Real(3),1/Real(3));
+        libmesh_fallthrough();
+      }
+    case TET10:
+      {
         nodes[4] = Point (.5,0.,0.);
         nodes[5] = Point (.5,.5,0.);
         nodes[6] = Point (0.,.5,0.);
         nodes[7] = Point (0.,0.,.5);
         nodes[8] = Point (.5,0.,.5);
         nodes[9] = Point (0.,.5,.5);
-        nodes[10] = Point (1/Real(3),1/Real(3),0.);
-        nodes[11] = Point (1/Real(3),0.,1/Real(3));
-        nodes[12] = Point (1/Real(3),1/Real(3),1/Real(3));
-        nodes[13] = Point (0.,1/Real(3),1/Real(3));
-        return;
+        libmesh_fallthrough();
       }
-    case HEX8:
+    case TET4:
       {
-        nodes.resize(8);
-        nodes[0] = Point (-1.,-1.,-1.);
-        nodes[1] = Point (1.,-1.,-1.);
-        nodes[2] = Point (1.,1.,-1.);
-        nodes[3] = Point (-1.,1.,-1.);
-        nodes[4] = Point (-1.,-1.,1.);
-        nodes[5] = Point (1.,-1.,1.);
-        nodes[6] = Point (1.,1.,1.);
-        nodes[7] = Point (-1.,1.,1.);
-        return;
-      }
-    case HEX20:
-      {
-        nodes.resize(20);
-        nodes[0] = Point (-1.,-1.,-1.);
-        nodes[1] = Point (1.,-1.,-1.);
-        nodes[2] = Point (1.,1.,-1.);
-        nodes[3] = Point (-1.,1.,-1.);
-        nodes[4] = Point (-1.,-1.,1.);
-        nodes[5] = Point (1.,-1.,1.);
-        nodes[6] = Point (1.,1.,1.);
-        nodes[7] = Point (-1.,1.,1.);
-        nodes[8] = Point (0.,-1.,-1.);
-        nodes[9] = Point (1.,0.,-1.);
-        nodes[10] = Point (0.,1.,-1.);
-        nodes[11] = Point (-1.,0.,-1.);
-        nodes[12] = Point (-1.,-1.,0.);
-        nodes[13] = Point (1.,-1.,0.);
-        nodes[14] = Point (1.,1.,0.);
-        nodes[15] = Point (-1.,1.,0.);
-        nodes[16] = Point (0.,-1.,1.);
-        nodes[17] = Point (1.,0.,1.);
-        nodes[18] = Point (0.,1.,1.);
-        nodes[19] = Point (-1.,0.,1.);
+        nodes[0] = Point (0.,0.,0.);
+        nodes[1] = Point (1.,0.,0.);
+        nodes[2] = Point (0.,1.,0.);
+        nodes[3] = Point (0.,0.,1.);
         return;
       }
     case HEX27:
       {
-        nodes.resize(27);
-        nodes[0] = Point (-1.,-1.,-1.);
-        nodes[1] = Point (1.,-1.,-1.);
-        nodes[2] = Point (1.,1.,-1.);
-        nodes[3] = Point (-1.,1.,-1.);
-        nodes[4] = Point (-1.,-1.,1.);
-        nodes[5] = Point (1.,-1.,1.);
-        nodes[6] = Point (1.,1.,1.);
-        nodes[7] = Point (-1.,1.,1.);
-        nodes[8] = Point (0.,-1.,-1.);
-        nodes[9] = Point (1.,0.,-1.);
-        nodes[10] = Point (0.,1.,-1.);
-        nodes[11] = Point (-1.,0.,-1.);
-        nodes[12] = Point (-1.,-1.,0.);
-        nodes[13] = Point (1.,-1.,0.);
-        nodes[14] = Point (1.,1.,0.);
-        nodes[15] = Point (-1.,1.,0.);
-        nodes[16] = Point (0.,-1.,1.);
-        nodes[17] = Point (1.,0.,1.);
-        nodes[18] = Point (0.,1.,1.);
-        nodes[19] = Point (-1.,0.,1.);
         nodes[20] = Point (0.,0.,-1.);
         nodes[21] = Point (0.,-1.,0.);
         nodes[22] = Point (1.,0.,0.);
@@ -535,48 +427,45 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         nodes[24] = Point (-1.,0.,0.);
         nodes[25] = Point (0.,0.,1.);
         nodes[26] = Point (0.,0.,0.);
-        return;
+        libmesh_fallthrough();
       }
-    case PRISM6:
+    case HEX20:
       {
-        nodes.resize(6);
-        nodes[0] = Point (0.,0.,-1.);
-        nodes[1] = Point (1.,0.,-1.);
-        nodes[2] = Point (0.,1.,-1.);
-        nodes[3] = Point (0.,0.,1.);
-        nodes[4] = Point (1.,0.,1.);
-        nodes[5] = Point (0.,1.,1.);
-        return;
+        nodes[8] = Point (0.,-1.,-1.);
+        nodes[9] = Point (1.,0.,-1.);
+        nodes[10] = Point (0.,1.,-1.);
+        nodes[11] = Point (-1.,0.,-1.);
+        nodes[12] = Point (-1.,-1.,0.);
+        nodes[13] = Point (1.,-1.,0.);
+        nodes[14] = Point (1.,1.,0.);
+        nodes[15] = Point (-1.,1.,0.);
+        nodes[16] = Point (0.,-1.,1.);
+        nodes[17] = Point (1.,0.,1.);
+        nodes[18] = Point (0.,1.,1.);
+        nodes[19] = Point (-1.,0.,1.);
+        libmesh_fallthrough();
       }
-    case PRISM15:
+    case HEX8:
       {
-        nodes.resize(15);
-        nodes[0] = Point (0.,0.,-1.);
-        nodes[1] = Point (1.,0.,-1.);
-        nodes[2] = Point (0.,1.,-1.);
-        nodes[3] = Point (0.,0.,1.);
-        nodes[4] = Point (1.,0.,1.);
-        nodes[5] = Point (0.,1.,1.);
-        nodes[6] = Point (.5,0.,-1.);
-        nodes[7] = Point (.5,.5,-1.);
-        nodes[8] = Point (0.,.5,-1.);
-        nodes[9] = Point (0.,0.,0.);
-        nodes[10] = Point (1.,0.,0.);
-        nodes[11] = Point (0.,1.,0.);
-        nodes[12] = Point (.5,0.,1.);
-        nodes[13] = Point (.5,.5,1.);
-        nodes[14] = Point (0.,.5,1.);
+        nodes[0] = Point (-1.,-1.,-1.);
+        nodes[1] = Point (1.,-1.,-1.);
+        nodes[2] = Point (1.,1.,-1.);
+        nodes[3] = Point (-1.,1.,-1.);
+        nodes[4] = Point (-1.,-1.,1.);
+        nodes[5] = Point (1.,-1.,1.);
+        nodes[6] = Point (1.,1.,1.);
+        nodes[7] = Point (-1.,1.,1.);
         return;
       }
     case PRISM18:
       {
-        nodes.resize(18);
-        nodes[0] = Point (0.,0.,-1.);
-        nodes[1] = Point (1.,0.,-1.);
-        nodes[2] = Point (0.,1.,-1.);
-        nodes[3] = Point (0.,0.,1.);
-        nodes[4] = Point (1.,0.,1.);
-        nodes[5] = Point (0.,1.,1.);
+        nodes[15] = Point (.5,0.,0.);
+        nodes[16] = Point (.5,.5,0.);
+        nodes[17] = Point (0.,.5,0.);
+        libmesh_fallthrough();
+      }
+    case PRISM15:
+      {
         nodes[6] = Point (.5,0.,-1.);
         nodes[7] = Point (.5,.5,-1.);
         nodes[8] = Point (0.,.5,-1.);
@@ -586,61 +475,27 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         nodes[12] = Point (.5,0.,1.);
         nodes[13] = Point (.5,.5,1.);
         nodes[14] = Point (0.,.5,1.);
-        nodes[15] = Point (.5,0.,0.);
-        nodes[16] = Point (.5,.5,0.);
-        nodes[17] = Point (0.,.5,0.);
-        return;
+        libmesh_fallthrough();
       }
-    case PYRAMID5:
+    case PRISM6:
       {
-        nodes.resize(5);
-        nodes[0] = Point (-1.,-1.,0.);
-        nodes[1] = Point (1.,-1.,0.);
-        nodes[2] = Point (1.,1.,0.);
-        nodes[3] = Point (-1.,1.,0.);
-        nodes[4] = Point (0.,0.,1.);
-        return;
-      }
-    case PYRAMID13:
-      {
-        nodes.resize(13);
-
-        // base corners
-        nodes[0] = Point (-1.,-1.,0.);
-        nodes[1] = Point (1.,-1.,0.);
-        nodes[2] = Point (1.,1.,0.);
-        nodes[3] = Point (-1.,1.,0.);
-
-        // apex
-        nodes[4] = Point (0.,0.,1.);
-
-        // base midedge
-        nodes[5] = Point (0.,-1.,0.);
-        nodes[6] = Point (1.,0.,0.);
-        nodes[7] = Point (0.,1.,0.);
-        nodes[8] = Point (-1,0.,0.);
-
-        // lateral midedge
-        nodes[9] = Point (-.5,-.5,.5);
-        nodes[10] = Point (.5,-.5,.5);
-        nodes[11] = Point (.5,.5,.5);
-        nodes[12] = Point (-.5,.5,.5);
-
+        nodes[0] = Point (0.,0.,-1.);
+        nodes[1] = Point (1.,0.,-1.);
+        nodes[2] = Point (0.,1.,-1.);
+        nodes[3] = Point (0.,0.,1.);
+        nodes[4] = Point (1.,0.,1.);
+        nodes[5] = Point (0.,1.,1.);
         return;
       }
     case PYRAMID14:
       {
-        nodes.resize(14);
+        // base center
+        nodes[13] = Point (0.,0.,0.);
 
-        // base corners
-        nodes[0] = Point (-1.,-1.,0.);
-        nodes[1] = Point (1.,-1.,0.);
-        nodes[2] = Point (1.,1.,0.);
-        nodes[3] = Point (-1.,1.,0.);
-
-        // apex
-        nodes[4] = Point (0.,0.,1.);
-
+        libmesh_fallthrough();
+      }
+    case PYRAMID13:
+      {
         // base midedge
         nodes[5] = Point (0.,-1.,0.);
         nodes[6] = Point (1.,0.,0.);
@@ -653,9 +508,17 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         nodes[11] = Point (.5,.5,.5);
         nodes[12] = Point (-.5,.5,.5);
 
-        // base center
-        nodes[13] = Point (0.,0.,0.);
-
+        libmesh_fallthrough();
+      }
+    case PYRAMID5:
+      {
+        // base corners
+        nodes[0] = Point (-1.,-1.,0.);
+        nodes[1] = Point (1.,-1.,0.);
+        nodes[2] = Point (1.,1.,0.);
+        nodes[3] = Point (-1.,1.,0.);
+        // apex
+        nodes[4] = Point (0.,0.,1.);
         return;
       }
 

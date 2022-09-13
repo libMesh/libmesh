@@ -25,6 +25,37 @@
 #include "libmesh/elem.h"
 #include "libmesh/enum_to_string.h"
 
+
+namespace {
+  using namespace libMesh;
+
+  // Indices and coefficients for the HEX20
+  //
+  // The only way to make any sense of this
+  // is to look at the mgflo/mg2/mgf documentation
+  // and make the cut-out cube!
+  //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+  static const unsigned int hex20_i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
+  static const unsigned int hex20_i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
+  static const unsigned int hex20_i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
+  //To compute the hex20 shape functions the original shape functions for hex27 are used.
+  //hex20_scalx[i] tells how often the original x-th shape function has to be added to the original i-th shape function
+  //to compute the new i-th shape function for hex20
+  //example: B_0^HEX20 = B_0^HEX27 - 0.25*B_20^HEX27 - 0.25*B_21^HEX27 + 0*B_22^HEX27 + 0*B_23^HEX27 - 0.25*B_24^HEX27 + 0*B_25^HEX27 - 0.25*B_26^HEX27
+  //         B_0^HEX20 = B_0^HEX27 + hex20_scal20[0]*B_20^HEX27 + hex20_scal21[0]*B_21^HEX27 + ...
+
+  static const Real hex20_scal20[] =     {-0.25, -0.25, -0.25, -0.25, 0,     0,     0,     0,     0.5,   0.5,   0.5,   0.5,   0,     0,     0,     0,     0,     0,     0,     0};
+  static const Real hex20_scal21[] =     {-0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0,     0};
+  static const Real hex20_scal22[] =     {0,     -0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0};
+  static const Real hex20_scal23[] =     {0,     0,     -0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0};
+  static const Real hex20_scal24[] =     {-0.25, 0,     0,     -0.25, -0.25, 0,     0,     -0.25, 0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0,     0,     0.5};
+  static const Real hex20_scal25[] =     {0,     0,     0,     0,     -0.25, -0.25, -0.25, -0.25, 0,     0,     0,     0,     0,     0,     0,     0,     0.5,   0.5,   0.5,   0.5};
+  static const Real hex20_scal26[] =     {-0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, 0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25};
+
+} // anonymous namespace
+
+
+
 namespace libMesh
 {
 
@@ -657,57 +688,37 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               const Real eta  = p(1);
               const Real zeta = p(2);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0      1      2      3      4      5      6      7      8      9      10     11     12     13     14     15     16     17     18     19  20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0,     1,     1,     0,     0,     1,     1,     0,     2,     1,     2,     0,     0,     1,     1,     0,     2,     1,     2,     0,  2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0,     0,     1,     1,     0,     0,     1,     1,     0,     2,     1,     2,     0,     0,     1,     1,     0,     2,     1,     2,  2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0,     0,     0,     0,     1,     1,     1,     1,     0,     0,     0,     0,     2,     2,     2,     2,     1,     1,     1,     1,  0, 2, 2, 2, 2, 1, 2};
-              //To compute the hex20 shape functions the original shape functions for hex27 are used.
-              //scalx[i] tells how often the original x-th shape function has to be added to the original i-th shape function
-              //to compute the new i-th shape function for hex20
-              //example: B_0^HEX20 = B_0^HEX27 - 0.25*B_20^HEX27 - 0.25*B_21^HEX27 + 0*B_22^HEX27 + 0*B_23^HEX27 - 0.25*B_24^HEX27 + 0*B_25^HEX27 - 0.25*B_26^HEX27
-              //         B_0^HEX20 = B_0^HEX27 + scal20[0]*B_20^HEX27 + scal21[0]*B_21^HEX27 + ...
-              static const Real scal20[] =     {-0.25, -0.25, -0.25, -0.25, 0,     0,     0,     0,     0.5,   0.5,   0.5,   0.5,   0,     0,     0,     0,     0,     0,     0,     0};
-              static const Real scal21[] =     {-0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0,     0};
-              static const Real scal22[] =     {0,     -0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0};
-              static const Real scal23[] =     {0,     0,     -0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0};
-              static const Real scal24[] =     {-0.25, 0,     0,     -0.25, -0.25, 0,     0,     -0.25, 0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0,     0,     0.5};
-              static const Real scal25[] =     {0,     0,     0,     0,     -0.25, -0.25, -0.25, -0.25, 0,     0,     0,     0,     0,     0,     0,     0,     0.5,   0.5,   0.5,   0.5};
-              static const Real scal26[] =     {-0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, 0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25};
-
-              return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], zeta)
-                      +scal20[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[20], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[20], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[20], zeta)
-                      +scal21[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[21], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[21], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[21], zeta)
-                      +scal22[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[22], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[22], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[22], zeta)
-                      +scal23[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[23], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[23], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[23], zeta)
-                      +scal24[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[24], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[24], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[24], zeta)
-                      +scal25[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[25], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[25], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[25], zeta)
-                      +scal26[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[26], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[26], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[26], zeta));
+              return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i0[i], xi)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i1[i], eta)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i2[i], zeta)
+                      +hex20_scal20[i]*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i0[20], xi)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i1[20], eta)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i2[20], zeta)
+                      +hex20_scal21[i]*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i0[21], xi)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i1[21], eta)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i2[21], zeta)
+                      +hex20_scal22[i]*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i0[22], xi)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i1[22], eta)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i2[22], zeta)
+                      +hex20_scal23[i]*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i0[23], xi)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i1[23], eta)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i2[23], zeta)
+                      +hex20_scal24[i]*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i0[24], xi)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i1[24], eta)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i2[24], zeta)
+                      +hex20_scal25[i]*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i0[25], xi)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i1[25], eta)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i2[25], zeta)
+                      +hex20_scal26[i]*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i0[26], xi)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i1[26], eta)*
+                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, hex20_i2[26], zeta));
             }
 
             // Bernstein shape functions on the hexahedral.
@@ -1013,124 +1024,109 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
               const Real eta  = p(1);
               const Real zeta = p(2);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
-              static const Real scal20[] =     {-0.25, -0.25, -0.25, -0.25, 0,     0,     0,     0,     0.5,   0.5,   0.5,   0.5,   0,     0,     0,     0,     0,     0,     0,     0};
-              static const Real scal21[] =     {-0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0,     0};
-              static const Real scal22[] =     {0,     -0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0};
-              static const Real scal23[] =     {0,     0,     -0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0};
-              static const Real scal24[] =     {-0.25, 0,     0,     -0.25, -0.25, 0,     0,     -0.25, 0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0,     0,     0.5};
-              static const Real scal25[] =     {0,     0,     0,     0,     -0.25, -0.25, -0.25, -0.25, 0,     0,     0,     0,     0,     0,     0,     0,     0.5,   0.5,   0.5,   0.5};
-              static const Real scal26[] =     {-0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, 0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25};
-
               switch (j)
                 {
                   // d()/dxi
                 case 0:
-                  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[i],    zeta)
-                          +scal20[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[20], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[20],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[20],    zeta)
-                          +scal21[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[21], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[21],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[21],    zeta)
-                          +scal22[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[22], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[22],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[22],    zeta)
-                          +scal23[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[23], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[23],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[23],    zeta)
-                          +scal24[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[24], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[24],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[24],    zeta)
-                          +scal25[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[25], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[25],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[25],    zeta)
-                          +scal26[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[26], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[26],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[26],    zeta));
+                  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i0[i], 0, xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[i],    eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[i],    zeta)
+                          +hex20_scal20[i]*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i0[20], 0, xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[20],    eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[20],    zeta)
+                          +hex20_scal21[i]*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i0[21], 0, xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[21],    eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[21],    zeta)
+                          +hex20_scal22[i]*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i0[22], 0, xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[22],    eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[22],    zeta)
+                          +hex20_scal23[i]*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i0[23], 0, xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[23],    eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[23],    zeta)
+                          +hex20_scal24[i]*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i0[24], 0, xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[24],    eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[24],    zeta)
+                          +hex20_scal25[i]*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i0[25], 0, xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[25],    eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[25],    zeta)
+                          +hex20_scal26[i]*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i0[26], 0, xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[26],    eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[26],    zeta));
 
                   // d()/deta
                 case 1:
-                  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[i],    zeta)
-                          +scal20[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[20],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[20], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[20],    zeta)
-                          +scal21[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[21],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[21], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[21],    zeta)
-                          +scal22[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[22],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[22], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[22],    zeta)
-                          +scal23[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[23],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[23], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[23],    zeta)
-                          +scal24[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[24],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[24], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[24],    zeta)
-                          +scal25[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[25],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[25], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[25],    zeta)
-                          +scal26[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[26],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[26], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[26],    zeta));
+                  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[i],     xi)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i1[i], 0, eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[i],    zeta)
+                          +hex20_scal20[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[20],     xi)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i1[20], 0, eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[20],    zeta)
+                          +hex20_scal21[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[21],     xi)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i1[21], 0, eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[21],    zeta)
+                          +hex20_scal22[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[22],     xi)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i1[22], 0, eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[22],    zeta)
+                          +hex20_scal23[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[23],     xi)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i1[23], 0, eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[23],    zeta)
+                          +hex20_scal24[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[24],     xi)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i1[24], 0, eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[24],    zeta)
+                          +hex20_scal25[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[25],     xi)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i1[25], 0, eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[25],    zeta)
+                          +hex20_scal26[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[26],     xi)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i1[26], 0, eta)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i2[26],    zeta));
 
                   // d()/dzeta
                 case 2:
-                  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta)
-                          +scal20[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[20],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[20],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[20], 0, zeta)
-                          +scal21[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[21],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[21],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[21], 0, zeta)
-                          +scal22[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[22],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[22],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[22], 0, zeta)
-                          +scal23[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[23],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[23],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[23], 0, zeta)
-                          +scal24[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[24],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[24],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[24], 0, zeta)
-                          +scal25[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[25],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[25],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[25], 0, zeta)
-                          +scal26[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[26],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[26],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[26], 0, zeta));
+                  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[i],    xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[i],    eta)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i2[i], 0, zeta)
+                          +hex20_scal20[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[20],    xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[20],    eta)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i2[20], 0, zeta)
+                          +hex20_scal21[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[21],    xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[21],    eta)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i2[21], 0, zeta)
+                          +hex20_scal22[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[22],    xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[22],    eta)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i2[22], 0, zeta)
+                          +hex20_scal23[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[23],    xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[23],    eta)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i2[23], 0, zeta)
+                          +hex20_scal24[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[24],    xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[24],    eta)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i2[24], 0, zeta)
+                          +hex20_scal25[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[25],    xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[25],    eta)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i2[25], 0, zeta)
+                          +hex20_scal26[i]*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i0[26],    xi)*
+                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, hex20_i1[26],    eta)*
+                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, hex20_i2[26], 0, zeta));
 
                 default:
                   libmesh_error_msg("Invalid derivative index j = " << j);

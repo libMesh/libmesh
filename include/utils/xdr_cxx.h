@@ -36,12 +36,10 @@
 #include "libmesh/restore_warnings.h"
 #endif
 
+#include <complex>
 #include <iosfwd>
 #include <vector>
 #include <string>
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-# include <complex>
-#endif
 
 const unsigned int xdr_MAX_STRING_LENGTH=256;
 
@@ -196,6 +194,27 @@ private:
 
   template <typename T>
   void do_write(std::vector<std::complex<T>> & a);
+
+  /**
+   * Helper method for complex types
+   */
+  template <typename T>
+  void _complex_data_stream (std::complex<T> * val, const unsigned int len,
+                             const unsigned int line_break);
+
+  /**
+   * Helper method for extended FP types
+   */
+  template <typename XFP>
+  void _xfp_data_stream (XFP * val, const unsigned int len,
+#ifdef LIBMESH_HAVE_XDR
+                         xdrproc_t
+#else
+                         void *
+#endif
+                           xdr_proc,
+                         const unsigned int line_break,
+                         const int n_digits);
 
   /**
    * The mode used for accessing the file.

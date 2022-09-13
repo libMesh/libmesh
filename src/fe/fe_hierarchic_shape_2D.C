@@ -63,6 +63,63 @@ Real fe_hierarchic_2D_shape_second_deriv(const Elem * elem,
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
+
+std::tuple<unsigned int, unsigned int, Real>
+quad_indices(const Elem * elem,
+             const unsigned int totalorder,
+             const unsigned int i)
+{
+  libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
+
+  // Example i, i0, i1 values for totalorder = 5:
+  //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
+  //  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 3, 2, 4, 4, 4, 3, 2, 5, 5, 5, 5, 4, 3, 2};
+  //  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 3, 3, 2, 3, 4, 4, 4, 2, 3, 4, 5, 5, 5, 5};
+
+  unsigned int i0, i1;
+
+  // Vertex DoFs
+  if (i == 0)
+    { i0 = 0; i1 = 0; }
+  else if (i == 1)
+    { i0 = 1; i1 = 0; }
+  else if (i == 2)
+    { i0 = 1; i1 = 1; }
+  else if (i == 3)
+    { i0 = 0; i1 = 1; }
+  // Edge DoFs
+  else if (i < totalorder + 3u)
+    { i0 = i - 2; i1 = 0; }
+  else if (i < 2u*totalorder + 2)
+    { i0 = 1; i1 = i - totalorder - 1; }
+  else if (i < 3u*totalorder + 1)
+    { i0 = i - 2u*totalorder; i1 = 1; }
+  else if (i < 4u*totalorder)
+    { i0 = 0; i1 = i - 3u*totalorder + 1; }
+  // Interior DoFs
+  else
+    {
+      unsigned int basisnum = i - 4*totalorder;
+      i0 = square_number_column[basisnum] + 2;
+      i1 = square_number_row[basisnum] + 2;
+    }
+
+  // Flip odd degree of freedom values if necessary
+  // to keep continuity on sides
+  Real f = 1.;
+
+  if ((i0%2) && (i0 > 2) && (i1 == 0))
+    f = (elem->point(0) > elem->point(1))?-1.:1.;
+  else if ((i0%2) && (i0>2) && (i1 == 1))
+    f = (elem->point(3) > elem->point(2))?-1.:1.;
+  else if ((i0 == 0) && (i1%2) && (i1>2))
+    f = (elem->point(0) > elem->point(3))?-1.:1.;
+  else if ((i0 == 1) && (i1%2) && (i1>2))
+    f = (elem->point(1) > elem->point(2))?-1.:1.;
+
+  return {i0, i1, f};
+}
+
 } // anonymous namespace
 
 
@@ -984,59 +1041,10 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
     case QUAD9:
       {
         // Compute quad shape functions as a tensor-product
-        const Real xi  = p(0);
-        const Real eta = p(1);
+        auto [i0, i1, f] = quad_indices(elem, totalorder, i);
 
-        libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
-
-        // Example i, i0, i1 values for totalorder = 5:
-        //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
-        //  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 3, 2, 4, 4, 4, 3, 2, 5, 5, 5, 5, 4, 3, 2};
-        //  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 3, 3, 2, 3, 4, 4, 4, 2, 3, 4, 5, 5, 5, 5};
-
-        unsigned int i0, i1;
-
-        // Vertex DoFs
-        if (i == 0)
-          { i0 = 0; i1 = 0; }
-        else if (i == 1)
-          { i0 = 1; i1 = 0; }
-        else if (i == 2)
-          { i0 = 1; i1 = 1; }
-        else if (i == 3)
-          { i0 = 0; i1 = 1; }
-        // Edge DoFs
-        else if (i < totalorder + 3u)
-          { i0 = i - 2; i1 = 0; }
-        else if (i < 2u*totalorder + 2)
-          { i0 = 1; i1 = i - totalorder - 1; }
-        else if (i < 3u*totalorder + 1)
-          { i0 = i - 2u*totalorder; i1 = 1; }
-        else if (i < 4u*totalorder)
-          { i0 = 0; i1 = i - 3u*totalorder + 1; }
-        // Interior DoFs
-        else
-          {
-            unsigned int basisnum = i - 4*totalorder;
-            i0 = square_number_column[basisnum] + 2;
-            i1 = square_number_row[basisnum] + 2;
-          }
-
-        // Flip odd degree of freedom values if necessary
-        // to keep continuity on sides
-        Real f = 1.;
-
-        if ((i0%2) && (i0 > 2) && (i1 == 0))
-          f = (elem->point(0) > elem->point(1))?-1.:1.;
-        else if ((i0%2) && (i0>2) && (i1 == 1))
-          f = (elem->point(3) > elem->point(2))?-1.:1.;
-        else if ((i0 == 0) && (i1%2) && (i1>2))
-          f = (elem->point(0) > elem->point(3))?-1.:1.;
-        else if ((i0 == 1) && (i1%2) && (i1>2))
-          f = (elem->point(1) > elem->point(2))?-1.:1.;
-
-        return f*(FE<1,T>::shape(EDGE3, totalorder, i0, xi)*
-                  FE<1,T>::shape(EDGE3, totalorder, i1, eta));
+        return f*(FE<1,T>::shape(EDGE3, totalorder, i0, p(0))*
+                  FE<1,T>::shape(EDGE3, totalorder, i1, p(1)));
       }
 
     default:
@@ -1084,68 +1092,19 @@ Real fe_hierarchic_2D_shape_deriv(const Elem * elem,
     case QUAD9:
       {
         // Compute quad shape functions as a tensor-product
-        const Real xi  = p(0);
-        const Real eta = p(1);
-
-        libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
-
-        // Example i, i0, i1 values for totalorder = 5:
-        //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
-        //  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
-        //  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
-
-        unsigned int i0, i1;
-
-        // Vertex DoFs
-        if (i == 0)
-          { i0 = 0; i1 = 0; }
-        else if (i == 1)
-          { i0 = 1; i1 = 0; }
-        else if (i == 2)
-          { i0 = 1; i1 = 1; }
-        else if (i == 3)
-          { i0 = 0; i1 = 1; }
-        // Edge DoFs
-        else if (i < totalorder + 3u)
-          { i0 = i - 2; i1 = 0; }
-        else if (i < 2u*totalorder + 2)
-          { i0 = 1; i1 = i - totalorder - 1; }
-        else if (i < 3u*totalorder + 1u)
-          { i0 = i - 2u*totalorder; i1 = 1; }
-        else if (i < 4u*totalorder)
-          { i0 = 0; i1 = i - 3u*totalorder + 1; }
-        // Interior DoFs
-        else
-          {
-            unsigned int basisnum = i - 4*totalorder;
-            i0 = square_number_column[basisnum] + 2;
-            i1 = square_number_row[basisnum] + 2;
-          }
-
-        // Flip odd degree of freedom values if necessary
-        // to keep continuity on sides
-        Real f = 1.;
-
-        if ((i0%2) && (i0 > 2) && (i1 == 0))
-          f = (elem->point(0) > elem->point(1))?-1.:1.;
-        else if ((i0%2) && (i0>2) && (i1 == 1))
-          f = (elem->point(3) > elem->point(2))?-1.:1.;
-        else if ((i0 == 0) && (i1%2) && (i1>2))
-          f = (elem->point(0) > elem->point(3))?-1.:1.;
-        else if ((i0 == 1) && (i1%2) && (i1>2))
-          f = (elem->point(1) > elem->point(2))?-1.:1.;
+        auto [i0, i1, f] = quad_indices(elem, totalorder, i);
 
         switch (j)
           {
             // d()/dxi
           case 0:
-            return f*(FE<1,T>::shape_deriv(EDGE3, totalorder, i0, 0, xi)*
-                      FE<1,T>::shape      (EDGE3, totalorder, i1,    eta));
+            return f*(FE<1,T>::shape_deriv(EDGE3, totalorder, i0, 0, p(0))*
+                      FE<1,T>::shape      (EDGE3, totalorder, i1,    p(1)));
 
             // d()/deta
           case 1:
-            return f*(FE<1,T>::shape      (EDGE3, totalorder, i0,    xi)*
-                      FE<1,T>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
+            return f*(FE<1,T>::shape      (EDGE3, totalorder, i0,    p(0))*
+                      FE<1,T>::shape_deriv(EDGE3, totalorder, i1, 0, p(1)));
 
           default:
             libmesh_error_msg("Invalid derivative index j = " << j);
