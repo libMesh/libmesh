@@ -537,7 +537,7 @@ MeshTools::find_block_boundary_nodes(const MeshBase & mesh)
   // mark them as true in on_boundary.
   for (const auto & elem : mesh.active_element_ptr_range())
     for (auto s : elem->side_index_range())
-      if (elem->neighbor_ptr(s) && elem->neighbor_ptr(s)->subdomain_id() > elem->subdomain_id())
+      if (elem->neighbor_ptr(s) && elem->neighbor_ptr(s)->subdomain_id() != elem->subdomain_id())
         {
           auto nodes_on_side = elem->nodes_on_side(s);
 
@@ -549,27 +549,31 @@ MeshTools::find_block_boundary_nodes(const MeshBase & mesh)
 }
 
 
-std::multimap<dof_id_type, std::pair<subdomain_id_type, subdomain_id_type>>
-MeshTools::build_block_boundary_node_map(const MeshBase & mesh)
+std::map<dof_id_type, std::set<std::pair<subdomain_id_type, subdomain_id_type>>>
+MeshTools::build_subdomain_boundary_node_map(const MeshBase & mesh)
 {
-  std::multimap<dof_id_type, std::pair<subdomain_id_type, subdomain_id_type>> block_boundary_node_map;
+  std::map<dof_id_type, std::set<std::pair<subdomain_id_type, subdomain_id_type>>> block_boundary_node_map;
 
-  // Loop over elements, find those on boundary, and
-  // mark them as true in on_boundary.
+  // Loop over elements, find those on a block boundary, and
+  // add each boundary the node is on as a subdomain id pair
   for (const auto & elem : mesh.active_element_ptr_range())
   {
     const auto id1 = elem->subdomain_id();
     for (auto s : elem->side_index_range())
-    {
-      const auto id2 = elem->neighbor_ptr(s)->subdomain_id();
-      if (elem->neighbor_ptr(s) && id2 > id1)
-        {
-          auto nodes_on_side = elem->nodes_on_side(s);
+      {
+        if (elem->neighbor_ptr(s))
+          {
+            const auto id2 = elem->neighbor_ptr(s)->subdomain_id();
+            if (id2 != id1)
+              {
+                auto nodes_on_side = elem->nodes_on_side(s);
 
-          for (auto & local_id : nodes_on_side)
-            block_boundary_node_map.emplace(elem->node_ptr(local_id)->id(), id1, id2);
-        }
-    }
+                for (auto & local_id : nodes_on_side)
+                  block_boundary_node_map[elem->node_ptr(local_id)->id()].insert(std::make_pair(std::min(id1, id2), std::max(id1, id2)));
+              }
+          }
+      }
+  }
 
   return block_boundary_node_map;
 }
