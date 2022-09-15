@@ -925,8 +925,13 @@ template <>
 void Xdr::data_stream (double * val, const unsigned int len, const unsigned int line_break)
 {
   this->_xfp_data_stream
-    (val, len, (xdrproc_t)xdr_double, line_break,
-     std::numeric_limits<double>::max_digits10);
+    (val, len,
+#ifdef LIBMESH_HAVE_XDR
+     (xdrproc_t)xdr_double,
+#else
+     nullptr,
+#endif
+     line_break, std::numeric_limits<double>::max_digits10);
 }
 
 
@@ -935,8 +940,13 @@ template <>
 void Xdr::data_stream (float * val, const unsigned int len, const unsigned int line_break)
 {
   this->_xfp_data_stream
-    (val, len, (xdrproc_t)xdr_float, line_break,
-     std::numeric_limits<float>::max_digits10);
+    (val, len,
+#ifdef LIBMESH_HAVE_XDR
+     (xdrproc_t)xdr_float,
+#else
+     nullptr,
+#endif
+     line_break, std::numeric_limits<float>::max_digits10);
 }
 
 
@@ -963,11 +973,10 @@ void Xdr::data_stream (Real * val, const unsigned int len, const unsigned int li
 template <typename XFP>
 void Xdr::_xfp_data_stream (XFP * val, const unsigned int len,
 #ifdef LIBMESH_HAVE_XDR
-                            xdrproc_t
+                            xdrproc_t xdr_proc,
 #else
-                            void *
+                            void *,
 #endif
-                              xdr_proc,
                             const unsigned int line_break,
                             const int n_digits)
 {
