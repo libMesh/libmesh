@@ -8,6 +8,7 @@
 #include <libmesh/numeric_vector.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/enum_norm_type.h>
+#include <libmesh/enum_to_string.h>
 
 #include <libmesh/dyna_io.h>
 #include <libmesh/exodusII_io.h>
@@ -770,6 +771,9 @@ public:
     dof_id_type n_fake_nodes = 0;
     dof_id_type n_true_nodes = 0;
 
+    const std::string filename =
+      "side_discontinuous_"+Utility::enum_to_string<ElemType>(elem_type)+".e";
+
     // first scope: write file
     {
       Mesh mesh(*TestCommWorld);
@@ -850,7 +854,7 @@ public:
       ExodusII_IO exii(mesh);
       exii.write_added_sides(true);
 
-      exii.write_equation_systems("side_discontinuous.e", es);
+      exii.write_equation_systems(filename, es);
     } // end first scope
 
     // second scope: read file, verify extra elements exist
@@ -861,7 +865,7 @@ public:
       ExodusII_IO exii(mesh);
 
       if (mesh.processor_id() == 0)
-        exii.read("side_discontinuous.e");
+        exii.read(filename);
       MeshCommunication().broadcast(mesh);
       mesh.prepare_for_use();
 
