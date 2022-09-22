@@ -71,21 +71,25 @@ public:
   {
     LOG_UNIT_TEST;
     test<DistributedMesh>("meshes/smooth2d_in.e", "meshes/smooth2d_nomove.e", false);
+    test<ReplicatedMesh>("meshes/smooth2d_in.e", "meshes/smooth2d_nomove.e", false);
   }
   void laplace_smooth_2d_movable_boundary_nodes()
   {
     LOG_UNIT_TEST;
     test<DistributedMesh>("meshes/smooth2d_in.e", "meshes/smooth2d_move.e", true);
+    test<ReplicatedMesh>("meshes/smooth2d_in.e", "meshes/smooth2d_move.e", true);
   }
   void laplace_smooth_3d_fixed_boundary_nodes()
   {
     LOG_UNIT_TEST;
     test<DistributedMesh>("meshes/smooth3d_in.e", "meshes/smooth3d_nomove.e", false);
+    test<ReplicatedMesh>("meshes/smooth3d_in.e", "meshes/smooth3d_nomove.e", false);
   }
   void laplace_smooth_3d_movable_boundary_nodes()
   {
     LOG_UNIT_TEST;
     test<DistributedMesh>("meshes/smooth3d_in.e", "meshes/smooth3d_move.e", true);
+    test<ReplicatedMesh>("meshes/smooth3d_in.e", "meshes/smooth3d_move.e", true);
   }
 };
 
