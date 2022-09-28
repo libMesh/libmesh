@@ -137,15 +137,21 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
               return true;
             }
 
-          // 2D - collinear - check cross product of first edge with all other edges
+          // 2D - collinear - check cross product of first edge with all other edges.
+          // curvature is only zero if the second connected edge spans a zero area
+          // parallelogram with teh first edge. There shouldn't be a third edge, but if there
+          // ever is, we enforce it to be collinear as well.
           if (_mesh.mesh_dimension() == 2)
             return (base.cross(vec).norm_sq() < libMesh::TOLERANCE * libMesh::TOLERANCE);
 
-          // 3D
+          // 3D - we compute the cross product of the first and second edge...
           if (n_edges == 2)
             {
               const auto cross = base.cross(vec);
               const auto cross_norm_sq = cross.norm_sq();
+              // if the second edge is collinear to the first we simply drop it. This does not violate
+              // coplanarity, but it is insufficient to construct a normal for the tangent plane to check the
+              // remaining edges against.
               if (cross_norm_sq < libMesh::TOLERANCE * libMesh::TOLERANCE)
                 n_edges--;
               else
@@ -153,6 +159,8 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
               return true;
             }
 
+          // edges 3 and up are coplanar if they are orthogonal to the normal vector of the tangent
+          // plane calculated above.
           return (base * vec < libMesh::TOLERANCE);
         };
 

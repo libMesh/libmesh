@@ -537,7 +537,7 @@ MeshTools::find_block_boundary_nodes(const MeshBase & mesh)
   // mark them as true in on_boundary.
   for (const auto & elem : mesh.active_element_ptr_range())
     for (auto s : elem->side_index_range())
-      if (elem->neighbor_ptr(s) && elem->neighbor_ptr(s)->subdomain_id() != elem->subdomain_id())
+      if (elem->neighbor_ptr(s) && (elem->neighbor_ptr(s)->subdomain_id() != elem->subdomain_id()))
         {
           auto nodes_on_side = elem->nodes_on_side(s);
 
@@ -569,7 +569,7 @@ MeshTools::build_subdomain_boundary_node_map(const MeshBase & mesh)
                 auto nodes_on_side = elem->nodes_on_side(s);
 
                 for (auto & local_id : nodes_on_side)
-                  block_boundary_node_map[elem->node_ptr(local_id)->id()].insert(std::make_pair(std::min(id1, id2), std::max(id1, id2)));
+                  block_boundary_node_map[elem->node_ptr(local_id)->id()].insert(std::minmax(id1, id2));
               }
           }
       }
