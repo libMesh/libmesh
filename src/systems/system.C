@@ -1233,14 +1233,29 @@ unsigned int System::add_variable (std::string_view var,
     if (this->variable_name(v) == var)
       {
         if (this->variable_type(v) == type)
-        {
-          // Debugging
-          libMesh::out << "In System::add_variable(), found existing variable " << var
-                       << " with number " << _variables[v].number()
-                       << std::endl;
+          {
+            // Debugging
+            libMesh::out << "In System::add_variable(), found existing variable " << var
+                         << " with number " << _variables[v].number()
+                         << std::endl;
 
-          return _variables[v].number();
-        }
+            // Check whether the existing variable's active subdomains also matches
+            // the incoming variable's active subdomains. If they don't match, then
+            // either it is an error by the user or the user is trying to change the
+            // subdomain restriction after the variable has already been added, which
+            // is not supported.
+            const Variable & existing_var = this->variable(v);
+
+            // Check whether active_subdomains is not provided/empty and the existing_var is implicitly_active()
+            bool check1 = (!active_subdomains || active_subdomains->empty()) && existing_var.implicitly_active();
+
+            // Check if the provided active_subdomains is equal to the existing_var's active_subdomains
+            bool check2 = (active_subdomains && (*active_subdomains == existing_var.active_subdomains()));
+
+            // If either of these checks passed, then we already have this variable
+            if (check1 || check2)
+              return _variables[v].number();
+          }
 
         libmesh_error_msg("ERROR: incompatible variable " << var << " has already been added for this system!");
       }
