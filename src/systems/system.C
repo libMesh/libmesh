@@ -1217,16 +1217,6 @@ unsigned int System::add_variable (std::string_view var,
                                    const FEType & type,
                                    const std::set<subdomain_id_type> * const active_subdomains)
 {
-  // Debugging
-  libMesh::out << "Called System::add_variable(), with var = " << var << std::endl;
-  if (active_subdomains)
-  {
-    libMesh::out << "active_subdomains = ";
-    for (const auto & id : *active_subdomains)
-      libMesh::out << id << " ";
-    libMesh::out << std::endl;
-  }
-
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
   for (auto v : make_range(this->n_vars()))
@@ -1234,11 +1224,6 @@ unsigned int System::add_variable (std::string_view var,
       {
         if (this->variable_type(v) == type)
           {
-            // Debugging
-            libMesh::out << "In System::add_variable(), found existing variable " << var
-                         << " with number " << _variables[v].number()
-                         << std::endl;
-
             // Check whether the existing variable's active subdomains also matches
             // the incoming variable's active subdomains. If they don't match, then
             // either it is an error by the user or the user is trying to change the
