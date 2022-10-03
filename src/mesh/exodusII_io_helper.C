@@ -2258,6 +2258,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
       for (auto p : make_range(n_proc-1))
         _added_side_node_offsets[p+1] += _added_side_node_offsets[p];
 
+      num_nodes = _added_side_node_offsets[n_proc-1];
+
       dof_id_type n_local_nodes = cast_int<dof_id_type>
         (std::distance(mesh.local_nodes_begin(),
                        mesh.local_nodes_end()));
@@ -2303,21 +2305,6 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
       for (const auto & elem : mesh.active_element_ptr_range())
         num_nodes += elem->n_nodes();
     }
-
-  // If we're adding face elements they'll need copies of their nodes
-  if (_add_sides)
-    for (const auto & elem : mesh.active_element_ptr_range())
-      {
-
-        for (auto s : elem->side_index_range())
-          {
-            if (EquationSystems::redundant_added_side(*elem,s))
-              continue;
-
-            num_elem++;
-            num_nodes += elem->nodes_on_side(s).size();
-          }
-      }
 
   std::vector<boundary_id_type> unique_side_boundaries;
   std::vector<boundary_id_type> unique_node_boundaries;
