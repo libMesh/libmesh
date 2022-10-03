@@ -174,7 +174,9 @@ void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
   std::vector<Number>      v;
 
   es.build_variable_names  (solution_names, nullptr, system_names);
-  es.build_discontinuous_solution_vector (v, system_names, nullptr, this->get_add_sides());
+  es.build_discontinuous_solution_vector (v, system_names,
+                                          nullptr, false, /* defaults */
+                                          this->get_add_sides());
   this->write_nodal_data_discontinuous(name, v, solution_names);
 }
 
