@@ -133,7 +133,9 @@ void MeshOutput<MT>::write_discontinuous_equation_systems (const std::string & f
       // Build the nodal solution values & get the variable
       // names from the EquationSystems object
       std::vector<Number> soln;
-      es.build_discontinuous_solution_vector (soln, system_names);
+      es.build_discontinuous_solution_vector (soln, system_names,
+                                              nullptr, false, /* defaults */
+                                              this->get_add_sides());
 
       this->write_nodal_data_discontinuous (fname, soln, names);
     }
