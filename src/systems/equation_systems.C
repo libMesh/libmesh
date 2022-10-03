@@ -1424,70 +1424,80 @@ EquationSystems::build_discontinuous_solution_vector
                               soln[index] += nodal_soln[n];
                             }
                         }
-
-                      if (add_sides)
-                        {
-                          for (auto s : elem->side_index_range())
-                            {
-                              if (redundant_added_side(*elem,s))
-                                continue;
-
-                              const std::vector<unsigned int> side_nodes =
-                                elem->nodes_on_side(s);
-
-                              // Compute the FE solution at all the
-                              // side nodes, but only use those for
-                              // which is_vertex() == true if
-                              // vertices_only == true.
-                              FEInterface::side_nodal_soln
-                                (fe_type, elem, s, soln_coeffs,
-                                 nodal_soln);
-
-                              libmesh_assert_equal_to
-                                  (nodal_soln.size(),
-                                   side_nodes.size());
-
-                              for (auto n : index_range(side_nodes))
-                                {
-                                  if (vertices_only &&
-                                      !elem->is_vertex(n))
-                                    continue;
-
-                                  // Compute index into global solution vector.
-                                  std::size_t index =
-                                    nv * (nn++) + (n_vars_written_current_system + var_offset);
-
-                                  soln[index] += nodal_soln[n];
-                                }
-                            }
-                        }
                     }
                   else
-                    {
-                      nn += vertices_only ? elem->n_vertices() : elem->n_nodes();
+                    nn += vertices_only ? elem->n_vertices() : elem->n_nodes();
+                } // end loop over active elements writing interiors
 
-                      if (add_sides)
-                        {
-                          for (auto s : elem->side_index_range())
-                            {
-                              if (redundant_added_side(*elem,s))
-                                continue;
+              // Loop writing "fake" sides, if requested
+              if (add_sides)
+                for (auto & elem : _mesh.active_element_ptr_range())
+                  {
+                    if (var_description.active_on_subdomain(elem->subdomain_id()))
+                      {
+                        system->get_dof_map().dof_indices (elem, dof_indices, var);
 
-                              const std::vector<unsigned int> side_nodes =
-                                elem->nodes_on_side(s);
+                        soln_coeffs.resize(dof_indices.size());
 
-                              for (auto n : index_range(side_nodes))
-                                {
-                                  if (vertices_only &&
-                                      !elem->is_vertex(n))
-                                    continue;
-                                  nn++;
-                                }
-                            }
-                        }
+                        for (auto i : index_range(dof_indices))
+                          soln_coeffs[i] = sys_soln[dof_indices[i]];
 
-                    }
-                } // end loop over active elements
+                        for (auto s : elem->side_index_range())
+                          {
+                            if (redundant_added_side(*elem,s))
+                              continue;
+
+                            const std::vector<unsigned int> side_nodes =
+                              elem->nodes_on_side(s);
+
+                            // Compute the FE solution at all the
+                            // side nodes, but only use those for
+                            // which is_vertex() == true if
+                            // vertices_only == true.
+                            FEInterface::side_nodal_soln
+                              (fe_type, elem, s, soln_coeffs,
+                               nodal_soln);
+
+                            libmesh_assert_equal_to
+                                (nodal_soln.size(),
+                                 side_nodes.size());
+
+                            for (auto n : index_range(side_nodes))
+                              {
+                                if (vertices_only &&
+                                    !elem->is_vertex(n))
+                                  continue;
+
+                                // Compute index into global solution vector.
+                                std::size_t index =
+                                  nv * (nn++) + (n_vars_written_current_system + var_offset);
+
+                                soln[index] += nodal_soln[n];
+                              }
+                          }
+                      }
+                    else
+                      {
+                        nn += vertices_only ? elem->n_vertices() : elem->n_nodes();
+
+                        for (auto s : elem->side_index_range())
+                          {
+                            if (redundant_added_side(*elem,s))
+                              continue;
+
+                            const std::vector<unsigned int> side_nodes =
+                              elem->nodes_on_side(s);
+
+                            for (auto n : index_range(side_nodes))
+                              {
+                                if (vertices_only &&
+                                    !elem->is_vertex(n))
+                                  continue;
+                                nn++;
+                              }
+                          }
+                      }
+                  } // end loop over active elements, writing "fake" sides
 
               // If we made it here, we actually wrote a variable, so increment
               // the number of variables actually written for the current system.
