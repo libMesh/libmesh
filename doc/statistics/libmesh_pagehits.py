@@ -267,6 +267,7 @@ data = [
     'Jun 2022',   3964,      0, 0.0,
     'Jul 2022',   3275,      0, 0.0,
     'Aug 2022',   4745,      0, 0.0,
+    'Sep 2022',   4080,      0, 0.0,
 ]
 
 # Extract number of hits/month
@@ -300,7 +301,8 @@ ax.plot(date_nums, n_hits_month, marker='o', linewidth=2, color=u'#4878cf')
 fig.suptitle('libmesh.github.io Hits/Month (in Thousands)')
 
 # Set up x-tick locations
-ticks_names = ['2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021']
+# ticks_names = ['2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022']
+ticks_names = ['2012', '2014', '2016', '2018', '2020', '2022']
 
 # Get numerical values for the names
 tick_nums = []
