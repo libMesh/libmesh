@@ -1431,74 +1431,87 @@ EquationSystems::build_discontinuous_solution_vector
 
               // Loop writing "fake" sides, if requested
               if (add_sides)
-                for (auto & elem : _mesh.active_element_ptr_range())
-                  {
-                    if (var_description.active_on_subdomain(elem->subdomain_id()))
+                {
+                  // We don't build discontinuous solution vectors in
+                  // parallel yet, but we'll do ordering of fake side
+                  // values as if we did, for consistency with the
+                  // parallel continuous ordering and for future
+                  // compatibility.
+                  std::vector<std::vector<const Elem *>>
+                    elems_by_pid(_mesh.n_processors());
+
+                  for (const auto & elem : _mesh.active_element_ptr_range())
+                    elems_by_pid[elem->processor_id()].push_back(elem);
+
+                  for (auto p : index_range(elems_by_pid))
+                    for (const Elem * elem : elems_by_pid[p])
                       {
-                        system->get_dof_map().dof_indices (elem, dof_indices, var);
-
-                        soln_coeffs.resize(dof_indices.size());
-
-                        for (auto i : index_range(dof_indices))
-                          soln_coeffs[i] = sys_soln[dof_indices[i]];
-
-                        for (auto s : elem->side_index_range())
+                        if (var_description.active_on_subdomain(elem->subdomain_id()))
                           {
-                            if (redundant_added_side(*elem,s))
-                              continue;
+                            system->get_dof_map().dof_indices (elem, dof_indices, var);
 
-                            const std::vector<unsigned int> side_nodes =
-                              elem->nodes_on_side(s);
+                            soln_coeffs.resize(dof_indices.size());
 
-                            // Compute the FE solution at all the
-                            // side nodes, but only use those for
-                            // which is_vertex() == true if
-                            // vertices_only == true.
-                            FEInterface::side_nodal_soln
-                              (fe_type, elem, s, soln_coeffs,
-                               nodal_soln);
+                            for (auto i : index_range(dof_indices))
+                              soln_coeffs[i] = sys_soln[dof_indices[i]];
 
-                            libmesh_assert_equal_to
-                                (nodal_soln.size(),
-                                 side_nodes.size());
-
-                            for (auto n : index_range(side_nodes))
+                            for (auto s : elem->side_index_range())
                               {
-                                if (vertices_only &&
-                                    !elem->is_vertex(n))
+                                if (redundant_added_side(*elem,s))
                                   continue;
 
-                                // Compute index into global solution vector.
-                                std::size_t index =
-                                  nv * (nn++) + (n_vars_written_current_system + var_offset);
+                                const std::vector<unsigned int> side_nodes =
+                                  elem->nodes_on_side(s);
 
-                                soln[index] += nodal_soln[n];
+                                // Compute the FE solution at all the
+                                // side nodes, but only use those for
+                                // which is_vertex() == true if
+                                // vertices_only == true.
+                                FEInterface::side_nodal_soln
+                                  (fe_type, elem, s, soln_coeffs,
+                                   nodal_soln);
+
+                                libmesh_assert_equal_to
+                                    (nodal_soln.size(),
+                                     side_nodes.size());
+
+                                for (auto n : index_range(side_nodes))
+                                  {
+                                    if (vertices_only &&
+                                        !elem->is_vertex(n))
+                                      continue;
+
+                                    // Compute index into global solution vector.
+                                    std::size_t index =
+                                      nv * (nn++) + (n_vars_written_current_system + var_offset);
+
+                                    soln[index] += nodal_soln[n];
+                                  }
                               }
                           }
-                      }
-                    else
-                      {
-                        nn += vertices_only ? elem->n_vertices() : elem->n_nodes();
-
-                        for (auto s : elem->side_index_range())
+                        else
                           {
-                            if (redundant_added_side(*elem,s))
-                              continue;
+                            nn += vertices_only ? elem->n_vertices() : elem->n_nodes();
 
-                            const std::vector<unsigned int> side_nodes =
-                              elem->nodes_on_side(s);
-
-                            for (auto n : index_range(side_nodes))
+                            for (auto s : elem->side_index_range())
                               {
-                                if (vertices_only &&
-                                    !elem->is_vertex(n))
+                                if (redundant_added_side(*elem,s))
                                   continue;
-                                nn++;
+
+                                const std::vector<unsigned int> side_nodes =
+                                  elem->nodes_on_side(s);
+
+                                for (auto n : index_range(side_nodes))
+                                  {
+                                    if (vertices_only &&
+                                        !elem->is_vertex(n))
+                                      continue;
+                                    nn++;
+                                  }
                               }
                           }
-                      }
-                  } // end loop over active elements, writing "fake" sides
-
+                      } // end loop over active elements, writing "fake" sides
+                }
               // If we made it here, we actually wrote a variable, so increment
               // the number of variables actually written for the current system.
               n_vars_written_current_system++;
