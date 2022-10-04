@@ -787,7 +787,7 @@ public:
     dof_id_type n_true_nodes = 0;
 
     const std::string filename =
-      "side_discontinuous_"+Utility::enum_to_string<ElemType>(elem_type)+".e";
+      "side_discontinuous_"+Utility::enum_to_string<ElemType>(elem_type)+(write_discontinuous?"_disc":"")+".e";
 
     // first scope: write file
     {
