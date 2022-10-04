@@ -174,7 +174,9 @@ void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
   std::vector<Number>      v;
 
   es.build_variable_names  (solution_names, nullptr, system_names);
-  es.build_discontinuous_solution_vector (v, system_names, nullptr, this->get_add_sides());
+  es.build_discontinuous_solution_vector (v, system_names,
+                                          nullptr, false, /* defaults */
+                                          this->get_add_sides());
   this->write_nodal_data_discontinuous(name, v, solution_names);
 }
 
@@ -2178,6 +2180,7 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string & fname,
   int num_vars = cast_int<int>(names.size());
   libmesh_assert_equal_to(soln.size() % num_vars, 0);
   int num_nodes = soln.size() / num_vars;
+  libmesh_assert_equal_to(exio_helper->num_nodes, num_nodes);
 
 #ifndef NDEBUG
   if (!this->get_add_sides())

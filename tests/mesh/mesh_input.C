@@ -115,19 +115,33 @@ public:
 #endif // !LIBMESH_USE_COMPLEX_NUMBERS
 
   CPPUNIT_TEST( testExodusWriteAddedSidesEdgeC0 );
+  CPPUNIT_TEST( testExodusDiscWriteAddedSidesEdgeC0 );
   CPPUNIT_TEST( testExodusWriteAddedSidesMixedEdgeC0 );
-  // CPPUNIT_TEST( testExodusWriteAddedSidesEdgeDisc ); // need is_on_face fixes
+  CPPUNIT_TEST( testExodusDiscWriteAddedSidesMixedEdgeC0 );
+  // CPPUNIT_TEST( testExodusDiscWriteAddedSidesEdgeDisc ); // need is_on_face fixes
+  // CPPUNIT_TEST( testExodusDiscWriteAddedSidesEdgeDisc ); // need is_on_face fixes
   CPPUNIT_TEST( testExodusWriteAddedSidesTriC0 );
+  CPPUNIT_TEST( testExodusDiscWriteAddedSidesTriC0 );
   CPPUNIT_TEST( testExodusWriteAddedSidesMixedTriC0 );
+  CPPUNIT_TEST( testExodusDiscWriteAddedSidesMixedTriC0 );
   // CPPUNIT_TEST( testExodusWriteAddedSidesTriDisc ); // Need aligned faces
+  // CPPUNIT_TEST( testExodusDiscWriteAddedSidesTriDisc ); // Need aligned faces
   CPPUNIT_TEST( testExodusWriteAddedSidesQuadC0 );
+  CPPUNIT_TEST( testExodusDiscWriteAddedSidesQuadC0 );
   CPPUNIT_TEST( testExodusWriteAddedSidesMixedQuadC0 );
+  CPPUNIT_TEST( testExodusDiscWriteAddedSidesMixedQuadC0 );
   // CPPUNIT_TEST( testExodusWriteAddedSidesQuadDisc ); // need is_on_face fixes
+  // CPPUNIT_TEST( testExodusDiscWriteAddedSidesQuadDisc ); // need is_on_face fixes
   // CPPUNIT_TEST( testExodusWriteAddedSidesTetC0 ); // BROKEN!?!  WHY!?!
+  // CPPUNIT_TEST( testExodusDiscWriteAddedSidesTetC0 ); // BROKEN!?!  WHY!?!
   // CPPUNIT_TEST( testExodusWriteAddedSidesTetDisc );
+  // CPPUNIT_TEST( testExodusDiscWriteAddedSidesTetDisc );
   CPPUNIT_TEST( testExodusWriteAddedSidesHexC0 );
+  CPPUNIT_TEST( testExodusDiscWriteAddedSidesHexC0 );
   CPPUNIT_TEST( testExodusWriteAddedSidesMixedHexC0 );
+  CPPUNIT_TEST( testExodusDiscWriteAddedSidesMixedHexC0 );
   CPPUNIT_TEST( testExodusWriteAddedSidesHexDisc );
+  CPPUNIT_TEST( testExodusDiscWriteAddedSidesHexDisc );
 
   CPPUNIT_TEST( testExodusFileMappingsPlateWithHole);
   CPPUNIT_TEST( testExodusFileMappingsTwoBlocks);
@@ -754,6 +768,7 @@ public:
                          std::string &, const std::string &),
      const ElemType elem_type,
      const Order order,
+     const bool write_discontinuous = false,
      const std::vector<FEType> earlier_vars = {},
      const std::vector<FEType> later_vars = {})
   {
@@ -772,7 +787,7 @@ public:
     dof_id_type n_true_nodes = 0;
 
     const std::string filename =
-      "side_discontinuous_"+Utility::enum_to_string<ElemType>(elem_type)+".e";
+      "side_discontinuous_"+Utility::enum_to_string<ElemType>(elem_type)+(write_discontinuous?"_disc":"")+".e";
 
     // first scope: write file
     {
@@ -854,7 +869,10 @@ public:
       ExodusII_IO exii(mesh);
       exii.write_added_sides(true);
 
-      exii.write_equation_systems(filename, es);
+      if (write_discontinuous)
+        exii.write_discontinuous_equation_systems(filename, es);
+      else
+        exii.write_equation_systems(filename, es);
     } // end first scope
 
     // second scope: read file, verify extra elements exist
@@ -870,7 +888,14 @@ public:
       mesh.prepare_for_use();
 
       CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_true_elem + n_fake_elem);
-      CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), n_true_nodes + n_fake_nodes);
+      if (write_discontinuous)
+        {
+          const dof_id_type nodes_per_elem = Elem::build(elem_type)->n_nodes();
+          CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                               n_true_elem*nodes_per_elem + n_fake_nodes);
+        }
+      else
+        CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), n_true_nodes + n_fake_nodes);
 
       EquationSystems es(mesh);
       System & sys = es.add_system<System> ("SimpleSystem");
@@ -983,15 +1008,32 @@ public:
     testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, SECOND);
   }
 
+  void testExodusDiscWriteAddedSidesEdgeC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, FIRST, true);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, SECOND, true);
+  }
+
   void testExodusWriteAddedSidesMixedEdgeC0()
   {
-    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, FIRST, {{FIRST, LAGRANGE}});
-    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, SECOND, {}, {{FIRST, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, FIRST, false, {{FIRST, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, SECOND, false, {}, {{FIRST, LAGRANGE}});
+  }
+
+  void testExodusDiscWriteAddedSidesMixedEdgeC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, FIRST, true, {{FIRST, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, EDGE3, SECOND, true, {}, {{FIRST, LAGRANGE}});
   }
 
   void testExodusWriteAddedSidesEdgeDisc()
   {
     testExodusWriteAddedSides(designed_for_side_elems, EDGE3, SECOND);
+  }
+
+  void testExodusDiscWriteAddedSidesEdgeDisc()
+  {
+    testExodusWriteAddedSides(designed_for_side_elems, EDGE3, SECOND, true);
   }
 
   void testExodusWriteAddedSidesTriC0()
@@ -1000,15 +1042,32 @@ public:
     testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, SECOND);
   }
 
+  void testExodusDiscWriteAddedSidesTriC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, FIRST, true);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, SECOND, true);
+  }
+
   void testExodusWriteAddedSidesMixedTriC0()
   {
-    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, FIRST, {{SECOND, HIERARCHIC}});
-    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, SECOND, {}, {{SECOND, SZABAB}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, FIRST, false, {{SECOND, HIERARCHIC}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, SECOND, false, {}, {{SECOND, SZABAB}});
+  }
+
+  void testExodusDiscWriteAddedSidesMixedTriC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, FIRST, true, {{SECOND, HIERARCHIC}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TRI6, SECOND, true, {}, {{SECOND, SZABAB}});
   }
 
   void testExodusWriteAddedSidesTriDisc()
   {
     testExodusWriteAddedSides(designed_for_side_elems, TRI6, SECOND);
+  }
+
+  void testExodusDiscWriteAddedSidesTriDisc()
+  {
+    testExodusWriteAddedSides(designed_for_side_elems, TRI6, SECOND, true);
   }
 
   void testExodusWriteAddedSidesQuadC0()
@@ -1017,15 +1076,32 @@ public:
     testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, SECOND);
   }
 
+  void testExodusDiscWriteAddedSidesQuadC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, FIRST, true);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, SECOND, true);
+  }
+
   void testExodusWriteAddedSidesMixedQuadC0()
   {
-    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, FIRST, {{SECOND, LAGRANGE}});
-    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, SECOND, {}, {{FIRST, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, FIRST, false, {{SECOND, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, SECOND, false, {}, {{FIRST, LAGRANGE}});
+  }
+
+  void testExodusDiscWriteAddedSidesMixedQuadC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, FIRST, true, {{SECOND, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, QUAD9, SECOND, true, {}, {{FIRST, LAGRANGE}});
   }
 
   void testExodusWriteAddedSidesQuadDisc()
   {
     testExodusWriteAddedSides(designed_for_side_elems, QUAD9, SECOND);
+  }
+
+  void testExodusDiscWriteAddedSidesQuadDisc()
+  {
+    testExodusWriteAddedSides(designed_for_side_elems, QUAD9, SECOND, true);
   }
 
   void testExodusWriteAddedSidesTetC0()
@@ -1034,9 +1110,20 @@ public:
     testExodusWriteAddedSides(six_x_plus_sixty_y, TET14, SECOND);
   }
 
+  void testExodusDiscWriteAddedSidesTetC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TET14, FIRST, true);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, TET14, SECOND, true);
+  }
+
   void testExodusWriteAddedSidesTetDisc()
   {
     testExodusWriteAddedSides(designed_for_side_elems, TET14, SECOND);
+  }
+
+  void testExodusDiscWriteAddedSidesTetDisc()
+  {
+    testExodusWriteAddedSides(designed_for_side_elems, TET14, SECOND, true);
   }
 
   void testExodusWriteAddedSidesHexC0()
@@ -1045,15 +1132,32 @@ public:
     testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, SECOND);
   }
 
+  void testExodusDiscWriteAddedSidesHexC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, FIRST, true);
+    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, SECOND, true);
+  }
+
   void testExodusWriteAddedSidesMixedHexC0()
   {
-    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, FIRST, {{FIRST, LAGRANGE}});
-    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, SECOND, {}, {{SECOND, HIERARCHIC}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, FIRST, false, {{FIRST, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, SECOND, false, {}, {{SECOND, HIERARCHIC}});
+  }
+
+  void testExodusDiscWriteAddedSidesMixedHexC0()
+  {
+    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, FIRST, true, {{FIRST, LAGRANGE}});
+    testExodusWriteAddedSides(six_x_plus_sixty_y, HEX27, SECOND, true, {}, {{SECOND, HIERARCHIC}});
   }
 
   void testExodusWriteAddedSidesHexDisc()
   {
     testExodusWriteAddedSides(designed_for_side_elems, HEX27, SECOND);
+  }
+
+  void testExodusDiscWriteAddedSidesHexDisc()
+  {
+    testExodusWriteAddedSides(designed_for_side_elems, HEX27, SECOND, true);
   }
 
 #endif // LIBMESH_HAVE_EXODUS_API
