@@ -1,11 +1,9 @@
 [submodule "contrib/metaphysicl"]
 	path = contrib/metaphysicl
 	url = ../../libMesh/MetaPhysicL
-        fetchRecurseSubmodules = true
 [submodule "contrib/timpi"]
 	path = contrib/timpi
 	url = ../../libMesh/TIMPI
-        fetchRecurseSubmodules = true
 [submodule "m4/autoconf-submodule"]
 	path = m4/autoconf-submodule
 	url = ../../libMesh/autoconf-submodule
