@@ -18,22 +18,24 @@
 
 // Local includes
 #include "libmesh/exodusII_io.h"
+
 #include "libmesh/boundary_info.h"
-#include "libmesh/mesh_base.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/dyna_io.h"  // ElementDefinition for BEX
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/elem.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/system.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/exodusII_io_helper.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/exodusII_io_helper.h"
+#include "libmesh/int_range.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
+#include "libmesh/numeric_vector.h"
 #include "libmesh/parallel_mesh.h"
-#include "libmesh/dof_map.h"
 #include "libmesh/parallel.h"
+#include "libmesh/system.h"
 #include "libmesh/utility.h"
-#include "libmesh/dyna_io.h"  // ElementDefinition for BEX
 
 // TIMPI includes
 #include "timpi/parallel_sync.h"
@@ -361,7 +363,7 @@ void ExodusII_IO::read (const std::string & fname)
   // We use the last time step to load the IDs
   exio_helper->read_num_time_steps();
   unsigned int last_step = exio_helper->num_time_steps;
-  for (unsigned int i = 0; i < extra_ids.size(); i++)
+  for (auto i : index_range(extra_ids))
     exio_helper->read_elemental_var_values(_extra_integer_vars[i], last_step, elem_ids[i]);
 
   // Read in the element connectivity for each block.

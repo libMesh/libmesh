@@ -1826,7 +1826,8 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 
   // Look at all the variables in the system.  Reset the element
   // range at each iteration -- there is no need to reconstruct it.
-  for (unsigned int variable_number=0; variable_number<this->n_variables();
+  const auto n_vars = this->n_variables();
+  for (unsigned int variable_number=0; variable_number<n_vars;
        ++variable_number, range.reset())
     Threads::parallel_for (range,
                            ComputeConstraints (_dof_constraints,

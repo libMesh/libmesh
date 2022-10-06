@@ -30,6 +30,7 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/int_range.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/periodic_boundary_base.h"
 #include "libmesh/periodic_boundaries.h"
@@ -1508,7 +1509,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
 {
   Ue.resize(0);
 
-  for (unsigned int v=0; v != dof_map.n_variables(); ++v)
+  for (auto v : make_range(dof_map.n_variables()))
     {
       DenseVector<Number> Usub;
 

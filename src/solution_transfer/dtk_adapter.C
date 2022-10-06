@@ -24,6 +24,7 @@
 // libMesh includes
 #include "libmesh/dtk_adapter.h"
 #include "libmesh/dtk_evaluator.h"
+#include "libmesh/int_range.h"
 #include "libmesh/mesh.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/elem.h"
@@ -238,7 +239,7 @@ DTKAdapter::find_sys(std::string var_name)
   System * sys = nullptr;
 
   // Find the system this variable is from
-  for (unsigned int i=0; i<es.n_systems(); i++)
+  for (auto i : make_range(es.n_systems()))
     {
       if (es.get_system(i).has_variable(var_name))
         {

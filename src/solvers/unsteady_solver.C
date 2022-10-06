@@ -18,15 +18,16 @@
 
 #include "libmesh/unsteady_solver.h"
 
+#include "libmesh/adjoint_refinement_estimator.h"
 #include "libmesh/diff_solver.h"
 #include "libmesh/diff_system.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/int_range.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parameter_vector.h"
 #include "libmesh/sensitivity_data.h"
 #include "libmesh/solution_history.h"
-#include "libmesh/adjoint_refinement_estimator.h"
-#include "libmesh/error_vector.h"
 
 namespace libMesh
 {
@@ -315,10 +316,10 @@ void UnsteadySolver::integrate_adjoint_sensitivity(const QoISet & qois, const Pa
   _system.remove_vector("sensitivity_rhs0");
 
   // Get the contributions for each sensitivity from this timestep
-  for(unsigned int i = 0; i != qois.size(_system); i++)
-    for(unsigned int j = 0; j != parameter_vector.size(); j++)
-     sensitivities[i][j] = ( (sensitivities_left[i][j] + sensitivities_right[i][j])/2. )*(time_right - time_left);
-
+  const auto pv_size = parameter_vector.size();
+  for (auto i : make_range(qois.size(_system)))
+    for (auto j : make_range(pv_size))
+      sensitivities[i][j] = ( (sensitivities_left[i][j] + sensitivities_right[i][j])/2. )*(time_right - time_left);
 }
 
 void UnsteadySolver::integrate_qoi_timestep()

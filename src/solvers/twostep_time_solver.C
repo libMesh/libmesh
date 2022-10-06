@@ -18,16 +18,16 @@
 
 #include "libmesh/twostep_time_solver.h"
 
+#include "libmesh/adjoint_refinement_estimator.h"
 #include "libmesh/diff_system.h"
 #include "libmesh/enum_norm_type.h"
+#include "libmesh/error_vector.h"
 #include "libmesh/euler_solver.h"
+#include "libmesh/int_range.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parameter_vector.h"
 #include "libmesh/sensitivity_data.h"
 #include "libmesh/solution_history.h"
-
-#include "libmesh/adjoint_refinement_estimator.h"
-#include "libmesh/error_vector.h"
 
 // C++ includes
 #include <memory>
@@ -390,9 +390,10 @@ void TwostepTimeSolver::integrate_adjoint_sensitivity(const QoISet & qois, const
   core_time_solver->integrate_adjoint_sensitivity(qois, parameter_vector, sensitivities_second_half);
 
   // Get the contributions for each sensitivity from this timestep
-  for(unsigned int i = 0; i != qois.size(_system); i++)
-    for(unsigned int j = 0; j != parameter_vector.size(); j++)
-     sensitivities[i][j] = sensitivities_first_half[i][j] + sensitivities_second_half[i][j];
+  const auto pv_size = parameter_vector.size();
+  for (auto i : make_range(qois.size(_system)))
+    for (auto j : make_range(pv_size))
+      sensitivities[i][j] = sensitivities_first_half[i][j] + sensitivities_second_half[i][j];
 }
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -435,7 +436,7 @@ void TwostepTimeSolver::integrate_adjoint_refinement_error_estimate(AdjointRefin
   }
 
   // Error contribution from this timestep
-  for(unsigned int i = 0; i < QoI_elementwise_error.size(); i++)
+  for (auto i : index_range(QoI_elementwise_error))
     QoI_elementwise_error[i] = QoI_elementwise_error_first_half[i] + QoI_elementwise_error_second_half[i];
 
   for (auto j : make_range(_system.n_qois()))

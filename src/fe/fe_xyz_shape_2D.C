@@ -20,7 +20,9 @@
 
 // Local includes
 #include "libmesh/fe.h"
+
 #include "libmesh/elem.h"
+#include "libmesh/int_range.h"
 
 
 namespace libMesh
@@ -403,7 +405,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem * elem,
 
   Point avg = elem->vertex_average();
   Point max_distance = Point(0.,0.,0.);
-  for (unsigned int p = 0; p < elem->n_nodes(); p++)
+  for (auto p : make_range(elem->n_nodes()))
     for (unsigned int d = 0; d < 2; d++)
       {
         const Real distance = std::abs(avg(d) - elem->point(p)(d));

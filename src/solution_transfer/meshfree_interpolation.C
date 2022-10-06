@@ -18,11 +18,13 @@
 
 
 // Local includes
-#include "libmesh/point.h"
 #include "libmesh/meshfree_interpolation.h"
+
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_algebra.h"
+#include "libmesh/point.h"
 
 // C++ includes
 #include <iomanip>
@@ -43,7 +45,7 @@ void MeshfreeInterpolation::print_info (std::ostream & os) const
   if (this->n_field_variables())
     {
       os << "  variables = ";
-      for (unsigned int v=0; v<this->n_field_variables(); v++)
+      for (auto v : make_range(this->n_field_variables()))
         os << _names[v] << " ";
       os << std::endl;
     }
@@ -83,7 +85,7 @@ void MeshfreeInterpolation::add_field_data (const std::vector<std::string> & fie
       libmesh_error_msg_if(_names.size() != field_names.size(),
                            "ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 
-      for (std::size_t v=0; v<_names.size(); v++)
+      for (auto v : index_range(_names))
         libmesh_error_msg_if(_names[v] != field_names[v],
                              "ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
     }
@@ -209,7 +211,7 @@ void InverseDistanceInterpolation<KDDim>::interpolate_field_data (const std::vec
   libmesh_error_msg_if(_names.size() != field_names.size(),
                        "ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 
-  for (std::size_t v=0; v<_names.size(); v++)
+  for (auto v : index_range(_names))
     libmesh_error_msg_if(_names[v] != field_names[v],
                          "ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 

@@ -17,21 +17,23 @@
 
 
 
-// C++ includes
-#include <iomanip>
-
 // Local includes
 #include "libmesh/radial_basis_interpolation.h"
-#include "libmesh/radial_basis_functions.h"
-#include "libmesh/mesh_tools.h" // BoundingBox
-#include "libmesh/libmesh_logging.h"
+
 #include "libmesh/eigen_core_support.h"
+#include "libmesh/int_range.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_tools.h" // BoundingBox
+#include "libmesh/radial_basis_functions.h"
 
 #ifdef LIBMESH_HAVE_EIGEN
 # include "libmesh/ignore_warnings.h"
 # include <Eigen/Dense>
 # include "libmesh/restore_warnings.h"
 #endif
+
+// C++ includes
+#include <iomanip>
 
 
 namespace libMesh
@@ -185,7 +187,7 @@ void RadialBasisInterpolation<KDDim,RBF>::interpolate_field_data (const std::vec
   libmesh_error_msg_if(this->_names.size() != field_names.size(),
                        "ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 
-  for (std::size_t v=0; v<this->_names.size(); v++)
+  for (auto v : index_range(this->_names))
     libmesh_error_msg_if(_names[v] != field_names[v],
                          "ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 
