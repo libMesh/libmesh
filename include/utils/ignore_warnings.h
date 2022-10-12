@@ -99,3 +99,15 @@
 #pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
 #endif // __GNUC__ && !__INTEL_COMPILER
+
+#ifdef __NVCOMPILER
+#  pragma nv_diagnostic push
+// Warning numbers are from --display_error_number
+#  ifdef __NVCC_DIAG_PRAGMA_SUPPORT__
+#    pragma nv_diag_suppress 1758 // conversion between incompatible vector types
+#    pragma nv_diag_suppress = integer_sign_change
+#  else
+#    pragma diag_suppress 1758 // conversion between incompatible vector types
+#    pragma diag_suppress = integer_sign_change
+#  endif
+#endif
