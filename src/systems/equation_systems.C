@@ -1475,6 +1475,47 @@ EquationSystems::build_discontinuous_solution_vector
                                     (nodal_soln.size(),
                                      side_nodes.size());
 
+                                // If we don't have a continuous FE
+                                // then we want to average between
+                                // sides, at least in the equal-level
+                                // case where it's easy.  This is
+                                // analogous to our repeat_count
+                                // behavior elsewhere.
+                                const FEContinuity cont =
+                                  FEInterface::get_continuity(fe_type);
+                                const Elem * const neigh = elem->neighbor_ptr(s);
+
+                                if ((cont == DISCONTINUOUS || cont == H_CURL) &&
+                                    neigh &&
+                                    neigh->level() == elem->level() &&
+                                    var_description.active_on_subdomain(neigh->subdomain_id()))
+                                  {
+                                    std::vector<dof_id_type> neigh_indices;
+                                    system->get_dof_map().dof_indices (neigh, neigh_indices, var);
+                                    std::vector<Number> neigh_coeffs(neigh_indices.size());
+
+                                    for (auto i : index_range(neigh_indices))
+                                      neigh_coeffs[i] = sys_soln[neigh_indices[i]];
+
+                                    const unsigned int s_neigh =
+                                      neigh->which_neighbor_am_i(elem);
+                                    std::vector<Number> neigh_soln;
+                                    FEInterface::side_nodal_soln
+                                      (fe_type, neigh, s_neigh,
+                                       neigh_coeffs, neigh_soln);
+
+                                    const std::vector<unsigned int> neigh_nodes =
+                                      neigh->nodes_on_side(s_neigh);
+                                    for (auto n : index_range(side_nodes))
+                                      for (auto neigh_n : index_range(neigh_nodes))
+                                        if (neigh->node_ptr(neigh_nodes[neigh_n])
+                                            == elem->node_ptr(side_nodes[n]))
+                                          {
+                                            nodal_soln[n] += neigh_soln[neigh_n];
+                                            nodal_soln[n] /= 2;
+                                          }
+                                  }
+
                                 for (auto n : index_range(side_nodes))
                                   {
                                     if (vertices_only &&
