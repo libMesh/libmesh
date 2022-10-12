@@ -36,6 +36,10 @@
 #include "libmesh/int_range.h"
 #include "libmesh/utility.h"
 
+// Nvidia C++ whining about destroying incomplete unique_ptr<T> Base::foo types
+#include "libmesh/dof_map.h"
+#include "libmesh/sparse_matrix.h"
+
 namespace libMesh
 {
 
