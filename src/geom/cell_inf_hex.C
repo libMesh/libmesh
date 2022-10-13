@@ -370,9 +370,9 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
 {
   libmesh_not_implemented();
 
+  /*
   std::pair<Real, Real> bounds;
 
-  /*
     switch (q)
     {
 
@@ -432,9 +432,11 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
     bounds.first  = -1;
     bounds.second = -1;
     }
-  */
 
   return bounds;
+  */
+
+  return std::pair<Real,Real>();
 }
 
 

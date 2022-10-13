@@ -1997,8 +1997,6 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
             returnval *= zeta[3];
             return returnval;
           }
-
-        libmesh_error();
       }
 
     default:
