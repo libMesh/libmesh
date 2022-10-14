@@ -1219,11 +1219,9 @@ public:
         if (elem->dim() > 2)
           master_pt(2) = 0.75;
 
-        FEMap fe_map;
+        Point physical_pt = FEMap::map(elem->dim(), elem, master_pt);
 
-        Point physical_pt = fe_map.map(elem->dim(), elem, master_pt);
-
-        Point inverse_pt = fe_map.inverse_map(elem->dim(), elem,
+        Point inverse_pt = FEMap::inverse_map(elem->dim(), elem,
                                               physical_pt);
 
         CPPUNIT_ASSERT((inverse_pt-master_pt).norm() < TOLERANCE);
