@@ -81,8 +81,8 @@ public:
       VectorValue<float> fvec;
       VectorValue<double> dvec;
 
-      auto ftype = fvec * 1;
-      auto dtype = dvec * 1;
+      [[maybe_unused]] auto ftype = fvec * 1;
+      [[maybe_unused]] auto dtype = dvec * 1;
 
       {
         bool assertion = std::is_same<decltype(ftype), TypeVector<float>>::value;
@@ -93,33 +93,27 @@ public:
         CPPUNIT_ASSERT(assertion);
       }
       {
-        auto temp = average(ftype, ftype);
-        bool assertion = std::is_same<decltype(temp), TypeVector<float>>::value;
+        bool assertion = std::is_same<decltype(average(ftype, ftype)), TypeVector<float>>::value;
         CPPUNIT_ASSERT(assertion);
       }
       {
-        auto temp = average(ftype, dtype);
-        bool assertion = std::is_same<decltype(temp), TypeVector<double>>::value;
+        bool assertion = std::is_same<decltype(average(ftype, dtype)), TypeVector<double>>::value;
         CPPUNIT_ASSERT(assertion);
       }
       {
-        auto temp = average(fvec, fvec);
-        bool assertion = std::is_same<decltype(temp), VectorValue<float>>::value;
+        bool assertion = std::is_same<decltype(average(fvec, fvec)), VectorValue<float>>::value;
         CPPUNIT_ASSERT(assertion);
       }
       {
-        auto temp = average(fvec, dvec);
-        bool assertion = std::is_same<decltype(temp), VectorValue<double>>::value;
+        bool assertion = std::is_same<decltype(average(fvec, dvec)), VectorValue<double>>::value;
         CPPUNIT_ASSERT(assertion);
       }
       {
-        auto temp = average(fvec, dtype);
-        bool assertion = std::is_same<decltype(temp), VectorValue<double>>::value;
+        bool assertion = std::is_same<decltype(average(fvec, dtype)), VectorValue<double>>::value;
         CPPUNIT_ASSERT(assertion);
       }
       {
-        auto temp = average(ftype, dvec);
-        bool assertion = std::is_same<decltype(temp), VectorValue<double>>::value;
+        bool assertion = std::is_same<decltype(average(ftype, dvec)), VectorValue<double>>::value;
         CPPUNIT_ASSERT(assertion);
       }
 #ifdef LIBMESH_HAVE_METAPHYSICL
