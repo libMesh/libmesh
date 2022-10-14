@@ -121,7 +121,7 @@ public:
 
 // Assembly function used in testDofCouplingWithVarGroups
 void assemble_matrix_and_rhs(EquationSystems& es,
-                             const std::string& system_name)
+                             const std::string&)
 {
   const MeshBase& mesh = es.get_mesh();
   LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("test");
@@ -400,7 +400,7 @@ struct TripleFunction : public FunctionBase<Number>
   { libmesh_error(); }
 
   virtual void operator() (const Point & p,
-                           const Real time,
+                           const Real,
                            DenseVector<Number> & output) override
   {
     libmesh_assert_greater(output.size(), 0);
