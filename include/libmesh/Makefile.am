@@ -111,6 +111,8 @@ BUILT_SOURCES = \
         cell_prism.h \
         cell_prism15.h \
         cell_prism18.h \
+        cell_prism20.h \
+        cell_prism21.h \
         cell_prism6.h \
         cell_pyramid.h \
         cell_pyramid13.h \
@@ -889,6 +891,12 @@ cell_prism15.h: $(top_srcdir)/include/geom/cell_prism15.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_prism18.h: $(top_srcdir)/include/geom/cell_prism18.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_prism20.h: $(top_srcdir)/include/geom/cell_prism20.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_prism21.h: $(top_srcdir)/include/geom/cell_prism21.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_prism6.h: $(top_srcdir)/include/geom/cell_prism6.h

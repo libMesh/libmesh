@@ -135,6 +135,8 @@ libmesh_SOURCES =  \
         src/geom/cell_prism.C \
         src/geom/cell_prism15.C \
         src/geom/cell_prism18.C \
+        src/geom/cell_prism20.C \
+        src/geom/cell_prism21.C \
         src/geom/cell_prism6.C \
         src/geom/cell_pyramid.C \
         src/geom/cell_pyramid13.C \
