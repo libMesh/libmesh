@@ -75,7 +75,8 @@ enum ElemType : int {
                TRI7 = 33,
                TET14 = 34,
                PRISM20 = 35,
-               PYRAMID18 = 36,
+               PRISM21 = 36,
+               PYRAMID18 = 37,
                // Invalid
                INVALID_ELEM};   // should always be last
 
