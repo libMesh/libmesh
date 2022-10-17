@@ -711,6 +711,8 @@ include_HEADERS = \
         geom/cell_prism.h \
         geom/cell_prism15.h \
         geom/cell_prism18.h \
+        geom/cell_prism20.h \
+        geom/cell_prism21.h \
         geom/cell_prism6.h \
         geom/cell_pyramid.h \
         geom/cell_pyramid13.h \
