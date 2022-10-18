@@ -678,6 +678,10 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               break;
             }
 
+          case PRISM20:
+          case PRISM21:
+            libmesh_experimental(); // We should upgrade this to TET14...
+            libmesh_fallthrough();
           case PRISM18:
             {
               subelem[0] = Elem::build(TET10);
