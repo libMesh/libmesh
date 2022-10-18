@@ -52,6 +52,8 @@ public:
   CPPUNIT_TEST( buildCubePrism6 );
   CPPUNIT_TEST( buildCubePrism15 );
   CPPUNIT_TEST( buildCubePrism18 );
+  CPPUNIT_TEST( buildCubePrism20 );
+  CPPUNIT_TEST( buildCubePrism21 );
 
   // These tests throw an exception from contains_point() calls, and
   // this simply aborts() when exceptions are not enabled.
@@ -157,7 +159,8 @@ public:
         CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n*n*24));
         break;
       case 5: // prisms, pyramids
-        if (type == PRISM6 || type == PRISM15 || type == PRISM18)
+        if (type == PRISM6 || type == PRISM15 || type == PRISM18 ||
+            type == PRISM20 || type == PRISM21)
           CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n*n*2));
         else
           CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n*n*6));
@@ -191,8 +194,16 @@ public:
                              cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1)));
         break;
       case 20:
+        if (type == HEX20)
+          CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                               cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) - n*n*n - 3*(n+1)*n*n));
+        if (type == PRISM20)
+          CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                               cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 2*(n+1)*n*n));
+        break;
+      case 21: // Prisms based on full Tri7 cross sections
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                             cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) - n*n*n - 3*(n+1)*n*n));
+                             cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 2*(2*n+1)*n*n));
         break;
       case 15: // weird partial order prism
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
@@ -295,6 +306,8 @@ public:
   void buildCubePrism6 ()    { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM6); }
   void buildCubePrism15 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM15); }
   void buildCubePrism18 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM18); }
+  void buildCubePrism20 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM20); }
+  void buildCubePrism21 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM21); }
 
   // These tests throw an exception from contains_point() calls, and
   // this simply aborts() when exceptions are not enabled.
