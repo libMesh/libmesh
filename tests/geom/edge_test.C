@@ -10,6 +10,8 @@
 #include <libmesh/cell_inf_prism6.h>
 #include <libmesh/cell_prism15.h>
 #include <libmesh/cell_prism18.h>
+#include <libmesh/cell_prism20.h>
+#include <libmesh/cell_prism21.h>
 #include <libmesh/cell_prism6.h>
 #include <libmesh/cell_pyramid13.h>
 #include <libmesh/cell_pyramid14.h>
@@ -171,6 +173,8 @@ INSTANTIATE_EDGETEST(Hex27,     EDGE3, 0, 12);
 INSTANTIATE_EDGETEST(Hex8,      EDGE2, 0, 12);
 INSTANTIATE_EDGETEST(Prism15,   EDGE3, 0, 9);
 INSTANTIATE_EDGETEST(Prism18,   EDGE3, 0, 9);
+INSTANTIATE_EDGETEST(Prism20,   EDGE3, 0, 9);
+INSTANTIATE_EDGETEST(Prism21,   EDGE3, 0, 9);
 INSTANTIATE_EDGETEST(Prism6,    EDGE2, 0, 9);
 INSTANTIATE_EDGETEST(Pyramid13, EDGE3, 0, 8);
 INSTANTIATE_EDGETEST(Pyramid14, EDGE3, 0, 8);
