@@ -98,6 +98,9 @@ public:
   // Test monomial quadrature rules on quads and hexes
   CPPUNIT_TEST( testMonomialQuadrature );
 
+  // Test nodal quadrature rules on every specific type
+  CPPUNIT_TEST( testNodalQuadrature );
+
   // Test quadrature rules on Triangles
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testTriQuadrature );
@@ -302,7 +305,22 @@ public:
       for (ElemType elem_type : all_types[i])
         {
           const unsigned int order = Elem::build(elem_type)->default_order();
-          testPolynomials(QNODAL, order, elem_type, true_values[i], order);
+
+          unsigned int exactorder = order;
+          // There are some sad exceptions to the "positive nodal
+          // quadrature can integrate polynomials up to the element
+          // order" rule.
+          //
+          // Some "quadratic" elements can only exactly integrate
+          // linears when mass lumping.
+          if (elem_type == TRI6 || elem_type == QUAD8 ||
+              elem_type == TET10 || elem_type == HEX20 ||
+              elem_type == PRISM15 || elem_type == PRISM18 ||
+          // And some partially-cubic elements can only do quadratics
+              elem_type == TET14 || elem_type == PRISM20)
+            exactorder--;
+
+          testPolynomials(QNODAL, order, elem_type, true_values[i], exactorder);
         }
   }
 
