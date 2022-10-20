@@ -158,8 +158,8 @@ void QNodal::init_2D(const ElemType, unsigned int)
             Point(.5,.5), Point(0.,.5), Point(1/Real(3),1/Real(3))
           };
 
-        Real wv = Real(1)/15;
-        Real we = Real(1)/40;
+        Real wv = Real(1)/40;
+        Real we = Real(1)/15;
         _weights = {wv, wv, wv, we, we, we, Real(9)/40};
         return;
       }
