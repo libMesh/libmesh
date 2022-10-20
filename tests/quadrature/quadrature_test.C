@@ -60,8 +60,8 @@ public:
   LIBMESH_CPPUNIT_TEST_SUITE( QuadratureTest );
 
   TEST_ALL_ORDERS(QGAUSS, 9999);
-  TEST_ONE_ORDER(QSIMPSON, FIRST,  3);
-  TEST_ONE_ORDER(QSIMPSON, SECOND, 3);
+  TEST_ONE_ORDER(QSIMPSON, FIRST,  1);
+  TEST_ONE_ORDER(QSIMPSON, SECOND, 2);
   TEST_ONE_ORDER(QSIMPSON, THIRD,  3);
   TEST_ONE_ORDER(QTRAP, FIRST, 1);
   TEST_ALL_ORDERS(QGRID, 1);
@@ -165,6 +165,109 @@ private:
           }
   }
 
+  const std::function<Real(int,int,int)> edge_integrals =
+  [](int mode, int, int) {
+    return (mode % 2) ?  0 : (Real(2.0) / (mode+1));
+  };
+
+  const std::function<Real(int,int,int)> quad_integrals =
+  [](int modex, int modey, int) {
+    const Real exactx = (modex % 2) ?
+      0 : (Real(2.0) / (modex+1));
+
+    const Real exacty = (modey % 2) ?
+      0 : (Real(2.0) / (modey+1));
+
+    return exactx*exacty;
+  };
+
+  const std::function<Real(int,int,int)> tri_integrals =
+  [](int x_power, int y_power, int) {
+    // Compute the true integral, a! b! / (a + b + 2)!
+    Real analytical = 1.0;
+
+    unsigned
+      larger_power = std::max(x_power, y_power),
+      smaller_power = std::min(x_power, y_power);
+
+    // Cancel the larger of the two numerator terms with the
+    // denominator, and fill in the remaining entries.
+    std::vector<unsigned>
+      numerator(smaller_power > 1 ? smaller_power-1 : 0),
+      denominator(2+smaller_power);
+
+    // Fill up the vectors with sequences starting at the right values.
+    std::iota(numerator.begin(), numerator.end(), 2);
+    std::iota(denominator.begin(), denominator.end(), larger_power+1);
+
+    // The denominator is guaranteed to have more terms...
+    for (std::size_t i=0; i<denominator.size(); ++i)
+      {
+        if (i < numerator.size())
+          analytical *= numerator[i];
+        analytical /= denominator[i];
+      }
+    return analytical;
+  };
+
+  const std::function<Real(int,int,int)> hex_integrals =
+  [](int modex, int modey, int modez) {
+    const Real exactx = (modex % 2) ?
+      0 : (Real(2.0) / (modex+1));
+
+    const Real exacty = (modey % 2) ?
+      0 : (Real(2.0) / (modey+1));
+
+    const Real exactz = (modez % 2) ?
+      0 : (Real(2.0) / (modez+1));
+
+    return exactx*exacty*exactz;
+  };
+
+  const std::function<Real(int,int,int)> tet_integrals =
+  [](int x_power, int y_power, int z_power) {
+    // Compute the true integral, a! b! c! / (a + b + c + 3)!
+    Real analytical = 1.0;
+
+    // Sort the a, b, c values
+    int sorted_powers[3] = {x_power, y_power, z_power};
+    std::sort(sorted_powers, sorted_powers+3);
+
+    // Cancel the largest power with the denominator, fill in the
+    // entries for the remaining numerator terms and the denominator.
+    std::vector<int>
+      numerator_1(sorted_powers[0] > 1 ? sorted_powers[0]-1 : 0),
+      numerator_2(sorted_powers[1] > 1 ? sorted_powers[1]-1 : 0),
+      denominator(3 + sorted_powers[0] + sorted_powers[1]);
+
+    // Fill up the vectors with sequences starting at the right values.
+    std::iota(numerator_1.begin(), numerator_1.end(), 2);
+    std::iota(numerator_2.begin(), numerator_2.end(), 2);
+    std::iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
+
+    // The denominator is guaranteed to have the most terms...
+    for (std::size_t i=0; i<denominator.size(); ++i)
+      {
+        if (i < numerator_1.size())
+          analytical *= numerator_1[i];
+
+        if (i < numerator_2.size())
+          analytical *= numerator_2[i];
+
+        analytical /= denominator[i];
+      }
+    return analytical;
+  };
+
+  const std::function<Real(int,int,int)> prism_integrals =
+  [this](int modex, int modey, int modez) {
+    const Real exactz = (modez % 2) ?
+      0 : (Real(2.0) / (modez+1));
+
+    return exactz * tri_integrals(modex, modey, 0);
+  };
+
+
 public:
   void setUp ()
   { quadrature_tolerance = TOLERANCE * std::sqrt(TOLERANCE); }
@@ -172,68 +275,49 @@ public:
   void tearDown ()
   {}
 
+  void testNodalQuadrature ()
+  {
+    LOG_UNIT_TEST;
+
+    const std::vector<std::vector<ElemType>> all_types =
+      {{EDGE2, EDGE3, EDGE4},
+       {TRI3, TRI6, TRI7},
+       {QUAD4, QUAD8, QUAD9},
+       {TET4, TET10, TET14},
+       {HEX8, HEX20, HEX27},
+       {PRISM6, PRISM15, PRISM18, PRISM20, PRISM21}};
+
+    // We don't cover these at all yet?
+//       {PYRAMID5, PYRAMID13, PYRAMID14}};
+
+    const std::function<Real(int,int,int)> true_values[] =
+      {edge_integrals,
+       tri_integrals,
+       quad_integrals,
+       tet_integrals,
+       hex_integrals,
+       prism_integrals};
+
+    for (auto i : index_range(all_types))
+      for (ElemType elem_type : all_types[i])
+        {
+          const unsigned int order = Elem::build(elem_type)->default_order();
+          testPolynomials(QNODAL, order, elem_type, true_values[i], order);
+        }
+  }
+
+
   void testMonomialQuadrature ()
   {
     LOG_UNIT_TEST;
 
     ElemType elem_type[2] = {QUAD4, HEX8};
-    int dims[2]           = {2, 3};
+    const std::function<Real(int,int,int)> true_values[2] =
+      {quad_integrals, hex_integrals};
 
     for (int i=0; i<(LIBMESH_DIM-1); ++i)
-      {
-        // std::cout << "\nChecking monomial quadrature on element type " << elem_type[i] << std::endl;
-
-        for (int order=0; order<7; ++order)
-          {
-            std::unique_ptr<QBase> qrule = QBase::build(QMONOMIAL,
-                                                        dims[i],
-                                                        static_cast<Order>(order));
-            qrule->init(elem_type[i]);
-
-            // In 3D, max(z_power)==order, in 2D max(z_power)==0
-            int max_z_power = dims[i]==2 ? 0 : order;
-
-            int xyz_power[3];
-            for (xyz_power[0]=0; xyz_power[0]<=order; ++xyz_power[0])
-              for (xyz_power[1]=0; xyz_power[1]<=order; ++xyz_power[1])
-                for (xyz_power[2]=0; xyz_power[2]<=max_z_power; ++xyz_power[2])
-                  {
-                    // Only try to integrate polynomials we can integrate exactly
-                    if (xyz_power[0] + xyz_power[1] + xyz_power[2] > order)
-                      continue;
-
-                    // Compute the integral via quadrature.  Note that
-                    // std::pow(0,0) returns 1 in the 2D case.
-                    Real sumq = 0.;
-                    for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-                      {
-                        Real term = qrule->w(qp);
-                        for (unsigned int d=0; d != LIBMESH_DIM; ++d)
-                          term *= std::pow(qrule->qp(qp)(d), xyz_power[d]);
-                        sumq += term;
-                      }
-
-                    // std::cout << "Quadrature of x^" << xyz_power[0]
-                    //           << " y^" << xyz_power[1]
-                    //           << " z^" << xyz_power[2]
-                    //           << " = " << sumq << std::endl;
-
-                    // Copy-pasted code from test3DWeights()
-                    Real exact_x = (xyz_power[0] % 2) ? 0 : (Real(2.0) / (xyz_power[0]+1));
-                    Real exact_y = (xyz_power[1] % 2) ? 0 : (Real(2.0) / (xyz_power[1]+1));
-                    Real exact_z = (xyz_power[2] % 2) ? 0 : (Real(2.0) / (xyz_power[2]+1));
-
-                    // Handle 2D
-                    if (dims[i]==2)
-                      exact_z = 1.0;
-
-                    Real exact = exact_x*exact_y*exact_z;
-
-                    // Make sure that the quadrature solution matches the exact solution
-                    LIBMESH_ASSERT_REALS_EQUAL(exact, sumq, quadrature_tolerance);
-                  }
-          } // end for (order)
-      } // end for (i)
+      for (int order=0; order<7; ++order)
+        testPolynomials(QMONOMIAL, order, elem_type[i], true_values[i], order);
   }
 
   void testTetQuadrature ()
@@ -250,43 +334,7 @@ public:
 
     for (int qt=0; qt<3; ++qt)
       for (int order=0; order<end_order; ++order)
-        {
-          auto true_value = [](int x_power, int y_power, int z_power) {
-            // Compute the true integral, a! b! c! / (a + b + c + 3)!
-            Real analytical = 1.0;
-
-            // Sort the a, b, c values
-            int sorted_powers[3] = {x_power, y_power, z_power};
-            std::sort(sorted_powers, sorted_powers+3);
-
-            // Cancel the largest power with the denominator, fill in the
-            // entries for the remaining numerator terms and the denominator.
-            std::vector<int>
-              numerator_1(sorted_powers[0] > 1 ? sorted_powers[0]-1 : 0),
-              numerator_2(sorted_powers[1] > 1 ? sorted_powers[1]-1 : 0),
-              denominator(3 + sorted_powers[0] + sorted_powers[1]);
-
-            // Fill up the vectors with sequences starting at the right values.
-            std::iota(numerator_1.begin(), numerator_1.end(), 2);
-            std::iota(numerator_2.begin(), numerator_2.end(), 2);
-            std::iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
-
-            // The denominator is guaranteed to have the most terms...
-            for (std::size_t i=0; i<denominator.size(); ++i)
-              {
-                if (i < numerator_1.size())
-                  analytical *= numerator_1[i];
-
-                if (i < numerator_2.size())
-                  analytical *= numerator_2[i];
-
-                analytical /= denominator[i];
-              }
-            return analytical;
-          };
-
-          testPolynomials(qtype[qt], order, TET4, true_value, order);
-        } // end for(order)
+        testPolynomials(qtype[qt], order, TET4, tet_integrals, order);
   }
 
   void testTriQuadrature ()
@@ -297,37 +345,7 @@ public:
 
     for (int qt=0; qt<4; ++qt)
       for (int order=0; order<10; ++order)
-        {
-          auto true_value = [](int x_power, int y_power, int) {
-            // Compute the true integral, a! b! / (a + b + 2)!
-            Real analytical = 1.0;
-
-            unsigned
-              larger_power = std::max(x_power, y_power),
-              smaller_power = std::min(x_power, y_power);
-
-            // Cancel the larger of the two numerator terms with the
-            // denominator, and fill in the remaining entries.
-            std::vector<unsigned>
-              numerator(smaller_power > 1 ? smaller_power-1 : 0),
-              denominator(2+smaller_power);
-
-            // Fill up the vectors with sequences starting at the right values.
-            std::iota(numerator.begin(), numerator.end(), 2);
-            std::iota(denominator.begin(), denominator.end(), larger_power+1);
-
-            // The denominator is guaranteed to have more terms...
-            for (std::size_t i=0; i<denominator.size(); ++i)
-              {
-                if (i < numerator.size())
-                  analytical *= numerator[i];
-                analytical /= denominator[i];
-              }
-            return analytical;
-          };
-
-          testPolynomials(qtype[qt], order, TRI3, true_value, order);
-        } // end for(order)
+        testPolynomials(qtype[qt], order, TRI3, tri_integrals, order);
   }
 
   void testJacobi ()
@@ -432,11 +450,7 @@ public:
   {
     LOG_UNIT_TEST;
 
-    auto true_value = [](int mode, int, int) {
-      return (mode % 2) ?  0 : (Real(2.0) / (mode+1));
-    };
-
-    testPolynomials(qtype, order, EDGE3, true_value, exactorder);
+    testPolynomials(qtype, order, EDGE3, edge_integrals, exactorder);
   }
 
 
@@ -448,22 +462,21 @@ public:
   {
     LOG_UNIT_TEST;
 
-    auto true_value = [](int modex, int modey, int) {
-      const Real exactx = (modex % 2) ?
-        0 : (Real(2.0) / (modex+1));
-
-      const Real exacty = (modey % 2) ?
-        0 : (Real(2.0) / (modey+1));
-
-      return exactx*exacty;
-    };
-
-    testPolynomials(qtype, order, QUAD8, true_value, exactorder);
+    testPolynomials(qtype, order, QUAD8, quad_integrals, exactorder);
 
     // We may eventually support Gauss-Lobatto type quadrature on triangles...
-    auto tri_value = [](int,int,int){ return 0.5; };
-    if (qtype != QGAUSS_LOBATTO)
-      testPolynomials(qtype, order, TRI6, tri_value, 0);
+    if (qtype == QGAUSS_LOBATTO)
+      return;
+
+    // QGrid needs to be changed to use symmetric offsets on triangles
+    // so it can at *least* get linears right...
+    if (qtype == QGRID)
+      testPolynomials(qtype, order, TRI6, tri_integrals, 0);
+    // QSimpson doesn't even get all quadratics on a triangle
+    else if (qtype == QSIMPSON)
+      testPolynomials(qtype, order, TRI6, tri_integrals, std::min(1u,exactorder));
+    else
+      testPolynomials(qtype, order, TRI6, tri_integrals, exactorder);
   }
 
 
@@ -475,28 +488,26 @@ public:
   {
     LOG_UNIT_TEST;
 
-    auto true_value = [](int modex, int modey, int modez) {
-      const Real exactx = (modex % 2) ?
-        0 : (Real(2.0) / (modex+1));
-
-      const Real exacty = (modey % 2) ?
-        0 : (Real(2.0) / (modey+1));
-
-      const Real exactz = (modez % 2) ?
-        0 : (Real(2.0) / (modez+1));
-
-      return exactx*exacty*exactz;
-    };
-
-    testPolynomials(qtype, order, HEX20, true_value, exactorder);
+    testPolynomials(qtype, order, HEX20, hex_integrals, exactorder);
 
     // We may eventually support Gauss-Lobatto type quadrature on tets and prisms...
-    auto tet_value = [](int,int,int){ return 1/Real(6); };
-    auto prism_value = [](int,int,int){ return Real(1); };
-    if (qtype != QGAUSS_LOBATTO)
+    if (qtype == QGAUSS_LOBATTO)
+      return;
+
+    // QGrid needs to be changed to use symmetric offsets on triangles
+    // so it can at *least* get linears right...
+    if (qtype == QGRID)
+      testPolynomials(qtype, order, TET10, tet_integrals, 0);
+    // QSimpson doesn't get all quadratics on a simplex or its extrusion
+    else if (qtype == QSIMPSON)
       {
-        testPolynomials(qtype, order, TET10, tet_value, 0);
-        testPolynomials(qtype, order, PRISM15, prism_value, 0);
+        testPolynomials(qtype, order, TET10, tet_integrals, std::min(1u,exactorder));
+        testPolynomials(qtype, order, PRISM15, prism_integrals, std::min(1u,exactorder));
+      }
+    else
+      {
+        testPolynomials(qtype, order, TET10, tet_integrals, exactorder);
+        testPolynomials(qtype, order, PRISM15, prism_integrals, exactorder);
       }
   }
 };
