@@ -85,20 +85,36 @@ public:
     LOG_UNIT_TEST;
 
     // A PRISM6 has four nodes on some sides and three nodes on others
-    const Elem & prism6 = ReferenceElem::get(PRISM6);
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4), prism6.local_side_node(/*side=*/4, /*node=*/1));
-    // Edges 3, 4, 5 are the "vertical" Prism edges.
-    for (unsigned int edge=3; edge<6; ++edge)
+    for (ElemType elem_type : {PRISM6, PRISM15, PRISM18, PRISM20, PRISM21})
       {
-        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(edge-3),
-                             prism6.local_edge_node(/*edge=*/edge, /*node=*/0));
-        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(edge),
-                             prism6.local_edge_node(/*edge=*/edge, /*node=*/1));
+        const Elem & prism = ReferenceElem::get(elem_type);
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4),
+                             prism.local_side_node(/*side=*/4, /*node=*/1));
+        // Edges 3, 4, 5 are the "vertical" Prism edges.
+        // Edges 0-2 and 6-8 are the "triangle" Prism edges.
+        // We orient edges by volume-node order for some reason, which
+        // makes some cases here weird.
+        for (unsigned int i=0; i!=3; ++i)
+          {
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i%2),
+                                 prism.local_edge_node(/*edge=*/i, /*node=*/0));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1+(i>0)),
+                                 prism.local_edge_node(/*edge=*/i, /*node=*/1));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i),
+                                 prism.local_edge_node(/*edge=*/i+3, /*node=*/0));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i+3),
+                                 prism.local_edge_node(/*edge=*/i+3, /*node=*/1));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i%2+3),
+                                 prism.local_edge_node(/*edge=*/i+6, /*node=*/0));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4+(i>0)),
+                                 prism.local_edge_node(/*edge=*/i+6, /*node=*/1));
+          }
       }
 
     // Test the libmesh_asserts when they are enabled and exceptions
     // are available. If exceptions aren't available, libmesh_assert
     // simply aborts, so we can't unit test in that case.
+    const Elem & prism6 = ReferenceElem::get(PRISM6);
 #if !defined(NDEBUG) && defined(LIBMESH_ENABLE_EXCEPTIONS)
     try
       {
@@ -124,17 +140,55 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(99), n);
 #endif
 
-    // Test the Prism15.
-    const Elem & prism15 = ReferenceElem::get(PRISM15);
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(3), prism15.local_side_node(/*side=*/1, /*node=*/3));
-    // Edges 3, 4, 5 are the "vertical" Prism edges.
-    for (unsigned int edge=3; edge<6; ++edge)
+    // Test the Prism15 midedge nodes.
+    for (ElemType elem_type : {PRISM15, PRISM18, PRISM20, PRISM21})
       {
-        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(edge-3),
-                             prism15.local_edge_node(/*edge=*/edge, /*node=*/0));
-        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(edge),
-                             prism15.local_edge_node(/*edge=*/edge, /*node=*/1));
+        const Elem & prism = ReferenceElem::get(elem_type);
+        for (unsigned int i=0; i!=3; ++i)
+          {
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i+6),
+                                 prism.local_edge_node(/*edge=*/i, /*node=*/2));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i+6),
+                                 prism.local_side_node(/*side=*/i+1, /*node=*/4));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(8-i), // "flipped" side
+                                 prism.local_side_node(/*side=*/0, /*node=*/i+3));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i+9),
+                                 prism.local_edge_node(/*edge=*/i+3, /*node=*/2));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i+9),
+                                 prism.local_side_node(/*side=*/i+1, /*node=*/7));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i+9),
+                                 prism.local_side_node(/*side=*/(i+2)%3+1, /*node=*/5));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i+12),
+                                 prism.local_edge_node(/*edge=*/i+6, /*node=*/2));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i+12),
+                                 prism.local_side_node(/*side=*/i+1, /*node=*/6));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(i+12),
+                                 prism.local_side_node(/*side=*/4, /*node=*/i+3));
+          }
       }
+
+    // Test the Prism18 face nodes.
+    for (ElemType elem_type : {PRISM18, PRISM20, PRISM21})
+      {
+        const Elem & prism = ReferenceElem::get(elem_type);
+        // Faces 1, 2, 3 are the "vertical" Prism sides
+        for (unsigned int side=1; side<4; ++side)
+          {
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(side+14),
+                                 prism.local_side_node(/*side=*/side, /*node=*/8));
+          }
+      }
+
+    // Test the Prism20 face nodes.
+    for (ElemType elem_type : {PRISM20, PRISM21})
+      {
+        const Elem & prism = ReferenceElem::get(elem_type);
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(18),
+                             prism.local_side_node(/*side=*/0, /*node=*/6));
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(19),
+                             prism.local_side_node(/*side=*/4, /*node=*/6));
+      }
+
   }
 
 
