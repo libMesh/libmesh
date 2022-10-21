@@ -270,6 +270,17 @@ private:
     return exactz * tri_integrals(modex, modey, 0);
   };
 
+  const std::function<Real(int,int,int)> pyramid_integrals =
+  [this](int modex, int modey, int modez) {
+
+    const int binom = Utility::binomial(modex+modey+modez+3, modez);
+
+    if (modex%2 || modey%2)
+      return Real(0);
+
+    return Real(4)/((modex+1)*(modey+1)*binom*(modex+modey+modez+3));
+  };
+
 
 public:
   void setUp ()
@@ -329,13 +340,18 @@ public:
   {
     LOG_UNIT_TEST;
 
-    ElemType elem_type[2] = {QUAD4, HEX8};
-    const std::function<Real(int,int,int)> true_values[2] =
-      {quad_integrals, hex_integrals};
+    const std::vector<std::vector<ElemType>> all_types =
+      {{EDGE2}, {QUAD4, TRI3}, {HEX8, TET4, PRISM6, PYRAMID5}};
+    const std::vector<std::vector<std::function<Real(int,int,int)>>>
+      true_values =
+      {{edge_integrals},
+       {quad_integrals, tri_integrals},
+       {hex_integrals, tet_integrals, prism_integrals, pyramid_integrals}};
 
-    for (int i=0; i<(LIBMESH_DIM-1); ++i)
-      for (int order=0; order<7; ++order)
-        testPolynomials(QMONOMIAL, order, elem_type[i], true_values[i], order);
+    for (auto i : index_range(all_types))
+      for (auto j : index_range(all_types[i]))
+        for (int order=0; order<7; ++order)
+          testPolynomials(QMONOMIAL, order, all_types[i][j], true_values[i][j], order);
   }
 
   void testTetQuadrature ()
