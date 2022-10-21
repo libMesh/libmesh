@@ -299,10 +299,8 @@ public:
        {QUAD4, QUAD8, QUAD9},
        {TET4, TET10, TET14},
        {HEX8, HEX20, HEX27},
-       {PRISM6, PRISM15, PRISM18, PRISM20, PRISM21}};
-
-    // We don't cover these at all yet?
-//       {PYRAMID5, PYRAMID13, PYRAMID14}};
+       {PRISM6, PRISM15, PRISM18, PRISM20, PRISM21},
+       {PYRAMID5, PYRAMID13, PYRAMID14}};
 
     const std::function<Real(int,int,int)> true_values[] =
       {edge_integrals,
@@ -310,7 +308,8 @@ public:
        quad_integrals,
        tet_integrals,
        hex_integrals,
-       prism_integrals};
+       prism_integrals,
+       pyramid_integrals};
 
     for (auto i : index_range(all_types))
       for (ElemType elem_type : all_types[i])
@@ -327,6 +326,7 @@ public:
           if (elem_type == TRI6 || elem_type == QUAD8 ||
               elem_type == TET10 || elem_type == HEX20 ||
               elem_type == PRISM15 || elem_type == PRISM18 ||
+              elem_type == PYRAMID13 || elem_type == PYRAMID14 ||
           // And some partially-cubic elements can only do quadratics
               elem_type == TET14 || elem_type == PRISM20)
             exactorder--;
