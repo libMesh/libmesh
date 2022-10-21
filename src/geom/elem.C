@@ -49,6 +49,8 @@
 #include "libmesh/cell_prism6.h"
 #include "libmesh/cell_prism15.h"
 #include "libmesh/cell_prism18.h"
+#include "libmesh/cell_prism20.h"
+#include "libmesh/cell_prism21.h"
 #include "libmesh/cell_inf_prism6.h"
 #include "libmesh/cell_inf_prism12.h"
 #include "libmesh/cell_pyramid5.h"
@@ -147,6 +149,7 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     7,  // TRI7
     14, // TET14
     20, // PRISM20
+    21, // PRISM21
     18, // PYRAMID18
   };
 
@@ -202,6 +205,7 @@ const unsigned int Elem::type_to_n_sides_map [] =
     3,  // TRI7
     4,  // TET14
     5,  // PRISM20
+    5,  // PRISM21
     5,  // PYRAMID18
   };
 
@@ -257,6 +261,7 @@ const unsigned int Elem::type_to_n_edges_map [] =
     3,  // TRI7
     6,  // TET14
     9,  // PRISM20
+    9,  // PRISM21
     8,  // PYRAMID18
   };
 
@@ -320,6 +325,10 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
       return std::make_unique<Prism15>(p);
     case PRISM18:
       return std::make_unique<Prism18>(p);
+    case PRISM20:
+      return std::make_unique<Prism20>(p);
+    case PRISM21:
+      return std::make_unique<Prism21>(p);
     case PYRAMID5:
       return std::make_unique<Pyramid5>(p);
     case PYRAMID13:
@@ -2628,6 +2637,8 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
     case PRISM6:
     case PRISM15:
     case PRISM18:
+    case PRISM20:
+    case PRISM21:
       return PRISM6;
     case PYRAMID5:
     case PYRAMID13:
@@ -2752,11 +2763,13 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
           return PRISM15;
       }
 
+    // full_ordered not relevant, already fully second order
     case PRISM18:
-      {
-        // full_ordered not relevant
-        return PRISM18;
-      }
+      return PRISM18;
+    case PRISM20:
+      return PRISM20;
+    case PRISM21:
+      return PRISM21;
 
     case PYRAMID5:
     case PYRAMID13:

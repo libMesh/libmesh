@@ -10,6 +10,8 @@
 #include <libmesh/cell_inf_prism6.h>
 #include <libmesh/cell_prism15.h>
 #include <libmesh/cell_prism18.h>
+#include <libmesh/cell_prism20.h>
+#include <libmesh/cell_prism21.h>
 #include <libmesh/cell_prism6.h>
 #include <libmesh/cell_pyramid13.h>
 #include <libmesh/cell_pyramid14.h>
@@ -223,6 +225,12 @@ INSTANTIATE_SIDETEST(Prism15,   TRI6,  4, 5);
 INSTANTIATE_SIDETEST(Prism18,   TRI6,  0, 1);
 INSTANTIATE_SIDETEST(Prism18,   QUAD9, 1, 4);
 INSTANTIATE_SIDETEST(Prism18,   TRI6,  4, 5);
+INSTANTIATE_SIDETEST(Prism20,   TRI7,  0, 1);
+INSTANTIATE_SIDETEST(Prism20,   QUAD9, 1, 4);
+INSTANTIATE_SIDETEST(Prism20,   TRI7,  4, 5);
+INSTANTIATE_SIDETEST(Prism21,   TRI7,  0, 1);
+INSTANTIATE_SIDETEST(Prism21,   QUAD9, 1, 4);
+INSTANTIATE_SIDETEST(Prism21,   TRI7,  4, 5);
 INSTANTIATE_SIDETEST(Prism6,    TRI3,  0, 1);
 INSTANTIATE_SIDETEST(Prism6,    QUAD4, 1, 4);
 INSTANTIATE_SIDETEST(Prism6,    TRI3,  4, 5);

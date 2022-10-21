@@ -66,8 +66,9 @@ const std::vector<int> trishell3_inverse_edge_map = {3, 4, 5};
 const std::vector<int> quadshell4_inverse_edge_map = {3, 4, 5, 6};
 
 // 3D node map definitions
-// The hex27 and tet14 appear to be the only elements without an
-// identity mapping between Exodus' node numbering and libmesh's.
+// The hex27, prism20-21, and tet14 appear to be the only elements
+// with a non-identity mapping between Exodus' node numbering and
+// libmesh's.  Exodus doesn't even number prisms hierarchically!
 const std::vector<int> hex27_node_map = {
   // Vertex and mid-edge nodes
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -81,6 +82,42 @@ const std::vector<int> hex27_inverse_node_map = {
   // Mid-face nodes and center node
   26, 20, 25, 24, 22, 21, 23};
 //20  21  22  23  24  25  26
+
+const std::vector<int> prism20_node_map = {
+  // Vertices
+  0, 1, 2, 3, 4, 5,
+  // Matching mid-edge nodes
+  6, 7, 8, 9, 10, 11, 12, 13, 14,
+  // Non-matching nodes
+  19, 17, 18, 15, 16};
+//15  16  17  18  19 // LibMesh indices
+
+const std::vector<int> prism20_inverse_node_map = {
+  // Vertices
+  0, 1, 2, 3, 4, 5,
+  // Matching mid-edge nodes
+  6, 7, 8, 9, 10, 11, 12, 13, 14,
+  // Non-matching nodes
+  18, 19, 16, 17, 15};
+//15  16  17  18  19
+
+const std::vector<int> prism21_node_map = {
+  // Vertices
+  0, 1, 2, 3, 4, 5,
+  // Matching mid-edge nodes
+  6, 7, 8, 9, 10, 11, 12, 13, 14,
+  // Non-matching nodes
+  20, 18, 19, 16, 17, 15};
+//15  16  17  18  19  20 // LibMesh indices
+
+const std::vector<int> prism21_inverse_node_map = {
+  // Vertices
+  0, 1, 2, 3, 4, 5,
+  // Matching mid-edge nodes
+  6, 7, 8, 9, 10, 11, 12, 13, 14,
+  // Non-matching nodes
+  20, 18, 19, 16, 17, 15};
+//15  16  17  18  19  20
 
 const std::vector<int> tet14_node_map = {
   // Vertex and mid-edge nodes
@@ -463,6 +500,28 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.exodus_type = "WEDGE18";
   }
   {
+    auto & conv = conversion_map[PRISM20];
+    conv.node_map = &prism20_node_map;
+    conv.inverse_node_map = &prism20_inverse_node_map;
+    conv.side_map = &prism_face_map;
+    conv.inverse_side_map = &prism_inverse_face_map;
+    conv.libmesh_type = PRISM20;
+    conv.dim = 3;
+    conv.n_nodes = 20;
+    conv.exodus_type = "WEDGE20";
+  }
+  {
+    auto & conv = conversion_map[PRISM21];
+    conv.node_map = &prism21_node_map;
+    conv.inverse_node_map = &prism21_inverse_node_map;
+    conv.side_map = &prism_face_map;
+    conv.inverse_side_map = &prism_inverse_face_map;
+    conv.libmesh_type = PRISM21;
+    conv.dim = 3;
+    conv.n_nodes = 21;
+    conv.exodus_type = "WEDGE21";
+  }
+  {
     auto & conv = conversion_map[PYRAMID5];
     conv.libmesh_type = PYRAMID5;
     conv.dim = 3;
@@ -586,6 +645,12 @@ void ExodusII_IO_Helper::init_element_equivalence_map()
   element_equivalence_map["WEDGE18"] = PRISM18;
   // This only supports p==2 IGA:
   element_equivalence_map["BEX_WEDGE"] = PRISM18;
+
+  // PRISM20 equivalences
+  element_equivalence_map["WEDGE20"] = PRISM20;
+
+  // PRISM21 equivalences
+  element_equivalence_map["WEDGE21"] = PRISM21;
 
   // PYRAMID5 equivalences
   element_equivalence_map["PYRAMID"]  = PYRAMID5;

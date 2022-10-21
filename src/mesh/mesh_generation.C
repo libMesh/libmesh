@@ -36,6 +36,8 @@
 #include "libmesh/cell_prism6.h"
 #include "libmesh/cell_prism15.h"
 #include "libmesh/cell_prism18.h"
+#include "libmesh/cell_prism20.h"
+#include "libmesh/cell_prism21.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/cell_pyramid5.h"
 #include "libmesh/libmesh_logging.h"
@@ -134,6 +136,8 @@ unsigned int idx(const ElemType type,
     case PYRAMID14:
     case PRISM15:
     case PRISM18:
+    case PRISM20:
+    case PRISM21:
       {
         return i + (2*nx+1)*(j + k*(2*ny+1));
       }
@@ -964,6 +968,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case PRISM6:
           case PRISM15:
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
             {
               mesh.reserve_elem(2*nx*ny*nz);
               break;
@@ -1011,6 +1017,20 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               mesh.reserve_nodes( (2*nx+1)*(2*ny+1)*(2*nz+1) +
                                   24*nx*ny*nz +
                                   4*(nx*ny + ny*nz + nx*nz) );
+              break;
+            }
+
+          case PRISM20:
+            {
+              mesh.reserve_nodes( (2*nx+1)*(2*ny+1)*(2*nz+1) +
+                                  2*nx*ny*(nz+1) );
+              break;
+            }
+
+          case PRISM21:
+            {
+              mesh.reserve_nodes( (2*nx+1)*(2*ny+1)*(2*nz+1) +
+                                  2*nx*ny*(2*nz+1) );
               break;
             }
 
@@ -1065,6 +1085,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case PYRAMID14:
           case PRISM15:
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
             {
               for (unsigned int k=0; k<=(2*nz); k++)
                 for (unsigned int j=0; j<=(2*ny); j++)
@@ -1088,6 +1110,36 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                     if (i == 2*nx)
                       boundary_info.add_node(node, 2);
                   }
+
+              if (type == PRISM20 ||
+                  type == PRISM21)
+                {
+                  const unsigned int kmax = (type == PRISM20) ? nz : 2*nz;
+                  for (unsigned int k=0; k<=kmax; k++)
+                    for (unsigned int j=0; j<ny; j++)
+                      for (unsigned int i=0; i<nx; i++)
+                        {
+                          const Node * const node1 =
+                              mesh.add_point(Point((static_cast<Real>(i)+1/Real(3)) / static_cast<Real>(nx),
+                                                   (static_cast<Real>(j)+1/Real(3)) / static_cast<Real>(ny),
+                                                   static_cast<Real>(k) / static_cast<Real>(kmax)),
+                                             node_id++);
+                          if (k == 0)
+                            boundary_info.add_node(node1, 0);
+                          if (k == kmax)
+                            boundary_info.add_node(node1, 5);
+
+                          const Node * const node2 =
+                              mesh.add_point(Point((static_cast<Real>(i)+2/Real(3)) / static_cast<Real>(nx),
+                                                   (static_cast<Real>(j)+2/Real(3)) / static_cast<Real>(ny),
+                                                   static_cast<Real>(k) / static_cast<Real>(kmax)),
+                                             node_id++);
+                          if (k == 0)
+                            boundary_info.add_node(node2, 0);
+                          if (k == kmax)
+                            boundary_info.add_node(node2, 5);
+                        }
+                }
 
               break;
             }
@@ -1278,6 +1330,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
           case PRISM15:
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
             {
               for (unsigned int k=0; k<(2*nz); k += 2)
                 for (unsigned int j=0; j<(2*ny); j += 2)
@@ -1301,11 +1355,28 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                       elem->set_node(13) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+2));
                       elem->set_node(14) = mesh.node_ptr(idx(type,nx,ny,i,  j+1,k+2));
 
-                      if (type == PRISM18)
+                      if (type == PRISM18 ||
+                          type == PRISM20 ||
+                          type == PRISM21)
                         {
                           elem->set_node(15) = mesh.node_ptr(idx(type,nx,ny,i+1,j,  k+1));
                           elem->set_node(16) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1));
                           elem->set_node(17) = mesh.node_ptr(idx(type,nx,ny,i,  j+1,k+1));
+                        }
+
+                      if (type == PRISM20)
+                        {
+                          const dof_id_type base_idx = (2*nx+1)*(2*ny+1)*(2*nz+1);
+                          elem->set_node(18) = mesh.node_ptr(base_idx+((k/2)*(nx*ny)+j/2*nx+i/2)*2);
+                          elem->set_node(19) = mesh.node_ptr(base_idx+(((k/2)+1)*(nx*ny)+j/2*nx+i/2)*2);
+                        }
+
+                      if (type == PRISM21)
+                        {
+                          const dof_id_type base_idx = (2*nx+1)*(2*ny+1)*(2*nz+1);
+                          elem->set_node(18) = mesh.node_ptr(base_idx+(k*(nx*ny)+j/2*nx+i/2)*2);
+                          elem->set_node(19) = mesh.node_ptr(base_idx+((k+2)*(nx*ny)+j/2*nx+i/2)*2);
+                          elem->set_node(20) = mesh.node_ptr(base_idx+((k+1)*(nx*ny)+j/2*nx+i/2)*2);
                         }
 
                       // Add sides for first prism to boundary info object
@@ -1340,11 +1411,28 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                       elem->set_node(13) = mesh.node_ptr(idx(type,nx,ny,i+1,j+2,k+2));
                       elem->set_node(14) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+2));
 
-                      if (type == PRISM18)
+                      if (type == PRISM18 ||
+                          type == PRISM20 ||
+                          type == PRISM21)
                         {
                           elem->set_node(15)  = mesh.node_ptr(idx(type,nx,ny,i+2,j+1,k+1));
                           elem->set_node(16)  = mesh.node_ptr(idx(type,nx,ny,i+1,j+2,k+1));
                           elem->set_node(17)  = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1));
+                        }
+
+                      if (type == PRISM20)
+                        {
+                          const dof_id_type base_idx = (2*nx+1)*(2*ny+1)*(2*nz+1);
+                          elem->set_node(18) = mesh.node_ptr(base_idx+((k/2)*(nx*ny)+j/2*nx+i/2)*2+1);
+                          elem->set_node(19) = mesh.node_ptr(base_idx+(((k/2)+1)*(nx*ny)+j/2*nx+i/2)*2+1);
+                        }
+
+                      if (type == PRISM21)
+                        {
+                          const dof_id_type base_idx = (2*nx+1)*(2*ny+1)*(2*nz+1);
+                          elem->set_node(18) = mesh.node_ptr(base_idx+(k*(nx*ny)+j/2*nx+i/2)*2+1);
+                          elem->set_node(19) = mesh.node_ptr(base_idx+((k+2)*(nx*ny)+j/2*nx+i/2)*2+1);
+                          elem->set_node(20) = mesh.node_ptr(base_idx+((k+1)*(nx*ny)+j/2*nx+i/2)*2+1);
                         }
 
                       // Add sides for second prism to boundary info object
@@ -2319,6 +2407,41 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                 new_elem->set_node(15) = mesh.node_ptr(elem->node_ptr(3)->id() + ((2*k+1) * orig_nodes));
                 new_elem->set_node(16) = mesh.node_ptr(elem->node_ptr(4)->id() + ((2*k+1) * orig_nodes));
                 new_elem->set_node(17) = mesh.node_ptr(elem->node_ptr(5)->id() + ((2*k+1) * orig_nodes));
+
+                if (elem->neighbor_ptr(0) == remote_elem)
+                  new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor_ptr(1) == remote_elem)
+                  new_elem->set_neighbor(2, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor_ptr(2) == remote_elem)
+                  new_elem->set_neighbor(3, const_cast<RemoteElem *>(remote_elem));
+
+                break;
+              }
+            case TRI7:
+              {
+                new_elem = Elem::build(PRISM21);
+                new_elem->set_node(0) = mesh.node_ptr(elem->node_ptr(0)->id() + (2*k * orig_nodes));
+                new_elem->set_node(1) = mesh.node_ptr(elem->node_ptr(1)->id() + (2*k * orig_nodes));
+                new_elem->set_node(2) = mesh.node_ptr(elem->node_ptr(2)->id() + (2*k * orig_nodes));
+                new_elem->set_node(3) = mesh.node_ptr(elem->node_ptr(0)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(4) = mesh.node_ptr(elem->node_ptr(1)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(5) = mesh.node_ptr(elem->node_ptr(2)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(6) = mesh.node_ptr(elem->node_ptr(3)->id() + (2*k * orig_nodes));
+                new_elem->set_node(7) = mesh.node_ptr(elem->node_ptr(4)->id() + (2*k * orig_nodes));
+                new_elem->set_node(8) = mesh.node_ptr(elem->node_ptr(5)->id() + (2*k * orig_nodes));
+                new_elem->set_node(9) = mesh.node_ptr(elem->node_ptr(0)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(10) = mesh.node_ptr(elem->node_ptr(1)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(11) = mesh.node_ptr(elem->node_ptr(2)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(12) = mesh.node_ptr(elem->node_ptr(3)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(13) = mesh.node_ptr(elem->node_ptr(4)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(14) = mesh.node_ptr(elem->node_ptr(5)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(15) = mesh.node_ptr(elem->node_ptr(3)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(16) = mesh.node_ptr(elem->node_ptr(4)->id() + ((2*k+1) * orig_nodes));
+                new_elem->set_node(17) = mesh.node_ptr(elem->node_ptr(5)->id() + ((2*k+1) * orig_nodes));
+
+                new_elem->set_node(18) = mesh.node_ptr(elem->node_ptr(6)->id() + (2*k * orig_nodes));
+                new_elem->set_node(19) = mesh.node_ptr(elem->node_ptr(6)->id() + ((2*k+2) * orig_nodes));
+                new_elem->set_node(20) = mesh.node_ptr(elem->node_ptr(6)->id() + ((2*k+1) * orig_nodes));
 
                 if (elem->neighbor_ptr(0) == remote_elem)
                   new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));

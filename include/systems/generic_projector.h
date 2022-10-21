@@ -2541,7 +2541,13 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
           // along the side.
           if (fe_type.family == LAGRANGE || fe_type.family == LAGRANGE_VEC)
             {
-              if (fe_type.order > 1)
+              // If order==1 then we only have DoFs on vertices, so
+              // skip all this.
+              // If order>1 ... we might still have something tricky
+              // like order==2 PRISM20, where some side nodes have
+              // DoFs but others don't.  Gotta check.
+              if (fe_type.order > 1 &&
+                  side_node.n_comp(sys_num, var))
                 {
                   const processor_id_type pid =
                     side_node.processor_id();

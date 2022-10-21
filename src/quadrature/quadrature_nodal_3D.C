@@ -122,6 +122,82 @@ void QNodal::init_3D(const ElemType, unsigned int)
         return;
       }
 
+    case PRISM20:
+      {
+        _points =
+          {
+            Point(0.,0.,-1), Point(+1,0.,-1), Point(0.,+1,-1),
+            Point(0.,0.,+1), Point(+1,0.,+1), Point(0.,+1,+1),
+            Point(.5,0.,-1), Point(.5,.5,-1), Point(0.,.5,-1),
+            Point(0.,0.,0.), Point(+1,0.,0.), Point(0.,+1,0.),
+            Point(.5,0.,+1), Point(.5,.5,+1), Point(0.,.5,+1),
+            Point(.5,0.,0.), Point(.5,.5,0.), Point(0.,.5,0.),
+            Point(1/Real(3),1/Real(3),-1), Point(1/Real(3),1/Real(3),+1)
+          };
+
+        // Symmetry gives us identical weights on vertices, triangle
+        // edges, square edges, triangle faces, square faces; then we
+        // have the midnode.  Solving for weights which exactly
+        // integrate cubics and xi^2*zeta^2 would give a unique answer
+        // ... with wse=0 and wte<0.  See Quad8 in
+        // quadrature_nodal_2D.C for discussion of this problem.
+        //
+        // Dropping the xi^2 zeta^2 constraint gives us a rank-1 null
+        // space to play with ... but adding anything from that null
+        // space to push wte closer to positive just pushes wse
+        // negative.
+        //
+        // Dropping exact integration of xi^3 type terms gives us a
+        // rank-2 null space.  I just found the max(min(weight)) from
+        // that solution space using Octave.  Someone who cares more
+        // than me might want to repeat this exercise with better than
+        // double precision...
+
+        constexpr Real wv = 8.546754839782711e-03;
+        constexpr Real wte = 8.548403936750599e-03;
+        constexpr Real wse = wv; // here's our min(weight) constraint...
+        constexpr Real wtf = 1.153811903370667e-01;
+        constexpr Real wsf = 2.136754673824396e-01;
+
+        _weights = {wv, wv, wv, wv, wv, wv,
+                    wte, wte, wte, wse, wse, wse, wte, wte, wte,
+                    wsf, wsf, wsf, wtf, wtf};
+
+        return;
+      }
+
+    case PRISM21:
+      {
+        _points =
+          {
+            Point(0.,0.,-1), Point(+1,0.,-1), Point(0.,+1,-1),
+            Point(0.,0.,+1), Point(+1,0.,+1), Point(0.,+1,+1),
+            Point(.5,0.,-1), Point(.5,.5,-1), Point(0.,.5,-1),
+            Point(0.,0.,0.), Point(+1,0.,0.), Point(0.,+1,0.),
+            Point(.5,0.,+1), Point(.5,.5,+1), Point(0.,.5,+1),
+            Point(.5,0.,0.), Point(.5,.5,0.), Point(0.,.5,0.),
+            Point(1/Real(3),1/Real(3),-1), Point(1/Real(3),1/Real(3),+1),
+            Point(1/Real(3),1/Real(3),0.)
+          };
+
+        // Symmetry gives us identical weights on vertices, triangle
+        // edges, square edges, triangle faces, square faces; then we
+        // have the midnode.  Solving for weights which exactly
+        // integrate cubics, xi^2*zeta^2, and xi^3*zeta^2, gives a
+        // unique answer:
+        constexpr Real wv = Real(1)/120;
+        constexpr Real wte = Real(1)/45;
+        constexpr Real wse = Real(1)/30;
+        constexpr Real wtf = Real(3)/40;
+        constexpr Real wsf = Real(4)/45;
+
+        _weights = {wv, wv, wv, wv, wv, wv,
+                    wte, wte, wte, wse, wse, wse, wte, wte, wte,
+                    wsf, wsf, wsf, wtf, wtf, Real(3)/10};
+
+        return;
+      }
+
     case TET14:
       {
         _points.resize(14);

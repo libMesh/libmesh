@@ -279,6 +279,12 @@ public:
             CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 20), elem->center_node_on_side(s));
           else if (elem->type() == PRISM18 && s >= 1 && s <= 3)
             CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 14), elem->center_node_on_side(s));
+          else if ((elem->type() == PRISM20 ||
+                    elem->type() == PRISM21) && s >= 1 && s <= 3)
+            CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 14), elem->center_node_on_side(s));
+          else if (elem->type() == PRISM20 ||
+                   elem->type() == PRISM21)
+            CPPUNIT_ASSERT_EQUAL((unsigned int)(18 + (s == 4)), elem->center_node_on_side(s));
           else if (elem->type() == PYRAMID14 && s == 4)
             CPPUNIT_ASSERT_EQUAL((unsigned int)(13), elem->center_node_on_side(s));
           else
@@ -375,6 +381,8 @@ INSTANTIATE_ELEMTEST(HEX27);
 INSTANTIATE_ELEMTEST(PRISM6);
 INSTANTIATE_ELEMTEST(PRISM15);
 INSTANTIATE_ELEMTEST(PRISM18);
+INSTANTIATE_ELEMTEST(PRISM20);
+INSTANTIATE_ELEMTEST(PRISM21);
 
 INSTANTIATE_ELEMTEST(PYRAMID5);
 INSTANTIATE_ELEMTEST(PYRAMID13);

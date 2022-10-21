@@ -253,7 +253,8 @@ Gradient rational_test_grad (const Point& p,
 
 #define FE_CAN_TEST_CUBIC \
   (((family != LAGRANGE && family != L2_LAGRANGE) || \
-    (elem_type != TRI7 && elem_type != TET14)) && order > 2)
+    (elem_type != TRI7 && elem_type != TET14 && \
+     elem_type != PRISM20 && elem_type != PRISM21)) && order > 2)
 
 
 template <Order order, FEFamily family, ElemType elem_type, unsigned int build_nx>

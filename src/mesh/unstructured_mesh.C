@@ -1629,6 +1629,8 @@ void UnstructuredMesh::all_complete_order ()
       // if it doesn't need mid-face elements added, continue
       if (lo_elem->type() != TRI7 &&
           lo_elem->type() != TET14 &&
+          lo_elem->type() != PRISM20 &&
+          lo_elem->type() != PRISM21 &&
           lo_elem->default_order() != FIRST)
         continue;
 
@@ -1644,6 +1646,10 @@ void UnstructuredMesh::all_complete_order ()
       ElemType hi_type = TRI7;
       if (lo_elem->type() == TET10 || lo_elem->type() == TET4)
         hi_type = TET14;
+      else if (lo_elem->type() == PRISM18 ||
+               lo_elem->type() == PRISM15 ||
+               lo_elem->type() == PRISM6)
+        hi_type = PRISM21;
       else
         libmesh_assert(lo_elem->type() == TRI6 || lo_elem->type() == TRI3);
 

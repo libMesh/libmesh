@@ -34,6 +34,8 @@ public:
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testAllTriPrism6 );
   CPPUNIT_TEST( testAllTriPrism18 );
+  CPPUNIT_TEST( testAllTriPrism20 );
+  CPPUNIT_TEST( testAllTriPrism21 );
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -105,11 +107,11 @@ public:
   // 2 QUAD9s split into 4 TRIs.
   void testAllTriQuad9() { LOG_UNIT_TEST; test_helper_2D(QUAD9, /*nelem=*/4, /*nbcs=*/6); }
 
-  // 2 PRISM6s split into 6 TETs with 2 boundary faces per side.
+  // 2 PRISMs split into 6 TETs with 2 boundary faces per side.
   void testAllTriPrism6() { LOG_UNIT_TEST; test_helper_3D(PRISM6, /*nelem=*/6, /*nbcs=*/12); }
-
-  // 2 PRISM6s split into 6 TETs with 2 boundary faces per side.
   void testAllTriPrism18() { LOG_UNIT_TEST; test_helper_3D(PRISM18, /*nelem=*/6, /*nbcs=*/12); }
+  void testAllTriPrism20() { LOG_UNIT_TEST; test_helper_3D(PRISM20, /*nelem=*/6, /*nbcs=*/12); }
+  void testAllTriPrism21() { LOG_UNIT_TEST; test_helper_3D(PRISM21, /*nelem=*/6, /*nbcs=*/12); }
 };
 
 

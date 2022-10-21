@@ -410,6 +410,8 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
 
     case PRISM6:
     case PRISM18:
+    case PRISM20:
+    case PRISM21:
       {
         // None yet
         break;

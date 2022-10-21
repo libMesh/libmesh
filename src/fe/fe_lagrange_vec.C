@@ -394,15 +394,55 @@ void lagrange_vec_nodal_soln(const Elem * elem,
             }
 
 
-          case PRISM15:
+          case PRISM21:
+            libmesh_assert_equal_to (nodal_soln.size(), 3*21);
+
+            // node 20 components
+            nodal_soln[60]  = (elem_soln[27] + elem_soln[30] + elem_soln[33])/Real(3);
+            nodal_soln[61]  = (elem_soln[28] + elem_soln[31] + elem_soln[34])/Real(3);
+            nodal_soln[62]  = (elem_soln[29] + elem_soln[32] + elem_soln[35])/Real(3);
+            libmesh_fallthrough();
+          case PRISM20:
+            if (type == PRISM20)
+              libmesh_assert_equal_to (nodal_soln.size(), 3*20);
+
+            // node 18 components
+            nodal_soln[54]  = (elem_soln[0] + elem_soln[3] + elem_soln[6])/Real(3);
+            nodal_soln[55]  = (elem_soln[1] + elem_soln[4] + elem_soln[7])/Real(3);
+            nodal_soln[56]  = (elem_soln[2] + elem_soln[5] + elem_soln[8])/Real(3);
+
+            // node 19 components
+            nodal_soln[57]  = (elem_soln[9] + elem_soln[12] + elem_soln[15])/Real(3);
+            nodal_soln[58]  = (elem_soln[10] + elem_soln[13] + elem_soln[16])/Real(3);
+            nodal_soln[59]  = (elem_soln[11] + elem_soln[14] + elem_soln[17])/Real(3);
+
+            libmesh_fallthrough();
           case PRISM18:
+            if (type == PRISM18)
+              libmesh_assert_equal_to (nodal_soln.size(), 3*18);
+
+            // node 15 components
+            nodal_soln[45]  = .25*(elem_soln[0] + elem_soln[3] + elem_soln[12] + elem_soln[9]);
+            nodal_soln[46]  = .25*(elem_soln[1] + elem_soln[4] + elem_soln[13] + elem_soln[10]);
+            nodal_soln[47]  = .25*(elem_soln[2] + elem_soln[5] + elem_soln[14] + elem_soln[11]);
+
+            // node 16 components
+            nodal_soln[48]  = .25*(elem_soln[3] + elem_soln[6] + elem_soln[15] + elem_soln[12]);
+            nodal_soln[49]  = .25*(elem_soln[4] + elem_soln[7] + elem_soln[16] + elem_soln[13]);
+            nodal_soln[50]  = .25*(elem_soln[5] + elem_soln[8] + elem_soln[17] + elem_soln[14]);
+
+            // node 17 components
+            nodal_soln[51]  = .25*(elem_soln[6] + elem_soln[0] + elem_soln[9]  + elem_soln[15]);
+            nodal_soln[52]  = .25*(elem_soln[7] + elem_soln[1] + elem_soln[10] + elem_soln[16]);
+            nodal_soln[53]  = .25*(elem_soln[8] + elem_soln[2] + elem_soln[11] + elem_soln[17]);
+
+            libmesh_fallthrough();
+          case PRISM15:
             {
               libmesh_assert_equal_to (elem_soln.size(), 3*6);
 
               if (type == PRISM15)
                 libmesh_assert_equal_to (nodal_soln.size(), 3*15);
-              else
-                libmesh_assert_equal_to (nodal_soln.size(), 3*18);
 
               // node 0 components
               nodal_soln[0]  = elem_soln[0];
@@ -478,24 +518,6 @@ void lagrange_vec_nodal_soln(const Elem * elem,
               nodal_soln[42]  = .5*(elem_soln[12] + elem_soln[15]);
               nodal_soln[43]  = .5*(elem_soln[13] + elem_soln[16]);
               nodal_soln[44]  = .5*(elem_soln[14] + elem_soln[17]);
-
-              if (type == PRISM18)
-                {
-                  // node 15 components
-                  nodal_soln[45]  = .25*(elem_soln[0] + elem_soln[3] + elem_soln[12] + elem_soln[9]);
-                  nodal_soln[46]  = .25*(elem_soln[1] + elem_soln[4] + elem_soln[13] + elem_soln[10]);
-                  nodal_soln[47]  = .25*(elem_soln[2] + elem_soln[5] + elem_soln[14] + elem_soln[11]);
-
-                  // node 16 components
-                  nodal_soln[48]  = .25*(elem_soln[3] + elem_soln[6] + elem_soln[15] + elem_soln[12]);
-                  nodal_soln[49]  = .25*(elem_soln[4] + elem_soln[7] + elem_soln[16] + elem_soln[13]);
-                  nodal_soln[50]  = .25*(elem_soln[5] + elem_soln[8] + elem_soln[17] + elem_soln[14]);
-
-                  // node 17 components
-                  nodal_soln[51]  = .25*(elem_soln[6] + elem_soln[0] + elem_soln[9]  + elem_soln[15]);
-                  nodal_soln[52]  = .25*(elem_soln[7] + elem_soln[1] + elem_soln[10] + elem_soln[16]);
-                  nodal_soln[53]  = .25*(elem_soln[8] + elem_soln[2] + elem_soln[11] + elem_soln[17]);
-                }
 
               return;
             }

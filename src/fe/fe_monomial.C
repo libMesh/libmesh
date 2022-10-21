@@ -72,6 +72,8 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PRISM6:
           case PRISM15:
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
           case PYRAMID5:
           case PYRAMID13:
           case PYRAMID14:
@@ -120,6 +122,8 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PRISM6:
           case PRISM15:
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
           case PYRAMID5:
           case PYRAMID13:
           case PYRAMID14:
@@ -168,6 +172,8 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PRISM6:
           case PRISM15:
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
           case PYRAMID5:
           case PYRAMID13:
           case PYRAMID14:
@@ -215,6 +221,8 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PRISM6:
           case PRISM15:
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
           case PYRAMID5:
           case PYRAMID13:
           case PYRAMID14:
@@ -261,6 +269,8 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PRISM6:
           case PRISM15:
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
           case PYRAMID5:
           case PYRAMID13:
           case PYRAMID14:

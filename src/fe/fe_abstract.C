@@ -457,6 +457,17 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         nodes[7] = Point (-1.,1.,1.);
         return;
       }
+    case PRISM21:
+      {
+        nodes[20] = Point (1/Real(3),1/Real(3),0);
+        libmesh_fallthrough();
+      }
+    case PRISM20:
+      {
+        nodes[18] = Point (1/Real(3),1/Real(3),-1);
+        nodes[19] = Point (1/Real(3),1/Real(3),1);
+        libmesh_fallthrough();
+      }
     case PRISM18:
       {
         nodes[15] = Point (.5,0.,0.);
@@ -645,6 +656,8 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
     case PRISM6:
     case PRISM15:
     case PRISM18:
+    case PRISM20:
+    case PRISM21:
       {
         // Figure this one out...
         // inside the reference triangle with zeta in [-1,1]

@@ -140,6 +140,7 @@ void init_elem_type_to_enum ()
       elem_type_to_enum["PRISM15"        ]=PRISM15;
       elem_type_to_enum["PRISM18"        ]=PRISM18;
       elem_type_to_enum["PRISM20"        ]=PRISM20;
+      elem_type_to_enum["PRISM21"        ]=PRISM21;
 
       elem_type_to_enum["PYRAMID"        ]=PYRAMID5;
       elem_type_to_enum["PYRAMID5"       ]=PYRAMID5;

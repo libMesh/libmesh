@@ -85,6 +85,8 @@ void QGrid::init_3D(const ElemType, unsigned int)
     case PRISM6:
     case PRISM15:
     case PRISM18:
+    case PRISM20:
+    case PRISM21:
       {
         // We compute the 3D quadrature rule as a tensor
         // product of the 1D quadrature rule and a 2D

@@ -130,6 +130,8 @@ nobase_data_DATA = \
         reference_elements/3D/one_prism.xda \
         reference_elements/3D/one_prism15.xda \
         reference_elements/3D/one_prism18.xda \
+        reference_elements/3D/one_prism20.xda \
+        reference_elements/3D/one_prism21.xda \
         reference_elements/3D/one_pyramid.xda \
         reference_elements/3D/one_pyramid13.xda \
         reference_elements/3D/one_pyramid14.xda \

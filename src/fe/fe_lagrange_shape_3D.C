@@ -389,6 +389,8 @@ Real fe_lagrange_3D_shape(const ElemType type,
           case PRISM6:
           case PRISM15:
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
             {
               libmesh_assert_less (i, 6);
 
@@ -684,6 +686,8 @@ Real fe_lagrange_3D_shape(const ElemType type,
                                "High order on first order elements only supported for L2 families");
             libmesh_fallthrough();
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
             {
               libmesh_assert_less (i, 18);
 
@@ -852,7 +856,57 @@ Real fe_lagrange_3D_shape(const ElemType type,
       {
         switch (type)
           {
-            // quadratic Lagrange shape functions with a cubic bubble
+            // quadratic Lagrange shape functions with cubic bubbles
+          case PRISM20:
+            {
+              libmesh_assert_less (i, 20);
+
+              // Compute Prism21 shape functions as a tensor-product
+              // of a triangle and an edge, then redistribute the
+              // central bubble function over the other Tri6 nodes
+              // around it (in a way consistent with the Tri7 shape
+              // function definitions).
+              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19
+              static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2, 0, 1};
+
+              Point p2d(p(0),p(1));
+              Real p1d = p(2);
+
+              const Real mainval = FE<3,LAGRANGE>::shape(PRISM21, THIRD, i, p);
+
+              if (i0[i] != 2)
+                return mainval;
+
+              const Real bubbleval =
+                FE<2,LAGRANGE>::shape(TRI7, THIRD, 6, p2d) *
+                fe_lagrange_1D_quadratic_shape(2, p1d);
+
+              if (i < 12) // vertices
+                return mainval - bubbleval / 9;
+
+              return mainval + bubbleval * (Real(4) / 9);
+            }
+
+            // quadratic Lagrange shape functions with cubic bubbles
+          case PRISM21:
+            {
+              libmesh_assert_less (i, 21);
+
+              // Compute prism shape functions as a tensor-product
+              // of a triangle and an edge
+
+              Point p2d(p(0),p(1));
+              Real p1d = p(2);
+
+              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+              static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2, 0, 1, 2};
+              static const unsigned int i1[] = {0, 1, 2, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 3, 4, 5, 6, 6, 6};
+
+              return (FE<2,LAGRANGE>::shape(TRI7, THIRD, i1[i], p2d)*
+                      fe_lagrange_1D_quadratic_shape(i0[i], p1d));
+            }
+
+            // quadratic Lagrange shape functions with cubic bubbles
           case TET14:
             {
               libmesh_assert_less (i, 14);
@@ -1092,6 +1146,8 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
           case PRISM6:
           case PRISM15:
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
             {
               libmesh_assert_less (i, 6);
 
@@ -1838,6 +1894,8 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
                                "High order on first order elements only supported for L2 families");
             libmesh_fallthrough();
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
             {
               libmesh_assert_less (i, 18);
 
@@ -2487,6 +2545,91 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
                 }
             }
 
+          case PRISM20:
+            {
+              libmesh_assert_less (i, 20);
+
+              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+              static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2, 0, 1, 2};
+
+              Point p2d(p(0),p(1));
+              Real p1d = p(2);
+
+              const Real mainval = FE<3,LAGRANGE>::shape_deriv(PRISM21, THIRD, i, j, p);
+
+              if (i0[i] != 2)
+                return mainval;
+
+              Real bubbleval = 0;
+
+              switch (j)
+                {
+                  // d()/dxi
+                case 0:
+                  bubbleval =
+                    FE<2,LAGRANGE>::shape_deriv(TRI7, THIRD, 6, 0, p2d)*
+                    fe_lagrange_1D_quadratic_shape(2, p1d);
+                  break;
+
+                  // d()/deta
+                case 1:
+                  bubbleval =
+                    FE<2,LAGRANGE>::shape_deriv(TRI7, THIRD, 6, 1, p2d)*
+                    fe_lagrange_1D_quadratic_shape(2, p1d);
+                  break;
+
+                  // d()/dzeta
+                case 2:
+                  bubbleval =
+                    FE<2,LAGRANGE>::shape(TRI7, THIRD, 6, p2d)*
+                    fe_lagrange_1D_quadratic_shape_deriv(2, 0, p1d);
+                  break;
+
+                default:
+                  libmesh_error_msg("Invalid shape function derivative j = " << j);
+                }
+
+              if (i < 12) // vertices
+                return mainval - bubbleval / 9;
+
+              return mainval + bubbleval * (Real(4) / 9);
+            }
+
+          case PRISM21:
+            {
+              libmesh_assert_less (i, 21);
+
+              // Compute prism shape functions as a tensor-product
+              // of a triangle and an edge
+
+              Point p2d(p(0),p(1));
+              Real p1d = p(2);
+
+              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+              static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2, 0, 1, 2};
+              static const unsigned int i1[] = {0, 1, 2, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 3, 4, 5, 6, 6, 6};
+
+              switch (j)
+                {
+                  // d()/dxi
+                case 0:
+                  return (FE<2,LAGRANGE>::shape_deriv(TRI7, THIRD, i1[i], 0, p2d)*
+                          fe_lagrange_1D_quadratic_shape(i0[i], p1d));
+
+                  // d()/deta
+                case 1:
+                  return (FE<2,LAGRANGE>::shape_deriv(TRI7, THIRD, i1[i], 1, p2d)*
+                          fe_lagrange_1D_quadratic_shape(i0[i], p1d));
+
+                  // d()/dzeta
+                case 2:
+                  return (FE<2,LAGRANGE>::shape(TRI7, THIRD, i1[i], p2d)*
+                          fe_lagrange_1D_quadratic_shape_deriv(i0[i], 0, p1d));
+
+                default:
+                  libmesh_error_msg("Invalid shape function derivative j = " << j);
+                }
+            }
           default:
             libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
           }
@@ -2539,6 +2682,8 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
           case PRISM6:
           case PRISM15:
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
             {
               libmesh_assert_less (i, 6);
 
@@ -3362,6 +3507,8 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
                                "High order on first order elements only supported for L2 families");
             libmesh_fallthrough();
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
             {
               libmesh_assert_less (i, 18);
 
@@ -4421,6 +4568,130 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
                 }
             }
 
+          case PRISM20:
+            {
+              libmesh_assert_less (i, 20);
+
+              // Compute prism shape functions as a tensor-product
+              // of a triangle and an edge
+
+              Point p2d(p(0),p(1));
+              Real p1d = p(2);
+
+              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19
+              static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2, 0, 1};
+
+              const Real mainval = FE<3,LAGRANGE>::shape_second_deriv(PRISM21, THIRD, i, j, p);
+
+              if (i0[i] != 2)
+                return mainval;
+
+              Real bubbleval = 0;
+
+              switch (j)
+                {
+                  // d^2()/dxi^2
+                case 0:
+                  bubbleval =
+                    FE<2,LAGRANGE>::shape_second_deriv(TRI7, THIRD, 6, 0, p2d)*
+                    fe_lagrange_1D_quadratic_shape(2, p1d);
+                  break;
+
+                  // d^2()/dxideta
+                case 1:
+                  bubbleval =
+                    FE<2,LAGRANGE>::shape_second_deriv(TRI7, THIRD, 6, 1, p2d)*
+                    fe_lagrange_1D_quadratic_shape(2, p1d);
+                  break;
+
+                  // d^2()/deta^2
+                case 2:
+                  bubbleval =
+                    FE<2,LAGRANGE>::shape_second_deriv(TRI7, THIRD, 6, 2, p2d)*
+                    fe_lagrange_1D_quadratic_shape(2, p1d);
+                  break;
+
+                  // d^2()/dxidzeta
+                case 3:
+                  bubbleval =
+                    FE<2,LAGRANGE>::shape_deriv(TRI7, THIRD, 6, 0, p2d)*
+                    fe_lagrange_1D_quadratic_shape_deriv(2, 0, p1d);
+                  break;
+
+                  // d^2()/detadzeta
+                case 4:
+                  bubbleval =
+                    FE<2,LAGRANGE>::shape_deriv(TRI7, THIRD, 6, 1, p2d)*
+                    fe_lagrange_1D_quadratic_shape_deriv(2, 0, p1d);
+                  break;
+
+                  // d^2()/dzeta^2
+                case 5:
+                  bubbleval =
+                    FE<2,LAGRANGE>::shape(TRI7, THIRD, 6, p2d)*
+                    fe_lagrange_1D_quadratic_shape_second_deriv(2, 0, p1d);
+                  break;
+
+                default:
+                  libmesh_error_msg("Invalid shape function derivative j = " << j);
+                }
+
+              if (i < 12) // vertices
+                return mainval - bubbleval / 9;
+
+              return mainval + bubbleval * (Real(4) / 9);
+            }
+
+          case PRISM21:
+            {
+              libmesh_assert_less (i, 21);
+
+              // Compute prism shape functions as a tensor-product
+              // of a triangle and an edge
+
+              Point p2d(p(0),p(1));
+              Real p1d = p(2);
+
+              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+              static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2, 0, 1, 2};
+              static const unsigned int i1[] = {0, 1, 2, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 3, 4, 5, 6, 6, 6};
+
+              switch (j)
+                {
+                  // d^2()/dxi^2
+                case 0:
+                  return (FE<2,LAGRANGE>::shape_second_deriv(TRI7, THIRD, i1[i], 0, p2d)*
+                          fe_lagrange_1D_quadratic_shape(i0[i], p1d));
+
+                  // d^2()/dxideta
+                case 1:
+                  return (FE<2,LAGRANGE>::shape_second_deriv(TRI7, THIRD, i1[i], 1, p2d)*
+                          fe_lagrange_1D_quadratic_shape(i0[i], p1d));
+
+                  // d^2()/deta^2
+                case 2:
+                  return (FE<2,LAGRANGE>::shape_second_deriv(TRI7, THIRD, i1[i], 2, p2d)*
+                          fe_lagrange_1D_quadratic_shape(i0[i], p1d));
+
+                  // d^2()/dxidzeta
+                case 3:
+                  return (FE<2,LAGRANGE>::shape_deriv(TRI7, THIRD, i1[i], 0, p2d)*
+                          fe_lagrange_1D_quadratic_shape_deriv(i0[i], 0, p1d));
+
+                  // d^2()/detadzeta
+                case 4:
+                  return (FE<2,LAGRANGE>::shape_deriv(TRI7, THIRD, i1[i], 1, p2d)*
+                          fe_lagrange_1D_quadratic_shape_deriv(i0[i], 0, p1d));
+
+                  // d^2()/dzeta^2
+                case 5:
+                  return (FE<2,LAGRANGE>::shape(TRI7, THIRD, i1[i], p2d)*
+                          fe_lagrange_1D_quadratic_shape_second_deriv(i0[i], 0, p1d));
+
+                default:
+                  libmesh_error_msg("Invalid shape function derivative j = " << j);
+                }
+            }
           default:
             libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
           }

@@ -209,15 +209,28 @@ void lagrange_nodal_soln(const Elem * elem,
             }
 
 
-          case PRISM15:
+          case PRISM21:
+            nodal_soln[20]  = (elem_soln[9] + elem_soln[10] + elem_soln[11])/Real(3);
+            libmesh_fallthrough();
+          case PRISM20:
+            if (type == PRISM20)
+              libmesh_assert_equal_to (nodal_soln.size(), 20);
+            nodal_soln[18]  = (elem_soln[0] + elem_soln[1] + elem_soln[2])/Real(3);
+            nodal_soln[19]  = (elem_soln[3] + elem_soln[4] + elem_soln[5])/Real(3);
+            libmesh_fallthrough();
           case PRISM18:
+            if (type == PRISM18)
+              libmesh_assert_equal_to (nodal_soln.size(), 18);
+            nodal_soln[15] = .25*(elem_soln[0] + elem_soln[1] + elem_soln[4] + elem_soln[3]);
+            nodal_soln[16] = .25*(elem_soln[1] + elem_soln[2] + elem_soln[5] + elem_soln[4]);
+            nodal_soln[17] = .25*(elem_soln[2] + elem_soln[0] + elem_soln[3] + elem_soln[5]);
+            libmesh_fallthrough();
+          case PRISM15:
             {
               libmesh_assert_equal_to (elem_soln.size(), 6);
 
               if (type == PRISM15)
                 libmesh_assert_equal_to (nodal_soln.size(), 15);
-              else
-                libmesh_assert_equal_to (nodal_soln.size(), 18);
 
               nodal_soln[0]  = elem_soln[0];
               nodal_soln[1]  = elem_soln[1];
@@ -234,13 +247,6 @@ void lagrange_nodal_soln(const Elem * elem,
               nodal_soln[12] = .5*(elem_soln[3] + elem_soln[4]);
               nodal_soln[13] = .5*(elem_soln[4] + elem_soln[5]);
               nodal_soln[14] = .5*(elem_soln[3] + elem_soln[5]);
-
-              if (type == PRISM18)
-                {
-                  nodal_soln[15] = .25*(elem_soln[0] + elem_soln[1] + elem_soln[4] + elem_soln[3]);
-                  nodal_soln[16] = .25*(elem_soln[1] + elem_soln[2] + elem_soln[5] + elem_soln[4]);
-                  nodal_soln[17] = .25*(elem_soln[2] + elem_soln[0] + elem_soln[3] + elem_soln[5]);
-                }
 
               return;
             }
@@ -435,6 +441,8 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
           case PRISM6:
           case PRISM15:
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
             return 6;
 
           case PYRAMID5:
@@ -487,6 +495,8 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
             return 15;
 
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
             return 18;
 
           case PYRAMID13:
@@ -512,6 +522,12 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
 
           case EDGE4:
             return 4;
+
+          case PRISM20:
+            return 20;
+
+          case PRISM21:
+            return 21;
 
           case TRI7:
             return 7;
@@ -644,6 +660,8 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
           case PRISM6:
           case PRISM15:
           case PRISM18:
+          case PRISM20:
+          case PRISM21:
             {
               switch (n)
                 {
@@ -707,6 +725,10 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
           case PYRAMID14:
             return 1;
 
+          case PRISM20:
+          case PRISM21:
+            return (n < 18);
+
           case TRI7:
             return (n < 6);
 
@@ -727,6 +749,8 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
           {
           case NODEELEM:
           case EDGE4:
+          case PRISM20:
+          case PRISM21:
           case TRI7:
           case TET14:
             return 1;

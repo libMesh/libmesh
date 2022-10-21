@@ -1,7 +1,8 @@
+#include <libmesh/elem.h>
+#include <libmesh/enum_quadrature_type.h>
 #include <libmesh/quadrature.h>
 #include <libmesh/string_to_enum.h>
 #include <libmesh/utility.h>
-#include <libmesh/enum_quadrature_type.h>
 
 #include <iomanip>
 #include <numeric> // std::iota
@@ -59,8 +60,8 @@ public:
   LIBMESH_CPPUNIT_TEST_SUITE( QuadratureTest );
 
   TEST_ALL_ORDERS(QGAUSS, 9999);
-  TEST_ONE_ORDER(QSIMPSON, FIRST,  3);
-  TEST_ONE_ORDER(QSIMPSON, SECOND, 3);
+  TEST_ONE_ORDER(QSIMPSON, FIRST,  1);
+  TEST_ONE_ORDER(QSIMPSON, SECOND, 2);
   TEST_ONE_ORDER(QSIMPSON, THIRD,  3);
   TEST_ONE_ORDER(QTRAP, FIRST, 1);
   TEST_ALL_ORDERS(QGRID, 1);
@@ -97,6 +98,9 @@ public:
   // Test monomial quadrature rules on quads and hexes
   CPPUNIT_TEST( testMonomialQuadrature );
 
+  // Test nodal quadrature rules on every specific type
+  CPPUNIT_TEST( testNodalQuadrature );
+
   // Test quadrature rules on Triangles
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testTriQuadrature );
@@ -116,6 +120,156 @@ private:
 
   Real quadrature_tolerance;
 
+  void testPolynomial(QBase & qrule,
+                      int xp, int yp, int zp,
+                      Real true_value)
+  {
+    Real sum = 0.;
+    for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+      {
+        const Point p = qrule.qp(qp);
+        Real val = qrule.w(qp) * std::pow(p(0),xp);
+        if (qrule.get_dim() > 1)
+          val *= std::pow(p(1),yp);
+        if (qrule.get_dim() > 2)
+          val *= std::pow(p(2),zp);
+        sum += val;
+      }
+
+    // Make sure that the weighted evaluations add up to the true
+    // integral value we expect
+    LIBMESH_ASSERT_REALS_EQUAL(true_value, sum, quadrature_tolerance);
+  }
+
+  void testPolynomials(QuadratureType qtype, int order,
+                       ElemType elem_type,
+                       const std::function<Real(int,int,int)> & true_value,
+                       int exactorder)
+  {
+    unsigned int dim = Elem::build(elem_type)->dim();
+    std::unique_ptr<QBase> qrule =
+      QBase::build(qtype, dim, static_cast<Order>(order));
+
+    qrule->init (elem_type);
+
+    const int max_y_order = dim>1 ? 0 : exactorder;
+    const int max_z_order = dim>2 ? 0 : exactorder;
+
+    for (int xp=0; xp <= exactorder; ++xp)
+      for (int yp=0; yp <= max_y_order; ++yp)
+        for (int zp=0; zp <= max_z_order; ++zp)
+          {
+            // Only try to integrate polynomials we can integrate exactly
+            if (xp + yp + zp > exactorder)
+              continue;
+
+            const Real exact = true_value(xp, yp, zp);
+            testPolynomial(*qrule, xp, yp, zp, exact);
+          }
+  }
+
+  const std::function<Real(int,int,int)> edge_integrals =
+  [](int mode, int, int) {
+    return (mode % 2) ?  0 : (Real(2.0) / (mode+1));
+  };
+
+  const std::function<Real(int,int,int)> quad_integrals =
+  [](int modex, int modey, int) {
+    const Real exactx = (modex % 2) ?
+      0 : (Real(2.0) / (modex+1));
+
+    const Real exacty = (modey % 2) ?
+      0 : (Real(2.0) / (modey+1));
+
+    return exactx*exacty;
+  };
+
+  const std::function<Real(int,int,int)> tri_integrals =
+  [](int x_power, int y_power, int) {
+    // Compute the true integral, a! b! / (a + b + 2)!
+    Real analytical = 1.0;
+
+    unsigned
+      larger_power = std::max(x_power, y_power),
+      smaller_power = std::min(x_power, y_power);
+
+    // Cancel the larger of the two numerator terms with the
+    // denominator, and fill in the remaining entries.
+    std::vector<unsigned>
+      numerator(smaller_power > 1 ? smaller_power-1 : 0),
+      denominator(2+smaller_power);
+
+    // Fill up the vectors with sequences starting at the right values.
+    std::iota(numerator.begin(), numerator.end(), 2);
+    std::iota(denominator.begin(), denominator.end(), larger_power+1);
+
+    // The denominator is guaranteed to have more terms...
+    for (std::size_t i=0; i<denominator.size(); ++i)
+      {
+        if (i < numerator.size())
+          analytical *= numerator[i];
+        analytical /= denominator[i];
+      }
+    return analytical;
+  };
+
+  const std::function<Real(int,int,int)> hex_integrals =
+  [](int modex, int modey, int modez) {
+    const Real exactx = (modex % 2) ?
+      0 : (Real(2.0) / (modex+1));
+
+    const Real exacty = (modey % 2) ?
+      0 : (Real(2.0) / (modey+1));
+
+    const Real exactz = (modez % 2) ?
+      0 : (Real(2.0) / (modez+1));
+
+    return exactx*exacty*exactz;
+  };
+
+  const std::function<Real(int,int,int)> tet_integrals =
+  [](int x_power, int y_power, int z_power) {
+    // Compute the true integral, a! b! c! / (a + b + c + 3)!
+    Real analytical = 1.0;
+
+    // Sort the a, b, c values
+    int sorted_powers[3] = {x_power, y_power, z_power};
+    std::sort(sorted_powers, sorted_powers+3);
+
+    // Cancel the largest power with the denominator, fill in the
+    // entries for the remaining numerator terms and the denominator.
+    std::vector<int>
+      numerator_1(sorted_powers[0] > 1 ? sorted_powers[0]-1 : 0),
+      numerator_2(sorted_powers[1] > 1 ? sorted_powers[1]-1 : 0),
+      denominator(3 + sorted_powers[0] + sorted_powers[1]);
+
+    // Fill up the vectors with sequences starting at the right values.
+    std::iota(numerator_1.begin(), numerator_1.end(), 2);
+    std::iota(numerator_2.begin(), numerator_2.end(), 2);
+    std::iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
+
+    // The denominator is guaranteed to have the most terms...
+    for (std::size_t i=0; i<denominator.size(); ++i)
+      {
+        if (i < numerator_1.size())
+          analytical *= numerator_1[i];
+
+        if (i < numerator_2.size())
+          analytical *= numerator_2[i];
+
+        analytical /= denominator[i];
+      }
+    return analytical;
+  };
+
+  const std::function<Real(int,int,int)> prism_integrals =
+  [this](int modex, int modey, int modez) {
+    const Real exactz = (modez % 2) ?
+      0 : (Real(2.0) / (modez+1));
+
+    return exactz * tri_integrals(modex, modey, 0);
+  };
+
 
 public:
   void setUp ()
@@ -124,68 +278,64 @@ public:
   void tearDown ()
   {}
 
+  void testNodalQuadrature ()
+  {
+    LOG_UNIT_TEST;
+
+    const std::vector<std::vector<ElemType>> all_types =
+      {{EDGE2, EDGE3, EDGE4},
+       {TRI3, TRI6, TRI7},
+       {QUAD4, QUAD8, QUAD9},
+       {TET4, TET10, TET14},
+       {HEX8, HEX20, HEX27},
+       {PRISM6, PRISM15, PRISM18, PRISM20, PRISM21}};
+
+    // We don't cover these at all yet?
+//       {PYRAMID5, PYRAMID13, PYRAMID14}};
+
+    const std::function<Real(int,int,int)> true_values[] =
+      {edge_integrals,
+       tri_integrals,
+       quad_integrals,
+       tet_integrals,
+       hex_integrals,
+       prism_integrals};
+
+    for (auto i : index_range(all_types))
+      for (ElemType elem_type : all_types[i])
+        {
+          const unsigned int order = Elem::build(elem_type)->default_order();
+
+          unsigned int exactorder = order;
+          // There are some sad exceptions to the "positive nodal
+          // quadrature can integrate polynomials up to the element
+          // order" rule.
+          //
+          // Some "quadratic" elements can only exactly integrate
+          // linears when mass lumping.
+          if (elem_type == TRI6 || elem_type == QUAD8 ||
+              elem_type == TET10 || elem_type == HEX20 ||
+              elem_type == PRISM15 || elem_type == PRISM18 ||
+          // And some partially-cubic elements can only do quadratics
+              elem_type == TET14 || elem_type == PRISM20)
+            exactorder--;
+
+          testPolynomials(QNODAL, order, elem_type, true_values[i], exactorder);
+        }
+  }
+
+
   void testMonomialQuadrature ()
   {
     LOG_UNIT_TEST;
 
     ElemType elem_type[2] = {QUAD4, HEX8};
-    int dims[2]           = {2, 3};
+    const std::function<Real(int,int,int)> true_values[2] =
+      {quad_integrals, hex_integrals};
 
     for (int i=0; i<(LIBMESH_DIM-1); ++i)
-      {
-        // std::cout << "\nChecking monomial quadrature on element type " << elem_type[i] << std::endl;
-
-        for (int order=0; order<7; ++order)
-          {
-            std::unique_ptr<QBase> qrule = QBase::build(QMONOMIAL,
-                                                        dims[i],
-                                                        static_cast<Order>(order));
-            qrule->init(elem_type[i]);
-
-            // In 3D, max(z_power)==order, in 2D max(z_power)==0
-            int max_z_power = dims[i]==2 ? 0 : order;
-
-            int xyz_power[3];
-            for (xyz_power[0]=0; xyz_power[0]<=order; ++xyz_power[0])
-              for (xyz_power[1]=0; xyz_power[1]<=order; ++xyz_power[1])
-                for (xyz_power[2]=0; xyz_power[2]<=max_z_power; ++xyz_power[2])
-                  {
-                    // Only try to integrate polynomials we can integrate exactly
-                    if (xyz_power[0] + xyz_power[1] + xyz_power[2] > order)
-                      continue;
-
-                    // Compute the integral via quadrature.  Note that
-                    // std::pow(0,0) returns 1 in the 2D case.
-                    Real sumq = 0.;
-                    for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-                      {
-                        Real term = qrule->w(qp);
-                        for (unsigned int d=0; d != LIBMESH_DIM; ++d)
-                          term *= std::pow(qrule->qp(qp)(d), xyz_power[d]);
-                        sumq += term;
-                      }
-
-                    // std::cout << "Quadrature of x^" << xyz_power[0]
-                    //           << " y^" << xyz_power[1]
-                    //           << " z^" << xyz_power[2]
-                    //           << " = " << sumq << std::endl;
-
-                    // Copy-pasted code from test3DWeights()
-                    Real exact_x = (xyz_power[0] % 2) ? 0 : (Real(2.0) / (xyz_power[0]+1));
-                    Real exact_y = (xyz_power[1] % 2) ? 0 : (Real(2.0) / (xyz_power[1]+1));
-                    Real exact_z = (xyz_power[2] % 2) ? 0 : (Real(2.0) / (xyz_power[2]+1));
-
-                    // Handle 2D
-                    if (dims[i]==2)
-                      exact_z = 1.0;
-
-                    Real exact = exact_x*exact_y*exact_z;
-
-                    // Make sure that the quadrature solution matches the exact solution
-                    LIBMESH_ASSERT_REALS_EQUAL(exact, sumq, quadrature_tolerance);
-                  }
-          } // end for (order)
-      } // end for (i)
+      for (int order=0; order<7; ++order)
+        testPolynomials(QMONOMIAL, order, elem_type[i], true_values[i], order);
   }
 
   void testTetQuadrature ()
@@ -202,79 +352,7 @@ public:
 
     for (int qt=0; qt<3; ++qt)
       for (int order=0; order<end_order; ++order)
-        {
-          std::unique_ptr<QBase> qrule = QBase::build(qtype[qt],
-                                                      /*dim=*/3,
-                                                      static_cast<Order>(order));
-
-          // Initialize on a TET element
-          qrule->init (TET4);
-
-          // Test the sum of the weights for this order
-          Real sumw = 0.;
-          for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-            sumw += qrule->w(qp);
-
-          // Make sure that the weights add up to the value we expect
-          LIBMESH_ASSERT_REALS_EQUAL(1/Real(6), sumw, quadrature_tolerance);
-
-          // Test integrating different polynomial powers
-          for (int x_power=0; x_power<=order; ++x_power)
-            for (int y_power=0; y_power<=order; ++y_power)
-              for (int z_power=0; z_power<=order; ++z_power)
-                {
-                  // Only try to integrate polynomials we can integrate exactly
-                  if (x_power + y_power + z_power > order)
-                    continue;
-
-                  // Compute the integral via quadrature
-                  Real sumq = 0.;
-                  for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-                    sumq += qrule->w(qp)
-                      * std::pow(qrule->qp(qp)(0), x_power)
-                      * std::pow(qrule->qp(qp)(1), y_power)
-                      * std::pow(qrule->qp(qp)(2), z_power);
-
-                  // std::cout << "sumq = " << sumq << std::endl;
-
-                  // Compute the true integral, a! b! c! / (a + b + c + 3)!
-                  Real analytical = 1.0;
-                  {
-                    // Sort the a, b, c values
-                    int sorted_powers[3] = {x_power, y_power, z_power};
-                    std::sort(sorted_powers, sorted_powers+3);
-
-                    // Cancel the largest power with the denominator, fill in the
-                    // entries for the remaining numerator terms and the denominator.
-                    std::vector<int>
-                      numerator_1(sorted_powers[0] > 1 ? sorted_powers[0]-1 : 0),
-                      numerator_2(sorted_powers[1] > 1 ? sorted_powers[1]-1 : 0),
-                      denominator(3 + sorted_powers[0] + sorted_powers[1]);
-
-                    // Fill up the vectors with sequences starting at the right values.
-                    std::iota(numerator_1.begin(), numerator_1.end(), 2);
-                    std::iota(numerator_2.begin(), numerator_2.end(), 2);
-                    std::iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
-
-                    // The denominator is guaranteed to have the most terms...
-                    for (std::size_t i=0; i<denominator.size(); ++i)
-                      {
-                        if (i < numerator_1.size())
-                          analytical *= numerator_1[i];
-
-                        if (i < numerator_2.size())
-                          analytical *= numerator_2[i];
-
-                        analytical /= denominator[i];
-                      }
-                  }
-
-                  // std::cout << "analytical = " << analytical << std::endl;
-
-                  // Make sure that the computed integral agrees with the "true" value
-                  LIBMESH_ASSERT_REALS_EQUAL(analytical, sumq, quadrature_tolerance);
-                } // end for(testpower)
-        } // end for(order)
+        testPolynomials(qtype[qt], order, TET4, tet_integrals, order);
   }
 
   void testTriQuadrature ()
@@ -285,71 +363,7 @@ public:
 
     for (int qt=0; qt<4; ++qt)
       for (int order=0; order<10; ++order)
-        {
-          std::unique_ptr<QBase> qrule = QBase::build(qtype[qt],
-                                                      /*dim=*/2,
-                                                      static_cast<Order>(order));
-
-          // Initialize on a TRI element
-          qrule->init (TRI3);
-
-          // Test the sum of the weights for this order
-          Real sumw = 0.;
-          for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-            sumw += qrule->w(qp);
-
-          // Make sure that the weights add up to the value we expect
-          LIBMESH_ASSERT_REALS_EQUAL(0.5, sumw, quadrature_tolerance);
-
-          // Test integrating different polynomial powers
-          for (int x_power=0; x_power<=order; ++x_power)
-            for (int y_power=0; y_power<=order; ++y_power)
-              {
-                // Only try to integrate polynomials we can integrate exactly
-                if (x_power + y_power > order)
-                  continue;
-
-                // Compute the integral via quadrature
-                Real sumq = 0.;
-                for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-                  sumq += qrule->w(qp)
-                    * std::pow(qrule->qp(qp)(0), x_power)
-                    * std::pow(qrule->qp(qp)(1), y_power);
-
-                // std::cout << "sumq = " << sumq << std::endl;
-
-                // Compute the true integral, a! b! / (a + b + 2)!
-                Real analytical = 1.0;
-                {
-                  unsigned
-                    larger_power = std::max(x_power, y_power),
-                    smaller_power = std::min(x_power, y_power);
-
-                  // Cancel the larger of the two numerator terms with the
-                  // denominator, and fill in the remaining entries.
-                  std::vector<unsigned>
-                    numerator(smaller_power > 1 ? smaller_power-1 : 0),
-                    denominator(2+smaller_power);
-
-                  // Fill up the vectors with sequences starting at the right values.
-                  std::iota(numerator.begin(), numerator.end(), 2);
-                  std::iota(denominator.begin(), denominator.end(), larger_power+1);
-
-                  // The denominator is guaranteed to have more terms...
-                  for (std::size_t i=0; i<denominator.size(); ++i)
-                    {
-                      if (i < numerator.size())
-                        analytical *= numerator[i];
-                      analytical /= denominator[i];
-                    }
-                }
-
-                // std::cout << "analytical = " << analytical << std::endl;
-
-                // Make sure that the computed integral agrees with the "true" value
-                LIBMESH_ASSERT_REALS_EQUAL(analytical, sumq, quadrature_tolerance);
-              } // end for(testpower)
-        } // end for(order)
+        testPolynomials(qtype[qt], order, TRI3, tri_integrals, order);
   }
 
   void testJacobi ()
@@ -454,31 +468,7 @@ public:
   {
     LOG_UNIT_TEST;
 
-    std::unique_ptr<QBase> qrule = QBase::build(qtype , 1, order);
-    qrule->init (EDGE3);
-
-    for (unsigned int mode=0; mode <= exactorder; ++mode)
-      {
-        Real sum = 0;
-
-        for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-          sum += qrule->w(qp) * std::pow(qrule->qp(qp)(0), static_cast<Real>(mode));
-
-        const Real exact = (mode % 2) ?
-          0 : (Real(2.0) / (mode+1));
-
-        if (std::abs(exact - sum) >= quadrature_tolerance)
-          {
-            std::cout << "qtype = " << qtype << std::endl;
-            std::cout << "order = " << order << std::endl;
-            std::cout << "exactorder = " << exactorder << std::endl;
-            std::cout << "mode = " << mode << std::endl;
-            std::cout << "exact = " << exact << std::endl;
-            std::cout << "sum = " << sum << std::endl << std::endl;
-          }
-
-        LIBMESH_ASSERT_REALS_EQUAL( exact , sum , quadrature_tolerance );
-      }
+    testPolynomials(qtype, order, EDGE3, edge_integrals, exactorder);
   }
 
 
@@ -490,42 +480,21 @@ public:
   {
     LOG_UNIT_TEST;
 
-    std::unique_ptr<QBase> qrule = QBase::build(qtype, 2, order);
-    qrule->init (QUAD8);
-
-    for (unsigned int modex=0; modex <= exactorder; ++modex)
-      for (unsigned int modey=0; modey <= exactorder; ++modey)
-        {
-          Real sum = 0;
-
-          for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-            sum += qrule->w(qp)
-              * std::pow(qrule->qp(qp)(0), static_cast<Real>(modex))
-              * std::pow(qrule->qp(qp)(1), static_cast<Real>(modey));
-
-          const Real exactx = (modex % 2) ?
-            0 : (Real(2.0) / (modex+1));
-
-          const Real exacty = (modey % 2) ?
-            0 : (Real(2.0) / (modey+1));
-
-          const Real exact = exactx*exacty;
-
-          LIBMESH_ASSERT_REALS_EQUAL( exact , sum , quadrature_tolerance );
-        }
+    testPolynomials(qtype, order, QUAD8, quad_integrals, exactorder);
 
     // We may eventually support Gauss-Lobatto type quadrature on triangles...
-    if (qtype != QGAUSS_LOBATTO)
-      {
-        qrule->init (TRI6);
+    if (qtype == QGAUSS_LOBATTO)
+      return;
 
-        Real sum = 0;
-
-        for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-          sum += qrule->w(qp);
-
-        LIBMESH_ASSERT_REALS_EQUAL( 0.5 , sum , quadrature_tolerance );
-      }
+    // QGrid needs to be changed to use symmetric offsets on triangles
+    // so it can at *least* get linears right...
+    if (qtype == QGRID)
+      testPolynomials(qtype, order, TRI6, tri_integrals, 0);
+    // QSimpson doesn't even get all quadratics on a triangle
+    else if (qtype == QSIMPSON)
+      testPolynomials(qtype, order, TRI6, tri_integrals, std::min(1u,exactorder));
+    else
+      testPolynomials(qtype, order, TRI6, tri_integrals, exactorder);
   }
 
 
@@ -537,55 +506,26 @@ public:
   {
     LOG_UNIT_TEST;
 
-    std::unique_ptr<QBase> qrule = QBase::build(qtype, 3, order);
-    qrule->init (HEX20);
-
-    for (unsigned int modex=0; modex <= exactorder; ++modex)
-      for (unsigned int modey=0; modey <= exactorder; ++modey)
-        for (unsigned int modez=0; modez <= exactorder; ++modez)
-          {
-            Real sum = 0;
-
-            for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-              sum += qrule->w(qp)
-                * std::pow(qrule->qp(qp)(0), static_cast<Real>(modex))
-                * std::pow(qrule->qp(qp)(1), static_cast<Real>(modey))
-                * std::pow(qrule->qp(qp)(2), static_cast<Real>(modez));
-
-            const Real exactx = (modex % 2) ?
-              0 : (Real(2.0) / (modex+1));
-
-            const Real exacty = (modey % 2) ?
-              0 : (Real(2.0) / (modey+1));
-
-            const Real exactz = (modez % 2) ?
-              0 : (Real(2.0) / (modez+1));
-
-            const Real exact = exactx*exacty*exactz;
-
-            LIBMESH_ASSERT_REALS_EQUAL( exact , sum , quadrature_tolerance );
-          }
+    testPolynomials(qtype, order, HEX20, hex_integrals, exactorder);
 
     // We may eventually support Gauss-Lobatto type quadrature on tets and prisms...
-    if (qtype != QGAUSS_LOBATTO)
+    if (qtype == QGAUSS_LOBATTO)
+      return;
+
+    // QGrid needs to be changed to use symmetric offsets on triangles
+    // so it can at *least* get linears right...
+    if (qtype == QGRID)
+      testPolynomials(qtype, order, TET10, tet_integrals, 0);
+    // QSimpson doesn't get all quadratics on a simplex or its extrusion
+    else if (qtype == QSIMPSON)
       {
-        qrule->init (TET10);
-
-        Real sum = 0;
-
-        for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-          sum += qrule->w(qp);
-
-        LIBMESH_ASSERT_REALS_EQUAL( 1/Real(6), sum , quadrature_tolerance );
-
-        qrule->init (PRISM15);
-
-        sum = 0;
-
-        for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-          sum += qrule->w(qp);
-
-        LIBMESH_ASSERT_REALS_EQUAL( 1., sum , quadrature_tolerance );
+        testPolynomials(qtype, order, TET10, tet_integrals, std::min(1u,exactorder));
+        testPolynomials(qtype, order, PRISM15, prism_integrals, std::min(1u,exactorder));
+      }
+    else
+      {
+        testPolynomials(qtype, order, TET10, tet_integrals, exactorder);
+        testPolynomials(qtype, order, PRISM15, prism_integrals, exactorder);
       }
   }
 };
