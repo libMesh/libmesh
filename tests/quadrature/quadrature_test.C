@@ -270,6 +270,17 @@ private:
     return exactz * tri_integrals(modex, modey, 0);
   };
 
+  const std::function<Real(int,int,int)> pyramid_integrals =
+  [](int modex, int modey, int modez) {
+
+    const int binom = Utility::binomial(modex+modey+modez+3, modez);
+
+    if (modex%2 || modey%2)
+      return Real(0);
+
+    return Real(4)/((modex+1)*(modey+1)*binom*(modex+modey+modez+3));
+  };
+
 
 public:
   void setUp ()
@@ -288,10 +299,8 @@ public:
        {QUAD4, QUAD8, QUAD9},
        {TET4, TET10, TET14},
        {HEX8, HEX20, HEX27},
-       {PRISM6, PRISM15, PRISM18, PRISM20, PRISM21}};
-
-    // We don't cover these at all yet?
-//       {PYRAMID5, PYRAMID13, PYRAMID14}};
+       {PRISM6, PRISM15, PRISM18, PRISM20, PRISM21},
+       {PYRAMID5, PYRAMID13, PYRAMID14}};
 
     const std::function<Real(int,int,int)> true_values[] =
       {edge_integrals,
@@ -299,7 +308,8 @@ public:
        quad_integrals,
        tet_integrals,
        hex_integrals,
-       prism_integrals};
+       prism_integrals,
+       pyramid_integrals};
 
     for (auto i : index_range(all_types))
       for (ElemType elem_type : all_types[i])
@@ -316,6 +326,7 @@ public:
           if (elem_type == TRI6 || elem_type == QUAD8 ||
               elem_type == TET10 || elem_type == HEX20 ||
               elem_type == PRISM15 || elem_type == PRISM18 ||
+              elem_type == PYRAMID13 || elem_type == PYRAMID14 ||
           // And some partially-cubic elements can only do quadratics
               elem_type == TET14 || elem_type == PRISM20)
             exactorder--;
@@ -329,13 +340,18 @@ public:
   {
     LOG_UNIT_TEST;
 
-    ElemType elem_type[2] = {QUAD4, HEX8};
-    const std::function<Real(int,int,int)> true_values[2] =
-      {quad_integrals, hex_integrals};
+    const std::vector<std::vector<ElemType>> all_types =
+      {{EDGE2}, {QUAD4, TRI3}, {HEX8, TET4, PRISM6, PYRAMID5}};
+    const std::vector<std::vector<std::function<Real(int,int,int)>>>
+      true_values =
+      {{edge_integrals},
+       {quad_integrals, tri_integrals},
+       {hex_integrals, tet_integrals, prism_integrals, pyramid_integrals}};
 
-    for (int i=0; i<(LIBMESH_DIM-1); ++i)
-      for (int order=0; order<7; ++order)
-        testPolynomials(QMONOMIAL, order, elem_type[i], true_values[i], order);
+    for (auto i : index_range(all_types))
+      for (auto j : index_range(all_types[i]))
+        for (int order=0; order<7; ++order)
+          testPolynomials(QMONOMIAL, order, all_types[i][j], true_values[i][j], order);
   }
 
   void testTetQuadrature ()
@@ -512,20 +528,28 @@ public:
     if (qtype == QGAUSS_LOBATTO)
       return;
 
-    // QGrid needs to be changed to use symmetric offsets on triangles
-    // so it can at *least* get linears right...
+    // QGrid needs to be changed to use symmetric offsets on
+    // non-tensor product elements so it can at *least* get linears
+    // right...
     if (qtype == QGRID)
-      testPolynomials(qtype, order, TET10, tet_integrals, 0);
+      {
+        testPolynomials(qtype, order, TET10, tet_integrals, 0);
+        testPolynomials(qtype, order, PYRAMID14, pyramid_integrals, 0);
+      }
     // QSimpson doesn't get all quadratics on a simplex or its extrusion
     else if (qtype == QSIMPSON)
       {
         testPolynomials(qtype, order, TET10, tet_integrals, std::min(1u,exactorder));
         testPolynomials(qtype, order, PRISM15, prism_integrals, std::min(1u,exactorder));
+
+        // And on pyramids we gave up and redid QTrap
+        testPolynomials(qtype, order, PYRAMID14, pyramid_integrals, std::min(1u,exactorder));
       }
     else
       {
         testPolynomials(qtype, order, TET10, tet_integrals, exactorder);
         testPolynomials(qtype, order, PRISM15, prism_integrals, exactorder);
+        testPolynomials(qtype, order, PYRAMID14, pyramid_integrals, exactorder);
       }
   }
 };

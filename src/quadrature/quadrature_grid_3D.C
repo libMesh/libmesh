@@ -125,7 +125,7 @@ void QGrid::init_3D(const ElemType, unsigned int)
           {
             for (int i = 0; i != _order + 1 - k; ++i)
               {
-                for (int j = 0; j != _order + 1 - k; ++j)
+                for (int j = 0; j != _order + 1 - k - i; ++j)
                   {
                     _points[pt](0) = (i+0.5)*dx-1.0 +
                       (k+0.5)*dz;
