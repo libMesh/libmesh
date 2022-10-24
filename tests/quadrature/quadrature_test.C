@@ -34,7 +34,7 @@ using namespace libMesh;
 // std::min isn't constexpr, and C++03 lacks constexpr anyway
 #define mymin(a, b) (a < b ? a : b)
 
-#define TEST_ALL_ORDERS(qtype, maxorder)                \
+#define TEST_NINTH_ORDER(qtype, maxorder)               \
   TEST_ONE_ORDER(qtype, FIRST, mymin(1,maxorder));      \
   TEST_ONE_ORDER(qtype, SECOND, mymin(2,maxorder));     \
   TEST_ONE_ORDER(qtype, THIRD, mymin(3,maxorder));      \
@@ -44,6 +44,20 @@ using namespace libMesh;
   TEST_ONE_ORDER(qtype, SEVENTH, mymin(7,maxorder));    \
   TEST_ONE_ORDER(qtype, EIGHTH, mymin(8,maxorder));     \
   TEST_ONE_ORDER(qtype, NINTH, mymin(9,maxorder));
+
+#define TEST_TWENTIETH_ORDER(qtype, maxorder)           \
+  TEST_NINTH_ORDER(qtype, maxorder)                     \
+  TEST_ONE_ORDER(qtype, TENTH, mymin(10,maxorder));     \
+  TEST_ONE_ORDER(qtype, ELEVENTH, mymin(11,maxorder));  \
+  TEST_ONE_ORDER(qtype, TWELFTH, mymin(12,maxorder));   \
+  TEST_ONE_ORDER(qtype, THIRTEENTH, mymin(13,maxorder));\
+  TEST_ONE_ORDER(qtype, FOURTEENTH, mymin(14,maxorder));\
+  TEST_ONE_ORDER(qtype, FIFTEENTH, mymin(15,maxorder)); \
+  TEST_ONE_ORDER(qtype, SIXTEENTH, mymin(16,maxorder)); \
+  TEST_ONE_ORDER(qtype, SEVENTEENTH, mymin(17,maxorder));\
+  TEST_ONE_ORDER(qtype, EIGHTEENTH, mymin(18,maxorder));\
+  TEST_ONE_ORDER(qtype, NINETEENTH, mymin(19,maxorder));\
+  TEST_ONE_ORDER(qtype, TWENTIETH, mymin(20,maxorder));
 
 #define LIBMESH_ASSERT_REALS_EQUAL(first, second, tolerance)            \
   if (std::abs(first-second) >= tolerance)                              \
@@ -59,20 +73,19 @@ class QuadratureTest : public CppUnit::TestCase {
 public:
   LIBMESH_CPPUNIT_TEST_SUITE( QuadratureTest );
 
-  TEST_ALL_ORDERS(QGAUSS, 9999);
+  TEST_TWENTIETH_ORDER(QGAUSS, 9999);
   TEST_ONE_ORDER(QSIMPSON, FIRST,  1);
   TEST_ONE_ORDER(QSIMPSON, SECOND, 2);
   TEST_ONE_ORDER(QSIMPSON, THIRD,  3);
   TEST_ONE_ORDER(QTRAP, FIRST, 1);
-  TEST_ALL_ORDERS(QGRID, 1);
+  TEST_NINTH_ORDER(QGRID, 1);
 
   // In general, QNodal rules (e.g. QTRAP) are only exact for linears.
   // QSIMPSON is a special case of a nodal quadrature which obtains
   // higher accuracy.
   TEST_ONE_ORDER(QNODAL, /*ignored*/FIRST, /*max order=*/1);
 
-  // The TEST_ALL_ORDERS macro only goes up to 9th-order
-  TEST_ALL_ORDERS(QGAUSS_LOBATTO, 9);
+  TEST_NINTH_ORDER(QGAUSS_LOBATTO, 9);
 
   // The super-high-order Gauss-Lobatto quadrature rules only take
   // ~0.2s to test for me these days. - RHS
