@@ -58,8 +58,7 @@ namespace Parallel {
  *                  std::vector<sync::datum> & data)
  * The user must define Parallel::StandardType<sync::datum> if
  * sync::datum isn't a built-in type.
- * The user-provided location_map will be used and left unchanged
- * if it is provided, or filled and cleared if it is empty.
+ * The user-provided location_map should be already filled.
  */
 template <typename Iterator,
           typename DofObjType,
@@ -67,7 +66,7 @@ template <typename Iterator,
 void sync_dofobject_data_by_xyz(const Communicator &      comm,
                                 const Iterator &          range_begin,
                                 const Iterator &          range_end,
-                                LocationMap<DofObjType> * location_map,
+                                LocationMap<DofObjType> & location_map,
                                 SyncFunctor &             sync);
 
 //------------------------------------------------------------------------
