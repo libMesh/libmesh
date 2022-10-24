@@ -18,8 +18,10 @@
   CPPUNIT_TEST( testLocalizeIndicesBase );      \
   CPPUNIT_TEST( testLocalizeToOne );            \
   CPPUNIT_TEST( testLocalizeToOneBase );        \
-  CPPUNIT_TEST( testNorms );          \
-  CPPUNIT_TEST( testNormsBase );
+  CPPUNIT_TEST( testNorms );                    \
+  CPPUNIT_TEST( testNormsBase );                \
+  CPPUNIT_TEST( testOperations );               \
+  CPPUNIT_TEST( testOperationsBase );
 
 
 template <class DerivedClass>
@@ -54,6 +56,92 @@ public:
 
   void tearDown()
   {}
+
+  template <class Base, class Derived>
+  void Operations()
+  {
+    auto v_ptr = std::make_unique<Derived>(*my_comm, global_size, local_size);
+    Base & v = *v_ptr;
+
+    const libMesh::dof_id_type
+      first = v.first_local_index(),
+      last  = v.last_local_index();
+
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      v.set (n, static_cast<libMesh::Number>(n+1));
+    v.close();
+
+    auto v_clone = v.clone();
+    auto & vorig = *v_clone;
+
+    v += v;
+
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
+                              libMesh::Real(2*n+2),
+                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+    v *= v;
+
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
+                              libMesh::Real(4*n*n+8*n+4),
+                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+    v -= vorig;
+
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
+                              libMesh::Real(4*n*n+7*n+3),
+                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+    v /= vorig;
+
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
+                              libMesh::Real(4*n+3),
+                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+    v.add(1);
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
+                              libMesh::Real(4*n+4),
+                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+    v.add(2, vorig);
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
+                              libMesh::Real(6*n+6),
+                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+    v.scale(1/libMesh::Real(3));
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
+                              libMesh::Real(2*n+2),
+                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+    v = 4;
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
+                              libMesh::Real(4),
+                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+    v = vorig;
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
+                              libMesh::Real(n+1),
+                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+    v.reciprocal();
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
+                              1/libMesh::Real(n+1),
+                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v.dot(vorig)),
+                            libMesh::Real(global_size),
+                            libMesh::TOLERANCE*libMesh::TOLERANCE);
+  }
 
   template <class Base, class Derived>
   void Norms()
@@ -239,6 +327,20 @@ public:
     LOG_UNIT_TEST;
 
     Norms<libMesh::NumericVector<libMesh::Number>,DerivedClass>();
+  }
+
+  void testOperations()
+  {
+    LOG_UNIT_TEST;
+
+    Operations<DerivedClass,DerivedClass >();
+  }
+
+  void testOperationsBase()
+  {
+    LOG_UNIT_TEST;
+
+    Operations<libMesh::NumericVector<libMesh::Number>,DerivedClass>();
   }
 };
 
