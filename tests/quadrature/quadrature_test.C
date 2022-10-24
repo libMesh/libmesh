@@ -74,7 +74,7 @@ public:
   // The TEST_ALL_ORDERS macro only goes up to 9th-order
   TEST_ALL_ORDERS(QGAUSS_LOBATTO, 9);
 
-  // The super high order Gauss-Lobatto quadrature rules only take
+  // The super-high-order Gauss-Lobatto quadrature rules only take
   // ~0.2s to test for me these days. - RHS
   TEST_ONE_ORDER(QGAUSS_LOBATTO, ELEVENTH,    11);
   TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTEENTH,  13);
