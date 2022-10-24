@@ -59,6 +59,9 @@ namespace Parallel {
  * The user must define Parallel::StandardType<sync::datum> if
  * sync::datum isn't a built-in type.
  * The user-provided location_map should be already filled.
+ *
+ * This method may fail in cases of overlapping nodes or vertex
+ * averages, e.g. with slit meshes and/or overset meshes.
  */
 template <typename Iterator,
           typename DofObjType,
