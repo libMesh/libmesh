@@ -271,7 +271,7 @@ private:
   };
 
   const std::function<Real(int,int,int)> pyramid_integrals =
-  [this](int modex, int modey, int modez) {
+  [](int modex, int modey, int modez) {
 
     const int binom = Utility::binomial(modex+modey+modez+3, modez);
 
@@ -528,20 +528,28 @@ public:
     if (qtype == QGAUSS_LOBATTO)
       return;
 
-    // QGrid needs to be changed to use symmetric offsets on triangles
-    // so it can at *least* get linears right...
+    // QGrid needs to be changed to use symmetric offsets on
+    // non-tensor product elements so it can at *least* get linears
+    // right...
     if (qtype == QGRID)
-      testPolynomials(qtype, order, TET10, tet_integrals, 0);
+      {
+        testPolynomials(qtype, order, TET10, tet_integrals, 0);
+        testPolynomials(qtype, order, PYRAMID14, pyramid_integrals, 0);
+      }
     // QSimpson doesn't get all quadratics on a simplex or its extrusion
     else if (qtype == QSIMPSON)
       {
         testPolynomials(qtype, order, TET10, tet_integrals, std::min(1u,exactorder));
         testPolynomials(qtype, order, PRISM15, prism_integrals, std::min(1u,exactorder));
+
+        // And on pyramids we gave up and redid QTrap
+        testPolynomials(qtype, order, PYRAMID14, pyramid_integrals, std::min(1u,exactorder));
       }
     else
       {
         testPolynomials(qtype, order, TET10, tet_integrals, exactorder);
         testPolynomials(qtype, order, PRISM15, prism_integrals, exactorder);
+        testPolynomials(qtype, order, PYRAMID14, pyramid_integrals, exactorder);
       }
   }
 };
