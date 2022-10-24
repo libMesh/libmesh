@@ -364,7 +364,7 @@ public:
 
     for (auto i : index_range(all_types))
       for (auto j : index_range(all_types[i]))
-        for (int order=0; order<7; ++order)
+        for (int order=0; order<17; ++order)
           testPolynomials(QMONOMIAL, order, all_types[i][j], true_values[i][j], order);
   }
 
