@@ -7,13 +7,15 @@
 
 using namespace libMesh;
 
-class EigenSparseVectorTest : public NumericVectorTest<EigenSparseVector<libMesh::Number>> {
+class EigenSparseVectorTest : public NumericVectorTest<EigenSparseVector<Number>> {
 public:
   void setUp()
   {
     // Eigen doesn't support distributed parallel vectors, but we can
     // build a serial vector on each processor
     my_comm = new Parallel::Communicator();
+
+    this->NumericVectorTest<EigenSparseVector<Number>>::setUp();
   }
 
   void tearDown()

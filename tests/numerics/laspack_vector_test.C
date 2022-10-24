@@ -15,6 +15,8 @@ public:
     // Laspack doesn't support distributed parallel vectors, but we
     // can build a serial vector on each processor
     my_comm = new Parallel::Communicator();
+
+    this->NumericVectorTest<LaspackVector<Number>>::setUp();
   }
 
   void tearDown()

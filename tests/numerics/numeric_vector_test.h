@@ -17,42 +17,81 @@
   CPPUNIT_TEST( testLocalizeIndices );          \
   CPPUNIT_TEST( testLocalizeIndicesBase );      \
   CPPUNIT_TEST( testLocalizeToOne );            \
-  CPPUNIT_TEST( testLocalizeToOneBase );
+  CPPUNIT_TEST( testLocalizeToOneBase );        \
+  CPPUNIT_TEST( testNorms );          \
+  CPPUNIT_TEST( testNormsBase );
 
 
 template <class DerivedClass>
 class NumericVectorTest : public CppUnit::TestCase {
 
 protected:
-  libMesh::Parallel::Communicator *my_comm;
+  libMesh::Parallel::Communicator *my_comm = nullptr;
 
   std::string libmesh_suite_name;
+
+  unsigned int block_size, local_size, global_size;
 
 public:
   void setUp()
   {
     // By default we'll use the whole communicator in parallel;
     // Serial-only NumericVector subclasses will need to override
-    // this.
-    my_comm = TestCommWorld;
+    // this and set something else first.
+    if (!my_comm)
+      my_comm = TestCommWorld;
+
+    block_size  = 10;
+
+    // a different size on each processor.
+    local_size  = block_size +
+      static_cast<unsigned int>(my_comm->rank());
+
+    global_size = 0;
+    for (libMesh::processor_id_type p=0; p<my_comm->size(); p++)
+      global_size += (block_size + static_cast<unsigned int>(p));
   }
 
   void tearDown()
   {}
 
   template <class Base, class Derived>
+  void Norms()
+  {
+    auto v_ptr = std::make_unique<Derived>(*my_comm, global_size, local_size);
+    Base & v = *v_ptr;
+
+    const libMesh::dof_id_type
+      first = v.first_local_index(),
+      last  = v.last_local_index();
+
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      v.set (n, -static_cast<libMesh::Number>(n));
+    v.close();
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      v.add (n, -static_cast<libMesh::Number>(n));
+    v.close();
+
+    const libMesh::Real exact_l1 =
+      global_size * (global_size-libMesh::Real(1));
+    const libMesh::Real exact_l2 =
+      std::sqrt(libMesh::Real(global_size-1) *
+                (2*global_size) *
+                (2*global_size-1) / 3);
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v.sum()), -exact_l1,
+                            libMesh::TOLERANCE*libMesh::TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(v.l1_norm(), exact_l1,
+                            libMesh::TOLERANCE*libMesh::TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(v.l2_norm(), exact_l2,
+                            libMesh::TOLERANCE*libMesh::TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(v.linfty_norm(), 2*(global_size-libMesh::Real(1)),
+                            libMesh::TOLERANCE*libMesh::TOLERANCE);
+  }
+
+  template <class Base, class Derived>
   void Localize(bool to_one=false)
   {
     const libMesh::processor_id_type root_pid = 0;
-    unsigned int block_size  = 10;
-
-    // a different size on each processor.
-    unsigned int local_size  = block_size +
-      static_cast<unsigned int>(my_comm->rank());
-    unsigned int global_size = 0;
-
-    for (libMesh::processor_id_type p=0; p<my_comm->size(); p++)
-      global_size += (block_size + static_cast<unsigned int>(p));
 
     {
       auto v_ptr = std::make_unique<Derived>(*my_comm, global_size, local_size);
@@ -107,16 +146,6 @@ public:
   template <class Base, class Derived>
   void LocalizeIndices()
   {
-    unsigned int block_size  = 10;
-
-    // a different size on each processor.
-    unsigned int local_size  = block_size +
-      static_cast<unsigned int>(my_comm->rank());
-    unsigned int global_size = 0;
-
-    for (libMesh::processor_id_type p=0; p<my_comm->size(); p++)
-      global_size += (block_size + static_cast<unsigned int>(p));
-
     {
       auto v_ptr = std::make_unique<Derived>(*my_comm, global_size, local_size);
       Base & v = *v_ptr;
@@ -196,6 +225,20 @@ public:
     LOG_UNIT_TEST;
 
     LocalizeIndices<libMesh::NumericVector<libMesh::Number>,DerivedClass>();
+  }
+
+  void testNorms()
+  {
+    LOG_UNIT_TEST;
+
+    Norms<DerivedClass,DerivedClass >();
+  }
+
+  void testNormsBase()
+  {
+    LOG_UNIT_TEST;
+
+    Norms<libMesh::NumericVector<libMesh::Number>,DerivedClass>();
   }
 };
 
