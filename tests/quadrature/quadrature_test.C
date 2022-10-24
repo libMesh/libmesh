@@ -386,6 +386,8 @@ public:
   {
     LOG_UNIT_TEST;
 
+    constexpr int max_order = 43;  // We seriously implemented that?!
+
     // LibMesh supports two different types of Jacobi quadrature
     QuadratureType qtype[2] = {QJACOBI_1_0, QJACOBI_2_0};
 
@@ -407,20 +409,20 @@ public:
 
     // alpha=1 integral values
     // int((1-x)*x^p, x=0..1) = 1 / (p^2 + 3p + 2)
-    true_integrals[0].resize(10);
+    true_integrals[0].resize(max_order);
     for (std::size_t p=0; p<true_integrals[0].size(); ++p)
       true_integrals[0][p] = 1. / (p*p + 3.*p + 2.);
 
     // alpha=2 integral values
     // int((1-x)^2*x^p, x=0..1) = 2 / (p^3 + 6*p^2 + 11*p + 6)
-    true_integrals[1].resize(10);
+    true_integrals[1].resize(max_order);
     for (std::size_t p=0; p<true_integrals[1].size(); ++p)
       true_integrals[1][p] = 2. / (p*p*p + 6.*p*p + 11.*p + 6.);
 
     // Test both types of Jacobi quadrature rules
     for (int qt=0; qt<2; ++qt)
       {
-        for (int order=0; order<10; ++order)
+        for (int order=0; order<max_order; ++order)
           {
             std::unique_ptr<QBase> qrule = QBase::build(qtype[qt],
                                                         /*dim=*/1,
