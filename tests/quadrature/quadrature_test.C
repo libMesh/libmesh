@@ -468,6 +468,10 @@ public:
     std::unique_ptr<QBase> qrule2D = QBase::build (qtype, 2, order);
     std::unique_ptr<QBase> qrule3D = QBase::build (qtype, 3, order);
 
+    CPPUNIT_ASSERT_EQUAL ( qtype, qrule1D->type() );
+    CPPUNIT_ASSERT_EQUAL ( qtype, qrule2D->type() );
+    CPPUNIT_ASSERT_EQUAL ( qtype, qrule3D->type() );
+
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(1) , qrule1D->get_dim() );
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(2) , qrule2D->get_dim() );
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(3) , qrule3D->get_dim() );
