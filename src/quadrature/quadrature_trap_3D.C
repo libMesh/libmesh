@@ -89,6 +89,8 @@ void QTrap::init_3D(const ElemType, unsigned int)
       //---------------------------------------------
       // Pyramid quadrature rules
     case PYRAMID5:
+    case PYRAMID13:
+    case PYRAMID14:
       {
         _points.resize(5);
         _weights.resize(5);
