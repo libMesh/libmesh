@@ -336,6 +336,13 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T> & v_in)
 {
   this->_restore_array();
 
+  // VecAXPY doesn't support &x==&y
+  if (this == &v_in)
+    {
+      this->scale(a_in+1);
+      return;
+    }
+
   PetscScalar a = PS(a_in);
 
   // Make sure the NumericVector passed in is really a PetscVector
