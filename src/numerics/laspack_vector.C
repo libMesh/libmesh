@@ -110,10 +110,20 @@ NumericVector<T> & LaspackVector<T>::operator *= (const NumericVector<T> & v)
 {
   libmesh_assert_equal_to(size(), v.size());
 
+#ifndef NDEBUG
+  const bool was_closed = this->_is_closed;
+#endif
+
   const numeric_index_type n = this->size();
 
   for (numeric_index_type i=0; i<n; i++)
     this->set(i, (*this)(i) * v(i));
+
+  // This is an embarrassingly parallel method, but set() isn't in
+  // general so set() overzealously marked us as non-closed
+#ifndef NDEBUG
+  this->_is_closed = was_closed;
+#endif
 
   return *this;
 }
@@ -125,10 +135,20 @@ NumericVector<T> & LaspackVector<T>::operator /= (const NumericVector<T> & v)
 {
   libmesh_assert_equal_to(size(), v.size());
 
+#ifndef NDEBUG
+  const bool was_closed = this->_is_closed;
+#endif
+
   const numeric_index_type n = this->size();
 
   for (numeric_index_type i=0; i<n; i++)
     this->set(i, (*this)(i) / v(i));
+
+  // This is an embarrassingly parallel method, but set() isn't in
+  // general so set() overzealously marked us as non-closed
+#ifndef NDEBUG
+  this->_is_closed = was_closed;
+#endif
 
   return *this;
 }
@@ -140,6 +160,10 @@ void LaspackVector<T>::reciprocal()
 {
   const numeric_index_type n = this->size();
 
+#ifndef NDEBUG
+  const bool was_closed = this->_is_closed;
+#endif
+
   for (numeric_index_type i=0; i<n; i++)
     {
       T v = (*this)(i);
@@ -149,6 +173,12 @@ void LaspackVector<T>::reciprocal()
 
       this->set(i, 1. / v);
     }
+
+  // This is an embarrassingly parallel method, but set() isn't in
+  // general so set() overzealously marked us as non-closed
+#ifndef NDEBUG
+  this->_is_closed = was_closed;
+#endif
 }
 
 
@@ -158,25 +188,41 @@ void LaspackVector<T>::conjugate()
 {
   const numeric_index_type n = this->size();
 
+#ifndef NDEBUG
+  const bool was_closed = this->_is_closed;
+#endif
+
   for (numeric_index_type i=0; i<n; i++)
     {
       T v = (*this)(i);
 
       this->set(i, libmesh_conj(v) );
     }
+
+  // This is an embarrassingly parallel method, but set() isn't in
+  // general so set() overzealously marked us as non-closed
+#ifndef NDEBUG
+  this->_is_closed = was_closed;
+#endif
 }
 
 
 template <typename T>
 void LaspackVector<T>::add (const T v)
 {
+#ifndef NDEBUG
+  const bool was_closed = this->_is_closed;
+#endif
+
   const numeric_index_type n = this->size();
 
   for (numeric_index_type i=0; i<n; i++)
     this->add (i, v);
 
+  // This is an embarrassingly parallel method, but set() isn't in
+  // general so set() overzealously marked us as non-closed
 #ifndef NDEBUG
-  this->_is_closed = false;
+  this->_is_closed = was_closed;
 #endif
 }
 
