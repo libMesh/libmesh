@@ -9,7 +9,9 @@ example_name=fem_system_ex1
 example_dir=examples/fem_system/$example_name
 
 # First, run with standard options from input files.
-run_example "$example_name"
+# We'll throw Jacobian verification in too, just to get some test
+# coverage there.
+run_example "$example_name" verify_analytic_jacobians=1e-6
 
 # Next, lets run with pure fieldsplit without gmg, if we have PETSc
 
