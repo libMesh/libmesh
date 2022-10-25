@@ -23,6 +23,8 @@
 // Local Includes
 #include "libmesh/sfc_partitioner.h"
 
+#include "libmesh/enum_partitioner_type.h"
+
 // C++ Includes
 
 namespace libMesh
@@ -57,6 +59,11 @@ public:
   MortonSFCPartitioner & operator= (const MortonSFCPartitioner &) = default;
   MortonSFCPartitioner & operator= (MortonSFCPartitioner &&) = default;
   virtual ~MortonSFCPartitioner() = default;
+
+  virtual PartitionerType type () const override
+  {
+    return MORTON_SFC_PARTITIONER;
+  };
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.

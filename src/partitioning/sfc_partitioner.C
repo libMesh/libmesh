@@ -19,10 +19,11 @@
 
 // Local Includes
 #include "libmesh/libmesh_config.h"
+#include "libmesh/elem.h"
+#include "libmesh/enum_partitioner_type.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/sfc_partitioner.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/elem.h"
 
 #ifdef LIBMESH_HAVE_SFCURVES
 namespace Sfc {
@@ -36,6 +37,12 @@ extern "C" {
 
 namespace libMesh
 {
+
+
+PartitionerType SFCPartitioner::type() const
+{
+  return SFC_PARTITIONER;
+}
 
 
 void SFCPartitioner::partition_range(MeshBase & mesh,

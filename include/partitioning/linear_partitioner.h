@@ -54,6 +54,8 @@ public:
   LinearPartitioner & operator= (LinearPartitioner &&) = default;
   virtual ~LinearPartitioner() = default;
 
+  virtual PartitionerType type () const override;
+
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */

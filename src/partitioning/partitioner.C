@@ -146,6 +146,13 @@ const dof_id_type Partitioner::communication_blocksize =
 // ------------------------------------------------------------
 // Partitioner implementation
 
+
+PartitionerType Partitioner::type() const
+{
+  return INVALID_PARTITIONER;
+}
+
+
 std::unique_ptr<Partitioner>
 Partitioner::build (const PartitionerType partitioner_type)
 {

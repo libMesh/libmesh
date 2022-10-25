@@ -18,14 +18,21 @@
 
 
 // Local Includes
-#include "libmesh/mesh_base.h"
 #include "libmesh/mapped_subdomain_partitioner.h"
-#include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_partitioner_type.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
 #include "libmesh/utility.h"
 
 namespace libMesh
 {
+
+
+PartitionerType MappedSubdomainPartitioner::type() const
+{
+  return MAPPED_SUBDOMAIN_PARTITIONER;
+}
 
 
 void MappedSubdomainPartitioner::partition_range(MeshBase & /*mesh*/,

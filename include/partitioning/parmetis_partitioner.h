@@ -73,6 +73,8 @@ public:
    */
   virtual ~ParmetisPartitioner();
 
+  virtual PartitionerType type () const override;
+
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */

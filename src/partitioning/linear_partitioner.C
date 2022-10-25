@@ -21,10 +21,17 @@
 #include "libmesh/linear_partitioner.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_partitioner_type.h"
 #include "libmesh/parallel.h"
 
 namespace libMesh
 {
+
+PartitionerType LinearPartitioner::type() const
+{
+  return LINEAR_PARTITIONER;
+}
+
 
 void LinearPartitioner::partition_range(MeshBase & mesh,
                                         MeshBase::element_iterator it,

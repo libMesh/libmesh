@@ -67,6 +67,8 @@ public:
   Partitioner & operator= (Partitioner &&) = default;
   virtual ~Partitioner() = default;
 
+  virtual PartitionerType type () const;
+
   /**
    * Builds a \p Partitioner of the type specified by
    * \p partitioner_type

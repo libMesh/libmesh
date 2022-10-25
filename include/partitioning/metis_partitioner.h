@@ -52,6 +52,8 @@ public:
   MetisPartitioner & operator= (MetisPartitioner &&) = default;
   virtual ~MetisPartitioner() = default;
 
+  virtual PartitionerType type () const override;
+
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */
