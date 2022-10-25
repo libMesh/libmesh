@@ -1162,19 +1162,22 @@ void PetscVector<T>::_get_array(bool read_only) const
 {
   libmesh_assert (this->initialized());
 
-  const bool initially_array_is_present = _array_is_present.load(std::memory_order_acquire);
+  bool initially_array_is_present = _array_is_present.load(std::memory_order_acquire);
+
+  // If we already have a read/write array - and we're trying
+  // to get a read only array - let's just use the read write
+  if (initially_array_is_present && read_only && !_values_read_only)
+    _read_only_values = _values;
 
   // If the values have already been retrieved and we're currently
   // trying to get a non-read only view (ie read/write) and the
   // values are currently read only... then we need to restore
   // the array first... and then retrieve it again.
   if (initially_array_is_present && !read_only && _values_read_only)
-    _restore_array();
-
-  // If we already have a read/write array - and we're trying
-  // to get a read only array - let's just use the read write
-  if (initially_array_is_present && read_only && !_values_read_only)
-    _read_only_values = _values;
+    {
+      _restore_array();
+      initially_array_is_present = false;
+    }
 
   if (!initially_array_is_present)
     {
