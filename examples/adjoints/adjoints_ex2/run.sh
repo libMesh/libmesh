@@ -11,4 +11,4 @@ example_dir=examples/adjoints/$example_name
 run_example "$example_name"
 
 # Benchmark parameters
-benchmark_example 1 "$example_name" coarserefinements=4
+benchmark_example 1 "$example_name" coarserefinements=4 --forward_sensitivity=false
