@@ -379,6 +379,20 @@ int main(int argc, char ** argv)
           << exact_sol.h1_error("Biharmonic", "u") << " "
           << exact_sol.h2_error("Biharmonic", "u") << std::endl;
 
+      // Assert that we're not outright diverging here, for regression
+      // testing.  These bounds just come from eyeballing some graphs
+      // and tacking on a huge tolerance.
+      const dof_id_type n_dofs = system.n_dofs();
+
+      if (exact_sol.l2_error("Biharmonic", "u") > 200*std::pow(n_dofs,-4./3.))
+        libmesh_error_msg("Unacceptably high L2-error!");
+
+      if (exact_sol.h1_error("Biharmonic", "u") > 200./n_dofs)
+        libmesh_error_msg("Unacceptably high H1-error!");
+
+      if (exact_sol.h2_error("Biharmonic", "u") > 400*std::pow(n_dofs,-2./3.))
+        libmesh_error_msg("Unacceptably high H2-error!");
+
       // Possibly refine the mesh
       if (r_step+1 != max_r_steps)
         {
