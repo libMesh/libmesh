@@ -638,6 +638,10 @@ void Partitioner::set_interface_node_processor_ids_BFS(MeshBase & mesh)
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
+  // I see occasional consistency failures when using this on a
+  // distributed mesh
+  libmesh_experimental();
+
   std::map<std::pair<processor_id_type, processor_id_type>, std::set<dof_id_type>> processor_pair_to_nodes;
 
   processor_pairs_to_interface_nodes(mesh, processor_pair_to_nodes);
