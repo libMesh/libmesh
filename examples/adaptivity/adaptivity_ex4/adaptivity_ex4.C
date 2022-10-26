@@ -217,10 +217,12 @@ int main(int argc, char ** argv)
   else
     output_file += "clough_";
 
+  output_file += approx_order_string;
+
   if (uniform_refine == 0)
-    output_file += "adaptive";
+    output_file += "_adaptive";
   else
-    output_file += "uniform";
+    output_file += "_uniform";
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // If we have Exodus, use the same base output filename
