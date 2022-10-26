@@ -106,6 +106,14 @@
 # define LIBMESH_SETERRQ3 SETERRQ
 #endif
 
+// As of 3.18, %D is no longer supported in format strings, but the
+// replacement PetscInt_FMT didn't get added until 3.7.2
+#if PETSC_RELEASE_LESS_THAN(3,8,0)
+# define LIBMESH_PETSCINT_FMT "D"
+#else
+# define LIBMESH_PETSCINT_FMT PetscInt_FMT
+#endif
+
 // If we're using quad precision, we need to disambiguate std
 // operations on PetscScalar
 
