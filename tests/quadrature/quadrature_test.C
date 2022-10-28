@@ -34,7 +34,7 @@ using namespace libMesh;
 // std::min isn't constexpr, and C++03 lacks constexpr anyway
 #define mymin(a, b) (a < b ? a : b)
 
-#define TEST_ALL_ORDERS(qtype, maxorder)                \
+#define TEST_NINTH_ORDER(qtype, maxorder)               \
   TEST_ONE_ORDER(qtype, FIRST, mymin(1,maxorder));      \
   TEST_ONE_ORDER(qtype, SECOND, mymin(2,maxorder));     \
   TEST_ONE_ORDER(qtype, THIRD, mymin(3,maxorder));      \
@@ -44,6 +44,20 @@ using namespace libMesh;
   TEST_ONE_ORDER(qtype, SEVENTH, mymin(7,maxorder));    \
   TEST_ONE_ORDER(qtype, EIGHTH, mymin(8,maxorder));     \
   TEST_ONE_ORDER(qtype, NINTH, mymin(9,maxorder));
+
+#define TEST_TWENTIETH_ORDER(qtype, maxorder)           \
+  TEST_NINTH_ORDER(qtype, maxorder)                     \
+  TEST_ONE_ORDER(qtype, TENTH, mymin(10,maxorder));     \
+  TEST_ONE_ORDER(qtype, ELEVENTH, mymin(11,maxorder));  \
+  TEST_ONE_ORDER(qtype, TWELFTH, mymin(12,maxorder));   \
+  TEST_ONE_ORDER(qtype, THIRTEENTH, mymin(13,maxorder));\
+  TEST_ONE_ORDER(qtype, FOURTEENTH, mymin(14,maxorder));\
+  TEST_ONE_ORDER(qtype, FIFTEENTH, mymin(15,maxorder)); \
+  TEST_ONE_ORDER(qtype, SIXTEENTH, mymin(16,maxorder)); \
+  TEST_ONE_ORDER(qtype, SEVENTEENTH, mymin(17,maxorder));\
+  TEST_ONE_ORDER(qtype, EIGHTEENTH, mymin(18,maxorder));\
+  TEST_ONE_ORDER(qtype, NINETEENTH, mymin(19,maxorder));\
+  TEST_ONE_ORDER(qtype, TWENTIETH, mymin(20,maxorder));
 
 #define LIBMESH_ASSERT_REALS_EQUAL(first, second, tolerance)            \
   if (std::abs(first-second) >= tolerance)                              \
@@ -59,41 +73,54 @@ class QuadratureTest : public CppUnit::TestCase {
 public:
   LIBMESH_CPPUNIT_TEST_SUITE( QuadratureTest );
 
-  TEST_ALL_ORDERS(QGAUSS, 9999);
+  TEST_TWENTIETH_ORDER(QGAUSS, 9999);
   TEST_ONE_ORDER(QSIMPSON, FIRST,  1);
   TEST_ONE_ORDER(QSIMPSON, SECOND, 2);
   TEST_ONE_ORDER(QSIMPSON, THIRD,  3);
   TEST_ONE_ORDER(QTRAP, FIRST, 1);
-  TEST_ALL_ORDERS(QGRID, 1);
+  TEST_NINTH_ORDER(QGRID, 1);
 
   // In general, QNodal rules (e.g. QTRAP) are only exact for linears.
   // QSIMPSON is a special case of a nodal quadrature which obtains
   // higher accuracy.
   TEST_ONE_ORDER(QNODAL, /*ignored*/FIRST, /*max order=*/1);
 
-  // The TEST_ALL_ORDERS macro only goes up to 9th-order
-  TEST_ALL_ORDERS(QGAUSS_LOBATTO, 9);
+  TEST_NINTH_ORDER(QGAUSS_LOBATTO, 9);
 
-  // The Gauss-Lobatto quadrature rules passed all these tests during
-  // development, but we don't run them with every 'make check'
-  // because it takes too long.
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, ELEVENTH,    11);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTEENTH,  13);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, FIFTEENTH,   15);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, SEVENTEENTH, 17);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, NINETEENTH,  19);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYFIRST, 21);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYTHIRD, 23);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYFIFTH, 25);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYSEVENTH, 27);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYNINTH, 29);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYFIRST, 31);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYTHIRD, 33);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYFIFTH, 35);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYSEVENTH, 37);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYNINTH, 39);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, FORTYFIRST, 41);
-  // TEST_ONE_ORDER(QGAUSS_LOBATTO, FORTYTHIRD, 43);
+  // The super-high-order Gauss-Lobatto quadrature rules only take
+  // ~0.2s to test for me these days. - RHS
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, ELEVENTH,    11);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTEENTH,  13);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, FIFTEENTH,   15);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, SEVENTEENTH, 17);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, NINETEENTH,  19);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYFIRST, 21);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYTHIRD, 23);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYFIFTH, 25);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYSEVENTH, 27);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYNINTH, 29);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYFIRST, 31);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYTHIRD, 33);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYFIFTH, 35);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYSEVENTH, 37);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYNINTH, 39);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, FORTYFIRST, 41);
+  TEST_ONE_ORDER(QGAUSS_LOBATTO, FORTYTHIRD, 43);
+
+  // Might as well test super-high 1-D Gauss while we're at it.
+  // Some of the really high order stuff is getting pulled in
+  // indirectly; we'll just hit what lcov says we were missing.
+  CPPUNIT_TEST( test1DWeights<QGAUSS MACROCOMMA TWENTYFIRST MACROCOMMA 21> );
+  CPPUNIT_TEST( test1DWeights<QGAUSS MACROCOMMA TWENTYFIFTH MACROCOMMA 25> );
+  CPPUNIT_TEST( test1DWeights<QGAUSS MACROCOMMA TWENTYSEVENTH MACROCOMMA 27> );
+  CPPUNIT_TEST( test1DWeights<QGAUSS MACROCOMMA TWENTYNINTH MACROCOMMA 29> );
+  CPPUNIT_TEST( test1DWeights<QGAUSS MACROCOMMA THIRTYFIRST MACROCOMMA 31> );
+  CPPUNIT_TEST( test1DWeights<QGAUSS MACROCOMMA THIRTYTHIRD MACROCOMMA 33> );
+  CPPUNIT_TEST( test1DWeights<QGAUSS MACROCOMMA THIRTYFIFTH MACROCOMMA 35> );
+  CPPUNIT_TEST( test1DWeights<QGAUSS MACROCOMMA THIRTYSEVENTH MACROCOMMA 37> );
+  CPPUNIT_TEST( test1DWeights<QGAUSS MACROCOMMA THIRTYNINTH MACROCOMMA 39> );
+  CPPUNIT_TEST( test1DWeights<QGAUSS MACROCOMMA FORTYFIRST MACROCOMMA 41> );
+  CPPUNIT_TEST( test1DWeights<QGAUSS MACROCOMMA FORTYTHIRD MACROCOMMA 43> );
 
   // Test monomial quadrature rules on quads and hexes
   CPPUNIT_TEST( testMonomialQuadrature );
@@ -350,7 +377,7 @@ public:
 
     for (auto i : index_range(all_types))
       for (auto j : index_range(all_types[i]))
-        for (int order=0; order<7; ++order)
+        for (int order=0; order<17; ++order)
           testPolynomials(QMONOMIAL, order, all_types[i][j], true_values[i][j], order);
   }
 
@@ -386,6 +413,8 @@ public:
   {
     LOG_UNIT_TEST;
 
+    constexpr int max_order = 43;  // We seriously implemented that?!
+
     // LibMesh supports two different types of Jacobi quadrature
     QuadratureType qtype[2] = {QJACOBI_1_0, QJACOBI_2_0};
 
@@ -407,20 +436,20 @@ public:
 
     // alpha=1 integral values
     // int((1-x)*x^p, x=0..1) = 1 / (p^2 + 3p + 2)
-    true_integrals[0].resize(10);
+    true_integrals[0].resize(max_order);
     for (std::size_t p=0; p<true_integrals[0].size(); ++p)
       true_integrals[0][p] = 1. / (p*p + 3.*p + 2.);
 
     // alpha=2 integral values
     // int((1-x)^2*x^p, x=0..1) = 2 / (p^3 + 6*p^2 + 11*p + 6)
-    true_integrals[1].resize(10);
+    true_integrals[1].resize(max_order);
     for (std::size_t p=0; p<true_integrals[1].size(); ++p)
       true_integrals[1][p] = 2. / (p*p*p + 6.*p*p + 11.*p + 6.);
 
     // Test both types of Jacobi quadrature rules
     for (int qt=0; qt<2; ++qt)
       {
-        for (int order=0; order<10; ++order)
+        for (int order=0; order<max_order; ++order)
           {
             std::unique_ptr<QBase> qrule = QBase::build(qtype[qt],
                                                         /*dim=*/1,
@@ -465,6 +494,10 @@ public:
     std::unique_ptr<QBase> qrule1D = QBase::build (qtype, 1, order);
     std::unique_ptr<QBase> qrule2D = QBase::build (qtype, 2, order);
     std::unique_ptr<QBase> qrule3D = QBase::build (qtype, 3, order);
+
+    CPPUNIT_ASSERT_EQUAL ( qtype, qrule1D->type() );
+    CPPUNIT_ASSERT_EQUAL ( qtype, qrule2D->type() );
+    CPPUNIT_ASSERT_EQUAL ( qtype, qrule3D->type() );
 
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(1) , qrule1D->get_dim() );
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(2) , qrule2D->get_dim() );

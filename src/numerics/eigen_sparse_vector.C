@@ -165,8 +165,6 @@ template <typename T>
 void EigenSparseVector<T>::add (const T v)
 {
   _vec += EigenSV::Constant(this->size(), v);
-
-  this->_is_closed = false;
 }
 
 
