@@ -18,23 +18,24 @@
 
 // Local Includes
 #include "libmesh/default_coupling.h" // For downconversion
+#include "libmesh/dof_map.h"
+#include "libmesh/eigen_system.h"
+#include "libmesh/elem.h"
 #include "libmesh/explicit_system.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/frequency_system.h"
+#include "libmesh/int_range.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/linear_implicit_system.h"
+#include "libmesh/mesh_base.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/newmark_system.h"
 #include "libmesh/nonlinear_implicit_system.h"
+#include "libmesh/parallel.h"
 #include "libmesh/rb_construction.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/transient_rb_construction.h"
-#include "libmesh/eigen_system.h"
-#include "libmesh/parallel.h"
 #include "libmesh/transient_system.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/elem.h"
-#include "libmesh/libmesh_logging.h"
 
 // System includes
 #include <functional> // std::plus
@@ -90,7 +91,7 @@ void EquationSystems::init ()
   for (auto & elem : _mesh.element_ptr_range())
     elem->set_n_systems(n_sys);
 
-  for (unsigned int i=0; i != this->n_systems(); ++i)
+  for (auto i : make_range(this->n_systems()))
     this->get_system(i).init();
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -125,7 +126,7 @@ void EquationSystems::reinit_mesh ()
   for (auto & elem : _mesh.element_ptr_range())
     elem->set_n_systems(n_sys);
 
-  //for (unsigned int i=0; i != this->n_systems(); ++i)
+  //for (auto i : make_range(this->n_systems()))
     //this->get_system(i).init();
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -135,7 +136,7 @@ void EquationSystems::reinit_mesh ()
 
  // Now loop over all the systems belonging to this ES
  // and call reinit_mesh for each system
- for (unsigned int i=0; i != this->n_systems(); ++i)
+ for (auto i : make_range(this->n_systems()))
     this->get_system(i).reinit_mesh();
 
 }
@@ -216,7 +217,7 @@ bool EquationSystems::reinit_solutions ()
       // if necessary
       if (mesh_refine.coarsen_elements())
         {
-          for (unsigned int i=0; i != this->n_systems(); ++i)
+          for (auto i : make_range(this->n_systems()))
             {
               System & sys = this->get_system(i);
               sys.get_dof_map().distribute_dofs(_mesh);
@@ -235,7 +236,7 @@ bool EquationSystems::reinit_solutions ()
       // if necessary
       if (mesh_refine.refine_elements())
         {
-          for (unsigned int i=0; i != this->n_systems(); ++i)
+          for (auto i : make_range(this->n_systems()))
             {
               System & sys = this->get_system(i);
               sys.get_dof_map().distribute_dofs(_mesh);
@@ -257,7 +258,7 @@ bool EquationSystems::reinit_solutions ()
 
 void EquationSystems::reinit_systems()
 {
-  for (unsigned int i=0; i != this->n_systems(); ++i)
+  for (auto i : make_range(this->n_systems()))
     this->get_system(i).reinit();
 }
 
@@ -285,7 +286,7 @@ void EquationSystems::allgather ()
     elem->set_n_systems(n_sys);
 
   // And distribute each system's dofs
-  for (unsigned int i=0; i != this->n_systems(); ++i)
+  for (auto i : make_range(this->n_systems()))
     {
       System & sys = this->get_system(i);
       DofMap & dof_map = sys.get_dof_map();
@@ -311,7 +312,7 @@ void EquationSystems::enable_default_ghosting (bool enable)
   else
     mesh.remove_ghosting_functor(mesh.default_ghosting());
 
-  for (unsigned int i=0; i != this->n_systems(); ++i)
+  for (auto i : make_range(this->n_systems()))
     {
       DofMap & dof_map = this->get_system(i).get_dof_map();
       if (enable)
@@ -328,7 +329,7 @@ void EquationSystems::update ()
   LOG_SCOPE("update()", "EquationSystems");
 
   // Localize each system's vectors
-  for (unsigned int i=0; i != this->n_systems(); ++i)
+  for (auto i : make_range(this->n_systems()))
     this->get_system(i).update();
 }
 
@@ -420,7 +421,7 @@ void EquationSystems::solve ()
 {
   libmesh_assert (this->n_systems());
 
-  for (unsigned int i=0; i != this->n_systems(); ++i)
+  for (auto i : make_range(this->n_systems()))
     this->get_system(i).solve();
 }
 
@@ -430,7 +431,7 @@ void EquationSystems::sensitivity_solve (const ParameterVector & parameters_in)
 {
   libmesh_assert (this->n_systems());
 
-  for (unsigned int i=0; i != this->n_systems(); ++i)
+  for (auto i : make_range(this->n_systems()))
     this->get_system(i).sensitivity_solve(parameters_in);
 }
 

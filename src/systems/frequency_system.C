@@ -25,7 +25,9 @@
 
 // Local includes
 #include "libmesh/frequency_system.h"
+
 #include "libmesh/equation_systems.h"
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/numeric_vector.h"
@@ -249,7 +251,7 @@ void FrequencySystem::set_frequencies (const std::vector<Real> & frequencies,
   es.parameters.set<unsigned int>("n_frequencies") = frequencies.size();
 
   // set frequencies, build solution storage
-  for (std::size_t n=0; n<frequencies.size(); n++)
+  for (auto n : index_range(frequencies))
     {
       // remember frequencies as parameters
       es.parameters.set<Number>(this->form_freq_param_name(n)) = static_cast<Number>(frequencies[n]);

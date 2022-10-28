@@ -19,6 +19,8 @@
 
 #include "libmesh/plt_loader.h"
 
+#include "libmesh/int_range.h"
+
 namespace libMesh
 {
 
@@ -73,7 +75,7 @@ void PltLoader::set_n_vars (const unsigned int nv)
     {
       _data.resize  (this->n_zones());
 
-      for (unsigned int z=0; z<this->n_zones(); z++)
+      for (auto z : make_range(this->n_zones()))
         _data[z].resize  (this->n_vars());
     }
 }
@@ -97,7 +99,7 @@ void PltLoader::set_n_zones (const unsigned int nz)
 
   // If the number of variables are set, resize the data.
   if (this->n_vars())
-    for (unsigned int z=0; z<this->n_zones(); z++)
+    for (auto z : make_range(this->n_zones()))
       _data[z].resize (this->n_vars());
 }
 

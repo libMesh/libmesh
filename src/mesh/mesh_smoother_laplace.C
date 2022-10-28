@@ -322,14 +322,16 @@ void LaplaceMeshSmoother::allgather_graph()
 
   // Make sure the old graph is cleared out
   _graph.clear();
-  _graph.resize(_mesh.max_node_id());
+  const auto max_node_id = _mesh.max_node_id();
+  _graph.resize(max_node_id);
 
   // Our current position in the allgather'd flat_graph
   std::size_t cursor=0;
 
   // There are max_node_id * n_processors entries to read in total
-  for (processor_id_type p=0; p<_mesh.n_processors(); ++p)
-    for (dof_id_type node_ctr=0; node_ctr<_mesh.max_node_id(); ++node_ctr)
+  const auto n_procs = _mesh.n_processors();
+  for (processor_id_type p = 0; p != n_procs; ++p)
+    for (dof_id_type node_ctr : make_range(max_node_id))
       {
         // Read the number of entries for this node, move cursor
         std::size_t n_entries = flat_graph[cursor++];

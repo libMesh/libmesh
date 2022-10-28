@@ -1093,7 +1093,7 @@ eval_at_node(const FEMContext & c,
     {
       Gradient return_val;
 
-      for (unsigned int dim = 0; dim < elem.dim(); ++dim)
+      for (auto dim : make_range(elem.dim()))
       {
         const dof_id_type old_id =
           old_dof_object->dof_number(sys.number(), var, dim);
@@ -2051,7 +2051,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                 libmesh_assert_equal_to(vertex.n_comp(sys_num, var), elem.dim());
 
                 // We will have a number of nodal value DoFs equal to the elem dim
-                for (unsigned int i = 0; i < elem.dim(); ++i)
+                for (auto i : make_range(elem.dim()))
                 {
                   const dof_id_type id = vertex.dof_number(sys_num, var, i);
 
@@ -2370,7 +2370,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectEdge
                   if (fe_type.family == LAGRANGE_VEC)
                   {
                     // We will have a number of nodal value DoFs equal to the elem dim
-                    for (unsigned int i = 0; i < elem.dim(); ++i)
+                    for (auto i : make_range(elem.dim()))
                     {
                       const dof_id_type dof_id =
                         edge_node.dof_number(sys_num, var, i);
@@ -2558,7 +2558,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
                   if (fe_type.family == LAGRANGE_VEC)
                   {
                     // We will have a number of nodal value DoFs equal to the elem dim
-                    for (unsigned int i = 0; i < elem.dim(); ++i)
+                    for (auto i : make_range(elem.dim()))
                     {
                       const dof_id_type dof_id = side_node.dof_number(sys_num, var, i);
 

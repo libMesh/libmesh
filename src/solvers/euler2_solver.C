@@ -16,12 +16,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "libmesh/diff_system.h"
+// Local includes
 #include "libmesh/euler2_solver.h"
 
-#include "libmesh/error_vector.h"
-#include "libmesh/numeric_vector.h"
 #include "libmesh/adjoint_refinement_estimator.h"
+#include "libmesh/diff_system.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/int_range.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {
@@ -377,7 +379,7 @@ void Euler2Solver::integrate_adjoint_refinement_error_estimate(AdjointRefinement
   }
   else
   {
-    for(unsigned int i = 0; i < QoI_elementwise_error.size(); i++)
+    for(auto i : index_range(QoI_elementwise_error))
       QoI_elementwise_error_left[i] = 0.0;
   }
 
@@ -461,7 +463,7 @@ void Euler2Solver::integrate_adjoint_refinement_error_estimate(AdjointRefinement
   }
 
   // Error contribution from this timestep
-  for(unsigned int i = 0; i < QoI_elementwise_error.size(); i++)
+  for (auto i : index_range(QoI_elementwise_error))
     QoI_elementwise_error[i] = float(((QoI_elementwise_error_right[i] + QoI_elementwise_error_left[i])/2)
                                      * (time_right - time_left));
 

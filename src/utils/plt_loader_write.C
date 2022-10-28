@@ -17,11 +17,13 @@
 
 
 
-// C++ includes
-#include <fstream>
-
 // Local includes
 #include "libmesh/plt_loader.h"
+
+#include "libmesh/int_range.h"
+
+// C++ includes
+#include <fstream>
 
 namespace libMesh
 {
@@ -460,10 +462,10 @@ void PltLoader::write_dat (const std::string & name,
 
   out_stream << "VARIABLES = ";
 
-  for (unsigned int v=0; v<this->n_vars(); v++)
+  for (auto v : make_range(this->n_vars()))
     out_stream << "\"" << this->var_name(v) << "\"\n";
 
-  for (unsigned int z=0; z<this->n_zones(); z++)
+  for (auto z : make_range(this->n_zones()))
     {
       out_stream << "ZONE T=\"" << this->zone_name(z) << "\"\n";
       out_stream << " I="  << this->imax(z)
@@ -490,7 +492,7 @@ void PltLoader::write_dat (const std::string & name,
 
           out_stream.precision(9);
 
-          for (unsigned int v=0; v<this->n_vars(); v++)
+          for (auto v : make_range(this->n_vars()))
             {
               unsigned int l=0;
 
@@ -539,7 +541,7 @@ void PltLoader::write_dat (const std::string & name,
               for (unsigned int j=0; j<this->jmax(z); j++)
                 for (unsigned int i=0; i<this->imax(z); i++)
                   {
-                    for (unsigned int v=0; v<this->n_vars(); v++)
+                    for (auto v : make_range(this->n_vars()))
                       out_stream << std::scientific
                                  << _data[z][v][l] << " ";
 

@@ -1230,9 +1230,10 @@ struct RawType<libMesh::DenseMatrix<T>>
 
   static value_type value (const libMesh::DenseMatrix<T> & in)
     {
-      value_type ret(in.m(), in.n());
-      for (unsigned int i = 0; i < in.m(); ++i)
-        for (unsigned int j = 0; j < in.n(); ++j)
+      const auto m = in.m(), n = in.n();
+      value_type ret(m, n);
+      for (unsigned int i = 0; i < m; ++i)
+        for (unsigned int j = 0; j < n; ++j)
           ret(i,j) = raw_value(in(i,j));
 
       return ret;
