@@ -57,6 +57,19 @@ typedef int pid_t;
 #endif
 
 
+namespace // Anonymous namespace for helper
+{
+  // Only check a basename for a suffix, without any preceding
+  // path name.  "/tmp/foo.e25ad0/mesh.msh" is not ExodusII.
+  std::string_view basename_of(const std::string & fullname)
+  {
+    std::size_t first_char = fullname.find_last_of("/\\");
+    if (first_char == std::string::npos)
+      first_char = 0;
+    return std::string_view(fullname).substr(first_char);
+  }
+}
+
 namespace libMesh
 {
 
@@ -68,13 +81,7 @@ void NameBasedIO::read (const std::string & name)
 {
   MeshBase & mymesh = MeshInput<MeshBase>::mesh();
 
-  // Only check the basename for a suffix, without any preceding
-  // path name.  "/tmp/foo.e25ad0/mesh.msh" is not ExodusII.
-  std::size_t first_char = name.find_last_of("/\\");
-  if (first_char == std::string::npos)
-    first_char = 0;
-  const std::string_view basename =
-    std::string_view(name).substr(first_char);
+  const std::string_view basename = basename_of(name);
 
   // See if the file exists.  Perform this check on all processors
   // so that the code is terminated properly in the case that the
@@ -302,13 +309,7 @@ void NameBasedIO::write (const std::string & name)
 {
   MeshBase & mymesh = MeshInput<MeshBase>::mesh();
 
-  // Only check the basename for a suffix, without any preceding
-  // path name.  "/tmp/foo.e25ad0/mesh.msh" is not ExodusII.
-  std::size_t first_char = name.find_last_of("/\\");
-  if (first_char == std::string::npos)
-    first_char = 0;
-  const std::string_view basename =
-    std::string_view(name).substr(first_char);
+  const std::string_view basename = basename_of(name);
 
   // parallel formats are special -- they may choose to write
   // separate files, let's not try to handle the zipping here.
@@ -535,13 +536,7 @@ void NameBasedIO::write_equation_systems (const std::string & filename,
   // writing complete restarts
   if (!system_names)
     {
-      // Only check the basename for a suffix, without any preceding
-      // path name.  "/tmp/foo.xdr45a/mesh.xda" is not XDR
-      std::size_t first_char = filename.find_last_of("/\\");
-      if (first_char == std::string::npos)
-        first_char = 0;
-      const std::string_view basename =
-        std::string_view(filename).substr(first_char);
+      const std::string_view basename = basename_of(filename);
 
       if (basename.rfind(".xda") < basename.size())
         {
