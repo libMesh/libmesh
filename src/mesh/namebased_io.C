@@ -68,14 +68,22 @@ void NameBasedIO::read (const std::string & name)
 {
   MeshBase & mymesh = MeshInput<MeshBase>::mesh();
 
+  // Only check the basename for a suffix, without any preceding
+  // path name.  "/tmp/foo.e25ad0/mesh.msh" is not ExodusII.
+  std::size_t first_char = name.find_last_of("/\\");
+  if (first_char == std::string::npos)
+    first_char = 0;
+  const std::string_view basename =
+    std::string_view(name).substr(first_char);
+
   // See if the file exists.  Perform this check on all processors
   // so that the code is terminated properly in the case that the
   // file does not exist.
 
   // For Nemesis files, the name we try to read will have suffixes
   // identifying processor rank
-  if (name.rfind(".nem") + 4 == name.size() ||
-      name.rfind(".n") + 2 == name.size())
+  if (basename.rfind(".nem") + 4 == basename.size() ||
+      basename.rfind(".n") + 2 == basename.size())
     {
       std::ostringstream full_name;
 
@@ -94,7 +102,7 @@ void NameBasedIO::read (const std::string & name)
       std::ifstream in (full_name.str().c_str());
       libmesh_error_msg_if(!in.good(), "ERROR: cannot locate specified file:\n\t" << full_name.str());
     }
-  else if (name.rfind(".cp")) {} // Do error checking in the reader
+  else if (basename.rfind(".cp")) {} // Do error checking in the reader
   else
     {
       std::ifstream in (name.c_str());
@@ -102,16 +110,16 @@ void NameBasedIO::read (const std::string & name)
     }
 
   // Look for parallel formats first
-  if (is_parallel_file_format(name))
+  if (is_parallel_file_format(basename))
     {
       // no need to handle bz2 files here -- the Xdr class does that.
-      if ((name.rfind(".xda") < name.size()) ||
-          (name.rfind(".xdr") < name.size()))
+      if ((basename.rfind(".xda") < basename.size()) ||
+          (basename.rfind(".xdr") < basename.size()))
         {
           XdrIO xdr_io(mymesh);
 
           // .xda* ==> bzip2/gzip/ASCII flavors
-          if (name.rfind(".xda") < name.size())
+          if (basename.rfind(".xda") < basename.size())
             {
               xdr_io.binary() = false;
               xdr_io.read (name);
@@ -148,12 +156,12 @@ void NameBasedIO::read (const std::string & name)
           mymesh.allow_renumbering(false);
 #endif
         }
-      else if (name.rfind(".nem") < name.size() ||
-               name.rfind(".n")   < name.size())
+      else if (basename.rfind(".nem") < basename.size() ||
+               basename.rfind(".n")   < basename.size())
         Nemesis_IO(mymesh).read (name);
-      else if (name.rfind(".cp") < name.size())
+      else if (basename.rfind(".cp") < basename.size())
         {
-          if (name.rfind(".cpa") < name.size())
+          if (basename.rfind(".cpa") < basename.size())
             CheckpointIO(mymesh, false).read(name);
           else
             CheckpointIO(mymesh, true).read(name);
@@ -203,45 +211,45 @@ void NameBasedIO::read (const std::string & name)
 #endif
             }
 
-          if (new_name.rfind(".mat") < new_name.size())
+          if (basename.rfind(".mat") < basename.size())
             MatlabIO(mymesh).read(new_name);
 
-          else if (new_name.rfind(".ucd") < new_name.size())
+          else if (basename.rfind(".ucd") < basename.size())
             UCDIO(mymesh).read (new_name);
 
-          else if ((new_name.rfind(".off")  < new_name.size()) ||
-                   (new_name.rfind(".ogl")  < new_name.size()) ||
-                   (new_name.rfind(".oogl") < new_name.size()))
+          else if ((basename.rfind(".off")  < basename.size()) ||
+                   (basename.rfind(".ogl")  < basename.size()) ||
+                   (basename.rfind(".oogl") < basename.size()))
             OFFIO(mymesh).read (new_name);
 
-          else if (new_name.rfind(".unv") < new_name.size())
+          else if (basename.rfind(".unv") < basename.size())
             UNVIO(mymesh).read (new_name);
 
-          else if ((new_name.rfind(".node")  < new_name.size()) ||
-                   (new_name.rfind(".ele")   < new_name.size()))
+          else if ((basename.rfind(".node")  < basename.size()) ||
+                   (basename.rfind(".ele")   < basename.size()))
             TetGenIO(mymesh).read (new_name);
 
-          else if (new_name.rfind(".exd") < new_name.size() ||
-                   new_name.rfind(".e") < new_name.size())
+          else if (basename.rfind(".exd") < basename.size() ||
+                   basename.rfind(".e") < basename.size())
             ExodusII_IO(mymesh).read (new_name);
 
-          else if (new_name.rfind(".msh") < new_name.size())
+          else if (basename.rfind(".msh") < basename.size())
             GmshIO(mymesh).read (new_name);
 
-          else if (new_name.rfind(".gmv") < new_name.size())
+          else if (basename.rfind(".gmv") < basename.size())
             GMVIO(mymesh).read (new_name);
 
-          else if (new_name.rfind(".vtu") < new_name.size())
+          else if (basename.rfind(".vtu") < basename.size())
             VTKIO(mymesh).read(new_name);
 
-          else if (new_name.rfind(".inp") < new_name.size())
+          else if (basename.rfind(".inp") < basename.size())
             AbaqusIO(mymesh).read(new_name);
 
-          else if ((new_name.rfind(".bext")  < new_name.size()) ||
-                   (new_name.rfind(".bxt")   < new_name.size()))
+          else if ((basename.rfind(".bext")  < basename.size()) ||
+                   (basename.rfind(".bxt")   < basename.size()))
             DynaIO(mymesh).read (new_name);
 
-          else if (new_name.rfind(".bez")  < new_name.size())
+          else if (basename.rfind(".bez")  < basename.size())
             DynaIO(mymesh, false).read (new_name);
 
           else
@@ -294,25 +302,33 @@ void NameBasedIO::write (const std::string & name)
 {
   MeshBase & mymesh = MeshInput<MeshBase>::mesh();
 
+  // Only check the basename for a suffix, without any preceding
+  // path name.  "/tmp/foo.e25ad0/mesh.msh" is not ExodusII.
+  std::size_t first_char = name.find_last_of("/\\");
+  if (first_char == std::string::npos)
+    first_char = 0;
+  const std::string_view basename =
+    std::string_view(name).substr(first_char);
+
   // parallel formats are special -- they may choose to write
   // separate files, let's not try to handle the zipping here.
-  if (is_parallel_file_format(name))
+  if (is_parallel_file_format(basename))
     {
       // no need to handle bz2 files here -- the Xdr class does that.
-      if (name.rfind(".xda") < name.size())
+      if (basename.rfind(".xda") < basename.size())
         XdrIO(mymesh).write(name);
 
-      else if (name.rfind(".xdr") < name.size())
+      else if (basename.rfind(".xdr") < basename.size())
         XdrIO(mymesh,true).write(name);
 
-      else if (name.rfind(".nem") < name.size() ||
-               name.rfind(".n")   < name.size())
+      else if (basename.rfind(".nem") < basename.size() ||
+               basename.rfind(".n")   < basename.size())
         Nemesis_IO(mymesh).write(name);
 
-      else if (name.rfind(".cpa") < name.size())
+      else if (basename.rfind(".cpa") < basename.size())
         CheckpointIO(mymesh,false).write(name);
 
-      else if (name.rfind(".cpr") < name.size())
+      else if (basename.rfind(".cpr") < basename.size())
         CheckpointIO(mymesh,true).write(name);
 
       else
@@ -345,16 +361,16 @@ void NameBasedIO::write (const std::string & name)
       // New scope so that io will close before we try to zip the file
       {
         // Write the file based on extension
-        if (new_name.rfind(".dat") < new_name.size())
+        if (basename.rfind(".dat") < basename.size())
           TecplotIO(mymesh).write (new_name);
 
-        else if (new_name.rfind(".plt") < new_name.size())
+        else if (basename.rfind(".plt") < basename.size())
           TecplotIO(mymesh,true).write (new_name);
 
-        else if (new_name.rfind(".ucd") < new_name.size())
+        else if (basename.rfind(".ucd") < basename.size())
           UCDIO (mymesh).write (new_name);
 
-        else if (new_name.rfind(".gmv") < new_name.size())
+        else if (basename.rfind(".gmv") < basename.size())
           if (mymesh.n_partitions() > 1)
             GMVIO(mymesh).write (new_name);
           else
@@ -364,26 +380,26 @@ void NameBasedIO::write (const std::string & name)
               io.write (new_name);
             }
 
-        else if (new_name.rfind(".exd") < new_name.size() ||
-                 new_name.rfind(".e") < new_name.size())
+        else if (basename.rfind(".exd") < basename.size() ||
+                 basename.rfind(".e") < basename.size())
           ExodusII_IO(mymesh).write(new_name);
 
-        else if (new_name.rfind(".unv") < new_name.size())
+        else if (basename.rfind(".unv") < basename.size())
           UNVIO(mymesh).write (new_name);
 
-        else if (new_name.rfind(".mesh") < new_name.size())
+        else if (basename.rfind(".mesh") < basename.size())
           MEDITIO(mymesh).write (new_name);
 
-        else if (new_name.rfind(".poly") < new_name.size())
+        else if (basename.rfind(".poly") < basename.size())
           TetGenIO(mymesh).write (new_name);
 
-        else if (new_name.rfind(".msh") < new_name.size())
+        else if (basename.rfind(".msh") < basename.size())
           GmshIO(mymesh).write (new_name);
 
-        else if (new_name.rfind(".fro") < new_name.size())
+        else if (basename.rfind(".fro") < basename.size())
           FroIO(mymesh).write (new_name);
 
-        else if (new_name.rfind(".vtu") < new_name.size())
+        else if (basename.rfind(".vtu") < basename.size())
           VTKIO(mymesh).write (new_name);
 
         else
@@ -519,14 +535,22 @@ void NameBasedIO::write_equation_systems (const std::string & filename,
   // writing complete restarts
   if (!system_names)
     {
-      if (filename.rfind(".xda") < filename.size())
+      // Only check the basename for a suffix, without any preceding
+      // path name.  "/tmp/foo.xdr45a/mesh.xda" is not XDR
+      std::size_t first_char = filename.find_last_of("/\\");
+      if (first_char == std::string::npos)
+        first_char = 0;
+      const std::string_view basename =
+        std::string_view(filename).substr(first_char);
+
+      if (basename.rfind(".xda") < basename.size())
         {
           es.write(filename,WRITE,
                    EquationSystems::WRITE_DATA |
                    EquationSystems::WRITE_ADDITIONAL_DATA);
           return;
         }
-      else if (filename.rfind(".xdr") < filename.size())
+      else if (basename.rfind(".xdr") < basename.size())
         {
           es.write(filename,ENCODE,
                    EquationSystems::WRITE_DATA |
