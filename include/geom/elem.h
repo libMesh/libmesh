@@ -1762,12 +1762,16 @@ public:
   virtual unsigned int n_permutations() const = 0;
 
   /**
-   * Permutes the element (by swapping node_ptr values) according to
-   * the specified index.
+   * Permutes the element (by swapping node and neighbor pointers)
+   * according to the specified index.
    *
    * This is useful for regression testing, by making it easy to make
    * a structured mesh behave more like an arbitrarily unstructured
    * mesh.
+   *
+   * This is so far *only* used for regression testing, so we do
+   * not currently provide a way to permute any boundary side/edge ids
+   * along with the element permutation.
    */
   virtual void permute(unsigned int perm_num) = 0;
 
