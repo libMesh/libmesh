@@ -186,6 +186,23 @@ void MeshTools::Modification::permute_elements(MeshBase & mesh)
 }
 
 
+void MeshTools::Modification::orient_elements(MeshBase & mesh)
+{
+  LOG_SCOPE("orient_elements()", "MeshTools::Modification");
+
+  // We don't yet support doing orient() on a parent element, which
+  // would require us to consistently orient all its children and
+  // give them different local child numbers.
+  unsigned int n_levels = MeshTools::n_levels(mesh);
+  if (n_levels > 1)
+    libmesh_error();
+
+  BoundaryInfo & boundary_info = mesh.get_boundary_info();
+  for (auto elem : mesh.element_ptr_range())
+    elem->orient(&boundary_info);
+}
+
+
 
 void MeshTools::Modification::redistribute (MeshBase & mesh,
                                             const FunctionBase<Real> & mapfunc)
