@@ -13,6 +13,7 @@
 
 #if LIBMESH_DIM > 2
 #define PARTITIONERTEST                         \
+  CPPUNIT_TEST( testBuild );                    \
   CPPUNIT_TEST( testPartitionEmpty );           \
   CPPUNIT_TEST( testPartition1 );               \
   CPPUNIT_TEST( testPartition2 );               \
@@ -35,6 +36,17 @@ public:
 
   void tearDown()
   {}
+
+  void testBuild()
+  {
+    PartitionerSubclass myclass;
+
+    PartitionerType type = myclass.type();
+
+    auto new_build = Partitioner::build(type);
+
+    CPPUNIT_ASSERT_EQUAL(new_build->type(), type);
+  }
 
   void testPartition(processor_id_type n_parts)
   {

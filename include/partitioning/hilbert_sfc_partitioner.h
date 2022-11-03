@@ -23,6 +23,8 @@
 // Local Includes
 #include "libmesh/sfc_partitioner.h"
 
+#include "libmesh/enum_partitioner_type.h"
+
 namespace libMesh
 {
 
@@ -55,6 +57,11 @@ public:
   HilbertSFCPartitioner & operator= (const HilbertSFCPartitioner &) = default;
   HilbertSFCPartitioner & operator= (HilbertSFCPartitioner &&) = default;
   virtual ~HilbertSFCPartitioner() = default;
+
+  virtual PartitionerType type () const override
+  {
+    return HILBERT_SFC_PARTITIONER;
+  };
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.

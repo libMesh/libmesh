@@ -82,6 +82,8 @@ public:
   CentroidPartitioner & operator= (CentroidPartitioner &&) = default;
   virtual ~CentroidPartitioner() = default;
 
+  virtual PartitionerType type () const override;
+
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */

@@ -56,6 +56,8 @@ public:
   MappedSubdomainPartitioner & operator= (MappedSubdomainPartitioner &&) = default;
   virtual ~MappedSubdomainPartitioner() = default;
 
+  virtual PartitionerType type () const override;
+
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */

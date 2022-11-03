@@ -509,11 +509,9 @@ int main (int argc, char ** argv)
 
         write_output(equation_systems, a_step, "primal", param);
 
-        NumericVector<Number> & primal_solution = *system.solution;
+        system.assemble_qoi_sides = true;
 
         SensitivityData sensitivities(qois, system, system.get_parameter_vector());
-
-        system.assemble_qoi_sides = true;
 
         // Here we solve the adjoint problem inside the adjoint_qoi_parameter_sensitivity
         // function, so we have to set the adjoint_already_solved boolean to false
@@ -563,8 +561,45 @@ int main (int argc, char ** argv)
         libmesh_assert_less(std::abs((sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact)/sensitivity_QoI_0_0_exact), 2.e-4);
         libmesh_assert_less(std::abs((sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact), 2.e-4);
 
-        NumericVector<Number> & dual_solution_0 = system.get_adjoint_solution(0);
+        // Let's do a forward sensitivity solve too, unless we're
+        // told to skip it for backwards compatibility with old
+        // performance benchmarks.
+        const bool forward_sensitivity = infile("--forward_sensitivity", true);
 
+        if (forward_sensitivity)
+          {
+            // This will require two linear solves (one per parameter)
+            // rather than the adjoint sensitivity's one, but it's useful
+            // for regression testing.
+            SensitivityData forward_sensitivities(qois, system, system.get_parameter_vector());
+            system.forward_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), forward_sensitivities);
+
+            libmesh_assert_less(std::abs((forward_sensitivities[0][0] - sensitivity_QoI_0_0_exact)/sensitivity_QoI_0_0_exact), 2.e-4);
+            libmesh_assert_less(std::abs((forward_sensitivities[0][1] - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact), 2.e-4);
+
+            // These should be the same linearization, just calculated
+            // different ways with different roundoff error
+            libmesh_assert_less
+              (std::abs((forward_sensitivities[0][0] - sensitivity_QoI_0_0_computed)/sensitivity_QoI_0_0_computed), TOLERANCE);
+            libmesh_assert_less
+              (std::abs((forward_sensitivities[0][1] - sensitivity_QoI_0_1_computed)/sensitivity_QoI_0_1_computed), TOLERANCE);
+
+            libMesh::out << "The error in forward calculation of sensitivity QoI_0_0 is "
+                         << std::setprecision(17)
+                         << std::abs(forward_sensitivities[0][0] - sensitivity_QoI_0_0_exact)/sensitivity_QoI_0_0_exact
+                         << std::endl;
+
+            libMesh::out << "The error in forward calculation of sensitivity QoI_0_1 is "
+                         << std::setprecision(17)
+                         << std::abs(forward_sensitivities[0][1] - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact
+                         << std::endl
+                         << std::endl;
+
+
+          }
+
+        NumericVector<Number> & primal_solution = *system.solution;
+        NumericVector<Number> & dual_solution_0 = system.get_adjoint_solution(0);
         primal_solution.swap(dual_solution_0);
         write_output(equation_systems, a_step, "adjoint_0", param);
 

@@ -19,10 +19,11 @@
 
 // Local Includes
 #include "libmesh/subdomain_partitioner.h"
-#include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
-#include "libmesh/metis_partitioner.h"
+#include "libmesh/enum_partitioner_type.h"
 #include "libmesh/int_range.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/metis_partitioner.h"
 
 namespace libMesh
 {
@@ -37,6 +38,12 @@ SubdomainPartitioner::SubdomainPartitioner (const SubdomainPartitioner & other)
     chunks(other.chunks),
     _internal_partitioner(other._internal_partitioner->clone())
 {}
+
+
+PartitionerType SubdomainPartitioner::type() const
+{
+  return SUBDOMAIN_PARTITIONER;
+}
 
 
 void SubdomainPartitioner::_do_partition (MeshBase & mesh,

@@ -21,10 +21,17 @@
 // Local includes
 #include "libmesh/centroid_partitioner.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_partitioner_type.h"
 #include "libmesh/int_range.h"
 
 namespace libMesh
 {
+
+
+PartitionerType CentroidPartitioner::type() const
+{
+  return CENTROID_PARTITIONER;
+}
 
 
 void CentroidPartitioner::partition_range(MeshBase & mesh,

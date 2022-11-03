@@ -22,14 +22,15 @@
 
 // libMesh includes
 #include "libmesh/libmesh_config.h"
+#include "libmesh/elem.h"
+#include "libmesh/enum_partitioner_type.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/metis_partitioner.h"
 #include "libmesh/parallel_only.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/elem.h"
 #include "libmesh/parmetis_helper.h"
 
 // TIMPI includes
@@ -88,6 +89,13 @@ ParmetisPartitioner::ParmetisPartitioner (const ParmetisPartitioner & other)
 
 
 ParmetisPartitioner::~ParmetisPartitioner() = default;
+
+
+
+PartitionerType ParmetisPartitioner::type() const
+{
+  return PARMETIS_PARTITIONER;
+}
 
 
 

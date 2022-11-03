@@ -58,6 +58,8 @@
 #include "libmesh/perf_log.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/dirichlet_boundaries.h"
+#include "libmesh/wrapped_function.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -70,6 +72,9 @@ using namespace libMesh;
 // other objects we might need.
 void assemble_biharmonic(EquationSystems & es,
                          const std::string & system_name);
+
+// Global parameter, to be accessible to the above function
+bool penalty_dirichlet = true;
 
 
 // Prototypes for calculation of the exact solution.  Necessary
@@ -189,6 +194,7 @@ int main(int argc, char ** argv)
   const Real coarsen_percentage = input_file("coarsen_percentage", 0.5);
   const unsigned int dim = input_file("dimension", 2);
   const unsigned int max_linear_iterations = input_file("max_linear_iterations", 10000);
+  penalty_dirichlet = input_file("penalty_dirichlet", penalty_dirichlet);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
@@ -217,10 +223,12 @@ int main(int argc, char ** argv)
   else
     output_file += "clough_";
 
+  output_file += approx_order_string;
+
   if (uniform_refine == 0)
-    output_file += "adaptive";
+    output_file += "_adaptive";
   else
-    output_file += "uniform";
+    output_file += "_uniform";
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // If we have Exodus, use the same base output filename
@@ -303,6 +311,26 @@ int main(int argc, char ** argv)
   // function.
   system.attach_assemble_function (assemble_biharmonic);
 
+  // Give the system Dirichlet boundary conditions, if we want to
+  // enforce those strongly.
+  if (!penalty_dirichlet)
+    {
+      const std::vector<unsigned int>
+        all_vars(1, system.variable_number("u"));
+      std::set<boundary_id_type> all_bdys;
+      for (unsigned int i=0; i != dim; ++i)
+        {
+          all_bdys.insert(2*i);
+          all_bdys.insert(2*i+1);
+        }
+
+      WrappedFunction<Number> exact_val(system, exact_solution);
+      WrappedFunction<Gradient> exact_grad(system, *exact_derivative);
+      DirichletBoundary exact_bc(all_bdys, all_vars, exact_val,
+                                 exact_grad);
+      system.get_dof_map().add_dirichlet_boundary(exact_bc);
+    }
+
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
@@ -376,6 +404,20 @@ int main(int argc, char ** argv)
           << exact_sol.l2_error("Biharmonic", "u") << " "
           << exact_sol.h1_error("Biharmonic", "u") << " "
           << exact_sol.h2_error("Biharmonic", "u") << std::endl;
+
+      // Assert that we're not outright diverging here, for regression
+      // testing.  These bounds just come from eyeballing some graphs
+      // and tacking on a huge tolerance.
+      const dof_id_type n_dofs = system.n_dofs();
+
+      if (exact_sol.l2_error("Biharmonic", "u") > 200*std::pow(n_dofs,-4./3.))
+        libmesh_error_msg("Unacceptably high L2-error!");
+
+      if (exact_sol.h1_error("Biharmonic", "u") > 200./n_dofs)
+        libmesh_error_msg("Unacceptably high H1-error!");
+
+      if (exact_sol.h2_error("Biharmonic", "u") > 400*std::pow(n_dofs,-2./3.))
+        libmesh_error_msg("Unacceptably high H2-error!");
 
       // Possibly refine the mesh
       if (r_step+1 != max_r_steps)
@@ -836,12 +878,14 @@ void assemble_biharmonic(EquationSystems & es,
 
 
       // At this point the interior element integration has
-      // been completed.  However, we have not yet addressed
-      // boundary conditions.  For this example we will only
-      // consider simple Dirichlet boundary conditions imposed
+      // been completed.  However, we may have not yet addressed
+      // boundary conditions, if we didn't add a DirichletBoundary to
+      // our system earlier.  In that case, we will demonstrate the
+      // imposition of simple Dirichlet boundary conditions imposed
       // via the penalty method.  Note that this is a fourth-order
       // problem: Dirichlet boundary conditions include *both*
       // boundary values and boundary normal fluxes.
+      if (penalty_dirichlet)
       {
         // Start logging the boundary condition computation.  We use a
         // macro to log everything in this scope.

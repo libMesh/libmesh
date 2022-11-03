@@ -18,17 +18,19 @@
 
 
 // Local Includes
-#include "libmesh/libmesh_config.h"
-#include "libmesh/mesh_base.h"
 #include "libmesh/metis_partitioner.h"
-#include "libmesh/libmesh_logging.h"
+
+#include "libmesh/libmesh_config.h"
 #include "libmesh/elem.h"
-#include "libmesh/mesh_communication.h"
+#include "libmesh/enum_partitioner_type.h"
 #include "libmesh/error_vector.h"
-#include "libmesh/vectormap.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_communication.h"
 #include "libmesh/metis_csr_graph.h"
 #include "libmesh/parallel.h"
 #include "libmesh/utility.h"
+#include "libmesh/vectormap.h"
 
 #ifdef LIBMESH_HAVE_METIS
 // MIPSPro 7.4.2 gets confused about these nested namespaces
@@ -53,6 +55,12 @@ extern "C" {
 
 namespace libMesh
 {
+
+
+PartitionerType MetisPartitioner::type() const
+{
+  return METIS_PARTITIONER;
+}
 
 
 void MetisPartitioner::partition_range(MeshBase & mesh,
