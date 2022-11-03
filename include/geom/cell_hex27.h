@@ -252,6 +252,8 @@ public:
 
   virtual void permute(unsigned int perm_num) override final;
 
+  virtual void flip(BoundaryInfo *) override final;
+
   unsigned int center_node_on_side(const unsigned short side) const override final;
 
   ElemType side_type (const unsigned int s) const override final;

@@ -50,9 +50,9 @@ namespace libMesh
 
 // Forward declarations
 class BoundaryInfo;
+class Elem;
 class MeshBase;
 class MeshRefinement;
-class Elem;
 #ifdef LIBMESH_ENABLE_PERIODIC
 class PeriodicBoundaries;
 class PointLocatorBase;
@@ -1775,6 +1775,19 @@ public:
    * along with the element permutation.
    */
   virtual void permute(unsigned int perm_num) = 0;
+
+  /**
+   * Flips the element (by swapping node and neighbor pointers) to
+   * have a mapping Jacobian of opposite sign.
+   *
+   * This is useful for automatically fixing up elements that have
+   * been newly created (e.g. from extrusions) with a negative
+   * Jacobian.
+   *
+   * If \p boundary_info is not null, swap boundary side/edge ids
+   * consistently.
+   */
+  virtual void flip(BoundaryInfo * boundary_info) = 0;
 
 #ifdef LIBMESH_ENABLE_AMR
 

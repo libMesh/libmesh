@@ -153,4 +153,13 @@ dof_id_type Edge2::key () const
                            this->node_id(1));
 }
 
+
+void Edge2::flip(BoundaryInfo * boundary_info)
+{
+  swap2nodes(0,1);
+  swap2neighbors(0,1);
+  swap2boundarysides(0,1,boundary_info);
+}
+
+
 } // namespace libMesh

@@ -889,6 +889,23 @@ Prism21::permute(unsigned int perm_num)
 }
 
 
+void
+Prism21::flip(BoundaryInfo * boundary_info)
+{
+  swap2nodes(0,1);
+  swap2nodes(3,4);
+  swap2nodes(7,8);
+  swap2nodes(9,10);
+  swap2nodes(13,14);
+  swap2nodes(16,17);
+  swap2neighbors(2,3);
+  swap2boundarysides(2,3,boundary_info);
+  swap2boundaryedges(0,1,boundary_info);
+  swap2boundaryedges(3,4,boundary_info);
+  swap2boundaryedges(7,8,boundary_info);
+}
+
+
 unsigned int Prism21::center_node_on_side(const unsigned short side) const
 {
   libmesh_assert_less (side, Prism21::num_sides);

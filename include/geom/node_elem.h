@@ -265,6 +265,8 @@ public:
 
   virtual void permute(unsigned int) override final { libmesh_error(); }
 
+  virtual void flip(BoundaryInfo *) override final { libmesh_error(); }
+
   virtual ElemType side_type (const unsigned int) const override
   {
     libmesh_not_implemented();

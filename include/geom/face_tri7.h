@@ -219,6 +219,8 @@ public:
 
   virtual void permute(unsigned int perm_num) override final;
 
+  virtual void flip(BoundaryInfo *) override final;
+
 #ifdef LIBMESH_ENABLE_AMR
   virtual
   const std::vector<std::pair<unsigned char, unsigned char>> &

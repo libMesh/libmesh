@@ -471,6 +471,17 @@ void Quad9::permute(unsigned int perm_num)
 }
 
 
+void Quad9::flip(BoundaryInfo * boundary_info)
+{
+  swap2nodes(0,1);
+  swap2nodes(2,3);
+  swap2nodes(5,7);
+  swap2neighbors(1,3);
+  swap2boundarysides(1,3,boundary_info);
+  swap2boundaryedges(1,3,boundary_info);
+}
+
+
 unsigned int Quad9::center_node_on_side(const unsigned short side) const
 {
   libmesh_assert_less (side, Quad9::num_sides);

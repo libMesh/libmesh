@@ -508,6 +508,22 @@ Hex8::permute(unsigned int perm_num)
 }
 
 
+void
+Hex8::flip(BoundaryInfo * boundary_info)
+{
+  swap2nodes(0,1);
+  swap2nodes(2,3);
+  swap2nodes(4,5);
+  swap2nodes(6,7);
+  swap2neighbors(2,4);
+  swap2boundarysides(2,4,boundary_info);
+  swap2boundaryedges(1,3,boundary_info);
+  swap2boundaryedges(4,5,boundary_info);
+  swap2boundaryedges(6,7,boundary_info);
+  swap2boundaryedges(9,11,boundary_info);
+}
+
+
 ElemType
 Hex8::side_type (const unsigned int libmesh_dbg_var(s)) const
 {

@@ -204,6 +204,8 @@ public:
   static const int nodes_per_side = 1;
   static const int nodes_per_edge = invalid_int;
 
+  virtual void flip(BoundaryInfo *) override final;
+
 protected:
 
   /**

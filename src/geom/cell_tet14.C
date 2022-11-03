@@ -790,6 +790,19 @@ void Tet14::permute(unsigned int perm_num)
 }
 
 
+void Tet14::flip(BoundaryInfo * boundary_info)
+{
+  swap2nodes(0,2);
+  swap2nodes(4,5);
+  swap2nodes(7,9);
+  swap2nodes(11,12);
+  swap2neighbors(1,2);
+  swap2boundarysides(1,2,boundary_info);
+  swap2boundaryedges(0,1,boundary_info);
+  swap2boundaryedges(3,5,boundary_info);
+}
+
+
 ElemType Tet14::side_type (const unsigned int libmesh_dbg_var(s)) const
 {
   libmesh_assert_less (s, 4);

@@ -755,6 +755,22 @@ Prism15::permute(unsigned int perm_num)
 }
 
 
+void
+Prism15::flip(BoundaryInfo * boundary_info)
+{
+  swap2nodes(0,1);
+  swap2nodes(3,4);
+  swap2nodes(7,8);
+  swap2nodes(9,10);
+  swap2nodes(13,14);
+  swap2neighbors(2,3);
+  swap2boundarysides(2,3,boundary_info);
+  swap2boundaryedges(0,1,boundary_info);
+  swap2boundaryedges(3,4,boundary_info);
+  swap2boundaryedges(7,8,boundary_info);
+}
+
+
 ElemType
 Prism15::side_type (const unsigned int s) const
 {

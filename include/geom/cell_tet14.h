@@ -237,6 +237,8 @@ public:
 
   virtual void permute(unsigned int perm_num) override final;
 
+  virtual void flip(BoundaryInfo *) override final;
+
   ElemType side_type (const unsigned int s) const override final;
 
 #ifdef LIBMESH_ENABLE_AMR

@@ -386,6 +386,21 @@ InfHex8::permute(unsigned int perm_num)
 }
 
 
+void
+InfHex8::flip(BoundaryInfo * boundary_info)
+{
+  swap2nodes(0,1);
+  swap2nodes(2,3);
+  swap2nodes(4,5);
+  swap2nodes(6,7);
+  swap2neighbors(0,4);
+  swap2boundarysides(0,4,boundary_info);
+  swap2boundaryedges(1,3,boundary_info);
+  swap2boundaryedges(4,5,boundary_info);
+  swap2boundaryedges(6,7,boundary_info);
+}
+
+
 ElemType
 InfHex8::side_type (const unsigned int s) const
 {
