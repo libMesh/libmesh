@@ -236,6 +236,16 @@ std::vector<unsigned int> Prism::sides_on_edge(const unsigned int e) const
 }
 
 
+void
+Prism::orient(BoundaryInfo * boundary_info)
+{
+  if (triple_product(this->point(1)-this->point(0),
+                     this->point(2)-this->point(0),
+                     this->point(3)-this->point(0)) < 0)
+    this->flip(boundary_info);
+}
+
+
 
 const unsigned short int Prism::_second_order_vertex_child_number[18] =
   {

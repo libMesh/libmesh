@@ -302,6 +302,17 @@ InfPrism::sides_on_edge(const unsigned int e) const
   return {std::begin(edge_sides_map[e]), std::end(edge_sides_map[e])};
 }
 
+
+void
+InfPrism::orient(BoundaryInfo * boundary_info)
+{
+  if (triple_product(this->point(1)-this->point(0),
+                     this->point(2)-this->point(0),
+                     this->point(3)-this->point(0)) < 0)
+    this->flip(boundary_info);
+}
+
+
 } // namespace libMesh
 
 

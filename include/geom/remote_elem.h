@@ -231,6 +231,7 @@ public:
   virtual void permute(unsigned int) override { libmesh_error(); }
 
   virtual void flip(BoundaryInfo *) override final { libmesh_error(); }
+  virtual void orient(BoundaryInfo *) override final { libmesh_error(); }
 
   virtual unsigned int center_node_on_side(const unsigned short) const override
   { libmesh_error(); return invalid_uint; }

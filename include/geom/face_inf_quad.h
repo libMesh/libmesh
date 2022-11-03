@@ -231,6 +231,8 @@ public:
 
   virtual void permute(unsigned int) override final { libmesh_error(); }
 
+  virtual void orient(BoundaryInfo *) override final;
+
 protected:
 
   /**

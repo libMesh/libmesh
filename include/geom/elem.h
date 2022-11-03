@@ -1789,6 +1789,14 @@ public:
    */
   virtual void flip(BoundaryInfo * boundary_info) = 0;
 
+  /**
+   * Flips the element (by swapping node and neighbor pointers) to
+   * have a mapping Jacobian of opposite sign, iff we find a negative
+   * orientation.  This only fixes flipped elements; for tangled
+   * elements the only fixes possible are non-local.
+   */
+  virtual void orient(BoundaryInfo * boundary_info) = 0;
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**

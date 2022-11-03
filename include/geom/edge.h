@@ -202,6 +202,8 @@ public:
 
   virtual void permute(unsigned int) override final { libmesh_error(); }
 
+  virtual void orient(BoundaryInfo *) override final;
+
   unsigned int center_node_on_side(const unsigned short side) const override final;
 
   ElemType side_type (const unsigned int s) const override final;
