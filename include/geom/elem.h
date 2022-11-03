@@ -49,6 +49,7 @@ namespace libMesh
 {
 
 // Forward declarations
+class BoundaryInfo;
 class MeshBase;
 class MeshRefinement;
 class Elem;
@@ -1875,6 +1876,18 @@ protected:
     this->set_neighbor(n1, this->neighbor_ptr(n2));
     this->set_neighbor(n2, temp);
   }
+
+  /**
+   * Swaps two sides in \p boundary_info, if it is non-null.
+   */
+  void swap2boundarysides(unsigned short s1, unsigned short s2,
+                          BoundaryInfo * boundary_info) const;
+
+  /**
+   * Swaps two edges in \p boundary_info, if it is non-null.
+   */
+  void swap2boundaryedges(unsigned short e1, unsigned short e2,
+                          BoundaryInfo * boundary_info) const;
 
   /**
    * Swaps three node_ptrs, "rotating" them.
