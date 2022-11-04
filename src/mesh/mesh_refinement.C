@@ -644,11 +644,10 @@ bool MeshRefinement::coarsen_elements ()
   // we don't want to abort large parallel runs in opt mode... but we
   // do want to warn that they should be fixed.
   libmesh_assert(flags_were_consistent);
+
   if (!flags_were_consistent)
-    {
-      libMesh::out << "Refinement flags were not consistent between processors!\n"
-                   << "Correcting and continuing.";
-    }
+    libmesh_warning("Warning: Refinement flags were not consistent between processors! "
+                    "Correcting and continuing.\n");
 
   // Smooth coarsening flags
   _smooth_flags(false, true);
@@ -720,11 +719,10 @@ bool MeshRefinement::refine_elements ()
   // we don't want to abort large parallel runs in opt mode... but we
   // do want to warn that they should be fixed.
   libmesh_assert(flags_were_consistent);
+
   if (!flags_were_consistent)
-    {
-      libMesh::out << "Refinement flags were not consistent between processors!\n"
-                   << "Correcting and continuing.";
-    }
+    libmesh_warning("Warning: Refinement flags were not consistent between processors! "
+                    "Correcting and continuing.\n");
 
   // Smooth refinement flags
   _smooth_flags(true, false);
