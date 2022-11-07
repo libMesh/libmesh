@@ -177,6 +177,12 @@ private:
     std::unique_ptr<QBase> qrule =
       QBase::build(qtype, dim, static_cast<Order>(order));
 
+    // We are testing integration on the reference elements here, so
+    // the element map is not relevant, and we can safely use nodal
+    // Pyramid quadrature.
+    if (elem_type == PYRAMID5 || elem_type == PYRAMID13 || elem_type == PYRAMID14 || elem_type == PYRAMID18)
+      qrule->allow_nodal_pyramid_quadrature = true;
+
     qrule->init (elem_type);
 
     const int max_y_order = dim>1 ? 0 : exactorder;
