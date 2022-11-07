@@ -245,6 +245,19 @@ public:
    */
   bool allow_rules_with_negative_weights;
 
+  /**
+   * The flag's value defaults to false so that one does not accidentally
+   * use a nodal quadrature rule on Pyramid elements, since evaluating the
+   * inverse element Jacobian (e.g. dphi) is not well-defined at the
+   * Pyramid apex because the element Jacobian is zero there.
+   *
+   * We do not want to completely prevent someone from using a nodal
+   * quadrature rule on Pyramids, however, since there are legitimate
+   * use cases (lumped mass matrix) so the flag can be set to true to
+   * override this behavior.
+   */
+  bool allow_nodal_pyramid_quadrature;
+
 protected:
 
 

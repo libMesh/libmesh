@@ -27,6 +27,7 @@ namespace libMesh
 QBase::QBase(unsigned int d,
              Order o) :
   allow_rules_with_negative_weights(true),
+  allow_nodal_pyramid_quadrature(false),
   _dim(d),
   _order(o),
   _type(INVALID_ELEM),
