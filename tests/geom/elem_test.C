@@ -1,10 +1,11 @@
 #include "test_comm.h"
 
+#include <libmesh/boundary_info.h>
 #include <libmesh/elem.h>
 #include <libmesh/enum_elem_type.h>
+#include <libmesh/elem_side_builder.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
-#include <libmesh/elem_side_builder.h>
 
 #include "libmesh_cppunit.h"
 
@@ -262,6 +263,77 @@ public:
       }
   }
 
+  void test_flip()
+  {
+    LOG_UNIT_TEST;
+
+    BoundaryInfo & boundary_info = _mesh->get_boundary_info();
+
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      {
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+        if (elem->infinite())
+          continue;
+#endif
+        const Point vertex_avg = elem->vertex_average();
+
+        const unsigned int n_sides = elem->n_sides();
+        std::vector<std::set<Point*>> side_nodes(n_sides);
+        std::vector<Elem*> neighbors(n_sides);
+        std::vector<std::vector<boundary_id_type>> bcids(n_sides);
+        for (auto s : make_range(n_sides))
+          {
+            for (auto n : elem->nodes_on_side(s))
+              side_nodes[s].insert(elem->node_ptr(n));
+            neighbors[s] = elem->neighbor_ptr(s);
+            boundary_info.boundary_ids(elem, s, bcids[s]);
+          }
+
+        elem->flip(&boundary_info);
+
+        // We should just be flipped, not twisted, so our map should
+        // still be affine.
+        // ... except for stupid singular pyramid maps
+        if (elem->dim() < 3 ||
+            elem->n_vertices() != 5)
+          CPPUNIT_ASSERT(elem->has_affine_map());
+
+        // The neighbors and bcids should have flipped in a way
+        // consistently with the nodes.
+        bool something_changed = false;
+        for (auto s : make_range(n_sides))
+          {
+            std::set<Point*> new_side_nodes;
+            for (auto n : elem->nodes_on_side(s))
+              new_side_nodes.insert(elem->node_ptr(n));
+
+            std::vector<boundary_id_type> new_bcids;
+            boundary_info.boundary_ids(elem, s, new_bcids);
+
+            unsigned int old_side = libMesh::invalid_uint;
+            for (auto os : make_range(n_sides))
+              if (new_side_nodes == side_nodes[os])
+                old_side = os;
+
+            if (old_side != s)
+              something_changed = true;
+
+            CPPUNIT_ASSERT(old_side != libMesh::invalid_uint);
+
+            CPPUNIT_ASSERT(neighbors[old_side] ==
+                           elem->neighbor_ptr(s));
+
+            CPPUNIT_ASSERT(bcids[old_side] == new_bcids);
+          }
+        CPPUNIT_ASSERT(something_changed);
+
+        const Point new_vertex_avg = elem->vertex_average();
+        for (const auto d : make_range(LIBMESH_DIM))
+          LIBMESH_ASSERT_FP_EQUAL(vertex_avg(d), new_vertex_avg(d),
+                                  TOLERANCE*TOLERANCE);
+      }
+  }
+
   void test_center_node_on_side()
   {
     LOG_UNIT_TEST;
@@ -328,6 +400,7 @@ public:
   CPPUNIT_TEST( test_bounding_box );            \
   CPPUNIT_TEST( test_maps );                    \
   CPPUNIT_TEST( test_permute );                 \
+  CPPUNIT_TEST( test_flip );                    \
   CPPUNIT_TEST( test_contains_point_node );     \
   CPPUNIT_TEST( test_center_node_on_side );     \
   CPPUNIT_TEST( test_side_type );               \
