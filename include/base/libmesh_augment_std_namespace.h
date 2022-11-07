@@ -46,8 +46,8 @@ LIBMESH_DEFINE_BOTH_MAX_MIN(libMesh::Real, double)
 LIBMESH_DEFINE_BOTH_MAX_MIN(libMesh::Real, float)
 #endif
 
-// fix for std::abs() overload ambiguity
-#if defined(__PGI)
+// fix for std::abs() overload ambiguity with older PGI
+#if defined(__PGI) && !defined(__NVCOMPILER)
 inline double abs(double a)
 { return ::fabs(a); }
 #endif

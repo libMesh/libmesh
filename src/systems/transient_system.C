@@ -29,6 +29,12 @@
 #include "libmesh/rb_construction.h"
 #include "libmesh/eigen_system.h"
 
+// Nvidia C++ whining about destroying incomplete unique_ptr<T> Base::foo types
+#include "libmesh/diff_solver.h"
+#include "libmesh/nonlinear_solver.h"
+#include "libmesh/shell_matrix.h"
+#include "libmesh/sparse_matrix.h"
+
 namespace libMesh
 {
 

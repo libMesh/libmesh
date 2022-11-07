@@ -809,9 +809,9 @@ PTHREAD_CFLAGS
 PTHREAD_LIBS
 PTHREAD_CC
 ax_pthread_config
+OPENMP_CXXFLAGS
 OPENMP_FFLAGS
 OPENMP_CFLAGS
-OPENMP_CXXFLAGS
 TPETRA_INCLUDES
 TPETRA_LIBS
 ML_INCLUDES
@@ -7240,6 +7240,20 @@ fi
 $as_echo "<<< C++ compiler is Cray C++ >>>" >&6; }
                   ACSM_GXX_VERSION=cray_cc
                   compiler_brand_detected=yes
+
+fi
+
+fi
+
+    if test "x$compiler_brand_detected" = "xno"; then :
+
+          is_nvcc="`($CXX -V 2>&1) | grep 'NVIDIA'`"
+          if test "x$is_nvcc" != "x"; then :
+
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is NVIDIA C++ >>>" >&5
+$as_echo "<<< C++ compiler is NVIDIA C++ >>>" >&6; }
+            ACSM_GXX_VERSION=nvidia
+            compiler_brand_detected=yes
 
 fi
 
@@ -25167,6 +25181,26 @@ else
 $as_echo "Unknown Intel compiler" >&6; } ;;
 esac
                         ;; #(
+  nvidia) :
+
+
+                                                                                    ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG -O0 --display_error_number -g -pedantic -Wno-long-long -Wunused -Wuninitialized --diag_suppress=11,111,177,445,1676"
+                                ACSM_CXXFLAGS_DEVEL="$ACSM_CXXFLAGS_DEVEL -O2 --display_error_number -g -pedantic -Wno-long-long -Wunused -Wuninitialized --diag_suppress=11,111,177,445,1676"
+                                ACSM_CXXFLAGS_OPT="$ACSM_CXXFLAGS_OPT -O2 --display_error_number --diag_suppress=11,111,177,445,1676"
+
+                                ACSM_NODEPRECATEDFLAG="-Wno-deprecated-declarations"
+
+                                ACSM_CFLAGS_DBG="$ACSM_CFLAGS_DBG -O0 -g"
+                                ACSM_CFLAGS_DEVEL="$ACSM_CFLAGS_DEVEL -O2 -g"
+                                ACSM_CFLAGS_OPT="$ACSM_CFLAGS_OPT -O2"
+
+                                                                if test "$enableexceptions" = no; then :
+
+                                        ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG --no_exceptions"
+                                        ACSM_CXXFLAGS_OPT="$ACSM_CXXFLAGS_OPT --no_exceptions"
+
+fi
+                               ;; #(
   portland_group) :
 
                                 ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG -g --no_using_std"
@@ -50856,6 +50890,13 @@ fi
 
   if test "x$enableopenmp" = "xyes"; then :
 
+          ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenMP flag of C++ compiler" >&5
 $as_echo_n "checking for OpenMP flag of C++ compiler... " >&6; }
@@ -50926,30 +50967,210 @@ $as_echo "#define HAVE_OPENMP 1" >>confdefs.h
 
 fi
 
-                        if test "x$OPENMP_CXXFLAGS" != "x"; then :
+          ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with OpenMP support >>>" >&5
+          ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenMP flag of C compiler" >&5
+$as_echo_n "checking for OpenMP flag of C compiler... " >&6; }
+if ${ax_cv_c_openmp+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  saveCFLAGS=$CFLAGS
+ax_cv_c_openmp=unknown
+# Flags to try:  -fopenmp (gcc), -openmp (icc), -mp (SGI & PGI),
+#                -xopenmp (Sun), -omp (Tru64), -qsmp=omp (AIX), none
+ax_openmp_flags="-fopenmp -openmp -mp -xopenmp -omp -qsmp=omp none"
+
+if test "x$OPENMP_CFLAGS" != x; then
+  ax_openmp_flags="$OPENMP_CFLAGS $ax_openmp_flags"
+fi
+
+for ax_openmp_flag in $ax_openmp_flags; do
+  case $ax_openmp_flag in
+    none) CFLAGS=$saveC ;;
+    *)    CFLAGS="$saveCFLAGS $ax_openmp_flag" ;;
+  esac
+
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <omp.h>
+
+int
+main ()
+{
+
+    const int N = 100000;
+    int i, arr[N];
+
+    omp_set_num_threads(2);
+
+    #pragma omp parallel for
+    for (i = 0; i < N; i++)
+    {
+      arr[i] = i;
+    }
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ax_cv_c_openmp=$ax_openmp_flag; break
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+done
+
+CFLAGS=$saveCFLAGS
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_c_openmp" >&5
+$as_echo "$ax_cv_c_openmp" >&6; }
+
+if test "x$ax_cv_c_openmp" = "xunknown"; then
+  :
+else
+  if test "x$ax_cv_c_openmp" != "xnone"; then
+    OPENMP_CFLAGS=$ax_cv_c_openmp
+  fi
+
+$as_echo "#define HAVE_OPENMP 1" >>confdefs.h
+
+fi
+
+          ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+          if test "x$enablefortran" = "xyes"; then :
+
+                  ac_ext=f
+ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
+ac_link='$F77 -o conftest$ac_exeext $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_f77_compiler_gnu
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenMP flag of Fortran 77 compiler" >&5
+$as_echo_n "checking for OpenMP flag of Fortran 77 compiler... " >&6; }
+if ${ax_cv_f77_openmp+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  saveFFLAGS=$FFLAGS
+ax_cv_f77_openmp=unknown
+# Flags to try:  -fopenmp (gcc), -openmp (icc), -mp (SGI & PGI),
+#                -xopenmp (Sun), -omp (Tru64), -qsmp=omp (AIX), none
+ax_openmp_flags="-fopenmp -openmp -mp -xopenmp -omp -qsmp=omp none"
+
+if test "x$OPENMP_FFLAGS" != x; then
+  ax_openmp_flags="$OPENMP_FFLAGS $ax_openmp_flags"
+fi
+
+for ax_openmp_flag in $ax_openmp_flags; do
+  case $ax_openmp_flag in
+    none) FFLAGS=$saveF ;;
+    *)    FFLAGS="$saveFFLAGS $ax_openmp_flag" ;;
+  esac
+
+  cat > conftest.$ac_ext <<_ACEOF
+      program main
+
+    const int N = 100000;
+    int i, arr[N];
+
+    omp_set_num_threads(2);
+
+    #pragma omp parallel for
+    for (i = 0; i < N; i++)
+    {
+      arr[i] = i;
+    }
+
+      end
+_ACEOF
+if ac_fn_f77_try_link "$LINENO"; then :
+  ax_cv_f77_openmp=$ax_openmp_flag; break
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+done
+
+FFLAGS=$saveFFLAGS
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_f77_openmp" >&5
+$as_echo "$ax_cv_f77_openmp" >&6; }
+
+if test "x$ax_cv_f77_openmp" = "xunknown"; then
+  :
+else
+  if test "x$ax_cv_f77_openmp" != "xnone"; then
+    OPENMP_FFLAGS=$ax_cv_f77_openmp
+  fi
+
+$as_echo "#define HAVE_OPENMP 1" >>confdefs.h
+
+fi
+
+                  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+
+          if test "x$OPENMP_CFLAGS" != "x"; then :
+
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with C OpenMP support >>>" >&5
+$as_echo "<<< Configuring library with C OpenMP support >>>" >&6; }
+                  CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
+                  CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
+                  CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
+                  CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
+                  CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
+
+
+fi
+
+          if test "x$OPENMP_FFLAGS" != "x"; then :
+
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Fortran OpenMP support >>>" >&5
+$as_echo "<<< Configuring library with Fortran OpenMP support >>>" >&6; }
+                  FFLAGS="$FFLAGS $OPENMP_FFLAGS"
+
+
+fi
+
+          if test "x$OPENMP_CXXFLAGS" != "x"; then :
+
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with OpenMP support >>>" >&5
 $as_echo "<<< Configuring library with OpenMP support >>>" >&6; }
-                 OPENMP_CFLAGS=$OPENMP_CXXFLAGS
-                 OPENMP_FFLAGS=$OPENMP_CXXFLAGS
-                 CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
-                 CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
-                 CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
-                 CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
-                 CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
-                 CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
-                 CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
-                 CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
-                 CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
-                 CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
-                 FFLAGS="$FFLAGS $OPENMP_FFLAGS"
-
-
+                  CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
+                  CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
+                  CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
+                  CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
+                  CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
 
 
 else
-                                               if test "x$requested_thread_model" = "xopenmp"; then :
-  as_fn_error $? "requested openmp threading model, but compiler does not support openmp." "$LINENO" 5
+                                                  if test "x$requested_thread_model" = "xopenmp"; then :
+  as_fn_error $? "requested openmp threading model, but C++ compiler does not support openmp." "$LINENO" 5
 fi
 fi
 else
