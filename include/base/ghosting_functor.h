@@ -25,6 +25,7 @@
 #include "libmesh/id_types.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/reference_counted_object.h"
+#include "libmesh/dof_object.h"
 
 // C++ Includes
 #include <unordered_map>
@@ -228,7 +229,7 @@ public:
    * What elements do we care about and what variables do we care
    * about on each element?
    */
-  typedef std::unordered_map<const Elem*, const CouplingMatrix*> map_type;
+  typedef std::map<const Elem*, const CouplingMatrix*, CompareDofObjectsByID> map_type;
 
   /**
    * For the specified range of active elements, what other elements
