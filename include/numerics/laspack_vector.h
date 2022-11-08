@@ -35,7 +35,7 @@
 #include <qvector.h>
 
 // C++ includes
-#include <cstdio> // for std::sprintf
+#include <cstdio> // for std::snprintf
 #include <limits>
 #include <mutex>
 
@@ -329,7 +329,7 @@ void LaspackVector<T>::init (const numeric_index_type n,
 
   static int cnt = 0;
   char foo[80];
-  std::sprintf(foo,  "Vec-%d", cnt++);
+  std::snprintf(foo, 80, "Vec-%d", cnt++);
 
   V_Constr(&_vec, const_cast<char *>(foo), n, Normal, _LPTrue);
 

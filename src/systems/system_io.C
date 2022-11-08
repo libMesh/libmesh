@@ -31,7 +31,7 @@
 
 
 // C++ Includes
-#include <cstdio> // for std::sprintf
+#include <cstdio> // for std::snprintf
 #include <memory>
 #include <numeric> // for std::partial_sum
 #include <set>
@@ -1334,7 +1334,7 @@ void System::write_header (Xdr & io,
       {
         // set up the comment
         comment  = "#   Name, Variable No. ";
-        std::sprintf(buf, "%u", var);
+        std::snprintf(buf, 80, "%u", var);
         comment += buf;
         comment += ", System \"";
         comment += this->name();
@@ -1348,7 +1348,7 @@ void System::write_header (Xdr & io,
       {
         // set up the comment
         comment  = "#     Subdomains, Variable \"";
-        std::sprintf(buf, "%s", this->variable_name(var).c_str());
+        std::snprintf(buf, 80, "%s", this->variable_name(var).c_str());
         comment += buf;
         comment += "\", System \"";
         comment += this->name();
@@ -1366,7 +1366,7 @@ void System::write_header (Xdr & io,
       {
         // set up the comment
         comment = "#     Approximation Order, Variable \"";
-        std::sprintf(buf, "%s", this->variable_name(var).c_str());
+        std::snprintf(buf, 80, "%s", this->variable_name(var).c_str());
         comment += buf;
         comment += "\", System \"";
         comment += this->name();
@@ -1382,7 +1382,7 @@ void System::write_header (Xdr & io,
       // do the same for radial_order
       {
         comment = "#     Radial Approximation Order, Variable \"";
-        std::sprintf(buf, "%s", this->variable_name(var).c_str());
+        std::snprintf(buf, 80, "%s", this->variable_name(var).c_str());
         comment += buf;
         comment += "\", System \"";
         comment += this->name();
@@ -1399,7 +1399,7 @@ void System::write_header (Xdr & io,
       {
         // set up the comment
         comment = "#     FE Family, Variable \"";
-        std::sprintf(buf, "%s", this->variable_name(var).c_str());
+        std::snprintf(buf, 80, "%s", this->variable_name(var).c_str());
         comment += buf;
         comment += "\", System \"";
         comment += this->name();
@@ -1412,7 +1412,7 @@ void System::write_header (Xdr & io,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
         comment = "#     Radial FE Family, Variable \"";
-        std::sprintf(buf, "%s", this->variable_name(var).c_str());
+        std::snprintf(buf, 80,  "%s", this->variable_name(var).c_str());
         comment += buf;
         comment += "\", System \"";
         comment += this->name();
@@ -1422,7 +1422,7 @@ void System::write_header (Xdr & io,
         io.data (radial_fam, comment.c_str());
 
         comment = "#     Infinite Mapping Type, Variable \"";
-        std::sprintf(buf, "%s", this->variable_name(var).c_str());
+        std::snprintf(buf, 80, "%s", this->variable_name(var).c_str());
         comment += buf;
         comment += "\", System \"";
         comment += this->name();
@@ -1457,7 +1457,7 @@ void System::write_header (Xdr & io,
             // 9.)
             // write the name of the cnt-th additional vector
             comment =  "# Name of ";
-            std::sprintf(buf, "%dth vector", cnt++);
+            std::snprintf(buf, 80, "%dth vector", cnt++);
             comment += buf;
             std::string vec_name = pr.first;
 
