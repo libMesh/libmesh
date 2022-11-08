@@ -2424,6 +2424,9 @@ bool Elem::has_invertible_map(Real /*tol*/) const
   FEMap fe_map;
   auto & jac = fe_map.get_jacobian();
 
+  // We have a separate check for is_singular_node() below, so in this
+  // case its "OK" to do nodal quadrature on pyramids.
+  qnodal.allow_nodal_pyramid_quadrature = true;
   qnodal.init(this->type());
   auto & qp = qnodal.get_points();
   libmesh_assert_equal_to(qp.size(), this->n_nodes());

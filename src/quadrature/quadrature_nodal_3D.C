@@ -37,7 +37,9 @@ void QNodal::init_3D(const ElemType, unsigned int)
     case HEX8:
     case PYRAMID5:
       {
+        // Construct QTrap rule that matches our own nodal pyramid quadrature permissions
         QTrap rule(/*dim=*/3, /*ignored*/_order);
+        rule.allow_nodal_pyramid_quadrature = this->allow_nodal_pyramid_quadrature;
         rule.init(_type, /*ignored*/_p_level);
         _points.swap (rule.get_points());
         _weights.swap(rule.get_weights());
@@ -107,7 +109,9 @@ void QNodal::init_3D(const ElemType, unsigned int)
     case PYRAMID13:
     case PYRAMID14:
       {
+        // Construct QSimpson rule that matches our own nodal pyramid quadrature permissions
         QSimpson rule(/*dim=*/3, /*ignored*/_order);
+        rule.allow_nodal_pyramid_quadrature = this->allow_nodal_pyramid_quadrature;
         rule.init(_type, /*ignored*/_p_level);
         _points.swap (rule.get_points());
         _weights.swap(rule.get_weights());

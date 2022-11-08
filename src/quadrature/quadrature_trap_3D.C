@@ -92,6 +92,11 @@ void QTrap::init_3D(const ElemType, unsigned int)
     case PYRAMID13:
     case PYRAMID14:
       {
+        libmesh_error_msg_if(!allow_nodal_pyramid_quadrature,
+                             "Nodal quadrature on Pyramid elements is not allowed by default since\n"
+                             "the Jacobian of the inverse element map is not well-defined at the Pyramid apex.\n"
+                             "Set the QBase::allow_nodal_pyramid_quadrature flag to true to ignore skip this check.");
+
         _points.resize(5);
         _weights.resize(5);
 
