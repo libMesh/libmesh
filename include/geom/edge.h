@@ -79,6 +79,12 @@ public:
   virtual unsigned int n_vertices() const override final { return 2; }
 
   /**
+   * \returns 1. Every side has one vertex.
+   */
+  virtual unsigned int n_vertices_on_side(const unsigned short libmesh_dbg_var(s)) const override final
+  { libmesh_assert_less(s, this->n_sides()); return 1; }
+
+  /**
    * \returns 0.  All 1D elements have no edges.
    */
   virtual unsigned int n_edges() const override final { return 0; }

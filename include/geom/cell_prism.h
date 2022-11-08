@@ -83,6 +83,9 @@ public:
    */
   virtual unsigned int n_vertices() const override final { return 6; }
 
+  virtual unsigned int n_vertices_on_side(const unsigned short s) const override final
+  { libmesh_assert_less(s, this->n_sides()); return 4 - (s == 0 || s == 4); }
+
   /**
    * \returns 9.  All prisms have 9 edges.
    */

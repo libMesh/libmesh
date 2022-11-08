@@ -88,6 +88,12 @@ public:
   virtual unsigned int n_vertices() const override { return 1; }
 
   /**
+   * The \p Elem::n_vertices_on_side makes no sense for nodes.
+   */
+  virtual unsigned int n_vertices_on_side(const unsigned short) const override
+  { libmesh_not_implemented(); return 0; }
+
+  /**
    * \returns 0.
    */
   virtual unsigned int n_edges() const override { return 0; }

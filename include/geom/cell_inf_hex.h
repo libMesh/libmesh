@@ -91,6 +91,12 @@ public:
   virtual unsigned int n_vertices() const override final { return 8; }
 
   /**
+   * \returns 4. Every side has four vertices.
+   */
+  virtual unsigned int n_vertices_on_side(const unsigned short libmesh_dbg_var(s)) const override final
+  { libmesh_assert_less(s, this->n_sides()); return 4; }
+
+  /**
    * \returns \p true if the specified (local) node number is a
    * "mid-edge" node on an infinite element edge.
    */

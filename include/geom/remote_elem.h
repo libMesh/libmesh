@@ -125,6 +125,9 @@ public:
   virtual unsigned int n_vertices () const override
   { libmesh_not_implemented(); return 0; }
 
+  virtual unsigned int n_vertices_on_side(const unsigned short) const override
+  { libmesh_not_implemented(); return 0; }
+
   virtual unsigned int n_edges () const override
   { libmesh_not_implemented(); return 0; }
 

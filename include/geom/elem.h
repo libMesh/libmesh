@@ -643,6 +643,12 @@ public:
   IntRange<unsigned short> side_index_range () const;
 
   /**
+   * \returns An integer range from 0 up to (but not including)
+   * the number of vertices this element has.
+   */
+  IntRange<unsigned short> vertex_index_range () const;
+
+  /**
    * \returns The number of neighbors the element that has been derived
    * from this class has.
    *
@@ -659,6 +665,11 @@ public:
    * from this class has.
    */
   virtual unsigned int n_vertices () const = 0;
+
+  /**
+   * \returns The number of verticies on the side with index \p s.
+   */
+  virtual unsigned int n_vertices_on_side (const unsigned short s) const = 0;
 
   /**
    * \returns The number of edges the element that has been derived
@@ -2464,6 +2475,13 @@ Elem::side_index_range() const
 }
 
 
+
+inline
+IntRange<unsigned short>
+Elem::vertex_index_range() const
+{
+  return {0, cast_int<unsigned short>(this->n_vertices())};
+}
 
 
 inline

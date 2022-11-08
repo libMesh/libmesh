@@ -87,6 +87,9 @@ public:
    */
   virtual unsigned int n_vertices() const override { return 5; }
 
+  virtual unsigned int n_vertices_on_side(const unsigned short s) const override final
+  { libmesh_assert_less(s, this->n_sides()); return 4 - (s != 4); }
+
   /**
    * \returns 8.  All pyramids have 8 edges.
    */
