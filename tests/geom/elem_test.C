@@ -334,6 +334,70 @@ public:
       }
   }
 
+  void test_orient()
+  {
+    LOG_UNIT_TEST;
+
+    BoundaryInfo & boundary_info = _mesh->get_boundary_info();
+
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      {
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+        if (elem->infinite())
+          continue;
+#endif
+        const Point vertex_avg = elem->vertex_average();
+
+        const unsigned int n_sides = elem->n_sides();
+        std::vector<std::set<Point*>> side_nodes(n_sides);
+        std::vector<Elem*> neighbors(n_sides);
+        std::vector<std::vector<boundary_id_type>> bcids(n_sides);
+        for (auto s : make_range(n_sides))
+          {
+            for (auto n : elem->nodes_on_side(s))
+              side_nodes[s].insert(elem->node_ptr(n));
+            neighbors[s] = elem->neighbor_ptr(s);
+            boundary_info.boundary_ids(elem, s, bcids[s]);
+          }
+
+        if (elem->id()%2)
+          elem->flip(&boundary_info);
+
+        elem->orient(&boundary_info);
+
+        // Our map should still be affine.
+        // ... except for stupid singular pyramid maps
+        if (elem->dim() < 3 ||
+            elem->n_vertices() != 5)
+          CPPUNIT_ASSERT(elem->has_affine_map());
+
+        // The neighbors and bcids should have flipped back to where
+        // they were.
+        for (auto s : make_range(n_sides))
+          {
+            std::set<Point*> new_side_nodes;
+            for (auto n : elem->nodes_on_side(s))
+              new_side_nodes.insert(elem->node_ptr(n));
+
+            std::vector<boundary_id_type> new_bcids;
+            boundary_info.boundary_ids(elem, s, new_bcids);
+
+            CPPUNIT_ASSERT(side_nodes[s] ==
+                           new_side_nodes);
+
+            CPPUNIT_ASSERT(neighbors[s] ==
+                           elem->neighbor_ptr(s));
+
+            CPPUNIT_ASSERT(bcids[s] == new_bcids);
+          }
+
+        const Point new_vertex_avg = elem->vertex_average();
+        for (const auto d : make_range(LIBMESH_DIM))
+          LIBMESH_ASSERT_FP_EQUAL(vertex_avg(d), new_vertex_avg(d),
+                                  TOLERANCE*TOLERANCE);
+      }
+  }
+
   void test_center_node_on_side()
   {
     LOG_UNIT_TEST;
@@ -401,6 +465,7 @@ public:
   CPPUNIT_TEST( test_maps );                    \
   CPPUNIT_TEST( test_permute );                 \
   CPPUNIT_TEST( test_flip );                    \
+  CPPUNIT_TEST( test_orient );                  \
   CPPUNIT_TEST( test_contains_point_node );     \
   CPPUNIT_TEST( test_center_node_on_side );     \
   CPPUNIT_TEST( test_side_type );               \
