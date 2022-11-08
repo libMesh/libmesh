@@ -229,7 +229,7 @@ public:
    * What elements do we care about and what variables do we care
    * about on each element?
    */
-  typedef std::map<const Elem*, const CouplingMatrix*, CompareDofObjectsByID> map_type;
+  typedef std::map<const Elem*, const CouplingMatrix*, CompareDofObjectsByPIDAndThenID> map_type;
 
   /**
    * For the specified range of active elements, what other elements
