@@ -18,6 +18,8 @@
 
 // Local includes
 #include "libmesh/elem.h"
+
+#include "libmesh/boundary_info.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/node_elem.h"
@@ -72,7 +74,6 @@
 #ifdef LIBMESH_ENABLE_PERIODIC
 #include "libmesh/mesh.h"
 #include "libmesh/periodic_boundaries.h"
-#include "libmesh/boundary_info.h"
 #endif
 
 
@@ -2966,5 +2967,36 @@ unsigned int Elem::center_node_on_side(const unsigned short libmesh_dbg_var(side
   return invalid_uint;
 }
 
+
+void Elem::swap2boundarysides(unsigned short s1,
+                              unsigned short s2,
+                              BoundaryInfo * boundary_info) const
+{
+  std::vector<boundary_id_type> ids1, ids2;
+  boundary_info->boundary_ids(this, s1, ids1);
+  boundary_info->boundary_ids(this, s2, ids2);
+  boundary_info->remove_side(this, s1);
+  boundary_info->remove_side(this, s2);
+  if (!ids1.empty())
+    boundary_info->add_side(this, s2, ids1);
+  if (!ids2.empty())
+    boundary_info->add_side(this, s1, ids2);
+}
+
+
+void Elem::swap2boundaryedges(unsigned short e1,
+                              unsigned short e2,
+                              BoundaryInfo * boundary_info) const
+{
+  std::vector<boundary_id_type> ids1, ids2;
+  boundary_info->edge_boundary_ids(this, e1, ids1);
+  boundary_info->edge_boundary_ids(this, e2, ids2);
+  boundary_info->remove_edge(this, e1);
+  boundary_info->remove_edge(this, e2);
+  if (!ids1.empty())
+    boundary_info->add_edge(this, e2, ids1);
+  if (!ids2.empty())
+    boundary_info->add_edge(this, e1, ids2);
+}
 
 } // namespace libMesh

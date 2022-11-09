@@ -229,6 +229,16 @@ std::vector<unsigned int> Pyramid::sides_on_edge(const unsigned int e) const
 }
 
 
+void
+Pyramid::orient(BoundaryInfo * boundary_info)
+{
+  if (triple_product(this->point(1)-this->point(0),
+                     this->point(3)-this->point(0),
+                     this->point(4)-this->point(0)) < 0)
+    this->flip(boundary_info);
+}
+
+
 
 unsigned int Pyramid::local_singular_node(const Point & p, const Real tol) const
 {

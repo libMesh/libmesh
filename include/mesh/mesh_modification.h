@@ -57,7 +57,7 @@ void distort (MeshBase & mesh,
 
 /**
  * Randomly permute the nodal ordering of each element (without
- * twisting the element mapping.  This is useful for regression
+ * twisting the element mapping).  This is useful for regression
  * testing with a variety of element orientations.
  *
  * This function does not currently handle meshes with any element
@@ -68,6 +68,15 @@ void distort (MeshBase & mesh,
  * the permutation.
  */
 void permute_elements (MeshBase & mesh);
+
+/**
+ * Redo the nodal ordering of each element as necessary to give the
+ * element Jacobian a positive orientation.
+ *
+ * This function does not currently handle meshes with any element
+ * refinement.
+ */
+void orient_elements (MeshBase & mesh);
 
 /**
  * Deterministically perturb the nodal locations.  This function will

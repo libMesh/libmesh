@@ -188,6 +188,8 @@ public:
    */
   virtual unsigned int n_permutations() const override final { return 4; }
 
+  virtual void orient(BoundaryInfo *) override final;
+
 protected:
 
   /**

@@ -764,6 +764,21 @@ void Pyramid14::permute(unsigned int perm_num)
 }
 
 
+void Pyramid14::flip(BoundaryInfo * boundary_info)
+{
+  swap2nodes(0,1);
+  swap2nodes(2,3);
+  swap2nodes(6,8);
+  swap2nodes(9,10);
+  swap2nodes(11,12);
+  swap2neighbors(1,3);
+  swap2boundarysides(1,3,boundary_info);
+  swap2boundaryedges(1,3,boundary_info);
+  swap2boundaryedges(4,5,boundary_info);
+  swap2boundaryedges(6,7,boundary_info);
+}
+
+
 unsigned int Pyramid14::center_node_on_side(const unsigned short side) const
 {
   libmesh_assert_less (side, Pyramid14::num_sides);

@@ -220,6 +220,17 @@ std::vector<unsigned int> Tet::sides_on_edge(const unsigned int e) const
 
 
 
+void
+Tet::orient(BoundaryInfo * boundary_info)
+{
+  if (triple_product(this->point(1)-this->point(0),
+                     this->point(2)-this->point(0),
+                     this->point(3)-this->point(0)) < 0)
+    this->flip(boundary_info);
+}
+
+
+
 Real Tet::quality(const ElemQuality q) const
 {
   return Elem::quality(q); // Not implemented

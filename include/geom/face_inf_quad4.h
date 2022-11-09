@@ -162,6 +162,8 @@ public:
 
   ElemType side_type (const unsigned int s) const override final;
 
+  virtual void flip(BoundaryInfo *) override final;
+
 protected:
 
   /**

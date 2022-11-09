@@ -455,6 +455,16 @@ void Tri7::permute(unsigned int perm_num)
 }
 
 
+void Tri7::flip(BoundaryInfo * boundary_info)
+{
+  swap2nodes(0,1);
+  swap2nodes(4,5);
+  swap2neighbors(1,2);
+  swap2boundarysides(1,2,boundary_info);
+  swap2boundaryedges(1,2,boundary_info);
+}
+
+
 unsigned int Tri7::center_node_on_side(const unsigned short side) const
 {
   libmesh_assert_less (side, Tri7::num_sides);

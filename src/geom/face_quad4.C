@@ -369,6 +369,16 @@ void Quad4::permute(unsigned int perm_num)
 }
 
 
+void Quad4::flip(BoundaryInfo * boundary_info)
+{
+  swap2nodes(0,1);
+  swap2nodes(2,3);
+  swap2neighbors(1,3);
+  swap2boundarysides(1,3,boundary_info);
+  swap2boundaryedges(1,3,boundary_info);
+}
+
+
 ElemType Quad4::side_type (const unsigned int libmesh_dbg_var(s)) const
 {
   libmesh_assert_less (s, 4);

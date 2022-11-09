@@ -49,9 +49,10 @@ namespace libMesh
 {
 
 // Forward declarations
+class BoundaryInfo;
+class Elem;
 class MeshBase;
 class MeshRefinement;
-class Elem;
 #ifdef LIBMESH_ENABLE_PERIODIC
 class PeriodicBoundaries;
 class PointLocatorBase;
@@ -1762,14 +1763,39 @@ public:
   virtual unsigned int n_permutations() const = 0;
 
   /**
-   * Permutes the element (by swapping node_ptr values) according to
-   * the specified index.
+   * Permutes the element (by swapping node and neighbor pointers)
+   * according to the specified index.
    *
    * This is useful for regression testing, by making it easy to make
    * a structured mesh behave more like an arbitrarily unstructured
    * mesh.
+   *
+   * This is so far *only* used for regression testing, so we do
+   * not currently provide a way to permute any boundary side/edge ids
+   * along with the element permutation.
    */
   virtual void permute(unsigned int perm_num) = 0;
+
+  /**
+   * Flips the element (by swapping node and neighbor pointers) to
+   * have a mapping Jacobian of opposite sign.
+   *
+   * This is useful for automatically fixing up elements that have
+   * been newly created (e.g. from extrusions) with a negative
+   * Jacobian.
+   *
+   * If \p boundary_info is not null, swap boundary side/edge ids
+   * consistently.
+   */
+  virtual void flip(BoundaryInfo * boundary_info) = 0;
+
+  /**
+   * Flips the element (by swapping node and neighbor pointers) to
+   * have a mapping Jacobian of opposite sign, iff we find a negative
+   * orientation.  This only fixes flipped elements; for tangled
+   * elements the only fixes possible are non-local.
+   */
+  virtual void orient(BoundaryInfo * boundary_info) = 0;
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -1871,6 +1897,18 @@ protected:
     this->set_neighbor(n1, this->neighbor_ptr(n2));
     this->set_neighbor(n2, temp);
   }
+
+  /**
+   * Swaps two sides in \p boundary_info, if it is non-null.
+   */
+  void swap2boundarysides(unsigned short s1, unsigned short s2,
+                          BoundaryInfo * boundary_info) const;
+
+  /**
+   * Swaps two edges in \p boundary_info, if it is non-null.
+   */
+  void swap2boundaryedges(unsigned short e1, unsigned short e2,
+                          BoundaryInfo * boundary_info) const;
 
   /**
    * Swaps three node_ptrs, "rotating" them.

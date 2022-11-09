@@ -172,6 +172,8 @@ public:
    */
   virtual unsigned int n_permutations() const override final { return 24; }
 
+  virtual void orient(BoundaryInfo *) override final;
+
   /**
    * This maps each edge to the sides that contain said edge.
    */

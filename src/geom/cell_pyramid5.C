@@ -323,6 +323,19 @@ void Pyramid5::permute(unsigned int perm_num)
     }
 }
 
+
+void Pyramid5::flip(BoundaryInfo * boundary_info)
+{
+  swap2nodes(0,1);
+  swap2nodes(2,3);
+  swap2neighbors(1,3);
+  swap2boundarysides(1,3,boundary_info);
+  swap2boundaryedges(1,3,boundary_info);
+  swap2boundaryedges(4,5,boundary_info);
+  swap2boundaryedges(6,7,boundary_info);
+}
+
+
 ElemType Pyramid5::side_type (const unsigned int s) const
 {
   libmesh_assert_less (s, 5);

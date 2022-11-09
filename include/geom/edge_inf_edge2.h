@@ -126,6 +126,11 @@ public:
                             const IOPackage iop,
                             std::vector<dof_id_type> & conn) const override;
 
+  /**
+   * No such thing as a misoriented InfEdge
+   */
+  virtual void flip(BoundaryInfo *) override final {};
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**

@@ -274,6 +274,16 @@ void Tri3::permute(unsigned int perm_num)
     }
 }
 
+
+void Tri3::flip(BoundaryInfo * boundary_info)
+{
+  swap2nodes(0,1);
+  swap2neighbors(1,2);
+  swap2boundarysides(1,2,boundary_info);
+  swap2boundaryedges(1,2,boundary_info);
+}
+
+
 ElemType
 Tri3::side_type (const unsigned int libmesh_dbg_var(s)) const
 {
