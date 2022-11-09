@@ -238,6 +238,9 @@ public:
 
   ElemType side_type (const unsigned int s) const override final;
 
+  virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
+  { return this->_n_nodes_on_side<InfHex16, 2>(s); }
+
 protected:
 
   /**

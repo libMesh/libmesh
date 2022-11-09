@@ -488,6 +488,21 @@ public:
         CPPUNIT_ASSERT_EQUAL(elem->build_side_ptr(s)->type(), elem->side_type(s));
   }
 
+  void test_n_nodes_on_side()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      for (const auto s : elem->side_index_range())
+      {
+        unsigned int n_nodes_on_side = 0;
+        for (const auto n : elem->node_index_range())
+          if (elem->is_node_on_side(n, s))
+            ++n_nodes_on_side;
+        CPPUNIT_ASSERT_EQUAL(n_nodes_on_side, elem->n_nodes_on_side(s));
+      }
+  };
+
   void test_n_vertices_on_side()
   {
     LOG_UNIT_TEST;
@@ -536,6 +551,7 @@ public:
   CPPUNIT_TEST( test_contains_point_node );     \
   CPPUNIT_TEST( test_center_node_on_side );     \
   CPPUNIT_TEST( test_side_type );               \
+  CPPUNIT_TEST( test_n_nodes_on_side );         \
   CPPUNIT_TEST( test_n_vertices_on_side );      \
   CPPUNIT_TEST( test_elem_side_builder );
 

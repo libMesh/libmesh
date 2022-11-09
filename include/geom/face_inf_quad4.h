@@ -164,6 +164,9 @@ public:
 
   virtual void flip(BoundaryInfo *) override final;
 
+  virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
+  { return this->_n_nodes_on_side_constant<InfQuad4>(s); }
+
 protected:
 
   /**

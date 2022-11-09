@@ -78,6 +78,12 @@ public:
   virtual unsigned int n_nodes() const override { return 1; }
 
   /**
+   * The \p Elem::n_nodes_on_side makes no sense for nodes.
+   */
+  virtual unsigned int n_nodes_on_side(const unsigned short) const override
+  { libmesh_not_implemented(); return 0; }
+
+  /**
    * \returns 0.
    */
   virtual unsigned int n_sides() const override { return 0; }

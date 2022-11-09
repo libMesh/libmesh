@@ -188,6 +188,12 @@ public:
 
   ElemType side_type (const unsigned int s) const override final;
 
+  /**
+   * \returns 4. Every side has four nodes.
+   */
+  virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
+  { return this->_n_nodes_on_side_constant<InfHex8>(s); }
+
 protected:
 
   /**

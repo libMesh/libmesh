@@ -599,6 +599,11 @@ public:
   virtual unsigned int n_nodes () const = 0;
 
   /**
+   * \returns The number of nodes on the side with index \p s.
+   */
+  virtual unsigned int n_nodes_on_side (const unsigned short s) const = 0;
+
+  /**
    * The maximum number of nodes *any* element can contain.
    * This is useful for replacing heap vectors with stack arrays.
    */
@@ -2000,6 +2005,20 @@ protected:
                              const unsigned int i,
                              ElemType edgetype);
 
+
+  /**
+   * Helper for overriding n_nodes_on_side in derived classes.
+   *
+   * Performs bound checking on \p s and returns nodes_per_side
+   * for the given class for all sides.
+  */
+  template <class ElemClass>
+  unsigned int _n_nodes_on_side_constant(const unsigned short libmesh_dbg_var(s)) const
+  {
+    static_assert(std::is_base_of<Elem, ElemClass>::value, "Not an Elem");
+    libmesh_assert_less(s, this->n_sides());
+    return ElemClass::nodes_per_side;
+  }
 
 #ifdef LIBMESH_ENABLE_AMR
 

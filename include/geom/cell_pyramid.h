@@ -186,6 +186,18 @@ public:
   static const unsigned int edge_sides_map[8][2];
 
 protected:
+  /**
+   * Helper for n_nodes_on_side() for Pyramid-derived classes.
+   *
+   * That is, returns PyramidClass::nodes_per_side - \p remove_num
+   * for sides 0-3, and PyramidClass::nodes_per_side for side 4.
+  */
+  template <class PyramidClass, unsigned short remove_num>
+  unsigned int _n_nodes_on_side(const unsigned short s) const
+  {
+    static_assert(std::is_base_of<Pyramid, PyramidClass>::value, "Not a Pyramid");
+    return this->_n_nodes_on_side_constant<PyramidClass>(s) - ((s != 4) ? remove_num : 0);
+  }
 
   /**
    * Data for links to parent/neighbor/interior_parent elements.

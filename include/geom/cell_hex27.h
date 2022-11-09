@@ -258,6 +258,12 @@ public:
 
   ElemType side_type (const unsigned int s) const override final;
 
+  /**
+   * \returns 9. Every side has eight nodes.
+   */
+  virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
+  { return this->_n_nodes_on_side_constant<Hex27>(s); }
+
 protected:
 
 

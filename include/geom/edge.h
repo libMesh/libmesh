@@ -214,6 +214,12 @@ public:
 
   ElemType side_type (const unsigned int s) const override final;
 
+  /**
+   * \returns 1. Every side has one node.
+   */
+  virtual unsigned int n_nodes_on_side(const unsigned short libmesh_dbg_var(s)) const override final
+  { libmesh_assert_less(s, 2); return 1; }
+
 protected:
 
   /**

@@ -248,6 +248,12 @@ public:
 
   ElemType side_type (const unsigned int s) const override final;
 
+  /**
+   * \returns 3. Every side has three nodes.
+   */
+  virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
+  { return this->_n_nodes_on_side_constant<Tet4>(s); }
+
 protected:
 
   /**
