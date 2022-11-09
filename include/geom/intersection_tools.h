@@ -69,6 +69,19 @@ WithinSegmentResult within_segment(const Point & s1,
                                    const Point & p,
                                    const Real tol = TOLERANCE);
 
+/**
+ * Checks whether or not the given points are collinear
+ * @param p1 The first point
+ * @param p2 The second point
+ * @param p3 The third point
+ * @param tol The tolerance to use
+ * @return Whether or not the given points are collinear
+ */
+bool collinear(const Point & p1,
+               const Point & p2,
+               const Point & p3,
+               const Real tol = TOLERANCE);
+
 } // namespace IntersectionTools
 } // namespace libMesh
 

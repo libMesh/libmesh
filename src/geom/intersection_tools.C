@@ -20,6 +20,7 @@
 #include "libmesh/intersection_tools.h"
 
 #include "libmesh/point.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh::IntersectionTools
 {
@@ -60,6 +61,19 @@ WithinSegmentResult within_segment(const Point & s1,
                                    const Real tol)
 {
   return within_segment(s1, s2, (s1 - s2).norm(), p, tol);
+}
+
+bool collinear(const Point & p1,
+               const Point & p2,
+               const Point & p3,
+               const Real tol)
+{
+  // (p1 -> p2) X (p1 - > p3) should be == the zero vector
+  const auto p1p2_cross_p1p3 = (p2 - p1).cross(p3 - p1);
+  for (const auto i : make_range(LIBMESH_DIM))
+    if (std::abs(p1p2_cross_p1p3(i)) > tol)
+      return false;
+  return true;
 }
 
 } // namespace libMesh::IntersectionTools

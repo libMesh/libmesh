@@ -12,6 +12,7 @@ class IntersectionToolsTest : public CppUnit::TestCase
 public:
   LIBMESH_CPPUNIT_TEST_SUITE( IntersectionToolsTest );
   CPPUNIT_TEST( within_segment );
+  CPPUNIT_TEST( collinear );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -47,6 +48,35 @@ public:
                          IntersectionTools::WithinSegmentResult::NOT_WITHIN);
   }
 
+  void collinear()
+  {
+    LOG_UNIT_TEST;
+
+    const auto do_assert = [](const Point & p1,
+                              const Point & p2,
+                              const Point & p3,
+                              const bool collinear)
+    {
+      CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p1, p2, p3), collinear);
+      CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p1, p3, p2), collinear);
+      CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p2, p1, p3), collinear);
+      CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p2, p3, p1), collinear);
+      CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p3, p1, p2), collinear);
+      CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p3, p2, p1), collinear);
+    };
+
+    // two of the same points
+    do_assert(Point(1, 2, 3), Point(1, 2, 3), Point(4, 5, 6), true);
+
+    // three of the same points
+    do_assert(Point(1, 2, 3), Point(1, 2, 3), Point(1, 2, 3), true);
+
+    // all in a line
+    do_assert(Point(1, 1, 2), Point(1, 1, 3), Point(1, 1, 0), true);
+
+    // not collinear
+    do_assert(Point(0, 1, 2), Point(0, 1, 3), Point(1, 5, 10), false);
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( IntersectionToolsTest );
