@@ -204,6 +204,12 @@ public:
   virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
   { return _n_nodes_on_side<Pyramid5, 1>(s); }
 
+  /**
+   * \returns 2. Every edge has two nodes.
+   */
+  virtual unsigned int n_nodes_on_edge(const unsigned short e) const override final
+  { return this->_n_nodes_on_edge_constant<Pyramid5>(e); }
+
 protected:
 
   /**

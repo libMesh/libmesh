@@ -193,6 +193,9 @@ public:
   virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
   { return this->_n_nodes_on_side_constant<InfPrism6>(s) - ((s == 0) ? 1 : 0); }
 
+  virtual unsigned int n_nodes_on_edge(const unsigned short e) const override final
+  { return this->_n_nodes_on_edge_constant<InfPrism6>(e); }
+
 protected:
 
   /**

@@ -239,6 +239,9 @@ public:
 
   virtual void orient(BoundaryInfo *) override final;
 
+  virtual unsigned int n_nodes_on_edge(const unsigned short e) const override final
+  { return this->n_nodes_on_side(e); }
+
 protected:
 
   /**

@@ -122,6 +122,9 @@ public:
   virtual unsigned int n_nodes_on_side (const unsigned short) const override
   { libmesh_not_implemented(); return 0; }
 
+  virtual unsigned int n_nodes_on_edge (const unsigned short) const override
+  { libmesh_not_implemented(); return 0; }
+
   virtual unsigned int n_sides () const override
   { libmesh_not_implemented(); return 0; }
 

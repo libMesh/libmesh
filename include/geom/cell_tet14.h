@@ -250,6 +250,12 @@ public:
   virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
   { return this->_n_nodes_on_side_constant<Tet14>(s); }
 
+  /**
+   * \returns 3. Every edge has three nodes.
+   */
+  virtual unsigned int n_nodes_on_edge(const unsigned short e) const override final
+  { return this->_n_nodes_on_edge_constant<Tet14>(e); }
+
 #ifdef LIBMESH_ENABLE_AMR
   virtual
   const std::vector<std::pair<unsigned char, unsigned char>> &

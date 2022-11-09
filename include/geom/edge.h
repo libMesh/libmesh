@@ -237,6 +237,12 @@ public:
   virtual unsigned int n_nodes_on_side(const unsigned short libmesh_dbg_var(s)) const override final
   { libmesh_assert_less(s, 2); return 1; }
 
+  /**
+   * The \p Elem::n_nodes_on_edge() member makes no sense for edges.
+   */
+  virtual unsigned int n_nodes_on_edge(const unsigned short) const override final
+  { libmesh_not_implemented(); return 0; }
+
 protected:
 
   /**

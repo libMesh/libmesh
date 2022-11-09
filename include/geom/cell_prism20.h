@@ -268,6 +268,12 @@ public:
   virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
   { return _n_nodes_on_side<Prism20, 2>(s); }
 
+  /**
+   * \returns 3. Every edge has three nodes.
+   */
+  virtual unsigned int n_nodes_on_edge(const unsigned short e) const override final
+  { return this->_n_nodes_on_edge_constant<Prism20>(e); }
+
 protected:
 
   /**

@@ -683,6 +683,11 @@ public:
   virtual unsigned int n_edges () const = 0;
 
   /**
+   * \returns The number of nodes on the edge with index \p e.
+   */
+  virtual unsigned int n_nodes_on_edge (const unsigned short) const = 0;
+
+  /**
    * \returns An integer range from 0 up to (but not including)
    * the number of edges this element has.
    */
@@ -2026,6 +2031,20 @@ protected:
     static_assert(std::is_base_of<Elem, ElemClass>::value, "Not an Elem");
     libmesh_assert_less(s, this->n_sides());
     return ElemClass::nodes_per_side;
+  }
+
+  /**
+   * Helper for overriding n_nodes_per_edge in derived classes.
+   *
+   * Performs bound checking on \p s and returns nodes_per_edge
+   * for the given class for all edges.
+  */
+  template <class ElemClass>
+  unsigned int _n_nodes_on_edge_constant(const unsigned short libmesh_dbg_var(s)) const
+  {
+    static_assert(std::is_base_of<Elem, ElemClass>::value, "Not an Elem");
+    libmesh_assert_less(s, this->n_edges());
+    return ElemClass::nodes_per_edge;
   }
 
   /**

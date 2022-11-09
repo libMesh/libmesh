@@ -259,6 +259,9 @@ public:
   virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
   { return this->_n_nodes_on_side<InfHex18, 3>(s); }
 
+  virtual unsigned int n_nodes_on_edge(const unsigned short e) const override final
+  { return this->_n_nodes_on_edge_constant<InfHex18>(e) - ((e < 4) ? 0 : 1); }
+
 protected:
 
   /**
