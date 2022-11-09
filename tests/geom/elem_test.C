@@ -6,6 +6,7 @@
 #include <libmesh/elem_side_builder.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
+#include <libmesh/mesh_modification.h>
 
 #include "libmesh_cppunit.h"
 
@@ -398,6 +399,56 @@ public:
       }
   }
 
+  void test_orient_elements()
+  {
+    LOG_UNIT_TEST;
+
+    const Mesh old_mesh {*_mesh};
+
+    BoundaryInfo & boundary_info = _mesh->get_boundary_info();
+    const BoundaryInfo & old_boundary_info = old_mesh.get_boundary_info();
+    CPPUNIT_ASSERT(&boundary_info != &old_boundary_info);
+
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      {
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+        if (elem->infinite())
+          continue;
+#endif
+        if (elem->id()%2)
+          elem->flip(&boundary_info);
+      }
+
+    MeshTools::Modification::orient_elements(*_mesh);
+
+    // I should really create a MeshBase::operator==()...
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      {
+        const Elem & old_elem = old_mesh.elem_ref(elem->id());
+
+        // Elem::operator==() uses node ids to compare
+        CPPUNIT_ASSERT(*elem == old_elem);
+
+        const unsigned int n_sides = elem->n_sides();
+        for (auto s : make_range(n_sides))
+          {
+            std::vector<boundary_id_type> bcids, old_bcids;
+            boundary_info.boundary_ids(elem, s, bcids);
+            old_boundary_info.boundary_ids(&old_elem, s, old_bcids);
+            CPPUNIT_ASSERT(bcids == old_bcids);
+
+            if (elem->neighbor_ptr(s))
+              {
+                CPPUNIT_ASSERT(old_elem.neighbor_ptr(s));
+                CPPUNIT_ASSERT_EQUAL(elem->neighbor_ptr(s)->id(),
+                                     old_elem.neighbor_ptr(s)->id());
+              }
+            else
+              CPPUNIT_ASSERT(!old_elem.neighbor_ptr(s));
+          }
+      }
+  }
+
   void test_center_node_on_side()
   {
     LOG_UNIT_TEST;
@@ -466,6 +517,7 @@ public:
   CPPUNIT_TEST( test_permute );                 \
   CPPUNIT_TEST( test_flip );                    \
   CPPUNIT_TEST( test_orient );                  \
+  CPPUNIT_TEST( test_orient_elements );         \
   CPPUNIT_TEST( test_contains_point_node );     \
   CPPUNIT_TEST( test_center_node_on_side );     \
   CPPUNIT_TEST( test_side_type );               \
