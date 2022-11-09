@@ -171,6 +171,9 @@ public:
     return {0};
   }
 
+  virtual const unsigned int * nodes_on_edge_ptr(const unsigned short) const override
+  { libmesh_not_implemented(); return nullptr; }
+
   virtual std::vector<unsigned int> sides_on_edge(const unsigned int) const override
   {
     libmesh_not_implemented();

@@ -66,6 +66,9 @@ public:
    */
   virtual unsigned int n_faces() const override final { return 0; }
 
+  virtual const unsigned int * nodes_on_edge_ptr(const unsigned short s) const override final
+  { return nodes_on_side_ptr(s); }
+
   /**
    * \returns 2. Every side has two vertices.
    */

@@ -201,6 +201,9 @@ public:
 
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
 
+  virtual const unsigned int * nodes_on_edge_ptr(const unsigned short e) const override final
+  { return nodes_on_side_ptr(e); }
+
   virtual std::vector<unsigned int> sides_on_edge(const unsigned int) const override final
   { return {}; }
 

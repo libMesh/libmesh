@@ -242,6 +242,9 @@ public:
   virtual unsigned int n_nodes_on_edge(const unsigned short e) const override final
   { return this->n_nodes_on_side(e); }
 
+  virtual const unsigned int * nodes_on_edge_ptr(const unsigned short s) const override final
+  { return nodes_on_side_ptr(s); }
+
 protected:
 
   /**

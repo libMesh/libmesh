@@ -141,6 +141,9 @@ public:
 
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
 
+  virtual const unsigned int * nodes_on_edge_ptr(const unsigned short e) const override final
+  { return this->_nodes_on_edge_ptr<Prism21>(e); }
+
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified edge.
