@@ -751,6 +751,15 @@ public:
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int /*s*/) const = 0;
 
   /**
+   * \returns A pointer to the beginning of the array that contains the
+   * (local) node numbers on the specified side
+   *
+   * This does not create temproraries, unlike \p nodes_on_side.
+   * Use n_nodes_on_side for indexing.
+   */
+  virtual const unsigned int * nodes_on_side_ptr(const unsigned short) const = 0;
+
+  /**
    * \returns the (local) node numbers on the specified edge
    */
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int /*e*/) const = 0;
@@ -2005,7 +2014,6 @@ protected:
                              const unsigned int i,
                              ElemType edgetype);
 
-
   /**
    * Helper for overriding n_nodes_on_side in derived classes.
    *
@@ -2018,6 +2026,17 @@ protected:
     static_assert(std::is_base_of<Elem, ElemClass>::value, "Not an Elem");
     libmesh_assert_less(s, this->n_sides());
     return ElemClass::nodes_per_side;
+  }
+
+  /**
+   * Helper for overriding nodes_on_side in derived classes.
+  */
+  template <class ElemClass>
+  const unsigned int * _nodes_on_side_ptr(const unsigned short s) const
+  {
+    static_assert(std::is_base_of<Elem, ElemClass>::value, "Not an Elem");
+    libmesh_assert_less(s, std::extent<decltype(ElemClass::side_nodes_map)>::value);
+    return ElemClass::side_nodes_map[s];
   }
 
 #ifdef LIBMESH_ENABLE_AMR

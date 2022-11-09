@@ -518,6 +518,20 @@ public:
       }
   };
 
+  void test_nodes_on_side_ptr()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      for (const auto s : elem->side_index_range())
+      {
+        const auto nodes_on_side = elem->nodes_on_side(s);
+        const auto nodes_on_side_ptr = elem->nodes_on_side_ptr(s);
+        for (const auto i : index_range(nodes_on_side))
+          CPPUNIT_ASSERT_EQUAL(nodes_on_side[i], nodes_on_side_ptr[i]);
+      }
+  };
+
   void test_elem_side_builder()
   {
     LOG_UNIT_TEST;
@@ -553,6 +567,7 @@ public:
   CPPUNIT_TEST( test_side_type );               \
   CPPUNIT_TEST( test_n_nodes_on_side );         \
   CPPUNIT_TEST( test_n_vertices_on_side );      \
+  CPPUNIT_TEST( test_nodes_on_side_ptr );       \
   CPPUNIT_TEST( test_elem_side_builder );
 
 #define INSTANTIATE_ELEMTEST(elemtype)                          \

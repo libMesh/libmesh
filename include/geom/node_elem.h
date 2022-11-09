@@ -84,6 +84,12 @@ public:
   { libmesh_not_implemented(); return 0; }
 
   /**
+   * The \p Elem::nodes_on_side_ptr makes no sense for nodes.
+   */
+  virtual const unsigned int * nodes_on_side_ptr(const unsigned short) const override final
+  { libmesh_not_implemented(); return nullptr; }
+
+  /**
    * \returns 0.
    */
   virtual unsigned int n_sides() const override { return 0; }

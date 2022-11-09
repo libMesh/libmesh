@@ -59,6 +59,14 @@ public:
   virtual ~Edge() = default;
 
   /**
+   * Geometric constants for all edges.
+   */
+  static const int num_sides = 2;
+  static const int num_edges = 0;
+  static const int nodes_per_side = 1;
+  static const int nodes_per_edge = invalid_int;
+
+  /**
    * \returns 1, the dimensionality of the object.
    */
   virtual unsigned short dim () const override final { return 1; }
@@ -188,10 +196,19 @@ public:
 
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
 
+  virtual const unsigned int * nodes_on_side_ptr(const unsigned short s) const override final
+  { libmesh_assert_less(s, this->n_sides()); return side_nodes_map[s]; }
+
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
 
   virtual std::vector<unsigned int> sides_on_edge(const unsigned int) const override final
   { return {}; }
+
+  /**
+   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
+   * element node numbers.
+   */
+  static const unsigned int side_nodes_map[2][1];
 
   /**
    * \returns The "circumcenter of mass" (area-weighted average of
