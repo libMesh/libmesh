@@ -32,9 +32,6 @@
 #include "libmesh/linear_solver.h"
 #include "libmesh/numeric_vector.h"
 
-// C++ includes
-#include <cstdio>          // for sprintf
-
 namespace libMesh
 {
 
@@ -402,9 +399,11 @@ void FrequencySystem::set_current_frequency(unsigned int n)
 std::string FrequencySystem::form_freq_param_name(const unsigned int n) const
 {
   libmesh_assert_less (n, 9999);
-  char buf[15];
-  sprintf(buf, "frequency %04u", n);
-  return (buf);
+  std::string nstr = std::to_string(n);
+  constexpr std::size_t digits = 4;
+  const int zeros = digits - std::min(digits,nstr.size());
+  nstr.insert(0, zeros, '0');
+  return "frequency "+nstr;
 }
 
 
@@ -412,9 +411,11 @@ std::string FrequencySystem::form_freq_param_name(const unsigned int n) const
 std::string FrequencySystem::form_solu_vec_name(const unsigned int n) const
 {
   libmesh_assert_less (n, 9999);
-  char buf[15];
-  sprintf(buf, "solution %04u", n);
-  return (buf);
+  std::string nstr = std::to_string(n);
+  constexpr std::size_t digits = 4;
+  const int zeros = digits - std::min(digits,nstr.size());
+  nstr.insert(0, zeros, '0');
+  return "solution "+nstr;
 }
 
 } // namespace libMesh
