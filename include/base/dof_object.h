@@ -1380,6 +1380,23 @@ struct CompareDofObjectsByID
   }
 };
 
+struct CompareDofObjectsByPIDAndThenID
+{
+  bool operator()(const DofObject * a,
+                  const DofObject * b) const
+  {
+    libmesh_assert (a);
+    libmesh_assert (b);
+
+    if (a->processor_id() < b->processor_id())
+      return true;
+    if (b->processor_id() < a->processor_id())
+      return false;
+
+    return a->id() < b->id();
+  }
+};
+
 } // namespace libMesh
 
 

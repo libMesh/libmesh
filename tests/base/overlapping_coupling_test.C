@@ -67,7 +67,7 @@ class OverlappingCouplingFunctor : public GhostingFunctor
   (const MeshBase::const_element_iterator & range_begin,
    const MeshBase::const_element_iterator & range_end,
    processor_id_type p,
-   std::unordered_map<const Elem *,const CouplingMatrix*> & coupled_elements) override
+   map_type & coupled_elements) override
   {
     std::unique_ptr<PointLocatorBase> sub_point_locator = _mesh.sub_point_locator();
 
@@ -430,8 +430,8 @@ private:
 
     OverlappingCouplingFunctor coupling_functor(system);
 
-    std::unordered_map<const Elem *,const CouplingMatrix*> subdomain_one_couplings;
-    std::unordered_map<const Elem *,const CouplingMatrix*> subdomain_two_couplings;
+    GhostingFunctor::map_type subdomain_one_couplings;
+    GhostingFunctor::map_type subdomain_two_couplings;
 
     coupling_functor( _mesh->active_subdomain_elements_begin(1),
                       _mesh->active_subdomain_elements_end(1),

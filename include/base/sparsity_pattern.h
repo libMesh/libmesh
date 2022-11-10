@@ -249,38 +249,15 @@ void SparsityPattern::sort_row (const BidirectionalIterator begin,
                                 BidirectionalIterator       middle,
                                 const BidirectionalIterator end)
 {
-  if ((begin == middle) || (middle == end)) return;
-
-  libmesh_assert_greater (std::distance (begin,  middle), 0);
-  libmesh_assert_greater (std::distance (middle, end), 0);
-  libmesh_assert (std::unique (begin,  middle) == middle);
-  libmesh_assert (std::unique (middle, end) == end);
-
-  while (middle != end)
-    {
-      BidirectionalIterator
-        b = middle,
-        a = b-1;
-
-      // Bubble-sort the middle value downward
-      while (!(*a < *b)) // *a & *b are less-than comparable, so use <
-        {
-          std::swap (*a, *b);
-
-#if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
-          /* Prohibit optimization at this point since gcc 3.3.5 seems
-             to have a bug.  */
-          SparsityPattern::_dummy_function();
+  // Assure we have the conditions for an inplace_merge
+#ifdef DEBUG
+  libmesh_assert(std::is_sorted(begin, middle));
+  libmesh_assert(std::is_sorted(middle, end));
 #endif
+  libmesh_assert(std::unique(begin, middle) == middle);
+  libmesh_assert(std::unique(middle, end) == end);
 
-          if (a == begin) break;
-
-          b=a;
-          --a;
-        }
-
-      ++middle;
-    }
+  std::inplace_merge(begin, middle, end);
 
   // Assure the algorithm worked if we are in DEBUG mode
 #ifdef DEBUG
