@@ -40,6 +40,7 @@
 #include <iosfwd>
 #include <vector>
 #include <string>
+#include <string_view>
 
 const unsigned int xdr_MAX_STRING_LENGTH=256;
 
@@ -128,7 +129,7 @@ public:
    * Inputs or outputs a single value.
    */
   template <typename T>
-  void data(T & a, const char * comment="");
+  void data(T & a, std::string_view comment="");
 
   /**
    * Same, but provides an \p ostream like interface.
