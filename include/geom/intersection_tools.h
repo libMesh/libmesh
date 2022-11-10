@@ -25,6 +25,8 @@
 namespace libMesh
 {
 
+class Elem;
+class ElemCorner;
 class Point;
 
 namespace IntersectionTools
@@ -81,6 +83,31 @@ bool collinear(const Point & p1,
                const Point & p2,
                const Point & p3,
                const Real tol = TOLERANCE);
+
+/**
+ * \returns True if the given point is contained within an edge
+ * on the given side of an element
+ * @param elem The element
+ * @param p The point
+ * @param s The side
+ * @param corner To be filled with the edge/vertex that the point
+ * is within/at or, if any (must be initially invalid)
+ * @param linearize Whether or not to "linearize" the check, if this
+ * is set to false and edges are found to not be collinear, an error
+ * is thrown
+ *
+ * \p corner will be set to an "at vertex" state if the point is
+ * both within the edge _and_ at a vertex.
+ *
+ * This method is only implemented for three-dimensional, finite
+ * elements.
+*/
+bool within_edge_on_side(const Elem & elem,
+                         const Point & p,
+                         const unsigned short s,
+                         ElemCorner & corner,
+                         const bool linearize = false,
+                         const Real tol = TOLERANCE);
 
 } // namespace IntersectionTools
 } // namespace libMesh

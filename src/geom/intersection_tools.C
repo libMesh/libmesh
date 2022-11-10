@@ -21,6 +21,8 @@
 
 #include "libmesh/point.h"
 #include "libmesh/int_range.h"
+#include "libmesh/elem.h"
+#include "libmesh/elem_corner.h"
 
 namespace libMesh::IntersectionTools
 {
@@ -74,6 +76,71 @@ bool collinear(const Point & p1,
     if (std::abs(p1p2_cross_p1p3(i)) > tol)
       return false;
   return true;
+}
+
+bool within_edge_on_side(const Elem & elem,
+                         const Point & p,
+                         const unsigned short s,
+                         ElemCorner & corner,
+                         const bool linearize,
+                         const Real tol)
+{
+  libmesh_assert_less(s, elem.n_sides());
+  libmesh_assert(corner.is_invalid());
+  libmesh_assert_equal_to(elem.dim(), 3);
+
+  // For higher order than linear without linearization, make sure
+  // that our edges are collinear
+  if (elem.default_order() > 1 && !linearize)
+    for (const auto e : elem.edge_index_range())
+    {
+      // we should expect 3 edges for our higher order elems
+      libmesh_assert_equal_to(elem.n_nodes_on_edge(e), 3);
+
+      const unsigned int * edge_nodes_map = elem.nodes_on_edge_ptr(e);
+      if (!collinear(elem.point(edge_nodes_map[0]),
+                     elem.point(edge_nodes_map[1]),
+                     elem.point(edge_nodes_map[2])))
+        libmesh_error_msg("Failed to use Cell::without_edge_on_side without linearization "
+                          "because an edge was found that is not collinear.");
+    }
+
+  const auto vs = elem.n_vertices_on_side(s);
+  const unsigned int * side_nodes_map = elem.nodes_on_side_ptr(s);
+
+  // side_nodes_map will point to something like [v0, v1, v2, v3]
+  // With the loop below, we're going to check (in this order):
+  // [v3 -> v0], [v0 -> v1], [v1 -> v2], [v2 -> v3]
+  auto last_v = side_nodes_map[vs - 1];
+  for (const auto side_v : make_range(vs))
+  {
+    const auto other_v = side_nodes_map[side_v];
+    const auto within_result = within_segment(elem.point(last_v), elem.point(other_v), p, tol);
+    if (within_result == NOT_WITHIN)
+    {
+      last_v = side_nodes_map[side_v];
+      continue;
+    }
+
+    if (within_result == BETWEEN)
+    {
+      corner.set_edge(last_v, other_v);
+      libmesh_assert(corner.build_edge(elem)->close_to_point(p, tol));
+    }
+    else if (within_result == AT_BEGINNING)
+    {
+      corner.set_vertex(last_v);
+      libmesh_assert(elem.point(last_v).absolute_fuzzy_equals(p, tol));
+    }
+    else
+    {
+      corner.set_vertex(other_v);
+      libmesh_assert(elem.point(other_v).absolute_fuzzy_equals(p, tol));
+    }
+    return true;
+  }
+
+  return false;
 }
 
 } // namespace libMesh::IntersectionTools
