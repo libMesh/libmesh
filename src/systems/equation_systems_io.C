@@ -529,7 +529,7 @@ void EquationSystems::write(std::string_view name,
               // Note: There is no Xdr::data overload taking a "const
               // std::string &" so we need to make a copy.
               std::string copy = sys_name;
-              io.data (copy, comment.c_str());
+              io.data (copy, comment);
             }
 
             // 4.)
@@ -541,7 +541,7 @@ void EquationSystems::write(std::string_view name,
               comment =  "# Type, System No. ";
               comment += std::to_string(sys_num);
 
-              io.data (sys_type, comment.c_str());
+              io.data (sys_type, comment);
             }
 
             // 5.) - 9.)
