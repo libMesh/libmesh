@@ -195,7 +195,7 @@ void MeshTools::Modification::orient_elements(MeshBase & mesh)
   // give them different local child numbers.
   unsigned int n_levels = MeshTools::n_levels(mesh);
   if (n_levels > 1)
-    libmesh_error();
+    libmesh_not_implemented_msg("orient_elements() does not support refined meshes");
 
   BoundaryInfo & boundary_info = mesh.get_boundary_info();
   for (auto elem : mesh.element_ptr_range())
