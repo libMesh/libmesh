@@ -39,6 +39,16 @@ void NodeElem::connectivity(const unsigned int,
   libmesh_not_implemented();
 }
 
+bool NodeElem::contains_point(const Point & p, Real tol) const
+{
+  return (this->point(0) - p).norm() < tol;
+}
+
+bool NodeElem::close_to_point(const Point & p, Real tol) const
+{
+  return this->contains_point(p, tol);
+}
+
 #ifdef LIBMESH_ENABLE_AMR
 
 const Real NodeElem::_embedding_matrix[1][1][1] =

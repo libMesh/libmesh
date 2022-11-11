@@ -274,6 +274,24 @@ public:
     return INVALID_ELEM;
   }
 
+  /**
+   * \returns \p true if the point p is within a distance of "tol" from
+   * the point representing this element, false otherwise.
+   *
+   * The tolerance "tol" is normally treated as a relative tolerance in
+   * contains_point() checks, but in this case there is no relevant length
+   * to use in determing a relative tolerance, so "tol" is treated as an
+   * absolute tolerance. The NodeElem contains_point() and close_to_point()
+   * implementations are identical, whereas they differ for other element
+   * types.
+   */
+  virtual bool contains_point(const Point & p, Real tol) const override;
+
+  /**
+   * \returns this->contains_point(p, tol)
+   */
+  virtual bool close_to_point(const Point & p, Real tol) const override;
+
 protected:
 
   /**

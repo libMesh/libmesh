@@ -18,6 +18,7 @@ public:
   LIBMESH_CPPUNIT_TEST_SUITE( ContainsPointTest );
 
 #if LIBMESH_DIM > 2
+  CPPUNIT_TEST( testContainsPointNodeElem );
   CPPUNIT_TEST( testContainsPointTri3 );
   CPPUNIT_TEST( testContainsPointTet4 );
 #endif
@@ -28,6 +29,18 @@ public:
   void setUp() {}
 
   void tearDown() {}
+
+  // NodeElem test
+  void testContainsPointNodeElem()
+  {
+    Node node  (1., 1., 1., /*id=*/0);
+    std::unique_ptr<Elem> elem = Elem::build(NODEELEM);
+    elem->set_node(0) = &node;
+
+    Real epsilon = 1.e-4;
+    CPPUNIT_ASSERT(elem->contains_point(Point(1.+epsilon/2, 1.-epsilon/2, 1+epsilon/2), /*tol=*/epsilon));
+    CPPUNIT_ASSERT(!elem->contains_point(Point(1.+epsilon/2, 1.-epsilon/2, 1+epsilon/2), /*tol=*/epsilon/2));
+  }
 
   // TRI3 test
   void testContainsPointTri3()

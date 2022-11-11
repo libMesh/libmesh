@@ -1226,11 +1226,15 @@ public:
 
         CPPUNIT_ASSERT(elem->contains_point(physical_pt));
 
+        // We only want to find elements in the same block
         std::set<subdomain_id_type> my_subdomain { elem->subdomain_id() };
 
-        const Elem * located_elem = (*locator)(physical_pt, &my_subdomain);
+        // We can *still* have overlapping NodeElem from a slit mesh
+        // input file; better check them all
+        std::set<const Elem * > located_elems;
+        (*locator)(physical_pt, located_elems, &my_subdomain);
 
-        CPPUNIT_ASSERT(located_elem == elem);
+        CPPUNIT_ASSERT(located_elems.count(elem));
       }
   }
 
