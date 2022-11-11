@@ -335,6 +335,8 @@ extern "C"
   PetscErrorCode
   libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r)
   {
+    PetscFunctionBegin;
+
     // No way to safety-check this cast, since we got a void *...
     PetscNonlinearSolver<Number> * solver =
       static_cast<PetscNonlinearSolver<Number> *> (ctx);
