@@ -35,7 +35,6 @@
 #include <qvector.h>
 
 // C++ includes
-#include <cstdio> // for std::sprintf
 #include <limits>
 #include <mutex>
 
@@ -328,10 +327,10 @@ void LaspackVector<T>::init (const numeric_index_type n,
   // create a sequential vector
 
   static int cnt = 0;
-  char foo[80];
-  std::sprintf(foo,  "Vec-%d", cnt++);
+  std::string foo{"Vec-"};
+  foo += std::to_string(cnt++);
 
-  V_Constr(&_vec, const_cast<char *>(foo), n, Normal, _LPTrue);
+  V_Constr(&_vec, const_cast<char *>(foo.c_str()), n, Normal, _LPTrue);
 
   this->_is_initialized = true;
 #ifndef NDEBUG

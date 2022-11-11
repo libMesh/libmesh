@@ -31,7 +31,6 @@
 
 
 // C++ Includes
-#include <cstdio> // for std::sprintf
 #include <memory>
 #include <numeric> // for std::partial_sum
 #include <set>
@@ -1311,7 +1310,6 @@ void System::write_header (Xdr & io,
     return;
 
   std::string comment;
-  char buf[80];
 
   // 5.)
   // Write the number of variables in the system
@@ -1334,8 +1332,7 @@ void System::write_header (Xdr & io,
       {
         // set up the comment
         comment  = "#   Name, Variable No. ";
-        std::sprintf(buf, "%u", var);
-        comment += buf;
+        comment += std::to_string(var);
         comment += ", System \"";
         comment += this->name();
         comment += "\"";
@@ -1348,8 +1345,7 @@ void System::write_header (Xdr & io,
       {
         // set up the comment
         comment  = "#     Subdomains, Variable \"";
-        std::sprintf(buf, "%s", this->variable_name(var).c_str());
-        comment += buf;
+        comment += this->variable_name(var);
         comment += "\", System \"";
         comment += this->name();
         comment += "\"";
@@ -1366,8 +1362,7 @@ void System::write_header (Xdr & io,
       {
         // set up the comment
         comment = "#     Approximation Order, Variable \"";
-        std::sprintf(buf, "%s", this->variable_name(var).c_str());
-        comment += buf;
+        comment += this->variable_name(var);
         comment += "\", System \"";
         comment += this->name();
         comment += "\"";
@@ -1382,8 +1377,7 @@ void System::write_header (Xdr & io,
       // do the same for radial_order
       {
         comment = "#     Radial Approximation Order, Variable \"";
-        std::sprintf(buf, "%s", this->variable_name(var).c_str());
-        comment += buf;
+        comment += this->variable_name(var);
         comment += "\", System \"";
         comment += this->name();
         comment += "\"";
@@ -1399,8 +1393,7 @@ void System::write_header (Xdr & io,
       {
         // set up the comment
         comment = "#     FE Family, Variable \"";
-        std::sprintf(buf, "%s", this->variable_name(var).c_str());
-        comment += buf;
+        comment += this->variable_name(var);
         comment += "\", System \"";
         comment += this->name();
         comment += "\"";
@@ -1412,8 +1405,7 @@ void System::write_header (Xdr & io,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
         comment = "#     Radial FE Family, Variable \"";
-        std::sprintf(buf, "%s", this->variable_name(var).c_str());
-        comment += buf;
+        comment += this->variable_name(var);
         comment += "\", System \"";
         comment += this->name();
         comment += "\"";
@@ -1422,8 +1414,7 @@ void System::write_header (Xdr & io,
         io.data (radial_fam, comment.c_str());
 
         comment = "#     Infinite Mapping Type, Variable \"";
-        std::sprintf(buf, "%s", this->variable_name(var).c_str());
-        comment += buf;
+        comment += this->variable_name(var);
         comment += "\", System \"";
         comment += this->name();
         comment += "\"";
@@ -1456,19 +1447,16 @@ void System::write_header (Xdr & io,
           {
             // 9.)
             // write the name of the cnt-th additional vector
-            comment =  "# Name of ";
-            std::sprintf(buf, "%dth vector", cnt++);
-            comment += buf;
+            const std::string dth_vector = std::to_string(cnt++)+"th vector";
+            comment =  "# Name of " + dth_vector;
             std::string vec_name = pr.first;
 
             io.data (vec_name, comment.c_str());
             int vec_projection = _vector_projections.at(vec_name);
-            comment = "# Whether to do projections for ";
-            comment += buf;
+            comment = "# Whether to do projections for " + dth_vector;
             io.data (vec_projection, comment.c_str());
             int vec_type = _vector_types.at(vec_name);
-            comment = "# Parallel type of ";
-            comment += buf;
+            comment = "# Parallel type of " + dth_vector;
             io.data (vec_type, comment.c_str());
           }
       }
