@@ -93,6 +93,11 @@ public:
       for (const auto e : quad->edge_index_range())
         CPPUNIT_ASSERT_EQUAL(at_quad_edge.at_edge(*quad, e), e == 1);
     }
+    auto quad_edge_elem = at_quad_edge.build_edge(*quad);
+      CPPUNIT_ASSERT((quad_edge_elem->point(0).absolute_fuzzy_equals(quad->point(1))
+                      && quad_edge_elem->point(1).absolute_fuzzy_equals(quad->point(2))) ||
+                  ((quad_edge_elem->point(0).absolute_fuzzy_equals(quad->point(2))
+                       && quad_edge_elem->point(1).absolute_fuzzy_equals(quad->point(1)))));
 #endif
 
 #if LIBMESH_DIM > 2
@@ -123,11 +128,11 @@ public:
       CPPUNIT_ASSERT(!at_hex_edge.is_valid(*hex, (hex->point(2)) * 0.5));
 
       // build_edge
-      auto edge_elem = at_hex_edge.build_edge(*hex);
-      CPPUNIT_ASSERT((edge_elem->point(0).absolute_fuzzy_equals(hex->point(0))
-                      && edge_elem->point(1).absolute_fuzzy_equals(hex->point(1))) ||
-                  ((edge_elem->point(1).absolute_fuzzy_equals(hex->point(0))
-                       && edge_elem->point(0).absolute_fuzzy_equals(hex->point(1)))));
+      auto hex_edge_elem = at_hex_edge.build_edge(*hex);
+      CPPUNIT_ASSERT((hex_edge_elem->point(0).absolute_fuzzy_equals(hex->point(0))
+                      && hex_edge_elem->point(1).absolute_fuzzy_equals(hex->point(1))) ||
+                  ((hex_edge_elem->point(1).absolute_fuzzy_equals(hex->point(0))
+                       && hex_edge_elem->point(0).absolute_fuzzy_equals(hex->point(1)))));
     }
 #endif // LIBMESH_DIM > 2
 
