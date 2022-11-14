@@ -278,7 +278,7 @@ void libmesh_terminate_handler()
 {
   // If we have an active exception, it may have an error message that
   // we should print.
-  std::cout << "libMesh terminating";
+  libMesh::err << "libMesh terminating";
   std::exception_ptr ex = std::current_exception();
   if (ex)
     {
