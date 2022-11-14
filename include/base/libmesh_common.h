@@ -80,6 +80,16 @@ void lock_singleton_spin_mutex();
 void unlock_singleton_spin_mutex();
 }
 
+// Let's define a couple output streams - these will default
+// to cout/cerr, but LibMeshInit (or the user) can also set them to
+// something more sophisticated.
+//
+// We use a proxy class rather than references so they can be
+// reseated at runtime.
+
+extern OStreamProxy out;
+extern OStreamProxy err;
+
 // A namespace for functions used in the bodies of the macros below.
 // The macros generally call these functions with __FILE__, __LINE__,
 // __DATE__, and __TIME__ in the appropriate order.  These should not
@@ -87,9 +97,9 @@ void unlock_singleton_spin_mutex();
 // libmesh_common.C.
 namespace MacroFunctions
 {
-void here(const char * file, int line, const char * date, const char * time);
+void here(const char * file, int line, const char * date, const char * time, std::ostream & os = libMesh::err);
 void stop(const char * file, int line, const char * date, const char * time);
-void report_error(const char * file, int line, const char * date, const char * time);
+void report_error(const char * file, int line, const char * date, const char * time, std::ostream & os = libMesh::err);
 }
 
 // Undefine any existing macros
@@ -220,16 +230,6 @@ extern MPI_Comm GLOBAL_COMM_WORLD;
  */
 extern int GLOBAL_COMM_WORLD;
 #endif
-
-// Let's define a couple output streams - these will default
-// to cout/cerr, but LibMeshInit (or the user) can also set them to
-// something more sophisticated.
-//
-// We use a proxy class rather than references so they can be
-// reseated at runtime.
-
-extern OStreamProxy out;
-extern OStreamProxy err;
 
 // This global variable is to help us deprecate AutoPtr.  We can't
 // just use libmesh_deprecated() because then you get one print out
