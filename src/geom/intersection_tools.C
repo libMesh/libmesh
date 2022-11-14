@@ -120,17 +120,17 @@ bool within_edge_on_side(const Elem & elem,
     if (within_result == BETWEEN)
     {
       corner.set_edge(last_v, other_v);
-      libmesh_assert(corner.build_edge(elem)->close_to_point(p, tol));
+      libmesh_assert(corner.build_edge(elem)->contains_point(p, tol));
     }
     else if (within_result == AT_BEGINNING)
     {
       corner.set_vertex(last_v);
-      libmesh_assert(elem.point(last_v).absolute_fuzzy_equals(p, tol));
+      libmesh_assert(elem.point(last_v).relative_fuzzy_equals(p, tol));
     }
     else
     {
       corner.set_vertex(other_v);
-      libmesh_assert(elem.point(other_v).absolute_fuzzy_equals(p, tol));
+      libmesh_assert(elem.point(other_v).relative_fuzzy_equals(p, tol));
     }
     return true;
   }
