@@ -63,12 +63,19 @@ public:
                               const Point & p3,
                               const bool collinear)
     {
-      CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p1, p2, p3), collinear);
-      CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p1, p3, p2), collinear);
-      CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p2, p1, p3), collinear);
-      CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p2, p3, p1), collinear);
-      CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p3, p1, p2), collinear);
-      CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p3, p2, p1), collinear);
+      const std::vector<Real> scales{1e-8, 1, 1e8};
+      for (const auto scale : scales)
+      {
+        const auto p1s = scale * p1;
+        const auto p2s = scale * p2;
+        const auto p3s = scale * p3;
+        CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p1s, p2s, p3s), collinear);
+        CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p1s, p3s, p2s), collinear);
+        CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p2s, p1s, p3s), collinear);
+        CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p2s, p3s, p1s), collinear);
+        CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p3s, p1s, p2s), collinear);
+        CPPUNIT_ASSERT_EQUAL(IntersectionTools::collinear(p3s, p2s, p1s), collinear);
+      }
     };
 
     // two of the same points
