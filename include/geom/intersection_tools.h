@@ -87,9 +87,6 @@ bool edges_are_collinear(const Elem & elem, const Real tol = TOLERANCE);
  *
  * \p corner will be set to an "at vertex" state if the point is
  * both within the edge _and_ at a vertex.
- *
- * This method is only implemented for three-dimensional, finite
- * elements.
 */
 bool within_edge(const Elem & elem,
                  const Point & p,
