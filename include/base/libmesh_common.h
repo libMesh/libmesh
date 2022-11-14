@@ -390,7 +390,9 @@ struct casting_compare {
   do {                                                                  \
     std::stringstream message_stream;                                   \
     message_stream << msg << '\n';                                      \
+    libMesh::Threads::lock_singleton_spin_mutex();                      \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME, message_stream); \
+    libMesh::Threads::unlock_singleton_spin_mutex();                    \
     LIBMESH_THROW(libMesh::LogicError(message_stream.str()));           \
   } while (0)
 
@@ -418,7 +420,9 @@ struct casting_compare {
   do {                                                                  \
     std::stringstream message_stream;                                   \
     message_stream << msg << '\n';                                      \
+    libMesh::Threads::lock_singleton_spin_mutex();                      \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME, message_stream); \
+    libMesh::Threads::unlock_singleton_spin_mutex();                    \
     LIBMESH_THROW(libMesh::NotImplemented(message_stream.str()));       \
   } while (0)
 
@@ -428,7 +432,9 @@ struct casting_compare {
   do {                                                                  \
     std::stringstream message_stream;                                   \
     message_stream << msg << '\n';                                      \
+    libMesh::Threads::lock_singleton_spin_mutex();                      \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME, message_stream); \
+    libMesh::Threads::unlock_singleton_spin_mutex();                    \
     LIBMESH_THROW(libMesh::FileError(filename, message_stream.str()));  \
   } while (0)
 
