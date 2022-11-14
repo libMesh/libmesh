@@ -22,8 +22,6 @@
 
 #include "libmesh/libmesh_common.h"
 
-#if LIBMESH_DIM > 1
-
 #include "libmesh/elem.h"
 
 #include <utility> // std::pair
@@ -115,7 +113,6 @@ public:
     second = Elem::invalid_vertex;
   }
 
-#if LIBMESH_DIM > 2
   /**
    * @returns true if at an edge
    */
@@ -128,6 +125,7 @@ public:
   {
     libmesh_assert_not_equal_to(v1, Elem::invalid_vertex);
     libmesh_assert_not_equal_to(v2, Elem::invalid_vertex);
+    libmesh_assert_not_equal_to(v1, v2);
     return (first == v1 && second == v2) || (first == v2 && second == v1);
   }
   /**
@@ -148,6 +146,7 @@ public:
   {
     libmesh_assert_not_equal_to(v1, Elem::invalid_vertex);
     libmesh_assert_not_equal_to(v2, Elem::invalid_vertex);
+    libmesh_assert_not_equal_to(v1, v2);
     first = v1;
     second = v2;
   }
@@ -161,7 +160,6 @@ public:
    * @returns The edge when at an edge
    */
   std::unique_ptr<const Elem> build_edge(const Elem & elem) const;
-#endif
 
   /**
    * @returns The vertex point when at a vertex
@@ -182,7 +180,5 @@ public:
 } // namespace libMesh
 
 std::ostream & operator<<(std::ostream & os, const libMesh::ElemCorner & elem_corner);
-
-#endif // LIBMESH_DIM > 1
 
 #endif // LIBMESH_ELEMCORNER_H

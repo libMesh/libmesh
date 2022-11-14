@@ -19,14 +19,13 @@
 // Local includes
 #include "libmesh/elem_corner.h"
 
-#if LIBMESH_DIM > 1
 
 namespace libMesh
 {
 
-#if LIBMESH_DIM > 2
 bool ElemCorner::at_edge(const Elem & elem, const unsigned short e) const
 {
+  libmesh_assert_greater(elem.dim(), 1);
   libmesh_assert_less(e, elem.n_edges());
   if (!at_edge())
     return false;
@@ -36,6 +35,7 @@ bool ElemCorner::at_edge(const Elem & elem, const unsigned short e) const
 
 std::unique_ptr<const Elem> ElemCorner::build_edge(const Elem & elem) const
 {
+  libmesh_assert_greater(elem.dim(), 1);
   libmesh_assert(at_edge());
   libmesh_assert_less(first, elem.n_vertices());
   libmesh_assert_less(second, elem.n_vertices());
@@ -46,17 +46,14 @@ std::unique_ptr<const Elem> ElemCorner::build_edge(const Elem & elem) const
 
   libmesh_error_msg("Element does not contain vertices in ElemCorner");
 }
-#endif
 
 std::string ElemCorner::print() const
 {
   std::stringstream oss;
   if (at_vertex())
     oss << "at vertex " << vertex();
-#if LIBMESH_DIM > 2
   else if (at_edge())
     oss << "at edge with vertices " << first << " and " << second;
-#endif
   else
     oss << "not at corner";
   return oss.str();
@@ -68,11 +65,9 @@ bool ElemCorner::is_valid(const Elem & elem, const Point & point, const Real tol
   libmesh_assert(second == Elem::invalid_vertex || second < elem.n_vertices());
 
   if (at_vertex())
-    return vertex_point(elem).absolute_fuzzy_equals(point, tol);
-#if LIBMESH_DIM > 2
-  if (elem.dim() == 3 && at_edge())
+    return vertex_point(elem).relative_fuzzy_equals(point, tol);
+  if (at_edge())
     return build_edge(elem)->contains_point(point, tol);
-#endif
 
   return true;
 }
@@ -85,5 +80,3 @@ operator<<(std::ostream & os, const libMesh::ElemCorner & elem_corner)
   os << elem_corner.print();
   return os;
 }
-
-#endif // LIBMESH_DIM > 1
