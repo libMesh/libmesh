@@ -151,7 +151,7 @@ public:
 
 #else
 
-#define LIBMESH_THROW(e) do { std::abort(); } while (0)
+#define LIBMESH_THROW(e) do { libMesh::err << e.what(); std::abort(); } while (0)
 #define libmesh_try
 #define libmesh_catch(e) if (0)
 
