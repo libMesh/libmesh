@@ -1035,7 +1035,7 @@ void AbaqusIO::assign_boundary_node_ids()
 
   // Iterate over the container of nodesets
   container_t::iterator it = _nodeset_ids.begin(), end = _nodeset_ids.end();
-  for (unsigned short current_id=0; it != end; ++it, ++current_id)
+  for (boundary_id_type current_id=0; it != end; ++it, ++current_id)
     {
       // Associate current_id with the name we determined earlier
       the_mesh.get_boundary_info().nodeset_name(current_id) = it->first;
@@ -1075,7 +1075,7 @@ void AbaqusIO::assign_sideset_ids()
   // Iterate over the container of sidesets
   {
     sideset_container_t::iterator it = _sideset_ids.begin(), end = _sideset_ids.end();
-    for (unsigned short current_id=0; it != end; ++it, ++current_id)
+    for (boundary_id_type current_id=0; it != end; ++it, ++current_id)
       {
         // Associate current_id with the name we determined earlier
         the_mesh.get_boundary_info().sideset_name(current_id) = it->first;
