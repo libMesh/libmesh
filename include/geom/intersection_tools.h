@@ -46,7 +46,7 @@ enum WithinSegmentResult : int {
  * @param s1 The first point on the segment
  * @param s2 The second point on the segment
  * @param p The point
- * @param tol The tolerance to use
+ * @param tol The relative tolerance to use
  * @return Enum denoting whether or not the point is not within, at s1,
  * at s2, or between [s1, s2]
  */
