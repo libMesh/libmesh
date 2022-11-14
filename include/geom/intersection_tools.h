@@ -45,22 +45,6 @@ enum WithinSegmentResult : int {
  * Checks whether or not a point is within a line segment
  * @param s1 The first point on the segment
  * @param s2 The second point on the segment
- * @param length The segment length (for optimization if it's already computed)
- * @param p The point
- * @param tol The tolerance to use
- * @return Enum denoting whether or not the point is not within, at s1,
- * at s2, or between [s1, s2]
- */
-WithinSegmentResult within_segment(const Point & s1,
-                                   const Point & s2,
-                                   const Real length,
-                                   const Point & p,
-                                   const Real tol = TOLERANCE);
-
-/**
- * Checks whether or not a point is within a line segment
- * @param s1 The first point on the segment
- * @param s2 The second point on the segment
  * @param p The point
  * @param tol The tolerance to use
  * @return Enum denoting whether or not the point is not within, at s1,

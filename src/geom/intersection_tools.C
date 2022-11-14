@@ -29,40 +29,33 @@ namespace libMesh::IntersectionTools
 
 WithinSegmentResult within_segment(const Point & s1,
                                    const Point & s2,
-                                   const Real length,
                                    const Point & p,
                                    const Real tol)
 {
-  libmesh_assert(!s1.absolute_fuzzy_equals(s2, tol));
-  libmesh_assert_less(std::abs((s1 - s2).norm() - length), tol);
+  libmesh_assert(!s1.relative_fuzzy_equals(s2, tol));
 
+  // First, check whether or not the points are collinear
+  const auto l = s1 - s2;
+  const auto l_norm = l.norm();
   const auto diff1 = p - s1;
-  const auto diff2 = p - s2;
-  const auto tol_scaled = tol * length;
-
-  if (diff1 * diff2 > tol_scaled)
+  const auto diff1_norm = diff1.norm();
+  if ((std::abs(l * diff1) / (l_norm * diff1_norm)) < ((Real)1 - tol))
     return NOT_WITHIN;
 
-  const auto diff1_norm = diff1.norm();
-  if (diff1_norm < tol_scaled)
-    return AT_BEGINNING;
-
-  const auto diff2_norm = diff2.norm();
-  if (diff2_norm < tol_scaled)
-    return AT_END;
-
-  // whether or not p is _between_ [s1, s2]
-  if (std::abs(diff1_norm + diff2_norm - length) < tol_scaled)
+  // If the points are collinear, make sure that p is
+  // somewhere between [s1, s2]
+  const auto diff2_norm = (p - s2).norm();
+  const auto tol_scaled = tol * l_norm;
+  if (std::abs(diff1_norm + diff2_norm - l_norm) < tol_scaled)
+  {
+    if (diff1_norm < tol_scaled)
+      return AT_BEGINNING;
+    if (diff2_norm < tol_scaled)
+      return AT_END;
     return BETWEEN;
-  return NOT_WITHIN;
-}
+  }
 
-WithinSegmentResult within_segment(const Point & s1,
-                                   const Point & s2,
-                                   const Point & p,
-                                   const Real tol)
-{
-  return within_segment(s1, s2, (s1 - s2).norm(), p, tol);
+  return NOT_WITHIN;
 }
 
 bool collinear(const Point & p1,

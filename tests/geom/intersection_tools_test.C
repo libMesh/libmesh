@@ -47,7 +47,6 @@ public:
       else if (i == segments)
         within_result = IntersectionTools::WithinSegmentResult::AT_END;
 
-      CPPUNIT_ASSERT_EQUAL(IntersectionTools::within_segment(s1, s2, length, p), within_result);
       CPPUNIT_ASSERT_EQUAL(IntersectionTools::within_segment(s1, s2, p), within_result);
     }
 
