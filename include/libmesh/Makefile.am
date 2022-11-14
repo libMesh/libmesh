@@ -129,6 +129,7 @@ BUILT_SOURCES = \
         edge_edge4.h \
         edge_inf_edge2.h \
         elem.h \
+        elem_corner.h \
         elem_cutter.h \
         elem_hash.h \
         elem_internal.h \
@@ -151,6 +152,7 @@ BUILT_SOURCES = \
         face_tri3_subdivision.h \
         face_tri6.h \
         face_tri7.h \
+        intersection_tools.h \
         node.h \
         node_elem.h \
         node_range.h \
@@ -947,6 +949,9 @@ edge_inf_edge2.h: $(top_srcdir)/include/geom/edge_inf_edge2.h
 elem.h: $(top_srcdir)/include/geom/elem.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+elem_corner.h: $(top_srcdir)/include/geom/elem_corner.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 elem_cutter.h: $(top_srcdir)/include/geom/elem_cutter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1011,6 +1016,9 @@ face_tri6.h: $(top_srcdir)/include/geom/face_tri6.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri7.h: $(top_srcdir)/include/geom/face_tri7.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+intersection_tools.h: $(top_srcdir)/include/geom/intersection_tools.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 node.h: $(top_srcdir)/include/geom/node.h
