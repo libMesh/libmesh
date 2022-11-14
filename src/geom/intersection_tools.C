@@ -94,8 +94,8 @@ bool within_edge_on_side(const Elem & elem,
   if (elem.default_order() > 1 && !linearize)
     for (const auto e : elem.edge_index_range())
     {
-      // we should expect 3 edges for our higher order elems
-      libmesh_assert_equal_to(elem.n_nodes_on_edge(e), 3);
+      // we should expect at least 3 nodes/edges for our higher order elems
+      libmesh_assert_greater_equal(elem.n_nodes_on_edge(e), 3);
 
       const unsigned int * edge_nodes_map = elem.nodes_on_edge_ptr(e);
       if (!collinear(elem.point(edge_nodes_map[0]),
