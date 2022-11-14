@@ -71,6 +71,9 @@
 // compatibility, although we no longer use it in the library.
 #include "libmesh/libmesh_nullptr.h"
 
+// C++ headers
+#include <iomanip> // setprecision, in assertion macros
+
 namespace libMesh
 {
 namespace Threads
@@ -308,75 +311,14 @@ extern bool warned_about_auto_ptr;
 #define libmesh_assert_equal_to_msg(expr1,expr2, msg)                   \
   do {                                                                  \
     if (!((expr1) == (expr2))) {                                        \
-      libMesh::Threads::lock_singleton_spin_mutex();                    \
-      std::streamsize oldp = libMesh::err.precision(17);                \
-      libMesh::err << "Assertion `" #expr1 " == " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libMesh::err.precision(oldp);                                     \
-      libMesh::Threads::unlock_singleton_spin_mutex();                  \
-      libmesh_error();                                                  \
+      libmesh_error_msg(std::setprecision(17) << "Assertion `" #expr1 " == " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl); \
     } } while (0)
 
 #define libmesh_assert_not_equal_to_msg(expr1,expr2, msg)               \
   do {                                                                  \
     if (!((expr1) != (expr2))) {                                        \
-      libMesh::Threads::lock_singleton_spin_mutex();                    \
-      std::streamsize oldp = libMesh::err.precision(17);                \
-      libMesh::err << "Assertion `" #expr1 " != " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libMesh::err.precision(oldp);                                     \
-      libMesh::Threads::unlock_singleton_spin_mutex();                  \
-      libmesh_error();                                                  \
+      libmesh_error_msg(std::setprecision(17) << "Assertion `" #expr1 " != " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl); \
     } } while (0)
-
-// Older Clang has a parsing bug that can't seem to handle the handle the decay statement when
-// expanding these macros. We'll just fall back to the previous behavior with those older compilers
-#if defined(__clang__) && (__clang_major__ <= 3)
-
-#define libmesh_assert_less_msg(expr1,expr2, msg)                       \
-  do {                                                                  \
-    if (!((expr1) < (expr2))) {                                         \
-      libMesh::Threads::lock_singleton_spin_mutex();                    \
-      std::streamsize oldp = libMesh::err.precision(17);                \
-      libMesh::err << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libMesh::err.precision(oldp);                                     \
-      libMesh::Threads::unlock_singleton_spin_mutex();                  \
-      libmesh_error();                                                  \
-    } } while (0)
-
-#define libmesh_assert_greater_msg(expr1,expr2, msg)                    \
-  do {                                                                  \
-    if (!((expr1) > (expr2))) {                                         \
-      libMesh::Threads::lock_singleton_spin_mutex();                    \
-      std::streamsize oldp = libMesh::err.precision(17);                \
-      libMesh::err << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libMesh::err.precision(oldp);                                     \
-      libMesh::Threads::unlock_singleton_spin_mutex();                  \
-      libmesh_error();                                                  \
-    } } while (0)
-
-#define libmesh_assert_less_equal_msg(expr1,expr2, msg)                 \
-  do {                                                                  \
-    if (!((expr1) <= (expr2))) {                                        \
-      libMesh::Threads::lock_singleton_spin_mutex();                    \
-      std::streamsize oldp = libMesh::err.precision(17);                \
-      libMesh::err << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libMesh::err.precision(oldp);                                     \
-      libMesh::Threads::unlock_singleton_spin_mutex();                  \
-      libmesh_error();                                                  \
-    } } while (0)
-
-#define libmesh_assert_greater_equal_msg(expr1,expr2, msg)              \
-  do {                                                                  \
-    if (!((expr1) >= (expr2))) {                                        \
-      libMesh::Threads::lock_singleton_spin_mutex();                    \
-      std::streamsize oldp = libMesh::err.precision(17);                \
-      libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libMesh::err.precision(oldp);                                     \
-      libMesh::Threads::unlock_singleton_spin_mutex();                  \
-      libmesh_error();                                                  \
-    } } while (0)
-
-// Newer clangs and all other supported compilers
-#else
 
 template <template <class> class Comp>
 struct casting_compare {
@@ -400,48 +342,26 @@ struct casting_compare {
 #define libmesh_assert_less_msg(expr1,expr2, msg)                       \
   do {                                                                  \
     if (!libMesh::casting_compare<std::less>()(expr1, expr2)) {         \
-      libMesh::Threads::lock_singleton_spin_mutex();                    \
-      std::streamsize oldp = libMesh::err.precision(17);                \
-      libMesh::err << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libMesh::err.precision(oldp);                                     \
-      libMesh::Threads::unlock_singleton_spin_mutex();                  \
-      libmesh_error();                                                  \
+      libmesh_error_msg(std::setprecision(17) << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl); \
     } } while (0)
 
 #define libmesh_assert_greater_msg(expr1,expr2, msg)                    \
   do {                                                                  \
     if (!libMesh::casting_compare<std::greater>()(expr1, expr2)) {      \
-      libMesh::Threads::lock_singleton_spin_mutex();                    \
-      std::streamsize oldp = libMesh::err.precision(17);                \
-      libMesh::err << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libMesh::err.precision(oldp);                                     \
-      libMesh::Threads::unlock_singleton_spin_mutex();                  \
-      libmesh_error();                                                  \
+      libmesh_error_msg(std::setprecision(17) << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl); \
     } } while (0)
 
 #define libmesh_assert_less_equal_msg(expr1,expr2, msg)                 \
   do {                                                                  \
     if (!libMesh::casting_compare<std::less_equal>()(expr1, expr2)) {   \
-      libMesh::Threads::lock_singleton_spin_mutex();                    \
-      std::streamsize oldp = libMesh::err.precision(17);                \
-      libMesh::err << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libMesh::err.precision(oldp);                                     \
-      libMesh::Threads::unlock_singleton_spin_mutex();                  \
-      libmesh_error();                                                  \
+      libmesh_error_msg(std::setprecision(17) << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl); \
     } } while (0)
 
 #define libmesh_assert_greater_equal_msg(expr1,expr2, msg)              \
   do {                                                                  \
     if (!libMesh::casting_compare<std::greater_equal>()(expr1, expr2)) { \
-      libMesh::Threads::lock_singleton_spin_mutex();                    \
-      std::streamsize oldp = libMesh::err.precision(17);                \
-      libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
-      libMesh::err.precision(oldp);                                     \
-      libMesh::Threads::unlock_singleton_spin_mutex();                  \
-      libmesh_error();                                                  \
+      libmesh_error_msg(std::setprecision(17) << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl); \
     } } while (0)
-
-#endif // clang <4.0
 
 #endif
 
@@ -468,13 +388,10 @@ struct casting_compare {
 // throws a ConvergenceFailure exception
 #define libmesh_error_msg(msg)                                          \
   do {                                                                  \
-    libMesh::Threads::lock_singleton_spin_mutex();                      \
-    libMesh::err << msg << std::endl;                                   \
-    std::stringstream msg_stream;                                       \
-    msg_stream << msg;                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); \
-    libMesh::Threads::unlock_singleton_spin_mutex();                    \
-    LIBMESH_THROW(libMesh::LogicError(msg_stream.str()));               \
+    std::stringstream message_stream;                                   \
+    message_stream << msg << '\n';                                      \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME, message_stream); \
+    LIBMESH_THROW(libMesh::LogicError(message_stream.str()));           \
   } while (0)
 
 #define libmesh_error() libmesh_error_msg("")
@@ -488,7 +405,7 @@ struct casting_compare {
 #define libmesh_exceptionless_error_msg(msg)                            \
   do {                                                                  \
     libMesh::Threads::lock_singleton_spin_mutex();                      \
-    libMesh::err << msg << std::endl;                                   \
+    libMesh::err << msg << '\n';                                        \
     libmesh_try { libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); } \
     libmesh_catch (...) {}                                              \
     libMesh::Threads::unlock_singleton_spin_mutex();                    \
@@ -499,23 +416,20 @@ struct casting_compare {
 
 #define libmesh_not_implemented_msg(msg)                                \
   do {                                                                  \
-    libMesh::Threads::lock_singleton_spin_mutex();                      \
-    libMesh::err << msg << std::endl;                                   \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); \
-    libMesh::Threads::unlock_singleton_spin_mutex();                    \
-    LIBMESH_THROW(libMesh::NotImplemented());                           \
+    std::stringstream message_stream;                                   \
+    message_stream << msg << '\n';                                      \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME, message_stream); \
+    LIBMESH_THROW(libMesh::NotImplemented(message_stream.str()));       \
   } while (0)
 
 #define libmesh_not_implemented() libmesh_not_implemented_msg("")
 
 #define libmesh_file_error_msg(filename, msg)                           \
   do {                                                                  \
-    libMesh::Threads::lock_singleton_spin_mutex();                      \
-    libMesh::err << "Error with file `" << filename << "'" << std::endl; \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); \
-    libMesh::err << msg << std::endl;                                   \
-    libMesh::Threads::unlock_singleton_spin_mutex();                    \
-    LIBMESH_THROW(libMesh::FileError(filename));                        \
+    std::stringstream message_stream;                                   \
+    message_stream << msg << '\n';                                      \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME, message_stream); \
+    LIBMESH_THROW(libMesh::FileError(filename, message_stream.str()));  \
   } while (0)
 
 #define libmesh_file_error(filename) libmesh_file_error_msg(filename,"")
