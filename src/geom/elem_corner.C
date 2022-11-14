@@ -33,7 +33,7 @@ bool ElemCorner::at_edge(const Elem & elem, const unsigned short e) const
   return at_edge(nodes_on_edge_ptr[0], nodes_on_edge_ptr[1]);
 }
 
-std::unique_ptr<const Elem> ElemCorner::build_edge(const Elem & elem) const
+void ElemCorner::build_edge(const Elem & elem, std::unique_ptr<const Elem> & edge) const
 {
   libmesh_assert_greater(elem.dim(), 1);
   libmesh_assert(at_edge());
@@ -42,9 +42,19 @@ std::unique_ptr<const Elem> ElemCorner::build_edge(const Elem & elem) const
 
   for (const auto e : elem.edge_index_range())
     if (elem.is_node_on_edge(first, e) && elem.is_node_on_edge(second, e))
-      return elem.build_edge_ptr(e);
+    {
+      elem.build_edge_ptr(edge, e);
+      return;
+    }
 
   libmesh_error_msg("Element does not contain vertices in ElemCorner");
+}
+
+std::unique_ptr<const Elem> ElemCorner::build_edge(const Elem & elem) const
+{
+  std::unique_ptr<const Elem> edge;
+  build_edge(elem, edge);
+  return edge;
 }
 
 std::string ElemCorner::print() const

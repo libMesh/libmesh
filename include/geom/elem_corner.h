@@ -157,7 +157,11 @@ public:
   { set_edge(vs.first, vs.second); }
 
   /**
-   * @returns The edge when at an edge
+   * Builds an edge of element \p elem into the Elem \p edge when at an edge
+   */
+  void build_edge(const Elem & elem, std::unique_ptr<const Elem> & edge) const;
+  /**
+   * @returns The built edge of element \p elem when at an edge
    */
   std::unique_ptr<const Elem> build_edge(const Elem & elem) const;
 
