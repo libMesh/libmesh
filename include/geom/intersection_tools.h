@@ -60,7 +60,8 @@ WithinSegmentResult within_segment(const Point & s1,
  * @param p1 The first point
  * @param p2 The second point
  * @param p3 The third point
- * @param tol The tolerance to use
+ * @param tol The tolerance to use (absolute tolerance of the cosine
+ * of the angle between [p1 -> p2] and [p1 -> p3])
  * @return Whether or not the given points are collinear
  */
 bool collinear(const Point & p1,

@@ -63,12 +63,14 @@ bool collinear(const Point & p1,
                const Point & p3,
                const Real tol)
 {
-  // (p1 -> p2) X (p1 - > p3) should be == the zero vector
-  const auto p1p2_cross_p1p3 = (p2 - p1).cross(p3 - p1);
-  for (const auto i : make_range(LIBMESH_DIM))
-    if (std::abs(p1p2_cross_p1p3(i)) > tol)
-      return false;
-  return true;
+  const auto p2_p1 = p1 - p2;
+  const auto p2_p1_norm = p2_p1.norm();
+  const auto p3_p2 = p2 - p3;
+  const auto p3_p2_norm = p3_p2.norm();
+  const auto denom = p2_p1_norm * p3_p2_norm;
+  if (denom == 0) // same points
+    return true;
+  return (std::abs(p2_p1 * p3_p2) / denom) > ((Real)1 - tol);
 }
 
 bool within_edge_on_side(const Elem & elem,
