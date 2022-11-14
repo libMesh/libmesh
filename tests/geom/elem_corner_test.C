@@ -92,12 +92,13 @@ public:
       CPPUNIT_ASSERT(at_quad_edge.is_valid(*quad, 0.5 * (quad->point(1) + quad->point(2))));
       for (const auto e : quad->edge_index_range())
         CPPUNIT_ASSERT_EQUAL(at_quad_edge.at_edge(*quad, e), e == 1);
-    }
-    auto quad_edge_elem = at_quad_edge.build_edge(*quad);
+
+      auto quad_edge_elem = at_quad_edge.build_edge(*quad);
       CPPUNIT_ASSERT((quad_edge_elem->point(0).absolute_fuzzy_equals(quad->point(1))
                       && quad_edge_elem->point(1).absolute_fuzzy_equals(quad->point(2))) ||
                   ((quad_edge_elem->point(0).absolute_fuzzy_equals(quad->point(2))
                        && quad_edge_elem->point(1).absolute_fuzzy_equals(quad->point(1)))));
+    }
 #endif
 
 #if LIBMESH_DIM > 2
