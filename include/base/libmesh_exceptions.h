@@ -51,7 +51,7 @@ public:
 class NotImplemented : public std::logic_error
 {
 public:
-  NotImplemented() : std::logic_error( "Error: not implemented!" ) {}
+  NotImplemented(std::string msg="") : std::logic_error( "Error: feature not implemented!\n" + msg ) {}
 };
 
 
@@ -65,7 +65,8 @@ public:
 class FileError : public std::runtime_error
 {
 public:
-  FileError(const std::string & filename) : std::runtime_error( "Error accessing file: " + filename ) {}
+  FileError(const std::string & filename, const std::string msg="") :
+    std::runtime_error("Error with file `" + filename + "'\n" + std::move(msg)) {}
 };
 
 
