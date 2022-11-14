@@ -754,7 +754,7 @@ public:
    * \returns A pointer to the beginning of the array that contains the
    * (local) node numbers on the side \p s
    *
-   * This does not create temproraries, unlike \p nodes_on_side.
+   * This does not create temporaries, unlike \p nodes_on_side.
    * Use n_nodes_on_side for indexing.
    */
   virtual const unsigned int * nodes_on_side_ptr(const unsigned short s) const = 0;
@@ -768,7 +768,7 @@ public:
    * \returns A pointer to the beginning of the array that contains the
    * (local) node numbers on the edge \p e
    *
-   * This does not create temproraries, unlike \p nodes_on_edge.
+   * This does not create temporaries, unlike \p nodes_on_edge.
    * Use n_nodes_on_edge for indexing.
    */
   virtual const unsigned int * nodes_on_edge_ptr(const unsigned short e) const = 0;
