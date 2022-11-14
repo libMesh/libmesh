@@ -117,80 +117,102 @@ public:
                                        elem_type);
   }
 
-  void test_within_edge_on_side()
+  void test_within_edge()
   {
     LOG_UNIT_TEST;
 
-    if (_mesh->mesh_dimension() != 3)
-      return;
+    const auto is_3d = _mesh->mesh_dimension() == 3;
 
     // check locations at every node
     for (const auto & elem : _mesh->active_local_element_ptr_range())
-      for (const auto s : elem->side_index_range())
-        for (const auto e : elem->edge_index_range())
-          for (const auto n : elem->nodes_on_edge(e))
-          {
-            ElemCorner corner;
-            const auto within = IntersectionTools::within_edge_on_side(*elem,
-                                                                        elem->point(n),
-                                                                        s,
-                                                                        corner);
+      for (const auto e : elem->edge_index_range())
+        for (const auto n : elem->nodes_on_edge(e))
+        {
+          ElemCorner corner;
+          const auto within = IntersectionTools::within_edge(*elem, elem->point(n), corner);
+          CPPUNIT_ASSERT(within);
 
-            CPPUNIT_ASSERT_EQUAL(within, elem->is_node_on_side(n, s));
-            if (elem->is_node_on_side(n, s))
+          if (is_3d)
+            for (const auto s : elem->side_index_range())
             {
-              CPPUNIT_ASSERT_EQUAL(elem->is_vertex(n), corner.at_vertex(n));
-              CPPUNIT_ASSERT_EQUAL(elem->is_vertex(n), !corner.at_edge(*elem, e));
+              ElemCorner corner_on_side;
+              const auto within_on_side = IntersectionTools::within_edge_on_side(*elem,
+                                                                                elem->point(n),
+                                                                                s,
+                                                                                corner_on_side);
+
+              const auto node_is_on_side = elem->is_node_on_side(n, s);
+              CPPUNIT_ASSERT_EQUAL(within_on_side, node_is_on_side);
+              if (node_is_on_side)
+              {
+                CPPUNIT_ASSERT_EQUAL(corner.at_vertex(n), corner_on_side.at_vertex(n));
+                CPPUNIT_ASSERT_EQUAL(corner.at_edge(*elem, e), corner_on_side.at_edge(*elem, e));
+                CPPUNIT_ASSERT_EQUAL(elem->is_vertex(n), corner_on_side.at_vertex(n));
+                CPPUNIT_ASSERT_EQUAL(elem->is_vertex(n), !corner_on_side.at_edge(*elem, e));
+              }
             }
-          }
+        }
 
     // cut edges into segments
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       for (const auto e : elem->edge_index_range())
-        for (const auto s : elem->side_index_range())
-          if (elem->is_edge_on_side(e, s))
-          {
-            const auto nodes_on_edge = elem->nodes_on_edge(e);
-            const auto & p1 = elem->point(nodes_on_edge[0]);
-            const auto & p2 = elem->point(nodes_on_edge[1]);
-            const auto length_vec = p2 - p1;
-            const auto length = length_vec.norm();
-            const auto p1_to_p2 = length_vec / length;
+      {
+        const auto nodes_on_edge = elem->nodes_on_edge(e);
+        const auto & p1 = elem->point(nodes_on_edge[0]);
+        const auto & p2 = elem->point(nodes_on_edge[1]);
+        const auto length_vec = p2 - p1;
+        const auto length = length_vec.norm();
+        const auto p1_to_p2 = length_vec / length;
 
-            int segments = 5;
-            Real dx = (Real)1 / segments * length;
-            for (const auto i : make_range(-1, segments + 1))
-            {
-              const auto p = p1 + Real(i) * dx * p1_to_p2;
-              ElemCorner corner;
-              const auto within = IntersectionTools::within_edge_on_side(*elem,
-                                                                         p,
-                                                                         s,
-                                                                         corner);
+        int segments = 5;
+        Real dx = (Real)1 / segments * length;
+        for (const auto i : make_range(-1, segments + 1))
+        {
+          const auto p = p1 + Real(i) * dx * p1_to_p2;
 
-              CPPUNIT_ASSERT_EQUAL(within, i >= 0 && i <= segments);
-              CPPUNIT_ASSERT_EQUAL(corner.at_vertex(nodes_on_edge[0]), i == 0);
-              CPPUNIT_ASSERT_EQUAL(corner.at_vertex(nodes_on_edge[1]), i == segments);
-              CPPUNIT_ASSERT_EQUAL(corner.at_edge(*elem, e), i > 0 && i < segments);
-            }
-          }
+          ElemCorner corner;
+          const auto within = IntersectionTools::within_edge(*elem, p, corner);
+          CPPUNIT_ASSERT_EQUAL(within, i >= 0 && i <= segments);
+
+          if (is_3d)
+            for (const auto s : elem->side_index_range())
+              if (elem->is_edge_on_side(e, s))
+              {
+                ElemCorner corner_on_side;
+                const auto within_on_side = IntersectionTools::within_edge_on_side(*elem,
+                                                                                  p,
+                                                                                  s,
+                                                                                  corner_on_side);
+
+                CPPUNIT_ASSERT_EQUAL(within_on_side, within);
+                CPPUNIT_ASSERT_EQUAL(corner_on_side.at_vertex(nodes_on_edge[0]), i == 0);
+                CPPUNIT_ASSERT_EQUAL(corner_on_side.at_vertex(nodes_on_edge[1]), i == segments);
+                CPPUNIT_ASSERT_EQUAL(corner_on_side.at_edge(*elem, e), i > 0 && i < segments);
+              }
+        }
+      }
 
     // check elem centroids
     for (const auto & elem : _mesh->active_local_element_ptr_range())
-      for (const auto s : elem->side_index_range())
-      {
-        ElemCorner corner;
-        CPPUNIT_ASSERT(!IntersectionTools::within_edge_on_side(*elem,
-                                                               elem->vertex_average(),
-                                                               s,
-                                                               corner));
-      }
+    {
+      const auto p = elem->vertex_average();
+
+      ElemCorner corner;
+      CPPUNIT_ASSERT(!IntersectionTools::within_edge(*elem, p, corner));
+
+      if (is_3d)
+        for (const auto s : elem->side_index_range())
+        {
+          ElemCorner corner_on_side;
+          CPPUNIT_ASSERT(!IntersectionTools::within_edge_on_side(*elem, p, s, corner_on_side));
+        }
+    }
   }
 
 };
 
 #define MESHEDINTERSECTIONTOOLSTEST               \
-  CPPUNIT_TEST( test_within_edge_on_side );
+  CPPUNIT_TEST( test_within_edge );
 
 #define INSTANTIATE_MESHEDINTERSECTIONTOOLSTEST(elemtype)                                       \
   class MeshedIntersectionToolsTest_##elemtype : public MeshedIntersectionToolsTest<elemtype> { \
@@ -209,6 +231,15 @@ public:
                                                                                                 \
   CPPUNIT_TEST_SUITE_REGISTRATION( MeshedIntersectionToolsTest_##elemtype )
 
+#if LIBMESH_DIM > 1
+INSTANTIATE_MESHEDINTERSECTIONTOOLSTEST(TRI3);
+INSTANTIATE_MESHEDINTERSECTIONTOOLSTEST(TRI6);
+INSTANTIATE_MESHEDINTERSECTIONTOOLSTEST(TRI7);
+
+INSTANTIATE_MESHEDINTERSECTIONTOOLSTEST(QUAD4);
+INSTANTIATE_MESHEDINTERSECTIONTOOLSTEST(QUAD8);
+INSTANTIATE_MESHEDINTERSECTIONTOOLSTEST(QUAD9);
+#endif // LIBMESH_DIM > 1
 
 #if LIBMESH_DIM > 2
 INSTANTIATE_MESHEDINTERSECTIONTOOLSTEST(TET4);

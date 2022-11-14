@@ -73,6 +73,27 @@ bool collinear(const Point & p1,
   return (std::abs(p2_p1 * p3_p2) / denom) > ((Real)1 - tol);
 }
 
+bool edges_are_collinear(const Elem & elem, const Real tol)
+{
+  if (elem.default_order() < 2)
+    return true;
+
+  for (const auto e : elem.edge_index_range())
+  {
+    // we should expect at least 3 nodes/edges for our higher order elems
+    libmesh_assert_greater_equal(elem.n_nodes_on_edge(e), 3);
+
+    const unsigned int * edge_nodes_map = elem.nodes_on_edge_ptr(e);
+    if (!collinear(elem.point(edge_nodes_map[0]),
+                   elem.point(edge_nodes_map[1]),
+                   elem.point(edge_nodes_map[2]),
+                   tol))
+      return false;
+  }
+
+  return true;
+}
+
 bool within_edge_on_side(const Elem & elem,
                          const Point & p,
                          const unsigned short s,
@@ -84,21 +105,10 @@ bool within_edge_on_side(const Elem & elem,
   libmesh_assert(corner.is_invalid());
   libmesh_assert_equal_to(elem.dim(), 3);
 
-  // For higher order than linear without linearization, make sure
-  // that our edges are collinear
-  if (elem.default_order() > 1 && !linearize)
-    for (const auto e : elem.edge_index_range())
-    {
-      // we should expect at least 3 nodes/edges for our higher order elems
-      libmesh_assert_greater_equal(elem.n_nodes_on_edge(e), 3);
-
-      const unsigned int * edge_nodes_map = elem.nodes_on_edge_ptr(e);
-      if (!collinear(elem.point(edge_nodes_map[0]),
-                     elem.point(edge_nodes_map[1]),
-                     elem.point(edge_nodes_map[2])))
-        libmesh_error_msg("Failed to use Cell::without_edge_on_side without linearization "
-                          "because an edge was found that is not collinear.");
-    }
+  // Without linearization, make sure that our edges are collinear
+  if (!linearize && !edges_are_collinear(elem, tol))
+    libmesh_error_msg("Failed to use Cell::without_edge_on_side without linearization "
+                      "because an edge was found that is not collinear.");
 
   const auto vs = elem.n_vertices_on_side(s);
   const unsigned int * side_nodes_map = elem.nodes_on_side_ptr(s);
@@ -109,35 +119,73 @@ bool within_edge_on_side(const Elem & elem,
   auto last_v = side_nodes_map[vs - 1];
   for (const auto side_v : make_range(vs))
   {
-    const auto other_v = side_nodes_map[side_v];
-    const auto within_result = within_segment(elem.point(last_v), elem.point(other_v), p, tol);
-    if (within_result == NOT_WITHIN)
-    {
-      last_v = side_nodes_map[side_v];
-      continue;
-    }
-
-    if (within_result == BETWEEN)
-    {
-      corner.set_edge(last_v, other_v);
-      libmesh_assert(corner.build_edge(elem)->contains_point(p, tol));
-    }
-    else if (within_result == AT_BEGINNING)
-    {
-      corner.set_vertex(last_v);
-      libmesh_assert(elem.point(last_v).relative_fuzzy_equals(p, tol));
-    }
-    else
-    {
-      corner.set_vertex(other_v);
-      libmesh_assert(elem.point(other_v).relative_fuzzy_equals(p, tol));
-    }
-    return true;
+    if (detail::_within_edge(elem, p, corner, last_v, side_nodes_map[side_v], tol))
+      return true;
+    last_v = side_nodes_map[side_v];
   }
 
   return false;
 }
 
+bool within_edge(const Elem & elem,
+                 const Point & p,
+                 ElemCorner & corner,
+                 const bool linearize,
+                 const Real tol)
+{
+  libmesh_assert(corner.is_invalid());
+
+  // Without linearization, make sure that our edges are collinear
+  if (!linearize && !edges_are_collinear(elem, tol))
+    libmesh_error_msg("Failed to use Cell::without_edge without linearization "
+                      "because an edge was found that is not collinear.");
+
+  for (const auto e : elem.edge_index_range())
+  {
+    const unsigned int * edge_nodes_map = elem.nodes_on_edge_ptr(e);
+    if (detail::_within_edge(elem, p, corner, edge_nodes_map[0], edge_nodes_map[1], tol))
+      return true;
+  }
+
+  return false;
+}
+
+namespace detail
+{
+bool _within_edge(const Elem & elem,
+                  const Point & p,
+                  ElemCorner & corner,
+                  const unsigned int v1,
+                  const unsigned int v2,
+                  const Real tol)
+{
+  libmesh_assert(corner.is_invalid());
+  libmesh_assert_less(v1, elem.n_vertices());
+  libmesh_assert_less(v2, elem.n_vertices());
+
+  const auto within_result = within_segment(elem.point(v1), elem.point(v2), p, tol);
+  if (within_result == NOT_WITHIN)
+    return false;
+
+  if (within_result == BETWEEN)
+  {
+    corner.set_edge(v1, v2);
+    libmesh_assert(corner.build_edge(elem)->contains_point(p, tol));
+  }
+  else if (within_result == AT_BEGINNING)
+  {
+    corner.set_vertex(v1);
+    libmesh_assert(elem.point(v1).relative_fuzzy_equals(p, tol));
+  }
+  else
+  {
+    corner.set_vertex(v2);
+    libmesh_assert(elem.point(v2).relative_fuzzy_equals(p, tol));
+  }
+
+  return true;
+}
+} // namespace detail
 } // namespace libMesh::IntersectionTools
 
 
