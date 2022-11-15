@@ -29,7 +29,11 @@ public:
     CPPUNIT_ASSERT(!default_corner.at_corner());
     CPPUNIT_ASSERT(!default_corner.at_vertex());
     CPPUNIT_ASSERT(!default_corner.at_edge());
-    CPPUNIT_ASSERT_EQUAL((std::string)"not at corner", default_corner.print());
+    const std::string default_corner_string = "not at corner";
+    std::stringstream default_corner_ss;
+    default_corner_ss << default_corner;
+    CPPUNIT_ASSERT_EQUAL(default_corner_string, default_corner.print());
+    CPPUNIT_ASSERT_EQUAL(default_corner_string, default_corner_ss.str());
 
     // EDGE elem for vertex testing
     Mesh mesh_1d (*TestCommWorld);
@@ -50,6 +54,11 @@ public:
         CPPUNIT_ASSERT_EQUAL(at_edge_vertex.at_vertex(v), v == 1);
         CPPUNIT_ASSERT_EQUAL(at_edge_vertex.is_valid(*edge, edge->point(v)), v == 1);
       }
+    const std::string at_vertex_string = "at vertex 1";
+    std::stringstream at_vertex_ss;
+    at_vertex_ss << at_edge_vertex;
+    CPPUNIT_ASSERT_EQUAL(at_vertex_string, at_edge_vertex.print());
+    CPPUNIT_ASSERT_EQUAL(at_vertex_string, at_vertex_ss.str());
 
 #if LIBMESH_DIM > 1
     // QUAD elem for vertex testing
@@ -99,6 +108,11 @@ public:
                   ((quad_edge_elem->point(0).absolute_fuzzy_equals(quad->point(2))
                        && quad_edge_elem->point(1).absolute_fuzzy_equals(quad->point(1)))));
     }
+    const std::string at_edge_string = "at edge with vertices 1 and 2";
+    std::stringstream at_edge_ss;
+    at_edge_ss << at_quad_edge;
+    CPPUNIT_ASSERT_EQUAL(at_edge_string, at_quad_edge.print());
+    CPPUNIT_ASSERT_EQUAL(at_edge_string, at_edge_ss.str());
 #endif
 
 #if LIBMESH_DIM > 2
