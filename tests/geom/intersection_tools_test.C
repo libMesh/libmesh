@@ -229,10 +229,56 @@ public:
       }
   }
 
+  void test_at_vertex()
+  {
+    LOG_UNIT_TEST;
+
+    // check locations at every node
+    for (const auto & mesh : _meshes)
+      for (const auto & elem : mesh->active_local_element_ptr_range())
+        for (const auto n : elem->node_index_range())
+        {
+          const auto & p = elem->point(n);
+          const auto is_vertex = elem->is_vertex(n);
+          const auto at_vertex = IntersectionTools::at_vertex(*elem, p);
+
+          if (is_vertex)
+            CPPUNIT_ASSERT_EQUAL(at_vertex, (unsigned short)n);
+          else
+            CPPUNIT_ASSERT_EQUAL(at_vertex, Elem::invalid_vertex);
+
+          for (const auto s : elem->side_index_range())
+          {
+            const auto at_vertex_on_side = IntersectionTools::at_vertex_on_side(*elem, p, s);
+            if (is_vertex && elem->is_node_on_side(n, s))
+              CPPUNIT_ASSERT_EQUAL(at_vertex_on_side, at_vertex);
+            else
+              CPPUNIT_ASSERT_EQUAL(at_vertex_on_side, Elem::invalid_vertex);
+          }
+        }
+
+    // check edge centroids
+    for (const auto & mesh : _meshes)
+      if (mesh->mesh_dimension() > 1)
+        for (const auto & elem : mesh->active_local_element_ptr_range())
+          for (const auto e : elem->edge_index_range())
+          {
+            const auto edge = elem->build_edge_ptr(e);
+            const auto at_vertex = IntersectionTools::at_vertex(*elem, edge->vertex_average());
+            CPPUNIT_ASSERT_EQUAL(at_vertex, Elem::invalid_vertex);
+          }
+
+    // check elem centroids
+    for (const auto & mesh : _meshes)
+      for (const auto & elem : mesh->active_local_element_ptr_range())
+        CPPUNIT_ASSERT_EQUAL(IntersectionTools::at_vertex(*elem, elem->centroid()), Elem::invalid_vertex);
+  }
+
 };
 
-#define MESHEDINTERSECTIONTOOLSTEST               \
-  CPPUNIT_TEST( test_within_edge );
+#define MESHEDINTERSECTIONTOOLSTEST  \
+  CPPUNIT_TEST( test_within_edge );  \
+  CPPUNIT_TEST( test_at_vertex );
 
 #define INSTANTIATE_MESHEDINTERSECTIONTOOLSTEST(elemtype)                                       \
   class MeshedIntersectionToolsTest_##elemtype : public MeshedIntersectionToolsTest<elemtype> { \

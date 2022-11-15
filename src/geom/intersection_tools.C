@@ -150,6 +150,32 @@ bool within_edge(const Elem & elem,
   return false;
 }
 
+unsigned short at_vertex(const Elem & elem,
+                         const Point & p,
+                         const Real tol)
+{
+  for (const auto v : elem.vertex_index_range())
+    if (elem.point(v).relative_fuzzy_equals(p, tol))
+      return v;
+  return Elem::invalid_vertex;
+}
+
+unsigned short at_vertex_on_side(const Elem & elem,
+                                 const Point & p,
+                                 const unsigned short s,
+                                 const Real tol)
+{
+  libmesh_assert_less(s, elem.n_sides());
+  const unsigned int * side_node_map = elem.nodes_on_side_ptr(s);
+  for (const auto i : make_range(elem.n_vertices_on_side(s)))
+  {
+    const auto v = side_node_map[i];
+    if (elem.point(v).relative_fuzzy_equals(p, tol))
+      return v;
+  }
+  return Elem::invalid_vertex;
+}
+
 namespace detail
 {
 bool _within_edge(const Elem & elem,

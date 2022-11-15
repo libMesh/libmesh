@@ -119,6 +119,30 @@ bool within_edge_on_side(const Elem & elem,
                          const bool linearize = false,
                          const Real tol = TOLERANCE);
 
+/**
+ * \returns The index of the vertex that the given point is at
+ * on the given element, invalid otherwise
+ * @param elem The element
+ * @param p The point
+ * @param tol The relative tolerance used in point comparison
+*/
+unsigned short at_vertex(const Elem & elem,
+                         const Point & p,
+                         const Real tol = TOLERANCE);
+
+/**
+ * \returns The index of the vertex that the given point is at
+ * on the given element on the given side, invalid otherwise
+ * @param elem The element
+ * @param p The point
+ * @param s The side
+ * @param tol The relative tolerance used in point comparison
+*/
+unsigned short at_vertex_on_side(const Elem & elem,
+                                 const Point & p,
+                                 const unsigned short s,
+                                 const Real tol = TOLERANCE);
+
 namespace detail
 {
 /**
