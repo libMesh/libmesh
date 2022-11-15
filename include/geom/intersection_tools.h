@@ -84,6 +84,7 @@ bool edges_are_collinear(const Elem & elem, const Real tol = TOLERANCE);
  * @param linearize Whether or not to "linearize" the check, if this
  * is set to false and edges are found to not be collinear, an error
  * is thrown
+ * @param tol Relative tolerance to use in comparison
  *
  * \p corner will be set to an "at vertex" state if the point is
  * both within the edge _and_ at a vertex.
@@ -105,6 +106,7 @@ bool within_edge(const Elem & elem,
  * @param linearize Whether or not to "linearize" the check, if this
  * is set to false and edges are found to not be collinear, an error
  * is thrown
+ * @param tol Relative tolerance to use in comparison
  *
  * \p corner will be set to an "at vertex" state if the point is
  * both within the edge _and_ at a vertex.
