@@ -672,6 +672,14 @@ public:
                                const NumericVector<T> & vec2) = 0;
 
   /**
+   * Computes \f$ u_i \leftarrow \frac{v_{1,i}}{v_{2,i}} \f$ (summation not implied)
+   * i.e. the pointwise (component-wise) division of \p vec1 and
+   * \p vec2, and stores the result in \p *this.
+   */
+  virtual void pointwise_divide (const NumericVector<T> & vec1,
+                                 const NumericVector<T> & vec2) = 0;
+
+  /**
    * Prints the local contents of the vector, by default to
    * libMesh::out
    */

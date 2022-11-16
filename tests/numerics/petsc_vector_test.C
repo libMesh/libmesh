@@ -23,6 +23,8 @@ public:
 
   CPPUNIT_TEST( testGetArray );
 
+  CPPUNIT_TEST( testPetscOperations );
+
   CPPUNIT_TEST_SUITE_END();
 
   void testGetArray()
@@ -75,6 +77,41 @@ public:
     CPPUNIT_ASSERT_EQUAL((intptr_t)read_only_values, (intptr_t)values);
 
     v.restore_array();
+  }
+
+  void testPetscOperations()
+  {
+    PetscVector<Number> v1(*my_comm, global_size, local_size);
+    auto v2 = v1.clone();
+
+    const libMesh::dof_id_type
+      first = v1.first_local_index(),
+      last  = v1.last_local_index();
+
+    for (libMesh::dof_id_type n=first; n != last; n++)
+    {
+      v1.set (n, static_cast<libMesh::Number>(n+1));
+      v2->set (n, static_cast<libMesh::Number>(2*(n+1)));
+    }
+    v1.close();
+    v2->close();
+
+    auto v_working_ptr = v1.clone();
+    auto & v_working = *v_working_ptr;
+
+    v_working.pointwise_mult(v1, *v2);
+
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v_working(n)),
+                              libMesh::Real((n+1)*2*(n+1)),
+                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+    v_working.pointwise_divide(v1, *v2);
+
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v_working(n)),
+                              libMesh::Real(0.5),
+                              libMesh::TOLERANCE*libMesh::TOLERANCE);
   }
 
 };

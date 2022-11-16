@@ -1022,7 +1022,24 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T> & vec1,
   this->_is_closed = true;
 }
 
+template <typename T>
+void PetscVector<T>::pointwise_divide (const NumericVector<T> & vec1,
+                                       const NumericVector<T> & vec2)
+{
+  this->_restore_array();
 
+  // Convert arguments to PetscVector*.
+  const PetscVector<T> * const vec1_petsc = cast_ptr<const PetscVector<T> *>(&vec1);
+  const PetscVector<T> * const vec2_petsc = cast_ptr<const PetscVector<T> *>(&vec2);
+
+  // Call PETSc function.
+  PetscErrorCode ierr = VecPointwiseDivide(_vec, vec1_petsc->vec(), vec2_petsc->vec());
+  LIBMESH_CHKERR(ierr);
+  if (this->type() == GHOSTED)
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
+
+  this->_is_closed = true;
+}
 
 template <typename T>
 void PetscVector<T>::print_matlab (const std::string & name) const

@@ -321,6 +321,9 @@ public:
   virtual void pointwise_mult (const NumericVector<T> & vec1,
                                const NumericVector<T> & vec2) override;
 
+  virtual void pointwise_divide (const NumericVector<T> & vec1,
+                                 const NumericVector<T> & vec2) override;
+
   virtual void print_matlab(const std::string & name = "") const override;
 
   virtual void create_subvector(NumericVector<T> & subvector,

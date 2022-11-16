@@ -482,7 +482,12 @@ void LaspackVector<T>::pointwise_mult (const NumericVector<T> & /*vec1*/,
   libmesh_not_implemented();
 }
 
-
+template <typename T>
+void LaspackVector<T>::pointwise_divide (const NumericVector<T> & /*vec1*/,
+                                         const NumericVector<T> & /*vec2*/)
+{
+  libmesh_not_implemented();
+}
 
 template <typename T>
 Real LaspackVector<T>::max() const

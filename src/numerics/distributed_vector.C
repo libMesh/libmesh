@@ -619,7 +619,12 @@ void DistributedVector<T>::pointwise_mult (const NumericVector<T> &,
   libmesh_not_implemented();
 }
 
-
+template <typename T>
+void DistributedVector<T>::pointwise_divide (const NumericVector<T> &,
+                                             const NumericVector<T> &)
+{
+  libmesh_not_implemented();
+}
 
 //--------------------------------------------------------------
 // Explicit instantiations
