@@ -32,7 +32,7 @@
 #include "libmesh/point.h"
 
 // C++ includes
-
+#include <numeric> // gcd
 
 using namespace libMesh;
 
@@ -45,6 +45,7 @@ void usage_error(const char * progname)
                << " --elem type           elem type (e.g. TET14)\n"
                << " --childnum num        child number\n"
                << " --denominator num     denominator to use\n"
+               << " --diff                only output diffs from existing\n"
                << std::endl;
 
   exit(1);
@@ -83,7 +84,9 @@ int main(int argc, char ** argv)
     assert_argument(cl, "--childnum", argv[0], 0);
 
   const int denominator =
-    assert_argument(cl, "--denominator", argv[0], 0);
+    assert_argument(cl, "--denominator", argv[0], 1);
+
+  const bool diff = cl.search("--diff");
 
   const ElemType elem_type =
     Utility::string_to_enum<ElemType>(elem_type_string);
@@ -131,26 +134,97 @@ int main(int argc, char ** argv)
       elem->set_node(n) = &nodes[n];
     }
 
-  for (auto i : elem->node_index_range())
+  const unsigned int denomdigits = std::ceil(std::log10(denominator));
+  const unsigned int spacing = denomdigits*2+3;
+
+  std::cout.precision(17);
+
+  std::cout << "    // embedding matrix for child " << childnum << '\n';
+  std::cout << "    {\n";
+  std::cout << "      //";
+  for (auto i : make_range(n_nodes))
+    {
+      const unsigned int indexdigits =
+        std::ceil(std::log10(i));
+      const int padding = spacing-indexdigits-2*(i==0);
+      for (int k=0; k < padding; ++k)
+        std::cout << ' ';
+      std::cout << i;
+      if (i+1 == n_nodes)
+        std::cout << '\n';
+      else
+        std::cout << ',';
+    }
+
+  for (auto i : make_range(n_nodes))
     {
       const Point & pt = elem->point(i);
-      std::cout << '{';
+      std::cout << "      {";
       for (auto j : make_range(n_nodes))
         {
           Real shape = FEInterface::shape(dim, fe_type, elem_type, j, pt);
+
+          // Don't print -0 or 1e-17; we don't tolerate FP error at 0
+          if (std::abs(shape) < TOLERANCE*std::sqrt(TOLERANCE))
+            shape = 0;
+
           const Real embed = ref.embedding_matrix(childnum, i, j);
-          if (std::abs(shape - embed) < TOLERANCE*TOLERANCE)
-            std::cout << "++++++,";
+          if (diff &&
+              std::abs(shape - embed) < TOLERANCE*std::sqrt(TOLERANCE))
+            {
+              for (unsigned int k=0; k != spacing; ++k)
+                std::cout << '+';
+              if (j+1 != n_nodes)
+                std::cout << ',';
+            }
           else
             {
-              std::cout << (shape*denominator);
-              if (shape != 0.0)
-                std::cout << "/r" << denominator;
-              std::cout << ", ";
+              int oldnumerator = std::round(shape*denominator);
+              int newnumerator = oldnumerator;
+              int newdenominator = denominator;
+
+              if (std::abs(oldnumerator-shape*denominator) < TOLERANCE*sqrt(TOLERANCE))
+                {
+                  int the_gcd = std::gcd(newnumerator, newdenominator);
+                  newnumerator /= the_gcd;
+                  newdenominator /= the_gcd;
+                }
+
+              const unsigned int newdenomdigits =
+                std::ceil(std::log10(newdenominator));
+              std::ostringstream ostr;
+              ostr << (shape*newdenominator);
+              const int padding =
+                (shape != 0.0 && newdenominator != 1) ?
+                int(spacing)-newdenomdigits-2-ostr.str().size() :
+                int(spacing)-ostr.str().size();
+              for (int k=0; k < padding; ++k)
+                std::cout << ' ';
+              std::cout << ostr.str();
+              if (shape != 0.0 && newdenominator != 1)
+                {
+                  if (1 << (int)std::round(std::log2(newdenominator)) ==
+                      newdenominator)
+                    std::cout << "/" << newdenominator << '.';
+                  // If we don't have a power of 2 we need to make
+                  // sure we're dividing at might-exceed-double Real
+                  // precision
+                  else
+                    std::cout << "/r" << newdenominator;
+                }
+              if (j+1 != n_nodes)
+                std::cout << ',';
             }
         }
-      std::cout << '}' << std::endl;
+
+      if (i+1 == n_nodes)
+        std::cout << "}  ";
+      else
+        std::cout << "}, ";
+
+      std::cout << "// " << i << '\n';
     }
+  std::cout << "    },\n";
 
   return 0;
 }
