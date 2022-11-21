@@ -674,8 +674,7 @@ public:
    * (elem-id, side-id, bc-id) triplets and returns it to the user,
    * taking advantage of guaranteed RVO.
    */
-  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
-  build_active_side_list () const;
+  std::vector<BCTuple> build_active_side_list () const;
 
   /**
    * Creates a list of element numbers, edges, and boundary ids for those edges.
@@ -698,8 +697,7 @@ public:
    * (elem-id, side-id, bc-id) triplets and returns it to the user,
    * taking advantage of guaranteed RVO.
    */
-  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
-  build_edge_list() const;
+  std::vector<BCTuple> build_edge_list() const;
 
   /**
    * Creates a list of element numbers, shellfaces, and boundary ids for those shellfaces.
@@ -722,8 +720,7 @@ public:
    * (elem-id, side-id, bc-id) triplets and returns it to the user,
    * taking advantage of guaranteed RVO.
    */
-  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
-  build_shellface_list() const;
+  std::vector<BCTuple> build_shellface_list() const;
 
   /**
    * Synchronize the boundary element side and node across processors.
