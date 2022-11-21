@@ -261,6 +261,14 @@ public:
 
   virtual void flip(BoundaryInfo *) override final;
 
+#ifdef LIBMESH_ENABLE_AMR
+  virtual
+  const std::vector<std::pair<unsigned char, unsigned char>> &
+  parent_bracketing_nodes(unsigned int c,
+                          unsigned int n) const override
+  { return _parent_bracketing_nodes[c][n]; }
+#endif
+
   unsigned int center_node_on_side(const unsigned short side) const override final;
 
   ElemType side_type (const unsigned int s) const override final;
@@ -289,6 +297,13 @@ protected:
    * from current nodes/solution.
    */
   static const Real _embedding_matrix[num_children][num_nodes][num_nodes];
+
+  /**
+   * Pairs of nodes that bracket child nodes when doing mesh
+   * refinement.
+   */
+  static const std::vector<std::pair<unsigned char, unsigned char>>
+    _parent_bracketing_nodes[num_children][num_nodes];
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;
 
