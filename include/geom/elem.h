@@ -691,7 +691,7 @@ public:
   virtual unsigned int n_children () const = 0;
 
   /**
-   * \returns \p true if the specified (local) node number is a vertex.
+   * \returns \p true if the specified (local) node number is a vertex node.
    */
   virtual bool is_vertex(const unsigned int i) const = 0;
 
@@ -713,12 +713,12 @@ public:
                                    unsigned int n) const;
 
   /**
-   * \returns \p true if the specified (local) node number is an edge.
+   * \returns \p true if the specified (local) node number is an edge node.
    */
   virtual bool is_edge(const unsigned int i) const = 0;
 
   /**
-   * \returns \p true if the specified (local) node number is a face.
+   * \returns \p true if the specified (local) node number is a face node.
    */
   virtual bool is_face(const unsigned int i) const = 0;
 
