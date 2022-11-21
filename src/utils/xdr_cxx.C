@@ -741,7 +741,7 @@ void Xdr::do_write(std::vector<std::complex<T>> & a)
 
 
 template <typename T>
-void Xdr::data (T & a, const char * comment_in)
+void Xdr::data (T & a, std::string_view comment_in)
 {
   switch (mode)
     {
@@ -790,7 +790,7 @@ void Xdr::data (T & a, const char * comment_in)
 
         // If there's a comment provided, write a tab character and
         // then the comment.
-        if (std::string(comment_in) != "")
+        if (comment_in != "")
           *out << "\t " << comment_in;
 
         // Go to the next line.
@@ -1297,42 +1297,42 @@ void Xdr::comment (std::string & comment_in)
 
 
 //
-template LIBMESH_EXPORT void Xdr::data<int>                              (int &,                             const char *);
-template LIBMESH_EXPORT void Xdr::data<unsigned int>                     (unsigned int &,                    const char *);
-template LIBMESH_EXPORT void Xdr::data<unsigned short int>               (unsigned short int &,              const char *);
-template LIBMESH_EXPORT void Xdr::data<short int>                        (short int &,                       const char *);
-template LIBMESH_EXPORT void Xdr::data<unsigned long int>                (unsigned long int &,               const char *);
-template LIBMESH_EXPORT void Xdr::data<unsigned long long>               (unsigned long long &,              const char *);
-template LIBMESH_EXPORT void Xdr::data<long int>                         (long int &,                        const char *);
-template LIBMESH_EXPORT void Xdr::data<long long>                        (long long &,                       const char *);
-template LIBMESH_EXPORT void Xdr::data<char>                             (char &,                            const char *);
-template LIBMESH_EXPORT void Xdr::data<signed char>                      (signed char &,                     const char *);
-template LIBMESH_EXPORT void Xdr::data<unsigned char>                    (unsigned char &,                   const char *);
-template LIBMESH_EXPORT void Xdr::data<float>                            (float &,                           const char *);
-template LIBMESH_EXPORT void Xdr::data<double>                           (double &,                          const char *);
-template LIBMESH_EXPORT void Xdr::data<long double>                      (long double &,                     const char *);
-template LIBMESH_EXPORT void Xdr::data<std::complex<float>>              (std::complex<float> &,             const char *);
-template LIBMESH_EXPORT void Xdr::data<std::complex<double>>             (std::complex<double> &,            const char *);
-template LIBMESH_EXPORT void Xdr::data<std::complex<long double>>        (std::complex<long double> &,       const char *);
-template LIBMESH_EXPORT void Xdr::data<std::string>                      (std::string &,                     const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<int>>                 (std::vector<int> &,                const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned int>>        (std::vector<unsigned int> &,       const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<short int>>           (std::vector<short int> &,          const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned short int>>  (std::vector<unsigned short int> &, const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<long int>>            (std::vector<long int> &,           const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<long long>>           (std::vector<long long> &,          const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned long int>>   (std::vector<unsigned long int> &,  const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned long long>>  (std::vector<unsigned long long> &, const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<char>>                (std::vector<char> &,               const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<signed char>>         (std::vector<signed char> &,        const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned char>>       (std::vector<unsigned char> &,      const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<float>>               (std::vector<float> &,              const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<double>>              (std::vector<double> &,             const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<long double>>         (std::vector<long double> &,        const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<std::complex<float>>>  (std::vector<std::complex<float>> &,  const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<std::complex<double>>> (std::vector<std::complex<double>> &, const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<std::complex<long double>>> (std::vector<std::complex<long double>> &, const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<std::string>>        (std::vector<std::string> &,        const char *);
+template LIBMESH_EXPORT void Xdr::data<int>                              (int &,                             std::string_view);
+template LIBMESH_EXPORT void Xdr::data<unsigned int>                     (unsigned int &,                    std::string_view);
+template LIBMESH_EXPORT void Xdr::data<unsigned short int>               (unsigned short int &,              std::string_view);
+template LIBMESH_EXPORT void Xdr::data<short int>                        (short int &,                       std::string_view);
+template LIBMESH_EXPORT void Xdr::data<unsigned long int>                (unsigned long int &,               std::string_view);
+template LIBMESH_EXPORT void Xdr::data<unsigned long long>               (unsigned long long &,              std::string_view);
+template LIBMESH_EXPORT void Xdr::data<long int>                         (long int &,                        std::string_view);
+template LIBMESH_EXPORT void Xdr::data<long long>                        (long long &,                       std::string_view);
+template LIBMESH_EXPORT void Xdr::data<char>                             (char &,                            std::string_view);
+template LIBMESH_EXPORT void Xdr::data<signed char>                      (signed char &,                     std::string_view);
+template LIBMESH_EXPORT void Xdr::data<unsigned char>                    (unsigned char &,                   std::string_view);
+template LIBMESH_EXPORT void Xdr::data<float>                            (float &,                           std::string_view);
+template LIBMESH_EXPORT void Xdr::data<double>                           (double &,                          std::string_view);
+template LIBMESH_EXPORT void Xdr::data<long double>                      (long double &,                     std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::complex<float>>              (std::complex<float> &,             std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::complex<double>>             (std::complex<double> &,            std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::complex<long double>>        (std::complex<long double> &,       std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::string>                      (std::string &,                     std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<int>>                 (std::vector<int> &,                std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned int>>        (std::vector<unsigned int> &,       std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<short int>>           (std::vector<short int> &,          std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned short int>>  (std::vector<unsigned short int> &, std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<long int>>            (std::vector<long int> &,           std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<long long>>           (std::vector<long long> &,          std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned long int>>   (std::vector<unsigned long int> &,  std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned long long>>  (std::vector<unsigned long long> &, std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<char>>                (std::vector<char> &,               std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<signed char>>         (std::vector<signed char> &,        std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<unsigned char>>       (std::vector<unsigned char> &,      std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<float>>               (std::vector<float> &,              std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<double>>              (std::vector<double> &,             std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<long double>>         (std::vector<long double> &,        std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<std::complex<float>>>  (std::vector<std::complex<float>> &,  std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<std::complex<double>>> (std::vector<std::complex<double>> &, std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<std::complex<long double>>> (std::vector<std::complex<long double>> &, std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<std::string>>        (std::vector<std::string> &,        std::string_view);
 template LIBMESH_EXPORT void Xdr::data_stream<unsigned char>      (unsigned char * val,      const unsigned int len, const unsigned int line_break);
 template LIBMESH_EXPORT void Xdr::data_stream<short int>          (short int * val,          const unsigned int len, const unsigned int line_break);
 template LIBMESH_EXPORT void Xdr::data_stream<int>                (int * val,                const unsigned int len, const unsigned int line_break);
@@ -1343,10 +1343,10 @@ template LIBMESH_EXPORT void Xdr::data_stream<unsigned long int>  (unsigned long
 template LIBMESH_EXPORT void Xdr::data_stream<unsigned long long> (unsigned long long * val, const unsigned int len, const unsigned int line_break);
 
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
-template LIBMESH_EXPORT void Xdr::data<Real>                             (Real &,                            const char *);
-template LIBMESH_EXPORT void Xdr::data<std::complex<Real>>               (std::complex<Real> &,              const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<Real>>                (std::vector<Real> &,               const char *);
-template LIBMESH_EXPORT void Xdr::data<std::vector<std::complex<Real>>>  (std::vector<std::complex<Real>> &, const char *);
+template LIBMESH_EXPORT void Xdr::data<Real>                             (Real &,                            std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::complex<Real>>               (std::complex<Real> &,              std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<Real>>                (std::vector<Real> &,               std::string_view);
+template LIBMESH_EXPORT void Xdr::data<std::vector<std::complex<Real>>>  (std::vector<std::complex<Real>> &, std::string_view);
 #endif
 
 } // namespace libMesh

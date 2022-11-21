@@ -222,7 +222,7 @@ void XdrIO::write (const std::string & name)
 
           // Write vector of elemset ids to file with comment
           std::string comment_string = "# elemset ids for elemset code " + std::to_string(elemset_code);
-          io.data(elemset_id_vec, comment_string.c_str());
+          io.data(elemset_id_vec, comment_string);
         }
     }
 
@@ -421,7 +421,7 @@ XdrIO::write_serialized_connectivity (Xdr & io,
           legend += "p_level ";
         legend += "(n0 ... nN-1) ]";
         comment += legend;
-        io.data (n_global_elem_at_level[0], comment.c_str());
+        io.data (n_global_elem_at_level[0], comment);
       }
 
       for (auto pid : make_range(this->n_processors()))
@@ -542,7 +542,7 @@ XdrIO::write_serialized_connectivity (Xdr & io,
               buf << "p_level ";
             buf << "(n0 ... nN-1) ]";
 
-            io.data (n_global_elem_at_level[level], buf.str().c_str());
+            io.data (n_global_elem_at_level[level], buf.str());
           }
 
           for (auto pid : make_range(this->n_processors()))
@@ -1161,7 +1161,7 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
     {
       std::stringstream comment_string;
       comment_string << "# number of " << bc_type << " boundary conditions";
-      io.data (n_bcs_out, comment_string.str().c_str());
+      io.data (n_bcs_out, comment_string.str());
     }
   n_bcs_out = 0;
 

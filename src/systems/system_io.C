@@ -1321,7 +1321,7 @@ void System::write_header (Xdr & io,
     comment += "\"";
 
     unsigned int nv = this->n_vars();
-    io.data (nv, comment.c_str());
+    io.data (nv, comment);
   }
 
 
@@ -1338,7 +1338,7 @@ void System::write_header (Xdr & io,
         comment += "\"";
 
         std::string var_name = this->variable_name(var);
-        io.data (var_name, comment.c_str());
+        io.data (var_name, comment);
       }
 
       // 6.1.) Variable subdomains
@@ -1353,7 +1353,7 @@ void System::write_header (Xdr & io,
         const std::set<subdomain_id_type> & domains = this->variable(var).active_subdomains();
         std::vector<subdomain_id_type> domain_array;
         domain_array.assign(domains.begin(), domains.end());
-        io.data (domain_array, comment.c_str());
+        io.data (domain_array, comment);
       }
 
       // 7.)
@@ -1368,7 +1368,7 @@ void System::write_header (Xdr & io,
         comment += "\"";
 
         int order = static_cast<int>(this->variable_type(var).order);
-        io.data (order, comment.c_str());
+        io.data (order, comment);
       }
 
 
@@ -1383,7 +1383,7 @@ void System::write_header (Xdr & io,
         comment += "\"";
 
         int rad_order = static_cast<int>(this->variable_type(var).radial_order);
-        io.data (rad_order, comment.c_str());
+        io.data (rad_order, comment);
       }
 
 #endif
@@ -1400,7 +1400,7 @@ void System::write_header (Xdr & io,
 
         const FEType & type = this->variable_type(var);
         int fam = static_cast<int>(type.family);
-        io.data (fam, comment.c_str());
+        io.data (fam, comment);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -1411,7 +1411,7 @@ void System::write_header (Xdr & io,
         comment += "\"";
 
         int radial_fam = static_cast<int>(type.radial_family);
-        io.data (radial_fam, comment.c_str());
+        io.data (radial_fam, comment);
 
         comment = "#     Infinite Mapping Type, Variable \"";
         comment += this->variable_name(var);
@@ -1420,7 +1420,7 @@ void System::write_header (Xdr & io,
         comment += "\"";
 
         int i_map = static_cast<int>(type.inf_map);
-        io.data (i_map, comment.c_str());
+        io.data (i_map, comment);
 #endif
       }
     } // end of the variable loop
@@ -1437,7 +1437,7 @@ void System::write_header (Xdr & io,
       comment += "\"";
 
       unsigned int nvecs = write_additional_data ? this->n_vectors () : 0;
-      io.data (nvecs, comment.c_str());
+      io.data (nvecs, comment);
     }
 
     if (write_additional_data)
@@ -1451,13 +1451,13 @@ void System::write_header (Xdr & io,
             comment =  "# Name of " + dth_vector;
             std::string vec_name = pr.first;
 
-            io.data (vec_name, comment.c_str());
+            io.data (vec_name, comment);
             int vec_projection = _vector_projections.at(vec_name);
             comment = "# Whether to do projections for " + dth_vector;
-            io.data (vec_projection, comment.c_str());
+            io.data (vec_projection, comment);
             int vec_type = _vector_types.at(vec_name);
             comment = "# Parallel type of " + dth_vector;
-            io.data (vec_type, comment.c_str());
+            io.data (vec_type, comment);
           }
       }
   }
@@ -1580,7 +1580,7 @@ void System::write_parallel_data (Xdr & io,
     comment += "\" Solution Vector";
   }
 
-  io.data (io_buffer, comment.c_str());
+  io.data (io_buffer, comment);
 
   // total_written_size += io_buffer.size();
 
@@ -1646,7 +1646,7 @@ void System::write_parallel_data (Xdr & io,
             comment += "\"";
           }
 
-          io.data (io_buffer, comment.c_str());
+          io.data (io_buffer, comment);
 
           // total_written_size += io_buffer.size();
         }
