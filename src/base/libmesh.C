@@ -276,6 +276,23 @@ std::terminate_handler old_terminate_handler;
 
 void libmesh_terminate_handler()
 {
+  // If we have an active exception, it may have an error message that
+  // we should print.
+  libMesh::err << "libMesh terminating";
+  std::exception_ptr ex = std::current_exception();
+  if (ex)
+    {
+      try
+        {
+          std::rethrow_exception(ex);
+        }
+      catch (const std::exception & std_ex)
+        {
+          libMesh::err << ":\n" << std_ex.what();
+        }
+    }
+  libMesh::err << std::endl;
+
   // If this got called then we're probably crashing; let's print a
   // stack trace.  The trace files that are ultimately written depend on:
   // 1.) Who throws the exception.
@@ -319,9 +336,8 @@ void libmesh_terminate_handler()
     MPI_Abort(libMesh::GLOBAL_COMM_WORLD, 1);
   else
 #endif
-    // The system terminate_handler may do useful things like printing
-    // uncaught exception information, or the user may have created
-    // their own terminate handler that we want to call.
+    // The system terminate_handler may do useful things, or the user
+    // may have set their own terminate handler that we want to call.
     old_terminate_handler();
 }
 #endif
