@@ -258,6 +258,19 @@ public:
 
   virtual void flip(BoundaryInfo *) override final;
 
+#ifdef LIBMESH_ENABLE_AMR
+  virtual
+  const std::vector<std::pair<unsigned char, unsigned char>> &
+  parent_bracketing_nodes(unsigned int,
+                          unsigned int) const override
+  {
+    // We can't get any good bracketing nodes for child tri-center
+    // nodes on the parent prism midplane.  No refining Prism20 for
+    // us.
+    libmesh_not_implemented_msg("Prism20 cannot be refined; use Prism21 instead.");
+  }
+#endif
+
   unsigned int center_node_on_side(const unsigned short side) const override final;
 
   ElemType side_type (const unsigned int s) const override final;
@@ -276,16 +289,16 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  virtual Real embedding_matrix (const unsigned int i,
-                                 const unsigned int j,
-                                 const unsigned int k) const override
-  { return _embedding_matrix[i][j][k]; }
-
-  /**
-   * Matrix that computes new nodal locations/solution values
-   * from current nodes/solution.
-   */
-  static const Real _embedding_matrix[num_children][num_nodes][num_nodes];
+  virtual Real embedding_matrix (const unsigned int,
+                                 const unsigned int,
+                                 const unsigned int) const override
+  {
+    // We can't get any good bracketing nodes for child tri-center
+    // nodes on the parent prism midplane, so we can't auto-calculate
+    // embedding matrices and couldn't use them if we did.
+    libmesh_not_implemented_msg("Prism20 cannot be refined; use Prism21 instead.");
+    return 0;
+  }
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;
 

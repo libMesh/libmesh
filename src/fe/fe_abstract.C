@@ -865,8 +865,24 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
                my_side_n < n_side_nodes;
                my_side_n++)
             {
+              // We can have an FE type that supports an order
+              // partially, such that sides do not support the same
+              // order.  E.g. we say that a LAGRANGE PRISM21 supports
+              // "third" order to distinguish its shape functions from
+              // a PRISM18, but the QUAD9 sides will still only
+              // support second order.
+              FEType side_fe_type = fe_type;
+              const int side_max_order =
+                FEInterface::max_order(fe_type, my_side->type());
+
+              if ((int)fe_type.order > side_max_order)
+                side_fe_type.order = side_max_order;
+
               // Do not use the p_level(), if any, that is inherited by the side.
-              libmesh_assert_less (my_side_n, FEInterface::n_dofs(fe_type, /*extra_order=*/0, my_side.get()));
+              libmesh_assert_less
+                (my_side_n,
+                 FEInterface::n_dofs(side_fe_type, /*extra_order=*/0,
+                                     my_side.get()));
 
               const Node * my_node = my_nodes[my_side_n];
 
@@ -884,13 +900,17 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
                    their_side_n++)
                 {
                   // Do not use the p_level(), if any, that is inherited by the side.
-                  libmesh_assert_less (their_side_n, FEInterface::n_dofs(fe_type, /*extra_order=*/0, parent_side.get()));
+                  libmesh_assert_less
+                    (their_side_n,
+                     FEInterface::n_dofs(side_fe_type,
+                                         /*extra_order=*/0,
+                                         parent_side.get()));
 
                   const Node * their_node = parent_nodes[their_side_n];
                   libmesh_assert(their_node);
 
                   // Do not use the p_level(), if any, that is inherited by the side.
-                  const Real their_value = FEInterface::shape(fe_type,
+                  const Real their_value = FEInterface::shape(side_fe_type,
                                                               /*extra_order=*/0,
                                                               parent_side.get(),
                                                               their_side_n,

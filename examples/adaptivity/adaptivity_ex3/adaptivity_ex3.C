@@ -170,6 +170,9 @@ int main(int argc, char ** argv)
   dim = input_file("dimension", 2);
   const std::string indicator_type = input_file("indicator_type", "kelly");
   singularity = input_file("singularity", true);
+  const bool extrusion = input_file("extrusion",false);
+  const bool complete = input_file("complete",false);
+  libmesh_error_msg_if(extrusion && dim < 3, "Extrusion option is only for 3D meshes");
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
@@ -224,7 +227,7 @@ int main(int argc, char ** argv)
   // Read in the mesh
   if (dim == 1)
     MeshTools::Generation::build_line(mesh, 1, -1., 0.);
-  else if (dim == 2)
+  else if (dim == 2 || extrusion == true)
     mesh.read("lshaped.xda");
   else
     mesh.read("lshaped3D.xda");
@@ -233,10 +236,20 @@ int main(int argc, char ** argv)
   if (element_type == "simplex")
     MeshTools::Modification::all_tri(mesh);
 
-  // We used first order elements to describe the geometry,
+  if (extrusion)
+    {
+      Mesh flat_mesh = mesh;
+      mesh.clear();
+      MeshTools::Generation::build_extrusion(mesh, flat_mesh, 1, {0,0,1});
+    }
+
+  // Use highest-order elements if the config file says so.
+  if (complete)
+    mesh.all_complete_order();
+  // Otherwise, we used first order elements to describe the geometry,
   // but we may need second order elements to hold the degrees
   // of freedom
-  if (approx_order > 1 || refine_type != "h")
+  else if (approx_order > 1 || refine_type != "h")
     mesh.all_second_order();
 
   // Mesh Refinement object

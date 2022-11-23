@@ -59,6 +59,8 @@ void TopologyMap::add_node(const Node & mid_node,
 
   for (auto [id1, id2] : bracketing_nodes)
     {
+      libmesh_assert_not_equal_to(id1, id2);
+
       const dof_id_type lower_id = std::min(id1, id2);
       const dof_id_type upper_id = std::max(id1, id2);
 

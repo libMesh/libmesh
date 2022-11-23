@@ -836,6 +836,18 @@ void lagrange_compute_constraints (DofConstraints & constraints,
           elem->build_side_ptr(my_side, s);
           parent->build_side_ptr(parent_side, s);
 
+          // We have some elements with interior bubble function bases
+          // and lower-order sides.  We need to only ask for the lower
+          // order in those cases.
+          FEType side_fe_type = fe_type;
+          int extra_order = 0;
+          if (my_side->default_order() < fe_type.order)
+            {
+              side_fe_type.order = my_side->default_order();
+              extra_order = (int)(side_fe_type.order) -
+                            (int)(fe_type.order);
+            }
+
           // This function gets called element-by-element, so there
           // will be a lot of memory allocation going on.  We can
           // at least minimize this for the case of the dof indices
@@ -844,14 +856,14 @@ void lagrange_compute_constraints (DofConstraints & constraints,
           parent_dof_indices.reserve (parent_side->n_nodes());
 
           dof_map.dof_indices (my_side.get(), my_dof_indices,
-                               variable_number);
+                               variable_number, extra_order);
           dof_map.dof_indices (parent_side.get(), parent_dof_indices,
-                               variable_number);
+                               variable_number, extra_order);
 
           const unsigned int n_side_dofs =
-            FEInterface::n_dofs(fe_type, my_side.get());
+            FEInterface::n_dofs(side_fe_type, my_side.get());
           const unsigned int n_parent_side_dofs =
-            FEInterface::n_dofs(fe_type, parent_side.get());
+            FEInterface::n_dofs(side_fe_type, parent_side.get());
           for (unsigned int my_dof=0; my_dof != n_side_dofs; my_dof++)
             {
               libmesh_assert_less (my_dof, my_side->n_nodes());
@@ -915,7 +927,7 @@ void lagrange_compute_constraints (DofConstraints & constraints,
                     parent_dof_indices[their_dof];
 
                   const Real their_dof_value = FEInterface::shape(Dim-1,
-                                                                  fe_type,
+                                                                  side_fe_type,
                                                                   parent_side.get(),
                                                                   their_dof,
                                                                   mapped_point);

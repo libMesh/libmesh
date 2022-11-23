@@ -26,6 +26,15 @@ run_example "$example_name" dimension=1 approx_type=HERMITE approx_order=3 refin
 run_example "$example_name" dimension=1 approx_type=HERMITE approx_order=3 refinement_type=hp max_r_steps=8
 run_example "$example_name" dimension=1 approx_type=HERMITE approx_order=3 refinement_type=matchedhp max_r_steps=4
 
+# Examples to use for test coverage
+run_example "$example_name" dimension=2 element_type=simplex approx_type=LAGRANGE approx_order=2 refinement_type=h max_r_steps=3
+run_example "$example_name" dimension=2 element_type=simplex complete=true approx_type=LAGRANGE approx_order=3 refinement_type=h max_r_steps=3
+run_example "$example_name" dimension=2 element_type=simplex approx_type=HIERARCHIC approx_order=3 refinement_type=h max_r_steps=3
+run_example "$example_name" dimension=2 element_type=simplex approx_type=CLOUGH singularity=false approx_order=3 refinement_type=h max_r_steps=3
+run_example "$example_name" dimension=3 element_type=simplex extrusion=true approx_type=LAGRANGE approx_order=1 refinement_type=h max_r_steps=3
+run_example "$example_name" dimension=3 element_type=simplex extrusion=true approx_type=LAGRANGE approx_order=2 refinement_type=h max_r_steps=3
+run_example "$example_name" dimension=3 element_type=simplex extrusion=true complete=true approx_type=LAGRANGE approx_order=3 refinement_type=h max_r_steps=3
+
 # Examples to use for benchmarking
 benchmark_example 1 "$example_name" dimension=3 approx_type=LAGRANGE approx_order=2 refinement_type=h max_r_steps=12
 benchmark_example 1 "$example_name" dimension=3 approx_type=HIERARCHIC approx_order=3 refinement_type=h
