@@ -123,6 +123,15 @@ unsigned int side_hierarchic_n_dofs_at_node(const ElemType t,
         return (o+1)*(o+2)/2;
       else
         return 0;
+    case PRISM20:
+    case PRISM21:
+      if (n > 19)
+        return 0;
+      if (n > 17)
+        return (o+1)*(o+2)/2;
+      if (n > 14)
+        return (o+1)*(o+1);
+      return 0;
     case INVALID_ELEM:
       return 0;
     // Without side nodes on all sides we can't support side elements
@@ -154,6 +163,9 @@ unsigned int side_hierarchic_n_dofs(const ElemType t, const Order o)
       return ((o+1)*3); // o+1 per side
     case TET14:
       return (o+1)*(o+2)*2; // 4 sides, each (o+1)(o+2)/2
+    case PRISM20:
+    case PRISM21:
+      return (o+1)*(o+1)*3+(o+1)*(o+2); // 2 tris, (o+1)(o+2)/2; 3 quads
     case INVALID_ELEM:
       return 0;
     // Without side nodes on all sides we can't support side elements
