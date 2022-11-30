@@ -450,10 +450,10 @@ int main (int argc, char ** argv)
   // In optimized mode we catch any solver errors, so that we can
   // write the proper footers before closing.  In debug mode we just
   // let the exception throw so that gdb can grab it.
-#ifdef NDEBUG
+#if defined(NDEBUG) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   try
-    {
 #endif
+    {
       // Now we begin the timestep loop to compute the time-accurate
       // solution of the equations.
       for (unsigned int t_step=param.initial_timestep;
@@ -924,8 +924,8 @@ int main (int argc, char ** argv)
         libmesh_error_msg_if(std::abs(accumulated_QoI_spatially_integrated_error[1] - (-0.23895256319278346)) >= 2.e-4,
                              "Error Estimator identity not satisfied!");
       }
-#ifdef NDEBUG
     }
+#if defined(NDEBUG) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   catch (...)
     {
       libMesh::err << '[' << mesh.processor_id()

@@ -131,7 +131,7 @@ void EquationSystems::read (std::string_view name,
                        << "Good Luck!!\n"
                        << "*********************************************************************\n"
                        << std::endl;
-          LIBMESH_THROW();
+          libmesh_error();
         }
     }
 

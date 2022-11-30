@@ -22,12 +22,9 @@
 
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
 #include <stdexcept>
 #include <string>
 #include <sstream>
-
-#define libmesh_noexcept noexcept
 
 namespace libMesh {
 
@@ -144,6 +141,9 @@ public:
 };
 
 }
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+#define libmesh_noexcept noexcept
 
 #define LIBMESH_THROW(e) do { throw e; } while (0)
 #define libmesh_try try

@@ -114,10 +114,10 @@ public:
     // Test the libmesh_asserts when they are enabled and exceptions
     // are available. If exceptions aren't available, libmesh_assert
     // simply aborts, so we can't unit test in that case.
-    const Elem & prism6 = ReferenceElem::get(PRISM6);
 #if !defined(NDEBUG) && defined(LIBMESH_ENABLE_EXCEPTIONS)
     try
       {
+        const Elem & prism6 = ReferenceElem::get(PRISM6);
         // Avoid sending confusing error messages to the console.
         StreamRedirector stream_redirector;
 
@@ -136,8 +136,11 @@ public:
 
 #ifdef NDEBUG
     // In optimized mode, we expect to get the "dummy" value 99.
-    unsigned int n = prism6.local_side_node(0, 3);
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(99), n);
+    {
+      const Elem & prism6 = ReferenceElem::get(PRISM6);
+      unsigned int n = prism6.local_side_node(0, 3);
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(99), n);
+    }
 #endif
 
     // Test the Prism15 midedge nodes.

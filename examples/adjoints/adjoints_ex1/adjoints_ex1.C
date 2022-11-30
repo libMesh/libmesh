@@ -321,8 +321,8 @@ int main (int argc, char ** argv)
   // safely
   if (param.mesh_partitioner_type != "Default")
     {
-#ifndef LIBMESH_HAVE_RTTI
-      libmesh_example_requires(false, "RTTI support");
+#if !defined(LIBMESH_HAVE_RTTI) || !defined(LIBMESH_ENABLE_EXCEPTIONS)
+      libmesh_example_requires(false, "RTTI + exceptions support");
 #else
       // Factory failures are *verbose* in parallel; let's silence
       // cerr temporarily.
@@ -349,7 +349,7 @@ int main (int argc, char ** argv)
           libmesh_example_requires(false, param.mesh_partitioner_type + " partitioner support");
         }
       libMesh::err.rdbuf(oldbuf);
-#endif // LIBMESH_HAVE_RTI
+#endif // LIBMESH_HAVE_RTTI, LIBMESH_ENABLE_EXCEPTIONS
     }
 
   // And an object to refine it
