@@ -462,10 +462,10 @@ int main (int argc, char ** argv)
   // In optimized mode we catch any solver errors, so that we can
   // write the proper footers before closing.  In debug mode we just
   // let the exception throw so that gdb can grab it.
-#ifdef NDEBUG
+#if defined(NDEBUG) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   try
-    {
 #endif
+    {
       // Now we begin the timestep loop to compute the time-accurate
       // solution of the equations.
       for (unsigned int t_step=param.initial_timestep;
@@ -777,8 +777,8 @@ int main (int argc, char ** argv)
         libmesh_error_msg_if(std::abs(total_sensitivity - 4.83551) >= 2.e-4,
                              "Mismatch in sensitivity gold value!");
       }
-#ifdef NDEBUG
     }
+#if defined(NDEBUG) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   catch (...)
     {
       libMesh::err << '[' << mesh.processor_id()
