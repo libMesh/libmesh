@@ -22,7 +22,9 @@
 #include "libmesh/number_lookups.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/cell_tet4.h" // We need edge_nodes_map + side_nodes_map
+#include "libmesh/cell_prism6.h"
 #include "libmesh/face_tri3.h" // Faster to construct these on the stack
+#include "libmesh/face_quad4.h"
 
 // Anonymous namespace for functions shared by HIERARCHIC and
 // L2_HIERARCHIC implementations. Implementations appear at the bottom
@@ -34,6 +36,9 @@ using namespace libMesh;
 unsigned int cube_side(const Point & p);
 
 Point cube_side_point(unsigned int sidenum, const Point & interior_point);
+
+std::array<unsigned int, 4> oriented_prism_nodes(const Elem & elem,
+                                                 unsigned int face_num);
 
 std::array<unsigned int, 3> oriented_tet_nodes(const Elem & elem,
                                                unsigned int face_num);
@@ -944,7 +949,8 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
         const std::array<unsigned int, 3> face_vertex =
           oriented_tet_nodes(*elem, face_num);
 
-        // We only need a Tri3 to evaluate L2_HIERARCHIC
+        // We only need a Tri3 to evaluate L2_HIERARCHIC on the affine
+        // master element
         Tri3 side;
 
         // We pinky swear not to modify these nodes
@@ -960,6 +966,136 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
         return FE<2,L2_HIERARCHIC>::shape(&side, totalorder,
                                           basisnum, sidep, false);
       }
+
+    case PRISM20:
+    case PRISM21:
+      {
+        const unsigned int dofs_per_quad = (totalorder+1u)*(totalorder+1u);
+        const unsigned int dofs_per_tri = (totalorder+1u)*(totalorder+2u)/2u;
+        libmesh_assert_less(i, 3*dofs_per_quad + 2*dofs_per_tri);
+
+        // We only need a Tri3 or Quad4 to evaluate L2_HIERARCHIC on
+        // the affine master element
+        Tri3 tri;
+        Quad4 quad;
+        Elem * side = &quad;
+        unsigned int dofs_on_side = dofs_per_quad;
+
+        // We pinky swear not to modify the nodes we'll point to
+        Elem & e = const_cast<Elem &>(*elem);
+
+        Point sidep;
+
+        // Face number calculation is tricky - the ordering of side
+        // nodes on Prisms does *not* match the ordering of sides!
+        // (the mid-triangle side nodes were added "later")
+        // Here face_num will be the numbering that matches the side
+        // number, but i_offset will have to consider the nodal
+        // ordering.
+        unsigned int face_num = 0;
+        unsigned int i_offset = 0;
+
+        // Triangular coordinates
+        const Real zeta[3] = { 1. - p(0) - p(1), p(0), p(1) };
+
+        // Closeness to midplane
+        const Real zmid = 1 - std::abs(p(2));
+
+        if (zeta[1] > zeta[2] && zeta[0] > zeta[2] &&
+            zmid > 3*zeta[2]) // face 1, quad
+          {
+            face_num = 1;
+            i_offset = 0;
+          }
+        else if (zeta[1] > zeta[0] && zeta[2] > zeta[0] &&
+                 zmid > 3*zeta[0]) // face 2, quad
+          {
+            face_num = 2;
+            i_offset = dofs_per_quad;
+          }
+        else if (zeta[0] > zeta[1] && zeta[2] > zeta[1] &&
+                 zmid > 3*zeta[1]) // face 3, quad
+          {
+            face_num = 3;
+            i_offset = 2*dofs_per_quad;
+          }
+        else if (p(2) + 1 < 3*zeta[0] &&
+                 p(2) + 1 < 3*zeta[1] &&
+                 p(2) + 1 < 3*zeta[2]) // face 0, tri
+          {
+            face_num = 0;
+            i_offset = 3*dofs_per_quad;
+            dofs_on_side = dofs_per_tri;
+            side = &tri;
+          }
+        else if (1 - p(2) < 3*zeta[0] &&
+                 1 - p(2) < 3*zeta[1] &&
+                 1 - p(2) < 3*zeta[2]) // face 4, tri
+          {
+            face_num = 4;
+            i_offset = dofs_per_tri + 3*dofs_per_quad;
+            dofs_on_side = dofs_per_tri;
+            side = &tri;
+          }
+        else
+          {
+            libmesh_error_msg("Evaluating SIDE_HIERARCHIC right between two Prism faces?");
+          }
+
+        if (i < i_offset ||
+            i >= i_offset + dofs_on_side)
+          return 0;
+
+        if (totalorder == 0)
+          return 1;
+
+        const std::array<unsigned int, 4> face_vertex =
+          oriented_prism_nodes(*elem, face_num);
+
+        side->set_node(0) = e.node_ptr(face_vertex[0]);
+        side->set_node(1) = e.node_ptr(face_vertex[1]);
+        side->set_node(2) = e.node_ptr(face_vertex[2]);
+        if (face_vertex[3] < 21)
+          side->set_node(3) = e.node_ptr(face_vertex[3]);
+
+        if (face_num == 0 || face_num == 4)
+          sidep = {zeta[face_vertex[1]%3], zeta[face_vertex[2]%3]};
+        else
+          {
+            // Transform a coordinate from the master prism to the
+            // master quad, based on two vertex indices defining the
+            // coordinate's direction
+            auto coord_val = [p](int v1, int v2){
+              if (v2-v1 == 3)
+                return p(2);
+              else if (v2-v1 == -3)
+                return -p(2);
+              else if (v1%3 == 0 && v2%3 == 1)
+                return 2*p(0)-1;
+              else if (v2%3 == 0 && v1%3 == 1)
+                return 1-2*p(0);
+              else if (v1%3 == 1 && v2%3 == 2)
+                return p(1)-p(0);
+              else if (v2%3 == 1 && v1%3 == 2)
+                return p(0)-p(1);
+              else if (v1%3 == 2 && v2%3 == 0)
+                return 1-2*p(1);
+              else if (v2%3 == 2 && v1%3 == 0)
+                return 2*p(1)-1;
+              else
+                libmesh_error();
+            };
+
+            sidep = {coord_val(face_vertex[0], face_vertex[1]),
+                     coord_val(face_vertex[0], face_vertex[3])};
+          }
+
+        const unsigned int basisnum = i - i_offset;
+
+        return FE<2,L2_HIERARCHIC>::shape(side, totalorder,
+                                          basisnum, sidep, false);
+      }
+
 
     default:
       libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));
@@ -1208,6 +1344,8 @@ Real FE<3,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
       }
 
     case TET14:
+    case PRISM20:
+    case PRISM21:
       {
         return fe_fdm_deriv(elem, order, i, j, p, add_p_level, FE<3,SIDE_HIERARCHIC>::shape);
       }
@@ -1527,6 +1665,8 @@ Real FE<3,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
       }
 
     case TET14:
+    case PRISM20:
+    case PRISM21:
       {
         return fe_fdm_second_deriv(elem, order, i, j, p, add_p_level,
                                    FE<3,SIDE_HIERARCHIC>::shape_deriv);
@@ -1633,18 +1773,38 @@ Point cube_side_point(unsigned int sidenum, const Point & p)
 }
 
 
-std::array<unsigned int, 3> oriented_tet_nodes(const Elem & elem,
-                                               unsigned int face_num)
+void orient_quad(const Elem & elem,
+                 std::array<unsigned int, 4> & face_vertex)
+{
+  // Sort the minimum point into face_vertex[0], the minimum of its
+  // neighbors into face_vertex[1].  Keep the other two consistent; we
+  // want to rotate or flip the quad but not to twist it.
+
+  const unsigned int min_pt =
+    std::min_element(face_vertex.begin(), face_vertex.end(),
+                     [&elem](auto v1, auto v2)
+                     {return elem.point(v1)<elem.point(v2);}) -
+    face_vertex.begin();
+
+  // Do we flip the quad?
+  if (elem.point(face_vertex[(min_pt+3)%4]) <
+      elem.point(face_vertex[(min_pt+1)%4]))
+    face_vertex = { face_vertex[min_pt], face_vertex[(min_pt+3)%4],
+                    face_vertex[(min_pt+2)%4], face_vertex[(min_pt+1)%4] };
+  else
+    face_vertex = { face_vertex[min_pt], face_vertex[(min_pt+1)%4],
+                    face_vertex[(min_pt+2)%4], face_vertex[(min_pt+3)%4] };
+}
+
+
+void orient_triangle(const Elem & elem,
+                     unsigned int * face_vertex)
 {
   // Reorient nodes to account for flipping and rotation.
   // We could try to identify indices with symmetric shape
   // functions, to skip this in those cases, if we really
   // need to optimize later.
-  std::array<unsigned int, 3> face_vertex
-    { Tet4::side_nodes_map[face_num][0],
-      Tet4::side_nodes_map[face_num][1],
-      Tet4::side_nodes_map[face_num][2] };
-
+  //
   // With only 3 items, we should bubble sort!
   // Programming-for-MechE's class pays off!
   bool lastcheck = true;
@@ -1657,6 +1817,36 @@ std::array<unsigned int, 3> oriented_tet_nodes(const Elem & elem,
     std::swap(face_vertex[1], face_vertex[2]);
   if (lastcheck && elem.point(face_vertex[0]) > elem.point(face_vertex[1]))
     std::swap(face_vertex[0], face_vertex[1]);
+}
+
+
+std::array<unsigned int, 4> oriented_prism_nodes(const Elem & elem,
+                                                 unsigned int face_num)
+{
+  std::array<unsigned int, 4> face_vertex
+    { Prism6::side_nodes_map[face_num][0],
+      Prism6::side_nodes_map[face_num][1],
+      Prism6::side_nodes_map[face_num][2],
+      Prism6::side_nodes_map[face_num][3] };
+
+  if (face_num > 0 && face_num < 4)
+    orient_quad(elem, face_vertex);
+  else
+    orient_triangle(elem, face_vertex.data());
+
+  return face_vertex;
+}
+
+
+std::array<unsigned int, 3> oriented_tet_nodes(const Elem & elem,
+                                               unsigned int face_num)
+{
+  std::array<unsigned int, 3> face_vertex
+    { Tet4::side_nodes_map[face_num][0],
+      Tet4::side_nodes_map[face_num][1],
+      Tet4::side_nodes_map[face_num][2] };
+
+  orient_triangle(elem, face_vertex.data());
 
   return face_vertex;
 }
