@@ -239,6 +239,7 @@ plot_one_year(2019, pub_2019, muted_green)
 plot_one_year(2020, pub_2020, muted_red)
 plot_one_year(2021, pub_2021, muted_pink)
 plot_one_year(2022, pub_2022, 'k')
+plot_one_year(2023, pub_2023, muted_grey)
 
 # Label beginning and end of year.
 ax1.set_xticks([0, 12])
