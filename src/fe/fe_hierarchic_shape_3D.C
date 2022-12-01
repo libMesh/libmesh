@@ -1230,6 +1230,10 @@ Real FE<3,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
     {
     case HEX27:
       {
+        // I need to debug the p>2 case here...
+        if (totalorder > 2)
+          return fe_fdm_deriv(elem, order, i, j, p, add_p_level, FE<3,SIDE_HIERARCHIC>::shape);
+
         const unsigned int dofs_per_side = (totalorder+1u)*(totalorder+1u);
         libmesh_assert_less(i, 6*dofs_per_side);
 
@@ -1486,6 +1490,11 @@ Real FE<3,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
     {
     case HEX27:
       {
+        // I need to debug the p>2 case here...
+        if (totalorder > 2)
+          return fe_fdm_second_deriv(elem, order, i, j, p, add_p_level,
+                                     FE<3,SIDE_HIERARCHIC>::shape_deriv);
+
         const unsigned int dofs_per_side = (totalorder+1u)*(totalorder+1u);
         libmesh_assert_less(i, 6*dofs_per_side);
 
