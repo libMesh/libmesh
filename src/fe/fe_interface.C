@@ -2676,8 +2676,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case HEX20:
           return 0;
         case HEX27:
-          return 2; // p=3+ is still buggy in 3D
-          // return unlimited;
+          return unlimited;
         case PRISM6:
         case PRISM15:
         case PRISM18:
