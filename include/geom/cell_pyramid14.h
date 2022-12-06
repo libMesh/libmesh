@@ -97,7 +97,7 @@ public:
   virtual unsigned int n_nodes() const override { return num_nodes; }
 
   /**
-   * \returns \p PRYAMID14.
+   * \returns \p PYRAMID14.
    */
   virtual ElemType type () const override { return PYRAMID14; }
 
