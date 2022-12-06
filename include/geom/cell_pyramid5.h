@@ -73,7 +73,7 @@ public:
   virtual ~Pyramid5() = default;
 
   /**
-   * \returns \p PRYAMID.
+   * \returns \p PYRAMID.
    */
   virtual ElemType type () const override { return PYRAMID5; }
 
