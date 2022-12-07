@@ -412,6 +412,7 @@ Real fe_lagrange_3D_shape(const ElemType type,
           case PYRAMID5:
           case PYRAMID13:
           case PYRAMID14:
+          case PYRAMID18:
             {
               libmesh_assert_less (i, 5);
 
@@ -775,6 +776,7 @@ Real fe_lagrange_3D_shape(const ElemType type,
                                "High order on first order elements only supported for L2 families");
             libmesh_fallthrough();
           case PYRAMID14:
+          case PYRAMID18:
             {
               libmesh_assert_less (i, 14);
 
@@ -1187,6 +1189,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
           case PYRAMID5:
           case PYRAMID13:
           case PYRAMID14:
+          case PYRAMID18:
             {
               libmesh_assert_less (i, 5);
 
@@ -2111,6 +2114,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
                                "High order on first order elements only supported for L2 families");
             libmesh_fallthrough();
           case PYRAMID14:
+          case PYRAMID18:
             {
               libmesh_assert_less (i, 14);
 
@@ -2724,6 +2728,7 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
           case PYRAMID5:
           case PYRAMID13:
           case PYRAMID14:
+          case PYRAMID18:
             {
               libmesh_assert_less (i, 5);
 
@@ -3568,6 +3573,7 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
                                "High order on first order elements only supported for L2 families");
             libmesh_fallthrough();
           case PYRAMID14:
+          case PYRAMID18:
             {
               libmesh_assert_less (i, 14);
 

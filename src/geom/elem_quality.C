@@ -420,6 +420,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
     case PYRAMID5:
     case PYRAMID13:
     case PYRAMID14:
+    case PYRAMID18:
       {
         // None yet
         break;
