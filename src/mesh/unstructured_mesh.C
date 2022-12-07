@@ -1631,6 +1631,7 @@ void UnstructuredMesh::all_complete_order ()
           lo_elem->type() != TET14 &&
           lo_elem->type() != PRISM20 &&
           lo_elem->type() != PRISM21 &&
+          lo_elem->type() != PYRAMID18 &&
           lo_elem->default_order() != FIRST)
         continue;
 
@@ -1650,6 +1651,10 @@ void UnstructuredMesh::all_complete_order ()
                lo_elem->type() == PRISM15 ||
                lo_elem->type() == PRISM6)
         hi_type = PRISM21;
+      else if (lo_elem->type() == PYRAMID14 ||
+               lo_elem->type() == PYRAMID13 ||
+               lo_elem->type() == PYRAMID5)
+        hi_type = PYRAMID18;
       else
         libmesh_assert(lo_elem->type() == TRI6 || lo_elem->type() == TRI3);
 
