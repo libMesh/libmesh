@@ -134,6 +134,7 @@ unsigned int idx(const ElemType type,
     case PYRAMID5: // PYRAMID5's are created from an initial HEX27 discretization
     case PYRAMID13:
     case PYRAMID14:
+    case PYRAMID18:
     case PRISM15:
     case PRISM18:
     case PRISM20:
@@ -960,6 +961,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case PYRAMID5: // PYRAMIDs are created from an initial HEX27 discretization
           case PYRAMID13:
           case PYRAMID14:
+          case PYRAMID18:
             {
               mesh.reserve_elem(nx*ny*nz);
               break;
@@ -1001,6 +1003,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case PYRAMID5: // PYRAMIDs are created from an initial HEX27 discretization
           case PYRAMID13:
           case PYRAMID14:
+          case PYRAMID18:
           case PRISM15:
           case PRISM18:
             {
@@ -1083,6 +1086,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case PYRAMID5: // PYRAMIDs are created from an initial HEX27 discretization
           case PYRAMID13:
           case PYRAMID14:
+          case PYRAMID18:
           case PRISM15:
           case PRISM18:
           case PRISM20:
@@ -1263,6 +1267,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case PYRAMID5: // PYRAMIDs are created from an initial HEX27 discretization
           case PYRAMID13:
           case PYRAMID14:
+          case PYRAMID18:
             {
               for (unsigned int k=0; k<(2*nz); k += 2)
                 for (unsigned int j=0; j<(2*ny); j += 2)
@@ -1293,7 +1298,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                       elem->set_node(19) = mesh.node_ptr(idx(type,nx,ny,i,  j+1,k+2));
 
                       if ((type == HEX27) || (type == TET4) || (type == TET10) || (type == TET14) ||
-                          (type == PYRAMID5) || (type == PYRAMID13) || (type == PYRAMID14))
+                          (type == PYRAMID5) || (type == PYRAMID13) || (type == PYRAMID14) ||
+                          (type == PYRAMID18))
                         {
                           elem->set_node(20) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k)  );
                           elem->set_node(21) = mesh.node_ptr(idx(type,nx,ny,i+1,j,  k+1));
@@ -1496,7 +1502,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             (type == TET14) ||
             (type == PYRAMID5) ||
             (type == PYRAMID13) ||
-            (type == PYRAMID14))
+            (type == PYRAMID14) ||
+            (type == PYRAMID18))
           {
             // Temporary storage for new elements. (24 tets per hex, 6 pyramids)
             std::vector<std::unique_ptr<Elem>> new_elements;
@@ -1552,7 +1559,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                           }
                       } // end if ((type == TET4) || (type == TET10) || (type == TET14))
 
-                    else // type==PYRAMID5 || type==PYRAMID13 || type==PYRAMID14
+                    else // type==PYRAMID*
                       {
                         // Build 1 sub-pyramid per side.
                         new_elements.push_back( Elem::build(PYRAMID5) );
@@ -1573,7 +1580,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                         // 4 (the square base) with the same b_id.
                         if (b_id != BoundaryInfo::invalid_id)
                           boundary_info.add_side(sub_elem.get(), 4, b_id);
-                      } // end else type==PYRAMID5 || type==PYRAMID13 || type==PYRAMID14
+                      } // end else type==PYRAMID*
                   }
               }
 
@@ -1592,7 +1599,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                 mesh.add_elem( std::move(new_elements[i]) );
               }
 
-          } // end if (type == TET4,TET10,TET14,PYRAMID5,PYRAMID13,PYRAMID14
+          } // end if (type == TET*,PYRAMID*)
 
 
         // Use all_second_order to convert the TET4's to TET10's or PYRAMID5's to PYRAMID14's
@@ -1602,7 +1609,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
         else if (type == PYRAMID13)
           mesh.all_second_order(/*full_ordered=*/false);
 
-        else if (type == TET14)
+        else if ((type == TET14) || (type == PYRAMID18))
           mesh.all_complete_order();
 
 
