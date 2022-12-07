@@ -91,6 +91,7 @@ void QTrap::init_3D(const ElemType, unsigned int)
     case PYRAMID5:
     case PYRAMID13:
     case PYRAMID14:
+    case PYRAMID18:
       {
         libmesh_error_msg_if(!allow_nodal_pyramid_quadrature,
                              "Nodal quadrature on Pyramid elements is not allowed by default since\n"

@@ -38,6 +38,7 @@ void QConical::init_3D(const ElemType, unsigned int)
     case PYRAMID5:
     case PYRAMID13:
     case PYRAMID14:
+    case PYRAMID18:
       {
         this->conical_product_pyramid();
         return;
