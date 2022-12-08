@@ -180,7 +180,8 @@ private:
     // We are testing integration on the reference elements here, so
     // the element map is not relevant, and we can safely use nodal
     // Pyramid quadrature.
-    if (elem_type == PYRAMID5 || elem_type == PYRAMID13 || elem_type == PYRAMID14 || elem_type == PYRAMID18)
+    if (elem_type == PYRAMID5 || elem_type == PYRAMID13 ||
+        elem_type == PYRAMID14 || elem_type == PYRAMID18)
       qrule->allow_nodal_pyramid_quadrature = true;
 
     qrule->init (elem_type);
@@ -333,7 +334,7 @@ public:
        {TET4, TET10, TET14},
        {HEX8, HEX20, HEX27},
        {PRISM6, PRISM15, PRISM18, PRISM20, PRISM21},
-       {PYRAMID5, PYRAMID13, PYRAMID14}};
+       {PYRAMID5, PYRAMID13, PYRAMID14, PYRAMID18}};
 
     const std::function<Real(int,int,int)> true_values[] =
       {edge_integrals,
@@ -363,6 +364,11 @@ public:
           // And some partially-cubic elements can only do quadratics
               elem_type == TET14 || elem_type == PRISM20)
             exactorder--;
+
+          // And one partially-cubic element can only do linears.
+          // Seriously.
+          if (elem_type == PYRAMID18)
+            exactorder=1;
 
           testPolynomials(QNODAL, order, elem_type, true_values[i], exactorder);
         }
