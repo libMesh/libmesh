@@ -202,6 +202,33 @@ void QNodal::init_3D(const ElemType, unsigned int)
         return;
       }
 
+    case PYRAMID18:
+      {
+        libmesh_error_msg_if(!allow_nodal_pyramid_quadrature,
+                             "Nodal quadrature on Pyramid elements is not allowed by default since\n"
+                             "the Jacobian of the inverse element map is not well-defined at the Pyramid apex.\n"
+                             "Set the QBase::allow_nodal_pyramid_quadrature flag to true to ignore skip this check.");
+
+        _points =
+          {
+            Point(-1,-1,0.), Point(+1,-1,0.), Point(+1,+1,0.),
+            Point(-1,+1,0.), Point(0.,0.,+1), Point(0.,-1,0.),
+            Point(+1,0.,0.), Point(0.,+1,0.), Point(-1,0.,0.),
+            Point(-.5,-.5,.5), Point(-.5,.5,.5), Point(.5,.5,.5),
+            Point(-.5,.5,.5), Point(0.,0.,0.), Point(0.,-2/Real(3),1/Real(3)),
+            Point(2/Real(3),0.,1/Real(3)), Point(0.,2/Real(3),1/Real(3)),
+            Point(-2/Real(3),0.,1/Real(3))
+          };
+
+        // Even with triangle faces to play with, I can't seem to get
+        // exact integrals of any higher order functions without
+        // negative weights.  So I punt and just use QTrap weights.
+        _weights = {1/Real(4), 1/Real(4), 1/Real(4), 1/Real(4), 1/Real(3),
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+        return;
+      }
+
     case TET14:
       {
         _points.resize(14);
