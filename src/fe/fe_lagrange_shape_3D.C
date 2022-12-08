@@ -908,6 +908,108 @@ Real fe_lagrange_3D_shape(const ElemType type,
                       fe_lagrange_1D_quadratic_shape(i0[i], p1d));
             }
 
+            // Weird rational shape functions with weirder bubbles...
+          case PYRAMID18:
+            {
+              libmesh_assert_less (i, 18);
+
+              const Real xi   = p(0);
+              const Real eta  = p(1);
+              const Real zeta = p(2);
+              const Real eps  = 1.e-35;
+
+              // The "normalized coordinates" defined by Graglia.  These are
+              // the planes which define the faces of the pyramid.
+              const Real
+                p1 = 0.5*(1. - eta - zeta), // back
+                p2 = 0.5*(1. + xi  - zeta), // left
+                p3 = 0.5*(1. + eta - zeta), // front
+                p4 = 0.5*(1. - xi  - zeta); // right
+
+              // Denominators are perturbed by epsilon to avoid
+              // divide-by-zero issues.
+              const Real
+                den = (-1. + zeta + eps),
+                den2 = den*den;
+
+              // Bubble functions on triangular sides.  We actually
+              // have a degree of freedom to play with here, and I'm
+              // not certain how best to use it, so let's leave it
+              // as a variable in case we figure that out later.
+              constexpr Real alpha = 0.5;
+              const Real
+                bub_f1 = ((1-alpha)*(1-zeta) + alpha*(-eta)),
+                bub_f2 = ((1-alpha)*(1-zeta) + alpha*(xi)),
+                bub_f3 = ((1-alpha)*(1-zeta) + alpha*(eta)),
+                bub_f4 = ((1-alpha)*(1-zeta) + alpha*(-xi));
+
+              const Real
+                bub1 = bub_f1*p1*p2*p4*zeta/den2,
+                bub2 = bub_f2*p1*p2*p3*zeta/den2,
+                bub3 = bub_f3*p2*p3*p4*zeta/den2,
+                bub4 = bub_f4*p1*p3*p4*zeta/den2;
+
+              switch(i)
+                {
+                case 0:
+                  return p4*p1*(xi*eta - zeta + zeta*zeta)/den2 + 3*(bub1+bub4);
+
+                case 1:
+                  return -p1*p2*(xi*eta + zeta - zeta*zeta)/den2 + 3*(bub1+bub2);
+
+                case 2:
+                  return p2*p3*(xi*eta - zeta + zeta*zeta)/den2 + 3*(bub2+bub3);
+
+                case 3:
+                  return -p3*p4*(xi*eta + zeta - zeta*zeta)/den2 + 3*(bub3+bub4);
+
+                case 4:
+                  return zeta*(2.*zeta - 1.) + 3*(bub1+bub2+bub3+bub4);
+
+                case 5:
+                  return -4.*p2*p1*p4*eta/den2 - 12*bub1;
+
+                case 6:
+                  return 4.*p1*p2*p3*xi/den2 - 12*bub2;
+
+                case 7:
+                  return 4.*p2*p3*p4*eta/den2 - 12*bub3;
+
+                case 8:
+                  return -4.*p3*p4*p1*xi/den2 - 12*bub4;
+
+                case 9:
+                  return -4.*p1*p4*zeta/den - 12*(bub1+bub4);
+
+                case 10:
+                  return -4.*p2*p1*zeta/den - 12*(bub1+bub2);
+
+                case 11:
+                  return -4.*p3*p2*zeta/den - 12*(bub2+bub3);
+
+                case 12:
+                  return -4.*p4*p3*zeta/den - 12*(bub3+bub4);
+
+                case 13:
+                  return 16.*p1*p2*p3*p4/den2;
+
+                case 14:
+                  return 27*bub1;
+
+                case 15:
+                  return 27*bub2;
+
+                case 16:
+                  return 27*bub3;
+
+                case 17:
+                  return 27*bub4;
+
+                default:
+                  libmesh_error_msg("Invalid i = " << i);
+                }
+            }
+
             // quadratic Lagrange shape functions with cubic bubbles
           case TET14:
             {
@@ -2634,6 +2736,12 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
                   libmesh_error_msg("Invalid shape function derivative j = " << j);
                 }
             }
+
+          case PYRAMID18:
+            {
+              return fe_fdm_deriv(type, order, i, j, p, fe_lagrange_3D_shape<T>);
+            }
+
           default:
             libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
           }
@@ -4698,6 +4806,13 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
                   libmesh_error_msg("Invalid shape function derivative j = " << j);
                 }
             }
+
+          case PYRAMID18:
+            {
+              return fe_fdm_second_deriv(type, order, i, j, p,
+                                         fe_lagrange_3D_shape_deriv<T>);
+            }
+
           default:
             libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
           }
