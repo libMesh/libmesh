@@ -124,7 +124,13 @@ public:
 
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
 
+  virtual const unsigned int * nodes_on_side_ptr(const unsigned short s) const override final
+  { return this->_nodes_on_side_ptr<InfHex16>(s); }
+
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
+
+  virtual const unsigned int * nodes_on_edge_ptr(const unsigned short e) const override final
+  { return this->_nodes_on_edge_ptr<InfHex16>(e); }
 
   /**
    * \returns \p true if the specified (local) node number is on the
@@ -237,6 +243,12 @@ public:
   virtual void flip(BoundaryInfo *) override final;
 
   ElemType side_type (const unsigned int s) const override final;
+
+  virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
+  { return this->_n_nodes_on_side<InfHex16, 2>(s); }
+
+  virtual unsigned int n_nodes_on_edge(const unsigned short e) const override final
+  { return this->_n_nodes_on_edge_constant<InfHex16>(e) - ((e < 4) ? 0 : 1); }
 
 protected:
 

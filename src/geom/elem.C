@@ -82,7 +82,6 @@
 #include <array>
 #include <iterator>  // for std::ostream_iterator
 #include <sstream>
-#include <limits>    // for std::numeric_limits<>
 #include <cmath>     // for std::sqrt()
 #include <memory>
 
@@ -92,8 +91,6 @@ namespace libMesh
 
 Threads::spin_mutex parent_indices_mutex;
 Threads::spin_mutex parent_bracketing_nodes_mutex;
-
-const subdomain_id_type Elem::invalid_subdomain_id = std::numeric_limits<subdomain_id_type>::max();
 
 // Initialize static member variables
 const unsigned int Elem::max_n_nodes;

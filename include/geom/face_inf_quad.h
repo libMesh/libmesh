@@ -107,6 +107,12 @@ public:
   virtual unsigned int n_vertices() const override final { return 4; }
 
   /**
+   * \returns 2. Every side has two vertices.
+   */
+  virtual unsigned int n_vertices_on_side(const unsigned short libmesh_dbg_var(s)) const override final
+  { libmesh_assert_less(s, this->n_sides()); return 2; }
+
+  /**
    * \returns 3.  All infinite quads have 1 edge in the
    * base, and 2 perpendicular to the base.
    */
@@ -232,6 +238,12 @@ public:
   virtual void permute(unsigned int) override final { libmesh_error(); }
 
   virtual void orient(BoundaryInfo *) override final;
+
+  virtual unsigned int n_nodes_on_edge(const unsigned short e) const override final
+  { return this->n_nodes_on_side(e); }
+
+  virtual const unsigned int * nodes_on_edge_ptr(const unsigned short s) const override final
+  { return nodes_on_side_ptr(s); }
 
 protected:
 

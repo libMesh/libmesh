@@ -24,6 +24,21 @@
 namespace libMesh
 {
 
+
+// ------------------------------------------------------------
+// Edge class static member initializations
+
+const int Edge::num_sides;
+const int Edge::num_edges;
+const int Edge::nodes_per_side;
+const int Edge::nodes_per_edge;
+
+const unsigned int Edge::side_nodes_map[Edge::num_sides][Edge::nodes_per_side] =
+  {
+    {0}, // Side 0
+    {1}, // Side 1
+  };
+
 unsigned int Edge::local_side_node(unsigned int side,
                                    unsigned int /*side_node*/) const
 {

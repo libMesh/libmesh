@@ -78,6 +78,30 @@ public:
   virtual unsigned int n_nodes() const override { return 1; }
 
   /**
+   * The \p Elem::n_nodes_on_side makes no sense for nodes.
+   */
+  virtual unsigned int n_nodes_on_side(const unsigned short) const override
+  { libmesh_not_implemented(); return 0; }
+
+  /**
+   * The \p Elem::n_nodes_on_edge makes no sense for nodes.
+   */
+  virtual unsigned int n_nodes_on_edge(const unsigned short) const override
+  { libmesh_not_implemented(); return 0; }
+
+  /**
+   * The \p Elem::nodes_on_side_ptr makes no sense for nodes.
+   */
+  virtual const unsigned int * nodes_on_side_ptr(const unsigned short) const override final
+  { libmesh_not_implemented(); return nullptr; }
+
+  /**
+   * The \p Elem::nodes_on_edge_ptr makes no sense for nodes.
+   */
+  virtual const unsigned int * nodes_on_edge_ptr(const unsigned short) const override final
+  { libmesh_not_implemented(); return nullptr; }
+
+  /**
    * \returns 0.
    */
   virtual unsigned int n_sides() const override { return 0; }
@@ -86,6 +110,12 @@ public:
    * \returns 1.  Every NodeElem is a vertex
    */
   virtual unsigned int n_vertices() const override { return 1; }
+
+  /**
+   * The \p Elem::n_vertices_on_side makes no sense for nodes.
+   */
+  virtual unsigned int n_vertices_on_side(const unsigned short) const override
+  { libmesh_not_implemented(); return 0; }
 
   /**
    * \returns 0.

@@ -488,6 +488,79 @@ public:
         CPPUNIT_ASSERT_EQUAL(elem->build_side_ptr(s)->type(), elem->side_type(s));
   }
 
+  void test_n_nodes_on_side()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      for (const auto s : elem->side_index_range())
+      {
+        unsigned int n_nodes_on_side = 0;
+        for (const auto n : elem->node_index_range())
+          if (elem->is_node_on_side(n, s))
+            ++n_nodes_on_side;
+        CPPUNIT_ASSERT_EQUAL(n_nodes_on_side, elem->n_nodes_on_side(s));
+      }
+  };
+
+  void test_n_nodes_on_edge()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      for (const auto e : elem->edge_index_range())
+      {
+        unsigned int n_nodes_on_edge = 0;
+        for (const auto n : elem->node_index_range())
+          if (elem->is_node_on_edge(n, e))
+            ++n_nodes_on_edge;
+        CPPUNIT_ASSERT_EQUAL(n_nodes_on_edge, elem->n_nodes_on_edge(e));
+      }
+  };
+
+  void test_n_vertices_on_side()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      for (const auto s : elem->side_index_range())
+      {
+        unsigned int n_vertices_on_side = 0;
+        for (const auto v : elem->vertex_index_range())
+          if (elem->is_node_on_side(v, s))
+            ++n_vertices_on_side;
+        CPPUNIT_ASSERT_EQUAL(n_vertices_on_side, elem->n_vertices_on_side(s));
+      }
+  };
+
+  void test_nodes_on_side_ptr()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      for (const auto s : elem->side_index_range())
+      {
+        const auto nodes_on_side = elem->nodes_on_side(s);
+        const auto nodes_on_side_ptr = elem->nodes_on_side_ptr(s);
+        for (const auto i : index_range(nodes_on_side))
+          CPPUNIT_ASSERT_EQUAL(nodes_on_side[i], nodes_on_side_ptr[i]);
+      }
+  };
+
+  void test_nodes_on_edge_ptr()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      for (const auto s : elem->side_index_range())
+      {
+        const auto nodes_on_edge = elem->nodes_on_edge(s);
+        const auto nodes_on_edge_ptr = elem->nodes_on_edge_ptr(s);
+        for (const auto i : index_range(nodes_on_edge))
+          CPPUNIT_ASSERT_EQUAL(nodes_on_edge_ptr[i], nodes_on_edge_ptr[i]);
+      }
+  };
+
   void test_elem_side_builder()
   {
     LOG_UNIT_TEST;
@@ -521,6 +594,11 @@ public:
   CPPUNIT_TEST( test_contains_point_node );     \
   CPPUNIT_TEST( test_center_node_on_side );     \
   CPPUNIT_TEST( test_side_type );               \
+  CPPUNIT_TEST( test_n_nodes_on_side );         \
+  CPPUNIT_TEST( test_n_nodes_on_edge );         \
+  CPPUNIT_TEST( test_n_vertices_on_side );      \
+  CPPUNIT_TEST( test_nodes_on_side_ptr );       \
+  CPPUNIT_TEST( test_nodes_on_edge_ptr );       \
   CPPUNIT_TEST( test_elem_side_builder );
 
 #define INSTANTIATE_ELEMTEST(elemtype)                          \

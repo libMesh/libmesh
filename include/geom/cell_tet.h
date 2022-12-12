@@ -79,6 +79,12 @@ public:
   virtual unsigned int n_vertices() const override final { return 4; }
 
   /**
+   * \returns 3. Every side has three vertices.
+   */
+  virtual unsigned int n_vertices_on_side(const unsigned short libmesh_dbg_var(s)) const override final
+  { libmesh_assert_less(s, this->n_sides()); return 3; }
+
+  /**
    * \returns 6.  All tetrahedra have 6 edges.
    */
   virtual unsigned int n_edges() const override final { return 6; }

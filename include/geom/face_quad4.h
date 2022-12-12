@@ -101,6 +101,9 @@ public:
 
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
 
+  virtual const unsigned int * nodes_on_side_ptr(const unsigned short s) const override final
+  { return this->_nodes_on_side_ptr<Quad4>(s); }
+
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
 
   /**
@@ -177,6 +180,12 @@ public:
   virtual void flip(BoundaryInfo *) override final;
 
   ElemType side_type (const unsigned int s) const override final;
+
+  /**
+   * \returns 2. Every side has seven nodes.
+   */
+  virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
+  { return this->_n_nodes_on_side_constant<Quad4>(s); }
 
 protected:
 

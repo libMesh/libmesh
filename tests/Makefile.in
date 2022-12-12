@@ -206,7 +206,8 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	fe/fe_rational_map.C fe/fe_rational_test.C fe/fe_side_test.C \
 	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
 	fe/dual_shape_verification_test.C geom/bbox_test.C \
-	geom/edge_test.C geom/elem_test.C geom/node_test.C \
+	geom/edge_test.C geom/elem_corner_test.C geom/elem_test.C \
+	geom/intersection_tools_test.C geom/node_test.C \
 	geom/point_test.C geom/point_test.h geom/side_test.C \
 	geom/volume_test.C geom/which_node_am_i_test.C \
 	mesh/all_second_order.C mesh/all_tri.C mesh/distort.C \
@@ -293,7 +294,9 @@ am__objects_3 = unit_tests_dbg-driver.$(OBJEXT) \
 	fe/unit_tests_dbg-dual_shape_verification_test.$(OBJEXT) \
 	geom/unit_tests_dbg-bbox_test.$(OBJEXT) \
 	geom/unit_tests_dbg-edge_test.$(OBJEXT) \
+	geom/unit_tests_dbg-elem_corner_test.$(OBJEXT) \
 	geom/unit_tests_dbg-elem_test.$(OBJEXT) \
+	geom/unit_tests_dbg-intersection_tools_test.$(OBJEXT) \
 	geom/unit_tests_dbg-node_test.$(OBJEXT) \
 	geom/unit_tests_dbg-point_test.$(OBJEXT) \
 	geom/unit_tests_dbg-side_test.$(OBJEXT) \
@@ -395,7 +398,8 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	fe/fe_rational_map.C fe/fe_rational_test.C fe/fe_side_test.C \
 	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
 	fe/dual_shape_verification_test.C geom/bbox_test.C \
-	geom/edge_test.C geom/elem_test.C geom/node_test.C \
+	geom/edge_test.C geom/elem_corner_test.C geom/elem_test.C \
+	geom/intersection_tools_test.C geom/node_test.C \
 	geom/point_test.C geom/point_test.h geom/side_test.C \
 	geom/volume_test.C geom/which_node_am_i_test.C \
 	mesh/all_second_order.C mesh/all_tri.C mesh/distort.C \
@@ -480,7 +484,9 @@ am__objects_5 = unit_tests_devel-driver.$(OBJEXT) \
 	fe/unit_tests_devel-dual_shape_verification_test.$(OBJEXT) \
 	geom/unit_tests_devel-bbox_test.$(OBJEXT) \
 	geom/unit_tests_devel-edge_test.$(OBJEXT) \
+	geom/unit_tests_devel-elem_corner_test.$(OBJEXT) \
 	geom/unit_tests_devel-elem_test.$(OBJEXT) \
+	geom/unit_tests_devel-intersection_tools_test.$(OBJEXT) \
 	geom/unit_tests_devel-node_test.$(OBJEXT) \
 	geom/unit_tests_devel-point_test.$(OBJEXT) \
 	geom/unit_tests_devel-side_test.$(OBJEXT) \
@@ -578,7 +584,8 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	fe/fe_rational_map.C fe/fe_rational_test.C fe/fe_side_test.C \
 	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
 	fe/dual_shape_verification_test.C geom/bbox_test.C \
-	geom/edge_test.C geom/elem_test.C geom/node_test.C \
+	geom/edge_test.C geom/elem_corner_test.C geom/elem_test.C \
+	geom/intersection_tools_test.C geom/node_test.C \
 	geom/point_test.C geom/point_test.h geom/side_test.C \
 	geom/volume_test.C geom/which_node_am_i_test.C \
 	mesh/all_second_order.C mesh/all_tri.C mesh/distort.C \
@@ -663,7 +670,9 @@ am__objects_7 = unit_tests_oprof-driver.$(OBJEXT) \
 	fe/unit_tests_oprof-dual_shape_verification_test.$(OBJEXT) \
 	geom/unit_tests_oprof-bbox_test.$(OBJEXT) \
 	geom/unit_tests_oprof-edge_test.$(OBJEXT) \
+	geom/unit_tests_oprof-elem_corner_test.$(OBJEXT) \
 	geom/unit_tests_oprof-elem_test.$(OBJEXT) \
+	geom/unit_tests_oprof-intersection_tools_test.$(OBJEXT) \
 	geom/unit_tests_oprof-node_test.$(OBJEXT) \
 	geom/unit_tests_oprof-point_test.$(OBJEXT) \
 	geom/unit_tests_oprof-side_test.$(OBJEXT) \
@@ -761,7 +770,8 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	fe/fe_rational_map.C fe/fe_rational_test.C fe/fe_side_test.C \
 	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
 	fe/dual_shape_verification_test.C geom/bbox_test.C \
-	geom/edge_test.C geom/elem_test.C geom/node_test.C \
+	geom/edge_test.C geom/elem_corner_test.C geom/elem_test.C \
+	geom/intersection_tools_test.C geom/node_test.C \
 	geom/point_test.C geom/point_test.h geom/side_test.C \
 	geom/volume_test.C geom/which_node_am_i_test.C \
 	mesh/all_second_order.C mesh/all_tri.C mesh/distort.C \
@@ -846,7 +856,9 @@ am__objects_9 = unit_tests_opt-driver.$(OBJEXT) \
 	fe/unit_tests_opt-dual_shape_verification_test.$(OBJEXT) \
 	geom/unit_tests_opt-bbox_test.$(OBJEXT) \
 	geom/unit_tests_opt-edge_test.$(OBJEXT) \
+	geom/unit_tests_opt-elem_corner_test.$(OBJEXT) \
 	geom/unit_tests_opt-elem_test.$(OBJEXT) \
+	geom/unit_tests_opt-intersection_tools_test.$(OBJEXT) \
 	geom/unit_tests_opt-node_test.$(OBJEXT) \
 	geom/unit_tests_opt-point_test.$(OBJEXT) \
 	geom/unit_tests_opt-side_test.$(OBJEXT) \
@@ -944,7 +956,8 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	fe/fe_rational_map.C fe/fe_rational_test.C fe/fe_side_test.C \
 	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
 	fe/dual_shape_verification_test.C geom/bbox_test.C \
-	geom/edge_test.C geom/elem_test.C geom/node_test.C \
+	geom/edge_test.C geom/elem_corner_test.C geom/elem_test.C \
+	geom/intersection_tools_test.C geom/node_test.C \
 	geom/point_test.C geom/point_test.h geom/side_test.C \
 	geom/volume_test.C geom/which_node_am_i_test.C \
 	mesh/all_second_order.C mesh/all_tri.C mesh/distort.C \
@@ -1029,7 +1042,9 @@ am__objects_11 = unit_tests_prof-driver.$(OBJEXT) \
 	fe/unit_tests_prof-dual_shape_verification_test.$(OBJEXT) \
 	geom/unit_tests_prof-bbox_test.$(OBJEXT) \
 	geom/unit_tests_prof-edge_test.$(OBJEXT) \
+	geom/unit_tests_prof-elem_corner_test.$(OBJEXT) \
 	geom/unit_tests_prof-elem_test.$(OBJEXT) \
+	geom/unit_tests_prof-intersection_tools_test.$(OBJEXT) \
 	geom/unit_tests_prof-node_test.$(OBJEXT) \
 	geom/unit_tests_prof-point_test.$(OBJEXT) \
 	geom/unit_tests_prof-side_test.$(OBJEXT) \
@@ -1246,7 +1261,9 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	fparser/$(DEPDIR)/unit_tests_prof-autodiff.Po \
 	geom/$(DEPDIR)/unit_tests_dbg-bbox_test.Po \
 	geom/$(DEPDIR)/unit_tests_dbg-edge_test.Po \
+	geom/$(DEPDIR)/unit_tests_dbg-elem_corner_test.Po \
 	geom/$(DEPDIR)/unit_tests_dbg-elem_test.Po \
+	geom/$(DEPDIR)/unit_tests_dbg-intersection_tools_test.Po \
 	geom/$(DEPDIR)/unit_tests_dbg-node_test.Po \
 	geom/$(DEPDIR)/unit_tests_dbg-point_test.Po \
 	geom/$(DEPDIR)/unit_tests_dbg-side_test.Po \
@@ -1254,7 +1271,9 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	geom/$(DEPDIR)/unit_tests_dbg-which_node_am_i_test.Po \
 	geom/$(DEPDIR)/unit_tests_devel-bbox_test.Po \
 	geom/$(DEPDIR)/unit_tests_devel-edge_test.Po \
+	geom/$(DEPDIR)/unit_tests_devel-elem_corner_test.Po \
 	geom/$(DEPDIR)/unit_tests_devel-elem_test.Po \
+	geom/$(DEPDIR)/unit_tests_devel-intersection_tools_test.Po \
 	geom/$(DEPDIR)/unit_tests_devel-node_test.Po \
 	geom/$(DEPDIR)/unit_tests_devel-point_test.Po \
 	geom/$(DEPDIR)/unit_tests_devel-side_test.Po \
@@ -1262,7 +1281,9 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	geom/$(DEPDIR)/unit_tests_devel-which_node_am_i_test.Po \
 	geom/$(DEPDIR)/unit_tests_oprof-bbox_test.Po \
 	geom/$(DEPDIR)/unit_tests_oprof-edge_test.Po \
+	geom/$(DEPDIR)/unit_tests_oprof-elem_corner_test.Po \
 	geom/$(DEPDIR)/unit_tests_oprof-elem_test.Po \
+	geom/$(DEPDIR)/unit_tests_oprof-intersection_tools_test.Po \
 	geom/$(DEPDIR)/unit_tests_oprof-node_test.Po \
 	geom/$(DEPDIR)/unit_tests_oprof-point_test.Po \
 	geom/$(DEPDIR)/unit_tests_oprof-side_test.Po \
@@ -1270,7 +1291,9 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	geom/$(DEPDIR)/unit_tests_oprof-which_node_am_i_test.Po \
 	geom/$(DEPDIR)/unit_tests_opt-bbox_test.Po \
 	geom/$(DEPDIR)/unit_tests_opt-edge_test.Po \
+	geom/$(DEPDIR)/unit_tests_opt-elem_corner_test.Po \
 	geom/$(DEPDIR)/unit_tests_opt-elem_test.Po \
+	geom/$(DEPDIR)/unit_tests_opt-intersection_tools_test.Po \
 	geom/$(DEPDIR)/unit_tests_opt-node_test.Po \
 	geom/$(DEPDIR)/unit_tests_opt-point_test.Po \
 	geom/$(DEPDIR)/unit_tests_opt-side_test.Po \
@@ -1278,7 +1301,9 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	geom/$(DEPDIR)/unit_tests_opt-which_node_am_i_test.Po \
 	geom/$(DEPDIR)/unit_tests_prof-bbox_test.Po \
 	geom/$(DEPDIR)/unit_tests_prof-edge_test.Po \
+	geom/$(DEPDIR)/unit_tests_prof-elem_corner_test.Po \
 	geom/$(DEPDIR)/unit_tests_prof-elem_test.Po \
+	geom/$(DEPDIR)/unit_tests_prof-intersection_tools_test.Po \
 	geom/$(DEPDIR)/unit_tests_prof-node_test.Po \
 	geom/$(DEPDIR)/unit_tests_prof-point_test.Po \
 	geom/$(DEPDIR)/unit_tests_prof-side_test.Po \
@@ -2106,7 +2131,8 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	fe/fe_rational_map.C fe/fe_rational_test.C fe/fe_side_test.C \
 	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
 	fe/dual_shape_verification_test.C geom/bbox_test.C \
-	geom/edge_test.C geom/elem_test.C geom/node_test.C \
+	geom/edge_test.C geom/elem_corner_test.C geom/elem_test.C \
+	geom/intersection_tools_test.C geom/node_test.C \
 	geom/point_test.C geom/point_test.h geom/side_test.C \
 	geom/volume_test.C geom/which_node_am_i_test.C \
 	mesh/all_second_order.C mesh/all_tri.C mesh/distort.C \
@@ -2339,8 +2365,12 @@ geom/unit_tests_dbg-bbox_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_dbg-edge_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_dbg-elem_corner_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_dbg-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_dbg-intersection_tools_test.$(OBJEXT):  \
+	geom/$(am__dirstamp) geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_dbg-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_dbg-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -2607,8 +2637,12 @@ geom/unit_tests_devel-bbox_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-edge_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_devel-elem_corner_test.$(OBJEXT):  \
+	geom/$(am__dirstamp) geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_devel-intersection_tools_test.$(OBJEXT):  \
+	geom/$(am__dirstamp) geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -2821,8 +2855,12 @@ geom/unit_tests_oprof-bbox_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-edge_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_oprof-elem_corner_test.$(OBJEXT):  \
+	geom/$(am__dirstamp) geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_oprof-intersection_tools_test.$(OBJEXT):  \
+	geom/$(am__dirstamp) geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -3035,8 +3073,12 @@ geom/unit_tests_opt-bbox_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-edge_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_opt-elem_corner_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_opt-intersection_tools_test.$(OBJEXT):  \
+	geom/$(am__dirstamp) geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -3249,8 +3291,12 @@ geom/unit_tests_prof-bbox_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-edge_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_prof-elem_corner_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_prof-intersection_tools_test.$(OBJEXT):  \
+	geom/$(am__dirstamp) geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -3553,7 +3599,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@fparser/$(DEPDIR)/unit_tests_prof-autodiff.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-bbox_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-edge_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-elem_corner_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-elem_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-intersection_tools_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-node_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-point_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-side_test.Po@am__quote@ # am--include-marker
@@ -3561,7 +3609,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-which_node_am_i_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-bbox_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-edge_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-elem_corner_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-elem_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-intersection_tools_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-node_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-point_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-side_test.Po@am__quote@ # am--include-marker
@@ -3569,7 +3619,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-which_node_am_i_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-bbox_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-edge_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-elem_corner_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-elem_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-intersection_tools_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-node_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-point_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-side_test.Po@am__quote@ # am--include-marker
@@ -3577,7 +3629,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-which_node_am_i_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-bbox_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-edge_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-elem_corner_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-elem_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-intersection_tools_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-node_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-point_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-side_test.Po@am__quote@ # am--include-marker
@@ -3585,7 +3639,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-which_node_am_i_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-bbox_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-edge_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-elem_corner_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-elem_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-intersection_tools_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-node_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-point_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-side_test.Po@am__quote@ # am--include-marker
@@ -4313,6 +4369,20 @@ geom/unit_tests_dbg-edge_test.obj: geom/edge_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-edge_test.obj `if test -f 'geom/edge_test.C'; then $(CYGPATH_W) 'geom/edge_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/edge_test.C'; fi`
 
+geom/unit_tests_dbg-elem_corner_test.o: geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-elem_corner_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-elem_corner_test.Tpo -c -o geom/unit_tests_dbg-elem_corner_test.o `test -f 'geom/elem_corner_test.C' || echo '$(srcdir)/'`geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_dbg-elem_corner_test.Tpo geom/$(DEPDIR)/unit_tests_dbg-elem_corner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_corner_test.C' object='geom/unit_tests_dbg-elem_corner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-elem_corner_test.o `test -f 'geom/elem_corner_test.C' || echo '$(srcdir)/'`geom/elem_corner_test.C
+
+geom/unit_tests_dbg-elem_corner_test.obj: geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-elem_corner_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-elem_corner_test.Tpo -c -o geom/unit_tests_dbg-elem_corner_test.obj `if test -f 'geom/elem_corner_test.C'; then $(CYGPATH_W) 'geom/elem_corner_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_corner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_dbg-elem_corner_test.Tpo geom/$(DEPDIR)/unit_tests_dbg-elem_corner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_corner_test.C' object='geom/unit_tests_dbg-elem_corner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-elem_corner_test.obj `if test -f 'geom/elem_corner_test.C'; then $(CYGPATH_W) 'geom/elem_corner_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_corner_test.C'; fi`
+
 geom/unit_tests_dbg-elem_test.o: geom/elem_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-elem_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-elem_test.Tpo -c -o geom/unit_tests_dbg-elem_test.o `test -f 'geom/elem_test.C' || echo '$(srcdir)/'`geom/elem_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_dbg-elem_test.Tpo geom/$(DEPDIR)/unit_tests_dbg-elem_test.Po
@@ -4326,6 +4396,20 @@ geom/unit_tests_dbg-elem_test.obj: geom/elem_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_test.C' object='geom/unit_tests_dbg-elem_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-elem_test.obj `if test -f 'geom/elem_test.C'; then $(CYGPATH_W) 'geom/elem_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_test.C'; fi`
+
+geom/unit_tests_dbg-intersection_tools_test.o: geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-intersection_tools_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-intersection_tools_test.Tpo -c -o geom/unit_tests_dbg-intersection_tools_test.o `test -f 'geom/intersection_tools_test.C' || echo '$(srcdir)/'`geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_dbg-intersection_tools_test.Tpo geom/$(DEPDIR)/unit_tests_dbg-intersection_tools_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/intersection_tools_test.C' object='geom/unit_tests_dbg-intersection_tools_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-intersection_tools_test.o `test -f 'geom/intersection_tools_test.C' || echo '$(srcdir)/'`geom/intersection_tools_test.C
+
+geom/unit_tests_dbg-intersection_tools_test.obj: geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-intersection_tools_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-intersection_tools_test.Tpo -c -o geom/unit_tests_dbg-intersection_tools_test.obj `if test -f 'geom/intersection_tools_test.C'; then $(CYGPATH_W) 'geom/intersection_tools_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/intersection_tools_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_dbg-intersection_tools_test.Tpo geom/$(DEPDIR)/unit_tests_dbg-intersection_tools_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/intersection_tools_test.C' object='geom/unit_tests_dbg-intersection_tools_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-intersection_tools_test.obj `if test -f 'geom/intersection_tools_test.C'; then $(CYGPATH_W) 'geom/intersection_tools_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/intersection_tools_test.C'; fi`
 
 geom/unit_tests_dbg-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-node_test.Tpo -c -o geom/unit_tests_dbg-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
@@ -5741,6 +5825,20 @@ geom/unit_tests_devel-edge_test.obj: geom/edge_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-edge_test.obj `if test -f 'geom/edge_test.C'; then $(CYGPATH_W) 'geom/edge_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/edge_test.C'; fi`
 
+geom/unit_tests_devel-elem_corner_test.o: geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-elem_corner_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-elem_corner_test.Tpo -c -o geom/unit_tests_devel-elem_corner_test.o `test -f 'geom/elem_corner_test.C' || echo '$(srcdir)/'`geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-elem_corner_test.Tpo geom/$(DEPDIR)/unit_tests_devel-elem_corner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_corner_test.C' object='geom/unit_tests_devel-elem_corner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-elem_corner_test.o `test -f 'geom/elem_corner_test.C' || echo '$(srcdir)/'`geom/elem_corner_test.C
+
+geom/unit_tests_devel-elem_corner_test.obj: geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-elem_corner_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-elem_corner_test.Tpo -c -o geom/unit_tests_devel-elem_corner_test.obj `if test -f 'geom/elem_corner_test.C'; then $(CYGPATH_W) 'geom/elem_corner_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_corner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-elem_corner_test.Tpo geom/$(DEPDIR)/unit_tests_devel-elem_corner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_corner_test.C' object='geom/unit_tests_devel-elem_corner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-elem_corner_test.obj `if test -f 'geom/elem_corner_test.C'; then $(CYGPATH_W) 'geom/elem_corner_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_corner_test.C'; fi`
+
 geom/unit_tests_devel-elem_test.o: geom/elem_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-elem_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-elem_test.Tpo -c -o geom/unit_tests_devel-elem_test.o `test -f 'geom/elem_test.C' || echo '$(srcdir)/'`geom/elem_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-elem_test.Tpo geom/$(DEPDIR)/unit_tests_devel-elem_test.Po
@@ -5754,6 +5852,20 @@ geom/unit_tests_devel-elem_test.obj: geom/elem_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_test.C' object='geom/unit_tests_devel-elem_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-elem_test.obj `if test -f 'geom/elem_test.C'; then $(CYGPATH_W) 'geom/elem_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_test.C'; fi`
+
+geom/unit_tests_devel-intersection_tools_test.o: geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-intersection_tools_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-intersection_tools_test.Tpo -c -o geom/unit_tests_devel-intersection_tools_test.o `test -f 'geom/intersection_tools_test.C' || echo '$(srcdir)/'`geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-intersection_tools_test.Tpo geom/$(DEPDIR)/unit_tests_devel-intersection_tools_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/intersection_tools_test.C' object='geom/unit_tests_devel-intersection_tools_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-intersection_tools_test.o `test -f 'geom/intersection_tools_test.C' || echo '$(srcdir)/'`geom/intersection_tools_test.C
+
+geom/unit_tests_devel-intersection_tools_test.obj: geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-intersection_tools_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-intersection_tools_test.Tpo -c -o geom/unit_tests_devel-intersection_tools_test.obj `if test -f 'geom/intersection_tools_test.C'; then $(CYGPATH_W) 'geom/intersection_tools_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/intersection_tools_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-intersection_tools_test.Tpo geom/$(DEPDIR)/unit_tests_devel-intersection_tools_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/intersection_tools_test.C' object='geom/unit_tests_devel-intersection_tools_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-intersection_tools_test.obj `if test -f 'geom/intersection_tools_test.C'; then $(CYGPATH_W) 'geom/intersection_tools_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/intersection_tools_test.C'; fi`
 
 geom/unit_tests_devel-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo -c -o geom/unit_tests_devel-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
@@ -7169,6 +7281,20 @@ geom/unit_tests_oprof-edge_test.obj: geom/edge_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-edge_test.obj `if test -f 'geom/edge_test.C'; then $(CYGPATH_W) 'geom/edge_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/edge_test.C'; fi`
 
+geom/unit_tests_oprof-elem_corner_test.o: geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-elem_corner_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-elem_corner_test.Tpo -c -o geom/unit_tests_oprof-elem_corner_test.o `test -f 'geom/elem_corner_test.C' || echo '$(srcdir)/'`geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-elem_corner_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-elem_corner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_corner_test.C' object='geom/unit_tests_oprof-elem_corner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-elem_corner_test.o `test -f 'geom/elem_corner_test.C' || echo '$(srcdir)/'`geom/elem_corner_test.C
+
+geom/unit_tests_oprof-elem_corner_test.obj: geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-elem_corner_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-elem_corner_test.Tpo -c -o geom/unit_tests_oprof-elem_corner_test.obj `if test -f 'geom/elem_corner_test.C'; then $(CYGPATH_W) 'geom/elem_corner_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_corner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-elem_corner_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-elem_corner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_corner_test.C' object='geom/unit_tests_oprof-elem_corner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-elem_corner_test.obj `if test -f 'geom/elem_corner_test.C'; then $(CYGPATH_W) 'geom/elem_corner_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_corner_test.C'; fi`
+
 geom/unit_tests_oprof-elem_test.o: geom/elem_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-elem_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-elem_test.Tpo -c -o geom/unit_tests_oprof-elem_test.o `test -f 'geom/elem_test.C' || echo '$(srcdir)/'`geom/elem_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-elem_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-elem_test.Po
@@ -7182,6 +7308,20 @@ geom/unit_tests_oprof-elem_test.obj: geom/elem_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_test.C' object='geom/unit_tests_oprof-elem_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-elem_test.obj `if test -f 'geom/elem_test.C'; then $(CYGPATH_W) 'geom/elem_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_test.C'; fi`
+
+geom/unit_tests_oprof-intersection_tools_test.o: geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-intersection_tools_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-intersection_tools_test.Tpo -c -o geom/unit_tests_oprof-intersection_tools_test.o `test -f 'geom/intersection_tools_test.C' || echo '$(srcdir)/'`geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-intersection_tools_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-intersection_tools_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/intersection_tools_test.C' object='geom/unit_tests_oprof-intersection_tools_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-intersection_tools_test.o `test -f 'geom/intersection_tools_test.C' || echo '$(srcdir)/'`geom/intersection_tools_test.C
+
+geom/unit_tests_oprof-intersection_tools_test.obj: geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-intersection_tools_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-intersection_tools_test.Tpo -c -o geom/unit_tests_oprof-intersection_tools_test.obj `if test -f 'geom/intersection_tools_test.C'; then $(CYGPATH_W) 'geom/intersection_tools_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/intersection_tools_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-intersection_tools_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-intersection_tools_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/intersection_tools_test.C' object='geom/unit_tests_oprof-intersection_tools_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-intersection_tools_test.obj `if test -f 'geom/intersection_tools_test.C'; then $(CYGPATH_W) 'geom/intersection_tools_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/intersection_tools_test.C'; fi`
 
 geom/unit_tests_oprof-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-node_test.Tpo -c -o geom/unit_tests_oprof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
@@ -8597,6 +8737,20 @@ geom/unit_tests_opt-edge_test.obj: geom/edge_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-edge_test.obj `if test -f 'geom/edge_test.C'; then $(CYGPATH_W) 'geom/edge_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/edge_test.C'; fi`
 
+geom/unit_tests_opt-elem_corner_test.o: geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-elem_corner_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-elem_corner_test.Tpo -c -o geom/unit_tests_opt-elem_corner_test.o `test -f 'geom/elem_corner_test.C' || echo '$(srcdir)/'`geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-elem_corner_test.Tpo geom/$(DEPDIR)/unit_tests_opt-elem_corner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_corner_test.C' object='geom/unit_tests_opt-elem_corner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-elem_corner_test.o `test -f 'geom/elem_corner_test.C' || echo '$(srcdir)/'`geom/elem_corner_test.C
+
+geom/unit_tests_opt-elem_corner_test.obj: geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-elem_corner_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-elem_corner_test.Tpo -c -o geom/unit_tests_opt-elem_corner_test.obj `if test -f 'geom/elem_corner_test.C'; then $(CYGPATH_W) 'geom/elem_corner_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_corner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-elem_corner_test.Tpo geom/$(DEPDIR)/unit_tests_opt-elem_corner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_corner_test.C' object='geom/unit_tests_opt-elem_corner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-elem_corner_test.obj `if test -f 'geom/elem_corner_test.C'; then $(CYGPATH_W) 'geom/elem_corner_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_corner_test.C'; fi`
+
 geom/unit_tests_opt-elem_test.o: geom/elem_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-elem_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-elem_test.Tpo -c -o geom/unit_tests_opt-elem_test.o `test -f 'geom/elem_test.C' || echo '$(srcdir)/'`geom/elem_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-elem_test.Tpo geom/$(DEPDIR)/unit_tests_opt-elem_test.Po
@@ -8610,6 +8764,20 @@ geom/unit_tests_opt-elem_test.obj: geom/elem_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_test.C' object='geom/unit_tests_opt-elem_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-elem_test.obj `if test -f 'geom/elem_test.C'; then $(CYGPATH_W) 'geom/elem_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_test.C'; fi`
+
+geom/unit_tests_opt-intersection_tools_test.o: geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-intersection_tools_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-intersection_tools_test.Tpo -c -o geom/unit_tests_opt-intersection_tools_test.o `test -f 'geom/intersection_tools_test.C' || echo '$(srcdir)/'`geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-intersection_tools_test.Tpo geom/$(DEPDIR)/unit_tests_opt-intersection_tools_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/intersection_tools_test.C' object='geom/unit_tests_opt-intersection_tools_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-intersection_tools_test.o `test -f 'geom/intersection_tools_test.C' || echo '$(srcdir)/'`geom/intersection_tools_test.C
+
+geom/unit_tests_opt-intersection_tools_test.obj: geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-intersection_tools_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-intersection_tools_test.Tpo -c -o geom/unit_tests_opt-intersection_tools_test.obj `if test -f 'geom/intersection_tools_test.C'; then $(CYGPATH_W) 'geom/intersection_tools_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/intersection_tools_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-intersection_tools_test.Tpo geom/$(DEPDIR)/unit_tests_opt-intersection_tools_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/intersection_tools_test.C' object='geom/unit_tests_opt-intersection_tools_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-intersection_tools_test.obj `if test -f 'geom/intersection_tools_test.C'; then $(CYGPATH_W) 'geom/intersection_tools_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/intersection_tools_test.C'; fi`
 
 geom/unit_tests_opt-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo -c -o geom/unit_tests_opt-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
@@ -10025,6 +10193,20 @@ geom/unit_tests_prof-edge_test.obj: geom/edge_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-edge_test.obj `if test -f 'geom/edge_test.C'; then $(CYGPATH_W) 'geom/edge_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/edge_test.C'; fi`
 
+geom/unit_tests_prof-elem_corner_test.o: geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-elem_corner_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-elem_corner_test.Tpo -c -o geom/unit_tests_prof-elem_corner_test.o `test -f 'geom/elem_corner_test.C' || echo '$(srcdir)/'`geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-elem_corner_test.Tpo geom/$(DEPDIR)/unit_tests_prof-elem_corner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_corner_test.C' object='geom/unit_tests_prof-elem_corner_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-elem_corner_test.o `test -f 'geom/elem_corner_test.C' || echo '$(srcdir)/'`geom/elem_corner_test.C
+
+geom/unit_tests_prof-elem_corner_test.obj: geom/elem_corner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-elem_corner_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-elem_corner_test.Tpo -c -o geom/unit_tests_prof-elem_corner_test.obj `if test -f 'geom/elem_corner_test.C'; then $(CYGPATH_W) 'geom/elem_corner_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_corner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-elem_corner_test.Tpo geom/$(DEPDIR)/unit_tests_prof-elem_corner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_corner_test.C' object='geom/unit_tests_prof-elem_corner_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-elem_corner_test.obj `if test -f 'geom/elem_corner_test.C'; then $(CYGPATH_W) 'geom/elem_corner_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_corner_test.C'; fi`
+
 geom/unit_tests_prof-elem_test.o: geom/elem_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-elem_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-elem_test.Tpo -c -o geom/unit_tests_prof-elem_test.o `test -f 'geom/elem_test.C' || echo '$(srcdir)/'`geom/elem_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-elem_test.Tpo geom/$(DEPDIR)/unit_tests_prof-elem_test.Po
@@ -10038,6 +10220,20 @@ geom/unit_tests_prof-elem_test.obj: geom/elem_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_test.C' object='geom/unit_tests_prof-elem_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-elem_test.obj `if test -f 'geom/elem_test.C'; then $(CYGPATH_W) 'geom/elem_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_test.C'; fi`
+
+geom/unit_tests_prof-intersection_tools_test.o: geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-intersection_tools_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-intersection_tools_test.Tpo -c -o geom/unit_tests_prof-intersection_tools_test.o `test -f 'geom/intersection_tools_test.C' || echo '$(srcdir)/'`geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-intersection_tools_test.Tpo geom/$(DEPDIR)/unit_tests_prof-intersection_tools_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/intersection_tools_test.C' object='geom/unit_tests_prof-intersection_tools_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-intersection_tools_test.o `test -f 'geom/intersection_tools_test.C' || echo '$(srcdir)/'`geom/intersection_tools_test.C
+
+geom/unit_tests_prof-intersection_tools_test.obj: geom/intersection_tools_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-intersection_tools_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-intersection_tools_test.Tpo -c -o geom/unit_tests_prof-intersection_tools_test.obj `if test -f 'geom/intersection_tools_test.C'; then $(CYGPATH_W) 'geom/intersection_tools_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/intersection_tools_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-intersection_tools_test.Tpo geom/$(DEPDIR)/unit_tests_prof-intersection_tools_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/intersection_tools_test.C' object='geom/unit_tests_prof-intersection_tools_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-intersection_tools_test.obj `if test -f 'geom/intersection_tools_test.C'; then $(CYGPATH_W) 'geom/intersection_tools_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/intersection_tools_test.C'; fi`
 
 geom/unit_tests_prof-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-node_test.Tpo -c -o geom/unit_tests_prof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
@@ -11596,7 +11792,9 @@ distclean: distclean-am
 	-rm -f fparser/$(DEPDIR)/unit_tests_prof-autodiff.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-edge_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_dbg-elem_corner_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-elem_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_dbg-intersection_tools_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-side_test.Po
@@ -11604,7 +11802,9 @@ distclean: distclean-am
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-edge_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_devel-elem_corner_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-elem_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_devel-intersection_tools_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-side_test.Po
@@ -11612,7 +11812,9 @@ distclean: distclean-am
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-edge_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_oprof-elem_corner_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-elem_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_oprof-intersection_tools_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-side_test.Po
@@ -11620,7 +11822,9 @@ distclean: distclean-am
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-edge_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_opt-elem_corner_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-elem_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_opt-intersection_tools_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-side_test.Po
@@ -11628,7 +11832,9 @@ distclean: distclean-am
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-edge_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_prof-elem_corner_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-elem_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_prof-intersection_tools_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-side_test.Po
@@ -12153,7 +12359,9 @@ maintainer-clean: maintainer-clean-am
 	-rm -f fparser/$(DEPDIR)/unit_tests_prof-autodiff.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-edge_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_dbg-elem_corner_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-elem_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_dbg-intersection_tools_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-side_test.Po
@@ -12161,7 +12369,9 @@ maintainer-clean: maintainer-clean-am
 	-rm -f geom/$(DEPDIR)/unit_tests_dbg-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-edge_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_devel-elem_corner_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-elem_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_devel-intersection_tools_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-side_test.Po
@@ -12169,7 +12379,9 @@ maintainer-clean: maintainer-clean-am
 	-rm -f geom/$(DEPDIR)/unit_tests_devel-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-edge_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_oprof-elem_corner_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-elem_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_oprof-intersection_tools_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-side_test.Po
@@ -12177,7 +12389,9 @@ maintainer-clean: maintainer-clean-am
 	-rm -f geom/$(DEPDIR)/unit_tests_oprof-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-edge_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_opt-elem_corner_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-elem_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_opt-intersection_tools_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-side_test.Po
@@ -12185,7 +12399,9 @@ maintainer-clean: maintainer-clean-am
 	-rm -f geom/$(DEPDIR)/unit_tests_opt-which_node_am_i_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-bbox_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-edge_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_prof-elem_corner_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-elem_test.Po
+	-rm -f geom/$(DEPDIR)/unit_tests_prof-intersection_tools_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-node_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-point_test.Po
 	-rm -f geom/$(DEPDIR)/unit_tests_prof-side_test.Po

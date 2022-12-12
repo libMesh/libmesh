@@ -139,6 +139,7 @@ include_HEADERS =  \
         geom/edge_edge4.h \
         geom/edge_inf_edge2.h \
         geom/elem.h \
+        geom/elem_corner.h \
         geom/elem_cutter.h \
         geom/elem_hash.h \
         geom/elem_internal.h \
@@ -161,6 +162,7 @@ include_HEADERS =  \
         geom/face_tri3_subdivision.h \
         geom/face_tri6.h \
         geom/face_tri7.h \
+        geom/intersection_tools.h \
         geom/node.h \
         geom/node_elem.h \
         geom/node_range.h \

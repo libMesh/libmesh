@@ -59,6 +59,14 @@ public:
   virtual ~Edge() = default;
 
   /**
+   * Geometric constants for all edges.
+   */
+  static const int num_sides = 2;
+  static const int num_edges = 0;
+  static const int nodes_per_side = 1;
+  static const int nodes_per_edge = invalid_int;
+
+  /**
    * \returns 1, the dimensionality of the object.
    */
   virtual unsigned short dim () const override final { return 1; }
@@ -77,6 +85,12 @@ public:
    * \returns 2.  Every edge has exactly two vertices.
    */
   virtual unsigned int n_vertices() const override final { return 2; }
+
+  /**
+   * \returns 1. Every side has one vertex.
+   */
+  virtual unsigned int n_vertices_on_side(const unsigned short libmesh_dbg_var(s)) const override final
+  { libmesh_assert_less(s, this->n_sides()); return 1; }
 
   /**
    * \returns 0.  All 1D elements have no edges.
@@ -182,10 +196,22 @@ public:
 
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
 
+  virtual const unsigned int * nodes_on_side_ptr(const unsigned short s) const override final
+  { libmesh_assert_less(s, this->n_sides()); return side_nodes_map[s]; }
+
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
+
+  virtual const unsigned int * nodes_on_edge_ptr(const unsigned short e) const override final
+  { return nodes_on_side_ptr(e); }
 
   virtual std::vector<unsigned int> sides_on_edge(const unsigned int) const override final
   { return {}; }
+
+  /**
+   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
+   * element node numbers.
+   */
+  static const unsigned int side_nodes_map[2][1];
 
   /**
    * \returns The "circumcenter of mass" (area-weighted average of
@@ -207,6 +233,18 @@ public:
   unsigned int center_node_on_side(const unsigned short side) const override final;
 
   ElemType side_type (const unsigned int s) const override final;
+
+  /**
+   * \returns 1. Every side has one node.
+   */
+  virtual unsigned int n_nodes_on_side(const unsigned short libmesh_dbg_var(s)) const override final
+  { libmesh_assert_less(s, 2); return 1; }
+
+  /**
+   * The \p Elem::n_nodes_on_edge() member makes no sense for edges.
+   */
+  virtual unsigned int n_nodes_on_edge(const unsigned short) const override final
+  { libmesh_not_implemented(); return 0; }
 
 protected:
 

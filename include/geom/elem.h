@@ -39,7 +39,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
-#include <limits.h> // CHAR_BIT
+#include <limits.h> // CHAR_BIT, std::numeric_limits
 #include <set>
 #include <vector>
 #include <memory>
@@ -224,18 +224,13 @@ public:
   /**
    * A static integral constant representing an invalid subdomain id.
    * See also DofObject::{invalid_id, invalid_unique_id, invalid_processor_id}.
-   *
-   * \note We don't use the static_cast(-1) trick here since
-   * \p subdomain_id_type is sometimes a *signed* integer for
-   * compatibility reasons (see libmesh/id_types.h).
-   *
-   * \note Normally you can declare static const integral types
-   * directly in the header file (C++ standard, 9.4.2/4) but
-   * std::numeric_limits<T>::max() is not considered a "constant
-   * expression".  This one is therefore defined in elem.C.
-   * http://stackoverflow.com/questions/2738435/using-numeric-limitsmax-in-constant-expressions
    */
-  static const subdomain_id_type invalid_subdomain_id;
+  static constexpr subdomain_id_type invalid_subdomain_id = std::numeric_limits<subdomain_id_type>::max();
+
+  /**
+   * A static integral constant representing an invalid index to a vertex.
+  */
+  static constexpr unsigned short invalid_vertex = std::numeric_limits<unsigned short>::max();
 
   /**
    * \returns A pointer to the "reference element" associated
@@ -599,6 +594,11 @@ public:
   virtual unsigned int n_nodes () const = 0;
 
   /**
+   * \returns The number of nodes on the side with index \p s.
+   */
+  virtual unsigned int n_nodes_on_side (const unsigned short s) const = 0;
+
+  /**
    * The maximum number of nodes *any* element can contain.
    * This is useful for replacing heap vectors with stack arrays.
    */
@@ -643,6 +643,12 @@ public:
   IntRange<unsigned short> side_index_range () const;
 
   /**
+   * \returns An integer range from 0 up to (but not including)
+   * the number of vertices this element has.
+   */
+  IntRange<unsigned short> vertex_index_range () const;
+
+  /**
    * \returns The number of neighbors the element that has been derived
    * from this class has.
    *
@@ -661,10 +667,20 @@ public:
   virtual unsigned int n_vertices () const = 0;
 
   /**
+   * \returns The number of verticies on the side with index \p s.
+   */
+  virtual unsigned int n_vertices_on_side (const unsigned short s) const = 0;
+
+  /**
    * \returns The number of edges the element that has been derived
    * from this class has.
    */
   virtual unsigned int n_edges () const = 0;
+
+  /**
+   * \returns The number of nodes on the edge with index \p e.
+   */
+  virtual unsigned int n_nodes_on_edge (const unsigned short) const = 0;
 
   /**
    * \returns An integer range from 0 up to (but not including)
@@ -735,9 +751,27 @@ public:
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int /*s*/) const = 0;
 
   /**
+   * \returns A pointer to the beginning of the array that contains the
+   * (local) node numbers on the side \p s
+   *
+   * This does not create temporaries, unlike \p nodes_on_side.
+   * Use n_nodes_on_side for indexing.
+   */
+  virtual const unsigned int * nodes_on_side_ptr(const unsigned short s) const = 0;
+
+  /**
    * \returns the (local) node numbers on the specified edge
    */
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int /*e*/) const = 0;
+
+  /**
+   * \returns A pointer to the beginning of the array that contains the
+   * (local) node numbers on the edge \p e
+   *
+   * This does not create temporaries, unlike \p nodes_on_edge.
+   * Use n_nodes_on_edge for indexing.
+   */
+  virtual const unsigned int * nodes_on_edge_ptr(const unsigned short e) const = 0;
 
   /**
    * \returns the (local) side numbers that touch the specified edge
@@ -1989,6 +2023,55 @@ protected:
                              const unsigned int i,
                              ElemType edgetype);
 
+  /**
+   * Helper for overriding n_nodes_on_side in derived classes.
+   *
+   * Performs bound checking on \p s and returns nodes_per_side
+   * for the given class for all sides.
+  */
+  template <class ElemClass>
+  unsigned int _n_nodes_on_side_constant(const unsigned short libmesh_dbg_var(s)) const
+  {
+    static_assert(std::is_base_of<Elem, ElemClass>::value, "Not an Elem");
+    libmesh_assert_less(s, this->n_sides());
+    return ElemClass::nodes_per_side;
+  }
+
+  /**
+   * Helper for overriding n_nodes_per_edge in derived classes.
+   *
+   * Performs bound checking on \p s and returns nodes_per_edge
+   * for the given class for all edges.
+  */
+  template <class ElemClass>
+  unsigned int _n_nodes_on_edge_constant(const unsigned short libmesh_dbg_var(s)) const
+  {
+    static_assert(std::is_base_of<Elem, ElemClass>::value, "Not an Elem");
+    libmesh_assert_less(s, this->n_edges());
+    return ElemClass::nodes_per_edge;
+  }
+
+  /**
+   * Helper for overriding nodes_on_side in derived classes.
+  */
+  template <class ElemClass>
+  const unsigned int * _nodes_on_side_ptr(const unsigned short s) const
+  {
+    static_assert(std::is_base_of<Elem, ElemClass>::value, "Not an Elem");
+    libmesh_assert_less(s, std::extent<decltype(ElemClass::side_nodes_map)>::value);
+    return ElemClass::side_nodes_map[s];
+  }
+
+  /**
+   * Helper for overriding nodes_on_side in derived classes.
+  */
+  template <class ElemClass>
+  const unsigned int * _nodes_on_edge_ptr(const unsigned short s) const
+  {
+    static_assert(std::is_base_of<Elem, ElemClass>::value, "Not an Elem");
+    libmesh_assert_less(s, std::extent<decltype(ElemClass::edge_nodes_map)>::value);
+    return ElemClass::edge_nodes_map[s];
+  }
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -2464,6 +2547,13 @@ Elem::side_index_range() const
 }
 
 
+
+inline
+IntRange<unsigned short>
+Elem::vertex_index_range() const
+{
+  return {0, cast_int<unsigned short>(this->n_vertices())};
+}
 
 
 inline

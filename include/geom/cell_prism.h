@@ -83,6 +83,9 @@ public:
    */
   virtual unsigned int n_vertices() const override final { return 6; }
 
+  virtual unsigned int n_vertices_on_side(const unsigned short s) const override final
+  { libmesh_assert_less(s, this->n_sides()); return 4 - (s == 0 || s == 4); }
+
   /**
    * \returns 9.  All prisms have 9 edges.
    */
@@ -159,6 +162,19 @@ public:
   static const unsigned int edge_sides_map[9][2];
 
 protected:
+
+  /**
+   * Helper for n_nodes_on_side() for Prism-derived classes.
+   *
+   * That is, returns \p PrismClass::nodes_per_side for sides 1-3, and
+   * the same value minus \p remove_num for sides 0 and 4.
+  */
+  template <class PrismClass, unsigned short remove_num>
+  unsigned int _n_nodes_on_side(const unsigned short s) const
+  {
+    static_assert(std::is_base_of<Prism, PrismClass>::value, "Not a Prism");
+    return this->_n_nodes_on_side_constant<PrismClass>(s) - ((s == 0 || s == 4) ? remove_num : 0);
+  }
 
   /**
    * Data for links to parent/neighbor/interior_parent elements.

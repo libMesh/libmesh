@@ -86,6 +86,9 @@ public:
    */
   virtual unsigned int n_vertices() const override final { return 6; }
 
+  virtual unsigned int n_vertices_on_side(const unsigned short s) const override final
+  { libmesh_assert_less(s, this->n_sides()); return 4 - (s == 0); }
+
   /**
    * \returns 6.  All infinite prisms have 6 edges,
    * 3 lying in the base, and 3 perpendicular to the base.

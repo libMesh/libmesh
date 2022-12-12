@@ -91,6 +91,12 @@ public:
   virtual unsigned int n_vertices() const override final { return 8; }
 
   /**
+   * \returns 4. Every side has four vertices.
+   */
+  virtual unsigned int n_vertices_on_side(const unsigned short libmesh_dbg_var(s)) const override final
+  { libmesh_assert_less(s, this->n_sides()); return 4; }
+
+  /**
    * \returns \p true if the specified (local) node number is a
    * "mid-edge" node on an infinite element edge.
    */
@@ -193,6 +199,19 @@ public:
    * This maps each edge to the sides that contain said edge.
    */
   static const unsigned int edge_sides_map[8][2];
+
+  /**
+   * Helper for n_nodes_on_side() for InfHex-derived classes.
+   *
+   * That is, returns InfHex::nodes_per_side - \p remove_num
+   * for sides 1-4, and InfHex::nodes_per_side for side 0.
+  */
+  template <class InfHexClass, unsigned short remove_num>
+  unsigned int _n_nodes_on_side(const unsigned short s) const
+  {
+    static_assert(std::is_base_of<InfHex, InfHexClass>::value, "Not a InfHex");
+    return this->_n_nodes_on_side_constant<InfHexClass>(s) - ((s == 0) ? 0 : remove_num);
+  }
 
 protected:
 

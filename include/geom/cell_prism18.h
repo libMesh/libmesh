@@ -129,7 +129,13 @@ public:
 
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
 
+  virtual const unsigned int * nodes_on_side_ptr(const unsigned short s) const override final
+  { return this->_nodes_on_side_ptr<Prism18>(s); }
+
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
+
+  virtual const unsigned int * nodes_on_edge_ptr(const unsigned short e) const override final
+  { return this->_nodes_on_edge_ptr<Prism18>(e); }
 
   /**
    * \returns \p true if the specified (local) node number is on the
@@ -262,6 +268,15 @@ public:
   unsigned int center_node_on_side(const unsigned short side) const override final;
 
   ElemType side_type (const unsigned int s) const override final;
+
+  virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
+  { return _n_nodes_on_side<Prism18, 3>(s); }
+
+  /**
+   * \returns 3. Every edge has three nodes.
+   */
+  virtual unsigned int n_nodes_on_edge(const unsigned short e) const override final
+  { return this->_n_nodes_on_edge_constant<Prism18>(e); }
 
 protected:
 

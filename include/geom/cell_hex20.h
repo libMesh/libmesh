@@ -124,7 +124,13 @@ public:
 
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
 
+  virtual const unsigned int * nodes_on_side_ptr(const unsigned short s) const override final
+  { return this->_nodes_on_side_ptr<Hex20>(s); }
+
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
+
+  virtual const unsigned int * nodes_on_edge_ptr(const unsigned short e) const override final
+  { return this->_nodes_on_edge_ptr<Hex20>(e); }
 
   /**
    * \returns \p true if the specified (local) node number is on the
@@ -240,14 +246,24 @@ public:
 
   ElemType side_type (const unsigned int s) const override final;
 
+  /**
+   * \returns 8. Every side has eight nodes.
+   */
+  virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
+  { return this->_n_nodes_on_side_constant<Hex20>(s); }
+
+  /**
+   * \returns 3. Every edge has two nodes.
+   */
+  virtual unsigned int n_nodes_on_edge(const unsigned short e) const override final
+  { return this->_n_nodes_on_edge_constant<Hex20>(e); }
+
 protected:
 
   /**
    * Data for links to nodes.
    */
   Node * _nodelinks_data[num_nodes];
-
-
 
 #ifdef LIBMESH_ENABLE_AMR
 

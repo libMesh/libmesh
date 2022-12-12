@@ -106,6 +106,9 @@ public:
 
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
 
+  virtual const unsigned int * nodes_on_side_ptr(const unsigned short s) const override final
+  { return this->_nodes_on_side_ptr<InfQuad6>(s); }
+
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
 
   /**
@@ -199,6 +202,9 @@ public:
   ElemType side_type (const unsigned int s) const override final;
 
   virtual void flip(BoundaryInfo *) override final;
+
+  virtual unsigned int n_nodes_on_side(const unsigned short s) const override final
+  { return this->_n_nodes_on_side_constant<InfQuad6>(s) - (s == 0 ? 0 : 1); }
 
 protected:
 

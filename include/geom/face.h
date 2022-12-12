@@ -66,6 +66,18 @@ public:
    */
   virtual unsigned int n_faces() const override final { return 0; }
 
+  virtual const unsigned int * nodes_on_edge_ptr(const unsigned short s) const override final
+  { return nodes_on_side_ptr(s); }
+
+  /**
+   * \returns 2. Every side has two vertices.
+   */
+  virtual unsigned int n_vertices_on_side(const unsigned short libmesh_dbg_var(s)) const override final
+  { libmesh_assert_less(s, this->n_sides()); return 2; }
+
+  virtual unsigned int n_nodes_on_edge(const unsigned short e) const override final
+  { return this->n_nodes_on_side(e); }
+
   /**
    * build_side and build_edge are identical for faces.
    */
