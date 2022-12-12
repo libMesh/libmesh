@@ -95,6 +95,8 @@ PetscLinearSolver<T>::PetscLinearSolver(const libMesh::Parallel::Communicator & 
   LinearSolver<T>(comm_in),
   _restrict_solve_to_is(nullptr),
   _restrict_solve_to_is_complement(nullptr),
+  _restrict_to_unconstrained_dofmap(nullptr),
+  _unconstrained_dofs_is(nullptr),
   _subset_solve_mode(SUBSET_ZERO)
 {
   if (this->n_processors() == 1)
@@ -117,6 +119,10 @@ void PetscLinearSolver<T>::clear ()
         _restrict_solve_to_is.reset_to_zero();
       if (_restrict_solve_to_is_complement)
         _restrict_solve_to_is_complement.reset_to_zero();
+
+      _restrict_to_unconstrained_dofmap = nullptr;
+      if (_unconstrained_dofs_is)
+        _unconstrained_dofs_is.reset_to_zero();
 
       // Previously we only called KSPDestroy(), we did not reset _ksp
       // to nullptr, so that behavior is maintained here.
@@ -349,6 +355,20 @@ PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int> * const
 }
 
 
+template <typename T>
+void
+PetscLinearSolver<T>::restrict_solve_to_unconstrained (const DofMap * dof_map)
+{
+  _restrict_to_unconstrained_dofmap = dof_map;
+}
+
+
+template <typename T>
+const DofMap * PetscLinearSolver<T>::restrictions_to_unconstrained()
+{
+  return _restrict_to_unconstrained_dofmap;
+}
+
 
 template <typename T>
 std::pair<unsigned int, Real>
@@ -521,11 +541,40 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
   WrappedPetsc<Vec> subsolution;
   WrappedPetsc<VecScatter> scatter;
 
+  // Set up restrictions based on DoF constraints, if asked.
+  if (_restrict_to_unconstrained_dofmap)
+    {
+      std::vector<PetscInt> unconstrained_dofs;
+      for (dof_id_type i = _restrict_to_unconstrained_dofmap->first_dof(),
+                   end_i = _restrict_to_unconstrained_dofmap->end_dof();
+           i != end_i; ++i)
+        if (!_restrict_to_unconstrained_dofmap->is_constrained_dof(i))
+          unconstrained_dofs.push_back(cast_int<PetscInt>(i));
+
+      ierr = ISCreateGeneral(this->comm().get(),
+                             cast_int<PetscInt>(unconstrained_dofs.size()),
+                             unconstrained_dofs.data(), PETSC_COPY_VALUES,
+                             _unconstrained_dofs_is.get());
+    }
+
   // Restrict rhs and solution vectors and set operators.  The input
   // matrix works as the preconditioning matrix.
-  if (_restrict_solve_to_is)
+  if (_restrict_solve_to_is || _unconstrained_dofs_is)
     {
-      PetscInt is_local_size = this->restrict_solve_to_is_local_size();
+      // We'll try to handle the combination eventually, but not
+      // today.
+      IS restrict_to_is = [this]() {
+        if (_restrict_solve_to_is)
+          {
+            if (_unconstrained_dofs_is)
+              libmesh_not_implemented_msg("Can't doubly restrict a solve");
+            return *_restrict_solve_to_is.get();
+          }
+        else
+          return *_unconstrained_dofs_is.get();
+      }();
+
+      PetscInt is_local_size = this->local_is_size(restrict_to_is);
 
       ierr = VecCreate(this->comm().get(), subrhs.get());
       LIBMESH_CHKERR(ierr);
@@ -541,15 +590,15 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
       ierr = VecSetFromOptions(subsolution);
       LIBMESH_CHKERR(ierr);
 
-      ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is, subrhs, nullptr, scatter.get());
+      ierr = VecScatterCreate(rhs->vec(), restrict_to_is, subrhs, nullptr, scatter.get());
       LIBMESH_CHKERR(ierr);
 
       VecScatterBeginEnd(this->comm(), scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
       VecScatterBeginEnd(this->comm(), scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
 
       ierr = LibMeshCreateSubMatrix(mat,
-                                    _restrict_solve_to_is,
-                                    _restrict_solve_to_is,
+                                    restrict_to_is,
+                                    restrict_to_is,
                                     MAT_INITIAL_MATRIX,
                                     submat.get());
       LIBMESH_CHKERR(ierr);
@@ -557,8 +606,8 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
       if (precond)
         {
           ierr = LibMeshCreateSubMatrix(const_cast<PetscMatrix<T> *>(precond)->mat(),
-                                        _restrict_solve_to_is,
-                                        _restrict_solve_to_is,
+                                        restrict_to_is,
+                                        restrict_to_is,
                                         MAT_INITIAL_MATRIX,
                                         subprecond.get());
           LIBMESH_CHKERR(ierr);
@@ -568,7 +617,7 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
       // system, we will now change the right hand side to compensate
       // for this.  Note that this is not necessary if \p SUBSET_ZERO
       // has been selected.
-      if (_subset_solve_mode!=SUBSET_ZERO)
+      else if (_subset_solve_mode!=SUBSET_ZERO)
         {
           this->create_complement_is(rhs_in);
           PetscInt is_complement_local_size =
@@ -662,7 +711,7 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
     }
 
   // Solve the linear system
-  if (_restrict_solve_to_is)
+  if (_restrict_solve_to_is || _unconstrained_dofs_is)
     {
       ierr = solve_func (_ksp, subrhs, subsolution);
       LIBMESH_CHKERR(ierr);
@@ -702,7 +751,10 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
         default:
           libmesh_error_msg("Invalid subset solve mode = " << _subset_solve_mode);
         }
+    }
 
+  if (_restrict_solve_to_is || _unconstrained_dofs_is)
+    {
       VecScatterBeginEnd(this->comm(), scatter, subsolution, solution->vec(), INSERT_VALUES, SCATTER_REVERSE);
 
       if (precond && this->_preconditioner)
@@ -1026,12 +1078,10 @@ PetscLinearSolver<T>::create_complement_is (const NumericVector<T> & vec_in)
 
 template <typename T>
 PetscInt
-PetscLinearSolver<T>::restrict_solve_to_is_local_size() const
+PetscLinearSolver<T>::local_is_size(IS & is) const
 {
-  libmesh_assert(_restrict_solve_to_is);
-
   PetscInt s;
-  int ierr = ISGetLocalSize(_restrict_solve_to_is, &s);
+  int ierr = ISGetLocalSize(is, &s);
   LIBMESH_CHKERR(ierr);
 
   return s;

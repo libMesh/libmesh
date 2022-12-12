@@ -1257,12 +1257,28 @@ public:
    * solver's solutions do not satisfy your DoF constraints to a tight enough
    * tolerance.
    *
+   * If \p homogeneous == true, heterogeneous constraints are enforced
+   * as if they were homogeneous.  This might be appropriate for e.g. a
+   * vector representing a difference between two
+   * heterogeneously-constrained solutions.
+   */
+  void enforce_constraints_exactly (NumericVector<Number> & v,
+                                    bool homogeneous = false) const;
+
+  /**
+   * Constrains the numeric vector \p v, which represents a solution defined on
+   * the mesh.  This may need to be used after a linear solve, if your linear
+   * solver's solutions do not satisfy your DoF constraints to a tight enough
+   * tolerance.
+   *
    * If \p v == nullptr, the system solution vector is constrained
    *
    * If \p homogeneous == true, heterogeneous constraints are enforced
    * as if they were homogeneous.  This might be appropriate for e.g. a
    * vector representing a difference between two
    * heterogeneously-constrained solutions.
+   *
+   * Will be deprecated eventually; use the non-System& overload.
    */
   void enforce_constraints_exactly (const System & system,
                                     NumericVector<Number> * v = nullptr,

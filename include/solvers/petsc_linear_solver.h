@@ -148,6 +148,26 @@ public:
                                   const SubsetSolveMode subset_solve_mode=SUBSET_ZERO) override;
 
   /**
+   * After calling this method, all successive solves will be
+   * restricted to unconstrained dofs.  This mode can be disabled by
+   * calling this method with \p dof_map being a \p nullptr.
+   *
+   * This does a pure submatrix \ subvector solve, with no correction
+   * of the rhs to account for ignored columns (so the application of
+   * constraints to the matrix should be done symmetrically
+   * beforehand) and no post-solution application of ignored rows (so
+   * homogeneous or heterogeneous primal or heterogeneous adjoint
+   * constraints should be applied manually afterward)
+   */
+  virtual void restrict_solve_to_unconstrained (const DofMap * dof_map) override;
+
+  /**
+   * Returns the current restriction (or lack thereof) state with
+   * regard to constrained/unconstrained dofs.
+   */
+  virtual const DofMap * restrictions_to_unconstrained() override;
+
+  /**
    * Call the Petsc solver.  It calls the method below, using the
    * same matrix for the system and preconditioner matrices.
    */
@@ -344,9 +364,21 @@ private:
   WrappedPetsc<IS> _restrict_solve_to_is_complement;
 
   /**
-   * \returns The local size of \p _restrict_solve_to_is.
+   * DoFMap to use if we're restricting solves to unconstrained DoFs.
+   * (\p nullptr means solve on constrained DoFs too)
    */
-  PetscInt restrict_solve_to_is_local_size() const;
+  const DofMap * _restrict_to_unconstrained_dofmap;
+
+  /**
+   * PETSc index set containing unconstrained dofs on which to solve
+   * (\p nullptr means solve on all dofs).
+   */
+  WrappedPetsc<IS> _unconstrained_dofs_is;
+
+  /**
+   * \returns The local size of \p is.
+   */
+  PetscInt local_is_size(IS & is) const;
 
   /**
    * Creates \p _restrict_solve_to_is_complement to contain all

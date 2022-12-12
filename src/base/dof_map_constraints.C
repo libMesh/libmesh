@@ -2895,8 +2895,7 @@ void DofMap::constrain_nothing (std::vector<dof_id_type> & dofs) const
 
 
 
-void DofMap::enforce_constraints_exactly (const System & system,
-                                          NumericVector<Number> * v,
+void DofMap::enforce_constraints_exactly (NumericVector<Number> & v,
                                           bool homogeneous) const
 {
   parallel_object_only();
@@ -2906,13 +2905,10 @@ void DofMap::enforce_constraints_exactly (const System & system,
 
   LOG_SCOPE("enforce_constraints_exactly()","DofMap");
 
-  if (!v)
-    v = system.solution.get();
-
   NumericVector<Number> * v_local  = nullptr; // will be initialized below
   NumericVector<Number> * v_global = nullptr; // will be initialized below
   std::unique_ptr<NumericVector<Number>> v_built;
-  if (v->type() == SERIAL)
+  if (v.type() == SERIAL)
     {
       v_built = NumericVector<Number>::build(this->comm());
       v_built->init(this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
@@ -2920,39 +2916,38 @@ void DofMap::enforce_constraints_exactly (const System & system,
 
       for (dof_id_type i=v_built->first_local_index();
            i<v_built->last_local_index(); i++)
-        v_built->set(i, (*v)(i));
+        v_built->set(i, v(i));
       v_built->close();
       v_global = v_built.get();
 
-      v_local = v;
+      v_local = &v;
       libmesh_assert (v_local->closed());
     }
-  else if (v->type() == PARALLEL)
+  else if (v.type() == PARALLEL)
     {
       v_built = NumericVector<Number>::build(this->comm());
-      v_built->init (v->size(), v->local_size(),
+      v_built->init (v.size(), v.local_size(),
                      this->get_send_list(), true,
                      GHOSTED);
-      v->localize(*v_built, this->get_send_list());
+      v.localize(*v_built, this->get_send_list());
       v_built->close();
       v_local = v_built.get();
 
-      v_global = v;
+      v_global = &v;
     }
-  else if (v->type() == GHOSTED)
+  else if (v.type() == GHOSTED)
     {
-      v_local = v;
-      v_global = v;
+      v_local = &v;
+      v_global = &v;
     }
-  else // unknown v->type()
-    libmesh_error_msg("ERROR: Unsupported NumericVector type == " << Utility::enum_to_string(v->type()));
+  else // unknown v.type()
+    libmesh_error_msg("ERROR: Unsupported NumericVector type == " << Utility::enum_to_string(v.type()));
 
   // We should never hit these asserts because we should error-out in
   // else clause above.  Just to be sure we don't try to use v_local
   // and v_global uninitialized...
   libmesh_assert(v_local);
   libmesh_assert(v_global);
-  libmesh_assert_equal_to (this, &(system.get_dof_map()));
 
   for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
     {
@@ -2975,14 +2970,26 @@ void DofMap::enforce_constraints_exactly (const System & system,
 
   // If the old vector was serial, we probably need to send our values
   // to other processors
-  if (v->type() == SERIAL)
+  if (v.type() == SERIAL)
     {
 #ifndef NDEBUG
       v_global->close();
 #endif
-      v_global->localize (*v);
+      v_global->localize (v);
     }
-  v->close();
+  v.close();
+}
+
+void DofMap::enforce_constraints_exactly (const System & system,
+                                          NumericVector<Number> * v,
+                                          bool homogeneous) const
+{
+  libmesh_assert_equal_to (this, &(system.get_dof_map()));
+
+  if (!v)
+    v = system.solution.get();
+
+  this->enforce_constraints_exactly(*v, homogeneous);
 }
 
 void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & system,

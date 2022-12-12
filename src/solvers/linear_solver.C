@@ -144,6 +144,22 @@ LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int> * const dofs,
 
 
 template <typename T>
+void
+LinearSolver<T>::restrict_solve_to_unconstrained(const DofMap * dof_map)
+{
+  if (dof_map != nullptr)
+    libmesh_not_implemented();
+}
+
+
+template <typename T>
+const DofMap * LinearSolver<T>::restrictions_to_unconstrained()
+{
+  return nullptr; // No support unless this is overridden
+}
+
+
+template <typename T>
 std::pair<unsigned int, Real> LinearSolver<T>::adjoint_solve (SparseMatrix<T> & mat,
                                                               NumericVector<T> & sol,
                                                               NumericVector<T> & rhs,

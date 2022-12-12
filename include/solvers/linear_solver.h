@@ -40,6 +40,7 @@ template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
 template <typename T> class Preconditioner;
+class DofMap;
 class System;
 class SolverConfiguration;
 enum SolverPackage : int;
@@ -151,6 +152,26 @@ public:
    */
   virtual void restrict_solve_to (const std::vector<unsigned int> * const dofs,
                                   const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
+
+  /**
+   * After calling this method, all successive solves will be
+   * restricted to unconstrained dofs.  This mode can be disabled by
+   * calling this method with \p dof_map being a \p nullptr.
+   *
+   * This does a pure submatrix \ subvector solve, with no correction
+   * of the rhs to account for ignored columns (so the application of
+   * constraints to the matrix should be done symmetrically
+   * beforehand) and no post-solution application of ignored rows (so
+   * homogeneous or heterogeneous primal or heterogeneous adjoint
+   * constraints should be applied manually afterward)
+   */
+  virtual void restrict_solve_to_unconstrained (const DofMap * dof_map);
+
+  /**
+   * Returns the current restriction (or lack thereof) state with
+   * regard to constrained/unconstrained dofs.
+   */
+  virtual const DofMap * restrictions_to_unconstrained();
 
   /**
    * This function calls the solver \p _solver_type preconditioned
