@@ -305,6 +305,13 @@ public:
   virtual void side_postprocess (DiffContext &) {}
 
   /**
+   * After calling this method with \p true, all successive solves
+   * will be restricted to unconstrained dofs, with constraints
+   * applied separately as necessary.
+   */
+  virtual void restrict_solves_to_unconstrained(bool restricting) override;
+
+  /**
    * For a given second order (in time) variable var, this method will return
    * the index to the corresponding "dot" variable. For FirstOrderUnsteadySolver
    * classes, the "dot" variable would automatically be added and the returned

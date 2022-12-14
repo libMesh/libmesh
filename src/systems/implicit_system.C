@@ -108,6 +108,14 @@ void ImplicitSystem::disable_cache () {
 }
 
 
+void ImplicitSystem::restrict_solves_to_unconstrained(bool restricting) {
+  if (restricting)
+    this->get_linear_solver()->restrict_solve_to_unconstrained(&this->get_dof_map());
+  else
+    this->get_linear_solver()->restrict_solve_to_unconstrained(nullptr);
+}
+
+
 
 std::pair<unsigned int, Real>
 ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
@@ -152,7 +160,8 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
       totalrval.second += rval.second;
     }
 
-  // The linear solver may not have fit our constraints exactly
+  // The linear solver may not have fit our constraints exactly, or we
+  // might have disabled solves of constrained dofs
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   for (auto p : make_range(parameters.size()))
     this->get_dof_map().enforce_constraints_exactly
@@ -203,7 +212,8 @@ ImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
         totalrval.second += rval.second;
       }
 
-  // The linear solver may not have fit our constraints exactly
+  // The linear solver may not have fit our constraints exactly, or we
+  // might have disabled solves of constrained dofs
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   for (auto i : make_range(this->n_qois()))
     if (qoi_indices.has_index(i))
@@ -348,7 +358,8 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
         totalrval.second += rval.second;
       }
 
-  // The linear solver may not have fit our constraints exactly
+  // The linear solver may not have fit our constraints exactly, or we
+  // might have disabled solves of constrained dofs
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   for (auto i : make_range(this->n_qois()))
     if (qoi_indices.has_index(i))
@@ -432,7 +443,8 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector & parameters_i
                    double(solver_params.second),
                    solver_params.first);
 
-  // The linear solver may not have fit our constraints exactly
+  // The linear solver may not have fit our constraints exactly, or we
+  // might have disabled solves of constrained dofs
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   this->get_dof_map().enforce_constraints_exactly
     (*this, &this->get_weighted_sensitivity_solution(),

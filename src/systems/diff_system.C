@@ -176,6 +176,13 @@ std::pair<unsigned int, Real> DifferentiableSystem::get_linear_solve_parameters(
 }
 
 
+void DifferentiableSystem::restrict_solves_to_unconstrained(bool restricting) {
+  // We need to restrict both the linear solver that's used for
+  // adjoint and sensitivity solves *and* the forward solver.
+  ImplicitSystem::restrict_solves_to_unconstrained(restricting);
+  this->time_solver->diff_solver()->restrict_solves_to_unconstrained(restricting);
+}
+
 
 void DifferentiableSystem::add_second_order_dot_vars()
 {
