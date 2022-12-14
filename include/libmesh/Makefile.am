@@ -117,6 +117,7 @@ BUILT_SOURCES = \
         cell_pyramid.h \
         cell_pyramid13.h \
         cell_pyramid14.h \
+        cell_pyramid18.h \
         cell_pyramid5.h \
         cell_tet.h \
         cell_tet10.h \
@@ -909,6 +910,9 @@ cell_pyramid13.h: $(top_srcdir)/include/geom/cell_pyramid13.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_pyramid14.h: $(top_srcdir)/include/geom/cell_pyramid14.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_pyramid18.h: $(top_srcdir)/include/geom/cell_pyramid18.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_pyramid5.h: $(top_srcdir)/include/geom/cell_pyramid5.h

@@ -2363,6 +2363,8 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID13:
         case PYRAMID14:
           return 2;
+        case PYRAMID18:
+          return 3;
         default:
           return unknown;
         }
@@ -2399,6 +2401,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID5:
         case PYRAMID13:
         case PYRAMID14:
+        case PYRAMID18:
           return unlimited;
         default:
           return unknown;
@@ -2445,6 +2448,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID5:
         case PYRAMID13:
         case PYRAMID14:
+        case PYRAMID18:
           return 0;
         default:
           return unknown;
@@ -2485,6 +2489,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID5:
         case PYRAMID13:
         case PYRAMID14:
+        case PYRAMID18:
           return 0;
         default:
           return unknown;
@@ -2520,6 +2525,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID5:
         case PYRAMID13:
         case PYRAMID14:
+        case PYRAMID18:
           return unlimited;
         default:
           return unknown;
@@ -2557,6 +2563,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID5:
         case PYRAMID13:
         case PYRAMID14:
+        case PYRAMID18:
           return 0;
         default:
           return unknown;
@@ -2598,6 +2605,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID5:
         case PYRAMID13:
         case PYRAMID14:
+        case PYRAMID18:
           return 0;
         default:
           return unknown;
@@ -2642,6 +2650,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID5:
         case PYRAMID13:
         case PYRAMID14:
+        case PYRAMID18:
           return 0;
         default:
           return unknown;
@@ -2687,6 +2696,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID5:
         case PYRAMID13:
         case PYRAMID14:
+        case PYRAMID18:
           return 0;
         default:
           return unknown;

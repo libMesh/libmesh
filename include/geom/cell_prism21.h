@@ -214,7 +214,8 @@ public:
                             std::vector<dof_id_type> & conn) const override;
 
   /**
-   * \returns 2 for all edge nodes and 4 for face nodes.
+   * \returns 2 for all edge nodes, 4 for quad face nodes, 3 for tri
+   * face nodes, 6 for the interior node.
    */
   virtual unsigned int n_second_order_adjacent_vertices (const unsigned int) const override;
 

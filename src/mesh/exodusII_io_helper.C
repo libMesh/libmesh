@@ -542,6 +542,13 @@ void ExodusII_IO_Helper::init_conversion_map()
     conv.n_nodes = 14;
     conv.exodus_type = "PYRAMID14";
   }
+  {
+    auto & conv = conversion_map[PYRAMID18];
+    conv.libmesh_type = PYRAMID18;
+    conv.dim = 3;
+    conv.n_nodes = 18;
+    conv.exodus_type = "PYRAMID18";
+  }
 }
 
 
@@ -652,15 +659,12 @@ void ExodusII_IO_Helper::init_element_equivalence_map()
   // PRISM21 equivalences
   element_equivalence_map["WEDGE21"] = PRISM21;
 
-  // PYRAMID5 equivalences
+  // PYRAMID equivalences
   element_equivalence_map["PYRAMID"]  = PYRAMID5;
   element_equivalence_map["PYRAMID5"] = PYRAMID5;
-
-  // PYRAMID13 equivalences
   element_equivalence_map["PYRAMID13"] = PYRAMID13;
-
-  // PYRAMID14 equivalences
   element_equivalence_map["PYRAMID14"] = PYRAMID14;
+  element_equivalence_map["PYRAMID18"] = PYRAMID18;
 }
 
 const ExodusII_IO_Helper::Conversion &

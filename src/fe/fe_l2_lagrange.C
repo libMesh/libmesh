@@ -85,6 +85,7 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
           case PYRAMID5:
           case PYRAMID13:
           case PYRAMID14:
+          case PYRAMID18:
             return 5;
 
           case INVALID_ELEM:
@@ -147,6 +148,7 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
 
           case PYRAMID5:
           case PYRAMID14:
+          case PYRAMID18:
             return 14;
 
           case INVALID_ELEM:
@@ -180,6 +182,9 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
 
           case PRISM21:
             return 21;
+
+          case PYRAMID18:
+            return 18;
 
           case INVALID_ELEM:
             return 0;

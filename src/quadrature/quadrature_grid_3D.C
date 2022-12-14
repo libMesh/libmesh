@@ -111,6 +111,7 @@ void QGrid::init_3D(const ElemType, unsigned int)
     case PYRAMID5:
     case PYRAMID13:
     case PYRAMID14:
+    case PYRAMID18:
       {
         const unsigned int np = (_order+1)*(_order+2)*(_order+3)/6;
         _points.resize(np);

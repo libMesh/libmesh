@@ -188,8 +188,8 @@ public:
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
                              cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 14*n*n*n + 4*3*(n+1)*n*n));
         break;
-      case 18: // Second-order prisms and hexes use the same nodes
-      case 27:
+      case 18:
+      case 27: // Second-order prisms and hexes use the same nodes
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
                              cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1)));
         break;

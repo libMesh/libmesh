@@ -253,8 +253,9 @@ public:
               new_quasicc = elem->quasicircumcenter();
             for (const auto d : make_range(LIBMESH_DIM))
               {
+                // Getting a little FP error from Pyramid18
                 LIBMESH_ASSERT_FP_EQUAL(centroid(d), new_centroid(d),
-                                        TOLERANCE*TOLERANCE);
+                                        TOLERANCE*std::sqrt(TOLERANCE));
                 LIBMESH_ASSERT_FP_EQUAL(vertex_avg(d), new_vertex_avg(d),
                                         TOLERANCE*TOLERANCE);
                 LIBMESH_ASSERT_FP_EQUAL(quasicc(d), new_quasicc(d),
@@ -474,6 +475,13 @@ public:
             CPPUNIT_ASSERT_EQUAL((unsigned int)(18 + (s == 4)), elem->center_node_on_side(s));
           else if (elem->type() == PYRAMID14 && s == 4)
             CPPUNIT_ASSERT_EQUAL((unsigned int)(13), elem->center_node_on_side(s));
+          else if (elem->type() == PYRAMID18)
+            {
+              if (s < 4)
+                CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 14), elem->center_node_on_side(s));
+              else
+                CPPUNIT_ASSERT_EQUAL((unsigned int)(13), elem->center_node_on_side(s));
+            }
           else
             CPPUNIT_ASSERT_EQUAL(invalid_uint, elem->center_node_on_side(s));
         }
@@ -577,6 +585,7 @@ INSTANTIATE_ELEMTEST(PRISM21);
 INSTANTIATE_ELEMTEST(PYRAMID5);
 INSTANTIATE_ELEMTEST(PYRAMID13);
 INSTANTIATE_ELEMTEST(PYRAMID14);
+INSTANTIATE_ELEMTEST(PYRAMID18);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 INSTANTIATE_ELEMTEST(INFHEX8);

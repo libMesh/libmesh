@@ -76,6 +76,17 @@ public:
     for (unsigned int edge=4; edge<8; ++edge)
       CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4),
                            pyr14.local_edge_node(edge, /*node=*/1));
+
+    const Elem & pyr18 = ReferenceElem::get(PYRAMID18);
+    // The central node of the base should be node 13
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(13), pyr18.local_side_node(/*side=*/4, /*node=*/8));
+    // The central node of the sides should be nodes 14-17
+    for (unsigned int side=0; side<4; ++side)
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(14+side), pyr18.local_side_node(side, /*node=*/6));
+    // Second node of edges 4-7 is the apex node (4).
+    for (unsigned int edge=4; edge<8; ++edge)
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4),
+                           pyr18.local_edge_node(edge, /*node=*/1));
   }
 
 

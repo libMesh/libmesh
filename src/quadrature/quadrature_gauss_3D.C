@@ -531,6 +531,7 @@ void QGauss::init_3D(const ElemType, unsigned int)
     case PYRAMID5:
     case PYRAMID13:
     case PYRAMID14:
+    case PYRAMID18:
       {
         // We compute the Pyramid rule as a conical product of a
         // Jacobi rule with alpha==2 on the interval [0,1] two 1D

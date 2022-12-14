@@ -5,6 +5,9 @@
 #ifndef _WIN_GETTIMEOFDAY_H_
 #define _WIN_GETTIMEOFDAY_H_
 
+#include "libmesh/libmesh_config.h"
+
+#ifndef LIBMESH_HAVE_GETTIMEOFDAY
 #ifdef _MSC_VER
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -39,5 +42,6 @@ inline int gettimeofday(struct timeval * tp, struct timezone * tzp)
 #else // _MSC_VER
 #error "gettimeofday() is not implemented"
 #endif // _MSC_VER
+#endif // !LIBMESH_HAVE_GETTIMEOFDAY
 
 #endif // _WIN_GETTIMEOFDAY_H_

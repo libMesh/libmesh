@@ -1325,6 +1325,16 @@ OutputShape fe_fdm_deriv(const Elem * elem,
                             const bool));
 
 template <typename OutputShape>
+OutputShape fe_fdm_deriv(const ElemType type,
+                         const Order order,
+                         const unsigned int i,
+                         const unsigned int j,
+                         const Point & p,
+                         OutputShape(*shape_func)
+                           (const ElemType, const Order,
+                            const unsigned int, const Point &));
+
+template <typename OutputShape>
 OutputShape
 fe_fdm_second_deriv(const Elem * elem,
                     const Order order,
@@ -1336,6 +1346,18 @@ fe_fdm_second_deriv(const Elem * elem,
                       (const Elem *, const Order,
                        const unsigned int, const unsigned int,
                        const Point &, const bool));
+
+template <typename OutputShape>
+OutputShape fe_fdm_second_deriv(const ElemType type,
+                                const Order order,
+                                const unsigned int i,
+                                const unsigned int j,
+                                const Point & p,
+                                OutputShape(*deriv_func)
+                                  (const ElemType, const Order,
+                                   const unsigned int,
+                                   const unsigned int,
+                                   const Point &));
 
 /**
  * Helper functions for Lagrange-based basis functions.

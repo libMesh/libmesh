@@ -58,6 +58,7 @@
 #include "libmesh/cell_pyramid5.h"
 #include "libmesh/cell_pyramid13.h"
 #include "libmesh/cell_pyramid14.h"
+#include "libmesh/cell_pyramid18.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/quadrature_nodal.h"
@@ -336,6 +337,8 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
       return std::make_unique<Pyramid13>(p);
     case PYRAMID14:
       return std::make_unique<Pyramid14>(p);
+    case PYRAMID18:
+      return std::make_unique<Pyramid18>(p);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       // 1D infinite elements
@@ -2647,6 +2650,7 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
     case PYRAMID5:
     case PYRAMID13:
     case PYRAMID14:
+    case PYRAMID18:
       return PYRAMID5;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -2774,6 +2778,8 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
       return PRISM20;
     case PRISM21:
       return PRISM21;
+    case PYRAMID18:
+      return PYRAMID18;
 
     case PYRAMID5:
     case PYRAMID13:

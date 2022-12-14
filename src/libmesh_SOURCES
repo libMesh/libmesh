@@ -141,6 +141,7 @@ libmesh_SOURCES =  \
         src/geom/cell_pyramid.C \
         src/geom/cell_pyramid13.C \
         src/geom/cell_pyramid14.C \
+        src/geom/cell_pyramid18.C \
         src/geom/cell_pyramid5.C \
         src/geom/cell_tet.C \
         src/geom/cell_tet10.C \

@@ -251,32 +251,34 @@ void lagrange_nodal_soln(const Elem * elem,
               return;
             }
 
-          case PYRAMID13:
+          case PYRAMID18:
             {
-              libmesh_assert_equal_to (elem_soln.size(), 5);
-              libmesh_assert_equal_to (nodal_soln.size(), 13);
+              libmesh_assert_equal_to (nodal_soln.size(), 18);
 
-              nodal_soln[0]  = elem_soln[0];
-              nodal_soln[1]  = elem_soln[1];
-              nodal_soln[2]  = elem_soln[2];
-              nodal_soln[3]  = elem_soln[3];
-              nodal_soln[4]  = elem_soln[4];
-              nodal_soln[5]  = .5*(elem_soln[0] + elem_soln[1]);
-              nodal_soln[6]  = .5*(elem_soln[1] + elem_soln[2]);
-              nodal_soln[7]  = .5*(elem_soln[2] + elem_soln[3]);
-              nodal_soln[8]  = .5*(elem_soln[3] + elem_soln[0]);
-              nodal_soln[9]  = .5*(elem_soln[0] + elem_soln[4]);
-              nodal_soln[10] = .5*(elem_soln[1] + elem_soln[4]);
-              nodal_soln[11] = .5*(elem_soln[2] + elem_soln[4]);
-              nodal_soln[12] = .5*(elem_soln[3] + elem_soln[4]);
+              nodal_soln[14] = (elem_soln[0] + elem_soln[1] + elem_soln[4])/Real(3);
+              nodal_soln[15] = (elem_soln[1] + elem_soln[2] + elem_soln[4])/Real(3);
+              nodal_soln[16] = (elem_soln[2] + elem_soln[3] + elem_soln[4])/Real(3);
+              nodal_soln[17] = (elem_soln[0] + elem_soln[3] + elem_soln[4])/Real(3);
 
-              return;
+              libmesh_fallthrough();
             }
 
           case PYRAMID14:
             {
+              if (type == PYRAMID14)
+                libmesh_assert_equal_to (nodal_soln.size(), 14);
+
+              nodal_soln[13] = .25*(elem_soln[0] + elem_soln[1] + elem_soln[2] + elem_soln[3]);
+
+              libmesh_fallthrough();
+            }
+
+          case PYRAMID13:
+            {
               libmesh_assert_equal_to (elem_soln.size(), 5);
-              libmesh_assert_equal_to (nodal_soln.size(), 14);
+
+              if (type == PYRAMID13)
+                libmesh_assert_equal_to (nodal_soln.size(), 13);
 
               nodal_soln[0]  = elem_soln[0];
               nodal_soln[1]  = elem_soln[1];
@@ -291,11 +293,9 @@ void lagrange_nodal_soln(const Elem * elem,
               nodal_soln[10] = .5*(elem_soln[1] + elem_soln[4]);
               nodal_soln[11] = .5*(elem_soln[2] + elem_soln[4]);
               nodal_soln[12] = .5*(elem_soln[3] + elem_soln[4]);
-              nodal_soln[13] = .25*(elem_soln[0] + elem_soln[1] + elem_soln[2] + elem_soln[3]);
 
               return;
             }
-
           default:
             {
               // By default the element solution _is_ nodal,
@@ -448,6 +448,7 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
           case PYRAMID5:
           case PYRAMID13:
           case PYRAMID14:
+          case PYRAMID18:
             return 5;
 
           case INVALID_ELEM:
@@ -503,6 +504,7 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
             return 13;
 
           case PYRAMID14:
+          case PYRAMID18:
             return 14;
 
           case INVALID_ELEM:
@@ -528,6 +530,9 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
 
           case PRISM21:
             return 21;
+
+          case PYRAMID18:
+            return 18;
 
           case TRI7:
             return 7;
@@ -681,6 +686,7 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
           case PYRAMID5:
           case PYRAMID13:
           case PYRAMID14:
+          case PYRAMID18:
             {
               switch (n)
                 {
@@ -729,6 +735,9 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
           case PRISM21:
             return (n < 18);
 
+          case PYRAMID18:
+            return (n < 14);
+
           case TRI7:
             return (n < 6);
 
@@ -751,6 +760,7 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
           case EDGE4:
           case PRISM20:
           case PRISM21:
+          case PYRAMID18:
           case TRI7:
           case TET14:
             return 1;

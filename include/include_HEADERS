@@ -127,6 +127,7 @@ include_HEADERS =  \
         geom/cell_pyramid.h \
         geom/cell_pyramid13.h \
         geom/cell_pyramid14.h \
+        geom/cell_pyramid18.h \
         geom/cell_pyramid5.h \
         geom/cell_tet.h \
         geom/cell_tet10.h \
@@ -484,4 +485,5 @@ include_HEADERS =  \
         utils/tree_node.h \
         utils/utility.h \
         utils/vectormap.h \
+        utils/win_gettimeofday.h \
         utils/xdr_cxx.h 

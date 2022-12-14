@@ -498,6 +498,16 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         nodes[5] = Point (0.,1.,1.);
         return;
       }
+    case PYRAMID18:
+      {
+        // triangle centers
+        nodes[14] = Point (-2/Real(3),0.,1/Real(3));
+        nodes[15] = Point (0.,2/Real(3),1/Real(3));
+        nodes[16] = Point (2/Real(3),0.,1/Real(3));
+        nodes[17] = Point (0.,-2/Real(3),1/Real(3));
+
+        libmesh_fallthrough();
+      }
     case PYRAMID14:
       {
         // base center
@@ -675,6 +685,7 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
     case PYRAMID5:
     case PYRAMID13:
     case PYRAMID14:
+    case PYRAMID18:
       {
         // Check that the point is on the same side of all the faces
         // by testing whether:
