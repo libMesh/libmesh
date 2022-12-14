@@ -790,6 +790,17 @@ int main (int argc, char ** argv)
 
   equation_systems.init ();
 
+  if (infile.search("--restrict_solves_to_unconstrained"))
+    {
+      libMesh::out << "Restricting solves to unconstrained DoFs" << std::endl;
+      system.restrict_solves_to_unconstrained(true);
+      libmesh_assert_equal_to(system.get_linear_solver()->restrictions_to_unconstrained(),
+                              &system.get_dof_map());
+      libmesh_assert(system.get_time_solver().diff_solver()->get_restrict_solves_to_unconstrained());
+    }
+  else
+    libMesh::out << "Not restricting solves to unconstrained DoFs" << std::endl;
+
   // Print information about the mesh and system to the screen.
   mesh.print_info();
   equation_systems.print_info();
@@ -830,8 +841,16 @@ int main (int argc, char ** argv)
                    << std::endl
                    << std::endl;
 
+      libmesh_assert_equal_to(system.get_linear_solver()->restrictions_to_unconstrained(),
+                              &system.get_dof_map());
+      libmesh_assert(system.get_time_solver().diff_solver()->get_restrict_solves_to_unconstrained());
+
       // Solve the forward system
       system.solve();
+
+      libmesh_assert_equal_to(system.get_linear_solver()->restrictions_to_unconstrained(),
+                              &system.get_dof_map());
+      libmesh_assert(system.get_time_solver().diff_solver()->get_restrict_solves_to_unconstrained());
 
       // Write the output
       write_output(equation_systems, 0, a_step, "primal", param);
