@@ -140,6 +140,15 @@ public:
   sys_type & system () { return _system; }
 
   /**
+   * After calling this method with \p true, all successive solves
+   * will be restricted to unconstrained dofs, with constraints
+   * applied separately as necessary.
+   */
+  virtual void restrict_solves_to_unconstrained(bool restricting) = 0;
+
+  virtual bool get_restrict_solves_to_unconstrained() = 0;
+
+  /**
    * Each linear solver step should exit after \p max_linear_iterations
    * is exceeded.
    */

@@ -89,6 +89,15 @@ public:
   }
 
   /**
+   * After calling this method with \p true, all successive solves
+   * will be restricted to unconstrained dofs, with constraints
+   * applied separately as necessary.
+   */
+  virtual void restrict_solves_to_unconstrained(bool restricting) override;
+
+  virtual bool get_restrict_solves_to_unconstrained() override;
+
+  /**
    * If this is set to true, the solver is forced to test the residual
    * after each Newton step, and to reduce the length of its steps
    * whenever necessary to avoid a residual increase.

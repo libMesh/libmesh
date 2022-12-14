@@ -58,7 +58,13 @@ void TimeSolver::reinit ()
   this->diff_solver()->reinit();
 
   libmesh_assert(this->linear_solver().get());
+  const DofMap * d = this->linear_solver()->restrictions_to_unconstrained();
+
+  // Clear what might be invalidated by system changes
   this->linear_solver()->clear();
+
+  // Then "un-clear" a few things
+  this->linear_solver()->restrict_solve_to_unconstrained(d);
   if (libMesh::on_command_line("--solver-system-names"))
     this->linear_solver()->init((_system.name()+"_").c_str());
   else

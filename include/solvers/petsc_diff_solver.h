@@ -87,6 +87,17 @@ public:
   void clear ();
 
   /**
+   * After calling this method with \p true, all successive solves
+   * will be restricted to unconstrained dofs, with constraints
+   * applied separately as necessary.
+   */
+  virtual void restrict_solves_to_unconstrained(bool restricting) override
+  { if (restricting) libmesh_not_implemented(); }
+
+  virtual bool get_restrict_solves_to_unconstrained() override
+  { return false; }
+
+  /**
    * This method performs a solve.  What occurs in
    * this method will depend on the PETSc SNES settings.
    * See the PETSc documentation for more details.

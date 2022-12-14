@@ -270,11 +270,33 @@ void NewtonSolver::reinit()
 {
   Parent::reinit();
 
+  const DofMap * d = _linear_solver->restrictions_to_unconstrained();
+
+  // Clear what might be invalidated by system changes
   _linear_solver->clear();
 
+  // Then "un-clear" a few things
+  _linear_solver->restrict_solve_to_unconstrained(d);
   _linear_solver->init_names(_system);
 }
 
+
+void NewtonSolver::restrict_solves_to_unconstrained(bool restricting)
+{
+  if (restricting)
+    {
+      const DofMap * d = &this->system().get_dof_map();
+      this->get_linear_solver().restrict_solve_to_unconstrained(d);
+    }
+  else
+    this->get_linear_solver().restrict_solve_to_unconstrained(nullptr);
+}
+
+
+bool NewtonSolver::get_restrict_solves_to_unconstrained()
+{
+  return this->get_linear_solver().restrictions_to_unconstrained();
+}
 
 
 unsigned int NewtonSolver::solve()
