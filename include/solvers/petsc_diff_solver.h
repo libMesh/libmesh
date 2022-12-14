@@ -91,11 +91,9 @@ public:
    * will be restricted to unconstrained dofs, with constraints
    * applied separately as necessary.
    */
-  virtual void restrict_solves_to_unconstrained(bool restricting) override
-  { if (restricting) libmesh_not_implemented(); }
+  virtual void restrict_solves_to_unconstrained(bool restricting) override;
 
-  virtual bool get_restrict_solves_to_unconstrained() override
-  { return false; }
+  virtual bool get_restrict_solves_to_unconstrained() override;
 
   /**
    * This method performs a solve.  What occurs in
@@ -103,6 +101,24 @@ public:
    * See the PETSc documentation for more details.
    */
   virtual unsigned int solve () override;
+
+  /*
+   * Scatter connecting full vectors with unconstrained subvectors
+   */
+  WrappedPetsc<VecScatter> scatter;
+
+  /*
+   * Submatrix of Jacobian with unconstrained-unconstrained coupling
+   */
+  WrappedPetsc<Mat> submat;
+
+  bool submat_created;
+
+  /**
+   * PETSc index set containing unconstrained dofs on which to solve
+   * (\p nullptr means solve on all dofs).
+   */
+  WrappedPetsc<IS> _unconstrained_dofs_is;
 
 protected:
 
@@ -119,6 +135,11 @@ protected:
   PetscDMWrapper _dm_wrapper;
 #endif
 #endif
+
+  /**
+   * Are we restricting solves to unconstrained DoFs?
+   */
+  bool _restrict_to_unconstrained;
 
 private:
 
