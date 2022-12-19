@@ -1840,14 +1840,23 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
+  // Call check_dirichlet_bcid_consistency() to check if the boundaries on
+  // which we have defined DirichletBoundary objects are actually defined in
+  // the mesh. Note that we may have set up _dirichlet_boundaries differently
+  // on different processors, and mesh boundary IDs may also be different on
+  // different processors, so we do some parallel communication in order to
+  // set up all_dirichlet_bcids, as well as to check if the IDs are found
+  // inside check_dirichlet_bcid_consistency().
+  std::set<boundary_id_type> all_dirichlet_bcids;
+  for (const auto & dirichlet : *_dirichlet_boundaries)
+  {
+    all_dirichlet_bcids.insert(dirichlet->b.begin(), dirichlet->b.end());
+  }
+  this->comm().set_union(all_dirichlet_bcids);
+  this->check_dirichlet_bcid_consistency(mesh, all_dirichlet_bcids);
+
   if (!_dirichlet_boundaries->empty())
     {
-      // Sanity check that the boundary ids associated with the
-      // DirichletBoundary objects are actually present in the
-      // mesh.
-      for (const auto & dirichlet : *_dirichlet_boundaries)
-        this->check_dirichlet_bcid_consistency(mesh, *dirichlet);
-
       // Threaded loop over local over elems applying all Dirichlet BCs
       Threads::parallel_for
         (range,
@@ -5320,7 +5329,7 @@ void DofMap::remove_adjoint_dirichlet_boundary (const DirichletBoundary & bounda
 
 
 void DofMap::check_dirichlet_bcid_consistency (const MeshBase & mesh,
-                                               const DirichletBoundary & boundary) const
+                                               const std::set<boundary_id_type>& dbc_bcids) const
 {
   const std::set<boundary_id_type>& mesh_side_bcids =
     mesh.get_boundary_info().get_boundary_ids();
@@ -5328,16 +5337,9 @@ void DofMap::check_dirichlet_bcid_consistency (const MeshBase & mesh,
     mesh.get_boundary_info().get_edge_boundary_ids();
   const std::set<boundary_id_type>& mesh_node_bcids =
     mesh.get_boundary_info().get_node_boundary_ids();
-  const std::set<boundary_id_type>& dbc_bcids = boundary.b;
-
-  // DirichletBoundary id sets should be consistent across all ranks
-  libmesh_assert(mesh.comm().verify(dbc_bcids.size()));
 
   for (const auto & bc_id : dbc_bcids)
     {
-      // DirichletBoundary id sets should be consistent across all ranks
-      libmesh_assert(mesh.comm().verify(bc_id));
-
       bool found_bcid = (mesh_side_bcids.find(bc_id) != mesh_side_bcids.end() ||
                          mesh_edge_bcids.find(bc_id) != mesh_edge_bcids.end() ||
                          mesh_node_bcids.find(bc_id) != mesh_node_bcids.end());
