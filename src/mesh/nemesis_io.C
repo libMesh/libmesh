@@ -902,6 +902,10 @@ void Nemesis_IO::read (const std::string & base_filename)
         } // for (unsigned int j=0; j<nemhelper->num_elem_this_blk; j++)
     } // end for (unsigned int i=0; i<nemhelper->num_elem_blk; i++)
 
+  for (const auto & [id, name] : nemhelper->id_to_block_names)
+    if (name != "")
+      mesh.subdomain_name(id) = name;
+
   if (_verbose)
     {
       // Print local elems_of_dimension information
@@ -1057,6 +1061,10 @@ void Nemesis_IO::read (const std::string & base_filename)
                                         cast_int<boundary_id_type>(nemhelper->id_list[e]));
     }
 
+  for (const auto & [id, name] : nemhelper->id_to_ss_names)
+    if (name != "")
+      mesh.get_boundary_info().sideset_name(id) = name;
+
   // Debugging: make sure there are as many boundary conditions in the
   // boundary ID object as expected.  Note that, at this point, the
   // mesh still thinks it's serial, so n_boundary_conds() returns the
@@ -1141,6 +1149,10 @@ void Nemesis_IO::read (const std::string & base_filename)
              cast_int<boundary_id_type>(nodeset_id));
         }
     }
+
+  for (const auto & [id, name] : nemhelper->id_to_ns_names)
+    if (name != "")
+      mesh.get_boundary_info().nodeset_name(id) = name;
 
   // See what the elem count is up to now.
   if (_verbose)
