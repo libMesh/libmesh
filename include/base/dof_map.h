@@ -1381,14 +1381,11 @@ public:
   get_adjoint_dirichlet_boundaries(unsigned int q);
 
   /**
-   * Check that all the \p dbc_bcids (which typically come from DirichetBoundary objects)
-   * are actually present in the mesh. If not, this will throw an error.
-   * This method is useful for detecting the case where DirichletBoundary objects have
-   * been defined using IDs that are not present in the mesh, since this usually indicates
-   * that there is some error in the model setup.
+   * Check that all the ids in dirichlet_bcids are actually present in the mesh.
+   * If not, this will throw an error.
    */
   void check_dirichlet_bcid_consistency (const MeshBase & mesh,
-                                         const std::set<boundary_id_type>& dbc_bcids) const;
+                                         const DirichletBoundary & boundary) const;
 #endif // LIBMESH_ENABLE_DIRICHLET
 
 
