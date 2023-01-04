@@ -181,7 +181,8 @@ DofMap::DofMap(const unsigned int number,
   , _adjoint_dirichlet_boundaries()
 #endif
   , _implicit_neighbor_dofs_initialized(false),
-  _implicit_neighbor_dofs(false)
+  _implicit_neighbor_dofs(false),
+  _verify_dirichlet_bc_consistency(true)
 {
   _matrices.clear();
 
@@ -1704,6 +1705,11 @@ void DofMap::set_implicit_neighbor_dofs(bool implicit_neighbor_dofs)
 {
   _implicit_neighbor_dofs_initialized = true;
   _implicit_neighbor_dofs = implicit_neighbor_dofs;
+}
+
+void DofMap::set_verify_dirichlet_bc_consistency(bool val)
+{
+  _verify_dirichlet_bc_consistency = val;
 }
 
 

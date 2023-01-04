@@ -1844,9 +1844,14 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
     {
       // Sanity check that the boundary ids associated with the
       // DirichletBoundary objects are actually present in the
-      // mesh.
-      for (const auto & dirichlet : *_dirichlet_boundaries)
-        this->check_dirichlet_bcid_consistency(mesh, *dirichlet);
+      // mesh. We do this check by default, but in cases where you
+      // intentionally add "inconsistent but valid" DirichletBoundary
+      // objects in parallel, this check can deadlock since it does a
+      // collective communication internally. In that case it is
+      // possible to disable this check by setting the flag to false.
+      if (_verify_dirichlet_bc_consistency)
+        for (const auto & dirichlet : *_dirichlet_boundaries)
+          this->check_dirichlet_bcid_consistency(mesh, *dirichlet);
 
       // Threaded loop over local over elems applying all Dirichlet BCs
       Threads::parallel_for
