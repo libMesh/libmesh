@@ -845,6 +845,11 @@ public:
   void set_implicit_neighbor_dofs(bool implicit_neighbor_dofs);
 
   /**
+   * Set the _verify_dirichlet_bc_consistency flag.
+   */
+  void set_verify_dirichlet_bc_consistency(bool val);
+
+  /**
    * Tells other library functions whether or not this problem
    * includes coupling between dofs in neighboring cells, as can
    * currently be specified on the command line or inferred from
@@ -1924,6 +1929,18 @@ private:
    */
   bool _implicit_neighbor_dofs_initialized;
   bool _implicit_neighbor_dofs;
+
+  /**
+   * Flag which determines whether we should do some additional
+   * checking of the consistency of the DirichletBoundary objects
+   * added by the user. Defaults to true, but can be disabled in cases
+   * where you only want to add DirichletBoundary objects "locally"
+   * and can guarantee that no repartitioning will be done, since
+   * repartitioning could cause processors to own new boundary sides
+   * for which they no longer have the proper DirichletBoundary
+   * objects stored.
+   */
+  bool _verify_dirichlet_bc_consistency;
 };
 
 
