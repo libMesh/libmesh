@@ -18,8 +18,6 @@
 #ifndef LIBMESH_HASHING_H
 #define LIBMESH_HASHING_H
 
-#include "libmesh/hashword.h"
-
 #include <functional>
 
 namespace libMesh
