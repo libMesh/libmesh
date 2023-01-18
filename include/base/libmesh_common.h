@@ -142,7 +142,7 @@ typedef LIBMESH_DEFAULT_SCALAR_TYPE Real;
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
 // Temporary
-typedef MetaPhysicL::DualNumber<Real, MetaPhysicL::SemiDynamicSparseNumberArray<Real, dof_id_type, MetaPhysicL::NWrapper<300>>> GeomReal;
+typedef MetaPhysicL::DualNumber<Real, MetaPhysicL::SemiDynamicSparseNumberArray<Real, dof_id_type, MetaPhysicL::NWrapper<300>>, true> GeomReal;
 #else
 typedef Real GeomReal;
 #endif
