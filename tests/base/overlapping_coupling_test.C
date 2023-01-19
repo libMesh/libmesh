@@ -298,7 +298,7 @@ protected:
 #endif // LIBMESH_ENABLE_AMR
   }
 
-  void init(MeshBase & mesh)
+  void init()
   {
     _es = std::make_unique<EquationSystems>(*_mesh);
     LinearImplicitSystem & sys = _es->add_system<LinearImplicitSystem> ("SimpleSystem");
@@ -373,7 +373,7 @@ public:
   void setUp()
   {
     this->build_quad_mesh();
-    this->init(*_mesh);
+    this->init();
   }
 
   void tearDown()
@@ -544,7 +544,7 @@ private:
   void run_ghosting_test(const unsigned int n_refinements, bool build_coupling_matrix)
   {
     this->build_quad_mesh(n_refinements);
-    this->init(*_mesh);
+    this->init();
 
     std::unique_ptr<CouplingMatrix> coupling_matrix;
     if (build_coupling_matrix)
@@ -662,7 +662,7 @@ private:
   void run_sparsity_pattern_test(const unsigned int n_refinements, bool build_coupling_matrix)
   {
     this->build_quad_mesh(n_refinements);
-    this->init(*_mesh);
+    this->init();
 
     std::unique_ptr<CouplingMatrix> coupling_matrix;
     if (build_coupling_matrix)

@@ -47,7 +47,7 @@ struct PeriodicQuadFunction : public FunctionBase<Number>
   { libmesh_error(); }
 
   virtual void operator() (const Point & p,
-                           const Real time,
+                           const Real,
                            DenseVector<Number> & output) override
   {
     libmesh_assert_equal_to(output.size(), 1);
@@ -72,7 +72,7 @@ struct PeriodicQuadFunction : public FunctionBase<Number>
 
 
 void periodic_bc_test_poisson(EquationSystems& es,
-                              const std::string& system_name)
+                              const std::string&)
 {
   const MeshBase& mesh = es.get_mesh();
   LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("PBCSys");

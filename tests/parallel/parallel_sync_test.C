@@ -219,7 +219,7 @@ public:
 
     auto compose_replies =
       []
-      (processor_id_type pid,
+      (processor_id_type,
        const std::vector<unsigned int> & query,
        std::vector<unsigned int> & response)
       {
@@ -354,7 +354,7 @@ public:
 
     auto compose_replies =
       []
-      (processor_id_type pid,
+      (processor_id_type,
        const std::vector<std::vector<unsigned int>> & query,
        std::vector<std::vector<unsigned int>> & response)
       {

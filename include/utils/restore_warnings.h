@@ -31,3 +31,7 @@
 #pragma GCC diagnostic pop
 #endif // GCC > 4.5
 #endif // __GNUC__ && !__INTEL_COMPILER
+
+#ifdef __NVCOMPILER
+#  pragma nv_diagnostic pop
+#endif

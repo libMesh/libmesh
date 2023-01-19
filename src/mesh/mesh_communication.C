@@ -48,6 +48,7 @@
 
 //-----------------------------------------------
 // anonymous namespace for implementation details
+#ifdef LIBMESH_HAVE_MPI
 namespace {
 
 using namespace libMesh;
@@ -127,8 +128,8 @@ struct SyncNeighbors
   }
 };
 
-
-}
+} // anonymous namespace
+#endif // LIBMESH_HAVE_MPI
 
 
 

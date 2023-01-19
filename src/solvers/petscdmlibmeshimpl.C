@@ -878,7 +878,7 @@ static PetscErrorCode  DMView_libMesh(DM dm, PetscViewer viewer)
           if (dit != dbegin) {
             ierr = PetscViewerASCIIPrintf(viewer, ","); CHKERRQ(ierr);
           }
-          ierr = PetscViewerASCIIPrintf(viewer, LIBMESH_PETSCINT_FMT, *dit); CHKERRQ(ierr);
+          ierr = PetscViewerASCIIPrintf(viewer, "%u", *dit); CHKERRQ(ierr);
         }
         ierr = PetscViewerASCIIPrintf(viewer, ";"); CHKERRQ(ierr);
       }

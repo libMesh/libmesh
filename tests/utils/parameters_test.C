@@ -31,6 +31,7 @@ public:
   template <typename T>
   void testScalar ()
   {
+    [[maybe_unused]] // nvc++ has some issues...
     Parameters param;
 
     T t = 10, t_orig = 10;

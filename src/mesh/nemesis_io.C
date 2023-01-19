@@ -45,6 +45,8 @@ namespace libMesh
 //-----------------------------------------------
 // anonymous namespace for implementation details
 namespace {
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 struct CompareGlobalIdxMappings
 {
   // strict weak ordering for a.first -> a.second mapping.  since we can only map to one
@@ -59,6 +61,7 @@ struct CompareGlobalIdxMappings
                   const unsigned int b) const
   { return a.first < b; }
 };
+#endif // defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
 // Nemesis & ExodusII use int for all integer values, even the ones which
 // should never be negative.  we like to use unsigned as a force of habit,

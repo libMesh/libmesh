@@ -38,13 +38,13 @@ class SkewFunc : public FunctionBase<Real>
   std::unique_ptr<FunctionBase<Real>> clone () const override
   { return std::make_unique<SkewFunc>(); }
 
-  Real operator() (const Point & p,
-                     const Real time = 0.) override
+  Real operator() (const Point &,
+                   const Real = 0.) override
   { libmesh_not_implemented(); } // scalar-only API
 
   // Skew in x based on y, y based on z
   void operator() (const Point & p,
-                   const Real time,
+                   const Real,
                    DenseVector<Real> & output)
   {
     output.resize(3);

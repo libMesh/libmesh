@@ -235,6 +235,8 @@ public:
 
     // FIXME - Nemesis still needs work for vector-valued variables
     // testSolution(read_mesh, sys2);
+#else
+    libmesh_ignore(filename);
 #endif // #ifdef LIBMESH_HAVE_NEMESIS_API
   }
 

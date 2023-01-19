@@ -384,12 +384,13 @@ void Prism21::build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i
 
 
 
-void Prism21::connectivity(const unsigned int sc,
-                           const IOPackage iop,
-                           std::vector<dof_id_type> & conn) const
+void Prism21::connectivity(const unsigned int /*sc*/,
+                           const IOPackage /*iop*/,
+                           std::vector<dof_id_type> & /*conn*/) const
 {
   libmesh_not_implemented(); // FIXME RHS
 
+/*
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
   libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
@@ -548,6 +549,7 @@ void Prism21::connectivity(const unsigned int sc,
     default:
       libmesh_error_msg("Unsupported IO package " << iop);
     }
+*/
 }
 
 

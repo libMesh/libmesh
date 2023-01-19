@@ -42,7 +42,8 @@
 #endif
 
 
-#ifdef LIBMESH_HAVE_LIBHILBERT
+#if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
+
 namespace { // anonymous namespace for helper functions
 
 using namespace libMesh;
@@ -165,8 +166,9 @@ private:
   const libMesh::BoundingBox & _bbox;
   std::vector<Parallel::DofObjectKey> & _keys;
 };
+
 }
-#endif
+#endif // defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 
 
 namespace libMesh

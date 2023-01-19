@@ -145,12 +145,16 @@ const std::vector<int> hex_inverse_face_map = {5, 1, 2, 3, 4, 6};
 const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
 
 // 3D element edge maps. Map 0-based Exodus id -> libMesh id.
-const std::vector<int> hex_edge_map =
-  {0,1,2,3,8,9,10,11,4,5,7,6};
+// Commented out until we have code that needs it, to keep compiler
+// warnings happy.
+// const std::vector<int> hex_edge_map =
+  // {0,1,2,3,8,9,10,11,4,5,7,6};
 
 // 3D inverse element edge maps. Map libmesh edge ids to 1-based Exodus edge ids.
-const std::vector<int> hex_inverse_edge_map =
-  {1,2,3,4,9,10,12,11,5,6,7,8};
+// Commented out until we have code that needs it, to keep compiler
+// warnings happy.
+// const std::vector<int> hex_inverse_edge_map =
+  // {1,2,3,4,9,10,12,11,5,6,7,8};
 
   /**
    * \returns The value obtained from a generic exII::ex_inquire() call.

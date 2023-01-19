@@ -200,31 +200,32 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
       // the quadrature points must be assembled differently for lower dims.
       libmesh_not_implemented();
     }
-  {
-    const std::vector<Real> & radial_qw = radial_qrule->get_weights();
-    const std::vector<Real> & base_qw   = base_qrule->get_weights();
-    const std::vector<Point> & radial_qp = radial_qrule->get_points();
-    const std::vector<Point> & base_qp   = base_qrule->get_points();
+  else
+    {
+      const std::vector<Real> & radial_qw = radial_qrule->get_weights();
+      const std::vector<Real> & base_qw   = base_qrule->get_weights();
+      const std::vector<Point> & radial_qp = radial_qrule->get_points();
+      const std::vector<Point> & base_qp   = base_qrule->get_points();
 
-    libmesh_assert_equal_to (radial_qw.size(), n_radial_qp);
-    libmesh_assert_equal_to (base_qw.size(), n_base_qp);
+      libmesh_assert_equal_to (radial_qw.size(), n_radial_qp);
+      libmesh_assert_equal_to (base_qw.size(), n_base_qp);
 
-    for (unsigned int rp=0; rp<n_radial_qp; rp++)
-      for (unsigned int bp=0; bp<n_base_qp; bp++)
-        {
-          _total_qrule_weights[bp + rp*n_base_qp] = radial_qw[rp] * base_qw[bp];
-          // initialize the quadrature-points for the 2D side element
-          // - either the base element or it has a 1D base + radial direction.
-          if (inf_side->infinite())
-            qp[bp + rp*n_base_qp]=Point(base_qp[bp](0),
-                                        0.,
-                                        radial_qp[rp](0));
-          else
-            qp[bp + rp*n_base_qp]=Point(base_qp[bp](0),
-                                        base_qp[bp](1),
-                                        -1.);
-        }
-  }
+      for (unsigned int rp=0; rp<n_radial_qp; rp++)
+        for (unsigned int bp=0; bp<n_base_qp; bp++)
+          {
+            _total_qrule_weights[bp + rp*n_base_qp] = radial_qw[rp] * base_qw[bp];
+            // initialize the quadrature-points for the 2D side element
+            // - either the base element or it has a 1D base + radial direction.
+            if (inf_side->infinite())
+              qp[bp + rp*n_base_qp]=Point(base_qp[bp](0),
+                                          0.,
+                                          radial_qp[rp](0));
+            else
+              qp[bp + rp*n_base_qp]=Point(base_qp[bp](0),
+                                          base_qp[bp](1),
+                                          -1.);
+          }
+    }
 
   this->reinit(inf_side->interior_parent(), &qp);
 

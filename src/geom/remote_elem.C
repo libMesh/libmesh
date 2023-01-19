@@ -41,6 +41,7 @@ class RemoteElemSetup : public Singleton::Setup
     RemoteElem::create();
   }
 } remote_elem_setup;
+
 }
 
 
@@ -56,6 +57,11 @@ const RemoteElem * remote_elem;
 RemoteElem::~RemoteElem()
 {
   remote_elem = nullptr;
+
+  // Putting this somewhere to unconfuse Nvidia, which thinks an
+  // object used solely to invoke its constructor is "never
+  // referenced".
+  libmesh_ignore(remote_elem_setup);
 }
 
 

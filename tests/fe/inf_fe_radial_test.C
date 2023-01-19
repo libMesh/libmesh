@@ -206,6 +206,7 @@ public:
 
     return intersection;
 #else
+    libmesh_ignore(physical_point, inf_elem);
     // lets make the compilers happy:
     return Point(0.,0.,-2.);
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
