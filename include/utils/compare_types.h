@@ -258,6 +258,7 @@ struct CompareTypes<T, MetaPhysicL::DualNumber<T2, D, asd>>
                                   asd>
       supertype;
 };
+
 template <typename T, typename D, typename T2, bool asd>
 struct CompareTypes<MetaPhysicL::DualNumber<T, D, asd>, T2>
 {
@@ -266,6 +267,7 @@ struct CompareTypes<MetaPhysicL::DualNumber<T, D, asd>, T2>
                                   asd>
       supertype;
 };
+
 template <typename T, typename D, typename T2, typename D2, bool asd>
 struct CompareTypes<MetaPhysicL::DualNumber<T, D, asd>, MetaPhysicL::DualNumber<T2, D2, asd>>
 {
@@ -274,11 +276,13 @@ struct CompareTypes<MetaPhysicL::DualNumber<T, D, asd>, MetaPhysicL::DualNumber<
                                   asd>
       supertype;
 };
+
 template <typename T, typename D, bool asd>
 struct CompareTypes<MetaPhysicL::DualNumber<T, D, asd>, MetaPhysicL::DualNumber<T, D, asd>>
 {
   typedef MetaPhysicL::DualNumber<T, D, asd> supertype;
 };
+
 template <typename T, typename T2, bool asd>
 struct CompareTypes<T, MetaPhysicL::DualNumber<T2, T2, asd>>
 {
@@ -287,6 +291,7 @@ struct CompareTypes<T, MetaPhysicL::DualNumber<T2, T2, asd>>
                                   asd>
       supertype;
 };
+
 template <typename T, typename T2, bool asd>
 struct CompareTypes<MetaPhysicL::DualNumber<T, T, asd>, T2>
 {
@@ -295,6 +300,7 @@ struct CompareTypes<MetaPhysicL::DualNumber<T, T, asd>, T2>
                                   asd>
       supertype;
 };
+
 template <typename T, typename T2, bool asd>
 struct CompareTypes<MetaPhysicL::DualNumber<T, T, asd>, MetaPhysicL::DualNumber<T2, T2, asd>>
 {
@@ -303,6 +309,29 @@ struct CompareTypes<MetaPhysicL::DualNumber<T, T, asd>, MetaPhysicL::DualNumber<
                                   asd>
       supertype;
 };
+
+template <typename T, typename D, bool asd>
+struct CompareTypes<MetaPhysicL::DualNumber<MetaPhysicL::DualNumber<T, D, asd>,
+                                            MetaPhysicL::DualNumber<T, D, asd>,
+                                            asd>,
+                    MetaPhysicL::DualNumber<T, D, asd>>
+{
+  typedef MetaPhysicL::
+      DualNumber<MetaPhysicL::DualNumber<T, D, asd>, MetaPhysicL::DualNumber<T, D, asd>, asd>
+          supertype;
+};
+
+template <typename T, typename D, bool asd>
+struct CompareTypes<MetaPhysicL::DualNumber<T, D, asd>,
+                    MetaPhysicL::DualNumber<MetaPhysicL::DualNumber<T, D, asd>,
+                                            MetaPhysicL::DualNumber<T, D, asd>,
+                                            asd>>
+{
+  typedef MetaPhysicL::
+      DualNumber<MetaPhysicL::DualNumber<T, D, asd>, MetaPhysicL::DualNumber<T, D, asd>, asd>
+          supertype;
+};
+
 template <typename T, typename D, bool asd>
 struct ScalarTraits<MetaPhysicL::DualNumber<T, D, asd>>
 {
