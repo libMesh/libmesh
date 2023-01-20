@@ -317,7 +317,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::reinit_dual_shape_coeffs(const Elem * elem,
                                          const std::vector<Point> & pts,
-                                         const std::vector<Real> & JxW)
+                                         const std::vector<GeomReal> & JxW)
 {
   // Set the type and p level for this element
   this->elem_type = elem->type();
@@ -347,7 +347,11 @@ void FE<Dim,T>::reinit_default_dual_shape_coeffs (const Elem * elem)
   // In preparation of computing dual_coeff, we compute the default shape
   // function values and use these to compute the dual shape coefficients.
   // The TRUE dual_phi values are computed in compute_dual_shape_functions()
-  this->reinit_dual_shape_coeffs(elem, default_qrule.get_points(), default_qrule.get_weights());
+  const auto & weights = default_qrule.get_weights();
+  std::vector<GeomReal> JxW(weights.size());
+  for (const auto i : index_range(weights))
+    JxW[i] = weights[i];
+  this->reinit_dual_shape_coeffs(elem, default_qrule.get_points(), JxW);
   // we do not compute default dual coeff many times as this can be expensive
   this->set_calculate_default_dual_coeff(false);
 }

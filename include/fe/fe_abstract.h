@@ -149,7 +149,7 @@ public:
    */
   virtual void reinit_dual_shape_coeffs (const Elem * /*elem*/,
                                          const std::vector<Point> & /*pts*/,
-                                         const std::vector<Real> & /*JxW*/)
+                                         const std::vector<GeomReal> & /*JxW*/)
   {
     libmesh_error_msg("Customized dual shape coefficient calculation has not been implemented for this FE type.");
   }

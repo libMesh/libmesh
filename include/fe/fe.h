@@ -469,7 +469,7 @@ public:
   */
   virtual void reinit_dual_shape_coeffs (const Elem * elem,
                                          const std::vector<Point> & pts,
-                                         const std::vector<Real> & JxW) override;
+                                         const std::vector<GeomReal> & JxW) override;
 
   /**
    * This computes the default dual shape function coefficients.
