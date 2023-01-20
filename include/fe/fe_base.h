@@ -602,7 +602,7 @@ protected:
    * we rely on the \p JxW (or weights) and the \p phi values,
    * which can come from default or customized qrule
    */
-  void compute_dual_shape_coeffs(const std::vector<Real> & JxW, const std::vector<std::vector<OutputShape>> & phi);
+  void compute_dual_shape_coeffs(const std::vector<GeomReal> & JxW, const std::vector<std::vector<OutputShape>> & phi);
 
   /**
    * Compute \p dual_phi, \p dual_dphi, \p dual_d2phi
@@ -806,7 +806,7 @@ void FEGenericBase<OutputType>::compute_dual_shape_functions ()
 }
 
 template <typename OutputType>
-void FEGenericBase<OutputType>::compute_dual_shape_coeffs(const std::vector<Real> & /*JxW*/, const std::vector<std::vector<OutputShape>> & /*phi_vals*/)
+void FEGenericBase<OutputType>::compute_dual_shape_coeffs(const std::vector<GeomReal> & /*JxW*/, const std::vector<std::vector<OutputShape>> & /*phi_vals*/)
 {
   libmesh_error_msg(
       "Computation of dual shape functions for vector finite element "
@@ -819,7 +819,7 @@ template <>
 void FEGenericBase<Real>::compute_dual_shape_functions();
 
 template <>
-void FEGenericBase<Real>::compute_dual_shape_coeffs(const std::vector<Real> & /*JxW*/, const std::vector<std::vector<OutputShape>> & /*phi_vals*/);
+void FEGenericBase<Real>::compute_dual_shape_coeffs(const std::vector<GeomReal> & /*JxW*/, const std::vector<std::vector<OutputShape>> & /*phi_vals*/);
 
 
 // Typedefs for convenience and backwards compatibility

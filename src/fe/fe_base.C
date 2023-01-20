@@ -754,7 +754,7 @@ void FEGenericBase<OutputType>::compute_shape_functions (const Elem * elem,
 // due to deformation of the element, and the size of \p phi_vals for the secondary
 // element changes accordingly.
 template <>
-void FEGenericBase<Real>::compute_dual_shape_coeffs (const std::vector<Real> & JxW, const std::vector<std::vector<OutputShape>> & phi_vals)
+void FEGenericBase<Real>::compute_dual_shape_coeffs (const std::vector<GeomReal> & JxW, const std::vector<std::vector<OutputShape>> & phi_vals)
 {
   // Start logging the dual coeff computation
   LOG_SCOPE("compute_dual_shape_coeffs()", "FE");
