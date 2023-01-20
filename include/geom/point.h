@@ -21,8 +21,8 @@
 #define LIBMESH_POINT_H
 
 // Local includes
-#include "libmesh/hashing.h"
-#include "libmesh/type_vector.h"
+#include "libmesh/vector_value.h"
+#include "libmesh/raw_type.h"
 
 namespace libMesh
 {
@@ -36,7 +36,7 @@ namespace libMesh
  * \date 2003
  * \brief A geometric point in (x,y,z) space.
  */
-class Point : public TypeVector<Real>
+class Point : public VectorValue<GeomReal>
 {
 public:
 
@@ -44,10 +44,10 @@ public:
    * Constructor.  By default sets all entries to 0.  Gives the point
    * 0 in \p LIBMESH_DIM dimensions.
    */
-  Point (const Real x=0.,
-         const Real y=0.,
-         const Real z=0.) :
-    TypeVector<Real> (x,y,z)
+  Point (const GeomReal x=0.,
+         const GeomReal y=0.,
+         const GeomReal z=0.) :
+    VectorValue<GeomReal> (x,y,z)
   {}
 
   /**
@@ -56,10 +56,19 @@ public:
   Point (const Point & p) = default;
 
   /**
+   * Copy-constructor.
+   */
+  template <typename T>
+  Point (const VectorValue<T> & p) :
+    VectorValue<GeomReal> (p)
+  {}
+
+  /**
    * Copy-constructor from non-point Typevector.
    */
-  Point (const TypeVector<Real> & p) :
-    TypeVector<Real> (p)
+  template <typename T>
+  Point (const TypeVector<T> & p) :
+    VectorValue<GeomReal> (p)
   {}
 
   /**
@@ -74,7 +83,7 @@ public:
             typename = typename
               boostcopy::enable_if_c<ScalarTraits<T>::value,void>::type>
   Point (const T x) :
-    TypeVector<Real> (x,0,0)
+    VectorValue<GeomReal> (x,0,0)
   {}
 
   /**
@@ -92,20 +101,47 @@ protected:
 
 } // namespace libMesh
 
-namespace std
+namespace MetaPhysicL
 {
+template <bool>
+struct PointRawValueHelper;
+
 template <>
-struct hash<libMesh::Point>
+struct PointRawValueHelper<true>
 {
-  std::size_t operator()(const libMesh::Point & p) const
-    {
-      std::size_t seed = 0;
-      for (int d=0; d != LIBMESH_DIM; ++d)
-        libMesh::boostcopy::hash_combine(seed, std::hash<libMesh::Real>()(p(d)));
-      return seed;
-    }
+  typedef const libMesh::Point & value_type;
 };
 
+template <>
+struct PointRawValueHelper<false>
+{
+  typedef libMesh::VectorValue<typename RawType<libMesh::GeomReal>::value_type> value_type;
+};
+
+template <>
+struct RawType<libMesh::Point>
+{
+  typedef typename PointRawValueHelper<IsRawSame<libMesh::GeomReal>::value>::value_type value_type;
+
+  template <typename T = libMesh::GeomReal,
+            typename std::enable_if<!IsRawSame<T>::value, int>::type = 0>
+  static value_type value (const libMesh::Point & in)
+    {
+      value_type ret;
+      for (unsigned int i = 0; i < LIBMESH_DIM; ++i)
+        ret(i) = raw_value(in(i));
+
+      return ret;
+    }
+
+  template <typename T = libMesh::GeomReal,
+            typename std::enable_if<IsRawSame<T>::value, int>::type = 0>
+  static value_type value (const libMesh::Point & in)
+    {
+      return in;
+    }
+};
 }
+
 
 #endif // LIBMESH_POINT_H

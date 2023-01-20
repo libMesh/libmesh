@@ -562,7 +562,7 @@ Hex27::second_order_child_vertex (const unsigned int n) const
 
 
 
-Real Hex27::volume () const
+GeomReal Hex27::volume () const
 {
   // This specialization is good for Lagrange mappings only
   if (this->mapping_type() != LAGRANGE_MAP)
@@ -763,7 +763,7 @@ Real Hex27::volume () const
       {  1., std::sqrt(15)/5.,  15./25}
     };
 
-  Real vol = 0.;
+  GeomReal vol = 0.;
   for (int i=0; i<N; ++i)
     for (int j=0; j<N; ++j)
       for (int k=0; k<N; ++k)

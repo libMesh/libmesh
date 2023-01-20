@@ -25,6 +25,7 @@
 #include "libmesh/face_quad4.h"
 #include "libmesh/enum_elem_quality.h"
 #include "libmesh/tensor_value.h"
+#include "libmesh/raw_type.h"
 
 #include <array>
 
@@ -250,16 +251,16 @@ Real Hex::quality (const ElemQuality q) const
     case DIAGONAL:
       {
         // Diagonal between node 0 and node 6
-        const Real d06 = this->length(0,6);
+        const Real d06 = MetaPhysicL::raw_value(this->length(0,6));
 
         // Diagonal between node 3 and node 5
-        const Real d35 = this->length(3,5);
+        const Real d35 = MetaPhysicL::raw_value(this->length(3,5));
 
         // Diagonal between node 1 and node 7
-        const Real d17 = this->length(1,7);
+        const Real d17 = MetaPhysicL::raw_value(this->length(1,7));
 
         // Diagonal between node 2 and node 4
-        const Real d24 = this->length(2,4);
+        const Real d24 = MetaPhysicL::raw_value(this->length(2,4));
 
         // Find the biggest and smallest diagonals
         const Real min = std::min(d06, std::min(d35, std::min(d17, d24)));
@@ -282,18 +283,18 @@ Real Hex::quality (const ElemQuality q) const
         /**
          * Compute the side lengths.
          */
-        const Real d01 = this->length(0,1);
-        const Real d12 = this->length(1,2);
-        const Real d23 = this->length(2,3);
-        const Real d03 = this->length(0,3);
-        const Real d45 = this->length(4,5);
-        const Real d56 = this->length(5,6);
-        const Real d67 = this->length(6,7);
-        const Real d47 = this->length(4,7);
-        const Real d04 = this->length(0,4);
-        const Real d15 = this->length(1,5);
-        const Real d37 = this->length(3,7);
-        const Real d26 = this->length(2,6);
+        const Real d01 = MetaPhysicL::raw_value(this->length(0,1));
+        const Real d12 = MetaPhysicL::raw_value(this->length(1,2));
+        const Real d23 = MetaPhysicL::raw_value(this->length(2,3));
+        const Real d03 = MetaPhysicL::raw_value(this->length(0,3));
+        const Real d45 = MetaPhysicL::raw_value(this->length(4,5));
+        const Real d56 = MetaPhysicL::raw_value(this->length(5,6));
+        const Real d67 = MetaPhysicL::raw_value(this->length(6,7));
+        const Real d47 = MetaPhysicL::raw_value(this->length(4,7));
+        const Real d04 = MetaPhysicL::raw_value(this->length(0,4));
+        const Real d15 = MetaPhysicL::raw_value(this->length(1,5));
+        const Real d37 = MetaPhysicL::raw_value(this->length(3,7));
+        const Real d26 = MetaPhysicL::raw_value(this->length(2,6));
 
         std::vector<Real> edge_ratios(12);
         // Front
@@ -337,10 +338,10 @@ Real Hex::quality (const ElemQuality q) const
         /**
          * Compute the maximum diagonal.
          */
-        const Real d06 = this->length(0,6);
-        const Real d17 = this->length(1,7);
-        const Real d35 = this->length(3,5);
-        const Real d24 = this->length(2,4);
+        const Real d06 = MetaPhysicL::raw_value(this->length(0,6));
+        const Real d17 = MetaPhysicL::raw_value(this->length(1,7));
+        const Real d35 = MetaPhysicL::raw_value(this->length(3,5));
+        const Real d24 = MetaPhysicL::raw_value(this->length(2,4));
         const Real max_diag = std::max(d06, std::max(d17, std::max(d35, d24)));
 
         libmesh_assert_not_equal_to ( max_diag, 0.0 );
@@ -349,18 +350,18 @@ Real Hex::quality (const ElemQuality q) const
          * Compute the minimum edge length.
          */
         std::vector<Real> edges(12);
-        edges[0]  = this->length(0,1);
-        edges[1]  = this->length(1,2);
-        edges[2]  = this->length(2,3);
-        edges[3]  = this->length(0,3);
-        edges[4]  = this->length(4,5);
-        edges[5]  = this->length(5,6);
-        edges[6]  = this->length(6,7);
-        edges[7]  = this->length(4,7);
-        edges[8]  = this->length(0,4);
-        edges[9]  = this->length(1,5);
-        edges[10] = this->length(2,6);
-        edges[11] = this->length(3,7);
+        edges[0]  = MetaPhysicL::raw_value(this->length(0,1));
+        edges[1]  = MetaPhysicL::raw_value(this->length(1,2));
+        edges[2]  = MetaPhysicL::raw_value(this->length(2,3));
+        edges[3]  = MetaPhysicL::raw_value(this->length(0,3));
+        edges[4]  = MetaPhysicL::raw_value(this->length(4,5));
+        edges[5]  = MetaPhysicL::raw_value(this->length(5,6));
+        edges[6]  = MetaPhysicL::raw_value(this->length(6,7));
+        edges[7]  = MetaPhysicL::raw_value(this->length(4,7));
+        edges[8]  = MetaPhysicL::raw_value(this->length(0,4));
+        edges[9]  = MetaPhysicL::raw_value(this->length(1,5));
+        edges[10] = MetaPhysicL::raw_value(this->length(2,6));
+        edges[11] = MetaPhysicL::raw_value(this->length(3,7));
 
         const Real min_edge = *(std::min_element(edges.begin(), edges.end()));
         return sqrt3 * min_edge / max_diag ;
@@ -376,29 +377,29 @@ Real Hex::quality (const ElemQuality q) const
 
         // Make local copies of points, we will access these several
         // times below.
-        const Point
-          x0 = point(0), x1 = point(1), x2 = point(2), x3 = point(3),
-          x4 = point(4), x5 = point(5), x6 = point(6), x7 = point(7);
+        const auto
+          x0 = MetaPhysicL::raw_value(point(0)), x1 = MetaPhysicL::raw_value(point(1)), x2 = MetaPhysicL::raw_value(point(2)), x3 = MetaPhysicL::raw_value(point(3)),
+          x4 = MetaPhysicL::raw_value(point(4)), x5 = MetaPhysicL::raw_value(point(5)), x6 = MetaPhysicL::raw_value(point(6)), x7 = MetaPhysicL::raw_value(point(7));
 
         // The columns of the Jacobian matrices are:
         // \vec{x}_{\xi}   = \vec{a1}*eta*zeta + \vec{b1}*eta + \vec{c1}*zeta + \vec{d1}
         // \vec{x}_{\eta}  = \vec{a2}*xi*zeta  + \vec{b2}*xi  + \vec{c2}*zeta + \vec{d2}
         // \vec{x}_{\zeta} = \vec{a3}*xi*eta   + \vec{b3}*xi  + \vec{c3}*eta  + \vec{d3}
         // where the ai, bi, ci, and di are constants defined below.
-        const Point a1 = -x0 + x1 - x2 + x3 + x4 - x5 + x6 - x7;
-        const Point b1 =  x0 - x1 + x2 - x3 + x4 - x5 + x6 - x7;
-        const Point c1 =  x0 - x1 - x2 + x3 - x4 + x5 + x6 - x7;
-        const Point d1 = -x0 + x1 + x2 - x3 - x4 + x5 + x6 - x7;
+        const auto a1 = -x0 + x1 - x2 + x3 + x4 - x5 + x6 - x7;
+        const auto b1 =  x0 - x1 + x2 - x3 + x4 - x5 + x6 - x7;
+        const auto c1 =  x0 - x1 - x2 + x3 - x4 + x5 + x6 - x7;
+        const auto d1 = -x0 + x1 + x2 - x3 - x4 + x5 + x6 - x7;
 
-        const Point a2 =  a1;
-        const Point b2 =  b1;
-        const Point c2 =  x0 + x1 - x2 - x3 - x4 - x5 + x6 + x7;
-        const Point d2 = -x0 - x1 + x2 + x3 - x4 - x5 + x6 + x7;
+        const auto a2 =  a1;
+        const auto b2 =  b1;
+        const auto c2 =  x0 + x1 - x2 - x3 - x4 - x5 + x6 + x7;
+        const auto d2 = -x0 - x1 + x2 + x3 - x4 - x5 + x6 + x7;
 
-        const Point a3 =  a1;
-        const Point b3 =  c1;
-        const Point c3 =  c2;
-        const Point d3 = -x0 - x1 - x2 - x3 + x4 + x5 + x6 + x7;
+        const auto a3 =  a1;
+        const auto b3 =  c1;
+        const auto c3 =  c2;
+        const auto d3 = -x0 - x1 - x2 - x3 + x4 + x5 + x6 + x7;
 
         // Form the nodal Jacobians. These were computed using a
         // Python script and the formulas above. Note that we are

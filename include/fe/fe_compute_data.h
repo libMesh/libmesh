@@ -78,12 +78,12 @@ public:
   /**
    * Storage for the computed shape function values.
    */
-  std::vector<Number> shape;
+  std::vector<GeomNumber> shape;
 
   /**
    * Storage for the computed shape derivative values.
    */
-  std::vector<Gradient> dshape;
+  std::vector<GeomNumberGradient> dshape;
 
   /**
    * Storage for local to global mapping at \p p.
@@ -93,7 +93,7 @@ public:
    *  The matrix-class don't look as if they were made for it
    *  and neither are the TensorTool-members.
    */
-  std::vector<std::vector<Real>> local_transform;
+  std::vector<std::vector<GeomReal>> local_transform;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   /**

@@ -513,13 +513,12 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
           std::unique_ptr<QBase> qrule = fe_type.default_quadrature_rule(dim);
           fe->attach_quadrature_rule (qrule.get());
 
-          const std::vector<Real> &  JxW = fe->get_JxW();
-          const std::vector<std::vector<Real>> & phi = fe->get_phi();
-          const std::vector<std::vector<RealGradient>> & dphi =
-            fe->get_dphi();
+          const auto & JxW = MetaPhysicL::raw_value(fe->get_JxW());
+          const auto & phi = MetaPhysicL::raw_value(fe->get_phi());
+          const auto & dphi = MetaPhysicL::raw_value(fe->get_dphi());
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          const std::vector<std::vector<RealTensor>> & d2phi =
-            fe->get_d2phi();
+          const auto & d2phi =
+            MetaPhysicL::raw_value(fe->get_d2phi());
 #endif
 
           // The global DOF indices for the fine element

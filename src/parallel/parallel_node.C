@@ -41,8 +41,8 @@ static const unsigned int header_size = 2;
 #endif
 
 // use "(a+b-1)/b" trick to get a/b to round up
-static const unsigned int idtypes_per_Real =
-  (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
+static const unsigned int idtypes_per_GeomReal =
+  (sizeof(GeomReal) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
 
 #ifndef NDEBUG
 // Currently this constant is only used for debugging.
@@ -66,7 +66,7 @@ Packing<const Node *>::packable_size (const Node * const & node,
 #ifndef NDEBUG
     1 + // add an int for the magic header when testing
 #endif
-    header_size + LIBMESH_DIM*idtypes_per_Real +
+    header_size + LIBMESH_DIM*idtypes_per_GeomReal +
     node->packed_indexing_size() +
     1 + mesh->get_boundary_info().n_boundary_ids(node);
 }
@@ -81,7 +81,7 @@ Packing<const Node *>::packed_size (const std::vector<largest_id_type>::const_it
 #ifndef NDEBUG
     1 + // add an int for the magic header when testing
 #endif
-    header_size + LIBMESH_DIM*idtypes_per_Real;
+    header_size + LIBMESH_DIM*idtypes_per_GeomReal;
 
   const unsigned int indexing_size =
     DofObject::unpackable_indexing_size(in+pre_indexing_size);
@@ -153,11 +153,11 @@ Packing<const Node *>::pack (const Node * const & node,
 
   for (unsigned int i=0; i != LIBMESH_DIM; ++i)
     {
-      const Real node_i = (*node)(i);
-      largest_id_type Real_as_idtypes[idtypes_per_Real];
-      std::memcpy(Real_as_idtypes, &node_i, sizeof(Real));
-      for (unsigned int j=0; j != idtypes_per_Real; ++j)
-        *data_out++ =(Real_as_idtypes[j]);
+      const GeomReal node_i = (*node)(i);
+      largest_id_type GeomReal_as_idtypes[idtypes_per_GeomReal];
+      std::memcpy(GeomReal_as_idtypes, &node_i, sizeof(GeomReal));
+      for (unsigned int j=0; j != idtypes_per_GeomReal; ++j)
+        *data_out++ =(GeomReal_as_idtypes[j]);
     }
 
   // Add any DofObject indices
@@ -214,14 +214,15 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
       // own the node.
       for (unsigned int i=0; i != LIBMESH_DIM; ++i)
         {
-          Real idtypes_as_Real;
-          std::memcpy(&idtypes_as_Real, &(*in), sizeof(Real));
-          in += idtypes_per_Real;
-          libmesh_assert_less_equal ((*node)(i), idtypes_as_Real + (std::max(Real(1),idtypes_as_Real)*TOLERANCE*TOLERANCE));
-          libmesh_assert_greater_equal ((*node)(i), idtypes_as_Real - (std::max(Real(1),idtypes_as_Real)*TOLERANCE*TOLERANCE));
+          GeomReal idtypes_as_GeomReal;
+          char * idtypes_as_GeomReal_bytes = reinterpret_cast<char *>(&idtypes_as_GeomReal);
+          std::memcpy(idtypes_as_GeomReal_bytes, &(*in), sizeof(GeomReal));
+          in += idtypes_per_GeomReal;
+          libmesh_assert_less_equal ((*node)(i), idtypes_as_GeomReal + (std::max(GeomReal(1),idtypes_as_GeomReal)*TOLERANCE*TOLERANCE));
+          libmesh_assert_greater_equal ((*node)(i), idtypes_as_GeomReal - (std::max(GeomReal(1),idtypes_as_GeomReal)*TOLERANCE*TOLERANCE));
 
           if (processor_id != mesh->processor_id())
-            (*node)(i) = idtypes_as_Real;
+            (*node)(i) = idtypes_as_GeomReal;
         }
 
       if (!node->has_dofs())
@@ -245,10 +246,11 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
       for (unsigned int i=0; i != LIBMESH_DIM; ++i)
         {
-          Real idtypes_as_Real;
-          std::memcpy(&idtypes_as_Real, &(*in), sizeof(Real));
-          (*node)(i) = idtypes_as_Real;
-          in += idtypes_per_Real;
+          GeomReal idtypes_as_GeomReal;
+          char * idtypes_as_GeomReal_bytes = reinterpret_cast<char *>(&idtypes_as_GeomReal);
+          std::memcpy(idtypes_as_GeomReal_bytes, &(*in), sizeof(GeomReal));
+          (*node)(i) = idtypes_as_GeomReal;
+          in += idtypes_per_GeomReal;
         }
 
       node->set_id() = id;

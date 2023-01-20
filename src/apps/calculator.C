@@ -97,8 +97,8 @@ struct Integrate {
     FEBase * elem_fe = nullptr;
     context.get_element_fe(0, elem_fe);
 
-    const std::vector<Real> & JxW = elem_fe->get_JxW();
-    const std::vector<Point> & xyz = elem_fe->get_xyz();
+    const auto & JxW = MetaPhysicL::raw_value(elem_fe->get_JxW());
+    const auto & xyz = MetaPhysicL::raw_value(elem_fe->get_xyz());
 
     _f->init_context(context);
 

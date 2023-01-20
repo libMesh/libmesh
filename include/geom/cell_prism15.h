@@ -237,7 +237,7 @@ public:
   /**
    * A specialization for computing the volume of a Prism15.
    */
-  virtual Real volume () const override;
+  virtual GeomReal volume () const override;
 
   virtual void permute(unsigned int perm_num) override final;
 

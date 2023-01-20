@@ -225,6 +225,7 @@ bool TypeVector<Complex>::operator >= (const TypeVector<Complex> & rhs) const
 // ------------------------------------------------------------
 // Explicit instantiations
 template class LIBMESH_EXPORT TypeVector<Real>;
+template class LIBMESH_EXPORT TypeVector<GeomReal>;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class LIBMESH_EXPORT TypeVector<Complex>;

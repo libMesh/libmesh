@@ -1131,7 +1131,7 @@ void TypeTensor<T>::solve(const TypeVector<T> & b, TypeVector<T> & x) const
     //           a11*(a33       *a22        - a32       *a23)
     /**/  _coords[0]*(_coords[8]*_coords[4] - _coords[7]*_coords[5])
     //          -a21*(a33       *a12        - a32       *a13)
-    /**/ -_coords[3]*(_coords[8]*_coords[1] - _coords[7]*_coords[2]) +
+    /**/ -_coords[3]*(_coords[8]*_coords[1] - _coords[7]*_coords[2])
     //          +a31*(a23       *a12        - a22       *a13)
     /**/ +_coords[6]*(_coords[5]*_coords[1] - _coords[4]*_coords[2]);
 
@@ -1327,7 +1327,7 @@ template <typename T>
 inline
 auto TypeTensor<T>::norm_sq () const -> decltype(std::norm(T()))
 {
-  Real sum = 0.;
+  typename TensorTools::MakeReal<T>::type sum = 0.;
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
     sum += TensorTools::norm_sq(_coords[i]);
   return sum;

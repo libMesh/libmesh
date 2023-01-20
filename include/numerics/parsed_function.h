@@ -167,6 +167,20 @@ private:
                      std::string_view libmesh_dbg_var(function_name),
                      unsigned int libmesh_dbg_var(component_idx)) const;
 
+  template <typename T, typename std::enable_if<!(!std::is_same<Output, T>::value &&
+                                                  std::is_same<T, GeomReal>::value), int>::type = 0>
+  static Output convert_to_output(const T & in)
+    {
+      return in;
+    }
+
+  template <typename T, typename std::enable_if<!std::is_same<Output, T>::value &&
+                                                std::is_same<T, GeomReal>::value, int>::type = 0>
+  static Output convert_to_output(const T & in)
+    {
+      return MetaPhysicL::raw_value(in);
+    }
+
   std::string _expression;
   std::vector<std::string> _subexpressions;
   std::vector<std::unique_ptr<FunctionParserADBase<Output>>> parsers;
@@ -652,12 +666,12 @@ void
 ParsedFunction<Output,OutputGradient>::set_spacetime (const Point & p,
                                                       const Real time)
 {
-  _spacetime[0] = p(0);
+  _spacetime[0] = convert_to_output(p(0));
 #if LIBMESH_DIM > 1
-  _spacetime[1] = p(1);
+  _spacetime[1] = convert_to_output(p(1));
 #endif
 #if LIBMESH_DIM > 2
-  _spacetime[2] = p(2);
+  _spacetime[2] = convert_to_output(p(2));
 #endif
   _spacetime[LIBMESH_DIM] = time;
 

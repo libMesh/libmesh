@@ -202,10 +202,12 @@ public:
  * between Real and Complex data types.
  */
 typedef TensorValue<Real>   RealTensorValue;
+typedef TensorValue<GeomReal> GeomRealTensorValue;
 typedef TensorValue<Number> NumberTensorValue;
 typedef RealTensorValue     RealTensor;
+typedef GeomRealTensorValue GeomRealTensor;
 typedef NumberTensorValue   Tensor;
-
+typedef TensorValue<GeomNumber> GeomNumberTensor;
 
 
 //------------------------------------------------------
@@ -411,23 +413,37 @@ TensorValue<T>::inverse_extrinsic_rotation_matrix(const Real angle1_deg,
 
 } // namespace libMesh
 
-#ifdef LIBMESH_HAVE_METAPHYSICL
 namespace MetaPhysicL
 {
+// specialization when conversion needs to happen
 template <typename T>
-struct RawType<libMesh::TensorValue<T>>
+struct RawType<libMesh::TensorValue<T>,
+               typename std::enable_if<!IsRawSame<T>::value>::type>
 {
   typedef libMesh::TensorValue<typename RawType<T>::value_type> value_type;
 
-  static value_type value (const libMesh::TensorValue<T> & in)
-    {
-      value_type ret;
-      for (unsigned int i = 0; i < LIBMESH_DIM; ++i)
-        for (unsigned int j = 0; j < LIBMESH_DIM; ++j)
-          ret(i,j) = raw_value(in(i,j));
+  static value_type value(const libMesh::TensorValue<T> & in)
+  {
+    value_type ret_val;
+    for (unsigned int i = 0; i < LIBMESH_DIM; ++i)
+      for (unsigned int j = 0; j < LIBMESH_DIM; ++j)
+        ret_val(i,j) = raw_value(in(i,j));
 
-      return ret;
-    }
+    return ret_val;
+  }
+};
+
+// specialization when we can just pass through
+template <typename T>
+struct RawType<libMesh::TensorValue<T>,
+               typename std::enable_if<IsRawSame<T>::value>::type>
+{
+  typedef const libMesh::TensorValue<T> & value_type;
+
+  static value_type value(const libMesh::TensorValue<T> & in)
+  {
+    return in;
+  }
 };
 
 template <typename T, typename U>
@@ -436,6 +452,5 @@ struct ReplaceAlgebraicType<libMesh::TensorValue<T>, U>
   typedef U type;
 };
 }
-#endif
 
 #endif // LIBMESH_TENSOR_VALUE_H

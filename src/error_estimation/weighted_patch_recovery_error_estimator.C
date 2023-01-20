@@ -36,6 +36,7 @@
 #include "libmesh/enum_order.h"
 #include "libmesh/enum_norm_type.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/raw_type.h"
 
 // C++ includes
 #include <algorithm> // for std::fill
@@ -229,14 +230,14 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           fe->attach_quadrature_rule (qrule.get());
 
           // Get Jacobian values, etc..
-          const std::vector<Real> & JxW = fe->get_JxW();
+          const std::vector<Real> & JxW = MetaPhysicL::raw_value(fe->get_JxW());
           const std::vector<Point> & q_point = fe->get_xyz();
 
           // Get whatever phi/dphi/d2phi values we need.  Avoid
           // getting them unless the requested norm is actually going
           // to use them.
 
-          const std::vector<std::vector<Real>> * phi = nullptr;
+          std::vector<std::vector<Real>> phi;
           // If we're using phi to assert the correct dof_indices
           // vector size later, then we'll need to get_phi whether we
           // plan to use it or not.
@@ -244,9 +245,9 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           if (norm_type == L2 ||
               norm_type == L_INF)
 #endif
-            phi = &(fe->get_phi());
+            phi = MetaPhysicL::raw_value(fe->get_phi());
 
-          const std::vector<std::vector<RealGradient>> * dphi = nullptr;
+          const std::vector<std::vector<GeomRealGradient>> * dphi = nullptr;
           if (norm_type == H1_SEMINORM ||
               norm_type == H1_X_SEMINORM ||
               norm_type == H1_Y_SEMINORM ||
@@ -255,7 +256,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
             dphi = &(fe->get_dphi());
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          const std::vector<std::vector<RealTensor>> * d2phi = nullptr;
+          const std::vector<std::vector<GeomRealTensor>> * d2phi = nullptr;
           if (norm_type == H2_SEMINORM ||
               norm_type == W2_INF_SEMINORM)
             d2phi = &(fe->get_d2phi());
@@ -338,7 +339,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
               // Get the global DOF indices for the current variable
               // in the current element
               dof_map.dof_indices (e_p, dof_indices, var);
-              libmesh_assert (dof_indices.size() == phi->size());
+              libmesh_assert (dof_indices.size() == phi.size());
 
               const unsigned int n_dofs =
                 cast_int<unsigned int>(dof_indices.size());
@@ -367,7 +368,8 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       Number u_h = libMesh::zero;
 
                       for (unsigned int i=0; i<n_dofs; i++)
-                        u_h += (*phi)[i][qp]*system.current_solution (dof_indices[i]);
+                        u_h += phi[i][qp] *
+                          system.current_solution (dof_indices[i]);
 
                       // Patch RHS contributions
                       for (unsigned int i=0; i != psi_size; i++)
@@ -382,7 +384,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       Gradient grad_u_h;
 
                       for (std::size_t i=0; i<n_dofs; i++)
-                        grad_u_h.add_scaled ((*dphi)[i][qp],
+                        grad_u_h.add_scaled (MetaPhysicL::raw_value((*dphi)[i][qp]),
                                              system.current_solution(dof_indices[i]));
 
 
@@ -406,7 +408,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       Gradient grad_u_h;
 
                       for (unsigned int i=0; i<n_dofs; i++)
-                        grad_u_h.add_scaled ((*dphi)[i][qp],
+                        grad_u_h.add_scaled (MetaPhysicL::raw_value((*dphi)[i][qp]),
                                              system.current_solution(dof_indices[i]));
 
 
@@ -425,7 +427,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       Gradient grad_u_h;
 
                       for (unsigned int i=0; i<n_dofs; i++)
-                        grad_u_h.add_scaled ((*dphi)[i][qp],
+                        grad_u_h.add_scaled (MetaPhysicL::raw_value((*dphi)[i][qp]),
                                              system.current_solution(dof_indices[i]));
 
 
@@ -445,7 +447,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       Gradient grad_u_h;
 
                       for (unsigned int i=0; i<n_dofs; i++)
-                        grad_u_h.add_scaled ((*dphi)[i][qp],
+                        grad_u_h.add_scaled (MetaPhysicL::raw_value((*dphi)[i][qp]),
                                              system.current_solution(dof_indices[i]));
 
 
@@ -466,7 +468,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       Tensor hess_u_h;
 
                       for (unsigned int i=0; i<n_dofs; i++)
-                        hess_u_h.add_scaled ((*d2phi)[i][qp],
+                        hess_u_h.add_scaled (MetaPhysicL::raw_value((*d2phi)[i][qp]),
                                              system.current_solution(dof_indices[i]));
 
 
@@ -610,7 +612,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
               // Get the global DOF indices for the current variable
               // in the current element
               dof_map.dof_indices (e_p, dof_indices, var);
-              libmesh_assert (dof_indices.size() == phi->size());
+              libmesh_assert (dof_indices.size() == phi.size());
 
               // The number of dofs for this variable on this element
               const unsigned int n_dofs =
@@ -647,7 +649,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       Number u_h = libMesh::zero;
 
                       for (unsigned int i=0; i<n_dofs; i++)
-                        u_h += (*phi)[i][sp]*system.current_solution (dof_indices[i]);
+                        u_h += MetaPhysicL::raw_value(phi[i][sp])*system.current_solution (dof_indices[i]);
 
                       // Compute the phi values at the current sample point
                       std::vector<Real> psi(specpoly(dim, element_order, q_point[sp], matsize));
@@ -665,7 +667,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       Gradient grad_u_h;
 
                       for (unsigned int i=0; i<n_dofs; i++)
-                        grad_u_h.add_scaled ((*dphi)[i][sp],
+                        grad_u_h.add_scaled (MetaPhysicL::raw_value((*dphi)[i][sp]),
                                              system.current_solution(dof_indices[i]));
 
                       // Compute the phi values at the current sample point
@@ -695,7 +697,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       Gradient grad_u_h;
 
                       for (unsigned int i=0; i<n_dofs; i++)
-                        grad_u_h.add_scaled ((*dphi)[i][sp],
+                        grad_u_h.add_scaled (MetaPhysicL::raw_value((*dphi)[i][sp]),
                                              system.current_solution(dof_indices[i]));
 
                       // Compute the phi values at the current sample point
@@ -714,7 +716,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       Gradient grad_u_h;
 
                       for (unsigned int i=0; i<n_dofs; i++)
-                        grad_u_h.add_scaled ((*dphi)[i][sp],
+                        grad_u_h.add_scaled (MetaPhysicL::raw_value((*dphi)[i][sp]),
                                              system.current_solution(dof_indices[i]));
 
                       // Compute the phi values at the current sample point
@@ -734,7 +736,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       Gradient grad_u_h;
 
                       for (unsigned int i=0; i<n_dofs; i++)
-                        grad_u_h.add_scaled ((*dphi)[i][sp],
+                        grad_u_h.add_scaled (MetaPhysicL::raw_value((*dphi)[i][sp]),
                                              system.current_solution(dof_indices[i]));
 
                       // Compute the phi values at the current sample point
@@ -755,7 +757,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       Tensor hess_u_h;
 
                       for (unsigned int i=0; i<n_dofs; i++)
-                        hess_u_h.add_scaled ((*d2phi)[i][sp],
+                        hess_u_h.add_scaled (MetaPhysicL::raw_value((*d2phi)[i][sp]),
                                              system.current_solution(dof_indices[i]));
 
                       // Compute the phi values at the current sample point

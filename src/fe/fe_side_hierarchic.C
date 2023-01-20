@@ -36,7 +36,7 @@ namespace {
 void side_hierarchic_nodal_soln(const Elem * elem,
                                 const Order /* order */,
                                 const std::vector<Number> & /* elem_soln */,
-                                std::vector<Number> & nodal_soln)
+                                std::vector<GeomNumber> & nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
 
@@ -54,7 +54,7 @@ void side_hierarchic_side_nodal_soln
   (const Elem * elem, const Order o,
    const unsigned int side,
    const std::vector<Number> & elem_soln,
-   std::vector<Number> & nodal_soln_on_side)
+   std::vector<GeomNumber> & nodal_soln_on_side)
 {
   // Cheat here for now: perturb vertices toward the side center so as
   // to make the values well-defined.
@@ -188,7 +188,7 @@ void FE<0, SIDE_HIERARCHIC>::side_nodal_soln
   (const Elem *, const Order,
    const unsigned int,
    const std::vector<Number> &,
-   std::vector<Number> &)
+   std::vector<GeomNumber> &)
 {
   libmesh_error_msg("No side variables in 0D!");
 }
@@ -198,7 +198,7 @@ void FE<1, SIDE_HIERARCHIC>::side_nodal_soln
   (const Elem *, const Order,
    const unsigned int side,
    const std::vector<Number> & elem_soln,
-   std::vector<Number> & nodal_soln_on_side)
+   std::vector<GeomNumber> & nodal_soln_on_side)
 {
   libmesh_assert_less(side, 2);
   nodal_soln_on_side.resize(1);
@@ -211,7 +211,7 @@ void FE<2, SIDE_HIERARCHIC>::side_nodal_soln
   (const Elem * elem, const Order o,
    const unsigned int side,
    const std::vector<Number> & elem_soln,
-   std::vector<Number> & nodal_soln_on_side)
+   std::vector<GeomNumber> & nodal_soln_on_side)
 {
   libmesh_assert_equal_to(elem->dim(), 2);
   side_hierarchic_side_nodal_soln(elem, o, side, elem_soln,
@@ -224,7 +224,7 @@ void FE<3, SIDE_HIERARCHIC>::side_nodal_soln
   (const Elem * elem, const Order o,
    const unsigned int side,
    const std::vector<Number> & elem_soln,
-   std::vector<Number> & nodal_soln_on_side)
+   std::vector<GeomNumber> & nodal_soln_on_side)
 {
   libmesh_assert_equal_to(elem->dim(), 3);
   side_hierarchic_side_nodal_soln(elem, o, side, elem_soln,

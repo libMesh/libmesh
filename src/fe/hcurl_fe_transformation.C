@@ -22,24 +22,24 @@
 namespace libMesh
 {
 
-template<typename OutputShape>
-void HCurlFETransformation<OutputShape>::init_map_phi(const FEGenericBase<OutputShape> & fe) const
+template<typename OutputType>
+void HCurlFETransformation<OutputType>::init_map_phi(const FEGenericBase<OutputType> & fe) const
 {
   fe.get_fe_map().get_dxidx();
 }
 
 
 
-template<typename OutputShape>
-void HCurlFETransformation<OutputShape>::init_map_dphi(const FEGenericBase<OutputShape> & fe) const
+template<typename OutputType>
+void HCurlFETransformation<OutputType>::init_map_dphi(const FEGenericBase<OutputType> & fe) const
 {
   fe.get_fe_map().get_dxidx();
 }
 
 
 
-template<typename OutputShape>
-void HCurlFETransformation<OutputShape>::init_map_d2phi(const FEGenericBase<OutputShape> & fe) const
+template<typename OutputType>
+void HCurlFETransformation<OutputType>::init_map_d2phi(const FEGenericBase<OutputType> & fe) const
 {
   fe.get_fe_map().get_dxidx();
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -49,11 +49,11 @@ void HCurlFETransformation<OutputShape>::init_map_d2phi(const FEGenericBase<Outp
 
 
 
-template<typename OutputShape>
-void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
+template<typename OutputType>
+void HCurlFETransformation<OutputType>::map_phi(const unsigned int dim,
                                                  const Elem * const elem,
                                                  const std::vector<Point> & qp,
-                                                 const FEGenericBase<OutputShape> & fe,
+                                                 const FEGenericBase<OutputType> & fe,
                                                  std::vector<std::vector<OutputShape>> & phi) const
 {
   switch (dim)
@@ -64,11 +64,11 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
 
     case 2:
       {
-        const std::vector<Real> & dxidx_map = fe.get_fe_map().get_dxidx();
-        const std::vector<Real> & dxidy_map = fe.get_fe_map().get_dxidy();
+        const std::vector<GeomReal> & dxidx_map = fe.get_fe_map().get_dxidx();
+        const std::vector<GeomReal> & dxidy_map = fe.get_fe_map().get_dxidy();
 
-        const std::vector<Real> & detadx_map = fe.get_fe_map().get_detadx();
-        const std::vector<Real> & detady_map = fe.get_fe_map().get_detady();
+        const std::vector<GeomReal> & detadx_map = fe.get_fe_map().get_detadx();
+        const std::vector<GeomReal> & detady_map = fe.get_fe_map().get_detady();
 
         // FIXME: Need to update for 2D elements in 3D space
         // phi = (dx/dxi)^-T * \hat{phi}
@@ -101,17 +101,17 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
 
     case 3:
       {
-        const std::vector<Real> & dxidx_map = fe.get_fe_map().get_dxidx();
-        const std::vector<Real> & dxidy_map = fe.get_fe_map().get_dxidy();
-        const std::vector<Real> & dxidz_map = fe.get_fe_map().get_dxidz();
+        const std::vector<GeomReal> & dxidx_map = fe.get_fe_map().get_dxidx();
+        const std::vector<GeomReal> & dxidy_map = fe.get_fe_map().get_dxidy();
+        const std::vector<GeomReal> & dxidz_map = fe.get_fe_map().get_dxidz();
 
-        const std::vector<Real> & detadx_map = fe.get_fe_map().get_detadx();
-        const std::vector<Real> & detady_map = fe.get_fe_map().get_detady();
-        const std::vector<Real> & detadz_map = fe.get_fe_map().get_detadz();
+        const std::vector<GeomReal> & detadx_map = fe.get_fe_map().get_detadx();
+        const std::vector<GeomReal> & detady_map = fe.get_fe_map().get_detady();
+        const std::vector<GeomReal> & detadz_map = fe.get_fe_map().get_detadz();
 
-        const std::vector<Real> & dzetadx_map = fe.get_fe_map().get_dzetadx();
-        const std::vector<Real> & dzetady_map = fe.get_fe_map().get_dzetady();
-        const std::vector<Real> & dzetadz_map = fe.get_fe_map().get_dzetadz();
+        const std::vector<GeomReal> & dzetadx_map = fe.get_fe_map().get_dzetadx();
+        const std::vector<GeomReal> & dzetady_map = fe.get_fe_map().get_dzetady();
+        const std::vector<GeomReal> & dzetadz_map = fe.get_fe_map().get_dzetadz();
 
         // phi = (dx/dxi)^-T * \hat{phi}
         // In 3D:
@@ -152,11 +152,11 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
     } // switch(dim)
 }
 
-template<typename OutputShape>
-void HCurlFETransformation<OutputShape>::map_curl(const unsigned int dim,
+template<typename OutputType>
+void HCurlFETransformation<OutputType>::map_curl(const unsigned int dim,
                                                   const Elem * const,
                                                   const std::vector<Point> &,
-                                                  const FEGenericBase<OutputShape> & fe,
+                                                  const FEGenericBase<OutputType> & fe,
                                                   std::vector<std::vector<OutputShape>> & curl_phi) const
 {
   switch (dim)
@@ -170,7 +170,7 @@ void HCurlFETransformation<OutputShape>::map_curl(const unsigned int dim,
         const std::vector<std::vector<OutputShape>> & dphi_dxi = fe.get_dphidxi();
         const std::vector<std::vector<OutputShape>> & dphi_deta = fe.get_dphideta();
 
-        const std::vector<Real> & J = fe.get_fe_map().get_jacobian();
+        const std::vector<GeomReal> & J = fe.get_fe_map().get_jacobian();
 
         // FIXME: I don't think this is valid for 2D elements in 3D space
         // In 2D: curl(phi) = J^{-1} * curl(\hat{phi})
@@ -190,28 +190,28 @@ void HCurlFETransformation<OutputShape>::map_curl(const unsigned int dim,
         const std::vector<std::vector<OutputShape>> & dphi_deta = fe.get_dphideta();
         const std::vector<std::vector<OutputShape>> & dphi_dzeta = fe.get_dphidzeta();
 
-        const std::vector<RealGradient> & dxyz_dxi   = fe.get_fe_map().get_dxyzdxi();
-        const std::vector<RealGradient> & dxyz_deta  = fe.get_fe_map().get_dxyzdeta();
-        const std::vector<RealGradient> & dxyz_dzeta = fe.get_fe_map().get_dxyzdzeta();
+        const std::vector<GeomRealGradient> & dxyz_dxi   = fe.get_fe_map().get_dxyzdxi();
+        const std::vector<GeomRealGradient> & dxyz_deta  = fe.get_fe_map().get_dxyzdeta();
+        const std::vector<GeomRealGradient> & dxyz_dzeta = fe.get_fe_map().get_dxyzdzeta();
 
-        const std::vector<Real> & J = fe.get_fe_map().get_jacobian();
+        const std::vector<GeomReal> & J = fe.get_fe_map().get_jacobian();
 
         for (auto i : index_range(curl_phi))
           for (auto p : index_range(curl_phi[i]))
             {
-              Real dx_dxi   = dxyz_dxi[p](0);
-              Real dx_deta  = dxyz_deta[p](0);
-              Real dx_dzeta = dxyz_dzeta[p](0);
+              GeomReal dx_dxi   = dxyz_dxi[p](0);
+              GeomReal dx_deta  = dxyz_deta[p](0);
+              GeomReal dx_dzeta = dxyz_dzeta[p](0);
 
-              Real dy_dxi   = dxyz_dxi[p](1);
-              Real dy_deta  = dxyz_deta[p](1);
-              Real dy_dzeta = dxyz_dzeta[p](1);
+              GeomReal dy_dxi   = dxyz_dxi[p](1);
+              GeomReal dy_deta  = dxyz_deta[p](1);
+              GeomReal dy_dzeta = dxyz_dzeta[p](1);
 
-              Real dz_dxi   = dxyz_dxi[p](2);
-              Real dz_deta  = dxyz_deta[p](2);
-              Real dz_dzeta = dxyz_dzeta[p](2);
+              GeomReal dz_dxi   = dxyz_dxi[p](2);
+              GeomReal dz_deta  = dxyz_deta[p](2);
+              GeomReal dz_dzeta = dxyz_dzeta[p](2);
 
-              const Real inv_jac = 1.0/J[p];
+              const GeomReal inv_jac = 1.0/J[p];
 
               /* In 3D: curl(phi) = J^{-1} dx/dxi * curl(\hat{phi})
 
@@ -278,7 +278,7 @@ void HCurlFETransformation<Real>::map_phi(const unsigned int,
                                           const Elem * const,
                                           const std::vector<Point> &,
                                           const FEGenericBase<Real> &,
-                                          std::vector<std::vector<Real>> &) const
+                                          std::vector<std::vector<GeomReal>> &) const
 {
   libmesh_error_msg("HCurl transformations only make sense for vector-valued elements.");
 }
@@ -288,7 +288,7 @@ void HCurlFETransformation<Real>::map_curl(const unsigned int,
                                            const Elem * const,
                                            const std::vector<Point> &,
                                            const FEGenericBase<Real> &,
-                                           std::vector<std::vector<Real>> &) const
+                                           std::vector<std::vector<GeomReal>> &) const
 {
   libmesh_error_msg("HCurl transformations only make sense for vector-valued elements.");
 }

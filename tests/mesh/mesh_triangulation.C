@@ -8,6 +8,11 @@
 #include <libmesh/parsed_function.h>
 #include <libmesh/point.h>
 #include <libmesh/poly2tri_triangulator.h>
+#include <libmesh/parallel_algebra.h>
+#ifdef LIBMESH_HAVE_METAPHYSICL
+#include "metaphysicl/parallel_dualnumber.h"
+#include "metaphysicl/parallel_semidynamicsparsenumberarray.h"
+#endif
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -146,7 +151,7 @@ public:
         // Really?  This isn't until C++20?
         constexpr double my_pi = 3.141592653589793238462643383279;
 
-        const Real computed_area = hole.area();
+        const auto computed_area = MetaPhysicL::raw_value(hole.area());
         const Real theta = my_pi/n_sides;
         const Real half_side_length = radius*std::cos(theta);
         const Real apothem = radius*std::sin(theta);
@@ -156,12 +161,12 @@ public:
       }
 
     TriangulatorInterface::ArbitraryHole arbhole {center, {{0,-1},{2,-1},{2,1},{0,2}}};
-    LIBMESH_ASSERT_FP_EQUAL(arbhole.area(), Real(5), TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(MetaPhysicL::raw_value(arbhole.area()), Real(5), TOLERANCE*TOLERANCE);
 
 #ifdef LIBMESH_HAVE_TRIANGLE
     // Make sure we're compatible with the old naming structure too
     TriangleInterface::PolygonHole square(center, radius, 4);
-    LIBMESH_ASSERT_FP_EQUAL(square.area(), 2*radius*radius, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(MetaPhysicL::raw_value(square.area()), 2*radius*radius, TOLERANCE*TOLERANCE);
 #endif
   }
 
@@ -171,7 +176,7 @@ public:
     LOG_UNIT_TEST;
 
     // Using center=(1,2), radius=2 for the heck of it
-    Point center{1,2};
+    RawPoint center{1,2};
     Real radius = 2;
     std::vector<TriangulatorInterface::PolygonHole> polyholes;
 
@@ -285,8 +290,8 @@ public:
 
         // Make sure we're not getting any inverted elements
         auto cross_prod =
-          (elem->point(1) - elem->point(0)).cross
-            (elem->point(2) - elem->point(0));
+          MetaPhysicL::raw_value((elem->point(1) - elem->point(0)).cross
+                                 (elem->point(2) - elem->point(0)));
 
         CPPUNIT_ASSERT_GREATER(Real(0), cross_prod(2));
 
@@ -378,7 +383,7 @@ public:
     if (n_expected_elem)
       CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_expected_elem);
 
-    Real area = 0;
+    GeomReal area = 0;
     for (const auto & elem : mesh.active_local_element_ptr_range())
       {
         CPPUNIT_ASSERT_EQUAL(elem->level(), 0u);
@@ -389,7 +394,7 @@ public:
 
     mesh.comm().sum(area);
 
-    LIBMESH_ASSERT_FP_EQUAL(area, expected_total_area, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(MetaPhysicL::raw_value(area), expected_total_area, TOLERANCE*TOLERANCE);
   }
 
 
@@ -404,8 +409,8 @@ public:
 
         // Make sure we're not getting any inverted elements
         auto cross_prod =
-          (elem->point(1) - elem->point(0)).cross
-            (elem->point(2) - elem->point(0));
+          MetaPhysicL::raw_value((elem->point(1) - elem->point(0)).cross
+                                 (elem->point(2) - elem->point(0)));
 
         CPPUNIT_ASSERT_GREATER(Real(0), cross_prod(2));
 
@@ -488,8 +493,8 @@ public:
     TriangulatorInterface::MeshedHole centerhole { centermesh };
 
     CPPUNIT_ASSERT_EQUAL(centerhole.n_points(), 8u);
-    CPPUNIT_ASSERT_EQUAL(centerhole.area(), Real(1));
-    Point inside = centerhole.inside();
+    CPPUNIT_ASSERT_EQUAL(MetaPhysicL::raw_value(centerhole.area()), Real(1));
+    const auto inside = MetaPhysicL::raw_value(centerhole.inside());
     CPPUNIT_ASSERT_EQUAL(inside(0), Real(20));
     CPPUNIT_ASSERT_EQUAL(inside(1), Real(20));
 
@@ -913,7 +918,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(elem->level(), 0u);
         CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
 
-        const Real my_area = elem->volume();
+        const auto my_area = MetaPhysicL::raw_value(elem->volume());
 
         // my_area <= desired_area, wow this macro ordering hurts
         if (desired_area != 0)
@@ -922,8 +927,8 @@ public:
         if (area_func != nullptr)
           for (auto v : make_range(elem->n_vertices()))
             {
-              const Real local_desired_area =
-                (*area_func)(elem->point(v));
+              const auto local_desired_area =
+                MetaPhysicL::raw_value((*area_func)(elem->point(v)));
               CPPUNIT_ASSERT_LESSEQUAL(local_desired_area, my_area);
             }
 
@@ -1013,7 +1018,7 @@ public:
           Point shift(Real(i+1)/(M+1),Real(j+1)/(N+1));
           hole_data.emplace_back(diamond, 0, shift);
           holes.push_back(&hole_data.back());
-          total_area -= hole_data.back().area();
+          total_area -= MetaPhysicL::raw_value(hole_data.back().area());
         }
 
     p2t_tri.attach_hole_list(&holes);

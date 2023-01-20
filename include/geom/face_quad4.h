@@ -165,7 +165,7 @@ public:
    * 4-node quad with straight sides, but not necessarily a
    * parallelogram.
    */
-  virtual Real volume () const override;
+  virtual GeomReal volume () const override;
 
   /**
    * Builds a bounding box out of the nodal positions

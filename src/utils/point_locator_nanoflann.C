@@ -28,6 +28,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/int_range.h" // make_range
+#include "libmesh/raw_type.h"
 
 // C++ includes
 #include <array>
@@ -83,7 +84,7 @@ PointLocatorNanoflann::init ()
       if (we_are_master)
         {
           _elems = std::make_shared<std::vector<const Elem *>>();
-          _point_cloud = std::make_shared<std::vector<Point>>();
+          _point_cloud = std::make_shared<std::vector<RawPoint>>();
 
           // Make the KD-Tree out of active element vertex averages.
           //
@@ -103,7 +104,7 @@ PointLocatorNanoflann::init ()
           for (const auto & elem : _mesh.active_element_ptr_range())
             {
               _elems->push_back(elem);
-              _point_cloud->push_back(elem->vertex_average());
+              _point_cloud->push_back(MetaPhysicL::raw_value(elem->vertex_average()));
             }
 
           // Construct the KD-Tree
@@ -131,9 +132,10 @@ PointLocatorNanoflann::init ()
 }
 
 nanoflann::KNNResultSet<Real>
-PointLocatorNanoflann::kd_tree_find_neighbors(const Point & p,
+PointLocatorNanoflann::kd_tree_find_neighbors(const Point & p_in,
                                               std::size_t num_results) const
 {
+  const auto p = MetaPhysicL::raw_value(p_in);
   // We are searching for the Point(s) closest to Point p.
   //
   // TODO: The kd_tree's findNeighbors() routine needs a pointer to
@@ -418,7 +420,7 @@ PointLocatorNanoflann::kdtree_distance(const coord_t * p1,
 
   // Construct a libmesh Point object from the LIBMESH_DIM-dimensional
   // input object, p1.
-  Point point1;
+  RawPoint point1;
   for (int i=0; i<LIBMESH_DIM; ++i)
     point1(i) = p1[i];
 

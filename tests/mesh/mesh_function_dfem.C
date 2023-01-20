@@ -10,6 +10,7 @@
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/mesh_function.h>
 #include <libmesh/numeric_vector.h>
+#include <libmesh/raw_type.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -34,9 +35,9 @@ Number position_function2 (const Point& p,
                            const std::string&)
 {
   if (p(1) > 0.0)
-    return 2.0 * p(1) + 1.0;
+    return 2.0 * MetaPhysicL::raw_value(p(1)) + 1.0;
   else
-    return p(1) + 1.0;
+    return MetaPhysicL::raw_value(p(1)) + 1.0;
 }
 
 class MeshfunctionDFEM : public CppUnit::TestCase
@@ -189,8 +190,8 @@ public:
     mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
     sys.solution->localize(*mesh_function_vector);
 
-    MeshFunction mesh_function (es, *mesh_function_vector,
-                                sys.get_dof_map(), variables);
+    MeshFunction<> mesh_function (es, *mesh_function_vector,
+                                  sys.get_dof_map(), variables);
     mesh_function.init();
 
     // test mesh function in top
@@ -259,8 +260,8 @@ public:
     mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
     sys.solution->localize(*mesh_function_vector);
 
-    MeshFunction mesh_function (es, *mesh_function_vector,
-                                sys.get_dof_map(), variables);
+    MeshFunction<Number> mesh_function (es, *mesh_function_vector,
+                                        sys.get_dof_map(), variables);
     mesh_function.init();
 
     // test mesh function in top

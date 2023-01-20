@@ -334,8 +334,8 @@ BoundingBox Quad9::loose_bounding_box () const
 
   for (unsigned d=0; d<LIBMESH_DIM; ++d)
     {
-      const Real center = this->point(8)(d);
-      Real hd = std::abs(center - this->point(0)(d));
+      const GeomReal center = this->point(8)(d);
+      GeomReal hd = std::abs(center - this->point(0)(d));
       for (unsigned int p=0; p != 8; ++p)
         hd = std::max(hd, std::abs(center - this->point(p)(d)));
 
@@ -348,7 +348,7 @@ BoundingBox Quad9::loose_bounding_box () const
 
 
 
-Real Quad9::volume () const
+GeomReal Quad9::volume () const
 {
   // This specialization is good for Lagrange mappings only
   if (this->mapping_type() != LAGRANGE_MAP)
@@ -384,7 +384,7 @@ Real Quad9::volume () const
   const Real q[N] = {-std::sqrt(15)/5., 0., std::sqrt(15)/5.};
   const Real w[N] = {5./9, 8./9, 5./9};
 
-  Real vol=0.;
+  GeomReal vol=0.;
   for (unsigned int i=0; i<N; ++i)
     for (unsigned int j=0; j<N; ++j)
       vol += w[i] * w[j] *

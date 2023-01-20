@@ -31,7 +31,7 @@ LIBMESH_DEFAULT_VECTORIZED_FE(1,SCALAR)
 
 
 template <>
-Real FE<1,SCALAR>::shape(const ElemType,
+GeomReal FE<1,SCALAR>::shape(const ElemType,
                          const Order,
                          const unsigned int,
                          const Point &)
@@ -40,7 +40,7 @@ Real FE<1,SCALAR>::shape(const ElemType,
 }
 
 template <>
-Real FE<1,SCALAR>::shape(const Elem *,
+GeomReal FE<1,SCALAR>::shape(const Elem *,
                          const Order,
                          const unsigned int,
                          const Point &,
@@ -52,7 +52,7 @@ Real FE<1,SCALAR>::shape(const Elem *,
 
 
 template <>
-Real FE<1,SCALAR>::shape(const FEType,
+GeomReal FE<1,SCALAR>::shape(const FEType,
                          const Elem *,
                          const unsigned int,
                          const Point &,
@@ -63,7 +63,7 @@ Real FE<1,SCALAR>::shape(const FEType,
 
 
 template <>
-Real FE<1,SCALAR>::shape_deriv(const ElemType,
+GeomReal FE<1,SCALAR>::shape_deriv(const ElemType,
                                const Order,
                                const unsigned int,
                                const unsigned int,
@@ -73,7 +73,7 @@ Real FE<1,SCALAR>::shape_deriv(const ElemType,
 }
 
 template <>
-Real FE<1,SCALAR>::shape_deriv(const Elem *,
+GeomReal FE<1,SCALAR>::shape_deriv(const Elem *,
                                const Order,
                                const unsigned int,
                                const unsigned int,
@@ -85,7 +85,7 @@ Real FE<1,SCALAR>::shape_deriv(const Elem *,
 
 
 template <>
-Real FE<1,SCALAR>::shape_deriv(const FEType,
+GeomReal FE<1,SCALAR>::shape_deriv(const FEType,
                                const Elem *,
                                const unsigned int,
                                const unsigned int,
@@ -100,7 +100,7 @@ Real FE<1,SCALAR>::shape_deriv(const FEType,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-Real FE<1,SCALAR>::shape_second_deriv(const ElemType,
+GeomReal FE<1,SCALAR>::shape_second_deriv(const ElemType,
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
@@ -110,7 +110,7 @@ Real FE<1,SCALAR>::shape_second_deriv(const ElemType,
 }
 
 template <>
-Real FE<1,SCALAR>::shape_second_deriv(const Elem *,
+GeomReal FE<1,SCALAR>::shape_second_deriv(const Elem *,
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
@@ -122,7 +122,7 @@ Real FE<1,SCALAR>::shape_second_deriv(const Elem *,
 
 
 template <>
-Real FE<1,SCALAR>::shape_second_deriv(const FEType,
+GeomReal FE<1,SCALAR>::shape_second_deriv(const FEType,
                                       const Elem *,
                                       const unsigned int,
                                       const unsigned int,

@@ -27,8 +27,8 @@
 namespace libMesh
 {
 
-template<typename OutputShape>
-std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputShape>::build( const FEType & fe_type )
+template<typename OutputType>
+std::unique_ptr<FETransformationBase<OutputType>> FETransformationBase<OutputType>::build( const FEType & fe_type )
 {
   switch (fe_type.family)
     {
@@ -50,11 +50,11 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
     case L2_LAGRANGE: // PB: Shouldn't this be L2 conforming?
     case JACOBI_20_00: // PB: For infinite elements...
     case JACOBI_30_00: // PB: For infinite elements...
-      return std::make_unique<H1FETransformation<OutputShape>>();
+      return std::make_unique<H1FETransformation<OutputType>>();
 
       // HCurl Conforming Elements
     case NEDELEC_ONE:
-      return std::make_unique<HCurlFETransformation<OutputShape>>();
+      return std::make_unique<HCurlFETransformation<OutputType>>();
 
       // HDiv Conforming Elements
       // L2 Conforming Elements
@@ -62,7 +62,7 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
       // Other...
     case SCALAR:
       // Should never need this for SCALARs
-      return std::make_unique<H1FETransformation<OutputShape>>();
+      return std::make_unique<H1FETransformation<OutputType>>();
 
     default:
       libmesh_error_msg("Unknown family = " << Utility::enum_to_string(fe_type.family));

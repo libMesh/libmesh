@@ -38,12 +38,12 @@ LIBMESH_DEFAULT_VECTORIZED_FE(1,BERNSTEIN)
 
 
 template <>
-Real FE<1,BERNSTEIN>::shape(const ElemType,
+GeomReal FE<1,BERNSTEIN>::shape(const ElemType,
                             const Order order,
                             const unsigned int i,
                             const Point & p)
 {
-  const Real xi = p(0);
+  const GeomReal xi = p(0);
   using Utility::pow;
 
   switch (order)
@@ -190,7 +190,7 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
 
 
 template <>
-Real FE<1,BERNSTEIN>::shape(const Elem * elem,
+GeomReal FE<1,BERNSTEIN>::shape(const Elem * elem,
                             const Order order,
                             const unsigned int i,
                             const Point & p,
@@ -205,7 +205,7 @@ Real FE<1,BERNSTEIN>::shape(const Elem * elem,
 
 
 template <>
-Real FE<1,BERNSTEIN>::shape(const FEType fet,
+GeomReal FE<1,BERNSTEIN>::shape(const FEType fet,
                             const Elem * elem,
                             const unsigned int i,
                             const Point & p,
@@ -219,7 +219,7 @@ Real FE<1,BERNSTEIN>::shape(const FEType fet,
 
 
 template <>
-Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
+GeomReal FE<1,BERNSTEIN>::shape_deriv(const ElemType,
                                   const Order order,
                                   const unsigned int i,
                                   const unsigned int libmesh_dbg_var(j),
@@ -229,7 +229,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
 
   libmesh_assert_equal_to (j, 0);
 
-  const Real xi = p(0);
+  const GeomReal xi = p(0);
 
   using Utility::pow;
 
@@ -377,7 +377,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<1,BERNSTEIN>::shape_deriv(const Elem * elem,
+GeomReal FE<1,BERNSTEIN>::shape_deriv(const Elem * elem,
                                   const Order order,
                                   const unsigned int i,
                                   const unsigned int j,
@@ -392,7 +392,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const Elem * elem,
 }
 
 template <>
-Real FE<1,BERNSTEIN>::shape_deriv(const FEType fet,
+GeomReal FE<1,BERNSTEIN>::shape_deriv(const FEType fet,
                                   const Elem * elem,
                                   const unsigned int i,
                                   const unsigned int j,
@@ -409,7 +409,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const FEType fet,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-Real FE<1,BERNSTEIN>::shape_second_deriv(const ElemType,
+GeomReal FE<1,BERNSTEIN>::shape_second_deriv(const ElemType,
                                          const Order order,
                                          const unsigned int i,
                                          const unsigned int libmesh_dbg_var(j),
@@ -419,7 +419,7 @@ Real FE<1,BERNSTEIN>::shape_second_deriv(const ElemType,
 
   libmesh_assert_equal_to (j, 0);
 
-  const Real xi = p(0);
+  const GeomReal xi = p(0);
 
   using Utility::pow;
 
@@ -562,7 +562,7 @@ Real FE<1,BERNSTEIN>::shape_second_deriv(const ElemType,
 
           default:
             {
-              Real val = 0;
+              GeomReal val = 0;
 
               if (n == 1)
                 val +=
@@ -590,7 +590,7 @@ Real FE<1,BERNSTEIN>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<1,BERNSTEIN>::shape_second_deriv(const Elem * elem,
+GeomReal FE<1,BERNSTEIN>::shape_second_deriv(const Elem * elem,
                                          const Order order,
                                          const unsigned int i,
                                          const unsigned int j,
@@ -605,7 +605,7 @@ Real FE<1,BERNSTEIN>::shape_second_deriv(const Elem * elem,
 }
 
 template <>
-Real FE<1,BERNSTEIN>::shape_second_deriv(const FEType fet,
+GeomReal FE<1,BERNSTEIN>::shape_second_deriv(const FEType fet,
                                          const Elem * elem,
                                          const unsigned int i,
                                          const unsigned int j,

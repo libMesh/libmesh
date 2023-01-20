@@ -220,7 +220,7 @@ protected:
    * PointLocator, they need to point at the master's vectors instead.
    */
   std::shared_ptr<std::vector<const Elem *>> _elems;
-  std::shared_ptr<std::vector<Point>> _point_cloud;
+  std::shared_ptr<std::vector<RawPoint>> _point_cloud;
 
   // kd_tree will be initialized during init() and then automatically
   // cleaned up by the destructor. We always create a LIBMESH_DIM

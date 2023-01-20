@@ -106,9 +106,9 @@ LaplacianErrorEstimator::internal_side_integration ()
   Real error = 1.e-30;
   unsigned int n_qp = fe_fine->n_quadrature_points();
 
-  std::vector<std::vector<RealTensor>> d2phi_coarse = fe_coarse->get_d2phi();
-  std::vector<std::vector<RealTensor>> d2phi_fine = fe_fine->get_d2phi();
-  std::vector<Real> JxW_face = fe_fine->get_JxW();
+  std::vector<std::vector<RealTensor>> d2phi_coarse = MetaPhysicL::raw_value(fe_coarse->get_d2phi());
+  std::vector<std::vector<RealTensor>> d2phi_fine = MetaPhysicL::raw_value(fe_fine->get_d2phi());
+  std::vector<Real> JxW_face = MetaPhysicL::raw_value(fe_fine->get_JxW());
 
   for (unsigned int qp=0; qp != n_qp; ++qp)
     {
@@ -148,9 +148,9 @@ LaplacianErrorEstimator::internal_side_integration ()
 
   // Add the h-weighted jump integral to each error term
   fine_error =
-    error * fine_elem.hmax() * error_norm.weight(var);
+    error * MetaPhysicL::raw_value(fine_elem.hmax()) * error_norm.weight(var);
   coarse_error =
-    error * coarse_elem.hmax() * error_norm.weight(var);
+    error * MetaPhysicL::raw_value(coarse_elem.hmax()) * error_norm.weight(var);
 }
 
 } // namespace libMesh

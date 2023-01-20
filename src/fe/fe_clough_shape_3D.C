@@ -33,7 +33,7 @@ LIBMESH_DEFAULT_VECTORIZED_FE(3,CLOUGH)
 
 
 template <>
-Real FE<3,CLOUGH>::shape(const ElemType,
+GeomReal FE<3,CLOUGH>::shape(const ElemType,
                          const Order,
                          const unsigned int,
                          const Point &)
@@ -45,7 +45,7 @@ Real FE<3,CLOUGH>::shape(const ElemType,
 
 
 template <>
-Real FE<3,CLOUGH>::shape(const Elem * libmesh_dbg_var(elem),
+GeomReal FE<3,CLOUGH>::shape(const Elem * libmesh_dbg_var(elem),
                          const Order,
                          const unsigned int,
                          const Point &,
@@ -59,7 +59,7 @@ Real FE<3,CLOUGH>::shape(const Elem * libmesh_dbg_var(elem),
 
 
 template <>
-Real FE<3,CLOUGH>::shape(const FEType,
+GeomReal FE<3,CLOUGH>::shape(const FEType,
                          const Elem * libmesh_dbg_var(elem),
                          const unsigned int,
                          const Point &,
@@ -74,7 +74,7 @@ Real FE<3,CLOUGH>::shape(const FEType,
 
 
 template <>
-Real FE<3,CLOUGH>::shape_deriv(const ElemType,
+GeomReal FE<3,CLOUGH>::shape_deriv(const ElemType,
                                const Order,
                                const unsigned int,
                                const unsigned int,
@@ -87,7 +87,7 @@ Real FE<3,CLOUGH>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<3,CLOUGH>::shape_deriv(const Elem * libmesh_dbg_var(elem),
+GeomReal FE<3,CLOUGH>::shape_deriv(const Elem * libmesh_dbg_var(elem),
                                const Order,
                                const unsigned int,
                                const unsigned int,
@@ -101,7 +101,7 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem * libmesh_dbg_var(elem),
 
 
 template <>
-Real FE<3,CLOUGH>::shape_deriv(const FEType,
+GeomReal FE<3,CLOUGH>::shape_deriv(const FEType,
                                const Elem * libmesh_dbg_var(elem),
                                const unsigned int,
                                const unsigned int,
@@ -117,7 +117,7 @@ Real FE<3,CLOUGH>::shape_deriv(const FEType,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-Real FE<3,CLOUGH>::shape_second_deriv(const ElemType,
+GeomReal FE<3,CLOUGH>::shape_second_deriv(const ElemType,
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
@@ -129,7 +129,7 @@ Real FE<3,CLOUGH>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<3,CLOUGH>::shape_second_deriv(const Elem * libmesh_dbg_var(elem),
+GeomReal FE<3,CLOUGH>::shape_second_deriv(const Elem * libmesh_dbg_var(elem),
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
@@ -142,7 +142,7 @@ Real FE<3,CLOUGH>::shape_second_deriv(const Elem * libmesh_dbg_var(elem),
 }
 
 template <>
-Real FE<3,CLOUGH>::shape_second_deriv(const FEType,
+GeomReal FE<3,CLOUGH>::shape_second_deriv(const FEType,
                                       const Elem * libmesh_dbg_var(elem),
                                       const unsigned int,
                                       const unsigned int,

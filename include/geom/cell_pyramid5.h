@@ -185,7 +185,7 @@ public:
   /**
    * Specialization for computing the volume of a pyramid.
    */
-  virtual Real volume () const override;
+  virtual GeomReal volume () const override;
 
   /**
    * Builds a bounding box out of the nodal positions

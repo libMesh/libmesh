@@ -26,6 +26,7 @@
 #include "libmesh/fe_macro.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/threads.h"
+#include "libmesh/raw_type.h"
 
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -43,7 +44,7 @@ namespace libMesh
 void lagrange_nodal_soln(const Elem * elem,
                          const Order order,
                          const std::vector<Number> & elem_soln,
-                         std::vector<Number> &       nodal_soln)
+                         std::vector<GeomNumber> &       nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType type        = elem->type();
@@ -300,7 +301,9 @@ void lagrange_nodal_soln(const Elem * elem,
             {
               // By default the element solution _is_ nodal,
               // so just copy it.
-              nodal_soln = elem_soln;
+              nodal_soln.resize(elem_soln.size());
+              for (std::size_t i = 0; i < elem_soln.size(); ++i)
+                nodal_soln[i] = elem_soln[i];
 
               return;
             }
@@ -936,11 +939,11 @@ void lagrange_compute_constraints (DofConstraints & constraints,
                   const dof_id_type their_dof_g =
                     parent_dof_indices[their_dof];
 
-                  const Real their_dof_value = FEInterface::shape(Dim-1,
-                                                                  side_fe_type,
-                                                                  parent_side.get(),
-                                                                  their_dof,
-                                                                  mapped_point);
+                  const Real their_dof_value = MetaPhysicL::raw_value(FEInterface::shape(Dim-1,
+                                                                                         side_fe_type,
+                                                                                         parent_side.get(),
+                                                                                         their_dof,
+                                                                                         mapped_point));
 
                   // Only add non-zero and non-identity values
                   // for Lagrange basis functions.

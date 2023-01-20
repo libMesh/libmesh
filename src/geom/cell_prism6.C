@@ -45,12 +45,15 @@ void cell_integral(const Elem * elem, T & t);
 struct VolumeIntegral
 {
   // API
-  void accumulate_qp(Real /*xi*/, Real /*eta*/, Real /*zeta*/, Real JxW)
+  void accumulate_qp(const GeomReal & /*xi*/,
+                     const GeomReal & /*eta*/,
+                     const GeomReal & /*zeta*/,
+                     const GeomReal & JxW)
   {
     vol += JxW;
   };
 
-  Real vol = 0.;
+  GeomReal vol = 0.;
 };
 
 /**
@@ -60,14 +63,17 @@ struct VolumeIntegral
 struct NodalVolumeIntegral
 {
   // API
-  void accumulate_qp(Real xi, Real eta, Real zeta, Real JxW)
+  void accumulate_qp(const GeomReal & xi,
+                     const GeomReal & eta,
+                     const GeomReal & zeta,
+                     const GeomReal & JxW)
   {
     // Copied from fe_lagrange_shape_3D.C
     static const unsigned int i0[] = {0, 0, 0, 1, 1, 1};
     static const unsigned int i1[] = {0, 1, 2, 0, 1, 2};
 
     // Copied from fe_lagrange_shape_2D.C
-    auto tri3_phi = [](int i, Real x, Real y)
+    auto tri3_phi = [](int i, const GeomReal & x, const GeomReal & y)
     {
       switch(i)
       {
@@ -87,7 +93,7 @@ struct NodalVolumeIntegral
 
     for (int i=0; i<6; ++i)
       {
-        Real phi =
+        auto phi =
           tri3_phi(i1[i], xi, eta) * fe_lagrange_1D_linear_shape(i0[i], zeta);
 
         V[i] += phi * JxW;
@@ -95,7 +101,7 @@ struct NodalVolumeIntegral
   };
 
   // nodal volumes
-  std::array<Real, 6> V {};
+  std::array<GeomReal, 6> V {};
 };
 
 }
@@ -463,7 +469,7 @@ Point Prism6::true_centroid () const
 
   // Compute centroid
   Point cp;
-  Real vol = 0.;
+  GeomReal vol = 0.;
 
   for (int i=0; i<6; ++i)
     {
@@ -474,7 +480,7 @@ Point Prism6::true_centroid () const
   return cp / vol;
 }
 
-Real Prism6::volume () const
+GeomReal Prism6::volume () const
 {
   VolumeIntegral vi;
   cell_integral(this, vi);

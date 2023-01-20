@@ -34,32 +34,32 @@ struct CloughCoefs {
 // Coefficient naming: d(1)d(2n) is the coefficient of the
 // global shape function corresponding to value 1 in terms of the
 // local shape function corresponding to normal derivative 2
-Real d1d2n, d1d3n, d2d3n, d2d1n, d3d1n, d3d2n;
-Real d1xd1x, d1xd1y, d1xd2n, d1xd3n;
-Real d1yd1x, d1yd1y, d1yd2n, d1yd3n;
-Real d2xd2x, d2xd2y, d2xd3n, d2xd1n;
-Real d2yd2x, d2yd2y, d2yd3n, d2yd1n;
-Real d3xd3x, d3xd3y, d3xd1n, d3xd2n;
-Real d3yd3x, d3yd3y, d3yd1n, d3yd2n;
-Real d1nd1n, d2nd2n, d3nd3n;
+GeomReal d1d2n, d1d3n, d2d3n, d2d1n, d3d1n, d3d2n;
+GeomReal d1xd1x, d1xd1y, d1xd2n, d1xd3n;
+GeomReal d1yd1x, d1yd1y, d1yd2n, d1yd3n;
+GeomReal d2xd2x, d2xd2y, d2xd3n, d2xd1n;
+GeomReal d2yd2x, d2yd2y, d2yd3n, d2yd1n;
+GeomReal d3xd3x, d3xd3y, d3xd1n, d3xd2n;
+GeomReal d3yd3x, d3yd3y, d3yd1n, d3yd2n;
+GeomReal d1nd1n, d2nd2n, d3nd3n;
 // Normal vector naming: N01x is the x component of the
 // unit vector at point 0 normal to (possibly curved) side 01
-Real N01x, N01y, N10x, N10y;
-Real N02x, N02y, N20x, N20y;
-Real N21x, N21y, N12x, N12y;
+GeomReal N01x, N01y, N10x, N10y;
+GeomReal N02x, N02y, N20x, N20y;
+GeomReal N21x, N21y, N12x, N12y;
 };
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-Real clough_raw_shape_second_deriv(const unsigned int basis_num,
+GeomReal clough_raw_shape_second_deriv(const unsigned int basis_num,
                                    const unsigned int deriv_type,
                                    const Point & p);
 #endif
 
-Real clough_raw_shape_deriv(const unsigned int basis_num,
+GeomReal clough_raw_shape_deriv(const unsigned int basis_num,
                             const unsigned int deriv_type,
                             const Point & p);
-Real clough_raw_shape(const unsigned int basis_num,
+GeomReal clough_raw_shape(const unsigned int basis_num,
                       const Point & p);
 unsigned char subtriangle_lookup(const Point & p);
 
@@ -85,8 +85,8 @@ void clough_compute_coefs(const Elem * elem, CloughCoefs & coefs)
   dofpt.push_back(Point(1/2.,0));
 
   // Mapping functions - first derivatives at each dofpt
-  std::vector<Real> dxdxi(6), dxdeta(6), dydxi(6), dydeta(6);
-  std::vector<Real> dxidx(6), detadx(6), dxidy(6), detady(6);
+  std::vector<GeomReal> dxdxi(6), dxdeta(6), dydxi(6), dydeta(6);
+  std::vector<GeomReal> dxidx(6), detadx(6), dxidy(6), detady(6);
 
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
     FEInterface::shape_deriv_function(map_fe_type, elem);
@@ -96,9 +96,9 @@ void clough_compute_coefs(const Elem * elem, CloughCoefs & coefs)
       //      libMesh::err << p << ' ' << dofpt[p];
       for (int i = 0; i != n_mapping_shape_functions; ++i)
         {
-          const Real ddxi = shape_deriv_ptr
+          const GeomReal ddxi = shape_deriv_ptr
             (map_fe_type, elem, i, 0, dofpt[p], /*add_p_level=*/false);
-          const Real ddeta = shape_deriv_ptr
+          const GeomReal ddeta = shape_deriv_ptr
             (map_fe_type, elem, i, 1, dofpt[p], /*add_p_level=*/false);
 
           //      libMesh::err << ddxi << ' ';
@@ -120,7 +120,7 @@ void clough_compute_coefs(const Elem * elem, CloughCoefs & coefs)
       //      libMesh::err << dxdeta[p] << ' ';
       //      libMesh::err << dydeta[p] << std::endl << std::endl;
 
-      const Real inv_jac = 1. / (dxdxi[p]*dydeta[p] -
+      const GeomReal inv_jac = 1. / (dxdxi[p]*dydeta[p] -
                                  dxdeta[p]*dydxi[p]);
       dxidx[p] = dydeta[p] * inv_jac;
       dxidy[p] = - dxdeta[p] * inv_jac;
@@ -129,50 +129,50 @@ void clough_compute_coefs(const Elem * elem, CloughCoefs & coefs)
     }
 
   // Calculate midpoint normal vectors
-  Real N1x = dydeta[3] - dydxi[3];
-  Real N1y = dxdxi[3] - dxdeta[3];
-  Real Nlength = std::sqrt(static_cast<Real>(N1x*N1x + N1y*N1y));
+  GeomReal N1x = dydeta[3] - dydxi[3];
+  GeomReal N1y = dxdxi[3] - dxdeta[3];
+  GeomReal Nlength = std::sqrt(static_cast<GeomReal>(N1x*N1x + N1y*N1y));
   N1x /= Nlength; N1y /= Nlength;
 
-  Real N2x = - dydeta[4];
-  Real N2y = dxdeta[4];
-  Nlength = std::sqrt(static_cast<Real>(N2x*N2x + N2y*N2y));
+  GeomReal N2x = - dydeta[4];
+  GeomReal N2y = dxdeta[4];
+  Nlength = std::sqrt(static_cast<GeomReal>(N2x*N2x + N2y*N2y));
   N2x /= Nlength; N2y /= Nlength;
 
-  Real N3x = dydxi[5];
-  Real N3y = - dxdxi[5];
-  Nlength = std::sqrt(static_cast<Real>(N3x*N3x + N3y*N3y));
+  GeomReal N3x = dydxi[5];
+  GeomReal N3y = - dxdxi[5];
+  Nlength = std::sqrt(static_cast<GeomReal>(N3x*N3x + N3y*N3y));
   N3x /= Nlength; N3y /= Nlength;
 
   // Calculate corner normal vectors (used for reduced element)
   coefs.N01x = dydxi[0];
   coefs.N01y = - dxdxi[0];
-  Nlength = std::sqrt(static_cast<Real>(coefs.N01x*coefs.N01x + coefs.N01y*coefs.N01y));
+  Nlength = std::sqrt(static_cast<GeomReal>(coefs.N01x*coefs.N01x + coefs.N01y*coefs.N01y));
   coefs.N01x /= Nlength; coefs.N01y /= Nlength;
 
   coefs.N10x = dydxi[1];
   coefs.N10y = - dxdxi[1];
-  Nlength = std::sqrt(static_cast<Real>(coefs.N10x*coefs.N10x + coefs.N10y*coefs.N10y));
+  Nlength = std::sqrt(static_cast<GeomReal>(coefs.N10x*coefs.N10x + coefs.N10y*coefs.N10y));
   coefs.N10x /= Nlength; coefs.N10y /= Nlength;
 
   coefs.N02x = - dydeta[0];
   coefs.N02y = dxdeta[0];
-  Nlength = std::sqrt(static_cast<Real>(coefs.N02x*coefs.N02x + coefs.N02y*coefs.N02y));
+  Nlength = std::sqrt(static_cast<GeomReal>(coefs.N02x*coefs.N02x + coefs.N02y*coefs.N02y));
   coefs.N02x /= Nlength; coefs.N02y /= Nlength;
 
   coefs.N20x = - dydeta[2];
   coefs.N20y = dxdeta[2];
-  Nlength = std::sqrt(static_cast<Real>(coefs.N20x*coefs.N20x + coefs.N20y*coefs.N20y));
+  Nlength = std::sqrt(static_cast<GeomReal>(coefs.N20x*coefs.N20x + coefs.N20y*coefs.N20y));
   coefs.N20x /= Nlength; coefs.N20y /= Nlength;
 
   coefs.N12x = dydeta[1] - dydxi[1];
   coefs.N12y = dxdxi[1] - dxdeta[1];
-  Nlength = std::sqrt(static_cast<Real>(coefs.N12x*coefs.N12x + coefs.N12y*coefs.N12y));
+  Nlength = std::sqrt(static_cast<GeomReal>(coefs.N12x*coefs.N12x + coefs.N12y*coefs.N12y));
   coefs.N12x /= Nlength; coefs.N12y /= Nlength;
 
   coefs.N21x = dydeta[1] - dydxi[1];
   coefs.N21y = dxdxi[1] - dxdeta[1];
-  Nlength = std::sqrt(static_cast<Real>(coefs.N21x*coefs.N21x + coefs.N21y*coefs.N21y));
+  Nlength = std::sqrt(static_cast<GeomReal>(coefs.N21x*coefs.N21x + coefs.N21y*coefs.N21y));
   coefs.N21x /= Nlength; coefs.N21y /= Nlength;
 
   //  for (int i=0; i != 6; ++i) {
@@ -254,103 +254,103 @@ void clough_compute_coefs(const Elem * elem, CloughCoefs & coefs)
   // local basis function corresponding to value 1 at the node
   // corresponding to normal vector 2
 
-  Real d1d2ndxi   = clough_raw_shape_deriv(0, 0, dofpt[4]);
-  Real d1d2ndeta  = clough_raw_shape_deriv(0, 1, dofpt[4]);
-  Real d1d2ndx = d1d2ndxi * dxidx[4] + d1d2ndeta * detadx[4];
-  Real d1d2ndy = d1d2ndxi * dxidy[4] + d1d2ndeta * detady[4];
-  Real d1d3ndxi   = clough_raw_shape_deriv(0, 0, dofpt[5]);
-  Real d1d3ndeta  = clough_raw_shape_deriv(0, 1, dofpt[5]);
-  Real d1d3ndx = d1d3ndxi * dxidx[5] + d1d3ndeta * detadx[5];
-  Real d1d3ndy = d1d3ndxi * dxidy[5] + d1d3ndeta * detady[5];
-  Real d2d3ndxi   = clough_raw_shape_deriv(1, 0, dofpt[5]);
-  Real d2d3ndeta  = clough_raw_shape_deriv(1, 1, dofpt[5]);
-  Real d2d3ndx = d2d3ndxi * dxidx[5] + d2d3ndeta * detadx[5];
-  Real d2d3ndy = d2d3ndxi * dxidy[5] + d2d3ndeta * detady[5];
-  Real d2d1ndxi   = clough_raw_shape_deriv(1, 0, dofpt[3]);
-  Real d2d1ndeta  = clough_raw_shape_deriv(1, 1, dofpt[3]);
-  Real d2d1ndx = d2d1ndxi * dxidx[3] + d2d1ndeta * detadx[3];
-  Real d2d1ndy = d2d1ndxi * dxidy[3] + d2d1ndeta * detady[3];
-  Real d3d1ndxi   = clough_raw_shape_deriv(2, 0, dofpt[3]);
-  Real d3d1ndeta  = clough_raw_shape_deriv(2, 1, dofpt[3]);
-  Real d3d1ndx = d3d1ndxi * dxidx[3] + d3d1ndeta * detadx[3];
-  Real d3d1ndy = d3d1ndxi * dxidy[3] + d3d1ndeta * detady[3];
-  Real d3d2ndxi   = clough_raw_shape_deriv(2, 0, dofpt[4]);
-  Real d3d2ndeta  = clough_raw_shape_deriv(2, 1, dofpt[4]);
-  Real d3d2ndx = d3d2ndxi * dxidx[4] + d3d2ndeta * detadx[4];
-  Real d3d2ndy = d3d2ndxi * dxidy[4] + d3d2ndeta * detady[4];
-  Real d1xd2ndxi  = clough_raw_shape_deriv(3, 0, dofpt[4]);
-  Real d1xd2ndeta = clough_raw_shape_deriv(3, 1, dofpt[4]);
-  Real d1xd2ndx = d1xd2ndxi * dxidx[4] + d1xd2ndeta * detadx[4];
-  Real d1xd2ndy = d1xd2ndxi * dxidy[4] + d1xd2ndeta * detady[4];
-  Real d1xd3ndxi  = clough_raw_shape_deriv(3, 0, dofpt[5]);
-  Real d1xd3ndeta = clough_raw_shape_deriv(3, 1, dofpt[5]);
-  Real d1xd3ndx = d1xd3ndxi * dxidx[5] + d1xd3ndeta * detadx[5];
-  Real d1xd3ndy = d1xd3ndxi * dxidy[5] + d1xd3ndeta * detady[5];
-  Real d1yd2ndxi  = clough_raw_shape_deriv(4, 0, dofpt[4]);
-  Real d1yd2ndeta = clough_raw_shape_deriv(4, 1, dofpt[4]);
-  Real d1yd2ndx = d1yd2ndxi * dxidx[4] + d1yd2ndeta * detadx[4];
-  Real d1yd2ndy = d1yd2ndxi * dxidy[4] + d1yd2ndeta * detady[4];
-  Real d1yd3ndxi  = clough_raw_shape_deriv(4, 0, dofpt[5]);
-  Real d1yd3ndeta = clough_raw_shape_deriv(4, 1, dofpt[5]);
-  Real d1yd3ndx = d1yd3ndxi * dxidx[5] + d1yd3ndeta * detadx[5];
-  Real d1yd3ndy = d1yd3ndxi * dxidy[5] + d1yd3ndeta * detady[5];
-  Real d2xd3ndxi  = clough_raw_shape_deriv(5, 0, dofpt[5]);
-  Real d2xd3ndeta = clough_raw_shape_deriv(5, 1, dofpt[5]);
-  Real d2xd3ndx = d2xd3ndxi * dxidx[5] + d2xd3ndeta * detadx[5];
-  Real d2xd3ndy = d2xd3ndxi * dxidy[5] + d2xd3ndeta * detady[5];
-  Real d2xd1ndxi  = clough_raw_shape_deriv(5, 0, dofpt[3]);
-  Real d2xd1ndeta = clough_raw_shape_deriv(5, 1, dofpt[3]);
-  Real d2xd1ndx = d2xd1ndxi * dxidx[3] + d2xd1ndeta * detadx[3];
-  Real d2xd1ndy = d2xd1ndxi * dxidy[3] + d2xd1ndeta * detady[3];
-  Real d2yd3ndxi  = clough_raw_shape_deriv(6, 0, dofpt[5]);
-  Real d2yd3ndeta = clough_raw_shape_deriv(6, 1, dofpt[5]);
-  Real d2yd3ndx = d2yd3ndxi * dxidx[5] + d2yd3ndeta * detadx[5];
-  Real d2yd3ndy = d2yd3ndxi * dxidy[5] + d2yd3ndeta * detady[5];
-  Real d2yd1ndxi  = clough_raw_shape_deriv(6, 0, dofpt[3]);
-  Real d2yd1ndeta = clough_raw_shape_deriv(6, 1, dofpt[3]);
-  Real d2yd1ndx = d2yd1ndxi * dxidx[3] + d2yd1ndeta * detadx[3];
-  Real d2yd1ndy = d2yd1ndxi * dxidy[3] + d2yd1ndeta * detady[3];
-  Real d3xd1ndxi  = clough_raw_shape_deriv(7, 0, dofpt[3]);
-  Real d3xd1ndeta = clough_raw_shape_deriv(7, 1, dofpt[3]);
-  Real d3xd1ndx = d3xd1ndxi * dxidx[3] + d3xd1ndeta * detadx[3];
-  Real d3xd1ndy = d3xd1ndxi * dxidy[3] + d3xd1ndeta * detady[3];
-  Real d3xd2ndxi  = clough_raw_shape_deriv(7, 0, dofpt[4]);
-  Real d3xd2ndeta = clough_raw_shape_deriv(7, 1, dofpt[4]);
-  Real d3xd2ndx = d3xd2ndxi * dxidx[4] + d3xd2ndeta * detadx[4];
-  Real d3xd2ndy = d3xd2ndxi * dxidy[4] + d3xd2ndeta * detady[4];
-  Real d3yd1ndxi  = clough_raw_shape_deriv(8, 0, dofpt[3]);
-  Real d3yd1ndeta = clough_raw_shape_deriv(8, 1, dofpt[3]);
-  Real d3yd1ndx = d3yd1ndxi * dxidx[3] + d3yd1ndeta * detadx[3];
-  Real d3yd1ndy = d3yd1ndxi * dxidy[3] + d3yd1ndeta * detady[3];
-  Real d3yd2ndxi  = clough_raw_shape_deriv(8, 0, dofpt[4]);
-  Real d3yd2ndeta = clough_raw_shape_deriv(8, 1, dofpt[4]);
-  Real d3yd2ndx = d3yd2ndxi * dxidx[4] + d3yd2ndeta * detadx[4];
-  Real d3yd2ndy = d3yd2ndxi * dxidy[4] + d3yd2ndeta * detady[4];
-  Real d1nd1ndxi  = clough_raw_shape_deriv(9, 0, dofpt[3]);
-  Real d1nd1ndeta = clough_raw_shape_deriv(9, 1, dofpt[3]);
-  Real d1nd1ndx = d1nd1ndxi * dxidx[3] + d1nd1ndeta * detadx[3];
-  Real d1nd1ndy = d1nd1ndxi * dxidy[3] + d1nd1ndeta * detady[3];
-  Real d2nd2ndxi  = clough_raw_shape_deriv(10, 0, dofpt[4]);
-  Real d2nd2ndeta = clough_raw_shape_deriv(10, 1, dofpt[4]);
-  Real d2nd2ndx = d2nd2ndxi * dxidx[4] + d2nd2ndeta * detadx[4];
-  Real d2nd2ndy = d2nd2ndxi * dxidy[4] + d2nd2ndeta * detady[4];
-  Real d3nd3ndxi  = clough_raw_shape_deriv(11, 0, dofpt[5]);
-  Real d3nd3ndeta = clough_raw_shape_deriv(11, 1, dofpt[5]);
-  Real d3nd3ndx = d3nd3ndxi * dxidx[3] + d3nd3ndeta * detadx[3];
-  Real d3nd3ndy = d3nd3ndxi * dxidy[3] + d3nd3ndeta * detady[3];
+  GeomReal d1d2ndxi   = clough_raw_shape_deriv(0, 0, dofpt[4]);
+  GeomReal d1d2ndeta  = clough_raw_shape_deriv(0, 1, dofpt[4]);
+  GeomReal d1d2ndx = d1d2ndxi * dxidx[4] + d1d2ndeta * detadx[4];
+  GeomReal d1d2ndy = d1d2ndxi * dxidy[4] + d1d2ndeta * detady[4];
+  GeomReal d1d3ndxi   = clough_raw_shape_deriv(0, 0, dofpt[5]);
+  GeomReal d1d3ndeta  = clough_raw_shape_deriv(0, 1, dofpt[5]);
+  GeomReal d1d3ndx = d1d3ndxi * dxidx[5] + d1d3ndeta * detadx[5];
+  GeomReal d1d3ndy = d1d3ndxi * dxidy[5] + d1d3ndeta * detady[5];
+  GeomReal d2d3ndxi   = clough_raw_shape_deriv(1, 0, dofpt[5]);
+  GeomReal d2d3ndeta  = clough_raw_shape_deriv(1, 1, dofpt[5]);
+  GeomReal d2d3ndx = d2d3ndxi * dxidx[5] + d2d3ndeta * detadx[5];
+  GeomReal d2d3ndy = d2d3ndxi * dxidy[5] + d2d3ndeta * detady[5];
+  GeomReal d2d1ndxi   = clough_raw_shape_deriv(1, 0, dofpt[3]);
+  GeomReal d2d1ndeta  = clough_raw_shape_deriv(1, 1, dofpt[3]);
+  GeomReal d2d1ndx = d2d1ndxi * dxidx[3] + d2d1ndeta * detadx[3];
+  GeomReal d2d1ndy = d2d1ndxi * dxidy[3] + d2d1ndeta * detady[3];
+  GeomReal d3d1ndxi   = clough_raw_shape_deriv(2, 0, dofpt[3]);
+  GeomReal d3d1ndeta  = clough_raw_shape_deriv(2, 1, dofpt[3]);
+  GeomReal d3d1ndx = d3d1ndxi * dxidx[3] + d3d1ndeta * detadx[3];
+  GeomReal d3d1ndy = d3d1ndxi * dxidy[3] + d3d1ndeta * detady[3];
+  GeomReal d3d2ndxi   = clough_raw_shape_deriv(2, 0, dofpt[4]);
+  GeomReal d3d2ndeta  = clough_raw_shape_deriv(2, 1, dofpt[4]);
+  GeomReal d3d2ndx = d3d2ndxi * dxidx[4] + d3d2ndeta * detadx[4];
+  GeomReal d3d2ndy = d3d2ndxi * dxidy[4] + d3d2ndeta * detady[4];
+  GeomReal d1xd2ndxi  = clough_raw_shape_deriv(3, 0, dofpt[4]);
+  GeomReal d1xd2ndeta = clough_raw_shape_deriv(3, 1, dofpt[4]);
+  GeomReal d1xd2ndx = d1xd2ndxi * dxidx[4] + d1xd2ndeta * detadx[4];
+  GeomReal d1xd2ndy = d1xd2ndxi * dxidy[4] + d1xd2ndeta * detady[4];
+  GeomReal d1xd3ndxi  = clough_raw_shape_deriv(3, 0, dofpt[5]);
+  GeomReal d1xd3ndeta = clough_raw_shape_deriv(3, 1, dofpt[5]);
+  GeomReal d1xd3ndx = d1xd3ndxi * dxidx[5] + d1xd3ndeta * detadx[5];
+  GeomReal d1xd3ndy = d1xd3ndxi * dxidy[5] + d1xd3ndeta * detady[5];
+  GeomReal d1yd2ndxi  = clough_raw_shape_deriv(4, 0, dofpt[4]);
+  GeomReal d1yd2ndeta = clough_raw_shape_deriv(4, 1, dofpt[4]);
+  GeomReal d1yd2ndx = d1yd2ndxi * dxidx[4] + d1yd2ndeta * detadx[4];
+  GeomReal d1yd2ndy = d1yd2ndxi * dxidy[4] + d1yd2ndeta * detady[4];
+  GeomReal d1yd3ndxi  = clough_raw_shape_deriv(4, 0, dofpt[5]);
+  GeomReal d1yd3ndeta = clough_raw_shape_deriv(4, 1, dofpt[5]);
+  GeomReal d1yd3ndx = d1yd3ndxi * dxidx[5] + d1yd3ndeta * detadx[5];
+  GeomReal d1yd3ndy = d1yd3ndxi * dxidy[5] + d1yd3ndeta * detady[5];
+  GeomReal d2xd3ndxi  = clough_raw_shape_deriv(5, 0, dofpt[5]);
+  GeomReal d2xd3ndeta = clough_raw_shape_deriv(5, 1, dofpt[5]);
+  GeomReal d2xd3ndx = d2xd3ndxi * dxidx[5] + d2xd3ndeta * detadx[5];
+  GeomReal d2xd3ndy = d2xd3ndxi * dxidy[5] + d2xd3ndeta * detady[5];
+  GeomReal d2xd1ndxi  = clough_raw_shape_deriv(5, 0, dofpt[3]);
+  GeomReal d2xd1ndeta = clough_raw_shape_deriv(5, 1, dofpt[3]);
+  GeomReal d2xd1ndx = d2xd1ndxi * dxidx[3] + d2xd1ndeta * detadx[3];
+  GeomReal d2xd1ndy = d2xd1ndxi * dxidy[3] + d2xd1ndeta * detady[3];
+  GeomReal d2yd3ndxi  = clough_raw_shape_deriv(6, 0, dofpt[5]);
+  GeomReal d2yd3ndeta = clough_raw_shape_deriv(6, 1, dofpt[5]);
+  GeomReal d2yd3ndx = d2yd3ndxi * dxidx[5] + d2yd3ndeta * detadx[5];
+  GeomReal d2yd3ndy = d2yd3ndxi * dxidy[5] + d2yd3ndeta * detady[5];
+  GeomReal d2yd1ndxi  = clough_raw_shape_deriv(6, 0, dofpt[3]);
+  GeomReal d2yd1ndeta = clough_raw_shape_deriv(6, 1, dofpt[3]);
+  GeomReal d2yd1ndx = d2yd1ndxi * dxidx[3] + d2yd1ndeta * detadx[3];
+  GeomReal d2yd1ndy = d2yd1ndxi * dxidy[3] + d2yd1ndeta * detady[3];
+  GeomReal d3xd1ndxi  = clough_raw_shape_deriv(7, 0, dofpt[3]);
+  GeomReal d3xd1ndeta = clough_raw_shape_deriv(7, 1, dofpt[3]);
+  GeomReal d3xd1ndx = d3xd1ndxi * dxidx[3] + d3xd1ndeta * detadx[3];
+  GeomReal d3xd1ndy = d3xd1ndxi * dxidy[3] + d3xd1ndeta * detady[3];
+  GeomReal d3xd2ndxi  = clough_raw_shape_deriv(7, 0, dofpt[4]);
+  GeomReal d3xd2ndeta = clough_raw_shape_deriv(7, 1, dofpt[4]);
+  GeomReal d3xd2ndx = d3xd2ndxi * dxidx[4] + d3xd2ndeta * detadx[4];
+  GeomReal d3xd2ndy = d3xd2ndxi * dxidy[4] + d3xd2ndeta * detady[4];
+  GeomReal d3yd1ndxi  = clough_raw_shape_deriv(8, 0, dofpt[3]);
+  GeomReal d3yd1ndeta = clough_raw_shape_deriv(8, 1, dofpt[3]);
+  GeomReal d3yd1ndx = d3yd1ndxi * dxidx[3] + d3yd1ndeta * detadx[3];
+  GeomReal d3yd1ndy = d3yd1ndxi * dxidy[3] + d3yd1ndeta * detady[3];
+  GeomReal d3yd2ndxi  = clough_raw_shape_deriv(8, 0, dofpt[4]);
+  GeomReal d3yd2ndeta = clough_raw_shape_deriv(8, 1, dofpt[4]);
+  GeomReal d3yd2ndx = d3yd2ndxi * dxidx[4] + d3yd2ndeta * detadx[4];
+  GeomReal d3yd2ndy = d3yd2ndxi * dxidy[4] + d3yd2ndeta * detady[4];
+  GeomReal d1nd1ndxi  = clough_raw_shape_deriv(9, 0, dofpt[3]);
+  GeomReal d1nd1ndeta = clough_raw_shape_deriv(9, 1, dofpt[3]);
+  GeomReal d1nd1ndx = d1nd1ndxi * dxidx[3] + d1nd1ndeta * detadx[3];
+  GeomReal d1nd1ndy = d1nd1ndxi * dxidy[3] + d1nd1ndeta * detady[3];
+  GeomReal d2nd2ndxi  = clough_raw_shape_deriv(10, 0, dofpt[4]);
+  GeomReal d2nd2ndeta = clough_raw_shape_deriv(10, 1, dofpt[4]);
+  GeomReal d2nd2ndx = d2nd2ndxi * dxidx[4] + d2nd2ndeta * detadx[4];
+  GeomReal d2nd2ndy = d2nd2ndxi * dxidy[4] + d2nd2ndeta * detady[4];
+  GeomReal d3nd3ndxi  = clough_raw_shape_deriv(11, 0, dofpt[5]);
+  GeomReal d3nd3ndeta = clough_raw_shape_deriv(11, 1, dofpt[5]);
+  GeomReal d3nd3ndx = d3nd3ndxi * dxidx[3] + d3nd3ndeta * detadx[3];
+  GeomReal d3nd3ndy = d3nd3ndxi * dxidy[3] + d3nd3ndeta * detady[3];
 
-  Real d1xd1dxi   = clough_raw_shape_deriv(3, 0, dofpt[0]);
-  Real d1xd1deta  = clough_raw_shape_deriv(3, 1, dofpt[0]);
-  Real d1xd1dx    = d1xd1dxi * dxidx[0] + d1xd1deta * detadx[0];
-  Real d1xd1dy    = d1xd1dxi * dxidy[0] + d1xd1deta * detady[0];
-  Real d1yd1dxi   = clough_raw_shape_deriv(4, 0, dofpt[0]);
-  Real d1yd1deta  = clough_raw_shape_deriv(4, 1, dofpt[0]);
-  Real d1yd1dx    = d1yd1dxi * dxidx[0] + d1yd1deta * detadx[0];
-  Real d1yd1dy    = d1yd1dxi * dxidy[0] + d1yd1deta * detady[0];
-  Real d2xd2dxi   = clough_raw_shape_deriv(5, 0, dofpt[1]);
-  Real d2xd2deta  = clough_raw_shape_deriv(5, 1, dofpt[1]);
-  Real d2xd2dx    = d2xd2dxi * dxidx[1] + d2xd2deta * detadx[1];
-  Real d2xd2dy    = d2xd2dxi * dxidy[1] + d2xd2deta * detady[1];
+  GeomReal d1xd1dxi   = clough_raw_shape_deriv(3, 0, dofpt[0]);
+  GeomReal d1xd1deta  = clough_raw_shape_deriv(3, 1, dofpt[0]);
+  GeomReal d1xd1dx    = d1xd1dxi * dxidx[0] + d1xd1deta * detadx[0];
+  GeomReal d1xd1dy    = d1xd1dxi * dxidy[0] + d1xd1deta * detady[0];
+  GeomReal d1yd1dxi   = clough_raw_shape_deriv(4, 0, dofpt[0]);
+  GeomReal d1yd1deta  = clough_raw_shape_deriv(4, 1, dofpt[0]);
+  GeomReal d1yd1dx    = d1yd1dxi * dxidx[0] + d1yd1deta * detadx[0];
+  GeomReal d1yd1dy    = d1yd1dxi * dxidy[0] + d1yd1deta * detady[0];
+  GeomReal d2xd2dxi   = clough_raw_shape_deriv(5, 0, dofpt[1]);
+  GeomReal d2xd2deta  = clough_raw_shape_deriv(5, 1, dofpt[1]);
+  GeomReal d2xd2dx    = d2xd2dxi * dxidx[1] + d2xd2deta * detadx[1];
+  GeomReal d2xd2dy    = d2xd2dxi * dxidy[1] + d2xd2deta * detady[1];
 
   //  libMesh::err << dofpt[4](0) << ' ';
   //  libMesh::err << dofpt[4](1) << ' ';
@@ -370,38 +370,38 @@ void clough_compute_coefs(const Elem * elem, CloughCoefs & coefs)
   //  libMesh::err << d2yd1ndx << ' ';
   //  libMesh::err << d2yd1ndy << std::endl;
 
-  Real d2yd2dxi   = clough_raw_shape_deriv(6, 0, dofpt[1]);
-  Real d2yd2deta  = clough_raw_shape_deriv(6, 1, dofpt[1]);
-  Real d2yd2dx    = d2yd2dxi * dxidx[1] + d2yd2deta * detadx[1];
-  Real d2yd2dy    = d2yd2dxi * dxidy[1] + d2yd2deta * detady[1];
-  Real d3xd3dxi   = clough_raw_shape_deriv(7, 0, dofpt[2]);
-  Real d3xd3deta  = clough_raw_shape_deriv(7, 1, dofpt[2]);
-  Real d3xd3dx    = d3xd3dxi * dxidx[1] + d3xd3deta * detadx[1];
-  Real d3xd3dy    = d3xd3dxi * dxidy[1] + d3xd3deta * detady[1];
-  Real d3yd3dxi   = clough_raw_shape_deriv(8, 0, dofpt[2]);
-  Real d3yd3deta  = clough_raw_shape_deriv(8, 1, dofpt[2]);
-  Real d3yd3dx    = d3yd3dxi * dxidx[1] + d3yd3deta * detadx[1];
-  Real d3yd3dy    = d3yd3dxi * dxidy[1] + d3yd3deta * detady[1];
+  GeomReal d2yd2dxi   = clough_raw_shape_deriv(6, 0, dofpt[1]);
+  GeomReal d2yd2deta  = clough_raw_shape_deriv(6, 1, dofpt[1]);
+  GeomReal d2yd2dx    = d2yd2dxi * dxidx[1] + d2yd2deta * detadx[1];
+  GeomReal d2yd2dy    = d2yd2dxi * dxidy[1] + d2yd2deta * detady[1];
+  GeomReal d3xd3dxi   = clough_raw_shape_deriv(7, 0, dofpt[2]);
+  GeomReal d3xd3deta  = clough_raw_shape_deriv(7, 1, dofpt[2]);
+  GeomReal d3xd3dx    = d3xd3dxi * dxidx[1] + d3xd3deta * detadx[1];
+  GeomReal d3xd3dy    = d3xd3dxi * dxidy[1] + d3xd3deta * detady[1];
+  GeomReal d3yd3dxi   = clough_raw_shape_deriv(8, 0, dofpt[2]);
+  GeomReal d3yd3deta  = clough_raw_shape_deriv(8, 1, dofpt[2]);
+  GeomReal d3yd3dx    = d3yd3dxi * dxidx[1] + d3yd3deta * detadx[1];
+  GeomReal d3yd3dy    = d3yd3dxi * dxidy[1] + d3yd3deta * detady[1];
 
   // Calculate normal derivatives
 
-  Real d1nd1ndn = d1nd1ndx * N1x + d1nd1ndy * N1y;
-  Real d1xd2ndn = d1xd2ndx * N2x + d1xd2ndy * N2y;
-  Real d1xd3ndn = d1xd3ndx * N3x + d1xd3ndy * N3y;
-  Real d1yd2ndn = d1yd2ndx * N2x + d1yd2ndy * N2y;
-  Real d1yd3ndn = d1yd3ndx * N3x + d1yd3ndy * N3y;
+  GeomReal d1nd1ndn = d1nd1ndx * N1x + d1nd1ndy * N1y;
+  GeomReal d1xd2ndn = d1xd2ndx * N2x + d1xd2ndy * N2y;
+  GeomReal d1xd3ndn = d1xd3ndx * N3x + d1xd3ndy * N3y;
+  GeomReal d1yd2ndn = d1yd2ndx * N2x + d1yd2ndy * N2y;
+  GeomReal d1yd3ndn = d1yd3ndx * N3x + d1yd3ndy * N3y;
 
-  Real d2nd2ndn = d2nd2ndx * N2x + d2nd2ndy * N2y;
-  Real d2xd3ndn = d2xd3ndx * N3x + d2xd3ndy * N3y;
-  Real d2xd1ndn = d2xd1ndx * N1x + d2xd1ndy * N1y;
-  Real d2yd3ndn = d2yd3ndx * N3x + d2yd3ndy * N3y;
-  Real d2yd1ndn = d2yd1ndx * N1x + d2yd1ndy * N1y;
+  GeomReal d2nd2ndn = d2nd2ndx * N2x + d2nd2ndy * N2y;
+  GeomReal d2xd3ndn = d2xd3ndx * N3x + d2xd3ndy * N3y;
+  GeomReal d2xd1ndn = d2xd1ndx * N1x + d2xd1ndy * N1y;
+  GeomReal d2yd3ndn = d2yd3ndx * N3x + d2yd3ndy * N3y;
+  GeomReal d2yd1ndn = d2yd1ndx * N1x + d2yd1ndy * N1y;
 
-  Real d3nd3ndn = d3nd3ndx * N3x + d3nd3ndy * N3y;
-  Real d3xd1ndn = d3xd1ndx * N1x + d3xd1ndy * N1y;
-  Real d3xd2ndn = d3xd2ndx * N2x + d3xd2ndy * N2y;
-  Real d3yd1ndn = d3yd1ndx * N1x + d3yd1ndy * N1y;
-  Real d3yd2ndn = d3yd2ndx * N2x + d3yd2ndy * N2y;
+  GeomReal d3nd3ndn = d3nd3ndx * N3x + d3nd3ndy * N3y;
+  GeomReal d3xd1ndn = d3xd1ndx * N1x + d3xd1ndy * N1y;
+  GeomReal d3xd2ndn = d3xd2ndx * N2x + d3xd2ndy * N2y;
+  GeomReal d3yd1ndn = d3yd1ndx * N1x + d3yd1ndy * N1y;
+  GeomReal d3yd2ndn = d3yd2ndx * N2x + d3yd2ndy * N2y;
 
   // Calculate midpoint scaling factors
 
@@ -527,11 +527,11 @@ unsigned char subtriangle_lookup(const Point & p)
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 // Return shape function second derivatives on the unit right
 // triangle
-Real clough_raw_shape_second_deriv(const unsigned int basis_num,
+GeomReal clough_raw_shape_second_deriv(const unsigned int basis_num,
                                    const unsigned int deriv_type,
                                    const Point & p)
 {
-  Real xi = p(0), eta = p(1);
+  GeomReal xi = p(0), eta = p(1);
 
   switch (deriv_type)
     {
@@ -1081,11 +1081,11 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
 
 
 
-Real clough_raw_shape_deriv(const unsigned int basis_num,
+GeomReal clough_raw_shape_deriv(const unsigned int basis_num,
                             const unsigned int deriv_type,
                             const Point & p)
 {
-  Real xi = p(0), eta = p(1);
+  GeomReal xi = p(0), eta = p(1);
 
   switch (deriv_type)
     {
@@ -1516,10 +1516,10 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
     }
 }
 
-Real clough_raw_shape(const unsigned int basis_num,
+GeomReal clough_raw_shape(const unsigned int basis_num,
                       const Point & p)
 {
-  Real xi = p(0), eta = p(1);
+  GeomReal xi = p(0), eta = p(1);
 
   switch (basis_num)
     {
@@ -1758,7 +1758,7 @@ LIBMESH_DEFAULT_VECTORIZED_FE(2,CLOUGH)
 
 
 template <>
-Real FE<2,CLOUGH>::shape(const Elem * elem,
+GeomReal FE<2,CLOUGH>::shape(const Elem * elem,
                          const Order order,
                          const unsigned int i,
                          const Point & p,
@@ -1943,7 +1943,7 @@ Real FE<2,CLOUGH>::shape(const Elem * elem,
 
 
 template <>
-Real FE<2,CLOUGH>::shape(const ElemType,
+GeomReal FE<2,CLOUGH>::shape(const ElemType,
                          const Order,
                          const unsigned int,
                          const Point &)
@@ -1954,7 +1954,7 @@ Real FE<2,CLOUGH>::shape(const ElemType,
 
 
 template <>
-Real FE<2,CLOUGH>::shape(const FEType fet,
+GeomReal FE<2,CLOUGH>::shape(const FEType fet,
                          const Elem * elem,
                          const unsigned int i,
                          const Point & p,
@@ -1967,7 +1967,7 @@ Real FE<2,CLOUGH>::shape(const FEType fet,
 
 
 template <>
-Real FE<2,CLOUGH>::shape_deriv(const Elem * elem,
+GeomReal FE<2,CLOUGH>::shape_deriv(const Elem * elem,
                                const Order order,
                                const unsigned int i,
                                const unsigned int j,
@@ -2152,7 +2152,7 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem * elem,
 
 
 template <>
-Real FE<2,CLOUGH>::shape_deriv(const ElemType,
+GeomReal FE<2,CLOUGH>::shape_deriv(const ElemType,
                                const Order,
                                const unsigned int,
                                const unsigned int,
@@ -2164,7 +2164,7 @@ Real FE<2,CLOUGH>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<2,CLOUGH>::shape_deriv(const FEType fet,
+GeomReal FE<2,CLOUGH>::shape_deriv(const FEType fet,
                                const Elem * elem,
                                const unsigned int i,
                                const unsigned int j,
@@ -2180,7 +2180,7 @@ Real FE<2,CLOUGH>::shape_deriv(const FEType fet,
 
 
 template <>
-Real FE<2,CLOUGH>::shape_second_deriv(const Elem * elem,
+GeomReal FE<2,CLOUGH>::shape_second_deriv(const Elem * elem,
                                       const Order order,
                                       const unsigned int i,
                                       const unsigned int j,
@@ -2361,7 +2361,7 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem * elem,
 
 
 template <>
-Real FE<2,CLOUGH>::shape_second_deriv(const ElemType,
+GeomReal FE<2,CLOUGH>::shape_second_deriv(const ElemType,
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
@@ -2372,7 +2372,7 @@ Real FE<2,CLOUGH>::shape_second_deriv(const ElemType,
 }
 
 template <>
-Real FE<2,CLOUGH>::shape_second_deriv(const FEType fet,
+GeomReal FE<2,CLOUGH>::shape_second_deriv(const FEType fet,
                                       const Elem * elem,
                                       const unsigned int i,
                                       const unsigned int j,

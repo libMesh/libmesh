@@ -47,7 +47,7 @@ void lagrange_vec_nodal_soln(const Elem * elem,
                              const Order order,
                              const std::vector<Number> & elem_soln,
                              const int dim,
-                             std::vector<Number> &       nodal_soln)
+                             std::vector<GeomNumber> &       nodal_soln)
 {
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType type        = elem->type();
@@ -526,7 +526,9 @@ void lagrange_vec_nodal_soln(const Elem * elem,
             {
               // By default the element solution _is_ nodal,
               // so just copy it.
-              nodal_soln = elem_soln;
+              nodal_soln.resize(elem_soln.size());
+              for (std::size_t i = 0; i < elem_soln.size(); ++i)
+                nodal_soln[i] = elem_soln[i];
 
               return;
             }
@@ -600,7 +602,9 @@ void lagrange_vec_nodal_soln(const Elem * elem,
             {
               // By default the element solution _is_ nodal,
               // so just copy it.
-              nodal_soln = elem_soln;
+              nodal_soln.resize(elem_soln.size());
+              for (std::size_t i = 0; i < elem_soln.size(); ++i)
+                nodal_soln[i] = elem_soln[i];
 
               return;
             }
@@ -611,7 +615,8 @@ void lagrange_vec_nodal_soln(const Elem * elem,
       {
         // By default the element solution _is_ nodal,
         // so just copy it.
-        nodal_soln = elem_soln;
+        for (const auto i : index_range(elem_soln))
+          nodal_soln[i] = elem_soln[i];
 
         return;
       }
@@ -632,28 +637,28 @@ template <>
 void FE<0,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
                                     const Order order,
                                     const std::vector<Number> & elem_soln,
-                                    std::vector<Number> & nodal_soln)
+                                    std::vector<GeomNumber> & nodal_soln)
 { FE<0,LAGRANGE>::nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<1,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
                                     const Order order,
                                     const std::vector<Number> & elem_soln,
-                                    std::vector<Number> & nodal_soln)
+                                    std::vector<GeomNumber> & nodal_soln)
 { FE<1,LAGRANGE>::nodal_soln(elem, order, elem_soln, nodal_soln); }
 
 template <>
 void FE<2,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
                                     const Order order,
                                     const std::vector<Number> & elem_soln,
-                                    std::vector<Number> & nodal_soln)
+                                    std::vector<GeomNumber> & nodal_soln)
 { lagrange_vec_nodal_soln(elem, order, elem_soln, 2 /*dimension*/, nodal_soln); }
 
 template <>
 void FE<3,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
                                     const Order order,
                                     const std::vector<Number> & elem_soln,
-                                    std::vector<Number> & nodal_soln)
+                                    std::vector<GeomNumber> & nodal_soln)
 { lagrange_vec_nodal_soln(elem, order, elem_soln, 3 /*dimension*/, nodal_soln); }
 
 LIBMESH_FE_SIDE_NODAL_SOLN(LAGRANGE_VEC)
@@ -662,411 +667,411 @@ LIBMESH_FE_SIDE_NODAL_SOLN(LAGRANGE_VEC)
 // Specialize for shape function routines by leveraging scalar LAGRANGE elements
 
 // 0-D
-template <> RealGradient FE<0,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
+template <> GeomRealGradient FE<0,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
                                                    const unsigned int i, const Point & p)
 {
-  Real value = FE<0,LAGRANGE>::shape( type, order, i, p );
-  return libMesh::RealGradient( value );
+  GeomReal value = FE<0,LAGRANGE>::shape( type, order, i, p );
+  return libMesh::GeomRealGradient( value );
 }
-template <> RealGradient FE<0,LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
+template <> GeomRealGradient FE<0,LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
                                                          const unsigned int i, const unsigned int j,
                                                          const Point & p)
 {
-  Real value = FE<0,LAGRANGE>::shape_deriv( type, order, i, j, p );
-  return libMesh::RealGradient( value );
+  GeomReal value = FE<0,LAGRANGE>::shape_deriv( type, order, i, j, p );
+  return libMesh::GeomRealGradient( value );
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-template <> RealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
+template <> GeomRealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p)
 {
-  Real value = FE<0,LAGRANGE>::shape_second_deriv( type, order, i, j, p );
-  return libMesh::RealGradient( value );
+  GeomReal value = FE<0,LAGRANGE>::shape_second_deriv( type, order, i, j, p );
+  return libMesh::GeomRealGradient( value );
 }
 #endif
 
 // 1-D
-template <> RealGradient FE<1,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
+template <> GeomRealGradient FE<1,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
                                                    const unsigned int i, const Point & p)
 {
-  Real value = FE<1,LAGRANGE>::shape( type, order, i, p );
-  return libMesh::RealGradient( value );
+  GeomReal value = FE<1,LAGRANGE>::shape( type, order, i, p );
+  return libMesh::GeomRealGradient( value );
 }
-template <> RealGradient FE<1,LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
+template <> GeomRealGradient FE<1,LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
                                                          const unsigned int i, const unsigned int j,
                                                          const Point & p)
 {
-  Real value = FE<1,LAGRANGE>::shape_deriv( type, order, i, j, p );
-  return libMesh::RealGradient( value );
+  GeomReal value = FE<1,LAGRANGE>::shape_deriv( type, order, i, j, p );
+  return libMesh::GeomRealGradient( value );
 }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-template <> RealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
+template <> GeomRealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p)
 {
-  Real value = FE<1,LAGRANGE>::shape_second_deriv( type, order, i, j, p );
-  return libMesh::RealGradient( value );
+  GeomReal value = FE<1,LAGRANGE>::shape_second_deriv( type, order, i, j, p );
+  return libMesh::GeomRealGradient( value );
 }
 
 #endif
 
 // 2-D
-template <> RealGradient FE<2,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
+template <> GeomRealGradient FE<2,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
                                                    const unsigned int i, const Point & p)
 {
-  Real value = FE<2,LAGRANGE>::shape( type, order, i/2, p );
+  GeomReal value = FE<2,LAGRANGE>::shape( type, order, i/2, p );
 
   switch( i%2 )
     {
     case 0:
-      return libMesh::RealGradient( value );
+      return libMesh::GeomRealGradient( value );
 
     case 1:
-      return libMesh::RealGradient( Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), value );
 
     default:
       libmesh_error_msg("i%2 must be either 0 or 1!");
     }
 
   //dummy
-  return libMesh::RealGradient();
+  return libMesh::GeomRealGradient();
 }
-template <> RealGradient FE<2,LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
+template <> GeomRealGradient FE<2,LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
                                                          const unsigned int i, const unsigned int j,
                                                          const Point & p)
 {
-  Real value = FE<2,LAGRANGE>::shape_deriv( type, order, i/2, j, p );
+  GeomReal value = FE<2,LAGRANGE>::shape_deriv( type, order, i/2, j, p );
 
   switch( i%2 )
     {
     case 0:
-      return libMesh::RealGradient( value );
+      return libMesh::GeomRealGradient( value );
 
     case 1:
-      return libMesh::RealGradient( Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), value );
 
     default:
       libmesh_error_msg("i%2 must be either 0 or 1!");
     }
 
   //dummy
-  return libMesh::RealGradient();
+  return libMesh::GeomRealGradient();
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
+template <> GeomRealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p)
 {
-  Real value = FE<2,LAGRANGE>::shape_second_deriv( type, order, i/2, j, p );
+  GeomReal value = FE<2,LAGRANGE>::shape_second_deriv( type, order, i/2, j, p );
 
   switch( i%2 )
     {
     case 0:
-      return libMesh::RealGradient( value );
+      return libMesh::GeomRealGradient( value );
 
     case 1:
-      return libMesh::RealGradient( Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), value );
 
     default:
       libmesh_error_msg("i%2 must be either 0 or 1!");
     }
 
   //dummy
-  return libMesh::RealGradient();
+  return libMesh::GeomRealGradient();
 }
 
 #endif
 
 
 // 3-D
-template <> RealGradient FE<3,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
+template <> GeomRealGradient FE<3,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
                                                    const unsigned int i, const Point & p)
 {
-  Real value = FE<3,LAGRANGE>::shape( type, order, i/3, p );
+  GeomReal value = FE<3,LAGRANGE>::shape( type, order, i/3, p );
 
   switch( i%3 )
     {
     case 0:
-      return libMesh::RealGradient( value );
+      return libMesh::GeomRealGradient( value );
 
     case 1:
-      return libMesh::RealGradient( Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), value );
 
     case 2:
-      return libMesh::RealGradient( Real(0), Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), GeomReal(0), value );
 
     default:
       libmesh_error_msg("i%3 must be 0, 1, or 2!");
     }
 
   //dummy
-  return libMesh::RealGradient();
+  return libMesh::GeomRealGradient();
 }
-template <> RealGradient FE<3,LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
+template <> GeomRealGradient FE<3,LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
                                                          const unsigned int i, const unsigned int j,
                                                          const Point & p)
 {
-  Real value = FE<3,LAGRANGE>::shape_deriv( type, order, i/3, j, p );
+  GeomReal value = FE<3,LAGRANGE>::shape_deriv( type, order, i/3, j, p );
 
   switch( i%3 )
     {
     case 0:
-      return libMesh::RealGradient( value );
+      return libMesh::GeomRealGradient( value );
 
     case 1:
-      return libMesh::RealGradient( Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), value );
 
     case 2:
-      return libMesh::RealGradient( Real(0), Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), GeomReal(0), value );
 
     default:
       libmesh_error_msg("i%3 must be 0, 1, or 2!");
     }
 
   //dummy
-  return libMesh::RealGradient();
+  return libMesh::GeomRealGradient();
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
+template <> GeomRealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p)
 {
-  Real value = FE<3,LAGRANGE>::shape_second_deriv( type, order, i/3, j, p );
+  GeomReal value = FE<3,LAGRANGE>::shape_second_deriv( type, order, i/3, j, p );
 
   switch( i%3 )
     {
     case 0:
-      return libMesh::RealGradient( value );
+      return libMesh::GeomRealGradient( value );
 
     case 1:
-      return libMesh::RealGradient( Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), value );
 
     case 2:
-      return libMesh::RealGradient( Real(0), Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), GeomReal(0), value );
 
     default:
       libmesh_error_msg("i%3 must be 0, 1, or 2!");
     }
 
   //dummy
-  return libMesh::RealGradient();
+  return libMesh::GeomRealGradient();
 }
 
 #endif
 
 
 // 0-D
-template <> RealGradient FE<0,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
+template <> GeomRealGradient FE<0,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
                                                    const unsigned int i, const Point & p,
                                                    const bool add_p_level)
 {
-  Real value = FE<0,LAGRANGE>::shape( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
-  return libMesh::RealGradient( value );
+  GeomReal value = FE<0,LAGRANGE>::shape( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
+  return libMesh::GeomRealGradient( value );
 }
-template <> RealGradient FE<0,LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
+template <> GeomRealGradient FE<0,LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
                                                          const unsigned int i, const unsigned int j,
                                                          const Point & p,
                                                          const bool add_p_level)
 {
-  Real value = FE<0,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
-  return libMesh::RealGradient( value );
+  GeomReal value = FE<0,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+  return libMesh::GeomRealGradient( value );
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-template <> RealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
+template <> GeomRealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p,
                                                                 const bool add_p_level)
 {
-  Real value = FE<0,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
-  return libMesh::RealGradient( value );
+  GeomReal value = FE<0,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+  return libMesh::GeomRealGradient( value );
 }
 
 #endif
 
 // 1-D
-template <> RealGradient FE<1,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
+template <> GeomRealGradient FE<1,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
                                                    const unsigned int i, const Point & p,
                                                    const bool add_p_level)
 {
-  Real value = FE<1,LAGRANGE>::shape( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
-  return libMesh::RealGradient( value );
+  GeomReal value = FE<1,LAGRANGE>::shape( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
+  return libMesh::GeomRealGradient( value );
 }
-template <> RealGradient FE<1,LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
+template <> GeomRealGradient FE<1,LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
                                                          const unsigned int i, const unsigned int j,
                                                          const Point & p,
                                                          const bool add_p_level)
 {
-  Real value = FE<1,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
-  return libMesh::RealGradient( value );
+  GeomReal value = FE<1,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+  return libMesh::GeomRealGradient( value );
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-template <> RealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
+template <> GeomRealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p,
                                                                 const bool add_p_level)
 {
-  Real value = FE<1,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
-  return libMesh::RealGradient( value );
+  GeomReal value = FE<1,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+  return libMesh::GeomRealGradient( value );
 }
 
 #endif
 
 // 2-D
-template <> RealGradient FE<2,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
+template <> GeomRealGradient FE<2,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
                                                    const unsigned int i, const Point & p,
                                                    const bool add_p_level)
 {
-  Real value = FE<2,LAGRANGE>::shape( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i/2, p );
+  GeomReal value = FE<2,LAGRANGE>::shape( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i/2, p );
 
   switch( i%2 )
     {
     case 0:
-      return libMesh::RealGradient( value );
+      return libMesh::GeomRealGradient( value );
 
     case 1:
-      return libMesh::RealGradient( Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), value );
 
     default:
       libmesh_error_msg("i%2 must be either 0 or 1!");
     }
 
   //dummy
-  return libMesh::RealGradient();
+  return libMesh::GeomRealGradient();
 }
-template <> RealGradient FE<2,LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
+template <> GeomRealGradient FE<2,LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
                                                          const unsigned int i, const unsigned int j,
                                                          const Point & p,
                                                          const bool add_p_level)
 {
-  Real value = FE<2,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i/2, j, p );
+  GeomReal value = FE<2,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i/2, j, p );
 
   switch( i%2 )
     {
     case 0:
-      return libMesh::RealGradient( value );
+      return libMesh::GeomRealGradient( value );
 
     case 1:
-      return libMesh::RealGradient( Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), value );
 
     default:
       libmesh_error_msg("i%2 must be either 0 or 1!");
     }
 
   //dummy
-  return libMesh::RealGradient();
+  return libMesh::GeomRealGradient();
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
+template <> GeomRealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p,
                                                                 const bool add_p_level)
 {
-  Real value = FE<2,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i/2, j, p );
+  GeomReal value = FE<2,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i/2, j, p );
 
   switch( i%2 )
     {
     case 0:
-      return libMesh::RealGradient( value );
+      return libMesh::GeomRealGradient( value );
 
     case 1:
-      return libMesh::RealGradient( Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), value );
 
     default:
       libmesh_error_msg("i%2 must be either 0 or 1!");
     }
 
   //dummy
-  return libMesh::RealGradient();
+  return libMesh::GeomRealGradient();
 }
 
 #endif
 
 // 3-D
-template <> RealGradient FE<3,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
+template <> GeomRealGradient FE<3,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
                                                    const unsigned int i, const Point & p,
                                                    const bool add_p_level)
 {
-  Real value = FE<3,LAGRANGE>::shape( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i/3, p );
+  GeomReal value = FE<3,LAGRANGE>::shape( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i/3, p );
 
   switch( i%3 )
     {
     case 0:
-      return libMesh::RealGradient( value );
+      return libMesh::GeomRealGradient( value );
 
     case 1:
-      return libMesh::RealGradient( Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), value );
 
     case 2:
-      return libMesh::RealGradient( Real(0), Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), GeomReal(0), value );
 
     default:
       libmesh_error_msg("i%3 must be 0, 1, or 2!");
     }
 
   //dummy
-  return libMesh::RealGradient();
+  return libMesh::GeomRealGradient();
 }
-template <> RealGradient FE<3,LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
+template <> GeomRealGradient FE<3,LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
                                                          const unsigned int i, const unsigned int j,
                                                          const Point & p,
                                                          const bool add_p_level)
 {
-  Real value = FE<3,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i/3, j, p );
+  GeomReal value = FE<3,LAGRANGE>::shape_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i/3, j, p );
 
   switch( i%3 )
     {
     case 0:
-      return libMesh::RealGradient( value );
+      return libMesh::GeomRealGradient( value );
 
     case 1:
-      return libMesh::RealGradient( Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), value );
 
     case 2:
-      return libMesh::RealGradient( Real(0), Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), GeomReal(0), value );
 
     default:
       libmesh_error_msg("i%3 must be 0, 1, or 2!");
     }
 
   //dummy
-  return libMesh::RealGradient();
+  return libMesh::GeomRealGradient();
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
+template <> GeomRealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
                                                                 const unsigned int i, const unsigned int j,
                                                                 const Point & p,
                                                                 const bool add_p_level)
 {
-  Real value = FE<3,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i/3, j, p );
+  GeomReal value = FE<3,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i/3, j, p );
 
   switch( i%3 )
     {
     case 0:
-      return libMesh::RealGradient( value );
+      return libMesh::GeomRealGradient( value );
 
     case 1:
-      return libMesh::RealGradient( Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), value );
 
     case 2:
-      return libMesh::RealGradient( Real(0), Real(0), value );
+      return libMesh::GeomRealGradient( GeomReal(0), GeomReal(0), value );
 
     default:
       libmesh_error_msg("i%3 must be 0, 1, or 2!");
     }
 
   //dummy
-  return libMesh::RealGradient();
+  return libMesh::GeomRealGradient();
 }
 
 #endif

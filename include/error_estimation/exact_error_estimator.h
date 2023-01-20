@@ -36,12 +36,12 @@ namespace libMesh
 
 // Forward Declarations
 class Elem;
-template <typename T> class FEGenericBase;
+template <typename> class FEGenericBase;
 typedef FEGenericBase<Real> FEBase;
-class MeshFunction;
+template <typename> class MeshFunction;
 class Point;
 class Parameters;
-template <typename T> class DenseVector;
+template <typename> class DenseVector;
 
 /**
  * This class implements an "error estimator"
@@ -236,7 +236,7 @@ private:
                                    const Elem * elem,
                                    const DenseVector<Number> & Uelem,
                                    FEBase * fe,
-                                   MeshFunction * fine_values) const;
+                                   MeshFunction<Number> * fine_values) const;
 
   /**
    * Helper method for cleanup

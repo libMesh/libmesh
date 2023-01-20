@@ -202,7 +202,7 @@ public:
    * A specialization for computing the area of a hexahedron
    * with flat sides.
    */
-  virtual Real volume () const override;
+  virtual GeomReal volume () const override;
 
   /**
    * Builds a bounding box out of the nodal positions

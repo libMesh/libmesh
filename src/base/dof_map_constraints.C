@@ -52,6 +52,7 @@
 #include "libmesh/threads.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/coupling_matrix.h"
+#include "libmesh/raw_type.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -281,11 +282,11 @@ private:
   }
 
   static Gradient g_component (FunctionBase<Gradient> * g,
-                               FEMFunctionBase<Gradient> * g_fem,
-                               const FEMContext * c,
-                               unsigned int i,
-                               const Point & p,
-                               Real time)
+                                         FEMFunctionBase<Gradient> * g_fem,
+                                         const FEMContext * c,
+                                         unsigned int i,
+                                         const Point & p,
+                                         Real time)
   {
     if (g_fem)
       {
@@ -747,12 +748,10 @@ private:
     if (!variable.active_on_subdomain(elem->subdomain_id()))
       return;
 
-    typedef OutputType                                                      OutputShape;
-    typedef typename TensorTools::IncrementRank<OutputShape>::type          OutputGradient;
-    //typedef typename TensorTools::IncrementRank<OutputGradient>::type       OutputTensor;
-    typedef typename TensorTools::MakeNumber<OutputShape>::type             OutputNumber;
-    typedef typename TensorTools::IncrementRank<OutputNumber>::type         OutputNumberGradient;
-    //typedef typename TensorTools::IncrementRank<OutputNumberGradient>::type OutputNumberTensor;
+    typedef typename MakeOutput<OutputType>::type OutputShape;
+    typedef typename TensorTools::IncrementRank<OutputShape>::type OutputShapeGradient;
+    typedef typename TensorTools::MakeNumber<OutputType>::type OutputNumber;
+    typedef typename TensorTools::IncrementRank<OutputNumber>::type OutputNumberGradient;
 
     FunctionBase<Number> * f = dirichlet.f.get();
     FunctionBase<Gradient> * g = dirichlet.g.get();
@@ -1068,15 +1067,15 @@ private:
         edge_fe->get_fe_map().set_jacobian_tolerance(dirichlet.jacobian_tolerance);
 
         // Pre-request FE data
-        const std::vector<std::vector<OutputShape>> & phi = edge_fe->get_phi();
-        const std::vector<Point> & xyz_values = edge_fe->get_xyz();
-        const std::vector<Real> & JxW = edge_fe->get_JxW();
+        const auto & phi = edge_fe->get_phi();
+        const auto & xyz_values = edge_fe->get_xyz();
+        const auto & JxW = edge_fe->get_JxW();
 
         // Only pre-request gradients for C1 projections
-        const std::vector<std::vector<OutputGradient>> * dphi = nullptr;
+        const std::vector<std::vector<OutputShapeGradient>> * dphi = nullptr;
         if ((cont == C_ONE) && (fe_type.family != SUBDIVISION))
           {
-            const std::vector<std::vector<OutputGradient>> & ref_dphi = edge_fe->get_dphi();
+            const auto & ref_dphi = edge_fe->get_dphi();
             dphi = &ref_dphi;
           }
 
@@ -1172,27 +1171,27 @@ private:
                       {
                         unsigned int j = edge_dofs[sidej];
                         if (dof_is_fixed[j])
-                          Fe(freei) -= phi[i][qp] * phi[j][qp] *
-                            JxW[qp] * Ue(j);
+                          Fe(freei) -= MetaPhysicL::raw_value(phi[i][qp] * phi[j][qp] *
+                                                              JxW[qp]) * Ue(j);
                         else
-                          Ke(freei,freej) += phi[i][qp] *
-                            phi[j][qp] * JxW[qp];
+                          Ke(freei,freej) += MetaPhysicL::raw_value(phi[i][qp] *
+                                                                    phi[j][qp] * JxW[qp]);
                         if (cont == C_ONE)
                           {
                             if (dof_is_fixed[j])
-                              Fe(freei) -= ((*dphi)[i][qp].contract((*dphi)[j][qp]) ) *
-                                JxW[qp] * Ue(j);
+                              Fe(freei) -= MetaPhysicL::raw_value(((*dphi)[i][qp].contract((*dphi)[j][qp]) ) *
+                                                                  JxW[qp]) * Ue(j);
                             else
-                              Ke(freei,freej) += ((*dphi)[i][qp].contract((*dphi)[j][qp]))
-                                * JxW[qp];
+                              Ke(freei,freej) += MetaPhysicL::raw_value(((*dphi)[i][qp].contract((*dphi)[j][qp]))
+                                                                        * JxW[qp]);
                           }
                         if (!dof_is_fixed[j])
                           freej++;
                       }
-                    Fe(freei) += phi[i][qp] * fineval * JxW[qp];
+                    Fe(freei) += MetaPhysicL::raw_value(phi[i][qp] * fineval * JxW[qp]);
                     if (cont == C_ONE)
-                      Fe(freei) += (finegrad.contract( (*dphi)[i][qp]) ) *
-                        JxW[qp];
+                      Fe(freei) += MetaPhysicL::raw_value((finegrad.contract( (*dphi)[i][qp]) ) *
+                                                          JxW[qp]);
                     freei++;
                   }
               }
@@ -1225,15 +1224,15 @@ private:
         side_fe->get_fe_map().set_jacobian_tolerance(dirichlet.jacobian_tolerance);
 
         // Pre-request FE data
-        const std::vector<std::vector<OutputShape>> & phi = side_fe->get_phi();
-        const std::vector<Point> & xyz_values = side_fe->get_xyz();
-        const std::vector<Real> & JxW = side_fe->get_JxW();
+        const auto & phi = side_fe->get_phi();
+        const auto & xyz_values = side_fe->get_xyz();
+        const auto & JxW = side_fe->get_JxW();
 
         // Only pre-request gradients for C1 projections
-        const std::vector<std::vector<OutputGradient>> * dphi = nullptr;
+        const std::vector<std::vector<OutputShapeGradient>> * dphi = nullptr;
         if ((cont == C_ONE) && (fe_type.family != SUBDIVISION))
           {
-            const std::vector<std::vector<OutputGradient>> & ref_dphi = side_fe->get_dphi();
+            const auto & ref_dphi = side_fe->get_dphi();
             dphi = &ref_dphi;
           }
 
@@ -1329,27 +1328,27 @@ private:
                       {
                         unsigned int j = side_dofs[sidej];
                         if (dof_is_fixed[j])
-                          Fe(freei) -= phi[i][qp] * phi[j][qp] *
-                            JxW[qp] * Ue(j);
+                          Fe(freei) -= MetaPhysicL::raw_value(phi[i][qp] * phi[j][qp] *
+                                                              JxW[qp]) * Ue(j);
                         else
-                          Ke(freei,freej) += phi[i][qp] *
-                            phi[j][qp] * JxW[qp];
+                          Ke(freei,freej) += MetaPhysicL::raw_value(phi[i][qp] *
+                                                                    phi[j][qp] * JxW[qp]);
                         if (cont == C_ONE)
                           {
                             if (dof_is_fixed[j])
-                              Fe(freei) -= ((*dphi)[i][qp].contract((*dphi)[j][qp])) *
-                                JxW[qp] * Ue(j);
+                              Fe(freei) -= MetaPhysicL::raw_value(((*dphi)[i][qp].contract((*dphi)[j][qp])) *
+                                                                  JxW[qp]) * Ue(j);
                             else
-                              Ke(freei,freej) += ((*dphi)[i][qp].contract((*dphi)[j][qp]))
-                                * JxW[qp];
+                              Ke(freei,freej) += MetaPhysicL::raw_value(((*dphi)[i][qp].contract((*dphi)[j][qp]))
+                                                                        * JxW[qp]);
                           }
                         if (!dof_is_fixed[j])
                           freej++;
                       }
-                    Fe(freei) += (fineval * phi[i][qp]) * JxW[qp];
+                    Fe(freei) += MetaPhysicL::raw_value((fineval * phi[i][qp]) * JxW[qp]);
                     if (cont == C_ONE)
-                      Fe(freei) += (finegrad.contract((*dphi)[i][qp])) *
-                        JxW[qp];
+                      Fe(freei) += MetaPhysicL::raw_value((finegrad.contract((*dphi)[i][qp])) *
+                                                          JxW[qp]);
                     freei++;
                   }
               }
@@ -1384,15 +1383,15 @@ private:
         fe->get_fe_map().set_jacobian_tolerance(dirichlet.jacobian_tolerance);
 
         // Pre-request FE data
-        const std::vector<std::vector<OutputShape>> & phi = fe->get_phi();
-        const std::vector<Point> & xyz_values = fe->get_xyz();
-        const std::vector<Real> & JxW = fe->get_JxW();
+        const auto & phi = fe->get_phi();
+        const auto & xyz_values = fe->get_xyz();
+        const auto & JxW = fe->get_JxW();
 
         // Only pre-request gradients for C1 projections
-        const std::vector<std::vector<OutputGradient>> * dphi = nullptr;
+        const std::vector<std::vector<OutputShapeGradient>> * dphi = nullptr;
         if ((cont == C_ONE) && (fe_type.family != SUBDIVISION))
           {
-            const std::vector<std::vector<OutputGradient>> & ref_dphi = fe->get_dphi();
+            const auto & ref_dphi = fe->get_dphi();
             dphi = &ref_dphi;
           }
 
@@ -1485,27 +1484,27 @@ private:
                       {
                         unsigned int j = shellface_dofs[shellfacej];
                         if (dof_is_fixed[j])
-                          Fe(freei) -= phi[i][qp] * phi[j][qp] *
-                            JxW[qp] * Ue(j);
+                          Fe(freei) -= MetaPhysicL::raw_value(phi[i][qp] * phi[j][qp] *
+                                                              JxW[qp]) * Ue(j);
                         else
-                          Ke(freei,freej) += phi[i][qp] *
-                            phi[j][qp] * JxW[qp];
+                          Ke(freei,freej) += MetaPhysicL::raw_value(phi[i][qp] *
+                                                                    phi[j][qp] * JxW[qp]);
                         if (cont == C_ONE)
                           {
                             if (dof_is_fixed[j])
-                              Fe(freei) -= ((*dphi)[i][qp].contract((*dphi)[j][qp])) *
-                                JxW[qp] * Ue(j);
+                              Fe(freei) -= MetaPhysicL::raw_value(((*dphi)[i][qp].contract((*dphi)[j][qp])) *
+                                                                  JxW[qp]) * Ue(j);
                             else
-                              Ke(freei,freej) += ((*dphi)[i][qp].contract((*dphi)[j][qp]))
-                                * JxW[qp];
+                              Ke(freei,freej) += MetaPhysicL::raw_value(((*dphi)[i][qp].contract((*dphi)[j][qp]))
+                                                                        * JxW[qp]);
                           }
                         if (!dof_is_fixed[j])
                           freej++;
                       }
-                    Fe(freei) += (fineval * phi[i][qp]) * JxW[qp];
+                    Fe(freei) += MetaPhysicL::raw_value((fineval * phi[i][qp]) * JxW[qp]);
                     if (cont == C_ONE)
-                      Fe(freei) += (finegrad.contract((*dphi)[i][qp])) *
-                        JxW[qp];
+                      Fe(freei) += MetaPhysicL::raw_value((finegrad.contract((*dphi)[i][qp])) *
+                                                          JxW[qp]);
                     freei++;
                   }
               }

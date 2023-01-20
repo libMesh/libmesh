@@ -56819,8 +56819,8 @@ if test "${with_metaphysicl_include+set}" = set; then :
                build_metaphysicl=no
 else
   if test "x$build_metaphysicl" = "xyes"; then :
-  METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/src/numerics/include -I\$(top_srcdir)/contrib/metaphysicl/src/core/include -I\$(top_srcdir)/contrib/metaphysicl/src/utilities/include"
-                      METAPHYSICL_INC="-I$top_srcdir/contrib/metaphysicl/src/numerics/include -I$top_srcdir/contrib/metaphysicl/src/core/include -I$top_srcdir/contrib/metaphysicl/src/utilities/include"
+  METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/src/numerics/include -I\$(top_srcdir)/contrib/metaphysicl/src/core/include -I\$(top_srcdir)/contrib/metaphysicl/src/utilities/include -I\$(top_builddir)/contrib/metaphysicl/src/utilities/include"
+                      METAPHYSICL_INC="-I$top_srcdir/contrib/metaphysicl/src/numerics/include -I$top_srcdir/contrib/metaphysicl/src/core/include -I$top_srcdir/contrib/metaphysicl/src/utilities/include -I$top_builddir/contrib/metaphysicl/src/utilities/include"
 else
   METAPHYSICL_INCLUDE="-I$METAPHYSICL_DIR/include"
                       METAPHYSICL_INC="-I$METAPHYSICL_DIR/include"

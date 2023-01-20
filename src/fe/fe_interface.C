@@ -815,7 +815,7 @@ void FEInterface::nodal_soln(const unsigned int dim,
                              const FEType & fe_t,
                              const Elem * elem,
                              const std::vector<Number> & elem_soln,
-                             std::vector<Number> &       nodal_soln)
+                             std::vector<GeomNumber> & nodal_soln)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -838,7 +838,7 @@ void FEInterface::side_nodal_soln(const FEType & fe_t,
                                   const Elem * elem,
                                   const unsigned int side,
                                   const std::vector<Number> & elem_soln,
-                                  std::vector<Number> &       nodal_soln)
+                                  std::vector<GeomNumber> & nodal_soln)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -941,7 +941,7 @@ bool FEInterface::on_reference_element(const Point & p,
 
 
 
-Real FEInterface::shape(const unsigned int dim,
+GeomReal FEInterface::shape(const unsigned int dim,
                         const FEType & fe_t,
                         const ElemType t,
                         const unsigned int i,
@@ -962,11 +962,11 @@ Real FEInterface::shape(const unsigned int dim,
   fe_switch(shape(t,o,i,p));
 }
 
-Real FEInterface::shape(const unsigned int dim,
-                        const FEType & fe_t,
-                        const Elem * elem,
-                        const unsigned int i,
-                        const Point & p)
+GeomReal FEInterface::shape(const unsigned int dim,
+                            const FEType & fe_t,
+                            const Elem * elem,
+                            const unsigned int i,
+                            const Point & p)
 {
   // TODO:
   // libmesh_deprecated();
@@ -985,7 +985,7 @@ Real FEInterface::shape(const unsigned int dim,
 
 
 
-Real
+GeomReal
 FEInterface::shape(const FEType & fe_t,
                    const Elem * elem,
                    const unsigned int i,
@@ -1012,7 +1012,7 @@ FEInterface::shape(const FEType & fe_t,
 
 
 
-Real
+GeomReal
 FEInterface::shape(const FEType & fe_t,
                    int extra_order,
                    const Elem * elem,
@@ -1044,12 +1044,12 @@ FEInterface::shape(const FEType & fe_t,
 
 
 template<>
-void FEInterface::shape<Real>(const unsigned int dim,
-                              const FEType & fe_t,
-                              const ElemType t,
-                              const unsigned int i,
-                              const Point & p,
-                              Real & phi)
+void FEInterface::shape<GeomReal>(const unsigned int dim,
+                                  const FEType & fe_t,
+                                  const ElemType t,
+                                  const unsigned int i,
+                                  const Point & p,
+                                  GeomReal & phi)
 {
   // TODO
   // libmesh_deprecated();
@@ -1088,12 +1088,12 @@ void FEInterface::shape<Real>(const unsigned int dim,
 }
 
 template<>
-void FEInterface::shape<Real>(const unsigned int dim,
+void FEInterface::shape<GeomReal>(const unsigned int dim,
                               const FEType & fe_t,
                               const Elem * elem,
                               const unsigned int i,
                               const Point & p,
-                              Real & phi)
+                              GeomReal & phi)
 {
   // TODO
   // libmesh_deprecated();
@@ -1133,11 +1133,11 @@ void FEInterface::shape<Real>(const unsigned int dim,
 
 
 template<>
-void FEInterface::shape<Real>(const FEType & fe_t,
-                              const Elem * elem,
-                              const unsigned int i,
-                              const Point & p,
-                              Real & phi)
+void FEInterface::shape<GeomReal>(const FEType & fe_t,
+                                  const Elem * elem,
+                                  const unsigned int i,
+                                  const Point & p,
+                                  GeomReal & phi)
 {
   // dim is required by the fe_switch macro
   auto dim = elem->dim();
@@ -1176,12 +1176,12 @@ void FEInterface::shape<Real>(const FEType & fe_t,
 
 
 template<>
-void FEInterface::shape<Real>(const FEType & fe_t,
-                              int extra_order,
-                              const Elem * elem,
-                              const unsigned int i,
-                              const Point & p,
-                              Real & phi)
+void FEInterface::shape<GeomReal>(const FEType & fe_t,
+                                  int extra_order,
+                                  const Elem * elem,
+                                  const unsigned int i,
+                                  const Point & p,
+                                  GeomReal & phi)
 {
   // dim is required by the fe_switch macro
   auto dim = elem->dim();
@@ -1227,13 +1227,13 @@ void FEInterface::shape<Real>(const FEType & fe_t,
 
 
 template<>
-void FEInterface::shapes<Real>(const unsigned int dim,
-                               const FEType & fe_t,
-                               const Elem * elem,
-                               const unsigned int i,
-                               const std::vector<Point> & p,
-                               std::vector<Real> & phi,
-                               const bool add_p_level)
+void FEInterface::shapes<GeomReal>(const unsigned int dim,
+                                   const FEType & fe_t,
+                                   const Elem * elem,
+                                   const unsigned int i,
+                                   const std::vector<Point> & p,
+                                   std::vector<GeomReal> & phi,
+                                   const bool add_p_level)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -1272,19 +1272,19 @@ void FEInterface::shapes<Real>(const unsigned int dim,
 
 
 template<>
-void FEInterface::all_shapes<Real>(const unsigned int dim,
-                                   const FEType & fe_t,
-                                   const Elem * elem,
-                                   const std::vector<Point> & p,
-                                   std::vector<std::vector<Real>> & phi,
-                                   const bool add_p_level)
+void FEInterface::all_shapes<GeomReal>(const unsigned int dim,
+                                       const FEType & fe_t,
+                                       const Elem * elem,
+                                       const std::vector<Point> & p,
+                                       std::vector<std::vector<GeomReal>> & phi,
+                                       const bool add_p_level)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (elem && is_InfFE_elem(elem->type()))
     {
       for (auto i : index_range(phi))
-        FEInterface::shapes<Real>(dim, fe_t, elem, i, p, phi[i], add_p_level);
+        FEInterface::shapes<GeomReal>(dim, fe_t, elem, i, p, phi[i], add_p_level);
       return;
     }
 #endif
@@ -1317,12 +1317,12 @@ void FEInterface::all_shapes<Real>(const unsigned int dim,
 
 
 template<>
-void FEInterface::shape<RealGradient>(const unsigned int dim,
-                                      const FEType & fe_t,
-                                      const ElemType t,
-                                      const unsigned int i,
-                                      const Point & p,
-                                      RealGradient & phi)
+void FEInterface::shape<GeomRealGradient>(const unsigned int dim,
+                                          const FEType & fe_t,
+                                          const ElemType t,
+                                          const unsigned int i,
+                                          const Point & p,
+                                          GeomRealGradient & phi)
 {
   // TODO:
   // libmesh_deprecated();
@@ -1358,11 +1358,11 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
 
 
 template<>
-void FEInterface::shape<RealGradient>(const FEType & fe_t,
-                                      const Elem * elem,
-                                      const unsigned int i,
-                                      const Point & p,
-                                      RealGradient & phi)
+void FEInterface::shape<GeomRealGradient>(const FEType & fe_t,
+                                          const Elem * elem,
+                                          const unsigned int i,
+                                          const Point & p,
+                                          GeomRealGradient & phi)
 {
   // This API does not currently support infinite elements.
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -1403,12 +1403,12 @@ void FEInterface::shape<RealGradient>(const FEType & fe_t,
 
 
 template<>
-void FEInterface::shape<RealGradient>(const FEType & fe_t,
-                                      int extra_order,
-                                      const Elem * elem,
-                                      const unsigned int i,
-                                      const Point & p,
-                                      RealGradient & phi)
+void FEInterface::shape<GeomRealGradient>(const FEType & fe_t,
+                                          int extra_order,
+                                          const Elem * elem,
+                                          const unsigned int i,
+                                          const Point & p,
+                                          GeomRealGradient & phi)
 {
   // This API does not currently support infinite elements.
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -1451,12 +1451,12 @@ void FEInterface::shape<RealGradient>(const FEType & fe_t,
 
 
 template<>
-void FEInterface::shapes<RealGradient>(const unsigned int dim,
+void FEInterface::shapes<GeomRealGradient>(const unsigned int dim,
                                        const FEType & fe_t,
                                        const Elem * elem,
                                        const unsigned int i,
                                        const std::vector<Point> & p,
-                                       std::vector<RealGradient> & phi,
+                                       std::vector<GeomRealGradient> & phi,
                                        const bool add_p_level)
 {
 
@@ -1492,11 +1492,11 @@ void FEInterface::shapes<RealGradient>(const unsigned int dim,
 
 
 template<>
-void FEInterface::all_shapes<RealGradient>(const unsigned int dim,
+void FEInterface::all_shapes<GeomRealGradient>(const unsigned int dim,
                                            const FEType & fe_t,
                                            const Elem * elem,
                                            const std::vector<Point> & p,
-                                           std::vector<std::vector<RealGradient>> & phi,
+                                           std::vector<std::vector<GeomRealGradient>> & phi,
                                            const bool add_p_level)
 {
 
@@ -1564,12 +1564,12 @@ FEInterface::shape_function(const FEType & fe_t,
 }
 
 
-Real FEInterface::shape_deriv(const unsigned int dim,
-                              const FEType & fe_t,
-                              const ElemType t,
-                              const unsigned int i,
-                              const unsigned int j,
-                              const Point & p)
+GeomReal FEInterface::shape_deriv(const unsigned int dim,
+                                  const FEType & fe_t,
+                                  const ElemType t,
+                                  const unsigned int i,
+                                  const unsigned int j,
+                                  const Point & p)
 {
   // TODO
   // libmesh_deprecated();
@@ -1589,12 +1589,12 @@ Real FEInterface::shape_deriv(const unsigned int dim,
 }
 
 
-Real FEInterface::shape_deriv(const unsigned int dim,
-                              const FEType & fe_t,
-                              const Elem * elem,
-                              const unsigned int i,
-                              const unsigned int j,
-                              const Point & p)
+GeomReal FEInterface::shape_deriv(const unsigned int dim,
+                                  const FEType & fe_t,
+                                  const Elem * elem,
+                                  const unsigned int i,
+                                  const unsigned int j,
+                                  const Point & p)
 {
   // TODO
   // libmesh_deprecated();
@@ -1628,11 +1628,11 @@ Real FEInterface::shape_deriv(const unsigned int dim,
 
 
 
-Real FEInterface::shape_deriv(const FEType & fe_t,
-                              const Elem * elem,
-                              const unsigned int i,
-                              const unsigned int j,
-                              const Point & p)
+GeomReal FEInterface::shape_deriv(const FEType & fe_t,
+                                  const Elem * elem,
+                                  const unsigned int i,
+                                  const unsigned int j,
+                                  const Point & p)
 {
   auto dim = elem->dim();
 
@@ -1656,12 +1656,12 @@ Real FEInterface::shape_deriv(const FEType & fe_t,
 
 
 
-Real FEInterface::shape_deriv(const FEType & fe_t,
-                              int extra_order,
-                              const Elem * elem,
-                              const unsigned int i,
-                              const unsigned int j,
-                              const Point & p)
+GeomReal FEInterface::shape_deriv(const FEType & fe_t,
+                                  int extra_order,
+                                  const Elem * elem,
+                                  const unsigned int i,
+                                  const unsigned int j,
+                                  const Point & p)
 {
   auto dim = elem->dim();
 
@@ -1701,13 +1701,13 @@ Real FEInterface::shape_deriv(const FEType & fe_t,
 
 
 template<>
-void FEInterface::shape_derivs<Real>(const FEType & fe_t,
-                                     const Elem * elem,
-                                     const unsigned int i,
-                                     const unsigned int j,
-                                     const std::vector<Point> & p,
-                                     std::vector<Real> & dphi,
-                                     const bool add_p_level)
+void FEInterface::shape_derivs<GeomReal>(const FEType & fe_t,
+                                         const Elem * elem,
+                                         const unsigned int i,
+                                         const unsigned int j,
+                                         const std::vector<Point> & p,
+                                         std::vector<GeomReal> & dphi,
+                                         const bool add_p_level)
 {
   const Order o = fe_t.order;
 
@@ -1735,13 +1735,13 @@ void FEInterface::shape_derivs<Real>(const FEType & fe_t,
 
 
 template<>
-void FEInterface::shape_derivs<RealGradient>(const FEType & fe_t,
-                                             const Elem * elem,
-                                             const unsigned int i,
-                                             const unsigned int j,
-                                             const std::vector<Point> & p,
-                                             std::vector<RealGradient> & dphi,
-                                             const bool add_p_level)
+void FEInterface::shape_derivs<GeomRealGradient>(const FEType & fe_t,
+                                                 const Elem * elem,
+                                                 const unsigned int i,
+                                                 const unsigned int j,
+                                                 const std::vector<Point> & p,
+                                                 std::vector<GeomRealGradient> & dphi,
+                                                 const bool add_p_level)
 {
   const Order o = fe_t.order;
 
@@ -1805,7 +1805,7 @@ FEInterface::shape_deriv_function(const FEType & fe_t,
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Real FEInterface::shape_second_deriv(const unsigned int dim,
+GeomReal FEInterface::shape_second_deriv(const unsigned int dim,
                                      const FEType & fe_t,
                                      const ElemType t,
                                      const unsigned int i,
@@ -1840,7 +1840,7 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
 }
 
 
-Real FEInterface::shape_second_deriv(const unsigned int dim,
+GeomReal FEInterface::shape_second_deriv(const unsigned int dim,
                                      const FEType & fe_t,
                                      const Elem * elem,
                                      const unsigned int i,
@@ -1876,11 +1876,11 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
 
 
 
-Real FEInterface::shape_second_deriv(const FEType & fe_t,
-                                     const Elem * elem,
-                                     const unsigned int i,
-                                     const unsigned int j,
-                                     const Point & p)
+GeomReal FEInterface::shape_second_deriv(const FEType & fe_t,
+                                         const Elem * elem,
+                                         const unsigned int i,
+                                         const unsigned int j,
+                                         const Point & p)
 {
   auto dim = elem->dim();
 
@@ -1913,12 +1913,12 @@ Real FEInterface::shape_second_deriv(const FEType & fe_t,
 
 
 
-Real FEInterface::shape_second_deriv(const FEType & fe_t,
-                                     int extra_order,
-                                     const Elem * elem,
-                                     const unsigned int i,
-                                     const unsigned int j,
-                                     const Point & p)
+GeomReal FEInterface::shape_second_deriv(const FEType & fe_t,
+                                         int extra_order,
+                                         const Elem * elem,
+                                         const unsigned int i,
+                                         const unsigned int j,
+                                         const Point & p)
 {
   auto dim = elem->dim();
 
@@ -1989,12 +1989,12 @@ FEInterface::shape_second_deriv_function(const FEType & fe_t,
 
 
 template<>
-void FEInterface::shape<RealGradient>(const unsigned int dim,
+void FEInterface::shape<GeomRealGradient>(const unsigned int dim,
                                       const FEType & fe_t,
                                       const Elem * elem,
                                       const unsigned int i,
                                       const Point & p,
-                                      RealGradient & phi)
+                                      GeomRealGradient & phi)
 {
   // TODO
   // libmesh_deprecated();

@@ -40,7 +40,8 @@ namespace
 {
   using namespace libMesh;
 
-  int signof(Real val) {
+  template <typename T>
+  int signof(const T & val) {
     return (0 < val) - (val < 0);
   }
 
@@ -51,8 +52,8 @@ namespace
                   const Point & p1,
                   const Point & p2)
   {
-    const double detleft  = (p0(0)-p2(0))*(p1(1)-p2(1));
-    const double detright = (p0(1)-p2(1))*(p1(0)-p2(0));
+    const auto detleft  = (p0(0)-p2(0))*(p1(1)-p2(1));
+    const auto detright = (p0(1)-p2(1))*(p1(0)-p2(0));
 
     return signof(detleft - detright);
   }
@@ -65,7 +66,7 @@ namespace
   {
     const Point rayvec = ray_target - source;
     const Point edgevec = p1 - p0;
-    const double det = edgevec(0)*rayvec(1)-edgevec(1)*rayvec(0);
+    const auto det = edgevec(0)*rayvec(1)-edgevec(1)*rayvec(0);
 
     return signof(det);
   }
@@ -104,11 +105,11 @@ namespace
   // (non-inclusive) to pt1 (inclusive), -1 otherwise.
   //
   // If the intersection is a "glancing" one at a corner, return -1.
-  Real find_intersection(const Point & source,
-                         const Point & ray_target,
-                         const Point & edge_pt0,
-                         const Point & edge_pt1,
-                         const Point & edge_pt2)
+  GeomReal find_intersection(const Point & source,
+                             const Point & ray_target,
+                             const Point & edge_pt0,
+                             const Point & edge_pt1,
+                             const Point & edge_pt2)
   {
     // Quick and more numerically stable check
     if (!is_intersection(source, ray_target, edge_pt0, edge_pt1))
@@ -116,24 +117,24 @@ namespace
 
     // Calculate intersection parameters (fractions of the distance
     // along each segment)
-    const Real raydx = ray_target(0)-source(0),
+    const auto raydx = ray_target(0)-source(0),
                raydy = ray_target(1)-source(1),
                edgedx = edge_pt1(0)-edge_pt0(0),
                edgedy = edge_pt1(1)-edge_pt0(1);
-    const Real denom = edgedx * raydy - edgedy * raydx;
+    const auto denom = edgedx * raydy - edgedy * raydx;
 
     // divide-by-zero means the segments are parallel
     if (denom == 0)
       return -1;
 
-    const Real one_over_denom = 1 / denom;
+    const auto one_over_denom = 1 / denom;
 
-    const Real targetsdx = edge_pt1(0)-ray_target(0),
+    const auto targetsdx = edge_pt1(0)-ray_target(0),
                targetsdy = edge_pt1(1)-ray_target(1);
 
-    const Real t_num = targetsdx * raydy -
+    const auto t_num = targetsdx * raydy -
                        targetsdy * raydx;
-    const Real t = t_num * one_over_denom;
+    const auto t = t_num * one_over_denom;
 
     // There's an intersection between the ray line and the edge?
     if (t >= 0 && t < 1)
@@ -143,29 +144,29 @@ namespace
         // *next* edge in line is on the other side of our ray.
         if (!t)
           {
-            const Real prevdx = edge_pt0(0)-ray_target(0),
+            const auto prevdx = edge_pt0(0)-ray_target(0),
                        prevdy = edge_pt0(1)-ray_target(1);
-            const Real p_num = prevdx * raydy -
+            const auto p_num = prevdx * raydy -
                                prevdy * raydx;
 
-            const Real nextdx = edge_pt2(0)-ray_target(0),
+            const auto nextdx = edge_pt2(0)-ray_target(0),
                        nextdy = edge_pt2(1)-ray_target(1);
-            const Real n_num = nextdx * raydy -
+            const auto n_num = nextdx * raydy -
                                nextdy * raydx;
 
             if (signof(p_num) != -signof(n_num))
               return -1;
           }
 
-        const Real u_num = targetsdx * edgedy - targetsdy * edgedx;
-        const Real u = u_num * one_over_denom;
-        const Real ray_fraction = (1-u);
+        const auto u_num = targetsdx * edgedy - targetsdy * edgedx;
+        const auto u = u_num * one_over_denom;
+        const auto ray_fraction = (1-u);
 
         // Intersection is in the other direction!?
         if (ray_fraction < 0)
           return -1;
 
-        const Real distance =
+        const auto distance =
           ray_fraction * std::sqrt(raydx*raydx + raydy*raydy);
         return distance;
       }
@@ -181,13 +182,13 @@ namespace libMesh
 //
 // Hole member functions
 //
-Real TriangulatorInterface::Hole::area() const
+GeomReal TriangulatorInterface::Hole::area() const
 {
   return this->areavec().norm() / 2;
 }
 
 
-RealGradient TriangulatorInterface::Hole::areavec() const
+GeomRealGradient TriangulatorInterface::Hole::areavec() const
 {
   const unsigned int np = this->n_points();
 
@@ -205,7 +206,7 @@ RealGradient TriangulatorInterface::Hole::areavec() const
   // then the standard counter-clockwise hole point ordering gives you
   // a positive areavec(2);
 
-  RealGradient areavec = 0;
+  GeomRealGradient areavec = 0;
 
   for (unsigned int i=2; i != np; ++i)
     {
@@ -220,20 +221,20 @@ RealGradient TriangulatorInterface::Hole::areavec() const
 
 
 
-std::vector<Real>
-TriangulatorInterface::Hole::find_ray_intersections(Point ray_start,
-                                                    Point ray_target) const
+std::vector<GeomReal>
+TriangulatorInterface::Hole::find_ray_intersections(const Point & ray_start,
+                                                    const Point & ray_target) const
 {
   const auto np = this->n_points();
 
-  std::vector<Real> intersection_distances;
+  std::vector<GeomReal> intersection_distances;
 
   for (auto i : make_range(np))
     {
       const Point & p0 = this->point(i),
                   & p1 = this->point((i+1)%np),
                   & p2 = this->point((i+2)%np);
-      const Real intersection_distance =
+      const auto intersection_distance =
         find_intersection(ray_start, ray_target, p0, p1, p2);
       if (intersection_distance >= 0)
         intersection_distances.push_back
@@ -261,7 +262,7 @@ Point TriangulatorInterface::Hole::calculate_inside_point() const
   // Count the number of intersections with a ray to the right,
   // keep track of how far they are
   Point ray_target = inside + Point(1);
-  std::vector<Real> intersection_distances =
+  auto intersection_distances =
     this->find_ray_intersections(inside, ray_target);
 
   // The vertex average isn't on the interior, and we found no
@@ -286,16 +287,16 @@ Point TriangulatorInterface::Hole::calculate_inside_point() const
   // the closest edge intersection, then halfway to the next-closest.
 
   // Find the nearest first.
-  Real min_distance    = std::numeric_limits<Real>::max(),
-       second_distance = std::numeric_limits<Real>::max();
-  for (Real d : intersection_distances)
+  GeomReal min_distance    = std::numeric_limits<Real>::max(),
+           second_distance = std::numeric_limits<Real>::max();
+  for (const auto & d : intersection_distances)
     if (d < min_distance)
       {
         second_distance = min_distance;
         min_distance = d;
       }
 
-  const Point ray = ray_target - inside;
+  const auto ray = ray_target - inside;
   inside += ray * (min_distance + second_distance)/2;
 
   return inside;
@@ -307,7 +308,7 @@ bool TriangulatorInterface::Hole::contains(Point p) const
   // Count the number of intersections with a ray to the right,
   // keep track of how far they are
   Point ray_target = p + Point(1);
-  std::vector<Real> intersection_distances =
+  auto intersection_distances =
     this->find_ray_intersections(p, ray_target);
 
   // Odd number of intersections == we're inside
@@ -618,12 +619,12 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
 
   std::vector<const Node *> outer_hole_points;
   int outer_edge_type = -1;
-  Real twice_outer_area = 0,
+  GeomReal twice_outer_area = 0,
        abs_twice_outer_area = 0;
 
 #ifdef DEBUG
   // Area and edge type, for error reporting
-  std::vector<std::pair<Real, int>> areas;
+  std::vector<std::pair<GeomReal, int>> areas;
 #endif
 
   while (!hole_edge_map.empty()) {
@@ -643,7 +644,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
       report_error("Loop with only " + std::to_string(n_hole_points) +
                    " hole edges found in mesh!");
 
-    Real twice_this_area = 0;
+    GeomReal twice_this_area = 0;
     const Point p0 = *hole_points[0];
     for (unsigned int i=2; i != n_hole_points; ++i)
       {

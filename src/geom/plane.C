@@ -125,7 +125,7 @@ bool Plane::above_surface (const Point & p) const
 
   // The point is above the surface if the projection
   // of that vector onto the normal is positive
-  const Real proj = w*this->normal();
+  const GeomReal proj = w*this->normal();
 
   if (proj > 0.)
     return true;
@@ -150,7 +150,7 @@ bool Plane::on_surface (const Point & p) const
   // If the projection of that vector onto the
   // plane's normal is 0 then the point is in
   // the plane.
-  const Real proj = w * this->normal();
+  const GeomReal proj = w * this->normal();
 
   if (std::abs(proj) < 1.e-10)
     return true;

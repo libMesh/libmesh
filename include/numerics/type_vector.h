@@ -1016,9 +1016,12 @@ bool TypeVector<T>::relative_fuzzy_equals(const TypeVector<T> & rhs, Real tol) c
 
 #if LIBMESH_DIM == 3
   return this->absolute_fuzzy_equals(rhs, tol *
-                                     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
-                                      std::abs(_coords[1]) + std::abs(rhs._coords[1]) +
-                                      std::abs(_coords[2]) + std::abs(rhs._coords[2])));
+                                     (std::abs(MetaPhysicL::raw_value(_coords[0])) +
+                                      std::abs(MetaPhysicL::raw_value(rhs._coords[0])) +
+                                      std::abs(MetaPhysicL::raw_value(_coords[1])) +
+                                      std::abs(MetaPhysicL::raw_value(rhs._coords[1])) +
+                                      std::abs(MetaPhysicL::raw_value(_coords[2])) +
+                                      std::abs(MetaPhysicL::raw_value(rhs._coords[2]))));
 #endif
 }
 

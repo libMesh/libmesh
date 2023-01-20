@@ -81,7 +81,7 @@ public:
   /**
    * Constructs a sphere of radius r centered at c.
    */
-  Sphere (const Point & c, const Real r);
+  Sphere (const Point & c, const GeomReal & r);
 
   /**
    * Constructs a sphere connecting four points.
@@ -101,7 +101,7 @@ public:
   /**
    * Defines a sphere of radius r centered at c.
    */
-  void create_from_center_radius (const Point & c, const Real r);
+  void create_from_center_radius (const Point & c, const GeomReal & r);
 
   /**
    * \returns \p true if other_sphere intersects this sphere,
@@ -113,7 +113,7 @@ public:
    * \returns The distance between the surface of this sphere and
    * another sphere.
    */
-  Real distance (const Sphere & other_sphere) const;
+  GeomReal distance (const Sphere & other_sphere) const;
 
   /**
    * \returns \p true if the point p is above the surface,
@@ -150,12 +150,12 @@ public:
   /**
    * \returns The radius of the sphere.
    */
-  Real radius() const { return _rad; }
+  GeomReal radius() const { return _rad; }
 
   /**
    * \returns The radius of the sphere as a writable reference.
    */
-  Real & radius() { return _rad; }
+  GeomReal & radius() { return _rad; }
 
   /**
    * \returns The center of the sphere.
@@ -190,7 +190,7 @@ private:
   /**
    * The radius of the sphere.
    */
-  Real  _rad;
+  GeomReal  _rad;
 };
 
 
@@ -205,7 +205,7 @@ Point Sphere::surface_coords (const Point & cart) const
   const Point c (cart-this->center());
 
   // phi: special care, so that it gives 0..2pi results
-  const Real phi = std::atan2(c(1), c(0));
+  const GeomReal phi = std::atan2(c(1), c(0));
 
   return Point(/* radius */ c.norm(),
                /* theta  */ std::atan2( std::sqrt( c(0)*c(0) + c(1)*c(1) ), c(2) ),
@@ -221,9 +221,9 @@ Point Sphere::surface_coords (const Point & cart) const
 inline
 Point Sphere::world_coords (const Point & sph) const
 {
-  const Real r     = sph(0);
-  const Real theta = sph(1);
-  const Real phi   = sph(2);
+  const GeomReal r     = sph(0);
+  const GeomReal theta = sph(1);
+  const GeomReal phi   = sph(2);
 
   // constant translation out of the origin
   return Point (/* x */ r*std::sin(theta)*std::cos(phi) + this->center()(0),

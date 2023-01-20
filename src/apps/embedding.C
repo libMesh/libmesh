@@ -162,13 +162,13 @@ int main(int argc, char ** argv)
       std::cout << "      {";
       for (auto j : make_range(n_nodes))
         {
-          Real shape = FEInterface::shape(dim, fe_type, elem_type, j, pt);
+          auto shape = MetaPhysicL::raw_value(FEInterface::shape(dim, fe_type, elem_type, j, pt));
 
           // Don't print -0 or 1e-17; we don't tolerate FP error at 0
           if (std::abs(shape) < TOLERANCE*std::sqrt(TOLERANCE))
             shape = 0;
 
-          const Real embed = ref.embedding_matrix(childnum, i, j);
+          const auto embed = ref.embedding_matrix(childnum, i, j);
           if (diff &&
               std::abs(shape - embed) < TOLERANCE*std::sqrt(TOLERANCE))
             {

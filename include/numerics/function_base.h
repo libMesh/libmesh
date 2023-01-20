@@ -23,6 +23,8 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dense_vector.h" // required to instantiate a DenseVector<> below
+#include "libmesh/compare_types.h"
+#include "libmesh/raw_type.h"
 
 // C++ includes
 #include <cstddef>
@@ -163,6 +165,26 @@ public:
   bool is_time_dependent() const;
 
 protected:
+
+  /**
+   * Helper function for converting a dual type to a non-dual Output
+   */
+  template <typename T,
+            typename std::enable_if<!IsDual<Output>::value && IsDual<T>::value,
+                                    int>::type = 0>
+  static auto dual_converter(const T &in) -> typename MetaPhysicL::RawType<T>::value_type {
+    return MetaPhysicL::raw_value(in);
+  }
+
+  /**
+   * Template overload for all the other cases
+   */
+  template <typename T,
+            typename std::enable_if<
+                !(!IsDual<Output>::value && IsDual<T>::value), int>::type = 0>
+  static const T & dual_converter(const T &in) {
+    return in;
+  }
 
   /**
    * Const pointer to our master, initialized to \p nullptr.

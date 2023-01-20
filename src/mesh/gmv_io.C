@@ -34,6 +34,7 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/int_range.h"
 #include "libmesh/utility.h"
+#include "libmesh/raw_type.h"
 
 // Wrap everything in a GMVLib namespace and
 // use extern "C" to avoid name mangling.
@@ -1266,14 +1267,14 @@ void GMVIO::write_binary (const std::string & fname,
     // write the x coordinate
     std::vector<float> temp(mesh.n_nodes());
     for (auto v : make_range(mesh.n_nodes()))
-      temp[v] = static_cast<float>(mesh.point(v)(0));
+      temp[v] = static_cast<float>(MetaPhysicL::raw_value(mesh.point(v)(0)));
     out_stream.write(reinterpret_cast<char *>(temp.data()), sizeof(float)*mesh.n_nodes());
 
     // write the y coordinate
     for (auto v : make_range(mesh.n_nodes()))
       {
 #if LIBMESH_DIM > 1
-        temp[v] = static_cast<float>(mesh.point(v)(1));
+        temp[v] = static_cast<float>(MetaPhysicL::raw_value(mesh.point(v)(1)));
 #else
         temp[v] = 0.;
 #endif
@@ -1284,7 +1285,7 @@ void GMVIO::write_binary (const std::string & fname,
     for (auto v : make_range(mesh.n_nodes()))
       {
 #if LIBMESH_DIM > 2
-        temp[v] = static_cast<float>(mesh.point(v)(2));
+        temp[v] = static_cast<float>(MetaPhysicL::raw_value(mesh.point(v)(2)));
 #else
         temp[v] = 0.;
 #endif

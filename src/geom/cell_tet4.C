@@ -318,7 +318,7 @@ Point Tet4::true_centroid () const
 
 
 
-Real Tet4::volume () const
+GeomReal Tet4::volume () const
 {
   // The volume of a tetrahedron is 1/6 the box product formed
   // by its base and apex vectors
@@ -336,7 +336,7 @@ Real Tet4::volume () const
 
 
 
-std::pair<Real, Real> Tet4::min_and_max_angle() const
+std::pair<GeomReal, GeomReal> Tet4::min_and_max_angle() const
 {
   Point n[4];
 
@@ -346,7 +346,7 @@ std::pair<Real, Real> Tet4::min_and_max_angle() const
   n[2] = (this->point(2) - this->point(1)).cross(this->point(3) - this->point(1));
   n[3] = (this->point(0) - this->point(2)).cross(this->point(3) - this->point(2));
 
-  Real dihedral_angles[6]; // 01, 02, 03, 12, 13, 23
+  GeomReal dihedral_angles[6]; // 01, 02, 03, 12, 13, 23
 
   // Compute dihedral angles
   for (unsigned int k=0,i=0; i<4; ++i)
@@ -384,9 +384,9 @@ bool Tet4::contains_point (const Point & p, Real tol) const
 
   libmesh_try
     {
-      RealTensorValue(col1(0), col2(0), col3(0),
-                      col1(1), col2(1), col3(1),
-                      col1(2), col2(2), col3(2)).solve(p - point(0), r);
+      GeomRealTensorValue(col1(0), col2(0), col3(0),
+                          col1(1), col2(1), col3(1),
+                          col1(2), col2(2), col3(2)).solve(p - point(0), r);
     }
   libmesh_catch (ConvergenceFailure &)
     {

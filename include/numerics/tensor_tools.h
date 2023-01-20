@@ -197,6 +197,34 @@ struct MakeNumber<std::complex<T>>
   typedef std::complex<T> type;
 };
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+template <typename T, bool asd>
+struct MakeNumber<MetaPhysicL::DualNumber<T, T, asd>>
+{
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  typedef MetaPhysicL::DualNumber<std::complex<T>,
+                                  std::complex<T>,
+                                  asd> type;
+
+#else
+  typedef MetaPhysicL::DualNumber<T, T, asd> type;
+#endif
+};
+
+template <typename T, typename D, bool asd>
+struct MakeNumber<MetaPhysicL::DualNumber<T, D, asd>>
+{
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  typedef MetaPhysicL::DualNumber<std::complex<T>,
+                                  typename D::template rebind<std::complex<T>>::other,
+                                  asd> type;
+
+#else
+  typedef MetaPhysicL::DualNumber<T, D, asd> type;
+#endif
+};
+
+#endif // LIBMESH_HAVE_METAPHYSICL
 
 template <typename T>
 struct MakeNumber<TypeVector<T>>

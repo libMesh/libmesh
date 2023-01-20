@@ -513,10 +513,11 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	libmesh_logging.h libmesh_singleton.h libmesh_version.h \
 	multi_predicates.h periodic_boundaries.h periodic_boundary.h \
 	periodic_boundary_base.h point_neighbor_coupling.h \
-	print_trace.h reference_counted_object.h reference_counter.h \
-	sibling_coupling.h single_predicates.h sparsity_pattern.h \
-	variable.h variant_filter_iterator.h enum_convergence_flags.h \
-	enum_eigen_solver_type.h enum_elem_quality.h enum_elem_type.h \
+	print_trace.h raw_type.h reference_counted_object.h \
+	reference_counter.h sibling_coupling.h single_predicates.h \
+	sparsity_pattern.h variable.h variant_filter_iterator.h \
+	enum_convergence_flags.h enum_eigen_solver_type.h \
+	enum_elem_quality.h enum_elem_type.h \
 	enum_error_estimator_type.h enum_fe_family.h \
 	enum_inf_map_type.h enum_io_package.h enum_matrix_build_type.h \
 	enum_norm_type.h enum_order.h enum_parallel_type.h \
@@ -664,10 +665,10 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	number_lookups.h ostream_proxy.h parameters.h perf_log.h \
 	perfmon.h plt_loader.h point_locator_base.h \
 	point_locator_nanoflann.h point_locator_tree.h \
-	pointer_to_pointer_iter.h pool_allocator.h restore_warnings.h \
-	simple_range.h statistics.h string_to_enum.h timestamp.h \
-	topology_map.h tree.h tree_base.h tree_node.h utility.h \
-	vectormap.h win_gettimeofday.h xdr_cxx.h \
+	pointer_to_pointer_iter.h pool_allocator.h raw_value.h \
+	restore_warnings.h simple_range.h statistics.h \
+	string_to_enum.h timestamp.h topology_map.h tree.h tree_base.h \
+	tree_node.h utility.h vectormap.h win_gettimeofday.h xdr_cxx.h \
 	parallel_communicator_specializations $(am__append_1) \
 	$(am__append_3) $(am__append_5) $(am__append_7) \
 	$(am__append_9) $(am__append_11) $(am__append_13) \
@@ -989,6 +990,9 @@ point_neighbor_coupling.h: $(top_srcdir)/include/base/point_neighbor_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 print_trace.h: $(top_srcdir)/include/base/print_trace.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+raw_type.h: $(top_srcdir)/include/base/raw_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 reference_counted_object.h: $(top_srcdir)/include/base/reference_counted_object.h
@@ -2303,6 +2307,9 @@ pointer_to_pointer_iter.h: $(top_srcdir)/include/utils/pointer_to_pointer_iter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+raw_value.h: $(top_srcdir)/include/utils/raw_value.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 restore_warnings.h: $(top_srcdir)/include/utils/restore_warnings.h

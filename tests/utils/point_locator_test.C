@@ -3,6 +3,7 @@
 #include <libmesh/elem.h>
 #include <libmesh/node.h>
 #include <libmesh/parallel.h>
+#include <libmesh/raw_type.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -93,13 +94,13 @@ public:
 
                 if (node)
                   {
-                    LIBMESH_ASSERT_FP_EQUAL(i*h, (*node)(0),
+                    LIBMESH_ASSERT_FP_EQUAL(i*h, MetaPhysicL::raw_value((*node)(0)),
                                             TOLERANCE*TOLERANCE);
                     if (LIBMESH_DIM > 1)
-                      LIBMESH_ASSERT_FP_EQUAL(j*h, (*node)(1),
+                      LIBMESH_ASSERT_FP_EQUAL(j*h, MetaPhysicL::raw_value((*node)(1)),
                                               TOLERANCE*TOLERANCE);
                     if (LIBMESH_DIM > 2)
-                      LIBMESH_ASSERT_FP_EQUAL(k*h, (*node)(2),
+                      LIBMESH_ASSERT_FP_EQUAL(k*h, MetaPhysicL::raw_value((*node)(2)),
                                               TOLERANCE*TOLERANCE);
                   }
               }

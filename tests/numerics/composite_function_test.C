@@ -5,6 +5,7 @@
 #include <libmesh/parsed_function.h>
 #include <libmesh/zero_function.h>
 #include <libmesh/analytic_function.h>
+#include "libmesh/raw_type.h"
 
 #include "libmesh_cppunit.h"
 
@@ -128,7 +129,7 @@ private:
     // Test constructing AnalyticFunction with lambda.
     auto af_lambda =
       [](const Point & p, const Real t) -> Real
-      { return p(0)*p(0) + p(1)*p(1) + t*t; };
+        { return MetaPhysicL::raw_value(p(0)*p(0) + p(1)*p(1) + t*t); };
     AnalyticFunction<Real> x2y2t2(af_lambda);
 
     std::vector<unsigned int> index_set(1,0);

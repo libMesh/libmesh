@@ -15,6 +15,7 @@
 #include <libmesh/nemesis_io.h>
 #include <libmesh/vtk_io.h>
 #include <libmesh/tetgen_io.h>
+#include <libmesh/raw_type.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -23,39 +24,42 @@
 using namespace libMesh;
 
 
-Number six_x_plus_sixty_y (const Point& p,
+Number six_x_plus_sixty_y (const Point& p_in,
                            const Parameters&,
                            const std::string&,
                            const std::string&)
 {
-  const Real & x = p(0);
-  const Real & y = p(1);
+  const auto p = MetaPhysicL::raw_value(p_in);
+  const auto & x = p(0);
+  const auto & y = p(1);
 
   return 6*x + 60*y;
 }
 
 
-Number sin_x_plus_cos_y (const Point& p,
+Number sin_x_plus_cos_y (const Point& p_in,
                          const Parameters&,
                          const std::string&,
                          const std::string&)
 {
-  const Real & x = p(0);
-  const Real & y = p(1);
+  const auto p = MetaPhysicL::raw_value(p_in);
+  const auto & x = p(0);
+  const auto & y = p(1);
 
   return sin(x) + cos(y);
 }
 
 constexpr int added_sides_nxyz[] = {2,2,2};
 
-Number designed_for_side_elems (const Point & p,
+Number designed_for_side_elems (const Point & p_in,
                                 const Parameters & param,
                                 const std::string &,
                                 const std::string &)
 {
-  const Real & x = p(0);
-  const Real & y = p(1);
-  const Real & z = p(2);
+  const auto p = MetaPhysicL::raw_value(p_in);
+  const auto & x = p(0);
+  const auto & y = p(1);
+  const auto & z = p(2);
 
   short facedim = param.have_parameter<short>("face") ?
     param.get<short>("face") : -1;
@@ -383,7 +387,7 @@ public:
         for (Real y = 0; y < 1 + TOLERANCE; y += Real(1.L/3.L))
           {
             Point p(x,y);
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(MetaPhysicL::raw_value(sys.point_value(0,p))),
                                     libmesh_real(6*x+60*y),
                                     exotol);
           }
@@ -473,8 +477,8 @@ public:
         for (Real y = Real(1.L/6.L); y < 1; y += Real(1.L/3.L))
           {
             Point p(x,y);
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                    libmesh_real(6*x+60*y),
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(MetaPhysicL::raw_value(sys.point_value(0,p))),
+                                    libmesh_real(MetaPhysicL::raw_value(6*x+60*y)),
                                     exotol);
           }
     }
@@ -544,7 +548,7 @@ public:
 
       // The result should be '\frac{6 + 60}{2} = 33' at all points in the element domain
       CPPUNIT_ASSERT_EQUAL(int(sys.solution->size()), 1);
-      CPPUNIT_ASSERT_EQUAL(libmesh_real(sys.point_value(0, Point(0.5, 0.5))), Real(33));
+      CPPUNIT_ASSERT_EQUAL(libmesh_real(MetaPhysicL::raw_value(sys.point_value(0, Point(0.5, 0.5)))), Real(33));
     }
   }
 
@@ -652,10 +656,10 @@ public:
         for (Real y = Real(1.L/6.L); y < 1; y += Real(1.L/3.L))
           {
             Point p(x,y);
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(MetaPhysicL::raw_value(sys.point_value(0,p))),
                                     libmesh_real(6*x+60*y),
                                     exotol);
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(1,p)),
+            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(MetaPhysicL::raw_value(sys.point_value(1,p))),
                                     libmesh_real(sin(x)+cos(y)),
                                     exotol);
           }
@@ -753,9 +757,9 @@ public:
       for (const auto & elem : mesh.active_element_ptr_range())
         for (auto i : index_range(file_var_names))
           {
-            Real read_val = sys.point_value(i, elem->vertex_average());
+            GeomReal read_val = sys.point_value(i, elem->vertex_average());
             LIBMESH_ASSERT_FP_EQUAL
-              (expected_values[i], read_val, TOLERANCE*TOLERANCE);
+              (expected_values[i], MetaPhysicL::raw_value(read_val), TOLERANCE*TOLERANCE);
           }
     } // end second scope
   } // end testExodusWriteElementDataFromDiscontinuousNodalData
@@ -1266,18 +1270,18 @@ public:
             (elem->node_ref(n).get_extra_datum<Real>(weight_index),
              Real(0.75));
 
-        CPPUNIT_ASSERT_EQUAL(elem->point(0)(0), Real(0.5));
-        CPPUNIT_ASSERT_EQUAL(elem->point(0)(1), Real(0.5));
-        CPPUNIT_ASSERT_EQUAL(elem->point(1)(0), Real(1.5));
-        CPPUNIT_ASSERT_EQUAL(elem->point(1)(1), Real(0.5));
-        CPPUNIT_ASSERT_EQUAL(elem->point(2)(0), Real(1.5));
-        CPPUNIT_ASSERT_EQUAL(elem->point(2)(1), Real(1.5));
-        CPPUNIT_ASSERT_EQUAL(elem->point(3)(0), Real(0.5));
-        CPPUNIT_ASSERT_EQUAL(elem->point(3)(1), Real(1.5));
+        CPPUNIT_ASSERT_EQUAL(MetaPhysicL::raw_value(elem->point(0)(0)), Real(0.5));
+        CPPUNIT_ASSERT_EQUAL(MetaPhysicL::raw_value(elem->point(0)(1)), Real(0.5));
+        CPPUNIT_ASSERT_EQUAL(MetaPhysicL::raw_value(elem->point(1)(0)), Real(1.5));
+        CPPUNIT_ASSERT_EQUAL(MetaPhysicL::raw_value(elem->point(1)(1)), Real(0.5));
+        CPPUNIT_ASSERT_EQUAL(MetaPhysicL::raw_value(elem->point(2)(0)), Real(1.5));
+        CPPUNIT_ASSERT_EQUAL(MetaPhysicL::raw_value(elem->point(2)(1)), Real(1.5));
+        CPPUNIT_ASSERT_EQUAL(MetaPhysicL::raw_value(elem->point(3)(0)), Real(0.5));
+        CPPUNIT_ASSERT_EQUAL(MetaPhysicL::raw_value(elem->point(3)(1)), Real(1.5));
         CPPUNIT_ASSERT(elem->has_affine_map());
 #if LIBMESH_DIM > 2
         for (unsigned int v=0; v != 4; ++v)
-          CPPUNIT_ASSERT_EQUAL(elem->point(v)(2), Real(0));
+          CPPUNIT_ASSERT_EQUAL(MetaPhysicL::raw_value(elem->point(v)(2)), Real(0));
 #endif
       }
 
@@ -1399,7 +1403,7 @@ public:
       {
         if (elem->type() == NODEELEM)
           continue;
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(0.04), elem->volume(), TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(0.04), MetaPhysicL::raw_value(elem->volume()), TOLERANCE);
 
         for (unsigned int n=0; n != 9; ++n)
           CPPUNIT_ASSERT_EQUAL

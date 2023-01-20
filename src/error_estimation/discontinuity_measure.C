@@ -34,6 +34,7 @@
 #include "libmesh/tensor_tools.h"
 #include "libmesh/enum_error_estimator_type.h"
 #include "libmesh/enum_norm_type.h"
+#include "libmesh/raw_type.h"
 
 namespace libMesh
 {
@@ -97,17 +98,17 @@ DiscontinuityMeasure::internal_side_integration ()
   Real error = 1.e-30;
   unsigned int n_qp = fe_fine->n_quadrature_points();
 
-  std::vector<std::vector<Real>> phi_coarse = fe_coarse->get_phi();
-  std::vector<std::vector<Real>> phi_fine = fe_fine->get_phi();
-  std::vector<Real> JxW_face = fe_fine->get_JxW();
+  std::vector<std::vector<Real>> phi_coarse = MetaPhysicL::raw_value(fe_coarse->get_phi());
+  std::vector<std::vector<Real>> phi_fine = MetaPhysicL::raw_value(fe_fine->get_phi());
+  std::vector<Real> JxW_face = MetaPhysicL::raw_value(fe_fine->get_JxW());
 
   for (unsigned int qp=0; qp != n_qp; ++qp)
     {
       // Calculate solution values on fine and coarse elements
       // at this quadrature point
       Number
-        u_fine   = fine_context->side_value(var, qp),
-        u_coarse = coarse_context->side_value(var, qp);
+        u_fine   = MetaPhysicL::raw_value(fine_context->side_value(var, qp)),
+        u_coarse = MetaPhysicL::raw_value(coarse_context->side_value(var, qp));
 
       // Find the jump in the value
       // at this quadrature point
@@ -119,9 +120,9 @@ DiscontinuityMeasure::internal_side_integration ()
 
   // Add the h-weighted jump integral to each error term
   fine_error =
-    error * fine_elem.hmax() * error_norm.weight(var);
+    error * MetaPhysicL::raw_value(fine_elem.hmax()) * error_norm.weight(var);
   coarse_error =
-    error * coarse_elem.hmax() * error_norm.weight(var);
+    error * MetaPhysicL::raw_value(coarse_elem.hmax()) * error_norm.weight(var);
 }
 
 
@@ -136,8 +137,8 @@ DiscontinuityMeasure::boundary_side_integration ()
   const std::string & var_name =
     fine_context->get_system().variable_name(var);
 
-  std::vector<std::vector<Real>> phi_fine = fe_fine->get_phi();
-  std::vector<Real> JxW_face = fe_fine->get_JxW();
+  std::vector<std::vector<Real>> phi_fine = MetaPhysicL::raw_value(fe_fine->get_phi());
+  std::vector<Real> JxW_face = MetaPhysicL::raw_value(fe_fine->get_JxW());
   std::vector<Point> qface_point = fe_fine->get_xyz();
 
   // The reinitialization also recomputes the locations of
@@ -149,7 +150,7 @@ DiscontinuityMeasure::boundary_side_integration ()
   if (this->_bc_function(fine_context->get_system(),
                          qface_point[0], var_name).first)
     {
-      const Real h = fine_elem.hmax();
+      const Real h = MetaPhysicL::raw_value(fine_elem.hmax());
 
       // The number of quadrature points
       const unsigned int n_qp = fe_fine->n_quadrature_points();
@@ -170,7 +171,7 @@ DiscontinuityMeasure::boundary_side_integration ()
           libmesh_assert_equal_to (essential_bc.first, true);
 
           // The solution value on each point
-          Number u_fine = fine_context->side_value(var, qp);
+          Number u_fine = MetaPhysicL::raw_value(fine_context->side_value(var, qp));
 
           // The difference between the desired BC and the approximate solution.
           const Number jump = essential_bc.second - u_fine;

@@ -99,8 +99,8 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
             // 3D case.  Concave-upward curves (smiles) have a positive
             // curvature.  Concave-downward curves (frowns) have a
             // negative curvature.  Be sure to take that into account!
-            const Real numerator   = this->d2xyzdxi2_map[p] * this->normals[p];
-            const Real denominator = this->dxyzdxi_map[p].norm_sq();
+            const GeomReal numerator   = this->d2xyzdxi2_map[p] * this->normals[p];
+            const GeomReal denominator = this->dxyzdxi_map[p].norm_sq();
             libmesh_assert_not_equal_to (denominator, 0);
             this->curvatures[p] = numerator / denominator;
 #endif
@@ -110,10 +110,10 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
         // compute the jacobian at the quadrature points
         for (unsigned int p=0; p<n_qp; p++)
           {
-            const Real the_jac = std::sqrt(this->dxdxi_map(p)*this->dxdxi_map(p) +
+            const GeomReal the_jac = std::sqrt(this->dxdxi_map(p)*this->dxdxi_map(p) +
                                            this->dydxi_map(p)*this->dydxi_map(p));
 
-            libmesh_assert_greater (the_jac, 0.);
+            libmesh_assert_greater (MetaPhysicL::raw_value(the_jac), 0.);
 
             this->JxW[p] = the_jac*qw[p];
           }
@@ -189,15 +189,15 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
             // 1) http://mathworld.wolfram.com/MeanCurvature.html
             //    (note -- they are using inward normal)
             // 2) F.S. Merritt, Mathematics Manual, 1962, McGraw-Hill
-            const Real L  = -this->d2xyzdxi2_map[p]    * this->normals[p];
-            const Real M  = -this->d2xyzdxideta_map[p] * this->normals[p];
-            const Real N  = -this->d2xyzdeta2_map[p]   * this->normals[p];
-            const Real E  =  this->dxyzdxi_map[p].norm_sq();
-            const Real F  =  this->dxyzdxi_map[p]      * this->dxyzdeta_map[p];
-            const Real G  =  this->dxyzdeta_map[p].norm_sq();
+            const GeomReal L  = -this->d2xyzdxi2_map[p]    * this->normals[p];
+            const GeomReal M  = -this->d2xyzdxideta_map[p] * this->normals[p];
+            const GeomReal N  = -this->d2xyzdeta2_map[p]   * this->normals[p];
+            const GeomReal E  =  this->dxyzdxi_map[p].norm_sq();
+            const GeomReal F  =  this->dxyzdxi_map[p]      * this->dxyzdeta_map[p];
+            const GeomReal G  =  this->dxyzdeta_map[p].norm_sq();
 
-            const Real numerator   = E*N -2.*F*M + G*L;
-            const Real denominator = E*G - F*F;
+            const GeomReal numerator   = E*N -2.*F*M + G*L;
+            const GeomReal denominator = E*G - F*F;
             libmesh_assert_not_equal_to (denominator, 0.);
             this->curvatures[p] = 0.5*numerator/denominator;
 #endif
@@ -207,22 +207,22 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real> & qw, const Ele
         // http://sp81.msi.umn.edu:999/fluent/fidap/help/theory/thtoc.htm
         for (unsigned int p=0; p<n_qp; p++)
           {
-            const Real g11 = (this->dxdxi_map(p)*this->dxdxi_map(p) +
+            const GeomReal g11 = (this->dxdxi_map(p)*this->dxdxi_map(p) +
                               this->dydxi_map(p)*this->dydxi_map(p) +
                               this->dzdxi_map(p)*this->dzdxi_map(p));
 
-            const Real g12 = (this->dxdxi_map(p)*this->dxdeta_map(p) +
+            const GeomReal g12 = (this->dxdxi_map(p)*this->dxdeta_map(p) +
                               this->dydxi_map(p)*this->dydeta_map(p) +
                               this->dzdxi_map(p)*this->dzdeta_map(p));
 
-            const Real g21 = g12;
+            const GeomReal g21 = g12;
 
-            const Real g22 = (this->dxdeta_map(p)*this->dxdeta_map(p) +
+            const GeomReal g22 = (this->dxdeta_map(p)*this->dxdeta_map(p) +
                               this->dydeta_map(p)*this->dydeta_map(p) +
                               this->dzdeta_map(p)*this->dzdeta_map(p));
 
 
-            const Real the_jac = std::sqrt(g11*g22 - g12*g21);
+            const GeomReal the_jac = std::sqrt(g11*g22 - g12*g21);
 
             libmesh_assert_greater (the_jac, 0.);
 

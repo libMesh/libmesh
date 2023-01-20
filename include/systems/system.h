@@ -1640,9 +1640,9 @@ public:
    * optional parameter \p insist_on_success can be set to false to allow
    * the method to return 0 when the point is not located.
    */
-  Number point_value(unsigned int var, const Point & p,
-                     const bool insist_on_success = true,
-                     const NumericVector<Number> * sol = nullptr) const;
+  GeomNumber point_value(unsigned int var, const Point & p,
+                         const bool insist_on_success = true,
+                         const NumericVector<Number> * sol = nullptr) const;
 
   /**
    * \returns The value of the solution variable \p var at the physical
@@ -1653,8 +1653,8 @@ public:
    * This version of point_value can be run in serial, but assumes \p e is in
    * the local mesh partition or is algebraically ghosted.
    */
-  Number point_value(unsigned int var, const Point & p, const Elem & e,
-                     const NumericVector<Number> * sol = nullptr) const;
+  GeomNumber point_value(unsigned int var, const Point & p, const Elem & e,
+                         const NumericVector<Number> * sol = nullptr) const;
 
   /**
    * Calls the version of point_value() which takes a reference.
@@ -1662,7 +1662,7 @@ public:
    * version of point_value() that has a boolean third argument, which
    * would result in unnecessary PointLocator calls.
    */
-  Number point_value(unsigned int var, const Point & p, const Elem * e) const;
+  GeomNumber point_value(unsigned int var, const Point & p, const Elem * e) const;
 
   /**
    * Calls the parallel version of point_value().
@@ -1670,22 +1670,22 @@ public:
    * calling the version of point_value() that has a boolean third
    * argument, which would result in incorrect output.
    */
-  Number point_value(unsigned int var, const Point & p, const NumericVector<Number> * sol) const;
+  GeomNumber point_value(unsigned int var, const Point & p, const NumericVector<Number> * sol) const;
 
   /**
    * \returns The gradient of the solution variable \p var at the physical
    * point \p p in the mesh, similarly to point_value.
    */
-  Gradient point_gradient(unsigned int var, const Point & p,
-                          const bool insist_on_success = true,
-                          const NumericVector<Number> * sol = nullptr) const;
+  GeomNumberGradient point_gradient(unsigned int var, const Point & p,
+                                    const bool insist_on_success = true,
+                                    const NumericVector<Number> * sol = nullptr) const;
 
   /**
    * \returns The gradient of the solution variable \p var at the physical
    * point \p p in local Elem \p e in the mesh, similarly to point_value.
    */
-  Gradient point_gradient(unsigned int var, const Point & p, const Elem & e,
-                          const NumericVector<Number> * sol = nullptr) const;
+  GeomNumberGradient point_gradient(unsigned int var, const Point & p, const Elem & e,
+                                    const NumericVector<Number> * sol = nullptr) const;
 
   /**
    * Calls the version of point_gradient() which takes a reference.
@@ -1693,7 +1693,7 @@ public:
    * version of point_gradient() that has a boolean third argument, which
    * would result in unnecessary PointLocator calls.
    */
-  Gradient point_gradient(unsigned int var, const Point & p, const Elem * e) const;
+  GeomNumberGradient point_gradient(unsigned int var, const Point & p, const Elem * e) const;
 
   /**
    * Calls the parallel version of point_gradient().
@@ -1701,13 +1701,13 @@ public:
    * calling the version of point_gradient() that has a boolean third
    * argument, which would result in incorrect output.
    */
-  Gradient point_gradient(unsigned int var, const Point & p, const NumericVector<Number> * sol) const;
+  GeomNumberGradient point_gradient(unsigned int var, const Point & p, const NumericVector<Number> * sol) const;
 
   /**
    * \returns The second derivative tensor of the solution variable \p var
    * at the physical point \p p in the mesh, similarly to point_value.
    */
-  Tensor point_hessian(unsigned int var, const Point & p,
+  GeomNumberTensor point_hessian(unsigned int var, const Point & p,
                        const bool insist_on_success = true,
                        const NumericVector<Number> * sol = nullptr) const;
 
@@ -1716,7 +1716,7 @@ public:
    * at the physical point \p p in local Elem \p e in the mesh, similarly to
    * point_value.
    */
-  Tensor point_hessian(unsigned int var, const Point & p, const Elem & e,
+  GeomNumberTensor point_hessian(unsigned int var, const Point & p, const Elem & e,
                        const NumericVector<Number> * sol = nullptr) const;
 
   /**
@@ -1725,7 +1725,7 @@ public:
    * version of point_hessian() that has a boolean third argument, which
    * would result in unnecessary PointLocator calls.
    */
-  Tensor point_hessian(unsigned int var, const Point & p, const Elem * e) const;
+  GeomNumberTensor point_hessian(unsigned int var, const Point & p, const Elem * e) const;
 
   /**
    * Calls the parallel version of point_hessian().
@@ -1733,7 +1733,7 @@ public:
    * calling the version of point_hessian() that has a boolean third
    * argument, which would result in incorrect output.
    */
-  Tensor point_hessian(unsigned int var, const Point & p, const NumericVector<Number> * sol) const;
+  GeomNumberTensor point_hessian(unsigned int var, const Point & p, const NumericVector<Number> * sol) const;
 
 
   /**

@@ -29,6 +29,7 @@
 #include "libmesh/node.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/xdr_cxx.h"
+#include "libmesh/raw_type.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -725,12 +726,12 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
             break;
 
           xfer_ids.push_back(node.id());
-          xfer_coords.push_back(node(0));
+          xfer_coords.push_back(MetaPhysicL::raw_value(node(0)));
 #if LIBMESH_DIM > 1
-          xfer_coords.push_back(node(1));
+          xfer_coords.push_back(MetaPhysicL::raw_value(node(1)));
 #endif
 #if LIBMESH_DIM > 2
-          xfer_coords.push_back(node(2));
+          xfer_coords.push_back(MetaPhysicL::raw_value(node(2)));
 #endif
         }
 

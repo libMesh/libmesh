@@ -617,7 +617,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
             // The inverse Jacobian entries also come from the
             // generalized inverse of T (see also the 2D element
             // living in 3D code).
-            const Real jacm2 = 1./jac[p]/jac[p];
+            const GeomReal jacm2 = 1./jac[p]/jac[p];
             dxidx_map[p] = jacm2*dxdxi_map(p);
 #if LIBMESH_DIM > 1
             dxidy_map[p] = jacm2*dydxi_map(p);
@@ -641,12 +641,12 @@ void FEMap::compute_single_point_map(const unsigned int dim,
             // See JWP notes for details
 
             // numer = x_xi*x_{xi xi} + y_xi*y_{xi xi}
-            Real numer =
+            GeomReal numer =
               dxyzdxi_map[p](0)*d2xyzdxi2_map[p](0) +
               dxyzdxi_map[p](1)*d2xyzdxi2_map[p](1);
 
             // denom = (x_xi)^2 + (y_xi)^2 must be >= 0.0
-            Real denom =
+            GeomReal denom =
               dxyzdxi_map[p](0)*dxyzdxi_map[p](0) +
               dxyzdxi_map[p](1)*dxyzdxi_map[p](1);
 
@@ -686,13 +686,13 @@ void FEMap::compute_single_point_map(const unsigned int dim,
             // See JWP notes for details
 
             // numer = x_xi*x_{xi xi} + y_xi*y_{xi xi} + z_xi*z_{xi xi}
-            Real numer =
+            GeomReal numer =
               dxyzdxi_map[p](0)*d2xyzdxi2_map[p](0) +
               dxyzdxi_map[p](1)*d2xyzdxi2_map[p](1) +
               dxyzdxi_map[p](2)*d2xyzdxi2_map[p](2);
 
             // denom = (x_xi)^2 + (y_xi)^2 + (z_xi)^2 must be >= 0.0
-            Real denom =
+            GeomReal denom =
               dxyzdxi_map[p](0)*dxyzdxi_map[p](0) +
               dxyzdxi_map[p](1)*dxyzdxi_map[p](1) +
               dxyzdxi_map[p](2)*dxyzdxi_map[p](2);
@@ -804,7 +804,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         if (calculate_dxyz)
           {
             // compute the jacobian once
-            const Real dx_dxi = dxdxi_map(p),
+            const GeomReal dx_dxi = dxdxi_map(p),
               dx_deta = dxdeta_map(p),
               dy_dxi = dydxi_map(p),
               dy_deta = dydeta_map(p);
@@ -866,7 +866,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
             // Compute the shape function derivatives wrt x,y at the
             // quadrature points
-            const Real inv_jac = 1./jac[p];
+            const GeomReal inv_jac = 1./jac[p];
 
             dxidx_map[p]  =  dy_deta*inv_jac; //dxi/dx  =  (1/J)*dy/deta
             dxidy_map[p]  = -dx_deta*inv_jac; //dxi/dy  = -(1/J)*dx/deta
@@ -881,7 +881,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 #endif
 #else // LIBMESH_DIM == 3
 
-            const Real dz_dxi = dzdxi_map(p),
+            const GeomReal dz_dxi = dzdxi_map(p),
               dz_deta = dzdeta_map(p);
 
             // Compute the Jacobian.  This assumes a 2D face in
@@ -906,21 +906,21 @@ void FEMap::compute_single_point_map(const unsigned int dim,
             //
             // and R^-1 R = (R'R)^-1 R'R = I.
             //
-            const Real g11 = (dx_dxi*dx_dxi +
+            const GeomReal g11 = (dx_dxi*dx_dxi +
                               dy_dxi*dy_dxi +
                               dz_dxi*dz_dxi);
 
-            const Real g12 = (dx_dxi*dx_deta +
+            const GeomReal g12 = (dx_dxi*dx_deta +
                               dy_dxi*dy_deta +
                               dz_dxi*dz_deta);
 
-            const Real g21 = g12;
+            const GeomReal g21 = g12;
 
-            const Real g22 = (dx_deta*dx_deta +
+            const GeomReal g22 = (dx_deta*dx_deta +
                               dy_deta*dy_deta +
                               dz_deta*dz_deta);
 
-            const Real det = (g11*g22 - g12*g21);
+            const GeomReal det = (g11*g22 - g12*g21);
 
             if (det <= 0.)
               {
@@ -963,15 +963,15 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                   }
               }
 
-            const Real inv_det = 1./det;
+            const GeomReal inv_det = 1./det;
             jac[p] = std::sqrt(det);
 
             JxW[p] = jac[p]*qw[p];
 
-            const Real g11inv =  g22*inv_det;
-            const Real g12inv = -g12*inv_det;
-            const Real g21inv = -g21*inv_det;
-            const Real g22inv =  g11*inv_det;
+            const GeomReal g11inv =  g22*inv_det;
+            const GeomReal g12inv = -g12*inv_det;
+            const GeomReal g21inv = -g21*inv_det;
+            const GeomReal g22inv =  g11*inv_det;
 
             dxidx_map[p]  = g11inv*dx_dxi + g12inv*dx_deta;
             dxidy_map[p]  = g11inv*dy_dxi + g12inv*dy_deta;
@@ -993,30 +993,30 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                 // A = [ x_{xi xi} x_{eta eta} ]
                 //     [ y_{xi xi} y_{eta eta} ]
                 //     [ z_{xi xi} z_{eta eta} ]
-                DenseMatrix<Real> A(3,2);
+                DenseMatrix<GeomReal> A(3,2);
                 A(0,0) = d2xyzdxi2_map[p](0);  A(0,1) = d2xyzdeta2_map[p](0);
                 A(1,0) = d2xyzdxi2_map[p](1);  A(1,1) = d2xyzdeta2_map[p](1);
                 A(2,0) = d2xyzdxi2_map[p](2);  A(2,1) = d2xyzdeta2_map[p](2);
 
                 // J^T, the transpose of the Jacobian matrix
-                DenseMatrix<Real> JT(2,3);
+                DenseMatrix<GeomReal> JT(2,3);
                 JT(0,0) = dx_dxi;   JT(0,1) = dy_dxi;   JT(0,2) = dz_dxi;
                 JT(1,0) = dx_deta;  JT(1,1) = dy_deta;  JT(1,2) = dz_deta;
 
                 // (J^T J)^(-1), this has already been computed for us above...
-                DenseMatrix<Real> JTJinv(2,2);
+                DenseMatrix<GeomReal> JTJinv(2,2);
                 JTJinv(0,0) = g11inv;  JTJinv(0,1) = g12inv;
                 JTJinv(1,0) = g21inv;  JTJinv(1,1) = g22inv;
 
                 // Some helper variables
-                RealVectorValue
+                GeomRealVectorValue
                   dxi  (dxidx_map[p],   dxidy_map[p],   dxidz_map[p]),
                   deta (detadx_map[p],  detady_map[p],  detadz_map[p]);
 
                 // To be filled in below
-                DenseVector<Real> tmp1(2);
-                DenseVector<Real> tmp2(3);
-                DenseVector<Real> tmp3(2);
+                DenseVector<GeomReal> tmp1(2);
+                DenseVector<GeomReal> tmp2(3);
+                DenseVector<GeomReal> tmp3(2);
 
                 // For (s,t) in {(x,x), (x,y), (x,z), (y,y), (y,z), (z,z)}, compute the
                 // vector of inverse map second derivatives [xi_{s t}, eta_{s t}]
@@ -1032,7 +1032,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                       A.vector_mult(tmp2, tmp1);
 
                       // Compute scalar value "alpha"
-                      Real alpha = dxi(s)*deta(t) + deta(s)*dxi(t);
+                      GeomReal alpha = dxi(s)*deta(t) + deta(s)*dxi(t);
 
                       // Compute tmp2 <- tmp2 + alpha * x_{xi eta}
                       for (unsigned i=0; i<3; ++i)
@@ -1138,7 +1138,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         if (calculate_dxyz)
           {
             // compute the jacobian
-            const Real
+            const GeomReal
               dx_dxi   = dxdxi_map(p),   dy_dxi   = dydxi_map(p),   dz_dxi   = dzdxi_map(p),
               dx_deta  = dxdeta_map(p),  dy_deta  = dydeta_map(p),  dz_deta  = dzdeta_map(p),
               dx_dzeta = dxdzeta_map(p), dy_dzeta = dydzeta_map(p), dz_dzeta = dzdzeta_map(p);
@@ -1202,7 +1202,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
             // Compute the shape function derivatives wrt x,y at the
             // quadrature points
-            const Real inv_jac  = 1./jac[p];
+            const GeomReal inv_jac  = 1./jac[p];
 
             dxidx_map[p]   = (dy_deta*dz_dzeta - dz_deta*dy_dzeta)*inv_jac;
             dxidy_map[p]   = (dz_deta*dx_dzeta - dx_deta*dz_dzeta)*inv_jac;
@@ -1548,7 +1548,7 @@ void FEMap::compute_inverse_map_second_derivs(unsigned p)
   // Construct J^{-1}, A, and B matrices (see JWP's notes for details)
   // for cases in which the element dimension matches LIBMESH_DIM.
 #if LIBMESH_DIM==1
-  RealTensor
+  GeomRealTensor
     Jinv(dxidx_map[p],  0.,  0.,
          0.,            0.,  0.,
          0.,            0.,  0.),
@@ -1561,7 +1561,7 @@ void FEMap::compute_inverse_map_second_derivs(unsigned p)
       0., 0., 0.,
       0., 0., 0.);
 
-  RealVectorValue
+  GeomRealVectorValue
     dxi  (dxidx_map[p], 0., 0.),
     deta (0.,           0., 0.),
     dzeta(0.,           0., 0.);
@@ -1570,7 +1570,7 @@ void FEMap::compute_inverse_map_second_derivs(unsigned p)
   valid_indices.insert(0);
 
 #elif LIBMESH_DIM==2
-  RealTensor
+  GeomRealTensor
     Jinv(dxidx_map[p],  dxidy_map[p],  0.,
          detadx_map[p], detady_map[p], 0.,
          0.,            0.,            0.),
@@ -1583,7 +1583,7 @@ void FEMap::compute_inverse_map_second_derivs(unsigned p)
       d2xyzdxideta_map[p](1), 0., 0.,
       0.,                     0., 0.);
 
-  RealVectorValue
+  GeomRealVectorValue
     dxi  (dxidx_map[p],  dxidy_map[p],  0.),
     deta (detadx_map[p], detady_map[p], 0.),
     dzeta(0.,            0.,            0.);
@@ -1593,7 +1593,7 @@ void FEMap::compute_inverse_map_second_derivs(unsigned p)
   valid_indices.insert(tmp, tmp+3);
 
 #elif LIBMESH_DIM==3
-  RealTensor
+  GeomRealTensor
     Jinv(dxidx_map[p],   dxidy_map[p],   dxidz_map[p],
          detadx_map[p],  detady_map[p],  detadz_map[p],
          dzetadx_map[p], dzetady_map[p], dzetadz_map[p]),
@@ -1606,7 +1606,7 @@ void FEMap::compute_inverse_map_second_derivs(unsigned p)
       d2xyzdxideta_map[p](1), d2xyzdxidzeta_map[p](1), d2xyzdetadzeta_map[p](1),
       d2xyzdxideta_map[p](2), d2xyzdxidzeta_map[p](2), d2xyzdetadzeta_map[p](2));
 
-  RealVectorValue
+  GeomRealVectorValue
     dxi  (dxidx_map[p],   dxidy_map[p],   dxidz_map[p]),
     deta (detadx_map[p],  detady_map[p],  detadz_map[p]),
     dzeta(dzetadx_map[p], dzetady_map[p], dzetadz_map[p]);
@@ -1625,7 +1625,7 @@ void FEMap::compute_inverse_map_second_derivs(unsigned p)
       {
         if (valid_indices.count(ctr))
           {
-            RealVectorValue
+            GeomRealVectorValue
               v1(dxi(s)*dxi(t),
                  deta(s)*deta(t),
                  dzeta(s)*dzeta(t)),
@@ -1635,7 +1635,7 @@ void FEMap::compute_inverse_map_second_derivs(unsigned p)
                  deta(s)*dzeta(t) + dzeta(s)*deta(t));
 
             // Compute the inverse map second derivatives
-            RealVectorValue v3 = -Jinv*(A*v1 + B*v2);
+            GeomRealVectorValue v3 = -Jinv*(A*v1 + B*v2);
 
             // Store them in the appropriate locations in the class data structures
             d2xidxyz2_map[p][ctr] = v3(0);
@@ -1686,7 +1686,7 @@ Point FEMap::inverse_map (const unsigned int dim,
 
   // How much did the point on the reference
   // element change by in this Newton step?
-  Real inverse_map_error = 0.;
+  GeomReal inverse_map_error = 0.;
 
   //  The point on the reference element.  This is
   //  the "initial guess" for Newton's method.  The
@@ -1761,14 +1761,14 @@ Point FEMap::inverse_map (const unsigned int dim,
             //
             //  which involves the trivial inversion of the scalar
             //  G = [J]^T [J]
-            const Real G = dxi*dxi;
+            const GeomReal G = dxi*dxi;
 
             if (secure)
-              libmesh_assert_greater (G, 0.);
+              libmesh_assert_greater (MetaPhysicL::raw_value(G), 0.);
 
-            const Real Ginv = 1./G;
+            const GeomReal Ginv = 1./G;
 
-            const Real  dxidelta = dxi*delta;
+            const GeomReal  dxidelta = dxi*delta;
 
             dp(0) = Ginv*dxidelta;
 
@@ -1809,19 +1809,19 @@ Point FEMap::inverse_map (const unsigned int dim,
             //
             //  which involves the inversion of the 2x2 matrix
             //  [G] = [J]^T [J]
-            const Real
+            const GeomReal
               G11 = dxi*dxi,  G12 = dxi*deta,
               G21 = dxi*deta, G22 = deta*deta;
 
 
-            const Real det = (G11*G22 - G12*G21);
+            const GeomReal det = (G11*G22 - G12*G21);
 
             if (secure)
               libmesh_assert_not_equal_to (det, 0.);
 
-            const Real inv_det = 1./det;
+            const GeomReal inv_det = 1./det;
 
-            const Real
+            const GeomReal
               Ginv11 =  G22*inv_det,
               Ginv12 = -G12*inv_det,
 
@@ -1829,8 +1829,8 @@ Point FEMap::inverse_map (const unsigned int dim,
               Ginv22 =  G11*inv_det;
 
 
-            const Real  dxidelta  = dxi*delta;
-            const Real  detadelta = deta*delta;
+            const GeomReal  dxidelta  = dxi*delta;
+            const GeomReal  detadelta = deta*delta;
 
             dp(0) = (Ginv11*dxidelta + Ginv12*detadelta);
             dp(1) = (Ginv21*dxidelta + Ginv22*detadelta);
@@ -1873,9 +1873,9 @@ Point FEMap::inverse_map (const unsigned int dim,
             //  which involves the inversion of the 3x3 matrix [J]
             libmesh_try
               {
-                RealTensorValue(dxi(0), deta(0), dzeta(0),
-                                dxi(1), deta(1), dzeta(1),
-                                dxi(2), deta(2), dzeta(2)).solve(delta, dp);
+                GeomRealTensorValue(dxi(0), deta(0), dzeta(0),
+                                    dxi(1), deta(1), dzeta(1),
+                                    dxi(2), deta(2), dzeta(2)).solve(delta, dp);
               }
             libmesh_catch (ConvergenceFailure &)
               {
@@ -1891,7 +1891,7 @@ Point FEMap::inverse_map (const unsigned int dim,
 
                 // We encountered a singular Jacobian.  The value of
                 // dp is zero, since it was never changed during the
-                // call to RealTensorValue::solve().  We don't want to
+                // call to GeomRealTensorValue::solve().  We don't want to
                 // continue iterating until max_cnt since there is no
                 // update to the Newton iterate, and we don't want to
                 // print the inverse_map_error value since it will

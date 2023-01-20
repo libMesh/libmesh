@@ -138,7 +138,7 @@ Point Edge2::true_centroid () const
   return Real(0.5) * (this->point(0) + this->point(1));
 }
 
-Real Edge2::volume () const
+GeomReal Edge2::volume () const
 {
   // OK, so this is probably overkill, since it is equivalent to
   // Elem::hmax() for the Edge2, but here it is nonetheless...

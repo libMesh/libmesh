@@ -186,7 +186,7 @@ public:
    * An optimized method for approximating the length of an
    * EDGE4 using quadrature.
    */
-  virtual Real volume () const override;
+  virtual GeomReal volume () const override;
 
   /**
    * Geometric constants for Edge4.

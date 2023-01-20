@@ -176,7 +176,6 @@ libmesh_SOURCES =  \
         src/geom/node.C \
         src/geom/node_elem.C \
         src/geom/plane.C \
-        src/geom/point.C \
         src/geom/reference_elem.C \
         src/geom/reference_elem.data \
         src/geom/remote_elem.C \
@@ -240,6 +239,7 @@ libmesh_SOURCES =  \
         src/numerics/dense_matrix.C \
         src/numerics/dense_matrix_base.C \
         src/numerics/dense_matrix_blas_lapack.C \
+        src/numerics/dense_matrix_geom_real.C \
         src/numerics/dense_submatrix.C \
         src/numerics/dense_subvector.C \
         src/numerics/dense_vector.C \
@@ -447,4 +447,4 @@ libmesh_SOURCES =  \
         src/utils/tree.C \
         src/utils/tree_node.C \
         src/utils/utility.C \
-        src/utils/xdr_cxx.C 
+        src/utils/xdr_cxx.C

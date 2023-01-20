@@ -211,7 +211,7 @@ public:
    * An optimized method for approximating the area of a
    * TRI6 using quadrature.
    */
-  virtual Real volume () const override;
+  virtual GeomReal volume () const override;
 
   /**
    * \returns A bounding box (not necessarily the minimal bounding box)

@@ -211,7 +211,7 @@ public:
    * An optimized method for computing the area of a
    * 4-node tetrahedron.
    */
-  virtual Real volume () const override;
+  virtual GeomReal volume () const override;
 
   /**
    * \returns The min and max *dihedral* angles for the tetrahedron.
@@ -222,7 +222,7 @@ public:
    * bad for interpolation, but they can affect the stiffness matrix
    * condition number.
    */
-  std::pair<Real, Real> min_and_max_angle() const;
+  std::pair<GeomReal, GeomReal> min_and_max_angle() const;
 
   /**
    * Don't hide Tet::key(side) defined in the base class.

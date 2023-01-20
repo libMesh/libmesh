@@ -144,7 +144,7 @@ public:
   /**
    * An optimized method for computing the length of a 2-node edge.
    */
-  virtual Real volume () const override;
+  virtual GeomReal volume () const override;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

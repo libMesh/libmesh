@@ -3,6 +3,7 @@
 #include <libmesh/elem.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_refinement.h>
+#include <libmesh/raw_type.h>
 
 #include <libmesh/exodusII_io.h>
 
@@ -86,10 +87,10 @@ protected:
           2 + (sizeof(Real)-1)/sizeof(dof_id_type);
         CPPUNIT_ASSERT_EQUAL(elem->n_extra_integers(), expected_extra_ints);
         CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), DofObject::invalid_id);
-        elem->set_extra_integer(i1, dof_id_type(elem->point(0)(0)*100));
-        CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), dof_id_type(elem->point(0)(0)*100));
-        elem->set_extra_datum<Real>(r1, elem->point(0)(0)*1000);
-        CPPUNIT_ASSERT_EQUAL(elem->get_extra_datum<Real>(r1), elem->point(0)(0)*1000);
+        elem->set_extra_integer(i1, dof_id_type(MetaPhysicL::raw_value(elem->point(0)(0))*100));
+        CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), dof_id_type(MetaPhysicL::raw_value(elem->point(0)(0))*100));
+        elem->set_extra_datum<Real>(r1, MetaPhysicL::raw_value(elem->point(0)(0))*1000);
+        CPPUNIT_ASSERT_EQUAL(elem->get_extra_datum<Real>(r1), MetaPhysicL::raw_value(elem->point(0)(0))*1000);
       }
 
     for (const auto & node : mesh.node_ptr_range())
@@ -99,8 +100,8 @@ protected:
         CPPUNIT_ASSERT_EQUAL(node->n_extra_integers(), expected_extra_ints);
         CPPUNIT_ASSERT_EQUAL(node->get_extra_integer(ni1), DofObject::invalid_id);
         CPPUNIT_ASSERT_EQUAL(node->get_extra_integer(ni2), DofObject::invalid_id);
-        node->set_extra_datum<Real>(nr1, (*node)(0)*1000);
-        CPPUNIT_ASSERT_EQUAL(node->get_extra_datum<Real>(nr1), (*node)(0)*1000);
+        node->set_extra_datum<Real>(nr1, MetaPhysicL::raw_value((*node)(0))*1000);
+        CPPUNIT_ASSERT_EQUAL(node->get_extra_datum<Real>(nr1), MetaPhysicL::raw_value((*node)(0))*1000);
       }
 
   }
@@ -128,7 +129,7 @@ protected:
         const unsigned int expected_extra_ints =
           2 + (sizeof(Real)-1)/sizeof(dof_id_type);
         CPPUNIT_ASSERT_EQUAL(elem->n_extra_integers(), expected_extra_ints);
-        CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), dof_id_type(top_parent->point(0)(0)*100));
+        CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), dof_id_type(MetaPhysicL::raw_value(top_parent->point(0)(0))*100));
       }
   }
 
@@ -250,7 +251,7 @@ protected:
    for (const auto & elem : mesh3.element_ptr_range())
      {
        auto r1_actual = elem->get_extra_datum<Real>(/*r1=*/ini[1]);
-       CPPUNIT_ASSERT_EQUAL(r1_actual, elem->point(0)(0)*1000);
+       CPPUNIT_ASSERT_EQUAL(r1_actual, MetaPhysicL::raw_value(elem->point(0)(0)*1000));
      }
 
    // Loop over mesh3 Nodes, check that the Real-valued data match the
@@ -258,7 +259,7 @@ protected:
    for (const auto & node : mesh3.node_ptr_range())
      {
        auto nr1_actual = node->get_extra_datum<Real>(/*nr1=*/ini[4]);
-       CPPUNIT_ASSERT_EQUAL(/*expected=*/(*node)(0)*1000, /*actual=*/nr1_actual);
+       CPPUNIT_ASSERT_EQUAL(MetaPhysicL::raw_value(/*expected=*/(*node)(0)*1000), /*actual=*/nr1_actual);
 
        // Note: nr2 is never set to anything and there is no default
        // value provided, so the datum values get set to 2 copies

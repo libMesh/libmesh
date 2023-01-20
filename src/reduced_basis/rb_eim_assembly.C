@@ -27,6 +27,7 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/int_range.h"
+#include "libmesh/raw_type.h"
 
 namespace libMesh
 {

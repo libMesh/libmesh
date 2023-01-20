@@ -269,6 +269,13 @@ private:
   int version_number;
 };
 
+template <>
+inline
+void Xdr::data(GeomReal &, std::string_view)
+{
+  libmesh_error_msg("Where are you calling me from?!");
+}
+
 
 } // namespace libMesh
 

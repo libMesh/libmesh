@@ -2771,8 +2771,8 @@ void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
 
   FEBase * elem_fe = nullptr;
   context.get_element_fe( 0, elem_fe );
-  const std::vector<Real> & JxW = elem_fe->get_JxW();
-  const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+  const auto & JxW = MetaPhysicL::raw_value(elem_fe->get_JxW());
+  const auto & phi = MetaPhysicL::raw_value(elem_fe->get_phi());
 
   // Get a reference to the current_local_solution vector, which has
   // GHOSTED DOFs. Make sure it is initially zeroed, since we will now

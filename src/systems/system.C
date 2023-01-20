@@ -48,6 +48,7 @@
 #include "libmesh/vector_value.h"
 #include "libmesh/tensor_tools.h"
 #include "libmesh/enum_norm_type.h"
+#include "libmesh/raw_type.h"
 
 // C++ includes
 #include <sstream>   // for std::ostringstream
@@ -1719,8 +1720,8 @@ Real System::calculate_norm(const NumericVector<Number> & v,
           libmesh_assert(fe);
           libmesh_assert(qrule);
 
-          const std::vector<Real> &               JxW = fe->get_JxW();
-          const std::vector<std::vector<Real>> * phi = nullptr;
+          const auto & JxW = MetaPhysicL::raw_value(fe->get_JxW());
+          const std::vector<std::vector<GeomReal>> * phi = nullptr;
           if (norm_type == H1 ||
               norm_type == H2 ||
               norm_type == L2 ||
@@ -1728,14 +1729,14 @@ Real System::calculate_norm(const NumericVector<Number> & v,
               norm_type == L_INF)
             phi = &(fe->get_phi());
 
-          const std::vector<std::vector<RealGradient>> * dphi = nullptr;
+          const std::vector<std::vector<GeomRealGradient>> * dphi = nullptr;
           if (norm_type == H1 ||
               norm_type == H2 ||
               norm_type == H1_SEMINORM ||
               norm_type == W1_INF_SEMINORM)
             dphi = &(fe->get_dphi());
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          const std::vector<std::vector<RealTensor>> *   d2phi = nullptr;
+          const std::vector<std::vector<GeomRealTensor>> *   d2phi = nullptr;
           if (norm_type == H2 ||
               norm_type == H2_SEMINORM ||
               norm_type == W2_INF_SEMINORM)
@@ -1758,7 +1759,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                 {
                   Number u_h = 0.;
                   for (unsigned int i=0; i != n_sf; ++i)
-                    u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
+                    u_h += MetaPhysicL::raw_value((*phi)[i][qp]) * (*local_v)(dof_indices[i]);
                   v_norm += norm_weight *
                     JxW[qp] * std::abs(u_h);
                 }
@@ -1767,7 +1768,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                 {
                   Number u_h = 0.;
                   for (unsigned int i=0; i != n_sf; ++i)
-                    u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
+                    u_h += MetaPhysicL::raw_value((*phi)[i][qp]) * (*local_v)(dof_indices[i]);
                   v_norm = std::max(v_norm, norm_weight * std::abs(u_h));
                 }
 
@@ -1777,7 +1778,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                 {
                   Number u_h = 0.;
                   for (unsigned int i=0; i != n_sf; ++i)
-                    u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
+                    u_h += MetaPhysicL::raw_value((*phi)[i][qp]) * (*local_v)(dof_indices[i]);
                   v_norm += norm_weight_sq *
                     JxW[qp] * TensorTools::norm_sq(u_h);
                 }
@@ -1788,7 +1789,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                 {
                   Gradient grad_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
-                    grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
+                    grad_u_h.add_scaled(MetaPhysicL::raw_value((*dphi)[i][qp]), (*local_v)(dof_indices[i]));
                   v_norm += norm_weight_sq *
                     JxW[qp] * grad_u_h.norm_sq();
                 }
@@ -1797,7 +1798,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                 {
                   Gradient grad_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
-                    grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
+                    grad_u_h.add_scaled(MetaPhysicL::raw_value((*dphi)[i][qp]), (*local_v)(dof_indices[i]));
                   v_norm = std::max(v_norm, norm_weight * grad_u_h.norm());
                 }
 
@@ -1807,7 +1808,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                 {
                   Tensor hess_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
-                    hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
+                    hess_u_h.add_scaled(MetaPhysicL::raw_value((*d2phi)[i][qp]), (*local_v)(dof_indices[i]));
                   v_norm += norm_weight_sq *
                     JxW[qp] * hess_u_h.norm_sq();
                 }
@@ -1816,7 +1817,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                 {
                   Tensor hess_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
-                    hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
+                    hess_u_h.add_scaled(MetaPhysicL::raw_value((*d2phi)[i][qp]), (*local_v)(dof_indices[i]));
                   v_norm = std::max(v_norm, norm_weight * hess_u_h.norm());
                 }
 #endif
@@ -2209,7 +2210,7 @@ Number System::get_qoi_error_estimate_value(unsigned int qoi_index) const
 
 
 
-Number System::point_value(unsigned int var,
+GeomNumber System::point_value(unsigned int var,
                            const Point & p,
                            const bool insist_on_success,
                            const NumericVector<Number> *sol) const
@@ -2221,12 +2222,12 @@ Number System::point_value(unsigned int var,
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  libmesh_assert(this->comm().verify(p(0)));
+  libmesh_assert(this->comm().verify(MetaPhysicL::raw_value(p(0))));
 #if LIBMESH_DIM > 1
-  libmesh_assert(this->comm().verify(p(1)));
+  libmesh_assert(this->comm().verify(MetaPhysicL::raw_value(p(1))));
 #endif
 #if LIBMESH_DIM > 2
-  libmesh_assert(this->comm().verify(p(2)));
+  libmesh_assert(this->comm().verify(MetaPhysicL::raw_value(p(2))));
 #endif
 #endif // NDEBUG
 
@@ -2248,7 +2249,7 @@ Number System::point_value(unsigned int var,
     raw_subdomains.empty() ? nullptr : &raw_subdomains;
   const Elem * e = locator(p, implicit_subdomains);
 
-  Number u = 0;
+  GeomNumber u = 0;
 
   if (e && this->get_dof_map().is_evaluable(*e, var))
     u = point_value(var, p, *e, sol);
@@ -2270,7 +2271,7 @@ Number System::point_value(unsigned int var,
   return u;
 }
 
-Number System::point_value(unsigned int var,
+GeomNumber System::point_value(unsigned int var,
                            const Point & p,
                            const Elem & e,
                            const NumericVector<Number> *sol) const
@@ -2310,7 +2311,7 @@ Number System::point_value(unsigned int var,
   FEInterface::compute_data(e.dim(), fe_type, &e, fe_data);
 
   // Get ready to accumulate a value
-  Number u = 0;
+  GeomNumber u = 0;
 
   for (unsigned int l=0; l<num_dofs; l++)
     {
@@ -2322,7 +2323,7 @@ Number System::point_value(unsigned int var,
 
 
 
-Number System::point_value(unsigned int var, const Point & p, const Elem * e) const
+GeomNumber System::point_value(unsigned int var, const Point & p, const Elem * e) const
 {
   libmesh_assert(e);
   return this->point_value(var, p, *e);
@@ -2330,7 +2331,7 @@ Number System::point_value(unsigned int var, const Point & p, const Elem * e) co
 
 
 
-Number System::point_value(unsigned int var, const Point & p, const NumericVector<Number> * sol) const
+GeomNumber System::point_value(unsigned int var, const Point & p, const NumericVector<Number> * sol) const
 {
   return this->point_value(var, p, true, sol);
 }
@@ -2338,7 +2339,7 @@ Number System::point_value(unsigned int var, const Point & p, const NumericVecto
 
 
 
-Gradient System::point_gradient(unsigned int var,
+GeomNumberGradient System::point_gradient(unsigned int var,
                                 const Point & p,
                                 const bool insist_on_success,
                                 const NumericVector<Number> *sol) const
@@ -2350,12 +2351,12 @@ Gradient System::point_gradient(unsigned int var,
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  libmesh_assert(this->comm().verify(p(0)));
+  libmesh_assert(this->comm().verify(MetaPhysicL::raw_value(p(0))));
 #if LIBMESH_DIM > 1
-  libmesh_assert(this->comm().verify(p(1)));
+  libmesh_assert(this->comm().verify(MetaPhysicL::raw_value(p(1))));
 #endif
 #if LIBMESH_DIM > 2
-  libmesh_assert(this->comm().verify(p(2)));
+  libmesh_assert(this->comm().verify(MetaPhysicL::raw_value(p(2))));
 #endif
 #endif // NDEBUG
 
@@ -2377,7 +2378,7 @@ Gradient System::point_gradient(unsigned int var,
     raw_subdomains.empty() ? nullptr : &raw_subdomains;
   const Elem * e = locator(p, implicit_subdomains);
 
-  Gradient grad_u;
+  GeomNumberGradient grad_u;
 
   if (e && this->get_dof_map().is_evaluable(*e, var))
     grad_u = point_gradient(var, p, *e, sol);
@@ -2400,7 +2401,7 @@ Gradient System::point_gradient(unsigned int var,
 }
 
 
-Gradient System::point_gradient(unsigned int var,
+GeomNumberGradient System::point_gradient(unsigned int var,
                                 const Point & p,
                                 const Elem & e,
                                 const NumericVector<Number> *sol) const
@@ -2444,7 +2445,7 @@ Gradient System::point_gradient(unsigned int var,
   FEInterface::compute_data(dim, fe_type, &e, fe_data);
 
   // Get ready to accumulate a gradient
-  Gradient grad_u;
+  GeomNumberGradient grad_u;
 
   for (unsigned int l=0; l<num_dofs; l++)
     {
@@ -2465,7 +2466,7 @@ Gradient System::point_gradient(unsigned int var,
 
 
 
-Gradient System::point_gradient(unsigned int var, const Point & p, const Elem * e) const
+GeomNumberGradient System::point_gradient(unsigned int var, const Point & p, const Elem * e) const
 {
   libmesh_assert(e);
   return this->point_gradient(var, p, *e);
@@ -2473,7 +2474,7 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const Elem * 
 
 
 
-Gradient System::point_gradient(unsigned int var, const Point & p, const NumericVector<Number> * sol) const
+GeomNumberGradient System::point_gradient(unsigned int var, const Point & p, const NumericVector<Number> * sol) const
 {
   return this->point_gradient(var, p, true, sol);
 }
@@ -2482,7 +2483,7 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const Numeric
 
 // We can only accumulate a hessian with --enable-second
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor System::point_hessian(unsigned int var,
+GeomNumberTensor System::point_hessian(unsigned int var,
                              const Point & p,
                              const bool insist_on_success,
                              const NumericVector<Number> *sol) const
@@ -2494,12 +2495,12 @@ Tensor System::point_hessian(unsigned int var,
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  libmesh_assert(this->comm().verify(p(0)));
+  libmesh_assert(this->comm().verify(MetaPhysicL::raw_value(p(0))));
 #if LIBMESH_DIM > 1
-  libmesh_assert(this->comm().verify(p(1)));
+  libmesh_assert(this->comm().verify(MetaPhysicL::raw_value(p(1))));
 #endif
 #if LIBMESH_DIM > 2
-  libmesh_assert(this->comm().verify(p(2)));
+  libmesh_assert(this->comm().verify(MetaPhysicL::raw_value(p(2))));
 #endif
 #endif // NDEBUG
 
@@ -2521,7 +2522,7 @@ Tensor System::point_hessian(unsigned int var,
     raw_subdomains.empty() ? nullptr : &raw_subdomains;
   const Elem * e = locator(p, implicit_subdomains);
 
-  Tensor hess_u;
+  GeomNumberTensor hess_u;
 
   if (e && this->get_dof_map().is_evaluable(*e, var))
     hess_u = point_hessian(var, p, *e, sol);
@@ -2543,7 +2544,7 @@ Tensor System::point_hessian(unsigned int var,
   return hess_u;
 }
 
-Tensor System::point_hessian(unsigned int var,
+GeomNumberTensor System::point_hessian(unsigned int var,
                              const Point & p,
                              const Elem & e,
                              const NumericVector<Number> *sol) const
@@ -2587,13 +2588,13 @@ Tensor System::point_hessian(unsigned int var,
   std::vector<Point> coor(1, FEMap::inverse_map(e.dim(), &e, p));
 
   // Get the values of the shape function derivatives
-  const std::vector<std::vector<RealTensor>> &  d2phi = fe->get_d2phi();
+  const auto &  d2phi = fe->get_d2phi();
 
   // Reinitialize the element and compute the shape function values at coor
   fe->reinit (&e, &coor);
 
   // Get ready to accumulate a hessian
-  Tensor hess_u;
+  GeomNumberTensor hess_u;
 
   for (unsigned int l=0; l<num_dofs; l++)
     {
@@ -2605,7 +2606,7 @@ Tensor System::point_hessian(unsigned int var,
 
 
 
-Tensor System::point_hessian(unsigned int var, const Point & p, const Elem * e) const
+GeomNumberTensor System::point_hessian(unsigned int var, const Point & p, const Elem * e) const
 {
   libmesh_assert(e);
   return this->point_hessian(var, p, *e);
@@ -2613,45 +2614,45 @@ Tensor System::point_hessian(unsigned int var, const Point & p, const Elem * e) 
 
 
 
-Tensor System::point_hessian(unsigned int var, const Point & p, const NumericVector<Number> * sol) const
+GeomNumberTensor System::point_hessian(unsigned int var, const Point & p, const NumericVector<Number> * sol) const
 {
   return this->point_hessian(var, p, true, sol);
 }
 
 #else
 
-Tensor System::point_hessian(unsigned int, const Point &, const bool,
+GeomNumberTensor System::point_hessian(unsigned int, const Point &, const bool,
                              const NumericVector<Number> *) const
 {
   libmesh_error_msg("We can only accumulate a hessian with --enable-second");
 
   // Avoid compiler warnings
-  return Tensor();
+  return GeomNumberTensor();
 }
 
-Tensor System::point_hessian(unsigned int, const Point &, const Elem &,
+GeomNumberTensor System::point_hessian(unsigned int, const Point &, const Elem &,
                              const NumericVector<Number> *) const
 {
   libmesh_error_msg("We can only accumulate a hessian with --enable-second");
 
   // Avoid compiler warnings
-  return Tensor();
+  return GeomNumberTensor();
 }
 
-Tensor System::point_hessian(unsigned int, const Point &, const Elem *) const
+GeomNumberTensor System::point_hessian(unsigned int, const Point &, const Elem *) const
 {
   libmesh_error_msg("We can only accumulate a hessian with --enable-second");
 
   // Avoid compiler warnings
-  return Tensor();
+  return GeomNumberTensor();
 }
 
-Tensor System::point_hessian(unsigned int, const Point &, const NumericVector<Number> *) const
+GeomNumberTensor System::point_hessian(unsigned int, const Point &, const NumericVector<Number> *) const
 {
   libmesh_error_msg("We can only accumulate a hessian with --enable-second");
 
   // Avoid compiler warnings
-  return Tensor();
+  return GeomNumberTensor();
 }
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES

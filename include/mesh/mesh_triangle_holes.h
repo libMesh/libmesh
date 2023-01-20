@@ -81,14 +81,14 @@ public:
   /**
    * Return the area of the hole
    */
-  Real area() const;
+  GeomReal area() const;
 
   /**
    * Return a vector with right-hand-rule orientation and length of
    * twice area() squared.  This is useful for determining
    * orientation of non-planar or non-counter-clockwise holes.
    */
-  RealGradient areavec() const;
+  GeomRealGradient areavec() const;
 
   /**
    * Starting indices of points for a hole with multiple disconnected boundaries.
@@ -123,8 +123,8 @@ protected:
   /**
    * Helper function for contains(), also useful for MeshedHole::inside()
    */
-  std::vector<Real> find_ray_intersections(Point ray_start,
-                                           Point ray_target) const;
+  std::vector<GeomReal> find_ray_intersections(const Point & ray_start,
+                                               const Point & ray_target) const;
 
   /**
    * Calculate an inside point based on our boundary

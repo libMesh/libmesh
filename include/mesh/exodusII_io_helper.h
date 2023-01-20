@@ -560,7 +560,7 @@ public:
    * Allows you to set a vector that is added to the coordinates of all
    * of the nodes.  Effectively, this "moves" the mesh to a particular position
    */
-  void set_coordinate_offset(Point p);
+  void set_coordinate_offset(const Point & p);
 
   /**
    * \returns A vector with three copies of each element in the provided name vector,
@@ -963,7 +963,7 @@ protected:
   unsigned _write_as_dimension;
 
   // On output, shift every point by _coordinate_offset
-  Point _coordinate_offset;
+  RawPoint _coordinate_offset;
 
   // If true, forces single precision I/O
   bool _single_precision;

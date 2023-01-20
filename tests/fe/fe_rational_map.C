@@ -74,8 +74,8 @@ public:
 
     for (auto node : _mesh->node_ptr_range())
       {
-        Real & x = (*node)(0);
-        Real & y = (*node)(1);
+        GeomReal & x = (*node)(0);
+        GeomReal & y = (*node)(1);
         node->set_extra_datum<Real>(weight_index, 1);
         if (y > .6)
           {

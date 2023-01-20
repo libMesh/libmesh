@@ -29,37 +29,37 @@ namespace
 {
 using namespace libMesh;
 
-Real fe_triangle_helper (const Elem & elem,
-                         const Real edgenumerator,
-                         const Real crossval,
-                         const unsigned int basisorder,
-                         const Order totalorder,
-                         const unsigned int noden);
+GeomReal fe_triangle_helper (const Elem & elem,
+                             const GeomReal edgenumerator,
+                             const GeomReal crossval,
+                             const unsigned int basisorder,
+                             const Order totalorder,
+                             const unsigned int noden);
 
 template <FEFamily T>
-Real fe_hierarchic_2D_shape(const Elem * elem,
-                            const Order order,
-                            const unsigned int i,
-                            const Point & p,
-                            const bool add_p_level);
+GeomReal fe_hierarchic_2D_shape(const Elem * elem,
+                                const Order order,
+                                const unsigned int i,
+                                const Point & p,
+                                const bool add_p_level);
 
 template <FEFamily T>
-Real fe_hierarchic_2D_shape_deriv(const Elem * elem,
-                                  const Order order,
-                                  const unsigned int i,
-                                  const unsigned int j,
-                                  const Point & p,
-                                  const bool add_p_level);
+GeomReal fe_hierarchic_2D_shape_deriv(const Elem * elem,
+                                      const Order order,
+                                      const unsigned int i,
+                                      const unsigned int j,
+                                      const Point & p,
+                                      const bool add_p_level);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <FEFamily T>
-Real fe_hierarchic_2D_shape_second_deriv(const Elem * elem,
-                                         const Order order,
-                                         const unsigned int i,
-                                         const unsigned int j,
-                                         const Point & p,
-                                         const bool add_p_level);
+GeomReal fe_hierarchic_2D_shape_second_deriv(const Elem * elem,
+                                             const Order order,
+                                             const unsigned int i,
+                                             const unsigned int j,
+                                             const Point & p,
+                                             const bool add_p_level);
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -134,7 +134,7 @@ LIBMESH_DEFAULT_VECTORIZED_FE(2,SIDE_HIERARCHIC)
 
 
 template <>
-Real FE<2,HIERARCHIC>::shape(const ElemType,
+GeomReal FE<2,HIERARCHIC>::shape(const ElemType,
                              const Order,
                              const unsigned int,
                              const Point &)
@@ -146,7 +146,7 @@ Real FE<2,HIERARCHIC>::shape(const ElemType,
 
 
 template <>
-Real FE<2,L2_HIERARCHIC>::shape(const ElemType,
+GeomReal FE<2,L2_HIERARCHIC>::shape(const ElemType,
                                 const Order,
                                 const unsigned int,
                                 const Point &)
@@ -158,10 +158,10 @@ Real FE<2,L2_HIERARCHIC>::shape(const ElemType,
 
 
 template <>
-Real FE<2,SIDE_HIERARCHIC>::shape(const ElemType,
-                                  const Order,
-                                  const unsigned int,
-                                  const Point &)
+GeomReal FE<2,SIDE_HIERARCHIC>::shape(const ElemType,
+                                      const Order,
+                                      const unsigned int,
+                                      const Point &)
 {
   libmesh_error_msg("Hierarchic shape functions require an Elem for edge orientation.");
   return 0.;
@@ -170,11 +170,11 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const ElemType,
 
 
 template <>
-Real FE<2,HIERARCHIC>::shape(const Elem * elem,
-                             const Order order,
-                             const unsigned int i,
-                             const Point & p,
-                             const bool add_p_level)
+GeomReal FE<2,HIERARCHIC>::shape(const Elem * elem,
+                                 const Order order,
+                                 const unsigned int i,
+                                 const Point & p,
+                                 const bool add_p_level)
 {
   return fe_hierarchic_2D_shape<HIERARCHIC>(elem, order, i, p, add_p_level);
 }
@@ -182,18 +182,18 @@ Real FE<2,HIERARCHIC>::shape(const Elem * elem,
 
 
 template <>
-Real FE<2,HIERARCHIC>::shape(const FEType fet,
-                             const Elem * elem,
-                             const unsigned int i,
-                             const Point & p,
-                             const bool add_p_level)
+GeomReal FE<2,HIERARCHIC>::shape(const FEType fet,
+                                 const Elem * elem,
+                                 const unsigned int i,
+                                 const Point & p,
+                                 const bool add_p_level)
 {
   return fe_hierarchic_2D_shape<HIERARCHIC>(elem, fet.order, i, p, add_p_level);
 }
 
 
 template <>
-Real FE<2,L2_HIERARCHIC>::shape(const Elem * elem,
+GeomReal FE<2,L2_HIERARCHIC>::shape(const Elem * elem,
                                 const Order order,
                                 const unsigned int i,
                                 const Point & p,
@@ -204,7 +204,7 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem * elem,
 
 
 template <>
-Real FE<2,L2_HIERARCHIC>::shape(const FEType fet,
+GeomReal FE<2,L2_HIERARCHIC>::shape(const FEType fet,
                                 const Elem * elem,
                                 const unsigned int i,
                                 const Point & p,
@@ -215,11 +215,11 @@ Real FE<2,L2_HIERARCHIC>::shape(const FEType fet,
 
 
 template <>
-Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
-                                  const Order order,
-                                  const unsigned int i,
-                                  const Point & p,
-                                  const bool add_p_level)
+GeomReal FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
+                                      const Order order,
+                                      const unsigned int i,
+                                      const Point & p,
+                                      const bool add_p_level)
 {
   libmesh_assert(elem);
   const ElemType type = elem->type();
@@ -242,9 +242,9 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
         // degrees of freedom too.
         Real f = 1.;
 
-        const Real zeta1 = p(0);
-        const Real zeta2 = p(1);
-        const Real zeta0 = 1. - zeta1 - zeta2;
+        const auto zeta1 = p(0);
+        const auto zeta2 = p(1);
+        const auto zeta0 = 1. - zeta1 - zeta2;
 
         if (zeta1 > zeta2 && zeta0 > zeta2) // side 0
           {
@@ -308,7 +308,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
         // degrees of freedom too.
         Real f = 1.;
 
-        const Real xi = p(0), eta = p(1);
+        const auto xi = p(0), eta = p(1);
         if (eta < xi)
           {
             if (eta < -xi) // side 0
@@ -388,22 +388,22 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
 
 
 template <>
-Real FE<2,SIDE_HIERARCHIC>::shape(const FEType fet,
-                                  const Elem * elem,
-                                  const unsigned int i,
-                                  const Point & p,
-                                  const bool add_p_level)
+GeomReal FE<2,SIDE_HIERARCHIC>::shape(const FEType fet,
+                                      const Elem * elem,
+                                      const unsigned int i,
+                                      const Point & p,
+                                      const bool add_p_level)
 {
   return FE<2,SIDE_HIERARCHIC>::shape(elem, fet.order, i, p, add_p_level);
 }
 
 
 template <>
-Real FE<2,HIERARCHIC>::shape_deriv(const ElemType,
-                                   const Order,
-                                   const unsigned int,
-                                   const unsigned int,
-                                   const Point &)
+GeomReal FE<2,HIERARCHIC>::shape_deriv(const ElemType,
+                                       const Order,
+                                       const unsigned int,
+                                       const unsigned int,
+                                       const Point &)
 {
   libmesh_error_msg("Hierarchic shape functions require an Elem for edge orientation.");
   return 0.;
@@ -412,11 +412,11 @@ Real FE<2,HIERARCHIC>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<2,L2_HIERARCHIC>::shape_deriv(const ElemType,
-                                      const Order,
-                                      const unsigned int,
-                                      const unsigned int,
-                                      const Point &)
+GeomReal FE<2,L2_HIERARCHIC>::shape_deriv(const ElemType,
+                                          const Order,
+                                          const unsigned int,
+                                          const unsigned int,
+                                          const Point &)
 {
   libmesh_error_msg("Hierarchic shape functions require an Elem for edge orientation.");
   return 0.;
@@ -425,11 +425,11 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const ElemType,
-                                        const Order,
-                                        const unsigned int,
-                                        const unsigned int,
-                                        const Point &)
+GeomReal FE<2,SIDE_HIERARCHIC>::shape_deriv(const ElemType,
+                                            const Order,
+                                            const unsigned int,
+                                            const unsigned int,
+                                            const Point &)
 {
   libmesh_error_msg("Hierarchic shape functions require an Elem for edge orientation.");
   return 0.;
@@ -438,24 +438,24 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<2,HIERARCHIC>::shape_deriv(const Elem * elem,
-                                   const Order order,
-                                   const unsigned int i,
-                                   const unsigned int j,
-                                   const Point & p,
-                                   const bool add_p_level)
+GeomReal FE<2,HIERARCHIC>::shape_deriv(const Elem * elem,
+                                       const Order order,
+                                       const unsigned int i,
+                                       const unsigned int j,
+                                       const Point & p,
+                                       const bool add_p_level)
 {
   return fe_hierarchic_2D_shape_deriv<HIERARCHIC>(elem, order, i, j, p, add_p_level);
 }
 
 
 template <>
-Real FE<2,HIERARCHIC>::shape_deriv(const FEType fet,
-                                   const Elem * elem,
-                                   const unsigned int i,
-                                   const unsigned int j,
-                                   const Point & p,
-                                   const bool add_p_level)
+GeomReal FE<2,HIERARCHIC>::shape_deriv(const FEType fet,
+                                       const Elem * elem,
+                                       const unsigned int i,
+                                       const unsigned int j,
+                                       const Point & p,
+                                       const bool add_p_level)
 {
   return fe_hierarchic_2D_shape_deriv<HIERARCHIC>(elem, fet.order, i, j, p, add_p_level);
 }
@@ -464,24 +464,24 @@ Real FE<2,HIERARCHIC>::shape_deriv(const FEType fet,
 
 
 template <>
-Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
-                                      const Order order,
-                                      const unsigned int i,
-                                      const unsigned int j,
-                                      const Point & p,
-                                      const bool add_p_level)
+GeomReal FE<2,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
+                                          const Order order,
+                                          const unsigned int i,
+                                          const unsigned int j,
+                                          const Point & p,
+                                          const bool add_p_level)
 {
   return fe_hierarchic_2D_shape_deriv<L2_HIERARCHIC>(elem, order, i, j, p, add_p_level);
 }
 
 
 template <>
-Real FE<2,L2_HIERARCHIC>::shape_deriv(const FEType fet,
-                                      const Elem * elem,
-                                      const unsigned int i,
-                                      const unsigned int j,
-                                      const Point & p,
-                                      const bool add_p_level)
+GeomReal FE<2,L2_HIERARCHIC>::shape_deriv(const FEType fet,
+                                          const Elem * elem,
+                                          const unsigned int i,
+                                          const unsigned int j,
+                                          const Point & p,
+                                          const bool add_p_level)
 {
   return fe_hierarchic_2D_shape_deriv<L2_HIERARCHIC>(elem, fet.order, i, j, p, add_p_level);
 }
@@ -489,12 +489,12 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const FEType fet,
 
 
 template <>
-Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
-                                        const Order order,
-                                        const unsigned int i,
-                                        const unsigned int j,
-                                        const Point & p,
-                                        const bool add_p_level)
+GeomReal FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
+                                            const Order order,
+                                            const unsigned int i,
+                                            const unsigned int j,
+                                            const Point & p,
+                                            const bool add_p_level)
 {
   libmesh_assert(elem);
 
@@ -603,7 +603,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
         // degrees of freedom too.
         Real f = 1.;
 
-        const Real xi = p(0), eta = p(1);
+        const auto xi = p(0), eta = p(1);
         if (eta < xi)
           {
             if (eta < -xi) // side 0
@@ -678,12 +678,12 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
 
 
 template <>
-Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const FEType fet,
-                                        const Elem * elem,
-                                        const unsigned int i,
-                                        const unsigned int j,
-                                        const Point & p,
-                                        const bool add_p_level)
+GeomReal FE<2,SIDE_HIERARCHIC>::shape_deriv(const FEType fet,
+                                            const Elem * elem,
+                                            const unsigned int i,
+                                            const unsigned int j,
+                                            const Point & p,
+                                            const bool add_p_level)
 {
   return FE<2,SIDE_HIERARCHIC>::shape_deriv(elem, fet.order, i, j, p, add_p_level);
 }
@@ -692,11 +692,11 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const FEType fet,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-Real FE<2,HIERARCHIC>::shape_second_deriv(const ElemType,
-                                          const Order,
-                                          const unsigned int,
-                                          const unsigned int,
-                                          const Point &)
+GeomReal FE<2,HIERARCHIC>::shape_second_deriv(const ElemType,
+                                              const Order,
+                                              const unsigned int,
+                                              const unsigned int,
+                                              const Point &)
 {
   libmesh_error_msg("Hierarchic shape functions require an Elem for edge orientation.");
   return 0.;
@@ -705,11 +705,11 @@ Real FE<2,HIERARCHIC>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const ElemType,
-                                             const Order,
-                                             const unsigned int,
-                                             const unsigned int,
-                                             const Point &)
+GeomReal FE<2,L2_HIERARCHIC>::shape_second_deriv(const ElemType,
+                                                 const Order,
+                                                 const unsigned int,
+                                                 const unsigned int,
+                                                 const Point &)
 {
   libmesh_error_msg("Hierarchic shape functions require an Elem for edge orientation.");
   return 0.;
@@ -718,11 +718,11 @@ Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const ElemType,
-                                               const Order,
-                                               const unsigned int,
-                                               const unsigned int,
-                                               const Point &)
+GeomReal FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const ElemType,
+                                                   const Order,
+                                                   const unsigned int,
+                                                   const unsigned int,
+                                                   const Point &)
 {
   libmesh_error_msg("Hierarchic shape functions require an Elem for edge orientation.");
   return 0.;
@@ -731,60 +731,60 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<2,HIERARCHIC>::shape_second_deriv(const Elem * elem,
-                                          const Order order,
-                                          const unsigned int i,
-                                          const unsigned int j,
-                                          const Point & p,
-                                          const bool add_p_level)
+GeomReal FE<2,HIERARCHIC>::shape_second_deriv(const Elem * elem,
+                                              const Order order,
+                                              const unsigned int i,
+                                              const unsigned int j,
+                                              const Point & p,
+                                              const bool add_p_level)
 {
   return fe_hierarchic_2D_shape_second_deriv<HIERARCHIC>(elem, order, i, j, p, add_p_level);
 }
 
 
 template <>
-Real FE<2,HIERARCHIC>::shape_second_deriv(const FEType fet,
-                                          const Elem * elem,
-                                          const unsigned int i,
-                                          const unsigned int j,
-                                          const Point & p,
-                                          const bool add_p_level)
+GeomReal FE<2,HIERARCHIC>::shape_second_deriv(const FEType fet,
+                                              const Elem * elem,
+                                              const unsigned int i,
+                                              const unsigned int j,
+                                              const Point & p,
+                                              const bool add_p_level)
 {
   return fe_hierarchic_2D_shape_second_deriv<HIERARCHIC>(elem, fet.order, i, j, p, add_p_level);
 }
 
 
 template <>
-Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const Elem * elem,
-                                             const Order order,
-                                             const unsigned int i,
-                                             const unsigned int j,
-                                             const Point & p,
-                                             const bool add_p_level)
+GeomReal FE<2,L2_HIERARCHIC>::shape_second_deriv(const Elem * elem,
+                                                 const Order order,
+                                                 const unsigned int i,
+                                                 const unsigned int j,
+                                                 const Point & p,
+                                                 const bool add_p_level)
 {
   return fe_hierarchic_2D_shape_second_deriv<L2_HIERARCHIC>(elem, order, i, j, p, add_p_level);
 }
 
 
 template <>
-Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const FEType fet,
-                                             const Elem * elem,
-                                             const unsigned int i,
-                                             const unsigned int j,
-                                             const Point & p,
-                                             const bool add_p_level)
+GeomReal FE<2,L2_HIERARCHIC>::shape_second_deriv(const FEType fet,
+                                                 const Elem * elem,
+                                                 const unsigned int i,
+                                                 const unsigned int j,
+                                                 const Point & p,
+                                                 const bool add_p_level)
 {
   return fe_hierarchic_2D_shape_second_deriv<L2_HIERARCHIC>(elem, fet.order, i, j, p, add_p_level);
 }
 
 
 template <>
-Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
-                                               const Order order,
-                                               const unsigned int i,
-                                               const unsigned int j,
-                                               const Point & p,
-                                               const bool add_p_level)
+GeomReal FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
+                                                   const Order order,
+                                                   const unsigned int i,
+                                                   const unsigned int j,
+                                                   const Point & p,
+                                                   const bool add_p_level)
 {
   libmesh_assert(elem);
   const ElemType type = elem->type();
@@ -817,7 +817,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
         // degrees of freedom too.
         Real f = 1.;
 
-        const Real xi = p(0), eta = p(1);
+        const auto xi = p(0), eta = p(1);
         if (eta < xi)
           {
             if (eta < -xi) // side 0
@@ -892,12 +892,12 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
 
 
 template <>
-Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const FEType fet,
-                                               const Elem * elem,
-                                               const unsigned int i,
-                                               const unsigned int j,
-                                               const Point & p,
-                                               const bool add_p_level)
+GeomReal FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const FEType fet,
+                                                   const Elem * elem,
+                                                   const unsigned int i,
+                                                   const unsigned int j,
+                                                   const Point & p,
+                                                   const bool add_p_level)
 {
   return FE<2,SIDE_HIERARCHIC>::shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
 }
@@ -912,12 +912,12 @@ namespace
 {
 using namespace libMesh;
 
-Real fe_triangle_helper (const Elem & elem,
-                         const Real edgenumerator,
-                         const Real crossval,
-                         const unsigned int basisorder,
-                         const Order totalorder,
-                         const unsigned int noden)
+GeomReal fe_triangle_helper (const Elem & elem,
+                             const GeomReal edgenumerator,
+                             const GeomReal crossval,
+                             const unsigned int basisorder,
+                             const Order totalorder,
+                             const unsigned int noden)
 {
   // Get factors to account for edge-flipping
   Real flip = 1;
@@ -939,8 +939,8 @@ Real fe_triangle_helper (const Elem & elem,
   // Experimentally, as c -> 0, n propto c, I'm still seeing good
   // behavior from the default implementation below:
 
-  const Real edgeval = edgenumerator / crossval;
-  const Real crossfunc = std::pow(crossval, basisorder);
+  const GeomReal edgeval = edgenumerator / crossval;
+  const GeomReal crossfunc = std::pow(crossval, basisorder);
 
   return flip * crossfunc *
     FE<1,HIERARCHIC>::shape(EDGE3, totalorder,
@@ -948,11 +948,11 @@ Real fe_triangle_helper (const Elem & elem,
 }
 
 template <FEFamily T>
-Real fe_hierarchic_2D_shape(const Elem * elem,
-                            const Order order,
-                            const unsigned int i,
-                            const Point & p,
-                            const bool add_p_level)
+GeomReal fe_hierarchic_2D_shape(const Elem * elem,
+                                const Order order,
+                                const unsigned int i,
+                                const Point & p,
+                                const bool add_p_level)
 {
   libmesh_assert(elem);
 
@@ -967,9 +967,9 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
     case TRI6:
     case TRI7:
       {
-        const Real zeta1 = p(0);
-        const Real zeta2 = p(1);
-        const Real zeta0 = 1. - zeta1 - zeta2;
+        const GeomReal zeta1 = p(0);
+        const GeomReal zeta2 = p(1);
+        const GeomReal zeta0 = 1. - zeta1 - zeta2;
 
         libmesh_assert_less (i, (totalorder+1u)*(totalorder+2u)/2);
         libmesh_assert (T == L2_HIERARCHIC || elem->type() == TRI6 ||
@@ -987,8 +987,8 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
           {
             const unsigned int basisorder = i - 1;
 
-            const Real crossval = zeta0 + zeta1;
-            const Real edgenumerator = zeta1 - zeta0;
+            const GeomReal crossval = zeta0 + zeta1;
+            const GeomReal edgenumerator = zeta1 - zeta0;
 
             return fe_triangle_helper(*elem, edgenumerator, crossval,
                                       basisorder, totalorder, 0);
@@ -997,8 +997,8 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
           {
             const unsigned int basisorder = i - totalorder;
 
-            const Real crossval = zeta2 + zeta1;
-            const Real edgenumerator = zeta2 - zeta1;
+            const GeomReal crossval = zeta2 + zeta1;
+            const GeomReal edgenumerator = zeta2 - zeta1;
 
             return fe_triangle_helper(*elem, edgenumerator, crossval,
                                       basisorder, totalorder, 1);
@@ -1007,8 +1007,8 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
           {
             const unsigned int basisorder = i - (2u*totalorder) + 1;
 
-            const Real crossval = zeta0 + zeta2;
-            const Real edgenumerator = zeta0 - zeta2;
+            const GeomReal crossval = zeta0 + zeta2;
+            const GeomReal edgenumerator = zeta0 - zeta2;
 
             return fe_triangle_helper(*elem, edgenumerator, crossval,
                                       basisorder, totalorder, 2);
@@ -1021,7 +1021,7 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
             unsigned int exp1 = triangular_number_row[basisnum] + 1 -
               triangular_number_column[basisnum];
 
-            Real returnval = 1;
+            GeomReal returnval = 1;
             for (unsigned int n = 0; n != exp0; ++n)
               returnval *= zeta0;
             for (unsigned int n = 0; n != exp1; ++n)
@@ -1056,12 +1056,12 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
 
 
 template <FEFamily T>
-Real fe_hierarchic_2D_shape_deriv(const Elem * elem,
-                                  const Order order,
-                                  const unsigned int i,
-                                  const unsigned int j,
-                                  const Point & p,
-                                  const bool add_p_level)
+GeomReal fe_hierarchic_2D_shape_deriv(const Elem * elem,
+                                      const Order order,
+                                      const unsigned int i,
+                                      const unsigned int j,
+                                      const Point & p,
+                                      const bool add_p_level)
 {
   libmesh_assert(elem);
 
@@ -1123,12 +1123,12 @@ Real fe_hierarchic_2D_shape_deriv(const Elem * elem,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <FEFamily T>
-Real fe_hierarchic_2D_shape_second_deriv(const Elem * elem,
-                                         const Order order,
-                                         const unsigned int i,
-                                         const unsigned int j,
-                                         const Point & p,
-                                         const bool add_p_level)
+GeomReal fe_hierarchic_2D_shape_second_deriv(const Elem * elem,
+                                             const Order order,
+                                             const unsigned int i,
+                                             const unsigned int j,
+                                             const Point & p,
+                                             const bool add_p_level)
 {
   return fe_fdm_second_deriv(elem, order, i, j, p, add_p_level,
                              FE<2,T>::shape_deriv);

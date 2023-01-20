@@ -20,11 +20,12 @@ using namespace libMesh;
 
 
 
-Number quadratic_solution (const Point& p,
+Number quadratic_solution (const Point& p_in,
                            const Parameters&,
                            const std::string&,
                            const std::string&)
 {
+  const auto & p = MetaPhysicL::raw_value(p_in);
   const Real & y = LIBMESH_DIM > 1 ? p(1) : 0;
 
   // Discontinuity at y=1 from the forcing function there.
@@ -84,17 +85,17 @@ void periodic_bc_test_poisson(EquationSystems& es,
   QGauss qrule (2, fe_type.default_quadrature_order());
   fe->attach_quadrature_rule(&qrule);
 
-  const std::vector<Real> & JxW = fe->get_JxW();
-  const std::vector<std::vector<Real>> & phi = fe->get_phi();
-  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
+  const auto & JxW = fe->get_JxW();
+  const auto & phi = fe->get_phi();
+  const auto & dphi = fe->get_dphi();
 
   // Face FE to integrate delta function part of forcing
   std::unique_ptr<FEBase> fe_face (FEBase::build(2, fe_type));
   QGauss qface (1, fe_type.default_quadrature_order());
   fe_face->attach_quadrature_rule(&qface);
 
-  const std::vector<Real> & JxW_face = fe_face->get_JxW();
-  const std::vector<std::vector<Real>> & phi_face = fe_face->get_phi();
+  const auto & JxW_face = fe_face->get_JxW();
+  const auto & phi_face = fe_face->get_phi();
   std::unique_ptr<const Elem> elem_side;
 
   DenseMatrix<Number> Ke;
@@ -119,9 +120,9 @@ void periodic_bc_test_poisson(EquationSystems& es,
           for (unsigned int i=0; i != n_dofs; i++)
             {
               for (unsigned int j=0; j != n_dofs; j++)
-                Ke(i,j) += -JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                Ke(i,j) += MetaPhysicL::raw_value(-JxW[qp]*(dphi[i][qp]*dphi[j][qp]));
 
-              Fe(i) += JxW[qp]*phi[i][qp]*2;
+              Fe(i) += MetaPhysicL::raw_value(JxW[qp]*phi[i][qp]*2);
             }
         }
 
@@ -138,7 +139,7 @@ void periodic_bc_test_poisson(EquationSystems& es,
                 // delta function divided by 2 since we hit it from
                 // both sides
                 for (unsigned int i=0; i != n_dofs; i++)
-                  Fe(i) += JxW_face[qp]*phi_face[i][qp]*(-4);
+                  Fe(i) += MetaPhysicL::raw_value(JxW_face[qp]*phi_face[i][qp]*(-4));
               }
           }
       }
@@ -242,7 +243,7 @@ private:
           const Real y = ya + offset;
           Point p{x,y};
           const Number exact = quadratic_solution(p,params,"","");
-          const Number approx = sys.point_value(0,p);
+          const Number approx = MetaPhysicL::raw_value(sys.point_value(0,p));
           LIBMESH_ASSERT_FP_EQUAL(libmesh_real(exact),
                                   libmesh_real(approx),
                                   TOLERANCE*TOLERANCE*20);

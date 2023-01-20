@@ -164,7 +164,7 @@ public:
   /**
    * An optimized method for computing the length of a 3-node edge.
    */
-  virtual Real volume () const override;
+  virtual GeomReal volume () const override;
 
   /**
    * \returns A bounding box (not necessarily the minimal bounding box)

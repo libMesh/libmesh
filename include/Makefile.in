@@ -632,6 +632,7 @@ include_HEADERS = \
         base/periodic_boundary_base.h \
         base/point_neighbor_coupling.h \
         base/print_trace.h \
+        base/raw_type.h \
         base/reference_counted_object.h \
         base/reference_counter.h \
         base/sibling_coupling.h \
@@ -1064,6 +1065,7 @@ include_HEADERS = \
         utils/point_locator_tree.h \
         utils/pointer_to_pointer_iter.h \
         utils/pool_allocator.h \
+        utils/raw_value.h \
         utils/restore_warnings.h \
         utils/simple_range.h \
         utils/statistics.h \

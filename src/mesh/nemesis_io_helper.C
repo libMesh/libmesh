@@ -35,6 +35,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parallel.h"
 #include "libmesh/utility.h"
+#include "libmesh/raw_type.h"
 
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 
@@ -2214,7 +2215,7 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*us
   // Just loop over our list outputting the nodes the way we built the map
   for (auto i : make_range(local_num_nodes))
     {
-      const Point & pt = mesh.point(this->exodus_node_num_to_libmesh[i]-1);
+      const auto pt = MetaPhysicL::raw_value(mesh.point(this->exodus_node_num_to_libmesh[i]-1));
       x[i]=pt(0);
       y[i]=pt(1);
       z[i]=pt(2);
@@ -2516,8 +2517,8 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
               const DofMap & dof_map           = sys.get_dof_map();
 
               NumericVector<Number> & sys_soln(*sys.current_local_solution);
-              std::vector<Number>      elem_soln;   // The finite element solution
-              std::vector<Number>      nodal_soln;  // The FE solution interpolated to the nodes
+              std::vector<Number> elem_soln;   // The finite element solution
+              std::vector<GeomNumber> nodal_soln;  // The FE solution interpolated to the nodes
               std::vector<dof_id_type> dof_indices; // The DOF indices for the finite element
 
               for (const auto & elem : mesh.active_local_element_ptr_range())
@@ -2545,7 +2546,7 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
                             libmesh_node_num_to_exodus[elem->node_id(n)];
                           libmesh_assert_greater(exodus_num, 0);
                           libmesh_assert_less(exodus_num-1, local_soln.size());
-                          local_soln[exodus_num-1] = nodal_soln[n];
+                          local_soln[exodus_num-1] = MetaPhysicL::raw_value(nodal_soln[n]);
                         }
                   }
             }

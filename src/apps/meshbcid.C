@@ -92,37 +92,37 @@ int main(int argc, char ** argv)
               points(minpt, maxpt);
 
   if (cl.search("--minnormalx"))
-    normals.min()(0) = cl.next(normals.min()(0));
+    normals.min()(0) = cl.next(MetaPhysicL::raw_value(normals.min()(0)));
   if (cl.search("--maxnormalx"))
-    normals.max()(0) = cl.next(normals.max()(0));
+    normals.max()(0) = cl.next(MetaPhysicL::raw_value(normals.max()(0)));
 
   if (cl.search("--minpointx"))
-    points.min()(0) = cl.next(points.min()(0));
+    points.min()(0) = cl.next(MetaPhysicL::raw_value(points.min()(0)));
   if (cl.search("--maxpointx"))
-    points.max()(0) = cl.next(points.max()(0));
+    points.max()(0) = cl.next(MetaPhysicL::raw_value(points.max()(0)));
 
 #if LIBMESH_DIM > 1
   if (cl.search("--minnormaly"))
-    normals.min()(1) = cl.next(normals.min()(1));
+    normals.min()(1) = cl.next(MetaPhysicL::raw_value(normals.min()(1)));
   if (cl.search("--maxnormaly"))
-    normals.max()(1) = cl.next(normals.max()(1));
+    normals.max()(1) = cl.next(MetaPhysicL::raw_value(normals.max()(1)));
 
   if (cl.search("--minpointy"))
-    points.min()(1) = cl.next(points.min()(1));
+    points.min()(1) = cl.next(MetaPhysicL::raw_value(points.min()(1)));
   if (cl.search("--maxpointy"))
-    points.max()(1) = cl.next(points.max()(1));
+    points.max()(1) = cl.next(MetaPhysicL::raw_value(points.max()(1)));
 #endif
 
 #if LIBMESH_DIM > 2
   if (cl.search("--minnormalz"))
-    normals.min()(2) = cl.next(normals.min()(2));
+    normals.min()(2) = cl.next(MetaPhysicL::raw_value(normals.min()(2)));
   if (cl.search("--maxnormalz"))
-    normals.max()(2) = cl.next(normals.max()(2));
+    normals.max()(2) = cl.next(MetaPhysicL::raw_value(normals.max()(2)));
 
   if (cl.search("--minpointz"))
-    points.min()(2) = cl.next(points.min()(2));
+    points.min()(2) = cl.next(MetaPhysicL::raw_value(points.min()(2)));
   if (cl.search("--maxpointz"))
-    points.max()(2) = cl.next(points.max()(2));
+    points.max()(2) = cl.next(MetaPhysicL::raw_value(points.max()(2)));
 #endif
 
   libMesh::out << "min point = " << points.min() << std::endl;

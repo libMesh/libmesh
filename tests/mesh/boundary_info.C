@@ -435,7 +435,7 @@ public:
     variables.push_back(0);
     std::set<boundary_id_type> shellface_ids;
     shellface_ids.insert(20);
-    ZeroFunction<> zf;
+    ZeroFunction<Number> zf;
     DirichletBoundary dirichlet_bc(shellface_ids,
                                    variables,
                                    &zf);

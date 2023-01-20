@@ -155,7 +155,7 @@ int main(int argc, char ** argv)
                 var_remapping[j] = coarse_sys.variable_number(varname);
             }
 
-          MeshFunction coarse_solution
+          MeshFunction<> coarse_solution
             (coarse_es, *coarse_sys.solution,
              coarse_sys.get_dof_map(), std::move(var_remapping));
           coarse_solution.init();

@@ -31,7 +31,7 @@ LIBMESH_DEFAULT_VECTORIZED_FE(1,XYZ)
 
 
 template <>
-Real FE<1,XYZ>::shape(const Elem * elem,
+GeomReal FE<1,XYZ>::shape(const Elem * elem,
                       const Order libmesh_dbg_var(order),
                       const unsigned int i,
                       const Point & point_in,
@@ -41,16 +41,16 @@ Real FE<1,XYZ>::shape(const Elem * elem,
   libmesh_assert_less_equal (i, order + add_p_level * elem->p_level());
 
   Point avg = elem->vertex_average();
-  Real max_distance = 0.;
+  GeomReal max_distance = 0.;
   for (const Point & p : elem->node_ref_range())
     {
-      const Real distance = std::abs(avg(0) - p(0));
+      const GeomReal distance = std::abs(avg(0) - p(0));
       max_distance = std::max(distance, max_distance);
     }
 
-  const Real x  = point_in(0);
-  const Real xc = avg(0);
-  const Real dx = (x - xc)/max_distance;
+  const GeomReal x  = point_in(0);
+  const GeomReal xc = avg(0);
+  const GeomReal dx = (x - xc)/max_distance;
 
   // monomials. since they are hierarchic we only need one case block.
   switch (i)
@@ -71,7 +71,7 @@ Real FE<1,XYZ>::shape(const Elem * elem,
       return dx*dx*dx*dx;
 
     default:
-      Real val = 1.;
+      GeomReal val = 1.;
       for (unsigned int index = 0; index != i; ++index)
         val *= dx;
       return val;
@@ -81,7 +81,7 @@ Real FE<1,XYZ>::shape(const Elem * elem,
 
 
 template <>
-Real FE<1,XYZ>::shape(const ElemType,
+GeomReal FE<1,XYZ>::shape(const ElemType,
                       const Order,
                       const unsigned int,
                       const Point &)
@@ -94,7 +94,7 @@ Real FE<1,XYZ>::shape(const ElemType,
 
 
 template <>
-Real FE<1,XYZ>::shape(const FEType fet,
+GeomReal FE<1,XYZ>::shape(const FEType fet,
                       const Elem * elem,
                       const unsigned int i,
                       const Point & p,
@@ -105,7 +105,7 @@ Real FE<1,XYZ>::shape(const FEType fet,
 
 
 template <>
-Real FE<1,XYZ>::shape_deriv(const Elem * elem,
+GeomReal FE<1,XYZ>::shape_deriv(const Elem * elem,
                             const Order libmesh_dbg_var(order),
                             const unsigned int i,
                             const unsigned int libmesh_dbg_var(j),
@@ -120,16 +120,16 @@ Real FE<1,XYZ>::shape_deriv(const Elem * elem,
   libmesh_assert_equal_to (j, 0);
 
   Point avg = elem->vertex_average();
-  Real max_distance = 0.;
+  GeomReal max_distance = 0.;
   for (const Point & p : elem->node_ref_range())
     {
-      const Real distance = std::abs(avg(0) - p(0));
+      const GeomReal distance = std::abs(avg(0) - p(0));
       max_distance = std::max(distance, max_distance);
     }
 
-  const Real x  = point_in(0);
-  const Real xc = avg(0);
-  const Real dx = (x - xc)/max_distance;
+  const GeomReal x  = point_in(0);
+  const GeomReal xc = avg(0);
+  const GeomReal dx = (x - xc)/max_distance;
 
   // monomials. since they are hierarchic we only need one case block.
   switch (i)
@@ -150,7 +150,7 @@ Real FE<1,XYZ>::shape_deriv(const Elem * elem,
       return 4.*dx*dx*dx/max_distance;
 
     default:
-      Real val = i;
+      GeomReal val = i;
       for (unsigned int index = 1; index != i; ++index)
         val *= dx;
       return val/max_distance;
@@ -160,7 +160,7 @@ Real FE<1,XYZ>::shape_deriv(const Elem * elem,
 
 
 template <>
-Real FE<1,XYZ>::shape_deriv(const ElemType,
+GeomReal FE<1,XYZ>::shape_deriv(const ElemType,
                             const Order,
                             const unsigned int,
                             const unsigned int,
@@ -172,7 +172,7 @@ Real FE<1,XYZ>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<1,XYZ>::shape_deriv(const FEType fet,
+GeomReal FE<1,XYZ>::shape_deriv(const FEType fet,
                             const Elem * elem,
                             const unsigned int i,
                             const unsigned int j,
@@ -191,7 +191,7 @@ Real FE<1,XYZ>::shape_deriv(const FEType fet,
 
 
 template <>
-Real FE<1,XYZ>::shape_second_deriv(const Elem * elem,
+GeomReal FE<1,XYZ>::shape_second_deriv(const Elem * elem,
                                    const Order libmesh_dbg_var(order),
                                    const unsigned int i,
                                    const unsigned int libmesh_dbg_var(j),
@@ -206,17 +206,17 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem * elem,
   libmesh_assert_equal_to (j, 0);
 
   Point avg = elem->vertex_average();
-  Real max_distance = 0.;
+  GeomReal max_distance = 0.;
   for (const Point & p : elem->node_ref_range())
     {
-      const Real distance = std::abs(avg(0) - p(0));
+      const GeomReal distance = std::abs(avg(0) - p(0));
       max_distance = std::max(distance, max_distance);
     }
 
-  const Real x  = point_in(0);
-  const Real xc = avg(0);
-  const Real dx = (x - xc)/max_distance;
-  const Real dist2 = pow(max_distance,2.);
+  const GeomReal x  = point_in(0);
+  const GeomReal xc = avg(0);
+  const GeomReal dx = (x - xc)/max_distance;
+  const GeomReal dist2 = std::pow(max_distance,2.);
 
   // monomials. since they are hierarchic we only need one case block.
   switch (i)
@@ -235,7 +235,7 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem * elem,
       return 12.*dx*dx/dist2;
 
     default:
-      Real val = 2.;
+      GeomReal val = 2.;
       for (unsigned int index = 2; index != i; ++index)
         val *= (index+1) * dx;
       return val/dist2;
@@ -244,7 +244,7 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem * elem,
 
 
 template <>
-Real FE<1,XYZ>::shape_second_deriv(const ElemType,
+GeomReal FE<1,XYZ>::shape_second_deriv(const ElemType,
                                    const Order,
                                    const unsigned int,
                                    const unsigned int,
@@ -257,7 +257,7 @@ Real FE<1,XYZ>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<1,XYZ>::shape_second_deriv(const FEType fet,
+GeomReal FE<1,XYZ>::shape_second_deriv(const FEType fet,
                                    const Elem * elem,
                                    const unsigned int i,
                                    const unsigned int j,

@@ -32,6 +32,7 @@ BUILT_SOURCES = \
         periodic_boundary_base.h \
         point_neighbor_coupling.h \
         print_trace.h \
+        raw_type.h \
         reference_counted_object.h \
         reference_counter.h \
         sibling_coupling.h \
@@ -470,6 +471,7 @@ BUILT_SOURCES = \
         point_locator_tree.h \
         pointer_to_pointer_iter.h \
         pool_allocator.h \
+        raw_value.h \
         restore_warnings.h \
         simple_range.h \
         statistics.h \
@@ -655,6 +657,9 @@ point_neighbor_coupling.h: $(top_srcdir)/include/base/point_neighbor_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 print_trace.h: $(top_srcdir)/include/base/print_trace.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+raw_type.h: $(top_srcdir)/include/base/raw_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 reference_counted_object.h: $(top_srcdir)/include/base/reference_counted_object.h
@@ -1969,6 +1974,9 @@ pointer_to_pointer_iter.h: $(top_srcdir)/include/utils/pointer_to_pointer_iter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+raw_value.h: $(top_srcdir)/include/utils/raw_value.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 restore_warnings.h: $(top_srcdir)/include/utils/restore_warnings.h

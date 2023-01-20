@@ -4,6 +4,7 @@
 #include <libmesh/remote_elem.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/boundary_info.h>
+#include <libmesh/raw_type.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -229,7 +230,7 @@ public:
             CPPUNIT_ASSERT_EQUAL(pip->level(), elem->level());
 
             // We only added right edges
-            LIBMESH_ASSERT_FP_EQUAL(0.8, elem->vertex_average()(0),
+            LIBMESH_ASSERT_FP_EQUAL(0.8, MetaPhysicL::raw_value(elem->vertex_average()(0)),
                                     TOLERANCE*TOLERANCE);
           }
         else
@@ -258,7 +259,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(pip->level(), elem->level());
 
         // We only added left edges
-        LIBMESH_ASSERT_FP_EQUAL(0.2, elem->vertex_average()(0),
+        LIBMESH_ASSERT_FP_EQUAL(0.2, MetaPhysicL::raw_value(elem->vertex_average()(0)),
                                 TOLERANCE*TOLERANCE);
       }
 

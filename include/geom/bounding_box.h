@@ -139,7 +139,7 @@ public:
    * d > 0 if the point is outside the BoundingBox
    * d <= 0 if the point is inside the Bounding Box
    */
-  Real signed_distance(const Point & p) const;
+  GeomReal signed_distance(const Point & p) const;
 
   /**
    * Scales each dimension of the bounding box by \p factor.

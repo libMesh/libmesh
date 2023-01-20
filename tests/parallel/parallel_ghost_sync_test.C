@@ -41,7 +41,9 @@ namespace {
           CPPUNIT_ASSERT(node);
           CPPUNIT_ASSERT_EQUAL(mesh.processor_id(), node->processor_id());
 
-          data[i] = {(*node)(2), (*node)(1), (*node)(0)};
+          data[i] = {MetaPhysicL::raw_value((*node)(2)),
+            MetaPhysicL::raw_value((*node)(1)),
+            MetaPhysicL::raw_value((*node)(0))};
         }
     }
 
@@ -60,9 +62,9 @@ namespace {
           CPPUNIT_ASSERT(mesh.processor_id() != node->processor_id());
 
           CPPUNIT_ASSERT_EQUAL(data[i].size(), std::size_t(3));
-          CPPUNIT_ASSERT_EQUAL(data[i][0], (*node)(2));
-          CPPUNIT_ASSERT_EQUAL(data[i][1], (*node)(1));
-          CPPUNIT_ASSERT_EQUAL(data[i][2], (*node)(0));
+          CPPUNIT_ASSERT_EQUAL(data[i][0], MetaPhysicL::raw_value((*node)(2)));
+          CPPUNIT_ASSERT_EQUAL(data[i][1], MetaPhysicL::raw_value((*node)(1)));
+          CPPUNIT_ASSERT_EQUAL(data[i][2], MetaPhysicL::raw_value((*node)(0)));
         }
     }
   };

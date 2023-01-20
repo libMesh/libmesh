@@ -154,6 +154,7 @@ protected:
 #endif
 
 private:
+
   const System & _sys;
   std::string _expression;
   std::vector<std::string> _subexpressions;
@@ -711,12 +712,12 @@ ParsedFEMFunction<Output>::eval_args (const FEMContext & c,
                                       const Point & p,
                                       const Real time)
 {
-  _spacetime[0] = p(0);
+  _spacetime[0] = this->dual_converter(p(0));
 #if LIBMESH_DIM > 1
-  _spacetime[1] = p(1);
+  _spacetime[1] = this->dual_converter(p(1));
 #endif
 #if LIBMESH_DIM > 2
-  _spacetime[2] = p(2);
+  _spacetime[2] = this->dual_converter(p(2));
 #endif
   _spacetime[LIBMESH_DIM] = time;
 
@@ -726,7 +727,9 @@ ParsedFEMFunction<Output>::eval_args (const FEMContext & c,
       if (!_need_var[v])
         continue;
 
-      c.point_value(v, p, _spacetime[LIBMESH_DIM+1+request_index]);
+      GeomNumber val = _spacetime[LIBMESH_DIM+1+request_index];
+      c.point_value(v, p, val);
+      _spacetime[LIBMESH_DIM+1+request_index] = this->dual_converter(val);
       request_index++;
     }
 
@@ -743,7 +746,7 @@ ParsedFEMFunction<Output>::eval_args (const FEMContext & c,
             )
           continue;
 
-        Gradient g;
+        GeomNumberGradient g;
         c.point_gradient(v, p, g);
 
         for (unsigned int d=0; d != LIBMESH_DIM; ++d)
@@ -751,7 +754,7 @@ ParsedFEMFunction<Output>::eval_args (const FEMContext & c,
             if (!_need_var_grad[v*LIBMESH_DIM+d])
               continue;
 
-            _spacetime[LIBMESH_DIM+1+request_index] = g(d);
+            _spacetime[LIBMESH_DIM+1+request_index] = this->dual_converter(g(d));
             request_index++;
           }
       }
@@ -776,7 +779,7 @@ ParsedFEMFunction<Output>::eval_args (const FEMContext & c,
             )
           continue;
 
-        Tensor h;
+        GeomNumberTensor h;
         c.point_hessian(v, p, h);
 
         for (unsigned int d1=0; d1 != LIBMESH_DIM; ++d1)
@@ -785,7 +788,7 @@ ParsedFEMFunction<Output>::eval_args (const FEMContext & c,
               if (!_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+d1*LIBMESH_DIM+d2])
                 continue;
 
-              _spacetime[LIBMESH_DIM+1+request_index] = h(d1,d2);
+              _spacetime[LIBMESH_DIM+1+request_index] = this->dual_converter(h(d1,d2));
               request_index++;
             }
       }
@@ -813,7 +816,7 @@ ParsedFEMFunction<Output>::eval_args (const FEMContext & c,
               const Point & n = normals[qp];
               for (unsigned int d=0; d != LIBMESH_DIM; ++d)
                 {
-                  _spacetime[LIBMESH_DIM+1+request_index] = n(d);
+                  _spacetime[LIBMESH_DIM+1+request_index] = this->dual_converter(n(d));
                   request_index++;
                 }
 #ifndef NDEBUG

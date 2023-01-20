@@ -285,7 +285,7 @@ public:
                          const FEType & fe_t,
                          const Elem * elem,
                          const std::vector<Number> & elem_soln,
-                         std::vector<Number> & nodal_soln);
+                         std::vector<GeomNumber> & nodal_soln);
 
 
   /**
@@ -300,7 +300,7 @@ public:
                               const Elem * elem,
                               const unsigned int side,
                               const std::vector<Number> & elem_soln,
-                              std::vector<Number> & nodal_soln);
+                              std::vector<GeomNumber> & nodal_soln);
 
   /**
    * This is now deprecated; use FEMap::map instead.
@@ -355,11 +355,11 @@ public:
    * Elem::p_level() internally or the version which takes an
    * extra_order parameter.
    */
-  static Real shape(const unsigned int dim,
-                    const FEType & fe_t,
-                    const ElemType t,
-                    const unsigned int i,
-                    const Point & p);
+  static GeomReal shape(const unsigned int dim,
+                        const FEType & fe_t,
+                        const ElemType t,
+                        const unsigned int i,
+                        const Point & p);
 
   /**
    * \returns The value of the \f$ i^{th} \f$ shape function at
@@ -374,30 +374,30 @@ public:
    * Elem::p_level() internally or the version which takes an
    * extra_order parameter.
    */
-  static Real shape(const unsigned int dim,
-                    const FEType & fe_t,
-                    const Elem * elem,
-                    const unsigned int i,
-                    const Point & p);
+  static GeomReal shape(const unsigned int dim,
+                        const FEType & fe_t,
+                        const Elem * elem,
+                        const unsigned int i,
+                        const Point & p);
 
   /**
    * Non-deprecated version of the shape() function. The
    * Elem::p_level() is accounted for internally.
    */
-  static Real shape(const FEType & fe_t,
-                    const Elem * elem,
-                    const unsigned int i,
-                    const Point & p);
+  static GeomReal shape(const FEType & fe_t,
+                        const Elem * elem,
+                        const unsigned int i,
+                        const Point & p);
 
   /**
    * Non-deprecated version of the shape() function. The
    * Elem::p_level() is ignored and extra_order is used instead.
    */
-  static Real shape(const FEType & fe_t,
-                    int extra_order,
-                    const Elem * elem,
-                    const unsigned int i,
-                    const Point & p);
+  static GeomReal shape(const FEType & fe_t,
+                        int extra_order,
+                        const Elem * elem,
+                        const unsigned int i,
+                        const Point & p);
 
   /**
    * \returns The value of the \f$ i^{th} \f$ shape function at
@@ -412,13 +412,13 @@ public:
    * Elem::p_level() internally or the version which takes an
    * extra_order parameter.
    */
-  template<typename OutputType>
+  template<typename OutputShape>
   static void shape(const unsigned int dim,
                     const FEType & fe_t,
                     const ElemType t,
                     const unsigned int i,
                     const Point & p,
-                    OutputType & phi);
+                    OutputShape & phi);
 
   /**
    * \returns The value of the \f$ i^{th} \f$ shape function at
@@ -433,13 +433,13 @@ public:
    * Elem::p_level() internally or the version which takes an
    * extra_order parameter.
    */
-  template<typename OutputType>
+  template<typename OutputShape>
   static void shape(const unsigned int dim,
                     const FEType & fe_t,
                     const Elem * elem,
                     const unsigned int i,
                     const Point & p,
-                    OutputType & phi);
+                    OutputShape & phi);
 
   /**
    * Non-deprecated version of templated shape() function that
@@ -482,21 +482,21 @@ public:
    * internally by the library and changing them is unlikely to break
    * application codes.
    */
-  template<typename OutputType>
+  template<typename OutputShape>
   static void shapes(const unsigned int dim,
                      const FEType & fe_t,
                      const Elem * elem,
                      const unsigned int i,
                      const std::vector<Point> & p,
-                     std::vector<OutputType> & phi,
+                     std::vector<OutputShape> & phi,
                      const bool add_p_level = true);
 
-  template<typename OutputType>
+  template<typename OutputShape>
   static void all_shapes(const unsigned int dim,
                          const FEType & fe_t,
                          const Elem * elem,
                          const std::vector<Point> & p,
-                         std::vector<std::vector<OutputType>> & phi,
+                         std::vector<std::vector<OutputShape>> & phi,
                          const bool add_p_level = true);
 
   /**
@@ -504,7 +504,7 @@ public:
    * The \p p_level() of the passed-in \p elem is accounted for internally when
    * the \p add_p_level flag is set to true. For more information, see fe.h.
    */
-  typedef Real (*shape_ptr) (const FEType fe_t,
+  typedef GeomReal (*shape_ptr) (const FEType fe_t,
                              const Elem * elem,
                              const unsigned int i,
                              const Point & p,
@@ -540,12 +540,12 @@ public:
    *
    * \deprecated Call the version of this function taking an Elem* instead.
    */
-  static Real shape_deriv(const unsigned int dim,
-                          const FEType & fe_t,
-                          const ElemType t,
-                          const unsigned int i,
-                          const unsigned int j,
-                          const Point & p);
+  static GeomReal shape_deriv(const unsigned int dim,
+                              const FEType & fe_t,
+                              const ElemType t,
+                              const unsigned int i,
+                              const unsigned int j,
+                              const Point & p);
 
   /**
    * \returns The \f$ j^{th} \f$ coordinate of the gradient of
@@ -559,7 +559,7 @@ public:
    *
    * \deprecated Call the version of this function taking an Elem* instead.
    */
-  static Real shape_deriv (const unsigned int dim,
+  static GeomReal shape_deriv (const unsigned int dim,
                            const FEType & fe_t,
                            const Elem *elem,
                            const unsigned int i,
@@ -569,21 +569,21 @@ public:
   /**
    * Non-deprecated version of function above.
    */
-  static Real shape_deriv(const FEType & fe_t,
-                          const Elem * elem,
-                          const unsigned int i,
-                          const unsigned int j,
-                          const Point & p);
+  static GeomReal shape_deriv(const FEType & fe_t,
+                              const Elem * elem,
+                              const unsigned int i,
+                              const unsigned int j,
+                              const Point & p);
 
   /**
    * Non-deprecated version of function above.
    */
-  static Real shape_deriv(const FEType & fe_t,
-                          int extra_order,
-                          const Elem * elem,
-                          const unsigned int i,
-                          const unsigned int j,
-                          const Point & p);
+  static GeomReal shape_deriv(const FEType & fe_t,
+                              int extra_order,
+                              const Elem * elem,
+                              const unsigned int i,
+                              const unsigned int j,
+                              const Point & p);
 
   /**
    * Fills \p dphi with the derivatives of the \f$ i^{th} \f$ shape
@@ -603,12 +603,12 @@ public:
    * The \p p_level() of the passed-in \p elem is accounted for internally when
    * the \p add_p_level flag is set to true. For more information, see fe.h.
    */
-  typedef Real (*shape_deriv_ptr) (const FEType fet,
-                                   const Elem * elem,
-                                   const unsigned int i,
-                                   const unsigned int j,
-                                   const Point & p,
-                                   const bool add_p_level);
+  typedef GeomReal (*shape_deriv_ptr) (const FEType fet,
+                                       const Elem * elem,
+                                       const unsigned int i,
+                                       const unsigned int j,
+                                       const Point & p,
+                                       const bool add_p_level);
 
   /**
    * \returns A function which evaluates shape for the
@@ -651,12 +651,12 @@ public:
    * \deprecated Call version of this function which does not require
    * \p dim and takes an Elem * instead.
    */
-  static Real shape_second_deriv(const unsigned int dim,
-                                 const FEType & fe_t,
-                                 const ElemType t,
-                                 const unsigned int i,
-                                 const unsigned int j,
-                                 const Point & p);
+  static GeomReal shape_second_deriv(const unsigned int dim,
+                                     const FEType & fe_t,
+                                     const ElemType t,
+                                     const unsigned int i,
+                                     const unsigned int j,
+                                     const Point & p);
 
   /**
    * \returns The second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
@@ -676,38 +676,38 @@ public:
    * \deprecated Call version of this function which does not require
    * \p dim and takes an Elem * instead.
    */
-  static Real shape_second_deriv (const unsigned int dim,
-                                  const FEType & fe_t,
-                                  const Elem *elem,
-                                  const unsigned int i,
-                                  const unsigned int j,
-                                  const Point & p);
+  static GeomReal shape_second_deriv (const unsigned int dim,
+                                      const FEType & fe_t,
+                                      const Elem *elem,
+                                      const unsigned int i,
+                                      const unsigned int j,
+                                      const Point & p);
 
   /**
    * Non-deprecated version of function above.
    */
-  static Real shape_second_deriv(const FEType & fe_t,
-                                 const Elem * elem,
-                                 const unsigned int i,
-                                 const unsigned int j,
-                                 const Point & p);
+  static GeomReal shape_second_deriv(const FEType & fe_t,
+                                     const Elem * elem,
+                                     const unsigned int i,
+                                     const unsigned int j,
+                                     const Point & p);
 
   /**
    * Non-deprecated version of function above taking an \p extra_order parameter.
    */
-  static Real shape_second_deriv(const FEType & fe_t,
-                                 int extra_order,
-                                 const Elem * elem,
-                                 const unsigned int i,
-                                 const unsigned int j,
-                                 const Point & p);
+  static GeomReal shape_second_deriv(const FEType & fe_t,
+                                     int extra_order,
+                                     const Elem * elem,
+                                     const unsigned int i,
+                                     const unsigned int j,
+                                     const Point & p);
 
   /**
    * Typedef for pointer to a function that returns FE shape function second derivative values.
    * The \p p_level() of the passed-in \p elem is accounted for internally when
    * the \p add_p_level flag is set to true. For more information, see fe.h.
    */
-  typedef Real (*shape_second_deriv_ptr) (const FEType fet,
+  typedef GeomReal (*shape_second_deriv_ptr) (const FEType fet,
                                           const Elem * elem,
                                           const unsigned int i,
                                           const unsigned int j,
@@ -887,7 +887,7 @@ private:
                               const FEType & fe_t,
                               const Elem * elem,
                               const std::vector<Number> & elem_soln,
-                              std::vector<Number> & nodal_soln);
+                              std::vector<GeomNumber> & nodal_soln);
 
   static Point ifem_map (const unsigned int dim,
                          const FEType & fe_t,
@@ -918,7 +918,7 @@ private:
    * \deprecated Call version that takes a pointer-to-Elem and does
    * not require an explicit dim parameter instead.
    */
-  static Real ifem_shape(const unsigned int dim,
+  static GeomReal ifem_shape(const unsigned int dim,
                          const FEType & fe_t,
                          const ElemType t,
                          const unsigned int i,
@@ -928,7 +928,7 @@ private:
    * \deprecated Call version that takes a pointer-to-Elem and does
    * not require an explicit dim parameter instead.
    */
-  static Real ifem_shape(const unsigned int dim,
+  static GeomReal ifem_shape(const unsigned int dim,
                          const FEType & fe_t,
                          const Elem * elem,
                          const unsigned int i,
@@ -943,7 +943,7 @@ private:
    * \deprecated Call version that takes a pointer-to-Elem and does
    * not require an explicit dim parameter instead.
    */
-  static Real ifem_shape_deriv(const unsigned int dim,
+  static GeomReal ifem_shape_deriv(const unsigned int dim,
                                const FEType & fe_t,
                                const ElemType t,
                                const unsigned int i,
@@ -954,7 +954,7 @@ private:
    * \deprecated Call version that takes a pointer-to-Elem and does
    * not require an explicit dim parameter instead.
    */
-  static Real ifem_shape_deriv(const unsigned int dim,
+  static GeomReal ifem_shape_deriv(const unsigned int dim,
                                const FEType & fe_t,
                                const Elem * elem,
                                const unsigned int i,

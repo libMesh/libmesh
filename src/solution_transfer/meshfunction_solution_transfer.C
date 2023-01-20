@@ -60,7 +60,7 @@ MeshFunctionSolutionTransfer::transfer(const Variable & from_var,
   // so we can get values in parallel
   from_sys->solution->localize(*serialized_solution);
 
-  MeshFunction from_func(from_es, *serialized_solution, from_sys->get_dof_map(), to_var_num);
+  MeshFunction<Number> from_func(from_es, *serialized_solution, from_sys->get_dof_map(), to_var_num);
   from_func.init();
 
   // Now loop over the nodes of the 'To' mesh setting values for each variable.

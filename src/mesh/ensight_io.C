@@ -28,6 +28,7 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/int_range.h"
 #include "libmesh/utility.h" // map_find
+#include "libmesh/raw_type.h"
 
 // C++ includes
 #include <sstream>
@@ -367,7 +368,7 @@ void EnsightIO::write_scalar_ascii(std::string_view sys,
   std::map<int, Real> local_soln;
 
   std::vector<Number> elem_soln;
-  std::vector<Number> nodal_soln;
+  std::vector<GeomNumber> nodal_soln;
 
   // Loop over active local elements, construct the nodal solution, and write it to file.
   for (const auto & elem : the_mesh.active_local_element_ptr_range())
@@ -390,7 +391,7 @@ void EnsightIO::write_scalar_ascii(std::string_view sys,
 #endif
 
       for (auto n : elem->node_index_range())
-        local_soln[elem->node_id(n)] = libmesh_real(nodal_soln[n]);
+        local_soln[elem->node_id(n)] = libmesh_real(MetaPhysicL::raw_value(nodal_soln[n]));
     }
 
   for (const auto & pr : local_soln)
@@ -462,9 +463,9 @@ void EnsightIO::write_vector_ascii(std::string_view sys,
       std::vector<Number> elem_soln_v;
       std::vector<Number> elem_soln_w;
 
-      std::vector<Number> nodal_soln_u;
-      std::vector<Number> nodal_soln_v;
-      std::vector<Number> nodal_soln_w;
+      std::vector<GeomNumber> nodal_soln_u;
+      std::vector<GeomNumber> nodal_soln_v;
+      std::vector<GeomNumber> nodal_soln_w;
 
       elem_soln_u.resize(dof_indices_u.size());
       elem_soln_v.resize(dof_indices_v.size());
@@ -494,11 +495,11 @@ void EnsightIO::write_vector_ascii(std::string_view sys,
       for (const auto & n : elem->node_index_range())
         {
           std::vector<Real> node_vec(3);
-          node_vec[0] = libmesh_real(nodal_soln_u[n]);
-          node_vec[1] = libmesh_real(nodal_soln_v[n]);
+          node_vec[0] = libmesh_real(MetaPhysicL::raw_value(nodal_soln_u[n]));
+          node_vec[1] = libmesh_real(MetaPhysicL::raw_value(nodal_soln_v[n]));
           node_vec[2] = 0.0;
           if (dim==3)
-            node_vec[2] = libmesh_real(nodal_soln_w[n]);
+            node_vec[2] = libmesh_real(MetaPhysicL::raw_value(nodal_soln_w[n]));
           local_soln[elem->node_id(n)] = node_vec;
         }
     }

@@ -26,6 +26,7 @@
 #include "libmesh/mesh_tools.h"
 #include "libmesh/elem.h"
 #include "libmesh/int_range.h"
+#include "libmesh/raw_type.h"
 
 namespace libMesh
 {
@@ -93,16 +94,19 @@ void PostscriptIO::write (const std::string & fname)
       // Postscript bounding box should be.
       BoundingBox bbox = MeshTools::create_bounding_box(the_mesh);
 
+      auto bbox_first = MetaPhysicL::raw_value(bbox.first),
+           bbox_second = MetaPhysicL::raw_value(bbox.second);
+
       // Add a little extra padding to the "true" bounding box so
       // that we can still see the boundary
       const Real percent_padding = 0.01;
-      const Real dx=bbox.second(0)-bbox.first(0); libmesh_assert_greater (dx, 0.0);
-      const Real dy=bbox.second(1)-bbox.first(1); libmesh_assert_greater (dy, 0.0);
+      const Real dx=bbox_second(0)-bbox_first(0); libmesh_assert_greater (dx, 0.0);
+      const Real dy=bbox_second(1)-bbox_first(1); libmesh_assert_greater (dy, 0.0);
 
-      const Real x_min = bbox.first(0)  - percent_padding*dx;
-      const Real y_min = bbox.first(1)  - percent_padding*dy;
-      const Real x_max = bbox.second(0) + percent_padding*dx;
-      const Real y_max = bbox.second(1) + percent_padding*dy;
+      const Real x_min = bbox_first(0)  - percent_padding*dx;
+      const Real y_min = bbox_first(1)  - percent_padding*dy;
+      const Real x_max = bbox_second(0) + percent_padding*dx;
+      const Real y_max = bbox_second(1) + percent_padding*dy;
 
       // Width of the output as given in postscript units.
       // This usually is given by the strange unit 1/72 inch.
@@ -200,7 +204,7 @@ void PostscriptIO::plot_linear_elem(const Elem * elem)
   // so we can just draw them in the same order.
 
   // 1.)
-  _current_point = (elem->point(0) - _offset) * _scale;
+  _current_point = (MetaPhysicL::raw_value(elem->point(0)) - _offset) * _scale;
   _cell_string << _current_point(0) << " " << _current_point(1) << " "; // write x y
   _cell_string << "m ";
 
@@ -208,13 +212,13 @@ void PostscriptIO::plot_linear_elem(const Elem * elem)
   const unsigned int nv=elem->n_vertices();
   for (unsigned int v=1; v<nv-1; ++v)
     {
-      _current_point = (elem->point(v) - _offset) * _scale;
+      _current_point = (MetaPhysicL::raw_value(elem->point(v)) - _offset) * _scale;
       _cell_string << _current_point(0) << " " << _current_point(1) << " "; // write x y
       _cell_string << "l ";
     }
 
   // 3.)
-  _current_point = (elem->point(nv-1) - _offset) * _scale;
+  _current_point = (MetaPhysicL::raw_value(elem->point(nv-1)) - _offset) * _scale;
   _cell_string << _current_point(0) << " " << _current_point(1) << " "; // write x y
 
   // We draw the shaded (interior) parts first, if applicable.
@@ -242,7 +246,7 @@ void PostscriptIO::plot_quadratic_elem(const Elem * elem)
       _out << "0 sg ";
 
       // Move to the first point on this side.
-      _current_point = (side->point(0) - _offset) * _scale;
+      _current_point = (MetaPhysicL::raw_value(side->point(0)) - _offset) * _scale;
       _out << _current_point(0) << " " << _current_point(1) << " "; // write x y
       _out << "m ";
 
@@ -277,7 +281,7 @@ void PostscriptIO::_compute_edge_bezier_coeffs(const Elem * elem)
       for (unsigned int j=0; j<3; ++j)
         {
           phys_coords[j] = static_cast<float>
-            ((elem->point(j)(i) - _offset(i)) * _scale);
+            ((MetaPhysicL::raw_value(elem->point(j)(i)) - _offset(i)) * _scale);
           bez_coords[j] = 0.; // zero out result vector
         }
 

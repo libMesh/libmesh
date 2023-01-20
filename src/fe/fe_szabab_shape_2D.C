@@ -84,7 +84,7 @@ LIBMESH_DEFAULT_VECTORIZED_FE(2,SZABAB)
 
 
 template <>
-Real FE<2,SZABAB>::shape(const Elem * elem,
+GeomReal FE<2,SZABAB>::shape(const Elem * elem,
                          const Order order,
                          const unsigned int i,
                          const Point & p,
@@ -114,9 +114,9 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           case TRI6:
           case TRI7:
             {
-              const Real l1 = 1-p(0)-p(1);
-              const Real l2 = p(0);
-              const Real l3 = p(1);
+              const GeomReal l1 = 1-p(0)-p(1);
+              const GeomReal l2 = p(0);
+              const GeomReal l3 = p(1);
 
               libmesh_assert_less (i, 6);
 
@@ -142,8 +142,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 9);
 
@@ -172,9 +172,9 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           case TRI6:
           case TRI7:
             {
-              Real l1 = 1-p(0)-p(1);
-              Real l2 = p(0);
-              Real l3 = p(1);
+              GeomReal l1 = 1-p(0)-p(1);
+              GeomReal l2 = p(0);
+              GeomReal l3 = p(1);
 
               Real f=1;
 
@@ -217,8 +217,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 16);
 
@@ -249,9 +249,9 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           case TRI6:
           case TRI7:
             {
-              Real l1 = 1-p(0)-p(1);
-              Real l2 = p(0);
-              Real l3 = p(1);
+              GeomReal l1 = 1-p(0)-p(1);
+              GeomReal l2 = p(0);
+              GeomReal l3 = p(1);
 
               Real f=1;
 
@@ -300,8 +300,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 25);
 
@@ -332,12 +332,12 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           case TRI6:
           case TRI7:
             {
-              Real l1 = 1-p(0)-p(1);
-              Real l2 = p(0);
-              Real l3 = p(1);
+              GeomReal l1 = 1-p(0)-p(1);
+              GeomReal l2 = p(0);
+              GeomReal l3 = p(1);
 
-              const Real x=l2-l1;
-              const Real y=2.*l3-1;
+              const GeomReal x=l2-l1;
+              const GeomReal y=2.*l3-1;
 
               Real f=1;
 
@@ -392,8 +392,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 36);
 
@@ -424,12 +424,12 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           case TRI6:
           case TRI7:
             {
-              Real l1 = 1-p(0)-p(1);
-              Real l2 = p(0);
-              Real l3 = p(1);
+              GeomReal l1 = 1-p(0)-p(1);
+              GeomReal l2 = p(0);
+              GeomReal l3 = p(1);
 
-              const Real x=l2-l1;
-              const Real y=2.*l3-1;
+              const GeomReal x=l2-l1;
+              const GeomReal y=2.*l3-1;
 
               Real f=1;
 
@@ -494,8 +494,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 49);
 
@@ -528,12 +528,12 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           case TRI7:
             {
 
-              Real l1 = 1-p(0)-p(1);
-              Real l2 = p(0);
-              Real l3 = p(1);
+              GeomReal l1 = 1-p(0)-p(1);
+              GeomReal l2 = p(0);
+              GeomReal l3 = p(1);
 
-              const Real x=l2-l1;
-              const Real y=2.*l3-1.;
+              const GeomReal x=l2-l1;
+              const GeomReal y=2.*l3-1.;
 
               Real f=1;
 
@@ -608,8 +608,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 64);
 
@@ -643,7 +643,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
 
 
 template <>
-Real FE<2,SZABAB>::shape(const ElemType,
+GeomReal FE<2,SZABAB>::shape(const ElemType,
                          const Order,
                          const unsigned int,
                          const Point &)
@@ -655,7 +655,7 @@ Real FE<2,SZABAB>::shape(const ElemType,
 
 
 template <>
-Real FE<2,SZABAB>::shape(const FEType fet,
+GeomReal FE<2,SZABAB>::shape(const FEType fet,
                          const Elem * elem,
                          const unsigned int i,
                          const Point & p,
@@ -669,7 +669,7 @@ Real FE<2,SZABAB>::shape(const FEType fet,
 
 
 template <>
-Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
+GeomReal FE<2,SZABAB>::shape_deriv(const Elem * elem,
                                const Order order,
                                const unsigned int i,
                                const unsigned int j,
@@ -707,8 +707,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 9);
 
@@ -758,8 +758,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 16);
 
@@ -813,8 +813,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 25);
 
@@ -868,8 +868,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 36);
 
@@ -921,8 +921,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 49);
 
@@ -974,8 +974,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              const GeomReal xi  = p(0);
+              const GeomReal eta = p(1);
 
               libmesh_assert_less (i, 64);
 
@@ -1020,7 +1020,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 
 
 template <>
-Real FE<2,SZABAB>::shape_deriv(const ElemType,
+GeomReal FE<2,SZABAB>::shape_deriv(const ElemType,
                                const Order,
                                const unsigned int,
                                const unsigned int,
@@ -1032,7 +1032,7 @@ Real FE<2,SZABAB>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<2,SZABAB>::shape_deriv(const FEType fet,
+GeomReal FE<2,SZABAB>::shape_deriv(const FEType fet,
                                const Elem * elem,
                                const unsigned int i,
                                const unsigned int j,
@@ -1048,7 +1048,7 @@ Real FE<2,SZABAB>::shape_deriv(const FEType fet,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-Real FE<2,SZABAB>::shape_second_deriv(const ElemType,
+GeomReal FE<2,SZABAB>::shape_second_deriv(const ElemType,
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
@@ -1068,7 +1068,7 @@ Real FE<2,SZABAB>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<2,SZABAB>::shape_second_deriv(const Elem *,
+GeomReal FE<2,SZABAB>::shape_second_deriv(const Elem *,
                                       const Order,
                                       const unsigned int,
                                       const unsigned int,
@@ -1088,7 +1088,7 @@ Real FE<2,SZABAB>::shape_second_deriv(const Elem *,
 
 
 template <>
-Real FE<2,SZABAB>::shape_second_deriv(const FEType,
+GeomReal FE<2,SZABAB>::shape_second_deriv(const FEType,
                                       const Elem *,
                                       const unsigned int,
                                       const unsigned int,

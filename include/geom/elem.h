@@ -949,17 +949,17 @@ public:
   /**
    * \returns The minimum vertex separation for the element.
    */
-  virtual Real hmin () const;
+  virtual GeomReal hmin () const;
 
   /**
    * \returns The maximum vertex separation for the element.
    */
-  virtual Real hmax () const;
+  virtual GeomReal hmax () const;
 
   /**
    * \returns The (length/area/volume) of the geometric element.
    */
-  virtual Real volume () const;
+  virtual GeomReal volume () const;
 
   /**
    * \returns A bounding box (not necessarily the minimal bounding box)
@@ -1151,8 +1151,8 @@ public:
    *
    * Useful for computing the lengths of the sides of elements.
    */
-  Real length (const unsigned int n1,
-               const unsigned int n2) const;
+  GeomReal length (const unsigned int n1,
+                   const unsigned int n2) const;
 
   /**
    * \returns The number of adjacent vertices that uniquely define the

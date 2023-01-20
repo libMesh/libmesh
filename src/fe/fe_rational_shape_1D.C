@@ -41,7 +41,7 @@ namespace libMesh
 
 
 template <>
-Real FE<1,RATIONAL_BERNSTEIN>::shape(const Elem * elem,
+GeomReal FE<1,RATIONAL_BERNSTEIN>::shape(const Elem * elem,
                                      const Order order,
                                      const unsigned int i,
                                      const Point & p,
@@ -58,7 +58,7 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape(const Elem * elem,
 
 
 template <>
-Real FE<1,RATIONAL_BERNSTEIN>::shape(const ElemType,
+GeomReal FE<1,RATIONAL_BERNSTEIN>::shape(const ElemType,
                                      const Order,
                                      const unsigned int,
                                      const Point &)
@@ -69,7 +69,7 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape(const ElemType,
 
 
 template <>
-Real FE<1,RATIONAL_BERNSTEIN>::shape(const FEType fet,
+GeomReal FE<1,RATIONAL_BERNSTEIN>::shape(const FEType fet,
                                      const Elem * elem,
                                      const unsigned int i,
                                      const Point & p,
@@ -81,7 +81,7 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape(const FEType fet,
 
 
 template <>
-Real FE<1,RATIONAL_BERNSTEIN>::shape_deriv(const Elem * elem,
+GeomReal FE<1,RATIONAL_BERNSTEIN>::shape_deriv(const Elem * elem,
                                            const Order order,
                                            const unsigned int i,
                                            const unsigned int j,
@@ -98,7 +98,7 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape_deriv(const Elem * elem,
 
 
 template <>
-Real FE<1,RATIONAL_BERNSTEIN>::shape_deriv(const ElemType,
+GeomReal FE<1,RATIONAL_BERNSTEIN>::shape_deriv(const ElemType,
                                            const Order,
                                            const unsigned int,
                                            const unsigned int,
@@ -110,7 +110,7 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape_deriv(const ElemType,
 
 
 template <>
-Real FE<1,RATIONAL_BERNSTEIN>::shape_deriv(const FEType fet,
+GeomReal FE<1,RATIONAL_BERNSTEIN>::shape_deriv(const FEType fet,
                                            const Elem * elem,
                                            const unsigned int i,
                                            const unsigned int j,
@@ -128,7 +128,7 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape_deriv(const FEType fet,
 
 
 template <>
-Real FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem * elem,
+GeomReal FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem * elem,
                                                   const Order order,
                                                   const unsigned int i,
                                                   const unsigned int j,
@@ -146,7 +146,7 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const Elem * elem,
 
 
 template <>
-Real FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const ElemType,
+GeomReal FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const ElemType,
                                                   const Order,
                                                   const unsigned int,
                                                   const unsigned int,
@@ -160,7 +160,7 @@ Real FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const ElemType,
 
 
 template <>
-Real FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const FEType fet,
+GeomReal FE<1,RATIONAL_BERNSTEIN>::shape_second_deriv(const FEType fet,
                                                   const Elem * elem,
                                                   const unsigned int i,
                                                   const unsigned int j,
@@ -228,7 +228,7 @@ FE<1,RATIONAL_BERNSTEIN>::all_shape_derivs (const Elem * elem,
 {
   FEType underlying_fe_type(o, _underlying_fe_family);
 
-  std::vector<std::vector<Real>> * comps[3]
+  std::vector<std::vector<GeomReal>> * comps[3]
     { &this->dphidxi, &this->dphideta, &this->dphidzeta };
 
   rational_all_shape_derivs (*elem, underlying_fe_type, p,

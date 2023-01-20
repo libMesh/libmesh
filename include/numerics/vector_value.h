@@ -23,6 +23,7 @@
 // Local includes
 #include "libmesh/type_vector.h"
 #include "libmesh/compare_types.h"
+#include "libmesh/hashing.h"
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
 #include "metaphysicl/raw_type.h"
@@ -60,6 +61,11 @@ public:
    * Gives the vector 0 in \p LIBMESH_DIM dimensional T space.
    */
   VectorValue ();
+
+  /**
+   * Copy constructor
+   */
+  VectorValue (const VectorValue &) = default;
 
   /**
    * Constructor-from-T.  By default sets higher dimensional
@@ -135,12 +141,36 @@ public:
  * Useful typedefs to allow transparent switching
  * between Real and Complex data types.
  */
-typedef VectorValue<Real>   RealVectorValue;
-typedef VectorValue<Number> NumberVectorValue;
-typedef RealVectorValue     RealGradient;
-typedef NumberVectorValue   Gradient;
+typedef VectorValue<Real>       RealVectorValue;
+typedef RealVectorValue         RawPoint;
+typedef VectorValue<GeomReal>   GeomRealVectorValue;
+typedef VectorValue<Number>     NumberVectorValue;
+typedef RealVectorValue         RealGradient;
+typedef GeomRealVectorValue     GeomRealGradient;
+typedef NumberVectorValue       Gradient;
+typedef Gradient                NumberGradient;
+typedef VectorValue<GeomNumber> GeomNumberGradient;
 
+}
 
+namespace std
+{
+template <>
+struct hash<libMesh::RawPoint>
+{
+  std::size_t operator()(const libMesh::RawPoint & p) const
+    {
+      std::size_t seed = 0;
+      for (int d=0; d != LIBMESH_DIM; ++d)
+        libMesh::boostcopy::hash_combine(seed, std::hash<libMesh::Real>()(p(d)));
+      return seed;
+    }
+};
+
+}
+
+namespace libMesh
+{
 
 //------------------------------------------------------
 // Inline functions
@@ -248,22 +278,36 @@ struct CompareTypes<TypeVector<T>, VectorValue<T2>>
 
 } // namespace libMesh
 
-#ifdef LIBMESH_HAVE_METAPHYSICL
 namespace MetaPhysicL
 {
+// specialization when conversion needs to happen
 template <typename T>
-struct RawType<libMesh::VectorValue<T>>
+struct RawType<libMesh::VectorValue<T>,
+               typename std::enable_if<!IsRawSame<T>::value>::type>
 {
   typedef libMesh::VectorValue<typename RawType<T>::value_type> value_type;
 
-  static value_type value (const libMesh::VectorValue<T> & in)
-    {
-      value_type ret;
-      for (unsigned int i = 0; i < LIBMESH_DIM; ++i)
-        ret(i) = raw_value(in(i));
+  static value_type value(const libMesh::VectorValue<T> & in)
+  {
+    value_type ret_val;
+    for (unsigned int i = 0; i < LIBMESH_DIM; ++i)
+      ret_val(i) = raw_value(in(i));
 
-      return ret;
-    }
+    return ret_val;
+  }
+};
+
+// specialization when we can just pass through
+template <typename T>
+struct RawType<libMesh::VectorValue<T>,
+               typename std::enable_if<IsRawSame<T>::value>::type>
+{
+  typedef const libMesh::VectorValue<T> & value_type;
+
+  static value_type value(const libMesh::VectorValue<T> & in)
+  {
+    return in;
+  }
 };
 
 template <typename T, typename U>
@@ -272,6 +316,5 @@ struct ReplaceAlgebraicType<libMesh::VectorValue<T>, U>
   typedef U type;
 };
 }
-#endif
 
 #endif // LIBMESH_VECTOR_VALUE_H

@@ -243,7 +243,7 @@ void ExactErrorEstimator::estimate_error (const System & system,
       fe->attach_quadrature_rule (qrule.get());
 
       // Prepare a global solution and a MeshFunction of the fine system if we need one
-      std::unique_ptr<MeshFunction> fine_values;
+      std::unique_ptr<MeshFunction<Number>> fine_values;
       std::unique_ptr<NumericVector<Number>> fine_soln = NumericVector<Number>::build(system.comm());
       if (_equation_systems_fine)
         {
@@ -259,7 +259,7 @@ void ExactErrorEstimator::estimate_error (const System & system,
              SERIAL);
           (*fine_soln) = global_soln;
 
-          fine_values = std::make_unique<MeshFunction>
+          fine_values = std::make_unique<MeshFunction<Number>>
             (*_equation_systems_fine,
              *fine_soln,
              fine_system.get_dof_map(),
@@ -404,7 +404,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System & system,
                                                      const Elem * elem,
                                                      const DenseVector<Number> & Uelem,
                                                      FEBase * fe,
-                                                     MeshFunction * fine_values) const
+                                                     MeshFunction<Number> * fine_values) const
 {
   // The (string) name of this system
   const std::string & sys_name = system.name();
@@ -421,12 +421,12 @@ Real ExactErrorEstimator::find_squared_element_error(const System & system,
   fe->reinit (elem);
 
   // Get the data we need to compute with
-  const std::vector<Real> &                      JxW          = fe->get_JxW();
-  const std::vector<std::vector<Real>> &         phi_values   = fe->get_phi();
-  const std::vector<std::vector<RealGradient>> & dphi_values  = fe->get_dphi();
-  const std::vector<Point> &                     q_point      = fe->get_xyz();
+  std::vector<Real>                       JxW          = MetaPhysicL::raw_value(fe->get_JxW());
+  std::vector<std::vector<Real>>          phi_values   = MetaPhysicL::raw_value(fe->get_phi());
+  std::vector<std::vector<RealGradient>>  dphi_values  = MetaPhysicL::raw_value(fe->get_dphi());
+  std::vector<Point>                      q_point      = fe->get_xyz();
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  const std::vector<std::vector<RealTensor>> &   d2phi_values = fe->get_d2phi();
+  std::vector<std::vector<RealTensor>>    d2phi_values = MetaPhysicL::raw_value(fe->get_d2phi());
 #endif
 
   // The number of shape functions

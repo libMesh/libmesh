@@ -25,6 +25,7 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/vector_value.h"
 #include "libmesh/tensor_value.h"
+#include "libmesh/tensor_tools.h"
 #include "libmesh/tree_base.h"
 #include "libmesh/parallel_object.h"
 
@@ -51,10 +52,13 @@ class PointLocatorBase;
  * \author Daniel Dreyer
  * \date 2003
  */
-class MeshFunction : public FunctionBase<Number>,
+template <typename Output=Number>
+class MeshFunction : public FunctionBase<Output>,
                      public ParallelObject
 {
 public:
+  typedef typename TensorTools::IncrementRank<Output>::type OutputGradient;
+  typedef typename TensorTools::IncrementRank<OutputGradient>::type OutputTensor;
 
   /**
    * Constructor for mesh based functions with vectors
@@ -68,7 +72,7 @@ public:
                 const NumericVector<Number> & vec,
                 const DofMap & dof_map,
                 std::vector<unsigned int> vars,
-                const FunctionBase<Number> * master=nullptr);
+                const FunctionBase<Output> * master=nullptr);
 
   /**
    * Constructor for mesh based functions with a number
@@ -82,7 +86,7 @@ public:
                 const NumericVector<Number> & vec,
                 const DofMap & dof_map,
                 const unsigned int var,
-                const FunctionBase<Number> * master=nullptr);
+                const FunctionBase<Output> * master=nullptr);
 
   /**
    * A regular copy constructor.
@@ -133,32 +137,32 @@ public:
    * \note This implies the copy should not be used after the
    * original is destroyed.
    */
-  virtual std::unique_ptr<FunctionBase<Number>> clone () const override;
+  virtual std::unique_ptr<FunctionBase<Output>> clone () const override;
 
   /**
    * \returns The value of variable 0 at point \p p and for \p time,
    * which defaults to zero.
    */
-  virtual Number operator() (const Point & p,
+  virtual Output operator() (const Point & p,
                              const Real time=0.) override;
 
   /**
    * \returns A map of values of variable 0 at point
    * \p p and for \p time.
    *
-   * The std::map is from element to Number and accounts for
+   * The std::map is from element to Output and accounts for
    * doubly-defined values on faces if discontinuous variables are
    * used.
    */
-  std::map<const Elem *, Number> discontinuous_value (const Point & p,
-                                                      const Real time=0.);
+  std::map<const Elem *, Output> discontinuous_value (const Point & p,
+                                                          const Real time=0.);
 
   /**
    * \returns The first derivatives of variable 0 at point
    * \p p and for \p time, which defaults to zero.
    */
-  Gradient gradient (const Point & p,
-                     const Real time=0.);
+  OutputGradient gradient (const Point & p,
+                           const Real time=0.);
 
   /**
    * \returns A map of first derivatives (gradients) of variable 0 at point
@@ -166,15 +170,15 @@ public:
    * map is from element to Gradient and accounts for double defined
    * values on faces if the gradient is discontinuous
    */
-  std::map<const Elem *, Gradient> discontinuous_gradient (const Point & p,
-                                                           const Real time=0.);
+  std::map<const Elem *, OutputGradient> discontinuous_gradient (const Point & p,
+                                                                 const Real time=0.);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * \returns The second derivatives of variable 0 at point
    * \p p and for \p time, which defaults to zero.
    */
-  Tensor hessian (const Point & p,
+  OutputTensor hessian (const Point & p,
                   const Real time=0.);
 #endif
 
@@ -186,7 +190,7 @@ public:
    */
   virtual void operator() (const Point & p,
                            const Real time,
-                           DenseVector<Number> & output) override;
+                           DenseVector<Output> & output) override;
 
   /**
    * Computes values at coordinate \p p and for time \p time,
@@ -195,7 +199,7 @@ public:
    */
   void operator() (const Point & p,
                    const Real time,
-                   DenseVector<Number> & output,
+                   DenseVector<Output> & output,
                    const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
@@ -205,7 +209,7 @@ public:
    */
   void discontinuous_value (const Point & p,
                             const Real time,
-                            std::map<const Elem *, DenseVector<Number>> & output);
+                            std::map<const Elem *, DenseVector<Output>> & output);
 
   /**
    * Similar to operator() with the same parameter list, but with the difference
@@ -214,7 +218,7 @@ public:
    */
   void discontinuous_value (const Point & p,
                             const Real time,
-                            std::map<const Elem *, DenseVector<Number>> & output,
+                            std::map<const Elem *, DenseVector<Output>> & output,
                             const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
@@ -224,7 +228,7 @@ public:
    */
   void gradient (const Point & p,
                  const Real time,
-                 std::vector<Gradient> & output);
+                 std::vector<OutputGradient> & output);
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
@@ -234,7 +238,7 @@ public:
    */
   void gradient (const Point & p,
                  const Real time,
-                 std::vector<Gradient> & output,
+                 std::vector<OutputGradient> & output,
                  const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
@@ -244,7 +248,7 @@ public:
    */
   void discontinuous_gradient (const Point & p,
                                const Real time,
-                               std::map<const Elem *, std::vector<Gradient>> & output);
+                               std::map<const Elem *, std::vector<OutputGradient>> & output);
 
   /**
    * Similar to gradient, but with the difference
@@ -253,7 +257,7 @@ public:
    */
   void discontinuous_gradient (const Point & p,
                                const Real time,
-                               std::map<const Elem *, std::vector<Gradient>> & output,
+                               std::map<const Elem *, std::vector<OutputGradient>> & output,
                                const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
@@ -263,7 +267,7 @@ public:
    */
   void hessian (const Point & p,
                 const Real time,
-                std::vector<Tensor> & output);
+                std::vector<OutputTensor> & output);
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
@@ -273,7 +277,7 @@ public:
    */
   void hessian (const Point & p,
                 const Real time,
-                std::vector<Tensor> & output,
+                std::vector<OutputTensor> & output,
                 const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
@@ -295,7 +299,7 @@ public:
    * master mesh function.  You may, however, specify different
    * values.
    */
-  void enable_out_of_mesh_mode(const DenseVector<Number> & value);
+  void enable_out_of_mesh_mode(const DenseVector<Output> & value);
 
   /**
    * Enables out-of-mesh mode.  In this mode, if asked for a point
@@ -307,7 +311,7 @@ public:
    * master mesh function.  You may, however, specify different
    * values.
    */
-  void enable_out_of_mesh_mode(const Number & value);
+  void enable_out_of_mesh_mode(const Output & value);
 
   /**
    * Disables out-of-mesh mode.  This is also the default.
@@ -359,7 +363,7 @@ protected:
    */
   void _gradient_on_elem (const Point & p,
                           const Elem * element,
-                          std::vector<Gradient> & output);
+                          std::vector<OutputGradient> & output);
 
   /**
    * The equation systems handler, from which
@@ -405,7 +409,7 @@ protected:
    * Value to return outside the mesh if out-of-mesh mode is enabled.
    * See \p enable_out_of_mesh_mode() for more details.
    */
-  DenseVector<Number> _out_of_mesh_value;
+  DenseVector<Output> _out_of_mesh_value;
 };
 
 
