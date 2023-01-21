@@ -139,7 +139,7 @@ private:
             // Subtract and assert that the norm of the difference is
             // below some tolerance.
             lhs -= rhs;
-            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(tol)*tol);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/MetaPhysicL::raw_value(lhs.l2_norm()), std::sqrt(tol)*tol);
           }
         else
           {
@@ -164,7 +164,7 @@ private:
               }
 
             lhs -= rhs;
-            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(tol)*tol);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/MetaPhysicL::raw_value(lhs.l2_norm()), std::sqrt(tol)*tol);
 
             // libMesh::out << "lhs=" << std::endl;
             // lhs.print_scientific(libMesh::out, /*precision=*/15);
@@ -183,7 +183,7 @@ private:
               }
 
             lhs -= rhs;
-            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(tol)*tol);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/MetaPhysicL::raw_value(lhs.l2_norm()), std::sqrt(tol)*tol);
 
             // libMesh::out << "lhs=" << std::endl;
             // lhs.print_scientific(libMesh::out, /*precision=*/15);
@@ -218,7 +218,7 @@ private:
               }
 
             lhs -= rhs;
-            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(tol)*tol);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/MetaPhysicL::raw_value(lhs.l2_norm()), std::sqrt(tol)*tol);
           }
         else
           {
@@ -243,7 +243,7 @@ private:
               }
 
             lhs -= rhs;
-            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(tol)*tol);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/MetaPhysicL::raw_value(lhs.l2_norm()), std::sqrt(tol)*tol);
 
             // 2.)
             lhs.zero();
@@ -256,7 +256,7 @@ private:
               }
 
             lhs -= rhs;
-            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(tol)*tol);
+            LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0., /*actual=*/MetaPhysicL::raw_value(lhs.l2_norm()), std::sqrt(tol)*tol);
 
             // We'll skip the second member of the complex conjugate
             // pair.  If the first one worked, the second one should

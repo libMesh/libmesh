@@ -244,7 +244,7 @@ public:
    * \returns The \f$l_2\f$-norm of the vector, i.e. the square root
    * of the sum of the squares of the entries.
    */
-  Real l2_norm () const;
+  GeomReal l2_norm () const;
 
   /**
    * \returns The \f$l_\infty\f$-norm of the vector, i.e. the maximum
@@ -638,15 +638,12 @@ Real DenseVector<T>::l1_norm () const
 
 template<typename T>
 inline
-Real DenseVector<T>::l2_norm () const
+GeomReal DenseVector<T>::l2_norm () const
 {
   if (!_val.size())
     return 0.;
 
-#ifdef LIBMESH_HAVE_EIGEN
-  return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(_val.data(), _val.size()).norm();
-#else
-  Real my_norm = 0.;
+  GeomReal my_norm = 0.;
   const int N = cast_int<int>(_val.size());
   // The following pragma tells clang's vectorizer that it is safe to
   // reorder floating point operations for this loop.
@@ -656,8 +653,7 @@ Real DenseVector<T>::l2_norm () const
   for (int i=0; i!=N; i++)
     my_norm += TensorTools::norm_sq((*this)(i));
 
-  return sqrt(my_norm);
-#endif
+  return std::sqrt(my_norm);
 }
 
 
