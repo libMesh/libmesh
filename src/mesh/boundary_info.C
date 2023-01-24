@@ -1597,10 +1597,16 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
   // the flag "_children_on_boundary" is on
   if (_children_on_boundary)
     searched_elem_vec.push_back(elem);
-  // Otherwise, we return boundary information of its
-  // parent if any
+  // Otherwise, we return boundary information of all its ancestors
   if (elem->level() != 0)
-    searched_elem_vec.push_back(elem->top_parent());
+  {
+    Elem * parent = elem->parent();
+    while (parent != nullptr)
+    {
+      searched_elem_vec.push_back(parent);
+      parent = parent->parent();
+    }
+  }
   else if (!_children_on_boundary)
     searched_elem_vec.push_back(elem);
 
