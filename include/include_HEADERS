@@ -18,15 +18,12 @@ noinst_HEADERS =  \
 include_HEADERS =  \
         libmesh_config.h \
         base/auto_ptr.h \
-        base/default_coupling.h \
         base/dirichlet_boundaries.h \
         base/dof_map.h \
         base/dof_object.h \
         base/factory.h \
         base/float128_shims.h \
         base/getpot.h \
-        base/ghost_point_neighbors.h \
-        base/ghosting_functor.h \
         base/id_types.h \
         base/libmesh.h \
         base/libmesh_base.h \
@@ -40,11 +37,9 @@ include_HEADERS =  \
         base/periodic_boundaries.h \
         base/periodic_boundary.h \
         base/periodic_boundary_base.h \
-        base/point_neighbor_coupling.h \
         base/print_trace.h \
         base/reference_counted_object.h \
         base/reference_counter.h \
-        base/sibling_coupling.h \
         base/single_predicates.h \
         base/sparsity_pattern.h \
         base/variable.h \
@@ -173,6 +168,11 @@ include_HEADERS =  \
         geom/sphere.h \
         geom/stored_range.h \
         geom/surface.h \
+        ghosting/default_coupling.h \
+        ghosting/ghost_point_neighbors.h \
+        ghosting/ghosting_functor.h \
+        ghosting/point_neighbor_coupling.h \
+        ghosting/sibling_coupling.h \
         mesh/abaqus_io.h \
         mesh/boundary_info.h \
         mesh/boundary_mesh.h \

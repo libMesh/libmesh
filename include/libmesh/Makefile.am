@@ -7,15 +7,12 @@ EXTRA_DIST = rebuild_makefile.sh
 
 BUILT_SOURCES = \
         auto_ptr.h \
-        default_coupling.h \
         dirichlet_boundaries.h \
         dof_map.h \
         dof_object.h \
         factory.h \
         float128_shims.h \
         getpot.h \
-        ghost_point_neighbors.h \
-        ghosting_functor.h \
         id_types.h \
         libmesh.h \
         libmesh_augment_std_namespace.h \
@@ -30,11 +27,9 @@ BUILT_SOURCES = \
         periodic_boundaries.h \
         periodic_boundary.h \
         periodic_boundary_base.h \
-        point_neighbor_coupling.h \
         print_trace.h \
         reference_counted_object.h \
         reference_counter.h \
-        sibling_coupling.h \
         single_predicates.h \
         sparsity_pattern.h \
         variable.h \
@@ -163,6 +158,11 @@ BUILT_SOURCES = \
         sphere.h \
         stored_range.h \
         surface.h \
+        default_coupling.h \
+        ghost_point_neighbors.h \
+        ghosting_functor.h \
+        point_neighbor_coupling.h \
+        sibling_coupling.h \
         abaqus_io.h \
         boundary_info.h \
         boundary_mesh.h \
@@ -582,9 +582,6 @@ libmesh_config.h: $(top_builddir)/include/libmesh_config.h
 auto_ptr.h: $(top_srcdir)/include/base/auto_ptr.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-default_coupling.h: $(top_srcdir)/include/base/default_coupling.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 dirichlet_boundaries.h: $(top_srcdir)/include/base/dirichlet_boundaries.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -601,12 +598,6 @@ float128_shims.h: $(top_srcdir)/include/base/float128_shims.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 getpot.h: $(top_srcdir)/include/base/getpot.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-ghost_point_neighbors.h: $(top_srcdir)/include/base/ghost_point_neighbors.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-ghosting_functor.h: $(top_srcdir)/include/base/ghosting_functor.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 id_types.h: $(top_srcdir)/include/base/id_types.h
@@ -651,9 +642,6 @@ periodic_boundary.h: $(top_srcdir)/include/base/periodic_boundary.h
 periodic_boundary_base.h: $(top_srcdir)/include/base/periodic_boundary_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-point_neighbor_coupling.h: $(top_srcdir)/include/base/point_neighbor_coupling.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 print_trace.h: $(top_srcdir)/include/base/print_trace.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -661,9 +649,6 @@ reference_counted_object.h: $(top_srcdir)/include/base/reference_counted_object.
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 reference_counter.h: $(top_srcdir)/include/base/reference_counter.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-sibling_coupling.h: $(top_srcdir)/include/base/sibling_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 single_predicates.h: $(top_srcdir)/include/base/single_predicates.h
@@ -1048,6 +1033,21 @@ stored_range.h: $(top_srcdir)/include/geom/stored_range.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 surface.h: $(top_srcdir)/include/geom/surface.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+default_coupling.h: $(top_srcdir)/include/ghosting/default_coupling.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+ghost_point_neighbors.h: $(top_srcdir)/include/ghosting/ghost_point_neighbors.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+ghosting_functor.h: $(top_srcdir)/include/ghosting/ghosting_functor.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+point_neighbor_coupling.h: $(top_srcdir)/include/ghosting/point_neighbor_coupling.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+sibling_coupling.h: $(top_srcdir)/include/ghosting/sibling_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 abaqus_io.h: $(top_srcdir)/include/mesh/abaqus_io.h
