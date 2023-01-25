@@ -219,14 +219,18 @@ protected:
    * Simply loops through the elements and assigns all of them
    * to processor 0.  Is is provided as a separate function
    * so that derived classes may use it without reimplementing it.
+   *
+   * Returns \p true iff any processor id was changed.
    */
-  void single_partition (MeshBase & mesh);
+  bool single_partition (MeshBase & mesh);
 
   /**
    * Slightly generalized version of single_partition which acts on a
    * range of elements defined by the pair of iterators (it, end).
+   *
+   * Returns \p true iff any processor id was changed.
    */
-  void single_partition_range(MeshBase::element_iterator it,
+  bool single_partition_range(MeshBase::element_iterator it,
                               MeshBase::element_iterator end);
 
   /**
