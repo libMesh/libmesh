@@ -551,6 +551,20 @@ public:
   void build_shellface_boundary_ids(std::vector<boundary_id_type> & b_ids) const;
 
   /**
+  * Update parent's boundary id list so that this information is consistent with
+  * its children elements
+  *
+  * This is useful when `_children_on_boundary = true`, and is used when the
+  * element is about to get coarsened i.e., in MeshRefinement::_coarsen_elements()
+  *
+  * Specifically, when coarsen a child element who is the last child on that
+  * boundary, we remove that boundary on the parent's side accordingly.
+  *
+  * Otherwise, we add the parent's side to the boundary.
+  */
+  void transfer_boundary_ids_to_parent(const Elem * const elem);
+
+  /**
    * \returns The number of element-side-based boundary conditions.
    *
    * This will be the correct global count even on a distributed mesh.

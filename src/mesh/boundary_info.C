@@ -1600,7 +1600,7 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
   // Otherwise, we return boundary information of all its ancestors
   if (elem->level() != 0)
   {
-    Elem * parent = elem->parent();
+    const Elem * parent = elem->parent();
     while (parent != nullptr)
     {
       searched_elem_vec.push_back(parent);
@@ -1755,6 +1755,48 @@ BoundaryInfo::build_shellface_boundary_ids(std::vector<boundary_id_type> & b_ids
       if (std::find(b_ids.begin(),b_ids.end(),id) == b_ids.end())
         b_ids.push_back(id);
     }
+}
+
+void
+BoundaryInfo::transfer_boundary_ids_to_parent(const Elem * const elem)
+{
+  // this is only needed when we allow boundary to be associated with children elements
+  // also, we only transfer the parent's boundary ids when we are actually coarsen the child element
+  if (!_children_on_boundary ||
+      !elem->active() ||
+      elem->level()==0 ||
+      elem->refinement_flag() != Elem::COARSEN)
+    return;
+
+  const Elem * parent = elem->parent();
+
+  for (const auto & pr : as_range(_boundary_side_id.equal_range(elem)))
+  {
+    auto side = pr.second.first;
+    auto bnd_id = pr.second.second;
+    // Track if any of the sibling elements is on this boundary.
+    // If yes, we make sure that the corresponding parent side is added to the boundary.
+    // Otherwise, we remove the parent side from the boundary.
+    std::vector<const Elem *> family_on_side;
+    elem->family_tree_by_side(family_on_side, side);
+    for (auto relative : family_on_side)
+    {
+      if (relative != elem && relative->level() == elem->level()) // check only siblings
+      {
+        for (unsigned int i = 0; i < relative->n_sides(); ++i)
+          if (this->has_boundary_id(relative, i, bnd_id))
+          {
+            // Do not worry, `add_side` will avoid adding duplicate sides on the same boundary
+            // Note: it is assumed that the child and parent elements' side numberings are identical.
+            // I.e., a child's ith side is encompassed in the parent's jth side, where i=j.
+            this->add_side(parent, side, bnd_id);
+            return;
+          }
+      }
+    }
+    // No relative share the same boundary, therefore, we remove it from the parent, if any.
+    this->remove_side(parent, side, bnd_id);
+  }
 }
 
 std::size_t BoundaryInfo::n_boundary_conds () const
