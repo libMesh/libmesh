@@ -8,6 +8,7 @@
 #include <libmesh/dirichlet_boundaries.h>
 #include <libmesh/dof_map.h>
 #include <libmesh/parallel.h>
+#include <libmesh/mesh_refinement.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -27,6 +28,9 @@ public:
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testRenumber );
+#ifdef LIBMESH_ENABLE_AMR
+  CPPUNIT_TEST( testBoundaryOnChildrenElements );
+# endif
 # ifdef LIBMESH_ENABLE_DIRICHLET
   CPPUNIT_TEST( testShellFaceConstraints );
 # endif
@@ -474,6 +478,117 @@ public:
   }
 #endif // LIBMESH_ENABLE_DIRICHLET
 
+#ifdef LIBMESH_ENABLE_AMR
+  void testBoundaryOnChildrenElements()
+  {
+    LOG_UNIT_TEST;
+
+    std::unique_ptr<Mesh> mesh;
+    mesh = std::make_unique<Mesh>(*TestCommWorld);
+
+    MeshTools::Generation::build_square(*mesh,
+                                        2, 1,
+                                        0., 2.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh->get_boundary_info();
+
+    // Set subdomain ids for specific elements
+    // _____________
+    // |  1  |  2  |
+    // |_____|_____|
+
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 1)
+      {
+        elem->subdomain_id() = 1;
+        elem->set_refinement_flag(Elem::REFINE);
+      }
+      else
+        elem->subdomain_id() = 2;
+    }
+    mesh->prepare_for_use();
+
+    // Refine the elements once in subdomain 1, and
+    // add the right side subdomain 1 as boundary 5
+    MeshRefinement(*mesh).refine_elements();
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 1 && c(0) > 0.5)
+        bi.add_side(elem, 1, 5);
+    }
+    mesh->prepare_for_use();
+
+    // Check the middle boundary, we expect to have two sides in boundary 5
+    auto boundary_side_id = bi.get_sideset_map();
+    unsigned int count = 0;
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+        if (bi.has_boundary_id(elem, 1, 5))
+          count++;
+    }
+    CPPUNIT_ASSERT_EQUAL((unsigned int) 2, count);
+    CPPUNIT_ASSERT(bi.is_children_on_boundary_side());
+
+    // Remove the top element side on boundary 5, mark it to coarsen
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) > 0.5 && c(0) < 1 && c(1) > 0.5)
+      {
+        elem->set_refinement_flag(Elem::COARSEN);
+        bi.remove_side(elem, 1, 5);
+        CPPUNIT_ASSERT(!bi.has_boundary_id(elem, 1, 5));
+      }
+    }
+    mesh->prepare_for_use();
+
+    // The coarsened element should have its side on boundary 5
+    // This is boundary info transferred from this child element
+    MeshRefinement(*mesh).coarsen_elements();
+    mesh->prepare_for_use();
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 1)
+      {
+        CPPUNIT_ASSERT(bi.has_boundary_id(elem, 1, 5));
+        // we refine again later
+        elem->set_refinement_flag(Elem::REFINE);
+      }
+    }
+
+    MeshRefinement(*mesh).refine_elements();
+    mesh->prepare_for_use();
+
+    // This time we remove boundary 5 from all children sides
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 1 && c(0) > 0.5)
+      {
+        bi.remove_side(elem, 1, 5);
+        elem->set_refinement_flag(Elem::COARSEN);
+      }
+    }
+    mesh->prepare_for_use();
+
+    MeshRefinement(*mesh).coarsen_elements();
+    mesh->prepare_for_use();
+
+    // The parent element should not have any side associated with boundary 5
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 1)
+        CPPUNIT_ASSERT(!bi.has_boundary_id(elem, 1, 5));
+    }
+  }
+#endif //LIBMESH_ENABLE_AMR
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryInfoTest );
