@@ -47,19 +47,19 @@
 #include "libmesh/libmesh.h"
 
 #ifdef LIBMESH_HAVE_UNISTD_H
+#include <sys/types.h>
 #include <unistd.h>  // needed for getpid() on Unix
 #endif
+
 #ifdef LIBMESH_HAVE_PROCESS_H
 #include <process.h> // for getpid() on Windows
-
-typedef int pid_t;
 #endif
+
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <cstdio> // std::remove
 #include <cstdlib> // std::system
-#include <sys/types.h> // pid_t
 #ifndef LIBMESH_HAVE_MKSTEMP
 #include "win_mkstemp.h"
 #endif
@@ -154,7 +154,7 @@ bool gdb_backtrace(std::ostream & out_stream)
     {
       // Run gdb using a system() call, redirecting the output to our
       // temporary file.
-      pid_t this_pid = getpid();
+      auto this_pid = getpid();
 
       int exit_status = 1;
 
