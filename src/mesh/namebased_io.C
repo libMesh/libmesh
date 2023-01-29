@@ -46,14 +46,14 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
+
 #ifdef LIBMESH_HAVE_UNISTD_H
-#include <sys/types.h> // pid_t
+#include <sys/types.h>
 #include <unistd.h>  // for getpid() on Unix
 #endif
+
 #ifdef LIBMESH_HAVE_PROCESS_H
 #include <process.h> // for getpid() on Windows
-
-typedef int pid_t;
 #endif
 
 
@@ -341,7 +341,7 @@ void NameBasedIO::write (const std::string & name)
     {
       // Nasty hack for reading/writing zipped files
       std::string new_name = name;
-      pid_t pid_0 = 0;
+      int pid_0 = 0;
       if (mymesh.processor_id() == 0)
         pid_0 = getpid();
       mymesh.comm().broadcast(pid_0);
