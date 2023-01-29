@@ -632,7 +632,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   if (libMesh::on_command_line("--enable-segv"))
     libMesh::enableSEGV(true);
 
-#ifdef LIBMESH_HAVE_HDF5
+#if defined(LIBMESH_HAVE_HDF5) && !defined(_MSC_VER)
   // We may be running with ExodusII configured not to use HDF5 (in
   // which case user code which wants to lock files has to do flock()
   // itself) or with ExodusII configured to use HDF5 (which will
