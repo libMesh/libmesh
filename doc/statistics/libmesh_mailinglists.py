@@ -209,13 +209,18 @@ fig.suptitle('LibMesh Mailing List Membership Size')
 
 # Set up xticks and xticklabels
 N = len(devel_count)
-xtick_indexes = [0, 1, N-1]
+
+# create "num" x-axis tick indexes. Note that we are missing some early
+# data so the tick marks will not be evenly spaced on the x-axis.
+xtick_indexes = [int(x) for x in np.linspace(0, N-1, num=9)]
 
 xticks = []
 xticklabels = []
 for index in xtick_indexes:
     xticks.append(date_nums[index])
-    xticklabels.append(date_strings[index])
+    month, year = date_strings[index].split(' ')
+    # Label x-axis with newline inserted between month and year, otherwise label is too long
+    xticklabels.append(month + '\n' + year)
 
 ax.set_xticks(xticks)
 ax.set_xticklabels(xticklabels)
@@ -369,7 +374,7 @@ ax.bar(x, combined_devel_users_number, width, color=primary, label='libmesh-user
 ax.bar(x, devel_numbers, width, color=secondary, label='libmesh-devel')
 
 # Set bi-yearly xticklabels
-year_labels = ['2003', '2005', '2007', '2009', '2011', '2013', '2015', '2017', '2019', '2021']
+year_labels = ['2003', '2005', '2007', '2009', '2011', '2013', '2015', '2017', '2019', '2021', '2023']
 
 # Set up the corresponding tick locations. This starting point was chosen by
 # trial and error because it lined up the tick marks fairly well, but I don't
