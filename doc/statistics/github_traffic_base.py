@@ -133,7 +133,15 @@ class PlotData(object):
 
     # Generate date numbers at monthly intervals starting from '2014-Feb-17'
     now = datetime.now()
-    month_intervals = [735281] # date2num for '2014-Feb-17'
+
+    # I used to hardcode the date2num value of the starting month, but
+    # the output of date2num for '2014-Feb-17' changed between python2
+    # and python3 as follows:
+    # python2: 735281.0
+    # python3: 16118.0
+    # so now we no longer rely on any hard-coded value.
+    month_intervals = [date2num(datetime.strptime('2014-Feb-17', '%Y-%b-%d'))]
+
     for yr in range(2014, now.year+1):
       for mo in range(1, 13):
         # Skip Jan 2014
