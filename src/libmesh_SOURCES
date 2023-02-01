@@ -1,11 +1,9 @@
 # Do not edit - automatically generated from ./rebuild_libmesh_SOURCES.sh
 libmesh_SOURCES =  \
-        src/base/default_coupling.C \
         src/base/dirichlet_boundary.C \
         src/base/dof_map.C \
         src/base/dof_map_constraints.C \
         src/base/dof_object.C \
-        src/base/ghost_point_neighbors.C \
         src/base/libmesh.C \
         src/base/libmesh_common.C \
         src/base/libmesh_singleton.C \
@@ -13,11 +11,9 @@ libmesh_SOURCES =  \
         src/base/periodic_boundaries.C \
         src/base/periodic_boundary.C \
         src/base/periodic_boundary_base.C \
-        src/base/point_neighbor_coupling.C \
         src/base/print_trace.C \
         src/base/reference_counted_object.C \
         src/base/reference_counter.C \
-        src/base/sibling_coupling.C \
         src/base/single_predicates.C \
         src/base/sparsity_pattern.C \
         src/error_estimation/adjoint_refinement_estimator.C \
@@ -182,6 +178,10 @@ libmesh_SOURCES =  \
         src/geom/remote_elem.C \
         src/geom/sphere.C \
         src/geom/surface.C \
+        src/ghosting/default_coupling.C \
+        src/ghosting/ghost_point_neighbors.C \
+        src/ghosting/point_neighbor_coupling.C \
+        src/ghosting/sibling_coupling.C \
         src/mesh/abaqus_io.C \
         src/mesh/boundary_info.C \
         src/mesh/boundary_mesh.C \
