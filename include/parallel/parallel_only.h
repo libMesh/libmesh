@@ -19,11 +19,14 @@
 #ifndef LIBMESH_PARALLEL_ONLY_H
 #define LIBMESH_PARALLEL_ONLY_H
 
+#ifndef NDEBUG
 // TIMPI includes
 #include <timpi/communicator.h>
+#include <timpi/parallel_implementation.h>
 
 // C++ includes
 #include <string>
+#endif // !NDEBUG
 
 // Macro to identify and debug functions which should only be called in
 // parallel on every processor at once
@@ -31,12 +34,22 @@
 #undef libmesh_parallel_only
 #undef libmesh_exceptionless_parallel_only
 #ifndef NDEBUG
-#define libmesh_parallel_only(comm_obj) do {                            \
-    libmesh_assert((comm_obj).verify(std::string(__FILE__)));           \
-    libmesh_assert((comm_obj).verify(std::to_string(__LINE__))); } while (0)
-#define libmesh_exceptionless_parallel_only(comm_obj) do {              \
-    libmesh_exceptionless_assert((comm_obj).verify(std::string(__FILE__))); \
-    libmesh_exceptionless_assert((comm_obj).verify(std::to_string(__LINE__))); } while (0)
+#define libmesh_parallel_only(comm_obj) do {                                             \
+    libmesh_assert_msg((comm_obj).verify(std::string(__FILE__).length()),                \
+                       "Different ranks are at different libmesh_parallel_only points"); \
+    libmesh_assert_msg((comm_obj).verify(std::string(__FILE__)),                         \
+                       "Different ranks are at different libmesh_parallel_only points"); \
+    libmesh_assert_msg((comm_obj).verify(std::to_string(__LINE__)),                      \
+                       "Different ranks are at different libmesh_parallel_only points"); \
+  } while (0)
+#define libmesh_exceptionless_parallel_only(comm_obj) do {                                                           \
+    libmesh_exceptionless_assert_msg((comm_obj).verify(std::string(__FILE__).length()),                              \
+                                     "Different ranks are at different libmesh_exceptionless_parallel_only points"); \
+    libmesh_exceptionless_assert_msg((comm_obj).verify(std::string(__FILE__)),                                       \
+                                     "Different ranks are at different libmesh_exceptionless_parallel_only points"); \
+    libmesh_exceptionless_assert_msg((comm_obj).verify(std::to_string(__LINE__)),                                    \
+                                     "Different ranks are at different libmesh_exceptionless_parallel_only points"); \
+  } while (0)
 #else
 #define libmesh_parallel_only(comm_obj)  ((void) 0)
 #define libmesh_exceptionless_parallel_only(comm_obj)  ((void) 0)
