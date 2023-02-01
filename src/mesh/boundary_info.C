@@ -1610,9 +1610,8 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
   else if (!_children_on_boundary)
     searched_elem_vec.push_back(elem);
 
-  for (auto it = searched_elem_vec.begin(); it != searched_elem_vec.end(); ++it)
+  for (const Elem * searched_elem : searched_elem_vec)
   {
-    const Elem * searched_elem = *it;
     // elem may have zero or multiple occurrences
     for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
     {
