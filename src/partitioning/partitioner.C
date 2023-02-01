@@ -293,32 +293,51 @@ void Partitioner::repartition (MeshBase & mesh,
 
 
 
-void Partitioner::single_partition (MeshBase & mesh)
+bool Partitioner::single_partition (MeshBase & mesh)
 {
-  this->single_partition_range(mesh.elements_begin(),
-                               mesh.elements_end());
+  bool changed_pid =
+    this->single_partition_range(mesh.elements_begin(),
+                                 mesh.elements_end());
 
-  // Redistribute, in case someone (like our unit tests) is doing
-  // something silly (like moving a whole already-distributed mesh
-  // back onto rank 0).
-  mesh.redistribute();
+  // If we have a distributed mesh with an empty rank (or where rank
+  // 0 has only its own component of a disconnected mesh, I guess),
+  // that rank might need to be informed of a change.
+  mesh.comm().max(changed_pid);
+
+  // We may need to redistribute, in case someone (like our unit
+  // tests) is doing something silly (like moving a whole
+  // already-distributed mesh back onto rank 0).
+  if (changed_pid)
+    mesh.redistribute();
+
+  return changed_pid;
 }
 
 
 
-void Partitioner::single_partition_range (MeshBase::element_iterator it,
+bool Partitioner::single_partition_range (MeshBase::element_iterator it,
                                           MeshBase::element_iterator end)
 {
   LOG_SCOPE("single_partition_range()", "Partitioner");
 
+  bool changed_pid = false;
+
   for (auto & elem : as_range(it, end))
     {
+      if (elem->processor_id())
+        changed_pid = true;
       elem->processor_id() = 0;
 
       // Assign all this element's nodes to processor 0 as well.
       for (Node & node : elem->node_ref_range())
-        node.processor_id() = 0;
+        {
+          if (node.processor_id())
+            changed_pid = true;
+          node.processor_id() = 0;
+        }
     }
+
+  return changed_pid;
 }
 
 void Partitioner::partition_unpartitioned_elements (MeshBase & mesh)
