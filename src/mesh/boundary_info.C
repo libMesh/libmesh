@@ -1247,31 +1247,48 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
   // Clear out any previous contents
   vec_to_fill.clear();
 
-  // Search BC on the current element. If we find anything, we should return
-  for (const auto & pr : as_range(_boundary_side_id.equal_range(elem)))
-    if (pr.second.first == side)
-      vec_to_fill.push_back(pr.second.second);
-
-  if (vec_to_fill.size())
-    return;
-
-  // We check the top parent now
+  // In most of the cases only level-0 elements store BCs.
+  // In certain application (such as time-dependent domains), however, children
+  // need to store BSc too. This case is covered with the _children_on_boundary
+  // flag.
   const Elem * searched_elem = elem;
-  if (elem->level() != 0)
-    {
-      if (elem->neighbor_ptr(side) == nullptr)
-        searched_elem = elem->top_parent ();
+
 #ifdef LIBMESH_ENABLE_AMR
-      else
-        while (searched_elem->parent() != nullptr)
-          {
-            const Elem * parent = searched_elem->parent();
-            if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
-              return;
-            searched_elem = parent;
-          }
+
+  if (elem->level() != 0)
+  {
+    // If we have children on the boundaries, we need to search for boundary IDs on the
+    // child and its ancestors too if they share the side.
+    if (_children_on_boundary)
+      for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
+              if (pr.second.first == side)
+                vec_to_fill.push_back(pr.second.second);
+
+    // If we don't have children on boundaries and we are on an external boundary,
+    // we just look for the top parent
+    if (elem->neighbor_ptr(side) == nullptr)
+      searched_elem = elem->top_parent();
+    // Otherwise we loop over the ancestors and check if they have a different BC for us
+    else
+      while (searched_elem->parent() != nullptr)
+      {
+              const Elem * parent = searched_elem->parent();
+              if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
+                return;
+
+              searched_elem = parent;
+
+              if (_children_on_boundary)
+                for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
+                      // Here we need to check if the boundary id already exists
+                      if (pr.second.first == side &&
+                          std::find(vec_to_fill.begin(), vec_to_fill.end(), pr.second.second) !=
+                              vec_to_fill.end())
+                          vec_to_fill.push_back(pr.second.second);
+      }
+  }
+
 #endif
-    }
 
   // Check each element in the range to see if its side matches the requested side.
   for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
@@ -1452,9 +1469,6 @@ void BoundaryInfo::remove_side (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Only level 0 elements unless the flag "_children_on_boundary" is on.
-  libmesh_assert(elem->level() == 0 || _children_on_boundary);
-
   // Erase (elem, side, *) entries from map.
   erase_if(_boundary_side_id, elem,
            [side](decltype(_boundary_side_id)::mapped_type & pr)
@@ -1592,59 +1606,53 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
 unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
                                                  const boundary_id_type boundary_id_in) const
 {
-  std::vector<const Elem *>  searched_elem_vec;
-  // If elem has boundary information, we return that when
-  // the flag "_children_on_boundary" is on
-  if (_children_on_boundary)
-    searched_elem_vec.push_back(elem);
-  // Otherwise, we return boundary information of all its ancestors
-  if (elem->level() != 0)
-  {
-    const Elem * parent = elem->parent();
-    while (parent != nullptr)
-    {
-      searched_elem_vec.push_back(parent);
-      parent = parent->parent();
-    }
-  }
-  else if (!_children_on_boundary)
-    searched_elem_vec.push_back(elem);
+  const Elem * searched_elem = elem;
 
-  for (const Elem * searched_elem : searched_elem_vec)
+  // If we don't have a time-dependent domain, we can just go ahead and use the top parent
+  // (since only those contain boundary conditions). Otherwise, we keep the element
+  if (elem->level() != 0 && !_children_on_boundary)
+      searched_elem = elem->top_parent();
+
+  // elem may have zero or multiple occurrences
+  for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
   {
-    // elem may have zero or multiple occurrences
-    for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
-    {
       // if this is true we found the requested boundary_id
       // of the element and want to return the side
       if (pr.second.second == boundary_id_in)
+      {
+        unsigned int side = pr.second.first;
+
+        // Here we branch out. If we don't allow time-dependent boundary domains,
+        // we need to check if our parents are consistent.
+        if (!_children_on_boundary)
         {
-          unsigned int side = pr.second.first;
+              // If we're on this external boundary then we share this
+              // external boundary id
+              if (elem->neighbor_ptr(side) == nullptr)
+                return side;
 
-          // If we're on this external boundary then we share this
-          // external boundary id
-          if (elem->neighbor_ptr(side) == nullptr)
-            return side;
-
-          // If we're on an internal boundary then we need to be sure
-          // it's the same internal boundary as our top_parent
-          const Elem * p = elem;
+              // If we're on an internal boundary then we need to be sure
+              // it's the same internal boundary as our top_parent
+              const Elem * p = elem;
 
 #ifdef LIBMESH_ENABLE_AMR
 
-          while (p != nullptr)
-            {
-              const Elem * parent = p->parent();
-              if (parent && !parent->is_child_on_side(parent->which_child_am_i(p), side))
-                break;
-              p = parent;
-            }
+              while (p != nullptr)
+              {
+                const Elem * parent = p->parent();
+                if (parent && !parent->is_child_on_side(parent->which_child_am_i(p), side))
+                      break;
+                p = parent;
+              }
 #endif
-          // We're on that side of our top_parent; return it
-          if (!p)
-            return side;
+              // We're on that side of our top_parent; return it
+              if (!p)
+                return side;
         }
-     }
+        // Otherwise we trust what we got and return the side
+        else
+              return side;
+      }
   }
 
   // if we get here, we found elem in the data structure but not
@@ -1659,60 +1667,58 @@ BoundaryInfo::sides_with_boundary_id(const Elem * const elem,
 {
   std::vector<unsigned int> returnval;
 
-  std::vector<const Elem *>  searched_elem_vec;
-  // If elem has boundary information, that is part of return when
-  // the flag "_children_on_boundary" is on
-  if (_children_on_boundary)
-    searched_elem_vec.push_back(elem);
-  // Return boundary information of its parent as well
-  if (elem->level() != 0)
-    searched_elem_vec.push_back(elem->top_parent());
-  else if (!_children_on_boundary)
-    searched_elem_vec.push_back(elem);
+  const Elem * searched_elem = elem;
+  if (elem->level() != 0 && !_children_on_boundary)
+      searched_elem = elem->top_parent();
 
-  for (auto it = searched_elem_vec.begin(); it != searched_elem_vec.end(); ++it)
+  // elem may have zero or multiple occurrences
+  for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
   {
-    const Elem * searched_elem = *it;
-    // elem may have zero or multiple occurrences
-    for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
-    {
       // if this is true we found the requested boundary_id
       // of the element and want to return the side
       if (pr.second.second == boundary_id_in)
+      {
+        unsigned int side = pr.second.first;
+
+        // Here we branch out. If we don't allow time-dependent boundary domains,
+        // we need to check if our parents are consistent.
+        if (!_children_on_boundary)
         {
-          unsigned int side = pr.second.first;
 
-          // If we're on this external boundary then we share this
-          // external boundary id
-          if (elem->neighbor_ptr(side) == nullptr)
-            {
-              returnval.push_back(side);
-              continue;
-            }
+              // If we're on this external boundary then we share this
+              // external boundary id
+              if (elem->neighbor_ptr(side) == nullptr)
+              {
+                returnval.push_back(side);
+                continue;
+              }
 
-          // If we're on an internal boundary then we need to be sure
-          // it's the same internal boundary as our top_parent
-          const Elem * p = elem;
+              // If we're on an internal boundary then we need to be sure
+              // it's the same internal boundary as our top_parent
+              const Elem * p = elem;
 
 #ifdef LIBMESH_ENABLE_AMR
 
-          while (p != nullptr)
-            {
-              const Elem * parent = p->parent();
-              if (parent && !parent->is_child_on_side(parent->which_child_am_i(p), side))
-                break;
-              p = parent;
-            }
+              while (p != nullptr)
+              {
+                const Elem * parent = p->parent();
+                if (parent && !parent->is_child_on_side(parent->which_child_am_i(p), side))
+                      break;
+                p = parent;
+              }
 #endif
-          // We're on that side of our top_parent; return it
-          if (!p)
-            returnval.push_back(side);
+              // We're on that side of our top_parent; return it
+              if (!p)
+                returnval.push_back(side);
         }
-    }
+        // Otherwise we trust what we got and return the side
+        else
+              returnval.push_back(side);
+      }
   }
+
   return returnval;
 }
-
 
 void
 BoundaryInfo::build_node_boundary_ids(std::vector<boundary_id_type> & b_ids) const
@@ -1776,24 +1782,25 @@ BoundaryInfo::transfer_boundary_ids_to_parent(const Elem * const elem)
     // Track if any of the sibling elements is on this boundary.
     // If yes, we make sure that the corresponding parent side is added to the boundary.
     // Otherwise, we remove the parent side from the boundary.
-    std::vector<const Elem *> family_on_side;
-    elem->family_tree_by_side(family_on_side, side);
-    for (auto relative : family_on_side)
-    {
-      if (relative != elem && relative->level() == elem->level()) // check only siblings
-      {
-        for (unsigned int i = 0; i < relative->n_sides(); ++i)
-          if (this->has_boundary_id(relative, i, bnd_id))
-          {
-            // Do not worry, `add_side` will avoid adding duplicate sides on the same boundary
-            // Note: it is assumed that the child and parent elements' side numberings are identical.
-            // I.e., a child's ith side is encompassed in the parent's jth side, where i=j.
-            this->add_side(parent, side, bnd_id);
-            return;
-          }
-      }
-    }
-    // No relative share the same boundary, therefore, we remove it from the parent, if any.
+    if (parent->is_child_on_side(parent->which_child_am_i(elem), side))
+        for (auto & sibling : parent->child_ref_range())
+        {
+              // Check siblings only if they are on the same side
+              if (&sibling != elem &&
+                  parent->is_child_on_side(parent->which_child_am_i(&sibling), side) == true)
+              {
+                if (this->has_boundary_id(&sibling, side, bnd_id))
+                {
+                      // Do not worry, `add_side` will avoid adding duplicate sides on the
+                      // same boundary Note: it is assumed that the child and parent
+                      // elements' side numberings are identical. I.e., a child's ith side
+                      // is encompassed in the parent's jth side, where i=j.
+                      this->add_side(parent, side, bnd_id);
+                      return;
+                }
+              }
+        }
+    // No relatives share the same boundary, therefore, we remove it from the parent, if any.
     this->remove_side(parent, side, bnd_id);
   }
 }
