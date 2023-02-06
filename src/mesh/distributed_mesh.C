@@ -1026,6 +1026,10 @@ void DistributedMesh::redistribute ()
       // delete nodes until we do.
       // this->delete_remote_elements();
     }
+  else
+    // The base class can handle non-distributed things, like
+    // notifying any GhostingFunctors of changes
+    MeshBase::redistribute();
 }
 
 
