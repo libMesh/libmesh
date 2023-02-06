@@ -596,11 +596,10 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   // elements it can't locate.
   mesh.clear_point_locator();
 
-  // We now have all elements and nodes redistributed; our ghosting
-  // functors should be ready to redistribute and/or recompute any
-  // cached data they use too.
-  for (auto & gf : as_range(mesh.ghosting_functors_begin(), mesh.ghosting_functors_end()))
-    gf->redistribute();
+  // Let the mesh handle any other post-redistribute() tasks, like
+  // notifying GhostingFunctors.  Be sure we're just calling the base
+  // class method so we don't recurse back into ourselves here.
+  mesh.MeshBase::redistribute();
 }
 #endif // LIBMESH_HAVE_MPI
 
