@@ -1260,9 +1260,33 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
     // If we have children on the boundaries, we need to search for boundary IDs on the
     // child and its ancestors too if they share the side.
     if (_children_on_boundary)
+    {
       for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
-              if (pr.second.first == side)
+              // We check if we already have this ID, we might have inherited it from our ancestors
+              if (pr.second.first == side &&
+                  std::find(vec_to_fill.begin(), vec_to_fill.end(), pr.second.second) ==
+                      vec_to_fill.end())
                 vec_to_fill.push_back(pr.second.second);
+
+      while (searched_elem->parent() != nullptr)
+      {
+              const Elem * parent = searched_elem->parent();
+              if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
+                return;
+
+              searched_elem = parent;
+
+              if (_children_on_boundary)
+                for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
+                      // Here we need to check if the boundary id already exists
+                      if (pr.second.first == side &&
+                          std::find(vec_to_fill.begin(), vec_to_fill.end(), pr.second.second) ==
+                              vec_to_fill.end())
+                          vec_to_fill.push_back(pr.second.second);
+      }
+
+      return;
+    }
 
     // If we don't have children on boundaries and we are on an external boundary,
     // we just look for the top parent
@@ -1277,14 +1301,6 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
                 return;
 
               searched_elem = parent;
-
-              if (_children_on_boundary)
-                for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
-                      // Here we need to check if the boundary id already exists
-                      if (pr.second.first == side &&
-                          std::find(vec_to_fill.begin(), vec_to_fill.end(), pr.second.second) !=
-                              vec_to_fill.end())
-                          vec_to_fill.push_back(pr.second.second);
       }
   }
 
@@ -1768,40 +1784,46 @@ BoundaryInfo::transfer_boundary_ids_to_parent(const Elem * const elem)
   // this is only needed when we allow boundary to be associated with children elements
   // also, we only transfer the parent's boundary ids when we are actually coarsen the child element
   if (!_children_on_boundary ||
-      !elem->active() ||
-      elem->level()==0 ||
-      elem->refinement_flag() != Elem::COARSEN)
+      !(!elem->active() && elem->refinement_flag() == Elem::COARSEN_INACTIVE))
     return;
 
-  const Elem * parent = elem->parent();
-
-  for (const auto & pr : as_range(_boundary_side_id.equal_range(elem)))
+  // In this case the input argument elem is the parent element. We need to check all of its sides
+  // to grab any potential boundary ids.
+  for (unsigned int side_i = 0; side_i < elem->n_sides(); ++side_i)
   {
-    auto side = pr.second.first;
-    auto bnd_id = pr.second.second;
-    // Track if any of the sibling elements is on this boundary.
-    // If yes, we make sure that the corresponding parent side is added to the boundary.
-    // Otherwise, we remove the parent side from the boundary.
-    if (parent->is_child_on_side(parent->which_child_am_i(elem), side))
-        for (auto & sibling : parent->child_ref_range())
+    // An temporary storage to count how many times the children's boundaries occur. the general
+    // consensus is that if the boundary occurs more than once we propagate upon coarsening. Otherwise,
+    // it will get deleted.
+    std::map<unsigned short int, unsigned short int> boundary_counts;
+
+    for (auto & child : elem->child_ref_range())
+    {
+      // We only need to check the children which share the side
+      if (elem->is_child_on_side(elem->which_child_am_i(&child), side_i) == true)
+        // Fetching the boundary tags on the child's side
+        for (const auto & pr : as_range(_boundary_side_id.equal_range(&child)))
         {
-              // Check siblings only if they are on the same side
-              if (&sibling != elem &&
-                  parent->is_child_on_side(parent->which_child_am_i(&sibling), side) == true)
-              {
-                if (this->has_boundary_id(&sibling, side, bnd_id))
-                {
-                      // Do not worry, `add_side` will avoid adding duplicate sides on the
-                      // same boundary Note: it is assumed that the child and parent
-                      // elements' side numberings are identical. I.e., a child's ith side
-                      // is encompassed in the parent's jth side, where i=j.
-                      this->add_side(parent, side, bnd_id);
-                      return;
-                }
-              }
+          // Making sure we are on the same boundary
+          if (pr.second.first == side_i)
+          {
+            // If this is the first time we hit this boundary tag, we create an entry for it in the map
+            if (!boundary_counts.count(pr.second.second))
+                boundary_counts.insert({pr.second.second, 0});
+            // Otherwise, just increment the count
+            boundary_counts[pr.second.second] += 1;
+          }
         }
-    // No relatives share the same boundary, therefore, we remove it from the parent, if any.
-    this->remove_side(parent, side, bnd_id);
+    }
+
+    // This is where the decision is made. If we the given tags occur more than one, we propagate them
+    // upwards upon coarsening. Otherwise, they are deleted.
+    for (const auto & boundary : boundary_counts)
+    {
+      if (boundary.second > 1)
+        this->add_side(elem, side_i, boundary.first);
+      else
+        this->remove_side(elem, side_i, boundary.first);
+    }
   }
 }
 

@@ -29,7 +29,7 @@ public:
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testRenumber );
 #ifdef LIBMESH_ENABLE_AMR
-  CPPUNIT_TEST( testBoundaryOnChildrenElements );
+  CPPUNIT_TEST( testBoundaryOnChildrenElementsRefineCoarsen );
 # endif
 # ifdef LIBMESH_ENABLE_DIRICHLET
   CPPUNIT_TEST( testShellFaceConstraints );
@@ -479,7 +479,7 @@ public:
 #endif // LIBMESH_ENABLE_DIRICHLET
 
 #ifdef LIBMESH_ENABLE_AMR
-  void testBoundaryOnChildrenElements()
+  void testBoundaryOnChildrenElementsRefineCoarsen()
   {
     LOG_UNIT_TEST;
 
@@ -494,7 +494,8 @@ public:
 
     BoundaryInfo & bi = mesh->get_boundary_info();
 
-    // Set subdomain ids for specific elements
+    // Set subdomain ids for specific elements, we will refine/coarsen
+    // the cell on subdomain 1
     // _____________
     // |  1  |  2  |
     // |_____|_____|
@@ -524,26 +525,22 @@ public:
     mesh->prepare_for_use();
 
     // Check the middle boundary, we expect to have two sides in boundary 5
-    auto boundary_side_id = bi.get_sideset_map();
     unsigned int count = 0;
     for (auto & elem : mesh->active_element_ptr_range())
-    {
-        if (bi.has_boundary_id(elem, 1, 5))
-          count++;
-    }
+      if (bi.has_boundary_id(elem, 1, 5))
+        count++;
+
     CPPUNIT_ASSERT_EQUAL((unsigned int) 2, count);
     CPPUNIT_ASSERT(bi.is_children_on_boundary_side());
 
-    // Remove the top element side on boundary 5, mark it to coarsen
+    // First, we will coarsen the the elements on subdomain 1. This
+    // is to check if the boundary information propagates upward upon
+    // coarsening.
     for (auto & elem : mesh->active_element_ptr_range())
     {
       const Point c = elem->vertex_average();
-      if (c(0) > 0.5 && c(0) < 1 && c(1) > 0.5)
-      {
+      if (c(0) < 1)
         elem->set_refinement_flag(Elem::COARSEN);
-        bi.remove_side(elem, 1, 5);
-        CPPUNIT_ASSERT(!bi.has_boundary_id(elem, 1, 5));
-      }
     }
     mesh->prepare_for_use();
 
@@ -551,13 +548,14 @@ public:
     // This is boundary info transferred from this child element
     MeshRefinement(*mesh).coarsen_elements();
     mesh->prepare_for_use();
+
     for (auto & elem : mesh->active_element_ptr_range())
     {
       const Point c = elem->vertex_average();
       if (c(0) < 1)
       {
         CPPUNIT_ASSERT(bi.has_boundary_id(elem, 1, 5));
-        // we refine again later
+        // we will refine this element again
         elem->set_refinement_flag(Elem::REFINE);
       }
     }
@@ -565,15 +563,16 @@ public:
     MeshRefinement(*mesh).refine_elements();
     mesh->prepare_for_use();
 
-    // This time we remove boundary 5 from all children sides
+    // This time we remove boundary 5 from one of the children. We expect
+    // the boundary not to propagate to the next level. Furthermore we
+    // expect boundary 5 to be deleted from the parent's boundaries
     for (auto & elem : mesh->active_element_ptr_range())
     {
       const Point c = elem->vertex_average();
-      if (c(0) < 1 && c(0) > 0.5)
-      {
-        bi.remove_side(elem, 1, 5);
+      if (c(0) < 1)
         elem->set_refinement_flag(Elem::COARSEN);
-      }
+      if (c(1) > 0.5)
+        bi.remove_side(elem, 1, 5);
     }
     mesh->prepare_for_use();
 
