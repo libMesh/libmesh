@@ -1642,34 +1642,68 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
         // we need to check if our parents are consistent.
         if (!_children_on_boundary)
         {
-              // If we're on this external boundary then we share this
-              // external boundary id
-              if (elem->neighbor_ptr(side) == nullptr)
-                return side;
+          // If we're on this external boundary then we share this
+          // external boundary id
+          if (elem->neighbor_ptr(side) == nullptr)
+            return side;
 
-              // If we're on an internal boundary then we need to be sure
-              // it's the same internal boundary as our top_parent
-              const Elem * p = elem;
+          // If we're on an internal boundary then we need to be sure
+          // it's the same internal boundary as our top_parent
+          const Elem * p = elem;
 
 #ifdef LIBMESH_ENABLE_AMR
 
-              while (p != nullptr)
-              {
-                const Elem * parent = p->parent();
-                if (parent && !parent->is_child_on_side(parent->which_child_am_i(p), side))
-                      break;
-                p = parent;
-              }
+          while (p != nullptr)
+          {
+            const Elem * parent = p->parent();
+            if (parent && !parent->is_child_on_side(parent->which_child_am_i(p), side))
+              break;
+            p = parent;
+          }
 #endif
               // We're on that side of our top_parent; return it
-              if (!p)
-                return side;
+          if (!p)
+            return side;
         }
-        // Otherwise we trust what we got and return the side
+        // Otherwise we need to check if the child's ancestors have something on
+        // the side of the child
         else
-              return side;
+          return side;
       }
   }
+
+#ifdef LIBMESH_ENABLE_AMR
+  // We might have instances (especially with moving boundary domains) when we
+  // query the paren't boundary ID on a child. We only do this till we find the
+  // the first side, for multiple sides see above.
+  if (_children_on_boundary && elem->level() != 0)
+  {
+    for (auto side : make_range(elem->n_sides()))
+    {
+      const Elem * p = elem;
+      while (p->parent() != nullptr)
+      {
+        const Elem * parent = p->parent();
+
+        // First we make sure the parent shares this side
+        if (parent->is_child_on_side(parent->which_child_am_i(p), side))
+        {
+          // parent may have multiple boundary ids
+          for (const auto & pr : as_range(_boundary_side_id.equal_range(parent)))
+            // if this is true we found the requested boundary_id
+            // of the element and want to return the side
+            if (pr.second.first == side && pr.second.second == boundary_id_in)
+              return side;
+
+          p = parent;
+        }
+        // If the parent is not on the same side, other ancestors won't be on the same side either
+        else
+          break;
+      }
+    }
+  }
+#endif
 
   // if we get here, we found elem in the data structure but not
   // the requested boundary id, so return the default value
@@ -1700,38 +1734,72 @@ BoundaryInfo::sides_with_boundary_id(const Elem * const elem,
         // we need to check if our parents are consistent.
         if (!_children_on_boundary)
         {
+          // If we're on this external boundary then we share this
+          // external boundary id
+          if (elem->neighbor_ptr(side) == nullptr)
+          {
+            returnval.push_back(side);
+            continue;
+          }
 
-              // If we're on this external boundary then we share this
-              // external boundary id
-              if (elem->neighbor_ptr(side) == nullptr)
-              {
-                returnval.push_back(side);
-                continue;
-              }
-
-              // If we're on an internal boundary then we need to be sure
-              // it's the same internal boundary as our top_parent
-              const Elem * p = elem;
+          // If we're on an internal boundary then we need to be sure
+          // it's the same internal boundary as our top_parent
+          const Elem * p = elem;
 
 #ifdef LIBMESH_ENABLE_AMR
 
-              while (p != nullptr)
-              {
-                const Elem * parent = p->parent();
-                if (parent && !parent->is_child_on_side(parent->which_child_am_i(p), side))
-                      break;
-                p = parent;
-              }
+          while (p != nullptr)
+          {
+            const Elem * parent = p->parent();
+            if (parent && !parent->is_child_on_side(parent->which_child_am_i(p), side))
+              break;
+            p = parent;
+          }
 #endif
-              // We're on that side of our top_parent; return it
-              if (!p)
-                returnval.push_back(side);
+          // We're on that side of our top_parent; return it
+          if (!p)
+            returnval.push_back(side);
         }
         // Otherwise we trust what we got and return the side
         else
-              returnval.push_back(side);
+          returnval.push_back(side);
       }
   }
+
+#ifdef LIBMESH_ENABLE_AMR
+  // We might have instances (especially with moving boundary domains) when we
+  // query the paren't boundary ID on a child.
+  if (_children_on_boundary && elem->level() != 0)
+  {
+    for (auto side : make_range(elem->n_sides()))
+    {
+      const Elem * p = elem;
+      while (p->parent() != nullptr)
+      {
+        const Elem * parent = p->parent();
+        // First we make sure the parent shares this side
+        if (parent->is_child_on_side(parent->which_child_am_i(p), side))
+        {
+          // parent may have multiple boundary ids
+          for (const auto & pr : as_range(_boundary_side_id.equal_range(parent)))
+          {
+            // if this is true we found the requested boundary_id
+            // of the element and want to add the side to the vector. We
+            // also need to check if the side is already in the vector. This might
+            // happen if the child inherits the boundary from the parent.
+            if (pr.second.first == side && pr.second.second == boundary_id_in &&
+                std::find(returnval.begin(), returnval.end(), side) == returnval.end())
+              returnval.push_back(side);
+          }
+        }
+        // If the parent is not on the same side, other ancestors won't be on the same side either
+        else
+          break;
+        p = parent;
+      }
+    }
+  }
+#endif
 
   return returnval;
 }
