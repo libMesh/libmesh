@@ -814,6 +814,18 @@ void MeshBase::subdomain_ids (std::set<subdomain_id_type> & ids, const bool glob
 
 
 
+void MeshBase::redistribute()
+{
+  // We now have all elements and nodes redistributed; our ghosting
+  // functors should be ready to redistribute and/or recompute any
+  // cached data they use too.
+  for (auto & gf : as_range(this->ghosting_functors_begin(),
+                            this->ghosting_functors_end()))
+    gf->redistribute();
+}
+
+
+
 subdomain_id_type MeshBase::n_subdomains() const
 {
   // This requires an inspection on every processor

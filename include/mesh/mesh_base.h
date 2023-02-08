@@ -1105,10 +1105,11 @@ public:
 
   /**
    * Redistribute elements between processors.  This gets called
-   * automatically by the Partitioner, and is a no-op in the case of a
+   * automatically by the Partitioner, and merely notifies any
+   * GhostingFunctors of redistribution in the case of a
    * ReplicatedMesh or serialized DistributedMesh
    */
-  virtual void redistribute () {}
+  virtual void redistribute ();
 
   /**
    * Recalculate any cached data after elements and nodes have been
