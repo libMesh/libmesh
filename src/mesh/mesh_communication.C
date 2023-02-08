@@ -1034,28 +1034,16 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
         coarsening_elements_to_ghost[their_proc_id].push_back(elem);
     }
 
+  std::map<processor_id_type, std::vector<const Node *>> all_nodes_to_send;
+  std::map<processor_id_type, std::vector<const Elem *>> all_elems_to_send;
+
   const processor_id_type n_proc = mesh.n_processors();
-
-  // Get a few unique message tags to use in communications; we'll
-  // default to some numbers around pi*1000
-  Parallel::MessageTag
-    nodestag   = mesh.comm().get_unique_tag(3141),
-    elemstag   = mesh.comm().get_unique_tag(3142);
-
-  std::vector<Parallel::Request> send_requests;
-
-  // Using unsigned char instead of bool since it'll get converted for
-  // MPI use later anyway
-  std::vector<unsigned char> send_to_proc(n_proc, 0);
 
   for (processor_id_type p=0; p != n_proc; ++p)
     {
       if (p == proc_id)
-        break;
+        continue;
 
-      // We'll send these asynchronously, but their data will be
-      // packed into Parallel:: buffers so it will be okay when the
-      // original containers are destructed before the sends complete.
       std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
       std::set<const Node *> nodes_to_send;
 
@@ -1099,56 +1087,22 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
                 }
             }
 
-          send_requests.push_back(Parallel::request());
-
-          mesh.comm().send_packed_range (p, &mesh,
-                                         nodes_to_send.begin(),
-                                         nodes_to_send.end(),
-                                         send_requests.back(),
-                                         nodestag);
-
-          send_requests.push_back(Parallel::request());
-
-          send_to_proc[p] = 1; // true
-
-          mesh.comm().send_packed_range (p, &mesh,
-                                         elements_to_send.begin(),
-                                         elements_to_send.end(),
-                                         send_requests.back(),
-                                         elemstag);
+          all_nodes_to_send[p].assign(nodes_to_send.begin(), nodes_to_send.end());
+          all_elems_to_send[p].assign(elements_to_send.begin(), elements_to_send.end());
         }
     }
 
-  // Find out how many other processors are sending us elements+nodes.
-  std::vector<unsigned char> recv_from_proc(send_to_proc);
-  mesh.comm().alltoall(recv_from_proc);
-
-  const processor_id_type n_receives = cast_int<processor_id_type>
-    (std::count(recv_from_proc.begin(), recv_from_proc.end(), 1));
+  // Elem/Node unpack() automatically adds them to the given mesh
+  auto null_node_action = [](processor_id_type, const std::vector<const Node*>&){};
+  auto null_elem_action = [](processor_id_type, const std::vector<const Elem*>&){};
 
   // Receive nodes first since elements will need to attach to them
-  for (processor_id_type recv_i = 0; recv_i != n_receives; ++recv_i)
-    {
-      mesh.comm().receive_packed_range
-        (Parallel::any_source,
-         &mesh,
-         null_output_iterator<Node>(),
-         (Node**)nullptr,
-         nodestag);
-    }
+  TIMPI::push_parallel_packed_range(mesh.comm(), all_nodes_to_send, &mesh,
+                                    null_node_action);
 
-  for (processor_id_type recv_i = 0; recv_i != n_receives; ++recv_i)
-    {
-      mesh.comm().receive_packed_range
-        (Parallel::any_source,
-         &mesh,
-         null_output_iterator<Elem>(),
-         (Elem**)nullptr,
-         elemstag);
-    }
+  TIMPI::push_parallel_packed_range(mesh.comm(), all_elems_to_send, &mesh,
+                                    null_elem_action);
 
-  // Wait for all sends to complete
-  Parallel::wait (send_requests);
 #endif // LIBMESH_ENABLE_AMR
 }
 
