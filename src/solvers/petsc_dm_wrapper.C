@@ -574,6 +574,7 @@ namespace libMesh
           {
             LOG_CALL("PDM_coarsen", "PetscDMWrapper", mesh_refinement.uniformly_coarsen(1));
             LOG_CALL("PDM_dist_dof", "PetscDMWrapper", system.get_dof_map().distribute_dofs(mesh));
+            LOG_CALL("PDM_prep_send", "PetscDMWrapper", system.get_dof_map().prepare_send_list());
           }
       } // End PETSc data structure creation
 
@@ -645,6 +646,7 @@ namespace libMesh
         LOG_CALL ("PDM_refine", "PetscDMWrapper", mesh_refinement.uniformly_refine(1));
         LOG_CALL ("PDM_dist_dof", "PetscDMWrapper", system.get_dof_map().distribute_dofs(mesh));
         LOG_CALL ("PDM_cnstrnts", "PetscDMWrapper", system.reinit_constraints());
+        LOG_CALL ("PDM_prep_send", "PetscDMWrapper", system.get_dof_map().prepare_send_list());
       }
 
     // Create the Interpolation Matrices between adjacent mesh levels
@@ -698,6 +700,7 @@ namespace libMesh
             LOG_CALL ("PDM_refine", "PetscDMWrapper", mesh_refinement.uniformly_refine(1));
             LOG_CALL ("PDM_dist_dof", "PetscDMWrapper", system.get_dof_map().distribute_dofs(mesh));
             LOG_CALL ("PDM_cnstrnts", "PetscDMWrapper", system.reinit_constraints());
+            LOG_CALL ("PDM_prep_send", "PetscDMWrapper", system.get_dof_map().prepare_send_list());
           }
       } // End create transfer operators. System back at the finest grid
 
