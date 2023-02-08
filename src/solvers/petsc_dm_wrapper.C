@@ -791,6 +791,15 @@ namespace libMesh
     static_assert(sizeof(PetscInt) == sizeof(dof_id_type),"PetscInt is not a dof_id_type!");
     PetscInt * local_dofs = reinterpret_cast<PetscInt *>(const_cast<dof_id_type *>(send_list.data()));
 
+#ifdef DEBUG
+    // PETSc 3.18 and above don't want duplicate entries here ... and
+    // frankly we shouldn't have duplicates in the first place!
+    {
+      std::set<dof_id_type> send_set(send_list.begin(), send_list.end());
+      libmesh_assert_equal_to(send_list.size(), send_set.size());
+    }
+#endif
+
     // This is the vector of PetscSFNode's for the local_dofs.
     // For each entry in local_dof, we have to supply the rank from which
     // that dof stems and its local index on that rank.
