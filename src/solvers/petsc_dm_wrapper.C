@@ -574,6 +574,7 @@ namespace libMesh
           {
             LOG_CALL("PDM_coarsen", "PetscDMWrapper", mesh_refinement.uniformly_coarsen(1));
             LOG_CALL("PDM_dist_dof", "PetscDMWrapper", system.get_dof_map().distribute_dofs(mesh));
+            LOG_CALL("PDM_prep_send", "PetscDMWrapper", system.get_dof_map().prepare_send_list());
           }
       } // End PETSc data structure creation
 
@@ -645,6 +646,7 @@ namespace libMesh
         LOG_CALL ("PDM_refine", "PetscDMWrapper", mesh_refinement.uniformly_refine(1));
         LOG_CALL ("PDM_dist_dof", "PetscDMWrapper", system.get_dof_map().distribute_dofs(mesh));
         LOG_CALL ("PDM_cnstrnts", "PetscDMWrapper", system.reinit_constraints());
+        LOG_CALL ("PDM_prep_send", "PetscDMWrapper", system.get_dof_map().prepare_send_list());
       }
 
     // Create the Interpolation Matrices between adjacent mesh levels
@@ -698,6 +700,7 @@ namespace libMesh
             LOG_CALL ("PDM_refine", "PetscDMWrapper", mesh_refinement.uniformly_refine(1));
             LOG_CALL ("PDM_dist_dof", "PetscDMWrapper", system.get_dof_map().distribute_dofs(mesh));
             LOG_CALL ("PDM_cnstrnts", "PetscDMWrapper", system.reinit_constraints());
+            LOG_CALL ("PDM_prep_send", "PetscDMWrapper", system.get_dof_map().prepare_send_list());
           }
       } // End create transfer operators. System back at the finest grid
 
@@ -790,6 +793,15 @@ namespace libMesh
     // We'll be extra paranoid about this ugly double cast
     static_assert(sizeof(PetscInt) == sizeof(dof_id_type),"PetscInt is not a dof_id_type!");
     PetscInt * local_dofs = reinterpret_cast<PetscInt *>(const_cast<dof_id_type *>(send_list.data()));
+
+#ifdef DEBUG
+    // PETSc 3.18 and above don't want duplicate entries here ... and
+    // frankly we shouldn't have duplicates in the first place!
+    {
+      std::set<dof_id_type> send_set(send_list.begin(), send_list.end());
+      libmesh_assert_equal_to(send_list.size(), send_set.size());
+    }
+#endif
 
     // This is the vector of PetscSFNode's for the local_dofs.
     // For each entry in local_dof, we have to supply the rank from which

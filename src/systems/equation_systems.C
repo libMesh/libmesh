@@ -200,6 +200,8 @@ bool EquationSystems::reinit_solutions ()
         // Recreate any user or internal constraints
         sys.reinit_constraints();
 
+        sys.get_dof_map().prepare_send_list();
+
         sys.prolong_vectors();
       }
     mesh_changed = true;
@@ -222,6 +224,7 @@ bool EquationSystems::reinit_solutions ()
               System & sys = this->get_system(i);
               sys.get_dof_map().distribute_dofs(_mesh);
               sys.reinit_constraints();
+              sys.get_dof_map().prepare_send_list();
               sys.restrict_vectors();
             }
           mesh_changed = true;
@@ -241,6 +244,7 @@ bool EquationSystems::reinit_solutions ()
               System & sys = this->get_system(i);
               sys.get_dof_map().distribute_dofs(_mesh);
               sys.reinit_constraints();
+              sys.get_dof_map().prepare_send_list();
               sys.prolong_vectors();
             }
           mesh_changed = true;
