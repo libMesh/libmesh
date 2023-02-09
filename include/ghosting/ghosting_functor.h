@@ -71,12 +71,21 @@ class PeriodicBoundaries;
  * The user should omit from their implementations relations which we
  * already have enough information to understand implicitly. For
  * instance, K is obviously in C(K), so a GhostingFunctor should never
- * bother telling us so. We may have a PeriodicBoundary, a hanging
- * node constraint equation, or a user-defined constraint equation
- * which creates a dependency between two elements; if so then we
- * don't need the user to also tell us about that relation.  The
- * DefaultCoupling functor will make both direct and periodic neighbor
- * elements algebraically ghosted by default.
+ * bother telling us so.  We pass a processor_id_type parameter to the
+ * GhostingFunctor::operator(), e.g. when determining what ghosted
+ * elements need to be sent to that processor while redistributing,
+ * and a GhostingFunctor should not return any elements which already
+ * have that processor_id.  We determine what ancestor elements should
+ * be ghosted based on what active elements are being ghosted, and a
+ * GhostingFunctor should not return any elements which are not
+ * active.
+ *
+ * We may have a PeriodicBoundary, a hanging node constraint equation,
+ * or a user-defined constraint equation which creates a dependency
+ * between two elements; if so then we don't need the user to also
+ * tell us about that relation.  The DefaultCoupling functor will make
+ * both direct and periodic neighbor elements algebraically ghosted by
+ * default.
  *
  * However, note that geometric ghosting information needs to all be
  * inferrable (e.g. with PeriodicBoundary objects already all
