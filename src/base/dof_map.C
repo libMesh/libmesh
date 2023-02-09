@@ -1451,6 +1451,7 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
           const Elem * elem = it->first;
           if (!elem->active())
             {
+              libmesh_deprecated();
               std::vector<const Elem*> children_to_ghost;
               elem->active_family_tree(children_to_ghost,
                                        /*reset=*/ false);
