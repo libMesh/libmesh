@@ -1849,6 +1849,7 @@ BoundaryInfo::build_shellface_boundary_ids(std::vector<boundary_id_type> & b_ids
 void
 BoundaryInfo::transfer_boundary_ids_to_parent(const Elem * const elem)
 {
+
   // this is only needed when we allow boundary to be associated with children elements
   // also, we only transfer the parent's boundary ids when we are actually coarsen the child element
   if (!_children_on_boundary ||
@@ -1864,12 +1865,13 @@ BoundaryInfo::transfer_boundary_ids_to_parent(const Elem * const elem)
     // it will get deleted.
     std::map<unsigned short int, unsigned short int> boundary_counts;
 
-    for (auto & child : elem->child_ref_range())
+    for (const auto & child_i : make_range(elem->n_children()))
     {
       // We only need to check the children which share the side
-      if (elem->is_child_on_side(elem->which_child_am_i(&child), side_i) == true)
+      if (elem->is_child_on_side(child_i, side_i))
+      {
         // Fetching the boundary tags on the child's side
-        for (const auto & pr : as_range(_boundary_side_id.equal_range(&child)))
+        for (const auto & pr : as_range(_boundary_side_id.equal_range(elem->child_ptr(child_i))))
         {
           // Making sure we are on the same boundary
           if (pr.second.first == side_i)
@@ -1881,6 +1883,7 @@ BoundaryInfo::transfer_boundary_ids_to_parent(const Elem * const elem)
             boundary_counts[pr.second.second] += 1;
           }
         }
+      }
     }
 
     // This is where the decision is made. If we the given tags occur more than one, we propagate them
@@ -1893,6 +1896,9 @@ BoundaryInfo::transfer_boundary_ids_to_parent(const Elem * const elem)
         this->remove_side(elem, side_i, boundary.first);
     }
   }
+
+  for (const auto & child_i : make_range(elem->n_children()))
+    this->remove(elem->child_ptr(child_i));
 }
 
 std::size_t BoundaryInfo::n_boundary_conds () const
@@ -2063,8 +2069,8 @@ BoundaryInfo::build_node_list_from_side_list()
       // Need to loop over the sides of any possible children
       std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
-      if (!elem->subactive())
-        elem->active_family_tree_by_side (family, id_pair.first);
+      // if (!elem->subactive())
+      elem->active_family_tree_by_side (family, id_pair.first);
 #else
       family.push_back(elem);
 #endif
@@ -2426,7 +2432,7 @@ BoundaryInfo::build_active_side_list () const
       // Loop over the sides of possible children
       std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
-      if (!elem->subactive())
+      // if (!elem->subactive())
         elem->active_family_tree_by_side(family, id_pair.first);
 #else
       family.push_back(elem);
