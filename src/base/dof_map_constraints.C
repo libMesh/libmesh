@@ -4623,7 +4623,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
     pushed_node_keys_vals, pushed_node_keys_vals_to_me;
   std::map<processor_id_type, std::vector<std::pair<dof_id_type, Point>>>
     pushed_node_ids_offsets, pushed_node_ids_offsets_to_me;
-  std::map<processor_id_type, std::set<Node *>> pushed_node_sets;
+  std::map<processor_id_type, std::vector<const Node *>> pushed_node_vecs;
 
   for (const auto & [pid, pid_ids]: pushed_node_ids)
     {
@@ -4665,8 +4665,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 
       if (!mesh.is_serial())
         {
-          auto & pid_nodes = pushed_node_sets[pid];
-          pid_nodes.insert(nodes.begin(), nodes.end());
+          auto & pid_nodes = pushed_node_vecs[pid];
+          pid_nodes.assign(nodes.begin(), nodes.end());
         }
     }
 
@@ -4694,18 +4694,13 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 
   // Constraining nodes might not even exist on our subset of a
   // distributed mesh, so let's make them exist.
-  auto insert_nodes_functor =
-    [& mesh]
-    (processor_id_type /* pid */,
-     const std::set<Node *> & nodes)
-    {
-      for (Node * node : nodes)
-        mesh.add_node(node);
-    };
+
+  // Node unpack() now automatically adds them to the context mesh
+  auto null_node_functor = [](processor_id_type, const std::vector<const Node *> &){};
 
   if (!mesh.is_serial())
     Parallel::push_parallel_packed_range
-      (this->comm(), pushed_node_sets, &mesh, insert_nodes_functor);
+      (this->comm(), pushed_node_vecs, &mesh, null_node_functor);
 
   for (const auto & [pid, ids_offsets] : pushed_node_ids_offsets_to_me)
     {

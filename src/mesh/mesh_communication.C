@@ -376,24 +376,6 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
 
   LOG_SCOPE("redistribute()", "MeshCommunication");
 
-  // Get a few unique message tags to use in communications; we'll
-  // default to some numbers around pi*1000
-  Parallel::MessageTag
-    nodestag   = mesh.comm().get_unique_tag(3141),
-    elemstag   = mesh.comm().get_unique_tag(3142);
-
-  // Figure out how many nodes and elements we have which are assigned to each
-  // processor.  send_n_nodes_and_elem_per_proc contains the number of nodes/elements
-  // we will be sending to each processor, recv_n_nodes_and_elem_per_proc contains
-  // the number of nodes/elements we will be receiving from each processor.
-  // Format:
-  //  send_n_nodes_and_elem_per_proc[2*pid+0] = number of nodes to send to pid
-  //  send_n_nodes_and_elem_per_proc[2*pid+1] = number of elements to send to pid
-  std::vector<dof_id_type> send_n_nodes_and_elem_per_proc(2*mesh.n_processors(), 0);
-
-  std::vector<Parallel::Request>
-    node_send_requests, element_send_requests;
-
   // Be compatible with both deprecated and corrected MeshBase iterator types
   typedef std::remove_const<MeshBase::const_element_iterator::value_type>::type nc_v_t;
 
@@ -415,18 +397,19 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
 #endif
       mesh.active_elements_end();
 
+  // See what should get sent where.  We don't send to ourselves.
   for (auto & elem : as_range(send_elems_begin, send_elems_end))
-    send_to_pid[elem->processor_id()].push_back(elem);
+    if (elem->processor_id() != mesh.processor_id())
+      send_to_pid[elem->processor_id()].push_back(elem);
+
+  std::map<processor_id_type, std::vector<const Node *>> all_nodes_to_send;
+  std::map<processor_id_type, std::vector<const Elem *>> all_elems_to_send;
 
   // If we don't have any just-coarsened elements to send to a
   // pid, then there won't be any nodes or any elements pulled
   // in by ghosting either, and we're done with this pid.
   for (const auto & [pid, p_elements] : send_to_pid)
     {
-      // don't send to ourselves!!
-      if (pid == mesh.processor_id())
-        continue;
-
       // Build up a list of nodes and elements to send to processor pid.
       // We will certainly send all the elements assigned to this processor,
       // but we will also ship off any elements which are required
@@ -477,99 +460,23 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
       connected_node_set_type connected_nodes;
       reconnect_nodes(elements_to_send, connected_nodes);
 
-      // the number of nodes we will ship to pid
-      send_n_nodes_and_elem_per_proc[2*pid+0] =
-        cast_int<dof_id_type>(connected_nodes.size());
+      all_nodes_to_send[pid].assign(connected_nodes.begin(),
+                                    connected_nodes.end());
 
-      // send any nodes off to the destination processor
-      libmesh_assert (!connected_nodes.empty());
-      node_send_requests.push_back(Parallel::request());
-
-      mesh.comm().send_packed_range (pid, &mesh,
-                                     connected_nodes.begin(),
-                                     connected_nodes.end(),
-                                     node_send_requests.back(),
-                                     nodestag);
-
-      // the number of elements we will send to this processor
-      send_n_nodes_and_elem_per_proc[2*pid+1] =
-        cast_int<dof_id_type>(elements_to_send.size());
-
-      // send the elements off to the destination processor
-      libmesh_assert (!elements_to_send.empty());
-      element_send_requests.push_back(Parallel::request());
-
-      mesh.comm().send_packed_range (pid, &mesh,
-                                     elements_to_send.begin(),
-                                     elements_to_send.end(),
-                                     element_send_requests.back(),
-                                     elemstag);
+      all_elems_to_send[pid].assign(elements_to_send.begin(),
+                                    elements_to_send.end());
     }
 
-  std::vector<dof_id_type> recv_n_nodes_and_elem_per_proc(send_n_nodes_and_elem_per_proc);
+  // Elem/Node unpack() automatically adds them to the given mesh
+  auto null_node_action = [](processor_id_type, const std::vector<const Node*>&){};
+  auto null_elem_action = [](processor_id_type, const std::vector<const Elem*>&){};
 
-  mesh.comm().alltoall (recv_n_nodes_and_elem_per_proc);
+  // Communicate nodes first since elements will need to attach to them
+  TIMPI::push_parallel_packed_range(mesh.comm(), all_nodes_to_send, &mesh,
+                                    null_node_action);
 
-  // In general we will only need to communicate with a subset of the other processors.
-  // I can't immediately think of a case where we will send elements but not nodes, but
-  // these are only bools and we have the information anyway...
-  std::vector<bool>
-    send_node_pair(mesh.n_processors(),false), send_elem_pair(mesh.n_processors(),false),
-    recv_node_pair(mesh.n_processors(),false), recv_elem_pair(mesh.n_processors(),false);
-
-  unsigned int
-    n_send_node_pairs=0,      n_send_elem_pairs=0,
-    n_recv_node_pairs=0,      n_recv_elem_pairs=0;
-
-  for (auto pid : make_range(mesh.n_processors()))
-    {
-      if (send_n_nodes_and_elem_per_proc[2*pid+0]) // we have nodes to send
-        {
-          send_node_pair[pid] = true;
-          n_send_node_pairs++;
-        }
-
-      if (send_n_nodes_and_elem_per_proc[2*pid+1]) // we have elements to send
-        {
-          send_elem_pair[pid] = true;
-          n_send_elem_pairs++;
-        }
-
-      if (recv_n_nodes_and_elem_per_proc[2*pid+0]) // we have nodes to receive
-        {
-          recv_node_pair[pid] = true;
-          n_recv_node_pairs++;
-        }
-
-      if (recv_n_nodes_and_elem_per_proc[2*pid+1]) // we have elements to receive
-        {
-          recv_elem_pair[pid] = true;
-          n_recv_elem_pairs++;
-        }
-    }
-  libmesh_assert_equal_to (n_send_node_pairs, node_send_requests.size());
-  libmesh_assert_equal_to (n_send_elem_pairs, element_send_requests.size());
-
-  // Receive nodes.
-  // We now know how many processors will be sending us nodes.
-  for (unsigned int node_comm_step=0; node_comm_step<n_recv_node_pairs; node_comm_step++)
-    // but we don't necessarily want to impose an ordering, so
-    // just process whatever message is available next.
-    mesh.comm().receive_packed_range (Parallel::any_source,
-                                      &mesh,
-                                      null_output_iterator<Node>(),
-                                      (Node**)nullptr,
-                                      nodestag);
-
-  // Receive elements.
-  // Similarly we know how many processors are sending us elements,
-  // but we don't really care in what order we receive them.
-  for (unsigned int elem_comm_step=0; elem_comm_step<n_recv_elem_pairs; elem_comm_step++)
-    mesh.comm().receive_packed_range (Parallel::any_source,
-                                      &mesh,
-                                      null_output_iterator<Elem>(),
-                                      (Elem**)nullptr,
-                                      elemstag);
+  TIMPI::push_parallel_packed_range(mesh.comm(), all_elems_to_send, &mesh,
+                                    null_elem_action);
 
   // At this point we have all the nodes and elems we need, so we can
   // communicate any constraint rows that our targets will need.
@@ -580,10 +487,6 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
     {
       libmesh_not_implemented();
     }
-
-  // Wait for all sends to complete
-  Parallel::wait (node_send_requests);
-  Parallel::wait (element_send_requests);
 
   // Check on the redistribution consistency
 #ifdef DEBUG
@@ -1033,28 +936,16 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
         coarsening_elements_to_ghost[their_proc_id].push_back(elem);
     }
 
+  std::map<processor_id_type, std::vector<const Node *>> all_nodes_to_send;
+  std::map<processor_id_type, std::vector<const Elem *>> all_elems_to_send;
+
   const processor_id_type n_proc = mesh.n_processors();
-
-  // Get a few unique message tags to use in communications; we'll
-  // default to some numbers around pi*1000
-  Parallel::MessageTag
-    nodestag   = mesh.comm().get_unique_tag(3141),
-    elemstag   = mesh.comm().get_unique_tag(3142);
-
-  std::vector<Parallel::Request> send_requests;
-
-  // Using unsigned char instead of bool since it'll get converted for
-  // MPI use later anyway
-  std::vector<unsigned char> send_to_proc(n_proc, 0);
 
   for (processor_id_type p=0; p != n_proc; ++p)
     {
       if (p == proc_id)
-        break;
+        continue;
 
-      // We'll send these asynchronously, but their data will be
-      // packed into Parallel:: buffers so it will be okay when the
-      // original containers are destructed before the sends complete.
       std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
       std::set<const Node *> nodes_to_send;
 
@@ -1098,56 +989,22 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
                 }
             }
 
-          send_requests.push_back(Parallel::request());
-
-          mesh.comm().send_packed_range (p, &mesh,
-                                         nodes_to_send.begin(),
-                                         nodes_to_send.end(),
-                                         send_requests.back(),
-                                         nodestag);
-
-          send_requests.push_back(Parallel::request());
-
-          send_to_proc[p] = 1; // true
-
-          mesh.comm().send_packed_range (p, &mesh,
-                                         elements_to_send.begin(),
-                                         elements_to_send.end(),
-                                         send_requests.back(),
-                                         elemstag);
+          all_nodes_to_send[p].assign(nodes_to_send.begin(), nodes_to_send.end());
+          all_elems_to_send[p].assign(elements_to_send.begin(), elements_to_send.end());
         }
     }
 
-  // Find out how many other processors are sending us elements+nodes.
-  std::vector<unsigned char> recv_from_proc(send_to_proc);
-  mesh.comm().alltoall(recv_from_proc);
+  // Elem/Node unpack() automatically adds them to the given mesh
+  auto null_node_action = [](processor_id_type, const std::vector<const Node*>&){};
+  auto null_elem_action = [](processor_id_type, const std::vector<const Elem*>&){};
 
-  const processor_id_type n_receives = cast_int<processor_id_type>
-    (std::count(recv_from_proc.begin(), recv_from_proc.end(), 1));
+  // Communicate nodes first since elements will need to attach to them
+  TIMPI::push_parallel_packed_range(mesh.comm(), all_nodes_to_send, &mesh,
+                                    null_node_action);
 
-  // Receive nodes first since elements will need to attach to them
-  for (processor_id_type recv_i = 0; recv_i != n_receives; ++recv_i)
-    {
-      mesh.comm().receive_packed_range
-        (Parallel::any_source,
-         &mesh,
-         null_output_iterator<Node>(),
-         (Node**)nullptr,
-         nodestag);
-    }
+  TIMPI::push_parallel_packed_range(mesh.comm(), all_elems_to_send, &mesh,
+                                    null_elem_action);
 
-  for (processor_id_type recv_i = 0; recv_i != n_receives; ++recv_i)
-    {
-      mesh.comm().receive_packed_range
-        (Parallel::any_source,
-         &mesh,
-         null_output_iterator<Elem>(),
-         (Elem**)nullptr,
-         elemstag);
-    }
-
-  // Wait for all sends to complete
-  Parallel::wait (send_requests);
 #endif // LIBMESH_ENABLE_AMR
 }
 
