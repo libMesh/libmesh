@@ -1440,8 +1440,40 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
       libmesh_assert(gf);
       (*gf)(elems_begin, elems_end, p, more_elements_to_ghost);
 
+      // A GhostingFunctor should only return active elements, but
+      // I forgot to *document* that, so let's go as easy as we
+      // can on functors that return inactive elements.
+#ifdef LIBMESH_ENABLE_DEPRECATED
+      std::vector<std::pair<const Elem*, const CouplingMatrix*>> children_to_couple;
+      for (auto it = more_elements_to_ghost.begin();
+           it != more_elements_to_ghost.end();)
+        {
+          const Elem * elem = it->first;
+          if (!elem->active())
+            {
+              libmesh_deprecated();
+              std::vector<const Elem*> children_to_ghost;
+              elem->active_family_tree(children_to_ghost,
+                                       /*reset=*/ false);
+              for (const Elem * child : children_to_ghost)
+                if (child->processor_id() != p)
+                  children_to_couple.emplace_back(child, it->second);
+
+              it = more_elements_to_ghost.erase(it);
+            }
+          else
+            ++it;
+        }
+      more_elements_to_ghost.insert(children_to_couple.begin(),
+                                    children_to_couple.end());
+#endif
+
       for (const auto & [elem, elem_cm] : more_elements_to_ghost)
         {
+          // At this point we should only have active elements, even
+          // if we had to fix up gf output to get here.
+          libmesh_assert(elem->active());
+
           GhostingFunctor::map_type::iterator existing_it =
             elements_to_ghost.find (elem);
 
