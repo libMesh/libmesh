@@ -23,6 +23,7 @@
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/petsc_auto_fieldsplit.h"
+#include "libmesh/boundary_info.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
@@ -284,6 +285,14 @@ DiffSolver::SolveResult convert_solve_result(SNESConvergedReason r)
 unsigned int PetscDiffSolver::solve()
 {
   LOG_SCOPE("solve()", "PetscDiffSolver");
+
+#if !PETSC_VERSION_LESS_THAN(3,7,3)
+#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
+  // GMG is currently not supported if we enable children to be associated with
+  // boundary sides
+  libmesh_assert(!_system.get_mesh().get_boundary_info().is_children_on_boundary_side());
+#endif
+#endif
 
   PetscVector<Number> & x =
     *(cast_ptr<PetscVector<Number> *>(_system.solution.get()));

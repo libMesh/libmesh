@@ -659,7 +659,6 @@ bool MeshRefinement::coarsen_elements ()
   if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
   libmesh_assert(this->make_coarsening_compatible());
-
   // FIXME: This won't pass unless we add a redundant find_neighbors()
   // call or replace find_neighbors() with on-the-fly neighbor updating
   // libmesh_assert(!this->eliminate_unrefined_patches());
@@ -706,8 +705,6 @@ bool MeshRefinement::refine_elements ()
         elem->set_refinement_flag(Elem::DO_NOTHING);
     }
 
-
-
   // Parallel consistency has to come first, or coarsening
   // along processor boundaries might occasionally be falsely
   // prevented
@@ -736,6 +733,7 @@ bool MeshRefinement::refine_elements ()
   if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
   libmesh_assert(this->make_refinement_compatible());
+
   // FIXME: This won't pass unless we add a redundant find_neighbors()
   // call or replace find_neighbors() with on-the-fly neighbor updating
   // libmesh_assert(!this->eliminate_unrefined_patches());
@@ -1393,8 +1391,8 @@ bool MeshRefinement::_coarsen_elements ()
           // with this element if we do not allow children to have boundary info
           // otherwise we will have trouble in boundary info consistency among
           // parent and children elements
-          if (!_mesh.get_boundary_info().is_children_on_boundary_side())
-            _mesh.get_boundary_info().remove (elem);
+          // if (!_mesh.get_boundary_info().is_children_on_boundary_side())
+          _mesh.get_boundary_info().remove (elem);
 
           // Add this iterator to the _unused_elements
           // data structure so we might fill it.
@@ -1406,8 +1404,6 @@ bool MeshRefinement::_coarsen_elements ()
           // _mesh.delete_elem(elem);
         }
 
-
-
       // inactive elements flagged for coarsening
       // will become active
       else if (elem->refinement_flag() == Elem::COARSEN_INACTIVE)
@@ -1417,8 +1413,6 @@ bool MeshRefinement::_coarsen_elements ()
 
           // the mesh has certainly changed
           mesh_changed = true;
-
-
         }
       if (elem->p_refinement_flag() == Elem::COARSEN)
         {
@@ -1433,7 +1427,6 @@ bool MeshRefinement::_coarsen_elements ()
               elem->set_p_refinement_flag(Elem::DO_NOTHING);
             }
         }
-
     }
 
   this->comm().max(mesh_p_changed);
@@ -1460,8 +1453,6 @@ bool MeshRefinement::_coarsen_elements ()
 #endif
     }
 
-
-
   // If p levels changed all we need to do is make sure that parent p
   // levels changed in sync
   if (mesh_p_changed && !_mesh.is_serial())
@@ -1470,8 +1461,6 @@ bool MeshRefinement::_coarsen_elements ()
     }
 
   return (mesh_changed || mesh_p_changed);
-
-
 }
 
 

@@ -607,46 +607,49 @@ public:
     //   |_____|
     //      0
 
-    // auto mesh = std::make_unique<Mesh>(*TestCommWorld);
-    // MeshTools::Generation::build_square(*mesh,
-    //                                     1, 1,
-    //                                     0., 1.,
-    //                                     0., 1.,
-    //                                     QUAD4);
+    auto mesh = std::make_unique<Mesh>(*TestCommWorld);
+    MeshTools::Generation::build_square(*mesh,
+                                        1, 1,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
 
-    // BoundaryInfo & bi = mesh->get_boundary_info();
+    BoundaryInfo & bi = mesh->get_boundary_info();
 
-    // // We only have one element, but for easy access we use the iterator
-    // for (auto & elem : mesh->active_element_ptr_range())
-    //   elem->set_refinement_flag(Elem::REFINE);
-    // mesh->prepare_for_use();
-    // MeshRefinement(*mesh).refine_elements();
+    std::ostringstream mystream;
 
-    // // Now we add the extra boundary ID (5) to the element in the top
-    // // left corner
-    // for (auto & elem : mesh->active_element_ptr_range())
-    // {
-    //   const Point c = elem->vertex_average();
-    //   if (c(0) < 0.5 && c(1) > 0.5)
-    //     bi.add_side(elem, 3, 5);
-    // }
-    // mesh->prepare_for_use();
+    // We only have one element, but for easy access we use the iterator
+    for (auto & elem : mesh->active_element_ptr_range())
+      elem->set_refinement_flag(Elem::REFINE);
+    mesh->prepare_for_use();
 
-    // // Okay, now we query the boundary ids on side 3 of the child and check if it has
-    // // the right elements
-    // for (auto & elem : mesh->active_element_ptr_range())
-    // {
-    //   const Point c = elem->vertex_average();
-    //   if (c(0) < 0.5 && c(1) > 0.5)
-    //   {
-    //     std::vector<boundary_id_type> container;
-    //     bi.boundary_ids(elem, 3, container);
+    MeshRefinement(*mesh).refine_elements();
 
-    //     CPPUNIT_ASSERT_EQUAL((unsigned long) 2, container.size());
-    //     CPPUNIT_ASSERT_EQUAL((short int) 5, container[0]);
-    //     CPPUNIT_ASSERT_EQUAL((short int) 3, container[1]);
-    //   }
-    // }
+    // Now we add the extra boundary ID (5) to the element in the top
+    // left corner
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 0.5 && c(1) > 0.5)
+        bi.add_side(elem, 3, 5);
+    }
+    mesh->prepare_for_use();
+
+    // Okay, now we query the boundary ids on side 3 of the child and check if it has
+    // the right elements
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 0.5 && c(1) > 0.5)
+      {
+        std::vector<boundary_id_type> container;
+        bi.boundary_ids(elem, 3, container);
+
+        CPPUNIT_ASSERT_EQUAL((unsigned long) 2, container.size());
+        CPPUNIT_ASSERT_EQUAL((short int) 5, container[0]);
+        CPPUNIT_ASSERT_EQUAL((short int) 3, container[1]);
+      }
+    }
   }
 
   void testBoundaryOnChildrenBoundarySides()
@@ -661,77 +664,77 @@ public:
     //   |_____|
     //      0
 
-    // auto mesh = std::make_unique<Mesh>(*TestCommWorld);
-    // MeshTools::Generation::build_square(*mesh,
-    //                                     1, 1,
-    //                                     0., 1.,
-    //                                     0., 1.,
-    //                                     QUAD4);
+    auto mesh = std::make_unique<Mesh>(*TestCommWorld);
+    MeshTools::Generation::build_square(*mesh,
+                                        1, 1,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
 
-    // BoundaryInfo & bi = mesh->get_boundary_info();
+    BoundaryInfo & bi = mesh->get_boundary_info();
 
-    // // We only have one element, but for easy access we use the iterator
-    // for (auto & elem : mesh->active_element_ptr_range())
-    //   elem->set_refinement_flag(Elem::REFINE);
-    // mesh->prepare_for_use();
-    // MeshRefinement(*mesh).refine_elements();
 
-    // // Now we add the extra boundary ID (5) to two sides of
-    // // the element in the bottom left corner. then we refine again
-    // for (auto & elem : mesh->active_element_ptr_range())
-    // {
-    //   const Point c = elem->vertex_average();
-    //   if (c(0) < 0.5 && c(1) < 0.5)
-    //   {
-    //     bi.add_side(elem, 1, 5);
-    //     bi.add_side(elem, 2, 5);
-    //     elem->set_refinement_flag(Elem::REFINE);
-    //   }
-    // }
-    // mesh->prepare_for_use();
-    // MeshRefinement(*mesh).refine_elements();
-    // mesh->prepare_for_use();
+    // We only have one element, but for easy access we use the iterator
+    for (auto & elem : mesh->active_element_ptr_range())
+      elem->set_refinement_flag(Elem::REFINE);
+    mesh->prepare_for_use();
+    MeshRefinement(*mesh).refine_elements();
 
-    // // Okay, now we add another boundary id (6) to the cell which is in the bottom
-    // // right corner of the refined element
-    // for (auto & elem : mesh->active_element_ptr_range())
-    // {
-    //   const Point c = elem->vertex_average();
-    //   if (c(0) < 0.5 && c(0) > 0.25 && c(1) < 0.25)
-    //     bi.add_side(elem, 1, 6);
-    // }
+    // Now we add the extra boundary ID (5) to two sides of
+    // the element in the bottom left corner. then we refine again
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 0.5 && c(1) < 0.5)
+      {
+        bi.add_side(elem, 1, 5);
+        bi.add_side(elem, 2, 5);
+        elem->set_refinement_flag(Elem::REFINE);
+      }
+    }
+    mesh->prepare_for_use();
+    MeshRefinement(*mesh).refine_elements();
 
-    // // Time to test if we can get back the boundary sides, first we
-    // // check if we can get back boundary from the ancestors of (5) on
-    // // the cell which only has boundary (6) registered. We also check
-    // // if we can get boundary (6) back.
+    // Okay, now we add another boundary id (6) to the cell which is in the bottom
+    // right corner of the refined element
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 0.5 && c(0) > 0.25 && c(1) < 0.25)
+        bi.add_side(elem, 1, 6);
+    }
 
-    // for (auto & elem : mesh->active_element_ptr_range())
-    // {
-    //   const Point c = elem->vertex_average();
-    //   if (c(0) < 0.5 && c(0) > 0.25 && c(1) < 0.25)
-    //   {
-    //     const auto side_5 = bi.side_with_boundary_id(elem, 5);
-    //     const auto side_6 = bi.side_with_boundary_id(elem, 6);
-    //     CPPUNIT_ASSERT_EQUAL((unsigned int) 1, side_5);
-    //     CPPUNIT_ASSERT_EQUAL((unsigned int) 1, side_6);
-    //   }
-    // }
+    // Time to test if we can get back the boundary sides, first we
+    // check if we can get back boundary from the ancestors of (5) on
+    // the cell which only has boundary (6) registered. We also check
+    // if we can get boundary (6) back.
 
-    // // Now we go and try to query the sides with boundary id (5) using
-    // // the element which is at the top right corner of the bottom
-    // // right parent.
-    // for (auto & elem : mesh->active_element_ptr_range())
-    // {
-    //   const Point c = elem->vertex_average();
-    //   if (c(0) < 0.5 && c(0) > 0.25 && c(1) > 0.25 && c(1) < 0.5)
-    //   {
-    //     const auto sides = bi.sides_with_boundary_id(elem, 5);
-    //     CPPUNIT_ASSERT_EQUAL((unsigned long) 2, sides.size());
-    //     CPPUNIT_ASSERT_EQUAL((unsigned int) 1, sides[0]);
-    //     CPPUNIT_ASSERT_EQUAL((unsigned int) 2, sides[1]);
-    //   }
-    // }
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 0.5 && c(0) > 0.25 && c(1) < 0.25)
+      {
+        const auto side_5 = bi.side_with_boundary_id(elem, 5);
+        const auto side_6 = bi.side_with_boundary_id(elem, 6);
+        CPPUNIT_ASSERT_EQUAL((unsigned int) 1, side_5);
+        CPPUNIT_ASSERT_EQUAL((unsigned int) 1, side_6);
+      }
+    }
+
+    // Now we go and try to query the sides with boundary id (5) using
+    // the element which is at the top right corner of the bottom
+    // right parent.
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 0.5 && c(0) > 0.25 && c(1) > 0.25 && c(1) < 0.5)
+      {
+        const auto sides = bi.sides_with_boundary_id(elem, 5);
+        CPPUNIT_ASSERT_EQUAL((unsigned long) 2, sides.size());
+        CPPUNIT_ASSERT_EQUAL((unsigned int) 1, sides[0]);
+        CPPUNIT_ASSERT_EQUAL((unsigned int) 2, sides[1]);
+      }
+    }
   }
 #endif //LIBMESH_ENABLE_AMR
 };

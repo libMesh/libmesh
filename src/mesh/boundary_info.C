@@ -1268,21 +1268,22 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
                       vec_to_fill.end())
                 vec_to_fill.push_back(pr.second.second);
 
+      // Loop over ancestors to check if they have boundary ids on the same side
       while (searched_elem->parent() != nullptr)
       {
-              const Elem * parent = searched_elem->parent();
-              if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
-                return;
+        const Elem * parent = searched_elem->parent();
+        if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
+          return;
 
-              searched_elem = parent;
+        searched_elem = parent;
 
-              if (_children_on_boundary)
-                for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
-                      // Here we need to check if the boundary id already exists
-                      if (pr.second.first == side &&
-                          std::find(vec_to_fill.begin(), vec_to_fill.end(), pr.second.second) ==
-                              vec_to_fill.end())
-                          vec_to_fill.push_back(pr.second.second);
+        if (_children_on_boundary)
+          for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
+            // Here we need to check if the boundary id already exists
+            if (pr.second.first == side &&
+                std::find(vec_to_fill.begin(), vec_to_fill.end(), pr.second.second) ==
+                vec_to_fill.end())
+              vec_to_fill.push_back(pr.second.second);
       }
 
       return;
@@ -1296,11 +1297,11 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
     else
       while (searched_elem->parent() != nullptr)
       {
-              const Elem * parent = searched_elem->parent();
-              if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
-                return;
+        const Elem * parent = searched_elem->parent();
+        if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
+          return;
 
-              searched_elem = parent;
+        searched_elem = parent;
       }
   }
 
@@ -1320,6 +1321,15 @@ unsigned int BoundaryInfo::n_boundary_ids (const Elem * const elem,
 {
   std::vector<boundary_id_type> ids;
   this->boundary_ids(elem, side, ids);
+  return cast_int<unsigned int>(ids.size());
+}
+
+
+unsigned int BoundaryInfo::n_raw_boundary_ids (const Elem * const elem,
+                                               const unsigned short int side) const
+{
+  std::vector<boundary_id_type> ids;
+  this->raw_boundary_ids(elem, side, ids);
   return cast_int<unsigned int>(ids.size());
 }
 
@@ -1499,9 +1509,6 @@ void BoundaryInfo::remove_side (const Elem * elem,
 {
   libmesh_assert(elem);
 
-  // Only level 0 elements unless the flag "_children_on_boundary" is on.
-  libmesh_assert(elem->level() == 0 || _children_on_boundary);
-
   // Erase (elem, side, id) entries from map.
   erase_if(_boundary_side_id, elem,
            [side, id](decltype(_boundary_side_id)::mapped_type & pr)
@@ -1661,7 +1668,7 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
             p = parent;
           }
 #endif
-              // We're on that side of our top_parent; return it
+          // We're on that side of our top_parent; return it
           if (!p)
             return side;
         }
@@ -1719,7 +1726,7 @@ BoundaryInfo::sides_with_boundary_id(const Elem * const elem,
 
   const Elem * searched_elem = elem;
   if (elem->level() != 0 && !_children_on_boundary)
-      searched_elem = elem->top_parent();
+    searched_elem = elem->top_parent();
 
   // elem may have zero or multiple occurrences
   for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
@@ -1737,10 +1744,10 @@ BoundaryInfo::sides_with_boundary_id(const Elem * const elem,
           // If we're on this external boundary then we share this
           // external boundary id
           if (elem->neighbor_ptr(side) == nullptr)
-          {
-            returnval.push_back(side);
-            continue;
-          }
+            {
+              returnval.push_back(side);
+              continue;
+            }
 
           // If we're on an internal boundary then we need to be sure
           // it's the same internal boundary as our top_parent
@@ -2069,7 +2076,6 @@ BoundaryInfo::build_node_list_from_side_list()
       // Need to loop over the sides of any possible children
       std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
-      // if (!elem->subactive())
       elem->active_family_tree_by_side (family, id_pair.first);
 #else
       family.push_back(elem);
@@ -2432,8 +2438,7 @@ BoundaryInfo::build_active_side_list () const
       // Loop over the sides of possible children
       std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
-      // if (!elem->subactive())
-        elem->active_family_tree_by_side(family, id_pair.first);
+      elem->active_family_tree_by_side(family, id_pair.first);
 #else
       family.push_back(elem);
 #endif

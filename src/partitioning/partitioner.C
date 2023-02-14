@@ -28,6 +28,7 @@
 #include "libmesh/mesh_communication.h"
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/wrapped_petsc.h"
+#include "libmesh/boundary_info.h"
 
 // Subclasses to build()
 #include "libmesh/enum_partitioner_type.h"

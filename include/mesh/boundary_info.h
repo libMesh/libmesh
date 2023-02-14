@@ -481,6 +481,13 @@ public:
                                const unsigned short int side) const;
 
   /**
+   * \returns The number of raw (excludes ancestors) boundary ids associated with the \p side
+   * side of element \p elem.
+   */
+  unsigned int n_raw_boundary_ids (const Elem * const elem,
+                                   const unsigned short int side) const;
+
+  /**
    * \returns The list of boundary ids associated with the \p side side of
    * element \p elem.
    */
@@ -552,15 +559,15 @@ public:
 
   /**
   * Update parent's boundary id list so that this information is consistent with
-  * its children elements
+  * its children
   *
   * This is useful when `_children_on_boundary = true`, and is used when the
   * element is about to get coarsened i.e., in MeshRefinement::_coarsen_elements()
   *
-  * Specifically, when coarsen a child element who is the last child on that
-  * boundary, we remove that boundary on the parent's side accordingly.
-  *
-  * Otherwise, we add the parent's side to the boundary.
+  * Specifically, when we coarsen an element whose children have different boundary ids.
+  * In such scenarios, the parent will inherit the children's boundaries if at
+  * least two of them own a boundary while sharing the side of the parent.
+  * Otherwise, we delete the boundary from the children and the parent as well.
   */
   void transfer_boundary_ids_to_parent(const Elem * const elem);
 
@@ -954,8 +961,8 @@ private:
   _boundary_side_id;
 
   /*
-   * Whether or not children elements are associated to any boundary
-   * It is false by default. The flag will be turned on if add_side
+   * Whether or not children elements are associated with any boundary
+   * It is false by default. The flag will be turned on if `add_side`
    * function is called with a child element
    */
   bool _children_on_boundary;
