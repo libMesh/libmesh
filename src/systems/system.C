@@ -2014,6 +2014,11 @@ void System::attach_constraint_object (System::Constraint & constrain)
   _constrain_system_object = &constrain;
 }
 
+bool System::has_constraint_object () const
+{
+  return _constrain_system_object != nullptr;
+}
+
 System::Constraint& System::get_constraint_object ()
 {
   libmesh_assert_msg(_constrain_system_object,"No constraint object available.");

@@ -1400,6 +1400,17 @@ public:
   void attach_constraint_object (Constraint & constrain);
 
   /**
+   * \returns true if there is a user-defined constraint object
+   * attached to this object, false otherwise.  Calling System::
+   * get_constraint_object() when there is no user-defined constraint
+   * object attached leads to either undefined behavior (dereferencing
+   * a nullptr) or an assert (in dbg mode) so you should call this
+   * function first unless you are sure there is a user-defined
+   * constraint object attached.
+   */
+  bool has_constraint_object () const;
+
+  /**
    * Return the user object for imposing constraints.
    */
   Constraint& get_constraint_object ();
