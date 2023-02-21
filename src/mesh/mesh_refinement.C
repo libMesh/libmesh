@@ -1373,7 +1373,7 @@ bool MeshRefinement::_coarsen_elements ()
       // Make sure we transfer the element's boundary id(s)
       // up to its parent when necessary before coarsening.
       // This can be adding or removing the corresonding boundary info.
-      _mesh.get_boundary_info().transfer_boundary_ids_to_parent(elem);
+      _mesh.get_boundary_info().transfer_boundary_ids_from_children(elem);
 
       // active elements flagged for coarsening will
       // no longer be deleted until MeshRefinement::contract()

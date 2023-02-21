@@ -566,10 +566,10 @@ public:
   *
   * Specifically, when we coarsen an element whose children have different boundary ids.
   * In such scenarios, the parent will inherit the children's boundaries if at
-  * least two of them own a boundary while sharing the side of the parent.
+  * least 50% them own a boundary while sharing the side of the parent.
   * Otherwise, we delete the boundary from the children and the parent as well.
   */
-  void transfer_boundary_ids_to_parent(const Elem * const elem);
+  void transfer_boundary_ids_from_children(const Elem * const parent);
 
   /**
    * \returns The number of element-side-based boundary conditions.
