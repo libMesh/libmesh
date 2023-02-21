@@ -1443,7 +1443,7 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
       // A GhostingFunctor should only return active elements, but
       // I forgot to *document* that, so let's go as easy as we
       // can on functors that return inactive elements.
-#ifdef LIBMESH_ENABLE_DEPRECATED
+#if defined(LIBMESH_ENABLE_DEPRECATED) && defined(LIBMESH_ENABLE_AMR)
       std::vector<std::pair<const Elem*, const CouplingMatrix*>> children_to_couple;
       for (auto it = more_elements_to_ghost.begin();
            it != more_elements_to_ghost.end();)
