@@ -217,6 +217,12 @@ public:
   void make_node_unique_ids_parallel_consistent (MeshBase &);
 
   /**
+   * Assuming all processor ids are parallel consistent, this function
+   * makes all ghost boundary ids on nodes parallel consistent.
+   */
+  void make_node_bcids_parallel_consistent (MeshBase &);
+
+  /**
    * Assuming all processor ids on nodes touching local elements
    * are parallel consistent, this function makes all other processor ids
    * parallel consistent as well.
