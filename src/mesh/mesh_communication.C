@@ -1510,6 +1510,50 @@ struct SyncUniqueIds
   }
 };
 #endif // LIBMESH_ENABLE_UNIQUE_ID
+
+template <typename DofObjSubclass>
+struct SyncBCIds
+{
+  typedef std::vector<boundary_id_type> datum;
+
+  SyncBCIds(MeshBase &_mesh) :
+    mesh(_mesh) {}
+
+  MeshBase & mesh;
+
+  // Find the id of each requested DofObject -
+  // Parallel::sync_* already did the work for us
+  void gather_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> & ids_out) const
+  {
+    ids_out.reserve(ids.size());
+
+    const BoundaryInfo & boundary_info = mesh.get_boundary_info();
+
+    for (const auto & id : ids)
+      {
+        Node * n = mesh.query_node_ptr(id);
+        libmesh_assert(n);
+        std::vector<boundary_id_type> bcids;
+        boundary_info.boundary_ids(n, bcids);
+        ids_out.push_back(std::move(bcids));
+      }
+  }
+
+  void act_on_data (const std::vector<dof_id_type> & ids,
+                    const std::vector<datum> & bcids) const
+  {
+    BoundaryInfo & boundary_info = mesh.get_boundary_info();
+
+    for (auto i : index_range(ids))
+      {
+        Node * n = mesh.query_node_ptr(ids[i]);
+        libmesh_assert(n);
+        boundary_info.add_node(n, bcids[i]);
+      }
+  }
+};
+
 }
 
 
@@ -1563,6 +1607,25 @@ void MeshCommunication::make_node_unique_ids_parallel_consistent (MeshBase & mes
 
 #endif
 }
+
+
+void MeshCommunication::make_node_bcids_parallel_consistent (MeshBase & mesh)
+{
+  // Avoid unused variable warnings if unique ids aren't enabled.
+  libmesh_ignore(mesh);
+
+  // This function must be run on all processors at once
+  libmesh_parallel_only(mesh.comm());
+
+  LOG_SCOPE ("make_node_bcids_parallel_consistent()", "MeshCommunication");
+
+  SyncBCIds<Node> syncbcids(mesh);
+  Parallel::sync_dofobject_data_by_id(mesh.comm(),
+                                      mesh.nodes_begin(),
+                                      mesh.nodes_end(),
+                                      syncbcids);
+}
+
 
 
 
@@ -1898,6 +1961,9 @@ void MeshCommunication::make_new_nodes_parallel_consistent (MeshBase & mesh)
 
   // Third, sync up dofobject unique_ids if applicable.
   this->make_node_unique_ids_parallel_consistent(mesh);
+
+  // Fourth, sync up any nodal boundary conditions
+  this->make_node_bcids_parallel_consistent(mesh);
 
   // Finally, correct the processor ids to make DofMap happy
   MeshTools::correct_node_proc_ids(mesh);
