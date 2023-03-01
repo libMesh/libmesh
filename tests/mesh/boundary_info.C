@@ -13,6 +13,7 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <regex>
 
 using namespace libMesh;
 
@@ -29,6 +30,7 @@ public:
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testRenumber );
 #ifdef LIBMESH_ENABLE_AMR
+  CPPUNIT_TEST( testBoundaryOnChildrenErrors );
   CPPUNIT_TEST( testBoundaryOnChildrenElementsRefineCoarsen );
   CPPUNIT_TEST( testBoundaryOnChildrenBoundaryIDs );
   CPPUNIT_TEST( testBoundaryOnChildrenBoundarySides );
@@ -481,6 +483,101 @@ public:
 #endif // LIBMESH_ENABLE_DIRICHLET
 
 #ifdef LIBMESH_ENABLE_AMR
+  void testBoundaryOnChildrenErrors()
+  {
+    LOG_UNIT_TEST;
+
+    // We create one cell only. The default boundaries of the cell are below.
+    //   ___2___
+    // 3 |     | 1
+    //   |_____|
+    //      0
+
+    auto mesh = std::make_unique<Mesh>(*TestCommWorld);
+    MeshTools::Generation::build_square(*mesh,
+                                        1, 1,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh->get_boundary_info();
+
+    // We only have one element, but for easy access we use the iterator
+    for (auto & elem : mesh->active_element_ptr_range())
+      elem->set_refinement_flag(Elem::REFINE);
+    mesh->prepare_for_use();
+
+    MeshRefinement(*mesh).refine_elements();
+    mesh->prepare_for_use();
+
+    // Now we try to add boundary id 3 to a child on side 3. This should
+    // result in a "not implemented" error message
+    bool threw_desired_exception = false;
+    try {
+      for (auto & elem : mesh->active_element_ptr_range())
+      {
+        const Point c = elem->vertex_average();
+        if (c(0) < 0.5 && c(1) > 0.5)
+          bi.add_side(elem, 3, 3);
+      }
+    }
+    catch (libMesh::NotImplemented & e) {
+      std::regex msg_regex("Trying to add boundary ID 3 which already exists on the ancestors");
+      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+      threw_desired_exception = true;
+    }
+    // If we have more than 4 processors, or a poor partitioner, we
+    // might not get an exception on every processor
+    mesh->comm().max(threw_desired_exception);
+
+    CPPUNIT_ASSERT(threw_desired_exception);
+
+    threw_desired_exception = false;
+    try {
+      for (auto & elem : mesh->active_element_ptr_range())
+      {
+        const Point c = elem->vertex_average();
+        if (c(0) < 0.5 && c(1) > 0.5)
+          bi.add_side(elem, 3, {3,4});
+      }
+    }
+    catch (libMesh::NotImplemented & e) {
+      std::regex msg_regex("Trying to add boundary ID 3 which already exists on the ancestors");
+      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+      threw_desired_exception = true;
+    }
+
+    // If we have more than 4 processors, or a poor partitioner, we
+    // might not get an exception on every processor
+    mesh->comm().max(threw_desired_exception);
+
+    CPPUNIT_ASSERT(threw_desired_exception);
+
+    // We tested the side addition errors, now we move to the removal parts.
+    // We will attempt the removal of boundary 3 through the child
+    threw_desired_exception = false;
+    bi.allow_children_on_boundary_side(true);
+    try {
+      for (auto & elem : mesh->active_element_ptr_range())
+      {
+        const Point c = elem->vertex_average();
+        if (c(0) < 0.5 && c(1) > 0.5)
+          bi.remove_side(elem, 3, 3);
+      }
+    }
+    catch (libMesh::NotImplemented & e) {
+      std::regex msg_regex("We cannot delete boundary ID 3 using a child because it is inherited from an ancestor");
+      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+      threw_desired_exception = true;
+    }
+
+    // If we have more than 4 processors, or a poor partitioner, we
+    // might not get an exception on every processor
+    mesh->comm().max(threw_desired_exception);
+
+    CPPUNIT_ASSERT(threw_desired_exception);
+  }
+
   void testBoundaryOnChildrenElementsRefineCoarsen()
   {
     LOG_UNIT_TEST;
@@ -617,8 +714,6 @@ public:
                                         QUAD4);
 
     BoundaryInfo & bi = mesh->get_boundary_info();
-
-    std::ostringstream mystream;
 
     // We only have one element, but for easy access we use the iterator
     for (auto & elem : mesh->active_element_ptr_range())

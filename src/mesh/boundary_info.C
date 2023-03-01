@@ -963,11 +963,25 @@ void BoundaryInfo::add_side(const Elem * elem,
 {
   libmesh_assert(elem);
 
+#ifdef LIBMESH_ENABLE_AMR
   // Users try to mark boundary on child elements
   // If this happens, we will allow users to remove
   // side from child elements as well
   if (elem->level())
+  {
     _children_on_boundary = true;
+
+    // Here we have to stop and check if we already have this boundary defined on the
+    // parent (if yes, no need to add)
+    std::vector<boundary_id_type> bd_ids;
+    this->boundary_ids(elem,side,bd_ids);
+
+    if(std::find(bd_ids.begin(), bd_ids.end(), id) != bd_ids.end())
+      libmesh_not_implemented_msg("Trying to add boundary ID "
+                                  + std::to_string(id)
+                                  + " which already exists on the ancestors.");
+  }
+#endif
 
   libmesh_error_msg_if(id == invalid_id, "ERROR: You may not set a boundary ID of "
                        << invalid_id
@@ -995,11 +1009,26 @@ void BoundaryInfo::add_side(const Elem * elem,
 
   libmesh_assert(elem);
 
+#ifdef LIBMESH_ENABLE_AMR
   // Users try to mark boundary on child elements
   // If this happens, we will allow users to remove
   // side from child elements as well
   if (elem->level())
+  {
     _children_on_boundary = true;
+
+    // Here we have to stop and check if we already have this boundary defined on the
+    // parent (if yes, no need to add)
+    std::vector<boundary_id_type> bd_ids;
+    this->boundary_ids(elem,side,bd_ids);
+
+    for (const auto id : ids)
+      if(std::find(bd_ids.begin(), bd_ids.end(), id) != bd_ids.end())
+        libmesh_not_implemented_msg("Trying to add boundary ID "
+                                    + std::to_string(id)
+                                    + " which already exists on the ancestors.");
+  }
+#endif
 
   // Don't add the same ID twice
   auto bounds = _boundary_side_id.equal_range(elem);
@@ -1503,6 +1532,25 @@ void BoundaryInfo::remove_side (const Elem * elem,
                                 const boundary_id_type id)
 {
   libmesh_assert(elem);
+
+#ifdef LIBMESH_ENABLE_AMR
+  // Here we have to stop and check if somebody tries to remove an ancestor's boundary ID
+  // through a child
+  if (elem->level())
+  {
+    std::vector<boundary_id_type> bd_ids;
+    this->boundary_ids(elem,side,bd_ids);
+    if(std::find(bd_ids.begin(), bd_ids.end(), id) != bd_ids.end())
+    {
+      std::vector<boundary_id_type> raw_bd_ids;
+      this->raw_boundary_ids(elem, side, raw_bd_ids);
+      if(std::find(raw_bd_ids.begin(), raw_bd_ids.end(), id) == raw_bd_ids.end())
+        libmesh_not_implemented_msg("We cannot delete boundary ID "
+                                    + std::to_string(id) +
+                                    " using a child because it is inherited from an ancestor.");
+    }
+  }
+#endif
 
   // Erase (elem, side, id) entries from map.
   erase_if(_boundary_side_id, elem,
