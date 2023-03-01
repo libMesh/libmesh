@@ -1848,10 +1848,10 @@ BoundaryInfo::build_shellface_boundary_ids(std::vector<boundary_id_type> & b_ids
     }
 }
 
+#ifdef LIBMESH_ENABLE_AMR
 void
 BoundaryInfo::transfer_boundary_ids_from_children(const Elem * const parent)
 {
-
   // this is only needed when we allow boundary to be associated with children elements
   // also, we only transfer the parent's boundary ids when we are actually coarsen the child element
   if (!_children_on_boundary ||
@@ -1890,17 +1890,14 @@ BoundaryInfo::transfer_boundary_ids_from_children(const Elem * const parent)
     // This is where the decision is made. If 50% of the children have the tags,
     // we propagate them upwards upon coarsening. Otherwise, they are deleted.
     for (const auto & boundary : boundary_counts)
-    {
       if (boundary.second / number_of_sides_on_children > 0.5)
         this->add_side(parent, side_i, boundary.first);
-      else
-        this->remove_side(parent, side_i, boundary.first);
-    }
   }
 
   for (const auto & child_i : make_range(parent->n_children()))
     this->remove(parent->child_ptr(child_i));
 }
+#endif
 
 std::size_t BoundaryInfo::n_boundary_conds () const
 {

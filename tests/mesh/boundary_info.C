@@ -560,6 +560,8 @@ public:
       if (c(0) < 1)
       {
         CPPUNIT_ASSERT(bi.has_boundary_id(elem, 1, 5));
+        // We clean up this boundary ID for the next round of tests
+        bi.remove_side(elem, 1, 5);
         // we will refine this element again
         elem->set_refinement_flag(Elem::REFINE);
       }

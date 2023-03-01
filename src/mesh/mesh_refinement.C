@@ -1370,9 +1370,8 @@ bool MeshRefinement::_coarsen_elements ()
 
   for (auto & elem : _mesh.element_ptr_range())
     {
-      // Make sure we transfer the element's boundary id(s)
+      // Make sure we transfer the children's boundary id(s)
       // up to its parent when necessary before coarsening.
-      // This can be adding or removing the corresonding boundary info.
       _mesh.get_boundary_info().transfer_boundary_ids_from_children(elem);
 
       // active elements flagged for coarsening will
@@ -1388,11 +1387,11 @@ bool MeshRefinement::_coarsen_elements ()
           elem->nullify_neighbors();
 
           // Remove any boundary information associated
-          // with this element if we do not allow children to have boundary info
-          // otherwise we will have trouble in boundary info consistency among
-          // parent and children elements
-          // if (!_mesh.get_boundary_info().is_children_on_boundary_side())
-          _mesh.get_boundary_info().remove (elem);
+          // with this element if we do not allow children to have boundary info.
+          // Otherwise, we will do the removal in `transfer_boundary_ids_from_children`
+          // to make sure we don't delete the information before it is transferred
+          if (!_mesh.get_boundary_info().is_children_on_boundary_side())
+            _mesh.get_boundary_info().remove (elem);
 
           // Add this iterator to the _unused_elements
           // data structure so we might fill it.

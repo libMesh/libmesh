@@ -557,6 +557,7 @@ public:
    */
   void build_shellface_boundary_ids(std::vector<boundary_id_type> & b_ids) const;
 
+#ifdef LIBMESH_ENABLE_AMR
   /**
   * Update parent's boundary id list so that this information is consistent with
   * its children
@@ -567,9 +568,9 @@ public:
   * Specifically, when we coarsen an element whose children have different boundary ids.
   * In such scenarios, the parent will inherit the children's boundaries if at
   * least 50% them own a boundary while sharing the side of the parent.
-  * Otherwise, we delete the boundary from the children and the parent as well.
   */
   void transfer_boundary_ids_from_children(const Elem * const parent);
+#endif
 
   /**
    * \returns The number of element-side-based boundary conditions.
