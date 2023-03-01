@@ -2484,6 +2484,7 @@ std::string Elem::get_info () const
     oss << "invalid";
 #endif
 
+  oss << ", subdomain_id()=" << this->subdomain_id();
   oss << ", processor_id()=" << this->processor_id()               << '\n';
 
   oss << "   type()="    << Utility::enum_to_string(this->type())  << '\n'
