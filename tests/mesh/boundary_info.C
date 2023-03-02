@@ -8,10 +8,12 @@
 #include <libmesh/dirichlet_boundaries.h>
 #include <libmesh/dof_map.h>
 #include <libmesh/parallel.h>
+#include <libmesh/mesh_refinement.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <regex>
 
 using namespace libMesh;
 
@@ -27,6 +29,14 @@ public:
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testRenumber );
+# ifdef LIBMESH_ENABLE_AMR
+#  ifdef LIBMESH_ENABLE_EXCEPTIONS
+  CPPUNIT_TEST( testBoundaryOnChildrenErrors );
+#  endif
+  CPPUNIT_TEST( testBoundaryOnChildrenElementsRefineCoarsen );
+  CPPUNIT_TEST( testBoundaryOnChildrenBoundaryIDs );
+  CPPUNIT_TEST( testBoundaryOnChildrenBoundarySides );
+# endif
 # ifdef LIBMESH_ENABLE_DIRICHLET
   CPPUNIT_TEST( testShellFaceConstraints );
 # endif
@@ -474,6 +484,360 @@ public:
   }
 #endif // LIBMESH_ENABLE_DIRICHLET
 
+#if LIBMESH_ENABLE_AMR
+#  if LIBMESH_ENABLE_EXCEPTIONS
+  void testBoundaryOnChildrenErrors()
+  {
+    LOG_UNIT_TEST;
+
+    // We create one cell only. The default boundaries of the cell are below.
+    //   ___2___
+    // 3 |     | 1
+    //   |_____|
+    //      0
+
+    auto mesh = std::make_unique<Mesh>(*TestCommWorld);
+    MeshTools::Generation::build_square(*mesh,
+                                        1, 1,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh->get_boundary_info();
+
+    // We only have one element, but for easy access we use the iterator
+    for (auto & elem : mesh->active_element_ptr_range())
+      elem->set_refinement_flag(Elem::REFINE);
+    mesh->prepare_for_use();
+
+    MeshRefinement(*mesh).refine_elements();
+    mesh->prepare_for_use();
+
+    // Now we try to add boundary id 3 to a child on side 3. This should
+    // result in a "not implemented" error message
+    bool threw_desired_exception = false;
+    try {
+      for (auto & elem : mesh->active_element_ptr_range())
+      {
+        const Point c = elem->vertex_average();
+        if (c(0) < 0.5 && c(1) > 0.5)
+          bi.add_side(elem, 3, 3);
+      }
+    }
+    catch (libMesh::NotImplemented & e) {
+      std::regex msg_regex("Trying to add boundary ID 3 which already exists on the ancestors");
+      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+      threw_desired_exception = true;
+    }
+    // If we have more than 4 processors, or a poor partitioner, we
+    // might not get an exception on every processor
+    mesh->comm().max(threw_desired_exception);
+
+    CPPUNIT_ASSERT(threw_desired_exception);
+
+    threw_desired_exception = false;
+    try {
+      for (auto & elem : mesh->active_element_ptr_range())
+      {
+        const Point c = elem->vertex_average();
+        if (c(0) < 0.5 && c(1) > 0.5)
+          bi.add_side(elem, 3, {3,4});
+      }
+    }
+    catch (libMesh::NotImplemented & e) {
+      std::regex msg_regex("Trying to add boundary ID 3 which already exists on the ancestors");
+      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+      threw_desired_exception = true;
+    }
+
+    // If we have more than 4 processors, or a poor partitioner, we
+    // might not get an exception on every processor
+    mesh->comm().max(threw_desired_exception);
+
+    CPPUNIT_ASSERT(threw_desired_exception);
+
+    // We tested the side addition errors, now we move to the removal parts.
+    // We will attempt the removal of boundary 3 through the child
+    threw_desired_exception = false;
+    bi.allow_children_on_boundary_side(true);
+    try {
+      for (auto & elem : mesh->active_element_ptr_range())
+      {
+        const Point c = elem->vertex_average();
+        if (c(0) < 0.5 && c(1) > 0.5)
+          bi.remove_side(elem, 3, 3);
+      }
+    }
+    catch (libMesh::NotImplemented & e) {
+      std::regex msg_regex("We cannot delete boundary ID 3 using a child because it is inherited from an ancestor");
+      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+      threw_desired_exception = true;
+    }
+
+    // If we have more than 4 processors, or a poor partitioner, we
+    // might not get an exception on every processor
+    mesh->comm().max(threw_desired_exception);
+
+    CPPUNIT_ASSERT(threw_desired_exception);
+  }
+#  endif // LIBMESH_ENABLE_EXCEPTIONS
+
+  void testBoundaryOnChildrenElementsRefineCoarsen()
+  {
+    LOG_UNIT_TEST;
+
+    // Set subdomain ids for specific elements, we will refine/coarsen
+    // the cell on subdomain 1
+    // _____________
+    // |  1  |  2  |
+    // |_____|_____|
+
+    auto mesh = std::make_unique<Mesh>(*TestCommWorld);
+    MeshTools::Generation::build_square(*mesh,
+                                        2, 1,
+                                        0., 2.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh->get_boundary_info();
+
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 1)
+      {
+        elem->subdomain_id() = 1;
+        elem->set_refinement_flag(Elem::REFINE);
+      }
+      else
+        elem->subdomain_id() = 2;
+    }
+    mesh->prepare_for_use();
+
+    // Refine the elements once in subdomain 1, and
+    // add the right side subdomain 1 as boundary 5
+    MeshRefinement(*mesh).refine_elements();
+    mesh->prepare_for_use();
+
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 1 && c(0) > 0.5)
+        bi.add_side(elem, 1, 5);
+    }
+    mesh->prepare_for_use();
+
+    // Check the middle boundary, we expect to have two sides in boundary 5
+    unsigned int count = 0;
+    for (auto & elem : mesh->active_element_ptr_range())
+      if (bi.has_boundary_id(elem, 1, 5))
+        count++;
+
+    if (mesh->n_active_local_elem())
+    {
+      CPPUNIT_ASSERT_EQUAL((unsigned int) 2, count);
+      CPPUNIT_ASSERT(bi.is_children_on_boundary_side());
+    }
+
+    // First, we will coarsen the the elements on subdomain 1. This
+    // is to check if the boundary information propagates upward upon
+    // coarsening.
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 1)
+        elem->set_refinement_flag(Elem::COARSEN);
+    }
+    mesh->prepare_for_use();
+
+    // The coarsened element should have its side on boundary 5
+    // This is boundary info transferred from this child element
+    MeshRefinement(*mesh).coarsen_elements();
+    mesh->prepare_for_use();
+
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 1)
+      {
+        CPPUNIT_ASSERT(bi.has_boundary_id(elem, 1, 5));
+        // We clean up this boundary ID for the next round of tests
+        bi.remove_side(elem, 1, 5);
+        // we will refine this element again
+        elem->set_refinement_flag(Elem::REFINE);
+      }
+    }
+
+    MeshRefinement(*mesh).refine_elements();
+    mesh->prepare_for_use();
+
+    // This time we remove boundary 5 from one of the children. We expect
+    // the boundary not to propagate to the next level. Furthermore we
+    // expect boundary 5 to be deleted from the parent's boundaries
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 1)
+        elem->set_refinement_flag(Elem::COARSEN);
+      if (c(0) > 0.5 && c(0) < 1 && c(1) < 0.5)
+        bi.add_side(elem, 1, 5);
+    }
+    mesh->prepare_for_use();
+
+    MeshRefinement(*mesh).coarsen_elements();
+
+    mesh->prepare_for_use();
+
+    // The parent element should not have any side associated with boundary 5
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 1)
+        CPPUNIT_ASSERT(!bi.has_boundary_id(elem, 1, 5));
+    }
+  }
+
+  void testBoundaryOnChildrenBoundaryIDs()
+  {
+    LOG_UNIT_TEST;
+
+    // We create one cell only. The default boundaries of the cell are below.
+    // We will refine the mesh and add a new boundary id to the left side (side 3).
+    // Then will query the available boundary ids on the added side. It should return
+    // both the parent's and the child's boundaries.
+    //   ___2___
+    // 3 |     | 1
+    //   |_____|
+    //      0
+
+    auto mesh = std::make_unique<Mesh>(*TestCommWorld);
+    MeshTools::Generation::build_square(*mesh,
+                                        1, 1,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh->get_boundary_info();
+
+    // We only have one element, but for easy access we use the iterator
+    for (auto & elem : mesh->active_element_ptr_range())
+      elem->set_refinement_flag(Elem::REFINE);
+    mesh->prepare_for_use();
+
+    MeshRefinement(*mesh).refine_elements();
+
+    // Now we add the extra boundary ID (5) to the element in the top
+    // left corner
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 0.5 && c(1) > 0.5)
+        bi.add_side(elem, 3, 5);
+    }
+    mesh->prepare_for_use();
+
+    // Okay, now we query the boundary ids on side 3 of the child and check if it has
+    // the right elements
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 0.5 && c(1) > 0.5)
+      {
+        std::vector<boundary_id_type> container;
+        bi.boundary_ids(elem, 3, container);
+
+        CPPUNIT_ASSERT_EQUAL((unsigned long) 2, container.size());
+        CPPUNIT_ASSERT_EQUAL((short int) 5, container[0]);
+        CPPUNIT_ASSERT_EQUAL((short int) 3, container[1]);
+      }
+    }
+  }
+
+  void testBoundaryOnChildrenBoundarySides()
+  {
+    LOG_UNIT_TEST;
+
+    // We create one cell only. The default boundaries of the cell are below.
+    // We will refine mesh and see if we can get back the correct sides
+    // for a given boundary id on an internal boundary.
+    //   ___2___
+    // 3 |     | 1
+    //   |_____|
+    //      0
+
+    auto mesh = std::make_unique<Mesh>(*TestCommWorld);
+    MeshTools::Generation::build_square(*mesh,
+                                        1, 1,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh->get_boundary_info();
+
+
+    // We only have one element, but for easy access we use the iterator
+    for (auto & elem : mesh->active_element_ptr_range())
+      elem->set_refinement_flag(Elem::REFINE);
+    mesh->prepare_for_use();
+    MeshRefinement(*mesh).refine_elements();
+
+    // Now we add the extra boundary ID (5) to two sides of
+    // the element in the bottom left corner. then we refine again
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 0.5 && c(1) < 0.5)
+      {
+        bi.add_side(elem, 1, 5);
+        bi.add_side(elem, 2, 5);
+        elem->set_refinement_flag(Elem::REFINE);
+      }
+    }
+    mesh->prepare_for_use();
+    MeshRefinement(*mesh).refine_elements();
+
+    // Okay, now we add another boundary id (6) to the cell which is in the bottom
+    // right corner of the refined element
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 0.5 && c(0) > 0.25 && c(1) < 0.25)
+        bi.add_side(elem, 1, 6);
+    }
+
+    // Time to test if we can get back the boundary sides, first we
+    // check if we can get back boundary from the ancestors of (5) on
+    // the cell which only has boundary (6) registered. We also check
+    // if we can get boundary (6) back.
+
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 0.5 && c(0) > 0.25 && c(1) < 0.25)
+      {
+        const auto side_5 = bi.side_with_boundary_id(elem, 5);
+        const auto side_6 = bi.side_with_boundary_id(elem, 6);
+        CPPUNIT_ASSERT_EQUAL((unsigned int) 1, side_5);
+        CPPUNIT_ASSERT_EQUAL((unsigned int) 1, side_6);
+      }
+    }
+
+    // Now we go and try to query the sides with boundary id (5) using
+    // the element which is at the top right corner of the bottom
+    // right parent.
+    for (auto & elem : mesh->active_element_ptr_range())
+    {
+      const Point c = elem->vertex_average();
+      if (c(0) < 0.5 && c(0) > 0.25 && c(1) > 0.25 && c(1) < 0.5)
+      {
+        const auto sides = bi.sides_with_boundary_id(elem, 5);
+        CPPUNIT_ASSERT_EQUAL((unsigned long) 2, sides.size());
+        CPPUNIT_ASSERT_EQUAL((unsigned int) 1, sides[0]);
+        CPPUNIT_ASSERT_EQUAL((unsigned int) 2, sides[1]);
+      }
+    }
+  }
+#endif //LIBMESH_ENABLE_AMR
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryInfoTest );

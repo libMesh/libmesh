@@ -241,6 +241,10 @@ public:
    *
    * \note This function used to take an argument, \p maintain_level_one,
    * new code should use face_level_mismatch_limit() instead.
+   *
+   * \note When we allow boundaries to be directly associated with child elements,
+   * i.e., `_children_on_boundary = true`. A child's boundary ID may be
+   * lost during coarsening if it differs from its siblings on that parent side.
    */
   bool coarsen_elements ();
 

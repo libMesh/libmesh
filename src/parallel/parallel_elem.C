@@ -88,23 +88,37 @@ Packing<const Elem *>::packed_size (std::vector<largest_id_type>::const_iterator
   const unsigned int indexing_size =
     DofObject::unpackable_indexing_size(in+pre_indexing_size);
 
-  unsigned int total_packed_bc_data = 0;
-  if (level == 0)
+  // We communicate if we are on the boundary or not
+  unsigned int total_packed_bc_data = 1;
+  largest_id_type on_boundary = *(in + pre_indexing_size + indexing_size);
+
+  if (on_boundary)
+  {
+    // Extracting if the children are allowed on the boundary
+    total_packed_bc_data++;
+    largest_id_type allow_children_on_boundary = *(in + pre_indexing_size + indexing_size + 1);
+
+    // For now, children are only supported on sides, the nodes and shell faces are
+    // treated using the top parents only
+    if (level == 0 || allow_children_on_boundary)
     {
       for (unsigned int s = 0; s != n_sides; ++s)
-        {
-          const int n_bcs = cast_int<int>
-            (*(in + pre_indexing_size + indexing_size +
-               total_packed_bc_data++));
-          libmesh_assert_greater_equal (n_bcs, 0);
-          total_packed_bc_data += n_bcs;
-        }
-
+      {
+        const int n_bcs = cast_int<int>
+          (*(in + pre_indexing_size + indexing_size +
+            total_packed_bc_data++));
+        libmesh_assert_greater_equal (n_bcs, 0);
+        total_packed_bc_data += n_bcs;
+      }
+    }
+  }
+  if (level == 0)
+    {
       for (unsigned int e = 0; e != n_edges; ++e)
         {
           const int n_bcs = cast_int<int>
             (*(in + pre_indexing_size + indexing_size +
-               total_packed_bc_data++));
+              total_packed_bc_data++));
           libmesh_assert_greater_equal (n_bcs, 0);
           total_packed_bc_data += n_bcs;
         }
@@ -113,7 +127,7 @@ Packing<const Elem *>::packed_size (std::vector<largest_id_type>::const_iterator
         {
           const int n_bcs = cast_int<int>
             (*(in + pre_indexing_size + indexing_size +
-               total_packed_bc_data++));
+              total_packed_bc_data++));
           libmesh_assert_greater_equal (n_bcs, 0);
           total_packed_bc_data += n_bcs;
         }
@@ -142,16 +156,35 @@ unsigned int
 Packing<const Elem *>::packable_size (const Elem * const & elem,
                                       const MeshBase * mesh)
 {
-  unsigned int total_packed_bcs = 0;
+  // We always communicate if we are on a boundary or not
+  unsigned int total_packed_bcs = 1;
   const unsigned short n_sides = elem->n_sides();
 
-  if (elem->level() == 0)
+  largest_id_type on_boundary = 0;
+  for (auto s : elem->side_index_range())
+    if (mesh->get_boundary_info().n_raw_boundary_ids(elem,s))
+    {
+      on_boundary = 1;
+      break;
+    }
+
+  if (on_boundary)
+  {
+    // In this case we need another entry to check if we allow children on the boundary.
+    // We only allow children on sides, edges and sheel faces are treated normally using
+    // their top parents.
+    total_packed_bcs++;
+    if (elem->level() == 0 || mesh->get_boundary_info().is_children_on_boundary_side())
     {
       total_packed_bcs += n_sides;
       for (unsigned short s = 0; s != n_sides; ++s)
         total_packed_bcs +=
-          mesh->get_boundary_info().n_boundary_ids(elem,s);
+          mesh->get_boundary_info().n_raw_boundary_ids(elem,s);
+    }
+  }
 
+  if (elem->level() == 0)
+    {
       const unsigned short n_edges = elem->n_edges();
       total_packed_bcs += n_edges;
       for (unsigned short e = 0; e != n_edges; ++e)
@@ -288,41 +321,64 @@ Packing<const Elem *>::pack (const Elem * const & elem,
   // Add any DofObject indices
   elem->pack_indexing(data_out);
 
-  // If this is a coarse element,
-  // Add any element side boundary condition ids
-  if (elem->level() == 0)
+  // We check if this is a boundary cell. We use the raw
+  // IDs because we also communicate the parents which
+  // will bring their associated IDs
+  largest_id_type on_boundary = 0;
+  for (auto s : elem->side_index_range())
+    if (mesh->get_boundary_info().n_raw_boundary_ids(elem,s))
+    {
+      on_boundary = 1;
+      break;
+    }
+
+  *data_out++ = on_boundary;
+
+  if (on_boundary)
+  {
+    *data_out++ = mesh->get_boundary_info().is_children_on_boundary_side();
+    // Again, only do this if we allow children to hold boundary sides, the edges and
+    // shell faces are treated normally using their top parents
+    if (elem->level() == 0 || mesh->get_boundary_info().is_children_on_boundary_side())
     {
       std::vector<boundary_id_type> bcs;
       for (auto s : elem->side_index_range())
-        {
-          mesh->get_boundary_info().boundary_ids(elem, s, bcs);
+      {
+        mesh->get_boundary_info().raw_boundary_ids(elem, s, bcs);
 
-          *data_out++ =(bcs.size());
+        *data_out++ =(bcs.size());
 
-          for (const auto & bid : bcs)
-            *data_out++ = bid;
-        }
-
-      for (auto e : elem->edge_index_range())
-        {
-          mesh->get_boundary_info().edge_boundary_ids(elem, e, bcs);
-
-          *data_out++ =(bcs.size());
-
-          for (const auto & bid : bcs)
-            *data_out++ = bid;
-        }
-
-      for (unsigned short sf=0; sf != 2; ++sf)
-        {
-          mesh->get_boundary_info().shellface_boundary_ids(elem, sf, bcs);
-
-          *data_out++ =(bcs.size());
-
-          for (const auto & bid : bcs)
-            *data_out++ = bid;
-        }
+        for (const auto & bid : bcs)
+          *data_out++ = bid;
+      }
     }
+  }
+
+  // If this is a coarse element,
+  // Add any element side boundary condition ids
+  if (elem->level() == 0)
+  {
+    std::vector<boundary_id_type> bcs;
+    for (auto e : elem->edge_index_range())
+      {
+        mesh->get_boundary_info().edge_boundary_ids(elem, e, bcs);
+
+        *data_out++ =(bcs.size());
+
+        for (const auto & bid : bcs)
+          *data_out++ = bid;
+      }
+
+    for (unsigned short sf=0; sf != 2; ++sf)
+      {
+        mesh->get_boundary_info().shellface_boundary_ids(elem, sf, bcs);
+
+        *data_out++ =(bcs.size());
+
+        for (const auto & bid : bcs)
+          *data_out++ = bid;
+      }
+  }
 }
 
 
@@ -611,6 +667,10 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
               libmesh_assert(neigh->level() < elem->level() ||
                              neigh->neighbor_ptr(neighbor_side) == elem);
           }
+      else
+        // We skip these to go to the boundary information if the element is
+        // actually subactive
+        in += 2*elem->n_sides();
 
       // Our p level and refinement flags should be "close to" correct
       // if we're not an active element - we might have a p level
@@ -776,9 +836,15 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
   in += elem->packed_indexing_size();
 
-  // If this is a coarse element,
-  // add any element side or edge boundary condition ids
-  if (level == 0)
+  // We check if this is cell holds a boundary ID or not
+  auto on_boundary = *in++;
+  if (on_boundary)
+  {
+    // Only treat the sides with caution. This is because we might hold boundary IDs
+    // on the sides of the children. This is not supported for edges and shell faces, thus
+    // they are treated assuming that only top parents can hold the IDs.
+    auto children_on_boundary = *in++;
+    if (elem->level() == 0 || children_on_boundary)
     {
       for (auto s : elem->side_index_range())
         {
@@ -789,7 +855,13 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
             mesh->get_boundary_info().add_side
               (elem, s, cast_int<boundary_id_type>(*in++));
         }
+    }
+  }
 
+  // If this is a coarse element,
+  // add any element side or edge boundary condition ids
+  if (level == 0)
+    {
       for (auto e : elem->edge_index_range())
         {
           const boundary_id_type num_bcs =

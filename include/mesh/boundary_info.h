@@ -481,6 +481,13 @@ public:
                                const unsigned short int side) const;
 
   /**
+   * \returns The number of raw (excludes ancestors) boundary ids associated with the \p side
+   * side of element \p elem.
+   */
+  unsigned int n_raw_boundary_ids (const Elem * const elem,
+                                   const unsigned short int side) const;
+
+  /**
    * \returns The list of boundary ids associated with the \p side side of
    * element \p elem.
    */
@@ -549,6 +556,21 @@ public:
    * only ids on shellfaces of semilocal elements will be included.
    */
   void build_shellface_boundary_ids(std::vector<boundary_id_type> & b_ids) const;
+
+#ifdef LIBMESH_ENABLE_AMR
+  /**
+  * Update parent's boundary id list so that this information is consistent with
+  * its children
+  *
+  * This is useful when `_children_on_boundary = true`, and is used when the
+  * element is about to get coarsened i.e., in MeshRefinement::_coarsen_elements()
+  *
+  * Specifically, when we coarsen an element whose children have different boundary ids.
+  * In such scenarios, the parent will inherit the children's boundaries if at
+  * least 50% them own a boundary while sharing the side of the parent.
+  */
+  void transfer_boundary_ids_from_children(const Elem * const parent);
+#endif
 
   /**
    * \returns The number of element-side-based boundary conditions.
@@ -877,6 +899,18 @@ public:
   const std::multimap<const Elem *, std::pair<unsigned short int, boundary_id_type>> & get_sideset_map() const
   { return _boundary_side_id; }
 
+  /**
+   * \returns Whether or not there may be child elements directly assigned boundary sides
+   */
+  bool is_children_on_boundary_side() const
+  { return _children_on_boundary; }
+
+  /**
+   * Whether or not to allow directly setting boundary sides on child elements
+   */
+  void allow_children_on_boundary_side(const bool children_on_boundary)
+  { _children_on_boundary = children_on_boundary; }
+
 private:
 
   /**
@@ -926,6 +960,13 @@ private:
   std::multimap<const Elem *,
                 std::pair<unsigned short int, boundary_id_type>>
   _boundary_side_id;
+
+  /*
+   * Whether or not children elements are associated with any boundary
+   * It is false by default. The flag will be turned on if `add_side`
+   * function is called with a child element
+   */
+  bool _children_on_boundary;
 
   /**
    * A collection of user-specified boundary ids for sides, edges, nodes,
