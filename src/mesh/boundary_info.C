@@ -962,6 +962,15 @@ void BoundaryInfo::add_side(const Elem * elem,
                             const boundary_id_type id)
 {
   libmesh_assert(elem);
+  libmesh_error_msg_if(id == invalid_id, "ERROR: You may not set a boundary ID of "
+                       << invalid_id
+                       << "\n That is reserved for internal use.");
+
+  // Don't add the same ID twice
+  for (const auto & pr : as_range(_boundary_side_id.equal_range(elem)))
+    if (pr.second.first == side &&
+        pr.second.second == id)
+      return;
 
 #ifdef LIBMESH_ENABLE_AMR
   // Users try to mark boundary on child elements
@@ -982,16 +991,6 @@ void BoundaryInfo::add_side(const Elem * elem,
                                   + " which already exists on the ancestors.");
   }
 #endif
-
-  libmesh_error_msg_if(id == invalid_id, "ERROR: You may not set a boundary ID of "
-                       << invalid_id
-                       << "\n That is reserved for internal use.");
-
-  // Don't add the same ID twice
-  for (const auto & pr : as_range(_boundary_side_id.equal_range(elem)))
-    if (pr.second.first == side &&
-        pr.second.second == id)
-      return;
 
   _boundary_side_id.emplace(elem, std::make_pair(side, id));
   _boundary_ids.insert(id);
