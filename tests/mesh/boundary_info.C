@@ -29,8 +29,10 @@ public:
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testRenumber );
-#ifdef LIBMESH_ENABLE_AMR
+# ifdef LIBMESH_ENABLE_AMR
+#  ifdef LIBMESH_ENABLE_EXCEPTIONS
   CPPUNIT_TEST( testBoundaryOnChildrenErrors );
+#  endif
   CPPUNIT_TEST( testBoundaryOnChildrenElementsRefineCoarsen );
   CPPUNIT_TEST( testBoundaryOnChildrenBoundaryIDs );
   CPPUNIT_TEST( testBoundaryOnChildrenBoundarySides );
@@ -482,7 +484,8 @@ public:
   }
 #endif // LIBMESH_ENABLE_DIRICHLET
 
-#ifdef LIBMESH_ENABLE_AMR
+#if LIBMESH_ENABLE_AMR
+#  if LIBMESH_ENABLE_EXCEPTIONS
   void testBoundaryOnChildrenErrors()
   {
     LOG_UNIT_TEST;
@@ -577,6 +580,7 @@ public:
 
     CPPUNIT_ASSERT(threw_desired_exception);
   }
+#  endif // LIBMESH_ENABLE_EXCEPTIONS
 
   void testBoundaryOnChildrenElementsRefineCoarsen()
   {
