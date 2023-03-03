@@ -150,7 +150,6 @@ unsigned int side_hierarchic_n_dofs(const ElemType t, const Order o)
     case EDGE3:
     case EDGE4:
       return 2; // One per side
-      libmesh_fallthrough();
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
