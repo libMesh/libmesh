@@ -105,6 +105,7 @@ public:
   CPPUNIT_TEST( testExodusReadHeader );
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testExodusIGASidesets );
+  CPPUNIT_TEST( testLowOrderEdgeBlocks );
 #endif
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
   CPPUNIT_TEST( testExodusCopyElementVectorDistributed );
@@ -230,6 +231,44 @@ public:
     }
   }
 
+  void testLowOrderEdgeBlocks ()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    ExodusII_IO exii(mesh);
+
+    if (mesh.processor_id() == 0)
+      exii.read("meshes/mesh_with_low_order_edge_blocks.e");
+
+    MeshCommunication().broadcast(mesh);
+    mesh.prepare_for_use();
+
+    // Check that we see the boundary ids we expect
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    // On a ReplicatedMesh, check that the number of edge boundary
+    // conditions is as expected. The real test is that we can read
+    // this file in at all. Prior to the changes in #3491, the Exodus
+    // reader threw an exception while trying to read this mesh.
+    if (mesh.is_serial())
+    {
+      // Mesh has 15 boundary ids total (including edge and side ids).
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(15), bi.n_boundary_ids());
+
+      // We can binary_search() the build_edge_list() which is sorted
+      // in lexicographical order before it's returned.
+      auto edge_list = bi.build_edge_list();
+
+      // Search for some tuples we expect to be present
+      CPPUNIT_ASSERT(std::binary_search(edge_list.begin(), edge_list.end(), std::make_tuple(4, 1, 8007)));
+      CPPUNIT_ASSERT(std::binary_search(edge_list.begin(), edge_list.end(), std::make_tuple(10, 6, 8001)));
+
+      // And make sure we don't have entries we shouldn't have
+      CPPUNIT_ASSERT(!std::binary_search(edge_list.begin(), edge_list.end(), std::make_tuple(1, 8, 8009)));
+      CPPUNIT_ASSERT(!std::binary_search(edge_list.begin(), edge_list.end(), std::make_tuple(2, 10, 9011)));
+    }
+  }
 
   void testExodusIGASidesets ()
   {
