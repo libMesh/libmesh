@@ -1444,6 +1444,30 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
         // Creates vector if not already there
         auto & vec = edge_map[edge_key];
         vec.emplace_back(elem->id(), e);
+
+        // If edge_ptr is a higher-order Elem (EDGE3 or higher) then also add
+        // a map entry for the lower-order (EDGE2) element which has matching
+        // vertices. This allows us to match lower-order edge blocks to edges
+        // of higher-order 3D elems (e.g. HEX20, TET10) and simplifies the
+        // definition of edge blocks.
+        if (edge_ptr->default_order() != FIRST)
+          {
+            // Construct a temporary low-order edge so that we can compute its key()
+            auto low_order_edge =
+              Elem::build(Elem::first_order_equivalent_type(edge_ptr->type()));
+
+            // Assign node pointers to low-order edge
+            for (unsigned int v=0; v<edge_ptr->n_vertices(); ++v)
+              low_order_edge->set_node(v) = edge_ptr->node_ptr(v);
+
+            // Compute the key for the temporary low-order edge we just built
+            dof_id_type low_order_edge_key = low_order_edge->key();
+
+            // Add this key to the map associated with the same (elem,
+            // edge) pair as the higher-order edge
+            auto & low_order_vec = edge_map[low_order_edge_key];
+            low_order_vec.emplace_back(elem->id(), e);
+          }
       }
 
   // Get reference to the mesh's BoundaryInfo object, as we will be
@@ -1533,9 +1557,12 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
                     build_edge_ptr(edge_ptr, elem_edge_pair.second);
 
                   // Determine whether this candidate edge is a "real" match,
-                  // i.e. also has the same orientation.
+                  // i.e. also has the same orientation. Note that here we
+                  // only check that the vertices match regardless of how many
+                  // nodes the edge has, which allows us to match a lower-order
+                  // edge to a higher-order Elem.
                   bool is_match = true;
-                  for (int n=0; n<num_nodes_per_edge; ++n)
+                  for (unsigned int n=0; n<edge_ptr->n_vertices(); ++n)
                     if (edge_ptr->node_id(n) != edge->node_id(n))
                       {
                         is_match = false;
