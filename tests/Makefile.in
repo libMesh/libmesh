@@ -264,6 +264,7 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	meshes/bad_64bit_elem_integers.e \
 	meshes/good_32bit_elem_integers.e \
 	meshes/mesh_assign_test_mesh.xda \
+	meshes/mesh_with_low_order_edge_blocks.e \
 	meshes/shark_tooth_tri6.xda.gz meshes/tetgen_one_tet10.ele \
 	meshes/tetgen_one_tet10.node fparser/autodiff.C
 am__dirstamp = $(am__leading_dot)dirstamp
@@ -453,6 +454,7 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	meshes/bad_64bit_elem_integers.e \
 	meshes/good_32bit_elem_integers.e \
 	meshes/mesh_assign_test_mesh.xda \
+	meshes/mesh_with_low_order_edge_blocks.e \
 	meshes/shark_tooth_tri6.xda.gz meshes/tetgen_one_tet10.ele \
 	meshes/tetgen_one_tet10.node fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_4 = fparser/unit_tests_devel-autodiff.$(OBJEXT)
@@ -636,6 +638,7 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	meshes/bad_64bit_elem_integers.e \
 	meshes/good_32bit_elem_integers.e \
 	meshes/mesh_assign_test_mesh.xda \
+	meshes/mesh_with_low_order_edge_blocks.e \
 	meshes/shark_tooth_tri6.xda.gz meshes/tetgen_one_tet10.ele \
 	meshes/tetgen_one_tet10.node fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_6 = fparser/unit_tests_oprof-autodiff.$(OBJEXT)
@@ -819,6 +822,7 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	meshes/bad_64bit_elem_integers.e \
 	meshes/good_32bit_elem_integers.e \
 	meshes/mesh_assign_test_mesh.xda \
+	meshes/mesh_with_low_order_edge_blocks.e \
 	meshes/shark_tooth_tri6.xda.gz meshes/tetgen_one_tet10.ele \
 	meshes/tetgen_one_tet10.node fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_8 = fparser/unit_tests_opt-autodiff.$(OBJEXT)
@@ -1002,6 +1006,7 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	meshes/bad_64bit_elem_integers.e \
 	meshes/good_32bit_elem_integers.e \
 	meshes/mesh_assign_test_mesh.xda \
+	meshes/mesh_with_low_order_edge_blocks.e \
 	meshes/shark_tooth_tri6.xda.gz meshes/tetgen_one_tet10.ele \
 	meshes/tetgen_one_tet10.node fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_10 = fparser/unit_tests_prof-autodiff.$(OBJEXT)
@@ -2168,6 +2173,7 @@ data = meshes/1_quad.bxt.gz \
        meshes/bad_64bit_elem_integers.e \
        meshes/good_32bit_elem_integers.e \
        meshes/mesh_assign_test_mesh.xda \
+       meshes/mesh_with_low_order_edge_blocks.e \
        meshes/shark_tooth_tri6.xda.gz \
        meshes/tetgen_one_tet10.ele \
        meshes/tetgen_one_tet10.node
