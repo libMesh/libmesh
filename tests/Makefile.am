@@ -144,6 +144,7 @@ data = meshes/1_quad.bxt.gz \
        meshes/bad_64bit_elem_integers.e \
        meshes/good_32bit_elem_integers.e \
        meshes/mesh_assign_test_mesh.xda \
+       meshes/mesh_with_low_order_edge_blocks.e \
        meshes/shark_tooth_tri6.xda.gz \
        meshes/tetgen_one_tet10.ele \
        meshes/tetgen_one_tet10.node
