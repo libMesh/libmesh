@@ -49,7 +49,7 @@ public:
    * in the protected data section of the class.
    */
   explicit
-  LaplaceMeshSmoother(UnstructuredMesh & mesh);
+  LaplaceMeshSmoother(UnstructuredMesh & mesh, bool smooth_boundary = false);
 
   /**
    * Destructor.
@@ -97,6 +97,11 @@ private:
    * True if the L-graph has been created, false otherwise.
    */
   bool _initialized;
+
+  /**
+   * Allow boundary nodes to move tangentially
+   */
+  bool _smooth_boundary;
 
   /**
    * Data structure for holding the L-graph

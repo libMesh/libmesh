@@ -34,9 +34,10 @@
 namespace libMesh
 {
 // LaplaceMeshSmoother member functions
-LaplaceMeshSmoother::LaplaceMeshSmoother(UnstructuredMesh & mesh)
+LaplaceMeshSmoother::LaplaceMeshSmoother(UnstructuredMesh & mesh, bool smooth_boundary)
   : MeshSmoother(mesh),
-    _initialized(false)
+    _initialized(false),
+    _smooth_boundary(smooth_boundary)
 {
 }
 
@@ -54,10 +55,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
   auto on_boundary = MeshTools::find_boundary_nodes(_mesh);
 
   // Also: don't smooth block boundary nodes
-  auto on_block_boundary = MeshTools::find_block_boundary_nodes(_mesh);
-
-  // Merge them
-  on_boundary.insert(on_block_boundary.begin(), on_block_boundary.end());
+  auto subdomain_boundary_map = MeshTools::build_subdomain_boundary_node_map(_mesh);
 
   // We can only update the nodes after all new positions were
   // determined. We store the new positions here
@@ -67,11 +65,11 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
     {
       new_positions.resize(_mesh.max_node_id());
 
-      auto calculate_new_position = [this, &on_boundary, &new_positions](const Node * node) {
+      auto calculate_new_position = [this, &new_positions](const Node * node) {
         // leave the boundary intact
         // Only relocate the nodes which are vertices of an element
         // All other entries of _graph (the secondary nodes) are empty
-        if (!on_boundary.count(node->id()) && (_graph[node->id()].size() > 0))
+        if (_graph[node->id()].size() > 0)
           {
             Point avg_position(0.,0.,0.);
 
@@ -100,16 +98,142 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
                                   _mesh.pid_nodes_end(DofObject::invalid_processor_id)))
         calculate_new_position(node);
 
+      // update node position
+      auto update_node_position = [this, &new_positions, &subdomain_boundary_map, &on_boundary](Node * node)
+      {
+        if (_graph[node->id()].size() == 0)
+          return;
+
+        // check if a node is on a given block boundary
+        auto is_node_on_block_boundary = [&subdomain_boundary_map](dof_id_type node_id, const std::pair<subdomain_id_type, subdomain_id_type> & block_boundary)
+        {
+          const auto it = subdomain_boundary_map.find(node_id);
+          if (it == subdomain_boundary_map.end())
+            return false;
+          return it->second.count(block_boundary) > 0;
+        };
+
+        // check if a series of vectors is collinear/coplanar
+        RealVectorValue base;
+        std::size_t n_edges = 0;
+        auto has_zero_curvature = [this, &node, &base, &n_edges](dof_id_type connected_id) {
+          const auto connected_node = _mesh.point(connected_id);
+          RealVectorValue vec = connected_node - *node;
+          const auto vec_norm_sq = vec.norm_sq();
+          // if any connected edge has length zero we give up and don't move the node
+          if (vec_norm_sq < libMesh::TOLERANCE * libMesh::TOLERANCE)
+            return false;
+
+          // normalize
+          vec /= std::sqrt(vec_norm_sq);
+
+          // count edges
+          n_edges++;
+
+          // store first two edges for later projection
+          if (n_edges == 1)
+            {
+              base = vec;
+              return true;
+            }
+
+          // 2D - collinear - check cross product of first edge with all other edges.
+          // curvature is only zero if the second connected edge spans a zero area
+          // parallelogram with teh first edge. There shouldn't be a third edge, but if there
+          // ever is, we enforce it to be collinear as well.
+          if (_mesh.mesh_dimension() == 2)
+            return (base.cross(vec).norm_sq() < libMesh::TOLERANCE * libMesh::TOLERANCE);
+
+          // 3D - we compute the cross product of the first and second edge...
+          if (n_edges == 2)
+            {
+              const auto cross = base.cross(vec);
+              const auto cross_norm_sq = cross.norm_sq();
+              // if the second edge is collinear to the first we simply drop it. This does not violate
+              // coplanarity, but it is insufficient to construct a normal for the tangent plane to check the
+              // remaining edges against.
+              if (cross_norm_sq < libMesh::TOLERANCE * libMesh::TOLERANCE)
+                n_edges--;
+              else
+                base = cross / std::sqrt(cross_norm_sq);
+              return true;
+            }
+
+          // edges 3 and up are coplanar if they are orthogonal to the normal vector of the tangent
+          // plane calculated above.
+          return (base * vec < libMesh::TOLERANCE);
+        };
+
+        const auto it = subdomain_boundary_map.find(node->id());
+        if (it != subdomain_boundary_map.end())
+        {
+          if (!_smooth_boundary)
+            return;
+
+          const auto num_boundaries = it->second.size();
+
+          // do not touch nodes at the intersection of two or more boundaries
+          if (num_boundaries > 1 || on_boundary.count(node->id()) > 0)
+            return;
+
+          if (num_boundaries == 1)
+            {
+              // project to block boundary
+              const auto & boundary = *(it->second.begin());
+              // iterate over neighboring nodes that share the same boundary and check if all edges are coplanar/collinear
+              for (const auto & connected_id : _graph[node->id()])
+                if (is_node_on_block_boundary(connected_id, boundary) && !has_zero_curvature(connected_id))
+                  return;
+              // we have not failed the curvature check, but do we have enough edges?
+              if (n_edges < _mesh.mesh_dimension())
+                return;
+
+              // now project
+              auto delta = new_positions[node->id()] - *node;
+              if (_mesh.mesh_dimension() == 2)
+                delta = base * (delta * base);
+              else
+                delta -= base * (delta * base);
+              *node += delta;
+              return;
+            }
+        }
+
+        if (on_boundary.count(node->id()))
+        {
+          if (!_smooth_boundary)
+            return;
+
+          // project to boundary
+          for (const auto & connected_id : _graph[node->id()])
+            if (on_boundary.count(connected_id) && !has_zero_curvature(connected_id))
+              return;
+          // we have not failed the curvature check, but do we have enough edges?
+          if (n_edges < _mesh.mesh_dimension())
+            return;
+
+          // now project
+          auto delta = new_positions[node->id()] - *node;
+          if (_mesh.mesh_dimension() == 2)
+            delta = base * (delta * base);
+          else
+            delta -= base * (delta * base);
+          *node += delta;
+          return;
+        }
+
+
+        // otherwise just move the node freely
+        *node = new_positions[node->id()];
+      };
 
       // now update the node positions (local and unpartitioned nodes only)
       for (auto & node : _mesh.local_node_ptr_range())
-        if (!on_boundary.count(node->id()) && (_graph[node->id()].size() > 0))
-          *node = new_positions[node->id()];
+        update_node_position(node);
 
       for (auto & node : as_range(_mesh.pid_nodes_begin(DofObject::invalid_processor_id),
                                   _mesh.pid_nodes_end(DofObject::invalid_processor_id)))
-        if (!on_boundary.count(node->id()) && (_graph[node->id()].size() > 0))
-          *node = new_positions[node->id()];
+        update_node_position(node);
 
       // Now the nodes which are ghosts on this processor may have been moved on
       // the processors which own them.  So we need to synchronize with our neighbors

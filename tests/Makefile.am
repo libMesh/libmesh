@@ -68,6 +68,7 @@ unit_tests_sources = \
   mesh/mesh_function_dfem.C \
   mesh/mesh_generation_test.C \
   mesh/mesh_input.C \
+  mesh/mesh_smoother.C \
   mesh/mesh_stitch.C \
   mesh/mesh_triangulation.C \
   mesh/mixed_dim_mesh_test.C \
@@ -145,6 +146,12 @@ data = meshes/1_quad.bxt.gz \
        meshes/good_32bit_elem_integers.e \
        meshes/mesh_assign_test_mesh.xda \
        meshes/shark_tooth_tri6.xda.gz \
+       meshes/smooth2d_in.e \
+       meshes/smooth2d_move.e \
+       meshes/smooth2d_nomove.e \
+       meshes/smooth3d_in.e \
+       meshes/smooth3d_move.e \
+       meshes/smooth3d_nomove.e \
        meshes/tetgen_one_tet10.ele \
        meshes/tetgen_one_tet10.node
 

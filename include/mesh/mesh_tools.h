@@ -130,6 +130,13 @@ std::unordered_set<dof_id_type> find_boundary_nodes(const MeshBase & mesh);
 std::unordered_set<dof_id_type> find_block_boundary_nodes(const MeshBase & mesh);
 
 /**
+ * Returns a std::multimap for all block boundary nodes, listing all subdomain id pairs
+ * for each block boundary the node is on
+ */
+std::map<dof_id_type, std::set<std::pair<subdomain_id_type, subdomain_id_type>>>
+build_subdomain_boundary_node_map(const MeshBase & mesh);
+
+/**
  * \returns A BoundingBox that bounds the mesh.
  */
 libMesh::BoundingBox

@@ -549,6 +549,35 @@ MeshTools::find_block_boundary_nodes(const MeshBase & mesh)
 }
 
 
+std::map<dof_id_type, std::set<std::pair<subdomain_id_type, subdomain_id_type>>>
+MeshTools::build_subdomain_boundary_node_map(const MeshBase & mesh)
+{
+  std::map<dof_id_type, std::set<std::pair<subdomain_id_type, subdomain_id_type>>> block_boundary_node_map;
+
+  // Loop over elements, find those on a block boundary, and
+  // add each boundary the node is on as a subdomain id pair
+  for (const auto & elem : mesh.active_element_ptr_range())
+  {
+    const auto id1 = elem->subdomain_id();
+    for (auto s : elem->side_index_range())
+      {
+        if (elem->neighbor_ptr(s))
+          {
+            const auto id2 = elem->neighbor_ptr(s)->subdomain_id();
+            if (id2 != id1)
+              {
+                auto nodes_on_side = elem->nodes_on_side(s);
+
+                for (auto & local_id : nodes_on_side)
+                  block_boundary_node_map[elem->node_ptr(local_id)->id()].insert(std::minmax(id1, id2));
+              }
+          }
+      }
+  }
+
+  return block_boundary_node_map;
+}
+
 
 libMesh::BoundingBox
 MeshTools::create_bounding_box (const MeshBase & mesh)
