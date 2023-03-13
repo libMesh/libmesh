@@ -132,6 +132,7 @@ BUILT_SOURCES = \
         elem_range.h \
         elem_side_builder.h \
         face.h \
+        face_generic.h \
         face_inf_quad.h \
         face_inf_quad4.h \
         face_inf_quad6.h \
@@ -965,6 +966,9 @@ elem_side_builder.h: $(top_srcdir)/include/geom/elem_side_builder.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face.h: $(top_srcdir)/include/geom/face.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_generic.h: $(top_srcdir)/include/geom/face_generic.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_inf_quad.h: $(top_srcdir)/include/geom/face_inf_quad.h
