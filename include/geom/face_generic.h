@@ -41,7 +41,7 @@ public:
    * Generic 2D element, takes number of nodes and an optional
    * parent. Order and interpretation of the nodes is up to the user.
    */
-  GenericFace(const unsigned int nn, Elem * p = nullptr) : Face(nn, 0, p, nullptr, nullptr)
+  GenericFace(const unsigned int nn, Elem * p = nullptr) : Face(nn, 0, p, &_parent_link, nullptr)
   {
     // copy nodes
     _nodelinks_data.resize(nn);
@@ -187,7 +187,12 @@ public:
 
   virtual void orient(BoundaryInfo *) override final {}
 
-  virtual ElemType type() const override { return INVALID_ELEM; }
+  virtual ElemType type() const override { return GENERIC_FACE; }
+
+  /**
+   * \returns True if the element supports libmesh quadrature
+   */
+  virtual bool has_quadrature_support() const { return false; }
 
   virtual unsigned int n_sub_elem() const override { return 1; }
 
@@ -278,6 +283,8 @@ protected:
    * node locations
    */
   std::vector<Node *> _nodelinks_data;
+
+  Elem * _parent_link;
 };
 
 } // namespace libMesh
