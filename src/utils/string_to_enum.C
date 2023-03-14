@@ -167,6 +167,8 @@ void init_elem_type_to_enum ()
       elem_type_to_enum["NODE"           ]=NODEELEM;
       elem_type_to_enum["NODEELEM"       ]=NODEELEM;
 
+      elem_type_to_enum["GENERIC_FACE"   ]=GENERIC_FACE;
+
       elem_type_to_enum["INVALID_ELEM"   ]=INVALID_ELEM;
     }
 }
