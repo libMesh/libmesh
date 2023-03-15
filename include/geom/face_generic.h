@@ -81,7 +81,7 @@ public:
   /**
    * \returns 3.  All triangles have 3 vertices.
    */
-  virtual unsigned int n_vertices() const override final { libmesh_error_msg("Generic 2d elements cannot distinguish between nodes and vertices");; }
+  virtual unsigned int n_vertices() const override final { return n_nodes(); }
 
   /**
    * \returns 3.  All triangles have 3 edges.
