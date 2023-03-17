@@ -77,6 +77,21 @@ public:
     CPPUNIT_ASSERT_EQUAL((intptr_t)read_only_values, (intptr_t)values);
 
     v.restore_array();
+
+    // Test to make sure we can get arrays after other operators
+    for (unsigned int i = 0; i < local_size; i++)
+      v.set(my_offset + i, i * 2.0);
+    v.close();
+    for (unsigned int i = 0; i < local_size; i++)
+      LIBMESH_ASSERT_FP_EQUAL(i * 2.0, std::abs(v(my_offset + i)), TOLERANCE * TOLERANCE);
+    values = v.get_array();
+    read_only_values = v.get_array_read();
+    for (unsigned int i = 0; i < local_size; i++)
+    {
+      LIBMESH_ASSERT_FP_EQUAL(i * 2.0, std::abs(values[i]), TOLERANCE * TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(i * 2.0, std::abs(read_only_values[i]), TOLERANCE * TOLERANCE);
+    }
+    v.restore_array();
   }
 
   void testPetscOperations()

@@ -1110,8 +1110,8 @@ template <typename T>
 inline
 PetscScalar * PetscVector<T>::get_array()
 {
-  _values_manually_retrieved = true;
   _get_array(false);
+  _values_manually_retrieved = true;
 
   return _values;
 }
@@ -1121,8 +1121,8 @@ template <typename T>
 inline
 const PetscScalar * PetscVector<T>::get_array_read() const
 {
-  _values_manually_retrieved = true;
   _get_array(true);
+  _values_manually_retrieved = true;
 
   return _read_only_values;
 }
