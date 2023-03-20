@@ -54,6 +54,9 @@ public:
   // This covers an old poly2tri collinearity-tolerance bug
   CPPUNIT_TEST( testPoly2TriHolesExtraRefined );
 
+  // This covers a more recent tolerance bug when verifying holes
+  CPPUNIT_TEST( testPoly2TriHolePerturbed );
+
   CPPUNIT_TEST( testPoly2TriNonUniformRefined );
   CPPUNIT_TEST( testPoly2TriHolesNonUniformRefined );
 #endif
@@ -64,6 +67,7 @@ public:
   CPPUNIT_TEST( testTriangleInterp );
   CPPUNIT_TEST( testTriangleInterp2 );
   CPPUNIT_TEST( testTriangleHoles );
+  CPPUNIT_TEST( testTriangleHolePerturbed );
   CPPUNIT_TEST( testTriangleMeshedHoles );
   CPPUNIT_TEST( testTriangleEdges );
   CPPUNIT_TEST( testTriangleSegments );
@@ -84,7 +88,7 @@ public:
     triangulator.triangulation_type() = TriangulatorInterface::PSLG;
 
     // Don't try to insert points unless we're requested to later
-    triangulator.desired_area() = 1000;
+    triangulator.desired_area() = 1e16;
     triangulator.minimum_angle() = 0;
     triangulator.smooth_after_generating() = false;
     triangulator.set_verify_hole_boundaries(true);
@@ -469,6 +473,50 @@ public:
   }
 
 
+  void testTriangulatorHolePerturbed(MeshBase & mesh,
+                                     TriangulatorInterface & triangulator)
+  {
+    // Points based on a simplification of a hole verification failure
+    // case
+    mesh.add_point(Point(100,0), 0);
+    mesh.add_point(Point(100,100), 1);
+    mesh.add_point(Point(0,100), 2);
+    mesh.add_point(Point(-100,100), 3);
+    mesh.add_point(Point(-100,0), 4);
+    mesh.add_point(Point(-100,-100), 5);
+    mesh.add_point(Point(0,-100), 6);
+    mesh.add_point(Point(100,-100), 7);
+
+    commonSettings(triangulator);
+
+    // Add a diamond hole in *almost* the center
+    TriangulatorInterface::PolygonHole
+      diamond(Point(0,4.e-16),
+              std::sqrt(2)/2, 4);
+    const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
+    triangulator.attach_hole_list(&holes);
+
+    triangulator.triangulate();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(12));
+
+    // Center coordinates for all the elements we expect
+    const Real r2p200o6 = (std::sqrt(Real(2))+200)/6,
+               r2p400o6 = (std::sqrt(Real(2))+400)/6;
+
+    std::vector <Point> expected_centers
+    { {r2p400o6,100./3}, {-r2p400o6,100./3},
+      {r2p400o6,-100./3}, {-r2p400o6,-100./3},
+      {100./3,r2p400o6}, {-100./3,r2p400o6},
+      {100./3,-r2p400o6}, {-100./3,-r2p400o6},
+      {r2p200o6,r2p200o6}, {-r2p200o6,r2p200o6},
+      {r2p200o6,-r2p200o6}, {-r2p200o6,-r2p200o6},
+    };
+
+    testFoundCenters(mesh, expected_centers);
+  }
+
+
   void testTriangulatorMeshedHoles(MeshBase & mesh,
                                    TriangulatorInterface & triangulator)
   {
@@ -652,6 +700,16 @@ public:
   }
 
 
+  void testTriangleHolePerturbed()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    TriangleInterface triangle(mesh);
+    testTriangulatorHolePerturbed(mesh, triangle);
+  }
+
+
   void testTriangleMeshedHoles()
   {
     LOG_UNIT_TEST;
@@ -733,6 +791,16 @@ public:
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulatorHoles(mesh, p2t_tri);
+  }
+
+
+  void testPoly2TriHolePerturbed()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator p2t_tri(mesh);
+    testTriangulatorHolePerturbed(mesh, p2t_tri);
   }
 
 
