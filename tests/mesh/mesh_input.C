@@ -148,6 +148,11 @@ public:
   CPPUNIT_TEST( testExodusFileMappingsTwoBlocks);
   CPPUNIT_TEST( testExodusFileMappingsTwoElemIGA);
   CPPUNIT_TEST( testExodusFileMappingsCyl3d);
+
+  CPPUNIT_TEST( testExodusDiscPlateWithHole);
+  CPPUNIT_TEST( testExodusDiscTwoBlocks);
+  CPPUNIT_TEST( testExodusDiscTwoElemIGA);
+  CPPUNIT_TEST( testExodusDiscCyl3d);
 #endif // LIBMESH_HAVE_EXODUS_API
 
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
@@ -1577,7 +1582,9 @@ public:
                            0.707998701597943, 1.31399222566683}});
   }
 
-  void testExodusFileMappings (const std::string & filename, std::array<Real, 4> expected_norms)
+  void testExodusFileMappings (const std::string & filename,
+                               std::array<Real, 4> expected_norms,
+                               bool use_disc_bex = false)
   {
     Mesh mesh(*TestCommWorld);
 
@@ -1585,6 +1592,10 @@ public:
     // IGA Exodus meshes require ExodusII 8 or higher
     if (exii.get_exodus_version() < 800)
       return;
+
+    // This should default to false
+    if (use_disc_bex)
+      exii.set_discontinuous_bex(true);
 
     if (mesh.processor_id() == 0)
       exii.read(filename);
@@ -1652,6 +1663,55 @@ public:
     testExodusFileMappings("meshes/PressurizedCyl3d_Patch1_8Elem.e",
                            {{0.963612880188165, 1.82329452603503,
                              0.707998701597943, 1.31399222566683}});
+  }
+
+  void testExodusDiscPlateWithHole ()
+  {
+    LOG_UNIT_TEST;
+
+    testExodusFileMappings("meshes/PlateWithHole_Patch8.e",
+    // Regression values for sin_x_plus_cos_y
+    //
+    // These are *not* the same as for the continuous plate, because
+    // we do the C^TKCx=C^Tf trick to pull back projections to the
+    // spline nodes, and the pseudoinverse here minimizes the error in
+    // a discretization-dependent norm, not in a Sobolev norm.  For
+    // these coarse meshes, our Sobolev norms can end up being ~0.1%
+    // different.
+                           {{2.28234312456534, 1.97439548757586,
+                             1.79290449809266, 1.41075128955985}},
+                             true);
+  }
+
+  void testExodusDiscTwoBlocks ()
+  {
+    LOG_UNIT_TEST;
+
+    testExodusFileMappings("meshes/two_quads_two_blocks.e",
+    // Regression values for sin_x_plus_cos_y
+                           {{2.03496953073072, 1.97996853164955,
+                             1.18462134113435, 1.03085301158959}},
+                             true);
+  }
+  void testExodusDiscTwoElemIGA()
+  {
+    LOG_UNIT_TEST;
+
+    testExodusFileMappings("meshes/two_element_iga_in.e",
+    // Regression values for sin_x_plus_cos_y
+                           {{1.26877626663365, 1.42553698909339,
+                             1.54810114917177, 1.29792704408979}},
+                             true);
+  }
+
+  void testExodusDiscCyl3d ()
+  {
+    LOG_UNIT_TEST;
+
+    testExodusFileMappings("meshes/PressurizedCyl3d_Patch1_8Elem.e",
+                           {{0.963855209590556, 1.8234396424318,
+                             0.708286572453382, 1.31468940958327}},
+                             true);
   }
 };
 
