@@ -201,6 +201,13 @@ public:
                             unsigned int timestep,
                             std::vector<Real> & global_values);
 
+  /**
+   * Set to true (the default) to write files in an HDF5-based file
+   * format (when HDF5 is available), or to false to write files in
+   * the old NetCDF3-based format.  If HDF5 is unavailable, this
+   * setting does nothing.
+   */
+  void set_hdf5_writing(bool write_hdf5);
 
 private:
 

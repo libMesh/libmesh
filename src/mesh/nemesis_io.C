@@ -1813,7 +1813,10 @@ void Nemesis_IO::read_global_variable(std::vector<std::string> global_var_names,
     }
 }
 
-
+void Nemesis_IO::set_hdf5_writing(bool write_hdf5)
+{
+    nemhelper->set_hdf5_writing(write_hdf5);
+}
 
 #else
 
@@ -1834,6 +1837,8 @@ void Nemesis_IO::copy_nodal_solution(System &, std::string, std::string, unsigne
 {
   libmesh_error_msg("ERROR, Nemesis API is not defined.");
 }
+
+void Nemesis_IO::set_hdf5_writing(bool) {}
 
 #endif // #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
