@@ -569,6 +569,17 @@ public:
   void set_hdf5_writing(bool write_hdf5);
 
   /**
+   * Set to true (false is the default) to generate independent nodes
+   * for every Bezier Extraction element in an input file containing
+   * them, causing those elements to be disconnected from each other.
+   * (Their vertices will be multiple distinct nodes at overlapping
+   * points.)  If this is false, Bezier Extraction elements will be
+   * connected where possible, thereby using fewer redundancies and
+   * less memory, but the input mesh will need to be conforming.
+   */
+  void set_discontinuous_bex(bool disc_bex);
+
+  /**
    * This function factors out a bunch of code which is common to the
    * write_nodal_data() and write_nodal_data_discontinuous() functions
    */
@@ -636,6 +647,12 @@ private:
    * by not writing out.
    */
   bool _write_complex_abs;
+
+  /**
+   * Set to true (false is the default) to generate independent nodes
+   * for every Bezier Extraction element.
+   */
+  bool _disc_bex;
 };
 
 

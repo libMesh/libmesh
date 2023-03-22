@@ -2070,6 +2070,12 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
   // to get C^T*K*C*x = C^T*f - C^T*K*h
   // - a constrained and no-longer-singular system that finds the
   // closest approximation for the unconstrained degrees of freedom.
+  //
+  // Here, though "closest" is in an algebraic sense; we're
+  // effectively using a pseudoinverse that optimizes in a
+  // discretization-dependent norm.  That only seems to give ~0.1%
+  // excess error even in coarse unit test cases, but at some point it
+  // might be reasonable to weight K and f properly.
 
   for (dof_id_type d : IntRange<dof_id_type>(dof_map.first_dof(),
                                              dof_map.end_dof()))

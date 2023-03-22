@@ -137,7 +137,8 @@ ExodusII_IO::ExodusII_IO (MeshBase & mesh,
   _append(false),
 #endif
   _allow_empty_variables(false),
-  _write_complex_abs(true)
+  _write_complex_abs(true),
+  _disc_bex(false)
 {
 }
 
@@ -620,7 +621,12 @@ void ExodusII_IO::read (const std::string & fname)
                       Node *n = mesh.add_point(p);
                       if (weights_exist)
                         n->set_extra_datum<Real>(weight_index, w);
-                      local_nodes[key] = n;
+
+                      // If we're building disconnected Bezier
+                      // extraction elements then we don't want to
+                      // find the new nodes to reuse later.
+                      if (!_disc_bex)
+                        local_nodes[key] = n;
                       elem->set_node(dyna_elem_defn.nodes[elem_node_index]) = n;
 
                       constraint_rows[n] = constraint_row;
@@ -2346,6 +2352,12 @@ ExodusII_IO_Helper & ExodusII_IO::get_exio_helper()
 void ExodusII_IO::set_hdf5_writing(bool write_hdf5)
 {
   exio_helper->set_hdf5_writing(write_hdf5);
+}
+
+
+void ExodusII_IO::set_discontinuous_bex(bool disc_bex)
+{
+  _disc_bex = disc_bex;
 }
 
 
