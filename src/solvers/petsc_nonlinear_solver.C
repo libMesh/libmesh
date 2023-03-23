@@ -64,6 +64,8 @@ libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx)
   PetscNonlinearSolver<Number> * solver =
     static_cast<PetscNonlinearSolver<Number> *> (ctx);
 
+  libmesh_parallel_only(solver->comm());
+
   // Get the current iteration number from the snes object,
   // store it in the PetscNonlinearSolver object for possible use
   // by the user's residual function.
@@ -171,6 +173,8 @@ extern "C"
   {
     ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, ctx);
 
+    libmesh_parallel_only(rc.sys.comm());
+
     libmesh_assert(r);
     PetscVector<Number> R(r, rc.sys.comm());
 
@@ -247,6 +251,8 @@ extern "C"
   {
     ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, ctx);
 
+    libmesh_parallel_only(rc.sys.comm());
+
     libmesh_assert(r);
     PetscVector<Number> R(r, rc.sys.comm());
 
@@ -295,6 +301,8 @@ extern "C"
   libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
     ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, ctx);
+
+    libmesh_parallel_only(rc.sys.comm());
 
     libmesh_assert(r);
     PetscVector<Number> R(r, rc.sys.comm());
@@ -438,6 +446,8 @@ extern "C"
     PetscNonlinearSolver<Number> * solver =
       static_cast<PetscNonlinearSolver<Number> *> (ctx);
 
+    libmesh_parallel_only(solver->comm());
+
     // Get the current iteration number from the snes object,
     // store it in the PetscNonlinearSolver object for possible use
     // by the user's Jacobian function.
@@ -520,7 +530,7 @@ extern "C"
 
   // This function gets called by PETSc in place of the standard Petsc line searches
   // if a linesearch object is supplied to the PetscNonlinearSolver class. It wraps
-  // the lineserach algorithm implemented on the linesearch object.
+  // the linesearch algorithm implemented on the linesearch object.
   // * "linesearch" is an object that can be used to access the non-linear and linear solution
   // vectors as well as the residual and SNES object
   // * "ctx" is the PetscNonlinearSolver context
@@ -529,6 +539,8 @@ extern "C"
     // No way to safety-check this cast, since we got a void *...
     PetscNonlinearSolver<Number> * solver =
       static_cast<PetscNonlinearSolver<Number> *> (ctx);
+
+    libmesh_parallel_only(solver->comm());
 
     solver->linesearch_object->linesearch(linesearch);
     return 0;
@@ -569,6 +581,8 @@ extern "C"
     // Cast the context to a NonlinearSolver object.
     PetscNonlinearSolver<Number> * solver =
       static_cast<PetscNonlinearSolver<Number> *> (context);
+
+    libmesh_parallel_only(solver->comm());
 
     // If the user has provided both postcheck function pointer and
     // object, this is ambiguous, so throw an error.
@@ -687,6 +701,8 @@ void PetscNonlinearSolver<T>::clear ()
 template <typename T>
 void PetscNonlinearSolver<T>::init (const char * name)
 {
+  parallel_object_only();
+
   // Initialize the data structures if not done so already.
   if (!this->initialized())
     {
@@ -787,6 +803,8 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
                                               void (*computeSubspace)(std::vector<NumericVector<Number> *> &, sys_type &),
                                               MatNullSpace * msp)
 {
+  parallel_object_only();
+
   PetscErrorCode ierr;
   std::vector<NumericVector<Number> *> sp;
   if (computeSubspaceObject)
@@ -852,6 +870,8 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
                                 const double,              // Stopping tolerance
                                 const unsigned int)
 {
+  parallel_object_only();
+
   LOG_SCOPE("solve()", "PetscNonlinearSolver");
   this->init ();
 
