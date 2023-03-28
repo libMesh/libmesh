@@ -56938,7 +56938,6 @@ fi
 
                               my_top_srcdir="$(cd $srcdir && pwd)"
 
-
           if test "x$build_metaphysicl" = "xyes"; then :
 
                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with built-in MetaPhysicL support >>>" >&5
@@ -57035,7 +57034,7 @@ ac_abs_srcdir=$ac_abs_top_srcdir$ac_dir_suffix
       as_fn_append ax_args " '--with-cxx-std=20$acsm_cxx_version'"
       as_fn_append ax_args " 'CPPFLAGS=-I$my_top_srcdir/contrib/timpi/src/algorithms/include/ -I$my_top_srcdir/contrib/timpi/src/parallel/include/ -I$my_top_srcdir/contrib/timpi/src/utilities/include/ -I$ac_abs_top_builddir/contrib/timpi/src/utilities/include/ $CPPFLAGS'"
       as_fn_append ax_args " 'LDFLAGS=-L$ac_abs_top_builddir/contrib/timpi/src/ $LDFLAGS'"
-      as_fn_append ax_args " 'TIMPI_DIR=$my_top_srcdir/contrib/timpi/'"
+      as_fn_append ax_args " '--with-future-timpi-dir=$prefix'"
       as_fn_append ax_args " '--with-timpi-method=$my_method'"
 
       # New options that may need to be merged with existing options.
