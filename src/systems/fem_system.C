@@ -272,29 +272,46 @@ void add_element_system(FEMSystem & _sys,
 
   if (_get_residual && _get_jacobian)
     {
-      if (_constrain_heterogeneously)
-        _sys.get_dof_map().heterogenously_constrain_element_matrix_and_vector
-          (_femcontext.get_elem_jacobian(),
-           _femcontext.get_elem_residual(),
-           _femcontext.get_dof_indices(), !constrain_in_solver);
+      if (constrain_in_solver)
+        {
+          if (_constrain_heterogeneously)
+            _sys.get_dof_map().heterogenously_constrain_element_matrix_and_vector
+              (_femcontext.get_elem_jacobian(),
+               _femcontext.get_elem_residual(),
+               _femcontext.get_dof_indices(), false);
+          else if (!_no_constraints)
+            _sys.get_dof_map().constrain_element_matrix_and_vector
+              (_femcontext.get_elem_jacobian(),
+               _femcontext.get_elem_residual(),
+               _femcontext.get_dof_indices(), false);
+        }
       else if (!_no_constraints)
-        _sys.get_dof_map().constrain_element_matrix_and_vector
+        _sys.get_dof_map().heterogeneously_constrain_element_jacobian_and_residual
           (_femcontext.get_elem_jacobian(),
            _femcontext.get_elem_residual(),
-           _femcontext.get_dof_indices(), !constrain_in_solver);
+           _femcontext.get_dof_indices(),
+           *_sys.current_local_solution);
       // Do nothing if (_no_constraints)
     }
   else if (_get_residual)
     {
-      if (_constrain_heterogeneously)
-        _sys.get_dof_map().heterogenously_constrain_element_vector
-          (_femcontext.get_elem_jacobian(),
-           _femcontext.get_elem_residual(),
-           _femcontext.get_dof_indices(), !constrain_in_solver);
+      if (constrain_in_solver)
+        {
+          if (_constrain_heterogeneously)
+            _sys.get_dof_map().heterogenously_constrain_element_vector
+              (_femcontext.get_elem_jacobian(),
+               _femcontext.get_elem_residual(),
+               _femcontext.get_dof_indices(), false);
+          else if (!_no_constraints)
+            _sys.get_dof_map().constrain_element_vector
+              (_femcontext.get_elem_residual(),
+               _femcontext.get_dof_indices(), false);
+        }
       else if (!_no_constraints)
-        _sys.get_dof_map().constrain_element_vector
+        _sys.get_dof_map().heterogeneously_constrain_element_residual
           (_femcontext.get_elem_residual(),
-           _femcontext.get_dof_indices(), !constrain_in_solver);
+           _femcontext.get_dof_indices(),
+           *_sys.current_local_solution);
       // Do nothing if (_no_constraints)
     }
   else if (_get_jacobian)
@@ -307,12 +324,6 @@ void add_element_system(FEMSystem & _sys,
                                                      _femcontext.get_dof_indices(),
                                                      !constrain_in_solver);
     }
-
-  if (_get_residual && !_no_constraints && !constrain_in_solver)
-    _sys.get_dof_map().residual_constrain_element_vector
-      (_femcontext.get_elem_residual(),
-       _femcontext.get_dof_indices(),
-       *_sys.current_local_solution);
 #else
   libmesh_ignore(_constrain_heterogeneously, _no_constraints);
 #endif // #ifdef LIBMESH_ENABLE_CONSTRAINTS

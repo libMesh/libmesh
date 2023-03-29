@@ -83,7 +83,7 @@ Real NewtonSolver::line_search(Real tol,
       _system.update();
 
       // Check residual with fractional Newton step
-      _system.assembly (true, false);
+      _system.assembly(true, false, !this->_exact_constraint_enforcement);
 
       rhs.close();
       current_residual = rhs.l2_norm();
@@ -191,7 +191,7 @@ Real NewtonSolver::line_search(Real tol,
 
       // We may need to localize a parallel solution
       _system.update();
-      _system.assembly (true, false);
+      _system.assembly(true, false, !this->_exact_constraint_enforcement);
 
       rhs.close();
       Real fu = current_residual = rhs.l2_norm();
@@ -317,7 +317,7 @@ unsigned int NewtonSolver::solve()
       if (verbose)
         libMesh::out << "Assembling the System" << std::endl;
 
-      _system.assembly(true, true);
+      _system.assembly(true, true, !this->_exact_constraint_enforcement);
       rhs.close();
       Real current_residual = rhs.l2_norm();
 
@@ -472,7 +472,7 @@ unsigned int NewtonSolver::solve()
           !continue_after_max_iterations)
         {
           _system.update ();
-          _system.assembly(true, false);
+          _system.assembly(true, false, !this->_exact_constraint_enforcement);
 
           rhs.close();
           current_residual = rhs.l2_norm();

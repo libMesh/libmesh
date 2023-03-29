@@ -119,7 +119,7 @@ extern "C"
       sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     // Do DiffSystem assembly
-    sys.assembly(true, false);
+    sys.assembly(true, false, !solver.exact_constraint_enforcement());
     R_system.close();
 
     // Swap back
@@ -173,7 +173,7 @@ extern "C"
       sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     // Do DiffSystem assembly
-    sys.assembly(false, true);
+    sys.assembly(false, true, !solver.exact_constraint_enforcement());
     J_system.close();
 
     // Swap back

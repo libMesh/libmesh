@@ -1249,6 +1249,10 @@ public:
    * appropriate for finding linearized updates to a solution in which
    * heterogeneous constraints are already satisfied.
    *
+   * Note the sign difference from the nonlinear heterogeneous constraint
+   * method: Solving u:=K\f has the opposite sign convention from
+   * u:=u_in-J\r, and we apply heterogeneous constraints accordingly.
+   *
    * By default, the constraints for the primal solution of this
    * system are used.  If a non-negative \p qoi_index is passed in,
    * then the constraints for the corresponding adjoint solution are
@@ -1272,7 +1276,67 @@ public:
       (matrix, rhs, elem_dofs, asymmetric_constraint_rows, qoi_index);
   }
 
+  /**
+   * Constrains the element Jacobian and residual.  The element
+   * Jacobian is square, and the elem_dofs should correspond to the
+   * global DOF indices of both the rows and columns of the element
+   * matrix.
+   *
+   * The residual-constraining version of this method creates linear
+   * systems in which heterogeneously constrained degrees of freedom
+   * create non-zero residual terms when not at their correct offset
+   * values, as would be appropriate for finding a solution to a
+   * nonlinear problem in a quasi-Newton solve.
+   *
+   * Note the sign difference from the linear heterogeneous constraint
+   * method: Solving u:=u_in-J\r has the opposite sign convention from
+   * u:=K\f, and we apply heterogeneous constraints accordingly.
+   *
+   * The \p solution vector passed in should be a serialized or
+   * ghosted primal solution
+   */
+  void heterogeneously_constrain_element_jacobian_and_residual (DenseMatrix<Number> & matrix,
+                                                                DenseVector<Number> & rhs,
+                                                                std::vector<dof_id_type> & elem_dofs,
+                                                                NumericVector<Number> & solution_local) const;
 
+  /**
+   * Constrains the element residual.  The element Jacobian is square,
+   * and the elem_dofs should correspond to the global DOF indices of
+   * both the rows and columns of the element matrix.
+   *
+   * The residual-constraining version of this method creates linear
+   * systems in which heterogeneously constrained degrees of freedom
+   * create non-zero residual terms when not at their correct offset
+   * values, as would be appropriate for finding a solution to a
+   * nonlinear problem in a quasi-Newton solve.
+   *
+   * The \p solution vector passed in should be a serialized or
+   * ghosted primal solution
+   */
+  void heterogeneously_constrain_element_residual (DenseVector<Number> & rhs,
+                                                   std::vector<dof_id_type> & elem_dofs,
+                                                   NumericVector<Number> & solution_local) const;
+
+
+  /**
+   * Constrains the element residual.  The element Jacobian is square,
+   * and the elem_dofs should correspond to the global DOF indices of
+   * both the rows and columns of the element matrix, and the dof
+   * constraint should not include any heterogeneous terms.
+   *
+   * The residual-constraining version of this method creates linear
+   * systems in which heterogeneously constrained degrees of freedom
+   * create non-zero residual terms when not at their correct offset
+   * values, as would be appropriate for finding a solution to a
+   * nonlinear problem in a quasi-Newton solve.
+   *
+   * The \p solution vector passed in should be a serialized or
+   * ghosted primal solution
+   */
+  void constrain_element_residual (DenseVector<Number> & rhs,
+                                   std::vector<dof_id_type> & elem_dofs,
+                                   NumericVector<Number> & solution_local) const;
 
   /**
    * Constrains a dyadic element matrix B = v w'.  This method
