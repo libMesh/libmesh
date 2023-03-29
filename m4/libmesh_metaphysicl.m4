@@ -124,7 +124,10 @@ AC_DEFUN([CONFIGURE_METAPHYSICL],
           AS_IF([test "x$build_metaphysicl" = "xyes"],
                 [
                  AC_MSG_RESULT(<<< Configuring library with built-in MetaPhysicL support >>>)
-                 AX_SUBDIRS_CONFIGURE([contrib/metaphysicl],[[--with-cxx-std=20$acsm_cxx_version],[CPPFLAGS=-I$my_top_srcdir/contrib/timpi/src/algorithms/include/ -I$my_top_srcdir/contrib/timpi/src/parallel/include/ -I$my_top_srcdir/contrib/timpi/src/utilities/include/ -I$ac_abs_top_builddir/contrib/timpi/src/utilities/include/ $CPPFLAGS],[LDFLAGS=-L$ac_abs_top_builddir/contrib/timpi/src/ $LDFLAGS],[--with-future-timpi-dir=$prefix],[--with-timpi-method=$my_method]])
+                 AS_IF([test "x$prefix" = "xNONE"],
+                       [future_timpi_prefix=$ac_abs_top_builddir/contrib/timpi/src/],
+                       [future_timpi_prefix=$prefix])
+                 AX_SUBDIRS_CONFIGURE([contrib/metaphysicl],[[--with-cxx-std=20$acsm_cxx_version],[CPPFLAGS=-I$my_top_srcdir/contrib/timpi/src/algorithms/include/ -I$my_top_srcdir/contrib/timpi/src/parallel/include/ -I$my_top_srcdir/contrib/timpi/src/utilities/include/ -I$ac_abs_top_builddir/contrib/timpi/src/utilities/include/ $CPPFLAGS],[LDFLAGS=-L$ac_abs_top_builddir/contrib/timpi/src/ $LDFLAGS],[--with-future-timpi-dir=$future_timpi_prefix],[--with-timpi-method=$my_method]])
                 ],
                 [AC_MSG_RESULT(<<< Configuring library with external MetaPhysicL support >>>)])
         ],
