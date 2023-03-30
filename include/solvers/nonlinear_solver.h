@@ -397,6 +397,10 @@ public:
     _exact_constraint_enforcement = enable;
   }
 
+  bool exact_constraint_enforcement() {
+    return _exact_constraint_enforcement;
+  }
+
 protected:
   /**
    * Whether we should reuse the linear preconditioner
