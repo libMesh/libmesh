@@ -295,7 +295,8 @@ unsigned int NewtonSolver::solve()
   rhs.close();
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  _system.get_dof_map().enforce_constraints_exactly(_system);
+  if (this->_exact_constraint_enforcement)
+    _system.get_dof_map().enforce_constraints_exactly(_system);
 #endif
 
   SparseMatrix<Number> & matrix = *(_system.matrix);
@@ -426,8 +427,9 @@ unsigned int NewtonSolver::solve()
       _system.update ();
       // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-      _system.get_dof_map().enforce_constraints_exactly
-        (_system, &linear_solution, /* homogeneous = */ true);
+      if (this->_exact_constraint_enforcement)
+        _system.get_dof_map().enforce_constraints_exactly
+          (_system, &linear_solution, /* homogeneous = */ true);
 #endif
 
       const unsigned int linear_steps = rval.first;
@@ -553,7 +555,8 @@ unsigned int NewtonSolver::solve()
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  _system.get_dof_map().enforce_constraints_exactly(_system);
+  if (this->_exact_constraint_enforcement)
+    _system.get_dof_map().enforce_constraints_exactly(_system);
 #endif
 
   // We may need to localize a parallel solution
