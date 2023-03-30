@@ -266,20 +266,22 @@ void add_element_system(FEMSystem & _sys,
       libMesh::out.precision(old_precision);
     }
 
-  // We turn off the asymmetric constraint application;
-  // enforce_constraints_exactly() should be called in the solver
+  // We turn off the asymmetric constraint application iff we expect
+  // enforce_constraints_exactly() to be called in the solver
+  const bool constrain_in_solver = _sys.get_constrain_in_solver();
+
   if (_get_residual && _get_jacobian)
     {
       if (_constrain_heterogeneously)
         _sys.get_dof_map().heterogenously_constrain_element_matrix_and_vector
           (_femcontext.get_elem_jacobian(),
            _femcontext.get_elem_residual(),
-           _femcontext.get_dof_indices(), false);
+           _femcontext.get_dof_indices(), !constrain_in_solver);
       else if (!_no_constraints)
         _sys.get_dof_map().constrain_element_matrix_and_vector
           (_femcontext.get_elem_jacobian(),
            _femcontext.get_elem_residual(),
-           _femcontext.get_dof_indices(), false);
+           _femcontext.get_dof_indices(), !constrain_in_solver);
       // Do nothing if (_no_constraints)
     }
   else if (_get_residual)
@@ -288,10 +290,11 @@ void add_element_system(FEMSystem & _sys,
         _sys.get_dof_map().heterogenously_constrain_element_vector
           (_femcontext.get_elem_jacobian(),
            _femcontext.get_elem_residual(),
-           _femcontext.get_dof_indices(), false);
+           _femcontext.get_dof_indices(), !constrain_in_solver);
       else if (!_no_constraints)
         _sys.get_dof_map().constrain_element_vector
-          (_femcontext.get_elem_residual(), _femcontext.get_dof_indices(), false);
+          (_femcontext.get_elem_residual(),
+           _femcontext.get_dof_indices(), !constrain_in_solver);
       // Do nothing if (_no_constraints)
     }
   else if (_get_jacobian)
@@ -302,8 +305,14 @@ void add_element_system(FEMSystem & _sys,
       if (!_no_constraints)
         _sys.get_dof_map().constrain_element_matrix (_femcontext.get_elem_jacobian(),
                                                      _femcontext.get_dof_indices(),
-                                                     false);
+                                                     !constrain_in_solver);
     }
+
+  if (_get_residual && !_no_constraints && !constrain_in_solver)
+    _sys.get_dof_map().residual_constrain_element_vector
+      (_femcontext.get_elem_residual(),
+       _femcontext.get_dof_indices(),
+       *_sys.current_local_solution);
 #else
   libmesh_ignore(_constrain_heterogeneously, _no_constraints);
 #endif // #ifdef LIBMESH_ENABLE_CONSTRAINTS
