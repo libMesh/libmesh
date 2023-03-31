@@ -46,6 +46,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <cctype>
 
 extern "C" {
 #include <stdarg.h> // --> va_list and friends
@@ -1308,7 +1309,7 @@ GetPot::_skip_whitespace(std::istream& istr)
   int tmp = istr.get();
   do {
     // -- search a non whitespace
-    while (isspace(tmp))
+    while (std::isspace(tmp))
       {
         tmp = istr.get();
         if (!istr)
@@ -2811,7 +2812,7 @@ GetPot::_DBE_get_expr_list(const std::string& str_, const unsigned ExpectedNumbe
   unsigned i=0;
   // (1) eat initial whitespaces
   for (; i < str.size(); i++)
-    if (!isspace(str[i]))
+    if (!std::isspace(str[i]))
       break;
 
   STRING_VECTOR   expr_list;
@@ -2825,13 +2826,13 @@ GetPot::_DBE_get_expr_list(const std::string& str_, const unsigned ExpectedNumbe
     {
       const char letter = str[i];
       // whitespace -> end of expression
-      if (isspace(letter) && open_brackets == 0)
+      if (std::isspace(letter) && open_brackets == 0)
         {
           expr_list.push_back(str.substr(start_new_string, i - start_new_string));
           bool no_breakout_f = true;
           for (i++; i < l ; i++)
             {
-              if (!isspace(str[i]))
+              if (!std::isspace(str[i]))
                 {
                   no_breakout_f = false;
                   start_new_string = i;

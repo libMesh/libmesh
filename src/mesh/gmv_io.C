@@ -19,7 +19,7 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
-#include <ctype.h> // isspace
+#include <cctype> // isspace
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -2135,7 +2135,9 @@ void GMVIO::_read_one_cell()
 ElemType GMVIO::gmv_elem_to_libmesh_elem(std::string elemname)
 {
   // Erase any whitespace padding in name coming from gmv before performing comparison.
-  elemname.erase(std::remove_if(elemname.begin(), elemname.end(), isspace), elemname.end());
+  elemname.erase(std::remove_if(elemname.begin(), elemname.end(),
+                                [](unsigned char const c){return std::isspace(c);}),
+                 elemname.end());
   return libmesh_map_find(_reading_element_map, elemname);
 }
 
