@@ -125,6 +125,7 @@ public:
 
   //   Solver options
 
+  bool constrain_in_solver;
   bool use_petsc_snes;
   bool time_solver_quiet, solver_quiet, solver_verbose,
     reuse_preconditioner, require_residual_reduction;

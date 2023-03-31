@@ -579,6 +579,7 @@ void set_system_parameters(FEMSystem & system,
           solver->continue_after_max_iterations = true;
           solver->continue_after_backtrack_failure = true;
         }
+      system.set_constrain_in_solver(param.constrain_in_solver);
 
       // And the linear solver options
       solver->max_linear_iterations       = param.max_linear_iterations;
