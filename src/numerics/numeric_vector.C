@@ -114,15 +114,14 @@ int NumericVector<T>::compare (const NumericVector<T> & other_vector,
   int first_different_i = std::numeric_limits<int>::max();
   numeric_index_type i = first_local_index();
 
-  do
-    {
-      if (std::abs((*this)(i) - other_vector(i)) > threshold)
-        first_different_i = i;
-      else
-        i++;
-    }
   while (first_different_i==std::numeric_limits<int>::max()
-         && i<last_local_index());
+         && i<last_local_index())
+  {
+    if (std::abs((*this)(i) - other_vector(i)) > threshold)
+      first_different_i = i;
+    else
+      i++;
+  }
 
   // Find the correct first differing index in parallel
   this->comm().min(first_different_i);
