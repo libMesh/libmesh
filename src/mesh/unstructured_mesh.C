@@ -1727,6 +1727,8 @@ void UnstructuredMesh::stitch_meshes (const MeshBase & other_mesh,
                                       bool enforce_all_nodes_match_on_boundaries)
 {
   LOG_SCOPE("stitch_meshes()", "UnstructuredMesh");
+  if (!this->is_prepared() && other_mesh.is_prepared())
+    this->prepare_for_use();
   stitching_helper(&other_mesh,
                    this_mesh_boundary_id,
                    other_mesh_boundary_id,
@@ -1738,6 +1740,26 @@ void UnstructuredMesh::stitch_meshes (const MeshBase & other_mesh,
                    true);
 }
 
+void UnstructuredMesh::stitch_meshes (MeshBase & other_mesh,
+                                      boundary_id_type this_mesh_boundary_id,
+                                      boundary_id_type other_mesh_boundary_id,
+                                      Real tol,
+                                      bool clear_stitched_boundary_ids,
+                                      bool verbose,
+                                      bool use_binary_search,
+                                      bool enforce_all_nodes_match_on_boundaries)
+{
+  if (this->is_prepared() && !other_mesh.is_prepared())
+    other_mesh.prepare_for_use();
+  stitch_meshes(const_cast<const MeshBase &>(other_mesh),
+                this_mesh_boundary_id,
+                other_mesh_boundary_id,
+                tol,
+                clear_stitched_boundary_ids,
+                verbose,
+                use_binary_search,
+                enforce_all_nodes_match_on_boundaries);
+}
 
 void UnstructuredMesh::stitch_surfaces (boundary_id_type boundary_id_1,
                                         boundary_id_type boundary_id_2,

@@ -168,6 +168,7 @@ public:
                        const const_element_iterator & it_end) const;
 
   /**
+   * @name Stitching
    * Stitch \p other_mesh to this mesh so that this mesh is the union of the two meshes.
    * \p this_mesh_boundary and \p other_mesh_boundary are used to specify a dim-1 dimensional
    * surface on which we seek to merge any "overlapping" nodes, where we use the parameter
@@ -193,6 +194,11 @@ public:
    * and other_mesh and node IDs in the stitched mesh because the number of nodes (and hence
    * the node IDs) in the stitched mesh depend on how many nodes are stitched.
    */
+  ///@{
+  /**
+   * This mesh stitching overload will call \p prepare_for_use on this mesh if it is not prepared
+   * and \p other_mesh is prepared. \p other_mesh will not be modified
+   */
   void stitch_meshes (const MeshBase & other_mesh,
                       boundary_id_type this_mesh_boundary,
                       boundary_id_type other_mesh_boundary,
@@ -201,6 +207,19 @@ public:
                       bool verbose=true,
                       bool use_binary_search=true,
                       bool enforce_all_nodes_match_on_boundaries=false);
+  /**
+   * This mesh stitching overload will call \p prepare_for_use on this mesh if it is not prepared
+   * and \p other_mesh is prepared, and visa versa
+   */
+  void stitch_meshes (MeshBase & other_mesh,
+                      boundary_id_type this_mesh_boundary,
+                      boundary_id_type other_mesh_boundary,
+                      Real tol=TOLERANCE,
+                      bool clear_stitched_boundary_ids=false,
+                      bool verbose=true,
+                      bool use_binary_search=true,
+                      bool enforce_all_nodes_match_on_boundaries=false);
+  ///@}
 
   /**
    * Similar to stitch_meshes, except that we stitch two adjacent surfaces within this mesh.
