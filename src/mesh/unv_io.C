@@ -41,7 +41,7 @@
 #include <iomanip>
 #include <algorithm> // for std::sort
 #include <fstream>
-#include <ctype.h> // isspace
+#include <cctype>  // isspace
 #include <sstream> // std::istringstream
 #include <unordered_map>
 
@@ -156,7 +156,8 @@ void UNVIO::read_implementation (std::istream & in_stream)
             // UNV files always have some amount of leading
             // whitespace, let's not rely on exactly how much...  This
             // command deletes it.
-            current_line.erase(std::remove_if(current_line.begin(), current_line.end(), isspace),
+            current_line.erase(std::remove_if(current_line.begin(), current_line.end(),
+                                              [](unsigned char const c){return std::isspace(c);}),
                                current_line.end());
 
             // Parse the nodes section
