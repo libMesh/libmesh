@@ -335,10 +335,6 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
   bool wrap_proc_ids = (this->n_partitions() <
                         other_mesh.n_partitions());
 
-  // We're assuming our subclass data needs no copy
-  libmesh_assert_equal_to (this->is_prepared(),
-                           other_mesh.is_prepared());
-
   // We're assuming the other mesh has proper element number ordering,
   // so that we add parents before their children, and that the other
   // mesh is consistently partitioned.
