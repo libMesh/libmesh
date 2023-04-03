@@ -28,7 +28,7 @@
 #include <string>
 #include <cstdlib> // std::strtol
 #include <sstream>
-#include <ctype.h> // isspace
+#include <cctype> // isspace
 
 // Anonymous namespace to hold mapping Data for Abaqus/libMesh element types
 namespace
@@ -56,7 +56,9 @@ bool string_to_num(const std::string & input, dof_id_type & output)
  */
 void strip_ws(std::string & line)
 {
-  line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
+  line.erase(std::remove_if(line.begin(), line.end(),
+                            [](unsigned char const c){return std::isspace(c);}),
+             line.end());
 }
 
 /**
