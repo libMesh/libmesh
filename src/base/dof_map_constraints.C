@@ -2106,7 +2106,7 @@ void DofMap::process_mesh_constraint_rows(const MeshBase & mesh)
                       if (rhsit != vals.end())
                         vals.erase(rhsit);
 
-                      this->heterogenously_constrain_element_matrix_and_vector
+                      this->heterogeneously_constrain_element_matrix_and_vector
                         (K, F, dof_indices, false, q ? (q-1) : -1);
                       if (!q)
                         mat->add_matrix(K, dof_indices);
@@ -2422,7 +2422,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
                 const DofConstraintRow & constraint_row = pos->second;
 
                 // This is an overzealous assertion in the presence of
-                // heterogenous constraints: we now can constrain "u_i = c"
+                // heterogeneous constraints: we now can constrain "u_i = c"
                 // with no other u_j terms involved.
                 //
                 // libmesh_assert (!constraint_row.empty());
@@ -2517,11 +2517,11 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
 
 
 
-void DofMap::heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
-                                                                 DenseVector<Number> & rhs,
-                                                                 std::vector<dof_id_type> & elem_dofs,
-                                                                 bool asymmetric_constraint_rows,
-                                                                 int qoi_index) const
+void DofMap::heterogeneously_constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
+                                                                  DenseVector<Number> & rhs,
+                                                                  std::vector<dof_id_type> & elem_dofs,
+                                                                  bool asymmetric_constraint_rows,
+                                                                  int qoi_index) const
 {
   libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
   libmesh_assert_equal_to (elem_dofs.size(), matrix.n());
@@ -2623,11 +2623,11 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Num
 
 
 
-void DofMap::heterogenously_constrain_element_vector (const DenseMatrix<Number> & matrix,
-                                                      DenseVector<Number> & rhs,
-                                                      std::vector<dof_id_type> & elem_dofs,
-                                                      bool asymmetric_constraint_rows,
-                                                      int qoi_index) const
+void DofMap::heterogeneously_constrain_element_vector (const DenseMatrix<Number> & matrix,
+                                                       DenseVector<Number> & rhs,
+                                                       std::vector<dof_id_type> & elem_dofs,
+                                                       bool asymmetric_constraint_rows,
+                                                       int qoi_index) const
 {
   libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
   libmesh_assert_equal_to (elem_dofs.size(), matrix.n());
@@ -3515,7 +3515,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
   if (!has_constraints)
     return;
 
-  // If we have heterogenous adjoint constraints we need to
+  // If we have heterogeneous adjoint constraints we need to
   // communicate those too.
   const unsigned int max_qoi_num =
     _adjoint_constraint_values.empty() ?
@@ -4848,7 +4848,7 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
 {
   typedef std::set<dof_id_type> DoF_RCSet;
 
-  // If we have heterogenous adjoint constraints we need to
+  // If we have heterogeneous adjoint constraints we need to
   // communicate those too.
   const unsigned int max_qoi_num =
     _adjoint_constraint_values.empty() ?
