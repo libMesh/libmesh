@@ -253,8 +253,12 @@ public:
     // reader threw an exception while trying to read this mesh.
     if (mesh.is_serial())
     {
-      // Mesh has 15 boundary ids total (including edge and side ids).
-      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(15), bi.n_boundary_ids());
+      // Mesh has 26 boundary ids total (including edge and side ids).
+      // ss_prop1 = 200, 201 ;
+      // ed_prop1 = 8000, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010,
+      //            8011, 9001, 9002, 9003, 9004, 9005, 9006, 9007, 9008, 9009, 9010,
+      //            9011, 9012 ;
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(26), bi.n_boundary_ids());
 
       // We can binary_search() the build_edge_list() which is sorted
       // in lexicographical order before it's returned.
