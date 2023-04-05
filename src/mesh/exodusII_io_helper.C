@@ -1576,21 +1576,6 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
                       bi.add_edge(elem_edge_pair.first,
                                   elem_edge_pair.second,
                                   edge_block_id);
-
-                      // Debugging
-                      libMesh::out << "Added (Elem=" << elem_edge_pair.first
-                                   << ", Edge=" << elem_edge_pair.second
-                                   << ", Id=" << edge_block_id
-                                   << ") to BoundaryInfo." << std::endl;
-                    }
-                  // Debugging
-                  else
-                    {
-                      // We didn't find a match for some reason
-                      libMesh::out << "Skipped adding (Elem=" << elem_edge_pair.first
-                                   << ", Edge=" << elem_edge_pair.second
-                                   << ", Id=" << edge_block_id
-                                   << ") to BoundaryInfo, orientation check failed." << std::endl;
                     }
                 } // end loop over elem_edge_pairs
             } // end loop over connectivity array
