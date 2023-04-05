@@ -746,9 +746,9 @@ public:
         std::vector<boundary_id_type> container;
         bi.boundary_ids(elem, 3, container);
 
-        CPPUNIT_ASSERT_EQUAL((unsigned long) 2, container.size());
-        CPPUNIT_ASSERT_EQUAL((short int) 5, container[0]);
-        CPPUNIT_ASSERT_EQUAL((short int) 3, container[1]);
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), container.size());
+        CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(5), container[0]);
+        CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(3), container[1]);
       }
     }
   }
