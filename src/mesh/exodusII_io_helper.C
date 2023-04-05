@@ -1431,7 +1431,11 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
   // map from edge->key() to a list of (elem_id, edge_id) pairs
   // for the Edge in question. Since edge->key() is edge orientation
   // invariant, this map does not distinguish different orientations
-  // of the same Edge.
+  // of the same Edge. Since edge->key() is also not guaranteed to be
+  // unique (though it is very unlikely for two distinct edges to have
+  // the same key()), when we later look up an (elem_id, edge_id) pair
+  // in the edge_map, we need to verify that the edge indeed matches
+  // the searched edge by doing some further checks.
   typedef std::pair<dof_id_type, unsigned int> ElemEdgePair;
   std::unordered_map<dof_id_type, std::vector<ElemEdgePair>> edge_map;
   std::unique_ptr<Elem> edge_ptr;
@@ -1538,14 +1542,14 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
 
               // If this key is not found in the edge_map, which is
               // supposed to include every edge in the Mesh, then we
-              // need to throw an error.
+              // will throw an error now.
               auto & elem_edge_pair_vec =
                 libmesh_map_find(edge_map, edge_key);
 
               for (const auto & elem_edge_pair : elem_edge_pair_vec)
                 {
                   // We only want to match edges which have the same
-                  // orientation (node ordering) to the one in the
+                  // nodes (possibly with different orientation) to the one in the
                   // Exodus file, otherwise we ignore this elem_edge_pair.
                   //
                   // Note: this also handles the situation where two
@@ -1557,17 +1561,14 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
                     build_edge_ptr(edge_ptr, elem_edge_pair.second);
 
                   // Determine whether this candidate edge is a "real" match,
-                  // i.e. also has the same orientation. Note that here we
-                  // only check that the vertices match regardless of how many
-                  // nodes the edge has, which allows us to match a lower-order
-                  // edge to a higher-order Elem.
-                  bool is_match = true;
-                  for (unsigned int n=0; n<edge_ptr->n_vertices(); ++n)
-                    if (edge_ptr->node_id(n) != edge->node_id(n))
-                      {
-                        is_match = false;
-                        break;
-                      }
+                  // i.e. has the same nodes with a possibly different
+                  // orientation. Note that here we only check that
+                  // the vertices match regardless of how many nodes
+                  // the edge has, which allows us to match a
+                  // lower-order edge to a higher-order Elem.
+                  bool is_match =
+                    ((edge_ptr->node_id(0) == edge->node_id(0)) && (edge_ptr->node_id(1) == edge->node_id(1))) ||
+                    ((edge_ptr->node_id(0) == edge->node_id(1)) && (edge_ptr->node_id(1) == edge->node_id(0)));
 
                   if (is_match)
                     {
