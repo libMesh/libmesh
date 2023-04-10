@@ -419,6 +419,15 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
                              handle_mpi_errors, COMM_WORLD_IN);
       _comm = new Parallel::Communicator(this->_timpi_init->comm().get());
 
+      const std::string timpi_sync =
+        libMesh::command_line_value("--timpi_sync", std::string("nbx"));
+      if (timpi_sync == "sendreceive")
+        _comm->sync_type(TIMPI::Communicator::SENDRECEIVE);
+      else if (timpi_sync == "alltoall")
+        _comm->sync_type(TIMPI::Communicator::ALLTOALL_COUNTS);
+      else if (timpi_sync != "nbx")
+        libmesh_error_msg("Unrecognized --timpi_sync type " << timpi_sync);
+
       libMesh::GLOBAL_COMM_WORLD = COMM_WORLD_IN;
 
       //MPI_Comm_set_name not supported in at least SGI MPT's MPI implementation
