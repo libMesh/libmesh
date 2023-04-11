@@ -91,7 +91,7 @@ void LinearPartitioner::partition_range(MeshBase & mesh,
       mesh.comm().set_union(element_ids);
 
       const dof_id_type blksize = cast_int<dof_id_type>
-        (element_ids.size());
+        (element_ids.size() / n);
 
       dof_id_type e = 0;
       for (auto eid : element_ids)
