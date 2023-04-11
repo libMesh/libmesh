@@ -266,6 +266,18 @@ void add_element_system(FEMSystem & _sys,
       libMesh::out.precision(old_precision);
     }
 
+  if (_get_jacobian && _sys.print_element_jacobians)
+    {
+      std::streamsize old_precision = libMesh::out.precision();
+      libMesh::out.precision(16);
+      if (_femcontext.has_elem())
+        libMesh::out << "Jraw_elem " << _femcontext.get_elem().id();
+      else
+        libMesh::out << "Jraw_scalar ";
+      libMesh::out << " = " << _femcontext.get_elem_jacobian() << std::endl;
+      libMesh::out.precision(old_precision);
+    }
+
   // We turn off the asymmetric constraint application iff we expect
   // enforce_constraints_exactly() to be called in the solver
   const bool constrain_in_solver = _sys.get_constrain_in_solver();
