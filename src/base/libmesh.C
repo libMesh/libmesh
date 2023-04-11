@@ -420,7 +420,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       _comm = new Parallel::Communicator(this->_timpi_init->comm().get());
 
       const std::string timpi_sync =
-        libMesh::command_line_value("--timpi_sync", std::string("nbx"));
+        libMesh::command_line_value("--timpi-sync", std::string("nbx"));
       _comm->sync_type(timpi_sync);
 
       libMesh::GLOBAL_COMM_WORLD = COMM_WORLD_IN;
