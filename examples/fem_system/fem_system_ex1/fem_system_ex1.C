@@ -104,6 +104,12 @@ int main (int argc, char ** argv)
   const unsigned int dim               = infile("dimension", 2);
   const std::string slvr_type          = infile("solver_type", "newton");
   const std::string mesh_type          = infile("mesh_type"  , "replicated");
+  const bool constrain_in_solver       = infile("constrain_in_solver", true);
+
+  // More desperate debugging options
+  const bool print_solutions           = infile("print_solutions", false);
+  const bool print_residuals           = infile("print_residuals", false);
+  const bool print_jacobians           = infile("print_jacobians", false);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   const unsigned int write_interval    = infile("write_interval", 5);
@@ -176,6 +182,14 @@ int main (int argc, char ** argv)
   NavierSystem & system =
     equation_systems.add_system<NavierSystem> ("Navier-Stokes");
 
+  // Debug it if requested
+  system.print_solutions = print_solutions;
+  system.print_solution_norms = print_solutions;
+  system.print_residuals = print_residuals;
+  system.print_residual_norms = print_residuals;
+  system.print_jacobians = print_jacobians;
+  system.print_jacobian_norms = print_jacobians;
+
   // Solve this as a time-dependent or steady system
   if (transient)
     system.time_solver = std::make_unique<EulerSolver>(system);
@@ -216,6 +230,8 @@ int main (int argc, char ** argv)
     infile("relative_residual_tolerance", 0.0);
   solver.absolute_residual_tolerance =
     infile("absolute_residual_tolerance", 0.0);
+
+  system.set_constrain_in_solver(constrain_in_solver);
 
   // And the linear solver options
   solver.max_linear_iterations =
