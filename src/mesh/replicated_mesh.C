@@ -57,7 +57,7 @@ ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
 }
 
 
-bool ReplicatedMesh::subclass_locally_equals(const MeshBase & other_mesh_base)
+bool ReplicatedMesh::subclass_locally_equals(const MeshBase & other_mesh_base) const
 {
   const ReplicatedMesh * rep_mesh_ptr =
     dynamic_cast<const ReplicatedMesh *>(&other_mesh_base);

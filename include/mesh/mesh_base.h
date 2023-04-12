@@ -119,9 +119,9 @@ public:
    * not accept different subclass types, nor even different Elem/Node
    * ids).
    */
-  bool operator== (const MeshBase & other_mesh);
+  bool operator== (const MeshBase & other_mesh) const;
 
-  bool operator!= (const MeshBase & other_mesh) {
+  bool operator!= (const MeshBase & other_mesh) const {
     return !(*this == other_mesh);
   }
 
@@ -130,7 +130,7 @@ public:
    * ghosted aspects of the mesh; i.e. operator== is true iff local
    * equality is true on every rank.
    */
-  bool locally_equals (const MeshBase & other_mesh);
+  bool locally_equals (const MeshBase & other_mesh) const;
 
 
   /**
@@ -1927,13 +1927,13 @@ protected:
    * Shim to allow operator == (&) to behave like a virtual function
    * without having to be one.
    */
-  virtual bool subclass_locally_equals (const MeshBase & other_mesh) = 0;
+  virtual bool subclass_locally_equals (const MeshBase & other_mesh) const = 0;
 
   /**
    * Tests for equality of all elements and nodes in the mesh.  Helper
    * function for subclass_equals() in unstructured mesh subclasses.
    */
-  bool nodes_and_elements_equal(const MeshBase & other_mesh);
+  bool nodes_and_elements_equal(const MeshBase & other_mesh) const;
 
   /**
    * \returns A writable reference to the number of partitions.

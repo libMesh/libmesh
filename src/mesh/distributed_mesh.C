@@ -88,7 +88,7 @@ MeshBase & DistributedMesh::assign(MeshBase && other_mesh)
   return *this;
 }
 
-bool DistributedMesh::subclass_locally_equals(const MeshBase & other_mesh_base)
+bool DistributedMesh::subclass_locally_equals(const MeshBase & other_mesh_base) const
 {
   const DistributedMesh * dist_mesh_ptr =
     dynamic_cast<const DistributedMesh *>(&other_mesh_base);

@@ -205,7 +205,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
 }
 
 
-bool MeshBase::operator== (const MeshBase & other_mesh)
+bool MeshBase::operator== (const MeshBase & other_mesh) const
 {
   bool is_equal = this->locally_equals(other_mesh);
   this->comm().min(is_equal);
@@ -213,7 +213,7 @@ bool MeshBase::operator== (const MeshBase & other_mesh)
 }
 
 
-bool MeshBase::locally_equals (const MeshBase & other_mesh)
+bool MeshBase::locally_equals (const MeshBase & other_mesh) const
 {
   // Check whether everything in the base is equal
   if (_n_parts != other_mesh._n_parts ||
@@ -1892,7 +1892,7 @@ MeshBase::post_dofobject_moves(MeshBase && other_mesh)
 }
 
 
-bool MeshBase::nodes_and_elements_equal(const MeshBase & other_mesh)
+bool MeshBase::nodes_and_elements_equal(const MeshBase & other_mesh) const
 {
   for (const auto & other_node : other_mesh.node_ptr_range())
     {
