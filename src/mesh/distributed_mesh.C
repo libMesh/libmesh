@@ -65,6 +65,8 @@ DistributedMesh::DistributedMesh (const Parallel::Communicator & comm_in,
 
 DistributedMesh & DistributedMesh::operator= (DistributedMesh && other_mesh)
 {
+  LOG_SCOPE("operator=()", "DistributedMesh");
+
   // Move assign as an UnstructuredMesh.
   this->UnstructuredMesh::operator=(std::move(other_mesh));
 

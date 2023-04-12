@@ -155,6 +155,8 @@ ReplicatedMesh::ReplicatedMesh (const UnstructuredMesh & other_mesh) :
 
 ReplicatedMesh & ReplicatedMesh::operator= (ReplicatedMesh && other_mesh)
 {
+  LOG_SCOPE("operator=()", "ReplicatedMesh");
+
   // Move assign as an UnstructuredMesh
   this->UnstructuredMesh::operator=(std::move(other_mesh));
 

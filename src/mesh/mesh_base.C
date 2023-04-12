@@ -152,6 +152,8 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 
 MeshBase& MeshBase::operator= (MeshBase && other_mesh)
 {
+  LOG_SCOPE("operator=()", "MeshBase");
+
   // Move assign as a ParallelObject.
   this->ParallelObject::operator=(other_mesh);
 
@@ -207,6 +209,8 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
 
 bool MeshBase::operator== (const MeshBase & other_mesh) const
 {
+  LOG_SCOPE("operator==()", "MeshBase");
+
   bool is_equal = this->locally_equals(other_mesh);
   this->comm().min(is_equal);
   return is_equal;
