@@ -360,13 +360,7 @@ void correct_node_proc_ids(MeshBase &);
  */
 void clear_spline_nodes(MeshBase &);
 
-#ifdef DEBUG
-/**
- * A function for verifying that an element has been cut off
- * from the rest of the mesh
- */
-void libmesh_assert_no_links_to_elem(const MeshBase & mesh,
-                                     const Elem * bad_elem);
+#ifndef NDEBUG
 
 /**
  * A function for testing that all DofObjects within a mesh
@@ -413,6 +407,61 @@ void libmesh_assert_valid_amr_elem_ids (const MeshBase & mesh);
 void libmesh_assert_valid_amr_interior_parents (const MeshBase & mesh);
 
 /**
+ * A function for verifying that all mesh constraint rows express
+ * relations between nodes and elements that are semilocal (local or
+ * ghosted) to the current processor's portion of the mesh.
+ */
+void libmesh_assert_valid_constraint_rows (const MeshBase & mesh);
+
+/**
+ * A function for verifying that degree of freedom indexes are
+ * contiguous on each processors, as is required by libMesh numeric
+ * classes.
+ *
+ * Verify a particular system by specifying that system's number.
+ */
+void libmesh_assert_contiguous_dof_ids (const MeshBase & mesh,
+                                        unsigned int sysnum);
+
+/**
+ * A function for verifying that processor assignment is
+ * topologically consistent on nodes (each node part of an active
+ * element on its processor) or elements (each parent has the
+ * processor id of one of its children).
+ */
+template <typename DofObjectSubclass>
+void libmesh_assert_topology_consistent_procids (const MeshBase & mesh);
+
+/**
+ * A function for verifying that processor assignment of nodes matches
+ * the heuristic specified in Node::choose_processor_id()
+ */
+void libmesh_assert_canonical_node_procids (const MeshBase & mesh);
+
+/**
+ * A function for verifying that elements on this processor have
+ * valid descendants and consistent active flags.
+ */
+void libmesh_assert_valid_refinement_tree (const MeshBase & mesh);
+
+#endif // !NDEBUG
+
+/**
+ * The following functions, only available in builds with DEBUG
+ * defined, typically have surprisingly slow asymptotic behavior, and
+ * so are unsuitable for use even with METHOD=devel
+ */
+
+#ifdef DEBUG
+
+/**
+ * A function for verifying that an element has been cut off
+ * from the rest of the mesh
+ */
+void libmesh_assert_no_links_to_elem(const MeshBase & mesh,
+                                     const Elem * bad_elem);
+
+/**
  * A function for verifying that all nodes are connected to at least
  * one element.
  *
@@ -423,13 +472,6 @@ void libmesh_assert_valid_amr_interior_parents (const MeshBase & mesh);
  * nodes.
  */
 void libmesh_assert_connected_nodes (const MeshBase & mesh);
-
-/**
- * A function for verifying that all mesh constraint rows express
- * relations between nodes and elements that are semilocal (local or
- * ghosted) to the current processor's portion of the mesh.
- */
-void libmesh_assert_valid_constraint_rows (const MeshBase & mesh);
 
 /**
  * A function for verifying that boundary condition ids match
@@ -446,16 +488,6 @@ void libmesh_assert_valid_boundary_ids (const MeshBase & mesh);
  */
 void libmesh_assert_valid_dof_ids (const MeshBase & mesh,
                                    unsigned int sysnum = libMesh::invalid_uint);
-
-/**
- * A function for verifying that degree of freedom indexes are
- * contiguous on each processors, as is required by libMesh numeric
- * classes.
- *
- * Verify a particular system by specifying that system's number.
- */
-void libmesh_assert_contiguous_dof_ids (const MeshBase & mesh,
-                                        unsigned int sysnum);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 /**
@@ -498,15 +530,6 @@ void libmesh_assert_parallel_consistent_procids (const MeshBase & mesh);
 
 /**
  * A function for verifying that processor assignment is
- * topologically consistent on nodes (each node part of an active
- * element on its processor) or elements (each parent has the
- * processor id of one of its children).
- */
-template <typename DofObjectSubclass>
-void libmesh_assert_topology_consistent_procids (const MeshBase & mesh);
-
-/**
- * A function for verifying that processor assignment is
  * both parallel and topologically consistent.
  */
 template <typename DofObjectSubclass>
@@ -516,22 +539,10 @@ void libmesh_assert_valid_procids (const MeshBase & mesh) {
 }
 
 /**
- * A function for verifying that processor assignment of nodes matches
- * the heuristic specified in Node::choose_processor_id()
- */
-void libmesh_assert_canonical_node_procids (const MeshBase & mesh);
-
-/**
  * A function for verifying that refinement flags on elements
  * are consistent between processors
  */
 void libmesh_assert_valid_refinement_flags (const MeshBase & mesh);
-
-/**
- * A function for verifying that elements on this processor have
- * valid descendants and consistent active flags.
- */
-void libmesh_assert_valid_refinement_tree (const MeshBase & mesh);
 
 /**
  * A function for verifying that neighbor connectivity is correct (each
@@ -545,7 +556,8 @@ void libmesh_assert_valid_refinement_tree (const MeshBase & mesh);
  */
 void libmesh_assert_valid_neighbors (const MeshBase & mesh,
                                      bool assert_valid_remote_elems=true);
-#endif
+
+#endif // DEBUG
 
 // There is no reason for users to call functions in the MeshTools::Private namespace.
 namespace Private {

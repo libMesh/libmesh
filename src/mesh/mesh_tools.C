@@ -36,7 +36,7 @@
 #include "libmesh/utility.h"
 #include "libmesh/boundary_info.h"
 
-#ifdef DEBUG
+#ifndef NDEBUG
 #  include "libmesh/remote_elem.h"
 #endif
 
@@ -1026,8 +1026,7 @@ void MeshTools::clear_spline_nodes(MeshBase & mesh)
 }
 
 
-
-#ifdef DEBUG
+#ifndef NDEBUG
 void MeshTools::libmesh_assert_equal_n_systems (const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_equal_n_systems()", "MeshTools");
@@ -1102,6 +1101,7 @@ void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase & mesh)
 }
 
 
+
 void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_remote_elems()", "MeshTools");
@@ -1127,25 +1127,6 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
       if (elem->active() && elem->has_children())
         for (auto & child : elem->child_ref_range())
           libmesh_assert_not_equal_to (&child, remote_elem);
-#endif
-    }
-}
-
-
-void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase & mesh,
-                                                const Elem * bad_elem)
-{
-  for (const auto & elem : mesh.element_ptr_range())
-    {
-      libmesh_assert (elem);
-      libmesh_assert_not_equal_to (elem->parent(), bad_elem);
-      for (auto n : elem->neighbor_ptr_range())
-        libmesh_assert_not_equal_to (n, bad_elem);
-
-#ifdef LIBMESH_ENABLE_AMR
-      if (elem->has_children())
-        for (auto & child : elem->child_ref_range())
-          libmesh_assert_not_equal_to (&child, bad_elem);
 #endif
     }
 }
@@ -1231,6 +1212,231 @@ void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase & mesh)
 
 
 
+void MeshTools::libmesh_assert_valid_constraint_rows (const MeshBase & mesh)
+{
+  for (auto & row : mesh.get_constraint_rows())
+    {
+      const Node * node = row.first;
+      libmesh_assert(node == mesh.node_ptr(node->id()));
+
+      for (auto & pr : row.second)
+        {
+          const Elem * spline_elem = pr.first.first;
+          libmesh_assert(spline_elem == mesh.elem_ptr(spline_elem->id()));
+        }
+    }
+}
+
+
+
+void MeshTools::libmesh_assert_contiguous_dof_ids(const MeshBase & mesh, unsigned int sysnum)
+{
+  LOG_SCOPE("libmesh_assert_contiguous_dof_ids()", "MeshTools");
+
+  if (mesh.n_processors() == 1)
+    return;
+
+  libmesh_parallel_only(mesh.comm());
+
+  dof_id_type min_dof_id = std::numeric_limits<dof_id_type>::max(),
+              max_dof_id = std::numeric_limits<dof_id_type>::min();
+
+  // Figure out what our local dof id range is
+  for (const auto * node : mesh.local_node_ptr_range())
+    {
+      for (auto v : make_range(node->n_vars(sysnum)))
+        for (auto c : make_range(node->n_comp(sysnum, v)))
+          {
+            dof_id_type id = node->dof_number(sysnum, v, c);
+            min_dof_id = std::min (min_dof_id, id);
+            max_dof_id = std::max (max_dof_id, id);
+          }
+    }
+
+  // Make sure no other processors' ids are inside it
+  for (const auto * node : mesh.node_ptr_range())
+    {
+      if (node->processor_id() == mesh.processor_id())
+        continue;
+      for (auto v : make_range(node->n_vars(sysnum)))
+        for (auto c : make_range(node->n_comp(sysnum, v)))
+          {
+            dof_id_type id = node->dof_number(sysnum, v, c);
+            libmesh_assert (id < min_dof_id ||
+                            id > max_dof_id);
+          }
+    }
+}
+
+
+
+template <>
+void MeshTools::libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
+{
+  LOG_SCOPE("libmesh_assert_topology_consistent_procids()", "MeshTools");
+
+  // This parameter is not used when !LIBMESH_ENABLE_AMR
+  libmesh_ignore(mesh);
+
+  // If we're adaptively refining, check processor ids for consistency
+  // between parents and children.
+#ifdef LIBMESH_ENABLE_AMR
+
+  // Ancestor elements we won't worry about, but subactive and active
+  // elements ought to have parents with consistent processor ids
+  for (const auto & elem : mesh.element_ptr_range())
+    {
+      libmesh_assert(elem);
+
+      if (!elem->active() && !elem->subactive())
+        continue;
+
+      const Elem * parent = elem->parent();
+
+      if (parent)
+        {
+          libmesh_assert(parent->has_children());
+          processor_id_type parent_procid = parent->processor_id();
+          bool matching_child_id = false;
+          // If we've got a remote_elem then we don't know whether
+          // it's responsible for the parent's processor id; all
+          // we can do is assume it is and let its processor fail
+          // an assert if there's something wrong.
+          for (auto & child : parent->child_ref_range())
+            if (&child == remote_elem ||
+                child.processor_id() == parent_procid)
+              matching_child_id = true;
+          libmesh_assert(matching_child_id);
+        }
+    }
+#endif
+}
+
+
+
+template <>
+void MeshTools::libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
+{
+  LOG_SCOPE("libmesh_assert_topology_consistent_procids()", "MeshTools");
+
+  if (mesh.n_processors() == 1)
+    return;
+
+  libmesh_parallel_only(mesh.comm());
+
+  // We want this test to be valid even when called even after nodes
+  // have been added asynchronously but before they're renumbered.
+  //
+  // Plus, some code (looking at you, stitch_meshes) modifies
+  // DofObject ids without keeping max_elem_id()/max_node_id()
+  // consistent, but that's done in a safe way for performance
+  // reasons, so we'll play along and just figure out new max ids
+  // ourselves.
+  dof_id_type parallel_max_node_id = 0;
+  for (const auto & node : mesh.node_ptr_range())
+    parallel_max_node_id = std::max<dof_id_type>(parallel_max_node_id,
+                                                 node->id()+1);
+  mesh.comm().max(parallel_max_node_id);
+
+
+  std::vector<bool> node_touched_by_me(parallel_max_node_id, false);
+
+  for (const auto & elem : as_range(mesh.local_elements_begin(),
+                                    mesh.local_elements_end()))
+    {
+      libmesh_assert (elem);
+
+      for (auto & node : elem->node_ref_range())
+        {
+          dof_id_type nodeid = node.id();
+          node_touched_by_me[nodeid] = true;
+        }
+    }
+  std::vector<bool> node_touched_by_anyone(node_touched_by_me);
+  mesh.comm().max(node_touched_by_anyone);
+
+  for (const auto & node : mesh.local_node_ptr_range())
+    {
+      libmesh_assert(node);
+      dof_id_type nodeid = node->id();
+      libmesh_assert(!node_touched_by_anyone[nodeid] ||
+                     node_touched_by_me[nodeid]);
+    }
+}
+
+
+
+void MeshTools::libmesh_assert_canonical_node_procids (const MeshBase & mesh)
+{
+  for (const auto & elem : mesh.active_element_ptr_range())
+    for (auto & node : elem->node_ref_range())
+      libmesh_assert_equal_to
+        (node.processor_id(),
+         node.choose_processor_id(node.processor_id(),
+                                  elem->processor_id()));
+}
+
+
+
+#ifdef LIBMESH_ENABLE_AMR
+void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase & mesh)
+{
+  LOG_SCOPE("libmesh_assert_valid_refinement_tree()", "MeshTools");
+
+  for (const auto & elem : mesh.element_ptr_range())
+    {
+      libmesh_assert(elem);
+      if (elem->has_children())
+        for (auto & child : elem->child_ref_range())
+          if (&child != remote_elem)
+            libmesh_assert_equal_to (child.parent(), elem);
+      if (elem->active())
+        {
+          libmesh_assert(!elem->ancestor());
+          libmesh_assert(!elem->subactive());
+        }
+      else if (elem->ancestor())
+        {
+          libmesh_assert(!elem->subactive());
+        }
+      else
+        libmesh_assert(elem->subactive());
+
+      if (elem->p_refinement_flag() == Elem::JUST_REFINED)
+        libmesh_assert_greater(elem->p_level(), 0);
+    }
+}
+#else
+void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &)
+{
+}
+#endif // LIBMESH_ENABLE_AMR
+
+#endif // !NDEBUG
+
+
+
+#ifdef DEBUG
+void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase & mesh,
+                                                const Elem * bad_elem)
+{
+  for (const auto & elem : mesh.element_ptr_range())
+    {
+      libmesh_assert (elem);
+      libmesh_assert_not_equal_to (elem->parent(), bad_elem);
+      for (auto n : elem->neighbor_ptr_range())
+        libmesh_assert_not_equal_to (n, bad_elem);
+
+#ifdef LIBMESH_ENABLE_AMR
+      if (elem->has_children())
+        for (auto & child : elem->child_ref_range())
+          libmesh_assert_not_equal_to (&child, bad_elem);
+#endif
+    }
+}
+
+
+
 void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_connected_nodes()", "MeshTools");
@@ -1249,23 +1455,6 @@ void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
     {
       libmesh_assert(node);
       libmesh_assert(used_nodes.count(node));
-    }
-}
-
-
-
-void MeshTools::libmesh_assert_valid_constraint_rows (const MeshBase & mesh)
-{
-  for (auto & row : mesh.get_constraint_rows())
-    {
-      const Node * node = row.first;
-      libmesh_assert(node == mesh.node_ptr(node->id()));
-
-      for (auto & pr : row.second)
-        {
-          const Elem * spline_elem = pr.first.first;
-          libmesh_assert(spline_elem == mesh.elem_ptr(spline_elem->id()));
-        }
     }
 }
 
@@ -1470,46 +1659,6 @@ void libmesh_assert_valid_dof_ids(const MeshBase & mesh, unsigned int sysnum)
 }
 
 
-void libmesh_assert_contiguous_dof_ids(const MeshBase & mesh, unsigned int sysnum)
-{
-  LOG_SCOPE("libmesh_assert_contiguous_dof_ids()", "MeshTools");
-
-  if (mesh.n_processors() == 1)
-    return;
-
-  libmesh_parallel_only(mesh.comm());
-
-  dof_id_type min_dof_id = std::numeric_limits<dof_id_type>::max(),
-              max_dof_id = std::numeric_limits<dof_id_type>::min();
-
-  // Figure out what our local dof id range is
-  for (const auto * node : mesh.local_node_ptr_range())
-    {
-      for (auto v : make_range(node->n_vars(sysnum)))
-        for (auto c : make_range(node->n_comp(sysnum, v)))
-          {
-            dof_id_type id = node->dof_number(sysnum, v, c);
-            min_dof_id = std::min (min_dof_id, id);
-            max_dof_id = std::max (max_dof_id, id);
-          }
-    }
-
-  // Make sure no other processors' ids are inside it
-  for (const auto * node : mesh.node_ptr_range())
-    {
-      if (node->processor_id() == mesh.processor_id())
-        continue;
-      for (auto v : make_range(node->n_vars(sysnum)))
-        for (auto c : make_range(node->n_comp(sysnum, v)))
-          {
-            dof_id_type id = node->dof_number(sysnum, v, c);
-            libmesh_assert (id < min_dof_id ||
-                            id > max_dof_id);
-          }
-    }
-}
-
-
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
 {
@@ -1623,49 +1772,6 @@ void libmesh_assert_consistent_distributed_nodes(const MeshBase & mesh)
 }
 
 
-template <>
-void libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
-{
-  LOG_SCOPE("libmesh_assert_topology_consistent_procids()", "MeshTools");
-
-  // This parameter is not used when !LIBMESH_ENABLE_AMR
-  libmesh_ignore(mesh);
-
-  // If we're adaptively refining, check processor ids for consistency
-  // between parents and children.
-#ifdef LIBMESH_ENABLE_AMR
-
-  // Ancestor elements we won't worry about, but subactive and active
-  // elements ought to have parents with consistent processor ids
-  for (const auto & elem : mesh.element_ptr_range())
-    {
-      libmesh_assert(elem);
-
-      if (!elem->active() && !elem->subactive())
-        continue;
-
-      const Elem * parent = elem->parent();
-
-      if (parent)
-        {
-          libmesh_assert(parent->has_children());
-          processor_id_type parent_procid = parent->processor_id();
-          bool matching_child_id = false;
-          // If we've got a remote_elem then we don't know whether
-          // it's responsible for the parent's processor id; all
-          // we can do is assume it is and let its processor fail
-          // an assert if there's something wrong.
-          for (auto & child : parent->child_ref_range())
-            if (&child == remote_elem ||
-                child.processor_id() == parent_procid)
-              matching_child_id = true;
-          libmesh_assert(matching_child_id);
-        }
-    }
-#endif
-}
-
-
 
 template <>
 void libmesh_assert_parallel_consistent_procids<Elem>(const MeshBase & mesh)
@@ -1711,58 +1817,6 @@ void libmesh_assert_parallel_consistent_procids<Elem>(const MeshBase & mesh)
 
       if (min_id == mesh.processor_id())
         libmesh_assert(elem);
-    }
-}
-
-
-
-template <>
-void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
-{
-  LOG_SCOPE("libmesh_assert_topology_consistent_procids()", "MeshTools");
-
-  if (mesh.n_processors() == 1)
-    return;
-
-  libmesh_parallel_only(mesh.comm());
-
-  // We want this test to be valid even when called even after nodes
-  // have been added asynchronously but before they're renumbered.
-  //
-  // Plus, some code (looking at you, stitch_meshes) modifies
-  // DofObject ids without keeping max_elem_id()/max_node_id()
-  // consistent, but that's done in a safe way for performance
-  // reasons, so we'll play along and just figure out new max ids
-  // ourselves.
-  dof_id_type parallel_max_node_id = 0;
-  for (const auto & node : mesh.node_ptr_range())
-    parallel_max_node_id = std::max<dof_id_type>(parallel_max_node_id,
-                                                 node->id()+1);
-  mesh.comm().max(parallel_max_node_id);
-
-
-  std::vector<bool> node_touched_by_me(parallel_max_node_id, false);
-
-  for (const auto & elem : as_range(mesh.local_elements_begin(),
-                                    mesh.local_elements_end()))
-    {
-      libmesh_assert (elem);
-
-      for (auto & node : elem->node_ref_range())
-        {
-          dof_id_type nodeid = node.id();
-          node_touched_by_me[nodeid] = true;
-        }
-    }
-  std::vector<bool> node_touched_by_anyone(node_touched_by_me);
-  mesh.comm().max(node_touched_by_anyone);
-
-  for (const auto & node : mesh.local_node_ptr_range())
-    {
-      libmesh_assert(node);
-      dof_id_type nodeid = node->id();
-      libmesh_assert(!node_touched_by_anyone[nodeid] ||
-                     node_touched_by_me[nodeid]);
     }
 }
 
@@ -1859,17 +1913,6 @@ void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
 }
 
 
-void libmesh_assert_canonical_node_procids (const MeshBase & mesh)
-{
-  for (const auto & elem : mesh.active_element_ptr_range())
-    for (auto & node : elem->node_ref_range())
-      libmesh_assert_equal_to
-        (node.processor_id(),
-         node.choose_processor_id(node.processor_id(),
-                                  elem->processor_id()));
-}
-
-
 
 } // namespace MeshTools
 
@@ -1917,42 +1960,6 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase & mesh)
 }
 #else
 void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &)
-{
-}
-#endif // LIBMESH_ENABLE_AMR
-
-
-
-#ifdef LIBMESH_ENABLE_AMR
-void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase & mesh)
-{
-  LOG_SCOPE("libmesh_assert_valid_refinement_tree()", "MeshTools");
-
-  for (const auto & elem : mesh.element_ptr_range())
-    {
-      libmesh_assert(elem);
-      if (elem->has_children())
-        for (auto & child : elem->child_ref_range())
-          if (&child != remote_elem)
-            libmesh_assert_equal_to (child.parent(), elem);
-      if (elem->active())
-        {
-          libmesh_assert(!elem->ancestor());
-          libmesh_assert(!elem->subactive());
-        }
-      else if (elem->ancestor())
-        {
-          libmesh_assert(!elem->subactive());
-        }
-      else
-        libmesh_assert(elem->subactive());
-
-      if (elem->p_refinement_flag() == Elem::JUST_REFINED)
-        libmesh_assert_greater(elem->p_level(), 0);
-    }
-}
-#else
-void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &)
 {
 }
 #endif // LIBMESH_ENABLE_AMR
@@ -2013,9 +2020,6 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
         }
     }
 }
-
-
-
 #endif // DEBUG
 
 
