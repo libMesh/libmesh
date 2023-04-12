@@ -94,6 +94,12 @@ public:
   virtual void move_nodes_and_elements(MeshBase && other_mesh) override;
 
   /**
+   * Shim to allow operator == (&) to behave like a virtual function
+   * without having to be one.
+   */
+  virtual bool subclass_locally_equals (const MeshBase & other_mesh);
+
+  /**
    * Virtual copy-constructor, creates a copy of this mesh
    */
   virtual std::unique_ptr<MeshBase> clone () const override

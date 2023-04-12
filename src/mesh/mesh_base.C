@@ -205,6 +205,108 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
 }
 
 
+bool MeshBase::operator== (const MeshBase & other_mesh)
+{
+  bool is_equal = this->locally_equals(other_mesh);
+  this->comm().min(is_equal);
+  return is_equal;
+}
+
+
+bool MeshBase::locally_equals (const MeshBase & other_mesh)
+{
+  // Check whether everything in the base is equal
+  if (_n_parts != other_mesh._n_parts ||
+      _default_mapping_type != other_mesh._default_mapping_type ||
+      _default_mapping_data != other_mesh._default_mapping_data ||
+      _is_prepared != other_mesh._is_prepared ||
+      _count_lower_dim_elems_in_point_locator !=
+        other_mesh._count_lower_dim_elems_in_point_locator ||
+      // We expect this to change in a DistributeMesh prepare_for_use();
+      // it's conceptually "mutable"...
+/*
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      _next_unique_id != other_mesh._next_unique_id ||
+#endif
+*/
+      _skip_noncritical_partitioning != other_mesh._skip_noncritical_partitioning ||
+      _skip_all_partitioning != other_mesh._skip_all_partitioning ||
+      _skip_renumber_nodes_and_elements != other_mesh._skip_renumber_nodes_and_elements ||
+      _skip_find_neighbors != other_mesh._skip_find_neighbors ||
+      _allow_remote_element_removal != other_mesh._allow_remote_element_removal ||
+      _spatial_dimension != other_mesh._spatial_dimension ||
+      _point_locator_close_to_point_tol != other_mesh._point_locator_close_to_point_tol ||
+      _block_id_to_name != other_mesh._block_id_to_name ||
+      _elem_dims != other_mesh._elem_dims ||
+      _mesh_subdomains != other_mesh._mesh_subdomains ||
+      _all_elemset_ids != other_mesh._all_elemset_ids ||
+      _elem_integer_names != other_mesh._elem_integer_names ||
+      _elem_integer_default_values != other_mesh._elem_integer_default_values ||
+      _node_integer_names != other_mesh._node_integer_names ||
+      _node_integer_default_values != other_mesh._node_integer_default_values ||
+      bool(_default_ghosting) != bool(other_mesh._default_ghosting) ||
+      bool(_partitioner) != bool(other_mesh._partitioner) ||
+      *boundary_info != *other_mesh.boundary_info)
+    return false;
+
+  const constraint_rows_type & other_rows =
+    other_mesh.get_constraint_rows();
+  for (auto constraint_row_pair : this->_constraint_rows)
+    {
+      const dof_id_type node_id = constraint_row_pair.first->id();
+      const Node * other_node = other_mesh.query_node_ptr(node_id);
+      if (!other_node)
+        return false;
+
+      auto it = other_rows.find(other_node);
+      if (it == other_rows.end())
+        return false;
+
+      auto & row = constraint_row_pair.second;
+      auto & other_row = it->second;
+      if (row.size() != other_row.size())
+        return false;
+
+      for (auto i : index_range(row))
+        {
+          const auto & row_i = row[i];
+          const auto & other_row_i = other_row[i];
+          libmesh_assert(row_i.first.first);
+          libmesh_assert(other_row_i.first.first);
+          if (row_i.first.first->id() !=
+              other_row_i.first.first->id() ||
+              row_i.first.second !=
+              other_row_i.first.second ||
+              row_i.second !=
+              other_row_i.second)
+            return false;
+        }
+    }
+
+  for (auto elemset_codes_pair : this->_elemset_codes)
+    {
+      auto it = other_mesh._elemset_codes.find(elemset_codes_pair.first);
+      if (it == other_mesh._elemset_codes.end() ||
+          elemset_codes_pair.second != it->second)
+        return false;
+    }
+
+  // FIXME: we have no good way to compare ghosting functors, since
+  // they're in a set sorted by pointer, and we have no way *at all*
+  // to compare ghosting functors, since they don't have operator==
+  // defined and we encourage users to subclass them.  We can check if
+  // we have the same number, is all.
+  if (_ghosting_functors.size() !=
+      other_mesh._ghosting_functors.size())
+    return false;
+
+  // Same deal for partitioners.  We tested that we both have one or
+  // both don't, but are they equivalent?  Let's guess "yes".
+
+  // Now let the subclasses decide whether everything else is equal
+  return this->subclass_locally_equals(other_mesh);
+}
+
 
 MeshBase::~MeshBase()
 {
@@ -1787,6 +1889,36 @@ MeshBase::post_dofobject_moves(MeshBase && other_mesh)
 
   if (other_mesh.partitioner())
     _partitioner = std::move(other_mesh.partitioner());
+}
+
+
+bool MeshBase::nodes_and_elements_equal(const MeshBase & other_mesh)
+{
+  for (const auto & other_node : other_mesh.node_ptr_range())
+    {
+      const Node * node = this->query_node_ptr(other_node->id());
+      if (!node)
+        return false;
+      if (*other_node != *node)
+        return false;
+    }
+  for (const auto & node : this->node_ptr_range())
+    if (!other_mesh.query_node_ptr(node->id()))
+      return false;
+
+  for (const auto & other_elem : other_mesh.element_ptr_range())
+    {
+      const Elem * elem = this->query_elem_ptr(other_elem->id());
+      if (!elem)
+        return false;
+      if (!other_elem->topologically_equal(*elem))
+        return false;
+    }
+  for (const auto & elem : this->element_ptr_range())
+    if (!other_mesh.query_elem_ptr(elem->id()))
+      return false;
+
+  return true;
 }
 
 

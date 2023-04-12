@@ -111,6 +111,29 @@ public:
   virtual MeshBase & assign(MeshBase && other_mesh) = 0;
 
   /**
+   * This tests for exactly-equal data in all the senses that a
+   * mathematician would care about (element connectivity, nodal
+   * coordinates), but in the senses a programmer would care about it
+   * allows for non-equal equivalence in some ways (we accept
+   * different Elem/Node addresses in memory) but not others (we do
+   * not accept different subclass types, nor even different Elem/Node
+   * ids).
+   */
+  bool operator== (const MeshBase & other_mesh);
+
+  bool operator!= (const MeshBase & other_mesh) {
+    return !(*this == other_mesh);
+  }
+
+  /**
+   * This behaves the same as operator==, but only for the local and
+   * ghosted aspects of the mesh; i.e. operator== is true iff local
+   * equality is true on every rank.
+   */
+  bool locally_equals (const MeshBase & other_mesh);
+
+
+  /**
    * Virtual "copy constructor"
    */
   virtual std::unique_ptr<MeshBase> clone() const = 0;
@@ -1899,6 +1922,18 @@ protected:
    * operators.
    */
   void post_dofobject_moves(MeshBase && other_mesh);
+
+  /**
+   * Shim to allow operator == (&) to behave like a virtual function
+   * without having to be one.
+   */
+  virtual bool subclass_locally_equals (const MeshBase & other_mesh) = 0;
+
+  /**
+   * Tests for equality of all elements and nodes in the mesh.  Helper
+   * function for subclass_equals() in unstructured mesh subclasses.
+   */
+  bool nodes_and_elements_equal(const MeshBase & other_mesh);
 
   /**
    * \returns A writable reference to the number of partitions.
