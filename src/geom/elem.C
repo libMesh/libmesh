@@ -609,6 +609,58 @@ bool Elem::operator == (const Elem & rhs) const
 
 
 
+bool Elem::topologically_equal (const Elem & rhs) const
+{
+  // If the elements aren't the same type, they aren't equal
+  if (this->type() != rhs.type())
+    return false;
+
+  libmesh_assert_equal_to(this->n_nodes(), rhs.n_nodes());
+
+  for (auto n : make_range(this->n_nodes()))
+    if (this->node_id(n) != rhs.node_id(n))
+      return false;
+
+  for (auto neigh : make_range(this->n_neighbors()))
+    {
+      if (!this->neighbor_ptr(neigh))
+        {
+          if (rhs.neighbor_ptr(neigh))
+            return false;
+          continue;
+        }
+      if (!rhs.neighbor_ptr(neigh) ||
+          this->neighbor_ptr(neigh)->id() !=
+          rhs.neighbor_ptr(neigh)->id())
+        return false;
+    }
+
+  if (this->parent())
+    {
+      if (!rhs.parent())
+        return false;
+      if (this->parent()->id() != rhs.parent()->id())
+        return false;
+    }
+  else if (rhs.parent())
+    return false;
+
+  if (this->interior_parent())
+    {
+      if (!rhs.interior_parent())
+        return false;
+      if (this->interior_parent()->id() !=
+          rhs.interior_parent()->id())
+        return false;
+    }
+  else if (rhs.interior_parent())
+    return false;
+
+  return true;
+}
+
+
+
 bool Elem::is_semilocal(const processor_id_type my_pid) const
 {
   std::set<const Elem *> point_neighbors;
