@@ -309,6 +309,13 @@ public:
   SparseMatrix<Number> & get_system_matrix();
 
   /**
+   * After calling this method with \p true, all successive solves
+   * will be restricted to unconstrained dofs, with constraints
+   * applied separately as necessary.
+   */
+  virtual void restrict_solves_to_unconstrained(bool restricting);
+
+  /**
    * The system matrix.  Implicit systems are characterized by
    * the need to solve the linear system Ax=b.  This is the
    * system matrix A.
