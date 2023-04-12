@@ -406,7 +406,11 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // MeshTools functions
-dof_id_type MeshTools::total_weight(const MeshBase & mesh)
+
+namespace MeshTools
+{
+
+dof_id_type total_weight(const MeshBase & mesh)
 {
   if (!mesh.is_serial())
     {
@@ -429,7 +433,7 @@ dof_id_type MeshTools::total_weight(const MeshBase & mesh)
 
 
 
-dof_id_type MeshTools::weight(const MeshBase & mesh, const processor_id_type pid)
+dof_id_type weight(const MeshBase & mesh, const processor_id_type pid)
 {
   SumElemWeight sew;
 
@@ -441,8 +445,8 @@ dof_id_type MeshTools::weight(const MeshBase & mesh, const processor_id_type pid
 
 
 
-void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
-                                         std::vector<std::vector<dof_id_type>> & nodes_to_elem_map)
+void build_nodes_to_elem_map (const MeshBase & mesh,
+                              std::vector<std::vector<dof_id_type>> & nodes_to_elem_map)
 {
   // A vector indexed over all nodes is too inefficient to use for a
   // distributed mesh.  Use the unordered_map API instead.
@@ -463,8 +467,8 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 
 
 
-void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
-                                         std::vector<std::vector<const Elem *>> & nodes_to_elem_map)
+void build_nodes_to_elem_map (const MeshBase & mesh,
+                              std::vector<std::vector<const Elem *>> & nodes_to_elem_map)
 {
   // A vector indexed over all nodes is too inefficient to use for a
   // distributed mesh.  Use the unordered_map API instead.
@@ -484,8 +488,8 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 
 
 
-void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
-                                         std::unordered_map<dof_id_type, std::vector<dof_id_type>> & nodes_to_elem_map)
+void build_nodes_to_elem_map (const MeshBase & mesh,
+                              std::unordered_map<dof_id_type, std::vector<dof_id_type>> & nodes_to_elem_map)
 {
   nodes_to_elem_map.clear();
 
@@ -496,8 +500,8 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 
 
 
-void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
-                                         std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map)
+void build_nodes_to_elem_map (const MeshBase & mesh,
+                              std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map)
 {
   nodes_to_elem_map.clear();
 
@@ -509,7 +513,7 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 
 
 std::unordered_set<dof_id_type>
-MeshTools::find_boundary_nodes(const MeshBase & mesh)
+find_boundary_nodes(const MeshBase & mesh)
 {
   std::unordered_set<dof_id_type> boundary_nodes;
 
@@ -529,7 +533,7 @@ MeshTools::find_boundary_nodes(const MeshBase & mesh)
 }
 
 std::unordered_set<dof_id_type>
-MeshTools::find_block_boundary_nodes(const MeshBase & mesh)
+find_block_boundary_nodes(const MeshBase & mesh)
 {
   std::unordered_set<dof_id_type> block_boundary_nodes;
 
@@ -551,7 +555,7 @@ MeshTools::find_block_boundary_nodes(const MeshBase & mesh)
 
 
 libMesh::BoundingBox
-MeshTools::create_bounding_box (const MeshBase & mesh)
+create_bounding_box (const MeshBase & mesh)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
@@ -564,7 +568,7 @@ MeshTools::create_bounding_box (const MeshBase & mesh)
                             find_bbox);
 
   // And combine with our local elements
-  find_bbox.bbox().union_with(MeshTools::create_local_bounding_box(mesh));
+  find_bbox.bbox().union_with(create_local_bounding_box(mesh));
 
   // Compare the bounding boxes across processors
   mesh.comm().min(find_bbox.min());
@@ -576,7 +580,7 @@ MeshTools::create_bounding_box (const MeshBase & mesh)
 
 
 libMesh::BoundingBox
-MeshTools::create_nodal_bounding_box (const MeshBase & mesh)
+create_nodal_bounding_box (const MeshBase & mesh)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
@@ -603,9 +607,9 @@ MeshTools::create_nodal_bounding_box (const MeshBase & mesh)
 
 
 Sphere
-MeshTools::bounding_sphere(const MeshBase & mesh)
+bounding_sphere(const MeshBase & mesh)
 {
-  libMesh::BoundingBox bbox = MeshTools::create_bounding_box(mesh);
+  libMesh::BoundingBox bbox = create_bounding_box(mesh);
 
   const Real  diag = (bbox.second - bbox.first).norm();
   const Point cent = (bbox.second + bbox.first)/2;
@@ -616,7 +620,7 @@ MeshTools::bounding_sphere(const MeshBase & mesh)
 
 
 libMesh::BoundingBox
-MeshTools::create_local_bounding_box (const MeshBase & mesh)
+create_local_bounding_box (const MeshBase & mesh)
 {
   FindBBox find_bbox;
 
@@ -630,7 +634,7 @@ MeshTools::create_local_bounding_box (const MeshBase & mesh)
 
 
 libMesh::BoundingBox
-MeshTools::create_processor_bounding_box (const MeshBase & mesh,
+create_processor_bounding_box (const MeshBase & mesh,
                                           const processor_id_type pid)
 {
   // This can only be run in parallel, with consistent arguments.
@@ -655,11 +659,11 @@ MeshTools::create_processor_bounding_box (const MeshBase & mesh,
 
 
 Sphere
-MeshTools::processor_bounding_sphere (const MeshBase & mesh,
+processor_bounding_sphere (const MeshBase & mesh,
                                       const processor_id_type pid)
 {
   libMesh::BoundingBox bbox =
-    MeshTools::create_processor_bounding_box(mesh, pid);
+    create_processor_bounding_box(mesh, pid);
 
   const Real  diag = (bbox.second - bbox.first).norm();
   const Point cent = (bbox.second + bbox.first)/2;
@@ -670,8 +674,8 @@ MeshTools::processor_bounding_sphere (const MeshBase & mesh,
 
 
 libMesh::BoundingBox
-MeshTools::create_subdomain_bounding_box (const MeshBase & mesh,
-                                          const subdomain_id_type sid)
+create_subdomain_bounding_box (const MeshBase & mesh,
+                               const subdomain_id_type sid)
 {
   // This can only be run in parallel, with consistent arguments.
   libmesh_parallel_only(mesh.comm());
@@ -694,11 +698,11 @@ MeshTools::create_subdomain_bounding_box (const MeshBase & mesh,
 
 
 Sphere
-MeshTools::subdomain_bounding_sphere (const MeshBase & mesh,
-                                      const subdomain_id_type sid)
+subdomain_bounding_sphere (const MeshBase & mesh,
+                           const subdomain_id_type sid)
 {
   libMesh::BoundingBox bbox =
-    MeshTools::create_subdomain_bounding_box(mesh, sid);
+    create_subdomain_bounding_box(mesh, sid);
 
   const Real  diag = (bbox.second - bbox.first).norm();
   const Point cent = (bbox.second + bbox.first)/2;
@@ -708,8 +712,8 @@ MeshTools::subdomain_bounding_sphere (const MeshBase & mesh,
 
 
 
-void MeshTools::elem_types (const MeshBase & mesh,
-                            std::vector<ElemType> & et)
+void elem_types (const MeshBase & mesh,
+                 std::vector<ElemType> & et)
 {
   // Loop over the the elements.  If the current element type isn't in
   // the vector, insert it.
@@ -720,8 +724,8 @@ void MeshTools::elem_types (const MeshBase & mesh,
 
 
 
-dof_id_type MeshTools::n_elem_of_type (const MeshBase & mesh,
-                                       const ElemType type)
+dof_id_type n_elem_of_type (const MeshBase & mesh,
+                            const ElemType type)
 {
   return static_cast<dof_id_type>(std::distance(mesh.type_elements_begin(type),
                                                 mesh.type_elements_end  (type)));
@@ -729,16 +733,16 @@ dof_id_type MeshTools::n_elem_of_type (const MeshBase & mesh,
 
 
 
-dof_id_type MeshTools::n_active_elem_of_type (const MeshBase & mesh,
-                                              const ElemType type)
+dof_id_type n_active_elem_of_type (const MeshBase & mesh,
+                                   const ElemType type)
 {
   return static_cast<dof_id_type>(std::distance(mesh.active_type_elements_begin(type),
                                                 mesh.active_type_elements_end  (type)));
 }
 
-dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase & mesh,
-                                                             const ElemType type,
-                                                             const unsigned int level)
+dof_id_type n_non_subactive_elem_of_type_at_level(const MeshBase & mesh,
+                                                  const ElemType type,
+                                                  const unsigned int level)
 {
   dof_id_type cnt = 0;
 
@@ -752,7 +756,7 @@ dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase & me
 }
 
 
-unsigned int MeshTools::n_active_local_levels(const MeshBase & mesh)
+unsigned int n_active_local_levels(const MeshBase & mesh)
 {
   unsigned int nl = 0;
 
@@ -764,11 +768,11 @@ unsigned int MeshTools::n_active_local_levels(const MeshBase & mesh)
 
 
 
-unsigned int MeshTools::n_active_levels(const MeshBase & mesh)
+unsigned int n_active_levels(const MeshBase & mesh)
 {
   libmesh_parallel_only(mesh.comm());
 
-  unsigned int nl = MeshTools::n_active_local_levels(mesh);
+  unsigned int nl = n_active_local_levels(mesh);
 
   for (const auto & elem : as_range(mesh.unpartitioned_elements_begin(),
                                     mesh.unpartitioned_elements_end()))
@@ -781,7 +785,7 @@ unsigned int MeshTools::n_active_levels(const MeshBase & mesh)
 
 
 
-unsigned int MeshTools::n_local_levels(const MeshBase & mesh)
+unsigned int n_local_levels(const MeshBase & mesh)
 {
   unsigned int nl = 0;
 
@@ -794,11 +798,11 @@ unsigned int MeshTools::n_local_levels(const MeshBase & mesh)
 
 
 
-unsigned int MeshTools::n_levels(const MeshBase & mesh)
+unsigned int n_levels(const MeshBase & mesh)
 {
   libmesh_parallel_only(mesh.comm());
 
-  unsigned int nl = MeshTools::n_local_levels(mesh);
+  unsigned int nl = n_local_levels(mesh);
 
   for (const auto & elem : as_range(mesh.unpartitioned_elements_begin(),
                                     mesh.unpartitioned_elements_end()))
@@ -810,7 +814,7 @@ unsigned int MeshTools::n_levels(const MeshBase & mesh)
   // the mesh is validly distributed (or serialized).  Let's run an
   // expensive test in debug mode to make sure this is such a case.
 #ifdef DEBUG
-  const unsigned int paranoid_nl = MeshTools::paranoid_n_levels(mesh);
+  const unsigned int paranoid_nl = paranoid_n_levels(mesh);
   libmesh_assert_equal_to(nl, paranoid_nl);
 #endif
   return nl;
@@ -818,7 +822,7 @@ unsigned int MeshTools::n_levels(const MeshBase & mesh)
 
 
 
-unsigned int MeshTools::paranoid_n_levels(const MeshBase & mesh)
+unsigned int paranoid_n_levels(const MeshBase & mesh)
 {
   libmesh_parallel_only(mesh.comm());
 
@@ -832,8 +836,8 @@ unsigned int MeshTools::paranoid_n_levels(const MeshBase & mesh)
 
 
 
-void MeshTools::get_not_subactive_node_ids(const MeshBase & mesh,
-                                           std::set<dof_id_type> & not_subactive_node_ids)
+void get_not_subactive_node_ids(const MeshBase & mesh,
+                                std::set<dof_id_type> & not_subactive_node_ids)
 {
   for (const auto & elem : mesh.element_ptr_range())
     if (!elem->subactive())
@@ -843,23 +847,23 @@ void MeshTools::get_not_subactive_node_ids(const MeshBase & mesh,
 
 
 
-dof_id_type MeshTools::n_elem (const MeshBase::const_element_iterator & begin,
-                               const MeshBase::const_element_iterator & end)
+dof_id_type n_elem (const MeshBase::const_element_iterator & begin,
+                    const MeshBase::const_element_iterator & end)
 {
   return cast_int<dof_id_type>(std::distance(begin, end));
 }
 
 
 
-dof_id_type MeshTools::n_nodes (const MeshBase::const_node_iterator & begin,
-                                const MeshBase::const_node_iterator & end)
+dof_id_type n_nodes (const MeshBase::const_node_iterator & begin,
+                     const MeshBase::const_node_iterator & end)
 {
   return cast_int<dof_id_type>(std::distance(begin, end));
 }
 
 
 
-unsigned int MeshTools::n_p_levels (const MeshBase & mesh)
+unsigned int n_p_levels (const MeshBase & mesh)
 {
   libmesh_parallel_only(mesh.comm());
 
@@ -881,10 +885,10 @@ unsigned int MeshTools::n_p_levels (const MeshBase & mesh)
 
 
 
-void MeshTools::find_nodal_neighbors(const MeshBase &,
-                                     const Node & node,
-                                     const std::vector<std::vector<const Elem *>> & nodes_to_elem_map,
-                                     std::vector<const Node *> & neighbors)
+void find_nodal_neighbors(const MeshBase &,
+                          const Node & node,
+                          const std::vector<std::vector<const Elem *>> & nodes_to_elem_map,
+                          std::vector<const Node *> & neighbors)
 {
   find_nodal_neighbors_helper(node.id(), nodes_to_elem_map[node.id()],
                               neighbors);
@@ -892,10 +896,10 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
 
 
 
-void MeshTools::find_nodal_neighbors(const MeshBase &,
-                                     const Node & node,
-                                     const std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map,
-                                     std::vector<const Node *> & neighbors)
+void find_nodal_neighbors(const MeshBase &,
+                          const Node & node,
+                          const std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map,
+                          std::vector<const Node *> & neighbors)
 {
   const std::vector<const Elem *> node_to_elem_vec =
     libmesh_map_find(nodes_to_elem_map, node.id());
@@ -904,8 +908,8 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
 
 
 
-void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
-                                               std::map<dof_id_type, std::vector<dof_id_type>> & hanging_nodes)
+void find_hanging_nodes_and_parents(const MeshBase & mesh,
+                                    std::map<dof_id_type, std::vector<dof_id_type>> & hanging_nodes)
 {
   // Loop through all the elements
   for (auto & elem : mesh.active_local_element_ptr_range())
@@ -992,7 +996,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
 
 
 
-void MeshTools::clear_spline_nodes(MeshBase & mesh)
+void clear_spline_nodes(MeshBase & mesh)
 {
   std::vector<Elem *> nodeelem_to_delete;
 
@@ -1027,7 +1031,7 @@ void MeshTools::clear_spline_nodes(MeshBase & mesh)
 
 
 #ifndef NDEBUG
-void MeshTools::libmesh_assert_equal_n_systems (const MeshBase & mesh)
+void libmesh_assert_equal_n_systems (const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_equal_n_systems()", "MeshTools");
 
@@ -1053,7 +1057,7 @@ void MeshTools::libmesh_assert_equal_n_systems (const MeshBase & mesh)
 
 
 #ifdef LIBMESH_ENABLE_AMR
-void MeshTools::libmesh_assert_old_dof_objects (const MeshBase & mesh)
+void libmesh_assert_old_dof_objects (const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_old_dof_objects()", "MeshTools");
 
@@ -1072,12 +1076,12 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase & mesh)
     }
 }
 #else
-void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &) {}
+void libmesh_assert_old_dof_objects (const MeshBase &) {}
 #endif // LIBMESH_ENABLE_AMR
 
 
 
-void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase & mesh)
+void libmesh_assert_valid_node_pointers(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_node_pointers()", "MeshTools");
 
@@ -1102,7 +1106,7 @@ void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase & mesh)
 
 
 
-void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
+void libmesh_assert_valid_remote_elems(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_remote_elems()", "MeshTools");
 
@@ -1133,7 +1137,7 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
 
 
 
-void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase & mesh)
+void libmesh_assert_valid_elem_ids(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_elem_ids()", "MeshTools");
 
@@ -1156,7 +1160,7 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase & mesh)
 
 
 
-void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase & mesh)
+void libmesh_assert_valid_amr_elem_ids(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_amr_elem_ids()", "MeshTools");
 
@@ -1176,7 +1180,7 @@ void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase & mesh)
 
 
 
-void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase & mesh)
+void libmesh_assert_valid_amr_interior_parents(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_amr_interior_parents()", "MeshTools");
 
@@ -1212,7 +1216,7 @@ void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase & mesh)
 
 
 
-void MeshTools::libmesh_assert_valid_constraint_rows (const MeshBase & mesh)
+void libmesh_assert_valid_constraint_rows (const MeshBase & mesh)
 {
   for (auto & row : mesh.get_constraint_rows())
     {
@@ -1229,7 +1233,7 @@ void MeshTools::libmesh_assert_valid_constraint_rows (const MeshBase & mesh)
 
 
 
-void MeshTools::libmesh_assert_contiguous_dof_ids(const MeshBase & mesh, unsigned int sysnum)
+void libmesh_assert_contiguous_dof_ids(const MeshBase & mesh, unsigned int sysnum)
 {
   LOG_SCOPE("libmesh_assert_contiguous_dof_ids()", "MeshTools");
 
@@ -1271,7 +1275,7 @@ void MeshTools::libmesh_assert_contiguous_dof_ids(const MeshBase & mesh, unsigne
 
 
 template <>
-void MeshTools::libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
+void libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_topology_consistent_procids()", "MeshTools");
 
@@ -1315,7 +1319,7 @@ void MeshTools::libmesh_assert_topology_consistent_procids<Elem>(const MeshBase 
 
 
 template <>
-void MeshTools::libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
+void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_topology_consistent_procids()", "MeshTools");
 
@@ -1366,7 +1370,7 @@ void MeshTools::libmesh_assert_topology_consistent_procids<Node>(const MeshBase 
 
 
 
-void MeshTools::libmesh_assert_canonical_node_procids (const MeshBase & mesh)
+void libmesh_assert_canonical_node_procids (const MeshBase & mesh)
 {
   for (const auto & elem : mesh.active_element_ptr_range())
     for (auto & node : elem->node_ref_range())
@@ -1379,7 +1383,7 @@ void MeshTools::libmesh_assert_canonical_node_procids (const MeshBase & mesh)
 
 
 #ifdef LIBMESH_ENABLE_AMR
-void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase & mesh)
+void libmesh_assert_valid_refinement_tree(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_refinement_tree()", "MeshTools");
 
@@ -1407,7 +1411,7 @@ void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase & mesh)
     }
 }
 #else
-void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &)
+void libmesh_assert_valid_refinement_tree(const MeshBase &)
 {
 }
 #endif // LIBMESH_ENABLE_AMR
@@ -1417,8 +1421,8 @@ void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &)
 
 
 #ifdef DEBUG
-void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase & mesh,
-                                                const Elem * bad_elem)
+void libmesh_assert_no_links_to_elem(const MeshBase & mesh,
+                                     const Elem * bad_elem)
 {
   for (const auto & elem : mesh.element_ptr_range())
     {
@@ -1437,7 +1441,7 @@ void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase & mesh,
 
 
 
-void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
+void libmesh_assert_connected_nodes (const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_connected_nodes()", "MeshTools");
 
@@ -1459,8 +1463,6 @@ void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
 }
 
 
-
-namespace MeshTools {
 
 void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
 {
@@ -1914,12 +1916,8 @@ void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
 
 
 
-} // namespace MeshTools
-
-
-
 #ifdef LIBMESH_ENABLE_AMR
-void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase & mesh)
+void libmesh_assert_valid_refinement_flags(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_refinement_flags()", "MeshTools");
 
@@ -1959,15 +1957,15 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase & mesh)
     }
 }
 #else
-void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &)
+void libmesh_assert_valid_refinement_flags(const MeshBase &)
 {
 }
 #endif // LIBMESH_ENABLE_AMR
 
 
 
-void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
-                                               bool assert_valid_remote_elems)
+void libmesh_assert_valid_neighbors(const MeshBase & mesh,
+                                    bool assert_valid_remote_elems)
 {
   LOG_SCOPE("libmesh_assert_valid_neighbors()", "MeshTools");
 
@@ -2154,7 +2152,7 @@ struct SyncProcIdsFromMap
 
 
 
-void MeshTools::correct_node_proc_ids (MeshBase & mesh)
+void correct_node_proc_ids (MeshBase & mesh)
 {
   LOG_SCOPE("correct_node_proc_ids()","MeshTools");
 
@@ -2164,13 +2162,13 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   // We require all processors to agree on nodal processor ids before
   // going into this algorithm.
 #ifdef DEBUG
-  MeshTools::libmesh_assert_parallel_consistent_procids<Node>(mesh);
+  libmesh_assert_parallel_consistent_procids<Node>(mesh);
 #endif
 
   // If we have any unpartitioned elements at this
   // stage there is a problem
-  libmesh_assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
-                                    mesh.unpartitioned_elements_end()) == 0);
+  libmesh_assert (n_elem(mesh.unpartitioned_elements_begin(),
+                         mesh.unpartitioned_elements_end()) == 0);
 
   // Fix nodes' processor ids.  Coarsening may have left us with nodes
   // which are no longer touched by any elements of the same processor
@@ -2303,17 +2301,19 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   // this algorithm, but if we're allowed to repartition the mesh then
   // they should be canonically correct too.
 #ifdef DEBUG
-  MeshTools::libmesh_assert_valid_procids<Node>(mesh);
+  libmesh_assert_valid_procids<Node>(mesh);
   //if (repartition_all_nodes)
-  //  MeshTools::libmesh_assert_canonical_node_procids(mesh);
+  //  libmesh_assert_canonical_node_procids(mesh);
 #endif
 }
 
 
 
-void MeshTools::Private::globally_renumber_nodes_and_elements (MeshBase & mesh)
+void Private::globally_renumber_nodes_and_elements (MeshBase & mesh)
 {
   MeshCommunication().assign_global_indices(mesh);
 }
+
+} // namespace MeshTools
 
 } // namespace libMesh
