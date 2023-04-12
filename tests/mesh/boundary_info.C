@@ -442,6 +442,12 @@ public:
     mesh.allow_renumbering(true);
     mesh.prepare_for_use();
 
+    // Let's test that shellface BCIDs are preserved (in a relative
+    // sense) when we clone a mesh.
+    std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
+    CPPUNIT_ASSERT(mesh_clone->get_boundary_info() ==
+                   mesh.get_boundary_info());
+
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), bi.n_shellface_conds());
 
     EquationSystems es(mesh);
