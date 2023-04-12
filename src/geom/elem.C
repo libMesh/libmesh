@@ -1172,7 +1172,7 @@ bool Elem::has_topological_neighbor (const Elem * elem,
 
 #endif
 
-#ifdef DEBUG
+#ifndef NDEBUG
 
 void Elem::libmesh_assert_valid_node_pointers() const
 {
@@ -1254,7 +1254,7 @@ void Elem::libmesh_assert_valid_neighbors() const
     }
 }
 
-#endif // DEBUG
+#endif // !NDEBUG
 
 
 

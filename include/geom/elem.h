@@ -1632,7 +1632,7 @@ public:
 
 #endif
 
-#ifdef DEBUG
+#ifndef NDEBUG
   /**
    * Checks for consistent neighbor links on this element.
    */
@@ -1643,7 +1643,7 @@ public:
    * this element.
    */
   void libmesh_assert_valid_node_pointers() const;
-#endif // DEBUG
+#endif // !NDEBUG
 
   /**
    * \returns The local node index of the given point IF said node
