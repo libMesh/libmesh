@@ -1031,6 +1031,35 @@ void clear_spline_nodes(MeshBase & mesh)
 
 
 #ifndef NDEBUG
+
+void libmesh_assert_valid_is_prepared (const MeshBase & mesh)
+{
+  LOG_SCOPE("libmesh_assert_valid_is_prepared()", "MeshTools");
+
+  if (!mesh.is_prepared())
+    return;
+
+  std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
+
+  // Try preparing (without allowing repartitioning or renumbering, to
+  // avoid false assertion failures)
+  bool old_allow_renumbering = mesh_clone->allow_renumbering();
+  mesh_clone->allow_renumbering(false);
+  bool old_allow_remote_element_removal =
+    mesh_clone->allow_remote_element_removal();
+  bool old_skip_partitioning = mesh_clone->skip_partitioning();
+  mesh_clone->skip_partitioning(true);
+  mesh_clone->allow_remote_element_removal(false);
+  mesh_clone->prepare_for_use();
+  mesh_clone->allow_renumbering(old_allow_renumbering);
+  mesh_clone->allow_remote_element_removal(old_allow_remote_element_removal);
+  mesh_clone->skip_partitioning(old_skip_partitioning);
+
+  libmesh_assert(mesh == *mesh_clone);
+}
+
+
+
 void libmesh_assert_equal_n_systems (const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_equal_n_systems()", "MeshTools");

@@ -363,6 +363,12 @@ void clear_spline_nodes(MeshBase &);
 #ifndef NDEBUG
 
 /**
+ * A function for testing that a mesh's cached is_prepared() setting
+ * is not a false positive.
+ */
+void libmesh_assert_valid_is_prepared (const MeshBase & mesh);
+
+/**
  * A function for testing that all DofObjects within a mesh
  * have the same n_systems count
  */
