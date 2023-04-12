@@ -152,6 +152,189 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
 }
 
 
+bool BoundaryInfo::operator==(const BoundaryInfo & other_boundary_info)
+{
+  for (const auto & [other_node, bid] : other_boundary_info._boundary_node_id)
+    {
+      Node * node = this->_mesh->query_node_ptr(other_node->id());
+      if (!node)
+        return false;
+      if (!this->has_boundary_id(node, bid))
+        return false;
+    }
+  for (const auto & [node, bid] : this->_boundary_node_id)
+    {
+      Node * other_node =
+        other_boundary_info._mesh->query_node_ptr(node->id());
+      if (!other_node)
+        return false;
+      if (!other_boundary_info.has_boundary_id(other_node, bid))
+        return false;
+    }
+
+  auto compare_edges = [&](const Elem * elem,
+                           const Elem * other_elem,
+                           unsigned short int edge)
+  {
+    if (!elem)
+      return false;
+    if (!other_elem)
+      return false;
+
+    std::vector<boundary_id_type> our_edges, other_edges;
+    this->edge_boundary_ids(elem, edge, our_edges);
+    other_boundary_info.edge_boundary_ids(other_elem, edge, other_edges);
+    if (our_edges.size() != other_edges.size())
+      return false;
+
+    std::sort(our_edges.begin(), our_edges.end());
+    std::sort(other_edges.begin(), other_edges.end());
+    for (auto i : index_range(our_edges))
+      if (our_edges[i] != other_edges[i])
+        return false;
+    return true;
+  };
+
+  for (const auto & [other_elem, edge_id_pair] : other_boundary_info._boundary_edge_id)
+    {
+      Elem * elem = this->_mesh->query_elem_ptr(other_elem->id());
+      if (!compare_edges(elem, other_elem, edge_id_pair.first))
+        return false;
+    }
+
+  for (const auto & [elem, edge_id_pair] : this->_boundary_edge_id)
+    {
+      Elem * other_elem = other_boundary_info._mesh->query_elem_ptr(elem->id());
+      if (!compare_edges(elem, other_elem, edge_id_pair.first))
+        return false;
+    }
+
+  auto compare_sides = [&](const Elem * elem,
+                           const Elem * other_elem,
+                           unsigned short int side)
+  {
+    if (!elem)
+      return false;
+    if (!other_elem)
+      return false;
+
+    std::vector<boundary_id_type> our_sides, other_sides;
+    this->boundary_ids(elem, side, our_sides);
+    other_boundary_info.boundary_ids(other_elem, side, other_sides);
+    if (our_sides.size() != other_sides.size())
+      return false;
+
+    std::sort(our_sides.begin(), our_sides.end());
+    std::sort(other_sides.begin(), other_sides.end());
+    for (auto i : index_range(our_sides))
+      if (our_sides[i] != other_sides[i])
+        return false;
+    return true;
+  };
+
+  for (const auto & [other_elem, side_id_pair] : other_boundary_info._boundary_side_id)
+    {
+      Elem * elem = this->_mesh->query_elem_ptr(other_elem->id());
+      if (!compare_sides(elem, other_elem, side_id_pair.first))
+        return false;
+    }
+
+  for (const auto & [elem, side_id_pair] : this->_boundary_side_id)
+    {
+      Elem * other_elem = other_boundary_info._mesh->query_elem_ptr(elem->id());
+      if (!compare_sides(elem, other_elem, side_id_pair.first))
+        return false;
+    }
+
+  auto compare_shellfaces = [&](const Elem * elem,
+                                const Elem * other_elem,
+                                unsigned short int shellface)
+  {
+    if (!elem)
+      return false;
+    if (!other_elem)
+      return false;
+
+    std::vector<boundary_id_type> our_shellfaces, other_shellfaces;
+    this->shellface_boundary_ids(elem, shellface, our_shellfaces);
+    other_boundary_info.shellface_boundary_ids(other_elem, shellface, other_shellfaces);
+    if (our_shellfaces.size() != other_shellfaces.size())
+      return false;
+
+    std::sort(our_shellfaces.begin(), our_shellfaces.end());
+    std::sort(other_shellfaces.begin(), other_shellfaces.end());
+    for (auto i : index_range(our_shellfaces))
+      if (our_shellfaces[i] != other_shellfaces[i])
+        return false;
+    return true;
+  };
+
+  for (const auto & [other_elem, shellface_id_pair] : other_boundary_info._boundary_shellface_id)
+    {
+      Elem * elem = this->_mesh->query_elem_ptr(other_elem->id());
+      if (!compare_shellfaces(elem, other_elem, shellface_id_pair.first))
+        return false;
+    }
+
+  for (const auto & [elem, shellface_id_pair] : this->_boundary_shellface_id)
+    {
+      Elem * other_elem = other_boundary_info._mesh->query_elem_ptr(elem->id());
+      if (!compare_shellfaces(elem, other_elem, shellface_id_pair.first))
+        return false;
+    }
+
+  if (_children_on_boundary != other_boundary_info._children_on_boundary)
+    return false;
+
+  auto compare_sets = [](auto set1, auto set2)
+  {
+    if (set1.size() != set2.size())
+      return false;
+    for (boundary_id_type bid : set1)
+      if (!set2.count(bid))
+        return false;
+
+    return true;
+  };
+
+  if (!compare_sets(_boundary_ids,
+                    other_boundary_info._boundary_ids) ||
+      !compare_sets(_global_boundary_ids,
+                    other_boundary_info._global_boundary_ids) ||
+      !compare_sets(_edge_boundary_ids,
+                    other_boundary_info._edge_boundary_ids) ||
+      !compare_sets(_node_boundary_ids,
+                    other_boundary_info._node_boundary_ids) ||
+      !compare_sets(_shellface_boundary_ids,
+                    other_boundary_info._shellface_boundary_ids) ||
+      !compare_sets(_side_boundary_ids,
+                    other_boundary_info._side_boundary_ids))
+    return false;
+
+  auto compare_maps = [](auto map1, auto map2)
+  {
+    if (map1.size() != map2.size())
+      return false;
+    for (auto & pair : map1)
+      if (!map2.count(pair.first) ||
+          map2[pair.first] != pair.second)
+        return false;
+
+    return true;
+  };
+
+  if (!compare_maps(_ss_id_to_name,
+                    other_boundary_info._ss_id_to_name) ||
+      !compare_maps(_ns_id_to_name,
+                    other_boundary_info._ns_id_to_name) ||
+      !compare_maps(_es_id_to_name,
+                    other_boundary_info._es_id_to_name))
+    return false;
+
+  return true;
+}
+
+
 BoundaryInfo::~BoundaryInfo() = default;
 
 

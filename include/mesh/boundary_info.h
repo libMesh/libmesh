@@ -80,6 +80,14 @@ public:
    */
   BoundaryInfo & operator=(const BoundaryInfo & other_boundary_info);
 
+  /**
+   * This tests for data equality via element ids
+   */
+  bool operator== (const BoundaryInfo & other_boundary_info);
+
+  bool operator!= (const BoundaryInfo & other_boundary_info) {
+    return !(*this == other_boundary_info);
+  }
 
   /**
    * Destructor.  Not much to do.
