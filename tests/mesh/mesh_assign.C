@@ -153,6 +153,9 @@ public:
 
           mesh_refinement->uniformly_refine(1);
 
+          std::unique_ptr<MeshBase> mesh_two_clone =
+            mesh_two->clone();
+
           // Move mesh_two into mesh_one
           system.get_mesh().clear();
           system.get_mesh().assign(std::move(*mesh_two));
@@ -160,6 +163,8 @@ public:
 
           // Assert that the moved into mesh has the right number of elements.
           CPPUNIT_ASSERT_EQUAL(system.get_mesh().n_elem(), dof_id_type(20));
+
+          CPPUNIT_ASSERT(system.get_mesh() == *mesh_two_clone);
 
           // Reinit the dofs and other system related data structures
           // based on its mesh
@@ -179,7 +184,9 @@ public:
         {
           mesh_two->read("meshes/mesh_assign_test_mesh.xda");
 
-          // Read in the mesh at this time instant and reinit to project solutions on to the new mesh
+          std::unique_ptr<MeshBase> mesh_two_clone =
+            mesh_two->clone();
+
           system.get_mesh().clear();
           system.get_mesh().assign(std::move(*mesh_two));
 
@@ -187,6 +194,8 @@ public:
 
           // Assert that the moved into mesh has the right number of elements.
           CPPUNIT_ASSERT_EQUAL(system.get_mesh().n_elem(), dof_id_type(42));
+
+          CPPUNIT_ASSERT(system.get_mesh() == *mesh_two_clone);
 
           system.get_equation_systems().reinit_mesh();
           system.get_equation_systems().reinit();
