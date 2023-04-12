@@ -841,9 +841,11 @@ void MeshBase::prepare_for_use ()
   // The mesh is now prepared for use.
   _is_prepared = true;
 
-#if defined(DEBUG) && defined(LIBMESH_ENABLE_UNIQUE_ID)
+#ifdef DEBUG
   MeshTools::libmesh_assert_valid_boundary_ids(*this);
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
   MeshTools::libmesh_assert_valid_unique_ids(*this);
+#endif
 #endif
 }
 
