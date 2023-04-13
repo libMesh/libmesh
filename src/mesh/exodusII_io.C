@@ -1033,9 +1033,11 @@ void ExodusII_IO::copy_nodal_solution(System & system,
       std::unordered_map<processor_id_type, std::vector<dof_id_type>> node_ids_to_request;
       if (this->processor_id() != 0)
         {
-          std::vector<dof_id_type> & node_ids = node_ids_to_request[0];
+          std::vector<dof_id_type> node_ids;
           for (auto & node : mesh.local_node_ptr_range())
             node_ids.push_back(node->id());
+          if (!node_ids.empty())
+            node_ids_to_request[0] = std::move(node_ids);
         }
 
       auto value_gather_functor =
