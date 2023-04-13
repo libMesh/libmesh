@@ -199,7 +199,7 @@ void PetscLinearSolver<T>::init (const char * name)
       // behavior is for PETSc to allocate (internally) an array
       // of size 1000 to hold the residual norm history.
       ierr = KSPSetResidualHistory(_ksp,
-                                   PETSC_NULL,   // pointer to the array which holds the history
+                                   LIBMESH_PETSC_NULLPTR, // pointer to the array which holds the history
                                    PETSC_DECIDE, // size of the array holding the history
                                    PETSC_TRUE);  // Whether or not to reset the history for each solve.
       LIBMESH_CHKERR(ierr);
@@ -285,7 +285,7 @@ void PetscLinearSolver<T>::init (PetscMatrix<T> * matrix,
       // behavior is for PETSc to allocate (internally) an array
       // of size 1000 to hold the residual norm history.
       ierr = KSPSetResidualHistory(_ksp,
-                                   PETSC_NULL,   // pointer to the array which holds the history
+                                   LIBMESH_PETSC_NULLPTR, // pointer to the array which holds the history
                                    PETSC_DECIDE, // size of the array holding the history
                                    PETSC_TRUE);  // Whether or not to reset the history for each solve.
       LIBMESH_CHKERR(ierr);
@@ -901,8 +901,13 @@ LinearConvergenceReason PetscLinearSolver<T>::get_converged_reason() const
     case KSP_CONVERGED_RTOL            : return CONVERGED_RTOL;
     case KSP_CONVERGED_ATOL            : return CONVERGED_ATOL;
     case KSP_CONVERGED_ITS             : return CONVERGED_ITS;
+#if PETSC_VERSION_LESS_THAN(3,19,0)
     case KSP_CONVERGED_CG_NEG_CURVE    : return CONVERGED_CG_NEG_CURVE;
+    // This was deprecated for STEP_LENGTH
     case KSP_CONVERGED_CG_CONSTRAINED  : return CONVERGED_CG_CONSTRAINED;
+#else
+    case KSP_CONVERGED_NEG_CURVE       : return CONVERGED_CG_NEG_CURVE;
+#endif
     case KSP_CONVERGED_STEP_LENGTH     : return CONVERGED_STEP_LENGTH;
     case KSP_CONVERGED_HAPPY_BREAKDOWN : return CONVERGED_HAPPY_BREAKDOWN;
     case KSP_DIVERGED_NULL             : return DIVERGED_NULL;

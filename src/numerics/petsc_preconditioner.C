@@ -277,11 +277,12 @@ void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(const PCType type,
   PetscInt n_local;
 
   // The global number of the first block on this processor.
-  // This is not used, so we just pass PETSC_NULL instead.
+  // This is not used, so we just pass null instead.
   // int first_local;
 
   // Fill array of local KSP contexts
-  ierr = PCBJacobiGetSubKSP(pc, &n_local, PETSC_NULL, &subksps);
+  ierr = PCBJacobiGetSubKSP(pc, &n_local, LIBMESH_PETSC_NULLPTR,
+                            &subksps);
   CHKERRABORT(comm,ierr);
 
   // Loop over sub-ksp objects, set ILU preconditioner

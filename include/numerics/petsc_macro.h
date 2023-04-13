@@ -114,6 +114,13 @@
 # define LIBMESH_PETSCINT_FMT PetscInt_FMT
 #endif
 
+// As of 3.19, PETSC_NULL is deprecated
+#if PETSC_VERSION_LESS_THAN(3,19,0)
+# define LIBMESH_PETSC_NULLPTR PETSC_NULL
+#else
+# define LIBMESH_PETSC_NULLPTR PETSC_NULLPTR
+#endif
+
 // If we're using quad precision, we need to disambiguate std
 // operations on PetscScalar
 

@@ -735,7 +735,7 @@ void PetscVector<T>::init (const numeric_index_type n,
 
   libmesh_assert(sizeof(PetscInt) == sizeof(numeric_index_type));
 
-  PetscInt * petsc_ghost = ghost.empty() ? PETSC_NULL :
+  PetscInt * petsc_ghost = ghost.empty() ? LIBMESH_PETSC_NULLPTR :
     const_cast<PetscInt *>(reinterpret_cast<const PetscInt *>(ghost.data()));
 
   // Clear initialized vectors

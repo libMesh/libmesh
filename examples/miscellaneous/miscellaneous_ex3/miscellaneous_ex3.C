@@ -192,9 +192,11 @@ int main (int argc, char ** argv)
 #ifdef LIBMESH_HAVE_PETSC
       //Use the jacobian for preconditioning.
 #  if PETSC_VERSION_LESS_THAN(3,7,0)
-      PetscOptionsSetValue("-snes_mf_operator", PETSC_NULL);
+      PetscOptionsSetValue("-snes_mf_operator",
+                           LIBMESH_PETSC_NULLPTR);
 #  else
-      PetscOptionsSetValue(PETSC_NULL, "-snes_mf_operator", PETSC_NULL);
+      PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-snes_mf_operator",
+                           LIBMESH_PETSC_NULLPTR);
 #  endif
 #else
       libMesh::err << "Must be using PETSc to use jacobian based preconditioning" << std::endl;
