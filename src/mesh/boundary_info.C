@@ -286,7 +286,7 @@ bool BoundaryInfo::operator==(const BoundaryInfo & other_boundary_info) const
   if (_children_on_boundary != other_boundary_info._children_on_boundary)
     return false;
 
-  auto compare_sets = [](auto set1, auto set2)
+  auto compare_sets = [](const auto & set1, const auto & set2)
   {
     if (set1.size() != set2.size())
       return false;
@@ -311,13 +311,13 @@ bool BoundaryInfo::operator==(const BoundaryInfo & other_boundary_info) const
                     other_boundary_info._side_boundary_ids))
     return false;
 
-  auto compare_maps = [](auto map1, auto map2)
+  auto compare_maps = [](const auto & map1, const auto & map2)
   {
     if (map1.size() != map2.size())
       return false;
-    for (auto & pair : map1)
+    for (const auto & pair : map1)
       if (!map2.count(pair.first) ||
-          map2[pair.first] != pair.second)
+          map2.at(pair.first) != pair.second)
         return false;
 
     return true;
