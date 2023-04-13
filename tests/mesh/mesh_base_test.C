@@ -41,7 +41,6 @@ public:
      * Build a 2d 2x2 square mesh (mesh_one) covering [0.0, 1.0] x [0.0, 1.0]
      * with linear Quad elements.
      */
-
     MeshTools::Generation::build_square(mesh,
                                         2, 2,
                                         0., 1.,
