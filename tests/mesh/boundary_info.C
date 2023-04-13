@@ -339,6 +339,12 @@ public:
       // updating bi
       CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(n_elem), bi.n_edge_conds());
 
+      // Let's test that edge BCIDs are preserved (in a relative
+      // sense) when we clone a mesh.
+      std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
+      CPPUNIT_ASSERT(mesh_clone->get_boundary_info() ==
+                     mesh.get_boundary_info());
+
       mesh.write(mesh_filename);
     }
 
