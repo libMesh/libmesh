@@ -1358,8 +1358,8 @@ void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
 
   libmesh_parallel_only(mesh.comm());
 
-  // We want this test to be valid even when called even after nodes
-  // have been added asynchronously but before they're renumbered.
+  // We want this test to be valid even when called after nodes have
+  // been added asynchronously but before they're renumbered.
   //
   // Plus, some code (looking at you, stitch_meshes) modifies
   // DofObject ids without keeping max_elem_id()/max_node_id()
