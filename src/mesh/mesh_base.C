@@ -255,9 +255,9 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
 
   const constraint_rows_type & other_rows =
     other_mesh.get_constraint_rows();
-  for (auto constraint_row_pair : this->_constraint_rows)
+  for (const auto & [node, row] : this->_constraint_rows)
     {
-      const dof_id_type node_id = constraint_row_pair.first->id();
+      const dof_id_type node_id = node->id();
       const Node * other_node = other_mesh.query_node_ptr(node_id);
       if (!other_node)
         return false;
@@ -266,32 +266,30 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
       if (it == other_rows.end())
         return false;
 
-      auto & row = constraint_row_pair.second;
-      auto & other_row = it->second;
+      const auto & other_row = it->second;
       if (row.size() != other_row.size())
         return false;
 
       for (auto i : index_range(row))
         {
-          const auto & row_i = row[i];
-          const auto & other_row_i = other_row[i];
-          libmesh_assert(row_i.first.first);
-          libmesh_assert(other_row_i.first.first);
-          if (row_i.first.first->id() !=
-              other_row_i.first.first->id() ||
-              row_i.first.second !=
-              other_row_i.first.second ||
-              row_i.second !=
-              other_row_i.second)
+          const auto & [elem_pair, coef] = row[i];
+          const auto & [other_elem_pair, other_coef] = other_row[i];
+          libmesh_assert(elem_pair.first);
+          libmesh_assert(other_elem_pair.first);
+          if (elem_pair.first->id() !=
+              other_elem_pair.first->id() ||
+              elem_pair.second !=
+              other_elem_pair.second ||
+              coef != other_coef)
             return false;
         }
     }
 
-  for (auto elemset_codes_pair : this->_elemset_codes)
+  for (const auto & [elemset_code, elemset_ptr] : this->_elemset_codes)
     {
-      auto it = other_mesh._elemset_codes.find(elemset_codes_pair.first);
+      auto it = other_mesh._elemset_codes.find(elemset_code);
       if (it == other_mesh._elemset_codes.end() ||
-          elemset_codes_pair.second != it->second)
+          *elemset_ptr != *it->second)
         return false;
     }
 
