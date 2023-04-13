@@ -1490,6 +1490,11 @@ public:
     TestCommWorld->max(order);
     CPPUNIT_ASSERT (order > 0);
 
+    // Let's test that IGA constraints are preserved (in a relative
+    // sense) when we clone a mesh.
+    std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
+    CPPUNIT_ASSERT(*mesh_clone == mesh);
+
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");
     sys.add_variable("n", Order(order), RATIONAL_BERNSTEIN);

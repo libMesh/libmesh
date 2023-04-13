@@ -263,12 +263,21 @@ public:
   virtual dof_id_type key () const;
 
   /**
-   * \returns \p true if two elements are identical, false otherwise.
+   * \returns \p true if two elements are equivalent, false otherwise.
    * This is true if the elements are connected to identical global
    * nodes, regardless of how those nodes might be numbered local
    * to the elements.
    */
   bool operator == (const Elem & rhs) const;
+
+  /**
+   * \returns \p true if two elements have equal topologies, false
+   * otherwise.
+   * This is true if the elements connect to nodes of the same id in
+   * the same order, and neighbors of the same id on each side, the
+   * same id on any parent and/or interior_parent link, etc.
+   */
+  bool topologically_equal (const Elem & rhs) const;
 
   /**
    * \returns A const pointer to the \f$ i^{th} \f$ neighbor of this
@@ -1623,7 +1632,7 @@ public:
 
 #endif
 
-#ifdef DEBUG
+#ifndef NDEBUG
   /**
    * Checks for consistent neighbor links on this element.
    */
@@ -1634,7 +1643,7 @@ public:
    * this element.
    */
   void libmesh_assert_valid_node_pointers() const;
-#endif // DEBUG
+#endif // !NDEBUG
 
   /**
    * \returns The local node index of the given point IF said node

@@ -115,8 +115,17 @@ public:
         CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), bc_triples.size());
       }
 
+    // Let's test that they are preserved (in a relative sense) when
+    // we clone a mesh.
+    std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
+    CPPUNIT_ASSERT(mesh_clone->get_boundary_info() ==
+                   mesh.get_boundary_info());
+
     // Let's test that we can remove them successfully.
     bi.remove_id(0);
+
+    CPPUNIT_ASSERT(mesh_clone->get_boundary_info() !=
+                   mesh.get_boundary_info());
 
     // Check that there are now only 3 boundary ids total on the Mesh.
     if (mesh.is_serial())
@@ -330,6 +339,12 @@ public:
       // updating bi
       CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(n_elem), bi.n_edge_conds());
 
+      // Let's test that edge BCIDs are preserved (in a relative
+      // sense) when we clone a mesh.
+      std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
+      CPPUNIT_ASSERT(mesh_clone->get_boundary_info() ==
+                     mesh.get_boundary_info());
+
       mesh.write(mesh_filename);
     }
 
@@ -432,6 +447,12 @@ public:
 
     mesh.allow_renumbering(true);
     mesh.prepare_for_use();
+
+    // Let's test that shellface BCIDs are preserved (in a relative
+    // sense) when we clone a mesh.
+    std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
+    CPPUNIT_ASSERT(mesh_clone->get_boundary_info() ==
+                   mesh.get_boundary_info());
 
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), bi.n_shellface_conds());
 

@@ -65,6 +65,8 @@ DistributedMesh::DistributedMesh (const Parallel::Communicator & comm_in,
 
 DistributedMesh & DistributedMesh::operator= (DistributedMesh && other_mesh)
 {
+  LOG_SCOPE("operator=(&&)", "DistributedMesh");
+
   // Move assign as an UnstructuredMesh.
   this->UnstructuredMesh::operator=(std::move(other_mesh));
 
@@ -86,6 +88,49 @@ MeshBase & DistributedMesh::assign(MeshBase && other_mesh)
   *this = std::move(cast_ref<DistributedMesh&>(other_mesh));
 
   return *this;
+}
+
+bool DistributedMesh::subclass_locally_equals(const MeshBase & other_mesh_base) const
+{
+  const DistributedMesh * dist_mesh_ptr =
+    dynamic_cast<const DistributedMesh *>(&other_mesh_base);
+  if (!dist_mesh_ptr)
+    return false;
+  const DistributedMesh & other_mesh = *dist_mesh_ptr;
+
+  if (_is_serial != other_mesh._is_serial ||
+      _is_serial_on_proc_0 != other_mesh._is_serial_on_proc_0 ||
+      _n_nodes != other_mesh._n_nodes ||
+      _n_elem != other_mesh._n_elem ||
+      _max_node_id != other_mesh._max_node_id ||
+      _max_elem_id != other_mesh._max_elem_id ||
+      // We expect these things to change in a prepare_for_use();
+      // they're conceptually "mutable"...
+/*
+      _next_free_local_node_id != other_mesh._next_free_local_node_id ||
+      _next_free_local_elem_id != other_mesh._next_free_local_elem_id ||
+      _next_free_unpartitioned_node_id != other_mesh._next_free_unpartitioned_node_id ||
+      _next_free_unpartitioned_elem_id != other_mesh._next_free_unpartitioned_elem_id ||
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      _next_unpartitioned_unique_id != other_mesh._next_unpartitioned_unique_id ||
+#endif
+*/
+      !this->nodes_and_elements_equal(other_mesh))
+    return false;
+
+  if (_extra_ghost_elems.size() !=
+      other_mesh._extra_ghost_elems.size())
+    return false;
+  for (auto & elem : _extra_ghost_elems)
+    {
+      libmesh_assert(this->query_elem_ptr(elem->id()) == elem);
+      const Elem * other_elem = other_mesh.query_elem_ptr(elem->id());
+      if (!other_elem ||
+          !other_mesh._extra_ghost_elems.count(const_cast<Elem *>(other_elem)))
+        return false;
+    }
+
+  return true;
 }
 
 DistributedMesh::~DistributedMesh ()
