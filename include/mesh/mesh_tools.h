@@ -431,7 +431,7 @@ void libmesh_assert_valid_constraint_rows (const MeshBase & mesh);
 
 /**
  * A function for verifying that degree of freedom indexes are
- * contiguous on each processors, as is required by libMesh numeric
+ * contiguous on each processor, as is required by libMesh numeric
  * classes.
  *
  * Verify a particular system by specifying that system's number.
