@@ -305,7 +305,7 @@ unsigned int PetscDiffSolver::solve()
   ierr = SNESSetFromOptions(_snes);
   LIBMESH_CHKERR(ierr);
 
-  ierr = SNESSolve (_snes, PETSC_NULL, x.vec());
+  ierr = SNESSolve (_snes, LIBMESH_PETSC_NULLPTR, x.vec());
   LIBMESH_CHKERR(ierr);
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
@@ -335,7 +335,7 @@ void PetscDiffSolver::setup_petsc_data()
   LIBMESH_CHKERR(ierr);
 
   ierr = SNESMonitorSet (_snes, __libmesh_petsc_diff_solver_monitor,
-                         this, PETSC_NULL);
+                         this, LIBMESH_PETSC_NULLPTR);
   LIBMESH_CHKERR(ierr);
 
   if (libMesh::on_command_line("--solver-system-names"))

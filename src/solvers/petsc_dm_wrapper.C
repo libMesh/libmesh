@@ -390,7 +390,7 @@ namespace libMesh
         }
 
       // Vec scaling isnt needed so were done.
-      *(vec) = PETSC_NULL;
+      *(vec) = LIBMESH_PETSC_NULLPTR;
 
       return 0;
     } // end libmesh_petsc_DMCreateInterpolation

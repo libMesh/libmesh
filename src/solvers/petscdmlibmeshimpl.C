@@ -227,7 +227,8 @@ PetscErrorCode DMlibMeshSetUpName_Private(DM dm)
   PetscErrorCode ierr;
   PetscFunctionBegin;
   std::string name = dlm->sys->name();
-  std::map<unsigned int, std::string> * dnames = PETSC_NULL, * enames = PETSC_NULL;
+  std::map<unsigned int, std::string> * dnames = LIBMESH_PETSC_NULLPTR,
+                                      * enames = LIBMESH_PETSC_NULLPTR;
   if (dlm->decomposition_type == DMLIBMESH_FIELD_DECOMPOSITION) {
     name += ":dec:var:";
     dnames = dlm->varnames;
@@ -388,7 +389,7 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt * len
   *len = cast_int<unsigned int>(dlm->decomposition->size());
   if (namelist)      {ierr = PetscMalloc(*len*sizeof(char *), namelist);  CHKERRQ(ierr);}
   if (innerislist)   {ierr = PetscMalloc(*len*sizeof(IS),    innerislist);    CHKERRQ(ierr);}
-  if (outerislist)   *outerislist = PETSC_NULL; /* FIX: allow mesh-based overlap. */
+  if (outerislist)   *outerislist = LIBMESH_PETSC_NULLPTR; /* FIX: allow mesh-based overlap. */
   if (dmlist)        {ierr = PetscMalloc(*len*sizeof(DM),    dmlist);    CHKERRQ(ierr);}
   for (auto d : index_range(*dlm->decomposition)) {
     std::set<numeric_index_type>               dindices;
@@ -966,7 +967,7 @@ PetscErrorCode  DMCreate_libMesh(DM dm)
   dlm->blockids   = new(std::map<std::string, unsigned int>);
   dlm->varnames   = new(std::map<unsigned int, std::string>);
   dlm->blocknames = new(std::map<unsigned int, std::string>);
-  dlm->decomposition   = PETSC_NULL;
+  dlm->decomposition   = LIBMESH_PETSC_NULLPTR;
   dlm->decomposition_type  = DMLIBMESH_NO_DECOMPOSITION;
 
   /* DM API */

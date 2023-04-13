@@ -199,7 +199,7 @@ void PetscLinearSolver<T>::init (const char * name)
       // behavior is for PETSc to allocate (internally) an array
       // of size 1000 to hold the residual norm history.
       ierr = KSPSetResidualHistory(_ksp,
-                                   PETSC_NULL,   // pointer to the array which holds the history
+                                   LIBMESH_PETSC_NULLPTR, // pointer to the array which holds the history
                                    PETSC_DECIDE, // size of the array holding the history
                                    PETSC_TRUE);  // Whether or not to reset the history for each solve.
       LIBMESH_CHKERR(ierr);
@@ -285,7 +285,7 @@ void PetscLinearSolver<T>::init (PetscMatrix<T> * matrix,
       // behavior is for PETSc to allocate (internally) an array
       // of size 1000 to hold the residual norm history.
       ierr = KSPSetResidualHistory(_ksp,
-                                   PETSC_NULL,   // pointer to the array which holds the history
+                                   LIBMESH_PETSC_NULLPTR, // pointer to the array which holds the history
                                    PETSC_DECIDE, // size of the array holding the history
                                    PETSC_TRUE);  // Whether or not to reset the history for each solve.
       LIBMESH_CHKERR(ierr);

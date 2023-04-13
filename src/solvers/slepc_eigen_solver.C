@@ -229,8 +229,6 @@ SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
 {
   LOG_SCOPE("solve_standard()", "SlepcEigenSolver");
 
-  PetscErrorCode ierr=0;
-
   // converged eigen pairs and number of iterations
   PetscInt nconv=0;
   PetscInt its=0;
@@ -245,7 +243,7 @@ SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
 #endif
 
   // Set operators.
-  ierr = EPSSetOperators (_eps, mat, PETSC_NULL);
+  PetscErrorCode ierr = EPSSetOperators (_eps, mat, LIBMESH_PETSC_NULLPTR);
   LIBMESH_CHKERR(ierr);
 
   //set the problem type and the position of the spectrum
@@ -709,7 +707,8 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 
   for (PetscInt i=0; i<nconv; i++ )
     {
-      ierr = EPSGetEigenpair(_eps, i, &kr, &ki, PETSC_NULL, PETSC_NULL);
+      ierr = EPSGetEigenpair(_eps, i, &kr, &ki, LIBMESH_PETSC_NULLPTR,
+                             LIBMESH_PETSC_NULLPTR);
       LIBMESH_CHKERR(ierr);
 
 #if SLEPC_VERSION_LESS_THAN(3,6,0)
@@ -920,7 +919,8 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(dof_id_type i,
 
   solution->close();
 
-  ierr = EPSGetEigenpair(_eps, i, &kr, &ki, solution->vec(), PETSC_NULL);
+  ierr = EPSGetEigenpair(_eps, i, &kr, &ki, solution->vec(),
+                         LIBMESH_PETSC_NULLPTR);
   LIBMESH_CHKERR(ierr);
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
