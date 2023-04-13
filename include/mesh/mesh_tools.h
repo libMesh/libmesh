@@ -360,13 +360,23 @@ void correct_node_proc_ids(MeshBase &);
  */
 void clear_spline_nodes(MeshBase &);
 
-#ifndef NDEBUG
+/**
+ * A function for testing whether a mesh's cached is_prepared() setting
+ * is not a false positive.  If the mesh is marked as not prepared, or
+ * if preparing the already-partitioned mesh (without any
+ * repartitioning or renumbering) does not change it, then we return
+ * true.  If the mesh believes it is prepared but prepare_for_use()
+ * would change it, we return false.
+ */
+bool valid_is_prepared (const MeshBase & mesh);
 
 /**
- * A function for testing that a mesh's cached is_prepared() setting
- * is not a false positive.
+ * The following functions, only available in builds with NDEBUG
+ * undefined, are for asserting internal consistency that we hope
+ * should never be broken in opt
  */
-void libmesh_assert_valid_is_prepared (const MeshBase & mesh);
+
+#ifndef NDEBUG
 
 /**
  * A function for testing that all DofObjects within a mesh

@@ -1030,14 +1030,13 @@ void clear_spline_nodes(MeshBase & mesh)
 }
 
 
-#ifndef NDEBUG
 
-void libmesh_assert_valid_is_prepared (const MeshBase & mesh)
+bool valid_is_prepared (const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_is_prepared()", "MeshTools");
 
   if (!mesh.is_prepared())
-    return;
+    return true;
 
   std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
 
@@ -1055,10 +1054,12 @@ void libmesh_assert_valid_is_prepared (const MeshBase & mesh)
   mesh_clone->allow_remote_element_removal(old_allow_remote_element_removal);
   mesh_clone->skip_partitioning(old_skip_partitioning);
 
-  libmesh_assert(mesh == *mesh_clone);
+  return (mesh == *mesh_clone);
 }
 
 
+
+#ifndef NDEBUG
 
 void libmesh_assert_equal_n_systems (const MeshBase & mesh)
 {
