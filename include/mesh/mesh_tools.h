@@ -370,6 +370,8 @@ void clear_spline_nodes(MeshBase &);
  */
 bool valid_is_prepared (const MeshBase & mesh);
 
+///@{
+
 /**
  * The following functions, only available in builds with NDEBUG
  * undefined, are for asserting internal consistency that we hope
@@ -461,6 +463,10 @@ void libmesh_assert_canonical_node_procids (const MeshBase & mesh);
 void libmesh_assert_valid_refinement_tree (const MeshBase & mesh);
 
 #endif // !NDEBUG
+
+///@}
+
+///@{
 
 /**
  * The following functions, only available in builds with DEBUG
@@ -574,6 +580,8 @@ void libmesh_assert_valid_neighbors (const MeshBase & mesh,
                                      bool assert_valid_remote_elems=true);
 
 #endif // DEBUG
+
+///@}
 
 // There is no reason for users to call functions in the MeshTools::Private namespace.
 namespace Private {
