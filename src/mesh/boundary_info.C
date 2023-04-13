@@ -152,11 +152,11 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
 }
 
 
-bool BoundaryInfo::operator==(const BoundaryInfo & other_boundary_info)
+bool BoundaryInfo::operator==(const BoundaryInfo & other_boundary_info) const
 {
   for (const auto & [other_node, bid] : other_boundary_info._boundary_node_id)
     {
-      Node * node = this->_mesh->query_node_ptr(other_node->id());
+      const Node * node = this->_mesh->query_node_ptr(other_node->id());
       if (!node)
         return false;
       if (!this->has_boundary_id(node, bid))
@@ -164,7 +164,7 @@ bool BoundaryInfo::operator==(const BoundaryInfo & other_boundary_info)
     }
   for (const auto & [node, bid] : this->_boundary_node_id)
     {
-      Node * other_node =
+      const Node * other_node =
         other_boundary_info._mesh->query_node_ptr(node->id());
       if (!other_node)
         return false;
@@ -197,14 +197,14 @@ bool BoundaryInfo::operator==(const BoundaryInfo & other_boundary_info)
 
   for (const auto & [other_elem, edge_id_pair] : other_boundary_info._boundary_edge_id)
     {
-      Elem * elem = this->_mesh->query_elem_ptr(other_elem->id());
+      const Elem * elem = this->_mesh->query_elem_ptr(other_elem->id());
       if (!compare_edges(elem, other_elem, edge_id_pair.first))
         return false;
     }
 
   for (const auto & [elem, edge_id_pair] : this->_boundary_edge_id)
     {
-      Elem * other_elem = other_boundary_info._mesh->query_elem_ptr(elem->id());
+      const Elem * other_elem = other_boundary_info._mesh->query_elem_ptr(elem->id());
       if (!compare_edges(elem, other_elem, edge_id_pair.first))
         return false;
     }
@@ -234,14 +234,14 @@ bool BoundaryInfo::operator==(const BoundaryInfo & other_boundary_info)
 
   for (const auto & [other_elem, side_id_pair] : other_boundary_info._boundary_side_id)
     {
-      Elem * elem = this->_mesh->query_elem_ptr(other_elem->id());
+      const Elem * elem = this->_mesh->query_elem_ptr(other_elem->id());
       if (!compare_sides(elem, other_elem, side_id_pair.first))
         return false;
     }
 
   for (const auto & [elem, side_id_pair] : this->_boundary_side_id)
     {
-      Elem * other_elem = other_boundary_info._mesh->query_elem_ptr(elem->id());
+      const Elem * other_elem = other_boundary_info._mesh->query_elem_ptr(elem->id());
       if (!compare_sides(elem, other_elem, side_id_pair.first))
         return false;
     }
@@ -271,14 +271,14 @@ bool BoundaryInfo::operator==(const BoundaryInfo & other_boundary_info)
 
   for (const auto & [other_elem, shellface_id_pair] : other_boundary_info._boundary_shellface_id)
     {
-      Elem * elem = this->_mesh->query_elem_ptr(other_elem->id());
+      const Elem * elem = this->_mesh->query_elem_ptr(other_elem->id());
       if (!compare_shellfaces(elem, other_elem, shellface_id_pair.first))
         return false;
     }
 
   for (const auto & [elem, shellface_id_pair] : this->_boundary_shellface_id)
     {
-      Elem * other_elem = other_boundary_info._mesh->query_elem_ptr(elem->id());
+      const Elem * other_elem = other_boundary_info._mesh->query_elem_ptr(elem->id());
       if (!compare_shellfaces(elem, other_elem, shellface_id_pair.first))
         return false;
     }
