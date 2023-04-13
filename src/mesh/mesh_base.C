@@ -152,7 +152,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 
 MeshBase& MeshBase::operator= (MeshBase && other_mesh)
 {
-  LOG_SCOPE("operator=()", "MeshBase");
+  LOG_SCOPE("operator=(&&)", "MeshBase");
 
   // Move assign as a ParallelObject.
   this->ParallelObject::operator=(other_mesh);
