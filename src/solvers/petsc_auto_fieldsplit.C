@@ -33,7 +33,7 @@ void indices_to_fieldsplit (const Parallel::Communicator & comm,
                             PC my_pc,
                             const std::string & field_name)
 {
-  const PetscInt * idx = PETSC_NULL;
+  const PetscInt * idx = LIBMESH_PETSC_NULLPTR;
   if (!indices.empty())
     idx = reinterpret_cast<const PetscInt *>(indices.data());
 

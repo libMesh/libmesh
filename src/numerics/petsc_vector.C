@@ -706,7 +706,7 @@ void PetscVector<T>::localize (std::vector<T> & v_local,
   ierr = VecScatterCreate(_vec,
                           /*src is=*/is,
                           /*dest vec=*/dest,
-                          /*dest is=*/PETSC_NULL,
+                          /*dest is=*/LIBMESH_PETSC_NULLPTR,
                           scatter.get());
   LIBMESH_CHKERR(ierr);
 

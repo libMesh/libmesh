@@ -812,7 +812,7 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
   else
     (*computeSubspace)(sp, this->system());
 
-  *msp = PETSC_NULL;
+  *msp = LIBMESH_PETSC_NULLPTR;
   if (sp.size())
     {
       PetscInt nmodes = cast_int<PetscInt>(sp.size());
@@ -832,7 +832,7 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
         }
 
       // Normalize.
-      ierr = VecNormalize(modes[0], PETSC_NULL);
+      ierr = VecNormalize(modes[0], LIBMESH_PETSC_NULLPTR);
       LIBMESH_CHKERR(ierr);
 
       for (PetscInt i=1; i<nmodes; i++)
@@ -847,7 +847,7 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
           ierr = VecMAXPY(modes[i], i, dots.data(), modes.data());
           LIBMESH_CHKERR(ierr);
 
-          ierr = VecNormalize(modes[i], PETSC_NULL);
+          ierr = VecNormalize(modes[i], LIBMESH_PETSC_NULLPTR);
           LIBMESH_CHKERR(ierr);
         }
 
@@ -1036,7 +1036,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   LIBMESH_CHKERR(ierr);
 
   Mat J;
-  ierr = SNESGetJacobian(_snes, &J, PETSC_NULL, PETSC_NULL, PETSC_NULL);
+  ierr = SNESGetJacobian(_snes, &J, LIBMESH_PETSC_NULLPTR,
+                         LIBMESH_PETSC_NULLPTR,
+                         LIBMESH_PETSC_NULLPTR);
   LIBMESH_CHKERR(ierr);
   ierr = MatMFFDSetFunction(J, libmesh_petsc_snes_mffd_interface, this);
   LIBMESH_CHKERR(ierr);
@@ -1066,7 +1068,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
     LIBMESH_CHKERR(ierr);
   }
 
-  ierr = SNESSolve (_snes, PETSC_NULL, x->vec());
+  ierr = SNESSolve (_snes, LIBMESH_PETSC_NULLPTR, x->vec());
   LIBMESH_CHKERR(ierr);
 
   ierr = SNESGetIterationNumber(_snes, &n_iterations);
@@ -1136,7 +1138,7 @@ void PetscNonlinearSolver<T>::setup_default_monitor()
   if (_default_monitor)
     {
       PetscErrorCode ierr = SNESMonitorSet (_snes, libmesh_petsc_snes_monitor,
-                                            this, PETSC_NULL);
+                                            this, LIBMESH_PETSC_NULLPTR);
       LIBMESH_CHKERR(ierr);
     }
 }
