@@ -111,6 +111,18 @@ const std::set<unsigned int> & PeriodicBoundaryBase::get_variables() const
   return variables;
 }
 
+
+const EnforcementType & PeriodicBoundaryBase::get_enforcement_type() const
+{
+  return _enforcement_type;
+}
+
+
+void PeriodicBoundaryBase::set_enforcement_type(const EnforcementType & e_type)
+{
+  this->_enforcement_type = e_type;
+}
+
 } // namespace libMesh
 
 #endif // LIBMESH_ENABLE_PERIODIC

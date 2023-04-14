@@ -1928,7 +1928,7 @@ compute_periodic_constraints (DofConstraints & constraints,
       for (const auto & boundary_id : bc_ids)
         {
           const PeriodicBoundaryBase * periodic = boundaries.boundary(boundary_id);
-          if (!periodic || !periodic->is_my_variable(variable_number))
+          if (!periodic || !periodic->is_my_variable(variable_number) || (periodic->get_enforcement_type()==EnforcementType::WEAK_ENFORCEMENT))
             continue;
 
           libmesh_assert(point_locator);
