@@ -203,7 +203,9 @@ void NewmarkSystem::update_rhs ()
   rhs_c.add(_a_5, this->get_vector("acceleration"));
 
   // compute rhs
-  the_rhs.add(this->get_vector("force"));
+  NumericVector<Number> & force = this->get_vector("force");
+  force.close();
+  the_rhs.add(force);
   the_rhs.add_vector(rhs_m, this->get_matrix("mass"));
   the_rhs.add_vector(rhs_c, this->get_matrix("damping"));
 }
