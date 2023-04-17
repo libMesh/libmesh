@@ -1154,7 +1154,7 @@ void ExodusII_IO::copy_elemental_solution(System & system,
           for (auto & elem : mesh.active_local_element_ptr_range())
             elem_ids.push_back(elem->id());
 
-          if (!elem_ids.empty()
+          if (!elem_ids.empty())
             elem_ids_to_request[0] = std::move(elem_ids);
         }
 
