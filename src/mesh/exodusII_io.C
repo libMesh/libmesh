@@ -1150,9 +1150,12 @@ void ExodusII_IO::copy_elemental_solution(System & system,
       std::unordered_map<processor_id_type, std::vector<dof_id_type>> elem_ids_to_request;
       if (this->processor_id() != 0)
         {
-          std::vector<dof_id_type> & elem_ids = elem_ids_to_request[0];
+          std::vector<dof_id_type> elem_ids;
           for (auto & elem : mesh.active_local_element_ptr_range())
             elem_ids.push_back(elem->id());
+
+          if (!elem_ids.empty())
+            elem_ids_to_request[0] = std::move(elem_ids);
         }
 
       auto value_gather_functor =
