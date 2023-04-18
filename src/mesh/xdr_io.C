@@ -698,7 +698,9 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
   std::vector<std::vector<dof_id_type>> recv_ids   (this->n_processors());
   std::vector<std::vector<Real>>         recv_coords(this->n_processors());
 
+#ifndef NDEBUG
   std::size_t n_written=0;
+#endif
 
   // Note: do not be tempted to replace the node loops below with
   // range-based iterators, these iterators must be defined outside
@@ -837,7 +839,9 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
                 coords[3*local_idx+2] = 0.;
 #endif
 
+#ifndef NDEBUG
                 n_written++;
+#endif
               }
 
           io.data_stream (coords.empty() ? nullptr : coords.data(),
@@ -864,8 +868,10 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
   std::vector<xdr_id_type> & unique_ids=xfer_unique_ids;
   std::vector<std::vector<xdr_id_type>> recv_unique_ids (this->n_processors());
 
+#ifndef NDEBUG
   // Reset write counter
   n_written = 0;
+#endif
 
   // Return node iterator to the beginning
   node_iter = mesh.local_nodes_begin();
@@ -976,7 +982,9 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
 
                 unique_ids[local_idx] = recv_unique_ids[pid][idx];
 
+#ifndef NDEBUG
                 n_written++;
+#endif
               }
 
           io.data_stream (unique_ids.empty() ? nullptr : unique_ids.data(),
@@ -992,8 +1000,10 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
   // Next: do "block"-based I/O for the extra node integers (if necessary)
   if (n_node_integers)
     {
+#ifndef NDEBUG
       // Reset write counter
       n_written = 0;
+#endif
 
       // Return node iterator to the beginning
       node_iter = mesh.local_nodes_begin();
@@ -1127,7 +1137,9 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id,
                     for (unsigned int i=0; i != n_node_integers; ++i)
                       node_integers[n_node_integers*local_idx + i] = recv_node_integers[pid][n_node_integers*idx + i];
 
+#ifndef NDEBUG
                     n_written++;
+#endif
                   }
 
               io.data_stream (node_integers.empty() ? nullptr : node_integers.data(),
