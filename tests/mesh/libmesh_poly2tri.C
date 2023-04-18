@@ -2,7 +2,9 @@
 #include "libmesh_cppunit.h"
 
 #ifdef LIBMESH_HAVE_POLY2TRI
+#  include "libmesh/ignore_warnings.h" // utf-8 comments should be fine...
 #  include "poly2tri/poly2tri.h"
+#  include "libmesh/restore_warnings.h"
 #endif
 
 #include <numeric>

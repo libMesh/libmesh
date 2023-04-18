@@ -35,7 +35,9 @@
 #include "libmesh/utility.h"
 
 // poly2tri includes
+#include "libmesh/ignore_warnings.h" // utf-8 comments should be fine...
 #include "poly2tri/poly2tri.h"
+#include "libmesh/restore_warnings.h"
 
 // Anonymous namespace - poly2tri doesn't define operator<(Point,Point)
 namespace
