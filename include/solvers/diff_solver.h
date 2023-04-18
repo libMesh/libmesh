@@ -285,7 +285,35 @@ public:
    */
   std::unique_ptr<LinearSolutionMonitor> linear_solution_monitor;
 
+  /**
+   * Enable (or disable; it is \p true by default) exact enforcement
+   * of constraints at the solver level, correcting any constrained
+   * DoF coefficients in \p current_local_solution as well as applying
+   * nonlinear residual and Jacobian terms based on constraint
+   * equations.
+   *
+   * This is probably only safe to disable if user code is setting
+   * nonlinear residual and Jacobian terms based on constraint
+   * equations at an element-by-element level, by combining the
+   * \p asymmetric_constraint_rows option with the
+   * \p residual_constrain_element_vector processing option in
+   * \p DofMap.
+   */
+  virtual void set_exact_constraint_enforcement(bool enable) {
+    _exact_constraint_enforcement = enable;
+  }
+
+  bool exact_constraint_enforcement() {
+    return _exact_constraint_enforcement;
+  }
+
 protected:
+
+  /**
+   * Whether we should enforce exact constraints globally during a
+   * solve.
+   */
+  bool _exact_constraint_enforcement;
 
   /**
    * The largest solution norm which the DiffSolver has yet seen will be stored

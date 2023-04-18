@@ -379,12 +379,39 @@ public:
    */
   virtual void force_new_preconditioner() {};
 
+  /**
+   * Enable (or disable; it is \p true by default) exact enforcement
+   * of constraints at the solver level, correcting any constrained
+   * DoF coefficients in \p current_local_solution as well as applying
+   * nonlinear residual and Jacobian terms based on constraint
+   * equations.
+   *
+   * This is probably only safe to disable if user code is setting
+   * nonlinear residual and Jacobian terms based on constraint
+   * equations at an element-by-element level, by combining the
+   * \p asymmetric_constraint_rows option with the
+   * \p residual_constrain_element_vector processing option in
+   * \p DofMap.
+   */
+  virtual void set_exact_constraint_enforcement(bool enable) {
+    _exact_constraint_enforcement = enable;
+  }
+
+  bool exact_constraint_enforcement() {
+    return _exact_constraint_enforcement;
+  }
 
 protected:
   /**
    * Whether we should reuse the linear preconditioner
    */
   bool _reuse_preconditioner;
+
+  /**
+   * Whether we should enforce exact constraints globally during a
+   * solve.
+   */
+  bool _exact_constraint_enforcement;
 
   /**
    * Number of linear iterations to retain the preconditioner
@@ -452,6 +479,7 @@ NonlinearSolver<T>::NonlinearSolver (sys_type & s) :
   minimum_linear_tolerance(0),
   converged(false),
   _reuse_preconditioner(false),
+  _exact_constraint_enforcement(true),
   _reuse_preconditioner_max_linear_its(0),
   _system(s),
   _is_initialized (false),

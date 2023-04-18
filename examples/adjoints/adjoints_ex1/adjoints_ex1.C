@@ -67,6 +67,7 @@
 #include "libmesh/newton_solver.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/partitioner.h"
+#include "libmesh/petsc_diff_solver.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/system_norm.h"
 #include "libmesh/enum_solver_package.h"
@@ -184,6 +185,16 @@ void set_system_parameters(LaplaceSystem & system,
   system.time_solver = std::make_unique<SteadySolver>(system);
 
   // Nonlinear solver options
+  if (param.use_petsc_snes)
+  {
+#ifdef LIBMESH_HAVE_PETSC
+    PetscDiffSolver *solver = new PetscDiffSolver(system);
+    system.time_solver->diff_solver().reset(solver);
+#else
+    libmesh_error_msg("This example requires libMesh to be compiled with PETSc support.");
+#endif
+  }
+  else
   {
     NewtonSolver * solver = new NewtonSolver(system);
     system.time_solver->diff_solver() = std::unique_ptr<DiffSolver>(solver);
@@ -201,6 +212,7 @@ void set_system_parameters(LaplaceSystem & system,
         solver->continue_after_max_iterations = true;
         solver->continue_after_backtrack_failure = true;
       }
+    system.set_constrain_in_solver(param.constrain_in_solver);
 
     // And the linear solver options
     solver->max_linear_iterations       = param.max_linear_iterations;

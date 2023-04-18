@@ -115,10 +115,11 @@ extern "C"
     sys.update();
 
     // We may need to correct a non-conforming solution
-    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
+    if (solver.exact_constraint_enforcement())
+      sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     // Do DiffSystem assembly
-    sys.assembly(true, false);
+    sys.assembly(true, false, !solver.exact_constraint_enforcement());
     R_system.close();
 
     // Swap back
@@ -168,10 +169,11 @@ extern "C"
     sys.update();
 
     // We may need to correct a non-conforming solution
-    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
+    if (solver.exact_constraint_enforcement())
+      sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     // Do DiffSystem assembly
-    sys.assembly(false, true);
+    sys.assembly(false, true, !solver.exact_constraint_enforcement());
     J_system.close();
 
     // Swap back
@@ -318,7 +320,8 @@ unsigned int PetscDiffSolver::solve()
   LIBMESH_CHKERR(ierr);
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  _system.get_dof_map().enforce_constraints_exactly(_system);
+  if (this->_exact_constraint_enforcement)
+    _system.get_dof_map().enforce_constraints_exactly(_system);
 #endif
 
   SNESConvergedReason reason;

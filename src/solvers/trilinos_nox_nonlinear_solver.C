@@ -107,7 +107,8 @@ bool Problem_Interface::computeF(const Epetra_Vector & x,
   X_global.swap(X_sys);
   R.swap(R_sys);
 
-  sys.get_dof_map().enforce_constraints_exactly(sys);
+  if (_solver->_exact_constraint_enforcement)
+    sys.get_dof_map().enforce_constraints_exactly(sys);
   sys.update();
 
   // Swap back
@@ -165,7 +166,8 @@ bool Problem_Interface::computeJacobian(const Epetra_Vector & x,
   // Use the systems update() to get a good local version of the parallel solution
   X_global.swap(X_sys);
 
-  sys.get_dof_map().enforce_constraints_exactly(sys);
+  if (_solver->_exact_constraint_enforcement)
+    sys.get_dof_map().enforce_constraints_exactly(sys);
   sys.update();
 
   X_global.swap(X_sys);
@@ -229,7 +231,8 @@ bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
   // Use the systems update() to get a good local version of the parallel solution
   X_global.swap(X_sys);
 
-  sys.get_dof_map().enforce_constraints_exactly(sys);
+  if (this->_exact_constraint_enforcement)
+    sys.get_dof_map().enforce_constraints_exactly(sys);
   sys.update();
 
   X_global.swap(X_sys);

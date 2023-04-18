@@ -1067,18 +1067,33 @@ public:
   bool is_constrained_dof (const dof_id_type dof) const;
 
   /**
-   * \returns \p true if the system has any heterogenous constraints for
+   * \returns \p true if the system has any heterogeneous constraints for
    * adjoint solution \p qoi_num, \p false otherwise.
    */
-  bool has_heterogenous_adjoint_constraints (const unsigned int qoi_num) const;
+  bool has_heterogeneous_adjoint_constraints (const unsigned int qoi_num) const;
+
+  /**
+   * Backwards compatibility with misspelling.
+   */
+  bool has_heterogenous_adjoint_constraints (const unsigned int qoi_num) const {
+    return this->has_heterogeneous_adjoint_constraints (qoi_num);
+  }
 
   /**
    * \returns The heterogeneous constraint value if the degree of
-   * freedom \p dof has a heterogenous constraint for adjoint solution
+   * freedom \p dof has a heterogeneous constraint for adjoint solution
    * \p qoi_num, zero otherwise.
    */
+  Number has_heterogeneous_adjoint_constraint (const unsigned int qoi_num,
+                                               const dof_id_type dof) const;
+
+  /**
+   * Backwards compatibility with misspelling.
+   */
   Number has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
-                                              const dof_id_type dof) const;
+                                              const dof_id_type dof) const {
+    return this->has_heterogeneous_adjoint_constraint (qoi_num, dof);
+  }
 
   /**
    * \returns A reference to the set of right-hand-side values in
@@ -1185,26 +1200,38 @@ public:
    * and columns of the matrix necessarily correspond to variables
    * of the same approximation order.
    *
-   * The heterogenous version of this method creates linear systems in
-   * which heterogenously constrained degrees of freedom will solve to
+   * The heterogeneous version of this method creates linear systems in
+   * which heterogeneously constrained degrees of freedom will solve to
    * their correct offset values, as would be appropriate for finding
    * a solution to a linear problem in a single algebraic solve.  The
-   * non-heterogenous version of this method creates linear systems in
-   * which even heterogenously constrained degrees of freedom are
+   * non-heterogeneous version of this method creates linear systems in
+   * which even heterogeneously constrained degrees of freedom are
    * solved without offset values taken into account, as would be
    * appropriate for finding linearized updates to a solution in which
-   * heterogenous constraints are already satisfied.
+   * heterogeneous constraints are already satisfied.
    *
    * By default, the constraints for the primal solution of this
    * system are used.  If a non-negative \p qoi_index is passed in,
    * then the constraints for the corresponding adjoint solution are
    * used instead.
    */
+  void heterogeneously_constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
+                                                            DenseVector<Number> & rhs,
+                                                            std::vector<dof_id_type> & elem_dofs,
+                                                            bool asymmetric_constraint_rows = true,
+                                                            int qoi_index = -1) const;
+
+  /*
+   * Backwards compatibility with misspelling.
+   */
   void heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
                                                            DenseVector<Number> & rhs,
                                                            std::vector<dof_id_type> & elem_dofs,
                                                            bool asymmetric_constraint_rows = true,
-                                                           int qoi_index = -1) const;
+                                                           int qoi_index = -1) const {
+    return this->heterogeneously_constrain_element_matrix_and_vector
+      (matrix, rhs, elem_dofs, asymmetric_constraint_rows, qoi_index);
+  }
 
   /**
    * Constrains the element vector.  This method requires
@@ -1212,28 +1239,104 @@ public:
    * case the elem_dofs correspond to the global DOF indices of both
    * the rows and columns of the element matrix.
    *
-   * The heterogenous version of this method creates linear systems in
-   * which heterogenously constrained degrees of freedom will solve to
+   * The heterogeneous version of this method creates linear systems in
+   * which heterogeneously constrained degrees of freedom will solve to
    * their correct offset values, as would be appropriate for finding
    * a solution to a linear problem in a single algebraic solve.  The
-   * non-heterogenous version of this method creates linear systems in
-   * which even heterogenously constrained degrees of freedom are
+   * non-heterogeneous version of this method creates linear systems in
+   * which even heterogeneously constrained degrees of freedom are
    * solved without offset values taken into account, as would be
    * appropriate for finding linearized updates to a solution in which
-   * heterogenous constraints are already satisfied.
+   * heterogeneous constraints are already satisfied.
+   *
+   * Note the sign difference from the nonlinear heterogeneous constraint
+   * method: Solving u:=K\f has the opposite sign convention from
+   * u:=u_in-J\r, and we apply heterogeneous constraints accordingly.
    *
    * By default, the constraints for the primal solution of this
    * system are used.  If a non-negative \p qoi_index is passed in,
    * then the constraints for the corresponding adjoint solution are
    * used instead.
    */
+  void heterogeneously_constrain_element_vector (const DenseMatrix<Number> & matrix,
+                                                 DenseVector<Number> & rhs,
+                                                 std::vector<dof_id_type> & elem_dofs,
+                                                 bool asymmetric_constraint_rows = true,
+                                                 int qoi_index = -1) const;
+
+  /*
+   * Backwards compatibility with misspelling.
+   */
   void heterogenously_constrain_element_vector (const DenseMatrix<Number> & matrix,
                                                 DenseVector<Number> & rhs,
                                                 std::vector<dof_id_type> & elem_dofs,
                                                 bool asymmetric_constraint_rows = true,
-                                                int qoi_index = -1) const;
+                                                int qoi_index = -1) const {
+    return this->heterogeneously_constrain_element_vector
+      (matrix, rhs, elem_dofs, asymmetric_constraint_rows, qoi_index);
+  }
+
+  /**
+   * Constrains the element Jacobian and residual.  The element
+   * Jacobian is square, and the elem_dofs should correspond to the
+   * global DOF indices of both the rows and columns of the element
+   * matrix.
+   *
+   * The residual-constraining version of this method creates linear
+   * systems in which heterogeneously constrained degrees of freedom
+   * create non-zero residual terms when not at their correct offset
+   * values, as would be appropriate for finding a solution to a
+   * nonlinear problem in a quasi-Newton solve.
+   *
+   * Note the sign difference from the linear heterogeneous constraint
+   * method: Solving u:=u_in-J\r has the opposite sign convention from
+   * u:=K\f, and we apply heterogeneous constraints accordingly.
+   *
+   * The \p solution vector passed in should be a serialized or
+   * ghosted primal solution
+   */
+  void heterogeneously_constrain_element_jacobian_and_residual (DenseMatrix<Number> & matrix,
+                                                                DenseVector<Number> & rhs,
+                                                                std::vector<dof_id_type> & elem_dofs,
+                                                                NumericVector<Number> & solution_local) const;
+
+  /**
+   * Constrains the element residual.  The element Jacobian is square,
+   * and the elem_dofs should correspond to the global DOF indices of
+   * both the rows and columns of the element matrix.
+   *
+   * The residual-constraining version of this method creates linear
+   * systems in which heterogeneously constrained degrees of freedom
+   * create non-zero residual terms when not at their correct offset
+   * values, as would be appropriate for finding a solution to a
+   * nonlinear problem in a quasi-Newton solve.
+   *
+   * The \p solution vector passed in should be a serialized or
+   * ghosted primal solution
+   */
+  void heterogeneously_constrain_element_residual (DenseVector<Number> & rhs,
+                                                   std::vector<dof_id_type> & elem_dofs,
+                                                   NumericVector<Number> & solution_local) const;
 
 
+  /**
+   * Constrains the element residual.  The element Jacobian is square,
+   * and the elem_dofs should correspond to the global DOF indices of
+   * both the rows and columns of the element matrix, and the dof
+   * constraint should not include any heterogeneous terms.
+   *
+   * The residual-constraining version of this method creates linear
+   * systems in which heterogeneously constrained degrees of freedom
+   * create non-zero residual terms when not at their correct offset
+   * values, as would be appropriate for finding a solution to a
+   * nonlinear problem in a quasi-Newton solve.
+   *
+   * The \p solution vector passed in should be a serialized or
+   * ghosted primal solution
+   */
+  void constrain_element_residual (DenseVector<Number> & rhs,
+                                   std::vector<dof_id_type> & elem_dofs,
+                                   NumericVector<Number> & solution_local) const;
 
   /**
    * Constrains a dyadic element matrix B = v w'.  This method
@@ -1274,7 +1377,7 @@ public:
                                     bool homogeneous = false) const;
 
   /**
-   * Heterogenously constrains the numeric vector \p v, which
+   * Heterogeneously constrains the numeric vector \p v, which
    * represents an adjoint solution defined on the mesh for quantity
    * fo interest \p q.  For homogeneous constraints, use \p
    * enforce_constraints_exactly instead
@@ -1647,7 +1750,7 @@ private:
    * an elements DOFs to be constrained by some other, external DOFs
    * and/or Dirichlet conditions.
    *
-   * The forcing vector will depend on which solution's heterogenous
+   * The forcing vector will depend on which solution's heterogeneous
    * constraints are being applied.  For the default \p qoi_index this
    * will be the primal solution; for \p qoi_index >= 0 the
    * corresponding adjoint solution's constraints will be used.
@@ -2043,7 +2146,7 @@ bool DofMap::is_constrained_dof (const dof_id_type dof) const
 
 
 inline
-bool DofMap::has_heterogenous_adjoint_constraints (const unsigned int qoi_num) const
+bool DofMap::has_heterogeneous_adjoint_constraints (const unsigned int qoi_num) const
 {
   AdjointDofConstraintValues::const_iterator it =
     _adjoint_constraint_values.find(qoi_num);
@@ -2057,7 +2160,7 @@ bool DofMap::has_heterogenous_adjoint_constraints (const unsigned int qoi_num) c
 
 
 inline
-Number DofMap::has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
+Number DofMap::has_heterogeneous_adjoint_constraint (const unsigned int qoi_num,
                                                     const dof_id_type dof) const
 {
   AdjointDofConstraintValues::const_iterator it =
@@ -2110,11 +2213,11 @@ inline void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number> &,
                                                          std::vector<dof_id_type> &,
                                                          bool) const {}
 
-inline void DofMap::heterogenously_constrain_element_matrix_and_vector
+inline void DofMap::heterogeneously_constrain_element_matrix_and_vector
   (DenseMatrix<Number> &, DenseVector<Number> &,
    std::vector<dof_id_type> &, bool, int) const {}
 
-inline void DofMap::heterogenously_constrain_element_vector
+inline void DofMap::heterogeneously_constrain_element_vector
   (const DenseMatrix<Number> &, DenseVector<Number> &,
    std::vector<dof_id_type> &, bool, int) const {}
 

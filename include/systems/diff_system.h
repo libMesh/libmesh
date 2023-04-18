@@ -378,6 +378,16 @@ public:
    */
   bool print_element_jacobians;
 
+  /**
+   * set_constrain_in_solver to false to apply constraints only via
+   * residual terms in the systems to be solved.
+   */
+  virtual void set_constrain_in_solver(bool enable);
+
+  virtual bool get_constrain_in_solver() {
+    return _constrain_in_solver;
+  }
+
 protected:
 
   /**
@@ -411,6 +421,12 @@ protected:
    */
   void add_dot_var_dirichlet_bcs( unsigned int var_idx, unsigned int dot_var_idx);
 #endif
+
+  /**
+   * _constrain_in_solver defaults to true; if false then we apply
+   * constraints only via residual terms in the systems to be solved.
+   */
+  bool _constrain_in_solver;
 
 private:
   /**

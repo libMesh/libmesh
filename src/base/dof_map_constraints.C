@@ -2106,7 +2106,7 @@ void DofMap::process_mesh_constraint_rows(const MeshBase & mesh)
                       if (rhsit != vals.end())
                         vals.erase(rhsit);
 
-                      this->heterogenously_constrain_element_matrix_and_vector
+                      this->heterogeneously_constrain_element_matrix_and_vector
                         (K, F, dof_indices, false, q ? (q-1) : -1);
                       if (!q)
                         mat->add_matrix(K, dof_indices);
@@ -2422,7 +2422,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
                 const DofConstraintRow & constraint_row = pos->second;
 
                 // This is an overzealous assertion in the presence of
-                // heterogenous constraints: we now can constrain "u_i = c"
+                // heterogeneous constraints: we now can constrain "u_i = c"
                 // with no other u_j terms involved.
                 //
                 // libmesh_assert (!constraint_row.empty());
@@ -2517,11 +2517,11 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
 
 
 
-void DofMap::heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
-                                                                 DenseVector<Number> & rhs,
-                                                                 std::vector<dof_id_type> & elem_dofs,
-                                                                 bool asymmetric_constraint_rows,
-                                                                 int qoi_index) const
+void DofMap::heterogeneously_constrain_element_matrix_and_vector (DenseMatrix<Number> & matrix,
+                                                                  DenseVector<Number> & rhs,
+                                                                  std::vector<dof_id_type> & elem_dofs,
+                                                                  bool asymmetric_constraint_rows,
+                                                                  int qoi_index) const
 {
   libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
   libmesh_assert_equal_to (elem_dofs.size(), matrix.n());
@@ -2622,12 +2622,213 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Num
 }
 
 
+void DofMap::heterogeneously_constrain_element_jacobian_and_residual
+  (DenseMatrix<Number> & matrix,
+   DenseVector<Number> & rhs,
+   std::vector<dof_id_type> & elem_dofs,
+   NumericVector<Number> & solution_local) const
+{
+  libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
+  libmesh_assert_equal_to (elem_dofs.size(), matrix.n());
+  libmesh_assert_equal_to (elem_dofs.size(), rhs.size());
 
-void DofMap::heterogenously_constrain_element_vector (const DenseMatrix<Number> & matrix,
-                                                      DenseVector<Number> & rhs,
-                                                      std::vector<dof_id_type> & elem_dofs,
-                                                      bool asymmetric_constraint_rows,
-                                                      int qoi_index) const
+  libmesh_assert (solution_local.type() == SERIAL ||
+                  solution_local.type() == GHOSTED);
+
+  // check for easy return
+  if (this->_dof_constraints.empty())
+    return;
+
+  // The constrained matrix is built up as C^T K C.
+  // The constrained RHS is built up as C^T F
+  // Asymmetric residual terms are added if we do not have x = Cx+h
+  DenseMatrix<Number> C;
+  DenseVector<Number> H;
+
+  this->build_constraint_matrix_and_vector (C, H, elem_dofs);
+
+  LOG_SCOPE("hetero_cnstrn_elem_jac_res()", "DofMap");
+
+  // It is possible that the matrix is not constrained at all.
+  if ((C.m() != matrix.m()) ||
+      (C.n() != elem_dofs.size()))
+    return;
+
+  // Compute the matrix-vector product C^T F
+  DenseVector<Number> old_rhs(rhs);
+  C.vector_mult_transpose(rhs, old_rhs);
+
+  // Compute the matrix-matrix-matrix product C^T K C
+  matrix.left_multiply_transpose  (C);
+  matrix.right_multiply (C);
+
+  libmesh_assert_equal_to (matrix.m(), matrix.n());
+  libmesh_assert_equal_to (matrix.m(), elem_dofs.size());
+  libmesh_assert_equal_to (matrix.n(), elem_dofs.size());
+
+  for (unsigned int i=0,
+       n_elem_dofs = cast_int<unsigned int>(elem_dofs.size());
+       i != n_elem_dofs; i++)
+    {
+      const dof_id_type dof_id = elem_dofs[i];
+
+      const DofConstraints::const_iterator
+        pos = _dof_constraints.find(dof_id);
+
+      if (pos != _dof_constraints.end())
+        {
+          for (auto j : make_range(matrix.n()))
+            matrix(i,j) = 0.;
+
+          // If the DOF is constrained
+          matrix(i,i) = 1.;
+
+          // This will put a nonsymmetric entry in the constraint
+          // row to ensure that the linear system produces the
+          // correct value for the constrained DOF.
+          const DofConstraintRow & constraint_row = pos->second;
+
+          for (const auto & item : constraint_row)
+            for (unsigned int j=0; j != n_elem_dofs; j++)
+              if (elem_dofs[j] == item.first)
+                matrix(i,j) = -item.second;
+
+          const DofConstraintValueMap::const_iterator valpos =
+            _primal_constraint_values.find(dof_id);
+
+          Number & rhs_val = rhs(i);
+          rhs_val = (valpos == _primal_constraint_values.end()) ?
+            0 : -valpos->second;
+          for (const auto & [constraining_dof, coef] : constraint_row)
+            rhs_val -= coef * solution_local(constraining_dof);
+          rhs_val += solution_local(dof_id);
+        }
+    }
+}
+
+
+void DofMap::heterogeneously_constrain_element_residual
+  (DenseVector<Number> & rhs,
+   std::vector<dof_id_type> & elem_dofs,
+   NumericVector<Number> & solution_local) const
+{
+  libmesh_assert_equal_to (elem_dofs.size(), rhs.size());
+
+  libmesh_assert (solution_local.type() == SERIAL ||
+                  solution_local.type() == GHOSTED);
+
+  // check for easy return
+  if (this->_dof_constraints.empty())
+    return;
+
+  // The constrained RHS is built up as C^T F
+  // Asymmetric residual terms are added if we do not have x = Cx+h
+  DenseMatrix<Number> C;
+  DenseVector<Number> H;
+
+  this->build_constraint_matrix_and_vector (C, H, elem_dofs);
+
+  LOG_SCOPE("hetero_cnstrn_elem_res()", "DofMap");
+
+  // It is possible that the element is not constrained at all.
+  if ((C.m() != rhs.size()) ||
+      (C.n() != elem_dofs.size()))
+    return;
+
+  // Compute the matrix-vector product C^T F
+  DenseVector<Number> old_rhs(rhs);
+  C.vector_mult_transpose(rhs, old_rhs);
+
+  for (unsigned int i=0,
+       n_elem_dofs = cast_int<unsigned int>(elem_dofs.size());
+       i != n_elem_dofs; i++)
+    {
+      const dof_id_type dof_id = elem_dofs[i];
+
+      const DofConstraints::const_iterator
+        pos = _dof_constraints.find(dof_id);
+
+      if (pos != _dof_constraints.end())
+        {
+          // This will put a nonsymmetric entry in the constraint
+          // row to ensure that the linear system produces the
+          // correct value for the constrained DOF.
+          const DofConstraintRow & constraint_row = pos->second;
+
+          const DofConstraintValueMap::const_iterator valpos =
+            _primal_constraint_values.find(dof_id);
+
+          Number & rhs_val = rhs(i);
+          rhs_val = (valpos == _primal_constraint_values.end()) ?
+            0 : -valpos->second;
+          for (const auto & [constraining_dof, coef] : constraint_row)
+            rhs_val -= coef * solution_local(constraining_dof);
+          rhs_val += solution_local(dof_id);
+        }
+    }
+}
+
+
+void DofMap::constrain_element_residual
+  (DenseVector<Number> & rhs,
+   std::vector<dof_id_type> & elem_dofs,
+   NumericVector<Number> & solution_local) const
+{
+  libmesh_assert_equal_to (elem_dofs.size(), rhs.size());
+
+  libmesh_assert (solution_local.type() == SERIAL ||
+                  solution_local.type() == GHOSTED);
+
+  // check for easy return
+  if (this->_dof_constraints.empty())
+    return;
+
+  // The constrained RHS is built up as C^T F
+  DenseMatrix<Number> C;
+
+  this->build_constraint_matrix (C, elem_dofs);
+
+  LOG_SCOPE("cnstrn_elem_residual()", "DofMap");
+
+  // It is possible that the matrix is not constrained at all.
+  if (C.n() != elem_dofs.size())
+    return;
+
+  // Compute the matrix-vector product C^T F
+  DenseVector<Number> old_rhs(rhs);
+  C.vector_mult_transpose(rhs, old_rhs);
+
+  for (unsigned int i=0,
+       n_elem_dofs = cast_int<unsigned int>(elem_dofs.size());
+       i != n_elem_dofs; i++)
+    {
+      const dof_id_type dof_id = elem_dofs[i];
+
+      const DofConstraints::const_iterator
+        pos = _dof_constraints.find(dof_id);
+
+      if (pos != _dof_constraints.end())
+        {
+          // This will put a nonsymmetric entry in the constraint
+          // row to ensure that the linear system produces the
+          // correct value for the constrained DOF.
+          const DofConstraintRow & constraint_row = pos->second;
+
+          Number & rhs_val = rhs(i);
+          rhs_val = 0;
+          for (const auto & [constraining_dof, coef] : constraint_row)
+            rhs_val -= coef * solution_local(constraining_dof);
+          rhs_val += solution_local(dof_id);
+        }
+    }
+}
+
+
+void DofMap::heterogeneously_constrain_element_vector (const DenseMatrix<Number> & matrix,
+                                                       DenseVector<Number> & rhs,
+                                                       std::vector<dof_id_type> & elem_dofs,
+                                                       bool asymmetric_constraint_rows,
+                                                       int qoi_index) const
 {
   libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
   libmesh_assert_equal_to (elem_dofs.size(), matrix.n());
@@ -3515,7 +3716,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
   if (!has_constraints)
     return;
 
-  // If we have heterogenous adjoint constraints we need to
+  // If we have heterogeneous adjoint constraints we need to
   // communicate those too.
   const unsigned int max_qoi_num =
     _adjoint_constraint_values.empty() ?
@@ -4848,7 +5049,7 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
 {
   typedef std::set<dof_id_type> DoF_RCSet;
 
-  // If we have heterogenous adjoint constraints we need to
+  // If we have heterogeneous adjoint constraints we need to
   // communicate those too.
   const unsigned int max_qoi_num =
     _adjoint_constraint_values.empty() ?

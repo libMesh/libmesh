@@ -48,6 +48,7 @@ DifferentiableSystem::DifferentiableSystem(EquationSystems & es,
   print_element_solutions(false),
   print_element_residuals(false),
   print_element_jacobians(false),
+  _constrain_in_solver(true),
   _diff_physics(),
   _diff_qoi()
 {
@@ -417,6 +418,11 @@ void DifferentiableSystem::pop_physics ()
 }
 
 
+void DifferentiableSystem::set_constrain_in_solver(bool enable)
+{
+  _constrain_in_solver = enable;
+  this->time_solver->diff_solver()->set_exact_constraint_enforcement(enable);
+}
 
 
 } // namespace libMesh

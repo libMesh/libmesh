@@ -81,6 +81,7 @@ FEMParameters::FEMParameters(const Parallel::Communicator & comm_in) :
   print_element_residuals(false),
   print_element_jacobians(false),
 
+  constrain_in_solver(true),
   use_petsc_snes(false),
   time_solver_quiet(true), solver_quiet(true), solver_verbose(false),
   reuse_preconditioner(true),
@@ -686,6 +687,7 @@ void FEMParameters::read(GetPot & input,
   GETPOT_INPUT(print_element_jacobians);
 
 
+  GETPOT_INPUT(constrain_in_solver);
   GETPOT_INPUT(use_petsc_snes);
   GETPOT_INPUT(time_solver_quiet);
   GETPOT_INPUT(solver_quiet);

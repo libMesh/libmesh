@@ -83,7 +83,7 @@ Real NewtonSolver::line_search(Real tol,
       _system.update();
 
       // Check residual with fractional Newton step
-      _system.assembly (true, false);
+      _system.assembly(true, false, !this->_exact_constraint_enforcement);
 
       rhs.close();
       current_residual = rhs.l2_norm();
@@ -191,7 +191,7 @@ Real NewtonSolver::line_search(Real tol,
 
       // We may need to localize a parallel solution
       _system.update();
-      _system.assembly (true, false);
+      _system.assembly(true, false, !this->_exact_constraint_enforcement);
 
       rhs.close();
       Real fu = current_residual = rhs.l2_norm();
@@ -295,7 +295,8 @@ unsigned int NewtonSolver::solve()
   rhs.close();
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  _system.get_dof_map().enforce_constraints_exactly(_system);
+  if (this->_exact_constraint_enforcement)
+    _system.get_dof_map().enforce_constraints_exactly(_system);
 #endif
 
   SparseMatrix<Number> & matrix = *(_system.matrix);
@@ -316,7 +317,7 @@ unsigned int NewtonSolver::solve()
       if (verbose)
         libMesh::out << "Assembling the System" << std::endl;
 
-      _system.assembly(true, true);
+      _system.assembly(true, true, !this->_exact_constraint_enforcement);
       rhs.close();
       Real current_residual = rhs.l2_norm();
 
@@ -426,8 +427,9 @@ unsigned int NewtonSolver::solve()
       _system.update ();
       // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-      _system.get_dof_map().enforce_constraints_exactly
-        (_system, &linear_solution, /* homogeneous = */ true);
+      if (this->_exact_constraint_enforcement)
+        _system.get_dof_map().enforce_constraints_exactly
+          (_system, &linear_solution, /* homogeneous = */ true);
 #endif
 
       const unsigned int linear_steps = rval.first;
@@ -470,7 +472,7 @@ unsigned int NewtonSolver::solve()
           !continue_after_max_iterations)
         {
           _system.update ();
-          _system.assembly(true, false);
+          _system.assembly(true, false, !this->_exact_constraint_enforcement);
 
           rhs.close();
           current_residual = rhs.l2_norm();
@@ -553,7 +555,8 @@ unsigned int NewtonSolver::solve()
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  _system.get_dof_map().enforce_constraints_exactly(_system);
+  if (this->_exact_constraint_enforcement)
+    _system.get_dof_map().enforce_constraints_exactly(_system);
 #endif
 
   // We may need to localize a parallel solution

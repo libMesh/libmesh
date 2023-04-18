@@ -98,6 +98,7 @@
 #include "libmesh/euler_solver.h"
 #include "libmesh/euler2_solver.h"
 #include "libmesh/newton_solver.h"
+#include "libmesh/petsc_diff_solver.h"
 #include "libmesh/twostep_time_solver.h"
 
 #include "libmesh/getpot.h"
@@ -338,6 +339,7 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
           solver->continue_after_max_iterations = true;
           solver->continue_after_backtrack_failure = true;
         }
+      system.set_constrain_in_solver(param.constrain_in_solver);
 
       // And the linear solver options
       solver->max_linear_iterations       = param.max_linear_iterations;
