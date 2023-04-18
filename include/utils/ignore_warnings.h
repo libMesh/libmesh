@@ -45,6 +45,8 @@
 #pragma clang diagnostic ignored "-Woverloaded-virtual"
 #pragma clang diagnostic ignored "-Wmacro-redefined"
 #pragma clang diagnostic ignored "-Winconsistent-missing-override"
+#pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#pragma clang diagnostic ignored "-Winvalid-utf8"
 // Ignore warnings from code that does "if (foo) bar();"
 #pragma clang diagnostic ignored "-Wmisleading-indentation"
 #pragma clang diagnostic ignored "-Wint-in-bool-context"
