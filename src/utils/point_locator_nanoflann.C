@@ -319,7 +319,7 @@ PointLocatorNanoflann::operator() (const Point & p,
   candidate_elements.clear();
 
   // Keep track of the number of elements checked in detail
-  unsigned int n_elems_checked = 0;
+  // unsigned int n_elems_checked = 0;
 
   // Do the KD-Tree search
   auto result_set = this->kd_tree_find_neighbors(p, _num_results);
@@ -350,7 +350,7 @@ PointLocatorNanoflann::operator() (const Point & p,
         candidate_elem->contains_point(p);
 
       // Increment the number of elements checked
-      n_elems_checked++;
+      // n_elems_checked++;
 
       // If the point is contained in/close to an Elem from an
       // allowed subdomain, add it to the list.
