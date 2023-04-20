@@ -335,7 +335,7 @@ public:
                                MeshBase & mesh,
                                const PointLocatorBase & point_locator,
                                const PeriodicBoundaries * pb);
-                               
+
   /**
    * \returns A pointer to the \f$ i^{th} \f$ neighbor of this element
    * for interior elements.  If an element is on a periodic
