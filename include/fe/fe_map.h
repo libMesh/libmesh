@@ -645,7 +645,8 @@ protected:
   /**
    * Determine which values are to be calculated
    */
-  void determine_calculations() {
+  void determine_calculations()
+  {
     calculations_started = true;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES

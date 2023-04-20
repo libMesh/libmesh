@@ -112,28 +112,32 @@ public:
    * Redirect any output to the target.
    */
   template<typename T>
-  BasicOStreamProxy & operator<< (const T & in) {
+  BasicOStreamProxy & operator<< (const T & in)
+  {
     (*_target) << in; return *this;
   }
 
   /**
    * Redirect any ostream manipulators to the target.
    */
-  BasicOStreamProxy & operator<< (streamT & (*in)(streamT &)) {
+  BasicOStreamProxy & operator<< (streamT & (*in)(streamT &))
+  {
     (*_target) << in; return *this;
   }
 
   /**
    * Redirect any ios manipulators to the target.
    */
-  BasicOStreamProxy & operator<< (std::basic_ios<charT,traits> & (*in)(std::basic_ios<charT,traits> &)) {
+  BasicOStreamProxy & operator<< (std::basic_ios<charT,traits> & (*in)(std::basic_ios<charT,traits> &))
+  {
     (*_target) << in; return *this;
   }
 
   /**
    * Redirect any ios_base manipulators to the target.
    */
-  BasicOStreamProxy & operator<< (std::ios_base & (*in)(std::ios_base &)) {
+  BasicOStreamProxy & operator<< (std::ios_base & (*in)(std::ios_base &))
+  {
     (*_target) << in; return *this;
   }
 
@@ -210,7 +214,8 @@ public:
    * Rather than implement every ostream/ios/ios_base function, we'll
    * be lazy and make esoteric uses go through a \p get() function.
    */
-  streamT * get() {
+  streamT * get()
+  {
     return _target;
   }
 
@@ -218,7 +223,8 @@ public:
    * Rather than implement every ostream/ios/ios_base function, we'll
    * be lazy and make esoteric uses go through a \p get() function.
    */
-  const streamT * get() const {
+  const streamT * get() const
+  {
     return _target;
   }
 

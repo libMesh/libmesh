@@ -64,18 +64,21 @@ public:
       return *this;
     }
 
-    iterator operator++(int) {
+    iterator operator++(int)
+    {
       iterator it = *this;
       ++(*this);
       return it;
     }
 
-    bool operator==(const iterator & other) const {
+    bool operator==(const iterator & other) const
+    {
       libmesh_assert_equal_to (&_vecbool, &other._vecbool);
       return _i == other._i;
     }
 
-    bool operator!=(const iterator & other) const {
+    bool operator!=(const iterator & other) const
+    {
       libmesh_assert_equal_to (&_vecbool, &other._vecbool);
       return _i != other._i;
     }

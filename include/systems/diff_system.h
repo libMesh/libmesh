@@ -384,7 +384,8 @@ public:
    */
   virtual void set_constrain_in_solver(bool enable);
 
-  virtual bool get_constrain_in_solver() {
+  virtual bool get_constrain_in_solver()
+  {
     return _constrain_in_solver;
   }
 

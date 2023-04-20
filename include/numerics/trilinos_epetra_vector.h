@@ -358,7 +358,8 @@ private:
   /**
    * Set whether or not non-local data values should be ignored.
    */
-  void setIgnoreNonLocalEntries(bool flag) {
+  void setIgnoreNonLocalEntries(bool flag)
+  {
     ignoreNonLocalEntries_ = flag;
   }
 

@@ -456,7 +456,8 @@ public:
 
 
   static Point map (const Elem * inf_elem,
-                    const Point & reference_point) {
+                    const Point & reference_point)
+  {
     // libmesh_deprecated(); // soon
     return InfFEMap::map(Dim, inf_elem, reference_point);
   }
@@ -465,7 +466,8 @@ public:
   static Point inverse_map (const Elem * elem,
                             const Point & p,
                             const Real tolerance = TOLERANCE,
-                            const bool secure = true) {
+                            const bool secure = true)
+  {
     // libmesh_deprecated(); // soon
     return InfFEMap::inverse_map(Dim, elem, p, tolerance, secure);
   }
@@ -475,7 +477,8 @@ public:
                            const std::vector<Point> & physical_points,
                            std::vector<Point> &       reference_points,
                            const Real tolerance = TOLERANCE,
-                           const bool secure = true) {
+                           const bool secure = true)
+  {
     // libmesh_deprecated(); // soon
     return InfFEMap::inverse_map(Dim, elem, physical_points,
                                  reference_points, tolerance, secure);

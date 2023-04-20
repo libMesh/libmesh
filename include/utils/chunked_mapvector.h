@@ -61,7 +61,8 @@ public:
     veclike_iterator_base(const veclike_iterator_base<T> & i)
       : it(i.it), array_index(i.idx) {}
 
-    veclike_iterator_base & operator++() {
+    veclike_iterator_base & operator++()
+    {
       ++array_index;
       if (array_index >= N)
         {
@@ -71,17 +72,20 @@ public:
       return *this;
     }
 
-    veclike_iterator_base operator++(int) {
+    veclike_iterator_base operator++(int)
+    {
       veclike_iterator i = *this;
       ++(*this);
       return i;
     }
 
-    bool operator==(const veclike_iterator_base & other) const {
+    bool operator==(const veclike_iterator_base & other) const
+    {
       return (it == other.it && array_index == other.array_index);
     }
 
-    bool operator!=(const veclike_iterator_base & other) const {
+    bool operator!=(const veclike_iterator_base & other) const
+    {
       return (it != other.it || array_index != other.array_index);
     }
 
@@ -131,7 +135,8 @@ public:
 
     const_reverse_veclike_iterator(const const_reverse_veclike_iterator & i) = default;
 
-    const_reverse_veclike_iterator & operator++() {
+    const_reverse_veclike_iterator & operator++()
+    {
       if (array_index == 0)
         {
           array_index = N-1;
@@ -142,7 +147,8 @@ public:
       return *this;
     }
 
-    const_reverse_veclike_iterator operator++(int) {
+    const_reverse_veclike_iterator operator++(int)
+    {
       veclike_iterator i = *this;
       ++(*this);
       return i;
@@ -154,11 +160,13 @@ public:
 
     index_t index() const { return this->it->first * N + this->array_index; }
 
-    bool operator==(const const_reverse_veclike_iterator & other) const {
+    bool operator==(const const_reverse_veclike_iterator & other) const
+    {
       return (it == other.it && array_index == other.array_index);
     }
 
-    bool operator!=(const const_reverse_veclike_iterator & other) const {
+    bool operator!=(const const_reverse_veclike_iterator & other) const
+    {
       return (it != other.it || array_index != other.array_index);
     }
 
@@ -203,7 +211,8 @@ public:
     return it == this->end().it? Val() : (it->second)[k%N];
   }
 
-  void erase(index_t i) {
+  void erase(index_t i)
+  {
     typename maptype::iterator it = maptype::find(i/N);
     if (it == maptype::end())
       return;
@@ -216,7 +225,8 @@ public:
     maptype::erase(it);
   }
 
-  veclike_iterator erase(const veclike_iterator & pos) {
+  veclike_iterator erase(const veclike_iterator & pos)
+  {
     if (pos.it == maptype::end())
       return pos;
     *pos = Val();
@@ -236,27 +246,33 @@ public:
     return newpos;
   }
 
-  veclike_iterator begin() {
+  veclike_iterator begin()
+  {
     return veclike_iterator(maptype::begin(), 0);
   }
 
-  const_veclike_iterator begin() const {
+  const_veclike_iterator begin() const
+  {
     return const_veclike_iterator(maptype::begin(), 0);
   }
 
-  veclike_iterator end() {
+  veclike_iterator end()
+  {
     return veclike_iterator(maptype::end(), 0);
   }
 
-  const_veclike_iterator end() const {
+  const_veclike_iterator end() const
+  {
     return const_veclike_iterator(maptype::end(), 0);
   }
 
-  const_reverse_veclike_iterator rbegin() const {
+  const_reverse_veclike_iterator rbegin() const
+  {
     return const_reverse_veclike_iterator(maptype::rbegin(), N-1);
   }
 
-  const_reverse_veclike_iterator rend() const {
+  const_reverse_veclike_iterator rend() const
+  {
     return const_reverse_veclike_iterator(maptype::rend(), N-1);
   }
 };

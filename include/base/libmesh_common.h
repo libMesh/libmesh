@@ -514,12 +514,14 @@ template<class ...Args> inline void libmesh_ignore( const Args&... ) { }
 
 #ifdef LIBMESH_HAVE_CXX17_SPLICING
 template <typename T>
-void libmesh_merge_move(T & target, T & source) {
+void libmesh_merge_move(T & target, T & source)
+{
   target.merge(std::move(source));
 }
 #else
 template <typename T>
-void libmesh_merge_move(T & target, T & source) {
+void libmesh_merge_move(T & target, T & source) 
+{
   target.insert(source.begin(), source.end());
   source.clear(); // Avoid forwards-incompatibility
 }

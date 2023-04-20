@@ -1075,7 +1075,8 @@ public:
   /**
    * Backwards compatibility with misspelling.
    */
-  bool has_heterogenous_adjoint_constraints (const unsigned int qoi_num) const {
+  bool has_heterogenous_adjoint_constraints (const unsigned int qoi_num) const
+  {
     return this->has_heterogeneous_adjoint_constraints (qoi_num);
   }
 
@@ -1091,7 +1092,8 @@ public:
    * Backwards compatibility with misspelling.
    */
   Number has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
-                                              const dof_id_type dof) const {
+                                              const dof_id_type dof) const
+  {
     return this->has_heterogeneous_adjoint_constraint (qoi_num, dof);
   }
 
@@ -1228,7 +1230,8 @@ public:
                                                            DenseVector<Number> & rhs,
                                                            std::vector<dof_id_type> & elem_dofs,
                                                            bool asymmetric_constraint_rows = true,
-                                                           int qoi_index = -1) const {
+                                                           int qoi_index = -1) const
+  {
     return this->heterogeneously_constrain_element_matrix_and_vector
       (matrix, rhs, elem_dofs, asymmetric_constraint_rows, qoi_index);
   }
@@ -1271,7 +1274,8 @@ public:
                                                 DenseVector<Number> & rhs,
                                                 std::vector<dof_id_type> & elem_dofs,
                                                 bool asymmetric_constraint_rows = true,
-                                                int qoi_index = -1) const {
+                                                int qoi_index = -1) const
+  {
     return this->heterogeneously_constrain_element_vector
       (matrix, rhs, elem_dofs, asymmetric_constraint_rows, qoi_index);
   }

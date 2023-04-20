@@ -555,7 +555,8 @@ void libmesh_assert_parallel_consistent_procids (const MeshBase & mesh);
  * both parallel and topologically consistent.
  */
 template <typename DofObjectSubclass>
-void libmesh_assert_valid_procids (const MeshBase & mesh) {
+void libmesh_assert_valid_procids (const MeshBase & mesh)
+{
   libmesh_assert_parallel_consistent_procids<DofObjectSubclass>(mesh);
   libmesh_assert_topology_consistent_procids<DofObjectSubclass>(mesh);
 }

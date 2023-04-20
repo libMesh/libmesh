@@ -59,22 +59,26 @@ public:
 
     T operator* () const { return _i; }
 
-    const iterator & operator++ () {
+    const iterator & operator++ ()
+    {
       ++_i;
       return *this;
     }
 
-    iterator operator++ (int) {
+    iterator operator++ (int)
+    {
       iterator returnval(*this);
       ++_i;
       return returnval;
     }
 
-    bool operator== (const iterator & j) const {
+    bool operator== (const iterator & j) const
+    {
       return ( _i == j._i );
     }
 
-    bool operator!= (const iterator & j) const {
+    bool operator!= (const iterator & j) const
+    {
       return !(*this == j);
     }
 

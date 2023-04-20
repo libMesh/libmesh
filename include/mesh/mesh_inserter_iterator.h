@@ -68,11 +68,13 @@ struct mesh_inserter_iterator
 
   void operator=(Point * p) { mesh.add_point(*p); }
 
-  mesh_inserter_iterator & operator++() {
+  mesh_inserter_iterator & operator++()
+  {
     return *this;
   }
 
-  mesh_inserter_iterator operator++(int) {
+  mesh_inserter_iterator operator++(int)
+  {
     return mesh_inserter_iterator(*this);
   }
 

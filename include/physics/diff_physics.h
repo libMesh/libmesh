@@ -123,7 +123,8 @@ public:
    * in elem_time_derivative().
    */
   virtual bool element_time_derivative (bool request_jacobian,
-                                        DiffContext &) {
+                                        DiffContext &)
+  {
     return request_jacobian;
   }
 
@@ -141,7 +142,8 @@ public:
    * in elem_constraint().
    */
   virtual bool element_constraint (bool request_jacobian,
-                                   DiffContext &) {
+                                   DiffContext &)
+  {
     return request_jacobian;
   }
 
@@ -170,7 +172,8 @@ public:
    * integral contributions to elem_residual in side_constraint().
    */
   virtual bool side_time_derivative (bool request_jacobian,
-                                     DiffContext &) {
+                                     DiffContext &)
+  {
     return request_jacobian;
   }
 
@@ -190,7 +193,8 @@ public:
    * integral contributions to elem_residual in side_constraint().
    */
   virtual bool side_constraint (bool request_jacobian,
-                                DiffContext &) {
+                                DiffContext &)
+  {
     return request_jacobian;
   }
 
@@ -208,7 +212,8 @@ public:
    * SCALAR variables have been added.
    */
   virtual bool nonlocal_time_derivative (bool request_jacobian,
-                                         DiffContext &) {
+                                         DiffContext &)
+  {
     return request_jacobian;
   }
 
@@ -226,7 +231,8 @@ public:
    * SCALAR variables with non-transient equations have been added.
    */
   virtual bool nonlocal_constraint (bool request_jacobian,
-                                    DiffContext &) {
+                                    DiffContext &)
+  {
     return request_jacobian;
   }
 
@@ -269,7 +275,8 @@ public:
    * FEMPhysics::eulerian_residual()
    */
   virtual bool eulerian_residual (bool request_jacobian,
-                                  DiffContext &) {
+                                  DiffContext &)
+  {
     return request_jacobian;
   }
 
@@ -293,7 +300,8 @@ public:
    * this themselves.
    */
   virtual bool mass_residual (bool request_jacobian,
-                              DiffContext &) {
+                              DiffContext &)
+  {
     return request_jacobian;
   }
 
@@ -310,7 +318,8 @@ public:
    * derivatives may need to reimplement this themselves.
    */
   virtual bool side_mass_residual (bool request_jacobian,
-                                   DiffContext &) {
+                                   DiffContext &)
+  {
     return request_jacobian;
   }
 
@@ -349,7 +358,8 @@ public:
    * Otherwise, this must be reimplemented.
    */
   virtual bool damping_residual (bool request_jacobian,
-                                 DiffContext &) {
+                                 DiffContext &)
+  {
     return request_jacobian;
   }
 
@@ -366,7 +376,8 @@ public:
    * derivatives may need to reimplement this themselves.
    */
   virtual bool side_damping_residual (bool request_jacobian,
-                                      DiffContext &) {
+                                      DiffContext &)
+  {
     return request_jacobian;
   }
 
@@ -381,7 +392,8 @@ public:
    * should return false.
    */
   virtual bool nonlocal_damping_residual (bool request_jacobian,
-                                          DiffContext &) {
+                                          DiffContext &)
+  {
     return request_jacobian;
   }
 

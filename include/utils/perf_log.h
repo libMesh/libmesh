@@ -112,7 +112,8 @@ public:
   /**
    * Sums timing results from \p other
    */
-  PerfData & operator += (const PerfData & other) {
+  PerfData & operator += (const PerfData & other)
+  {
     libmesh_assert(!open);
     tot_time += other.tot_time;
     tot_time_incl_sub += other.tot_time_incl_sub;

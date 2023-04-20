@@ -48,11 +48,13 @@ struct null_output_iterator
   template <typename T2>
   void operator=(const T2&) {}
 
-  null_output_iterator & operator++() {
+  null_output_iterator & operator++()
+  {
     return *this;
   }
 
-  null_output_iterator operator++(int) {
+  null_output_iterator operator++(int)
+  {
     return null_output_iterator(*this);
   }
 

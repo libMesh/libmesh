@@ -434,7 +434,8 @@ public:
   static Point inverse_map (const Elem * elem,
                             const Point & p,
                             const Real tolerance = TOLERANCE,
-                            const bool secure = true) {
+                            const bool secure = true)
+  {
     // libmesh_deprecated(); // soon
     return FEMap::inverse_map(Dim, elem, p, tolerance, secure, secure);
   }
@@ -443,7 +444,8 @@ public:
                            const std::vector<Point> & physical_points,
                            std::vector<Point> &       reference_points,
                            const Real tolerance = TOLERANCE,
-                           const bool secure = true) {
+                           const bool secure = true)
+  {
     // libmesh_deprecated(); // soon
     FEMap::inverse_map(Dim, elem, physical_points, reference_points,
                        tolerance, secure, secure);
@@ -563,25 +565,29 @@ public:
   virtual bool shapes_need_reinit() const override;
 
   static Point map (const Elem * elem,
-                    const Point & reference_point) {
+                    const Point & reference_point)
+  {
     // libmesh_deprecated(); // soon
     return FEMap::map(Dim, elem, reference_point);
   }
 
   static Point map_xi (const Elem * elem,
-                       const Point & reference_point) {
+                       const Point & reference_point)
+  {
     // libmesh_deprecated(); // soon
     return FEMap::map_deriv(Dim, elem, 0, reference_point);
   }
 
   static Point map_eta (const Elem * elem,
-                        const Point & reference_point) {
+                        const Point & reference_point)
+  {
     // libmesh_deprecated(); // soon
     return FEMap::map_deriv(Dim, elem, 1, reference_point);
   }
 
   static Point map_zeta (const Elem * elem,
-                         const Point & reference_point) {
+                         const Point & reference_point)
+  {
     // libmesh_deprecated(); // soon
     return FEMap::map_deriv(Dim, elem, 2, reference_point);
   }

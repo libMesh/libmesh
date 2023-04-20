@@ -85,7 +85,8 @@ public:
    */
   bool operator== (const BoundaryInfo & other_boundary_info) const;
 
-  bool operator!= (const BoundaryInfo & other_boundary_info) const {
+  bool operator!= (const BoundaryInfo & other_boundary_info) const
+  {
     return !(*this == other_boundary_info);
   }
 

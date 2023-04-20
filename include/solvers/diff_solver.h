@@ -299,11 +299,13 @@ public:
    * \p residual_constrain_element_vector processing option in
    * \p DofMap.
    */
-  virtual void set_exact_constraint_enforcement(bool enable) {
+  virtual void set_exact_constraint_enforcement(bool enable)
+  {
     _exact_constraint_enforcement = enable;
   }
 
-  bool exact_constraint_enforcement() {
+  bool exact_constraint_enforcement()
+  {
     return _exact_constraint_enforcement;
   }
 
