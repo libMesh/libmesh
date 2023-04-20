@@ -141,7 +141,8 @@ public:
     libmesh_assert_less(_location, _mat.size() * _mat.size());
   }
 
-  operator bool() const {
+  operator bool() const
+  {
     const std::size_t max_size = std::numeric_limits<std::size_t>::max();
 
     // Find the range that might contain i,j
@@ -549,12 +550,14 @@ private:
 //--------------------------------------------------
 // ConstCouplingRow inline methods
 inline
-ConstCouplingRow::const_iterator ConstCouplingRow::begin() const {
+ConstCouplingRow::const_iterator ConstCouplingRow::begin() const
+{
   return const_iterator (*this, _begin_location, _begin_it);
 }
 
 inline
-ConstCouplingRow::const_iterator ConstCouplingRow::end() const {
+ConstCouplingRow::const_iterator ConstCouplingRow::end() const
+{
   return const_iterator
     (*this, std::numeric_limits<std::size_t>::max(),
      _mat._ranges.end());

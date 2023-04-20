@@ -801,7 +801,8 @@ protected:
    * Reimplement this in derived classes in order to
    * call FE::get_*() as the particular physics requires.
    */
-  virtual void init_context(FEMContext &) {
+  virtual void init_context(FEMContext &)
+  {
     // Failing to rederive init_context() means your FE objects don't
     // know what to compute.
     libmesh_deprecated();

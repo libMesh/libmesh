@@ -121,7 +121,8 @@ public:
    */
   bool operator== (const MeshBase & other_mesh) const;
 
-  bool operator!= (const MeshBase & other_mesh) const {
+  bool operator!= (const MeshBase & other_mesh) const
+  {
     return !(*this == other_mesh);
   }
 
@@ -567,7 +568,8 @@ public:
    * \f$ i^{th} \f$ node, which should be present in this processor's
    * subset of the mesh data structure.
    */
-  virtual const Node & node_ref (const dof_id_type i) const {
+  virtual const Node & node_ref (const dof_id_type i) const
+  {
     return *this->node_ptr(i);
   }
 
@@ -575,7 +577,8 @@ public:
    * \returns A reference to the \f$ i^{th} \f$ node, which should be
    * present in this processor's subset of the mesh data structure.
    */
-  virtual Node & node_ref (const dof_id_type i) {
+  virtual Node & node_ref (const dof_id_type i)
+  {
     return *this->node_ptr(i);
   }
 
@@ -608,7 +611,8 @@ public:
    * \returns A reference to the \f$ i^{th} \f$ element, which should be
    * present in this processor's subset of the mesh data structure.
    */
-  virtual const Elem & elem_ref (const dof_id_type i) const {
+  virtual const Elem & elem_ref (const dof_id_type i) const
+  {
     return *this->elem_ptr(i);
   }
 
@@ -617,7 +621,8 @@ public:
    * should be present in this processor's subset of the mesh data
    * structure.
    */
-  virtual Elem & elem_ref (const dof_id_type i) {
+  virtual Elem & elem_ref (const dof_id_type i)
+  {
     return *this->elem_ptr(i);
   }
 
@@ -779,7 +784,8 @@ public:
    * Returns the default master space to physical space mapping basis
    * functions to be used on newly added elements.
    */
-  ElemMappingType default_mapping_type () const {
+  ElemMappingType default_mapping_type () const
+  {
     return _default_mapping_type;
   }
 
@@ -787,7 +793,8 @@ public:
    * Set the default master space to physical space mapping basis
    * functions to be used on newly added elements.
    */
-  void set_default_mapping_type (const ElemMappingType type) {
+  void set_default_mapping_type (const ElemMappingType type)
+  {
     _default_mapping_type = type;
   }
 
@@ -795,7 +802,8 @@ public:
    * Returns any default data value used by the master space to
    * physical space mapping.
    */
-  unsigned char default_mapping_data () const {
+  unsigned char default_mapping_data () const
+  {
     return _default_mapping_data;
   }
 
@@ -803,7 +811,8 @@ public:
    * Set the default master space to physical space mapping basis
    * functions to be used on newly added elements.
    */
-  void set_default_mapping_data (const unsigned char data) {
+  void set_default_mapping_data (const unsigned char data)
+  {
     _default_mapping_data = data;
   }
 

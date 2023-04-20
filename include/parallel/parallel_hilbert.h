@@ -51,7 +51,8 @@ class StandardType<Hilbert::HilbertIndices> : public DataType
 {
 public:
   explicit
-  StandardType(const Hilbert::HilbertIndices * =nullptr) {
+  StandardType(const Hilbert::HilbertIndices * =nullptr)
+  {
     _datatype = DataType(StandardType<Hilbert::inttype>(), 3);
   }
 

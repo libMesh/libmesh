@@ -59,17 +59,20 @@ public:
 
     veclike_iterator & operator++() { ++it; return *this; }
 
-    veclike_iterator operator++(int) {
+    veclike_iterator operator++(int)
+    {
       veclike_iterator i = *this;
       ++(*this);
       return i;
     }
 
-    bool operator==(const veclike_iterator & other) const {
+    bool operator==(const veclike_iterator & other) const
+    {
       return it == other.it;
     }
 
-    bool operator!=(const veclike_iterator & other) const {
+    bool operator!=(const veclike_iterator & other) const
+    {
       return it != other.it;
     }
 
@@ -94,17 +97,20 @@ public:
 
     const_veclike_iterator & operator++() { ++it; return *this; }
 
-    const_veclike_iterator operator++(int) {
+    const_veclike_iterator operator++(int)
+    {
       veclike_iterator i = *this;
       ++(*this);
       return i;
     }
 
-    bool operator==(const const_veclike_iterator & other) const {
+    bool operator==(const const_veclike_iterator & other) const
+    {
       return it == other.it;
     }
 
-    bool operator!=(const const_veclike_iterator & other) const {
+    bool operator!=(const const_veclike_iterator & other) const
+    {
       return it != other.it;
     }
 
@@ -130,17 +136,20 @@ public:
 
     const_reverse_veclike_iterator & operator++() { ++it; return *this; }
 
-    const_reverse_veclike_iterator operator++(int) {
+    const_reverse_veclike_iterator operator++(int)
+    {
       const_reverse_veclike_iterator i = *this;
       ++(*this);
       return i;
     }
 
-    bool operator==(const const_reverse_veclike_iterator & other) const {
+    bool operator==(const const_reverse_veclike_iterator & other) const
+    {
       return it == other.it;
     }
 
-    bool operator!=(const const_reverse_veclike_iterator & other) const {
+    bool operator!=(const const_reverse_veclike_iterator & other) const
+    {
       return it != other.it;
     }
 
@@ -171,27 +180,33 @@ public:
     return it == this->end().it? Val() : it->second;
   }
 
-  void erase(index_t i) {
+  void erase(index_t i)
+  {
     maptype::erase(i);
   }
 
-  veclike_iterator erase(const veclike_iterator & pos) {
+  veclike_iterator erase(const veclike_iterator & pos)
+  {
     return veclike_iterator(maptype::erase(pos.it));
   }
 
-  veclike_iterator begin() {
+  veclike_iterator begin()
+  {
     return veclike_iterator(maptype::begin());
   }
 
-  const_veclike_iterator begin() const {
+  const_veclike_iterator begin() const
+  {
     return const_veclike_iterator(maptype::begin());
   }
 
-  veclike_iterator end() {
+  veclike_iterator end()
+  {
     return veclike_iterator(maptype::end());
   }
 
-  const_veclike_iterator end() const {
+  const_veclike_iterator end() const
+  {
     return const_veclike_iterator(maptype::end());
   }
 };

@@ -59,7 +59,8 @@ class StandardType<TypeVector<T>, typename std::enable_if<StandardType<T>::is_fi
 {
 public:
   explicit
-  StandardType(const TypeVector<T> * example=nullptr) {
+  StandardType(const TypeVector<T> * example=nullptr)
+  {
     // We need an example for MPI_Address to use
     TypeVector<T> * ex;
     std::unique_ptr<TypeVector<T>> temp;
@@ -125,7 +126,8 @@ class StandardType<VectorValue<T>, typename std::enable_if<StandardType<T>::is_f
 {
 public:
   explicit
-  StandardType(const VectorValue<T> * example=nullptr) {
+  StandardType(const VectorValue<T> * example=nullptr)
+  {
     // We need an example for MPI_Address to use
     VectorValue<T> * ex;
     std::unique_ptr<VectorValue<T>> temp;

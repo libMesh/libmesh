@@ -890,7 +890,8 @@ public:
    * each processor.  This plus a node id gives a valid nodal solution
    * vector index.
    */
-  dof_id_type node_id_to_vec_id(dof_id_type n) const {
+  dof_id_type node_id_to_vec_id(dof_id_type n) const
+  {
     if (_added_side_node_offsets.empty())
       return n;
 
@@ -908,7 +909,8 @@ public:
    * through p-1 and real nodes added on processors 0 to p.
    * This is the starting index for added nodes' data.
    */
-  dof_id_type added_node_offset_on(processor_id_type p) const {
+  dof_id_type added_node_offset_on(processor_id_type p) const
+  {
     libmesh_assert (p < _true_node_offsets.size());
     const dof_id_type added_node_offsets =
       (_added_side_node_offsets.empty() || !p) ? 0 :
@@ -1277,17 +1279,20 @@ private:
 };
 
 
-inline void ExodusII_IO_Helper::set_add_sides(bool add_sides) {
+inline void ExodusII_IO_Helper::set_add_sides(bool add_sides)
+{
   _add_sides = add_sides;
 }
 
 
-inline bool ExodusII_IO_Helper::get_add_sides() {
+inline bool ExodusII_IO_Helper::get_add_sides()
+{
   return _add_sides;
 }
 
 
-inline int ExodusII_IO_Helper::end_elem_id() const {
+inline int ExodusII_IO_Helper::end_elem_id() const
+{
   libmesh_assert_equal_to(std::size_t(num_elem), elem_num_map.size());
   return _end_elem_id;
 }
