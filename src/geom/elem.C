@@ -1153,6 +1153,45 @@ const Elem * Elem::topological_neighbor (const unsigned int i,
 }
 
 
+const Elem *
+Elem::topological_neighbor_side(const unsigned int i,
+                                const MeshBase & mesh,
+                                const PointLocatorBase & point_locator,
+                                const PeriodicBoundaries * pb,
+                                unsigned int * neigh_side) const
+{
+  libmesh_assert_less (i, this->n_neighbors());
+
+  const Elem * neighbor_i = this->neighbor_ptr(i);
+  if (neighbor_i != nullptr)
+    return neighbor_i;
+
+  if (pb)
+    {
+      // Since the neighbor is nullptr it must be on a boundary. We need
+      // see if this is a periodic boundary in which case it will have a
+      // topological neighbor
+      std::vector<boundary_id_type> bc_ids;
+      mesh.get_boundary_info().boundary_ids(this, cast_int<unsigned short>(i), bc_ids);
+      for (const auto & id : bc_ids)
+        if (pb->boundary(id))
+          {
+            neighbor_i = pb->neighbor(id, point_locator, this, i, neigh_side);
+
+            // Since coarse elements do not have more refined
+            // neighbors we need to make sure that we don't return one
+            // of these types of neighbors.
+            if (neighbor_i)
+              while (level() < neighbor_i->level())
+                neighbor_i = neighbor_i->parent();
+            return neighbor_i;
+          }
+    }
+
+  return nullptr;
+}
+
+
 bool Elem::has_topological_neighbor (const Elem * elem,
                                      const MeshBase & mesh,
                                      const PointLocatorBase & point_locator,
