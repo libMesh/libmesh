@@ -503,7 +503,6 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
   this->allow_renumbering(other_mesh.allow_renumbering());
   this->allow_remote_element_removal(other_mesh.allow_remote_element_removal());
   this->skip_partitioning(other_mesh.skip_partitioning());
-  this->skip_noncritical_partitioning(other_mesh.skip_noncritical_partitioning());
 }
 
 
