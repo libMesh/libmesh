@@ -99,23 +99,6 @@ ReplicatedMesh::ReplicatedMesh (const ReplicatedMesh & other_mesh) :
 
   this->set_subdomain_name_map() = other_mesh.get_subdomain_name_map();
 
-  // Use the first BoundaryInfo object to build the list of side boundary ids
-  std::vector<boundary_id_type> side_boundaries;
-  other_boundary_info.build_side_boundary_ids(side_boundaries);
-
-  // Assign those boundary ids in our BoundaryInfo object
-  for (const auto & side_bnd_id : side_boundaries)
-    this_boundary_info.sideset_name(side_bnd_id) =
-      other_boundary_info.get_sideset_name(side_bnd_id);
-
-  // Do the same thing for node boundary ids
-  std::vector<boundary_id_type> node_boundaries;
-  other_boundary_info.build_node_boundary_ids(node_boundaries);
-
-  for (const auto & node_bnd_id : node_boundaries)
-    this_boundary_info.nodeset_name(node_bnd_id) =
-      other_boundary_info.get_nodeset_name(node_bnd_id);
-
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   this->_next_unique_id = other_mesh._next_unique_id;
 #endif
@@ -134,23 +117,6 @@ ReplicatedMesh::ReplicatedMesh (const UnstructuredMesh & other_mesh) :
   this_boundary_info = other_boundary_info;
 
   this->set_subdomain_name_map() = other_mesh.get_subdomain_name_map();
-
-  // Use the first BoundaryInfo object to build the list of side boundary ids
-  std::vector<boundary_id_type> side_boundaries;
-  other_boundary_info.build_side_boundary_ids(side_boundaries);
-
-  // Assign those boundary ids in our BoundaryInfo object
-  for (const auto & side_bnd_id : side_boundaries)
-    this_boundary_info.sideset_name(side_bnd_id) =
-      other_boundary_info.get_sideset_name(side_bnd_id);
-
-  // Do the same thing for node boundary ids
-  std::vector<boundary_id_type> node_boundaries;
-  other_boundary_info.build_node_boundary_ids(node_boundaries);
-
-  for (const auto & node_bnd_id : node_boundaries)
-    this_boundary_info.nodeset_name(node_bnd_id) =
-      other_boundary_info.get_nodeset_name(node_bnd_id);
 }
 
 ReplicatedMesh & ReplicatedMesh::operator= (ReplicatedMesh && other_mesh)
