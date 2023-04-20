@@ -520,7 +520,7 @@ void libmesh_merge_move(T & target, T & source)
 }
 #else
 template <typename T>
-void libmesh_merge_move(T & target, T & source) 
+void libmesh_merge_move(T & target, T & source)
 {
   target.insert(source.begin(), source.end());
   source.clear(); // Avoid forwards-incompatibility
