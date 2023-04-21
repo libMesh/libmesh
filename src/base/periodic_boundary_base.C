@@ -33,7 +33,8 @@ namespace libMesh
 
 PeriodicBoundaryBase::PeriodicBoundaryBase() :
   myboundary(BoundaryInfo::invalid_id),
-  pairedboundary(BoundaryInfo::invalid_id)
+  pairedboundary(BoundaryInfo::invalid_id),
+  _enforcement_type(EnforcementType::STRONG_ENFORCEMENT)
 {
 }
 
@@ -42,7 +43,8 @@ PeriodicBoundaryBase::PeriodicBoundaryBase() :
 PeriodicBoundaryBase::PeriodicBoundaryBase(const PeriodicBoundaryBase & o) :
   myboundary(o.myboundary),
   pairedboundary(o.pairedboundary),
-  variables(o.variables)
+  variables(o.variables),
+  _enforcement_type(EnforcementType::STRONG_ENFORCEMENT)
 {
   // Make a deep copy of _transformation_matrix, if it's not null
   if(o._transformation_matrix)

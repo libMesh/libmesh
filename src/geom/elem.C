@@ -1153,18 +1153,21 @@ const Elem * Elem::topological_neighbor (const unsigned int i,
 }
 
 
-const Elem *
+const std::pair<const Elem *, unsigned int>
 Elem::topological_neighbor_side(const unsigned int i,
                                 const MeshBase & mesh,
                                 const PointLocatorBase & point_locator,
-                                const PeriodicBoundaries * pb,
-                                unsigned int * neigh_side) const
+                                const PeriodicBoundaries * pb) const
 {
   libmesh_assert_less (i, this->n_neighbors());
 
   const Elem * neighbor_i = this->neighbor_ptr(i);
   if (neighbor_i != nullptr)
-    return neighbor_i;
+  {
+    unsigned int neighbor_side = neighbor_i->which_neighbor_am_i(this);
+    const std::pair<const Elem *, unsigned int> neighbor_and_side (neighbor_i, neighbor_side);
+    return neighbor_and_side;
+  }
 
   if (pb)
     {
@@ -1176,6 +1179,8 @@ Elem::topological_neighbor_side(const unsigned int i,
       for (const auto & id : bc_ids)
         if (pb->boundary(id))
           {
+            unsigned int neighbor_side = 0;
+            unsigned int * neigh_side = &neighbor_side;
             neighbor_i = pb->neighbor(id, point_locator, this, i, neigh_side);
 
             // Since coarse elements do not have more refined
@@ -1184,11 +1189,12 @@ Elem::topological_neighbor_side(const unsigned int i,
             if (neighbor_i)
               while (level() < neighbor_i->level())
                 neighbor_i = neighbor_i->parent();
-            return neighbor_i;
+            const std::pair<const Elem *, unsigned int> neighbor_and_side (neighbor_i, neighbor_side);
+            return neighbor_and_side;
           }
     }
-
-  return nullptr;
+  const std::pair<const Elem *, unsigned int> neighbor_and_side (nullptr, 0);
+  return neighbor_and_side;
 }
 
 
