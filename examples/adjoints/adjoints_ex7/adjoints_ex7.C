@@ -163,41 +163,32 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
   // Solve this as a time-dependent or steady system
   if (param.transient)
     {
-      UnsteadySolver *innersolver;
+      std::unique_ptr<UnsteadySolver> innersolver;
       if (param.timesolver_core == "euler2")
         {
-          Euler2Solver *euler2solver =
-            new Euler2Solver(system);
-
+          auto euler2solver = std::make_unique<Euler2Solver>(system);
           euler2solver->theta = param.timesolver_theta;
-          innersolver = euler2solver;
+          innersolver = std::move(euler2solver);
         }
       else if (param.timesolver_core == "euler")
         {
-          EulerSolver *eulersolver =
-            new EulerSolver(system);
-
+          auto eulersolver = std::make_unique<EulerSolver>(system);
           eulersolver->theta = param.timesolver_theta;
-          innersolver = eulersolver;
+          innersolver = std::move(eulersolver);
         }
       else
         libmesh_error_msg("This example (and unsteady adjoints in libMesh) only support Backward Euler and explicit methods.");
 
       if (param.timesolver_tolerance)
         {
-          TwostepTimeSolver *timesolver =
-            new TwostepTimeSolver(system);
+          system.time_solver = std::make_unique<TwostepTimeSolver>(system);
+          auto timesolver = cast_ptr<TwostepTimeSolver *>(system.time_solver.get());
 
           timesolver->max_growth       = param.timesolver_maxgrowth;
           timesolver->target_tolerance = param.timesolver_tolerance;
           timesolver->upper_tolerance  = param.timesolver_upper_tolerance;
           timesolver->component_norm   = SystemNorm(param.timesolver_norm);
-
-          timesolver->core_time_solver =
-            std::unique_ptr<UnsteadySolver>(innersolver);
-
-          system.time_solver =
-            std::unique_ptr<UnsteadySolver>(timesolver);
+          timesolver->core_time_solver = std::move(innersolver);
 
           // The Memory/File Solution History object we will set the system SolutionHistory object to
           if(param.solution_history_type == "memory")
@@ -211,13 +202,11 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
             system.time_solver->set_solution_history(heatsystem_solution_history);
           }
           else
-          libmesh_error_msg("Unrecognized solution history type: " << param.solution_history_type);
-
+            libmesh_error_msg("Unrecognized solution history type: " << param.solution_history_type);
         }
       else
       {
-        system.time_solver =
-          std::unique_ptr<TimeSolver>(innersolver);
+        system.time_solver = std::move(innersolver);
 
         // The Memory/File Solution History object we will set the system SolutionHistory object to
         if(param.solution_history_type == "memory")
@@ -231,17 +220,14 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
           system.time_solver->set_solution_history(heatsystem_solution_history);
         }
         else
-        libmesh_error_msg("Unrecognized solution history type: " << param.solution_history_type);
-
+          libmesh_error_msg("Unrecognized solution history type: " << param.solution_history_type);
       }
     }
   else
-    system.time_solver =
-      std::unique_ptr<TimeSolver>(new SteadySolver(system));
+    system.time_solver = std::make_unique<SteadySolver>(system);
 
-  system.time_solver->reduce_deltat_on_diffsolver_failure =
-                                        param.deltat_reductions;
-  system.time_solver->quiet           = param.time_solver_quiet;
+  system.time_solver->reduce_deltat_on_diffsolver_failure = param.deltat_reductions;
+  system.time_solver->quiet = param.time_solver_quiet;
 
  #ifdef LIBMESH_ENABLE_DIRICHLET
   // Create any Dirichlet boundary conditions
@@ -276,16 +262,15 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
   if (param.use_petsc_snes)
     {
 #ifdef LIBMESH_HAVE_PETSC
-      PetscDiffSolver *solver = new PetscDiffSolver(system);
-      system.time_solver->diff_solver() = std::unique_ptr<DiffSolver>(solver);
+      system.time_solver->diff_solver() = std::make_unique<PetscDiffSolver>(system);
 #else
       libmesh_error_msg("This example requires libMesh to be compiled with PETSc support.");
 #endif
     }
   else
     {
-      NewtonSolver *solver = new NewtonSolver(system);
-      system.time_solver->diff_solver() = std::unique_ptr<DiffSolver>(solver);
+      system.time_solver->diff_solver() = std::make_unique<NewtonSolver>(system);
+      auto solver = cast_ptr<NewtonSolver*>(system.time_solver->diff_solver().get());
 
       solver->quiet                       = param.solver_quiet;
       solver->verbose                     = param.solver_verbose;
