@@ -217,14 +217,12 @@ int main (int argc, char ** argv)
           // size at once
           libmesh_assert_equal_to (nelem_target, 0);
 
-          UniformRefinementEstimator * u =
-            new UniformRefinementEstimator;
+          auto u = std::make_unique<UniformRefinementEstimator>();
 
           // The lid-driven cavity problem isn't in H1, so
           // lets estimate L2 error
           u->error_norm = L2;
-
-          error_estimator.reset(u);
+          error_estimator = std::move(u);
         }
       else
         {
