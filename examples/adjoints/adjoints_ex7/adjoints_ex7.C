@@ -390,7 +390,7 @@ int main (int argc, char ** argv)
   set_system_parameters(system, param);
 
   // Also build an FEMPhysics to provide the residual definition for the adjoint activities
-  SigmaPhysics* sigma_physics = new SigmaPhysics();
+  auto sigma_physics = std::make_unique<SigmaPhysics>();
   sigma_physics->init_data(system);
 
   libMesh::out << "Initializing systems" << std::endl;
@@ -739,7 +739,7 @@ int main (int argc, char ** argv)
 
       // The adjoint refinement error estimator object (which also computed model error)
       auto adjoint_refinement_error_estimator =
-        build_adjoint_refinement_error_estimator(qois, dynamic_cast<FEMPhysics *>(sigma_physics), param);
+        build_adjoint_refinement_error_estimator(qois, dynamic_cast<FEMPhysics *>(sigma_physics.get()), param);
 
       // Error Vector to be filled by the error estimator at each timestep
       ErrorVector QoI_elementwise_error;
