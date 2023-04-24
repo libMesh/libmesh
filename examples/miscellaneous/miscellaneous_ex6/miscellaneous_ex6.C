@@ -310,7 +310,7 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
   for (auto & old_elem : cube_mesh.element_ptr_range())
     if (old_elem->type() == TRI3)
       {
-        Elem * new_elem = mesh.add_elem(new Tri3);
+        Elem * new_elem = mesh.add_elem(Elem::build(TRI3));
 
         // Assign nodes in new elements.  Since this is an example,
         // we'll do it in several steps.
