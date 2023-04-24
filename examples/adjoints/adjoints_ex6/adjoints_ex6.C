@@ -146,16 +146,15 @@ void set_system_parameters(PoissonSystem & system, FEMParameters & param)
   if (param.use_petsc_snes)
   {
 #ifdef LIBMESH_HAVE_PETSC
-    PetscDiffSolver *solver = new PetscDiffSolver(system);
-    system.time_solver->diff_solver().reset(solver);
+    system.time_solver->diff_solver() = std::make_unique<PetscDiffSolver>(system);
 #else
     libmesh_error_msg("This example requires libMesh to be compiled with PETSc support.");
 #endif
   }
   else
   {
-    NewtonSolver * solver = new NewtonSolver(system);
-    system.time_solver->diff_solver() = std::unique_ptr<DiffSolver>(solver);
+    system.time_solver->diff_solver() = std::make_unique<NewtonSolver>(system);
+    auto solver = cast_ptr<NewtonSolver*>(system.time_solver->diff_solver().get());
 
     solver->quiet                       = param.solver_quiet;
     solver->max_nonlinear_iterations    = param.max_nonlinear_iterations;
@@ -185,7 +184,7 @@ void set_system_parameters(PoissonSystem & system, FEMParameters & param)
 std::unique_ptr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
                                                       FEMParameters & param)
 {
-  MeshRefinement * mesh_refinement = new MeshRefinement(mesh);
+  auto mesh_refinement = std::make_unique<MeshRefinement>(mesh);
   mesh_refinement->coarsen_by_parents() = true;
   mesh_refinement->absolute_global_tolerance() = param.global_tolerance;
   mesh_refinement->nelem_target()      = param.nelem_target;
@@ -193,7 +192,7 @@ std::unique_ptr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
   mesh_refinement->coarsen_fraction()  = param.coarsen_fraction;
   mesh_refinement->coarsen_threshold() = param.coarsen_threshold;
 
-  return std::unique_ptr<MeshRefinement>(mesh_refinement);
+  return mesh_refinement;
 }
 
 
@@ -206,14 +205,14 @@ std::unique_ptr<AdjointRefinementEstimator> build_adjoint_refinement_error_estim
 {
   libMesh::out << "Computing the error estimate using the Adjoint Refinement Error Estimator\n" << std::endl;
 
-  AdjointRefinementEstimator * adjoint_refinement_estimator = new AdjointRefinementEstimator;
+  auto adjoint_refinement_estimator = std::make_unique<AdjointRefinementEstimator>();
 
   adjoint_refinement_estimator->qoi_set() = qois;
 
   // We enrich the FE space for the dual problem by doing 2 uniform h refinements
   adjoint_refinement_estimator->number_h_refinements = 2;
 
-  return std::unique_ptr<AdjointRefinementEstimator>(adjoint_refinement_estimator);
+  return adjoint_refinement_estimator;
 }
 
 #endif // LIBMESH_ENABLE_AMR

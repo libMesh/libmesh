@@ -16,6 +16,7 @@ class CoupledSystemQoI : public DifferentiableQoI
 {
 public:
   CoupledSystemQoI() = default;
+  CoupledSystemQoI(const CoupledSystemQoI &) = default;
   virtual ~CoupledSystemQoI() = default;
 
   virtual void init_qoi_count(System & sys);
@@ -31,9 +32,8 @@ public:
 
   virtual std::unique_ptr<DifferentiableQoI> clone()
   {
-    DifferentiableQoI * my_clone = new CoupledSystemQoI;
-    *my_clone = *this;
-    return std::unique_ptr<DifferentiableQoI>(my_clone);
+    // Calls defaulted copy constructor for this class
+    return std::make_unique<CoupledSystemQoI>(*this);
   }
 
 protected:

@@ -191,16 +191,15 @@ void set_system_parameters(LaplaceSystem & system, FEMParameters & param)
   if (param.use_petsc_snes)
   {
 #ifdef LIBMESH_HAVE_PETSC
-    PetscDiffSolver *solver = new PetscDiffSolver(system);
-    system.time_solver->diff_solver().reset(solver);
+    system.time_solver->diff_solver() = std::make_unique<PetscDiffSolver>(system);
 #else
     libmesh_error_msg("This example requires libMesh to be compiled with PETSc support.");
 #endif
   }
   else
   {
-    NewtonSolver * solver = new NewtonSolver(system);
-    system.time_solver->diff_solver() = std::unique_ptr<DiffSolver>(solver);
+    system.time_solver->diff_solver() = std::make_unique<NewtonSolver>(system);
+    auto solver = cast_ptr<NewtonSolver*>(system.time_solver->diff_solver().get());
 
     solver->quiet                       = param.solver_quiet;
     solver->max_nonlinear_iterations    = param.max_nonlinear_iterations;
@@ -230,7 +229,7 @@ void set_system_parameters(LaplaceSystem & system, FEMParameters & param)
 std::unique_ptr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
                                                       FEMParameters & param)
 {
-  MeshRefinement * mesh_refinement = new MeshRefinement(mesh);
+  auto mesh_refinement = std::make_unique<MeshRefinement>(mesh);
   mesh_refinement->coarsen_by_parents() = true;
   mesh_refinement->absolute_global_tolerance() = param.global_tolerance;
   mesh_refinement->nelem_target()      = param.nelem_target;
@@ -238,7 +237,7 @@ std::unique_ptr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
   mesh_refinement->coarsen_fraction()  = param.coarsen_fraction;
   mesh_refinement->coarsen_threshold() = param.coarsen_threshold;
 
-  return std::unique_ptr<MeshRefinement>(mesh_refinement);
+  return mesh_refinement;
 }
 
 #endif // LIBMESH_ENABLE_AMR
@@ -262,21 +261,17 @@ std::unique_ptr<ErrorEstimator> build_error_estimator(FEMParameters & param)
     {
       libMesh::out << "Using Adjoint Residual Error Estimator with Patch Recovery Weights" << std::endl << std::endl;
 
-      AdjointResidualErrorEstimator * adjoint_residual_estimator = new AdjointResidualErrorEstimator;
+      auto adjoint_residual_estimator = std::make_unique<AdjointResidualErrorEstimator>();
 
       adjoint_residual_estimator->error_plot_suffix = "error.gmv";
 
-      PatchRecoveryErrorEstimator * p1 = new PatchRecoveryErrorEstimator;
-      adjoint_residual_estimator->primal_error_estimator().reset(p1);
-
-      PatchRecoveryErrorEstimator * p2 = new PatchRecoveryErrorEstimator;
-      adjoint_residual_estimator->dual_error_estimator().reset(p2);
-
+      adjoint_residual_estimator->primal_error_estimator() = std::make_unique<PatchRecoveryErrorEstimator>();
       adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(0, H1_SEMINORM);
 
+      adjoint_residual_estimator->dual_error_estimator() = std::make_unique<PatchRecoveryErrorEstimator>();
       adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(0, H1_SEMINORM);
 
-      return std::unique_ptr<ErrorEstimator>(adjoint_residual_estimator);
+      return adjoint_residual_estimator;
     }
   else
     libmesh_error_msg("Unknown indicator_type = " << param.indicator_type);

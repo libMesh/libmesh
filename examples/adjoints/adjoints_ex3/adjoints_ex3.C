@@ -501,41 +501,35 @@ void set_system_parameters(FEMSystem & system,
   // Solve this as a time-dependent or steady system
   if (param.transient)
     {
-      UnsteadySolver *innersolver;
+      std::unique_ptr<UnsteadySolver> innersolver;
       if (param.timesolver_core == "euler2")
         {
-          Euler2Solver *euler2solver =
-            new Euler2Solver(system);
-
+          auto euler2solver = std::make_unique<Euler2Solver>(system);
           euler2solver->theta = param.timesolver_theta;
-          innersolver = euler2solver;
+          innersolver = std::move(euler2solver);
         }
       else if (param.timesolver_core == "euler")
         {
-          EulerSolver *eulersolver =
-            new EulerSolver(system);
-
+          auto eulersolver = std::make_unique<EulerSolver>(system);
           eulersolver->theta = param.timesolver_theta;
-          innersolver = eulersolver;
+          innersolver = std::move(eulersolver);
         }
       else
         libmesh_error_msg("Don't recognize core TimeSolver type: " << param.timesolver_core);
 
       if (param.timesolver_tolerance)
         {
-          TwostepTimeSolver *timesolver =
-            new TwostepTimeSolver(system);
+          system.time_solver = std::make_unique<TwostepTimeSolver>(system);
+          auto timesolver = cast_ptr<TwostepTimeSolver *>(system.time_solver.get());
 
           timesolver->max_growth       = param.timesolver_maxgrowth;
           timesolver->target_tolerance = param.timesolver_tolerance;
           timesolver->upper_tolerance  = param.timesolver_upper_tolerance;
           timesolver->component_norm   = SystemNorm(param.timesolver_norm);
-
-          timesolver->core_time_solver.reset(innersolver);
-          system.time_solver.reset(timesolver);
+          timesolver->core_time_solver = std::move(innersolver);
         }
       else
-        system.time_solver.reset(innersolver);
+        system.time_solver = std::move(innersolver);
     }
   else
     system.time_solver = std::make_unique<SteadySolver>(system);
@@ -554,16 +548,15 @@ void set_system_parameters(FEMSystem & system,
   if (param.use_petsc_snes)
     {
 #ifdef LIBMESH_HAVE_PETSC
-      PetscDiffSolver *solver = new PetscDiffSolver(system);
-      system.time_solver->diff_solver().reset(solver);
+      system.time_solver->diff_solver() = std::make_unique<PetscDiffSolver>(system);
 #else
       libmesh_error_msg("This example requires libMesh to be compiled with PETSc support.");
 #endif
     }
   else
     {
-      NewtonSolver *solver = new NewtonSolver(system);
-      system.time_solver->diff_solver().reset(solver);
+      system.time_solver->diff_solver() = std::make_unique<NewtonSolver>(system);
+      auto solver = cast_ptr<NewtonSolver*>(system.time_solver->diff_solver().get());
 
       solver->quiet                       = param.solver_quiet;
       solver->verbose                     = !param.solver_quiet;
@@ -593,7 +586,7 @@ void set_system_parameters(FEMSystem & system,
 std::unique_ptr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
                                                       FEMParameters & param)
 {
-  MeshRefinement * mesh_refinement = new MeshRefinement(mesh);
+  auto mesh_refinement = std::make_unique<MeshRefinement>(mesh);
   mesh_refinement->coarsen_by_parents() = true;
   mesh_refinement->absolute_global_tolerance() = param.global_tolerance;
   mesh_refinement->nelem_target()      = param.nelem_target;
@@ -601,7 +594,7 @@ std::unique_ptr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
   mesh_refinement->coarsen_fraction()  = param.coarsen_fraction;
   mesh_refinement->coarsen_threshold() = param.coarsen_threshold;
 
-  return std::unique_ptr<MeshRefinement>(mesh_refinement);
+  return mesh_refinement;
 }
 
 #endif // LIBMESH_ENABLE_AMR
@@ -622,14 +615,14 @@ build_error_estimator_component_wise (FEMParameters & param,
                                       std::vector<FEMNormType> & primal_error_norm_type,
                                       std::vector<FEMNormType> & dual_error_norm_type)
 {
-  AdjointResidualErrorEstimator * adjoint_residual_estimator = new AdjointResidualErrorEstimator;
+  auto adjoint_residual_estimator = std::make_unique<AdjointResidualErrorEstimator>();
 
   // Both the primal and dual weights are going to be estimated using the patch recovery error estimator
-  PatchRecoveryErrorEstimator * p1 = new PatchRecoveryErrorEstimator;
-  adjoint_residual_estimator->primal_error_estimator().reset(p1);
+  adjoint_residual_estimator->primal_error_estimator() = std::make_unique<PatchRecoveryErrorEstimator>();
+  auto p1 = cast_ptr<PatchRecoveryErrorEstimator *>(adjoint_residual_estimator->primal_error_estimator().get());
 
-  PatchRecoveryErrorEstimator * p2 = new PatchRecoveryErrorEstimator;
-  adjoint_residual_estimator->dual_error_estimator().reset(p2);
+  adjoint_residual_estimator->dual_error_estimator() = std::make_unique<PatchRecoveryErrorEstimator>();
+  auto p2 = cast_ptr<PatchRecoveryErrorEstimator *>(adjoint_residual_estimator->dual_error_estimator().get());
 
   // Set the boolean for specifying whether we are reusing patches while building the patch recovery estimates
   p1->set_patch_reuse(param.patch_reuse);
@@ -659,7 +652,7 @@ build_error_estimator_component_wise (FEMParameters & param,
           adjoint_residual_estimator->error_norm.set_off_diagonal_weight(i, j, term_weights[i][j]);
     }
 
-  return std::unique_ptr<ErrorEstimator>(adjoint_residual_estimator);
+  return adjoint_residual_estimator;
 }
 
 // The error_convection_diffusion_x and error_convection_diffusion_y are the nonlinear contributions which
@@ -671,17 +664,16 @@ build_weighted_error_estimator_component_wise (FEMParameters & param,
                                                std::vector<FEMNormType> & dual_error_norm_type,
                                                std::vector<FEMFunctionBase<Number> *> coupled_system_weight_functions)
 {
-  AdjointResidualErrorEstimator * adjoint_residual_estimator = new AdjointResidualErrorEstimator;
+  auto adjoint_residual_estimator = std::make_unique<AdjointResidualErrorEstimator>();
 
   // Using the user filled error norm type vector, we pass the type of norm to be used for
   // the error in each variable, we can have different types of norms for the primal and
   // dual variables
+  adjoint_residual_estimator->primal_error_estimator() = std::make_unique<WeightedPatchRecoveryErrorEstimator>();
+  auto p1 = cast_ptr<WeightedPatchRecoveryErrorEstimator *>(adjoint_residual_estimator->primal_error_estimator().get());
 
-  WeightedPatchRecoveryErrorEstimator * p1 = new WeightedPatchRecoveryErrorEstimator;
-  adjoint_residual_estimator->primal_error_estimator().reset(p1);
-
-  PatchRecoveryErrorEstimator * p2 = new PatchRecoveryErrorEstimator;
-  adjoint_residual_estimator->dual_error_estimator().reset(p2);
+  adjoint_residual_estimator->dual_error_estimator() = std::make_unique<PatchRecoveryErrorEstimator>();
+  auto p2 = cast_ptr<PatchRecoveryErrorEstimator *>(adjoint_residual_estimator->dual_error_estimator().get());
 
   p1->set_patch_reuse(param.patch_reuse);
   p2->set_patch_reuse(param.patch_reuse);
@@ -715,7 +707,7 @@ build_weighted_error_estimator_component_wise (FEMParameters & param,
           adjoint_residual_estimator->error_norm.set_off_diagonal_weight(i, j, term_weights[i][j]);
     }
 
-  return std::unique_ptr<ErrorEstimator>(adjoint_residual_estimator);
+  return adjoint_residual_estimator;
 }
 
 // The main program.
