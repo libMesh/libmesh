@@ -59,12 +59,12 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
 protected:
-  ReplicatedMesh * _mesh;
+  std::unique_ptr<ReplicatedMesh> _mesh;
   std::unique_ptr<PointLocatorBase> _point_locator;
 
   void build_mesh()
   {
-    _mesh = new ReplicatedMesh(*TestCommWorld);
+    _mesh = std::make_unique<ReplicatedMesh>(*TestCommWorld);
 
     // (0,1)           (1,1)
     // x---------------x
@@ -120,12 +120,7 @@ public:
 #endif
   }
 
-  void tearDown()
-  {
-#if LIBMESH_DIM > 1
-    delete _mesh;
-#endif
-  }
+  void tearDown() {}
 
   // test that point locator works correctly
   void test_point_locator_dfem()
