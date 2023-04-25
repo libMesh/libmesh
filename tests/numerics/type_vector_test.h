@@ -64,14 +64,15 @@ protected:
   std::string libmesh_suite_name;
 
 private:
-  DerivedClass *m_1_1_1, *m_n1_1_n1;
+  std::unique_ptr<DerivedClass> m_1_1_1;
+  std::unique_ptr<DerivedClass> m_n1_1_n1;
   TypeVector<T>   *basem_1_1_1, *basem_n1_1_n1;
 
 public:
   virtual void setUp()
   {
-    m_1_1_1 = new DerivedClass(1);
-    m_n1_1_n1 = new DerivedClass(-1);
+    m_1_1_1 = std::make_unique<DerivedClass>(1);
+    m_n1_1_n1 = std::make_unique<DerivedClass>(-1);
 
 #if LIBMESH_DIM > 1
     (*m_1_1_1)(1) = 1;
@@ -83,15 +84,11 @@ public:
 #endif
 
 
-    basem_1_1_1 = m_1_1_1;
-    basem_n1_1_n1 = m_n1_1_n1;
+    basem_1_1_1 = m_1_1_1.get();
+    basem_n1_1_n1 = m_n1_1_n1.get();
   }
 
-  virtual void tearDown()
-  {
-    delete m_1_1_1;
-    delete m_n1_1_n1;
-  }
+  virtual void tearDown() {}
 
   void testValue()
   {
