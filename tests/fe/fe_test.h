@@ -267,14 +267,14 @@ protected:
   unsigned int _dim, _nx, _ny, _nz;
   Elem *_elem;
   std::vector<dof_id_type> _dof_indices;
-  FEBase * _fe;
-  Mesh * _mesh;
   System * _sys;
-  EquationSystems * _es;
+  std::unique_ptr<Mesh> _mesh;
+  std::unique_ptr<EquationSystems> _es;
+  std::unique_ptr<FEBase> _fe;
+  std::unique_ptr<QGauss> _qrule;
 
   Real _value_tol, _grad_tol, _hess_tol;
 
-  QGauss * _qrule;
 
   static RealGradient true_gradient(Point p)
   {
@@ -345,7 +345,7 @@ protected:
 public:
   void setUp()
   {
-    _mesh = new Mesh(*TestCommWorld);
+    _mesh = std::make_unique<Mesh>(*TestCommWorld);
     const std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
     _dim = test_elem->dim();
     const unsigned int build_ny = (_dim > 1) * build_nx;
@@ -426,7 +426,7 @@ public:
           }
       }
 
-    _es = new EquationSystems(*_mesh);
+    _es = std::make_unique<EquationSystems>(*_mesh);
     _sys = &(_es->add_system<System> ("SimpleSystem"));
     _sys->add_variable("u", order, family);
     _es->init();
@@ -455,11 +455,11 @@ public:
       }
 
     FEType fe_type = _sys->variable_type(0);
-    _fe = FEBase::build(_dim, fe_type).release();
+    _fe = FEBase::build(_dim, fe_type);
 
     // Create quadrature rule for use in computing dual shape coefficients
-    _qrule = new QGauss(_dim, fe_type.default_quadrature_order());
-    _fe->attach_quadrature_rule(_qrule);
+    _qrule = std::make_unique<QGauss>(_dim, fe_type.default_quadrature_order());
+    _fe->attach_quadrature_rule(_qrule.get());
 
     auto rng = _mesh->active_local_element_ptr_range();
     this->_elem = rng.begin() == rng.end() ? nullptr : *(rng.begin());
@@ -511,13 +511,7 @@ public:
 #endif
   }
 
-  void tearDown()
-  {
-    delete _fe;
-    delete _es;
-    delete _mesh;
-    delete _qrule;
-  }
+  void tearDown() {}
 };
 
 
