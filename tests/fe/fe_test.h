@@ -1,5 +1,5 @@
-#ifndef __fe_test_h__
-#define __fe_test_h__
+#ifndef FE_TEST_H
+#define FE_TEST_H
 
 #include "test_comm.h"
 
@@ -903,4 +903,4 @@ public:
                                                                         \
   CPPUNIT_TEST_SUITE_REGISTRATION( FETest_##order##_##family##_##elemtype );
 
-#endif // #ifdef __fe_test_h__
+#endif

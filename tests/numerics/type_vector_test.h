@@ -1,5 +1,5 @@
-#ifndef __type_vector_test_h__
-#define __type_vector_test_h__
+#ifndef TYPE_VECTOR_TEST_H
+#define TYPE_VECTOR_TEST_H
 
 #include <libmesh/type_vector.h>
 
@@ -505,4 +505,4 @@ public:
   }
 };
 
-#endif // #ifdef __type_vector_test_h__
+#endif
