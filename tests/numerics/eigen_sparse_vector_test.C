@@ -8,20 +8,26 @@
 using namespace libMesh;
 
 class EigenSparseVectorTest : public NumericVectorTest<EigenSparseVector<Number>> {
+private:
+  // This class manages the memory for the communicator it uses,
+  // providing a dumb pointer to the managed resource for the base
+  // class.
+  std::unique_ptr<Parallel::Communicator> _managed_comm;
+
 public:
   void setUp()
   {
     // Eigen doesn't support distributed parallel vectors, but we can
     // build a serial vector on each processor
-    my_comm = new Parallel::Communicator();
+    _managed_comm = std::make_unique<Parallel::Communicator>();
+
+    // Base class communicator points to our managed communicator
+    my_comm = _managed_comm.get();
 
     this->NumericVectorTest<EigenSparseVector<Number>>::setUp();
   }
 
-  void tearDown()
-  {
-    delete my_comm;
-  }
+  void tearDown() {}
 
   EigenSparseVectorTest() :
     NumericVectorTest<EigenSparseVector<Number>>() {
