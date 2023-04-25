@@ -1412,7 +1412,16 @@ UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & 
    */
   for (auto & lo_elem : range)
     {
-      // make sure it is linear order
+      // Skip elements in the range that are already SECOND-order.
+      // Ordinarily one does not have a mixture of FIRST and
+      // SECOND-order elements in an all-2D or all-3D mesh, since
+      // FIRST and SECOND-order elements can't be (conforming)
+      // neighbors, but in a mixed-dimension element mesh, this is
+      // possible.
+      if (lo_elem->default_order() == SECOND)
+        continue;
+
+      // Otherwise, we only know how to handle FIRST-order elements
       libmesh_error_msg_if(lo_elem->default_order() != FIRST,
                            "ERROR: This is not a linear element: type=" << Utility::enum_to_string(lo_elem->type()));
 
@@ -1452,7 +1461,7 @@ UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & 
                     max_unique_id, max_new_nodes_per_elem,
 #endif
                     *this, adj_vertices_to_so_nodes);
-    }
+    } // end for (auto & lo_elem : range)
 
   // we can clear the map
   adj_vertices_to_so_nodes.clear();
