@@ -81,11 +81,11 @@ public:
 
 protected:
 
-  Mesh* _mesh;
+  std::unique_ptr<Mesh> _mesh;
 
   void build_mesh()
   {
-    _mesh = new Mesh(*TestCommWorld);
+    _mesh = std::make_unique<Mesh>(*TestCommWorld);
 
     // (-1,1)     (0,1)      (1,1)      (2,1)      (3,1)
     // o----------o----------o----------o----------o
@@ -185,10 +185,7 @@ public:
 #endif
   }
 
-  void tearDown()
-  {
-    delete _mesh;
-  }
+  void tearDown() {}
 
   void testMesh()
   {
@@ -288,7 +285,7 @@ public:
 protected:
 
   System* _sys;
-  EquationSystems* _es;
+  std::unique_ptr<EquationSystems> _es;
 
 public:
 
@@ -301,7 +298,7 @@ public:
     // have contiguous ids, which is a requirement to write xda files.
     _mesh->allow_renumbering(true);
 
-    _es = new EquationSystems(*_mesh);
+    _es = std::make_unique<EquationSystems>(*_mesh);
     _sys = &_es->add_system<System> ("SimpleSystem");
     _sys->add_variable("u", FIRST);
 
@@ -318,12 +315,7 @@ public:
 #endif
   }
 
-  void tearDown()
-  {
-    delete _es;
-    // _sys is owned by _es
-    delete _mesh;
-  }
+  void tearDown() {}
 
   void testMesh()
   {
