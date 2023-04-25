@@ -629,6 +629,17 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
   for (const auto & t : mesh.get_boundary_info().build_node_list())
     nodes_with_nodesets.insert(std::get<0>(t));
 
+  // It's possible for the node assembly loop below to throw an
+  // exception on one (or some subset) of the processors. In that
+  // case, we stop assembling on the processor(s) that threw and let
+  // the other processors finish assembly. Then we synchronize to
+  // check whether an exception was thrown on _any_ processor, and if
+  // so, re-throw it on _all_ processors.
+  int nodal_assembly_threw = 0;
+
+  libmesh_try
+  {
+
   for (const auto & id : nodes_with_nodesets)
     {
       const Node & node = mesh.node_ref(id);
@@ -682,6 +693,18 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
             }
         }
     }
+  } // libmesh_try
+  libmesh_catch(...)
+  {
+    nodal_assembly_threw = 1;
+  }
+
+  // Check for exceptions on any procs and if there is one, re-throw
+  // it on all procs.
+  this->comm().max(nodal_assembly_threw);
+
+  if (nodal_assembly_threw)
+    libmesh_error_msg("Error during assembly in RBConstruction::add_scaled_matrix_and_vector()");
 
   std::unique_ptr<DGFEMContext> c = this->build_context();
   DGFEMContext & context  = cast_ref<DGFEMContext &>(*c);
