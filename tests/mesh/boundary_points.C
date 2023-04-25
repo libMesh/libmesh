@@ -25,11 +25,11 @@ public:
 
 protected:
 
-  ReplicatedMesh* _mesh;
+  std::unique_ptr<ReplicatedMesh> _mesh;
 
   void build_mesh()
   {
-    _mesh = new ReplicatedMesh(*TestCommWorld, 2);
+    _mesh = std::make_unique<ReplicatedMesh>(*TestCommWorld, 2);
 
     // (0,1)           (1,1)           (2,1) (3,1)       (4,1)       (5,1)       (6,1)
     // x---------------x---------------x     x-----------x-----------x-----------x
@@ -175,10 +175,7 @@ public:
 #endif
   }
 
-  void tearDown()
-  {
-    delete _mesh;
-  }
+  void tearDown() {}
 
   void testMesh()
   {
