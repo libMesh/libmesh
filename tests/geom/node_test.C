@@ -24,7 +24,7 @@ public:
 
 private:
 
-  Node * dof_object_instance;
+  std::unique_ptr<Node> dof_object_instance;
 
 public:
 
@@ -32,15 +32,13 @@ public:
   {
     PointTestBase<Node>::setUp();
 
-    dof_object_instance = new Node(1,1,1);
-    DofObjectTest<Node>::setUp(dof_object_instance);
+    dof_object_instance = std::make_unique<Node>(1,1,1);
+    DofObjectTest<Node>::setUp(dof_object_instance.get());
   }
 
   virtual void tearDown()
   {
     PointTestBase<Node>::tearDown();
-
-    delete dof_object_instance;
   }
 
 };

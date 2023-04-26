@@ -1,5 +1,5 @@
-#ifndef __fe_test_h__
-#define __fe_test_h__
+#ifndef PARTITIONER_TEST_H
+#define PARTITIONER_TEST_H
 
 #include <libmesh/distributed_mesh.h>
 #include <libmesh/elem.h>
@@ -159,4 +159,4 @@ public:
                                                                             \
   CPPUNIT_TEST_SUITE_REGISTRATION( PartitionerTest_##partitionersubclass##_##meshclass );
 
-#endif // #ifdef __fe_test_h__
+#endif

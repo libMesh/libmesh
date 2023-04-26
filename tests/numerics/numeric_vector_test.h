@@ -1,5 +1,5 @@
-#ifndef __numeric_vector_test_h__
-#define __numeric_vector_test_h__
+#ifndef NUMERIC_VECTOR_TEST_H
+#define NUMERIC_VECTOR_TEST_H
 
 // test includes
 #include "test_comm.h"
@@ -344,4 +344,4 @@ public:
   }
 };
 
-#endif // #ifdef __numeric_vector_test_h__
+#endif

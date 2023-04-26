@@ -36,11 +36,11 @@ public:
 
 protected:
 
-  ReplicatedMesh* _mesh;
+  std::unique_ptr<ReplicatedMesh> _mesh;
 
   void build_mesh()
   {
-    _mesh = new ReplicatedMesh(*TestCommWorld);
+    _mesh = std::make_unique<ReplicatedMesh>(*TestCommWorld);
 
     // (0,1)           (1,1)
     // x---------------x
@@ -100,10 +100,7 @@ public:
 #endif
   }
 
-  void tearDown()
-  {
-    delete _mesh;
-  }
+  void tearDown() {}
 
   void testMesh()
   {
@@ -371,11 +368,11 @@ public:
   // Yes, this is necessary. Somewhere in those macros is a protected/private
 protected:
 
-  ReplicatedMesh* _mesh;
+  std::unique_ptr<ReplicatedMesh> _mesh;
 
   void build_mesh()
   {
-    _mesh = new ReplicatedMesh(*TestCommWorld);
+    _mesh = std::make_unique<ReplicatedMesh>(*TestCommWorld);
     // We start with this
     //
     //
@@ -504,12 +501,7 @@ public:
 #endif
   }
 
-  void tearDown()
-  {
-#if LIBMESH_DIM > 1
-    delete _mesh;
-#endif
-  }
+  void tearDown() {}
 
   void testMesh()
   {
@@ -632,11 +624,11 @@ public:
 
 protected:
 
-  ReplicatedMesh* _mesh;
+  std::unique_ptr<ReplicatedMesh> _mesh;
 
   void build_mesh()
   {
-    _mesh = new ReplicatedMesh(*TestCommWorld);
+    _mesh = std::make_unique<ReplicatedMesh>(*TestCommWorld);
 
     /**
      * We start with this
@@ -735,12 +727,7 @@ public:
 #endif
   }
 
-  void tearDown()
-  {
-#if LIBMESH_DIM > 1
-    delete _mesh;
-#endif
-  }
+  void tearDown() {}
 
   void testMesh()
   {
@@ -898,11 +885,11 @@ public:
   // Yes, this is necessary. Somewhere in those macros is a protected/private
 protected:
 
-  ReplicatedMesh* _mesh;
+  std::unique_ptr<ReplicatedMesh> _mesh;
 
   void build_mesh()
   {
-    _mesh = new ReplicatedMesh(*TestCommWorld);
+    _mesh = std::make_unique<ReplicatedMesh>(*TestCommWorld);
 
     _mesh->set_mesh_dimension(3);
 
@@ -967,12 +954,7 @@ public:
 #endif
   }
 
-  void tearDown()
-  {
-#if LIBMESH_DIM > 2
-    delete _mesh;
-#endif
-  }
+  void tearDown() {}
 
   void testMesh()
   {

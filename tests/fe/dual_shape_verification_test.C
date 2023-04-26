@@ -24,9 +24,9 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  Mesh * _mesh;
-  QGauss * _qrule;
-  FEBase * _fe;
+  std::unique_ptr<Mesh> _mesh;
+  std::unique_ptr<QGauss> _qrule;
+  std::unique_ptr<FEBase> _fe;
   Elem * _elem;
 
 public:
@@ -71,27 +71,22 @@ public:
   void setUp()
     {
       FEType fe_type(FIRST, LAGRANGE);
-      _fe = FEBase::build(1, fe_type).release();
+      _fe = FEBase::build(1, fe_type);
       _fe->get_phi();
       _fe->get_dual_phi();
 
-      _mesh = new Mesh(*TestCommWorld);
+      _mesh = std::make_unique<Mesh>(*TestCommWorld);
 
       MeshTools::Generation::build_line(*_mesh, 1, -1, 1, EDGE2);
 
       auto rng = _mesh->active_local_element_ptr_range();
       _elem = rng.begin() == rng.end() ? nullptr : *(rng.begin());
 
-      _qrule = new QGauss(1, fe_type.default_quadrature_order());
-      _fe->attach_quadrature_rule(_qrule);
+      _qrule = std::make_unique<QGauss>(1, fe_type.default_quadrature_order());
+      _fe->attach_quadrature_rule(_qrule.get());
     }
 
-  void tearDown()
-    {
-      delete _mesh;
-      delete _fe;
-      delete _qrule;
-    }
+  void tearDown() {}
 
 };
 

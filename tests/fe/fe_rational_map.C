@@ -25,10 +25,9 @@ private:
   unsigned int _dim, _nx, _ny, _nz;
   Elem *_elem;
   std::vector<dof_id_type> _dof_indices;
-  FEBase * _fe;
-  Mesh * _mesh;
-  System * _sys;
-  EquationSystems * _es;
+  std::unique_ptr<Mesh> _mesh;
+  std::unique_ptr<EquationSystems> _es;
+  std::unique_ptr<FEBase> _fe;
 
 protected:
   std::string libmesh_suite_name;
@@ -36,7 +35,7 @@ protected:
 public:
   void setUp()
   {
-    _mesh = new Mesh(*TestCommWorld);
+    _mesh = std::make_unique<Mesh>(*TestCommWorld);
     const std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
     _dim = test_elem->dim();
     const unsigned int ny = _dim > 1;
@@ -90,12 +89,12 @@ public:
           }
       }
 
-    _es = new EquationSystems(*_mesh);
-    _sys = &(_es->add_system<System> ("SimpleSystem"));
-    _sys->add_variable("u", FIRST);
+    _es = std::make_unique<EquationSystems>(*_mesh);
+    System * sys = &(_es->add_system<System> ("SimpleSystem"));
+    sys->add_variable("u", FIRST);
     _es->init();
 
-    _fe = FEBase::build(_dim, _sys->variable_type("u")).release();
+    _fe = FEBase::build(_dim, sys->variable_type("u"));
     _fe->get_xyz();
     _fe->get_phi();
     _fe->get_dphi();
@@ -115,12 +114,7 @@ public:
     _nz = (_dim > 2) ? _nx : 0;
   }
 
-  void tearDown()
-  {
-    delete _fe;
-    delete _es;
-    delete _mesh;
-  }
+  void tearDown() {}
 
   void testContainsPoint()
   {

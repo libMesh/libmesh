@@ -41,8 +41,8 @@ template <Order order, FEFamily family, ElemType elem_type>
 class FESideTest : public FETestBase<order, family, elem_type, N_x> {
 
 private:
-  FEBase * _fe_side;
-  QGauss * _qrule_side;
+  std::unique_ptr<FEBase> _fe_side;
+  std::unique_ptr<QGauss> _qrule_side;
 
 public:
   void setUp()
@@ -50,10 +50,10 @@ public:
     FETestBase<order,family,elem_type,N_x>::setUp();
 
     FEType fe_type = this->_sys->variable_type(0);
-    _fe_side = FEBase::build(this->_dim, fe_type).release();
+    _fe_side = FEBase::build(this->_dim, fe_type);
 
-    _qrule_side = new QGauss(this->_dim-1, fe_type.default_quadrature_order());
-    _fe_side->attach_quadrature_rule(this->_qrule_side);
+    _qrule_side = std::make_unique<QGauss>(this->_dim-1, fe_type.default_quadrature_order());
+    _fe_side->attach_quadrature_rule(this->_qrule_side.get());
 
     _fe_side->get_xyz();
     _fe_side->get_normals();
@@ -94,8 +94,6 @@ public:
 
   void tearDown()
   {
-    delete _fe_side;
-    delete _qrule_side;
     FETestBase<order,family,elem_type,N_x>::tearDown();
   }
 
