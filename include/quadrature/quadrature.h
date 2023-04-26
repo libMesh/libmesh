@@ -122,6 +122,16 @@ public:
   }
 
   /**
+   * Alias for n_points() to enable use in index_range
+   *
+   * \returns The number of points associated with the quadrature rule.
+   */
+  unsigned int size() const
+  {
+    return n_points();
+  }
+
+  /**
    * \returns The spatial dimension of the quadrature rule.
    */
   unsigned int get_dim() const { return _dim; }
