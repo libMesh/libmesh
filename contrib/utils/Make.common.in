@@ -197,8 +197,8 @@ libmesh_static   := $(shell $(libmesh_LIBTOOL) --config | grep build_old_libs | 
 
 
 echo_libmode:
-	echo "libmesh_shared=$(libmesh_shared)"
-	echo "libmesh_static=$(libmesh_static)"
+	@echo "libmesh_shared=$(libmesh_shared)"
+	@echo "libmesh_static=$(libmesh_static)"
 
 # Local Variables:
 # mode: makefile
