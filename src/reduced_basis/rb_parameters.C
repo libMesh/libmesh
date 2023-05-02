@@ -40,11 +40,13 @@ void RBParameters::clear()
 
 const std::map<std::string, Real> & RBParameters::get_parameters_map() const
 {
+  libmesh_deprecated();
   return _parameters;
 }
 
 const std::map<std::string, Real> & RBParameters::get_extra_parameters_map() const
 {
+  libmesh_deprecated();
   return _extra_parameters;
 }
 

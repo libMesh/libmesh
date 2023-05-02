@@ -69,11 +69,19 @@ public:
 
   /**
    * Get a const reference to the map that stores all of the values.
+   *
+   * This interface is \deprecated and will be removed soon. To iterate over
+   * the parameters map, you should instead use the begin/end APIs provided
+   * by this class.
    */
   const std::map<std::string, Real> & get_parameters_map() const;
 
   /**
    * Get a const reference to the map that stores all of the "extra" values.
+   *
+   * This interface is \deprecated and will be removed soon. To iterate over
+   * the parameters map, you should instead use the begin/end APIs provided
+   * by this class.
    */
   const std::map<std::string, Real> & get_extra_parameters_map() const;
 
