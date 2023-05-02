@@ -17,19 +17,19 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ includes
-#include <sstream>
-
 // libmesh includes
 #include "libmesh/rb_parameters.h"
 #include "libmesh/utility.h"
 
+// C++ includes
+#include <sstream>
+
 namespace libMesh
 {
 
-RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map)
+RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map) :
+  _parameters(parameter_map)
 {
-  _parameters = parameter_map;
 }
 
 void RBParameters::clear()

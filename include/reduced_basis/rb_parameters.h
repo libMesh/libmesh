@@ -56,6 +56,10 @@ public:
 
   /**
    * Constructor. Set parameters based on the std::map \p parameter_map.
+   *
+   * This constructor will still be supported once we switch over to
+   * the vector-based storage for RBParameters objects. It will just set
+   * the 0th entry of the vector corresponding to each parameter name.
    */
   RBParameters(const std::map<std::string, Real> & parameter_map);
 
