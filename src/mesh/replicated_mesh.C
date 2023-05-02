@@ -91,6 +91,7 @@ ReplicatedMesh::ReplicatedMesh (const ReplicatedMesh & other_mesh) :
   _n_nodes(0), _n_elem(0) // copy_* will increment this
 {
   this->copy_nodes_and_elements(other_mesh, true);
+  this->copy_constraint_rows(other_mesh);
 
   auto & this_boundary_info = this->get_boundary_info();
   const auto & other_boundary_info = other_mesh.get_boundary_info();
@@ -110,6 +111,7 @@ ReplicatedMesh::ReplicatedMesh (const UnstructuredMesh & other_mesh) :
   _n_nodes(0), _n_elem(0) // copy_* will increment this
 {
   this->copy_nodes_and_elements(other_mesh, true);
+  this->copy_constraint_rows(other_mesh);
 
   auto & this_boundary_info = this->get_boundary_info();
   const auto & other_boundary_info = other_mesh.get_boundary_info();

@@ -1925,5 +1925,22 @@ bool MeshBase::nodes_and_elements_equal(const MeshBase & other_mesh) const
   return true;
 }
 
+void
+MeshBase::copy_constraint_rows(const MeshBase & other_mesh)
+{
+  const auto & other_constraint_rows = other_mesh.get_constraint_rows();
+  for (const auto & [other_node, other_node_constraints] : other_constraint_rows)
+  {
+    const Node * const our_node = this->node_ptr(other_node->id());
+    constraint_rows_mapped_type our_node_constraints;
+    for (const auto & [other_inner_key_pair, constraint_value] : other_node_constraints)
+    {
+      const auto & [other_elem, local_node_id] = other_inner_key_pair;
+      const Elem * const our_elem = this->elem_ptr(other_elem->id());
+      our_node_constraints.emplace_back(std::make_pair(our_elem, local_node_id), constraint_value);
+    }
+    _constraint_rows[our_node] = std::move(our_node_constraints);
+  }
+}
 
 } // namespace libMesh
