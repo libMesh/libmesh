@@ -86,6 +86,12 @@ public:
   const std::map<std::string, Real> & get_extra_parameters_map() const;
 
   /**
+   * \returns true if there is a parameter named "param_name" present
+   * in this class, false otherwise.
+   */
+  bool has_value(const std::string & param_name) const;
+
+  /**
    * Get the value of the specified parameter, throwing an error if it
    * does not exist.
    */

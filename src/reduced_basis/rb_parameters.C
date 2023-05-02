@@ -50,6 +50,11 @@ const std::map<std::string, Real> & RBParameters::get_extra_parameters_map() con
   return _extra_parameters;
 }
 
+bool RBParameters::has_value(const std::string & param_name) const
+{
+  return _parameters.count(param_name);
+}
+
 Real RBParameters::get_value(const std::string & param_name) const
 {
   // find the parameter value, throwing an error if it doesn't exist.
