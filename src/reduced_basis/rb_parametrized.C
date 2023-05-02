@@ -124,8 +124,7 @@ std::set<std::string> RBParametrized::get_parameter_names() const
   libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_parameter_names");
 
   std::set<std::string> parameter_names;
-  const auto & params_map = parameters_min.get_parameters_map();
-  for (const auto & pr : params_map)
+  for (const auto & pr : parameters_min)
     parameter_names.insert(pr.first);
 
   return parameter_names;

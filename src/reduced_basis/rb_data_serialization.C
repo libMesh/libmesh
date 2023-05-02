@@ -258,7 +258,7 @@ void add_parameter_ranges_to_builder(const RBParametrized & rb_evaluation,
 
     // We could loop over either parameters_min or parameters_max, they should have the same keys.
     unsigned int count = 0;
-    for (const auto & [key, val] : parameters_min.get_parameters_map())
+    for (const auto & [key, val] : parameters_min)
       if (!rb_evaluation.is_discrete_parameter(key))
         {
           names.set(count, key);
