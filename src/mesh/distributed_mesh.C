@@ -152,6 +152,7 @@ DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
   _next_free_unpartitioned_elem_id(this->n_processors())
 {
   this->copy_nodes_and_elements(other_mesh, true);
+  this->copy_constraint_rows(other_mesh);
   _n_nodes = other_mesh.n_nodes();
   _n_elem  = other_mesh.n_elem();
   _max_node_id = other_mesh.max_node_id();
@@ -195,6 +196,7 @@ DistributedMesh::DistributedMesh (const UnstructuredMesh & other_mesh) :
   _next_free_unpartitioned_elem_id(this->n_processors())
 {
   this->copy_nodes_and_elements(other_mesh, true);
+  this->copy_constraint_rows(other_mesh);
 
   auto & this_boundary_info = this->get_boundary_info();
   const auto & other_boundary_info = other_mesh.get_boundary_info();

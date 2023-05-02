@@ -1863,8 +1863,14 @@ public:
   const std::map<subdomain_id_type, std::string> & get_subdomain_name_map () const
   { return _block_id_to_name; }
 
-  typedef std::map<const Node *, std::vector<std::pair<std::pair<const Elem *, unsigned int>, Real>>>
-    constraint_rows_type;
+  typedef std::vector<std::pair<std::pair<const Elem *, unsigned int>, Real>> constraint_rows_mapped_type;
+  typedef std::map<const Node *, constraint_rows_mapped_type> constraint_rows_type;
+
+
+  /**
+   * Copy the constraints from the other mesh to this mesh
+   */
+  void copy_constraint_rows(const MeshBase & other_mesh);
 
   constraint_rows_type & get_constraint_rows()
   { return _constraint_rows; }
@@ -2162,7 +2168,7 @@ protected:
   // constrained in terms of values on spline control nodes.
   //
   // _constraint_rows[constrained_node_id][i].first.first is an
-  // element id,
+  // element,
   // _constraint_rows[constrained_node_id][i].first.second is the
   // local node id of that element which is a constraining node,
   // _constraint_rows[constrained_node_id][i].second is that node's
