@@ -86,9 +86,16 @@ public:
   const std::map<std::string, Real> & get_extra_parameters_map() const;
 
   /**
-   * Get the value of the specific parameter.
+   * Get the value of the specified parameter, throwing an error if it
+   * does not exist.
    */
   Real get_value(const std::string & param_name) const;
+
+  /**
+   * Get the value of the specified parameter, returning the provided
+   * default value if it does not exist.
+   */
+  Real get_value(const std::string & param_name, const Real & default_val) const;
 
   /**
    * Set the value of the specified parameter. If param_name
@@ -97,9 +104,16 @@ public:
   void set_value(const std::string & param_name, Real value);
 
   /**
-   * Get the value of the specific extra parameter.
+   * Get the value of the specified extra parameter, throwing an error
+   * if it does not exist.
    */
   Real get_extra_value(const std::string & param_name) const;
+
+  /**
+   * Get the value of the specified extra parameter, returning the
+   * provided default value if it does not exist.
+   */
+  Real get_extra_value(const std::string & param_name, const Real & default_val) const;
 
   /**
    * Set the value of the specified extra parameter. If param_name

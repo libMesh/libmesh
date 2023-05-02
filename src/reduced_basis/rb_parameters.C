@@ -56,6 +56,12 @@ Real RBParameters::get_value(const std::string & param_name) const
   return libmesh_map_find(_parameters, param_name);
 }
 
+Real RBParameters::get_value(const std::string & param_name, const Real & default_val) const
+{
+  auto it = _parameters.find(param_name);
+  return (it != _parameters.end() ? it->second : default_val);
+}
+
 void RBParameters::set_value(const std::string & param_name, Real value)
 {
   _parameters[param_name] = value;
@@ -65,6 +71,12 @@ Real RBParameters::get_extra_value(const std::string & param_name) const
 {
   // find the parameter value, throwing an error if it doesn't exist.
   return libmesh_map_find(_extra_parameters, param_name);
+}
+
+Real RBParameters::get_extra_value(const std::string & param_name, const Real & default_val) const
+{
+  auto it = _extra_parameters.find(param_name);
+  return (it != _extra_parameters.end() ? it->second : default_val);
 }
 
 void RBParameters::set_extra_value(const std::string & param_name, Real value)
