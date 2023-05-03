@@ -56,6 +56,10 @@ public:
 
   /**
    * Constructor. Set parameters based on the std::map \p parameter_map.
+   *
+   * This constructor will still be supported once we switch over to
+   * the vector-based storage for RBParameters objects. It will just set
+   * the 0th entry of the vector corresponding to each parameter name.
    */
   RBParameters(const std::map<std::string, Real> & parameter_map);
 
@@ -69,18 +73,45 @@ public:
 
   /**
    * Get a const reference to the map that stores all of the values.
+   *
+   * This interface is \deprecated and will be removed soon. To iterate over
+   * the parameters map, you should instead use the begin/end APIs provided
+   * by this class.
    */
   const std::map<std::string, Real> & get_parameters_map() const;
 
   /**
    * Get a const reference to the map that stores all of the "extra" values.
+   *
+   * This interface is \deprecated and will be removed soon. To iterate over
+   * the parameters map, you should instead use the begin/end APIs provided
+   * by this class.
    */
   const std::map<std::string, Real> & get_extra_parameters_map() const;
 
   /**
-   * Get the value of the specific parameter.
+   * \returns true if there is a parameter named "param_name" present
+   * in this class, false otherwise.
+   */
+  bool has_value(const std::string & param_name) const;
+
+  /**
+   * \returns true if there is an extra parameter named "param_name" present
+   * in this class, false otherwise.
+   */
+  bool has_extra_value(const std::string & param_name) const;
+
+  /**
+   * Get the value of the specified parameter, throwing an error if it
+   * does not exist.
    */
   Real get_value(const std::string & param_name) const;
+
+  /**
+   * Get the value of the specified parameter, returning the provided
+   * default value if it does not exist.
+   */
+  Real get_value(const std::string & param_name, const Real & default_val) const;
 
   /**
    * Set the value of the specified parameter. If param_name
@@ -89,9 +120,16 @@ public:
   void set_value(const std::string & param_name, Real value);
 
   /**
-   * Get the value of the specific extra parameter.
+   * Get the value of the specified extra parameter, throwing an error
+   * if it does not exist.
    */
   Real get_extra_value(const std::string & param_name) const;
+
+  /**
+   * Get the value of the specified extra parameter, returning the
+   * provided default value if it does not exist.
+   */
+  Real get_extra_value(const std::string & param_name, const Real & default_val) const;
 
   /**
    * Set the value of the specified extra parameter. If param_name

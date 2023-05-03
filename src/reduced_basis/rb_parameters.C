@@ -17,19 +17,19 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ includes
-#include <sstream>
-
 // libmesh includes
 #include "libmesh/rb_parameters.h"
 #include "libmesh/utility.h"
 
+// C++ includes
+#include <sstream>
+
 namespace libMesh
 {
 
-RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map)
+RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map) :
+  _parameters(parameter_map)
 {
-  _parameters = parameter_map;
 }
 
 void RBParameters::clear()
@@ -40,18 +40,36 @@ void RBParameters::clear()
 
 const std::map<std::string, Real> & RBParameters::get_parameters_map() const
 {
+  libmesh_deprecated();
   return _parameters;
 }
 
 const std::map<std::string, Real> & RBParameters::get_extra_parameters_map() const
 {
+  libmesh_deprecated();
   return _extra_parameters;
+}
+
+bool RBParameters::has_value(const std::string & param_name) const
+{
+  return _parameters.count(param_name);
+}
+
+bool RBParameters::has_extra_value(const std::string & param_name) const
+{
+  return _extra_parameters.count(param_name);
 }
 
 Real RBParameters::get_value(const std::string & param_name) const
 {
   // find the parameter value, throwing an error if it doesn't exist.
   return libmesh_map_find(_parameters, param_name);
+}
+
+Real RBParameters::get_value(const std::string & param_name, const Real & default_val) const
+{
+  auto it = _parameters.find(param_name);
+  return (it != _parameters.end() ? it->second : default_val);
 }
 
 void RBParameters::set_value(const std::string & param_name, Real value)
@@ -63,6 +81,12 @@ Real RBParameters::get_extra_value(const std::string & param_name) const
 {
   // find the parameter value, throwing an error if it doesn't exist.
   return libmesh_map_find(_extra_parameters, param_name);
+}
+
+Real RBParameters::get_extra_value(const std::string & param_name, const Real & default_val) const
+{
+  auto it = _extra_parameters.find(param_name);
+  return (it != _extra_parameters.end() ? it->second : default_val);
 }
 
 void RBParameters::set_extra_value(const std::string & param_name, Real value)
@@ -140,12 +164,9 @@ std::string RBParameters::get_string(unsigned int precision) const
   std::stringstream param_stringstream;
   param_stringstream.precision(precision);
 
-  const_iterator it     = _parameters.begin();
-  const_iterator it_end = _parameters.end();
-  for ( ; it != it_end; ++it)
-    {
-      param_stringstream << it->first << ": " << std::scientific <<  it->second << std::endl;
-    }
+  for (const auto & [key, value] : _parameters)
+    param_stringstream << key << ": " << std::scientific <<  value << std::endl;
+
   return param_stringstream.str();
 }
 
