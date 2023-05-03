@@ -96,6 +96,12 @@ public:
   bool has_value(const std::string & param_name) const;
 
   /**
+   * \returns true if there is an extra parameter named "param_name" present
+   * in this class, false otherwise.
+   */
+  bool has_extra_value(const std::string & param_name) const;
+
+  /**
    * Get the value of the specified parameter, throwing an error if it
    * does not exist.
    */
