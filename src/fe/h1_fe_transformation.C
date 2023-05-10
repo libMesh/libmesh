@@ -55,11 +55,7 @@ void H1FETransformation<OutputShape>::map_phi( const unsigned int dim,
                                                const FEGenericBase<OutputShape> & fe,
                                                std::vector<std::vector<OutputShape>> & phi ) const
 {
-  for (auto i : index_range(phi))
-    {
-      libmesh_assert_equal_to ( qp.size(), phi[i].size() );
-      FEInterface::shapes<OutputShape>(dim, fe.get_fe_type(), elem, i, qp, phi[i]);
-    }
+  FEInterface::all_shapes<OutputShape>(dim, fe.get_fe_type(), elem, qp, phi);
 }
 
 
