@@ -1064,12 +1064,14 @@ void rational_fe_weighted_shapes_derivs(const Elem * elem,
 
   shapes.resize(n_sf);
   for (unsigned int i=0; i != n_sf; ++i)
+    shapes[i].resize(n_p, 0);
+
+  FEInterface::all_shapes(dim, fe_type, elem, p, shapes, add_p_level);
+
+  for (unsigned int i=0; i != n_sf; ++i)
     {
       auto & shapes_i = shapes[i];
 
-      shapes_i.resize(n_p, 0);
-
-      FEInterface::shapes(dim, fe_type, elem, i, p, shapes_i, add_p_level);
       for (auto & s : shapes_i)
         s *= node_weights[i];
 
