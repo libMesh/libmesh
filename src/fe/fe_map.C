@@ -267,9 +267,7 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
               {
                 if (calculate_xyz)
                   {
-                    this->phi_map[i][0] =
-                      shape_ptr(map_fe_type, elem, i, qp[0], false);
-                    for (std::size_t p=1; p<n_qp; p++)
+                    for (std::size_t p=0; p<n_qp; p++)
                       this->phi_map[i][p] =
                         shape_ptr(map_fe_type, elem, i, qp[p], false);
                   }
@@ -325,9 +323,7 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
               {
                 if (calculate_xyz)
                   {
-                    this->phi_map[i][0] =
-                      shape_ptr (map_fe_type, elem, i, qp[0], false);
-                    for (std::size_t p=1; p<n_qp; p++)
+                    for (std::size_t p=0; p<n_qp; p++)
                       this->phi_map[i][p] =
                         shape_ptr (map_fe_type, elem, i, qp[p], false);
                   }
@@ -397,10 +393,7 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
               {
                 if (calculate_xyz)
                   {
-                    this->phi_map[i][0] =
-                      shape_ptr (map_fe_type, elem, i, qp[0], false);
-
-                    for (std::size_t p=1; p<n_qp; p++)
+                    for (std::size_t p=0; p<n_qp; p++)
                       this->phi_map[i][p] =
                         shape_ptr (map_fe_type, elem, i, qp[p], false);
                   }
