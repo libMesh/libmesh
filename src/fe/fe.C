@@ -579,6 +579,14 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
   }
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
+        // Compute the values of the shape function derivatives
+  if (this->calculate_dphiref && Dim > 0)
+    {
+      std::vector<std::vector<OutputShape>> * comps[3]
+        { &this->dphidxi, &this->dphideta, &this->dphidzeta };
+      FE<Dim,T>::all_shape_derivs(elem, this->fe_type.order, qp, comps);
+    }
+
   switch (Dim)
     {
 
@@ -593,10 +601,6 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
       // 1D
     case 1:
       {
-        // Compute the values of the shape function derivatives
-        if (this->calculate_dphiref)
-          FE<Dim,T>::all_shape_derivs(elem, this->fe_type.order, qp);
-
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         // Compute the value of shape function i Hessians at quadrature point p
         if (this->calculate_d2phi)
@@ -614,10 +618,6 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
       // 2D
     case 2:
       {
-        // Compute the values of the shape function derivatives
-        if (this->calculate_dphiref)
-          FE<Dim,T>::all_shape_derivs(elem, this->fe_type.order, qp);
-
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         // Compute the value of shape function i Hessians at quadrature point p
         if (this->calculate_d2phi)
@@ -640,10 +640,6 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
       // 3D
     case 3:
       {
-        // Compute the values of the shape function derivatives
-        if (this->calculate_dphiref)
-          FE<Dim,T>::all_shape_derivs(elem, this->fe_type.order, qp);
-
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         // Compute the value of shape function i Hessians at quadrature point p
         if (this->calculate_d2phi)
@@ -676,10 +672,9 @@ void
 FE<Dim,T>::default_all_shape_derivs (const Elem * elem,
                                      const Order o,
                                      const std::vector<Point> & p,
+                                     std::vector<std::vector<OutputShape>> * comps[3],
                                      const bool add_p_level)
 {
-  std::vector<std::vector<OutputShape>> * comps[3]
-    { &this->dphidxi, &this->dphideta, &this->dphidzeta };
   for (unsigned int d=0; d != Dim; ++d)
     {
       auto & comps_d = *comps[d];
@@ -1306,10 +1301,11 @@ void rational_all_shapes (const Elem & elem,
 }
 
 
+template <typename OutputShape>
 void rational_all_shape_derivs (const Elem & elem,
                                 const FEType underlying_fe_type,
                                 const std::vector<Point> & p,
-                                std::vector<std::vector<Real>> * comps[3],
+                                std::vector<std::vector<OutputShape>> * comps[3],
                                 const bool add_p_level)
 {
   const int my_dim = elem.dim();
@@ -1418,4 +1414,5 @@ INSTANTIATE_FE(3);
 
 INSTANTIATE_SUBDIVISION_FE;
 
+template LIBMESH_EXPORT void rational_all_shape_derivs<double> (const Elem & elem, const FEType underlying_fe_type, const std::vector<Point> & p, std::vector<std::vector<Real>> * comps[3], const bool add_p_level);
 } // namespace libMesh
