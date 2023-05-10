@@ -232,9 +232,6 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
   // Optimize for the *linear* geometric elements case:
   bool is_linear = elem->is_linear();
 
-  FEInterface::shape_ptr shape_ptr =
-    FEInterface::shape_function(map_fe_type, elem);
-
   FEInterface::shape_deriv_ptr shape_deriv_ptr =
     FEInterface::shape_deriv_function(map_fe_type, elem);
 
@@ -243,15 +240,16 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
     FEInterface::shape_second_deriv_function(map_fe_type, elem);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
+  if (calculate_xyz)
+    FEInterface::all_shapes(Dim, map_fe_type, elem, qp, this->phi_map, false);
+
   switch (Dim)
     {
       //------------------------------------------------------------
       // 0D
     case 0:
       {
-        if (calculate_xyz)
-          FEInterface::all_shapes(0, map_fe_type, elem, qp, this->phi_map, false);
-
+        // No mapping derivatives here
         break;
       }
 
@@ -259,19 +257,11 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
       // 1D
     case 1:
       {
-        // Compute the value of the mapping shape function i at quadrature point p
-        // (Lagrange shape functions are used for mapping)
+        // Compute gradients of mapping shape functions i at quadrature points p
         if (is_linear)
           {
             for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
-                if (calculate_xyz)
-                  {
-                    for (std::size_t p=0; p<n_qp; p++)
-                      this->phi_map[i][p] =
-                        shape_ptr(map_fe_type, elem, i, qp[p], false);
-                  }
-
                 if (calculate_dxyz)
                   {
                     this->dphidxi_map[i][0] =
@@ -293,9 +283,6 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
           }
         else
           {
-            if (calculate_xyz)
-              FEInterface::all_shapes(1, map_fe_type, elem, qp, this->phi_map, false);
-
             for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
                 if (calculate_dxyz)
@@ -315,18 +302,11 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
       // 2D
     case 2:
       {
-        // Compute the value of the mapping shape function i at quadrature point p
-        // (Lagrange shape functions are used for mapping)
+        // Compute gradients of mapping shape functions i at quadrature points p
         if (is_linear)
           {
             for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
-                if (calculate_xyz)
-                  {
-                    for (std::size_t p=0; p<n_qp; p++)
-                      this->phi_map[i][p] =
-                        shape_ptr (map_fe_type, elem, i, qp[p], false);
-                  }
                 if (calculate_dxyz)
                   {
                     this->dphidxi_map[i][0]  = shape_deriv_ptr (map_fe_type, elem, i, 0, qp[0], false);
@@ -355,9 +335,6 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
           }
         else
           {
-            if (calculate_xyz)
-              FEInterface::all_shapes(2, map_fe_type, elem, qp, this->phi_map, false);
-
             for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
                 if (calculate_dxyz)
@@ -385,18 +362,11 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
       // 3D
     case 3:
       {
-        // Compute the value of the mapping shape function i at quadrature point p
-        // (Lagrange shape functions are used for mapping)
+        // Compute gradients of mapping shape functions i at quadrature points p
         if (is_linear)
           {
             for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
-                if (calculate_xyz)
-                  {
-                    for (std::size_t p=0; p<n_qp; p++)
-                      this->phi_map[i][p] =
-                        shape_ptr (map_fe_type, elem, i, qp[p], false);
-                  }
                 if (calculate_dxyz)
                   {
                     this->dphidxi_map[i][0]  = shape_deriv_ptr (map_fe_type, elem, i, 0, qp[0], false);
@@ -435,9 +405,6 @@ void FEMap::init_reference_to_physical_map(const std::vector<Point> & qp,
           }
         else
           {
-            if (calculate_xyz)
-              FEInterface::all_shapes(3, map_fe_type, elem, qp, this->phi_map, false);
-
             for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
                 if (calculate_dxyz)
