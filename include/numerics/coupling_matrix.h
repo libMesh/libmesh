@@ -59,32 +59,32 @@ public:
    * Constructor.
    */
   explicit
-  CouplingMatrix (const unsigned int n=0);
+  CouplingMatrix (const std::size_t n=0);
 
   /**
    * \returns The (i,j) entry of the matrix.
    */
-  bool operator() (const unsigned int i,
-                   const unsigned int j) const;
+  bool operator() (const std::size_t i,
+                   const std::size_t j) const;
 
   /**
    * \returns The (i,j) entry of the matrix as
    * a smart-reference.
    */
-  CouplingAccessor operator() (const unsigned int i,
-                               const unsigned int j);
+  CouplingAccessor operator() (const std::size_t i,
+                               const std::size_t j);
 
   /**
    * \returns The size of the matrix, i.e. N for an
    * NxN matrix.
    */
-  unsigned int size() const;
+  std::size_t size() const;
 
   /**
    * Resizes the matrix and initializes
    * all entries to be 0.
    */
-  void resize(const unsigned int n);
+  void resize(const std::size_t n);
 
   /**
    * Clears the matrix.
@@ -123,7 +123,7 @@ private:
   /**
    * The size of the matrix.
    */
-  unsigned int _size;
+  std::size_t _size;
 };
 
 
@@ -336,7 +336,7 @@ private:
 class ConstCouplingRow
 {
 public:
-  ConstCouplingRow(unsigned int row_in,
+  ConstCouplingRow(std::size_t row_in,
                    const CouplingMatrix & mat_in) :
     _row_i(row_in), _mat(mat_in),
     _end_location(_row_i*_mat.size()+_mat.size()-1)
@@ -434,7 +434,7 @@ protected:
 
   friend class ConstCouplingRowConstIterator;
 
-  unsigned int _row_i;
+  std::size_t _row_i;
   const CouplingMatrix & _mat;
 
   // The location (i*size+j) corresponding to the first entry in this
@@ -478,11 +478,11 @@ public:
 #endif
   }
 
-  unsigned int operator* ()
+  std::size_t operator* ()
   {
     libmesh_assert_not_equal_to
       (_location, std::numeric_limits<std::size_t>::max());
-    return cast_int<unsigned int>(_location % _row._mat.size());
+    return _location % _row._mat.size();
   }
 
   ConstCouplingRowConstIterator & operator++ ()
@@ -568,7 +568,7 @@ ConstCouplingRow::const_iterator ConstCouplingRow::end() const
 //--------------------------------------------------
 // CouplingMatrix inline methods
 inline
-CouplingMatrix::CouplingMatrix (const unsigned int n) :
+CouplingMatrix::CouplingMatrix (const std::size_t n) :
   _ranges(), _size(n)
 {
   this->resize(n);
@@ -577,8 +577,8 @@ CouplingMatrix::CouplingMatrix (const unsigned int n) :
 
 
 inline
-bool CouplingMatrix::operator() (const unsigned int i,
-                                 const unsigned int j) const
+bool CouplingMatrix::operator() (const std::size_t i,
+                                 const std::size_t j) const
 {
   libmesh_assert_less (i, _size);
   libmesh_assert_less (j, _size);
@@ -592,8 +592,8 @@ bool CouplingMatrix::operator() (const unsigned int i,
 
 
 inline
-CouplingAccessor CouplingMatrix::operator() (const unsigned int i,
-                                             const unsigned int j)
+CouplingAccessor CouplingMatrix::operator() (const std::size_t i,
+                                             const std::size_t j)
 {
   const std::size_t location = std::size_t(i)*_size + j;
 
@@ -603,7 +603,7 @@ CouplingAccessor CouplingMatrix::operator() (const unsigned int i,
 
 
 inline
-unsigned int CouplingMatrix::size() const
+std::size_t CouplingMatrix::size() const
 {
   return _size;
 }
@@ -611,7 +611,7 @@ unsigned int CouplingMatrix::size() const
 
 
 inline
-void CouplingMatrix::resize(const unsigned int n)
+void CouplingMatrix::resize(const std::size_t n)
 {
   _size = n;
 
