@@ -543,7 +543,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
   // are neighbors
   {
     // data structures -- Use the hash_multimap if available
-    typedef unsigned int                    key_type;
+    typedef dof_id_type                     key_type;
     typedef std::pair<Elem *, unsigned char> val_type;
     typedef std::unordered_multimap<key_type, val_type> map_type;
 
@@ -565,7 +565,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                 element->neighbor_ptr(ms) == remote_elem)
               {
                 // Get the key for the side of this element
-                const unsigned int key = element->key(ms);
+                const dof_id_type key = element->key(ms);
 
                 // Look for elements that have an identical side key
                 auto bounds = side_to_elem_map.equal_range(key);
