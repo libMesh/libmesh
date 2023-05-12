@@ -274,8 +274,11 @@ public:
 
   /**
    * Closes the \p ExodusII mesh file.
+   *
+   * This function is called from the ExodusII_IO destructor, so it should
+   * not throw an exception.
    */
-  void close();
+  void close() noexcept;
 
   /**
    * Reads and stores the timesteps in the 'time_steps' array.
