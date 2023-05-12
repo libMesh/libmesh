@@ -1887,7 +1887,7 @@ void ExodusII_IO_Helper::read_all_nodesets()
 
 
 
-void ExodusII_IO_Helper::close()
+void ExodusII_IO_Helper::close() noexcept
 {
   // Call ex_close on every processor that did ex_open or ex_create;
   // newer Exodus versions error if we try to reopen a file that
@@ -1904,8 +1904,16 @@ void ExodusII_IO_Helper::close()
       if (opened_for_writing || opened_for_reading)
         {
           ex_err = exII::ex_close(ex_id);
-          EX_CHECK_ERR(ex_err, "Error closing Exodus file.");
-          message("Exodus file closed successfully.");
+          // close() is called from the destructor, so it may be called e.g.
+          // during stack unwinding while processing an exception. In that case
+          // we don't want to throw another exception or immediately terminate
+          // the code, since that would prevent any possible recovery from the
+          // exception in question. So we just log the error closing the file
+          // and continue.
+          if (ex_err < 0)
+            message("Error closing Exodus file.");
+          else
+            message("Exodus file closed successfully.");
         }
     }
 
