@@ -59,8 +59,355 @@ namespace libMesh
 {
 
 
-LIBMESH_DEFAULT_VECTORIZED_FE(3,LAGRANGE)
+// TODO: If optimizations for LAGRANGE work well we should do
+// L2_LAGRANGE too...
 LIBMESH_DEFAULT_VECTORIZED_FE(3,L2_LAGRANGE)
+
+
+template<>
+void FE<3,LAGRANGE>::all_shapes
+  (const Elem * elem,
+   const Order o,
+   const std::vector<Point> & p,
+   std::vector<std::vector<OutputShape>> & v,
+   const bool add_p_level)
+{
+  const ElemType type = elem->type();
+
+  // Just loop on the harder-to-optimize cases
+  if (type != HEX8 && type != HEX27)
+    {
+      FE<3,LAGRANGE>::default_all_shapes
+        (elem,o,p,v,add_p_level);
+      return;
+    }
+
+#if LIBMESH_DIM == 3
+
+  const unsigned int n_sf = v.size();
+
+  switch (o)
+    {
+      // linear Lagrange shape functions
+    case FIRST:
+      {
+        switch (type)
+          {
+            // trilinear hexahedral shape functions
+          case HEX8:
+          case HEX20:
+          case HEX27:
+            {
+              libmesh_assert_less_equal (n_sf, 8);
+
+              //                                0  1  2  3  4  5  6  7
+              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
+              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
+              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
+
+              for (auto qp : index_range(p))
+                {
+                  const Point & q_point = p[qp];
+                  // Compute hex shape functions as a tensor-product
+                  const Real xi   = q_point(0);
+                  const Real eta  = q_point(1);
+                  const Real zeta = q_point(2);
+
+                  // one_d_shapes[dim][i] = phi_i(p(dim))
+                  Real one_d_shapes[3][2] = {
+                    {fe_lagrange_1D_linear_shape(0, xi),
+                     fe_lagrange_1D_linear_shape(1, xi)},
+                    {fe_lagrange_1D_linear_shape(0, eta),
+                     fe_lagrange_1D_linear_shape(1, eta)},
+                    {fe_lagrange_1D_linear_shape(0, zeta),
+                     fe_lagrange_1D_linear_shape(1, zeta)}};
+
+                  for (unsigned int i : make_range(n_sf))
+                    v[i][qp] = one_d_shapes[0][i0[i]] *
+                               one_d_shapes[1][i1[i]] *
+                               one_d_shapes[2][i2[i]];
+                }
+              return;
+            }
+
+          default:
+            libmesh_error(); // How did we get here?
+          }
+      }
+
+
+      // quadratic Lagrange shape functions
+    case SECOND:
+      {
+        switch (type)
+          {
+            // triquadratic hexahedral shape functions
+          case HEX8:
+// TODO: refactor to optimize this
+//            libmesh_assert_msg(T == L2_LAGRANGE,
+//                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
+          case HEX27:
+            {
+              libmesh_assert_less_equal (n_sf, 27);
+
+              // The only way to make any sense of this
+              // is to look at the mgflo/mg2/mgf documentation
+              // and make the cut-out cube!
+              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
+              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
+              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
+
+              for (auto qp : index_range(p))
+                {
+                  const Point & q_point = p[qp];
+                  // Compute hex shape functions as a tensor-product
+                  const Real xi   = q_point(0);
+                  const Real eta  = q_point(1);
+                  const Real zeta = q_point(2);
+
+                  // linear_shapes[dim][i] = phi_i(p(dim))
+                  Real one_d_shapes[3][3] = {
+                    {fe_lagrange_1D_quadratic_shape(0, xi),
+                     fe_lagrange_1D_quadratic_shape(1, xi),
+                     fe_lagrange_1D_quadratic_shape(2, xi)},
+                    {fe_lagrange_1D_quadratic_shape(0, eta),
+                     fe_lagrange_1D_quadratic_shape(1, eta),
+                     fe_lagrange_1D_quadratic_shape(2, eta)},
+                    {fe_lagrange_1D_quadratic_shape(0, zeta),
+                     fe_lagrange_1D_quadratic_shape(1, zeta),
+                     fe_lagrange_1D_quadratic_shape(2, zeta)}};
+
+                  for (unsigned int i : make_range(n_sf))
+                    v[i][qp] = one_d_shapes[0][i0[i]] *
+                               one_d_shapes[1][i1[i]] *
+                               one_d_shapes[2][i2[i]];
+                }
+              return;
+            }
+
+          default:
+            libmesh_error(); // How did we get here?
+          }
+      }
+
+      // unsupported order
+    default:
+      libmesh_error_msg("ERROR: Unsupported 3D FE order on HEX!: " << o);
+    }
+#else // LIBMESH_DIM != 3
+  libmesh_ignore(elem, o, p, v, add_p_level);
+  libmesh_not_implemented();
+#endif // LIBMESH_DIM == 3
+}
+
+template<>
+void FE<3,LAGRANGE>::shapes
+  (const Elem * elem,
+   const Order o,
+   const unsigned int i,
+   const std::vector<Point> & p,
+   std::vector<OutputShape> & v,
+   const bool add_p_level)
+{
+  FE<3,LAGRANGE>::default_shapes
+    (elem,o,i,p,v,add_p_level);
+}
+
+template<>
+void FE<3,LAGRANGE>::shape_derivs
+  (const Elem * elem,
+   const Order o,
+   const unsigned int i,
+   const unsigned int j,
+   const std::vector<Point> & p,
+   std::vector<OutputShape> & v,
+   const bool add_p_level)
+{
+  FE<3,LAGRANGE>::default_shape_derivs
+    (elem,o,i,j,p,v,add_p_level);
+}
+
+template<>
+void FE<3,LAGRANGE>::all_shape_derivs
+  (const Elem * elem,
+   const Order o,
+   const std::vector<Point> & p,
+   std::vector<std::vector<OutputShape>> * comps[3],
+   const bool add_p_level)
+{
+  const ElemType type = elem->type();
+
+  // Just loop on the harder-to-optimize cases
+  if (type != HEX8 && type != HEX27)
+    {
+      FE<3,LAGRANGE>::default_all_shape_derivs
+        (elem,o,p,comps,add_p_level);
+      return;
+    }
+
+#if LIBMESH_DIM == 3
+
+  libmesh_assert(comps[0]);
+  libmesh_assert(comps[1]);
+  libmesh_assert(comps[2]);
+  const unsigned int n_sf = comps[0]->size();
+
+  switch (o)
+    {
+      // linear Lagrange shape functions
+    case FIRST:
+      {
+        switch (type)
+          {
+            // trilinear hexahedral shape functions
+          case HEX8:
+          case HEX20:
+          case HEX27:
+            {
+              libmesh_assert_equal_to (n_sf, 8);
+
+              //                                0  1  2  3  4  5  6  7
+              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
+              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
+              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
+
+              for (auto qp : index_range(p))
+                {
+                  const Point & q_point = p[qp];
+                  // Compute hex shape functions as a tensor-product
+                  const Real xi   = q_point(0);
+                  const Real eta  = q_point(1);
+                  const Real zeta = q_point(2);
+
+                  // one_d_shapes[dim][i] = phi_i(p(dim))
+                  Real one_d_shapes[3][2] = {
+                    {fe_lagrange_1D_linear_shape(0, xi),
+                     fe_lagrange_1D_linear_shape(1, xi)},
+                    {fe_lagrange_1D_linear_shape(0, eta),
+                     fe_lagrange_1D_linear_shape(1, eta)},
+                    {fe_lagrange_1D_linear_shape(0, zeta),
+                     fe_lagrange_1D_linear_shape(1, zeta)}};
+
+                  // one_d_derivs[dim][i] = dphi_i/dxi(p(dim))
+                  Real one_d_derivs[3][2] = {
+                    {fe_lagrange_1D_linear_shape_deriv(0, 0, xi),
+                     fe_lagrange_1D_linear_shape_deriv(1, 0, xi)},
+                    {fe_lagrange_1D_linear_shape_deriv(0, 0, eta),
+                     fe_lagrange_1D_linear_shape_deriv(1, 0, eta)},
+                    {fe_lagrange_1D_linear_shape_deriv(0, 0, zeta),
+                     fe_lagrange_1D_linear_shape_deriv(1, 0, zeta)}};
+
+                    for (unsigned int i : make_range(n_sf))
+                      {
+                        (*comps[0])[i][qp] = one_d_derivs[0][i0[i]] *
+                                             one_d_shapes[1][i1[i]] *
+                                             one_d_shapes[2][i2[i]];
+                        (*comps[1])[i][qp] = one_d_shapes[0][i0[i]] *
+                                             one_d_derivs[1][i1[i]] *
+                                             one_d_shapes[2][i2[i]];
+                        (*comps[2])[i][qp] = one_d_shapes[0][i0[i]] *
+                                             one_d_shapes[1][i1[i]] *
+                                             one_d_derivs[2][i2[i]];
+                      }
+                }
+              return;
+            }
+
+          default:
+            libmesh_error(); // How did we get here?
+          }
+      }
+
+
+      // quadratic Lagrange shape functions
+    case SECOND:
+      {
+        switch (type)
+          {
+            // triquadratic hexahedral shape functions
+          case HEX8:
+// TODO: refactor to optimize this
+//            libmesh_assert_msg(T == L2_LAGRANGE,
+//                               "High order on first order elements only supported for L2 families");
+            libmesh_fallthrough();
+          case HEX27:
+            {
+              libmesh_assert_less_equal (n_sf, 27);
+
+              // The only way to make any sense of this
+              // is to look at the mgflo/mg2/mgf documentation
+              // and make the cut-out cube!
+              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
+              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
+              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
+
+              for (auto qp : index_range(p))
+                {
+                  const Point & q_point = p[qp];
+                  // Compute hex shape functions as a tensor-product
+                  const Real xi   = q_point(0);
+                  const Real eta  = q_point(1);
+                  const Real zeta = q_point(2);
+
+                  // one_d_shapes[dim][i] = phi_i(p(dim))
+                  Real one_d_shapes[3][3] = {
+                    {fe_lagrange_1D_quadratic_shape(0, xi),
+                     fe_lagrange_1D_quadratic_shape(1, xi),
+                     fe_lagrange_1D_quadratic_shape(2, xi)},
+                    {fe_lagrange_1D_quadratic_shape(0, eta),
+                     fe_lagrange_1D_quadratic_shape(1, eta),
+                     fe_lagrange_1D_quadratic_shape(2, eta)},
+                    {fe_lagrange_1D_quadratic_shape(0, zeta),
+                     fe_lagrange_1D_quadratic_shape(1, zeta),
+                     fe_lagrange_1D_quadratic_shape(2, zeta)}};
+
+                  // one_d_derivs[dim][i] = dphi_i/dxi(p(dim))
+                  Real one_d_derivs[3][3] = {
+                    {fe_lagrange_1D_quadratic_shape_deriv(0, 0, xi),
+                     fe_lagrange_1D_quadratic_shape_deriv(1, 0, xi),
+                     fe_lagrange_1D_quadratic_shape_deriv(2, 0, xi)},
+                    {fe_lagrange_1D_quadratic_shape_deriv(0, 0, eta),
+                     fe_lagrange_1D_quadratic_shape_deriv(1, 0, eta),
+                     fe_lagrange_1D_quadratic_shape_deriv(2, 0, eta)},
+                    {fe_lagrange_1D_quadratic_shape_deriv(0, 0, zeta),
+                     fe_lagrange_1D_quadratic_shape_deriv(1, 0, zeta),
+                     fe_lagrange_1D_quadratic_shape_deriv(2, 0, zeta)}};
+
+                    for (unsigned int i : make_range(n_sf))
+                      {
+                        (*comps[0])[i][qp] = one_d_derivs[0][i0[i]] *
+                                             one_d_shapes[1][i1[i]] *
+                                             one_d_shapes[2][i2[i]];
+                        (*comps[1])[i][qp] = one_d_shapes[0][i0[i]] *
+                                             one_d_derivs[1][i1[i]] *
+                                             one_d_shapes[2][i2[i]];
+                        (*comps[2])[i][qp] = one_d_shapes[0][i0[i]] *
+                                             one_d_shapes[1][i1[i]] *
+                                             one_d_derivs[2][i2[i]];
+                      }
+                }
+              return;
+            }
+
+          default:
+            libmesh_error(); // How did we get here?
+          }
+      }
+
+      // unsupported order
+    default:
+      libmesh_error_msg("ERROR: Unsupported 3D FE order on HEX!: " << o);
+    }
+#else // LIBMESH_DIM != 3
+  libmesh_ignore(elem, o, p, v, add_p_level);
+  libmesh_not_implemented();
+#endif // LIBMESH_DIM == 3
+}
+
+
 
 
 template <>

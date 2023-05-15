@@ -249,6 +249,22 @@ public:
                            std::vector<OutputShape> & v,
                            const bool add_p_level = true);
 
+  /**
+   * Fills \p comps with dphidxi (and in higher dimensions, eta/zeta)
+   * derivative component values for all shape functions, evaluated at
+   * all points in p.  You must specify element order directly.
+   * Output component arrays in \p comps should already be the
+   * appropriate size.
+   *
+   * On a p-refined element, \p o should be the base order of the
+   * element if \p add_p_level is left \p true, or can be the base
+   * order of the element if \p add_p_level is set to \p false.
+   */
+  static void all_shape_derivs(const Elem * elem,
+                               const Order o,
+                               const std::vector<Point> & p,
+                               std::vector<std::vector<OutputShape>> * comps[3],
+                               const bool add_p_level = true);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -614,27 +630,13 @@ protected:
                                     const Elem * e);
 
   /**
-   * Fills \p dphidxi (and in higher dimensions, eta/zeta) derivative
-   * values for all shape functions, evaluated at all points in p.
-   * You must specify element order directly.  \p Internal arrays
-   * should already be the appropriate size.
-   *
-   * On a p-refined element, \p o should be the base order of the
-   * element if \p add_p_level is left \p true, or can be the base
-   * order of the element if \p add_p_level is set to \p false.
-   */
-  void all_shape_derivs(const Elem * elem,
-                        const Order o,
-                        const std::vector<Point> & p,
-                        const bool add_p_level = true);
-
-  /**
    * A default implementation for all_shape_derivs
    */
-  void default_all_shape_derivs (const Elem * elem,
-                                 const Order o,
-                                 const std::vector<Point> & p,
-                                 const bool add_p_level = true);
+  static void default_all_shape_derivs (const Elem * elem,
+                                        const Order o,
+                                        const std::vector<Point> & p,
+                                        std::vector<std::vector<OutputShape>> * comps[3],
+                                        const bool add_p_level = true);
 
 
   /**
@@ -1423,10 +1425,11 @@ void rational_all_shapes (const Elem & elem,
                           std::vector<std::vector<Real>> & v,
                           const bool add_p_level);
 
+template <typename OutputShape>
 void rational_all_shape_derivs (const Elem & elem,
                                 const FEType underlying_fe_type,
                                 const std::vector<Point> & p,
-                                std::vector<std::vector<Real>> * comps[3],
+                                std::vector<std::vector<OutputShape>> * comps[3],
                                 const bool add_p_level);
 
 } // namespace libMesh
@@ -1476,10 +1479,11 @@ void FE<MyDim,MyType>::all_shape_derivs              \
   (const Elem * elem,                                \
    const Order o,                                    \
    const std::vector<Point> & p,                     \
+   std::vector<std::vector<OutputShape>> * comps[3], \
    const bool add_p_level)                           \
 {                                                    \
-  this->default_all_shape_derivs                     \
-    (elem,o,p,add_p_level);                          \
+  FE<MyDim,MyType>::default_all_shape_derivs         \
+    (elem,o,p,comps,add_p_level);                    \
 }
 
 

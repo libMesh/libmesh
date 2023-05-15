@@ -50,7 +50,7 @@
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::init_base_shape_functions(const std::vector<Point> &, const Elem *); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point> &, const Elem *); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::init_dual_shape_functions(unsigned int, unsigned int); \
-  template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::default_all_shape_derivs (const Elem * elem, const Order o, const std::vector<Point> & p, const bool add_p_level); \
+  template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::default_all_shape_derivs (const Elem * elem, const Order o, const std::vector<Point> & p, std::vector<std::vector<Real>> * comps[3], const bool add_p_level); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::default_side_nodal_soln(const Elem * elem, const Order o, const unsigned int side, const std::vector<Number> & elem_soln, std::vector<Number> & nodal_soln_on_side)
 
 #else // LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -63,7 +63,7 @@
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::reinit(const Elem *,const std::vector<Point> * const,const std::vector<Real> * const); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point> &, const Elem *); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::init_dual_shape_functions(unsigned int, unsigned int); \
-  template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::default_all_shape_derivs (const Elem * elem, const Order o, const std::vector<Point> & p, const bool add_p_level); \
+  template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::default_all_shape_derivs (const Elem * elem, const Order o, const std::vector<Point> & p, std::vector<std::vector<Real>> * comps[3], const bool add_p_level); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::default_side_nodal_soln(const Elem * elem, const Order o, const unsigned int side, const std::vector<Number> & elem_soln, std::vector<Number> & nodal_soln_on_side)
 
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS

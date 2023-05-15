@@ -224,12 +224,10 @@ void
 FE<1,RATIONAL_BERNSTEIN>::all_shape_derivs (const Elem * elem,
                                             const Order o,
                                             const std::vector<Point> & p,
+                                            std::vector<std::vector<Real>> * comps[3],
                                             const bool add_p_level)
 {
   FEType underlying_fe_type(o, _underlying_fe_family);
-
-  std::vector<std::vector<Real>> * comps[3]
-    { &this->dphidxi, &this->dphideta, &this->dphidzeta };
 
   rational_all_shape_derivs (*elem, underlying_fe_type, p,
                              comps, add_p_level);

@@ -598,6 +598,14 @@ public:
                            std::vector<OutputType> & dphi,
                            const bool add_p_level = true);
 
+  template<typename OutputType>
+  static void all_shape_derivs(const unsigned int dim,
+                               const FEType & fe_t,
+                               const Elem * elem,
+                               const std::vector<Point> & p,
+                               std::vector<std::vector<OutputType>> * comps[3],
+                               const bool add_p_level = true);
+
   /**
    * Typedef for pointer to a function that returns FE shape function derivative values.
    * The \p p_level() of the passed-in \p elem is accounted for internally when

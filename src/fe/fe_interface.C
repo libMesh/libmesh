@@ -1734,6 +1734,52 @@ void FEInterface::shape_derivs<Real>(const FEType & fe_t,
 
 
 
+// Only instantiating Real because we don't expect vector-valued
+// mapping functions, and that's what's using this interface.
+template<>
+void FEInterface::all_shape_derivs<Real>(const unsigned int dim,
+                                         const FEType & fe_t,
+                                         const Elem * elem,
+                                         const std::vector<Point> & p,
+                                         std::vector<std::vector<Real>> * comps[3],
+                                         const bool add_p_level)
+{
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if (elem && is_InfFE_elem(elem->type()))
+    {
+      for (auto j : make_range(dim))
+        for (auto i : index_range(*comps[j]))
+          FEInterface::shape_derivs<Real>(fe_t, elem, i, j, p, (*comps[j])[i], add_p_level);
+      return;
+    }
+#endif
+
+  const Order o = fe_t.order;
+
+  switch(dim)
+    {
+    case 0:
+      fe_scalar_vec_error_switch(0, all_shape_derivs(elem,o,p,comps,add_p_level), , ; return;);
+      break;
+    case 1:
+      fe_scalar_vec_error_switch(1, all_shape_derivs(elem,o,p,comps,add_p_level), , ; return;);
+      break;
+    case 2:
+      fe_scalar_vec_error_switch(2, all_shape_derivs(elem,o,p,comps,add_p_level), , ; return;);
+      break;
+    case 3:
+      fe_scalar_vec_error_switch(3, all_shape_derivs(elem,o,p,comps,add_p_level), , ; return;);
+      break;
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
+    }
+
+  return;
+}
+
+
+
 template<>
 void FEInterface::shape_derivs<RealGradient>(const FEType & fe_t,
                                              const Elem * elem,
