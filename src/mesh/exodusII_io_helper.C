@@ -2415,29 +2415,28 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
         num_nodes += elem->n_nodes();
     }
 
-  std::vector<boundary_id_type> unique_side_boundaries;
+  std::set<boundary_id_type> unique_side_boundaries;
   std::vector<boundary_id_type> unique_node_boundaries;
 
-  bi.build_side_boundary_ids(unique_side_boundaries);
+  // Build set of unique sideset (+shellface) ids
   {
+    // Start with "side" boundaries (i.e. of 3D elements)
+    std::vector<boundary_id_type> side_boundaries;
+    bi.build_side_boundary_ids(side_boundaries);
+    unique_side_boundaries.insert(side_boundaries.begin(), side_boundaries.end());
+
     // Add shell face boundaries to the list of side boundaries, since ExodusII
     // treats these the same way.
     std::vector<boundary_id_type> shellface_boundaries;
     bi.build_shellface_boundary_ids(shellface_boundaries);
-    for (const auto & id : shellface_boundaries)
-      unique_side_boundaries.push_back(id);
+    unique_side_boundaries.insert(shellface_boundaries.begin(), shellface_boundaries.end());
+
+    // Add any empty-but-named side boundary ids
+    for (const auto & pr : bi.get_sideset_name_map())
+      unique_side_boundaries.insert(pr.first);
   }
-  // Add any empty-but-named side boundary ids
-  for (const auto & pair : bi.get_sideset_name_map())
-    {
-      const boundary_id_type id = pair.first;
 
-      if (std::find(unique_side_boundaries.begin(),
-                    unique_side_boundaries.end(), id)
-            == unique_side_boundaries.end())
-        unique_side_boundaries.push_back(id);
-    }
-
+  // Build set of unique nodeset ids
   bi.build_node_boundary_ids(unique_node_boundaries);
   for (const auto & pair : bi.get_nodeset_name_map())
     {
@@ -3121,14 +3120,14 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  // Maps from sideset id to the element and sides
-  std::map<int, std::vector<int>> elem;
-  std::map<int, std::vector<int>> side;
-  std::vector<boundary_id_type> side_boundary_ids;
+  // Maps from sideset id to lists of corresponding element ids and side ids
+  std::map<int, std::vector<int>> elem_lists;
+  std::map<int, std::vector<int>> side_lists;
+  std::set<boundary_id_type> side_boundary_ids;
 
   {
     // Accumulate the vectors to pass into ex_put_side_set
-    // build_side_list() returns a vector of (elem, side, bc) tuples.
+    // build_side_lists() returns a vector of (elem, side, bc) tuples.
     for (const auto & t : mesh.get_boundary_info().build_side_list())
       {
         std::vector<const Elem *> family;
@@ -3148,12 +3147,14 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
             // Use the libmesh to exodus data structure map to get the proper sideset IDs
             // The data structure contains the "collapsed" contiguous ids
-            elem[std::get<2>(t)].push_back(libmesh_elem_num_to_exodus[f->id()]);
-            side[std::get<2>(t)].push_back(conv.get_inverse_side_map(std::get<1>(t)));
+            elem_lists[std::get<2>(t)].push_back(libmesh_elem_num_to_exodus[f->id()]);
+            side_lists[std::get<2>(t)].push_back(conv.get_inverse_side_map(std::get<1>(t)));
           }
       }
 
-    mesh.get_boundary_info().build_side_boundary_ids(side_boundary_ids);
+    std::vector<boundary_id_type> tmp;
+    mesh.get_boundary_info().build_side_boundary_ids(tmp);
+    side_boundary_ids.insert(tmp.begin(), tmp.end());
   }
 
   {
@@ -3179,27 +3180,19 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
             // Use the libmesh to exodus data structure map to get the proper sideset IDs
             // The data structure contains the "collapsed" contiguous ids
-            elem[std::get<2>(t)].push_back(libmesh_elem_num_to_exodus[f->id()]);
-            side[std::get<2>(t)].push_back(conv.get_inverse_shellface_map(std::get<1>(t)));
+            elem_lists[std::get<2>(t)].push_back(libmesh_elem_num_to_exodus[f->id()]);
+            side_lists[std::get<2>(t)].push_back(conv.get_inverse_shellface_map(std::get<1>(t)));
           }
       }
 
-    std::vector<boundary_id_type> shellface_boundary_ids;
-    mesh.get_boundary_info().build_shellface_boundary_ids(shellface_boundary_ids);
-    for (const auto & id : shellface_boundary_ids)
-      side_boundary_ids.push_back(id);
+    std::vector<boundary_id_type> tmp;
+    mesh.get_boundary_info().build_shellface_boundary_ids(tmp);
+    side_boundary_ids.insert(tmp.begin(), tmp.end());
   }
 
   // Add any empty-but-named side boundary ids
-  for (const auto & pair : mesh.get_boundary_info().get_sideset_name_map())
-    {
-      const boundary_id_type id = pair.first;
-
-      if (std::find(side_boundary_ids.begin(),
-                    side_boundary_ids.end(), id)
-            == side_boundary_ids.end())
-        side_boundary_ids.push_back(id);
-    }
+  for (const auto & pr : mesh.get_boundary_info().get_sideset_name_map())
+    side_boundary_ids.insert(pr.first);
 
   // Write out the sideset names, but only if there is something to write
   if (side_boundary_ids.size() > 0)
@@ -3208,9 +3201,10 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
       std::vector<exII::ex_set> sets(side_boundary_ids.size());
 
-      for (auto i : index_range(side_boundary_ids))
+      // Loop over "side_boundary_ids" and "sets" simultaneously
+      for (auto [i, it] = std::tuple{0u, side_boundary_ids.begin()}; i<sets.size(); ++i, ++it)
         {
-          boundary_id_type ss_id = side_boundary_ids[i];
+          boundary_id_type ss_id = *it;
           names_table.push_back_entry(mesh.get_boundary_info().get_sideset_name(ss_id));
 
           sets[i].id = ss_id;
@@ -3218,8 +3212,8 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
           sets[i].num_distribution_factor = 0;
           sets[i].distribution_factor_list = nullptr;
 
-          auto elem_it = elem.find(ss_id);
-          if (elem_it == elem.end())
+          auto elem_it = elem_lists.find(ss_id);
+          if (elem_it == elem_lists.end())
             {
               sets[i].num_entry = 0;
               sets[i].entry_list = nullptr;
@@ -3229,7 +3223,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
             {
               sets[i].num_entry = elem_it->second.size();
               sets[i].entry_list = elem_it->second.data();
-              sets[i].extra_list = libmesh_map_find(side, ss_id).data();
+              sets[i].extra_list = libmesh_map_find(side_lists, ss_id).data();
             }
         }
 
