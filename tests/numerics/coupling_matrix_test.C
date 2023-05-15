@@ -169,7 +169,7 @@ private:
         for (unsigned int pj = 0; pj != sizeof(jvals)/isize; ++pj)
           {
             CPPUNIT_ASSERT(ccr_it != ccr.end());
-            CPPUNIT_ASSERT_EQUAL((unsigned int) *ccr_it, jvals[pj]);
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(*ccr_it), jvals[pj]);
             ++ccr_it;
           }
 

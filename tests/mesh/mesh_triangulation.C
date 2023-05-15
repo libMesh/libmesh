@@ -278,7 +278,7 @@ public:
 
     triangulator.triangulate();
 
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(2));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), static_cast<dof_id_type>(2));
     for (const auto & elem : mesh.element_ptr_range())
       {
         CPPUNIT_ASSERT_EQUAL(elem->type(), TRI3);
@@ -452,7 +452,7 @@ public:
 
     triangulator.triangulate();
 
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(8));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), static_cast<dof_id_type>(8));
 
     // Center coordinates for all the elements we expect
     Real r2p2o6 = (std::sqrt(Real(2))+2)/6;
@@ -498,7 +498,7 @@ public:
 
     triangulator.triangulate();
 
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(12));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), static_cast<dof_id_type>(12));
 
     // Center coordinates for all the elements we expect
     std::vector <Point> expected_centers

@@ -302,9 +302,9 @@ public:
     mesh.prepare_for_use();
 
     // 5^3 spline nodes + 7^3 Rational Bezier nodes
-    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(468));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), static_cast<dof_id_type>(468));
     // 5^3 spline elements + 3^3 Rational Bezier elements
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(),  dof_id_type(152));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(),  static_cast<dof_id_type>(152));
 
     // Check that we see the boundary ids we expect
     BoundaryInfo & bi = mesh.get_boundary_info();
@@ -1236,8 +1236,8 @@ public:
 
       nem.read("test_nemesis_read.nem");
       mesh.prepare_for_use();
-      CPPUNIT_ASSERT_EQUAL(mesh.n_elem(),  dof_id_type(9));
-      CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(16));
+      CPPUNIT_ASSERT_EQUAL(mesh.n_elem(),  static_cast<dof_id_type>(9));
+      CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), static_cast<dof_id_type>(16));
     }
   }
 
@@ -1350,8 +1350,8 @@ public:
 
     // We have 1 QUAD9 finite element, attached via a trivial map to 9
     // spline Node+NodeElem objects
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(10));
-    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(18));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(),  static_cast<dof_id_type>(10));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), static_cast<dof_id_type>(18));
 
     helperTestingDynaQuad(mesh);
   }
@@ -1372,8 +1372,8 @@ public:
     mesh.prepare_for_use();
 
     // Mesh should contain 1 TET10 finite element
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(1));
-    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(10));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(),  static_cast<dof_id_type>(1));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), static_cast<dof_id_type>(10));
 
     // Element should have TET10 reference element volume
     const Elem * const elem = mesh.query_elem_ptr(0);
@@ -1411,8 +1411,8 @@ public:
     mesh.prepare_for_use();
 
     // We have 1 QUAD9 finite element
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(1));
-    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(9));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(),  static_cast<dof_id_type>(1));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), static_cast<dof_id_type>(9));
 
     helperTestingDynaQuad(mesh);
   }
@@ -1433,8 +1433,8 @@ public:
 
     // We have 5^2 QUAD9 elements, with 11^2 nodes,
     // tied to 49 Node/NodeElem spline nodes
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(25+49));
-    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(121+49));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(),  static_cast<dof_id_type>(25+49));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), static_cast<dof_id_type>(121+49));
 
     CPPUNIT_ASSERT_EQUAL(mesh.default_mapping_type(),
                          RATIONAL_BERNSTEIN_MAP);
@@ -1477,7 +1477,7 @@ public:
     es.init();
 
     // We should have a constraint on every FE dof
-    CPPUNIT_ASSERT_EQUAL(sys.get_dof_map().n_constrained_dofs(), dof_id_type(121));
+    CPPUNIT_ASSERT_EQUAL(sys.get_dof_map().n_constrained_dofs(), static_cast<dof_id_type>(121));
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 #endif // LIBMESH_HAVE_SOLVER
   }

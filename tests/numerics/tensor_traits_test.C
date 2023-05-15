@@ -18,13 +18,13 @@ public:
     {
       LOG_UNIT_TEST;
 
-      CPPUNIT_ASSERT_EQUAL((unsigned char)0, TensorTraits<Real>::rank);
-      CPPUNIT_ASSERT_EQUAL((unsigned char)1, TensorTraits<VectorValue<Real>>::rank);
-      CPPUNIT_ASSERT_EQUAL((unsigned char)1, TensorTraits<TypeVector<Real>>::rank);
-      CPPUNIT_ASSERT_EQUAL((unsigned char)2, TensorTraits<TensorValue<Real>>::rank);
-      CPPUNIT_ASSERT_EQUAL((unsigned char)2, TensorTraits<TypeTensor<Real>>::rank);
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(0), TensorTraits<Real>::rank);
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(1), TensorTraits<VectorValue<Real>>::rank);
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(1), TensorTraits<TypeVector<Real>>::rank);
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(2), TensorTraits<TensorValue<Real>>::rank);
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(2), TensorTraits<TypeTensor<Real>>::rank);
       typedef TypeNTensor<3, Real> TypeNTensorTestType;
-      CPPUNIT_ASSERT_EQUAL((unsigned char)3, TensorTraits<TypeNTensorTestType>::rank);
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(3), TensorTraits<TypeNTensorTestType>::rank);
     }
 };
 

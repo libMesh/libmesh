@@ -47,7 +47,7 @@ class OverlappingCouplingFunctor : public GhostingFunctor
   {
     // This is a highly specalized coupling functor where we are assuming
     // only two subdomains that are overlapping so make sure there's only two.
-    CPPUNIT_ASSERT_EQUAL(2, (int)_mesh.n_subdomains());
+    CPPUNIT_ASSERT_EQUAL(2, static_cast<int>(_mesh.n_subdomains()));
 
     // We're assuming a specific set of subdomain ids
     std::set<subdomain_id_type> ids;
@@ -446,8 +446,8 @@ private:
     dof_id_type n_elems_subdomain_two = std::distance( _mesh->active_subdomain_elements_begin(2),
                                                        _mesh->active_subdomain_elements_end(2) );
 
-    CPPUNIT_ASSERT_EQUAL( n_elems_subdomain_two, (dof_id_type) subdomain_one_couplings.size() );
-    CPPUNIT_ASSERT_EQUAL( dof_id_type(2*n_elems_subdomain_two), (dof_id_type) subdomain_two_couplings.size() );
+    CPPUNIT_ASSERT_EQUAL(n_elems_subdomain_two, static_cast<dof_id_type>(subdomain_one_couplings.size()));
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2*n_elems_subdomain_two), static_cast<dof_id_type>(subdomain_two_couplings.size()));
   }
 
   void run_partitioner_test(unsigned int n_refinements)
@@ -474,8 +474,8 @@ private:
     // Everyone should be on the same processor if only 1 processor
     if( system.n_processors() == 1 )
       {
-        CPPUNIT_ASSERT_EQUAL( 1, (int)sub_one_proc_ids.size() );
-        CPPUNIT_ASSERT_EQUAL( 1, (int)sub_two_proc_ids.size() );
+        CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(sub_one_proc_ids.size()));
+        CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(sub_two_proc_ids.size()));
         CPPUNIT_ASSERT( sub_one_proc_ids == sub_two_proc_ids );
       }
     // Otherwise these sets should be disjoint
@@ -586,7 +586,7 @@ private:
     for (const auto & elem : _mesh->active_local_subdomain_elements_ptr_range(2))
       {
         // A little extra unit testing on the range iterator
-        CPPUNIT_ASSERT_EQUAL(2, (int)elem->subdomain_id());
+        CPPUNIT_ASSERT_EQUAL(2, static_cast<int>(elem->subdomain_id()));
 
         subdomain_one_context.get_element_fe(u_var)->get_nothing(); // for this unit test
         const std::vector<libMesh::Point> & qpoints = subdomain_two_context.get_element_fe(u_var)->get_xyz();
@@ -735,7 +735,7 @@ private:
     for (const auto & elem : _mesh->active_local_subdomain_elements_ptr_range(2))
       {
         // A little extra unit testing on the range iterator
-        CPPUNIT_ASSERT_EQUAL(2, (int)elem->subdomain_id());
+        CPPUNIT_ASSERT_EQUAL(2, static_cast<int>(elem->subdomain_id()));
 
         const std::vector<libMesh::Point> & qpoints = subdomain_two_context.get_element_fe(u_var)->get_xyz();
 

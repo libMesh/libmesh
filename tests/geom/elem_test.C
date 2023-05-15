@@ -458,29 +458,29 @@ public:
       for (const auto s : elem->side_index_range())
         {
           if (elem->type() == EDGE2 || elem->type() == EDGE3 || elem->type() == EDGE4)
-            CPPUNIT_ASSERT_EQUAL((unsigned int)s, elem->center_node_on_side(s));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(s), elem->center_node_on_side(s));
           else if (elem->type() == TRI6 || elem->type() == TRI7)
-            CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 3), elem->center_node_on_side(s));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(s + 3), elem->center_node_on_side(s));
           else if (elem->type() == QUAD8 || elem->type() == QUAD9 || elem->type() == QUADSHELL8)
-            CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 4), elem->center_node_on_side(s));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(s + 4), elem->center_node_on_side(s));
           else if (elem->type() == HEX27)
-            CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 20), elem->center_node_on_side(s));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(s + 20), elem->center_node_on_side(s));
           else if (elem->type() == PRISM18 && s >= 1 && s <= 3)
-            CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 14), elem->center_node_on_side(s));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(s + 14), elem->center_node_on_side(s));
           else if ((elem->type() == PRISM20 ||
                     elem->type() == PRISM21) && s >= 1 && s <= 3)
-            CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 14), elem->center_node_on_side(s));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(s + 14), elem->center_node_on_side(s));
           else if (elem->type() == PRISM20 ||
                    elem->type() == PRISM21)
-            CPPUNIT_ASSERT_EQUAL((unsigned int)(18 + (s == 4)), elem->center_node_on_side(s));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(18 + (s == 4)), elem->center_node_on_side(s));
           else if (elem->type() == PYRAMID14 && s == 4)
-            CPPUNIT_ASSERT_EQUAL((unsigned int)(13), elem->center_node_on_side(s));
+            CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(13), elem->center_node_on_side(s));
           else if (elem->type() == PYRAMID18)
             {
               if (s < 4)
-                CPPUNIT_ASSERT_EQUAL((unsigned int)(s + 14), elem->center_node_on_side(s));
+                CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(s + 14), elem->center_node_on_side(s));
               else
-                CPPUNIT_ASSERT_EQUAL((unsigned int)(13), elem->center_node_on_side(s));
+                CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(13), elem->center_node_on_side(s));
             }
           else
             CPPUNIT_ASSERT_EQUAL(invalid_uint, elem->center_node_on_side(s));

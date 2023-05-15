@@ -99,7 +99,7 @@ public:
 
     CPPUNIT_ASSERT( input.have_variable("Section2/Subsection4/var6") );
     unsigned int var6 = input("Section2/Subsection4/var6", 21);
-    CPPUNIT_ASSERT_EQUAL( var6, (unsigned int)42 );
+    CPPUNIT_ASSERT_EQUAL(var6, static_cast<unsigned int>(42));
 
     // We didn't use Section3/unused_var so it should be a UFO
     std::vector<std::string> ufos = input.unidentified_variables();

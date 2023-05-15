@@ -60,7 +60,7 @@ public:
     std::set<subdomain_id_type> actual_ids;
     for (auto & elem : mesh->active_element_ptr_range())
       {
-        CPPUNIT_ASSERT(elem->id() < (dof_id_type)Elem::invalid_subdomain_id);
+        CPPUNIT_ASSERT(elem->id() < static_cast<dof_id_type>(Elem::invalid_subdomain_id));
         actual_ids.insert((subdomain_id_type)elem->id());
         elem->subdomain_id() = (subdomain_id_type)elem->id();
       }

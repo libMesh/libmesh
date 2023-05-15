@@ -656,7 +656,7 @@ public:
 
     if (mesh->n_active_local_elem())
     {
-      CPPUNIT_ASSERT_EQUAL((unsigned int) 2, count);
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), count);
       CPPUNIT_ASSERT(bi.is_children_on_boundary_side());
     }
 
@@ -838,8 +838,8 @@ public:
       {
         const auto side_5 = bi.side_with_boundary_id(elem, 5);
         const auto side_6 = bi.side_with_boundary_id(elem, 6);
-        CPPUNIT_ASSERT_EQUAL((unsigned int) 1, side_5);
-        CPPUNIT_ASSERT_EQUAL((unsigned int) 1, side_6);
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), side_5);
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), side_6);
       }
     }
 
@@ -852,9 +852,9 @@ public:
       if (c(0) < 0.5 && c(0) > 0.25 && c(1) > 0.25 && c(1) < 0.5)
       {
         const auto sides = bi.sides_with_boundary_id(elem, 5);
-        CPPUNIT_ASSERT_EQUAL((unsigned long) 2, sides.size());
-        CPPUNIT_ASSERT_EQUAL((unsigned int) 1, sides[0]);
-        CPPUNIT_ASSERT_EQUAL((unsigned int) 2, sides[1]);
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned long>(2), sides.size());
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), sides[0]);
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), sides[1]);
       }
     }
   }

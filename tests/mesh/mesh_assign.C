@@ -162,7 +162,7 @@ public:
           mesh_two->clear();
 
           // Assert that the moved into mesh has the right number of elements.
-          CPPUNIT_ASSERT_EQUAL(system.get_mesh().n_elem(), dof_id_type(20));
+          CPPUNIT_ASSERT_EQUAL(system.get_mesh().n_elem(), static_cast<dof_id_type>(20));
 
           CPPUNIT_ASSERT(system.get_mesh() == *mesh_two_clone);
 
@@ -193,7 +193,7 @@ public:
           mesh_two->clear();
 
           // Assert that the moved into mesh has the right number of elements.
-          CPPUNIT_ASSERT_EQUAL(system.get_mesh().n_elem(), dof_id_type(42));
+          CPPUNIT_ASSERT_EQUAL(system.get_mesh().n_elem(), static_cast<dof_id_type>(42));
 
           CPPUNIT_ASSERT(system.get_mesh() == *mesh_two_clone);
 

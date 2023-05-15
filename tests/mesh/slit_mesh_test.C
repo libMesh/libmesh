@@ -192,10 +192,10 @@ public:
     LOG_UNIT_TEST;
 
     // There'd better be 8 elements
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)8, _mesh->n_elem() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(8), _mesh->n_elem());
 
     // There'd better still be a full 16 nodes
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)16, _mesh->n_nodes() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(16), _mesh->n_nodes());
 
     /* The middle nodes should still be distinct between the top and
      * bottom elements */
@@ -252,11 +252,11 @@ public:
 
 #ifdef LIBMESH_ENABLE_AMR
     // We should have 40 total and 32 active elements.
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)40, _mesh->n_elem() );
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)32, _mesh->n_active_elem() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(40), _mesh->n_elem());
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(32), _mesh->n_active_elem());
 
     // We should have 48 nodes, not 45 or 46
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)48, _mesh->n_nodes() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(48), _mesh->n_nodes());
 #endif
   }
 };
@@ -323,11 +323,11 @@ public:
 
 #ifdef LIBMESH_ENABLE_AMR
     // We should have 168 total and 128 active elements.
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)(8+32+128), _mesh->n_elem() );
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)128, _mesh->n_active_elem() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(8+32+128), _mesh->n_elem());
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(128), _mesh->n_active_elem());
 
     // We should have 160 nodes
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)160, _mesh->n_nodes() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(160), _mesh->n_nodes());
 #endif
   }
 
