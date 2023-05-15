@@ -27,6 +27,7 @@
 #include <string>
 #include <map>
 #include <set>
+#include <vector>
 
 namespace libMesh
 {
@@ -63,31 +64,98 @@ public:
    */
   RBParameters(const std::map<std::string, Real> & parameter_map);
 
-  // Define a constant iterator for this class
-  typedef std::map<std::string, Real>::const_iterator const_iterator;
+  /**
+   * Define a constant iterator for this class. This custom iterator
+   * design is copied from the chunked_mapvector class.
+   */
+  class const_iterator
+  {
+  public:
+    // Underlying iterator type, must match the container type of _parameters.
+    typedef std::map<std::string, std::vector<Real>>::const_iterator MapIter;
+
+    // Constructor
+    const_iterator(const MapIter & it,
+                   const std::size_t vec_index)
+      : _it(it),
+        _vec_index(vec_index)
+    {}
+
+    // Copy ctor
+    const_iterator(const const_iterator & i) = default;
+
+    // Prefix increment operator "++it"
+    const_iterator & operator++()
+    {
+      // First increment the vector index
+      ++_vec_index;
+
+      // If _vec_index goes past the current vector, start at beginning of next one
+      if (_vec_index >= _it->second.size())
+        {
+          _vec_index = 0;
+          ++_it;
+        }
+
+      return *this;
+    }
+
+    // Postfix increment operator "it++". This is actually less
+    // efficient than doing the prefix increment, so if nothing
+    // requires it, let's skip defining it.
+    // const_iterator operator++(int)
+    // {
+    //   const_iterator i = *this;
+    //   ++(*this);
+    //   return i;
+    // }
+
+    // Dereference operator - returns a const reference to the value
+    // indexed by it and _vec_index. Note: this is needed for backwards
+    // compatibility but it is not the most efficient thing since we
+    // need to construct a std::pair every time we dereference a
+    // const_iterator.
+    const std::pair<std::string, Real> &
+    operator*() const
+    {
+      _emulator = std::make_pair(_it->first, _it->second[_vec_index]);
+      return _emulator;
+    }
+
+    // Equivalence comparison operator.
+    bool operator==(const const_iterator & other) const
+    {
+      return (_it == other._it && _vec_index == other._vec_index);
+    }
+
+    // Non-equvialence comparison operator
+    bool operator!=(const const_iterator & other) const
+    {
+      return !(other == *this);
+    }
+
+  private:
+    // Give RBParameters access to our private members. At the moment
+    // this is not needed since the RBParameters class does not really
+    // need to know anything about the const_iterator once it has been
+    // created.
+    // friend class RBParameters;
+
+    // Iterator into real container
+    MapIter _it;
+
+    // Accompanying current vector index into it->second
+    std::size_t _vec_index;
+
+    // Returned by the operator* function. Emulates dereferencing a
+    // map<sring, Real> iterator.
+    mutable std::pair<std::string, Real> _emulator;
+  };
 
   /**
    * Clear this object.
    */
   void clear();
-
-  /**
-   * Get a const reference to the map that stores all of the values.
-   *
-   * This interface is \deprecated and will be removed soon. To iterate over
-   * the parameters map, you should instead use the begin/end APIs provided
-   * by this class.
-   */
-  const std::map<std::string, Real> & get_parameters_map() const;
-
-  /**
-   * Get a const reference to the map that stores all of the "extra" values.
-   *
-   * This interface is \deprecated and will be removed soon. To iterate over
-   * the parameters map, you should instead use the begin/end APIs provided
-   * by this class.
-   */
-  const std::map<std::string, Real> & get_extra_parameters_map() const;
 
   /**
    * \returns true if there is a parameter named "param_name" present
@@ -146,9 +214,10 @@ public:
    * Fill \p param_names with the names of the parameters.
    *
    * \deprecated to avoid making it too easy to create copies that in
-   * most circumstances aren't needed.  If this functionality really
-   * is required, call get_parameters_map() and loop over the keys
-   * directly.
+   * most circumstances aren't needed.  If you really need a list of
+   * the parameter names, the best approach is to iterate over this
+   * object using the begin()/end() APIs and build a std::set that
+   * way.
    */
   void get_parameter_names(std::set<std::string> & param_names) const;
 
@@ -156,9 +225,10 @@ public:
    * Fill \p param_names with the names of the extra parameters.
    *
    * \deprecated to avoid making it too easy to create copies that in
-   * most circumstances aren't needed.  If this functionality really
-   * is required, call get_parameters_map() and loop over the keys
-   * directly.
+   * most circumstances aren't needed.  If you really need a list of
+   * the parameter names, the best approach is to iterate over this
+   * object using the extra_begin()/extra_end() APIs and build a std::set that
+   * way.
    */
   void get_extra_parameter_names(std::set<std::string> & param_names) const;
 
@@ -211,15 +281,16 @@ public:
 private:
 
   /**
-   * The map that stores the actual parameters, indexed by names.
+   * The map that stores the actual parameter vectors. Each vector is
+   * indexed by a name.
    */
-  std::map<std::string, Real> _parameters;
+  std::map<std::string, std::vector<Real>> _parameters;
 
   /**
-   * The map that stores extra parameters not used for RB training, indexed by names.
+   * The map that stores extra parameter vectors not used for RB
+   * training. Each vector is indexed by a name.
    */
-  std::map<std::string, Real> _extra_parameters;
-
+  std::map<std::string, std::vector<Real>> _extra_parameters;
 };
 
 } // namespace libMesh
