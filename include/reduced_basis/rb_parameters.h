@@ -182,6 +182,19 @@ public:
   Real get_value(const std::string & param_name, const Real & default_val) const;
 
   /**
+   * Get the value of the specified parameter at the specified index,
+   * throwing an error if it does not exist.
+   */
+  Real get_value(const std::string & param_name, std::size_t index) const;
+
+  /**
+   * Get the value of the specified parameter at the specified index,
+   * returning the provided default value if either the parameter is
+   * not defined or the index is invalid.
+   */
+  Real get_value(const std::string & param_name, std::size_t index, const Real & default_val) const;
+
+  /**
    * Set the value of the specified parameter. If param_name
    * doesn't already exist, it is added to the RBParameters object.
    * For backwards compatibility, calling this function sets up

@@ -57,9 +57,7 @@ Real RBParameters::get_value(const std::string & param_name) const
   // This version of get_value() does not take an index and is provided
   // for backwards compatibility. It simply returns the [0]th entry of
   // the vector if it can, throwing an error otherwise.
-  const auto & vec = libmesh_map_find(_parameters, param_name);
-  libmesh_error_msg_if(vec.size() == 0, "Error getting value for parameter " << param_name);
-  return vec[0];
+  return this->get_value(param_name, /*index=*/static_cast<std::size_t>(0));
 }
 
 Real RBParameters::get_value(const std::string & param_name, const Real & default_val) const
@@ -67,8 +65,20 @@ Real RBParameters::get_value(const std::string & param_name, const Real & defaul
   // This version of get_value() does not take an index and is provided
   // for backwards compatibility. It simply returns the [0]th entry of
   // the vector if it can, or the default value otherwise.
+  return this->get_value(param_name, /*index=*/0, default_val);
+}
+
+Real RBParameters::get_value(const std::string & param_name, std::size_t index) const
+{
+  const auto & vec = libmesh_map_find(_parameters, param_name);
+  libmesh_error_msg_if(index >= vec.size(), "Error getting value for parameter " << param_name);
+  return vec[index];
+}
+
+Real RBParameters::get_value(const std::string & param_name, std::size_t index, const Real & default_val) const
+{
   auto it = _parameters.find(param_name);
-  return ((it != _parameters.end() && it->second.size() != 0) ? it->second[0] : default_val);
+  return ((it != _parameters.end() && index < it->second.size()) ? it->second[index] : default_val);
 }
 
 void RBParameters::set_value(const std::string & param_name, Real value)

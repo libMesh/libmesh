@@ -159,6 +159,22 @@ void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters>
   libMesh::out << "mus.size() = " << mus.size() << std::endl;
   libMesh::out << "n_points = " << n_points << std::endl;
 
+  // Debugging: A new feature is that each parameter stored in an
+  // RBParameters object can have multiple values defined in a vector.
+  // The following code iterates over each RBParameters object and
+  // checks the number of values it has.
+  {
+    std::map<std::string, unsigned int> num_values_per_param;
+    for (const auto & mu : mus)
+    {
+      for (const auto & pr : mu)
+        num_values_per_param[pr.first]++;
+    }
+
+    for (const auto & [param_name, nvals] : num_values_per_param)
+      libMesh::out << "Parameter " << param_name << " has " << nvals << " value(s)" << std::endl;
+  }
+
   output.resize(mus.size());
   for ( unsigned int mu_index : index_range(mus))
     {

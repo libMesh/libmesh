@@ -254,6 +254,12 @@ int main (int argc, char ** argv)
       RBParameters online_mu;
       online_mu.push_back_value("center_x", online_center_x);
       online_mu.push_back_value("center_y", online_center_y);
+
+      // Testing: Add secondary center_x and center_y values,
+      // corresponding to e.g. a different time step or load step.
+      online_mu.push_back_value("center_x", 0.5);
+      online_mu.push_back_value("center_y", 0.5);
+
       rb_eval.set_parameters(online_mu);
       rb_eval.print_parameters();
       rb_eval.rb_solve(rb_eval.get_n_basis_functions());
