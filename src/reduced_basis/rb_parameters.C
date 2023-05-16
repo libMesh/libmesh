@@ -27,27 +27,19 @@
 namespace libMesh
 {
 
-RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map) :
-  _parameters(parameter_map)
+RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map)
 {
+  // Backwards compatible support for constructing an RBParameters
+  // object from a map<string, Real>. We store a single entry in each
+  // vector in the map.
+  for (const auto & [key, val] : parameter_map)
+    _parameters[key] = {val};
 }
 
 void RBParameters::clear()
 {
   _parameters.clear();
   _extra_parameters.clear();
-}
-
-const std::map<std::string, Real> & RBParameters::get_parameters_map() const
-{
-  libmesh_deprecated();
-  return _parameters;
-}
-
-const std::map<std::string, Real> & RBParameters::get_extra_parameters_map() const
-{
-  libmesh_deprecated();
-  return _extra_parameters;
 }
 
 bool RBParameters::has_value(const std::string & param_name) const
@@ -62,36 +54,50 @@ bool RBParameters::has_extra_value(const std::string & param_name) const
 
 Real RBParameters::get_value(const std::string & param_name) const
 {
-  // find the parameter value, throwing an error if it doesn't exist.
-  return libmesh_map_find(_parameters, param_name);
+  // This version of get_value() does not take an index and is provided
+  // for backwards compatibility. It simply returns the [0]th entry of
+  // the vector if it can, throwing an error otherwise.
+  const auto & vec = libmesh_map_find(_parameters, param_name);
+  libmesh_error_msg_if(vec.size() == 0, "Error getting value for parameter " << param_name);
+  return vec[0];
 }
 
 Real RBParameters::get_value(const std::string & param_name, const Real & default_val) const
 {
+  // This version of get_value() does not take an index and is provided
+  // for backwards compatibility. It simply returns the [0]th entry of
+  // the vector if it can, or the default value otherwise.
   auto it = _parameters.find(param_name);
-  return (it != _parameters.end() ? it->second : default_val);
+  return ((it != _parameters.end() && it->second.size() != 0) ? it->second[0] : default_val);
 }
 
 void RBParameters::set_value(const std::string & param_name, Real value)
 {
-  _parameters[param_name] = value;
+  // This version of set_value() does not take an index and is provided
+  // for backwards compatibility. It creates a vector entry for the specified
+  // param_name, overwriting any value(s) that were present.
+  _parameters[param_name] = {value};
 }
 
 Real RBParameters::get_extra_value(const std::string & param_name) const
 {
-  // find the parameter value, throwing an error if it doesn't exist.
-  return libmesh_map_find(_extra_parameters, param_name);
+  // Same as get_value(param_name) but for the map of extra parameters
+  const auto & vec = libmesh_map_find(_extra_parameters, param_name);
+  libmesh_error_msg_if(vec.size() == 0, "Error getting value for extra parameter " << param_name);
+  return vec[0];
 }
 
 Real RBParameters::get_extra_value(const std::string & param_name, const Real & default_val) const
 {
+  // same as get_value(param_name, default_val) but for the map of extra parameters
   auto it = _extra_parameters.find(param_name);
-  return (it != _extra_parameters.end() ? it->second : default_val);
+  return ((it != _extra_parameters.end() && it->second.size() != 0) ? it->second[0] : default_val);
 }
 
 void RBParameters::set_extra_value(const std::string & param_name, Real value)
 {
-  _extra_parameters[param_name] = value;
+  // Same as set_value(param_name, value) but for the map of extra parameters
+  _extra_parameters[param_name] = {value};
 }
 
 unsigned int RBParameters::n_parameters() const
@@ -130,22 +136,26 @@ void RBParameters::erase_extra_parameter(const std::string & param_name)
 
 RBParameters::const_iterator RBParameters::begin() const
 {
-  return _parameters.begin();
+  return const_iterator(_parameters.begin(), 0);
 }
 
 RBParameters::const_iterator RBParameters::end() const
 {
-  return _parameters.end();
+  // Note: the index 0 is irrelevant here since _parameters.end() does
+  // not refer to a valid vector entry in the map.
+  return const_iterator(_parameters.end(), 0);
 }
 
 RBParameters::const_iterator RBParameters::extra_begin() const
 {
-  return _extra_parameters.begin();
+  return const_iterator(_extra_parameters.begin(), 0);
 }
 
 RBParameters::const_iterator RBParameters::extra_end() const
 {
-  return _extra_parameters.end();
+  // Note: the index 0 is irrelevant here since _parameters.end() does
+  // not refer to a valid vector entry in the map.
+  return const_iterator(_extra_parameters.end(), 0);
 }
 
 bool RBParameters::operator==(const RBParameters & rhs) const
@@ -162,17 +172,28 @@ bool RBParameters::operator!=(const RBParameters & rhs) const
 std::string RBParameters::get_string(unsigned int precision) const
 {
   std::stringstream param_stringstream;
-  param_stringstream.precision(precision);
+  param_stringstream << std::setprecision(precision) << std::scientific;
 
-  for (const auto & [key, value] : _parameters)
-    param_stringstream << key << ": " << std::scientific <<  value << std::endl;
+  for (const auto & [key, vec] : _parameters)
+  {
+    param_stringstream << key << ": ";
+
+    // Write comma separated list of values for each param_name
+    std::string separator = "";
+    for (const auto & val : vec)
+    {
+      param_stringstream << separator << val;
+      separator = ", ";
+    }
+    param_stringstream << std::endl;
+  }
 
   return param_stringstream.str();
 }
 
 void RBParameters::print() const
 {
-  libMesh::out << get_string() << std::endl;
+  libMesh::out << get_string();
 }
 
 }
