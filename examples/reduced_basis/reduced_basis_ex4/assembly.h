@@ -13,6 +13,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/elem.h"
 #include "libmesh/utility.h"
+#include "libmesh/print_trace.h"
 
 // rbOOmit includes
 #include "libmesh/rb_assembly_expansion.h"
@@ -59,6 +60,9 @@ struct ShiftedGaussian : public RBParametrizedFunction
            const std::vector<Point> & /*p_perturb*/,
            const std::vector<Real> & /*phi_i_qp*/) override
   {
+    // Debugging - to figure out where this function is called from
+    // libMesh::print_trace();
+
     Real center_x = mu.get_value("center_x");
     Real center_y = mu.get_value("center_y");
     return std::vector<Number> { std::exp(-2. * (pow<2>(center_x - p(0)) + pow<2>(center_y - p(1)))) };

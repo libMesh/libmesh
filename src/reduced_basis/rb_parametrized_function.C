@@ -155,6 +155,10 @@ void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters>
   // Dummy vector to be used when xyz perturbations are not required
   std::vector<Point> empty_perturbs;
 
+  // Debugging
+  libMesh::out << "mus.size() = " << mus.size() << std::endl;
+  libMesh::out << "n_points = " << n_points << std::endl;
+
   output.resize(mus.size());
   for ( unsigned int mu_index : index_range(mus))
     {

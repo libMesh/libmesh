@@ -184,8 +184,27 @@ public:
   /**
    * Set the value of the specified parameter. If param_name
    * doesn't already exist, it is added to the RBParameters object.
+   * For backwards compatibility, calling this function sets up
+   * "param_name" to be a single-entry vector with "value" as the
+   * only entry.
    */
   void set_value(const std::string & param_name, Real value);
+
+  /**
+   * Set the value of the specified parameter at the specified vector
+   * index.  Note: each parameter is now allowed to be vector-valued,
+   * it is up to the user to organize what the vector indices refer to
+   * (e.g. load or time steps).
+   */
+  void set_value(const std::string & param_name, std::size_t index, Real value);
+
+  /**
+   * Similar to set_value(name, index, value) but instead of specifying a particular
+   * index, just appends one more. Calling push_back_value() many times is more efficient
+   * than calling set_value(name, index, value) many times because it takes advantage
+   * of the std::vector's size-doubling t reduce allocations.
+   */
+  void push_back_value(const std::string & param_name, Real value);
 
   /**
    * Get the value of the specified extra parameter, throwing an error
