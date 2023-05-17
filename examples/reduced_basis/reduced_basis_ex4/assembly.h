@@ -60,12 +60,28 @@ struct ShiftedGaussian : public RBParametrizedFunction
            const std::vector<Point> & /*p_perturb*/,
            const std::vector<Real> & /*phi_i_qp*/) override
   {
-    // Debugging - to figure out where this function is called from
-    // libMesh::print_trace();
+    // // Old way, there is only 1 entry in the return vector
+    // Real center_x = mu.get_value("center_x");
+    // Real center_y = mu.get_value("center_y");
+    // return std::vector<Number> { std::exp(-2. * (pow<2>(center_x - p(0)) + pow<2>(center_y - p(1)))) };
 
-    Real center_x = mu.get_value("center_x");
-    Real center_y = mu.get_value("center_y");
-    return std::vector<Number> { std::exp(-2. * (pow<2>(center_x - p(0)) + pow<2>(center_y - p(1)))) };
+    // New way, there are get_n_components() * mu.max_n_values() entries in the return vector.
+    // Make sure that the same number of values are provided for both relevant parameters.
+    auto n_values_x = mu.n_values("center_x");
+    auto n_values_y = mu.n_values("center_y");
+    libmesh_error_msg_if(n_values_x != n_values_y, "Must specify same number of values for all parameters.");
+
+    // Debugging: print number of values
+    libMesh::out << "Called ShiftedGaussian::evaluate() with " << n_values_x << " value(s) for each parameter." << std::endl;
+
+    std::vector<Number> ret(this->get_n_components() * n_values_x);
+    for (std::size_t i=0; i<n_values_x; ++i)
+      {
+        Real center_x = mu.get_value("center_x", i);
+        Real center_y = mu.get_value("center_y", i);
+        ret[i] = std::exp(-2. * (pow<2>(center_x - p(0)) + pow<2>(center_y - p(1))));
+      }
+    return ret;
   }
 };
 
