@@ -260,6 +260,12 @@ int main (int argc, char ** argv)
       online_mu.push_back_value("center_x", 0.5);
       online_mu.push_back_value("center_y", 0.5);
 
+      // Add 3rd (center_x, center_y) values. For debugging purposes,
+      // we want the number of "steps" (3) to be different from the
+      // number of parameters (2).
+      online_mu.push_back_value("center_x", -0.25);
+      online_mu.push_back_value("center_y", -0.25);
+
       rb_eval.set_parameters(online_mu);
       rb_eval.print_parameters();
       rb_eval.rb_solve(rb_eval.get_n_basis_functions());
