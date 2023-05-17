@@ -133,8 +133,21 @@ void RBParameters::set_extra_value(const std::string & param_name, Real value)
 
 unsigned int RBParameters::n_parameters() const
 {
-  return cast_int<unsigned int>
-    (_parameters.size());
+  return cast_int<unsigned int>(_parameters.size());
+}
+
+unsigned int RBParameters::n_values(const std::string & param_name) const
+{
+  auto it = _parameters.find(param_name);
+  return (it != _parameters.end() ? it->second.size() : 0);
+}
+
+unsigned int RBParameters::max_n_values() const
+{
+  std::size_t ret = 0;
+  for (const auto & pr : _parameters)
+    ret = std::max(ret, pr.second.size());
+  return cast_int<unsigned int>(ret);
 }
 
 void RBParameters::get_parameter_names(std::set<std::string> & param_names) const
