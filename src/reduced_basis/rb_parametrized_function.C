@@ -156,51 +156,45 @@ void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters>
   std::vector<Point> empty_perturbs;
 
   // Debugging
-  libMesh::out << "mus.size() = " << mus.size() << std::endl;
-  libMesh::out << "n_points = " << n_points << std::endl;
+  // libMesh::out << "mus.size() = " << mus.size() << std::endl;
+  // libMesh::out << "n_points = " << n_points << std::endl;
 
   // Debugging: A new feature is that each parameter stored in an
   // RBParameters object can have multiple values defined in a vector.
   // The following code iterates over each RBParameters object and
   // checks the number of values it has.
-  {
-    std::map<std::string, unsigned int> num_values_per_param;
-    for (const auto & mu : mus)
-    {
-      for (const auto & pr : mu)
-        num_values_per_param[pr.first]++;
-    }
-
-    for (const auto & [param_name, nvals] : num_values_per_param)
-      libMesh::out << "Parameter " << param_name << " has " << nvals << " value(s)" << std::endl;
-  }
+  // {
+  //   std::map<std::string, unsigned int> num_values_per_param;
+  //   for (const auto & mu : mus)
+  //   {
+  //     for (const auto & pr : mu)
+  //       num_values_per_param[pr.first]++;
+  //   }
+  //
+  //   for (const auto & [param_name, nvals] : num_values_per_param)
+  //     libMesh::out << "Parameter " << param_name << " has " << nvals << " value(s)" << std::endl;
+  // }
 
   output.resize(mus.size());
-  for ( unsigned int mu_index : index_range(mus))
+  for (auto mu_index : index_range(mus))
     {
       output[mu_index].resize(n_points);
       for (unsigned int point_index=0; point_index<n_points; point_index++)
         {
-          if (requires_xyz_perturbations)
-            {
-              output[mu_index][point_index] = evaluate(mus[mu_index],
-                                                       all_xyz[point_index],
-                                                       elem_ids[point_index],
-                                                       qps[point_index],
-                                                       sbd_ids[point_index],
-                                                       all_xyz_perturb[point_index],
-                                                       phi_i_qp[point_index]);
-            }
-          else
-            {
-              output[mu_index][point_index] = evaluate(mus[mu_index],
-                                                       all_xyz[point_index],
-                                                       elem_ids[point_index],
-                                                       qps[point_index],
-                                                       sbd_ids[point_index],
-                                                       empty_perturbs,
-                                                       phi_i_qp[point_index]);
-            }
+          output[mu_index][point_index] =
+            evaluate(mus[mu_index],
+                     all_xyz[point_index],
+                     elem_ids[point_index],
+                     qps[point_index],
+                     sbd_ids[point_index],
+                     requires_xyz_perturbations ? all_xyz_perturb[point_index] : empty_perturbs,
+                     phi_i_qp[point_index]);
+
+          // Debugging
+          // libMesh::out << "mu_index = " << mu_index
+          //              << ", point_index = " << point_index
+          //              << ", output[mu_index][point_index].size() = " << output[mu_index][point_index].size()
+          //              << std::endl;
         }
     }
 }
@@ -228,35 +222,21 @@ void RBParametrizedFunction::side_vectorized_evaluate(const std::vector<RBParame
   std::vector<Point> empty_perturbs;
 
   output.resize(mus.size());
-  for ( unsigned int mu_index : index_range(mus))
+  for (auto mu_index : index_range(mus))
     {
       output[mu_index].resize(n_points);
       for (unsigned int point_index=0; point_index<n_points; point_index++)
         {
-          if (requires_xyz_perturbations)
-            {
-              output[mu_index][point_index] = side_evaluate(mus[mu_index],
-                                                            all_xyz[point_index],
-                                                            elem_ids[point_index],
-                                                            side_indices[point_index],
-                                                            qps[point_index],
-                                                            sbd_ids[point_index],
-                                                            boundary_ids[point_index],
-                                                            all_xyz_perturb[point_index],
-                                                            phi_i_qp[point_index]);
-            }
-          else
-            {
-              output[mu_index][point_index] = side_evaluate(mus[mu_index],
-                                                            all_xyz[point_index],
-                                                            elem_ids[point_index],
-                                                            side_indices[point_index],
-                                                            qps[point_index],
-                                                            sbd_ids[point_index],
-                                                            boundary_ids[point_index],
-                                                            empty_perturbs,
-                                                            phi_i_qp[point_index]);
-            }
+          output[mu_index][point_index] =
+            side_evaluate(mus[mu_index],
+                          all_xyz[point_index],
+                          elem_ids[point_index],
+                          side_indices[point_index],
+                          qps[point_index],
+                          sbd_ids[point_index],
+                          boundary_ids[point_index],
+                          requires_xyz_perturbations ? all_xyz_perturb[point_index] : empty_perturbs,
+                          phi_i_qp[point_index]);
         }
     }
 }
@@ -273,7 +253,7 @@ void RBParametrizedFunction::node_vectorized_evaluate(const std::vector<RBParame
   unsigned int n_points = all_xyz.size();
 
   output.resize(mus.size());
-  for ( unsigned int mu_index : index_range(mus))
+  for (auto mu_index : index_range(mus))
     {
       output[mu_index].resize(n_points);
       for (unsigned int point_index=0; point_index<n_points; point_index++)

@@ -72,7 +72,7 @@ struct ShiftedGaussian : public RBParametrizedFunction
     libmesh_error_msg_if(n_values_x != n_values_y, "Must specify same number of values for all parameters.");
 
     // Debugging: print number of values
-    libMesh::out << "Called ShiftedGaussian::evaluate() with " << n_values_x << " value(s) for each parameter." << std::endl;
+    // libMesh::out << "Called ShiftedGaussian::evaluate() with " << n_values_x << " value(s) for each parameter." << std::endl;
 
     std::vector<Number> ret(this->get_n_components() * n_values_x);
     for (std::size_t i=0; i<n_values_x; ++i)

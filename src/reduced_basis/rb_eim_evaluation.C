@@ -207,14 +207,57 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
                                                     _interpolation_points_phi_i_qp,
                                                     output_all_comps);
 
+  // Debugging
+  libMesh::out << "output_all_comps.size()=" << output_all_comps.size() << std::endl;
+
+  // Debugging
+  // The size of output_all_comps[i][j] should now be 2 in our test
+  for (auto i : index_range(output_all_comps))
+    for (auto j : index_range(output_all_comps[i]))
+      libMesh::out << "output_all_comps["<<i<<"]["<<j<<"].size() = " << output_all_comps[i][j].size() << std::endl;
+
+  // Debugging print output_all_comps[i][j]
+  for (auto i : index_range(output_all_comps))
+    for (auto j : index_range(output_all_comps[i]))
+      {
+        libMesh::out << "output_all_comps["<<i<<"]["<<j<<"] = ";
+        for (auto k : index_range(output_all_comps[i][j]))
+          libMesh::out << output_all_comps[i][j][k] << ", ";
+        libMesh::out << std::endl;
+      }
+
+  // The size of this array should depend on the number of steps
+  // stored within each mu object somehow, e.g. it should instead be
+  // something like:
+  // sum_i mus[i].max_n_values()
+  // where the sum goes over all entries of mus.
+  unsigned int evaluated_values_at_interp_points_size = 0;
+  for (const auto & mu : mus)
+    evaluated_values_at_interp_points_size += mu.max_n_values();
+
+  // Debugging:
+  std::cout << "evaluated_values_at_interp_points_size = "
+            << evaluated_values_at_interp_points_size
+            << std::endl;
+
   std::vector<std::vector<Number>> evaluated_values_at_interp_points(output_all_comps.size());
 
+  // In this loop, mu_index does not just refer to the ith
+  // RBParameters object, but also the jth step within the ith
+  // RBParameters object.
   for (unsigned int mu_index : index_range(evaluated_values_at_interp_points))
     {
-      evaluated_values_at_interp_points[mu_index].resize(N);
+      evaluated_values_at_interp_points[mu_index].resize(N); // N is number of RB basis functions
       for (unsigned int interp_pt_index=0; interp_pt_index<N; interp_pt_index++)
         {
+          // FIXME: We need to index into output_all_comps[i][j] using more than just comp now...
           unsigned int comp = _interpolation_points_comp[interp_pt_index];
+
+          // Debugging
+          // libMesh::out << "mu_index = " << mu_index
+          //              << ", interp_pt_index = " << interp_pt_index
+          //              << ", comp = " << comp
+          //              << std::endl;
 
           evaluated_values_at_interp_points[mu_index][interp_pt_index] =
             output_all_comps[mu_index][interp_pt_index][comp];
