@@ -1516,14 +1516,14 @@ void DistributedMesh::renumber_nodes_and_elements ()
         (processor_id_type pid,
          const std::vector<std::pair<dof_id_type, boolish>> & ids_and_bools)
         {
-          for (auto [n, local_to_pid] : ids_and_bools)
+          for (auto [n, sender_could_become_owner] : ids_and_bools)
             {
               // If we don't see a use for our own node, but someone
               // else does, better figure out who should own it next.
               if (!used_nodes.count(n))
                 {
                   auto it = repartitioned_node_pids.find(n);
-                  if (local_to_pid)
+                  if (sender_could_become_owner)
                     {
                       if (it != repartitioned_node_pids.end() &&
                           pid < it->second)
