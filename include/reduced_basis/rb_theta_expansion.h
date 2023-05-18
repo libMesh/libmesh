@@ -116,6 +116,14 @@ public:
   unsigned int get_total_n_output_terms() const;
 
   /**
+   * Computes the one-dimensional index for output n, term q_l implied by
+   * a "row-major" ordering of the outputs. This is useful for indexing into
+   * pre-evaluated theta arrays, which store the pre-evaluated output theta
+   * values in this order following the "A" and "F" theta values.
+   */
+  unsigned int output_index_1D(unsigned int n, unsigned int q_l);
+
+  /**
    * Attach a pointer to a functor object that defines one
    * of the theta_q_a terms.
    */

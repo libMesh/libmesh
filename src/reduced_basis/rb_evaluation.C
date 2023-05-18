@@ -315,9 +315,7 @@ Real RBEvaluation::rb_solve(unsigned int N,
 
       // Now compute the output error bounds
       for (unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
-        {
-          RB_output_error_bounds[n] = abs_error_bound * eval_output_dual_norm(n, mu);
-        }
+        RB_output_error_bounds[n] = abs_error_bound * this->eval_output_dual_norm(n, evaluated_thetas);
 
       return abs_error_bound;
     }
@@ -464,18 +462,44 @@ Real RBEvaluation::residual_scaling_denom(Real alpha_LB)
   return alpha_LB;
 }
 
-Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters & mu)
+Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters & /*mu*/)
 {
+  libmesh_deprecated();
+
+  // Call non-deprecated version of this function, ignoring input mu
+  return this->eval_output_dual_norm(n, nullptr);
+}
+
+Real RBEvaluation::eval_output_dual_norm(unsigned int n,
+                                         const std::vector<Number> * evaluated_thetas)
+{
+  // Return value
   Number output_bound_sq = 0.;
+
+  // mu is only used if evaluated_thetas == nullptr
+  const RBParameters & mu = this->get_parameters();
+
+  // Index into output_dual_innerprods
   unsigned int q=0;
   for (unsigned int q_l1=0; q_l1<rb_theta_expansion->get_n_output_terms(n); q_l1++)
     {
       for (unsigned int q_l2=q_l1; q_l2<rb_theta_expansion->get_n_output_terms(n); q_l2++)
         {
           Real delta = (q_l1==q_l2) ? 1. : 2.;
+
+          Number val_l1 =
+            evaluated_thetas ?
+            (*evaluated_thetas)[rb_theta_expansion->output_index_1D(n, q_l1) + rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms()] :
+            rb_theta_expansion->eval_output_theta(n, q_l1, mu);
+
+          Number val_l2 =
+            evaluated_thetas ?
+            (*evaluated_thetas)[rb_theta_expansion->output_index_1D(n, q_l2) + rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms()] :
+            rb_theta_expansion->eval_output_theta(n, q_l2, mu);
+
           output_bound_sq += delta * libmesh_real(
-                                                  libmesh_conj(rb_theta_expansion->eval_output_theta(n,q_l1,mu))*
-                                                  rb_theta_expansion->eval_output_theta(n,q_l2,mu) * output_dual_innerprods[n][q] );
+            libmesh_conj(val_l1) * val_l2 * output_dual_innerprods[n][q]);
+
           q++;
         }
     }

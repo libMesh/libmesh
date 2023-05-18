@@ -22,6 +22,9 @@
 #include "libmesh/rb_theta.h"
 #include "libmesh/rb_parameters.h"
 
+// libMesh includes
+#include "libmesh/int_range.h" // make_range
+
 namespace libMesh
 {
 
@@ -64,6 +67,18 @@ unsigned int RBThetaExpansion::get_total_n_output_terms() const
   for (const auto & vec : _output_theta_vector)
     sum += vec.size();
   return sum;
+}
+
+unsigned int RBThetaExpansion::output_index_1D(unsigned int n, unsigned int q_l)
+{
+  // Start with index of the current term
+  unsigned int index = q_l;
+
+  // Add to it the number of terms for all outputs prior to n
+  for (auto i : make_range(n))
+    index += _output_theta_vector[i].size();
+
+  return index;
 }
 
 void RBThetaExpansion::attach_A_theta(RBTheta * theta_q_a)
