@@ -534,7 +534,7 @@ public:
    * and its parent's and children's appropriate pointers
    * to point to null instead of to this.
    *
-   * Used by the library before an element is deleted from a mesh.
+   * To be used before an element is deleted from a mesh.
    */
   void remove_links_to_me ();
 
