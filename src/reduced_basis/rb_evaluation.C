@@ -327,6 +327,7 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N,
                        evaluated_thetas->size() != rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms(),
                        "ERROR: Evaluated thetas have wrong size");
 
+  // If evaluated_thetas is provided, then mu is not actually used for anything
   const RBParameters & mu = get_parameters();
 
   const unsigned int n_A_terms = rb_theta_expansion->get_n_A_terms();
@@ -336,16 +337,26 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N,
   // to evaluate the residual norm
   Number residual_norm_sq = 0.;
 
+  // Lambdas to help with evaluating F_theta and A_theta functions
+  // using either the pre-evaluated thetas (if provided) or by calling
+  // eval_{F,A}_theta()
+  auto eval_F = [&](unsigned int index)
+    {
+      return (evaluated_thetas) ? (*evaluated_thetas)[index + n_A_terms] : rb_theta_expansion->eval_F_theta(index, mu);
+    };
+  auto eval_A = [&](unsigned int index)
+    {
+      return (evaluated_thetas) ? (*evaluated_thetas)[index] : rb_theta_expansion->eval_A_theta(index, mu);
+    };
+
   unsigned int q=0;
   for (unsigned int q_f1=0; q_f1<n_F_terms; q_f1++)
     {
-      const Number val_q_f1 = (evaluated_thetas) ? (*evaluated_thetas)[q_f1 + n_A_terms]
-                                                 : rb_theta_expansion->eval_F_theta(q_f1, mu);
+      const Number val_q_f1 = eval_F(q_f1);
 
       for (unsigned int q_f2=q_f1; q_f2<n_F_terms; q_f2++)
         {
-          const Number val_q_f2 = (evaluated_thetas) ? (*evaluated_thetas)[q_f2 + n_A_terms]
-                                                     : rb_theta_expansion->eval_F_theta(q_f2, mu);
+          const Number val_q_f2 = eval_F(q_f2);
 
           Real delta = (q_f1==q_f2) ? 1. : 2.;
           residual_norm_sq += delta * libmesh_real(val_q_f1 * libmesh_conj(val_q_f2) * Fq_representor_innerprods[q] );
@@ -356,13 +367,11 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N,
 
   for (unsigned int q_f=0; q_f<n_F_terms; q_f++)
     {
-      const Number val_q_f = (evaluated_thetas) ? (*evaluated_thetas)[q_f + n_A_terms]
-                                                : rb_theta_expansion->eval_F_theta(q_f, mu);
+      const Number val_q_f = eval_F(q_f);
 
       for (unsigned int q_a=0; q_a<n_A_terms; q_a++)
         {
-          const Number val_q_a = (evaluated_thetas) ? (*evaluated_thetas)[q_a]
-                                                    : rb_theta_expansion->eval_A_theta(q_a, mu);
+          const Number val_q_a = eval_A(q_a);
 
           for (unsigned int i=0; i<N; i++)
             {
@@ -377,13 +386,11 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N,
   q=0;
   for (unsigned int q_a1=0; q_a1<n_A_terms; q_a1++)
     {
-      const Number val_q_a1 = (evaluated_thetas) ? (*evaluated_thetas)[q_a1]
-                                                 : rb_theta_expansion->eval_A_theta(q_a1, mu);
+      const Number val_q_a1 = eval_A(q_a1);
 
       for (unsigned int q_a2=q_a1; q_a2<n_A_terms; q_a2++)
         {
-          const Number val_q_a2 = (evaluated_thetas) ? (*evaluated_thetas)[q_a2]
-                                                     : rb_theta_expansion->eval_A_theta(q_a2, mu);
+          const Number val_q_a2 = eval_A(q_a2);
 
           Real delta = (q_a1==q_a2) ? 1. : 2.;
 
