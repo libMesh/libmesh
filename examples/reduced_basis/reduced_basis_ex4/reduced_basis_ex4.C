@@ -232,7 +232,7 @@ int main (int argc, char ** argv)
                                                                       "rb_data");
       }
     }
-  else
+  else // online mode
     {
       SimpleEIMEvaluation eim_rb_eval(mesh.comm());
       SimpleRBEvaluation rb_eval(mesh.comm());
@@ -268,6 +268,9 @@ int main (int argc, char ** argv)
 
       rb_eval.set_parameters(online_mu);
       rb_eval.print_parameters();
+
+      // FIXME: Here we need to pre-evaluate the thetas and call rb_solve in a loop while
+      // passing in the pre-evaluated thetas.
       rb_eval.rb_solve(rb_eval.get_n_basis_functions());
 
       EquationSystems equation_systems (mesh);

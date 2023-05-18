@@ -215,9 +215,14 @@ Real RBEvaluation::rb_solve(unsigned int N,
   libmesh_error_msg_if(N > get_n_basis_functions(),
                        "ERROR: N cannot be larger than the number of basis functions in rb_solve");
 
-  // In case the theta functions have been pre-evaluated, first check the size for consistency
+  // In case the theta functions have been pre-evaluated, first check the size for consistency. The
+  // size of the input "evaluated_thetas" vector must match the sum of the "A", "F", and "output" terms
+  // in the expansion.
   libmesh_error_msg_if(evaluated_thetas &&
-                       evaluated_thetas->size() != rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms(),
+                       evaluated_thetas->size() !=
+                       rb_theta_expansion->get_n_A_terms() +
+                       rb_theta_expansion->get_n_F_terms() +
+                       rb_theta_expansion->get_total_n_output_terms(),
                        "ERROR: Evaluated thetas have wrong size");
 
   const RBParameters & mu = get_parameters();
@@ -261,15 +266,37 @@ Real RBEvaluation::rb_solve(unsigned int N,
       RB_system_matrix.lu_solve(RB_rhs, RB_solution);
     }
 
-  // Evaluate RB outputs
+  // Place to store the output of get_principal_subvector() calls
   DenseVector<Number> RB_output_vector_N;
+
+  // Evaluate RB outputs
+  unsigned int output_counter = 0;
   for (unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     {
       RB_outputs[n] = 0.;
       for (unsigned int q_l=0; q_l<rb_theta_expansion->get_n_output_terms(n); q_l++)
         {
           RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-          RB_outputs[n] += rb_theta_expansion->eval_output_theta(n,q_l,mu)*RB_output_vector_N.dot(RB_solution);
+
+          // Compute dot product with current output vector and RB_solution
+          auto dot_prod = RB_output_vector_N.dot(RB_solution);
+
+          // Determine the coefficient depending on whether or not
+          // pre-evaluated thetas were provided. Note that if
+          // pre-evaluated thetas were provided, they must come after
+          // the "A" and "F" thetas and be in "row-major" order. In
+          // other words, there is a possibly "ragged" 2D array of
+          // output thetas ordered by output index "n" and term index
+          // "q_l" which is accessed in row-major order.
+          auto coeff = evaluated_thetas ?
+            (*evaluated_thetas)[output_counter + rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms()] :
+            rb_theta_expansion->eval_output_theta(n, q_l, mu);
+
+          // Finally, accumulate the result in RB_outputs[n]
+          RB_outputs[n] += coeff * dot_prod;
+
+          // Go to next output
+          output_counter++;
         }
     }
 

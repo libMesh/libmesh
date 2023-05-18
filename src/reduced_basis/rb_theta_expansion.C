@@ -58,6 +58,14 @@ unsigned int RBThetaExpansion::get_n_output_terms(unsigned int index) const
     (_output_theta_vector[index].size());
 }
 
+unsigned int RBThetaExpansion::get_total_n_output_terms() const
+{
+  unsigned int sum = 0;
+  for (const auto & vec : _output_theta_vector)
+    sum += vec.size();
+  return sum;
+}
+
 void RBThetaExpansion::attach_A_theta(RBTheta * theta_q_a)
 {
   libmesh_assert(theta_q_a);

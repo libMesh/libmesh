@@ -111,6 +111,11 @@ public:
   unsigned int get_n_output_terms(unsigned int output_index) const;
 
   /**
+   * Returns the total number of affine terms associated with all outputs.
+   */
+  unsigned int get_total_n_output_terms() const;
+
+  /**
    * Attach a pointer to a functor object that defines one
    * of the theta_q_a terms.
    */
