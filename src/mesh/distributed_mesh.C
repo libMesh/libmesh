@@ -42,6 +42,7 @@ DistributedMesh::DistributedMesh (const Parallel::Communicator & comm_in,
                                   unsigned char d) :
   UnstructuredMesh (comm_in,d), _is_serial(true),
   _is_serial_on_proc_0(true),
+  _deleted_coarse_elements(false),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
   _next_free_local_elem_id(this->processor_id()),
@@ -75,6 +76,9 @@ DistributedMesh & DistributedMesh::operator= (DistributedMesh && other_mesh)
   // etc. subclasses.
   this->move_nodes_and_elements(std::move(other_mesh));
 
+  // But move_nodes_and_elems misses (or guesses about) some of our
+  // subclass values, and we want more precision than a guess.
+  _deleted_coarse_elements = other_mesh._deleted_coarse_elements;
   _extra_ghost_elems = std::move(other_mesh._extra_ghost_elems);
 
   // Handle remaining MeshBase moves.
@@ -100,6 +104,7 @@ bool DistributedMesh::subclass_locally_equals(const MeshBase & other_mesh_base) 
 
   if (_is_serial != other_mesh._is_serial ||
       _is_serial_on_proc_0 != other_mesh._is_serial_on_proc_0 ||
+      _deleted_coarse_elements != other_mesh._deleted_coarse_elements ||
       _n_nodes != other_mesh._n_nodes ||
       _n_elem != other_mesh._n_elem ||
       _max_node_id != other_mesh._max_node_id ||
@@ -145,6 +150,7 @@ DistributedMesh::~DistributedMesh ()
 DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh._is_serial),
   _is_serial_on_proc_0(other_mesh._is_serial_on_proc_0),
+  _deleted_coarse_elements(other_mesh._deleted_coarse_elements),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
   _next_free_local_elem_id(this->processor_id()),
@@ -189,6 +195,7 @@ DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
 DistributedMesh::DistributedMesh (const UnstructuredMesh & other_mesh) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh.is_serial()),
   _is_serial_on_proc_0(other_mesh.is_serial()),
+  _deleted_coarse_elements(true), // better safe than sorry...
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
   _next_free_local_elem_id(this->processor_id()),
@@ -226,6 +233,7 @@ void DistributedMesh::move_nodes_and_elements(MeshBase && other_meshbase)
 
   _is_serial = other_mesh.is_serial();
   _is_serial_on_proc_0 = other_mesh.is_serial_on_zero();
+  _deleted_coarse_elements = true; // Better safe than sorry
 
   _max_node_id = other_mesh.max_node_id();
   _max_elem_id = other_mesh.max_elem_id();
@@ -707,6 +715,12 @@ void DistributedMesh::delete_elem(Elem * e)
   // Try to make the cached elem data more accurate
   _n_elem--;
 
+  // Was this a coarse element?  We'll have to be more careful with our nodes
+  // in contract() later; no telling if we just locally orphaned a node that
+  // should be globally retained.
+  if (!e->parent())
+    _deleted_coarse_elements = true;
+
   // Delete the element from the BoundaryInfo object
   this->get_boundary_info().remove(e);
 
@@ -987,6 +1001,10 @@ void DistributedMesh::clear ()
   // We're no longer distributed if we were before
   _is_serial = true;
   _is_serial_on_proc_0 = true;
+
+  // We deleted a ton of coarse elements, but their nodes got deleted too so
+  // all is copacetic.
+  _deleted_coarse_elements = false;
 
   // Correct our caches
   _n_nodes = 0;
@@ -1442,12 +1460,133 @@ void DistributedMesh::renumber_nodes_and_elements ()
 
   LOG_SCOPE("renumber_nodes_and_elements()", "DistributedMesh");
 
+  // Nodes not connected to any elements, and nullptr node entries
+  // in our container, should be deleted.  But wait!  If we've deleted coarse
+  // local elements on some processor, other processors might have ghosted
+  // nodes from it that are now no longer connected to any elements on it, but
+  // that are connected to their own semilocal elements.  We'll have to
+  // communicate to ascertain if that's the case.
+  this->comm().max(_deleted_coarse_elements);
+
+  // What used nodes do we see on our proc?
   std::set<dof_id_type> used_nodes;
+
+  // What used node info should we send from our proc?  Could we take ownership
+  // of each if we needed to?
+  std::map<processor_id_type, std::map<dof_id_type, bool>>
+    used_nodes_on_proc;
 
   // flag the nodes we need
   for (auto & elem : this->element_ptr_range())
     for (const Node & node : elem->node_ref_range())
-      used_nodes.insert(node.id());
+      {
+        const dof_id_type n = node.id();
+        used_nodes.insert(n);
+        if (_deleted_coarse_elements)
+          {
+            const processor_id_type p = node.processor_id();
+            if (p != this->processor_id())
+              {
+                auto & used_nodes_on_p = used_nodes_on_proc[p];
+                if (elem->processor_id() == this->processor_id())
+                  used_nodes_on_p[n] = true;
+                else
+                  if (!used_nodes_on_p.count(n))
+                    used_nodes_on_p[n] = false;
+              }
+          }
+      }
+
+  if (_deleted_coarse_elements)
+    {
+      // "unsigned char" == "bool, but MPI::BOOL is iffy to use"
+      typedef unsigned char boolish;
+      std::map<processor_id_type, std::vector<std::pair<dof_id_type, boolish>>>
+        used_nodes_on_proc_vecs;
+      for (auto & [pid, nodemap] : used_nodes_on_proc)
+        used_nodes_on_proc_vecs[pid].assign(nodemap.begin(), nodemap.end());
+
+      std::map<dof_id_type,processor_id_type> repartitioned_node_pids;
+      std::map<processor_id_type, std::set<dof_id_type>>
+        repartitioned_node_sets_to_push;
+
+      auto ids_action_functor =
+        [this, &used_nodes, &repartitioned_node_pids,
+         &repartitioned_node_sets_to_push]
+        (processor_id_type pid,
+         const std::vector<std::pair<dof_id_type, boolish>> & ids_and_bools)
+        {
+          for (auto [n, local_to_pid] : ids_and_bools)
+            {
+              // If we don't see a use for our own node, but someone
+              // else does, better figure out who should own it next.
+              if (!used_nodes.count(n))
+                {
+                  auto it = repartitioned_node_pids.find(n);
+                  if (local_to_pid)
+                    {
+                      if (it != repartitioned_node_pids.end() &&
+                          pid < it->second)
+                        it->second = pid;
+                      else
+                        repartitioned_node_pids[n] = pid;
+                    }
+                  else
+                    if (it == repartitioned_node_pids.end())
+                      repartitioned_node_pids[n] =
+                        DofObject::invalid_processor_id;
+
+                  repartitioned_node_sets_to_push[pid].insert(n);
+                }
+            }
+        };
+
+      // We need two pushes instead of a pull here because we need to
+      // know *all* the queries for a particular node before we can
+      // respond to *any* of them.
+      Parallel::push_parallel_vector_data
+      (this->comm(), used_nodes_on_proc_vecs, ids_action_functor);
+
+      // Repartition (what used to be) our own nodes first
+      for (auto & [n, p] : repartitioned_node_pids)
+        {
+          Node & node = this->node_ref(n);
+          libmesh_assert_equal_to(node.processor_id(), this->processor_id());
+          libmesh_assert_not_equal_to_msg(p, DofObject::invalid_processor_id, "Node " << n << " is lost?");
+          node.processor_id() = p;
+        }
+
+      // Then push to repartition others' ghosted copies.
+
+      std::map<processor_id_type, std::vector<std::pair<dof_id_type,processor_id_type>>>
+        repartitioned_node_vecs;
+
+      for (auto & [p, nodeset] : repartitioned_node_sets_to_push)
+        {
+          auto & rn_vec = repartitioned_node_vecs[p];
+          for (auto n : nodeset)
+            rn_vec.emplace_back(n, repartitioned_node_pids[n]);
+        }
+
+      auto repartition_node_functor =
+        [this]
+        (processor_id_type libmesh_dbg_var(pid),
+         const std::vector<std::pair<dof_id_type, processor_id_type>> & ids_and_pids)
+        {
+          for (auto [n, p] : ids_and_pids)
+            {
+              libmesh_assert_not_equal_to(p, DofObject::invalid_processor_id);
+              Node & node = this->node_ref(n);
+              libmesh_assert_equal_to(node.processor_id(), pid);
+              node.processor_id() = p;
+            }
+        };
+
+      Parallel::push_parallel_vector_data
+      (this->comm(), repartitioned_node_vecs, repartition_node_functor);
+    }
+
+  _deleted_coarse_elements = false;
 
   // Nodes not connected to any local elements, and nullptr node entries
   // in our container, are deleted

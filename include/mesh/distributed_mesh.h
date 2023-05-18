@@ -644,6 +644,13 @@ protected:
   bool _is_serial_on_proc_0;
 
   /**
+   * A boolean remembering whether we've recently deleted top-level elements or
+   * not.  If so, we'll need to be extra careful when deleting "unused" nodes
+   * they used to have, because those nodes might still be used by ghost elements.
+   */
+  bool _deleted_coarse_elements;
+
+  /**
    * Cached data from the last renumber_nodes_and_elements call
    */
   dof_id_type _n_nodes, _n_elem, _max_node_id, _max_elem_id;
