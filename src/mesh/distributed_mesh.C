@@ -715,10 +715,14 @@ void DistributedMesh::delete_elem(Elem * e)
   // Try to make the cached elem data more accurate
   _n_elem--;
 
-  // Was this a coarse element?  We'll have to be more careful with our nodes
-  // in contract() later; no telling if we just locally orphaned a node that
-  // should be globally retained.
-  if (!e->parent())
+  // Was this a coarse element, not just a coarsening where we still
+  // have some ancestor structure?  Was it a *local* element, that we
+  // might have been depending on as an owner of local nodes?  We'll
+  // have to be more careful with our nodes in contract() later; no
+  // telling if we just locally orphaned a node that should be
+  // globally retained.
+  if (e->processor_id() == this->processor_id() &&
+      !e->parent())
     _deleted_coarse_elements = true;
 
   // Delete the element from the BoundaryInfo object
