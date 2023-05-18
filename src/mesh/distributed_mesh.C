@@ -1511,7 +1511,7 @@ void DistributedMesh::renumber_nodes_and_elements ()
         repartitioned_node_sets_to_push;
 
       auto ids_action_functor =
-        [this, &used_nodes, &repartitioned_node_pids,
+        [&used_nodes, &repartitioned_node_pids,
          &repartitioned_node_sets_to_push]
         (processor_id_type pid,
          const std::vector<std::pair<dof_id_type, boolish>> & ids_and_bools)
