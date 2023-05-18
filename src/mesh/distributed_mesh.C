@@ -1472,7 +1472,7 @@ void DistributedMesh::renumber_nodes_and_elements ()
   std::set<dof_id_type> used_nodes;
 
   // What used node info should we send from our proc?  Could we take ownership
-  // of each if we needed to?
+  // of each node if we needed to?
   std::map<processor_id_type, std::map<dof_id_type, bool>>
     used_nodes_on_proc;
 
