@@ -37,9 +37,9 @@ Number RBEIMTheta::evaluate(const RBParameters & mu)
   std::vector<Number> values = evaluate_vec(mus);
 
   // Debugging:
-  for (const auto & val : values)
-    libMesh::out << val << ", ";
-  libMesh::out << std::endl;
+  // for (const auto & val : values)
+  //   libMesh::out << val << ", ";
+  // libMesh::out << std::endl;
 
   libmesh_error_msg_if(values.size() != 1, "Error: should have one value");
   return values[0];

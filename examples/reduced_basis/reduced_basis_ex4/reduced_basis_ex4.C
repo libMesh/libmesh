@@ -266,13 +266,89 @@ int main (int argc, char ** argv)
       online_mu.push_back_value("center_x", -0.25);
       online_mu.push_back_value("center_y", -0.25);
 
+      // Here we are going to pre-evaluate the thetas and pass them in
+      // to rb_solve() in a loop.  Note that the rb_solve doesn't
+      // explicitly need the parameters ("mus"), it just needs the
+      // evaluated functions of parameters ("thetas"), but we can
+      // perform an rb_solve() with either.
       rb_eval.set_parameters(online_mu);
       rb_eval.print_parameters();
 
-      // FIXME: Here we need to pre-evaluate the thetas and call rb_solve in a loop while
-      // passing in the pre-evaluated thetas.
-      rb_eval.rb_solve(rb_eval.get_n_basis_functions());
+      // When performing an rb_solve() with "mu" values, we only
+      // support single-valued RBParameters objects.  In this case,
+      // since the RBParameters object stores multiple "steps", we
+      // take the approach of pre-evaluating the thetas for each
+      // parameter while calling the rb_solve in a loop.
+      //
+      // FIXME: There are some const-correctness issues with the
+      // RBThetaExpansion API here, so this reference is non-const,
+      // but actually we are not changing it so we should be able to
+      // use a const reference here.
+      RBThetaExpansion & rb_theta_expansion = rb_eval.get_rb_theta_expansion();
 
+      // Single-entry vector which makes calling the vector-overrides
+      // of eval_A_theta(), eval_F_theta(), etc. easier.
+      std::vector<RBParameters> mu_vec = {online_mu};
+
+      // 1.) Evaluate and store "A" thetas at all steps:
+      std::vector<std::vector<Number>> all_A(rb_theta_expansion.get_n_A_terms());
+      for (unsigned int q_a=0; q_a<rb_theta_expansion.get_n_A_terms(); q_a++)
+        {
+          // Here we call the version of eval_A_theta() taking a
+          // vector, so we evaluate theta(mu) at all steps
+          // simultaneously.
+          all_A[q_a] = rb_theta_expansion.eval_A_theta(q_a, mu_vec);
+
+          // This size of each A_q vector here is:
+          // sum_i mu_vec[i].max_n_values()
+          // and it contains
+          // the logically 2D array of values:
+          // according to: {Theta(mu_vec[0], step_0), Theta(mu_vec[1], step_0), ... Theta(mu_vec[M], step_0),
+          //                Theta(mu_vec[0], step_1), Theta(mu_vec[1], step_1), ... Theta(mu_vec[M], step_1),
+          //                ...
+          //                Theta(mu_vec[0], step_N), Theta(mu_vec[1], step_N), ... Theta(mu_vec[M], step_N)}
+          // arranged in row-major format, i.e. all the step_0 Theta
+          // values, followed by all the step_1 Theta values, etc.
+          libMesh::out << "A_" << q_a << " = ";
+          for (const auto & val : all_A[q_a])
+            libMesh::out << val << ", ";
+          libMesh::out << std::endl;
+        }
+
+      // 2.) Evaluate "F" thetas at all steps:
+      std::vector<std::vector<Number>> all_F(rb_theta_expansion.get_n_F_terms());
+      for (unsigned int q_f=0; q_f<rb_theta_expansion.get_n_F_terms(); q_f++)
+        {
+          all_F[q_f] = rb_theta_expansion.eval_F_theta(q_f, mu_vec);
+
+          // The F_q values are indexed the same way as the A_q values, see comment above.
+          libMesh::out << "F_" << q_f << " = ";
+          for (const auto & val : all_F[q_f])
+            libMesh::out << val << ", ";
+          libMesh::out << std::endl;
+        }
+
+      // 3.) Evaluate "output" thetas at all steps: in this case there are no outputs and there
+      // is no "vector-valued" version of the RBThetaExpansion::eval_output_theta() API, so we
+      // skip this step for now.
+
+      // The total number of thetas is the sum of the "A", "F", and
+      // "output" thetas.
+      unsigned int n_thetas =
+        rb_theta_expansion.get_n_A_terms() +
+        rb_theta_expansion.get_n_F_terms() +
+        rb_theta_expansion.get_total_n_output_terms();
+
+      // Debugging
+      libMesh::out << "n_A_terms = " << rb_theta_expansion.get_n_A_terms() << std::endl;
+      libMesh::out << "n_F_terms = " << rb_theta_expansion.get_n_F_terms() << std::endl;
+      libMesh::out << "total_n_output_terms = " << rb_theta_expansion.get_total_n_output_terms() << std::endl;
+      libMesh::out << "n_thetas = " << n_thetas << std::endl;
+
+      // Allocate enough space to store all the evaluated theta values for this RBThetaExpansion
+      std::vector<Number> evaluated_thetas(n_thetas);
+
+      // The RBConstruction object is used for plotting reduced-basis solutions (visualization)
       EquationSystems equation_systems (mesh);
 
       SimpleRBConstruction & rb_construction =
@@ -280,13 +356,36 @@ int main (int argc, char ** argv)
 
       equation_systems.init ();
 
+      // Tell the RBConstruction object about the RBEvaluation object
+      // and read in the RB basis functions.
       rb_construction.set_rb_evaluation(rb_eval);
-
       rb_eval.read_in_basis_functions(rb_construction, "rb_data");
-      rb_construction.load_rb_solution();
+
+      // Loop over each step, fill the evaluated_thetas array, call rb_solve
+      for (unsigned step=0; step<online_mu.max_n_values(); ++step)
+        {
+          unsigned int counter = 0;
+
+          // Set A Theta values for current step
+          for (unsigned int q_a=0; q_a<rb_theta_expansion.get_n_A_terms(); q_a++)
+            evaluated_thetas[counter++] = all_A[q_a][step];
+
+          // Set F Theta values for current step
+          for (unsigned int q_f=0; q_f<rb_theta_expansion.get_n_F_terms(); q_f++)
+            evaluated_thetas[counter++] = all_F[q_f][step];
+
+          // Set output Theta values for current step
+          // TODO: add some outputs since currently there are none in this example
+
+          // Call rb_solve() for the current thetas
+          libMesh::out << "Performing solve for step " << step << std::endl;
+          rb_eval.rb_solve(rb_eval.get_n_basis_functions(), &evaluated_thetas);
+
+          rb_construction.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
-      ExodusII_IO(mesh).write_equation_systems("RB_sol.e", equation_systems);
+          ExodusII_IO(mesh).write_equation_systems("RB_sol_" + std::to_string(step) + ".e", equation_systems);
 #endif
+        } // end for (step)
     }
 
 #endif // LIBMESH_ENABLE_DIRICHLET

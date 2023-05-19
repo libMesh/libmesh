@@ -86,7 +86,36 @@ struct ShiftedGaussian : public RBParametrizedFunction
 };
 
 // Expansion of the PDE operator
-struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters &) { return 0.05;  } };
+struct ThetaA0 : RBTheta
+{
+  /**
+   * Evaluate theta for a single scalar-valued RBParameters object.
+   * In this case, Theta(mu) does not depend on mu
+   */
+  virtual Number evaluate(const RBParameters &) override
+  {
+    return 0.05;
+  }
+
+  /**
+   * Evaluate theta for multiple mu values, each of which may have multiple "steps".
+   * This theta still doesn't depend on mu, but the output vector must be sized appropriately.
+   */
+  virtual std::vector<Number> evaluate_vec(const std::vector<RBParameters> & mus) override
+  {
+    // Compute the number of values to be returned in the vector. For
+    // scalar-valued RBParameters objects, there would be mus.size()
+    // values returned in the vector. For step-valued RBParameters
+    // objects, there are:
+    // sum_i mus[i].max_n_values()
+    // total Thetas, i.e. one Theta per step.
+    unsigned int count = 0;
+    for (const auto & mu : mus)
+      count += mu.max_n_values();
+
+    return std::vector<Number>(count, /*value=*/0.05);
+  }
+};
 
 struct A0 : ElemAssembly
 {
