@@ -278,7 +278,7 @@ int main (int argc, char ** argv)
       // support single-valued RBParameters objects.  In this case,
       // since the RBParameters object stores multiple "steps", we
       // take the approach of pre-evaluating the thetas for each
-      // parameter while calling the rb_solve in a loop.
+      // parameter while calling the rb_solve() in a loop.
       //
       // FIXME: There are some const-correctness issues with the
       // RBThetaExpansion API here, so this reference is non-const,
@@ -341,7 +341,7 @@ int main (int argc, char ** argv)
           for (unsigned int q_l=0; q_l<rb_theta_expansion.get_n_output_terms(n); q_l++)
             {
               all_outputs[output_counter++] =
-                rb_theta_expansion.eval_output_theta(n, q_l, mu_vec); // TODO: Add vector-valued API
+                rb_theta_expansion.eval_output_theta(n, q_l, mu_vec);
 
               // Debugging:
               libMesh::out << "output(" << n << ", " << q_l << ") = ";
@@ -405,6 +405,12 @@ int main (int argc, char ** argv)
           libMesh::out << "Performing solve for step " << step << std::endl;
           rb_eval.rb_solve(rb_eval.get_n_basis_functions(), &evaluated_thetas);
 
+          // Print the output as well as the corresponding output error bound
+          libMesh::out << "Output value = " << rb_eval.RB_outputs[0]
+                       << ", error bound = " << rb_eval.RB_output_error_bounds[0]
+                       << std::endl;
+
+      // Write an exo file to visualize this solution
           rb_construction.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
           ExodusII_IO(mesh).write_equation_systems("RB_sol_" + std::to_string(step) + ".e", equation_systems);
