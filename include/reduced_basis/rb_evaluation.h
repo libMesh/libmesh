@@ -370,6 +370,12 @@ private:
    */
   RBThetaExpansion * rb_theta_expansion;
 
+  /**
+   * For interfaces like rb_solve() and compute_residual_dual_norm() that optinally
+   * take a vector of "pre-evaluated" theta values, this function checks to make sure
+   * that, when provided, it is the right size.
+   */
+  void check_evaluated_thetas_size(const std::vector<Number> * evaluated_thetas) const;
 };
 
 }

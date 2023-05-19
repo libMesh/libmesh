@@ -380,7 +380,7 @@ int main (int argc, char ** argv)
       rb_construction.set_rb_evaluation(rb_eval);
       rb_eval.read_in_basis_functions(rb_construction, "rb_data");
 
-      // Loop over each step, fill the evaluated_thetas array, call rb_solve
+      // Loop over each step, fill the evaluated_thetas array, call rb_solve()
       for (unsigned step=0; step<online_mu.max_n_values(); ++step)
         {
           unsigned int counter = 0;
@@ -394,7 +394,12 @@ int main (int argc, char ** argv)
             evaluated_thetas[counter++] = all_F[q_f][step];
 
           // Set output Theta values for current step
-          // TODO: add some outputs since currently there are none in this example
+          {
+            unsigned int output_counter = 0;
+            for (unsigned int n=0; n<rb_theta_expansion.get_n_outputs(); n++)
+              for (unsigned int q_l=0; q_l<rb_theta_expansion.get_n_output_terms(n); q_l++)
+                evaluated_thetas[counter++] = all_outputs[output_counter++][step];
+          }
 
           // Call rb_solve() for the current thetas
           libMesh::out << "Performing solve for step " << step << std::endl;

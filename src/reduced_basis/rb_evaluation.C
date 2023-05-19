@@ -218,12 +218,7 @@ Real RBEvaluation::rb_solve(unsigned int N,
   // In case the theta functions have been pre-evaluated, first check the size for consistency. The
   // size of the input "evaluated_thetas" vector must match the sum of the "A", "F", and "output" terms
   // in the expansion.
-  libmesh_error_msg_if(evaluated_thetas &&
-                       evaluated_thetas->size() !=
-                       rb_theta_expansion->get_n_A_terms() +
-                       rb_theta_expansion->get_n_F_terms() +
-                       rb_theta_expansion->get_total_n_output_terms(),
-                       "ERROR: Evaluated thetas have wrong size");
+  this->check_evaluated_thetas_size(evaluated_thetas);
 
   const RBParameters & mu = get_parameters();
 
@@ -348,9 +343,7 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N,
   LOG_SCOPE("compute_residual_dual_norm()", "RBEvaluation");
 
   // In case the theta functions have been pre-evaluated, first check the size for consistency
-  libmesh_error_msg_if(evaluated_thetas &&
-                       evaluated_thetas->size() != rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms(),
-                       "ERROR: Evaluated thetas have wrong size");
+  this->check_evaluated_thetas_size(evaluated_thetas);
 
   // If evaluated_thetas is provided, then mu is not actually used for anything
   const RBParameters & mu = get_parameters();
@@ -1187,6 +1180,16 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
 
   // Undo the temporary renumbering
   sys.get_mesh().fix_broken_node_and_element_numbering();
+}
+
+void RBEvaluation::check_evaluated_thetas_size(const std::vector<Number> * evaluated_thetas) const
+{
+  libmesh_error_msg_if((rb_theta_expansion && evaluated_thetas) &&
+                       evaluated_thetas->size() !=
+                       rb_theta_expansion->get_n_A_terms() +
+                       rb_theta_expansion->get_n_F_terms() +
+                       rb_theta_expansion->get_total_n_output_terms(),
+                       "ERROR: Evaluated thetas have wrong size");
 }
 
 } // namespace libMesh

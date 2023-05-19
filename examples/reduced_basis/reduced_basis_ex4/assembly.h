@@ -288,9 +288,8 @@ struct EimTestRBThetaExpansion : RBThetaExpansion
     // Note: there are no Thetas associated with the RHS since we use
     // an EIM approximation for the forcing term.
 
-    // Attach a default RBTheta object for the output which just
-    // returns 1.  We just need the default RBTheta in this case
-    // because the output functional does not depend on mu.
+    // Attach an RBTheta object for the output. Here we just use the
+    // ThetaConstant class again, but this time with a value of 1.0.
     attach_output_theta(&output_theta);
   }
 
