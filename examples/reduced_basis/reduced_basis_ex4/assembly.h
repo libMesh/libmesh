@@ -209,6 +209,55 @@ struct EIM_F : RBEIMAssembly
   }
 };
 
+/**
+ * Output assembly object which computes the average value of the
+ * solution variable inside a BoundingBox defined by lower corner
+ * [min_x_in, min_y_in] and upper corner [max_x_in, max_y_in].
+ * OutputAssembly is copied from reduced_basis_ex1 where it is also
+ * used.
+ */
+struct OutputAssembly : ElemAssembly
+{
+  OutputAssembly(Real min_x_in, Real max_x_in,
+                 Real min_y_in, Real max_y_in)
+    :
+    min_x(min_x_in),
+    max_x(max_x_in),
+    min_y(min_y_in),
+    max_y(max_y_in)
+  {}
+
+  // Output: Average value over the region [min_x,max_x]x[min_y,max_y]
+  virtual void interior_assembly(FEMContext & c)
+  {
+    const unsigned int u_var = 0;
+
+    FEBase * fe = nullptr;
+    c.get_element_fe(u_var, fe);
+
+    const std::vector<Real> & JxW = fe->get_JxW();
+    const std::vector<std::vector<Real>> & phi = fe->get_phi();
+
+    // The number of local degrees of freedom in each variable
+    const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+
+    // Now we will build the affine operator
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
+
+    Real output_area = (max_x-min_x) * (max_y-min_y);
+
+    Point avg = c.get_elem().vertex_average();
+    if ((min_x <= avg(0)) && (avg(0) <= max_x) &&
+        (min_y <= avg(1)) && (avg(1) <= max_y))
+      for (unsigned int qp=0; qp != n_qpoints; qp++)
+        for (unsigned int i=0; i != n_u_dofs; i++)
+          c.get_elem_residual()(i) += JxW[qp] * phi[i][qp] / output_area;
+  }
+
+  // Member variables that define the output region in 2D
+  Real min_x, max_x, min_y, max_y;
+};
+
 // Define an RBThetaExpansion class for this PDE
 struct EimTestRBThetaExpansion : RBThetaExpansion
 {
@@ -218,10 +267,19 @@ struct EimTestRBThetaExpansion : RBThetaExpansion
   EimTestRBThetaExpansion()
   {
     attach_A_theta(&theta_a_0);
+
+    // Note: there are no Thetas associated with the RHS since we use
+    // an EIM approximation for the forcing term.
+
+    // Attach a default RBTheta object for the output which just
+    // returns 1.  We just need the default RBTheta in this case
+    // because the output functional does not depend on mu.
+    attach_output_theta(&rb_theta);
   }
 
   // The RBTheta member variables
   ThetaA0 theta_a_0;
+  RBTheta rb_theta;
 };
 
 // Define an RBAssemblyExpansion class for this PDE
@@ -230,13 +288,19 @@ struct EimTestRBAssemblyExpansion : RBAssemblyExpansion
   /**
    * Constructor.
    */
-  EimTestRBAssemblyExpansion()
+  EimTestRBAssemblyExpansion():
+    L0(/*min_x=*/-0.2, /*max_x=*/0.2,
+       /*min_y=*/-0.2, /*max_x=*/0.2)
   {
     attach_A_assembly(&A0_assembly);
+    attach_output_assembly(&L0);
   }
 
   // A0 assembly object
   A0 A0_assembly;
+
+  // Assembly object associated with the output functional
+  OutputAssembly L0;
 };
 
 #endif
