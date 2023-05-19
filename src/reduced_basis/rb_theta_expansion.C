@@ -187,5 +187,18 @@ Number RBThetaExpansion::eval_output_theta(unsigned int output_index,
   return _output_theta_vector[output_index][q_l]->evaluate( mu );
 }
 
+std::vector<Number>
+RBThetaExpansion::eval_output_theta(unsigned int output_index,
+                                    unsigned int q_l,
+                                    const std::vector<RBParameters> & mus)
+{
+  libmesh_error_msg_if((output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)),
+                       "Error: We must have output_index < n_outputs and "
+                       "q_l < get_n_output_terms(output_index) in eval_output_theta.");
+
+  libmesh_assert(_output_theta_vector[output_index][q_l]);
+
+  return _output_theta_vector[output_index][q_l]->evaluate_vec(mus);
+}
 
 }

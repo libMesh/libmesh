@@ -89,6 +89,13 @@ public:
                                    const RBParameters & mu);
 
   /**
+   * Evaluate theta_q_l at multiple parameters simultaneously.
+   */
+  virtual std::vector<Number> eval_output_theta(unsigned int output_index,
+                                                unsigned int q_l,
+                                                const std::vector<RBParameters> & mus);
+
+  /**
    * Get Q_a, the number of terms in the affine
    * expansion for the bilinear form.
    */

@@ -328,9 +328,28 @@ int main (int argc, char ** argv)
           libMesh::out << std::endl;
         }
 
-      // 3.) Evaluate "output" thetas at all steps: in this case there are no outputs and there
-      // is no "vector-valued" version of the RBThetaExpansion::eval_output_theta() API, so we
-      // skip this step for now.
+      // 3.) Evaluate "output" thetas at all steps: in this case, the
+      // output is particularly simple (does not depend on mu) so this
+      // should just be a vector of all 1s. Also note that there is no
+      // "vector-valued" version of the RBThetaExpansion::eval_output_theta() API currently,
+      // but this example uses an RBParameters object with multiple steps, so we need to add
+      // that...
+      std::vector<std::vector<Number>> all_outputs(rb_theta_expansion.get_total_n_output_terms());
+      {
+        unsigned int output_counter = 0;
+        for (unsigned int n=0; n<rb_theta_expansion.get_n_outputs(); n++)
+          for (unsigned int q_l=0; q_l<rb_theta_expansion.get_n_output_terms(n); q_l++)
+            {
+              all_outputs[output_counter++] =
+                rb_theta_expansion.eval_output_theta(n, q_l, mu_vec); // TODO: Add vector-valued API
+
+              // Debugging:
+              libMesh::out << "output(" << n << ", " << q_l << ") = ";
+              for (const auto & val : all_outputs.back())
+                libMesh::out << val << ", ";
+              libMesh::out << std::endl;
+            }
+      }
 
       // The total number of thetas is the sum of the "A", "F", and
       // "output" thetas.

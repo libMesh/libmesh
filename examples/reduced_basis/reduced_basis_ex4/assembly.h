@@ -85,16 +85,28 @@ struct ShiftedGaussian : public RBParametrizedFunction
   }
 };
 
-// Expansion of the PDE operator
-struct ThetaA0 : RBTheta
+// A simple Theta(mu) function which just returns a constant value
+// (hence does not depend on mu). The constant must be specified when
+// calling the constructor.
+struct ThetaConstant : RBTheta
 {
   /**
-   * Evaluate theta for a single scalar-valued RBParameters object.
-   * In this case, Theta(mu) does not depend on mu
+   * Constructor
    */
-  virtual Number evaluate(const RBParameters &) override
+  ThetaConstant(Number val) : _val(val) {}
+
+  /**
+   * Evaluate theta for a single scalar-valued RBParameters object.
+   * In this case, Theta(mu) does not depend on mu explicitly, except
+   * to determine the number of "steps" (aka max_n_values()) which mu
+   * has, so that the output vector is sized appropriately.
+   */
+  virtual Number evaluate(const RBParameters & mu) override
   {
-    return 0.05;
+    libmesh_error_msg_if(mu.max_n_values() > 1,
+                         "You should only call the evaluate_vec() API when using multi-step RBParameters objects.");
+
+    return _val;
   }
 
   /**
@@ -113,8 +125,11 @@ struct ThetaA0 : RBTheta
     for (const auto & mu : mus)
       count += mu.max_n_values();
 
-    return std::vector<Number>(count, /*value=*/0.05);
+    return std::vector<Number>(count, _val);
   }
+
+private:
+  Number _val;
 };
 
 struct A0 : ElemAssembly
@@ -264,7 +279,9 @@ struct EimTestRBThetaExpansion : RBThetaExpansion
   /**
    * Constructor.
    */
-  EimTestRBThetaExpansion()
+  EimTestRBThetaExpansion() :
+    theta_a_0(0.05),
+    output_theta(1.0)
   {
     attach_A_theta(&theta_a_0);
 
@@ -274,12 +291,12 @@ struct EimTestRBThetaExpansion : RBThetaExpansion
     // Attach a default RBTheta object for the output which just
     // returns 1.  We just need the default RBTheta in this case
     // because the output functional does not depend on mu.
-    attach_output_theta(&rb_theta);
+    attach_output_theta(&output_theta);
   }
 
   // The RBTheta member variables
-  ThetaA0 theta_a_0;
-  RBTheta rb_theta;
+  ThetaConstant theta_a_0;
+  ThetaConstant output_theta;
 };
 
 // Define an RBAssemblyExpansion class for this PDE
