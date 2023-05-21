@@ -64,6 +64,7 @@ unit_tests_sources = \
   mesh/mesh_assign.C \
   mesh/mesh_base_test.C \
   mesh/mesh_collection.C \
+  mesh/mesh_deletions.C \
   mesh/mesh_extruder.C \
   mesh/mesh_function.C \
   mesh/mesh_function_dfem.C \

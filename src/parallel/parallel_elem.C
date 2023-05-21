@@ -619,19 +619,30 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
               cast_int<dof_id_type>(*in++);
 
             // If the sending processor sees a domain boundary here,
-            // we'd better agree.
+            // we'd better agree ... unless all we see is a
+            // remote_elem?  In that case maybe we just couldn't keep
+            // up with a user's delete_elem.  Let's trust them.
             if (neighbor_id == DofObject::invalid_id)
               {
-                libmesh_assert (!(elem->neighbor_ptr(n)));
+                const Elem * my_neigh = elem->neighbor_ptr(n);
+                if (my_neigh == remote_elem)
+                  elem->set_neighbor(n, nullptr);
+                else
+                  libmesh_assert (!my_neigh);
                 continue;
               }
 
             // If the sending processor has a remote_elem neighbor here,
             // then all we know is that we'd better *not* have a domain
-            // boundary.
+            // boundary ... except that maybe it's the *sending*
+            // processor who missed a delete_elem we saw.
             if (neighbor_id == remote_elem->id())
               {
-                libmesh_assert(elem->neighbor_ptr(n));
+                // At this level of the code we can't even assert in
+                // cases where the neighbor should know what they're
+                // talking about, so skip it.
+
+                // libmesh_assert(elem->neighbor_ptr(n));
                 continue;
               }
 
