@@ -79,8 +79,8 @@ struct ShiftedGaussian : public RBParametrizedFunction
     std::vector<Number> ret(this->get_n_components() * mu.n_steps());
     for (auto i : make_range(mu.n_steps()))
       {
-        Real center_x = mu.get_value("center_x", static_cast<std::size_t>(i));
-        Real center_y = mu.get_value("center_y", static_cast<std::size_t>(i));
+        Real center_x = mu.get_step_value("center_x", i);
+        Real center_y = mu.get_step_value("center_y", i);
         ret[i] = std::exp(-2. * (pow<2>(center_x - p(0)) + pow<2>(center_y - p(1))));
       }
     return ret;

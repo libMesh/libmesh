@@ -182,17 +182,17 @@ public:
   Real get_value(const std::string & param_name, const Real & default_val) const;
 
   /**
-   * Get the value of the specified parameter at the specified index,
+   * Get the value of the specified parameter at the specified step,
    * throwing an error if it does not exist.
    */
-  Real get_value(const std::string & param_name, std::size_t index) const;
+  Real get_step_value(const std::string & param_name, std::size_t index) const;
 
   /**
-   * Get the value of the specified parameter at the specified index,
+   * Get the value of the specified parameter at the specified step,
    * returning the provided default value if either the parameter is
-   * not defined or the index is invalid.
+   * not defined or the step is invalid.
    */
-  Real get_value(const std::string & param_name, std::size_t index, const Real & default_val) const;
+  Real get_step_value(const std::string & param_name, std::size_t index, const Real & default_val) const;
 
   /**
    * Set the value of the specified parameter. If param_name
