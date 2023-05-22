@@ -155,26 +155,6 @@ void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters>
   // Dummy vector to be used when xyz perturbations are not required
   std::vector<Point> empty_perturbs;
 
-  // Debugging
-  // libMesh::out << "mus.size() = " << mus.size() << std::endl;
-  // libMesh::out << "n_points = " << n_points << std::endl;
-
-  // Debugging: A new feature is that each parameter stored in an
-  // RBParameters object can have multiple values defined in a vector.
-  // The following code iterates over each RBParameters object and
-  // checks the number of values it has.
-  // {
-  //   std::map<std::string, unsigned int> num_values_per_param;
-  //   for (const auto & mu : mus)
-  //   {
-  //     for (const auto & pr : mu)
-  //       num_values_per_param[pr.first]++;
-  //   }
-  //
-  //   for (const auto & [param_name, nvals] : num_values_per_param)
-  //     libMesh::out << "Parameter " << param_name << " has " << nvals << " value(s)" << std::endl;
-  // }
-
   output.resize(mus.size());
   for (auto mu_index : index_range(mus))
     {
@@ -189,12 +169,6 @@ void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters>
                      sbd_ids[point_index],
                      requires_xyz_perturbations ? all_xyz_perturb[point_index] : empty_perturbs,
                      phi_i_qp[point_index]);
-
-          // Debugging
-          // libMesh::out << "mu_index = " << mu_index
-          //              << ", point_index = " << point_index
-          //              << ", output[mu_index][point_index].size() = " << output[mu_index][point_index].size()
-          //              << std::endl;
         }
     }
 }

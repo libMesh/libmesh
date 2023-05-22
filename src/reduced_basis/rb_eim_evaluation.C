@@ -207,25 +207,6 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
                                                     _interpolation_points_phi_i_qp,
                                                     output_all_comps);
 
-  // Debugging: This should be equal to mus.size()
-  // libMesh::out << "output_all_comps.size()=" << output_all_comps.size() << std::endl;
-
-  // Debugging
-  // The size of output_all_comps[i][j] should now be 3 in our test
-  // for (auto i : index_range(output_all_comps))
-  //   for (auto j : index_range(output_all_comps[i]))
-  //     libMesh::out << "output_all_comps["<<i<<"]["<<j<<"].size() = " << output_all_comps[i][j].size() << std::endl;
-
-  // Debugging print output_all_comps[i][j]
-  // for (auto i : index_range(output_all_comps))
-  //   for (auto j : index_range(output_all_comps[i]))
-  //     {
-  //       libMesh::out << "output_all_comps["<<i<<"]["<<j<<"] = ";
-  //       for (auto k : index_range(output_all_comps[i][j]))
-  //         libMesh::out << output_all_comps[i][j][k] << ", ";
-  //       libMesh::out << std::endl;
-  //     }
-
   // Previously we did one RB-EIM solve per input mu, but now we do
   // one RB-EIM solve per input mu, per step. In order for this to
   // work, we require that all the input mu objects have the same
@@ -238,9 +219,6 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   // the total number of RB-EIM solves is simply the number of mus
   // times the number of steps.
   unsigned int num_rb_eim_solves = mus.size() * n_steps_0;
-
-  // Debugging:
-  // std::cout << "num_rb_eim_solves = " << num_rb_eim_solves << std::endl;
 
   std::vector<std::vector<Number>> evaluated_values_at_interp_points(num_rb_eim_solves);
 
@@ -258,12 +236,6 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
         {
           unsigned int comp = _interpolation_points_comp[interp_pt_index];
 
-          // Debugging
-          // libMesh::out << "mu_index = " << mu_index
-          //              << ", interp_pt_index = " << interp_pt_index
-          //              << ", comp = " << comp
-          //              << std::endl;
-
           // For vector-valued functions, the output_all_comps vectors are indexed first by component, then by step.
           // For example, if there are 2 components and 3 steps, the output entries will be:
           // [(comp0, step0), (comp1, step0),  (comp0, step1), (comp1, step1),  (comp0, step2), (comp1, step2)]
@@ -276,15 +248,6 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
       counter++;
     }
   }
-
-  // Debugging: print the contents of evaluated_values_at_interp_points
-  // for (auto i : index_range(evaluated_values_at_interp_points))
-  //   {
-  //     libMesh::out << "evaluated_values_at_interp_points["<<i<<"] = ";
-  //     for (auto j : index_range(evaluated_values_at_interp_points[i]))
-  //       libMesh::out << evaluated_values_at_interp_points[i][j] << ", ";
-  //     libMesh::out << std::endl;
-  //   }
 
   DenseMatrix<Number> interpolation_matrix_N;
   _interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);

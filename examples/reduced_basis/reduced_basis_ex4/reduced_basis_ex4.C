@@ -301,32 +301,33 @@ int main (int argc, char ** argv)
 
           // This size of each A_q vector here is:
           // sum_i mu_vec[i].n_steps()
-          // and it contains
-          // the logically 2D array of values:
-          // according to: {Theta(mu_vec[0], step_0), Theta(mu_vec[1], step_0), ... Theta(mu_vec[M], step_0),
-          //                Theta(mu_vec[0], step_1), Theta(mu_vec[1], step_1), ... Theta(mu_vec[M], step_1),
-          //                ...
-          //                Theta(mu_vec[0], step_N), Theta(mu_vec[1], step_N), ... Theta(mu_vec[M], step_N)}
-          // arranged in row-major format, i.e. all the step_0 Theta
-          // values, followed by all the step_1 Theta values, etc.
-          libMesh::out << "A_" << q_a << " = ";
-          for (const auto & val : all_A[q_a])
-            libMesh::out << val << ", ";
-          libMesh::out << std::endl;
+          //
+          // Each A_q vector contains the logically 2D ragged array of
+          // values (theta[i], step[j(i)]), arranged in "row-major"
+          // format, where the number of steps defined by each mu
+          // object can vary, and they are all concatenated together
+          // to produce one long list of steps.
+          //
+          // Example: suppose that there are 2 mu values containing
+          // the same sets of parameters, with 5 steps defined in the
+          // first and 10 steps defined in the second. Then, the A_q
+          // vector will look like:
+          //
+          // {Theta(mu_vec[0], step_0), Theta(mu_vec[0], step_1), ... Theta(mu_vec[0], step_4),
+          //  Theta(mu_vec[1], step_0), Theta(mu_vec[1], step_1), ... Theta(mu_vec[1], step_4), ..., Theta(mu_vec[1], step_9)}
+          //
+          // Note: this example is unusual in that it would be
+          // conceptually much simpler to have either:
+          // (i) A vector of 15 single-step RBParameters objects, or
+          // (ii) A single RBParameters object with 15 steps defined in it.
+          // but we can also support a combination of approaches (i)
+          // and (ii) by concatenation, if necessary.
         }
 
       // 2.) Evaluate "F" thetas at all steps:
       std::vector<std::vector<Number>> all_F(rb_theta_expansion.get_n_F_terms());
       for (unsigned int q_f=0; q_f<rb_theta_expansion.get_n_F_terms(); q_f++)
-        {
-          all_F[q_f] = rb_theta_expansion.eval_F_theta(q_f, mu_vec);
-
-          // The F_q values are indexed the same way as the A_q values, see comment above.
-          libMesh::out << "F_" << q_f << " = ";
-          for (const auto & val : all_F[q_f])
-            libMesh::out << val << ", ";
-          libMesh::out << std::endl;
-        }
+        all_F[q_f] = rb_theta_expansion.eval_F_theta(q_f, mu_vec);
 
       // 3.) Evaluate "output" thetas at all steps: in this case, the
       // output is particularly simple (does not depend on mu) so this
@@ -339,16 +340,8 @@ int main (int argc, char ** argv)
         unsigned int output_counter = 0;
         for (unsigned int n=0; n<rb_theta_expansion.get_n_outputs(); n++)
           for (unsigned int q_l=0; q_l<rb_theta_expansion.get_n_output_terms(n); q_l++)
-            {
-              all_outputs[output_counter++] =
-                rb_theta_expansion.eval_output_theta(n, q_l, mu_vec);
-
-              // Debugging:
-              libMesh::out << "output(" << n << ", " << q_l << ") = ";
-              for (const auto & val : all_outputs.back())
-                libMesh::out << val << ", ";
-              libMesh::out << std::endl;
-            }
+            all_outputs[output_counter++] =
+              rb_theta_expansion.eval_output_theta(n, q_l, mu_vec);
       }
 
       // The total number of thetas is the sum of the "A", "F", and
@@ -357,12 +350,6 @@ int main (int argc, char ** argv)
         rb_theta_expansion.get_n_A_terms() +
         rb_theta_expansion.get_n_F_terms() +
         rb_theta_expansion.get_total_n_output_terms();
-
-      // Debugging
-      libMesh::out << "n_A_terms = " << rb_theta_expansion.get_n_A_terms() << std::endl;
-      libMesh::out << "n_F_terms = " << rb_theta_expansion.get_n_F_terms() << std::endl;
-      libMesh::out << "total_n_output_terms = " << rb_theta_expansion.get_total_n_output_terms() << std::endl;
-      libMesh::out << "n_thetas = " << n_thetas << std::endl;
 
       // Allocate enough space to store all the evaluated theta values for this RBThetaExpansion
       std::vector<Number> evaluated_thetas(n_thetas);

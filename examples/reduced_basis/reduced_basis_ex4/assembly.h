@@ -69,9 +69,6 @@ struct ShiftedGaussian : public RBParametrizedFunction
     // Real center_y = mu.get_value("center_y");
     // return std::vector<Number> { std::exp(-2. * (pow<2>(center_x - p(0)) + pow<2>(center_y - p(1)))) };
 
-    // Debugging: print number of steps stored for each parameter
-    // libMesh::out << "Called ShiftedGaussian::evaluate() with " << mu.n_steps << " step(s) for each parameter." << std::endl;
-
     // New way, there are get_n_components() * mu.n_steps() entries in
     // the return vector.  In debug mode, we verify that the same
     // number of steps are provided for all parameters when
