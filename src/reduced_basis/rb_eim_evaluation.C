@@ -262,6 +262,9 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   for (auto mu_index : index_range(mus))
     for (auto step_index : make_range(mus[mu_index].n_steps()))
     {
+      // Ignore compiler warnings about unused loop index
+      libmesh_ignore(step_index);
+
       DenseVector<Number> EIM_rhs = evaluated_values_at_interp_points[counter];
       interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[counter]);
       counter++;
