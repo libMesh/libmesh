@@ -406,11 +406,12 @@ int main (int argc, char ** argv)
           rb_eval.rb_solve(rb_eval.get_n_basis_functions(), &evaluated_thetas);
 
           // Print the output as well as the corresponding output error bound
-          libMesh::out << "Output value = " << rb_eval.RB_outputs[0]
-                       << ", error bound = " << rb_eval.RB_output_error_bounds[0]
-                       << std::endl;
+          for (auto i : index_range(rb_eval.RB_outputs))
+            libMesh::out << "Output value " << i << " = " << rb_eval.RB_outputs[i]
+                         << ", error bound " << i << " = " << rb_eval.RB_output_error_bounds[i]
+                         << std::endl;
 
-      // Write an exo file to visualize this solution
+          // Write an exo file to visualize this solution
           rb_construction.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
           ExodusII_IO(mesh).write_equation_systems("RB_sol_" + std::to_string(step) + ".e", equation_systems);

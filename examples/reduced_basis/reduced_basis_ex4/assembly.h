@@ -286,8 +286,9 @@ struct EimTestRBThetaExpansion : RBThetaExpansion
     // Note: there are no Thetas associated with the RHS since we use
     // an EIM approximation for the forcing term.
 
-    // Attach an RBTheta object for the output. Here we just use the
+    // Attach an RBTheta object for each output. Here we just use the
     // ThetaConstant class again, but this time with a value of 1.0.
+    attach_output_theta(&output_theta);
     attach_output_theta(&output_theta);
   }
 
@@ -303,18 +304,22 @@ struct EimTestRBAssemblyExpansion : RBAssemblyExpansion
    * Constructor.
    */
   EimTestRBAssemblyExpansion():
-    L0(BoundingBox(/*min=*/Point(-0.2, -0.2),
-                   /*max=*/Point(0.2, 0.2)))
+    L0(BoundingBox(/*min=*/Point(-0.2, -0.2), /*max=*/Point(0.0, 0.0))),
+    L1(BoundingBox(/*min=*/Point(0.0, 0.0), /*max=*/Point(0.2, 0.2)))
   {
     attach_A_assembly(&A0_assembly);
+
+    // Attach output assembly objects
     attach_output_assembly(&L0);
+    attach_output_assembly(&L1);
   }
 
   // A0 assembly object
   A0 A0_assembly;
 
-  // Assembly object associated with the output functional
+  // Assembly objects associated with the output functionals
   OutputAssembly L0;
+  OutputAssembly L1;
 };
 
 #endif
