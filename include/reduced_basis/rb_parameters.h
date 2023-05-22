@@ -243,22 +243,12 @@ public:
   unsigned int n_parameters() const;
 
   /**
-   * Returns the number of values stored for param_name, or 0 if
-   * param_name is not present. Each parameter stored in an
-   * RBParameters object can have one value for time step or load
-   * step, and n_values() gives the number of such values.
+   * Returns the number of steps stored for all parameters. For
+   * simplicity, we require all parameters to store the same number of
+   * steps ("step" here may refer to time step or load step) and in
+   * debug mode we actually verify that is the case.
    */
-  unsigned int n_values(const std::string & param_name) const;
-
-  /**
-   * Returns the maximum number of values stored for any
-   * parameter. Note: we generally expect all parameters to store the
-   * same number of values (e.g. one per time step or one per load
-   * step) but there is nothing which requires that to be the case
-   * currently, so this function may be helpful in sizing output data
-   * structures.
-   */
-  unsigned int max_n_values() const;
+  unsigned int n_steps() const;
 
   /**
    * Fill \p param_names with the names of the parameters.

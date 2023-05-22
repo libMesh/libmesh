@@ -136,18 +136,24 @@ unsigned int RBParameters::n_parameters() const
   return cast_int<unsigned int>(_parameters.size());
 }
 
-unsigned int RBParameters::n_values(const std::string & param_name) const
+unsigned int RBParameters::n_steps() const
 {
-  auto it = _parameters.find(param_name);
-  return (it != _parameters.end() ? it->second.size() : 0);
-}
+  // Quick return if there are no parameters
+  if (_parameters.empty())
+    return 0;
 
-unsigned int RBParameters::max_n_values() const
-{
-  std::size_t ret = 0;
+  // If _parameters is not empty, we can check the number of steps in the first param
+  auto size_first = _parameters.begin()->second.size();
+
+#ifdef DEBUG
+  // In debug mode, verify that all parameters have the same number of steps
   for (const auto & pr : _parameters)
-    ret = std::max(ret, pr.second.size());
-  return cast_int<unsigned int>(ret);
+    libmesh_assert_msg(pr.second.size() == size_first, "All parameters must have the same number of steps.");
+#endif
+
+  // If we made it here in DEBUG mode, then all parameters were
+  // verified to have the same number of steps.
+  return size_first;
 }
 
 void RBParameters::get_parameter_names(std::set<std::string> & param_names) const

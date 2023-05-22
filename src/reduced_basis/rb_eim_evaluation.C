@@ -230,14 +230,14 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   // one RB-EIM solve per input mu, per step. In order for this to
   // work, we require that all the input mu objects have the same
   // number of steps.
-  auto n_vals_0 = mus[0].max_n_values();
+  auto n_steps_0 = mus[0].n_steps();
   for (const auto & mu : mus)
-    libmesh_error_msg_if(mu.max_n_values() != n_vals_0, "All RBParameters objects must have same max_n_values()");
+    libmesh_error_msg_if(mu.n_steps() != n_steps_0, "All RBParameters objects must have same n_steps()");
 
   // After we verified that all mus have the same number of values,
   // the total number of RB-EIM solves is simply the number of mus
   // times the number of steps.
-  unsigned int num_rb_eim_solves = mus.size() * n_vals_0;
+  unsigned int num_rb_eim_solves = mus.size() * n_steps_0;
 
   // Debugging:
   // std::cout << "num_rb_eim_solves = " << num_rb_eim_solves << std::endl;
@@ -250,7 +250,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   {
   unsigned int counter = 0;
   for (auto mu_index : index_range(mus))
-    for (auto step_index : make_range(mus[mu_index].max_n_values()))
+    for (auto step_index : make_range(mus[mu_index].n_steps()))
     {
       evaluated_values_at_interp_points[counter].resize(N); // N is number of RB basis functions
 
@@ -297,7 +297,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   {
   unsigned int counter = 0;
   for (auto mu_index : index_range(mus))
-    for (auto step_index : make_range(mus[mu_index].max_n_values()))
+    for (auto step_index : make_range(mus[mu_index].n_steps()))
     {
       DenseVector<Number> EIM_rhs = evaluated_values_at_interp_points[counter];
       interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[counter]);

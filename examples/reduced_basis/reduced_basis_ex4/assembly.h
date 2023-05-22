@@ -14,6 +14,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/utility.h"
 #include "libmesh/print_trace.h"
+#include "libmesh/int_range.h"
 
 // rbOOmit includes
 #include "libmesh/rb_assembly_expansion.h"
@@ -43,6 +44,7 @@ using libMesh::FEBase;
 using libMesh::subdomain_id_type;
 using libMesh::dof_id_type;
 using libMesh::Utility::pow;
+using libMesh::make_range;
 
 struct ShiftedGaussian : public RBParametrizedFunction
 {
@@ -65,20 +67,18 @@ struct ShiftedGaussian : public RBParametrizedFunction
     // Real center_y = mu.get_value("center_y");
     // return std::vector<Number> { std::exp(-2. * (pow<2>(center_x - p(0)) + pow<2>(center_y - p(1)))) };
 
-    // New way, there are get_n_components() * mu.max_n_values() entries in the return vector.
-    // Make sure that the same number of values are provided for both relevant parameters.
-    auto n_values_x = mu.n_values("center_x");
-    auto n_values_y = mu.n_values("center_y");
-    libmesh_error_msg_if(n_values_x != n_values_y, "Must specify same number of values for all parameters.");
+    // Debugging: print number of steps stored for each parameter
+    // libMesh::out << "Called ShiftedGaussian::evaluate() with " << mu.n_steps << " step(s) for each parameter." << std::endl;
 
-    // Debugging: print number of values
-    // libMesh::out << "Called ShiftedGaussian::evaluate() with " << n_values_x << " value(s) for each parameter." << std::endl;
-
-    std::vector<Number> ret(this->get_n_components() * n_values_x);
-    for (std::size_t i=0; i<n_values_x; ++i)
+    // New way, there are get_n_components() * mu.n_steps() entries in
+    // the return vector.  In debug mode, we verify that the same
+    // number of steps are provided for all parameters when
+    // RBParameters::n_steps() is called.
+    std::vector<Number> ret(this->get_n_components() * mu.n_steps());
+    for (auto i : make_range(mu.n_steps()))
       {
-        Real center_x = mu.get_value("center_x", i);
-        Real center_y = mu.get_value("center_y", i);
+        Real center_x = mu.get_value("center_x", static_cast<std::size_t>(i));
+        Real center_y = mu.get_value("center_y", static_cast<std::size_t>(i));
         ret[i] = std::exp(-2. * (pow<2>(center_x - p(0)) + pow<2>(center_y - p(1))));
       }
     return ret;
@@ -98,12 +98,12 @@ struct ThetaConstant : RBTheta
   /**
    * Evaluate theta for a single scalar-valued RBParameters object.
    * In this case, Theta(mu) does not depend on mu explicitly, except
-   * to determine the number of "steps" (aka max_n_values()) which mu
+   * to determine the number of "steps" (aka n_steps()) which mu
    * has, so that the output vector is sized appropriately.
    */
   virtual Number evaluate(const RBParameters & mu) override
   {
-    libmesh_error_msg_if(mu.max_n_values() > 1,
+    libmesh_error_msg_if(mu.n_steps() > 1,
                          "You should only call the evaluate_vec() API when using multi-step RBParameters objects.");
 
     return _val;
@@ -119,11 +119,11 @@ struct ThetaConstant : RBTheta
     // scalar-valued RBParameters objects, there would be mus.size()
     // values returned in the vector. For step-valued RBParameters
     // objects, there are:
-    // sum_i mus[i].max_n_values()
+    // sum_i mus[i].n_steps()
     // total Thetas, i.e. one Theta per step.
     unsigned int count = 0;
     for (const auto & mu : mus)
-      count += mu.max_n_values();
+      count += mu.n_steps();
 
     return std::vector<Number>(count, _val);
   }

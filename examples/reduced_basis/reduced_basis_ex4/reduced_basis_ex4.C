@@ -300,7 +300,7 @@ int main (int argc, char ** argv)
           all_A[q_a] = rb_theta_expansion.eval_A_theta(q_a, mu_vec);
 
           // This size of each A_q vector here is:
-          // sum_i mu_vec[i].max_n_values()
+          // sum_i mu_vec[i].n_steps()
           // and it contains
           // the logically 2D array of values:
           // according to: {Theta(mu_vec[0], step_0), Theta(mu_vec[1], step_0), ... Theta(mu_vec[M], step_0),
@@ -381,7 +381,7 @@ int main (int argc, char ** argv)
       rb_eval.read_in_basis_functions(rb_construction, "rb_data");
 
       // Loop over each step, fill the evaluated_thetas array, call rb_solve()
-      for (unsigned step=0; step<online_mu.max_n_values(); ++step)
+      for (unsigned step=0; step<online_mu.n_steps(); ++step)
         {
           unsigned int counter = 0;
 
