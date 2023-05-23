@@ -43,9 +43,14 @@ class TransientRBThetaExpansion : public RBThetaExpansion
 public:
 
   /**
-   * Constructor.
+   * All special functions can be defaulted for this simple class.
    */
-  TransientRBThetaExpansion();
+  TransientRBThetaExpansion() = default;
+  TransientRBThetaExpansion (TransientRBThetaExpansion &&) = default;
+  TransientRBThetaExpansion (const TransientRBThetaExpansion &) = default;
+  TransientRBThetaExpansion & operator= (const TransientRBThetaExpansion &) = default;
+  TransientRBThetaExpansion & operator= (TransientRBThetaExpansion &&) = default;
+  virtual ~TransientRBThetaExpansion () = default;
 
   /**
    * The type of the parent.

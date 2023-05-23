@@ -23,13 +23,6 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// RBThetaExpansion implementation
-
-TransientRBThetaExpansion::TransientRBThetaExpansion()
-{
-}
-
 Number TransientRBThetaExpansion::eval_M_theta(unsigned int q,
                                                const RBParameters & mu) const
 {
