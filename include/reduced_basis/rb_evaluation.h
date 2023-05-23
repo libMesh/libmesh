@@ -126,14 +126,14 @@ public:
    * Compute the dual norm of the residual for the solution
    * saved in RB_solution_vector.
    */
-  virtual Real compute_residual_dual_norm(const unsigned int N);
+  virtual Real compute_residual_dual_norm(const unsigned int N) const;
 
   /**
    * The same as above, except that we pass in evaluated thetas
    * instead of recomputing the theta values.
    */
   virtual Real compute_residual_dual_norm(const unsigned int N,
-                                          const std::vector<Number> * evaluated_thetas);
+                                          const std::vector<Number> * evaluated_thetas) const;
 
   /**
    * Specifies the residual scaling on the denominator to
