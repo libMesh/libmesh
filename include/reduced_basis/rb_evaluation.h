@@ -104,6 +104,7 @@ public:
    * Get a reference to the i^th basis function.
    */
   NumericVector<Number> & get_basis_function(unsigned int i);
+  const NumericVector<Number> & get_basis_function(unsigned int i) const;
 
   /**
    * Perform online solve with the N RB basis functions, for the

@@ -210,6 +210,13 @@ NumericVector<Number> & RBEvaluation::get_basis_function(unsigned int i)
   return *(basis_functions[i]);
 }
 
+const NumericVector<Number> & RBEvaluation::get_basis_function(unsigned int i) const
+{
+  libmesh_assert_less (i, basis_functions.size());
+
+  return *(basis_functions[i]);
+}
+
 Real RBEvaluation::rb_solve(unsigned int N)
 {
   return rb_solve(N, nullptr);

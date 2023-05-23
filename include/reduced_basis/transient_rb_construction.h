@@ -118,7 +118,7 @@ public:
   /**
    * Print out info that describes the current setup of this RBConstruction.
    */
-  virtual void print_info() override;
+  virtual void print_info() const override;
 
   /**
    * Function that indicates when to terminate the Greedy
