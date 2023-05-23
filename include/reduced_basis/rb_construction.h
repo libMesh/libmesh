@@ -95,6 +95,7 @@ public:
    * Get a reference to the RBEvaluation object.
    */
   RBEvaluation & get_rb_evaluation();
+  const RBEvaluation & get_rb_evaluation() const;
 
   /**
    * \returns \p true if rb_eval is initialized. False, otherwise.
@@ -106,6 +107,7 @@ public:
    * that belongs to rb_eval.
    */
   RBThetaExpansion & get_rb_theta_expansion();
+  const RBThetaExpansion & get_rb_theta_expansion() const;
 
   /**
    * Set the rb_assembly_expansion object.

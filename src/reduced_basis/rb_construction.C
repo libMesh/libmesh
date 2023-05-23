@@ -178,12 +178,24 @@ RBEvaluation & RBConstruction::get_rb_evaluation()
   return *rb_eval;
 }
 
+const RBEvaluation & RBConstruction::get_rb_evaluation() const
+{
+  libmesh_error_msg_if(!rb_eval, "Error: RBEvaluation object hasn't been initialized yet");
+
+  return *rb_eval;
+}
+
 bool RBConstruction::is_rb_eval_initialized() const
 {
   return (rb_eval != nullptr);
 }
 
 RBThetaExpansion & RBConstruction::get_rb_theta_expansion()
+{
+  return get_rb_evaluation().get_rb_theta_expansion();
+}
+
+const RBThetaExpansion & RBConstruction::get_rb_theta_expansion() const
 {
   return get_rb_evaluation().get_rb_theta_expansion();
 }
