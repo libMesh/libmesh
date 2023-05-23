@@ -58,8 +58,14 @@ public:
                            const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class has the same restrictions/defaults as its base class.
+   * - Destructor is defaulted out-of-line
    */
+  TransientRBConstruction (TransientRBConstruction &&) = default;
+  TransientRBConstruction (const TransientRBConstruction &) = delete;
+  TransientRBConstruction & operator= (const TransientRBConstruction &) = delete;
+  TransientRBConstruction & operator= (TransientRBConstruction &&) = delete;
   virtual ~TransientRBConstruction ();
 
   /**
