@@ -46,14 +46,14 @@ class RBAssemblyExpansion : public ReferenceCountedObject<RBAssemblyExpansion>
 public:
 
   /**
-   * Constructor.
+   * All special functions can be defaulted for this simple class.
    */
-  RBAssemblyExpansion();
-
-  /**
-   * Destructor.
-   */
-  virtual ~RBAssemblyExpansion() = default;
+  RBAssemblyExpansion() = default;
+  RBAssemblyExpansion (RBAssemblyExpansion &&) = default;
+  RBAssemblyExpansion (const RBAssemblyExpansion &) = default;
+  RBAssemblyExpansion & operator= (const RBAssemblyExpansion &) = default;
+  RBAssemblyExpansion & operator= (RBAssemblyExpansion &&) = default;
+  virtual ~RBAssemblyExpansion () = default;
 
   /**
    * Perform the specified A interior assembly.

@@ -24,13 +24,6 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// RBAssemblyExpansion implementation
-
-RBAssemblyExpansion::RBAssemblyExpansion()
-{
-}
-
 void RBAssemblyExpansion::perform_A_interior_assembly(unsigned int q,
                                                       FEMContext & context)
 {
