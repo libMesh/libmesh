@@ -79,7 +79,7 @@ public:
         // Retrieve the element from the mesh by ID to guarantee proper ordering instead of with iterators
         Elem & elem = dest_mesh.elem_ref(i);
 
-        CPPUNIT_ASSERT_EQUAL((unsigned int)elem.subdomain_id(), i%n_elems_per_layer + i/n_elems_per_layer /* integer division */);
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(elem.subdomain_id()), i%n_elems_per_layer + i/n_elems_per_layer /* integer division */);
       }
   }
 };

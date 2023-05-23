@@ -107,10 +107,10 @@ public:
     LOG_UNIT_TEST;
 
     // There'd better be 3 elements
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)3, _mesh->n_elem() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(3), _mesh->n_elem());
 
     // There'd better be only 6 nodes
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)6, _mesh->n_nodes() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(6), _mesh->n_nodes());
 
     /* The nodes for the EDGE2 element should have the same global ids
        as the bottom edge of the top QUAD4 element */
@@ -176,14 +176,14 @@ public:
     CPPUNIT_ASSERT(top_elem);
 
     // We should have gotten back the top quad
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)0, top_elem->id() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(0), top_elem->id());
 
     Point bottom_point(0.5, -0.5);
     const Elem* bottom_elem = (*locator)(bottom_point);
     CPPUNIT_ASSERT(bottom_elem);
 
     // We should have gotten back the bottom quad
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)1, bottom_elem->id() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(1), bottom_elem->id());
 
     // Test getting back the edge
     {
@@ -193,7 +193,7 @@ public:
       CPPUNIT_ASSERT(interface_elem);
 
       // We should have gotten back the overlapping edge element
-      CPPUNIT_ASSERT_EQUAL( (dof_id_type)2, interface_elem->id() );
+      CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2), interface_elem->id());
     }
   }
 
@@ -251,11 +251,11 @@ public:
     LOG_UNIT_TEST;
 
     // We should have 13 total and 10 active elements.
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)13, _mesh->n_elem() );
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)10, _mesh->n_active_elem() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(13), _mesh->n_elem());
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(10), _mesh->n_active_elem());
 
     // We should have 15 nodes
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)15, _mesh->n_nodes() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(15), _mesh->n_nodes());
 
     // EDGE2,id=11 should have same nodes of bottom of QUAD4, id=3
     CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(11).node_id(0),
@@ -509,11 +509,11 @@ public:
     LOG_UNIT_TEST;
 
     // We should have 13 total and 10 active elements.
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)15, _mesh->n_elem() );
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)12, _mesh->n_active_elem() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(15), _mesh->n_elem());
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(12), _mesh->n_active_elem());
 
     // We should have 15 nodes
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)19, _mesh->n_nodes() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(19), _mesh->n_nodes());
 
     // EDGE2,id=13 should have same nodes of bottom of QUAD4, id=5
     CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(0),
@@ -735,11 +735,11 @@ public:
     LOG_UNIT_TEST;
 
     // We should have 15 total and 12 active elements.
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)15, _mesh->n_elem() );
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)12, _mesh->n_active_elem() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(15), _mesh->n_elem());
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(12), _mesh->n_active_elem());
 
     // We should have 15 nodes
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)11, _mesh->n_nodes() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(11), _mesh->n_nodes());
 
     // EDGE2,id=13 should have same nodes of the base of TRI3, id=5
     CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(13).node_id(0),
@@ -962,11 +962,11 @@ public:
     LOG_UNIT_TEST;
 
     // We should have 57 total and 54 active elements.
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)57, _mesh->n_elem() );
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)54, _mesh->n_active_elem() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(57), _mesh->n_elem() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(54), _mesh->n_active_elem() );
 
     // We should have 113 nodes
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)113, _mesh->n_nodes() );
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(113), _mesh->n_nodes() );
 
     // QUAD4,id=53 should have same nodes as a face in HEX8, id=39
     CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(53).node_id(0),

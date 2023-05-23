@@ -78,8 +78,8 @@ public:
 
     mesh0.stitch_meshes(mesh1, 2, 10, TOLERANCE, true, true, false, false);
 
-    CPPUNIT_ASSERT_EQUAL(mesh0.n_elem(), dof_id_type(16));
-    CPPUNIT_ASSERT_EQUAL(mesh0.n_nodes(), dof_id_type(45));
+    CPPUNIT_ASSERT_EQUAL(mesh0.n_elem(),  static_cast<dof_id_type>(16));
+    CPPUNIT_ASSERT_EQUAL(mesh0.n_nodes(), static_cast<dof_id_type>(45));
 
     const BoundaryInfo & bi = mesh0.get_boundary_info();
     const auto & sbi = bi.get_side_boundary_ids();
@@ -176,8 +176,8 @@ public:
     mesh2.stitch_meshes(mesh3, 2, 4, TOLERANCE, true, true, false, false);
     mesh0.stitch_meshes(mesh2, 1, 3, TOLERANCE, true, true, false, false);
 
-    CPPUNIT_ASSERT_EQUAL(mesh0.n_elem(), dof_id_type(32));
-    CPPUNIT_ASSERT_EQUAL(mesh0.n_nodes(), dof_id_type(405));
+    CPPUNIT_ASSERT_EQUAL(mesh0.n_elem(),  static_cast<dof_id_type>(32));
+    CPPUNIT_ASSERT_EQUAL(mesh0.n_nodes(), static_cast<dof_id_type>(405));
     CPPUNIT_ASSERT_EQUAL(mesh0.n_elem_integers(), 5u); // that pair counts 2x
     CPPUNIT_ASSERT_EQUAL(mesh0.n_node_integers(), 5u);
     std::vector<std::string> all_names {"foo", "bar", "baz", "qux"};
@@ -196,7 +196,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(elem->n_extra_integers(), 5u);
         const Point c = elem->vertex_average();
         if (c(0) > 0 && c(1) > 0) // this came from mesh1
-          CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(foo0e_idx), dof_id_type(2));
+          CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(foo0e_idx), static_cast<dof_id_type>(2));
         else
           CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(foo0e_idx), DofObject::invalid_id);
       }
@@ -209,8 +209,8 @@ public:
           node->template get_extra_datum<trivially_copyable_pair>(qux0n_idx);
         if ((*node)(0) <= 0 && (*node)(1) < 0) // this came from mesh2
           {
-            CPPUNIT_ASSERT_EQUAL(datum.first, dof_id_type(3));
-            CPPUNIT_ASSERT_EQUAL(datum.second, dof_id_type(4));
+            CPPUNIT_ASSERT_EQUAL(datum.first,  static_cast<dof_id_type>(3));
+            CPPUNIT_ASSERT_EQUAL(datum.second, static_cast<dof_id_type>(4));
           }
         else
           {
