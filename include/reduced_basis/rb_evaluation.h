@@ -58,8 +58,15 @@ public:
   RBEvaluation (const Parallel::Communicator & comm);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains unique_ptrs, so it can't be default copy
+   *   constructed/assigned.
+   * - The destructor is defaulted out of line.
    */
+  RBEvaluation (RBEvaluation &&) = default;
+  RBEvaluation (const RBEvaluation &) = delete;
+  RBEvaluation & operator= (const RBEvaluation &) = delete;
+  RBEvaluation & operator= (RBEvaluation &&) = default;
   virtual ~RBEvaluation ();
 
   /**
