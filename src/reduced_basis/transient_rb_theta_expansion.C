@@ -39,6 +39,11 @@ Number TransientRBThetaExpansion::eval_M_theta(unsigned int q,
   return _M_theta_vector[q]->evaluate( mu );
 }
 
+unsigned int TransientRBThetaExpansion::get_n_M_terms() const
+{
+  return cast_int<unsigned int>(_M_theta_vector.size());
+}
+
 void TransientRBThetaExpansion::attach_M_theta(RBTheta * theta_q_m)
 {
   libmesh_assert(theta_q_m);
