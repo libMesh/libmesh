@@ -59,39 +59,39 @@ public:
    * Perform the specified A interior assembly.
    */
   void perform_A_interior_assembly(unsigned int q,
-                                   FEMContext & context);
+                                   FEMContext & context) const;
 
   /**
    * Perform the specified A boundary assembly.
    */
   void perform_A_boundary_assembly(unsigned int q,
-                                   FEMContext & context);
+                                   FEMContext & context) const;
 
   /**
    * Perform the specified F interior assembly.
    */
   void perform_F_interior_assembly(unsigned int q,
-                                   FEMContext & context);
+                                   FEMContext & context) const;
 
   /**
    * Perform the specified F boundary assembly.
    */
   void perform_F_boundary_assembly(unsigned int q,
-                                   FEMContext & context);
+                                   FEMContext & context) const;
 
   /**
    * Perform the specified output assembly.
    */
   void perform_output_interior_assembly(unsigned int output_index,
                                         unsigned int q_l,
-                                        FEMContext & context);
+                                        FEMContext & context) const;
 
   /**
    * Perform the specified output assembly.
    */
   void perform_output_boundary_assembly(unsigned int output_index,
                                         unsigned int q_l,
-                                        FEMContext & context);
+                                        FEMContext & context) const;
 
   /**
    * Get Q_a, the number of terms in the affine

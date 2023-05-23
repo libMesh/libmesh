@@ -25,7 +25,7 @@ namespace libMesh
 {
 
 void RBAssemblyExpansion::perform_A_interior_assembly(unsigned int q,
-                                                      FEMContext & context)
+                                                      FEMContext & context) const
 {
   libmesh_error_msg_if(q >= get_n_A_terms(),
                        "Error: We must have q < get_n_A_terms in perform_A_interior_assembly.");
@@ -36,7 +36,7 @@ void RBAssemblyExpansion::perform_A_interior_assembly(unsigned int q,
 }
 
 void RBAssemblyExpansion::perform_A_boundary_assembly(unsigned int q,
-                                                      FEMContext & context)
+                                                      FEMContext & context) const
 {
   libmesh_error_msg_if(q >= get_n_A_terms(),
                        "Error: We must have q < get_n_A_terms in perform_A_boundary_assembly.");
@@ -47,7 +47,7 @@ void RBAssemblyExpansion::perform_A_boundary_assembly(unsigned int q,
 }
 
 void RBAssemblyExpansion::perform_F_interior_assembly(unsigned int q,
-                                                      FEMContext & context)
+                                                      FEMContext & context) const
 {
   libmesh_error_msg_if(q >= get_n_F_terms(),
                        "Error: We must have q < get_n_F_terms in perform_F_interior_assembly.");
@@ -58,7 +58,7 @@ void RBAssemblyExpansion::perform_F_interior_assembly(unsigned int q,
 }
 
 void RBAssemblyExpansion::perform_F_boundary_assembly(unsigned int q,
-                                                      FEMContext & context)
+                                                      FEMContext & context) const
 {
   libmesh_error_msg_if(q >= get_n_F_terms(),
                        "Error: We must have q < get_n_F_terms in perform_F_interior_assembly.");
@@ -70,7 +70,7 @@ void RBAssemblyExpansion::perform_F_boundary_assembly(unsigned int q,
 
 void RBAssemblyExpansion::perform_output_interior_assembly(unsigned int output_index,
                                                            unsigned int q_l,
-                                                           FEMContext & context)
+                                                           FEMContext & context) const
 {
   libmesh_error_msg_if((output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)),
                        "Error: We must have output_index < n_outputs and "
@@ -83,7 +83,7 @@ void RBAssemblyExpansion::perform_output_interior_assembly(unsigned int output_i
 
 void RBAssemblyExpansion::perform_output_boundary_assembly(unsigned int output_index,
                                                            unsigned int q_l,
-                                                           FEMContext & context)
+                                                           FEMContext & context) const
 {
   libmesh_error_msg_if((output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)),
                        "Error: We must have output_index < n_outputs and "
