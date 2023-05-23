@@ -2777,7 +2777,7 @@ GetPot::_DBE_expand_string(const std::string& str)
   unsigned first = 0;
   for (unsigned i = 0;  i<str.size(); i++)
     {
-      if (i < str.size() - 2 && str.substr(i, 2) == "${")
+      if (i + 2 < str.size() && str.substr(i, 2) == "${")
         {
           if (open_brackets == 0)
             first = i+2;
