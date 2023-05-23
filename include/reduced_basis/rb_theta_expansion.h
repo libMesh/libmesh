@@ -61,39 +61,39 @@ public:
    * in subclasses.
    */
   virtual Number eval_A_theta(unsigned int q,
-                              const RBParameters & mu);
+                              const RBParameters & mu) const;
 
   /**
    * Evaluate theta_q_a at multiple parameters simultaneously.
    */
   virtual std::vector<Number> eval_A_theta(unsigned int q,
-                                           const std::vector<RBParameters> & mus);
+                                           const std::vector<RBParameters> & mus) const;
 
   /**
    * Evaluate theta_q_f at the current parameter.
    */
   virtual Number eval_F_theta(unsigned int q,
-                              const RBParameters & mu);
+                              const RBParameters & mu) const;
 
   /**
    * Evaluate theta_q_f at multiple parameters simultaneously.
    */
   virtual std::vector<Number> eval_F_theta(unsigned int q,
-                                           const std::vector<RBParameters> & mus);
+                                           const std::vector<RBParameters> & mus) const;
 
   /**
    * Evaluate theta_q_l at the current parameter.
    */
   virtual Number eval_output_theta(unsigned int output_index,
                                    unsigned int q_l,
-                                   const RBParameters & mu);
+                                   const RBParameters & mu) const;
 
   /**
    * Evaluate theta_q_l at multiple parameters simultaneously.
    */
   virtual std::vector<Number> eval_output_theta(unsigned int output_index,
                                                 unsigned int q_l,
-                                                const std::vector<RBParameters> & mus);
+                                                const std::vector<RBParameters> & mus) const;
 
   /**
    * Get Q_a, the number of terms in the affine
@@ -128,7 +128,7 @@ public:
    * pre-evaluated theta arrays, which store the pre-evaluated output theta
    * values in this order following the "A" and "F" theta values.
    */
-  unsigned int output_index_1D(unsigned int n, unsigned int q_l);
+  unsigned int output_index_1D(unsigned int n, unsigned int q_l) const;
 
   /**
    * Attach a pointer to a functor object that defines one
