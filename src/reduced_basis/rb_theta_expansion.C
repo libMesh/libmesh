@@ -22,6 +22,9 @@
 #include "libmesh/rb_theta.h"
 #include "libmesh/rb_parameters.h"
 
+// libMesh includes
+#include "libmesh/int_range.h" // make_range
+
 namespace libMesh
 {
 
@@ -56,6 +59,26 @@ unsigned int RBThetaExpansion::get_n_output_terms(unsigned int index) const
 
   return cast_int<unsigned int>
     (_output_theta_vector[index].size());
+}
+
+unsigned int RBThetaExpansion::get_total_n_output_terms() const
+{
+  unsigned int sum = 0;
+  for (const auto & vec : _output_theta_vector)
+    sum += vec.size();
+  return sum;
+}
+
+unsigned int RBThetaExpansion::output_index_1D(unsigned int n, unsigned int q_l)
+{
+  // Start with index of the current term
+  unsigned int index = q_l;
+
+  // Add to it the number of terms for all outputs prior to n
+  for (auto i : make_range(n))
+    index += _output_theta_vector[i].size();
+
+  return index;
 }
 
 void RBThetaExpansion::attach_A_theta(RBTheta * theta_q_a)
@@ -164,5 +187,18 @@ Number RBThetaExpansion::eval_output_theta(unsigned int output_index,
   return _output_theta_vector[output_index][q_l]->evaluate( mu );
 }
 
+std::vector<Number>
+RBThetaExpansion::eval_output_theta(unsigned int output_index,
+                                    unsigned int q_l,
+                                    const std::vector<RBParameters> & mus)
+{
+  libmesh_error_msg_if((output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)),
+                       "Error: We must have output_index < n_outputs and "
+                       "q_l < get_n_output_terms(output_index) in eval_output_theta.");
+
+  libmesh_assert(_output_theta_vector[output_index][q_l]);
+
+  return _output_theta_vector[output_index][q_l]->evaluate_vec(mus);
+}
 
 }

@@ -54,21 +54,31 @@ bool RBParameters::has_extra_value(const std::string & param_name) const
 
 Real RBParameters::get_value(const std::string & param_name) const
 {
-  // This version of get_value() does not take an index and is provided
-  // for backwards compatibility. It simply returns the [0]th entry of
-  // the vector if it can, throwing an error otherwise.
-  const auto & vec = libmesh_map_find(_parameters, param_name);
-  libmesh_error_msg_if(vec.size() == 0, "Error getting value for parameter " << param_name);
-  return vec[0];
+  // get_value() is maintained for backwards compatibility. It simply
+  // returns the [0]th entry of the vector if it can, throwing an
+  // error otherwise.
+  return this->get_step_value(param_name, /*step=*/0);
 }
 
 Real RBParameters::get_value(const std::string & param_name, const Real & default_val) const
 {
-  // This version of get_value() does not take an index and is provided
-  // for backwards compatibility. It simply returns the [0]th entry of
-  // the vector if it can, or the default value otherwise.
+  // get_value() is maintained for backwards compatibility. It simply
+  // returns the [0]th entry of the vector if it can, or the default
+  // value otherwise.
+  return this->get_step_value(param_name, /*step=*/0, default_val);
+}
+
+Real RBParameters::get_step_value(const std::string & param_name, std::size_t step) const
+{
+  const auto & vec = libmesh_map_find(_parameters, param_name);
+  libmesh_error_msg_if(step >= vec.size(), "Error getting value for parameter " << param_name);
+  return vec[step];
+}
+
+Real RBParameters::get_step_value(const std::string & param_name, std::size_t step, const Real & default_val) const
+{
   auto it = _parameters.find(param_name);
-  return ((it != _parameters.end() && it->second.size() != 0) ? it->second[0] : default_val);
+  return ((it != _parameters.end() && step < it->second.size()) ? it->second[step] : default_val);
 }
 
 void RBParameters::set_value(const std::string & param_name, Real value)
@@ -77,6 +87,27 @@ void RBParameters::set_value(const std::string & param_name, Real value)
   // for backwards compatibility. It creates a vector entry for the specified
   // param_name, overwriting any value(s) that were present.
   _parameters[param_name] = {value};
+}
+
+void RBParameters::set_value(const std::string & param_name, std::size_t index, Real value)
+{
+  // Get reference to vector of values for this parameter, creating it
+  // if it does not already exist.
+  auto & vec = _parameters[param_name];
+
+  // Allocate more space (padding with 0s) if vector is not big enough
+  // to fit the user's requested index.
+  if (vec.size() < index+1)
+    vec.resize(index+1);
+
+  vec[index] = value;
+}
+
+void RBParameters::push_back_value(const std::string & param_name, Real value)
+{
+  // Get reference to vector of values for this parameter, creating it
+  // if it does not already exist, and push back the specified value.
+  _parameters[param_name].push_back(value);
 }
 
 Real RBParameters::get_extra_value(const std::string & param_name) const
@@ -102,8 +133,27 @@ void RBParameters::set_extra_value(const std::string & param_name, Real value)
 
 unsigned int RBParameters::n_parameters() const
 {
-  return cast_int<unsigned int>
-    (_parameters.size());
+  return cast_int<unsigned int>(_parameters.size());
+}
+
+unsigned int RBParameters::n_steps() const
+{
+  // Quick return if there are no parameters
+  if (_parameters.empty())
+    return 0;
+
+  // If _parameters is not empty, we can check the number of steps in the first param
+  auto size_first = _parameters.begin()->second.size();
+
+#ifdef DEBUG
+  // In debug mode, verify that all parameters have the same number of steps
+  for (const auto & pr : _parameters)
+    libmesh_assert_msg(pr.second.size() == size_first, "All parameters must have the same number of steps.");
+#endif
+
+  // If we made it here in DEBUG mode, then all parameters were
+  // verified to have the same number of steps.
+  return size_first;
 }
 
 void RBParameters::get_parameter_names(std::set<std::string> & param_names) const

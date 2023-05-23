@@ -207,34 +207,69 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
                                                     _interpolation_points_phi_i_qp,
                                                     output_all_comps);
 
-  std::vector<std::vector<Number>> evaluated_values_at_interp_points(output_all_comps.size());
+  // Previously we did one RB-EIM solve per input mu, but now we do
+  // one RB-EIM solve per input mu, per step. In order for this to
+  // work, we require that all the input mu objects have the same
+  // number of steps.
+  auto n_steps_0 = mus[0].n_steps();
+  for (const auto & mu : mus)
+    libmesh_error_msg_if(mu.n_steps() != n_steps_0, "All RBParameters objects must have same n_steps()");
 
-  for (unsigned int mu_index : index_range(evaluated_values_at_interp_points))
+  // After we verified that all mus have the same number of values,
+  // the total number of RB-EIM solves is simply the number of mus
+  // times the number of steps.
+  unsigned int num_rb_eim_solves = mus.size() * n_steps_0;
+
+  std::vector<std::vector<Number>> evaluated_values_at_interp_points(num_rb_eim_solves);
+
+  // In this loop, counter goes from 0 to num_rb_eim_solves.  The
+  // purpose of this loop is to strip out the "columns" of the
+  // output_all_comps array into rows.
+  {
+  unsigned int counter = 0;
+  for (auto mu_index : index_range(mus))
+    for (auto step_index : make_range(mus[mu_index].n_steps()))
     {
-      evaluated_values_at_interp_points[mu_index].resize(N);
+      evaluated_values_at_interp_points[counter].resize(N); // N is number of RB basis functions
+
       for (unsigned int interp_pt_index=0; interp_pt_index<N; interp_pt_index++)
         {
           unsigned int comp = _interpolation_points_comp[interp_pt_index];
 
-          evaluated_values_at_interp_points[mu_index][interp_pt_index] =
-            output_all_comps[mu_index][interp_pt_index][comp];
+          // For vector-valued functions, the output_all_comps vectors are indexed first by component, then by step.
+          // For example, if there are 2 components and 3 steps, the output entries will be:
+          // [(comp0, step0), (comp1, step0),  (comp0, step1), (comp1, step1),  (comp0, step2), (comp1, step2)]
+          // To index into this vector, we need to know the current step_index and the total number of components:
+          // index = get_parametrized_function().get_n_components() * step_index + comp
+          evaluated_values_at_interp_points[counter][interp_pt_index] =
+            output_all_comps[mu_index][interp_pt_index][get_parametrized_function().get_n_components() * step_index + comp];
         }
+
+      counter++;
     }
+  }
 
   DenseMatrix<Number> interpolation_matrix_N;
   _interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
 
-  _rb_eim_solutions.resize(mus.size());
-  for (unsigned int mu_index : index_range(mus))
-    {
-      DenseVector<Number> EIM_rhs(N);
-      for (unsigned int i=0; i<N; i++)
-        {
-          EIM_rhs(i) = evaluated_values_at_interp_points[mu_index][i];
-        }
+  // The number of RB EIM solutions is equal to the size of the
+  // "evaluated_values_at_interp_points" vector which we determined
+  // earlier.
+  _rb_eim_solutions.resize(num_rb_eim_solves);
 
-      interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[mu_index]);
+  {
+  unsigned int counter = 0;
+  for (auto mu_index : index_range(mus))
+    for (auto step_index : make_range(mus[mu_index].n_steps()))
+    {
+      // Ignore compiler warnings about unused loop index
+      libmesh_ignore(step_index);
+
+      DenseVector<Number> EIM_rhs = evaluated_values_at_interp_points[counter];
+      interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[counter]);
+      counter++;
     }
+  }
 }
 
 void RBEIMEvaluation::initialize_interpolation_points_spatial_indices()

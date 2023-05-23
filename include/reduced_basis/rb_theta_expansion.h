@@ -89,6 +89,13 @@ public:
                                    const RBParameters & mu);
 
   /**
+   * Evaluate theta_q_l at multiple parameters simultaneously.
+   */
+  virtual std::vector<Number> eval_output_theta(unsigned int output_index,
+                                                unsigned int q_l,
+                                                const std::vector<RBParameters> & mus);
+
+  /**
    * Get Q_a, the number of terms in the affine
    * expansion for the bilinear form.
    */
@@ -109,6 +116,19 @@ public:
    * Get the number of affine terms associated with the specified output.
    */
   unsigned int get_n_output_terms(unsigned int output_index) const;
+
+  /**
+   * Returns the total number of affine terms associated with all outputs.
+   */
+  unsigned int get_total_n_output_terms() const;
+
+  /**
+   * Computes the one-dimensional index for output n, term q_l implied by
+   * a "row-major" ordering of the outputs. This is useful for indexing into
+   * pre-evaluated theta arrays, which store the pre-evaluated output theta
+   * values in this order following the "A" and "F" theta values.
+   */
+  unsigned int output_index_1D(unsigned int n, unsigned int q_l);
 
   /**
    * Attach a pointer to a functor object that defines one

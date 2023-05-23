@@ -215,10 +215,10 @@ Real RBEvaluation::rb_solve(unsigned int N,
   libmesh_error_msg_if(N > get_n_basis_functions(),
                        "ERROR: N cannot be larger than the number of basis functions in rb_solve");
 
-  // In case the theta functions have been pre-evaluated, first check the size for consistency
-  libmesh_error_msg_if(evaluated_thetas &&
-                       evaluated_thetas->size() != rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms(),
-                       "ERROR: Evaluated thetas have wrong size");
+  // In case the theta functions have been pre-evaluated, first check the size for consistency. The
+  // size of the input "evaluated_thetas" vector must match the sum of the "A", "F", and "output" terms
+  // in the expansion.
+  this->check_evaluated_thetas_size(evaluated_thetas);
 
   const RBParameters & mu = get_parameters();
 
@@ -261,15 +261,37 @@ Real RBEvaluation::rb_solve(unsigned int N,
       RB_system_matrix.lu_solve(RB_rhs, RB_solution);
     }
 
-  // Evaluate RB outputs
+  // Place to store the output of get_principal_subvector() calls
   DenseVector<Number> RB_output_vector_N;
+
+  // Evaluate RB outputs
+  unsigned int output_counter = 0;
   for (unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     {
       RB_outputs[n] = 0.;
       for (unsigned int q_l=0; q_l<rb_theta_expansion->get_n_output_terms(n); q_l++)
         {
           RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-          RB_outputs[n] += rb_theta_expansion->eval_output_theta(n,q_l,mu)*RB_output_vector_N.dot(RB_solution);
+
+          // Compute dot product with current output vector and RB_solution
+          auto dot_prod = RB_output_vector_N.dot(RB_solution);
+
+          // Determine the coefficient depending on whether or not
+          // pre-evaluated thetas were provided. Note that if
+          // pre-evaluated thetas were provided, they must come after
+          // the "A" and "F" thetas and be in "row-major" order. In
+          // other words, there is a possibly "ragged" 2D array of
+          // output thetas ordered by output index "n" and term index
+          // "q_l" which is accessed in row-major order.
+          auto coeff = evaluated_thetas ?
+            (*evaluated_thetas)[output_counter + rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms()] :
+            rb_theta_expansion->eval_output_theta(n, q_l, mu);
+
+          // Finally, accumulate the result in RB_outputs[n]
+          RB_outputs[n] += coeff * dot_prod;
+
+          // Go to next output
+          output_counter++;
         }
     }
 
@@ -288,9 +310,7 @@ Real RBEvaluation::rb_solve(unsigned int N,
 
       // Now compute the output error bounds
       for (unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
-        {
-          RB_output_error_bounds[n] = abs_error_bound * eval_output_dual_norm(n, mu);
-        }
+        RB_output_error_bounds[n] = abs_error_bound * this->eval_output_dual_norm(n, evaluated_thetas);
 
       return abs_error_bound;
     }
@@ -323,10 +343,9 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N,
   LOG_SCOPE("compute_residual_dual_norm()", "RBEvaluation");
 
   // In case the theta functions have been pre-evaluated, first check the size for consistency
-  libmesh_error_msg_if(evaluated_thetas &&
-                       evaluated_thetas->size() != rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms(),
-                       "ERROR: Evaluated thetas have wrong size");
+  this->check_evaluated_thetas_size(evaluated_thetas);
 
+  // If evaluated_thetas is provided, then mu is not actually used for anything
   const RBParameters & mu = get_parameters();
 
   const unsigned int n_A_terms = rb_theta_expansion->get_n_A_terms();
@@ -336,16 +355,26 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N,
   // to evaluate the residual norm
   Number residual_norm_sq = 0.;
 
+  // Lambdas to help with evaluating F_theta and A_theta functions
+  // using either the pre-evaluated thetas (if provided) or by calling
+  // eval_{F,A}_theta()
+  auto eval_F = [&](unsigned int index)
+    {
+      return (evaluated_thetas) ? (*evaluated_thetas)[index + n_A_terms] : rb_theta_expansion->eval_F_theta(index, mu);
+    };
+  auto eval_A = [&](unsigned int index)
+    {
+      return (evaluated_thetas) ? (*evaluated_thetas)[index] : rb_theta_expansion->eval_A_theta(index, mu);
+    };
+
   unsigned int q=0;
   for (unsigned int q_f1=0; q_f1<n_F_terms; q_f1++)
     {
-      const Number val_q_f1 = (evaluated_thetas) ? (*evaluated_thetas)[q_f1 + n_A_terms]
-                                                 : rb_theta_expansion->eval_F_theta(q_f1, mu);
+      const Number val_q_f1 = eval_F(q_f1);
 
       for (unsigned int q_f2=q_f1; q_f2<n_F_terms; q_f2++)
         {
-          const Number val_q_f2 = (evaluated_thetas) ? (*evaluated_thetas)[q_f2 + n_A_terms]
-                                                     : rb_theta_expansion->eval_F_theta(q_f2, mu);
+          const Number val_q_f2 = eval_F(q_f2);
 
           Real delta = (q_f1==q_f2) ? 1. : 2.;
           residual_norm_sq += delta * libmesh_real(val_q_f1 * libmesh_conj(val_q_f2) * Fq_representor_innerprods[q] );
@@ -356,13 +385,11 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N,
 
   for (unsigned int q_f=0; q_f<n_F_terms; q_f++)
     {
-      const Number val_q_f = (evaluated_thetas) ? (*evaluated_thetas)[q_f + n_A_terms]
-                                                : rb_theta_expansion->eval_F_theta(q_f, mu);
+      const Number val_q_f = eval_F(q_f);
 
       for (unsigned int q_a=0; q_a<n_A_terms; q_a++)
         {
-          const Number val_q_a = (evaluated_thetas) ? (*evaluated_thetas)[q_a]
-                                                    : rb_theta_expansion->eval_A_theta(q_a, mu);
+          const Number val_q_a = eval_A(q_a);
 
           for (unsigned int i=0; i<N; i++)
             {
@@ -377,13 +404,11 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N,
   q=0;
   for (unsigned int q_a1=0; q_a1<n_A_terms; q_a1++)
     {
-      const Number val_q_a1 = (evaluated_thetas) ? (*evaluated_thetas)[q_a1]
-                                                 : rb_theta_expansion->eval_A_theta(q_a1, mu);
+      const Number val_q_a1 = eval_A(q_a1);
 
       for (unsigned int q_a2=q_a1; q_a2<n_A_terms; q_a2++)
         {
-          const Number val_q_a2 = (evaluated_thetas) ? (*evaluated_thetas)[q_a2]
-                                                     : rb_theta_expansion->eval_A_theta(q_a2, mu);
+          const Number val_q_a2 = eval_A(q_a2);
 
           Real delta = (q_a1==q_a2) ? 1. : 2.;
 
@@ -430,18 +455,44 @@ Real RBEvaluation::residual_scaling_denom(Real alpha_LB)
   return alpha_LB;
 }
 
-Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters & mu)
+Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters & /*mu*/)
 {
+  libmesh_deprecated();
+
+  // Call non-deprecated version of this function, ignoring input mu
+  return this->eval_output_dual_norm(n, nullptr);
+}
+
+Real RBEvaluation::eval_output_dual_norm(unsigned int n,
+                                         const std::vector<Number> * evaluated_thetas)
+{
+  // Return value
   Number output_bound_sq = 0.;
+
+  // mu is only used if evaluated_thetas == nullptr
+  const RBParameters & mu = this->get_parameters();
+
+  // Index into output_dual_innerprods
   unsigned int q=0;
   for (unsigned int q_l1=0; q_l1<rb_theta_expansion->get_n_output_terms(n); q_l1++)
     {
       for (unsigned int q_l2=q_l1; q_l2<rb_theta_expansion->get_n_output_terms(n); q_l2++)
         {
           Real delta = (q_l1==q_l2) ? 1. : 2.;
+
+          Number val_l1 =
+            evaluated_thetas ?
+            (*evaluated_thetas)[rb_theta_expansion->output_index_1D(n, q_l1) + rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms()] :
+            rb_theta_expansion->eval_output_theta(n, q_l1, mu);
+
+          Number val_l2 =
+            evaluated_thetas ?
+            (*evaluated_thetas)[rb_theta_expansion->output_index_1D(n, q_l2) + rb_theta_expansion->get_n_A_terms() + rb_theta_expansion->get_n_F_terms()] :
+            rb_theta_expansion->eval_output_theta(n, q_l2, mu);
+
           output_bound_sq += delta * libmesh_real(
-                                                  libmesh_conj(rb_theta_expansion->eval_output_theta(n,q_l1,mu))*
-                                                  rb_theta_expansion->eval_output_theta(n,q_l2,mu) * output_dual_innerprods[n][q] );
+            libmesh_conj(val_l1) * val_l2 * output_dual_innerprods[n][q]);
+
           q++;
         }
     }
@@ -1129,6 +1180,16 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
 
   // Undo the temporary renumbering
   sys.get_mesh().fix_broken_node_and_element_numbering();
+}
+
+void RBEvaluation::check_evaluated_thetas_size(const std::vector<Number> * evaluated_thetas) const
+{
+  libmesh_error_msg_if((rb_theta_expansion && evaluated_thetas) &&
+                       evaluated_thetas->size() !=
+                       rb_theta_expansion->get_n_A_terms() +
+                       rb_theta_expansion->get_n_F_terms() +
+                       rb_theta_expansion->get_total_n_output_terms(),
+                       "ERROR: Evaluated thetas have wrong size");
 }
 
 } // namespace libMesh
