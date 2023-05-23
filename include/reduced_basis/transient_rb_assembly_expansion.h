@@ -55,13 +55,13 @@ public:
    * Perform the specified M interior assembly.
    */
   void perform_M_interior_assembly(unsigned int q,
-                                   FEMContext & context);
+                                   FEMContext & context) const;
 
   /**
    * Perform the specified M boundary assembly.
    */
   void perform_M_boundary_assembly(unsigned int q,
-                                   FEMContext & context);
+                                   FEMContext & context) const;
 
   /**
    * Get Q_m, the number of terms in the affine
