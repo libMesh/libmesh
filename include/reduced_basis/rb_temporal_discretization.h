@@ -47,6 +47,15 @@ public:
   RBTemporalDiscretization();
 
   /**
+   * Special functions can all be defaulted for this simple class.
+   */
+  RBTemporalDiscretization (RBTemporalDiscretization &&) = default;
+  RBTemporalDiscretization (const RBTemporalDiscretization &) = default;
+  RBTemporalDiscretization & operator= (const RBTemporalDiscretization &) = default;
+  RBTemporalDiscretization & operator= (RBTemporalDiscretization &&) = default;
+  virtual ~RBTemporalDiscretization () = default;
+
+  /**
    * Get/set delta_t, the time-step size.
    */
   Real get_delta_t() const;
@@ -119,7 +128,6 @@ private:
    * See Martin Grepl's thesis
    */
   std::vector<Real> _control;
-
 };
 
 }
