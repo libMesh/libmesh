@@ -159,7 +159,7 @@ std::string Utility::unzip_file (std::string_view name)
   pid_suffix << '_' << getpid();
 
   std::string new_name { name };
-  if (name.size() - name.rfind(".bz2") == 4)
+  if (name.rfind(".bz2") == name.size() - 4)
     {
 #ifdef LIBMESH_HAVE_BZIP
       new_name.erase(new_name.end() - 4, new_name.end());
@@ -174,7 +174,7 @@ std::string Utility::unzip_file (std::string_view name)
       libmesh_error_msg("ERROR: need bzip2/bunzip2 to open .bz2 file " << name);
 #endif
     }
-  else if (name.size() - name.rfind(".xz") == 3)
+  else if (name.rfind(".xz") == name.size() - 3)
     {
 #ifdef LIBMESH_HAVE_XZ
       new_name.erase(new_name.end() - 3, new_name.end());

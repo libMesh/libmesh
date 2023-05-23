@@ -82,13 +82,13 @@ void remove_unzipped_file (std::string_view name)
 
   // If we temporarily decompressed a file, remove the
   // uncompressed version
-  if (name.size() - name.rfind(".bz2") == 4)
+  if (name.rfind(".bz2") == name.size() - 4)
     {
       std::string new_name(name.begin(), name.end()-4);
       new_name += pid_suffix.str();
       std::remove(new_name.c_str());
     }
-  if (name.size() - name.rfind(".xz") == 3)
+  if (name.rfind(".xz") == name.size() - 3)
     {
       std::string new_name(name.begin(), name.end()-3);
       new_name += pid_suffix.str();
@@ -161,9 +161,9 @@ void Xdr::open (std::string name)
 
     case READ:
       {
-        gzipped_file = (file_name.size() - file_name.rfind(".gz")  == 3);
-        bzipped_file = (file_name.size() - file_name.rfind(".bz2") == 4);
-        xzipped_file = (file_name.size() - file_name.rfind(".xz") == 3);
+        gzipped_file = (file_name.rfind(".gz") == file_name.size() - 3);
+        bzipped_file = (file_name.rfind(".bz2") == file_name.size() - 4);
+        xzipped_file = (file_name.rfind(".xz") == file_name.size() - 3);
 
         if (gzipped_file)
           {
@@ -196,9 +196,9 @@ void Xdr::open (std::string name)
 
     case WRITE:
       {
-        gzipped_file = (file_name.size() - file_name.rfind(".gz")  == 3);
-        bzipped_file = (file_name.size() - file_name.rfind(".bz2") == 4);
-        xzipped_file = (file_name.size() - file_name.rfind(".xz")  == 3);
+        gzipped_file = (file_name.rfind(".gz") == file_name.size() - 3);
+        bzipped_file = (file_name.rfind(".bz2") == file_name.size() - 4);
+        xzipped_file = (file_name.rfind(".xz") == file_name.size() - 3);
 
         if (gzipped_file)
           {
