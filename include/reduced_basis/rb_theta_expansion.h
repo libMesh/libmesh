@@ -46,14 +46,14 @@ class RBThetaExpansion : public ReferenceCountedObject<RBThetaExpansion>
 public:
 
   /**
-   * Constructor.
+   * All special functions can be defaulted for this simple class.
    */
-  RBThetaExpansion();
-
-  /**
-   * Destructor.
-   */
-  virtual ~RBThetaExpansion() = default;
+  RBThetaExpansion() = default;
+  RBThetaExpansion (RBThetaExpansion &&) = default;
+  RBThetaExpansion (const RBThetaExpansion &) = default;
+  RBThetaExpansion & operator= (const RBThetaExpansion &) = default;
+  RBThetaExpansion & operator= (RBThetaExpansion &&) = default;
+  virtual ~RBThetaExpansion () = default;
 
   /**
    * Evaluate theta_q_a at the current parameter. Override
@@ -172,7 +172,6 @@ public:
    */
   virtual void attach_output_theta(RBTheta * theta_q_l);
 
-
 private:
 
   /**
@@ -189,7 +188,6 @@ private:
    * Vector storing the RBTheta functors for the affine expansion of the outputs.
    */
   std::vector<std::vector<RBTheta *>> _output_theta_vector;
-
 };
 
 }

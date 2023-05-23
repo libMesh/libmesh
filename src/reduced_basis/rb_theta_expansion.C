@@ -28,13 +28,6 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// RBThetaExpansion implementation
-
-RBThetaExpansion::RBThetaExpansion()
-{
-}
-
 unsigned int RBThetaExpansion::get_n_A_terms() const
 {
   return cast_int<unsigned int>
