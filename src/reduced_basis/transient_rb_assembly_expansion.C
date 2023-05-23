@@ -24,13 +24,6 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// TransientRBAssemblyExpansion implementation
-
-TransientRBAssemblyExpansion::TransientRBAssemblyExpansion()
-{
-}
-
 void TransientRBAssemblyExpansion::perform_M_interior_assembly(unsigned int q,
                                                                FEMContext & context)
 {

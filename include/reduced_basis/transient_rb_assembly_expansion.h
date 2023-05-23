@@ -42,9 +42,14 @@ class TransientRBAssemblyExpansion : public RBAssemblyExpansion
 public:
 
   /**
-   * Constructor.
+   * All special functions can be defaulted for this simple class.
    */
-  TransientRBAssemblyExpansion();
+  TransientRBAssemblyExpansion() = default;
+  TransientRBAssemblyExpansion (TransientRBAssemblyExpansion &&) = default;
+  TransientRBAssemblyExpansion (const TransientRBAssemblyExpansion &) = default;
+  TransientRBAssemblyExpansion & operator= (const TransientRBAssemblyExpansion &) = default;
+  TransientRBAssemblyExpansion & operator= (TransientRBAssemblyExpansion &&) = default;
+  virtual ~TransientRBAssemblyExpansion () = default;
 
   /**
    * Perform the specified M interior assembly.
