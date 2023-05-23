@@ -58,7 +58,7 @@ public:
    * in subclasses.
    */
   virtual Number eval_M_theta(unsigned int q,
-                              const RBParameters & mu);
+                              const RBParameters & mu) const;
 
   /**
    * Get Q_m, the number of terms in the affine
