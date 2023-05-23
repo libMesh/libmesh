@@ -89,6 +89,14 @@ RBThetaExpansion & RBEvaluation::get_rb_theta_expansion()
   return *rb_theta_expansion;
 }
 
+const RBThetaExpansion & RBEvaluation::get_rb_theta_expansion() const
+{
+  libmesh_error_msg_if(!is_rb_theta_expansion_initialized(),
+                       "Error: rb_theta_expansion hasn't been initialized yet");
+
+  return *rb_theta_expansion;
+}
+
 bool RBEvaluation::is_rb_theta_expansion_initialized() const
 {
   if (rb_theta_expansion)

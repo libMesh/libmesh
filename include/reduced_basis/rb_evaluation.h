@@ -77,6 +77,7 @@ public:
    * Get a reference to the rb_theta_expansion.
    */
   RBThetaExpansion & get_rb_theta_expansion();
+  const RBThetaExpansion & get_rb_theta_expansion() const;
 
   /**
    * \returns \p true if the theta expansion has been initialized.
