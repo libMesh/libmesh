@@ -71,6 +71,13 @@ public:
   class const_iterator
   {
   public:
+    // Typedefs needed for interoperating with other STL algorithms and containers.
+    typedef std::forward_iterator_tag iterator_category;
+    typedef std::pair<std::string, Real> value_type;
+    typedef std::ptrdiff_t difference_type;
+    typedef value_type* pointer;
+    typedef value_type& reference;
+
     // Underlying iterator type, must match the container type of _parameters.
     typedef std::map<std::string, std::vector<Real>>::const_iterator MapIter;
 
@@ -115,7 +122,7 @@ public:
     // compatibility but it is not the most efficient thing since we
     // need to construct a std::pair every time we dereference a
     // const_iterator.
-    const std::pair<std::string, Real> &
+    const value_type &
     operator*() const
     {
       _emulator = std::make_pair(_it->first, _it->second[_vec_index]);
@@ -148,8 +155,8 @@ public:
     std::size_t _vec_index;
 
     // Returned by the operator* function. Emulates dereferencing a
-    // map<sring, Real> iterator.
-    mutable std::pair<std::string, Real> _emulator;
+    // map<string, Real> iterator.
+    mutable value_type _emulator;
   };
 
   /**
