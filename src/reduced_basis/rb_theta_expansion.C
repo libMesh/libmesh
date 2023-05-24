@@ -28,13 +28,6 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// RBThetaExpansion implementation
-
-RBThetaExpansion::RBThetaExpansion()
-{
-}
-
 unsigned int RBThetaExpansion::get_n_A_terms() const
 {
   return cast_int<unsigned int>
@@ -69,7 +62,7 @@ unsigned int RBThetaExpansion::get_total_n_output_terms() const
   return sum;
 }
 
-unsigned int RBThetaExpansion::output_index_1D(unsigned int n, unsigned int q_l)
+unsigned int RBThetaExpansion::output_index_1D(unsigned int n, unsigned int q_l) const
 {
   // Start with index of the current term
   unsigned int index = q_l;
@@ -139,7 +132,7 @@ void RBThetaExpansion::attach_output_theta(RBTheta * theta_q_l)
 }
 
 Number RBThetaExpansion::eval_A_theta(unsigned int q,
-                                      const RBParameters & mu)
+                                      const RBParameters & mu) const
 {
   libmesh_error_msg_if(q >= get_n_A_terms(), "Error: We must have q < get_n_A_terms in eval_A_theta.");
   libmesh_assert(_A_theta_vector[q]);
@@ -148,7 +141,7 @@ Number RBThetaExpansion::eval_A_theta(unsigned int q,
 }
 
 std::vector<Number> RBThetaExpansion::eval_A_theta(unsigned int q,
-                                                   const std::vector<RBParameters> & mus)
+                                                   const std::vector<RBParameters> & mus) const
 {
   libmesh_error_msg_if(q >= get_n_A_terms(), "Error: We must have q < get_n_A_terms in eval_A_theta.");
   libmesh_assert(_A_theta_vector[q]);
@@ -157,7 +150,7 @@ std::vector<Number> RBThetaExpansion::eval_A_theta(unsigned int q,
 }
 
 Number RBThetaExpansion::eval_F_theta(unsigned int q,
-                                      const RBParameters & mu)
+                                      const RBParameters & mu) const
 {
   libmesh_error_msg_if(q >= get_n_F_terms(), "Error: We must have q < get_n_F_terms in eval_F_theta.");
   libmesh_assert(_F_theta_vector[q]);
@@ -166,7 +159,7 @@ Number RBThetaExpansion::eval_F_theta(unsigned int q,
 }
 
 std::vector<Number> RBThetaExpansion::eval_F_theta(unsigned int q,
-                                                   const std::vector<RBParameters> & mus)
+                                                   const std::vector<RBParameters> & mus) const
 {
   libmesh_error_msg_if(q >= get_n_F_terms(), "Error: We must have q < get_n_F_terms in eval_F_theta.");
   libmesh_assert(_F_theta_vector[q]);
@@ -176,7 +169,7 @@ std::vector<Number> RBThetaExpansion::eval_F_theta(unsigned int q,
 
 Number RBThetaExpansion::eval_output_theta(unsigned int output_index,
                                            unsigned int q_l,
-                                           const RBParameters & mu)
+                                           const RBParameters & mu) const
 {
   libmesh_error_msg_if((output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)),
                        "Error: We must have output_index < n_outputs and "
@@ -190,7 +183,7 @@ Number RBThetaExpansion::eval_output_theta(unsigned int output_index,
 std::vector<Number>
 RBThetaExpansion::eval_output_theta(unsigned int output_index,
                                     unsigned int q_l,
-                                    const std::vector<RBParameters> & mus)
+                                    const std::vector<RBParameters> & mus) const
 {
   libmesh_error_msg_if((output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)),
                        "Error: We must have output_index < n_outputs and "

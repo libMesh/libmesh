@@ -58,8 +58,15 @@ public:
   RBEvaluation (const Parallel::Communicator & comm);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains unique_ptrs, so it can't be default copy
+   *   constructed/assigned.
+   * - The destructor is defaulted out of line.
    */
+  RBEvaluation (RBEvaluation &&) = default;
+  RBEvaluation (const RBEvaluation &) = delete;
+  RBEvaluation & operator= (const RBEvaluation &) = delete;
+  RBEvaluation & operator= (RBEvaluation &&) = default;
   virtual ~RBEvaluation ();
 
   /**
@@ -77,6 +84,7 @@ public:
    * Get a reference to the rb_theta_expansion.
    */
   RBThetaExpansion & get_rb_theta_expansion();
+  const RBThetaExpansion & get_rb_theta_expansion() const;
 
   /**
    * \returns \p true if the theta expansion has been initialized.
@@ -96,6 +104,7 @@ public:
    * Get a reference to the i^th basis function.
    */
   NumericVector<Number> & get_basis_function(unsigned int i);
+  const NumericVector<Number> & get_basis_function(unsigned int i) const;
 
   /**
    * Perform online solve with the N RB basis functions, for the

@@ -57,9 +57,16 @@ public:
   TransientRBEvaluation (const Parallel::Communicator & comm_in);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class contains unique_ptrs, so it can't be default copy
+   *   constructed/assigned.
+   * - The destructor is defaulted out of line.
    */
-  ~TransientRBEvaluation ();
+  TransientRBEvaluation (TransientRBEvaluation &&) = default;
+  TransientRBEvaluation (const TransientRBEvaluation &) = delete;
+  TransientRBEvaluation & operator= (const TransientRBEvaluation &) = delete;
+  TransientRBEvaluation & operator= (TransientRBEvaluation &&) = default;
+  virtual ~TransientRBEvaluation ();
 
   /**
    * The type of the parent.

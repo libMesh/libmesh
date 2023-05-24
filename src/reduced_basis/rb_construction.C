@@ -178,12 +178,24 @@ RBEvaluation & RBConstruction::get_rb_evaluation()
   return *rb_eval;
 }
 
+const RBEvaluation & RBConstruction::get_rb_evaluation() const
+{
+  libmesh_error_msg_if(!rb_eval, "Error: RBEvaluation object hasn't been initialized yet");
+
+  return *rb_eval;
+}
+
 bool RBConstruction::is_rb_eval_initialized() const
 {
   return (rb_eval != nullptr);
 }
 
 RBThetaExpansion & RBConstruction::get_rb_theta_expansion()
+{
+  return get_rb_evaluation().get_rb_theta_expansion();
+}
+
+const RBThetaExpansion & RBConstruction::get_rb_theta_expansion() const
 {
   return get_rb_evaluation().get_rb_theta_expansion();
 }
@@ -321,7 +333,7 @@ void RBConstruction::set_rb_construction_parameters(
     }
 }
 
-void RBConstruction::print_info()
+void RBConstruction::print_info() const
 {
   // Print out info that describes the current setup
   libMesh::out << std::endl << "RBConstruction parameters:" << std::endl;
@@ -358,7 +370,7 @@ void RBConstruction::print_info()
   libMesh::out << std::endl;
 }
 
-void RBConstruction::print_basis_function_orthogonality()
+void RBConstruction::print_basis_function_orthogonality() const
 {
   std::unique_ptr<NumericVector<Number>> temp = solution->clone();
 
@@ -411,7 +423,7 @@ void RBConstruction::set_energy_inner_product(const std::vector<Number> & energy
   energy_inner_product_coeffs = energy_inner_product_coeffs_in;
 }
 
-void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number> & vector)
+void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number> & vector) const
 {
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   const DofMap & dof_map = get_dof_map();
@@ -428,7 +440,7 @@ void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number> & vec
   vector.close();
 }
 
-bool RBConstruction::check_if_zero_truth_solve()
+bool RBConstruction::check_if_zero_truth_solve() const
 {
   return (solution->l2_norm() == 0.);
 }
@@ -2253,6 +2265,11 @@ SparseMatrix<Number> * RBConstruction::get_inner_product_matrix()
   return inner_product_matrix.get();
 }
 
+const SparseMatrix<Number> * RBConstruction::get_inner_product_matrix() const
+{
+  return inner_product_matrix.get();
+}
+
 SparseMatrix<Number> * RBConstruction::get_non_dirichlet_inner_product_matrix()
 {
   libmesh_error_msg_if(!store_non_dirichlet_operators,
@@ -2261,7 +2278,25 @@ SparseMatrix<Number> * RBConstruction::get_non_dirichlet_inner_product_matrix()
   return non_dirichlet_inner_product_matrix.get();
 }
 
+const SparseMatrix<Number> * RBConstruction::get_non_dirichlet_inner_product_matrix() const
+{
+  libmesh_error_msg_if(!store_non_dirichlet_operators,
+                       "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_inner_product_matrix.");
+
+  return non_dirichlet_inner_product_matrix.get();
+}
+
 SparseMatrix<Number> * RBConstruction::get_non_dirichlet_inner_product_matrix_if_avail()
+{
+  if (store_non_dirichlet_operators)
+    {
+      return get_non_dirichlet_inner_product_matrix();
+    }
+
+  return get_inner_product_matrix();
+}
+
+const SparseMatrix<Number> * RBConstruction::get_non_dirichlet_inner_product_matrix_if_avail() const
 {
   if (store_non_dirichlet_operators)
     {

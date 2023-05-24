@@ -24,15 +24,8 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// TransientRBAssemblyExpansion implementation
-
-TransientRBAssemblyExpansion::TransientRBAssemblyExpansion()
-{
-}
-
 void TransientRBAssemblyExpansion::perform_M_interior_assembly(unsigned int q,
-                                                               FEMContext & context)
+                                                               FEMContext & context) const
 {
   libmesh_error_msg_if(q >= get_n_M_terms(), "Error: We must have q < get_n_M_terms in perform_M_interior_assembly.");
   libmesh_assert(_M_assembly_vector[q]);
@@ -41,7 +34,7 @@ void TransientRBAssemblyExpansion::perform_M_interior_assembly(unsigned int q,
 }
 
 void TransientRBAssemblyExpansion::perform_M_boundary_assembly(unsigned int q,
-                                                               FEMContext & context)
+                                                               FEMContext & context) const
 {
   libmesh_error_msg_if(q >= get_n_M_terms(), "Error: We must have q < get_n_M_terms in perform_M_boundary_assembly.");
   libmesh_assert(_M_assembly_vector[q]);

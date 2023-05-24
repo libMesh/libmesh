@@ -279,12 +279,7 @@ int main (int argc, char ** argv)
       // since the RBParameters object stores multiple "steps", we
       // take the approach of pre-evaluating the thetas for each
       // parameter while calling the rb_solve() in a loop.
-      //
-      // FIXME: There are some const-correctness issues with the
-      // RBThetaExpansion API here, so this reference is non-const,
-      // but actually we are not changing it so we should be able to
-      // use a const reference here.
-      RBThetaExpansion & rb_theta_expansion = rb_eval.get_rb_theta_expansion();
+      const RBThetaExpansion & rb_theta_expansion = rb_eval.get_rb_theta_expansion();
 
       // Single-entry vector which makes calling the vector-overrides
       // of eval_A_theta(), eval_F_theta(), etc. easier.

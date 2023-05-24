@@ -95,6 +95,7 @@ public:
    * Get a reference to the RBEvaluation object.
    */
   RBEvaluation & get_rb_evaluation();
+  const RBEvaluation & get_rb_evaluation() const;
 
   /**
    * \returns \p true if rb_eval is initialized. False, otherwise.
@@ -106,6 +107,7 @@ public:
    * that belongs to rb_eval.
    */
   RBThetaExpansion & get_rb_theta_expansion();
+  const RBThetaExpansion & get_rb_theta_expansion() const;
 
   /**
    * Set the rb_assembly_expansion object.
@@ -215,21 +217,21 @@ public:
    */
   void set_rel_training_tolerance(Real new_training_tolerance)
   {this->rel_training_tolerance = new_training_tolerance; }
-  Real get_rel_training_tolerance() { return rel_training_tolerance; }
+  Real get_rel_training_tolerance() const { return rel_training_tolerance; }
 
   /**
    * Get/set the absolute tolerance for the basis training.
    */
   void set_abs_training_tolerance(Real new_training_tolerance)
   {this->abs_training_tolerance = new_training_tolerance; }
-  Real get_abs_training_tolerance() { return abs_training_tolerance; }
+  Real get_abs_training_tolerance() const { return abs_training_tolerance; }
 
   /**
    * Get/set the boolean to indicate if we normalize the RB error in the greedy.
    */
   void set_normalize_rb_bound_in_greedy(bool normalize_rb_bound_in_greedy_in)
   {this->normalize_rb_bound_in_greedy = normalize_rb_bound_in_greedy_in; }
-  bool get_normalize_rb_bound_in_greedy() { return normalize_rb_bound_in_greedy; }
+  bool get_normalize_rb_bound_in_greedy() const { return normalize_rb_bound_in_greedy; }
 
   /**
    * Get/set the string that determines the training type.
@@ -269,6 +271,7 @@ public:
    * defined in low-memory mode).
    */
   SparseMatrix<Number> * get_inner_product_matrix();
+  const SparseMatrix<Number> * get_inner_product_matrix() const;
 
   /**
    * Get the non-Dirichlet (or more generally no-constraints) version
@@ -276,12 +279,14 @@ public:
    * on vectors that already have constraints enforced.
    */
   SparseMatrix<Number> * get_non_dirichlet_inner_product_matrix();
+  const SparseMatrix<Number> * get_non_dirichlet_inner_product_matrix() const;
 
   /**
    * Get the non-Dirichlet inner-product matrix if it's available,
    * otherwise get the inner-product matrix with constraints.
    */
   SparseMatrix<Number> * get_non_dirichlet_inner_product_matrix_if_avail();
+  const SparseMatrix<Number> * get_non_dirichlet_inner_product_matrix_if_avail() const;
 
   /**
    * Get a pointer to Aq.
@@ -438,14 +443,14 @@ public:
   /**
    * Print out info that describes the current setup of this RBConstruction.
    */
-  virtual void print_info();
+  virtual void print_info() const;
 
   /**
    * Print out a matrix that shows the orthogonality of the RB basis functions.
    * This is a helpful debugging tool, e.g. orthogonality can be degraded
    * due to finite precision arithmetic.
    */
-  void print_basis_function_orthogonality();
+  void print_basis_function_orthogonality() const;
 
   /**
    * Get delta_N, the number of basis functions we
@@ -476,12 +481,12 @@ public:
    * It is sometimes useful to be able to zero vector entries
    * that correspond to constrained dofs.
    */
-  void zero_constrained_dofs_on_vector(NumericVector<Number> & vector);
+  void zero_constrained_dofs_on_vector(NumericVector<Number> & vector) const;
 
   /**
    * @return true if the most recent truth solve gave a zero solution.
    */
-  virtual bool check_if_zero_truth_solve();
+  virtual bool check_if_zero_truth_solve() const;
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
   /**

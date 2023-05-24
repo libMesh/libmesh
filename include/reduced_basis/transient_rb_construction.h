@@ -58,8 +58,14 @@ public:
                            const unsigned int number);
 
   /**
-   * Destructor.
+   * Special functions.
+   * - This class has the same restrictions/defaults as its base class.
+   * - Destructor is defaulted out-of-line
    */
+  TransientRBConstruction (TransientRBConstruction &&) = default;
+  TransientRBConstruction (const TransientRBConstruction &) = delete;
+  TransientRBConstruction & operator= (const TransientRBConstruction &) = delete;
+  TransientRBConstruction & operator= (TransientRBConstruction &&) = delete;
   virtual ~TransientRBConstruction ();
 
   /**
@@ -112,7 +118,7 @@ public:
   /**
    * Print out info that describes the current setup of this RBConstruction.
    */
-  virtual void print_info() override;
+  virtual void print_info() const override;
 
   /**
    * Function that indicates when to terminate the Greedy

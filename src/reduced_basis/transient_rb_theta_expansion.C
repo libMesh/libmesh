@@ -23,20 +23,18 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// RBThetaExpansion implementation
-
-TransientRBThetaExpansion::TransientRBThetaExpansion()
-{
-}
-
 Number TransientRBThetaExpansion::eval_M_theta(unsigned int q,
-                                               const RBParameters & mu)
+                                               const RBParameters & mu) const
 {
   libmesh_error_msg_if(q >= get_n_M_terms(), "Error: We must have q < get_n_M_terms in eval_M_theta.");
   libmesh_assert(_M_theta_vector[q]);
 
   return _M_theta_vector[q]->evaluate( mu );
+}
+
+unsigned int TransientRBThetaExpansion::get_n_M_terms() const
+{
+  return cast_int<unsigned int>(_M_theta_vector.size());
 }
 
 void TransientRBThetaExpansion::attach_M_theta(RBTheta * theta_q_m)

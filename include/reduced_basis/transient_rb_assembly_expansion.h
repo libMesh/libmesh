@@ -42,21 +42,26 @@ class TransientRBAssemblyExpansion : public RBAssemblyExpansion
 public:
 
   /**
-   * Constructor.
+   * All special functions can be defaulted for this simple class.
    */
-  TransientRBAssemblyExpansion();
+  TransientRBAssemblyExpansion() = default;
+  TransientRBAssemblyExpansion (TransientRBAssemblyExpansion &&) = default;
+  TransientRBAssemblyExpansion (const TransientRBAssemblyExpansion &) = default;
+  TransientRBAssemblyExpansion & operator= (const TransientRBAssemblyExpansion &) = default;
+  TransientRBAssemblyExpansion & operator= (TransientRBAssemblyExpansion &&) = default;
+  virtual ~TransientRBAssemblyExpansion () = default;
 
   /**
    * Perform the specified M interior assembly.
    */
   void perform_M_interior_assembly(unsigned int q,
-                                   FEMContext & context);
+                                   FEMContext & context) const;
 
   /**
    * Perform the specified M boundary assembly.
    */
   void perform_M_boundary_assembly(unsigned int q,
-                                   FEMContext & context);
+                                   FEMContext & context) const;
 
   /**
    * Get Q_m, the number of terms in the affine

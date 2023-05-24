@@ -43,9 +43,14 @@ class TransientRBThetaExpansion : public RBThetaExpansion
 public:
 
   /**
-   * Constructor.
+   * All special functions can be defaulted for this simple class.
    */
-  TransientRBThetaExpansion();
+  TransientRBThetaExpansion() = default;
+  TransientRBThetaExpansion (TransientRBThetaExpansion &&) = default;
+  TransientRBThetaExpansion (const TransientRBThetaExpansion &) = default;
+  TransientRBThetaExpansion & operator= (const TransientRBThetaExpansion &) = default;
+  TransientRBThetaExpansion & operator= (TransientRBThetaExpansion &&) = default;
+  virtual ~TransientRBThetaExpansion () = default;
 
   /**
    * The type of the parent.
@@ -58,14 +63,13 @@ public:
    * in subclasses.
    */
   virtual Number eval_M_theta(unsigned int q,
-                              const RBParameters & mu);
+                              const RBParameters & mu) const;
 
   /**
    * Get Q_m, the number of terms in the affine
    * expansion for the mass operator.
    */
-  virtual unsigned int get_n_M_terms()
-  { return cast_int<unsigned int>(_M_theta_vector.size()); }
+  virtual unsigned int get_n_M_terms() const;
 
   /**
    * Attach a pointer to a functor object that defines one

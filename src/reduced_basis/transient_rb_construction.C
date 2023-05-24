@@ -140,7 +140,7 @@ void TransientRBConstruction::process_parameters_file (const std::string & param
   trans_rb_eval.pull_temporal_discretization_data( *this );
 }
 
-void TransientRBConstruction::print_info()
+void TransientRBConstruction::print_info() const
 {
   Parent::print_info();
 
@@ -149,8 +149,8 @@ void TransientRBConstruction::print_info()
   if (is_rb_eval_initialized())
     {
       // Print out info that describes the current setup
-      TransientRBThetaExpansion & trans_theta_expansion =
-        cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
+      auto & trans_theta_expansion =
+        cast_ref<const TransientRBThetaExpansion &>(get_rb_theta_expansion());
       libMesh::out << "Q_m: " << trans_theta_expansion.get_n_M_terms() << std::endl;
     }
   else
