@@ -89,11 +89,15 @@ void RBParameters::set_value(const std::string & param_name, Real value)
   _parameters[param_name] = {value};
 }
 
-void RBParameters::set_value(const std::string & param_name, std::size_t index, Real value)
+void
+RBParameters::set_value_helper(std::map<std::string, std::vector<Real>> & map,
+                               const std::string & param_name,
+                               std::size_t index,
+                               Real value)
 {
   // Get reference to vector of values for this parameter, creating it
   // if it does not already exist.
-  auto & vec = _parameters[param_name];
+  auto & vec = map[param_name];
 
   // If vec is already big enough, just set the value
   if (vec.size() > index)
@@ -110,6 +114,16 @@ void RBParameters::set_value(const std::string & param_name, std::size_t index, 
       vec.resize(index+1);
       vec[index] = value;
     }
+}
+
+void RBParameters::set_value(const std::string & param_name, std::size_t index, Real value)
+{
+  this->set_value_helper(_parameters, param_name, index, value);
+}
+
+void RBParameters::set_extra_value(const std::string & param_name, std::size_t index, Real value)
+{
+  this->set_value_helper(_extra_parameters, param_name, index, value);
 }
 
 void RBParameters::push_back_value(const std::string & param_name, Real value)

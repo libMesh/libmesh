@@ -245,6 +245,14 @@ public:
   void set_extra_value(const std::string & param_name, Real value);
 
   /**
+   * Set the value of the specified extra parameter at the specified vector
+   * index.  Note: each parameter is now allowed to be vector-valued,
+   * it is up to the user to organize what the vector indices refer to
+   * (e.g. load or time steps).
+   */
+  void set_extra_value(const std::string & param_name, std::size_t index, Real value);
+
+  /**
    * Get the number of parameters that have been added.
    */
   unsigned int n_parameters() const;
@@ -326,6 +334,15 @@ public:
   void print() const;
 
 private:
+
+  /**
+   * Helper function for the 3-parameter versions of set_value() and
+   * set_extra_value().
+   */
+  void set_value_helper(std::map<std::string, std::vector<Real>> & map,
+                        const std::string & param_name,
+                        std::size_t index,
+                        Real value);
 
   /**
    * The map that stores the actual parameter vectors. Each vector is
