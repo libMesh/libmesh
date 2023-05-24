@@ -319,7 +319,15 @@ public:
   /**
    * \returns !(*this == rhs).
    */
-  bool operator!= (const RBParameters & node) const;
+  bool operator!= (const RBParameters & rhs) const;
+
+  /**
+   * Append "rhs" to "*this".  Both RBParameters objects must have the
+   * same n_steps(), otherwise an error is thrown. If some of the
+   * parameter names overlap, then the values from rhs overwrite
+   * *this. Both parameters and "extra" parameters are appended.
+   */
+  RBParameters & operator+= (const RBParameters & rhs);
 
   /**
    * Get a string that specifies the contents of this RBParameters object.

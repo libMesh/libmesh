@@ -242,6 +242,20 @@ bool RBParameters::operator!=(const RBParameters & rhs) const
   return !(*this == rhs);
 }
 
+RBParameters & RBParameters::operator+= (const RBParameters & rhs)
+{
+  libmesh_error_msg_if(this->n_steps() != rhs.n_steps(),
+                       "Can only append RBParameters objects with matching numbers of steps");
+
+  // Overwrite or add each (key, vec) pair in rhs to *this.
+  for (const auto & [key, vec] : rhs._parameters)
+    _parameters[key] = vec;
+  for (const auto & [key, vec] : rhs._extra_parameters)
+    _extra_parameters[key] = vec;
+
+  return *this;
+}
+
 std::string RBParameters::get_string(unsigned int precision) const
 {
   std::stringstream param_stringstream;
