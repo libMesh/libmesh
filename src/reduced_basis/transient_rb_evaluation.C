@@ -281,7 +281,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
               RB_outputs_all_k[n][0] += trans_theta_expansion.eval_output_theta(n,q_l,mu)*RB_output_vector_N.dot(RB_solution);
             }
 
-          RB_output_error_bounds_all_k[n][0] = error_bound_all_k[0] * eval_output_dual_norm(n,mu);
+          RB_output_error_bounds_all_k[n][0] = error_bound_all_k[0] * eval_output_dual_norm(n, nullptr);
         }
 
       alpha_LB = get_stability_lower_bound();
@@ -338,7 +338,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
           for (unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
             {
               RB_output_error_bounds_all_k[n][time_level] = error_bound_all_k[time_level] *
-                eval_output_dual_norm(n,mu);
+                eval_output_dual_norm(n, nullptr);
             }
         }
     }
