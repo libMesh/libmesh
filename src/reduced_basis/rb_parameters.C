@@ -95,12 +95,21 @@ void RBParameters::set_value(const std::string & param_name, std::size_t index, 
   // if it does not already exist.
   auto & vec = _parameters[param_name];
 
-  // Allocate more space (padding with 0s) if vector is not big enough
-  // to fit the user's requested index.
-  if (vec.size() < index+1)
-    vec.resize(index+1);
+  // If vec is already big enough, just set the value
+  if (vec.size() > index)
+    vec[index] = value;
 
-  vec[index] = value;
+  // Otherwise push_back() if the vec is just barely not big enough
+  else if (vec.size() == index)
+    vec.push_back(value);
+
+  // Otherwise, allocate more space (padding with 0s) if vector is not
+  // big enough to fit the user's requested index.
+  else
+    {
+      vec.resize(index+1);
+      vec[index] = value;
+    }
 }
 
 void RBParameters::push_back_value(const std::string & param_name, Real value)
