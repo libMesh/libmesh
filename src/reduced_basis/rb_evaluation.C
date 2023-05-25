@@ -1199,12 +1199,22 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
 
 void RBEvaluation::check_evaluated_thetas_size(const std::vector<Number> * evaluated_thetas) const
 {
-  libmesh_error_msg_if((rb_theta_expansion && evaluated_thetas) &&
-                       evaluated_thetas->size() !=
-                       rb_theta_expansion->get_n_A_terms() +
-                       rb_theta_expansion->get_n_F_terms() +
-                       rb_theta_expansion->get_total_n_output_terms(),
-                       "ERROR: Evaluated thetas have wrong size");
+  if (rb_theta_expansion && evaluated_thetas)
+    {
+      auto actual_size = evaluated_thetas->size();
+      auto expected_size =
+        rb_theta_expansion->get_n_A_terms() +
+        rb_theta_expansion->get_n_F_terms() +
+        rb_theta_expansion->get_total_n_output_terms();
+
+      libmesh_error_msg_if(actual_size != expected_size,
+                           "ERROR: Evaluated thetas vector has size " <<
+                           actual_size << ", but we expected " <<
+                           rb_theta_expansion->get_n_A_terms() << " A term(s), " <<
+                           rb_theta_expansion->get_n_F_terms() << " F term(s), and " <<
+                           rb_theta_expansion->get_total_n_output_terms() << " output term(s), " <<
+                           "for a total of " << expected_size << " terms.");
+    }
 }
 
 } // namespace libMesh

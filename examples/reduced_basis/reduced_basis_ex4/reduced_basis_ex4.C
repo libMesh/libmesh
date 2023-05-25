@@ -326,10 +326,7 @@ int main (int argc, char ** argv)
 
       // 3.) Evaluate "output" thetas at all steps: in this case, the
       // output is particularly simple (does not depend on mu) so this
-      // should just be a vector of all 1s. Also note that there is no
-      // "vector-valued" version of the RBThetaExpansion::eval_output_theta() API currently,
-      // but this example uses an RBParameters object with multiple steps, so we need to add
-      // that...
+      // should just be a vector of all 1s.
       std::vector<std::vector<Number>> all_outputs(rb_theta_expansion.get_total_n_output_terms());
       {
         unsigned int output_counter = 0;
