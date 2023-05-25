@@ -149,19 +149,18 @@ ElemType Edge::side_type (const unsigned int libmesh_dbg_var(s)) const
 }
 
 
-void
-Edge::orient(BoundaryInfo * boundary_info)
+bool
+Edge::is_flipped() const
 {
-  // Don't bother on 1D elements embedded in 2D/3D
-  if (
+  // Don't trigger on 1D elements embedded in 2D/3D
+  return (
 #if LIBMESH_DIM > 2
-      !this->point(0)(2) && !this->point(1)(2) &&
+          !this->point(0)(2) && !this->point(1)(2) &&
 #endif
 #if LIBMESH_DIM > 1
-      !this->point(0)(1) && !this->point(1)(1) &&
+          !this->point(0)(1) && !this->point(1)(1) &&
 #endif
-      this->point(0)(0) > this->point(1)(0))
-    this->flip(boundary_info);
+          this->point(0)(0) > this->point(1)(0));
 }
 
 

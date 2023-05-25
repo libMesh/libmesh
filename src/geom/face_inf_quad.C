@@ -167,20 +167,19 @@ bool InfQuad::is_child_on_side(const unsigned int c,
 }
 
 
-void
-InfQuad::orient(BoundaryInfo * boundary_info)
+bool
+InfQuad::is_flipped() const
 {
-  if (
+  return (
 #if LIBMESH_DIM > 2
-      // Don't bother outside the XY plane
-      this->point(0)(2) && this->point(1)(2) &&
-      this->point(2)(2) && this->point(3)(2) &&
+          // Don't bother outside the XY plane
+          this->point(0)(2) && this->point(1)(2) &&
+          this->point(2)(2) && this->point(3)(2) &&
 #endif
-      ((this->point(1)(0)-this->point(0)(0))*
-       (this->point(2)(1)-this->point(0)(1)) >
-       (this->point(2)(0)-this->point(0)(0))*
-       (this->point(1)(1)-this->point(0)(1))))
-    this->flip(boundary_info);
+          ((this->point(1)(0)-this->point(0)(0))*
+           (this->point(2)(1)-this->point(0)(1)) >
+           (this->point(2)(0)-this->point(0)(0))*
+           (this->point(1)(1)-this->point(0)(1))));
 }
 
 

@@ -202,7 +202,7 @@ public:
 
   virtual void permute(unsigned int) override final { libmesh_error(); }
 
-  virtual void orient(BoundaryInfo *) override final;
+  virtual bool is_flipped() const override final;
 
   unsigned int center_node_on_side(const unsigned short side) const override final;
 

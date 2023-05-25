@@ -231,7 +231,7 @@ public:
 
   virtual void permute(unsigned int) override final { libmesh_error(); }
 
-  virtual void orient(BoundaryInfo *) override final;
+  virtual bool is_flipped() const override final;
 
 protected:
 

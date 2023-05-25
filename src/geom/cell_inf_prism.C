@@ -303,13 +303,12 @@ InfPrism::sides_on_edge(const unsigned int e) const
 }
 
 
-void
-InfPrism::orient(BoundaryInfo * boundary_info)
+bool
+InfPrism::is_flipped() const
 {
-  if (triple_product(this->point(1)-this->point(0),
-                     this->point(2)-this->point(0),
-                     this->point(3)-this->point(0)) < 0)
-    this->flip(boundary_info);
+  return (triple_product(this->point(1)-this->point(0),
+                         this->point(2)-this->point(0),
+                         this->point(3)-this->point(0)) < 0);
 }
 
 
