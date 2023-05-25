@@ -362,10 +362,16 @@ public:
             boundary_info.boundary_ids(elem, s, bcids[s]);
           }
 
+        CPPUNIT_ASSERT(!elem->is_flipped());
+
         if (elem->id()%2)
-          elem->flip(&boundary_info);
+          {
+            elem->flip(&boundary_info);
+            CPPUNIT_ASSERT(elem->is_flipped());
+          }
 
         elem->orient(&boundary_info);
+        CPPUNIT_ASSERT(!elem->is_flipped());
 
         // Our map should still be affine.
         // ... except for stupid singular pyramid maps
@@ -417,7 +423,10 @@ public:
           continue;
 #endif
         if (elem->id()%2)
-          elem->flip(&boundary_info);
+          {
+            elem->flip(&boundary_info);
+            CPPUNIT_ASSERT(elem->is_flipped());
+          }
       }
 
     MeshTools::Modification::orient_elements(*_mesh);
@@ -426,6 +435,8 @@ public:
     for (const auto & elem : _mesh->active_local_element_ptr_range())
       {
         const Elem & old_elem = old_mesh.elem_ref(elem->id());
+
+        CPPUNIT_ASSERT(!elem->is_flipped());
 
         // Elem::operator==() uses node ids to compare
         CPPUNIT_ASSERT(*elem == old_elem);
