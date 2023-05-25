@@ -13,6 +13,7 @@ public:
   CPPUNIT_TEST( testScalar );
   CPPUNIT_TEST( testOldConstructor );
   CPPUNIT_TEST( testIterators );
+  CPPUNIT_TEST( testAppend );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -90,6 +91,32 @@ public:
     CPPUNIT_ASSERT_EQUAL(m["c"], 3.);
   }
 
+  void testAppend()
+  {
+    LOG_UNIT_TEST;
+
+    // Create first multi-step RBParameters object
+    RBParameters params1;
+    for (int i=0; i<3; ++i)
+      params1.push_back_value("a", Real(i));
+
+    // Create second multi-step RBParameters object
+    // (must have same number of steps)
+    RBParameters params2;
+    for (int i=0; i<3; ++i)
+      params2.push_back_value("b", Real(i+3));
+
+    // Append second onto first
+    params1 += params2;
+
+    // Print result
+    // params1.print();
+
+    // Check that the desired appending happened
+    CPPUNIT_ASSERT(params1.has_value("b"));
+    for (int i=0; i<3; ++i)
+      CPPUNIT_ASSERT_EQUAL(params1.get_step_value("b", i), Real(i+3));
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION ( RBParametersTest );

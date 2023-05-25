@@ -89,18 +89,41 @@ void RBParameters::set_value(const std::string & param_name, Real value)
   _parameters[param_name] = {value};
 }
 
-void RBParameters::set_value(const std::string & param_name, std::size_t index, Real value)
+void
+RBParameters::set_value_helper(std::map<std::string, std::vector<Real>> & map,
+                               const std::string & param_name,
+                               std::size_t index,
+                               Real value)
 {
   // Get reference to vector of values for this parameter, creating it
   // if it does not already exist.
-  auto & vec = _parameters[param_name];
+  auto & vec = map[param_name];
 
-  // Allocate more space (padding with 0s) if vector is not big enough
-  // to fit the user's requested index.
-  if (vec.size() < index+1)
-    vec.resize(index+1);
+  // If vec is already big enough, just set the value
+  if (vec.size() > index)
+    vec[index] = value;
 
-  vec[index] = value;
+  // Otherwise push_back() if the vec is just barely not big enough
+  else if (vec.size() == index)
+    vec.push_back(value);
+
+  // Otherwise, allocate more space (padding with 0s) if vector is not
+  // big enough to fit the user's requested index.
+  else
+    {
+      vec.resize(index+1);
+      vec[index] = value;
+    }
+}
+
+void RBParameters::set_value(const std::string & param_name, std::size_t index, Real value)
+{
+  this->set_value_helper(_parameters, param_name, index, value);
+}
+
+void RBParameters::set_extra_value(const std::string & param_name, std::size_t index, Real value)
+{
+  this->set_value_helper(_extra_parameters, param_name, index, value);
 }
 
 void RBParameters::push_back_value(const std::string & param_name, Real value)
@@ -217,6 +240,20 @@ bool RBParameters::operator==(const RBParameters & rhs) const
 bool RBParameters::operator!=(const RBParameters & rhs) const
 {
   return !(*this == rhs);
+}
+
+RBParameters & RBParameters::operator+= (const RBParameters & rhs)
+{
+  libmesh_error_msg_if(this->n_steps() != rhs.n_steps(),
+                       "Can only append RBParameters objects with matching numbers of steps");
+
+  // Overwrite or add each (key, vec) pair in rhs to *this.
+  for (const auto & [key, vec] : rhs._parameters)
+    _parameters[key] = vec;
+  for (const auto & [key, vec] : rhs._extra_parameters)
+    _extra_parameters[key] = vec;
+
+  return *this;
 }
 
 std::string RBParameters::get_string(unsigned int precision) const
