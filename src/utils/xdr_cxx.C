@@ -122,6 +122,42 @@ Xdr::Xdr (std::string name,
 
 
 
+Xdr::Xdr (std::ostream & stream) :
+  mode(WRITE),
+  file_name(),
+#ifdef LIBMESH_HAVE_XDR
+  fp(nullptr),
+#endif
+  in(),
+  out(std::make_unique<std::ostream>(stream.rdbuf())),
+  comm_len(xdr_MAX_STRING_LENGTH),
+  gzipped_file(false),
+  bzipped_file(false),
+  xzipped_file(false),
+  version_number(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION, LIBMESH_MINOR_VERSION, LIBMESH_MICRO_VERSION))
+{
+}
+
+
+
+Xdr::Xdr (std::istream & stream) :
+  mode(READ),
+  file_name(),
+#ifdef LIBMESH_HAVE_XDR
+  fp(nullptr),
+#endif
+  in(std::make_unique<std::istream>(stream.rdbuf())),
+  out(),
+  comm_len(xdr_MAX_STRING_LENGTH),
+  gzipped_file(false),
+  bzipped_file(false),
+  xzipped_file(false),
+  version_number(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION, LIBMESH_MINOR_VERSION, LIBMESH_MICRO_VERSION))
+{
+}
+
+
+
 Xdr::~Xdr()
 {
   this->close();

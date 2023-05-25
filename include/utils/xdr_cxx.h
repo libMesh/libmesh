@@ -70,10 +70,21 @@ class Xdr
 public:
 
   /**
-   * Constructor.  Takes the filename and the mode.
+   * File-based constructor.  Takes the filename and the mode.
    * Valid modes are ENCODE, DECODE, READ, and WRITE.
    */
   Xdr (std::string name="", const XdrMODE m=UNKNOWN);
+
+  /**
+   * Output stream based constructor.
+   * Assumes mode WRITE.
+   */
+  Xdr (std::ostream & stream);
+  /**
+   * Input stream based constructor.
+   * Assumes mode READ.
+   */
+  Xdr (std::istream & stream);
 
   /**
    * Destructor.  Closes the file if it is open.
