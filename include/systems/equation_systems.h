@@ -514,6 +514,15 @@ public:
               const unsigned int write_flags=(WRITE_DATA),
               bool partition_agnostic = true) const;
 
+  void write (std::ostream name,
+              const unsigned int write_flags=(WRITE_DATA),
+              bool partition_agnostic = true) const;
+
+  void write (Xdr & io,
+              const unsigned int write_flags=(WRITE_DATA),
+              bool partition_agnostic = true,
+              Xdr * const local_io = nullptr) const;
+
   /**
    * \returns \p true when this equation system contains
    * identical data, up to the given threshold.  Delegates

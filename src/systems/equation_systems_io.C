@@ -382,6 +382,23 @@ void EquationSystems::write(std::string_view name,
                             const unsigned int write_flags,
                             bool partition_agnostic) const
 {
+  Xdr io((this->processor_id()==0) ? std::string(name) : "", mode);
+
+  std::unique_ptr<Xdr> local_io;
+  // open a parallel buffer if warranted
+  if (write_flags & EquationSystems::WRITE_PARALLEL_FILES && write_flags & EquationSystems::WRITE_DATA)
+    local_io = std::make_unique<Xdr>(local_file_name(this->processor_id(),name), mode);
+
+  this->write(io, write_flags, partition_agnostic, local_io.get());
+}
+
+
+
+void EquationSystems::write(Xdr & io,
+                            const unsigned int write_flags,
+                            bool partition_agnostic,
+                            Xdr * const local_io) const
+{
   /**
    * This program implements the output of an
    * EquationSystems object.  This warrants some
@@ -474,9 +491,10 @@ void EquationSystems::write(std::string_view name,
     // !this->get_mesh().is_serial())
     ;
 
-  // New scope so that io will close before we try to zip the file
+  if (write_parallel_files && write_data)
+    libmesh_assert(local_io);
+
   {
-    Xdr io((this->processor_id()==0) ? std::string(name) : "", mode);
     libmesh_assert (io.writing());
 
     LOG_SCOPE("write()", "EquationSystems");
@@ -554,9 +572,6 @@ void EquationSystems::write(std::string_view name,
     // to write vectors to disk, if wanted
     if (write_data)
       {
-        // open a parallel buffer if warranted.
-        Xdr local_io (write_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
-
         for (auto & pr : _systems)
           {
             // Ignore this system if it has been marked as hidden
@@ -564,11 +579,16 @@ void EquationSystems::write(std::string_view name,
 
             // 10.) + 11.)
             if (write_parallel_files)
-              pr.second->write_parallel_data (local_io,write_additional_data);
+              pr.second->write_parallel_data (*local_io,write_additional_data);
             else
               pr.second->write_serialized_data (io,write_additional_data);
           }
+
+        if (local_io)
+          local_io->close();
       }
+
+    io.close();
   }
 
   // the EquationSystems::write() method should look constant,
