@@ -903,6 +903,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                   new_elem->set_node(0) = new_node;
                   new_elem->set_node(1) = node_CW;
                   new_elem->set_node(2) = node_CCW;
+                  libmesh_assert(!new_elem->is_flipped());
 
                   // Set in-and-out-of-cavity neighbor pointers
                   new_elem->set_neighbor(1, neigh);
