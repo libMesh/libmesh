@@ -546,6 +546,9 @@ void Poly2TriTriangulator::triangulate_current_points()
           elem->set_node(v) = node;
         }
 
+      // We expect a consistent triangle orientation
+      libmesh_assert(!elem->is_flipped());
+
       Elem * added_elem = _mesh.add_elem(std::move(elem));
 
       for (auto v : make_range(3))
@@ -1160,8 +1163,12 @@ bool Poly2TriTriangulator::insert_refinement_points()
     }
 
   // Okay, *now* we can add the new elements.
-  for (auto & new_elem_pair : new_elems)
-    mesh.add_elem(std::move(new_elem_pair.second));
+  for (auto & [raw_elem, unique_elem] : new_elems)
+    {
+      libmesh_assert_equal_to(raw_elem, unique_elem.get());
+      libmesh_assert(!raw_elem->is_flipped());
+      mesh.add_elem(std::move(unique_elem));
+    }
 
   // Did we add anything?
   return !new_elems.empty();
