@@ -706,10 +706,12 @@ void RBEIMConstruction::init_context(FEMContext & c)
         auto fe = c.get_element_fe(var, dim);
         fe->get_JxW();
         fe->get_xyz();
+        fe->get_phi();
 
         auto side_fe = c.get_side_fe(var, dim);
         side_fe->get_JxW();
         side_fe->get_xyz();
+        side_fe->get_phi();
       }
 }
 
