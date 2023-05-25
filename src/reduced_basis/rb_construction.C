@@ -2726,8 +2726,14 @@ void RBConstruction::preevaluate_thetas()
   auto & rb_theta_expansion = get_rb_evaluation().get_rb_theta_expansion();
   const unsigned int n_A_terms = rb_theta_expansion.get_n_A_terms();
   const unsigned int n_F_terms = rb_theta_expansion.get_n_F_terms();
+  const unsigned int n_outputs = rb_theta_expansion.get_total_n_output_terms();
 
   // Collect all training parameters
+  // TODO: Here instead of using a vector of RBParameters objects,
+  // we could use a single RBParameters object with multiple "steps".
+  // This would save memory over the current approach, but that may
+  // not be a big deal in practice unless the number of training samples
+  // is very large for some reason.
   std::vector<RBParameters> mus(get_local_n_training_samples());
   const numeric_index_type first_index = get_first_local_training_index();
   for (unsigned int i=0; i<get_local_n_training_samples(); i++)
@@ -2736,7 +2742,7 @@ void RBConstruction::preevaluate_thetas()
       // locally since the RB solves are local.
       set_params_from_training_set( first_index+i );
       mus[i] = get_parameters();
-      _evaluated_thetas[i].resize(n_A_terms + n_F_terms);
+      _evaluated_thetas[i].resize(n_A_terms + n_F_terms + n_outputs);
     }
 
   // Evaluate thetas for all training parameters simultaneously
@@ -2753,6 +2759,31 @@ void RBConstruction::preevaluate_thetas()
       for (auto i : make_range(get_local_n_training_samples()))
         _evaluated_thetas[i][n_A_terms + q_f] = F_vals[i];
     }
+
+  {
+    unsigned int output_counter = 0;
+    for (unsigned int n=0; n<rb_theta_expansion.get_n_outputs(); n++)
+      for (unsigned int q_l=0; q_l<rb_theta_expansion.get_n_output_terms(n); q_l++)
+        {
+          // Evaluate the current output functional term for all
+          // training parameters simultaneously.
+          const auto output_vals = rb_theta_expansion.eval_output_theta(n, q_l, mus);
+
+          // TODO: the size of _evaluated_thetas is currently assumed to be
+          // the same as get_local_n_training_samples(), but this won't be
+          // the case if we use RBParameters objects that have multiple steps.
+          // So just make sure that's the case for now.
+          libmesh_error_msg_if(output_vals.size() != get_local_n_training_samples(),
+                               "We currently only support single-step RBParameters "
+                               "objects during the training stage.");
+
+          for (auto i : index_range(output_vals))
+            _evaluated_thetas[i][n_A_terms + n_F_terms + output_counter] = output_vals[i];
+
+          // Go to next output term
+          output_counter++;
+        }
+  }
 
   _preevaluate_thetas_completed = true;
 }
