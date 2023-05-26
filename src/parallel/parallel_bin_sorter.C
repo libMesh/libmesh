@@ -105,7 +105,9 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
 
           // Step through the histogram until we have the
           // desired bin size
-          while ((current_bin_size + histogram[current_histogram_bin] + delta) <= target_bin_size[b])
+          while ((current_bin_size +
+                  cast_int<int>(histogram[current_histogram_bin]) +
+                  delta) <= cast_int<int>(target_bin_size[b]))
             {
               // Don't index out of the histogram!
               if ((current_histogram_bin+1) == phist.n_bins())
@@ -114,7 +116,7 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
               current_bin_size += histogram[current_histogram_bin++];
             }
 
-          delta += current_bin_size - target_bin_size[b];
+          delta += current_bin_size - static_cast<int>(target_bin_size[b]);
 
           // Set the upper bound of the bin
           bin_bounds[b+1] = phist.upper_bound (current_histogram_bin);
