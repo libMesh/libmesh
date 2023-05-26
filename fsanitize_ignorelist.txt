@@ -1,0 +1,14 @@
+# This is a set of exceptions to use in
+# '-fsanitize-ignorelist=yourdir/fsanitize_ignorelist.txt'
+#
+# So far it's been tested and found to be complete for
+# -fsanitize=integer on clang++ 14 with g++ 12.1.0 headers
+fun:*basic_string_view*rfind*
+fun:*basic_string*compare*
+src:*hashing.h
+src:*hashword.h
+src:*fpoptimizer*
+src:*fp_opcode_add*
+src:*bytecodesynth*
+src:*fparser.cc
+src:*Eigen/*
