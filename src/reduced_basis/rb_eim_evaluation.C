@@ -215,10 +215,21 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   for (const auto & mu : mus)
     libmesh_error_msg_if(mu.n_steps() != n_steps_0, "All RBParameters objects must have same n_steps()");
 
-  // After we verified that all mus have the same number of values,
+  // After we verified that all mus have the same number of steps,
   // the total number of RB-EIM solves is simply the number of mus
   // times the number of steps.
   unsigned int num_rb_eim_solves = mus.size() * n_steps_0;
+
+  // A special case is when we are passed a single RBParameters object
+  // with no parameters stored on it. In this case, we effectively
+  // have Theta(mu) == const, and therefore we still need to do at
+  // least one RB-EIM solve. In this case, we require that there is
+  // only one entry in "mus" for simplicity.
+  if (num_rb_eim_solves == 0 && mus[0].n_parameters() == 0)
+    {
+      libmesh_error_msg_if(mus.size() != 1, "Must pass in only a single RBParameters object when solving with no parameters.");
+      num_rb_eim_solves = 1;
+    }
 
   std::vector<std::vector<Number>> evaluated_values_at_interp_points(num_rb_eim_solves);
 
@@ -228,7 +239,8 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   {
   unsigned int counter = 0;
   for (auto mu_index : index_range(mus))
-    for (auto step_index : make_range(mus[mu_index].n_steps()))
+    // Do at least one solve even if there are no parameters (hence no steps) defined on this mu
+    for (auto step_index : make_range(std::max(1u, mus[mu_index].n_steps())))
     {
       evaluated_values_at_interp_points[counter].resize(N); // N is number of RB basis functions
 
@@ -247,6 +259,12 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
 
       counter++;
     }
+
+  // Throw an error if we didn't do the required number of solves for
+  // some reason
+  libmesh_error_msg_if(counter != num_rb_eim_solves,
+                       "We should have done " << num_rb_eim_solves <<
+                       " solves, instead we did " << counter);
   }
 
   DenseMatrix<Number> interpolation_matrix_N;
@@ -260,7 +278,8 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   {
   unsigned int counter = 0;
   for (auto mu_index : index_range(mus))
-    for (auto step_index : make_range(mus[mu_index].n_steps()))
+    // Do at least one solve even if there are no parameters (hence no steps) defined on this mu
+    for (auto step_index : make_range(std::max(1u, mus[mu_index].n_steps())))
     {
       // Ignore compiler warnings about unused loop index
       libmesh_ignore(step_index);
@@ -660,7 +679,9 @@ std::vector<Number> RBEIMEvaluation::get_rb_eim_solutions_entries(unsigned int i
   std::vector<Number> rb_eim_solutions_entries(_rb_eim_solutions.size());
   for (unsigned int mu_index : index_range(_rb_eim_solutions))
     {
-      libmesh_error_msg_if(index >= _rb_eim_solutions[mu_index].size(), "Error: Invalid index");
+      libmesh_error_msg_if(index >= _rb_eim_solutions[mu_index].size(),
+                           "Error: Requested solution index " << index <<
+                           ", but only have " << _rb_eim_solutions[mu_index].size() << " entries.");
       rb_eim_solutions_entries[mu_index] = _rb_eim_solutions[mu_index](index);
     }
 
