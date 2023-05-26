@@ -697,8 +697,24 @@ bool Poly2TriTriangulator::insert_refinement_points()
                 }
               else
                 {
+                  // Should we just add the vertex average of the
+                  // boundary element, to minimize the number of
+                  // slivers created?
+                  //
+                  // new_pt = cavity_elem->vertex_average();
+                  //
+                  // That works for a while, but it
+                  // seems to be able to "run away" and leave us with
+                  // crazy slivers on boundaries if we push interior
+                  // refinement too far while disabling boundary
+                  // refinement.
+                  //
+                  // Let's go back to refining our original problem
+                  // element.
+                  cavity_elem = elem;
                   new_pt = cavity_elem->vertex_average();
                   new_node = mesh.add_point(new_pt, nn++);
+
                   // This was going to be a side refinement but it's
                   // now an internal refinement
                   side = invalid_uint;
