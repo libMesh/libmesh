@@ -727,7 +727,7 @@ void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
 }
 
 template <class Base>
-void RBConstructionBase<Base>::set_training_random_seed(unsigned int seed)
+void RBConstructionBase<Base>::set_training_random_seed(int seed)
 {
   this->training_parameters_random_seed = seed;
 }

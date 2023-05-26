@@ -156,7 +156,7 @@ public:
   /**
    * Set the seed that is used to randomly generate training parameters.
    */
-  void set_training_random_seed(unsigned int seed);
+  void set_training_random_seed(int seed);
 
   /**
    * In some cases we only want to allow discrete parameter values, instead
