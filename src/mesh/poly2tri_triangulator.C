@@ -541,7 +541,7 @@ void Poly2TriTriangulator::triangulate_current_points()
         {
           const p2t::Point & vertex = *ptri.GetPoint(v);
 
-          Node * node = point_node_map[vertex];
+          Node * node = libmesh_map_find(point_node_map, vertex);
           libmesh_assert(node);
           elem->set_node(v) = node;
         }
