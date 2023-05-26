@@ -743,7 +743,7 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
   libmesh_assert_less_equal (last_local_idx+1, this->size());
 
   const numeric_index_type my_size       = this->size();
-  const numeric_index_type my_local_size = (last_local_idx - first_local_idx + 1);
+  const numeric_index_type my_local_size = (last_local_idx + 1 - first_local_idx);
   PetscErrorCode ierr=0;
 
   // Don't bother for serial cases
