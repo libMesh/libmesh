@@ -138,7 +138,7 @@ DynaIO::DynaIO (MeshBase & mesh,
 
 void DynaIO::read (const std::string & name)
 {
-  const bool gzipped_file = (name.size() - name.rfind(".gz")  == 3);
+  const bool gzipped_file = (name.rfind(".gz") == name.size() - 3);
   // These will be handled in unzip_file:
   // const bool bzipped_file = (name.size() - name.rfind(".bz2") == 4);
   // const bool xzipped_file = (name.size() - name.rfind(".xz") == 3);
