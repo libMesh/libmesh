@@ -2447,7 +2447,7 @@ void DofMap::_dof_indices (const Elem & elem,
                   di.resize(di.size() + nc, DofObject::invalid_id);
                 }
               else
-                for (int i=n_comp-1; i>=dof_offset; i--)
+                for (int i=int(n_comp)-1; i>=dof_offset; i--)
                   {
                     const dof_id_type d =
                       node.dof_number(sys_num, vg, vig, i, n_comp);
@@ -2685,7 +2685,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                       }
 
                     // Compute the net amount of "extra" order, including Elem::p_level()
-                    int extra_order = elem->p_level() + p_adjustment;
+                    int extra_order = int(elem->p_level()) + p_adjustment;
 
                     FEType fe_type = var.type();
 

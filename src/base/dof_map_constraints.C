@@ -2086,7 +2086,7 @@ void DofMap::process_mesh_constraint_rows(const MeshBase & mesh)
 
               if (was_previously_constrained.count(constrained_id))
                 {
-                  for (auto q : IntRange<unsigned int>(0, n_adjoint_rhs+1))
+                  for (auto q : IntRange<int>(0, n_adjoint_rhs+1))
                     {
                       DenseMatrix<Number> K(1,1);
                       DenseVector<Number> F(1);
