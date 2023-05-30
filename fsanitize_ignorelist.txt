@@ -7,6 +7,7 @@ fun:*basic_string_view*rfind*
 fun:*basic_string*compare*
 src:*hashing.h
 src:*hashword.h
+src:*libHilbert*SetBits*
 src:*fpoptimizer*
 src:*fp_opcode_add*
 src:*bytecodesynth*
