@@ -118,13 +118,13 @@ unsigned int segment_intersection(const libMesh::Elem & elem,
                          targetsdy * raydx;
       const Real t = t_num * one_over_denom;
 
-      if (t < -TOLERANCE || t > 1 + TOLERANCE)
+      if (t < -TOLERANCE*TOLERANCE || t > 1 + TOLERANCE*TOLERANCE)
         continue;
 
       const Real u_num = targetsdx * edgedy - targetsdy * edgedx;
       const Real u = u_num * one_over_denom;
 
-      if (u < -TOLERANCE || u > 1 + TOLERANCE)
+      if (u < -TOLERANCE*TOLERANCE || u > 1 + TOLERANCE*TOLERANCE)
         continue;
 
 /*
