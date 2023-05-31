@@ -172,6 +172,8 @@ Poly2TriTriangulator::~Poly2TriTriangulator() = default;
 // Primary function responsible for performing the triangulation
 void Poly2TriTriangulator::triangulate()
 {
+  LOG_SCOPE("triangulate()", "Poly2TriTriangulator");
+
   // We only operate on serialized meshes.  And it's not safe to
   // serialize earlier, because it would then be possible for the user
   // to re-parallelize the mesh in between there and here.
@@ -280,6 +282,8 @@ bool Poly2TriTriangulator::is_refine_boundary_allowed
 
 void Poly2TriTriangulator::triangulate_current_points()
 {
+  LOG_SCOPE("triangulate_current_points()", "Poly2TriTriangulator");
+
   // Will the triangulation have holes?
   const std::size_t n_holes = _holes != nullptr ? _holes->size() : 0;
 
@@ -571,6 +575,8 @@ void Poly2TriTriangulator::triangulate_current_points()
 
 bool Poly2TriTriangulator::insert_refinement_points()
 {
+  LOG_SCOPE("insert_refinement_points()", "Poly2TriTriangulator");
+
   if (this->minimum_angle() != 0)
     libmesh_not_implemented();
 
