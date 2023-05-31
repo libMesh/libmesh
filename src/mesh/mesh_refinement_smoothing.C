@@ -424,8 +424,9 @@ bool MeshRefinement::eliminate_unrefined_patches ()
           libmesh_assert_greater (elem->p_level(), 0);
           my_p_adjustment = -1;
         }
-      const unsigned int my_new_p_level = elem->p_level() +
-        my_p_adjustment;
+      const unsigned int my_new_p_level =
+        cast_int<unsigned int>(int(elem->p_level()) +
+                               my_p_adjustment);
 
       // Check all the element neighbors
       for (auto neighbor : elem->neighbor_ptr_range())
@@ -479,7 +480,9 @@ bool MeshRefinement::eliminate_unrefined_patches ()
                       libmesh_assert_greater (neighbor->p_level(), 0);
                       p_adjustment = -1;
                     }
-                  if (my_new_p_level >= neighbor->p_level() + p_adjustment)
+                  if (my_new_p_level >=
+                      cast_int<unsigned int>(int(neighbor->p_level())
+                                             + p_adjustment))
                     {
                       p_flag_me = false;
                       if (!h_flag_me)

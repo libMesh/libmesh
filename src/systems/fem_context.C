@@ -129,8 +129,8 @@ void FEMContext::attach_quadrature_rules()
           FEType fe_type = sys.variable_type(v);
 
           _element_fe[dim][fe_type]->attach_quadrature_rule(_element_qrule[dim].get());
-          _side_fe[dim][fe_type]->attach_quadrature_rule(_side_qrule[dim].get());
-
+          if (dim)
+            _side_fe[dim][fe_type]->attach_quadrature_rule(_side_qrule[dim].get());
           if (dim == 3)
             _edge_fe[fe_type]->attach_quadrature_rule(_edge_qrule.get());
         };
@@ -157,8 +157,9 @@ void FEMContext::use_default_quadrature_rules(int extra_quadrature_order)
       // Create an adequate quadrature rule
       _element_qrule[dim] =
         hardest_fe_type.default_quadrature_rule(dim, _extra_quadrature_order);
-      _side_qrule[dim] =
-        hardest_fe_type.default_quadrature_rule(dim-1, _extra_quadrature_order);
+      if (dim)
+        _side_qrule[dim] =
+          hardest_fe_type.default_quadrature_rule(dim-1, _extra_quadrature_order);
       if (dim == 3)
         _edge_qrule = hardest_fe_type.default_quadrature_rule(1, _extra_quadrature_order);
     }

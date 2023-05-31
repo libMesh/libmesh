@@ -157,7 +157,9 @@ void DofObject::set_n_systems (const unsigned int ns)
 
   const unsigned int nei = this->n_extra_integers();
   const dof_id_type header_size = ns + bool(nei);
-  const dof_id_type hdr = nei ? -header_size : header_size;
+  const dof_id_type hdr = nei ?
+    static_cast<dof_id_type>(-static_cast<std::ptrdiff_t>(header_size))
+    : header_size;
   index_buffer_t new_buf(header_size + nei, hdr);
   if (nei)
     {

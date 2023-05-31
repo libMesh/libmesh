@@ -323,7 +323,7 @@ void RBEIMConstruction::process_parameters_file (const std::string & parameters_
 
 void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_samples_in,
                                                        bool deterministic_training_in,
-                                                       unsigned int training_parameters_random_seed_in,
+                                                       int training_parameters_random_seed_in,
                                                        bool quiet_mode_in,
                                                        unsigned int Nmax_in,
                                                        Real rel_training_tolerance_in,

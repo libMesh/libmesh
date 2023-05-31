@@ -1717,7 +1717,7 @@ dof_id_type DofMap::n_local_constrained_dofs() const
   const DofConstraints::const_iterator lower =
     _dof_constraints.lower_bound(this->first_dof()),
     upper =
-    _dof_constraints.upper_bound(this->end_dof()-1);
+    _dof_constraints.lower_bound(this->end_dof());
 
   return cast_int<dof_id_type>(std::distance(lower, upper));
 }
@@ -2086,7 +2086,7 @@ void DofMap::process_mesh_constraint_rows(const MeshBase & mesh)
 
               if (was_previously_constrained.count(constrained_id))
                 {
-                  for (auto q : IntRange<unsigned int>(0, n_adjoint_rhs+1))
+                  for (auto q : IntRange<int>(0, n_adjoint_rhs+1))
                     {
                       DenseMatrix<Number> K(1,1);
                       DenseVector<Number> F(1);

@@ -89,8 +89,8 @@ void NameBasedIO::read (const std::string & name)
 
   // For Nemesis files, the name we try to read will have suffixes
   // identifying processor rank
-  if (basename.rfind(".nem") + 4 == basename.size() ||
-      basename.rfind(".n") + 2 == basename.size())
+  if (basename.rfind(".nem") == basename.size() - 4 ||
+      basename.rfind(".n") == basename.size() - 2)
     {
       std::ostringstream full_name;
 
@@ -189,7 +189,7 @@ void NameBasedIO::read (const std::string & name)
           pid_suffix << '_' << getpid();
           // Nasty hack for reading/writing zipped files
           std::string new_name = name;
-          if (name.size() - name.rfind(".bz2") == 4)
+          if (name.rfind(".bz2") == name.size() - 4)
             {
 #ifdef LIBMESH_HAVE_BZIP
               new_name.erase(new_name.end() - 4, new_name.end());
@@ -203,7 +203,7 @@ void NameBasedIO::read (const std::string & name)
               libmesh_error_msg("ERROR: need bzip2/bunzip2 to open .bz2 file " << name);
 #endif
             }
-          else if (name.size() - name.rfind(".xz") == 3)
+          else if (name.rfind(".xz") == name.size() - 3)
             {
 #ifdef LIBMESH_HAVE_XZ
               new_name.erase(new_name.end() - 3, new_name.end());
@@ -292,9 +292,9 @@ void NameBasedIO::read (const std::string & name)
 
           // If we temporarily decompressed a file, remove the
           // uncompressed version
-          if (name.size() - name.rfind(".bz2") == 4)
+          if (name.rfind(".bz2") == name.size() - 4)
             std::remove(new_name.c_str());
-          if (name.size() - name.rfind(".xz") == 3)
+          if (name.rfind(".xz") == name.size() - 3)
             std::remove(new_name.c_str());
         }
 
@@ -348,12 +348,12 @@ void NameBasedIO::write (const std::string & name)
       std::ostringstream pid_suffix;
       pid_suffix << '_' << pid_0;
 
-      if (name.size() - name.rfind(".bz2") == 4)
+      if (name.rfind(".bz2") == name.size() - 4)
         {
           new_name.erase(new_name.end() - 4, new_name.end());
           new_name += pid_suffix.str();
         }
-      else if (name.size() - name.rfind(".xz") == 3)
+      else if (name.rfind(".xz") == name.size() - 3)
         {
           new_name.erase(new_name.end() - 3, new_name.end());
           new_name += pid_suffix.str();
@@ -432,7 +432,7 @@ void NameBasedIO::write (const std::string & name)
       }
 
       // Nasty hack for reading/writing zipped files
-      if (name.size() - name.rfind(".bz2") == 4)
+      if (name.rfind(".bz2") == name.size() - 4)
         {
           LOG_SCOPE("system(bzip2)", "NameBasedIO");
           if (mymesh.processor_id() == 0)
@@ -445,7 +445,7 @@ void NameBasedIO::write (const std::string & name)
             }
           mymesh.comm().barrier();
         }
-      if (name.size() - name.rfind(".xz") == 3)
+      if (name.rfind(".xz") == name.size() - 3)
         {
           LOG_SCOPE("system(xz)", "NameBasedIO");
           if (mymesh.processor_id() == 0)

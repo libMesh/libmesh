@@ -131,7 +131,7 @@ namespace
                       size_t indent)
         {
             std::string codehash, prevlabel;
-            for(size_t a=chain.size(); a-- > 0; )
+            for(ptrdiff_t a=chain.size(); a-- > 0; )
             {
                 codehash += chain[a];
                 std::string label = GenLabel(codehash);
@@ -509,7 +509,7 @@ namespace
             outstream << "\n" << Indent(indent+1);
 
         outstream << '"';
-        for(size_t a=so_far.size(); a-- > 0; )
+        for(ptrdiff_t a=so_far.size(); a-- > 0; )
         {
             if(a+1 != so_far.size()) outstream << " ";
             outstream << so_far[a].name;
@@ -1269,7 +1269,7 @@ namespace
             }
 
             Node* head = &global_head;
-            for(size_t b=sequence.size(); b-->0; )
+            for(ptrdiff_t b=sequence.size(); b-->0; )
             {
                 const Match& m = sequence[b];
                 bool dup = false;

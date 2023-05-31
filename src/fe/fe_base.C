@@ -1635,10 +1635,10 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
           // minimum shared p_level
           const unsigned int old_elem_level = elem->p_level();
           if (elem->p_level() != min_p_level)
-            my_fe->set_fe_order(my_fe->get_fe_type().order.get_order() - old_elem_level + min_p_level);
+            my_fe->set_fe_order(my_fe->get_fe_type().order.get_order() + min_p_level - old_elem_level);
           const unsigned int old_neigh_level = neigh->p_level();
           if (old_neigh_level != min_p_level)
-            neigh_fe->set_fe_order(neigh_fe->get_fe_type().order.get_order() - old_neigh_level + min_p_level);
+            neigh_fe->set_fe_order(neigh_fe->get_fe_type().order.get_order() + min_p_level - old_neigh_level);
 
           my_fe->reinit(elem, s);
 
@@ -1668,10 +1668,10 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
           // derivatives for C1 elements) are supported on side nodes
           FEType elem_fe_type = base_fe_type;
           if (old_elem_level != min_p_level)
-            elem_fe_type.order = base_fe_type.order.get_order() - old_elem_level + min_p_level;
+            elem_fe_type.order = base_fe_type.order.get_order() + min_p_level - old_elem_level;
           FEType neigh_fe_type = base_fe_type;
           if (old_neigh_level != min_p_level)
-            neigh_fe_type.order = base_fe_type.order.get_order() - old_neigh_level + min_p_level;
+            neigh_fe_type.order = base_fe_type.order.get_order() + min_p_level - old_neigh_level;
           FEInterface::dofs_on_side(elem,  Dim, elem_fe_type,  s,       my_side_dofs);
           FEInterface::dofs_on_side(neigh, Dim, neigh_fe_type, s_neigh, neigh_side_dofs);
 
