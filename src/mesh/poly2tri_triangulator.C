@@ -159,12 +159,12 @@ void libmesh_assert_locally_delaunay(const Elem & elem)
 void libmesh_assert_delaunay(MeshBase & mesh,
                              std::unordered_map<Elem *, std::unique_ptr<Elem>> & new_elems)
 {
-  LOG_SCOPE("libmesh_assert_delaunay", "Poly2TriTriangulator");
-
   libmesh_ignore(new_elems);
   if (0) // Keep gcc from complaining about an unused function in opt
     libmesh_assert_locally_delaunay(**mesh.elements_begin());
 #ifndef NDEBUG
+  LOG_SCOPE("libmesh_assert_delaunay()", "Poly2TriTriangulator");
+
   for (auto & elem : mesh.element_ptr_range())
     libmesh_assert_locally_delaunay(*elem);
 
