@@ -723,6 +723,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
       // What side are we coming from, and what side are we going to?
       unsigned int source_side = invalid_uint;
       unsigned int side = invalid_uint;
+
       while (!cavity_elem->contains_point(new_pt))
         {
           side = segment_intersection(*cavity_elem, ray_start, new_pt, source_side);
@@ -835,10 +836,10 @@ bool Poly2TriTriangulator::insert_refinement_points()
       else
         libmesh_assert(new_node);
 
-
       // Find the Delaunay cavity around the new point.
-      std::set<Elem *> unchecked_cavity {cavity_elem};
       std::set<Elem *> cavity;
+
+      std::set<Elem *> unchecked_cavity {cavity_elem};
       std::set<Node *> cavity_nodes {cavity_elem->node_ptr(0),
                                      cavity_elem->node_ptr(1),
                                      cavity_elem->node_ptr(2)};
