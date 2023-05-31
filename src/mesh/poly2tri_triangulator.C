@@ -838,7 +838,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                       cavity.end())
                     continue;
 
-                  if (in_circumcircle(*neigh, new_pt))
+                  if (in_circumcircle(*neigh, new_pt, TOLERANCE*TOLERANCE))
                     {
                       unchecked_cavity.insert(neigh);
                       for (auto v : make_range(3u))
