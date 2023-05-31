@@ -144,7 +144,7 @@ can_delaunay_swap(const Elem & elem,
 }
 
 
-void libmesh_assert_locally_delaunay(const Elem & elem)
+[[maybe_unused]] void libmesh_assert_locally_delaunay(const Elem & elem)
 {
   libmesh_ignore(elem);
 
@@ -156,12 +156,10 @@ void libmesh_assert_locally_delaunay(const Elem & elem)
 #endif
 }
 
-void libmesh_assert_delaunay(MeshBase & mesh,
+void libmesh_assert_delaunay(MeshBase & libmesh_dbg_var(mesh),
                              std::unordered_map<Elem *, std::unique_ptr<Elem>> & new_elems)
 {
   libmesh_ignore(new_elems);
-  if (0) // Keep gcc from complaining about an unused function in opt
-    libmesh_assert_locally_delaunay(**mesh.elements_begin());
 #ifndef NDEBUG
   LOG_SCOPE("libmesh_assert_delaunay()", "Poly2TriTriangulator");
 
@@ -1437,6 +1435,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
     {
       libmesh_assert_equal_to(raw_elem, unique_elem.get());
       libmesh_assert(!raw_elem->is_flipped());
+      libmesh_ignore(raw_elem); // Old gcc warns "unused variable"
       mesh.add_elem(std::move(unique_elem));
     }
 
