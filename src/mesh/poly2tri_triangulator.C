@@ -396,7 +396,8 @@ void Poly2TriTriangulator::triangulate_current_points()
 
           // We're not going to support overlapping nodes on the boundary
           if (point_node_map.count(*pt))
-            libmesh_not_implemented();
+            libmesh_not_implemented_msg
+              ("Triangulating overlapping boundary nodes is unsupported");
 
           point_node_map.emplace(*pt, node);
         }
