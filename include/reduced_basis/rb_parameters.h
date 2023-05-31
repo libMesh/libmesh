@@ -45,10 +45,16 @@ class RBParameters
 public:
 
   /**
+   * Constructor. Initializes the _n_steps parameter to 1 for
+   * backwards compatibility, but the set_n_steps() function can
+   * always be called later to update this value.
+   */
+  RBParameters();
+
+  /**
    * The special functions can be defaulted for this class, as it
    * does not manage any memory itself.
    */
-  RBParameters () = default;
   RBParameters (RBParameters &&) = default;
   RBParameters (const RBParameters &) = default;
   RBParameters & operator= (const RBParameters &) = default;
@@ -258,6 +264,16 @@ public:
   unsigned int n_parameters() const;
 
   /**
+   * Set the number of steps this RBParameters object is intended to
+   * represent, in the case that there are no actual parameters stored
+   * on it. Note: this value will only be used in the no-parameters
+   * case; if there are actual parameters specified in this class, the
+   * number set via this API is ignored. All parameters stored within
+   * the RBParameters object must have n_steps() steps.
+   */
+  void set_n_steps(unsigned int n_steps);
+
+  /**
    * Returns the number of steps stored for all parameters. For
    * simplicity, we require all parameters to store the same number of
    * steps ("step" here may refer to time step or load step) and in
@@ -351,6 +367,14 @@ private:
                         const std::string & param_name,
                         std::size_t index,
                         Real value);
+
+  /**
+   * The number of steps represented by this RBParameters object, in
+   * the case where there are no parameters actually stored on it. If
+   * there are parameters stored on this RBParameters object, then the
+   * n_steps() API returns that number of steps instead.
+   */
+  unsigned int _n_steps;
 
   /**
    * The map that stores the actual parameter vectors. Each vector is
