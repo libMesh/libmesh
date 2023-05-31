@@ -69,7 +69,8 @@ public:
                        const Elem * const,
                        const std::vector<Point> &,
                        const FEGenericBase<OutputShape> &,
-                       std::vector<std::vector<OutputShape>> &) const override;
+                       std::vector<std::vector<OutputShape>> &,
+                       bool add_p_level = true) const override;
 
   /**
    * Evaluates shape function gradients in physical coordinates for H1

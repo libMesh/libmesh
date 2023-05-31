@@ -74,7 +74,8 @@ public:
                        const Elem * const elem,
                        const std::vector<Point> & qp,
                        const FEGenericBase<OutputShape> & fe,
-                       std::vector<std::vector<OutputShape>> & phi) const = 0;
+                       std::vector<std::vector<OutputShape>> & phi,
+                       bool add_p_level = true) const = 0;
 
   /**
    * Evaluates shape function gradients in physical coordinates based on proper

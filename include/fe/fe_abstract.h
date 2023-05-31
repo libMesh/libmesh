@@ -501,7 +501,8 @@ public:
   /**
    * \returns The approximation order of the finite element.
    */
-  Order get_order()  const { return static_cast<Order>(fe_type.order + _p_level); }
+  Order get_order(bool add_p_level = true) const
+  { return static_cast<Order>(fe_type.order + add_p_level * _p_level); }
 
   /**
    * Sets the *base* FE order of the finite element.
@@ -602,6 +603,11 @@ public:
    * set calculate_default_dual_coeff as needed
    */
   void set_calculate_default_dual_coeff(const bool val){calculate_default_dual_coeff = val; }
+
+  /**
+   * Indicate whether to add p-refinement levels in init/reinit methods
+   */
+  void add_p_level_in_reinit(bool value) { _add_p_level_in_reinit = value; }
 
 protected:
 
@@ -728,6 +734,10 @@ protected:
    */
   virtual bool shapes_need_reinit() const = 0;
 
+  /**
+   * Whether to add p-refinement levels in init/reinit methods
+   */
+  bool _add_p_level_in_reinit;
 };
 
 } // namespace libMesh
