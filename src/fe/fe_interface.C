@@ -1247,21 +1247,22 @@ void FEInterface::shapes<Real>(const unsigned int dim,
     }
 #endif
 
-  const Order o = fe_t.order;
+  const auto o = Order(std::min(static_cast<int>(fe_t.order + add_p_level * elem->p_level()),
+                                static_cast<int>(FEInterface::max_order(fe_t, elem->type()))));
 
   switch(dim)
     {
     case 0:
-      fe_scalar_vec_error_switch(0, shapes(elem,o,i,p,phi,add_p_level), , ; return;);
+      fe_scalar_vec_error_switch(0, shapes(elem,o,i,p,phi,false), , ; return;);
       break;
     case 1:
-      fe_scalar_vec_error_switch(1, shapes(elem,o,i,p,phi,add_p_level), , ; return;);
+      fe_scalar_vec_error_switch(1, shapes(elem,o,i,p,phi,false), , ; return;);
       break;
     case 2:
-      fe_scalar_vec_error_switch(2, shapes(elem,o,i,p,phi,add_p_level), , ; return;);
+      fe_scalar_vec_error_switch(2, shapes(elem,o,i,p,phi,false), , ; return;);
       break;
     case 3:
-      fe_scalar_vec_error_switch(3, shapes(elem,o,i,p,phi,add_p_level), , ; return;);
+      fe_scalar_vec_error_switch(3, shapes(elem,o,i,p,phi,false), , ; return;);
       break;
     default:
       libmesh_error_msg("Invalid dimension = " << dim);
@@ -1289,21 +1290,22 @@ void FEInterface::all_shapes<Real>(const unsigned int dim,
     }
 #endif
 
-  const Order o = fe_t.order;
+  const auto o = Order(std::min(static_cast<int>(fe_t.order + add_p_level * elem->p_level()),
+                                static_cast<int>(FEInterface::max_order(fe_t, elem->type()))));
 
   switch(dim)
     {
     case 0:
-      fe_scalar_vec_error_switch(0, all_shapes(elem,o,p,phi,add_p_level), , ; return;);
+      fe_scalar_vec_error_switch(0, all_shapes(elem,o,p,phi,false), , ; return;);
       break;
     case 1:
-      fe_scalar_vec_error_switch(1, all_shapes(elem,o,p,phi,add_p_level), , ; return;);
+      fe_scalar_vec_error_switch(1, all_shapes(elem,o,p,phi,false), , ; return;);
       break;
     case 2:
-      fe_scalar_vec_error_switch(2, all_shapes(elem,o,p,phi,add_p_level), , ; return;);
+      fe_scalar_vec_error_switch(2, all_shapes(elem,o,p,phi,false), , ; return;);
       break;
     case 3:
-      fe_scalar_vec_error_switch(3, all_shapes(elem,o,p,phi,add_p_level), , ; return;);
+      fe_scalar_vec_error_switch(3, all_shapes(elem,o,p,phi,false), , ; return;);
       break;
     default:
       libmesh_error_msg("Invalid dimension = " << dim);
