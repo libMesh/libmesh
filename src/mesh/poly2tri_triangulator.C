@@ -63,11 +63,26 @@ p2t::Point to_p2t(const libMesh::Point & p)
   return {p(0), p(1)};
 }
 
-bool in_circumcircle(const libMesh::Elem & elem,
-                     const libMesh::Point & p)
+Real distance_from_circumcircle(const Elem & elem,
+                                const Point & p)
 {
-  using namespace libMesh;
+  libmesh_assert_equal_to(elem.n_vertices(), 3);
 
+  const Point circumcenter = elem.quasicircumcenter();
+  const Real radius = (elem.point(0) - circumcenter).norm();
+  const Real p_dist = (p - circumcenter).norm();
+
+  return p_dist - radius;
+}
+
+
+bool in_circumcircle(const Elem & elem,
+                     const Point & p,
+                     const Real tol = 0)
+{
+  return (distance_from_circumcircle(elem, p) < tol);
+
+  /*
   libmesh_assert_equal_to(elem.n_vertices(), 3);
 
   const Point pv0 = elem.point(0) - p;
@@ -77,6 +92,7 @@ bool in_circumcircle(const libMesh::Elem & elem,
   return ((pv0.norm_sq() * (pv1(0)*pv2(1)-pv2(0)*pv1(1))) -
           (pv1.norm_sq() * (pv0(0)*pv2(1)-pv2(0)*pv0(1))) +
           (pv2.norm_sq() * (pv0(0)*pv1(1)-pv1(0)*pv0(1)))) > 0;
+  */
 }
 
 unsigned int segment_intersection(const libMesh::Elem & elem,
