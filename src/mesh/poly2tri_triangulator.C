@@ -42,6 +42,8 @@
 // Anonymous namespace - poly2tri doesn't define operator<(Point,Point)
 namespace
 {
+using namespace libMesh;
+
 struct P2TPointCompare
 {
   bool operator()(const p2t::Point & a, const p2t::Point & b) const
