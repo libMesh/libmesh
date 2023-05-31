@@ -98,15 +98,19 @@ bool in_circumcircle(const Elem & elem,
 
 std::pair<bool, unsigned short>
 can_delaunay_swap(const Elem & elem,
-                  const Elem & neigh,
+                  unsigned short side,
                   Real tol)
 {
+  const Elem * neigh = elem.neighbor_ptr(side);
+  if (!neigh)
+    return {false, 0};
+
   unsigned short nn = 0;
 
   // What neighbor node does elem not share?
   for (; nn < 3; ++nn)
     {
-      const Node * neigh_node = neigh.node_ptr(nn);
+      const Node * neigh_node = neigh->node_ptr(nn);
       if (neigh_node == elem.node_ptr(0) ||
           neigh_node == elem.node_ptr(1) ||
           neigh_node == elem.node_ptr(2))
@@ -121,7 +125,20 @@ can_delaunay_swap(const Elem & elem,
   if (nn == 3)
     return {false, 0};
 
-  // FIXME: what about boundaries?
+  const unsigned short n = (side+2)%3;
+  const RealVectorValue right =
+    (elem.point((n+1)%3)-elem.point(n)).unit();
+  const RealVectorValue mid =
+    (neigh->point(nn)-elem.point(n)).unit();
+  const RealVectorValue left =
+    (elem.point((n+2)%3)-elem.point(n)).unit();
+
+  // If the "middle" vector isn't really in the middle, we can't do a
+  // swap without involving other triangles (or we can't at all if
+  // there's a domain boundary in the way)
+  if (mid*right < left*right ||
+      left*mid < left*right)
+    return {false, 0};
 
   return {true, nn};
 }
@@ -132,17 +149,10 @@ void libmesh_assert_locally_delaunay(const Elem & elem)
   libmesh_ignore(elem);
 
 #ifndef NDEBUG
+  // -TOLERANCE, because we're fine with something a little inside the
+  // circumcircle
   for (auto s : make_range(elem.n_sides()))
-    {
-      const Elem * neigh = elem.neighbor_ptr(s);
-      if (!neigh)
-        continue;
-
-      // -TOLERANCE, because we're fine with something a little inside
-      // the circumcircle
-      libmesh_assert(!can_delaunay_swap(elem, *neigh,
-                                        -TOLERANCE).first);
-    }
+    libmesh_assert(!can_delaunay_swap(elem, s, -TOLERANCE).first);
 #endif
 }
 
@@ -179,15 +189,15 @@ void restore_delaunay(std::unordered_set<Elem *> & check_delaunay_on,
       check_delaunay_on.erase(&elem);
       for (auto s : make_range(elem.n_sides()))
         {
-          Elem * neigh = elem.neighbor_ptr(s);
-          if (!neigh)
-            continue;
-
-          // Can we make a swap here?  With what far node?  Use a
-          // negative tolerance to avoid swapping back and forth.
-          auto [can_swap, nn] = can_delaunay_swap(elem, *neigh, -TOLERANCE*TOLERANCE);
+          // Can we make a swap here?  With what neighbor, with what
+          // far node?  Use a negative tolerance to avoid swapping
+          // back and forth.
+          auto [can_swap, nn] =
+            can_delaunay_swap(elem, s, -TOLERANCE*TOLERANCE);
           if (!can_swap)
             continue;
+
+          Elem * neigh = elem.neighbor_ptr(s);
 
           // If we made it here it's time to diagonal swap
           const unsigned short n = (s+2)%3;
