@@ -877,7 +877,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
       // cavity will be a source of one new triangle.
 
       // Keep maps for doing neighbor pointer assignment
-      std::map<Node *, std::pair<Elem *, boundary_id_type>>
+      std::unordered_map<Node *, std::pair<Elem *, boundary_id_type>>
         neighbors_CCW, neighbors_CW;
 
       for (Elem * old_elem : cavity)
