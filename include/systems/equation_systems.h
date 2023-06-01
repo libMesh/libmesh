@@ -458,28 +458,22 @@ public:
    * processes.  This renumbering is not compatible with meshes
    * that have two nodes in exactly the same position!
    */
-  template <typename InValType>
+  template <typename InValType = Number>
   void read (std::string_view name,
              const XdrMODE,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true);
 
-  void read (std::string_view name,
-             const XdrMODE mode,
-             const unsigned int read_flags=(READ_HEADER | READ_DATA),
-             bool partition_agnostic = true)
-  { read<Number>(name, mode, read_flags, partition_agnostic); }
-
-  template <typename InValType>
+  template <typename InValType = Number>
   void read (std::string_view name,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true);
 
-  void read (std::string_view name,
+  template <typename InValType = Number>
+  void read (Xdr & io,
+             std::function<std::unique_ptr<Xdr>()> & local_io_functor,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
-             bool partition_agnostic = true)
-  { read<Number>(name, read_flags, partition_agnostic); }
-
+             bool partition_agnostic = true);
 
   /**
    * Write the systems to disk using the XDR data format.
@@ -513,6 +507,15 @@ public:
   void write (std::string_view name,
               const unsigned int write_flags=(WRITE_DATA),
               bool partition_agnostic = true) const;
+
+  void write (std::ostream name,
+              const unsigned int write_flags=(WRITE_DATA),
+              bool partition_agnostic = true) const;
+
+  void write (Xdr & io,
+              const unsigned int write_flags=(WRITE_DATA),
+              bool partition_agnostic = true,
+              Xdr * const local_io = nullptr) const;
 
   /**
    * \returns \p true when this equation system contains
@@ -618,27 +621,6 @@ protected:
   bool _enable_default_ghosting;
 
 private:
-
-  /**
-   * Actual read implementation.  This can be called repeatedly
-   * inside a try-catch block in an attempt to read broken files.
-   *
-   * \param name Name of the file to be read.
-   * \param read_flags Single flag created by bitwise-OR'ing several flags together.
-   * \param partition_agnostic If true then the mesh and degrees of freedom
-   * will be temporarily renumbered in a partition agnostic way so that
-   * files written using "n" mpi processes can be re-read on "m" mpi
-   * processes.
-   *
-   * \note This renumbering is not compatible with meshes that have
-   * two nodes in exactly the same position!
-   */
-  template <typename InValType>
-  void _read_impl (std::string_view name,
-                   const XdrMODE,
-                   const unsigned int read_flags,
-                   bool partition_agnostic = true);
-
   /**
    * This function is used in the implementation of add_system,
    * it loops over the nodes and elements of the Mesh, adding the

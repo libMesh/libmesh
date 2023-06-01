@@ -81,11 +81,6 @@ void EquationSystems::read (std::string_view name,
   if (name.find(".xdr") != std::string::npos)
     mode = DECODE;
   this->read(name, mode, read_flags, partition_agnostic);
-
-#ifdef LIBMESH_ENABLE_AMR
-  MeshRefinement mesh_refine(_mesh);
-  mesh_refine.clean_refinement_flags();
-#endif
 }
 
 
@@ -96,58 +91,24 @@ void EquationSystems::read (std::string_view name,
                             const unsigned int read_flags,
                             bool partition_agnostic)
 {
-  // If we have exceptions enabled we can be considerate and try
-  // to read old restart files which contain infinite element
-  // information but do not have the " with infinite elements"
-  // string in the version information.
+  // This will unzip a file with .bz2 as the extension, otherwise it
+  // simply returns the name if the file need not be unzipped.
+  Xdr io ((this->processor_id() == 0) ? std::string(name) : "", mode);
 
-  // First try the read the user requested
-  libmesh_try
-    {
-      this->_read_impl<InValType> (name, mode, read_flags, partition_agnostic);
-    }
+  std::function<std::unique_ptr<Xdr>()> local_io_functor;
+  local_io_functor = [this,&name,&mode]() {
+    return std::make_unique<Xdr>(local_file_name(this->processor_id(), name), mode); };
 
-  // If that fails, try it again but explicitly request we look for infinite element info
-  libmesh_catch (...)
-    {
-      libMesh::out << "\n*********************************************************************\n"
-                   << "READING THE FILE \"" << name << "\" FAILED.\n"
-                   << "It is possible this file contains infinite element information,\n"
-                   << "but the version string does not contain \" with infinite elements\"\n"
-                   << "Let's try this again, but looking for infinite element information...\n"
-                   << "*********************************************************************\n"
-                   << std::endl;
-
-      libmesh_try
-        {
-          this->_read_impl<InValType> (name, mode, read_flags | EquationSystems::TRY_READ_IFEMS, partition_agnostic);
-        }
-
-      // If all that failed, we are out of ideas here...
-      libmesh_catch (...)
-        {
-          libMesh::out << "\n*********************************************************************\n"
-                       << "Well, at least we tried!\n"
-                       << "Good Luck!!\n"
-                       << "*********************************************************************\n"
-                       << std::endl;
-          libmesh_error();
-        }
-    }
-
-#ifdef LIBMESH_ENABLE_AMR
-  MeshRefinement mesh_refine(_mesh);
-  mesh_refine.clean_refinement_flags();
-#endif
+  this->read(io, local_io_functor, read_flags, partition_agnostic);
 }
 
 
 
 template <typename InValType>
-void EquationSystems::_read_impl (std::string_view name,
-                                  const XdrMODE mode,
-                                  const unsigned int read_flags,
-                                  bool partition_agnostic)
+void EquationSystems::read (Xdr & io,
+                            std::function<std::unique_ptr<Xdr>()> & local_io_functor,
+                            const unsigned int read_flags,
+                            bool partition_agnostic)
 {
   /**
    * This program implements the output of an
@@ -223,9 +184,6 @@ void EquationSystems::_read_impl (std::string_view name,
 
   std::vector<std::pair<std::string, System *>> xda_systems;
 
-  // This will unzip a file with .bz2 as the extension, otherwise it
-  // simply returns the name if the file need not be unzipped.
-  Xdr io ((this->processor_id() == 0) ? std::string(name) : "", mode);
   libmesh_assert (io.reading());
 
   {
@@ -247,7 +205,7 @@ void EquationSystems::_read_impl (std::string_view name,
 
             // Recursively call this read() function but with the
             // EquationSystems::READ_LEGACY_FORMAT bit set.
-            this->read (name, mode, (read_flags | EquationSystems::READ_LEGACY_FORMAT), partition_agnostic);
+            this->read (io, local_io_functor, (read_flags | EquationSystems::READ_LEGACY_FORMAT), partition_agnostic);
             return;
           }
 
@@ -328,6 +286,8 @@ void EquationSystems::_read_impl (std::string_view name,
   // Read and set the numeric vector values
   if (read_data)
     {
+      std::unique_ptr<Xdr> local_io;
+
       // the EquationSystems::read() method should look constant from the mesh
       // perspective, but we need to assign a temporary numbering to the nodes
       // and elements in the mesh, which requires that we abuse const_cast
@@ -336,8 +296,6 @@ void EquationSystems::_read_impl (std::string_view name,
           MeshBase & mesh = const_cast<MeshBase &>(this->get_mesh());
           MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
         }
-
-      Xdr local_io (read_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
 
       for (auto & pr : xda_systems)
         if (read_legacy_format)
@@ -349,7 +307,14 @@ void EquationSystems::_read_impl (std::string_view name,
           }
         else
           if (read_parallel_files)
-            pr.second->read_parallel_data<InValType>   (local_io, read_additional_data);
+            {
+              if (!local_io)
+              {
+                local_io = local_io_functor();
+                libmesh_assert(local_io->reading());
+              }
+              pr.second->read_parallel_data<InValType> (*local_io, read_additional_data);
+            }
           else
             pr.second->read_serialized_data<InValType> (io, read_additional_data);
 
@@ -361,6 +326,11 @@ void EquationSystems::_read_impl (std::string_view name,
 
   // Localize each system's data
   this->update();
+
+  #ifdef LIBMESH_ENABLE_AMR
+    MeshRefinement mesh_refine(_mesh);
+    mesh_refine.clean_refinement_flags();
+  #endif
 }
 
 
@@ -381,6 +351,23 @@ void EquationSystems::write(std::string_view name,
                             const XdrMODE mode,
                             const unsigned int write_flags,
                             bool partition_agnostic) const
+{
+  Xdr io((this->processor_id()==0) ? std::string(name) : "", mode);
+
+  std::unique_ptr<Xdr> local_io;
+  // open a parallel buffer if warranted
+  if (write_flags & EquationSystems::WRITE_PARALLEL_FILES && write_flags & EquationSystems::WRITE_DATA)
+    local_io = std::make_unique<Xdr>(local_file_name(this->processor_id(),name), mode);
+
+  this->write(io, write_flags, partition_agnostic, local_io.get());
+}
+
+
+
+void EquationSystems::write(Xdr & io,
+                            const unsigned int write_flags,
+                            bool partition_agnostic,
+                            Xdr * const local_io) const
 {
   /**
    * This program implements the output of an
@@ -474,9 +461,10 @@ void EquationSystems::write(std::string_view name,
     // !this->get_mesh().is_serial())
     ;
 
-  // New scope so that io will close before we try to zip the file
+  if (write_parallel_files && write_data)
+    libmesh_assert(local_io);
+
   {
-    Xdr io((this->processor_id()==0) ? std::string(name) : "", mode);
     libmesh_assert (io.writing());
 
     LOG_SCOPE("write()", "EquationSystems");
@@ -554,9 +542,6 @@ void EquationSystems::write(std::string_view name,
     // to write vectors to disk, if wanted
     if (write_data)
       {
-        // open a parallel buffer if warranted.
-        Xdr local_io (write_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
-
         for (auto & pr : _systems)
           {
             // Ignore this system if it has been marked as hidden
@@ -564,11 +549,16 @@ void EquationSystems::write(std::string_view name,
 
             // 10.) + 11.)
             if (write_parallel_files)
-              pr.second->write_parallel_data (local_io,write_additional_data);
+              pr.second->write_parallel_data (*local_io,write_additional_data);
             else
               pr.second->write_serialized_data (io,write_additional_data);
           }
+
+        if (local_io)
+          local_io->close();
       }
+
+    io.close();
   }
 
   // the EquationSystems::write() method should look constant,
@@ -582,13 +572,13 @@ void EquationSystems::write(std::string_view name,
 
 // template specialization
 
+template LIBMESH_EXPORT void EquationSystems::read<Number> (Xdr & io, std::function<std::unique_ptr<Xdr>()> & local_io_functor, const unsigned int read_flags, bool partition_agnostic);
 template LIBMESH_EXPORT void EquationSystems::read<Number> (std::string_view name, const unsigned int read_flags, bool partition_agnostic);
 template LIBMESH_EXPORT void EquationSystems::read<Number> (std::string_view name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
-template LIBMESH_EXPORT void EquationSystems::_read_impl<Number> (std::string_view name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
+template LIBMESH_EXPORT void EquationSystems::read<Real> (Xdr & io, std::function<std::unique_ptr<Xdr>()> & local_io_functor, const unsigned int read_flags, bool partition_agnostic);
 template LIBMESH_EXPORT void EquationSystems::read<Real> (std::string_view name, const unsigned int read_flags, bool partition_agnostic);
 template LIBMESH_EXPORT void EquationSystems::read<Real> (std::string_view name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
-template LIBMESH_EXPORT void EquationSystems::_read_impl<Real> (std::string_view name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
 #endif
 
 } // namespace libMesh
