@@ -14,6 +14,7 @@ public:
   CPPUNIT_TEST( testOldConstructor );
   CPPUNIT_TEST( testIterators );
   CPPUNIT_TEST( testAppend );
+  CPPUNIT_TEST( testNSteps );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -116,6 +117,25 @@ public:
     CPPUNIT_ASSERT(params1.has_value("b"));
     for (int i=0; i<3; ++i)
       CPPUNIT_ASSERT_EQUAL(params1.get_step_value("b", i), Real(i+3));
+  }
+
+  void testNSteps()
+  {
+    LOG_UNIT_TEST;
+
+    // A default-constructed RBparameters object has 1 step by definition
+    RBParameters params;
+    CPPUNIT_ASSERT_EQUAL(params.n_steps(), static_cast<unsigned int>(1));
+
+    // Set the number of steps to use in the no-parameters case
+    params.set_n_steps(10);
+    CPPUNIT_ASSERT_EQUAL(params.n_steps(), static_cast<unsigned int>(10));
+
+    // Define multiple steps for a single parameter. Now we no longer
+    // use the set_n_steps() value, since we have actual steps.
+    params.push_back_value("a", 1.);
+    params.push_back_value("a", 2.);
+    CPPUNIT_ASSERT_EQUAL(params.n_steps(), static_cast<unsigned int>(2));
   }
 };
 

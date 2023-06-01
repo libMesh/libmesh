@@ -25,14 +25,37 @@
 namespace libMesh
 {
 
-Number RBTheta::evaluate(const RBParameters &) { return 1.; }
+Number RBTheta::evaluate(const RBParameters & mu)
+{
+  // The RBTheta::evaluate() API is not general enough to handle the
+  // multi-step RBParameters case, and you must therefore call
+  // RBTheta::evaluate_vec() instead.
+  libmesh_error_msg_if(mu.n_steps() > 1,
+                       "You should only call the evaluate_vec() API when using multi-step RBParameters objects.");
+
+  return 1.;
+}
 
 std::vector<Number>
 RBTheta::evaluate_vec(const std::vector<RBParameters> & mus)
 {
-  std::vector<Number> result(mus.size());
-  for (auto i : index_range(mus))
-    result[i] = evaluate(mus[i]);
+  // Eventual return value
+  std::vector<Number> result;
+
+  for (const auto & mu : mus)
+    {
+      // Backwards-compatible behavior: for single-step RBParameters objects, we fall back on
+      // calling the scalar evaluate() function for this RBTheta object, which may have been
+      // overridden by the user.
+      if (mu.n_steps() == 1)
+        result.push_back( this->evaluate(mu) );
+      else
+        {
+          // For multistep RBParameters objects, all we can do is return
+          // mu.n_steps() copies of 1 here at the base class level.
+          result.insert(result.end(), /*count=*/mu.n_steps(), /*val=*/1.);
+        }
+    }
 
   return result;
 }

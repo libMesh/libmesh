@@ -27,6 +27,11 @@
 namespace libMesh
 {
 
+RBParameters::RBParameters() :
+  _n_steps(1)
+{
+}
+
 RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map)
 {
   // Backwards compatible support for constructing an RBParameters
@@ -38,6 +43,7 @@ RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map)
 
 void RBParameters::clear()
 {
+  _n_steps = 1;
   _parameters.clear();
   _extra_parameters.clear();
 }
@@ -159,11 +165,16 @@ unsigned int RBParameters::n_parameters() const
   return cast_int<unsigned int>(_parameters.size());
 }
 
+void RBParameters::set_n_steps(unsigned int n_steps)
+{
+  _n_steps = n_steps;
+}
+
 unsigned int RBParameters::n_steps() const
 {
   // Quick return if there are no parameters
   if (_parameters.empty())
-    return 0;
+    return _n_steps;
 
   // If _parameters is not empty, we can check the number of steps in the first param
   auto size_first = _parameters.begin()->second.size();
