@@ -284,22 +284,20 @@ public:
   /**
    * Fill \p param_names with the names of the parameters.
    *
-   * \deprecated to avoid making it too easy to create copies that in
-   * most circumstances aren't needed.  If you really need a list of
-   * the parameter names, the best approach is to iterate over this
-   * object using the begin()/end() APIs and build a std::set that
-   * way.
+   * Note: this function was previously deprecated, but now that
+   * multi-step RBParameters objects are possible, this is actually
+   * the most efficient way to get a list of the parameter names
+   * stored on this object.
    */
   void get_parameter_names(std::set<std::string> & param_names) const;
 
   /**
    * Fill \p param_names with the names of the extra parameters.
    *
-   * \deprecated to avoid making it too easy to create copies that in
-   * most circumstances aren't needed.  If you really need a list of
-   * the parameter names, the best approach is to iterate over this
-   * object using the extra_begin()/extra_end() APIs and build a std::set that
-   * way.
+   * Note: this function was previously deprecated, but now that
+   * multi-step RBParameters objects are possible, this is actually
+   * the most efficient way to get a list of the parameter names
+   * stored on this object.
    */
   void get_extra_parameter_names(std::set<std::string> & param_names) const;
 
