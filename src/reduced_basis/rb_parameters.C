@@ -192,8 +192,6 @@ unsigned int RBParameters::n_steps() const
 
 void RBParameters::get_parameter_names(std::set<std::string> & param_names) const
 {
-  libmesh_deprecated();
-
   param_names.clear();
   for (const auto & pr : _parameters)
     param_names.insert(pr.first);
@@ -201,8 +199,6 @@ void RBParameters::get_parameter_names(std::set<std::string> & param_names) cons
 
 void RBParameters::get_extra_parameter_names(std::set<std::string> & param_names) const
 {
-  libmesh_deprecated();
-
   param_names.clear();
   for (const auto & pr : _extra_parameters)
     param_names.insert(pr.first);
