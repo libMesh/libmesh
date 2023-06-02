@@ -239,8 +239,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   {
   unsigned int counter = 0;
   for (auto mu_index : index_range(mus))
-    // Do at least one solve even if there are no parameters (hence no steps) defined on this mu
-    for (auto step_index : make_range(std::max(1u, mus[mu_index].n_steps())))
+    for (auto step_index : make_range(mus[mu_index].n_steps()))
     {
       // Ignore compiler warnings about unused loop index
       libmesh_ignore(step_index);
@@ -278,8 +277,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   {
   unsigned int counter = 0;
   for (auto mu_index : index_range(mus))
-    // Do at least one solve even if there are no parameters (hence no steps) defined on this mu
-    for (auto step_index : make_range(std::max(1u, mus[mu_index].n_steps())))
+    for (auto step_index : make_range(mus[mu_index].n_steps()))
     {
       // Ignore compiler warnings about unused loop index
       libmesh_ignore(step_index);
