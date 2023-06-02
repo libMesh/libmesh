@@ -242,19 +242,19 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
     // Do at least one solve even if there are no parameters (hence no steps) defined on this mu
     for (auto step_index : make_range(std::max(1u, mus[mu_index].n_steps())))
     {
+      // Ignore compiler warnings about unused loop index
+      libmesh_ignore(step_index);
+
       evaluated_values_at_interp_points[counter].resize(N); // N is number of RB basis functions
 
       for (unsigned int interp_pt_index=0; interp_pt_index<N; interp_pt_index++)
         {
           unsigned int comp = _interpolation_points_comp[interp_pt_index];
 
-          // For vector-valued functions, the output_all_comps vectors are indexed first by component, then by step.
-          // For example, if there are 2 components and 3 steps, the output entries will be:
-          // [(comp0, step0), (comp1, step0),  (comp0, step1), (comp1, step1),  (comp0, step2), (comp1, step2)]
-          // To index into this vector, we need to know the current step_index and the total number of components:
-          // index = get_parametrized_function().get_n_components() * step_index + comp
+          // This line of code previously used "mu_index", now we use
+          // "counter" handle the multi-step RBParameters case.
           evaluated_values_at_interp_points[counter][interp_pt_index] =
-            output_all_comps[mu_index][interp_pt_index][get_parametrized_function().get_n_components() * step_index + comp];
+            output_all_comps[counter][interp_pt_index][comp];
         }
 
       counter++;
