@@ -139,6 +139,13 @@ void RBParameters::push_back_value(const std::string & param_name, Real value)
   _parameters[param_name].push_back(value);
 }
 
+void RBParameters::push_back_extra_value(const std::string & param_name, Real value)
+{
+  // Get reference to vector of values for this extra parameter, creating it
+  // if it does not already exist, and push back the specified value.
+  _extra_parameters[param_name].push_back(value);
+}
+
 Real RBParameters::get_extra_value(const std::string & param_name) const
 {
   // Same as get_value(param_name) but for the map of extra parameters

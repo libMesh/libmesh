@@ -233,6 +233,11 @@ public:
   void push_back_value(const std::string & param_name, Real value);
 
   /**
+   * Same as push_back_value(), but for "extra" parameters.
+   */
+  void push_back_extra_value(const std::string & param_name, Real value);
+
+  /**
    * Get the value of the specified extra parameter, throwing an error
    * if it does not exist.
    */
