@@ -105,7 +105,10 @@ public:
     // (must have same number of steps)
     RBParameters params2;
     for (int i=0; i<3; ++i)
-      params2.push_back_value("b", Real(i+3));
+      {
+        params2.push_back_value("b", Real(i+3));
+        params2.push_back_extra_value("c", Real(i*i));
+      }
 
     // Append second onto first
     params1 += params2;
@@ -115,8 +118,12 @@ public:
 
     // Check that the desired appending happened
     CPPUNIT_ASSERT(params1.has_value("b"));
+    CPPUNIT_ASSERT(params1.has_extra_value("c"));
     for (int i=0; i<3; ++i)
-      CPPUNIT_ASSERT_EQUAL(params1.get_step_value("b", i), Real(i+3));
+      {
+        CPPUNIT_ASSERT_EQUAL(params1.get_step_value("b", i), static_cast<Real>(i+3));
+        CPPUNIT_ASSERT_EQUAL(params1.get_extra_step_value("c", i), static_cast<Real>(i*i));
+      }
   }
 
   void testNSteps()
