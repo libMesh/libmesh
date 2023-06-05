@@ -54,7 +54,8 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
                                                  const Elem * const elem,
                                                  const std::vector<Point> & qp,
                                                  const FEGenericBase<OutputShape> & fe,
-                                                 std::vector<std::vector<OutputShape>> & phi) const
+                                                 std::vector<std::vector<OutputShape>> & phi,
+                                                 const bool /*add_p_level*/) const
 {
   switch (dim)
     {
@@ -278,7 +279,8 @@ void HCurlFETransformation<Real>::map_phi(const unsigned int,
                                           const Elem * const,
                                           const std::vector<Point> &,
                                           const FEGenericBase<Real> &,
-                                          std::vector<std::vector<Real>> &) const
+                                          std::vector<std::vector<Real>> &,
+                                          bool) const
 {
   libmesh_error_msg("HCurl transformations only make sense for vector-valued elements.");
 }

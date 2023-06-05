@@ -53,9 +53,10 @@ void H1FETransformation<OutputShape>::map_phi( const unsigned int dim,
                                                const Elem * const elem,
                                                const std::vector<Point> & qp,
                                                const FEGenericBase<OutputShape> & fe,
-                                               std::vector<std::vector<OutputShape>> & phi ) const
+                                               std::vector<std::vector<OutputShape>> & phi,
+                                               const bool add_p_level) const
 {
-  FEInterface::all_shapes<OutputShape>(dim, fe.get_fe_type(), elem, qp, phi);
+  FEInterface::all_shapes<OutputShape>(dim, fe.get_fe_type(), elem, qp, phi, add_p_level);
 }
 
 

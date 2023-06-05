@@ -325,14 +325,14 @@ void FE<Dim,T>::reinit_dual_shape_coeffs(const Elem * elem,
 
   const unsigned int n_shapes =
     this->n_shape_functions(this->get_type(),
-                            this->get_order());
+                            this->get_order(this->_add_p_level_in_reinit));
 
   std::vector<std::vector<OutputShape>> phi_vals;
   phi_vals.resize(n_shapes);
   for (const auto i : make_range(phi_vals.size()))
     phi_vals[i].resize(pts.size());
 
-  all_shapes(elem, this->get_order(), pts, phi_vals);
+  all_shapes(elem, this->get_order(this->_add_p_level_in_reinit), pts, phi_vals);
   this->compute_dual_shape_coeffs(JxW, phi_vals);
 }
 
@@ -341,7 +341,7 @@ void FE<Dim,T>::reinit_default_dual_shape_coeffs (const Elem * elem)
 {
   libmesh_assert(elem);
 
-  FEType default_fe_type(this->get_order(), T);
+  FEType default_fe_type(this->get_order(this->_add_p_level_in_reinit), T);
   QGauss default_qrule(elem->dim(), default_fe_type.default_quadrature_order());
   default_qrule.init(elem->type(), elem->p_level());
   // In preparation of computing dual_coeff, we compute the default shape
@@ -397,7 +397,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
   // space.
   const unsigned int n_approx_shape_functions =
     this->n_shape_functions(this->get_type(),
-                            this->get_order());
+                            this->get_order(this->_add_p_level_in_reinit));
 
   // Maybe we already have correctly-sized data?  Check data sizes,
   // and get ready to break out of a "loop" if all these resize()
@@ -584,7 +584,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
     {
       std::vector<std::vector<OutputShape>> * comps[3]
         { &this->dphidxi, &this->dphideta, &this->dphidzeta };
-      FE<Dim,T>::all_shape_derivs(elem, this->fe_type.order, qp, comps);
+      FE<Dim,T>::all_shape_derivs(elem, this->fe_type.order, qp, comps, this->_add_p_level_in_reinit);
     }
 
   switch (Dim)
@@ -606,7 +606,8 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
         if (this->calculate_d2phi)
           for (unsigned int i=0; i<n_approx_shape_functions; i++)
             for (unsigned int p=0; p<n_qp; p++)
-              this->d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 0, qp[p]);
+              this->d2phidxi2[i][p] = FE<Dim, T>::shape_second_deriv(
+                  elem, this->fe_type.order, i, 0, qp[p], this->_add_p_level_in_reinit);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
         break;
@@ -624,9 +625,12 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
           for (unsigned int i=0; i<n_approx_shape_functions; i++)
             for (unsigned int p=0; p<n_qp; p++)
               {
-                this->d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 0, qp[p]);
-                this->d2phidxideta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 1, qp[p]);
-                this->d2phideta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 2, qp[p]);
+                this->d2phidxi2[i][p] = FE<Dim, T>::shape_second_deriv(
+                    elem, this->fe_type.order, i, 0, qp[p], this->_add_p_level_in_reinit);
+                this->d2phidxideta[i][p] = FE<Dim, T>::shape_second_deriv(
+                    elem, this->fe_type.order, i, 1, qp[p], this->_add_p_level_in_reinit);
+                this->d2phideta2[i][p] = FE<Dim, T>::shape_second_deriv(
+                    elem, this->fe_type.order, i, 2, qp[p], this->_add_p_level_in_reinit);
               }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -646,12 +650,18 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
           for (unsigned int i=0; i<n_approx_shape_functions; i++)
             for (unsigned int p=0; p<n_qp; p++)
               {
-                this->d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 0, qp[p]);
-                this->d2phidxideta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 1, qp[p]);
-                this->d2phideta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 2, qp[p]);
-                this->d2phidxidzeta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 3, qp[p]);
-                this->d2phidetadzeta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 4, qp[p]);
-                this->d2phidzeta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 5, qp[p]);
+                this->d2phidxi2[i][p] = FE<Dim, T>::shape_second_deriv(
+                    elem, this->fe_type.order, i, 0, qp[p], this->_add_p_level_in_reinit);
+                this->d2phidxideta[i][p] = FE<Dim, T>::shape_second_deriv(
+                    elem, this->fe_type.order, i, 1, qp[p], this->_add_p_level_in_reinit);
+                this->d2phideta2[i][p] = FE<Dim, T>::shape_second_deriv(
+                    elem, this->fe_type.order, i, 2, qp[p], this->_add_p_level_in_reinit);
+                this->d2phidxidzeta[i][p] = FE<Dim, T>::shape_second_deriv(
+                    elem, this->fe_type.order, i, 3, qp[p], this->_add_p_level_in_reinit);
+                this->d2phidetadzeta[i][p] = FE<Dim, T>::shape_second_deriv(
+                    elem, this->fe_type.order, i, 4, qp[p], this->_add_p_level_in_reinit);
+                this->d2phidzeta2[i][p] = FE<Dim, T>::shape_second_deriv(
+                    elem, this->fe_type.order, i, 5, qp[p], this->_add_p_level_in_reinit);
               }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 

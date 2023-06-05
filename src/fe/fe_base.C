@@ -725,7 +725,7 @@ void FEGenericBase<OutputType>::compute_shape_functions (const Elem * elem,
   this->determine_calculations();
 
   if (calculate_phi)
-    this->_fe_trans->map_phi(this->dim, elem, qp, (*this), this->phi);
+    this->_fe_trans->map_phi(this->dim, elem, qp, (*this), this->phi, this->_add_p_level_in_reinit);
 
   if (calculate_dphi)
     this->_fe_trans->map_dphi(this->dim, elem, qp, (*this), this->dphi,

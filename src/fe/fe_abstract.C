@@ -64,7 +64,8 @@ FEAbstract::FEAbstract(const unsigned int d,
   elem_type(INVALID_ELEM),
   _p_level(0),
   qrule(nullptr),
-  shapes_on_quadrature(false)
+  shapes_on_quadrature(false),
+  _add_p_level_in_reinit(true)
 {
 }
 
