@@ -139,6 +139,13 @@ void RBParameters::push_back_value(const std::string & param_name, Real value)
   _parameters[param_name].push_back(value);
 }
 
+void RBParameters::push_back_extra_value(const std::string & param_name, Real value)
+{
+  // Get reference to vector of values for this extra parameter, creating it
+  // if it does not already exist, and push back the specified value.
+  _extra_parameters[param_name].push_back(value);
+}
+
 Real RBParameters::get_extra_value(const std::string & param_name) const
 {
   // Same as get_value(param_name) but for the map of extra parameters
@@ -152,6 +159,20 @@ Real RBParameters::get_extra_value(const std::string & param_name, const Real & 
   // same as get_value(param_name, default_val) but for the map of extra parameters
   auto it = _extra_parameters.find(param_name);
   return ((it != _extra_parameters.end() && it->second.size() != 0) ? it->second[0] : default_val);
+}
+
+Real RBParameters::get_extra_step_value(const std::string & param_name, std::size_t step) const
+{
+  const auto & vec = libmesh_map_find(_extra_parameters, param_name);
+  libmesh_error_msg_if(step >= vec.size(), "Error getting value for parameter " << param_name);
+  return vec[step];
+}
+
+Real RBParameters::get_extra_step_value(const std::string & param_name, std::size_t step, const Real & default_val) const
+{
+  // same as get_step_value(param_name, index, default_val) but for the map of extra parameters
+  auto it = _extra_parameters.find(param_name);
+  return ((it != _extra_parameters.end() && step < it->second.size()) ? it->second[step] : default_val);
 }
 
 void RBParameters::set_extra_value(const std::string & param_name, Real value)

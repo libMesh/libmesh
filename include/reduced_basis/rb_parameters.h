@@ -198,14 +198,14 @@ public:
    * Get the value of the specified parameter at the specified step,
    * throwing an error if it does not exist.
    */
-  Real get_step_value(const std::string & param_name, std::size_t index) const;
+  Real get_step_value(const std::string & param_name, std::size_t step) const;
 
   /**
    * Get the value of the specified parameter at the specified step,
    * returning the provided default value if either the parameter is
    * not defined or the step is invalid.
    */
-  Real get_step_value(const std::string & param_name, std::size_t index, const Real & default_val) const;
+  Real get_step_value(const std::string & param_name, std::size_t step, const Real & default_val) const;
 
   /**
    * Set the value of the specified parameter. If param_name
@@ -233,6 +233,11 @@ public:
   void push_back_value(const std::string & param_name, Real value);
 
   /**
+   * Same as push_back_value(), but for "extra" parameters.
+   */
+  void push_back_extra_value(const std::string & param_name, Real value);
+
+  /**
    * Get the value of the specified extra parameter, throwing an error
    * if it does not exist.
    */
@@ -243,6 +248,19 @@ public:
    * provided default value if it does not exist.
    */
   Real get_extra_value(const std::string & param_name, const Real & default_val) const;
+
+  /**
+   * Get the value of the specified "extra" parameter at the specified step,
+   * throwing an error if it does not exist.
+   */
+  Real get_extra_step_value(const std::string & param_name, std::size_t step) const;
+
+  /**
+   * Get the value of the specified extra parameter at the specified step,
+   * returning the provided default value if either the parameter is
+   * not defined or the step is invalid.
+   */
+  Real get_extra_step_value(const std::string & param_name, std::size_t step, const Real & default_val) const;
 
   /**
    * Set the value of the specified extra parameter. If param_name
