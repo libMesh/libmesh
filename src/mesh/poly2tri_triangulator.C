@@ -812,7 +812,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
     { return (a->id() < b->id()); }
   } comp;
 
-  std::unordered_map<Elem *, std::unique_ptr<Elem>> new_elems;
+  std::map<Elem *, std::unique_ptr<Elem>, decltype(comp)> new_elems(comp);
 
   // We should already be Delaunay when we get here, otherwise we
   // won't be able to stay Delaunay later.  But we're *not* always
