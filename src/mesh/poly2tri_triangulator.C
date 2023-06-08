@@ -402,11 +402,19 @@ void Poly2TriTriangulator::triangulate()
   // if that is requested and reasonable
   this->insert_any_extra_boundary_points();
 
+  // Triangulate the points we have, then see if we need to add more;
+  // repeat until we don't need to add more.
+  //
+  // This is currently done redundantly in parallel; make sure no
+  // processor quits before the others.
   do
     {
+      libmesh_parallel_only(_mesh.comm());
       this->triangulate_current_points();
     }
   while (this->insert_refinement_points());
+
+  libmesh_parallel_only(_mesh.comm());
 
   // Okay, we really do need to support boundary ids soon, but we
   // don't yet
