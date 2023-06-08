@@ -1054,12 +1054,12 @@ bool Poly2TriTriangulator::insert_refinement_points()
         libmesh_assert(new_node);
 
       // Find the Delaunay cavity around the new point.
-      std::set<Elem *> cavity;
+      std::set<Elem *, decltype(comp)> cavity(comp);
 
-      std::set<Elem *> unchecked_cavity {cavity_elem};
+      std::set<Elem *, decltype(comp)> unchecked_cavity ({cavity_elem}, comp);
       while (!unchecked_cavity.empty())
         {
-          std::set<Elem *> checking_cavity;
+          std::set<Elem *, decltype(comp)> checking_cavity(comp);
           checking_cavity.swap(unchecked_cavity);
           for (Elem * checking_elem : checking_cavity)
             {
@@ -1211,7 +1211,13 @@ bool Poly2TriTriangulator::insert_refinement_points()
             }
 
           boundary_info.remove(old_elem);
+        }
 
+      // Now that we're done using our cavity elems (including with a
+      // cavity.find() that used a comparator that dereferences the
+      // elmeents!) it's safe to delete them.
+      for (Elem * old_elem : cavity)
+        {
           auto it = new_elems.find(old_elem);
           if (it == new_elems.end())
             mesh.delete_elem(old_elem);
