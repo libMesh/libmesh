@@ -1086,7 +1086,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
       // cavity will be a source of one new triangle.
 
       // Set of elements that might need Delaunay swaps
-      std::unordered_set<Elem *> check_delaunay_on;
+      std::set<Elem *, decltype(comp)> check_delaunay_on(comp);
 
       // Keep maps for doing neighbor pointer assignment.  Not going
       // to iterate through these so hashing pointers is fine.
