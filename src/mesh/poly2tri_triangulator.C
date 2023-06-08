@@ -1088,7 +1088,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
       // Set of elements that might need Delaunay swaps
       std::unordered_set<Elem *> check_delaunay_on;
 
-      // Keep maps for doing neighbor pointer assignment
+      // Keep maps for doing neighbor pointer assignment.  Not going
+      // to iterate through these so hashing pointers is fine.
       std::unordered_map<Node *, std::pair<Elem *, boundary_id_type>>
         neighbors_CCW, neighbors_CW;
 
