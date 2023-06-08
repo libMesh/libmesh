@@ -156,8 +156,10 @@ can_delaunay_swap(const Elem & elem,
 #endif
 }
 
+template <typename Container>
+inline
 void libmesh_assert_delaunay(MeshBase & libmesh_dbg_var(mesh),
-                             std::unordered_map<Elem *, std::unique_ptr<Elem>> & new_elems)
+                             Container & new_elems)
 {
   libmesh_ignore(new_elems);
 #ifndef NDEBUG
@@ -175,12 +177,13 @@ void libmesh_assert_delaunay(MeshBase & libmesh_dbg_var(mesh),
 // Restore a triangulation's Delaunay property, starting with a set of
 // all triangles that might initially not be locally Delaunay with
 // their neighbors.
-void restore_delaunay(std::unordered_set<Elem *> & check_delaunay_on,
+template <typename Container>
+inline
+void restore_delaunay(Container & check_delaunay_on,
                       BoundaryInfo & boundary_info)
 {
   LOG_SCOPE("restore_delaunay()", "Poly2TriTriangulator");
 
-  std::unordered_set<Elem *> newly_flipped;
   while (!check_delaunay_on.empty())
     {
       Elem & elem = **check_delaunay_on.begin();
