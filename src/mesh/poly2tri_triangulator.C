@@ -1055,9 +1055,6 @@ bool Poly2TriTriangulator::insert_refinement_points()
       std::set<Elem *> cavity;
 
       std::set<Elem *> unchecked_cavity {cavity_elem};
-      std::set<Node *> cavity_nodes {cavity_elem->node_ptr(0),
-                                     cavity_elem->node_ptr(1),
-                                     cavity_elem->node_ptr(2)};
       while (!unchecked_cavity.empty())
         {
           std::set<Elem *> checking_cavity;
@@ -1077,11 +1074,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                     continue;
 
                   if (in_circumcircle(*neigh, new_pt, TOLERANCE*TOLERANCE))
-                    {
-                      unchecked_cavity.insert(neigh);
-                      for (auto v : make_range(3u))
-                        cavity_nodes.insert(neigh->node_ptr(v));
-                    }
+                    unchecked_cavity.insert(neigh);
                 }
             }
 
