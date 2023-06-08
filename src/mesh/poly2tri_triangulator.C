@@ -800,6 +800,18 @@ bool Poly2TriTriangulator::insert_refinement_points()
   // cases where a later refinement insertion has a not-yet-added
   // element in its cavity, so we'll use a map here to make searching
   // possible.
+  //
+  // For parallel consistency, we can't order a container we plan to
+  // iterate through based on Elem * or a hash of it.  We'll be doing
+  // Delaunay swaps so we can't iterate based on geometry.  These are
+  // not-yet-added elements so we can't iterate based on proper
+  // element ids ... but we can set a temporary element id to use for
+  // the purpose.
+  struct cmp {
+    bool operator()(Elem * a, Elem * b) const
+    { return (a->id() < b->id()); }
+  } comp;
+
   std::unordered_map<Elem *, std::unique_ptr<Elem>> new_elems;
 
   // We should already be Delaunay when we get here, otherwise we
@@ -807,8 +819,13 @@ bool Poly2TriTriangulator::insert_refinement_points()
   // Delaunay when we get here?  What the hell, poly2tri?  Fixing this
   // is expensive!
   {
-    std::unordered_set<Elem *> all_elems
-      { mesh.elements_begin(), mesh.elements_end() };
+    // restore_delaunay should get to the same Delaunay triangulation up to
+    // isomorphism regardless of ordering ... but we actually care
+    // about the isomorphisms!  If a triangle's nodes are permuted on
+    // one processor vs another that's an issue.  So sort our input
+    // carefully.
+    std::set<Elem *, decltype(comp)> all_elems
+      { mesh.elements_begin(), mesh.elements_end(), comp };
 
     restore_delaunay(all_elems, boundary_info);
 
