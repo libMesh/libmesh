@@ -1773,6 +1773,11 @@ void UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                                          bool enforce_all_nodes_match_on_boundaries,
                                          bool skip_find_neighbors)
 {
+#ifdef DEBUG
+  // We rely on neighbor links here
+  MeshTools::libmesh_assert_valid_neighbors(*this);
+#endif
+
   // FIXME: make distributed mesh support efficient.
   // Yes, we currently suck.
   MeshSerializer serialize(*this);
