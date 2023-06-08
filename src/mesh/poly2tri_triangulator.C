@@ -808,8 +808,10 @@ bool Poly2TriTriangulator::insert_refinement_points()
   // element ids ... but we can set a temporary element id to use for
   // the purpose.
   struct cmp {
-    bool operator()(Elem * a, Elem * b) const
-    { return (a->id() < b->id()); }
+    bool operator()(Elem * a, Elem * b) const {
+      libmesh_assert(a == b || a->id() != b->id());
+      return (a->id() < b->id());
+    }
   } comp;
 
   std::map<Elem *, std::unique_ptr<Elem>, decltype(comp)> new_elems(comp);
