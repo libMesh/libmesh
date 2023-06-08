@@ -1773,6 +1773,11 @@ void UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                                          bool enforce_all_nodes_match_on_boundaries,
                                          bool skip_find_neighbors)
 {
+#ifdef DEBUG
+  // We rely on neighbor links here
+  MeshTools::libmesh_assert_valid_neighbors(*this);
+#endif
+
   // FIXME: make distributed mesh support efficient.
   // Yes, we currently suck.
   MeshSerializer serialize(*this);
@@ -1935,9 +1940,13 @@ void UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
         {
           libMesh::out << "In UnstructuredMesh::stitch_meshes:\n"
                        << "This mesh has "  << this_boundary_node_ids.size()
-                       << " nodes on boundary " << this_mesh_boundary_id  << ".\n"
+                       << " nodes on boundary `"
+                       << this->get_boundary_info().get_sideset_name(this_mesh_boundary_id)
+                       << "' (" << this_mesh_boundary_id  << ").\n"
                        << "Other mesh has " << other_boundary_node_ids.size()
-                       << " nodes on boundary " << other_mesh_boundary_id << ".\n";
+                       << " nodes on boundary `"
+                       << this->get_boundary_info().get_sideset_name(other_mesh_boundary_id)
+                       << "' (" << other_mesh_boundary_id  << ").\n";
 
           if (h_min_updated)
             {

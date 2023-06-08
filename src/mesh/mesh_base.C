@@ -1159,7 +1159,7 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
               if (verbosity > 1)
                 {
                   this->comm().min(info.bbox.min());
-                  this->comm().min(info.bbox.max());
+                  this->comm().max(info.bbox.max());
                 }
             }
 

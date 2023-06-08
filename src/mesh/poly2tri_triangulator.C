@@ -292,9 +292,12 @@ void Poly2TriTriangulator::triangulate_current_points()
   std::vector<p2t::Point> outer_boundary_points;
   std::vector<std::vector<p2t::Point>> inner_hole_points(n_holes);
 
+  dof_id_type nn = _mesh.max_node_id();
+  libmesh_error_msg_if
+    (!nn, "Poly2TriTriangulator cannot triangulate an empty mesh!");
+
   // Unless we're using an explicit segments list, we assume node ids
   // are contiguous here.
-  dof_id_type nn = _mesh.max_node_id();
   if (this->segments.empty())
     libmesh_error_msg_if
       (_mesh.n_nodes() != nn,
