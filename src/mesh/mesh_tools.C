@@ -1451,6 +1451,7 @@ void libmesh_assert_valid_refinement_tree(const MeshBase &)
 
 
 #ifdef DEBUG
+
 void libmesh_assert_no_links_to_elem(const MeshBase & mesh,
                                      const Elem * bad_elem)
 {
@@ -1469,6 +1470,42 @@ void libmesh_assert_no_links_to_elem(const MeshBase & mesh,
     }
 }
 
+
+void libmesh_assert_equal_points (const MeshBase & mesh)
+{
+  LOG_SCOPE("libmesh_assert_equal_points()", "MeshTools");
+
+  dof_id_type pmax_node_id = mesh.max_node_id();
+  mesh.comm().max(pmax_node_id);
+
+  for (dof_id_type i=0; i != pmax_node_id; ++i)
+    {
+      const Point * p = mesh.query_node_ptr(i);
+
+      mesh.comm().semiverify(p);
+    }
+}
+
+
+void libmesh_assert_equal_connectivity (const MeshBase & mesh)
+{
+  LOG_SCOPE("libmesh_assert_equal_connectivity()", "MeshTools");
+
+  dof_id_type pmax_elem_id = mesh.max_elem_id();
+  mesh.comm().max(pmax_elem_id);
+
+  for (dof_id_type i=0; i != pmax_elem_id; ++i)
+    {
+      const Elem * e = mesh.query_elem_ptr(i);
+
+      std::vector<dof_id_type> nodes;
+      if (e)
+        for (auto n : e->node_index_range())
+          nodes.push_back(e->node_id(n));
+
+      mesh.comm().semiverify(e ? &nodes : nullptr);
+    }
+}
 
 
 void libmesh_assert_connected_nodes (const MeshBase & mesh)
