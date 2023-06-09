@@ -2257,6 +2257,10 @@ inline void DofMap::enforce_constraints_on_jacobian
 inline
 void DofMap::set_constrained_sparsity_construction(bool use_constraints)
 {
+  // This got only partly finished...
+  if (use_constraints)
+    libmesh_not_implemented();
+
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   _constrained_sparsity_construction = use_constraints;
 #endif
