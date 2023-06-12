@@ -742,17 +742,20 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
   hilbert_keys.reserve(n_objects);
   {
     LOG_SCOPE("compute_hilbert_indices()", "MeshCommunication");
+    const processor_id_type my_pid = communicator.rank();
     for (ForwardIterator it=begin; it!=end; ++it)
       {
         const Parallel::DofObjectKey hi(get_dofobject_key (**it, bbox));
         hilbert_keys.push_back(hi);
 
-        if ((*it)->processor_id() == communicator.rank())
+        const processor_id_type pid = (*it)->processor_id();
+
+        if (pid == my_pid)
           sorted_hilbert_keys.push_back(hi);
 
         // someone needs to take care of unpartitioned objects!
-        if ((communicator.rank() == 0) &&
-            ((*it)->processor_id() == DofObject::invalid_processor_id))
+        if ((my_pid == 0) &&
+            (pid == DofObject::invalid_processor_id))
           sorted_hilbert_keys.push_back(hi);
       }
   }
