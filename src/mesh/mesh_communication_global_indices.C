@@ -86,7 +86,7 @@ void get_hilbert_coords (const Point & p,
 
 
 Parallel::DofObjectKey
-get_dofobject_key (const Elem * e,
+get_dofobject_key (const Elem & e,
                    const libMesh::BoundingBox & bbox)
 {
   static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
@@ -94,12 +94,12 @@ get_dofobject_key (const Elem * e,
   Hilbert::HilbertIndices index;
   CFixBitVec icoords[3];
   Hilbert::BitVecType bv;
-  get_hilbert_coords (e->vertex_average(), bbox, icoords);
+  get_hilbert_coords (e.vertex_average(), bbox, icoords);
   Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, bv);
   index = bv;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  return std::make_pair(index, e->unique_id());
+  return std::make_pair(index, e.unique_id());
 #else
   return index;
 #endif
@@ -109,7 +109,7 @@ get_dofobject_key (const Elem * e,
 
 // Compute the hilbert index
 Parallel::DofObjectKey
-get_dofobject_key (const Node * n,
+get_dofobject_key (const Node & n,
                    const libMesh::BoundingBox & bbox)
 {
   static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
@@ -117,12 +117,12 @@ get_dofobject_key (const Node * n,
   Hilbert::HilbertIndices index;
   CFixBitVec icoords[3];
   Hilbert::BitVecType bv;
-  get_hilbert_coords (*n, bbox, icoords);
+  get_hilbert_coords (n, bbox, icoords);
   Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, bv);
   index = bv;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  return std::make_pair(index, n->unique_id());
+  return std::make_pair(index, n.unique_id());
 #else
   return index;
 #endif
@@ -146,7 +146,7 @@ public:
       {
         libmesh_assert(node);
         libmesh_assert_less (pos, _keys.size());
-        _keys[pos++] = get_dofobject_key (node, _bbox);
+        _keys[pos++] = get_dofobject_key (*node, _bbox);
       }
   }
 
@@ -158,7 +158,7 @@ public:
       {
         libmesh_assert(elem);
         libmesh_assert_less (pos, _keys.size());
-        _keys[pos++] = get_dofobject_key (elem, _bbox);
+        _keys[pos++] = get_dofobject_key (*elem, _bbox);
       }
   }
 
@@ -256,13 +256,13 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       //                          << " elem\n" << (**elemj)
       //                          << " vertex average " << (*elemj)->vertex_average()
       //                          << " has HilbertIndices " << elem_keys[j]
-      //                          << " or " << get_dofobject_key((*elemj), bbox)
+      //                          << " or " << get_dofobject_key((**elemj), bbox)
       //                          << std::endl;
       //             libMesh::err << "level " << (*elemi)->level()
       //                          << " elem\n" << (**elemi)
       //                          << " vertex average " << (*elemi)->vertex_average()
       //                          << " has HilbertIndices " << elem_keys[i]
-      //                          << " or " << get_dofobject_key((*elemi), bbox)
+      //                          << " or " << get_dofobject_key((**elemi), bbox)
       //                          << std::endl;
       //             libmesh_error_msg("Error: level " << (*elemi)->level() << " elements with duplicate Hilbert keys!");
       //           }
@@ -350,7 +350,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
         {
           libmesh_assert(node);
           const Parallel::DofObjectKey hi =
-            get_dofobject_key (node, bbox);
+            get_dofobject_key (*node, bbox);
           const processor_id_type pid =
             cast_int<processor_id_type>
             (std::distance (node_upper_bounds.begin(),
@@ -431,7 +431,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
           {
             libmesh_assert(node);
             const Parallel::DofObjectKey hi =
-              get_dofobject_key (node, bbox);
+              get_dofobject_key (*node, bbox);
             const processor_id_type pid =
               cast_int<processor_id_type>
               (std::distance (node_upper_bounds.begin(),
@@ -466,7 +466,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
         {
           libmesh_assert(elem);
           const Parallel::DofObjectKey hi =
-            get_dofobject_key (elem, bbox);
+            get_dofobject_key (*elem, bbox);
           const processor_id_type pid =
             cast_int<processor_id_type>
             (std::distance (elem_upper_bounds.begin(),
@@ -547,7 +547,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
           {
             libmesh_assert(elem);
             const Parallel::DofObjectKey hi =
-              get_dofobject_key (elem, bbox);
+              get_dofobject_key (*elem, bbox);
             const processor_id_type pid =
               cast_int<processor_id_type>
               (std::distance (elem_upper_bounds.begin(),
@@ -649,14 +649,14 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
                     (**elemj) << " vertex average " <<
                     (*elemj)->vertex_average() << " has HilbertIndices " <<
                     elem_keys[j] << " or " <<
-                    get_dofobject_key((*elemj), bbox) <<
+                    get_dofobject_key((**elemj), bbox) <<
                     std::endl;
                   libMesh::err <<
                     "level " << (*elemi)->level() << " elem\n" <<
                     (**elemi) << " vertex average " <<
                     (*elemi)->vertex_average() << " has HilbertIndices " <<
                     elem_keys[i] << " or " <<
-                    get_dofobject_key((*elemi), bbox) <<
+                    get_dofobject_key((**elemi), bbox) <<
                     std::endl;
                   libmesh_error_msg("Error: level " << (*elemi)->level() << " elements with duplicate Hilbert keys!");
                 }
@@ -695,7 +695,7 @@ void MeshCommunication::find_local_indices (const libMesh::BoundingBox & bbox,
     LOG_SCOPE("local_hilbert_indices", "MeshCommunication");
     for (ForwardIterator it=begin; it!=end; ++it)
       {
-        const Parallel::DofObjectKey hi(get_dofobject_key ((*it), bbox));
+        const Parallel::DofObjectKey hi(get_dofobject_key ((**it), bbox));
         hilbert_keys.emplace(hi, (*it)->id());
       }
   }
@@ -744,7 +744,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
     LOG_SCOPE("compute_hilbert_indices()", "MeshCommunication");
     for (ForwardIterator it=begin; it!=end; ++it)
       {
-        const Parallel::DofObjectKey hi(get_dofobject_key (*it, bbox));
+        const Parallel::DofObjectKey hi(get_dofobject_key (**it, bbox));
         hilbert_keys.push_back(hi);
 
         if ((*it)->processor_id() == communicator.rank())
