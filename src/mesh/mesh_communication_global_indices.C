@@ -48,30 +48,52 @@ namespace { // anonymous namespace for helper functions
 
 using namespace libMesh;
 
+
+// Trying to divide per mesh, not per point
+Point invert_bbox (const BoundingBox & bbox)
+{
+  Point p;
+
+  p(0) = (bbox.first(0) == bbox.second(0)) ? 0. :
+          1/(bbox.second(0)-bbox.first(0));
+
+#if LIBMESH_DIM > 1
+  p(1) = (bbox.first(1) == bbox.second(1)) ? 0. :
+          1/(bbox.second(1)-bbox.first(1));
+#endif
+
+#if LIBMESH_DIM > 2
+  p(2) = (bbox.first(2) == bbox.second(2)) ? 0. :
+          1/(bbox.second(2)-bbox.first(2));
+#endif
+
+  return p;
+}
+
+
+
 // Utility function to map (x,y,z) in [bbox.min, bbox.max]^3 into
 // [0,max_inttype]^3 for computing Hilbert keys
 void get_hilbert_coords (const Point & p,
-                         const libMesh::BoundingBox & bbox,
+                         const BoundingBox & bbox,
+                         const Point & bboxinv,
                          CFixBitVec icoords[3])
 {
   static const Hilbert::inttype max_inttype = static_cast<Hilbert::inttype>(-1);
 
   const double // put (x,y,z) in [0,1]^3 (don't divide by 0)
-    x = ((bbox.first(0) == bbox.second(0)) ? 0. :
-         (p(0)-bbox.first(0))/(bbox.second(0)-bbox.first(0))),
+    x = (p(0)-bbox.first(0)) * bboxinv(0),
 
 #if LIBMESH_DIM > 1
-    y = ((bbox.first(1) == bbox.second(1)) ? 0. :
-         (p(1)-bbox.first(1))/(bbox.second(1)-bbox.first(1))),
+    y = (p(1)-bbox.first(1)) * bboxinv(1),
 #else
     y = 0.,
 #endif
 
 #if LIBMESH_DIM > 2
-    z = ((bbox.first(2) == bbox.second(2)) ? 0. :
-         (p(2)-bbox.first(2))/(bbox.second(2)-bbox.first(2)));
+    z = (p(2)-bbox.first(2)) * bboxinv(2);
 #else
-  z = 0.;
+    z = 0.;
 #endif
 
   // (icoords) in [0,max_inttype]^3
@@ -84,14 +106,15 @@ void get_hilbert_coords (const Point & p,
 
 Parallel::DofObjectKey
 get_dofobject_key (const Elem & e,
-                   const libMesh::BoundingBox & bbox)
+                   const BoundingBox & bbox,
+                   const Point & bboxinv)
 {
   static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
 
   Hilbert::HilbertIndices index;
   CFixBitVec icoords[3];
   Hilbert::BitVecType bv;
-  get_hilbert_coords (e.vertex_average(), bbox, icoords);
+  get_hilbert_coords (e.vertex_average(), bbox, bboxinv, icoords);
   Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, bv);
   index = bv;
 
@@ -107,14 +130,15 @@ get_dofobject_key (const Elem & e,
 // Compute the hilbert index
 Parallel::DofObjectKey
 get_dofobject_key (const Node & n,
-                   const libMesh::BoundingBox & bbox)
+                   const BoundingBox & bbox,
+                   const Point & bboxinv)
 {
   static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
 
   Hilbert::HilbertIndices index;
   CFixBitVec icoords[3];
   Hilbert::BitVecType bv;
-  get_hilbert_coords (n, bbox, icoords);
+  get_hilbert_coords (n, bbox, bboxinv, icoords);
   Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, bv);
   index = bv;
 
@@ -129,9 +153,11 @@ get_dofobject_key (const Node & n,
 class ComputeHilbertKeys
 {
 public:
-  ComputeHilbertKeys (const libMesh::BoundingBox & bbox,
+  ComputeHilbertKeys (const BoundingBox & bbox,
+                      const Point & bboxinv,
                       std::vector<Parallel::DofObjectKey> & keys) :
     _bbox(bbox),
+    _bboxinv(bboxinv),
     _keys(keys)
   {}
 
@@ -143,7 +169,7 @@ public:
       {
         libmesh_assert(node);
         libmesh_assert_less (pos, _keys.size());
-        _keys[pos++] = get_dofobject_key (*node, _bbox);
+        _keys[pos++] = get_dofobject_key (*node, _bbox, _bboxinv);
       }
   }
 
@@ -155,12 +181,13 @@ public:
       {
         libmesh_assert(elem);
         libmesh_assert_less (pos, _keys.size());
-        _keys[pos++] = get_dofobject_key (*elem, _bbox);
+        _keys[pos++] = get_dofobject_key (*elem, _bbox, _bboxinv);
       }
   }
 
 private:
-  const libMesh::BoundingBox & _bbox;
+  const BoundingBox _bbox;
+  const Point _bboxinv;
   std::vector<Parallel::DofObjectKey> & _keys;
 };
 
@@ -193,8 +220,10 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
   // Global bounding box.  We choose the nodal bounding box for
   // backwards compatibility; the element bounding box may be looser
   // on curved elements.
-  BoundingBox bbox =
+  const BoundingBox bbox =
     MeshTools::create_nodal_bounding_box (mesh);
+
+  const Point bboxinv = invert_bbox(bbox);
 
   //-------------------------------------------------------------
   // (1) compute Hilbert keys
@@ -207,10 +236,11 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       ConstNodeRange nr (mesh.local_nodes_begin(),
                          mesh.local_nodes_end());
       node_keys.resize (nr.size());
-      Threads::parallel_for (nr, ComputeHilbertKeys (bbox, node_keys));
+      Threads::parallel_for (nr, ComputeHilbertKeys (bbox, bboxinv, node_keys));
 
       // // It's O(N^2) to check that these keys don't duplicate before the
       // // sort...
+      //
       // MeshBase::const_node_iterator nodei = mesh.local_nodes_begin();
       // for (std::size_t i = 0; i != node_keys.size(); ++i, ++nodei)
       //   {
@@ -220,9 +250,9 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       //         if (node_keys[i] == node_keys[j])
       //           {
       //             CFixBitVec icoords[3], jcoords[3];
-      //             get_hilbert_coords(**nodej, bbox, jcoords);
+      //             get_hilbert_coords(**nodej, bbox, bboxinv, jcoords);
       //             libMesh::err << "node " << (*nodej)->id() << ", " << static_cast<Point &>(**nodej) << " has HilbertIndices " << node_keys[j] << std::endl;
-      //             get_hilbert_coords(**nodei, bbox, icoords);
+      //             get_hilbert_coords(**nodei, bbox, bboxinv, icoords);
       //             libMesh::err << "node " << (*nodei)->id() << ", " << static_cast<Point &>(**nodei) << " has HilbertIndices " << node_keys[i] << std::endl;
       //             libmesh_error_msg("Error: nodes with duplicate Hilbert keys!");
       //           }
@@ -235,7 +265,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       ConstElemRange er (mesh.local_elements_begin(),
                          mesh.local_elements_end());
       elem_keys.resize (er.size());
-      Threads::parallel_for (er, ComputeHilbertKeys (bbox, elem_keys));
+      Threads::parallel_for (er, ComputeHilbertKeys (bbox, bboxinv, elem_keys));
 
       // // For elements, the keys can be (and in the case of TRI, are
       // // expected to be) duplicates, but only if the elements are at
@@ -253,13 +283,13 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       //                          << " elem\n" << (**elemj)
       //                          << " vertex average " << (*elemj)->vertex_average()
       //                          << " has HilbertIndices " << elem_keys[j]
-      //                          << " or " << get_dofobject_key((**elemj), bbox)
+      //                          << " or " << get_dofobject_key((**elemj), bbox, bboxinv)
       //                          << std::endl;
       //             libMesh::err << "level " << (*elemi)->level()
       //                          << " elem\n" << (**elemi)
       //                          << " vertex average " << (*elemi)->vertex_average()
       //                          << " has HilbertIndices " << elem_keys[i]
-      //                          << " or " << get_dofobject_key((**elemi), bbox)
+      //                          << " or " << get_dofobject_key((**elemi), bbox, bboxinv)
       //                          << std::endl;
       //             libmesh_error_msg("Error: level " << (*elemi)->level() << " elements with duplicate Hilbert keys!");
       //           }
@@ -347,7 +377,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
         {
           libmesh_assert(node);
           const Parallel::DofObjectKey hi =
-            get_dofobject_key (*node, bbox);
+            get_dofobject_key (*node, bbox, bboxinv);
           const processor_id_type pid =
             cast_int<processor_id_type>
             (std::distance (node_upper_bounds.begin(),
@@ -428,7 +458,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
           {
             libmesh_assert(node);
             const Parallel::DofObjectKey hi =
-              get_dofobject_key (*node, bbox);
+              get_dofobject_key (*node, bbox, bboxinv);
             const processor_id_type pid =
               cast_int<processor_id_type>
               (std::distance (node_upper_bounds.begin(),
@@ -463,7 +493,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
         {
           libmesh_assert(elem);
           const Parallel::DofObjectKey hi =
-            get_dofobject_key (*elem, bbox);
+            get_dofobject_key (*elem, bbox, bboxinv);
           const processor_id_type pid =
             cast_int<processor_id_type>
             (std::distance (elem_upper_bounds.begin(),
@@ -544,7 +574,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
           {
             libmesh_assert(elem);
             const Parallel::DofObjectKey hi =
-              get_dofobject_key (*elem, bbox);
+              get_dofobject_key (*elem, bbox, bboxinv);
             const processor_id_type pid =
               cast_int<processor_id_type>
               (std::distance (elem_upper_bounds.begin(),
@@ -580,9 +610,10 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
   // Global bounding box.  We choose the nodal bounding box for
   // backwards compatibility; the element bounding box may be looser
   // on curved elements.
-  BoundingBox bbox =
+  const BoundingBox bbox =
     MeshTools::create_nodal_bounding_box (mesh);
 
+  const Point bboxinv = invert_bbox(bbox);
 
   std::vector<Parallel::DofObjectKey>
     node_keys, elem_keys;
@@ -593,7 +624,7 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
       ConstNodeRange nr (mesh.local_nodes_begin(),
                          mesh.local_nodes_end());
       node_keys.resize (nr.size());
-      Threads::parallel_for (nr, ComputeHilbertKeys (bbox, node_keys));
+      Threads::parallel_for (nr, ComputeHilbertKeys (bbox, bboxinv, node_keys));
 
       // It's O(N^2) to check that these keys don't duplicate before the
       // sort...
@@ -606,12 +637,12 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
               if (node_keys[i] == node_keys[j])
                 {
                   CFixBitVec icoords[3], jcoords[3];
-                  get_hilbert_coords(**nodej, bbox, jcoords);
+                  get_hilbert_coords(**nodej, bbox, bboxinv, jcoords);
                   libMesh::err <<
                     "node " << (*nodej)->id() << ", " <<
                     *(const Point *)(*nodej) << " has HilbertIndices " <<
                     node_keys[j] << std::endl;
-                  get_hilbert_coords(**nodei, bbox, icoords);
+                  get_hilbert_coords(**nodei, bbox, bboxinv, icoords);
                   libMesh::err <<
                     "node " << (*nodei)->id() << ", " <<
                     *(const Point *)(*nodei) << " has HilbertIndices " <<
@@ -627,7 +658,7 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
       ConstElemRange er (mesh.local_elements_begin(),
                          mesh.local_elements_end());
       elem_keys.resize (er.size());
-      Threads::parallel_for (er, ComputeHilbertKeys (bbox, elem_keys));
+      Threads::parallel_for (er, ComputeHilbertKeys (bbox, bboxinv, elem_keys));
 
       // For elements, the keys can be (and in the case of TRI, are
       // expected to be) duplicates, but only if the elements are at
@@ -646,14 +677,14 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
                     (**elemj) << " vertex average " <<
                     (*elemj)->vertex_average() << " has HilbertIndices " <<
                     elem_keys[j] << " or " <<
-                    get_dofobject_key((**elemj), bbox) <<
+                    get_dofobject_key((**elemj), bbox, bboxinv) <<
                     std::endl;
                   libMesh::err <<
                     "level " << (*elemi)->level() << " elem\n" <<
                     (**elemi) << " vertex average " <<
                     (*elemi)->vertex_average() << " has HilbertIndices " <<
                     elem_keys[i] << " or " <<
-                    get_dofobject_key((**elemi), bbox) <<
+                    get_dofobject_key((**elemi), bbox, bboxinv) <<
                     std::endl;
                   libmesh_error_msg("Error: level " << (*elemi)->level() << " elements with duplicate Hilbert keys!");
                 }
@@ -670,7 +701,7 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase &) const
 
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 template <typename ForwardIterator>
-void MeshCommunication::find_local_indices (const libMesh::BoundingBox & bbox,
+void MeshCommunication::find_local_indices (const BoundingBox & bbox,
                                             const ForwardIterator & begin,
                                             const ForwardIterator & end,
                                             std::unordered_map<dof_id_type, dof_id_type> & index_map) const
@@ -682,6 +713,8 @@ void MeshCommunication::find_local_indices (const libMesh::BoundingBox & bbox,
 
   index_map.clear();
 
+  const Point bboxinv = invert_bbox(bbox);
+
   //-------------------------------------------------------------
   // (1) compute Hilbert keys
   // These aren't trivial to compute, and we will need them again.
@@ -692,7 +725,7 @@ void MeshCommunication::find_local_indices (const libMesh::BoundingBox & bbox,
     LOG_SCOPE("local_hilbert_indices", "MeshCommunication");
     for (ForwardIterator it=begin; it!=end; ++it)
       {
-        const Parallel::DofObjectKey hi(get_dofobject_key ((**it), bbox));
+        const Parallel::DofObjectKey hi(get_dofobject_key ((**it), bbox, bboxinv));
         hilbert_keys.emplace(hi, (*it)->id());
       }
   }
@@ -707,7 +740,7 @@ void MeshCommunication::find_local_indices (const libMesh::BoundingBox & bbox,
 
 template <typename ForwardIterator>
 void MeshCommunication::find_global_indices (const Parallel::Communicator & communicator,
-                                             const libMesh::BoundingBox & bbox,
+                                             const BoundingBox & bbox,
                                              const ForwardIterator & begin,
                                              const ForwardIterator & end,
                                              std::vector<dof_id_type> & index_map) const
@@ -727,6 +760,8 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
   std::size_t n_objects = std::distance (begin, end);
   index_map.reserve(n_objects);
 
+  const Point bboxinv = invert_bbox(bbox);
+
   //-------------------------------------------------------------
   // (1) compute Hilbert keys
   // These aren't trivial to compute, and we will need them again.
@@ -742,7 +777,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
     const processor_id_type my_pid = communicator.rank();
     for (ForwardIterator it=begin; it!=end; ++it)
       {
-        const Parallel::DofObjectKey hi(get_dofobject_key (**it, bbox));
+        const Parallel::DofObjectKey hi(get_dofobject_key (**it, bbox, bboxinv));
         hilbert_keys.push_back(hi);
 
         const processor_id_type pid = (*it)->processor_id();
