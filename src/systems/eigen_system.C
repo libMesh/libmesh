@@ -208,6 +208,10 @@ void EigenSystem::reinit ()
 
 void EigenSystem::solve ()
 {
+  if (get_dof_map().n_constrained_dofs())
+    libmesh_error_msg("EigenSystem does not support constrained degrees of freedom. If you wish to "
+                      "perform a solve on a system with constraints, then please use the "
+                      "CondensedEigenSystem class instead");
 
   // A reference to the EquationSystems
   EquationSystems & es = this->get_equation_systems();
