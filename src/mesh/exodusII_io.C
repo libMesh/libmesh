@@ -699,11 +699,11 @@ void ExodusII_IO::read (const std::string & fname)
             int mapped_shellface = raw_side_index;
 
             // Check for errors
-            libmesh_error_msg_if(mapped_shellface == ExodusII_IO_Helper::Conversion::invalid_id,
-                                 "Invalid 1-based side id: "
+            libmesh_error_msg_if(mapped_shellface < 0 || mapped_shellface >= 2,
+                                 "Bad 0-based shellface id: "
                                  << mapped_shellface
-                                 << " detected for "
-                                 << Utility::enum_to_string(elem.type()));
+                                 << " detected in Exodus file "
+                                 << exio_helper->current_filename);
 
             // Add this (elem,shellface,id) triplet to the BoundaryInfo object.
             mesh.get_boundary_info().add_shellface (libmesh_elem_id,
@@ -720,7 +720,18 @@ void ExodusII_IO::read (const std::string & fname)
                                  "Invalid 1-based side id: "
                                  << side_index
                                  << " detected for "
-                                 << Utility::enum_to_string(elem.type()));
+                                 << Utility::enum_to_string(elem.type())
+                                 << " in Exodus file "
+                                 << exio_helper->current_filename);
+
+            libmesh_error_msg_if(mapped_side < 0 ||
+                                 cast_int<unsigned int>(mapped_side) >= elem.n_sides(),
+                                 "Bad 0-based side id: "
+                                 << mapped_side
+                                 << " detected for "
+                                 << Utility::enum_to_string(elem.type())
+                                 << " in Exodus file "
+                                 << exio_helper->current_filename);
 
             // Add this (elem,side,id) triplet to the BoundaryInfo object.
             mesh.get_boundary_info().add_side (libmesh_elem_id,
