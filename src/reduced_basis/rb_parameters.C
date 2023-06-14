@@ -32,7 +32,8 @@ RBParameters::RBParameters() :
 {
 }
 
-RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map)
+RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map) :
+  _n_steps(1)
 {
   // Backwards compatible support for constructing an RBParameters
   // object from a map<string, Real>. We store a single entry in each
