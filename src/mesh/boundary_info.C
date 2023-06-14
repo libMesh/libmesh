@@ -970,6 +970,9 @@ void BoundaryInfo::add_edge(const Elem * elem,
   // Only add BCs for level-0 elements.
   libmesh_assert_equal_to (elem->level(), 0);
 
+  // Only add BCs for edges that exist.
+  libmesh_assert_less (edge, elem->n_edges());
+
   libmesh_error_msg_if(id == invalid_id,
                        "ERROR: You may not set a boundary ID of "
                        << invalid_id
@@ -999,6 +1002,9 @@ void BoundaryInfo::add_edge(const Elem * elem,
 
   // Only add BCs for level-0 elements.
   libmesh_assert_equal_to (elem->level(), 0);
+
+  // Only add BCs for edges that exist.
+  libmesh_assert_less (edge, elem->n_edges());
 
   // Don't add the same ID twice
   auto bounds = _boundary_edge_id.equal_range(elem);
@@ -1145,6 +1151,10 @@ void BoundaryInfo::add_side(const Elem * elem,
                             const boundary_id_type id)
 {
   libmesh_assert(elem);
+
+  // Only add BCs for sides that exist.
+  libmesh_assert_less (side, elem->n_sides());
+
   libmesh_error_msg_if(id == invalid_id, "ERROR: You may not set a boundary ID of "
                        << invalid_id
                        << "\n That is reserved for internal use.");
@@ -1190,6 +1200,9 @@ void BoundaryInfo::add_side(const Elem * elem,
     return;
 
   libmesh_assert(elem);
+
+  // Only add BCs for sides that exist.
+  libmesh_assert_less (side, elem->n_sides());
 
 #ifdef LIBMESH_ENABLE_AMR
   // Users try to mark boundary on child elements
@@ -1291,6 +1304,9 @@ void BoundaryInfo::edge_boundary_ids (const Elem * const elem,
   // Clear out any previous contents
   vec_to_fill.clear();
 
+  // Only query BCs for edges that exist.
+  libmesh_assert_less (edge, elem->n_edges());
+
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
   const Elem * searched_elem = elem;
@@ -1354,6 +1370,9 @@ void BoundaryInfo::raw_edge_boundary_ids (const Elem * const elem,
                                           std::vector<boundary_id_type> & vec_to_fill) const
 {
   libmesh_assert(elem);
+
+  // Only query BCs for edges that exist.
+  libmesh_assert_less (edge, elem->n_edges());
 
   // Clear out any previous contents
   vec_to_fill.clear();
@@ -1455,6 +1474,9 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
 {
   libmesh_assert(elem);
 
+  // Only query BCs for sides that exist.
+  libmesh_assert_less (side, elem->n_sides());
+
   // Clear out any previous contents
   vec_to_fill.clear();
 
@@ -1547,6 +1569,9 @@ void BoundaryInfo::raw_boundary_ids (const Elem * const elem,
 {
   libmesh_assert(elem);
 
+  // Only query BCs for sides that exist.
+  libmesh_assert_less (side, elem->n_sides());
+
   // Clear out any previous contents
   vec_to_fill.clear();
 
@@ -1632,6 +1657,9 @@ void BoundaryInfo::remove_edge (const Elem * elem,
 {
   libmesh_assert(elem);
 
+  // Only touch BCs for edges that exist.
+  libmesh_assert_less (edge, elem->n_edges());
+
   // Only level 0 elements are stored in BoundaryInfo.
   libmesh_assert_equal_to (elem->level(), 0);
 
@@ -1648,6 +1676,9 @@ void BoundaryInfo::remove_edge (const Elem * elem,
                                 const boundary_id_type id)
 {
   libmesh_assert(elem);
+
+  // Only touch BCs for edges that exist.
+  libmesh_assert_less (edge, elem->n_edges());
 
   // Only level 0 elements are stored in BoundaryInfo.
   libmesh_assert_equal_to (elem->level(), 0);
@@ -1701,6 +1732,9 @@ void BoundaryInfo::remove_side (const Elem * elem,
 {
   libmesh_assert(elem);
 
+  // Only touch BCs for sides that exist.
+  libmesh_assert_less (side, elem->n_sides());
+
   // Erase (elem, side, *) entries from map.
   erase_if(_boundary_side_id, elem,
            [side](decltype(_boundary_side_id)::mapped_type & pr)
@@ -1714,6 +1748,9 @@ void BoundaryInfo::remove_side (const Elem * elem,
                                 const boundary_id_type id)
 {
   libmesh_assert(elem);
+
+  // Only touch BCs for sides that exist.
+  libmesh_assert_less (side, elem->n_sides());
 
 #ifdef LIBMESH_ENABLE_AMR
   // Here we have to stop and check if somebody tries to remove an ancestor's boundary ID
