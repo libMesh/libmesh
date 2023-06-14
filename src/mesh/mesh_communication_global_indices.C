@@ -193,6 +193,12 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
 
   const Parallel::Communicator & communicator (mesh.comm());
 
+#ifdef DEBUG
+  // This is going to be a mess if geometry is out of sync
+  MeshTools::libmesh_assert_equal_points(mesh);
+  MeshTools::libmesh_assert_equal_connectivity(mesh);
+#endif
+
   // Global bounding box.  We choose the nodal bounding box for
   // backwards compatibility; the element bounding box may be looser
   // on curved elements.

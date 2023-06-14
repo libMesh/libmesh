@@ -19,10 +19,6 @@
 #ifndef LIBMESH_PARALLEL_ALGEBRA_H
 #define LIBMESH_PARALLEL_ALGEBRA_H
 
-// This class contains all the functionality for bin sorting
-// Templated on the type of keys you will be sorting and the
-// type of iterator you will be using.
-
 
 // libMesh includes
 #include "libmesh/libmesh_config.h"
@@ -31,6 +27,7 @@
 #include "libmesh/vector_value.h"
 
 // TIMPI includes
+#include "timpi/attributes.h"
 #include "timpi/op_function.h"
 #include "timpi/standard_type.h"
 
@@ -39,223 +36,7 @@
 #include <memory>
 #include <type_traits>
 
-namespace TIMPI {
-
-using libMesh::TypeVector;
-using libMesh::TypeTensor;
-using libMesh::VectorValue;
-using libMesh::TensorValue;
-using libMesh::Point;
-
-// StandardType<> specializations to return a derived MPI datatype
-// to handle communication of LIBMESH_DIM-vectors.
-//
-// We use MPI_Create_struct here because our vector classes might
-// have vptrs, and I'd rather not have the datatype break in those
-// cases.
-template <typename T>
-class StandardType<TypeVector<T>, typename std::enable_if<StandardType<T>::is_fixed_type>::type>
-  : public DataType
-{
-public:
-  explicit
-  StandardType(const TypeVector<T> * example=nullptr)
-  {
-    // We need an example for MPI_Address to use
-    TypeVector<T> * ex;
-    std::unique_ptr<TypeVector<T>> temp;
-    if (example)
-      ex = const_cast<TypeVector<T> *>(example);
-    else
-      {
-        temp = std::make_unique<TypeVector<T>>();
-        ex = temp.get();
-      }
-
-#ifdef LIBMESH_HAVE_MPI
-    StandardType<T> T_type(&((*ex)(0)));
-
-    // We require MPI-2 here:
-    int blocklength = LIBMESH_DIM;
-    MPI_Aint displs, start;
-    MPI_Datatype tmptype, type = T_type;
-
-    timpi_call_mpi
-      (MPI_Get_address (ex, &start));
-    timpi_call_mpi
-      (MPI_Get_address (&((*ex)(0)), &displs));
-
-    // subtract off offset to first value from the beginning of the structure
-    displs -= start;
-
-    // create a prototype structure
-    timpi_call_mpi
-      (MPI_Type_create_struct (1, &blocklength, &displs, &type,
-                               &tmptype));
-    timpi_call_mpi
-      (MPI_Type_commit (&tmptype));
-
-    // resize the structure type to account for padding, if any
-    timpi_call_mpi
-      (MPI_Type_create_resized (tmptype, 0, sizeof(TypeVector<T>),
-                                &_datatype));
-
-    timpi_call_mpi
-      (MPI_Type_commit (&_datatype));
-
-    timpi_call_mpi
-      (MPI_Type_free (&tmptype));
-#endif // #ifdef LIBMESH_HAVE_MPI
-  }
-
-  StandardType(const StandardType<TypeVector<T>> & timpi_mpi_var(t))
-    : DataType()
-  {
-    timpi_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
-  }
-
-  ~StandardType() { this->free(); }
-
-  static const bool is_fixed_type = true;
-};
-
-
-template <typename T>
-class StandardType<VectorValue<T>, typename std::enable_if<StandardType<T>::is_fixed_type>::type>
-  : public DataType
-{
-public:
-  explicit
-  StandardType(const VectorValue<T> * example=nullptr)
-  {
-    // We need an example for MPI_Address to use
-    VectorValue<T> * ex;
-    std::unique_ptr<VectorValue<T>> temp;
-    if (example)
-      ex = const_cast<VectorValue<T> *>(example);
-    else
-      {
-        temp = std::make_unique<VectorValue<T>>();
-        ex = temp.get();
-      }
-
-#ifdef LIBMESH_HAVE_MPI
-    StandardType<T> T_type(&((*ex)(0)));
-
-    int blocklength = LIBMESH_DIM;
-    MPI_Aint displs, start;
-    MPI_Datatype tmptype, type = T_type;
-
-    timpi_call_mpi
-      (MPI_Get_address (ex, &start));
-    timpi_call_mpi
-      (MPI_Get_address (&((*ex)(0)), &displs));
-
-    // subtract off offset to first value from the beginning of the structure
-    displs -= start;
-
-    // create a prototype structure
-    timpi_call_mpi
-      (MPI_Type_create_struct (1, &blocklength, &displs, &type,
-                               &tmptype));
-    timpi_call_mpi
-      (MPI_Type_commit (&tmptype));
-
-    // resize the structure type to account for padding, if any
-    timpi_call_mpi
-      (MPI_Type_create_resized (tmptype, 0,
-                                sizeof(VectorValue<T>),
-                                &_datatype));
-
-    timpi_call_mpi
-      (MPI_Type_commit (&_datatype));
-
-    timpi_call_mpi
-      (MPI_Type_free (&tmptype));
-#endif // #ifdef LIBMESH_HAVE_MPI
-  }
-
-  StandardType(const StandardType<VectorValue<T>> & timpi_mpi_var(t))
-    : DataType()
-  {
-#ifdef LIBMESH_HAVE_MPI
-    timpi_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
-#endif
-  }
-
-  ~StandardType() { this->free(); }
-
-  static const bool is_fixed_type = true;
-};
-
-template <>
-class StandardType<Point> : public DataType
-{
-public:
-  explicit
-  StandardType(const Point * example=nullptr)
-  {
-    // Prevent unused variable warnings when !LIBMESH_HAVE_MPI
-    libmesh_ignore(example);
-
-#ifdef LIBMESH_HAVE_MPI
-
-    // We need an example for MPI_Address to use
-    Point * ex;
-
-    std::unique_ptr<Point> temp;
-    if (example)
-      ex = const_cast<Point *>(example);
-    else
-      {
-        temp = std::make_unique<Point>();
-        ex = temp.get();
-      }
-
-    StandardType<libMesh::Real> T_type(&((*ex)(0)));
-
-    int blocklength = LIBMESH_DIM;
-    MPI_Aint displs, start;
-    MPI_Datatype tmptype, type = T_type;
-
-    timpi_call_mpi
-      (MPI_Get_address (ex, &start));
-    timpi_call_mpi
-      (MPI_Get_address (&((*ex)(0)), &displs));
-
-    // subtract off offset to first value from the beginning of the structure
-    displs -= start;
-
-    // create a prototype structure
-    timpi_call_mpi
-      (MPI_Type_create_struct (1, &blocklength, &displs, &type,
-                               &tmptype));
-    timpi_call_mpi
-      (MPI_Type_commit (&tmptype));
-
-    // resize the structure type to account for padding, if any
-    timpi_call_mpi
-      (MPI_Type_create_resized (tmptype, 0, sizeof(Point),
-                                &_datatype));
-
-    timpi_call_mpi
-      (MPI_Type_commit (&_datatype));
-
-    timpi_call_mpi
-      (MPI_Type_free (&tmptype));
-#endif // #ifdef LIBMESH_HAVE_MPI
-  }
-
-  StandardType(const StandardType<Point> & timpi_mpi_var(t))
-    : DataType()
-  {
-    timpi_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
-  }
-
-  ~StandardType() { this->free(); }
-
-  static const bool is_fixed_type = true;
-};
+namespace libMesh {
 
 // OpFunction<> specializations to return an MPI_Op version of the
 // reduction operations on LIBMESH_DIM-vectors.
@@ -268,6 +49,7 @@ public:
 //
 // min() and max() are applied component-wise; this makes them useful
 // for bounding box reduction operations.
+
 template <typename V>
 class TypeVectorOpFunction
 {
@@ -355,26 +137,273 @@ public:
 #endif // LIBMESH_HAVE_MPI
 };
 
+
+template <typename V>
+struct TypeVectorAttributes
+{
+  static const bool has_min_max = true;
+  static void set_lowest(V & x) {
+    for (int d=0; d != LIBMESH_DIM; ++d)
+      TIMPI::Attributes<decltype(x(d))>::set_lowest(x(d));
+  }
+  static void set_highest(V & x) {
+    for (int d=0; d != LIBMESH_DIM; ++d)
+      TIMPI::Attributes<decltype(x(d))>::set_highest(x(d));
+  }
+};
+
+} // namespace libMesh
+
+
+namespace TIMPI {
+
+// StandardType<> specializations to return a derived MPI datatype
+// to handle communication of LIBMESH_DIM-vectors.
+//
+// We use MPI_Create_struct here because our vector classes might
+// have vptrs, and I'd rather not have the datatype break in those
+// cases.
 template <typename T>
-class OpFunction<TypeVector<T>> : public TypeVectorOpFunction<TypeVector<T>> {};
+class StandardType<libMesh::TypeVector<T>, typename std::enable_if<StandardType<T>::is_fixed_type>::type>
+  : public DataType
+{
+public:
+  explicit
+  StandardType(const libMesh::TypeVector<T> * example=nullptr)
+  {
+    using libMesh::TypeVector;
+
+    // We need an example for MPI_Address to use
+    TypeVector<T> * ex;
+    std::unique_ptr<TypeVector<T>> temp;
+    if (example)
+      ex = const_cast<TypeVector<T> *>(example);
+    else
+      {
+        temp = std::make_unique<TypeVector<T>>();
+        ex = temp.get();
+      }
+
+#ifdef LIBMESH_HAVE_MPI
+    StandardType<T> T_type(&((*ex)(0)));
+
+    // We require MPI-2 here:
+    int blocklength = LIBMESH_DIM;
+    MPI_Aint displs, start;
+    MPI_Datatype tmptype, type = T_type;
+
+    timpi_call_mpi
+      (MPI_Get_address (ex, &start));
+    timpi_call_mpi
+      (MPI_Get_address (&((*ex)(0)), &displs));
+
+    // subtract off offset to first value from the beginning of the structure
+    displs -= start;
+
+    // create a prototype structure
+    timpi_call_mpi
+      (MPI_Type_create_struct (1, &blocklength, &displs, &type,
+                               &tmptype));
+    timpi_call_mpi
+      (MPI_Type_commit (&tmptype));
+
+    // resize the structure type to account for padding, if any
+    timpi_call_mpi
+      (MPI_Type_create_resized (tmptype, 0, sizeof(TypeVector<T>),
+                                &_datatype));
+
+    timpi_call_mpi
+      (MPI_Type_commit (&_datatype));
+
+    timpi_call_mpi
+      (MPI_Type_free (&tmptype));
+#endif // #ifdef LIBMESH_HAVE_MPI
+  }
+
+  StandardType(const StandardType<libMesh::TypeVector<T>> & timpi_mpi_var(t))
+    : DataType()
+  {
+    timpi_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
+  }
+
+  ~StandardType() { this->free(); }
+
+  static const bool is_fixed_type = true;
+};
+
 
 template <typename T>
-class OpFunction<VectorValue<T>> : public TypeVectorOpFunction<VectorValue<T>> {};
+class StandardType<libMesh::VectorValue<T>, typename std::enable_if<StandardType<T>::is_fixed_type>::type>
+  : public DataType
+{
+public:
+  explicit
+  StandardType(const libMesh::VectorValue<T> * example=nullptr)
+  {
+    using libMesh::VectorValue;
+
+    // We need an example for MPI_Address to use
+    VectorValue<T> * ex;
+    std::unique_ptr<VectorValue<T>> temp;
+    if (example)
+      ex = const_cast<VectorValue<T> *>(example);
+    else
+      {
+        temp = std::make_unique<VectorValue<T>>();
+        ex = temp.get();
+      }
+
+#ifdef LIBMESH_HAVE_MPI
+    StandardType<T> T_type(&((*ex)(0)));
+
+    int blocklength = LIBMESH_DIM;
+    MPI_Aint displs, start;
+    MPI_Datatype tmptype, type = T_type;
+
+    timpi_call_mpi
+      (MPI_Get_address (ex, &start));
+    timpi_call_mpi
+      (MPI_Get_address (&((*ex)(0)), &displs));
+
+    // subtract off offset to first value from the beginning of the structure
+    displs -= start;
+
+    // create a prototype structure
+    timpi_call_mpi
+      (MPI_Type_create_struct (1, &blocklength, &displs, &type,
+                               &tmptype));
+    timpi_call_mpi
+      (MPI_Type_commit (&tmptype));
+
+    // resize the structure type to account for padding, if any
+    timpi_call_mpi
+      (MPI_Type_create_resized (tmptype, 0,
+                                sizeof(VectorValue<T>),
+                                &_datatype));
+
+    timpi_call_mpi
+      (MPI_Type_commit (&_datatype));
+
+    timpi_call_mpi
+      (MPI_Type_free (&tmptype));
+#endif // #ifdef LIBMESH_HAVE_MPI
+  }
+
+  StandardType(const StandardType<libMesh::VectorValue<T>> & timpi_mpi_var(t))
+    : DataType()
+  {
+#ifdef LIBMESH_HAVE_MPI
+    timpi_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
+#endif
+  }
+
+  ~StandardType() { this->free(); }
+
+  static const bool is_fixed_type = true;
+};
 
 template <>
-class OpFunction<Point> : public TypeVectorOpFunction<Point> {};
+class StandardType<libMesh::Point> : public DataType
+{
+public:
+  explicit
+  StandardType(const libMesh::Point * example=nullptr)
+  {
+    using libMesh::Point;
+
+    // Prevent unused variable warnings when !LIBMESH_HAVE_MPI
+    libmesh_ignore(example);
+
+#ifdef LIBMESH_HAVE_MPI
+
+    // We need an example for MPI_Address to use
+    Point * ex;
+
+    std::unique_ptr<Point> temp;
+    if (example)
+      ex = const_cast<Point *>(example);
+    else
+      {
+        temp = std::make_unique<Point>();
+        ex = temp.get();
+      }
+
+    StandardType<libMesh::Real> T_type(&((*ex)(0)));
+
+    int blocklength = LIBMESH_DIM;
+    MPI_Aint displs, start;
+    MPI_Datatype tmptype, type = T_type;
+
+    timpi_call_mpi
+      (MPI_Get_address (ex, &start));
+    timpi_call_mpi
+      (MPI_Get_address (&((*ex)(0)), &displs));
+
+    // subtract off offset to first value from the beginning of the structure
+    displs -= start;
+
+    // create a prototype structure
+    timpi_call_mpi
+      (MPI_Type_create_struct (1, &blocklength, &displs, &type,
+                               &tmptype));
+    timpi_call_mpi
+      (MPI_Type_commit (&tmptype));
+
+    // resize the structure type to account for padding, if any
+    timpi_call_mpi
+      (MPI_Type_create_resized (tmptype, 0, sizeof(Point),
+                                &_datatype));
+
+    timpi_call_mpi
+      (MPI_Type_commit (&_datatype));
+
+    timpi_call_mpi
+      (MPI_Type_free (&tmptype));
+#endif // #ifdef LIBMESH_HAVE_MPI
+  }
+
+  StandardType(const StandardType<libMesh::Point> & timpi_mpi_var(t))
+    : DataType()
+  {
+    timpi_call_mpi (MPI_Type_dup (t._datatype, &_datatype));
+  }
+
+  ~StandardType() { this->free(); }
+
+  static const bool is_fixed_type = true;
+};
+
+template <typename T>
+class OpFunction<libMesh::TypeVector<T>> : public libMesh::TypeVectorOpFunction<libMesh::TypeVector<T>> {};
+
+template <typename T>
+class OpFunction<libMesh::VectorValue<T>> : public libMesh::TypeVectorOpFunction<libMesh::VectorValue<T>> {};
+
+template <>
+class OpFunction<libMesh::Point> : public libMesh::TypeVectorOpFunction<libMesh::Point> {};
+
+
+template <typename T>
+class Attributes<libMesh::TypeVector<T>> : public libMesh::TypeVectorAttributes<libMesh::TypeVector<T>> {};
+
+template <typename T>
+class Attributes<libMesh::VectorValue<T>> : public libMesh::TypeVectorAttributes<libMesh::VectorValue<T>> {};
+
+template <>
+class Attributes<libMesh::Point> : public libMesh::TypeVectorAttributes<libMesh::Point> {};
+
 
 // StandardType<> specializations to return a derived MPI datatype
 // to handle communication of LIBMESH_DIM*LIBMESH_DIM-tensors.
 //
 // We assume contiguous storage here
 template <typename T>
-class StandardType<TypeTensor<T>, typename std::enable_if<StandardType<T>::is_fixed_type>::type>
+class StandardType<libMesh::TypeTensor<T>, typename std::enable_if<StandardType<T>::is_fixed_type>::type>
   : public DataType
 {
 public:
   explicit
-  StandardType(const TypeTensor<T> * example=nullptr) :
+  StandardType(const libMesh::TypeTensor<T> * example=nullptr) :
     DataType(StandardType<T>(example ?  &((*example)(0,0)) : nullptr), LIBMESH_DIM*LIBMESH_DIM) {}
 
   inline ~StandardType() { this->free(); }
@@ -383,12 +412,12 @@ public:
 };
 
 template <typename T>
-class StandardType<TensorValue<T>, typename std::enable_if<StandardType<T>::is_fixed_type>::type>
+class StandardType<libMesh::TensorValue<T>, typename std::enable_if<StandardType<T>::is_fixed_type>::type>
   : public DataType
 {
 public:
   explicit
-  StandardType(const TensorValue<T> * example=nullptr) :
+  StandardType(const libMesh::TensorValue<T> * example=nullptr) :
     DataType(StandardType<T>(example ?  &((*example)(0,0)) : nullptr), LIBMESH_DIM*LIBMESH_DIM) {}
 
   inline ~StandardType() { this->free(); }

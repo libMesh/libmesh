@@ -171,7 +171,7 @@ public:
 
   std::vector<unsigned int> sides_on_edge(const unsigned int e) const override final;
 
-  virtual void orient(BoundaryInfo *) override final;
+  virtual bool is_flipped() const override final;
 
   /**
    * This maps each edge to the sides that contain said edge.

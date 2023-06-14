@@ -1799,12 +1799,24 @@ public:
   virtual void flip(BoundaryInfo * boundary_info) = 0;
 
   /**
+   * \returns Whether the element is flipped compared to standard
+   * libMesh (e.g. clockwise for 2D elements) node orientations.
+   *
+   * Always returns \p false if a 2D element is not in the XY plane or
+   * a 1D element is not on the X axis; user code designed to work for
+   * embedded manifolds should handle any consistent orientation, and
+   * determining whether an orientation is consistent is not a local
+   * operation.
+   */
+   virtual bool is_flipped() const = 0;
+
+  /**
    * Flips the element (by swapping node and neighbor pointers) to
    * have a mapping Jacobian of opposite sign, iff we find a negative
    * orientation.  This only fixes flipped elements; for tangled
    * elements the only fixes possible are non-local.
    */
-  virtual void orient(BoundaryInfo * boundary_info) = 0;
+  void orient(BoundaryInfo * boundary_info);
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -3077,6 +3089,14 @@ void Elem::hack_p_level_and_refinement_flag (unsigned int p,
 }
 
 #endif // ifdef LIBMESH_ENABLE_AMR
+
+
+inline
+void Elem::orient(BoundaryInfo * boundary_info)
+{
+  if (this->is_flipped())
+    this->flip(boundary_info);
+}
 
 
 inline

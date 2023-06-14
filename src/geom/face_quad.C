@@ -163,19 +163,18 @@ unsigned int Quad::opposite_node(const unsigned int node_in,
 }
 
 
-void Quad::orient(BoundaryInfo * boundary_info)
+bool Quad::is_flipped() const
 {
-  if (
+  return (
 #if LIBMESH_DIM > 2
-      // Don't bother outside the XY plane
-      !this->point(0)(2) && !this->point(1)(2) &&
-      !this->point(2)(2) && !this->point(3)(2) &&
+          // Don't bother outside the XY plane
+          !this->point(0)(2) && !this->point(1)(2) &&
+          !this->point(2)(2) && !this->point(3)(2) &&
 #endif
-      ((this->point(1)(0)-this->point(0)(0))*
-       (this->point(3)(1)-this->point(0)(1)) <
-       (this->point(3)(0)-this->point(0)(0))*
-       (this->point(1)(1)-this->point(0)(1))))
-    this->flip(boundary_info);
+          ((this->point(1)(0)-this->point(0)(0))*
+           (this->point(3)(1)-this->point(0)(1)) <
+           (this->point(3)(0)-this->point(0)(0))*
+           (this->point(1)(1)-this->point(0)(1))));
 }
 
 

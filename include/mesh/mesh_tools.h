@@ -484,6 +484,17 @@ void libmesh_assert_no_links_to_elem(const MeshBase & mesh,
                                      const Elem * bad_elem);
 
 /**
+ * A function for testing that node locations match across processors.
+ */
+void libmesh_assert_equal_points (const MeshBase & mesh);
+
+/**
+ * A function for testing that element nodal connectivities match
+ * across processors.
+ */
+void libmesh_assert_equal_connectivity (const MeshBase & mesh);
+
+/**
  * A function for verifying that all nodes are connected to at least
  * one element.
  *
