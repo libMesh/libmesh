@@ -169,7 +169,10 @@ void libmesh_assert_delaunay(MeshBase & libmesh_dbg_var(mesh),
     libmesh_assert_locally_delaunay(*elem);
 
   for (auto & [raw_elem, unique_elem] : new_elems)
-    libmesh_assert_locally_delaunay(*raw_elem);
+    {
+      libmesh_ignore(unique_elem); // avoid warnings on old gcc
+      libmesh_assert_locally_delaunay(*raw_elem);
+    }
 #endif
 }
 
