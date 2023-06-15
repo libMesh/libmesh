@@ -65,6 +65,10 @@ public:
     CPPUNIT_ASSERT_EQUAL(params.get_value("a"), 1.);
     CPPUNIT_ASSERT_EQUAL(params.get_value("b"), 2.);
     CPPUNIT_ASSERT_EQUAL(params.get_value("c"), 3.);
+
+    // Test that RBParameters objects constructed with the old
+    // constructor have the correct number of steps.
+    CPPUNIT_ASSERT_EQUAL(params.n_steps(), 1u);
   }
 
   void testIterators()
