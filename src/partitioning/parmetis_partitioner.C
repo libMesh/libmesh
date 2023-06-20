@@ -386,8 +386,16 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
         libmesh_assert_less (local_index, n_active_local_elem);
         libmesh_assert_less (local_index, _pmetis->vwgt.size());
 
-        // TODO:[BSK] maybe there is a better weight?
-        _pmetis->vwgt[local_index] = elem->n_nodes();
+        // Spline nodes are a special case (storing all the
+        // unconstrained DoFs in an IGA simulation), but in general
+        // we'll try to distribute work by expecting it to be roughly
+        // proportional to DoFs, which are roughly proportional to
+        // nodes.
+        if (elem->type() == NODEELEM &&
+            elem->mapping_type() == RATIONAL_BERNSTEIN_MAP)
+          _pmetis->vwgt[local_index] = 50;
+        else
+          _pmetis->vwgt[local_index] = elem->n_nodes();
 
         // find the subdomain this element belongs in
         libmesh_assert (global_index_map.count(elem->id()));
