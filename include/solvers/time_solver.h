@@ -265,9 +265,9 @@ public:
   void set_solution_history(const SolutionHistory & _solution_history);
 
   /**
-￼   * A getter function that returns a reference to the solution history
-￼   * object owned by TimeSolver
-￼   * */
+   * A getter function that returns a reference to the solution history
+   * object owned by TimeSolver
+   */
   SolutionHistory & get_solution_history();
 
   /**
