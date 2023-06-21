@@ -1906,10 +1906,16 @@ std::string System::get_info() const
   oss << '\n';
 
   oss << "    n_dofs()="             << this->n_dofs()             << '\n';
-  oss << "    n_local_dofs()="       << this->n_local_dofs()       << '\n';
+  dof_id_type local_dofs = this->n_local_dofs();
+  oss << "    n_local_dofs()="       << local_dofs                 << '\n';
+  this->comm().max(local_dofs);
+  oss << "    max(n_local_dofs())="       << local_dofs                 << '\n';
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   oss << "    n_constrained_dofs()=" << this->n_constrained_dofs() << '\n';
   oss << "    n_local_constrained_dofs()=" << this->n_local_constrained_dofs() << '\n';
+  dof_id_type local_unconstrained_dofs = this->n_local_dofs() - this->n_local_constrained_dofs();
+  this->comm().max(local_unconstrained_dofs);
+  oss << "    max(local unconstrained dofs)=" << local_unconstrained_dofs << '\n';
 #endif
 
   oss << "    " << "n_vectors()="  << this->n_vectors()  << '\n';
