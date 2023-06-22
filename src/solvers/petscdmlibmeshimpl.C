@@ -343,7 +343,7 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt * len,
         PetscInt elen, dlen;
         ierr = ISGetLocalSize(emb, &elen); CHKERRQ(ierr);
         ierr = ISGetLocalSize(dis, &dlen); CHKERRQ(ierr);
-        if (elen != dlen) LIBMESH_SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_PLIB, "Failed to embed subdomain %" LIBMESH_PETSCINT_FMT, d);
+        if (elen != dlen) LIBMESH_SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_PLIB, "Failed to embed subdomain %zu", d);
         ierr = ISDestroy(&dis); CHKERRQ(ierr);
         dis = emb;
       }
@@ -444,7 +444,7 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt * len
         PetscInt elen, dlen;
         ierr = ISGetLocalSize(emb, &elen); CHKERRQ(ierr);
         ierr = ISGetLocalSize(dis, &dlen);  CHKERRQ(ierr);
-        if (elen != dlen) LIBMESH_SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_PLIB, "Failed to embed field %" LIBMESH_PETSCINT_FMT, d);
+        if (elen != dlen) LIBMESH_SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_PLIB, "Failed to embed field %zu" , d);
         ierr = ISDestroy(&dis); CHKERRQ(ierr);
         dis = emb;
       }
