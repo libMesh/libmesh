@@ -28,6 +28,12 @@ AS_ECHO(["C compiler......................... : $CC"])
 AS_ECHO(["Fortran compiler................... : $FC"])
 AS_ECHO(["Build Methods...................... : $METHODS"])
 AS_ECHO([])
+AS_IF([test "x$CPPFLAGS" != "x"],
+      [AS_ECHO(["CPPFLAGS........................... : $CPPFLAGS"])])
+AS_IF([test "x$CXXFLAGS" != "x"],
+      [AS_ECHO(["CXXFLAGS........................... : $CXXFLAGS"])])
+AS_IF([test "x$CFLAGS" != "x"],
+      [AS_ECHO(["CFLAGS............................. : $CFLAGS"])])
 for method in ${METHODS}; do
      AS_CASE("${method}",
              [opt],   [AS_ECHO(["CPPFLAGS...(opt)................... : $CPPFLAGS_OPT"])
