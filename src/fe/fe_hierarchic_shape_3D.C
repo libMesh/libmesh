@@ -1901,7 +1901,11 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
       }
 
     case TET4:
+      libmesh_assert (T == L2_HIERARCHIC || totalorder < 2);
+      libmesh_fallthrough();
     case TET10:
+      libmesh_assert (T == L2_HIERARCHIC || totalorder < 3);
+      libmesh_fallthrough();
     case TET14:
       {
         const Real zeta[4] = { 1 - p(0) - p(1) - p(2), p(0), p(1), p(2) };

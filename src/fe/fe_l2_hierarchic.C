@@ -121,6 +121,10 @@ unsigned int l2_hierarchic_n_dofs(const ElemType t, const Order o)
     case TRI6:
     case TRI7:
       return ((o+1)*(o+2)/2);
+    case TET4:
+    case TET10:
+    case TET14:
+      return ((o+1)*(o+2)*(o+3)/6);
     case INVALID_ELEM:
       return 0;
     default:
