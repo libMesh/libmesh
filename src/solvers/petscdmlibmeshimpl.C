@@ -24,7 +24,7 @@
 #include "libmesh/ignore_warnings.h"
 
 // PETSc includes
-#if !PETSC_RELEASE_LESS_THAN(3,6,0)
+#if !PETSC_VERSION_LESS_THAN(3,6,0)
 # include <petsc/private/dmimpl.h>
 #else
 # include <petsc-private/dmimpl.h>
@@ -812,7 +812,7 @@ static PetscErrorCode DMCreateGlobalVector_libMesh(DM dm, Vec *x)
     ierr = VecDuplicate(v,x); CHKERRQ(ierr);
   }
 
-#if PETSC_RELEASE_LESS_THAN(3,13,0)
+#if PETSC_VERSION_LESS_THAN(3,13,0)
   ierr = PetscObjectCompose((PetscObject)*x,"DM",(PetscObject)dm); CHKERRQ(ierr);
 #else
   ierr = VecSetDM(*x, dm);CHKERRQ(ierr);
@@ -999,7 +999,7 @@ PetscErrorCode  DMCreate_libMesh(DM dm)
   // * dm->ops->getinjection was renamed to dm->ops->createinjection in PETSc 5a84ad338 (5 Jul 2019)
   // * dm->ops-getaggregates was removed in PETSc 97779f9a (5 Jul 2019)
   // * Both changes were merged into PETSc master in 94aad3ce (7 Jul 2019).
-#if PETSC_RELEASE_LESS_THAN(3,12,0)
+#if PETSC_VERSION_LESS_THAN(3,12,0)
   dm->ops->getinjection       = 0; // DMGetInjection_libMesh;
   dm->ops->getaggregates      = 0; // DMGetAggregates_libMesh;
 #else

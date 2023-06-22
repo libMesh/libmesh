@@ -1265,7 +1265,7 @@ void PetscLinearSolver<T>::get_residual_history(std::vector<double> & hist)
 
   // Recent versions of PETSc require the residual
   // history vector pointer to be declared as const.
-#if PETSC_RELEASE_LESS_THAN(3,15,0)
+#if PETSC_VERSION_LESS_THAN(3,15,0)
   PetscReal * p;
 #else
   const PetscReal * p;
@@ -1306,7 +1306,7 @@ Real PetscLinearSolver<T>::get_initial_residual()
 
   // Recent versions of PETSc require the residual
   // history vector pointer to be declared as const.
-#if PETSC_RELEASE_LESS_THAN(3,15,0)
+#if PETSC_VERSION_LESS_THAN(3,15,0)
   PetscReal * p;
 #else
   const PetscReal * p;

@@ -21,7 +21,7 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
-#if !PETSC_RELEASE_LESS_THAN(3,6,0)
+#if !PETSC_VERSION_LESS_THAN(3,6,0)
 # include <petsc/private/petscimpl.h>
 #else
 # include <petsc-private/petscimpl.h>
