@@ -61378,6 +61378,15 @@ $as_echo "C compiler......................... : $CC"
 $as_echo "Fortran compiler................... : $FC"
 $as_echo "Build Methods...................... : $METHODS"
 $as_echo
+if test "x$CPPFLAGS" != "x"; then :
+  $as_echo "CPPFLAGS........................... : $CPPFLAGS"
+fi
+if test "x$CXXFLAGS" != "x"; then :
+  $as_echo "CXXFLAGS........................... : $CXXFLAGS"
+fi
+if test "x$CFLAGS" != "x"; then :
+  $as_echo "CFLAGS............................. : $CFLAGS"
+fi
 for method in ${METHODS}; do
      case "${method}" in #(
   opt) :
