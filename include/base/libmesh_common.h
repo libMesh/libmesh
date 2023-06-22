@@ -20,6 +20,13 @@
 #ifndef LIBMESH_LIBMESH_COMMON_H
 #define LIBMESH_LIBMESH_COMMON_H
 
+// These flags should never be used together.  -DDEBUG means "turn on
+// all the ridiculously expensive error checking"; -DNDEBUG means
+// "turn off all the somewhat affordable error checking"
+#if defined(DEBUG) && defined(NDEBUG)
+#  error DEBUG and NDEBUG should never be defined simultaneously
+#endif
+
 // The library configuration options
 #include "libmesh/libmesh_config.h"
 
