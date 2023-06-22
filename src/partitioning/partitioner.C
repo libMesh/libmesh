@@ -1142,7 +1142,10 @@ void Partitioner::build_graph (const MeshBase & mesh)
               auto row_it = mesh_constrained_nodes.find(&node);
               if (row_it != end_it)
                 for (auto [pr, coef] : row_it->second)
-                  constraining_elems.insert(pr.first);
+                  {
+                    libmesh_ignore(coef); // avoid gcc 7 warning
+                    constraining_elems.insert(pr.first);
+                  }
             }
           for (const Elem * constraining_elem : constraining_elems)
             elems_constrained_by.emplace(constraining_elem, elem);
@@ -1302,7 +1305,10 @@ void Partitioner::build_graph (const MeshBase & mesh)
               auto row_it = mesh_constrained_nodes.find(&node);
               if (row_it != end_it)
                 for (auto [pr, coef] : row_it->second)
-                  constraining_elems.insert(pr.first);
+                  {
+                    libmesh_ignore(coef); // avoid gcc 7 warning
+                    constraining_elems.insert(pr.first);
+                  }
             }
           for (const Elem * constraining_elem : constraining_elems)
             {
