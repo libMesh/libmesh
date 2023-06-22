@@ -88,7 +88,7 @@
 #define ISCreateLibMesh(comm,n,idx,mode,is) ISCreateGeneral((comm),(n),(idx),(mode),(is))
 
 // As of release 3.8.0, MatGetSubMatrix was renamed to MatCreateSubMatrix.
-#if PETSC_RELEASE_LESS_THAN(3,8,0)
+#if PETSC_VERSION_LESS_THAN(3,8,0)
 # define LibMeshCreateSubMatrix MatGetSubMatrix
 #else
 # define LibMeshCreateSubMatrix MatCreateSubMatrix
@@ -108,7 +108,7 @@
 
 // As of 3.18, %D is no longer supported in format strings, but the
 // replacement PetscInt_FMT didn't get added until 3.7.2
-#if PETSC_RELEASE_LESS_THAN(3,8,0)
+#if PETSC_VERSION_LESS_THAN(3,8,0)
 # define LIBMESH_PETSCINT_FMT "D"
 #else
 # define LIBMESH_PETSCINT_FMT PetscInt_FMT
