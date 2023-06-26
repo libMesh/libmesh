@@ -161,7 +161,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
         {
           // Set the type and p level for this element
           this->elem_type = elem->type();
-          this->_p_level = elem->p_level();
+          this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
 
           // Initialize the shape functions
           this->_fe_map->template init_reference_to_physical_map<Dim>
@@ -193,7 +193,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
             {
               // Set the type and p level for this element
               this->elem_type = elem->type();
-              this->_p_level = elem->p_level();
+              this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
               // Initialize the shape functions
               this->_fe_map->template init_reference_to_physical_map<Dim>
                 (this->qrule->get_points(), elem);
@@ -321,18 +321,18 @@ void FE<Dim,T>::reinit_dual_shape_coeffs(const Elem * elem,
 {
   // Set the type and p level for this element
   this->elem_type = elem->type();
-  this->_p_level = elem->p_level();
+  this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
 
   const unsigned int n_shapes =
     this->n_shape_functions(this->get_type(),
-                            this->get_order(this->_add_p_level_in_reinit));
+                            this->get_order());
 
   std::vector<std::vector<OutputShape>> phi_vals;
   phi_vals.resize(n_shapes);
   for (const auto i : make_range(phi_vals.size()))
     phi_vals[i].resize(pts.size());
 
-  all_shapes(elem, this->get_order(this->_add_p_level_in_reinit), pts, phi_vals);
+  all_shapes(elem, this->get_order(), pts, phi_vals);
   this->compute_dual_shape_coeffs(JxW, phi_vals);
 }
 
@@ -341,7 +341,7 @@ void FE<Dim,T>::reinit_default_dual_shape_coeffs (const Elem * elem)
 {
   libmesh_assert(elem);
 
-  FEType default_fe_type(this->get_order(this->_add_p_level_in_reinit), T);
+  FEType default_fe_type(this->get_order(), T);
   QGauss default_qrule(elem->dim(), default_fe_type.default_quadrature_order());
   default_qrule.init(elem->type(), elem->p_level());
   // In preparation of computing dual_coeff, we compute the default shape
@@ -397,7 +397,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
   // space.
   const unsigned int n_approx_shape_functions =
     this->n_shape_functions(this->get_type(),
-                            this->get_order(this->_add_p_level_in_reinit));
+                            this->get_order());
 
   // Maybe we already have correctly-sized data?  Check data sizes,
   // and get ready to break out of a "loop" if all these resize()
