@@ -182,7 +182,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
           last_side = side->type();
 
           // Set the last p level
-          this->_p_level = side_p_level;
+          this->_p_level = this->_add_p_level_in_reinit * side_p_level;
 
           // Initialize the face shape functions
           this->_fe_map->template init_face_shape_functions<Dim>(this->qrule->get_points(),  side.get());
@@ -344,7 +344,7 @@ void FE<Dim,T>::side_map (const Elem * elem,
     {
       // Set the element type
       this->elem_type = elem->type();
-      this->_p_level = side_p_level;
+      this->_p_level = this->_add_p_level_in_reinit * side_p_level;
 
       // Set the last_side
       last_side = side->type();
@@ -392,7 +392,7 @@ void FE<Dim,T>::edge_map (const Elem * elem,
     {
       // Set the element type
       this->elem_type = elem->type();
-      this->_p_level = edge_p_level;
+      this->_p_level = this->_add_p_level_in_reinit * edge_p_level;
 
       // Set the last_edge
       last_edge = edge->type();

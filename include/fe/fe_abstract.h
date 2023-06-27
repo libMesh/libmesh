@@ -501,8 +501,8 @@ public:
   /**
    * \returns The approximation order of the finite element.
    */
-  Order get_order(bool add_p_level = true) const
-  { return static_cast<Order>(fe_type.order + add_p_level * _p_level); }
+  Order get_order() const
+  { return static_cast<Order>(fe_type.order + _p_level); }
 
   /**
    * Sets the *base* FE order of the finite element.
