@@ -202,10 +202,20 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
 
             libmesh_assert_less (elem_global_index, vwgt.size());
 
-            // maybe there is a better weight?
             // The weight is used to define what a balanced graph is
             if (!_weights)
-              vwgt[elem_global_index] = elem->n_nodes();
+              {
+                // Spline nodes are a special case (storing all the
+                // unconstrained DoFs in an IGA simulation), but in
+                // general we'll try to distribute work by expecting
+                // it to be roughly proportional to DoFs, which are
+                // roughly proportional to nodes.
+                if (elem->type() == NODEELEM &&
+                    elem->mapping_type() == RATIONAL_BERNSTEIN_MAP)
+                  vwgt[elem_global_index] = 50;
+                else
+                  vwgt[elem_global_index] = elem->n_nodes();
+              }
             else
               vwgt[elem_global_index] = static_cast<Metis::idx_t>((*_weights)[elem->id()]);
 

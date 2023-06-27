@@ -1113,6 +1113,7 @@ void Partitioner::build_graph (const MeshBase & mesh)
   LOG_SCOPE("build_graph()", "Partitioner");
 
   const dof_id_type n_active_local_elem  = mesh.n_active_local_elem();
+
   // If we have boundary elements in this mesh, we want to account for
   // the connectivity between them and interior elements.  We can find
   // interior elements from boundary elements, but we need to build up
@@ -1120,20 +1121,47 @@ void Partitioner::build_graph (const MeshBase & mesh)
   typedef std::unordered_multimap<const Elem *, const Elem *> map_type;
   map_type interior_to_boundary_map;
 
-  for (const auto & elem : mesh.active_element_ptr_range())
+  // If we have spline nodes in this mesh, we want to account for the
+  // connectivity between them and integration elements.  We can find
+  // spline nodes from integration elements, but need a reverse map
+  // {integration_elements} = elems_constrained_by[spline_nodeelem]
+  map_type elems_constrained_by;
+
+  const auto & mesh_constrained_nodes = mesh.get_constraint_rows();
+
+  for (const Elem * elem : mesh.active_element_ptr_range())
     {
-      // If we don't have an interior_parent then there's nothing to look us
-      // up.
-      if ((elem->dim() >= LIBMESH_DIM) ||
-          !elem->interior_parent())
-        continue;
+      if (!mesh_constrained_nodes.empty()) // quick test for non-IGA cases
+        {
+          const auto end_it = mesh_constrained_nodes.end();
 
-      // get all relevant interior elements
-      std::set<const Elem *> neighbor_set;
-      elem->find_interior_neighbors(neighbor_set);
+          // Use a set to avoid duplicates
+          std::set<const Elem *> constraining_elems;
+          for (const Node & node : elem->node_ref_range())
+            {
+              auto row_it = mesh_constrained_nodes.find(&node);
+              if (row_it != end_it)
+                for (auto [pr, coef] : row_it->second)
+                  {
+                    libmesh_ignore(coef); // avoid gcc 7 warning
+                    constraining_elems.insert(pr.first);
+                  }
+            }
+          for (const Elem * constraining_elem : constraining_elems)
+            elems_constrained_by.emplace(constraining_elem, elem);
+        }
 
-      for (const auto & neighbor : neighbor_set)
-        interior_to_boundary_map.emplace(neighbor, elem);
+      // If we don't have an interior_parent and we don't have any
+      // constrained nodes then there's nothing else to look up.
+      if (elem->interior_parent())
+        {
+          // get all relevant interior elements
+          std::set<const Elem *> neighbor_set;
+          elem->find_interior_neighbors(neighbor_set);
+
+          for (const auto & neighbor : neighbor_set)
+            interior_to_boundary_map.emplace(neighbor, elem);
+        }
     }
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -1264,8 +1292,43 @@ void Partitioner::build_graph (const MeshBase & mesh)
 
           graph_row.push_back(neighbor_global_index_by_pid);
         }
-    }
 
+      // Check for any constraining elements
+      if (!mesh_constrained_nodes.empty()) // quick test for non-IGA cases
+        {
+          const auto end_it = mesh_constrained_nodes.end();
+
+          // Use a set to avoid duplicates
+          std::set<const Elem *> constraining_elems;
+          for (const Node & node : elem->node_ref_range())
+            {
+              auto row_it = mesh_constrained_nodes.find(&node);
+              if (row_it != end_it)
+                for (auto [pr, coef] : row_it->second)
+                  {
+                    libmesh_ignore(coef); // avoid gcc 7 warning
+                    constraining_elems.insert(pr.first);
+                  }
+            }
+          for (const Elem * constraining_elem : constraining_elems)
+            {
+              const dof_id_type constraining_global_index_by_pid =
+                _global_index_by_pid_map[constraining_elem->id()];
+
+              graph_row.push_back(constraining_global_index_by_pid);
+            }
+        }
+
+      // Check for any constrained elements
+      for (const auto & pr : as_range(elems_constrained_by.equal_range(elem)))
+        {
+          const Elem * constrained = pr.second;
+          const dof_id_type constrained_global_index_by_pid =
+            _global_index_by_pid_map[constrained->id()];
+
+          graph_row.push_back(constrained_global_index_by_pid);
+        }
+    }
 }
 
 void Partitioner::assign_partitioning (MeshBase & mesh, const std::vector<dof_id_type> & parts)
