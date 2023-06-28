@@ -322,237 +322,91 @@ int ExodusII_IO_Helper::get_exodus_version()
 // Initialization function for conversion_map object
 void ExodusII_IO_Helper::init_conversion_map()
 {
+  auto convert_type = [this](ElemType type,
+                             std::string_view exodus_type,
+                             const std::vector<int> * node_map = nullptr,
+                             const std::vector<int> * inverse_node_map = nullptr,
+                             const std::vector<int> * side_map = nullptr,
+                             const std::vector<int> * inverse_side_map = nullptr,
+                             const std::vector<int> * shellface_map = nullptr,
+                             const std::vector<int> * inverse_shellface_map = nullptr,
+                             size_t shellface_index_offset = 0)
   {
-    auto & conv = conversion_map[NODEELEM];
-    conv.libmesh_type = NODEELEM;
-    conv.exodus_type = "SPHERE";
-    conv.n_nodes = 1;
-  }
-  {
-    auto & conv = conversion_map[EDGE2];
-    conv.libmesh_type = EDGE2;
-    conv.dim = 1;
-    conv.n_nodes = 2;
-    conv.exodus_type = "EDGE2";
-  }
-  {
-    auto & conv = conversion_map[EDGE3];
-    conv.libmesh_type = EDGE3;
-    conv.dim = 1;
-    conv.n_nodes = 3;
-    conv.exodus_type = "EDGE3";
-  }
-  {
-    auto & conv = conversion_map[QUAD4];
-    conv.libmesh_type = QUAD4;
-    conv.dim = 2;
-    conv.n_nodes = 4;
-    conv.exodus_type = "QUAD4";
-  }
-  {
-    auto & conv = conversion_map[QUADSHELL4];
-    conv.inverse_side_map = &quadshell4_inverse_edge_map;
-    conv.shellface_index_offset = 2;
-    conv.libmesh_type = QUADSHELL4;
-    conv.dim = 2;
-    conv.n_nodes = 4;
-    conv.exodus_type = "SHELL4";
-  }
-  {
-    auto & conv = conversion_map[QUAD8];
-    conv.libmesh_type = QUAD8;
-    conv.dim = 2;
-    conv.n_nodes = 8;
-    conv.exodus_type = "QUAD8";
-  }
-  {
-    auto & conv = conversion_map[QUADSHELL8];
-    conv.inverse_side_map = &quadshell4_inverse_edge_map;
-    conv.shellface_index_offset = 2;
-    conv.libmesh_type = QUADSHELL8;
-    conv.dim = 2;
-    conv.n_nodes = 8;
-    conv.exodus_type = "SHELL8";
-  }
-  {
-    auto & conv = conversion_map[QUAD9];
-    conv.libmesh_type = QUAD9;
-    conv.dim = 2;
-    conv.n_nodes = 9;
-    conv.exodus_type = "QUAD9";
-  }
-  {
-    auto & conv = conversion_map[TRI3];
-    conv.libmesh_type = TRI3;
-    conv.dim = 2;
-    conv.n_nodes = 3;
-    conv.exodus_type = "TRI3";
-  }
-  {
-    auto & conv = conversion_map[TRISHELL3];
-    conv.inverse_side_map = &trishell3_inverse_edge_map;
-    conv.shellface_index_offset = 2;
-    conv.libmesh_type = TRISHELL3;
-    conv.dim = 2;
-    conv.n_nodes = 3;
-    conv.exodus_type = "TRISHELL3";
-  }
-  {
-    auto & conv = conversion_map[TRI3SUBDIVISION];
-    conv.libmesh_type = TRI3SUBDIVISION;
-    conv.dim = 2;
-    conv.n_nodes = 3;
-    conv.exodus_type = "TRI3";
-  }
-  {
-    auto & conv = conversion_map[TRI6];
-    conv.libmesh_type = TRI6;
-    conv.dim = 2;
-    conv.n_nodes = 6;
-    conv.exodus_type = "TRI6";
-  }
-  {
-    auto & conv = conversion_map[TRI7];
-    conv.libmesh_type = TRI7;
-    conv.dim = 2;
-    conv.n_nodes = 7;
-    conv.exodus_type = "TRI7";
-  }
-  {
-    auto & conv = conversion_map[HEX8];
-    conv.side_map = &hex_face_map;
-    conv.inverse_side_map = &hex_inverse_face_map;
-    conv.libmesh_type = HEX8;
-    conv.dim = 3;
-    conv.n_nodes = 8;
-    conv.exodus_type = "HEX8";
-  }
-  {
-    auto & conv = conversion_map[HEX20];
-    conv.side_map = &hex_face_map;
-    conv.inverse_side_map = &hex_inverse_face_map;
-    conv.libmesh_type = HEX20;
-    conv.dim = 3;
-    conv.n_nodes = 20;
-    conv.exodus_type = "HEX20";
-  }
-  {
-    auto & conv = conversion_map[HEX27];
-    conv.node_map = &hex27_node_map;
-    conv.inverse_node_map = &hex27_inverse_node_map;
-    conv.side_map = &hex_face_map;
-    conv.inverse_side_map = &hex_inverse_face_map;
-    conv.libmesh_type = HEX27;
-    conv.dim = 3;
-    conv.n_nodes = 27;
-    conv.exodus_type = "HEX27";
-  }
-  {
-    auto & conv = conversion_map[TET4];
-    conv.side_map = &tet_face_map;
-    conv.inverse_side_map = &tet_inverse_face_map;
-    conv.libmesh_type = TET4;
-    conv.dim = 3;
-    conv.n_nodes = 4;
-    conv.exodus_type = "TETRA4";
-  }
-  {
-    auto & conv = conversion_map[TET10];
-    conv.side_map = &tet_face_map;
-    conv.inverse_side_map = &tet_inverse_face_map;
-    conv.libmesh_type = TET10;
-    conv.dim = 3;
-    conv.n_nodes = 10;
-    conv.exodus_type = "TETRA10";
-  }
-  {
-    auto & conv = conversion_map[TET14];
-    conv.node_map = &tet14_node_map;
-    conv.inverse_node_map = &tet14_inverse_node_map;
-    conv.side_map = &tet_face_map;
-    conv.inverse_side_map = &tet_inverse_face_map;
-    conv.libmesh_type = TET14;
-    conv.dim = 3;
-    conv.n_nodes = 14;
-    conv.exodus_type = "TETRA14";
-  }
-  {
-    auto & conv = conversion_map[PRISM6];
-    conv.side_map = &prism_face_map;
-    conv.inverse_side_map = &prism_inverse_face_map;
-    conv.libmesh_type = PRISM6;
-    conv.dim = 3;
-    conv.n_nodes = 6;
-    conv.exodus_type = "WEDGE";
-  }
-  {
-    auto & conv = conversion_map[PRISM15];
-    conv.side_map = &prism_face_map;
-    conv.inverse_side_map = &prism_inverse_face_map;
-    conv.libmesh_type = PRISM15;
-    conv.dim = 3;
-    conv.n_nodes = 15;
-    conv.exodus_type = "WEDGE15";
-  }
-  {
-    auto & conv = conversion_map[PRISM18];
-    conv.side_map = &prism_face_map;
-    conv.inverse_side_map = &prism_inverse_face_map;
-    conv.libmesh_type = PRISM18;
-    conv.dim = 3;
-    conv.n_nodes = 18;
-    conv.exodus_type = "WEDGE18";
-  }
-  {
-    auto & conv = conversion_map[PRISM20];
-    conv.node_map = &prism20_node_map;
-    conv.inverse_node_map = &prism20_inverse_node_map;
-    conv.side_map = &prism_face_map;
-    conv.inverse_side_map = &prism_inverse_face_map;
-    conv.libmesh_type = PRISM20;
-    conv.dim = 3;
-    conv.n_nodes = 20;
-    conv.exodus_type = "WEDGE20";
-  }
-  {
-    auto & conv = conversion_map[PRISM21];
-    conv.node_map = &prism21_node_map;
-    conv.inverse_node_map = &prism21_inverse_node_map;
-    conv.side_map = &prism_face_map;
-    conv.inverse_side_map = &prism_inverse_face_map;
-    conv.libmesh_type = PRISM21;
-    conv.dim = 3;
-    conv.n_nodes = 21;
-    conv.exodus_type = "WEDGE21";
-  }
-  {
-    auto & conv = conversion_map[PYRAMID5];
-    conv.libmesh_type = PYRAMID5;
-    conv.dim = 3;
-    conv.n_nodes = 5;
-    conv.exodus_type = "PYRAMID5";
-  }
-  {
-    auto & conv = conversion_map[PYRAMID13];
-    conv.libmesh_type = PYRAMID13;
-    conv.dim = 3;
-    conv.n_nodes = 13;
-    conv.exodus_type = "PYRAMID13";
-  }
-  {
-    auto & conv = conversion_map[PYRAMID14];
-    conv.libmesh_type = PYRAMID14;
-    conv.dim = 3;
-    conv.n_nodes = 14;
-    conv.exodus_type = "PYRAMID14";
-  }
-  {
-    auto & conv = conversion_map[PYRAMID18];
-    conv.libmesh_type = PYRAMID18;
-    conv.dim = 3;
-    conv.n_nodes = 18;
-    conv.exodus_type = "PYRAMID18";
-  }
+    std::unique_ptr<Elem> elem = Elem::build(type);
+    auto & conv = conversion_map[elem->dim()][type];
+    conv.libmesh_type = type;
+    conv.exodus_type = exodus_type;
+    conv.node_map = node_map;
+    conv.inverse_node_map = inverse_node_map;
+    conv.side_map = side_map;
+    conv.inverse_side_map = inverse_side_map;
+    conv.shellface_map = shellface_map;
+    conv.inverse_shellface_map = inverse_shellface_map;
+    conv.shellface_index_offset = shellface_index_offset;
+    conv.n_nodes = elem->n_nodes();
+    for (int d = elem->dim()+1; d <= 3; ++d)
+      conversion_map[d][type] = conv;
+  };
+
+  convert_type(NODEELEM, "SPHERE");
+  convert_type(EDGE2, "EDGE2");
+  convert_type(EDGE3, "EDGE3");
+  convert_type(QUAD4, "QUAD4");
+  convert_type(QUAD8, "QUAD8");
+  convert_type(QUAD9, "QUAD9");
+  convert_type(QUADSHELL4, "SHELL4", nullptr, nullptr, nullptr,
+               /* inverse_side_map = */ &quadshell4_inverse_edge_map,
+               nullptr, nullptr, /* shellface_index_offset = */ 2);
+  convert_type(QUADSHELL8, "SHELL8", nullptr, nullptr, nullptr,
+               /* inverse_side_map = */ &quadshell4_inverse_edge_map,
+               nullptr, nullptr, /* shellface_index_offset = */ 2);
+
+  convert_type(TRI3, "TRI3");
+  convert_type(TRI6, "TRI6");
+  convert_type(TRI7, "TRI7");
+  // Exodus does weird things to triangle side mapping in 3D.  See
+  // https://sandialabs.github.io/seacas-docs/html/element_types.html#tri
+  conversion_map[3][TRI3].inverse_side_map = &trishell3_inverse_edge_map;
+  conversion_map[3][TRI3].shellface_index_offset = 2;
+  conversion_map[3][TRI6].inverse_side_map = &trishell3_inverse_edge_map;
+  conversion_map[3][TRI6].shellface_index_offset = 2;
+  conversion_map[3][TRI7].inverse_side_map = &trishell3_inverse_edge_map;
+  conversion_map[3][TRI7].shellface_index_offset = 2;
+
+  convert_type(TRISHELL3, "TRISHELL3", nullptr, nullptr, nullptr,
+               /* inverse_side_map = */ &trishell3_inverse_edge_map,
+               nullptr, nullptr, /* shellface_index_offset = */ 2);
+  convert_type(TRI3SUBDIVISION, "TRI3");
+  convert_type(HEX8, "HEX8", nullptr, nullptr,
+               &hex_face_map, &hex_inverse_face_map);
+  convert_type(HEX20, "HEX20", nullptr, nullptr,
+               &hex_face_map, &hex_inverse_face_map);
+  convert_type(HEX27, "HEX27", &hex27_node_map,
+               &hex27_inverse_node_map,
+               &hex_face_map, &hex_inverse_face_map);
+  convert_type(TET4, "TETRA4", nullptr, nullptr,
+               &tet_face_map, &tet_inverse_face_map);
+  convert_type(TET10, "TETRA10", nullptr, nullptr,
+               &tet_face_map, &tet_inverse_face_map);
+  convert_type(TET14, "TETRA14", &tet14_node_map,
+               &tet14_inverse_node_map,
+               &tet_face_map, &tet_inverse_face_map);
+  convert_type(PRISM6, "WEDGE", nullptr, nullptr,
+               &prism_face_map, &prism_inverse_face_map);
+  convert_type(PRISM15, "WEDGE15", nullptr, nullptr,
+               &prism_face_map, &prism_inverse_face_map);
+  convert_type(PRISM18, "WEDGE18", nullptr, nullptr,
+               &prism_face_map, &prism_inverse_face_map);
+  convert_type(PRISM20, "WEDGE20", &prism20_node_map,
+               &prism20_inverse_node_map,
+               &prism_face_map, &prism_inverse_face_map);
+  convert_type(PRISM21, "WEDGE21", &prism21_node_map,
+               &prism21_inverse_node_map,
+               &prism_face_map, &prism_inverse_face_map);
+  convert_type(PYRAMID5, "PYRAMID5");
+  convert_type(PYRAMID13, "PYRAMID13");
+  convert_type(PYRAMID14, "PYRAMID14");
+  convert_type(PYRAMID18, "PYRAMID18");
 }
 
 
@@ -674,7 +528,8 @@ void ExodusII_IO_Helper::init_element_equivalence_map()
 const ExodusII_IO_Helper::Conversion &
 ExodusII_IO_Helper::get_conversion(const ElemType type) const
 {
-  return libmesh_map_find(conversion_map, type);
+  auto & maps_for_dim = libmesh_map_find(conversion_map, this->num_dim);
+  return libmesh_map_find(maps_for_dim, type);
 }
 
 const ExodusII_IO_Helper::Conversion &

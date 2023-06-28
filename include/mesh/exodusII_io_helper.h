@@ -1076,8 +1076,12 @@ private:
   /**
    * Associates libMesh ElemTypes with node/face/edge/etc. mappings
    * of the corresponding Exodus element types.
+   *
+   * We have to map based on both ElemType and mesh dimension, because
+   * Exodus treats "TRI" side numbering in two different ways
+   * depending on whether a triangle is embedded in a 2D or a 3D mesh.
    */
-  std::map<ElemType, ExodusII_IO_Helper::Conversion> conversion_map;
+  std::map<int, std::map<ElemType, ExodusII_IO_Helper::Conversion>> conversion_map;
   void init_conversion_map();
 };
 
