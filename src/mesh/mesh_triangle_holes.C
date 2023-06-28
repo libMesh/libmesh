@@ -719,7 +719,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
         {
           print_areas();
           report_error("MeshedHole found " +
-                       std::to_string(n_positive_areas) +
+                       std::to_string(n_negative_areas) +
                        " clockwise boundaries and cannot choose one!");
         }
 
