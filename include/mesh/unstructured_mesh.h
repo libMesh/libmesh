@@ -183,7 +183,7 @@ public:
    * This is a helpful error check in some cases.
    * If \p skip_find_neighbors is true, a faster stitching method is used, where the lists of
    * neighbors for each elements are copied as well and patched, without calling the time-consuming
-   * find_neighbors() function.
+   * find_neighbors() function. This option is now hard-coded to true.
    *
    * Note that the element IDs for elements in the stitched mesh corresponding to "this" mesh
    * will be unchanged. The IDs for elements corresponding to \p other_mesh will be incremented
