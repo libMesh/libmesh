@@ -1721,7 +1721,7 @@ void UnstructuredMesh::all_complete_order ()
 }
 
 
-void UnstructuredMesh::stitch_meshes (const MeshBase & other_mesh,
+bool UnstructuredMesh::stitch_meshes (const MeshBase & other_mesh,
                                       boundary_id_type this_mesh_boundary_id,
                                       boundary_id_type other_mesh_boundary_id,
                                       Real tol,
@@ -1731,19 +1731,19 @@ void UnstructuredMesh::stitch_meshes (const MeshBase & other_mesh,
                                       bool enforce_all_nodes_match_on_boundaries)
 {
   LOG_SCOPE("stitch_meshes()", "UnstructuredMesh");
-  stitching_helper(&other_mesh,
-                   this_mesh_boundary_id,
-                   other_mesh_boundary_id,
-                   tol,
-                   clear_stitched_boundary_ids,
-                   verbose,
-                   use_binary_search,
-                   enforce_all_nodes_match_on_boundaries,
-                   true);
+  return stitching_helper(&other_mesh,
+                          this_mesh_boundary_id,
+                          other_mesh_boundary_id,
+                          tol,
+                          clear_stitched_boundary_ids,
+                          verbose,
+                          use_binary_search,
+                          enforce_all_nodes_match_on_boundaries,
+                          true);
 }
 
 
-void UnstructuredMesh::stitch_surfaces (boundary_id_type boundary_id_1,
+bool UnstructuredMesh::stitch_surfaces (boundary_id_type boundary_id_1,
                                         boundary_id_type boundary_id_2,
                                         Real tol,
                                         bool clear_stitched_boundary_ids,
@@ -1751,19 +1751,19 @@ void UnstructuredMesh::stitch_surfaces (boundary_id_type boundary_id_1,
                                         bool use_binary_search,
                                         bool enforce_all_nodes_match_on_boundaries)
 {
-  stitching_helper(nullptr,
-                   boundary_id_1,
-                   boundary_id_2,
-                   tol,
-                   clear_stitched_boundary_ids,
-                   verbose,
-                   use_binary_search,
-                   enforce_all_nodes_match_on_boundaries,
-                   true);
+  return stitching_helper(nullptr,
+                          boundary_id_1,
+                          boundary_id_2,
+                          tol,
+                          clear_stitched_boundary_ids,
+                          verbose,
+                          use_binary_search,
+                          enforce_all_nodes_match_on_boundaries,
+                          true);
 }
 
 
-void UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
+bool UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                                          boundary_id_type this_mesh_boundary_id,
                                          boundary_id_type other_mesh_boundary_id,
                                          Real tol,
@@ -2395,6 +2395,9 @@ void UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
       this->get_boundary_info().clear_stitched_boundary_side_ids(
           this_mesh_boundary_id, other_mesh_boundary_id, /*clear_nodeset_data=*/true);
     }
+
+  // Return true if some nodes were merged, false otherwise.
+  return !node_to_node_map.empty();
 }
 
 

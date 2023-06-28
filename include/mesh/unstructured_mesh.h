@@ -192,8 +192,10 @@ public:
    * There is no simple a priori relationship between node IDs in "this" mesh
    * and other_mesh and node IDs in the stitched mesh because the number of nodes (and hence
    * the node IDs) in the stitched mesh depend on how many nodes are stitched.
+   *
+   * \returns true if any coincident nodes were found and merged, and false otherwise,
    */
-  void stitch_meshes (const MeshBase & other_mesh,
+  bool stitch_meshes (const MeshBase & other_mesh,
                       boundary_id_type this_mesh_boundary,
                       boundary_id_type other_mesh_boundary,
                       Real tol=TOLERANCE,
@@ -205,7 +207,7 @@ public:
   /**
    * Similar to stitch_meshes, except that we stitch two adjacent surfaces within this mesh.
    */
-  void stitch_surfaces (boundary_id_type boundary_id_1,
+  bool stitch_surfaces (boundary_id_type boundary_id_1,
                         boundary_id_type boundary_id_2,
                         Real tol=TOLERANCE,
                         bool clear_stitched_boundary_ids=false,
@@ -256,7 +258,7 @@ private:
    * Helper function for stitch_meshes and stitch_surfaces
    * that does the mesh stitching.
    */
-  void stitching_helper (const MeshBase * other_mesh,
+  bool stitching_helper (const MeshBase * other_mesh,
                          boundary_id_type boundary_id_1,
                          boundary_id_type boundary_id_2,
                          Real tol,
