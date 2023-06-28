@@ -658,7 +658,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
     if (((twice_this_area > 0) && edge_type == 2) ||
         ((twice_this_area < 0) && edge_type == 1))
       ++n_positive_areas;
-    else
+    else if (edge_type != 0)
       ++n_negative_areas;
 
 #ifdef DEBUG
