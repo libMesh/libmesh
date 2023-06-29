@@ -351,6 +351,7 @@ void ExodusII_IO_Helper::init_conversion_map()
   convert_type(NODEELEM, "SPHERE");
   convert_type(EDGE2, "EDGE2");
   convert_type(EDGE3, "EDGE3");
+  convert_type(EDGE4, "EDGE4");
   convert_type(QUAD4, "QUAD4");
   convert_type(QUAD8, "QUAD8");
   convert_type(QUAD9, "QUAD9");
@@ -433,6 +434,13 @@ void ExodusII_IO_Helper::init_element_equivalence_map()
   element_equivalence_map["TRUSS3"] = EDGE3;
   element_equivalence_map["BEAM3"]  = EDGE3;
   element_equivalence_map["BAR3"]   = EDGE3;
+
+  // EDGE4 equivalences
+  element_equivalence_map["EDGE4"]  = EDGE4;
+  element_equivalence_map["TRUSS4"] = EDGE4;
+  element_equivalence_map["BEAM4"]  = EDGE4;
+  element_equivalence_map["BAR4"]   = EDGE4;
+
   // This whole design is going to need to be refactored whenever we
   // support higher-order IGA, with one element type having variable
   // polynomiaal degree...
