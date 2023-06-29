@@ -62,6 +62,7 @@ unit_tests_sources = \
   mesh/checkpoint.C \
   mesh/contains_point.C \
   mesh/extra_integers.C \
+  mesh/exodus_test.C \
   mesh/mesh_assign.C \
   mesh/mesh_base_test.C \
   mesh/mesh_collection.C \
