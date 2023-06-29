@@ -1,146 +1,21 @@
-#include "test_comm.h"
+#include "elem_test.h"
 
 #include <libmesh/boundary_info.h>
-#include <libmesh/elem.h>
 #include <libmesh/enum_elem_quality.h>
-#include <libmesh/enum_elem_type.h>
 #include <libmesh/elem_side_builder.h>
-#include <libmesh/mesh.h>
-#include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_modification.h>
-
-#include "libmesh_cppunit.h"
-
-#include <memory>
 
 using namespace libMesh;
 
 template <ElemType elem_type>
-class ElemTest : public CppUnit::TestCase {
-
-private:
-  std::unique_ptr<Mesh> _mesh;
-
-protected:
-  std::string libmesh_suite_name;
-
+class ElemTest : public PerElemTest<elem_type> {
 public:
-  void setUp()
-  {
-    const Real minpos = 1.5, maxpos = 5.5;
-    const unsigned int N = 2;
-
-    _mesh = std::make_unique<Mesh>(*TestCommWorld);
-    std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
-
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-#if LIBMESH_DIM > 1
-    if (test_elem->infinite())
-      {
-        Elem * elem = _mesh->add_elem(std::move(test_elem));
-
-        const auto add_point =
-          [this, elem](const unsigned int i,
-                       const Real x,
-                       const Real y,
-                       const Real
-#if LIBMESH_DIM == 3
-                                  z
-#endif
-                      )
-          {
-#if LIBMESH_DIM == 2
-            auto node = _mesh->add_point(Point(x, y), i);
-#else
-            auto node = _mesh->add_point(Point(x, y, z), i);
-#endif
-            elem->set_node(i) = node;
-          };
-
-        const Real halfpos = (minpos + maxpos) / 2.;
-
-        if (elem_type == INFQUAD4 || elem_type == INFQUAD6 ||
-            elem_type == INFHEX8 || elem_type == INFHEX16 || elem_type == INFHEX18)
-          {
-            add_point(0, minpos, minpos, minpos);
-            add_point(1, maxpos, minpos, minpos);
-            add_point(2, minpos, maxpos, minpos);
-            add_point(3, maxpos, maxpos, minpos);
-
-            if (elem_type == INFQUAD6)
-              {
-                add_point(4, halfpos, minpos, minpos);
-                add_point(5, halfpos, maxpos, minpos);
-              }
-          }
-        if (elem_type == INFHEX8 || elem_type == INFHEX16 || elem_type == INFHEX18)
-          {
-            add_point(4, minpos, minpos, maxpos);
-            add_point(5, maxpos, minpos, maxpos);
-            add_point(6, minpos, maxpos, maxpos);
-            add_point(7, maxpos, maxpos, maxpos);
-
-            if (elem_type == INFHEX16 || elem_type == INFHEX18)
-              {
-                add_point(8, halfpos, minpos, minpos);
-                add_point(9, maxpos, halfpos, minpos);
-                add_point(10, halfpos, maxpos, minpos);
-                add_point(11, minpos, halfpos, minpos);
-                add_point(12, halfpos, minpos, maxpos);
-                add_point(13, maxpos, halfpos, maxpos);
-                add_point(14, halfpos, maxpos, maxpos);
-                add_point(15, minpos, halfpos, maxpos);
-              }
-            if (elem_type == INFHEX18)
-              {
-                add_point(16, halfpos, halfpos, minpos);
-                add_point(17, halfpos, halfpos, maxpos);
-              }
-          }
-        if (elem_type == INFPRISM6 || elem_type == INFPRISM12)
-          {
-            add_point(0, minpos, minpos, minpos);
-            add_point(1, maxpos, minpos, minpos);
-            add_point(2, halfpos, maxpos, minpos);
-            add_point(3, minpos, minpos, maxpos);
-            add_point(4, maxpos, minpos, maxpos);
-            add_point(5, halfpos, maxpos, maxpos);
-
-            if (elem_type == INFPRISM12)
-              {
-                add_point(6, halfpos, minpos, minpos);
-                add_point(7, (halfpos + maxpos) / 2., halfpos, minpos);
-                add_point(8, (halfpos + minpos) / 2., halfpos, minpos);
-                add_point(9, halfpos, minpos, maxpos);
-                add_point(10, (halfpos + maxpos) / 2., halfpos, maxpos);
-                add_point(11, (halfpos + minpos) / 2., halfpos, maxpos);
-              }
-          }
-
-        _mesh->prepare_for_use();
-      }
-    else
-#endif
-#endif
-      {
-        const unsigned int dim = test_elem->dim();
-        const unsigned int use_y = dim > 1;
-        const unsigned int use_z = dim > 2;
-
-        MeshTools::Generation::build_cube (*_mesh,
-                                           N, N*use_y, N*use_z,
-                                           minpos, maxpos,
-                                           minpos, use_y*maxpos,
-                                           minpos, use_z*maxpos,
-                                           elem_type);
-      }
-  }
-
   void test_bounding_box()
   {
     LOG_UNIT_TEST;
 
-    for (const auto & elem : _mesh->active_local_element_ptr_range())
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
       {
         const BoundingBox bbox = elem->loose_bounding_box();
 
@@ -181,7 +56,7 @@ public:
   {
     LOG_UNIT_TEST;
 
-    for (const auto & elem : _mesh->active_local_element_ptr_range())
+    for (const auto & elem : this->_mesh->active_local_element_ptr_range())
       {
         // We only have one metric defined on all elements
         const Real q = elem->quality(ASPECT_RATIO);
@@ -203,7 +78,8 @@ public:
   {
     LOG_UNIT_TEST;
 
-    for (const auto & elem : _mesh->active_local_element_ptr_range())
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
       {
         for (const auto edge : elem->edge_index_range())
           for (const auto side_on_edge : elem->sides_on_edge(edge))
@@ -228,7 +104,8 @@ public:
   {
     LOG_UNIT_TEST;
 
-    for (const auto & elem : _mesh->active_local_element_ptr_range())
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
       {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         if (elem->infinite())
@@ -253,7 +130,8 @@ public:
   {
     LOG_UNIT_TEST;
 
-    for (const auto & elem : _mesh->active_local_element_ptr_range())
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
       {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         if (elem->infinite())
@@ -292,9 +170,10 @@ public:
   {
     LOG_UNIT_TEST;
 
-    BoundaryInfo & boundary_info = _mesh->get_boundary_info();
+    BoundaryInfo & boundary_info = this->_mesh->get_boundary_info();
 
-    for (const auto & elem : _mesh->active_local_element_ptr_range())
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
       {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         if (elem->infinite())
@@ -363,9 +242,10 @@ public:
   {
     LOG_UNIT_TEST;
 
-    BoundaryInfo & boundary_info = _mesh->get_boundary_info();
+    BoundaryInfo & boundary_info = this->_mesh->get_boundary_info();
 
-    for (const auto & elem : _mesh->active_local_element_ptr_range())
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
       {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         if (elem->infinite())
@@ -433,13 +313,14 @@ public:
   {
     LOG_UNIT_TEST;
 
-    const Mesh old_mesh {*_mesh};
+    const Mesh old_mesh {*this->_mesh};
 
-    BoundaryInfo & boundary_info = _mesh->get_boundary_info();
+    BoundaryInfo & boundary_info = this->_mesh->get_boundary_info();
     const BoundaryInfo & old_boundary_info = old_mesh.get_boundary_info();
     CPPUNIT_ASSERT(&boundary_info != &old_boundary_info);
 
-    for (const auto & elem : _mesh->active_local_element_ptr_range())
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
       {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         if (elem->infinite())
@@ -452,10 +333,11 @@ public:
           }
       }
 
-    MeshTools::Modification::orient_elements(*_mesh);
+    MeshTools::Modification::orient_elements(*this->_mesh);
 
     // I should really create a MeshBase::operator==()...
-    for (const auto & elem : _mesh->active_local_element_ptr_range())
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
       {
         const Elem & old_elem = old_mesh.elem_ref(elem->id());
 
@@ -488,7 +370,8 @@ public:
   {
     LOG_UNIT_TEST;
 
-    for (const auto & elem : _mesh->active_local_element_ptr_range())
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
       for (const auto s : elem->side_index_range())
         {
           if (elem->type() == EDGE2 || elem->type() == EDGE3 || elem->type() == EDGE4)
@@ -525,7 +408,8 @@ public:
   {
     LOG_UNIT_TEST;
 
-    for (const auto & elem : _mesh->active_local_element_ptr_range())
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
       for (const auto s : elem->side_index_range())
         CPPUNIT_ASSERT_EQUAL(elem->build_side_ptr(s)->type(), elem->side_type(s));
   }
@@ -535,7 +419,7 @@ public:
     LOG_UNIT_TEST;
 
     ElemSideBuilder cache;
-    for (auto & elem : _mesh->active_local_element_ptr_range())
+    for (auto & elem : this->_mesh->active_local_element_ptr_range())
       for (const auto s : elem->side_index_range())
       {
         const auto side = elem->build_side_ptr(s);
