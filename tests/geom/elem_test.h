@@ -25,6 +25,7 @@ public:
     const unsigned int N = 2;
 
     _mesh = std::make_unique<Mesh>(*TestCommWorld);
+
     std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
