@@ -199,31 +199,31 @@ public:
    * and other_mesh and node IDs in the stitched mesh because the number of nodes (and hence
    * the node IDs) in the stitched mesh depend on how many nodes are stitched.
    *
-   * \returns true if any coincident nodes were found and merged, and false otherwise,
-   * e.g. in the case of no matching nodes or if \p merge_boundary_nodes_all_or_nothing
-   * was active and relevant.
+   * \returns the count of how many nodes were merged between the two meshes.
+   * This can be zero in the case of no matching nodes or if
+   * \p merge_boundary_nodes_all_or_nothing was active and relevant.
    */
-  bool stitch_meshes (const MeshBase & other_mesh,
-                      boundary_id_type this_mesh_boundary,
-                      boundary_id_type other_mesh_boundary,
-                      Real tol=TOLERANCE,
-                      bool clear_stitched_boundary_ids=false,
-                      bool verbose=true,
-                      bool use_binary_search=true,
-                      bool enforce_all_nodes_match_on_boundaries=false,
-                      bool merge_boundary_nodes_all_or_nothing=false);
+  std::size_t stitch_meshes (const MeshBase & other_mesh,
+                             boundary_id_type this_mesh_boundary,
+                             boundary_id_type other_mesh_boundary,
+                             Real tol=TOLERANCE,
+                             bool clear_stitched_boundary_ids=false,
+                             bool verbose=true,
+                             bool use_binary_search=true,
+                             bool enforce_all_nodes_match_on_boundaries=false,
+                             bool merge_boundary_nodes_all_or_nothing=false);
 
   /**
    * Similar to stitch_meshes, except that we stitch two adjacent surfaces within this mesh.
    */
-  bool stitch_surfaces (boundary_id_type boundary_id_1,
-                        boundary_id_type boundary_id_2,
-                        Real tol=TOLERANCE,
-                        bool clear_stitched_boundary_ids=false,
-                        bool verbose=true,
-                        bool use_binary_search=true,
-                        bool enforce_all_nodes_match_on_boundaries=false,
-                        bool merge_boundary_nodes_all_or_nothing=false);
+  std::size_t stitch_surfaces (boundary_id_type boundary_id_1,
+                               boundary_id_type boundary_id_2,
+                               Real tol=TOLERANCE,
+                               bool clear_stitched_boundary_ids=false,
+                               bool verbose=true,
+                               bool use_binary_search=true,
+                               bool enforce_all_nodes_match_on_boundaries=false,
+                               bool merge_boundary_nodes_all_or_nothing=false);
 
   /**
    * Deep copy of nodes and elements from another mesh object (used by
@@ -268,16 +268,16 @@ private:
    * Helper function for stitch_meshes and stitch_surfaces
    * that does the mesh stitching.
    */
-  bool stitching_helper (const MeshBase * other_mesh,
-                         boundary_id_type boundary_id_1,
-                         boundary_id_type boundary_id_2,
-                         Real tol,
-                         bool clear_stitched_boundary_ids,
-                         bool verbose,
-                         bool use_binary_search,
-                         bool enforce_all_nodes_match_on_boundaries,
-                         bool skip_find_neighbors,
-                         bool merge_boundary_nodes_all_or_nothing);
+  std::size_t stitching_helper (const MeshBase * other_mesh,
+                                boundary_id_type boundary_id_1,
+                                boundary_id_type boundary_id_2,
+                                Real tol,
+                                bool clear_stitched_boundary_ids,
+                                bool verbose,
+                                bool use_binary_search,
+                                bool enforce_all_nodes_match_on_boundaries,
+                                bool skip_find_neighbors,
+                                bool merge_boundary_nodes_all_or_nothing);
 };
 
 
