@@ -632,6 +632,11 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
           ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T> *>(precond)->mat());
           LIBMESH_CHKERR(ierr);
         }
+      else
+        {
+          ierr = KSPSetOperators(_ksp, mat, mat);
+          LIBMESH_CHKERR(ierr);
+        }
 
       if (this->_preconditioner)
         {
