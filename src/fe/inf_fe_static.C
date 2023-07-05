@@ -517,7 +517,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
    */
   if (Dim > 1)
     {
-      const unsigned int n_dof = n_dofs (fet, inf_elem->type());
+      const unsigned int n_dof = n_dofs (fet, inf_elem);
       data.shape.resize(n_dof);
       if (data.need_derivative())
         {
