@@ -334,6 +334,7 @@ void InfFE<Dim, T_radial, T_map>::determine_calculations()
 #ifdef LIBMESH_ENABLE_DEPRECATED
   if (!this->calculate_nothing &&
       !this->calculate_phi && !this->calculate_dphi &&
+      !this->calculate_dphiref &&
       !this->calculate_phi_scaled && !this->calculate_dphi_scaled &&
       !this->calculate_xyz && !this->calculate_jxw &&
       !this->calculate_map_scaled && !this->calculate_map &&
@@ -344,6 +345,7 @@ void InfFE<Dim, T_radial, T_map>::determine_calculations()
     {
       libmesh_deprecated();
       this->calculate_phi = this->calculate_dphi = this->calculate_jxw = true;
+      this->calculate_dphiref = true;
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       this->calculate_d2phi = true;
 #endif
@@ -360,6 +362,7 @@ void InfFE<Dim, T_radial, T_map>::determine_calculations()
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   libmesh_assert (this->calculate_nothing || this->calculate_d2phi ||
                   this->calculate_phi || this->calculate_dphi ||
+                  this->calculate_dphiref ||
                   this->calculate_phi_scaled || this->calculate_dphi_scaled ||
                   this->calculate_xyz || this->calculate_jxw ||
                   this->calculate_map_scaled || this->calculate_map ||
@@ -367,6 +370,7 @@ void InfFE<Dim, T_radial, T_map>::determine_calculations()
 #else
   libmesh_assert (this->calculate_nothing ||
                   this->calculate_phi || this->calculate_dphi ||
+                  this->calculate_dphiref ||
                   this->calculate_phi_scaled || this->calculate_dphi_scaled ||
                   this->calculate_xyz || this->calculate_jxw ||
                   this->calculate_map_scaled || this->calculate_map ||
@@ -388,7 +392,8 @@ void InfFE<Dim, T_radial, T_map>::determine_calculations()
   base_fe->calculate_phi = this->calculate_phi || this->calculate_phi_scaled
                        || this->calculate_dphi || this->calculate_dphi_scaled;
   base_fe->calculate_dphi = this->calculate_dphi || this->calculate_dphi_scaled;
-  if (this->calculate_map || this->calculate_map_scaled)
+  if (this->calculate_map || this->calculate_map_scaled
+      || this->calculate_dphiref)
     {
       base_fe->calculate_dphiref = true;
       base_fe->get_xyz(); // trigger base_fe->fe_map to 'calculate_xyz'
@@ -903,7 +908,10 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
                   r_norm = r.norm();
 
                   // check that 'som' == a/r.
-                  libmesh_assert_less(std::abs(som[rp] -a/r_norm) , 1e-7);
+#ifndef NDEVEL
+                  if (som.size())
+                    libmesh_assert_less(std::abs(som[rp] -a/r_norm) , 1e-7);
+#endif
                   unit_r=(r/r_norm);
 
                   // They are used for computing the normal and do not correspond to the direction of eta and xi in this element:
