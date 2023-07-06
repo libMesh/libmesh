@@ -1721,57 +1721,66 @@ void UnstructuredMesh::all_complete_order ()
 }
 
 
-void UnstructuredMesh::stitch_meshes (const MeshBase & other_mesh,
-                                      boundary_id_type this_mesh_boundary_id,
-                                      boundary_id_type other_mesh_boundary_id,
-                                      Real tol,
-                                      bool clear_stitched_boundary_ids,
-                                      bool verbose,
-                                      bool use_binary_search,
-                                      bool enforce_all_nodes_match_on_boundaries)
+std::size_t
+UnstructuredMesh::stitch_meshes (const MeshBase & other_mesh,
+                                 boundary_id_type this_mesh_boundary_id,
+                                 boundary_id_type other_mesh_boundary_id,
+                                 Real tol,
+                                 bool clear_stitched_boundary_ids,
+                                 bool verbose,
+                                 bool use_binary_search,
+                                 bool enforce_all_nodes_match_on_boundaries,
+                                 bool merge_boundary_nodes_all_or_nothing)
 {
   LOG_SCOPE("stitch_meshes()", "UnstructuredMesh");
-  stitching_helper(&other_mesh,
-                   this_mesh_boundary_id,
-                   other_mesh_boundary_id,
-                   tol,
-                   clear_stitched_boundary_ids,
-                   verbose,
-                   use_binary_search,
-                   enforce_all_nodes_match_on_boundaries,
-                   true);
+  return stitching_helper(&other_mesh,
+                          this_mesh_boundary_id,
+                          other_mesh_boundary_id,
+                          tol,
+                          clear_stitched_boundary_ids,
+                          verbose,
+                          use_binary_search,
+                          enforce_all_nodes_match_on_boundaries,
+                          true,
+                          merge_boundary_nodes_all_or_nothing);
 }
 
 
-void UnstructuredMesh::stitch_surfaces (boundary_id_type boundary_id_1,
-                                        boundary_id_type boundary_id_2,
-                                        Real tol,
-                                        bool clear_stitched_boundary_ids,
-                                        bool verbose,
-                                        bool use_binary_search,
-                                        bool enforce_all_nodes_match_on_boundaries)
+std::size_t
+UnstructuredMesh::stitch_surfaces (boundary_id_type boundary_id_1,
+                                   boundary_id_type boundary_id_2,
+                                   Real tol,
+                                   bool clear_stitched_boundary_ids,
+                                   bool verbose,
+                                   bool use_binary_search,
+                                   bool enforce_all_nodes_match_on_boundaries,
+                                   bool merge_boundary_nodes_all_or_nothing)
+
 {
-  stitching_helper(nullptr,
-                   boundary_id_1,
-                   boundary_id_2,
-                   tol,
-                   clear_stitched_boundary_ids,
-                   verbose,
-                   use_binary_search,
-                   enforce_all_nodes_match_on_boundaries,
-                   true);
+  return stitching_helper(nullptr,
+                          boundary_id_1,
+                          boundary_id_2,
+                          tol,
+                          clear_stitched_boundary_ids,
+                          verbose,
+                          use_binary_search,
+                          enforce_all_nodes_match_on_boundaries,
+                          true,
+                          merge_boundary_nodes_all_or_nothing);
 }
 
 
-void UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
-                                         boundary_id_type this_mesh_boundary_id,
-                                         boundary_id_type other_mesh_boundary_id,
-                                         Real tol,
-                                         bool clear_stitched_boundary_ids,
-                                         bool verbose,
-                                         bool use_binary_search,
-                                         bool enforce_all_nodes_match_on_boundaries,
-                                         bool skip_find_neighbors)
+std::size_t
+UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
+                                    boundary_id_type this_mesh_boundary_id,
+                                    boundary_id_type other_mesh_boundary_id,
+                                    Real tol,
+                                    bool clear_stitched_boundary_ids,
+                                    bool verbose,
+                                    bool use_binary_search,
+                                    bool enforce_all_nodes_match_on_boundaries,
+                                    bool skip_find_neighbors,
+                                    bool merge_boundary_nodes_all_or_nothing)
 {
 #ifdef DEBUG
   // We rely on neighbor links here
@@ -2109,6 +2118,26 @@ void UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
           libmesh_error_msg_if((n_matching_nodes != this_mesh_n_nodes) || (n_matching_nodes != other_mesh_n_nodes),
                                "Error: We expected the number of nodes to match.");
         }
+
+      if (merge_boundary_nodes_all_or_nothing)
+        {
+          std::size_t n_matching_nodes = node_to_node_map.size();
+          std::size_t this_mesh_n_nodes = this_boundary_node_ids.size();
+          std::size_t other_mesh_n_nodes = other_boundary_node_ids.size();
+          if ((n_matching_nodes != this_mesh_n_nodes) || (n_matching_nodes != other_mesh_n_nodes))
+            {
+              if (verbose)
+                {
+                  libMesh::out << "Skipping node merging in "
+                                  "UnstructuredMesh::stitch_meshes because not "
+                                  "all boundary nodes were matched."
+                               << std::endl;
+                }
+              node_to_node_map.clear();
+              other_to_this_node_map.clear();
+              node_to_elems_map.clear();
+            }
+        }
     }
   else
     {
@@ -2395,6 +2424,9 @@ void UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
       this->get_boundary_info().clear_stitched_boundary_side_ids(
           this_mesh_boundary_id, other_mesh_boundary_id, /*clear_nodeset_data=*/true);
     }
+
+  // Return the number of nodes which were merged.
+  return node_to_node_map.size();
 }
 
 

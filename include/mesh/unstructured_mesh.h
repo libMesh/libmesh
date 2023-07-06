@@ -180,10 +180,16 @@ public:
    * at dealing with slightly misaligned meshes).
    * If \p enforce_all_nodes_match_on_boundaries is true, we throw an error if the number of
    * nodes on the specified boundaries don't match the number of nodes that were merged.
-   * This is a helpful error check in some cases.
+   * This is a helpful error check in some cases. If this is true, it overrides the value of
+   * \p merge_boundary_nodes_all_or_nothing.
    * If \p skip_find_neighbors is true, a faster stitching method is used, where the lists of
    * neighbors for each elements are copied as well and patched, without calling the time-consuming
-   * find_neighbors() function.
+   * find_neighbors() function. This option is now hard-coded to true.
+   * If \p merge_boundary_nodes_all_or_nothing is true, instead of throwing an error
+   * like \p enforce_all_nodes_match_on_boundaries, the meshes are combined anyway but coincident
+   * nodes are not merged into single nodes. This is useful in cases where you are not sure if the
+   * boundaries are fully conforming beforehand and you want to handle the non-conforming cases
+   * differently.
    *
    * Note that the element IDs for elements in the stitched mesh corresponding to "this" mesh
    * will be unchanged. The IDs for elements corresponding to \p other_mesh will be incremented
@@ -192,26 +198,32 @@ public:
    * There is no simple a priori relationship between node IDs in "this" mesh
    * and other_mesh and node IDs in the stitched mesh because the number of nodes (and hence
    * the node IDs) in the stitched mesh depend on how many nodes are stitched.
+   *
+   * \returns the count of how many nodes were merged between the two meshes.
+   * This can be zero in the case of no matching nodes or if
+   * \p merge_boundary_nodes_all_or_nothing was active and relevant.
    */
-  void stitch_meshes (const MeshBase & other_mesh,
-                      boundary_id_type this_mesh_boundary,
-                      boundary_id_type other_mesh_boundary,
-                      Real tol=TOLERANCE,
-                      bool clear_stitched_boundary_ids=false,
-                      bool verbose=true,
-                      bool use_binary_search=true,
-                      bool enforce_all_nodes_match_on_boundaries=false);
+  std::size_t stitch_meshes (const MeshBase & other_mesh,
+                             boundary_id_type this_mesh_boundary,
+                             boundary_id_type other_mesh_boundary,
+                             Real tol=TOLERANCE,
+                             bool clear_stitched_boundary_ids=false,
+                             bool verbose=true,
+                             bool use_binary_search=true,
+                             bool enforce_all_nodes_match_on_boundaries=false,
+                             bool merge_boundary_nodes_all_or_nothing=false);
 
   /**
    * Similar to stitch_meshes, except that we stitch two adjacent surfaces within this mesh.
    */
-  void stitch_surfaces (boundary_id_type boundary_id_1,
-                        boundary_id_type boundary_id_2,
-                        Real tol=TOLERANCE,
-                        bool clear_stitched_boundary_ids=false,
-                        bool verbose=true,
-                        bool use_binary_search=true,
-                        bool enforce_all_nodes_match_on_boundaries=false);
+  std::size_t stitch_surfaces (boundary_id_type boundary_id_1,
+                               boundary_id_type boundary_id_2,
+                               Real tol=TOLERANCE,
+                               bool clear_stitched_boundary_ids=false,
+                               bool verbose=true,
+                               bool use_binary_search=true,
+                               bool enforce_all_nodes_match_on_boundaries=false,
+                               bool merge_boundary_nodes_all_or_nothing=false);
 
   /**
    * Deep copy of nodes and elements from another mesh object (used by
@@ -256,15 +268,16 @@ private:
    * Helper function for stitch_meshes and stitch_surfaces
    * that does the mesh stitching.
    */
-  void stitching_helper (const MeshBase * other_mesh,
-                         boundary_id_type boundary_id_1,
-                         boundary_id_type boundary_id_2,
-                         Real tol,
-                         bool clear_stitched_boundary_ids,
-                         bool verbose,
-                         bool use_binary_search,
-                         bool enforce_all_nodes_match_on_boundaries,
-                         bool skip_find_neighbors);
+  std::size_t stitching_helper (const MeshBase * other_mesh,
+                                boundary_id_type boundary_id_1,
+                                boundary_id_type boundary_id_2,
+                                Real tol,
+                                bool clear_stitched_boundary_ids,
+                                bool verbose,
+                                bool use_binary_search,
+                                bool enforce_all_nodes_match_on_boundaries,
+                                bool skip_find_neighbors,
+                                bool merge_boundary_nodes_all_or_nothing);
 };
 
 
