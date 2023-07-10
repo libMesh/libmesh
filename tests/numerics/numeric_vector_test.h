@@ -180,7 +180,8 @@ public:
     for (libMesh::dof_id_type n=first; n != last; n++)
       u.set (n, -static_cast<libMesh::Number>(n * n));
 
-    auto diff = u;
+    Derived diff_derived = *u_ptr;
+    Base & diff = diff_derived;
     diff -= v;
     LIBMESH_ASSERT_FP_EQUAL(diff.l2_norm(), u.l2_norm_diff(v),
                             libMesh::TOLERANCE*libMesh::TOLERANCE);
