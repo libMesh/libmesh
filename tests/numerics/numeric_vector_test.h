@@ -174,6 +174,16 @@ public:
                             libMesh::TOLERANCE*libMesh::TOLERANCE);
     LIBMESH_ASSERT_FP_EQUAL(v.linfty_norm(), 2*(global_size-libMesh::Real(1)),
                             libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+    auto u_ptr = std::make_unique<Derived>(*my_comm, global_size, local_size);
+    Base & u = *u_ptr;
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      u.set (n, -static_cast<libMesh::Number>(n * n));
+
+    auto diff = u;
+    diff -= v;
+    LIBMESH_ASSERT_FP_EQUAL(diff.l2_norm(), u.l2_norm_diff(v),
+                            libMesh::TOLERANCE*libMesh::TOLERANCE);
   }
 
   template <class Base, class Derived>

@@ -359,6 +359,24 @@ Real NumericVector<T>::subset_linfty_norm (const std::set<numeric_index_type> & 
 
 
 
+template <class T>
+Real NumericVector<T>::l2_norm_diff (const NumericVector<T> & v) const
+{
+  libmesh_assert_equal_to(this->local_size(), v.local_size());
+  libmesh_assert_equal_to(this->first_local_index(), v.first_local_index());
+  libmesh_assert_equal_to(this->last_local_index(), v.last_local_index());
+
+  Real norm = 0;
+  for (const auto i : make_range(this->first_local_index(), this->last_local_index()))
+    norm += TensorTools::norm_sq((*this)(i) - v(i));
+
+  this->comm().sum(norm);
+
+  return std::sqrt(norm);
+}
+
+
+
 template <typename T>
 void NumericVector<T>::add_vector (const T * v,
                                    const std::vector<numeric_index_type> & dof_indices)
