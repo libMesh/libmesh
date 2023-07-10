@@ -179,12 +179,12 @@ public:
     Base & u = *u_ptr;
     for (libMesh::dof_id_type n=first; n != last; n++)
       u.set (n, -static_cast<libMesh::Number>(n * n));
+    u.close();
 
     Derived diff_derived(*my_comm, global_size, local_size);
     Base & diff = diff_derived;
     diff = u;
     diff -= v;
-    diff.close();
     LIBMESH_ASSERT_FP_EQUAL(diff.l2_norm(), u.l2_norm_diff(v),
                             libMesh::TOLERANCE*libMesh::TOLERANCE);
   }
