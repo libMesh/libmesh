@@ -180,7 +180,7 @@ public:
     for (libMesh::dof_id_type n=first; n != last; n++)
       u.set (n, -static_cast<libMesh::Number>(n * n));
 
-    Derived diff_derived;
+    Derived diff_derived(*my_comm);
     Base & diff = diff_derived;
     diff = u;
     diff -= v;
