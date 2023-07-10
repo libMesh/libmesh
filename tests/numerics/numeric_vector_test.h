@@ -184,6 +184,7 @@ public:
     Base & diff = diff_derived;
     diff = u;
     diff -= v;
+    diff.close();
     LIBMESH_ASSERT_FP_EQUAL(diff.l2_norm(), u.l2_norm_diff(v),
                             libMesh::TOLERANCE*libMesh::TOLERANCE);
   }
