@@ -123,6 +123,16 @@ unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
       libmesh_fallthrough();
     case HEX27:
       return ((o+1)*(o+1)*(o+1));
+    case PRISM6:
+    case PRISM15:
+      libmesh_assert_less (o, 2);
+      libmesh_fallthrough();
+    case PRISM18:
+      libmesh_assert_less (o, 3);
+      libmesh_fallthrough();
+    case PRISM20:
+    case PRISM21:
+      return ((o+1)*(o+1)*(o+2)/2);
     case TRI3:
       libmesh_assert_less (o, 2);
       libmesh_fallthrough();
@@ -275,6 +285,59 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
           libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for HEX8/20/27!");
         }
 
+    case PRISM6:
+      libmesh_assert_less (n, 6);
+      libmesh_fallthrough();
+    case PRISM15:
+      libmesh_assert_less (n, 15);
+      libmesh_assert_less (o, 2);
+      libmesh_fallthrough();
+    case PRISM18:
+      libmesh_assert_less (n, 18);
+      libmesh_assert_less (o, 3);
+      libmesh_fallthrough();
+    case PRISM20:
+      // Internal DoFs are associated with the elem on a Prism20, or
+      // node 20 on a Prism21
+      libmesh_assert_less (n, 20);
+      libmesh_fallthrough();
+    case PRISM21:
+      libmesh_assert_less (n, 21);
+      switch (n)
+        {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+          return 1;
+
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+          return (o-1);
+
+        case 15:
+        case 16:
+        case 17:
+          return ((o-1)*(o-1));
+
+        case 18:
+        case 19:
+          return ((o-1)*(o-2)/2);
+        case 20:
+          return ((o-1)*(o-1)*(o-2)/2);
+        default:
+          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI!");
+        }
+
     case TET4:
       libmesh_assert_less (o, 2);
       libmesh_assert_less (n, 4);
@@ -353,6 +416,17 @@ unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
       return 0;
     case HEX27:
       return ((o-1)*(o-1)*(o-1));
+    case PRISM6:
+    case PRISM15:
+      libmesh_assert_less (o, 2);
+      libmesh_fallthrough();
+    case PRISM18:
+      libmesh_assert_less (o, 3);
+      return 0;
+    case PRISM20:
+      return ((o-1)*(o-1)*(o-2)/2);
+    case PRISM21: // Store interior DoFs on interior node
+      return 0;
     case TET4:
       libmesh_assert_less (o, 2);
       libmesh_fallthrough();
