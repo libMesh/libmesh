@@ -2312,8 +2312,7 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
         prism_indices(elem, totalorder, i, xi_eta, zeta, i01, i2);
 
         // We'll use the 2D Tri to handle any basis function flipping
-        // needed in xi/eta; prism_indices handled any flipping in
-        // zeta
+        // needed in xi/eta for triangle face+edge bases.
         Tri3 tri;
 
         // We pinky swear not to modify these nodes
@@ -2332,9 +2331,33 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
           }
         else
           {
-            tri.set_node(0) = e.node_ptr(9);
-            tri.set_node(1) = e.node_ptr(10);
-            tri.set_node(2) = e.node_ptr(11);
+            // For interior DoFs, no flipping is necessary or done; we
+            // can just evaluate on any triangle ... but *not* the
+            // obvious 9,10,11 triangle, because that might not exist
+            // if we have L2_HIERARCHIC on Prism6.
+            tri.set_node(0) = e.node_ptr(0);
+            tri.set_node(1) = e.node_ptr(1);
+            tri.set_node(2) = e.node_ptr(2);
+
+            // For square face DoFs, prism_indices handles flipping,
+            // and we *can't* override that in the tri shape call.
+            if (i01 > 2 && i01 < 3u*totalorder)
+              {
+                // %(p-1) to find the edge number, %2 for even vs odd
+                const bool odd_basis = ((i01-1)%(totalorder-1))%2;
+                if (odd_basis)
+                  {
+                    const int tri_edge = (i01-3)/(totalorder-1);
+                    // Flip nodes now to avoid triggering a shape
+                    // function flip later
+                    if (tri.point(tri_edge) > tri.point((tri_edge+1)%3))
+                      {
+                        Node * n = tri.node_ptr(tri_edge);
+                        tri.set_node(tri_edge) = tri.node_ptr((tri_edge+1)%3);
+                        tri.set_node((tri_edge+1)%3) = n;
+                      }
+                  }
+              }
           }
 
         return (FE<2,L2_HIERARCHIC>::shape(&tri, totalorder, i01, xi_eta)*
