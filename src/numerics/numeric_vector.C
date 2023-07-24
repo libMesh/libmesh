@@ -85,7 +85,6 @@ void NumericVector<T>::insert (const T * v,
                                const std::vector<numeric_index_type> & dof_indices)
 {
   libmesh_assert (v);
-  libmesh_assert (v->readable());
 
   for (auto i : index_range(dof_indices))
     this->set (dof_indices[i], v[i]);
@@ -381,7 +380,6 @@ void NumericVector<T>::add_vector (const T * v,
                                    const std::vector<numeric_index_type> & dof_indices)
 {
   libmesh_assert(v);
-  libmesh_assert(v->readable());
 
   for (auto i : index_range(dof_indices))
     this->add (dof_indices[i], v[i]);
