@@ -758,7 +758,7 @@ public:
    * \returns whether or not this vector and the vector \p v are
    * able to be read for global operations with one-another
    */
-  bool comparable(const NumericVector<T> & v) const;
+  bool compatible(const NumericVector<T> & v) const;
 
 protected:
 

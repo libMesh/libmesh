@@ -109,7 +109,7 @@ template <typename T>
 int NumericVector<T>::compare (const NumericVector<T> & other_vector,
                                const Real threshold) const
 {
-  libmesh_assert(this->comparable(other_vector));
+  libmesh_assert(this->compatible(other_vector));
 
   int first_different_i = std::numeric_limits<int>::max();
   numeric_index_type i = first_local_index();
@@ -137,7 +137,7 @@ template <typename T>
 int NumericVector<T>::local_relative_compare (const NumericVector<T> & other_vector,
                                               const Real threshold) const
 {
-  libmesh_assert(this->comparable(other_vector));
+  libmesh_assert(this->compatible(other_vector));
 
   int first_different_i = std::numeric_limits<int>::max();
   numeric_index_type i = first_local_index();
@@ -167,7 +167,7 @@ template <typename T>
 int NumericVector<T>::global_relative_compare (const NumericVector<T> & other_vector,
                                                const Real threshold) const
 {
-  libmesh_assert(this->comparable(other_vector));
+  libmesh_assert(this->compatible(other_vector));
 
   int first_different_i = std::numeric_limits<int>::max();
   numeric_index_type i = first_local_index();
@@ -362,7 +362,7 @@ Real NumericVector<T>::subset_linfty_norm (const std::set<numeric_index_type> & 
 template <class T>
 Real NumericVector<T>::l2_norm_diff (const NumericVector<T> & v) const
 {
-  libmesh_assert(this->comparable(v));
+  libmesh_assert(this->compatible(v));
 
   Real norm = 0;
   for (const auto i : make_range(this->first_local_index(), this->last_local_index()))
@@ -405,7 +405,7 @@ template <typename T>
 void NumericVector<T>::add_vector (const NumericVector<T> & v,
                                    const ShellMatrix<T> & a)
 {
-  libmesh_assert(this->comparable(v));
+  libmesh_assert(this->compatible(v));
 
   a.vector_mult_add(*this,v);
 }
@@ -420,7 +420,7 @@ bool NumericVector<T>::readable () const
 
 
 template <typename T>
-bool NumericVector<T>::comparable (const NumericVector<T> & v) const
+bool NumericVector<T>::compatible (const NumericVector<T> & v) const
 {
   return this->readable() && v.readable() &&
          this->size() == v.size() &&
