@@ -748,6 +748,18 @@ public:
    */
   virtual std::size_t max_allowed_id() const = 0;
 
+  /**
+   * \returns whether or not this vector is able to be read for
+   * global operations
+   */
+  bool readable() const;
+
+  /**
+   * \returns whether or not this vector and the vector \p v are
+   * able to be read for global operations with one-another
+   */
+  bool comparable(const NumericVector<T> & v) const;
+
 protected:
 
   /**
