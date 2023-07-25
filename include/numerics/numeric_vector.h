@@ -309,6 +309,12 @@ public:
   virtual Real subset_linfty_norm (const std::set<numeric_index_type> & indices) const;
 
   /**
+   * \returns The \f$ \ell_2 \f$-norm of \f$ \vec{u} - \vec{v} \f$, where
+   * \f$ \vec{u} \f$ is \p this.
+  */
+  Real l2_norm_diff (const NumericVector<T> & other_vec) const;
+
+  /**
    * \returns The size of the vector.
    */
   virtual numeric_index_type size () const = 0;
@@ -741,6 +747,18 @@ public:
    * NumericVector.
    */
   virtual std::size_t max_allowed_id() const = 0;
+
+  /**
+   * \returns whether or not this vector is able to be read for
+   * global operations
+   */
+  bool readable() const;
+
+  /**
+   * \returns whether or not this vector and the vector \p v are
+   * able to be read for global operations with one-another
+   */
+  bool compatible(const NumericVector<T> & v) const;
 
 protected:
 

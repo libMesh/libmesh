@@ -84,6 +84,8 @@ template <typename T>
 void NumericVector<T>::insert (const T * v,
                                const std::vector<numeric_index_type> & dof_indices)
 {
+  libmesh_assert (v);
+
   for (auto i : index_range(dof_indices))
     this->set (dof_indices[i], v[i]);
 }
@@ -95,6 +97,7 @@ void NumericVector<T>::insert (const NumericVector<T> & V,
                                const std::vector<numeric_index_type> & dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
+  libmesh_assert (V.readable());
 
   for (auto i : index_range(dof_indices))
     this->set (dof_indices[i], V(i));
@@ -106,10 +109,7 @@ template <typename T>
 int NumericVector<T>::compare (const NumericVector<T> & other_vector,
                                const Real threshold) const
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (other_vector.initialized());
-  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+  libmesh_assert(this->compatible(other_vector));
 
   int first_different_i = std::numeric_limits<int>::max();
   numeric_index_type i = first_local_index();
@@ -137,10 +137,7 @@ template <typename T>
 int NumericVector<T>::local_relative_compare (const NumericVector<T> & other_vector,
                                               const Real threshold) const
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (other_vector.initialized());
-  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+  libmesh_assert(this->compatible(other_vector));
 
   int first_different_i = std::numeric_limits<int>::max();
   numeric_index_type i = first_local_index();
@@ -170,10 +167,7 @@ template <typename T>
 int NumericVector<T>::global_relative_compare (const NumericVector<T> & other_vector,
                                                const Real threshold) const
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (other_vector.initialized());
-  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+  libmesh_assert(this->compatible(other_vector));
 
   int first_different_i = std::numeric_limits<int>::max();
   numeric_index_type i = first_local_index();
@@ -311,6 +305,8 @@ return rvalue;
 template <class T>
 Real NumericVector<T>::subset_l1_norm (const std::set<numeric_index_type> & indices) const
 {
+  libmesh_assert (this->readable());
+
   const NumericVector<T> & v = *this;
 
   Real norm = 0;
@@ -326,6 +322,8 @@ Real NumericVector<T>::subset_l1_norm (const std::set<numeric_index_type> & indi
 template <class T>
 Real NumericVector<T>::subset_l2_norm (const std::set<numeric_index_type> & indices) const
 {
+  libmesh_assert (this->readable());
+
   const NumericVector<T> & v = *this;
 
   Real norm = 0;
@@ -341,6 +339,8 @@ Real NumericVector<T>::subset_l2_norm (const std::set<numeric_index_type> & indi
 template <class T>
 Real NumericVector<T>::subset_linfty_norm (const std::set<numeric_index_type> & indices) const
 {
+  libmesh_assert (this->readable());
+
   const NumericVector<T> & v = *this;
 
   Real norm = 0;
@@ -359,10 +359,28 @@ Real NumericVector<T>::subset_linfty_norm (const std::set<numeric_index_type> & 
 
 
 
+template <class T>
+Real NumericVector<T>::l2_norm_diff (const NumericVector<T> & v) const
+{
+  libmesh_assert(this->compatible(v));
+
+  Real norm = 0;
+  for (const auto i : make_range(this->first_local_index(), this->last_local_index()))
+    norm += TensorTools::norm_sq((*this)(i) - v(i));
+
+  this->comm().sum(norm);
+
+  return std::sqrt(norm);
+}
+
+
+
 template <typename T>
 void NumericVector<T>::add_vector (const T * v,
                                    const std::vector<numeric_index_type> & dof_indices)
 {
+  libmesh_assert(v);
+
   for (auto i : index_range(dof_indices))
     this->add (dof_indices[i], v[i]);
 }
@@ -373,6 +391,8 @@ template <typename T>
 void NumericVector<T>::add_vector (const NumericVector<T> & v,
                                    const std::vector<numeric_index_type> & dof_indices)
 {
+  libmesh_assert(v.readable());
+
   const std::size_t n = dof_indices.size();
   libmesh_assert_equal_to(v.size(), n);
   for (numeric_index_type i=0; i != n; i++)
@@ -385,7 +405,28 @@ template <typename T>
 void NumericVector<T>::add_vector (const NumericVector<T> & v,
                                    const ShellMatrix<T> & a)
 {
+  libmesh_assert(this->compatible(v));
+
   a.vector_mult_add(*this,v);
+}
+
+
+
+template <typename T>
+bool NumericVector<T>::readable () const
+{
+  return this->initialized() && this->closed();
+}
+
+
+template <typename T>
+bool NumericVector<T>::compatible (const NumericVector<T> & v) const
+{
+  return this->readable() && v.readable() &&
+         this->size() == v.size() &&
+         this->local_size() == v.local_size() &&
+         this->first_local_index() == v.first_local_index() &&
+         this->last_local_index() == v.last_local_index();
 }
 
 
