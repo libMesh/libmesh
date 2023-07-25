@@ -759,6 +759,395 @@ void cube_indices(const Elem * elem,
       i2 = cube_number_page[basisnum] + 2;
     }
 }
+
+
+void prism_indices(const Elem * elem,
+                   const unsigned int totalorder,
+                   const unsigned int i,
+                   Point & xi_eta, Real & zeta,
+                   unsigned int & i01,
+                   unsigned int & i2)
+{
+  // the number of DoFs per edge appears everywhere:
+  const unsigned int e = totalorder - 1u;
+
+  libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u)*(totalorder+2u)/2u);
+
+  Point xi_eta_saved = xi_eta;
+  Real zeta_saved = zeta;
+
+  // Vertices:
+  if (i == 0)
+    {
+      i01 = 0;
+      i2 = 0;
+    }
+  else if (i == 1)
+    {
+      i01 = 1;
+      i2 = 0;
+    }
+  else if (i == 2)
+    {
+      i01 = 2;
+      i2 = 0;
+    }
+  else if (i == 3)
+    {
+      i01 = 0;
+      i2 = 1;
+    }
+  else if (i == 4)
+    {
+      i01 = 1;
+      i2 = 1;
+    }
+  else if (i == 5)
+    {
+      i01 = 2;
+      i2 = 1;
+    }
+  // Edges 0,1,2 (vertices 6,7,8)
+  else if (i < 6 + 3*e)
+    {
+      // The TRI code will handle any flips here
+      i01 = i - 3;
+      i2 = 0;
+    }
+  // Edge 3,4,5 (vertices 9,10,11)
+  else if (i < 6 + 6*e)
+    {
+      i01 = (i - 6 - 3*e)/e; // which tri DoF are we?
+      i2 = (i - 6 - 3*e)%e+2; // edge DoF? +2 to skip endpoints
+      // EDGE evaluations don't flip, so handle that here
+      if (elem->point(i01) > elem->point(i01+3))
+        zeta = -zeta;
+    }
+  // Edge 6,7,8 (vertices 12,13,14)
+  else if (i < 6 + 9*e)
+    {
+      // The TRI code will handle any flips here
+      i01 = i - 3 - 6*e;
+      i2 = 1;
+    }
+  // Face 1, node 15 (*before* 0, via node 18 on prism20)
+  else if (i < 6 + 9*e + e*e)
+    {
+      unsigned int basisnum = i - 6 - 9*e;
+
+      // How wide is the stretch from one side to the other of the
+      // line in the xi-eta plane parallel to this face?
+      const Real xe_scale = 1 - xi_eta_saved(1);
+
+      // What percentage of the way along that stretch are we?
+      const Real xe_fraction = (xe_scale==0) ?
+        0 : xi_eta_saved(0)/xe_scale;
+
+      // indexes in edge numbering
+      unsigned int s0 = square_number_row[basisnum] + 2;
+      unsigned int s1 = square_number_column[basisnum] + 2;
+      const Point min_point = get_min_point(elem, 0, 1, 3, 4);
+
+      if (elem->point(0) == min_point)
+        {
+          if (elem->point(1) == std::min(elem->point(1), elem->point(3)))
+            {
+              // Case 1: no flips needed
+              i01 = s0+1; // edge to triangle side 0 numbering
+              i2 = s1;
+            }
+          else
+            {
+              // Case 2: flip about 0-4 diagonal
+              i01 = s1+1;
+              i2 = s0;
+              zeta = 2*xe_fraction-1;
+              xi_eta(0) = (zeta_saved+1)*xe_scale/2;
+            }
+        }
+      else if (elem->point(3) == min_point)
+        {
+          if (elem->point(0) == std::min(elem->point(0), elem->point(4)))
+            {
+              // Case 3: 0->3->4->1->0 rotation
+              i01 = s1+1;
+              i2 = s0;
+              zeta = 1-2*xe_fraction;
+              xi_eta(0) = (zeta_saved+1)*xe_scale/2;
+            }
+          else
+            {
+              // Case 4: flip about 9-10 midline
+              i01 = s0+1;
+              i2 = s1;
+              zeta = -zeta_saved;
+            }
+        }
+
+      else if (elem->point(1) == min_point)
+        {
+          if (elem->point(4) == std::min(elem->point(4), elem->point(0)))
+            {
+              // Case 5: 0->1->4->3->0 rotation
+              i01 = s1+1;
+              i2 = s0;
+              zeta = 2*xe_fraction-1;
+              xi_eta(0) = (1-zeta_saved)*xe_scale/2;
+            }
+          else
+            {
+              // Case 6: flip about 6-12 midline
+              i01 = s0+1;
+              i2 = s1;
+              xi_eta(0) = (1-xe_fraction)*xe_scale;
+            }
+        }
+      else if (elem->point(4) == min_point)
+        {
+          if (elem->point(3) == std::min(elem->point(3), elem->point(1)))
+            {
+              // Case 7: 180 degree rotation
+              i01 = s0+1;
+              i2 = s1;
+              xi_eta(0) = (1-xe_fraction)*xe_scale;
+              zeta = -zeta_saved;
+            }
+          else
+            {
+              // Case 8: flip about 1-3 diagonal
+              i01 = s1+1;
+              i2 = s0;
+              zeta = 1-2*xe_fraction;
+              xi_eta(0) = (1-zeta_saved)*xe_scale/2;
+            }
+        }
+    }
+  // Face 2, node 16
+  else if (i < 6 + 9*e + 2*e*e)
+    {
+      unsigned int basisnum = i - 6 - 9*e - e*e;
+
+      // How wide is the stretch from one side to the other of the
+      // line in the xi-eta plane parallel to this face?
+      const Real xe_scale = xi_eta_saved(0) + xi_eta_saved(1);
+
+      // What percentage of the way along that stretch are we?
+      const Real xe_fraction = (xe_scale==0) ?
+        0 : xi_eta_saved(0)/xe_scale;
+
+      // indexes in edge numbering
+      unsigned int s0 = square_number_row[basisnum] + 2;
+      unsigned int s1 = square_number_column[basisnum] + 2;
+      const Point min_point = get_min_point(elem, 1, 2, 4, 5);
+
+      if (elem->point(1) == min_point)
+        {
+          if (elem->point(2) == std::min(elem->point(2), elem->point(4)))
+            {
+              // Case 1: no flips needed
+              i01 = s0+1+3; // edge to triangle side 1 numbering
+              i2 = s1;
+            }
+          else
+            {
+              // Case 2: flip about 1-5 diagonal
+              i01 = s1+1+e;
+              i2 = s0;
+              zeta = 2*xe_fraction-1;
+              const Real xe = (zeta_saved+1)/2;
+              xi_eta(1) = xe*xe_scale;
+              xi_eta(0) = xe_scale - xi_eta(1);
+            }
+        }
+      else if (elem->point(4) == min_point)
+        {
+          if (elem->point(1) == std::min(elem->point(1), elem->point(5)))
+            {
+              // Case 3: 1->4->5->2->1 rotation
+              i01 = s1+1+e;
+              i2 = s0;
+              zeta = 1-2*xe_fraction;
+              const Real xe = (zeta_saved+1)/2;
+              xi_eta(1) = xe*xe_scale;
+              xi_eta(0) = xe_scale - xi_eta(1);
+            }
+          else
+            {
+              // Case 4: flip about 10-11 midline
+              i01 = s0+1+e;
+              i2 = s1;
+              zeta = -zeta_saved;
+            }
+        }
+
+      else if (elem->point(2) == min_point)
+        {
+          if (elem->point(5) == std::min(elem->point(5), elem->point(1)))
+            {
+              // Case 5: 1->2->5->4->1 rotation
+              i01 = s1+1+e;
+              i2 = s0;
+              zeta = 2*xe_fraction-1;
+              const Real xe = (1-zeta_saved)/2;
+              xi_eta(1) = xe*xe_scale;
+              xi_eta(0) = xe_scale - xi_eta(1);
+            }
+          else
+            {
+              // Case 6: flip about 7-13 midline
+              i01 = s0+1+e;
+              i2 = s1;
+              const Real xe = (1-xe_fraction);
+              xi_eta(1) = xe*xe_scale;
+              xi_eta(0) = xe_scale - xi_eta(1);
+            }
+        }
+      else if (elem->point(5) == min_point)
+        {
+          if (elem->point(4) == std::min(elem->point(4), elem->point(2)))
+            {
+              // Case 7: 180 degree rotation
+              i01 = s0+1+e;
+              i2 = s1;
+              zeta = -zeta_saved;
+              const Real xe = (1-xe_fraction);
+              xi_eta(1) = xe*xe_scale;
+              xi_eta(0) = xe_scale - xi_eta(1);
+            }
+          else
+            {
+              // Case 8: flip about 1-3 diagonal
+              i01 = s1+1+e;
+              i2 = s0;
+              zeta = 1-2*xe_fraction;
+              const Real xe = (1-zeta_saved)/2;
+              xi_eta(1) = xe*xe_scale;
+              xi_eta(0) = xe_scale - xi_eta(1);
+            }
+        }
+    }
+  // Face 3, node 17
+  else if (i < 6 + 9*e + 3*e*e)
+    {
+      unsigned int basisnum = i - 6 - 9*e - 2*e*e;
+
+      // How wide is the stretch from one side to the other of the
+      // line in the xi-eta plane parallel to this face?
+      const Real xe_scale = 1 - xi_eta_saved(0);
+
+      // What percentage of the way along that stretch are we?
+      const Real xe_fraction = (xe_scale==0) ?
+        0 : (xe_scale - xi_eta_saved(1))/xe_scale;
+
+      // indexes in edge numbering
+      unsigned int s0 = square_number_row[basisnum] + 2;
+      unsigned int s1 = square_number_column[basisnum] + 2;
+      const Point min_point = get_min_point(elem, 0, 2, 3, 5);
+
+      if (elem->point(2) == min_point)
+        {
+          if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
+            {
+              // Case 1: no flips needed
+              i01 = s0+1+2*e; // edge to triangle side 2 numbering
+              i2 = s1;
+            }
+          else
+            {
+              // Case 2: flip about 2-3 diagonal
+              i01 = s1+1+2*e;
+              i2 = s0;
+              zeta = 2*xe_fraction-1;
+              const Real xe = (zeta_saved+1)/2;
+              xi_eta(1) = xe_scale - xe*xe_scale;
+            }
+        }
+      else if (elem->point(5) == min_point)
+        {
+          if (elem->point(2) == std::min(elem->point(2), elem->point(3)))
+            {
+              // Case 3: 2->5->3->0->2 rotation
+              i01 = s1+1+2*e;
+              i2 = s0;
+              zeta = 1-2*xe_fraction;
+              const Real xe = (zeta_saved+1)/2;
+              xi_eta(1) = xe_scale - xe*xe_scale;
+            }
+          else
+            {
+              // Case 4: flip about 11-9 midline
+              i01 = s0+1+2*e;
+              i2 = s1;
+              zeta = -zeta_saved;
+            }
+        }
+      else if (elem->point(0) == min_point)
+        {
+          if (elem->point(3) == std::min(elem->point(3), elem->point(2)))
+            {
+              // Case 5: 2->0->3->5->2 rotation
+              i01 = s1+1+2*e;
+              i2 = s0;
+              zeta = 2*xe_fraction-1;
+              const Real xe = (1-zeta_saved)/2;
+              xi_eta(1) = xe_scale - xe*xe_scale;
+            }
+          else
+            {
+              // Case 6: flip about 8-14 midline
+              i01 = s0+1+2*e;
+              i2 = s1;
+              const Real xe = (1-xe_fraction);
+              xi_eta(1) = xe_scale - xe*xe_scale;
+            }
+        }
+      else if (elem->point(3) == min_point)
+        {
+          if (elem->point(5) == std::min(elem->point(5), elem->point(0)))
+            {
+              // Case 7: 180 degree rotation
+              i01 = s0+1+2*e;
+              i2 = s1;
+              zeta = -zeta_saved;
+              const Real xe = (1-xe_fraction);
+              xi_eta(1) = xe_scale - xe*xe_scale;
+            }
+          else
+            {
+              // Case 8: flip about 0-5 diagonal
+              i01 = s1+1+2*e;
+              i2 = s0;
+              zeta = 1-2*xe_fraction;
+              const Real xe = (1-zeta_saved)/2;
+              xi_eta(1) = xe_scale - xe*xe_scale;
+            }
+        }
+    }
+  // Face 0, node 18 - node order due to hierarchic numbering
+  else if (i < 6 + 9*e + 3*e*e + e*(e-1)/2)
+    {
+      // The TRI code will handle any flips here
+      i01 = i - 3 - 6*e - 3*e*e;
+      i2 = 0;
+    }
+  // Face 4
+  else if (i < 6 + 9*e + 3*e*e + e*(e-1))
+    {
+      // The TRI code will handle any flips here
+      i01 = i - 3 - 6*e - 3*e*e - e*(e-1)/2;
+      i2 = 1;
+    }
+  // Internal DoFs
+  else
+    {
+      // We won't bother with any internal DoF reordering / flipping;
+      // that's fine unless we ever get to 4D.
+      unsigned int basisnum = i - 6 - 9*e - 3*e*e - e*(e-1);
+      i01 = prism_number_triangle[basisnum] + 3 + 3*e;
+      i2 = prism_number_page[basisnum] + 2;
+    }
+}
+
 #endif // LIBMESH_DIM > 2
 
 } // end anonymous namespace
@@ -1900,8 +2289,87 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
                 FE<1,T>::shape(EDGE3, totalorder, i2, zeta));
       }
 
+    case PRISM6:
+    case PRISM15:
+      libmesh_assert (T == L2_HIERARCHIC || totalorder < 2);
+      libmesh_fallthrough();
+    case PRISM18:
+      libmesh_assert (T == L2_HIERARCHIC || totalorder < 3);
+      libmesh_fallthrough();
+    case PRISM20:
+    case PRISM21:
+      {
+        libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u)*(totalorder+2u)/2u);
+
+        // Compute prism shape functions as a tensor-product.
+        // Non-const here, because prism_indices might need to do some
+        // flips before evaluating edge or face DoFs
+        Point xi_eta {p(0),p(1)};
+        Real zeta = p(2);
+
+        unsigned int i01, i2;
+
+        prism_indices(elem, totalorder, i, xi_eta, zeta, i01, i2);
+
+        // We'll use the 2D Tri to handle any basis function flipping
+        // needed in xi/eta for triangle face+edge bases.
+        Tri3 tri;
+
+        // We pinky swear not to modify these nodes
+        Elem & e = const_cast<Elem &>(*elem);
+        if (i2 == 0)
+          {
+            tri.set_node(0) = e.node_ptr(0);
+            tri.set_node(1) = e.node_ptr(1);
+            tri.set_node(2) = e.node_ptr(2);
+          }
+        else if (i2 == 1)
+          {
+            tri.set_node(0) = e.node_ptr(3);
+            tri.set_node(1) = e.node_ptr(4);
+            tri.set_node(2) = e.node_ptr(5);
+          }
+        else
+          {
+            // For interior DoFs, no flipping is necessary or done; we
+            // can just evaluate on any triangle ... but *not* the
+            // obvious 9,10,11 triangle, because that might not exist
+            // if we have L2_HIERARCHIC on Prism6.
+            tri.set_node(0) = e.node_ptr(0);
+            tri.set_node(1) = e.node_ptr(1);
+            tri.set_node(2) = e.node_ptr(2);
+
+            // For square face DoFs, prism_indices handles flipping,
+            // and we *can't* override that in the tri shape call.
+            if (i01 > 2 && i01 < 3u*totalorder)
+              {
+                // %(p-1) to find the edge number, %2 for even vs odd
+                const bool odd_basis = ((i01-1)%(totalorder-1))%2;
+                if (odd_basis)
+                  {
+                    const int tri_edge = (i01-3)/(totalorder-1);
+                    // Flip nodes now to avoid triggering a shape
+                    // function flip later
+                    if (tri.point(tri_edge) > tri.point((tri_edge+1)%3))
+                      {
+                        Node * n = tri.node_ptr(tri_edge);
+                        tri.set_node(tri_edge) = tri.node_ptr((tri_edge+1)%3);
+                        tri.set_node((tri_edge+1)%3) = n;
+                      }
+                  }
+              }
+          }
+
+        return (FE<2,L2_HIERARCHIC>::shape(&tri, totalorder, i01, xi_eta)*
+                FE<1,L2_HIERARCHIC>::shape(EDGE2, totalorder, i2, zeta));
+      }
+
     case TET4:
+      libmesh_assert (T == L2_HIERARCHIC || totalorder < 2);
+      libmesh_fallthrough();
     case TET10:
+      libmesh_assert (T == L2_HIERARCHIC || totalorder < 3);
+      libmesh_fallthrough();
     case TET14:
       {
         const Real zeta[4] = { 1 - p(0) - p(1) - p(2), p(0), p(1), p(2) };

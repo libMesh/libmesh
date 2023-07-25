@@ -377,6 +377,20 @@ public:
                                        0., 1., 0., 1., 0., 1.,
                                        elem_type);
 
+    // For debugging purposes it can be helpful to only consider one
+    // element even when we're using an element type that requires
+    // more than one element to fill out a square or cube.
+#if 0
+    for (dof_id_type i = 0; i != _mesh->max_elem_id(); ++i)
+      {
+        Elem * elem = _mesh->query_elem_ptr(i);
+        if (elem && elem->id())
+          _mesh->delete_elem(elem);
+      }
+    _mesh->prepare_for_use();
+    CPPUNIT_ASSERT_EQUAL(_mesh->n_elem(), dof_id_type(1));
+#endif
+
     // Permute our elements randomly and rotate and skew our mesh so
     // we test all sorts of orientations ... except with Hermite
     // elements, which are only designed to support meshes with a

@@ -2693,6 +2693,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PRISM18:
         case PRISM20:
         case PRISM21:
+          return unlimited;
         case PYRAMID5:
         case PYRAMID13:
         case PYRAMID14:
