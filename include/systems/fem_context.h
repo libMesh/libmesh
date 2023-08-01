@@ -72,7 +72,8 @@ public:
    */
   explicit
   FEMContext (const System & sys,
-              const std::vector<unsigned int> * active_vars = nullptr);
+              const std::vector<unsigned int> * active_vars = nullptr,
+              bool allocate_local_matrices = true);
 
   /**
    * Constructor.  Specify the extra quadrature order instead
@@ -85,7 +86,8 @@ public:
   explicit
   FEMContext (const System & sys,
               int extra_quadrature_order,
-              const std::vector<unsigned int> * active_vars = nullptr);
+              const std::vector<unsigned int> * active_vars = nullptr,
+              bool allocate_local_matrices = true);
 
 
   /**
