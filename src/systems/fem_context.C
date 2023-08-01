@@ -1868,7 +1868,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
               // This is redundant with earlier initialization, isn't it? - RHS
               // sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
 
-              localized_vec_it->second.second[i]->reposition
+              localized_vec_it->second.second[i].reposition
                 (sub_dofs, n_dofs_var);
 
               sub_dofs += n_dofs_var;

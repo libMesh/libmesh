@@ -63,10 +63,10 @@ DiffContext::DiffContext (const System & sys) :
 
   for (unsigned int i=0; i != nv; ++i)
     {
-      _elem_subsolutions.emplace_back(std::make_unique<DenseSubVector<Number>>(_elem_solution));
-      _elem_subresiduals.emplace_back(std::make_unique<DenseSubVector<Number>>(_elem_residual));
+      _elem_subsolutions.emplace_back(_elem_solution);
+      _elem_subresiduals.emplace_back(_elem_residual);
       for (std::size_t q=0; q != n_qoi; ++q)
-        _elem_qoi_subderivatives[q].emplace_back(std::make_unique<DenseSubVector<Number>>(_elem_qoi_derivative[q]));
+        _elem_qoi_subderivatives[q].emplace_back(_elem_qoi_derivative[q]);
       _elem_subjacobians[i].reserve(nv);
 
       // Only make space for these if we're using DiffSystem
@@ -77,21 +77,21 @@ DiffContext::DiffContext (const System & sys) :
           // Now, we only need these if the solver is unsteady
           if (!diff_system->get_time_solver().is_steady())
             {
-              _elem_subsolution_rates.emplace_back(std::make_unique<DenseSubVector<Number>>(_elem_solution_rate));
+              _elem_subsolution_rates.emplace_back(_elem_solution_rate);
 
               // We only need accel space if the TimeSolver is second order
               const UnsteadySolver & time_solver = cast_ref<const UnsteadySolver &>(diff_system->get_time_solver());
 
               if (time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty())
-                _elem_subsolution_accels.emplace_back(std::make_unique<DenseSubVector<Number>>(_elem_solution_accel));
+                _elem_subsolution_accels.emplace_back(_elem_solution_accel);
             }
         }
 
       if (sys.use_fixed_solution)
-        _elem_fixed_subsolutions.emplace_back(std::make_unique<DenseSubVector<Number>>(_elem_fixed_solution));
+        _elem_fixed_subsolutions.emplace_back(_elem_fixed_solution);
 
       for (unsigned int j=0; j != nv; ++j)
-        _elem_subjacobians[i].emplace_back(std::make_unique<DenseSubMatrix<Number>>(_elem_jacobian));
+        _elem_subjacobians[i].emplace_back(_elem_jacobian);
     }
 }
 
@@ -119,7 +119,7 @@ Real DiffContext::get_deltat_value()
 void DiffContext::add_localized_vector (NumericVector<Number> & localized_vector, const System & sys)
 {
   // Make an empty pair keyed with a reference to this _localized_vector
-  _localized_vectors[&localized_vector] = std::make_pair(DenseVector<Number>(), std::vector<std::unique_ptr<DenseSubVector<Number>>>());
+  _localized_vectors[&localized_vector] = std::make_pair(DenseVector<Number>(), std::vector<DenseSubVector<Number>>());
 
   unsigned int nv = sys.n_vars();
 
@@ -127,7 +127,7 @@ void DiffContext::add_localized_vector (NumericVector<Number> & localized_vector
 
   // Fill the DenseSubVector with nv copies of DenseVector
   for (unsigned int i=0; i != nv; ++i)
-    _localized_vectors[&localized_vector].second.emplace_back(std::make_unique<DenseSubVector<Number>>(_localized_vectors[&localized_vector].first));
+    _localized_vectors[&localized_vector].second.emplace_back(_localized_vectors[&localized_vector].first);
 }
 
 
@@ -147,7 +147,7 @@ const DenseVector<Number> & DiffContext::get_localized_vector (const NumericVect
 
 DenseSubVector<Number> & DiffContext::get_localized_subvector (const NumericVector<Number> & localized_vector, unsigned int var)
 {
-  return *_localized_vectors[&localized_vector].second[var];
+  return _localized_vectors[&localized_vector].second[var];
 }
 
 
@@ -155,7 +155,7 @@ const DenseSubVector<Number> & DiffContext::get_localized_subvector (const Numer
 {
   auto localized_vectors_it = _localized_vectors.find(&localized_vector);
   libmesh_assert(localized_vectors_it != _localized_vectors.end());
-  return *localized_vectors_it->second.second[var];
+  return localized_vectors_it->second.second[var];
 }
 
 } // namespace libMesh
