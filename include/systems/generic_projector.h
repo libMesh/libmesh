@@ -532,7 +532,7 @@ public:
                   const std::vector<unsigned int> * vars) :
     last_elem(nullptr),
     sys(sys_in),
-    old_context(sys_in, vars)
+    old_context(sys_in, vars, /* allocate_local_matrices= */ false)
   {
     // We'll be queried for components but we'll typically be looking
     // up data by variables, and those indices don't always match
@@ -555,7 +555,7 @@ public:
   OldSolutionBase(const OldSolutionBase & in) :
     last_elem(nullptr),
     sys(in.sys),
-    old_context(sys, in.old_context.active_vars()),
+    old_context(sys, in.old_context.active_vars(), /* allocate_local_matrices= */ false),
     component_to_var(in.component_to_var)
   {
   }
@@ -1267,8 +1267,11 @@ template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
 GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubFunctor::SubFunctor
   (GenericProjector & p) :
-  projector(p), action(p.master_action), f(p.master_f),
-  context(p.system, &p.variables), conts(p.system.n_vars()),
+  projector(p),
+  action(p.master_action),
+  f(p.master_f),
+  context(p.system, &p.variables, /* allocate_local_matrices= */ false),
+  conts(p.system.n_vars()),
   field_types(p.system.n_vars()), system(p.system)
 {
   // Loop over all the variables we've been requested to project, to
