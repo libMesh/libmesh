@@ -824,6 +824,8 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
 
       NumericVector<Number> & sys_soln(*system.current_local_solution);
 
+      const DofMap & dof_map = system.get_dof_map();
+
       std::vector<Number>      elem_soln;   // The finite element solution
       std::vector<Number>      nodal_soln;  // The FE solution interpolated to the nodes
       std::vector<dof_id_type> dof_indices; // The DOF indices for the finite element
@@ -833,8 +835,6 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
         {
           const FEType & fe_type           = system.variable_type(var);
           const Variable & var_description = system.variable(var);
-          const DofMap & dof_map           = system.get_dof_map();
-
           unsigned int n_vec_dim = FEInterface::n_vec_dim( sys_ptr->get_mesh(), fe_type );
 
           for (const auto & elem : _mesh.active_local_element_ptr_range())
@@ -842,11 +842,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
               if (var_description.active_on_subdomain(elem->subdomain_id()))
                 {
                   dof_map.dof_indices (elem, dof_indices, var);
-
-                  elem_soln.resize(dof_indices.size());
-
-                  for (auto i : index_range(dof_indices))
-                    elem_soln[i] = sys_soln(dof_indices[i]);
+                  sys_soln.get(dof_indices, elem_soln);
 
                   FEInterface::nodal_soln (elem->dim(),
                                            fe_type,
