@@ -1337,18 +1337,16 @@ GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SubProjector::Su
   (GenericProjector & p) :
   SubFunctor(p)
 {
-  if (p.master_g)
-    g = std::make_unique<GFunctor>(*p.master_g);
 
-#ifndef NDEBUG
   // Our C1 elements need gradient information
   for (const auto & var : this->projector.variables)
     if (this->conts[var] == C_ONE)
-      libmesh_assert(g);
-#endif
-
-  if (g)
-    g->init_context(context);
+      {
+        libmesh_assert(p.master_g);
+        g = std::make_unique<GFunctor>(*p.master_g);
+        g->init_context(context);
+        return;
+      }
 }
 
 template <typename FFunctor, typename GFunctor, typename FValue, typename ProjectionAction>
