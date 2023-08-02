@@ -592,6 +592,10 @@ public:
   {
     LOG_SCOPE ("eval_old_dofs(node)", "OldSolutionCoefs");
 
+    // We may be reusing a std::vector here, but the following
+    // dof_indices call appends without first clearing.
+    indices.clear();
+
     this->sys.get_dof_map().dof_indices(elem, node_num, indices, var_num);
 
     std::vector<dof_id_type> old_indices;

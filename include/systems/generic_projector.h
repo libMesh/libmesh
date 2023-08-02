@@ -829,6 +829,10 @@ public:
   {
     LOG_SCOPE ("eval_old_dofs(node)", "OldSolutionValue");
 
+    // We may be reusing a std::vector here, but the following
+    // dof_indices call appends without first clearing.
+    indices.clear();
+
     this->sys.get_dof_map().dof_indices(elem, node_num, indices, var_num);
 
     std::vector<dof_id_type> old_indices;
@@ -1521,44 +1525,51 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
           // it must be newly added, so the user is responsible for
           // setting the new dofs on it during a grid projection.
           const DofObject * old_dof_object = elem->get_old_dof_object();
+          const Elem::RefinementState h_flag = elem->refinement_flag();
+          const Elem::RefinementState p_flag = elem->p_refinement_flag();
           if (!old_dof_object &&
-              elem->refinement_flag() != Elem::JUST_REFINED &&
-              elem->refinement_flag() != Elem::JUST_COARSENED)
+              h_flag != Elem::JUST_REFINED &&
+              h_flag != Elem::JUST_COARSENED)
             continue;
 
           // If this is an unchanged element, just copy everything
-          if ((elem->refinement_flag() != Elem::JUST_REFINED &&
-              elem->refinement_flag() != Elem::JUST_COARSENED &&
-              elem->p_refinement_flag() != Elem::JUST_REFINED &&
-              elem->p_refinement_flag() != Elem::JUST_COARSENED))
+          if (h_flag != Elem::JUST_REFINED &&
+              h_flag != Elem::JUST_COARSENED &&
+              p_flag != Elem::JUST_REFINED &&
+              p_flag != Elem::JUST_COARSENED)
             copy_this_elem = true;
           else
             {
               bool reinitted = false;
 
+              const unsigned int p_level = elem->p_level();
+
               // If this element has a low order monomial which has
               // merely been h refined, copy it.
+              const bool copy_possible =
+                p_level == 0 &&
+                h_flag != Elem::JUST_COARSENED &&
+                p_flag != Elem::JUST_COARSENED;
+
+              std::vector<typename FFunctor::ValuePushType> Ue(1);
+              std::vector<dof_id_type> elem_dof_ids(1);
+
               for (auto v_num : this->projector.variables)
                 {
                   const Variable & var = system.variable(v_num);
                   if (!var.active_on_subdomain(elem->subdomain_id()))
                     continue;
-                  FEType fe_type = var.type();
+                  const FEType fe_type = var.type();
 
                   if (fe_type.family == MONOMIAL &&
                       fe_type.order == CONSTANT &&
-                      elem->p_level() == 0 &&
-                      elem->refinement_flag() != Elem::JUST_COARSENED &&
-                      elem->p_refinement_flag() != Elem::JUST_COARSENED)
+                      copy_possible)
                     {
                       if (!reinitted)
                         {
                           reinitted = true;
                           context.pre_fe_reinit(system, elem);
                         }
-
-                      std::vector<typename FFunctor::ValuePushType> Ue(1);
-                      std::vector<dof_id_type> elem_dof_ids(1);
 
                       f.eval_old_dofs(*elem, fe_type, sys_num, v_num,
                                       elem_dof_ids, Ue);
@@ -1600,7 +1611,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
           const Variable & var = this->projector.system.variable(v_num);
           if (!var.active_on_subdomain(elem->subdomain_id()))
             continue;
-          FEType fe_type = var.type();
+          const FEType fe_type = var.type();
 
           // If we're trying to do projections on an isogeometric
           // analysis mesh, only the finite element nodes constrained
@@ -1733,13 +1744,12 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
 
           if (copy_this_elem)
             {
+              std::vector<dof_id_type> node_dof_ids;
+              std::vector<typename FFunctor::ValuePushType> values;
+
               for (auto var : remaining_vars)
                 {
-                  std::vector<dof_id_type> node_dof_ids;
-                  std::vector<typename FFunctor::ValuePushType> values;
-
                   f.eval_old_dofs(*elem, v, var, node_dof_ids, values);
-
                   insert_ids(node_dof_ids, values, node->processor_id());
                 }
               copied_nodes[node].first.insert(remaining_vars.begin(),
@@ -1780,15 +1790,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
 
               if (copy_this_elem)
                 {
+                  std::vector<dof_id_type> edge_dof_ids;
+                  std::vector<typename FFunctor::ValuePushType> values;
+
                   for (auto var : remaining_vars)
                     {
-                      std::vector<dof_id_type> edge_dof_ids;
-                      std::vector<typename FFunctor::ValuePushType> values;
-
                       f.eval_old_dofs(*elem, n_vertices+e, var, edge_dof_ids, values);
-
                       insert_ids(edge_dof_ids, values, node->processor_id());
                     }
+
                   copied_nodes[node].second.insert(remaining_vars.begin(),
                                                    remaining_vars.end());
                   this->find_dofs_to_send(*node, *elem, n_vertices+e, remaining_vars);
@@ -1850,15 +1860,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
 
               if (copy_this_elem)
                 {
+                  std::vector<dof_id_type> side_dof_ids;
+                  std::vector<typename FFunctor::ValuePushType> values;
+
                   for (auto var : remaining_vars)
                     {
-                      std::vector<dof_id_type> side_dof_ids;
-                      std::vector<typename FFunctor::ValuePushType> values;
-
                       f.eval_old_dofs(*elem, node_num, var, side_dof_ids, values);
-
                       insert_ids(side_dof_ids, values, node->processor_id());
                     }
+
                   copied_nodes[node].second.insert(remaining_vars.begin(),
                                                    remaining_vars.end());
                   this->find_dofs_to_send(*node, *elem, node_num, remaining_vars);
@@ -1872,6 +1882,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
       // Elements with elemental dofs might need those copied too.
       if (copy_this_elem)
         {
+          std::vector<typename FFunctor::ValuePushType> U;
+          std::vector<dof_id_type> dof_ids;
+
           for (auto v_num : this->projector.variables)
             {
               const Variable & var = system.variable(v_num);
@@ -1879,19 +1892,14 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
                 continue;
               FEType fe_type = var.type();
 
-              std::vector<typename FFunctor::ValuePushType> Ue;
-              std::vector<dof_id_type> elem_dof_ids;
               f.eval_old_dofs(*elem, fe_type, sys_num, v_num,
-                              elem_dof_ids, Ue);
-              action.insert(elem_dof_ids, Ue);
+                              dof_ids, U);
+              action.insert(dof_ids, U);
 
               if (has_interior_nodes)
                 {
-                  std::vector<typename FFunctor::ValuePushType> Un;
-                  std::vector<dof_id_type> node_dof_ids;
-
-                  f.eval_old_dofs(*elem, n_nodes-1, v_num, node_dof_ids, Un);
-                  action.insert(node_dof_ids, Un);
+                  f.eval_old_dofs(*elem, n_nodes-1, v_num, dof_ids, U);
+                  action.insert(dof_ids, U);
                 }
             }
         }
