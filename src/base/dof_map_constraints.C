@@ -632,14 +632,17 @@ private:
 
     // If our supplied functions require a FEMContext, and if we have
     // an initialized solution to use with that FEMContext, then
-    // create one
+    // create one.  We're not going to use elem_jacobian or
+    // subjacobians here so don't allocate them.
     std::unique_ptr<FEMContext> context;
     if (f_fem)
       {
         libmesh_assert(f_system);
         if (f_system->current_local_solution->initialized())
           {
-            context = std::make_unique<FEMContext>(*f_system);
+            context = std::make_unique<FEMContext>
+              (*f_system, nullptr,
+               /* allocate local_matrices = */ false);
             f_fem->init_context(*context);
           }
       }
@@ -812,14 +815,17 @@ private:
 
     // If our supplied functions require a FEMContext, and if we have
     // an initialized solution to use with that FEMContext, then
-    // create one
+    // create one.  We're not going to use elem_jacobian or
+    // subjacobians here so don't allocate them.
     std::unique_ptr<FEMContext> context;
     if (f_fem)
       {
         libmesh_assert(f_system);
         if (f_system->current_local_solution->initialized())
           {
-            context = std::make_unique<FEMContext>(*f_system);
+            context = std::make_unique<FEMContext>
+              (*f_system, nullptr,
+               /* allocate local_matrices = */ false);
             f_fem->init_context(*context);
             if (g_fem)
               g_fem->init_context(*context);
@@ -1610,7 +1616,10 @@ public:
     // Construct a FEMContext object for the System on which the
     // Variables in our DirichletBoundary objects are defined. This
     // will be used in the apply_dirichlet_impl() function.
-    auto fem_context = std::make_unique<FEMContext>(*system);
+    // We're not going to use elem_jacobian or subjacobians here so
+    // don't allocate them.
+    auto fem_context = std::make_unique<FEMContext>
+      (*system, nullptr, /* allocate local_matrices = */ false);
 
     // At the time we are using this FEMContext, the current_local_solution
     // vector is not initialized, but also we don't need it, so set
