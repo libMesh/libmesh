@@ -1460,6 +1460,8 @@ template <typename FFunctor, typename GFunctor,
 void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy::operator()
   (const ConstElemRange & range)
 {
+  LOG_SCOPE ("SortAndCopy::operator()","GenericProjector");
+
   // Look at all the elements in the range.  Directly copy values from
   // unchanged elements.  For other elements, determine sets of
   // vertices, edge nodes, and side nodes to project.
@@ -2865,6 +2867,8 @@ GenericProjector<FFunctor, GFunctor, FValue,
   (std::unordered_map<dof_id_type, std::pair<Value, processor_id_type>> & ids_to_push,
    ProjectionAction & action) const
 {
+  LOG_SCOPE ("send_and_insert_dof_values", "GenericProjector");
+
   // See if we calculated any ids that need to be pushed; get them
   // ready to push.
   std::unordered_map<processor_id_type, std::vector<dof_id_type>>
