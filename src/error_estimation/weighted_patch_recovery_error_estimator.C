@@ -578,8 +578,10 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           // seminorm, otherwise just compute it for the current element
 
           // Get an FEMContext for this system, this will help us in
-          // obtaining the weights from the user code
-          FEMContext femcontext(system);
+          // obtaining the weights from the user code.
+          // We don't use full elem_jacobian or subjacobians here.
+          FEMContext femcontext(system, nullptr,
+                                /* allocate_local_matrices = */ false);
           error_estimator.weight_functions[var]->init_context(femcontext);
 
           // Loop over every element in the patch
