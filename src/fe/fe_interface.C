@@ -789,11 +789,12 @@ void FEInterface::dofs_on_side(const Elem * const elem,
                                const unsigned int dim,
                                const FEType & fe_t,
                                unsigned int s,
-                               std::vector<unsigned int> & di)
+                               std::vector<unsigned int> & di,
+                               const bool add_p_level)
 {
   const Order o = fe_t.order;
 
-  void_fe_with_vec_switch(dofs_on_side(elem, o, s, di));
+  void_fe_with_vec_switch(dofs_on_side(elem, o, s, di, add_p_level));
 }
 
 
@@ -802,11 +803,12 @@ void FEInterface::dofs_on_edge(const Elem * const elem,
                                const unsigned int dim,
                                const FEType & fe_t,
                                unsigned int e,
-                               std::vector<unsigned int> & di)
+                               std::vector<unsigned int> & di,
+                               const bool add_p_level)
 {
   const Order o = fe_t.order;
 
-  void_fe_with_vec_switch(dofs_on_edge(elem, o, e, di));
+  void_fe_with_vec_switch(dofs_on_edge(elem, o, e, di, add_p_level));
 }
 
 

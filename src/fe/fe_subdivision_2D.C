@@ -967,8 +967,8 @@ template <> unsigned int FE<2,SUBDIVISION>::n_dofs_at_node(const ElemType, const
 template <> unsigned int FE<2,SUBDIVISION>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 
 // Subdivision FEMs have dofs only at the nodes
-template <> void FE<2,SUBDIVISION>::dofs_on_side(const Elem * const, const Order, unsigned int, std::vector<unsigned int> & di) { di.resize(0); }
-template <> void FE<2,SUBDIVISION>::dofs_on_edge(const Elem * const, const Order, unsigned int, std::vector<unsigned int> & di) { di.resize(0); }
+template <> void FE<2,SUBDIVISION>::dofs_on_side(const Elem * const, const Order, unsigned int, std::vector<unsigned int> & di, bool) { di.resize(0); }
+template <> void FE<2,SUBDIVISION>::dofs_on_edge(const Elem * const, const Order, unsigned int, std::vector<unsigned int> & di, bool) { di.resize(0); }
 
 // Subdivision FEMs are C^1 continuous
 template <> FEContinuity FE<2,SUBDIVISION>::get_continuity() const { return C_ONE; }

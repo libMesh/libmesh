@@ -249,7 +249,8 @@ public:
                            const unsigned int dim,
                            const FEType & fe_t,
                            unsigned int s,
-                           std::vector<unsigned int> & di);
+                           std::vector<unsigned int> & di,
+                           bool add_p_level=true);
 
   /**
    * Fills the vector di with the local degree of freedom indices
@@ -265,7 +266,8 @@ public:
                            const unsigned int dim,
                            const FEType & fe_t,
                            unsigned int e,
-                           std::vector<unsigned int> & di);
+                           std::vector<unsigned int> & di,
+                           bool add_p_level=true);
 
   /**
    * Build the nodal soln from the element soln.
