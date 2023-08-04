@@ -1605,6 +1605,16 @@ public:
   std::unique_ptr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh,
                                                          bool calculate_constrained = false) const;
 
+  /**
+   * Directs this object to not p-refine variables with the given \p fe_family
+   */
+  void dont_p_refine(FEFamily fe_family);
+
+  /**
+   * Whether the given finite element family should be p-refined
+   */
+  bool should_p_refine(FEFamily fe_family) const;
+
 private:
 
   /**
@@ -1984,6 +1994,10 @@ private:
    */
   std::vector<dof_id_type> _first_old_scalar_df;
 
+  /**
+   * A container of finite element families that we should not p-refine
+   */
+  std::unordered_set<FEFamily> _dont_p_refine;
 #endif
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
@@ -2276,6 +2290,28 @@ bool DofMap::constrained_sparsity_construction()
   return _constrained_sparsity_construction;
 #else
   return true;
+#endif
+}
+
+
+inline
+void DofMap::dont_p_refine(const FEFamily fe_family)
+{
+#ifdef LIBMESH_ENABLE_AMR
+  _dont_p_refine.insert(fe_family);
+#else
+  libmesh_ignore(fe_family);
+#endif
+}
+
+inline
+bool DofMap::should_p_refine(const FEFamily fe_family) const
+{
+#ifdef LIBMESH_ENABLE_AMR
+  return !_dont_p_refine.count(fe_family);
+#else
+  libmesh_ignore(fe_family);
+  return false;
 #endif
 }
 

@@ -674,7 +674,8 @@ FEInterface::n_dofs_at_node_function(const FEType & fe_t,
 unsigned int
 FEInterface::n_dofs_at_node(const FEType & fe_t,
                             const Elem * elem,
-                            const unsigned int n)
+                            const unsigned int n,
+                            const bool add_p_level)
 {
   // dim is required by the fe_with_vec_switch macro
   auto dim = elem->dim();
@@ -687,7 +688,7 @@ FEInterface::n_dofs_at_node(const FEType & fe_t,
 #endif
 
   // Account for Elem::p_level() when computing total_order
-  auto total_order = static_cast<Order>(fe_t.order + elem->p_level());
+  auto total_order = static_cast<Order>(fe_t.order + add_p_level*elem->p_level());
 
   fe_with_vec_switch(n_dofs_at_node(elem->type(), total_order, n));
 }
