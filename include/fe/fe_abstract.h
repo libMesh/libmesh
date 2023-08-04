@@ -710,6 +710,17 @@ protected:
   ElemType elem_type;
 
   /**
+   * The element p-refinement level the current data structures are
+   * set up for. Note that this is different from \p _p_level which
+   * is the p-refinement level this finite elment object is operating
+   * at, e.g. how many dofs per elem, etc. On the other hand, this data
+   * member can indicate things like the order of the quadrature rule.
+   * We will use this primarily to determine whether cached data is still
+   * valid
+   */
+  unsigned int _elem_p_level;
+
+  /**
    * The p refinement level the current data structures are
    * set up for.
    */

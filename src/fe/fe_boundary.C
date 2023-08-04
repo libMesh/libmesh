@@ -171,12 +171,13 @@ void FE<Dim,T>::reinit(const Elem * elem,
       // We might not need to reinitialize the shape functions
       if ((this->get_type() != elem->type())    ||
           (side->type() != last_side)           ||
-          (this->get_p_level() != side_p_level) ||
+          (this->_elem_p_level != side_p_level) ||
           this->shapes_need_reinit()            ||
           !this->shapes_on_quadrature)
         {
           // Set the element type and p_level
           this->elem_type = elem->type();
+          this->_elem_p_level = side_p_level;
 
           // Set the last_side
           last_side = side->type();
@@ -339,11 +340,12 @@ void FE<Dim,T>::side_map (const Elem * elem,
     side_p_level = std::max(side_p_level, elem->neighbor_ptr(s)->p_level());
 
   if (side->type() != last_side ||
-      side_p_level != this->_p_level ||
+      side_p_level != this->_elem_p_level ||
       !this->shapes_on_quadrature)
     {
       // Set the element type
       this->elem_type = elem->type();
+      this->_elem_p_level = side_p_level;
       this->_p_level = this->_add_p_level_in_reinit * side_p_level;
 
       // Set the last_side
@@ -387,11 +389,12 @@ void FE<Dim,T>::edge_map (const Elem * elem,
   unsigned int edge_p_level = elem->p_level();
 
   if (edge->type() != last_edge ||
-      edge_p_level != this->_p_level ||
+      edge_p_level != this->_elem_p_level ||
       !this->shapes_on_quadrature)
     {
       // Set the element type
       this->elem_type = elem->type();
+      this->_elem_p_level = edge_p_level;
       this->_p_level = this->_add_p_level_in_reinit * edge_p_level;
 
       // Set the last_edge

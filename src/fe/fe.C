@@ -161,6 +161,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
         {
           // Set the type and p level for this element
           this->elem_type = elem->type();
+          this->_elem_p_level = elem->p_level();
           this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
 
           // Initialize the shape functions
@@ -188,11 +189,12 @@ void FE<Dim,T>::reinit(const Elem * elem,
             this->shapes_on_quadrature = false;
 
           if (this->elem_type != elem->type() ||
-              this->_p_level != elem->p_level() ||
+              this->_elem_p_level != elem->p_level() ||
               !this->shapes_on_quadrature)
             {
               // Set the type and p level for this element
               this->elem_type = elem->type();
+              this->_elem_p_level = elem->p_level();
               this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
               // Initialize the shape functions
               this->_fe_map->template init_reference_to_physical_map<Dim>
@@ -244,6 +246,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
        // (SCALAR) variables and zero points for local variables.
     {
       this->elem_type = INVALID_ELEM;
+      this->_elem_p_level = 0;
       this->_p_level = 0;
 
       if (!pts)
@@ -321,6 +324,7 @@ void FE<Dim,T>::reinit_dual_shape_coeffs(const Elem * elem,
 {
   // Set the type and p level for this element
   this->elem_type = elem->type();
+  this->_elem_p_level = elem->p_level();
   this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
 
   const unsigned int n_shapes =
