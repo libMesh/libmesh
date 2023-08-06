@@ -1,6 +1,7 @@
 #include "libmesh/shell_matrix.h"
 #include "libmesh/enum_solver_type.h"
 #include "libmesh/sparse_shell_matrix.h"
+#include "libmesh/solver_configuration.h"
 #ifdef LIBMESH_HAVE_PETSC
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/petsc_vector.h"
@@ -37,10 +38,8 @@ public:
     // Depending on the config: Use different vector-types here!
     PetscLinearSolver<Number> linear_solver(*_comm);
     linear_solver.init();
-    auto ierr = KSPSetType (linear_solver.ksp(), const_cast<KSPType>(KSPGMRES));
-    CHKERRABORT(linear_solver.comm().get(), ierr);
-    ierr = PCSetType (linear_solver.pc(), const_cast<PCType>(PCNONE));
-    CHKERRABORT(linear_solver.comm().get(), ierr);
+    NoPcSolverConfiguration solver_conf(linear_solver);
+    linear_solver.set_solver_configuration(solver_conf);
     KSPSetInitialGuessNonzero(linear_solver.ksp(), PETSC_TRUE);
 
     unsigned int maxits=20;
@@ -68,10 +67,8 @@ public:
     // Depending on the config: Use different vector-types here!
     PetscLinearSolver<Number> linear_solver(*_comm);
     linear_solver.init();
-    auto ierr = KSPSetType (linear_solver.ksp(), const_cast<KSPType>(KSPGMRES));
-    CHKERRABORT(linear_solver.comm().get(), ierr);
-    ierr = PCSetType (linear_solver.pc(), const_cast<PCType>(PCNONE));
-    CHKERRABORT(linear_solver.comm().get(), ierr);
+    NoPcSolverConfiguration solver_conf(linear_solver);
+    linear_solver.set_solver_configuration(solver_conf);
     KSPSetInitialGuessNonzero(linear_solver.ksp(), PETSC_TRUE);
 
     PetscMatrix<Number> petsc_mat(*_comm);
@@ -99,11 +96,13 @@ public:
     // a) set an irrelevant element to '0':
     solution->set(7,2.);
     petsc_mat.set(2,2,0.);
+    petsc_mat.close();
     auto rval = linear_solver.solve(mat, *solution, rhs, tol, maxits);
     // In this case, we can solve the equation.
     CPPUNIT_ASSERT_EQUAL(rval.second, 0.00);
     // b) set the relevant element to '0':
     petsc_mat.set(5,5,0.);
+    petsc_mat.close();
     rval = linear_solver.solve(mat, *solution, rhs, tol, maxits);
     // In this case, we can not solve the equation.
     //   The best solution is the 0-vector and we have an error of 2.0
@@ -119,6 +118,33 @@ private:
     for (libMesh::numeric_index_type n=0; n < M.m(); ++n)
       M.set(n,n,1.);
   }
+
+
+  class NoPcSolverConfiguration : public libMesh::SolverConfiguration
+  {
+  public:
+
+    NoPcSolverConfiguration(libMesh::PetscLinearSolver<libMesh::Number> & petsc_linear_solver) :
+      _petsc_linear_solver(petsc_linear_solver)
+    {
+    }
+
+    // Shell-matrices are implemented only for few solvers/preconditioners.
+    // The SolverConfiguration overrides input-arguments, so here we force GMRES without precond.
+    virtual void configure_solver()
+    {
+      PetscErrorCode ierr = 0;
+      ierr = KSPSetType (_petsc_linear_solver.ksp(), const_cast<KSPType>(KSPGMRES));
+      CHKERRABORT(_petsc_linear_solver.comm().get(), ierr);
+      ierr = PCSetType (_petsc_linear_solver.pc(), const_cast<PCType>(PCNONE));
+      CHKERRABORT(_petsc_linear_solver.comm().get(), ierr);
+    }
+
+    // The linear solver object that we are configuring
+    libMesh::PetscLinearSolver<libMesh::Number> & _petsc_linear_solver;
+
+  };
+
 
   class UnityShellMat : public libMesh::ShellMatrix<libMesh::Number>
   {
