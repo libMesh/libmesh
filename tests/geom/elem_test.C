@@ -2,6 +2,7 @@
 
 #include <libmesh/boundary_info.h>
 #include <libmesh/elem.h>
+#include <libmesh/enum_elem_quality.h>
 #include <libmesh/enum_elem_type.h>
 #include <libmesh/elem_side_builder.h>
 #include <libmesh/mesh.h>
@@ -173,6 +174,28 @@ public:
             CPPUNIT_ASSERT(!bbox.contains_point(wide_bbox.min()));
             CPPUNIT_ASSERT(!bbox.contains_point(wide_bbox.max()));
           }
+      }
+  }
+
+  void test_quality()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : _mesh->active_local_element_ptr_range())
+      {
+        // We only have one metric defined on all elements
+        const Real q = elem->quality(ASPECT_RATIO);
+
+        // We use "0" to mean infinity rather than inf or NaN, and
+        // every quality other than that should be 1 or larger (worse)
+        CPPUNIT_ASSERT_LESSEQUAL(q, Real(1)); // 1 <= q
+
+        // We're building isotropic meshes, where even elements
+        // dissected from cubes ought to have tolerable quality.
+        //
+        // Worst I see is 2 on tets, but let's add a little tolerance
+        // in case we decide to play with rotated meshes here later
+        CPPUNIT_ASSERT_LESSEQUAL(Real(2+TOLERANCE), q); // q <= 2
       }
   }
 
@@ -532,6 +555,7 @@ public:
 
 #define ELEMTEST                                \
   CPPUNIT_TEST( test_bounding_box );            \
+  CPPUNIT_TEST( test_quality );                 \
   CPPUNIT_TEST( test_maps );                    \
   CPPUNIT_TEST( test_permute );                 \
   CPPUNIT_TEST( test_flip );                    \
