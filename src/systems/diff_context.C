@@ -29,13 +29,15 @@ namespace libMesh
 
 
 
-DiffContext::DiffContext (const System & sys) :
+DiffContext::DiffContext (const System & sys,
+                          bool allocate_local_matrices) :
   time(sys.time),
   system_time(sys.time),
   elem_solution_derivative(1.),
   elem_solution_rate_derivative(1.),
   elem_solution_accel_derivative(1.),
   fixed_solution_derivative(0.),
+  _have_local_matrices(allocate_local_matrices),
   _dof_indices_var(sys.n_vars()),
   _deltat(nullptr),
   _system(sys),
@@ -46,14 +48,16 @@ DiffContext::DiffContext (const System & sys) :
 
   _elem_subsolutions.reserve(nv);
   _elem_subresiduals.reserve(nv);
-  _elem_subjacobians.resize(nv);
   _elem_subsolution_rates.reserve(nv);
   _elem_subsolution_accels.reserve(nv);
+
   if (sys.use_fixed_solution)
     _elem_fixed_subsolutions.reserve(nv);
 
-  // If the user resizes sys.qoi, it will invalidate us
+  if (allocate_local_matrices)
+    _elem_subjacobians.resize(nv);
 
+  // If the user resizes sys.qoi, it will invalidate us
   std::size_t n_qoi = sys.n_qois();
   _elem_qoi.resize(n_qoi);
   _elem_qoi_derivative.resize(n_qoi);
@@ -67,7 +71,8 @@ DiffContext::DiffContext (const System & sys) :
       _elem_subresiduals.emplace_back(_elem_residual);
       for (std::size_t q=0; q != n_qoi; ++q)
         _elem_qoi_subderivatives[q].emplace_back(_elem_qoi_derivative[q]);
-      _elem_subjacobians[i].reserve(nv);
+      if (allocate_local_matrices)
+        _elem_subjacobians[i].reserve(nv);
 
       // Only make space for these if we're using DiffSystem
       // This is assuming *only* DiffSystem is using elem_solution_rate/accel
@@ -90,8 +95,9 @@ DiffContext::DiffContext (const System & sys) :
       if (sys.use_fixed_solution)
         _elem_fixed_subsolutions.emplace_back(_elem_fixed_solution);
 
-      for (unsigned int j=0; j != nv; ++j)
-        _elem_subjacobians[i].emplace_back(_elem_jacobian);
+      if (allocate_local_matrices)
+        for (unsigned int j=0; j != nv; ++j)
+          _elem_subjacobians[i].emplace_back(_elem_jacobian);
     }
 }
 

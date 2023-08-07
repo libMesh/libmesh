@@ -61,7 +61,8 @@ public:
    * data structures.
    */
   explicit
-  DiffContext (const System &);
+  DiffContext (const System &,
+               bool allocate_local_matrices = true);
 
   /**
    * Destructor.
@@ -271,13 +272,19 @@ public:
    * Const accessor for element Jacobian.
    */
   const DenseMatrix<Number> & get_elem_jacobian() const
-  { return _elem_jacobian; }
+  {
+    libmesh_assert(_have_local_matrices);
+    return _elem_jacobian;
+  }
 
   /**
    * Non-const accessor for element Jacobian.
    */
   DenseMatrix<Number> & get_elem_jacobian()
-  { return _elem_jacobian; }
+  {
+    libmesh_assert(_have_local_matrices);
+    return _elem_jacobian;
+  }
 
   /**
    * Const accessor for element Jacobian of particular variables corresponding
@@ -285,6 +292,7 @@ public:
    */
   const DenseSubMatrix<Number> & get_elem_jacobian( unsigned int var1, unsigned int var2 ) const
   {
+    libmesh_assert(_have_local_matrices);
     libmesh_assert_greater(_elem_subjacobians.size(), var1);
     libmesh_assert_greater(_elem_subjacobians[var1].size(), var2);
     return _elem_subjacobians[var1][var2];
@@ -292,10 +300,12 @@ public:
 
   /**
    * Non-const accessor for element Jacobian of particular variables corresponding
-   * to the variable index arguments.
+   * to the variable index arguments.  Only available if \p
+   * _have_local_matrices
    */
   DenseSubMatrix<Number> & get_elem_jacobian( unsigned int var1, unsigned int var2 )
   {
+    libmesh_assert(_have_local_matrices);
     libmesh_assert_greater(_elem_subjacobians.size(), var1);
     libmesh_assert_greater(_elem_subjacobians[var1].size(), var2);
     return _elem_subjacobians[var1][var2];
@@ -561,6 +571,11 @@ protected:
   std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>>>> _localized_vectors;
 
   /**
+   * Whether we have local matrices allocated/initialized
+   */
+  const bool _have_local_matrices;
+
+  /**
    * Element by element components of nonlinear_solution
    * as adjusted by a time_solver
    */
@@ -596,7 +611,7 @@ protected:
 
   /**
    * Element jacobian: derivatives of elem_residual with respect to
-   * elem_solution
+   * elem_solution.  Only initialized if \p _have_local_matrices
    */
   DenseMatrix<Number> _elem_jacobian;
 
@@ -612,7 +627,8 @@ protected:
   std::vector<std::vector<DenseSubVector<Number>>> _elem_qoi_subderivatives;
 
   /**
-   * Element residual subvectors and Jacobian submatrices
+   * Element residual subvectors and (if \p _have_local_matrices)
+   * Jacobian submatrices
    */
   std::vector<DenseSubVector<Number>> _elem_subresiduals;
   std::vector<std::vector<DenseSubMatrix<Number>>> _elem_subjacobians;

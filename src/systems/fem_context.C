@@ -37,16 +37,19 @@ namespace libMesh
 {
 
 FEMContext::FEMContext (const System & sys,
-                        const std::vector<unsigned int> * active_vars)
-  : FEMContext(sys, sys.extra_quadrature_order, active_vars)
+                        const std::vector<unsigned int> * active_vars,
+                        bool allocate_local_matrices)
+  : FEMContext(sys, sys.extra_quadrature_order, active_vars,
+               allocate_local_matrices)
 {
   init_internal_data(sys);
 }
 
 FEMContext::FEMContext (const System & sys,
                         int extra_quadrature_order,
-                        const std::vector<unsigned int> * active_vars)
-  : DiffContext(sys),
+                        const std::vector<unsigned int> * active_vars,
+                        bool allocate_local_matrices)
+  : DiffContext(sys, allocate_local_matrices),
     side(0), edge(0),
     _mesh_sys(nullptr),
     _mesh_x_var(0),
@@ -1727,7 +1730,8 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
         {
           // These resize calls also zero out the residual and jacobian
           this->get_elem_residual().resize(n_dofs);
-          this->get_elem_jacobian().resize(n_dofs, n_dofs);
+          if (this->_have_local_matrices)
+            this->get_elem_jacobian().resize(n_dofs, n_dofs);
 
           this->get_qoi_derivatives().resize(n_qoi);
           this->_elem_qoi_subderivatives.resize(n_qoi);
@@ -1812,23 +1816,26 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
                       this->get_qoi_derivatives(q,i).reposition
                         (sub_dofs, n_dofs_var);
 
-                    for (unsigned int j=0; j != i; ++j)
+                    if (this->_have_local_matrices)
                       {
-                        const unsigned int n_dofs_var_j =
-                          cast_int<unsigned int>
-                          (this->get_dof_indices(j).size());
+                        for (unsigned int j=0; j != i; ++j)
+                          {
+                            const unsigned int n_dofs_var_j =
+                              cast_int<unsigned int>
+                              (this->get_dof_indices(j).size());
 
-                        this->get_elem_jacobian(i,j).reposition
-                          (sub_dofs, this->get_elem_residual(j).i_off(),
-                           n_dofs_var, n_dofs_var_j);
-                        this->get_elem_jacobian(j,i).reposition
-                          (this->get_elem_residual(j).i_off(), sub_dofs,
-                           n_dofs_var_j, n_dofs_var);
+                            this->get_elem_jacobian(i,j).reposition
+                              (sub_dofs, this->get_elem_residual(j).i_off(),
+                               n_dofs_var, n_dofs_var_j);
+                            this->get_elem_jacobian(j,i).reposition
+                              (this->get_elem_residual(j).i_off(), sub_dofs,
+                               n_dofs_var_j, n_dofs_var);
+                          }
+                        this->get_elem_jacobian(i,i).reposition
+                          (sub_dofs, sub_dofs,
+                           n_dofs_var,
+                           n_dofs_var);
                       }
-                    this->get_elem_jacobian(i,i).reposition
-                      (sub_dofs, sub_dofs,
-                       n_dofs_var,
-                       n_dofs_var);
                   }
               }
 

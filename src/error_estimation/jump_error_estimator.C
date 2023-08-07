@@ -142,8 +142,11 @@ void JumpErrorEstimator::estimate_error (const System & system,
       sys.update();
     }
 
-  fine_context = std::make_unique<FEMContext>(system);
-  coarse_context = std::make_unique<FEMContext>(system);
+  // We don't use full elem_jacobian or subjacobians here.
+  fine_context = std::make_unique<FEMContext>
+    (system, nullptr, /* allocate_local_matrices = */ false);
+  coarse_context = std::make_unique<FEMContext>
+    (system, nullptr, /* allocate_local_matrices = */ false);
 
   // Don't overintegrate - we're evaluating differences of FE values,
   // not products of them.
