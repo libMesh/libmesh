@@ -183,9 +183,9 @@ InfQuad::is_flipped() const
 }
 
 
-Real InfQuad::quality (const ElemQuality) const
+Real InfQuad::quality (const ElemQuality q) const
 {
-  return 0.; // Not implemented
+  return Elem::quality(q); // Not implemented
 }
 
 
