@@ -649,7 +649,10 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
                    << ", POD error norm: " << rel_err << std::endl;
 
       if (exit_on_next_iteration)
+      {
         libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
+        break;
+      }
 
       bool exit_condition_satisfied = false;
       if (rel_err < get_rel_training_tolerance())

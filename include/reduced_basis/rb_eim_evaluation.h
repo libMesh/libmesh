@@ -543,6 +543,12 @@ public:
 
   /**
    * Virtual function to indicate if we use the EIM error indicator in this case.
+   * This indicates if we will generate the data during the Offline training for
+   * the EIM error indicator. In EIM solves, the error indicator will only
+   * be used if set_eim_error_indicator_active() is set to true, since we want
+   * to be able to enable or disable the error indicator depending on the type
+   * of solve we are doing (e.g. EIM solves during training do not need the
+   * error indicator).
    */
   virtual bool use_eim_error_indicator() const;
 

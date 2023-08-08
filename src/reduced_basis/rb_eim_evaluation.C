@@ -160,9 +160,6 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   if (get_parametrized_function().is_lookup_table)
     {
       _rb_eim_solutions.resize(mus.size());
-      if (_is_eim_error_indicator_active)
-        _rb_eim_error_indicators.resize(mus.size());
-
       for (auto mu_index : index_range(mus))
         {
           Real lookup_table_param =
@@ -176,21 +173,6 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
           DenseVector<Number> values;
           _eim_solutions_for_training_set[lookup_table_index].get_principal_subvector(N, values);
           _rb_eim_solutions[mu_index] = values;
-
-          // If we're using the EIM error indicator, then we use the coefficient of the "last"
-          // EIM basis function as the error indicator (following Maday et al.), and we zero
-          // out this coefficient in _rb_eim_solutions so that we do not include its
-          // contribution in our EIM approximation, since we consider it to be an "extra"
-          // EIM term.
-          if (_is_eim_error_indicator_active && (N > 1) && (N == get_n_basis_functions()))
-            {
-              Number rb_eim_error_indicator_val = _rb_eim_solutions[mu_index](N-1);
-              _rb_eim_solutions[mu_index](N-1) = 0.;
-
-              // Normalize the error indicator based on the norm of the coefficient vector
-              _rb_eim_error_indicators[mu_index] =
-                std::abs(rb_eim_error_indicator_val) / _rb_eim_solutions[mu_index].l2_norm();
-            }
         }
 
       return;
@@ -252,6 +234,10 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
 
   std::vector<std::vector<Number>> evaluated_values_at_interp_points(num_rb_eim_solves);
 
+  // If we're computing the EIM error indicator, then we need to use
+  // one extra EIM interpolation point.
+  unsigned int n_interp_pts_in_solve = _is_eim_error_indicator_active ? N+1 : N;
+
   // In this loop, counter goes from 0 to num_rb_eim_solves.  The
   // purpose of this loop is to strip out the "columns" of the
   // output_all_comps array into rows.
@@ -263,9 +249,12 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
         // Ignore compiler warnings about unused loop index
         libmesh_ignore(step_index);
 
-        evaluated_values_at_interp_points[counter].resize(N); // N is number of RB basis functions
+        evaluated_values_at_interp_points[counter].resize(n_interp_pts_in_solve);
 
-        for (unsigned int interp_pt_index=0; interp_pt_index<N; interp_pt_index++)
+        libmesh_error_msg_if(n_interp_pts_in_solve >= _interpolation_points_comp.size(),
+          "Invalid number of interpolation points");
+
+        for (unsigned int interp_pt_index=0; interp_pt_index<n_interp_pts_in_solve; interp_pt_index++)
           {
             unsigned int comp = _interpolation_points_comp[interp_pt_index];
 
@@ -286,7 +275,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   }
 
   DenseMatrix<Number> interpolation_matrix_N;
-  _interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
+  _interpolation_matrix.get_principal_submatrix(n_interp_pts_in_solve, interpolation_matrix_N);
 
   // The number of RB EIM solutions is equal to the size of the
   // "evaluated_values_at_interp_points" vector which we determined
@@ -307,18 +296,24 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
         interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[counter]);
 
         // If we're using the EIM error indicator, then we use the coefficient of the "last"
-        // EIM basis function as the error indicator (following Maday et al.), and we zero
-        // out this coefficient in _rb_eim_solutions so that we do not include its
-        // contribution in our EIM approximation, since we consider it to be an "extra"
-        // EIM term.
-        if (_is_eim_error_indicator_active && (N > 1) && (N == get_n_basis_functions()))
+        // EIM basis function as the error indicator. This is equivalent to the error
+        // indicator proposed in Proposition 3.3 of "An empirical interpolation method:
+        // application to efficient reduced-basis discretization of partial differential
+        // equations", Barrault et al.
+        //
+        // The one difference here compared to Barrault et al. is that we use a relative
+        // error indicator based on normalizing relative to the max norm of the solution
+        // vector (excluding the "last" entry). In Barrault et al. they use an absolute
+        // error indicator, but we prefer not to follow that here since it can be harder
+        // to set a target tolerance when using an absolute error indicator.
+        if (_is_eim_error_indicator_active)
           {
-            Number rb_eim_error_indicator_val = _rb_eim_solutions[counter](N-1);
-            _rb_eim_solutions[counter](N-1) = 0.;
+            Number rb_eim_error_indicator_val = _rb_eim_solutions[counter](N);
+            _rb_eim_solutions[counter](N) = 0.;
 
             // Normalize the error indicator based on the norm of the coefficient vector
             _rb_eim_error_indicators[counter] =
-              std::abs(rb_eim_error_indicator_val) / _rb_eim_solutions[counter].l2_norm();
+              std::abs(rb_eim_error_indicator_val) / _rb_eim_solutions[counter].linfty_norm();
           }
 
         counter++;
