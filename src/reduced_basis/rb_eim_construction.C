@@ -473,7 +473,11 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
       libMesh::out << "Maximum EIM error is " << greedy_error << std::endl << std::endl;
 
       if (exit_on_next_iteration)
-        libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
+        {
+          libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
+          get_rb_eim_evaluation().set_eim_error_indicator_active(false);
+          break;
+        }
 
       // Convergence and/or termination tests
       {
@@ -531,6 +535,11 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
             if (get_rb_eim_evaluation().use_eim_error_indicator())
               {
                 exit_on_next_iteration = true;
+
+                // We set eim_error_indicator_active to true so that we skip
+                // adding the basis function for the "final" interpolation point,
+                // since we only need the interpolation point data in that case.
+                get_rb_eim_evaluation().set_eim_error_indicator_active(true);
                 libMesh::out << "EIM error indicator is active, hence we will run one extra EIM iteration before exiting"
                              << std::endl;
               }
@@ -649,10 +658,11 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
                    << ", POD error norm: " << rel_err << std::endl;
 
       if (exit_on_next_iteration)
-      {
-        libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
-        break;
-      }
+        {
+          libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
+          get_rb_eim_evaluation().set_eim_error_indicator_active(false);
+          break;
+        }
 
       bool exit_condition_satisfied = false;
       if (rel_err < get_rel_training_tolerance())
@@ -670,6 +680,11 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           if (get_rb_eim_evaluation().use_eim_error_indicator())
             {
               exit_on_next_iteration = true;
+
+              // We set eim_error_indicator_active to true so that we skip
+              // adding the basis function for the "final" interpolation point,
+              // since we only need the interpolation point data in that case.
+              get_rb_eim_evaluation().set_eim_error_indicator_active(true);
               libMesh::out << "EIM error indicator is active, hence we will run one extra EIM iteration before exiting"
                             << std::endl;
             }
@@ -2380,13 +2395,13 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
   // Add local_pf as the new basis function and store data
   // associated with the interpolation point.
   eim_eval.add_basis_function_and_interpolation_data(local_pf,
-                                                    optimal_point,
-                                                    optimal_comp,
-                                                    optimal_elem_id,
-                                                    optimal_subdomain_id,
-                                                    optimal_qp,
-                                                    optimal_point_perturbs,
-                                                    optimal_point_phi_i_qp);
+                                                     optimal_point,
+                                                     optimal_comp,
+                                                     optimal_elem_id,
+                                                     optimal_subdomain_id,
+                                                     optimal_qp,
+                                                     optimal_point_perturbs,
+                                                     optimal_point_phi_i_qp);
 
   if (has_obs_vals)
     {

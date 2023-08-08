@@ -936,7 +936,14 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   const std::vector<Point> & perturbs,
   const std::vector<Real> & phi_i_qp)
 {
-  _local_eim_basis_functions.emplace_back(bf);
+  if (!_is_eim_error_indicator_active)
+    {
+      // We use the _is_eim_error_indicator_active to indicate
+      // when we are adding data associated with the error indicator
+      // only, and in that case we should skip adding the basis
+      // function since we only need the interpolation point data.
+      _local_eim_basis_functions.emplace_back(bf);
+    }
 
   _interpolation_points_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
@@ -959,7 +966,14 @@ void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
   const std::vector<Point> & perturbs,
   const std::vector<Real> & phi_i_qp)
 {
-  _local_side_eim_basis_functions.emplace_back(side_bf);
+  if (!_is_eim_error_indicator_active)
+    {
+      // We use the _is_eim_error_indicator_active to indicate
+      // when we are adding data associated with the error indicator
+      // only, and in that case we should skip adding the basis
+      // function since we only need the interpolation point data.
+      _local_side_eim_basis_functions.emplace_back(side_bf);
+    }
 
   _interpolation_points_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
@@ -979,7 +993,14 @@ void RBEIMEvaluation::add_node_basis_function_and_interpolation_data(
   dof_id_type node_id,
   boundary_id_type boundary_id)
 {
-  _local_node_eim_basis_functions.emplace_back(node_bf);
+  if (!_is_eim_error_indicator_active)
+    {
+      // We use the _is_eim_error_indicator_active to indicate
+      // when we are adding data associated with the error indicator
+      // only, and in that case we should skip adding the basis
+      // function since we only need the interpolation point data.
+      _local_node_eim_basis_functions.emplace_back(node_bf);
+    }
 
   _interpolation_points_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
