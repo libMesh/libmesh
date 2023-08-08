@@ -180,7 +180,11 @@ PetscErrorCode DMlibMeshGetBlocks(DM dm, PetscInt * n, char *** blocknames)
   CHKERRQ(ierr);
   if (!islibmesh) LIBMESH_SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM of type %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
   DM_libMesh * dlm = (DM_libMesh *)(dm->data);
+#if PETSC_RELEASE_GREATER_EQUALS(3,20,0)
+  PetscAssertPointer(n,2);
+#else
   PetscValidPointer(n,2);
+#endif
   *n = cast_int<unsigned int>(dlm->blockids->size());
   if (!blocknames) PetscFunctionReturn(0);
   ierr = PetscMalloc(*n*sizeof(char *), blocknames); CHKERRQ(ierr);
@@ -206,7 +210,11 @@ PetscErrorCode DMlibMeshGetVariables(DM dm, PetscInt * n, char *** varnames)
   CHKERRQ(ierr);
   if (!islibmesh) LIBMESH_SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM of type %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
   DM_libMesh * dlm = (DM_libMesh *)(dm->data);
+#if PETSC_RELEASE_GREATER_EQUALS(3,20,0)
+  PetscAssertPointer(n,2);
+#else
   PetscValidPointer(n,2);
+#endif
   *n = cast_int<unsigned int>(dlm->varids->size());
   if (!varnames) PetscFunctionReturn(0);
   ierr = PetscMalloc(*n*sizeof(char *), varnames); CHKERRQ(ierr);
@@ -494,7 +502,11 @@ PetscErrorCode DMlibMeshCreateFieldDecompositionDM(DM dm, PetscInt dnumber, Pets
   CHKERRQ(ierr);
   if (!islibmesh) LIBMESH_SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM of type %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
   if (dnumber < 0) LIBMESH_SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Negative number %" LIBMESH_PETSCINT_FMT " of decomposition parts", dnumber);
+#if PETSC_RELEASE_GREATER_EQUALS(3,20,0)
+  PetscAssertPointer(ddm,5);
+#else
   PetscValidPointer(ddm,5);
+#endif
   DM_libMesh * dlm = (DM_libMesh *)(dm->data);
   ierr = DMCreate(((PetscObject)dm)->comm, ddm); CHKERRQ(ierr);
   ierr = DMSetType(*ddm, DMLIBMESH);             CHKERRQ(ierr);
@@ -547,7 +559,11 @@ PetscErrorCode DMlibMeshCreateDomainDecompositionDM(DM dm, PetscInt dnumber, Pet
   CHKERRQ(ierr);
   if (!islibmesh) LIBMESH_SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM of type %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
   if (dnumber < 0) LIBMESH_SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Negative number %" LIBMESH_PETSCINT_FMT " of decomposition parts", dnumber);
+#if PETSC_RELEASE_GREATER_EQUALS(3,20,0)
+  PetscAssertPointer(ddm,5);
+#else
   PetscValidPointer(ddm,5);
+#endif
   DM_libMesh * dlm = (DM_libMesh *)(dm->data);
   ierr = DMCreate(((PetscObject)dm)->comm, ddm); CHKERRQ(ierr);
   ierr = DMSetType(*ddm, DMLIBMESH);             CHKERRQ(ierr);

@@ -34,21 +34,11 @@
   ((LIBMESH_DETECTED_PETSC_VERSION_MAJOR < (major) ||                   \
     (LIBMESH_DETECTED_PETSC_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_PETSC_VERSION_MINOR < (minor) || \
                                                          (LIBMESH_DETECTED_PETSC_VERSION_MINOR == (minor) && \
-                                                          LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
-
-// The PETSC_VERSION_RELEASE constant was introduced just prior to 2.3.0 (ca. Apr 22 2005),
-// so fall back to using PETSC_VERSION_LESS_THAN in case it doesn't exist.
-#ifdef LIBMESH_DETECTED_PETSC_VERSION_RELEASE
-
-#define PETSC_RELEASE_LESS_THAN(major,minor,subminor)                   \
-  (PETSC_VERSION_LESS_THAN(major,minor,subminor) && LIBMESH_DETECTED_PETSC_VERSION_RELEASE)
-
-#else
-
-#define PETSC_RELEASE_LESS_THAN(major,minor,subminor)   \
-  (PETSC_VERSION_LESS_THAN(major,minor,subminor))
-
-#endif
+                                                          LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR < (subminor))))))
+#define PETSC_VERSION_EQUALS(major,minor,subminor)              \
+  ((LIBMESH_DETECTED_PETSC_VERSION_MAJOR == (major)) &&         \
+   (LIBMESH_DETECTED_PETSC_VERSION_MINOR == (minor)) &&         \
+   (LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR == (subminor)))
 
 // We used to have workarounds for missing extern "C" in old PETSc
 // versions.  We no longer support PETSc versions so old, but we do
@@ -238,8 +228,34 @@ const PetscReal * pPR(const T * ptr)
 #else // LIBMESH_HAVE_PETSC
 
 #define PETSC_VERSION_LESS_THAN(major,minor,subminor) 1
-#define PETSC_RELEASE_LESS_THAN(major,minor,subminor) 1
+#define PETSC_VERSION_EQUALS(major,minor,revision) 0
 
 #endif // LIBMESH_HAVE_PETSC
+
+// The PETSC_VERSION_RELEASE constant was introduced just prior to 2.3.0 (ca. Apr 22 2005),
+// so fall back to using PETSC_VERSION_LESS_THAN in case it doesn't exist.
+#ifdef LIBMESH_DETECTED_PETSC_VERSION_RELEASE
+
+#define PETSC_RELEASE_LESS_THAN(major, minor, subminor) \
+  (PETSC_VERSION_LESS_THAN(major, minor, subminor) && LIBMESH_DETECTED_PETSC_VERSION_RELEASE)
+#define PETSC_RELEASE_EQUALS(major, minor, subminor) \
+  (PETSC_VERSION_EQUALS(major, minor, subminor) && LIBMESH_DETECTED_PETSC_VERSION_RELEASE)
+
+#else
+
+#define PETSC_RELEASE_LESS_THAN(major, minor, subminor) \
+  (PETSC_VERSION_LESS_THAN(major, minor, subminor))
+#define PETSC_RELEASE_EQUALS(major, minor, subminor) (PETSC_VERSION_EQUALS(major, minor, subminor))
+
+#endif
+
+#define PETSC_RELEASE_LESS_EQUALS(major, minor, subminor) \
+  (PETSC_RELEASE_LESS_THAN(major, minor, subminor) || PETSC_RELEASE_EQUALS(major, minor, subminor))
+
+#define PETSC_RELEASE_GREATER_EQUALS(major, minor, subminor) \
+  (0 == PETSC_RELEASE_LESS_THAN(major, minor, subminor))
+
+#define PETSC_RELEASE_GREATER_THAN(major, minor, subminor) \
+  (0 == PETSC_RELEASE_LESS_EQUALS(major, minor, subminor))
 
 #endif // LIBMESH_PETSC_MACRO_H
