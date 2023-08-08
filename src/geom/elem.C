@@ -1581,17 +1581,45 @@ Real Elem::quality (const ElemQuality q) const
 {
   switch (q)
     {
+      // Aspect Ratio: Maximum edge length ratios
+    case ASPECT_RATIO:
+      {
+        if (this->dim() < 2)
+          return 1;
+
+        std::vector<Real> edge_lengths;
+        for (auto e : make_range(this->n_edges()))
+          {
+            const Point p0 = this->point(this->local_edge_node(e,0)),
+                        p1 = this->point(this->local_edge_node(e,1));
+
+            edge_lengths.push_back((p1-p0).norm());
+          }
+
+        const Real max = *std::max_element(edge_lengths.begin(),
+                                           edge_lengths.end()),
+                   min = *std::min_element(edge_lengths.begin(),
+                                           edge_lengths.end());
+
+        if (min == 0.)
+          return 0.;
+        else
+          return max / min;
+      }
       /**
-       * I don't know what to do for this metric.
+       * I don't know what to do for any other metric in general;
+       * subclasses may have specific overrides.
        */
     default:
       {
         libmesh_do_once( libmesh_here();
 
-                         libMesh::err << "ERROR:  unknown quality metric: "
+                         libMesh::err << "ERROR: quality metric "
                          << Utility::enum_to_string(q)
+                         << " not implemented on element type "
+                         << Utility::enum_to_string(this->type())
                          << std::endl
-                         << "Cowardly returning 1."
+                         << "Returning 1."
                          << std::endl; );
 
         return 1.;
