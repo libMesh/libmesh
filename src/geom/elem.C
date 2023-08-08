@@ -1614,10 +1614,12 @@ Real Elem::quality (const ElemQuality q) const
       {
         libmesh_do_once( libmesh_here();
 
-                         libMesh::err << "ERROR:  unknown quality metric: "
+                         libMesh::err << "ERROR: quality metric "
                          << Utility::enum_to_string(q)
+                         << " not implemented on element type "
+                         << Utility::enum_to_string(this->type())
                          << std::endl
-                         << "Cowardly returning 1."
+                         << "Returning 1."
                          << std::endl; );
 
         return 1.;
