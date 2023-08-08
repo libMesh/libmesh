@@ -541,6 +541,18 @@ public:
    */
   virtual bool scale_components_in_enrichment() const;
 
+  /**
+   * Virtual function to indicate if we use the EIM error indicator in this case.
+   */
+  virtual bool use_eim_error_indicator() const;
+
+  /**
+   * Activate/decative the error indicator in EIM solves. We need this option since
+   * in some cases (e.g. during EIM training) we do not want to activate the EIM
+   * error indicator, whereas in "online solves" we do want to activate it.
+   */
+  void set_eim_error_indicator_active(bool is_active);
+
 private:
 
   /**
@@ -592,6 +604,12 @@ private:
    * The EIM solution coefficients from the most recent call to rb_eim_solves().
    */
   std::vector<DenseVector<Number>> _rb_eim_solutions;
+
+  /**
+   * If we're using the EIM error indicator, then we store the error indicator
+   * values corresponding to _rb_eim_solutions here.
+   */
+  std::vector<Real> _rb_eim_error_indicators;
 
   /**
    * Storage for EIM solutions from the training set. This is typically used in
@@ -780,6 +798,17 @@ private:
    * want to avoid changing it.
    */
   bool _preserve_rb_eim_solutions;
+
+  /**
+   * Indicate if the EIM error indicator is active in RB EIM solves. Note that
+   * this is distinct from use_eim_error_indicator(), since use_eim_error_indicator()
+   * indicates if this RBEIMEvaluation has an EIM error indicator defined,
+   * whereas _is_eim_error_indicator_active is used to turn on or off the
+   * error indicator. This primary purpose of _is_eim_error_indicator_active
+   * is to turn the error indicator off during EIM training (when it is not relevant)
+   * and to turn it on during "online solves".
+   */
+  bool _is_eim_error_indicator_active;
 
 };
 

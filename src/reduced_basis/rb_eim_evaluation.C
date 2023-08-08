@@ -48,7 +48,8 @@ RBEIMEvaluation::RBEIMEvaluation(const Parallel::Communicator & comm)
 :
 ParallelObject(comm),
 _rb_eim_solves_N(0),
-_preserve_rb_eim_solutions(false)
+_preserve_rb_eim_solutions(false),
+_is_eim_error_indicator_active(false)
 {
 }
 
@@ -159,6 +160,9 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   if (get_parametrized_function().is_lookup_table)
     {
       _rb_eim_solutions.resize(mus.size());
+      if (_is_eim_error_indicator_active)
+        _rb_eim_error_indicators.resize(mus.size());
+
       for (auto mu_index : index_range(mus))
         {
           Real lookup_table_param =
@@ -172,6 +176,21 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
           DenseVector<Number> values;
           _eim_solutions_for_training_set[lookup_table_index].get_principal_subvector(N, values);
           _rb_eim_solutions[mu_index] = values;
+
+          // If we're using the EIM error indicator, then we use the coefficient of the "last"
+          // EIM basis function as the error indicator (following Maday et al.), and we zero
+          // out this coefficient in _rb_eim_solutions so that we do not include its
+          // contribution in our EIM approximation, since we consider it to be an "extra"
+          // EIM term.
+          if (_is_eim_error_indicator_active && (N > 1) && (N == get_n_basis_functions()))
+            {
+              Number rb_eim_error_indicator_val = _rb_eim_solutions[mu_index](N-1);
+              _rb_eim_solutions[mu_index](N-1) = 0.;
+
+              // Normalize the error indicator based on the norm of the coefficient vector
+              _rb_eim_error_indicators[mu_index] =
+                std::abs(rb_eim_error_indicator_val) / _rb_eim_solutions[mu_index].l2_norm();
+            }
         }
 
       return;
@@ -237,33 +256,33 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   // purpose of this loop is to strip out the "columns" of the
   // output_all_comps array into rows.
   {
-  unsigned int counter = 0;
-  for (auto mu_index : index_range(mus))
-    for (auto step_index : make_range(mus[mu_index].n_steps()))
-    {
-      // Ignore compiler warnings about unused loop index
-      libmesh_ignore(step_index);
+    unsigned int counter = 0;
+    for (auto mu_index : index_range(mus))
+      for (auto step_index : make_range(mus[mu_index].n_steps()))
+      {
+        // Ignore compiler warnings about unused loop index
+        libmesh_ignore(step_index);
 
-      evaluated_values_at_interp_points[counter].resize(N); // N is number of RB basis functions
+        evaluated_values_at_interp_points[counter].resize(N); // N is number of RB basis functions
 
-      for (unsigned int interp_pt_index=0; interp_pt_index<N; interp_pt_index++)
-        {
-          unsigned int comp = _interpolation_points_comp[interp_pt_index];
+        for (unsigned int interp_pt_index=0; interp_pt_index<N; interp_pt_index++)
+          {
+            unsigned int comp = _interpolation_points_comp[interp_pt_index];
 
-          // This line of code previously used "mu_index", now we use
-          // "counter" handle the multi-step RBParameters case.
-          evaluated_values_at_interp_points[counter][interp_pt_index] =
-            output_all_comps[counter][interp_pt_index][comp];
-        }
+            // This line of code previously used "mu_index", now we use
+            // "counter" handle the multi-step RBParameters case.
+            evaluated_values_at_interp_points[counter][interp_pt_index] =
+              output_all_comps[counter][interp_pt_index][comp];
+          }
 
-      counter++;
-    }
+        counter++;
+      }
 
-  // Throw an error if we didn't do the required number of solves for
-  // some reason
-  libmesh_error_msg_if(counter != num_rb_eim_solves,
-                       "We should have done " << num_rb_eim_solves <<
-                       " solves, instead we did " << counter);
+    // Throw an error if we didn't do the required number of solves for
+    // some reason
+    libmesh_error_msg_if(counter != num_rb_eim_solves,
+                        "We should have done " << num_rb_eim_solves <<
+                        " solves, instead we did " << counter);
   }
 
   DenseMatrix<Number> interpolation_matrix_N;
@@ -273,19 +292,37 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   // "evaluated_values_at_interp_points" vector which we determined
   // earlier.
   _rb_eim_solutions.resize(num_rb_eim_solves);
+  if (_is_eim_error_indicator_active)
+    _rb_eim_error_indicators.resize(mus.size());
 
   {
-  unsigned int counter = 0;
-  for (auto mu_index : index_range(mus))
-    for (auto step_index : make_range(mus[mu_index].n_steps()))
-    {
-      // Ignore compiler warnings about unused loop index
-      libmesh_ignore(step_index);
+    unsigned int counter = 0;
+    for (auto mu_index : index_range(mus))
+      for (auto step_index : make_range(mus[mu_index].n_steps()))
+      {
+        // Ignore compiler warnings about unused loop index
+        libmesh_ignore(step_index);
 
-      DenseVector<Number> EIM_rhs = evaluated_values_at_interp_points[counter];
-      interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[counter]);
-      counter++;
-    }
+        DenseVector<Number> EIM_rhs = evaluated_values_at_interp_points[counter];
+        interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[counter]);
+
+        // If we're using the EIM error indicator, then we use the coefficient of the "last"
+        // EIM basis function as the error indicator (following Maday et al.), and we zero
+        // out this coefficient in _rb_eim_solutions so that we do not include its
+        // contribution in our EIM approximation, since we consider it to be an "extra"
+        // EIM term.
+        if (_is_eim_error_indicator_active && (N > 1) && (N == get_n_basis_functions()))
+          {
+            Number rb_eim_error_indicator_val = _rb_eim_solutions[counter](N-1);
+            _rb_eim_solutions[counter](N-1) = 0.;
+
+            // Normalize the error indicator based on the norm of the coefficient vector
+            _rb_eim_error_indicators[counter] =
+              std::abs(rb_eim_error_indicator_val) / _rb_eim_solutions[counter].l2_norm();
+          }
+
+        counter++;
+      }
   }
 }
 
@@ -2941,6 +2978,18 @@ bool RBEIMEvaluation::scale_components_in_enrichment() const
   // where the parametrized function components differ widely in
   // magnitude.
   return false;
+}
+
+bool RBEIMEvaluation::use_eim_error_indicator() const
+{
+  // Return false by default, but we override this in subclasses
+  // for cases where we want to use the error indicator.
+  return false;
+}
+
+void RBEIMEvaluation::set_eim_error_indicator_active(bool is_active)
+{
+  _is_eim_error_indicator_active = (is_active && use_eim_error_indicator());
 }
 
 } // namespace libMesh

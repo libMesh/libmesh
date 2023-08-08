@@ -438,6 +438,12 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
   // We do this to ensure that the first EIM basis function is not zero.
   unsigned int current_training_index = _max_abs_value_in_training_set_index;
   set_params_from_training_set(current_training_index);
+
+  // We use this boolean to indicate if we will run one more iteration
+  // before exiting the loop below. We use this when computing the EIM
+  // error indicator, which requires one extra EIM iteration.
+  bool exit_on_next_iteration = false;
+
   while (true)
     {
       libMesh::out << "Greedily selected parameter vector:" << std::endl;
@@ -466,13 +472,18 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
 
       libMesh::out << "Maximum EIM error is " << greedy_error << std::endl << std::endl;
 
+      if (exit_on_next_iteration)
+        libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
+
       // Convergence and/or termination tests
       {
+        bool exit_condition_satisfied = false;
+
         if (rbe.get_n_basis_functions() >= this->get_Nmax())
           {
             libMesh::out << "Maximum number of basis functions reached: Nmax = "
                           << get_Nmax() << std::endl;
-            break;
+            exit_condition_satisfied = true;
           }
 
         // We consider the relative tolerance as relative to the maximum value in the training
@@ -480,20 +491,20 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
         if (greedy_error < (get_rel_training_tolerance() * get_max_abs_value_in_training_set()))
           {
             libMesh::out << "Relative error tolerance reached." << std::endl;
-            break;
+            exit_condition_satisfied = true;
           }
 
         if (greedy_error < get_abs_training_tolerance())
           {
             libMesh::out << "Absolute error tolerance reached." << std::endl;
-            break;
+            exit_condition_satisfied = true;
           }
 
         if (rbe.get_n_basis_functions() >= this->get_Nmax())
           {
             libMesh::out << "Maximum number of basis functions reached: Nmax = "
                          << get_Nmax() << std::endl;
-            break;
+            exit_condition_satisfied = true;
           }
 
         {
@@ -508,8 +519,24 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
               }
 
           if (do_exit)
-            break; // out of while
+            exit_condition_satisfied = true;
         }
+
+        if (exit_condition_satisfied)
+          {
+            // If we're using the EIM error indicator then we need to run
+            // one extra EIM iteration since we use the extra EIM point
+            // to obtain our error indicator. If we're not using the EIM
+            // error indicator, then we just exit now.
+            if (get_rb_eim_evaluation().use_eim_error_indicator())
+              {
+                exit_on_next_iteration = true;
+                libMesh::out << "EIM error indicator is active, hence we will run one extra EIM iteration before exiting"
+                             << std::endl;
+              }
+            else
+              break;
+          }
       }
     } // end while(true)
 
@@ -597,6 +624,11 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
     return 0.;
   }
 
+  // We use this boolean to indicate if we will run one more iteration
+  // before exiting the loop below. We use this when computing the EIM
+  // error indicator, which requires one extra EIM iteration.
+  bool exit_on_next_iteration = false;
+
   // Add dominant vectors from the POD as basis functions.
   unsigned int j = 0;
   Real rel_err = 0.;
@@ -616,10 +648,30 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
       libMesh::out << "Number of basis functions: " << j
                    << ", POD error norm: " << rel_err << std::endl;
 
+      if (exit_on_next_iteration)
+        libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
+
+      bool exit_condition_satisfied = false;
       if (rel_err < get_rel_training_tolerance())
         {
           libMesh::out << "Training tolerance reached." << std::endl;
-          break;
+          exit_condition_satisfied = true;
+        }
+
+      if (exit_condition_satisfied)
+        {
+          // If we're using the EIM error indicator then we need to run
+          // one extra EIM iteration since we use the extra EIM point
+          // to obtain our error indicator. If we're not using the EIM
+          // error indicator, then we just exit now.
+          if (get_rb_eim_evaluation().use_eim_error_indicator())
+            {
+              exit_on_next_iteration = true;
+              libMesh::out << "EIM error indicator is active, hence we will run one extra EIM iteration before exiting"
+                            << std::endl;
+            }
+          else
+            break;
         }
 
       if (rbe.get_parametrized_function().on_mesh_sides())
