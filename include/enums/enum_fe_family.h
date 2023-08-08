@@ -57,9 +57,10 @@ enum FEFamily : int {
                // all other DOFs in the system
                SCALAR       = 31,
                // Vector-valued elements
-               LAGRANGE_VEC = 41,
-               NEDELEC_ONE  = 42,
-               MONOMIAL_VEC = 43,
+               LAGRANGE_VEC   = 41,
+               NEDELEC_ONE    = 42,
+               MONOMIAL_VEC   = 43,
+               RAVIART_THOMAS = 44,
                // Rational basis functions
                RATIONAL_BERNSTEIN = 61,
                // Side-supported basis functions
