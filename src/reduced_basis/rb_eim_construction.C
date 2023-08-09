@@ -504,13 +504,6 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
             exit_condition_satisfied = true;
           }
 
-        if (rbe.get_n_basis_functions() >= this->get_Nmax())
-          {
-            libMesh::out << "Maximum number of basis functions reached: Nmax = "
-                         << get_Nmax() << std::endl;
-            exit_condition_satisfied = true;
-          }
-
         {
           bool do_exit = false;
           for (auto & param : greedy_param_list)
