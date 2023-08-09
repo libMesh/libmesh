@@ -7,14 +7,16 @@ AC_DEFUN([CONFIGURE_NETCDF],
                 AS_HELP_STRING([--disable-netcdf],
                                [build without netCDF binary I/O]),
                 [AS_CASE("${enableval}",
-                  [yes|new|v4], [enablenetcdf=yes
-                                 netcdfversion=4],
+                  [v492],      [enablenetcdf=yes
+                                 netcdfversion="v4.9.2"],
+                  [yes|new|v4|v462], [enablenetcdf=yes
+                                 netcdfversion="v4.6.2"],
                   [old|v3],     [enablenetcdf=yes
                                  netcdfversion=3],
                   [no],         [enablenetcdf=no
                                  netcdfversion=no],
                   [AC_MSG_ERROR(bad value ${enableval} for --enable-netcdf)])],
-                [enablenetcdf=$enableoptional; netcdfversion=4])
+                [enablenetcdf=$enableoptional; netcdfversion="v4.6.2"])
 
   dnl fix for --disable-optional
   AS_IF([test "x$enablenetcdf" = "xno"], [netcdfversion=no])
@@ -27,22 +29,36 @@ AC_DEFUN([CONFIGURE_NETCDF],
         ])
 
   netcdf_v4_arg=''
+  netcdf_v4_subdir=''
   AS_CASE("${netcdfversion}",
           [3], [
                  dnl We shouldn't get here, see if test above.
                  AC_MSG_ERROR([>>> Error: netCDF3 is no longer distributed with libMesh <<<])
                ],
-          [4], [NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v4/include"
-                AC_DEFINE(HAVE_NETCDF, 1, [Flag indicating whether the library will be compiled with Netcdf support])
-                dnl building netcdf-4 requires that we support nested subpackages
-                AS_IF([test "x$enablenested" = "xno"], [AC_MSG_ERROR([NetCDF v4 requires nested subpackages, try --enable-nested])])
+          ["v4.6.2"], [NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/netcdf-c-4.6.2/include -I\$(top_builddir)/contrib/netcdf/netcdf-c-4.6.2/include"
+                       AC_DEFINE(HAVE_NETCDF, 1, [Flag indicating whether the library will be compiled with Netcdf support])
+                       dnl building netcdf-4 requires that we support nested subpackages
+                       AS_IF([test "x$enablenested" = "xno"], [AC_MSG_ERROR([NetCDF v4 requires nested subpackages, try --enable-nested])])
 
-                dnl pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
-                AS_IF([test "x$enablehdf5" = "xno"], [netcdf_v4_arg=--disable-netcdf-4])
+                       dnl pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
+                       AS_IF([test "x$enablehdf5" = "xno"], [netcdf_v4_arg=--disable-netcdf-4])
 
-                dnl netcdf will install its own pkgconfig script, use this to get proper static linking
-                libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
-                AC_MSG_RESULT(<<< Configuring library with NetCDF version 4 support >>>)],
+                       dnl netcdf will install its own pkgconfig script, use this to get proper static linking
+                       libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
+                       netcdf_v4_subdir='contrib/netcdf/netcdf-c-4.6.2'
+                       AC_MSG_RESULT(<<< Configuring library with NetCDF version 4.6.2 support >>>)],
+          ["v4.9.2"], [NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/netcdf-c/include -I\$(top_builddir)/contrib/netcdf/netcdf-c/include"
+                       AC_DEFINE(HAVE_NETCDF, 1, [Flag indicating whether the library will be compiled with Netcdf support])
+                       dnl building netcdf-4 requires that we support nested subpackages
+                       AS_IF([test "x$enablenested" = "xno"], [AC_MSG_ERROR([NetCDF v4 requires nested subpackages, try --enable-nested])])
+
+                       dnl pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
+                       AS_IF([test "x$enablehdf5" = "xno"], [netcdf_v4_arg=--disable-netcdf-4])
+
+                       dnl netcdf will install its own pkgconfig script, use this to get proper static linking
+                       libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
+                       netcdf_v4_subdir='contrib/netcdf/netcdf-c'
+                       AC_MSG_RESULT(<<< Configuring library with NetCDF version 4.9.2 support >>>)],
           [
             NETCDF_INCLUDE=""
             enablenetcdf=no
@@ -68,14 +84,22 @@ AC_DEFUN([CONFIGURE_NETCDF],
                         SUB_LIBS="$PETSCLINKLIBS $SUB_LIBS"
                        ])])
 
+          dnl netcdf 4.9.2 requires either than an external libxml2 be present or that the
+          dnl --disable-libxml2 flag be passed
+          AS_IF([test "x$haveexternalxml2" = "xyes"],
+                [netcdf_xml2_arg=''],
+                [netcdf_xml2_arg='--disable-libxml2'])
+
           dnl ensure that the configuration is consistent
           dnl pass --disable-testsets to the netcdf subpackage to disable the most rigorous tests
           AS_IF([test "x$enablecurl" = "xyes"],
                 [netcdf_dap_arg=--enable-dap
-                 netcdf_curl_arg=''],
+                 netcdf_curl_arg=''
+                 netcdf_byterange_arg=''],
                 [netcdf_dap_arg=--disable-dap
-                 netcdf_curl_arg=--disable-curl])
-          AX_SUBDIRS_CONFIGURE([contrib/netcdf/v4],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[$netcdf_dap_arg],[$netcdf_curl_arg],[--disable-testsets],[$netcdf_v4_arg]])
+                 netcdf_curl_arg=--disable-curl
+                 netcdf_byterange_arg=--disable-byterange])
+          AX_SUBDIRS_CONFIGURE([$netcdf_v4_subdir],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
         ])
 
   AC_SUBST(NETCDF_INCLUDE)
