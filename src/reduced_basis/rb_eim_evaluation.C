@@ -236,7 +236,18 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
 
   // If we're computing the EIM error indicator, then we need to use
   // one extra EIM interpolation point.
-  unsigned int n_interp_pts_in_solve = _is_eim_error_indicator_active ? N+1 : N;
+  unsigned int n_interp_pts_in_solve = N;
+  if (_is_eim_error_indicator_active)
+    {
+      // If we have at least N+1 EIM interpolation points stored, then
+      // we increment n_interp_pts_in_solve here. Note that we may not
+      // have any extra interpolation points since, for example, the
+      // EIM could have generated basis functions for "all" the input
+      // data. If that is the case then we simply skip using the error
+      // indicator here.
+      if (_interpolation_points_comp.size() > N)
+        n_interp_pts_in_solve++;
+    }
 
   // In this loop, counter goes from 0 to num_rb_eim_solves.  The
   // purpose of this loop is to strip out the "columns" of the
@@ -251,7 +262,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
 
         evaluated_values_at_interp_points[counter].resize(n_interp_pts_in_solve);
 
-        libmesh_error_msg_if(n_interp_pts_in_solve >= _interpolation_points_comp.size(),
+        libmesh_error_msg_if(n_interp_pts_in_solve > _interpolation_points_comp.size(),
           "Invalid number of interpolation points");
 
         for (unsigned int interp_pt_index=0; interp_pt_index<n_interp_pts_in_solve; interp_pt_index++)
@@ -306,7 +317,11 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
         // vector (excluding the "last" entry). In Barrault et al. they use an absolute
         // error indicator, but we prefer not to follow that here since it can be harder
         // to set a target tolerance when using an absolute error indicator.
-        if (_is_eim_error_indicator_active)
+        //
+        // Also note that we check n_interp_pts_in_solve > N below, since if this is not
+        // the case the we assume that the error indicator is inactive, as discussed
+        // above when we set up n_interp_pts_in_solve.
+        if (_is_eim_error_indicator_active && (n_interp_pts_in_solve > N))
           {
             Number rb_eim_error_indicator_val = _rb_eim_solutions[counter](N);
             _rb_eim_solutions[counter](N) = 0.;

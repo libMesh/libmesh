@@ -643,10 +643,17 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
   Real rel_err = 0.;
   while (true)
     {
-      if (j >= get_Nmax() || j >= n_snapshots)
+      if (j >= n_snapshots)
+        {
+          libMesh::out << "Number of basis functions (" << j << ") equals number of training samples, hence exiting." << std::endl;
+          break;
+        }
+
+      bool exit_condition_satisfied = false;
+      if (j >= get_Nmax())
         {
           libMesh::out << "Maximum number of basis functions (" << j << ") reached." << std::endl;
-          break;
+          exit_condition_satisfied = true;
         }
 
       // The "energy" error in the POD approximation is determined by the first omitted
@@ -664,7 +671,6 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           break;
         }
 
-      bool exit_condition_satisfied = false;
       if (rel_err < get_rel_training_tolerance())
         {
           libMesh::out << "Training tolerance reached." << std::endl;
