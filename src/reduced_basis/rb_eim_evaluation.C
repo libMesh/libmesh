@@ -293,7 +293,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   // earlier.
   _rb_eim_solutions.resize(num_rb_eim_solves);
   if (_is_eim_error_indicator_active)
-    _rb_eim_error_indicators.resize(mus.size());
+    _rb_eim_error_indicators.resize(num_rb_eim_solves);
 
   {
     unsigned int counter = 0;
