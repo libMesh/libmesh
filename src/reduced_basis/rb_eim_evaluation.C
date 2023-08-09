@@ -944,6 +944,8 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
       // function since we only need the interpolation point data.
       _local_eim_basis_functions.emplace_back(bf);
     }
+  else
+    std::cout << "Skip storing extra basis function since it is not needed to evaluate the error indicator" << std::endl;
 
   _interpolation_points_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
@@ -974,6 +976,8 @@ void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
       // function since we only need the interpolation point data.
       _local_side_eim_basis_functions.emplace_back(side_bf);
     }
+  else
+    std::cout << "Skip storing extra basis function since it is not needed to evaluate the error indicator" << std::endl;
 
   _interpolation_points_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
@@ -1001,6 +1005,8 @@ void RBEIMEvaluation::add_node_basis_function_and_interpolation_data(
       // function since we only need the interpolation point data.
       _local_node_eim_basis_functions.emplace_back(node_bf);
     }
+  else
+    std::cout << "Skip storing extra basis function since it is not needed to evaluate the error indicator" << std::endl;
 
   _interpolation_points_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
