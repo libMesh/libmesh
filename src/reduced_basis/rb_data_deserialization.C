@@ -677,8 +677,13 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
   // If we're using the EIM error indicator then we store one extra
   // interpolation point and associated data, hence we increment n_bfs
   // here so that we write out the extra data below.
-  if (rb_eim_evaluation.use_eim_error_indicator() &&
-      (rb_eim_evaluation_reader.getInterpolationXyz().size() > n_bfs))
+  //
+  // Note that we do not check rb_eim_evaluation.use_eim_error_indicator()
+  // below because it can be false in some cases when we're reading in
+  // data (e.g. if we're using a base class RBEIMEvaluation to do the
+  // reading). The check below will still give the right behavior whether
+  // regardless of the value of use_eim_error_indicator().
+  if (rb_eim_evaluation_reader.getInterpolationXyz().size() > n_bfs)
     n_bfs++;
 
   rb_eim_evaluation.resize_data_structures(n_bfs);
