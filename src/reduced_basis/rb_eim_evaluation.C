@@ -370,6 +370,11 @@ unsigned int RBEIMEvaluation::get_n_basis_functions() const
     return _local_eim_basis_functions.size();
 }
 
+unsigned int RBEIMEvaluation::get_n_interpolation_points() const
+{
+  return _interpolation_points_xyz.size();
+}
+
 void RBEIMEvaluation::set_n_basis_functions(unsigned int n_bfs)
 {
   if (get_parametrized_function().on_mesh_sides())

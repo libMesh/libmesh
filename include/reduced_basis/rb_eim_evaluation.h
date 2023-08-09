@@ -147,6 +147,13 @@ public:
   unsigned int get_n_basis_functions() const;
 
   /**
+   * Return the number of interpolation points. If we're not using the EIM error
+   * indicator, then this matches get_n_basis_functions(), but if we are using
+   * the EIM error indicator then we should have one extra interpolation point.
+   */
+  unsigned int get_n_interpolation_points() const;
+
+  /**
    * Set the number of basis functions. Useful when reading in
    * stored data.
    */
