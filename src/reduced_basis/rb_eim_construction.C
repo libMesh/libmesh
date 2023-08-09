@@ -475,7 +475,11 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
       if (exit_on_next_iteration)
         {
           libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
-          get_rb_eim_evaluation().set_eim_error_indicator_active(false);
+
+          // Before we exit we remove the "final" EIM basis function, since it was only added in order
+          // to create data for the EIM error indicator.
+          rbe.set_n_basis_functions(rbe.get_n_basis_functions()-1);
+
           break;
         }
 
@@ -528,11 +532,6 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
             if (get_rb_eim_evaluation().use_eim_error_indicator())
               {
                 exit_on_next_iteration = true;
-
-                // We set eim_error_indicator_active to true so that we skip
-                // adding the basis function for the "final" interpolation point,
-                // since we only need the interpolation point data in that case.
-                get_rb_eim_evaluation().set_eim_error_indicator_active(true);
                 libMesh::out << "EIM error indicator is active, hence we will run one extra EIM iteration before exiting"
                              << std::endl;
               }
@@ -660,7 +659,11 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
       if (exit_on_next_iteration)
         {
           libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
-          get_rb_eim_evaluation().set_eim_error_indicator_active(false);
+
+          // Before we exit we remove the "final" EIM basis function, since it was only added in order
+          // to create data for the EIM error indicator.
+          get_rb_eim_evaluation().set_n_basis_functions(get_rb_eim_evaluation().get_n_basis_functions()-1);
+
           break;
         }
 
@@ -679,11 +682,6 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           if (get_rb_eim_evaluation().use_eim_error_indicator())
             {
               exit_on_next_iteration = true;
-
-              // We set eim_error_indicator_active to true so that we skip
-              // adding the basis function for the "final" interpolation point,
-              // since we only need the interpolation point data in that case.
-              get_rb_eim_evaluation().set_eim_error_indicator_active(true);
               libMesh::out << "EIM error indicator is active, hence we will run one extra EIM iteration before exiting"
                             << std::endl;
             }
