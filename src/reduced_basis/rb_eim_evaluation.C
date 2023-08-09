@@ -324,7 +324,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
         if (_is_eim_error_indicator_active && (n_interp_pts_in_solve > N))
           {
             Number rb_eim_error_indicator_val = _rb_eim_solutions[counter](N);
-            _rb_eim_solutions[counter](N) = 0.;
+            _rb_eim_solutions[counter].resize(N);
 
             // Normalize the error indicator based on the norm of the coefficient vector
             _rb_eim_error_indicators[counter] =
