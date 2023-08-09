@@ -65,7 +65,11 @@ void nedelec_one_nodal_soln(const Elem * elem,
           case TRI7:
             {
               libmesh_assert_equal_to (elem_soln.size(), 3);
-              libmesh_assert_equal_to (nodal_soln.size(), 6*2);
+
+              if (elem_type == TRI6)
+                libmesh_assert_equal_to (nodal_soln.size(), 6*2);
+              else
+                libmesh_assert_equal_to (nodal_soln.size(), 7*2);
               break;
             }
           case QUAD8:
@@ -90,8 +94,6 @@ void nedelec_one_nodal_soln(const Elem * elem,
 
               break;
             }
-
-
           case HEX20:
           case HEX27:
             {
@@ -209,6 +211,22 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
         switch (t)
           {
           case TRI6:
+            {
+              switch (n)
+                {
+                case 0:
+                case 1:
+                case 2:
+                  return 0;
+                case 3:
+                case 4:
+                case 5:
+                  return 1;
+
+                default:
+                  libmesh_error_msg("ERROR: Invalid node ID " << n);
+                }
+            }
           case TRI7:
             {
               switch (n)
@@ -216,6 +234,7 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
                 case 0:
                 case 1:
                 case 2:
+                case 6:
                   return 0;
                 case 3:
                 case 4:
@@ -266,7 +285,6 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
                 }
             }
           case TET10:
-          case TET14:
             {
               switch (n)
                 {
@@ -283,17 +301,35 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
                 case 9:
                   return 1;
 
+                default:
+                  libmesh_error_msg("ERROR: Invalid node ID " << n);
+                }
+            }
+          case TET14:
+            {
+              switch (n)
+                {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
                 case 10:
                 case 11:
                 case 12:
                 case 13:
                   return 0;
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                  return 1;
 
                 default:
                   libmesh_error_msg("ERROR: Invalid node ID " << n);
                 }
             }
-
           case HEX20:
             {
               switch (n)
