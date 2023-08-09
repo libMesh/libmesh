@@ -262,8 +262,11 @@ void DofMap::add_variable_group (VariableGroup var_group)
 
     for (auto var : make_range(new_var_group.n_variables()))
     {
-      _variables.push_back (new_var_group(var));
+      auto var_instance = new_var_group(var);
+      const auto vn = var_instance.number();
+      _variables.push_back (std::move(var_instance));
       _variable_group_numbers.push_back (vg);
+      _var_to_vg.emplace(vn, vg);
     }
   }
   // End if check for var_group in _variable_groups
@@ -609,7 +612,7 @@ void DofMap::reinit(MeshBase & mesh)
 
       const bool add_p_level =
 #ifdef LIBMESH_ENABLE_AMR
-          !_dont_p_refine.count(base_fe_type.family);
+          !_dont_p_refine.count(vg);
 #else
           false;
 #endif
@@ -892,6 +895,7 @@ void DofMap::clear()
 
   _variables.clear();
   _variable_groups.clear();
+  _var_to_vg.clear();
   _variable_group_numbers.clear();
   _first_df.clear();
   _end_df.clear();
@@ -2314,7 +2318,7 @@ void DofMap::_node_dof_indices (const Elem & elem,
 
   const bool add_p_level =
 #ifdef LIBMESH_ENABLE_AMR
-      !_dont_p_refine.count(fe_type.family);
+      !_dont_p_refine.count(vg);
 #else
       false;
 #endif
@@ -2405,7 +2409,7 @@ void DofMap::_dof_indices (const Elem & elem,
 
       const bool add_p_level =
 #ifdef LIBMESH_ENABLE_AMR
-          !_dont_p_refine.count(fe_type.family);
+          !_dont_p_refine.count(vg);
 #else
           false;
 #endif
@@ -2695,7 +2699,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                     FEType fe_type = var.type();
                     const bool add_p_level =
 #ifdef LIBMESH_ENABLE_AMR
-                        !_dont_p_refine.count(fe_type.family);
+                        !_dont_p_refine.count(vg);
 #else
                         false;
 #endif

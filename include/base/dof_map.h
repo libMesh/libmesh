@@ -622,6 +622,11 @@ public:
   { return cast_int<unsigned int>(_variables.size()); }
 
   /**
+   * \returns The variable group number that the provided variable number belongs to
+   */
+  unsigned int var_group_from_var_number(unsigned int var_num) const;
+
+  /**
    * \returns \p true if the variables are capable of being stored in a blocked
    * form.  Presently, this means that there can only be one variable group,
    * and that the group has more than one variable.
@@ -1606,14 +1611,15 @@ public:
                                                          bool calculate_constrained = false) const;
 
   /**
-   * Directs this object to not p-refine variables with the given \p fe_family
+   * Describe whether the given variable group should be p-refined. If this API is not called with
+   * \p false, the default is to p-refine
    */
-  void dont_p_refine(FEFamily fe_family);
+  void should_p_refine(unsigned int g, bool p_refine);
 
   /**
-   * Whether the given finite element family should be p-refined
+   * Whether the given variable group should be p-refined
    */
-  bool should_p_refine(FEFamily fe_family) const;
+  bool should_p_refine(unsigned int g) const;
 
 private:
 
@@ -1832,6 +1838,11 @@ private:
   std::vector<unsigned int> _variable_group_numbers;
 
   /**
+   * A map from variable number to variable group number
+   */
+  std::unordered_map<unsigned int, unsigned int> _var_to_vg;
+
+  /**
    * The number of the system we manage DOFs for.
    */
   const unsigned int _sys_number;
@@ -1995,9 +2006,9 @@ private:
   std::vector<dof_id_type> _first_old_scalar_df;
 
   /**
-   * A container of finite element families that we should not p-refine
+   * A container of variable groups that we should not p-refine
    */
-  std::unordered_set<FEFamily> _dont_p_refine;
+  std::unordered_set<unsigned int> _dont_p_refine;
 #endif
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
@@ -2293,28 +2304,40 @@ bool DofMap::constrained_sparsity_construction()
 #endif
 }
 
-
 inline
-void DofMap::dont_p_refine(const FEFamily fe_family)
+void DofMap::should_p_refine(const unsigned int g, const bool p_refine)
 {
 #ifdef LIBMESH_ENABLE_AMR
-  _dont_p_refine.insert(fe_family);
+  if (p_refine)
+  {
+    auto it = _dont_p_refine.find(g);
+    if (it != _dont_p_refine.end())
+      _dont_p_refine.erase(it);
+  }
+  else
+    _dont_p_refine.insert(g);
 #else
-  libmesh_ignore(fe_family);
+  libmesh_ignore(g, p_refine);
 #endif
 }
 
 inline
-bool DofMap::should_p_refine(const FEFamily fe_family) const
+bool DofMap::should_p_refine(const unsigned int g) const
 {
 #ifdef LIBMESH_ENABLE_AMR
-  return !_dont_p_refine.count(fe_family);
+  return !_dont_p_refine.count(g);
 #else
-  libmesh_ignore(fe_family);
+  libmesh_ignore(g);
   return false;
 #endif
 }
 
+inline
+unsigned int DofMap::var_group_from_var_number(const unsigned int var_num) const
+{
+  libmesh_assert(var_num < n_variables());
+  return libmesh_map_find(_var_to_vg, var_num);
+}
 } // namespace libMesh
 
 #endif // LIBMESH_DOF_MAP_H

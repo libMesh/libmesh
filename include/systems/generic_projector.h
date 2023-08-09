@@ -1615,8 +1615,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
           if (!var.active_on_subdomain(elem->subdomain_id()))
             continue;
           const FEType fe_type = var.type();
-          const bool add_p_level =
-              this->projector.system.get_dof_map().should_p_refine(fe_type.family);
+          const auto & dof_map = this->projector.system.get_dof_map();
+          const auto vg = dof_map.var_group_from_var_number(v_num);
+          const bool add_p_level = dof_map.should_p_refine(vg);
 
           // If we're trying to do projections on an isogeometric
           // analysis mesh, only the finite element nodes constrained
@@ -2286,12 +2287,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                   // Currently other C_ONE elements have a single nodal
                   // value shape function and nodal gradient component
                   // shape functions
-                  libmesh_assert_equal_to
-                    (FEInterface::n_dofs_at_node
-                      (base_fe_type, &elem,
-                       elem.get_node_index(&vertex),
-                       this->projector.system.get_dof_map().should_p_refine(base_fe_type.family)),
-                    (unsigned int)(1 + dim));
+                  libmesh_assert_equal_to(
+                      FEInterface::n_dofs_at_node(
+                          base_fe_type,
+                          &elem,
+                          elem.get_node_index(&vertex),
+                          this->projector.system.get_dof_map().should_p_refine(
+                              this->projector.system.get_dof_map().var_group_from_var_number(var))),
+                      (unsigned int)(1 + dim));
+
                   const FValue val =
                     f.eval_at_node(context, var_component, dim,
                                    vertex, extra_hanging_dofs[var],
