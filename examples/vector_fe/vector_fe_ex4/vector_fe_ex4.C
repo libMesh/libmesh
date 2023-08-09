@@ -71,9 +71,8 @@ int main (int argc, char ** argv)
   Mesh mesh(init.comm());
 
   // Use the MeshTools::Generation mesh generator to create a uniform
-  // grid on the square [-1,1]^D. We must use TRI6 elements for the
-  // Nedelec triangle elements.
-
+  // grid on the square [-1,1]^D. We must use at least TET10 or HEX20 elements
+  // for the Nedelec tetrahedral or hexahedral elements, respectively.
   std::string elem_str =
     command_line_value(std::string("element_type"),
                        std::string("HEX27"));
@@ -90,9 +89,9 @@ int main (int argc, char ** argv)
   // [3]: FEniCS, https://fenicsproject.org/pub/book/book/fenics-book-2011-06-24.pdf
   // [4]: Monk, https://icerm.brown.edu/materials/Slides/tw-18-7/Finite_Element_Methods_for_Maxwells_Equations_%5D_Peter_Monk,_University_of_Delaware.pdf
   // [5]: Hiptmair at al., https://www.sam.math.ethz.ch/sam_reports/reports_final/reports2009/2009-04_fp.pdf
-  libmesh_error_msg_if(elem_str != "TET10" && elem_str != "HEX20" && elem_str != "HEX27",
+  libmesh_error_msg_if(elem_str != "TET10" && elem_str != "TET14" && elem_str != "HEX20" && elem_str != "HEX27",
                        "You entered: " << elem_str <<
-                       " but this example must be run with TET10, HEX20 or HEX27.");
+                       " but this example must be run with TET10, TET14, HEX20 or HEX27.");
 
   MeshTools::Generation::build_cube (mesh,
                                      grid_size,
