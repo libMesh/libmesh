@@ -25,7 +25,7 @@ namespace libMesh
 {
 
 // An excellent discussion of Nedelec shape functions is given in
-// http://www.dealii.org/developer/reports/nedelec/nedelec.pdf
+// https://www.dealii.org/reports/nedelec/nedelec.pdf
 template <>
 RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
                                       const Order order,
