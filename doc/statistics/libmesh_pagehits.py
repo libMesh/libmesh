@@ -277,6 +277,7 @@ data = [
     'Apr 2023',   3585,      0, 0.0,
     'May 2023',   3041,      0, 0.0,
     'Jun 2023',   2756,      0, 0.0,
+    'Jul 2023',   1381,      0, 0.0, # Stopped processing data on July 16, 2023
 ]
 
 # Extract number of hits/month
