@@ -324,6 +324,15 @@ int main (int argc, char ** argv)
       for (unsigned int q_f=0; q_f<rb_theta_expansion.get_n_F_terms(); q_f++)
         all_F[q_f] = rb_theta_expansion.eval_F_theta(q_f, mu_vec);
 
+      // The eval_F_theta() calls above use "EIM solves" from eim_rb_eval, hence we
+      // can now print out the EIM error indicator values.
+      const auto & eim_error_indicators =
+        eim_rb_eval.get_rb_eim_error_indicators();
+      for (auto idx : index_range(eim_error_indicators))
+        std::cout << "EIM error indicator for step: " << idx << ": "
+                  << std::scientific << eim_error_indicators[idx] << std::endl;
+      std::cout << std::endl;
+
       // 3.) Evaluate "output" thetas at all steps: in this case, the
       // output is particularly simple (does not depend on mu) so this
       // should just be a vector of all 1s.
