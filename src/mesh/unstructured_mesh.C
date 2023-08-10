@@ -2304,7 +2304,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
       // of neighbors will be copied verbatim from the other mesh
       this->copy_nodes_and_elements(*other_mesh, skip_find_neighbors,
                                     elem_delta, node_delta,
-                                    unique_delta);
+                                    unique_delta, &id_remapping);
 
       // Copy BoundaryInfo from other_mesh too.  We do this via the
       // list APIs rather than element-by-element for speed.
