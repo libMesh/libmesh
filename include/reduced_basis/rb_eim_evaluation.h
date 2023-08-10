@@ -361,6 +361,11 @@ public:
   std::vector<DenseVector<Number>> & get_eim_solutions_for_training_set();
 
   /**
+   * Return the EIM error indicator values from the most recent call to rb_eim_solves().
+   */
+  const std::vector<Real> & get_rb_eim_error_indicators() const;
+
+  /**
    * Set the data associated with EIM interpolation points.
    */
   void add_interpolation_points_xyz(Point p);

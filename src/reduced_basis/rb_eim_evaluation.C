@@ -754,6 +754,11 @@ std::vector<DenseVector<Number>> & RBEIMEvaluation::get_eim_solutions_for_traini
   return _eim_solutions_for_training_set;
 }
 
+const std::vector<Real> & RBEIMEvaluation::get_rb_eim_error_indicators() const
+{
+  return _rb_eim_error_indicators;
+}
+
 void RBEIMEvaluation::add_interpolation_points_xyz(Point p)
 {
   _interpolation_points_xyz.emplace_back(p);
