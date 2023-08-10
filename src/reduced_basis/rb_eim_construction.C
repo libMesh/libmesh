@@ -417,9 +417,13 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
 {
   LOG_SCOPE("train_eim_approximation_with_greedy()", "RBEIMConstruction");
 
-  _eim_projection_matrix.resize(get_Nmax(),get_Nmax());
-
   RBEIMEvaluation & rbe = get_rb_eim_evaluation();
+
+  // We need space for one extra interpolation point if we're using the
+  // EIM error indicator.
+  unsigned int max_matrix_size = rbe.use_eim_error_indicator() ? get_Nmax()+1 : get_Nmax();
+  _eim_projection_matrix.resize(max_matrix_size,max_matrix_size);
+
   rbe.initialize_parameters(*this);
   rbe.resize_data_structures(get_Nmax());
 
@@ -556,11 +560,15 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 {
   LOG_SCOPE("train_eim_approximation_with_POD()", "RBEIMConstruction");
 
+  RBEIMEvaluation & rbe = get_rb_eim_evaluation();
+
   // _eim_projection_matrix is not used in the POD case, but we resize it here in any case
   // to be consistent with what we do in train_eim_approximation_with_greedy().
-  _eim_projection_matrix.resize(get_Nmax(),get_Nmax());
+  // We need space for one extra interpolation point if we're using the
+  // EIM error indicator.
+  unsigned int max_matrix_size = rbe.use_eim_error_indicator() ? get_Nmax()+1 : get_Nmax();
+  _eim_projection_matrix.resize(max_matrix_size,max_matrix_size);
 
-  RBEIMEvaluation & rbe = get_rb_eim_evaluation();
   rbe.initialize_parameters(*this);
   rbe.resize_data_structures(get_Nmax());
 
@@ -943,7 +951,12 @@ unsigned int RBEIMConstruction::get_n_parametrized_functions_for_training() cons
 
 void RBEIMConstruction::reinit_eim_projection_matrix()
 {
-  _eim_projection_matrix.resize(get_Nmax(),get_Nmax());
+  RBEIMEvaluation & rbe = get_rb_eim_evaluation();
+
+  // We need space for one extra interpolation point if we're using the
+  // EIM error indicator.
+  unsigned int max_matrix_size = rbe.use_eim_error_indicator() ? get_Nmax()+1 : get_Nmax();
+  _eim_projection_matrix.resize(max_matrix_size,max_matrix_size);
 }
 
 std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
