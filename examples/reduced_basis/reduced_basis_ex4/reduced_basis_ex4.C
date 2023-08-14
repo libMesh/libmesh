@@ -329,9 +329,9 @@ int main (int argc, char ** argv)
       const auto & eim_error_indicators =
         eim_rb_eval.get_rb_eim_error_indicators();
       for (auto idx : index_range(eim_error_indicators))
-        std::cout << "EIM error indicator for step: " << idx << ": "
-                  << std::scientific << eim_error_indicators[idx] << std::endl;
-      std::cout << std::endl;
+        libMesh::out << "EIM error indicator for step: " << idx << ": "
+                     << std::scientific << eim_error_indicators[idx] << std::endl;
+      libMesh::out << std::endl;
 
       // 3.) Evaluate "output" thetas at all steps: in this case, the
       // output is particularly simple (does not depend on mu) so this
