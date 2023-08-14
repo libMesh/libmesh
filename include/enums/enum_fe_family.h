@@ -82,6 +82,7 @@ enum FEContinuity : int {
                    C_ZERO,
                    C_ONE,
                    H_CURL,
+                   H_DIV,
                    SIDE_DISCONTINUOUS};
 
 /**

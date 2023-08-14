@@ -2901,6 +2901,9 @@ FEContinuity FEInterface::get_continuity(const FEType & fe_type)
     case NEDELEC_ONE:
       return H_CURL;
 
+    case RAVIART_THOMAS:
+      return H_DIV;
+
       // Side elements
     case SIDE_HIERARCHIC:
       return SIDE_DISCONTINUOUS;
