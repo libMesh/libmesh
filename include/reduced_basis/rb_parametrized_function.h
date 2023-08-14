@@ -185,6 +185,10 @@ public:
 
   /**
    * Same as vectorized_evaluate() but on element nodes.
+   *
+   * The base class implementation of this function loops over the
+   * input "mus" vector and calls node_evaluate() for each entry. The
+   * node_evaluate() function may be overridden in derived classes.
    */
   virtual void node_vectorized_evaluate(const std::vector<RBParameters> & mus,
                                         const std::vector<Point> & all_xyz,
