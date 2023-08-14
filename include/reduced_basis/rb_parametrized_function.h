@@ -151,6 +151,10 @@ public:
 
   /**
    * Vectorized version of evaluate. If requires_xyz_perturbations==false, then all_xyz_perturb will not be used.
+   *
+   * The base class implementation of this function loops over the
+   * input "mus" vector and calls evaluate() for each entry. The
+   * evaluate() function may be overridden in derived classes.
    */
   virtual void vectorized_evaluate(const std::vector<RBParameters> & mus,
                                    const std::vector<Point> & all_xyz,
