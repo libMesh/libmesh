@@ -1621,6 +1621,12 @@ public:
    */
   bool should_p_refine(unsigned int g) const;
 
+  // Prevent bad user implicit conversions
+  void should_p_refine(FEFamily, bool) = delete;
+  void should_p_refine(Order, bool) = delete;
+  bool should_p_refine(FEFamily) const = delete;
+  bool should_p_refine(Order) const = delete;
+
 private:
 
   /**
