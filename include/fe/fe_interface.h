@@ -191,11 +191,13 @@ public:
 
   /**
    * \returns The number of dofs at node n for a finite element
-   * of type \p fe_t. Accounts for Elem::p_level() internally.
+   * of type \p fe_t. Accounts for Elem::p_level() internally if
+   * \p add_p_level is true.
    */
   static unsigned int n_dofs_at_node(const FEType & fe_t,
                                      const Elem * elem,
-                                     const unsigned int n);
+                                     const unsigned int n,
+                                     bool add_p_level=true);
 
   /**
    * \returns The number of dofs at node n for a finite element
@@ -247,7 +249,8 @@ public:
                            const unsigned int dim,
                            const FEType & fe_t,
                            unsigned int s,
-                           std::vector<unsigned int> & di);
+                           std::vector<unsigned int> & di,
+                           bool add_p_level=true);
 
   /**
    * Fills the vector di with the local degree of freedom indices
@@ -263,7 +266,8 @@ public:
                            const unsigned int dim,
                            const FEType & fe_t,
                            unsigned int e,
-                           std::vector<unsigned int> & di);
+                           std::vector<unsigned int> & di,
+                           bool add_p_level=true);
 
   /**
    * Build the nodal soln from the element soln.

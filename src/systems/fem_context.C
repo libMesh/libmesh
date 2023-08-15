@@ -241,18 +241,28 @@ void FEMContext::init_internal_data(const System & sys)
                                    unsigned int i)
     {
       FEType fe_type = sys.variable_type(i);
+      const auto & dof_map = sys.get_dof_map();
+      const bool add_p_level = dof_map.should_p_refine(dof_map.var_group_from_var_number(i));
 
-      if (_element_fe[dim][fe_type] == nullptr)
+      auto & element_fe = _element_fe[dim][fe_type];
+      auto & side_fe = _side_fe[dim][fe_type];
+      if (!element_fe)
         {
-          _element_fe[dim][fe_type] = FEAbstract::build(dim, fe_type);
-          _side_fe[dim][fe_type] = FEAbstract::build(dim, fe_type);
+          element_fe = FEAbstract::build(dim, fe_type);
+          element_fe->add_p_level_in_reinit(add_p_level);
+          side_fe = FEAbstract::build(dim, fe_type);
+          side_fe->add_p_level_in_reinit(add_p_level);
 
           if (dim == 3)
-            _edge_fe[fe_type] = FEAbstract::build(dim, fe_type);
+          {
+            auto & edge_fe = _edge_fe[fe_type];
+            edge_fe = FEAbstract::build(dim, fe_type);
+            edge_fe->add_p_level_in_reinit(add_p_level);
+          }
         }
 
-      _element_fe_var[dim][i] = _element_fe[dim][fe_type].get();
-      _side_fe_var[dim][i] = _side_fe[dim][fe_type].get();
+      _element_fe_var[dim][i] = element_fe.get();
+      _side_fe_var[dim][i] = side_fe.get();
       if ((dim) == 3)
         _edge_fe_var[i] = _edge_fe[fe_type].get();
     };

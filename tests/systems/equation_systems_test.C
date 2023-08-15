@@ -46,6 +46,7 @@ public:
   CPPUNIT_TEST( testRefineThenReinitPreserveFlags );
 #ifdef LIBMESH_ENABLE_AMR // needs project_solution, even for reordering
   CPPUNIT_TEST( testRepartitionThenReinit );
+  CPPUNIT_TEST( testSelectivePRefine );
 #endif
 #endif
   CPPUNIT_TEST( testDisableDefaultGhosting );
@@ -229,6 +230,48 @@ public:
 #endif
   }
 
+
+  void testSelectivePRefine()
+  {
+    // This test requires AMR support since it sets refinement flags.
+#ifdef LIBMESH_ENABLE_AMR
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    System & sys = es.add_system<System> ("SimpleSystem");
+    const auto un = sys.add_variable("u", FIRST);
+    const auto vn = sys.add_variable("v", CONSTANT, MONOMIAL);
+    MeshTools::Generation::build_line(mesh,1);
+    es.init();
+    auto & dof_map = sys.get_dof_map();
+    const auto ug = dof_map.var_group_from_var_number(un);
+    const auto vg = dof_map.var_group_from_var_number(vn);
+    dof_map.should_p_refine(ug, false);
+    dof_map.should_p_refine(vg, true);
+
+    Elem * to_refine = mesh.query_elem_ptr(0);
+    if (to_refine)
+      to_refine->set_refinement_flag(Elem::REFINE);
+
+    MeshRefinement mr(mesh);
+    mr.switch_h_to_p_refinement();
+    mr.refine_elements();
+    es.disable_refine_in_reinit();
+    es.reinit();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(1));
+    const Elem * elem = mesh.query_elem_ptr(0);
+    if (elem)
+      {
+        std::vector<dof_id_type> dof_indices;
+        dof_map.dof_indices(elem, dof_indices, un);
+        CPPUNIT_ASSERT_EQUAL(dof_indices.size(), std::size_t(2));
+        dof_map.dof_indices(elem, dof_indices, vn);
+        CPPUNIT_ASSERT_EQUAL(dof_indices.size(), std::size_t(2));
+      }
+#endif
+  }
 
 
   void testRepartitionThenReinit()

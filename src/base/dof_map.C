@@ -262,8 +262,11 @@ void DofMap::add_variable_group (VariableGroup var_group)
 
     for (auto var : make_range(new_var_group.n_variables()))
     {
-      _variables.push_back (new_var_group(var));
+      auto var_instance = new_var_group(var);
+      const auto vn = var_instance.number();
+      _variables.push_back (std::move(var_instance));
       _variable_group_numbers.push_back (vg);
+      _var_to_vg.emplace(vn, vg);
     }
   }
   // End if check for var_group in _variable_groups
@@ -607,6 +610,13 @@ void DofMap::reinit(MeshBase & mesh)
       const unsigned int n_var_in_group = vg_description.n_variables();
       const FEType & base_fe_type        = vg_description.type();
 
+      const bool add_p_level =
+#ifdef LIBMESH_ENABLE_AMR
+          !_dont_p_refine.count(vg);
+#else
+          false;
+#endif
+
       // Don't need to loop over elements for a SCALAR variable
       // Just increment _n_SCALAR_dofs
       if (base_fe_type.family == SCALAR)
@@ -647,7 +657,7 @@ void DofMap::reinit(MeshBase & mesh)
 #ifdef LIBMESH_ENABLE_AMR
           // Make sure we haven't done more p refinement than we can
           // handle
-          if (elem->p_level() + base_fe_type.order >
+          if (add_p_level*elem->p_level() + base_fe_type.order >
               FEInterface::max_order(base_fe_type, type))
             {
 #  ifdef DEBUG
@@ -675,7 +685,7 @@ void DofMap::reinit(MeshBase & mesh)
                     node.n_comp_group(sys_num, vg);
 
                   const unsigned int vertex_dofs =
-                    std::max(FEInterface::n_dofs_at_node(fe_type, elem, n),
+                    std::max(FEInterface::n_dofs_at_node(fe_type, elem, n, add_p_level),
                              old_node_dofs);
 
                   // Some discontinuous FEs have no vertex dofs
@@ -725,7 +735,7 @@ void DofMap::reinit(MeshBase & mesh)
                 cast_int<unsigned int>(node.vg_dof_base (sys_num,vg)):0;
 
               const unsigned int new_node_dofs =
-                FEInterface::n_dofs_at_node(base_fe_type, elem, n);
+                FEInterface::n_dofs_at_node(base_fe_type, elem, n, add_p_level);
 
               // We've already allocated vertex DOFs
               if (elem->is_vertex(n))
@@ -885,6 +895,7 @@ void DofMap::clear()
 
   _variables.clear();
   _variable_groups.clear();
+  _var_to_vg.clear();
   _variable_group_numbers.clear();
   _first_df.clear();
   _end_df.clear();
@@ -2305,12 +2316,19 @@ void DofMap::_node_dof_indices (const Elem & elem,
   const bool extra_hanging_dofs =
     FEInterface::extra_hanging_dofs(fe_type);
 
+  const bool add_p_level =
+#ifdef LIBMESH_ENABLE_AMR
+      !_dont_p_refine.count(vg);
+#else
+      false;
+#endif
+
   // There is a potential problem with h refinement.  Imagine a
   // quad9 that has a linear FE on it.  Then, on the hanging side,
   // it can falsely identify a DOF at the mid-edge node. This is why
   // we go through FEInterface instead of obj->n_comp() directly.
   const unsigned int nc =
-    FEInterface::n_dofs_at_node(fe_type, &elem, n);
+    FEInterface::n_dofs_at_node(fe_type, &elem, n, add_p_level);
 
   // If this is a non-vertex on a hanging node with extra
   // degrees of freedom, we use the non-vertex dofs (which
@@ -2389,6 +2407,13 @@ void DofMap::_dof_indices (const Elem & elem,
 
       FEType fe_type = var.type();
 
+      const bool add_p_level =
+#ifdef LIBMESH_ENABLE_AMR
+          !_dont_p_refine.count(vg);
+#else
+          false;
+#endif
+
 #ifdef DEBUG
       // The number of dofs per element is non-static for subdivision FE
       if (var.type().family == SUBDIVISION)
@@ -2396,7 +2421,7 @@ void DofMap::_dof_indices (const Elem & elem,
       else
         // FIXME: Is the passed-in p_level just elem.p_level()? If so,
         // this seems redundant.
-        tot_size += FEInterface::n_dofs(fe_type, p_level, &elem);
+        tot_size += FEInterface::n_dofs(fe_type, add_p_level*p_level, &elem);
 #endif
 
       // The total Order is not required when getting the function
@@ -2427,9 +2452,9 @@ void DofMap::_dof_indices (const Elem & elem,
           const unsigned int nc =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
             is_inf ?
-            FEInterface::n_dofs_at_node(fe_type, p_level, &elem, n) :
+            FEInterface::n_dofs_at_node(fe_type, add_p_level*p_level, &elem, n) :
 #endif
-            ndan (type, static_cast<Order>(fe_type.order + p_level), n);
+            ndan (type, static_cast<Order>(fe_type.order + add_p_level*p_level), n);
 
           // If this is a non-vertex on a hanging node with extra
           // degrees of freedom, we use the non-vertex dofs (which
@@ -2671,6 +2696,13 @@ void DofMap::old_dof_indices (const Elem * const elem,
                   { // Do this for all the variables if one was not specified
                     // or just for the specified variable
 
+                    FEType fe_type = var.type();
+                    const bool add_p_level =
+#ifdef LIBMESH_ENABLE_AMR
+                        !_dont_p_refine.count(vg);
+#else
+                        false;
+#endif
                     // Increase the polynomial order on p refined elements,
                     // but make sure you get the right polynomial order for
                     // the OLD degrees of freedom
@@ -2684,11 +2716,10 @@ void DofMap::old_dof_indices (const Elem * const elem,
                       {
                         p_adjustment = 1;
                       }
+                    p_adjustment *= add_p_level;
 
                     // Compute the net amount of "extra" order, including Elem::p_level()
-                    int extra_order = int(elem->p_level()) + p_adjustment;
-
-                    FEType fe_type = var.type();
+                    int extra_order = int(add_p_level*elem->p_level()) + p_adjustment;
 
                     const bool extra_hanging_dofs =
                       FEInterface::extra_hanging_dofs(fe_type);

@@ -88,7 +88,8 @@ template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::dofs_on_side(const Elem * const elem,
                              const Order o,
                              unsigned int s,
-                             std::vector<unsigned int> & di)
+                             std::vector<unsigned int> & di,
+                             const bool add_p_level)
 {
   libmesh_assert(elem);
   libmesh_assert_less (s, elem->n_sides());
@@ -98,8 +99,8 @@ void FE<Dim,T>::dofs_on_side(const Elem * const elem,
   const unsigned int n_nodes = elem->n_nodes();
   for (unsigned int n = 0; n != n_nodes; ++n)
     {
-      const unsigned int n_dofs = n_dofs_at_node(elem->type(),
-                                                 static_cast<Order>(o + elem->p_level()), n);
+      const unsigned int n_dofs =
+          n_dofs_at_node(elem->type(), static_cast<Order>(o + add_p_level*elem->p_level()), n);
       if (elem->is_node_on_side(n, s))
         for (unsigned int i = 0; i != n_dofs; ++i)
           di.push_back(nodenum++);
@@ -114,7 +115,8 @@ template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::dofs_on_edge(const Elem * const elem,
                              const Order o,
                              unsigned int e,
-                             std::vector<unsigned int> & di)
+                             std::vector<unsigned int> & di,
+                             const bool add_p_level)
 {
   libmesh_assert(elem);
   libmesh_assert_less (e, elem->n_edges());
@@ -124,8 +126,8 @@ void FE<Dim,T>::dofs_on_edge(const Elem * const elem,
   const unsigned int n_nodes = elem->n_nodes();
   for (unsigned int n = 0; n != n_nodes; ++n)
     {
-      const unsigned int n_dofs = n_dofs_at_node(elem->type(),
-                                                 static_cast<Order>(o + elem->p_level()), n);
+      const unsigned int n_dofs =
+          n_dofs_at_node(elem->type(), static_cast<Order>(o + add_p_level*elem->p_level()), n);
       if (elem->is_node_on_edge(n, e))
         for (unsigned int i = 0; i != n_dofs; ++i)
           di.push_back(nodenum++);
@@ -161,6 +163,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
         {
           // Set the type and p level for this element
           this->elem_type = elem->type();
+          this->_elem_p_level = elem->p_level();
           this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
 
           // Initialize the shape functions
@@ -188,11 +191,12 @@ void FE<Dim,T>::reinit(const Elem * elem,
             this->shapes_on_quadrature = false;
 
           if (this->elem_type != elem->type() ||
-              this->_p_level != elem->p_level() ||
+              this->_elem_p_level != elem->p_level() ||
               !this->shapes_on_quadrature)
             {
               // Set the type and p level for this element
               this->elem_type = elem->type();
+              this->_elem_p_level = elem->p_level();
               this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
               // Initialize the shape functions
               this->_fe_map->template init_reference_to_physical_map<Dim>
@@ -244,6 +248,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
        // (SCALAR) variables and zero points for local variables.
     {
       this->elem_type = INVALID_ELEM;
+      this->_elem_p_level = 0;
       this->_p_level = 0;
 
       if (!pts)
@@ -321,6 +326,7 @@ void FE<Dim,T>::reinit_dual_shape_coeffs(const Elem * elem,
 {
   // Set the type and p level for this element
   this->elem_type = elem->type();
+  this->_elem_p_level = elem->p_level();
   this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
 
   const unsigned int n_shapes =

@@ -1615,6 +1615,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
           if (!var.active_on_subdomain(elem->subdomain_id()))
             continue;
           const FEType fe_type = var.type();
+          const auto & dof_map = this->projector.system.get_dof_map();
+          const auto vg = dof_map.var_group_from_var_number(v_num);
+          const bool add_p_level = dof_map.should_p_refine(vg);
 
           // If we're trying to do projections on an isogeometric
           // analysis mesh, only the finite element nodes constrained
@@ -1625,20 +1628,20 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
               elem->type() == NODEELEM)
             continue;
 
-          if (FEInterface::n_dofs_at_node(fe_type, elem, 0))
+          if (FEInterface::n_dofs_at_node(fe_type, elem, 0, add_p_level))
             vertex_vars.insert(vertex_vars.end(), v_num);
 
           // The first non-vertex node is always an edge node if those
           // exist.  All edge nodes have the same number of DoFs
           if (has_edge_nodes)
-            if (FEInterface::n_dofs_at_node(fe_type, elem, n_vertices))
+            if (FEInterface::n_dofs_at_node(fe_type, elem, n_vertices, add_p_level))
               edge_vars.insert(edge_vars.end(), v_num);
 
           if (has_side_nodes)
             {
               if (dim != 3)
                 {
-                  if (FEInterface::n_dofs_at_node(fe_type, elem, n_vertices))
+                  if (FEInterface::n_dofs_at_node(fe_type, elem, n_vertices, add_p_level))
                     side_vars.insert(side_vars.end(), v_num);
                 }
               else
@@ -1646,7 +1649,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
                 // DoFs!  We'll loop over all sides to be safe.
                 for (unsigned int n = 0; n != n_nodes; ++n)
                   if (elem->is_face(n))
-                    if (FEInterface::n_dofs_at_node(fe_type, elem, n))
+                    if (FEInterface::n_dofs_at_node(fe_type, elem, n, add_p_level))
                       {
                         side_vars.insert(side_vars.end(), v_num);
                         break;
@@ -1655,7 +1658,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
 
           if (FEInterface::n_dofs_per_elem(fe_type, elem) ||
               (has_interior_nodes &&
-               FEInterface::n_dofs_at_node(fe_type, elem, n_nodes-1)))
+               FEInterface::n_dofs_at_node(fe_type, elem, n_nodes-1, add_p_level)))
             {
 #ifdef LIBMESH_ENABLE_AMR
               // We may have already just copied constant monomials,
@@ -2284,11 +2287,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectVert
                   // Currently other C_ONE elements have a single nodal
                   // value shape function and nodal gradient component
                   // shape functions
-                  libmesh_assert_equal_to
-                    (FEInterface::n_dofs_at_node
-                      (base_fe_type, &elem,
-                       elem.get_node_index(&vertex)),
-                    (unsigned int)(1 + dim));
+                  libmesh_assert_equal_to(
+                      FEInterface::n_dofs_at_node(
+                          base_fe_type,
+                          &elem,
+                          elem.get_node_index(&vertex),
+                          this->projector.system.get_dof_map().should_p_refine(
+                              this->projector.system.get_dof_map().var_group_from_var_number(var))),
+                      (unsigned int)(1 + dim));
+
                   const FValue val =
                     f.eval_at_node(context, var_component, dim,
                                    vertex, extra_hanging_dofs[var],

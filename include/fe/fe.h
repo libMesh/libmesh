@@ -435,7 +435,8 @@ public:
   static void dofs_on_side(const Elem * const elem,
                            const Order o,
                            unsigned int s,
-                           std::vector<unsigned int> & di);
+                           std::vector<unsigned int> & di,
+                           bool add_p_level=true);
   /**
    * Fills the vector di with the local degree of freedom indices
    * associated with edge \p e of element \p elem
@@ -445,7 +446,8 @@ public:
   static void dofs_on_edge(const Elem * const elem,
                            const Order o,
                            unsigned int e,
-                           std::vector<unsigned int> & di);
+                           std::vector<unsigned int> & di,
+                           bool add_p_level=true);
 
   static Point inverse_map (const Elem * elem,
                             const Point & p,
