@@ -580,8 +580,18 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
                                            RBEIMEvaluationBuilderNumber & rb_eim_evaluation_builder)
 {
   // Number of basis functions
-    unsigned int n_bfs = rb_eim_evaluation.get_n_basis_functions();
+  unsigned int n_bfs = rb_eim_evaluation.get_n_basis_functions();
   rb_eim_evaluation_builder.setNBfs(n_bfs);
+
+  // If we're using the EIM error indicator then we store one extra
+  // interpolation point and associated data, hence we increment n_bfs
+  // here so that we write out the extra data below.
+  if (rb_eim_evaluation.use_eim_error_indicator() &&
+      (rb_eim_evaluation.get_n_interpolation_points() > n_bfs))
+    n_bfs++;
+
+  libmesh_error_msg_if(n_bfs != rb_eim_evaluation.get_n_interpolation_points(),
+    "Number of basis functions should match number of interpolation points");
 
   auto parameter_ranges_list =
     rb_eim_evaluation_builder.initParameterRanges();

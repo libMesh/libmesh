@@ -147,6 +147,13 @@ public:
   unsigned int get_n_basis_functions() const;
 
   /**
+   * Return the number of interpolation points. If we're not using the EIM error
+   * indicator, then this matches get_n_basis_functions(), but if we are using
+   * the EIM error indicator then we should have one extra interpolation point.
+   */
+  unsigned int get_n_interpolation_points() const;
+
+  /**
    * Set the number of basis functions. Useful when reading in
    * stored data.
    */
@@ -354,6 +361,11 @@ public:
   std::vector<DenseVector<Number>> & get_eim_solutions_for_training_set();
 
   /**
+   * Return the EIM error indicator values from the most recent call to rb_eim_solves().
+   */
+  const std::vector<Real> & get_rb_eim_error_indicators() const;
+
+  /**
    * Set the data associated with EIM interpolation points.
    */
   void add_interpolation_points_xyz(Point p);
@@ -541,6 +553,24 @@ public:
    */
   virtual bool scale_components_in_enrichment() const;
 
+  /**
+   * Virtual function to indicate if we use the EIM error indicator in this case.
+   * This indicates if we will generate the data during the Offline training for
+   * the EIM error indicator. In EIM solves, the error indicator will only
+   * be used if set_eim_error_indicator_active() is set to true, since we want
+   * to be able to enable or disable the error indicator depending on the type
+   * of solve we are doing (e.g. EIM solves during training do not need the
+   * error indicator).
+   */
+  virtual bool use_eim_error_indicator() const;
+
+  /**
+   * Activate/decative the error indicator in EIM solves. We need this option since
+   * in some cases (e.g. during EIM training) we do not want to activate the EIM
+   * error indicator, whereas in "online solves" we do want to activate it.
+   */
+  void set_eim_error_indicator_active(bool is_active);
+
 private:
 
   /**
@@ -592,6 +622,12 @@ private:
    * The EIM solution coefficients from the most recent call to rb_eim_solves().
    */
   std::vector<DenseVector<Number>> _rb_eim_solutions;
+
+  /**
+   * If we're using the EIM error indicator, then we store the error indicator
+   * values corresponding to _rb_eim_solutions here.
+   */
+  std::vector<Real> _rb_eim_error_indicators;
 
   /**
    * Storage for EIM solutions from the training set. This is typically used in
@@ -780,6 +816,17 @@ private:
    * want to avoid changing it.
    */
   bool _preserve_rb_eim_solutions;
+
+  /**
+   * Indicate if the EIM error indicator is active in RB EIM solves. Note that
+   * this is distinct from use_eim_error_indicator(), since use_eim_error_indicator()
+   * indicates if this RBEIMEvaluation has an EIM error indicator defined,
+   * whereas _is_eim_error_indicator_active is used to turn on or off the
+   * error indicator. This primary purpose of _is_eim_error_indicator_active
+   * is to turn the error indicator off during EIM training (when it is not relevant)
+   * and to turn it on during "online solves".
+   */
+  bool _is_eim_error_indicator_active;
 
 };
 

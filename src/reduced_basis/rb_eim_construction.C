@@ -417,9 +417,13 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
 {
   LOG_SCOPE("train_eim_approximation_with_greedy()", "RBEIMConstruction");
 
-  _eim_projection_matrix.resize(get_Nmax(),get_Nmax());
-
   RBEIMEvaluation & rbe = get_rb_eim_evaluation();
+
+  // We need space for one extra interpolation point if we're using the
+  // EIM error indicator.
+  unsigned int max_matrix_size = rbe.use_eim_error_indicator() ? get_Nmax()+1 : get_Nmax();
+  _eim_projection_matrix.resize(max_matrix_size,max_matrix_size);
+
   rbe.initialize_parameters(*this);
   rbe.resize_data_structures(get_Nmax());
 
@@ -438,6 +442,12 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
   // We do this to ensure that the first EIM basis function is not zero.
   unsigned int current_training_index = _max_abs_value_in_training_set_index;
   set_params_from_training_set(current_training_index);
+
+  // We use this boolean to indicate if we will run one more iteration
+  // before exiting the loop below. We use this when computing the EIM
+  // error indicator, which requires one extra EIM iteration.
+  bool exit_on_next_iteration = false;
+
   while (true)
     {
       libMesh::out << "Greedily selected parameter vector:" << std::endl;
@@ -466,13 +476,26 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
 
       libMesh::out << "Maximum EIM error is " << greedy_error << std::endl << std::endl;
 
+      if (exit_on_next_iteration)
+        {
+          libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
+
+          // Before we exit we remove the "final" EIM basis function, since it was only added in order
+          // to create data for the EIM error indicator.
+          rbe.set_n_basis_functions(rbe.get_n_basis_functions()-1);
+
+          break;
+        }
+
       // Convergence and/or termination tests
       {
+        bool exit_condition_satisfied = false;
+
         if (rbe.get_n_basis_functions() >= this->get_Nmax())
           {
             libMesh::out << "Maximum number of basis functions reached: Nmax = "
                           << get_Nmax() << std::endl;
-            break;
+            exit_condition_satisfied = true;
           }
 
         // We consider the relative tolerance as relative to the maximum value in the training
@@ -480,20 +503,13 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
         if (greedy_error < (get_rel_training_tolerance() * get_max_abs_value_in_training_set()))
           {
             libMesh::out << "Relative error tolerance reached." << std::endl;
-            break;
+            exit_condition_satisfied = true;
           }
 
         if (greedy_error < get_abs_training_tolerance())
           {
             libMesh::out << "Absolute error tolerance reached." << std::endl;
-            break;
-          }
-
-        if (rbe.get_n_basis_functions() >= this->get_Nmax())
-          {
-            libMesh::out << "Maximum number of basis functions reached: Nmax = "
-                         << get_Nmax() << std::endl;
-            break;
+            exit_condition_satisfied = true;
           }
 
         {
@@ -508,8 +524,24 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
               }
 
           if (do_exit)
-            break; // out of while
+            exit_condition_satisfied = true;
         }
+
+        if (exit_condition_satisfied)
+          {
+            // If we're using the EIM error indicator then we need to run
+            // one extra EIM iteration since we use the extra EIM point
+            // to obtain our error indicator. If we're not using the EIM
+            // error indicator, then we just exit now.
+            if (get_rb_eim_evaluation().use_eim_error_indicator())
+              {
+                exit_on_next_iteration = true;
+                libMesh::out << "EIM error indicator is active, hence we will run one extra EIM iteration before exiting"
+                             << std::endl;
+              }
+            else
+              break;
+          }
       }
     } // end while(true)
 
@@ -528,11 +560,15 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 {
   LOG_SCOPE("train_eim_approximation_with_POD()", "RBEIMConstruction");
 
+  RBEIMEvaluation & rbe = get_rb_eim_evaluation();
+
   // _eim_projection_matrix is not used in the POD case, but we resize it here in any case
   // to be consistent with what we do in train_eim_approximation_with_greedy().
-  _eim_projection_matrix.resize(get_Nmax(),get_Nmax());
+  // We need space for one extra interpolation point if we're using the
+  // EIM error indicator.
+  unsigned int max_matrix_size = rbe.use_eim_error_indicator() ? get_Nmax()+1 : get_Nmax();
+  _eim_projection_matrix.resize(max_matrix_size,max_matrix_size);
 
-  RBEIMEvaluation & rbe = get_rb_eim_evaluation();
   rbe.initialize_parameters(*this);
   rbe.resize_data_structures(get_Nmax());
 
@@ -597,15 +633,27 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
     return 0.;
   }
 
+  // We use this boolean to indicate if we will run one more iteration
+  // before exiting the loop below. We use this when computing the EIM
+  // error indicator, which requires one extra EIM iteration.
+  bool exit_on_next_iteration = false;
+
   // Add dominant vectors from the POD as basis functions.
   unsigned int j = 0;
   Real rel_err = 0.;
   while (true)
     {
-      if (j >= get_Nmax() || j >= n_snapshots)
+      if (j >= n_snapshots)
+        {
+          libMesh::out << "Number of basis functions (" << j << ") equals number of training samples, hence exiting." << std::endl;
+          break;
+        }
+
+      bool exit_condition_satisfied = false;
+      if (j >= get_Nmax())
         {
           libMesh::out << "Maximum number of basis functions (" << j << ") reached." << std::endl;
-          break;
+          exit_condition_satisfied = true;
         }
 
       // The "energy" error in the POD approximation is determined by the first omitted
@@ -616,10 +664,37 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
       libMesh::out << "Number of basis functions: " << j
                    << ", POD error norm: " << rel_err << std::endl;
 
+      if (exit_on_next_iteration)
+        {
+          libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
+
+          // Before we exit we remove the "final" EIM basis function, since it was only added in order
+          // to create data for the EIM error indicator.
+          get_rb_eim_evaluation().set_n_basis_functions(get_rb_eim_evaluation().get_n_basis_functions()-1);
+
+          break;
+        }
+
       if (rel_err < get_rel_training_tolerance())
         {
           libMesh::out << "Training tolerance reached." << std::endl;
-          break;
+          exit_condition_satisfied = true;
+        }
+
+      if (exit_condition_satisfied)
+        {
+          // If we're using the EIM error indicator then we need to run
+          // one extra EIM iteration since we use the extra EIM point
+          // to obtain our error indicator. If we're not using the EIM
+          // error indicator, then we just exit now.
+          if (get_rb_eim_evaluation().use_eim_error_indicator())
+            {
+              exit_on_next_iteration = true;
+              libMesh::out << "EIM error indicator is active, hence we will run one extra EIM iteration before exiting"
+                            << std::endl;
+            }
+          else
+            break;
         }
 
       if (rbe.get_parametrized_function().on_mesh_sides())
@@ -876,7 +951,12 @@ unsigned int RBEIMConstruction::get_n_parametrized_functions_for_training() cons
 
 void RBEIMConstruction::reinit_eim_projection_matrix()
 {
-  _eim_projection_matrix.resize(get_Nmax(),get_Nmax());
+  RBEIMEvaluation & rbe = get_rb_eim_evaluation();
+
+  // We need space for one extra interpolation point if we're using the
+  // EIM error indicator.
+  unsigned int max_matrix_size = rbe.use_eim_error_indicator() ? get_Nmax()+1 : get_Nmax();
+  _eim_projection_matrix.resize(max_matrix_size,max_matrix_size);
 }
 
 std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
@@ -2325,13 +2405,13 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
   // Add local_pf as the new basis function and store data
   // associated with the interpolation point.
   eim_eval.add_basis_function_and_interpolation_data(local_pf,
-                                                    optimal_point,
-                                                    optimal_comp,
-                                                    optimal_elem_id,
-                                                    optimal_subdomain_id,
-                                                    optimal_qp,
-                                                    optimal_point_perturbs,
-                                                    optimal_point_phi_i_qp);
+                                                     optimal_point,
+                                                     optimal_comp,
+                                                     optimal_elem_id,
+                                                     optimal_subdomain_id,
+                                                     optimal_qp,
+                                                     optimal_point_perturbs,
+                                                     optimal_point_phi_i_qp);
 
   if (has_obs_vals)
     {

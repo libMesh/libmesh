@@ -29,6 +29,12 @@ public:
   {
     set_parametrized_function(std::make_unique<ShiftedGaussian>());
   }
+
+  virtual bool use_eim_error_indicator() const override
+  {
+    // Indicate that we do use the EIM error indicator here.
+    return true;
+  }
 };
 
 // A simple subclass of RBEIMConstruction.
