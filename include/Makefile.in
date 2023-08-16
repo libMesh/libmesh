@@ -687,6 +687,7 @@ include_HEADERS = \
         fe/fe_xyz_map.h \
         fe/h1_fe_transformation.h \
         fe/hcurl_fe_transformation.h \
+        fe/hdiv_fe_transformation.h \
         fe/inf_fe.h \
         fe/inf_fe_instantiate_1D.h \
         fe/inf_fe_instantiate_2D.h \

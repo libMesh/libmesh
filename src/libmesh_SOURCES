@@ -81,6 +81,9 @@ libmesh_SOURCES =  \
         src/fe/fe_rational_shape_1D.C \
         src/fe/fe_rational_shape_2D.C \
         src/fe/fe_rational_shape_3D.C \
+        src/fe/fe_raviart.C \
+        src/fe/fe_raviart_shape_2D.C \
+        src/fe/fe_raviart_shape_3D.C \
         src/fe/fe_scalar.C \
         src/fe/fe_scalar_shape_0D.C \
         src/fe/fe_scalar_shape_1D.C \
@@ -104,6 +107,7 @@ libmesh_SOURCES =  \
         src/fe/fe_xyz_shape_3D.C \
         src/fe/h1_fe_transformation.C \
         src/fe/hcurl_fe_transformation.C \
+        src/fe/hdiv_fe_transformation.C \
         src/fe/inf_fe.C \
         src/fe/inf_fe_base_radial.C \
         src/fe/inf_fe_boundary.C \
