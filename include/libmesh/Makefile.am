@@ -548,9 +548,19 @@ exodusII.h: $(top_srcdir)/contrib/exodusii/v8.11/exodus/include/exodusII.h
 
 endif
 
-if LIBMESH_ENABLE_NETCDF_V4
+if LIBMESH_ENABLE_NETCDF_V462
 
-netcdf.h: $(top_srcdir)/contrib/netcdf/v4/include/netcdf.h
+netcdf.h: $(top_srcdir)/contrib/netcdf/netcdf-c-4.6.2/include/netcdf.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+  BUILT_SOURCES  += netcdf.h
+  DISTCLEANFILES += netcdf.h
+
+endif
+
+if LIBMESH_ENABLE_NETCDF_V492
+
+netcdf.h: $(top_srcdir)/contrib/netcdf/netcdf-c/include/netcdf.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
   BUILT_SOURCES  += netcdf.h

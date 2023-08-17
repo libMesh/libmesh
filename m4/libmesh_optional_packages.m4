@@ -728,6 +728,13 @@ AS_IF([test $enablehdf5 = yes],
       ])
 AM_CONDITIONAL(LIBMESH_ENABLE_HDF5, test x$enablehdf5 = xyes)
 
+# --------------------------------------------------------------
+# libxml2 for netCDF
+# --------------------------------------------------------------
+AM_PATH_XML2(2.0.0, [haveexternalxml2=yes], [haveexternalxml2=no])
+AS_IF([test $haveexternalxml2 = yes],
+      [libmesh_contrib_CPPFLAGS="$XML_CPPFLAGS $libmesh_contrib_CPPFLAGS"
+       libmesh_contrib_LIBS="$XML_LIBS $libmesh_contrib_LIBS"])
 
 # --------------------------------------------------------------
 # netCDF -- enabled by default (it is distributed in contrib)
@@ -737,7 +744,8 @@ AS_IF([test $enablenetcdf = yes],
       [libmesh_contrib_INCLUDES="$NETCDF_INCLUDE $libmesh_contrib_INCLUDES"])
 
 AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF,    test x$enablenetcdf  = xyes)
-AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF_V4, test x$netcdfversion = x4)
+AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF_V462, test x$netcdfversion = xv4.6.2)
+AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF_V492, test x$netcdfversion = xv4.9.2)
 
 # -------------------------------------------------------------
 # ExodusII -- enabled by default (it is distributed in contrib)

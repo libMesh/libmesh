@@ -705,11 +705,16 @@ EXODUS_FORTRAN_API_FALSE
 EXODUS_FORTRAN_API_TRUE
 EXODUS_NOT_NETCDF4_FLAG
 EXODUS_INCLUDE
-LIBMESH_ENABLE_NETCDF_V4_FALSE
-LIBMESH_ENABLE_NETCDF_V4_TRUE
+LIBMESH_ENABLE_NETCDF_V492_FALSE
+LIBMESH_ENABLE_NETCDF_V492_TRUE
+LIBMESH_ENABLE_NETCDF_V462_FALSE
+LIBMESH_ENABLE_NETCDF_V462_TRUE
 LIBMESH_ENABLE_NETCDF_FALSE
 LIBMESH_ENABLE_NETCDF_TRUE
 NETCDF_INCLUDE
+XML_LIBS
+XML_CPPFLAGS
+XML2_CONFIG
 LIBMESH_ENABLE_HDF5_FALSE
 LIBMESH_ENABLE_HDF5_TRUE
 HDF5_PREFIX
@@ -1279,6 +1284,9 @@ with_curl_lib
 enable_hdf5
 enable_hdf5_required
 with_hdf5
+with_xml_prefix
+with_xml_exec_prefix
+enable_xmltest
 enable_netcdf
 enable_exodus
 enable_exodus_fortran
@@ -2076,6 +2084,7 @@ Optional Features:
   --enable-hdf5           build with HDF5 support; the selected HDF5 must be
                           compatible with our netcdf
   --enable-hdf5-required  Error if HDF5 is not detected by configure
+  --disable-xmltest       Do not try to compile and run a test LIBXML program
   --disable-netcdf        build without netCDF binary I/O
   --disable-exodus        build without ExodusII API support
   --enable-exodus-fortran build with ExodusII Fortran API support
@@ -2188,6 +2197,8 @@ Optional Packages:
   --with-curl-lib=PATH    Specify the path for CURL libs
   --with-hdf5=DIR         root directory of HDF5 installation (default =
                           HDF5_DIR)
+  --with-xml-prefix=PFX   Prefix where libxml is installed (optional)
+  --with-xml-exec-prefix=PFX Exec prefix where libxml is installed (optional)
   --with-fparser=<release|none|devel>
                           Determine which version of the C++ function parser
                           to use
@@ -55490,6 +55501,272 @@ else
 fi
 
 
+# --------------------------------------------------------------
+# libxml2 for netCDF
+# --------------------------------------------------------------
+
+
+# Check whether --with-xml-prefix was given.
+if test "${with_xml_prefix+set}" = set; then :
+  withval=$with_xml_prefix; xml_config_prefix="$withval"
+else
+  xml_config_prefix=""
+fi
+
+
+# Check whether --with-xml-exec-prefix was given.
+if test "${with_xml_exec_prefix+set}" = set; then :
+  withval=$with_xml_exec_prefix; xml_config_exec_prefix="$withval"
+else
+  xml_config_exec_prefix=""
+fi
+
+# Check whether --enable-xmltest was given.
+if test "${enable_xmltest+set}" = set; then :
+  enableval=$enable_xmltest;
+else
+  enable_xmltest=yes
+fi
+
+
+  if test x$xml_config_exec_prefix != x ; then
+     xml_config_args="$xml_config_args"
+     if test x${XML2_CONFIG+set} != xset ; then
+        XML2_CONFIG=$xml_config_exec_prefix/bin/xml2-config
+     fi
+  fi
+  if test x$xml_config_prefix != x ; then
+     xml_config_args="$xml_config_args --prefix=$xml_config_prefix"
+     if test x${XML2_CONFIG+set} != xset ; then
+        XML2_CONFIG=$xml_config_prefix/bin/xml2-config
+     fi
+  fi
+
+  # Extract the first word of "xml2-config", so it can be a program name with args.
+set dummy xml2-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_XML2_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $XML2_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_XML2_CONFIG="$XML2_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_XML2_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_XML2_CONFIG" && ac_cv_path_XML2_CONFIG="no"
+  ;;
+esac
+fi
+XML2_CONFIG=$ac_cv_path_XML2_CONFIG
+if test -n "$XML2_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $XML2_CONFIG" >&5
+$as_echo "$XML2_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  min_xml_version=2.0.0
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libxml - version >= $min_xml_version" >&5
+$as_echo_n "checking for libxml - version >= $min_xml_version... " >&6; }
+  no_xml=""
+  if test "$XML2_CONFIG" = "no" ; then
+    no_xml=yes
+  else
+    XML_CPPFLAGS=`$XML2_CONFIG $xml_config_args --cflags`
+    XML_LIBS=`$XML2_CONFIG $xml_config_args --libs`
+    xml_config_major_version=`$XML2_CONFIG $xml_config_args --version | \
+           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
+    xml_config_minor_version=`$XML2_CONFIG $xml_config_args --version | \
+           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
+    xml_config_micro_version=`$XML2_CONFIG $xml_config_args --version | \
+           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
+    if test "x$enable_xmltest" = "xyes" ; then
+      ac_save_CPPFLAGS="$CPPFLAGS"
+      ac_save_LIBS="$LIBS"
+      CPPFLAGS="$CPPFLAGS $XML_CPPFLAGS"
+      LIBS="$XML_LIBS $LIBS"
+      rm -f conf.xmltest
+      if test "$cross_compiling" = yes; then :
+  echo $ac_n "cross compiling; assumed OK... $ac_c"
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <libxml/xmlversion.h>
+
+int
+main()
+{
+  int xml_major_version, xml_minor_version, xml_micro_version;
+  int major, minor, micro;
+  char *tmp_version;
+
+  system("touch conf.xmltest");
+
+  /* Capture xml2-config output via autoconf/configure variables */
+  /* HP/UX 9 (%@#!) writes to sscanf strings */
+  tmp_version = (char *)strdup("$min_xml_version");
+  if (sscanf(tmp_version, "%d.%d.%d", &major, &minor, &micro) != 3) {
+     printf("%s, bad version string from xml2-config\n", "$min_xml_version");
+     exit(1);
+   }
+   free(tmp_version);
+
+   /* Capture the version information from the header files */
+   tmp_version = (char *)strdup(LIBXML_DOTTED_VERSION);
+   if (sscanf(tmp_version, "%d.%d.%d", &xml_major_version, &xml_minor_version, &xml_micro_version) != 3) {
+     printf("%s, bad version string from libxml includes\n", "LIBXML_DOTTED_VERSION");
+     exit(1);
+   }
+   free(tmp_version);
+
+ /* Compare xml2-config output to the libxml headers */
+  if ((xml_major_version != $xml_config_major_version) ||
+      (xml_minor_version != $xml_config_minor_version) ||
+      (xml_micro_version != $xml_config_micro_version))
+    {
+      printf("*** libxml header files (version %d.%d.%d) do not match\n",
+         xml_major_version, xml_minor_version, xml_micro_version);
+      printf("*** xml2-config (version %d.%d.%d)\n",
+         $xml_config_major_version, $xml_config_minor_version, $xml_config_micro_version);
+      return 1;
+    }
+/* Compare the headers to the library to make sure we match */
+  /* Less than ideal -- doesn't provide us with return value feedback,
+   * only exits if there's a serious mismatch between header and library.
+   */
+    LIBXML_TEST_VERSION;
+
+    /* Test that the library is greater than our minimum version */
+    if ((xml_major_version > major) ||
+        ((xml_major_version == major) && (xml_minor_version > minor)) ||
+        ((xml_major_version == major) && (xml_minor_version == minor) &&
+        (xml_micro_version >= micro)))
+      {
+        return 0;
+       }
+     else
+      {
+        printf("\n*** An old version of libxml (%d.%d.%d) was found.\n",
+               xml_major_version, xml_minor_version, xml_micro_version);
+        printf("*** You need a version of libxml newer than %d.%d.%d.\n",
+           major, minor, micro);
+        printf("***\n");
+        printf("*** If you have already installed a sufficiently new version, this error\n");
+        printf("*** probably means that the wrong copy of the xml2-config shell script is\n");
+        printf("*** being found. The easiest way to fix this is to remove the old version\n");
+        printf("*** of LIBXML, but you can also set the XML2_CONFIG environment to point to the\n");
+        printf("*** correct copy of xml2-config. (In this case, you will have to\n");
+        printf("*** modify your LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf\n");
+        printf("*** so that the correct libraries are found at run-time))\n");
+    }
+  return 1;
+}
+
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+
+else
+  no_xml=yes
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+       CPPFLAGS="$ac_save_CPPFLAGS"
+       LIBS="$ac_save_LIBS"
+     fi
+  fi
+
+  if test "x$no_xml" = x ; then
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes (version $xml_config_major_version.$xml_config_minor_version.$xml_config_micro_version)" >&5
+$as_echo "yes (version $xml_config_major_version.$xml_config_minor_version.$xml_config_micro_version)" >&6; }
+     haveexternalxml2=yes
+  else
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+     if test "$XML2_CONFIG" = "no" ; then
+       echo "*** The xml2-config script installed by LIBXML could not be found"
+       echo "*** If libxml was installed in PREFIX, make sure PREFIX/bin is in"
+       echo "*** your path, or set the XML2_CONFIG environment variable to the"
+       echo "*** full path to xml2-config."
+     else
+       if test -f conf.xmltest ; then
+        :
+       else
+          echo "*** Could not run libxml test program, checking why..."
+          CPPFLAGS="$CPPFLAGS $XML_CPPFLAGS"
+          LIBS="$LIBS $XML_LIBS"
+	  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <libxml/xmlversion.h>
+#include <stdio.h>
+
+int
+main ()
+{
+ LIBXML_TEST_VERSION; return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+   echo "*** The test program compiled, but did not run. This usually means"
+          echo "*** that the run-time linker is not finding LIBXML or finding the wrong"
+          echo "*** version of LIBXML. If it is not finding LIBXML, you'll need to set your"
+          echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
+          echo "*** to the installed location  Also, make sure you have run ldconfig if that"
+          echo "*** is required on your system"
+          echo "***"
+          echo "*** If you have an old version installed, it is best to remove it, although"
+          echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"
+else
+   echo "*** The test program failed to compile or link. See the file config.log for the"
+          echo "*** exact error that occurred. This usually means LIBXML was incorrectly installed"
+          echo "*** or that you have moved LIBXML since it was installed. In the latter case, you"
+          echo "*** may want to edit the xml2-config script: $XML2_CONFIG"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+          CPPFLAGS="$ac_save_CPPFLAGS"
+          LIBS="$ac_save_LIBS"
+       fi
+     fi
+
+     XML_CPPFLAGS=""
+     XML_LIBS=""
+     haveexternalxml2=no
+  fi
+
+
+  rm -f conf.xmltest
+
+if test $haveexternalxml2 = yes; then :
+  libmesh_contrib_CPPFLAGS="$XML_CPPFLAGS $libmesh_contrib_CPPFLAGS"
+       libmesh_contrib_LIBS="$XML_LIBS $libmesh_contrib_LIBS"
+fi
 
 # --------------------------------------------------------------
 # netCDF -- enabled by default (it is distributed in contrib)
@@ -55498,9 +55775,12 @@ fi
   # Check whether --enable-netcdf was given.
 if test "${enable_netcdf+set}" = set; then :
   enableval=$enable_netcdf; case "${enableval}" in #(
-  yes|new|v4) :
+  v492) :
     enablenetcdf=yes
-                                 netcdfversion=4 ;; #(
+                                 netcdfversion="v4.9.2" ;; #(
+  yes|new|v4|v462) :
+    enablenetcdf=yes
+                                 netcdfversion="v4.6.2" ;; #(
   old|v3) :
     enablenetcdf=yes
                                  netcdfversion=3 ;; #(
@@ -55511,7 +55791,7 @@ if test "${enable_netcdf+set}" = set; then :
     as_fn_error $? "bad value ${enableval} for --enable-netcdf" "$LINENO" 5 ;;
 esac
 else
-  enablenetcdf=$enableoptional; netcdfversion=4
+  enablenetcdf=$enableoptional; netcdfversion="v4.6.2"
 fi
 
 
@@ -55528,27 +55808,46 @@ $as_echo "<<< Using netCDF 3.x is no longer supported, using version 4.x instead
 fi
 
   netcdf_v4_arg=''
+  netcdf_v4_subdir=''
   case "${netcdfversion}" in #(
   3) :
 
                                   as_fn_error $? ">>> Error: netCDF3 is no longer distributed with libMesh <<<" "$LINENO" 5
                 ;; #(
-  4) :
-    NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v4/include"
+  "v4.6.2") :
+    NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/netcdf-c-4.6.2/include -I\$(top_builddir)/contrib/netcdf/netcdf-c-4.6.2/include"
 
 $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 
-                                if test "x$enablenested" = "xno"; then :
+                                              if test "x$enablenested" = "xno"; then :
   as_fn_error $? "NetCDF v4 requires nested subpackages, try --enable-nested" "$LINENO" 5
 fi
 
-                                if test "x$enablehdf5" = "xno"; then :
+                                              if test "x$enablehdf5" = "xno"; then :
   netcdf_v4_arg=--disable-netcdf-4
 fi
 
-                                libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
-                { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4 support >>>" >&5
-$as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; } ;; #(
+                                              libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
+                       netcdf_v4_subdir='contrib/netcdf/netcdf-c-4.6.2'
+                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4.6.2 support >>>" >&5
+$as_echo "<<< Configuring library with NetCDF version 4.6.2 support >>>" >&6; } ;; #(
+  "v4.9.2") :
+    NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/netcdf-c/include -I\$(top_builddir)/contrib/netcdf/netcdf-c/include"
+
+$as_echo "#define HAVE_NETCDF 1" >>confdefs.h
+
+                                              if test "x$enablenested" = "xno"; then :
+  as_fn_error $? "NetCDF v4 requires nested subpackages, try --enable-nested" "$LINENO" 5
+fi
+
+                                              if test "x$enablehdf5" = "xno"; then :
+  netcdf_v4_arg=--disable-netcdf-4
+fi
+
+                                              libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
+                       netcdf_v4_subdir='contrib/netcdf/netcdf-c'
+                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4.9.2 support >>>" >&5
+$as_echo "<<< Configuring library with NetCDF version 4.9.2 support >>>" >&6; } ;; #(
   *) :
 
             NETCDF_INCLUDE=""
@@ -55572,12 +55871,20 @@ esac
 fi
 fi
 
+                              if test "x$haveexternalxml2" = "xyes"; then :
+  netcdf_xml2_arg=''
+else
+  netcdf_xml2_arg='--disable-libxml2'
+fi
+
                               if test "x$enablecurl" = "xyes"; then :
   netcdf_dap_arg=--enable-dap
                  netcdf_curl_arg=''
+                 netcdf_byterange_arg=''
 else
   netcdf_dap_arg=--disable-dap
                  netcdf_curl_arg=--disable-curl
+                 netcdf_byterange_arg=--disable-byterange
 fi
 
 
@@ -55587,7 +55894,7 @@ fi
 
 
 
-    ax_dir="contrib/netcdf/v4"
+    ax_dir="$netcdf_v4_subdir"
 
                     # Do not complain, so a configure script can configure whichever parts of a
     # large source tree are present.
@@ -55674,8 +55981,10 @@ ac_abs_srcdir=$ac_abs_top_srcdir$ac_dir_suffix
       as_fn_append ax_args " 'FC=$FC'"
       as_fn_append ax_args " 'CPPFLAGS=$SUB_CPPFLAGS'"
       as_fn_append ax_args " 'LIBS=$SUB_LIBS'"
+      as_fn_append ax_args " '$netcdf_xml2_arg'"
       as_fn_append ax_args " '$netcdf_dap_arg'"
       as_fn_append ax_args " '$netcdf_curl_arg'"
+      as_fn_append ax_args " '$netcdf_byterange_arg'"
       as_fn_append ax_args " '--disable-testsets'"
       as_fn_append ax_args " '$netcdf_v4_arg'"
 
@@ -55718,12 +56027,20 @@ else
   LIBMESH_ENABLE_NETCDF_FALSE=
 fi
 
- if test x$netcdfversion = x4; then
-  LIBMESH_ENABLE_NETCDF_V4_TRUE=
-  LIBMESH_ENABLE_NETCDF_V4_FALSE='#'
+ if test x$netcdfversion = xv4.6.2; then
+  LIBMESH_ENABLE_NETCDF_V462_TRUE=
+  LIBMESH_ENABLE_NETCDF_V462_FALSE='#'
 else
-  LIBMESH_ENABLE_NETCDF_V4_TRUE='#'
-  LIBMESH_ENABLE_NETCDF_V4_FALSE=
+  LIBMESH_ENABLE_NETCDF_V462_TRUE='#'
+  LIBMESH_ENABLE_NETCDF_V462_FALSE=
+fi
+
+ if test x$netcdfversion = xv4.9.2; then
+  LIBMESH_ENABLE_NETCDF_V492_TRUE=
+  LIBMESH_ENABLE_NETCDF_V492_FALSE='#'
+else
+  LIBMESH_ENABLE_NETCDF_V492_TRUE='#'
+  LIBMESH_ENABLE_NETCDF_V492_FALSE=
 fi
 
 
@@ -57978,7 +58295,7 @@ if test -z "${LIBMESH_ENABLE_HDF5_TRUE}" && test -z "${LIBMESH_ENABLE_HDF5_FALSE
   as_fn_error $? "conditional \"LIBMESH_ENABLE_HDF5\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-      ax_dir="contrib/netcdf/v4"
+      ax_dir="$netcdf_v4_subdir"
 
       # Convert the path to the subdirectory into a shell variable name.
       ax_var=$(printf "$ax_dir" | tr -c "0-9a-zA-Z_" "_")
@@ -58077,8 +58394,12 @@ if test -z "${LIBMESH_ENABLE_NETCDF_TRUE}" && test -z "${LIBMESH_ENABLE_NETCDF_F
   as_fn_error $? "conditional \"LIBMESH_ENABLE_NETCDF\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${LIBMESH_ENABLE_NETCDF_V4_TRUE}" && test -z "${LIBMESH_ENABLE_NETCDF_V4_FALSE}"; then
-  as_fn_error $? "conditional \"LIBMESH_ENABLE_NETCDF_V4\" was never defined.
+if test -z "${LIBMESH_ENABLE_NETCDF_V462_TRUE}" && test -z "${LIBMESH_ENABLE_NETCDF_V462_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_NETCDF_V462\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_NETCDF_V492_TRUE}" && test -z "${LIBMESH_ENABLE_NETCDF_V492_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_NETCDF_V492\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${EXODUS_FORTRAN_API_TRUE}" && test -z "${EXODUS_FORTRAN_API_FALSE}"; then

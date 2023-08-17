@@ -50,13 +50,22 @@ endif
 
 if LIBMESH_ENABLE_NETCDF
 # NetCDF version 4, use their autotools package
-if LIBMESH_ENABLE_NETCDF_V4
-  SUBDIRS    += netcdf/v4
-  opt_libs   += netcdf/v4/liblib/libnetcdf.la
-  dbg_libs   += netcdf/v4/liblib/libnetcdf.la
-  devel_libs += netcdf/v4/liblib/libnetcdf.la
-  prof_libs  += netcdf/v4/liblib/libnetcdf.la
-  oprof_libs += netcdf/v4/liblib/libnetcdf.la
+if LIBMESH_ENABLE_NETCDF_V462
+  SUBDIRS    += netcdf/netcdf-c-4.6.2
+  opt_libs   += netcdf/netcdf-c-4.6.2/liblib/libnetcdf.la
+  dbg_libs   += netcdf/netcdf-c-4.6.2/liblib/libnetcdf.la
+  devel_libs += netcdf/netcdf-c-4.6.2/liblib/libnetcdf.la
+  prof_libs  += netcdf/netcdf-c-4.6.2/liblib/libnetcdf.la
+  oprof_libs += netcdf/netcdf-c-4.6.2/liblib/libnetcdf.la
+endif
+
+if LIBMESH_ENABLE_NETCDF_V492
+  SUBDIRS    += netcdf/netcdf-c
+  opt_libs   += netcdf/netcdf-c/liblib/libnetcdf.la
+  dbg_libs   += netcdf/netcdf-c/liblib/libnetcdf.la
+  devel_libs += netcdf/netcdf-c/liblib/libnetcdf.la
+  prof_libs  += netcdf/netcdf-c/liblib/libnetcdf.la
+  oprof_libs += netcdf/netcdf-c/liblib/libnetcdf.la
 endif
 endif
 

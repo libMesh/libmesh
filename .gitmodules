@@ -13,3 +13,6 @@
 [submodule "contrib/eigen/git"]
 	path = contrib/eigen/git
 	url = https://gitlab.com/libeigen/eigen.git
+[submodule "contrib/netcdf/netcdf-c"]
+	path = contrib/netcdf/netcdf-c
+	url = ../../Unidata/netcdf-c
