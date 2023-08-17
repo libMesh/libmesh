@@ -69,15 +69,15 @@ int main (int argc, char ** argv)
   Mesh mesh(init.comm());
 
   // Use the MeshTools::Generation mesh generator to create a uniform
-  // grid on the square [-1,1]^D. We must use TRI6 elements for the
-  // Nedelec triangle elements.
+  // grid on the square [-1,1]^D. We must use at least TRI6 or QUAD8 elements
+  // for the Nedelec triangle or quadrilateral elements, respectively.
   std::string elem_str =
     command_line_value(std::string("element_type"),
                        std::string("TRI6"));
 
-  libmesh_error_msg_if(elem_str != "TRI6" && elem_str != "QUAD8" && elem_str != "QUAD9",
+  libmesh_error_msg_if(elem_str != "TRI6" && elem_str != "TRI7" && elem_str != "QUAD8" && elem_str != "QUAD9",
                        "You selected: " << elem_str <<
-                       " but this example must be run with TRI6, QUAD8, or QUAD9.");
+                       " but this example must be run with TRI6, TRI7, QUAD8, or QUAD9.");
 
   MeshTools::Generation::build_square (mesh,
                                        grid_size,

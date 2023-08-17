@@ -1,4 +1,4 @@
-# The coarse rid size from which to start adaptivity
+# The coarse grid size from which to start adaptivity
 grid_size = 4 
 
 # Turn this off to see the NewtonSolver chatter
