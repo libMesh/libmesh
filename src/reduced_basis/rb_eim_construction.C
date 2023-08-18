@@ -649,11 +649,15 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           break;
         }
 
-      bool exit_condition_satisfied = false;
-      if (j >= get_Nmax())
+      if (exit_on_next_iteration)
         {
-          libMesh::out << "Maximum number of basis functions (" << j << ") reached." << std::endl;
-          exit_condition_satisfied = true;
+          libMesh::out << "Extra EIM iteration for error indicator is complete, POD error norm for extra iteration: " << rel_err << std::endl;
+
+          // Before we exit we remove the "final" EIM basis function, since it was only added in order
+          // to create data for the EIM error indicator.
+          get_rb_eim_evaluation().set_n_basis_functions(get_rb_eim_evaluation().get_n_basis_functions()-1);
+
+          break;
         }
 
       // The "energy" error in the POD approximation is determined by the first omitted
@@ -664,15 +668,11 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
       libMesh::out << "Number of basis functions: " << j
                    << ", POD error norm: " << rel_err << std::endl;
 
-      if (exit_on_next_iteration)
+      bool exit_condition_satisfied = false;
+      if (j >= get_Nmax())
         {
-          libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
-
-          // Before we exit we remove the "final" EIM basis function, since it was only added in order
-          // to create data for the EIM error indicator.
-          get_rb_eim_evaluation().set_n_basis_functions(get_rb_eim_evaluation().get_n_basis_functions()-1);
-
-          break;
+          libMesh::out << "Maximum number of basis functions (" << j << ") reached." << std::endl;
+          exit_condition_satisfied = true;
         }
 
       if (rel_err < get_rel_training_tolerance())
