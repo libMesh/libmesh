@@ -512,10 +512,14 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
             exit_condition_satisfied = true;
           }
 
+        bool has_parameters = (get_parameters().n_parameters() > 0);
         {
           bool do_exit = false;
+          // In the check for repeated parameters we have to make sure this isn't a case
+          // with no parameters, since in that case we would always report repeated
+          // parameters.
           for (auto & param : greedy_param_list)
-            if (param == get_parameters())
+            if (param == get_parameters() && has_parameters)
               {
                 libMesh::out << "Exiting greedy because the same parameters were selected twice"
                              << std::endl;
@@ -533,7 +537,7 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
             // one extra EIM iteration since we use the extra EIM point
             // to obtain our error indicator. If we're not using the EIM
             // error indicator, then we just exit now.
-            if (get_rb_eim_evaluation().use_eim_error_indicator())
+            if (get_rb_eim_evaluation().use_eim_error_indicator() && has_parameters)
               {
                 exit_on_next_iteration = true;
                 libMesh::out << "EIM error indicator is active, hence we will run one extra EIM iteration before exiting"
@@ -687,7 +691,8 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           // one extra EIM iteration since we use the extra EIM point
           // to obtain our error indicator. If we're not using the EIM
           // error indicator, then we just exit now.
-          if (get_rb_eim_evaluation().use_eim_error_indicator())
+          bool has_parameters = (get_parameters().n_parameters() > 0);
+          if (get_rb_eim_evaluation().use_eim_error_indicator() && has_parameters)
             {
               exit_on_next_iteration = true;
               libMesh::out << "EIM error indicator is active, hence we will run one extra EIM iteration before exiting"
