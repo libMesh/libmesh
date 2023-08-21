@@ -27,6 +27,7 @@ namespace libMesh
 template<typename T> class FEGenericBase;
 template<typename T> class H1FETransformation;
 template<typename T> class HCurlFETransformation;
+template<typename T> class HDivFETransformation;
 class FEType;
 
 /**

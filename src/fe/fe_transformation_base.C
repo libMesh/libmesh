@@ -18,6 +18,7 @@
 #include "libmesh/fe_transformation_base.h"
 #include "libmesh/h1_fe_transformation.h"
 #include "libmesh/hcurl_fe_transformation.h"
+#include "libmesh/hdiv_fe_transformation.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/enum_to_string.h"
 
@@ -57,6 +58,9 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
       return std::make_unique<HCurlFETransformation<OutputShape>>();
 
       // HDiv Conforming Elements
+    case RAVIART_THOMAS:
+      return std::make_unique<HDivFETransformation<OutputShape>>();
+
       // L2 Conforming Elements
 
       // Other...
