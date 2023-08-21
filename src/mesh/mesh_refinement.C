@@ -107,6 +107,7 @@ MeshRefinement::MeshRefinement (MeshBase & m) :
   _node_level_mismatch_limit(0),
   _overrefined_boundary_limit(0),
   _underrefined_boundary_limit(0),
+  _allow_unrefined_patches(false),
   _enforce_mismatch_limit_prior_to_refinement(false)
 #ifdef LIBMESH_ENABLE_PERIODIC
   , _periodic_boundaries(nullptr)
