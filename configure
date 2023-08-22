@@ -24921,6 +24921,7 @@ fi
 
 
 
+
   # method-specific preprocessor flags, independent of compiler.
   ACSM_CPPFLAGS_OPT="-DNDEBUG"
   ACSM_CPPFLAGS_DBG="-DDEBUG"
@@ -25101,7 +25102,7 @@ fi
 
           ACSM_CFLAGS_OPT="-O2 -fstrict-aliasing"
           ACSM_CFLAGS_DEVEL="$ACSM_CFLAGS_OPT -g -Wimplicit -fstrict-aliasing"
-          ACSM_CFLAGS_DBG="-g -Wimplicit"
+          ACSM_CFLAGS_DBG="-O0 -g -Wimplicit"
           ACSM_ASSEMBLY_FLAGS="$ACSM_ASSEMBLY_FLAGS -fverbose-asm"
 
                     if test "x$ACSM_GXX_VERSION" != "xgcc11"; then :
@@ -25282,6 +25283,7 @@ fi
 
 
 
+
   # in the case blocks below we may add GLIBCXX-specific pedantic debugging preprocessor
   # definitions. Should only be used by a knowing user, because these options break
   # ABI compatibility.
@@ -25353,6 +25355,10 @@ fi
   CPPFLAGS_OPT="$ACSM_CPPFLAGS_OPT"
   CPPFLAGS_DEVEL="$ACSM_CPPFLAGS_DEVEL"
   CPPFLAGS_DBG="$ACSM_CPPFLAGS_DBG"
+
+  CFLAGS_OPT="$ACSM_CFLAGS_OPT"
+  CFLAGS_DEVEL="$ACSM_CFLAGS_DEVEL"
+  CFLAGS_DBG="$ACSM_CFLAGS_DBG"
 
   ASSEMBLY_FLAGS="$ACSM_ASSEMBLY_FLAGS"
   NODEPRECATEDFLAG="$ACSM_NODEPRECATEDFLAG"
