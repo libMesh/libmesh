@@ -115,9 +115,15 @@ public:
   {
     LOG_UNIT_TEST;
 
-    ExodusII_IO exii(*this->_mesh);
-    exii.write("write_exodus_" +
-               Utility::enum_to_string(elem_type) + ".e");
+    // This is a *buffered* write; we use scope to make sure the
+    // ExodusII_IO object gets destructed (and thus is guaranteed to
+    // finish writing and close the file) before we try to read what
+    // was written.
+    {
+      ExodusII_IO exii(*this->_mesh);
+      exii.write("write_exodus_" +
+                 Utility::enum_to_string(elem_type) + ".e");
+    }
 
     Mesh input_mesh(*TestCommWorld);
     ExodusII_IO exii_input(input_mesh);
