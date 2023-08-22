@@ -480,6 +480,16 @@ public:
    */
   signed char & underrefined_boundary_limit();
 
+  /**
+   * This flag defaults to false in order to maintain the original
+   * behavior of the code, which was to always eliminate unrefined
+   * element patches. If you set this flag to true, then the
+   * MeshRefinement::eliminate_unrefined_patches() function
+   * essentially does nothing, allowing such patches to persist. This
+   * may be particularly useful in e.g. 1D meshes where having
+   * unrefined patches does not introduce additional hanging nodes.
+   */
+  bool & allow_unrefined_patches();
 
   /**
    * Copy refinement flags on ghost elements from their
@@ -690,7 +700,9 @@ private:
    * o---o---o---o---o---o---o
    * \endverbatim
    *
-   * by refining the indicated element
+   * by refining the indicated element. If the _allow_unrefined_patches
+   * flag (default false) is set to true, then this function simpy returns
+   * false (indicating that no changes were made).
    */
   bool eliminate_unrefined_patches ();
 
@@ -788,6 +800,8 @@ private:
 
   signed char _overrefined_boundary_limit;
   signed char _underrefined_boundary_limit;
+
+  bool _allow_unrefined_patches;
 
   /**
    * This option enforces the mismatch level prior to refinement by checking
@@ -948,6 +962,11 @@ inline signed char & MeshRefinement::overrefined_boundary_limit()
 inline signed char & MeshRefinement::underrefined_boundary_limit()
 {
   return _underrefined_boundary_limit;
+}
+
+inline bool & MeshRefinement::allow_unrefined_patches()
+{
+  return _allow_unrefined_patches;
 }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED

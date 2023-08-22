@@ -373,6 +373,12 @@ bool MeshRefinement::eliminate_unrefined_patches ()
 
   bool flags_changed = false;
 
+  // Quick return: if unrefined patches are allowed, then we are not
+  // going to do anything here and can simply return that the flags
+  // haven't changed.
+  if (_allow_unrefined_patches)
+    return flags_changed;
+
   // Note: we *cannot* use a reference to the real pointer here, since
   // the pointer may be reseated below and we don't want to reseat
   // pointers held by the Mesh.
