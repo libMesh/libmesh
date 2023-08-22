@@ -186,7 +186,7 @@ double LinearSolver<T>::get_real_solver_setting (const std::string & setting_nam
                                                  const std::optional<double> & setting,
                                                  const std::optional<double> default_value)
 {
-  if (setting)
+  if (setting.has_value())
     return setting.value();
   else if (_solver_configuration)
   {
@@ -195,20 +195,20 @@ double LinearSolver<T>::get_real_solver_setting (const std::string & setting_nam
     if (it != this->_solver_configuration->real_valued_data.end())
       return it->second;
   }
-  else if (default_value)
+  else if (default_value.has_value())
     return default_value.value();
-
-  libmesh_error_msg("Iteration configuration parameter to the linear solver should either be supplied through input arguments or a SolverConfiguration object!");
+  else
+    libmesh_error_msg("Iteration configuration parameter to the linear solver should either be supplied through input arguments or a SolverConfiguration object!");
 
   return 0.0;
 }
 
 template <typename T>
 int LinearSolver<T>::get_int_solver_setting (const std::string & setting_name,
-                                                const std::optional<int> & setting,
-                                                const std::optional<int> default_value)
+                                             const std::optional<int> & setting,
+                                             const std::optional<int> default_value)
 {
-  if (setting)
+  if (setting.has_value())
     return setting.value();
   else if (_solver_configuration)
   {
@@ -217,10 +217,11 @@ int LinearSolver<T>::get_int_solver_setting (const std::string & setting_name,
     if (it != this->_solver_configuration->int_valued_data.end())
       return it->second;
   }
-  else if (default_value)
+  else if (default_value.has_value())
     return default_value.value();
+  else
+    libmesh_error_msg("Iteration configuration parameter to the linear solver should either be supplied through input arguments or a SolverConfiguration object!");
 
-  libmesh_error_msg("Iteration configuration parameter to the linear solver should either be supplied through input arguments or a SolverConfiguration object!");
   return 0.0;
 
 }
