@@ -159,7 +159,7 @@ std::pair<unsigned int, Real> LinearSolver<T>::adjoint_solve (SparseMatrix<T> & 
 
   // Call the solve function for the relevant linear algebra library and
   // solve the transpose matrix
-  const std::pair<unsigned int, Real> totalrval =  this->solve (mat, sol, rhs, tol, n_iter);
+  const std::pair<unsigned int, Real> totalrval =  this->solve (mat, sol, rhs, tol, n_its);
 
   // Now transpose back and restore the original matrix
   // by taking the discrete adjoint
@@ -187,7 +187,7 @@ double LinearSolver<T>::get_real_solver_setting (const std::string & setting_nam
                                                  const std::optional<double> default_value)
 {
   if (setting)
-    return setting.value()
+    return setting.value();
   else if (_solver_configuration)
   {
     auto it = this->_solver_configuration->real_valued_data.find(setting_name);
@@ -198,18 +198,18 @@ double LinearSolver<T>::get_real_solver_setting (const std::string & setting_nam
   else if (default_value)
     return default_value.value();
 
-  libmesh_error_msg("Iteration configuration aprameter to the linear solver should either"
-                    "be supplied through input arguments or a SolverConfiguration object".);
+  libmesh_error_msg("Iteration configuration parameter to the linear solver should either be supplied through input arguments or a SolverConfiguration object!");
+
   return 0.0;
 }
 
 template <typename T>
-double LinearSolver<T>::get_int_solver_setting (const std::string & setting_name,
+int LinearSolver<T>::get_int_solver_setting (const std::string & setting_name,
                                                 const std::optional<int> & setting,
                                                 const std::optional<int> default_value)
 {
   if (setting)
-    return setting.value()
+    return setting.value();
   else if (_solver_configuration)
   {
     auto it = this->_solver_configuration->int_valued_data.find(setting_name);
@@ -220,8 +220,7 @@ double LinearSolver<T>::get_int_solver_setting (const std::string & setting_name
   else if (default_value)
     return default_value.value();
 
-  libmesh_error_msg("Iteration configuration aprameter to the linear solver should either"
-                    "be supplied through input arguments or a SolverConfiguration object".);
+  libmesh_error_msg("Iteration configuration parameter to the linear solver should either be supplied through input arguments or a SolverConfiguration object!");
   return 0.0;
 
 }

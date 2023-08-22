@@ -361,12 +361,12 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
 {
   LOG_SCOPE("solve()", "PetscLinearSolver");
 
-  const double rel_tol = get_real_solver_setting("rel_tol", tol);
-  const double abs_tol = get_real_solve_setting("abs_tol", std::nullopt, (double)PETSC_DEFAULT);
-  const double m_its = get_int_solver_setting("max_its", m_its);
+  const double rel_tol = this->get_real_solver_setting("rel_tol", tol);
+  const double abs_tol = this->get_real_solver_setting("abs_tol", std::nullopt, (double)PETSC_DEFAULT);
+  const double max_its = this->get_int_solver_setting("max_its", m_its);
 
   return this->solve_common(matrix_in, precond_in, solution_in,
-                            rhs_in, rel_tol, abs_tol, m_its, KSPSolve);
+                            rhs_in, rel_tol, abs_tol, max_its, KSPSolve);
 }
 
 template <typename T>
@@ -379,13 +379,13 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
 {
   LOG_SCOPE("adjoint_solve()", "PetscLinearSolver");
 
-  const double rel_tol = get_real_solver_setting("rel_tol", tol);
-  const double abs_tol = get_real_solve_setting("abs_tol", std::nullopt, (double)PETSC_DEFAULT);
-  const double m_its = get_int_solver_setting("max_its", m_its);
+  const double rel_tol = this->get_real_solver_setting("rel_tol", tol);
+  const double abs_tol = this->get_real_solver_setting("abs_tol", std::nullopt, (double)PETSC_DEFAULT);
+  const double max_its = this->get_int_solver_setting("max_its", m_its);
 
   // Note that the matrix and precond matrix are the same
   return this->solve_common(matrix_in, matrix_in, solution_in,
-                            rhs_in, rel_tol, abs_tol, m_its, KSPSolveTranspose);
+                            rhs_in, rel_tol, abs_tol, max_its, KSPSolveTranspose);
 }
 
 
@@ -423,17 +423,17 @@ std::pair<unsigned int, Real>
 PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
                              NumericVector<T> & solution_in,
                              NumericVector<T> & rhs_in,
-                             const double tol,
-                             const unsigned int m_its)
+                             const std::optional<double> tol,
+                             const std::optional<unsigned int> m_its)
 {
   LOG_SCOPE("solve()", "PetscLinearSolver");
 
-  const double rel_tol = get_real_solver_setting("rel_tol", tol);
-  const double abs_tol = get_real_solve_setting("abs_tol", std::nullopt, (double)PETSC_DEFAULT);
-  const double m_its = get_int_solver_setting("max_its", m_its);
+  const double rel_tol = this->get_real_solver_setting("rel_tol", tol);
+  const double abs_tol = this->get_real_solver_setting("abs_tol", std::nullopt, (double)PETSC_DEFAULT);
+  const double max_its = this->get_int_solver_setting("max_its", m_its);
 
   return this->shell_solve_common(shell_matrix, nullptr, solution_in,
-                                  rhs_in, rel_tol, abs_tol, m_its);
+                                  rhs_in, rel_tol, abs_tol, max_its);
 }
 
 
@@ -444,19 +444,19 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
                              const SparseMatrix<T> & precond_matrix,
                              NumericVector<T> & solution_in,
                              NumericVector<T> & rhs_in,
-                             const double tol,
-                             const unsigned int m_its)
+                             const std::optional<double> tol,
+                             const std::optional<unsigned int> m_its)
 {
-  const double rel_tol = get_real_solver_setting("rel_tol", tol);
-  const double abs_tol = get_real_solve_setting("abs_tol", std::nullopt, (double)PETSC_DEFAULT);
-  const double m_its = get_int_solver_setting("max_its", m_its);
+  const double rel_tol = this->get_real_solver_setting("rel_tol", tol);
+  const double abs_tol = this->get_real_solver_setting("abs_tol", std::nullopt, (double)PETSC_DEFAULT);
+  const double max_its = this->get_int_solver_setting("max_its", m_its);
 
   // Make sure the data passed in are really of Petsc types
   const PetscMatrix<T> * precond  = cast_ptr<const PetscMatrix<T> *>(&precond_matrix);
 
   return this->shell_solve_common
     (shell_matrix, const_cast<PetscMatrix<T> *>(precond), solution_in,
-     rhs_in, rel_tol, abs_tol, m_its);
+     rhs_in, rel_tol, abs_tol, max_its);
 }
 
 
@@ -469,7 +469,7 @@ PetscLinearSolver<T>::shell_solve_common (const ShellMatrix<T> & shell_matrix,
                                           NumericVector<T> & rhs_in,
                                           const double rel_tol,
                                           const double abs_tol,
-                                          const unsigned int m_its,)
+                                          const unsigned int m_its)
 {
   LOG_SCOPE("solve()", "PetscLinearSolver");
 

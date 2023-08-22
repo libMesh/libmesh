@@ -75,8 +75,8 @@ public:
   solve (SparseMatrix<T> & matrix,
          NumericVector<T> & solution,
          NumericVector<T> & rhs,
-         const double tol,
-         const unsigned int m_its) override;
+         const std::optional<double> tol = std::nullopt,
+         const std::optional<unsigned int> m_its = std::nullopt) override;
 
   /**
    * Call the Eigen solver to solve A^T x = b
@@ -85,8 +85,8 @@ public:
   adjoint_solve (SparseMatrix<T> & matrix,
                  NumericVector<T> & solution,
                  NumericVector<T> & rhs,
-                 const double tol,
-                 const unsigned int m_its) override;
+                 const std::optional<double> tol = std::nullopt,
+                 const std::optional<unsigned int> m_its = std::nullopt) override;
 
   /**
    * Call the Eigen solver
@@ -96,8 +96,8 @@ public:
          SparseMatrix<T> & pc,
          NumericVector<T> & solution,
          NumericVector<T> & rhs,
-         const double tol,
-         const unsigned int m_its) override;
+         const std::optional<double> tol = std::nullopt,
+         const std::optional<unsigned int> m_its = std::nullopt) override;
 
   /**
    * This function solves a system whose matrix is a shell matrix.
@@ -106,8 +106,8 @@ public:
   solve (const ShellMatrix<T> & shell_matrix,
          NumericVector<T> & solution_in,
          NumericVector<T> & rhs_in,
-         const double tol,
-         const unsigned int m_its) override;
+         const std::optional<double> tol = std::nullopt,
+         const std::optional<unsigned int> m_its = std::nullopt) override;
 
   /**
    * This function solves a system whose matrix is a shell matrix, but
@@ -119,8 +119,8 @@ public:
          const SparseMatrix<T> & precond_matrix,
          NumericVector<T> & solution_in,
          NumericVector<T> & rhs_in,
-         const double tol,
-         const unsigned int m_its) override;
+         const std::optional<double> tol = std::nullopt,
+         const std::optional<unsigned int> m_its = std::nullopt) override;
 
   /**
    * \returns The solver's convergence flag
@@ -187,8 +187,8 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &,
                                    SparseMatrix<T> &,
                                    NumericVector<T> &,
                                    NumericVector<T> &,
-                                   const double,
-                                   const unsigned int)
+                                   const std::optional<double>,
+                                   const std::optional<unsigned int>)
 {
   libmesh_error_msg("ERROR: Eigen does not support a user-supplied preconditioner!");
 
