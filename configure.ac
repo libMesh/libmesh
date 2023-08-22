@@ -184,7 +184,7 @@ ACSM_CXX_COMPILER_STANDARD([2017], [2017])
 # compilers.  For example, newer versions of GCC have additional C++ debugging
 # flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
 # --------------------------------------------------------------
-LIBMESH_SET_CXX_FLAGS
+LIBMESH_SET_BUILD_FLAGS
 
 #------------------------------------------------------
 # Checks for code coverage
