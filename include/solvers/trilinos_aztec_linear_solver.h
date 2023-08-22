@@ -81,8 +81,8 @@ public:
   solve (SparseMatrix<T> & matrix_in,
          NumericVector<T> & solution_in,
          NumericVector<T> & rhs_in,
-         const double tol,
-         const unsigned int m_its) override
+         const std::optional<double> tol = std::nullopt,
+         const std::optional<unsigned int> m_its = std::nullopt) override
   {
     return this->solve(matrix_in, matrix_in, solution_in, rhs_in, tol, m_its);
   }
@@ -99,8 +99,8 @@ public:
          SparseMatrix<T> & preconditioner,
          NumericVector<T> & solution,
          NumericVector<T> & rhs,
-         const double tol,
-         const unsigned int m_its) override;
+         const std::optional<double> tol = std::nullopt,
+         const std::optional<unsigned int> m_its = std::nullopt) override;
 
   /**
    * This function solves a system whose matrix is a shell matrix.
@@ -109,8 +109,8 @@ public:
   solve (const ShellMatrix<T> & shell_matrix,
          NumericVector<T> & solution_in,
          NumericVector<T> & rhs_in,
-         const double tol,
-         const unsigned int m_its) override;
+         const std::optional<double> tol = std::nullopt,
+         const std::optional<unsigned int> m_its = std::nullopt) override;
 
   /**
    * This function solves a system whose matrix is a shell matrix, but
@@ -122,8 +122,8 @@ public:
          const SparseMatrix<T> & precond_matrix,
          NumericVector<T> & solution_in,
          NumericVector<T> & rhs_in,
-         const double tol,
-         const unsigned int m_its) override;
+         const std::optional<double> tol = std::nullopt,
+         const std::optional<unsigned int> m_its = std::nullopt) override;
 
   /**
    * Fills the input vector with the sequence of residual norms

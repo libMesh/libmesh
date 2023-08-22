@@ -31,6 +31,7 @@
 #include <cstddef>
 #include <vector>
 #include <memory>
+#include <optional>
 
 namespace libMesh
 {
