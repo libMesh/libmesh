@@ -155,8 +155,8 @@ public:
   solve (SparseMatrix<T> & matrix_in,
          NumericVector<T> & solution_in,
          NumericVector<T> & rhs_in,
-         const double tol,
-         const unsigned int m_its) override
+         const std::optional<double> tol = std::nullopt,
+         const std::optional<unsigned int> m_its = std::nullopt) override
   {
     return this->solve(matrix_in, matrix_in, solution_in, rhs_in, tol, m_its);
   }
@@ -170,8 +170,8 @@ public:
   adjoint_solve (SparseMatrix<T> & matrix_in,
                  NumericVector<T> & solution_in,
                  NumericVector<T> & rhs_in,
-                 const double tol,
-                 const unsigned int m_its) override;
+                 const std::optional<double> tol = std::nullopt,
+                 const std::optional<unsigned int> m_its = std::nullopt) override;
 
   /**
    * This method allows you to call a linear solver while specifying
@@ -194,8 +194,8 @@ public:
          SparseMatrix<T> & preconditioner,
          NumericVector<T> & solution,
          NumericVector<T> & rhs,
-         const double tol,
-         const unsigned int m_its) override;
+         const std::optional<double> tol = std::nullopt,
+         const std::optional<unsigned int> m_its = std::nullopt) override;
 
   /**
    * This function solves a system whose matrix is a shell matrix.
@@ -204,8 +204,8 @@ public:
   solve (const ShellMatrix<T> & shell_matrix,
          NumericVector<T> & solution_in,
          NumericVector<T> & rhs_in,
-         const double tol,
-         const unsigned int m_its) override;
+         const std::optional<double> tol = std::nullopt,
+         const std::optional<unsigned int> m_its = std::nullopt) override;
 
   /**
    * This function solves a system whose matrix is a shell matrix, but
@@ -217,8 +217,8 @@ public:
          const SparseMatrix<T> & precond_matrix,
          NumericVector<T> & solution_in,
          NumericVector<T> & rhs_in,
-         const double tol,
-         const unsigned int m_its) override;
+         const std::optional<double> tol = std::nullopt,
+         const std::optional<unsigned int> m_its = std::nullopt) override;
 
   /**
    * \returns The raw PETSc preconditioner context pointer.
@@ -269,7 +269,8 @@ private:
                 SparseMatrix<T> & precond_in,
                 NumericVector<T> & solution_in,
                 NumericVector<T> & rhs_in,
-                const double tol,
+                const double rel_tol,
+                const double abs_tol,
                 const unsigned int m_its,
                 ksp_solve_func_type solve_func);
 
@@ -282,7 +283,8 @@ private:
                       PetscMatrix<T> * precond_matrix,
                       NumericVector<T> & solution_in,
                       NumericVector<T> & rhs_in,
-                      const double tol,
+                      const double rel_tol,
+                      const double abs_tol,
                       const unsigned int m_its);
 
   /*
@@ -294,7 +296,8 @@ private:
               Mat mat,
               NumericVector<T> & solution_in,
               NumericVector<T> & rhs_in,
-              const double tol,
+              const double rel_tol,
+              const double abs_tol,
               const unsigned int m_its,
               ksp_solve_func_type solve_func);
 

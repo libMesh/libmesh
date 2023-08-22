@@ -147,8 +147,8 @@ template <typename T>
 std::pair<unsigned int, Real> LinearSolver<T>::adjoint_solve (SparseMatrix<T> & mat,
                                                               NumericVector<T> & sol,
                                                               NumericVector<T> & rhs,
-                                                              const double tol,
-                                                              const unsigned int n_iter)
+                                                              const std::optional<double> tol,
+                                                              const std::optional<unsigned int> n_its)
 {
   // Log how long the linear solve takes.
   LOG_SCOPE("adjoint_solve()", "LinearSolver");
@@ -179,6 +179,51 @@ template <typename T>
 void LinearSolver<T>::set_solver_configuration(SolverConfiguration & solver_configuration)
 {
   _solver_configuration = &solver_configuration;
+}
+
+template <typename T>
+double LinearSolver<T>::get_real_solver_setting (const std::string & setting_name,
+                                                 const std::optional<double> & setting,
+                                                 const std::optional<double> default_value)
+{
+  if (setting)
+    return setting.value()
+  else if (_solver_configuration)
+  {
+    auto it = this->_solver_configuration->real_valued_data.find(setting_name);
+
+    if (it != this->_solver_configuration->real_valued_data.end())
+      return it->second;
+  }
+  else if (default_value)
+    return default_value.value();
+
+  libmesh_error_msg("Iteration configuration aprameter to the linear solver should either"
+                    "be supplied through input arguments or a SolverConfiguration object".);
+  return 0.0;
+}
+
+template <typename T>
+double LinearSolver<T>::get_int_solver_setting (const std::string & setting_name,
+                                                const std::optional<int> & setting,
+                                                const std::optional<int> default_value)
+{
+  if (setting)
+    return setting.value()
+  else if (_solver_configuration)
+  {
+    auto it = this->_solver_configuration->int_valued_data.find(setting_name);
+
+    if (it != this->_solver_configuration->int_valued_data.end())
+      return it->second;
+  }
+  else if (default_value)
+    return default_value.value();
+
+  libmesh_error_msg("Iteration configuration aprameter to the linear solver should either"
+                    "be supplied through input arguments or a SolverConfiguration object".);
+  return 0.0;
+
 }
 
 //------------------------------------------------------------------
