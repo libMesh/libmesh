@@ -117,8 +117,8 @@ AztecLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
                              SparseMatrix<T> & precond_in,
                              NumericVector<T> & solution_in,
                              NumericVector<T> & rhs_in,
-                             const double tol,
-                             const unsigned int m_its)
+                             const std::optional<double> tol,
+                             const std::optional<unsigned int> m_its)
 {
   LOG_SCOPE("solve()", "AztecLinearSolver");
 
@@ -136,14 +136,17 @@ AztecLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
   solution->close ();
   rhs->close ();
 
-  _linear_solver->SetAztecOption(AZ_max_iter,m_its);
-  _linear_solver->SetAztecParam(AZ_tol,tol);
+  const int max_its = this->get_int_solver_setting("max_its", m_its);
+  const double rel_tol = this->get_real_solver_setting("rel_tol", tol);
+
+  _linear_solver->SetAztecOption(AZ_max_iter,max_its);
+  _linear_solver->SetAztecParam(AZ_tol,rel_tol);
 
   Epetra_FECrsMatrix * emat = matrix->mat();
   Epetra_Vector * esol = solution->vec();
   Epetra_Vector * erhs = rhs->vec();
 
-  _linear_solver->Iterate(emat, esol, erhs, m_its, tol);
+  _linear_solver->Iterate(emat, esol, erhs, max_its, rel_tol);
 
   // return the # of its. and the final residual norm.
   return std::make_pair(_linear_solver->NumIters(), _linear_solver->TrueResidual());
@@ -156,8 +159,8 @@ std::pair<unsigned int, Real>
 AztecLinearSolver<T>::solve (const ShellMatrix<T> &,
                              NumericVector<T> &,
                              NumericVector<T> &,
-                             const double,
-                             const unsigned int)
+                             const std::optional<double>,
+                             const std::optional<unsigned int>)
 {
   libmesh_not_implemented();
 }
@@ -170,8 +173,8 @@ AztecLinearSolver<T>::solve (const ShellMatrix<T> &,
                              const SparseMatrix<T> &,
                              NumericVector<T> &,
                              NumericVector<T> &,
-                             const double,
-                             const unsigned int)
+                             const std::optional<double>,
+                             const std::optional<unsigned int>)
 {
   libmesh_not_implemented();
 }

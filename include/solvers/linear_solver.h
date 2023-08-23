@@ -31,6 +31,7 @@
 #include <cstddef>
 #include <vector>
 #include <memory>
+#include <optional>
 
 namespace libMesh
 {
@@ -162,8 +163,8 @@ public:
   virtual std::pair<unsigned int, Real> solve (SparseMatrix<T> &,  // System Matrix
                                                NumericVector<T> &, // Solution vector
                                                NumericVector<T> &, // RHS vector
-                                               const double,      // Stopping tolerance
-                                               const unsigned int) = 0; // N. Iterations
+                                               const std::optional<double> tol = std::nullopt,
+                                               const std::optional<unsigned int> m_its = std::nullopt) = 0; // N. Iterations
 
   /**
    * Function to solve the adjoint system.
@@ -175,8 +176,8 @@ public:
   virtual std::pair<unsigned int, Real> adjoint_solve (SparseMatrix<T> &,  // System Matrix
                                                        NumericVector<T> &, // Solution vector
                                                        NumericVector<T> &, // RHS vector
-                                                       const double,      // Stopping tolerance
-                                                       const unsigned int); // N. Iterations
+                                                       const std::optional<double> tol = std::nullopt,
+                                                       const std::optional<unsigned int> m_its = std::nullopt); // N. Iterations
 
   /**
    * This function calls the solver
@@ -187,8 +188,8 @@ public:
                                                SparseMatrix<T> &,  // Preconditioning Matrix
                                                NumericVector<T> &, // Solution vector
                                                NumericVector<T> &, // RHS vector
-                                               const double,      // Stopping tolerance
-                                               const unsigned int) = 0; // N. Iterations
+                                               const std::optional<double> tol = std::nullopt,
+                                               const std::optional<unsigned int> m_its = std::nullopt) = 0; // N. Iterations
 
   /**
    * This function calls the solver "_solver_type" preconditioned with
@@ -200,8 +201,8 @@ public:
                                        SparseMatrix<T> * precond_matrix,
                                        NumericVector<T> &, // Solution vector
                                        NumericVector<T> &, // RHS vector
-                                       const double,      // Stopping tolerance
-                                       const unsigned int); // N. Iterations
+                                       const std::optional<double> tol = std::nullopt,
+                                       const std::optional<unsigned int> m_its = std::nullopt); // N. Iterations
 
 
 
@@ -211,8 +212,8 @@ public:
   virtual std::pair<unsigned int, Real> solve (const ShellMatrix<T> & shell_matrix,
                                                NumericVector<T> &, // Solution vector
                                                NumericVector<T> &, // RHS vector
-                                               const double,      // Stopping tolerance
-                                               const unsigned int) = 0; // N. Iterations
+                                               const std::optional<double> tol = std::nullopt,
+                                               const std::optional<unsigned int> m_its = std::nullopt) = 0; // N. Iterations
 
 
   /**
@@ -224,8 +225,8 @@ public:
                                                const SparseMatrix<T> & precond_matrix,
                                                NumericVector<T> &, // Solution vector
                                                NumericVector<T> &, // RHS vector
-                                               const double,      // Stopping tolerance
-                                               const unsigned int) = 0; // N. Iterations
+                                               const std::optional<double> tol = std::nullopt,
+                                               const std::optional<unsigned int> m_its = std::nullopt) = 0; // N. Iterations
 
 
   /**
@@ -236,8 +237,8 @@ public:
                                        const SparseMatrix<T> * precond_matrix,
                                        NumericVector<T> &, // Solution vector
                                        NumericVector<T> &, // RHS vector
-                                       const double,      // Stopping tolerance
-                                       const unsigned int); // N. Iterations
+                                       const std::optional<double> tol = std::nullopt,
+                                       const std::optional<unsigned int> m_its = std::nullopt); // N. Iterations
 
 
   /**
@@ -292,6 +293,22 @@ protected:
    * to set parameters like solver type, tolerances and iteration limits.
    */
   SolverConfiguration * _solver_configuration;
+
+  /**
+   * Get solver settings based on optional parameters and the solver
+   * configuration object
+   */
+  double get_real_solver_setting(const std::string & setting_name,
+                                 const std::optional<double> & setting,
+                                 const std::optional<double> default_value = std::nullopt);
+
+  /**
+   * Get solver settings based on optional parameters and the solver
+   * configuration object
+   */
+  int get_int_solver_setting(const std::string & setting_name,
+                             const std::optional<int> & setting,
+                             const std::optional<int> default_value = std::nullopt);
 };
 
 
@@ -319,8 +336,8 @@ LinearSolver<T>::solve (SparseMatrix<T> & mat,
                         SparseMatrix<T> * pc_mat,
                         NumericVector<T> & sol,
                         NumericVector<T> & rhs,
-                        const double tol,
-                        const unsigned int n_iter)
+                        const std::optional<double> tol,
+                        const std::optional<unsigned int> n_iter)
 {
   if (pc_mat)
     return this->solve(mat, *pc_mat, sol, rhs, tol, n_iter);
@@ -336,8 +353,8 @@ LinearSolver<T>::solve (const ShellMatrix<T> & mat,
                         const SparseMatrix<T> * pc_mat,
                         NumericVector<T> & sol,
                         NumericVector<T> & rhs,
-                        const double tol,
-                        const unsigned int n_iter)
+                        const std::optional<double> tol,
+                        const std::optional<unsigned int> n_iter)
 {
   if (pc_mat)
     return this->solve(mat, *pc_mat, sol, rhs, tol, n_iter);

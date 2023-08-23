@@ -83,8 +83,8 @@ std::pair<unsigned int, Real>
 EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
                                    NumericVector<T> & solution_in,
                                    NumericVector<T> & rhs_in,
-                                   const double tol,
-                                   const unsigned int m_its)
+                                   const std::optional<double> tol,
+                                   const std::optional<unsigned int> m_its)
 {
   LOG_SCOPE("solve()", "EigenSparseLinearSolver");
   this->init ();
@@ -101,6 +101,9 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
 
   std::pair<unsigned int, Real> retval(0,0.);
 
+  const int max_its = this->get_int_solver_setting("max_its", m_its);
+  const double abs_tol = this->get_real_solver_setting("abs_tol", tol);
+
   // Solve the linear system
   switch (this->_solver_type)
     {
@@ -108,8 +111,8 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
     case CG:
       {
         Eigen::ConjugateGradient<EigenSM> solver (matrix._mat);
-        solver.setMaxIterations(m_its);
-        solver.setTolerance(tol);
+        solver.setMaxIterations(max_its);
+        solver.setTolerance(abs_tol);
         solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
         libMesh::out << "#iterations: " << solver.iterations() << std::endl;
         libMesh::out << "estimated error: " << solver.error() << std::endl;
@@ -122,8 +125,8 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
     case BICGSTAB:
       {
         Eigen::BiCGSTAB<EigenSM> solver (matrix._mat);
-        solver.setMaxIterations(m_its);
-        solver.setTolerance(tol);
+        solver.setMaxIterations(max_its);
+        solver.setTolerance(abs_tol);
         solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
         libMesh::out << "#iterations: " << solver.iterations() << std::endl;
         libMesh::out << "estimated error: " << solver.error() << std::endl;
@@ -136,8 +139,8 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
     case GMRES:
       {
         Eigen::GMRES<EigenSM> solver (matrix._mat);
-        solver.setMaxIterations(m_its);
-        solver.setTolerance(tol);
+        solver.setMaxIterations(max_its);
+        solver.setTolerance(abs_tol);
 
         // If there is an int parameter called "gmres_restart" in the
         // SolverConfiguration object, pass it to the Eigen GMRES
@@ -233,8 +236,8 @@ std::pair<unsigned int, Real>
 EigenSparseLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
                                            NumericVector<T> & solution_in,
                                            NumericVector<T> & rhs_in,
-                                           const double tol,
-                                           const unsigned int m_its)
+                                           const std::optional<double> tol,
+                                           const std::optional<unsigned int> m_its)
 {
   LOG_SCOPE("adjoint_solve()", "EigenSparseLinearSolver");
 
@@ -259,8 +262,8 @@ std::pair<unsigned int, Real>
 EigenSparseLinearSolver<T>::solve (const ShellMatrix<T> & /*shell_matrix*/,
                                    NumericVector<T> & /*solution_in*/,
                                    NumericVector<T> & /*rhs_in*/,
-                                   const double /*tol*/,
-                                   const unsigned int /*m_its*/)
+                                   const std::optional<double> /*tol*/,
+                                   const std::optional<unsigned int> /*m_its*/)
 {
   libmesh_not_implemented();
   return std::make_pair(0,0.0);
@@ -274,8 +277,8 @@ EigenSparseLinearSolver<T>::solve (const ShellMatrix<T> & /*shell_matrix*/,
                                    const SparseMatrix<T> & /*precond_matrix*/,
                                    NumericVector<T> & /*solution_in*/,
                                    NumericVector<T> & /*rhs_in*/,
-                                   const double /*tol*/,
-                                   const unsigned int /*m_its*/)
+                                   const std::optional<double> /*tol*/,
+                                   const std::optional<unsigned int> /*m_its*/)
 {
   libmesh_not_implemented();
   return std::make_pair(0,0.0);

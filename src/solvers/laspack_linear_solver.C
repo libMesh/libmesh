@@ -110,8 +110,8 @@ std::pair<unsigned int, Real>
 LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
                                NumericVector<T> & solution_in,
                                NumericVector<T> & rhs_in,
-                               const double tol,
-                               const unsigned int m_its)
+                               const std::optional<double> tol,
+                               const std::optional<unsigned int> m_its)
 {
   LOG_SCOPE("solve()", "LaspackLinearSolver");
   this->init ();
@@ -120,6 +120,9 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
   LaspackMatrix<T> * matrix   = cast_ptr<LaspackMatrix<T> *>(&matrix_in);
   LaspackVector<T> * solution = cast_ptr<LaspackVector<T> *>(&solution_in);
   LaspackVector<T> * rhs      = cast_ptr<LaspackVector<T> *>(&rhs_in);
+
+  const int max_its = this->get_int_solver_setting("max_its", m_its);
+  const double abs_tol = this->get_real_solver_setting("abs_tol", tol);
 
   // Zero-out the solution to prevent the solver from exiting in 0
   // iterations (?)
@@ -135,7 +138,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
   this->set_laspack_preconditioner_type ();
 
   // Set the solver tolerance
-  SetRTCAccuracy (tol);
+  SetRTCAccuracy (abs_tol);
 
   // Solve the linear system
   switch (this->_solver_type)
@@ -146,7 +149,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
         CGIter (&matrix->_QMat,
                 &solution->_vec,
                 &rhs->_vec,
-                m_its,
+                max_its,
                 _precond_type,
                 1.);
         break;
@@ -158,7 +161,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
         CGNIter (&matrix->_QMat,
                  &solution->_vec,
                  &rhs->_vec,
-                 m_its,
+                 max_its,
                  _precond_type,
                  1.);
         break;
@@ -170,7 +173,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
         CGSIter (&matrix->_QMat,
                  &solution->_vec,
                  &rhs->_vec,
-                 m_its,
+                 max_its,
                  _precond_type,
                  1.);
         break;
@@ -182,7 +185,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
         BiCGIter (&matrix->_QMat,
                   &solution->_vec,
                   &rhs->_vec,
-                  m_its,
+                  max_its,
                   _precond_type,
                   1.);
         break;
@@ -194,7 +197,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
         BiCGSTABIter (&matrix->_QMat,
                       &solution->_vec,
                       &rhs->_vec,
-                      m_its,
+                      max_its,
                       _precond_type,
                       1.);
         break;
@@ -206,7 +209,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
         QMRIter (&matrix->_QMat,
                  &solution->_vec,
                  &rhs->_vec,
-                 m_its,
+                 max_its,
                  _precond_type,
                  1.);
         break;
@@ -218,7 +221,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
         SSORIter (&matrix->_QMat,
                   &solution->_vec,
                   &rhs->_vec,
-                  m_its,
+                  max_its,
                   _precond_type,
                   1.);
         break;
@@ -230,7 +233,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
         JacobiIter (&matrix->_QMat,
                     &solution->_vec,
                     &rhs->_vec,
-                    m_its,
+                    max_its,
                     _precond_type,
                     1.);
         break;
@@ -243,7 +246,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
         GMRESIter (&matrix->_QMat,
                    &solution->_vec,
                    &rhs->_vec,
-                   m_its,
+                   max_its,
                    _precond_type,
                    1.);
         break;
@@ -284,8 +287,8 @@ std::pair<unsigned int, Real>
 LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
                                        NumericVector<T> & solution_in,
                                        NumericVector<T> & rhs_in,
-                                       const double tol,
-                                       const unsigned int m_its)
+                                       const std::optional<double> tol,
+                                       const std::optional<unsigned int> m_its)
 {
   LOG_SCOPE("adjoint_solve()", "LaspackLinearSolver");
   this->init ();
@@ -294,6 +297,9 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
   LaspackMatrix<T> * matrix   = cast_ptr<LaspackMatrix<T> *>(&matrix_in);
   LaspackVector<T> * solution = cast_ptr<LaspackVector<T> *>(&solution_in);
   LaspackVector<T> * rhs      = cast_ptr<LaspackVector<T> *>(&rhs_in);
+
+  const int max_its = this->get_int_solver_setting("max_its", m_its);
+  const double abs_tol = this->get_real_solver_setting("abs_tol", tol);
 
   // Zero-out the solution to prevent the solver from exiting in 0
   // iterations (?)
@@ -309,7 +315,7 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
   this->set_laspack_preconditioner_type ();
 
   // Set the solver tolerance
-  SetRTCAccuracy (tol);
+  SetRTCAccuracy (abs_tol);
 
   // Solve the linear system
   switch (this->_solver_type)
@@ -320,7 +326,7 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
         CGIter (Transp_Q(&matrix->_QMat),
                 &solution->_vec,
                 &rhs->_vec,
-                m_its,
+                max_its,
                 _precond_type,
                 1.);
         break;
@@ -332,7 +338,7 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
         CGNIter (Transp_Q(&matrix->_QMat),
                  &solution->_vec,
                  &rhs->_vec,
-                 m_its,
+                 max_its,
                  _precond_type,
                  1.);
         break;
@@ -344,7 +350,7 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
         CGSIter (Transp_Q(&matrix->_QMat),
                  &solution->_vec,
                  &rhs->_vec,
-                 m_its,
+                 max_its,
                  _precond_type,
                  1.);
         break;
@@ -356,7 +362,7 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
         BiCGIter (Transp_Q(&matrix->_QMat),
                   &solution->_vec,
                   &rhs->_vec,
-                  m_its,
+                  max_its,
                   _precond_type,
                   1.);
         break;
@@ -368,7 +374,7 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
         BiCGSTABIter (Transp_Q(&matrix->_QMat),
                       &solution->_vec,
                       &rhs->_vec,
-                      m_its,
+                      max_its,
                       _precond_type,
                       1.);
         break;
@@ -380,7 +386,7 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
         QMRIter (Transp_Q(&matrix->_QMat),
                  &solution->_vec,
                  &rhs->_vec,
-                 m_its,
+                 max_its,
                  _precond_type,
                  1.);
         break;
@@ -392,7 +398,7 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
         SSORIter (Transp_Q(&matrix->_QMat),
                   &solution->_vec,
                   &rhs->_vec,
-                  m_its,
+                  max_its,
                   _precond_type,
                   1.);
         break;
@@ -404,7 +410,7 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
         JacobiIter (Transp_Q(&matrix->_QMat),
                     &solution->_vec,
                     &rhs->_vec,
-                    m_its,
+                    max_its,
                     _precond_type,
                     1.);
         break;
@@ -417,7 +423,7 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> & matrix_in,
         GMRESIter (Transp_Q(&matrix->_QMat),
                    &solution->_vec,
                    &rhs->_vec,
-                   m_its,
+                   max_its,
                    _precond_type,
                    1.);
         break;
@@ -459,8 +465,8 @@ std::pair<unsigned int, Real>
 LaspackLinearSolver<T>::solve (const ShellMatrix<T> & /*shell_matrix*/,
                                NumericVector<T> & /*solution_in*/,
                                NumericVector<T> & /*rhs_in*/,
-                               const double /*tol*/,
-                               const unsigned int /*m_its*/)
+                               const std::optional<double> /*tol*/,
+                               const std::optional<unsigned int> /*m_its*/)
 {
   libmesh_not_implemented();
   return std::make_pair(0,0.0);
@@ -474,8 +480,8 @@ LaspackLinearSolver<T>::solve (const ShellMatrix<T> & /*shell_matrix*/,
                                const SparseMatrix<T> & /*precond_matrix*/,
                                NumericVector<T> & /*solution_in*/,
                                NumericVector<T> & /*rhs_in*/,
-                               const double /*tol*/,
-                               const unsigned int /*m_its*/)
+                               const std::optional<double> /*tol*/,
+                               const std::optional<unsigned int> /*m_its*/)
 {
   libmesh_not_implemented();
   return std::make_pair(0,0.0);
