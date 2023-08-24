@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// <h1>Vector Finite Element Example 1 - Solving an uncoupled Poisson Problem using DG</h1>
+// <h1>Vector Finite Elements Example 5 - Solving an uncoupled Poisson Problem using DG</h1>
 // \author Alexander Lindsay
 // \date 2019
 //

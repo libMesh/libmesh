@@ -17,7 +17,7 @@
 
 
 
-// <h1>Vector Finite Element Example 1 - Solving an uncoupled Poisson Problem</h1>
+// <h1>Vector Finite Elements Example 1 - Solving an uncoupled Poisson Problem</h1>
 // \author Paul Bauman
 // \date 2012
 //
