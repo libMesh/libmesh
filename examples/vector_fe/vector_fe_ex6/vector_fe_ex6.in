@@ -1,0 +1,5 @@
+# The coarse grid size from which to start adaptivity
+grid_size = 15
+
+# Higher quadrature order for more accurate error results
+extra_quadrature_order = 0
