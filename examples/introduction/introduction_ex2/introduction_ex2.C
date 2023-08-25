@@ -17,12 +17,12 @@
 
 
 
-// <h1>Introduction Example 2 - Defining a Simple System</h1>
+// <h1>Introduction Example 2 - Defining an Equation System</h1>
 // \author Benjamin S. Kirk
 // \date 2003
 //
 // This is the second example program.  It demonstrates how to
-// create an equation system for a simple scalar system.  This
+// create an equation system for two simple scalar systems.  This
 // example will also introduce some of the issues involved with using PETSc
 // in your application.
 //
@@ -98,9 +98,8 @@ int main (int argc, char ** argv)
   // contain multiple systems of different
   // flavors for solving loosely coupled physics.  Each system can
   // contain multiple variables of different approximation orders.
-  // Here we will simply create a single system with one variable.
-  // Later on, other flavors of systems will be introduced.  For the
-  // moment, we use the general system.
+  // Here we create two systems, the first with one variable and the second
+  // with three variables.
   // The EquationSystems object needs a reference to the mesh
   // object, so the order of construction here is important.
   EquationSystems equation_systems (mesh);
@@ -123,16 +122,16 @@ int main (int argc, char ** argv)
   equation_systems.add_system<TransientLinearImplicitSystem> ("Simple System");
 
   // Adds the variable "u" to "Simple System".  "u"
-  // will be approximated using first-order approximation.
+  // will be approximated using a first-order approximation.
   equation_systems.get_system("Simple System").add_variable("u", FIRST);
 
-  // Next we'll by add an "ExplicitSystem" to the
+  // Next we add an "ExplicitSystem" to the
   // EquationSystems object, and we give it the name
   // "Complex System".
   equation_systems.add_system<ExplicitSystem> ("Complex System");
 
   // Give "Complex System" three variables -- each with a different approximation
-  // order.  Variables "c" and "T" will use first-order Lagrange approximation,
+  // order.  Variables "c" and "T" will use a first-order Lagrange approximation,
   // while variable "dv" will use a second-order discontinuous
   // approximation space.
   equation_systems.get_system("Complex System").add_variable("c", FIRST);

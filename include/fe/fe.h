@@ -1178,7 +1178,7 @@ class FENedelecOne : public FE<Dim,NEDELEC_ONE>
 {
 public:
   /**
-   * Constructor. Creates a vector Lagrange finite element
+   * Constructor. Creates a Nedelec finite element of the first kind
    * to be used in dimension \p Dim.
    */
   explicit
