@@ -109,7 +109,7 @@ int main (int argc, char ** argv)
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
-  // Declare the system "Navier-Stokes" and its variables.
+  // Declare the system "CurlCurl" and its variables.
   CurlCurlSystem & system =
     equation_systems.add_system<CurlCurlSystem> ("CurlCurl");
 

@@ -98,7 +98,7 @@ int main (int argc, char** argv)
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
-  // Declare the system "Navier-Stokes" and its variables.
+  // Declare the system "Laplace" and its variables.
   LaplaceSystem & system =
     equation_systems.add_system<LaplaceSystem> ("Laplace");
 
