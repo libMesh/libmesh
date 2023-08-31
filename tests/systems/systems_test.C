@@ -699,7 +699,7 @@ public:
         dof_map.dof_indices (elem, dof_indices);
 
         for (auto d : dof_indices)
-          CPPUNIT_ASSERT_EQUAL(late_vec(d), Real(2.0*d));
+          CPPUNIT_ASSERT_EQUAL(late_vec(d), Number(2.0*d));
       }
   }
 
