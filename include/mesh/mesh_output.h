@@ -78,6 +78,10 @@ public:
 
   /**
    * This method implements writing a mesh to a specified file.
+   *
+   * Note that writes may be buffered for efficiency, and so may not
+   * reach disk until after the file has been closed, which happens
+   * when the \p MeshOutput object is destructed.
    */
   virtual void write (const std::string &) = 0;
 

@@ -517,7 +517,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
    */
   if (Dim > 1)
     {
-      const unsigned int n_dof = n_dofs (fet, inf_elem->type());
+      const unsigned int n_dof = n_dofs (fet, inf_elem);
       data.shape.resize(n_dof);
       if (data.need_derivative())
         {
@@ -532,7 +532,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
           // which is initialized at the quadrature points...
           auto fe = FEBase::build_InfFE(Dim, fet);
           std::vector<Point> pt = {p};
-          fe->get_dphideta(); // to compute the map
+          fe->get_dxidx(); // to compute the map
           fe->reinit(inf_elem, &pt);
 
           // compute the reference->physical map.

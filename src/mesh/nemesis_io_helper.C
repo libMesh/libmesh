@@ -738,6 +738,14 @@ void Nemesis_IO_Helper::initialize(std::string title_in, const MeshBase & mesh, 
   // const DistributedMesh & pmesh = cast_ref<const DistributedMesh &>(mesh);
   const MeshBase & pmesh = mesh;
 
+  // If _write_as_dimension is nonzero, use it to set num_dim later in the Exodus file.
+  if (_write_as_dimension)
+    num_dim = _write_as_dimension;
+  else if (_use_mesh_dimension_instead_of_spatial_dimension)
+    num_dim = mesh.mesh_dimension();
+  else
+    num_dim = mesh.spatial_dimension();
+
   // According to Nemesis documentation, first call when writing should be to
   // ne_put_init_info().  Our reader doesn't actually call this, but we should
   // strive to be as close to a normal nemesis file as possible...
@@ -892,10 +900,6 @@ void Nemesis_IO_Helper::initialize(std::string title_in, const MeshBase & mesh, 
 void Nemesis_IO_Helper::write_exodus_initialization_info(const MeshBase & pmesh,
                                                          const std::string & title_in)
 {
-  // This follows the convention of Exodus: we always write out the mesh as LIBMESH_DIM-dimensional,
-  // even if it is 2D...
-  this->num_dim = LIBMESH_DIM;
-
   this->num_elem = static_cast<unsigned int>(std::distance (pmesh.active_local_elements_begin(),
                                                             pmesh.active_local_elements_end()));
 

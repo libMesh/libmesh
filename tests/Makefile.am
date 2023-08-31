@@ -46,6 +46,7 @@ unit_tests_sources = \
   geom/bbox_test.C \
   geom/edge_test.C \
   geom/elem_test.C \
+  geom/elem_test.h \
   geom/node_test.C \
   geom/point_test.C \
   geom/point_test.h \
@@ -61,6 +62,7 @@ unit_tests_sources = \
   mesh/checkpoint.C \
   mesh/contains_point.C \
   mesh/extra_integers.C \
+  mesh/exodus_test.C \
   mesh/mesh_assign.C \
   mesh/mesh_base_test.C \
   mesh/mesh_collection.C \
