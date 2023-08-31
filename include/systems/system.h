@@ -2167,11 +2167,6 @@ private:
   std::map<std::string, int, std::less<>> _vector_is_adjoint;
 
   /**
-   * Holds the type of a vector
-   */
-  std::map<std::string, ParallelType, std::less<>> _vector_types;
-
-  /**
    * Some systems need an arbitrary number of matrices.
    */
   std::map<std::string, std::unique_ptr<SparseMatrix<Number>>, std::less<>> _matrices;

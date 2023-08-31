@@ -175,7 +175,6 @@ void System::clear ()
   _vectors.clear();
   _vector_projections.clear();
   _vector_is_adjoint.clear();
-  _vector_types.clear();
   _is_initialized = false;
 
   // clear any user-added matrices
@@ -260,7 +259,7 @@ void System::init_data ()
   // initialize & zero other vectors, if necessary
   for (auto & [vec_name, vec] : _vectors)
     {
-      ParallelType type = _vector_types[vec_name];
+      const ParallelType type = vec->type();
 
       if (type == GHOSTED)
         {
@@ -379,7 +378,7 @@ void System::restrict_vectors ()
         }
       else
         {
-          ParallelType type = _vector_types[vec_name];
+          const ParallelType type = vec->type();
 
           if (type == GHOSTED)
             {
@@ -739,7 +738,7 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
   auto pr = _vectors.emplace(vec_name, NumericVector<Number>::build(this->comm()));
   auto buf = pr.first->second.get();
   _vector_projections.emplace(vec_name, projections);
-  _vector_types.emplace(vec_name, type);
+  buf->type() = type;
 
   // Vectors are primal by default
   _vector_is_adjoint.emplace(vec_name, -1);
@@ -780,10 +779,6 @@ void System::remove_vector (std::string_view vec_name)
   auto adj_it = _vector_is_adjoint.find(vec_name);
   libmesh_assert(adj_it != _vector_is_adjoint.end());
   _vector_is_adjoint.erase(adj_it);
-
-  auto type_it = _vector_types.find(vec_name);
-  libmesh_assert(type_it != _vector_types.end());
-  _vector_types.erase(type_it);
 }
 
 const NumericVector<Number> * System::request_vector (std::string_view vec_name) const
