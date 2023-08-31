@@ -794,6 +794,15 @@ public:
    * By default vectors added by add_vector are projected to changed grids by
    * reinit().  To zero them instead (more efficient), pass "false" as the
    * second argument
+   *
+   * If the vector already exists, the existing vector is returned.
+   * after any upgrade to the \p projections or \p type has been made.
+   * We *only* handle upgrades (projections false->true, or type
+   * PARALLEL->GHOSTED) in this fashion, not downgrades, on the theory
+   * that if two codes have differing needs we want to support the
+   * union of those needs, not the intersection.  Downgrades can only
+   * be accomplished manually, via \p set_vector_preservation() or by
+   * setting a vector \p type() and re-initializing.
    */
   NumericVector<Number> & add_vector (std::string_view vec_name,
                                       const bool projections=true,

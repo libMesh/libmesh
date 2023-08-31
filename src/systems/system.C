@@ -732,7 +732,58 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
   // Return the vector if it is already there.
   auto it = this->_vectors.find(vec_name);
   if (it != this->_vectors.end())
-    return *it->second;
+    {
+      // If the projection setting has *upgraded*, change it.
+      if (projections) // only do expensive lookup if needed
+        libmesh_map_find(_vector_projections, vec_name) = projections;
+
+      NumericVector<Number> & vec = *it->second;
+
+      // If we're in serial, our vectors are effectively SERIAL, so
+      // we'll ignore any type setting.  If we're in parallel, we
+      // might have a type change to deal with.
+
+      if (this->n_processors() > 1)
+        {
+          // If the type setting has changed in a way we can't
+          // perceive as an upgrade or a downgrade, scream.
+          libmesh_assert_equal_to(type == SERIAL,
+                                  vec.type() == SERIAL);
+
+          // If the type setting has *upgraded*, change it.
+          if (type == GHOSTED && vec.type() == PARALLEL)
+            {
+              // A *really* late upgrade is expensive, but better not
+              // to risk zeroing data.
+              if (vec.initialized())
+                {
+                  if (!vec.closed())
+                    vec.close();
+
+                  // Ideally we'd move parallel coefficients and then
+                  // add ghosted coefficients, but copy and swap is
+                  // simpler.  If anyone actually ever uses this case
+                  // for real we can look into optimizing it.
+                  auto new_vec = NumericVector<Number>::build(this->comm());
+#ifdef LIBMESH_ENABLE_GHOSTED
+                  new_vec->init (this->n_dofs(), this->n_local_dofs(),
+                                 _dof_map->get_send_list(), false,
+                                 GHOSTED);
+#else
+                  libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
+#endif
+
+                  *new_vec = vec;
+                  vec.swap(*new_vec);
+                }
+              else
+                vec.type() = type;
+            }
+        }
+
+      // Any upgrades are done; we're happy here.
+      return vec;
+    }
 
   // Otherwise build the vector
   auto pr = _vectors.emplace(vec_name, NumericVector<Number>::build(this->comm()));
