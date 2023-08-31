@@ -440,6 +440,11 @@ public:
 
   CPPUNIT_TEST( test100KVariables );
 
+  CPPUNIT_TEST( testPostInitAddVector );
+  CPPUNIT_TEST( testAddVectorProjChange );
+  CPPUNIT_TEST( testAddVectorTypeChange );
+  CPPUNIT_TEST( testPostInitAddVectorTypeChange );
+
   CPPUNIT_TEST( testProjectHierarchicEdge3 );
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testProjectHierarchicQuad9 );
@@ -549,6 +554,24 @@ public:
   void tearDown()
   {}
 
+
+  ExplicitSystem & simpleSetup(UnstructuredMesh & mesh,
+                               EquationSystems & es)
+  {
+    ExplicitSystem &sys =
+      es.add_system<ExplicitSystem> ("Simple");
+
+    sys.add_variable("u", FIRST);
+
+    MeshTools::Generation::build_line (mesh,
+                                       10,
+                                       0., 1.,
+                                       EDGE3);
+
+    return sys;
+  }
+
+
   void test100KVariables()
   {
     Mesh mesh(*TestCommWorld);
@@ -581,6 +604,106 @@ public:
     for (const Node * node : mesh.node_ptr_range())
       CPPUNIT_ASSERT_EQUAL(dof_id_type(node->n_vars(0)), n_dofs);
   }
+
+
+  void testPostInitAddVector()
+  {
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    ExplicitSystem & sys = simpleSetup(mesh, es);
+    es.init();
+
+    auto & late_vec = sys.add_vector("late");
+
+    CPPUNIT_ASSERT_EQUAL(sys.n_dofs(), dof_id_type(11));
+
+    // late_vec should be initialized
+    CPPUNIT_ASSERT_EQUAL(late_vec.size(), dof_id_type(11));
+    CPPUNIT_ASSERT_EQUAL(late_vec.local_size(), sys.solution->local_size());
+  }
+
+
+  void testAddVectorProjChange()
+  {
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    ExplicitSystem & sys = simpleSetup(mesh, es);
+
+    sys.add_vector("late", /* projections = */ false);
+    CPPUNIT_ASSERT_EQUAL(sys.vector_preservation("late"), false);
+
+    sys.add_vector("late");
+    CPPUNIT_ASSERT_EQUAL(sys.vector_preservation("late"), true);
+  }
+
+
+  void testAddVectorTypeChange()
+  {
+    // Vector types are all pretty much equivalent in serial.
+    if (TestCommWorld->size() == 1)
+      return;
+
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    ExplicitSystem & sys = simpleSetup(mesh, es);
+
+    auto & late_vec = sys.add_vector("late");
+    CPPUNIT_ASSERT_EQUAL(late_vec.type(), PARALLEL);
+    CPPUNIT_ASSERT_EQUAL(sys.vector_preservation("late"), true);
+
+    // We should never downgrade projection settings, so "false"
+    // should be safely ignored here
+    sys.add_vector("late", false, GHOSTED);
+    CPPUNIT_ASSERT_EQUAL(late_vec.type(), GHOSTED);
+    CPPUNIT_ASSERT_EQUAL(sys.vector_preservation("late"), true);
+
+    // We should never downgrade storage settings, so this should be a
+    // no-op.
+    sys.add_vector("late", true, PARALLEL);
+    CPPUNIT_ASSERT_EQUAL(late_vec.type(), GHOSTED);
+    CPPUNIT_ASSERT_EQUAL(sys.vector_preservation("late"), true);
+  }
+
+
+  void testPostInitAddVectorTypeChange()
+  {
+    // Vector types are all pretty much equivalent in serial.
+    if (TestCommWorld->size() == 1)
+      return;
+
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    ExplicitSystem & sys = simpleSetup(mesh, es);
+
+    auto & late_vec = sys.add_vector("late");
+    CPPUNIT_ASSERT_EQUAL(late_vec.type(), PARALLEL);
+    CPPUNIT_ASSERT_EQUAL(sys.vector_preservation("late"), true);
+
+    es.init();
+
+    auto & dof_map = sys.get_dof_map();
+
+    // Set some data to make sure it's preserved
+    CPPUNIT_ASSERT_EQUAL(sys.n_dofs(), dof_id_type(11));
+    for (auto i : make_range(dof_map.first_dof(),
+                             dof_map.end_dof()))
+      late_vec.set(i, 2.0*i);
+    late_vec.close();
+
+    sys.add_vector("late", false, GHOSTED);
+    CPPUNIT_ASSERT_EQUAL(late_vec.type(), GHOSTED);
+
+    std::vector<dof_id_type> dof_indices;
+    for (auto & elem : mesh.active_local_element_ptr_range())
+      {
+        dof_map.dof_indices (elem, dof_indices);
+
+        for (auto d : dof_indices)
+          CPPUNIT_ASSERT_EQUAL(late_vec(d), Real(2.0*d));
+      }
+  }
+
+
 
   void testProjectLine(const ElemType elem_type)
   {
