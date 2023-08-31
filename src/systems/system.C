@@ -246,7 +246,7 @@ void System::init_data ()
   // Resize the current_local_solution for the current mesh
 #ifdef LIBMESH_ENABLE_GHOSTED
   current_local_solution->init (this->n_dofs(), this->n_local_dofs(),
-                                _dof_map->get_send_list(), false,
+                                _dof_map->get_send_list(), /*fast=*/false,
                                 GHOSTED);
 #else
   current_local_solution->init (this->n_dofs(), false, SERIAL);
@@ -266,7 +266,7 @@ void System::init_data ()
         {
 #ifdef LIBMESH_ENABLE_GHOSTED
           vec->init (this->n_dofs(), this->n_local_dofs(),
-                           _dof_map->get_send_list(), false,
+                           _dof_map->get_send_list(), /*fast=*/false,
                            GHOSTED);
 #else
           libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
@@ -385,7 +385,7 @@ void System::restrict_vectors ()
             {
 #ifdef LIBMESH_ENABLE_GHOSTED
               vec->init (this->n_dofs(), this->n_local_dofs(),
-                               _dof_map->get_send_list(), false,
+                               _dof_map->get_send_list(), /*fast=*/false,
                                GHOSTED);
 #else
               libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
@@ -768,7 +768,7 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
                   auto new_vec = NumericVector<Number>::build(this->comm());
 #ifdef LIBMESH_ENABLE_GHOSTED
                   new_vec->init (this->n_dofs(), this->n_local_dofs(),
-                                 _dof_map->get_send_list(), false,
+                                 _dof_map->get_send_list(), /*fast=*/false,
                                  GHOSTED);
 #else
                   libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
@@ -802,7 +802,7 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
         {
 #ifdef LIBMESH_ENABLE_GHOSTED
           buf->init (this->n_dofs(), this->n_local_dofs(),
-                     _dof_map->get_send_list(), false,
+                     _dof_map->get_send_list(), /*fast=*/false,
                      GHOSTED);
 #else
           libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
