@@ -259,6 +259,7 @@ void System::init_data ()
   // initialize & zero other vectors, if necessary
   for (auto & [vec_name, vec] : _vectors)
     {
+      libmesh_ignore(vec_name); // spurious warning from old gcc
       const ParallelType type = vec->type();
 
       if (type == GHOSTED)
