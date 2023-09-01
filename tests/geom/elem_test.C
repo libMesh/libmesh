@@ -96,6 +96,20 @@ public:
       }
   }
 
+  void test_static_data()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
+      {
+        CPPUNIT_ASSERT(elem->n_nodes() <= Elem::max_n_nodes);
+        CPPUNIT_ASSERT_EQUAL(elem->n_nodes(), Elem::type_to_n_nodes_map[elem->type()]);
+        CPPUNIT_ASSERT_EQUAL(elem->n_sides(), Elem::type_to_n_sides_map[elem->type()]);
+        CPPUNIT_ASSERT_EQUAL(elem->n_edges(), Elem::type_to_n_edges_map[elem->type()]);
+      }
+  }
+
   void test_contains_point_node()
   {
     LOG_UNIT_TEST;
@@ -596,6 +610,7 @@ public:
   CPPUNIT_TEST( test_bounding_box );            \
   CPPUNIT_TEST( test_quality );                 \
   CPPUNIT_TEST( test_maps );                    \
+  CPPUNIT_TEST( test_static_data );             \
   CPPUNIT_TEST( test_permute );                 \
   CPPUNIT_TEST( test_flip );                    \
   CPPUNIT_TEST( test_orient );                  \
