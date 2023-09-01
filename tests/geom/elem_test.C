@@ -4,6 +4,8 @@
 #include <libmesh/enum_elem_quality.h>
 #include <libmesh/elem_side_builder.h>
 #include <libmesh/mesh_modification.h>
+#include <libmesh/mesh_refinement.h>
+#include <libmesh/parallel_implementation.h>
 
 using namespace libMesh;
 
@@ -423,6 +425,171 @@ public:
           CPPUNIT_ASSERT_EQUAL(side->node_ref(n), const_cached_side.node_ref(n));
       }
   }
+
+  void test_refinement()
+  {
+#ifdef LIBMESH_ENABLE_AMR
+    // We don't support refinement of all element types
+    if (elem_type == EDGE4 ||
+        elem_type == PRISM20 ||
+        elem_type == PYRAMID5 ||
+        elem_type == PYRAMID13 ||
+        elem_type == PYRAMID14 ||
+        elem_type == PYRAMID18)
+      return;
+
+    LOG_UNIT_TEST;
+
+    auto refining_mesh = this->_mesh->clone();
+
+    MeshRefinement mr(*refining_mesh);
+    mr.uniformly_refine(1);
+
+    std::set<std::pair<dof_id_type, unsigned int>> parent_node_was_touched;
+    std::set<std::pair<dof_id_type, unsigned int>> parent_child_was_touched;
+
+    for (const Elem * elem : refining_mesh->active_element_ptr_range())
+      {
+        CPPUNIT_ASSERT_EQUAL(elem->level(), 1u);
+        CPPUNIT_ASSERT(!elem->ancestor());
+        CPPUNIT_ASSERT(elem->active());
+        CPPUNIT_ASSERT(!elem->subactive());
+        CPPUNIT_ASSERT(!elem->has_children());
+        CPPUNIT_ASSERT(!elem->has_ancestor_children());
+        CPPUNIT_ASSERT(!elem->interior_parent());
+
+        const Elem * parent = elem->parent();
+        CPPUNIT_ASSERT(parent);
+        CPPUNIT_ASSERT(parent->ancestor());
+        CPPUNIT_ASSERT(!parent->active());
+        CPPUNIT_ASSERT(!parent->subactive());
+        CPPUNIT_ASSERT(parent->has_children());
+        CPPUNIT_ASSERT(!parent->has_ancestor_children());
+        CPPUNIT_ASSERT(!parent->interior_parent());
+        CPPUNIT_ASSERT_EQUAL(parent, elem->top_parent());
+        CPPUNIT_ASSERT_EQUAL(parent, parent->top_parent());
+
+        CPPUNIT_ASSERT(parent->is_ancestor_of(elem));
+        const unsigned int c = parent->which_child_am_i(elem);
+        CPPUNIT_ASSERT(c < parent->n_children());
+        CPPUNIT_ASSERT_EQUAL(elem, parent->child_ptr(c));
+        parent_child_was_touched.emplace(parent->id(), c);
+
+        CPPUNIT_ASSERT_EQUAL(parent->n_nodes_in_child(c), elem->n_nodes());
+        for (auto n : make_range(elem->n_nodes()))
+          {
+            CPPUNIT_ASSERT_EQUAL(parent->is_vertex_on_child(c, n), elem->is_vertex(n));
+
+            auto pn = parent->as_parent_node(c, n);
+            CPPUNIT_ASSERT_EQUAL(pn, parent->get_node_index(elem->node_ptr(n)));
+            if (pn == libMesh::invalid_uint)
+              continue;
+            CPPUNIT_ASSERT_EQUAL(parent->is_vertex_on_parent(c, n), parent->is_vertex(pn));
+            parent_node_was_touched.emplace(parent->id(), pn);
+          }
+
+        for (auto s : make_range(parent->n_sides()))
+          {
+            if (parent->is_child_on_side(c,s))
+              {
+                auto parent_side = parent->build_side_ptr(s);
+
+                // Implicitly assuming here that s is the child side
+                // too - we support that now and hopefully won't have
+                // to change it later
+                auto child_side  = elem->build_side_ptr(s);
+
+                // 2D Inf FE inverse_map not yet implemented?
+                if (!parent_side->infinite())
+                  for (const Node & node : child_side->node_ref_range())
+                    CPPUNIT_ASSERT(parent_side->contains_point(node));
+
+                if (elem->neighbor_ptr(s) && !elem->neighbor_ptr(s)->is_remote())
+                  CPPUNIT_ASSERT_EQUAL(parent->child_neighbor(elem->neighbor_ptr(s)), elem);
+              }
+          }
+
+        for (auto e : make_range(parent->n_edges()))
+          {
+            if (parent->is_child_on_edge(c,e))
+              {
+                auto parent_edge = parent->build_edge_ptr(e);
+
+                // Implicitly assuming here that e is the child edge
+                // too - we support that now and hopefully won't have
+                // to change it later
+                auto child_edge  = elem->build_edge_ptr(e);
+
+                // 1D Inf FE inverse_map not yet implemented?
+                if (!parent_edge->infinite())
+                  for (const Node & node : child_edge->node_ref_range())
+                    CPPUNIT_ASSERT(parent_edge->contains_point(node));
+              }
+          }
+      }
+
+    // It's possible for a parent element on a distributed mesh to not
+    // have all its children available on any one processor
+    TestCommWorld->set_union(parent_child_was_touched);
+    TestCommWorld->set_union(parent_node_was_touched);
+
+    for (const Elem * elem : refining_mesh->local_element_ptr_range())
+      {
+        if (elem->active())
+          continue;
+
+        // With only one layer of refinement the family tree methods
+        // should have the right number of elements, even if some are
+        // remote.
+        std::vector<const Elem *> family;
+        elem->family_tree(family);
+        CPPUNIT_ASSERT_EQUAL(family.size(),
+                             std::size_t(elem->n_children() + 1));
+
+        family.clear();
+        elem->total_family_tree(family);
+        CPPUNIT_ASSERT_EQUAL(family.size(),
+                             std::size_t(elem->n_children() + 1));
+
+        family.clear();
+        elem->active_family_tree(family);
+        CPPUNIT_ASSERT_EQUAL(family.size(),
+                             std::size_t(elem->n_children()));
+
+        for (auto s : make_range(elem->n_sides()))
+          {
+            family.clear();
+            elem->active_family_tree_by_side(family,s);
+            if (!elem->build_side_ptr(s)->infinite())
+              CPPUNIT_ASSERT_EQUAL(double(family.size()),
+                                   std::pow(2.0, int(elem->dim()-1)));
+            else
+              CPPUNIT_ASSERT_EQUAL(double(family.size()),
+                                   std::pow(2.0, int(elem->dim()-2)));
+            for (const Elem * child : family)
+              {
+                if (child->is_remote())
+                  continue;
+
+                unsigned int c = elem->which_child_am_i(child);
+                CPPUNIT_ASSERT(elem->is_child_on_side(c, s));
+              }
+          }
+
+        for (auto c : make_range(elem->n_children()))
+          {
+            auto it = parent_child_was_touched.find(std::make_pair(elem->id(), c));
+            CPPUNIT_ASSERT(it != parent_child_was_touched.end());
+          }
+
+        for (auto n : make_range(elem->n_nodes()))
+          {
+            auto it = parent_node_was_touched.find(std::make_pair(elem->id(), n));
+            CPPUNIT_ASSERT(it != parent_node_was_touched.end());
+          }
+      }
+#endif
+  }
 };
 
 #define ELEMTEST                                \
@@ -436,7 +603,8 @@ public:
   CPPUNIT_TEST( test_contains_point_node );     \
   CPPUNIT_TEST( test_center_node_on_side );     \
   CPPUNIT_TEST( test_side_type );               \
-  CPPUNIT_TEST( test_elem_side_builder );
+  CPPUNIT_TEST( test_elem_side_builder );       \
+  CPPUNIT_TEST( test_refinement);
 
 #define INSTANTIATE_ELEMTEST(elemtype)                          \
   class ElemTest_##elemtype : public ElemTest<elemtype> {       \
