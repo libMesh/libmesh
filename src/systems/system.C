@@ -175,7 +175,6 @@ void System::clear ()
   _vectors.clear();
   _vector_projections.clear();
   _vector_is_adjoint.clear();
-  _vector_types.clear();
   _is_initialized = false;
 
   // clear any user-added matrices
@@ -247,7 +246,7 @@ void System::init_data ()
   // Resize the current_local_solution for the current mesh
 #ifdef LIBMESH_ENABLE_GHOSTED
   current_local_solution->init (this->n_dofs(), this->n_local_dofs(),
-                                _dof_map->get_send_list(), false,
+                                _dof_map->get_send_list(), /*fast=*/false,
                                 GHOSTED);
 #else
   current_local_solution->init (this->n_dofs(), false, SERIAL);
@@ -260,13 +259,14 @@ void System::init_data ()
   // initialize & zero other vectors, if necessary
   for (auto & [vec_name, vec] : _vectors)
     {
-      ParallelType type = _vector_types[vec_name];
+      libmesh_ignore(vec_name); // spurious warning from old gcc
+      const ParallelType type = vec->type();
 
       if (type == GHOSTED)
         {
 #ifdef LIBMESH_ENABLE_GHOSTED
           vec->init (this->n_dofs(), this->n_local_dofs(),
-                           _dof_map->get_send_list(), false,
+                           _dof_map->get_send_list(), /*fast=*/false,
                            GHOSTED);
 #else
           libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
@@ -379,13 +379,13 @@ void System::restrict_vectors ()
         }
       else
         {
-          ParallelType type = _vector_types[vec_name];
+          const ParallelType type = vec->type();
 
           if (type == GHOSTED)
             {
 #ifdef LIBMESH_ENABLE_GHOSTED
               vec->init (this->n_dofs(), this->n_local_dofs(),
-                               _dof_map->get_send_list(), false,
+                               _dof_map->get_send_list(), /*fast=*/false,
                                GHOSTED);
 #else
               libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
@@ -733,13 +733,64 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
   // Return the vector if it is already there.
   auto it = this->_vectors.find(vec_name);
   if (it != this->_vectors.end())
-    return *it->second;
+    {
+      // If the projection setting has *upgraded*, change it.
+      if (projections) // only do expensive lookup if needed
+        libmesh_map_find(_vector_projections, vec_name) = projections;
+
+      NumericVector<Number> & vec = *it->second;
+
+      // If we're in serial, our vectors are effectively SERIAL, so
+      // we'll ignore any type setting.  If we're in parallel, we
+      // might have a type change to deal with.
+
+      if (this->n_processors() > 1)
+        {
+          // If the type setting has changed in a way we can't
+          // perceive as an upgrade or a downgrade, scream.
+          libmesh_assert_equal_to(type == SERIAL,
+                                  vec.type() == SERIAL);
+
+          // If the type setting has *upgraded*, change it.
+          if (type == GHOSTED && vec.type() == PARALLEL)
+            {
+              // A *really* late upgrade is expensive, but better not
+              // to risk zeroing data.
+              if (vec.initialized())
+                {
+                  if (!vec.closed())
+                    vec.close();
+
+                  // Ideally we'd move parallel coefficients and then
+                  // add ghosted coefficients, but copy and swap is
+                  // simpler.  If anyone actually ever uses this case
+                  // for real we can look into optimizing it.
+                  auto new_vec = NumericVector<Number>::build(this->comm());
+#ifdef LIBMESH_ENABLE_GHOSTED
+                  new_vec->init (this->n_dofs(), this->n_local_dofs(),
+                                 _dof_map->get_send_list(), /*fast=*/false,
+                                 GHOSTED);
+#else
+                  libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
+#endif
+
+                  *new_vec = vec;
+                  vec.swap(*new_vec);
+                }
+              else
+                vec.type() = type;
+            }
+        }
+
+      // Any upgrades are done; we're happy here.
+      return vec;
+    }
 
   // Otherwise build the vector
   auto pr = _vectors.emplace(vec_name, NumericVector<Number>::build(this->comm()));
   auto buf = pr.first->second.get();
   _vector_projections.emplace(vec_name, projections);
-  _vector_types.emplace(vec_name, type);
+  buf->type() = type;
 
   // Vectors are primal by default
   _vector_is_adjoint.emplace(vec_name, -1);
@@ -751,7 +802,7 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
         {
 #ifdef LIBMESH_ENABLE_GHOSTED
           buf->init (this->n_dofs(), this->n_local_dofs(),
-                     _dof_map->get_send_list(), false,
+                     _dof_map->get_send_list(), /*fast=*/false,
                      GHOSTED);
 #else
           libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
@@ -780,10 +831,6 @@ void System::remove_vector (std::string_view vec_name)
   auto adj_it = _vector_is_adjoint.find(vec_name);
   libmesh_assert(adj_it != _vector_is_adjoint.end());
   _vector_is_adjoint.erase(adj_it);
-
-  auto type_it = _vector_types.find(vec_name);
-  libmesh_assert(type_it != _vector_types.end());
-  _vector_types.erase(type_it);
 }
 
 const NumericVector<Number> * System::request_vector (std::string_view vec_name) const

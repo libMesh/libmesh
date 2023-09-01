@@ -1443,19 +1443,19 @@ void System::write_header (Xdr & io,
     if (write_additional_data)
       {
         unsigned int cnt=0;
-        for (const auto & pr : _vectors)
+        for (const auto & [vec_name, vec] : _vectors)
           {
             // 9.)
             // write the name of the cnt-th additional vector
             const std::string dth_vector = std::to_string(cnt++)+"th vector";
             comment =  "# Name of " + dth_vector;
-            std::string vec_name = pr.first;
+            std::string nonconst_vec_name = vec_name; // Stupid XDR API
 
-            io.data (vec_name, comment);
+            io.data (nonconst_vec_name, comment);
             int vec_projection = _vector_projections.at(vec_name);
             comment = "# Whether to do projections for " + dth_vector;
             io.data (vec_projection, comment);
-            int vec_type = _vector_types.at(vec_name);
+            int vec_type = vec->type();
             comment = "# Parallel type of " + dth_vector;
             io.data (vec_type, comment);
           }
