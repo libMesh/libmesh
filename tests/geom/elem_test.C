@@ -29,12 +29,8 @@ public:
           {
             const Point & p = elem->point(n);
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
             if (!elem->infinite())
-#endif
-              {
-                CPPUNIT_ASSERT(bbox.contains_point(p));
-              }
+              CPPUNIT_ASSERT(bbox.contains_point(p));
 
             wide_bbox.union_with
               (BoundingBox(elem->point(n), elem->point(n)));
@@ -42,9 +38,7 @@ public:
 
         wide_bbox.scale(1. / 3.);
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         if (!elem->infinite())
-#endif
           {
             CPPUNIT_ASSERT(!bbox.contains_point(wide_bbox.min()));
             CPPUNIT_ASSERT(!bbox.contains_point(wide_bbox.max()));
@@ -107,10 +101,8 @@ public:
     for (const auto & elem :
          this->_mesh->active_local_element_ptr_range())
       {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         if (elem->infinite())
           continue;
-#endif
 
         for (const auto n : elem->node_index_range())
 #ifndef LIBMESH_ENABLE_EXCEPTIONS
@@ -133,10 +125,9 @@ public:
     for (const auto & elem :
          this->_mesh->active_local_element_ptr_range())
       {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         if (elem->infinite())
           continue;
-#endif
+
         const Point centroid = elem->true_centroid();
         const Point vertex_avg = elem->vertex_average();
         Point quasicc;
@@ -175,10 +166,9 @@ public:
     for (const auto & elem :
          this->_mesh->active_local_element_ptr_range())
       {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         if (elem->infinite())
           continue;
-#endif
+
         const Point vertex_avg = elem->vertex_average();
 
         const unsigned int n_sides = elem->n_sides();
@@ -247,10 +237,9 @@ public:
     for (const auto & elem :
          this->_mesh->active_local_element_ptr_range())
       {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         if (elem->infinite())
           continue;
-#endif
+
         const Point vertex_avg = elem->vertex_average();
 
         const unsigned int n_sides = elem->n_sides();
@@ -322,10 +311,9 @@ public:
     for (const auto & elem :
          this->_mesh->active_local_element_ptr_range())
       {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         if (elem->infinite())
           continue;
-#endif
+
         if (elem->id()%2)
           {
             elem->flip(&boundary_info);

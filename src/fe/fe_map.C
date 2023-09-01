@@ -2106,10 +2106,8 @@ Point FEMap::map_deriv (const unsigned int dim,
   libmesh_assert(elem);
   libmesh_ignore(dim);
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (elem->infinite())
     libmesh_not_implemented();
-#endif
 
   Point p;
 

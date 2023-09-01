@@ -2539,10 +2539,8 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
                                              elem_soln,
                                              nodal_soln);
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
                     // infinite elements should be skipped...
                     if (!elem->infinite())
-#endif
                       for (auto n : elem->node_index_range())
                         {
                           const std::size_t exodus_num =
