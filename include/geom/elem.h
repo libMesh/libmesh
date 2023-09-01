@@ -1742,6 +1742,10 @@ public:
    */
   virtual Point origin () const { libmesh_not_implemented(); return Point(); }
 
+#else
+
+  static constexpr bool infinite () { return false; }
+
 #endif
 
 
