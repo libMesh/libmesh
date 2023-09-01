@@ -241,8 +241,8 @@ const unsigned int Elem::type_to_n_edges_map [] =
 
     0,  // INFEDGE2
 
-    4,  // INFQUAD4
-    4,  // INFQUAD6
+    3,  // INFQUAD4
+    3,  // INFQUAD6
 
     8,  // INFHEX8
     8,  // INFHEX16
