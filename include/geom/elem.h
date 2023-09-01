@@ -710,8 +710,8 @@ public:
    * Except in odd cases like pyramid refinement the child will have
    * the same local structure as the parent element.
    */
-  virtual unsigned int is_vertex_on_child (unsigned int /*c*/,
-                                           unsigned int n) const
+  virtual bool is_vertex_on_child (unsigned int /*c*/,
+                                   unsigned int n) const
   { return this->is_vertex(n); }
 
   /**
