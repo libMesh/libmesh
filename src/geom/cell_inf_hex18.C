@@ -72,29 +72,6 @@ Order InfHex18::default_order() const
   return SECOND;
 }
 
-bool InfHex18::is_vertex(const unsigned int i) const
-{
-  if (i < 4)
-    return true;
-  return false;
-}
-
-bool InfHex18::is_edge(const unsigned int i) const
-{
-  if (i < 4)
-    return false;
-  if (i > 11)
-    return false;
-  return true;
-}
-
-bool InfHex18::is_face(const unsigned int i) const
-{
-  if (i > 11)
-    return true;
-  return false;
-}
-
 bool InfHex18::is_node_on_side(const unsigned int n,
                                const unsigned int s) const
 {

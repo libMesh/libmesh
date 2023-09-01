@@ -67,29 +67,6 @@ const unsigned int InfHex16::edge_nodes_map[InfHex16::num_edges][InfHex16::nodes
 // ------------------------------------------------------------
 // InfHex16 class member functions
 
-bool InfHex16::is_vertex(const unsigned int i) const
-{
-  if (i < 4)
-    return true;
-  return false;
-}
-
-bool InfHex16::is_edge(const unsigned int i) const
-{
-  if (i < 4)
-    return false;
-  if (i > 11)
-    return false;
-  return true;
-}
-
-bool InfHex16::is_face(const unsigned int i) const
-{
-  if (i > 11)
-    return true;
-  return false;
-}
-
 bool InfHex16::is_node_on_side(const unsigned int n,
                                const unsigned int s) const
 {

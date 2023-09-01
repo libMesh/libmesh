@@ -67,25 +67,6 @@ const unsigned int InfHex8::edge_nodes_map[InfHex8::num_edges][InfHex8::nodes_pe
 // ------------------------------------------------------------
 // InfHex8 class member functions
 
-bool InfHex8::is_vertex(const unsigned int i) const
-{
-  if (i < 4)
-    return true;
-  return false;
-}
-
-bool InfHex8::is_edge(const unsigned int i) const
-{
-  if (i < 4)
-    return false;
-  return true;
-}
-
-bool InfHex8::is_face(const unsigned int) const
-{
-  return false;
-}
-
 bool InfHex8::is_node_on_side(const unsigned int n,
                               const unsigned int s) const
 {

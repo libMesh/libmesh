@@ -82,25 +82,6 @@ const Real InfQuad4::_embedding_matrix[InfQuad4::num_children][InfQuad4::num_nod
 // ------------------------------------------------------------
 // InfQuad4 class member functions
 
-bool InfQuad4::is_vertex(const unsigned int i) const
-{
-  if (i < 2)
-    return true;
-  return false;
-}
-
-bool InfQuad4::is_edge(const unsigned int i) const
-{
-  if (i < 2)
-    return false;
-  return true;
-}
-
-bool InfQuad4::is_face(const unsigned int) const
-{
-  return false;
-}
-
 bool InfQuad4::is_node_on_side(const unsigned int n,
                                const unsigned int s) const
 {
