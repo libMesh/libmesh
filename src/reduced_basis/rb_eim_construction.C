@@ -668,6 +668,11 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           break;
         }
 
+      // The "energy" error in the POD approximation is determined by the first omitted
+      // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
+      // "energy", in order to obtain a relative error.
+      rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
+
       if (exit_on_next_iteration)
         {
           libMesh::out << "Extra EIM iteration for error indicator is complete, POD error norm for extra iteration: " << rel_err << std::endl;
@@ -678,11 +683,6 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 
           break;
         }
-
-      // The "energy" error in the POD approximation is determined by the first omitted
-      // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
-      // "energy", in order to obtain a relative error.
-      rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
 
       libMesh::out << "Number of basis functions: " << j
                    << ", POD error norm: " << rel_err << std::endl;
