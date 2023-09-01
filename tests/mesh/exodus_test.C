@@ -1,5 +1,7 @@
 #include "../geom/elem_test.h"
 
+#ifdef LIBMESH_HAVE_EXODUS_API
+
 #include "libmesh/enum_to_string.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/mesh_communication.h"
@@ -193,3 +195,5 @@ INSTANTIATE_EXODUSTEST(PYRAMID13);
 INSTANTIATE_EXODUSTEST(PYRAMID14);
 INSTANTIATE_EXODUSTEST(PYRAMID18);
 #endif // LIBMESH_DIM > 2
+
+#endif // LIBMESH_HAVE_EXODUS_API
