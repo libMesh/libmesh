@@ -159,7 +159,7 @@ public:
 
   /**
    * \returns The local index for the \p Node pointer \p node_ptr,
-   * or \p invalid_id if \p node_ptr is not a local node.
+   * or \p invalid_uint if \p node_ptr is not a local node.
    */
   unsigned int get_node_index (const Node * node_ptr) const;
 
