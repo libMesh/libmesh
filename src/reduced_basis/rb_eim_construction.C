@@ -455,7 +455,7 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
       greedy_param_list.emplace_back(get_parameters());
 
       libMesh::out << "Enriching the EIM approximation" << std::endl;
-      try
+      libmesh_try
         {
           enrich_eim_approximation(current_training_index);
           update_eim_matrices();
@@ -478,7 +478,7 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
 
           libMesh::out << "Maximum EIM error is " << greedy_error << std::endl << std::endl;
         }
-      catch (std::exception & e)
+      libmesh_catch (std::exception & e)
         {
           // If we hit an exception when performing the enrichment for the error indicator, then
           // we just continue and skip the error indicator. Otherwise we rethrow the exception.
@@ -488,7 +488,7 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
               break;
             }
           else
-              throw e;
+              LIBMESH_THROW(e);
         }
 
       if (exit_on_next_iteration)
@@ -729,12 +729,12 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           Real norm_v = std::sqrt(sigma(j));
           scale(v, 1./norm_v);
 
-          try
+          libmesh_try
             {
               enrich_eim_approximation_on_sides(v);
               update_eim_matrices();
             }
-          catch (std::exception & e)
+          libmesh_catch (std::exception & e)
             {
               // If we hit an exception when performing the enrichment for the error indicator, then
               // we just continue and skip the error indicator. Otherwise we rethrow the exception.
@@ -744,7 +744,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
                   break;
                 }
               else
-                  throw e;
+                  LIBMESH_THROW(e);
             }
         }
       else if (rbe.get_parametrized_function().on_mesh_nodes())
@@ -759,12 +759,12 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           Real norm_v = std::sqrt(sigma(j));
           scale_node_data_map(v, 1./norm_v);
 
-          try
+          libmesh_try
             {
               enrich_eim_approximation_on_nodes(v);
               update_eim_matrices();
             }
-          catch (std::exception & e)
+          libmesh_catch (std::exception & e)
             {
               // If we hit an exception when performing the enrichment for the error indicator, then
               // we just continue and skip the error indicator. Otherwise we rethrow the exception.
@@ -774,7 +774,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
                   break;
                 }
               else
-                  throw e;
+                  LIBMESH_THROW(e);
             }
         }
       else
@@ -789,7 +789,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           Real norm_v = std::sqrt(sigma(j));
           scale(v, 1./norm_v);
 
-          try
+          libmesh_try
             {
               // We leave v_obs_vals empty for now, but we can support this later
               // by accumulating v_obs_vals in the same way that we accumulate v.
@@ -797,7 +797,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
               enrich_eim_approximation_on_interiors(v, v_obs_vals);
               update_eim_matrices();
             }
-          catch (std::exception & e)
+          libmesh_catch (std::exception & e)
             {
               // If we hit an exception when performing the enrichment for the error indicator, then
               // we just continue and skip the error indicator. Otherwise we rethrow the exception.
@@ -807,7 +807,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
                   break;
                 }
               else
-                  throw e;
+                  LIBMESH_THROW(e);
             }
         }
 
