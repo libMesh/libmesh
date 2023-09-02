@@ -1,5 +1,7 @@
 #include "../geom/elem_test.h"
 
+#ifdef LIBMESH_HAVE_EXODUS_API
+
 #include "libmesh/enum_to_string.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/mesh_communication.h"
@@ -188,8 +190,15 @@ INSTANTIATE_EXODUSTEST(PRISM18);
 INSTANTIATE_EXODUSTEST(PRISM20);
 INSTANTIATE_EXODUSTEST(PRISM21);
 
+// These tests use PointLocator, which uses contains_point(), which
+// uses inverse_map(), which doesn't play nicely on Pyramids unless we
+// have exceptions support
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
 INSTANTIATE_EXODUSTEST(PYRAMID5);
 INSTANTIATE_EXODUSTEST(PYRAMID13);
 INSTANTIATE_EXODUSTEST(PYRAMID14);
 INSTANTIATE_EXODUSTEST(PYRAMID18);
+#endif
 #endif // LIBMESH_DIM > 2
+
+#endif // LIBMESH_HAVE_EXODUS_API
