@@ -83,21 +83,6 @@ public:
   virtual unsigned int n_sub_elem() const override { return 2; }
 
   /**
-   * \returns \p true if the specified (local) node number is a vertex.
-   */
-  virtual bool is_vertex(const unsigned int i) const override;
-
-  /**
-   * \returns \p true if the specified (local) node number is an edge.
-   */
-  virtual bool is_edge(const unsigned int i) const override;
-
-  /**
-   * \returns \p true if the specified (local) node number is a face.
-   */
-  virtual bool is_face(const unsigned int i) const override;
-
-  /**
    * \returns \p true if the specified (local) node number is on the
    * specified side.
    */

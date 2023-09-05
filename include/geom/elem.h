@@ -159,7 +159,7 @@ public:
 
   /**
    * \returns The local index for the \p Node pointer \p node_ptr,
-   * or \p invalid_id if \p node_ptr is not a local node.
+   * or \p invalid_uint if \p node_ptr is not a local node.
    */
   unsigned int get_node_index (const Node * node_ptr) const;
 
@@ -710,8 +710,8 @@ public:
    * Except in odd cases like pyramid refinement the child will have
    * the same local structure as the parent element.
    */
-  virtual unsigned int is_vertex_on_child (unsigned int /*c*/,
-                                           unsigned int n) const
+  virtual bool is_vertex_on_child (unsigned int /*c*/,
+                                   unsigned int n) const
   { return this->is_vertex(n); }
 
   /**
@@ -1741,6 +1741,10 @@ public:
    * origin.  Override this in infinite element classes.
    */
   virtual Point origin () const { libmesh_not_implemented(); return Point(); }
+
+#else
+
+  static constexpr bool infinite () { return false; }
 
 #endif
 

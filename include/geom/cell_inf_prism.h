@@ -103,6 +103,21 @@ public:
   virtual unsigned int n_children() const override final { return 4; }
 
   /**
+   * We number vertices first.
+   */
+  virtual bool is_vertex(const unsigned int i) const override final { return (i < 6); }
+
+  /**
+   * We number edges next.
+   */
+  virtual bool is_edge(const unsigned int i) const override final { return (i > 6 && i < 9); }
+
+  /**
+   * We number faces last.
+   */
+  virtual bool is_face(const unsigned int i) const override final { return (i > 9 && i < 12); }
+
+  /**
    * \returns \p true if the specified (local) node number is a
    * "mid-edge" node on an infinite element edge.
    */

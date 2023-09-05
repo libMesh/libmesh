@@ -514,10 +514,8 @@ void MeshFunction::_gradient_on_elem (const Point & p,
       // for performance-reasons, we use different algorithms now.
       // TODO: Check that both give the same result for finite elements.
       // Otherwive it is wrong...
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       if (!element->infinite())
         {
-#endif
           std::unique_ptr<FEBase> point_fe (FEBase::build(dim, fe_type));
           const std::vector<std::vector<RealGradient>> & dphi = point_fe->get_dphi();
           point_fe->reinit(element, &point_list);
@@ -525,8 +523,8 @@ void MeshFunction::_gradient_on_elem (const Point & p,
           for (auto i : index_range(dof_indices))
             grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         }
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       else
         {
           /**
@@ -583,13 +581,12 @@ void MeshFunction::hessian (const Point & p,
     }
   else
     {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       if(element->infinite())
         libmesh_warning("Warning: Requested the Hessian of an Infinite element."
                         << "Second derivatives for Infinite elements"
                         << " are not yet implemented!"
                         << std::endl);
-#endif
+
       // resize the output vector to the number of output values
       // that the user told us
       output.resize (this->_system_vars.size());

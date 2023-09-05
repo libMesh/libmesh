@@ -65,25 +65,6 @@ const unsigned int InfPrism6::edge_nodes_map[InfPrism6::num_edges][InfPrism6::no
 // ------------------------------------------------------------
 // InfPrism6 class member functions
 
-bool InfPrism6::is_vertex(const unsigned int i) const
-{
-  if (i < 3)
-    return true;
-  return false;
-}
-
-bool InfPrism6::is_edge(const unsigned int i) const
-{
-  if (i < 3)
-    return false;
-  return true;
-}
-
-bool InfPrism6::is_face(const unsigned int) const
-{
-  return false;
-}
-
 bool InfPrism6::is_node_on_side(const unsigned int n,
                                 const unsigned int s) const
 {

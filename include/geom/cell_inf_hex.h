@@ -86,7 +86,8 @@ public:
 
   /**
    * \returns 8.  All infinite hexahedra (in our
-   * setting) have 8 vertices.
+   * setting) have 8 "vertices"; we're counting the infinite edge's
+   * nodes too.
    */
   virtual unsigned int n_vertices() const override final { return 8; }
 
@@ -112,6 +113,21 @@ public:
    * \returns 4.
    */
   virtual unsigned int n_children() const override final { return 4; }
+
+  /**
+   * We number vertices first.
+   */
+  virtual bool is_vertex(const unsigned int i) const override final { return (i < 8); }
+
+  /**
+   * We number edges next.
+   */
+  virtual bool is_edge(const unsigned int i) const override final { return (i >= 8 && i < 12); }
+
+  /**
+   * We number faces last.
+   */
+  virtual bool is_face(const unsigned int i) const override final { return (i >= 12 && i < 16); }
 
   /**
    * \returns \p true if the specified child is on the

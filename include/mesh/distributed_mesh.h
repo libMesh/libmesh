@@ -342,279 +342,72 @@ public:
 
 public:
   /**
-   * Elem iterator accessor functions.
+   * Elem and Node iterator accessor functions.  See MeshBase for
+   * documentation.
    */
-  virtual element_iterator elements_begin () override final;
-  virtual element_iterator elements_end () override final;
-  virtual const_element_iterator elements_begin() const override final;
-  virtual const_element_iterator elements_end() const override final;
-  virtual SimpleRange<element_iterator> element_ptr_range() override final { return {elements_begin(), elements_end()}; }
-  virtual SimpleRange<const_element_iterator> element_ptr_range() const override final { return {elements_begin(), elements_end()}; }
+  DECLARE_ELEM_ITERATORS(,,);
+  DECLARE_ELEM_ITERATORS(active_,,);
+  DECLARE_ELEM_ITERATORS(ancestor_,,)
+  DECLARE_ELEM_ITERATORS(subactive_,,)
+  DECLARE_ELEM_ITERATORS(local_,,)
+  DECLARE_ELEM_ITERATORS(unpartitioned_,,)
+  DECLARE_ELEM_ITERATORS(facelocal_,,)
+  DECLARE_ELEM_ITERATORS(level_, unsigned int level, level)
+  DECLARE_ELEM_ITERATORS(pid_, processor_id_type pid, pid)
+  DECLARE_ELEM_ITERATORS(type_, ElemType type, type)
 
-  virtual element_iterator active_elements_begin () override final;
-  virtual element_iterator active_elements_end () override final;
-  virtual const_element_iterator active_elements_begin() const override final;
-  virtual const_element_iterator active_elements_end() const override final;
-  virtual SimpleRange<element_iterator> active_element_ptr_range() override final { return {active_elements_begin(), active_elements_end()}; }
-  virtual SimpleRange<const_element_iterator> active_element_ptr_range() const override final  { return {active_elements_begin(), active_elements_end()}; }
+  DECLARE_ELEM_ITERATORS(active_subdomain_, subdomain_id_type sid, sid)
+  DECLARE_ELEM_ITERATORS(active_subdomain_set_, std::set<subdomain_id_type> ss, ss)
 
-  virtual element_iterator ancestor_elements_begin () override final;
-  virtual element_iterator ancestor_elements_end () override final;
-  virtual const_element_iterator ancestor_elements_begin() const override final;
-  virtual const_element_iterator ancestor_elements_end() const override final;
+  // Backwards compatibility
+  virtual SimpleRange<element_iterator> active_subdomain_elements_ptr_range(subdomain_id_type sid) override final { return active_subdomain_element_ptr_range(sid); }
+  virtual SimpleRange<const_element_iterator> active_subdomain_elements_ptr_range(subdomain_id_type sid) const override final { return active_subdomain_element_ptr_range(sid); }
+  virtual SimpleRange<element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type sid) override final { return active_local_subdomain_element_ptr_range(sid); }
+  virtual SimpleRange<const_element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type sid) const override final { return active_local_subdomain_element_ptr_range(sid); }
+  virtual SimpleRange<element_iterator> active_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) override final { return active_subdomain_set_element_ptr_range(ss); }
+  virtual SimpleRange<const_element_iterator> active_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) const override final { return active_subdomain_set_element_ptr_range(ss); }
 
-  virtual element_iterator subactive_elements_begin () override final;
-  virtual element_iterator subactive_elements_end () override final;
-  virtual const_element_iterator subactive_elements_begin() const override final;
-  virtual const_element_iterator subactive_elements_end() const override final;
+  DECLARE_ELEM_ITERATORS(not_active_,,);
+  DECLARE_ELEM_ITERATORS(not_ancestor_,,);
+  DECLARE_ELEM_ITERATORS(not_subactive_,,);
+  DECLARE_ELEM_ITERATORS(not_local_,,);
+  DECLARE_ELEM_ITERATORS(not_level_, unsigned int level, level)
 
-  virtual element_iterator not_active_elements_begin () override final;
-  virtual element_iterator not_active_elements_end () override final;
-  virtual const_element_iterator not_active_elements_begin() const override final;
-  virtual const_element_iterator not_active_elements_end() const override final;
+  DECLARE_ELEM_ITERATORS(active_local_,,)
+  DECLARE_ELEM_ITERATORS(active_not_local_,,)
+  DECLARE_ELEM_ITERATORS(active_unpartitioned_,,)
+  DECLARE_ELEM_ITERATORS(active_type_, ElemType type, type)
+  DECLARE_ELEM_ITERATORS(active_pid_, processor_id_type pid, pid)
+  DECLARE_ELEM_ITERATORS(local_level_, unsigned int level, level)
+  DECLARE_ELEM_ITERATORS(local_not_level_, unsigned int level, level)
+  DECLARE_ELEM_ITERATORS(active_local_subdomain_, subdomain_id_type sid, sid)
+  DECLARE_ELEM_ITERATORS(active_local_subdomain_set_, std::set<subdomain_id_type> ss, ss)
 
-  virtual element_iterator not_ancestor_elements_begin () override final;
-  virtual element_iterator not_ancestor_elements_end () override final;
-  virtual const_element_iterator not_ancestor_elements_begin() const override final;
-  virtual const_element_iterator not_ancestor_elements_end() const override final;
+  DECLARE_ELEM_ITERATORS(semilocal_,,)
+  DECLARE_ELEM_ITERATORS(ghost_,,)
+  DECLARE_ELEM_ITERATORS(active_semilocal_,,)
 
-  virtual element_iterator not_subactive_elements_begin () override final;
-  virtual element_iterator not_subactive_elements_end () override final;
-  virtual const_element_iterator not_subactive_elements_begin() const override final;
-  virtual const_element_iterator not_subactive_elements_end() const override final;
-
-  virtual element_iterator local_elements_begin () override final;
-  virtual element_iterator local_elements_end () override final;
-  virtual const_element_iterator local_elements_begin () const override final;
-  virtual const_element_iterator local_elements_end () const override final;
-
-  virtual element_iterator semilocal_elements_begin () override final;
-  virtual element_iterator semilocal_elements_end () override final;
-  virtual const_element_iterator semilocal_elements_begin () const override final;
-  virtual const_element_iterator semilocal_elements_end () const override final;
-
-  virtual element_iterator active_semilocal_elements_begin () override final;
-  virtual element_iterator active_semilocal_elements_end () override final;
-  virtual const_element_iterator active_semilocal_elements_begin () const override final;
-  virtual const_element_iterator active_semilocal_elements_end () const override final;
-
-  virtual element_iterator facelocal_elements_begin () override final;
-  virtual element_iterator facelocal_elements_end () override final;
-  virtual const_element_iterator facelocal_elements_begin () const override final;
-  virtual const_element_iterator facelocal_elements_end () const override final;
-
-  virtual element_iterator not_local_elements_begin () override final;
-  virtual element_iterator not_local_elements_end () override final;
-  virtual const_element_iterator not_local_elements_begin () const override final;
-  virtual const_element_iterator not_local_elements_end () const override final;
-
-  virtual element_iterator active_local_elements_begin () override final;
-  virtual element_iterator active_local_elements_end () override final;
-  virtual const_element_iterator active_local_elements_begin () const override final;
-  virtual const_element_iterator active_local_elements_end () const override final;
-  virtual SimpleRange<element_iterator> active_local_element_ptr_range() override final { return {active_local_elements_begin(), active_local_elements_end()}; }
-  virtual SimpleRange<const_element_iterator> active_local_element_ptr_range() const override final  { return {active_local_elements_begin(), active_local_elements_end()}; }
-
-  virtual element_iterator active_not_local_elements_begin () override final;
-  virtual element_iterator active_not_local_elements_end () override final;
-  virtual const_element_iterator active_not_local_elements_begin () const override final;
-  virtual const_element_iterator active_not_local_elements_end () const override final;
-
-  virtual element_iterator level_elements_begin (unsigned int level) override final;
-  virtual element_iterator level_elements_end (unsigned int level) override final;
-  virtual const_element_iterator level_elements_begin (unsigned int level) const override final;
-  virtual const_element_iterator level_elements_end (unsigned int level) const override final;
-
-  virtual element_iterator not_level_elements_begin (unsigned int level) override final;
-  virtual element_iterator not_level_elements_end (unsigned int level) override final;
-  virtual const_element_iterator not_level_elements_begin (unsigned int level) const override final;
-  virtual const_element_iterator not_level_elements_end (unsigned int level) const override final;
-
-  virtual element_iterator local_level_elements_begin (unsigned int level) override final;
-  virtual element_iterator local_level_elements_end (unsigned int level) override final;
-  virtual const_element_iterator local_level_elements_begin (unsigned int level) const override final;
-  virtual const_element_iterator local_level_elements_end (unsigned int level) const override final;
-
-  virtual element_iterator local_not_level_elements_begin (unsigned int level) override final;
-  virtual element_iterator local_not_level_elements_end (unsigned int level) override final;
-  virtual const_element_iterator local_not_level_elements_begin (unsigned int level) const override final;
-  virtual const_element_iterator local_not_level_elements_end (unsigned int level) const override final;
-
-  virtual element_iterator pid_elements_begin (processor_id_type proc_id) override final;
-  virtual element_iterator pid_elements_end (processor_id_type proc_id) override final;
-  virtual const_element_iterator pid_elements_begin (processor_id_type proc_id) const override final;
-  virtual const_element_iterator pid_elements_end (processor_id_type proc_id) const override final;
-
-  virtual element_iterator type_elements_begin (ElemType type) override final;
-  virtual element_iterator type_elements_end (ElemType type) override final;
-  virtual const_element_iterator type_elements_begin (ElemType type) const override final;
-  virtual const_element_iterator type_elements_end (ElemType type) const override final;
-
-  virtual element_iterator active_type_elements_begin (ElemType type) override final;
-  virtual element_iterator active_type_elements_end (ElemType type) override final;
-  virtual const_element_iterator active_type_elements_begin (ElemType type) const override final;
-  virtual const_element_iterator active_type_elements_end (ElemType type) const override final;
-
-  virtual element_iterator active_pid_elements_begin (processor_id_type proc_id) override final;
-  virtual element_iterator active_pid_elements_end (processor_id_type proc_id) override final;
-  virtual const_element_iterator active_pid_elements_begin (processor_id_type proc_id) const override final;
-  virtual const_element_iterator active_pid_elements_end (processor_id_type proc_id) const override final;
-
-  virtual element_iterator unpartitioned_elements_begin () override final;
-  virtual element_iterator unpartitioned_elements_end () override final;
-  virtual const_element_iterator unpartitioned_elements_begin () const override final;
-  virtual const_element_iterator unpartitioned_elements_end () const override final;
-
-  virtual element_iterator active_unpartitioned_elements_begin () override final;
-  virtual element_iterator active_unpartitioned_elements_end () override final;
-  virtual const_element_iterator active_unpartitioned_elements_begin () const override final;
-  virtual const_element_iterator active_unpartitioned_elements_end () const override final;
-  virtual SimpleRange<element_iterator> active_unpartitioned_element_ptr_range() override final { return {active_unpartitioned_elements_begin(), active_unpartitioned_elements_end()}; }
-  virtual SimpleRange<const_element_iterator> active_unpartitioned_element_ptr_range() const override final  { return {active_unpartitioned_elements_begin(), active_unpartitioned_elements_end()}; }
-
-  virtual element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) override final;
-  virtual element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) override final;
-  virtual const_element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const override final;
-  virtual const_element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) const override final;
-  virtual SimpleRange<element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) override final
-  { return {active_local_subdomain_elements_begin(subdomain_id), active_local_subdomain_elements_end(subdomain_id)}; }
-  virtual SimpleRange<const_element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) const override final
-  { return {active_local_subdomain_elements_begin(subdomain_id), active_local_subdomain_elements_end(subdomain_id)}; }
-
-  virtual element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) override final;
-  virtual element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) override final;
-  virtual const_element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) const override final;
-  virtual const_element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) const override final;
-  virtual SimpleRange<element_iterator> active_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) override final
-  { return {active_subdomain_elements_begin(subdomain_id), active_subdomain_elements_end(subdomain_id)}; }
-  virtual SimpleRange<const_element_iterator> active_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) const override final
-  { return {active_subdomain_elements_begin(subdomain_id), active_subdomain_elements_end(subdomain_id)}; }
-
-  virtual element_iterator active_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) override final;
-  virtual element_iterator active_subdomain_set_elements_end (std::set<subdomain_id_type> ss) override final;
-  virtual const_element_iterator active_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) const override final;
-  virtual const_element_iterator active_subdomain_set_elements_end (std::set<subdomain_id_type> ss) const override final;
-  virtual SimpleRange<element_iterator> active_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) override final
-  { return {active_subdomain_set_elements_begin(ss), active_subdomain_set_elements_end(ss)}; }
-  virtual SimpleRange<const_element_iterator> active_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) const override final
-  { return {active_subdomain_set_elements_begin(ss), active_subdomain_set_elements_end(ss)}; }
-
-  virtual element_iterator active_local_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) override final;
-  virtual element_iterator active_local_subdomain_set_elements_end (std::set<subdomain_id_type> ss) override final;
-  virtual const_element_iterator active_local_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) const override final;
-  virtual const_element_iterator active_local_subdomain_set_elements_end (std::set<subdomain_id_type> ss) const override final;
-  virtual SimpleRange<element_iterator> active_local_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) override final
-  { return {active_local_subdomain_set_elements_begin(ss), active_local_subdomain_set_elements_end(ss)}; }
-  virtual SimpleRange<const_element_iterator> active_local_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) const override final
-  { return {active_local_subdomain_set_elements_begin(ss), active_local_subdomain_set_elements_end(ss)}; }
-
-  virtual element_iterator ghost_elements_begin () override final;
-  virtual element_iterator ghost_elements_end () override final;
-  virtual const_element_iterator ghost_elements_begin () const override final;
-  virtual const_element_iterator ghost_elements_end () const override final;
-
-  virtual element_iterator
-  evaluable_elements_begin (const DofMap & dof_map,
-                            unsigned int var_num = libMesh::invalid_uint) override final;
-
-  virtual element_iterator
-  evaluable_elements_end (const DofMap & dof_map,
-                          unsigned int var_num = libMesh::invalid_uint) override final;
-
-  virtual const_element_iterator
-  evaluable_elements_begin (const DofMap & dof_map,
-                            unsigned int var_num = libMesh::invalid_uint) const override final;
-
-  virtual const_element_iterator
-  evaluable_elements_end (const DofMap & dof_map,
-                          unsigned int var_num = libMesh::invalid_uint) const override final;
-
-  virtual element_iterator
-  multi_evaluable_elements_begin (std::vector<const DofMap *> dof_maps) override final;
-
-  virtual element_iterator
-  multi_evaluable_elements_end (std::vector<const DofMap *> dof_maps) override final;
-
-  virtual const_element_iterator
-  multi_evaluable_elements_begin (std::vector<const DofMap *> dof_maps) const override final;
-
-  virtual const_element_iterator
-  multi_evaluable_elements_end (std::vector<const DofMap *> dof_maps) const override final;
+  DECLARE_ELEM_ITERATORS(evaluable_, const DofMap & dof_map LIBMESH_COMMA unsigned int var_num = libMesh::invalid_uint, dof_map LIBMESH_COMMA var_num)
+  DECLARE_ELEM_ITERATORS(multi_evaluable_, std::vector<const DofMap *> dof_maps, dof_maps)
 
 #ifdef LIBMESH_ENABLE_AMR
-  virtual element_iterator flagged_elements_begin (unsigned char rflag) override final;
-  virtual element_iterator flagged_elements_end (unsigned char rflag) override final;
-  virtual const_element_iterator flagged_elements_begin (unsigned char rflag) const override final;
-  virtual const_element_iterator flagged_elements_end (unsigned char rflag) const override final;
+  DECLARE_ELEM_ITERATORS(flagged_, unsigned char rflag, rflag)
 
-  virtual element_iterator flagged_pid_elements_begin (unsigned char rflag,
-                                                       processor_id_type pid) override final;
-  virtual element_iterator flagged_pid_elements_end (unsigned char rflag,
-                                                     processor_id_type pid) override final;
-  virtual const_element_iterator flagged_pid_elements_begin (unsigned char rflag,
-                                                             processor_id_type pid) const override final;
-  virtual const_element_iterator flagged_pid_elements_end (unsigned char rflag,
-                                                           processor_id_type pid) const override final;
-#endif // LIBMESH_ENABLE_AMR
+  // Elem::refinement_flag() == rflag && Elem::processor_id() == pid
+  DECLARE_ELEM_ITERATORS(flagged_pid_, unsigned char rflag LIBMESH_COMMA processor_id_type pid, rflag LIBMESH_COMMA pid)
+#endif
 
-  /**
-   * Node iterator accessor functions.
-   */
-  virtual node_iterator nodes_begin () override final;
-  virtual node_iterator nodes_end () override final;
-  virtual const_node_iterator nodes_begin () const override final;
-  virtual const_node_iterator nodes_end () const override final;
-  virtual SimpleRange<node_iterator> node_ptr_range() override final { return {nodes_begin(), nodes_end()}; }
-  virtual SimpleRange<const_node_iterator> node_ptr_range() const override final { return {nodes_begin(), nodes_end()}; }
+  DECLARE_NODE_ITERATORS(,,)
+  DECLARE_NODE_ITERATORS(active_,,)
+  DECLARE_NODE_ITERATORS(local_,,)
+  DECLARE_NODE_ITERATORS(bnd_,,)
+  DECLARE_NODE_ITERATORS(pid_, processor_id_type pid, pid)
+  DECLARE_NODE_ITERATORS(bid_, boundary_id_type bid, bid)
 
-  virtual node_iterator active_nodes_begin () override final;
-  virtual node_iterator active_nodes_end () override final;
-  virtual const_node_iterator active_nodes_begin () const override final;
-  virtual const_node_iterator active_nodes_end () const override final;
+  DECLARE_NODE_ITERATORS(evaluable_, const DofMap & dof_map LIBMESH_COMMA unsigned int var_num = libMesh::invalid_uint, dof_map LIBMESH_COMMA var_num)
 
-  virtual node_iterator local_nodes_begin () override final;
-  virtual node_iterator local_nodes_end () override final;
-  virtual const_node_iterator local_nodes_begin () const override final;
-  virtual const_node_iterator local_nodes_end () const override final;
-  virtual SimpleRange<node_iterator> local_node_ptr_range() override final { return {local_nodes_begin(), local_nodes_end()}; }
-  virtual SimpleRange<const_node_iterator> local_node_ptr_range() const override final { return {local_nodes_begin(), local_nodes_end()}; }
+  DECLARE_NODE_ITERATORS(multi_evaluable_, std::vector<const DofMap *> dof_maps, dof_maps)
 
-  virtual node_iterator pid_nodes_begin (processor_id_type proc_id) override final;
-  virtual node_iterator pid_nodes_end (processor_id_type proc_id) override final;
-  virtual const_node_iterator pid_nodes_begin (processor_id_type proc_id) const override final;
-  virtual const_node_iterator pid_nodes_end (processor_id_type proc_id) const override final;
-
-  virtual node_iterator bid_nodes_begin (boundary_id_type bndry_id) override final;
-  virtual node_iterator bid_nodes_end (boundary_id_type bndry_id) override final;
-  virtual const_node_iterator bid_nodes_begin (boundary_id_type bndry_id) const override final;
-  virtual const_node_iterator bid_nodes_end (boundary_id_type bndry_id) const override final;
-
-  virtual node_iterator bnd_nodes_begin () override final;
-  virtual node_iterator bnd_nodes_end () override final;
-  virtual const_node_iterator bnd_nodes_begin () const override final;
-  virtual const_node_iterator bnd_nodes_end () const override final;
-
-  virtual node_iterator
-  evaluable_nodes_begin (const DofMap & dof_map,
-                         unsigned int var_num = libMesh::invalid_uint) override final;
-  virtual node_iterator
-  evaluable_nodes_end (const DofMap & dof_map,
-                       unsigned int var_num = libMesh::invalid_uint) override final;
-  virtual const_node_iterator
-  evaluable_nodes_begin (const DofMap & dof_map,
-                         unsigned int var_num = libMesh::invalid_uint) const override final;
-  virtual const_node_iterator
-  evaluable_nodes_end (const DofMap & dof_map,
-                       unsigned int var_num = libMesh::invalid_uint) const override final;
-
-  virtual node_iterator
-  multi_evaluable_nodes_begin (std::vector<const DofMap *> dof_maps) override final;
-  virtual node_iterator
-  multi_evaluable_nodes_end (std::vector<const DofMap *> dof_maps) override final;
-  virtual const_node_iterator
-  multi_evaluable_nodes_begin (std::vector<const DofMap *> dof_maps) const override final;
-  virtual const_node_iterator
-  multi_evaluable_nodes_end (std::vector<const DofMap *> dof_maps) const override final;
 
 protected:
 

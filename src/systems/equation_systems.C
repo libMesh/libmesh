@@ -850,10 +850,8 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                                            elem_soln,
                                            nodal_soln);
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
                   // infinite elements should be skipped...
                   if (!elem->infinite())
-#endif
                     {
                       libmesh_assert_equal_to (nodal_soln.size(), n_vec_dim*elem->n_nodes());
 
@@ -1406,10 +1404,8 @@ EquationSystems::build_discontinuous_solution_vector
                                                soln_coeffs,
                                                nodal_soln);
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
                       // infinite elements should be skipped...
                       if (!elem->infinite())
-#endif
                         {
                           libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
 

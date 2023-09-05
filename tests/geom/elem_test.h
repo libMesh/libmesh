@@ -57,10 +57,12 @@ public:
         if (elem_type == INFQUAD4 || elem_type == INFQUAD6 ||
             elem_type == INFHEX8 || elem_type == INFHEX16 || elem_type == INFHEX18)
           {
+            const bool is_quad = (elem_type == INFQUAD4 || elem_type == INFQUAD6);
+
             add_point(0, minpos, minpos, minpos);
             add_point(1, maxpos, minpos, minpos);
-            add_point(2, minpos, maxpos, minpos);
-            add_point(3, maxpos, maxpos, minpos);
+            add_point(2+is_quad, maxpos, maxpos, minpos);
+            add_point(3-is_quad, minpos, maxpos, minpos);
 
             if (elem_type == INFQUAD6)
               {
@@ -72,8 +74,8 @@ public:
           {
             add_point(4, minpos, minpos, maxpos);
             add_point(5, maxpos, minpos, maxpos);
-            add_point(6, minpos, maxpos, maxpos);
-            add_point(7, maxpos, maxpos, maxpos);
+            add_point(6, maxpos, maxpos, maxpos);
+            add_point(7, minpos, maxpos, maxpos);
 
             if (elem_type == INFHEX16 || elem_type == INFHEX18)
               {

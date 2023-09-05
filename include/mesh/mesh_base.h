@@ -1495,365 +1495,163 @@ public:
    */
   subdomain_id_type get_id_by_name(std::string_view name) const;
 
-  //
-  // element_iterator accessors
-  //
-
-  /**
-   * Iterate over all the elements in the Mesh.
+  /*
+   * We have many combinations of iterators that filter on various
+   * characteristics; we use macros to make their abstract base class
+   * and their subclass declarations more terse.
    */
-  virtual element_iterator elements_begin () = 0;
-  virtual element_iterator elements_end () = 0;
-  virtual const_element_iterator elements_begin () const = 0;
-  virtual const_element_iterator elements_end () const = 0;
-  virtual SimpleRange<element_iterator> element_ptr_range() = 0;
-  virtual SimpleRange<const_element_iterator> element_ptr_range() const = 0;
+#define ABSTRACT_ELEM_ITERATORS(TYPE, ARGDECL) \
+  virtual element_iterator TYPE##elements_begin(ARGDECL) = 0; \
+  virtual element_iterator TYPE##elements_end(ARGDECL) = 0; \
+  virtual const_element_iterator TYPE##elements_begin(ARGDECL) const = 0; \
+  virtual const_element_iterator TYPE##elements_end(ARGDECL) const = 0; \
+  virtual SimpleRange<element_iterator> TYPE##element_ptr_range(ARGDECL) = 0; \
+  virtual SimpleRange<const_element_iterator> TYPE##element_ptr_range(ARGDECL) const = 0;
 
-  /**
-   * Iterate over elements for which elem->ancestor() is true.
+#define DECLARE_ELEM_ITERATORS(TYPE, ARGDECL, ARGS) \
+  virtual element_iterator TYPE##elements_begin(ARGDECL) override final; \
+  virtual element_iterator TYPE##elements_end(ARGDECL) override final; \
+  virtual const_element_iterator TYPE##elements_begin(ARGDECL) const override final; \
+  virtual const_element_iterator TYPE##elements_end(ARGDECL) const override final; \
+  virtual SimpleRange<element_iterator> TYPE##element_ptr_range(ARGDECL) override final { return {TYPE##elements_begin(ARGS), TYPE##elements_end(ARGS)}; } \
+  virtual SimpleRange<const_element_iterator> TYPE##element_ptr_range(ARGDECL) const override final  { return {TYPE##elements_begin(ARGS), TYPE##elements_end(ARGS)}; }
+
+#define ABSTRACT_NODE_ITERATORS(TYPE, ARGDECL) \
+  virtual node_iterator TYPE##nodes_begin(ARGDECL) = 0; \
+  virtual node_iterator TYPE##nodes_end(ARGDECL) = 0; \
+  virtual const_node_iterator TYPE##nodes_begin(ARGDECL) const = 0; \
+  virtual const_node_iterator TYPE##nodes_end(ARGDECL) const = 0; \
+  virtual SimpleRange<node_iterator> TYPE##node_ptr_range(ARGDECL) = 0; \
+  virtual SimpleRange<const_node_iterator> TYPE##node_ptr_range(ARGDECL) const = 0;
+
+#define DECLARE_NODE_ITERATORS(TYPE, ARGDECL, ARGS) \
+  virtual node_iterator TYPE##nodes_begin(ARGDECL) override final; \
+  virtual node_iterator TYPE##nodes_end(ARGDECL) override final; \
+  virtual const_node_iterator TYPE##nodes_begin(ARGDECL) const override final; \
+  virtual const_node_iterator TYPE##nodes_end(ARGDECL) const override final; \
+  virtual SimpleRange<node_iterator> TYPE##node_ptr_range(ARGDECL) override final { return {TYPE##nodes_begin(ARGS), TYPE##nodes_end(ARGS)}; } \
+  virtual SimpleRange<const_node_iterator> TYPE##node_ptr_range(ARGDECL) const override final  { return {TYPE##nodes_begin(ARGS), TYPE##nodes_end(ARGS)}; }
+
+#define LIBMESH_COMMA ,
+
+  /*
+   * element_iterator accessors
+   *
+   * The basic elements_begin() and elements_end() iterators iterate
+   * over all elements in a mesh, returning element pointers or const
+   * element pointers when dereferenced (depending on whether the mesh
+   * reference was const). range-for loops can be written using
+   * element_ptr_range()
+   *
+   * Filtered versions of these iterators, which skip over all
+   * elements not matching some predicate, are also available, by
+   * adding a prefix to the methods above.  E.g. local_ (in a form
+   * like local_elements_begin() or local_element_ptr_range()) will
+   * iterate only over elements whose processor_id() is the current
+   * processor, or active_ will iterate only over active elements even
+   * if the mesh is refined, or active_local_ will iterate over
+   * elements that are both active and local.  Negation forms such as
+   * not_local_ also exist.
+   *
+   * For some iterator prefixes, such as type_, an argument is needed
+   * for the filter; e.g. the ElemType to select for in that case.
+   *
+   * All valid prefixes and their corresponding arguments can be found
+   * in the macro invocations below.
    */
-  virtual element_iterator ancestor_elements_begin () = 0;
-  virtual element_iterator ancestor_elements_end () = 0;
-  virtual const_element_iterator ancestor_elements_begin () const = 0;
-  virtual const_element_iterator ancestor_elements_end () const = 0;
+  ABSTRACT_ELEM_ITERATORS(,)                // elements_begin(), element_ptr_range(): all elements
+  ABSTRACT_ELEM_ITERATORS(active_,)         // Elem::active() == true
+  ABSTRACT_ELEM_ITERATORS(ancestor_,)       // Elem::ancestor() == true
+  ABSTRACT_ELEM_ITERATORS(subactive_,)      // Elem::subactive() == true
+  ABSTRACT_ELEM_ITERATORS(local_,)          // Elem::processor_id() == this processor
+  ABSTRACT_ELEM_ITERATORS(unpartitioned_,)  // Elem::processor_id() == invalid_processor_id
+  ABSTRACT_ELEM_ITERATORS(facelocal_,)      // is on or has a neighbor on this processor
+  ABSTRACT_ELEM_ITERATORS(level_,unsigned int level)   // Elem::level() == level
+  ABSTRACT_ELEM_ITERATORS(pid_,processor_id_type pid)  // Elem::processor_id() == pid
+  ABSTRACT_ELEM_ITERATORS(type_,ElemType type)         // Elem::type() == type
 
-  /**
-   * Iterate over elements for which elem->subactive() is true.
-   */
-  virtual element_iterator subactive_elements_begin () = 0;
-  virtual element_iterator subactive_elements_end () = 0;
-  virtual const_element_iterator subactive_elements_begin () const = 0;
-  virtual const_element_iterator subactive_elements_end () const = 0;
+  ABSTRACT_ELEM_ITERATORS(active_subdomain_,subdomain_id_type sid) // active && Elem::subdomain_id() == sid
+  ABSTRACT_ELEM_ITERATORS(active_subdomain_set_,std::set<subdomain_id_type> ss) // active && ss.contains(Elem::subdomain_id())
 
-  /**
-   * Iterate over elements for which elem->is_semilocal() is true for the current processor.
-   */
-  virtual element_iterator semilocal_elements_begin () = 0;
-  virtual element_iterator semilocal_elements_end () = 0;
-  virtual const_element_iterator semilocal_elements_begin () const = 0;
-  virtual const_element_iterator semilocal_elements_end () const = 0;
+  // Iterators which use negations of filters described above
+  ABSTRACT_ELEM_ITERATORS(not_active_,)
+  ABSTRACT_ELEM_ITERATORS(not_ancestor_,)
+  ABSTRACT_ELEM_ITERATORS(not_subactive_,)
+  ABSTRACT_ELEM_ITERATORS(not_local_,)
+  ABSTRACT_ELEM_ITERATORS(not_level_,unsigned int level)
 
-  /**
-   * Iterate over elements which are on or have a neighbor on the current processor.
-   */
-  virtual element_iterator facelocal_elements_begin () = 0;
-  virtual element_iterator facelocal_elements_end () = 0;
-  virtual const_element_iterator facelocal_elements_begin () const = 0;
-  virtual const_element_iterator facelocal_elements_end () const = 0;
+  // Iterators which combine multiple of the filters described above
+  ABSTRACT_ELEM_ITERATORS(active_local_,)
+  ABSTRACT_ELEM_ITERATORS(active_not_local_,)
+  ABSTRACT_ELEM_ITERATORS(active_unpartitioned_,)
+  ABSTRACT_ELEM_ITERATORS(active_type_,ElemType type)
+  ABSTRACT_ELEM_ITERATORS(active_pid_,processor_id_type pid)
+  ABSTRACT_ELEM_ITERATORS(local_level_,unsigned int level)
+  ABSTRACT_ELEM_ITERATORS(local_not_level_,unsigned int level)
+  ABSTRACT_ELEM_ITERATORS(active_local_subdomain_,subdomain_id_type sid)
+  ABSTRACT_ELEM_ITERATORS(active_local_subdomain_set_,std::set<subdomain_id_type> ss)
 
-  /**
-   * Iterate over elements of a given level.
-   */
-  virtual element_iterator level_elements_begin (unsigned int level) = 0;
-  virtual element_iterator level_elements_end (unsigned int level) = 0;
-  virtual const_element_iterator level_elements_begin (unsigned int level) const = 0;
-  virtual const_element_iterator level_elements_end (unsigned int level) const = 0;
-
-  /**
-   * Iterate over all elements with a specified processor id.
-   */
-  virtual element_iterator pid_elements_begin (processor_id_type proc_id) = 0;
-  virtual element_iterator pid_elements_end (processor_id_type proc_id) = 0;
-  virtual const_element_iterator pid_elements_begin (processor_id_type proc_id) const = 0;
-  virtual const_element_iterator pid_elements_end (processor_id_type proc_id) const = 0;
-
-  /**
-   * Iterate over all elements with a specified geometric type.
-   */
-  virtual element_iterator type_elements_begin (ElemType type) = 0;
-  virtual element_iterator type_elements_end (ElemType type) = 0;
-  virtual const_element_iterator type_elements_begin (ElemType type) const = 0;
-  virtual const_element_iterator type_elements_end (ElemType type) const = 0;
-
-  /**
-   * Iterate over unpartitioned elements in the Mesh.
-   */
-  virtual element_iterator unpartitioned_elements_begin () = 0;
-  virtual element_iterator unpartitioned_elements_end () = 0;
-  virtual const_element_iterator unpartitioned_elements_begin () const = 0;
-  virtual const_element_iterator unpartitioned_elements_end () const = 0;
-
-  /**
-   * Iterate over active unpartitioned elements in the Mesh.
-   */
-  virtual element_iterator active_unpartitioned_elements_begin () = 0;
-  virtual element_iterator active_unpartitioned_elements_end () = 0;
-  virtual const_element_iterator active_unpartitioned_elements_begin () const = 0;
-  virtual const_element_iterator active_unpartitioned_elements_end () const = 0;
-  virtual SimpleRange<element_iterator> active_unpartitioned_element_ptr_range() = 0;
-  virtual SimpleRange<const_element_iterator> active_unpartitioned_element_ptr_range() const = 0;
-
-  /**
-   * Iterate over "ghost" elements in the Mesh.  This method is
-   * discouraged, as it iterates over ghost elements by the *old*
-   * definition (active elements which are not local but which are
-   * point neighbors of something local) rather than by any of the new
-   * definitions discussed in ghosting_functor.h
-   */
-  virtual element_iterator ghost_elements_begin () = 0;
-  virtual element_iterator ghost_elements_end () = 0;
-  virtual const_element_iterator ghost_elements_begin () const = 0;
-  virtual const_element_iterator ghost_elements_end () const = 0;
-
-  /**
-   * Iterate over elements in the Mesh where the solution (as
-   * distributed by the given DofMap) can be evaluated, for the given
-   * variable var_num, or for all variables by default.
-   */
-  virtual element_iterator
-  evaluable_elements_begin (const DofMap & dof_map,
-                            unsigned int var_num = libMesh::invalid_uint) = 0;
-
-  virtual element_iterator
-  evaluable_elements_end (const DofMap & dof_map,
-                          unsigned int var_num = libMesh::invalid_uint) = 0;
-
-  virtual const_element_iterator
-  evaluable_elements_begin (const DofMap & dof_map,
-                            unsigned int var_num = libMesh::invalid_uint) const = 0;
-
-  virtual const_element_iterator
-  evaluable_elements_end (const DofMap & dof_map,
-                          unsigned int var_num = libMesh::invalid_uint) const = 0;
-
-  /**
-   * Iterate over elements in the Mesh where the solutions (as
-   * distributed by the given DofMaps) can be evaluated for all variables
-   */
-  virtual element_iterator
-  multi_evaluable_elements_begin (std::vector<const DofMap *> dof_maps) = 0;
-
-  virtual element_iterator
-  multi_evaluable_elements_end (std::vector<const DofMap *> dof_maps) = 0;
-
-  virtual const_element_iterator
-  multi_evaluable_elements_begin (std::vector<const DofMap *> dof_maps) const = 0;
-
-  virtual const_element_iterator
-  multi_evaluable_elements_end (std::vector<const DofMap *> dof_maps) const = 0;
-
-#ifdef LIBMESH_ENABLE_AMR
-  /**
-   * Iterate over all elements with a specified refinement flag.
-   */
-  virtual element_iterator flagged_elements_begin (unsigned char rflag) = 0;
-  virtual element_iterator flagged_elements_end (unsigned char rflag) = 0;
-  virtual const_element_iterator flagged_elements_begin (unsigned char rflag) const = 0;
-  virtual const_element_iterator flagged_elements_end (unsigned char rflag) const = 0;
-
-  /**
-   * Iterate over all elements with a specified refinement flag on a
-   * specified processor.
-   */
-  virtual element_iterator flagged_pid_elements_begin (unsigned char rflag,
-                                                       processor_id_type pid) = 0;
-  virtual element_iterator flagged_pid_elements_end (unsigned char rflag,
-                                                     processor_id_type pid) = 0;
-  virtual const_element_iterator flagged_pid_elements_begin (unsigned char rflag,
-                                                             processor_id_type pid) const = 0;
-  virtual const_element_iterator flagged_pid_elements_end (unsigned char rflag,
-                                                           processor_id_type pid) const = 0;
-#endif
-
-  /**
-   * Active, local, and negation forms of the element iterators described above.
-   * An "active" element is an element without children (i.e. has not been refined).
-   * A "local" element is one whose processor_id() matches the current processor.
-   */
-  virtual element_iterator active_elements_begin () = 0;
-  virtual element_iterator active_elements_end () = 0;
-  virtual const_element_iterator active_elements_begin () const = 0;
-  virtual const_element_iterator active_elements_end () const = 0;
-  virtual SimpleRange<element_iterator> active_element_ptr_range() = 0;
-  virtual SimpleRange<const_element_iterator> active_element_ptr_range() const = 0;
-
-  virtual element_iterator local_elements_begin () = 0;
-  virtual element_iterator local_elements_end () = 0;
-  virtual const_element_iterator local_elements_begin () const = 0;
-  virtual const_element_iterator local_elements_end () const = 0;
-
-  virtual element_iterator active_semilocal_elements_begin () = 0;
-  virtual element_iterator active_semilocal_elements_end () = 0;
-  virtual const_element_iterator active_semilocal_elements_begin () const = 0;
-  virtual const_element_iterator active_semilocal_elements_end () const = 0;
-
-  virtual element_iterator active_type_elements_begin (ElemType type) = 0;
-  virtual element_iterator active_type_elements_end (ElemType type) = 0;
-  virtual const_element_iterator active_type_elements_begin (ElemType type) const = 0;
-  virtual const_element_iterator active_type_elements_end (ElemType type) const = 0;
-
-  virtual element_iterator active_pid_elements_begin (processor_id_type proc_id) = 0;
-  virtual element_iterator active_pid_elements_end (processor_id_type proc_id) = 0;
-  virtual const_element_iterator active_pid_elements_begin (processor_id_type proc_id) const = 0;
-  virtual const_element_iterator active_pid_elements_end (processor_id_type proc_id) const = 0;
-
-  virtual element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) = 0;
-  virtual element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) = 0;
-  virtual const_element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) const = 0;
-  virtual const_element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) const = 0;
-  virtual SimpleRange<element_iterator> active_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) = 0;
-  virtual SimpleRange<const_element_iterator> active_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) const = 0;
-
-  virtual element_iterator active_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) = 0;
-  virtual element_iterator active_subdomain_set_elements_end (std::set<subdomain_id_type> ss) = 0;
-  virtual const_element_iterator active_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) const = 0;
-  virtual const_element_iterator active_subdomain_set_elements_end (std::set<subdomain_id_type> ss) const = 0;
+  // Backwards compatibility
+  virtual SimpleRange<element_iterator> active_subdomain_elements_ptr_range(subdomain_id_type sid) = 0;
+  virtual SimpleRange<const_element_iterator> active_subdomain_elements_ptr_range(subdomain_id_type sid) const = 0;
+  virtual SimpleRange<element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type sid) = 0;
+  virtual SimpleRange<const_element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type sid) const = 0;
   virtual SimpleRange<element_iterator> active_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) = 0;
   virtual SimpleRange<const_element_iterator> active_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) const = 0;
 
-  virtual element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) = 0;
-  virtual element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) = 0;
-  virtual const_element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const = 0;
-  virtual const_element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) const = 0;
-  virtual SimpleRange<element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) = 0;
-  virtual SimpleRange<const_element_iterator> active_local_subdomain_elements_ptr_range(subdomain_id_type subdomain_id) const = 0;
+  // Discouraged from use - these iterators use outdated
+  // pre-GhostingFunctor definitions and should be renamed if not
+  // deprecated
+  ABSTRACT_ELEM_ITERATORS(semilocal_,)         // active && Elem::is_semilocal()
+  ABSTRACT_ELEM_ITERATORS(ghost_,)             // active && Elem::is_semilocal() && not local discouraged
+  ABSTRACT_ELEM_ITERATORS(active_semilocal_,)
 
-  virtual element_iterator active_local_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) = 0;
-  virtual element_iterator active_local_subdomain_set_elements_end (std::set<subdomain_id_type> ss) = 0;
-  virtual const_element_iterator active_local_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) const = 0;
-  virtual const_element_iterator active_local_subdomain_set_elements_end (std::set<subdomain_id_type> ss) const = 0;
-  virtual SimpleRange<element_iterator> active_local_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) = 0;
-  virtual SimpleRange<const_element_iterator> active_local_subdomain_set_elements_ptr_range(std::set<subdomain_id_type> ss) const = 0;
+  // solution can be evaluated, with the given DoF map, for the given
+  // variable number, or for all variables by default
+  ABSTRACT_ELEM_ITERATORS(evaluable_,const DofMap & dof_map LIBMESH_COMMA unsigned int var_num = libMesh::invalid_uint)
 
-  virtual element_iterator local_level_elements_begin (unsigned int level) = 0;
-  virtual element_iterator local_level_elements_end (unsigned int level) = 0;
-  virtual const_element_iterator local_level_elements_begin (unsigned int level) const = 0;
-  virtual const_element_iterator local_level_elements_end (unsigned int level) const = 0;
+  // solution can be evaluated for all variables of all given DoF maps
+  ABSTRACT_ELEM_ITERATORS(multi_evaluable_,std::vector<const DofMap *> dof_maps)
 
-  virtual element_iterator local_not_level_elements_begin (unsigned int level) = 0;
-  virtual element_iterator local_not_level_elements_end (unsigned int level) = 0;
-  virtual const_element_iterator local_not_level_elements_begin (unsigned int level) const = 0;
-  virtual const_element_iterator local_not_level_elements_end (unsigned int level) const = 0;
+#ifdef LIBMESH_ENABLE_AMR
+  ABSTRACT_ELEM_ITERATORS(flagged_,unsigned char rflag)  // Elem::refinement_flag() == rflag
 
-  virtual element_iterator not_level_elements_begin (unsigned int level) = 0;
-  virtual element_iterator not_level_elements_end (unsigned int level) = 0;
-  virtual const_element_iterator not_level_elements_begin (unsigned int level) const = 0;
-  virtual const_element_iterator not_level_elements_end (unsigned int level) const = 0;
+  // Elem::refinement_flag() == rflag && Elem::processor_id() == pid
+  ABSTRACT_ELEM_ITERATORS(flagged_pid_,unsigned char rflag LIBMESH_COMMA processor_id_type pid)
+#endif
 
-  virtual element_iterator active_local_elements_begin () = 0;
-  virtual element_iterator active_local_elements_end () = 0;
-  virtual const_element_iterator active_local_elements_begin () const = 0;
-  virtual const_element_iterator active_local_elements_end () const = 0;
-  virtual SimpleRange<element_iterator> active_local_element_ptr_range() = 0;
-  virtual SimpleRange<const_element_iterator> active_local_element_ptr_range() const = 0;
-
-  virtual element_iterator active_not_local_elements_begin () = 0;
-  virtual element_iterator active_not_local_elements_end () = 0;
-  virtual const_element_iterator active_not_local_elements_begin () const = 0;
-  virtual const_element_iterator active_not_local_elements_end () const = 0;
-
-  virtual element_iterator not_local_elements_begin () = 0;
-  virtual element_iterator not_local_elements_end () = 0;
-  virtual const_element_iterator not_local_elements_begin () const = 0;
-  virtual const_element_iterator not_local_elements_end () const = 0;
-
-  virtual element_iterator not_subactive_elements_begin () = 0;
-  virtual element_iterator not_subactive_elements_end () = 0;
-  virtual const_element_iterator not_subactive_elements_begin () const = 0;
-  virtual const_element_iterator not_subactive_elements_end () const = 0;
-
-  virtual element_iterator not_active_elements_begin () = 0;
-  virtual element_iterator not_active_elements_end () = 0;
-  virtual const_element_iterator not_active_elements_begin () const = 0;
-  virtual const_element_iterator not_active_elements_end () const = 0;
-
-  virtual element_iterator not_ancestor_elements_begin () = 0;
-  virtual element_iterator not_ancestor_elements_end () = 0;
-  virtual const_element_iterator not_ancestor_elements_begin () const = 0;
-  virtual const_element_iterator not_ancestor_elements_end () const = 0;
-
-  //
-  // node_iterator accessors
-  //
-
-  /**
-   * Iterate over all the nodes in the Mesh.
+  /*
+   * node_iterator accessors
+   *
+   * The basic nodes_begin() and nodes_end() iterators iterate
+   * over all nodes in a mesh, returning node pointers or const
+   * node pointers when dereferenced (depending on whether the mesh
+   * reference was const). range-for loops can be written using
+   * node_ptr_range()
+   *
+   * Filtered versions of these iterators, which skip over all
+   * nodes not matching some predicate, are also available, by
+   * adding a prefix to the methods above.  E.g. local_ (in a form
+   * like local_nodes_begin() or local_node_ptr_range()) will
+   * iterate only over nodes whose processor_id() is the current
+   * processor.
+   *
+   * All valid prefixes and their corresponding arguments can be found
+   * in the macro invocations below.
    */
-  virtual node_iterator nodes_begin () = 0;
-  virtual node_iterator nodes_end () = 0;
-  virtual const_node_iterator nodes_begin () const = 0;
-  virtual const_node_iterator nodes_end () const = 0;
-  virtual SimpleRange<node_iterator> node_ptr_range() = 0;
-  virtual SimpleRange<const_node_iterator> node_ptr_range() const = 0;
+  ABSTRACT_NODE_ITERATORS(,)          // nodes_begin(), node_ptr_range(): all nodes
+  ABSTRACT_NODE_ITERATORS(active_,)   // Node::active() == true; i.e. Node::id() != invalid_id
+  ABSTRACT_NODE_ITERATORS(local_,)    // Node::processor_id() == this processor
+  ABSTRACT_NODE_ITERATORS(bnd_,)      // BoundaryInfo::n_boundary_ids(node) > 0
+  ABSTRACT_NODE_ITERATORS(pid_,processor_id_type pid)  // Node::processor_id() == pid
+  ABSTRACT_NODE_ITERATORS(bid_,boundary_id_type bid)   // BoundaryInfo::has_boundary_id(node, bid)
 
-  /**
-   * Iterate over only the active nodes in the Mesh.
-   */
-  virtual node_iterator active_nodes_begin () = 0;
-  virtual node_iterator active_nodes_end () = 0;
-  virtual const_node_iterator active_nodes_begin () const = 0;
-  virtual const_node_iterator active_nodes_end () const = 0;
+  // solution can be evaluated, with the given DoF map, for the given
+  // variable number, or for all variables by default
+  ABSTRACT_NODE_ITERATORS(evaluable_,const DofMap & dof_map LIBMESH_COMMA unsigned int var_num = libMesh::invalid_uint)
 
-  /**
-   * Iterate over local nodes (nodes whose processor_id() matches the current processor).
-   */
-  virtual node_iterator local_nodes_begin () = 0;
-  virtual node_iterator local_nodes_end () = 0;
-  virtual const_node_iterator local_nodes_begin () const = 0;
-  virtual const_node_iterator local_nodes_end () const = 0;
-  virtual SimpleRange<node_iterator> local_node_ptr_range() = 0;
-  virtual SimpleRange<const_node_iterator> local_node_ptr_range() const = 0;
-
-  /**
-   * Iterate over nodes with processor_id() == proc_id
-   */
-  virtual node_iterator pid_nodes_begin (processor_id_type proc_id) = 0;
-  virtual node_iterator pid_nodes_end (processor_id_type proc_id) = 0;
-  virtual const_node_iterator pid_nodes_begin (processor_id_type proc_id) const = 0;
-  virtual const_node_iterator pid_nodes_end (processor_id_type proc_id) const = 0;
-
-  /**
-   * Iterate over nodes for which BoundaryInfo::has_boundary_id(node, bndry_id) is true.
-   */
-  virtual node_iterator bid_nodes_begin (boundary_id_type bndry_id) = 0;
-  virtual node_iterator bid_nodes_end (boundary_id_type bndry_id) = 0;
-  virtual const_node_iterator bid_nodes_begin (boundary_id_type bndry_id) const = 0;
-  virtual const_node_iterator bid_nodes_end (boundary_id_type bndry_id) const = 0;
-
-  /**
-   * Iterate over nodes for which BoundaryInfo::n_boundary_ids(node) > 0.
-   */
-  virtual node_iterator bnd_nodes_begin () = 0;
-  virtual node_iterator bnd_nodes_end () = 0;
-  virtual const_node_iterator bnd_nodes_begin () const = 0;
-  virtual const_node_iterator bnd_nodes_end () const = 0;
-
-  /**
-   * Iterate over nodes in the Mesh where the solution (as
-   * distributed by the given DofMap) can be evaluated, for the given
-   * variable var_num, or for all variables by default.
-   */
-  virtual node_iterator
-  evaluable_nodes_begin (const DofMap & dof_map,
-                         unsigned int var_num = libMesh::invalid_uint) = 0;
-
-  virtual node_iterator
-  evaluable_nodes_end (const DofMap & dof_map,
-                       unsigned int var_num = libMesh::invalid_uint) = 0;
-
-  virtual const_node_iterator
-  evaluable_nodes_begin (const DofMap & dof_map,
-                         unsigned int var_num = libMesh::invalid_uint) const = 0;
-
-  virtual const_node_iterator
-  evaluable_nodes_end (const DofMap & dof_map,
-                       unsigned int var_num = libMesh::invalid_uint) const = 0;
-
-  /**
-   * Iterate over nodes in the Mesh where the solutions (as
-   * distributed by the given DofMaps) can be evaluated for all variables
-   */
-  virtual node_iterator
-  multi_evaluable_nodes_begin (std::vector<const DofMap *> dof_maps) = 0;
-
-  virtual node_iterator
-  multi_evaluable_nodes_end (std::vector<const DofMap *> dof_maps) = 0;
-
-  virtual const_node_iterator
-  multi_evaluable_nodes_begin (std::vector<const DofMap *> dof_maps) const = 0;
-
-  virtual const_node_iterator
-  multi_evaluable_nodes_end (std::vector<const DofMap *> dof_maps) const = 0;
+  // solution can be evaluated for all variables of all given DoF maps
+  ABSTRACT_NODE_ITERATORS(multi_evaluable_,std::vector<const DofMap *> dof_maps)
 
   /**
    * \returns A writable reference to the whole subdomain name map

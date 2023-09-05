@@ -1462,12 +1462,9 @@ void FEInterface::shapes<RealGradient>(const unsigned int dim,
                                        std::vector<RealGradient> & phi,
                                        const bool add_p_level)
 {
-
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  // This is actually an issue for infinite elements: They require type 'Gradient'!
   if (elem->infinite())
     libmesh_not_implemented();
-  // This is actually an issue for infinite elements: They require type 'Gradient'!
-#endif
 
   const Order o = fe_t.order;
 
@@ -1502,12 +1499,9 @@ void FEInterface::all_shapes<RealGradient>(const unsigned int dim,
                                            std::vector<std::vector<RealGradient>> & phi,
                                            const bool add_p_level)
 {
-
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  // This is actually an issue for infinite elements: They require type 'Gradient'!
   if (elem->infinite())
     libmesh_not_implemented();
-  // This is actually an issue for infinite elements: They require type 'Gradient'!
-#endif
 
   const Order o = fe_t.order;
 
@@ -1900,10 +1894,9 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
   // libmesh_deprecated();
 
   libmesh_assert_greater_equal (dim*(dim-1),j);
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
   if (elem->infinite())
     libmesh_not_implemented();
-#endif
 
   const Order o = fe_t.order;
 
@@ -1972,10 +1965,9 @@ Real FEInterface::shape_second_deriv(const FEType & fe_t,
   auto dim = elem->dim();
 
   libmesh_assert_greater_equal (dim*(dim-1),j);
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
   if (elem->infinite())
     libmesh_not_implemented();
-#endif
 
   // Ignore Elem::p_level() when computing total order, use
   // extra_order instead.
@@ -2048,11 +2040,9 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
   // TODO
   // libmesh_deprecated();
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  // This is actually an issue for infinite elements: They require type 'Gradient'!
   if (elem->infinite())
     libmesh_not_implemented();
-  // This is actually an issue for infinite elements: They require type 'Gradient'!
-#endif
 
   const Order o = fe_t.order;
 

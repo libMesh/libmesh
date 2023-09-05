@@ -53,25 +53,6 @@ const unsigned int InfQuad6::side_nodes_map[InfQuad6::num_sides][InfQuad6::nodes
 // ------------------------------------------------------------
 // InfQuad6 class member functions
 
-bool InfQuad6::is_vertex(const unsigned int i) const
-{
-  if (i < 2)
-    return true;
-  return false;
-}
-
-bool InfQuad6::is_edge(const unsigned int i) const
-{
-  if (i < 2)
-    return false;
-  return true;
-}
-
-bool InfQuad6::is_face(const unsigned int) const
-{
-  return false;
-}
-
 bool InfQuad6::is_node_on_side(const unsigned int n,
                                const unsigned int s) const
 {

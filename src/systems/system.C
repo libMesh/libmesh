@@ -1748,15 +1748,11 @@ Real System::calculate_norm(const NumericVector<Number> & v,
         {
           const unsigned int dim = elem->dim();
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
           // One way for implementing this would be to exchange the fe with the FEInterface- class.
           // However, it needs to be discussed whether integral-norms make sense for infinite elements.
           // or in which sense they could make sense.
           if (elem->infinite() )
             libmesh_not_implemented();
-
-#endif
 
           if (skip_dimensions && skip_dimensions->find(dim) != skip_dimensions->end())
             continue;
@@ -2614,10 +2610,8 @@ Tensor System::point_hessian(unsigned int var,
   if (!sol)
     sol = this->current_local_solution.get();
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (e.infinite())
     libmesh_not_implemented();
-#endif
 
   // Get the dof map to get the proper indices for our computation
   const DofMap & dof_map = this->get_dof_map();

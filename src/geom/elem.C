@@ -241,8 +241,8 @@ const unsigned int Elem::type_to_n_edges_map [] =
 
     0,  // INFEDGE2
 
-    4,  // INFQUAD4
-    4,  // INFQUAD6
+    3,  // INFQUAD4
+    3,  // INFQUAD6
 
     8,  // INFHEX8
     8,  // INFHEX16
@@ -2595,21 +2595,17 @@ std::string Elem::get_info () const
         oss << "nullptr\n";
     }
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (!this->infinite())
     {
-#endif
     oss << "   hmin()=" << this->hmin()
         << ", hmax()=" << this->hmax()                             << '\n'
         << "   volume()=" << this->volume()                        << '\n';
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
     }
-#endif
-    oss << "   active()=" << this->active()
-      << ", ancestor()=" << this->ancestor()
-      << ", subactive()=" << this->subactive()
-      << ", has_children()=" << this->has_children()               << '\n'
-      << "   parent()=";
+  oss << "   active()=" << this->active()
+    << ", ancestor()=" << this->ancestor()
+    << ", subactive()=" << this->subactive()
+    << ", has_children()=" << this->has_children()               << '\n'
+    << "   parent()=";
   if (this->parent())
     oss << this->parent()->id() << '\n';
   else

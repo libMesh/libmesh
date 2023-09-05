@@ -213,10 +213,8 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
         // We skip writing infinite elements to the Exodus file, so
         // don't put them in the subdomain_map. That way the number of
         // blocks should be correct.
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
         if (elem->infinite())
           continue;
-#endif
 
         subdomain_map[ elem->subdomain_id() ].push_back(elem->id());
 
