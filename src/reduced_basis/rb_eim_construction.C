@@ -478,7 +478,8 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
 
           libMesh::out << "Maximum EIM error is " << greedy_error << std::endl << std::endl;
         }
-      libmesh_catch (std::exception & e)
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+      catch (const std::exception & e)
         {
           // If we hit an exception when performing the enrichment for the error indicator, then
           // we just continue and skip the error indicator. Otherwise we rethrow the exception.
@@ -488,8 +489,9 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
               break;
             }
           else
-              LIBMESH_THROW(e);
+            throw;
         }
+#endif
 
       if (exit_on_next_iteration)
         {
@@ -734,7 +736,8 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
               enrich_eim_approximation_on_sides(v);
               update_eim_matrices();
             }
-          libmesh_catch (std::exception & e)
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+          catch (const std::exception & e)
             {
               // If we hit an exception when performing the enrichment for the error indicator, then
               // we just continue and skip the error indicator. Otherwise we rethrow the exception.
@@ -744,8 +747,9 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
                   break;
                 }
               else
-                  LIBMESH_THROW(e);
+                throw;
             }
+#endif
         }
       else if (rbe.get_parametrized_function().on_mesh_nodes())
         {
@@ -764,7 +768,8 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
               enrich_eim_approximation_on_nodes(v);
               update_eim_matrices();
             }
-          libmesh_catch (std::exception & e)
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+          catch (const std::exception & e)
             {
               // If we hit an exception when performing the enrichment for the error indicator, then
               // we just continue and skip the error indicator. Otherwise we rethrow the exception.
@@ -774,8 +779,9 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
                   break;
                 }
               else
-                  LIBMESH_THROW(e);
+                throw;
             }
+#endif
         }
       else
         {
@@ -797,7 +803,8 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
               enrich_eim_approximation_on_interiors(v, v_obs_vals);
               update_eim_matrices();
             }
-          libmesh_catch (std::exception & e)
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+          catch (const std::exception & e)
             {
               // If we hit an exception when performing the enrichment for the error indicator, then
               // we just continue and skip the error indicator. Otherwise we rethrow the exception.
@@ -807,8 +814,9 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
                   break;
                 }
               else
-                  LIBMESH_THROW(e);
+                throw;
             }
+#endif
         }
 
       j++;
