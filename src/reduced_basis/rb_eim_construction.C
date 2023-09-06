@@ -455,26 +455,43 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
       greedy_param_list.emplace_back(get_parameters());
 
       libMesh::out << "Enriching the EIM approximation" << std::endl;
-      enrich_eim_approximation(current_training_index);
-      update_eim_matrices();
-
-      libMesh::out << std::endl << "---- Basis dimension: "
-                   << rbe.get_n_basis_functions() << " ----" << std::endl;
-
-      if (get_rb_eim_evaluation().get_parametrized_function().is_lookup_table &&
-          best_fit_type_flag == EIM_BEST_FIT)
+      libmesh_try
         {
-          // If this is a lookup table and we're using "EIM best fit" then we
-          // need to update the eim_solutions after each EIM enrichment so that
-          // we can call rb_eim_eval.rb_eim_solve() from within compute_max_eim_error().
-          store_eim_solutions_for_training_set();
+          enrich_eim_approximation(current_training_index);
+          update_eim_matrices();
+
+          libMesh::out << std::endl << "---- Basis dimension: "
+                      << rbe.get_n_basis_functions() << " ----" << std::endl;
+
+          if (get_rb_eim_evaluation().get_parametrized_function().is_lookup_table &&
+              best_fit_type_flag == EIM_BEST_FIT)
+            {
+              // If this is a lookup table and we're using "EIM best fit" then we
+              // need to update the eim_solutions after each EIM enrichment so that
+              // we can call rb_eim_eval.rb_eim_solve() from within compute_max_eim_error().
+              store_eim_solutions_for_training_set();
+            }
+
+          libMesh::out << "Computing EIM error on training set" << std::endl;
+          std::tie(greedy_error, current_training_index) = compute_max_eim_error();
+          set_params_from_training_set(current_training_index);
+
+          libMesh::out << "Maximum EIM error is " << greedy_error << std::endl << std::endl;
         }
-
-      libMesh::out << "Computing EIM error on training set" << std::endl;
-      std::tie(greedy_error, current_training_index) = compute_max_eim_error();
-      set_params_from_training_set(current_training_index);
-
-      libMesh::out << "Maximum EIM error is " << greedy_error << std::endl << std::endl;
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+      catch (const std::exception & e)
+        {
+          // If we hit an exception when performing the enrichment for the error indicator, then
+          // we just continue and skip the error indicator. Otherwise we rethrow the exception.
+          if (exit_on_next_iteration)
+            {
+              std::cout << "Exception occurred when enriching basis for error indicator hence we skip the error indicator in this case" << std::endl;
+              break;
+            }
+          else
+            throw;
+        }
+#endif
 
       if (exit_on_next_iteration)
         {
@@ -653,6 +670,11 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           break;
         }
 
+      // The "energy" error in the POD approximation is determined by the first omitted
+      // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
+      // "energy", in order to obtain a relative error.
+      rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
+
       if (exit_on_next_iteration)
         {
           libMesh::out << "Extra EIM iteration for error indicator is complete, POD error norm for extra iteration: " << rel_err << std::endl;
@@ -663,11 +685,6 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 
           break;
         }
-
-      // The "energy" error in the POD approximation is determined by the first omitted
-      // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
-      // "energy", in order to obtain a relative error.
-      rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
 
       libMesh::out << "Number of basis functions: " << j
                    << ", POD error norm: " << rel_err << std::endl;
@@ -714,8 +731,25 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           Real norm_v = std::sqrt(sigma(j));
           scale(v, 1./norm_v);
 
-          enrich_eim_approximation_on_sides(v);
-          update_eim_matrices();
+          libmesh_try
+            {
+              enrich_eim_approximation_on_sides(v);
+              update_eim_matrices();
+            }
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+          catch (const std::exception & e)
+            {
+              // If we hit an exception when performing the enrichment for the error indicator, then
+              // we just continue and skip the error indicator. Otherwise we rethrow the exception.
+              if (exit_on_next_iteration)
+                {
+                  std::cout << "Exception occurred when enriching basis for error indicator hence we skip the error indicator in this case" << std::endl;
+                  break;
+                }
+              else
+                throw;
+            }
+#endif
         }
       else if (rbe.get_parametrized_function().on_mesh_nodes())
         {
@@ -729,8 +763,25 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           Real norm_v = std::sqrt(sigma(j));
           scale_node_data_map(v, 1./norm_v);
 
-          enrich_eim_approximation_on_nodes(v);
-          update_eim_matrices();
+          libmesh_try
+            {
+              enrich_eim_approximation_on_nodes(v);
+              update_eim_matrices();
+            }
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+          catch (const std::exception & e)
+            {
+              // If we hit an exception when performing the enrichment for the error indicator, then
+              // we just continue and skip the error indicator. Otherwise we rethrow the exception.
+              if (exit_on_next_iteration)
+                {
+                  std::cout << "Exception occurred when enriching basis for error indicator hence we skip the error indicator in this case" << std::endl;
+                  break;
+                }
+              else
+                throw;
+            }
+#endif
         }
       else
         {
@@ -744,11 +795,28 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           Real norm_v = std::sqrt(sigma(j));
           scale(v, 1./norm_v);
 
-          // We leave v_obs_vals empty for now, but we can support this later
-          // by accumulating v_obs_vals in the same way that we accumulate v.
-          std::vector<std::vector<Number>> v_obs_vals;
-          enrich_eim_approximation_on_interiors(v, v_obs_vals);
-          update_eim_matrices();
+          libmesh_try
+            {
+              // We leave v_obs_vals empty for now, but we can support this later
+              // by accumulating v_obs_vals in the same way that we accumulate v.
+              std::vector<std::vector<Number>> v_obs_vals;
+              enrich_eim_approximation_on_interiors(v, v_obs_vals);
+              update_eim_matrices();
+            }
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+          catch (const std::exception & e)
+            {
+              // If we hit an exception when performing the enrichment for the error indicator, then
+              // we just continue and skip the error indicator. Otherwise we rethrow the exception.
+              if (exit_on_next_iteration)
+                {
+                  std::cout << "Exception occurred when enriching basis for error indicator hence we skip the error indicator in this case" << std::endl;
+                  break;
+                }
+              else
+                throw;
+            }
+#endif
         }
 
       j++;
@@ -2143,7 +2211,16 @@ void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & 
 
   libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
 
-  libmesh_error_msg_if(optimal_value == 0., "New EIM basis function should not be zero");
+  if (optimal_value == 0.)
+    {
+      // Use libMesh::out to print the error message because we want to see this error message
+      // in this case that we're doing an extra basis enrichment for the error indicator and
+      // we hit the "zero basis function" error. In that case we catch the exception and we
+      // do not print the exception's error message directly, so we print the message here
+      // instead.
+      libMesh::out << "Error in EIM basis enrichment: New EIM basis function should not be zero" << std::endl;
+      libmesh_error_msg("Error in EIM basis enrichment");
+    }
 
   // Scale local_pf so that its largest value is 1.0
   scale_parametrized_function(local_pf, 1./optimal_value);
@@ -2242,7 +2319,16 @@ void RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & no
 
   libmesh_error_msg_if(optimal_node_id == DofObject::invalid_id, "Error: Invalid node ID");
 
-  libmesh_error_msg_if(optimal_value == 0., "New EIM basis function should not be zero");
+  if (optimal_value == 0.)
+    {
+      // Use libMesh::out to print the error message because we want to see this error message
+      // in this case that we're doing an extra basis enrichment for the error indicator and
+      // we hit the "zero basis function" error. In that case we catch the exception and we
+      // do not print the exception's error message directly, so we print the message here
+      // instead.
+      libMesh::out << "Error in EIM basis enrichment: New EIM basis function should not be zero" << std::endl;
+      libmesh_error_msg("Error in EIM basis enrichment");
+    }
 
   // Scale local_pf so that its largest value is 1.0
   scale_node_parametrized_function(local_pf, 1./optimal_value);
@@ -2402,7 +2488,16 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
 
   libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
 
-  libmesh_error_msg_if(optimal_value == 0., "New EIM basis function should not be zero");
+  if (optimal_value == 0.)
+    {
+      // Use libMesh::out to print the error message because we want to see this error message
+      // in this case that we're doing an extra basis enrichment for the error indicator and
+      // we hit the "zero basis function" error. In that case we catch the exception and we
+      // do not print the exception's error message directly, so we print the message here
+      // instead.
+      libMesh::out << "Error in EIM basis enrichment: New EIM basis function should not be zero" << std::endl;
+      libmesh_error_msg("Error in EIM basis enrichment");
+    }
 
   // Scale local_pf so that its largest value is 1.0
   scale_parametrized_function(local_pf, 1./optimal_value);
