@@ -373,9 +373,12 @@ public:
    * \p id's existence from the BoundaryInfo object.  That is, after
    * calling remove_id(), \p id will no longer be in the sets returned by
    * get_boundary_ids(), get_side_boundary_ids(), etc., and will not
-   * be in the bc_id_list vector returned by build_side_list(), etc.
+   * be in the bc_id_list vector returned by build_side_list(), etc. Set
+   * the \p global parameter to true if this is being called for all processes
+   * in the object's communicator, in which case we will remove the id from
+   * the global boundary ID container
    */
-  void remove_id (boundary_id_type id);
+  void remove_id (boundary_id_type id, bool global = false);
 
   /**
    * Changes all entities (nodes, sides, edges, shellfaces) with boundary

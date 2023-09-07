@@ -1779,7 +1779,7 @@ void BoundaryInfo::remove_side (const Elem * elem,
 
 
 
-void BoundaryInfo::remove_id (boundary_id_type id)
+void BoundaryInfo::remove_id (boundary_id_type id, const bool global)
 {
   // Erase id from ids containers
   _boundary_ids.erase(id);
@@ -1790,6 +1790,8 @@ void BoundaryInfo::remove_id (boundary_id_type id)
   _ss_id_to_name.erase(id);
   _ns_id_to_name.erase(id);
   _es_id_to_name.erase(id);
+  if (global)
+    _global_boundary_ids.erase(id);
 
   // Erase (*, id) entries from map.
   erase_if(_boundary_node_id,
