@@ -420,7 +420,7 @@ void assemble_divgrad(EquationSystems & es,
             // "f" is the forcing function for the Poisson equation, which is
             // just the divergence of the exact solution for the vector field.
             // This is the well-known "method of manufactured solutions".
-            Real f;
+            Real f = 0;
             if (dim == 2)
               f = DivGradExactSolution().forcing(x, y);
             else if (dim == 3)
@@ -480,7 +480,7 @@ void assemble_divgrad(EquationSystems & es,
                   const Real zf = qface_point[qp](2);
 
                   // The boundary values for both variables.
-                  Real scalar_value;
+                  Real scalar_value = 0;
                   RealGradient vector_value;
                   if (dim == 2)
                     {
