@@ -268,15 +268,13 @@ void assemble_divgrad(EquationSystems & es,
 
   // Declare a special finite element object for boundary integration.
   std::unique_ptr<FEVectorBase> vector_fe_face (FEVectorBase::build(dim, vector_fe_type));
-  std::unique_ptr<FEBase> scalar_fe_face (FEBase::build(dim, scalar_fe_type));
 
   // Boundary integration requires one quadrature rule with dimensionality one
   // less than the dimensionality of the element.
   QGauss qface(dim-1, FIFTH);
 
-  // Tell the finite element objects to use our quadrature rule.
+  // Tell the finite element object to use our quadrature rule.
   vector_fe_face->attach_quadrature_rule (&qface);
-  scalar_fe_face->attach_quadrature_rule (&qface);
 
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
@@ -414,6 +412,7 @@ void assemble_divgrad(EquationSystems & es,
           // This involves a single loop in which we integrate the "forcing
           // function" in the PDE against the scalar test functions (k).
           {
+            // The location of the current quadrature point.
             const Real x = q_point[qp](0);
             const Real y = q_point[qp](1);
             const Real z = q_point[qp](2);
@@ -427,15 +426,51 @@ void assemble_divgrad(EquationSystems & es,
             else if (dim == 3)
               f = DivGradExactSolution().forcing(x, y, z);
 
+            // Loop to integrate the scalar test functions (k) against the
+            // forcing function.
             for (unsigned int k = 0; k != scalar_n_dofs; k++)
               {
                 Fe(k + vector_n_dofs) += JxW[qp]*f*scalar_phi[k][qp];
               }
           }
+
+          // We have now reached the end of the RHS summation. In addition,
+          // however, since the scalar variable is defined only up
+          // to an additive constant with the previous constraints, we
+          // constrain the integral of the scalar variable to the integral
+          // of the exact solution we seek.
+          {
+            // The location of the current quadrature point.
+            const Real x = q_point[qp](0);
+            const Real y = q_point[qp](1);
+            const Real z = q_point[qp](2);
+
+            // The value of the scalar variable.
+            Real scalar_value = 0;
+            if (dim == 2)
+              scalar_value = DivGradExactSolution().scalar(x, y);
+            else if (dim == 3)
+              scalar_value = DivGradExactSolution().scalar(x, y, z);
+
+            // The lower-right block involves a double loop to integrate the
+            // scalar test functions (k) against the
+            // scalar trial functions (l).
+            for (unsigned int k = 0; k != scalar_n_dofs; k++)
+              for (unsigned int l = 0; l != scalar_n_dofs; l++)
+                {
+                  Ke(k + vector_n_dofs, l + vector_n_dofs) += JxW[qp]*scalar_phi[k][qp]*scalar_phi[l][qp];
+                }
+
+            // Loop to integrate the scalar test functions (k) against the
+            // exact solution for the scalar variable.
+            for (unsigned int k = 0; k != scalar_n_dofs; k++)
+              {
+                Fe(k + vector_n_dofs) += JxW[qp]*scalar_phi[k][qp]*scalar_value;
+              }
+          }
         }
 
-      // We have now reached the end of the RHS summation,
-      // and the end of the quadrature point loop, so
+      // We have now reached the end of the quadrature point loop, so
       // the interior element integration has
       // been completed.  However, we have not yet addressed
       // boundary conditions.  For this example we will only
@@ -450,7 +485,6 @@ void assemble_divgrad(EquationSystems & es,
             {
               // The value of the shape functions at the quadrature points.
               const std::vector<std::vector<RealGradient>> & vector_phi_face = vector_fe_face->get_phi();
-              const std::vector<std::vector<Real>> & scalar_phi_face = scalar_fe_face->get_phi();
 
               // The Jacobian * Quadrature Weight at the quadrature
               // points on the face.
@@ -462,14 +496,12 @@ void assemble_divgrad(EquationSystems & es,
               const std::vector<Point> & qface_point = vector_fe_face->get_xyz();
               const std::vector<Point> & normals = vector_fe_face->get_normals();
 
-              // Compute the shape function values on the element face.
+              // Compute the vector shape function values on the element face.
               vector_fe_face->reinit(elem, side);
-              scalar_fe_face->reinit(elem, side);
 
               // Some shape functions will be 0 on the face, but for ease of
               // indexing and generality of code we loop over them anyway.
               libmesh_assert_equal_to (vector_n_dofs, vector_phi_face.size());
-              libmesh_assert_equal_to (scalar_n_dofs, scalar_phi_face.size());
 
               // Loop over the face quadrature points for integration.
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
@@ -480,48 +512,32 @@ void assemble_divgrad(EquationSystems & es,
                   const Real yf = qface_point[qp](1);
                   const Real zf = qface_point[qp](2);
 
-                  // The boundary values for both variables.
-                  Real scalar_value = 0;
+                  // The boundary value for the vector variable.
                   RealGradient vector_value;
                   if (dim == 2)
-                    {
-                      scalar_value = DivGradExactSolution().scalar(xf, yf);
-                      vector_value = DivGradExactSolution()(xf, yf);
-                    }
+                    vector_value = DivGradExactSolution()(xf, yf);
                   else if (dim == 3)
-                    {
-                      scalar_value = DivGradExactSolution().scalar(xf, yf, zf);
-                      vector_value = DivGradExactSolution()(xf, yf, zf);
-                    }
+                    vector_value = DivGradExactSolution()(xf, yf, zf);
 
                   // We use the penalty method to set the flux of the vector
                   // variable at the boundary, i.e. the RT vector boundary dof.
                   const Real penalty = 1.e10;
 
+                  // A double loop to integrate the normal component of the
+                  // vector test functions (i) against the normal component of
+                  // the vector trial functions (j).
                   for (unsigned int i = 0; i != vector_n_dofs; i++)
                     for (unsigned int j = 0; j != vector_n_dofs; j++)
                       {
                         Ke(i, j) += JxW_face[qp]*penalty*vector_phi_face[i][qp]*normals[qp]*vector_phi_face[j][qp]*normals[qp];
                       }
 
+                  // Loop to integrate the normal component of the vector test
+                  // functions (i) against the normal component of the
+                  // exact solution for the vector variable.
                   for (unsigned int i = 0; i != vector_n_dofs; i++)
                     {
                       Fe(i) += JxW_face[qp]*penalty*vector_phi_face[i][qp]*normals[qp]*vector_value*normals[qp];
-                    }
-
-                  // In addition, since the scalar variable is defined only up
-                  // to an additive constant with the previous constraints, we
-                  // constrain the boundary integral of the scalar variable to
-                  // the boundary integral of the exact solution we seek.
-                  for (unsigned int k = 0; k != scalar_n_dofs; k++)
-                    for (unsigned int l = 0; l != scalar_n_dofs; l++)
-                      {
-                        Ke(k + vector_n_dofs, l + vector_n_dofs) += JxW_face[qp]*scalar_phi_face[k][qp]*scalar_phi_face[l][qp];
-                      }
-
-                  for (unsigned int k = 0; k != scalar_n_dofs; k++)
-                    {
-                      Fe(k + vector_n_dofs) += JxW_face[qp]*scalar_phi_face[k][qp]*scalar_value;
                     }
                 }
             }
