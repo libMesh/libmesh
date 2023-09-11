@@ -15,13 +15,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef DIV_GRAD_EXACT_SOLUTION_H
+#define DIV_GRAD_EXACT_SOLUTION_H
+
 #include "libmesh/libmesh_common.h"
 #include "libmesh/vector_value.h"
 
 using namespace libMesh;
-
-#ifndef DIV_GRAD_EXACT_SOLUTION_H
-#define DIV_GRAD_EXACT_SOLUTION_H
 
 class DivGradExactSolution
 {

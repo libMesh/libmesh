@@ -110,7 +110,7 @@ int main (int argc, char ** argv)
 
   libmesh_error_msg_if((dimension == 2 && elem_str != "TRI6" && elem_str != "TRI7" && elem_str != "QUAD8" && elem_str != "QUAD9") ||
                        (dimension == 3 && elem_str != "TET14" && elem_str != "HEX27"),
-                       "You selected: " << elem_str <<
+                       "You selected " << elem_str <<
                        " but this example must be run with TRI6, TRI7, QUAD8, or QUAD9 in 2d" <<
                        " or with TET14, or HEX27 in 3d.");
 
