@@ -15,6 +15,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef LAPLACE_SYSTEM_H
+#define LAPLACE_SYSTEM_H
+
 // DiffSystem framework files
 #include "libmesh/fem_system.h"
 #include "libmesh/vector_value.h"
@@ -24,9 +27,6 @@
 #include "solution_function.h"
 
 using namespace libMesh;
-
-#ifndef LAPLACE_SYSTEM_H
-#define LAPLACE_SYSTEM_H
 
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
 // but we must specify element residuals

@@ -23,12 +23,12 @@
  *    - 2, 3, and 4 noded edges (\p Edge2, \p Edge3, \p Edge4).
  *
  *  - Generic 2D Finite Elements
- *    - 3 and 6 noded triangles (\p Tri3, \p Tri6).
+ *    - 3, 6 and 7 noded triangles (\p Tri3, \p Tri6, \p Tri7).
  *    - 4, 8, and 9 noded quadrilaterals (\p Quad4, \p Quad8, \p Quad9).
  *    - 4 and 6 noded infinite quadrilaterals (\p InfQuad4, \p InfQuad6).
  *
  *  - Generic 3D Finite Elements
- *    - 4 and 10 noded tetrahedra (\p Tet4, \p Tet10).
+ *    - 4, 10 and 14 noded tetrahedra (\p Tet4, \p Tet10, \p Tet14).
  *    - 8, 20, and 27 noded hexahedra (\p Hex8, \p Hex20, \p Hex27).
  *    - 6, 15, and 18 noded prisms (\p Prism6, \p Prism15, \p Prism18).
  *    - 5, 13, and 14 noded pyramids (\p Pyramid5, \p Pyramid13, \p Pyramid14).
@@ -40,7 +40,7 @@
  *    - Hierarchic
  *    - C1 elements (Hermite, Clough-Tocher)
  *    - Discontinuous elements (Monomials, L2-Lagrange)
- *    - Vector-valued elements (Lagrange-Vec, Nedelec first type)
+ *    - Vector-valued elements (Lagrange-Vec, Monomial-Vec, Nedelec first type)
  *
  *  - Dimension-independence
  *    - Operators are defined to allow the same code to run unmodified on 2D and 3D applications.
