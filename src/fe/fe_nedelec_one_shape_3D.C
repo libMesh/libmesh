@@ -38,7 +38,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem * elem,
 
   switch (totalorder)
     {
-      // linear Lagrange shape functions
+      // linear Nedelec (first kind) shape functions
     case FIRST:
       {
         switch (elem->type())
@@ -268,6 +268,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
 
   switch (totalorder)
     {
+      // linear Nedelec (first kind) shape function first derivatives
     case FIRST:
       {
         switch (elem->type())
@@ -360,7 +361,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
 
-                  } // j=0
+                  } // j = 0
 
                   // d()/deta
                 case 1:
@@ -432,7 +433,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
 
-                  } // j=1
+                  } // j = 1
 
                   // d()/dzeta
                 case 2:
@@ -520,7 +521,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
               libmesh_assert_less (i, 6);
 
 
-              switch (j) //loop over components of vector shape function
+              switch (j)
                 {
                   // d()/dxi
                 case 0:
@@ -571,7 +572,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
 
-                  } // j=0
+                  } // j = 0
 
                   // d()/deta
                 case 1:
@@ -621,7 +622,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
 
-                  } // j=1
+                  } // j = 1
 
                   // d()/dzeta
                 case 2:
@@ -747,7 +748,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
 
   switch (totalorder)
     {
-      // linear Lagrange shape functions
+      // linear Nedelec (first kind) shape function second derivatives
     case FIRST:
       {
         switch (elem->type())
@@ -774,7 +775,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                   {
                     // All d^2()/dxi^2 derivatives for linear hexes are zero.
                     return RealGradient();
-                  } // j=0
+                  } // j = 0
 
                   // d^2()/dxideta
                 case 1:
@@ -822,7 +823,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
 
-                  } // j=1
+                  } // j = 1
 
                   // d^2()/deta^2
                 case 2:
@@ -947,6 +948,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
           case TET14:
             {
               libmesh_assert_less (i, 6);
+              // All second derivatives for linear tets are zero.
               return RealGradient();
             }
 
