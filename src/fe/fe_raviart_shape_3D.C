@@ -52,7 +52,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
 
   switch (totalorder)
     {
-      // linear Lagrange shape functions
+      // linear Raviart-Thomas shape functions
     case FIRST:
       {
         switch (elem->type())
@@ -234,6 +234,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
 
   switch (totalorder)
     {
+      // linear Raviart-Thomas shape function first derivatives
     case FIRST:
       {
         switch (elem->type())
@@ -351,7 +352,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
             {
               libmesh_assert_less (i, 4);
 
-              switch (j) //loop over components of vector shape function
+              switch (j)
                 {
                   // d()/dxi
                 case 0:
@@ -558,7 +559,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_second_deriv(const Elem * elem,
 
   switch (totalorder)
     {
-      // linear Lagrange shape functions
+      // linear Raviart-Thomas shape function second derivatives
     case FIRST:
       {
         switch (elem->type())
@@ -566,12 +567,14 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_second_deriv(const Elem * elem,
           case HEX27:
             {
               libmesh_assert_less (i, 6);
+              // All second derivatives for linear hexes are zero.
               return RealGradient();
             }
 
           case TET14:
             {
               libmesh_assert_less (i, 4);
+              // All second derivatives for linear tets are zero.
               return RealGradient();
             }
 

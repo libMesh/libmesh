@@ -109,7 +109,7 @@ void raviart_thomas_nodal_soln(const Elem * elem,
         libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
 
 
-        // Need to create new fe object so the shape function as the FETransformation
+        // Need to create new fe object so the shape function has the FETransformation
         // applied to it.
         std::unique_ptr<FEVectorBase> vis_fe = FEVectorBase::build(dim, p_refined_fe_type);
 

@@ -38,6 +38,7 @@ RealGradient FE<2,RAVIART_THOMAS>::shape(const Elem * elem,
 
   switch (total_order)
     {
+      // linear Raviart-Thomas shape functions
     case FIRST:
       {
         switch (elem->type())
@@ -188,7 +189,7 @@ RealGradient FE<2,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
 
   switch (total_order)
     {
-      // linear Lagrange shape functions
+      // linear Raviart-Thomas shape function first derivatives
     case FIRST:
       {
         switch (elem->type())
@@ -225,7 +226,7 @@ RealGradient FE<2,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       default:
                         libmesh_error_msg("Invalid i = " << i);
                       }
-                  } // j=0
+                  } // j = 0
 
                   // d()/deta
                 case 1:
@@ -252,7 +253,7 @@ RealGradient FE<2,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       default:
                         libmesh_error_msg("Invalid i = " << i);
                       }
-                  } // j=1
+                  } // j = 1
 
                 default:
                   libmesh_error_msg("Invalid j = " << j);
@@ -374,7 +375,7 @@ RealGradient FE<2,RAVIART_THOMAS>::shape_second_deriv(const Elem * elem,
 
   switch (total_order)
     {
-      // linear Lagrange shape functions
+      // linear Raviart-Thomas shape function second derivatives
     case FIRST:
       {
         switch (elem->type())
