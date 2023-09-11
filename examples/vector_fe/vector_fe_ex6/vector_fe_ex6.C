@@ -89,9 +89,11 @@ int main (int argc, char ** argv)
   // Parse the input file.
   GetPot infile("vector_fe_ex6.in");
 
+  // But allow the command line to override it.
+  infile.parse_command_line(argc, argv);
+
   // Read in parameters from the command line and the input file.
-  const unsigned int dimension = std::stoi(command_line_value(std::string("dim"),
-                                                              std::string("2")));
+  const unsigned int dimension = infile("dim", 2);
   const unsigned int grid_size = infile("grid_size", 15);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build.
@@ -104,8 +106,7 @@ int main (int argc, char ** argv)
   // Use the MeshTools::Generation mesh generator to create a uniform
   // grid on the cube [-1,1]^D. To accomodate Raviart-Thomas elements, we must
   // use TRI6/7 or QUAD8/9 elements in 2d, or TET14 or HEX27 in 3d.
-  const std::string elem_str = command_line_value(std::string("element_type"),
-                                                  std::string("TRI6"));
+  const std::string elem_str = infile("element_type", std::string("TRI6"));
 
   libmesh_error_msg_if((dimension == 2 && elem_str != "TRI6" && elem_str != "TRI7" && elem_str != "QUAD8" && elem_str != "QUAD9") ||
                        (dimension == 3 && elem_str != "TET14" && elem_str != "HEX27"),
