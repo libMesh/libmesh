@@ -145,6 +145,9 @@ int main (int argc, char ** argv)
   system.add_variable("u", FIRST, RAVIART_THOMAS);
   system.add_variable("p", CONSTANT, MONOMIAL);
 
+  // Add a scalar Lagrange multiplier to enforce our constraint
+  system.add_variable("l", FIRST, SCALAR);
+
   // Give the system a pointer to the matrix assembly
   // function. This will be called when needed by the library.
   system.attach_assemble_function(assemble_divgrad);
@@ -310,6 +313,7 @@ void assemble_divgrad(EquationSystems & es,
   std::vector<dof_id_type> dof_indices;
   std::vector<dof_id_type> vector_dof_indices;
   std::vector<dof_id_type> scalar_dof_indices;
+  std::vector<dof_id_type> lambda_dof_indices;
 
   // The global system matrix
   SparseMatrix<Number> & matrix = system.get_system_matrix();
@@ -336,6 +340,7 @@ void assemble_divgrad(EquationSystems & es,
       dof_map.dof_indices (elem, dof_indices);
       dof_map.dof_indices (elem, vector_dof_indices, system.variable_number("u"));
       dof_map.dof_indices (elem, scalar_dof_indices, system.variable_number("p"));
+      dof_map.dof_indices (elem, lambda_dof_indices, system.variable_number("l"));
 
       // Cache the number of degrees of freedom, in total and for each
       // variable, on this element, for use as array and loop bounds later.
@@ -348,6 +353,8 @@ void assemble_divgrad(EquationSystems & es,
         cast_int<unsigned int>(vector_dof_indices.size());
       const unsigned int scalar_n_dofs =
         cast_int<unsigned int>(scalar_dof_indices.size());
+      const unsigned int lambda_n_dofs =
+        cast_int<unsigned int>(lambda_dof_indices.size());
 
       // Compute the element-specific data for the current
       // element.  This involves computing the location of the
@@ -359,7 +366,7 @@ void assemble_divgrad(EquationSystems & es,
       // The total number of degrees of freedom is just the sum of the number
       // of degrees of freedom per variable. We should also have the same
       // number of degrees of freedom as shape functions for each variable.
-      libmesh_assert_equal_to (n_dofs, vector_n_dofs + scalar_n_dofs);
+      libmesh_assert_equal_to (n_dofs, vector_n_dofs + scalar_n_dofs + lambda_n_dofs);
       libmesh_assert_equal_to (vector_n_dofs, vector_phi.size());
       libmesh_assert_equal_to (scalar_n_dofs, scalar_phi.size());
 
@@ -452,20 +459,26 @@ void assemble_divgrad(EquationSystems & es,
             else if (dim == 3)
               scalar_value = DivGradExactSolution().scalar(x, y, z);
 
-            // The lower-right block involves a double loop to integrate the
-            // scalar test functions (k) against the
-            // scalar trial functions (l).
+            // A double loop to integrate the
+            // scalar test functions (k) against the Lagrange dof (n).
             for (unsigned int k = 0; k != scalar_n_dofs; k++)
-              for (unsigned int l = 0; l != scalar_n_dofs; l++)
+              for (unsigned int n = 0; n != lambda_n_dofs; n++)
                 {
-                  Ke(k + vector_n_dofs, l + vector_n_dofs) += JxW[qp]*scalar_phi[k][qp]*scalar_phi[l][qp];
+                  Ke(k + vector_n_dofs, n + vector_n_dofs + scalar_n_dofs) += JxW[qp]*scalar_phi[k][qp];
                 }
 
-            // Loop to integrate the scalar test functions (k) against the
-            // exact solution for the scalar variable.
-            for (unsigned int k = 0; k != scalar_n_dofs; k++)
+            // A double loop to integrate the Lagrange dof (m) against the
+            // scalar trial functions (l).
+            for (unsigned int m = 0; m != lambda_n_dofs; m++)
+              for (unsigned int l = 0; l != scalar_n_dofs; l++)
+                {
+                  Ke(m + vector_n_dofs + scalar_n_dofs, l + vector_n_dofs) += JxW[qp]*scalar_phi[l][qp];
+                }
+
+            // Loop to integrate the exact solution for the scalar variable.
+            for (unsigned int m = 0; m != lambda_n_dofs; m++)
               {
-                Fe(k + vector_n_dofs) += JxW[qp]*scalar_phi[k][qp]*scalar_value;
+                Fe(m + vector_n_dofs + scalar_n_dofs) += JxW[qp]*scalar_value;
               }
           }
         }
