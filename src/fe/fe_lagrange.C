@@ -452,6 +452,7 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
             return 5;
 
           case INVALID_ELEM:
+          case GENERIC_FACE:
             return 0;
 
           default:
@@ -701,6 +702,9 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
                   return 0;
                 }
             }
+
+          case GENERIC_FACE:
+            return 1;
 
           case INVALID_ELEM:
             return 0;

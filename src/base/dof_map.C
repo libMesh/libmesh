@@ -2416,7 +2416,7 @@ void DofMap::_dof_indices (const Elem & elem,
 
 #ifdef DEBUG
       // The number of dofs per element is non-static for subdivision FE
-      if (var.type().family == SUBDIVISION)
+      if (var.type().family == SUBDIVISION || type == GENERIC_FACE)
         tot_size += n_nodes;
       else
         // FIXME: Is the passed-in p_level just elem.p_level()? If so,

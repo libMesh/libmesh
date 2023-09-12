@@ -592,6 +592,11 @@ public:
   virtual ElemType type () const = 0;
 
   /**
+   * \returns True if the element supports libmesh quadrature
+   */
+  virtual bool has_quadrature_support() const { return true; }
+
+  /**
    * \returns The dimensionality of the object.
    */
   virtual unsigned short dim () const = 0;
