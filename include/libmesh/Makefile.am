@@ -83,6 +83,7 @@ BUILT_SOURCES = \
         fe_xyz_map.h \
         h1_fe_transformation.h \
         hcurl_fe_transformation.h \
+        hdiv_fe_transformation.h \
         inf_fe.h \
         inf_fe_instantiate_1D.h \
         inf_fe_instantiate_2D.h \
@@ -818,6 +819,9 @@ h1_fe_transformation.h: $(top_srcdir)/include/fe/h1_fe_transformation.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 hcurl_fe_transformation.h: $(top_srcdir)/include/fe/hcurl_fe_transformation.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+hdiv_fe_transformation.h: $(top_srcdir)/include/fe/hdiv_fe_transformation.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 inf_fe.h: $(top_srcdir)/include/fe/inf_fe.h

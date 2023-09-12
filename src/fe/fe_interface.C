@@ -163,6 +163,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
       case NEDELEC_ONE:                                                 \
         prefix FENedelecOne<dim>::func_and_args suffix                  \
+      case RAVIART_THOMAS:                                              \
+        prefix FERaviartThomas<dim>::func_and_args suffix               \
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
       }                                                                 \
@@ -204,6 +206,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
       case LAGRANGE_VEC:                                                \
       case NEDELEC_ONE:                                                 \
       case MONOMIAL_VEC:                                                \
+      case RAVIART_THOMAS:                                              \
         libmesh_error_msg("Error: Can only request scalar valued elements for Real FEInterface::func_and_args"); \
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
@@ -221,6 +224,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FENedelecOne<dim>::func_and_args suffix                  \
       case MONOMIAL_VEC:                                                \
         prefix FEMonomialVec<dim>::func_and_args suffix                 \
+      case RAVIART_THOMAS:                                              \
+        prefix FERaviartThomas<dim>::func_and_args suffix               \
       case HERMITE:                                                     \
       case HIERARCHIC:                                                  \
       case L2_HIERARCHIC:                                               \
@@ -306,6 +311,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
       case NEDELEC_ONE:                                                 \
         prefix FENedelecOne<dim>::func_and_args suffix                  \
+      case RAVIART_THOMAS:                                              \
+        prefix FERaviartThomas<dim>::func_and_args suffix               \
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
       }                                                                 \
@@ -341,6 +348,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
       case LAGRANGE_VEC:                                                \
       case NEDELEC_ONE:                                                 \
       case MONOMIAL_VEC:                                                \
+      case RAVIART_THOMAS:                                              \
         libmesh_error_msg("Error: Can only request scalar valued elements for Real FEInterface::func_and_args"); \
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
@@ -358,6 +366,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FENedelecOne<dim>::func_and_args suffix                  \
       case MONOMIAL_VEC:                                                \
         prefix FEMonomialVec<dim>::func_and_args suffix                 \
+      case RAVIART_THOMAS:                                              \
+        prefix FERaviartThomas<dim>::func_and_args suffix               \
       case HERMITE:                                                     \
       case HIERARCHIC:                                                  \
       case L2_HIERARCHIC:                                               \
@@ -2767,6 +2777,20 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return 0;
         }
       break;
+    case RAVIART_THOMAS:
+      switch (el_t)
+        {
+        case TRI6:
+        case TRI7:
+        case QUAD8:
+        case QUAD9:
+        case TET14:
+        case HEX27:
+          return 1;
+        default:
+          return 0;
+        }
+      break;
     default:
       return 0;
       break;
@@ -2789,6 +2813,7 @@ bool FEInterface::extra_hanging_dofs(const FEType & fe_t)
     case SUBDIVISION:
     case LAGRANGE_VEC:
     case NEDELEC_ONE:
+    case RAVIART_THOMAS:
       return false;
     case CLOUGH:
     case HERMITE:
@@ -2815,6 +2840,7 @@ FEFieldType FEInterface::field_type (const FEFamily & fe_family)
     case LAGRANGE_VEC:
     case NEDELEC_ONE:
     case MONOMIAL_VEC:
+    case RAVIART_THOMAS:
       return TYPE_VECTOR;
     default:
       return TYPE_SCALAR;
@@ -2831,6 +2857,7 @@ unsigned int FEInterface::n_vec_dim (const MeshBase & mesh,
     case LAGRANGE_VEC:
     case NEDELEC_ONE:
     case MONOMIAL_VEC:
+    case RAVIART_THOMAS:
       return mesh.mesh_dimension();
     default:
       return 1;
@@ -2873,6 +2900,9 @@ FEContinuity FEInterface::get_continuity(const FEType & fe_type)
 
     case NEDELEC_ONE:
       return H_CURL;
+
+    case RAVIART_THOMAS:
+      return H_DIV;
 
       // Side elements
     case SIDE_HIERARCHIC:

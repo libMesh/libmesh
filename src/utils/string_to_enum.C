@@ -276,6 +276,7 @@ void init_fefamily_to_enum ()
       fefamily_to_enum["HERMITE"           ]=HERMITE;
       fefamily_to_enum["SUBDIVISION"       ]=SUBDIVISION;
       fefamily_to_enum["NEDELEC_ONE"       ]=NEDELEC_ONE;
+      fefamily_to_enum["RAVIART_THOMAS"    ]=RAVIART_THOMAS;
     }
 
 }

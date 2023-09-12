@@ -40,7 +40,7 @@
  *    - Hierarchic
  *    - C1 elements (Hermite, Clough-Tocher)
  *    - Discontinuous elements (Monomials, L2-Lagrange)
- *    - Vector-valued elements (Lagrange-Vec, Monomial-Vec, Nedelec first type)
+ *    - Vector-valued elements (Lagrange-Vec, Monomial-Vec, Nedelec first type, Raviart-Thomas)
  *
  *  - Dimension-independence
  *    - Operators are defined to allow the same code to run unmodified on 2D and 3D applications.

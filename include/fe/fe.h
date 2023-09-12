@@ -75,6 +75,12 @@ struct FEOutputType<MONOMIAL_VEC>
   typedef RealVectorValue type;
 };
 
+template<>
+struct FEOutputType<RAVIART_THOMAS>
+{
+  typedef RealVectorValue type;
+};
+
 
 /**
  * A specific instantiation of the \p FEBase class. This
@@ -1209,7 +1215,27 @@ public:
   {}
 };
 
+/**
+ * FERaviartThomas objects are used for working with vector-valued
+ * Raviart-Thomas finite elements.
+ *
+ * \author Nuno Nobre & Karthikeyan Chockalingam
+ * \date 2023
+ */
+template <unsigned int Dim>
+class FERaviartThomas : public FE<Dim,RAVIART_THOMAS>
+{
+public:
 
+  /**
+   * Constructor. Creates a Raviart-Thomas finite element
+   * to be used in dimension \p Dim.
+   */
+  explicit
+  FERaviartThomas(const FEType & fet) :
+    FE<Dim,RAVIART_THOMAS> (fet)
+  {}
+};
 
 /**
  * Provide Typedefs for various element types.
