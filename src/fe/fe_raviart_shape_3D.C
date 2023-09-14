@@ -25,10 +25,11 @@ namespace libMesh
 {
 
 
-bool orientation(std::vector<Point> & arr)
+template<size_t N>
+bool orientation(std::array<Point, N> & arr)
 {
-  while (std::min_element(arr.begin(), arr.end()) != arr.begin())
-    std::rotate(arr.begin(), arr.begin() + 1, arr.end());
+  if (N % 2 == 0)
+    std::rotate(arr.begin(), std::min_element(arr.begin(), arr.end()), arr.end());
 
   size_t cnt = 0;
     for(size_t i = 0; i < arr.size(); i++)
@@ -76,7 +77,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
                 {
                 case 0:
                   {
-                    std::vector<Point> arr = {elem->point(1), elem->point(0), elem->point(3), elem->point(2)};
+                    std::array<Point, 4> arr = {elem->point(1), elem->point(0), elem->point(3), elem->point(2)};
                     if (orientation(arr))
                       return RealGradient( 0.0, 0.0,  0.125*(zeta-1.0) );
                     else
@@ -84,7 +85,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
                   }
                 case 1:
                   {
-                    std::vector<Point> arr = {elem->point(4), elem->point(0), elem->point(1), elem->point(5)};
+                    std::array<Point, 4> arr = {elem->point(4), elem->point(0), elem->point(1), elem->point(5)};
                     if (orientation(arr))
                       return RealGradient( 0.0,  0.125*(eta-1.0), 0.0 );
                     else
@@ -92,7 +93,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
                   }
                 case 2:
                   {
-                    std::vector<Point> arr = {elem->point(6), elem->point(5), elem->point(1), elem->point(2)};
+                    std::array<Point, 4> arr = {elem->point(6), elem->point(5), elem->point(1), elem->point(2)};
                     if (orientation(arr))
                       return RealGradient(  0.125*(xi+1.0), 0.0, 0.0 );
                     else
@@ -100,7 +101,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
                   }
                 case 3:
                   {
-                    std::vector<Point> arr = {elem->point(7), elem->point(6), elem->point(2), elem->point(3)};
+                    std::array<Point, 4> arr = {elem->point(7), elem->point(6), elem->point(2), elem->point(3)};
                     if (orientation(arr))
                       return RealGradient( 0.0,  0.125*(1.0+eta), 0.0 );
                     else
@@ -108,7 +109,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
                   }
                 case 4:
                   {
-                    std::vector<Point> arr = {elem->point(7), elem->point(3), elem->point(0), elem->point(4)};
+                    std::array<Point, 4> arr = {elem->point(7), elem->point(3), elem->point(0), elem->point(4)};
                     if (orientation(arr))
                       return RealGradient(  0.125*(xi-1.0), 0.0, 0.0 );
                     else
@@ -116,7 +117,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
                   }
                 case 5:
                   {
-                    std::vector<Point> arr = {elem->point(5), elem->point(6), elem->point(7), elem->point(4)};
+                    std::array<Point, 4> arr = {elem->point(5), elem->point(6), elem->point(7), elem->point(4)};
                     if (orientation(arr))
                       return RealGradient( 0.0, 0.0,  0.125*(1.0+zeta) );
                     else
@@ -141,7 +142,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
                 {
                 case 0:
                   {
-                    std::vector<Point> arr = {elem->point(0), elem->point(2), elem->point(1)};
+                    std::array<Point, 3> arr = {elem->point(0), elem->point(2), elem->point(1)};
                     if (orientation(arr))
                       return RealGradient(  2.0*xi,  2.0*eta,  2.0*zeta-2.0 );
                     else
@@ -149,7 +150,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
                   }
                 case 1:
                   {
-                    std::vector<Point> arr = {elem->point(1), elem->point(3), elem->point(0)};
+                    std::array<Point, 3> arr = {elem->point(1), elem->point(3), elem->point(0)};
                     if (orientation(arr))
                       return RealGradient(  2.0*xi,  2.0*eta-2.0,  2.0*zeta );
                     else
@@ -157,7 +158,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
                   }
                 case 2:
                   {
-                    std::vector<Point> arr = {elem->point(1), elem->point(2), elem->point(3)};
+                    std::array<Point, 3> arr = {elem->point(1), elem->point(2), elem->point(3)};
                     if (orientation(arr))
                       return RealGradient(  2.0*xi,  2.0*eta,  2.0*zeta );
                     else
@@ -165,7 +166,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
                   }
                 case 3:
                   {
-                    std::vector<Point> arr = {elem->point(0), elem->point(3), elem->point(2)};
+                    std::array<Point, 3> arr = {elem->point(0), elem->point(3), elem->point(2)};
                     if (orientation(arr))
                       return RealGradient(  2.0*xi-2.0,  2.0*eta,  2.0*zeta );
                     else
@@ -257,7 +258,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                         return RealGradient();
                       case 2:
                         {
-                          std::vector<Point> arr = {elem->point(6), elem->point(5), elem->point(1), elem->point(2)};
+                          std::array<Point, 4> arr = {elem->point(6), elem->point(5), elem->point(1), elem->point(2)};
                           if (orientation(arr))
                             return RealGradient(  0.125, 0.0, 0.0 );
                           else
@@ -265,7 +266,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                         }
                       case 4:
                         {
-                          std::vector<Point> arr = {elem->point(7), elem->point(3), elem->point(0), elem->point(4)};
+                          std::array<Point, 4> arr = {elem->point(7), elem->point(3), elem->point(0), elem->point(4)};
                           if (orientation(arr))
                             return RealGradient(  0.125, 0.0, 0.0 );
                           else
@@ -289,7 +290,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                         return RealGradient();
                       case 1:
                         {
-                          std::vector<Point> arr = {elem->point(4), elem->point(0), elem->point(1), elem->point(5)};
+                          std::array<Point, 4> arr = {elem->point(4), elem->point(0), elem->point(1), elem->point(5)};
                           if (orientation(arr))
                             return RealGradient( 0.0,  0.125, 0.0 );
                           else
@@ -297,7 +298,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                         }
                       case 3:
                         {
-                          std::vector<Point> arr = {elem->point(7), elem->point(6), elem->point(2), elem->point(3)};
+                          std::array<Point, 4> arr = {elem->point(7), elem->point(6), elem->point(2), elem->point(3)};
                           if (orientation(arr))
                             return RealGradient( 0.0,  0.125, 0.0 );
                           else
@@ -321,7 +322,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                         return RealGradient();
                       case 0:
                         {
-                          std::vector<Point> arr = {elem->point(1), elem->point(0), elem->point(3), elem->point(2)};
+                          std::array<Point, 4> arr = {elem->point(1), elem->point(0), elem->point(3), elem->point(2)};
                           if (orientation(arr))
                             return RealGradient( 0.0, 0.0,  0.125 );
                           else
@@ -329,7 +330,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                         }
                       case 5:
                         {
-                          std::vector<Point> arr = {elem->point(5), elem->point(6), elem->point(7), elem->point(4)};
+                          std::array<Point, 4> arr = {elem->point(5), elem->point(6), elem->point(7), elem->point(4)};
                           if (orientation(arr))
                             return RealGradient( 0.0, 0.0,  0.125 );
                           else
@@ -361,7 +362,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                     {
                     case 0:
                       {
-                        std::vector<Point> arr = {elem->point(0), elem->point(2), elem->point(1)};
+                        std::array<Point, 3> arr = {elem->point(0), elem->point(2), elem->point(1)};
                         if (orientation(arr))
                           return RealGradient(  2.0, 0.0, 0.0 );
                         else
@@ -369,7 +370,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       }
                     case 1:
                       {
-                        std::vector<Point> arr = {elem->point(1), elem->point(3), elem->point(0)};
+                        std::array<Point, 3> arr = {elem->point(1), elem->point(3), elem->point(0)};
                         if (orientation(arr))
                           return RealGradient(  2.0, 0.0, 0.0 );
                         else
@@ -377,7 +378,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       }
                     case 2:
                       {
-                        std::vector<Point> arr = {elem->point(1), elem->point(2), elem->point(3)};
+                        std::array<Point, 3> arr = {elem->point(1), elem->point(2), elem->point(3)};
                         if (orientation(arr))
                           return RealGradient(  2.0, 0.0, 0.0 );
                         else
@@ -385,7 +386,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       }
                     case 3:
                       {
-                        std::vector<Point> arr = {elem->point(0), elem->point(3), elem->point(2)};
+                        std::array<Point, 3> arr = {elem->point(0), elem->point(3), elem->point(2)};
                         if (orientation(arr))
                           return RealGradient(  2.0, 0.0, 0.0 );
                         else
@@ -404,7 +405,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                     {
                     case 0:
                       {
-                        std::vector<Point> arr = {elem->point(0), elem->point(2), elem->point(1)};
+                        std::array<Point, 3> arr = {elem->point(0), elem->point(2), elem->point(1)};
                         if (orientation(arr))
                           return RealGradient( 0.0,  2.0, 0.0 );
                         else
@@ -412,7 +413,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       }
                     case 1:
                       {
-                        std::vector<Point> arr = {elem->point(1), elem->point(3), elem->point(0)};
+                        std::array<Point, 3> arr = {elem->point(1), elem->point(3), elem->point(0)};
                         if (orientation(arr))
                           return RealGradient( 0.0,  2.0, 0.0 );
                         else
@@ -420,7 +421,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       }
                     case 2:
                       {
-                        std::vector<Point> arr = {elem->point(1), elem->point(2), elem->point(3)};
+                        std::array<Point, 3> arr = {elem->point(1), elem->point(2), elem->point(3)};
                         if (orientation(arr))
                           return RealGradient( 0.0,  2.0, 0.0 );
                         else
@@ -428,7 +429,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       }
                     case 3:
                       {
-                        std::vector<Point> arr = {elem->point(0), elem->point(3), elem->point(2)};
+                        std::array<Point, 3> arr = {elem->point(0), elem->point(3), elem->point(2)};
                         if (orientation(arr))
                           return RealGradient( 0.0,  2.0, 0.0 );
                         else
@@ -447,7 +448,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                     {
                     case 0:
                       {
-                        std::vector<Point> arr = {elem->point(0), elem->point(2), elem->point(1)};
+                        std::array<Point, 3> arr = {elem->point(0), elem->point(2), elem->point(1)};
                         if (orientation(arr))
                           return RealGradient( 0.0, 0.0,  2.0 );
                         else
@@ -455,7 +456,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       }
                     case 1:
                       {
-                        std::vector<Point> arr = {elem->point(1), elem->point(3), elem->point(0)};
+                        std::array<Point, 3> arr = {elem->point(1), elem->point(3), elem->point(0)};
                         if (orientation(arr))
                           return RealGradient( 0.0, 0.0,  2.0 );
                         else
@@ -463,7 +464,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       }
                     case 2:
                       {
-                        std::vector<Point> arr = {elem->point(1), elem->point(2), elem->point(3)};
+                        std::array<Point, 3> arr = {elem->point(1), elem->point(2), elem->point(3)};
                         if (orientation(arr))
                           return RealGradient( 0.0, 0.0,  2.0 );
                         else
@@ -471,7 +472,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       }
                     case 3:
                       {
-                        std::vector<Point> arr = {elem->point(0), elem->point(3), elem->point(2)};
+                        std::array<Point, 3> arr = {elem->point(0), elem->point(3), elem->point(2)};
                         if (orientation(arr))
                           return RealGradient( 0.0, 0.0,  2.0 );
                         else

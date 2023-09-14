@@ -31,9 +31,10 @@
 // The solver packages supported by libMesh.
 #include "libmesh/enum_solver_package.h"
 
-// The mesh object and mesh generation utilities.
+// The mesh object and mesh generation and modification utilities.
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
+#include "libmesh/mesh_modification.h"
 
 // Matrix and vector types.
 #include "libmesh/dense_matrix.h"
@@ -130,6 +131,9 @@ int main (int argc, char ** argv)
                                        -1., 1.,
                                        -1., 1.,
                                        Utility::string_to_enum<ElemType>(elem_str));
+
+  // Make sure the code is robust against nodal reorderings.
+  MeshTools::Modification::permute_elements(mesh);
 
   // Print information about the mesh to the screen.
   mesh.print_info();
