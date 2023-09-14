@@ -102,7 +102,10 @@ AC_DEFUN([CONFIGURE_VTK],
           [
        dnl Check for existence of a header file in the specified location
        vtkincFound=no;
-       AC_CHECK_HEADERS($VTK_INC/vtkConfigure.h, vtkincFound=yes)
+       ac_vtk_save_CPPFLAGS="$CPPFLAGS"
+       CPPFLAGS="-I${VTK_INC} ${CPPFLAGS}"
+       AC_CHECK_HEADERS([vtkConfigure.h], [vtkincFound=yes])
+       CPPFLAGS="${ac_vtk_save_CPPFLAGS}"
 
        AS_IF([test "$vtkincFound" = "no"],
              [
