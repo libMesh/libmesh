@@ -6,11 +6,11 @@ AC_DEFUN([AX_CXX_GLIBC_BACKTRACE],
 ac_cv_cxx_glibc_backtrace,
 [AC_LANG_SAVE
  AC_LANG([C++])
- AC_TRY_COMPILE([@%:@include <execinfo.h>],
-[void *addresses[10];
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([@%:@include <execinfo.h>],
+[[void *addresses[10];
 int size = backtrace(addresses, 10);
 char** strings = backtrace_symbols(addresses, size);
-],
+]])],
  ac_cv_cxx_glibc_backtrace=yes, ac_cv_cxx_glibc_backtrace=no)
  AC_LANG_RESTORE
 ])

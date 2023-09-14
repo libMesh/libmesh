@@ -11,7 +11,7 @@ AC_DEFUN([AX_CXX_GCC_ABI_DEMANGLE],
 ac_cv_cxx_gcc_abi_demangle,
 [AC_LANG_SAVE
  AC_LANG([C++])
- AC_TRY_COMPILE(
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
  [
    @%:@include <typeinfo>
    @%:@include <cxxabi.h>
@@ -25,7 +25,7 @@ ac_cv_cxx_gcc_abi_demangle,
    c_name = abi::__cxa_demangle(typeid(instance).name(), 0, 0, &status);
    std::string name(c_name);
    return name == "A<int>";
- ],
+ ])],
  ac_cv_cxx_gcc_abi_demangle=yes, ac_cv_cxx_gcc_abi_demangle=no)
  AC_LANG_RESTORE
 ])
