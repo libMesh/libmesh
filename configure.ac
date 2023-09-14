@@ -3,7 +3,7 @@
 # aclocal.m4 and Makefile.in. See also: http://tinyurl.com/hatuyfn
 # --------------------------------------------------------------
 AC_INIT([libmesh],[1.8.0-pre],[https://github.com/libMesh/libmesh/discussions],[libmesh],[http://libmesh.github.io])
-AC_PREREQ([2.71])
+AC_PREREQ([2.68])
 
 # by default CFLAGS and CXXFLAGS are set to '-g -O2' on systems that support them.
 # this causes a problem if we then declare a different optimization level. So
