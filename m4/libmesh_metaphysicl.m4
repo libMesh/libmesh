@@ -49,7 +49,7 @@ AC_DEFUN([CONFIGURE_METAPHYSICL],
   dnl (which may take a very long time), and then the app fails to
   dnl compile, requiring you to redo everything.
   AC_ARG_ENABLE(metaphysicl-required,
-                AC_HELP_STRING([--enable-metaphysicl-required],
+                AS_HELP_STRING([--enable-metaphysicl-required],
                                [Error if MetaPhysicL is not detected by configure]),
                 [AS_CASE("${enableval}",
                          [yes], [metaphysiclrequired=yes],

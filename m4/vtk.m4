@@ -49,7 +49,7 @@ AC_DEFUN([CONFIGURE_VTK],
   dnl (which may take a very long time), and then the app fails to compile,
   dnl requiring you to redo everything.
   AC_ARG_ENABLE(vtk-required,
-                AC_HELP_STRING([--enable-vtk-required],
+                AS_HELP_STRING([--enable-vtk-required],
                                [Error if VTK is not detected by configure]),
                 [AS_CASE("${enableval}",
                          [yes], [vtkrequired=yes],

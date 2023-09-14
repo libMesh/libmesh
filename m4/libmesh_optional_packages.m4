@@ -107,7 +107,7 @@ dnl during configure if XDR headers are not detected successfully during
 dnl configure.  This is useful for app codes which require XDR (like
 dnl MOOSE-based apps).
 AC_ARG_ENABLE(xdr-required,
-              AC_HELP_STRING([--enable-xdr-required],
+              AS_HELP_STRING([--enable-xdr-required],
                              [Error if XDR is not detected by configure]),
               [AS_CASE("${enableval}",
                        [yes], [xdrrequired=yes],
@@ -196,7 +196,7 @@ dnl accidentally built without PETSc support (which may take a very
 dnl long time), and then the app fails to compile, requiring you to
 dnl redo everything.
 AC_ARG_ENABLE(petsc-required,
-              AC_HELP_STRING([--enable-petsc-required],
+              AS_HELP_STRING([--enable-petsc-required],
                              [Error if PETSc is not detected by configure]),
               [AS_CASE("${enableval}",
                        [yes], [petscrequired=yes],
@@ -211,7 +211,7 @@ dnl both PETSc and Hypre (like MOOSE-based apps), since it prevents
 dnl libmesh from being accidentally built without PETSc and Hypre
 dnl support.
 AC_ARG_ENABLE(petsc-hypre-required,
-              AC_HELP_STRING([--enable-petsc-hypre-required],
+              AS_HELP_STRING([--enable-petsc-hypre-required],
                              [Error if a PETSc with Hypre is not detected by configure]),
               [AS_CASE("${enableval}",
                        [yes], [petschyprerequired=yes

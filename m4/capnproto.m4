@@ -19,7 +19,7 @@ AC_DEFUN([CONFIGURE_CAPNPROTO],
   dnl Throw an error during configure if the user passes --enable-capnp-required
   dnl and capnp can't be configured for whatever reason.
   AC_ARG_ENABLE(capnp-required,
-                AC_HELP_STRING([--enable-capnp-required],
+                AS_HELP_STRING([--enable-capnp-required],
                                [Error if Cap'n Proto support is not detected by configure]),
                 [AS_CASE("${enableval}",
                          [yes], [capnprequired=yes],
