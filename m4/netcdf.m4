@@ -99,7 +99,13 @@ AC_DEFUN([CONFIGURE_NETCDF],
                 [netcdf_dap_arg=--disable-dap
                  netcdf_curl_arg=--disable-curl
                  netcdf_byterange_arg=--disable-byterange])
-          AX_SUBDIRS_CONFIGURE([$netcdf_v4_subdir],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
+          dnl AX_SUBDIRS_CONFIGURE now dislikes variables in $1
+          AS_IF([test "x$netcdf_v4_subdir" = "xcontrib/netcdf/netcdf-c-4.6.2"],[
+                AX_SUBDIRS_CONFIGURE([contrib/netcdf/netcdf-c-4.6.2],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
+          ])
+          AS_IF([test "x$netcdf_v4_subdir" = "xcontrib/netcdf/netcdf-c"],[
+                AX_SUBDIRS_CONFIGURE([contrib/netcdf/netcdf-c],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
+          ])
         ])
 
   AC_SUBST(NETCDF_INCLUDE)
