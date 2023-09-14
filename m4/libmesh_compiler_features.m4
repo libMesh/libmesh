@@ -11,7 +11,7 @@ AC_MSG_RESULT(---------------------------------------------)
 libmesh_compiler_features_save_CXXFLAGS="$CXXFLAGS"
 CXXFLAGS="$CXXFLAGS_DEVEL"
 AC_LANG_SAVE
-AC_LANG_CPLUSPLUS
+AC_LANG([C++])
 
 # --------------------------------------------------------------
 # Real precision - double by default

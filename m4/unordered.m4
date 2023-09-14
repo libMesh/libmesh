@@ -6,7 +6,7 @@ AC_DEFUN([ACX_STD_UNORDERED_MAP],
 [AC_CACHE_CHECK(whether the compiler supports std::unordered_map,
 ac_cv_cxx_unordered_map,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
+ AC_LANG([C++])
  AC_TRY_COMPILE([@%:@include <unordered_map>],
 [
   std::unordered_map<int, int> m;
@@ -38,7 +38,7 @@ AC_DEFUN([ACX_STD_UNORDERED_MULTIMAP],
 [AC_CACHE_CHECK(whether the compiler supports std::unordered_multimap,
 ac_cv_cxx_unordered_multimap,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
+ AC_LANG([C++])
  AC_TRY_COMPILE([@%:@include <unordered_map>],
 [
   std::unordered_multimap<int, int> m;
@@ -72,7 +72,7 @@ AC_DEFUN([ACX_STD_UNORDERED_MULTISET],
 [AC_CACHE_CHECK(whether the compiler supports std::unordered_multiset,
 ac_cv_cxx_unordered_multiset,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
+ AC_LANG([C++])
  AC_TRY_COMPILE([@%:@include <unordered_set>],
 [
   std::unordered_multiset<int> s;
@@ -107,7 +107,7 @@ AC_DEFUN([ACX_STD_UNORDERED_SET],
 [AC_CACHE_CHECK(whether the compiler supports std::unordered_set,
 ac_cv_cxx_unordered_set,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
+ AC_LANG([C++])
  AC_TRY_COMPILE([@%:@include <unordered_set>],
 [
   std::unordered_set<int> s;
@@ -140,7 +140,7 @@ AC_DEFUN([ACX_STD_HASH],
 [AC_CACHE_CHECK(whether the compiler supports std::hash,
 ac_cv_cxx_hash,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
+ AC_LANG([C++])
  AC_TRY_COMPILE(
 [
   @%:@include <functional>

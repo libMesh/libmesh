@@ -5,7 +5,7 @@ AC_DEFUN([AX_CXX_GLIBC_BACKTRACE],
 [AC_CACHE_CHECK(whether the c++ compiler supports glibc backtrace,
 ac_cv_cxx_glibc_backtrace,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
+ AC_LANG([C++])
  AC_TRY_COMPILE([@%:@include <execinfo.h>],
 [void *addresses[10];
 int size = backtrace(addresses, 10);

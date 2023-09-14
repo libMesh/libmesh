@@ -10,7 +10,7 @@ AC_DEFUN([AX_CXX_GCC_ABI_DEMANGLE],
 [AC_CACHE_CHECK(whether the compiler supports GCC C++ ABI name demangling,
 ac_cv_cxx_gcc_abi_demangle,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
+ AC_LANG([C++])
  AC_TRY_COMPILE(
  [
    @%:@include <typeinfo>

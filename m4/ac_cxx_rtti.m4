@@ -13,7 +13,7 @@ AC_DEFUN([AC_CXX_RTTI],
 [AC_CACHE_CHECK(whether the compiler supports Run-Time Type Identification,
 ac_cv_cxx_rtti,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
+ AC_LANG([C++])
  AC_TRY_COMPILE([@%:@include <typeinfo>
 class Base { public :
              Base () {}
