@@ -1,3 +1,56 @@
+% BISON
+% "... the BISON fuel performance code was used to evaluate the cladding under the burst conditions."
+@Article{Massey_2023,
+  author  = {Caleb P. Massey and Kenneth A. Kane and Ryan T. Sweet and Samuel B. Bell and Sebastien N. Dryepondt and James Burns and Andrew T. Nelson},
+  title   = {{Microstructure dependent burst behavior of oxide dispersion-strengthened FeCrAl cladding}},
+  journal = {Materials \& Design},
+  month   = oct,
+  year    = 2023,
+  volume  = 234,
+  pages   = {112307 (34 pages)},
+  note    = {\url{https://doi.org/10.1016/j.matdes.2023.112307}}
+}
+
+% MOOSE
+% "The system of equations ... is ... implemented within ... (MOOSE)"
+% https://doi.org/10.2139/ssrn.4466905
+@Article{Guevel_2023,
+  author  = {Alexandre Gu{\'{e}}vel and Yue Meng and Christian Peco and Ruben Juanes and John E. Dolbow},
+  title   = {{A Darcy--Cahn--Hilliard model of multiphase fluid-driven fracture}},
+  journal = {Journal of the Mechanics and Physics of Solids},
+  month   = dec,
+  year    = 2023,
+  volume  = 181,
+  pages   = {105427 (xx pages)},
+  note    = {\url{https://doi.org/10.1016/j.jmps.2023.105427}, ArXiv e-print: \url{https://arxiv.org/abs/2306.16930}}
+}
+
+% MOOSE
+% "The elastodynamics equation was solved on a moving tetrahedral mesh consisting of about 200,000 tetrahedra ... using the finite-element method with ... a second-order central difference time-stepping scheme [32,33]."
+% It is not explicitly stated that the implementation is based on MOOSE, but MOOSE and a MOOSE-based code are cited in a sentence describing the numerical simulations. 
+@Article{Tsolaki_2023,
+  author  = {Elena Tsolaki and Pascal Corso and Robert Zboray and Jonathan Avaro and Christian Appel and Marianne Liebi and Sergio Bertazzo and Paul Philipp Heinisch and Thierry Carrel and Dominik Obrist and Inge K. Herrmann},
+  title   = {Multiscale multimodal characterization and simulation of structural alterations in failed bioprosthetic heart valves},
+  journal = {Acta Biomaterialia},
+  month   = oct,
+  year    = 2023,
+  volume  = 169,
+  pages   = {138--154},
+  note    = {\url{https://doi.org/10.1016/j.actbio.2023.07.044}, bioR$\chi$iv e-print: \url{https://doi.org/10.1101/2023.02.26.529530}}
+}
+
+% MOOSE/Mole
+% "Mole is built on ... (MOOSE) framework"
+% author:lee author:jessee author:graham coupled neutronics and species transport
+@Misc{KLee_2023,
+  author       = {Kyoung Lee and Matthew Jessee and Aaron Graham and David Kropaczek},
+  title        = {{Coupled neutronics and species transport simulation of the Molten Salt Reactor Experiment}},
+  month        = apr,
+  year         = 2023,
+  howpublished = {SSRN Preprint},
+  note         = {\url{https://doi.org/10.2139/ssrn.4415792}}
+}
+
 % MARMOT
 % "The simulation was performed using the phase field code MARMOT..."
 @TechReport{Greenquist_2023,
@@ -41,6 +94,7 @@
 
 % MOOSE
 % "We implement the above weak forms in the open source finite-element, multiphysics framework MOOSE..."
+% author:zhang author:balakrishna coupling diffusion finite deformation
 @Misc{TZhang_2023,
   author       = {Tao Zhang and Delin Zhang and Ananya Renuka Balakrishna},
   title        = {Coupling diffusion and finite deformation in phase transformation materials},
@@ -53,8 +107,9 @@
 % MOOSE
 % "Our study is accompanied by finite element simulations, revealing the impact and dependency of process parameters during PBF-LB/M..."
 % I confirmed on ResearchGate that the authors used MOOSE for the FEM simulations.
+% author:gabriel influence of silver nanoparticle additivation
 @Misc{Gabriel_2023,
-  author       = {Philipp Gabriel and others},
+  author       = {Philipp Gabriel and Jianing Liu and Franziska Staab and Timileyin David Oyedeji and Yangyiwei Yang and Nick Hantke and Franziska Scheibel and Esmaeil Adabifiroozjaei and Oscar Recalde-Benitez and Leopoldo Molina-Luna and Ziyuan Rao and Baptiste Gault and Jan T. Sehrt and Konstantin Skokov and Bai-Xiang Xu and Karsten Durst and Oliver Gutfleisch and Stephan Barcikowski and Anna Rosa Ziefu{\ss} },
   title        = {{Influence of silver nanoparticle additivation on Nd-Fe-B permanent magnets produced by laser powder bed fusion}},
   month        = may,
   year         = 2023,
@@ -77,6 +132,7 @@
 
 % MOOSE
 % "The proposed model was implemented using the open-source finite element-based solver MOOSE ..."
+% author:guin author:verma solute segregation
 @Misc{Guin_2023,
   author       = {Sandip Guin and Miral Verma and Soumya Bandyopadhyay and Yu-Chieh Lo and Rajdip Mukherjee},
   title        = {{Solute segregation in a moving grain boundary: A novel phase-field approach}},
@@ -784,6 +840,35 @@
   year         = 2023,
   howpublished = {ArXiv e-print},
   note         = {\url{https://arxiv.org/abs/2307.02680}}
+}
+
+% MOOSE/Griffin
+% Dissertation defense related to the same work:
+% https://inldigitallibrary.inl.gov/sites/sti/sti/Sort_66437.pdf
+% Dissertation entry in Pro-quest:
+% https://www.proquest.com/openview/4ab8b9b7b6c338abed44d8ae53c7c69c/1
+@phdthesis{Calvin_thesis,
+  author = {Olin W. Calvin},
+  school = {University of Idaho},
+  title  = {Depletion chain simplification with pseudo-nuclides to model decay effects},
+  note   = {\url{https://tinyurl.com/yx29k5u2}},
+  month  = aug,
+  year   = 2023
+}
+
+% MOOSE/Griffin
+% "Pseudo-nuclides can model the decay photon emission of radionuclides... in the reactor analysis code, Griffin."
+% The pre-print and the final paper have slightly different titles, I assume they refer to the same work
+% Paper related to the work in Calvin_thesis
+@Article{Calvin_2023b,
+  author  = {Olin Calvin},
+  title   = {Depletion chain simplification using pseudo-nuclides},
+  journal = {Annals of Nuclear Energy},
+  month   = dec,
+  year    = 2023,
+  volume  = 193,
+  pages   = {110011 (19 pages)},
+  note    = {\url{https://doi.org/10.1016/j.anucene.2023.110011}, SSRN Preprint: \url{https://doi.org/10.2139/ssrn.4463259}}
 }
 
 % MOOSE/Griffin
