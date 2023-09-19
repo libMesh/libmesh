@@ -125,8 +125,6 @@ AS_IF([test "x${with_hdf5}" != "xno"],
     AS_IF([test -d "${HDF5_PREFIX}/lib"],
           [
             HDF5_LIBS="-L${HDF5_PREFIX}/lib -lhdf5"
-            HDF5_FLIBS="-L${HDF5_PREFIX}/lib -lhdf5_fortran"
-            HDF5_CXXLIBS="-L${HDF5_PREFIX}/lib -lhdf5_cpp"
           ])
 
     dnl If there is an "rpath" flag detected, append it to the various
@@ -135,8 +133,6 @@ AS_IF([test "x${with_hdf5}" != "xno"],
     AS_IF([test "x$RPATHFLAG" != "x" && test -d "${HDF5_PREFIX}/lib"],
           [
             HDF5_LIBS="${HDF5_LIBS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
-            HDF5_FLIBS="${HDF5_FLIBS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
-            HDF5_CXXLIBS="${HDF5_CXXLIBS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
           ])
 
     AS_IF([test -d "${HDF5_PREFIX}/include"], [HDF5_CPPFLAGS="-I${HDF5_PREFIX}/include"])
@@ -177,7 +173,6 @@ AS_IF([test "x${with_hdf5}" != "xno"],
     AS_IF([test "x${found_header}" = "xyes"],
           [
             min_version_succeeded=no
-            hdf5_has_cxx=no
 
             dnl Test that HDF5 version is greater than or equal to the required min version.
             AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
@@ -209,41 +204,6 @@ AS_IF([test "x${with_hdf5}" != "xno"],
             dnl Check for -lhdf5
             AC_CHECK_LIB([hdf5],[H5Fopen],[found_library=yes],[found_library=no])
 
-            dnl Test for the HDF5 C++ interface by trying to link a test code.
-            AC_LANG_PUSH([C++])
-
-            AC_MSG_CHECKING([If HDF5 C++ interface is present])
-
-            dnl Using the C++ interface requires linking against both the C
-            dnl and C++ libs.
-            LIBS="${HDF5_LIBS} ${HDF5_CXXLIBS}"
-
-            AC_LINK_IFELSE([AC_LANG_PROGRAM([[
-              @%:@include <H5Cpp.h>
-              @%:@ifndef H5_NO_NAMESPACE
-              using namespace H5;
-              @%:@endif
-                  ]], [[
-              H5std_string  fname("test.h5");
-              H5File file (fname, H5F_ACC_TRUNC);
-              ]])],[
-                  hdf5_has_cxx=yes
-              ],[
-                  hdf5_has_cxx=no
-              ])
-
-            AC_LANG_POP([C++])
-
-            dnl Not having the C++ interface doesn't disqualify us from using
-            dnl the C interface.  We'll set a define if C++ is available, so
-            dnl code can conditionally make use of it.
-            AS_IF([test "x$hdf5_has_cxx" = "xyes"],
-                  [
-                    AC_MSG_RESULT(yes)
-                    AC_DEFINE(HAVE_HDF5_CXX, 1, [Define if the HDF5 C++ interface is available])
-                  ],
-                  [AC_MSG_RESULT(no)])
-
             succeeded=no
             AS_IF([test "x$found_header" = "xyes" && test "x$min_version_succeeded" = "xyes" && test "x$found_library" = "xyes"],
                   [succeeded=yes])
@@ -264,8 +224,6 @@ AS_IF([test "x${with_hdf5}" != "xno"],
             HDF5_CFLAGS=""
             HDF5_CPPFLAGS=""
             HDF5_LIBS=""
-            HDF5_FLIBS=""
-            HDF5_CXXLIBS=""
             HDF5_PREFIX=""
           ],
           [
@@ -274,8 +232,6 @@ AS_IF([test "x${with_hdf5}" != "xno"],
             AC_SUBST(HDF5_CFLAGS)
             AC_SUBST(HDF5_CPPFLAGS)
             AC_SUBST(HDF5_LIBS)
-            AC_SUBST(HDF5_FLIBS)
-            AC_SUBST(HDF5_CXXLIBS)
             AC_SUBST(HDF5_PREFIX)
           ])
       ])
