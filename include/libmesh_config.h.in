@@ -426,9 +426,6 @@
 /* Define if HDF5 is available */
 #undef HAVE_HDF5
 
-/* Define if the HDF5 C++ interface is available */
-#undef HAVE_HDF5_CXX
-
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
