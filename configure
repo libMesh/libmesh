@@ -718,8 +718,6 @@ XML2_CONFIG
 LIBMESH_ENABLE_HDF5_FALSE
 LIBMESH_ENABLE_HDF5_TRUE
 HDF5_PREFIX
-HDF5_CXXLIBS
-HDF5_FLIBS
 HDF5_LIBS
 HDF5_CPPFLAGS
 HDF5_CFLAGS
@@ -55190,16 +55188,12 @@ if test "x${with_hdf5}" != "xno"; then :
     if test -d "${HDF5_PREFIX}/lib"; then :
 
             HDF5_LIBS="-L${HDF5_PREFIX}/lib -lhdf5"
-            HDF5_FLIBS="-L${HDF5_PREFIX}/lib -lhdf5_fortran"
-            HDF5_CXXLIBS="-L${HDF5_PREFIX}/lib -lhdf5_cpp"
 
 fi
 
                 if test "x$RPATHFLAG" != "x" && test -d "${HDF5_PREFIX}/lib"; then :
 
             HDF5_LIBS="${HDF5_LIBS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
-            HDF5_FLIBS="${HDF5_FLIBS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
-            HDF5_CXXLIBS="${HDF5_CXXLIBS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
 
 fi
 
@@ -55262,7 +55256,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     if test "x${found_header}" = "xyes"; then :
 
             min_version_succeeded=no
-            hdf5_has_cxx=no
 
                         cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -55359,69 +55352,6 @@ else
 fi
 
 
-                        ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-            { $as_echo "$as_me:${as_lineno-$LINENO}: checking If HDF5 C++ interface is present" >&5
-$as_echo_n "checking If HDF5 C++ interface is present... " >&6; }
-
-                                    LIBS="${HDF5_LIBS} ${HDF5_CXXLIBS}"
-
-            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-              #include <H5Cpp.h>
-              #ifndef H5_NO_NAMESPACE
-              using namespace H5;
-              #endif
-
-int
-main ()
-{
-
-              H5std_string  fname("test.h5");
-              H5File file (fname, H5F_ACC_TRUNC);
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-
-                  hdf5_has_cxx=yes
-
-else
-
-                  hdf5_has_cxx=no
-
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-
-            ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-                                                if test "x$hdf5_has_cxx" = "xyes"; then :
-
-                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-$as_echo "#define HAVE_HDF5_CXX 1" >>confdefs.h
-
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
             succeeded=no
             if test "x$found_header" = "xyes" && test "x$min_version_succeeded" = "xyes" && test "x$found_library" = "xyes"; then :
   succeeded=yes
@@ -55446,8 +55376,6 @@ fi
             HDF5_CFLAGS=""
             HDF5_CPPFLAGS=""
             HDF5_LIBS=""
-            HDF5_FLIBS=""
-            HDF5_CXXLIBS=""
             HDF5_PREFIX=""
 
 else
@@ -55455,8 +55383,6 @@ else
             HAVE_HDF5=1
 
 $as_echo "#define HAVE_HDF5 1" >>confdefs.h
-
-
 
 
 
