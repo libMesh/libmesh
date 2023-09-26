@@ -13,8 +13,8 @@ AC_DEFUN([AC_CXX_RTTI],
 [AC_CACHE_CHECK(whether the compiler supports Run-Time Type Identification,
 ac_cv_cxx_rtti,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([@%:@include <typeinfo>
+ AC_LANG([C++])
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([@%:@include <typeinfo>
 class Base { public :
              Base () {}
              virtual int f () { return 0; }
@@ -26,7 +26,7 @@ class Derived : public Base { public :
 ],[Derived d;
 Base *ptr = &d;
 return typeid (*ptr) == typeid (Derived);
-],
+])],
  ac_cv_cxx_rtti=yes, ac_cv_cxx_rtti=no)
  AC_LANG_RESTORE
 ])

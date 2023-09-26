@@ -57,7 +57,10 @@ AC_DEFUN([CONFIGURE_GLPK],
                 [
                   dnl Check for existence of a header file in the specified location
                   glpkincFound=no;
-                  AC_CHECK_HEADERS($GLPK_INC/glpk.h, glpkincFound=yes)
+                  ac_glpk_save_CPPFLAGS="$CPPFLAGS"
+                  CPPFLAGS="-I${GLPK_INC} ${CPPFLAGS}"
+                  AC_CHECK_HEADERS([glpk.h], [glpkincFound=yes])
+                  CPPFLAGS="${ac_glpk_save_CPPFLAGS}"
 
                   AS_IF([test "x$glpkincFound" = "xno"],
                         [

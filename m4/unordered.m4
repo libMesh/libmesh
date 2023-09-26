@@ -6,15 +6,15 @@ AC_DEFUN([ACX_STD_UNORDERED_MAP],
 [AC_CACHE_CHECK(whether the compiler supports std::unordered_map,
 ac_cv_cxx_unordered_map,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([@%:@include <unordered_map>],
+ AC_LANG([C++])
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([@%:@include <unordered_map>],
 [
   std::unordered_map<int, int> m;
   m.insert(std::make_pair(1, 2));
   m.emplace(3, 4);
   std::unordered_map<int, int>::iterator it = m.erase(m.begin());
   m.emplace_hint(m.begin(), 0, 5);
-],
+])],
  ac_cv_cxx_unordered_map=yes, ac_cv_cxx_unordered_map=no)
  AC_LANG_RESTORE
 ])
@@ -38,8 +38,8 @@ AC_DEFUN([ACX_STD_UNORDERED_MULTIMAP],
 [AC_CACHE_CHECK(whether the compiler supports std::unordered_multimap,
 ac_cv_cxx_unordered_multimap,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([@%:@include <unordered_map>],
+ AC_LANG([C++])
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([@%:@include <unordered_map>],
 [
   std::unordered_multimap<int, int> m;
   m.insert(std::make_pair(1, 2));
@@ -48,7 +48,7 @@ ac_cv_cxx_unordered_multimap,
   std::unordered_multimap<int, int>::iterator it = m.erase(m.begin());
   m.emplace(1, 4);
   m.emplace_hint(m.begin(), 0, 5);
-],
+])],
  ac_cv_cxx_unordered_multimap=yes, ac_cv_cxx_unordered_multimap=no)
  AC_LANG_RESTORE
 ])
@@ -72,8 +72,8 @@ AC_DEFUN([ACX_STD_UNORDERED_MULTISET],
 [AC_CACHE_CHECK(whether the compiler supports std::unordered_multiset,
 ac_cv_cxx_unordered_multiset,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([@%:@include <unordered_set>],
+ AC_LANG([C++])
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([@%:@include <unordered_set>],
 [
   std::unordered_multiset<int> s;
   s.insert(1);
@@ -82,7 +82,7 @@ ac_cv_cxx_unordered_multiset,
   std::unordered_multiset<int>::iterator it = s.erase(s.begin());
   s.emplace(1);
   s.emplace_hint(s.begin(), 0);
-],
+])],
  ac_cv_cxx_unordered_multiset=yes,
  ac_cv_cxx_unordered_multiset=no)
  AC_LANG_RESTORE
@@ -107,8 +107,8 @@ AC_DEFUN([ACX_STD_UNORDERED_SET],
 [AC_CACHE_CHECK(whether the compiler supports std::unordered_set,
 ac_cv_cxx_unordered_set,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([@%:@include <unordered_set>],
+ AC_LANG([C++])
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([@%:@include <unordered_set>],
 [
   std::unordered_set<int> s;
   s.insert(1);
@@ -116,7 +116,7 @@ ac_cv_cxx_unordered_set,
   std::unordered_set<int>::iterator it = s.erase(s.begin());
   s.emplace(3);
   s.emplace_hint(s.begin(), 0);
-],
+])],
  ac_cv_cxx_unordered_set=yes, ac_cv_cxx_unordered_set=no)
  AC_LANG_RESTORE
 ])
@@ -140,8 +140,8 @@ AC_DEFUN([ACX_STD_HASH],
 [AC_CACHE_CHECK(whether the compiler supports std::hash,
 ac_cv_cxx_hash,
 [AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE(
+ AC_LANG([C++])
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
 [
   @%:@include <functional>
   @%:@include <string>
@@ -151,7 +151,7 @@ ac_cv_cxx_hash,
   std::size_t hashed = m(12345);
   std::hash<std::string> m2;
   std::size_t hashed2 = m2(std::string("foo"));
-],
+])],
  ac_cv_cxx_hash=yes, ac_cv_cxx_hash=no)
  AC_LANG_RESTORE
 ])
