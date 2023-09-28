@@ -337,14 +337,6 @@ public:
                                           const std::vector<boundary_id_type> & boundary_ids);
 
   /**
-   * Virtual function that performs cleanup after each
-   * "preevaluate parametrized function" evaluation. This function
-   * is a no-op by default, but it can be overridden in subclasses
-   * in order to do necessary cleanup, such as clearing cached data.
-   */
-  virtual void preevaluate_parametrized_function_cleanup();
-
-  /**
    * Storage for pre-evaluated values. The indexing is given by:
    *   parameter index --> point index --> component index --> value.
    */

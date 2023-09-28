@@ -484,8 +484,6 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
                       all_xyz_perturb_vec,
                       phi_i_qp_vec,
                       preevaluated_values);
-
-  preevaluate_parametrized_function_cleanup();
 }
 
 void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(const RBParameters & mu,
@@ -641,8 +639,6 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
                            all_xyz_perturb_vec,
                            phi_i_qp_vec,
                            preevaluated_values);
-
-  preevaluate_parametrized_function_cleanup();
 }
 
 void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_nodes(const RBParameters & mu,
@@ -681,8 +677,6 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_nodes(con
                            node_ids_vec,
                            boundary_ids_vec,
                            preevaluated_values);
-
-  preevaluate_parametrized_function_cleanup();
 }
 
 Number RBParametrizedFunction::lookup_preevaluated_value_on_mesh(unsigned int comp,
@@ -825,11 +819,6 @@ void RBParametrizedFunction::initialize_spatial_indices(const std::vector<std::v
                                                         const std::vector<unsigned int> & /*qps*/,
                                                         const std::vector<subdomain_id_type> & /*sbd_ids*/,
                                                         const std::vector<boundary_id_type> & /*boundary_ids*/)
-{
-  // No-op by default
-}
-
-void RBParametrizedFunction::preevaluate_parametrized_function_cleanup()
 {
   // No-op by default
 }

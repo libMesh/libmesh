@@ -6,8 +6,8 @@ AC_DEFUN([AC_CXX_HAVE_LOCALE],
 ac_cv_cxx_have_locale,
 [AC_REQUIRE([AC_CXX_NAMESPACES])
  AC_LANG_SAVE
- AC_LANG([C++])
- AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE(
  [
    @%:@include <locale>
    @%:@ifdef HAVE_NAMESPACES
@@ -17,7 +17,7 @@ ac_cv_cxx_have_locale,
  [
    locale loc;
    return 0;
- ])],
+ ],
  ac_cv_cxx_have_locale=yes, ac_cv_cxx_have_locale=no)
  AC_LANG_RESTORE
 ])

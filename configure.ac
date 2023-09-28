@@ -2,8 +2,8 @@
 # configure.ac file for libmesh.  Used by Automake to generate
 # aclocal.m4 and Makefile.in. See also: http://tinyurl.com/hatuyfn
 # --------------------------------------------------------------
-AC_INIT([libmesh],[1.8.0-pre],[https://github.com/libMesh/libmesh/discussions],[libmesh],[http://libmesh.github.io])
-AC_PREREQ([2.68])
+AC_INIT([libmesh], [1.8.0-pre], [https://github.com/libMesh/libmesh/discussions], [libmesh], [http://libmesh.github.io])
+AC_PREREQ([2.69])
 
 # by default CFLAGS and CXXFLAGS are set to '-g -O2' on systems that support them.
 # this causes a problem if we then declare a different optimization level. So
@@ -54,7 +54,7 @@ AC_CONFIG_FILES(doc/dot,                             [chmod +x doc/dot])
 AC_CONFIG_FILES(tests/run_unit_tests.sh,             [chmod +x tests/run_unit_tests.sh])
 
 # Create a temporary file with e.g. HAVE_MPI
-AC_CONFIG_HEADERS([include/libmesh_config.h.tmp:include/libmesh_config.h.in])
+AC_CONFIG_HEADER(include/libmesh_config.h.tmp:include/libmesh_config.h.in)
 # Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
 AX_PREFIX_CONFIG_H(include/libmesh_config.h,LIBMESH,include/libmesh_config.h.tmp)
 
@@ -140,7 +140,8 @@ LIBMESH_SET_COMPILERS
 # By default we do not set any -march flag, but this can be turned on
 # by configuring with --enable-march
 AC_ARG_ENABLE(march,
-              AS_HELP_STRING([--enable-march],[Determine the correct -march flag for this system]),
+              AC_HELP_STRING([--enable-march],
+                             [Determine the correct -march flag for this system]),
               [AS_CASE("${enableval}",
                        [yes], [enablemarch=yes],
                        [no],  [enablemarch=no],

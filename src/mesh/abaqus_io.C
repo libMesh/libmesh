@@ -479,6 +479,12 @@ void AbaqusIO::read_nodes(std::string nset_name)
   char c;
   std::string line;
 
+  // Defines the sequential node numbering used by libmesh.  Since
+  // there can be multiple *NODE sections in an Abaqus file, we always
+  // start our numbering with the number of nodes currently in the
+  // Mesh.
+  dof_id_type libmesh_node_id = the_mesh.n_nodes();
+
   // We need to duplicate some of the read_ids code if this *NODE
   // section also defines an NSET.  We'll set up the id_storage
   // pointer and push back IDs into this vector in the loop below...
@@ -521,17 +527,13 @@ void AbaqusIO::read_nodes(std::string nset_name)
       if (id_storage)
         id_storage->push_back(abaqus_node_id);
 
-      // Convert from Abaqus 1-based to libMesh 0-based numbering
-      libmesh_error_msg_if(abaqus_node_id < 1,
-                           "Invalid Abaqus node ID found");
-      const dof_id_type libmesh_node_id = abaqus_node_id-1;
-
-      libmesh_error_msg_if(the_mesh.query_node_ptr(libmesh_node_id),
-                           "Duplicate Abaqus node ID found");
+      // Set up the abaqus -> libmesh node mapping.  This is usually just the
+      // "off-by-one" map, but it doesn't have to be.
+      _abaqus_to_libmesh_node_mapping[abaqus_node_id] = libmesh_node_id;
 
       // Add the point to the mesh using libmesh's numbering,
       // and post-increment the libmesh node counter.
-      the_mesh.add_point(Point(x,y,z), libmesh_node_id);
+      the_mesh.add_point(Point(x,y,z), libmesh_node_id++);
     } // while
 }
 
@@ -676,12 +678,12 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
       char c;
       _in >> abaqus_elem_id >> c;
 
-      // Add an element of the appropriate type to the Mesh, with the
-      // abaqus element ID.
-      std::unique_ptr<Elem> new_elem = Elem::build(elem_type);
-      new_elem->set_id() = abaqus_elem_id;
+      // Add an element of the appropriate type to the Mesh.
+      Elem * elem = the_mesh.add_elem(Elem::build(elem_type));
 
-      Elem * elem = the_mesh.add_elem(std::move(new_elem));
+      // Associate the ID returned from libmesh with the abaqus element ID
+      //_libmesh_to_abaqus_elem_mapping[elem->id()] = abaqus_elem_id;
+      _abaqus_to_libmesh_elem_mapping[abaqus_elem_id] = elem->id();
 
       // The count of the total number of IDs read for the current element.
       unsigned id_count=0;
@@ -705,10 +707,8 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
 
               if (success)
                 {
-                  // Map the id'th element ID (Abaqus 1-based numbering) to LibMesh numbering
-                  libmesh_error_msg_if(abaqus_global_node_id < 1,
-                                       "Invalid Abaqus node ID found");
-                  const dof_id_type libmesh_global_node_id = abaqus_global_node_id-1;
+                  // Use the global node number mapping to determine the corresponding libmesh global node id
+                  dof_id_type libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[abaqus_global_node_id];
 
                   // Grab the node pointer from the mesh for this ID
                   Node * node = the_mesh.node_ptr(libmesh_global_node_id);
@@ -993,10 +993,8 @@ void AbaqusIO::assign_subdomain_ids()
         // Loop over this vector
         for (const auto & id : id_vector)
           {
-            // Map the id'th element ID (Abaqus 1-based numbering) to LibMesh numbering
-            libmesh_error_msg_if(id < 1,
-                                 "Invalid Abaqus element ID found");
-            const dof_id_type libmesh_elem_id = id-1;
+            // Map the id'th element ID (Abaqus numbering) to LibMesh numbering
+            dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[id];
 
             // Get reference to that element
             Elem & elem = the_mesh.elem_ref(libmesh_elem_id);
@@ -1049,10 +1047,8 @@ void AbaqusIO::assign_boundary_node_ids()
 
       for (const auto & id : nodeset_ids)
         {
-          // Map the id'th element ID (Abaqus 1-based numbering) to LibMesh numbering
-          libmesh_error_msg_if(id < 1,
-                               "Invalid Abaqus node ID found");
-          const dof_id_type libmesh_global_node_id = id-1;
+          // Map the Abaqus global node ID to the libmesh node ID
+          dof_id_type libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[id];
 
           // Get node pointer from the mesh
           Node * node = the_mesh.node_ptr(libmesh_global_node_id);
@@ -1091,10 +1087,8 @@ void AbaqusIO::assign_sideset_ids()
 
         for (const auto & [abaqus_elem_id, abaqus_side_number] : sideset_ids)
           {
-            // Map the id'th element ID (Abaqus 1-based numbering) to LibMesh numbering
-            libmesh_error_msg_if(abaqus_elem_id < 1,
-                                 "Invalid Abaqus element ID found");
-            const dof_id_type libmesh_elem_id = abaqus_elem_id-1;
+            // Map the Abaqus element ID to LibMesh numbering
+            dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ abaqus_elem_id ];
 
             // Get a reference to that element
             Elem & elem = the_mesh.elem_ref(libmesh_elem_id);
@@ -1149,10 +1143,8 @@ void AbaqusIO::assign_sideset_ids()
         // Loop over this vector
         for (const auto & id : id_vector)
           {
-            // Map the id'th element ID (Abaqus 1-based numbering) to LibMesh numbering
-            libmesh_error_msg_if(id < 1,
-                                 "Invalid Abaqus element ID found");
-            const dof_id_type libmesh_elem_id = id-1;
+            // Map the id_vector[i]'th element ID (Abaqus numbering) to LibMesh numbering
+            dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[id];
 
             // Get a reference to that element
             Elem & elem = the_mesh.elem_ref(libmesh_elem_id);

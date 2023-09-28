@@ -212,6 +212,23 @@ private:
   std::set<ElemType> _elem_types;
 
   /**
+   * Map from libmesh element number -> abaqus element number,
+   * and the converse.
+   */
+  // std::map<dof_id_type, dof_id_type> _libmesh_to_abaqus_elem_mapping;
+  std::map<dof_id_type, dof_id_type> _abaqus_to_libmesh_elem_mapping;
+
+  /**
+   * Map from abaqus node number -> sequential, 0-based libmesh node numbering.
+   *
+   * \note In every Abaqus file I've ever seen the node numbers were 1-based,
+   * sequential, and all in order, so that this map is probably overkill.
+   * Nevertheless, it is the most general solution in case we come across a
+   * weird Abaqus file some day.
+   */
+  std::map<dof_id_type, dof_id_type> _abaqus_to_libmesh_node_mapping;
+
+  /**
    * This flag gets set to true after the first "*PART" section
    * we see.  If it is still true when we see a second PART
    * section, we will print an error message... we don't currently

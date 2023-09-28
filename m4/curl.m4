@@ -46,10 +46,7 @@ AC_DEFUN([CONFIGURE_CURL],
                 [
                   dnl Check for existence of a header file in the specified location
                   curlincFound=no;
-                  ac_curl_save_CPPFLAGS="$CPPFLAGS"
-                  CPPFLAGS="-I${CURL_INC} ${CPPFLAGS}"
-                  AC_CHECK_HEADERS([curl.h], [curlincFound=yes])
-                  CPPFLAGS="${ac_curl_save_CPPFLAGS}"
+                  AC_CHECK_HEADERS($CURL_INC/curl.h, curlincFound=yes)
 
                   AS_IF([test "x$curlincFound" = "xno"],
                         [

@@ -49,7 +49,7 @@ AC_DEFUN([CONFIGURE_VTK],
   dnl (which may take a very long time), and then the app fails to compile,
   dnl requiring you to redo everything.
   AC_ARG_ENABLE(vtk-required,
-                AS_HELP_STRING([--enable-vtk-required],
+                AC_HELP_STRING([--enable-vtk-required],
                                [Error if VTK is not detected by configure]),
                 [AS_CASE("${enableval}",
                          [yes], [vtkrequired=yes],
@@ -102,10 +102,7 @@ AC_DEFUN([CONFIGURE_VTK],
           [
        dnl Check for existence of a header file in the specified location
        vtkincFound=no;
-       ac_vtk_save_CPPFLAGS="$CPPFLAGS"
-       CPPFLAGS="-I${VTK_INC} ${CPPFLAGS}"
-       AC_CHECK_HEADERS([vtkConfigure.h], [vtkincFound=yes])
-       CPPFLAGS="${ac_vtk_save_CPPFLAGS}"
+       AC_CHECK_HEADERS($VTK_INC/vtkConfigure.h, vtkincFound=yes)
 
        AS_IF([test "$vtkincFound" = "no"],
              [

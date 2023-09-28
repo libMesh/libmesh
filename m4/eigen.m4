@@ -61,13 +61,10 @@ AC_DEFUN([CONFIGURE_EIGEN],
           dnl Check for existence of a header file in the specified location.  Note: here
           dnl we are checking for the header file "Eigen" in the Eigen directory.
           AC_LANG_SAVE
-          AC_LANG([C++])
+          AC_LANG_CPLUSPLUS
 
           externaleigenincFound=no;
-          ac_eigen_save_CPPFLAGS="$CPPFLAGS"
-          CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
-          AC_CHECK_HEADERS([Eigen/Eigen], [externaleigenincFound=yes])
-          CPPFLAGS="${ac_eigen_save_CPPFLAGS}"
+          AC_CHECK_HEADERS($EIGEN_INC/Eigen/Eigen, externaleigenincFound=yes)
 
           dnl Check to make sure the external header files are sufficiently up
           dnl to date - this fixes our Eigen detection on Scientific Linux 6
