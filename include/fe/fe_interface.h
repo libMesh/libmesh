@@ -95,7 +95,8 @@ public:
    * Non-deprecated version of function above.
    */
   static unsigned int n_shape_functions(const FEType & fe_t,
-                                        const Elem * elem);
+                                        const Elem * elem,
+                                        const bool add_p_level = true);
 
   /**
    * Same as above, but ignores the elem->p_level() and uses the
@@ -226,7 +227,8 @@ public:
    * The non-deprecated version of the function above.
    */
   static unsigned int n_dofs_per_elem(const FEType & fe_t,
-                                      const Elem * elem);
+                                      const Elem * elem,
+                                      bool add_p_level = true);
 
   /**
    * Same thing but internally elem->p_level() is ignored and extra_order is used instead.
@@ -289,7 +291,8 @@ public:
                          const FEType & fe_t,
                          const Elem * elem,
                          const std::vector<Number> & elem_soln,
-                         std::vector<Number> & nodal_soln);
+                         std::vector<Number> & nodal_soln,
+                         bool add_p_level = true);
 
 
   /**
@@ -304,7 +307,8 @@ public:
                               const Elem * elem,
                               const unsigned int side,
                               const std::vector<Number> & elem_soln,
-                              std::vector<Number> & nodal_soln);
+                              std::vector<Number> & nodal_soln,
+                              bool add_p_level = true);
 
   /**
    * This is now deprecated; use FEMap::map instead.
@@ -386,12 +390,13 @@ public:
 
   /**
    * Non-deprecated version of the shape() function. The
-   * Elem::p_level() is accounted for internally.
+   * Elem::p_level() is accounted for internally if \p add_p_level
    */
   static Real shape(const FEType & fe_t,
                     const Elem * elem,
                     const unsigned int i,
-                    const Point & p);
+                    const Point & p,
+                    const bool add_p_level = true);
 
   /**
    * Non-deprecated version of the shape() function. The

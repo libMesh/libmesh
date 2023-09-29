@@ -38,13 +38,14 @@ namespace {
 void xyz_nodal_soln(const Elem * elem,
                     const Order order,
                     const std::vector<Number> & elem_soln,
-                    std::vector<Number> & nodal_soln)
+                    std::vector<Number> & nodal_soln,
+                    const bool add_p_level)
 {
   const unsigned int n_nodes = elem->n_nodes();
 
   nodal_soln.resize(n_nodes);
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder = static_cast<Order>(order + add_p_level*elem->p_level());
 
   switch (totalorder)
     {

@@ -501,7 +501,8 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
 unsigned int
 FEInterface::n_shape_functions(const FEType & fe_t,
-                               const Elem * elem)
+                               const Elem * elem,
+                               const bool add_p_level)
 {
   // dim is required by the fe_with_vec_switch macro
   auto dim = elem->dim();
@@ -519,7 +520,7 @@ FEInterface::n_shape_functions(const FEType & fe_t,
 #endif
 
   // Account for Elem::p_level() when computing total_order
-  auto total_order = static_cast<Order>(fe_t.order + elem->p_level());
+  auto total_order = static_cast<Order>(fe_t.order + add_p_level*elem->p_level());
 
   fe_with_vec_switch(n_shape_functions(elem->type(), total_order));
 }
@@ -752,7 +753,8 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
 unsigned int
 FEInterface::n_dofs_per_elem(const FEType & fe_t,
-                             const Elem * elem)
+                             const Elem * elem,
+                             const bool add_p_level)
 {
   // dim is required by the fe_with_vec_switch macro
   auto dim = elem->dim();
@@ -765,7 +767,7 @@ FEInterface::n_dofs_per_elem(const FEType & fe_t,
 #endif
 
   // Account for Elem::p_level() when computing total_order
-  auto total_order = static_cast<Order>(fe_t.order + elem->p_level());
+  auto total_order = static_cast<Order>(fe_t.order + add_p_level*elem->p_level());
 
   fe_with_vec_switch(n_dofs_per_elem(elem->type(), total_order));
 }
@@ -828,7 +830,8 @@ void FEInterface::nodal_soln(const unsigned int dim,
                              const FEType & fe_t,
                              const Elem * elem,
                              const std::vector<Number> & elem_soln,
-                             std::vector<Number> &       nodal_soln)
+                             std::vector<Number> &       nodal_soln,
+                             const bool add_p_level)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -842,7 +845,7 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
   const Order order = fe_t.order;
 
-  void_fe_with_vec_switch(nodal_soln(elem, order, elem_soln, nodal_soln));
+  void_fe_with_vec_switch(nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level));
 }
 
 
@@ -851,7 +854,8 @@ void FEInterface::side_nodal_soln(const FEType & fe_t,
                                   const Elem * elem,
                                   const unsigned int side,
                                   const std::vector<Number> & elem_soln,
-                                  std::vector<Number> &       nodal_soln)
+                                  std::vector<Number> &       nodal_soln,
+                                  const bool add_p_level)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -866,7 +870,7 @@ void FEInterface::side_nodal_soln(const FEType & fe_t,
   const Order order = fe_t.order;
   const unsigned int dim = elem->dim();
 
-  void_fe_with_vec_switch(side_nodal_soln(elem, order, side, elem_soln, nodal_soln));
+  void_fe_with_vec_switch(side_nodal_soln(elem, order, side, elem_soln, nodal_soln, add_p_level));
 }
 
 
@@ -1002,7 +1006,8 @@ Real
 FEInterface::shape(const FEType & fe_t,
                    const Elem * elem,
                    const unsigned int i,
-                   const Point & p)
+                   const Point & p,
+                   const bool add_p_level)
 {
   // dim is required by the fe_switch macro
   auto dim = elem->dim();
@@ -1018,9 +1023,8 @@ FEInterface::shape(const FEType & fe_t,
   //
   // FE<X,Y>::shape(Elem *, Order, unsigned, Point, true)
   //
-  // with the last parameter set to "true" so that the Elem::p_level()
-  // is accounted for internally. See fe.h for more details.
-  fe_switch(shape(elem, fe_t.order, i, p, true));
+  // See fe.h for more details.
+  fe_switch(shape(elem, fe_t.order, i, p, add_p_level));
 }
 
 

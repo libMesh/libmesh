@@ -882,7 +882,8 @@ template <>
 void FE<2,SUBDIVISION>::nodal_soln(const Elem * elem,
                                    const Order,
                                    const std::vector<Number> & elem_soln,
-                                   std::vector<Number> & nodal_soln)
+                                   std::vector<Number> & nodal_soln,
+                                   const bool /*add_p_level*/)
 {
   libmesh_assert(elem);
   libmesh_assert_equal_to(elem->type(), TRI3SUBDIVISION);

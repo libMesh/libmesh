@@ -836,6 +836,8 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
           const FEType & fe_type           = system.variable_type(var);
           const Variable & var_description = system.variable(var);
           unsigned int n_vec_dim = FEInterface::n_vec_dim( sys_ptr->get_mesh(), fe_type );
+          const auto vg = dof_map.var_group_from_var_number(var);
+          const bool add_p_level = dof_map.should_p_refine(vg);
 
           for (const auto & elem : _mesh.active_local_element_ptr_range())
             {
@@ -848,7 +850,8 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                                            fe_type,
                                            elem,
                                            elem_soln,
-                                           nodal_soln);
+                                           nodal_soln,
+                                           add_p_level);
 
                   // infinite elements should be skipped...
                   if (!elem->infinite())
@@ -884,7 +887,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                               // side nodes
                               FEInterface::side_nodal_soln
                                 (fe_type, elem, s, elem_soln,
-                                 nodal_soln);
+                                 nodal_soln, add_p_level);
 
 #ifdef DEBUG
                               const std::vector<unsigned int> side_nodes =
@@ -1349,6 +1352,7 @@ EquationSystems::build_discontinuous_solution_vector
         continue;
 
       const unsigned int nv_sys = system->n_vars();
+      const auto & dof_map = system->get_dof_map();
 
       system->update_global_solution (sys_soln, 0);
 
@@ -1381,6 +1385,8 @@ EquationSystems::build_discontinuous_solution_vector
 
               const FEType & fe_type = system->variable_type(var);
               const Variable & var_description = system->variable(var);
+              const auto vg = dof_map.var_group_from_var_number(var);
+              const bool add_p_level = dof_map.should_p_refine(vg);
 
               unsigned int nn=0;
 
@@ -1402,7 +1408,8 @@ EquationSystems::build_discontinuous_solution_vector
                                                fe_type,
                                                elem,
                                                soln_coeffs,
-                                               nodal_soln);
+                                               nodal_soln,
+                                               add_p_level);
 
                       // infinite elements should be skipped...
                       if (!elem->infinite())
@@ -1466,7 +1473,7 @@ EquationSystems::build_discontinuous_solution_vector
                                 // vertices_only == true.
                                 FEInterface::side_nodal_soln
                                   (fe_type, elem, s, soln_coeffs,
-                                   nodal_soln);
+                                   nodal_soln, add_p_level);
 
                                 libmesh_assert_equal_to
                                     (nodal_soln.size(),
@@ -1499,7 +1506,7 @@ EquationSystems::build_discontinuous_solution_vector
                                     std::vector<Number> neigh_soln;
                                     FEInterface::side_nodal_soln
                                       (fe_type, neigh, s_neigh,
-                                       neigh_coeffs, neigh_soln);
+                                       neigh_coeffs, neigh_soln, add_p_level);
 
                                     const std::vector<unsigned int> neigh_nodes =
                                       neigh->nodes_on_side(s_neigh);

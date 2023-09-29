@@ -51,7 +51,7 @@
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point> &, const Elem *); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::init_dual_shape_functions(unsigned int, unsigned int); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::default_all_shape_derivs (const Elem * elem, const Order o, const std::vector<Point> & p, std::vector<std::vector<Real>> * comps[3], const bool add_p_level); \
-  template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::default_side_nodal_soln(const Elem * elem, const Order o, const unsigned int side, const std::vector<Number> & elem_soln, std::vector<Number> & nodal_soln_on_side)
+  template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::default_side_nodal_soln(const Elem * elem, const Order o, const unsigned int side, const std::vector<Number> & elem_soln, std::vector<Number> & nodal_soln_on_side, bool add_p_level)
 
 #else // LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -64,7 +64,7 @@
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point> &, const Elem *); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::init_dual_shape_functions(unsigned int, unsigned int); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::default_all_shape_derivs (const Elem * elem, const Order o, const std::vector<Point> & p, std::vector<std::vector<Real>> * comps[3], const bool add_p_level); \
-  template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::default_side_nodal_soln(const Elem * elem, const Order o, const unsigned int side, const std::vector<Number> & elem_soln, std::vector<Number> & nodal_soln_on_side)
+  template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::default_side_nodal_soln(const Elem * elem, const Order o, const unsigned int side, const std::vector<Number> & elem_soln, std::vector<Number> & nodal_soln_on_side, bool add_p_level)
 
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -116,8 +116,9 @@ template <>                                                             \
 void FE<_dim,_fetype>::nodal_soln(const Elem * elem,                    \
                                   const Order order,                    \
                                   const std::vector<Number> & elem_soln,\
-                                  std::vector<Number> & nodal_soln)     \
-{ _funcname(elem, order, elem_soln, nodal_soln); }
+                                  std::vector<Number> & nodal_soln,     \
+                                  const bool add_p_level)               \
+{ _funcname(elem, order, elem_soln, nodal_soln, add_p_level); }
 
 #define LIBMESH_FE_NODAL_SOLN(fetype, _funcname)                        \
 LIBMESH_FE_NODAL_SOLN_DIM(fetype, _funcname, 0)                         \
@@ -132,8 +133,9 @@ void FE<_dim,_fetype>::side_nodal_soln(const Elem * elem,               \
                                        const Order order,               \
                                        const unsigned int side,         \
                                        const std::vector<Number> & elem_soln,\
-                                       std::vector<Number> & nodal_soln)\
-{ default_side_nodal_soln(elem, order, side, elem_soln, nodal_soln); }
+                                       std::vector<Number> & nodal_soln, \
+                                       const bool add_p_level)          \
+{ default_side_nodal_soln(elem, order, side, elem_soln, nodal_soln, add_p_level); }
 
 #define LIBMESH_FE_SIDE_NODAL_SOLN(fetype)                              \
 LIBMESH_FE_SIDE_NODAL_SOLN_DIM(fetype, 0)                               \

@@ -1549,10 +1549,12 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
 
   const Variable & var = dof_map.variable(variable_number);
   const FEType & base_fe_type = var.type();
+  const bool add_p_level = dof_map.should_p_refine_var(variable_number);
 
   // Construct FE objects for this element and its neighbors.
   std::unique_ptr<FEGenericBase<OutputShape>> my_fe
     (FEGenericBase<OutputShape>::build(Dim, base_fe_type));
+  my_fe->add_p_level_in_reinit(add_p_level);
   const FEContinuity cont = my_fe->get_continuity();
 
   // We don't need to constrain discontinuous elements
@@ -1570,6 +1572,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
 
   std::unique_ptr<FEGenericBase<OutputShape>> neigh_fe
     (FEGenericBase<OutputShape>::build(Dim, base_fe_type));
+  neigh_fe->add_p_level_in_reinit(add_p_level);
 
   QGauss my_qface(Dim-1, base_fe_type.default_quadrature_order());
   my_fe->attach_quadrature_rule (&my_qface);
@@ -1630,15 +1633,14 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
           // matrix with this and then constrain away all higher p
           // DoFs.
           libmesh_assert(neigh->active());
-          const unsigned int min_p_level =
+          const unsigned int min_p_level = add_p_level *
             std::min(elem->p_level(), neigh->p_level());
-
           // we may need to make the FE objects reinit with the
           // minimum shared p_level
-          const unsigned int old_elem_level = elem->p_level();
-          if (elem->p_level() != min_p_level)
+          const unsigned int old_elem_level = add_p_level * elem->p_level();
+          if (old_elem_level != min_p_level)
             my_fe->set_fe_order(my_fe->get_fe_type().order.get_order() + min_p_level - old_elem_level);
-          const unsigned int old_neigh_level = neigh->p_level();
+          const unsigned int old_neigh_level = add_p_level * neigh->p_level();
           if (old_neigh_level != min_p_level)
             neigh_fe->set_fe_order(neigh_fe->get_fe_type().order.get_order() + min_p_level - old_neigh_level);
 
@@ -1808,13 +1810,15 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
           neigh_fe->set_fe_order(neigh_fe->get_fe_type().order.get_order() + old_neigh_level - min_p_level);
         }
 
-      // p refinement constraints:
-      // constrain dofs shared between
-      // active elements and neighbors with
-      // lower polynomial degrees
-      const unsigned int min_p_level =
-        neigh->min_p_level_by_neighbor(elem, elem->p_level());
-      if (min_p_level < elem->p_level())
+      if (add_p_level)
+      {
+        // p refinement constraints:
+        // constrain dofs shared between
+        // active elements and neighbors with
+        // lower polynomial degrees
+        const unsigned int min_p_level =
+          neigh->min_p_level_by_neighbor(elem, elem->p_level());
+        if (min_p_level < elem->p_level())
         {
           // Adaptive p refinement of non-hierarchic bases will
           // require more coding
@@ -1822,6 +1826,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
           dof_map.constrain_p_dofs(variable_number, elem,
                                    s, min_p_level);
         }
+      }
     }
 }
 
