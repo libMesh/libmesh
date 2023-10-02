@@ -2025,13 +2025,14 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
   libmesh_assert(this->has_elem() || fe_type.family == SCALAR);
 
 #ifdef LIBMESH_ENABLE_AMR
+  const bool add_p_level = fe->add_p_level_in_reinit();
   if ((algebraic_type() == OLD) &&
       this->has_elem())
     {
       if (this->get_elem().p_refinement_flag() == Elem::JUST_REFINED)
-        fe_type.order = static_cast<Order>(fe_type.order - 1);
+        fe_type.order = static_cast<Order>(fe_type.order - add_p_level);
       else if (this->get_elem().p_refinement_flag() == Elem::JUST_COARSENED)
-        fe_type.order = static_cast<Order>(fe_type.order + 1);
+        fe_type.order = static_cast<Order>(fe_type.order + add_p_level);
     }
 #endif // LIBMESH_ENABLE_AMR
 
@@ -2039,6 +2040,9 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
 
   FEGenericBase<OutputShape>* fe_new =
     cached_fe<OutputShape>(elem_dim, fe_type, get_derivative_level);
+#ifdef LIBMESH_ENABLE_AMR
+  fe_new->add_p_level_in_reinit(add_p_level);
+#endif // LIBMESH_ENABLE_AMR
 
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit

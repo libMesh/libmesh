@@ -2549,10 +2549,12 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
             continue;
 
           FEType fe_type = base_fe_type;
+          const auto & dof_map = system.get_dof_map();
+          const bool add_p_level = dof_map.should_p_refine_var(var);
 
           // This may be a p refined element
           fe_type.order =
-            libMesh::Order (fe_type.order + elem.p_level());
+            libMesh::Order (fe_type.order + add_p_level*elem.p_level());
 
           // If this is a Lagrange element with DoFs on sides then by
           // convention we interpolate at the node rather than project
@@ -2664,7 +2666,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
 
           std::vector<unsigned int> side_dofs;
           FEInterface::dofs_on_side(&elem, dim, base_fe_type,
-                                    context.side, side_dofs);
+                                    context.side, side_dofs, add_p_level);
 
           this->construct_projection
             (dof_indices, side_dofs, var_component,

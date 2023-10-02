@@ -609,6 +609,11 @@ public:
    */
   void add_p_level_in_reinit(bool value) { _add_p_level_in_reinit = value; }
 
+  /**
+   * Whether to add p-refinement levels in init/reinit methods
+   */
+  bool add_p_level_in_reinit() const { return _add_p_level_in_reinit; }
+
 protected:
 
   /**
