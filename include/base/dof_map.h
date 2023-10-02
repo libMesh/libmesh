@@ -1621,6 +1621,11 @@ public:
    */
   bool should_p_refine(unsigned int g) const;
 
+  /**
+   * Whether the given variable should be p-refined
+   */
+  bool should_p_refine_var(unsigned int var) const;
+
   // Prevent bad user implicit conversions
   void should_p_refine(FEFamily, bool) = delete;
   void should_p_refine(Order, bool) = delete;
@@ -2343,6 +2348,18 @@ unsigned int DofMap::var_group_from_var_number(const unsigned int var_num) const
 {
   libmesh_assert(var_num < n_variables());
   return libmesh_map_find(_var_to_vg, var_num);
+}
+
+inline
+bool DofMap::should_p_refine_var(const unsigned int var) const
+{
+#ifdef LIBMESH_ENABLE_AMR
+  const auto vg = this->var_group_from_var_number(var);
+  return !_dont_p_refine.count(vg);
+#else
+  libmesh_ignore(var);
+  return false;
+#endif
 }
 } // namespace libMesh
 

@@ -45,7 +45,8 @@ monomial_vec_nodal_soln(const Elem * elem,
                         const Order order,
                         const std::vector<Number> & elem_soln,
                         const int dim,
-                        std::vector<Number> & nodal_soln)
+                        std::vector<Number> & nodal_soln,
+                        const bool add_p_level)
 {
   const unsigned int n_nodes = elem->n_nodes();
 
@@ -53,7 +54,7 @@ monomial_vec_nodal_soln(const Elem * elem,
 
   nodal_soln.resize(dim * n_nodes);
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder = static_cast<Order>(order + add_p_level*elem->p_level());
 
   switch (totalorder)
   {
@@ -130,9 +131,10 @@ void
 FE<0, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
+                                std::vector<Number> & nodal_soln,
+                                const bool add_p_level)
 {
-  FE<0, MONOMIAL>::nodal_soln(elem, order, elem_soln, nodal_soln);
+  FE<0, MONOMIAL>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level);
 }
 
 template <>
@@ -140,9 +142,10 @@ void
 FE<1, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
+                                std::vector<Number> & nodal_soln,
+                                const bool add_p_level)
 {
-  FE<1, MONOMIAL>::nodal_soln(elem, order, elem_soln, nodal_soln);
+  FE<1, MONOMIAL>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level);
 }
 
 template <>
@@ -150,9 +153,10 @@ void
 FE<2, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
+                                std::vector<Number> & nodal_soln,
+                                const bool add_p_level)
 {
-  monomial_vec_nodal_soln(elem, order, elem_soln, 2 /*dimension*/, nodal_soln);
+  monomial_vec_nodal_soln(elem, order, elem_soln, 2 /*dimension*/, nodal_soln, add_p_level);
 }
 
 template <>
@@ -160,9 +164,10 @@ void
 FE<3, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln)
+                                std::vector<Number> & nodal_soln,
+                                const bool add_p_level)
 {
-  monomial_vec_nodal_soln(elem, order, elem_soln, 3 /*dimension*/, nodal_soln);
+  monomial_vec_nodal_soln(elem, order, elem_soln, 3 /*dimension*/, nodal_soln, add_p_level);
 }
 
 LIBMESH_FE_SIDE_NODAL_SOLN(MONOMIAL_VEC)

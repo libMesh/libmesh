@@ -813,7 +813,7 @@ void DofMap::reinit(MeshBase & mesh)
             }
           // Allocate the element DOFs
           const unsigned int dofs_per_elem =
-            FEInterface::n_dofs_per_elem(base_fe_type, elem);
+            FEInterface::n_dofs_per_elem(base_fe_type, elem, add_p_level);
 
           elem->set_n_comp_group(sys_num, vg, dofs_per_elem);
 
@@ -2509,7 +2509,7 @@ void DofMap::_dof_indices (const Elem & elem,
         }
 
       // If there are any element-based DOF numbers, get them
-      const unsigned int nc = FEInterface::n_dofs_per_elem(fe_type, p_level, &elem);
+      const unsigned int nc = FEInterface::n_dofs_per_elem(fe_type, add_p_level*p_level, &elem);
 
       // We should never have fewer dofs than necessary on an
       // element unless we're getting indices on a parent element

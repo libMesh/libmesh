@@ -43,12 +43,13 @@ namespace libMesh
 void lagrange_nodal_soln(const Elem * elem,
                          const Order order,
                          const std::vector<Number> & elem_soln,
-                         std::vector<Number> &       nodal_soln)
+                         std::vector<Number> &       nodal_soln,
+                         const bool add_p_level)
 {
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType type        = elem->type();
 
-  const Order totalorder = static_cast<Order>(order+elem->p_level());
+  const Order totalorder = static_cast<Order>(order+add_p_level*elem->p_level());
 
   nodal_soln.resize(n_nodes);
 

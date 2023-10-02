@@ -364,7 +364,8 @@ public:
    */
   static void nodal_soln(const Elem * elem, const Order o,
                          const std::vector<Number> & elem_soln,
-                         std::vector<Number> & nodal_soln);
+                         std::vector<Number> & nodal_soln,
+                         bool add_p_level = true);
 
   /**
    * Build the nodal soln on one side from the (full) element soln.
@@ -375,7 +376,8 @@ public:
   static void side_nodal_soln(const Elem * elem, const Order o,
                               const unsigned int side,
                               const std::vector<Number> & elem_soln,
-                              std::vector<Number> & nodal_soln_on_side);
+                              std::vector<Number> & nodal_soln_on_side,
+                              bool add_p_level = true);
 
   /**
    * \returns The number of shape functions associated with
@@ -716,7 +718,8 @@ protected:
   static void default_side_nodal_soln(const Elem * elem, const Order o,
                                       const unsigned int side,
                                       const std::vector<Number> & elem_soln,
-                                      std::vector<Number> & nodal_soln_on_side);
+                                      std::vector<Number> & nodal_soln_on_side,
+                                      bool add_p_level = true);
 
   /**
    * An array of the node locations on the last
@@ -1401,7 +1404,8 @@ OutputShape fe_fdm_second_deriv(const ElemType type,
 void lagrange_nodal_soln(const Elem * elem,
                          const Order order,
                          const std::vector<Number> & elem_soln,
-                         std::vector<Number> &       nodal_soln);
+                         std::vector<Number> &       nodal_soln,
+                         bool add_p_level = true);
 
 /**
  * Helper functions for Discontinuous-Pn type basis functions.

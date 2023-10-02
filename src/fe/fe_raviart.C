@@ -43,12 +43,13 @@ void raviart_thomas_nodal_soln(const Elem * elem,
                                const Order order,
                                const std::vector<Number> & elem_soln,
                                const int dim,
-                               std::vector<Number> & nodal_soln)
+                               std::vector<Number> & nodal_soln,
+                               const bool add_p_level)
 {
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType elem_type   = elem->type();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  const Order totalorder = static_cast<Order>(order + add_p_level*elem->p_level());
 
   nodal_soln.resize(n_nodes*dim);
 
@@ -379,29 +380,33 @@ template <>
 void FE<0,RAVIART_THOMAS>::nodal_soln(const Elem *,
                                       const Order,
                                       const std::vector<Number> &,
-                                      std::vector<Number> &)
+                                      std::vector<Number> &,
+                                      bool)
 { RAVIART_LOW_D_ERROR_MESSAGE }
 
 template <>
 void FE<1,RAVIART_THOMAS>::nodal_soln(const Elem *,
                                       const Order,
                                       const std::vector<Number> &,
-                                      std::vector<Number> &)
+                                      std::vector<Number> &,
+                                      bool)
 { RAVIART_LOW_D_ERROR_MESSAGE }
 
 template <>
 void FE<2,RAVIART_THOMAS>::nodal_soln(const Elem * elem,
                                       const Order order,
                                       const std::vector<Number> & elem_soln,
-                                      std::vector<Number> & nodal_soln)
-{ raviart_thomas_nodal_soln(elem, order, elem_soln, 2 /*dim*/, nodal_soln); }
+                                      std::vector<Number> & nodal_soln,
+                                      const bool add_p_level)
+{ raviart_thomas_nodal_soln(elem, order, elem_soln, 2 /*dim*/, nodal_soln, add_p_level); }
 
 template <>
 void FE<3,RAVIART_THOMAS>::nodal_soln(const Elem * elem,
                                       const Order order,
                                       const std::vector<Number> & elem_soln,
-                                      std::vector<Number> & nodal_soln)
-{ raviart_thomas_nodal_soln(elem, order, elem_soln, 3 /*dim*/, nodal_soln); }
+                                      std::vector<Number> & nodal_soln,
+                                      const bool add_p_level)
+{ raviart_thomas_nodal_soln(elem, order, elem_soln, 3 /*dim*/, nodal_soln, add_p_level); }
 
 LIBMESH_FE_SIDE_NODAL_SOLN(RAVIART_THOMAS)
 

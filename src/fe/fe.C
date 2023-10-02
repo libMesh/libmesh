@@ -706,10 +706,11 @@ void
 FE<Dim,T>::default_side_nodal_soln(const Elem * elem, const Order o,
                                    const unsigned int side,
                                    const std::vector<Number> & elem_soln,
-                                   std::vector<Number> & nodal_soln_on_side)
+                                   std::vector<Number> & nodal_soln_on_side,
+                                   const bool add_p_level)
 {
   std::vector<Number> full_nodal_soln;
-  nodal_soln(elem, o, elem_soln, full_nodal_soln);
+  nodal_soln(elem, o, elem_soln, full_nodal_soln, add_p_level);
   const std::vector<unsigned int> side_nodes =
     elem->nodes_on_side(side);
 

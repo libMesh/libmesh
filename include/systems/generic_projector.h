@@ -1656,7 +1656,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::SortAndCopy
                       }
             }
 
-          if (FEInterface::n_dofs_per_elem(fe_type, elem) ||
+          if (FEInterface::n_dofs_per_elem(fe_type, elem, add_p_level) ||
               (has_interior_nodes &&
                FEInterface::n_dofs_at_node(fe_type, elem, n_nodes-1, add_p_level)))
             {
@@ -2549,10 +2549,12 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
             continue;
 
           FEType fe_type = base_fe_type;
+          const auto & dof_map = system.get_dof_map();
+          const bool add_p_level = dof_map.should_p_refine_var(var);
 
           // This may be a p refined element
           fe_type.order =
-            libMesh::Order (fe_type.order + elem.p_level());
+            libMesh::Order (fe_type.order + add_p_level*elem.p_level());
 
           // If this is a Lagrange element with DoFs on sides then by
           // convention we interpolate at the node rather than project
@@ -2664,7 +2666,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
 
           std::vector<unsigned int> side_dofs;
           FEInterface::dofs_on_side(&elem, dim, base_fe_type,
-                                    context.side, side_dofs);
+                                    context.side, side_dofs, add_p_level);
 
           this->construct_projection
             (dof_indices, side_dofs, var_component,
@@ -2708,10 +2710,13 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectInte
           context.get_element_fe( var, fe, dim );
 
           FEType fe_type = base_fe_type;
+          const auto & dof_map = system.get_dof_map();
+          const auto vg = dof_map.var_group_from_var_number(var);
+          const bool add_p_level = dof_map.should_p_refine(vg);
 
           // This may be a p refined element
           fe_type.order =
-            libMesh::Order (fe_type.order + elem->p_level());
+            libMesh::Order (fe_type.order + add_p_level * elem->p_level());
 
           const unsigned int var_component =
             system.variable_scalar_number(var, 0);

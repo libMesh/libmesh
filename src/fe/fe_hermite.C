@@ -36,7 +36,8 @@ namespace {
 void hermite_nodal_soln(const Elem * elem,
                         const Order order,
                         const std::vector<Number> & elem_soln,
-                        std::vector<Number> & nodal_soln)
+                        std::vector<Number> & nodal_soln,
+                        const bool add_p_level)
 {
   const unsigned int n_nodes = elem->n_nodes();
 
@@ -48,7 +49,7 @@ void hermite_nodal_soln(const Elem * elem,
   FEType fe_type(order, HERMITE);
 
   const unsigned int n_sf =
-    FEInterface::n_shape_functions(fe_type, elem);
+    FEInterface::n_shape_functions(fe_type, elem, add_p_level);
 
   std::vector<Point> refspace_nodes;
   FEBase::get_refspace_nodes(elem_type,refspace_nodes);
@@ -64,7 +65,7 @@ void hermite_nodal_soln(const Elem * elem,
       // u_i = Sum (alpha_i phi_i)
       for (unsigned int i=0; i<n_sf; i++)
         nodal_soln[n] += elem_soln[i] *
-          FEInterface::shape(fe_type, elem, i, refspace_nodes[n]);
+          FEInterface::shape(fe_type, elem, i, refspace_nodes[n], add_p_level);
     }
 } // hermite_nodal_soln()
 
