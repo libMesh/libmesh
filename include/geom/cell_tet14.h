@@ -53,10 +53,10 @@ namespace libMesh
  * \endverbatim
  *
  * And it also includes four face nodes:
- * Node 10, on side 0, equidistant from 0/1/2 or 4/5/6
- * Node 11, on side 1, equidistant from 0/1/3 or 4/7/8
- * Node 12, on side 2, equidistant from 1/2/3 or 5/8/9
- * Node 13, on side 3, equidistant from 0/2/3 or 6/7/9
+ * Node 10, centroid on side 0, arithmetic mean of 0/1/2 or 4/5/6
+ * Node 11, centroid on side 1, arithmetic mean of 0/1/3 or 4/7/8
+ * Node 12, centroid on side 2, arithmetic mean of 1/2/3 or 5/8/9
+ * Node 13, centroid on side 3, arithmetic mean of 0/2/3 or 6/7/9
  *
  * (xi, eta, zeta): { 0 <= xi   <= 1
  *                  { 0 <= eta  <= 1
