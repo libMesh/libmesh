@@ -62,11 +62,11 @@ namespace libMesh
  * \endverbatim
  *
  * And it also includes two face nodes:
- * Node 18, on side 0, equidistant from 0/1/2 or 6/7/8
- * Node 19, on side 4, equidistant from 3/4/5 or 12/13/14
+ * Node 18, centroid on side 0, arithmetic mean of 0/1/2 or 6/7/8
+ * Node 19, centroid on side 4, arithmetic mean of 3/4/5 or 12/13/14
  *
  * And one midpoint node:
- * Node 20, on the interior, equidistant from 9/10/11 or 15/16/17
+ * Node 20, on the interior, arithmetic mean of 9/10/11 or 15/16/17
  *
  * (xi, eta, zeta): { 0  <= xi   <= 1
  *                  { 0  <= eta  <= 1

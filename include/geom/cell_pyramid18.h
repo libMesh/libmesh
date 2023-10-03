@@ -64,10 +64,10 @@ namespace libMesh
  * \endverbatim
  *
  * And it also includes four triangle face nodes:
- * Node 14, on side 0, equidistant from 0/1/4 or 5/9/10
- * Node 15, on side 1, equidistant from 1/2/4 or 6/10/11
- * Node 16, on side 2, equidistant from 2/3/4 or 7/11/12
- * Node 17, on side 3, equidistant from 0/3/4 or 8/9/12
+ * Node 14, centroid on side 0, arithmetic mean of 0/1/4 or 5/9/10
+ * Node 15, centroid on side 1, arithmetic mean of 1/2/4 or 6/10/11
+ * Node 16, centroid on side 2, arithmetic mean of 2/3/4 or 7/11/12
+ * Node 17, centroid on side 3, arithmetic mean of 0/3/4 or 8/9/12
  *
  * (xi, eta, zeta): { zeta-1 <= xi   <= 1-zeta
  *                  { zeta-1 <= eta  <= 1-zeta
