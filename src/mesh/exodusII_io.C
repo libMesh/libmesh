@@ -607,38 +607,18 @@ void ExodusII_IO::read (const std::string & fname)
                       Real w = 0;
                       std::vector<std::pair<std::pair<const Elem *, unsigned int>, Real>> constraint_row;
 
-                      for (auto spline_node_index :
-                           make_range(exio_helper->bex_num_elem_cvs))
+                      for (auto [libmesh_spline_node_id, coef] : key)
                         {
-                          // global => libMesh index, with crazy 1-based data - see comments above
-                          const int gi = (elem_num)*exio_helper->bex_num_elem_cvs +
-                            spline_node_index;
-                          const dof_id_type libmesh_node_id =
-                            exio_helper->node_num_map[exio_helper->connect[gi] - 1] - 1;
+                          const Node & spline_node = mesh.node_ref(libmesh_spline_node_id);
 
-                          const unsigned long elem_coef_vec_index =
-                            my_constraint_rows[spline_node_index] - 1; // Exodus isn't 0-based
+                          p.add_scaled(spline_node, coef);
+                          const Real spline_w = weights_exist ?
+                            spline_node.get_extra_datum<Real>(weight_index) : 1;
+                          w += coef * spline_w;
 
-                          const Node & spline_node = mesh.node_ref(libmesh_node_id);
-
-                          auto & coef_vec =
-                            bex_constraint_vec(elem_coef_vec_index, *exio_helper);
-                          const Real coef =
-                            libmesh_vector_at(coef_vec, elem_node_index);
-
-                          // We don't need to store 0 entries;
-                          // constraint_rows is a sparse structure.
-                          if (coef)
-                            {
-                              p.add_scaled(spline_node, coef);
-                              const Real spline_w = weights_exist ?
-                                spline_node.get_extra_datum<Real>(weight_index) : 1;
-                              w += coef * spline_w;
-
-                              const Elem * nodeelem =
-                                libmesh_map_find(spline_nodeelem_ptrs, &spline_node);
-                              constraint_row.emplace_back(std::make_pair(nodeelem, 0), coef);
-                            }
+                          const Elem * nodeelem =
+                            libmesh_map_find(spline_nodeelem_ptrs, &spline_node);
+                          constraint_row.emplace_back(std::make_pair(nodeelem, 0), coef);
                         }
 
                       Node *n = mesh.add_point(p, n_nodes++);
