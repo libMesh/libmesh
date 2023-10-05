@@ -2000,11 +2000,11 @@ protected:
   // mesh, such as FE nodes whose Rational Bernstein values need to be
   // constrained in terms of values on spline control nodes.
   //
-  // _constraint_rows[constrained_node_id][i].first.first is an
-  // element,
-  // _constraint_rows[constrained_node_id][i].first.second is the
+  // _constraint_rows[constrained_node][i].first.first is an
+  // element (e.g. a NodeElem for a spline control node),
+  // _constraint_rows[constrained_node][i].first.second is the
   // local node id of that element which is a constraining node,
-  // _constraint_rows[constrained_node_id][i].second is that node's
+  // _constraint_rows[constrained_node][i].second is that node's
   // constraint coefficient.
   constraint_rows_type _constraint_rows;
 
