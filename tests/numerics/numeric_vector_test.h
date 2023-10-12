@@ -186,7 +186,14 @@ public:
     diff = u;
     diff -= v;
     diff.close();
-    LIBMESH_ASSERT_FP_EQUAL(diff.l2_norm(), u.l2_norm_diff(v),
+
+    // Use a relative tolerance here; the norms are O(1e5) when our
+    // processor count gets big enough, at which point O(1e-12) is
+    // testing for exact equality...
+    const auto diff_norm = diff.l2_norm();
+    const auto norm_diff = u.l2_norm_diff(v);
+    LIBMESH_ASSERT_FP_EQUAL(diff_norm, norm_diff,
+                            (std::abs(diff_norm)+std::abs(norm_diff)) *
                             libMesh::TOLERANCE*libMesh::TOLERANCE);
   }
 
