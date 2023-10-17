@@ -70,8 +70,8 @@ class DisablePerfLogInScope
 {
 public:
 #ifndef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  DisablePerfLogInScope() {}
-  ~DisablePerfLogInScope() {}
+  DisablePerfLogInScope() = default;
+  ~DisablePerfLogInScope() = default;
 #else
   DisablePerfLogInScope();
   ~DisablePerfLogInScope();
