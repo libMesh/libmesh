@@ -28,8 +28,6 @@
 #ifdef LIBMESH_HAVE_TBB_API
 
 // libMesh includes
-#include "libmesh/libmesh_logging.h"
-
 #include "libmesh/ignore_warnings.h"
 
 // Threading building blocks includes
@@ -88,23 +86,13 @@ void parallel_for (const Range & range, const Body & body)
 {
   BoolAcquire b(in_threads);
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
-
   if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
-#endif
-
-  if (libMesh::n_threads() > 1)
-    tbb::parallel_for (range, body, tbb::auto_partitioner());
-
+    {
+      DisablePerfLogInScope disable_perf;
+      tbb::parallel_for (range, body, tbb::auto_partitioner());
+    }
   else
     body(range);
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
-#endif
 }
 
 
@@ -119,23 +107,13 @@ void parallel_for (const Range & range, const Body & body, const Partitioner & p
 {
   BoolAcquire b(in_threads);
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
-
   if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
-#endif
-
-  if (libMesh::n_threads() > 1)
-    tbb::parallel_for (range, body, partitioner);
-
+    {
+      DisablePerfLogInScope disable_perf;
+      tbb::parallel_for (range, body, partitioner);
+    }
   else
     body(range);
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
-#endif
 }
 
 
@@ -150,23 +128,13 @@ void parallel_reduce (const Range & range, Body & body)
 {
   BoolAcquire b(in_threads);
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
-
   if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
-#endif
-
-  if (libMesh::n_threads() > 1)
-    tbb::parallel_reduce (range, body, tbb::auto_partitioner());
-
+    {
+      DisablePerfLogInScope disable_perf;
+      tbb::parallel_reduce (range, body, tbb::auto_partitioner());
+    }
   else
     body(range);
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
-#endif
 }
 
 
@@ -181,23 +149,13 @@ void parallel_reduce (const Range & range, Body & body, const Partitioner & part
 {
   BoolAcquire b(in_threads);
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
-
   if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
-#endif
-
-  if (libMesh::n_threads() > 1)
-    tbb::parallel_reduce (range, body, partitioner);
-
+    {
+      DisablePerfLogInScope disable_perf;
+      tbb::parallel_reduce (range, body, partitioner);
+    }
   else
     body(range);
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
-#endif
 }
 
 
