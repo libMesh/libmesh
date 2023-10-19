@@ -82,6 +82,7 @@ LIBMESH_ERRORS_IN_LOW_D(MONOMIAL)
 LIBMESH_ERRORS_IN_LOW_D(MONOMIAL_VEC)
 LIBMESH_ERRORS_IN_LOW_D(NEDELEC_ONE)
 LIBMESH_ERRORS_IN_LOW_D(RAVIART_THOMAS)
+LIBMESH_ERRORS_IN_LOW_D(L2_RAVIART_THOMAS)
 LIBMESH_ERRORS_IN_LOW_D(SCALAR)
 LIBMESH_ERRORS_IN_LOW_D(XYZ)
 
@@ -96,6 +97,8 @@ REINIT_ERROR(1, NEDELEC_ONE, reinit)        { libmesh_error_msg("ERROR: Cannot r
 SIDEMAP_ERROR(1, NEDELEC_ONE, side_map)     { libmesh_error_msg("ERROR: Cannot side_map 1D NEDELEC_ONE elements!"); }
 REINIT_ERROR(1, RAVIART_THOMAS, reinit)     { libmesh_error_msg("ERROR: Cannot reinit 1D RAVIART_THOMAS elements!"); }
 SIDEMAP_ERROR(1, RAVIART_THOMAS, side_map)  { libmesh_error_msg("ERROR: Cannot side_map 1D RAVIART_THOMAS elements!"); }
+REINIT_ERROR(1, L2_RAVIART_THOMAS, reinit)     { libmesh_error_msg("ERROR: Cannot reinit 1D L2_RAVIART_THOMAS elements!"); }
+SIDEMAP_ERROR(1, L2_RAVIART_THOMAS, side_map)  { libmesh_error_msg("ERROR: Cannot side_map 1D L2_RAVIART_THOMAS elements!"); }
 
 //-------------------------------------------------------
 // Methods for 2D, 3D
@@ -1160,6 +1163,11 @@ template LIBMESH_EXPORT void FE<2,RAVIART_THOMAS>::side_map(Elem const *, Elem c
 template LIBMESH_EXPORT void FE<2,RAVIART_THOMAS>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template LIBMESH_EXPORT void FE<2,RAVIART_THOMAS>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 
+template LIBMESH_EXPORT void FE<2,L2_RAVIART_THOMAS>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template LIBMESH_EXPORT void FE<2,L2_RAVIART_THOMAS>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template LIBMESH_EXPORT void FE<2,L2_RAVIART_THOMAS>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template LIBMESH_EXPORT void FE<2,L2_RAVIART_THOMAS>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+
 template LIBMESH_EXPORT void FE<3,NEDELEC_ONE>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 template LIBMESH_EXPORT void FE<3,NEDELEC_ONE>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template LIBMESH_EXPORT void FE<3,NEDELEC_ONE>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
@@ -1169,6 +1177,11 @@ template LIBMESH_EXPORT void FE<3,RAVIART_THOMAS>::reinit(Elem const *, unsigned
 template LIBMESH_EXPORT void FE<3,RAVIART_THOMAS>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template LIBMESH_EXPORT void FE<3,RAVIART_THOMAS>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
 template LIBMESH_EXPORT void FE<3,RAVIART_THOMAS>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+
+template LIBMESH_EXPORT void FE<3,L2_RAVIART_THOMAS>::reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
+template LIBMESH_EXPORT void FE<3,L2_RAVIART_THOMAS>::side_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template LIBMESH_EXPORT void FE<3,L2_RAVIART_THOMAS>::edge_map(Elem const *, Elem const *, const unsigned int, const std::vector<Point> &, std::vector<Point> &);
+template LIBMESH_EXPORT void FE<3,L2_RAVIART_THOMAS>::edge_reinit(Elem const *, unsigned int, Real, const std::vector<Point> * const, const std::vector<Real> * const);
 
 // Intel 9.1 complained it needed this in devel mode.
 //template LIBMESH_EXPORT void FE<2,XYZ>::init_face_shape_functions(const std::vector<Point> &, const Elem *);

@@ -251,6 +251,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
           case RAVIART_THOMAS:
             return std::make_unique<FERaviartThomas<2>>(fet);
 
+          case L2_RAVIART_THOMAS:
+            return std::make_unique<FEL2RaviartThomas<2>>(fet);
+
           case SUBDIVISION:
             return std::make_unique<FESubdivision>(fet);
 
@@ -317,6 +320,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
 
           case RAVIART_THOMAS:
             return std::make_unique<FERaviartThomas<3>>(fet);
+
+          case L2_RAVIART_THOMAS:
+            return std::make_unique<FEL2RaviartThomas<3>>(fet);
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << Utility::enum_to_string(fet.family));

@@ -35,6 +35,10 @@ LIBMESH_DEFAULT_VECTORIZED_FE(0,RAVIART_THOMAS)
 LIBMESH_DEFAULT_VECTORIZED_FE(1,RAVIART_THOMAS)
 LIBMESH_DEFAULT_VECTORIZED_FE(2,RAVIART_THOMAS)
 LIBMESH_DEFAULT_VECTORIZED_FE(3,RAVIART_THOMAS)
+LIBMESH_DEFAULT_VECTORIZED_FE(0,L2_RAVIART_THOMAS)
+LIBMESH_DEFAULT_VECTORIZED_FE(1,L2_RAVIART_THOMAS)
+LIBMESH_DEFAULT_VECTORIZED_FE(2,L2_RAVIART_THOMAS)
+LIBMESH_DEFAULT_VECTORIZED_FE(3,L2_RAVIART_THOMAS)
 
 
 // Anonymous namespace for local helper functions
@@ -408,7 +412,40 @@ void FE<3,RAVIART_THOMAS>::nodal_soln(const Elem * elem,
                                       const bool add_p_level)
 { raviart_thomas_nodal_soln(elem, order, elem_soln, 3 /*dim*/, nodal_soln, add_p_level); }
 
+template <>
+void FE<0,L2_RAVIART_THOMAS>::nodal_soln(const Elem *,
+                                         const Order,
+                                         const std::vector<Number> &,
+                                         std::vector<Number> &,
+                                         bool)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+
+template <>
+void FE<1,L2_RAVIART_THOMAS>::nodal_soln(const Elem *,
+                                         const Order,
+                                         const std::vector<Number> &,
+                                         std::vector<Number> &,
+                                         bool)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+
+template <>
+void FE<2,L2_RAVIART_THOMAS>::nodal_soln(const Elem * elem,
+                                         const Order order,
+                                         const std::vector<Number> & elem_soln,
+                                         std::vector<Number> & nodal_soln,
+                                         const bool add_p_level)
+{ raviart_thomas_nodal_soln(elem, order, elem_soln, 2 /*dim*/, nodal_soln, add_p_level); }
+
+template <>
+void FE<3,L2_RAVIART_THOMAS>::nodal_soln(const Elem * elem,
+                                         const Order order,
+                                         const std::vector<Number> & elem_soln,
+                                         std::vector<Number> & nodal_soln,
+                                         const bool add_p_level)
+{ raviart_thomas_nodal_soln(elem, order, elem_soln, 3 /*dim*/, nodal_soln, add_p_level); }
+
 LIBMESH_FE_SIDE_NODAL_SOLN(RAVIART_THOMAS)
+LIBMESH_FE_SIDE_NODAL_SOLN(L2_RAVIART_THOMAS)
 
 
 // Do full-specialization for every dimension, instead
@@ -418,6 +455,10 @@ template <> unsigned int FE<0,RAVIART_THOMAS>::n_dofs(const ElemType, const Orde
 template <> unsigned int FE<1,RAVIART_THOMAS>::n_dofs(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<2,RAVIART_THOMAS>::n_dofs(const ElemType t, const Order o) { return raviart_thomas_n_dofs(t, o); }
 template <> unsigned int FE<3,RAVIART_THOMAS>::n_dofs(const ElemType t, const Order o) { return raviart_thomas_n_dofs(t, o); }
+template <> unsigned int FE<0,L2_RAVIART_THOMAS>::n_dofs(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<1,L2_RAVIART_THOMAS>::n_dofs(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<2,L2_RAVIART_THOMAS>::n_dofs(const ElemType t, const Order o) { return raviart_thomas_n_dofs(t, o); }
+template <> unsigned int FE<3,L2_RAVIART_THOMAS>::n_dofs(const ElemType t, const Order o) { return raviart_thomas_n_dofs(t, o); }
 
 
 // Do full-specialization for every dimension, instead
@@ -426,6 +467,10 @@ template <> unsigned int FE<0,RAVIART_THOMAS>::n_dofs_at_node(const ElemType, co
 template <> unsigned int FE<1,RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<2,RAVIART_THOMAS>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return raviart_thomas_n_dofs_at_node(t, o, n); }
 template <> unsigned int FE<3,RAVIART_THOMAS>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return raviart_thomas_n_dofs_at_node(t, o, n); }
+template <> unsigned int FE<0,L2_RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<1,L2_RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<2,L2_RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<3,L2_RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 
 
 // Raviart-Thomas elements have no dofs per element
@@ -434,23 +479,45 @@ template <> unsigned int FE<1,RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, c
 template <> unsigned int FE<2,RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 template <> unsigned int FE<3,RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 
+// L2 Raviart-Thomas elements have all their dofs per element
+template <> unsigned int FE<0,L2_RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<1,L2_RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<2,L2_RAVIART_THOMAS>::n_dofs_per_elem(const ElemType t, const Order o) { return n_dofs(t, o); }
+template <> unsigned int FE<3,L2_RAVIART_THOMAS>::n_dofs_per_elem(const ElemType t, const Order o) { return n_dofs(t, o); }
+
 // Raviart-Thomas FEMs are always normally continuous
 template <> FEContinuity FE<0,RAVIART_THOMAS>::get_continuity() const { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> FEContinuity FE<1,RAVIART_THOMAS>::get_continuity() const { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> FEContinuity FE<2,RAVIART_THOMAS>::get_continuity() const { return H_DIV; }
 template <> FEContinuity FE<3,RAVIART_THOMAS>::get_continuity() const { return H_DIV; }
 
+// L2 Raviart-Thomas FEMs are discontinuous
+template <> FEContinuity FE<0,L2_RAVIART_THOMAS>::get_continuity() const { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> FEContinuity FE<1,L2_RAVIART_THOMAS>::get_continuity() const { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> FEContinuity FE<2,L2_RAVIART_THOMAS>::get_continuity() const { return DISCONTINUOUS; }
+template <> FEContinuity FE<3,L2_RAVIART_THOMAS>::get_continuity() const { return DISCONTINUOUS; }
+
 // Raviart-Thomas FEMs are not hierarchic
 template <> bool FE<0,RAVIART_THOMAS>::is_hierarchic() const { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> bool FE<1,RAVIART_THOMAS>::is_hierarchic() const { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> bool FE<2,RAVIART_THOMAS>::is_hierarchic() const { return false; }
 template <> bool FE<3,RAVIART_THOMAS>::is_hierarchic() const { return false; }
+template <> bool FE<0,L2_RAVIART_THOMAS>::is_hierarchic() const { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> bool FE<1,L2_RAVIART_THOMAS>::is_hierarchic() const { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> bool FE<2,L2_RAVIART_THOMAS>::is_hierarchic() const { return false; }
+template <> bool FE<3,L2_RAVIART_THOMAS>::is_hierarchic() const { return false; }
 
 // Raviart-Thomas FEM shapes always need to be reinit'ed (because of orientation dependence)
 template <> bool FE<0,RAVIART_THOMAS>::shapes_need_reinit() const { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> bool FE<1,RAVIART_THOMAS>::shapes_need_reinit() const { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> bool FE<2,RAVIART_THOMAS>::shapes_need_reinit() const { return true; }
 template <> bool FE<3,RAVIART_THOMAS>::shapes_need_reinit() const { return true; }
+
+// Do L2 Raviart-Thomas FEM shapes always need to be reinit'ed because of orientation dependence?
+template <> bool FE<0,L2_RAVIART_THOMAS>::shapes_need_reinit() const { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> bool FE<1,L2_RAVIART_THOMAS>::shapes_need_reinit() const { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> bool FE<2,L2_RAVIART_THOMAS>::shapes_need_reinit() const { return true; }
+template <> bool FE<3,L2_RAVIART_THOMAS>::shapes_need_reinit() const { return true; }
 
 #ifdef LIBMESH_ENABLE_AMR
 template <>
@@ -480,6 +547,34 @@ void FE<3,RAVIART_THOMAS>::compute_constraints (DofConstraints & constraints,
                                                 const unsigned int variable_number,
                                                 const Elem * elem)
 { raviart_thomas_compute_constraints(constraints, dof_map, variable_number, elem, /*Dim=*/3); }
+
+template <>
+void FE<0,L2_RAVIART_THOMAS>::compute_constraints (DofConstraints &,
+                                                   DofMap &,
+                                                   const unsigned int,
+                                                   const Elem *)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+
+template <>
+void FE<1,L2_RAVIART_THOMAS>::compute_constraints (DofConstraints &,
+                                                   DofMap &,
+                                                   const unsigned int,
+                                                   const Elem *)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+
+template <>
+void FE<2,L2_RAVIART_THOMAS>::compute_constraints (DofConstraints & constraints,
+                                                   DofMap & dof_map,
+                                                   const unsigned int variable_number,
+                                                   const Elem * elem)
+{ raviart_thomas_compute_constraints(constraints, dof_map, variable_number, elem, /*Dim=*/2); }
+
+template <>
+void FE<3,L2_RAVIART_THOMAS>::compute_constraints (DofConstraints & constraints,
+                                                   DofMap & dof_map,
+                                                   const unsigned int variable_number,
+                                                   const Elem * elem)
+{ raviart_thomas_compute_constraints(constraints, dof_map, variable_number, elem, /*Dim=*/3); }
 #endif // LIBMESH_ENABLE_AMR
 
 // Specialize useless shape function methods
@@ -490,12 +585,26 @@ template <>
 RealGradient FE<0,RAVIART_THOMAS>::shape(const Elem *,const Order,const unsigned int,const Point &,const bool)
 { RAVIART_LOW_D_ERROR_MESSAGE }
 template <>
+RealGradient FE<0,L2_RAVIART_THOMAS>::shape(const ElemType, const Order,const unsigned int,const Point &)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+template <>
+RealGradient FE<0,L2_RAVIART_THOMAS>::shape(const Elem *,const Order,const unsigned int,const Point &,const bool)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+template <>
 RealGradient FE<0,RAVIART_THOMAS>::shape_deriv(const ElemType, const Order,const unsigned int,
                                                const unsigned int,const Point &)
 { RAVIART_LOW_D_ERROR_MESSAGE }
 template <>
 RealGradient FE<0,RAVIART_THOMAS>::shape_deriv(const Elem *,const Order,const unsigned int,
                                                const unsigned int,const Point &,const bool)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+template <>
+RealGradient FE<0,L2_RAVIART_THOMAS>::shape_deriv(const ElemType, const Order,const unsigned int,
+                                                  const unsigned int,const Point &)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+template <>
+RealGradient FE<0,L2_RAVIART_THOMAS>::shape_deriv(const Elem *,const Order,const unsigned int,
+                                                  const unsigned int,const Point &,const bool)
 { RAVIART_LOW_D_ERROR_MESSAGE }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -507,6 +616,14 @@ template <>
 RealGradient FE<0,RAVIART_THOMAS>::shape_second_deriv(const Elem *,const Order,const unsigned int,
                                                       const unsigned int,const Point &,const bool)
 { RAVIART_LOW_D_ERROR_MESSAGE }
+template <>
+RealGradient FE<0,L2_RAVIART_THOMAS>::shape_second_deriv(const ElemType, const Order,const unsigned int,
+                                                         const unsigned int,const Point &)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+template <>
+RealGradient FE<0,L2_RAVIART_THOMAS>::shape_second_deriv(const Elem *,const Order,const unsigned int,
+                                                         const unsigned int,const Point &,const bool)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
 
 #endif
 
@@ -517,12 +634,26 @@ template <>
 RealGradient FE<1,RAVIART_THOMAS>::shape(const Elem *,const Order,const unsigned int,const Point &,const bool)
 { RAVIART_LOW_D_ERROR_MESSAGE }
 template <>
+RealGradient FE<1,L2_RAVIART_THOMAS>::shape(const ElemType, const Order,const unsigned int,const Point &)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+template <>
+RealGradient FE<1,L2_RAVIART_THOMAS>::shape(const Elem *,const Order,const unsigned int,const Point &,const bool)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+template <>
 RealGradient FE<1,RAVIART_THOMAS>::shape_deriv(const ElemType, const Order,const unsigned int,
                                                const unsigned int,const Point &)
 { RAVIART_LOW_D_ERROR_MESSAGE }
 template <>
 RealGradient FE<1,RAVIART_THOMAS>::shape_deriv(const Elem *,const Order,const unsigned int,
                                                const unsigned int,const Point &,const bool)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+template <>
+RealGradient FE<1,L2_RAVIART_THOMAS>::shape_deriv(const ElemType, const Order,const unsigned int,
+                                                  const unsigned int,const Point &)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+template <>
+RealGradient FE<1,L2_RAVIART_THOMAS>::shape_deriv(const Elem *,const Order,const unsigned int,
+                                                  const unsigned int,const Point &,const bool)
 { RAVIART_LOW_D_ERROR_MESSAGE }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -533,6 +664,14 @@ RealGradient FE<1,RAVIART_THOMAS>::shape_second_deriv(const ElemType, const Orde
 template <>
 RealGradient FE<1,RAVIART_THOMAS>::shape_second_deriv(const Elem *,const Order,const unsigned int,
                                                       const unsigned int,const Point &,const bool)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+template <>
+RealGradient FE<1,L2_RAVIART_THOMAS>::shape_second_deriv(const ElemType, const Order,const unsigned int,
+                                                         const unsigned int,const Point &)
+{ RAVIART_LOW_D_ERROR_MESSAGE }
+template <>
+RealGradient FE<1,L2_RAVIART_THOMAS>::shape_second_deriv(const Elem *,const Order,const unsigned int,
+                                                         const unsigned int,const Point &,const bool)
 { RAVIART_LOW_D_ERROR_MESSAGE }
 
 #endif

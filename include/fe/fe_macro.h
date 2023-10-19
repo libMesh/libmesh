@@ -85,7 +85,8 @@
   template class LIBMESH_EXPORT FE< (_dim), XYZ>;                       \
   template class LIBMESH_EXPORT FE< (_dim), NEDELEC_ONE>;               \
   template class LIBMESH_EXPORT FE< (_dim), MONOMIAL_VEC>;              \
-  template class LIBMESH_EXPORT FE< (_dim), RAVIART_THOMAS>
+  template class LIBMESH_EXPORT FE< (_dim), RAVIART_THOMAS>;            \
+  template class LIBMESH_EXPORT FE< (_dim), L2_RAVIART_THOMAS>
 
 #else //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
@@ -106,7 +107,8 @@
   template class LIBMESH_EXPORT FE< (_dim), RATIONAL_BERNSTEIN>;        \
   template class LIBMESH_EXPORT FE< (_dim), NEDELEC_ONE>;               \
   template class LIBMESH_EXPORT FE< (_dim), MONOMIAL_VEC>;              \
-  template class LIBMESH_EXPORT FE< (_dim), RAVIART_THOMAS>
+  template class LIBMESH_EXPORT FE< (_dim), RAVIART_THOMAS>;            \
+  template class LIBMESH_EXPORT FE< (_dim), L2_RAVIART_THOMAS>
 
 #endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
