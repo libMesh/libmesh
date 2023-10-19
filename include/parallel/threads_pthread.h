@@ -31,7 +31,6 @@
 # include <thread>
 #endif
 
-#include "libmesh/libmesh_logging.h"
 #include <pthread.h>
 #include <algorithm>
 #include <vector>
@@ -278,12 +277,8 @@ void parallel_for (const Range & range, const Body & body)
     return;
   }
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+  DisablePerfLogInScope disable_perf;
 
-  if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
-#endif
   unsigned int n_threads = num_pthreads(range);
 
   std::vector<Range *> ranges(n_threads);
@@ -346,11 +341,6 @@ void parallel_for (const Range & range, const Body & body)
   // Clean up
   for (unsigned int i=0; i<n_threads; i++)
     delete ranges[i];
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
-#endif
 }
 
 /**
@@ -381,12 +371,7 @@ void parallel_reduce (const Range & range, Body & body)
     return;
   }
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
-
-  if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
-#endif
+  DisablePerfLogInScope disable_perf;
 
   unsigned int n_threads = num_pthreads(range);
 
@@ -462,11 +447,6 @@ void parallel_reduce (const Range & range, Body & body)
     delete bodies[i];
   for (unsigned int i=0; i<n_threads; i++)
     delete ranges[i];
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
-#endif
 }
 
 /**

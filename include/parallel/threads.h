@@ -61,6 +61,28 @@ private:
   bool & _b;
 };
 
+/**
+ * We use a class to turn perf logging off and on within threads, to
+ * be exception-safe and to avoid forcing indirect inclusion of
+ * libmesh_logging.h everywhere.
+ *
+ * If we have logging disabled, constructing this class should do
+ * nothing; [[maybe_unused]] disables warnings about that.
+ */
+class [[maybe_unused]] DisablePerfLogInScope
+{
+public:
+#ifndef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+  DisablePerfLogInScope() = default;
+  ~DisablePerfLogInScope() = default;
+#else
+  DisablePerfLogInScope();
+  ~DisablePerfLogInScope();
+private:
+  const bool _logging_was_enabled;
+#endif
+};
+
 
 /**
  * Simple compatibility class for std::thread 'concurrent' execution.

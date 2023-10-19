@@ -16,10 +16,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// System Includes
-
-// Local Includes
 #include "libmesh/threads.h"
+
+// libMesh includes
+#include "libmesh/libmesh_logging.h"
 
 namespace libMesh
 {
@@ -33,5 +33,20 @@ bool in_threads = false;
 
 void lock_singleton_spin_mutex() { spin_mtx.lock(); }
 void unlock_singleton_spin_mutex() { spin_mtx.unlock(); }
+
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+DisablePerfLogInScope::DisablePerfLogInScope() :
+  _logging_was_enabled(libMesh::perflog.logging_enabled())
+{
+  libMesh::perflog.disable_logging();
+}
+
+DisablePerfLogInScope::~DisablePerfLogInScope()
+{
+  if (_logging_was_enabled)
+    libMesh::perflog.enable_logging();
+}
+#endif
+
 }
 } // namespace libMesh

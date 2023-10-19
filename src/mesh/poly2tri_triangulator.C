@@ -28,6 +28,7 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/function_base.h"
 #include "libmesh/hashing.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/mesh_smoother_laplace.h"
 #include "libmesh/mesh_triangle_holes.h"
