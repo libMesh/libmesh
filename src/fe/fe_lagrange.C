@@ -977,6 +977,10 @@ template <> unsigned int FE<0,LAGRANGE>::n_dofs(const ElemType t, const Order o)
 template <> unsigned int FE<1,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
 template <> unsigned int FE<2,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
 template <> unsigned int FE<3,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
+template <> unsigned int FE<0,L2_LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
+template <> unsigned int FE<1,L2_LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
+template <> unsigned int FE<2,L2_LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
+template <> unsigned int FE<3,L2_LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
 
 
 // Do full-specialization for every dimension, instead
@@ -993,6 +997,12 @@ template <> unsigned int FE<0,LAGRANGE>::n_dofs_per_elem(const ElemType, const O
 template <> unsigned int FE<1,LAGRANGE>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 template <> unsigned int FE<2,LAGRANGE>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 template <> unsigned int FE<3,LAGRANGE>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
+
+// L2 Lagrange elements have all dofs on elements
+template <> unsigned int FE<0,L2_LAGRANGE>::n_dofs_per_elem(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
+template <> unsigned int FE<1,L2_LAGRANGE>::n_dofs_per_elem(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
+template <> unsigned int FE<2,L2_LAGRANGE>::n_dofs_per_elem(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
+template <> unsigned int FE<3,L2_LAGRANGE>::n_dofs_per_elem(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
 
 // Lagrange FEMs are always C^0 continuous
 template <> FEContinuity FE<0,LAGRANGE>::get_continuity() const { return C_ZERO; }
