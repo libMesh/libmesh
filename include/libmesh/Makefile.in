@@ -183,11 +183,11 @@ am__v_P_1 = :
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN     " $@;
-am__v_GEN_1 = 
+am__v_GEN_1 =
 AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
-am__v_at_1 = 
+am__v_at_1 =
 SOURCES =
 DIST_SOURCES =
 am__can_run_installinfo = \
@@ -604,7 +604,7 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	wrapped_functor.h wrapped_petsc.h zero_function.h \
 	libmesh_call_mpi.h parallel.h parallel_algebra.h \
 	parallel_bin_sorter.h parallel_conversion_utils.h \
-	parallel_elem.h parallel_fe_type.h parallel_ghost_sync.h \
+	parallel_eigen.h parallel_elem.h parallel_fe_type.h parallel_ghost_sync.h \
 	parallel_hilbert.h parallel_histogram.h parallel_node.h \
 	parallel_object.h parallel_only.h parallel_sort.h threads.h \
 	threads_allocators.h threads_none.h threads_pthread.h \
@@ -1758,6 +1758,9 @@ parallel_bin_sorter.h: $(top_srcdir)/include/parallel/parallel_bin_sorter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_conversion_utils.h: $(top_srcdir)/include/parallel/parallel_conversion_utils.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parallel_eigen.h: $(top_srcdir)/include/parallel/parallel_eigen.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_elem.h: $(top_srcdir)/include/parallel/parallel_elem.h
