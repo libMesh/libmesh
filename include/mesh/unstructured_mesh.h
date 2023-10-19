@@ -221,7 +221,7 @@ public:
                              bool use_binary_search=true,
                              bool enforce_all_nodes_match_on_boundaries=false,
                              bool merge_boundary_nodes_all_or_nothing=false,
-                             bool remap_subdomain_ids=true);
+                             bool remap_subdomain_ids=false);
 
   /**
    * Similar to stitch_meshes, except that we stitch two adjacent surfaces within this mesh.
