@@ -2,6 +2,7 @@
 #include <libmesh/boundary_info.h>
 #include <libmesh/distributed_mesh.h>
 #include <libmesh/elem.h>
+#include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_modification.h>
 #include <libmesh/node.h>
@@ -13,6 +14,7 @@
 #include "libmesh_cppunit.h"
 
 #include <algorithm>
+#include <regex>
 
 using namespace libMesh;
 
@@ -27,6 +29,8 @@ public:
   CPPUNIT_TEST( testReplicatedBoundaryInfo );
   CPPUNIT_TEST( testDistributedBoundaryInfo );
   CPPUNIT_TEST( testReplicatedMeshStitchElemsets );
+  CPPUNIT_TEST( testRemappingStitch );
+  CPPUNIT_TEST( testAmbiguousRemappingStitch );
 #endif // LIBMESH_DIM > 2
 
   CPPUNIT_TEST_SUITE_END();
@@ -362,6 +366,85 @@ public:
     testMeshStitchElemsets<ReplicatedMesh>(/*ps=*/3);
   }
 
+
+  void testRemappingStitch()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh0(*TestCommWorld), mesh1(*TestCommWorld);
+
+    int ps = 2;
+    MeshTools::Generation::build_cube(mesh0, ps, ps, ps, -1, 0, 0, 1, 0, 1, HEX8);
+    MeshTools::Generation::build_cube(mesh1, ps, ps, ps, 0, 1, 0, 1, 0, 1, HEX8);
+
+    // rename and shift boundaries
+    renameAndShift(mesh0, 0, "zero_");
+    renameAndShift(mesh1, 6, "one_");
+
+    // Create "auto" generated subdomain ids
+    for (const auto & elem : mesh0.element_ptr_range())
+      elem->subdomain_id() = 123;
+
+    for (const auto & elem : mesh1.element_ptr_range())
+      elem->subdomain_id() = 456;
+
+    // Resolve them to the same name
+    mesh0.subdomain_name(123) = "OneTwoThree";
+    mesh1.subdomain_name(456) = "OneTwoThree"; // silly autogen
+
+    mesh0.stitch_meshes(mesh1, 2, 10, TOLERANCE, true, false, false,
+                        false, false, /* remap_subdomain_ids = */ true);
+
+    CPPUNIT_ASSERT_EQUAL(mesh0.n_elem(),  static_cast<dof_id_type>(16));
+    CPPUNIT_ASSERT_EQUAL(mesh0.n_nodes(), static_cast<dof_id_type>(45));
+
+    // Ensure they still map to the same name but now with the same id
+    for (const auto & elem : mesh0.element_ptr_range())
+      CPPUNIT_ASSERT_EQUAL(elem->subdomain_id(), subdomain_id_type(123));
+  }
+
+
+  void testAmbiguousRemappingStitch()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh0(*TestCommWorld), mesh1(*TestCommWorld);
+
+    int ps = 2;
+    MeshTools::Generation::build_cube(mesh0, ps, ps, ps, -1, 0, 0, 1, 0, 1, HEX8);
+    MeshTools::Generation::build_cube(mesh1, ps, ps, ps, 0, 1, 0, 1, 0, 1, HEX8);
+
+    // rename and shift boundaries
+    renameAndShift(mesh0, 0, "zero_");
+    renameAndShift(mesh1, 6, "one_");
+
+    // Create matching subdomain ids
+    for (const auto & elem : mesh0.element_ptr_range())
+      elem->subdomain_id() = 123;
+
+    for (const auto & elem : mesh1.element_ptr_range())
+      elem->subdomain_id() = 123;
+
+    // Create a conflict when only one is named
+    mesh1.subdomain_name(123) = "OneTwoThree";
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    bool threw_error = false;
+    try
+    {
+      mesh0.stitch_meshes(mesh1, 2, 10, TOLERANCE, true, false, false,
+                          false, false, /* remap_subdomain_ids = */ true);
+    }
+    catch (libMesh::LogicError & e)
+    {
+      std::regex msg_regex("safely stitch with a mesh");
+      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+      threw_error = true;
+    }
+
+    CPPUNIT_ASSERT(threw_error);
+#endif // LIBMESH_ENABLE_EXCEPTIONS
+  }
 
 };
 
