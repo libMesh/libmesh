@@ -612,6 +612,9 @@
 /* Define to 1 if you have the <vtkConfigure.h> header file. */
 #undef HAVE_VTKCONFIGURE_H
 
+/* Define to 1 if you have the <vtkVersionMacros.h> header file. */
+#undef HAVE_VTKVERSIONMACROS_H
+
 /* Flag indicating headers and libraries for XDR IO are available */
 #undef HAVE_XDR
 
