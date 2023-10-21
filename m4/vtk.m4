@@ -63,7 +63,7 @@ AC_DEFUN([CONFIGURE_VTK],
     AS_IF([test "x$VTK_DIR" = "x"], [VTK_DIR=/usr])
 
     dnl Look for VTK location in the environment, then default paths
-    VTK_LS_CHECK=$(dirname $(ls -d $VTK_DIR/include/vtk*/vtkConfigure.h 2>/dev/null | tail -n 1) 2>/dev/null)
+    VTK_LS_CHECK=$(dirname $(ls -d $VTK_DIR/include/vtk*/vtkConfigure.h $VTK_DIR/include/vtk*/vtkVersionMacros.h 2>/dev/null | tail -n 1) 2>/dev/null)
     AS_IF([test "x$VTK_INC" = "x"],
           [
             AS_IF([test "x$VTK_INCLUDE" != "x"], [AS_IF([test -d $VTK_INCLUDE], [VTK_INC=$VTK_INCLUDE])],
@@ -104,7 +104,9 @@ AC_DEFUN([CONFIGURE_VTK],
        vtkincFound=no;
        ac_vtk_save_CPPFLAGS="$CPPFLAGS"
        CPPFLAGS="-I${VTK_INC} ${CPPFLAGS}"
-       AC_CHECK_HEADERS([vtkConfigure.h], [vtkincFound=yes])
+       dnl Look for vtkConfigure.h in old VTK, vtkVersionMacros.h in new
+       AC_CHECK_HEADERS([vtkConfigure.h],     [vtkincFound=yes])
+       AC_CHECK_HEADERS([vtkVersionMacros.h], [vtkincFound=yes])
        CPPFLAGS="${ac_vtk_save_CPPFLAGS}"
 
        AS_IF([test "$vtkincFound" = "no"],
