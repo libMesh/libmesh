@@ -2296,6 +2296,10 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                       id_remapping[sid] = next_free_id++;
                       this->subdomain_name(next_free_id) = sname;
                     }
+                  // If we don't have this subdomain id, well, we're
+                  // about to, so we should have its name too.
+                  else
+                    this->subdomain_name(sid) = sname;
                 }
             }
         }
