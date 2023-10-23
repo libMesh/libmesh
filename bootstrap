@@ -36,9 +36,10 @@ function check_autotool_prerequisites ()
     # prerequisite versions
     automake_major=1
     automake_minor=16
+    automake_subminor=5
 
     autoconf_major=2
-    autoconf_minor=69
+    autoconf_minor=71
 
     build_autotools=0
 
@@ -89,13 +90,19 @@ function check_autotool_prerequisites ()
     automake=`which automake 2>/dev/null`
     if (test "x$automake" != "x"); then
 	if (test -x $automake); then
-	    automake_version=`$automake --version | grep " $automake_major\." | cut -d"." -f2`
-	    if (test $automake_version -lt $automake_minor); then
-		echo "Automake Version $automake_major.$automake_version too old, building a new one..."
+	    automake_minor_version=`$automake --version | grep " $automake_major\." | cut -d"." -f2`
+	    if (test $automake_minor_version -lt $automake_minor); then
+		echo "Automake Version $automake_major.$automake_minor_version too old, building a new one..."
 		build_autotools=1
 	    else
+	        automake_subminor_version=`$automake --version | grep " $automake_major\." | cut -d"." -f3`
 		version_id=`$automake --version 2>&1 | grep "(GNU automake)"`
-		echo "Using automake ($version_id)"
+	        if (test $automake_subminor_version -lt $automake_subminor); then
+		    echo "Automake Version $version_id too old, building a new one..."
+		    build_autotools=1
+	        else
+		    echo "Using automake ($version_id)"
+	        fi
 	    fi
 	else
 	    build_autotools=1
