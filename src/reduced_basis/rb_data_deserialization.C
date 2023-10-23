@@ -31,6 +31,7 @@
 #include "libmesh/rb_eim_evaluation.h"
 #include "libmesh/rb_scm_evaluation.h"
 #include "libmesh/rb_parametrized_function.h"
+#include "libmesh/libmesh_logging.h"
 
 // Cap'n'Proto includes
 #include "capnp/serialize.h"
