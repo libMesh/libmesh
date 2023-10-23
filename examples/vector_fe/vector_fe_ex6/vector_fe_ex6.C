@@ -115,6 +115,12 @@ int main (int argc, char ** argv)
                        " but this example must be run with TRI6, TRI7, QUAD8, or QUAD9 in 2d" <<
                        " or with TET14, or HEX27 in 3d.");
 
+  const std::string bc_str = infile("boundary_condition", std::string("neumann"));
+  libmesh_error_msg_if(
+      (bc_str != "neumann") && (bc_str != "dirichlet"),
+      "You selected '" << bc_str << "', however, the valid options are 'dirichlet' or 'neumann'");
+  const bool neumann = (bc_str == "neumann");
+
   if (dimension == 2)
     MeshTools::Generation::build_square (mesh,
                                          grid_size,
@@ -140,6 +146,7 @@ int main (int argc, char ** argv)
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
+  equation_systems.parameters.set<bool>("neumann") = neumann;
 
   // Declare the system  "DivGrad" and its variables.
   LinearImplicitSystem & system = equation_systems.add_system<LinearImplicitSystem>("DivGrad");
@@ -149,8 +156,9 @@ int main (int argc, char ** argv)
   system.add_variable("u", FIRST, RAVIART_THOMAS);
   system.add_variable("p", CONSTANT, MONOMIAL);
 
-  // Add a scalar Lagrange multiplier to enforce our constraint
-  system.add_variable("l", FIRST, SCALAR);
+  // Add a scalar Lagrange multiplier to remove the nullspace if imposing the Neumann condition.
+  if (neumann)
+    system.add_variable("l", FIRST, SCALAR);
 
   // Give the system a pointer to the matrix assembly
   // function. This will be called when needed by the library.
@@ -237,6 +245,9 @@ void assemble_divgrad(EquationSystems & es,
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "DivGrad");
+
+  // Retrieve our boundary condition type. If not Neumann, then it is Dirichlet.
+  const bool neumann = es.parameters.get<bool>("neumann");
 
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
@@ -344,7 +355,8 @@ void assemble_divgrad(EquationSystems & es,
       dof_map.dof_indices (elem, dof_indices);
       dof_map.dof_indices (elem, vector_dof_indices, system.variable_number("u"));
       dof_map.dof_indices (elem, scalar_dof_indices, system.variable_number("p"));
-      dof_map.dof_indices (elem, lambda_dof_indices, system.variable_number("l"));
+      if (neumann)
+        dof_map.dof_indices (elem, lambda_dof_indices, system.variable_number("l"));
 
       // Cache the number of degrees of freedom, in total and for each
       // variable, on this element, for use as array and loop bounds later.
@@ -447,7 +459,7 @@ void assemble_divgrad(EquationSystems & es,
 
           // We have now reached the end of the RHS summation. In addition,
           // however, since the scalar variable is defined only up
-          // to an additive constant with the previous constraints, we
+          // to an additive constant with purely Neumann boundary conditions, we
           // constrain the integral of the scalar variable to the integral
           // of the exact solution we seek.
           {
@@ -490,8 +502,10 @@ void assemble_divgrad(EquationSystems & es,
       // We have now reached the end of the quadrature point loop, so
       // the interior element integration has
       // been completed.  However, we have not yet addressed
-      // boundary conditions.  For this example we will only
-      // consider simple Dirichlet boundary conditions.
+      // boundary conditions.  For this Poisson example, we consider either
+      // Dirichlet or Neumann for the scalar solution field p. Note that in
+      // the mixed formulation a Neumann condition for p corresponds to a
+      // Dirichlet condition for u.
       {
 
         // The following loop is over the sides of the element.
@@ -529,32 +543,53 @@ void assemble_divgrad(EquationSystems & es,
                   const Real yf = qface_point[qp](1);
                   const Real zf = qface_point[qp](2);
 
-                  // The boundary value for the vector variable.
-                  RealGradient vector_value;
-                  if (dim == 2)
-                    vector_value = DivGradExactSolution()(xf, yf);
-                  else if (dim == 3)
-                    vector_value = DivGradExactSolution()(xf, yf, zf);
-
-                  // We use the penalty method to set the flux of the vector
-                  // variable at the boundary, i.e. the RT vector boundary dof.
-                  const Real penalty = 1.e10;
-
-                  // A double loop to integrate the normal component of the
-                  // vector test functions (i) against the normal component of
-                  // the vector trial functions (j).
-                  for (unsigned int i = 0; i != vector_n_dofs; i++)
-                    for (unsigned int j = 0; j != vector_n_dofs; j++)
-                      {
-                        Ke(i, j) += JxW_face[qp]*penalty*vector_phi_face[i][qp]*normals[qp]*vector_phi_face[j][qp]*normals[qp];
-                      }
-
-                  // Loop to integrate the normal component of the vector test
-                  // functions (i) against the normal component of the
-                  // exact solution for the vector variable.
-                  for (unsigned int i = 0; i != vector_n_dofs; i++)
+                  if (neumann)
                     {
-                      Fe(i) += JxW_face[qp]*penalty*vector_phi_face[i][qp]*normals[qp]*vector_value*normals[qp];
+                      // The boundary value for the vector variable.
+                      RealGradient vector_value;
+                      if (dim == 2)
+                        vector_value = DivGradExactSolution()(xf, yf);
+                      else if (dim == 3)
+                        vector_value = DivGradExactSolution()(xf, yf, zf);
+
+                      // We use the penalty method to set the flux of the vector
+                      // variable at the boundary, i.e. the RT vector boundary dof.
+                      const Real penalty = 1.e10;
+
+                      // A double loop to integrate the normal component of the
+                      // vector test functions (i) against the normal component of
+                      // the vector trial functions (j).
+                      for (unsigned int i = 0; i != vector_n_dofs; i++)
+                        for (unsigned int j = 0; j != vector_n_dofs; j++)
+                          {
+                            Ke(i, j) += JxW_face[qp]*penalty*vector_phi_face[i][qp]*
+                                        normals[qp]*vector_phi_face[j][qp]*normals[qp];
+                          }
+
+                      // Loop to integrate the normal component of the vector test
+                      // functions (i) against the normal component of the
+                      // exact solution for the vector variable.
+                      for (unsigned int i = 0; i != vector_n_dofs; i++)
+                        {
+                          Fe(i) += JxW_face[qp]*penalty*vector_phi_face[i][qp]*normals[qp]*
+                                   vector_value*normals[qp];
+                        }
+                    }
+                  else
+                    {
+                      // The boundary value for scalar field.
+                      Real scalar_value = 0;
+                      if (dim == 2)
+                        scalar_value = DivGradExactSolution().scalar(xf, yf);
+                      else if (dim == 3)
+                        scalar_value = DivGradExactSolution().scalar(xf, yf, zf);
+
+                      // Loop to integrate the normal component of the vector test
+                      // functions (i) against the exact solution for the scalar variable.
+                      for (unsigned int i = 0; i != vector_n_dofs; i++)
+                        {
+                          Fe(i) += -JxW_face[qp]*vector_phi_face[i][qp]*normals[qp]*scalar_value;
+                        }
                     }
                 }
             }
