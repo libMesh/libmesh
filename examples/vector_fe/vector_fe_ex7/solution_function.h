@@ -176,4 +176,51 @@ Gradient SolutionGradient<3>::component(unsigned int component_in,
   return soln.grad(x, y, z).row(component_in);
 }
 
+template<unsigned int dim>
+class PSolutionFunction : public FunctionBase<Number>
+{
+public:
+
+  PSolutionFunction(const unsigned int p_var)
+    : _p_var(p_var) {}
+
+  ~PSolutionFunction() = default;
+
+  virtual Number operator() (const Point &,
+                             const Real = 0)
+  { libmesh_not_implemented(); }
+
+  virtual void operator() (const Point & p,
+                           const Real,
+                           DenseVector<Number> & output);
+
+  virtual std::unique_ptr<FunctionBase<Number>> clone() const
+  { return std::make_unique<PSolutionFunction>(_p_var); }
+
+private:
+
+  const unsigned int _p_var;
+  DivGradExactSolution soln;
+};
+
+template<>
+void PSolutionFunction<2>::operator() (const Point & p,
+                                      const Real,
+                                      DenseVector<Number> & output)
+{
+  output.zero();
+  const Real x=p(0), y=p(1);
+  output(0) = soln.scalar(x, y);
+}
+
+template<>
+void PSolutionFunction<3>::operator() (const Point & p,
+                                      const Real,
+                                      DenseVector<Number> & output)
+{
+  output.zero();
+  const Real x=p(0), y=p(1), z=p(2);
+  output(0) = soln.scalar(x, y, z);
+}
+
 #endif // SOLUTION_FUNCTION_H

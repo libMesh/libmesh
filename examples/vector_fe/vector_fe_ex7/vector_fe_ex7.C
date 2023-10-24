@@ -135,6 +135,7 @@ main(int argc, char ** argv)
   // whereas "p" will be the scalar field.
   system.add_variable("u", FIRST, L2_RAVIART_THOMAS);
   system.add_variable("p", CONSTANT, MONOMIAL);
+  system.add_variable("p_enriched", FIRST, MONOMIAL);
 
   lm_system.add_variable("lambda", CONSTANT, SIDE_HIERARCHIC);
 
@@ -150,30 +151,44 @@ main(int argc, char ** argv)
   fe_assembly(equation_systems, /*global_solve=*/false);
 
   ExactSolution exact_sol(equation_systems);
+  ExactSolution p_exact_sol(equation_systems);
+  ExactSolution enriched_p_exact_sol(equation_systems);
 
   if (dimension == 2)
   {
     SolutionFunction<2> soln_func(system.variable_number("u"));
     SolutionGradient<2> soln_grad(system.variable_number("u"));
+    PSolutionFunction<2> p_soln_func(system.variable_number("p"));
+    PSolutionFunction<2> enriched_p_soln_func(system.variable_number("p_enriched"));
 
     // Build FunctionBase* containers to attach to the ExactSolution object.
     std::vector<FunctionBase<Number> *> sols(1, &soln_func);
     std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
+    std::vector<FunctionBase<Number> *> p_sols(1, &p_soln_func);
+    std::vector<FunctionBase<Number> *> enriched_p_sols(1, &enriched_p_soln_func);
 
     exact_sol.attach_exact_values(sols);
     exact_sol.attach_exact_derivs(grads);
+    p_exact_sol.attach_exact_values(p_sols);
+    enriched_p_exact_sol.attach_exact_values(enriched_p_sols);
   }
   else if (dimension == 3)
   {
     SolutionFunction<3> soln_func(system.variable_number("u"));
     SolutionGradient<3> soln_grad(system.variable_number("u"));
+    PSolutionFunction<3> p_soln_func(system.variable_number("p"));
+    PSolutionFunction<3> enriched_p_soln_func(system.variable_number("p_enriched"));
 
     // Build FunctionBase* containers to attach to the ExactSolution object.
     std::vector<FunctionBase<Number> *> sols(1, &soln_func);
     std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
+    std::vector<FunctionBase<Number> *> p_sols(1, &p_soln_func);
+    std::vector<FunctionBase<Number> *> enriched_p_sols(1, &enriched_p_soln_func);
 
     exact_sol.attach_exact_values(sols);
     exact_sol.attach_exact_derivs(grads);
+    p_exact_sol.attach_exact_values(p_sols);
+    enriched_p_exact_sol.attach_exact_values(enriched_p_sols);
   }
 
   // Use higher quadrature order for more accurate error results.
@@ -182,12 +197,17 @@ main(int argc, char ** argv)
 
   // Compute the error.
   exact_sol.compute_error("DivGrad", "u");
+  p_exact_sol.compute_error("DivGrad", "p");
+  enriched_p_exact_sol.compute_error("DivGrad", "p_enriched");
 
   // Print out the error values.
   libMesh::out << "L2 error is: " << exact_sol.l2_error("DivGrad", "u") << std::endl;
   libMesh::out << "HDiv semi-norm error is: " << exact_sol.error_norm("DivGrad", "u", HDIV_SEMINORM)
                << std::endl;
   libMesh::out << "HDiv error is: " << exact_sol.hdiv_error("DivGrad", "u") << std::endl;
+  libMesh::out << "L2 error for p is: " << p_exact_sol.l2_error("DivGrad", "p") << std::endl;
+  libMesh::out << "L2 error p_enriched is: "
+               << enriched_p_exact_sol.l2_error("DivGrad", "p_enriched") << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
@@ -214,6 +234,8 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 
   const FEType vector_fe_type = dof_map.variable_type(system.variable_number("u"));
   const FEType scalar_fe_type = dof_map.variable_type(system.variable_number("p"));
+  const FEType enriched_scalar_fe_type =
+      dof_map.variable_type(system.variable_number("p_enriched"));
   const FEType lambda_fe_type =
       lambda_dof_map.variable_type(lambda_system.variable_number("lambda"));
 
@@ -229,6 +251,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 
   // Declare finite element objects for boundary integration
   std::unique_ptr<FEVectorBase> vector_fe_face(FEVectorBase::build(dim, vector_fe_type));
+  std::unique_ptr<FEBase> enriched_scalar_fe_face(FEBase::build(dim, enriched_scalar_fe_type));
   std::unique_ptr<FEBase> lambda_fe_face(FEBase::build(dim, lambda_fe_type));
 
   // Boundary integration requires one quadrature rule with dimensionality one
@@ -236,6 +259,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   QGauss qface(dim - 1, FIFTH);
 
   vector_fe_face->attach_quadrature_rule(&qface);
+  enriched_scalar_fe_face->attach_quadrature_rule(&qface);
   lambda_fe_face->attach_quadrature_rule(&qface);
 
   const auto & JxW = vector_fe->get_JxW();
@@ -244,6 +268,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   const auto & scalar_phi = scalar_fe->get_phi();
   const auto & div_vector_phi = vector_fe->get_div_phi();
   const auto & vector_phi_face = vector_fe_face->get_phi();
+  const auto & enriched_scalar_phi_face = enriched_scalar_fe_face->get_phi();
   const auto & lambda_phi_face = lambda_fe_face->get_phi();
   const auto & JxW_face = vector_fe_face->get_JxW();
   const auto & qface_point = vector_fe_face->get_xyz();
@@ -263,6 +288,12 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 
   // Lambda eigen vector for constructing vector and scalar solutions
   VectorXd Lambda;
+  // The lambda solution at the quadrature points
+  std::vector<Number> lambda_qps;
+
+  /// Data structures for computing the enriched scalar solution
+  DenseMatrix<Number> K_enriched_scalar;
+  DenseVector<Number> F_enriched_scalar, U_enriched_scalar;
 
   auto zero_mat = [](auto & mat)
   {
@@ -278,6 +309,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 
   std::vector<dof_id_type> vector_dof_indices;
   std::vector<dof_id_type> scalar_dof_indices;
+  std::vector<dof_id_type> enriched_scalar_dof_indices;
   std::vector<dof_id_type> lambda_dof_indices;
   std::vector<Number> lambda_solution_std_vec;
 
@@ -438,6 +470,63 @@ fe_assembly(EquationSystems & es, const bool global_solve)
         system.solution->set(vector_dof_indices[i], vector_soln(i));
       for (const auto i : make_range(scalar_n_dofs))
         system.solution->set(scalar_dof_indices[i], scalar_soln(i));
+
+      // Solve for the enriched solution
+      dof_map.dof_indices(elem, enriched_scalar_dof_indices, system.variable_number("p_enriched"));
+      const auto enriched_scalar_n_dofs = enriched_scalar_dof_indices.size();
+      K_enriched_scalar.resize(enriched_scalar_n_dofs, enriched_scalar_n_dofs);
+      F_enriched_scalar.resize(enriched_scalar_n_dofs);
+      U_enriched_scalar.resize(enriched_scalar_n_dofs);
+      for (const auto side : elem->side_index_range())
+      {
+        vector_fe_face->reinit(elem, side); // for JxW_face and qface_point
+        enriched_scalar_fe_face->reinit(elem, side);
+        if (elem->neighbor_ptr(side) == nullptr)
+          for (const auto qp : make_range(qface.n_points()))
+          {
+            const Real xf = qface_point[qp](0);
+            const Real yf = qface_point[qp](1);
+            const Real zf = qface_point[qp](2);
+
+            // The boundary value for scalar field.
+            Real scalar_value = 0;
+            if (dim == 2)
+              scalar_value = DivGradExactSolution().scalar(xf, yf);
+            else if (dim == 3)
+              scalar_value = DivGradExactSolution().scalar(xf, yf, zf);
+
+            for (const auto i : make_range(enriched_scalar_n_dofs))
+            {
+              F_enriched_scalar(i) += JxW_face[qp] * enriched_scalar_phi_face[i][qp] * scalar_value;
+              for (const auto j : make_range(enriched_scalar_n_dofs))
+                K_enriched_scalar(i, j) += JxW_face[qp] * enriched_scalar_phi_face[i][qp] *
+                                           enriched_scalar_phi_face[j][qp];
+            }
+          }
+        else
+        {
+          lambda_fe_face->reinit(elem, side);
+          // compute local face lambda solution
+          lambda_qps.resize(qface.n_points());
+          for (auto & lambda_qp : lambda_qps)
+            lambda_qp = 0;
+          for (const auto qp : make_range(qface.n_points()))
+            for (const auto i : index_range(lambda_solution_std_vec))
+              lambda_qps[qp] += lambda_solution_std_vec[i] * lambda_phi_face[i][qp];
+
+          for (const auto qp : make_range(qface.n_points()))
+            for (const auto i : make_range(enriched_scalar_n_dofs))
+            {
+              F_enriched_scalar(i) +=
+                  JxW_face[qp] * enriched_scalar_phi_face[i][qp] * lambda_qps[qp];
+              for (const auto j : make_range(enriched_scalar_n_dofs))
+                K_enriched_scalar(i, j) += JxW_face[qp] * enriched_scalar_phi_face[i][qp] *
+                                           enriched_scalar_phi_face[j][qp];
+            }
+        }
+      }
+      K_enriched_scalar.cholesky_solve(F_enriched_scalar, U_enriched_scalar);
+      system.solution->insert(U_enriched_scalar, enriched_scalar_dof_indices);
     }
   }
 
