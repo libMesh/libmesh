@@ -52,7 +52,6 @@ void kdtree_demo(const size_t N)
     dump_mem_usage();
 
     my_kd_tree_t index(1 /*dim*/, cloud, {10 /* max leaf */});
-    index.buildIndex();
 
     dump_mem_usage();
     {
@@ -62,8 +61,7 @@ void kdtree_demo(const size_t N)
         num_t                          out_dist_sqr;
         nanoflann::KNNResultSet<num_t> resultSet(num_results);
         resultSet.init(&ret_index, &out_dist_sqr);
-        index.findNeighbors(
-            resultSet, &query_pt[0], nanoflann::SearchParams(10));
+        index.findNeighbors(resultSet, &query_pt[0]);
 
         std::cout << "knnSearch(nn=" << num_results << "): \n";
         std::cout << "ret_index=" << ret_index

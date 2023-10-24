@@ -24,7 +24,10 @@ file(WRITE "${nanoflann_BINARY_DIR}/version" "${NANOFLANN_VERSION_MAJOR}.${NANOF
 if (CMAKE_COMPILER_IS_GNUCXX)
 	# The -Wno-long-long is required in 64bit systems when including sytem headers.
 	# The -Wno-variadic-macros was needed for Eigen3, StdVector.h
-	add_compile_options(-Wall -Wno-long-long -Wno-variadic-macros -O2 -mtune=native)
+	add_compile_options(-Wall -Wshadow -Wno-long-long -Wno-variadic-macros)
+	if (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+		add_compile_options(-O2 -mtune=native)
+	endif()
 	# Workaround: Eigen <3.4 produces *tons* of warnings in GCC >=6. See http://eigen.tuxfamily.org/bz/show_bug.cgi?id=1221
 	if (NOT ${CMAKE_CXX_COMPILER_VERSION} LESS "6.0")
 		add_compile_options(-Wno-ignored-attributes -Wno-int-in-bool-context)
@@ -44,13 +47,24 @@ endif()
 add_definitions ( -DNANOFLANN_PATH="${CMAKE_SOURCE_DIR}" )
 
 include(GNUInstallDirs)
+if ($ENV{VERBOSE})
+	message(STATUS "CMAKE_INSTALL_INCLUDEDIR: ${CMAKE_INSTALL_INCLUDEDIR}")
+	message(STATUS "CMAKE_INSTALL_DATADIR   : ${CMAKE_INSTALL_DATADIR}")
+	message(STATUS "CMAKE_INSTALL_LIBDIR    : ${CMAKE_INSTALL_LIBDIR}")
+	message(STATUS "CMAKE_INSTALL_DOCDIR    : ${CMAKE_INSTALL_DOCDIR}")
+	message(STATUS "CMAKE_INSTALL_PREFIX    : ${CMAKE_INSTALL_PREFIX}")
+endif()
+
 # Set relative install directories
 set(INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
 set(INSTALL_CMAKE_DIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake/")
 set(INSTALL_COPYRIGHT_DIR "${CMAKE_INSTALL_DOCDIR}")
 if(NOT DEFINED PKGCONFIG_INSTALL_DIR)
-  set(PKGCONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/pkgconfig")
+  set(PKGCONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 endif()
+
+# Save all executables (unit tests & examples) in the same place:
+set(EXECUTABLE_OUTPUT_PATH ${${PROJECT_NAME}_BINARY_DIR}/bin CACHE PATH "Output directory for executables")
 
 # Define nanoflann lib (header-only)
 add_library(nanoflann INTERFACE)
@@ -70,22 +84,18 @@ target_include_directories(nanoflann
 install(TARGETS nanoflann
         EXPORT nanoflannTargets)
 
+# Since 2023-March, the parallel KD tree construction feature
+# needs pthreads for gcc:
+find_package(Threads)
+target_link_libraries(nanoflann INTERFACE Threads::Threads)
+
+
 add_library(nanoflann::nanoflann ALIAS nanoflann)
 
 # Examples
 option(NANOFLANN_BUILD_EXAMPLES "Build examples" ON)
 if(NANOFLANN_BUILD_EXAMPLES)
 	add_subdirectory(examples)
-endif()
-
-# Benchmarks
-option(NANOFLANN_BUILD_BENCHMARKS "Build benchmarks" OFF)
-if(NANOFLANN_BUILD_BENCHMARKS)
-        # 3rdparty Libraries
-        include(3rdparty/CMakeLists-flann.txt)
-        include(3rdparty/CMakeLists-fastann.txt)
-        include(3rdparty/CMakeLists-libkdtree.txt)
-	add_subdirectory(benchmarkTool)
 endif()
 
 # Tests

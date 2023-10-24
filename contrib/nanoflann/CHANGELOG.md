@@ -1,3 +1,39 @@
+nanoflann 1.5.0: Released Jun 16, 2023
+ * **API changes:**
+   - Users of radius search should change their result placeholder type:
+   `std::vector<std::pair<IndexType, DistanceType>>` => `std::vector<nanoflann::ResultItem<IndexType, DistanceType>>`. (See [#166](https://github.com/jlblancoc/nanoflann/issues/166) for the motivation of this change).
+   - More concise auxiliary (internal) type name:
+     `array_or_vector_selector` -> `array_or_vector`.
+   - Remove obsolete parameter `nChecks_IGNORED`. Removed from `SearchParams`
+     constructor too, so that structure has been renamed `SearchParameters` to
+     enforce users to update the code and avoid mistakes with the order of its
+     ctor parameters.
+   - Added method RadiusResultSet::empty()
+   - Template argument rename: `AccesorType` => `IndexType` (does not actually affect user code at all).
+   - Added concurrent tree building support, refer to `KDTreeSingleIndexAdaptorParams::n_thread_build`.
+ * **Other changes:**
+   - Macros to avoid conflicts with X11 symbols.
+   - Inline an auxiliary example function in case users want to use it and
+    include the file in multiple translation units (Closes [#182](https://github.com/jlblancoc/nanoflann/issues/182)).
+   - Move all benchmarking code, data, and scripts to [its own repository](https://github.com/MRPT/nanoflann-benchmark) to keep this repo as clean as possible.
+   - Fix "potentially uninitialized" GCC warning.
+   - Clarified, even more, in docs and examples, that L2 distances are **squared** distances.
+   - Removed the (with modern compilers) now useless `inline` keyword in class members.
+   - Add examples with GUI (requires [mrpt-gui](https://docs.mrpt.org/reference/latest/group_mrpt_gui_grp.html)):
+     - nanoflann_gui_example_R3: Radius search on R³ Euclidean space.
+     - nanoflann_gui_example_bearings: NN search on non-Euclidean spaces.
+ * BUGFIXES:
+     - Avoid segfault if saving an empty index (Closes [#205](https://github.com/jlblancoc/nanoflann/issues/205)).
+
+nanoflann 1.4.3: Released Jul 24, 2022
+ * Added flag SkipInitialBuildIndex to allow not wasting time building a tree when it will be loaded from a file later on ([PR #171](https://github.com/jlblancoc/nanoflann/pull/171)).
+ * Mark all constructors explicit, to avoid unintended creation of temporary objects ([Issue #179](https://github.com/jlblancoc/nanoflann/issues/179)).
+ * BUGFIX: avoid potential index out of bounds in KDTreeSingleIndexDynamicAdaptor ([PR #173](https://github.com/jlblancoc/nanoflann/pull/173))
+
+nanoflann 1.4.2: Released Jan 11, 2022
+ * Install pkg-config .pc file under lib directory (Closes [#161](https://github.com/jlblancoc/nanoflann/issues/161)).
+ * Integrate AppVeyor CI.
+
 nanoflann 1.4.1: Released Jan 6, 2022
   * Fix incorrect install directory for cmake target & config files.
   * Do not install example binaries with `make install`.

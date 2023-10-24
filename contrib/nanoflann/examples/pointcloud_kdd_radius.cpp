@@ -51,7 +51,6 @@ void kdtree_demo(const size_t N)
         >;
 
     my_kd_tree_t index(3 /*dim*/, cloud, {10 /* max leaf */});
-    index.buildIndex();
 
 #if 0
 	// Test resize of dataset and rebuild of index:
@@ -88,13 +87,13 @@ void kdtree_demo(const size_t N)
     // ----------------------------------------------------------------
     {
         const num_t search_radius = static_cast<num_t>(0.1);
-        std::vector<std::pair<uint32_t, num_t>> ret_matches;
+        std::vector<nanoflann::ResultItem<uint32_t, num_t>> ret_matches;
 
-        nanoflann::SearchParams params;
+        // nanoflanSearchParamsameters params;
         // params.sorted = false;
 
-        const size_t nMatches = index.radiusSearch(
-            &query_pt[0], search_radius, ret_matches, params);
+        const size_t nMatches =
+            index.radiusSearch(&query_pt[0], search_radius, ret_matches);
 
         cout << "radiusSearch(): radius=" << search_radius << " -> " << nMatches
              << " matches\n";

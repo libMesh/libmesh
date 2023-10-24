@@ -1,14 +1,17 @@
 ![nanoflann](https://raw.githubusercontent.com/jlblancoc/nanoflann/master/doc/logo.png)
 
 # nanoflann
+[![CI Linux](https://github.com/jlblancoc/nanoflann/actions/workflows/ci-linux.yml/badge.svg)](https://github.com/jlblancoc/nanoflann/actions/workflows/ci-linux.yml)
+[![CI Check clang-format](https://github.com/jlblancoc/nanoflann/actions/workflows/check-clang-format.yml/badge.svg)](https://github.com/jlblancoc/nanoflann/actions/workflows/check-clang-format.yml)
 [![CircleCI](https://circleci.com/gh/jlblancoc/nanoflann/tree/master.svg?style=svg)](https://circleci.com/gh/jlblancoc/nanoflann/tree/master)
+[![Windows build status](https://ci.appveyor.com/api/projects/status/h8k1apfogxyqhskd/branch/master?svg=true)](https://ci.appveyor.com/project/jlblancoc/nanoflann/branch/master)
 
 
 ## 1. About
 
 *nanoflann* is a **C++11 [header-only](http://en.wikipedia.org/wiki/Header-only) library** for building KD-Trees of datasets with different topologies: R<sup>2</sup>, R<sup>3</sup> (point clouds), SO(2) and SO(3) (2D and 3D rotation groups). No support for approximate NN is provided. *nanoflann* does not require compiling or installing. You just need to `#include <nanoflann.hpp>` in your code.
 
-This library is a *fork* of the [flann library](http://www.cs.ubc.ca/research/flann/) ([git](https://github.com/mariusmuja/flann)) by Marius Muja and David G. Lowe, and born as a child project of [MRPT](https://www.mrpt.org/). Following the original license terms, *nanoflann* is distributed under the BSD license. Please, for bugs use the issues button or fork and open a pull request.
+This library is a *fork* of the [flann library](https://github.com/flann-lib/flann) by Marius Muja and David G. Lowe, and born as a child project of [MRPT](https://www.mrpt.org/). Following the original license terms, *nanoflann* is distributed under the BSD license. Please, for bugs use the issues button or fork and open a pull request.
 
 Cite as:
 ```
@@ -23,6 +26,10 @@ Cite as:
 ### 1.1. Obtaining the code
 
 * Easiest way: clone this GIT repository and take the `include/nanoflann.hpp` file for use where you need it.
+* Debian or Ubuntu ([21.04 or newer](https://packages.ubuntu.com/source/hirsute/nanoflann)) users can install it simply with:
+  ```bash
+  sudo apt install libnanoflann-dev
+  ```
 * macOS users can install `nanoflann` with [Homebrew](https://brew.sh) with:
   ```shell
   $ brew install brewsci/science/nanoflann
@@ -32,8 +39,12 @@ Cite as:
   $ brew tap brewsci/science
   $ brew install nanoflann
   ```
-* Linux users can install it with [Linuxbrew](https://linuxbrew.sh/) with: `brew install homebrew/science/nanoflann`
-* List of [**stable releases**](https://github.com/jlblancoc/nanoflann/releases). Check out the [CHANGELOG](https://raw.githubusercontent.com/jlblancoc/nanoflann/master/CHANGELOG.txt)
+  MacPorts users can use:
+  ```
+  $ sudo port install nanoflann
+  ```
+* Linux users can also install it with [Linuxbrew](https://docs.brew.sh/Homebrew-on-Linux) with: `brew install homebrew/science/nanoflann`
+* List of [**stable releases**](https://github.com/jlblancoc/nanoflann/releases). Check out the [CHANGELOG](https://github.com/jlblancoc/nanoflann/blob/master/CHANGELOG.md)
 
 Although nanoflann itself doesn't have to be compiled, you can build some examples and tests with:
 
@@ -50,7 +61,7 @@ Although nanoflann itself doesn't have to be compiled, you can build some exampl
 
 ### 1.3. Code examples
 
-  * KD-tree look-up with `kdd_search()` and `radius_search()`: [pointcloud_kdd_radius.cpp](https://github.com/jlblancoc/nanoflann/blob/master/examples/pointcloud_kdd_radius.cpp)
+  * KD-tree look-up with `knnSearch()` and `radiusSearch()`: [pointcloud_kdd_radius.cpp](https://github.com/jlblancoc/nanoflann/blob/master/examples/pointcloud_kdd_radius.cpp)
   * KD-tree look-up on a point cloud dataset: [pointcloud_example.cpp](https://github.com/jlblancoc/nanoflann/blob/master/examples/pointcloud_example.cpp)
   * KD-tree look-up on a dynamic point cloud dataset: [dynamic_pointcloud_example.cpp](https://github.com/jlblancoc/nanoflann/blob/master/examples/dynamic_pointcloud_example.cpp)
   * KD-tree look-up on a rotation group (SO2): [SO2_example.cpp](https://github.com/jlblancoc/nanoflann/blob/master/examples/SO2_adaptor_example.cpp)
@@ -60,6 +71,11 @@ Although nanoflann itself doesn't have to be compiled, you can build some exampl
   * KD-tree look-up directly on `std::vector<std::vector<T> >` or `std::vector<Eigen::VectorXd>`: [vector_of_vectors_example.cpp](https://github.com/jlblancoc/nanoflann/blob/master/examples/vector_of_vectors_example.cpp)
   * Example with a `Makefile` for usage through `pkg-config` (for example, after doing a "make install" or after installing from Ubuntu repositories): [example_with_pkgconfig/](https://github.com/jlblancoc/nanoflann/blob/master/examples/example_with_pkgconfig/)
   * Example of how to build an index and save it to disk for later usage: [saveload_example.cpp](https://github.com/jlblancoc/nanoflann/blob/master/examples/saveload_example.cpp)
+  * GUI examples (requires `mrpt-gui`, e.g. `sudo apt install libmrpt-gui-dev`):
+    - [nanoflann_gui_example_R3](https://github.com/jlblancoc/nanoflann/blob/master/examples/examples_gui/nanoflann_gui_example_R3/nanoflann_gui_example_R3.cpp)
+
+![nanoflann-demo-1](https://user-images.githubusercontent.com/5497818/201550433-d561c5a9-4e87-453d-9cf8-8202d7876235.gif)
+
 
 
 ### 1.4. Why a fork?
@@ -128,6 +144,18 @@ add_executable(my_project test.cpp)
 target_link_libraries(my_project nanoflann::nanoflann)
 ```
 
+### 1.8. Package Managers
+
+You can download and install nanoflann using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:
+
+    git clone https://github.com/Microsoft/vcpkg.git
+    cd vcpkg
+    ./bootstrap-vcpkg.sh
+    ./vcpkg integrate install
+    ./vcpkg install nanoflann
+
+The nanoflann port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
+
 ------
 
 ## 2. Any help choosing the KD-tree parameters?
@@ -162,6 +190,10 @@ So, it seems that a `leaf_max_size` **between 10 and 50** would be optimum in ap
 ### 2.2. `KDTreeSingleIndexAdaptorParams::checks`
 
 This parameter is really ignored in `nanoflann`, but was kept for backward compatibility with the original FLANN interface. Just ignore it.
+
+### 2.3. `KDTreeSingleIndexAdaptorParams::n_thread_build`
+
+This parameter determines the maximum number of threads that can be called concurrently during the construction of the KD tree. The default value is 1. When the parameter is set to 0, `nanoflann` automatically determines the number of threads to use.
 
 -----
 

@@ -54,8 +54,8 @@ template <
     class Distance = nanoflann::metric_L2, typename IndexType = size_t>
 struct KDTreeVectorOfVectorsAdaptor
 {
-    using self_t =
-        KDTreeVectorOfVectorsAdaptor<VectorOfVectorsType, num_t, DIM, Distance>;
+    using self_t = KDTreeVectorOfVectorsAdaptor<
+        VectorOfVectorsType, num_t, DIM, Distance, IndexType>;
     using metric_t =
         typename Distance::template traits<num_t, self_t>::distance_t;
     using index_t =
@@ -68,8 +68,8 @@ struct KDTreeVectorOfVectorsAdaptor
     /// Constructor: takes a const ref to the vector of vectors object with the
     /// data points
     KDTreeVectorOfVectorsAdaptor(
-        const size_t /* dimensionality */, const VectorOfVectorsType& mat,
-        const int leaf_max_size = 10)
+        const size_t /* dimensionality */, const VectorOfVectorsType &mat,
+        const int leaf_max_size = 10, const unsigned int n_thread_build = 1)
         : m_data(mat)
     {
         assert(mat.size() != 0 && mat[0].size() != 0);
@@ -80,8 +80,9 @@ struct KDTreeVectorOfVectorsAdaptor
                 "argument");
         index = new index_t(
             static_cast<int>(dims), *this /* adaptor */,
-            nanoflann::KDTreeSingleIndexAdaptorParams(leaf_max_size));
-        index->buildIndex();
+            nanoflann::KDTreeSingleIndexAdaptorParams(
+                leaf_max_size, nanoflann::KDTreeSingleIndexAdaptorFlags::None,
+                n_thread_build));
     }
 
     ~KDTreeVectorOfVectorsAdaptor() { delete index; }
@@ -92,18 +93,14 @@ struct KDTreeVectorOfVectorsAdaptor
      *  (entered as query_point[0:dim-1]).
      *  Note that this is a short-cut method for index->findNeighbors().
      *  The user can also call index->... methods as desired.
-     *
-     * \note nChecks_IGNORED is ignored but kept for compatibility with
-     * the original FLANN interface.
      */
     inline void query(
-        const num_t* query_point, const size_t num_closest,
-        IndexType* out_indices, num_t* out_distances_sq,
-        const int nChecks_IGNORED = 10) const
+        const num_t *query_point, const size_t num_closest,
+        IndexType *out_indices, num_t *out_distances_sq) const
     {
         nanoflann::KNNResultSet<num_t, IndexType> resultSet(num_closest);
         resultSet.init(out_indices, out_distances_sq);
-        index->findNeighbors(resultSet, query_point, nanoflann::SearchParams());
+        index->findNeighbors(resultSet, query_point);
     }
 
     /** @name Interface expected by KDTreeSingleIndexAdaptor
