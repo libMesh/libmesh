@@ -48,9 +48,10 @@ class Point;
  * allow the convenient and libMesh-common usage through a \p FunctionBase *.
  *
  * \note For functor objects for vector-valued variables, it is
- * assumed each component is indexed contiguously; i.e. if u_var is
- * index 3, then libMesh expects the x-component of u_var is index 3,
- * the y-component is index 4, and the z-component is index 5.
+ * assumed each component is indexed contiguously; e.g. if u_var is a
+ * 3d vector-valued variable at index 3, following some scalar-valued variables
+ * at indices 0, 1, and 2, then libMesh expects the x-component of u_var to be
+ * at index 3, the y-component at index 4, and the z-component at index 5.
  *
  * \note For 2-D elements in 3 spatial dimensions, libMesh is expecting
  * 2 components (i.e. mesh_dimension() number of components).
@@ -136,6 +137,10 @@ public:
    * \note Subclasses are recommended to override this, since the default
    * implementation is based on a vector evaluation, which is usually
    * unnecessarily inefficient.
+   *
+   * \note The default implementation calls operator() with a DenseVector of
+   * size \p i+1 which will result in unexpected behaviour if operator()
+   * makes any access beyond that limit.
    */
   virtual Output component(unsigned int i,
                            const Point & p,
