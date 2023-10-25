@@ -54,7 +54,8 @@ namespace libMesh
 UniformRefinementEstimator::UniformRefinementEstimator() :
     ErrorEstimator(),
     number_h_refinements(1),
-    number_p_refinements(0)
+    number_p_refinements(0),
+    _extra_order(1)
 {
   error_norm = H1;
 }
@@ -510,7 +511,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
           std::unique_ptr<FEBase> fe (FEBase::build (dim, fe_type));
 
           // Build and attach an appropriate quadrature rule
-          std::unique_ptr<QBase> qrule = fe_type.default_quadrature_rule(dim);
+          std::unique_ptr<QBase> qrule = fe_type.default_quadrature_rule(dim, _extra_order);
           fe->attach_quadrature_rule (qrule.get());
 
           const std::vector<Real> &  JxW = fe->get_JxW();
