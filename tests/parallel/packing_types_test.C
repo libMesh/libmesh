@@ -15,7 +15,8 @@ class PackingTypesTest : public CppUnit::TestCase {
 public:
   LIBMESH_CPPUNIT_TEST_SUITE( PackingTypesTest );
 
-  CPPUNIT_TEST( testEigenMatrix );
+  CPPUNIT_TEST( testDynamicEigenMatrix );
+  CPPUNIT_TEST( testDynamicEigenVector );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -30,18 +31,19 @@ public:
 
 
 
-  void testEigenMatrix()
+  void testDynamicEigenMatrix()
   {
     LOG_UNIT_TEST;
 
-    typedef std::vector<Parallel::DynamicEigenMatrix> DynamicMatrixVector;
+    typedef Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> DynamicEigenMatrix;
+    typedef std::vector<DynamicEigenMatrix> DynamicMatrixVector;
     std::map<processor_id_type, DynamicMatrixVector> send_data;
 
     // prepare unique data
     for (const auto i : index_range(*TestCommWorld))
     {
       const auto j = TestCommWorld->rank();
-      send_data[i] = DynamicMatrixVector{ Parallel::DynamicEigenMatrix(i+1, i+2) };
+      send_data[i] = DynamicMatrixVector{ DynamicEigenMatrix(i+1, i+2) };
       for (const auto row: make_range(i+1))
         for (const auto col: make_range(i+2))
           send_data[i][0](row, col) = row * 100000.0 + col * 1000.0 + 10.0 * i + j;
@@ -49,8 +51,7 @@ public:
 
     // verification
     auto verify_data =
-    [this](processor_id_type j,
-            const DynamicMatrixVector & recv_data)
+    [](processor_id_type j, const DynamicMatrixVector & recv_data)
     {
       const auto i = TestCommWorld->rank();
       const std::size_t rows = recv_data[0].rows();
@@ -62,6 +63,42 @@ public:
       for (const auto row: make_range(rows))
         for (const auto col: make_range(cols))
           CPPUNIT_ASSERT_EQUAL( recv_data[0](row, col), static_cast<Real>(row * 100000.0 + col * 1000.0 + j + 10.0 * i) );
+    };
+
+    // communicate
+    Parallel::push_parallel_vector_data(*TestCommWorld, send_data, verify_data);
+  }
+
+  void testDynamicEigenVector()
+  {
+    LOG_UNIT_TEST;
+
+    typedef Eigen::Matrix<Real, Eigen::Dynamic, 1> DynamicEigenVector;
+    typedef std::vector<DynamicEigenVector> DynamicVectorVector;
+    std::map<processor_id_type, DynamicVectorVector> send_data;
+
+    // prepare unique data
+    for (const auto i : index_range(*TestCommWorld))
+    {
+      const auto j = TestCommWorld->rank();
+      send_data[i] = DynamicVectorVector{ DynamicEigenVector(i+1, 1) };
+      for (const auto row: make_range(i+1))
+          send_data[i][0](row) = row * 1000.0 + 10.0 * i + j;
+    }
+
+    // verification
+    auto verify_data =
+    [](processor_id_type j, const DynamicVectorVector & recv_data)
+    {
+      const auto i = TestCommWorld->rank();
+      const std::size_t rows = recv_data[0].rows();
+      const std::size_t cols = recv_data[0].cols();
+
+      CPPUNIT_ASSERT_EQUAL( rows, static_cast<std::size_t>(i+1) );
+      CPPUNIT_ASSERT_EQUAL( cols, 1lu );
+
+      for (const auto row: make_range(rows))
+        CPPUNIT_ASSERT_EQUAL( recv_data[0](row), static_cast<Real>(row * 1000.0 + j + 10.0 * i) );
     };
 
     // communicate
