@@ -66,7 +66,8 @@ PatchRecoveryErrorEstimator::PatchRecoveryErrorEstimator() :
     ErrorEstimator(),
     target_patch_size(20),
     patch_growth_strategy(&Patch::add_local_face_neighbors),
-    patch_reuse(true)
+    patch_reuse(true),
+    _extra_order(1)
 {
   error_norm = H1_SEMINORM;
 }
@@ -322,7 +323,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
           std::unique_ptr<FEBase> fe (FEBase::build (dim, fe_type));
 
           // Build an appropriate Gaussian quadrature rule
-          std::unique_ptr<QBase> qrule (fe_type.default_quadrature_rule(dim));
+          std::unique_ptr<QBase> qrule (fe_type.default_quadrature_rule(dim, error_estimator._extra_order));
 
           // Tell the finite element about the quadrature rule.
           fe->attach_quadrature_rule (qrule.get());
