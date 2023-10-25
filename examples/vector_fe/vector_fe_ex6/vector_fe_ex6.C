@@ -179,8 +179,8 @@ int main (int argc, char ** argv)
 
   if (dimension == 2)
     {
-      SolutionFunction<2> soln_func(system.variable_number("u"));
-      SolutionGradient<2> soln_grad(system.variable_number("u"));
+      SolutionFunction<2> soln_func;
+      SolutionGradient<2> soln_grad;
 
       // Build FunctionBase* containers to attach to the ExactSolution object.
       std::vector<FunctionBase<Number> *> sols(1, &soln_func);
@@ -191,8 +191,8 @@ int main (int argc, char ** argv)
     }
   else if (dimension == 3)
     {
-      SolutionFunction<3> soln_func(system.variable_number("u"));
-      SolutionGradient<3> soln_grad(system.variable_number("u"));
+      SolutionFunction<3> soln_func;
+      SolutionGradient<3> soln_grad;
 
       // Build FunctionBase* containers to attach to the ExactSolution object.
       std::vector<FunctionBase<Number> *> sols(1, &soln_func);
