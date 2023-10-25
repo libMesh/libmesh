@@ -156,39 +156,27 @@ main(int argc, char ** argv)
 
   if (dimension == 2)
   {
-    SolutionFunction<2> soln_func(system.variable_number("u"));
-    SolutionGradient<2> soln_grad(system.variable_number("u"));
-    PSolutionFunction<2> p_soln_func(system.variable_number("p"));
-    PSolutionFunction<2> enriched_p_soln_func(system.variable_number("p_enriched"));
+    SolutionFunction<2> soln_func;
+    SolutionGradient<2> soln_grad;
 
     // Build FunctionBase* containers to attach to the ExactSolution object.
     std::vector<FunctionBase<Number> *> sols(1, &soln_func);
     std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
-    std::vector<FunctionBase<Number> *> p_sols(1, &p_soln_func);
-    std::vector<FunctionBase<Number> *> enriched_p_sols(1, &enriched_p_soln_func);
 
     exact_sol.attach_exact_values(sols);
     exact_sol.attach_exact_derivs(grads);
-    p_exact_sol.attach_exact_values(p_sols);
-    enriched_p_exact_sol.attach_exact_values(enriched_p_sols);
   }
   else if (dimension == 3)
   {
-    SolutionFunction<3> soln_func(system.variable_number("u"));
-    SolutionGradient<3> soln_grad(system.variable_number("u"));
-    PSolutionFunction<3> p_soln_func(system.variable_number("p"));
-    PSolutionFunction<3> enriched_p_soln_func(system.variable_number("p_enriched"));
+    SolutionFunction<3> soln_func;
+    SolutionGradient<3> soln_grad;
 
     // Build FunctionBase* containers to attach to the ExactSolution object.
     std::vector<FunctionBase<Number> *> sols(1, &soln_func);
     std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
-    std::vector<FunctionBase<Number> *> p_sols(1, &p_soln_func);
-    std::vector<FunctionBase<Number> *> enriched_p_sols(1, &enriched_p_soln_func);
 
     exact_sol.attach_exact_values(sols);
     exact_sol.attach_exact_derivs(grads);
-    p_exact_sol.attach_exact_values(p_sols);
-    enriched_p_exact_sol.attach_exact_values(enriched_p_sols);
   }
 
   // Use higher quadrature order for more accurate error results.
@@ -197,17 +185,17 @@ main(int argc, char ** argv)
 
   // Compute the error.
   exact_sol.compute_error("DivGrad", "u");
-  p_exact_sol.compute_error("DivGrad", "p");
-  enriched_p_exact_sol.compute_error("DivGrad", "p_enriched");
+  exact_sol.compute_error("DivGrad", "p");
+  exact_sol.compute_error("DivGrad", "p_enriched");
 
   // Print out the error values.
   libMesh::out << "L2 error is: " << exact_sol.l2_error("DivGrad", "u") << std::endl;
   libMesh::out << "HDiv semi-norm error is: " << exact_sol.error_norm("DivGrad", "u", HDIV_SEMINORM)
                << std::endl;
   libMesh::out << "HDiv error is: " << exact_sol.hdiv_error("DivGrad", "u") << std::endl;
-  libMesh::out << "L2 error for p is: " << p_exact_sol.l2_error("DivGrad", "p") << std::endl;
-  libMesh::out << "L2 error p_enriched is: "
-               << enriched_p_exact_sol.l2_error("DivGrad", "p_enriched") << std::endl;
+  libMesh::out << "L2 error for p is: " << exact_sol.l2_error("DivGrad", "p") << std::endl;
+  libMesh::out << "L2 error p_enriched is: " << exact_sol.l2_error("DivGrad", "p_enriched")
+               << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
