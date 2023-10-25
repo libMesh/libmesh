@@ -71,6 +71,8 @@ void SolutionFunction<2>::operator() (const Point & p,
   // contiguously.
   output(_u_var)   = soln(x, y)(0);
   output(_u_var+1) = soln(x, y)(1);
+  // scalar solution
+  output(_u_var+2) = soln.scalar(x, y);
 }
 
 template<>
@@ -85,6 +87,8 @@ void SolutionFunction<3>::operator() (const Point & p,
   output(_u_var)   = soln(x, y, z)(0);
   output(_u_var+1) = soln(x, y, z)(1);
   output(_u_var+2) = soln(x, y, z)(2);
+  // scalar solution
+  output(_u_var+3) = soln.scalar(x, y);
 }
 
 template<>
@@ -93,7 +97,10 @@ Number SolutionFunction<2>::component(unsigned int component_in,
                                       const Real)
 {
   const Real x=p(0), y=p(1);
-  return soln(x, y)(component_in);
+  if (component_in == 2)
+    return soln.scalar(x, y);
+  else
+    return soln(x, y)(component_in);
 }
 
 template<>
@@ -102,7 +109,10 @@ Number SolutionFunction<3>::component(unsigned int component_in,
                                       const Real)
 {
   const Real x=p(0), y=p(1), z=p(2);
-  return soln(x, y, z)(component_in);
+  if (component_in == 3)
+    return soln.scalar(x, y);
+  else
+    return soln(x, y, z)(component_in);
 }
 
 template<unsigned int dim>
@@ -164,7 +174,11 @@ Gradient SolutionGradient<2>::component(unsigned int component_in,
                                         const Real)
 {
   const Real x=p(0), y=p(1);
-  return soln.grad(x, y).row(component_in);
+  if (component_in == 2)
+    // Only interested in L2 norms for the scalar field
+    return {};
+  else
+    return soln.grad(x, y).row(component_in);
 }
 
 template<>
@@ -173,6 +187,9 @@ Gradient SolutionGradient<3>::component(unsigned int component_in,
                                         const Real)
 {
   const Real x=p(0), y=p(1), z=p(2);
+  if (component_in == 3)
+    // Only interested in L2 norms for the scalar field
+    return {};
   return soln.grad(x, y, z).row(component_in);
 }
 

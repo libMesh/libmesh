@@ -208,6 +208,7 @@ int main (int argc, char ** argv)
 
   // Compute the error.
   exact_sol.compute_error("DivGrad", "u");
+  exact_sol.compute_error("DivGrad", "p");
 
   // Print out the error values.
   libMesh::out << "L2 error is: "
@@ -218,6 +219,9 @@ int main (int argc, char ** argv)
                << std::endl;
   libMesh::out << "HDiv error is: "
                << exact_sol.hdiv_error("DivGrad", "u")
+               << std::endl;
+  libMesh::out << "L2 error for p is: "
+               << exact_sol.l2_error("DivGrad", "p")
                << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
