@@ -198,7 +198,7 @@ void HPCoarsenTest::select_refinement (System & system)
                       cont == C_ONE);
 
       // Build an appropriate quadrature rule
-      qrule = fe_type.default_quadrature_rule(dim);
+      qrule = fe_type.default_quadrature_rule(dim, _extra_order);
 
       // Tell the refined finite element about the quadrature
       // rule.  The coarse finite element need not know about it
