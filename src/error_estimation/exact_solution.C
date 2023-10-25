@@ -469,12 +469,19 @@ void ExactSolution::_compute_error(std::string_view sys_name,
     _equation_systems_fine->get_system(sys_name) :
     _equation_systems.get_system (sys_name);
 
+  const MeshBase & mesh = computed_system.get_mesh();
+
   const Real time = _equation_systems.get_system(sys_name).time;
 
   const unsigned int sys_num = computed_system.number();
   const unsigned int var = computed_system.variable_number(unknown_name);
-  const unsigned int var_component =
-    computed_system.variable_scalar_number(var, 0);
+  unsigned int var_component = 0;
+  for (const auto var_num : make_range(cast_int<decltype(var)>(0), var))
+  {
+    const auto & var_fe_type = computed_system.variable_type(var_num);
+    const auto var_vec_dim = FEInterface::n_vec_dim(mesh, var_fe_type);
+    var_component += var_vec_dim;
+  }
 
   // Prepare a global solution, a serialized mesh, and a MeshFunction
   // of the coarse system, if we need them for fine-system integration
@@ -517,8 +524,6 @@ void ExactSolution::_compute_error(std::string_view sys_name,
 
   // Get a reference to the dofmap and mesh for that system
   const DofMap & computed_dof_map = computed_system.get_dof_map();
-
-  const MeshBase & mesh = computed_system.get_mesh();
 
   // Grab which element dimensions are present in the mesh
   const std::set<unsigned char> & elem_dims = mesh.elem_dimensions();
