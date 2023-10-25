@@ -52,7 +52,7 @@ ExactErrorEstimator::ExactErrorEstimator() :
     _exact_deriv(nullptr),
     _exact_hessian(nullptr),
     _equation_systems_fine(nullptr),
-    _extra_order(0)
+    _extra_order(1)
 {
   error_norm = H1;
 }

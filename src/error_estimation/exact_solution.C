@@ -45,7 +45,7 @@ namespace libMesh
 ExactSolution::ExactSolution(const EquationSystems & es) :
   _equation_systems(es),
   _equation_systems_fine(nullptr),
-  _extra_order(0)
+  _extra_order(1)
 {
   // Initialize the _errors data structure which holds all
   // the eventual values of the error.
