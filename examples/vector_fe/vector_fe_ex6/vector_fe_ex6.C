@@ -151,7 +151,7 @@ int main (int argc, char ** argv)
   // Declare the system  "DivGrad" and its variables.
   LinearImplicitSystem & system = equation_systems.add_system<LinearImplicitSystem>("DivGrad");
 
-  // Adds the variable "u" and "p" to "DivGrad". "u" will be our vector field
+  // Adds the variables "u" and "p" to "DivGrad". "u" will be our vector field
   // whereas "p" will be the scalar field.
   system.add_variable("u", FIRST, RAVIART_THOMAS);
   system.add_variable("p", CONSTANT, MONOMIAL);
@@ -179,8 +179,8 @@ int main (int argc, char ** argv)
 
   if (dimension == 2)
     {
-      SolutionFunction<2> soln_func(system.variable_number("u"));
-      SolutionGradient<2> soln_grad(system.variable_number("u"));
+      SolutionFunction<2> soln_func;
+      SolutionGradient<2> soln_grad;
 
       // Build FunctionBase* containers to attach to the ExactSolution object.
       std::vector<FunctionBase<Number> *> sols(1, &soln_func);
@@ -191,8 +191,8 @@ int main (int argc, char ** argv)
     }
   else if (dimension == 3)
     {
-      SolutionFunction<3> soln_func(system.variable_number("u"));
-      SolutionGradient<3> soln_grad(system.variable_number("u"));
+      SolutionFunction<3> soln_func;
+      SolutionGradient<3> soln_grad;
 
       // Build FunctionBase* containers to attach to the ExactSolution object.
       std::vector<FunctionBase<Number> *> sols(1, &soln_func);
@@ -208,8 +208,11 @@ int main (int argc, char ** argv)
 
   // Compute the error.
   exact_sol.compute_error("DivGrad", "u");
+  exact_sol.compute_error("DivGrad", "p");
 
   // Print out the error values.
+  libMesh::out << "~~ Vector field (u) ~~"
+               << std::endl;
   libMesh::out << "L2 error is: "
                << exact_sol.l2_error("DivGrad", "u")
                << std::endl;
@@ -218,6 +221,11 @@ int main (int argc, char ** argv)
                << std::endl;
   libMesh::out << "HDiv error is: "
                << exact_sol.hdiv_error("DivGrad", "u")
+               << std::endl;
+  libMesh::out << "~~ Scalar field (p) ~~"
+               << std::endl;
+  libMesh::out << "L2 error is: "
+               << exact_sol.l2_error("DivGrad", "p")
                << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API

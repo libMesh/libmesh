@@ -34,9 +34,7 @@ class SolutionFunction : public FunctionBase<Number>
 {
 public:
 
-  SolutionFunction(const unsigned int u_var)
-    : _u_var(u_var) {}
-
+  SolutionFunction() = default;
   ~SolutionFunction() = default;
 
   virtual Number operator() (const Point &,
@@ -52,11 +50,10 @@ public:
                            const Real);
 
   virtual std::unique_ptr<FunctionBase<Number>> clone() const
-  { return std::make_unique<SolutionFunction>(_u_var); }
+  { return std::make_unique<SolutionFunction>(); }
 
 private:
 
-  const unsigned int _u_var;
   DivGradExactSolution soln;
 };
 
@@ -67,10 +64,9 @@ void SolutionFunction<2>::operator() (const Point & p,
 {
   output.zero();
   const Real x=p(0), y=p(1);
-  // libMesh assumes each component of the vector-valued variable is stored
-  // contiguously.
-  output(_u_var)   = soln(x, y)(0);
-  output(_u_var+1) = soln(x, y)(1);
+  output(0) = soln(x, y)(0);
+  output(1) = soln(x, y)(1);
+  output(2) = soln.scalar(x, y);
 }
 
 template<>
@@ -80,29 +76,20 @@ void SolutionFunction<3>::operator() (const Point & p,
 {
   output.zero();
   const Real x=p(0), y=p(1), z=p(2);
-  // libMesh assumes each component of the vector-valued variable is stored
-  // contiguously.
-  output(_u_var)   = soln(x, y, z)(0);
-  output(_u_var+1) = soln(x, y, z)(1);
-  output(_u_var+2) = soln(x, y, z)(2);
+  output(0) = soln(x, y, z)(0);
+  output(1) = soln(x, y, z)(1);
+  output(2) = soln(x, y, z)(2);
+  output(3) = soln.scalar(x, y, z);
 }
 
-template<>
-Number SolutionFunction<2>::component(unsigned int component_in,
-                                      const Point & p,
-                                      const Real)
+template<unsigned int dim>
+Number SolutionFunction<dim>::component(unsigned int component_in,
+                                        const Point & p,
+                                        const Real)
 {
-  const Real x=p(0), y=p(1);
-  return soln(x, y)(component_in);
-}
-
-template<>
-Number SolutionFunction<3>::component(unsigned int component_in,
-                                      const Point & p,
-                                      const Real)
-{
-  const Real x=p(0), y=p(1), z=p(2);
-  return soln(x, y, z)(component_in);
+  DenseVector<Number> outvec(dim+1);
+  (*this)(p, 0, outvec);
+  return outvec(component_in);
 }
 
 template<unsigned int dim>
@@ -110,9 +97,7 @@ class SolutionGradient : public FunctionBase<Gradient>
 {
 public:
 
-  SolutionGradient(const unsigned int u_var)
-    : _u_var(u_var) {}
-
+  SolutionGradient() = default;
   ~SolutionGradient() = default;
 
   virtual Gradient operator() (const Point &, const Real = 0)
@@ -127,11 +112,10 @@ public:
                              const Real);
 
   virtual std::unique_ptr<FunctionBase<Gradient>> clone() const
-  { return std::make_unique<SolutionGradient>(_u_var); }
+  { return std::make_unique<SolutionGradient>(); }
 
 private:
 
-  const unsigned int _u_var;
   DivGradExactSolution soln;
 };
 
@@ -142,8 +126,9 @@ void SolutionGradient<2>::operator() (const Point & p,
 {
   output.zero();
   const Real x=p(0), y=p(1);
-  output(_u_var)   = soln.grad(x, y).row(0);
-  output(_u_var+1) = soln.grad(x, y).row(1);
+  output(0) = soln.grad(x, y).row(0);
+  output(1) = soln.grad(x, y).row(1);
+  output(2) = -soln(x, y);
 }
 
 template<>
@@ -153,27 +138,20 @@ void SolutionGradient<3>::operator() (const Point & p,
 {
   output.zero();
   const Real x=p(0), y=p(1), z=p(2);
-  output(_u_var)   = soln.grad(x, y, z).row(0);
-  output(_u_var+1) = soln.grad(x, y, z).row(1);
-  output(_u_var+2) = soln.grad(x, y, z).row(2);
+  output(0) = soln.grad(x, y, z).row(0);
+  output(1) = soln.grad(x, y, z).row(1);
+  output(2) = soln.grad(x, y, z).row(2);
+  output(3) = -soln(x, y, z);
 }
 
-template<>
-Gradient SolutionGradient<2>::component(unsigned int component_in,
-                                        const Point & p,
-                                        const Real)
+template<unsigned int dim>
+Gradient SolutionGradient<dim>::component(unsigned int component_in,
+                                          const Point & p,
+                                          const Real)
 {
-  const Real x=p(0), y=p(1);
-  return soln.grad(x, y).row(component_in);
-}
-
-template<>
-Gradient SolutionGradient<3>::component(unsigned int component_in,
-                                        const Point & p,
-                                        const Real)
-{
-  const Real x=p(0), y=p(1), z=p(2);
-  return soln.grad(x, y, z).row(component_in);
+  DenseVector<Gradient> outvec(dim+1);
+  (*this)(p, 0, outvec);
+  return outvec(component_in);
 }
 
 #endif // SOLUTION_FUNCTION_H
