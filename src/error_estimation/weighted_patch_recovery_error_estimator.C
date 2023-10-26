@@ -223,7 +223,8 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           std::unique_ptr<FEBase> fe (FEBase::build (dim, fe_type));
 
           // Build an appropriate Gaussian quadrature rule
-          std::unique_ptr<QBase> qrule (fe_type.default_quadrature_rule(dim));
+          std::unique_ptr<QBase> qrule =
+            fe_type.default_quadrature_rule(dim, error_estimator._extra_order);
 
           // Tell the finite element about the quadrature rule.
           fe->attach_quadrature_rule (qrule.get());

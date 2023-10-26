@@ -92,6 +92,16 @@ public:
 
   void set_patch_reuse (bool);
 
+  /**
+   * Increases or decreases the order of the quadrature rule used for numerical
+   * integration.  The default \p extraorder is 1, because properly
+   * integrating L2 error requires integrating the squares of terms
+   * with order p+1, and 2p+2 is 1 higher than what we default to
+   * using for reasonable mass matrix integration.
+   */
+  void extra_quadrature_order (const int extraorder)
+  { _extra_order = extraorder; }
+
   virtual ErrorEstimatorType type() const override;
 
 protected:
@@ -105,6 +115,11 @@ protected:
                                     const unsigned int matsize);
 
   bool patch_reuse;
+
+  /**
+   * Extra order to use for quadrature rule
+   */
+  int _extra_order;
 
 private:
 
