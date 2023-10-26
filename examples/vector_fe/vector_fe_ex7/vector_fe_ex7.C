@@ -135,7 +135,7 @@ main(int argc, char ** argv)
   // whereas "p" will be the scalar field.
   system.add_variable("u", FIRST, L2_RAVIART_THOMAS);
   system.add_variable("p", CONSTANT, MONOMIAL);
-  system.add_variable("p_enriched", FIRST, MONOMIAL);
+  system.add_variable("p_enriched", FIRST, L2_LAGRANGE);
 
   lm_system.add_variable("lambda", CONSTANT, SIDE_HIERARCHIC);
 
@@ -462,6 +462,8 @@ fe_assembly(EquationSystems & es, const bool global_solve)
       // Solve for the enriched solution
       dof_map.dof_indices(elem, enriched_scalar_dof_indices, system.variable_number("p_enriched"));
       const auto enriched_scalar_n_dofs = enriched_scalar_dof_indices.size();
+      libmesh_assert(lambda_n_dofs == enriched_scalar_n_dofs);
+
       K_enriched_scalar.resize(enriched_scalar_n_dofs, enriched_scalar_n_dofs);
       F_enriched_scalar.resize(enriched_scalar_n_dofs);
       U_enriched_scalar.resize(enriched_scalar_n_dofs);
@@ -469,6 +471,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
       {
         vector_fe_face->reinit(elem, side); // for JxW_face and qface_point
         enriched_scalar_fe_face->reinit(elem, side);
+        lambda_fe_face->reinit(elem, side);
         if (elem->neighbor_ptr(side) == nullptr)
           for (const auto qp : make_range(qface.n_points()))
           {
@@ -483,17 +486,16 @@ fe_assembly(EquationSystems & es, const bool global_solve)
             else if (dim == 3)
               scalar_value = DivGradExactSolution().scalar(xf, yf, zf);
 
-            for (const auto i : make_range(enriched_scalar_n_dofs))
+            for (const auto i : make_range(lambda_n_dofs))
             {
-              F_enriched_scalar(i) += JxW_face[qp] * enriched_scalar_phi_face[i][qp] * scalar_value;
+              F_enriched_scalar(i) += JxW_face[qp] * lambda_phi_face[i][qp] * scalar_value;
               for (const auto j : make_range(enriched_scalar_n_dofs))
-                K_enriched_scalar(i, j) += JxW_face[qp] * enriched_scalar_phi_face[i][qp] *
-                                           enriched_scalar_phi_face[j][qp];
+                K_enriched_scalar(i, j) +=
+                    JxW_face[qp] * lambda_phi_face[i][qp] * enriched_scalar_phi_face[j][qp];
             }
           }
         else
         {
-          lambda_fe_face->reinit(elem, side);
           // compute local face lambda solution
           lambda_qps.resize(qface.n_points());
           for (auto & lambda_qp : lambda_qps)
@@ -503,17 +505,16 @@ fe_assembly(EquationSystems & es, const bool global_solve)
               lambda_qps[qp] += lambda_solution_std_vec[i] * lambda_phi_face[i][qp];
 
           for (const auto qp : make_range(qface.n_points()))
-            for (const auto i : make_range(enriched_scalar_n_dofs))
+            for (const auto i : make_range(lambda_n_dofs))
             {
-              F_enriched_scalar(i) +=
-                  JxW_face[qp] * enriched_scalar_phi_face[i][qp] * lambda_qps[qp];
+              F_enriched_scalar(i) += JxW_face[qp] * lambda_phi_face[i][qp] * lambda_qps[qp];
               for (const auto j : make_range(enriched_scalar_n_dofs))
-                K_enriched_scalar(i, j) += JxW_face[qp] * enriched_scalar_phi_face[i][qp] *
-                                           enriched_scalar_phi_face[j][qp];
+                K_enriched_scalar(i, j) +=
+                    JxW_face[qp] * lambda_phi_face[i][qp] * enriched_scalar_phi_face[j][qp];
             }
         }
       }
-      K_enriched_scalar.cholesky_solve(F_enriched_scalar, U_enriched_scalar);
+      K_enriched_scalar.lu_solve(F_enriched_scalar, U_enriched_scalar);
       system.solution->insert(U_enriched_scalar, enriched_scalar_dof_indices);
     }
   }
