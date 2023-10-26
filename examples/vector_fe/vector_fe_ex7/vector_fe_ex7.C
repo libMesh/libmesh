@@ -181,7 +181,8 @@ main(int argc, char ** argv)
 
   // Use higher quadrature order for more accurate error results.
   int extra_error_quadrature = infile("extra_error_quadrature", 2);
-  exact_sol.extra_quadrature_order(extra_error_quadrature);
+  if (extra_error_quadrature)
+    exact_sol.extra_quadrature_order(extra_error_quadrature);
 
   // Compute the error.
   exact_sol.compute_error("DivGrad", "u");
