@@ -137,7 +137,7 @@ main(int argc, char ** argv)
   // whereas "p" will be the scalar field.
   system.add_variable("u", FIRST, L2_RAVIART_THOMAS);
   system.add_variable("p", CONSTANT, MONOMIAL);
-  system.add_variable("p_enriched", FIRST, L2_LAGRANGE);
+  system.add_variable("p_enriched", FIRST, MONOMIAL);
 
   lm_system.add_variable("lambda", CONSTANT, SIDE_HIERARCHIC);
 
@@ -474,8 +474,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 
       dof_map.dof_indices(elem, enriched_scalar_dof_indices, system.variable_number("p_enriched"));
       const auto enriched_scalar_n_dofs = enriched_scalar_dof_indices.size();
-      libmesh_assert(lambda_n_dofs == enriched_scalar_n_dofs);
-      const auto m = simplicial ? enriched_scalar_n_dofs : enriched_scalar_n_dofs + 1;
+      const auto m = simplicial ? lambda_n_dofs : lambda_n_dofs + 1;
       const auto n = enriched_scalar_n_dofs;
 
       K_enriched_scalar.resize(m, n);
