@@ -124,6 +124,8 @@ main(int argc, char ** argv)
 
   // Create an equation systems object.
   EquationSystems equation_systems(mesh);
+  equation_systems.parameters.set<bool>("simplicial") =
+      (elem_str == "TRI6") || (elem_str == "TRI7") || (elem_str == "TET14");
 
   // Declare the system  "DivGrad" and its variables.
   auto & system = equation_systems.add_system<System>("DivGrad");
@@ -214,6 +216,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 {
   const MeshBase & mesh = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
+  const bool simplicial = es.parameters.get<bool>("simplicial");
 
   auto & system = es.get_system<System>("DivGrad");
   auto & lambda_system = es.get_system<LinearImplicitSystem>("Lambda");
@@ -465,14 +468,19 @@ fe_assembly(EquationSystems & es, const bool global_solve)
       for (const auto i : make_range(scalar_n_dofs))
         system.solution->set(scalar_dof_indices[i], scalar_soln(i));
 
-      // Solve for the enriched solution
+      //
+      // Now solve for the enriched solution
+      //
+
       dof_map.dof_indices(elem, enriched_scalar_dof_indices, system.variable_number("p_enriched"));
       const auto enriched_scalar_n_dofs = enriched_scalar_dof_indices.size();
       libmesh_assert(lambda_n_dofs == enriched_scalar_n_dofs);
+      const auto m = simplicial ? enriched_scalar_n_dofs : enriched_scalar_n_dofs + 1;
+      const auto n = enriched_scalar_n_dofs;
 
-      K_enriched_scalar.resize(enriched_scalar_n_dofs, enriched_scalar_n_dofs);
-      F_enriched_scalar.resize(enriched_scalar_n_dofs);
-      U_enriched_scalar.resize(enriched_scalar_n_dofs);
+      K_enriched_scalar.resize(m, n);
+      F_enriched_scalar.resize(m);
+      U_enriched_scalar.resize(n);
       for (const auto side : elem->side_index_range())
       {
         vector_fe_face->reinit(elem, side); // for JxW_face and qface_point
@@ -520,20 +528,10 @@ fe_assembly(EquationSystems & es, const bool global_solve)
             }
         }
       }
-      // In case the trace problem is singular
-      DenseMatrix<Number> nonsquare_K(K_enriched_scalar.m() + 1, K_enriched_scalar.n());
-      DenseVector<Number> nonsquare_F(F_enriched_scalar.size() + 1);
-      for (const auto i : make_range(F_enriched_scalar.size()))
-      {
-        nonsquare_F(i) = F_enriched_scalar(i);
-        for (const auto j : make_range(F_enriched_scalar.size()))
-          nonsquare_K(i, j) = K_enriched_scalar(i, j);
-      }
-      try
-      {
+
+      if (simplicial)
         K_enriched_scalar.lu_solve(F_enriched_scalar, U_enriched_scalar);
-      }
-      catch (...)
+      else
       {
         //
         // We need another equation. We take the internal solution space
@@ -551,15 +549,13 @@ fe_assembly(EquationSystems & es, const bool global_solve)
           scalar_qps[qp] += scalar_soln(0) * scalar_phi[0][qp];
         for (const auto qp : make_range(qrule.n_points()))
         {
-          nonsquare_F(lambda_n_dofs) += JxW[qp] * scalar_phi[0][qp] * scalar_qps[qp];
-          for (const auto j : make_range(enriched_scalar_n_dofs))
-            nonsquare_K(lambda_n_dofs, j) +=
-                JxW[qp] * scalar_phi[0][qp] * enriched_scalar_phi[j][qp];
+          F_enriched_scalar(n) += JxW[qp] * scalar_phi[0][qp] * scalar_qps[qp];
+          for (const auto j : make_range(n))
+            K_enriched_scalar(n, j) += JxW[qp] * scalar_phi[0][qp] * enriched_scalar_phi[j][qp];
         }
-
-        U_enriched_scalar.zero(); // I don't know if this matters
-        nonsquare_K.svd_solve(nonsquare_F, U_enriched_scalar);
+        K_enriched_scalar.svd_solve(F_enriched_scalar, U_enriched_scalar);
       }
+
       system.solution->insert(U_enriched_scalar, enriched_scalar_dof_indices);
     }
   }
