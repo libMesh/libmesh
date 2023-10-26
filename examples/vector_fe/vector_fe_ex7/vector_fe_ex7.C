@@ -458,7 +458,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
     else
     {
       Lambda.resize(lambda_n_dofs);
-      lambda_system.solution->get(lambda_dof_indices, lambda_solution_std_vec);
+      lambda_system.current_local_solution->get(lambda_dof_indices, lambda_solution_std_vec);
       for (const auto i : make_range(lambda_n_dofs))
         Lambda(i) = lambda_solution_std_vec[i];
       const auto scalar_soln = Sinv * Bt * Ainv * G - Sinv * F - Sinv * Bt * Ainv * C * Lambda;
