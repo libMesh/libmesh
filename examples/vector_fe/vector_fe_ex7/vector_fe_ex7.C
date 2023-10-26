@@ -231,12 +231,14 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   // Volumetric FE objects
   std::unique_ptr<FEVectorBase> vector_fe(FEVectorBase::build(dim, vector_fe_type));
   std::unique_ptr<FEBase> scalar_fe(FEBase::build(dim, scalar_fe_type));
+  std::unique_ptr<FEBase> enriched_scalar_fe(FEBase::build(dim, enriched_scalar_fe_type));
 
   // Volumetric quadrature rule
   QGauss qrule(dim, FIFTH);
 
   vector_fe->attach_quadrature_rule(&qrule);
   scalar_fe->attach_quadrature_rule(&qrule);
+  enriched_scalar_fe->attach_quadrature_rule(&qrule);
 
   // Declare finite element objects for boundary integration
   std::unique_ptr<FEVectorBase> vector_fe_face(FEVectorBase::build(dim, vector_fe_type));
@@ -255,6 +257,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   const auto & q_point = vector_fe->get_xyz();
   const auto & vector_phi = vector_fe->get_phi();
   const auto & scalar_phi = scalar_fe->get_phi();
+  const auto & enriched_scalar_phi = enriched_scalar_fe->get_phi();
   const auto & div_vector_phi = vector_fe->get_div_phi();
   const auto & vector_phi_face = vector_fe_face->get_phi();
   const auto & enriched_scalar_phi_face = enriched_scalar_fe_face->get_phi();
@@ -279,6 +282,8 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   VectorXd Lambda;
   // The lambda solution at the quadrature points
   std::vector<Number> lambda_qps;
+  /// The scalar solution at the quadrature points
+  std::vector<Number> scalar_qps;
 
   /// Data structures for computing the enriched scalar solution
   DenseMatrix<Number> K_enriched_scalar;
@@ -515,7 +520,46 @@ fe_assembly(EquationSystems & es, const bool global_solve)
             }
         }
       }
-      K_enriched_scalar.lu_solve(F_enriched_scalar, U_enriched_scalar);
+      // In case the trace problem is singular
+      DenseMatrix<Number> nonsquare_K(K_enriched_scalar.m() + 1, K_enriched_scalar.n());
+      DenseVector<Number> nonsquare_F(F_enriched_scalar.size() + 1);
+      for (const auto i : make_range(F_enriched_scalar.size()))
+      {
+        nonsquare_F(i) = F_enriched_scalar(i);
+        for (const auto j : make_range(F_enriched_scalar.size()))
+          nonsquare_K(i, j) = K_enriched_scalar(i, j);
+      }
+      try
+      {
+        K_enriched_scalar.lu_solve(F_enriched_scalar, U_enriched_scalar);
+      }
+      catch (...)
+      {
+        //
+        // We need another equation. We take the internal solution space
+        //
+
+        enriched_scalar_fe->reinit(elem);
+        libmesh_assert(scalar_n_dofs == 1);
+        libmesh_assert(scalar_soln.size() == 1);
+        libmesh_assert(scalar_phi.size() == 1);
+
+        scalar_qps.resize(qrule.n_points());
+        for (auto & scalar_qp : scalar_qps)
+          scalar_qp = 0;
+        for (const auto qp : make_range(qrule.n_points()))
+          scalar_qps[qp] += scalar_soln(0) * scalar_phi[0][qp];
+        for (const auto qp : make_range(qrule.n_points()))
+        {
+          nonsquare_F(lambda_n_dofs) += JxW[qp] * scalar_phi[0][qp] * scalar_qps[qp];
+          for (const auto j : make_range(enriched_scalar_n_dofs))
+            nonsquare_K(lambda_n_dofs, j) +=
+                JxW[qp] * scalar_phi[0][qp] * enriched_scalar_phi[j][qp];
+        }
+
+        U_enriched_scalar.zero(); // I don't know if this matters
+        nonsquare_K.svd_solve(nonsquare_F, U_enriched_scalar);
+      }
       system.solution->insert(U_enriched_scalar, enriched_scalar_dof_indices);
     }
   }
