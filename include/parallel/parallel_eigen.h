@@ -57,10 +57,8 @@ namespace libMesh
 
     private:
       template <typename T2>
-      inline constexpr bool IsFixed = typename TIMPI::StandardType<T2>::is_fixed_type;
-
-      template <typename T1, typename T2>
-      inline constexpr std::size_t PackingTypesPer = (sizeof(T1) + sizeof(T2) - 1) / sizeof(T2);
+      static inline constexpr bool IsFixed = TIMPI::StandardType<T2>::is_fixed_type;
+      static std::size_t BufferCount(std::size_t n) { return (sizeof(Scalar) * n + sizeof(buffer_type) - 1) / sizeof(buffer_type); }
     };
 
 
@@ -77,7 +75,10 @@ namespace libMesh
       // compute packable size of the underlying data
       std::size_t ints_per_data;
       if constexpr (IsFixed<Scalar>)
-        ints_per_data = PackingTypesPer<buffer_type, Scalar>;
+      {
+        libmesh_ignore(context);
+        ints_per_data = BufferCount(rows * cols);
+      }
       else
       {
         ints_per_data = 0;
@@ -94,28 +95,22 @@ namespace libMesh
     unsigned int
     Packing<Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>>::packed_size(BufferIter in)
     {
-      std::size_t rows, cols;
       constexpr std::size_t header_size = (Rows == Eigen::Dynamic) + (Cols == Eigen::Dynamic);
-
-      if constexpr (Rows == Eigen::Dynamic)
-          rows = *in++;
-      else
-          rows = Rows;
-
-      if constexpr (Cols == Eigen::Dynamic)
-          cols = *in++;
-      else
-          cols = Cols;
+      const std::size_t rows = Rows == Eigen::Dynamic ? *in++ : Rows;
+      const std::size_t cols = Cols == Eigen::Dynamic ? *in++ : Cols;
 
       // compute packable size of the underlying data
       std::size_t ints_per_data;
       if constexpr (IsFixed<Scalar>)
-        ints_per_data = PackingTypesPer<buffer_type, Scalar>;
+        ints_per_data = BufferCount(rows * cols);
       else
       {
         ints_per_data = 0;
         for (const auto i : make_range(rows * cols))
-          ints_per_data += Packing<Scalar>::packed_size(in++);
+        {
+          ints_per_data += Packing<Scalar>::packed_size(in + ints_per_data);
+          libmesh_ignore(i);
+        }
       }
 
       return header_size + ints_per_data;
@@ -131,25 +126,23 @@ namespace libMesh
       const auto rows = mtx.rows();
       const auto cols = mtx.cols();
 
+      // store dynamic dimensions
       if constexpr (Rows == Eigen::Dynamic)
         *data_out++ = rows;
       if constexpr (Cols == Eigen::Dynamic)
         *data_out++ = cols;
 
       // pack underlying data
-      std::size_t ints_per_data;
       if constexpr (IsFixed<Scalar>)
       {
-        const auto *raw_data = reinterpret_cast<const unsigned int *>(mtx.data());
-        for (const auto i : make_range(PackingTypesPer<buffer_type, Scalar>))
+        libmesh_ignore(context);
+        const auto *raw_data = reinterpret_cast<const buffer_type *>(mtx.data());
+        for (const auto i : make_range(BufferCount(rows * cols)))
           *data_out++ = (raw_data[i]);
         }
       else
-      {
-        ints_per_data = 0;
         for (const auto i : make_range(rows * cols))
           Packing<Scalar>::pack(mtx.data()[i], data_out, context);
-      }
     }
 
     template<typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxCols>
@@ -157,34 +150,25 @@ namespace libMesh
     Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>
     Packing<Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>>::unpack(BufferIter in, Context *context)
     {
-      std::size_t rows, cols;
-
-      if constexpr (Rows == Eigen::Dynamic)
-          rows = *in++;
-      else
-          rows = Rows;
-
-      if constexpr (Cols == Eigen::Dynamic)
-          cols = *in++;
-      else
-          cols = Cols;
-
-      auto mtx = Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>(rows, cols); //buildMatrix();
+      const std::size_t rows = Rows == Eigen::Dynamic ? *in++ : Rows;
+      const std::size_t cols = Cols == Eigen::Dynamic ? *in++ : Cols;
+      auto mtx = Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>(rows, cols);
 
       // unpack underlying data
-      std::size_t ints_per_data;
       if constexpr (IsFixed<Scalar>)
       {
-        const auto *raw_data = reinterpret_cast<const unsigned int *>(mtx.data());
-        for (const auto i : make_range(PackingTypesPer<buffer_type, Scalar>))
+        libmesh_ignore(context);
+        auto *raw_data = reinterpret_cast<buffer_type *>(mtx.data());
+        for (const auto i : make_range(BufferCount(rows * cols)))
          raw_data[i] = *in++;
-        }
-      else
-      {
-        ints_per_data = 0;
-        for (const auto i : make_range(rows * cols))
-          mtx.data()[i] = Packing<Scalar>::unpack(in, context);
       }
+      else
+        for (const auto i : make_range(rows * cols))
+        {
+          // unpack matrix entry and advance iterator
+          mtx.data()[i] = Packing<Scalar>::unpack(in, context);
+          in += Packing<Scalar>::packed_size(in);
+        }
 
       return mtx;
     }

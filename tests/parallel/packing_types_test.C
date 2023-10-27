@@ -17,6 +17,7 @@ public:
 
   CPPUNIT_TEST( testDynamicEigenMatrix );
   CPPUNIT_TEST( testDynamicEigenVector );
+  CPPUNIT_TEST( testNonFixedScalar );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -104,6 +105,49 @@ public:
     // communicate
     Parallel::push_parallel_vector_data(*TestCommWorld, send_data, verify_data);
   }
+
+  void testNonFixedScalar()
+  {
+    LOG_UNIT_TEST;
+
+    typedef Eigen::Matrix<std::vector<Real>, 3, 3> VectorEigenMatrix;
+    typedef std::vector<VectorEigenMatrix> VectorMatrixVector;
+    std::map<processor_id_type, VectorMatrixVector> send_data;
+
+    // prepare unique data
+    for (const auto i : index_range(*TestCommWorld))
+    {
+      const auto j = TestCommWorld->rank();
+      send_data[i] = VectorMatrixVector(1);
+      for (const auto row: make_range(3))
+        for (const auto col: make_range(3))
+          send_data[i][0](row, col).assign(row + col + 1, 10.0 * i + j);
+    }
+
+    // verification
+    auto verify_data =
+    [](processor_id_type j, const VectorMatrixVector & recv_data)
+    {
+      const auto i = TestCommWorld->rank();
+      const std::size_t rows = recv_data[0].rows();
+      const std::size_t cols = recv_data[0].cols();
+
+      CPPUNIT_ASSERT_EQUAL( rows, static_cast<std::size_t>(3) );
+      CPPUNIT_ASSERT_EQUAL( cols, static_cast<std::size_t>(3) );
+
+      for (const auto row: make_range(rows))
+        for (const auto col: make_range(cols))
+        {
+          CPPUNIT_ASSERT_EQUAL( recv_data[0](row, col).size(), static_cast<std::size_t>(row + col + 1) );
+          for (const auto val : recv_data[0](row, col))
+            CPPUNIT_ASSERT_EQUAL( val, static_cast<Real>(j + 10.0 * i) );
+        }
+    };
+
+    // communicate
+    Parallel::push_parallel_vector_data(*TestCommWorld, send_data, verify_data);
+  }
+
 
 };
 
