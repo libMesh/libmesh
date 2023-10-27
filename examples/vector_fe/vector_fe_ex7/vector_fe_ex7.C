@@ -132,8 +132,9 @@ main(int argc, char ** argv)
 
   // Create an equation systems object.
   EquationSystems equation_systems(mesh);
-  equation_systems.parameters.set<bool>("simplicial") =
-      (elem_str == "TRI6") || (elem_str == "TRI7") || (elem_str == "TET14");
+  const bool simplicial = (elem_str == "TRI6") || (elem_str == "TRI7") || (elem_str == "TET14");
+  equation_systems.parameters.set<bool>("simplicial") = simplicial;
+
 
   // Declare the system  "DivGrad" and its variables.
   auto & system = equation_systems.add_system<System>("DivGrad");
@@ -197,7 +198,10 @@ main(int argc, char ** argv)
   // Compute the error.
   exact_sol.compute_error("DivGrad", "u");
   exact_sol.compute_error("DivGrad", "p");
-  exact_sol.compute_error("DivGrad", "p_enriched");
+#if !defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_USE_REAL_NUMBERS)
+  if (simplicial)
+#endif
+    exact_sol.compute_error("DivGrad", "p_enriched");
 
   // Print out the error values.
   libMesh::out << "L2 error is: " << exact_sol.l2_error("DivGrad", "u") << std::endl;
@@ -205,8 +209,11 @@ main(int argc, char ** argv)
                << std::endl;
   libMesh::out << "HDiv error is: " << exact_sol.hdiv_error("DivGrad", "u") << std::endl;
   libMesh::out << "L2 error for p is: " << exact_sol.l2_error("DivGrad", "p") << std::endl;
-  libMesh::out << "L2 error p_enriched is: " << exact_sol.l2_error("DivGrad", "p_enriched")
-               << std::endl;
+#if !defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_USE_REAL_NUMBERS)
+  if (simplicial)
+#endif
+    libMesh::out << "L2 error p_enriched is: " << exact_sol.l2_error("DivGrad", "p_enriched")
+                 << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
@@ -475,6 +482,12 @@ fe_assembly(EquationSystems & es, const bool global_solve)
         system.solution->set(vector_dof_indices[i], vector_soln(i));
       for (const auto i : make_range(scalar_n_dofs))
         system.solution->set(scalar_dof_indices[i], scalar_soln(i));
+
+#if !defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_USE_REAL_NUMBERS)
+      if (!simplicial)
+        // We don't support SVD solves in this configuration
+        continue;
+#endif
 
       //
       // Now solve for the enriched solution
