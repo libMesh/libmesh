@@ -60,6 +60,14 @@
 using namespace libMesh;
 using namespace Eigen;
 
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+typedef MatrixXcd EigenMatrix;
+typedef VectorXcd EigenVector;
+#else
+typedef MatrixXd EigenMatrix;
+typedef VectorXd EigenVector;
+#endif
+
 void fe_assembly(EquationSystems & es, bool global_solve);
 void assemble_divgrad(EquationSystems & es, const std::string & system_name);
 
@@ -273,16 +281,16 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   // LM matrix and RHS
   DenseMatrix<Number> E_libmesh;
   DenseVector<Number> H_libmesh;
-  MatrixXd E;
-  MatrixXd H;
+  EigenMatrix E;
+  EigenMatrix H;
   // Auxiliary matrices and RHS
-  MatrixXd A, Ainv, B, Bt, C, Ct, Sinv;
-  VectorXd G, F, Hg, Hf;
+  EigenMatrix A, Ainv, B, Bt, C, Ct, Sinv;
+  EigenVector G, F, Hg, Hf;
   // element matrix for boundary LM dofs
-  MatrixXd L;
+  EigenMatrix L;
 
   // Lambda eigen vector for constructing vector and scalar solutions
-  VectorXd Lambda;
+  EigenVector Lambda;
   // The lambda solution at the quadrature points
   std::vector<Number> lambda_qps;
   /// The scalar solution at the quadrature points
