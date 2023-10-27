@@ -83,8 +83,11 @@ void rational_nodal_soln(const Elem * elem,
 
         std::vector<Real> node_weights(n_nodes);
 
+        const unsigned char weight_index = elem->mapping_data();
+
         for (unsigned int n=0; n<n_nodes; n++)
-          node_weights[n] = elem->node_ref(n).get_extra_integer(0);
+          node_weights[n] =
+            elem->node_ref(n).get_extra_datum<Real>(weight_index);
 
         for (unsigned int n=0; n<n_nodes; n++)
           {
