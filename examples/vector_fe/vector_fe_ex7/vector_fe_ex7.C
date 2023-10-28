@@ -55,6 +55,8 @@
 #include "libmesh/getpot.h"
 #include "libmesh/exodusII_io.h"
 
+#ifdef LIBMESH_HAVE_EIGEN_DENSE
+
 #include <Eigen/Dense>
 
 using namespace libMesh;
@@ -587,3 +589,13 @@ assemble_divgrad(EquationSystems & es, const std::string & libmesh_dbg_var(syste
   libmesh_assert_equal_to(system_name, "Lambda");
   fe_assembly(es, /*global_solve=*/true);
 }
+
+#else
+
+int
+main()
+{
+  return 0;
+}
+
+#endif
