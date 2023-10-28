@@ -15,6 +15,87 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+
+// <h1>Vector Finite Elements Example 7 - Hybridized Raviart-Thomas elements</h1>
+// \author Alexander Lindsay
+// \date 2023
+//
+// This example hybridizes Raviart-Thomas elements to solve a model div-grad
+// problem in both 2d and 3d. Before hybridization, the mixed problem is simply
+// a div-grad formulation, \vec{u} = -\nabla p, and \nabla \cdot \vec{u} = f, of
+// the Poisson problem in Introduction Example 3, \nabla^2 p = -f. A standard
+// (non-hybridized) Raviart-Thomas discretization of the same problem can be
+// found in Vector Example 6.
+//
+// One of the first references for the hybridized Raviart-Thomas (RT)
+// formulation is Arnold's and Brezzi's "Mixed and nonconforming finite element
+// methods: implementation, postprocessing and error estimates". The key piece
+// to the hybridized formulation is breaking the continuity of the RT space,
+// e.g. we no longer require that the normal component of the RT space be
+// continuous across interelement boundaries. In the notation of Arnold and
+// Brezzi this means a change from RT_0^k -> RT_{-1}^k where k is the polynomial
+// order of the basis (note that here k denotes the polynomial order of the
+// *divergence* of the vector shape functions, so for k = 0, the RT basis in
+// libMesh is FIRST). This breakage in continuity is accomplished by changing
+// from an FEFamily of RAVIART_THOMAS to L2_RAVIART_THOMAS. Instead of being
+// enforced by the finite element space itself, continuity of the normal
+// component of the vector field is enforced through Lagrange multipliers that
+// live on the skeleton of the mesh. Let's introduce a subspace of L2, M_{-1}^k,
+// where the functions in M_{-1}^k are polynomials of degree of k or less. These
+// polynomials can live on our elements (I_h) or on our internal element faces
+// (E0_h); we will denote these polynomial subspaces respectively as M_{-1}^k (I_h)
+//  and M_{-1}^k (E0_h). We will denote boundary faces by E. The hybridized
+// problem can be summarized as follows:
+//
+// find the approximate solutions (u_h, p_h, lambda_h) in
+// RT_{-1}^k x M_{-1}^k (I_h) x M^{-1}^k (E0_h)
+// such that
+//
+// (u, tau) - (p, div(tau)) - <lambda, tau*n>_E0 = -<g, tau*n>_E for all tau in RT_{-1}^k (I_h)
+// -(v, div(u)) = (f, v) for all v in M_{-1}^k (I_h)
+// -<mu, u*n> = 0 for all mu in M_{-1}^k (E0_h)
+//
+// with p = g on the boundary (Dirichlet problem)
+//
+// We can write this in a matrix form:
+// (A  B  C)(u)        (G)
+// (Bt 0  0)(p)      = (F)
+// (Ct 0  0)(lambda)   (0)
+//
+// The matrix A is block diagonal, e.g. it is entirely localized within an
+// element due to the breakage of the continuity requirements of the RT
+// space. This allows us to write:
+//
+// u = A^{-1} (G - Bp - C lambda)
+//
+// We can further eliminate p to end up with a global system that depends only on lambda:
+//
+// E lambda = H
+//
+// where
+//
+// E = Ct * A^{-1} * (A - B * S^{-1} * Bt) * A^{-1} * C
+// S = Bt * A^{-1} * B
+// H = Hg + Hf
+// Hg = Ct * A^{-1} * (A - B * S^{-1} * Bt) * A^{-1} * G
+// Hf = Ct * A^{-1} * B * S^{-1} * F
+//
+// Here in our example we compose local element matrices A, B, C, Bt, Ct, G, and
+// F using finite element assembly. Then due to the small size of the local
+// element matrices, we actually compute the required inverses and build E and H
+// which is then fed into the global matrix and vector respectively. The
+// resulting global matrix is symmetric positive definite which is a nice change
+// over the saddle point standard RT discretization. Moreover, the global system
+// size of the hybridized problem is less than standard RT.
+//
+// Once the global system is solved. We go through finite element assembly a
+// second time to locally construct the u and p solutions from lambda. Finally,
+// lambda (and p for non-simplices) are used to reconstruct a higher-order
+// approximation of p, e.g. a solution using a basis of polynomials of degree k + 1.
+// Lambda is used in this reconstruction because it represents a
+// projection of the true solution for p onto M_{-1}^k (E0_h) ; e.g. as is so
+// often the case, the Lagrange multipliers have a physical meaning
+
 // Basic utilities.
 #include "libmesh/string_to_enum.h"
 
