@@ -74,6 +74,22 @@ public:
 };
 
 /**
+ * -Wdangling-reference was nowhere *near* ready to add to -Wall in
+ *  gcc 13.  It's been moved to -Wextra, but we use that too.  :-)
+ *
+ *  See e.g. https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109642
+ *
+ *  Our map_find functions trigger it.
+ */
+
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__)
+#if (__GNUC__ > 12)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdangling-reference"
+#endif
+#endif
+
+/**
  * This function should not be called directly (although it can be),
  * instead see the libmesh_map_find() macro.
  *
@@ -155,6 +171,14 @@ map_find(const Map & map,
                        << filename << " on line " << line_number);
   return it->second;
 }
+
+// The map_find functions are our only dangling-reference false positives
+
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__)
+#if (__GNUC__ > 12)
+#pragma GCC diagnostic pop
+#endif
+#endif
 
 
 /**
