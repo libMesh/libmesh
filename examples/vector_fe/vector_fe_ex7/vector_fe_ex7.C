@@ -307,18 +307,6 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   DenseMatrix<Number> K_enriched_scalar;
   DenseVector<Number> F_enriched_scalar, U_enriched_scalar;
 
-  auto zero_mat = [](auto & mat)
-  {
-    for (const auto i : make_range(mat.rows()))
-      for (const auto j : make_range(mat.cols()))
-        mat(i, j) = 0;
-  };
-  auto zero_vec = [](auto & vec)
-  {
-    for (const auto i : make_range(vec.size()))
-      vec(i) = 0;
-  };
-
   std::vector<dof_id_type> vector_dof_indices;
   std::vector<dof_id_type> scalar_dof_indices;
   std::vector<dof_id_type> enriched_scalar_dof_indices;
@@ -349,20 +337,20 @@ fe_assembly(EquationSystems & es, const bool global_solve)
     B.resize(vector_n_dofs, scalar_n_dofs);
     C.resize(vector_n_dofs, lambda_n_dofs);
     G.resize(vector_n_dofs);
-    zero_mat(A);
-    zero_mat(B);
-    zero_mat(C);
-    zero_vec(G);
+    A.setZero(A.rows(), A.cols());
+    B.setZero(B.rows(), B.cols());
+    C.setZero(C.rows(), C.cols());
+    G.setZero(G.size());
     // scalar equation
     Bt.resize(scalar_n_dofs, vector_n_dofs);
     F.resize(scalar_n_dofs);
-    zero_mat(Bt);
-    zero_vec(F);
+    Bt.setZero(Bt.rows(), Bt.cols());
+    F.setZero(F.size());
     // lm equation
     Ct.resize(lambda_n_dofs, vector_n_dofs);
     L.resize(lambda_n_dofs, lambda_n_dofs);
-    zero_mat(Ct);
-    zero_mat(L);
+    Ct.setZero(Ct.rows(), Ct.cols());
+    L.setZero(L.rows(), L.cols());
 
     for (const auto qp : make_range(qrule.n_points()))
     {
