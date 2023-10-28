@@ -118,7 +118,7 @@ void RBThetaExpansion::attach_output_theta(std::vector<std::unique_ptr<RBTheta>>
 
 void RBThetaExpansion::attach_output_theta(std::vector<RBTheta *> theta_q_l)
 {
-  _output_theta_vector.push_back(theta_q_l);
+  _output_theta_vector.push_back(std::move(theta_q_l));
 }
 
 void RBThetaExpansion::attach_output_theta(RBTheta * theta_q_l)
