@@ -153,7 +153,7 @@ void RBAssemblyExpansion::attach_output_assembly(std::vector<std::unique_ptr<Ele
 
 void RBAssemblyExpansion::attach_output_assembly(std::vector<ElemAssembly *> output_assembly)
 {
-  _output_assembly_vector.push_back(output_assembly);
+  _output_assembly_vector.push_back(std::move(output_assembly));
 }
 
 void RBAssemblyExpansion::attach_output_assembly(ElemAssembly * output_assembly)
