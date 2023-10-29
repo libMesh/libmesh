@@ -74,6 +74,11 @@ public:
   virtual ~QBase() = default;
 
   /**
+   * \returns A copy of this quadrature rule wrapped in a smart pointer.
+   */
+  virtual std::unique_ptr<QBase> clone() const;
+
+  /**
    * \returns The quadrature type in derived classes.
    */
   virtual QuadratureType type() const = 0;

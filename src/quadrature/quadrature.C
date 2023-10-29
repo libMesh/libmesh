@@ -34,6 +34,10 @@ QBase::QBase(unsigned int d,
   _p_level(0)
 {}
 
+std::unique_ptr<QBase> QBase::clone() const
+{
+  return QBase::build(this->type(), this->get_dim(), this->get_order());
+}
 
 void QBase::print_info(std::ostream & os) const
 {

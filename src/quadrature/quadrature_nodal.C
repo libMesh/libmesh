@@ -28,6 +28,11 @@ QuadratureType QNodal::type() const
   return QNODAL;
 }
 
+std::unique_ptr<QBase> QNodal::clone() const
+{
+  return std::make_unique<QNodal>(*this);
+}
+
 // See the files:
 // quadrature_nodal_1D.C
 // quadrature_nodal_2D.C

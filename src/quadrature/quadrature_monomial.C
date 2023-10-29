@@ -34,6 +34,11 @@ QuadratureType QMonomial::type() const
   return QMONOMIAL;
 }
 
+std::unique_ptr<QBase> QMonomial::clone() const
+{
+  return std::make_unique<QMonomial>(*this);
+}
+
 void QMonomial::wissmann_rule(const Real rule_data[][3],
                               const unsigned int n_pts)
 {

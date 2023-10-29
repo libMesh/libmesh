@@ -48,4 +48,9 @@ QuadratureType QGaussLobatto::type() const
   return QGAUSS_LOBATTO;
 }
 
+std::unique_ptr<QBase> QGaussLobatto::clone() const
+{
+  return std::make_unique<QGaussLobatto>(*this);
+}
+
 } // namespace libMesh

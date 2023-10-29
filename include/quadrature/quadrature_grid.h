@@ -71,6 +71,7 @@ public:
    */
   virtual QuadratureType type() const override;
 
+  virtual std::unique_ptr<QBase> clone() const override;
 
 private:
 

@@ -81,6 +81,8 @@ public:
    */
   virtual QuadratureType type() const override;
 
+  virtual std::unique_ptr<QBase> clone() const override;
+
 private:
   unsigned int _alpha;
   unsigned int _beta;

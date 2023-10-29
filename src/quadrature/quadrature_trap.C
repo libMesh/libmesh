@@ -28,6 +28,11 @@ QuadratureType QTrap::type() const
   return QTRAP;
 }
 
+std::unique_ptr<QBase> QTrap::clone() const
+{
+  return std::make_unique<QTrap>(*this);
+}
+
 // See the files:
 // quadrature_trap_1D.C
 // quadrature_trap_2D.C
