@@ -416,24 +416,16 @@ fe_assembly(EquationSystems & es, const bool global_solve)
     libmesh_assert_equal_to(scalar_n_dofs, scalar_phi.size());
 
     // vector equation
-    A.resize(vector_n_dofs, vector_n_dofs);
-    B.resize(vector_n_dofs, scalar_n_dofs);
-    C.resize(vector_n_dofs, lambda_n_dofs);
-    G.resize(vector_n_dofs);
-    A.setZero(A.rows(), A.cols());
-    B.setZero(B.rows(), B.cols());
-    C.setZero(C.rows(), C.cols());
-    G.setZero(G.size());
+    A.setZero(vector_n_dofs, vector_n_dofs);
+    B.setZero(vector_n_dofs, scalar_n_dofs);
+    C.setZero(vector_n_dofs, lambda_n_dofs);
+    G.setZero(vector_n_dofs);
     // scalar equation
-    Bt.resize(scalar_n_dofs, vector_n_dofs);
-    F.resize(scalar_n_dofs);
-    Bt.setZero(Bt.rows(), Bt.cols());
-    F.setZero(F.size());
+    Bt.setZero(scalar_n_dofs, vector_n_dofs);
+    F.setZero(scalar_n_dofs);
     // lm equation
-    Ct.resize(lambda_n_dofs, vector_n_dofs);
-    L.resize(lambda_n_dofs, lambda_n_dofs);
-    Ct.setZero(Ct.rows(), Ct.cols());
-    L.setZero(L.rows(), L.cols());
+    Ct.setZero(lambda_n_dofs, vector_n_dofs);
+    L.setZero(lambda_n_dofs, lambda_n_dofs);
 
     for (const auto qp : make_range(qrule.n_points()))
     {
