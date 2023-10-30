@@ -231,8 +231,12 @@ main(int argc, char ** argv)
   // whereas "p" will be the scalar field.
   system.add_variable("u", FIRST, L2_RAVIART_THOMAS);
   system.add_variable("p", CONSTANT, MONOMIAL);
+  // We also add a higher order version of our 'p' variable whose solution we
+  // will compute using the Lagrange multiplier field and, for non-simplexes,
+  // the low order 'p' solution
   system.add_variable("p_enriched", FIRST, MONOMIAL);
 
+  // Add our Lagrange multiplier to the implicit system
   lm_system.add_variable("lambda", CONSTANT, SIDE_HIERARCHIC);
 
   // Give the system a pointer to the matrix assembly
@@ -242,13 +246,17 @@ main(int argc, char ** argv)
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
+  // Solve the implicit system for the Lagrange multiplier
   lm_system.solve();
-  // Now populate the vector and scalar solutions
+
+  // Armed with our Lagrange multiplier solution, we can now compute the vector and scalar solutions
   fe_assembly(equation_systems, /*global_solve=*/false);
 
+  //
+  // Now we will compute our solution approximation errors
+  //
+
   ExactSolution exact_sol(equation_systems);
-  ExactSolution p_exact_sol(equation_systems);
-  ExactSolution enriched_p_exact_sol(equation_systems);
 
   if (dimension == 2)
   {
@@ -311,14 +319,20 @@ main(int argc, char ** argv)
   return 0;
 }
 
+// We will perform finite element assembly twice. The first time to setup the global implicit system
+// for the Lagrange multiplier degrees of freedom. And then the second time to compute the vector
+// and scalar field solutions using the already-compute Lagrange multiplier solution
 void
 fe_assembly(EquationSystems & es, const bool global_solve)
 {
   const MeshBase & mesh = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
+  // Are our elements simplicial?
   const bool simplicial = es.parameters.get<bool>("simplicial");
 
+  // The div-grad, e.g. vector-scalar system
   auto & system = es.get_system<System>("DivGrad");
+  // Our implicit Lagrange multiplier system
   auto & lambda_system = es.get_system<LinearImplicitSystem>("Lambda");
 
   const auto & dof_map = system.get_dof_map();
@@ -339,6 +353,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   // Volumetric quadrature rule
   QGauss qrule(dim, FIFTH);
 
+  // Attach quadrature rules for the FE objects that we will reinit within the element "volume"
   vector_fe->attach_quadrature_rule(&qrule);
   scalar_fe->attach_quadrature_rule(&qrule);
   enriched_scalar_fe->attach_quadrature_rule(&qrule);
@@ -352,16 +367,20 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   // less than the dimensionality of the element.
   QGauss qface(dim - 1, FIFTH);
 
+  // Attach quadrature rules for the FE objects that we will reinit on the element faces
   vector_fe_face->attach_quadrature_rule(&qface);
   enriched_scalar_fe_face->attach_quadrature_rule(&qface);
   lambda_fe_face->attach_quadrature_rule(&qface);
 
+  // pre-request our required volumetric data
   const auto & JxW = vector_fe->get_JxW();
   const auto & q_point = vector_fe->get_xyz();
   const auto & vector_phi = vector_fe->get_phi();
   const auto & scalar_phi = scalar_fe->get_phi();
   const auto & enriched_scalar_phi = enriched_scalar_fe->get_phi();
   const auto & div_vector_phi = vector_fe->get_div_phi();
+
+  // pre-request our required element face data
   const auto & vector_phi_face = vector_fe_face->get_phi();
   const auto & enriched_scalar_phi_face = enriched_scalar_fe_face->get_phi();
   const auto & lambda_phi_face = lambda_fe_face->get_phi();
@@ -369,16 +388,30 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   const auto & qface_point = vector_fe_face->get_xyz();
   const auto & normals = vector_fe_face->get_normals();
 
-  // We follow the notation of Cockburn
-  // LM matrix and RHS
+  //
+  // We follow the notation of Cockburn in "A Charactrization of Hybridized
+  // Mixed methods for Second Order Elliptic problems"for the element
+  // matrices/vectors. We will need "Eigen" versions of many of the
+  // matrices/vectors because the libMesh DenseMatrix doesn't have an inverse
+  // API
+  //
+
+  // LM matrix and RHS after eliminating vector and scalar dofs
   DenseMatrix<Number> E_libmesh;
   DenseVector<Number> H_libmesh;
   EigenMatrix E;
   EigenMatrix H;
-  // Auxiliary matrices and RHS
+  // Auxiliary matrices and RHS. A is vector-vector. B is vector-scalar. C is
+  // vector-LM. Sinv is the inverse of the Schur complement S which is given by
+  // S = Bt * A^{-1} * B. G is the RHS of the vector equation (e.g. the
+  // Dirichlet condition). F is the RHS of the scalar equation (resulting from
+  // the body force or MMS force in this case). Hg is the post-elimination
+  // version of G, and Hf is the post-elimination version of F
   EigenMatrix A, Ainv, B, Bt, C, Ct, Sinv;
   EigenVector G, F, Hg, Hf;
-  // element matrix for boundary LM dofs
+  // element matrix for boundary LM dofs. We have to have this because our
+  // SIDE_HIERARCHIC variables live on *all* element faces, not just interior
+  // ones.
   EigenMatrix L;
 
   // Lambda eigen vector for constructing vector and scalar solutions
@@ -392,6 +425,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   DenseMatrix<Number> K_enriched_scalar;
   DenseVector<Number> F_enriched_scalar, U_enriched_scalar;
 
+  // Containers for dof indices
   std::vector<dof_id_type> vector_dof_indices;
   std::vector<dof_id_type> scalar_dof_indices;
   std::vector<dof_id_type> enriched_scalar_dof_indices;
@@ -403,6 +437,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
   {
+    // Retrive our dof indices for all fields
     dof_map.dof_indices(elem, vector_dof_indices, system.variable_number("u"));
     dof_map.dof_indices(elem, scalar_dof_indices, system.variable_number("p"));
     lambda_dof_map.dof_indices(elem, lambda_dof_indices, lambda_system.variable_number("lambda"));
@@ -411,34 +446,38 @@ fe_assembly(EquationSystems & es, const bool global_solve)
     const auto scalar_n_dofs = scalar_dof_indices.size();
     const auto lambda_n_dofs = lambda_dof_indices.size();
 
+    // Reinit our volume FE objects
     vector_fe->reinit(elem);
     scalar_fe->reinit(elem);
 
     libmesh_assert_equal_to(vector_n_dofs, vector_phi.size());
     libmesh_assert_equal_to(scalar_n_dofs, scalar_phi.size());
 
-    // vector equation
+    // prepare our matrix/vector data structures for the vector equation
     A.setZero(vector_n_dofs, vector_n_dofs);
     B.setZero(vector_n_dofs, scalar_n_dofs);
     C.setZero(vector_n_dofs, lambda_n_dofs);
     G.setZero(vector_n_dofs);
-    // scalar equation
+    // and for the scalar equation
     Bt.setZero(scalar_n_dofs, vector_n_dofs);
     F.setZero(scalar_n_dofs);
-    // lm equation
+    // and for the LM equation
     Ct.setZero(lambda_n_dofs, vector_n_dofs);
     L.setZero(lambda_n_dofs, lambda_n_dofs);
 
     for (const auto qp : make_range(qrule.n_points()))
     {
+      // Vector equation dependence on vector dofs
       for (const auto i : make_range(vector_n_dofs))
         for (const auto j : make_range(vector_n_dofs))
           A(i, j) += JxW[qp] * (vector_phi[i][qp] * vector_phi[j][qp]);
 
+      // Vector equation dependence on scalar dofs
       for (const auto i : make_range(vector_n_dofs))
         for (const auto j : make_range(scalar_n_dofs))
           B(i, j) -= JxW[qp] * (div_vector_phi[i][qp] * scalar_phi[j][qp]);
 
+      // Scalar equation dependence on vector dofs
       for (const auto i : make_range(scalar_n_dofs))
         for (const auto j : make_range(vector_n_dofs))
           Bt(i, j) -= JxW[qp] * (scalar_phi[i][qp] * div_vector_phi[j][qp]);
@@ -461,6 +500,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
         else if (dim == 3)
           f = DivGradExactSolution().forcing(x, y, z);
 
+        // Scalar equation RHS
         for (const auto i : make_range(scalar_n_dofs))
           F(i) -= JxW[qp] * scalar_phi[i][qp] * f;
       }
@@ -469,9 +509,11 @@ fe_assembly(EquationSystems & es, const bool global_solve)
     {
       for (auto side : elem->side_index_range())
       {
+        // Reinit our face FE objects
         vector_fe_face->reinit(elem, side);
         libmesh_assert_equal_to(vector_n_dofs, vector_phi_face.size());
         lambda_fe_face->reinit(elem, side);
+
         if (elem->neighbor_ptr(side) == nullptr)
           for (const auto qp : make_range(qface.n_points()))
           {
@@ -486,6 +528,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
             else if (dim == 3)
               scalar_value = DivGradExactSolution().scalar(xf, yf, zf);
 
+            // External boundary -> Dirichlet faces -> Vector equaton RHS
             for (const auto i : make_range(vector_n_dofs))
               G(i) -= JxW_face[qp] * (vector_phi_face[i][qp] * normals[qp]) * scalar_value;
 
@@ -498,11 +541,13 @@ fe_assembly(EquationSystems & es, const bool global_solve)
         else
           for (const auto qp : make_range(qface.n_points()))
           {
+            // Vector equation dependence on LM dofs
             for (const auto i : make_range(vector_n_dofs))
               for (const auto j : make_range(lambda_n_dofs))
                 C(i, j) +=
                     JxW_face[qp] * (vector_phi_face[i][qp] * normals[qp]) * lambda_phi_face[j][qp];
 
+            // LM equation dependence on vector dofs
             for (const auto i : make_range(lambda_n_dofs))
               for (const auto j : make_range(vector_n_dofs))
                 Ct(i, j) +=
@@ -512,13 +557,19 @@ fe_assembly(EquationSystems & es, const bool global_solve)
     }
 
     Ainv = A.inverse();
+    // Compute the Schur complement inverse
     Sinv = (Bt * Ainv * B).inverse();
+    // These equations can be derived at by eliminating the u and p dofs from the system
+    // (A  B  C)(u)        (G)
+    // (Bt 0  0)(p)      = (F)
+    // (Ct 0  0)(lambda)   (0)
     E = Ct * Ainv * (A - B * Sinv * Bt) * Ainv * C;
     E = E + L;
     Hg = Ct * Ainv * (A - B * Sinv * Bt) * Ainv * G;
     Hf = Ct * Ainv * B * Sinv * F;
     H = Hg + Hf;
 
+    // Build our libMesh data structures from the Eigen ones
     E_libmesh.resize(E.rows(), E.cols());
     H_libmesh.resize(H.size());
     libmesh_assert((E.rows() == E.cols()) && (E.rows() == H.size()));
@@ -531,12 +582,20 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 
     if (global_solve)
     {
+      // We were performing our finite element assembly for the implicit solve step of our
+      // example. Add our local element vectors/matrices into the global system
       dof_map.constrain_element_matrix_and_vector(E_libmesh, H_libmesh, lambda_dof_indices);
       matrix.add_matrix(E_libmesh, lambda_dof_indices);
       lambda_system.rhs->add_vector(H_libmesh, lambda_dof_indices);
     }
     else
     {
+      //
+      // We are doing our finite element assembly for the second time. We now know the Lagrange
+      // multiplier solution. With that and the local element matrices and vectors we can compute
+      // the vector and scalar solutions
+      //
+
       Lambda.resize(lambda_n_dofs);
       lambda_system.current_local_solution->get(lambda_dof_indices, lambda_solution_std_vec);
       for (const auto i : make_range(lambda_n_dofs))
@@ -555,7 +614,10 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 #endif
 
       //
-      // Now solve for the enriched solution
+      // Now solve for the enriched scalar solution using our Lagrange multiplier solution and, for
+      // non-simplexes, the lower-order scalar solution. Note that the Lagrange multiplier
+      // represents the trace of p so it is a logical choice to leverage in this postprocessing
+      // stage!
       //
 
       dof_map.dof_indices(elem, enriched_scalar_dof_indices, system.variable_number("p_enriched"));
@@ -566,6 +628,8 @@ fe_assembly(EquationSystems & es, const bool global_solve)
       K_enriched_scalar.resize(m, n);
       F_enriched_scalar.resize(m);
       U_enriched_scalar.resize(n);
+
+      // L2 projection of the enriched scalar into the LM space
       for (const auto side : elem->side_index_range())
       {
         vector_fe_face->reinit(elem, side); // for JxW_face and qface_point
@@ -619,7 +683,9 @@ fe_assembly(EquationSystems & es, const bool global_solve)
       else
       {
         //
-        // We need another equation. We take the internal solution space
+        // For tensor product elements, the system of equations coming from the L2 projection into
+        // the Lagrange multiplier space is singular. To make the system nonsingular, we add an L2
+        // projection into the low-order scalar solution space.
         //
 
         enriched_scalar_fe->reinit(elem);
@@ -638,9 +704,11 @@ fe_assembly(EquationSystems & es, const bool global_solve)
           for (const auto j : make_range(n))
             K_enriched_scalar(n, j) += JxW[qp] * scalar_phi[0][qp] * enriched_scalar_phi[j][qp];
         }
+        // We have more rows than columns so an LU solve isn't an option
         K_enriched_scalar.svd_solve(F_enriched_scalar, U_enriched_scalar);
       }
 
+      // Our solution for the local enriched scalar dofs is complete. Insert into the global vector
       system.solution->insert(U_enriched_scalar, enriched_scalar_dof_indices);
     }
   }
@@ -653,11 +721,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   }
 }
 
-// We now define the matrix assembly function for the
-// div-grad system. We need to first compute element
-// matrices and right-hand sides, and then take into
-// account the boundary conditions, which will be handled
-// via a penalty method.
+// Call this assembly function when assembling the global implicit system
 void
 assemble_divgrad(EquationSystems & es, const std::string & libmesh_dbg_var(system_name))
 {
