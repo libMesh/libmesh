@@ -39,4 +39,9 @@ QuadratureType QJacobi::type() const
     libmesh_error_msg("Invalid Jacobi quadrature rule: alpha = " << _alpha << ", beta = " << _beta);
 }
 
+std::unique_ptr<QBase> QJacobi::clone() const
+{
+  return std::make_unique<QJacobi>(*this);
+}
+
 }

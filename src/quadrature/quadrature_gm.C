@@ -35,6 +35,11 @@ QuadratureType QGrundmann_Moller::type() const
 }
 
 
+std::unique_ptr<QBase> QGrundmann_Moller::clone() const
+{
+  return std::make_unique<QGrundmann_Moller>(*this);
+}
+
 
 void QGrundmann_Moller::init_1D(const ElemType, unsigned int)
 {

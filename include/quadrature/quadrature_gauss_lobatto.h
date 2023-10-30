@@ -63,6 +63,8 @@ public:
    */
   virtual QuadratureType type() const override;
 
+  virtual std::unique_ptr<QBase> clone() const override;
+
 private:
 
   virtual void init_1D (const ElemType, unsigned int) override;

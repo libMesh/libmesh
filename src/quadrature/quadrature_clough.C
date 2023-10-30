@@ -28,6 +28,11 @@ QuadratureType QClough::type() const
   return QCLOUGH;
 }
 
+std::unique_ptr<QBase> QClough::clone() const
+{
+  return std::make_unique<QClough>(*this);
+}
+
 // See the files:
 // quadrature_clough_1D.C
 // quadrature_clough_2D.C

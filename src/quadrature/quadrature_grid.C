@@ -28,6 +28,11 @@ QuadratureType QGrid::type() const
   return QGRID;
 }
 
+std::unique_ptr<QBase> QGrid::clone() const
+{
+  return std::make_unique<QGrid>(*this);
+}
+
 // See the files:
 // quadrature_grid_1D.C
 // quadrature_grid_2D.C

@@ -28,6 +28,11 @@ QuadratureType QSimpson::type() const
   return QSIMPSON;
 }
 
+std::unique_ptr<QBase> QSimpson::clone() const
+{
+  return std::make_unique<QSimpson>(*this);
+}
+
 // See the files:
 // quadrature_simpson_1D.C
 // quadrature_simpson_2D.C

@@ -35,6 +35,11 @@ QuadratureType QGauss::type() const
   return QGAUSS;
 }
 
+std::unique_ptr<QBase> QGauss::clone() const
+{
+  return std::make_unique<QGauss>(*this);
+}
+
 void QGauss::keast_rule(const Real rule_data[][4],
                         const unsigned int n_pts)
 {
