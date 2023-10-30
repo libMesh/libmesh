@@ -40,7 +40,7 @@
 // from an FEFamily of RAVIART_THOMAS to L2_RAVIART_THOMAS. Instead of being
 // enforced by the finite element space itself, continuity of the normal
 // component of the vector field is enforced through Lagrange multipliers that
-// live on the skeleton of the mesh. Let's introduce a subspace of L2, M_{-1}^k,
+// live on the sides of the elements. Let's introduce a subspace of L2, M_{-1}^k,
 // where the functions in M_{-1}^k are polynomials of degree of k or less. These
 // polynomials can live on our elements (I_h) or on our internal element faces
 // (E0_h); we will denote these polynomial subspaces respectively as M_{-1}^k (I_h)
@@ -51,11 +51,13 @@
 // RT_{-1}^k x M_{-1}^k (I_h) x M^{-1}^k (E0_h)
 // such that
 //
-// (u, tau) - (p, div(tau)) - <lambda, tau*n>_E0 = -<g, tau*n>_E for all tau in RT_{-1}^k (I_h)
-// -(v, div(u)) = (f, v) for all v in M_{-1}^k (I_h)
-// -<mu, u*n> = 0 for all mu in M_{-1}^k (E0_h)
+// (u, tau) - (p, div(tau)) + <lambda, tau*n>_E0 = -<g, tau*n>_E for all tau in RT_{-1}^k (I_h)
+// -(v, div(u)) = -(f, v) for all v in M_{-1}^k (I_h)
+// <mu, u*n> = 0 for all mu in M_{-1}^k (E0_h)
 //
-// with p = g on the boundary (Dirichlet problem)
+// with p = g on the boundary (Dirichlet problem). In the above, n denotes the
+// normal vector facing outward from the element for which we are doing local
+// assembly
 //
 // We can write this in a matrix form:
 // (A  B  C)(u)        (G)
