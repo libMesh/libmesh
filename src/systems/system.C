@@ -35,6 +35,7 @@
 #include "libmesh/utility.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_type.h"
+#include "libmesh/parallel_fe_type.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
 
@@ -752,6 +753,10 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
 {
   parallel_object_only();
 
+  libmesh_assert(this->comm().verify(std::string(vec_name)));
+  libmesh_assert(this->comm().verify(int(type)));
+  libmesh_assert(this->comm().verify(projections));
+
   // Return the vector if it is already there.
   auto it = this->_vectors.find(vec_name);
   if (it != this->_vectors.end())
@@ -981,6 +986,10 @@ SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
                                            const MatrixBuildType mat_build_type)
 {
   parallel_object_only();
+
+  libmesh_assert(this->comm().verify(std::string(mat_name)));
+  libmesh_assert(this->comm().verify(int(type)));
+  libmesh_assert(this->comm().verify(int(mat_build_type)));
 
   // Return the matrix if it is already there.
   auto it = this->_matrices.find(mat_name);
@@ -1298,6 +1307,13 @@ unsigned int System::add_variable (std::string_view var,
 {
   parallel_object_only();  // Not strictly needed, but the only safe way to keep in sync
 
+  libmesh_assert(this->comm().verify(std::string(var)));
+  libmesh_assert(this->comm().verify(type));
+  libmesh_assert(this->comm().verify((active_subdomains == nullptr)));
+
+  if (active_subdomains)
+    libmesh_assert(this->comm().verify(active_subdomains->size()));
+
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
   for (auto v : make_range(this->n_vars()))
@@ -1407,17 +1423,28 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
 
   libmesh_assert(!this->is_initialized());
 
+  libmesh_assert(this->comm().verify(vars.size()));
+  libmesh_assert(this->comm().verify(type));
+  libmesh_assert(this->comm().verify((active_subdomains == nullptr)));
+
+  if (active_subdomains)
+    libmesh_assert(this->comm().verify(active_subdomains->size()));
+
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
   for (auto ovar : vars)
-    for (auto v : make_range(this->n_vars()))
-      if (this->variable_name(v) == ovar)
-        {
-          if (this->variable_type(v) == type)
-            return _variables[v].number();
+    {
+      libmesh_assert(this->comm().verify(ovar));
 
-          libmesh_error_msg("ERROR: incompatible variable " << ovar << " has already been added for this system!");
-        }
+      for (auto v : make_range(this->n_vars()))
+        if (this->variable_name(v) == ovar)
+          {
+            if (this->variable_type(v) == type)
+              return _variables[v].number();
+
+            libmesh_error_msg("ERROR: incompatible variable " << ovar << " has already been added for this system!");
+          }
+    }
 
   if (this->n_variable_groups())
     {
