@@ -186,6 +186,8 @@ void System::clear ()
 
 void System::init ()
 {
+  parallel_object_only();
+
   // Calling init() twice on the same system currently works evil
   // magic, whether done directly or via EquationSystems::read()
   libmesh_assert(!this->is_initialized());
@@ -211,6 +213,8 @@ void System::init ()
 
 void System::init_data ()
 {
+  parallel_object_only();
+
   MeshBase & mesh = this->get_mesh();
 
   // Add all variable groups to our underlying DofMap
@@ -297,6 +301,8 @@ void System::init_data ()
 
 void System::reinit_mesh ()
 {
+  parallel_object_only();
+
   // First initialize any required data:
   // either only the basic System data
   if (_basic_system_only)
@@ -317,6 +323,8 @@ void System::reinit_mesh ()
 
 void System::init_matrices ()
 {
+  parallel_object_only();
+
   // No matrices to init
   if (_matrices.empty())
     {
@@ -367,6 +375,8 @@ void System::init_matrices ()
 
 void System::restrict_vectors ()
 {
+  parallel_object_only();
+
 #ifdef LIBMESH_ENABLE_AMR
   // Restrict the _vectors on the coarsened cells
   for (auto & [vec_name, vec] : _vectors)
@@ -433,6 +443,8 @@ void System::prolong_vectors ()
 
 void System::reinit ()
 {
+  parallel_object_only();
+
   // project_vector handles vector initialization now
   libmesh_assert_equal_to (solution->size(), current_local_solution->size());
 
@@ -465,6 +477,8 @@ void System::reinit ()
 
 void System::reinit_constraints()
 {
+  parallel_object_only();
+
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   get_dof_map().create_dof_constraints(_mesh, this->time);
   user_constrain();
@@ -476,6 +490,8 @@ void System::reinit_constraints()
 
 void System::update ()
 {
+  parallel_object_only();
+
   libmesh_assert(solution->closed());
 
   const std::vector<dof_id_type> & send_list = _dof_map->get_send_list ();
@@ -709,6 +725,8 @@ bool System::compare (const System & other_system,
 
 void System::update_global_solution (std::vector<Number> & global_soln) const
 {
+  parallel_object_only();
+
   global_soln.resize (solution->size());
 
   solution->localize (global_soln);
@@ -719,6 +737,8 @@ void System::update_global_solution (std::vector<Number> & global_soln) const
 void System::update_global_solution (std::vector<Number> & global_soln,
                                      const processor_id_type dest_proc) const
 {
+  parallel_object_only();
+
   global_soln.resize        (solution->size());
 
   solution->localize_to_one (global_soln, dest_proc);
@@ -730,6 +750,8 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
                                             const bool projections,
                                             const ParallelType type)
 {
+  parallel_object_only();
+
   // Return the vector if it is already there.
   auto it = this->_vectors.find(vec_name);
   if (it != this->_vectors.end())
@@ -817,6 +839,8 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
 
 void System::remove_vector (std::string_view vec_name)
 {
+  parallel_object_only();  // Not strictly needed, but the only safe way to keep in sync
+
   vectors_iterator pos = _vectors.find(vec_name);
 
   //Return if the vector does not exist
@@ -956,6 +980,8 @@ SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
                                            const ParallelType type,
                                            const MatrixBuildType mat_build_type)
 {
+  parallel_object_only();
+
   // Return the matrix if it is already there.
   auto it = this->_matrices.find(mat_name);
   if (it != this->_matrices.end())
@@ -995,6 +1021,8 @@ void System::late_matrix_init(SparseMatrix<Number> & mat,
 
 void System::remove_matrix (std::string_view mat_name)
 {
+  parallel_object_only();  // Not strictly needed, but the only safe way to keep in sync
+
   matrices_iterator pos = _matrices.find(mat_name);
 
   // Return if the matrix does not exist
@@ -1049,6 +1077,8 @@ SparseMatrix<Number> & System::get_matrix (std::string_view mat_name)
 void System::set_vector_preservation (const std::string & vec_name,
                                       bool preserve)
 {
+  parallel_object_only();  // Not strictly needed, but the only safe way to keep in sync
+
   _vector_projections[vec_name] = preserve;
 }
 
@@ -1067,6 +1097,8 @@ bool System::vector_preservation (std::string_view vec_name) const
 void System::set_vector_as_adjoint (const std::string & vec_name,
                                     int qoi_num)
 {
+  parallel_object_only();  // Not strictly needed, but the only safe way to keep in sync
+
   // We reserve -1 for vectors which get primal constraints, -2 for
   // vectors which get no constraints
   libmesh_assert_greater_equal(qoi_num, -2);
@@ -1264,6 +1296,8 @@ unsigned int System::add_variable (std::string_view var,
                                    const FEType & type,
                                    const std::set<subdomain_id_type> * const active_subdomains)
 {
+  parallel_object_only();  // Not strictly needed, but the only safe way to keep in sync
+
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
   for (auto v : make_range(this->n_vars()))
@@ -1369,6 +1403,8 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
                                     const FEType & type,
                                     const std::set<subdomain_id_type> * const active_subdomains)
 {
+  parallel_object_only();  // Not strictly needed, but the only safe way to keep in sync
+
   libmesh_assert(!this->is_initialized());
 
   // Make sure the variable isn't there already
