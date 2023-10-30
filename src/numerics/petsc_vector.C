@@ -375,6 +375,9 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T> & v_in)
 
   PetscErrorCode ierr = VecAXPY(_vec, a, v->vec());
   LIBMESH_CHKERR(ierr);
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 
@@ -415,6 +418,9 @@ void PetscVector<T>::scale (const T factor_in)
 
   PetscErrorCode ierr = VecScale(_vec, factor);
   LIBMESH_CHKERR(ierr);
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 }
@@ -458,6 +464,9 @@ void PetscVector<T>::abs()
 
   PetscErrorCode ierr = VecAbs(_vec);
   LIBMESH_CHKERR(ierr);
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 }
@@ -524,6 +533,9 @@ PetscVector<T>::operator = (const T s_in)
     {
       PetscErrorCode ierr = VecSet(_vec, s);
       LIBMESH_CHKERR(ierr);
+
+      libmesh_assert(this->comm().verify(int(this->type())));
+
       if (this->type() == GHOSTED)
         VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
     }
@@ -566,6 +578,9 @@ PetscVector<T>::operator = (const PetscVector<T> & v)
 
   ierr = VecCopy (v._vec, this->_vec);
   LIBMESH_CHKERR(ierr);
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 
@@ -669,6 +684,9 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in,
                                const std::vector<numeric_index_type> & send_list) const
 {
   parallel_object_only();
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+  libmesh_assert(this->comm().verify(int(v_local_in.type())));
 
   // FIXME: Workaround for a strange bug at large-scale.
   // If we have ghosting, PETSc lets us just copy the solution, and
@@ -1074,6 +1092,9 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T> & vec1,
   // Call PETSc function.
   PetscErrorCode ierr = VecPointwiseMult(_vec, vec1_petsc->vec(), vec2_petsc->vec());
   LIBMESH_CHKERR(ierr);
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 
@@ -1095,6 +1116,9 @@ void PetscVector<T>::pointwise_divide (const NumericVector<T> & vec1,
   // Call PETSc function.
   PetscErrorCode ierr = VecPointwiseDivide(_vec, vec1_petsc->vec(), vec2_petsc->vec());
   LIBMESH_CHKERR(ierr);
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 
