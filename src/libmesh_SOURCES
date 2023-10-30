@@ -275,7 +275,6 @@ libmesh_SOURCES =  \
         src/numerics/type_vector.C \
         src/numerics/wrapped_petsc.C \
         src/parallel/parallel_bin_sorter.C \
-        src/parallel/parallel_eigen.C \
         src/parallel/parallel_elem.C \
         src/parallel/parallel_ghost_sync.C \
         src/parallel/parallel_histogram.C \
