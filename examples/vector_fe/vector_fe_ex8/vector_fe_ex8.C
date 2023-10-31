@@ -15,7 +15,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 // <h1>Vector Finite Elements Example 8 - Single Face Hybridizable</h1>
 // \author Alexander Lindsay
 // \date 2023
@@ -220,7 +219,6 @@ main(int argc, char ** argv)
   const bool simplicial = (elem_str == "TRI6") || (elem_str == "TRI7") || (elem_str == "TET14");
   equation_systems.parameters.set<bool>("simplicial") = simplicial;
 
-
   // Declare the system  "DivGrad" and its variables.
   auto & system = equation_systems.add_system<System>("DivGrad");
 
@@ -229,15 +227,16 @@ main(int argc, char ** argv)
 
   // Adds the variable "u" and "p" to "DivGrad". "u" will be our vector field
   // whereas "p" will be the scalar field.
-  system.add_variable("u", FIRST, L2_RAVIART_THOMAS);
-  system.add_variable("p", CONSTANT, MONOMIAL);
-  // We also add a higher order version of our 'p' variable whose solution we
-  // will compute using the Lagrange multiplier field and, for non-simplexes,
-  // the low order 'p' solution
-  system.add_variable("p_enriched", FIRST, MONOMIAL);
+  system.add_variable("u", FIRST, L2_LAGRANGE_VEC);
+  system.add_variable("p", FIRST, L2_LAGRANGE);
+
+  // // We also add a higher order version of our 'p' variable whose solution we
+  // // will compute using the Lagrange multiplier field and, for non-simplexes,
+  // // the low order 'p' solution
+  // system.add_variable("p_enriched", FIRST, MONOMIAL);
 
   // Add our Lagrange multiplier to the implicit system
-  lm_system.add_variable("lambda", CONSTANT, SIDE_HIERARCHIC);
+  lm_system.add_variable("lambda", FIRST, SIDE_HIERARCHIC);
 
   // Give the system a pointer to the matrix assembly
   // function. This will be called when needed by the library.
@@ -291,22 +290,19 @@ main(int argc, char ** argv)
   // Compute the error.
   exact_sol.compute_error("DivGrad", "u");
   exact_sol.compute_error("DivGrad", "p");
-#if !defined(LIBMESH_HAVE_PETSC) || !defined(LIBMESH_USE_REAL_NUMBERS)
-  if (simplicial)
-#endif
-    exact_sol.compute_error("DivGrad", "p_enriched");
+  // #if !defined(LIBMESH_HAVE_PETSC) || !defined(LIBMESH_USE_REAL_NUMBERS)
+  //   if (simplicial)
+  // #endif
+  //     exact_sol.compute_error("DivGrad", "p_enriched");
 
   // Print out the error values.
   libMesh::out << "L2 error is: " << exact_sol.l2_error("DivGrad", "u") << std::endl;
-  libMesh::out << "HDiv semi-norm error is: " << exact_sol.error_norm("DivGrad", "u", HDIV_SEMINORM)
-               << std::endl;
-  libMesh::out << "HDiv error is: " << exact_sol.hdiv_error("DivGrad", "u") << std::endl;
   libMesh::out << "L2 error for p is: " << exact_sol.l2_error("DivGrad", "p") << std::endl;
-#if !defined(LIBMESH_HAVE_PETSC) || !defined(LIBMESH_USE_REAL_NUMBERS)
-  if (simplicial)
-#endif
-    libMesh::out << "L2 error p_enriched is: " << exact_sol.l2_error("DivGrad", "p_enriched")
-                 << std::endl;
+  // #if !defined(LIBMESH_HAVE_PETSC) || !defined(LIBMESH_USE_REAL_NUMBERS)
+  //   if (simplicial)
+  // #endif
+  //     libMesh::out << "L2 error p_enriched is: " << exact_sol.l2_error("DivGrad", "p_enriched")
+  //                  << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
@@ -327,8 +323,8 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 {
   const MeshBase & mesh = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
-  // Are our elements simplicial?
-  const bool simplicial = es.parameters.get<bool>("simplicial");
+  // // Are our elements simplicial?
+  // const bool simplicial = es.parameters.get<bool>("simplicial");
 
   // The div-grad, e.g. vector-scalar system
   auto & system = es.get_system<System>("DivGrad");
@@ -340,15 +336,15 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 
   const FEType vector_fe_type = dof_map.variable_type(system.variable_number("u"));
   const FEType scalar_fe_type = dof_map.variable_type(system.variable_number("p"));
-  const FEType enriched_scalar_fe_type =
-      dof_map.variable_type(system.variable_number("p_enriched"));
+  // const FEType enriched_scalar_fe_type =
+  //     dof_map.variable_type(system.variable_number("p_enriched"));
   const FEType lambda_fe_type =
       lambda_dof_map.variable_type(lambda_system.variable_number("lambda"));
 
   // Volumetric FE objects
   std::unique_ptr<FEVectorBase> vector_fe(FEVectorBase::build(dim, vector_fe_type));
   std::unique_ptr<FEBase> scalar_fe(FEBase::build(dim, scalar_fe_type));
-  std::unique_ptr<FEBase> enriched_scalar_fe(FEBase::build(dim, enriched_scalar_fe_type));
+  // std::unique_ptr<FEBase> enriched_scalar_fe(FEBase::build(dim, enriched_scalar_fe_type));
 
   // Volumetric quadrature rule
   QGauss qrule(dim, FIFTH);
@@ -356,11 +352,12 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   // Attach quadrature rules for the FE objects that we will reinit within the element "volume"
   vector_fe->attach_quadrature_rule(&qrule);
   scalar_fe->attach_quadrature_rule(&qrule);
-  enriched_scalar_fe->attach_quadrature_rule(&qrule);
+  // enriched_scalar_fe->attach_quadrature_rule(&qrule);
 
   // Declare finite element objects for boundary integration
   std::unique_ptr<FEVectorBase> vector_fe_face(FEVectorBase::build(dim, vector_fe_type));
-  std::unique_ptr<FEBase> enriched_scalar_fe_face(FEBase::build(dim, enriched_scalar_fe_type));
+  std::unique_ptr<FEBase> scalar_fe_face(FEBase::build(dim, scalar_fe_type));
+  // std::unique_ptr<FEBase> enriched_scalar_fe_face(FEBase::build(dim, enriched_scalar_fe_type));
   std::unique_ptr<FEBase> lambda_fe_face(FEBase::build(dim, lambda_fe_type));
 
   // Boundary integration requires one quadrature rule with dimensionality one
@@ -369,7 +366,8 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 
   // Attach quadrature rules for the FE objects that we will reinit on the element faces
   vector_fe_face->attach_quadrature_rule(&qface);
-  enriched_scalar_fe_face->attach_quadrature_rule(&qface);
+  scalar_fe_face->attach_quadrature_rule(&qface);
+  // enriched_scalar_fe_face->attach_quadrature_rule(&qface);
   lambda_fe_face->attach_quadrature_rule(&qface);
 
   // pre-request our required volumetric data
@@ -377,58 +375,52 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   const auto & q_point = vector_fe->get_xyz();
   const auto & vector_phi = vector_fe->get_phi();
   const auto & scalar_phi = scalar_fe->get_phi();
-  const auto & enriched_scalar_phi = enriched_scalar_fe->get_phi();
+  const auto & grad_scalar_phi = scalar_fe->get_dphi();
+  // const auto & enriched_scalar_phi = enriched_scalar_fe->get_phi();
   const auto & div_vector_phi = vector_fe->get_div_phi();
 
   // pre-request our required element face data
   const auto & vector_phi_face = vector_fe_face->get_phi();
-  const auto & enriched_scalar_phi_face = enriched_scalar_fe_face->get_phi();
+  const auto & scalar_phi_face = scalar_fe_face->get_phi();
+  // const auto & enriched_scalar_phi_face = enriched_scalar_fe_face->get_phi();
   const auto & lambda_phi_face = lambda_fe_face->get_phi();
   const auto & JxW_face = vector_fe_face->get_JxW();
   const auto & qface_point = vector_fe_face->get_xyz();
   const auto & normals = vector_fe_face->get_normals();
 
   //
-  // We follow the notation of Cockburn in "A Charactrization of Hybridized
-  // Mixed methods for Second Order Elliptic problems"for the element
-  // matrices/vectors. We will need "Eigen" versions of many of the
-  // matrices/vectors because the libMesh DenseMatrix doesn't have an inverse
-  // API
+  // We will need "Eigen" versions of many of the matrices/vectors because the
+  // libMesh DenseMatrix doesn't have an inverse API
   //
 
   // LM matrix and RHS after eliminating vector and scalar dofs
-  DenseMatrix<Number> E_libmesh;
-  DenseVector<Number> H_libmesh;
-  EigenMatrix E;
-  EigenMatrix H;
-  // Auxiliary matrices and RHS. A is vector-vector. B is vector-scalar. C is
-  // vector-LM. Sinv is the inverse of the Schur complement S which is given by
-  // S = Bt * A^{-1} * B. G is the RHS of the vector equation (e.g. the
-  // Dirichlet condition). F is the RHS of the scalar equation (resulting from
-  // the body force or MMS force in this case). Hg is the post-elimination
-  // version of G, and Hf is the post-elimination version of F
-  EigenMatrix A, Ainv, B, Bt, C, Ct, Sinv;
-  EigenVector G, F, Hg, Hf;
-  // element matrix for boundary LM dofs. We have to have this because our
-  // SIDE_HIERARCHIC variables live on *all* element faces, not just interior
-  // ones.
-  EigenMatrix L;
+  DenseMatrix<Number> K_libmesh;
+  DenseVector<Number> P_libmesh;
+  EigenMatrix K;
+  EigenVector P;
+  // (A  B  C)(q) = (G)
+  // (Bt D  E)(u) = (F)
+  // (Ct Et H)(l) = (0)
+  // Sinv is the inverse of a Schur complement S which is given by
+  // S = Bt * A^{-1} * B.
+  EigenMatrix A, Ainv, B, Bt, C, Ct, Sinv, D, E, Et, H;
+  EigenVector G, F;
 
   // Lambda eigen vector for constructing vector and scalar solutions
   EigenVector Lambda;
   // The lambda solution at the quadrature points
   std::vector<Number> lambda_qps;
-  /// The scalar solution at the quadrature points
+  // The scalar solution at the quadrature points
   std::vector<Number> scalar_qps;
 
-  /// Data structures for computing the enriched scalar solution
-  DenseMatrix<Number> K_enriched_scalar;
-  DenseVector<Number> F_enriched_scalar, U_enriched_scalar;
+  // // Data structures for computing the enriched scalar solution
+  // DenseMatrix<Number> K_enriched_scalar;
+  // DenseVector<Number> F_enriched_scalar, U_enriched_scalar;
 
   // Containers for dof indices
   std::vector<dof_id_type> vector_dof_indices;
   std::vector<dof_id_type> scalar_dof_indices;
-  std::vector<dof_id_type> enriched_scalar_dof_indices;
+  // std::vector<dof_id_type> enriched_scalar_dof_indices;
   std::vector<dof_id_type> lambda_dof_indices;
   std::vector<Number> lambda_solution_std_vec;
 
@@ -460,27 +452,30 @@ fe_assembly(EquationSystems & es, const bool global_solve)
     G.setZero(vector_n_dofs);
     // and for the scalar equation
     Bt.setZero(scalar_n_dofs, vector_n_dofs);
+    D.setZero(scalar_n_dofs, scalar_n_dofs);
+    E.setZero(scalar_n_dofs, lambda_n_dofs);
     F.setZero(scalar_n_dofs);
     // and for the LM equation
     Ct.setZero(lambda_n_dofs, vector_n_dofs);
-    L.setZero(lambda_n_dofs, lambda_n_dofs);
+    Et.setZero(lambda_n_dofs, scalar_n_dofs);
+    H.setZero(lambda_n_dofs, lambda_n_dofs);
 
     for (const auto qp : make_range(qrule.n_points()))
     {
       // Vector equation dependence on vector dofs
       for (const auto i : make_range(vector_n_dofs))
         for (const auto j : make_range(vector_n_dofs))
-          A(i, j) += JxW[qp] * (vector_phi[i][qp] * vector_phi[j][qp]);
+          A(i, j) -= JxW[qp] * (vector_phi[i][qp] * vector_phi[j][qp]);
 
       // Vector equation dependence on scalar dofs
       for (const auto i : make_range(vector_n_dofs))
         for (const auto j : make_range(scalar_n_dofs))
-          B(i, j) -= JxW[qp] * (div_vector_phi[i][qp] * scalar_phi[j][qp]);
+          B(i, j) += JxW[qp] * (div_vector_phi[i][qp] * scalar_phi[j][qp]);
 
       // Scalar equation dependence on vector dofs
       for (const auto i : make_range(scalar_n_dofs))
         for (const auto j : make_range(vector_n_dofs))
-          Bt(i, j) -= JxW[qp] * (scalar_phi[i][qp] * div_vector_phi[j][qp]);
+          Bt(i, j) += JxW[qp] * (grad_scalar_phi[i][qp] * vector_phi[j][qp]);
 
       // This is the end of the matrix summation loop
       // Now we build the element right-hand-side contribution.
@@ -506,87 +501,133 @@ fe_assembly(EquationSystems & es, const bool global_solve)
       }
     }
 
+    bool tau_found = false;
+    for (auto side : elem->side_index_range())
     {
-      for (auto side : elem->side_index_range())
+      // Reinit our face FE objects
+      vector_fe_face->reinit(elem, side);
+      scalar_fe_face->reinit(elem, side);
+      lambda_fe_face->reinit(elem, side);
+
+      if (elem->neighbor_ptr(side) == nullptr)
+        for (const auto qp : make_range(qface.n_points()))
+        {
+          const Real xf = qface_point[qp](0);
+          const Real yf = qface_point[qp](1);
+          const Real zf = qface_point[qp](2);
+
+          // The boundary value for scalar field.
+          Real scalar_value = 0;
+          if (dim == 2)
+            scalar_value = DivGradExactSolution().scalar(xf, yf);
+          else if (dim == 3)
+            scalar_value = DivGradExactSolution().scalar(xf, yf, zf);
+
+          // External boundary -> Dirichlet faces -> Vector equation RHS
+          for (const auto i : make_range(vector_n_dofs))
+            G(i) += JxW_face[qp] * (vector_phi_face[i][qp] * normals[qp]) * scalar_value;
+
+          // Now do the external boundary term for <\hat{q} \cdot \vec{n}, \omega> ->
+          // <q + \tau (u - g), \omega> ->
+          // <q, \omega> + <\tau u, \omega> - <\tau g, \omega>
+          // BUT u = g on the boundary so we can drop those terms and just end up with
+          // <q, \omega>
+          for (const auto i : make_range(scalar_n_dofs))
+            for (const auto j : make_range(vector_n_dofs))
+              Bt(i, j) -=
+                  JxW_face[qp] * scalar_phi_face[i][qp] * (vector_phi_face[j][qp] * normals[qp]);
+
+          // Need to do something with the external boundary LM dofs to prevent
+          // the matrix from being singular. Use a minus sign because the
+          // formulation by Cockburn results in negative diagonals for the LM
+          for (const auto i : make_range(lambda_n_dofs))
+            for (const auto j : make_range(lambda_n_dofs))
+              H(i, j) += JxW_face[qp] * lambda_phi_face[i][qp] * lambda_phi_face[j][qp];
+        }
+      else
       {
-        // Reinit our face FE objects
-        vector_fe_face->reinit(elem, side);
-        libmesh_assert_equal_to(vector_n_dofs, vector_phi_face.size());
-        lambda_fe_face->reinit(elem, side);
+        // Stabilization parameter. In the single face discretization, only a single face has a
+        // non-zero value of tau
+        const Real tau = tau_found ? 0 : 1 / elem->hmin();
+        tau_found = true;
 
-        if (elem->neighbor_ptr(side) == nullptr)
-          for (const auto qp : make_range(qface.n_points()))
+        for (const auto qp : make_range(qface.n_points()))
+        {
+          const auto normal = normals[qp];
+          const auto normal_sq = normal * normal;
+
+          // Vector equation dependence on LM dofs
+          for (const auto i : make_range(vector_n_dofs))
+            for (const auto j : make_range(lambda_n_dofs))
+              C(i, j) -=
+                  JxW_face[qp] * (vector_phi_face[i][qp] * normals[qp]) * lambda_phi_face[j][qp];
+
+          // Now do the internal boundary term for <\hat{q} \cdot \vec{n}, \omega> ->
+          // <q + \tau (u - \lambda), \omega> ->
+          // <q, \omega> + <\tau u, \omega> - <\tau \lambda, \omega>
+          for (const auto i : make_range(scalar_n_dofs))
           {
-            const Real xf = qface_point[qp](0);
-            const Real yf = qface_point[qp](1);
-            const Real zf = qface_point[qp](2);
+            for (const auto j : make_range(vector_n_dofs))
+              Bt(i, j) -= JxW_face[qp] * scalar_phi_face[i][qp] * (vector_phi_face[j][qp] * normal);
 
-            // The boundary value for scalar field.
-            Real scalar_value = 0;
-            if (dim == 2)
-              scalar_value = DivGradExactSolution().scalar(xf, yf);
-            else if (dim == 3)
-              scalar_value = DivGradExactSolution().scalar(xf, yf, zf);
+            for (const auto j : make_range(scalar_n_dofs))
+              D(i, j) -=
+                  JxW_face[qp] * scalar_phi_face[i][qp] * tau * scalar_phi_face[j][qp] * normal_sq;
 
-            // External boundary -> Dirichlet faces -> Vector equaton RHS
-            for (const auto i : make_range(vector_n_dofs))
-              G(i) -= JxW_face[qp] * (vector_phi_face[i][qp] * normals[qp]) * scalar_value;
-
-            // Need to do something with the external boundary LM dofs to prevent the matrix from
-            // being singular
-            for (const auto i : make_range(lambda_n_dofs))
-              for (const auto j : make_range(lambda_n_dofs))
-                L(i, j) += JxW_face[qp] * lambda_phi_face[i][qp] * lambda_phi_face[j][qp];
+            for (const auto j : make_range(lambda_n_dofs))
+              E(i, j) +=
+                  JxW_face[qp] * scalar_phi_face[i][qp] * tau * lambda_phi_face[j][qp] * normal_sq;
           }
-        else
-          for (const auto qp : make_range(qface.n_points()))
+
+          // Now do the internal boundary term for <\hat{q} \cdot \vec{n}, \mu> ->
+          // <q + \tau (u - \lambda), \mu> ->
+          // <q, \mu> + <\tau u, \mu> - <\tau \lambda, \mu>
+          for (const auto i : make_range(lambda_n_dofs))
           {
-            // Vector equation dependence on LM dofs
-            for (const auto i : make_range(vector_n_dofs))
-              for (const auto j : make_range(lambda_n_dofs))
-                C(i, j) +=
-                    JxW_face[qp] * (vector_phi_face[i][qp] * normals[qp]) * lambda_phi_face[j][qp];
+            for (const auto j : make_range(vector_n_dofs))
+              Ct(i, j) -= JxW_face[qp] * lambda_phi_face[i][qp] * (vector_phi_face[j][qp] * normal);
 
-            // LM equation dependence on vector dofs
-            for (const auto i : make_range(lambda_n_dofs))
-              for (const auto j : make_range(vector_n_dofs))
-                Ct(i, j) +=
-                    JxW_face[qp] * lambda_phi_face[i][qp] * (vector_phi_face[j][qp] * normals[qp]);
+            for (const auto j : make_range(scalar_n_dofs))
+              Et(i, j) -=
+                  JxW_face[qp] * lambda_phi_face[i][qp] * tau * scalar_phi_face[j][qp] * normal_sq;
+
+            for (const auto j : make_range(lambda_n_dofs))
+              H(i, j) +=
+                  JxW_face[qp] * lambda_phi_face[i][qp] * tau * lambda_phi_face[j][qp] * normal_sq;
           }
+        }
       }
     }
 
     Ainv = A.inverse();
     // Compute the Schur complement inverse
-    Sinv = (Bt * Ainv * B).inverse();
-    // These equations can be derived at by eliminating the u and p dofs from the system
-    // (A  B  C)(u)        (G)
-    // (Bt 0  0)(p)      = (F)
-    // (Ct 0  0)(lambda)   (0)
-    E = Ct * Ainv * (A - B * Sinv * Bt) * Ainv * C;
-    E = E + L;
-    Hg = Ct * Ainv * (A - B * Sinv * Bt) * Ainv * G;
-    Hf = Ct * Ainv * B * Sinv * F;
-    H = Hg + Hf;
+    Sinv = (D - Bt * Ainv * B).inverse();
+    const auto BtAinvCMinusE = Bt * Ainv * C - E;
+    const auto BtAinvGMinusF = Bt * Ainv * G - F;
+    const auto CtAinv = Ct * Ainv;
+    const auto BSinv = B * Sinv;
+    const auto EtSinv = Et * Sinv;
+    K = -CtAinv * (BSinv * BtAinvCMinusE + C) + EtSinv * BtAinvCMinusE + H;
+    P = -CtAinv * (BSinv * BtAinvGMinusF + G) + EtSinv * BtAinvGMinusF;
 
     // Build our libMesh data structures from the Eigen ones
-    E_libmesh.resize(E.rows(), E.cols());
-    H_libmesh.resize(H.size());
-    libmesh_assert((E.rows() == E.cols()) && (E.rows() == H.size()));
-    for (const auto i : make_range(E.rows()))
+    K_libmesh.resize(K.rows(), K.cols());
+    P_libmesh.resize(P.size());
+    libmesh_assert((K.rows() == K.cols()) && (K.rows() == P.size()));
+    for (const auto i : make_range(K.rows()))
     {
-      H_libmesh(i) = H(i);
-      for (const auto j : make_range(E.cols()))
-        E_libmesh(i, j) = E(i, j);
+      P_libmesh(i) = P(i);
+      for (const auto j : make_range(K.cols()))
+        K_libmesh(i, j) = K(i, j);
     }
 
     if (global_solve)
     {
       // We were performing our finite element assembly for the implicit solve step of our
       // example. Add our local element vectors/matrices into the global system
-      dof_map.constrain_element_matrix_and_vector(E_libmesh, H_libmesh, lambda_dof_indices);
-      matrix.add_matrix(E_libmesh, lambda_dof_indices);
-      lambda_system.rhs->add_vector(H_libmesh, lambda_dof_indices);
+      dof_map.constrain_element_matrix_and_vector(K_libmesh, P_libmesh, lambda_dof_indices);
+      matrix.add_matrix(K_libmesh, lambda_dof_indices);
+      lambda_system.rhs->add_vector(P_libmesh, lambda_dof_indices);
     }
     else
     {
@@ -600,116 +641,119 @@ fe_assembly(EquationSystems & es, const bool global_solve)
       lambda_system.current_local_solution->get(lambda_dof_indices, lambda_solution_std_vec);
       for (const auto i : make_range(lambda_n_dofs))
         Lambda(i) = lambda_solution_std_vec[i];
-      const auto scalar_soln = Sinv * Bt * Ainv * G - Sinv * F - Sinv * Bt * Ainv * C * Lambda;
+      const auto scalar_soln = Sinv * (BtAinvCMinusE * Lambda - BtAinvGMinusF);
       const auto vector_soln = Ainv * (G - B * scalar_soln - C * Lambda);
       for (const auto i : make_range(vector_n_dofs))
         system.solution->set(vector_dof_indices[i], vector_soln(i));
       for (const auto i : make_range(scalar_n_dofs))
         system.solution->set(scalar_dof_indices[i], scalar_soln(i));
 
-#if !defined(LIBMESH_HAVE_PETSC) || !defined(LIBMESH_USE_REAL_NUMBERS)
-      if (!simplicial)
-        // We don't support SVD solves in this configuration
-        continue;
-#endif
+      // #if !defined(LIBMESH_HAVE_PETSC) || !defined(LIBMESH_USE_REAL_NUMBERS)
+      //       if (!simplicial)
+      //         // We don't support SVD solves in this configuration
+      //         continue;
+      // #endif
 
-      //
-      // Now solve for the enriched scalar solution using our Lagrange multiplier solution and, for
-      // non-simplexes, the lower-order scalar solution. Note that the Lagrange multiplier
-      // represents the trace of p so it is a logical choice to leverage in this postprocessing
-      // stage!
-      //
+      //       //
+      //       // Now solve for the enriched scalar solution using our Lagrange multiplier solution and, for
+      //       // non-simplexes, the lower-order scalar solution. Note that the Lagrange multiplier
+      //       // represents the trace of p so it is a logical choice to leverage in this postprocessing
+      //       // stage!
+      //       //
 
-      dof_map.dof_indices(elem, enriched_scalar_dof_indices, system.variable_number("p_enriched"));
-      const auto enriched_scalar_n_dofs = enriched_scalar_dof_indices.size();
-      const auto m = simplicial ? lambda_n_dofs : lambda_n_dofs + 1;
-      const auto n = enriched_scalar_n_dofs;
+      //       dof_map.dof_indices(elem, enriched_scalar_dof_indices,
+      //       system.variable_number("p_enriched")); const auto enriched_scalar_n_dofs =
+      //       enriched_scalar_dof_indices.size(); const auto m = simplicial ? lambda_n_dofs :
+      //       lambda_n_dofs + 1; const auto n = enriched_scalar_n_dofs;
 
-      K_enriched_scalar.resize(m, n);
-      F_enriched_scalar.resize(m);
-      U_enriched_scalar.resize(n);
+      //       K_enriched_scalar.resize(m, n);
+      //       F_enriched_scalar.resize(m);
+      //       U_enriched_scalar.resize(n);
 
-      // L2 projection of the enriched scalar into the LM space
-      for (const auto side : elem->side_index_range())
-      {
-        vector_fe_face->reinit(elem, side); // for JxW_face and qface_point
-        enriched_scalar_fe_face->reinit(elem, side);
-        lambda_fe_face->reinit(elem, side);
-        if (elem->neighbor_ptr(side) == nullptr)
-          for (const auto qp : make_range(qface.n_points()))
-          {
-            const Real xf = qface_point[qp](0);
-            const Real yf = qface_point[qp](1);
-            const Real zf = qface_point[qp](2);
+      //       // L2 projection of the enriched scalar into the LM space
+      //       for (const auto side : elem->side_index_range())
+      //       {
+      //         vector_fe_face->reinit(elem, side); // for JxW_face and qface_point
+      //         enriched_scalar_fe_face->reinit(elem, side);
+      //         lambda_fe_face->reinit(elem, side);
+      //         if (elem->neighbor_ptr(side) == nullptr)
+      //           for (const auto qp : make_range(qface.n_points()))
+      //           {
+      //             const Real xf = qface_point[qp](0);
+      //             const Real yf = qface_point[qp](1);
+      //             const Real zf = qface_point[qp](2);
 
-            // The boundary value for scalar field.
-            Real scalar_value = 0;
-            if (dim == 2)
-              scalar_value = DivGradExactSolution().scalar(xf, yf);
-            else if (dim == 3)
-              scalar_value = DivGradExactSolution().scalar(xf, yf, zf);
+      //             // The boundary value for scalar field.
+      //             Real scalar_value = 0;
+      //             if (dim == 2)
+      //               scalar_value = DivGradExactSolution().scalar(xf, yf);
+      //             else if (dim == 3)
+      //               scalar_value = DivGradExactSolution().scalar(xf, yf, zf);
 
-            for (const auto i : make_range(lambda_n_dofs))
-            {
-              F_enriched_scalar(i) += JxW_face[qp] * lambda_phi_face[i][qp] * scalar_value;
-              for (const auto j : make_range(enriched_scalar_n_dofs))
-                K_enriched_scalar(i, j) +=
-                    JxW_face[qp] * lambda_phi_face[i][qp] * enriched_scalar_phi_face[j][qp];
-            }
-          }
-        else
-        {
-          // compute local face lambda solution
-          lambda_qps.resize(qface.n_points());
-          for (auto & lambda_qp : lambda_qps)
-            lambda_qp = 0;
-          for (const auto qp : make_range(qface.n_points()))
-            for (const auto i : index_range(lambda_solution_std_vec))
-              lambda_qps[qp] += lambda_solution_std_vec[i] * lambda_phi_face[i][qp];
+      //             for (const auto i : make_range(lambda_n_dofs))
+      //             {
+      //               F_enriched_scalar(i) += JxW_face[qp] * lambda_phi_face[i][qp] * scalar_value;
+      //               for (const auto j : make_range(enriched_scalar_n_dofs))
+      //                 K_enriched_scalar(i, j) +=
+      //                     JxW_face[qp] * lambda_phi_face[i][qp] *
+      //                     enriched_scalar_phi_face[j][qp];
+      //             }
+      //           }
+      //         else
+      //         {
+      //           // compute local face lambda solution
+      //           lambda_qps.resize(qface.n_points());
+      //           for (auto & lambda_qp : lambda_qps)
+      //             lambda_qp = 0;
+      //           for (const auto qp : make_range(qface.n_points()))
+      //             for (const auto i : index_range(lambda_solution_std_vec))
+      //               lambda_qps[qp] += lambda_solution_std_vec[i] * lambda_phi_face[i][qp];
 
-          for (const auto qp : make_range(qface.n_points()))
-            for (const auto i : make_range(lambda_n_dofs))
-            {
-              F_enriched_scalar(i) += JxW_face[qp] * lambda_phi_face[i][qp] * lambda_qps[qp];
-              for (const auto j : make_range(enriched_scalar_n_dofs))
-                K_enriched_scalar(i, j) +=
-                    JxW_face[qp] * lambda_phi_face[i][qp] * enriched_scalar_phi_face[j][qp];
-            }
-        }
-      }
+      //           for (const auto qp : make_range(qface.n_points()))
+      //             for (const auto i : make_range(lambda_n_dofs))
+      //             {
+      //               F_enriched_scalar(i) += JxW_face[qp] * lambda_phi_face[i][qp] *
+      //               lambda_qps[qp]; for (const auto j : make_range(enriched_scalar_n_dofs))
+      //                 K_enriched_scalar(i, j) +=
+      //                     JxW_face[qp] * lambda_phi_face[i][qp] *
+      //                     enriched_scalar_phi_face[j][qp];
+      //             }
+      //         }
+      //       }
 
-      if (simplicial)
-        K_enriched_scalar.lu_solve(F_enriched_scalar, U_enriched_scalar);
-      else
-      {
-        //
-        // For tensor product elements, the system of equations coming from the L2 projection into
-        // the Lagrange multiplier space is singular. To make the system nonsingular, we add an L2
-        // projection into the low-order scalar solution space.
-        //
+      //       if (simplicial)
+      //         K_enriched_scalar.lu_solve(F_enriched_scalar, U_enriched_scalar);
+      //       else
+      //       {
+      //         //
+      //         // For tensor product elements, the system of equations coming from the L2 projection into
+      //         // the Lagrange multiplier space is singular. To make the system nonsingular, we add an L2
+      //         // projection into the low-order scalar solution space.
+      //         //
 
-        enriched_scalar_fe->reinit(elem);
-        libmesh_assert(scalar_n_dofs == 1);
-        libmesh_assert(scalar_soln.size() == 1);
-        libmesh_assert(scalar_phi.size() == 1);
+      //         enriched_scalar_fe->reinit(elem);
+      //         libmesh_assert(scalar_n_dofs == 1);
+      //         libmesh_assert(scalar_soln.size() == 1);
+      //         libmesh_assert(scalar_phi.size() == 1);
 
-        scalar_qps.resize(qrule.n_points());
-        for (auto & scalar_qp : scalar_qps)
-          scalar_qp = 0;
-        for (const auto qp : make_range(qrule.n_points()))
-          scalar_qps[qp] += scalar_soln(0) * scalar_phi[0][qp];
-        for (const auto qp : make_range(qrule.n_points()))
-        {
-          F_enriched_scalar(n) += JxW[qp] * scalar_phi[0][qp] * scalar_qps[qp];
-          for (const auto j : make_range(n))
-            K_enriched_scalar(n, j) += JxW[qp] * scalar_phi[0][qp] * enriched_scalar_phi[j][qp];
-        }
-        // We have more rows than columns so an LU solve isn't an option
-        K_enriched_scalar.svd_solve(F_enriched_scalar, U_enriched_scalar);
-      }
+      //         scalar_qps.resize(qrule.n_points());
+      //         for (auto & scalar_qp : scalar_qps)
+      //           scalar_qp = 0;
+      //         for (const auto qp : make_range(qrule.n_points()))
+      //           scalar_qps[qp] += scalar_soln(0) * scalar_phi[0][qp];
+      //         for (const auto qp : make_range(qrule.n_points()))
+      //         {
+      //           F_enriched_scalar(n) += JxW[qp] * scalar_phi[0][qp] * scalar_qps[qp];
+      //           for (const auto j : make_range(n))
+      //             K_enriched_scalar(n, j) += JxW[qp] * scalar_phi[0][qp] *
+      //             enriched_scalar_phi[j][qp];
+      //         }
+      //         // We have more rows than columns so an LU solve isn't an option
+      //         K_enriched_scalar.svd_solve(F_enriched_scalar, U_enriched_scalar);
+      //       }
 
-      // Our solution for the local enriched scalar dofs is complete. Insert into the global vector
-      system.solution->insert(U_enriched_scalar, enriched_scalar_dof_indices);
+      //       // Our solution for the local enriched scalar dofs is complete. Insert into the global vector
+      //       system.solution->insert(U_enriched_scalar, enriched_scalar_dof_indices);
     }
   }
 
