@@ -291,7 +291,7 @@ main(int argc, char ** argv)
   // Compute the error.
   exact_sol.compute_error("DivGrad", "u");
   exact_sol.compute_error("DivGrad", "p");
-#if !defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_USE_REAL_NUMBERS)
+#if !defined(LIBMESH_HAVE_PETSC) || !defined(LIBMESH_USE_REAL_NUMBERS)
   if (simplicial)
 #endif
     exact_sol.compute_error("DivGrad", "p_enriched");
@@ -302,7 +302,7 @@ main(int argc, char ** argv)
                << std::endl;
   libMesh::out << "HDiv error is: " << exact_sol.hdiv_error("DivGrad", "u") << std::endl;
   libMesh::out << "L2 error for p is: " << exact_sol.l2_error("DivGrad", "p") << std::endl;
-#if !defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_USE_REAL_NUMBERS)
+#if !defined(LIBMESH_HAVE_PETSC) || !defined(LIBMESH_USE_REAL_NUMBERS)
   if (simplicial)
 #endif
     libMesh::out << "L2 error p_enriched is: " << exact_sol.l2_error("DivGrad", "p_enriched")
@@ -607,7 +607,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
       for (const auto i : make_range(scalar_n_dofs))
         system.solution->set(scalar_dof_indices[i], scalar_soln(i));
 
-#if !defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_USE_REAL_NUMBERS)
+#if !defined(LIBMESH_HAVE_PETSC) || !defined(LIBMESH_USE_REAL_NUMBERS)
       if (!simplicial)
         // We don't support SVD solves in this configuration
         continue;
