@@ -285,6 +285,7 @@ BUILT_SOURCES = \
         parallel_bin_sorter.h \
         parallel_conversion_utils.h \
         parallel_elem.h \
+        parallel_fe_type.h \
         parallel_ghost_sync.h \
         parallel_hilbert.h \
         parallel_histogram.h \
@@ -1425,6 +1426,9 @@ parallel_conversion_utils.h: $(top_srcdir)/include/parallel/parallel_conversion_
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_elem.h: $(top_srcdir)/include/parallel/parallel_elem.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parallel_fe_type.h: $(top_srcdir)/include/parallel/parallel_fe_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_ghost_sync.h: $(top_srcdir)/include/parallel/parallel_ghost_sync.h
