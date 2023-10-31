@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="libMesh development team">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="https://mooseframework.inl.gov/docs/doxygen/libmesh/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="https://mooseframework.inl.gov/docs/doxygen/libmesh/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<br> <h1> Link to the source code for this example: </h1>
+<a href="https://github.com/libMesh/libmesh/tree/master/examples/vector_fe/vector_fe_ex7" target="_blank">Open vector_fe_ex7 in new tab.</a>
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+  CXX      example_dbg-vector_fe_ex7.o
+  CXXLD    example-dbg
+  CXX      example_devel-vector_fe_ex7.o
+  CXXLD    example-devel
+  CXX      example_oprof-vector_fe_ex7.o
+  CXXLD    example-oprof
+***************************************************************
+* Running Example vector_fe_ex7:
+*   ./example-opt dim=2 element_type=TRI6 
+***************************************************************
+ 
+L2 error is: 0.134279
+HDiv semi-norm error is: 0.344042
+HDiv error is: 0.369318
+L2 error for p is: 0.0697397
+L2 error p_enriched is: 0.00516164
+ 
+***************************************************************
+* Done Running Example vector_fe_ex7:
+*   ./example-opt dim=2 element_type=TRI6 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex7:
+*   ./example-opt dim=2 element_type=TRI7 
+***************************************************************
+ 
+L2 error is: 0.134279
+HDiv semi-norm error is: 0.344042
+HDiv error is: 0.369318
+L2 error for p is: 0.0697397
+L2 error p_enriched is: 0.00516164
+ 
+***************************************************************
+* Done Running Example vector_fe_ex7:
+*   ./example-opt dim=2 element_type=TRI7 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex7:
+*   ./example-opt dim=2 element_type=QUAD8 
+***************************************************************
+ 
+L2 error is: 0.134333
+HDiv semi-norm error is: 0.421249
+HDiv error is: 0.442149
+L2 error for p is: 0.0853821
+L2 error p_enriched is: 0.00635743
+ 
+***************************************************************
+* Done Running Example vector_fe_ex7:
+*   ./example-opt dim=2 element_type=QUAD8 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex7:
+*   ./example-opt dim=2 element_type=QUAD9 
+***************************************************************
+ 
+L2 error is: 0.134333
+HDiv semi-norm error is: 0.421249
+HDiv error is: 0.442149
+L2 error for p is: 0.0853821
+L2 error p_enriched is: 0.00635743
+ 
+***************************************************************
+* Done Running Example vector_fe_ex7:
+*   ./example-opt dim=2 element_type=QUAD9 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex7:
+*   ./example-opt dim=3 element_type=TET14 grid_size=4 
+***************************************************************
+ 
+L2 error is: 0.500135
+HDiv semi-norm error is: 1.24927
+HDiv error is: 1.34566
+L2 error for p is: 0.168995
+L2 error p_enriched is: 0.0390603
+ 
+***************************************************************
+* Done Running Example vector_fe_ex7:
+*   ./example-opt dim=3 element_type=TET14 grid_size=4 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex7:
+*   ./example-opt dim=3 element_type=HEX27 grid_size=4 
+***************************************************************
+ 
+L2 error is: 0.858294
+HDiv semi-norm error is: 2.80499
+HDiv error is: 2.93337
+L2 error for p is: 0.379979
+L2 error p_enriched is: 0.112876
+ 
+***************************************************************
+* Done Running Example vector_fe_ex7:
+*   ./example-opt dim=3 element_type=HEX27 grid_size=4 
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>
