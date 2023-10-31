@@ -454,8 +454,8 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
     const std::string jitdir = ".jitcache";
     if (cached)
     {
-      // generate a hash of the Value type size, byte code, immediate list, and registered derivatives
-      auto h = JITCodeHash();
+      // generate a hash of the size, byte code, immediate list, and registered derivatives (derivative form is type independent)
+      auto h = JITCodeHash(0);
       libMesh::boostcopy::hash_combine(h, sizeof(Value_t));
       for (auto i : this->mData->mImmed)
         libMesh::boostcopy::hash_combine(h, i);
@@ -609,18 +609,18 @@ int ADImplementation<Value_t>::AutoDiff(unsigned int _var, typename FunctionPars
   return -1;
 }
 
-template<typename Value_t>
-std::size_t FunctionParserADBase<Value_t>::JITCodeHash(const std::string & Value_t_name)
+template <typename Value_t>
+std::size_t FunctionParserADBase<Value_t>::JITCodeHash(const std::size_t type_hash)
 {
   // start with a version tag in case the JIT function signature changes
   std::size_t h = std::hash<std::string>{}("v3");
-  for (auto b :this->mData->mByteCode)
+  for (auto b : this->mData->mByteCode)
     libMesh::boostcopy::hash_combine(h, b);
-  libMesh::boostcopy::hash_combine(h, Value_t_name);
+  libMesh::boostcopy::hash_combine(h, type_hash);
   return h;
 }
 
-template<typename Value_t>
+template <typename Value_t>
 void FunctionParserADBase<Value_t>::Optimize()
 {
   FunctionParserBase<Value_t>::Optimize();
@@ -628,7 +628,7 @@ void FunctionParserADBase<Value_t>::Optimize()
     JITCompile();
 }
 
-template<typename Value_t>
+template <typename Value_t>
 bool FunctionParserADBase<Value_t>::JITCompile()
 {
   // JIT compile attempted for an unsupported value type
@@ -637,8 +637,8 @@ bool FunctionParserADBase<Value_t>::JITCompile()
 
 #if LIBMESH_HAVE_FPARSER_JIT
 
-template<typename Value_t>
-Value_t FunctionParserADBase<Value_t>::Eval(const Value_t* Vars)
+template <typename Value_t>
+Value_t FunctionParserADBase<Value_t>::Eval(const Value_t *Vars)
 {
   if (compiledFunction == NULL)
     return FunctionParserBase<Value_t>::Eval(Vars);
@@ -652,17 +652,27 @@ Value_t FunctionParserADBase<Value_t>::Eval(const Value_t* Vars)
 }
 
 // JIT compile for supported types
-template<>
+template <>
 bool FunctionParserADBase<double>::JITCompile() { return JITCompileHelper("double"); }
-template<>
+template <>
 bool FunctionParserADBase<float>::JITCompile() { return JITCompileHelper("float"); }
-template<>
+template <>
 bool FunctionParserADBase<long double>::JITCompile() { return JITCompileHelper("long double"); }
 
-template<typename Value_t>
-bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t_name,
-                                                     const std::string & extra_options,
-                                                     const std::string & extra_headers)
+template <typename Value_t>
+bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string &Value_t_name,
+                                                     const std::string &extra_options,
+                                                     const std::string &extra_headers)
+{
+  // if no type hash was provided use the value type name to generate it
+  return JITCompileHelper(Value_t_name, extra_options, extra_headers, std::hash<std::string>{}(Value_t_name));
+}
+
+template <typename Value_t>
+bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string &Value_t_name,
+                                                     const std::string &extra_options,
+                                                     const std::string &extra_headers,
+                                                     std::size_t type_hash)
 {
   // set compiled function pointer to zero to avoid stale values if JIT compilation fails
   compiledFunction = NULL;
@@ -675,7 +685,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
     return false;
 
   // compute hash of the function
-  std::string hash = FParserJIT::hashToString(JITCodeHash(Value_t_name));
+  std::string hash = FParserJIT::hashToString(JITCodeHash(type_hash));
 #ifndef NDEBUG
   hash += "_dbg";
 #endif

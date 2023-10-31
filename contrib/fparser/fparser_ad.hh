@@ -137,16 +137,22 @@ public:
 protected:
 
   /// return a SHA1 hash for the current bytecode and value type name
-  std::size_t JITCodeHash(const std::string & value_type_name = "");
+  std::size_t JITCodeHash(const std::size_t type_hash);
 
 #if LIBMESH_HAVE_FPARSER_JIT
   /// write generated C++ code to stream
   bool JITCodeGen(std::ostream & ccout, const std::string & fname, const std::string & Value_t_name);
 
   /// helper function to perform the JIT compilation (needs the Value_t typename as a string)
-  bool JITCompileHelper(const std::string & Value_t_name,
-                        const std::string & extra_options = "",
-                        const std::string & extra_headers = "");
+  bool JITCompileHelper(const std::string &Value_t_name,
+                        const std::string &extra_options = "",
+                        const std::string &extra_headers = "");
+
+  /// helper function to perform the JIT compilation (needs the Value_t typename as a string)
+  bool JITCompileHelper(const std::string &Value_t_name,
+                        const std::string &extra_options,
+                        const std::string &extra_headers,
+                        std::size_t type_hash);
 #endif // LIBMESH_HAVE_FPARSER_JIT
 
   /// function pointer type alias. This permits a Real Value_t function to be compiled
