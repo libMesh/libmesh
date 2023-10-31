@@ -3130,6 +3130,7 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
             // Linear tets have all second derivatives = 0
           case TET4:
           case TET10:
+          case TET14:
             {
               return 0.;
             }

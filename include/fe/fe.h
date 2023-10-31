@@ -81,6 +81,12 @@ struct FEOutputType<RAVIART_THOMAS>
   typedef RealVectorValue type;
 };
 
+template<>
+struct FEOutputType<L2_RAVIART_THOMAS>
+{
+  typedef RealVectorValue type;
+};
+
 
 /**
  * A specific instantiation of the \p FEBase class. This
@@ -1237,6 +1243,29 @@ public:
   explicit
   FERaviartThomas(const FEType & fet) :
     FE<Dim,RAVIART_THOMAS> (fet)
+  {}
+};
+
+/**
+ * FEL2RaviartThomas objects are used for working with vector-valued
+ * discontinuous Raviart-Thomas finite elements, e.g. when constructing
+ * hybridized methods
+ *
+ * \author Alex D. Lindsay
+ * \date 2023
+ */
+template <unsigned int Dim>
+class FEL2RaviartThomas : public FE<Dim,L2_RAVIART_THOMAS>
+{
+public:
+
+  /**
+   * Constructor. Creates a Raviart-Thomas finite element
+   * to be used in dimension \p Dim.
+   */
+  explicit
+  FEL2RaviartThomas(const FEType & fet) :
+    FE<Dim,L2_RAVIART_THOMAS> (fet)
   {}
 };
 

@@ -149,7 +149,15 @@ RealGradient FE<2,RAVIART_THOMAS>::shape(const Elem * elem,
 #endif
 }
 
-
+template <>
+RealGradient FE<2,L2_RAVIART_THOMAS>::shape(const Elem * elem,
+                                            const Order order,
+                                            const unsigned int i,
+                                            const Point & p,
+                                            const bool add_p_level)
+{
+  return FE<2,RAVIART_THOMAS>::shape(elem, order, i, p, add_p_level);
+}
 
 
 template <>
@@ -157,6 +165,16 @@ RealGradient FE<2,RAVIART_THOMAS>::shape(const ElemType,
                                          const Order,
                                          const unsigned int,
                                          const Point &)
+{
+  libmesh_error_msg("Raviart-Thomas elements require the element type \nbecause edge orientation is needed.");
+  return RealGradient();
+}
+
+template <>
+RealGradient FE<2,L2_RAVIART_THOMAS>::shape(const ElemType,
+                                            const Order,
+                                            const unsigned int,
+                                            const Point &)
 {
   libmesh_error_msg("Raviart-Thomas elements require the element type \nbecause edge orientation is needed.");
   return RealGradient();
@@ -171,6 +189,16 @@ RealGradient FE<2,RAVIART_THOMAS>::shape(const FEType fet,
                                          const bool add_p_level)
 {
   return FE<2,RAVIART_THOMAS>::shape(elem, fet.order, i, p, add_p_level);
+}
+
+template <>
+RealGradient FE<2,L2_RAVIART_THOMAS>::shape(const FEType fet,
+                                            const Elem * elem,
+                                            const unsigned int i,
+                                            const Point & p,
+                                            const bool add_p_level)
+{
+  return FE<2,L2_RAVIART_THOMAS>::shape(elem, fet.order, i, p, add_p_level);
 }
 
 template <>
@@ -325,6 +353,16 @@ RealGradient FE<2,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
 #endif
 }
 
+template <>
+RealGradient FE<2,L2_RAVIART_THOMAS>::shape_deriv(const Elem * elem,
+                                                  const Order order,
+                                                  const unsigned int i,
+                                                  const unsigned int j,
+                                                  const Point & p,
+                                                  const bool add_p_level)
+{
+  return FE<2,RAVIART_THOMAS>::shape_deriv(elem, order, i, j, p, add_p_level);
+}
 
 
 template <>
@@ -339,6 +377,17 @@ RealGradient FE<2,RAVIART_THOMAS>::shape_deriv(const ElemType,
 }
 
 template <>
+RealGradient FE<2,L2_RAVIART_THOMAS>::shape_deriv(const ElemType,
+                                                  const Order,
+                                                  const unsigned int,
+                                                  const unsigned int,
+                                                  const Point &)
+{
+  libmesh_error_msg("Raviart-Thomas elements require the element type \nbecause edge orientation is needed.");
+  return RealGradient();
+}
+
+template <>
 RealGradient FE<2,RAVIART_THOMAS>::shape_deriv(const FEType fet,
                                                const Elem * elem,
                                                const unsigned int i,
@@ -347,6 +396,17 @@ RealGradient FE<2,RAVIART_THOMAS>::shape_deriv(const FEType fet,
                                                const bool add_p_level)
 {
   return FE<2,RAVIART_THOMAS>::shape_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
+template <>
+RealGradient FE<2,L2_RAVIART_THOMAS>::shape_deriv(const FEType fet,
+                                                  const Elem * elem,
+                                                  const unsigned int i,
+                                                  const unsigned int j,
+                                                  const Point & p,
+                                                  const bool add_p_level)
+{
+  return FE<2,L2_RAVIART_THOMAS>::shape_deriv(elem, fet.order, i, j, p, add_p_level);
 }
 
 
@@ -415,6 +475,18 @@ RealGradient FE<2,RAVIART_THOMAS>::shape_second_deriv(const Elem * elem,
 #endif
 }
 
+template <>
+RealGradient FE<2,L2_RAVIART_THOMAS>::shape_second_deriv(const Elem * elem,
+                                                         const Order order,
+                                                         const unsigned int i,
+                                                         const unsigned int j,
+                                                         const Point & p,
+                                                         const bool add_p_level)
+{
+  return FE<2,RAVIART_THOMAS>::shape_second_deriv(elem, order, i, j, p, add_p_level);
+}
+
+
 
 
 template <>
@@ -423,6 +495,17 @@ RealGradient FE<2,RAVIART_THOMAS>::shape_second_deriv(const ElemType,
                                                       const unsigned int,
                                                       const unsigned int,
                                                       const Point &)
+{
+  libmesh_error_msg("Raviart-Thomas elements require the element type \nbecause edge orientation is needed.");
+  return RealGradient();
+}
+
+template <>
+RealGradient FE<2,L2_RAVIART_THOMAS>::shape_second_deriv(const ElemType,
+                                                         const Order,
+                                                         const unsigned int,
+                                                         const unsigned int,
+                                                         const Point &)
 {
   libmesh_error_msg("Raviart-Thomas elements require the element type \nbecause edge orientation is needed.");
   return RealGradient();
@@ -438,6 +521,17 @@ RealGradient FE<2,RAVIART_THOMAS>::shape_second_deriv(const FEType fet,
                                                       const bool add_p_level)
 {
   return FE<2,RAVIART_THOMAS>::shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
+}
+
+template <>
+RealGradient FE<2,L2_RAVIART_THOMAS>::shape_second_deriv(const FEType fet,
+                                                         const Elem * elem,
+                                                         const unsigned int i,
+                                                         const unsigned int j,
+                                                         const Point & p,
+                                                         const bool add_p_level)
+{
+  return FE<2,L2_RAVIART_THOMAS>::shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
 }
 
 

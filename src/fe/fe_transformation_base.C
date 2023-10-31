@@ -59,6 +59,7 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
 
       // HDiv Conforming Elements
     case RAVIART_THOMAS:
+    case L2_RAVIART_THOMAS:
       return std::make_unique<HDivFETransformation<OutputShape>>();
 
       // L2 Conforming Elements
