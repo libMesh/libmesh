@@ -35,6 +35,10 @@ LIBMESH_DEFAULT_VECTORIZED_FE(0,LAGRANGE_VEC)
 LIBMESH_DEFAULT_VECTORIZED_FE(1,LAGRANGE_VEC)
 LIBMESH_DEFAULT_VECTORIZED_FE(2,LAGRANGE_VEC)
 LIBMESH_DEFAULT_VECTORIZED_FE(3,LAGRANGE_VEC)
+LIBMESH_DEFAULT_VECTORIZED_FE(0,L2_LAGRANGE_VEC)
+LIBMESH_DEFAULT_VECTORIZED_FE(1,L2_LAGRANGE_VEC)
+LIBMESH_DEFAULT_VECTORIZED_FE(2,L2_LAGRANGE_VEC)
+LIBMESH_DEFAULT_VECTORIZED_FE(3,L2_LAGRANGE_VEC)
 
 
 // ------------------------------------------------------------
@@ -663,6 +667,40 @@ void FE<3,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
 
 LIBMESH_FE_SIDE_NODAL_SOLN(LAGRANGE_VEC)
 
+template <>
+void FE<0,L2_LAGRANGE_VEC>::nodal_soln(const Elem * elem,
+                                       const Order order,
+                                       const std::vector<Number> & elem_soln,
+                                       std::vector<Number> & nodal_soln,
+                                       const bool add_p_level)
+{ FE<0,LAGRANGE_VEC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
+
+template <>
+void FE<1,L2_LAGRANGE_VEC>::nodal_soln(const Elem * elem,
+                                       const Order order,
+                                       const std::vector<Number> & elem_soln,
+                                       std::vector<Number> & nodal_soln,
+                                       const bool add_p_level)
+{ FE<1,LAGRANGE_VEC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
+
+template <>
+void FE<2,L2_LAGRANGE_VEC>::nodal_soln(const Elem * elem,
+                                       const Order order,
+                                       const std::vector<Number> & elem_soln,
+                                       std::vector<Number> & nodal_soln,
+                                       const bool add_p_level)
+{ FE<2,LAGRANGE_VEC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
+
+template <>
+void FE<3,L2_LAGRANGE_VEC>::nodal_soln(const Elem * elem,
+                                       const Order order,
+                                       const std::vector<Number> & elem_soln,
+                                       std::vector<Number> & nodal_soln,
+                                       const bool add_p_level)
+{ FE<3,LAGRANGE_VEC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
+
+LIBMESH_FE_SIDE_NODAL_SOLN(L2_LAGRANGE_VEC)
+
 
 // Specialize for shape function routines by leveraging scalar LAGRANGE elements
 
@@ -692,6 +730,28 @@ template <> RealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
 }
 #endif
 
+template <> RealGradient FE<0,L2_LAGRANGE_VEC>::shape(const ElemType type, const Order order,
+                                                      const unsigned int i, const Point & p)
+{
+  return FE<0,LAGRANGE_VEC>::shape(type, order, i, p);
+}
+template <> RealGradient FE<0,L2_LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
+                                                            const unsigned int i, const unsigned int j,
+                                                            const Point & p)
+{
+  return FE<0,LAGRANGE_VEC>::shape_deriv(type, order, i, j, p);
+}
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+template <> RealGradient FE<0,L2_LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
+                                                                   const unsigned int i, const unsigned int j,
+                                                                   const Point & p)
+{
+  return FE<0,LAGRANGE_VEC>::shape_second_deriv(type, order, i, j, p);
+}
+#endif
+
 // 1-D
 template <> RealGradient FE<1,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
                                                    const unsigned int i, const Point & p)
@@ -715,6 +775,28 @@ template <> RealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
   return libMesh::RealGradient( value );
 }
 
+#endif
+
+template <> RealGradient FE<1,L2_LAGRANGE_VEC>::shape(const ElemType type, const Order order,
+                                                      const unsigned int i, const Point & p)
+{
+  return FE<1,LAGRANGE_VEC>::shape(type, order, i, p);
+}
+template <> RealGradient FE<1,L2_LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
+                                                            const unsigned int i, const unsigned int j,
+                                                            const Point & p)
+{
+  return FE<1,LAGRANGE_VEC>::shape_deriv(type, order, i, j, p);
+}
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+template <> RealGradient FE<1,L2_LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
+                                                                   const unsigned int i, const unsigned int j,
+                                                                   const Point & p)
+{
+  return FE<1,LAGRANGE_VEC>::shape_second_deriv(type, order, i, j, p);
+}
 #endif
 
 // 2-D
@@ -785,6 +867,28 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
 
 #endif
 
+template <> RealGradient FE<2,L2_LAGRANGE_VEC>::shape(const ElemType type, const Order order,
+                                                      const unsigned int i, const Point & p)
+{
+  return FE<2,LAGRANGE_VEC>::shape(type, order, i, p);
+}
+
+template <> RealGradient FE<2,L2_LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
+                                                            const unsigned int i, const unsigned int j,
+                                                            const Point & p)
+{
+  return FE<2,LAGRANGE_VEC>::shape_deriv(type, order, i, j, p);
+}
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+template <> RealGradient FE<2,L2_LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
+                                                                   const unsigned int i, const unsigned int j,
+                                                                   const Point & p)
+{
+  return FE<2,LAGRANGE_VEC>::shape_second_deriv(type, order, i, j, p);
+}
+
+#endif
 
 // 3-D
 template <> RealGradient FE<3,LAGRANGE_VEC>::shape(const ElemType type, const Order order,
@@ -864,6 +968,29 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
 
 #endif
 
+template <> RealGradient FE<3,L2_LAGRANGE_VEC>::shape(const ElemType type, const Order order,
+                                                      const unsigned int i, const Point & p)
+{
+  return FE<3,LAGRANGE_VEC>::shape(type, order, i, p);
+}
+
+template <> RealGradient FE<3,L2_LAGRANGE_VEC>::shape_deriv(const ElemType type, const Order order,
+                                                            const unsigned int i, const unsigned int j,
+                                                            const Point & p)
+{
+  return FE<3,LAGRANGE_VEC>::shape_deriv(type, order, i, j, p);
+}
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+template <> RealGradient FE<3,L2_LAGRANGE_VEC>::shape_second_deriv(const ElemType type, const Order order,
+                                                                   const unsigned int i, const unsigned int j,
+                                                                   const Point & p)
+{
+  return FE<3,LAGRANGE_VEC>::shape_second_deriv(type, order, i, j, p);
+}
+
+#endif
+
 
 // 0-D
 template <> RealGradient FE<0,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
@@ -895,6 +1022,32 @@ template <> RealGradient FE<0,LAGRANGE_VEC>::shape_second_deriv(const Elem * ele
 
 #endif
 
+template <> RealGradient FE<0,L2_LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
+                                                      const unsigned int i, const Point & p,
+                                                      const bool add_p_level)
+{
+  return FE<0,LAGRANGE_VEC>::shape(elem, order, i, p, add_p_level);
+}
+template <> RealGradient FE<0,L2_LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
+                                                            const unsigned int i, const unsigned int j,
+                                                            const Point & p,
+                                                            const bool add_p_level)
+{
+  return FE<0,LAGRANGE_VEC>::shape_deriv(elem, order, i, j, p, add_p_level);
+}
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+template <> RealGradient FE<0,L2_LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
+                                                                   const unsigned int i, const unsigned int j,
+                                                                   const Point & p,
+                                                                   const bool add_p_level)
+{
+  return FE<0,LAGRANGE_VEC>::shape_second_deriv(elem, order, i, j, p, add_p_level);
+}
+
+#endif
+
 // 1-D
 template <> RealGradient FE<1,LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
                                                    const unsigned int i, const Point & p,
@@ -920,6 +1073,32 @@ template <> RealGradient FE<1,LAGRANGE_VEC>::shape_second_deriv(const Elem * ele
 {
   Real value = FE<1,LAGRANGE>::shape_second_deriv( elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
   return libMesh::RealGradient( value );
+}
+
+#endif
+
+template <> RealGradient FE<1,L2_LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
+                                                      const unsigned int i, const Point & p,
+                                                      const bool add_p_level)
+{
+  return FE<1,LAGRANGE_VEC>::shape(elem, order, i, p, add_p_level);
+}
+template <> RealGradient FE<1,L2_LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
+                                                            const unsigned int i, const unsigned int j,
+                                                            const Point & p,
+                                                            const bool add_p_level)
+{
+  return FE<1,LAGRANGE_VEC>::shape_deriv(elem, order, i, j, p, add_p_level);
+}
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+template <> RealGradient FE<1,L2_LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
+                                                                   const unsigned int i, const unsigned int j,
+                                                                   const Point & p,
+                                                                   const bool add_p_level)
+{
+  return FE<1,LAGRANGE_VEC>::shape_second_deriv(elem, order, i, j, p, add_p_level);
 }
 
 #endif
@@ -991,6 +1170,32 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const Elem * ele
 
   //dummy
   return libMesh::RealGradient();
+}
+
+#endif
+
+template <> RealGradient FE<2,L2_LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
+                                                      const unsigned int i, const Point & p,
+                                                      const bool add_p_level)
+{
+  return FE<2,LAGRANGE_VEC>::shape(elem, order, i, p, add_p_level);
+}
+template <> RealGradient FE<2,L2_LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
+                                                            const unsigned int i, const unsigned int j,
+                                                            const Point & p,
+                                                            const bool add_p_level)
+{
+  return FE<2,LAGRANGE_VEC>::shape_deriv(elem, order, i, j, p, add_p_level);
+}
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+template <> RealGradient FE<2,L2_LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
+                                                                   const unsigned int i, const unsigned int j,
+                                                                   const Point & p,
+                                                                   const bool add_p_level)
+{
+  return FE<2,LAGRANGE_VEC>::shape_second_deriv(elem, order, i, j, p, add_p_level);
 }
 
 #endif
@@ -1076,6 +1281,32 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const Elem * ele
 
 #endif
 
+template <> RealGradient FE<3,L2_LAGRANGE_VEC>::shape(const Elem * elem, const Order order,
+                                                      const unsigned int i, const Point & p,
+                                                      const bool add_p_level)
+{
+  return FE<3,LAGRANGE_VEC>::shape(elem, order, i, p, add_p_level);
+}
+template <> RealGradient FE<3,L2_LAGRANGE_VEC>::shape_deriv(const Elem * elem, const Order order,
+                                                            const unsigned int i, const unsigned int j,
+                                                            const Point & p,
+                                                            const bool add_p_level)
+{
+  return FE<3,LAGRANGE_VEC>::shape_deriv(elem, order, i, j, p, add_p_level);
+}
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+template <> RealGradient FE<3,L2_LAGRANGE_VEC>::shape_second_deriv(const Elem * elem, const Order order,
+                                                                   const unsigned int i, const unsigned int j,
+                                                                   const Point & p,
+                                                                   const bool add_p_level)
+{
+  return FE<3,LAGRANGE_VEC>::shape_second_deriv(elem, order, i, j, p, add_p_level);
+}
+
+#endif
+
 // Do full-specialization for every dimension, instead
 // of explicit instantiation at the end of this function.
 // This could be macro-ified.
@@ -1083,6 +1314,11 @@ template <> unsigned int FE<0,LAGRANGE_VEC>::n_dofs(const ElemType t, const Orde
 template <> unsigned int FE<1,LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return FE<1,LAGRANGE>::n_dofs(t,o); }
 template <> unsigned int FE<2,LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return 2*FE<2,LAGRANGE>::n_dofs(t,o); }
 template <> unsigned int FE<3,LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return 3*FE<3,LAGRANGE>::n_dofs(t,o); }
+
+template <> unsigned int FE<0,L2_LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return FE<0,L2_LAGRANGE>::n_dofs(t,o); }
+template <> unsigned int FE<1,L2_LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return FE<1,L2_LAGRANGE>::n_dofs(t,o); }
+template <> unsigned int FE<2,L2_LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return 2*FE<2,L2_LAGRANGE>::n_dofs(t,o); }
+template <> unsigned int FE<3,L2_LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return 3*FE<3,L2_LAGRANGE>::n_dofs(t,o); }
 
 
 // Do full-specialization for every dimension, instead
@@ -1092,6 +1328,11 @@ template <> unsigned int FE<1,LAGRANGE_VEC>::n_dofs_at_node(const ElemType t, co
 template <> unsigned int FE<2,LAGRANGE_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return 2*FE<2,LAGRANGE>::n_dofs_at_node(t,o,n); }
 template <> unsigned int FE<3,LAGRANGE_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return 3*FE<2,LAGRANGE>::n_dofs_at_node(t,o,n); }
 
+template <> unsigned int FE<0,L2_LAGRANGE_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<1,L2_LAGRANGE_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<2,L2_LAGRANGE_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<3,L2_LAGRANGE_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
+
 
 // Lagrange elements have no dofs per element
 // (just at the nodes)
@@ -1100,23 +1341,43 @@ template <> unsigned int FE<1,LAGRANGE_VEC>::n_dofs_per_elem(const ElemType, con
 template <> unsigned int FE<2,LAGRANGE_VEC>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 template <> unsigned int FE<3,LAGRANGE_VEC>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 
+// L2 Lagrange elements have all their dofs on the element
+template <> unsigned int FE<0,L2_LAGRANGE_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<0,L2_LAGRANGE_VEC>::n_dofs(t, o); }
+template <> unsigned int FE<1,L2_LAGRANGE_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<1,L2_LAGRANGE_VEC>::n_dofs(t, o); }
+template <> unsigned int FE<2,L2_LAGRANGE_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<2,L2_LAGRANGE_VEC>::n_dofs(t, o); }
+template <> unsigned int FE<3,L2_LAGRANGE_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<3,L2_LAGRANGE_VEC>::n_dofs(t, o); }
+
 // Lagrange FEMs are always C^0 continuous
 template <> FEContinuity FE<0,LAGRANGE_VEC>::get_continuity() const { return C_ZERO; }
 template <> FEContinuity FE<1,LAGRANGE_VEC>::get_continuity() const { return C_ZERO; }
 template <> FEContinuity FE<2,LAGRANGE_VEC>::get_continuity() const { return C_ZERO; }
 template <> FEContinuity FE<3,LAGRANGE_VEC>::get_continuity() const { return C_ZERO; }
 
+// L2 Lagrange FEMs are always discontinuous
+template <> FEContinuity FE<0,L2_LAGRANGE_VEC>::get_continuity() const { return DISCONTINUOUS; }
+template <> FEContinuity FE<1,L2_LAGRANGE_VEC>::get_continuity() const { return DISCONTINUOUS; }
+template <> FEContinuity FE<2,L2_LAGRANGE_VEC>::get_continuity() const { return DISCONTINUOUS; }
+template <> FEContinuity FE<3,L2_LAGRANGE_VEC>::get_continuity() const { return DISCONTINUOUS; }
+
 // Lagrange FEMs are not hierarchic
 template <> bool FE<0,LAGRANGE_VEC>::is_hierarchic() const { return false; }
 template <> bool FE<1,LAGRANGE_VEC>::is_hierarchic() const { return false; }
 template <> bool FE<2,LAGRANGE_VEC>::is_hierarchic() const { return false; }
 template <> bool FE<3,LAGRANGE_VEC>::is_hierarchic() const { return false; }
+template <> bool FE<0,L2_LAGRANGE_VEC>::is_hierarchic() const { return false; }
+template <> bool FE<1,L2_LAGRANGE_VEC>::is_hierarchic() const { return false; }
+template <> bool FE<2,L2_LAGRANGE_VEC>::is_hierarchic() const { return false; }
+template <> bool FE<3,L2_LAGRANGE_VEC>::is_hierarchic() const { return false; }
 
 // Lagrange FEM shapes do not need reinit (is this always true?)
 template <> bool FE<0,LAGRANGE_VEC>::shapes_need_reinit() const { return false; }
 template <> bool FE<1,LAGRANGE_VEC>::shapes_need_reinit() const { return false; }
 template <> bool FE<2,LAGRANGE_VEC>::shapes_need_reinit() const { return false; }
 template <> bool FE<3,LAGRANGE_VEC>::shapes_need_reinit() const { return false; }
+template <> bool FE<0,L2_LAGRANGE_VEC>::shapes_need_reinit() const { return false; }
+template <> bool FE<1,L2_LAGRANGE_VEC>::shapes_need_reinit() const { return false; }
+template <> bool FE<2,L2_LAGRANGE_VEC>::shapes_need_reinit() const { return false; }
+template <> bool FE<3,L2_LAGRANGE_VEC>::shapes_need_reinit() const { return false; }
 
 // Methods for computing Lagrange constraints.  Note: we pass the
 // dimension as the last argument to the anonymous helper function.
@@ -1137,6 +1398,24 @@ void FE<3,LAGRANGE_VEC>::compute_constraints (DofConstraints & constraints,
                                               DofMap & dof_map,
                                               const unsigned int variable_number,
                                               const Elem * elem)
+{ //libmesh_not_implemented();
+  FEVectorBase::compute_proj_constraints(constraints, dof_map, variable_number, elem);
+}
+
+template <>
+void FE<2,L2_LAGRANGE_VEC>::compute_constraints (DofConstraints & constraints,
+                                                 DofMap & dof_map,
+                                                 const unsigned int variable_number,
+                                                 const Elem * elem)
+{ //libmesh_not_implemented();
+  FEVectorBase::compute_proj_constraints(constraints, dof_map, variable_number, elem);
+}
+
+template <>
+void FE<3,L2_LAGRANGE_VEC>::compute_constraints (DofConstraints & constraints,
+                                                 DofMap & dof_map,
+                                                 const unsigned int variable_number,
+                                                 const Elem * elem)
 { //libmesh_not_implemented();
   FEVectorBase::compute_proj_constraints(constraints, dof_map, variable_number, elem);
 }

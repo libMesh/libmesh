@@ -423,6 +423,9 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
           case LAGRANGE_VEC:
             return std::make_unique<FELagrangeVec<0>>(fet);
 
+          case L2_LAGRANGE_VEC:
+            return std::make_unique<FEL2LagrangeVec<0>>(fet);
+
           case MONOMIAL_VEC:
             return std::make_unique<FEMonomialVec<0>>(fet);
 
@@ -437,6 +440,9 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
           case LAGRANGE_VEC:
             return std::make_unique<FELagrangeVec<1>>(fet);
 
+          case L2_LAGRANGE_VEC:
+            return std::make_unique<FEL2LagrangeVec<1>>(fet);
+
           case MONOMIAL_VEC:
             return std::make_unique<FEMonomialVec<1>>(fet);
 
@@ -450,6 +456,9 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
           {
           case LAGRANGE_VEC:
             return std::make_unique<FELagrangeVec<2>>(fet);
+
+          case L2_LAGRANGE_VEC:
+            return std::make_unique<FEL2LagrangeVec<2>>(fet);
 
           case MONOMIAL_VEC:
             return std::make_unique<FEMonomialVec<2>>(fet);
@@ -473,6 +482,9 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
           {
           case LAGRANGE_VEC:
             return std::make_unique<FELagrangeVec<3>>(fet);
+
+          case L2_LAGRANGE_VEC:
+            return std::make_unique<FEL2LagrangeVec<3>>(fet);
 
           case MONOMIAL_VEC:
             return std::make_unique<FEMonomialVec<3>>(fet);

@@ -64,6 +64,12 @@ struct FEOutputType<LAGRANGE_VEC>
 };
 
 template<>
+struct FEOutputType<L2_LAGRANGE_VEC>
+{
+  typedef RealVectorValue type;
+};
+
+template<>
 struct FEOutputType<NEDELEC_ONE>
 {
   typedef RealVectorValue type;
@@ -1176,6 +1182,29 @@ public:
   explicit
   FELagrangeVec(const FEType & fet) :
     FE<Dim,LAGRANGE_VEC> (fet)
+  {}
+};
+
+
+/**
+ * FEL2LagrangeVec objects are used for working with vector-valued
+ * finite elements
+ *
+ * \author Alexander Lindsay
+ * \date 2023
+ */
+template <unsigned int Dim>
+class FEL2LagrangeVec : public FE<Dim,L2_LAGRANGE_VEC>
+{
+public:
+
+  /**
+   * Constructor. Creates a vector Lagrange finite element
+   * to be used in dimension \p Dim.
+   */
+  explicit
+  FEL2LagrangeVec(const FEType & fet) :
+    FE<Dim,L2_LAGRANGE_VEC> (fet)
   {}
 };
 
