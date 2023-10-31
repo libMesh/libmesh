@@ -21,6 +21,7 @@
 
 
 // libMesh includes
+#include "libmesh/libmesh_common.h"
 #include "libmesh/fe_type.h"
 
 // TIMPI includes
