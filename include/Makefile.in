@@ -885,6 +885,7 @@ include_HEADERS = \
         parallel/parallel_algebra.h \
         parallel/parallel_bin_sorter.h \
         parallel/parallel_elem.h \
+        parallel/parallel_fe_type.h \
         parallel/parallel_ghost_sync.h \
         parallel/parallel_histogram.h \
         parallel/parallel_node.h \
