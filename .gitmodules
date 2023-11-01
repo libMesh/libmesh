@@ -16,3 +16,6 @@
 [submodule "contrib/netcdf/netcdf-c"]
 	path = contrib/netcdf/netcdf-c
 	url = ../../Unidata/netcdf-c
+[submodule "contrib/nanoflann/nanoflann"]
+	path = contrib/nanoflann/nanoflann
+	url = https://github.com/jlblancoc/nanoflann.git
