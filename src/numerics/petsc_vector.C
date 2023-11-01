@@ -76,6 +76,8 @@ Real PetscVector<T>::l1_norm () const
 template <typename T>
 Real PetscVector<T>::l2_norm () const
 {
+  parallel_object_only();
+
   this->_restore_array();
   libmesh_assert(this->closed());
 
@@ -94,6 +96,8 @@ Real PetscVector<T>::l2_norm () const
 template <typename T>
 Real PetscVector<T>::linfty_norm () const
 {
+  parallel_object_only();
+
   this->_restore_array();
   libmesh_assert(this->closed());
 
@@ -113,6 +117,8 @@ template <typename T>
 NumericVector<T> &
 PetscVector<T>::operator += (const NumericVector<T> & v)
 {
+  parallel_object_only();
+
   this->_restore_array();
   libmesh_assert(this->closed());
 
@@ -127,6 +133,8 @@ template <typename T>
 NumericVector<T> &
 PetscVector<T>::operator -= (const NumericVector<T> & v)
 {
+  parallel_object_only();
+
   this->_restore_array();
   libmesh_assert(this->closed());
 
@@ -159,6 +167,8 @@ void PetscVector<T>::set (const numeric_index_type i, const T value)
 template <typename T>
 void PetscVector<T>::reciprocal()
 {
+  parallel_object_only();
+
   PetscErrorCode ierr = 0;
 
   // VecReciprocal has been in PETSc since at least 2.3.3 days
@@ -171,6 +181,8 @@ void PetscVector<T>::reciprocal()
 template <typename T>
 void PetscVector<T>::conjugate()
 {
+  parallel_object_only();
+
   PetscErrorCode ierr = 0;
 
   // We just call the PETSc VecConjugate
@@ -227,6 +239,8 @@ template <typename T>
 void PetscVector<T>::add_vector (const NumericVector<T> & v_in,
                                  const SparseMatrix<T> & A_in)
 {
+  parallel_object_only();
+
   this->_restore_array();
   // Make sure the data passed in are really of Petsc types
   const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
@@ -255,6 +269,8 @@ template <typename T>
 void PetscVector<T>::add_vector_transpose (const NumericVector<T> & v_in,
                                            const SparseMatrix<T> & A_in)
 {
+  parallel_object_only();
+
   this->_restore_array();
   // Make sure the data passed in are really of Petsc types
   const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
@@ -283,6 +299,8 @@ template <typename T>
 void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> & v_in,
                                                      const SparseMatrix<T> & A_in)
 {
+  parallel_object_only();
+
   this->_restore_array();
   // Make sure the data passed in are really of Petsc types
   const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
@@ -326,6 +344,8 @@ void PetscVector<T>::add (const T v_in)
 template <typename T>
 void PetscVector<T>::add (const NumericVector<T> & v)
 {
+  parallel_object_only();
+
   this->add (1., v);
 }
 
@@ -334,6 +354,8 @@ void PetscVector<T>::add (const NumericVector<T> & v)
 template <typename T>
 void PetscVector<T>::add (const T a_in, const NumericVector<T> & v_in)
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   // VecAXPY doesn't support &x==&y
@@ -353,6 +375,9 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T> & v_in)
 
   PetscErrorCode ierr = VecAXPY(_vec, a, v->vec());
   LIBMESH_CHKERR(ierr);
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 
@@ -385,12 +410,17 @@ void PetscVector<T>::insert (const T * v,
 template <typename T>
 void PetscVector<T>::scale (const T factor_in)
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   PetscScalar factor = PS(factor_in);
 
   PetscErrorCode ierr = VecScale(_vec, factor);
   LIBMESH_CHKERR(ierr);
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 }
@@ -398,6 +428,8 @@ void PetscVector<T>::scale (const T factor_in)
 template <typename T>
 NumericVector<T> & PetscVector<T>::operator *= (const NumericVector<T> & v)
 {
+  parallel_object_only();
+
   PetscErrorCode ierr = 0;
 
   const PetscVector<T> * v_vec = cast_ptr<const PetscVector<T> *>(&v);
@@ -411,6 +443,8 @@ NumericVector<T> & PetscVector<T>::operator *= (const NumericVector<T> & v)
 template <typename T>
 NumericVector<T> & PetscVector<T>::operator /= (const NumericVector<T> & v)
 {
+  parallel_object_only();
+
   PetscErrorCode ierr = 0;
 
   const PetscVector<T> * v_vec = cast_ptr<const PetscVector<T> *>(&v);
@@ -424,10 +458,15 @@ NumericVector<T> & PetscVector<T>::operator /= (const NumericVector<T> & v)
 template <typename T>
 void PetscVector<T>::abs()
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   PetscErrorCode ierr = VecAbs(_vec);
   LIBMESH_CHKERR(ierr);
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 }
@@ -435,6 +474,8 @@ void PetscVector<T>::abs()
 template <typename T>
 T PetscVector<T>::dot (const NumericVector<T> & v_in) const
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   // Error flag
@@ -456,6 +497,8 @@ T PetscVector<T>::dot (const NumericVector<T> & v_in) const
 template <typename T>
 T PetscVector<T>::indefinite_dot (const NumericVector<T> & v_in) const
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   // Error flag
@@ -479,6 +522,8 @@ template <typename T>
 NumericVector<T> &
 PetscVector<T>::operator = (const T s_in)
 {
+  parallel_object_only();
+
   this->_restore_array();
   libmesh_assert(this->closed());
 
@@ -488,6 +533,9 @@ PetscVector<T>::operator = (const T s_in)
     {
       PetscErrorCode ierr = VecSet(_vec, s);
       LIBMESH_CHKERR(ierr);
+
+      libmesh_assert(this->comm().verify(int(this->type())));
+
       if (this->type() == GHOSTED)
         VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
     }
@@ -501,6 +549,8 @@ template <typename T>
 NumericVector<T> &
 PetscVector<T>::operator = (const NumericVector<T> & v_in)
 {
+  parallel_object_only();
+
   // Make sure the NumericVector passed in is really a PetscVector
   const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
 
@@ -515,6 +565,8 @@ template <typename T>
 PetscVector<T> &
 PetscVector<T>::operator = (const PetscVector<T> & v)
 {
+  parallel_object_only();
+
   this->_restore_array();
   v._restore_array();
 
@@ -526,6 +578,9 @@ PetscVector<T>::operator = (const PetscVector<T> & v)
 
   ierr = VecCopy (v._vec, this->_vec);
   LIBMESH_CHKERR(ierr);
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 
@@ -540,6 +595,8 @@ template <typename T>
 NumericVector<T> &
 PetscVector<T>::operator = (const std::vector<T> & v)
 {
+  parallel_object_only();
+
   this->_get_array(false);
 
   /**
@@ -576,6 +633,8 @@ PetscVector<T>::operator = (const std::vector<T> & v)
 template <typename T>
 void PetscVector<T>::localize (NumericVector<T> & v_local_in) const
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   // Make sure the NumericVector passed in is really a PetscVector
@@ -624,6 +683,11 @@ template <typename T>
 void PetscVector<T>::localize (NumericVector<T> & v_local_in,
                                const std::vector<numeric_index_type> & send_list) const
 {
+  parallel_object_only();
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+  libmesh_assert(this->comm().verify(int(v_local_in.type())));
+
   // FIXME: Workaround for a strange bug at large-scale.
   // If we have ghosting, PETSc lets us just copy the solution, and
   // doing so avoids a segfault?
@@ -683,6 +747,8 @@ template <typename T>
 void PetscVector<T>::localize (std::vector<T> & v_local,
                                const std::vector<numeric_index_type> & indices) const
 {
+  parallel_object_only();
+
   // Error code used to check the status of all PETSc function calls.
   PetscErrorCode ierr = 0;
 
@@ -737,6 +803,8 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
                                const numeric_index_type last_local_idx,
                                const std::vector<numeric_index_type> & send_list)
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   libmesh_assert_less_equal (send_list.size(), this->size());
@@ -794,6 +862,8 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
 template <typename T>
 void PetscVector<T>::localize (std::vector<T> & v_local) const
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   // This function must be run on all processors at once
@@ -831,6 +901,8 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
                                          const processor_id_type
                                          timpi_mpi_var(pid)) const
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   PetscErrorCode ierr=0;
@@ -919,6 +991,8 @@ template <>
 void PetscVector<Complex>::localize_to_one (std::vector<Complex> & v_local,
                                             const processor_id_type pid) const
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   PetscErrorCode ierr=0;
@@ -1007,6 +1081,8 @@ template <typename T>
 void PetscVector<T>::pointwise_mult (const NumericVector<T> & vec1,
                                      const NumericVector<T> & vec2)
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   // Convert arguments to PetscVector*.
@@ -1016,6 +1092,9 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T> & vec1,
   // Call PETSc function.
   PetscErrorCode ierr = VecPointwiseMult(_vec, vec1_petsc->vec(), vec2_petsc->vec());
   LIBMESH_CHKERR(ierr);
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 
@@ -1026,6 +1105,8 @@ template <typename T>
 void PetscVector<T>::pointwise_divide (const NumericVector<T> & vec1,
                                        const NumericVector<T> & vec2)
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   // Convert arguments to PetscVector*.
@@ -1035,6 +1116,9 @@ void PetscVector<T>::pointwise_divide (const NumericVector<T> & vec1,
   // Call PETSc function.
   PetscErrorCode ierr = VecPointwiseDivide(_vec, vec1_petsc->vec(), vec2_petsc->vec());
   LIBMESH_CHKERR(ierr);
+
+  libmesh_assert(this->comm().verify(int(this->type())));
+
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
 
@@ -1044,6 +1128,8 @@ void PetscVector<T>::pointwise_divide (const NumericVector<T> & vec1,
 template <typename T>
 void PetscVector<T>::print_matlab (const std::string & name) const
 {
+  parallel_object_only();
+
   this->_restore_array();
   libmesh_assert (this->closed());
 
@@ -1103,6 +1189,8 @@ template <typename T>
 void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
                                       const std::vector<numeric_index_type> & rows) const
 {
+  parallel_object_only();
+
   this->_restore_array();
 
   // PETSc data structures
