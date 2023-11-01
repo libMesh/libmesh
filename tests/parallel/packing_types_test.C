@@ -11,6 +11,8 @@
 
 using namespace libMesh;
 
+#ifdef LIBMESH_HAVE_EIGEN
+
 class PackingTypesTest : public CppUnit::TestCase {
 public:
   LIBMESH_CPPUNIT_TEST_SUITE( PackingTypesTest );
@@ -152,3 +154,5 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( PackingTypesTest );
+
+#endif // LIBMESH_HAVE_EIGEN

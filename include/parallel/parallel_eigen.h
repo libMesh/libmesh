@@ -26,6 +26,8 @@
 // TIMPI includes
 #include "timpi/packing.h"
 
+#ifdef LIBMESH_HAVE_EIGEN
+
 // libEigen includes
 #include <Eigen/Core>
 
@@ -175,5 +177,7 @@ namespace libMesh
 
   } // namespace Parallel
 } // namespace libMesh
+
+#endif // LIBMESH_HAVE_EIGEN
 
 #endif // LIBMESH_PARALLEL_EIGEN_H
