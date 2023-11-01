@@ -13,6 +13,10 @@ of standard functions (but with enhanced functionality).
 */
 /************************************************************************/
 
+// On GCC, strptime is only defined in <time.h> if the _XOPEN_SOURCE macro
+// is defined. See also: the Stack Overflow dicussion here:
+// https://stackoverflow.com/questions/43460876/trouble-including-function-declaration-for-strptime
+#define _XOPEN_SOURCE 700
 #include <GKlib.h>
 #include <time.h> // strptime
 
