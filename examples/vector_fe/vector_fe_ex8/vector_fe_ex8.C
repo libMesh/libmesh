@@ -375,6 +375,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   const auto & scalar_phi = scalar_fe->get_phi();
   const auto & grad_scalar_phi = scalar_fe->get_dphi();
   const auto & enriched_scalar_phi = enriched_scalar_fe->get_phi();
+  const auto & enriched_scalar_dphi = enriched_scalar_fe->get_dphi();
   const auto & div_vector_phi = vector_fe->get_div_phi();
 
   // pre-request our required element face data
@@ -696,7 +697,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
         for (const auto i : make_range(enriched_scalar_n_dofs))
           for (const auto j : make_range(enriched_scalar_n_dofs))
             K_enriched_scalar(i, j) +=
-                JxW[qp] * (enriched_scalar_phi[i][qp] * enriched_scalar_phi[j][qp]);
+                JxW[qp] * (enriched_scalar_dphi[i][qp] * enriched_scalar_dphi[j][qp]);
 
         // Forcing function kernel
         {
