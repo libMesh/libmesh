@@ -95,7 +95,7 @@ check_PROGRAMS = pointcloud_kdd_radius$(EXEEXT) \
 	vector_of_vectors_example$(EXEEXT) $(am__EXEEXT_1)
 @LIBMESH_ENABLE_EIGEN_TRUE@am__append_1 = $(EIGEN_INCLUDE)
 @LIBMESH_ENABLE_EIGEN_TRUE@am__append_2 = matrix_example
-subdir = contrib/nanoflann/nanoflann/
+subdir = contrib/nanoflann/
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_code_coverage.m4 \
@@ -651,7 +651,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = -I$(top_srcdir)/contrib/nanoflann/nanoflann/include $(am__append_1)
 AM_CFLAGS =
 AM_CXXFLAGS =
-include_HEADERS = $(srcdir)/nanoflann/nanoflann/include/nanoflann.hpp
+include_HEADERS = $(srcdir)/nanoflann/include/nanoflann.hpp
 pointcloud_kdd_radius_SOURCES = $(srcdir)/nanoflann/examples/pointcloud_kdd_radius.cpp examples/utils.h
 pointcloud_example_SOURCES = $(srcdir)/nanoflann/examples/pointcloud_example.cpp examples/utils.h
 pointcloud_adaptor_example_SOURCES = $(srcdir)/nanoflann/examples/pointcloud_adaptor_example.cpp
