@@ -148,6 +148,7 @@ public:
   explicit
   StandardType(const libMesh::FEType * example=nullptr)
   {
+#ifdef LIBMESH_HAVE_MPI
     using libMesh::FEType;
 
     // We need an example for MPI_Address to use
@@ -161,7 +162,6 @@ public:
         ex = temp.get();
       }
 
-#ifdef LIBMESH_HAVE_MPI
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
     constexpr std::size_t structsize = 5;
 #else
@@ -223,6 +223,8 @@ public:
 
     timpi_call_mpi
       (MPI_Type_free (&tmptype));
+#else
+    libmesh_ignore(example);
 #endif // #ifdef LIBMESH_HAVE_MPI
   }
 
