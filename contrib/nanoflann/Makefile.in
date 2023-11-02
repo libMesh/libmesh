@@ -95,7 +95,7 @@ check_PROGRAMS = pointcloud_kdd_radius$(EXEEXT) \
 	vector_of_vectors_example$(EXEEXT) $(am__EXEEXT_1)
 @LIBMESH_ENABLE_EIGEN_TRUE@am__append_1 = $(EIGEN_INCLUDE)
 @LIBMESH_ENABLE_EIGEN_TRUE@am__append_2 = matrix_example
-subdir = contrib/nanoflann/
+subdir = contrib/nanoflann
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_code_coverage.m4 \
@@ -164,30 +164,31 @@ CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_ENABLE_EIGEN_TRUE@am__EXEEXT_1 = matrix_example$(EXEEXT)
-am__matrix_example_SOURCES_DIST = examples/matrix_example.cpp
+am__matrix_example_SOURCES_DIST =  \
+	$(srcdir)/nanoflann/examples/matrix_example.cpp
 am__dirstamp = $(am__leading_dot)dirstamp
-@LIBMESH_ENABLE_EIGEN_TRUE@am_matrix_example_OBJECTS =  \
-@LIBMESH_ENABLE_EIGEN_TRUE@	examples/matrix_example.$(OBJEXT)
+@LIBMESH_ENABLE_EIGEN_TRUE@am_matrix_example_OBJECTS = nanoflann/examples/matrix_example.$(OBJEXT)
 matrix_example_OBJECTS = $(am_matrix_example_OBJECTS)
 matrix_example_LDADD = $(LDADD)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
-am__v_lt_1 =
+am__v_lt_1 = 
 am_pointcloud_adaptor_example_OBJECTS =  \
-	examples/pointcloud_adaptor_example.$(OBJEXT)
+	nanoflann/examples/pointcloud_adaptor_example.$(OBJEXT)
 pointcloud_adaptor_example_OBJECTS =  \
 	$(am_pointcloud_adaptor_example_OBJECTS)
 pointcloud_adaptor_example_LDADD = $(LDADD)
-am_pointcloud_example_OBJECTS = examples/pointcloud_example.$(OBJEXT)
+am_pointcloud_example_OBJECTS =  \
+	nanoflann/examples/pointcloud_example.$(OBJEXT)
 pointcloud_example_OBJECTS = $(am_pointcloud_example_OBJECTS)
 pointcloud_example_LDADD = $(LDADD)
 am_pointcloud_kdd_radius_OBJECTS =  \
-	examples/pointcloud_kdd_radius.$(OBJEXT)
+	nanoflann/examples/pointcloud_kdd_radius.$(OBJEXT)
 pointcloud_kdd_radius_OBJECTS = $(am_pointcloud_kdd_radius_OBJECTS)
 pointcloud_kdd_radius_LDADD = $(LDADD)
 am_vector_of_vectors_example_OBJECTS =  \
-	examples/vector_of_vectors_example.$(OBJEXT)
+	nanoflann/examples/vector_of_vectors_example.$(OBJEXT)
 vector_of_vectors_example_OBJECTS =  \
 	$(am_vector_of_vectors_example_OBJECTS)
 vector_of_vectors_example_LDADD = $(LDADD)
@@ -198,19 +199,19 @@ am__v_P_1 = :
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN     " $@;
-am__v_GEN_1 =
+am__v_GEN_1 = 
 AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
-am__v_at_1 =
+am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = examples/$(DEPDIR)/matrix_example.Po \
-	examples/$(DEPDIR)/pointcloud_adaptor_example.Po \
-	examples/$(DEPDIR)/pointcloud_example.Po \
-	examples/$(DEPDIR)/pointcloud_kdd_radius.Po \
-	examples/$(DEPDIR)/vector_of_vectors_example.Po
+am__depfiles_remade = nanoflann/examples/$(DEPDIR)/matrix_example.Po \
+	nanoflann/examples/$(DEPDIR)/pointcloud_adaptor_example.Po \
+	nanoflann/examples/$(DEPDIR)/pointcloud_example.Po \
+	nanoflann/examples/$(DEPDIR)/pointcloud_kdd_radius.Po \
+	nanoflann/examples/$(DEPDIR)/vector_of_vectors_example.Po
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -221,7 +222,7 @@ LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 AM_V_CXX = $(am__v_CXX_@AM_V@)
 am__v_CXX_ = $(am__v_CXX_@AM_DEFAULT_V@)
 am__v_CXX_0 = @echo "  CXX     " $@;
-am__v_CXX_1 =
+am__v_CXX_1 = 
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -229,7 +230,7 @@ CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
-am__v_CXXLD_1 =
+am__v_CXXLD_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -239,7 +240,7 @@ LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CC = $(am__v_CC_@AM_V@)
 am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
 am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 =
+am__v_CC_1 = 
 CCLD = $(CC)
 LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -247,7 +248,7 @@ LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 =
+am__v_CCLD_1 = 
 SOURCES = $(matrix_example_SOURCES) \
 	$(pointcloud_adaptor_example_SOURCES) \
 	$(pointcloud_example_SOURCES) $(pointcloud_kdd_radius_SOURCES) \
@@ -330,7 +331,7 @@ am__tty_colors = { \
   fi; \
 }
 am__DIST_COMMON = $(srcdir)/Makefile.in \
-	$(top_srcdir)/build-aux/depcomp COPYING README.md
+	$(top_srcdir)/build-aux/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ACSM_ANY_PARANOID_FLAGS = @ACSM_ANY_PARANOID_FLAGS@
@@ -648,14 +649,15 @@ vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
 AUTOMAKE_OPTIONS = subdir-objects
-AM_CPPFLAGS = -I$(top_srcdir)/contrib/nanoflann/nanoflann/include $(am__append_1)
-AM_CFLAGS =
-AM_CXXFLAGS =
+AM_CPPFLAGS = -I$(top_srcdir)/contrib/nanoflann/nanoflann/include \
+	$(am__append_1)
+AM_CFLAGS = 
+AM_CXXFLAGS = 
 include_HEADERS = $(srcdir)/nanoflann/include/nanoflann.hpp
-pointcloud_kdd_radius_SOURCES = $(srcdir)/nanoflann/examples/pointcloud_kdd_radius.cpp examples/utils.h
-pointcloud_example_SOURCES = $(srcdir)/nanoflann/examples/pointcloud_example.cpp examples/utils.h
+pointcloud_kdd_radius_SOURCES = $(srcdir)/nanoflann/examples/pointcloud_kdd_radius.cpp nanoflann/examples/utils.h
+pointcloud_example_SOURCES = $(srcdir)/nanoflann/examples/pointcloud_example.cpp nanoflann/examples/utils.h
 pointcloud_adaptor_example_SOURCES = $(srcdir)/nanoflann/examples/pointcloud_adaptor_example.cpp
-vector_of_vectors_example_SOURCES = $(srcdir)/nanoflann/examples/vector_of_vectors_example.cpp examples/KDTreeVectorOfVectorsAdaptor.h
+vector_of_vectors_example_SOURCES = $(srcdir)/nanoflann/examples/vector_of_vectors_example.cpp nanoflann/examples/KDTreeVectorOfVectorsAdaptor.h
 @LIBMESH_ENABLE_EIGEN_TRUE@matrix_example_SOURCES = $(srcdir)/nanoflann/examples/matrix_example.cpp
 TESTS = $(check_PROGRAMS)
 all: all-am
@@ -700,55 +702,60 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-examples/$(am__dirstamp):
-	@$(MKDIR_P) examples
-	@: > examples/$(am__dirstamp)
-examples/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) examples/$(DEPDIR)
-	@: > examples/$(DEPDIR)/$(am__dirstamp)
-examples/matrix_example.$(OBJEXT): examples/$(am__dirstamp) \
-	examples/$(DEPDIR)/$(am__dirstamp)
+nanoflann/examples/$(am__dirstamp):
+	@$(MKDIR_P) nanoflann/examples
+	@: > nanoflann/examples/$(am__dirstamp)
+nanoflann/examples/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) nanoflann/examples/$(DEPDIR)
+	@: > nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
+nanoflann/examples/matrix_example.$(OBJEXT):  \
+	nanoflann/examples/$(am__dirstamp) \
+	nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
 
-matrix_example$(EXEEXT): $(matrix_example_OBJECTS) $(matrix_example_DEPENDENCIES) $(EXTRA_matrix_example_DEPENDENCIES)
+matrix_example$(EXEEXT): $(matrix_example_OBJECTS) $(matrix_example_DEPENDENCIES) $(EXTRA_matrix_example_DEPENDENCIES) 
 	@rm -f matrix_example$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(matrix_example_OBJECTS) $(matrix_example_LDADD) $(LIBS)
-examples/pointcloud_adaptor_example.$(OBJEXT):  \
-	examples/$(am__dirstamp) examples/$(DEPDIR)/$(am__dirstamp)
+nanoflann/examples/pointcloud_adaptor_example.$(OBJEXT):  \
+	nanoflann/examples/$(am__dirstamp) \
+	nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
 
-pointcloud_adaptor_example$(EXEEXT): $(pointcloud_adaptor_example_OBJECTS) $(pointcloud_adaptor_example_DEPENDENCIES) $(EXTRA_pointcloud_adaptor_example_DEPENDENCIES)
+pointcloud_adaptor_example$(EXEEXT): $(pointcloud_adaptor_example_OBJECTS) $(pointcloud_adaptor_example_DEPENDENCIES) $(EXTRA_pointcloud_adaptor_example_DEPENDENCIES) 
 	@rm -f pointcloud_adaptor_example$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(pointcloud_adaptor_example_OBJECTS) $(pointcloud_adaptor_example_LDADD) $(LIBS)
-examples/pointcloud_example.$(OBJEXT): examples/$(am__dirstamp) \
-	examples/$(DEPDIR)/$(am__dirstamp)
+nanoflann/examples/pointcloud_example.$(OBJEXT):  \
+	nanoflann/examples/$(am__dirstamp) \
+	nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
 
-pointcloud_example$(EXEEXT): $(pointcloud_example_OBJECTS) $(pointcloud_example_DEPENDENCIES) $(EXTRA_pointcloud_example_DEPENDENCIES)
+pointcloud_example$(EXEEXT): $(pointcloud_example_OBJECTS) $(pointcloud_example_DEPENDENCIES) $(EXTRA_pointcloud_example_DEPENDENCIES) 
 	@rm -f pointcloud_example$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(pointcloud_example_OBJECTS) $(pointcloud_example_LDADD) $(LIBS)
-examples/pointcloud_kdd_radius.$(OBJEXT): examples/$(am__dirstamp) \
-	examples/$(DEPDIR)/$(am__dirstamp)
+nanoflann/examples/pointcloud_kdd_radius.$(OBJEXT):  \
+	nanoflann/examples/$(am__dirstamp) \
+	nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
 
-pointcloud_kdd_radius$(EXEEXT): $(pointcloud_kdd_radius_OBJECTS) $(pointcloud_kdd_radius_DEPENDENCIES) $(EXTRA_pointcloud_kdd_radius_DEPENDENCIES)
+pointcloud_kdd_radius$(EXEEXT): $(pointcloud_kdd_radius_OBJECTS) $(pointcloud_kdd_radius_DEPENDENCIES) $(EXTRA_pointcloud_kdd_radius_DEPENDENCIES) 
 	@rm -f pointcloud_kdd_radius$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(pointcloud_kdd_radius_OBJECTS) $(pointcloud_kdd_radius_LDADD) $(LIBS)
-examples/vector_of_vectors_example.$(OBJEXT):  \
-	examples/$(am__dirstamp) examples/$(DEPDIR)/$(am__dirstamp)
+nanoflann/examples/vector_of_vectors_example.$(OBJEXT):  \
+	nanoflann/examples/$(am__dirstamp) \
+	nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
 
-vector_of_vectors_example$(EXEEXT): $(vector_of_vectors_example_OBJECTS) $(vector_of_vectors_example_DEPENDENCIES) $(EXTRA_vector_of_vectors_example_DEPENDENCIES)
+vector_of_vectors_example$(EXEEXT): $(vector_of_vectors_example_OBJECTS) $(vector_of_vectors_example_DEPENDENCIES) $(EXTRA_vector_of_vectors_example_DEPENDENCIES) 
 	@rm -f vector_of_vectors_example$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(vector_of_vectors_example_OBJECTS) $(vector_of_vectors_example_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f examples/*.$(OBJEXT)
+	-rm -f nanoflann/examples/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@examples/$(DEPDIR)/matrix_example.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@examples/$(DEPDIR)/pointcloud_adaptor_example.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@examples/$(DEPDIR)/pointcloud_example.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@examples/$(DEPDIR)/pointcloud_kdd_radius.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@examples/$(DEPDIR)/vector_of_vectors_example.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@nanoflann/examples/$(DEPDIR)/matrix_example.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@nanoflann/examples/$(DEPDIR)/pointcloud_adaptor_example.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@nanoflann/examples/$(DEPDIR)/pointcloud_example.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@nanoflann/examples/$(DEPDIR)/pointcloud_kdd_radius.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@nanoflann/examples/$(DEPDIR)/vector_of_vectors_example.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -1019,8 +1026,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f examples/$(DEPDIR)/$(am__dirstamp)
-	-rm -f examples/$(am__dirstamp)
+	-rm -f nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
+	-rm -f nanoflann/examples/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1031,11 +1038,11 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-		-rm -f examples/$(DEPDIR)/matrix_example.Po
-	-rm -f examples/$(DEPDIR)/pointcloud_adaptor_example.Po
-	-rm -f examples/$(DEPDIR)/pointcloud_example.Po
-	-rm -f examples/$(DEPDIR)/pointcloud_kdd_radius.Po
-	-rm -f examples/$(DEPDIR)/vector_of_vectors_example.Po
+		-rm -f nanoflann/examples/$(DEPDIR)/matrix_example.Po
+	-rm -f nanoflann/examples/$(DEPDIR)/pointcloud_adaptor_example.Po
+	-rm -f nanoflann/examples/$(DEPDIR)/pointcloud_example.Po
+	-rm -f nanoflann/examples/$(DEPDIR)/pointcloud_kdd_radius.Po
+	-rm -f nanoflann/examples/$(DEPDIR)/vector_of_vectors_example.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1081,11 +1088,11 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f examples/$(DEPDIR)/matrix_example.Po
-	-rm -f examples/$(DEPDIR)/pointcloud_adaptor_example.Po
-	-rm -f examples/$(DEPDIR)/pointcloud_example.Po
-	-rm -f examples/$(DEPDIR)/pointcloud_kdd_radius.Po
-	-rm -f examples/$(DEPDIR)/vector_of_vectors_example.Po
+		-rm -f nanoflann/examples/$(DEPDIR)/matrix_example.Po
+	-rm -f nanoflann/examples/$(DEPDIR)/pointcloud_adaptor_example.Po
+	-rm -f nanoflann/examples/$(DEPDIR)/pointcloud_example.Po
+	-rm -f nanoflann/examples/$(DEPDIR)/pointcloud_kdd_radius.Po
+	-rm -f nanoflann/examples/$(DEPDIR)/vector_of_vectors_example.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
