@@ -652,7 +652,10 @@ AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = -I$(top_srcdir)/contrib/nanoflann/nanoflann/include \
 	$(am__append_1)
 AM_CFLAGS = 
-AM_CXXFLAGS = 
+
+# Nanoflann uses C++ threads now, and sometimes we need special C++
+# flags to get those to link properly.  We'll just use opt-mode here.
+AM_CXXFLAGS = $(CXXFLAGS_OPT)
 include_HEADERS = $(srcdir)/nanoflann/include/nanoflann.hpp
 pointcloud_kdd_radius_SOURCES = $(srcdir)/nanoflann/examples/pointcloud_kdd_radius.cpp nanoflann/examples/utils.h
 pointcloud_example_SOURCES = $(srcdir)/nanoflann/examples/pointcloud_example.cpp nanoflann/examples/utils.h
