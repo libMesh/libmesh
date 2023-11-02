@@ -104,6 +104,7 @@ unit_tests_sources = \
   numerics/lumped_mass_matrix_test.C \
   numerics/eigen_sparse_matrix_test.C \
   numerics/tensor_traits_test.C \
+  numerics/shell_matrix.C \
   parallel/message_tag.C \
   parallel/packed_range_test.C \
   parallel/parallel_sort_test.C \
