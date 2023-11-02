@@ -450,6 +450,13 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
 
   while (true)
     {
+      if (rbe.get_n_basis_functions() >= get_n_training_samples())
+        {
+          libMesh::out << "Number of basis functions (" << rbe.get_n_basis_functions()
+            << ") equals number of training samples, hence exiting." << std::endl;
+          break;
+        }
+
       libMesh::out << "Greedily selected parameter vector:" << std::endl;
       print_parameters();
       greedy_param_list.emplace_back(get_parameters());
