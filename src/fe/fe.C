@@ -190,9 +190,12 @@ void FE<Dim,T>::reinit(const Elem * elem,
           if (this->qrule->shapes_need_reinit())
             this->shapes_on_quadrature = false;
 
+          // We're not going to bother trying to cache nodal
+          // points *and* weights for fancier mapping types.
           if (this->elem_type != elem->type() ||
               this->_elem_p_level != elem->p_level() ||
-              !this->shapes_on_quadrature)
+              !this->shapes_on_quadrature ||
+              elem->mapping_type() != LAGRANGE_MAP)
             {
               // Set the type and p level for this element
               this->elem_type = elem->type();
