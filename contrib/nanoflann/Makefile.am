@@ -2,7 +2,10 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 AM_CPPFLAGS  = -I$(top_srcdir)/contrib/nanoflann/nanoflann/include
 AM_CFLAGS    =
-AM_CXXFLAGS  =
+
+# Nanoflann uses C++ threads now, and sometimes we need special C++
+# flags to get those to link properly.  We'll just use opt-mode here.
+AM_CXXFLAGS  = $(CXXFLAGS_OPT)
 
 # generally we do not install contributed headers, but
 # for nanoflann we will because of its tight inlining
