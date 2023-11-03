@@ -106,6 +106,7 @@ unit_tests_sources = \
   numerics/tensor_traits_test.C \
   parallel/message_tag.C \
   parallel/packed_range_test.C \
+  parallel/packing_types_test.C \
   parallel/parallel_sort_test.C \
   parallel/parallel_sync_test.C \
   parallel/parallel_ghost_sync_test.C \
