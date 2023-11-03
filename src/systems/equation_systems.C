@@ -1489,7 +1489,7 @@ EquationSystems::build_discontinuous_solution_vector
                                   FEInterface::get_continuity(fe_type);
                                 const Elem * const neigh = elem->neighbor_ptr(s);
 
-                                if ((cont == DISCONTINUOUS || cont == H_CURL) &&
+                                if ((cont == DISCONTINUOUS || cont == H_CURL || cont == H_DIV) &&
                                     neigh &&
                                     neigh->level() == elem->level() &&
                                     var_description.active_on_subdomain(neigh->subdomain_id()))
