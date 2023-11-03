@@ -336,9 +336,14 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
             for (auto sol_idx : make_range(N))
               _rb_eim_solutions[counter](sol_idx) = rb_eim_sol_copy(sol_idx);
 
-            // Normalize the error indicator based on the norm of the coefficient vector
+            // Normalize the error indicator based on the norm of the EIM coefficient vector,
+            // but also check for the case that the EIM coefficient vector is zero in order
+            // to handle that separately.
+            Real eim_coeff_norm = _rb_eim_solutions[counter].linfty_norm();
+            Real normalization = (eim_coeff_norm > 0.) ? eim_coeff_norm : 1.;
+
             _rb_eim_error_indicators[counter] =
-              std::abs(rb_eim_error_indicator_val) / _rb_eim_solutions[counter].linfty_norm();
+              std::abs(rb_eim_error_indicator_val) / normalization;
           }
 
         counter++;
