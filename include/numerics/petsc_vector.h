@@ -576,7 +576,42 @@ PetscVector<T>::PetscVector (Vec v,
   ierr = VecGetType(_vec, &ptype);
   LIBMESH_CHKERR(ierr);
 
+#if PETSC_RELEASE_GREATER_EQUALS(3, 21, 0)
+  // Fande only implemented VecGhostGetGhostIS for VECMPI
+  if (std::strcmp(ptype, VECMPI) == 0)
+    {
+      IS ghostis;
+      ierr = VecGhostGetGhostIS(_vec, &ghostis);
+      LIBMESH_CHKERR(ierr);
+
+      Vec localrep;
+      ierr = VecGhostGetLocalForm(_vec, &localrep);
+      LIBMESH_CHKERR(ierr);
+
+      // If is a sparsely stored vector, set up our new mapping
+      // Only checking mapping is not enough to determine if a vec is ghosted
+      // We need to check if vec has a local representation
+      if (ghostis && localrep)
+        {
+          PetscInt ghost_size;
+          ierr = ISGetSize(ghostis, &ghost_size);
+          LIBMESH_CHKERR(ierr);
+
+          const PetscInt * indices;
+          ierr = ISGetIndices(ghostis, &indices);
+          LIBMESH_CHKERR(ierr);
+
+          for (const auto i : make_range(ghost_size))
+            _global_to_local_map[indices[i]] = i;
+          this->_type = GHOSTED;
+          ierr = ISRestoreIndices(ghostis, &indices);
+          LIBMESH_CHKERR(ierr);
+        }
+    }
+  else if (std::strcmp(ptype,VECSHARED) == 0)
+#else
   if ((std::strcmp(ptype,VECSHARED) == 0) || (std::strcmp(ptype,VECMPI) == 0))
+#endif
     {
       ISLocalToGlobalMapping mapping;
       ierr = VecGetLocalToGlobalMapping(_vec, &mapping);
