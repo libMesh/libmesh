@@ -524,19 +524,22 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
 
         // We consider the relative tolerance as relative to the maximum value in the training
         // set, since we assume that this maximum value provides a relevant scaling.
-        if (greedy_error < (get_rel_training_tolerance() * get_max_abs_value_in_training_set()))
-          {
-            libMesh::out << "Relative error tolerance reached." << std::endl;
-            exit_condition_satisfied = true;
-          }
+        if (!exit_condition_satisfied)
+          if (greedy_error < (get_rel_training_tolerance() * get_max_abs_value_in_training_set()))
+            {
+              libMesh::out << "Relative error tolerance reached." << std::endl;
+              exit_condition_satisfied = true;
+            }
 
-        if (greedy_error < get_abs_training_tolerance())
-          {
-            libMesh::out << "Absolute error tolerance reached." << std::endl;
-            exit_condition_satisfied = true;
-          }
+        if (!exit_condition_satisfied)
+          if (greedy_error < get_abs_training_tolerance())
+            {
+              libMesh::out << "Absolute error tolerance reached." << std::endl;
+              exit_condition_satisfied = true;
+            }
 
         bool has_parameters = (get_parameters().n_parameters() > 0);
+        if (!exit_condition_satisfied)
         {
           bool do_exit = false;
           // In the check for repeated parameters we have to make sure this isn't a case
@@ -703,11 +706,12 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           exit_condition_satisfied = true;
         }
 
-      if (rel_err < get_rel_training_tolerance())
-        {
-          libMesh::out << "Training tolerance reached." << std::endl;
-          exit_condition_satisfied = true;
-        }
+      if (!exit_condition_satisfied)
+        if (rel_err < get_rel_training_tolerance())
+          {
+            libMesh::out << "Training tolerance reached." << std::endl;
+            exit_condition_satisfied = true;
+          }
 
       if (exit_condition_satisfied)
         {
