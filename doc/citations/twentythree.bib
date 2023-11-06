@@ -1,3 +1,41 @@
+% MOOSE
+% "... MOOSE ... was leveraged in modeling selective leaching."
+@TechReport{Lawrence_2023,
+  author      = {Svetlana Lawrence and Vaibhav Yadav and Daniel Schwen and Daniel van Vanwasshenova and Jiheon Jun and James R. Keiser and John E. {Wade IV} and Xiang Chen and Dongjin Du and Pranav Karve and Sankaran Mahadevan},
+  title       = {Novel approaches and technologies for aging management},
+  institution = {Idaho National Laboratory},
+  day         = 26,
+  month       = sep,
+  year        = 2023,
+  number      = {INL/RPT-23-74593},
+  note        = {\url{https://www.osti.gov/biblio/2008367}}
+}
+
+% MOOSE
+% "Computational cost of PRIMME, SPPARKS and MOOSE for the 20,000 grain simulation"
+@phdthesis{Melville_thesis,
+  author = {Joseph Melville},
+  school = {University of Florida},
+  title  = {Leveraging machine learning frameworks for efficient, data driven grain growth models},
+  note   = {\url{https://www.proquest.com/openview/083b15a401524e1828277b93e5b95051/1}},
+  month  = dec,
+  year   = 2023
+}
+
+% BISON
+% "These governing equations are solved numerically using the Bison fuel performance code..."
+@Article{Chakroborty_2023,
+  author  = {Promit Chakroborty and Somayajulu L. N. Dhulipala and Yifeng Che and Wen Jiang and Benjamin W. Spencer and Jason D. Hales and Michael D. Shields},
+  title   = {{General multi-fidelity surrogate models: Framework and active learning strategies for efficient rare event simulation}},
+  journal = {Journal of Engineering Mechanics},
+  month   = dec,
+  year    = 2023,
+  volume  = 149,
+  number  = 12,
+  pages   = {04023096 (xx pages)},
+  note    = {\url{https://doi.org/10.1061/JENMDT.EMENG-7111}, ArXiv e-print: \url{https://arxiv.org/abs/2212.03375}}
+}
+
 % MOOSE/BlueCRAB
 % https://www.osti.gov/biblio/2203272
 @TechReport{Behne_2023,
@@ -13,6 +51,7 @@
 
 % MOOSE/NIsoS
 % "The theoretical models are numerically implemented ... within the program NIsoS, developed by authors based on MOOSE ..."
+% author:yang author:bharech elasto-plastic residual stress analysis
 @Misc{YYang_2023c,
   author       = {Yangyiwei Yang and Somnath Bharech and Nick Finger and Xiandong Zhou and Joerg Schr{\"{o}}der and Bai-Xiang Xu},
   title        = {{Elasto-plastic residual stress analysis of selective sintered porous materials based on 3D-multilayer thermo-structural phase-field simulations}},
@@ -24,13 +63,19 @@
 
 % MOOSE
 % "The PF model is solved using the MOOSE software ..."
-@Misc{SacMorane_2023,
-  author       = {Alexandre Sac-Morane and Manolis Veveakis and Hadrien Rattez},
-  title        = {{A phase-field discrete element method to study chemo-mechanical coupling in granular materials}},
-  month        = oct,
-  year         = 2023,
-  howpublished = {ArXiv e-print},
-  note         = {\url{https://arxiv.org/abs/2310.15718}}
+% Note 1: The DOI was not active when I first tried it.
+% https://proceedings.open.tudelft.nl/seg23/article/view/630
+% Note 2: the conference paper is two pages, but the ArXiv e-print is much longer (67 pages)
+% so this may appear as a journal article at some point.
+% author:sac-morane author:veveakis phase-field discrete element method
+@InProceedings{SacMorane_2023,
+  author    = {Alexandre Sac-Morane and Manolis Veveakis and Hadrien Rattez},
+  title     = {{A phase-field discrete element method to study chemo-mechanical coupling in granular materials}},
+  booktitle = {{Proceedings of the 2023 Symposium on Energy Geotechnics (SEG23)}},
+  address   = {Delft, Netherlands},
+  month     = oct # {~3--5,},
+  year      = 2023,
+  note      = {\url{https://doi.org/10.59490/seg.2023.630}, ArXiv e-print: \url{https://arxiv.org/abs/2310.15718}}
 }
 
 % MOOSE
@@ -129,7 +174,7 @@
 % MOOSE
 % "... the above chemo-mechanical governing equations and corresponding constitutive laws are numerically implemented in MOOSE..."
 % https://www.mathematik.uni-ulm.de/stochastik/personal/schmidt/publications/fractures.pdf
-% author:allen author:allen author:rezaei cohesive phase-field chemo-mechanical
+% author:chen author:allen author:rezaei cohesive phase-field chemo-mechanical
 @Misc{WXChen_2023,
   author       = {Wan-Xin Chen and Jeffery M. Allen and Shahed Rezaei and Orkun Furat and Volker Schmidt and Avtar Singh and Peter J. Weddle and Kandler Smith and Bai-Xang Xu},
   title        = {{Cohesive phase-field chemo-mechanical simulations of inter- and trans-granular fracture in polycrystalline NMC cathode via image-based 3D reconstruction}},
@@ -259,6 +304,7 @@
 % MOOSE
 % "... the PF simulations are implemented with MOOSE"
 % author:melville author:yadav new efficient grain growth
+% https://www.researchgate.net/publication/374215524_A_New_Efficient_Grain_Growth_Model_Using_a_Random_Gaussian-Sampled_Mode_Filter
 @Misc{Melville_2023,
   author       = {Joseph Fremont Melville and Vishal Yadav and Lin Yang and Amanda Krause and Michael Tonks and Joel B. Harley},
   title        = {{A new efficient grain growth model using a random Gaussian-sampled mode filter}},
@@ -1897,18 +1943,6 @@
   numbe   = 14,
   pages   = {2203969 (xx pages)},
   note    = {\url{https://doi.org/10.1002/aenm.202203969}, ChemRxiv e-print: \url{https://doi.org/10.26434/chemrxiv-2023-6qxhb}}
-}
-
-% MOOSE
-% "Eqs. (13)-(15) are implemented by FEM in the package NIsoS developed by authors based on MOOSE framework"
-% author:yang author:fathidoost Micromagnetics and multiscale hysteresis
-@Misc{YYang_2023b,
-  author       = {Yangyiwei Yang and Patrick K{\"{u}}hn and Mozhdeh Fathidoost and Bai-Xiang Xu},
-  title        = {Micromagnetics and multiscale hysteresis simulations of permanent magnets},
-  month        = apr,
-  year         = 2023,
-  howpublished = {ArXiv e-print},
-  note         = {\url{https://arxiv.org/abs/2304.05343}}
 }
 
 % MOOSE
