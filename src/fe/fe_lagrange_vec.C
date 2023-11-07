@@ -185,7 +185,7 @@ void lagrange_vec_nodal_soln(const Elem * elem,
             libmesh_fallthrough();
           case TET10:
             {
-              libmesh_assert (type == TET10 || nodal_soln.size() == 3*10);
+              libmesh_assert (type == TET14 || nodal_soln.size() == 3*10);
               libmesh_assert_equal_to (elem_soln.size(), 3*4);
 
               // node 0 components
