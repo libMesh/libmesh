@@ -15,87 +15,18 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// <h1>Vector Finite Elements Example 8 - Single Face Hybridizable</h1>
+// <h1>Vector Finite Elements Example 8 - Single Face Hybridizable Discontinuous Galerkin</h1>
 // \author Alexander Lindsay
 // \date 2023
 //
-// This example hybridizes Raviart-Thomas elements to solve a model div-grad
-// problem in both 2d and 3d. Before hybridization, the mixed problem is simply
-// a div-grad formulation, \vec{u} = -\nabla p, and \nabla \cdot \vec{u} = f, of
-// the Poisson problem in Introduction Example 3, \nabla^2 p = -f. A standard
-// (non-hybridized) Raviart-Thomas discretization of the same problem can be
-// found in Vector Example 6.
-//
-// One of the first references for the hybridized Raviart-Thomas (RT)
-// formulation is Arnold's and Brezzi's "Mixed and nonconforming finite element
-// methods: implementation, postprocessing and error estimates". The key piece
-// to the hybridized formulation is breaking the continuity of the RT space,
-// e.g. we no longer require that the normal component of the RT space be
-// continuous across interelement boundaries. In the notation of Arnold and
-// Brezzi this means a change from RT_0^k -> RT_{-1}^k where k is the polynomial
-// order of the basis (note that here k denotes the polynomial order of the
-// *divergence* of the vector shape functions, so for k = 0, the RT basis in
-// libMesh is FIRST). This breakage in continuity is accomplished by changing
-// from an FEFamily of RAVIART_THOMAS to L2_RAVIART_THOMAS. Instead of being
-// enforced by the finite element space itself, continuity of the normal
-// component of the vector field is enforced through Lagrange multipliers that
-// live on the sides of the elements. Let's introduce a subspace of L2, M_{-1}^k,
-// where the functions in M_{-1}^k are polynomials of degree of k or less. These
-// polynomials can live on our elements (I_h) or on our internal element faces
-// (E0_h); we will denote these polynomial subspaces respectively as M_{-1}^k (I_h)
-//  and M_{-1}^k (E0_h). We will denote boundary faces by E. The hybridized
-// problem can be summarized as follows:
-//
-// find the approximate solutions (u_h, p_h, lambda_h) in
-// RT_{-1}^k x M_{-1}^k (I_h) x M^{-1}^k (E0_h)
-// such that
-//
-// (u, tau) - (p, div(tau)) + <lambda, tau*n>_E0 = -<g, tau*n>_E for all tau in RT_{-1}^k (I_h)
-// -(v, div(u)) = -(f, v) for all v in M_{-1}^k (I_h)
-// <mu, u*n> = 0 for all mu in M_{-1}^k (E0_h)
-//
-// with p = g on the boundary (Dirichlet problem). In the above, n denotes the
-// normal vector facing outward from the element for which we are doing local
-// assembly
-//
-// We can write this in a matrix form:
-// (A  B  C)(u)        (G)
-// (Bt 0  0)(p)      = (F)
-// (Ct 0  0)(lambda)   (0)
-//
-// The matrix A is block diagonal, e.g. it is entirely localized within an
-// element due to the breakage of the continuity requirements of the RT
-// space. This allows us to write:
-//
-// u = A^{-1} (G - Bp - C lambda)
-//
-// We can further eliminate p to end up with a global system that depends only on lambda:
-//
-// E lambda = H
-//
-// where
-//
-// E = Ct * A^{-1} * (A - B * S^{-1} * Bt) * A^{-1} * C
-// S = Bt * A^{-1} * B
-// H = Hg + Hf
-// Hg = Ct * A^{-1} * (A - B * S^{-1} * Bt) * A^{-1} * G
-// Hf = Ct * A^{-1} * B * S^{-1} * F
-//
-// Here in our example we compose local element matrices A, B, C, Bt, Ct, G, and
-// F using finite element assembly. Then due to the small size of the local
-// element matrices, we actually compute the required inverses and build E and H
-// which is then fed into the global matrix and vector respectively. The
-// resulting global matrix is symmetric positive definite which is a nice change
-// over the saddle point standard RT discretization. Moreover, the global system
-// size of the hybridized problem is less than standard RT.
-//
-// Once the global system is solved. We go through finite element assembly a
-// second time to locally construct the u and p solutions from lambda. Finally,
-// lambda (and p for non-simplices) are used to reconstruct a higher-order
-// approximation of p, e.g. a solution using a basis of polynomials of degree k + 1.
-// Lambda is used in this reconstruction because it represents a
-// projection of the true solution for p onto M_{-1}^k (E0_h) ; e.g. as is so
-// often the case, the Lagrange multipliers have a physical meaning
+// This example is identical to Example 7 with the exception that the local
+// solvers are built using a Single Face Discontinuous Galerkin
+// formulation as opposed to a Raviart-Thomas Galerkin formulation. Equal order
+// polynomials are used to discretize the scalar and vector fields. "Single
+// Face" (SF) refers to the stabilization term added to the trace of the
+// flux. Whereas in example 7, the trace of the flux \hat{u} is simply set to
+// the flux u, in this SF-DG formulation \hat{u} = u + \tau * (p - \lambda)
+// where \tau is only nonzero on a single element face
 
 // Basic utilities.
 #include "libmesh/string_to_enum.h"
@@ -183,7 +114,7 @@ main(int argc, char ** argv)
   Mesh mesh(init.comm());
 
   // Use the MeshTools::Generation mesh generator to create a uniform
-  // grid on the cube [-1,1]^D. To accomodate Raviart-Thomas elements, we must
+  // grid on the cube [-1,1]^D. To accomodate first order side hierarchics, we must
   // use TRI6/7 or QUAD8/9 elements in 2d, or TET14 or HEX27 in 3d.
   const std::string elem_str = infile("element_type", std::string("TRI6"));
 
@@ -217,20 +148,20 @@ main(int argc, char ** argv)
   // Create an equation systems object.
   EquationSystems equation_systems(mesh);
 
-  // Declare the system  "DivGrad" and its variables.
-  auto & system = equation_systems.add_system<System>("DivGrad");
+  // Declare the system "Mixed" and its variables.
+  auto & system = equation_systems.add_system<System>("Mixed");
 
   // Add the LM system
   auto & lm_system = equation_systems.add_system<LinearImplicitSystem>("Lambda");
 
-  // Adds the variable "u" and "p" to "DivGrad". "u" will be our vector field
+  // Adds the variable "u" and "p" to "Mixed". "u" will be our vector field
   // whereas "p" will be the scalar field.
   system.add_variable("u", FIRST, L2_LAGRANGE_VEC);
   system.add_variable("p", FIRST, L2_LAGRANGE);
 
   // We also add a higher order version of our 'p' variable whose solution we
-  // will compute using the Lagrange multiplier field and, for non-simplexes,
-  // the low order 'p' solution
+  // will postprocess using the Lagrange multiplier, 'u', and the low order 'p'
+  // solution
   system.add_variable("p_enriched", SECOND, L2_LAGRANGE);
 
   // Add our Lagrange multiplier to the implicit system
@@ -420,6 +351,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   // The global system matrix
   SparseMatrix<Number> & matrix = lambda_system.get_system_matrix();
 
+  // Helper function to compute the solution at quadrature points for building right hand sides
   auto compute_qp_soln = [](auto & qp_vec, const auto n_qps, const auto & phi, const auto & soln)
   {
     libmesh_assert(cast_int<std::size_t>(soln.size()) == phi.size());
@@ -510,6 +442,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
       }
     }
 
+    // At the beginning of the loop, we mark that we haven't found our "Single-Face" yet
     bool tau_found = false;
     for (auto side : elem->side_index_range())
     {
@@ -555,8 +488,9 @@ fe_assembly(EquationSystems & es, const bool global_solve)
         }
       else
       {
-        // Stabilization parameter. In the single face discretization, only a single face has a
-        // non-zero value of tau
+        // If we haven't found our "Single-Face" yet, then we assign tau to
+        // something non-zero. Else we have previously designated our nonzero
+        // "Single-Face" and so we mark tau as zero
         const Real tau = tau_found ? 0 : 1 / elem->hmin();
         tau_found = true;
 
@@ -658,10 +592,8 @@ fe_assembly(EquationSystems & es, const bool global_solve)
         system.solution->set(scalar_dof_indices[i], scalar_soln(i));
 
       //
-      // Now solve for the enriched scalar solution using our Lagrange multiplier solution and, for
-      // non-simplexes, the lower-order scalar solution. Note that the Lagrange multiplier
-      // represents the trace of p so it is a logical choice to leverage in this postprocessing
-      // stage!
+      // Now solve for the enriched scalar solution using our Lagrange
+      // multiplier solution, u, and our low-order p
       //
 
       dof_map.dof_indices(elem, enriched_scalar_dof_indices, system.variable_number("p_enriched"));
