@@ -22,7 +22,7 @@
 #include "libmesh/function_base.h"
 
 // Example includes
-#include "div_grad_exact_solution.h"
+#include "mixed_exact_solution.h"
 
 // C++ includes
 #include <memory>
@@ -54,7 +54,7 @@ public:
   }
 
 private:
-  DivGradExactSolution soln;
+  MixedExactSolution soln;
 };
 
 template <>
@@ -119,7 +119,7 @@ public:
   }
 
 private:
-  DivGradExactSolution soln;
+  MixedExactSolution soln;
 };
 
 template <>

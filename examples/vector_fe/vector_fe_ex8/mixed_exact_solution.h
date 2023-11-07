@@ -15,19 +15,19 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef DIV_GRAD_EXACT_SOLUTION_H
-#define DIV_GRAD_EXACT_SOLUTION_H
+#ifndef MIXED_EXACT_SOLUTION_H
+#define MIXED_EXACT_SOLUTION_H
 
 #include "libmesh/libmesh_common.h"
 #include "libmesh/vector_value.h"
 
 using namespace libMesh;
 
-class DivGradExactSolution
+class MixedExactSolution
 {
 public:
-  DivGradExactSolution() = default;
-  ~DivGradExactSolution() = default;
+  MixedExactSolution() = default;
+  ~MixedExactSolution() = default;
 
   Real scalar(Real x, Real y)
   {
@@ -109,4 +109,4 @@ public:
   }
 };
 
-#endif // DIV_GRAD_EXACT_SOLUTION_H
+#endif // MIXED_EXACT_SOLUTION_H

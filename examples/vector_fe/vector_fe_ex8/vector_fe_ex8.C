@@ -286,14 +286,14 @@ main(int argc, char ** argv)
     exact_sol.extra_quadrature_order(extra_error_quadrature);
 
   // Compute the error.
-  exact_sol.compute_error("DivGrad", "u");
-  exact_sol.compute_error("DivGrad", "p");
-  exact_sol.compute_error("DivGrad", "p_enriched");
+  exact_sol.compute_error("Mixed", "u");
+  exact_sol.compute_error("Mixed", "p");
+  exact_sol.compute_error("Mixed", "p_enriched");
 
   // Print out the error values.
-  libMesh::out << "L2 error is: " << exact_sol.l2_error("DivGrad", "u") << std::endl;
-  libMesh::out << "L2 error for p is: " << exact_sol.l2_error("DivGrad", "p") << std::endl;
-  libMesh::out << "L2 error p_enriched is: " << exact_sol.l2_error("DivGrad", "p_enriched")
+  libMesh::out << "L2 error is: " << exact_sol.l2_error("Mixed", "u") << std::endl;
+  libMesh::out << "L2 error for p is: " << exact_sol.l2_error("Mixed", "p") << std::endl;
+  libMesh::out << "L2 error p_enriched is: " << exact_sol.l2_error("Mixed", "p_enriched")
                << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -316,8 +316,8 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   const MeshBase & mesh = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
 
-  // The div-grad, e.g. vector-scalar system
-  auto & system = es.get_system<System>("DivGrad");
+  // The mixed, e.g. vector-scalar system
+  auto & system = es.get_system<System>("Mixed");
   // Our implicit Lagrange multiplier system
   auto & lambda_system = es.get_system<LinearImplicitSystem>("Lambda");
 
@@ -500,9 +500,9 @@ fe_assembly(EquationSystems & es, const bool global_solve)
         // This is the well-known "method of manufactured solutions".
         Real f = 0;
         if (dim == 2)
-          f = DivGradExactSolution().forcing(x, y);
+          f = MixedExactSolution().forcing(x, y);
         else if (dim == 3)
-          f = DivGradExactSolution().forcing(x, y, z);
+          f = MixedExactSolution().forcing(x, y, z);
 
         // Scalar equation RHS
         for (const auto i : make_range(scalar_n_dofs))
@@ -528,9 +528,9 @@ fe_assembly(EquationSystems & es, const bool global_solve)
           // The boundary value for scalar field.
           Real scalar_value = 0;
           if (dim == 2)
-            scalar_value = DivGradExactSolution().scalar(xf, yf);
+            scalar_value = MixedExactSolution().scalar(xf, yf);
           else if (dim == 3)
-            scalar_value = DivGradExactSolution().scalar(xf, yf, zf);
+            scalar_value = MixedExactSolution().scalar(xf, yf, zf);
 
           // External boundary -> Dirichlet faces -> Vector equation RHS
           for (const auto i : make_range(vector_n_dofs))
@@ -702,9 +702,9 @@ fe_assembly(EquationSystems & es, const bool global_solve)
           // This is the well-known "method of manufactured solutions".
           Real f = 0;
           if (dim == 2)
-            f = DivGradExactSolution().forcing(x, y);
+            f = MixedExactSolution().forcing(x, y);
           else if (dim == 3)
-            f = DivGradExactSolution().forcing(x, y, z);
+            f = MixedExactSolution().forcing(x, y, z);
 
           // Scalar equation RHS
           for (const auto i : make_range(enriched_scalar_n_dofs))
