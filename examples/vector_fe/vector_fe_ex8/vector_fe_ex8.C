@@ -216,8 +216,6 @@ main(int argc, char ** argv)
 
   // Create an equation systems object.
   EquationSystems equation_systems(mesh);
-  const bool simplicial = (elem_str == "TRI6") || (elem_str == "TRI7") || (elem_str == "TET14");
-  equation_systems.parameters.set<bool>("simplicial") = simplicial;
 
   // Declare the system  "DivGrad" and its variables.
   auto & system = equation_systems.add_system<System>("DivGrad");
@@ -290,19 +288,13 @@ main(int argc, char ** argv)
   // Compute the error.
   exact_sol.compute_error("DivGrad", "u");
   exact_sol.compute_error("DivGrad", "p");
-#if !defined(LIBMESH_HAVE_PETSC) || !defined(LIBMESH_USE_REAL_NUMBERS)
-  if (simplicial)
-#endif
-    exact_sol.compute_error("DivGrad", "p_enriched");
+  exact_sol.compute_error("DivGrad", "p_enriched");
 
   // Print out the error values.
   libMesh::out << "L2 error is: " << exact_sol.l2_error("DivGrad", "u") << std::endl;
   libMesh::out << "L2 error for p is: " << exact_sol.l2_error("DivGrad", "p") << std::endl;
-#if !defined(LIBMESH_HAVE_PETSC) || !defined(LIBMESH_USE_REAL_NUMBERS)
-  if (simplicial)
-#endif
-    libMesh::out << "L2 error p_enriched is: " << exact_sol.l2_error("DivGrad", "p_enriched")
-                 << std::endl;
+  libMesh::out << "L2 error p_enriched is: " << exact_sol.l2_error("DivGrad", "p_enriched")
+               << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
