@@ -1079,6 +1079,7 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
+LOCAL_CC
 PETSCARCH
 PETSC_ARCH
 PETSC_DIR
@@ -5707,6 +5708,7 @@ then :
                   PETSCLINKLIBS=`make -s -C ${PETSC_DIR} SHELL=/bin/sh getlinklibs`
                   PETSCINCLUDEDIRS=`make -s -C ${PETSC_DIR} SHELL=/bin/sh getincludedirs`
                   PETSC_CXX=`make -s -C $PETSC_DIR SHELL=/bin/sh getcxxcompiler`
+                  PETSC_CC=`make -s -C $PETSC_DIR SHELL=/bin/sh getccompiler`
                   PETSC_MPI_INCLUDE_DIRS=`make -s -C $PETSC_DIR SHELL=/bin/sh getmpiincludedirs`
                   PETSC_MPI_LINK_LIBS=`make -s -C $PETSC_DIR SHELL=/bin/sh getmpilinklibs`
                   printf '%s\n' "include $PETSC_VARS_FILE" > Makefile_config_petsc
@@ -5740,6 +5742,8 @@ fi
                   printf '\t%s\n' "echo \$(PETSC_SNES_LIB)" >> Makefile_config_petsc
                   printf '%s\n' "getcxxcompiler:" >> Makefile_config_petsc
                   printf '\t%s\n' "echo \$(CXX)" >> Makefile_config_petsc
+                  printf '%s\n' "getccompiler:" >> Makefile_config_petsc
+                  printf '\t%s\n' "echo \$(CC)" >> Makefile_config_petsc
                   printf '%s\n' "getmpiincludedirs:" >> Makefile_config_petsc
                   printf '\t%s\n' "echo \$(MPI_INCLUDE)" >> Makefile_config_petsc
                   printf '%s\n' "getmpilinklibs:" >> Makefile_config_petsc
@@ -5749,6 +5753,7 @@ fi
                   PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc SHELL=/bin/sh getPETSC_CC_INCLUDES`
                   PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc SHELL=/bin/sh getPETSC_FC_INCLUDES`
                   PETSC_CXX=`make -s -f Makefile_config_petsc SHELL=/bin/sh getcxxcompiler`
+                  PETSC_CC=`make -s -f Makefile_config_petsc SHELL=/bin/sh getccompiler`
                   PETSC_MPI_INCLUDE_DIRS=`make -s -f Makefile_config_petsc SHELL=/bin/sh getmpiincludedirs`
                   PETSC_MPI_LINK_LIBS=`make -s -f Makefile_config_petsc SHELL=/bin/sh getmpilinklibs`
                   rm -f Makefile_config_petsc
@@ -5877,17 +5882,97 @@ then :
 fi
 
 
-  # --------------------------------------------------------------
-  # Determine a C compiler to use.  If CC is not already set, checks for
-  # gcc, cc, and other C compilers.  Then sets the CC variable to the result.
-  # --------------------------------------------------------------
-  ac_ext=c
+        if test -z "$CC" && test "$enablempi" != no
+then :
+
+                    if test x"$MPI" != x
+then :
+
+                                    if test -d "$MPI/bin"
+then :
+
+                          for ac_prog in mpicxx mpiCC mpicc
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_prog_LOCAL_CC+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  if test -n "$LOCAL_CC"; then
+  ac_cv_prog_LOCAL_CC="$LOCAL_CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in "$MPI/bin"
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_prog_LOCAL_CC="$ac_prog"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+LOCAL_CC=$ac_cv_prog_LOCAL_CC
+if test -n "$LOCAL_CC"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $LOCAL_CC" >&5
+printf "%s\n" "$LOCAL_CC" >&6; }
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+fi
+
+
+  test -n "$LOCAL_CC" && break
+done
+
+                          if test -z "$LOCAL_CC"
+then :
+  printf "%s\n" "None of the wrappers we look for exist in $MPI/bin. We will not try to use mpi compiler wrappers"
+else $as_nop
+  MPI_USING_WRAPPERS=1;CC="$MPI/bin/$LOCAL_CC"
+fi
+
+else $as_nop
+  printf "%s\n" "An MPI directory was specified, but $MPI/bin does not exist. We will not try to use mpi compiler wrappers"
+fi
+
+else $as_nop
+
+                                                                        if test x"$PETSC_HAVE_MPI" = x1 && test x"$PETSC_CC" != x
+then :
+
+else $as_nop
+                          CC_TRY_LIST="mpicc $CXX_TRY_LIST"
+fi
+
+fi
+fi
+
+                if test -z "$CC" && test x"$PETSC_HAVE_MPI" = x1 && test x"$PETSC_CC" != x
+then :
+  CC="$PETSC_CC"
+fi
+
+    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 if test -n "$ac_tool_prefix"; then
-  for ac_prog in $CC_TRY_LIST
+  for ac_prog in $CXX_TRY_LIST
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
 set dummy $ac_tool_prefix$ac_prog; ac_word=$2
@@ -5936,7 +6021,7 @@ fi
 fi
 if test -z "$CC"; then
   ac_ct_CC=$CC
-  for ac_prog in $CC_TRY_LIST
+  for ac_prog in $CXX_TRY_LIST
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -6741,7 +6826,6 @@ else
 fi
 
 
-  # --------------------------------------------------------------
 
 
   # --------------------------------------------------------------
@@ -26082,6 +26166,24 @@ fi
   # interferes with OProfile callgraphs
   ACSM_OPROFILE_FLAGS="-g -fno-omit-frame-pointer"
 
+  # Turning on floating-point exceptions is technically undefined
+  # behavior, and optimizers are starting to take advantage of that.
+  # See e.g. LLVM github issue #71492: "Whether your source code
+  # contains operations that produce a division by zero is irrelevant,
+  # as they may be legally introduced by the compiler." So if we might
+  # want to be able to trigger SIGFPE without false positives, we need
+  # to use compiler flags that enable that.
+  #
+  # Those are likely to vary from compiler to compiler, because "just
+  # never let the optimizer cause a floating-point exception" used to
+  # be a popular enough strategy that you didn't need a compiler
+  # flag.  The gcc manual for -fno-trapping-math still says "This
+  # option should never be turned on by any -O option since it can
+  # result in incorrect output for programs which depend on an exact
+  # implementation of IEEE or ISO rules/specifications for math
+  # functions"...
+  ACSM_FPE_SAFETY_FLAGS=""
+
   # For compilers that support it (clang >= 3.5.0 and GCC >= 4.8) the
   # user can selectively enable "sanitize" flags for different METHODs
   # with e.g.
@@ -26234,6 +26336,8 @@ then :
           ACSM_CXXFLAGS_DEVEL="$ACSM_CXXFLAGS_DEVEL -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -fstrict-aliasing -Woverloaded-virtual -Wdisabled-optimization"
           ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Woverloaded-virtual"
           ACSM_NODEPRECATEDFLAG="-Wno-deprecated"
+
+                    ACSM_FPE_SAFETY_FLAGS="-ftrapping-math"
 
           ACSM_CFLAGS_OPT="-O2 -fstrict-aliasing"
           ACSM_CFLAGS_DEVEL="$ACSM_CFLAGS_OPT -g -Wimplicit -fstrict-aliasing"
@@ -26389,6 +26493,8 @@ fi
                                               ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long"
                        ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
                        ACSM_NODEPRECATEDFLAG="-Wno-deprecated"
+
+                                                                                                                                                                                                               ACSM_FPE_SAFETY_FLAGS="-ftrapping-math"
 
                                               ACSM_PARANOID_FLAGS="-Wall -Wextra -Wcast-align -Wdisabled-optimization -Wformat=2"
                        ACSM_PARANOID_FLAGS="$ACSM_PARANOID_FLAGS -Wformat-nonliteral -Wformat-security -Wformat-y2k"
