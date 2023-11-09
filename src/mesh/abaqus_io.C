@@ -679,7 +679,7 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
       // Add an element of the appropriate type to the Mesh, with the
       // abaqus element ID.
       std::unique_ptr<Elem> new_elem = Elem::build(elem_type);
-      new_elem->set_id() = abaqus_elem_id;
+      new_elem->set_id() = abaqus_elem_id-1;
 
       Elem * elem = the_mesh.add_elem(std::move(new_elem));
 
