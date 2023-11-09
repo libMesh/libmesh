@@ -25,6 +25,7 @@
 
 // C++ includes
 #include <fstream>
+#include <memory>
 #include <set>
 
 namespace libMesh
@@ -203,7 +204,7 @@ private:
   /**
    * Stream object used to interact with the file
    */
-  std::ifstream _in;
+  std::unique_ptr<std::istream> _in;
 
   /**
    * A set of the different geometric element types detected when reading the

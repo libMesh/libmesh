@@ -23,6 +23,13 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/utility.h"
 
+// gzstream for reading compressed files as a stream
+#ifdef LIBMESH_HAVE_GZSTREAM
+# include "libmesh/ignore_warnings.h" // shadowing in gzstream.h
+# include "gzstream.h"
+# include "libmesh/restore_warnings.h"
+#endif
+
 // C++ includes
 #include <unordered_map>
 #include <string>
@@ -254,8 +261,30 @@ void AbaqusIO::read (const std::string & fname)
   the_mesh.clear();
 
   // Open stream for reading
-  _in.open(fname.c_str());
-  libmesh_assert(_in.good());
+  const bool gzipped_file = (fname.rfind(".gz") == fname.size() - 3);
+
+  if (gzipped_file)
+    {
+#ifdef LIBMESH_HAVE_GZSTREAM
+      igzstream * inf = new igzstream;
+      libmesh_assert(inf);
+      _in.reset(inf);
+      inf->open(fname.c_str(), std::ios::in);
+#else
+      libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
+#endif
+    }
+  else
+    {
+      std::ifstream * inf = new std::ifstream;
+      libmesh_assert(inf);
+      _in.reset(inf);
+
+      std::string new_name = Utility::unzip_file(fname);
+
+      inf->open(new_name.c_str(), std::ios::in);
+      libmesh_assert(inf->good());
+    }
 
   // Initialize the elems_of_dimension array.  We will use this in a
   // "1-based" manner so that elems_of_dimension[d]==true means
@@ -269,9 +298,9 @@ void AbaqusIO::read (const std::string & fname)
   while (true)
     {
       // Try to read something.  This may set EOF!
-      std::getline(_in, s);
+      std::getline(*_in, s);
 
-      if (_in)
+      if (*_in)
         {
           // Process s...
           //
@@ -414,11 +443,11 @@ void AbaqusIO::read (const std::string & fname)
             }
 
           continue;
-        } // if (_in)
+        } // if (*_in)
 
       // If !file, check to see if EOF was set.  If so, break out
       // of while loop.
-      if (_in.eof())
+      if (_in->eof())
         break;
 
       // If !in and !in.eof(), stream is in a bad state!
@@ -489,11 +518,11 @@ void AbaqusIO::read_nodes(std::string nset_name)
   // We will read nodes until the next line begins with *, since that will be the
   // next section.
   // TODO: Is Abaqus guaranteed to start the line with '*' or can there be leading white space?
-  while (_in.peek() != '*' && _in.peek() != EOF)
+  while (_in->peek() != '*' && _in->peek() != EOF)
     {
       // Read an entire line which corresponds to a single point's id
       // and (x,y,z) values.
-      std::getline(_in, line);
+      std::getline(*_in, line);
 
       // Remove all whitespace characters from the line.  This way we
       // can do the remaining parsing without worrying about tabs,
@@ -667,14 +696,14 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
 
   // We will read elements until the next line begins with *, since that will be the
   // next section.
-  while (_in.peek() != '*' && _in.peek() != EOF)
+  while (_in->peek() != '*' && _in->peek() != EOF)
     {
       // Read the element ID, it is the first number on each line.  It is
       // followed by a comma, so read that also.  We will need this ID later
       // when we try to assign subdomain IDs
       dof_id_type abaqus_elem_id = 0;
       char c;
-      _in >> abaqus_elem_id >> c;
+      *_in >> abaqus_elem_id >> c;
 
       // Add an element of the appropriate type to the Mesh, with the
       // abaqus element ID.
@@ -691,7 +720,7 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
         {
           // Read entire line (up to carriage return) of comma-separated values
           std::string csv_line;
-          std::getline(_in, csv_line);
+          std::getline(*_in, csv_line);
 
           // Create a stream object out of the current line
           std::stringstream line_stream(csv_line);
@@ -822,11 +851,11 @@ void AbaqusIO::read_ids(std::string set_name, container_t & container)
   std::vector<dof_id_type> & id_storage = container[set_name];
 
   // Read until the start of another section is detected, or EOF is encountered
-  while (_in.peek() != '*' && _in.peek() != EOF)
+  while (_in->peek() != '*' && _in->peek() != EOF)
     {
       // Read entire comma-separated line into a string
       std::string csv_line;
-      std::getline(_in, csv_line);
+      std::getline(*_in, csv_line);
 
       // On that line, use std::getline again to parse each
       // comma-separated entry.
@@ -857,11 +886,11 @@ void AbaqusIO::generate_ids(std::string set_name, container_t & container)
   // Read until the start of another section is detected, or EOF is
   // encountered.  "generate" sections seem to only have one line,
   // although I suppose it's possible they could have more.
-  while (_in.peek() != '*' && _in.peek() != EOF)
+  while (_in->peek() != '*' && _in->peek() != EOF)
     {
       // Read entire comma-separated line into a string
       std::string csv_line;
-      std::getline(_in, csv_line);
+      std::getline(*_in, csv_line);
 
       // Remove all whitespaces from csv_line.
       strip_ws(csv_line);
@@ -899,10 +928,10 @@ void AbaqusIO::read_sideset(const std::string & sideset_name,
   std::string elem_id_or_set, dummy;
 
   // Read until the start of another section is detected, or EOF is encountered
-  while (_in.peek() != '*' && _in.peek() != EOF)
+  while (_in->peek() != '*' && _in->peek() != EOF)
     {
       // Read first string up to and including the comma, which is discarded.
-      std::getline(_in, elem_id_or_set, ',');
+      std::getline(*_in, elem_id_or_set, ',');
 
       // Strip any leading or trailing trailing whitespace from this
       // string, since some Abaqus files may have this.
@@ -931,7 +960,7 @@ void AbaqusIO::read_sideset(const std::string & sideset_name,
           // Read the character "S", followed by the side id. Note: the >> operator
           // eats whitespace until it reaches a valid character, so this should work
           // whether or not there is a space after the previous comma.
-          _in >> c >> side_id;
+          *_in >> c >> side_id;
 
           // Try to convert first string to an integer.
           dof_id_type elem_id;
@@ -954,7 +983,7 @@ void AbaqusIO::read_sideset(const std::string & sideset_name,
 
       // Successful or not, we extract the remaining characters on the
       // line, including the newline, to (hopefully) go to the next section.
-      std::getline(_in, dummy);
+      std::getline(*_in, dummy);
     } // while
 }
 
@@ -1229,24 +1258,24 @@ void AbaqusIO::process_and_discard_comments()
       // comments or may be data.  We need to only discard the line if
       // it begins with **, but we must avoid calling std::getline()
       // since there's no way to put that back.
-      if (_in.peek() == '*')
+      if (_in->peek() == '*')
         {
           // The first character was a star, so actually read it from the stream.
-          _in.get();
+          _in->get();
 
           // Peek at the next character...
-          if (_in.peek() == '*')
+          if (_in->peek() == '*')
             {
               // OK, second character was star also, by definition this
               // line must be a comment!  Read the rest of the line and discard!
-              std::getline(_in, dummy);
+              std::getline(*_in, dummy);
             }
           else
             {
               // The second character was _not_ a star, so put back the first star
               // we pulled out so that the line can be parsed correctly by somebody
               // else!
-              _in.unget();
+              _in->unget();
 
               // Finally, break out of the while loop, we are done parsing comments
               break;
