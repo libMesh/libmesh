@@ -54,6 +54,7 @@ EXTRA_DIST = reference_elements \
              src/rebuild_libmesh_SOURCES.sh \
 	     contrib/eigen/git/README.md \
 	     contrib/poly2tri/poly2tri/README.md \
+	     contrib/nanoflann/nanoflann/README.md \
              contrib/tecplot/README \
              contrib/bin/strip_dup_incl_paths.pl \
              contrib/bin/strip_dup_libs.pl \
@@ -93,6 +94,13 @@ contrib/eigen/git/README.md:
 contrib/poly2tri/poly2tri/README.md:
 	@echo ""
 	@echo "Error: Poly2Tri submodule not found in contrib/poly2tri/"
+	@echo "You must run git submodule update --init --recursive first"
+	@echo ""
+	@exit 1
+
+contrib/nanoflann/nanoflann/README.md:
+	@echo ""
+	@echo "Error: Nanoflann submodule not found in contrib/nanoflann/"
 	@echo "You must run git submodule update --init --recursive first"
 	@echo ""
 	@exit 1

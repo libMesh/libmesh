@@ -27,7 +27,7 @@ AC_DEFUN([CONFIGURE_NANOFLANN],
   dnl where it might be installed...
   AS_IF([test "x$enablenanoflann" = "xyes"],
         [
-          NANOFLANN_INCLUDE="-I\$(top_srcdir)/contrib/nanoflann/include"
+          NANOFLANN_INCLUDE="-I\$(top_srcdir)/contrib/nanoflann/nanoflann/include"
           AC_DEFINE(HAVE_NANOFLANN, 1, [Flag indicating whether the library will be compiled with nanoflann KD-Tree support])
           AC_MSG_RESULT(<<< Configuring library with nanoflann KDtree support >>>)
 

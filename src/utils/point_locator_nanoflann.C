@@ -158,7 +158,7 @@ PointLocatorNanoflann::kd_tree_find_neighbors(const Point & p,
   // Do the search
   // We leave all the SearchParams() ctor args on their default values
   // (note that the first arg is ignored anyway).
-  _kd_tree->findNeighbors(result_set, query_pt.data(), nanoflann::SearchParams());
+  _kd_tree->findNeighbors(result_set, query_pt.data(), nanoflann::SearchParameters());
 
   return result_set;
 }

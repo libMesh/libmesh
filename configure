@@ -59159,7 +59159,7 @@ fi
       if test "x$enablenanoflann" = "xyes"
 then :
 
-          NANOFLANN_INCLUDE="-I\$(top_srcdir)/contrib/nanoflann/include"
+          NANOFLANN_INCLUDE="-I\$(top_srcdir)/contrib/nanoflann/nanoflann/include"
 
 printf "%s\n" "#define HAVE_NANOFLANN 1" >>confdefs.h
 

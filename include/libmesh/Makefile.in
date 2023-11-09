@@ -894,7 +894,7 @@ uninstall-am:
 @LIBMESH_ENABLE_FPARSER_TRUE@fparser_ad.hh: $(top_srcdir)/contrib/fparser/fparser_ad.hh
 @LIBMESH_ENABLE_FPARSER_TRUE@	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-@LIBMESH_ENABLE_NANOFLANN_TRUE@nanoflann.hpp: $(top_srcdir)/contrib/nanoflann/include/nanoflann.hpp
+@LIBMESH_ENABLE_NANOFLANN_TRUE@nanoflann.hpp: $(top_srcdir)/contrib/nanoflann/nanoflann/include/nanoflann.hpp
 @LIBMESH_ENABLE_NANOFLANN_TRUE@	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 @LIBMESH_ENABLE_EXODUS_V509_TRUE@exodusII.h: $(top_srcdir)/contrib/exodusii/v5.09/include/exodusII.h

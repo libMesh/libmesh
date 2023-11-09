@@ -507,7 +507,7 @@ endif
 
 if LIBMESH_ENABLE_NANOFLANN
 
-nanoflann.hpp: $(top_srcdir)/contrib/nanoflann/include/nanoflann.hpp
+nanoflann.hpp: $(top_srcdir)/contrib/nanoflann/nanoflann/include/nanoflann.hpp
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
   BUILT_SOURCES  += nanoflann.hpp
