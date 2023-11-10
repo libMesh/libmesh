@@ -909,39 +909,39 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
   auto & matrix = lambda_system.get_system_matrix();
 
   auto compute_and_invert_K =
-      [&](const auto vector_n_dofs, const auto scalar_n_dofs, const Elem * const elem)
+      [&](const auto vector_n_dofs_in, const auto scalar_n_dofs_in, const Elem * const elem_in)
   {
-    const auto mixed_size = vector_n_dofs + scalar_n_dofs;
+    const auto mixed_size = vector_n_dofs_in + scalar_n_dofs_in;
 
     K_mixed.setZero(mixed_size, mixed_size);
 
     for (const auto qp : make_range(qrule.n_points()))
     {
       // Vector equation dependence on vector dofs
-      for (const auto i : make_range(vector_n_dofs))
-        for (const auto j : make_range(vector_n_dofs))
+      for (const auto i : make_range(vector_n_dofs_in))
+        for (const auto j : make_range(vector_n_dofs_in))
           K_mixed(i, j) += JxW[qp] * (vector_phi[i][qp] * vector_phi[j][qp]);
 
       // Vector equation dependence on scalar dofs
-      for (const auto i : make_range(vector_n_dofs))
-        for (const auto j : make_range(scalar_n_dofs))
-          K_mixed(i, j + vector_n_dofs) -= JxW[qp] * (div_vector_phi[i][qp] * scalar_phi[j][qp]);
+      for (const auto i : make_range(vector_n_dofs_in))
+        for (const auto j : make_range(scalar_n_dofs_in))
+          K_mixed(i, j + vector_n_dofs_in) -= JxW[qp] * (div_vector_phi[i][qp] * scalar_phi[j][qp]);
 
       // Scalar equation dependence on vector dofs
-      for (const auto i : make_range(scalar_n_dofs))
-        for (const auto j : make_range(vector_n_dofs))
-          K_mixed(i + vector_n_dofs, j) -= JxW[qp] * (grad_scalar_phi[i][qp] * vector_phi[j][qp]);
+      for (const auto i : make_range(scalar_n_dofs_in))
+        for (const auto j : make_range(vector_n_dofs_in))
+          K_mixed(i + vector_n_dofs_in, j) -= JxW[qp] * (grad_scalar_phi[i][qp] * vector_phi[j][qp]);
     }
 
     // At the beginning of the loop, we mark that we haven't found our "Single-Face" yet
     bool tau_found = false;
-    for (auto side : elem->side_index_range())
+    for (auto side : elem_in->side_index_range())
     {
       // Reinit our face FE objects
-      vector_fe_face->reinit(elem, side);
-      scalar_fe_face->reinit(elem, side);
-      const bool internal_face = elem->neighbor_ptr(side);
-      const auto tau = compute_tau(internal_face, tau_found, elem);
+      vector_fe_face->reinit(elem_in, side);
+      scalar_fe_face->reinit(elem_in, side);
+      const bool internal_face = elem_in->neighbor_ptr(side);
+      const auto tau = compute_tau(internal_face, tau_found, elem_in);
 
       for (const auto qp : make_range(qface.n_points()))
       {
@@ -951,15 +951,15 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
         // Now do the internal boundary term for <\hat{q} \cdot \vec{n}, \omega> ->
         // <q + \tau (u - \lambda), \omega> ->
         // <q, \omega> + <\tau u, \omega> - <\tau \lambda, \omega>
-        for (const auto i : make_range(scalar_n_dofs))
+        for (const auto i : make_range(scalar_n_dofs_in))
         {
-          for (const auto j : make_range(vector_n_dofs))
-            K_mixed(i + vector_n_dofs, j) +=
+          for (const auto j : make_range(vector_n_dofs_in))
+            K_mixed(i + vector_n_dofs_in, j) +=
                 JxW_face[qp] * scalar_phi_face[i][qp] * (vector_phi_face[j][qp] * normal);
 
           if (tau) // Don't do unnecessary math ops if tau is 0
-            for (const auto j : make_range(scalar_n_dofs))
-              K_mixed(i + vector_n_dofs, j + vector_n_dofs) +=
+            for (const auto j : make_range(scalar_n_dofs_in))
+              K_mixed(i + vector_n_dofs_in, j + vector_n_dofs_in) +=
                   JxW_face[qp] * scalar_phi_face[i][qp] * tau * scalar_phi_face[j][qp] * normal_sq;
         }
       }
@@ -968,12 +968,12 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
     Kinv_mixed = K_mixed.inverse();
   };
 
-  auto compute_rhs = [&](const auto vector_n_dofs,
-                         const auto scalar_n_dofs,
-                         const Elem * const elem,
+  auto compute_rhs = [&](const auto vector_n_dofs_in,
+                         const auto scalar_n_dofs_in,
+                         const Elem * const elem_in,
                          const unsigned int shape_function)
   {
-    const auto mixed_size = vector_n_dofs + scalar_n_dofs;
+    const auto mixed_size = vector_n_dofs_in + scalar_n_dofs_in;
     F_mixed.setZero(mixed_size);
 
     // If the approximate LM solution was passed in, then we are solving for the elemental solution
@@ -991,26 +991,26 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
           f = MixedExactSolution().forcing(x, y);
         else if (dim == 3)
           f = MixedExactSolution().forcing(x, y, z);
-        for (const auto i : make_range(scalar_n_dofs))
-          F_mixed(i + vector_n_dofs) += JxW[qp] * f * scalar_phi[i][qp];
+        for (const auto ii : make_range(scalar_n_dofs_in))
+          F_mixed(ii + vector_n_dofs_in) += JxW[qp] * f * scalar_phi[ii][qp];
       }
 
     // At the beginning of the loop, we mark that we haven't found our "Single-Face" yet
     bool tau_found = false;
     std::vector<Number> g;
 
-    for (auto side : elem->side_index_range())
+    for (auto side : elem_in->side_index_range())
     {
       // Reinit our face FE objects
-      vector_fe_face->reinit(elem, side);
-      scalar_fe_face->reinit(elem, side);
-      lambda_fe_face->reinit(elem, side);
+      vector_fe_face->reinit(elem_in, side);
+      scalar_fe_face->reinit(elem_in, side);
+      lambda_fe_face->reinit(elem_in, side);
 
       const auto & qp_mu = [&]()
       {
         if (shape_function == libMesh::invalid_uint)
         {
-          if (elem->neighbor_ptr(side))
+          if (elem_in->neighbor_ptr(side))
           {
             compute_qp_soln(lambda_solution_std_vec, qface.n_points(), lambda_phi_face, Lambda);
             return lambda_solution_std_vec;
@@ -1038,8 +1038,8 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
           return lambda_phi_face[shape_function];
       }();
 
-      const bool internal_face = elem->neighbor_ptr(side);
-      const auto tau = compute_tau(internal_face, tau_found, elem);
+      const bool internal_face = elem_in->neighbor_ptr(side);
+      const auto tau = compute_tau(internal_face, tau_found, elem_in);
 
       for (const auto qp : make_range(qface.n_points()))
       {
@@ -1047,15 +1047,15 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
         const auto normal_sq = normal * normal;
 
         // Vector equation dependence on LM/mu
-        for (const auto i : make_range(vector_n_dofs))
-          F_mixed(i) -= JxW_face[qp] * (vector_phi_face[i][qp] * normal) * qp_mu[qp];
+        for (const auto ii : make_range(vector_n_dofs_in))
+          F_mixed(ii) -= JxW_face[qp] * (vector_phi_face[ii][qp] * normal) * qp_mu[qp];
 
         // Now do the boundary term for <\hat{q} \cdot \vec{n}, \omega> ->
         // <q + \tau (u - \lambda), \omega> ->
         // <q, \omega> + <\tau u, \omega> - <\tau \lambda, \omega>
-        for (const auto i : make_range(scalar_n_dofs))
-          F_mixed(i + vector_n_dofs) +=
-              JxW_face[qp] * scalar_phi_face[i][qp] * tau * qp_mu[qp] * normal_sq;
+        for (const auto ii : make_range(scalar_n_dofs_in))
+          F_mixed(ii + vector_n_dofs_in) +=
+              JxW_face[qp] * scalar_phi_face[ii][qp] * tau * qp_mu[qp] * normal_sq;
       }
     }
   };
