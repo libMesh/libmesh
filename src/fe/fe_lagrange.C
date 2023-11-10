@@ -823,6 +823,7 @@ void lagrange_compute_constraints (DofConstraints & constraints,
 #endif
 
   FEType fe_type = dof_map.variable_type(variable_number);
+  const bool add_p_level = dof_map.should_p_refine_var(variable_number);
 
   // Pull objects out of the loop to reduce heap operations
   std::vector<dof_id_type> my_dof_indices, parent_dof_indices;
@@ -831,134 +832,149 @@ void lagrange_compute_constraints (DofConstraints & constraints,
   // Look at the element faces.  Check to see if we need to
   // build constraints.
   for (auto s : elem->side_index_range())
-    if (elem->neighbor_ptr(s) != nullptr &&
-        elem->neighbor_ptr(s) != remote_elem)
-      if (elem->neighbor_ptr(s)->level() < elem->level()) // constrain dofs shared between
-        {                                                 // this element and ones coarser
-          // than this element.
-          // Get pointers to the elements of interest and its parent.
-          const Elem * parent = elem->parent();
+    if (const Elem * const neigh = elem->neighbor_ptr(s);
+        neigh && neigh != remote_elem)
+      {
+        if (elem->neighbor_ptr(s)->level() < elem->level()) // constrain dofs shared between
+          {                                                 // this element and ones coarser
+            // than this element.
+            // Get pointers to the elements of interest and its parent.
+            const Elem * parent = elem->parent();
 
-          // This can't happen...  Only level-0 elements have nullptr
-          // parents, and no level-0 elements can be at a higher
-          // level than their neighbors!
-          libmesh_assert(parent);
+            // This can't happen...  Only level-0 elements have nullptr
+            // parents, and no level-0 elements can be at a higher
+            // level than their neighbors!
+            libmesh_assert(parent);
 
-          elem->build_side_ptr(my_side, s);
-          parent->build_side_ptr(parent_side, s);
+            elem->build_side_ptr(my_side, s);
+            parent->build_side_ptr(parent_side, s);
 
-          // We have some elements with interior bubble function bases
-          // and lower-order sides.  We need to only ask for the lower
-          // order in those cases.
-          FEType side_fe_type = fe_type;
-          int extra_order = 0;
-          if (my_side->default_order() < fe_type.order)
-            {
-              side_fe_type.order = my_side->default_order();
-              extra_order = (int)(side_fe_type.order) -
-                            (int)(fe_type.order);
-            }
-
-          // This function gets called element-by-element, so there
-          // will be a lot of memory allocation going on.  We can
-          // at least minimize this for the case of the dof indices
-          // by efficiently preallocating the requisite storage.
-          my_dof_indices.reserve (my_side->n_nodes());
-          parent_dof_indices.reserve (parent_side->n_nodes());
-
-          dof_map.dof_indices (my_side.get(), my_dof_indices,
-                               variable_number, extra_order);
-          dof_map.dof_indices (parent_side.get(), parent_dof_indices,
-                               variable_number, extra_order);
-
-          const unsigned int n_side_dofs =
-            FEInterface::n_dofs(side_fe_type, my_side.get());
-          const unsigned int n_parent_side_dofs =
-            FEInterface::n_dofs(side_fe_type, parent_side.get());
-          for (unsigned int my_dof=0; my_dof != n_side_dofs; my_dof++)
-            {
-              libmesh_assert_less (my_dof, my_side->n_nodes());
-
-              // My global dof index.
-              const dof_id_type my_dof_g = my_dof_indices[my_dof];
-
-              // Hunt for "constraining against myself" cases before
-              // we bother creating a constraint row
-              bool self_constraint = false;
-              for (unsigned int their_dof=0;
-                   their_dof != n_parent_side_dofs; their_dof++)
-                {
-                  libmesh_assert_less (their_dof, parent_side->n_nodes());
-
-                  // Their global dof index.
-                  const dof_id_type their_dof_g =
-                    parent_dof_indices[their_dof];
-
-                  if (their_dof_g == my_dof_g)
-                    {
-                      self_constraint = true;
-                      break;
-                    }
-                }
-
-              if (self_constraint)
-                continue;
-
-              DofConstraintRow * constraint_row;
-
-              // we may be running constraint methods concurrently
-              // on multiple threads, so we need a lock to
-              // ensure that this constraint is "ours"
+            // We have some elements with interior bubble function bases
+            // and lower-order sides.  We need to only ask for the lower
+            // order in those cases.
+            FEType side_fe_type = fe_type;
+            int extra_order = 0;
+            if (my_side->default_order() < fe_type.order)
               {
-                Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-
-                if (dof_map.is_constrained_dof(my_dof_g))
-                  continue;
-
-                constraint_row = &(constraints[my_dof_g]);
-                libmesh_assert(constraint_row->empty());
+                side_fe_type.order = my_side->default_order();
+                extra_order = (int)(side_fe_type.order) -
+                              (int)(fe_type.order);
               }
 
-              // The support point of the DOF
-              const Point & support_point = my_side->point(my_dof);
+            // This function gets called element-by-element, so there
+            // will be a lot of memory allocation going on.  We can
+            // at least minimize this for the case of the dof indices
+            // by efficiently preallocating the requisite storage.
+            my_dof_indices.reserve (my_side->n_nodes());
+            parent_dof_indices.reserve (parent_side->n_nodes());
 
-              // Figure out where my node lies on their reference element.
-              const Point mapped_point = FEMap::inverse_map(Dim-1,
-                                                            parent_side.get(),
-                                                            support_point);
+            dof_map.dof_indices (my_side.get(), my_dof_indices,
+                                 variable_number, extra_order);
+            dof_map.dof_indices (parent_side.get(), parent_dof_indices,
+                                 variable_number, extra_order);
 
-              // Compute the parent's side shape function values.
-              for (unsigned int their_dof=0;
-                   their_dof != n_parent_side_dofs; their_dof++)
+            const unsigned int n_side_dofs =
+              FEInterface::n_dofs(side_fe_type, my_side.get());
+            const unsigned int n_parent_side_dofs =
+              FEInterface::n_dofs(side_fe_type, parent_side.get());
+            for (unsigned int my_dof=0; my_dof != n_side_dofs; my_dof++)
+              {
+                libmesh_assert_less (my_dof, my_side->n_nodes());
+
+                // My global dof index.
+                const dof_id_type my_dof_g = my_dof_indices[my_dof];
+
+                // Hunt for "constraining against myself" cases before
+                // we bother creating a constraint row
+                bool self_constraint = false;
+                for (unsigned int their_dof=0;
+                     their_dof != n_parent_side_dofs; their_dof++)
+                  {
+                    libmesh_assert_less (their_dof, parent_side->n_nodes());
+
+                    // Their global dof index.
+                    const dof_id_type their_dof_g =
+                      parent_dof_indices[their_dof];
+
+                    if (their_dof_g == my_dof_g)
+                      {
+                        self_constraint = true;
+                        break;
+                      }
+                  }
+
+                if (self_constraint)
+                  continue;
+
+                DofConstraintRow * constraint_row;
+
+                // we may be running constraint methods concurrently
+                // on multiple threads, so we need a lock to
+                // ensure that this constraint is "ours"
                 {
-                  libmesh_assert_less (their_dof, parent_side->n_nodes());
+                  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
-                  // Their global dof index.
-                  const dof_id_type their_dof_g =
-                    parent_dof_indices[their_dof];
+                  if (dof_map.is_constrained_dof(my_dof_g))
+                    continue;
 
-                  const Real their_dof_value = FEInterface::shape(Dim-1,
-                                                                  side_fe_type,
-                                                                  parent_side.get(),
-                                                                  their_dof,
-                                                                  mapped_point);
-
-                  // Only add non-zero and non-identity values
-                  // for Lagrange basis functions.
-                  if ((std::abs(their_dof_value) > 1.e-5) &&
-                      (std::abs(their_dof_value) < .999))
-                    {
-                      constraint_row->emplace(their_dof_g, their_dof_value);
-                    }
-#ifdef DEBUG
-                  // Protect for the case u_i = 0.999 u_j,
-                  // in which case i better equal j.
-                  else if (their_dof_value >= .999)
-                    libmesh_assert_equal_to (my_dof_g, their_dof_g);
-#endif
+                  constraint_row = &(constraints[my_dof_g]);
+                  libmesh_assert(constraint_row->empty());
                 }
-            }
-        }
+
+                // The support point of the DOF
+                const Point & support_point = my_side->point(my_dof);
+
+                // Figure out where my node lies on their reference element.
+                const Point mapped_point = FEMap::inverse_map(Dim-1,
+                                                              parent_side.get(),
+                                                              support_point);
+
+                // Compute the parent's side shape function values.
+                for (unsigned int their_dof=0;
+                     their_dof != n_parent_side_dofs; their_dof++)
+                  {
+                    libmesh_assert_less (their_dof, parent_side->n_nodes());
+
+                    // Their global dof index.
+                    const dof_id_type their_dof_g =
+                      parent_dof_indices[their_dof];
+
+                    const Real their_dof_value = FEInterface::shape(Dim-1,
+                                                                    side_fe_type,
+                                                                    parent_side.get(),
+                                                                    their_dof,
+                                                                    mapped_point);
+
+                    // Only add non-zero and non-identity values
+                    // for Lagrange basis functions.
+                    if ((std::abs(their_dof_value) > 1.e-5) &&
+                        (std::abs(their_dof_value) < .999))
+                      {
+                        constraint_row->emplace(their_dof_g, their_dof_value);
+                      }
+  #ifdef DEBUG
+                    // Protect for the case u_i = 0.999 u_j,
+                    // in which case i better equal j.
+                    else if (their_dof_value >= .999)
+                      libmesh_assert_equal_to (my_dof_g, their_dof_g);
+  #endif
+                  }
+              }
+          }
+
+        if (add_p_level)
+          {
+            // p refinement constraints:
+            // constrain dofs shared between
+            // active elements and neighbors with
+            // lower polynomial degrees
+            const unsigned int min_p_level =
+              neigh->min_p_level_by_neighbor(elem, elem->p_level());
+            if (min_p_level < elem->p_level())
+              libmesh_error_msg(
+                "Mismatched p-refinement levels for LAGRANGE is not currently supported");
+          }
+      }
 } // lagrange_compute_constraints()
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
