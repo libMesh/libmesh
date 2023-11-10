@@ -962,7 +962,7 @@ void lagrange_compute_constraints (DofConstraints & constraints,
               }
           }
 
-        if (add_p_level)
+        if (elem->active() && add_p_level)
           {
             // p refinement constraints:
             // constrain dofs shared between
