@@ -226,8 +226,8 @@ main(int argc, char ** argv)
 
   // Print out the error values.
   libMesh::out << "L2 error is: " << exact_sol.l2_error("Mixed", "q") << std::endl;
-  libMesh::out << "L2 error for p is: " << exact_sol.l2_error("Mixed", "u") << std::endl;
-  libMesh::out << "L2 error p_enriched is: " << exact_sol.l2_error("Mixed", "u_enriched")
+  libMesh::out << "L2 error for u is: " << exact_sol.l2_error("Mixed", "u") << std::endl;
+  libMesh::out << "L2 error u_enriched is: " << exact_sol.l2_error("Mixed", "u_enriched")
                << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -240,10 +240,20 @@ main(int argc, char ** argv)
   // Allright let's dry a different implementation and then ensure we get the same results
   // auto mixed_soln = system.solution->clone();
   // auto lm_soln = lm_system.solution->clone();
-
   lm_system.attach_assemble_function(alternative_assemble_hdg);
-
   lm_system.solve();
+  // Armed with our Lagrange multiplier solution, we can now compute the vector and scalar solutions
+  alternative_fe_assembly(equation_systems, /*global_solve=*/false);
+
+  // Compute the error.
+  exact_sol.compute_error("Mixed", "q");
+  exact_sol.compute_error("Mixed", "u");
+  exact_sol.compute_error("Mixed", "u_enriched");
+  // Print out the error values.
+  libMesh::out << "L2 error is: " << exact_sol.l2_error("Mixed", "q") << std::endl;
+  libMesh::out << "L2 error for u is: " << exact_sol.l2_error("Mixed", "u") << std::endl;
+  libMesh::out << "L2 error u_enriched is: " << exact_sol.l2_error("Mixed", "u_enriched")
+               << std::endl;
 
   // All done.
   return 0;
@@ -272,7 +282,6 @@ compute_qp_soln(std::vector<SolnType> & qp_vec,
   }
 }
 
-// compute the enriched solution
 void
 compute_enriched_soln(const MeshBase & mesh,
                       const DofMap & dof_map,
@@ -357,7 +366,7 @@ compute_enriched_soln(const MeshBase & mesh,
     for (const auto i : make_range(enriched_scalar_n_dofs))
       for (const auto j : make_range(enriched_scalar_n_dofs))
         K_enriched_scalar(i, j) +=
-          JxW[qp] * (enriched_scalar_dphi[i][qp] * enriched_scalar_dphi[j][qp]);
+            JxW[qp] * (enriched_scalar_dphi[i][qp] * enriched_scalar_dphi[j][qp]);
 
     // Forcing function kernel
     {
@@ -412,7 +421,7 @@ compute_enriched_soln(const MeshBase & mesh,
         // <q, \omega>
         for (const auto i : make_range(enriched_scalar_n_dofs))
           F_enriched_scalar(i) -=
-            JxW_face[qp] * enriched_scalar_phi_face[i][qp] * vector_qps[qp] * normals[qp];
+              JxW_face[qp] * enriched_scalar_phi_face[i][qp] * vector_qps[qp] * normals[qp];
     else
     {
       scalar_fe_face.reinit(elem, side);
@@ -432,8 +441,7 @@ compute_enriched_soln(const MeshBase & mesh,
 
         // Now do the internal boundary term for <\hat{q} \cdot \vec{n}, \omega> ->
         for (const auto i : make_range(enriched_scalar_n_dofs))
-          F_enriched_scalar(i) -=
-            JxW_face[qp] * enriched_scalar_phi_face[i][qp] * qhat * normal;
+          F_enriched_scalar(i) -= JxW_face[qp] * enriched_scalar_phi_face[i][qp] * qhat * normal;
       }
     }
   }
@@ -445,7 +453,7 @@ compute_enriched_soln(const MeshBase & mesh,
   DenseVector<Number> U_insertion(enriched_scalar_n_dofs);
   for (const auto i : make_range(enriched_scalar_n_dofs))
     U_insertion(i) = U_enriched_scalar(i);
-      system.solution->insert(U_insertion, enriched_scalar_dof_indices);
+  system.solution->insert(U_insertion, enriched_scalar_dof_indices);
 }
 
 // We will perform finite element assembly twice. The first time to setup the global implicit system
@@ -765,7 +773,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
         system.solution->set(scalar_dof_indices[i], scalar_soln(i));
 
       // Now solve for the enriched scalar solution using our Lagrange
-      // multiplier solution, u, and our low-order p
+      // multiplier solution, q, and our low-order u
       compute_enriched_soln(mesh,
                             dof_map,
                             system,
@@ -970,8 +978,29 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
     const auto mixed_size = vector_n_dofs + scalar_n_dofs;
     F_mixed.setZero(mixed_size);
 
+    // If the approximate LM solution was passed in, then we are solving for the elemental solution
+    // of q and u, not the mappings of individual LM shape functions. Consequently, we include the
+    // contribution of the forcing function
+    if (shape_function == libMesh::invalid_uint)
+      for (const auto qp : make_range(qrule.n_points()))
+      {
+        const Real x = q_point[qp](0);
+        const Real y = q_point[qp](1);
+        const Real z = q_point[qp](2);
+
+        Real f = 0;
+        if (dim == 2)
+          f = MixedExactSolution().forcing(x, y);
+        else if (dim == 3)
+          f = MixedExactSolution().forcing(x, y, z);
+        for (const auto i : make_range(scalar_n_dofs))
+          F_mixed(i + vector_n_dofs) += JxW[qp] * f * scalar_phi[i][qp];
+      }
+
     // At the beginning of the loop, we mark that we haven't found our "Single-Face" yet
     bool tau_found = false;
+    std::vector<Number> g;
+
     for (auto side : elem->side_index_range())
     {
       // Reinit our face FE objects
@@ -979,13 +1008,33 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
       scalar_fe_face->reinit(elem, side);
       lambda_fe_face->reinit(elem, side);
 
-      const auto & qp_mu =
-          [shape_function, &qface, &lambda_solution_std_vec, &lambda_phi_face, &Lambda]()
+      const auto & qp_mu = [&]()
       {
         if (shape_function == libMesh::invalid_uint)
         {
-          compute_qp_soln(lambda_solution_std_vec, qface.n_points(), lambda_phi_face, Lambda);
-          return lambda_solution_std_vec;
+          if (elem->neighbor_ptr(side))
+          {
+            compute_qp_soln(lambda_solution_std_vec, qface.n_points(), lambda_phi_face, Lambda);
+            return lambda_solution_std_vec;
+          }
+          else
+          {
+            g.resize(qface.n_points());
+            for (const auto qp : make_range(qface.n_points()))
+            {
+              auto & g_qp = g[qp];
+              const Real xf = qface_point[qp](0);
+              const Real yf = qface_point[qp](1);
+              const Real zf = qface_point[qp](2);
+
+              // The boundary value for scalar field.
+              if (dim == 2)
+                g_qp = MixedExactSolution().scalar(xf, yf);
+              else if (dim == 3)
+                g_qp = MixedExactSolution().scalar(xf, yf, zf);
+            }
+            return g;
+          }
         }
         else
           return lambda_phi_face[shape_function];
@@ -1112,7 +1161,8 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
             for (const auto j : make_range(lambda_n_dofs))
               if (external_boundary_indices.count(j))
                 for (const auto qp : make_range(qface.n_points()))
-                  K_lm_libmesh(i, j) += JxW_face[qp] * lambda_phi_face[i][qp] * lambda_phi_face[j][qp];
+                  K_lm_libmesh(i, j) +=
+                      JxW_face[qp] * lambda_phi_face[i][qp] * lambda_phi_face[j][qp];
 
         if (!elem->neighbor_ptr(s))
         {
@@ -1168,6 +1218,25 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
         system.solution->set(vector_dof_indices[i], vector_soln(i));
       for (const auto i : make_range(scalar_n_dofs))
         system.solution->set(scalar_dof_indices[i], scalar_soln(i));
+
+      // Now solve for the enriched scalar solution using our Lagrange
+      // multiplier solution, q, and our low-order u
+      compute_enriched_soln(mesh,
+                            dof_map,
+                            system,
+                            elem,
+                            vector_soln,
+                            scalar_soln,
+                            Lambda,
+                            *vector_fe,
+                            *vector_fe_face,
+                            *scalar_fe,
+                            *scalar_fe_face,
+                            *lambda_fe_face);
+
+      system.solution->close();
+      // Scatter solution into the current_solution which is used in error computation
+      system.update();
     }
   }
 }
