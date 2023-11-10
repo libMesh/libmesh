@@ -508,6 +508,7 @@ void ExodusII_IO_Helper::init_element_equivalence_map()
 
   // PRISM6 equivalences
   element_equivalence_map["WEDGE"] = PRISM6;
+  element_equivalence_map["WEDGE6"] = PRISM6;
 
   // PRISM15 equivalences
   element_equivalence_map["WEDGE15"] = PRISM15;
