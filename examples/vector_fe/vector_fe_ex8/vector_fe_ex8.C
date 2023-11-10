@@ -294,7 +294,9 @@ compute_enriched_soln(const MeshBase & mesh,
                       FEVectorBase & vector_fe_face,
                       FEBase & scalar_fe,
                       FEBase & scalar_fe_face,
-                      FEBase & lambda_fe_face)
+                      FEBase & lambda_fe_face,
+                      QBase & qrule,
+                      QBase & qface)
 {
   const unsigned int dim = mesh.mesh_dimension();
 
@@ -303,12 +305,6 @@ compute_enriched_soln(const MeshBase & mesh,
       dof_map.variable_type(system.variable_number("u_enriched"));
   std::unique_ptr<FEBase> enriched_scalar_fe(FEBase::build(dim, enriched_scalar_fe_type));
   std::unique_ptr<FEBase> enriched_scalar_fe_face(FEBase::build(dim, enriched_scalar_fe_type));
-
-  // Volumetric quadrature rule
-  QGauss qrule(dim, FIFTH);
-  // Boundary integration requires one quadrature rule with dimensionality one
-  // less than the dimensionality of the element.
-  QGauss qface(dim - 1, FIFTH);
 
   // Attach quadrature rules
   enriched_scalar_fe->attach_quadrature_rule(&qrule);
@@ -785,7 +781,9 @@ fe_assembly(EquationSystems & es, const bool global_solve)
                             *vector_fe_face,
                             *scalar_fe,
                             *scalar_fe_face,
-                            *lambda_fe_face);
+                            *lambda_fe_face,
+                            qrule,
+                            qface);
     }
   }
 
@@ -1232,7 +1230,9 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
                             *vector_fe_face,
                             *scalar_fe,
                             *scalar_fe_face,
-                            *lambda_fe_face);
+                            *lambda_fe_face,
+                            qrule,
+                            qface);
 
       system.solution->close();
       // Scatter solution into the current_solution which is used in error computation
