@@ -47,6 +47,7 @@
 
 // The finite element object and the geometric element type.
 #include "libmesh/fe.h"
+#include "libmesh/fe_interface.h"
 #include "libmesh/elem.h"
 
 // Gauss quadrature rules.
@@ -84,7 +85,8 @@ typedef VectorXd EigenVector;
 #endif
 
 void fe_assembly(EquationSystems & es, bool global_solve);
-void assemble_divgrad(EquationSystems & es, const std::string & system_name);
+void assemble_hdg(EquationSystems & es, const std::string & system_name);
+void alternative_fe_assembly(EquationSystems & es, const std::string & system_name);
 
 int
 main(int argc, char ** argv)
@@ -154,22 +156,22 @@ main(int argc, char ** argv)
   // Add the LM system
   auto & lm_system = equation_systems.add_system<LinearImplicitSystem>("Lambda");
 
-  // Adds the variable "u" and "p" to "Mixed". "u" will be our vector field
-  // whereas "p" will be the scalar field.
-  system.add_variable("u", FIRST, L2_LAGRANGE_VEC);
-  system.add_variable("p", FIRST, L2_LAGRANGE);
+  // Adds the variable "q" and "u" to "Mixed". "q" will be our vector field
+  // whereas "u" will be the scalar field.
+  system.add_variable("q", FIRST, L2_LAGRANGE_VEC);
+  system.add_variable("u", FIRST, L2_LAGRANGE);
 
   // We also add a higher order version of our 'p' variable whose solution we
   // will postprocess using the Lagrange multiplier, 'u', and the low order 'p'
   // solution
-  system.add_variable("p_enriched", SECOND, L2_LAGRANGE);
+  system.add_variable("u_enriched", SECOND, L2_LAGRANGE);
 
   // Add our Lagrange multiplier to the implicit system
   lm_system.add_variable("lambda", FIRST, SIDE_HIERARCHIC);
 
   // Give the system a pointer to the matrix assembly
   // function. This will be called when needed by the library.
-  lm_system.attach_assemble_function(assemble_divgrad);
+  lm_system.attach_assemble_function(assemble_hdg);
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -217,14 +219,14 @@ main(int argc, char ** argv)
     exact_sol.extra_quadrature_order(extra_error_quadrature);
 
   // Compute the error.
+  exact_sol.compute_error("Mixed", "q");
   exact_sol.compute_error("Mixed", "u");
-  exact_sol.compute_error("Mixed", "p");
-  exact_sol.compute_error("Mixed", "p_enriched");
+  exact_sol.compute_error("Mixed", "u_enriched");
 
   // Print out the error values.
-  libMesh::out << "L2 error is: " << exact_sol.l2_error("Mixed", "u") << std::endl;
-  libMesh::out << "L2 error for p is: " << exact_sol.l2_error("Mixed", "p") << std::endl;
-  libMesh::out << "L2 error p_enriched is: " << exact_sol.l2_error("Mixed", "p_enriched")
+  libMesh::out << "L2 error is: " << exact_sol.l2_error("Mixed", "q") << std::endl;
+  libMesh::out << "L2 error for p is: " << exact_sol.l2_error("Mixed", "u") << std::endl;
+  libMesh::out << "L2 error p_enriched is: " << exact_sol.l2_error("Mixed", "u_enriched")
                << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -234,8 +236,41 @@ main(int argc, char ** argv)
 
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
+  // Allright let's dry a different implementation and then ensure we get the same results
+  // auto mixed_soln = system.solution->clone();
+  auto lm_soln = lm_system.solution->clone();
+
+  lm_system.attach_assemble_function(alternative_fe_assembly);
+
+  lm_system.solve();
+  lm_soln->print_global();
+  lm_system.solution->print_global();
+
   // All done.
   return 0;
+}
+
+// compute a solution indexable at quadrature points composed from the local degree of freedom
+// solution vector and associated basis functions
+template <typename SolnType, typename PhiType, typename LocalSolutionVector>
+void
+compute_qp_soln(std::vector<SolnType> & qp_vec,
+                const unsigned int n_qps,
+                const std::vector<std::vector<PhiType>> & phi,
+                const LocalSolutionVector & soln)
+{
+  libmesh_assert(cast_int<std::size_t>(soln.size()) == phi.size());
+  qp_vec.resize(n_qps);
+  for (auto & val : qp_vec)
+    val = {};
+  for (const auto i : index_range(phi))
+  {
+    const auto & qp_phis = phi[i];
+    libmesh_assert(qp_phis.size() == n_qps);
+    const auto sol = soln(i);
+    for (const auto qp : make_range(n_qps))
+      qp_vec[qp] += qp_phis[qp] * sol;
+  }
 }
 
 // We will perform finite element assembly twice. The first time to setup the global implicit system
@@ -255,10 +290,10 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   const auto & dof_map = system.get_dof_map();
   const auto & lambda_dof_map = lambda_system.get_dof_map();
 
-  const FEType vector_fe_type = dof_map.variable_type(system.variable_number("u"));
-  const FEType scalar_fe_type = dof_map.variable_type(system.variable_number("p"));
+  const FEType vector_fe_type = dof_map.variable_type(system.variable_number("q"));
+  const FEType scalar_fe_type = dof_map.variable_type(system.variable_number("u"));
   const FEType enriched_scalar_fe_type =
-      dof_map.variable_type(system.variable_number("p_enriched"));
+      dof_map.variable_type(system.variable_number("u_enriched"));
   const FEType lambda_fe_type =
       lambda_dof_map.variable_type(lambda_system.variable_number("lambda"));
 
@@ -351,28 +386,11 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   // The global system matrix
   SparseMatrix<Number> & matrix = lambda_system.get_system_matrix();
 
-  // Helper function to compute the solution at quadrature points for building right hand sides
-  auto compute_qp_soln = [](auto & qp_vec, const auto n_qps, const auto & phi, const auto & soln)
-  {
-    libmesh_assert(cast_int<std::size_t>(soln.size()) == phi.size());
-    qp_vec.resize(n_qps);
-    for (auto & val : qp_vec)
-      val = {};
-    for (const auto i : index_range(phi))
-    {
-      const auto & qp_phis = phi[i];
-      libmesh_assert(qp_phis.size() == n_qps);
-      const auto sol = soln(i);
-      for (const auto qp : make_range(n_qps))
-        qp_vec[qp] += qp_phis[qp] * sol;
-    }
-  };
-
   for (const auto & elem : mesh.active_local_element_ptr_range())
   {
     // Retrive our dof indices for all fields
-    dof_map.dof_indices(elem, vector_dof_indices, system.variable_number("u"));
-    dof_map.dof_indices(elem, scalar_dof_indices, system.variable_number("p"));
+    dof_map.dof_indices(elem, vector_dof_indices, system.variable_number("q"));
+    dof_map.dof_indices(elem, scalar_dof_indices, system.variable_number("u"));
     lambda_dof_map.dof_indices(elem, lambda_dof_indices, lambda_system.variable_number("lambda"));
 
     const auto vector_n_dofs = vector_dof_indices.size();
@@ -596,7 +614,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
       // multiplier solution, u, and our low-order p
       //
 
-      dof_map.dof_indices(elem, enriched_scalar_dof_indices, system.variable_number("p_enriched"));
+      dof_map.dof_indices(elem, enriched_scalar_dof_indices, system.variable_number("u_enriched"));
       const auto enriched_scalar_n_dofs = enriched_scalar_dof_indices.size();
       // We have to add one for the mean value constraint
       const auto m = enriched_scalar_n_dofs + 1;
@@ -723,10 +741,358 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 
 // Call this assembly function when assembling the global implicit system
 void
-assemble_divgrad(EquationSystems & es, const std::string & libmesh_dbg_var(system_name))
+assemble_hdg(EquationSystems & es, const std::string & libmesh_dbg_var(system_name))
 {
   libmesh_assert_equal_to(system_name, "Lambda");
   fe_assembly(es, /*global_solve=*/true);
+}
+
+// Compute the stabilization parameter
+Real
+compute_tau(const bool internal_face, bool & tau_found, const Elem * const elem)
+{
+  if (!internal_face)
+    // if we're an external face then tau is 0
+    return 0;
+  else if (tau_found)
+    // if we've already applied a non-zero tau on another face, then we also return 0
+    return 0;
+  else
+  {
+    // This is our first internal face. We will apply our non-zero tau (and mark that we have)
+    tau_found = true;
+    return 1 / elem->hmin();
+  }
+}
+
+// We will perform finite element assembly twice. The first time to setup the global implicit system
+// for the Lagrange multiplier degrees of freedom. And then the second time to compute the vector
+// and scalar field solutions using the already-compute Lagrange multiplier solution
+void
+alternative_fe_assembly(EquationSystems & es, const std::string &)
+{
+  const MeshBase & mesh = es.get_mesh();
+  const unsigned int dim = mesh.mesh_dimension();
+
+  // The mixed, e.g. vector-scalar system
+  auto & system = es.get_system<System>("Mixed");
+  // Our implicit Lagrange multiplier system
+  auto & lambda_system = es.get_system<LinearImplicitSystem>("Lambda");
+
+  const auto & dof_map = system.get_dof_map();
+  const auto & lambda_dof_map = lambda_system.get_dof_map();
+
+  const FEType vector_fe_type = dof_map.variable_type(system.variable_number("q"));
+  const FEType scalar_fe_type = dof_map.variable_type(system.variable_number("u"));
+  const FEType lambda_fe_type =
+      lambda_dof_map.variable_type(lambda_system.variable_number("lambda"));
+
+  // Volumetric FE objects
+  std::unique_ptr<FEVectorBase> vector_fe(FEVectorBase::build(dim, vector_fe_type));
+  std::unique_ptr<FEBase> scalar_fe(FEBase::build(dim, scalar_fe_type));
+
+  // Volumetric quadrature rule
+  QGauss qrule(dim, FIFTH);
+
+  // Attach quadrature rules for the FE objects that we will reinit within the element "volume"
+  vector_fe->attach_quadrature_rule(&qrule);
+  scalar_fe->attach_quadrature_rule(&qrule);
+
+  // Declare finite element objects for boundary integration
+  std::unique_ptr<FEVectorBase> vector_fe_face(FEVectorBase::build(dim, vector_fe_type));
+  std::unique_ptr<FEBase> scalar_fe_face(FEBase::build(dim, scalar_fe_type));
+  std::unique_ptr<FEBase> lambda_fe_face(FEBase::build(dim, lambda_fe_type));
+
+  // Boundary integration requires one quadrature rule with dimensionality one
+  // less than the dimensionality of the element.
+  QGauss qface(dim - 1, FIFTH);
+
+  // Attach quadrature rules for the FE objects that we will reinit on the element faces
+  vector_fe_face->attach_quadrature_rule(&qface);
+  scalar_fe_face->attach_quadrature_rule(&qface);
+  lambda_fe_face->attach_quadrature_rule(&qface);
+
+  // pre-request our required volumetric data
+  const auto & JxW = vector_fe->get_JxW();
+  const auto & q_point = vector_fe->get_xyz();
+  const auto & vector_phi = vector_fe->get_phi();
+  const auto & scalar_phi = scalar_fe->get_phi();
+  const auto & grad_scalar_phi = scalar_fe->get_dphi();
+  const auto & div_vector_phi = vector_fe->get_div_phi();
+
+  // pre-request our required element face data
+  const auto & vector_phi_face = vector_fe_face->get_phi();
+  const auto & scalar_phi_face = scalar_fe_face->get_phi();
+  const auto & lambda_phi_face = lambda_fe_face->get_phi();
+  const auto & JxW_face = vector_fe_face->get_JxW();
+  const auto & qface_point = vector_fe_face->get_xyz();
+  const auto & normals = vector_fe_face->get_normals();
+
+  //
+  // We will need "Eigen" versions of many of the matrices/vectors because the
+  // libMesh DenseMatrix doesn't have an inverse API
+  //
+
+  // LM matrix and RHS after eliminating vector and scalar dofs
+  DenseMatrix<Number> K_lm_libmesh;
+  DenseVector<Number> F_lm_libmesh;
+  EigenMatrix K_mixed;
+  EigenMatrix Kinv_mixed;
+  EigenVector F_mixed;
+
+  // Lambda eigen vector for constructing vector and scalar solutions
+  EigenVector Lambda;
+
+  // Containers for dof indices
+  std::vector<dof_id_type> vector_dof_indices;
+  std::vector<dof_id_type> scalar_dof_indices;
+  std::vector<dof_id_type> lambda_dof_indices;
+  std::vector<Number> lambda_solution_std_vec;
+
+  // The global system matrix
+  auto & matrix = lambda_system.get_system_matrix();
+
+  auto compute_and_invert_K =
+      [&](const auto vector_n_dofs, const auto scalar_n_dofs, const Elem * const elem)
+  {
+    const auto mixed_size = vector_n_dofs + scalar_n_dofs;
+
+    K_mixed.setZero(mixed_size, mixed_size);
+
+    for (const auto qp : make_range(qrule.n_points()))
+    {
+      // Vector equation dependence on vector dofs
+      for (const auto i : make_range(vector_n_dofs))
+        for (const auto j : make_range(vector_n_dofs))
+          K_mixed(i, j) += JxW[qp] * (vector_phi[i][qp] * vector_phi[j][qp]);
+
+      // Vector equation dependence on scalar dofs
+      for (const auto i : make_range(vector_n_dofs))
+        for (const auto j : make_range(scalar_n_dofs))
+          K_mixed(i, j + vector_n_dofs) -= JxW[qp] * (div_vector_phi[i][qp] * scalar_phi[j][qp]);
+
+      // Scalar equation dependence on vector dofs
+      for (const auto i : make_range(scalar_n_dofs))
+        for (const auto j : make_range(vector_n_dofs))
+          K_mixed(i + vector_n_dofs, j) -= JxW[qp] * (grad_scalar_phi[i][qp] * vector_phi[j][qp]);
+    }
+
+    // At the beginning of the loop, we mark that we haven't found our "Single-Face" yet
+    bool tau_found = false;
+    for (auto side : elem->side_index_range())
+    {
+      // Reinit our face FE objects
+      vector_fe_face->reinit(elem, side);
+      scalar_fe_face->reinit(elem, side);
+      const bool internal_face = elem->neighbor_ptr(side);
+      const auto tau = compute_tau(internal_face, tau_found, elem);
+
+      for (const auto qp : make_range(qface.n_points()))
+      {
+        const auto normal = normals[qp];
+        const auto normal_sq = normal * normal;
+
+        // Now do the internal boundary term for <\hat{q} \cdot \vec{n}, \omega> ->
+        // <q + \tau (u - \lambda), \omega> ->
+        // <q, \omega> + <\tau u, \omega> - <\tau \lambda, \omega>
+        for (const auto i : make_range(scalar_n_dofs))
+        {
+          for (const auto j : make_range(vector_n_dofs))
+            K_mixed(i + vector_n_dofs, j) +=
+                JxW_face[qp] * scalar_phi_face[i][qp] * (vector_phi_face[j][qp] * normal);
+
+          if (tau) // Don't do unnecessary math ops if tau is 0
+            for (const auto j : make_range(scalar_n_dofs))
+              K_mixed(i + vector_n_dofs, j + vector_n_dofs) +=
+                  JxW_face[qp] * scalar_phi_face[i][qp] * tau * scalar_phi_face[j][qp] * normal_sq;
+        }
+      }
+    }
+
+    Kinv_mixed = K_mixed.inverse();
+  };
+
+  auto compute_rhs = [&](const auto vector_n_dofs,
+                         const auto scalar_n_dofs,
+                         const Elem * const elem,
+                         const unsigned int shape_function)
+  {
+    const auto mixed_size = vector_n_dofs + scalar_n_dofs;
+    F_mixed.setZero(mixed_size);
+
+    // At the beginning of the loop, we mark that we haven't found our "Single-Face" yet
+    bool tau_found = false;
+    for (auto side : elem->side_index_range())
+    {
+      // Reinit our face FE objects
+      vector_fe_face->reinit(elem, side);
+      scalar_fe_face->reinit(elem, side);
+      lambda_fe_face->reinit(elem, side);
+
+      const auto & qp_mu =
+          [shape_function, &qface, &lambda_solution_std_vec, &lambda_phi_face, &Lambda]()
+      {
+        if (shape_function == libMesh::invalid_uint)
+        {
+          compute_qp_soln(lambda_solution_std_vec, qface.n_points(), lambda_phi_face, Lambda);
+          return lambda_solution_std_vec;
+        }
+        else
+          return lambda_phi_face[shape_function];
+      }();
+
+      const bool internal_face = elem->neighbor_ptr(side);
+      const auto tau = compute_tau(internal_face, tau_found, elem);
+
+      for (const auto qp : make_range(qface.n_points()))
+      {
+        const auto normal = normals[qp];
+        const auto normal_sq = normal * normal;
+
+        // Vector equation dependence on LM/mu
+        for (const auto i : make_range(vector_n_dofs))
+          F_mixed(i) -= JxW_face[qp] * (vector_phi_face[i][qp] * normal) * qp_mu[qp];
+
+        // Now do the boundary term for <\hat{q} \cdot \vec{n}, \omega> ->
+        // <q + \tau (u - \lambda), \omega> ->
+        // <q, \omega> + <\tau u, \omega> - <\tau \lambda, \omega>
+        for (const auto i : make_range(scalar_n_dofs))
+          F_mixed(i + vector_n_dofs) +=
+              JxW_face[qp] * scalar_phi_face[i][qp] * tau * qp_mu[qp] * normal_sq;
+      }
+    }
+  };
+
+  std::vector<EigenVector> local_solns;
+  std::vector<unsigned int> dofs_on_side;
+  std::unordered_set<unsigned int> external_boundary_indices;
+  std::vector<std::vector<Gradient>> volumetric_q;
+  std::vector<std::vector<Number>> volumetric_u;
+  std::vector<std::vector<Gradient>> face_q;
+
+  for (const auto & elem : mesh.active_local_element_ptr_range())
+  {
+    // Retrive our dof indices for all fields
+    dof_map.dof_indices(elem, vector_dof_indices, system.variable_number("q"));
+    dof_map.dof_indices(elem, scalar_dof_indices, system.variable_number("u"));
+    lambda_dof_map.dof_indices(elem, lambda_dof_indices, lambda_system.variable_number("lambda"));
+
+    const auto vector_n_dofs = vector_dof_indices.size();
+    const auto scalar_n_dofs = scalar_dof_indices.size();
+    const auto lambda_n_dofs = lambda_dof_indices.size();
+
+    K_lm_libmesh.resize(lambda_n_dofs, lambda_n_dofs);
+    F_lm_libmesh.resize(lambda_n_dofs);
+
+    for (const auto s : elem->side_index_range())
+      if (!elem->neighbor_ptr(s))
+      {
+        FEInterface::dofs_on_side(elem, dim, lambda_fe_type, s, dofs_on_side);
+        external_boundary_indices.insert(dofs_on_side.begin(), dofs_on_side.end());
+      }
+
+    // Reinit our volume FE objects
+    vector_fe->reinit(elem);
+    scalar_fe->reinit(elem);
+
+    libmesh_assert_equal_to(vector_n_dofs, vector_phi.size());
+    libmesh_assert_equal_to(scalar_n_dofs, scalar_phi.size());
+
+    compute_and_invert_K(vector_n_dofs, scalar_n_dofs, elem);
+    local_solns.resize(lambda_n_dofs);
+    volumetric_q.resize(lambda_n_dofs);
+    volumetric_u.resize(lambda_n_dofs);
+    face_q.resize(lambda_n_dofs);
+    for (const auto i : make_range(lambda_n_dofs))
+    {
+      if (external_boundary_indices.count(i))
+        continue;
+
+      compute_rhs(vector_n_dofs, scalar_n_dofs, elem, i);
+      auto & local_soln = local_solns[i];
+      local_soln = Kinv_mixed * F_mixed;
+      const auto local_q_soln = local_soln.head(vector_n_dofs);
+      const auto local_u_soln = local_soln.tail(scalar_n_dofs);
+      compute_qp_soln(volumetric_q[i], qrule.n_points(), vector_phi, local_q_soln);
+      compute_qp_soln(volumetric_u[i], qrule.n_points(), scalar_phi, local_u_soln);
+    }
+
+    // Create the bilinear form for lambda
+    for (const auto i : make_range(lambda_n_dofs))
+      if (!external_boundary_indices.count(i))
+        for (const auto j : make_range(lambda_n_dofs))
+          if (!external_boundary_indices.count(j))
+            for (const auto qp : make_range(qrule.n_points()))
+              K_lm_libmesh(i, j) += JxW[qp] * volumetric_q[i][qp] * volumetric_q[j][qp];
+
+    // Now for the volumetric portion of the RHS
+    for (const auto qp : make_range(qrule.n_points()))
+    {
+      const Real x = q_point[qp](0);
+      const Real y = q_point[qp](1);
+      const Real z = q_point[qp](2);
+
+      // "f" is the forcing function for the Poisson equation, which is
+      // just the divergence of the exact solution for the vector field.
+      // This is the well-known "method of manufactured solutions".
+      Real f = 0;
+      if (dim == 2)
+        f = MixedExactSolution().forcing(x, y);
+      else if (dim == 3)
+        f = MixedExactSolution().forcing(x, y, z);
+      for (const auto i : make_range(lambda_n_dofs))
+        if (!external_boundary_indices.count(i))
+          F_lm_libmesh(i) += JxW[qp] * f * volumetric_u[i][qp];
+    }
+
+    // Now for the Dirichlet boundary portion of our RHS
+    for (const auto s : elem->side_index_range())
+    {
+      lambda_fe_face->reinit(elem, s);
+      for (const auto i : make_range(lambda_n_dofs))
+        if (external_boundary_indices.count(i))
+          for (const auto j : make_range(lambda_n_dofs))
+            if (external_boundary_indices.count(j))
+              for (const auto qp : make_range(qface.n_points()))
+                K_lm_libmesh(i, j) += JxW_face[qp] * lambda_phi_face[i][qp] * lambda_phi_face[j][qp];
+
+      if (!elem->neighbor_ptr(s))
+      {
+        vector_fe_face->reinit(elem, s);
+        for (const auto i : make_range(lambda_n_dofs))
+        {
+          if (external_boundary_indices.count(i))
+            continue;
+
+          const auto local_q_soln = local_solns[i].head(vector_n_dofs);
+          compute_qp_soln(face_q[i], qface.n_points(), vector_phi_face, local_q_soln);
+        }
+
+        for (const auto qp : make_range(qface.n_points()))
+        {
+          const Real xf = qface_point[qp](0);
+          const Real yf = qface_point[qp](1);
+          const Real zf = qface_point[qp](2);
+
+          // The boundary value for scalar field.
+          Real scalar_value = 0;
+          if (dim == 2)
+            scalar_value = MixedExactSolution().scalar(xf, yf);
+          else if (dim == 3)
+            scalar_value = MixedExactSolution().scalar(xf, yf, zf);
+          for (const auto i : make_range(lambda_n_dofs))
+            if (!external_boundary_indices.count(i))
+              F_lm_libmesh(i) += JxW_face[qp] * scalar_value * face_q[i][qp] * normals[qp];
+          }
+        }
+    }
+
+    // We were performing our finite element assembly for the implicit solve step of our
+    // example. Add our local element vectors/matrices into the global system
+    dof_map.constrain_element_matrix_and_vector(K_lm_libmesh, F_lm_libmesh, lambda_dof_indices);
+    matrix.add_matrix(K_lm_libmesh, lambda_dof_indices);
+    lambda_system.rhs->add_vector(F_lm_libmesh, lambda_dof_indices);
+  }
 }
 
 #else
