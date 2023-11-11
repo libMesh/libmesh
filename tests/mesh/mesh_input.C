@@ -10,6 +10,7 @@
 #include <libmesh/enum_norm_type.h>
 #include <libmesh/enum_to_string.h>
 
+#include <libmesh/abaqus_io.h>
 #include <libmesh/dyna_io.h>
 #include <libmesh/exodusII_io.h>
 #include <libmesh/nemesis_io.h>
@@ -173,6 +174,8 @@ public:
 #endif // defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
 
 #ifdef LIBMESH_HAVE_GZSTREAM
+  CPPUNIT_TEST( testAbaqusReadFirst );
+  CPPUNIT_TEST( testAbaqusReadSecond );
   CPPUNIT_TEST( testDynaReadElem );
   CPPUNIT_TEST( testDynaNoSplines );
   CPPUNIT_TEST( testDynaReadPatch );
@@ -1331,6 +1334,39 @@ public:
     CPPUNIT_ASSERT(found_the_quad);
 
     testMasterCenters(mesh);
+  }
+
+
+  void testAbaqusRead (const std::string & fname,
+                       dof_id_type n_elem,
+                       dof_id_type n_nodes)
+  {
+    Mesh mesh(*TestCommWorld);
+
+    AbaqusIO abaqus(mesh);
+
+    if (mesh.processor_id() == 0)
+      abaqus.read(fname);
+    MeshCommunication().broadcast (mesh);
+
+    mesh.prepare_for_use();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(),  n_elem);
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), n_nodes);
+  }
+
+
+  void testAbaqusReadFirst()
+  {
+    LOG_UNIT_TEST;
+    testAbaqusRead("meshes/tensile_sample_test1.inp.gz", 728, 1166);
+  }
+
+
+  void testAbaqusReadSecond()
+  {
+    LOG_UNIT_TEST;
+    testAbaqusRead("meshes/poly_sample_test2.inp.gz", 1280, 1625);
   }
 
 
