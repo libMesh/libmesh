@@ -50,7 +50,9 @@ extern "C" {
 
 
 // C++ includes
+#include <map>
 #include <unordered_map>
+#include <vector>
 
 
 namespace libMesh
@@ -123,11 +125,65 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
 
     libmesh_assert_equal_to (global_index.size(), n_range_elem);
 
+    // If we have unique_id() then global_index entries should be
+    // unique, so we just need a map for them.
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
     std::size_t cnt=0;
     for (const auto & elem : as_range(beg, end))
       global_index_map.emplace(elem->id(), global_index[cnt++]);
+#else
+    // If we don't have unique_id() then Hilbert SFC based
+    // global_index entries might overlap if elements overlap, so we
+    // need to fix any duplicates ...
+    //
+    // First, check for duplicates in O(N) time
+    std::unordered_map<dof_id_type, std::vector<dof_id_type>>
+      global_index_inverses;
+    bool found_duplicate_indices = false;
+      {
+        std::size_t cnt=0;
+        for (const auto & elem : as_range(beg, end))
+          {
+            auto & vec = global_index_inverses[global_index[cnt++]];
+            if (!vec.empty())
+              found_duplicate_indices = true;
+            vec.push_back(elem->id());
+          }
+      }
+
+    // But if we find them, we'll need O(N log N) to fix them while
+    // retaining the same space-filling-curve for efficient initial
+    // partitioning.
+    if (found_duplicate_indices)
+      {
+        const std::map<dof_id_type, std::vector<dof_id_type>>
+          sorted_inverses(global_index_inverses.begin(),
+                          global_index_inverses.end());
+        std::size_t new_global_index=0;
+        for (const auto & [index, elem_ids] : sorted_inverses)
+          for (const dof_id_type elem_id : elem_ids)
+            global_index_map.emplace(elem_id, new_global_index++);
+      }
+    else
+      {
+        std::size_t cnt=0;
+        for (const auto & elem : as_range(beg, end))
+          global_index_map.emplace(elem->id(), global_index[cnt++]);
+      }
+#endif
 
     libmesh_assert_equal_to (global_index_map.size(), n_range_elem);
+
+#ifdef DEBUG
+    std::unordered_set<dof_id_type> distinct_global_indices, distinct_ids;
+    for (const auto & [elem_id, index] : global_index_map)
+      {
+        distinct_ids.insert(elem_id);
+        distinct_global_indices.insert(index);
+      }
+    libmesh_assert_equal_to (distinct_global_indices.size(), n_range_elem);
+    libmesh_assert_equal_to (distinct_ids.size(), n_range_elem);
+#endif
   }
 
   // If we have boundary elements in this mesh, we want to account for
@@ -304,6 +360,13 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
               bounds = interior_to_boundary_map.equal_range(elem);
             num_neighbors += cast_int<unsigned int>
               (std::distance(bounds.first, bounds.second));
+
+            // Whether we enabled unique_id or had to fix any overlaps
+            // by hand, our global indices should be unique, so we
+            // should never see the same elem_global_index twice, so
+            // we should never be trying to edit an already-nonzero
+            // offset.
+            libmesh_assert(!csr_graph.offsets[elem_global_index+1]);
 
             csr_graph.prep_n_nonzeros(elem_global_index, num_neighbors);
 #ifndef NDEBUG
