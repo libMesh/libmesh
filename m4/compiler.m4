@@ -40,7 +40,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
                   AS_IF([test x"$PETSC_HAVE_MPI" = x1 && test x"$PETSC_CC" != x],
                         [],
                         dnl PETSc doesn't define a CC so we'll just try to pull one from the environment
-                        [CC_TRY_LIST="mpicc $CXX_TRY_LIST"])
+                        [CC_TRY_LIST="mpicc $CC_TRY_LIST"])
                 ]) dnl AS_IF([test x"$MPI" != x])
         ])
 
@@ -55,7 +55,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
         [CC="$PETSC_CC"])
 
   dnl If we still don't have a CC set then we will try to pick one up from CC_TRY_LIST
-  AC_PROG_CC([$CXX_TRY_LIST])
+  AC_PROG_CC([$CC_TRY_LIST])
 
 
   # --------------------------------------------------------------
