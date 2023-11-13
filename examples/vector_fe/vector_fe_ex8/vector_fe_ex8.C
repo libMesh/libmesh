@@ -905,6 +905,10 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
   std::vector<dof_id_type> lambda_dof_indices;
   std::vector<Number> lambda_solution_std_vec;
 
+  // Helper container for storing a given "mu" (function in the Langrange multiplier space) with
+  // quadrature point evaluations
+  std::vector<Number> mu;
+
   // The global system matrix
   auto & matrix = lambda_system.get_system_matrix();
 
@@ -1035,7 +1039,13 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
           }
         }
         else
-          return lambda_phi_face[shape_function];
+        {
+          auto & real_mu = lambda_phi_face[shape_function];
+          mu.resize(qface.n_points());
+          for (const auto qp : make_range(qface.n_points()))
+            mu[qp] = real_mu[qp];
+          return mu;
+        }
       }();
 
       const bool internal_face = elem_in->neighbor_ptr(side);
