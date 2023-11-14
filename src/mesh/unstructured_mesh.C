@@ -399,10 +399,10 @@ all_increased_order_range (UnstructuredMesh & mesh,
       libmesh_assert_equal_to (lo_elem->n_vertices(), ho_elem->n_vertices());
 
       /*
-       * By definition the vertices of the lower and higher order
+       * By definition the initial nodes of the lower and higher order
        * element are identically numbered.  Transfer these.
        */
-      for (unsigned int v=0, lnv=lo_elem->n_vertices(); v < lnv; v++)
+      for (unsigned int v=0, lnn=lo_elem->n_nodes(); v < lnn; v++)
         ho_elem->set_node(v) = lo_elem->node_ptr(v);
 
       transfer_elem(*lo_elem, std::move(ho_elem),
