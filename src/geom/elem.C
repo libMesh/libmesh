@@ -2947,8 +2947,6 @@ ElemType Elem::complete_order_equivalent_type (const ElemType et)
 
     case TRI3:
     case TRI6:
-      return TRI6; // Don't actually need the center node; elems can store dofs
-
     case TRI7:
       return TRI7;
 
