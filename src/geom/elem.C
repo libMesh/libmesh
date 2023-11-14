@@ -2978,11 +2978,12 @@ ElemType Elem::complete_order_equivalent_type (const ElemType et)
     case HEX27:
       return HEX27;
 
+    // We don't strictly need the 21st node for DoFs, but some code
+    // depends on it for e.g. refinement patterns
     case PRISM6:
     case PRISM15:
     case PRISM18:
     case PRISM20:
-      return PRISM20;
     case PRISM21:
       return PRISM21;
 
