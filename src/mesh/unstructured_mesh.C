@@ -49,7 +49,42 @@ namespace {
 
 using namespace libMesh;
 
-// Helper function for all_second_order, all_complete_order
+// Helper functions for all_second_order, all_complete_order
+
+std::map<std::vector<dof_id_type>, Node *>::iterator
+map_hi_order_node(unsigned int hon,
+                  const Elem & hi_elem,
+                  std::map<std::vector<dof_id_type>, Node *> & adj_vertices_to_ho_nodes)
+{
+  /*
+   * form a vector that will hold the node id's of
+   * the vertices that are adjacent to the nth
+   * higher-order node.
+   */
+  const unsigned int n_adjacent_vertices =
+    hi_elem.n_second_order_adjacent_vertices(hon);
+
+  std::vector<dof_id_type> adjacent_vertices_ids(n_adjacent_vertices);
+
+  for (unsigned int v=0; v<n_adjacent_vertices; v++)
+    adjacent_vertices_ids[v] =
+      hi_elem.node_id( hi_elem.second_order_adjacent_vertex(hon,v) );
+
+  /*
+   * \p adjacent_vertices_ids is now in order of the current
+   * side.  sort it, so that comparisons  with the
+   * \p adjacent_vertices_ids created through other elements'
+   * sides can match
+   */
+  std::sort(adjacent_vertices_ids.begin(),
+            adjacent_vertices_ids.end());
+
+  // Does this set of vertices already have a mid-node added?  If not
+  // we'll want to add it.
+  return adj_vertices_to_ho_nodes.try_emplace(adjacent_vertices_ids, nullptr).first;
+}
+
+
 void transfer_elem(const Elem & lo_elem,
                    std::unique_ptr<Elem> hi_elem,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -57,19 +92,12 @@ void transfer_elem(const Elem & lo_elem,
                    unique_id_type max_new_nodes_per_elem,
 #endif
                    UnstructuredMesh & mesh,
-                   std::map<std::vector<dof_id_type>, Node *> & adj_vertices_to_hi_nodes)
+                   std::map<std::vector<dof_id_type>, Node *> & adj_vertices_to_ho_nodes)
 {
   libmesh_assert_equal_to (lo_elem.n_vertices(), hi_elem->n_vertices());
 
   const processor_id_type my_pid = mesh.processor_id();
   const processor_id_type lo_pid = lo_elem.processor_id();
-
-  /*
-   * form a vector that will hold the node id's of
-   * the vertices that are adjacent to the nth
-   * higher-order node.
-   */
-  std::vector<dof_id_type> adjacent_vertices_ids;
 
   /*
    * Now handle the additional higher-order nodes.  This
@@ -84,31 +112,13 @@ void transfer_elem(const Elem & lo_elem,
 
   for (unsigned int hon=hon_begin; hon<hon_end; hon++)
     {
-      const unsigned int n_adjacent_vertices =
-        hi_elem->n_second_order_adjacent_vertices(hon);
-
-      adjacent_vertices_ids.resize(n_adjacent_vertices);
-
-      for (unsigned int v=0; v<n_adjacent_vertices; v++)
-        adjacent_vertices_ids[v] =
-          hi_elem->node_id( hi_elem->second_order_adjacent_vertex(hon,v) );
-
-      /*
-       * \p adjacent_vertices_ids is now in order of the current
-       * side.  sort it, so that comparisons  with the
-       * \p adjacent_vertices_ids created through other elements'
-       * sides can match
-       */
-      std::sort(adjacent_vertices_ids.begin(),
-                adjacent_vertices_ids.end());
-
-
-      // does this set of vertices already have a mid-node added?
-      auto pos = adj_vertices_to_hi_nodes.equal_range (adjacent_vertices_ids);
+      auto pos = map_hi_order_node(hon, *hi_elem, adj_vertices_to_ho_nodes);
 
       // no, not added yet
-      if (pos.first == pos.second)
+      if (!pos->second)
         {
+          const auto & adjacent_vertices_ids = pos->first;
+
           /*
            * for this set of vertices, there is no
            * second_order node yet.  Add it.
@@ -116,11 +126,11 @@ void transfer_elem(const Elem & lo_elem,
            * compute the location of the new node as
            * the average over the adjacent vertices.
            */
-          Point new_location = mesh.point(adjacent_vertices_ids[0]);
-          for (unsigned int v=1; v<n_adjacent_vertices; v++)
-            new_location += mesh.point(adjacent_vertices_ids[v]);
+          Point new_location = 0;
+          for (dof_id_type vertex_id : adjacent_vertices_ids)
+            new_location += mesh.point(vertex_id);
 
-          new_location /= static_cast<Real>(n_adjacent_vertices);
+          new_location /= static_cast<Real>(adjacent_vertices_ids.size());
 
           /* Add the new point to the mesh.
            *
@@ -167,15 +177,14 @@ void transfer_elem(const Elem & lo_elem,
            * new entry, so that the hi_elem can use
            * \p pos for inserting the node
            */
-          adj_vertices_to_hi_nodes.emplace_hint
-            (pos.first, adjacent_vertices_ids, hi_node);
+          pos->second = hi_node;
 
           hi_elem->set_node(hon) = hi_node;
         }
       // yes, already added.
       else
         {
-          Node * hi_node = pos.first->second;
+          Node * hi_node = pos->second;
           libmesh_assert(hi_node);
 
           hi_elem->set_node(hon) = hi_node;
@@ -247,6 +256,201 @@ void transfer_elem(const Elem & lo_elem,
 
   mesh.insert_elem(std::move(hi_elem));
 }
+
+
+template <typename ElemTypeConverter>
+void
+all_increased_order_range (UnstructuredMesh & mesh,
+                           const SimpleRange<MeshBase::element_iterator> & range,
+                           const unsigned int max_new_nodes_per_elem,
+                           const ElemTypeConverter & elem_type_converter)
+{
+  // This function must be run on all processors at once
+  timpi_parallel_only(mesh.comm());
+
+  /*
+   * The maximum number of new higher-order nodes we might be adding,
+   * for use when picking unique unique_id values later. This variable
+   * is not used unless unique ids are enabled, so libmesh_ignore() it
+   * to avoid warnings in that case.
+   */
+  libmesh_ignore(max_new_nodes_per_elem);
+
+  /*
+   * when the mesh is not prepared,
+   * at least renumber the nodes and
+   * elements, so that the node ids
+   * are correct
+   */
+  if (!mesh.is_prepared())
+    mesh.renumber_nodes_and_elements ();
+
+  /*
+   * If the mesh is empty
+   * then we have nothing to do
+   */
+  if (!mesh.n_elem())
+    return;
+
+  // If every element in the range _on every proc_ is already of the
+  // requested higher order then we have nothing to do. However, if
+  // any proc has some lower-order elements in the range, then _all_
+  // processors need to continue this function because it is
+  // parallel_only().
+  //
+  // Note: std::all_of() returns true for an empty range, which can
+  // happen for example in the DistributedMesh case when there are
+  // more processors than elements. In the case of an empty range we
+  // therefore set already_second_order to true on that proc.
+  auto is_higher_order = [&elem_type_converter](const auto & elem) {
+    ElemType old_type = elem->type();
+    ElemType new_type = elem_type_converter(old_type);
+    return old_type == new_type;
+  };
+
+  bool already_higher_order =
+    std::all_of(range.begin(), range.end(), is_higher_order);
+
+  // Check with other processors and possibly return early
+  mesh.comm().min(already_higher_order);
+  if (already_higher_order)
+    return;
+
+  /*
+   * this map helps in identifying higher order
+   * nodes.  Namely, a higher-order node:
+   * - edge node
+   * - face node
+   * - bubble node
+   * is uniquely defined through a set of adjacent
+   * vertices.  This set of adjacent vertices is
+   * used to identify already added higher-order
+   * nodes.  We are safe to use node id's since we
+   * make sure that these are correctly numbered.
+   */
+  std::map<std::vector<dof_id_type>, Node *> adj_vertices_to_ho_nodes;
+
+  /*
+   * max_new_nodes_per_elem is the maximum number of new higher order
+   * nodes we might be adding, for use when picking unique unique_id
+   * values later. This variable is not used unless unique ids are
+   * enabled.
+   */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  unique_id_type max_unique_id = mesh.parallel_max_unique_id();
+#endif
+
+  /**
+   * On distributed meshes we currently only support unpartitioned
+   * meshes (where we'll add every node in sync) or
+   * completely-partitioned meshes (where we'll sync nodes later);
+   * let's keep track to make sure we're not in any in-between state.
+   */
+  dof_id_type n_unpartitioned_elem = 0,
+              n_partitioned_elem = 0;
+
+  /**
+   * Loop over the elements in the _elements vector.  If any are
+   * already at higher than first-order, track their higher-order
+   * nodes in case we need them for neighboring elements later.
+   *
+   * In this way we can use this method to "fix up" a mesh which has
+   * otherwise inconsistent neighbor pairs of lower and higher order
+   * geometric elements.
+   */
+  for (auto & elem : range)
+    if (elem->default_order() == SECOND)
+      for (unsigned int hon : make_range(elem->n_vertices(), elem->n_nodes()))
+        {
+          auto pos = map_hi_order_node(hon, *elem, adj_vertices_to_ho_nodes);
+          pos->second = elem->node_ptr(hon);
+        }
+
+  /**
+   * Loop over the low-ordered elements in the _elements vector.
+   * First make sure they _are_ indeed low-order, and then replace
+   * them with an equivalent second-order element.  Don't
+   * forget to delete the low-order element, or else it will leak!
+   */
+  for (auto & lo_elem : range)
+    {
+      // Now we can skip the elements in the range that are already
+      // higher-order.
+      const ElemType old_type = lo_elem->type();
+      const ElemType new_type = elem_type_converter(old_type);
+
+      if (old_type == new_type)
+        continue;
+
+      // this does _not_ work for refined elements
+      libmesh_assert_equal_to (lo_elem->level(), 0);
+
+      if (lo_elem->processor_id() == DofObject::invalid_processor_id)
+        ++n_unpartitioned_elem;
+      else
+        ++n_partitioned_elem;
+
+      /*
+       * Build the higher-order equivalent; add to
+       * the new_elements list.
+       */
+      auto ho_elem = Elem::build (new_type);
+
+      libmesh_assert_equal_to (lo_elem->n_vertices(), ho_elem->n_vertices());
+
+      /*
+       * By definition the vertices of the lower and higher order
+       * element are identically numbered.  Transfer these.
+       */
+      for (unsigned int v=0, lnv=lo_elem->n_vertices(); v < lnv; v++)
+        ho_elem->set_node(v) = lo_elem->node_ptr(v);
+
+      transfer_elem(*lo_elem, std::move(ho_elem),
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+                    max_unique_id, max_new_nodes_per_elem,
+#endif
+                    mesh, adj_vertices_to_ho_nodes);
+    } // end for (auto & lo_elem : range)
+
+  // we can clear the map at this point.
+  adj_vertices_to_ho_nodes.clear();
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  const unique_id_type new_max_unique_id = max_unique_id +
+    max_new_nodes_per_elem * mesh.n_elem();
+  mesh.set_next_unique_id(new_max_unique_id);
+#endif
+
+  // On a DistributedMesh our ghost node processor ids may be bad,
+  // the ids of nodes touching remote elements may be inconsistent,
+  // unique_ids of newly added non-local nodes remain unset, and our
+  // partitioning of new nodes may not be well balanced.
+  //
+  // make_nodes_parallel_consistent() will fix all this.
+  if (!mesh.is_replicated())
+    {
+      dof_id_type max_unpartitioned_elem = n_unpartitioned_elem;
+      mesh.comm().max(max_unpartitioned_elem);
+      if (max_unpartitioned_elem)
+        {
+          // We'd better be effectively serialized here.  In theory we
+          // could support more complicated cases but in practice we
+          // only support "completely partitioned" and/or "serialized"
+          if (!mesh.comm().verify(n_unpartitioned_elem) ||
+              !mesh.comm().verify(n_partitioned_elem) ||
+              !mesh.is_serial())
+            libmesh_not_implemented();
+        }
+      else
+        {
+          MeshCommunication().make_nodes_parallel_consistent (mesh);
+        }
+    }
+
+  // renumber nodes, elements etc
+  mesh.prepare_for_use();
+}
+
 
 } // anonymous namespace
 
@@ -1277,68 +1481,14 @@ void
 UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & range,
                                           const bool full_ordered)
 {
-  // This function must be run on all processors at once
-  parallel_object_only();
-
   LOG_SCOPE("all_second_order_range()", "Mesh");
-
-  /*
-   * when the mesh is not prepared,
-   * at least renumber the nodes and
-   * elements, so that the node ids
-   * are correct
-   */
-  if (!this->_is_prepared)
-    this->renumber_nodes_and_elements ();
-
-  /*
-   * If the mesh is empty
-   * then we have nothing to do
-   */
-  if (!this->n_elem())
-    return;
-
-  // If every element in the range _on every proc_ is already second
-  // order then we have nothing to do. However, if any proc has some
-  // first-order elements in the range, then _all_ processors need to
-  // continue this function because it is parallel_only().  Note:
-  // std::all_of() returns true for an empty range, which can happen
-  // for example in the DistributedMesh case when there are more
-  // processors than elements. In the case of an empty range we
-  // therefore set already_second_order to true on that proc.
-  bool already_second_order =
-    std::all_of(range.begin(), range.end(),
-                [](const auto & elem){ return elem->default_order() == SECOND; });
-
-  // Check with other processors and possibly return early
-  this->comm().min(already_second_order);
-  if (already_second_order)
-    return;
-
-  /*
-   * this map helps in identifying second order
-   * nodes.  Namely, a second-order node:
-   * - edge node
-   * - face node
-   * - bubble node
-   * is uniquely defined through a set of adjacent
-   * vertices.  This set of adjacent vertices is
-   * used to identify already added higher-order
-   * nodes.  We are safe to use node id's since we
-   * make sure that these are correctly numbered.
-   */
-  std::map<std::vector<dof_id_type>, Node *> adj_vertices_to_so_nodes;
 
   /*
    * The maximum number of new second order nodes we might be adding,
    * for use when picking unique unique_id values later. This variable
    * is not used unless unique ids are enabled.
    */
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
   unsigned int max_new_nodes_per_elem;
-
-  unique_id_type max_unique_id = this->parallel_max_unique_id();
-#endif
 
   /*
    * For speed-up of the \p add_point() method, we
@@ -1354,9 +1504,7 @@ UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & 
        * to Edge3.  Something like 1/2 of n_nodes() have
        * to be added
        */
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 3 - 2;
-#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (1.5*static_cast<double>(this->n_nodes())));
       break;
@@ -1366,9 +1514,7 @@ UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & 
        * in 2D, either refine from Tri3 to Tri6 (double the nodes)
        * or from Quad4 to Quad8 (again, double) or Quad9 (2.25 that much)
        */
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 9 - 4;
-#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (2*static_cast<double>(this->n_nodes())));
       break;
@@ -1381,9 +1527,7 @@ UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & 
        * quite some nodes, and since we do not want to overburden the memory by
        * a too conservative guess, use the lower bound
        */
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
       max_new_nodes_per_elem = 27 - 8;
-#endif
       this->reserve_nodes(static_cast<unsigned int>
                           (2.5*static_cast<double>(this->n_nodes())));
       break;
@@ -1393,191 +1537,31 @@ UnstructuredMesh::all_second_order_range (const SimpleRange<element_iterator> & 
       libmesh_error_msg("Unknown mesh dimension " << this->mesh_dimension());
     }
 
-
-
-  /*
-   * form a vector that will hold the node id's of
-   * the vertices that are adjacent to the son-th
-   * second-order node.  Pull this outside of the
-   * loop so that silly compilers don't repeatedly
-   * create and destroy the vector.
-   */
-  std::vector<dof_id_type> adjacent_vertices_ids;
-
-  /**
-   * On distributed meshes we currently only support unpartitioned
-   * meshes (where we'll add every node in sync) or
-   * completely-partitioned meshes (where we'll sync nodes later);
-   * let's keep track to make sure we're not in any in-between state.
-   */
-  dof_id_type n_unpartitioned_elem = 0,
-              n_partitioned_elem = 0;
-
-  /**
-   * Loop over the low-ordered elements in the _elements vector.
-   * First make sure they _are_ indeed low-order, and then replace
-   * them with an equivalent second-order element.  Don't
-   * forget to delete the low-order element, or else it will leak!
-   */
-  for (auto & lo_elem : range)
-    {
-      // Skip elements in the range that are already SECOND-order.
-      // Ordinarily one does not have a mixture of FIRST and
-      // SECOND-order elements in an all-2D or all-3D mesh, since
-      // FIRST and SECOND-order elements can't be (conforming)
-      // neighbors, but in a mixed-dimension element mesh, this is
-      // possible.
-      if (lo_elem->default_order() == SECOND)
-        continue;
-
-      // Otherwise, we only know how to handle FIRST-order elements
-      libmesh_error_msg_if(lo_elem->default_order() != FIRST,
-                           "ERROR: This is not a linear element: type=" << Utility::enum_to_string(lo_elem->type()));
-
-      // this does _not_ work for refined elements
-      libmesh_assert_equal_to (lo_elem->level (), 0);
-
-      if (lo_elem->processor_id() == DofObject::invalid_processor_id)
-        ++n_unpartitioned_elem;
-      else
-        ++n_partitioned_elem;
-
-      /*
-       * build the second-order equivalent, add to
-       * the new_elements list.  Note that this here
-       * is the only point where \p full_ordered
-       * is necessary.  The remaining code works well
-       * for either type of second-order equivalent, e.g.
-       * Hex20 or Hex27, as equivalents for Hex8
-       */
-      auto so_elem =
-        Elem::build (Elem::second_order_equivalent_type(lo_elem->type(),
-                                                        full_ordered));
-
-      libmesh_assert_equal_to (lo_elem->n_vertices(), so_elem->n_vertices());
-
-
-      /*
-       * By definition the vertices of the linear and
-       * second order element are identically numbered.
-       * transfer these.
-       */
-      for (unsigned int v=0, lnv=lo_elem->n_vertices(); v < lnv; v++)
-        so_elem->set_node(v) = lo_elem->node_ptr(v);
-
-      transfer_elem(*lo_elem, std::move(so_elem),
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-                    max_unique_id, max_new_nodes_per_elem,
-#endif
-                    *this, adj_vertices_to_so_nodes);
-    } // end for (auto & lo_elem : range)
-
-  // we can clear the map
-  adj_vertices_to_so_nodes.clear();
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  const unique_id_type new_max_unique_id = max_unique_id +
-    max_new_nodes_per_elem * this->n_elem();
-  this->set_next_unique_id(new_max_unique_id);
-#endif
-
-
-
-  // On a DistributedMesh our ghost node processor ids may be bad,
-  // the ids of nodes touching remote elements may be inconsistent,
-  // unique_ids of newly added non-local nodes remain unset, and our
-  // partitioning of new nodes may not be well balanced.
-  //
-  // make_nodes_parallel_consistent() will fix all this.
-  if (!this->is_replicated())
-    {
-      dof_id_type max_unpartitioned_elem = n_unpartitioned_elem;
-      this->comm().max(max_unpartitioned_elem);
-      if (max_unpartitioned_elem)
-        {
-          // We'd better be effectively serialized here.  In theory we
-          // could support more complicated cases but in practice we
-          // only support "completely partitioned" and/or "serialized"
-          if (!this->comm().verify(n_unpartitioned_elem) ||
-              !this->comm().verify(n_partitioned_elem) ||
-              !this->is_serial())
-            libmesh_not_implemented();
-        }
-      else
-        {
-          MeshCommunication().make_nodes_parallel_consistent (*this);
-        }
-    }
-
-  // renumber nodes, elements etc
-  this->prepare_for_use();
+  // All the real work is done in the helper function
+  all_increased_order_range(*this, range, max_new_nodes_per_elem,
+    [full_ordered](ElemType t) {
+      return Elem::second_order_equivalent_type(t, full_ordered);
+    });
 }
 
 
 
-void UnstructuredMesh::all_complete_order ()
+void UnstructuredMesh::all_complete_order_range(const SimpleRange<element_iterator> & range)
 {
-  // This function must be run on all processors at once
-  parallel_object_only();
-
-  /*
-   * If the mesh is already complete ordered then we have nothing to
-   * do ... but what if we have a hybrid mesh where some elements are
-   * of complete order and others aren't?  So we won't short-circuit
-   * here.
-   */
   LOG_SCOPE("all_complete_order()", "Mesh");
 
   /*
-   * when the mesh is not prepared,
-   * at least renumber the nodes and
-   * elements, so that the node ids
-   * are correct
-   */
-  if (!this->_is_prepared)
-    this->renumber_nodes_and_elements ();
-
-  /*
-   * If the mesh is empty
-   * then we have nothing to do
-   */
-  if (!this->n_elem())
-    return;
-
-  /*
-   * this map helps in identifying second order
-   * nodes.  Namely, a higher-order node
-   * - edge node
-   * - face node
-   * - bubble node
-   * is uniquely defined through a set of adjacent
-   * vertices.  This set of adjacent vertices is
-   * used to identify already added higher-order
-   * nodes.  We are safe to use node id's since we
-   * make sure that these are correctly numbered.
-   */
-  std::map<std::vector<dof_id_type>, Node *> adj_vertices_to_co_nodes;
-
-  /*
-   * The maximum number of new second order nodes we might be adding,
+   * The maximum number of new higher-order nodes we might be adding,
    * for use when picking unique unique_id values later. This variable
-   * is not used unless unique ids are enabled, so libmesh_ignore() it
-   * to avoid warnings in that case.
+   * is not used unless unique ids are enabled.
    */
   unsigned int max_new_nodes_per_elem;
-
-#ifndef LIBMESH_ENABLE_UNIQUE_ID
-  libmesh_ignore(max_new_nodes_per_elem);
-#endif
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  unique_id_type max_unique_id = this->parallel_max_unique_id();
-#endif
 
   /*
    * for speed-up of the \p add_point() method, we
    * can reserve memory.  Guess the number of additional
-   * nodes for different dimensions
+   * nodes based on the element spatial dimensions and the
+   * total number of nodes in the mesh as an upper bound.
    */
   switch (this->mesh_dimension())
     {
@@ -1622,111 +1606,11 @@ void UnstructuredMesh::all_complete_order ()
       libmesh_error_msg("Unknown mesh dimension " << this->mesh_dimension());
     }
 
-  /**
-   * On distributed meshes we currently only support unpartitioned
-   * meshes (where we'll add every node in sync) or
-   * completely-partitioned meshes (where we'll sync nodes later);
-   * let's keep track to make sure we're not in any in-between state.
-   */
-  dof_id_type n_unpartitioned_elem = 0,
-              n_partitioned_elem = 0;
-
-  /**
-   * Loop over the low-ordered elements in the _elements vector.
-   * First make sure they _are_ indeed low-order, and then replace
-   * them with an equivalent second-order element.  Don't
-   * forget to delete the low-order element, or else it will leak!
-   */
-  for (auto & lo_elem : element_ptr_range())
-    {
-      // if it doesn't need mid-face elements added, continue
-      if (lo_elem->type() != TRI7 &&
-          lo_elem->type() != TET14 &&
-          lo_elem->type() != PRISM20 &&
-          lo_elem->type() != PRISM21 &&
-          lo_elem->type() != PYRAMID18 &&
-          lo_elem->default_order() != FIRST)
-        continue;
-
-      if (lo_elem->processor_id() == DofObject::invalid_processor_id)
-        ++n_unpartitioned_elem;
-      else
-        ++n_partitioned_elem;
-
-      /*
-       * build the complete elem equivalent, add to
-       * the new_elements list.
-       */
-      ElemType hi_type = TRI7;
-      if (lo_elem->type() == TET10 || lo_elem->type() == TET4)
-        hi_type = TET14;
-      else if (lo_elem->type() == PRISM18 ||
-               lo_elem->type() == PRISM15 ||
-               lo_elem->type() == PRISM6)
-        hi_type = PRISM21;
-      else if (lo_elem->type() == PYRAMID14 ||
-               lo_elem->type() == PYRAMID13 ||
-               lo_elem->type() == PYRAMID5)
-        hi_type = PYRAMID18;
-      else
-        libmesh_assert(lo_elem->type() == TRI6 || lo_elem->type() == TRI3);
-
-      auto co_elem = Elem::build (hi_type);
-
-      /*
-       * By definition the initial vertices of the linear and
-       * complete order element are identically numbered.
-       * transfer these.
-       */
-      for (auto n : make_range(lo_elem->n_nodes()))
-        co_elem->set_node(n) = lo_elem->node_ptr(n);
-
-      transfer_elem(*lo_elem, std::move(co_elem),
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-                    max_unique_id, max_new_nodes_per_elem,
-#endif
-                    *this, adj_vertices_to_co_nodes);
-    }
-
-  // we can clear the map
-  adj_vertices_to_co_nodes.clear();
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  const unique_id_type new_max_unique_id = max_unique_id +
-    max_new_nodes_per_elem * this->n_elem();
-  this->set_next_unique_id(new_max_unique_id);
-#endif
-
-
-
-  // On a DistributedMesh our ghost node processor ids may be bad,
-  // the ids of nodes touching remote elements may be inconsistent,
-  // unique_ids of newly added non-local nodes remain unset, and our
-  // partitioning of new nodes may not be well balanced.
-  //
-  // make_nodes_parallel_consistent() will fix all this.
-  if (!this->is_replicated())
-    {
-      dof_id_type max_unpartitioned_elem = n_unpartitioned_elem;
-      this->comm().max(max_unpartitioned_elem);
-      if (max_unpartitioned_elem)
-        {
-          // We'd better be effectively serialized here.  In theory we
-          // could support more complicated cases but in practice we
-          // only support "completely partitioned" and/or "serialized"
-          if (!this->comm().verify(n_unpartitioned_elem) ||
-              !this->comm().verify(n_partitioned_elem) ||
-              !this->is_serial())
-            libmesh_not_implemented();
-        }
-      else
-        {
-          MeshCommunication().make_nodes_parallel_consistent (*this);
-        }
-    }
-
-  // renumber nodes, elements etc
-  this->prepare_for_use();
+  // All the real work is done in the helper function
+  all_increased_order_range(*this, range, max_new_nodes_per_elem,
+    [](ElemType t) {
+      return Elem::complete_order_equivalent_type(t);
+    });
 }
 
 
