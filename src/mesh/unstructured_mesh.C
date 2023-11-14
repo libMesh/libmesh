@@ -359,7 +359,7 @@ all_increased_order_range (UnstructuredMesh & mesh,
    * geometric elements.
    */
   for (auto & elem : range)
-    if (elem->default_order() == SECOND)
+    if (elem->default_order() != FIRST)
       for (unsigned int hon : make_range(elem->n_vertices(), elem->n_nodes()))
         {
           auto pos = map_hi_order_node(hon, *elem, adj_vertices_to_ho_nodes);
