@@ -2932,6 +2932,102 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
 
 
 
+ElemType Elem::complete_order_equivalent_type (const ElemType et)
+{
+  switch (et)
+    {
+    case NODEELEM:
+      return NODEELEM;
+    case EDGE2:
+    case EDGE3:
+      return EDGE3;
+
+    case EDGE4:
+      return EDGE4;
+
+    case TRI3:
+    case TRI6:
+      return TRI6; // Don't actually need the center node; elems can store dofs
+
+    case TRI7:
+      return TRI7;
+
+      // Currently there is no TRISHELL6, so similarly to other types
+      // where this is the case, we just return the input.
+    case TRISHELL3:
+      return TRISHELL3;
+
+    case QUAD4:
+    case QUAD8:
+    case QUAD9:
+      return QUAD9;
+
+    case QUADSHELL4:
+    case QUADSHELL8:
+      {
+        // There is no QUADSHELL9, so in that sense QUADSHELL8 is the
+        // "full ordered" element.
+        return QUADSHELL8;
+      }
+
+    case TET4:
+    case TET10:
+    case TET14:
+      return TET14;
+
+    case HEX8:
+    case HEX20:
+    case HEX27:
+      return HEX27;
+
+    case PRISM6:
+    case PRISM15:
+    case PRISM18:
+    case PRISM20:
+      return PRISM20;
+    case PRISM21:
+      return PRISM21;
+
+    case PYRAMID5:
+    case PYRAMID13:
+    case PYRAMID14:
+    case PYRAMID18:
+      return PYRAMID18;
+
+
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+    case INFEDGE2:
+      return INFEDGE2;
+
+    case INFQUAD4:
+    case INFQUAD6:
+      return INFQUAD6;
+
+    case INFHEX8:
+    case INFHEX16:
+    case INFHEX18:
+      return INFHEX18;
+
+    // Probably ought to implement INFPRISM13 and/or 14; until then
+    // we'll just return the not-complete-order ElemType, in
+    // accordance which what seems like bad precedent...
+    case INFPRISM6:
+    case INFPRISM12:
+      return INFPRISM12;
+#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+    default:
+      {
+        // what did we miss?
+        libmesh_error_msg("No complete order equivalent element type for et =  "
+                          << Utility::enum_to_string(et));
+      }
+    }
+}
+
+
+
 Elem::side_iterator Elem::boundary_sides_begin()
 {
   Predicates::BoundarySide<SideIter> bsp;
