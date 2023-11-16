@@ -239,8 +239,8 @@ int main (int argc, char ** argv)
   // Solve this as a time-dependent or steady system
   std::string time_solver = infile("time_solver","DIE!");
 
-  ExplicitSystem * v_system;
-  ExplicitSystem * a_system;
+  ExplicitSystem * v_system = nullptr;
+  ExplicitSystem * a_system = nullptr;
 
   if( time_solver == std::string("newmark") )
     {
