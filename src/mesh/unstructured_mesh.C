@@ -85,7 +85,7 @@ map_hi_order_node(unsigned int hon,
 }
 
 
-void transfer_elem(const Elem & lo_elem,
+void transfer_elem(Elem & lo_elem,
                    std::unique_ptr<Elem> hi_elem,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
                    unique_id_type max_unique_id,
@@ -211,12 +211,28 @@ void transfer_elem(const Elem & lo_elem,
 
   /*
    * find_neighbors relies on remote_elem neighbor links being
-   * properly maintained.
+   * properly maintained.  Our own code here relies on ordinary
+   * neighbor links being properly maintained, so let's just keep
+   * everything up to date.
    */
   for (auto s : lo_elem.side_index_range())
     {
-      if (lo_elem.neighbor_ptr(s) == remote_elem)
-        hi_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
+      Elem * neigh = lo_elem.neighbor_ptr(s);
+      if (!neigh)
+        continue;
+
+      if (neigh != remote_elem)
+        {
+          // We don't support AMR even outside our own range yet.
+          libmesh_assert_equal_to (neigh->level(), 0);
+
+          const unsigned int ns = neigh->which_neighbor_am_i(&lo_elem);
+          libmesh_assert_not_equal_to(ns, libMesh::invalid_uint);
+
+          neigh->set_neighbor(ns, hi_elem.get());
+        }
+
+      hi_elem->set_neighbor(s, neigh);
     }
 
   /**
@@ -302,7 +318,7 @@ all_increased_order_range (UnstructuredMesh & mesh,
   // happen for example in the DistributedMesh case when there are
   // more processors than elements. In the case of an empty range we
   // therefore set already_second_order to true on that proc.
-  auto is_higher_order = [&elem_type_converter](const auto & elem) {
+  auto is_higher_order = [&elem_type_converter](const Elem * elem) {
     ElemType old_type = elem->type();
     ElemType new_type = elem_type_converter(old_type);
     return old_type == new_type;
@@ -350,21 +366,35 @@ all_increased_order_range (UnstructuredMesh & mesh,
               n_partitioned_elem = 0;
 
   /**
-   * Loop over the elements in the _elements vector.  If any are
+   * Loop over the elements in the given range.  If any are
    * already at higher than first-order, track their higher-order
    * nodes in case we need them for neighboring elements later.
    *
    * In this way we can use this method to "fix up" a mesh which has
    * otherwise inconsistent neighbor pairs of lower and higher order
    * geometric elements.
+   *
+   * If any elements are not at the desired order yet, check their
+   * neighbors for higher order; we may need to share elements with a
+   * neighbor not in the range.
    */
-  for (auto & elem : range)
-    if (elem->default_order() != FIRST)
+  auto track_if_necessary = [&adj_vertices_to_ho_nodes](Elem * elem) {
+    if (elem && elem->default_order() != FIRST)
       for (unsigned int hon : make_range(elem->n_vertices(), elem->n_nodes()))
         {
           auto pos = map_hi_order_node(hon, *elem, adj_vertices_to_ho_nodes);
           pos->second = elem->node_ptr(hon);
         }
+  };
+
+  for (auto & elem : range)
+    {
+      track_if_necessary(elem);
+
+      if (!is_higher_order(elem))
+        for (Elem * neigh : elem->neighbor_ptr_range())
+          track_if_necessary(neigh);
+    }
 
   /**
    * Loop over the low-ordered elements in the _elements vector.
@@ -447,8 +477,13 @@ all_increased_order_range (UnstructuredMesh & mesh,
         }
     }
 
-  // renumber nodes, elements etc
+  // renumber nodes, repartition nodes, etc.  We no longer need a
+  // find_neighbors() here since we're keeping neighbor links intact
+  // ourselves.
+  const bool old_find_neighbors = mesh.allow_find_neighbors();
+  mesh.allow_find_neighbors(false);
   mesh.prepare_for_use();
+  mesh.allow_find_neighbors(old_find_neighbors);
 }
 
 
