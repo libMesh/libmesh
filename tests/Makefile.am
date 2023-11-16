@@ -319,7 +319,8 @@ CLEANFILES = cube_mesh.xda \
              extra_integers.xda \
              extra_integers.xdr \
              write_elemset_data.xda \
-             write_elemset_data.xdr
+             write_elemset_data.xdr \
+             test_helper.xdr
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD
