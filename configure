@@ -49682,6 +49682,13 @@ else $as_nop
 fi
 
 
+if test "x${TIRPC_DIR}" != "x"
+then :
+  withxdrinc_default=${TIRPC_DIR}
+else $as_nop
+  withxdrinc_default=no
+fi
+
 # Support for --with-xdr-include configure option
 
 # Check whether --with-xdr-include was given.
@@ -49689,7 +49696,7 @@ if test ${with_xdr_include+y}
 then :
   withval=$with_xdr_include; withxdrinc=$withval
 else $as_nop
-  withxdrinc=no
+  withxdrinc=$withxdrinc_default
 fi
 
 
