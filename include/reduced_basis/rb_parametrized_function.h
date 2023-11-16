@@ -327,7 +327,7 @@ public:
    * can handle the case where the spatial function evaluation requires us to have
    * indices from all nodes of an element, since in that case we need a vector of
    * indices (one per node) for each point. Other cases, such as when we define
-   * the paramtrized function based on the element index only, only require a
+   * the parametrized function based on the element index only, only require a
    * singly-nested vector which we handle as a special case of the doubly-nested
    * vector.
    *
@@ -338,12 +338,7 @@ public:
    * to provide the relevant behavior.
    */
   virtual void get_spatial_indices(std::vector<std::vector<unsigned int>> & spatial_indices,
-                                   const std::vector<dof_id_type> & elem_ids,
-                                   const std::vector<unsigned int> & side_indices,
-                                   const std::vector<dof_id_type> & node_ids,
-                                   const std::vector<unsigned int> & qps,
-                                   const std::vector<subdomain_id_type> & sbd_ids,
-                                   const std::vector<boundary_id_type> & boundary_ids);
+                                   const VectorizedEvalInput & v);
 
   /**
    * The Online stage counterpart of get_spatial_indices(). This method
@@ -351,12 +346,7 @@ public:
    * we can evaluate it during an Online solve.
    */
   virtual void initialize_spatial_indices(const std::vector<std::vector<unsigned int>> & spatial_indices,
-                                          const std::vector<dof_id_type> & elem_ids,
-                                          const std::vector<unsigned int> & side_indices,
-                                          const std::vector<dof_id_type> & node_ids,
-                                          const std::vector<unsigned int> & qps,
-                                          const std::vector<subdomain_id_type> & sbd_ids,
-                                          const std::vector<boundary_id_type> & boundary_ids);
+                                          const VectorizedEvalInput & v);
 
   /**
    * Virtual function that performs cleanup after each

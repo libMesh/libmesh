@@ -324,23 +324,13 @@ void RBEIMEvaluation::initialize_interpolation_points_spatial_indices()
   _interpolation_points_spatial_indices.clear();
 
   get_parametrized_function().get_spatial_indices(_interpolation_points_spatial_indices,
-                                                  _vec_eval_input.elem_ids,
-                                                  _vec_eval_input.side_indices,
-                                                  _vec_eval_input.node_ids,
-                                                  _vec_eval_input.qps,
-                                                  _vec_eval_input.sbd_ids,
-                                                  _vec_eval_input.boundary_ids);
+                                                  _vec_eval_input);
 }
 
 void RBEIMEvaluation::initialize_param_fn_spatial_indices()
 {
   get_parametrized_function().initialize_spatial_indices(_interpolation_points_spatial_indices,
-                                                         _vec_eval_input.elem_ids,
-                                                         _vec_eval_input.side_indices,
-                                                         _vec_eval_input.node_ids,
-                                                         _vec_eval_input.qps,
-                                                         _vec_eval_input.sbd_ids,
-                                                         _vec_eval_input.boundary_ids);
+                                                         _vec_eval_input);
 }
 
 unsigned int RBEIMEvaluation::get_n_basis_functions() const
