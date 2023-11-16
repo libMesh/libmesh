@@ -177,10 +177,16 @@ protected:
     // a segfault for me.
     // TODO: currently we are only testing writing binary (XDR) files,
     // should probably also test writing ASCII (XDA) files.
-    // TODO: For now just test writing, should also test reading the mesh back in.
 #ifdef LIBMESH_HAVE_XDR
-    mesh.write("test_helper.xdr");
+    const std::string xdr_filename = "test_helper.xdr";
+    mesh.write(xdr_filename);
     TestCommWorld->barrier();
+
+   // And test that we can read extra integers from refined XDR/XDA
+   // files. Use a freshly constructed Mesh for this.
+   Mesh mesh2(*TestCommWorld);
+   mesh2.read(xdr_filename);
+   test_final_integers(mesh2, i1);
 #endif
 
 #endif
