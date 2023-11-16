@@ -22,6 +22,7 @@ public:
   CPPUNIT_TEST(testLeftMultiply);
   CPPUNIT_TEST(testRotation);
 #endif
+  CPPUNIT_TEST(testRowCol);
   CPPUNIT_TEST(testIsZero);
 #ifdef LIBMESH_HAVE_METAPHYSICL
   CPPUNIT_TEST(testReplaceAlgebraicType);
@@ -140,6 +141,29 @@ private:
       LIBMESH_ASSERT_FP_EQUAL(1, rotated(2), tol);
     }
   }
+
+  void testRowCol()
+  {
+    LOG_UNIT_TEST;
+
+    TensorValue<Real> t;
+    for (unsigned int i = 0; i < LIBMESH_DIM; i++)
+      for (unsigned int j = 0; j < LIBMESH_DIM; j++)
+        t(i, j) = Real(i * LIBMESH_DIM + j);
+
+    constexpr Real tol = TOLERANCE * TOLERANCE;
+    for (unsigned int k = 0; k < LIBMESH_DIM; k++)
+    {
+      const auto row = t.row(k);
+      for (unsigned int l = 0; l < LIBMESH_DIM; l++)
+        LIBMESH_ASSERT_FP_EQUAL(Real(k * LIBMESH_DIM + l), row(l), tol);
+
+      const auto col = t.column(k);
+      for (unsigned int l = 0; l < LIBMESH_DIM; l++)
+        LIBMESH_ASSERT_FP_EQUAL(Real(l * LIBMESH_DIM + k), col(l), tol);
+    }
+  }
+
 #ifdef LIBMESH_HAVE_METAPHYSICL
   void testReplaceAlgebraicType()
   {
