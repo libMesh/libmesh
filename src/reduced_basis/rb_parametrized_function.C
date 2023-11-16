@@ -415,6 +415,9 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
   v.sbd_ids.resize(n_points);
   v.all_xyz_perturb.resize(n_points);
   v.phi_i_qp.resize(n_points);
+  v.JxWs.resize(n_points);
+  v.elem_volumes.resize(n_points);
+  v.elem_types.resize(n_points);
 
   // Empty vector to be used when xyz perturbations are not required
   std::vector<Point> empty_perturbs;
@@ -424,6 +427,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
   for (auto dim : con.elem_dimensions())
     {
       auto fe = con.get_element_fe(/*var=*/0, dim);
+      fe->get_JxW();
       fe->get_phi();
     }
 
@@ -442,6 +446,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
 
       auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
       const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+      const std::vector<Real> & JxW = elem_fe->get_JxW();
 
       elem_fe->reinit(&elem_ref);
 
@@ -453,6 +458,10 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
           v.elem_ids[counter] = elem_id;
           v.qps[counter] = qp;
           v.sbd_ids[counter] = subdomain_id;
+
+          v.JxWs[counter] = JxW[qp];
+          v.elem_volumes[counter] = elem_ref.volume();
+          v.elem_types[counter] = elem_ref.type();
 
           v.phi_i_qp[counter].resize(phi.size());
           for(auto i : index_range(phi))

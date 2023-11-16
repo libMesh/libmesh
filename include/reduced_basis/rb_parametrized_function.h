@@ -22,6 +22,7 @@
 
 // libMesh includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/enum_elem_type.h"
 
 // C++ includes
 #include <unordered_map>
@@ -70,6 +71,9 @@ struct VectorizedEvalInput
   std::vector<unsigned int> side_indices;
   std::vector<boundary_id_type> boundary_ids;
   std::vector<dof_id_type> node_ids;
+  std::vector<Real> JxWs;
+  std::vector<Real> elem_volumes;
+  std::vector<ElemType> elem_types;
 };
 
 /**

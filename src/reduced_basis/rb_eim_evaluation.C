@@ -771,6 +771,21 @@ void RBEIMEvaluation::add_interpolation_points_qp(unsigned int qp)
   _vec_eval_input.qps.emplace_back(qp);
 }
 
+void RBEIMEvaluation::add_interpolation_points_JxW(Real JxW)
+{
+  _vec_eval_input.JxWs.emplace_back(JxW);
+}
+
+void RBEIMEvaluation::add_interpolation_points_elem_volume(Real elem_vol)
+{
+  _vec_eval_input.elem_volumes.emplace_back(elem_vol);
+}
+
+void RBEIMEvaluation::add_interpolation_points_elem_type(ElemType elem_type)
+{
+  _vec_eval_input.elem_types.emplace_back(elem_type);
+}
+
 void RBEIMEvaluation::add_interpolation_points_phi_i_qp(const std::vector<Real> & phi_i_qp)
 {
   _vec_eval_input.phi_i_qp.emplace_back(phi_i_qp);
@@ -842,6 +857,27 @@ unsigned int RBEIMEvaluation::get_interpolation_points_qp(unsigned int index) co
   libmesh_error_msg_if(index >= _vec_eval_input.qps.size(), "Error: Invalid index");
 
   return _vec_eval_input.qps[index];
+}
+
+Real RBEIMEvaluation::get_interpolation_points_JxW(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _vec_eval_input.JxWs.size(), "Error: Invalid index");
+
+  return _vec_eval_input.JxWs[index];
+}
+
+Real RBEIMEvaluation::get_interpolation_points_elem_volume(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _vec_eval_input.elem_volumes.size(), "Error: Invalid index");
+
+  return _vec_eval_input.elem_volumes[index];
+}
+
+ElemType RBEIMEvaluation::get_interpolation_points_elem_type(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _vec_eval_input.elem_types.size(), "Error: Invalid index");
+
+  return _vec_eval_input.elem_types[index];
 }
 
 const std::vector<Real> & RBEIMEvaluation::get_interpolation_points_phi_i_qp(unsigned int index) const
