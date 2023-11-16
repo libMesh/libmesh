@@ -122,11 +122,15 @@ AC_ARG_ENABLE(xdr,
               enablexdr=$enableval,
               enablexdr=yes)
 
+dnl If the user sets ${TIRPC_DIR} in their environment, then use that as the
+dnl default value for --with-xdr-include
+AS_IF([test "x${TIRPC_DIR}" != "x"], [withxdrinc_default=${TIRPC_DIR}], [withxdrinc_default=no])
+
 # Support for --with-xdr-include configure option
 AC_ARG_WITH(xdr-include,
             AS_HELP_STRING([--with-xdr-include=PATH],[Specify the path for RPC headers required by XDR]),
             withxdrinc=$withval,
-            withxdrinc=no)
+            withxdrinc=$withxdrinc_default)
 
 # Support for --with-xdr-libname configure option. Note that we currently
 # do not provide a way to specify a library PATH, but that could potentially
