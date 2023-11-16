@@ -598,7 +598,12 @@ XdrIO::write_serialized_connectivity (Xdr & io,
                     if (write_p_level)
                       output_buffer.push_back(tmp);
 
+                    // connectivity
                     for (xdr_id_type node=0; node<n_nodes; node++)
+                      output_buffer.push_back(*recv_conn_iter++);
+
+                    // Write out the elem extra integers after the connectivity
+                    for (dof_id_type n=0; n<n_elem_integers; n++)
                       output_buffer.push_back(*recv_conn_iter++);
 
                     io.data_stream

@@ -171,6 +171,24 @@ protected:
     mr.uniformly_refine(1);
 
     test_final_integers(mesh, i1);
+
+    // Test writing an XDR file for a refined mesh with extra elem integers.
+    // Note: without the fix in libMesh/libmesh@de15955c5, this test produced
+    // a segfault for me.
+    // TODO: currently we are only testing writing binary (XDR) files,
+    // should probably also test writing ASCII (XDA) files.
+#ifdef LIBMESH_HAVE_XDR
+    const std::string xdr_filename = "test_helper.xdr";
+    mesh.write(xdr_filename);
+    TestCommWorld->barrier();
+
+   // And test that we can read extra integers from refined XDR/XDA
+   // files. Use a freshly constructed Mesh for this.
+   Mesh mesh2(*TestCommWorld);
+   mesh2.read(xdr_filename);
+   test_final_integers(mesh2, i1);
+#endif
+
 #endif
   }
 
