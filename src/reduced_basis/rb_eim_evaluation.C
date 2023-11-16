@@ -57,17 +57,11 @@ RBEIMEvaluation::~RBEIMEvaluation() = default;
 
 void RBEIMEvaluation::clear()
 {
-  _interpolation_points_xyz.clear();
+  _vec_eval_input.clear();
+
   _interpolation_points_comp.clear();
-  _interpolation_points_subdomain_id.clear();
-  _interpolation_points_boundary_id.clear();
-  _interpolation_points_xyz_perturbations.clear();
-  _interpolation_points_elem_id.clear();
-  _interpolation_points_side_index.clear();
-  _interpolation_points_node_id.clear();
-  _interpolation_points_qp.clear();
-  _interpolation_points_phi_i_qp.clear();
   _interpolation_points_spatial_indices.clear();
+
 
   _interpolation_matrix.resize(0,0);
 
@@ -78,16 +72,10 @@ void RBEIMEvaluation::clear()
 void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
 {
   // Resize the data structures relevant to the EIM system
-  _interpolation_points_xyz.clear();
+  _vec_eval_input.clear();
+  _vec_eval_input.all_xyz.clear();
+
   _interpolation_points_comp.clear();
-  _interpolation_points_subdomain_id.clear();
-  _interpolation_points_boundary_id.clear();
-  _interpolation_points_xyz_perturbations.clear();
-  _interpolation_points_elem_id.clear();
-  _interpolation_points_side_index.clear();
-  _interpolation_points_node_id.clear();
-  _interpolation_points_qp.clear();
-  _interpolation_points_phi_i_qp.clear();
   _interpolation_points_spatial_indices.clear();
 
   // We need space for one extra interpolation point if we're using the
@@ -186,31 +174,11 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   //   mu index --> interpolation point index --> component index --> value.
   std::vector<std::vector<std::vector<Number>>> output_all_comps;
   if (get_parametrized_function().on_mesh_sides())
-    get_parametrized_function().side_vectorized_evaluate(mus,
-                                                         _interpolation_points_xyz,
-                                                         _interpolation_points_elem_id,
-                                                         _interpolation_points_side_index,
-                                                         _interpolation_points_qp,
-                                                         _interpolation_points_subdomain_id,
-                                                         _interpolation_points_boundary_id,
-                                                         _interpolation_points_xyz_perturbations,
-                                                         _interpolation_points_phi_i_qp,
-                                                         output_all_comps);
+    get_parametrized_function().side_vectorized_evaluate(mus, _vec_eval_input, output_all_comps);
   else if (get_parametrized_function().on_mesh_nodes())
-    get_parametrized_function().node_vectorized_evaluate(mus,
-                                                         _interpolation_points_xyz,
-                                                         _interpolation_points_node_id,
-                                                         _interpolation_points_boundary_id,
-                                                         output_all_comps);
+    get_parametrized_function().node_vectorized_evaluate(mus, _vec_eval_input, output_all_comps);
   else
-    get_parametrized_function().vectorized_evaluate(mus,
-                                                    _interpolation_points_xyz,
-                                                    _interpolation_points_elem_id,
-                                                    _interpolation_points_qp,
-                                                    _interpolation_points_subdomain_id,
-                                                    _interpolation_points_xyz_perturbations,
-                                                    _interpolation_points_phi_i_qp,
-                                                    output_all_comps);
+    get_parametrized_function().vectorized_evaluate(mus, _vec_eval_input, output_all_comps);
 
   // Previously we did one RB-EIM solve per input mu, but now we do
   // one RB-EIM solve per input mu, per step. In order for this to
@@ -356,23 +324,23 @@ void RBEIMEvaluation::initialize_interpolation_points_spatial_indices()
   _interpolation_points_spatial_indices.clear();
 
   get_parametrized_function().get_spatial_indices(_interpolation_points_spatial_indices,
-                                                  _interpolation_points_elem_id,
-                                                  _interpolation_points_side_index,
-                                                  _interpolation_points_node_id,
-                                                  _interpolation_points_qp,
-                                                  _interpolation_points_subdomain_id,
-                                                  _interpolation_points_boundary_id);
+                                                  _vec_eval_input.elem_ids,
+                                                  _vec_eval_input.side_indices,
+                                                  _vec_eval_input.node_ids,
+                                                  _vec_eval_input.qps,
+                                                  _vec_eval_input.sbd_ids,
+                                                  _vec_eval_input.boundary_ids);
 }
 
 void RBEIMEvaluation::initialize_param_fn_spatial_indices()
 {
   get_parametrized_function().initialize_spatial_indices(_interpolation_points_spatial_indices,
-                                                         _interpolation_points_elem_id,
-                                                         _interpolation_points_side_index,
-                                                         _interpolation_points_node_id,
-                                                         _interpolation_points_qp,
-                                                         _interpolation_points_subdomain_id,
-                                                         _interpolation_points_boundary_id);
+                                                         _vec_eval_input.elem_ids,
+                                                         _vec_eval_input.side_indices,
+                                                         _vec_eval_input.node_ids,
+                                                         _vec_eval_input.qps,
+                                                         _vec_eval_input.sbd_ids,
+                                                         _vec_eval_input.boundary_ids);
 }
 
 unsigned int RBEIMEvaluation::get_n_basis_functions() const
@@ -387,7 +355,7 @@ unsigned int RBEIMEvaluation::get_n_basis_functions() const
 
 unsigned int RBEIMEvaluation::get_n_interpolation_points() const
 {
-  return _interpolation_points_xyz.size();
+  return _vec_eval_input.all_xyz.size();
 }
 
 void RBEIMEvaluation::set_n_basis_functions(unsigned int n_bfs)
@@ -770,7 +738,7 @@ const std::vector<Real> & RBEIMEvaluation::get_rb_eim_error_indicators() const
 
 void RBEIMEvaluation::add_interpolation_points_xyz(Point p)
 {
-  _interpolation_points_xyz.emplace_back(p);
+  _vec_eval_input.all_xyz.emplace_back(p);
 }
 
 void RBEIMEvaluation::add_interpolation_points_comp(unsigned int comp)
@@ -780,42 +748,42 @@ void RBEIMEvaluation::add_interpolation_points_comp(unsigned int comp)
 
 void RBEIMEvaluation::add_interpolation_points_subdomain_id(subdomain_id_type sbd_id)
 {
-  _interpolation_points_subdomain_id.emplace_back(sbd_id);
+  _vec_eval_input.sbd_ids.emplace_back(sbd_id);
 }
 
 void RBEIMEvaluation::add_interpolation_points_boundary_id(boundary_id_type b_id)
 {
-  _interpolation_points_boundary_id.emplace_back(b_id);
+  _vec_eval_input.boundary_ids.emplace_back(b_id);
 }
 
 void RBEIMEvaluation::add_interpolation_points_xyz_perturbations(const std::vector<Point> & perturbs)
 {
-  _interpolation_points_xyz_perturbations.emplace_back(perturbs);
+  _vec_eval_input.all_xyz_perturb.emplace_back(perturbs);
 }
 
 void RBEIMEvaluation::add_interpolation_points_elem_id(dof_id_type elem_id)
 {
-  _interpolation_points_elem_id.emplace_back(elem_id);
+  _vec_eval_input.elem_ids.emplace_back(elem_id);
 }
 
 void RBEIMEvaluation::add_interpolation_points_side_index(unsigned int side_index)
 {
-  _interpolation_points_side_index.emplace_back(side_index);
+  _vec_eval_input.side_indices.emplace_back(side_index);
 }
 
 void RBEIMEvaluation::add_interpolation_points_node_id(dof_id_type node_id)
 {
-  _interpolation_points_node_id.emplace_back(node_id);
+  _vec_eval_input.node_ids.emplace_back(node_id);
 }
 
 void RBEIMEvaluation::add_interpolation_points_qp(unsigned int qp)
 {
-  _interpolation_points_qp.emplace_back(qp);
+  _vec_eval_input.qps.emplace_back(qp);
 }
 
 void RBEIMEvaluation::add_interpolation_points_phi_i_qp(const std::vector<Real> & phi_i_qp)
 {
-  _interpolation_points_phi_i_qp.emplace_back(phi_i_qp);
+  _vec_eval_input.phi_i_qp.emplace_back(phi_i_qp);
 }
 
 void RBEIMEvaluation::add_interpolation_points_spatial_indices(const std::vector<unsigned int> & spatial_indices)
@@ -825,9 +793,9 @@ void RBEIMEvaluation::add_interpolation_points_spatial_indices(const std::vector
 
 Point RBEIMEvaluation::get_interpolation_points_xyz(unsigned int index) const
 {
-  libmesh_error_msg_if(index >= _interpolation_points_xyz.size(), "Error: Invalid index");
+  libmesh_error_msg_if(index >= _vec_eval_input.all_xyz.size(), "Error: Invalid index");
 
-  return _interpolation_points_xyz[index];
+  return _vec_eval_input.all_xyz[index];
 }
 
 unsigned int RBEIMEvaluation::get_interpolation_points_comp(unsigned int index) const
@@ -839,58 +807,58 @@ unsigned int RBEIMEvaluation::get_interpolation_points_comp(unsigned int index) 
 
 subdomain_id_type RBEIMEvaluation::get_interpolation_points_subdomain_id(unsigned int index) const
 {
-  libmesh_error_msg_if(index >= _interpolation_points_subdomain_id.size(), "Error: Invalid index");
+  libmesh_error_msg_if(index >= _vec_eval_input.sbd_ids.size(), "Error: Invalid index");
 
-  return _interpolation_points_subdomain_id[index];
+  return _vec_eval_input.sbd_ids[index];
 }
 
 boundary_id_type RBEIMEvaluation::get_interpolation_points_boundary_id(unsigned int index) const
 {
-  libmesh_error_msg_if(index >= _interpolation_points_boundary_id.size(), "Error: Invalid index");
+  libmesh_error_msg_if(index >= _vec_eval_input.boundary_ids.size(), "Error: Invalid index");
 
-  return _interpolation_points_boundary_id[index];
+  return _vec_eval_input.boundary_ids[index];
 }
 
 const std::vector<Point> & RBEIMEvaluation::get_interpolation_points_xyz_perturbations(unsigned int index) const
 {
-  libmesh_error_msg_if(index >= _interpolation_points_xyz_perturbations.size(), "Error: Invalid index");
+  libmesh_error_msg_if(index >= _vec_eval_input.all_xyz_perturb.size(), "Error: Invalid index");
 
-  return _interpolation_points_xyz_perturbations[index];
+  return _vec_eval_input.all_xyz_perturb[index];
 }
 
 dof_id_type RBEIMEvaluation::get_interpolation_points_elem_id(unsigned int index) const
 {
-  libmesh_error_msg_if(index >= _interpolation_points_elem_id.size(), "Error: Invalid index");
+  libmesh_error_msg_if(index >= _vec_eval_input.elem_ids.size(), "Error: Invalid index");
 
-  return _interpolation_points_elem_id[index];
+  return _vec_eval_input.elem_ids[index];
 }
 
 unsigned int RBEIMEvaluation::get_interpolation_points_side_index(unsigned int index) const
 {
-  libmesh_error_msg_if(index >= _interpolation_points_side_index.size(), "Error: Invalid index");
+  libmesh_error_msg_if(index >= _vec_eval_input.side_indices.size(), "Error: Invalid index");
 
-  return _interpolation_points_side_index[index];
+  return _vec_eval_input.side_indices[index];
 }
 
 dof_id_type RBEIMEvaluation::get_interpolation_points_node_id(unsigned int index) const
 {
-  libmesh_error_msg_if(index >= _interpolation_points_node_id.size(), "Error: Invalid index");
+  libmesh_error_msg_if(index >= _vec_eval_input.node_ids.size(), "Error: Invalid index");
 
-  return _interpolation_points_node_id[index];
+  return _vec_eval_input.node_ids[index];
 }
 
 unsigned int RBEIMEvaluation::get_interpolation_points_qp(unsigned int index) const
 {
-  libmesh_error_msg_if(index >= _interpolation_points_qp.size(), "Error: Invalid index");
+  libmesh_error_msg_if(index >= _vec_eval_input.qps.size(), "Error: Invalid index");
 
-  return _interpolation_points_qp[index];
+  return _vec_eval_input.qps[index];
 }
 
 const std::vector<Real> & RBEIMEvaluation::get_interpolation_points_phi_i_qp(unsigned int index) const
 {
-  libmesh_error_msg_if(index >= _interpolation_points_phi_i_qp.size(), "Error: Invalid index");
+  libmesh_error_msg_if(index >= _vec_eval_input.phi_i_qp.size(), "Error: Invalid index");
 
-  return _interpolation_points_phi_i_qp[index];
+  return _vec_eval_input.phi_i_qp[index];
 }
 
 const std::vector<unsigned int> & RBEIMEvaluation::get_interpolation_points_spatial_indices(unsigned int index) const
@@ -977,13 +945,13 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   const std::vector<Real> & phi_i_qp)
 {
   _local_eim_basis_functions.emplace_back(bf);
-  _interpolation_points_xyz.emplace_back(p);
+  _vec_eval_input.all_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
-  _interpolation_points_elem_id.emplace_back(elem_id);
-  _interpolation_points_subdomain_id.emplace_back(subdomain_id);
-  _interpolation_points_qp.emplace_back(qp);
-  _interpolation_points_xyz_perturbations.emplace_back(perturbs);
-  _interpolation_points_phi_i_qp.emplace_back(phi_i_qp);
+  _vec_eval_input.elem_ids.emplace_back(elem_id);
+  _vec_eval_input.sbd_ids.emplace_back(subdomain_id);
+  _vec_eval_input.qps.emplace_back(qp);
+  _vec_eval_input.all_xyz_perturb.emplace_back(perturbs);
+  _vec_eval_input.phi_i_qp.emplace_back(phi_i_qp);
 }
 
 void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
@@ -999,15 +967,15 @@ void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
   const std::vector<Real> & phi_i_qp)
 {
   _local_side_eim_basis_functions.emplace_back(side_bf);
-  _interpolation_points_xyz.emplace_back(p);
+  _vec_eval_input.all_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
-  _interpolation_points_elem_id.emplace_back(elem_id);
-  _interpolation_points_side_index.emplace_back(side_index);
-  _interpolation_points_subdomain_id.emplace_back(subdomain_id);
-  _interpolation_points_boundary_id.emplace_back(boundary_id);
-  _interpolation_points_qp.emplace_back(qp);
-  _interpolation_points_xyz_perturbations.emplace_back(perturbs);
-  _interpolation_points_phi_i_qp.emplace_back(phi_i_qp);
+  _vec_eval_input.elem_ids.emplace_back(elem_id);
+  _vec_eval_input.side_indices.emplace_back(side_index);
+  _vec_eval_input.sbd_ids.emplace_back(subdomain_id);
+  _vec_eval_input.boundary_ids.emplace_back(boundary_id);
+  _vec_eval_input.qps.emplace_back(qp);
+  _vec_eval_input.all_xyz_perturb.emplace_back(perturbs);
+  _vec_eval_input.phi_i_qp.emplace_back(phi_i_qp);
 }
 
 void RBEIMEvaluation::add_node_basis_function_and_interpolation_data(
@@ -1018,21 +986,21 @@ void RBEIMEvaluation::add_node_basis_function_and_interpolation_data(
   boundary_id_type boundary_id)
 {
   _local_node_eim_basis_functions.emplace_back(node_bf);
-  _interpolation_points_xyz.emplace_back(p);
+  _vec_eval_input.all_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
-  _interpolation_points_node_id.emplace_back(node_id);
-  _interpolation_points_boundary_id.emplace_back(boundary_id);
+  _vec_eval_input.node_ids.emplace_back(node_id);
+  _vec_eval_input.boundary_ids.emplace_back(boundary_id);
 
   // Add dummy values for the other properties, which are unused in the
   // node case.
   std::vector<Point> empty_perturbs;
   std::vector<Real> empty_phi_i_qp;
-  _interpolation_points_elem_id.emplace_back(0);
-  _interpolation_points_side_index.emplace_back(0);
-  _interpolation_points_subdomain_id.emplace_back(0);
-  _interpolation_points_qp.emplace_back(0);
-  _interpolation_points_xyz_perturbations.emplace_back(empty_perturbs);
-  _interpolation_points_phi_i_qp.emplace_back(empty_phi_i_qp);
+  _vec_eval_input.elem_ids.emplace_back(0);
+  _vec_eval_input.side_indices.emplace_back(0);
+  _vec_eval_input.sbd_ids.emplace_back(0);
+  _vec_eval_input.qps.emplace_back(0);
+  _vec_eval_input.all_xyz_perturb.emplace_back(empty_perturbs);
+  _vec_eval_input.phi_i_qp.emplace_back(empty_phi_i_qp);
 }
 
 void RBEIMEvaluation::
