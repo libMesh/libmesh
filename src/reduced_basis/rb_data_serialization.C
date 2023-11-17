@@ -715,20 +715,20 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
 
   // Interpolation points JxW values at each qp
   {
-    auto interpolation_points_JxW_list =
-      rb_eim_evaluation_builder.initInterpolationJxW(n_bfs);
-    for (unsigned int i=0; i<n_bfs; ++i)
-      interpolation_points_JxW_list.set(i,
-                                        rb_eim_evaluation.get_interpolation_points_JxW(i));
-  }
+    auto interpolation_points_list_outer =
+      rb_eim_evaluation_builder.initInterpolationJxWAllQp(n_bfs);
+    for (unsigned int i=0; i < n_bfs; ++i)
+      {
+        const std::vector<Real> & JxW = rb_eim_evaluation.get_interpolation_points_JxW_all_qp(i);
+        auto interpolation_points_list_inner = interpolation_points_list_outer.init(i, JxW.size());
 
-  // Element volume for the element that contains each interpolation point
-  {
-    auto interpolation_points_elem_volume_list =
-      rb_eim_evaluation_builder.initInterpolationElemVolume(n_bfs);
-    for (unsigned int i=0; i<n_bfs; ++i)
-      interpolation_points_elem_volume_list.set(i,
-                                                rb_eim_evaluation.get_interpolation_points_elem_volume(i));
+        for (unsigned int j : index_range(JxW))
+          {
+            // Here we can use set() instead of set_scalar_in_list() because
+            // phi stores real-valued data only.
+            interpolation_points_list_inner.set(j, JxW[j]);
+          }
+      }
   }
 
   // Element type for the element that contains each interpolation point

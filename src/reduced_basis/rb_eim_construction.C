@@ -2416,9 +2416,9 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
   unsigned int optimal_qp = 0;
   std::vector<Point> optimal_point_perturbs;
   std::vector<Real> optimal_point_phi_i_qp;
-  Real optimal_JxW = 0.;
-  Real optimal_elem_volume = 0.;
   ElemType optimal_elem_type = INVALID_ELEM;
+  std::vector<Real> optimal_JxW_all_qp;
+  std::vector<std::vector<Real>> optimal_phi_i_all_qp;
 
   // Initialize largest_abs_value to be negative so that it definitely gets updated.
   Real largest_abs_value = -1.;
@@ -2460,8 +2460,6 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
                   optimal_comp = comp;
                   optimal_elem_id = elem_id;
                   optimal_qp = qp;
-                  optimal_JxW = JxW[qp];
-                  optimal_elem_volume = elem_ref.volume();
                   optimal_elem_type = elem_ref.type();
 
                   optimal_point_phi_i_qp.resize(phi.size());
@@ -2486,6 +2484,12 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
 
                       optimal_point_perturbs = perturb_list[qp];
                     }
+
+                  if (get_rb_eim_evaluation().get_parametrized_function().requires_all_elem_qp_data)
+                    {
+                      optimal_JxW_all_qp = JxW;
+                      optimal_phi_i_all_qp = phi;
+                    }
                 }
             }
         }
@@ -2504,8 +2508,8 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
   this->comm().broadcast(optimal_qp, proc_ID_index);
   this->comm().broadcast(optimal_point_perturbs, proc_ID_index);
   this->comm().broadcast(optimal_point_phi_i_qp, proc_ID_index);
-  this->comm().broadcast(optimal_JxW, proc_ID_index);
-  this->comm().broadcast(optimal_elem_volume, proc_ID_index);
+  this->comm().broadcast(optimal_JxW_all_qp, proc_ID_index);
+  this->comm().broadcast(optimal_phi_i_all_qp, proc_ID_index);
 
   // Cast optimal_elem_type to an int in order to broadcast it
   {
@@ -2540,9 +2544,9 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
                                                      optimal_qp,
                                                      optimal_point_perturbs,
                                                      optimal_point_phi_i_qp,
-                                                     optimal_JxW,
-                                                     optimal_elem_volume,
-                                                     optimal_elem_type);
+                                                     optimal_elem_type,
+                                                     optimal_JxW_all_qp,
+                                                     optimal_phi_i_all_qp);
 
   if (has_obs_vals)
     {

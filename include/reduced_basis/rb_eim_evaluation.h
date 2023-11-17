@@ -378,10 +378,10 @@ public:
   void add_interpolation_points_side_index(unsigned int side_index);
   void add_interpolation_points_node_id(dof_id_type node_id);
   void add_interpolation_points_qp(unsigned int qp);
-  void add_interpolation_points_JxW(Real JxW);
-  void add_interpolation_points_elem_volume(Real elem_vol);
   void add_interpolation_points_elem_type(ElemType elem_type);
   void add_interpolation_points_phi_i_qp(const std::vector<Real> & phi_i_qp);
+  void add_interpolation_points_JxW_all_qp(const std::vector<Real> & JxW_all_qp);
+  void add_interpolation_points_phi_i_all_qp(const std::vector<std::vector<Real>> & phi_i_all_qp);
   void add_interpolation_points_spatial_indices(const std::vector<unsigned int> & spatial_indices);
 
   /**
@@ -396,10 +396,10 @@ public:
   unsigned int get_interpolation_points_side_index(unsigned int index) const;
   dof_id_type get_interpolation_points_node_id(unsigned int index) const;
   unsigned int get_interpolation_points_qp(unsigned int index) const;
-  Real get_interpolation_points_JxW(unsigned int index) const;
-  Real get_interpolation_points_elem_volume(unsigned int index) const;
   ElemType get_interpolation_points_elem_type(unsigned int index) const;
   const std::vector<Real> & get_interpolation_points_phi_i_qp(unsigned int index) const;
+  const std::vector<Real> & get_interpolation_points_JxW_all_qp(unsigned int index) const;
+  const std::vector<std::vector<Real>> & get_interpolation_points_phi_i_all_qp(unsigned int index) const;
   const std::vector<unsigned int> & get_interpolation_points_spatial_indices(unsigned int index) const;
 
   /**
@@ -431,9 +431,9 @@ public:
     unsigned int qp,
     const std::vector<Point> & perturbs,
     const std::vector<Real> & phi_i_qp,
-    Real JxW,
-    Real elem_volume,
-    ElemType elem_type);
+    ElemType elem_type,
+    const std::vector<Real> & JxW_all_qp,
+    const std::vector<std::vector<Real>> & phi_i_all_qp);
 
   /**
    * Add \p side_bf to our EIM basis.

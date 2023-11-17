@@ -71,9 +71,9 @@ struct VectorizedEvalInput
   std::vector<unsigned int> side_indices;
   std::vector<boundary_id_type> boundary_ids;
   std::vector<dof_id_type> node_ids;
-  std::vector<Real> JxWs;
-  std::vector<Real> elem_volumes;
   std::vector<ElemType> elem_types;
+  std::vector<std::vector<Real>> JxW_all_qp;
+  std::vector<std::vector<std::vector<Real>>> phi_i_all_qp;
 };
 
 /**
@@ -398,6 +398,14 @@ public:
    * approximations to derivatives.
    */
   bool requires_xyz_perturbations;
+
+  /**
+   * Boolean to indicate whether this parametrized function requires data from
+   * all qps on the current element at each qp location. This can be necessary
+   * in certain cases, e.g. when the parametrized function depends on "element
+   * average" quantities.
+   */
+  bool requires_all_elem_qp_data;
 
   /**
    * Boolean to indicate if this parametrized function is defined based on a lookup
