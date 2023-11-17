@@ -2508,9 +2508,11 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
   this->comm().broadcast(optimal_elem_volume, proc_ID_index);
 
   // Cast optimal_elem_type to an int in order to broadcast it
-  int optimal_elem_type_int = static_cast<int>(optimal_elem_type);
-  this->comm().broadcast(optimal_elem_type_int, proc_ID_index);
-  optimal_elem_type = static_cast<ElemType>(optimal_elem_type_int);
+  {
+    int optimal_elem_type_int = static_cast<int>(optimal_elem_type);
+    this->comm().broadcast(optimal_elem_type_int, proc_ID_index);
+    optimal_elem_type = static_cast<ElemType>(optimal_elem_type_int);
+  }
 
   libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
 
