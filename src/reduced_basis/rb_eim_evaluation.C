@@ -968,7 +968,10 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   subdomain_id_type subdomain_id,
   unsigned int qp,
   const std::vector<Point> & perturbs,
-  const std::vector<Real> & phi_i_qp)
+  const std::vector<Real> & phi_i_qp,
+  Real JxW,
+  Real elem_volume,
+  ElemType elem_type)
 {
   _local_eim_basis_functions.emplace_back(bf);
   _vec_eval_input.all_xyz.emplace_back(p);
@@ -978,6 +981,9 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   _vec_eval_input.qps.emplace_back(qp);
   _vec_eval_input.all_xyz_perturb.emplace_back(perturbs);
   _vec_eval_input.phi_i_qp.emplace_back(phi_i_qp);
+  _vec_eval_input.JxWs.emplace_back(JxW);
+  _vec_eval_input.elem_volumes.emplace_back(elem_volume);
+  _vec_eval_input.elem_types.emplace_back(elem_type);
 }
 
 void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(

@@ -430,7 +430,10 @@ public:
     subdomain_id_type subdomain_id,
     unsigned int qp,
     const std::vector<Point> & perturbs,
-    const std::vector<Real> & phi_i_qp);
+    const std::vector<Real> & phi_i_qp,
+    Real JxW,
+    Real elem_volume,
+    ElemType elem_type);
 
   /**
    * Add \p side_bf to our EIM basis.
