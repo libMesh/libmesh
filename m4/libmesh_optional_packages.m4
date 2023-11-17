@@ -122,35 +122,86 @@ AC_ARG_ENABLE(xdr,
               enablexdr=$enableval,
               enablexdr=yes)
 
+dnl If the user sets ${TIRPC_DIR} in their environment, then use that as the
+dnl default value for --with-xdr-include
+AS_IF([test "x${TIRPC_DIR}" != "x"], [withxdrinc_default=${TIRPC_DIR}], [withxdrinc_default=no])
+
+# Support for --with-xdr-include configure option
+AC_ARG_WITH(xdr-include,
+            AS_HELP_STRING([--with-xdr-include=PATH],[Specify the path for RPC headers required by XDR]),
+            withxdrinc=$withval,
+            withxdrinc=$withxdrinc_default)
+
+# Support for --with-xdr-libname configure option. Note that we currently
+# do not provide a way to specify a library PATH, but that could potentially
+# be added. If the user does not specify this option, it defaults to "tirpc"
+# since that seems to be the current standard way of linking "external" RPC
+# libraries.
+AC_ARG_WITH(xdr-libname,
+            AS_HELP_STRING([--with-xdr-libname=foo],[Specify name of the XDR library to be appended to -l when linking]),
+            withxdrlibname=$withval,
+            withxdrlibname=tirpc)
+
 AS_IF([test "$enablexdr" != no],
       [
-      dnl Check whether the system/compiler has xdr.h in /usr/include and glibc.
-      AC_MSG_CHECKING([for built-in XDR support])
-      CONFIGURE_XDR
-
-      dnl Check for headers in /usr/include/tirpc. (Fedora 28 does this.)
-      AS_IF([test "x$enablexdr" = "xno"],
+      dnl If there is a user-provided XDR include/library provided, then we only
+      dnl try compiling/linking against those, to avoid accidentally bringing in
+      dnl any unwanted system RPC headers.
+      AS_IF([test "x$withxdrinc" != "xno"],
             [
-              AC_MSG_CHECKING([for XDR support in /usr/include/tirpc])
+              AC_MSG_CHECKING([for XDR support in $withxdrinc])
               old_CPPFLAGS="$CPPFLAGS"
               old_LIBS="$LIBS"
-              CPPFLAGS="$CPPFLAGS -I/usr/include/tirpc"
-              LIBS="$LIBS -ltirpc"
+              CPPFLAGS="$CPPFLAGS -I$withxdrinc"
+              LIBS="$LIBS -l$withxdrlibname"
 
               CONFIGURE_XDR
 
               dnl If that worked, append the required include paths and libraries as necessary.
               AS_IF([test "x$enablexdr" = "xyes"],
                     [
-                      libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES -I/usr/include/tirpc"
-                      libmesh_optional_LIBS="$libmesh_optional_LIBS -ltirpc"
+                      libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES -I$withxdrinc"
+                      libmesh_optional_LIBS="$libmesh_optional_LIBS -l$withxdrlibname"
                     ])
 
               dnl Reset flags after testing
               CPPFLAGS="$old_CPPFLAGS"
               LIBS="$old_LIBS"
-           ])
+            ],
+            [test "x$withxdrinc" = "xno"],
+            [
+              dnl The user did not provide a custom XDR include/header path, so we
+              dnl instead check whether the system/compiler has built-in support for
+              dnl compiling/linking a code that includes xdr.h, followed by checking
+              dnl other known locations.
+              AC_MSG_CHECKING([for built-in XDR support])
+              CONFIGURE_XDR
+
+              dnl Check for headers in /usr/include/tirpc. (Fedora 28 does this.)
+              AS_IF([test "x$enablexdr" = "xno"],
+                    [
+                      AC_MSG_CHECKING([for XDR support in /usr/include/tirpc])
+                      old_CPPFLAGS="$CPPFLAGS"
+                      old_LIBS="$LIBS"
+                      CPPFLAGS="$CPPFLAGS -I/usr/include/tirpc"
+                      LIBS="$LIBS -ltirpc"
+
+                      CONFIGURE_XDR
+
+                      dnl If that worked, append the required include paths and libraries as necessary.
+                      AS_IF([test "x$enablexdr" = "xyes"],
+                            [
+                              libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES -I/usr/include/tirpc"
+                              libmesh_optional_LIBS="$libmesh_optional_LIBS -ltirpc"
+                            ])
+
+                      dnl Reset flags after testing
+                      CPPFLAGS="$old_CPPFLAGS"
+                      LIBS="$old_LIBS"
+                   ])
+            ])
       ])
+
 AS_IF([test "x$enablexdr" = "xno" && test "x$xdrrequired" = "xyes"],
       [AC_MSG_ERROR([*** XDR was not found, but --enable-xdr-required was specified.], 4)])
 
