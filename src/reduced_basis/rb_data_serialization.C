@@ -713,6 +713,33 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
+  // Interpolation points JxW values at each qp
+  {
+    auto interpolation_points_JxW_list =
+      rb_eim_evaluation_builder.initInterpolationJxW(n_bfs);
+    for (unsigned int i=0; i<n_bfs; ++i)
+      interpolation_points_JxW_list.set(i,
+                                        rb_eim_evaluation.get_interpolation_points_JxW(i));
+  }
+
+  // Element volume for the element that contains each interpolation point
+  {
+    auto interpolation_points_elem_volume_list =
+      rb_eim_evaluation_builder.initInterpolationElemVolume(n_bfs);
+    for (unsigned int i=0; i<n_bfs; ++i)
+      interpolation_points_elem_volume_list.set(i,
+                                                rb_eim_evaluation.get_interpolation_points_elem_volume(i));
+  }
+
+  // Element type for the element that contains each interpolation point
+  {
+    auto interpolation_points_elem_type_list =
+      rb_eim_evaluation_builder.initInterpolationElemType(n_bfs);
+    for (unsigned int i=0; i<n_bfs; ++i)
+      interpolation_points_elem_type_list.set(i,
+                                              rb_eim_evaluation.get_interpolation_points_elem_type(i));
+  }
+
   // Optionally store EIM solutions for the training set
   if (rb_eim_evaluation.get_parametrized_function().is_lookup_table)
     {

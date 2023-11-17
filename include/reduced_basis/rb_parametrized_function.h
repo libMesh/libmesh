@@ -22,6 +22,7 @@
 
 // libMesh includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/enum_elem_type.h"
 
 // C++ includes
 #include <unordered_map>
@@ -35,6 +36,45 @@ namespace libMesh
 class RBParameters;
 class Point;
 class System;
+
+/**
+ * Define a struct for the input to the "vectorized evaluate" functions below.
+ * This encapsulates the arguments into a class to prevent having many function
+ * arguments, and also makes it easier to make API changes in the future because
+ * we can change these structs without changing the function arguments.
+ */
+struct VectorizedEvalInput
+{
+  VectorizedEvalInput () = default;
+  VectorizedEvalInput (const VectorizedEvalInput &) = default;
+  VectorizedEvalInput & operator= (const VectorizedEvalInput &) = default;
+  VectorizedEvalInput (VectorizedEvalInput &&) = default;
+  VectorizedEvalInput & operator= (VectorizedEvalInput &&) = default;
+  virtual ~VectorizedEvalInput() = default;
+
+  /**
+   * Clear all the members.
+   */
+  void clear();
+
+  /**
+   * The members that define the inputs to the vectorized evaluate functions. Note
+   * that some of these members may be unused, for example when we call the "interior"
+   * vectorized evaluate function, we do not use node_ids.
+   */
+  std::vector<Point> all_xyz;
+  std::vector<dof_id_type> elem_ids;
+  std::vector<unsigned int> qps;
+  std::vector<subdomain_id_type> sbd_ids;
+  std::vector<std::vector<Point>> all_xyz_perturb;
+  std::vector<std::vector<Real>> phi_i_qp;
+  std::vector<unsigned int> side_indices;
+  std::vector<boundary_id_type> boundary_ids;
+  std::vector<dof_id_type> node_ids;
+  std::vector<Real> JxWs;
+  std::vector<Real> elem_volumes;
+  std::vector<ElemType> elem_types;
+};
 
 /**
  * A simple functor class that provides a RBParameter-dependent function.
@@ -157,12 +197,7 @@ public:
    * evaluate() function may be overridden in derived classes.
    */
   virtual void vectorized_evaluate(const std::vector<RBParameters> & mus,
-                                   const std::vector<Point> & all_xyz,
-                                   const std::vector<dof_id_type> & elem_ids,
-                                   const std::vector<unsigned int> & qps,
-                                   const std::vector<subdomain_id_type> & sbd_ids,
-                                   const std::vector<std::vector<Point>> & all_xyz_perturb,
-                                   const std::vector<std::vector<Real>> & phi_i_qp,
+                                   const VectorizedEvalInput & v,
                                    std::vector<std::vector<std::vector<Number>>> & output);
 
   /**
@@ -173,14 +208,7 @@ public:
    * side_evaluate() function may be overridden in derived classes.
    */
   virtual void side_vectorized_evaluate(const std::vector<RBParameters> & mus,
-                                        const std::vector<Point> & all_xyz,
-                                        const std::vector<dof_id_type> & elem_ids,
-                                        const std::vector<unsigned int> & side_indices,
-                                        const std::vector<unsigned int> & qps,
-                                        const std::vector<subdomain_id_type> & sbd_ids,
-                                        const std::vector<boundary_id_type> & boundary_ids,
-                                        const std::vector<std::vector<Point>> & all_xyz_perturb,
-                                        const std::vector<std::vector<Real>> & phi_i_qp,
+                                        const VectorizedEvalInput & v,
                                         std::vector<std::vector<std::vector<Number>>> & output);
 
   /**
@@ -191,9 +219,7 @@ public:
    * node_evaluate() function may be overridden in derived classes.
    */
   virtual void node_vectorized_evaluate(const std::vector<RBParameters> & mus,
-                                        const std::vector<Point> & all_xyz,
-                                        const std::vector<dof_id_type> & node_ids,
-                                        const std::vector<boundary_id_type> & boundary_ids,
+                                        const VectorizedEvalInput & v,
                                         std::vector<std::vector<std::vector<Number>>> & output);
 
   /**
@@ -305,7 +331,7 @@ public:
    * can handle the case where the spatial function evaluation requires us to have
    * indices from all nodes of an element, since in that case we need a vector of
    * indices (one per node) for each point. Other cases, such as when we define
-   * the paramtrized function based on the element index only, only require a
+   * the parametrized function based on the element index only, only require a
    * singly-nested vector which we handle as a special case of the doubly-nested
    * vector.
    *
@@ -316,12 +342,7 @@ public:
    * to provide the relevant behavior.
    */
   virtual void get_spatial_indices(std::vector<std::vector<unsigned int>> & spatial_indices,
-                                   const std::vector<dof_id_type> & elem_ids,
-                                   const std::vector<unsigned int> & side_indices,
-                                   const std::vector<dof_id_type> & node_ids,
-                                   const std::vector<unsigned int> & qps,
-                                   const std::vector<subdomain_id_type> & sbd_ids,
-                                   const std::vector<boundary_id_type> & boundary_ids);
+                                   const VectorizedEvalInput & v);
 
   /**
    * The Online stage counterpart of get_spatial_indices(). This method
@@ -329,12 +350,7 @@ public:
    * we can evaluate it during an Online solve.
    */
   virtual void initialize_spatial_indices(const std::vector<std::vector<unsigned int>> & spatial_indices,
-                                          const std::vector<dof_id_type> & elem_ids,
-                                          const std::vector<unsigned int> & side_indices,
-                                          const std::vector<dof_id_type> & node_ids,
-                                          const std::vector<unsigned int> & qps,
-                                          const std::vector<subdomain_id_type> & sbd_ids,
-                                          const std::vector<boundary_id_type> & boundary_ids);
+                                          const VectorizedEvalInput & v);
 
   /**
    * Virtual function that performs cleanup after each

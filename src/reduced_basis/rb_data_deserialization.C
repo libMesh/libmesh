@@ -833,6 +833,48 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
+  // Interpolation points JxW values
+  {
+    auto interpolation_points_JxW_list =
+      rb_eim_evaluation_reader.getInterpolationJxW();
+
+    libmesh_error_msg_if(interpolation_points_JxW_list.size() != n_bfs,
+                         "Size error while reading the eim interpolation JxW values.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        rb_eim_evaluation.add_interpolation_points_JxW(interpolation_points_JxW_list[i]);
+      }
+  }
+
+  // Interpolation points element volume values
+  {
+    auto interpolation_points_elem_volume_list =
+      rb_eim_evaluation_reader.getInterpolationElemVolume();
+
+    libmesh_error_msg_if(interpolation_points_elem_volume_list.size() != n_bfs,
+                         "Size error while reading the eim interpolation element volumes.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        rb_eim_evaluation.add_interpolation_points_elem_volume(interpolation_points_elem_volume_list[i]);
+      }
+  }
+
+  // Interpolation points element types
+  {
+    auto interpolation_points_elem_type_list =
+      rb_eim_evaluation_reader.getInterpolationElemType();
+
+    libmesh_error_msg_if(interpolation_points_elem_type_list.size() != n_bfs,
+                         "Size error while reading the eim interpolation element types.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        rb_eim_evaluation.add_interpolation_points_elem_type(static_cast<ElemType>(interpolation_points_elem_type_list[i]));
+      }
+  }
+
   // Interpolation points perturbations
   {
     auto interpolation_points_list_outer =

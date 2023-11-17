@@ -27,6 +27,7 @@
 #include "libmesh/parallel_object.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
+#include "libmesh/rb_parametrized_function.h"
 
 // C++ includes
 #include <memory>
@@ -377,6 +378,9 @@ public:
   void add_interpolation_points_side_index(unsigned int side_index);
   void add_interpolation_points_node_id(dof_id_type node_id);
   void add_interpolation_points_qp(unsigned int qp);
+  void add_interpolation_points_JxW(Real JxW);
+  void add_interpolation_points_elem_volume(Real elem_vol);
+  void add_interpolation_points_elem_type(ElemType elem_type);
   void add_interpolation_points_phi_i_qp(const std::vector<Real> & phi_i_qp);
   void add_interpolation_points_spatial_indices(const std::vector<unsigned int> & spatial_indices);
 
@@ -392,6 +396,9 @@ public:
   unsigned int get_interpolation_points_side_index(unsigned int index) const;
   dof_id_type get_interpolation_points_node_id(unsigned int index) const;
   unsigned int get_interpolation_points_qp(unsigned int index) const;
+  Real get_interpolation_points_JxW(unsigned int index) const;
+  Real get_interpolation_points_elem_volume(unsigned int index) const;
+  ElemType get_interpolation_points_elem_type(unsigned int index) const;
   const std::vector<Real> & get_interpolation_points_phi_i_qp(unsigned int index) const;
   const std::vector<unsigned int> & get_interpolation_points_spatial_indices(unsigned int index) const;
 
@@ -655,50 +662,15 @@ private:
   DenseMatrix<Number> _interpolation_matrix;
 
   /**
-   * We need to store interpolation point data in order to
-   * evaluate parametrized functions at the interpolation points.
-   * This requires the xyz locations, the components to evaluate,
-   * and the subdomain IDs.
+   * We store the EIM interpolation point data in this object.
    */
-  std::vector<Point> _interpolation_points_xyz;
+  VectorizedEvalInput _vec_eval_input;
+
+  /**
+   * In the case of a "vector-valued" EIM, this vector determines which
+   * component of the parameterized function we sample at each EIM point.
+   */
   std::vector<unsigned int> _interpolation_points_comp;
-  std::vector<subdomain_id_type> _interpolation_points_subdomain_id;
-
-  /**
-   * We also store perturbations of the xyz locations that may be
-   * needed to evaluate finite difference approximations to derivatives.
-   */
-  std::vector<std::vector<Point>> _interpolation_points_xyz_perturbations;
-
-  /**
-   * We also store the element ID and qp index of each interpolation
-   * point so that we can evaluate our basis functions at these
-   * points by simply looking up the appropriate stored values.
-   * This data is only needed during the EIM training.
-   */
-  std::vector<dof_id_type> _interpolation_points_elem_id;
-  std::vector<unsigned int> _interpolation_points_qp;
-
-  /**
-   * If the EIM approximation applies to element sides, then we need to
-   * store the side index and boundary ID for each quadrature point.
-   */
-  std::vector<unsigned int> _interpolation_points_side_index;
-  std::vector<boundary_id_type> _interpolation_points_boundary_id;
-
-  /**
-   * If the EIM approximation applies to element nodes (e.g. from a nodeset),
-   * then we need to store the ID for each node. We also store the associated
-   * boundary ID in this case, using _interpolation_points_boundary_id.
-   */
-  std::vector<dof_id_type> _interpolation_points_node_id;
-
-  /**
-   * We store the shape function values at the qp as well. These values
-   * allows us to evaluate parametrized functions that depend on nodal
-   * data.
-   */
-  std::vector<std::vector<Real>> _interpolation_points_phi_i_qp;
 
   /**
    * Here we store the spatial indices that were initialized by

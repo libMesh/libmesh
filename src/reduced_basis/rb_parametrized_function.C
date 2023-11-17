@@ -31,6 +31,19 @@
 namespace libMesh
 {
 
+void VectorizedEvalInput::clear()
+{
+  all_xyz.clear();
+  elem_ids.clear();
+  qps.clear();
+  sbd_ids.clear();
+  all_xyz_perturb.clear();
+  phi_i_qp.clear();
+  side_indices.clear();
+  boundary_ids.clear();
+  node_ids.clear();
+}
+
 RBParametrizedFunction::RBParametrizedFunction()
 :
 requires_xyz_perturbations(false),
@@ -136,21 +149,16 @@ RBParametrizedFunction::node_evaluate(const RBParameters & /*mu*/,
 }
 
 void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters> & mus,
-                                                 const std::vector<Point> & all_xyz,
-                                                 const std::vector<dof_id_type> & elem_ids,
-                                                 const std::vector<unsigned int> & qps,
-                                                 const std::vector<subdomain_id_type> & sbd_ids,
-                                                 const std::vector<std::vector<Point>> & all_xyz_perturb,
-                                                 const std::vector<std::vector<Real>> & phi_i_qp,
+                                                 const VectorizedEvalInput & v,
                                                  std::vector<std::vector<std::vector<Number>>> & output)
 {
   LOG_SCOPE("vectorized_evaluate()", "RBParametrizedFunction");
 
   output.clear();
-  unsigned int n_points = all_xyz.size();
+  unsigned int n_points = v.all_xyz.size();
 
-  libmesh_error_msg_if(sbd_ids.size() != n_points, "Error: invalid vector sizes");
-  libmesh_error_msg_if(requires_xyz_perturbations && (all_xyz_perturb.size() != n_points), "Error: invalid vector sizes");
+  libmesh_error_msg_if(v.sbd_ids.size() != n_points, "Error: invalid vector sizes");
+  libmesh_error_msg_if(requires_xyz_perturbations && (v.all_xyz_perturb.size() != n_points), "Error: invalid vector sizes");
 
   // Dummy vector to be used when xyz perturbations are not required
   std::vector<Point> empty_perturbs;
@@ -173,12 +181,12 @@ void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters>
           // Evaluate all steps for the current mu at the current interpolation point
           all_evals[mu_index][point_index] =
             this->evaluate(mus[mu_index],
-                           all_xyz[point_index],
-                           elem_ids[point_index],
-                           qps[point_index],
-                           sbd_ids[point_index],
-                           requires_xyz_perturbations ? all_xyz_perturb[point_index] : empty_perturbs,
-                           phi_i_qp[point_index]);
+                           v.all_xyz[point_index],
+                           v.elem_ids[point_index],
+                           v.qps[point_index],
+                           v.sbd_ids[point_index],
+                           requires_xyz_perturbations ? v.all_xyz_perturb[point_index] : empty_perturbs,
+                           v.phi_i_qp[point_index]);
 
           // The vector returned by evaluate() should contain:
           // n_components * mus[mu_index].n_steps()
@@ -225,23 +233,16 @@ void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters>
 }
 
 void RBParametrizedFunction::side_vectorized_evaluate(const std::vector<RBParameters> & mus,
-                                                      const std::vector<Point> & all_xyz,
-                                                      const std::vector<dof_id_type> & elem_ids,
-                                                      const std::vector<unsigned int> & side_indices,
-                                                      const std::vector<unsigned int> & qps,
-                                                      const std::vector<subdomain_id_type> & sbd_ids,
-                                                      const std::vector<boundary_id_type> & boundary_ids,
-                                                      const std::vector<std::vector<Point>> & all_xyz_perturb,
-                                                      const std::vector<std::vector<Real>> & phi_i_qp,
+                                                      const VectorizedEvalInput & v,
                                                       std::vector<std::vector<std::vector<Number>>> & output)
 {
   LOG_SCOPE("side_vectorized_evaluate()", "RBParametrizedFunction");
 
   output.clear();
-  unsigned int n_points = all_xyz.size();
+  unsigned int n_points = v.all_xyz.size();
 
-  libmesh_error_msg_if(sbd_ids.size() != n_points, "Error: invalid vector sizes");
-  libmesh_error_msg_if(requires_xyz_perturbations && (all_xyz_perturb.size() != n_points), "Error: invalid vector sizes");
+  libmesh_error_msg_if(v.sbd_ids.size() != n_points, "Error: invalid vector sizes");
+  libmesh_error_msg_if(requires_xyz_perturbations && (v.all_xyz_perturb.size() != n_points), "Error: invalid vector sizes");
 
   // Dummy vector to be used when xyz perturbations are not required
   std::vector<Point> empty_perturbs;
@@ -264,14 +265,14 @@ void RBParametrizedFunction::side_vectorized_evaluate(const std::vector<RBParame
           // Evaluate all steps for the current mu at the current interpolation point
           all_evals[mu_index][point_index] =
             this->side_evaluate(mus[mu_index],
-                                all_xyz[point_index],
-                                elem_ids[point_index],
-                                side_indices[point_index],
-                                qps[point_index],
-                                sbd_ids[point_index],
-                                boundary_ids[point_index],
-                                requires_xyz_perturbations ? all_xyz_perturb[point_index] : empty_perturbs,
-                                phi_i_qp[point_index]);
+                                v.all_xyz[point_index],
+                                v.elem_ids[point_index],
+                                v.side_indices[point_index],
+                                v.qps[point_index],
+                                v.sbd_ids[point_index],
+                                v.boundary_ids[point_index],
+                                requires_xyz_perturbations ? v.all_xyz_perturb[point_index] : empty_perturbs,
+                                v.phi_i_qp[point_index]);
 
           // The vector returned by side_evaluate() should contain:
           // n_components * mus[mu_index].n_steps()
@@ -318,15 +319,13 @@ void RBParametrizedFunction::side_vectorized_evaluate(const std::vector<RBParame
 }
 
 void RBParametrizedFunction::node_vectorized_evaluate(const std::vector<RBParameters> & mus,
-                                                      const std::vector<Point> & all_xyz,
-                                                      const std::vector<dof_id_type> & node_ids,
-                                                      const std::vector<boundary_id_type> & boundary_ids,
+                                                      const VectorizedEvalInput & v,
                                                       std::vector<std::vector<std::vector<Number>>> & output)
 {
   LOG_SCOPE("node_vectorized_evaluate()", "RBParametrizedFunction");
 
   output.clear();
-  unsigned int n_points = all_xyz.size();
+  unsigned int n_points = v.all_xyz.size();
 
   // The number of components returned by this RBParametrizedFunction
   auto n_components = this->get_n_components();
@@ -346,9 +345,9 @@ void RBParametrizedFunction::node_vectorized_evaluate(const std::vector<RBParame
           // Evaluate all steps for the current mu at the current interpolation point
           all_evals[mu_index][point_index] =
             this->node_evaluate(mus[mu_index],
-                                all_xyz[point_index],
-                                node_ids[point_index],
-                                boundary_ids[point_index]);
+                                v.all_xyz[point_index],
+                                v.node_ids[point_index],
+                                v.boundary_ids[point_index]);
 
           // The vector returned by node_evaluate() should contain:
           // n_components * mus[mu_index].n_steps()
@@ -409,12 +408,16 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
     n_points += xyz_vec.size();
   }
 
-  std::vector<Point> all_xyz_vec(n_points);
-  std::vector<dof_id_type> elem_ids_vec(n_points);
-  std::vector<unsigned int> qps_vec(n_points);
-  std::vector<subdomain_id_type> sbd_ids_vec(n_points);
-  std::vector<std::vector<Point>> all_xyz_perturb_vec(n_points);
-  std::vector<std::vector<Real>> phi_i_qp_vec(n_points);
+  VectorizedEvalInput v;
+  v.all_xyz.resize(n_points);
+  v.elem_ids.resize(n_points);
+  v.qps.resize(n_points);
+  v.sbd_ids.resize(n_points);
+  v.all_xyz_perturb.resize(n_points);
+  v.phi_i_qp.resize(n_points);
+  v.JxWs.resize(n_points);
+  v.elem_volumes.resize(n_points);
+  v.elem_types.resize(n_points);
 
   // Empty vector to be used when xyz perturbations are not required
   std::vector<Point> empty_perturbs;
@@ -424,6 +427,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
   for (auto dim : con.elem_dimensions())
     {
       auto fe = con.get_element_fe(/*var=*/0, dim);
+      fe->get_JxW();
       fe->get_phi();
     }
 
@@ -442,6 +446,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
 
       auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
       const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+      const std::vector<Real> & JxW = elem_fe->get_JxW();
 
       elem_fe->reinit(&elem_ref);
 
@@ -449,14 +454,18 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
         {
           mesh_to_preevaluated_values_map[elem_id][qp] = counter;
 
-          all_xyz_vec[counter] = xyz_vec[qp];
-          elem_ids_vec[counter] = elem_id;
-          qps_vec[counter] = qp;
-          sbd_ids_vec[counter] = subdomain_id;
+          v.all_xyz[counter] = xyz_vec[qp];
+          v.elem_ids[counter] = elem_id;
+          v.qps[counter] = qp;
+          v.sbd_ids[counter] = subdomain_id;
 
-          phi_i_qp_vec[counter].resize(phi.size());
+          v.JxWs[counter] = JxW[qp];
+          v.elem_volumes[counter] = elem_ref.volume();
+          v.elem_types[counter] = elem_ref.type();
+
+          v.phi_i_qp[counter].resize(phi.size());
           for(auto i : index_range(phi))
-            phi_i_qp_vec[counter][i] = phi[i][qp];
+            v.phi_i_qp[counter][i] = phi[i][qp];
 
           if (requires_xyz_perturbations)
             {
@@ -464,11 +473,11 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
                 libmesh_map_find(all_xyz_perturb, elem_id);
               libmesh_error_msg_if(qp >= qps_and_perturbs.size(), "Error: Invalid qp");
 
-              all_xyz_perturb_vec[counter] = qps_and_perturbs[qp];
+              v.all_xyz_perturb[counter] = qps_and_perturbs[qp];
             }
           else
             {
-              all_xyz_perturb_vec[counter] = empty_perturbs;
+              v.all_xyz_perturb[counter] = empty_perturbs;
             }
 
           counter++;
@@ -476,14 +485,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
     }
 
   std::vector<RBParameters> mus {mu};
-  vectorized_evaluate(mus,
-                      all_xyz_vec,
-                      elem_ids_vec,
-                      qps_vec,
-                      sbd_ids_vec,
-                      all_xyz_perturb_vec,
-                      phi_i_qp_vec,
-                      preevaluated_values);
+  vectorized_evaluate(mus, v, preevaluated_values);
 
   preevaluate_parametrized_function_cleanup();
 }
@@ -505,14 +507,15 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
     n_points += xyz_vec.size();
   }
 
-  std::vector<Point> all_xyz_vec(n_points);
-  std::vector<dof_id_type> elem_ids_vec(n_points);
-  std::vector<unsigned int> side_indices_vec(n_points);
-  std::vector<unsigned int> qps_vec(n_points);
-  std::vector<subdomain_id_type> sbd_ids_vec(n_points);
-  std::vector<boundary_id_type> boundary_ids_vec(n_points);
-  std::vector<std::vector<Point>> all_xyz_perturb_vec(n_points);
-  std::vector<std::vector<Real>> phi_i_qp_vec(n_points);
+  VectorizedEvalInput v;
+  v.all_xyz.resize(n_points);
+  v.elem_ids.resize(n_points);
+  v.side_indices.resize(n_points);
+  v.qps.resize(n_points);
+  v.sbd_ids.resize(n_points);
+  v.boundary_ids.resize(n_points);
+  v.all_xyz_perturb.resize(n_points);
+  v.phi_i_qp.resize(n_points);
 
   // Empty vector to be used when xyz perturbations are not required
   std::vector<Point> empty_perturbs;
@@ -563,16 +566,16 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
             {
               mesh_to_preevaluated_side_values_map[elem_side_pair][qp] = counter;
 
-              all_xyz_vec[counter] = xyz_vec[qp];
-              elem_ids_vec[counter] = elem_side_pair.first;
-              side_indices_vec[counter] = elem_side_pair.second;
-              qps_vec[counter] = qp;
-              sbd_ids_vec[counter] = subdomain_id;
-              boundary_ids_vec[counter] = boundary_id;
+              v.all_xyz[counter] = xyz_vec[qp];
+              v.elem_ids[counter] = elem_side_pair.first;
+              v.side_indices[counter] = elem_side_pair.second;
+              v.qps[counter] = qp;
+              v.sbd_ids[counter] = subdomain_id;
+              v.boundary_ids[counter] = boundary_id;
 
-              phi_i_qp_vec[counter].resize(phi.size());
+              v.phi_i_qp[counter].resize(phi.size());
               for(auto i : index_range(phi))
-                phi_i_qp_vec[counter][i] = phi[i][qp];
+                v.phi_i_qp[counter][i] = phi[i][qp];
 
               if (requires_xyz_perturbations)
                 {
@@ -580,11 +583,11 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
                     libmesh_map_find(side_all_xyz_perturb, elem_side_pair);
                   libmesh_error_msg_if(qp >= qps_and_perturbs.size(), "Error: Invalid qp");
 
-                  all_xyz_perturb_vec[counter] = qps_and_perturbs[qp];
+                  v.all_xyz_perturb[counter] = qps_and_perturbs[qp];
                 }
               else
                 {
-                  all_xyz_perturb_vec[counter] = empty_perturbs;
+                  v.all_xyz_perturb[counter] = empty_perturbs;
                 }
               counter++;
             }
@@ -600,16 +603,16 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
             {
               mesh_to_preevaluated_side_values_map[elem_side_pair][qp] = counter;
 
-              all_xyz_vec[counter] = xyz_vec[qp];
-              elem_ids_vec[counter] = elem_side_pair.first;
-              side_indices_vec[counter] = elem_side_pair.second;
-              qps_vec[counter] = qp;
-              sbd_ids_vec[counter] = subdomain_id;
-              boundary_ids_vec[counter] = boundary_id;
+              v.all_xyz[counter] = xyz_vec[qp];
+              v.elem_ids[counter] = elem_side_pair.first;
+              v.side_indices[counter] = elem_side_pair.second;
+              v.qps[counter] = qp;
+              v.sbd_ids[counter] = subdomain_id;
+              v.boundary_ids[counter] = boundary_id;
 
-              phi_i_qp_vec[counter].resize(phi.size());
+              v.phi_i_qp[counter].resize(phi.size());
               for(auto i : index_range(phi))
-                phi_i_qp_vec[counter][i] = phi[i][qp];
+                v.phi_i_qp[counter][i] = phi[i][qp];
 
               if (requires_xyz_perturbations)
                 {
@@ -617,11 +620,11 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
                     libmesh_map_find(side_all_xyz_perturb, elem_side_pair);
                   libmesh_error_msg_if(qp >= qps_and_perturbs.size(), "Error: Invalid qp");
 
-                  all_xyz_perturb_vec[counter] = qps_and_perturbs[qp];
+                  v.all_xyz_perturb[counter] = qps_and_perturbs[qp];
                 }
               else
                 {
-                  all_xyz_perturb_vec[counter] = empty_perturbs;
+                  v.all_xyz_perturb[counter] = empty_perturbs;
                 }
               counter++;
             }
@@ -631,16 +634,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
     }
 
   std::vector<RBParameters> mus {mu};
-  side_vectorized_evaluate(mus,
-                           all_xyz_vec,
-                           elem_ids_vec,
-                           side_indices_vec,
-                           qps_vec,
-                           sbd_ids_vec,
-                           boundary_ids_vec,
-                           all_xyz_perturb_vec,
-                           phi_i_qp_vec,
-                           preevaluated_values);
+  side_vectorized_evaluate(mus, v, preevaluated_values);
 
   preevaluate_parametrized_function_cleanup();
 }
@@ -654,9 +648,10 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_nodes(con
 
   unsigned int n_points = all_xyz.size();
 
-  std::vector<Point> all_xyz_vec(n_points);
-  std::vector<dof_id_type> node_ids_vec(n_points);
-  std::vector<boundary_id_type> boundary_ids_vec(n_points);
+  VectorizedEvalInput v;
+  v.all_xyz.resize(n_points);
+  v.node_ids.resize(n_points);
+  v.boundary_ids.resize(n_points);
 
   // Empty vector to be used when xyz perturbations are not required
   std::vector<Point> empty_perturbs;
@@ -668,19 +663,15 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_nodes(con
 
       mesh_to_preevaluated_node_values_map[node_id] = counter;
 
-      all_xyz_vec[counter] = p;
-      node_ids_vec[counter] = node_id;
-      boundary_ids_vec[counter] = boundary_id;
+      v.all_xyz[counter] = p;
+      v.node_ids[counter] = node_id;
+      v.boundary_ids[counter] = boundary_id;
 
       counter++;
     }
 
   std::vector<RBParameters> mus {mu};
-  node_vectorized_evaluate(mus,
-                           all_xyz_vec,
-                           node_ids_vec,
-                           boundary_ids_vec,
-                           preevaluated_values);
+  node_vectorized_evaluate(mus, v, preevaluated_values);
 
   preevaluate_parametrized_function_cleanup();
 }
@@ -752,8 +743,12 @@ std::vector<std::vector<Number>> RBParametrizedFunction::evaluate_at_observation
   if (n_points == 0)
     return std::vector<std::vector<Number>>();
 
-  const std::vector<unsigned int> qps_vec(n_points);
-  std::vector<std::vector<Real>> phi_i_qp_vec(n_points);
+  VectorizedEvalInput v;
+  v.all_xyz = observation_points;
+  v.elem_ids = elem_ids;
+  v.sbd_ids = sbd_ids;
+  v.qps.resize(n_points);
+  v.phi_i_qp.resize(n_points);
 
   // In order to compute phi_i_qp, we initialize a FEMContext
   FEMContext con(sys);
@@ -788,43 +783,25 @@ std::vector<std::vector<Number>> RBParametrizedFunction::evaluate_at_observation
       con.pre_fe_reinit(sys, &elem_ref);
       con.get_element_fe(/*var*/ 0, elem_ref.dim())->reinit(&elem_ref, &obs_pt_ref_coords_vec);
 
-      phi_i_qp_vec[obs_pt_idx].resize(phi.size());
+      v.phi_i_qp[obs_pt_idx].resize(phi.size());
       for(auto i : index_range(phi))
-        phi_i_qp_vec[obs_pt_idx][i] = phi[i][/*qp*/ 0];
+        v.phi_i_qp[obs_pt_idx][i] = phi[i][/*qp*/ 0];
     }
 
   std::vector<std::vector<std::vector<Number>>> obs_pt_values;
-
-  vectorized_evaluate({mu},
-                      observation_points,
-                      elem_ids,
-                      qps_vec,
-                      sbd_ids,
-                      /*all_xyz_perturb_vec*/ {},
-                      phi_i_qp_vec,
-                      obs_pt_values);
+  vectorized_evaluate({mu}, v, obs_pt_values);
 
   return obs_pt_values[0];
 }
 
 void RBParametrizedFunction::get_spatial_indices(std::vector<std::vector<unsigned int>> & /*spatial_indices*/,
-                                                 const std::vector<dof_id_type> & /*elem_ids*/,
-                                                 const std::vector<unsigned int> & /*side_indices*/,
-                                                 const std::vector<dof_id_type> & /*node_ids*/,
-                                                 const std::vector<unsigned int> & /*qps*/,
-                                                 const std::vector<subdomain_id_type> & /*sbd_ids*/,
-                                                 const std::vector<boundary_id_type> & /*boundary_ids*/)
+                                                 const VectorizedEvalInput & /*v*/)
 {
   // No-op by default
 }
 
 void RBParametrizedFunction::initialize_spatial_indices(const std::vector<std::vector<unsigned int>> & /*spatial_indices*/,
-                                                        const std::vector<dof_id_type> & /*elem_ids*/,
-                                                        const std::vector<unsigned int> & /*side_indices*/,
-                                                        const std::vector<dof_id_type> & /*node_ids*/,
-                                                        const std::vector<unsigned int> & /*qps*/,
-                                                        const std::vector<subdomain_id_type> & /*sbd_ids*/,
-                                                        const std::vector<boundary_id_type> & /*boundary_ids*/)
+                                                        const VectorizedEvalInput & /*v*/)
 {
   // No-op by default
 }
