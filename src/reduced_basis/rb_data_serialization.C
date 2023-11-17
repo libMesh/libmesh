@@ -731,6 +731,26 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
+  // Interpolation points phi values at each qp
+  {
+    auto interpolation_points_list_outer =
+      rb_eim_evaluation_builder.initInterpolationPhiValuesAllQp(n_bfs);
+
+    for (unsigned int i=0; i < n_bfs; ++i)
+      {
+        const auto & phi_i_all_qp = rb_eim_evaluation.get_interpolation_points_phi_i_all_qp(i);
+        auto interpolation_points_list_middle = interpolation_points_list_outer.init(i, phi_i_all_qp.size());
+
+        for (unsigned int j : index_range(phi_i_all_qp))
+          {
+            auto interpolation_points_list_inner = interpolation_points_list_middle.init(j, phi_i_all_qp.size());
+
+            for (auto k : make_range(phi_i_all_qp[i].size()))
+                interpolation_points_list_inner.set(k, phi_i_all_qp[j][k]);
+          }
+      }
+  }
+
   // Element type for the element that contains each interpolation point
   {
     auto interpolation_points_elem_type_list =
