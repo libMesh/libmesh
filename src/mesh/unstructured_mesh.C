@@ -477,11 +477,13 @@ all_increased_order_range (UnstructuredMesh & mesh,
         }
     }
 
-  // renumber nodes, repartition nodes, etc.  We no longer need a
+  // renumber nodes, repartition nodes, etc.  We may no longer need a
   // find_neighbors() here since we're keeping neighbor links intact
-  // ourselves.
+  // ourselves, *except* that if we're not already prepared we may
+  // have user code that was expecting this call to prepare neighbors.
   const bool old_find_neighbors = mesh.allow_find_neighbors();
-  mesh.allow_find_neighbors(false);
+  if (mesh.is_prepared())
+    mesh.allow_find_neighbors(false);
   mesh.prepare_for_use();
   mesh.allow_find_neighbors(old_find_neighbors);
 }
