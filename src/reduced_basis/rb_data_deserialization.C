@@ -833,13 +833,13 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
-  // Interpolation points JxW values
+  // Interpolation points JxW all qp values
   {
     auto interpolation_points_list_outer =
       rb_eim_evaluation_reader.getInterpolationJxWAllQp();
 
     libmesh_error_msg_if(interpolation_points_list_outer.size() != n_bfs,
-                         "Size error while reading the eim interpolation points.");
+                         "Size error while reading the eim JxW values.");
 
     for (unsigned int i=0; i<n_bfs; ++i)
       {
@@ -851,6 +851,31 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
             JxW[j] = interpolation_points_list_inner[j];
           }
         rb_eim_evaluation.add_interpolation_points_JxW_all_qp(JxW);
+      }
+  }
+
+  // Interpolation points phi_i all qp values
+  {
+    auto interpolation_points_list_outer =
+      rb_eim_evaluation_reader.getInterpolationPhiValuesAllQp();
+
+    libmesh_error_msg_if(interpolation_points_list_outer.size() != n_bfs,
+                         "Size error while reading the eim phi_i all qp values.");
+
+    for (unsigned int i=0; i<n_bfs; ++i)
+      {
+        auto interpolation_points_list_middle = interpolation_points_list_outer[i];
+
+        std::vector<std::vector<Real>> phi_i_all_qp(interpolation_points_list_middle.size());
+        for (auto j : index_range(phi_i_all_qp))
+          {
+            auto interpolation_points_list_inner = interpolation_points_list_middle[j];
+
+            phi_i_all_qp[j].resize(interpolation_points_list_inner.size());
+            for (auto k : index_range(phi_i_all_qp[j]))
+              phi_i_all_qp[j][k] = load_scalar_value(interpolation_points_list_inner[k]);
+          }
+        rb_eim_evaluation.add_interpolation_points_phi_i_all_qp(phi_i_all_qp);
       }
   }
 
