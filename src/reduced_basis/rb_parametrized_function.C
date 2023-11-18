@@ -47,6 +47,7 @@ void VectorizedEvalInput::clear()
 RBParametrizedFunction::RBParametrizedFunction()
 :
 requires_xyz_perturbations(false),
+requires_all_elem_qp_data(false),
 is_lookup_table(false),
 fd_delta(1.e-6),
 _is_nodal_boundary(false)
