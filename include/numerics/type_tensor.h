@@ -179,6 +179,11 @@ public:
   TypeVector<T> row(const unsigned int r) const;
 
   /**
+   * \returns A copy of one column of the tensor as a TypeVector.
+   */
+  TypeVector<T> column(const unsigned int r) const;
+
+  /**
    * Add another tensor to this tensor.
    *
    * \returns A copy of the result, this tensor is unchanged.
@@ -766,6 +771,21 @@ TypeTensor<T>::row(const unsigned int r) const
 
   return return_vector;
 }
+
+
+template <typename T>
+inline
+TypeVector<T>
+TypeTensor<T>::column(const unsigned int r) const
+{
+  TypeVector<T> return_vector;
+
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    return_vector._coords[i] = _coords[i*LIBMESH_DIM + r];
+
+  return return_vector;
+}
+
 
 template <typename T>
 template<typename T2>
