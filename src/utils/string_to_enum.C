@@ -258,6 +258,7 @@ void init_fefamily_to_enum ()
       fefamily_to_enum["LAGRANGE"          ]=LAGRANGE;
       fefamily_to_enum["LAGRANGE_VEC"      ]=LAGRANGE_VEC;
       fefamily_to_enum["L2_LAGRANGE"       ]=L2_LAGRANGE;
+      fefamily_to_enum["L2_LAGRANGE_VEC"   ]=L2_LAGRANGE_VEC;
       fefamily_to_enum["HIERARCHIC"        ]=HIERARCHIC;
       fefamily_to_enum["L2_HIERARCHIC"     ]=L2_HIERARCHIC;
       fefamily_to_enum["SIDE_HIERARCHIC"   ]=SIDE_HIERARCHIC;

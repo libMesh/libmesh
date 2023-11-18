@@ -79,6 +79,7 @@
   template class LIBMESH_EXPORT FE< (_dim), LAGRANGE>;                  \
   template class LIBMESH_EXPORT FE< (_dim), LAGRANGE_VEC>;              \
   template class LIBMESH_EXPORT FE< (_dim), L2_LAGRANGE>;               \
+  template class LIBMESH_EXPORT FE< (_dim), L2_LAGRANGE_VEC>;           \
   template class LIBMESH_EXPORT FE< (_dim), MONOMIAL>;                  \
   template class LIBMESH_EXPORT FE< (_dim), SCALAR>;                    \
   template class LIBMESH_EXPORT FE< (_dim), SIDE_HIERARCHIC>;           \
@@ -98,6 +99,7 @@
   template class LIBMESH_EXPORT FE< (_dim), LAGRANGE>;                  \
   template class LIBMESH_EXPORT FE< (_dim), LAGRANGE_VEC>;              \
   template class LIBMESH_EXPORT FE< (_dim), L2_LAGRANGE>;               \
+  template class LIBMESH_EXPORT FE< (_dim), L2_LAGRANGE_VEC>;           \
   template class LIBMESH_EXPORT FE< (_dim), MONOMIAL>;                  \
   template class LIBMESH_EXPORT FE< (_dim), SCALAR>;                    \
   template class LIBMESH_EXPORT FE< (_dim), SIDE_HIERARCHIC>;           \

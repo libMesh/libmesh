@@ -144,6 +144,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FELagrangeVec<dim>::func_and_args suffix                 \
       case L2_LAGRANGE:                                                 \
         prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
+      case L2_LAGRANGE_VEC:                                             \
+        prefix FEL2LagrangeVec<dim>::func_and_args suffix               \
       case MONOMIAL:                                                    \
         prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
       case MONOMIAL_VEC:                                                \
@@ -206,6 +208,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
         libmesh_assert_equal_to (dim, 2);                               \
         prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
       case LAGRANGE_VEC:                                                \
+      case L2_LAGRANGE_VEC:                                             \
       case NEDELEC_ONE:                                                 \
       case MONOMIAL_VEC:                                                \
       case RAVIART_THOMAS:                                              \
@@ -223,6 +226,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
       {                                                                 \
       case LAGRANGE_VEC:                                                \
         prefix FELagrangeVec<dim>::func_and_args suffix                 \
+      case L2_LAGRANGE_VEC:                                             \
+        prefix FEL2LagrangeVec<dim>::func_and_args suffix               \
       case NEDELEC_ONE:                                                 \
         prefix FENedelecOne<dim>::func_and_args suffix                  \
       case MONOMIAL_VEC:                                                \
@@ -303,6 +308,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FELagrangeVec<dim>::func_and_args suffix                 \
       case L2_LAGRANGE:                                                 \
         prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
+      case L2_LAGRANGE_VEC:                                             \
+        prefix FEL2LagrangeVec<dim>::func_and_args suffix               \
       case MONOMIAL:                                                    \
         prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
       case MONOMIAL_VEC:                                                \
@@ -353,6 +360,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
         libmesh_assert_equal_to (dim, 2);                               \
         prefix  FE<2,SUBDIVISION>::func_and_args suffix                 \
       case LAGRANGE_VEC:                                                \
+      case L2_LAGRANGE_VEC:                                             \
       case NEDELEC_ONE:                                                 \
       case MONOMIAL_VEC:                                                \
       case RAVIART_THOMAS:                                              \
@@ -370,6 +378,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
       {                                                                 \
       case LAGRANGE_VEC:                                                \
         prefix FELagrangeVec<dim>::func_and_args suffix                 \
+      case L2_LAGRANGE_VEC:                                             \
+        prefix FEL2LagrangeVec<dim>::func_and_args suffix               \
       case NEDELEC_ONE:                                                 \
         prefix FENedelecOne<dim>::func_and_args suffix                  \
       case MONOMIAL_VEC:                                                \
@@ -2230,6 +2240,12 @@ void FEInterface::compute_constraints (DofConstraints & constraints,
                                                      variable_number,
                                                      elem); return;
 
+          case L2_LAGRANGE_VEC:
+            FE<2,L2_LAGRANGE_VEC>::compute_constraints (constraints,
+                                                        dof_map,
+                                                        variable_number,
+                                                        elem); return;
+
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
@@ -2296,6 +2312,13 @@ void FEInterface::compute_constraints (DofConstraints & constraints,
                                                      dof_map,
                                                      variable_number,
                                                      elem); return;
+
+          case L2_LAGRANGE_VEC:
+            FE<3,L2_LAGRANGE_VEC>::compute_constraints (constraints,
+                                                        dof_map,
+                                                        variable_number,
+                                                        elem); return;
+
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
             FE<3,SZABAB>::compute_constraints (constraints,
@@ -2434,6 +2457,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
       break;
     case MONOMIAL:
     case L2_LAGRANGE:
+    case L2_LAGRANGE_VEC:
     case L2_HIERARCHIC:
     case MONOMIAL_VEC:
       switch (el_t)
@@ -2827,6 +2851,7 @@ bool FEInterface::extra_hanging_dofs(const FEType & fe_t)
     case XYZ:
     case SUBDIVISION:
     case LAGRANGE_VEC:
+    case L2_LAGRANGE_VEC:
     case NEDELEC_ONE:
     case RAVIART_THOMAS:
     case L2_RAVIART_THOMAS:
@@ -2854,6 +2879,7 @@ FEFieldType FEInterface::field_type (const FEFamily & fe_family)
   switch (fe_family)
     {
     case LAGRANGE_VEC:
+    case L2_LAGRANGE_VEC:
     case NEDELEC_ONE:
     case MONOMIAL_VEC:
     case RAVIART_THOMAS:
@@ -2872,6 +2898,7 @@ unsigned int FEInterface::n_vec_dim (const MeshBase & mesh,
       //FIXME: We currently assume that the number of vector components is tied
       //       to the mesh dimension. This will break for mixed-dimension meshes.
     case LAGRANGE_VEC:
+    case L2_LAGRANGE_VEC:
     case NEDELEC_ONE:
     case MONOMIAL_VEC:
     case RAVIART_THOMAS:
@@ -2896,6 +2923,7 @@ FEContinuity FEInterface::get_continuity(const FEType & fe_type)
     case XYZ:
     case SCALAR:
     case L2_RAVIART_THOMAS:
+    case L2_LAGRANGE_VEC:
       return DISCONTINUOUS;
 
       // C0 elements
