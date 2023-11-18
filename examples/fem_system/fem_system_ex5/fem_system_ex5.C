@@ -239,10 +239,10 @@ int main (int argc, char ** argv)
   // Solve this as a time-dependent or steady system
   std::string time_solver = infile("time_solver","DIE!");
 
-  ExplicitSystem * v_system;
-  ExplicitSystem * a_system;
+  ExplicitSystem * v_system = nullptr;
+  ExplicitSystem * a_system = nullptr;
 
-  if( time_solver == std::string("newmark") )
+  if (time_solver == "newmark")
     {
       // Create ExplicitSystem to help output velocity
       v_system = &equation_systems.add_system<ExplicitSystem> ("Velocity");
@@ -259,24 +259,24 @@ int main (int argc, char ** argv)
         a_system->add_variable("w_accel", fe_type);
     }
 
-  if (time_solver == std::string("newmark"))
+  if (time_solver == "newmark")
     system.time_solver = std::make_unique<NewmarkSolver>(system);
 
-  else if( time_solver == std::string("euler") )
+  else if (time_solver == "euler")
     {
       system.time_solver = std::make_unique<EulerSolver>(system);
       EulerSolver & euler_solver = cast_ref<EulerSolver &>(*(system.time_solver.get()));
       euler_solver.theta = infile("theta", 1.0);
     }
 
-  else if( time_solver == std::string("euler2") )
+  else if (time_solver == "euler2")
     {
       system.time_solver = std::make_unique<Euler2Solver>(system);
       Euler2Solver & euler_solver = cast_ref<Euler2Solver &>(*(system.time_solver.get()));
       euler_solver.theta = infile("theta", 1.0);
     }
 
-  else if( time_solver == std::string("steady"))
+  else if (time_solver == "steady")
     {
       system.time_solver = std::make_unique<SteadySolver>(system);
       libmesh_assert_equal_to (n_timesteps, 1);
@@ -319,20 +319,20 @@ int main (int argc, char ** argv)
   // then we need to reset the EigenSparseLinearSolver to use SPARSELU because BICGSTAB
   // chokes on the Jacobian matrix we give it and Eigen's GMRES currently doesn't work.
   NewtonSolver * newton_solver = dynamic_cast<NewtonSolver *>( &solver );
-  if( newton_solver &&
-      (time_solver == std::string("euler") || time_solver == std::string("euler2") ) )
+  if (newton_solver &&
+      (time_solver == "euler" || time_solver == "euler2"))
     {
 #ifdef LIBMESH_HAVE_EIGEN_SPARSE
       LinearSolver<Number> & linear_solver = newton_solver->get_linear_solver();
       EigenSparseLinearSolver<Number> * eigen_linear_solver =
         dynamic_cast<EigenSparseLinearSolver<Number> *>(&linear_solver);
 
-      if( eigen_linear_solver )
+      if (eigen_linear_solver )
         eigen_linear_solver->set_solver_type(SPARSELU);
 #endif
     }
 
-  if( time_solver == std::string("newmark") )
+  if (time_solver == "newmark")
     {
       NewmarkSolver * newmark = cast_ptr<NewmarkSolver*>(system.time_solver.get());
       newmark->compute_initial_accel();
@@ -382,7 +382,7 @@ int main (int argc, char ** argv)
 
       // Copy over updated velocity and acceleration for output.
       // Note we can do this because of the matching variables/FE spaces
-      if( time_solver == std::string("newmark") )
+      if (time_solver == "newmark")
         {
           *(v_system->solution) = system.get_vector("_old_solution_rate");
           *(a_system->solution) = system.get_vector("_old_solution_accel");
