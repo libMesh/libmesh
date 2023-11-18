@@ -379,7 +379,7 @@ all_increased_order_range (UnstructuredMesh & mesh,
    * neighbor not in the range.
    */
   auto track_if_necessary = [&adj_vertices_to_ho_nodes](Elem * elem) {
-    if (elem && elem->default_order() != FIRST)
+    if (elem && elem != remote_elem && elem->default_order() != FIRST)
       for (unsigned int hon : make_range(elem->n_vertices(), elem->n_nodes()))
         {
           auto pos = map_hi_order_node(hon, *elem, adj_vertices_to_ho_nodes);
