@@ -492,8 +492,11 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
 
               v.phi_i_all_qp[counter].resize(phi.size());
               for(auto i : index_range(phi))
+              {
+                v.phi_i_all_qp[counter][i].resize(phi[i].size());
                 for(auto j : index_range(phi[i]))
                   v.phi_i_all_qp[counter][i][j] = phi[i][j];
+              }
             }
 
           counter++;
