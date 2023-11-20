@@ -61,6 +61,14 @@ struct VectorizedEvalInput
    * The members that define the inputs to the vectorized evaluate functions. Note
    * that some of these members may be unused, for example when we call the "interior"
    * vectorized evaluate function, we do not use node_ids.
+   *
+   * Some data below is the same for all points within an element, e.g. when we store
+   * data at multiple qps per element the sbd_ids, elem_ids, JxW_all_qp, phi_i_all_qp
+   * will store the same data repeated n_qp times per element. A possible optimization
+   * for this would be to store this data based on element indices rather than qp
+   * indices, and store an index per qp to index into the element-based data vector.
+   * This optimization hasn't been implemented at this stage, but it could be added
+   * at some point later.
    */
   std::vector<Point> all_xyz;
   std::vector<dof_id_type> elem_ids;
@@ -71,9 +79,9 @@ struct VectorizedEvalInput
   std::vector<unsigned int> side_indices;
   std::vector<boundary_id_type> boundary_ids;
   std::vector<dof_id_type> node_ids;
-  std::vector<Real> JxWs;
-  std::vector<Real> elem_volumes;
   std::vector<ElemType> elem_types;
+  std::vector<std::vector<Real>> JxW_all_qp;
+  std::vector<std::vector<std::vector<Real>>> phi_i_all_qp;
 };
 
 /**
@@ -398,6 +406,14 @@ public:
    * approximations to derivatives.
    */
   bool requires_xyz_perturbations;
+
+  /**
+   * Boolean to indicate whether this parametrized function requires data from
+   * all qps on the current element at each qp location. This can be necessary
+   * in certain cases, e.g. when the parametrized function depends on "element
+   * average" quantities.
+   */
+  bool requires_all_elem_qp_data;
 
   /**
    * Boolean to indicate if this parametrized function is defined based on a lookup

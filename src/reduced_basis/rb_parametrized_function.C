@@ -47,6 +47,7 @@ void VectorizedEvalInput::clear()
 RBParametrizedFunction::RBParametrizedFunction()
 :
 requires_xyz_perturbations(false),
+requires_all_elem_qp_data(false),
 is_lookup_table(false),
 fd_delta(1.e-6),
 _is_nodal_boundary(false)
@@ -415,9 +416,13 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
   v.sbd_ids.resize(n_points);
   v.all_xyz_perturb.resize(n_points);
   v.phi_i_qp.resize(n_points);
-  v.JxWs.resize(n_points);
-  v.elem_volumes.resize(n_points);
   v.elem_types.resize(n_points);
+
+  if (requires_all_elem_qp_data)
+    {
+      v.JxW_all_qp.resize(n_points);
+      v.phi_i_all_qp.resize(n_points);
+    }
 
   // Empty vector to be used when xyz perturbations are not required
   std::vector<Point> empty_perturbs;
@@ -458,9 +463,6 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
           v.elem_ids[counter] = elem_id;
           v.qps[counter] = qp;
           v.sbd_ids[counter] = subdomain_id;
-
-          v.JxWs[counter] = JxW[qp];
-          v.elem_volumes[counter] = elem_ref.volume();
           v.elem_types[counter] = elem_ref.type();
 
           v.phi_i_qp[counter].resize(phi.size());
@@ -478,6 +480,23 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
           else
             {
               v.all_xyz_perturb[counter] = empty_perturbs;
+            }
+
+          if (requires_all_elem_qp_data)
+            {
+              // In this case we store data for all qps on this element
+              // at each point.
+              v.JxW_all_qp[counter].resize(JxW.size());
+              for(auto i : index_range(JxW))
+                v.JxW_all_qp[counter][i] = JxW[i];
+
+              v.phi_i_all_qp[counter].resize(phi.size());
+              for(auto i : index_range(phi))
+              {
+                v.phi_i_all_qp[counter][i].resize(phi[i].size());
+                for(auto j : index_range(phi[i]))
+                  v.phi_i_all_qp[counter][i][j] = phi[i][j];
+              }
             }
 
           counter++;

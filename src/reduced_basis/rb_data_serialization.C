@@ -715,20 +715,40 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
 
   // Interpolation points JxW values at each qp
   {
-    auto interpolation_points_JxW_list =
-      rb_eim_evaluation_builder.initInterpolationJxW(n_bfs);
-    for (unsigned int i=0; i<n_bfs; ++i)
-      interpolation_points_JxW_list.set(i,
-                                        rb_eim_evaluation.get_interpolation_points_JxW(i));
+    auto interpolation_points_list_outer =
+      rb_eim_evaluation_builder.initInterpolationJxWAllQp(n_bfs);
+    for (unsigned int i=0; i < n_bfs; ++i)
+      {
+        const std::vector<Real> & JxW = rb_eim_evaluation.get_interpolation_points_JxW_all_qp(i);
+        auto interpolation_points_list_inner = interpolation_points_list_outer.init(i, JxW.size());
+
+        for (unsigned int j : index_range(JxW))
+          {
+            // Here we can use set() instead of set_scalar_in_list() because
+            // phi stores real-valued data only.
+            interpolation_points_list_inner.set(j, JxW[j]);
+          }
+      }
   }
 
-  // Element volume for the element that contains each interpolation point
+  // Interpolation points phi values at each qp
   {
-    auto interpolation_points_elem_volume_list =
-      rb_eim_evaluation_builder.initInterpolationElemVolume(n_bfs);
-    for (unsigned int i=0; i<n_bfs; ++i)
-      interpolation_points_elem_volume_list.set(i,
-                                                rb_eim_evaluation.get_interpolation_points_elem_volume(i));
+    auto interpolation_points_list_outer =
+      rb_eim_evaluation_builder.initInterpolationPhiValuesAllQp(n_bfs);
+
+    for (unsigned int i=0; i < n_bfs; ++i)
+      {
+        const auto & phi_i_all_qp = rb_eim_evaluation.get_interpolation_points_phi_i_all_qp(i);
+        auto interpolation_points_list_middle = interpolation_points_list_outer.init(i, phi_i_all_qp.size());
+
+        for (unsigned int j : index_range(phi_i_all_qp))
+          {
+            auto interpolation_points_list_inner = interpolation_points_list_middle.init(j, phi_i_all_qp.size());
+
+            for (auto k : make_range(phi_i_all_qp[i].size()))
+                interpolation_points_list_inner.set(k, phi_i_all_qp[j][k]);
+          }
+      }
   }
 
   // Element type for the element that contains each interpolation point

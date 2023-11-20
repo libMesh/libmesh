@@ -2416,6 +2416,9 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
   unsigned int optimal_qp = 0;
   std::vector<Point> optimal_point_perturbs;
   std::vector<Real> optimal_point_phi_i_qp;
+  ElemType optimal_elem_type = INVALID_ELEM;
+  std::vector<Real> optimal_JxW_all_qp;
+  std::vector<std::vector<Real>> optimal_phi_i_all_qp;
 
   // Initialize largest_abs_value to be negative so that it definitely gets updated.
   Real largest_abs_value = -1.;
@@ -2426,6 +2429,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
     {
       auto fe = con.get_element_fe(/*var=*/0, dim);
       fe->get_phi();
+      fe->get_JxW();
     }
 
   for (const auto & [elem_id, comp_and_qp] : local_pf)
@@ -2436,6 +2440,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
 
       auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
       const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+      const auto & JxW = elem_fe->get_JxW();
 
       elem_fe->reinit(&elem_ref);
 
@@ -2455,6 +2460,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
                   optimal_comp = comp;
                   optimal_elem_id = elem_id;
                   optimal_qp = qp;
+                  optimal_elem_type = elem_ref.type();
 
                   optimal_point_phi_i_qp.resize(phi.size());
                   for(auto i : index_range(phi))
@@ -2478,6 +2484,12 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
 
                       optimal_point_perturbs = perturb_list[qp];
                     }
+
+                  if (get_rb_eim_evaluation().get_parametrized_function().requires_all_elem_qp_data)
+                    {
+                      optimal_JxW_all_qp = JxW;
+                      optimal_phi_i_all_qp = phi;
+                    }
                 }
             }
         }
@@ -2496,6 +2508,15 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
   this->comm().broadcast(optimal_qp, proc_ID_index);
   this->comm().broadcast(optimal_point_perturbs, proc_ID_index);
   this->comm().broadcast(optimal_point_phi_i_qp, proc_ID_index);
+  this->comm().broadcast(optimal_JxW_all_qp, proc_ID_index);
+  this->comm().broadcast(optimal_phi_i_all_qp, proc_ID_index);
+
+  // Cast optimal_elem_type to an int in order to broadcast it
+  {
+    int optimal_elem_type_int = static_cast<int>(optimal_elem_type);
+    this->comm().broadcast(optimal_elem_type_int, proc_ID_index);
+    optimal_elem_type = static_cast<ElemType>(optimal_elem_type_int);
+  }
 
   libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
 
@@ -2522,7 +2543,10 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
                                                      optimal_subdomain_id,
                                                      optimal_qp,
                                                      optimal_point_perturbs,
-                                                     optimal_point_phi_i_qp);
+                                                     optimal_point_phi_i_qp,
+                                                     optimal_elem_type,
+                                                     optimal_JxW_all_qp,
+                                                     optimal_phi_i_all_qp);
 
   if (has_obs_vals)
     {

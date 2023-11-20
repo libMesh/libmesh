@@ -771,19 +771,19 @@ void RBEIMEvaluation::add_interpolation_points_qp(unsigned int qp)
   _vec_eval_input.qps.emplace_back(qp);
 }
 
-void RBEIMEvaluation::add_interpolation_points_JxW(Real JxW)
-{
-  _vec_eval_input.JxWs.emplace_back(JxW);
-}
-
-void RBEIMEvaluation::add_interpolation_points_elem_volume(Real elem_vol)
-{
-  _vec_eval_input.elem_volumes.emplace_back(elem_vol);
-}
-
 void RBEIMEvaluation::add_interpolation_points_elem_type(ElemType elem_type)
 {
   _vec_eval_input.elem_types.emplace_back(elem_type);
+}
+
+void RBEIMEvaluation::add_interpolation_points_JxW_all_qp(const std::vector<Real> & JxW_all_qp)
+{
+  _vec_eval_input.JxW_all_qp.emplace_back(JxW_all_qp);
+}
+
+void RBEIMEvaluation::add_interpolation_points_phi_i_all_qp(const std::vector<std::vector<Real>> & phi_i_all_qp)
+{
+  _vec_eval_input.phi_i_all_qp.emplace_back(phi_i_all_qp);
 }
 
 void RBEIMEvaluation::add_interpolation_points_phi_i_qp(const std::vector<Real> & phi_i_qp)
@@ -859,25 +859,25 @@ unsigned int RBEIMEvaluation::get_interpolation_points_qp(unsigned int index) co
   return _vec_eval_input.qps[index];
 }
 
-Real RBEIMEvaluation::get_interpolation_points_JxW(unsigned int index) const
-{
-  libmesh_error_msg_if(index >= _vec_eval_input.JxWs.size(), "Error: Invalid index");
-
-  return _vec_eval_input.JxWs[index];
-}
-
-Real RBEIMEvaluation::get_interpolation_points_elem_volume(unsigned int index) const
-{
-  libmesh_error_msg_if(index >= _vec_eval_input.elem_volumes.size(), "Error: Invalid index");
-
-  return _vec_eval_input.elem_volumes[index];
-}
-
 ElemType RBEIMEvaluation::get_interpolation_points_elem_type(unsigned int index) const
 {
   libmesh_error_msg_if(index >= _vec_eval_input.elem_types.size(), "Error: Invalid index");
 
   return _vec_eval_input.elem_types[index];
+}
+
+const std::vector<Real> & RBEIMEvaluation::get_interpolation_points_JxW_all_qp(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _vec_eval_input.JxW_all_qp.size(), "Error: Invalid index");
+
+  return _vec_eval_input.JxW_all_qp[index];
+}
+
+const std::vector<std::vector<Real>> & RBEIMEvaluation::get_interpolation_points_phi_i_all_qp(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _vec_eval_input.phi_i_all_qp.size(), "Error: Invalid index");
+
+  return _vec_eval_input.phi_i_all_qp[index];
 }
 
 const std::vector<Real> & RBEIMEvaluation::get_interpolation_points_phi_i_qp(unsigned int index) const
@@ -968,7 +968,10 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   subdomain_id_type subdomain_id,
   unsigned int qp,
   const std::vector<Point> & perturbs,
-  const std::vector<Real> & phi_i_qp)
+  const std::vector<Real> & phi_i_qp,
+  ElemType elem_type,
+  const std::vector<Real> & JxW_all_qp,
+  const std::vector<std::vector<Real>> & phi_i_all_qp)
 {
   _local_eim_basis_functions.emplace_back(bf);
   _vec_eval_input.all_xyz.emplace_back(p);
@@ -978,6 +981,9 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   _vec_eval_input.qps.emplace_back(qp);
   _vec_eval_input.all_xyz_perturb.emplace_back(perturbs);
   _vec_eval_input.phi_i_qp.emplace_back(phi_i_qp);
+  _vec_eval_input.elem_types.emplace_back(elem_type);
+  _vec_eval_input.JxW_all_qp.emplace_back(JxW_all_qp);
+  _vec_eval_input.phi_i_all_qp.emplace_back(phi_i_all_qp);
 }
 
 void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
@@ -1002,6 +1008,12 @@ void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
   _vec_eval_input.qps.emplace_back(qp);
   _vec_eval_input.all_xyz_perturb.emplace_back(perturbs);
   _vec_eval_input.phi_i_qp.emplace_back(phi_i_qp);
+
+  // Add dummy values for the other properties, which are unused in the
+  // node case.
+  _vec_eval_input.elem_types.emplace_back(INVALID_ELEM);
+  _vec_eval_input.JxW_all_qp.emplace_back();
+  _vec_eval_input.phi_i_all_qp.emplace_back();
 }
 
 void RBEIMEvaluation::add_node_basis_function_and_interpolation_data(
@@ -1019,14 +1031,15 @@ void RBEIMEvaluation::add_node_basis_function_and_interpolation_data(
 
   // Add dummy values for the other properties, which are unused in the
   // node case.
-  std::vector<Point> empty_perturbs;
-  std::vector<Real> empty_phi_i_qp;
   _vec_eval_input.elem_ids.emplace_back(0);
   _vec_eval_input.side_indices.emplace_back(0);
   _vec_eval_input.sbd_ids.emplace_back(0);
   _vec_eval_input.qps.emplace_back(0);
-  _vec_eval_input.all_xyz_perturb.emplace_back(empty_perturbs);
-  _vec_eval_input.phi_i_qp.emplace_back(empty_phi_i_qp);
+  _vec_eval_input.all_xyz_perturb.emplace_back();
+  _vec_eval_input.phi_i_qp.emplace_back();
+  _vec_eval_input.elem_types.emplace_back(INVALID_ELEM);
+  _vec_eval_input.JxW_all_qp.emplace_back();
+  _vec_eval_input.phi_i_all_qp.emplace_back();
 }
 
 void RBEIMEvaluation::
