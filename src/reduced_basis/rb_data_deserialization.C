@@ -873,7 +873,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
 
             phi_i_all_qp[j].resize(interpolation_points_list_inner.size());
             for (auto k : index_range(phi_i_all_qp[j]))
-              phi_i_all_qp[j][k] = load_scalar_value(interpolation_points_list_inner[k]);
+              phi_i_all_qp[j][k] = interpolation_points_list_inner[k];
           }
         rb_eim_evaluation.add_interpolation_points_phi_i_all_qp(phi_i_all_qp);
       }
