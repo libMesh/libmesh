@@ -54,25 +54,28 @@ namespace {
 
 
 // Reverse a map
-template <typename MapIter, class MapType>
+template <class MapType>
 inline
-void build_reverse_map (MapIter it, MapIter end, MapType & reverse)
+std::map<typename MapType::mapped_type, typename MapType::key_type>
+build_reverse_map (const MapType & forward)
 {
-  reverse.clear();
+  std::map<typename MapType::mapped_type, typename MapType::key_type> reverse;
 
-  for (; it != end; ++it)
+  for (auto & [key, val] : forward)
     {
       // If the forward map is not invertible, we might already have
-      // found a preimage of it->second.  Choose the "largest"
+      // found a preimage of val.  Choose the "largest"
       // preimage according to operator<; for std::string this will
       // give us the longest, hopefully most specific name
       // corresponding to an enum.
-      typename MapType::iterator preimage = reverse.find(it->second);
+      auto preimage = reverse.find(val);
       if (preimage == reverse.end())
-        reverse.emplace (it->second, it->first);
-      else if (preimage->second < it->first)
-        preimage->second = it->first;
+        reverse.emplace (val, key);
+      else if (preimage->second < key)
+        preimage->second = key;
     }
+
+  return reverse;
 }
 
 #define INSTANTIATE_ENUM_MAPS(ENUM_NAME,VAR_NAME)               \
@@ -97,566 +100,480 @@ void build_reverse_map (MapIter it, MapIter end, MapType & reverse)
       }                                                         \
   }
 
-INSTANTIATE_ENUM_MAPS(ElemType, elem_type)
 
-//----------------------------------------------------
+std::map<std::string, ElemType> elem_type_to_enum {
+   {"EDGE"           , EDGE2},
+   {"EDGE2"          , EDGE2},
+   {"EDGE2"          , EDGE2},
+   {"EDGE3"          , EDGE3},
+   {"EDGE4"          , EDGE4},
 
-// Initialize elem_type_to_enum on first call
-void init_elem_type_to_enum ()
-{
-  if (elem_type_to_enum.empty())
-    {
-      elem_type_to_enum["EDGE"           ]=EDGE2;
-      elem_type_to_enum["EDGE2"          ]=EDGE2;
-      elem_type_to_enum["EDGE3"          ]=EDGE3;
-      elem_type_to_enum["EDGE4"          ]=EDGE4;
+   {"TRI"            , TRI3},
+   {"TRI3"           , TRI3},
+   {"TRISHELL3"      , TRISHELL3},
+   {"TRI3SUBDIVISION", TRI3SUBDIVISION},
+   {"TRI6"           , TRI6},
+   {"TRI7"           , TRI7},
 
-      elem_type_to_enum["TRI"            ]=TRI3;
-      elem_type_to_enum["TRI3"           ]=TRI3;
-      elem_type_to_enum["TRISHELL3"      ]=TRISHELL3;
-      elem_type_to_enum["TRI3SUBDIVISION"]=TRI3SUBDIVISION;
-      elem_type_to_enum["TRI6"           ]=TRI6;
-      elem_type_to_enum["TRI7"           ]=TRI7;
+   {"QUAD"           , QUAD4},
+   {"QUAD4"          , QUAD4},
+   {"QUADSHELL4"     , QUADSHELL4},
+   {"QUAD8"          , QUAD8},
+   {"QUADSHELL8"     , QUADSHELL8},
+   {"QUAD9"          , QUAD9},
 
-      elem_type_to_enum["QUAD"           ]=QUAD4;
-      elem_type_to_enum["QUAD4"          ]=QUAD4;
-      elem_type_to_enum["QUADSHELL4"     ]=QUADSHELL4;
-      elem_type_to_enum["QUAD8"          ]=QUAD8;
-      elem_type_to_enum["QUADSHELL8"     ]=QUADSHELL8;
-      elem_type_to_enum["QUAD9"          ]=QUAD9;
+   {"TET"            , TET4},
+   {"TET4"           , TET4},
+   {"TET10"          , TET10},
+   {"TET14"          , TET14},
 
-      elem_type_to_enum["TET"            ]=TET4;
-      elem_type_to_enum["TET4"           ]=TET4;
-      elem_type_to_enum["TET10"          ]=TET10;
-      elem_type_to_enum["TET14"          ]=TET14;
+   {"HEX"            , HEX8},
+   {"HEX8"           , HEX8},
+   {"HEX20"          , HEX20},
+   {"HEX27"          , HEX27},
 
-      elem_type_to_enum["HEX"            ]=HEX8;
-      elem_type_to_enum["HEX8"           ]=HEX8;
-      elem_type_to_enum["HEX20"          ]=HEX20;
-      elem_type_to_enum["HEX27"          ]=HEX27;
+   {"PRISM"          , PRISM6},
+   {"PRISM6"         , PRISM6},
+   {"PRISM15"        , PRISM15},
+   {"PRISM18"        , PRISM18},
+   {"PRISM20"        , PRISM20},
+   {"PRISM21"        , PRISM21},
 
-      elem_type_to_enum["PRISM"          ]=PRISM6;
-      elem_type_to_enum["PRISM6"         ]=PRISM6;
-      elem_type_to_enum["PRISM15"        ]=PRISM15;
-      elem_type_to_enum["PRISM18"        ]=PRISM18;
-      elem_type_to_enum["PRISM20"        ]=PRISM20;
-      elem_type_to_enum["PRISM21"        ]=PRISM21;
+   {"PYRAMID"        , PYRAMID5},
+   {"PYRAMID5"       , PYRAMID5},
+   {"PYRAMID13"      , PYRAMID13},
+   {"PYRAMID14"      , PYRAMID14},
+   {"PYRAMID18"      , PYRAMID18},
 
-      elem_type_to_enum["PYRAMID"        ]=PYRAMID5;
-      elem_type_to_enum["PYRAMID5"       ]=PYRAMID5;
-      elem_type_to_enum["PYRAMID13"      ]=PYRAMID13;
-      elem_type_to_enum["PYRAMID14"      ]=PYRAMID14;
-      elem_type_to_enum["PYRAMID18"      ]=PYRAMID18;
+   {"INFEDGE"        , INFEDGE2},
+   {"INFEDGE2"       , INFEDGE2},
 
-      elem_type_to_enum["INFEDGE"        ]=INFEDGE2;
-      elem_type_to_enum["INFEDGE2"       ]=INFEDGE2;
+   {"INFQUAD"        , INFQUAD4},
+   {"INFQUAD4"       , INFQUAD4},
+   {"INFQUAD6"       , INFQUAD6},
 
-      elem_type_to_enum["INFQUAD"        ]=INFQUAD4;
-      elem_type_to_enum["INFQUAD4"       ]=INFQUAD4;
-      elem_type_to_enum["INFQUAD6"       ]=INFQUAD6;
+   {"INFHEX"         , INFHEX8},
+   {"INFHEX8"        , INFHEX8},
+   {"INFHEX16"       , INFHEX16},
+   {"INFHEX18"       , INFHEX18},
 
-      elem_type_to_enum["INFHEX"         ]=INFHEX8;
-      elem_type_to_enum["INFHEX8"        ]=INFHEX8;
-      elem_type_to_enum["INFHEX16"       ]=INFHEX16;
-      elem_type_to_enum["INFHEX18"       ]=INFHEX18;
+   {"INFPRISM"       , INFPRISM6},
+   {"INFPRISM6"      , INFPRISM6},
+   {"INFPRISM12"     , INFPRISM12},
 
-      elem_type_to_enum["INFPRISM"       ]=INFPRISM6;
-      elem_type_to_enum["INFPRISM6"      ]=INFPRISM6;
-      elem_type_to_enum["INFPRISM12"     ]=INFPRISM12;
+   {"NODE"           , NODEELEM},
+   {"NODEELEM"       , NODEELEM},
 
-      elem_type_to_enum["NODE"           ]=NODEELEM;
-      elem_type_to_enum["NODEELEM"       ]=NODEELEM;
+   {"INVALID_ELEM"   , INVALID_ELEM}
+  };
 
-      elem_type_to_enum["INVALID_ELEM"   ]=INVALID_ELEM;
-    }
-}
+std::map<ElemType, std::string> enum_to_elem_type =
+  build_reverse_map(elem_type_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(ElemMappingType, elem_mapping_type)
+std::map<std::string, ElemMappingType> elem_mapping_type_to_enum {
+   {"LAGRANGE_MAP"          , LAGRANGE_MAP},
+   {"RATIONAL_BERNSTEIN_MAP", RATIONAL_BERNSTEIN_MAP},
+   {"INVALID_MAP"           , INVALID_MAP}
+  };
 
-//----------------------------------------------------
-
-// Initialize elem_type_to_enum on first call
-void init_elem_mapping_type_to_enum ()
-{
-  if (elem_mapping_type_to_enum.empty())
-    {
-      elem_mapping_type_to_enum["LAGRANGE_MAP"          ]=LAGRANGE_MAP;
-      elem_mapping_type_to_enum["RATIONAL_BERNSTEIN_MAP"]=RATIONAL_BERNSTEIN_MAP;
-      elem_mapping_type_to_enum["INVALID_MAP"           ]=INVALID_MAP;
-    }
-}
+std::map<ElemMappingType, std::string> enum_to_elem_mapping_type =
+  build_reverse_map(elem_mapping_type_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(Order, order)
+std::map<std::string, Order> order_to_enum {
+   {"CONSTANT"     , CONSTANT},
+   {"FIRST"        , FIRST},
+   {"SECOND"       , SECOND},
+   {"THIRD"        , THIRD},
+   {"FOURTH"       , FOURTH},
+   {"FIFTH"        , FIFTH},
+   {"SIXTH"        , SIXTH},
+   {"SEVENTH"      , SEVENTH},
+   {"EIGHTH"       , EIGHTH},
+   {"NINTH"        , NINTH},
+   {"TENTH"        , TENTH},
 
-// Initialize order_to_enum on first call
-void init_order_to_enum ()
-{
-  if (order_to_enum.empty())
-    {
-      order_to_enum["CONSTANT"     ]=CONSTANT;
-      order_to_enum["FIRST"        ]=FIRST;
-      order_to_enum["SECOND"       ]=SECOND;
-      order_to_enum["THIRD"        ]=THIRD;
-      order_to_enum["FOURTH"       ]=FOURTH;
-      order_to_enum["FIFTH"        ]=FIFTH;
-      order_to_enum["SIXTH"        ]=SIXTH;
-      order_to_enum["SEVENTH"      ]=SEVENTH;
-      order_to_enum["EIGHTH"       ]=EIGHTH;
-      order_to_enum["NINTH"        ]=NINTH;
-      order_to_enum["TENTH"        ]=TENTH;
+   {"ELEVENTH"     , ELEVENTH},
+   {"TWELFTH"      , TWELFTH},
+   {"THIRTEENTH"   , THIRTEENTH},
+   {"FOURTEENTH"   , FOURTEENTH},
+   {"FIFTEENTH"    , FIFTEENTH},
+   {"SIXTEENTH"    , SIXTEENTH},
+   {"SEVENTEENTH"  , SEVENTEENTH},
+   {"EIGHTTEENTH"  , EIGHTTEENTH},
+   {"NINETEENTH"   , NINETEENTH},
+   {"TWENTIETH"    , TWENTIETH},
 
-      order_to_enum["ELEVENTH"     ]=ELEVENTH;
-      order_to_enum["TWELFTH"      ]=TWELFTH;
-      order_to_enum["THIRTEENTH"   ]=THIRTEENTH;
-      order_to_enum["FOURTEENTH"   ]=FOURTEENTH;
-      order_to_enum["FIFTEENTH"    ]=FIFTEENTH;
-      order_to_enum["SIXTEENTH"    ]=SIXTEENTH;
-      order_to_enum["SEVENTEENTH"  ]=SEVENTEENTH;
-      order_to_enum["EIGHTTEENTH"  ]=EIGHTTEENTH;
-      order_to_enum["NINETEENTH"   ]=NINETEENTH;
-      order_to_enum["TWENTIETH"    ]=TWENTIETH;
+   {"TWENTYFIRST"  , TWENTYFIRST},
+   {"TWENTYSECOND" , TWENTYSECOND},
+   {"TWENTYTHIRD"  , TWENTYTHIRD},
+   {"TWENTYFOURTH" , TWENTYFOURTH},
+   {"TWENTYFIFTH"  , TWENTYFIFTH},
+   {"TWENTYSIXTH"  , TWENTYSIXTH},
+   {"TWENTYSEVENTH", TWENTYSEVENTH},
+   {"TWENTYEIGHTH" , TWENTYEIGHTH},
+   {"TWENTYNINTH"  , TWENTYNINTH},
+   {"THIRTIETH"    , THIRTIETH},
 
-      order_to_enum["TWENTYFIRST"  ]=TWENTYFIRST;
-      order_to_enum["TWENTYSECOND" ]=TWENTYSECOND;
-      order_to_enum["TWENTYTHIRD"  ]=TWENTYTHIRD;
-      order_to_enum["TWENTYFOURTH" ]=TWENTYFOURTH;
-      order_to_enum["TWENTYFIFTH"  ]=TWENTYFIFTH;
-      order_to_enum["TWENTYSIXTH"  ]=TWENTYSIXTH;
-      order_to_enum["TWENTYSEVENTH"]=TWENTYSEVENTH;
-      order_to_enum["TWENTYEIGHTH" ]=TWENTYEIGHTH;
-      order_to_enum["TWENTYNINTH"  ]=TWENTYNINTH;
-      order_to_enum["THIRTIETH"    ]=THIRTIETH;
+   {"THIRTYFIRST"  , THIRTYFIRST},
+   {"THIRTYSECOND" , THIRTYSECOND},
+   {"THIRTYTHIRD"  , THIRTYTHIRD},
+   {"THIRTYFOURTH" , THIRTYFOURTH},
+   {"THIRTYFIFTH"  , THIRTYFIFTH},
+   {"THIRTYSIXTH"  , THIRTYSIXTH},
+   {"THIRTYSEVENTH", THIRTYSEVENTH},
+   {"THIRTYEIGHTH" , THIRTYEIGHTH},
+   {"THIRTYNINTH"  , THIRTYNINTH},
+   {"FORTIETH"     , FORTIETH},
 
-      order_to_enum["THIRTYFIRST"  ]=THIRTYFIRST;
-      order_to_enum["THIRTYSECOND" ]=THIRTYSECOND;
-      order_to_enum["THIRTYTHIRD"  ]=THIRTYTHIRD;
-      order_to_enum["THIRTYFOURTH" ]=THIRTYFOURTH;
-      order_to_enum["THIRTYFIFTH"  ]=THIRTYFIFTH;
-      order_to_enum["THIRTYSIXTH"  ]=THIRTYSIXTH;
-      order_to_enum["THIRTYSEVENTH"]=THIRTYSEVENTH;
-      order_to_enum["THIRTYEIGHTH" ]=THIRTYEIGHTH;
-      order_to_enum["THIRTYNINTH"  ]=THIRTYNINTH;
-      order_to_enum["FORTIETH"    ]=FORTIETH;
+   {"FORTYFIRST"   , FORTYFIRST},
+   {"FORTYSECOND"  , FORTYSECOND},
+   {"FORTYTHIRD"   , FORTYTHIRD}
+  };
 
-      order_to_enum["FORTYFIRST"  ]=FORTYFIRST;
-      order_to_enum["FORTYSECOND" ]=FORTYSECOND;
-      order_to_enum["FORTYTHIRD"  ]=FORTYTHIRD;
-    }
-}
+std::map<Order, std::string> enum_to_order =
+  build_reverse_map(order_to_enum);
 
 
+std::map<std::string, FEFamily> fefamily_to_enum {
+   {"LAGRANGE"          , LAGRANGE},
+   {"LAGRANGE_VEC"      , LAGRANGE_VEC},
+   {"L2_LAGRANGE"       , L2_LAGRANGE},
+   {"L2_LAGRANGE_VEC"   , L2_LAGRANGE_VEC},
+   {"HIERARCHIC"        , HIERARCHIC},
+   {"L2_HIERARCHIC"     , L2_HIERARCHIC},
+   {"SIDE_HIERARCHIC"   , SIDE_HIERARCHIC},
+   {"MONOMIAL"          , MONOMIAL},
+   {"MONOMIAL_VEC"      , MONOMIAL_VEC},
+   {"SCALAR"            , SCALAR},
+   {"XYZ"               , XYZ},
+   {"BERNSTEIN"         , BERNSTEIN},
+   {"RATIONAL_BERNSTEIN", RATIONAL_BERNSTEIN},
+   {"SZABAB"            , SZABAB},
+   {"INFINITE_MAP"      , INFINITE_MAP},
+   {"JACOBI_20_00"      , JACOBI_20_00},
+   {"JACOBI_30_00"      , JACOBI_30_00},
+   {"LEGENDRE"          , LEGENDRE},
+   {"CLOUGH"            , CLOUGH},
+   {"HERMITE"           , HERMITE},
+   {"SUBDIVISION"       , SUBDIVISION},
+   {"NEDELEC_ONE"       , NEDELEC_ONE},
+   {"RAVIART_THOMAS"    , RAVIART_THOMAS},
+   {"L2_RAVIART_THOMAS" , L2_RAVIART_THOMAS}
+  };
 
-INSTANTIATE_ENUM_MAPS(FEFamily, fefamily)
-
-// Initialize fefamily_to_enum on first call
-void init_fefamily_to_enum ()
-{
-  if (fefamily_to_enum.empty())
-    {
-      fefamily_to_enum["LAGRANGE"          ]=LAGRANGE;
-      fefamily_to_enum["LAGRANGE_VEC"      ]=LAGRANGE_VEC;
-      fefamily_to_enum["L2_LAGRANGE"       ]=L2_LAGRANGE;
-      fefamily_to_enum["L2_LAGRANGE_VEC"   ]=L2_LAGRANGE_VEC;
-      fefamily_to_enum["HIERARCHIC"        ]=HIERARCHIC;
-      fefamily_to_enum["L2_HIERARCHIC"     ]=L2_HIERARCHIC;
-      fefamily_to_enum["SIDE_HIERARCHIC"   ]=SIDE_HIERARCHIC;
-      fefamily_to_enum["MONOMIAL"          ]=MONOMIAL;
-      fefamily_to_enum["MONOMIAL_VEC"      ]=MONOMIAL_VEC;
-      fefamily_to_enum["SCALAR"            ]=SCALAR;
-      fefamily_to_enum["XYZ"               ]=XYZ;
-      fefamily_to_enum["BERNSTEIN"         ]=BERNSTEIN;
-      fefamily_to_enum["RATIONAL_BERNSTEIN"]=RATIONAL_BERNSTEIN;
-      fefamily_to_enum["SZABAB"            ]=SZABAB;
-      fefamily_to_enum["INFINITE_MAP"      ]=INFINITE_MAP;
-      fefamily_to_enum["JACOBI_20_00"      ]=JACOBI_20_00;
-      fefamily_to_enum["JACOBI_30_00"      ]=JACOBI_30_00;
-      fefamily_to_enum["LEGENDRE"          ]=LEGENDRE;
-      fefamily_to_enum["CLOUGH"            ]=CLOUGH;
-      fefamily_to_enum["HERMITE"           ]=HERMITE;
-      fefamily_to_enum["SUBDIVISION"       ]=SUBDIVISION;
-      fefamily_to_enum["NEDELEC_ONE"       ]=NEDELEC_ONE;
-      fefamily_to_enum["RAVIART_THOMAS"    ]=RAVIART_THOMAS;
-      fefamily_to_enum["L2_RAVIART_THOMAS" ]=L2_RAVIART_THOMAS;
-    }
-
-}
+std::map<FEFamily, std::string> enum_to_fefamily =
+  build_reverse_map(fefamily_to_enum);
 
 
+std::map<std::string, InfMapType> inf_map_type_to_enum {
+   {"CARTESIAN"  , CARTESIAN},
+   {"SPHERICAL"  , SPHERICAL},
+   {"ELLIPSOIDAL", ELLIPSOIDAL}
+  };
 
-INSTANTIATE_ENUM_MAPS(InfMapType, inf_map_type)
-
-// Initialize inf_map_type_to_enum on first call
-void init_inf_map_type_to_enum ()
-{
-  if (inf_map_type_to_enum.empty())
-    {
-      inf_map_type_to_enum["CARTESIAN"  ]=CARTESIAN;
-      inf_map_type_to_enum["SPHERICAL"  ]=SPHERICAL;
-      inf_map_type_to_enum["ELLIPSOIDAL"]=ELLIPSOIDAL;
-    }
-}
+std::map<InfMapType, std::string> enum_to_inf_map_type =
+  build_reverse_map(inf_map_type_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(QuadratureType, quadrature_type)
+std::map<std::string, QuadratureType> quadrature_type_to_enum {
+   {"QGAUSS"     , QGAUSS},
+   {"QJACOBI_1_0", QJACOBI_1_0},
+   {"QJACOBI_2_0", QJACOBI_2_0},
+   {"QSIMPSON"   , QSIMPSON},
+   {"QTRAP"      , QTRAP},
+   {"QGRID"      , QGRID},
+   {"QCLOUGH"    , QCLOUGH},
+   {"QGAUSS_LOBATTO"    , QGAUSS_LOBATTO},
+   {"QNODAL", QNODAL},
+  };
 
-// Initialize quadrature_type_to_enum on first call
-void init_quadrature_type_to_enum ()
-{
-  if (quadrature_type_to_enum.empty())
-    {
-      quadrature_type_to_enum["QGAUSS"     ]=QGAUSS;
-      quadrature_type_to_enum["QJACOBI_1_0"]=QJACOBI_1_0;
-      quadrature_type_to_enum["QJACOBI_2_0"]=QJACOBI_2_0;
-      quadrature_type_to_enum["QSIMPSON"   ]=QSIMPSON;
-      quadrature_type_to_enum["QTRAP"      ]=QTRAP;
-      quadrature_type_to_enum["QGRID"      ]=QGRID;
-      quadrature_type_to_enum["QCLOUGH"    ]=QCLOUGH;
-      quadrature_type_to_enum["QGAUSS_LOBATTO"    ]=QGAUSS_LOBATTO;
-      quadrature_type_to_enum["QNODAL"]=QNODAL;
-    }
-}
+std::map<QuadratureType, std::string> enum_to_quadrature_type =
+  build_reverse_map(quadrature_type_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(PartitionerType, partitioner_type)
-
-// Initialize partitioner_type_to_enum on first call
-void init_partitioner_type_to_enum ()
-{
-  if (partitioner_type_to_enum.empty())
-    {
-      partitioner_type_to_enum["CENTROID_PARTITIONER"        ]=CENTROID_PARTITIONER;
-      partitioner_type_to_enum["LINEAR_PARTITIONER"          ]=LINEAR_PARTITIONER;
-      partitioner_type_to_enum["SFC_PARTITIONER"             ]=SFC_PARTITIONER;
-      partitioner_type_to_enum["HILBERT_SFC_PARTITIONER"     ]=HILBERT_SFC_PARTITIONER;
-      partitioner_type_to_enum["MORTON_SFC_PARTITIONER"      ]=MORTON_SFC_PARTITIONER;
-      partitioner_type_to_enum["METIS_PARTITIONER"           ]=METIS_PARTITIONER;
-      partitioner_type_to_enum["PARMETIS_PARTITIONER"        ]=PARMETIS_PARTITIONER;
-      partitioner_type_to_enum["SUBDOMAIN_PARTITIONER"       ]=SUBDOMAIN_PARTITIONER;
-      partitioner_type_to_enum["MAPPED_SUBDOMAIN_PARTITIONER"]=MAPPED_SUBDOMAIN_PARTITIONER;
+std::map<std::string, PartitionerType> partitioner_type_to_enum {
+   {"CENTROID_PARTITIONER"        , CENTROID_PARTITIONER},
+   {"LINEAR_PARTITIONER"          , LINEAR_PARTITIONER},
+   {"SFC_PARTITIONER"             , SFC_PARTITIONER},
+   {"HILBERT_SFC_PARTITIONER"     , HILBERT_SFC_PARTITIONER},
+   {"MORTON_SFC_PARTITIONER"      , MORTON_SFC_PARTITIONER},
+   {"METIS_PARTITIONER"           , METIS_PARTITIONER},
+   {"PARMETIS_PARTITIONER"        , PARMETIS_PARTITIONER},
+   {"SUBDOMAIN_PARTITIONER"       , SUBDOMAIN_PARTITIONER},
+   {"MAPPED_SUBDOMAIN_PARTITIONER", MAPPED_SUBDOMAIN_PARTITIONER},
 
       //shorter
-      partitioner_type_to_enum["CENTROID"                    ]=CENTROID_PARTITIONER;
-      partitioner_type_to_enum["LINEAR"                      ]=LINEAR_PARTITIONER;
-      partitioner_type_to_enum["SFC"                         ]=SFC_PARTITIONER;
-      partitioner_type_to_enum["HILBERT_SFC"                 ]=HILBERT_SFC_PARTITIONER;
-      partitioner_type_to_enum["MORTON_SFC"                  ]=MORTON_SFC_PARTITIONER;
-      partitioner_type_to_enum["METIS"                       ]=METIS_PARTITIONER;
-      partitioner_type_to_enum["PARMETIS"                    ]=PARMETIS_PARTITIONER;
-      partitioner_type_to_enum["SUBDOMAIN"                   ]=SUBDOMAIN_PARTITIONER;
-      partitioner_type_to_enum["MAPPED_SUBDOMAIN"            ]=MAPPED_SUBDOMAIN_PARTITIONER;
-    }
-}
+   {"CENTROID"                    , CENTROID_PARTITIONER},
+   {"LINEAR"                      , LINEAR_PARTITIONER},
+   {"SFC"                         , SFC_PARTITIONER},
+   {"HILBERT_SFC"                 , HILBERT_SFC_PARTITIONER},
+   {"MORTON_SFC"                  , MORTON_SFC_PARTITIONER},
+   {"METIS"                       , METIS_PARTITIONER},
+   {"PARMETIS"                    , PARMETIS_PARTITIONER},
+   {"SUBDOMAIN"                   , SUBDOMAIN_PARTITIONER},
+   {"MAPPED_SUBDOMAIN"            , MAPPED_SUBDOMAIN_PARTITIONER},
+  };
+
+std::map<PartitionerType, std::string> enum_to_partitioner_type =
+  build_reverse_map(partitioner_type_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(PreconditionerType, preconditioner_type)
-
-// Initialize preconditioner_type_to_enum on first call
-void init_preconditioner_type_to_enum ()
-{
-  if (preconditioner_type_to_enum.empty())
-    {
-      preconditioner_type_to_enum["IDENTITY_PRECOND"      ]=IDENTITY_PRECOND;
-      preconditioner_type_to_enum["JACOBI_PRECOND"        ]=JACOBI_PRECOND;
-      preconditioner_type_to_enum["BLOCK_JACOBI_PRECOND"  ]=BLOCK_JACOBI_PRECOND;
-      preconditioner_type_to_enum["SOR_PRECOND"           ]=SOR_PRECOND;
-      preconditioner_type_to_enum["SSOR_PRECOND"          ]=SSOR_PRECOND;
-      preconditioner_type_to_enum["EISENSTAT_PRECOND"     ]=EISENSTAT_PRECOND;
-      preconditioner_type_to_enum["ASM_PRECOND"           ]=ASM_PRECOND;
-      preconditioner_type_to_enum["CHOLESKY_PRECOND"      ]=CHOLESKY_PRECOND;
-      preconditioner_type_to_enum["ICC_PRECOND"           ]=ICC_PRECOND;
-      preconditioner_type_to_enum["ILU_PRECOND"           ]=ILU_PRECOND;
-      preconditioner_type_to_enum["LU_PRECOND"            ]=LU_PRECOND;
-      preconditioner_type_to_enum["USER_PRECOND"          ]=USER_PRECOND;
-      preconditioner_type_to_enum["SHELL_PRECOND"         ]=SHELL_PRECOND;
-      preconditioner_type_to_enum["AMG_PRECOND"           ]=AMG_PRECOND;
-      preconditioner_type_to_enum["SVD_PRECOND"           ]=SVD_PRECOND;
-      preconditioner_type_to_enum["INVALID_PRECONDITIONER"]=INVALID_PRECONDITIONER;
+std::map<std::string, PreconditionerType> preconditioner_type_to_enum {
+   {"IDENTITY_PRECOND"      , IDENTITY_PRECOND},
+   {"JACOBI_PRECOND"        , JACOBI_PRECOND},
+   {"BLOCK_JACOBI_PRECOND"  , BLOCK_JACOBI_PRECOND},
+   {"SOR_PRECOND"           , SOR_PRECOND},
+   {"SSOR_PRECOND"          , SSOR_PRECOND},
+   {"EISENSTAT_PRECOND"     , EISENSTAT_PRECOND},
+   {"ASM_PRECOND"           , ASM_PRECOND},
+   {"CHOLESKY_PRECOND"      , CHOLESKY_PRECOND},
+   {"ICC_PRECOND"           , ICC_PRECOND},
+   {"ILU_PRECOND"           , ILU_PRECOND},
+   {"LU_PRECOND"            , LU_PRECOND},
+   {"USER_PRECOND"          , USER_PRECOND},
+   {"SHELL_PRECOND"         , SHELL_PRECOND},
+   {"AMG_PRECOND"           , AMG_PRECOND},
+   {"SVD_PRECOND"           , SVD_PRECOND},
+   {"INVALID_PRECONDITIONER", INVALID_PRECONDITIONER},
 
       //shorter
-      preconditioner_type_to_enum["IDENTITY"    ]=IDENTITY_PRECOND;
-      preconditioner_type_to_enum["JACOBI"  ]=JACOBI_PRECOND;
-      preconditioner_type_to_enum["BLOCK_JACOBI"]=BLOCK_JACOBI_PRECOND;
-      preconditioner_type_to_enum["SOR"         ]=SOR_PRECOND;
-      preconditioner_type_to_enum["SSOR"        ]=SSOR_PRECOND;
-      preconditioner_type_to_enum["EISENSTAT"  ]=EISENSTAT_PRECOND;
-      preconditioner_type_to_enum["ASM"  ]=ASM_PRECOND;
-      preconditioner_type_to_enum["CHOLESKY"  ]=CHOLESKY_PRECOND;
-      preconditioner_type_to_enum["ICC"  ]=ICC_PRECOND;
-      preconditioner_type_to_enum["ILU"         ]=ILU_PRECOND;
-      preconditioner_type_to_enum["LU"          ]=LU_PRECOND;
-      preconditioner_type_to_enum["USER"        ]=USER_PRECOND;
-      preconditioner_type_to_enum["SHELL"       ]=SHELL_PRECOND;
-      preconditioner_type_to_enum["AMG"         ]=AMG_PRECOND;
-      preconditioner_type_to_enum["SVD"         ]=SVD_PRECOND;
-      preconditioner_type_to_enum["INVALID"     ]=INVALID_PRECONDITIONER;
-    }
-}
+   {"IDENTITY"    , IDENTITY_PRECOND},
+   {"JACOBI"      , JACOBI_PRECOND},
+   {"BLOCK_JACOBI", BLOCK_JACOBI_PRECOND},
+   {"SOR"         , SOR_PRECOND},
+   {"SSOR"        , SSOR_PRECOND},
+   {"EISENSTAT"   , EISENSTAT_PRECOND},
+   {"ASM"         , ASM_PRECOND},
+   {"CHOLESKY"    , CHOLESKY_PRECOND},
+   {"ICC"         , ICC_PRECOND},
+   {"ILU"         , ILU_PRECOND},
+   {"LU"          , LU_PRECOND},
+   {"USER"        , USER_PRECOND},
+   {"SHELL"       , SHELL_PRECOND},
+   {"AMG"         , AMG_PRECOND},
+   {"SVD"         , SVD_PRECOND},
+   {"INVALID"     , INVALID_PRECONDITIONER},
+  };
+
+std::map<PreconditionerType, std::string> enum_to_preconditioner_type =
+  build_reverse_map(preconditioner_type_to_enum);
 
 
 #ifdef LIBMESH_ENABLE_AMR
+std::map<std::string, Elem::RefinementState> refinementstate_type_to_enum {
+   {"COARSEN"                , Elem::COARSEN},
+   {"DO_NOTHING"             , Elem::DO_NOTHING},
+   {"REFINE"                 , Elem::REFINE},
+   {"JUST_REFINED"           , Elem::JUST_REFINED},
+   {"JUST_COARSENED"         , Elem::JUST_COARSENED},
+   {"INACTIVE"               , Elem::INACTIVE},
+   {"COARSEN_INACTIVE"       , Elem::COARSEN_INACTIVE},
+   {"INVALID_REFINEMENTSTATE", Elem::INVALID_REFINEMENTSTATE},
+  };
 
-INSTANTIATE_ENUM_MAPS(Elem::RefinementState, refinementstate_type)
-
-// Initialize refinementstate_type_to_enum on first call
-void init_refinementstate_type_to_enum ()
-{
-  if (refinementstate_type_to_enum.empty())
-    {
-      refinementstate_type_to_enum["COARSEN"                ]=Elem::COARSEN;
-      refinementstate_type_to_enum["DO_NOTHING"             ]=Elem::DO_NOTHING;
-      refinementstate_type_to_enum["REFINE"                 ]=Elem::REFINE;
-      refinementstate_type_to_enum["JUST_REFINED"           ]=Elem::JUST_REFINED;
-      refinementstate_type_to_enum["JUST_COARSENED"         ]=Elem::JUST_COARSENED;
-      refinementstate_type_to_enum["INACTIVE"               ]=Elem::INACTIVE;
-      refinementstate_type_to_enum["COARSEN_INACTIVE"       ]=Elem::COARSEN_INACTIVE;
-      refinementstate_type_to_enum["INVALID_REFINEMENTSTATE"]=Elem::INVALID_REFINEMENTSTATE;
-    }
-}
+std::map<Elem::RefinementState, std::string> enum_to_refinementstate_type =
+  build_reverse_map(refinementstate_type_to_enum);
 #endif // LIBMESH_ENABLE_AMR
 
 
-INSTANTIATE_ENUM_MAPS(EigenSolverType, eigensolvertype)
+std::map<std::string, EigenSolverType> eigensolvertype_to_enum {
+   {"POWER"              , POWER},
+   {"LAPACK"             , LAPACK},
+   {"SUBSPACE"           , SUBSPACE},
+   {"ARNOLDI"            , ARNOLDI},
+   {"LANCZOS"            , LANCZOS},
+   {"KRYLOVSCHUR"        , KRYLOVSCHUR},
+   {"INVALID_EIGENSOLVER", INVALID_EIGENSOLVER},
+  };
 
-// Initialize eigensolvertype_to_enum on first call
-void init_eigensolvertype_to_enum ()
-{
-  if (eigensolvertype_to_enum.empty())
-    {
-      eigensolvertype_to_enum["POWER"              ]=POWER;
-      eigensolvertype_to_enum["LAPACK"             ]=LAPACK;
-      eigensolvertype_to_enum["SUBSPACE"           ]=SUBSPACE;
-      eigensolvertype_to_enum["ARNOLDI"            ]=ARNOLDI;
-      eigensolvertype_to_enum["LANCZOS"            ]=LANCZOS;
-      eigensolvertype_to_enum["KRYLOVSCHUR"        ]=KRYLOVSCHUR;
-      eigensolvertype_to_enum["INVALID_EIGENSOLVER"]=INVALID_EIGENSOLVER;
-    }
-}
+std::map<EigenSolverType, std::string> enum_to_eigensolvertype =
+  build_reverse_map(eigensolvertype_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(SolverType, solvertype)
+std::map<std::string, SolverType> solvertype_to_enum {
+   {"CG"            , CG},
+   {"CGN"           , CGN},
+   {"CGS"           , CGS},
+   {"CR"            , CR},
+   {"QMR"           , QMR},
+   {"TCQMR"         , TCQMR},
+   {"TFQMR"         , TFQMR},
+   {"BICG"          , BICG},
+   {"BICGSTAB"      , BICGSTAB},
+   {"MINRES"        , MINRES},
+   {"GMRES"         , GMRES},
+   {"LSQR"          , LSQR},
+   {"JACOBI"        , JACOBI},
+   {"SOR_FORWARD"   , SOR_FORWARD},
+   {"SOR_BACKWARD"  , SOR_BACKWARD},
+   {"SSOR"          , SSOR},
+   {"RICHARDSON"    , RICHARDSON},
+   {"CHEBYSHEV"     , CHEBYSHEV},
+   {"SPARSELU"      , SPARSELU},
+   {"INVALID_SOLVER", INVALID_SOLVER},
+  };
 
-// Initialize solvertype_to_enum on first call
-void init_solvertype_to_enum ()
-{
-  if (solvertype_to_enum.empty())
-    {
-      solvertype_to_enum["CG"            ]=CG;
-      solvertype_to_enum["CGN"           ]=CGN;
-      solvertype_to_enum["CGS"           ]=CGS;
-      solvertype_to_enum["CR"            ]=CR;
-      solvertype_to_enum["QMR"           ]=QMR;
-      solvertype_to_enum["TCQMR"         ]=TCQMR;
-      solvertype_to_enum["TFQMR"         ]=TFQMR;
-      solvertype_to_enum["BICG"          ]=BICG;
-      solvertype_to_enum["BICGSTAB"      ]=BICGSTAB;
-      solvertype_to_enum["MINRES"        ]=MINRES;
-      solvertype_to_enum["GMRES"         ]=GMRES;
-      solvertype_to_enum["LSQR"          ]=LSQR;
-      solvertype_to_enum["JACOBI"        ]=JACOBI;
-      solvertype_to_enum["SOR_FORWARD"   ]=SOR_FORWARD;
-      solvertype_to_enum["SOR_BACKWARD"  ]=SOR_BACKWARD;
-      solvertype_to_enum["SSOR"          ]=SSOR;
-      solvertype_to_enum["RICHARDSON"    ]=RICHARDSON;
-      solvertype_to_enum["CHEBYSHEV"     ]=CHEBYSHEV;
-      solvertype_to_enum["SPARSELU"      ]=SPARSELU;
-      solvertype_to_enum["INVALID_SOLVER"]=INVALID_SOLVER;
-    }
-}
+std::map<SolverType, std::string> enum_to_solvertype =
+  build_reverse_map(solvertype_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(ElemQuality, elemquality)
+std::map<std::string, ElemQuality> elemquality_to_enum {
+   {"ASPECT_RATIO"       , ASPECT_RATIO},
+   {"SKEW"               , SKEW},
+   {"SHEAR"              , SHEAR},
+   {"SHAPE"              , SHAPE},
+   {"MAX_ANGLE"          , MAX_ANGLE},
+   {"MIN_ANGLE"          , MIN_ANGLE},
+   {"CONDITION"          , CONDITION},
+   {"DISTORTION"         , DISTORTION},
+   {"TAPER"              , TAPER},
+   {"WARP"               , WARP},
+   {"STRETCH"            , STRETCH},
+   {"DIAGONAL"           , DIAGONAL},
+   {"ASPECT_RATIO_BETA"  , ASPECT_RATIO_BETA},
+   {"ASPECT_RATIO_GAMMA" , ASPECT_RATIO_GAMMA},
+   {"SIZE"               , SIZE},
+   {"JACOBIAN"           , JACOBIAN},
+   {"TWIST"              , TWIST},
+  };
 
-// Initialize elemquality_to_enum on first call
-void init_elemquality_to_enum ()
-{
-  if (elemquality_to_enum.empty())
-    {
-      elemquality_to_enum["ASPECT_RATIO"       ]=ASPECT_RATIO;
-      elemquality_to_enum["SKEW"               ]=SKEW;
-      elemquality_to_enum["SHEAR"              ]=SHEAR;
-      elemquality_to_enum["SHAPE"              ]=SHAPE;
-      elemquality_to_enum["MAX_ANGLE"          ]=MAX_ANGLE;
-      elemquality_to_enum["MIN_ANGLE"          ]=MIN_ANGLE;
-      elemquality_to_enum["CONDITION"          ]=CONDITION;
-      elemquality_to_enum["DISTORTION"         ]=DISTORTION;
-      elemquality_to_enum["TAPER"              ]=TAPER;
-      elemquality_to_enum["WARP"               ]=WARP;
-      elemquality_to_enum["STRETCH"            ]=STRETCH;
-      elemquality_to_enum["DIAGONAL"           ]=DIAGONAL;
-      elemquality_to_enum["ASPECT_RATIO_BETA"  ]=ASPECT_RATIO_BETA;
-      elemquality_to_enum["ASPECT_RATIO_GAMMA" ]=ASPECT_RATIO_GAMMA;
-      elemquality_to_enum["SIZE"               ]=SIZE;
-      elemquality_to_enum["JACOBIAN"           ]=JACOBIAN;
-      elemquality_to_enum["TWIST"              ]=TWIST;
-    }
-}
+std::map<ElemQuality, std::string> enum_to_elemquality =
+  build_reverse_map(elemquality_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(IOPackage, iopackage)
+std::map<std::string, IOPackage> iopackage_to_enum {
+   {"TECPLOT" , TECPLOT},
+   {"GMV"     , GMV},
+   {"GMSH"    , GMSH},
+   {"VTK"     , VTK},
+   {"DIVA"    , DIVA},
+   {"TETGEN"  , TETGEN},
+   {"UCD"     , UCD},
+   {"LIBMESH" , LIBMESH},
+  };
 
-// Initialize iopackage_to_enum on first call
-void init_iopackage_to_enum ()
-{
-  if (iopackage_to_enum.empty())
-    {
-      iopackage_to_enum["TECPLOT" ]=TECPLOT;
-      iopackage_to_enum["GMV"     ]=GMV;
-      iopackage_to_enum["GMSH"    ]=GMSH;
-      iopackage_to_enum["VTK"     ]=VTK;
-      iopackage_to_enum["DIVA"    ]=DIVA;
-      iopackage_to_enum["TETGEN"  ]=TETGEN;
-      iopackage_to_enum["UCD"     ]=UCD;
-      iopackage_to_enum["LIBMESH" ]=LIBMESH;
-    }
-}
+std::map<IOPackage, std::string> enum_to_iopackage =
+  build_reverse_map(iopackage_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(FEMNormType, norm_type)
+std::map<std::string, FEMNormType> norm_type_to_enum {
+   {"L2"             , L2},
+   {"H1"             , H1},
+   {"H2"             , H2},
+   {"HCURL"          , HCURL},
+   {"HDIV"           , HDIV},
 
-// Initialize norm_type_to_enum on first call
-void init_norm_type_to_enum ()
-{
-  if (norm_type_to_enum.empty())
-    {
-      norm_type_to_enum["L2" ]=L2;
-      norm_type_to_enum["H1" ]=H1;
-      norm_type_to_enum["H2" ]=H2;
-      norm_type_to_enum["HCURL" ]=HCURL;
-      norm_type_to_enum["HDIV" ]=HDIV;
+   {"L1"             , L1},
+   {"L_INF"          , L_INF},
 
-      norm_type_to_enum["L1" ]=L1;
-      norm_type_to_enum["L_INF" ]=L_INF;
+   {"H1_SEMINORM"    , H1_SEMINORM},
+   {"H2_SEMINORM"    , H2_SEMINORM},
+   {"HCURL_SEMINORM" , HCURL_SEMINORM},
+   {"HDIV_SEMINORM"  , HDIV_SEMINORM},
 
-      norm_type_to_enum["H1_SEMINORM" ]=H1_SEMINORM;
-      norm_type_to_enum["H2_SEMINORM" ]=H2_SEMINORM;
-      norm_type_to_enum["HCURL_SEMINORM" ]=HCURL_SEMINORM;
-      norm_type_to_enum["HDIV_SEMINORM" ]=HDIV_SEMINORM;
+   {"W1_INF_SEMINORM", W1_INF_SEMINORM},
+   {"W2_INF_SEMINORM", W2_INF_SEMINORM},
 
-      norm_type_to_enum["W1_INF_SEMINORM" ]=W1_INF_SEMINORM;
-      norm_type_to_enum["W2_INF_SEMINORM" ]=W2_INF_SEMINORM;
+   {"DISCRETE_L1"    , DISCRETE_L1},
+   {"DISCRETE_L2"    , DISCRETE_L2},
+   {"DISCRETE_L_INF" , DISCRETE_L_INF},
 
-      norm_type_to_enum["DISCRETE_L1" ]=DISCRETE_L1;
-      norm_type_to_enum["DISCRETE_L2" ]=DISCRETE_L2;
-      norm_type_to_enum["DISCRETE_L_INF" ]=DISCRETE_L_INF;
+   {"H1_X_SEMINORM"  , H1_X_SEMINORM},
+   {"H1_Y_SEMINORM"  , H1_Y_SEMINORM},
+   {"H1_Z_SEMINORM"  , H1_Z_SEMINORM},
 
-      norm_type_to_enum["H1_X_SEMINORM" ]=H1_X_SEMINORM;
-      norm_type_to_enum["H1_Y_SEMINORM" ]=H1_Y_SEMINORM;
-      norm_type_to_enum["H1_Z_SEMINORM" ]=H1_Z_SEMINORM;
+   {"INVALID_NORM"   , INVALID_NORM},
+  };
 
-      norm_type_to_enum["INVALID_NORM" ]=INVALID_NORM;
-    }
-}
+std::map<FEMNormType, std::string> enum_to_norm_type =
+  build_reverse_map(norm_type_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(ParallelType, parallel_type)
+std::map<std::string, ParallelType> parallel_type_to_enum {
+   {"AUTOMATIC"               , AUTOMATIC},
+   {"SERIAL"                  , SERIAL},
+   {"PARALLEL"                , PARALLEL},
+   {"GHOSTED"                 , GHOSTED},
+   {"INVALID_PARALLELIZATION" , INVALID_PARALLELIZATION},
+  };
 
-// Initialize parallel_type_to_enum on first call
-void init_parallel_type_to_enum ()
-{
-  if (parallel_type_to_enum.empty())
-    {
-      parallel_type_to_enum["AUTOMATIC" ]=AUTOMATIC;
-      parallel_type_to_enum["SERIAL"    ]=SERIAL;
-      parallel_type_to_enum["PARALLEL"  ]=PARALLEL;
-      parallel_type_to_enum["GHOSTED"   ]=GHOSTED;
-      parallel_type_to_enum["INVALID_PARALLELIZATION" ]=INVALID_PARALLELIZATION;
-    }
-}
+std::map<ParallelType, std::string> enum_to_parallel_type =
+  build_reverse_map(parallel_type_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(PointLocatorType, point_locator_type)
+std::map<std::string, PointLocatorType> point_locator_type_to_enum {
+   {"TREE"            , TREE},
+   {"INVALID_LOCATOR" , INVALID_LOCATOR},
+  };
 
-// Initialize point_locator_type_to_enum on first call
-void init_point_locator_type_to_enum ()
-{
-  if (point_locator_type_to_enum.empty())
-    {
-      point_locator_type_to_enum["TREE" ]=TREE;
-      point_locator_type_to_enum["INVALID_LOCATOR" ]=INVALID_LOCATOR;
-    }
-}
+std::map<PointLocatorType, std::string> enum_to_point_locator_type =
+  build_reverse_map(point_locator_type_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(SolverPackage, solverpackage_type)
+std::map<std::string, SolverPackage> solverpackage_type_to_enum {
+   {"PETSC_SOLVERS"          , PETSC_SOLVERS},
+   {"TRILINOS_SOLVERS"       , TRILINOS_SOLVERS},
+   {"LASPACK_SOLVERS"        , LASPACK_SOLVERS},
+   {"SLEPC_SOLVERS"          , SLEPC_SOLVERS},
+   {"EIGEN_SOLVERS"          , EIGEN_SOLVERS},
+   {"NLOPT_SOLVERS"          , NLOPT_SOLVERS},
+   {"INVALID_SOLVER_PACKAGE" , INVALID_SOLVER_PACKAGE},
+  };
 
-// Initialize solverpackage_type_to_enum on first call
-void init_solverpackage_type_to_enum ()
-{
-  if (solverpackage_type_to_enum.empty())
-    {
-      solverpackage_type_to_enum["PETSC_SOLVERS"    ]=PETSC_SOLVERS;
-      solverpackage_type_to_enum["TRILINOS_SOLVERS" ]=TRILINOS_SOLVERS;
-      solverpackage_type_to_enum["LASPACK_SOLVERS"  ]=LASPACK_SOLVERS;
-      solverpackage_type_to_enum["SLEPC_SOLVERS"    ]=SLEPC_SOLVERS;
-      solverpackage_type_to_enum["EIGEN_SOLVERS"    ]=EIGEN_SOLVERS;
-      solverpackage_type_to_enum["NLOPT_SOLVERS"    ]=NLOPT_SOLVERS;
-      solverpackage_type_to_enum["INVALID_SOLVER_PACKAGE" ]=INVALID_SOLVER_PACKAGE;
-    }
-}
+std::map<SolverPackage, std::string> enum_to_solverpackage_type =
+  build_reverse_map(solverpackage_type_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(SubsetSolveMode, subset_solve_mode)
+std::map<std::string, SubsetSolveMode> subset_solve_mode_to_enum {
+   {"SUBSET_ZERO"       , SUBSET_ZERO},
+   {"SUBSET_COPY_RHS"   , SUBSET_COPY_RHS},
+   {"SUBSET_DONT_TOUCH" , SUBSET_DONT_TOUCH},
+  };
 
-// Initialize subset_solve_mode_to_enum on first call
-void init_subset_solve_mode_to_enum ()
-{
-  if (subset_solve_mode_to_enum.empty())
-    {
-      subset_solve_mode_to_enum["SUBSET_ZERO" ]=SUBSET_ZERO;
-      subset_solve_mode_to_enum["SUBSET_COPY_RHS" ]=SUBSET_COPY_RHS;
-      subset_solve_mode_to_enum["SUBSET_DONT_TOUCH" ]=SUBSET_DONT_TOUCH;
-    }
-}
+std::map<SubsetSolveMode, std::string> enum_to_subset_solve_mode =
+  build_reverse_map(subset_solve_mode_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(XdrMODE, xdr_mode)
+std::map<std::string, XdrMODE> xdr_mode_to_enum {
+   {"UNKNOWN" , UNKNOWN},
+   {"ENCODE"  , ENCODE},
+   {"DECODE"  , DECODE},
+   {"WRITE"   , WRITE},
+   {"READ"    , READ},
+  };
 
-// Initialize xdr_mode_to_enum on first call
-void init_xdr_mode_to_enum ()
-{
-  if (xdr_mode_to_enum.empty())
-    {
-      xdr_mode_to_enum["UNKNOWN" ]=UNKNOWN;
-      xdr_mode_to_enum["ENCODE"  ]=ENCODE;
-      xdr_mode_to_enum["DECODE"  ]=DECODE;
-      xdr_mode_to_enum["WRITE"   ]=WRITE;
-      xdr_mode_to_enum["READ"    ]=READ;
-    }
-}
+std::map<XdrMODE, std::string> enum_to_xdr_mode =
+  build_reverse_map(xdr_mode_to_enum);
 
 
-INSTANTIATE_ENUM_MAPS(LinearConvergenceReason, linear_convergence_reason)
+std::map<std::string, LinearConvergenceReason> linear_convergence_reason_to_enum {
+   {"CONVERGED_RTOL_NORMAL",       CONVERGED_RTOL_NORMAL},
+   {"CONVERGED_ATOL_NORMAL",       CONVERGED_ATOL_NORMAL},
+   {"CONVERGED_RTOL",              CONVERGED_RTOL},
+   {"CONVERGED_ATOL",              CONVERGED_ATOL},
+   {"CONVERGED_ITS",               CONVERGED_ITS},
+   {"CONVERGED_CG_NEG_CURVE",      CONVERGED_CG_NEG_CURVE},
+   {"CONVERGED_CG_CONSTRAINED",    CONVERGED_CG_CONSTRAINED},
+   {"CONVERGED_STEP_LENGTH",       CONVERGED_STEP_LENGTH},
+   {"CONVERGED_HAPPY_BREAKDOWN",   CONVERGED_HAPPY_BREAKDOWN},
+   {"DIVERGED_NULL",               DIVERGED_NULL},
+   {"DIVERGED_ITS",                DIVERGED_ITS},
+   {"DIVERGED_DTOL",               DIVERGED_DTOL},
+   {"DIVERGED_BREAKDOWN",          DIVERGED_BREAKDOWN},
+   {"DIVERGED_BREAKDOWN_BICG",     DIVERGED_BREAKDOWN_BICG},
+   {"DIVERGED_NONSYMMETRIC",       DIVERGED_NONSYMMETRIC},
+   {"DIVERGED_INDEFINITE_PC",      DIVERGED_INDEFINITE_PC},
+   {"DIVERGED_NAN",                DIVERGED_NAN},
+   {"DIVERGED_INDEFINITE_MAT",     DIVERGED_INDEFINITE_MAT},
+   {"DIVERGED_PCSETUP_FAILED",     DIVERGED_PCSETUP_FAILED},
+   {"CONVERGED_ITERATING",         CONVERGED_ITERATING},
+   {"UNKNOWN_FLAG",                UNKNOWN_FLAG},
+  };
 
-// Initialize xdr_mode_to_enum on first call
-void init_linear_convergence_reason_to_enum ()
-{
-  if (linear_convergence_reason_to_enum.empty())
-    {
-      linear_convergence_reason_to_enum["CONVERGED_RTOL_NORMAL"]     = CONVERGED_RTOL_NORMAL;
-      linear_convergence_reason_to_enum["CONVERGED_ATOL_NORMAL"]     = CONVERGED_ATOL_NORMAL;
-      linear_convergence_reason_to_enum["CONVERGED_RTOL"]            = CONVERGED_RTOL;
-      linear_convergence_reason_to_enum["CONVERGED_ATOL"]            = CONVERGED_ATOL;
-      linear_convergence_reason_to_enum["CONVERGED_ITS"]             = CONVERGED_ITS;
-      linear_convergence_reason_to_enum["CONVERGED_CG_NEG_CURVE"]    = CONVERGED_CG_NEG_CURVE;
-      linear_convergence_reason_to_enum["CONVERGED_CG_CONSTRAINED"]  = CONVERGED_CG_CONSTRAINED;
-      linear_convergence_reason_to_enum["CONVERGED_STEP_LENGTH"]     = CONVERGED_STEP_LENGTH;
-      linear_convergence_reason_to_enum["CONVERGED_HAPPY_BREAKDOWN"] = CONVERGED_HAPPY_BREAKDOWN;
-      linear_convergence_reason_to_enum["DIVERGED_NULL"]             = DIVERGED_NULL;
-      linear_convergence_reason_to_enum["DIVERGED_ITS"]              = DIVERGED_ITS;
-      linear_convergence_reason_to_enum["DIVERGED_DTOL"]             = DIVERGED_DTOL;
-      linear_convergence_reason_to_enum["DIVERGED_BREAKDOWN"]        = DIVERGED_BREAKDOWN;
-      linear_convergence_reason_to_enum["DIVERGED_BREAKDOWN_BICG"]   = DIVERGED_BREAKDOWN_BICG;
-      linear_convergence_reason_to_enum["DIVERGED_NONSYMMETRIC"]     = DIVERGED_NONSYMMETRIC;
-      linear_convergence_reason_to_enum["DIVERGED_INDEFINITE_PC"]    = DIVERGED_INDEFINITE_PC;
-      linear_convergence_reason_to_enum["DIVERGED_NAN"]              = DIVERGED_NAN;
-      linear_convergence_reason_to_enum["DIVERGED_INDEFINITE_MAT"]   = DIVERGED_INDEFINITE_MAT;
-      linear_convergence_reason_to_enum["DIVERGED_PCSETUP_FAILED"]   = DIVERGED_PCSETUP_FAILED;
-      linear_convergence_reason_to_enum["CONVERGED_ITERATING"]       = CONVERGED_ITERATING;
-      linear_convergence_reason_to_enum["UNKNOWN_FLAG"]              = UNKNOWN_FLAG;
-    }
-}
+std::map<LinearConvergenceReason, std::string> enum_to_linear_convergence_reason =
+  build_reverse_map(linear_convergence_reason_to_enum);
 
 
 #undef INSTANTIATE_ENUM_MAPS
@@ -674,8 +591,6 @@ namespace Utility {
   template <>                                                           \
   ENUM_NAME string_to_enum<ENUM_NAME> (std::string_view s)              \
   {                                                                     \
-    init_##VAR_NAME##_to_enum();                                        \
-                                                                        \
     std::string upper(s);                                               \
     std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper); \
                                                                         \
@@ -702,8 +617,6 @@ namespace Utility {
   template <>                                                           \
   std::string enum_to_string<ENUM_NAME> (const ENUM_NAME e)             \
   {                                                                     \
-    init_enum_to_##VAR_NAME ();                                         \
-                                                                        \
     if (!enum_to_##VAR_NAME .count(e))                                  \
       libmesh_error_msg("No " #ENUM_NAME " with enumeration " << e << " found."); \
                                                                         \
