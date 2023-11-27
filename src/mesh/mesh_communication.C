@@ -1897,6 +1897,9 @@ void MeshCommunication::make_nodes_parallel_consistent (MeshBase & mesh)
   // When this function is called, each section of a parallelized mesh
   // should be in the following state:
   //
+  // Element ids and locations should be consistent on every processor
+  // where they exist.
+  //
   // All nodes should have the exact same physical location on every
   // processor where they exist.
   //
