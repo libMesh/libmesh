@@ -958,8 +958,6 @@ void DistributedMesh::renumber_node(const dof_id_type old_id,
   libmesh_assert (nd);
   libmesh_assert_equal_to (nd->id(), old_id);
 
-  nd->set_id(new_id);
-
   // If we have nodes shipped to this processor for NodeConstraints
   // use, then those nodes will exist in _nodes, but may not be
   // locatable via a TopologyMap due to the insufficiency of elements
@@ -981,6 +979,8 @@ void DistributedMesh::renumber_node(const dof_id_type old_id,
   libmesh_assert (!_nodes[new_id]);
 #endif
   _nodes[new_id] = nd;
+  nd->set_id(new_id);
+
   _nodes.erase(old_id);
 }
 
