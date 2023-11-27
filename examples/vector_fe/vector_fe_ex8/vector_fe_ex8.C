@@ -1243,11 +1243,14 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
                             *lambda_fe_face,
                             qrule,
                             qface);
-
-      system.solution->close();
-      // Scatter solution into the current_solution which is used in error computation
-      system.update();
     }
+  }
+
+  if (!global_solve)
+  {
+    system.solution->close();
+    // Scatter solution into the current_solution which is used in error computation
+    system.update();
   }
 }
 
