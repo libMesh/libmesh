@@ -587,9 +587,7 @@ Elem * DistributedMesh::add_elem (Elem * e)
   _elements[e->id()] = e;
 
   // Try to make the cached elem data more accurate
-  if (elem_procid == this->processor_id() ||
-      elem_procid == DofObject::invalid_processor_id)
-    _n_elem++;
+  _n_elem++;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   if (!e->valid_unique_id())
@@ -680,10 +678,7 @@ Elem * DistributedMesh::insert_elem (Elem * e)
 #endif
 
   // Try to make the cached elem data more accurate
-  processor_id_type elem_procid = e->processor_id();
-  if (elem_procid == this->processor_id() ||
-      elem_procid == DofObject::invalid_processor_id)
-    _n_elem++;
+  _n_elem++;
 
   _elements[e->id()] = e;
 
@@ -856,9 +851,7 @@ Node * DistributedMesh::add_node (Node * n)
   _nodes[n->id()] = n;
 
   // Try to make the cached node data more accurate
-  if (node_procid == this->processor_id() ||
-      node_procid == DofObject::invalid_processor_id)
-    _n_nodes++;
+  _n_nodes++;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   if (!n->valid_unique_id())
