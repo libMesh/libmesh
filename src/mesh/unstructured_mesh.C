@@ -186,6 +186,7 @@ void transfer_elem(Elem & lo_elem,
         {
           Node * hi_node = pos->second;
           libmesh_assert(hi_node);
+          libmesh_assert_equal_to(mesh.node_ptr(hi_node->id()), hi_node);
 
           hi_elem->set_node(hon) = hi_node;
 
@@ -293,10 +294,15 @@ all_increased_order_range (UnstructuredMesh & mesh,
   libmesh_ignore(max_new_nodes_per_elem);
 
   /*
-   * when the mesh is not prepared,
-   * at least renumber the nodes and
-   * elements, so that the node ids
-   * are correct
+   * The mesh should at least be consistent enough for us to add new
+   * nodes consistently.
+   */
+  libmesh_assert(mesh.comm().verify(mesh.n_elem()));
+  libmesh_assert(mesh.comm().verify(mesh.max_elem_id()));
+
+  /*
+   * When the mesh is not prepared, at least renumber the nodes and
+   * elements, so that the node ids are correct
    */
   if (!mesh.is_prepared())
     mesh.renumber_nodes_and_elements ();
