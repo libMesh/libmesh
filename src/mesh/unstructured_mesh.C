@@ -20,6 +20,7 @@
 // Local includes
 #include "libmesh/boundary_info.h"
 #include "libmesh/ghosting_functor.h"
+#include "libmesh/ghost_point_neighbors.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
@@ -308,8 +309,7 @@ all_increased_order_range (UnstructuredMesh & mesh,
     mesh.renumber_nodes_and_elements ();
 
   /*
-   * If the mesh is empty
-   * then we have nothing to do
+   * If the mesh is empty then we have nothing to do
    */
   if (!mesh.n_elem())
     return;
@@ -380,9 +380,10 @@ all_increased_order_range (UnstructuredMesh & mesh,
    * otherwise inconsistent neighbor pairs of lower and higher order
    * geometric elements.
    *
-   * If any elements are not at the desired order yet, check their
-   * neighbors for higher order; we may need to share elements with a
-   * neighbor not in the range.
+   * If any elements are not at the desired order yet, we need to
+   * check their neighbors and even their edge neighbors for higher
+   * order; we may need to share elements with a neighbor not in the
+   * range.
    */
   auto track_if_necessary = [&adj_vertices_to_ho_nodes](Elem * elem) {
     if (elem && elem != remote_elem && elem->default_order() != FIRST)
@@ -393,13 +394,28 @@ all_increased_order_range (UnstructuredMesh & mesh,
         }
   };
 
-  for (auto & elem : range)
+  // If we're in the common case then just track everything; otherwise
+  // find point neighbors to track
+  if (range.begin() == mesh.elements_begin() &&
+      range.end() == mesh.elements_end())
     {
-      track_if_necessary(elem);
+      for (auto & elem : range)
+        track_if_necessary(elem);
+    }
+  else
+    {
+      GhostingFunctor::map_type point_neighbor_elements;
 
-      if (!is_higher_order(elem))
-        for (Elem * neigh : elem->neighbor_ptr_range())
-          track_if_necessary(neigh);
+      GhostPointNeighbors point_neighbor_finder(mesh);
+      point_neighbor_finder(range.begin(), range.end(),
+                            mesh.n_processors(),
+                            point_neighbor_elements);
+
+      for (auto & [elem, coupling_map] : point_neighbor_elements)
+        {
+          libmesh_ignore(coupling_map);
+          track_if_necessary(const_cast<Elem *>(elem));
+        }
     }
 
   /**
