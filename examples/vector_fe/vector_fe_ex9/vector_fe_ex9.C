@@ -106,24 +106,6 @@ compute_qp_soln(std::vector<SolnType> & qp_vec,
   }
 }
 
-// Compute the stabilization parameter
-Real
-compute_tau(const bool internal_face, bool & tau_found, const Elem * const elem)
-{
-  if (!internal_face)
-    // if we're an external face then tau is 0
-    return 0;
-  else if (tau_found)
-    // if we've already applied a non-zero tau on another face, then we also return 0
-    return 0;
-  else
-  {
-    // This is our first internal face. We will apply our non-zero tau (and mark that we have)
-    tau_found = true;
-    return 1 / elem->hmin();
-  }
-}
-
 class HDGProblem : public libMesh::NonlinearImplicitSystem::ComputeResidualandJacobian,
                    public libMesh::NonlinearImplicitSystem::ComputePostCheck
 {
@@ -700,8 +682,6 @@ private:
         compute_qp_soln(lm_v_sol, qface->n_points(), *lm_phi_face, lm_v_dof_values);
         compute_qp_soln(p_sol, qface->n_points(), *scalar_phi_face, p_dof_values);
 
-        tau = compute_tau(elem->neighbor_ptr(side) != nullptr, tau_found, elem);
-
         if (elem->neighbor_ptr(side) == nullptr)
         {
           // qu, u, lm_u
@@ -895,7 +875,7 @@ private:
   std::size_t p_n_dofs;
 
   // Our stabilization coefficient
-  Real tau;
+  static constexpr Real tau = 1;
 
   // The viscosity
   static constexpr Real mu = 1;
