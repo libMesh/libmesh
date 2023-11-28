@@ -2906,7 +2906,6 @@ FEInterface::is_hierarchic (const FEType & fe_type)
     case LAGRANGE_VEC:
     case L2_LAGRANGE:
     case L2_LAGRANGE_VEC:
-    case L2_RAVIART_THOMAS:
     case NEDELEC_ONE:
     case RATIONAL_BERNSTEIN:
     case RAVIART_THOMAS:
