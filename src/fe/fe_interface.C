@@ -2910,6 +2910,7 @@ FEInterface::is_hierarchic (const FEType & fe_type)
     case NEDELEC_ONE:
     case RATIONAL_BERNSTEIN:
     case RAVIART_THOMAS:
+    case L2_RAVIART_THOMAS:
     case SCALAR:
     case SUBDIVISION:
       return false;
