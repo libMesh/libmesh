@@ -78,29 +78,6 @@ build_reverse_map (const MapType & forward)
   return reverse;
 }
 
-#define INSTANTIATE_ENUM_MAPS(ENUM_NAME,VAR_NAME)               \
-  std::map<std::string, ENUM_NAME> VAR_NAME##_to_enum;          \
-                                                                \
-  std::map<ENUM_NAME, std::string> enum_to_##VAR_NAME;          \
-                                                                \
-  void init_##VAR_NAME##_to_enum ();                            \
-                                                                \
-  /* Initialize the enum_to_elem_type on first call */          \
-  void init_enum_to_##VAR_NAME ()                               \
-  {                                                             \
-    /* Build reverse map */                                     \
-    if (enum_to_##VAR_NAME .empty())                            \
-      {                                                         \
-        /* Initialize elem_type_to_enum on first call */        \
-        init_##VAR_NAME##_to_enum();                            \
-                                                                \
-        build_reverse_map (VAR_NAME##_to_enum.begin(),          \
-                           VAR_NAME##_to_enum.end(),            \
-                           enum_to_##VAR_NAME);                 \
-      }                                                         \
-  }
-
-
 std::map<std::string, ElemType> elem_type_to_enum {
    {"EDGE"           , EDGE2},
    {"EDGE2"          , EDGE2},
@@ -575,9 +552,6 @@ std::map<std::string, LinearConvergenceReason> linear_convergence_reason_to_enum
 
 std::map<LinearConvergenceReason, std::string> enum_to_linear_convergence_reason =
   build_reverse_map(linear_convergence_reason_to_enum);
-
-
-#undef INSTANTIATE_ENUM_MAPS
 
 } // end anonymous namespace
 
