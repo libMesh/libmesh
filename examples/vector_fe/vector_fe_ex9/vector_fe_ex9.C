@@ -202,35 +202,41 @@ public:
   }
 
 private:
-  void vector_volume_residual()
+  void vector_volume_residual(const unsigned int i_offset,
+                              const std::vector<Gradient> & vector_sol,
+                              const std::vector<Number> & scalar_sol)
   {
     for (const auto qp : make_range(qrule->n_points()))
       for (const auto i : make_range(vector_n_dofs))
       {
         // Vector equation dependence on vector dofs
-        R(i) -= (*JxW)[qp] * ((*vector_phi)[i][qp] * vector_sol[qp]);
+        MixedVec(i_offset + i) -= (*JxW)[qp] * ((*vector_phi)[i][qp] * vector_sol[qp]);
 
         // Vector equation dependence on scalar dofs
-        R(i) += (*JxW)[qp] * ((*div_vector_phi)[i][qp] * scalar_sol[qp]);
+        MixedVec(i_offset + i) += (*JxW)[qp] * ((*div_vector_phi)[i][qp] * scalar_sol[qp]);
       }
   }
 
-  void vector_volume_jacobian()
+  void vector_volume_jacobian(const unsigned int i_offset,
+                              const unsigned int vector_j_offset,
+                              const unsigned int scalar_j_offset)
   {
     for (const auto qp : make_range(qrule->n_points()))
       for (const auto i : make_range(vector_n_dofs))
       {
         // Vector equation dependence on vector dofs
         for (const auto j : make_range(vector_n_dofs))
-          A(i, j) -= (*JxW)[qp] * ((*vector_phi)[i][qp] * (*vector_phi)[j][qp]);
+          MixedMat(i_offset + i, vector_j_offset + j) -=
+              (*JxW)[qp] * ((*vector_phi)[i][qp] * (*vector_phi)[j][qp]);
 
         // Vector equation dependence on scalar dofs
         for (const auto j : make_range(scalar_n_dofs))
-          Bt(i, j) += (*JxW)[qp] * ((*div_vector_phi)[i][qp] * (*scalar_phi)[j][qp]);
+          MixedMat(i_offset + i, scalar_j_offset + j) +=
+              (*JxW)[qp] * ((*div_vector_phi)[i][qp] * (*scalar_phi)[j][qp]);
       }
   }
 
-  void scalar_volume_residual()
+  void scalar_volume_residual(const unsigned int i_offset, const std::vector<Gradient> & vector_sol)
   {
     const auto dim = mesh->mesh_dimension();
     for (const auto qp : make_range(qrule->n_points()))
@@ -252,24 +258,25 @@ private:
       for (const auto i : make_range(scalar_n_dofs))
       {
         // Scalar equation dependence on vector dofs
-        F(i) += (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * vector_sol[qp]);
+        MixedVec(i_offset + i) += (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * vector_sol[qp]);
 
         // Scalar equation RHS
-        F(i) += (*JxW)[qp] * (*scalar_phi)[i][qp] * f;
+        MixedVec(i_offset + i) += (*JxW)[qp] * (*scalar_phi)[i][qp] * f;
       }
     }
   }
 
-  void scalar_volume_jacobian()
+  void scalar_volume_jacobian(const unsigned int i_offset, const unsigned int j_offset)
   {
     for (const auto qp : make_range(qrule->n_points()))
       for (const auto i : make_range(scalar_n_dofs))
         // Scalar equation dependence on vector dofs
         for (const auto j : make_range(vector_n_dofs))
-          B(i, j) += (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * (*vector_phi)[j][qp]);
+          MixedMat(i_offset + i, j_offset + j) +=
+              (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * (*vector_phi)[j][qp]);
   }
 
-  void vector_dirichlet_residual()
+  void vector_dirichlet_residual(const unsigned int i_offset)
   {
     const auto dim = mesh->mesh_dimension();
     for (const auto qp : make_range(qface->n_points()))
@@ -287,115 +294,148 @@ private:
 
       // External boundary -> Dirichlet faces -> Vector equation RHS
       for (const auto i : make_range(vector_n_dofs))
-        R(i) -= (*JxW_face)[qp] * ((*vector_phi_face)[i][qp] * (*normals)[qp]) * scalar_value;
+        MixedVec(i_offset + i) -=
+            (*JxW_face)[qp] * ((*vector_phi_face)[i][qp] * (*normals)[qp]) * scalar_value;
     }
   }
 
-  void vector_face_residual()
+  void vector_face_residual(const unsigned int i_offset, const std::vector<Number> & lm_sol)
   {
     for (const auto qp : make_range(qface->n_points()))
       // Vector equation dependence on LM dofs
       for (const auto i : make_range(vector_n_dofs))
-        R(i) -= (*JxW_face)[qp] * ((*vector_phi_face)[i][qp] * (*normals)[qp]) * lm_sol[qp];
+        MixedVec(i_offset + i) -=
+            (*JxW_face)[qp] * ((*vector_phi_face)[i][qp] * (*normals)[qp]) * lm_sol[qp];
   }
 
-  void vector_face_jacobian()
+  void vector_face_jacobian(const unsigned int i_offset, const unsigned int lm_j_offset)
   {
     for (const auto qp : make_range(qface->n_points()))
       // Vector equation dependence on LM dofs
       for (const auto i : make_range(vector_n_dofs))
         for (const auto j : make_range(lm_n_dofs))
-          Ct(i, j) -= (*JxW_face)[qp] * ((*vector_phi_face)[i][qp] * (*normals)[qp]) *
-                      (*lm_phi_face)[j][qp];
+          MixedLM(i_offset + i, lm_j_offset + j) -= (*JxW_face)[qp] *
+                                                    ((*vector_phi_face)[i][qp] * (*normals)[qp]) *
+                                                    (*lm_phi_face)[j][qp];
   }
 
-  void scalar_face_residual()
+  void scalar_face_residual(const unsigned int i_offset,
+                            const std::vector<Gradient> & vector_sol,
+                            const std::vector<Number> & scalar_sol,
+                            const std::vector<Number> & lm_sol)
   {
     for (const auto qp : make_range(qface->n_points()))
       for (const auto i : make_range(scalar_n_dofs))
       {
         // vector
-        F(i) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * (vector_sol[qp] * (*normals)[qp]);
+        MixedVec(i_offset + i) -=
+            (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * (vector_sol[qp] * (*normals)[qp]);
 
         // scalar
-        F(i) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * scalar_sol[qp] *
-                (*normals)[qp] * (*normals)[qp];
+        MixedVec(i_offset + i) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau *
+                                  scalar_sol[qp] * (*normals)[qp] * (*normals)[qp];
 
         // lm
-        F(i) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * lm_sol[qp] * (*normals)[qp] *
-                (*normals)[qp];
+        MixedVec(i_offset + i) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * lm_sol[qp] *
+                                  (*normals)[qp] * (*normals)[qp];
       }
   }
 
-  void scalar_face_jacobian()
+  void scalar_face_jacobian(const unsigned int i_offset,
+                            const unsigned int vector_j_offset,
+                            const unsigned int scalar_j_offset,
+                            const unsigned int lm_j_offset)
   {
     for (const auto qp : make_range(qface->n_points()))
       for (const auto i : make_range(scalar_n_dofs))
       {
         for (const auto j : make_range(vector_n_dofs))
-          B(i, j) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] *
-                     ((*vector_phi_face)[j][qp] * (*normals)[qp]);
+          MixedMat(i_offset + i, vector_j_offset + j) -=
+              (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] *
+              ((*vector_phi_face)[j][qp] * (*normals)[qp]);
 
         for (const auto j : make_range(scalar_n_dofs))
-          D(i, j) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * (*scalar_phi_face)[j][qp] *
-                     (*normals)[qp] * (*normals)[qp];
+          MixedMat(i_offset + i, scalar_j_offset + j) -=
+              (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * (*scalar_phi_face)[j][qp] *
+              (*normals)[qp] * (*normals)[qp];
 
         for (const auto j : make_range(lm_n_dofs))
-          E(i, j) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * (*lm_phi_face)[j][qp] *
-                     (*normals)[qp] * (*normals)[qp];
+          MixedLM(i_offset + i, lm_j_offset + j) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] *
+                                                    tau * (*lm_phi_face)[j][qp] * (*normals)[qp] *
+                                                    (*normals)[qp];
       }
   }
 
-  void lm_face_residual()
+  void lm_face_residual(const unsigned int i_offset,
+                        const std::vector<Gradient> & vector_sol,
+                        const std::vector<Number> & scalar_sol,
+                        const std::vector<Number> & lm_sol)
   {
     for (const auto qp : make_range(qface->n_points()))
       for (const auto i : make_range(lm_n_dofs))
       {
         // vector
-        L(i) -= (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * (vector_sol[qp] * (*normals)[qp]);
+        LMVec(i_offset + i) -=
+            (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * (vector_sol[qp] * (*normals)[qp]);
 
         // scalar
-        L(i) -= (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau * scalar_sol[qp] * (*normals)[qp] *
-                (*normals)[qp];
+        LMVec(i_offset + i) -= (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau * scalar_sol[qp] *
+                               (*normals)[qp] * (*normals)[qp];
 
         // lm
-        L(i) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau * lm_sol[qp] * (*normals)[qp] *
-                (*normals)[qp];
+        LMVec(i_offset + i) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau * lm_sol[qp] *
+                               (*normals)[qp] * (*normals)[qp];
       }
   }
 
-  void lm_face_jacobian()
+  void lm_face_jacobian(const unsigned int i_offset,
+                        const unsigned int vector_j_offset,
+                        const unsigned int scalar_j_offset,
+                        const unsigned int lm_j_offset)
   {
     for (const auto qp : make_range(qface->n_points()))
       for (const auto i : make_range(lm_n_dofs))
       {
         for (const auto j : make_range(vector_n_dofs))
-          C(i, j) -= (*JxW_face)[qp] * (*lm_phi_face)[i][qp] *
-                     ((*vector_phi_face)[j][qp] * (*normals)[qp]);
+          LMMixed(i_offset + i, vector_j_offset + j) -=
+              (*JxW_face)[qp] * (*lm_phi_face)[i][qp] *
+              ((*vector_phi_face)[j][qp] * (*normals)[qp]);
 
         for (const auto j : make_range(scalar_n_dofs))
-          G(i, j) -= (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau * (*scalar_phi_face)[j][qp] *
-                     (*normals)[qp] * (*normals)[qp];
+          LMMixed(i_offset + i, scalar_j_offset + j) -= (*JxW_face)[qp] * (*lm_phi_face)[i][qp] *
+                                                        tau * (*scalar_phi_face)[j][qp] *
+                                                        (*normals)[qp] * (*normals)[qp];
 
         for (const auto j : make_range(lm_n_dofs))
-          H(i, j) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau * (*lm_phi_face)[j][qp] *
-                     (*normals)[qp] * (*normals)[qp];
+          LMMat(i_offset + i, lm_j_offset + j) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau *
+                                                  (*lm_phi_face)[j][qp] * (*normals)[qp] *
+                                                  (*normals)[qp];
       }
   }
 
   void assemble(const bool lm_solve)
   {
     auto & lm_soln_vector = lm_solve ? *lm_system->current_local_solution : *ghosted_old_solution;
+    const auto u_num = mixed_system->variable_number("u");
+    const auto v_num = mixed_system->variable_number("v");
+    const auto qu_num = mixed_system->variable_number("qu");
+    const auto qv_num = mixed_system->variable_number("qv");
+    const auto lm_u_num = lm_system->variable_number("lm_u");
+    const auto lm_v_num = lm_system->variable_number("lm_v");
+
     for (const auto & elem : mesh->active_local_element_ptr_range())
     {
       // Retrive our dof indices for all fields
-      mixed_dof_map->dof_indices(elem, vector_dof_indices, mixed_system->variable_number("q"));
-      mixed_dof_map->dof_indices(elem, scalar_dof_indices, mixed_system->variable_number("u"));
-      lm_dof_map->dof_indices(elem, lm_dof_indices, lm_system->variable_number("lambda"));
+      mixed_dof_map->dof_indices(elem, qu_dof_indices, qu_num);
+      mixed_dof_map->dof_indices(elem, u_dof_indices, u_num);
+      lm_dof_map->dof_indices(elem, lm_u_dof_indices, lm_u_num);
+      mixed_dof_map->dof_indices(elem, qv_dof_indices, qv_num);
+      mixed_dof_map->dof_indices(elem, v_dof_indices, v_num);
+      lm_dof_map->dof_indices(elem, lm_v_dof_indices, lm_v_num);
 
-      vector_n_dofs = vector_dof_indices.size();
-      scalar_n_dofs = scalar_dof_indices.size();
-      lm_n_dofs = lm_dof_indices.size();
+      vector_n_dofs = qu_dof_indices.size();
+      scalar_n_dofs = u_dof_indices.size();
+      lm_n_dofs = lm_u_dof_indices.size();
 
       // Reinit our volume FE objects
       vector_fe->reinit(elem);
@@ -404,36 +444,50 @@ private:
       libmesh_assert_equal_to(vector_n_dofs, vector_phi->size());
       libmesh_assert_equal_to(scalar_n_dofs, scalar_phi->size());
 
-      // prepare our matrix/vector data structures for the vector equation
-      A.setZero(vector_n_dofs, vector_n_dofs);
-      Bt.setZero(vector_n_dofs, scalar_n_dofs);
-      Ct.setZero(vector_n_dofs, lm_n_dofs);
-      R.setZero(vector_n_dofs);
-      // and for the scalar equation
-      B.setZero(scalar_n_dofs, vector_n_dofs);
-      D.setZero(scalar_n_dofs, scalar_n_dofs);
-      E.setZero(scalar_n_dofs, lm_n_dofs);
-      F.setZero(scalar_n_dofs);
-      // and for the LM equation
-      C.setZero(lm_n_dofs, vector_n_dofs);
-      G.setZero(lm_n_dofs, scalar_n_dofs);
-      H.setZero(lm_n_dofs, lm_n_dofs);
-      L.setZero(lm_n_dofs);
+      const auto mixed_size = 2 * (vector_n_dofs + scalar_n_dofs);
+      const auto lm_size = 2 * lm_n_dofs;
+
+      // prepare our matrix/vector data structures
+      MixedMat.setZero(mixed_size, mixed_size);
+      MixedVec.setZero(mixed_size);
+      LMMat.setZero(lm_size, lm_size);
+      LMVec.setZero(lm_size);
+      MixedLM.setZero(mixed_size, lm_size);
+      LMMixed.setZero(lm_size, mixed_size);
+      K_libmesh.resize(lm_size, lm_size);
+      F_libmesh.resize(lm_size);
 
       // Get our local element dof values
-      mixed_system->current_local_solution->get(vector_dof_indices, vector_dof_values);
-      mixed_system->current_local_solution->get(scalar_dof_indices, scalar_dof_values);
-      lm_soln_vector.get(lm_dof_indices, lm_dof_values);
+      mixed_system->current_local_solution->get(qu_dof_indices, qu_dof_values);
+      mixed_system->current_local_solution->get(u_dof_indices, u_dof_values);
+      lm_soln_vector.get(lm_u_dof_indices, lm_u_dof_values);
+      mixed_system->current_local_solution->get(qv_dof_indices, qv_dof_values);
+      mixed_system->current_local_solution->get(v_dof_indices, v_dof_values);
+      lm_soln_vector.get(lm_v_dof_indices, lm_v_dof_values);
 
       // Compute volumetric local qp solutions
-      compute_qp_soln(vector_sol, qrule->n_points(), *vector_phi, vector_dof_values);
-      compute_qp_soln(scalar_sol, qrule->n_points(), *scalar_phi, scalar_dof_values);
+      compute_qp_soln(qu_sol, qrule->n_points(), *vector_phi, qu_dof_values);
+      compute_qp_soln(u_sol, qrule->n_points(), *scalar_phi, u_dof_values);
+      compute_qp_soln(qv_sol, qrule->n_points(), *vector_phi, qv_dof_values);
+      compute_qp_soln(v_sol, qrule->n_points(), *scalar_phi, v_dof_values);
 
+      //
       // compute volumetric residuals and Jacobians
-      vector_volume_residual();
-      scalar_volume_residual();
-      vector_volume_jacobian();
-      scalar_volume_jacobian();
+      //
+
+      // qu and u
+      vector_volume_residual(0, qu_sol, u_sol);
+      scalar_volume_residual(vector_n_dofs, qu_sol);
+      vector_volume_jacobian(0, 0, vector_n_dofs);
+      scalar_volume_jacobian(vector_n_dofs, 0);
+
+      // qv and v
+      vector_volume_residual(vector_n_dofs + scalar_n_dofs, qv_sol, v_sol);
+      scalar_volume_residual(2 * vector_n_dofs + scalar_n_dofs, qv_sol);
+      vector_volume_jacobian(vector_n_dofs + scalar_n_dofs,
+                             vector_n_dofs + scalar_n_dofs,
+                             2 * vector_n_dofs + scalar_n_dofs);
+      scalar_volume_jacobian(2 * vector_n_dofs + scalar_n_dofs, vector_n_dofs + scalar_n_dofs);
 
       // At the beginning of the loop, we mark that we haven't found our "Single-Face" yet
       bool tau_found = false;
@@ -445,102 +499,91 @@ private:
         lm_fe_face->reinit(elem, side);
 
         // Compute face local qp solutions
-        compute_qp_soln(vector_sol, qface->n_points(), *vector_phi_face, vector_dof_values);
-        compute_qp_soln(scalar_sol, qface->n_points(), *scalar_phi_face, scalar_dof_values);
-        compute_qp_soln(lm_sol, qface->n_points(), *lm_phi_face, lm_dof_values);
+        compute_qp_soln(qu_sol, qface->n_points(), *vector_phi_face, qu_dof_values);
+        compute_qp_soln(u_sol, qface->n_points(), *scalar_phi_face, u_dof_values);
+        compute_qp_soln(lm_u_sol, qface->n_points(), *lm_phi_face, lm_u_dof_values);
+        compute_qp_soln(qv_sol, qface->n_points(), *vector_phi_face, qv_dof_values);
+        compute_qp_soln(v_sol, qface->n_points(), *scalar_phi_face, v_dof_values);
+        compute_qp_soln(lm_v_sol, qface->n_points(), *lm_phi_face, lm_v_dof_values);
 
         tau = compute_tau(elem->neighbor_ptr(side) != nullptr, tau_found, elem);
 
         if (elem->neighbor_ptr(side) == nullptr)
         {
-          vector_dirichlet_residual();
-          scalar_face_residual();
-          scalar_face_jacobian();
+          // qu, u, lm_u
+          vector_dirichlet_residual(0);
+          scalar_face_residual(vector_n_dofs, qu_sol, u_sol, lm_u_sol);
+          scalar_face_jacobian(vector_n_dofs, 0, vector_n_dofs, 0);
+          // qv, v, lm_v
+          vector_dirichlet_residual(vector_n_dofs + scalar_n_dofs);
+          scalar_face_residual(2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, lm_v_sol);
+          scalar_face_jacobian(2 * vector_n_dofs + scalar_n_dofs,
+                               vector_n_dofs + scalar_n_dofs,
+                               2 * vector_n_dofs + scalar_n_dofs,
+                               lm_n_dofs);
           for (const auto qp : make_range(qface->n_points()))
           {
             // Need to do something with the external boundary LM dofs to prevent
             // the matrix from being singular
             for (const auto i : make_range(lm_n_dofs))
             {
-              L(i) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * lm_sol[qp];
+              LMVec(i) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * lm_u_sol[qp];
+              LMVec(lm_n_dofs + i) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * lm_v_sol[qp];
               for (const auto j : make_range(lm_n_dofs))
-                H(i, j) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * (*lm_phi_face)[j][qp];
+              {
+                const auto val = (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * (*lm_phi_face)[j][qp];
+                LMMat(i, j) += val;
+                LMMat(lm_n_dofs + i, lm_n_dofs + j) += val;
+              }
             }
           }
         }
         else
         {
-          vector_face_residual();
-          vector_face_jacobian();
-          scalar_face_residual();
-          scalar_face_jacobian();
-          lm_face_residual();
-          lm_face_jacobian();
+          // qu, u, lm_u
+          vector_face_residual(0, lm_u_sol);
+          vector_face_jacobian(0, 0);
+          scalar_face_residual(vector_n_dofs, qu_sol, u_sol, lm_u_sol);
+          scalar_face_jacobian(vector_n_dofs, 0, vector_n_dofs, 0);
+          lm_face_residual(0, qu_sol, u_sol, lm_u_sol);
+          lm_face_jacobian(0, 0, vector_n_dofs, 0);
+          // qv, v, lm_v
+          vector_face_residual(vector_n_dofs + scalar_n_dofs, lm_v_sol);
+          vector_face_jacobian(vector_n_dofs + scalar_n_dofs, lm_n_dofs);
+          scalar_face_residual(2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, lm_v_sol);
+          scalar_face_jacobian(2 * vector_n_dofs + scalar_n_dofs,
+                               vector_n_dofs + scalar_n_dofs,
+                               2 * vector_n_dofs + scalar_n_dofs,
+                               lm_n_dofs);
+          lm_face_residual(lm_n_dofs, qv_sol, v_sol, lm_v_sol);
+          lm_face_jacobian(lm_n_dofs,
+                           vector_n_dofs + scalar_n_dofs,
+                           2 * vector_n_dofs + scalar_n_dofs,
+                           lm_n_dofs);
         }
-      }
-
-      const auto mixed_size = vector_n_dofs + scalar_n_dofs;
-      MixedMat.resize(mixed_size, mixed_size);
-      MixedLM.resize(mixed_size, lm_n_dofs);
-      MixedVec.resize(mixed_size);
-      for (const auto i : make_range(vector_n_dofs))
-      {
-        for (const auto j : make_range(vector_n_dofs))
-          MixedMat(i, j) = A(i, j);
-
-        for (const auto j : make_range(scalar_n_dofs))
-          MixedMat(i, vector_n_dofs + j) = Bt(i, j);
-
-        for (const auto j : make_range(lm_n_dofs))
-          MixedLM(i, j) = Ct(i, j);
-
-        MixedVec(i) = R(i);
-      }
-      for (const auto i : make_range(scalar_n_dofs))
-      {
-        for (const auto j : make_range(vector_n_dofs))
-          MixedMat(vector_n_dofs + i, j) = B(i, j);
-
-        for (const auto j : make_range(scalar_n_dofs))
-          MixedMat(vector_n_dofs + i, vector_n_dofs + j) = D(i, j);
-
-        for (const auto j : make_range(lm_n_dofs))
-          MixedLM(vector_n_dofs + i, j) = E(i, j);
-
-        MixedVec(vector_n_dofs + i) = F(i);
       }
 
       MixedMatInv = MixedMat.inverse();
+      lm_dof_indices = lm_u_dof_indices;
+      lm_dof_indices.insert(lm_dof_indices.end(), lm_v_dof_indices.begin(), lm_v_dof_indices.end());
 
       if (lm_solve)
       {
-        LMMixed.resize(lm_n_dofs, mixed_size);
-        for (const auto i : make_range(lm_n_dofs))
-        {
-          for (const auto j : make_range(vector_n_dofs))
-            LMMixed(i, j) = C(i, j);
-
-          for (const auto j : make_range(scalar_n_dofs))
-            LMMixed(i, vector_n_dofs + j) = G(i, j);
-        }
-
         const auto LMProductMat = -LMMixed * MixedMatInv;
-        K = LMProductMat * MixedLM + H;
-        P = LMProductMat * MixedVec + L;
-        K_libmesh.resize(lm_n_dofs, lm_n_dofs);
-        P_libmesh.resize(lm_n_dofs);
+        LMMat += LMProductMat * MixedLM;
+        LMVec += LMProductMat * MixedVec;
 
-        for (const auto i : make_range(lm_n_dofs))
+        for (const auto i : make_range(2 * lm_n_dofs))
         {
-          for (const auto j : make_range(lm_n_dofs))
-            K_libmesh(i, j) = K(i, j);
-          P_libmesh(i) = P(i);
+          for (const auto j : make_range(2 * lm_n_dofs))
+            K_libmesh(i, j) = LMMat(i, j);
+          F_libmesh(i) = LMVec(i);
         }
 
         // We were performing our finite element assembly for the implicit solve step of our
         // example. Add our local element vectors/matrices into the global system
         J->add_matrix(K_libmesh, lm_dof_indices);
-        residual->add_vector(P_libmesh, lm_dof_indices);
+        residual->add_vector(F_libmesh, lm_dof_indices);
       }
       else
       {
@@ -550,20 +593,24 @@ private:
         // the vector and scalar solutions
         //
         ghosted_increment->get(lm_dof_indices, lm_increment_dof_values);
-        LMIncrement.resize(lm_n_dofs);
-        for (const auto i : make_range(lm_n_dofs))
+        libmesh_assert(lm_dof_indices.size() == 2 * lm_n_dofs);
+        LMIncrement.resize(2 * lm_n_dofs);
+        for (const auto i : index_range(lm_dof_indices))
           LMIncrement(i) = lm_increment_dof_values[i];
 
         MixedIncrement = MixedMatInv * (-MixedVec - MixedLM * LMIncrement);
-        vector_increment_dof_values.resize(vector_n_dofs);
-        scalar_increment_dof_values.resize(scalar_n_dofs);
-        for (const auto i : make_range(vector_n_dofs))
-          vector_increment_dof_values[i] = MixedIncrement(i);
-        for (const auto i : make_range(scalar_n_dofs))
-          scalar_increment_dof_values[i] = MixedIncrement(vector_n_dofs + i);
+        mixed_dof_indices = qu_dof_indices;
+        auto append = [this](const auto & dofs)
+        { mixed_dof_indices.insert(mixed_dof_indices.end(), dofs.begin(), dofs.end()); };
+        append(u_dof_indices);
+        append(qv_dof_indices);
+        append(v_dof_indices);
+        libmesh_assert(mixed_dof_indices.size() == mixed_size);
+        mixed_increment_dof_values.resize(mixed_size);
+        for (const auto i : index_range(mixed_increment_dof_values))
+          mixed_increment_dof_values[i] = MixedIncrement(i);
 
-        mixed_system->solution->add_vector(vector_increment_dof_values, vector_dof_indices);
-        mixed_system->solution->add_vector(scalar_increment_dof_values, scalar_dof_indices);
+        mixed_system->solution->add_vector(mixed_increment_dof_values, mixed_dof_indices);
       }
     }
 
@@ -601,39 +648,44 @@ private:
 
   // LM matrix and RHS after eliminating vector and scalar dofs
   DenseMatrix<Number> K_libmesh;
-  DenseVector<Number> P_libmesh;
-  EigenMatrix K;
-  EigenVector P;
-  // (A  Bt Ct)(q) = (R)
-  // (B  D  E) (u) = (F)
-  // (C  G  H) (l) = (L)
-  EigenMatrix A, Bt, Ct, B, D, E, C, G, H;
-  EigenVector R, F, L;
+  DenseVector<Number> F_libmesh;
 
-  // Compositions
-  EigenMatrix MixedMat, MixedMatInv;
-  EigenVector MixedVec;
+  // On-diagonals
+  EigenMatrix MixedMat, MixedMatInv, LMMat;
+  // Vectors
+  EigenVector MixedVec, LMVec;
+  // Off-diagonals
   EigenMatrix MixedLM, LMMixed;
 
   // Containers for dof indices
-  std::vector<dof_id_type> vector_dof_indices;
-  std::vector<dof_id_type> scalar_dof_indices;
+  std::vector<dof_id_type> qu_dof_indices;
+  std::vector<dof_id_type> u_dof_indices;
+  std::vector<dof_id_type> lm_u_dof_indices;
+  std::vector<dof_id_type> qv_dof_indices;
+  std::vector<dof_id_type> v_dof_indices;
+  std::vector<dof_id_type> lm_v_dof_indices;
   std::vector<dof_id_type> lm_dof_indices;
+  std::vector<dof_id_type> mixed_dof_indices;
 
   // local solutions at quadrature points
-  std::vector<Gradient> vector_sol;
-  std::vector<Number> scalar_sol;
-  std::vector<Number> lm_sol;
+  std::vector<Gradient> qu_sol;
+  std::vector<Number> u_sol;
+  std::vector<Number> lm_u_sol;
+  std::vector<Gradient> qv_sol;
+  std::vector<Number> v_sol;
+  std::vector<Number> lm_v_sol;
 
   // local degree of freedom values
-  std::vector<Number> vector_dof_values;
-  std::vector<Number> scalar_dof_values;
-  std::vector<Number> lm_dof_values;
+  std::vector<Number> qu_dof_values;
+  std::vector<Number> u_dof_values;
+  std::vector<Number> lm_u_dof_values;
+  std::vector<Number> qv_dof_values;
+  std::vector<Number> v_dof_values;
+  std::vector<Number> lm_v_dof_values;
 
   // local degree of freedom increment values
-  std::vector<Number> vector_increment_dof_values;
-  std::vector<Number> scalar_increment_dof_values;
   std::vector<Number> lm_increment_dof_values;
+  std::vector<Number> mixed_increment_dof_values;
   EigenVector LMIncrement, MixedIncrement;
 
   // Number of dofs on elem
@@ -713,13 +765,15 @@ main(int argc, char ** argv)
   // Add the LM system
   auto & lm_system = equation_systems.add_system<NonlinearImplicitSystem>("Lambda");
 
-  // Adds the variable "q" and "u" to "Mixed". "q" will be our vector field
-  // whereas "u" will be the scalar field.
-  system.add_variable("q", FIRST, L2_LAGRANGE_VEC);
+  // Adds the velocity variables and their gradients
+  system.add_variable("qu", FIRST, L2_LAGRANGE_VEC);
+  system.add_variable("qv", FIRST, L2_LAGRANGE_VEC);
   system.add_variable("u", FIRST, L2_LAGRANGE);
+  system.add_variable("v", FIRST, L2_LAGRANGE);
 
   // Add our Lagrange multiplier to the implicit system
-  lm_system.add_variable("lambda", FIRST, SIDE_HIERARCHIC);
+  lm_system.add_variable("lm_u", FIRST, SIDE_HIERARCHIC);
+  lm_system.add_variable("lm_v", FIRST, SIDE_HIERARCHIC);
 
   // Add vectors for increment
   auto & ghosted_inc = lm_system.add_vector("ghosted_increment", true, GHOSTED);
@@ -795,12 +849,16 @@ main(int argc, char ** argv)
     exact_sol.extra_quadrature_order(extra_error_quadrature);
 
   // Compute the error.
-  exact_sol.compute_error("Mixed", "q");
+  exact_sol.compute_error("Mixed", "qu");
   exact_sol.compute_error("Mixed", "u");
+  exact_sol.compute_error("Mixed", "qv");
+  exact_sol.compute_error("Mixed", "v");
 
   // Print out the error values.
-  libMesh::out << "L2 error is: " << exact_sol.l2_error("Mixed", "q") << std::endl;
+  libMesh::out << "L2 error for qu is: " << exact_sol.l2_error("Mixed", "qu") << std::endl;
   libMesh::out << "L2 error for u is: " << exact_sol.l2_error("Mixed", "u") << std::endl;
+  libMesh::out << "L2 error for qv is: " << exact_sol.l2_error("Mixed", "qv") << std::endl;
+  libMesh::out << "L2 error for v is: " << exact_sol.l2_error("Mixed", "v") << std::endl;
 
   // All done.
   return 0;

@@ -47,7 +47,7 @@ public:
 
   virtual Number component(unsigned int i, const Point & p, Real time = 0.) override
   {
-    const auto size = dim == 2 ? 4 : 5;
+    const auto size = 2 * (dim == 2 ? 3 : 4);
     DenseVector<Number> outvec(size);
     (*this)(p, time, outvec);
     return outvec(i);
@@ -61,8 +61,7 @@ template <>
 void
 SolutionFunction<2>::operator()(const Point & p, const Real, DenseVector<Number> & output)
 {
-  // We should have our vector variable, our scalar variable, and our higher order scalar variable
-  libmesh_assert(output.size() <= 4);
+  // We should have 2 x vector variable and 2 x scalar variable
   output.zero();
   const Real x = p(0), y = p(1);
   // libMesh assumes each component of a vector-valued variable is stored
@@ -70,17 +69,18 @@ SolutionFunction<2>::operator()(const Point & p, const Real, DenseVector<Number>
   const auto vector = soln(x, y);
   output(0) = vector(0);
   output(1) = vector(1);
+  output(2) = vector(0);
+  output(3) = vector(1);
   const auto scalar = soln.scalar(x, y);
-  output(2) = scalar;
-  output(3) = scalar;
+  output(4) = scalar;
+  output(5) = scalar;
 }
 
 template <>
 void
 SolutionFunction<3>::operator()(const Point & p, const Real, DenseVector<Number> & output)
 {
-  // We should have our vector variable, our scalar variable, and our higher order scalar variable
-  libmesh_assert(output.size() <= 5);
+  // We should have 2 x vector variable and 2 x scalar variable
   output.zero();
   const Real x = p(0), y = p(1), z = p(2);
   // libMesh assumes each component of the vector-valued variable is stored
@@ -89,9 +89,12 @@ SolutionFunction<3>::operator()(const Point & p, const Real, DenseVector<Number>
   output(0) = vector(0);
   output(1) = vector(1);
   output(2) = vector(2);
+  output(3) = vector(0);
+  output(4) = vector(1);
+  output(5) = vector(2);
   const auto scalar = soln.scalar(x, y, z);
-  output(3) = scalar;
-  output(4) = scalar;
+  output(6) = scalar;
+  output(7) = scalar;
 }
 
 template <unsigned int dim>
@@ -112,7 +115,7 @@ public:
 
   virtual Gradient component(unsigned int i, const Point & p, Real time = 0.) override
   {
-    const auto size = dim == 2 ? 4 : 5;
+    const auto size = 2 * (dim == 2 ? 3 : 4);
     DenseVector<Gradient> outvec(size);
     (*this)(p, time, outvec);
     return outvec(i);
@@ -130,6 +133,8 @@ SolutionGradient<2>::operator()(const Point & p, const Real, DenseVector<Gradien
   const Real x = p(0), y = p(1);
   output(0) = soln.grad(x, y).row(0);
   output(1) = soln.grad(x, y).row(1);
+  output(2) = output(0);
+  output(3) = output(1);
 }
 
 template <>
@@ -141,6 +146,9 @@ SolutionGradient<3>::operator()(const Point & p, const Real, DenseVector<Gradien
   output(0) = soln.grad(x, y, z).row(0);
   output(1) = soln.grad(x, y, z).row(1);
   output(2) = soln.grad(x, y, z).row(2);
+  output(3) = output(0);
+  output(4) = output(1);
+  output(5) = output(2);
 }
 
 #endif // SOLUTION_FUNCTION_H
