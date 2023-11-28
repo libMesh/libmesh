@@ -204,23 +204,23 @@ private:
                                 const std::vector<Number> & sol,
                                 const std::size_t n_dofs,
                                 const unsigned int i_offset)
-    {
-      for (const auto qp : make_range(quadrature.n_points()))
-        for (const auto i : make_range(n_dofs))
-          LMVec(i_offset + i) -= JxW[qp] * phi[i][qp] * sol[qp];
-    }
+  {
+    for (const auto qp : make_range(quadrature.n_points()))
+      for (const auto i : make_range(n_dofs))
+        LMVec(i_offset + i) -= JxW[qp] * phi[i][qp] * sol[qp];
+  }
 
   void create_identity_jacobian(const QBase & quadrature,
                                 const std::vector<Real> & JxW,
                                 const std::vector<std::vector<Real>> & phi,
                                 const std::size_t n_dofs,
                                 const unsigned int ij_offset)
-    {
-      for (const auto qp : make_range(quadrature.n_points()))
-        for (const auto i : make_range(n_dofs))
-          for (const auto j : make_range(n_dofs))
-            LMMat(ij_offset + i, ij_offset + j) -= JxW[qp] * phi[i][qp] * phi[j][qp];
-    }
+  {
+    for (const auto qp : make_range(quadrature.n_points()))
+      for (const auto i : make_range(n_dofs))
+        for (const auto j : make_range(n_dofs))
+          LMMat(ij_offset + i, ij_offset + j) -= JxW[qp] * phi[i][qp] * phi[j][qp];
+  }
 
   void compute_stress(const std::vector<Gradient> & vel_gradient,
                       const std::vector<Number> & p_sol,
@@ -275,31 +275,31 @@ private:
                               const unsigned int vel_component,
                               std::vector<Gradient> & sigma)
   {
-    const auto dim = mesh->mesh_dimension();
+    // const auto dim = mesh->mesh_dimension();
     compute_stress(vel_gradient, p_sol, vel_component, sigma);
     for (const auto qp : make_range(qrule->n_points()))
     {
-      // Prepare forcing function
-      const Real x = (*q_point)[qp](0);
-      const Real y = (*q_point)[qp](1);
-      const Real z = (*q_point)[qp](2);
+      // // Prepare forcing function
+      // const Real x = (*q_point)[qp](0);
+      // const Real y = (*q_point)[qp](1);
+      // const Real z = (*q_point)[qp](2);
 
-      // "f" is the forcing function for the Poisson equation, which is
-      // just the divergence of the exact solution for the vector field.
-      // This is the well-known "method of manufactured solutions".
-      Real f = 0;
-      if (dim == 2)
-        f = MixedExactSolution().forcing(x, y);
-      else if (dim == 3)
-        f = MixedExactSolution().forcing(x, y, z);
+      // // "f" is the forcing function for the Poisson equation, which is
+      // // just the divergence of the exact solution for the vector field.
+      // // This is the well-known "method of manufactured solutions".
+      // Real f = 0;
+      // if (dim == 2)
+      //   f = MixedExactSolution().forcing(x, y);
+      // else if (dim == 3)
+      //   f = MixedExactSolution().forcing(x, y, z);
 
       for (const auto i : make_range(scalar_n_dofs))
       {
         // Scalar equation dependence on vector dofs
         MixedVec(i_offset + i) += (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * sigma[qp]);
 
-        // Scalar equation RHS
-        MixedVec(i_offset + i) += (*JxW)[qp] * (*scalar_phi)[i][qp] * f;
+        // // Scalar equation RHS
+        // MixedVec(i_offset + i) += (*JxW)[qp] * (*scalar_phi)[i][qp] * f;
       }
     }
   }
@@ -327,27 +327,89 @@ private:
       }
   }
 
-  void vector_dirichlet_residual(const unsigned int i_offset)
-  {
-    const auto dim = mesh->mesh_dimension();
-    for (const auto qp : make_range(qface->n_points()))
+  void pressure_volume_residual(const unsigned int i_offset,
+                                const std::vector<Number> & u_sol,
+                                const std::vector<Number> & v_sol)
     {
-      const Real xf = (*qface_point)[qp](0);
-      const Real yf = (*qface_point)[qp](1);
-      const Real zf = (*qface_point)[qp](2);
+      for (const auto qp : make_range(qrule->n_points()))
+      {
+        const Gradient vel(u_sol[qp], v_sol[qp]);
+        for (const auto i : make_range(p_n_dofs))
+          LMVec(i_offset + i) -= (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * vel);
+      }
+    }
 
-      // The boundary value for scalar field.
-      Real scalar_value = 0;
-      if (dim == 2)
-        scalar_value = MixedExactSolution().scalar(xf, yf);
-      else if (dim == 3)
-        scalar_value = MixedExactSolution().scalar(xf, yf, zf);
+  void pressure_volume_jacobian(const unsigned int i_offset,
+                                const unsigned int u_j_offset,
+                                const unsigned int v_j_offset)
+    {
+      for (const auto qp : make_range(qrule->n_points()))
+        for (const auto i : make_range(p_n_dofs))
+          for (const auto j : make_range(scalar_n_dofs))
+          {
+            {
+              const Gradient phi((*scalar_phi)[j][qp], 0);
+              LMMixed(i_offset + i, u_j_offset + j) -=
+                (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * phi);
+            }
+            {
+              const Gradient phi(0, (*scalar_phi)[j][qp]);
+              LMMixed(i_offset + i, v_j_offset + j) -=
+                (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * phi);
+            }
+          }
+    }
 
+  void pressure_face_residual(const unsigned int i_offset,
+                              const std::vector<Number> & lm_u_sol,
+                              const std::vector<Number> & lm_v_sol)
+    {
+      for (const auto qp : make_range(qface->n_points()))
+      {
+        const Gradient vel(lm_u_sol[qp], lm_v_sol[qp]);
+        const auto vdotn = vel * (*normals)[qp];
+        for (const auto i : make_range(p_n_dofs))
+          LMVec(i_offset + i) += vdotn * (*scalar_phi_face)[i][qp];
+      }
+    }
+
+  void pressure_face_jacobian(const unsigned int i_offset,
+                              const unsigned int lm_u_j_offset,
+                              const unsigned int lm_v_j_offset)
+    {
+      for (const auto qp : make_range(qface->n_points()))
+        for (const auto i : make_range(p_n_dofs))
+          for (const auto j : make_range(lm_n_dofs))
+          {
+            {
+              const Gradient phi((*lm_phi_face)[j][qp], 0);
+              LMMat(i_offset + i, lm_u_j_offset + j) += phi * (*normals)[qp]  * (*scalar_phi_face)[i][qp];
+            }
+            {
+              const Gradient phi(0, (*lm_phi_face)[j][qp]);
+              LMMat(i_offset + i, lm_v_j_offset + j) += phi * (*normals)[qp]  * (*scalar_phi_face)[i][qp];
+            }
+          }
+    }
+
+  void pressure_dirichlet_residual(const unsigned int i_offset,
+                                   const RealVectorValue & dirichlet_velocity)
+    {
+      for (const auto qp : make_range(qface->n_points()))
+      {
+        const auto vdotn = dirichlet_velocity * (*normals)[qp];
+        for (const auto i : make_range(p_n_dofs))
+          LMVec(i_offset + i) += vdotn * (*scalar_phi_face)[i][qp];
+      }
+    }
+
+  void vector_dirichlet_residual(const unsigned int i_offset, const Real scalar_value)
+  {
+    for (const auto qp : make_range(qface->n_points()))
       // External boundary -> Dirichlet faces -> Vector equation RHS
       for (const auto i : make_range(vector_n_dofs))
         MixedVec(i_offset + i) -=
             (*JxW_face)[qp] * ((*vector_phi_face)[i][qp] * (*normals)[qp]) * scalar_value;
-    }
   }
 
   void vector_face_residual(const unsigned int i_offset, const std::vector<Number> & lm_sol)
@@ -373,24 +435,13 @@ private:
   void scalar_dirichlet_residual(const unsigned int i_offset,
                                  const std::vector<Gradient> & vector_sol,
                                  const std::vector<Number> & scalar_sol,
-                                 const unsigned int vel_component)
+                                 const unsigned int vel_component,
+                                 const Real scalar_value)
   {
-    const auto dim = mesh->mesh_dimension();
     for (const auto qp : make_range(qface->n_points()))
     {
       Gradient qp_p;
       qp_p(vel_component) = p_sol[qp];
-
-      const Real xf = (*qface_point)[qp](0);
-      const Real yf = (*qface_point)[qp](1);
-      const Real zf = (*qface_point)[qp](2);
-
-      // The boundary value for scalar field.
-      Real scalar_value = 0;
-      if (dim == 2)
-        scalar_value = MixedExactSolution().scalar(xf, yf);
-      else if (dim == 3)
-        scalar_value = MixedExactSolution().scalar(xf, yf, zf);
 
       for (const auto i : make_range(scalar_n_dofs))
       {
@@ -440,6 +491,42 @@ private:
           MixedMat(i_offset + i, scalar_j_offset + j) +=
               (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * (*scalar_phi_face)[j][qp] *
               (*normals)[qp] * (*normals)[qp];
+      }
+  }
+
+  void scalar_outlet_residual(const unsigned int i_offset,
+                              const std::vector<Number> & scalar_sol,
+                              const std::vector<Number> & lm_sol)
+  {
+    for (const auto qp : make_range(qface->n_points()))
+      for (const auto i : make_range(scalar_n_dofs))
+      {
+        // scalar
+        MixedVec(i_offset + i) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau *
+                                  scalar_sol[qp] * (*normals)[qp] * (*normals)[qp];
+
+        // lm
+        MixedVec(i_offset + i) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * lm_sol[qp] *
+                                  (*normals)[qp] * (*normals)[qp];
+      }
+  }
+
+  void scalar_outlet_jacobian(const unsigned int i_offset,
+                              const unsigned int scalar_j_offset,
+                              const unsigned int lm_j_offset)
+  {
+    for (const auto qp : make_range(qface->n_points()))
+      for (const auto i : make_range(scalar_n_dofs))
+      {
+        for (const auto j : make_range(scalar_n_dofs))
+          MixedMat(i_offset + i, scalar_j_offset + j) +=
+              (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * (*scalar_phi_face)[j][qp] *
+              (*normals)[qp] * (*normals)[qp];
+
+        for (const auto j : make_range(lm_n_dofs))
+          MixedLM(i_offset + i, lm_j_offset + j) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] *
+                                                    tau * (*lm_phi_face)[j][qp] * (*normals)[qp] *
+                                                    (*normals)[qp];
       }
   }
 
@@ -507,6 +594,42 @@ private:
           MixedLM(i_offset + i, lm_j_offset + j) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] *
                                                     tau * (*lm_phi_face)[j][qp] * (*normals)[qp] *
                                                     (*normals)[qp];
+      }
+  }
+
+  void lm_outlet_residual(const unsigned int i_offset,
+                          const std::vector<Number> & scalar_sol,
+                          const std::vector<Number> & lm_sol)
+  {
+    for (const auto qp : make_range(qface->n_points()))
+      for (const auto i : make_range(lm_n_dofs))
+      {
+        // scalar
+        LMVec(i_offset + i) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau * scalar_sol[qp] *
+                               (*normals)[qp] * (*normals)[qp];
+
+        // lm
+        LMVec(i_offset + i) -= (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau * lm_sol[qp] *
+                               (*normals)[qp] * (*normals)[qp];
+      }
+  }
+
+  void lm_outlet_jacobian(const unsigned int i_offset,
+                          const unsigned int scalar_j_offset,
+                          const unsigned int lm_j_offset)
+  {
+    for (const auto qp : make_range(qface->n_points()))
+      for (const auto i : make_range(lm_n_dofs))
+      {
+        for (const auto j : make_range(scalar_n_dofs))
+          LMMixed(i_offset + i, scalar_j_offset + j) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] *
+                                                        tau * (*scalar_phi_face)[j][qp] *
+                                                        (*normals)[qp] * (*normals)[qp];
+
+        for (const auto j : make_range(lm_n_dofs))
+          LMMat(i_offset + i, lm_j_offset + j) -= (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau *
+                                                  (*lm_phi_face)[j][qp] * (*normals)[qp] *
+                                                  (*normals)[qp];
       }
   }
 
@@ -578,13 +701,16 @@ private:
   void assemble(const bool lm_solve)
   {
     auto & lm_soln_vector = lm_solve ? *lm_system->current_local_solution : *ghosted_old_solution;
-    const auto u_num = mixed_system->variable_number("u");
-    const auto v_num = mixed_system->variable_number("v");
+    const auto u_num = mixed_system->variable_number("vel_x");
+    const auto v_num = mixed_system->variable_number("vel_y");
     const auto qu_num = mixed_system->variable_number("qu");
     const auto qv_num = mixed_system->variable_number("qv");
     const auto lm_u_num = lm_system->variable_number("lm_u");
     const auto lm_v_num = lm_system->variable_number("lm_v");
     const auto p_num = lm_system->variable_number("pressure");
+
+    std::vector<boundary_id_type> boundary_ids;
+    const auto & boundary_info = mesh->get_boundary_info();
 
     for (const auto & elem : mesh->active_local_element_ptr_range())
     {
@@ -601,6 +727,7 @@ private:
       scalar_n_dofs = u_dof_indices.size();
       lm_n_dofs = lm_u_dof_indices.size();
       p_n_dofs = p_dof_indices.size();
+      libmesh_assert(p_n_dofs == scalar_n_dofs);
 
       // Reinit our volume FE objects
       vector_fe->reinit(elem);
@@ -654,18 +781,13 @@ private:
       vector_volume_jacobian(vector_n_dofs + scalar_n_dofs,
                              vector_n_dofs + scalar_n_dofs,
                              2 * vector_n_dofs + scalar_n_dofs);
-      scalar_volume_jacobian(2 * vector_n_dofs + scalar_n_dofs,
-                             vector_n_dofs + scalar_n_dofs,
-                             2 * lm_n_dofs,
-                             1);
+      scalar_volume_jacobian(
+          2 * vector_n_dofs + scalar_n_dofs, vector_n_dofs + scalar_n_dofs, 2 * lm_n_dofs, 1);
 
-      // temporary p
-      create_identity_residual(*qrule, *JxW, *scalar_phi, p_sol, p_n_dofs, 2 * lm_n_dofs);
-      create_identity_jacobian(*qrule, *JxW, *scalar_phi, p_n_dofs, 2 * lm_n_dofs);
+      // p
+      pressure_volume_residual(2 * lm_n_dofs, u_sol, v_sol);
+      pressure_volume_jacobian(2 * lm_n_dofs, vector_n_dofs, 2 * vector_n_dofs + scalar_n_dofs);
 
-
-      // At the beginning of the loop, we mark that we haven't found our "Single-Face" yet
-      bool tau_found = false;
       for (auto side : elem->side_index_range())
       {
         // Reinit our face FE objects
@@ -684,25 +806,68 @@ private:
 
         if (elem->neighbor_ptr(side) == nullptr)
         {
-          // qu, u, lm_u
-          vector_dirichlet_residual(0);
-          scalar_dirichlet_residual(vector_n_dofs, qu_sol, u_sol, 0);
-          scalar_dirichlet_jacobian(vector_n_dofs, 0, vector_n_dofs, 2 * lm_n_dofs, 0);
-          // qv, v, lm_v
-          vector_dirichlet_residual(vector_n_dofs + scalar_n_dofs);
-          scalar_dirichlet_residual(2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, 1);
-          scalar_dirichlet_jacobian(2 * vector_n_dofs + scalar_n_dofs,
-                                    vector_n_dofs + scalar_n_dofs,
-                                    2 * vector_n_dofs + scalar_n_dofs,
-                                    2 * lm_n_dofs,
-                                    1);
+          boundary_info.boundary_ids(elem, side, boundary_ids);
+          libmesh_assert(boundary_ids.size() == 1);
+          const auto bnd_id = boundary_ids[0];
+          if (bnd_id != right_bnd)
+          {
+            const auto dirichlet_velocity = [bnd_id, this]()
+            {
+              if (bnd_id == left_bnd)
+                return RealVectorValue(1, 0);
+              else
+                return RealVectorValue(0, 0);
+            }();
 
-          create_identity_residual(*qface, *JxW_face, *lm_phi_face, lm_u_sol, lm_n_dofs, 0);
-          create_identity_residual(*qface, *JxW_face, *lm_phi_face, lm_v_sol, lm_n_dofs, lm_n_dofs);
-          create_identity_jacobian(*qface, *JxW_face, *lm_phi_face, lm_n_dofs, 0);
-          create_identity_jacobian(*qface, *JxW_face, *lm_phi_face, lm_n_dofs, lm_n_dofs);
+            // qu, u, lm_u
+            vector_dirichlet_residual(0, dirichlet_velocity(0));
+            scalar_dirichlet_residual(vector_n_dofs, qu_sol, u_sol, 0, dirichlet_velocity(0));
+            scalar_dirichlet_jacobian(vector_n_dofs, 0, vector_n_dofs, 2 * lm_n_dofs, 0);
+
+            // qv, v, lm_v
+            vector_dirichlet_residual(vector_n_dofs + scalar_n_dofs, dirichlet_velocity(1));
+            scalar_dirichlet_residual(
+                2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, 1, dirichlet_velocity(1));
+            scalar_dirichlet_jacobian(2 * vector_n_dofs + scalar_n_dofs,
+                                      vector_n_dofs + scalar_n_dofs,
+                                      2 * vector_n_dofs + scalar_n_dofs,
+                                      2 * lm_n_dofs,
+                                      1);
+
+            // p
+            pressure_dirichlet_residual(2 * lm_n_dofs, dirichlet_velocity);
+
+            // Set the LMs on these Dirichlet boundary faces to 0
+            create_identity_residual(*qface, *JxW_face, *lm_phi_face, lm_u_sol, lm_n_dofs, 0);
+            create_identity_residual(
+                *qface, *JxW_face, *lm_phi_face, lm_v_sol, lm_n_dofs, lm_n_dofs);
+            create_identity_jacobian(*qface, *JxW_face, *lm_phi_face, lm_n_dofs, 0);
+            create_identity_jacobian(*qface, *JxW_face, *lm_phi_face, lm_n_dofs, lm_n_dofs);
+          }
+          else // this is the outlet boundary with an implicit condition on the velocities
+          {
+            // qu, u, lm_u
+            vector_face_residual(0, lm_u_sol);
+            vector_face_jacobian(0, 0);
+            scalar_outlet_residual(vector_n_dofs, u_sol, lm_u_sol);
+            scalar_outlet_jacobian(vector_n_dofs, vector_n_dofs, 0);
+            lm_outlet_residual(0, u_sol, lm_u_sol);
+            lm_outlet_jacobian(0, vector_n_dofs, 0);
+
+            // qv, v, lm_v
+            vector_face_residual(vector_n_dofs + scalar_n_dofs, lm_v_sol);
+            vector_face_jacobian(vector_n_dofs + scalar_n_dofs, lm_n_dofs);
+            scalar_outlet_residual(2 * vector_n_dofs + scalar_n_dofs, v_sol, lm_v_sol);
+            scalar_outlet_jacobian(2 * vector_n_dofs + scalar_n_dofs, 2 * vector_n_dofs + scalar_n_dofs, lm_n_dofs);
+            lm_outlet_residual(lm_n_dofs, v_sol, lm_v_sol);
+            lm_outlet_jacobian(lm_n_dofs, 2 * vector_n_dofs + scalar_n_dofs, lm_n_dofs);
+
+            // p
+            pressure_face_residual(2 * lm_n_dofs, lm_u_sol, lm_v_sol);
+            pressure_face_jacobian(2 * lm_n_dofs, 0, lm_n_dofs);
+          }
         }
-        else
+        else // we are on an internal face
         {
           // qu, u, lm_u
           vector_face_residual(0, lm_u_sol);
@@ -729,6 +894,10 @@ private:
                            lm_n_dofs,
                            2 * lm_n_dofs,
                            1);
+
+          // p
+          pressure_face_residual(2 * lm_n_dofs, lm_u_sol, lm_v_sol);
+          pressure_face_jacobian(2 * lm_n_dofs, 0, lm_n_dofs);
         }
       }
 
@@ -898,8 +1067,8 @@ main(int argc, char ** argv)
   infile.parse_command_line(argc, argv);
 
   // Read in parameters from the command line and the input file.
-  const unsigned int dimension = infile("dim", 2);
-  const unsigned int grid_size = infile("grid_size", 15);
+  const unsigned int dimension = 2;
+  const unsigned int grid_size = infile("grid_size", 2);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build.
   libmesh_example_requires(dimension <= LIBMESH_DIM, dimension << "D support");
@@ -910,35 +1079,17 @@ main(int argc, char ** argv)
 
   // Use the MeshTools::Generation mesh generator to create a uniform
   // grid on the cube [-1,1]^D. To accomodate first order side hierarchics, we must
-  // use TRI6/7 or QUAD8/9 elements in 2d, or TET14 or HEX27 in 3d.
+  // use TRI6/7 elements
   const std::string elem_str = infile("element_type", std::string("TRI6"));
 
-  libmesh_error_msg_if((dimension == 2 && elem_str != "TRI6" && elem_str != "TRI7" &&
-                        elem_str != "QUAD8" && elem_str != "QUAD9") ||
-                           (dimension == 3 && elem_str != "TET14" && elem_str != "HEX27"),
+  libmesh_error_msg_if(elem_str != "TRI6" && elem_str != "TRI7",
                        "You selected "
                            << elem_str
                            << " but this example must be run with TRI6, TRI7, QUAD8, or QUAD9 in 2d"
                            << " or with TET14, or HEX27 in 3d.");
 
-  if (dimension == 2)
-    MeshTools::Generation::build_square(
-        mesh, grid_size, grid_size, -1., 1., -1., 1., Utility::string_to_enum<ElemType>(elem_str));
-  else if (dimension == 3)
-    MeshTools::Generation::build_cube(mesh,
-                                      grid_size,
-                                      grid_size,
-                                      grid_size,
-                                      -1.,
-                                      1.,
-                                      -1.,
-                                      1.,
-                                      -1.,
-                                      1.,
-                                      Utility::string_to_enum<ElemType>(elem_str));
-
-  // Make sure the code is robust against nodal reorderings.
-  MeshTools::Modification::permute_elements(mesh);
+  MeshTools::Generation::build_square(
+      mesh, 5 * grid_size, grid_size, 0., 10., -1, 1., Utility::string_to_enum<ElemType>(elem_str));
 
   // Create an equation systems object.
   EquationSystems equation_systems(mesh);
@@ -952,8 +1103,8 @@ main(int argc, char ** argv)
   // Adds the velocity variables and their gradients
   system.add_variable("qu", FIRST, L2_LAGRANGE_VEC);
   system.add_variable("qv", FIRST, L2_LAGRANGE_VEC);
-  system.add_variable("u", FIRST, L2_LAGRANGE);
-  system.add_variable("v", FIRST, L2_LAGRANGE);
+  system.add_variable("vel_x", FIRST, L2_LAGRANGE);
+  system.add_variable("vel_y", FIRST, L2_LAGRANGE);
 
   // Add our Lagrange multiplier to the implicit system
   lm_system.add_variable("lm_u", FIRST, SIDE_HIERARCHIC);
@@ -997,53 +1148,60 @@ main(int argc, char ** argv)
   // Solve the implicit system for the Lagrange multiplier
   lm_system.solve();
 
-  //
-  // Now we will compute our solution approximation errors
-  //
+  // //
+  // // Now we will compute our solution approximation errors
+  // //
 
-  ExactSolution exact_sol(equation_systems);
+  // ExactSolution exact_sol(equation_systems);
 
-  if (dimension == 2)
-  {
-    SolutionFunction<2> soln_func;
-    SolutionGradient<2> soln_grad;
+  // if (dimension == 2)
+  // {
+  //   SolutionFunction<2> soln_func;
+  //   SolutionGradient<2> soln_grad;
 
-    // Build FunctionBase* containers to attach to the ExactSolution object.
-    std::vector<FunctionBase<Number> *> sols(1, &soln_func);
-    std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
+  //   // Build FunctionBase* containers to attach to the ExactSolution object.
+  //   std::vector<FunctionBase<Number> *> sols(1, &soln_func);
+  //   std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
 
-    exact_sol.attach_exact_values(sols);
-    exact_sol.attach_exact_derivs(grads);
-  }
-  else if (dimension == 3)
-  {
-    SolutionFunction<3> soln_func;
-    SolutionGradient<3> soln_grad;
+  //   exact_sol.attach_exact_values(sols);
+  //   exact_sol.attach_exact_derivs(grads);
+  // }
+  // else if (dimension == 3)
+  // {
+  //   SolutionFunction<3> soln_func;
+  //   SolutionGradient<3> soln_grad;
 
-    // Build FunctionBase* containers to attach to the ExactSolution object.
-    std::vector<FunctionBase<Number> *> sols(1, &soln_func);
-    std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
+  //   // Build FunctionBase* containers to attach to the ExactSolution object.
+  //   std::vector<FunctionBase<Number> *> sols(1, &soln_func);
+  //   std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
 
-    exact_sol.attach_exact_values(sols);
-    exact_sol.attach_exact_derivs(grads);
-  }
+  //   exact_sol.attach_exact_values(sols);
+  //   exact_sol.attach_exact_derivs(grads);
+  // }
 
-  // Use higher quadrature order for more accurate error results.
-  int extra_error_quadrature = infile("extra_error_quadrature", 2);
-  if (extra_error_quadrature)
-    exact_sol.extra_quadrature_order(extra_error_quadrature);
+  // // Use higher quadrature order for more accurate error results.
+  // int extra_error_quadrature = infile("extra_error_quadrature", 2);
+  // if (extra_error_quadrature)
+  //   exact_sol.extra_quadrature_order(extra_error_quadrature);
 
-  // Compute the error.
-  exact_sol.compute_error("Mixed", "qu");
-  exact_sol.compute_error("Mixed", "u");
-  exact_sol.compute_error("Mixed", "qv");
-  exact_sol.compute_error("Mixed", "v");
+  // // Compute the error.
+  // exact_sol.compute_error("Mixed", "qu");
+  // exact_sol.compute_error("Mixed", "u");
+  // exact_sol.compute_error("Mixed", "qv");
+  // exact_sol.compute_error("Mixed", "v");
 
-  // Print out the error values.
-  libMesh::out << "L2 error for qu is: " << exact_sol.l2_error("Mixed", "qu") << std::endl;
-  libMesh::out << "L2 error for u is: " << exact_sol.l2_error("Mixed", "u") << std::endl;
-  libMesh::out << "L2 error for qv is: " << exact_sol.l2_error("Mixed", "qv") << std::endl;
-  libMesh::out << "L2 error for v is: " << exact_sol.l2_error("Mixed", "v") << std::endl;
+  // // Print out the error values.
+  // libMesh::out << "L2 error for qu is: " << exact_sol.l2_error("Mixed", "qu") << std::endl;
+  // libMesh::out << "L2 error for u is: " << exact_sol.l2_error("Mixed", "u") << std::endl;
+  // libMesh::out << "L2 error for qv is: " << exact_sol.l2_error("Mixed", "qv") << std::endl;
+  // libMesh::out << "L2 error for v is: " << exact_sol.l2_error("Mixed", "v") << std::endl;
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+
+  // We write the file in the ExodusII format.
+  ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
+
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // All done.
   return 0;
