@@ -148,6 +148,10 @@ public:
   NumericVector<Number> * ghosted_old_solution;
   SparseMatrix<Number> * J;
   NumericVector<Number> * residual;
+  boundary_id_type left_bnd;
+  boundary_id_type top_bnd;
+  boundary_id_type right_bnd;
+  boundary_id_type bottom_bnd;
 
   void init()
   {
@@ -175,6 +179,16 @@ public:
     JxW_face = &vector_fe_face->get_JxW();
     qface_point = &vector_fe_face->get_xyz();
     normals = &vector_fe_face->get_normals();
+
+    const auto & bnd_info = mesh->get_boundary_info();
+    left_bnd = bnd_info.get_id_by_name("left");
+    top_bnd = bnd_info.get_id_by_name("top");
+    right_bnd = bnd_info.get_id_by_name("right");
+    bottom_bnd = bnd_info.get_id_by_name("bottom");
+    libmesh_assert(left_bnd != BoundaryInfo::invalid_id);
+    libmesh_assert(top_bnd != BoundaryInfo::invalid_id);
+    libmesh_assert(right_bnd != BoundaryInfo::invalid_id);
+    libmesh_assert(bottom_bnd != BoundaryInfo::invalid_id);
   }
 
   virtual void residual_and_jacobian(const NumericVector<Number> & /*X*/,
@@ -372,6 +386,79 @@ private:
           MixedLM(i_offset + i, lm_j_offset + j) -= (*JxW_face)[qp] *
                                                     ((*vector_phi_face)[i][qp] * (*normals)[qp]) *
                                                     (*lm_phi_face)[j][qp];
+  }
+
+  void scalar_dirichlet_residual(const unsigned int i_offset,
+                                 const std::vector<Gradient> & vector_sol,
+                                 const std::vector<Number> & scalar_sol,
+                                 const unsigned int vel_component)
+  {
+    const auto dim = mesh->mesh_dimension();
+    for (const auto qp : make_range(qface->n_points()))
+    {
+      Gradient qp_p;
+      qp_p(vel_component) = p_sol[qp];
+
+      const Real xf = (*qface_point)[qp](0);
+      const Real yf = (*qface_point)[qp](1);
+      const Real zf = (*qface_point)[qp](2);
+
+      // The boundary value for scalar field.
+      Real scalar_value = 0;
+      if (dim == 2)
+        scalar_value = MixedExactSolution().scalar(xf, yf);
+      else if (dim == 3)
+        scalar_value = MixedExactSolution().scalar(xf, yf, zf);
+
+      for (const auto i : make_range(scalar_n_dofs))
+      {
+        // vector
+        MixedVec(i_offset + i) -=
+            (*JxW_face)[qp] * mu * (*scalar_phi_face)[i][qp] * (vector_sol[qp] * (*normals)[qp]);
+
+        // pressure
+        MixedVec(i_offset + i) +=
+            (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * (qp_p * (*normals)[qp]);
+
+        // scalar
+        MixedVec(i_offset + i) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau *
+                                  scalar_sol[qp] * (*normals)[qp] * (*normals)[qp];
+
+        // dirichlet
+        MixedVec(i_offset + i) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * scalar_value *
+                                  (*normals)[qp] * (*normals)[qp];
+      }
+    }
+  }
+
+  void scalar_dirichlet_jacobian(const unsigned int i_offset,
+                                 const unsigned int vector_j_offset,
+                                 const unsigned int scalar_j_offset,
+                                 const unsigned int p_j_offset,
+                                 const unsigned int vel_component)
+  {
+    for (const auto qp : make_range(qface->n_points()))
+      for (const auto i : make_range(scalar_n_dofs))
+      {
+        for (const auto j : make_range(vector_n_dofs))
+          MixedMat(i_offset + i, vector_j_offset + j) -=
+              (*JxW_face)[qp] * mu * (*scalar_phi_face)[i][qp] *
+              ((*vector_phi_face)[j][qp] * (*normals)[qp]);
+
+        for (const auto j : make_range(p_n_dofs))
+        {
+          Gradient p_phi;
+          p_phi(vel_component) = (*scalar_phi_face)[j][qp];
+          // pressure
+          MixedLM(i_offset + i, p_j_offset + j) +=
+              (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * (p_phi * (*normals)[qp]);
+        }
+
+        for (const auto j : make_range(scalar_n_dofs))
+          MixedMat(i_offset + i, scalar_j_offset + j) +=
+              (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * (*scalar_phi_face)[j][qp] *
+              (*normals)[qp] * (*normals)[qp];
+      }
   }
 
   void scalar_face_residual(const unsigned int i_offset,
@@ -619,17 +706,16 @@ private:
         {
           // qu, u, lm_u
           vector_dirichlet_residual(0);
-          scalar_face_residual(vector_n_dofs, qu_sol, u_sol, lm_u_sol, 0);
-          scalar_face_jacobian(vector_n_dofs, 0, vector_n_dofs, 0, 2 * lm_n_dofs, 0);
+          scalar_dirichlet_residual(vector_n_dofs, qu_sol, u_sol, 0);
+          scalar_dirichlet_jacobian(vector_n_dofs, 0, vector_n_dofs, 2 * lm_n_dofs, 0);
           // qv, v, lm_v
           vector_dirichlet_residual(vector_n_dofs + scalar_n_dofs);
-          scalar_face_residual(2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, lm_v_sol, 1);
-          scalar_face_jacobian(2 * vector_n_dofs + scalar_n_dofs,
-                               vector_n_dofs + scalar_n_dofs,
-                               2 * vector_n_dofs + scalar_n_dofs,
-                               lm_n_dofs,
-                               2 * lm_n_dofs,
-                               1);
+          scalar_dirichlet_residual(2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, 1);
+          scalar_dirichlet_jacobian(2 * vector_n_dofs + scalar_n_dofs,
+                                    vector_n_dofs + scalar_n_dofs,
+                                    2 * vector_n_dofs + scalar_n_dofs,
+                                    2 * lm_n_dofs,
+                                    1);
 
           create_identity_residual(*qface, *JxW_face, *lm_phi_face, lm_u_sol, lm_n_dofs, 0);
           create_identity_residual(*qface, *JxW_face, *lm_phi_face, lm_v_sol, lm_n_dofs, lm_n_dofs);
