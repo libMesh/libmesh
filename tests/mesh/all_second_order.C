@@ -165,9 +165,56 @@ public:
       CPPUNIT_ASSERT_EQUAL(EDGE3, mesh.elem_ptr(e)->type());
   }
 
+  template <typename ConversionFunc>
+  static void MixedFixingImpl(MeshBase & mesh,
+                              ConversionFunc & conv,
+                              dof_id_type expected_n_elem,
+                              dof_id_type expected_n_nodes,
+                              ElemType expected_type)
+  {
+    // Convert elements to higher-order, but do so a few at a time,
+    // leaving a broken mesh after initial conversions to see if it
+    // will be properly fixed by subsequent conversions.
+
+    // Keep element ids from being renumbered (DistributedMesh will do
+    // this to get contiguous ranges) so we don't miss any elements
+    // when we're making our ranges by id.
+    mesh.allow_renumbering(false);
+
+    // This test loop is O(N^2), because conversions can invalidate
+    // iterators so we have to start over each time, but N is like 27
+    // so we're okay.
+    for (dof_id_type start_elem_id : make_range(mesh.max_elem_id()))
+      {
+        auto range_start = mesh.elements_begin();
+        const auto end = mesh.elements_end();
+        while (range_start != end && (*range_start)->id() < start_elem_id)
+          ++range_start;
+        auto range_end = range_start;
+        while (range_end != end && (*range_end)->id() < start_elem_id+1+start_elem_id%2)
+          ++range_end;
+
+        conv({range_start, range_end});
+      }
+
+    // Make sure we still have the expected total number of elements
+    CPPUNIT_ASSERT_EQUAL(expected_n_elem, mesh.n_elem());
+
+    // Make sure we have the correct number of nodes, 7*7
+    CPPUNIT_ASSERT_EQUAL(expected_n_nodes, mesh.n_nodes());
+
+    // Make sure that the elements are now upgraded
+    for (const auto & elem : mesh.element_ptr_range())
+      CPPUNIT_ASSERT_EQUAL(expected_type, elem->type());
+  }
+
   void allSecondOrderMixedFixing()
   {
     Mesh mesh(*TestCommWorld);
+
+    // Disallow renumbering so we're doing the same thing on any
+    // distributed mesh partitioning
+    mesh.allow_renumbering(false);
 
     // Construct a multi-element Quad4 mesh
     MeshTools::Generation::build_square(mesh,
@@ -176,30 +223,11 @@ public:
                                         /*ymin=*/0., /*ymax=*/1.,
                                         /*elem_type=*/QUAD4);
 
-    // Convert elements to SECOND-order, but do so a few at a time,
-    // leaving a broken mesh after initial conversions to see if it
-    // will be fixed by subsequent conversions.
-    int flipcnt = 0;
-    for (auto it = mesh.elements_begin(), end = mesh.elements_end(); it != end; ++it)
-      {
-        auto range_start = it, range_end = it;
-        ++range_end;
-        if (flipcnt++%2 && range_end != end)
-          ++range_end;
+    auto conversion = [&mesh](const SimpleRange<MeshBase::element_iterator> & range) {
+      mesh.all_second_order_range(range, /*full_ordered=*/true);
+    };
 
-        mesh.all_second_order_range({range_start, range_end},
-                                    /*full_ordered=*/true);
-      }
-
-    // Make sure we still have the expected total number of elements
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(9), mesh.n_elem());
-
-    // Make sure we have the correct number of nodes, 7*7
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(49), mesh.n_nodes());
-
-    // Make sure that the elements are now upgraded
-    for (const auto & elem : mesh.element_ptr_range())
-      CPPUNIT_ASSERT_EQUAL(QUAD9, elem->type());
+    MixedFixingImpl(mesh, conversion, 3*3, 7*7, QUAD9);
   }
 
   void allSecondOrderMixedFixing3D()
@@ -214,30 +242,11 @@ public:
                                       /*zmin=*/0., /*zmax=*/1.,
                                       /*elem_type=*/HEX8);
 
-    // Convert elements to SECOND-order, but do so a few at a time,
-    // leaving a broken mesh after initial conversions to see if it
-    // will be fixed by subsequent conversions.
-    int flipcnt = 0;
-    for (auto it = mesh.elements_begin(), end = mesh.elements_end(); it != end; ++it)
-      {
-        auto range_start = it, range_end = it;
-        ++range_end;
-        if (flipcnt++%2 && range_end != end)
-          ++range_end;
+    auto conversion = [&mesh](const SimpleRange<MeshBase::element_iterator> & range) {
+      mesh.all_second_order_range(range, /*full_ordered=*/true);
+    };
 
-        mesh.all_second_order_range({range_start, range_end},
-                                    /*full_ordered=*/true);
-      }
-
-    // Make sure we still have the expected total number of elements
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(27), mesh.n_elem());
-
-    // Make sure we have the correct number of nodes, 7*7*7
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(343), mesh.n_nodes());
-
-    // Make sure that the elements are now upgraded
-    for (const auto & elem : mesh.element_ptr_range())
-      CPPUNIT_ASSERT_EQUAL(HEX27, elem->type());
+    MixedFixingImpl(mesh, conversion, 3*3*3, 7*7*7, HEX27);
   }
 
 
@@ -377,29 +386,11 @@ public:
                                         /*ymin=*/0., /*ymax=*/1.,
                                         /*elem_type=*/TRI3);
 
-    // Convert elements to "complete"-order, but do so a few at a time,
-    // leaving a broken mesh after initial conversions to see if it
-    // will be fixed by subsequent conversions.
-    int flipcnt = 0;
-    for (auto it = mesh.elements_begin(), end = mesh.elements_end(); it != end; ++it)
-      {
-        auto range_start = it, range_end = it;
-        ++range_end;
-        if (flipcnt++%2 && range_end != end)
-          ++range_end;
+    auto conversion = [&mesh](const SimpleRange<MeshBase::element_iterator> & range) {
+      mesh.all_complete_order_range(range);
+    };
 
-        mesh.all_complete_order_range({range_start, range_end});
-      }
-
-    // Make sure we still have the expected total number of elements
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(18), mesh.n_elem());
-
-    // Make sure we have the correct number of nodes, 7*7+3*3*2
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(67), mesh.n_nodes());
-
-    // Make sure that the elements are now upgraded
-    for (const auto & elem : mesh.element_ptr_range())
-      CPPUNIT_ASSERT_EQUAL(TRI7, elem->type());
+    MixedFixingImpl(mesh, conversion, 3*3*2, 7*7+3*3*2, TRI7);
   }
 
   void allCompleteOrderMixedFixing3D()
@@ -414,29 +405,11 @@ public:
                                       /*zmin=*/0., /*zmax=*/1.,
                                       /*elem_type=*/PRISM6);
 
-    // Convert elements to "complete"-order, but do so a few at a time,
-    // leaving a broken mesh after initial conversions to see if it
-    // will be fixed by subsequent conversions.
-    int flipcnt = 0;
-    for (auto it = mesh.elements_begin(), end = mesh.elements_end(); it != end; ++it)
-      {
-        auto range_start = it, range_end = it;
-        ++range_end;
-        if (flipcnt++%2 && range_end != end)
-          ++range_end;
+    auto conversion = [&mesh](const SimpleRange<MeshBase::element_iterator> & range) {
+      mesh.all_complete_order_range(range);
+    };
 
-        mesh.all_complete_order_range({range_start, range_end});
-      }
-
-    // Make sure we still have the expected total number of elements
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(54), mesh.n_elem());
-
-    // Make sure we have the correct number of nodes, 7*7*7 + 3*3*2*7
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(469), mesh.n_nodes());
-
-    // Make sure that the elements are now upgraded
-    for (const auto & elem : mesh.element_ptr_range())
-      CPPUNIT_ASSERT_EQUAL(PRISM21, elem->type());
+    MixedFixingImpl(mesh, conversion, 3*3*3*2, 7*7*7+3*3*2*7, PRISM21);
   }
 
 
