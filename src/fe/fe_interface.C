@@ -2911,6 +2911,43 @@ unsigned int FEInterface::n_vec_dim (const MeshBase & mesh,
 
 
 
+
+bool
+FEInterface::is_hierarchic (const FEType & fe_type)
+{
+  switch (fe_type.family)
+    {
+    case HERMITE:
+    case HIERARCHIC:
+    case L2_HIERARCHIC:
+    case MONOMIAL:
+    case MONOMIAL_VEC:
+    case SIDE_HIERARCHIC:
+    case SZABAB:
+    case XYZ:
+      return true;
+
+    case BERNSTEIN:
+    case CLOUGH:  // maybe some day?
+    case LAGRANGE:
+    case LAGRANGE_VEC:
+    case L2_LAGRANGE:
+    case L2_LAGRANGE_VEC:
+    case NEDELEC_ONE:
+    case RATIONAL_BERNSTEIN:
+    case RAVIART_THOMAS:
+    case L2_RAVIART_THOMAS:
+    case SCALAR:
+    case SUBDIVISION:
+      return false;
+
+    default:
+      libmesh_error_msg("Unknown FE Family " << Utility::enum_to_string(fe_type.family));
+    }
+}
+
+
+
 FEContinuity FEInterface::get_continuity(const FEType & fe_type)
 {
   switch (fe_type.family)

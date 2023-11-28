@@ -21,6 +21,7 @@
 #include "libmesh_cppunit.h"
 
 #define FETEST                                  \
+  CPPUNIT_TEST( testFEInterface );              \
   CPPUNIT_TEST( testU );                        \
   CPPUNIT_TEST( testPartitionOfUnity );         \
   CPPUNIT_TEST( testGradU );                    \
@@ -650,6 +651,31 @@ public:
       }
     }
 
+
+  void testFEInterface()
+  {
+    LOG_UNIT_TEST;
+
+    // Handle the "more processors than elements" case
+    if (!this->_elem)
+      return;
+
+    this->_fe->reinit(this->_elem);
+
+    const FEType fe_type = this->_sys->variable_type(0);
+
+    CPPUNIT_ASSERT_EQUAL(
+      FEInterface::n_shape_functions(fe_type, this->_elem),
+      this->_fe->n_shape_functions());
+
+    CPPUNIT_ASSERT_EQUAL(
+      FEInterface::get_continuity(fe_type),
+      this->_fe->get_continuity());
+
+    CPPUNIT_ASSERT_EQUAL(
+      FEInterface::is_hierarchic(fe_type),
+      this->_fe->is_hierarchic());
+  }
 
   void testU()
   {
