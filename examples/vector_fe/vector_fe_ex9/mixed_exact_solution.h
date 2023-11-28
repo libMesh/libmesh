@@ -41,42 +41,42 @@ public:
 
   RealGradient operator() (Real x, Real y)
   {
-    const Real ux =  .5*pi*sin(.5*pi*x)*sin(.5*pi*y);
-    const Real uy = -.5*pi*cos(.5*pi*x)*cos(.5*pi*y);
+    const Real ux = -.5*pi*sin(.5*pi*x)*sin(.5*pi*y);
+    const Real uy =  .5*pi*cos(.5*pi*x)*cos(.5*pi*y);
 
     return RealGradient(ux, uy);
   }
 
   RealGradient operator() (Real x, Real y, Real z)
   {
-    const Real ux =  .5*pi*sin(.5*pi*x)*sin(.5*pi*y)*cos(.5*pi*z);
-    const Real uy = -.5*pi*cos(.5*pi*x)*cos(.5*pi*y)*cos(.5*pi*z);
-    const Real uz =  .5*pi*cos(.5*pi*x)*sin(.5*pi*y)*sin(.5*pi*z);
+    const Real ux = -.5*pi*sin(.5*pi*x)*sin(.5*pi*y)*cos(.5*pi*z);
+    const Real uy =  .5*pi*cos(.5*pi*x)*cos(.5*pi*y)*cos(.5*pi*z);
+    const Real uz = -.5*pi*cos(.5*pi*x)*sin(.5*pi*y)*sin(.5*pi*z);
 
     return RealGradient(ux, uy, uz);
   }
 
   RealTensor grad(Real x, Real y)
   {
-    const Real dux_dx = .5*pi*.5*pi*cos(.5*pi*x)*sin(.5*pi*y);
-    const Real dux_dy = .5*pi*.5*pi*sin(.5*pi*x)*cos(.5*pi*y);
-    const Real duy_dx = .5*pi*.5*pi*sin(.5*pi*x)*cos(.5*pi*y);
-    const Real duy_dy = .5*pi*.5*pi*cos(.5*pi*x)*sin(.5*pi*y);
+    const Real dux_dx = -.5*pi*.5*pi*cos(.5*pi*x)*sin(.5*pi*y);
+    const Real dux_dy = -.5*pi*.5*pi*sin(.5*pi*x)*cos(.5*pi*y);
+    const Real duy_dx = -.5*pi*.5*pi*sin(.5*pi*x)*cos(.5*pi*y);
+    const Real duy_dy = -.5*pi*.5*pi*cos(.5*pi*x)*sin(.5*pi*y);
 
     return RealTensor(dux_dx, dux_dy, Real(0), duy_dx, duy_dy);
   }
 
   RealTensor grad(Real x, Real y, Real z)
   {
-    const Real dux_dx =  .5*pi*.5*pi*cos(.5*pi*x)*sin(.5*pi*y)*cos(.5*pi*z);
-    const Real dux_dy =  .5*pi*.5*pi*sin(.5*pi*x)*cos(.5*pi*y)*cos(.5*pi*z);
-    const Real dux_dz = -.5*pi*.5*pi*sin(.5*pi*x)*sin(.5*pi*y)*sin(.5*pi*z);
-    const Real duy_dx =  .5*pi*.5*pi*sin(.5*pi*x)*cos(.5*pi*y)*cos(.5*pi*z);
-    const Real duy_dy =  .5*pi*.5*pi*cos(.5*pi*x)*sin(.5*pi*y)*cos(.5*pi*z);
-    const Real duy_dz =  .5*pi*.5*pi*cos(.5*pi*x)*cos(.5*pi*y)*sin(.5*pi*z);
-    const Real duz_dx = -.5*pi*.5*pi*sin(.5*pi*x)*sin(.5*pi*y)*sin(.5*pi*z);
-    const Real duz_dy =  .5*pi*.5*pi*cos(.5*pi*x)*cos(.5*pi*y)*sin(.5*pi*z);
-    const Real duz_dz =  .5*pi*.5*pi*cos(.5*pi*x)*sin(.5*pi*y)*cos(.5*pi*z);
+    const Real dux_dx = -.5*pi*.5*pi*cos(.5*pi*x)*sin(.5*pi*y)*cos(.5*pi*z);
+    const Real dux_dy = -.5*pi*.5*pi*sin(.5*pi*x)*cos(.5*pi*y)*cos(.5*pi*z);
+    const Real dux_dz =  .5*pi*.5*pi*sin(.5*pi*x)*sin(.5*pi*y)*sin(.5*pi*z);
+    const Real duy_dx = -.5*pi*.5*pi*sin(.5*pi*x)*cos(.5*pi*y)*cos(.5*pi*z);
+    const Real duy_dy = -.5*pi*.5*pi*cos(.5*pi*x)*sin(.5*pi*y)*cos(.5*pi*z);
+    const Real duy_dz = -.5*pi*.5*pi*cos(.5*pi*x)*cos(.5*pi*y)*sin(.5*pi*z);
+    const Real duz_dx =  .5*pi*.5*pi*sin(.5*pi*x)*sin(.5*pi*y)*sin(.5*pi*z);
+    const Real duz_dy = -.5*pi*.5*pi*cos(.5*pi*x)*cos(.5*pi*y)*sin(.5*pi*z);
+    const Real duz_dz = -.5*pi*.5*pi*cos(.5*pi*x)*sin(.5*pi*y)*cos(.5*pi*z);
 
     return RealTensor(dux_dx, dux_dy, dux_dz, duy_dx, duy_dy, duy_dz, duz_dx, duz_dy, duz_dz);
   }
