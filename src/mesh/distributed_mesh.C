@@ -788,6 +788,7 @@ void DistributedMesh::own_node (Node & n)
   libmesh_assert(_nodes[n.id()] == &n);
 
   _nodes[n.id()] = nullptr;
+  _n_nodes--;
 
   n.set_id(DofObject::invalid_id);
   n.processor_id() = this->processor_id();
