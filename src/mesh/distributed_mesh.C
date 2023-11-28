@@ -1048,10 +1048,9 @@ void DistributedMesh::redistribute ()
 
       this->update_parallel_id_counts();
 
-      // We probably had valid neighbors previously, so that a quality
-      // new partitioning could be found, but we might not have valid
-      // neighbor links on the newly-redistributed elements
-      this->find_neighbors();
+      // We ought to still have valid neighbor links; we communicate
+      // them for newly-redistributed elements
+      // this->find_neighbors();
 
       // Is this necessary?  If we are called from prepare_for_use(), this will be called
       // anyway... but users can always call partition directly, in which case we do need
