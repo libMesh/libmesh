@@ -83,19 +83,36 @@ namespace libMesh
 class NonlinearImplicitSystem;
 }
 
-class USoln
+class ExactSoln
+{
+public:
+  virtual Real operator()(const Point & p) const = 0;
+  virtual Real forcing(const Point & p) const = 0;
+
+};
+
+Number compute_error(const Point & p,
+                     const Parameters & params,
+                     const std::string & /*sys_name*/,
+                     const std::string & unknown_name)
+{
+  const auto * const error_obj = params.get<const ExactSoln *>(unknown_name + "_exact_sol");
+  return (*error_obj)(p);
+}
+
+class USoln : public ExactSoln
 {
 public:
   USoln(const Real mu_in) : mu(mu_in) {}
 
-  Real operator()(const Point & p) const
+  Real operator()(const Point & p) const override
   {
     const auto x = p(0);
     const auto y = p(1);
     return sin(1. / 2 * y * pi) * cos(1. / 2 * x * pi);
   }
 
-  Real forcing(const Point & p) const
+  Real forcing(const Point & p) const override
   {
     const auto x = p(0);
     const auto y = p(1);
@@ -107,19 +124,19 @@ private:
   const Real mu;
 };
 
-class VSoln
+class VSoln : public ExactSoln
 {
 public:
   VSoln(const Real mu_in) : mu(mu_in) {}
 
-  Real operator()(const Point & p) const
+  Real operator()(const Point & p) const override
   {
     const auto x = p(0);
     const auto y = p(1);
     return sin((1. / 4) * x * pi) * cos((1. / 2) * y * pi);
   }
 
-  Real forcing(const Point & p) const
+  Real forcing(const Point & p) const override
   {
     const auto x = p(0);
     const auto y = p(1);
@@ -131,19 +148,19 @@ private:
   const Real mu;
 };
 
-class PSoln
+class PSoln : public ExactSoln
 {
 public:
   PSoln() = default;
 
-  Real operator()(const Point & p) const
+  Real operator()(const Point & p) const override
   {
     const auto x = p(0);
     const auto y = p(1);
     return sin((3. / 2) * y * pi) * cos((1. / 4) * x * pi);
   }
 
-  Real forcing(const Point & p) const
+  Real forcing(const Point & p) const override
   {
     const auto x = p(0);
     const auto y = p(1);
@@ -205,6 +222,9 @@ public:
   boundary_id_type top_bnd;
   boundary_id_type right_bnd;
   boundary_id_type bottom_bnd;
+  const USoln u_true_soln;
+  const VSoln v_true_soln;
+  const PSoln p_true_soln;
 
   void init()
   {
@@ -1101,10 +1121,6 @@ private:
 
   // The viscosity
   static constexpr Real mu = 1;
-
-  const USoln u_true_soln;
-  const VSoln v_true_soln;
-  const PSoln p_true_soln;
 };
 
 int
@@ -1209,7 +1225,11 @@ main(int argc, char ** argv)
   // // Now we will compute our solution approximation errors
   // //
 
-  // ExactSolution exact_sol(equation_systems);
+  equation_systems.parameters.set<const ExactSoln *>("vel_x_exact_sol") = &hdg.u_true_soln;
+  equation_systems.parameters.set<const ExactSoln *>("vel_y_exact_sol") = &hdg.v_true_soln;
+  equation_systems.parameters.set<const ExactSoln *>("pressure_exact_sol") = &hdg.p_true_soln;
+  ExactSolution exact_sol(equation_systems);
+  exact_sol.attach_exact_value(&compute_error);
 
   // if (dimension == 2)
   // {
