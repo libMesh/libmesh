@@ -255,16 +255,19 @@ std::map<InfMapType, std::string> enum_to_inf_map_type =
 
 
 std::map<std::string, QuadratureType> quadrature_type_to_enum {
-   {"QCLOUGH"       , QCLOUGH},
-   {"QGAUSS"        , QGAUSS},
-   {"QGAUSS_LOBATTO", QGAUSS_LOBATTO},
-   {"QGRID"         , QGRID},
-   {"QJACOBI_1_0"   , QJACOBI_1_0},
-   {"QJACOBI_2_0"   , QJACOBI_2_0},
-   {"QMONOMIAL"     , QMONOMIAL},
-   {"QNODAL"        , QNODAL},
-   {"QSIMPSON"      , QSIMPSON},
-   {"QTRAP"         , QTRAP},
+   {"QCLOUGH"          , QCLOUGH},
+   {"QCOMPOSITE"       , QCOMPOSITE},
+   {"QCONICAL"         , QCONICAL},
+   {"QGAUSS"           , QGAUSS},
+   {"QGAUSS_LOBATTO"   , QGAUSS_LOBATTO},
+   {"QGRID"            , QGRID},
+   {"QGRUNDMANN_MOLLER", QGRUNDMANN_MOLLER},
+   {"QJACOBI_1_0"      , QJACOBI_1_0},
+   {"QJACOBI_2_0"      , QJACOBI_2_0},
+   {"QMONOMIAL"        , QMONOMIAL},
+   {"QNODAL"           , QNODAL},
+   {"QSIMPSON"         , QSIMPSON},
+   {"QTRAP"            , QTRAP}
   };
 
 std::map<QuadratureType, std::string> enum_to_quadrature_type =
