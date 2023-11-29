@@ -843,44 +843,62 @@ private:
                 *qface, *JxW_face, *lm_phi_face, lm_v_sol, lm_n_dofs, lm_n_dofs);
             create_identity_jacobian(*qface, *JxW_face, *lm_phi_face, lm_n_dofs, 0);
             create_identity_jacobian(*qface, *JxW_face, *lm_phi_face, lm_n_dofs, lm_n_dofs);
+          }
+          else // this is the outlet boundary with an implicit condition on the velocities
+          {
+            // qu, u, lm_u
+            vector_face_residual(0, lm_u_sol);
+            vector_face_jacobian(0, 0);
+            scalar_outlet_residual(vector_n_dofs, u_sol, lm_u_sol);
+            scalar_outlet_jacobian(vector_n_dofs, vector_n_dofs, 0);
+            lm_outlet_residual(0, u_sol, lm_u_sol);
+            lm_outlet_jacobian(0, vector_n_dofs, 0);
 
-            continue;
+            // qv, v, lm_v
+            vector_face_residual(vector_n_dofs + scalar_n_dofs, lm_v_sol);
+            vector_face_jacobian(vector_n_dofs + scalar_n_dofs, lm_n_dofs);
+            scalar_outlet_residual(2 * vector_n_dofs + scalar_n_dofs, v_sol, lm_v_sol);
+            scalar_outlet_jacobian(2 * vector_n_dofs + scalar_n_dofs, 2 * vector_n_dofs + scalar_n_dofs, lm_n_dofs);
+            lm_outlet_residual(lm_n_dofs, v_sol, lm_v_sol);
+            lm_outlet_jacobian(lm_n_dofs, 2 * vector_n_dofs + scalar_n_dofs, lm_n_dofs);
+
+            // p
+            pressure_face_residual(2 * lm_n_dofs, lm_u_sol, lm_v_sol);
+            pressure_face_jacobian(2 * lm_n_dofs, 0, lm_n_dofs);
           }
         }
+        else // we are on an internal face
+        {
+          // qu, u, lm_u
+          vector_face_residual(0, lm_u_sol);
+          vector_face_jacobian(0, 0);
+          scalar_face_residual(vector_n_dofs, qu_sol, u_sol, lm_u_sol, 0);
+          scalar_face_jacobian(vector_n_dofs, 0, vector_n_dofs, 0, 2 * lm_n_dofs, 0);
+          lm_face_residual(0, qu_sol, u_sol, lm_u_sol, 0);
+          lm_face_jacobian(0, 0, vector_n_dofs, 0, 2 * lm_n_dofs, 0);
 
-        //
-        // if we got here, then we are on an internal face or an outlet face
-        //
+          // qv, v, lm_v
+          vector_face_residual(vector_n_dofs + scalar_n_dofs, lm_v_sol);
+          vector_face_jacobian(vector_n_dofs + scalar_n_dofs, lm_n_dofs);
+          scalar_face_residual(2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, lm_v_sol, 1);
+          scalar_face_jacobian(2 * vector_n_dofs + scalar_n_dofs,
+                               vector_n_dofs + scalar_n_dofs,
+                               2 * vector_n_dofs + scalar_n_dofs,
+                               lm_n_dofs,
+                               2 * lm_n_dofs,
+                               1);
+          lm_face_residual(lm_n_dofs, qv_sol, v_sol, lm_v_sol, 1);
+          lm_face_jacobian(lm_n_dofs,
+                           vector_n_dofs + scalar_n_dofs,
+                           2 * vector_n_dofs + scalar_n_dofs,
+                           lm_n_dofs,
+                           2 * lm_n_dofs,
+                           1);
 
-        // qu, u, lm_u
-        vector_face_residual(0, lm_u_sol);
-        vector_face_jacobian(0, 0);
-        scalar_face_residual(vector_n_dofs, qu_sol, u_sol, lm_u_sol, 0);
-        scalar_face_jacobian(vector_n_dofs, 0, vector_n_dofs, 0, 2 * lm_n_dofs, 0);
-        lm_face_residual(0, qu_sol, u_sol, lm_u_sol, 0);
-        lm_face_jacobian(0, 0, vector_n_dofs, 0, 2 * lm_n_dofs, 0);
-
-        // qv, v, lm_v
-        vector_face_residual(vector_n_dofs + scalar_n_dofs, lm_v_sol);
-        vector_face_jacobian(vector_n_dofs + scalar_n_dofs, lm_n_dofs);
-        scalar_face_residual(2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, lm_v_sol, 1);
-        scalar_face_jacobian(2 * vector_n_dofs + scalar_n_dofs,
-                             vector_n_dofs + scalar_n_dofs,
-                             2 * vector_n_dofs + scalar_n_dofs,
-                             lm_n_dofs,
-                             2 * lm_n_dofs,
-                             1);
-        lm_face_residual(lm_n_dofs, qv_sol, v_sol, lm_v_sol, 1);
-        lm_face_jacobian(lm_n_dofs,
-                         vector_n_dofs + scalar_n_dofs,
-                         2 * vector_n_dofs + scalar_n_dofs,
-                         lm_n_dofs,
-                         2 * lm_n_dofs,
-                         1);
-
-        // p
-        pressure_face_residual(2 * lm_n_dofs, lm_u_sol, lm_v_sol);
-        pressure_face_jacobian(2 * lm_n_dofs, 0, lm_n_dofs);
+          // p
+          pressure_face_residual(2 * lm_n_dofs, lm_u_sol, lm_v_sol);
+          pressure_face_jacobian(2 * lm_n_dofs, 0, lm_n_dofs);
+        }
       }
 
       MixedMatInv = MixedMat.inverse();
