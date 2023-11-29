@@ -491,18 +491,16 @@ private:
   }
 
   RealVectorValue get_dirichlet_velocity(const unsigned int qp) const
-    {
-      if (mms)
-        return RealVectorValue
-          (u_true_soln((*qface_point)[qp]),
-           v_true_soln((*qface_point)[qp]));
+  {
+    if (mms)
+      return RealVectorValue(u_true_soln((*qface_point)[qp]), v_true_soln((*qface_point)[qp]));
 
-      if (current_bnd == left_bnd)
-        return RealVectorValue(1, 0);
+    if (current_bnd == left_bnd)
+      return RealVectorValue(1, 0);
 
-      else
-        return RealVectorValue(0, 0);
-    }
+    else
+      return RealVectorValue(0, 0);
+  }
 
   void pressure_dirichlet_residual(const unsigned int i_offset)
   {
@@ -611,42 +609,6 @@ private:
       }
   }
 
-  void scalar_outlet_residual(const unsigned int i_offset,
-                              const std::vector<Number> & scalar_sol,
-                              const std::vector<Number> & lm_sol)
-  {
-    for (const auto qp : make_range(qface->n_points()))
-      for (const auto i : make_range(scalar_n_dofs))
-      {
-        // scalar
-        MixedVec(i_offset + i) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau *
-                                  scalar_sol[qp] * (*normals)[qp] * (*normals)[qp];
-
-        // lm
-        MixedVec(i_offset + i) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * lm_sol[qp] *
-                                  (*normals)[qp] * (*normals)[qp];
-      }
-  }
-
-  void scalar_outlet_jacobian(const unsigned int i_offset,
-                              const unsigned int scalar_j_offset,
-                              const unsigned int lm_j_offset)
-  {
-    for (const auto qp : make_range(qface->n_points()))
-      for (const auto i : make_range(scalar_n_dofs))
-      {
-        for (const auto j : make_range(scalar_n_dofs))
-          MixedMat(i_offset + i, scalar_j_offset + j) +=
-              (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * (*scalar_phi_face)[j][qp] *
-              (*normals)[qp] * (*normals)[qp];
-
-        for (const auto j : make_range(lm_n_dofs))
-          MixedLM(i_offset + i, lm_j_offset + j) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] *
-                                                    tau * (*lm_phi_face)[j][qp] * (*normals)[qp] *
-                                                    (*normals)[qp];
-      }
-  }
-
   void scalar_face_residual(const unsigned int i_offset,
                             const std::vector<Gradient> & vector_sol,
                             const std::vector<Number> & scalar_sol,
@@ -711,42 +673,6 @@ private:
           MixedLM(i_offset + i, lm_j_offset + j) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] *
                                                     tau * (*lm_phi_face)[j][qp] * (*normals)[qp] *
                                                     (*normals)[qp];
-      }
-  }
-
-  void lm_outlet_residual(const unsigned int i_offset,
-                          const std::vector<Number> & scalar_sol,
-                          const std::vector<Number> & lm_sol)
-  {
-    for (const auto qp : make_range(qface->n_points()))
-      for (const auto i : make_range(lm_n_dofs))
-      {
-        // scalar
-        LMVec(i_offset + i) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau * scalar_sol[qp] *
-                               (*normals)[qp] * (*normals)[qp];
-
-        // lm
-        LMVec(i_offset + i) -= (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau * lm_sol[qp] *
-                               (*normals)[qp] * (*normals)[qp];
-      }
-  }
-
-  void lm_outlet_jacobian(const unsigned int i_offset,
-                          const unsigned int scalar_j_offset,
-                          const unsigned int lm_j_offset)
-  {
-    for (const auto qp : make_range(qface->n_points()))
-      for (const auto i : make_range(lm_n_dofs))
-      {
-        for (const auto j : make_range(scalar_n_dofs))
-          LMMixed(i_offset + i, scalar_j_offset + j) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] *
-                                                        tau * (*scalar_phi_face)[j][qp] *
-                                                        (*normals)[qp] * (*normals)[qp];
-
-        for (const auto j : make_range(lm_n_dofs))
-          LMMat(i_offset + i, lm_j_offset + j) -= (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau *
-                                                  (*lm_phi_face)[j][qp] * (*normals)[qp] *
-                                                  (*normals)[qp];
       }
   }
 
@@ -1184,10 +1110,16 @@ main(int argc, char ** argv)
 
   if (mms)
     MeshTools::Generation::build_square(
-      mesh, grid_size, grid_size, 0., 2., -1, 1., Utility::string_to_enum<ElemType>(elem_str));
+        mesh, grid_size, grid_size, 0., 2., -1, 1., Utility::string_to_enum<ElemType>(elem_str));
   else
-    MeshTools::Generation::build_square(
-      mesh, 5 * grid_size, grid_size, 0., 10., -1, 1., Utility::string_to_enum<ElemType>(elem_str));
+    MeshTools::Generation::build_square(mesh,
+                                        5 * grid_size,
+                                        grid_size,
+                                        0.,
+                                        10.,
+                                        -1,
+                                        1.,
+                                        Utility::string_to_enum<ElemType>(elem_str));
 
   // Create an equation systems object.
   EquationSystems equation_systems(mesh);
