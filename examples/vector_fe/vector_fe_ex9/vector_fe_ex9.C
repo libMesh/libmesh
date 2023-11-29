@@ -1261,17 +1261,17 @@ main(int argc, char ** argv)
   // if (extra_error_quadrature)
   //   exact_sol.extra_quadrature_order(extra_error_quadrature);
 
-  // // Compute the error.
+  // Compute the error.
   // exact_sol.compute_error("Mixed", "qu");
-  // exact_sol.compute_error("Mixed", "u");
+  exact_sol.compute_error("Mixed", "vel_x");
   // exact_sol.compute_error("Mixed", "qv");
-  // exact_sol.compute_error("Mixed", "v");
+  exact_sol.compute_error("Mixed", "vel_y");
 
-  // // Print out the error values.
+  // Print out the error values.
   // libMesh::out << "L2 error for qu is: " << exact_sol.l2_error("Mixed", "qu") << std::endl;
-  // libMesh::out << "L2 error for u is: " << exact_sol.l2_error("Mixed", "u") << std::endl;
+  libMesh::out << "L2 error for u is: " << exact_sol.l2_error("Mixed", "vel_x") << std::endl;
   // libMesh::out << "L2 error for qv is: " << exact_sol.l2_error("Mixed", "qv") << std::endl;
-  // libMesh::out << "L2 error for v is: " << exact_sol.l2_error("Mixed", "v") << std::endl;
+  libMesh::out << "L2 error for v is: " << exact_sol.l2_error("Mixed", "vel_y") << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
