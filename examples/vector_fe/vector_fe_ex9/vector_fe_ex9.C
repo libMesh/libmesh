@@ -83,6 +83,75 @@ namespace libMesh
 class NonlinearImplicitSystem;
 }
 
+class USoln
+{
+public:
+  USoln(const Real mu_in) : mu(mu_in) {}
+
+  Real operator()(const Point & p) const
+  {
+    const auto x = p(0);
+    const auto y = p(1);
+    return sin(1. / 2 * y * pi) * cos(1. / 2 * x * pi);
+  }
+
+  Real forcing(const Point & p) const
+  {
+    const auto x = p(0);
+    const auto y = p(1);
+    return (1. / 2) * pi * pi * mu * sin((1. / 2) * y * pi) * cos((1. / 2) * x * pi) -
+           1. / 4 * pi * sin((1. / 4) * x * pi) * sin((3. / 2) * y * pi);
+  }
+
+private:
+  const Real mu;
+};
+
+class VSoln
+{
+public:
+  VSoln(const Real mu_in) : mu(mu_in) {}
+
+  Real operator()(const Point & p) const
+  {
+    const auto x = p(0);
+    const auto y = p(1);
+    return sin((1. / 4) * x * pi) * cos((1. / 2) * y * pi);
+  }
+
+  Real forcing(const Point & p) const
+  {
+    const auto x = p(0);
+    const auto y = p(1);
+    return (5. / 16) * pi * pi * mu * sin((1. / 4) * x * pi) * cos((1. / 2) * y * pi) +
+           (3. / 2) * pi * cos((1. / 4) * x * pi) * cos((3. / 2) * y * pi);
+  }
+
+private:
+  const Real mu;
+};
+
+class PSoln
+{
+public:
+  PSoln() = default;
+
+  Real operator()(const Point & p) const
+  {
+    const auto x = p(0);
+    const auto y = p(1);
+    return sin((3. / 2) * y * pi) * cos((1. / 4) * x * pi);
+  }
+
+  Real forcing(const Point & p) const
+  {
+    const auto x = p(0);
+    const auto y = p(1);
+    return -1. / 2 * pi * sin((1. / 4) * x * pi) * sin((1. / 2) * y * pi) -
+           1. / 2 * pi * sin((1. / 2) * x * pi) * sin((1. / 2) * y * pi);
+  }
+};
+
 // compute a solution indexable at quadrature points composed from the local degree of freedom
 // solution vector and associated basis functions
 template <typename SolnType, typename PhiType>
@@ -110,6 +179,8 @@ class HDGProblem : public libMesh::NonlinearImplicitSystem::ComputeResidualandJa
                    public libMesh::NonlinearImplicitSystem::ComputePostCheck
 {
 public:
+  HDGProblem() : u_true_soln(mu), v_true_soln(mu) {}
+
   System * mixed_system;
   ImplicitSystem * lm_system;
   const MeshBase * mesh;
@@ -330,78 +401,78 @@ private:
   void pressure_volume_residual(const unsigned int i_offset,
                                 const std::vector<Number> & u_sol,
                                 const std::vector<Number> & v_sol)
+  {
+    for (const auto qp : make_range(qrule->n_points()))
     {
-      for (const auto qp : make_range(qrule->n_points()))
-      {
-        const Gradient vel(u_sol[qp], v_sol[qp]);
-        for (const auto i : make_range(p_n_dofs))
-          LMVec(i_offset + i) -= (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * vel);
-      }
+      const Gradient vel(u_sol[qp], v_sol[qp]);
+      for (const auto i : make_range(p_n_dofs))
+        LMVec(i_offset + i) -= (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * vel);
     }
+  }
 
   void pressure_volume_jacobian(const unsigned int i_offset,
                                 const unsigned int u_j_offset,
                                 const unsigned int v_j_offset)
-    {
-      for (const auto qp : make_range(qrule->n_points()))
-        for (const auto i : make_range(p_n_dofs))
-          for (const auto j : make_range(scalar_n_dofs))
+  {
+    for (const auto qp : make_range(qrule->n_points()))
+      for (const auto i : make_range(p_n_dofs))
+        for (const auto j : make_range(scalar_n_dofs))
+        {
           {
-            {
-              const Gradient phi((*scalar_phi)[j][qp], 0);
-              LMMixed(i_offset + i, u_j_offset + j) -=
-                (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * phi);
-            }
-            {
-              const Gradient phi(0, (*scalar_phi)[j][qp]);
-              LMMixed(i_offset + i, v_j_offset + j) -=
-                (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * phi);
-            }
+            const Gradient phi((*scalar_phi)[j][qp], 0);
+            LMMixed(i_offset + i, u_j_offset + j) -= (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * phi);
           }
-    }
+          {
+            const Gradient phi(0, (*scalar_phi)[j][qp]);
+            LMMixed(i_offset + i, v_j_offset + j) -= (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * phi);
+          }
+        }
+  }
 
   void pressure_face_residual(const unsigned int i_offset,
                               const std::vector<Number> & lm_u_sol,
                               const std::vector<Number> & lm_v_sol)
+  {
+    for (const auto qp : make_range(qface->n_points()))
     {
-      for (const auto qp : make_range(qface->n_points()))
-      {
-        const Gradient vel(lm_u_sol[qp], lm_v_sol[qp]);
-        const auto vdotn = vel * (*normals)[qp];
-        for (const auto i : make_range(p_n_dofs))
-          LMVec(i_offset + i) += vdotn * (*scalar_phi_face)[i][qp];
-      }
+      const Gradient vel(lm_u_sol[qp], lm_v_sol[qp]);
+      const auto vdotn = vel * (*normals)[qp];
+      for (const auto i : make_range(p_n_dofs))
+        LMVec(i_offset + i) += vdotn * (*scalar_phi_face)[i][qp];
     }
+  }
 
   void pressure_face_jacobian(const unsigned int i_offset,
                               const unsigned int lm_u_j_offset,
                               const unsigned int lm_v_j_offset)
-    {
-      for (const auto qp : make_range(qface->n_points()))
-        for (const auto i : make_range(p_n_dofs))
-          for (const auto j : make_range(lm_n_dofs))
+  {
+    for (const auto qp : make_range(qface->n_points()))
+      for (const auto i : make_range(p_n_dofs))
+        for (const auto j : make_range(lm_n_dofs))
+        {
           {
-            {
-              const Gradient phi((*lm_phi_face)[j][qp], 0);
-              LMMat(i_offset + i, lm_u_j_offset + j) += phi * (*normals)[qp]  * (*scalar_phi_face)[i][qp];
-            }
-            {
-              const Gradient phi(0, (*lm_phi_face)[j][qp]);
-              LMMat(i_offset + i, lm_v_j_offset + j) += phi * (*normals)[qp]  * (*scalar_phi_face)[i][qp];
-            }
+            const Gradient phi((*lm_phi_face)[j][qp], 0);
+            LMMat(i_offset + i, lm_u_j_offset + j) +=
+                phi * (*normals)[qp] * (*scalar_phi_face)[i][qp];
           }
-    }
+          {
+            const Gradient phi(0, (*lm_phi_face)[j][qp]);
+            LMMat(i_offset + i, lm_v_j_offset + j) +=
+                phi * (*normals)[qp] * (*scalar_phi_face)[i][qp];
+          }
+        }
+  }
 
   void pressure_dirichlet_residual(const unsigned int i_offset,
                                    const RealVectorValue & dirichlet_velocity)
+  {
+    for (const auto qp : make_range(qface->n_points()))
     {
-      for (const auto qp : make_range(qface->n_points()))
-      {
-        const auto vdotn = dirichlet_velocity * (*normals)[qp];
-        for (const auto i : make_range(p_n_dofs))
-          LMVec(i_offset + i) += vdotn * (*scalar_phi_face)[i][qp];
-      }
+      const auto vdotn = dirichlet_velocity * (*normals)[qp];
+      for (const auto i : make_range(p_n_dofs))
+        LMVec(i_offset + i) += vdotn * (*scalar_phi_face)[i][qp];
     }
+  }
 
   void vector_dirichlet_residual(const unsigned int i_offset, const Real scalar_value)
   {
@@ -858,7 +929,8 @@ private:
             vector_face_residual(vector_n_dofs + scalar_n_dofs, lm_v_sol);
             vector_face_jacobian(vector_n_dofs + scalar_n_dofs, lm_n_dofs);
             scalar_outlet_residual(2 * vector_n_dofs + scalar_n_dofs, v_sol, lm_v_sol);
-            scalar_outlet_jacobian(2 * vector_n_dofs + scalar_n_dofs, 2 * vector_n_dofs + scalar_n_dofs, lm_n_dofs);
+            scalar_outlet_jacobian(
+                2 * vector_n_dofs + scalar_n_dofs, 2 * vector_n_dofs + scalar_n_dofs, lm_n_dofs);
             lm_outlet_residual(lm_n_dofs, v_sol, lm_v_sol);
             lm_outlet_jacobian(lm_n_dofs, 2 * vector_n_dofs + scalar_n_dofs, lm_n_dofs);
 
@@ -1048,6 +1120,10 @@ private:
 
   // The viscosity
   static constexpr Real mu = 1;
+
+  const USoln u_true_soln;
+  const VSoln v_true_soln;
+  const PSoln p_true_soln;
 };
 
 int
