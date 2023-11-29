@@ -366,31 +366,21 @@ private:
                               const unsigned int vel_component,
                               std::vector<Gradient> & sigma)
   {
-    // const auto dim = mesh->mesh_dimension();
     compute_stress(vel_gradient, p_sol, vel_component, sigma);
+    const auto & mms_info = vel_component == 0 ? static_cast<const ExactSoln &>(u_true_soln)
+                                               : static_cast<const ExactSoln &>(v_true_soln);
     for (const auto qp : make_range(qrule->n_points()))
     {
-      // // Prepare forcing function
-      // const Real x = (*q_point)[qp](0);
-      // const Real y = (*q_point)[qp](1);
-      // const Real z = (*q_point)[qp](2);
-
-      // // "f" is the forcing function for the Poisson equation, which is
-      // // just the divergence of the exact solution for the vector field.
-      // // This is the well-known "method of manufactured solutions".
-      // Real f = 0;
-      // if (dim == 2)
-      //   f = MixedExactSolution().forcing(x, y);
-      // else if (dim == 3)
-      //   f = MixedExactSolution().forcing(x, y, z);
+      // Prepare forcing function
+      const auto f = mms_info.forcing((*q_point)[qp]);
 
       for (const auto i : make_range(scalar_n_dofs))
       {
         // Scalar equation dependence on vector dofs
         MixedVec(i_offset + i) += (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * sigma[qp]);
 
-        // // Scalar equation RHS
-        // MixedVec(i_offset + i) += (*JxW)[qp] * (*scalar_phi)[i][qp] * f;
+        // Scalar equation RHS
+        MixedVec(i_offset + i) -= (*JxW)[qp] * (*scalar_phi)[i][qp] * f;
       }
     }
   }
@@ -483,24 +473,32 @@ private:
         }
   }
 
-  void pressure_dirichlet_residual(const unsigned int i_offset,
-                                   const RealVectorValue & dirichlet_velocity)
+  void pressure_dirichlet_residual(const unsigned int i_offset)
   {
     for (const auto qp : make_range(qface->n_points()))
     {
+      const RealVectorValue dirichlet_velocity(u_true_soln((*qface_point)[qp]),
+                                               v_true_soln((*qface_point)[qp]));
+
       const auto vdotn = dirichlet_velocity * (*normals)[qp];
       for (const auto i : make_range(p_n_dofs))
         LMVec(i_offset + i) += vdotn * (*scalar_phi_face)[i][qp];
     }
   }
 
-  void vector_dirichlet_residual(const unsigned int i_offset, const Real scalar_value)
+  void vector_dirichlet_residual(const unsigned int i_offset, const unsigned int vel_component)
   {
+    const auto & mms_info = vel_component == 0 ? static_cast<const ExactSoln &>(u_true_soln)
+                                               : static_cast<const ExactSoln &>(v_true_soln);
     for (const auto qp : make_range(qface->n_points()))
+    {
+      const auto scalar_value = mms_info((*qface_point)[qp]);
+
       // External boundary -> Dirichlet faces -> Vector equation RHS
       for (const auto i : make_range(vector_n_dofs))
         MixedVec(i_offset + i) -=
             (*JxW_face)[qp] * ((*vector_phi_face)[i][qp] * (*normals)[qp]) * scalar_value;
+    }
   }
 
   void vector_face_residual(const unsigned int i_offset, const std::vector<Number> & lm_sol)
@@ -526,13 +524,16 @@ private:
   void scalar_dirichlet_residual(const unsigned int i_offset,
                                  const std::vector<Gradient> & vector_sol,
                                  const std::vector<Number> & scalar_sol,
-                                 const unsigned int vel_component,
-                                 const Real scalar_value)
+                                 const unsigned int vel_component)
   {
+    const auto & mms_info = vel_component == 0 ? static_cast<const ExactSoln &>(u_true_soln)
+                                               : static_cast<const ExactSoln &>(v_true_soln);
     for (const auto qp : make_range(qface->n_points()))
     {
       Gradient qp_p;
       qp_p(vel_component) = p_sol[qp];
+
+      const auto scalar_value = mms_info((*qface_point)[qp]);
 
       for (const auto i : make_range(scalar_n_dofs))
       {
@@ -902,23 +903,15 @@ private:
           const auto bnd_id = boundary_ids[0];
           if (bnd_id != right_bnd)
           {
-            const auto dirichlet_velocity = [bnd_id, this]()
-            {
-              if (bnd_id == left_bnd)
-                return RealVectorValue(1, 0);
-              else
-                return RealVectorValue(0, 0);
-            }();
-
             // qu, u, lm_u
-            vector_dirichlet_residual(0, dirichlet_velocity(0));
-            scalar_dirichlet_residual(vector_n_dofs, qu_sol, u_sol, 0, dirichlet_velocity(0));
+            vector_dirichlet_residual(0, 0);
+            scalar_dirichlet_residual(vector_n_dofs, qu_sol, u_sol, 0);
             scalar_dirichlet_jacobian(vector_n_dofs, 0, vector_n_dofs, 2 * lm_n_dofs, 0);
 
             // qv, v, lm_v
-            vector_dirichlet_residual(vector_n_dofs + scalar_n_dofs, dirichlet_velocity(1));
+            vector_dirichlet_residual(vector_n_dofs + scalar_n_dofs, 1);
             scalar_dirichlet_residual(
-                2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, 1, dirichlet_velocity(1));
+              2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, 1);
             scalar_dirichlet_jacobian(2 * vector_n_dofs + scalar_n_dofs,
                                       vector_n_dofs + scalar_n_dofs,
                                       2 * vector_n_dofs + scalar_n_dofs,
@@ -926,7 +919,7 @@ private:
                                       1);
 
             // p
-            pressure_dirichlet_residual(2 * lm_n_dofs, dirichlet_velocity);
+            pressure_dirichlet_residual(2 * lm_n_dofs);
 
             // Set the LMs on these Dirichlet boundary faces to 0
             create_identity_residual(*qface, *JxW_face, *lm_phi_face, lm_u_sol, lm_n_dofs, 0);
@@ -1162,7 +1155,7 @@ main(int argc, char ** argv)
                            << " or with TET14, or HEX27 in 3d.");
 
   MeshTools::Generation::build_square(
-      mesh, 5 * grid_size, grid_size, 0., 10., -1, 1., Utility::string_to_enum<ElemType>(elem_str));
+      mesh, grid_size, grid_size, 0., 2., -1, 1., Utility::string_to_enum<ElemType>(elem_str));
 
   // Create an equation systems object.
   EquationSystems equation_systems(mesh);
