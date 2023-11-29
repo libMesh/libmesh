@@ -799,7 +799,7 @@ private:
     const auto qv_num = mixed_system->variable_number("qv");
     const auto lm_u_num = lm_system->variable_number("lm_u");
     const auto lm_v_num = lm_system->variable_number("lm_v");
-    const auto p_num = lm_system->variable_number("pressure");
+    // const auto p_num = lm_system->variable_number("pressure");
 
     std::vector<boundary_id_type> boundary_ids;
     const auto & boundary_info = mesh->get_boundary_info();
@@ -813,13 +813,14 @@ private:
       mixed_dof_map->dof_indices(elem, qv_dof_indices, qv_num);
       mixed_dof_map->dof_indices(elem, v_dof_indices, v_num);
       lm_dof_map->dof_indices(elem, lm_v_dof_indices, lm_v_num);
-      lm_dof_map->dof_indices(elem, p_dof_indices, p_num);
+      // lm_dof_map->dof_indices(elem, p_dof_indices, p_num);
 
       vector_n_dofs = qu_dof_indices.size();
       scalar_n_dofs = u_dof_indices.size();
       lm_n_dofs = lm_u_dof_indices.size();
-      p_n_dofs = p_dof_indices.size();
-      libmesh_assert(p_n_dofs == scalar_n_dofs);
+      // p_n_dofs = p_dof_indices.size();
+      // libmesh_assert(p_n_dofs == scalar_n_dofs);
+      p_n_dofs = 0;
 
       // Reinit our volume FE objects
       vector_fe->reinit(elem);
@@ -855,7 +856,10 @@ private:
       compute_qp_soln(u_sol, qrule->n_points(), *scalar_phi, u_dof_values);
       compute_qp_soln(qv_sol, qrule->n_points(), *vector_phi, qv_dof_values);
       compute_qp_soln(v_sol, qrule->n_points(), *scalar_phi, v_dof_values);
-      compute_qp_soln(p_sol, qrule->n_points(), *scalar_phi, p_dof_values);
+      // compute_qp_soln(p_sol, qrule->n_points(), *scalar_phi, p_dof_values);
+      p_sol.resize(qrule->n_points());
+      for (const auto qp : make_range(qrule->n_points()))
+        p_sol[qp] = p_true_soln((*q_point)[qp]);
 
       //
       // compute volumetric residuals and Jacobians
@@ -894,7 +898,10 @@ private:
         compute_qp_soln(qv_sol, qface->n_points(), *vector_phi_face, qv_dof_values);
         compute_qp_soln(v_sol, qface->n_points(), *scalar_phi_face, v_dof_values);
         compute_qp_soln(lm_v_sol, qface->n_points(), *lm_phi_face, lm_v_dof_values);
-        compute_qp_soln(p_sol, qface->n_points(), *scalar_phi_face, p_dof_values);
+        // compute_qp_soln(p_sol, qface->n_points(), *scalar_phi_face, p_dof_values);
+        p_sol.resize(qface->n_points());
+        for (const auto qp : make_range(qface->n_points()))
+          p_sol[qp] = p_true_soln((*qface_point)[qp]);
 
         if (elem->neighbor_ptr(side) == nullptr)
         {
@@ -1175,7 +1182,7 @@ main(int argc, char ** argv)
   // Add our Lagrange multiplier to the implicit system
   lm_system.add_variable("lm_u", FIRST, SIDE_HIERARCHIC);
   lm_system.add_variable("lm_v", FIRST, SIDE_HIERARCHIC);
-  lm_system.add_variable("pressure", FIRST, L2_LAGRANGE);
+  // lm_system.add_variable("pressure", FIRST, L2_LAGRANGE);
 
   // Add vectors for increment
   auto & ghosted_inc = lm_system.add_vector("ghosted_increment", true, GHOSTED);
