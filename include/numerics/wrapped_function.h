@@ -27,6 +27,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/point.h"
 #include "libmesh/system.h"
+#include "libmesh/fe_interface.h"
 
 // C++ includes
 #include <cstddef>
@@ -192,27 +193,39 @@ Output WrappedFunction<Output>::component (unsigned int i,
   libmesh_assert(_parameters);
 
   // Loop over variables, then over each component in
-  // vector-valued variables.
+  // FEFamily SCALAR variables.
+  unsigned int vc = 0;
   const unsigned int n_vars = _sys.n_vars();
   for (unsigned int v = 0; v != n_vars; ++v)
     {
-      const unsigned int n_components =
-        _sys.variable(v).n_components();
-      if (n_components == 1 &&
-          i == _sys.variable_scalar_number(v,0))
+      const auto & var_fe_type = _sys.variable_type(v);
+      const unsigned int n_components = [&var_fe_type, v, this](){
+        if (var_fe_type.family == SCALAR)
+          return _sys.variable(v).n_components();
+        else
+          return FEInterface::n_vec_dim(_sys.get_mesh(), var_fe_type);
+      }();
+      if (i >= vc + n_components)
+      {
+        vc += n_components;
+        continue;
+      }
+
+      if (n_components > 1 && var_fe_type.family != SCALAR)
+        libmesh_error_msg(
+            "WrappedFunction::component cannot currently evaluate vector finite element families");
+
+      if (n_components == 1)
         return _fptr(p, *_parameters, _sys.name(), _sys.variable_name(v));
-      else if (i >= _sys.variable_scalar_number(v,0) &&
-               i <= _sys.variable_scalar_number(v,n_components-1))
+      else
         {
-          // Right now our only non-scalar variable type is the
-          // SCALAR variables.  The irony is priceless.
           libmesh_assert_equal_to (_sys.variable(i).type().family, SCALAR);
 
           // We pass the point (j,0,0) to an old-style fptr function
           // pointer to distinguish the different scalars within the
           // SCALAR variable.
           for (unsigned int j=0; j != n_components; ++j)
-            if (i == _sys.variable_scalar_number(v,j))
+            if (i == vc + j)
               return _fptr(Point(j,0,0), *_parameters,
                            _sys.name(), _sys.variable_name(v));
         }
