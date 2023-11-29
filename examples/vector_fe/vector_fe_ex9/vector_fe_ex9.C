@@ -226,6 +226,9 @@ public:
   const VSoln v_true_soln;
   const PSoln p_true_soln;
 
+  // Whether we are performing an MMS study
+  bool mms;
+
   void init()
   {
     // Attach quadrature rules for the FE objects that we will reinit within the element "volume"
@@ -372,15 +375,18 @@ private:
     for (const auto qp : make_range(qrule->n_points()))
     {
       // Prepare forcing function
-      const auto f = mms_info.forcing((*q_point)[qp]);
+      Real f = 0;
+      if (mms)
+        f = mms_info.forcing((*q_point)[qp]);
 
       for (const auto i : make_range(scalar_n_dofs))
       {
         // Scalar equation dependence on vector dofs
         MixedVec(i_offset + i) += (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * sigma[qp]);
 
-        // Scalar equation RHS
-        MixedVec(i_offset + i) -= (*JxW)[qp] * (*scalar_phi)[i][qp] * f;
+        if (mms)
+          // Scalar equation RHS
+          MixedVec(i_offset + i) -= (*JxW)[qp] * (*scalar_phi)[i][qp] * f;
       }
     }
   }
@@ -415,15 +421,18 @@ private:
     for (const auto qp : make_range(qrule->n_points()))
     {
       // Prepare forcing function
-      const auto f = p_true_soln.forcing((*q_point)[qp]);
+      Real f = 0;
+      if (mms)
+        f = p_true_soln.forcing((*q_point)[qp]);
 
       const Gradient vel(u_sol[qp], v_sol[qp]);
       for (const auto i : make_range(p_n_dofs))
       {
         LMVec(i_offset + i) -= (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * vel);
 
-        // Pressure equation RHS
-        LMVec(i_offset + i) -= (*JxW)[qp] * (*scalar_phi)[i][qp] * f;
+        if (mms)
+          // Pressure equation RHS
+          LMVec(i_offset + i) -= (*JxW)[qp] * (*scalar_phi)[i][qp] * f;
       }
     }
   }
@@ -481,13 +490,25 @@ private:
         }
   }
 
+  RealVectorValue get_dirichlet_velocity(const unsigned int qp) const
+    {
+      if (mms)
+        return RealVectorValue
+          (u_true_soln((*qface_point)[qp]),
+           v_true_soln((*qface_point)[qp]));
+
+      if (current_bnd == left_bnd)
+        return RealVectorValue(1, 0);
+
+      else
+        return RealVectorValue(0, 0);
+    }
+
   void pressure_dirichlet_residual(const unsigned int i_offset)
   {
     for (const auto qp : make_range(qface->n_points()))
     {
-      const RealVectorValue dirichlet_velocity(u_true_soln((*qface_point)[qp]),
-                                               v_true_soln((*qface_point)[qp]));
-
+      const auto dirichlet_velocity = get_dirichlet_velocity(qp);
       const auto vdotn = dirichlet_velocity * (*normals)[qp];
       for (const auto i : make_range(p_n_dofs))
         LMVec(i_offset + i) += (*JxW_face)[qp] * vdotn * (*scalar_phi_face)[i][qp];
@@ -496,11 +517,9 @@ private:
 
   void vector_dirichlet_residual(const unsigned int i_offset, const unsigned int vel_component)
   {
-    const auto & mms_info = vel_component == 0 ? static_cast<const ExactSoln &>(u_true_soln)
-                                               : static_cast<const ExactSoln &>(v_true_soln);
     for (const auto qp : make_range(qface->n_points()))
     {
-      const auto scalar_value = mms_info((*qface_point)[qp]);
+      const auto scalar_value = get_dirichlet_velocity(qp)(vel_component);
 
       // External boundary -> Dirichlet faces -> Vector equation RHS
       for (const auto i : make_range(vector_n_dofs))
@@ -534,14 +553,12 @@ private:
                                  const std::vector<Number> & scalar_sol,
                                  const unsigned int vel_component)
   {
-    const auto & mms_info = vel_component == 0 ? static_cast<const ExactSoln &>(u_true_soln)
-                                               : static_cast<const ExactSoln &>(v_true_soln);
     for (const auto qp : make_range(qface->n_points()))
     {
       Gradient qp_p;
       qp_p(vel_component) = p_sol[qp];
 
-      const auto scalar_value = mms_info((*qface_point)[qp]);
+      const auto scalar_value = get_dirichlet_velocity(qp)(vel_component);
 
       for (const auto i : make_range(scalar_n_dofs))
       {
@@ -908,8 +925,8 @@ private:
         {
           boundary_info.boundary_ids(elem, side, boundary_ids);
           libmesh_assert(boundary_ids.size() == 1);
-          const auto bnd_id = boundary_ids[0];
-          if (bnd_id != right_bnd)
+          current_bnd = boundary_ids[0];
+          if (current_bnd != right_bnd)
           {
             // qu, u, lm_u
             vector_dirichlet_residual(0, 0);
@@ -1121,6 +1138,9 @@ private:
 
   // The viscosity
   static constexpr Real mu = 1;
+
+  // The current boundary ID
+  boundary_id_type current_bnd;
 };
 
 int
@@ -1142,6 +1162,7 @@ main(int argc, char ** argv)
   // Read in parameters from the command line and the input file.
   const unsigned int dimension = 2;
   const unsigned int grid_size = infile("grid_size", 2);
+  const bool mms = infile("mms", true);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build.
   libmesh_example_requires(dimension <= LIBMESH_DIM, dimension << "D support");
@@ -1161,8 +1182,12 @@ main(int argc, char ** argv)
                            << " but this example must be run with TRI6, TRI7, QUAD8, or QUAD9 in 2d"
                            << " or with TET14, or HEX27 in 3d.");
 
-  MeshTools::Generation::build_square(
+  if (mms)
+    MeshTools::Generation::build_square(
       mesh, grid_size, grid_size, 0., 2., -1, 1., Utility::string_to_enum<ElemType>(elem_str));
+  else
+    MeshTools::Generation::build_square(
+      mesh, 5 * grid_size, grid_size, 0., 10., -1, 1., Utility::string_to_enum<ElemType>(elem_str));
 
   // Create an equation systems object.
   EquationSystems equation_systems(mesh);
@@ -1209,6 +1234,7 @@ main(int argc, char ** argv)
   hdg.ghosted_increment = &ghosted_inc;
   hdg.parallel_increment = &parallel_inc;
   hdg.ghosted_old_solution = &ghosted_old;
+  hdg.mms = mms;
 
   lm_system.nonlinear_solver->residual_and_jacobian_object = &hdg;
   lm_system.nonlinear_solver->postcheck_object = &hdg;
@@ -1221,60 +1247,29 @@ main(int argc, char ** argv)
   // Solve the implicit system for the Lagrange multiplier
   lm_system.solve();
 
-  // //
-  // // Now we will compute our solution approximation errors
-  // //
+  if (mms)
+  {
+    //
+    // Now we will compute our solution approximation errors
+    //
 
-  equation_systems.parameters.set<const ExactSoln *>("vel_x_exact_sol") = &hdg.u_true_soln;
-  equation_systems.parameters.set<const ExactSoln *>("vel_y_exact_sol") = &hdg.v_true_soln;
-  equation_systems.parameters.set<const ExactSoln *>("pressure_exact_sol") = &hdg.p_true_soln;
-  ExactSolution exact_sol(equation_systems);
-  exact_sol.attach_exact_value(&compute_error);
+    equation_systems.parameters.set<const ExactSoln *>("vel_x_exact_sol") = &hdg.u_true_soln;
+    equation_systems.parameters.set<const ExactSoln *>("vel_y_exact_sol") = &hdg.v_true_soln;
+    equation_systems.parameters.set<const ExactSoln *>("pressure_exact_sol") = &hdg.p_true_soln;
+    ExactSolution exact_sol(equation_systems);
+    exact_sol.attach_exact_value(&compute_error);
 
-  // if (dimension == 2)
-  // {
-  //   SolutionFunction<2> soln_func;
-  //   SolutionGradient<2> soln_grad;
+    // Compute the error.
+    exact_sol.compute_error("Mixed", "vel_x");
+    exact_sol.compute_error("Mixed", "vel_y");
+    exact_sol.compute_error("Lambda", "pressure");
 
-  //   // Build FunctionBase* containers to attach to the ExactSolution object.
-  //   std::vector<FunctionBase<Number> *> sols(1, &soln_func);
-  //   std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
-
-  //   exact_sol.attach_exact_values(sols);
-  //   exact_sol.attach_exact_derivs(grads);
-  // }
-  // else if (dimension == 3)
-  // {
-  //   SolutionFunction<3> soln_func;
-  //   SolutionGradient<3> soln_grad;
-
-  //   // Build FunctionBase* containers to attach to the ExactSolution object.
-  //   std::vector<FunctionBase<Number> *> sols(1, &soln_func);
-  //   std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
-
-  //   exact_sol.attach_exact_values(sols);
-  //   exact_sol.attach_exact_derivs(grads);
-  // }
-
-  // // Use higher quadrature order for more accurate error results.
-  // int extra_error_quadrature = infile("extra_error_quadrature", 2);
-  // if (extra_error_quadrature)
-  //   exact_sol.extra_quadrature_order(extra_error_quadrature);
-
-  // Compute the error.
-  // exact_sol.compute_error("Mixed", "qu");
-  exact_sol.compute_error("Mixed", "vel_x");
-  // exact_sol.compute_error("Mixed", "qv");
-  exact_sol.compute_error("Mixed", "vel_y");
-  exact_sol.compute_error("Lambda", "pressure");
-
-  // Print out the error values.
-  // libMesh::out << "L2 error for qu is: " << exact_sol.l2_error("Mixed", "qu") << std::endl;
-  libMesh::out << "L2 error for u is: " << exact_sol.l2_error("Mixed", "vel_x") << std::endl;
-  // libMesh::out << "L2 error for qv is: " << exact_sol.l2_error("Mixed", "qv") << std::endl;
-  libMesh::out << "L2 error for v is: " << exact_sol.l2_error("Mixed", "vel_y") << std::endl;
-  libMesh::out << "L2 error for pressure is: " << exact_sol.l2_error("Lambda", "pressure")
-               << std::endl;
+    // Print out the error values.
+    libMesh::out << "L2 error for u is: " << exact_sol.l2_error("Mixed", "vel_x") << std::endl;
+    libMesh::out << "L2 error for v is: " << exact_sol.l2_error("Mixed", "vel_y") << std::endl;
+    libMesh::out << "L2 error for pressure is: " << exact_sol.l2_error("Lambda", "pressure")
+                 << std::endl;
+  }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
