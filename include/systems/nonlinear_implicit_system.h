@@ -212,6 +212,17 @@ public:
                             sys_type & S) = 0;
   };
 
+  class ComputePreCheck
+  {
+  public:
+    virtual ~ComputePreCheck () = default;
+
+    virtual void precheck (const NumericVector<Number> & old_soln,
+                           NumericVector<Number> & search_direction,
+                           bool & changed,
+                           sys_type & S) = 0;
+  };
+
   /**
    * \returns A reference to *this.
    */
