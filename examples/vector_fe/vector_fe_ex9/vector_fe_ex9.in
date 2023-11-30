@@ -12,3 +12,6 @@ mms = true
 
 # The kinematic viscosity
 nu = 1
+
+# Whether to do a lid cavity problem. This is incompatible with mms=true
+cavity = false

@@ -243,6 +243,9 @@ public:
   // Whether we are performing an MMS study
   bool mms;
 
+  // Whether we performing a cavity simulation
+  bool cavity;
+
   void init()
   {
     // Attach quadrature rules for the FE objects that we will reinit within the element "volume"
@@ -279,6 +282,7 @@ public:
     libmesh_assert(top_bnd != BoundaryInfo::invalid_id);
     libmesh_assert(right_bnd != BoundaryInfo::invalid_id);
     libmesh_assert(bottom_bnd != BoundaryInfo::invalid_id);
+    global_lm_n_dofs = cavity ? 1 : 0;
   }
 
   virtual void residual_and_jacobian(const NumericVector<Number> & /*X*/,
@@ -484,7 +488,8 @@ private:
 
   void pressure_volume_residual(const unsigned int i_offset,
                                 const std::vector<Number> & u_sol,
-                                const std::vector<Number> & v_sol)
+                                const std::vector<Number> & v_sol,
+                                const unsigned int global_lm_i_offset)
   {
     for (const auto qp : make_range(qrule->n_points()))
     {
@@ -501,16 +506,26 @@ private:
         if (mms)
           // Pressure equation RHS
           LMVec(i_offset + i) -= (*JxW)[qp] * (*scalar_phi)[i][qp] * f;
+
+        if (cavity)
+          LMVec(i_offset + i) -= (*JxW)[qp] * (*scalar_phi)[i][qp] * global_lm_dof_value;
       }
+
+      if (cavity)
+        LMVec(global_lm_i_offset) -= (*JxW)[qp] * p_sol[qp];
     }
   }
 
   void pressure_volume_jacobian(const unsigned int i_offset,
                                 const unsigned int u_j_offset,
-                                const unsigned int v_j_offset)
+                                const unsigned int v_j_offset,
+                                const unsigned int p_j_offset,
+                                const unsigned int global_lm_offset)
   {
     for (const auto qp : make_range(qrule->n_points()))
+    {
       for (const auto i : make_range(p_n_dofs))
+      {
         for (const auto j : make_range(scalar_n_dofs))
         {
           {
@@ -522,6 +537,17 @@ private:
             LMMixed(i_offset + i, v_j_offset + j) -= (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * phi);
           }
         }
+        if (cavity)
+          LMMat(i_offset + i, global_lm_offset) -= (*JxW)[qp] * (*scalar_phi)[i][qp];
+      }
+
+      if (cavity)
+      {
+        libmesh_assert(scalar_n_dofs == p_n_dofs);
+        for (const auto j : make_range(p_n_dofs))
+          LMMat(global_lm_offset, p_j_offset + j) -= (*JxW)[qp] * (*scalar_phi)[j][qp];
+      }
+    }
   }
 
   void pressure_face_residual(const unsigned int i_offset,
@@ -563,11 +589,23 @@ private:
     if (mms)
       return RealVectorValue(u_true_soln((*qface_point)[qp]), v_true_soln((*qface_point)[qp]));
 
-    if (current_bnd == left_bnd)
-      return RealVectorValue(1, 0);
+    if (cavity)
+    {
+      if (current_bnd == top_bnd)
+        return RealVectorValue(1, 0);
+      else
+        return RealVectorValue(0, 0);
+    }
+    else // channel flow case
+    {
+      libmesh_assert(current_bnd != right_bnd);
 
-    else
-      return RealVectorValue(0, 0);
+      if (current_bnd == left_bnd)
+        return RealVectorValue(1, 0);
+
+      else
+        return RealVectorValue(0, 0);
+    }
   }
 
   void pressure_dirichlet_residual(const unsigned int i_offset)
@@ -917,6 +955,7 @@ private:
     const auto lm_u_num = lm_system->variable_number("lm_u");
     const auto lm_v_num = lm_system->variable_number("lm_v");
     const auto p_num = lm_system->variable_number("pressure");
+    const auto global_lm_num = cavity ? lm_system->variable_number("global_lm") : invalid_uint;
 
     std::vector<boundary_id_type> boundary_ids;
     const auto & boundary_info = mesh->get_boundary_info();
@@ -931,6 +970,11 @@ private:
       mixed_dof_map->dof_indices(elem, v_dof_indices, v_num);
       lm_dof_map->dof_indices(elem, lm_v_dof_indices, lm_v_num);
       lm_dof_map->dof_indices(elem, p_dof_indices, p_num);
+      if (cavity)
+      {
+        lm_dof_map->dof_indices(elem, global_lm_dof_indices, global_lm_num);
+        libmesh_assert(global_lm_dof_indices.size() == 1);
+      }
 
       vector_n_dofs = qu_dof_indices.size();
       scalar_n_dofs = u_dof_indices.size();
@@ -946,7 +990,7 @@ private:
       libmesh_assert_equal_to(scalar_n_dofs, scalar_phi->size());
 
       const auto mixed_size = 2 * (vector_n_dofs + scalar_n_dofs);
-      const auto lm_size = 2 * lm_n_dofs + p_n_dofs;
+      const auto lm_size = 2 * lm_n_dofs + p_n_dofs + global_lm_n_dofs;
 
       // prepare our matrix/vector data structures
       MixedMat.setZero(mixed_size, mixed_size);
@@ -966,6 +1010,8 @@ private:
       mixed_system->current_local_solution->get(v_dof_indices, v_dof_values);
       lm_soln_vector.get(lm_v_dof_indices, lm_v_dof_values);
       lm_soln_vector.get(p_dof_indices, p_dof_values);
+      if (cavity)
+        global_lm_dof_value = lm_soln_vector(global_lm_dof_indices[0]);
 
       // Compute volumetric local qp solutions
       compute_qp_soln(qu_sol, qrule->n_points(), *vector_phi, qu_dof_values);
@@ -1007,8 +1053,12 @@ private:
                              2 * vector_n_dofs + scalar_n_dofs);
 
       // p
-      pressure_volume_residual(2 * lm_n_dofs, u_sol, v_sol);
-      pressure_volume_jacobian(2 * lm_n_dofs, vector_n_dofs, 2 * vector_n_dofs + scalar_n_dofs);
+      pressure_volume_residual(2 * lm_n_dofs, u_sol, v_sol, 2 * lm_n_dofs + p_n_dofs);
+      pressure_volume_jacobian(2 * lm_n_dofs,
+                               vector_n_dofs,
+                               2 * vector_n_dofs + scalar_n_dofs,
+                               2 * lm_n_dofs,
+                               2 * lm_n_dofs + p_n_dofs);
 
       for (auto side : elem->side_index_range())
       {
@@ -1033,7 +1083,7 @@ private:
           boundary_info.boundary_ids(elem, side, boundary_ids);
           libmesh_assert(boundary_ids.size() == 1);
           current_bnd = boundary_ids[0];
-          if (current_bnd != right_bnd)
+          if (cavity || (current_bnd != right_bnd))
           {
             // qu, u, lm_u
             vector_dirichlet_residual(0, 0);
@@ -1112,6 +1162,8 @@ private:
       lm_dof_indices = lm_u_dof_indices;
       lm_dof_indices.insert(lm_dof_indices.end(), lm_v_dof_indices.begin(), lm_v_dof_indices.end());
       lm_dof_indices.insert(lm_dof_indices.end(), p_dof_indices.begin(), p_dof_indices.end());
+      lm_dof_indices.insert(
+          lm_dof_indices.end(), global_lm_dof_indices.begin(), global_lm_dof_indices.end());
       libmesh_assert(lm_size == lm_dof_indices.size());
 
       if (lm_solve)
@@ -1216,6 +1268,7 @@ private:
   std::vector<dof_id_type> p_dof_indices;
   std::vector<dof_id_type> lm_dof_indices;
   std::vector<dof_id_type> mixed_dof_indices;
+  std::vector<dof_id_type> global_lm_dof_indices;
 
   // local solutions at quadrature points
   std::vector<Gradient> qu_sol;
@@ -1238,6 +1291,7 @@ private:
   std::vector<Number> v_dof_values;
   std::vector<Number> lm_v_dof_values;
   std::vector<Number> p_dof_values;
+  Number global_lm_dof_value;
 
   // local degree of freedom increment values
   std::vector<Number> lm_increment_dof_values;
@@ -1249,6 +1303,7 @@ private:
   std::size_t scalar_n_dofs;
   std::size_t lm_n_dofs;
   std::size_t p_n_dofs;
+  std::size_t global_lm_n_dofs;
 
   // Our stabilization coefficient
   static constexpr Real tau = 1;
@@ -1281,6 +1336,10 @@ main(int argc, char ** argv)
   const unsigned int grid_size = infile("grid_size", 2);
   const bool mms = infile("mms", true);
   const Real nu = infile("nu", 1.);
+  const bool cavity = infile("cavity", false);
+
+  if (mms && cavity)
+    libmesh_error_msg("'cavity' and 'mms' options are incompatible");
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build.
   libmesh_example_requires(dimension <= LIBMESH_DIM, dimension << "D support");
@@ -1300,7 +1359,7 @@ main(int argc, char ** argv)
                            << " but this example must be run with TRI6, TRI7, QUAD8, or QUAD9 in 2d"
                            << " or with TET14, or HEX27 in 3d.");
 
-  if (mms)
+  if (mms || cavity)
     MeshTools::Generation::build_square(
         mesh, grid_size, grid_size, 0., 2., -1, 1., Utility::string_to_enum<ElemType>(elem_str));
   else
@@ -1332,6 +1391,8 @@ main(int argc, char ** argv)
   lm_system.add_variable("lm_u", FIRST, SIDE_HIERARCHIC);
   lm_system.add_variable("lm_v", FIRST, SIDE_HIERARCHIC);
   lm_system.add_variable("pressure", FIRST, L2_LAGRANGE);
+  if (cavity)
+    lm_system.add_variable("global_lm", FIRST, SCALAR);
 
   // Add vectors for increment
   auto & ghosted_inc = lm_system.add_vector("ghosted_increment", true, GHOSTED);
@@ -1359,6 +1420,7 @@ main(int argc, char ** argv)
   hdg.parallel_increment = &parallel_inc;
   hdg.ghosted_old_solution = &ghosted_old;
   hdg.mms = mms;
+  hdg.cavity = cavity;
 
   lm_system.nonlinear_solver->residual_and_jacobian_object = &hdg;
   lm_system.nonlinear_solver->precheck_object = &hdg;
