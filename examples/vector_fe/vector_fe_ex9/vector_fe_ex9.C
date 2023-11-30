@@ -368,10 +368,10 @@ private:
                                          const std::vector<Number> & v_sol,
                                          const unsigned int qp,
                                          const unsigned int vel_component) const
-    {
-      const RealVectorValue U(u_sol[qp], v_sol[qp]);
-      return U * U(vel_component);
-    }
+  {
+    const RealVectorValue U(u_sol[qp], v_sol[qp]);
+    return U * U(vel_component);
+  }
 
   RealVectorValue vel_cross_vel_jacobian(const std::vector<Number> & u_sol,
                                          const std::vector<Number> & v_sol,
@@ -380,15 +380,15 @@ private:
                                          const unsigned int vel_j_component,
                                          const std::vector<std::vector<Real>> & phi,
                                          const unsigned int j) const
-    {
-      const RealVectorValue U(u_sol[qp], v_sol[qp]);
-      RealVectorValue vector_phi;
-      vector_phi(vel_j_component) = phi[j][qp];
-      auto ret = vector_phi * U(vel_component);
-      if (vel_component == vel_j_component)
-        ret += U * phi[j][qp];
-      return ret;
-    }
+  {
+    const RealVectorValue U(u_sol[qp], v_sol[qp]);
+    RealVectorValue vector_phi;
+    vector_phi(vel_j_component) = phi[j][qp];
+    auto ret = vector_phi * U(vel_component);
+    if (vel_component == vel_j_component)
+      ret += U * phi[j][qp];
+    return ret;
+  }
 
   void scalar_volume_residual(const unsigned int i_offset,
                               const std::vector<Gradient> & vel_gradient,
@@ -454,27 +454,17 @@ private:
         {
           // derivatives wrt 0th component
           {
-            const auto vel_cross_vel = vel_cross_vel_jacobian(u_sol,
-                                                              v_sol,
-                                                              qp,
-                                                              vel_component,
-                                                              0,
-                                                              (*scalar_phi),
-                                                              j);
+            const auto vel_cross_vel =
+                vel_cross_vel_jacobian(u_sol, v_sol, qp, vel_component, 0, (*scalar_phi), j);
             MixedMat(i_offset + i, u_j_offset + j) -=
-              (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * vel_cross_vel);
+                (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * vel_cross_vel);
           }
           // derivatives wrt 1th component
           {
-            const auto vel_cross_vel = vel_cross_vel_jacobian(u_sol,
-                                                              v_sol,
-                                                              qp,
-                                                              vel_component,
-                                                              1,
-                                                              (*scalar_phi),
-                                                              j);
+            const auto vel_cross_vel =
+                vel_cross_vel_jacobian(u_sol, v_sol, qp, vel_component, 1, (*scalar_phi), j);
             MixedMat(i_offset + i, v_j_offset + j) -=
-              (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * vel_cross_vel);
+                (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * vel_cross_vel);
           }
         }
       }
@@ -623,7 +613,8 @@ private:
       qp_p(vel_component) = p_sol[qp];
 
       const auto dirichlet_velocity = get_dirichlet_velocity(qp);
-      const auto scalar_value = dirichlet_velocity(vel_component);;
+      const auto scalar_value = dirichlet_velocity(vel_component);
+      ;
 
       for (const auto i : make_range(scalar_n_dofs))
       {
@@ -696,24 +687,32 @@ private:
 
       for (const auto i : make_range(scalar_n_dofs))
       {
-        // vector
-        MixedVec(i_offset + i) -=
-            (*JxW_face)[qp] * mu * (*scalar_phi_face)[i][qp] * (vector_sol[qp] * (*normals)[qp]);
+        if (neigh)
+        {
+          // vector
+          MixedVec(i_offset + i) -=
+              (*JxW_face)[qp] * mu * (*scalar_phi_face)[i][qp] * (vector_sol[qp] * (*normals)[qp]);
 
-        // pressure
-        MixedVec(i_offset + i) +=
-            (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * (qp_p * (*normals)[qp]);
+          // pressure
+          MixedVec(i_offset + i) +=
+              (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * (qp_p * (*normals)[qp]);
 
-        // scalar from stabilization term
-        MixedVec(i_offset + i) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau *
-                                  scalar_sol[qp] * (*normals)[qp] * (*normals)[qp];
+          // scalar from stabilization term
+          MixedVec(i_offset + i) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau *
+                                    scalar_sol[qp] * (*normals)[qp] * (*normals)[qp];
 
-        // lm from stabilization term
-        MixedVec(i_offset + i) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * lm_sol[qp] *
-                                  (*normals)[qp] * (*normals)[qp];
+          // lm from stabilization term
+          MixedVec(i_offset + i) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * lm_sol[qp] *
+                                    (*normals)[qp] * (*normals)[qp];
+        }
+        else
+          libmesh_assert_msg(current_bnd == right_bnd,
+                             "This method should only be called with an outflow boundary. "
+                             "Dirichlet boundaries should call a different routine");
 
         // lm from convection term
-        MixedVec(i_offset + i) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * vel_cross_vel * (*normals)[qp];
+        MixedVec(i_offset + i) +=
+            (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * vel_cross_vel * (*normals)[qp];
       }
     }
   }
@@ -732,31 +731,39 @@ private:
     for (const auto qp : make_range(qface->n_points()))
       for (const auto i : make_range(scalar_n_dofs))
       {
-        for (const auto j : make_range(vector_n_dofs))
-          MixedMat(i_offset + i, vector_j_offset + j) -=
-              (*JxW_face)[qp] * mu * (*scalar_phi_face)[i][qp] *
-              ((*vector_phi_face)[j][qp] * (*normals)[qp]);
-
-        for (const auto j : make_range(p_n_dofs))
+        if (neigh)
         {
-          Gradient p_phi;
-          p_phi(vel_component) = (*scalar_phi_face)[j][qp];
-          // pressure
-          MixedLM(i_offset + i, p_j_offset + j) +=
-              (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * (p_phi * (*normals)[qp]);
-        }
+          for (const auto j : make_range(vector_n_dofs))
+            MixedMat(i_offset + i, vector_j_offset + j) -=
+                (*JxW_face)[qp] * mu * (*scalar_phi_face)[i][qp] *
+                ((*vector_phi_face)[j][qp] * (*normals)[qp]);
 
-        for (const auto j : make_range(scalar_n_dofs))
-          MixedMat(i_offset + i, scalar_j_offset + j) +=
-              (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * (*scalar_phi_face)[j][qp] *
-              (*normals)[qp] * (*normals)[qp];
+          for (const auto j : make_range(p_n_dofs))
+          {
+            Gradient p_phi;
+            p_phi(vel_component) = (*scalar_phi_face)[j][qp];
+            // pressure
+            MixedLM(i_offset + i, p_j_offset + j) +=
+                (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * (p_phi * (*normals)[qp]);
+          }
+
+          for (const auto j : make_range(scalar_n_dofs))
+            MixedMat(i_offset + i, scalar_j_offset + j) +=
+                (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * (*scalar_phi_face)[j][qp] *
+                (*normals)[qp] * (*normals)[qp];
+        }
+        else
+          libmesh_assert_msg(current_bnd == right_bnd,
+                             "This method should only be called with an outflow boundary. "
+                             "Dirichlet boundaries should call a different routine");
 
         for (const auto j : make_range(lm_n_dofs))
         {
-          // from stabilization term
-          MixedLM(i_offset + i, lm_j_offset + j) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] *
-                                                    tau * (*lm_phi_face)[j][qp] * (*normals)[qp] *
-                                                    (*normals)[qp];
+          if (neigh)
+            // from stabilization term
+            MixedLM(i_offset + i, lm_j_offset + j) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] *
+                                                      tau * (*lm_phi_face)[j][qp] * (*normals)[qp] *
+                                                      (*normals)[qp];
 
           //
           // from convection term
@@ -764,27 +771,17 @@ private:
 
           // derivatives wrt 0th component
           {
-            const auto vel_cross_vel = vel_cross_vel_jacobian(lm_u_sol,
-                                                              lm_v_sol,
-                                                              qp,
-                                                              vel_component,
-                                                              0,
-                                                              (*lm_phi_face),
-                                                              j);
+            const auto vel_cross_vel =
+                vel_cross_vel_jacobian(lm_u_sol, lm_v_sol, qp, vel_component, 0, (*lm_phi_face), j);
             MixedLM(i_offset + i, lm_u_j_offset + j) +=
-              (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * vel_cross_vel * (*normals)[qp];
+                (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * vel_cross_vel * (*normals)[qp];
           }
           // derivatives wrt 1th component
           {
-            const auto vel_cross_vel = vel_cross_vel_jacobian(lm_u_sol,
-                                                              lm_v_sol,
-                                                              qp,
-                                                              vel_component,
-                                                              1,
-                                                              (*lm_phi_face),
-                                                              j);
+            const auto vel_cross_vel =
+                vel_cross_vel_jacobian(lm_u_sol, lm_v_sol, qp, vel_component, 1, (*lm_phi_face), j);
             MixedLM(i_offset + i, lm_v_j_offset + j) +=
-              (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * vel_cross_vel * (*normals)[qp];
+                (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * vel_cross_vel * (*normals)[qp];
           }
         }
       }
@@ -794,12 +791,16 @@ private:
                         const std::vector<Gradient> & vector_sol,
                         const std::vector<Number> & scalar_sol,
                         const std::vector<Number> & lm_sol,
-                        const unsigned int vel_component)
+                        const unsigned int vel_component,
+                        const std::vector<Number> & lm_u_sol,
+                        const std::vector<Number> & lm_v_sol)
   {
     for (const auto qp : make_range(qface->n_points()))
     {
       Gradient qp_p;
       qp_p(vel_component) = p_sol[qp];
+      const auto vel_cross_vel = vel_cross_vel_residual(lm_u_sol, lm_v_sol, qp, vel_component);
+
       for (const auto i : make_range(lm_n_dofs))
       {
         // vector
@@ -809,13 +810,24 @@ private:
         // pressure
         LMVec(i_offset + i) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * (qp_p * (*normals)[qp]);
 
-        // scalar
+        // scalar from stabilization term
         LMVec(i_offset + i) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau * scalar_sol[qp] *
                                (*normals)[qp] * (*normals)[qp];
 
-        // lm
+        // lm from stabilization term
         LMVec(i_offset + i) -= (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau * lm_sol[qp] *
                                (*normals)[qp] * (*normals)[qp];
+
+        // If we are an internal face we add the convective term. On the outflow boundary we do not
+        // zero out the convection term, e.g. we are going to set q + p + tau * (u - u_hat) to zero
+        if (neigh)
+          // lm from convection term
+          LMVec(i_offset + i) +=
+              (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * vel_cross_vel * (*normals)[qp];
+        else
+          libmesh_assert_msg(current_bnd == right_bnd,
+                             "This method should only be called with an outflow boundary. "
+                             "Dirichlet boundaries should call a different routine");
       }
     }
   }
@@ -825,7 +837,11 @@ private:
                         const unsigned int scalar_j_offset,
                         const unsigned int lm_j_offset,
                         const unsigned int p_j_offset,
-                        const unsigned int vel_component)
+                        const unsigned int vel_component,
+                        const std::vector<Number> & lm_u_sol,
+                        const std::vector<Number> & lm_v_sol,
+                        const unsigned int lm_u_j_offset,
+                        const unsigned int lm_v_j_offset)
   {
     for (const auto qp : make_range(qface->n_points()))
       for (const auto i : make_range(lm_n_dofs))
@@ -849,9 +865,33 @@ private:
                                                         (*normals)[qp] * (*normals)[qp];
 
         for (const auto j : make_range(lm_n_dofs))
+        {
+          // from stabilization term
           LMMat(i_offset + i, lm_j_offset + j) -= (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * tau *
                                                   (*lm_phi_face)[j][qp] * (*normals)[qp] *
                                                   (*normals)[qp];
+          if (neigh)
+          {
+            // derivatives wrt 0th component
+            {
+              const auto vel_cross_vel = vel_cross_vel_jacobian(
+                  lm_u_sol, lm_v_sol, qp, vel_component, 0, (*lm_phi_face), j);
+              LMMat(i_offset + i, lm_u_j_offset + j) +=
+                  (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * vel_cross_vel * (*normals)[qp];
+            }
+            // derivatives wrt 1th component
+            {
+              const auto vel_cross_vel = vel_cross_vel_jacobian(
+                  lm_u_sol, lm_v_sol, qp, vel_component, 1, (*lm_phi_face), j);
+              LMMat(i_offset + i, lm_v_j_offset + j) +=
+                  (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * vel_cross_vel * (*normals)[qp];
+            }
+          }
+          else
+            libmesh_assert_msg(current_bnd == right_bnd,
+                               "This method should only be called with an outflow boundary. "
+                               "Dirichlet boundaries should call a different routine");
+        }
       }
   }
 
@@ -928,18 +968,31 @@ private:
 
       // qu and u
       vector_volume_residual(0, qu_sol, u_sol);
-      scalar_volume_residual(vector_n_dofs, qu_sol, 0, sigma_u);
+      scalar_volume_residual(vector_n_dofs, qu_sol, 0, sigma_u, u_sol, v_sol);
       vector_volume_jacobian(0, 0, vector_n_dofs);
-      scalar_volume_jacobian(vector_n_dofs, 0, 2 * lm_n_dofs, 0);
+      scalar_volume_jacobian(vector_n_dofs,
+                             0,
+                             2 * lm_n_dofs,
+                             0,
+                             u_sol,
+                             v_sol,
+                             vector_n_dofs,
+                             2 * vector_n_dofs + scalar_n_dofs);
 
       // qv and v
       vector_volume_residual(vector_n_dofs + scalar_n_dofs, qv_sol, v_sol);
-      scalar_volume_residual(2 * vector_n_dofs + scalar_n_dofs, qv_sol, 1, sigma_v);
+      scalar_volume_residual(2 * vector_n_dofs + scalar_n_dofs, qv_sol, 1, sigma_v, u_sol, v_sol);
       vector_volume_jacobian(vector_n_dofs + scalar_n_dofs,
                              vector_n_dofs + scalar_n_dofs,
                              2 * vector_n_dofs + scalar_n_dofs);
-      scalar_volume_jacobian(
-          2 * vector_n_dofs + scalar_n_dofs, vector_n_dofs + scalar_n_dofs, 2 * lm_n_dofs, 1);
+      scalar_volume_jacobian(2 * vector_n_dofs + scalar_n_dofs,
+                             vector_n_dofs + scalar_n_dofs,
+                             2 * lm_n_dofs,
+                             1,
+                             u_sol,
+                             v_sol,
+                             vector_n_dofs,
+                             2 * vector_n_dofs + scalar_n_dofs);
 
       // p
       pressure_volume_residual(2 * lm_n_dofs, u_sol, v_sol);
@@ -947,6 +1000,8 @@ private:
 
       for (auto side : elem->side_index_range())
       {
+        neigh = elem->neighbor_ptr(side);
+
         // Reinit our face FE objects
         vector_fe_face->reinit(elem, side);
         scalar_fe_face->reinit(elem, side);
@@ -961,7 +1016,7 @@ private:
         compute_qp_soln(lm_v_sol, qface->n_points(), *lm_phi_face, lm_v_dof_values);
         compute_qp_soln(p_sol, qface->n_points(), *scalar_phi_face, p_dof_values);
 
-        if (elem->neighbor_ptr(side) == nullptr)
+        if (neigh == nullptr)
         {
           boundary_info.boundary_ids(elem, side, boundary_ids);
           libmesh_assert(boundary_ids.size() == 1);
@@ -1003,28 +1058,38 @@ private:
         // qu, u, lm_u
         vector_face_residual(0, lm_u_sol);
         vector_face_jacobian(0, 0);
-        scalar_face_residual(vector_n_dofs, qu_sol, u_sol, lm_u_sol, 0);
-        scalar_face_jacobian(vector_n_dofs, 0, vector_n_dofs, 0, 2 * lm_n_dofs, 0);
-        lm_face_residual(0, qu_sol, u_sol, lm_u_sol, 0);
-        lm_face_jacobian(0, 0, vector_n_dofs, 0, 2 * lm_n_dofs, 0);
-
+        scalar_face_residual(vector_n_dofs, qu_sol, u_sol, lm_u_sol, 0, lm_u_sol, lm_v_sol);
+        scalar_face_jacobian(
+            vector_n_dofs, 0, vector_n_dofs, 0, 2 * lm_n_dofs, 0, lm_u_sol, lm_v_sol, 0, lm_n_dofs);
+        lm_face_residual(0, qu_sol, u_sol, lm_u_sol, 0, lm_u_sol, lm_v_sol);
+        lm_face_jacobian(
+            0, 0, vector_n_dofs, 0, 2 * lm_n_dofs, 0, lm_u_sol, lm_v_sol, 0, lm_n_dofs);
         // qv, v, lm_v
         vector_face_residual(vector_n_dofs + scalar_n_dofs, lm_v_sol);
         vector_face_jacobian(vector_n_dofs + scalar_n_dofs, lm_n_dofs);
-        scalar_face_residual(2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, lm_v_sol, 1);
+        scalar_face_residual(
+            2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, lm_v_sol, 1, lm_u_sol, lm_v_sol);
         scalar_face_jacobian(2 * vector_n_dofs + scalar_n_dofs,
                              vector_n_dofs + scalar_n_dofs,
                              2 * vector_n_dofs + scalar_n_dofs,
                              lm_n_dofs,
                              2 * lm_n_dofs,
-                             1);
-        lm_face_residual(lm_n_dofs, qv_sol, v_sol, lm_v_sol, 1);
+                             1,
+                             lm_u_sol,
+                             lm_v_sol,
+                             0,
+                             lm_n_dofs);
+        lm_face_residual(lm_n_dofs, qv_sol, v_sol, lm_v_sol, 1, lm_u_sol, lm_v_sol);
         lm_face_jacobian(lm_n_dofs,
                          vector_n_dofs + scalar_n_dofs,
                          2 * vector_n_dofs + scalar_n_dofs,
                          lm_n_dofs,
                          2 * lm_n_dofs,
-                         1);
+                         1,
+                         lm_u_sol,
+                         lm_v_sol,
+                         0,
+                         lm_n_dofs);
 
         // p
         pressure_face_residual(2 * lm_n_dofs, lm_u_sol, lm_v_sol);
@@ -1181,6 +1246,9 @@ private:
 
   // The current boundary ID
   boundary_id_type current_bnd;
+
+  // The current element neighbor
+  const Elem * neigh;
 };
 
 int
