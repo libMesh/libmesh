@@ -203,9 +203,8 @@ compute_qp_soln(std::vector<SolnType> & qp_vec,
   }
 }
 
-class HDGProblem : public NonlinearImplicitSystem::ComputeResidualandJacobian,
-                   public NonlinearImplicitSystem::ComputeResidual,
-                   public NonlinearImplicitSystem::ComputePostCheck
+class HDGProblem : public libMesh::NonlinearImplicitSystem::ComputeResidualandJacobian,
+                   public libMesh::NonlinearImplicitSystem::ComputePostCheck
 {
 public:
   HDGProblem() : u_true_soln(mu), v_true_soln(mu) {}
@@ -229,7 +228,7 @@ public:
   // Ghosted version of old solution
   NumericVector<Number> * ghosted_old_solution;
   SparseMatrix<Number> * J;
-  NumericVector<Number> * nl_residual;
+  NumericVector<Number> * residual;
   boundary_id_type left_bnd;
   boundary_id_type top_bnd;
   boundary_id_type right_bnd;
@@ -237,7 +236,6 @@ public:
   const USoln u_true_soln;
   const VSoln v_true_soln;
   const PSoln p_true_soln;
-  bool compute_jacobian;
 
   // Whether we are performing an MMS study
   bool mms;
@@ -285,18 +283,10 @@ public:
                                      SparseMatrix<Number> * J_in,
                                      NonlinearImplicitSystem & /*S*/) override
   {
-    nl_residual = R_in;
+    residual = R_in;
     J = J_in;
     assemble(true);
   }
-
-  virtual void residual (const NumericVector<Number> & /*X*/,
-                         NumericVector<Number> & R_in,
-                         NonlinearImplicitSystem & /*S*/) override
-    {
-      nl_residual = &R_in;
-      assemble(true);
-    }
 
   virtual void postcheck(const NumericVector<Number> & old_soln,
                          NumericVector<Number> & /*search_direction*/,
@@ -1141,9 +1131,8 @@ private:
 
         // We were performing our finite element assembly for the implicit solve step of our
         // example. Add our local element vectors/matrices into the global system
-        if (compute_jacobian)
-          J->add_matrix(K_libmesh, lm_dof_indices);
-        nl_residual->add_vector(F_libmesh, lm_dof_indices);
+        J->add_matrix(K_libmesh, lm_dof_indices);
+        residual->add_vector(F_libmesh, lm_dof_indices);
       }
       else
       {
@@ -1371,12 +1360,8 @@ main(int argc, char ** argv)
   hdg.parallel_increment = &parallel_inc;
   hdg.ghosted_old_solution = &ghosted_old;
   hdg.mms = mms;
-  hdg.compute_jacobian = infile("compute_jacobian", true);
 
-  if (hdg.compute_jacobian)
-    lm_system.nonlinear_solver->residual_and_jacobian_object = &hdg;
-  else
-    lm_system.nonlinear_solver->residual_object = &hdg;
+  lm_system.nonlinear_solver->residual_and_jacobian_object = &hdg;
   lm_system.nonlinear_solver->postcheck_object = &hdg;
 
   hdg.init();
