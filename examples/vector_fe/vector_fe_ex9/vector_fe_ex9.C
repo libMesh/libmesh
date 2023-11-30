@@ -203,8 +203,8 @@ compute_qp_soln(std::vector<SolnType> & qp_vec,
   }
 }
 
-class HDGProblem : public libMesh::NonlinearImplicitSystem::ComputeResidualandJacobian,
-                   public libMesh::NonlinearImplicitSystem::ComputePostCheck
+class HDGProblem : public NonlinearImplicitSystem::ComputeResidualandJacobian,
+                   public NonlinearImplicitSystem::ComputePreCheck
 {
 public:
   HDGProblem() : u_true_soln(mu), v_true_soln(mu) {}
@@ -288,15 +288,13 @@ public:
     assemble(true);
   }
 
-  virtual void postcheck(const NumericVector<Number> & old_soln,
-                         NumericVector<Number> & /*search_direction*/,
-                         NumericVector<Number> & new_soln,
-                         bool & /*changed_search_direction*/,
-                         bool & /*changed_new_soln*/,
-                         NonlinearImplicitSystem & /*S*/) override
+  virtual void precheck(const NumericVector<Number> & old_soln,
+                        NumericVector<Number> & search_direction,
+                        bool & /*changed*/,
+                        NonlinearImplicitSystem & /*S*/) override
   {
-    *parallel_increment = new_soln;
-    *parallel_increment -= old_soln;
+    parallel_increment->zero();
+    *parallel_increment -= search_direction;
     *ghosted_increment = *parallel_increment;
     *ghosted_old_solution = old_soln;
     assemble(false);
@@ -1362,7 +1360,7 @@ main(int argc, char ** argv)
   hdg.mms = mms;
 
   lm_system.nonlinear_solver->residual_and_jacobian_object = &hdg;
-  lm_system.nonlinear_solver->postcheck_object = &hdg;
+  lm_system.nonlinear_solver->precheck_object = &hdg;
 
   hdg.init();
 
