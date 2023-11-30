@@ -103,7 +103,7 @@ compute_error(const Point & p,
 class USoln : public ExactSoln
 {
 public:
-  USoln(const Real mu_in) : mu(mu_in) {}
+  USoln(const Real nu_in) : nu(nu_in) {}
 
   Real operator()(const Point & p) const override
   {
@@ -118,7 +118,7 @@ public:
     const auto y = p(1);
     const auto quant1 = sin((1. / 2) * y * pi);
     const auto quant2 = cos((1. / 2) * y * pi);
-    return (1. / 2) * pi * pi * mu * sin((1. / 2) * y * pi) * cos((1. / 2) * x * pi) -
+    return (1. / 2) * pi * pi * nu * sin((1. / 2) * y * pi) * cos((1. / 2) * x * pi) -
            1. / 2 * pi * sin((1. / 4) * x * pi) * quant1 * quant1 * cos((1. / 2) * x * pi) -
            1. / 4 * pi * sin((1. / 4) * x * pi) * sin((3. / 2) * y * pi) +
            (1. / 2) * pi * sin((1. / 4) * x * pi) * cos((1. / 2) * x * pi) * quant2 * quant2 -
@@ -126,13 +126,13 @@ public:
   }
 
 private:
-  const Real mu;
+  const Real nu;
 };
 
 class VSoln : public ExactSoln
 {
 public:
-  VSoln(const Real mu_in) : mu(mu_in) {}
+  VSoln(const Real nu_in) : nu(nu_in) {}
 
   Real operator()(const Point & p) const override
   {
@@ -146,7 +146,7 @@ public:
     const auto x = p(0);
     const auto y = p(1);
     const auto quant1 = sin((1. / 4) * x * pi);
-    return (5. / 16) * pi * pi * mu * sin((1. / 4) * x * pi) * cos((1. / 2) * y * pi) -
+    return (5. / 16) * pi * pi * nu * sin((1. / 4) * x * pi) * cos((1. / 2) * y * pi) -
            pi * quant1 * quant1 * sin((1. / 2) * y * pi) * cos((1. / 2) * y * pi) -
            1. / 2 * pi * sin((1. / 4) * x * pi) * sin((1. / 2) * x * pi) * sin((1. / 2) * y * pi) *
                cos((1. / 2) * y * pi) +
@@ -156,7 +156,7 @@ public:
   }
 
 private:
-  const Real mu;
+  const Real nu;
 };
 
 class PSoln : public ExactSoln
@@ -207,7 +207,7 @@ class HDGProblem : public NonlinearImplicitSystem::ComputeResidualandJacobian,
                    public NonlinearImplicitSystem::ComputePreCheck
 {
 public:
-  HDGProblem() : u_true_soln(mu), v_true_soln(mu) {}
+  HDGProblem(const Real nu_in) : nu(nu_in), u_true_soln(nu), v_true_soln(nu) {}
 
   System * mixed_system;
   ImplicitSystem * lm_system;
@@ -233,6 +233,9 @@ public:
   boundary_id_type top_bnd;
   boundary_id_type right_bnd;
   boundary_id_type bottom_bnd;
+  // The kinematic viscosity
+  Real nu;
+  // The true solutions
   const USoln u_true_soln;
   const VSoln v_true_soln;
   const PSoln p_true_soln;
@@ -335,7 +338,7 @@ private:
     {
       Gradient qp_p;
       qp_p(vel_component) = p_sol[qp];
-      sigma[qp] = mu * vel_gradient[qp] - qp_p;
+      sigma[qp] = nu * vel_gradient[qp] - qp_p;
     }
   }
 
@@ -448,7 +451,7 @@ private:
         // Scalar equation dependence on vector dofs
         for (const auto j : make_range(vector_n_dofs))
           MixedMat(i_offset + i, vel_gradient_j_offset + j) +=
-              (*JxW)[qp] * mu * ((*grad_scalar_phi)[i][qp] * (*vector_phi)[j][qp]);
+              (*JxW)[qp] * nu * ((*grad_scalar_phi)[i][qp] * (*vector_phi)[j][qp]);
 
         // Scalar equation dependence on pressure dofs
         for (const auto j : make_range(p_n_dofs))
@@ -629,7 +632,7 @@ private:
       {
         // vector
         MixedVec(i_offset + i) -=
-            (*JxW_face)[qp] * mu * (*scalar_phi_face)[i][qp] * (vector_sol[qp] * (*normals)[qp]);
+            (*JxW_face)[qp] * nu * (*scalar_phi_face)[i][qp] * (vector_sol[qp] * (*normals)[qp]);
 
         // pressure
         MixedVec(i_offset + i) +=
@@ -661,7 +664,7 @@ private:
       {
         for (const auto j : make_range(vector_n_dofs))
           MixedMat(i_offset + i, vector_j_offset + j) -=
-              (*JxW_face)[qp] * mu * (*scalar_phi_face)[i][qp] *
+              (*JxW_face)[qp] * nu * (*scalar_phi_face)[i][qp] *
               ((*vector_phi_face)[j][qp] * (*normals)[qp]);
 
         for (const auto j : make_range(p_n_dofs))
@@ -700,7 +703,7 @@ private:
         {
           // vector
           MixedVec(i_offset + i) -=
-              (*JxW_face)[qp] * mu * (*scalar_phi_face)[i][qp] * (vector_sol[qp] * (*normals)[qp]);
+              (*JxW_face)[qp] * nu * (*scalar_phi_face)[i][qp] * (vector_sol[qp] * (*normals)[qp]);
 
           // pressure
           MixedVec(i_offset + i) +=
@@ -744,7 +747,7 @@ private:
         {
           for (const auto j : make_range(vector_n_dofs))
             MixedMat(i_offset + i, vector_j_offset + j) -=
-                (*JxW_face)[qp] * mu * (*scalar_phi_face)[i][qp] *
+                (*JxW_face)[qp] * nu * (*scalar_phi_face)[i][qp] *
                 ((*vector_phi_face)[j][qp] * (*normals)[qp]);
 
           for (const auto j : make_range(p_n_dofs))
@@ -814,7 +817,7 @@ private:
       {
         // vector
         LMVec(i_offset + i) -=
-            (*JxW_face)[qp] * mu * (*lm_phi_face)[i][qp] * (vector_sol[qp] * (*normals)[qp]);
+            (*JxW_face)[qp] * nu * (*lm_phi_face)[i][qp] * (vector_sol[qp] * (*normals)[qp]);
 
         // pressure
         LMVec(i_offset + i) += (*JxW_face)[qp] * (*lm_phi_face)[i][qp] * (qp_p * (*normals)[qp]);
@@ -857,7 +860,7 @@ private:
       {
         for (const auto j : make_range(vector_n_dofs))
           LMMixed(i_offset + i, vector_j_offset + j) -=
-              (*JxW_face)[qp] * mu * (*lm_phi_face)[i][qp] *
+              (*JxW_face)[qp] * nu * (*lm_phi_face)[i][qp] *
               ((*vector_phi_face)[j][qp] * (*normals)[qp]);
 
         for (const auto j : make_range(p_n_dofs))
@@ -1250,9 +1253,6 @@ private:
   // Our stabilization coefficient
   static constexpr Real tau = 1;
 
-  // The viscosity
-  static constexpr Real mu = 1;
-
   // The current boundary ID
   boundary_id_type current_bnd;
 
@@ -1280,6 +1280,7 @@ main(int argc, char ** argv)
   const unsigned int dimension = 2;
   const unsigned int grid_size = infile("grid_size", 2);
   const bool mms = infile("mms", true);
+  const Real nu = infile("nu", 1.);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build.
   libmesh_example_requires(dimension <= LIBMESH_DIM, dimension << "D support");
@@ -1341,7 +1342,7 @@ main(int argc, char ** argv)
   const FEType scalar_fe_type(FIRST, L2_LAGRANGE);
   const FEType lm_fe_type(FIRST, SIDE_HIERARCHIC);
 
-  HDGProblem hdg;
+  HDGProblem hdg(nu);
   hdg.mesh = &mesh;
   hdg.mixed_system = &system;
   hdg.lm_system = &lm_system;

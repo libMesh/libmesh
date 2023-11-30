@@ -9,3 +9,6 @@ extra_error_quadrature = 0
 
 # Whether performing an mms study
 mms = true
+
+# The kinematic viscosity
+nu = 1
