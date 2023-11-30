@@ -12,3 +12,6 @@ mms = true
 
 # The kinematic viscosity
 nu = 1
+
+# Whether to compute the residual and Jacobian together
+residual_and_jacobian_together = true

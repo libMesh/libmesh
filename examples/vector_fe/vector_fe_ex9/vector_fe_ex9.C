@@ -204,7 +204,9 @@ compute_qp_soln(std::vector<SolnType> & qp_vec,
 }
 
 class HDGProblem : public NonlinearImplicitSystem::ComputeResidualandJacobian,
-                   public NonlinearImplicitSystem::ComputePreCheck
+                   public NonlinearImplicitSystem::ComputeResidual,
+                   public NonlinearImplicitSystem::ComputeJacobian,
+                   public NonlinearImplicitSystem::ComputePostCheck
 {
 public:
   HDGProblem(const Real nu_in) : nu(nu_in), u_true_soln(nu), v_true_soln(nu) {}
@@ -225,10 +227,11 @@ public:
   NumericVector<Number> * parallel_increment;
   // Ghosted version of LM increment
   NumericVector<Number> * ghosted_increment;
-  // Ghosted version of old solution
-  NumericVector<Number> * ghosted_old_solution;
+  // Ghosted version of previous nonlinear iteration solution
+  NumericVector<Number> * ghosted_previous_nl_soln;
+  NumericVector<Number> * previous_aux_soln;
   SparseMatrix<Number> * J;
-  NumericVector<Number> * residual;
+  NumericVector<Number> * nl_residual;
   boundary_id_type left_bnd;
   boundary_id_type top_bnd;
   boundary_id_type right_bnd;
@@ -279,28 +282,67 @@ public:
     libmesh_assert(top_bnd != BoundaryInfo::invalid_id);
     libmesh_assert(right_bnd != BoundaryInfo::invalid_id);
     libmesh_assert(bottom_bnd != BoundaryInfo::invalid_id);
+
+    *ghosted_previous_nl_soln = *lm_system->solution;
+    *previous_aux_soln = *mixed_system->solution;
   }
+
+  void increment_aux_vector()
+    {
+      *ghosted_increment = *lm_system->solution;
+      *ghosted_increment -= *ghosted_previous_nl_soln;
+      // restore aux vector to previous state
+      *mixed_system->solution = *previous_aux_soln;
+      // scatter into the current local solution
+      mixed_system->update();
+      assemble(false);
+    }
 
   virtual void residual_and_jacobian(const NumericVector<Number> & /*X*/,
                                      NumericVector<Number> * R_in,
                                      SparseMatrix<Number> * J_in,
                                      NonlinearImplicitSystem & /*S*/) override
   {
-    residual = R_in;
+    nl_residual = R_in;
     J = J_in;
+    computing_residual = true;
+    computing_jacobian = true;
+    increment_aux_vector();
     assemble(true);
   }
 
-  virtual void precheck(const NumericVector<Number> & old_soln,
-                        NumericVector<Number> & search_direction,
-                        bool & /*changed*/,
-                        NonlinearImplicitSystem & /*S*/) override
+  virtual void residual (const NumericVector<Number> & /*X*/,
+                         NumericVector<Number> & R_in,
+                         NonlinearImplicitSystem & /*S*/) override
+    {
+      nl_residual = &R_in;
+      computing_residual = true;
+      computing_jacobian = false;
+      increment_aux_vector();
+      assemble(true);
+    }
+
+  virtual void jacobian (const NumericVector<Number> & /*X*/,
+                         SparseMatrix<Number> & J_in,
+                         NonlinearImplicitSystem & /*S*/) override
+    {
+      J = &J_in;
+      computing_residual = false;
+      computing_jacobian = true;
+      increment_aux_vector();
+      assemble(true);
+    }
+
+  virtual void postcheck(const NumericVector<Number> & /*old_soln*/,
+                         NumericVector<Number> & /*search_direction*/,
+                         NumericVector<Number> & new_soln,
+                         bool & /*changed_search_direction*/,
+                         bool & /*changed_new_soln*/,
+                         NonlinearImplicitSystem & /*S*/) override
   {
-    parallel_increment->zero();
-    *parallel_increment -= search_direction;
-    *ghosted_increment = *parallel_increment;
-    *ghosted_old_solution = old_soln;
-    assemble(false);
+    // We've succeeded. Update our "previous" vectors
+    *ghosted_previous_nl_soln = new_soln;
+    *previous_aux_soln = *mixed_system->solution;
   }
 
 private:
@@ -909,7 +951,7 @@ private:
 
   void assemble(const bool lm_solve)
   {
-    auto & lm_soln_vector = lm_solve ? *lm_system->current_local_solution : *ghosted_old_solution;
+    auto & lm_soln_vector = lm_solve ? *lm_system->current_local_solution : *ghosted_previous_nl_soln;
     const auto u_num = mixed_system->variable_number("vel_x");
     const auto v_num = mixed_system->variable_number("vel_y");
     const auto qu_num = mixed_system->variable_number("qu");
@@ -1132,8 +1174,10 @@ private:
 
         // We were performing our finite element assembly for the implicit solve step of our
         // example. Add our local element vectors/matrices into the global system
-        J->add_matrix(K_libmesh, lm_dof_indices);
-        residual->add_vector(F_libmesh, lm_dof_indices);
+        if (computing_jacobian)
+          J->add_matrix(K_libmesh, lm_dof_indices);
+        if (computing_residual)
+          nl_residual->add_vector(F_libmesh, lm_dof_indices);
       }
       else
       {
@@ -1258,6 +1302,9 @@ private:
 
   // The current element neighbor
   const Elem * neigh;
+
+  bool computing_residual;
+  bool computing_jacobian;
 };
 
 int
@@ -1336,7 +1383,7 @@ main(int argc, char ** argv)
   // Add vectors for increment
   auto & ghosted_inc = lm_system.add_vector("ghosted_increment", true, GHOSTED);
   auto & parallel_inc = lm_system.add_vector("parallel_increment", true, PARALLEL);
-  auto & ghosted_old = lm_system.add_vector("ghosted_old", true, GHOSTED);
+  auto & ghosted_previous_nl = lm_system.add_vector("ghosted_previous_nl", true, GHOSTED);
 
   const FEType vector_fe_type(FIRST, L2_LAGRANGE_VEC);
   const FEType scalar_fe_type(FIRST, L2_LAGRANGE);
@@ -1357,16 +1404,25 @@ main(int argc, char ** argv)
   hdg.lm_fe_face = FEBase::build(dimension, lm_fe_type);
   hdg.ghosted_increment = &ghosted_inc;
   hdg.parallel_increment = &parallel_inc;
-  hdg.ghosted_old_solution = &ghosted_old;
+  hdg.ghosted_previous_nl_soln = &ghosted_previous_nl;
+  hdg.previous_aux_soln = &system.add_vector("ghosted_previous_aux", true, PARALLEL);
   hdg.mms = mms;
 
-  lm_system.nonlinear_solver->residual_and_jacobian_object = &hdg;
-  lm_system.nonlinear_solver->precheck_object = &hdg;
+  const bool residual_and_jacobian_together = infile("residual_and_jacobian_together", true);
 
-  hdg.init();
+  if (residual_and_jacobian_together)
+    lm_system.nonlinear_solver->residual_and_jacobian_object = &hdg;
+  else
+  {
+    lm_system.nonlinear_solver->residual_object = &hdg;
+    lm_system.nonlinear_solver->jacobian_object = &hdg;
+  }
+  lm_system.nonlinear_solver->postcheck_object = &hdg;
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
+
+  hdg.init();
 
   // Solve the implicit system for the Lagrange multiplier
   lm_system.solve();
