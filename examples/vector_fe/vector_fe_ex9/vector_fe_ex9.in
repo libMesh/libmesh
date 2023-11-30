@@ -9,3 +9,6 @@ extra_error_quadrature = 0
 
 # Whether performing an mms study
 mms = true
+
+# Whether to compute the Jacobian. This should only be false if using FD to form the Jacobian
+compute_jacobian = true
