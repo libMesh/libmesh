@@ -116,8 +116,13 @@ public:
   {
     const auto x = p(0);
     const auto y = p(1);
+    const auto quant1 = sin((1. / 2) * y * pi);
+    const auto quant2 = cos((1. / 2) * y * pi);
     return (1. / 2) * pi * pi * mu * sin((1. / 2) * y * pi) * cos((1. / 2) * x * pi) -
-           1. / 4 * pi * sin((1. / 4) * x * pi) * sin((3. / 2) * y * pi);
+           1. / 2 * pi * sin((1. / 4) * x * pi) * quant1 * quant1 * cos((1. / 2) * x * pi) -
+           1. / 4 * pi * sin((1. / 4) * x * pi) * sin((3. / 2) * y * pi) +
+           (1. / 2) * pi * sin((1. / 4) * x * pi) * cos((1. / 2) * x * pi) * quant2 * quant2 -
+           pi * sin((1. / 2) * x * pi) * quant1 * quant1 * cos((1. / 2) * x * pi);
   }
 
 private:
@@ -140,7 +145,13 @@ public:
   {
     const auto x = p(0);
     const auto y = p(1);
-    return (5. / 16) * pi * pi * mu * sin((1. / 4) * x * pi) * cos((1. / 2) * y * pi) +
+    const auto quant1 = sin((1. / 4) * x * pi);
+    return (5. / 16) * pi * pi * mu * sin((1. / 4) * x * pi) * cos((1. / 2) * y * pi) -
+           pi * quant1 * quant1 * sin((1. / 2) * y * pi) * cos((1. / 2) * y * pi) -
+           1. / 2 * pi * sin((1. / 4) * x * pi) * sin((1. / 2) * x * pi) * sin((1. / 2) * y * pi) *
+               cos((1. / 2) * y * pi) +
+           (1. / 4) * pi * sin((1. / 2) * y * pi) * cos((1. / 4) * x * pi) *
+               cos((1. / 2) * x * pi) * cos((1. / 2) * y * pi) +
            (3. / 2) * pi * cos((1. / 4) * x * pi) * cos((3. / 2) * y * pi);
   }
 
