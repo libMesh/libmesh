@@ -364,16 +364,46 @@ private:
       }
   }
 
+  RealVectorValue vel_cross_vel_residual(const std::vector<Number> & u_sol,
+                                         const std::vector<Number> & v_sol,
+                                         const unsigned int qp,
+                                         const unsigned int vel_component) const
+    {
+      const RealVectorValue U(u_sol[qp], v_sol[qp]);
+      return U * U(vel_component);
+    }
+
+  RealVectorValue vel_cross_vel_jacobian(const std::vector<Number> & u_sol,
+                                         const std::vector<Number> & v_sol,
+                                         const unsigned int qp,
+                                         const unsigned int vel_component,
+                                         const unsigned int vel_j_component,
+                                         const std::vector<std::vector<Real>> & phi,
+                                         const unsigned int j) const
+    {
+      const RealVectorValue U(u_sol[qp], v_sol[qp]);
+      RealVectorValue vector_phi;
+      vector_phi(vel_j_component) = phi[j][qp];
+      auto ret = vector_phi * U(vel_component);
+      if (vel_component == vel_j_component)
+        ret += U * phi[j][qp];
+      return ret;
+    }
+
   void scalar_volume_residual(const unsigned int i_offset,
                               const std::vector<Gradient> & vel_gradient,
                               const unsigned int vel_component,
-                              std::vector<Gradient> & sigma)
+                              std::vector<Gradient> & sigma,
+                              const std::vector<Number> & u_sol,
+                              const std::vector<Number> & v_sol)
   {
     compute_stress(vel_gradient, p_sol, vel_component, sigma);
     const auto & mms_info = vel_component == 0 ? static_cast<const ExactSoln &>(u_true_soln)
                                                : static_cast<const ExactSoln &>(v_true_soln);
     for (const auto qp : make_range(qrule->n_points()))
     {
+      const auto vel_cross_vel = vel_cross_vel_residual(u_sol, v_sol, qp, vel_component);
+
       // Prepare forcing function
       Real f = 0;
       if (mms)
@@ -381,8 +411,11 @@ private:
 
       for (const auto i : make_range(scalar_n_dofs))
       {
-        // Scalar equation dependence on vector dofs
+        // Scalar equation dependence on vector and pressure dofs
         MixedVec(i_offset + i) += (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * sigma[qp]);
+
+        // Scalar equation dependence on scalar dofs
+        MixedVec(i_offset + i) -= (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * vel_cross_vel);
 
         if (mms)
           // Scalar equation RHS
@@ -394,7 +427,11 @@ private:
   void scalar_volume_jacobian(const unsigned int i_offset,
                               const unsigned int vel_gradient_j_offset,
                               const unsigned int p_j_offset,
-                              const unsigned int vel_component)
+                              const unsigned int vel_component,
+                              const std::vector<Number> & u_sol,
+                              const std::vector<Number> & v_sol,
+                              const unsigned int u_j_offset,
+                              const unsigned int v_j_offset)
   {
     for (const auto qp : make_range(qrule->n_points()))
       for (const auto i : make_range(scalar_n_dofs))
@@ -410,6 +447,35 @@ private:
           Gradient p_phi;
           p_phi(vel_component) = (*scalar_phi)[j][qp];
           MixedLM(i_offset + i, p_j_offset + j) -= (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * p_phi);
+        }
+
+        // Scalar equation dependence on scalar dofs
+        for (const auto j : make_range(scalar_n_dofs))
+        {
+          // derivatives wrt 0th component
+          {
+            const auto vel_cross_vel = vel_cross_vel_jacobian(u_sol,
+                                                              v_sol,
+                                                              qp,
+                                                              vel_component,
+                                                              0,
+                                                              (*scalar_phi),
+                                                              j);
+            MixedMat(i_offset + i, u_j_offset + j) -=
+              (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * vel_cross_vel);
+          }
+          // derivatives wrt 1th component
+          {
+            const auto vel_cross_vel = vel_cross_vel_jacobian(u_sol,
+                                                              v_sol,
+                                                              qp,
+                                                              vel_component,
+                                                              1,
+                                                              (*scalar_phi),
+                                                              j);
+            MixedMat(i_offset + i, v_j_offset + j) -=
+              (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * vel_cross_vel);
+          }
         }
       }
   }
@@ -556,7 +622,8 @@ private:
       Gradient qp_p;
       qp_p(vel_component) = p_sol[qp];
 
-      const auto scalar_value = get_dirichlet_velocity(qp)(vel_component);
+      const auto dirichlet_velocity = get_dirichlet_velocity(qp);
+      const auto scalar_value = dirichlet_velocity(vel_component);;
 
       for (const auto i : make_range(scalar_n_dofs))
       {
@@ -568,13 +635,17 @@ private:
         MixedVec(i_offset + i) +=
             (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * (qp_p * (*normals)[qp]);
 
-        // scalar
+        // scalar from stabilization term
         MixedVec(i_offset + i) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau *
                                   scalar_sol[qp] * (*normals)[qp] * (*normals)[qp];
 
-        // dirichlet
+        // dirichlet lm from stabilization term
         MixedVec(i_offset + i) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * scalar_value *
                                   (*normals)[qp] * (*normals)[qp];
+
+        // dirichlet lm from advection term
+        MixedVec(i_offset + i) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] *
+                                  (dirichlet_velocity * (*normals)[qp]) * scalar_value;
       }
     }
   }
@@ -613,12 +684,16 @@ private:
                             const std::vector<Gradient> & vector_sol,
                             const std::vector<Number> & scalar_sol,
                             const std::vector<Number> & lm_sol,
-                            const unsigned int vel_component)
+                            const unsigned int vel_component,
+                            const std::vector<Number> & lm_u_sol,
+                            const std::vector<Number> & lm_v_sol)
   {
     for (const auto qp : make_range(qface->n_points()))
     {
       Gradient qp_p;
       qp_p(vel_component) = p_sol[qp];
+      const auto vel_cross_vel = vel_cross_vel_residual(lm_u_sol, lm_v_sol, qp, vel_component);
+
       for (const auto i : make_range(scalar_n_dofs))
       {
         // vector
@@ -629,13 +704,16 @@ private:
         MixedVec(i_offset + i) +=
             (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * (qp_p * (*normals)[qp]);
 
-        // scalar
+        // scalar from stabilization term
         MixedVec(i_offset + i) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau *
                                   scalar_sol[qp] * (*normals)[qp] * (*normals)[qp];
 
-        // lm
+        // lm from stabilization term
         MixedVec(i_offset + i) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * tau * lm_sol[qp] *
                                   (*normals)[qp] * (*normals)[qp];
+
+        // lm from convection term
+        MixedVec(i_offset + i) += (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * vel_cross_vel * (*normals)[qp];
       }
     }
   }
@@ -645,7 +723,11 @@ private:
                             const unsigned int scalar_j_offset,
                             const unsigned int lm_j_offset,
                             const unsigned int p_j_offset,
-                            const unsigned int vel_component)
+                            const unsigned int vel_component,
+                            const std::vector<Number> & lm_u_sol,
+                            const std::vector<Number> & lm_v_sol,
+                            const unsigned int lm_u_j_offset,
+                            const unsigned int lm_v_j_offset)
   {
     for (const auto qp : make_range(qface->n_points()))
       for (const auto i : make_range(scalar_n_dofs))
@@ -670,9 +752,41 @@ private:
               (*normals)[qp] * (*normals)[qp];
 
         for (const auto j : make_range(lm_n_dofs))
+        {
+          // from stabilization term
           MixedLM(i_offset + i, lm_j_offset + j) -= (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] *
                                                     tau * (*lm_phi_face)[j][qp] * (*normals)[qp] *
                                                     (*normals)[qp];
+
+          //
+          // from convection term
+          //
+
+          // derivatives wrt 0th component
+          {
+            const auto vel_cross_vel = vel_cross_vel_jacobian(lm_u_sol,
+                                                              lm_v_sol,
+                                                              qp,
+                                                              vel_component,
+                                                              0,
+                                                              (*lm_phi_face),
+                                                              j);
+            MixedLM(i_offset + i, lm_u_j_offset + j) +=
+              (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * vel_cross_vel * (*normals)[qp];
+          }
+          // derivatives wrt 1th component
+          {
+            const auto vel_cross_vel = vel_cross_vel_jacobian(lm_u_sol,
+                                                              lm_v_sol,
+                                                              qp,
+                                                              vel_component,
+                                                              1,
+                                                              (*lm_phi_face),
+                                                              j);
+            MixedLM(i_offset + i, lm_v_j_offset + j) +=
+              (*JxW_face)[qp] * (*scalar_phi_face)[i][qp] * vel_cross_vel * (*normals)[qp];
+          }
+        }
       }
   }
 
