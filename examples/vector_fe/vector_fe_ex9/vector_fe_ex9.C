@@ -103,81 +103,120 @@ compute_error(const Point & p,
 class USoln : public ExactSoln
 {
 public:
-  USoln(const Real nu_in) : nu(nu_in) {}
+  USoln(const Real nu_in, const bool cavity_in) : nu(nu_in), cavity(cavity_in) {}
 
   Real operator()(const Point & p) const override
   {
     const auto x = p(0);
     const auto y = p(1);
-    return sin(1. / 2 * y * pi) * cos(1. / 2 * x * pi);
+    if (cavity)
+      return sin(y) * cos((1. / 2) * x * pi);
+    else
+      return sin(1. / 2 * y * pi) * cos(1. / 2 * x * pi);
   }
 
   Real forcing(const Point & p) const override
   {
     const auto x = p(0);
     const auto y = p(1);
-    const auto quant1 = sin((1. / 2) * y * pi);
-    const auto quant2 = cos((1. / 2) * y * pi);
-    return (1. / 2) * pi * pi * nu * sin((1. / 2) * y * pi) * cos((1. / 2) * x * pi) -
-           1. / 2 * pi * sin((1. / 4) * x * pi) * quant1 * quant1 * cos((1. / 2) * x * pi) -
-           1. / 4 * pi * sin((1. / 4) * x * pi) * sin((3. / 2) * y * pi) +
-           (1. / 2) * pi * sin((1. / 4) * x * pi) * cos((1. / 2) * x * pi) * quant2 * quant2 -
-           pi * sin((1. / 2) * x * pi) * quant1 * quant1 * cos((1. / 2) * x * pi);
+    if (cavity)
+    {
+      return nu * sin(y) * cos((1. / 2) * x * pi) +
+             (1. / 4) * pi * pi * nu * sin(y) * cos((1. / 2) * x * pi) -
+             1. / 2 * pi * sin(x) * sin(y) * sin((1. / 2) * y * pi) * cos((1. / 2) * x * pi) +
+             sin(x) * cos(y) * cos((1. / 2) * x * pi) * cos((1. / 2) * y * pi) -
+             pi * sin(y) * sin(y) * sin((1. / 2) * x * pi) * cos((1. / 2) * x * pi) +
+             sin(y) * cos(x);
+    }
+    else
+    {
+      const auto quant1 = sin((1. / 2) * y * pi);
+      const auto quant2 = cos((1. / 2) * y * pi);
+      return (1. / 2) * pi * pi * nu * sin((1. / 2) * y * pi) * cos((1. / 2) * x * pi) -
+             1. / 2 * pi * sin((1. / 4) * x * pi) * quant1 * quant1 * cos((1. / 2) * x * pi) -
+             1. / 4 * pi * sin((1. / 4) * x * pi) * sin((3. / 2) * y * pi) +
+             (1. / 2) * pi * sin((1. / 4) * x * pi) * cos((1. / 2) * x * pi) * quant2 * quant2 -
+             pi * sin((1. / 2) * x * pi) * quant1 * quant1 * cos((1. / 2) * x * pi);
+    }
   }
 
 private:
   const Real nu;
+  const bool cavity;
 };
 
 class VSoln : public ExactSoln
 {
 public:
-  VSoln(const Real nu_in) : nu(nu_in) {}
+  VSoln(const Real nu_in, const bool cavity_in) : nu(nu_in), cavity(cavity_in) {}
 
   Real operator()(const Point & p) const override
   {
     const auto x = p(0);
     const auto y = p(1);
-    return sin((1. / 4) * x * pi) * cos((1. / 2) * y * pi);
+    if (cavity)
+      return sin(x) * cos((1. / 2) * y * pi);
+    else
+      return sin((1. / 4) * x * pi) * cos((1. / 2) * y * pi);
   }
 
   Real forcing(const Point & p) const override
   {
     const auto x = p(0);
     const auto y = p(1);
-    const auto quant1 = sin((1. / 4) * x * pi);
-    return (5. / 16) * pi * pi * nu * sin((1. / 4) * x * pi) * cos((1. / 2) * y * pi) -
-           pi * quant1 * quant1 * sin((1. / 2) * y * pi) * cos((1. / 2) * y * pi) -
-           1. / 2 * pi * sin((1. / 4) * x * pi) * sin((1. / 2) * x * pi) * sin((1. / 2) * y * pi) *
-               cos((1. / 2) * y * pi) +
-           (1. / 4) * pi * sin((1. / 2) * y * pi) * cos((1. / 4) * x * pi) *
-               cos((1. / 2) * x * pi) * cos((1. / 2) * y * pi) +
-           (3. / 2) * pi * cos((1. / 4) * x * pi) * cos((3. / 2) * y * pi);
+    if (cavity)
+      return nu * sin(x) * cos((1. / 2) * y * pi) +
+             (1. / 4) * pi * pi * nu * sin(x) * cos((1. / 2) * y * pi) -
+             pi * sin(x) * sin(x) * sin((1. / 2) * y * pi) * cos((1. / 2) * y * pi) -
+             1. / 2 * pi * sin(x) * sin(y) * sin((1. / 2) * x * pi) * cos((1. / 2) * y * pi) +
+             sin(y) * cos(x) * cos((1. / 2) * x * pi) * cos((1. / 2) * y * pi) + sin(x) * cos(y);
+    else
+    {
+      const auto quant1 = sin((1. / 4) * x * pi);
+      return (5. / 16) * pi * pi * nu * sin((1. / 4) * x * pi) * cos((1. / 2) * y * pi) -
+             pi * quant1 * quant1 * sin((1. / 2) * y * pi) * cos((1. / 2) * y * pi) -
+             1. / 2 * pi * sin((1. / 4) * x * pi) * sin((1. / 2) * x * pi) *
+                 sin((1. / 2) * y * pi) * cos((1. / 2) * y * pi) +
+             (1. / 4) * pi * sin((1. / 2) * y * pi) * cos((1. / 4) * x * pi) *
+                 cos((1. / 2) * x * pi) * cos((1. / 2) * y * pi) +
+             (3. / 2) * pi * cos((1. / 4) * x * pi) * cos((3. / 2) * y * pi);
+    }
   }
 
 private:
   const Real nu;
+  const bool cavity;
 };
 
 class PSoln : public ExactSoln
 {
 public:
-  PSoln() = default;
+  PSoln(const bool cavity_in) : cavity(cavity_in) {}
 
   Real operator()(const Point & p) const override
   {
     const auto x = p(0);
     const auto y = p(1);
-    return sin((3. / 2) * y * pi) * cos((1. / 4) * x * pi);
+    if (cavity)
+      return sin(x) * sin(y);
+    else
+      return sin((3. / 2) * y * pi) * cos((1. / 4) * x * pi);
   }
 
   Real forcing(const Point & p) const override
   {
     const auto x = p(0);
     const auto y = p(1);
-    return -1. / 2 * pi * sin((1. / 4) * x * pi) * sin((1. / 2) * y * pi) -
-           1. / 2 * pi * sin((1. / 2) * x * pi) * sin((1. / 2) * y * pi);
+    if (cavity)
+      return -1. / 2 * pi * sin(x) * sin((1. / 2) * y * pi) -
+             1. / 2 * pi * sin(y) * sin((1. / 2) * x * pi);
+    else
+      return -1. / 2 * pi * sin((1. / 4) * x * pi) * sin((1. / 2) * y * pi) -
+             1. / 2 * pi * sin((1. / 2) * x * pi) * sin((1. / 2) * y * pi);
   }
+
+private:
+  const bool cavity;
 };
 
 // compute a solution indexable at quadrature points composed from the local degree of freedom
@@ -207,7 +246,14 @@ class HDGProblem : public NonlinearImplicitSystem::ComputeResidualandJacobian,
                    public NonlinearImplicitSystem::ComputePreCheck
 {
 public:
-  HDGProblem(const Real nu_in) : nu(nu_in), u_true_soln(nu), v_true_soln(nu) {}
+  HDGProblem(const Real nu_in, const bool cavity_in)
+    : nu(nu_in),
+      cavity(cavity_in),
+      u_true_soln(nu, cavity),
+      v_true_soln(nu, cavity),
+      p_true_soln(cavity)
+  {
+  }
 
   System * mixed_system;
   ImplicitSystem * lm_system;
@@ -235,6 +281,8 @@ public:
   boundary_id_type bottom_bnd;
   // The kinematic viscosity
   Real nu;
+  // Whether we performing a cavity simulation
+  bool cavity;
   // The true solutions
   const USoln u_true_soln;
   const VSoln v_true_soln;
@@ -242,9 +290,6 @@ public:
 
   // Whether we are performing an MMS study
   bool mms;
-
-  // Whether we performing a cavity simulation
-  bool cavity;
 
   void init()
   {
@@ -1338,9 +1383,6 @@ main(int argc, char ** argv)
   const Real nu = infile("nu", 1.);
   const bool cavity = infile("cavity", false);
 
-  if (mms && cavity)
-    libmesh_error_msg("'cavity' and 'mms' options are incompatible");
-
   // Skip higher-dimensional examples on a lower-dimensional libMesh build.
   libmesh_example_requires(dimension <= LIBMESH_DIM, dimension << "D support");
 
@@ -1359,9 +1401,12 @@ main(int argc, char ** argv)
                            << " but this example must be run with TRI6, TRI7, QUAD8, or QUAD9 in 2d"
                            << " or with TET14, or HEX27 in 3d.");
 
-  if (mms || cavity)
+  if (mms && !cavity)
     MeshTools::Generation::build_square(
         mesh, grid_size, grid_size, 0., 2., -1, 1., Utility::string_to_enum<ElemType>(elem_str));
+  else if (cavity)
+    MeshTools::Generation::build_square(
+        mesh, grid_size, grid_size, -1, 1, -1, 1., Utility::string_to_enum<ElemType>(elem_str));
   else
     MeshTools::Generation::build_square(mesh,
                                         5 * grid_size,
@@ -1403,7 +1448,7 @@ main(int argc, char ** argv)
   const FEType scalar_fe_type(FIRST, L2_LAGRANGE);
   const FEType lm_fe_type(FIRST, SIDE_HIERARCHIC);
 
-  HDGProblem hdg(nu);
+  HDGProblem hdg(nu, cavity);
   hdg.mesh = &mesh;
   hdg.mixed_system = &system;
   hdg.lm_system = &lm_system;
@@ -1420,7 +1465,6 @@ main(int argc, char ** argv)
   hdg.parallel_increment = &parallel_inc;
   hdg.ghosted_old_solution = &ghosted_old;
   hdg.mms = mms;
-  hdg.cavity = cavity;
 
   lm_system.nonlinear_solver->residual_and_jacobian_object = &hdg;
   lm_system.nonlinear_solver->precheck_object = &hdg;
