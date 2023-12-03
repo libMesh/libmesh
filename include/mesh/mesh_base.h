@@ -1370,15 +1370,6 @@ public:
   virtual void all_first_order () = 0;
 
   /**
-   * Converts a (conforming, non-refined) mesh with linear elements
-   * into a mesh with "complete" order elements, i.e. elements which
-   * can store degrees of freedom on any vertex, edge, or face.  For
-   * example, a mesh consisting of \p Tet4 or \p Tet10 will be
-   * converted to a mesh with \p Tet14 etc.
-   */
-  virtual void all_complete_order () = 0;
-
-  /**
    * We need an empty, generic class to act as a predicate for this
    * and derived mesh classes.
    */
@@ -1423,6 +1414,21 @@ public:
    * consisting of all elements in the mesh.
    */
   void all_second_order (const bool full_ordered = true);
+
+  /**
+   * Converts a set of elements in this (conforming, non-refined) mesh
+   * into "complete" order elements, i.e. elements which
+   * can store degrees of freedom on any vertex, edge, or face.  For
+   * example, a mesh consisting of \p Tet4 or \p Tet10 will be
+   * converted to a mesh with \p Tet14 etc.
+   */
+  virtual void all_complete_order_range(const SimpleRange<element_iterator> & range) = 0;
+
+  /**
+   * Calls the range-based version of this function with a range
+   * consisting of all elements in the mesh.
+   */
+  virtual void all_complete_order ();
 
   /**
    * In a few (very rare) cases, the user may have manually tagged the

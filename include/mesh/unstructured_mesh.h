@@ -147,7 +147,7 @@ public:
    * example, a mesh consisting of \p Tet4 or \p Tet10 will be
    * converted to a mesh with \p Tet14 etc.
    */
-  virtual void all_complete_order () override;
+  virtual void all_complete_order_range (const SimpleRange<element_iterator> & range) override;
 
   /**
    * Generates a new mesh containing all the elements which

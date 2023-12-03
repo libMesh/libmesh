@@ -788,6 +788,7 @@ void DistributedMesh::own_node (Node & n)
   libmesh_assert(_nodes[n.id()] == &n);
 
   _nodes[n.id()] = nullptr;
+  _n_nodes--;
 
   n.set_id(DofObject::invalid_id);
   n.processor_id() = this->processor_id();
@@ -958,8 +959,6 @@ void DistributedMesh::renumber_node(const dof_id_type old_id,
   libmesh_assert (nd);
   libmesh_assert_equal_to (nd->id(), old_id);
 
-  nd->set_id(new_id);
-
   // If we have nodes shipped to this processor for NodeConstraints
   // use, then those nodes will exist in _nodes, but may not be
   // locatable via a TopologyMap due to the insufficiency of elements
@@ -981,6 +980,8 @@ void DistributedMesh::renumber_node(const dof_id_type old_id,
   libmesh_assert (!_nodes[new_id]);
 #endif
   _nodes[new_id] = nd;
+  nd->set_id(new_id);
+
   _nodes.erase(old_id);
 }
 
@@ -1047,10 +1048,9 @@ void DistributedMesh::redistribute ()
 
       this->update_parallel_id_counts();
 
-      // We probably had valid neighbors previously, so that a quality
-      // new partitioning could be found, but we might not have valid
-      // neighbor links on the newly-redistributed elements
-      this->find_neighbors();
+      // We ought to still have valid neighbor links; we communicate
+      // them for newly-redistributed elements
+      // this->find_neighbors();
 
       // Is this necessary?  If we are called from prepare_for_use(), this will be called
       // anyway... but users can always call partition directly, in which case we do need

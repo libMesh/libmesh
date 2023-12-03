@@ -1229,6 +1229,19 @@ public:
    */
   static ElemType first_order_equivalent_type (const ElemType et);
 
+  /**
+   * \returns The ElemType of the associated "complete" order element
+   * (which will be the same as the input if the input is already a
+   * complete-order ElemType), or INVALID_ELEM for elements that cannot be
+   * converted into complete-order equivalents.
+   *
+   * The "complete" version of an element is an element which can
+   * represent the same geometry but which has nodes available to
+   * restore degrees of freedom on any vertex, edge, or face.
+   *
+   * For example, when \p this is a \p TET4, then \p TET14 is returned.
+   */
+  static ElemType complete_order_equivalent_type (const ElemType et);
 
   /**
    * \returns The refinement level of the current element.

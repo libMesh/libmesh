@@ -1535,6 +1535,11 @@ void MeshBase::all_second_order (const bool full_ordered)
   this->all_second_order_range(this->element_ptr_range(), full_ordered);
 }
 
+void MeshBase::all_complete_order ()
+{
+  this->all_complete_order_range(this->element_ptr_range());
+}
+
 unsigned int MeshBase::recalculate_n_partitions()
 {
   // This requires an inspection on every processor
