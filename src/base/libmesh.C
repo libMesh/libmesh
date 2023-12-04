@@ -762,6 +762,13 @@ LibMeshInit::~LibMeshInit()
     libMesh::enableFPE(false);
 
 #if defined(LIBMESH_HAVE_PETSC)
+  // Let PETSc know about all the command line objects that we
+  // consumed without asking them, so we don't get unused option
+  // warnings abou those.
+  std::vector<std::string> cli_names = command_line_names();
+  for (const auto & name : cli_names)
+    PetscOptionsClearValue(NULL, name.c_str());
+
   // Allow the user to bypass PETSc finalization
   if (!libMesh::on_command_line ("--disable-petsc")
 #if defined(LIBMESH_HAVE_MPI)
