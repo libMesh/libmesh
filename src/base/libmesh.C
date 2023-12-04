@@ -894,6 +894,17 @@ void add_command_line_name(const std::string & name)
 }
 
 
+
+void add_command_line_names(const GetPot & getpot)
+{
+  for (auto & getter : {&GetPot::get_requested_arguments,
+                        &GetPot::get_requested_variables,
+                        &GetPot::get_requested_sections})
+    for (const std::string & name : (getpot.*getter)())
+      add_command_line_name(name);
+}
+
+
 std::vector<std::string> command_line_names()
 {
   return std::vector<std::string>(command_line_name_set.begin(),

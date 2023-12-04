@@ -22,8 +22,9 @@
 
 
 // Local includes
-#include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh_base.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh_config.h"
 
 // C++ includes
 #include <string>
@@ -38,6 +39,14 @@ class vtkMPIController;
 namespace TIMPI {
   class TIMPIInit;
 }
+
+#ifdef GETPOT_NAMESPACE
+namespace GETPOT_NAMESPACE {
+#endif
+class GetPot;
+#ifdef GETPOT_NAMESPACE
+}
+#endif
 
 /**
  * The \p libMesh namespace provides an interface to certain functionality
@@ -55,6 +64,7 @@ namespace libMesh
 namespace Parallel {
   class Communicator;
 }
+
 enum SolverPackage : int;
 
 /**
@@ -233,6 +243,13 @@ std::vector<std::string> command_line_names();
  * Add a name to the set of queried command-line names
  */
 void add_command_line_name(const std::string & name);
+
+/**
+ * Merge a GetPot object's requested names into the set of queried
+ * command-line names
+ */
+void add_command_line_names(const GetPot & getpot);
+
 
 /**
  * The imaginary unit, \f$ \sqrt{-1} \f$.
