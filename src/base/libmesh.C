@@ -87,11 +87,16 @@
 #include "libmesh/restore_warnings.h"
 #endif
 
+#include <mutex>
+
 // --------------------------------------------------------
 // Local anonymous namespace to hold miscellaneous bits
 namespace {
 
 std::unique_ptr<GetPot> command_line;
+
+std::set<std::string> command_line_name_set;
+
 std::unique_ptr<std::ofstream> _ofstream;
 // If std::cout and std::cerr are redirected, we need to
 // be a little careful and save the original streambuf objects,
@@ -869,13 +874,33 @@ void enableSEGV(bool on)
 
 
 
+void add_command_line_name(const std::string & name)
+{
+  // Users had better not be asking about an empty string
+  libmesh_assert(!name.empty());
+
+  static std::mutex command_line_names_mutex;
+  std::scoped_lock lock(command_line_names_mutex);
+
+  command_line_name_set.insert(name);
+}
+
+
+std::vector<std::string> command_line_names()
+{
+  return std::vector<std::string>(command_line_name_set.begin(),
+                                  command_line_name_set.end());
+}
+
+
+
 bool on_command_line (std::string arg)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
 
-  // Users had better not be asking about an empty string
-  libmesh_assert(!arg.empty());
+  // Keep track of runtime queries, for later
+  add_command_line_name(arg);
 
   bool found_it = command_line->search(arg);
 
@@ -907,6 +932,9 @@ T command_line_value (const std::string & name, T value)
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
 
+  // Keep track of runtime queries, for later
+  add_command_line_name(name);
+
   // only if the variable exists in the file
   if (command_line->have_variable(name))
     value = (*command_line)(name, value);
@@ -915,13 +943,17 @@ T command_line_value (const std::string & name, T value)
 }
 
 template <typename T>
-T command_line_value (const std::vector<std::string> & name, T value)
+T command_line_value (const std::vector<std::string> & names, T value)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
 
+  // Keep track of runtime queries, for later
+  for (const auto & entry : names)
+    add_command_line_name(entry);
+
   // Check for multiple options (return the first that matches)
-  for (const auto & entry : name)
+  for (const auto & entry : names)
     if (command_line->have_variable(entry))
       {
         value = (*command_line)(entry, value);
@@ -936,6 +968,12 @@ T command_line_value (const std::vector<std::string> & name, T value)
 template <typename T>
 T command_line_next (std::string name, T value)
 {
+  // Make sure the command line parser is ready for use
+  libmesh_assert(command_line.get());
+
+  // Keep track of runtime queries, for later
+  add_command_line_name(name);
+
   // on_command_line also puts the command_line cursor in the spot we
   // need
   if (on_command_line(name))
@@ -951,6 +989,9 @@ void command_line_vector (const std::string & name, std::vector<T> & vec)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
+
+  // Keep track of runtime queries, for later
+  add_command_line_name(name);
 
   // only if the variable exists on the command line
   if (command_line->have_variable(name))
