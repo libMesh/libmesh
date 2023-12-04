@@ -767,7 +767,8 @@ LibMeshInit::~LibMeshInit()
   // warnings abou those.
   std::vector<std::string> cli_names = command_line_names();
   for (const auto & name : cli_names)
-    PetscOptionsClearValue(NULL, name.c_str());
+    if (!name.empty() && name[0] == '-')
+      PetscOptionsClearValue(NULL, name.c_str());
 
   // Allow the user to bypass PETSc finalization
   if (!libMesh::on_command_line ("--disable-petsc")
@@ -939,12 +940,19 @@ T command_line_value (const std::string & name, T value)
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
 
-  // Keep track of runtime queries, for later
-  add_command_line_name(name);
-
   // only if the variable exists in the file
   if (command_line->have_variable(name))
-    value = (*command_line)(name, value);
+    {
+      value = (*command_line)(name, value);
+
+      // Keep track of runtime queries, for later.  GetPot splits
+      // foo=bar into a separate name=value, so we can query for the
+      // name, but as far as PETSc is concerned that's one CLI
+      // argument.  We'll store it that way.
+      const std::string stringvalue =
+        (*command_line)(name, std::string());
+      add_command_line_name(name+"="+stringvalue);
+    }
 
   return value;
 }
@@ -957,7 +965,15 @@ T command_line_value (const std::vector<std::string> & names, T value)
 
   // Keep track of runtime queries, for later
   for (const auto & entry : names)
-    add_command_line_name(entry);
+    {
+      // Keep track of runtime queries, for later.  GetPot splits
+      // foo=bar into a separate name=value, so we can query for the
+      // name, but as far as PETSc is concerned that's one CLI
+      // argument.  We'll store it that way.
+      const std::string stringvalue =
+        (*command_line)(entry, std::string());
+      add_command_line_name(entry+"="+stringvalue);
+    }
 
   // Check for multiple options (return the first that matches)
   for (const auto & entry : names)
