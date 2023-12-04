@@ -94,18 +94,12 @@ int main (int argc, char ** argv)
   const unsigned int dim = 2;                      // The number of spatial dimensions
 
   // Read the "online_mode" flag from the command line
-  GetPot command_line (argc, argv);
-  int online_mode = 0;
-  if (command_line.search(1, "-online_mode"))
-    online_mode = command_line.next(online_mode);
-
-  int eim_training_function_to_plot = 0;
-  if (command_line.search(1, "-eim_training_function_to_plot"))
-    eim_training_function_to_plot = command_line.next(eim_training_function_to_plot);
-
-  int eim_basis_function_to_plot = 0;
-  if (command_line.search(1, "-eim_basis_function_to_plot"))
-    eim_basis_function_to_plot = command_line.next(eim_basis_function_to_plot);
+  const int online_mode =
+    libMesh::command_line_next("-online_mode", 0),
+            eim_training_function_to_plot =
+    libMesh::command_line_next("-eim_training_function_to_plot", 0),
+            eim_basis_function_to_plot =
+    libMesh::command_line_next("-eim_basis_function_to_plot", 0);
 
   ReplicatedMesh mesh (init.comm(), dim);
   MeshTools::Generation::build_square (mesh,

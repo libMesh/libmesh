@@ -129,28 +129,24 @@ int main (int argc, char ** argv)
   // Read problem dimension from command line.  Use int
   // instead of unsigned since the GetPot overload is ambiguous
   // otherwise.
-  int dim = 2;
-  if (command_line.search(1, "-d"))
-    dim = command_line.next(dim);
+  const int dim = libMesh::command_line_next("-d", 2);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
 
   // Create a mesh with user-defined dimension.
   // Read number of elements from command line
-  int ps = 15;
-  if (command_line.search(1, "-n"))
-    ps = command_line.next(ps);
+  const int ps = libMesh::command_line_next("-n", 15);
 
   // Read FE order from command line
   std::string order = "FIRST";
-  if (command_line.search(2, "-Order", "-o"))
-    order = command_line.next(order);
+  order = libMesh::command_line_next("-o", order);
+  order = libMesh::command_line_next("-Order", order);
 
   // Read FE Family from command line
   std::string family = "LAGRANGE";
-  if (command_line.search(2, "-FEFamily", "-f"))
-    family = command_line.next(family);
+  family = libMesh::command_line_next("-f", family);
+  family = libMesh::command_line_next("-Order", family);
 
   // Cannot use discontinuous basis.
   libmesh_error_msg_if((family == "MONOMIAL") || (family == "XYZ"),

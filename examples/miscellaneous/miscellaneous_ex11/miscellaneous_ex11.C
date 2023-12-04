@@ -116,10 +116,8 @@ int main (int argc, char ** argv)
   MeshTools::Modification::scale(mesh, L, L, L);
 
   // Get the number of mesh refinements from the command line
-  GetPot command_line (argc, argv);
-  int n_refinements = 3;
-  if (command_line.search(1, "-n_refinements"))
-    n_refinements = command_line.next(n_refinements);
+  const int n_refinements =
+    libMesh::command_line_next("-n_refinements", 3);
 
   // Quadrisect the mesh triangles a few times to obtain a
   // finer mesh.  Subdivision surface elements require the

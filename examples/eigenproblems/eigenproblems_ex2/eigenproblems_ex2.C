@@ -96,19 +96,9 @@ int main (int argc, char ** argv)
   // Get the number of eigen values to be computed from "-n", and
   // possibly the mesh size from -nx and -ny
 
-  GetPot command_line (argc, argv);
-
-  int nev = 5;
-  if (command_line.search(1, "-n"))
-    nev = command_line.next(nev);
-
-  int nx = 20;
-  if (command_line.search(1, "-nx"))
-    nx = command_line.next(nx);
-
-  int ny = 20;
-  if (command_line.search(1, "-ny"))
-    ny = command_line.next(ny);
+  const int nev = libMesh::command_line_next("-n", 5),
+            nx = libMesh::command_line_next("-nx", 20),
+            ny = libMesh::command_line_next("-ny", 20);
 
 
   // Skip this 2D example if libMesh was compiled as 1D-only.

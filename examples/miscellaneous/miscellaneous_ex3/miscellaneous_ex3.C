@@ -169,25 +169,23 @@ int main (int argc, char ** argv)
   libMesh::out << std::endl << std::endl;
 
   // Read number of refinements
-  int nr = 2;
-  if (command_line.search(1, "-r"))
-    nr = command_line.next(nr);
+  const int nr = libMesh::command_line_next("-r", 2);
 
   // Read FE order from command line
   std::string order = "FIRST";
-  if (command_line.search(2, "-Order", "-o"))
-    order = command_line.next(order);
+  order = libMesh::command_line_next("-o", order);
+  order = libMesh::command_line_next("-Order", order);
 
   // Read FE Family from command line
   std::string family = "LAGRANGE";
-  if (command_line.search(2, "-FEFamily", "-f"))
-    family = command_line.next(family);
+  family = libMesh::command_line_next("-f", family);
+  family = libMesh::command_line_next("-Order", family);
 
   // Cannot use discontinuous basis.
   libmesh_error_msg_if((family == "MONOMIAL") || (family == "XYZ"),
                        "This example requires a C^0 (or higher) FE basis.");
 
-  if (command_line.search(1, "-pre"))
+  if (libMesh::on_command_line("-pre"))
     {
 #ifdef LIBMESH_HAVE_PETSC
       //Use the jacobian for preconditioning.

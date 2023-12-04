@@ -79,11 +79,7 @@ int main(int argc, char ** argv)
   // default MPI communicator.
   Mesh mesh(init.comm());
 
-  GetPot command_line (argc, argv);
-
-  int n = 4;
-  if (command_line.search(1, "-n"))
-    n = command_line.next(n);
+  const int n = libMesh::command_line_next("-n", 4);
 
   // Build a 1D mesh with 4 elements from x=0 to x=1, using
   // EDGE3 (i.e. quadratic) 1D elements. They are called EDGE3 elements

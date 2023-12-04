@@ -114,10 +114,7 @@ int main (int argc, char ** argv)
   bool store_basis_functions = infile("store_basis_functions", true); // Do we write the RB basis functions to disk?
 
   // Read the "online_mode" flag from the command line
-  GetPot command_line (argc, argv);
-  int online_mode = 0;
-  if (command_line.search(1, "-online_mode"))
-    online_mode = command_line.next(online_mode);
+  const int online_mode = libMesh::command_line_next("-online_mode", 0);
 
   // Build a mesh on the default MPI communicator.
   Mesh mesh (init.comm(), dim);
