@@ -573,6 +573,9 @@ int main (int argc, char ** argv)
         // performance benchmarks.
         const bool forward_sensitivity = infile("--forward_sensitivity", true);
 
+        // Don't confuse PETSc with our custom GetPot's arguments
+        libMesh::add_command_line_names(infile);
+
         if (forward_sensitivity)
           {
             // This will require two linear solves (one per parameter)
