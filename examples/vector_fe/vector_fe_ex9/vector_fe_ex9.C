@@ -354,7 +354,7 @@ public:
 
 private:
   void create_identity_residual(const QBase & quadrature,
-                                const std::vector<Real> & JxW,
+                                const std::vector<Real> & JxW_local,
                                 const std::vector<std::vector<Real>> & phi,
                                 const std::vector<Number> & sol,
                                 const std::size_t n_dofs,
@@ -362,11 +362,11 @@ private:
   {
     for (const auto qp : make_range(quadrature.n_points()))
       for (const auto i : make_range(n_dofs))
-        LMVec(i_offset + i) -= JxW[qp] * phi[i][qp] * sol[qp];
+        LMVec(i_offset + i) -= JxW_local[qp] * phi[i][qp] * sol[qp];
   }
 
   void create_identity_jacobian(const QBase & quadrature,
-                                const std::vector<Real> & JxW,
+                                const std::vector<Real> & JxW_local,
                                 const std::vector<std::vector<Real>> & phi,
                                 const std::size_t n_dofs,
                                 const unsigned int ij_offset)
@@ -374,11 +374,10 @@ private:
     for (const auto qp : make_range(quadrature.n_points()))
       for (const auto i : make_range(n_dofs))
         for (const auto j : make_range(n_dofs))
-          LMMat(ij_offset + i, ij_offset + j) -= JxW[qp] * phi[i][qp] * phi[j][qp];
+          LMMat(ij_offset + i, ij_offset + j) -= JxW_local[qp] * phi[i][qp] * phi[j][qp];
   }
 
   void compute_stress(const std::vector<Gradient> & vel_gradient,
-                      const std::vector<Number> & p_sol,
                       const unsigned int vel_component,
                       std::vector<Gradient> & sigma)
   {
@@ -425,27 +424,27 @@ private:
       }
   }
 
-  RealVectorValue vel_cross_vel_residual(const std::vector<Number> & u_sol,
-                                         const std::vector<Number> & v_sol,
+  RealVectorValue vel_cross_vel_residual(const std::vector<Number> & u_sol_local,
+                                         const std::vector<Number> & v_sol_local,
                                          const unsigned int qp,
                                          const unsigned int vel_component) const
   {
-    const RealVectorValue U(u_sol[qp], v_sol[qp]);
+    const RealVectorValue U(u_sol_local[qp], v_sol_local[qp]);
     return U * U(vel_component);
   }
 
-  RealVectorValue vel_cross_vel_jacobian(const std::vector<Number> & u_sol,
-                                         const std::vector<Number> & v_sol,
+  RealVectorValue vel_cross_vel_jacobian(const std::vector<Number> & u_sol_local,
+                                         const std::vector<Number> & v_sol_local,
                                          const unsigned int qp,
                                          const unsigned int vel_component,
                                          const unsigned int vel_j_component,
                                          const std::vector<std::vector<Real>> & phi,
                                          const unsigned int j) const
   {
-    const RealVectorValue U(u_sol[qp], v_sol[qp]);
-    RealVectorValue vector_phi;
-    vector_phi(vel_j_component) = phi[j][qp];
-    auto ret = vector_phi * U(vel_component);
+    const RealVectorValue U(u_sol_local[qp], v_sol_local[qp]);
+    RealVectorValue vector_phi_local;
+    vector_phi_local(vel_j_component) = phi[j][qp];
+    auto ret = vector_phi_local * U(vel_component);
     if (vel_component == vel_j_component)
       ret += U * phi[j][qp];
     return ret;
@@ -454,11 +453,9 @@ private:
   void scalar_volume_residual(const unsigned int i_offset,
                               const std::vector<Gradient> & vel_gradient,
                               const unsigned int vel_component,
-                              std::vector<Gradient> & sigma,
-                              const std::vector<Number> & u_sol,
-                              const std::vector<Number> & v_sol)
+                              std::vector<Gradient> & sigma)
   {
-    compute_stress(vel_gradient, p_sol, vel_component, sigma);
+    compute_stress(vel_gradient, vel_component, sigma);
     const auto & mms_info = vel_component == 0 ? static_cast<const ExactSoln &>(u_true_soln)
                                                : static_cast<const ExactSoln &>(v_true_soln);
     for (const auto qp : make_range(qrule->n_points()))
@@ -489,8 +486,6 @@ private:
                               const unsigned int vel_gradient_j_offset,
                               const unsigned int p_j_offset,
                               const unsigned int vel_component,
-                              const std::vector<Number> & u_sol,
-                              const std::vector<Number> & v_sol,
                               const unsigned int u_j_offset,
                               const unsigned int v_j_offset)
   {
@@ -532,8 +527,6 @@ private:
   }
 
   void pressure_volume_residual(const unsigned int i_offset,
-                                const std::vector<Number> & u_sol,
-                                const std::vector<Number> & v_sol,
                                 const unsigned int global_lm_i_offset)
   {
     for (const auto qp : make_range(qrule->n_points()))
@@ -595,9 +588,7 @@ private:
     }
   }
 
-  void pressure_face_residual(const unsigned int i_offset,
-                              const std::vector<Number> & lm_u_sol,
-                              const std::vector<Number> & lm_v_sol)
+  void pressure_face_residual(const unsigned int i_offset)
   {
     for (const auto qp : make_range(qface->n_points()))
     {
@@ -770,9 +761,7 @@ private:
                             const std::vector<Gradient> & vector_sol,
                             const std::vector<Number> & scalar_sol,
                             const std::vector<Number> & lm_sol,
-                            const unsigned int vel_component,
-                            const std::vector<Number> & lm_u_sol,
-                            const std::vector<Number> & lm_v_sol)
+                            const unsigned int vel_component)
   {
     for (const auto qp : make_range(qface->n_points()))
     {
@@ -818,8 +807,6 @@ private:
                             const unsigned int lm_j_offset,
                             const unsigned int p_j_offset,
                             const unsigned int vel_component,
-                            const std::vector<Number> & lm_u_sol,
-                            const std::vector<Number> & lm_v_sol,
                             const unsigned int lm_u_j_offset,
                             const unsigned int lm_v_j_offset)
   {
@@ -886,9 +873,7 @@ private:
                         const std::vector<Gradient> & vector_sol,
                         const std::vector<Number> & scalar_sol,
                         const std::vector<Number> & lm_sol,
-                        const unsigned int vel_component,
-                        const std::vector<Number> & lm_u_sol,
-                        const std::vector<Number> & lm_v_sol)
+                        const unsigned int vel_component)
   {
     for (const auto qp : make_range(qface->n_points()))
     {
@@ -933,8 +918,6 @@ private:
                         const unsigned int lm_j_offset,
                         const unsigned int p_j_offset,
                         const unsigned int vel_component,
-                        const std::vector<Number> & lm_u_sol,
-                        const std::vector<Number> & lm_v_sol,
                         const unsigned int lm_u_j_offset,
                         const unsigned int lm_v_j_offset)
   {
@@ -1071,20 +1054,18 @@ private:
 
       // qu and u
       vector_volume_residual(0, qu_sol, u_sol);
-      scalar_volume_residual(vector_n_dofs, qu_sol, 0, sigma_u, u_sol, v_sol);
+      scalar_volume_residual(vector_n_dofs, qu_sol, 0, sigma_u);
       vector_volume_jacobian(0, 0, vector_n_dofs);
       scalar_volume_jacobian(vector_n_dofs,
                              0,
                              2 * lm_n_dofs,
                              0,
-                             u_sol,
-                             v_sol,
                              vector_n_dofs,
                              2 * vector_n_dofs + scalar_n_dofs);
 
       // qv and v
       vector_volume_residual(vector_n_dofs + scalar_n_dofs, qv_sol, v_sol);
-      scalar_volume_residual(2 * vector_n_dofs + scalar_n_dofs, qv_sol, 1, sigma_v, u_sol, v_sol);
+      scalar_volume_residual(2 * vector_n_dofs + scalar_n_dofs, qv_sol, 1, sigma_v);
       vector_volume_jacobian(vector_n_dofs + scalar_n_dofs,
                              vector_n_dofs + scalar_n_dofs,
                              2 * vector_n_dofs + scalar_n_dofs);
@@ -1092,13 +1073,11 @@ private:
                              vector_n_dofs + scalar_n_dofs,
                              2 * lm_n_dofs,
                              1,
-                             u_sol,
-                             v_sol,
                              vector_n_dofs,
                              2 * vector_n_dofs + scalar_n_dofs);
 
       // p
-      pressure_volume_residual(2 * lm_n_dofs, u_sol, v_sol, 2 * lm_n_dofs + p_n_dofs);
+      pressure_volume_residual(2 * lm_n_dofs, 2 * lm_n_dofs + p_n_dofs);
       pressure_volume_jacobian(2 * lm_n_dofs,
                                vector_n_dofs,
                                2 * vector_n_dofs + scalar_n_dofs,
@@ -1165,41 +1144,37 @@ private:
         // qu, u, lm_u
         vector_face_residual(0, lm_u_sol);
         vector_face_jacobian(0, 0);
-        scalar_face_residual(vector_n_dofs, qu_sol, u_sol, lm_u_sol, 0, lm_u_sol, lm_v_sol);
+        scalar_face_residual(vector_n_dofs, qu_sol, u_sol, lm_u_sol, 0);
         scalar_face_jacobian(
-            vector_n_dofs, 0, vector_n_dofs, 0, 2 * lm_n_dofs, 0, lm_u_sol, lm_v_sol, 0, lm_n_dofs);
-        lm_face_residual(0, qu_sol, u_sol, lm_u_sol, 0, lm_u_sol, lm_v_sol);
+            vector_n_dofs, 0, vector_n_dofs, 0, 2 * lm_n_dofs, 0, 0, lm_n_dofs);
+        lm_face_residual(0, qu_sol, u_sol, lm_u_sol, 0);
         lm_face_jacobian(
-            0, 0, vector_n_dofs, 0, 2 * lm_n_dofs, 0, lm_u_sol, lm_v_sol, 0, lm_n_dofs);
+            0, 0, vector_n_dofs, 0, 2 * lm_n_dofs, 0, 0, lm_n_dofs);
         // qv, v, lm_v
         vector_face_residual(vector_n_dofs + scalar_n_dofs, lm_v_sol);
         vector_face_jacobian(vector_n_dofs + scalar_n_dofs, lm_n_dofs);
         scalar_face_residual(
-            2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, lm_v_sol, 1, lm_u_sol, lm_v_sol);
+            2 * vector_n_dofs + scalar_n_dofs, qv_sol, v_sol, lm_v_sol, 1);
         scalar_face_jacobian(2 * vector_n_dofs + scalar_n_dofs,
                              vector_n_dofs + scalar_n_dofs,
                              2 * vector_n_dofs + scalar_n_dofs,
                              lm_n_dofs,
                              2 * lm_n_dofs,
                              1,
-                             lm_u_sol,
-                             lm_v_sol,
                              0,
                              lm_n_dofs);
-        lm_face_residual(lm_n_dofs, qv_sol, v_sol, lm_v_sol, 1, lm_u_sol, lm_v_sol);
+        lm_face_residual(lm_n_dofs, qv_sol, v_sol, lm_v_sol, 1);
         lm_face_jacobian(lm_n_dofs,
                          vector_n_dofs + scalar_n_dofs,
                          2 * vector_n_dofs + scalar_n_dofs,
                          lm_n_dofs,
                          2 * lm_n_dofs,
                          1,
-                         lm_u_sol,
-                         lm_v_sol,
                          0,
                          lm_n_dofs);
 
         // p
-        pressure_face_residual(2 * lm_n_dofs, lm_u_sol, lm_v_sol);
+        pressure_face_residual(2 * lm_n_dofs);
         pressure_face_jacobian(2 * lm_n_dofs, 0, lm_n_dofs);
       }
 
