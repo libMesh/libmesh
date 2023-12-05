@@ -323,8 +323,8 @@ ax2 = ax1.twinx()
 ax1.set_axisbelow(True)
 ax2.set_axisbelow(True)
 
-ax1.grid(b=True, axis='x', color='lightgray', linestyle='--', linewidth=1, alpha=0.25)
-ax2.grid(b=True, axis='y', color='lightgray', linestyle='--', linewidth=1, alpha=0.25)
+ax1.grid(visible=True, axis='x', color='lightgray', linestyle='--', linewidth=1, alpha=0.25)
+ax2.grid(visible=True, axis='y', color='lightgray', linestyle='--', linewidth=1, alpha=0.25)
 
 # Plot number of files vs. time
 ax1.plot(date_nums, n_files, color=u'#4878cf', marker='o', linestyle='-', markersize=4, markevery=5)
