@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
@@ -44,8 +44,9 @@ data = [
 '\'19', 132,
 '\'20', 188,
 '\'21', 211,
-'\'22', 229,
-'\'23', 206,
+'\'22', 228,
+'\'23', 226,
+'\'24', 3,
     ]
 
 # Parse command line args

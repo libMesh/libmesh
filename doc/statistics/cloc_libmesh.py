@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -284,6 +284,7 @@ data = [
     '2023-08-04', 942, 220602, # 69106dc3
     '2023-09-04', 942, 221002, # 67204eee
     '2023-10-04', 947, 222094, # fbd56da3
+    '2023-11-04', 949, 222982, # b2248b50
 ]
 
 # Extract the dates from the data array
@@ -322,8 +323,8 @@ ax2 = ax1.twinx()
 ax1.set_axisbelow(True)
 ax2.set_axisbelow(True)
 
-ax1.grid(b=True, axis='x', color='lightgray', linestyle='--', linewidth=1, alpha=0.25)
-ax2.grid(b=True, axis='y', color='lightgray', linestyle='--', linewidth=1, alpha=0.25)
+ax1.grid(visible=True, axis='x', color='lightgray', linestyle='--', linewidth=1, alpha=0.25)
+ax2.grid(visible=True, axis='y', color='lightgray', linestyle='--', linewidth=1, alpha=0.25)
 
 # Plot number of files vs. time
 ax1.plot(date_nums, n_files, color=u'#4878cf', marker='o', linestyle='-', markersize=4, markevery=5)
