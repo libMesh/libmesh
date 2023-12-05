@@ -62,8 +62,7 @@
 #include "libmesh/getpot.h"
 #include "libmesh/exodusII_io.h"
 
-#ifdef LIBMESH_HAVE_EIGEN_DENSE
-#ifdef LIBMESH_HAVE_METAPHYSICL
+#if defined(LIBMESH_HAVE_EIGEN_DENSE) && defined(LIBMESH_HAVE_PETSC)
 
 #include <Eigen/Dense>
 
@@ -1487,15 +1486,6 @@ main(int argc, char ** argv)
   return 0;
 }
 
-#else
-
-int
-main()
-{
-  return 0;
-}
-
-#endif
 #else
 
 int
