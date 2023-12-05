@@ -151,30 +151,24 @@ int main (int argc, char ** argv)
 
   libMesh::out << std::endl << std::endl;
 
-  // Create a GetPot object to parse the command line
-  GetPot command_line (argc, argv);
-
-
   // This boolean value is obtained from the command line, it is true
   // if the flag "-read_solution" is present, false otherwise.
   // It indicates whether we are going to read in
   // the mesh and solution files "saved_mesh.xda" and "saved_solution.xda"
   // or whether we are going to start from scratch by just reading
   // "mesh.xda"
-  const bool read_solution = command_line.search("-read_solution");
+  const bool read_solution = libMesh::on_command_line("-read_solution");
 
   // This value is also obtained from the commandline and it specifies the
   // initial value for the t_step looping variable. We must
   // distinguish between the two cases here, whether we read in the
   // solution or we started from scratch, so that we do not overwrite the
   // gmv output files.
-  unsigned int init_timestep = 0;
+  const unsigned int init_timestep =
+    libMesh::command_line_next("-init_timestep",
+                               libMesh::invalid_uint);
 
-  // Search the command line for the "init_timestep" flag and if it is
-  // present, set init_timestep accordingly.
-  if (command_line.search("-init_timestep"))
-    init_timestep = command_line.next(0);
-  else
+  if (init_timestep == libMesh::invalid_uint)
     {
       // This handy function will print the file name, line number,
       // specified message, and then throw an exception.
@@ -182,18 +176,16 @@ int main (int argc, char ** argv)
     }
 
   // This command line value specifies how many time steps to take.
-  unsigned int n_timesteps = 0;
+  const unsigned int n_timesteps =
+    libMesh::command_line_next("-n_timesteps",
+                               libMesh::invalid_uint);
 
-  if (command_line.search("-n_timesteps"))
-    n_timesteps = command_line.next(0);
-  else
+  if (n_timesteps == libMesh::invalid_uint)
     libmesh_error_msg("ERROR: Number of timesteps not specified");
 
   // This command line value specifies how far to allow refinement
-  unsigned int max_h_level = 5;
-  if (command_line.search("-max_h_level"))
-    max_h_level = command_line.next(n_timesteps);
-
+  const unsigned int max_h_level =
+    libMesh::command_line_next("-max_h_level", 5);
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
@@ -214,9 +206,8 @@ int main (int argc, char ** argv)
       mesh.read ("mesh.xda");
 
       // Again do a search on the command line for an argument
-      unsigned int n_refinements = 5;
-      if (command_line.search("-n_refinements"))
-        n_refinements = command_line.next(0);
+      const unsigned int n_refinements = 5;
+        libMesh::command_line_next("-n_refinements", 5);
 
       // Uniformly refine the mesh 5 times
       if (!read_solution)
@@ -422,9 +413,8 @@ int main (int argc, char ** argv)
         }
 
       // Again do a search on the command line for an argument
-      unsigned int output_freq = 10;
-      if (command_line.search("-output_freq"))
-        output_freq = command_line.next(0);
+      const unsigned int output_freq =
+        libMesh::command_line_next("-output_freq", 10);
 
       // Output every 10 timesteps to file.
       if ((t_step+1)%output_freq == 0)

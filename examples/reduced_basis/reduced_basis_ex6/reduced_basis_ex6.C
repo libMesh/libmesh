@@ -151,10 +151,8 @@ int main (int argc, char ** argv)
   unsigned int n_elem_z  = infile("n_elem_z", 1);
 
   // Read the "online_mode" flag from the command line
-  GetPot command_line (argc, argv);
-  int online_mode = 0;
-  if (command_line.search(1, "-online_mode"))
-    online_mode = command_line.next(online_mode);
+  const int online_mode =
+    libMesh::command_line_next("-online_mode", 0);
 
   // Create a mesh, with dimension to be overridden by build_cube, on
   // the default MPI communicator.  We currently have to create a

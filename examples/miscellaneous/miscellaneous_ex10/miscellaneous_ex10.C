@@ -77,9 +77,6 @@ int main (int argc, char ** argv)
   libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
                            "--enable-petsc, --enable-trilinos, or --enable-eigen");
 
-  // Create a GetPot object to parse the command line
-  GetPot command_line (argc, argv);
-
   // Check for proper calling arguments.
   libmesh_error_msg_if(argc < 3, "Usage:\n" << "\t " << argv[0] << " -n 15");
 
@@ -104,9 +101,7 @@ int main (int argc, char ** argv)
 #endif
 
   // Read number of elements used in each cube from command line
-  int ps = 10;
-  if (command_line.search(1, "-n"))
-    ps = command_line.next(ps);
+  const int ps = libMesh::command_line_next("-n", 10);
 
   // Generate eight meshes that will be stitched
   Mesh mesh (init.comm());

@@ -52,8 +52,10 @@ int main (int argc, char ** argv)
   // a filename to write the mesh into.
   libmesh_error_msg_if(argc < 4, "Usage: " << argv[0] << " -d 2 in.mesh [-o out.mesh]");
 
-  // Get the dimensionality of the mesh from argv[2]
-  const unsigned int dim = std::atoi(argv[2]);
+  // Get the dimensionality of the mesh from the "-d" argument
+  const unsigned int dim =
+    libMesh::command_line_next("-d", libMesh::invalid_uint);
+  libmesh_error_msg_if(dim > 3, "Usage: " << argv[0] << " -d 2 in.mesh [-o out.mesh]");
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
@@ -63,30 +65,31 @@ int main (int argc, char ** argv)
   Mesh mesh(init.comm());
 
   // We may need XDR support compiled in to read binary .xdr files
-  std::string input_filename = argv[3];
+  const std::string input_filename = argv[3];
 #ifndef LIBMESH_HAVE_XDR
   libmesh_example_requires(input_filename.rfind(".xdr") >=
                            input_filename.size(), "XDR support");
 #endif
 
   // Read the input mesh.
-  mesh.read (argv[3]);
+  mesh.read (input_filename);
 
   // Print information about the mesh to the screen.
   mesh.print_info();
 
   // Write the output mesh if the user specified an
   // output file name.
-  if (argc >= 6 && std::string("-o") == argv[4])
+  if (libMesh::on_command_line("-o"))
     {
       // We may need XDR support compiled in to read binary .xdr files
-      std::string output_filename = argv[5];
+      const std::string output_filename =
+        libMesh::command_line_next("-o",std::string());
 #ifndef LIBMESH_HAVE_XDR
       libmesh_example_requires(output_filename.rfind(".xdr") >=
                                output_filename.size(), "XDR support");
 #endif
 
-      mesh.write (argv[5]);
+      mesh.write (output_filename);
     }
 
   // All done.  libMesh objects are destroyed here.  Because the

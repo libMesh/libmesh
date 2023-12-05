@@ -90,11 +90,8 @@ int main (int argc, char ** argv)
   Mesh mesh(init.comm());
 
   // Get the mesh size from the command line.
-  GetPot command_line (argc, argv);
-
-  int n_elem = 15;
-  if (command_line.search(1, "-n_elem"))
-    n_elem = command_line.next(n_elem);
+  const int n_elem =
+    libMesh::command_line_next("-n_elem", 15);
 
   // Use the MeshTools::Generation mesh generator to create a uniform
   // 2D grid on the square [-1,1]^2.  We instruct the mesh generator

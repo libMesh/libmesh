@@ -124,10 +124,8 @@ int main (int argc, char ** argv)
 #endif
 
   // Read the "distributed_load" flag from the command line
-  GetPot command_line (argc, argv);
-  int distributed_load = 0;
-  if (command_line.search(1, "-distributed_load"))
-    distributed_load = command_line.next(distributed_load);
+  const int distributed_load =
+    libMesh::command_line_next("-distributed_load", 0);
 
   {
     Mesh mesh (init.comm(), 3);
@@ -143,9 +141,8 @@ int main (int argc, char ** argv)
   mesh.read("cylinder.xdr");
 
   // Get the number of mesh refinements from the command line
-  int n_refinements = 0;
-  if (command_line.search(1, "-n_refinements"))
-    n_refinements = command_line.next(n_refinements);
+  const int n_refinements =
+    libMesh::command_line_next("-n_refinements", 0);
 
   // Refine the mesh if requested
   // Skip adaptive runs on a non-adaptive libMesh build

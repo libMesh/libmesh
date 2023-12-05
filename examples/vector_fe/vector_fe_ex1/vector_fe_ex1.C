@@ -101,11 +101,8 @@ int main (int argc, char ** argv)
   // Get the mesh size from the command line.
   GetPot command_line (argc, argv);
 
-  int nx = 15, ny = 15;
-  if (command_line.search(1, "-nx"))
-    nx = command_line.next(nx);
-  if (command_line.search(1, "-ny"))
-    ny = command_line.next(ny);
+  const int nx = libMesh::command_line_next("-nx", 15),
+            ny = libMesh::command_line_next("-ny", 15);
 
   // Create a mesh, with dimension to be overridden later, on the
   // default MPI communicator.

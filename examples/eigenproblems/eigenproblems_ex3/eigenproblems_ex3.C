@@ -140,20 +140,17 @@ int main (int argc, char ** argv)
   GetPot command_line (argc, argv);
 
   // Read the mesh name from the command line
-  std::string mesh_name = "";
-  if (command_line.search(1, "-mesh_name"))
-    mesh_name = command_line.next(mesh_name);
+  const std::string mesh_name =
+    libMesh::command_line_next("-mesh_name", std::string());
 
   // Also, read in the index of the eigenvector that we should plot
   // (zero-based indexing, as usual!)
-  unsigned int plotting_index = 0;
-  if (command_line.search(1, "-plotting_index"))
-    plotting_index = command_line.next(plotting_index);
+  const unsigned int plotting_index =
+    libMesh::command_line_next("-plotting_index", 0u);
 
   // Finally, read in the number of eigenpairs we want to compute!
-  unsigned int n_evals = 0;
-  if (command_line.search(1, "-n_evals"))
-    n_evals = command_line.next(n_evals);
+  const unsigned int n_evals =
+    libMesh::command_line_next("-n_evals", 0u);
 
   // Append the .e to mesh_name
   std::ostringstream mesh_name_exodus;

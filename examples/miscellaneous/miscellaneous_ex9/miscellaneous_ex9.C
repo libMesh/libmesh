@@ -113,11 +113,7 @@ int main (int argc, char ** argv)
   libmesh_example_requires(false, "--enable-dirichlet");
 #endif
 
-  GetPot command_line (argc, argv);
-
-  Real R = 2.;
-  if (command_line.search(1, "-R"))
-    R = command_line.next(R);
+  const Real R = libMesh::command_line_next("-R", 2.);
 
   Mesh mesh(init.comm());
 
@@ -174,9 +170,8 @@ int main (int argc, char ** argv)
 #ifdef LIBMESH_ENABLE_AMR
   // Possibly solve on a refined mesh next.
   MeshRefinement mesh_refinement (mesh);
-  unsigned int n_refinements = 0;
-  if (command_line.search("-n_refinements"))
-    n_refinements = command_line.next(0);
+  unsigned int n_refinements =
+    libMesh::command_line_next("-n_refinements", 0);
 
   for (unsigned int r = 0; r != n_refinements; ++r)
     {

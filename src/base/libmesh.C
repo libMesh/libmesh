@@ -87,11 +87,16 @@
 #include "libmesh/restore_warnings.h"
 #endif
 
+#include <mutex>
+
 // --------------------------------------------------------
 // Local anonymous namespace to hold miscellaneous bits
 namespace {
 
 std::unique_ptr<GetPot> command_line;
+
+std::set<std::string> command_line_name_set;
+
 std::unique_ptr<std::ofstream> _ofstream;
 // If std::cout and std::cerr are redirected, we need to
 // be a little careful and save the original streambuf objects,
@@ -757,6 +762,22 @@ LibMeshInit::~LibMeshInit()
     libMesh::enableFPE(false);
 
 #if defined(LIBMESH_HAVE_PETSC)
+  // Let PETSc know about all the command line objects that we
+  // consumed without asking them, so we don't get unused option
+  // warnings about those.
+  std::vector<std::string> cli_names = command_line_names();
+  for (const auto & name : cli_names)
+    if (!name.empty() && name[0] == '-')
+      {
+        // Newer PETSc can give me a double-free I'm having trouble
+        // replicating; let's protect against trying to clear
+        // already-used values
+        PetscBool used = PETSC_FALSE;
+        PetscOptionsUsed(NULL, name.c_str(), &used);
+        if (used == PETSC_FALSE)
+          PetscOptionsClearValue(NULL, name.c_str());
+      }
+
   // Allow the user to bypass PETSc finalization
   if (!libMesh::on_command_line ("--disable-petsc")
 #if defined(LIBMESH_HAVE_MPI)
@@ -869,13 +890,44 @@ void enableSEGV(bool on)
 
 
 
+void add_command_line_name(const std::string & name)
+{
+  // Users had better not be asking about an empty string
+  libmesh_assert(!name.empty());
+
+  static std::mutex command_line_names_mutex;
+  std::scoped_lock lock(command_line_names_mutex);
+
+  command_line_name_set.insert(name);
+}
+
+
+
+void add_command_line_names(const GetPot & getpot)
+{
+  for (auto & getter : {&GetPot::get_requested_arguments,
+                        &GetPot::get_requested_variables,
+                        &GetPot::get_requested_sections})
+    for (const std::string & name : (getpot.*getter)())
+      add_command_line_name(name);
+}
+
+
+std::vector<std::string> command_line_names()
+{
+  return std::vector<std::string>(command_line_name_set.begin(),
+                                  command_line_name_set.end());
+}
+
+
+
 bool on_command_line (std::string arg)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
 
-  // Users had better not be asking about an empty string
-  libmesh_assert(!arg.empty());
+  // Keep track of runtime queries, for later
+  add_command_line_name(arg);
 
   bool found_it = command_line->search(arg);
 
@@ -909,19 +961,41 @@ T command_line_value (const std::string & name, T value)
 
   // only if the variable exists in the file
   if (command_line->have_variable(name))
-    value = (*command_line)(name, value);
+    {
+      value = (*command_line)(name, value);
+
+      // Keep track of runtime queries, for later.  GetPot splits
+      // foo=bar into a separate name=value, so we can query for the
+      // name, but as far as PETSc is concerned that's one CLI
+      // argument.  We'll store it that way.
+      const std::string stringvalue =
+        (*command_line)(name, std::string());
+      add_command_line_name(name+"="+stringvalue);
+    }
 
   return value;
 }
 
 template <typename T>
-T command_line_value (const std::vector<std::string> & name, T value)
+T command_line_value (const std::vector<std::string> & names, T value)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
 
+  // Keep track of runtime queries, for later
+  for (const auto & entry : names)
+    {
+      // Keep track of runtime queries, for later.  GetPot splits
+      // foo=bar into a separate name=value, so we can query for the
+      // name, but as far as PETSc is concerned that's one CLI
+      // argument.  We'll store it that way.
+      const std::string stringvalue =
+        (*command_line)(entry, std::string());
+      add_command_line_name(entry+"="+stringvalue);
+    }
+
   // Check for multiple options (return the first that matches)
-  for (const auto & entry : name)
+  for (const auto & entry : names)
     if (command_line->have_variable(entry))
       {
         value = (*command_line)(entry, value);
@@ -936,6 +1010,12 @@ T command_line_value (const std::vector<std::string> & name, T value)
 template <typename T>
 T command_line_next (std::string name, T value)
 {
+  // Make sure the command line parser is ready for use
+  libmesh_assert(command_line.get());
+
+  // Keep track of runtime queries, for later
+  add_command_line_name(name);
+
   // on_command_line also puts the command_line cursor in the spot we
   // need
   if (on_command_line(name))
@@ -951,6 +1031,9 @@ void command_line_vector (const std::string & name, std::vector<T> & vec)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
+
+  // Keep track of runtime queries, for later
+  add_command_line_name(name);
 
   // only if the variable exists on the command line
   if (command_line->have_variable(name))

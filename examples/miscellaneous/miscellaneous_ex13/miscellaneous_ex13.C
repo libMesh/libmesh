@@ -125,10 +125,7 @@ int main (int argc, char ** argv)
 #endif
 
   // Read the "distributed_load" flag from the command line
-  GetPot command_line (argc, argv);
-  int distributed_load = 0;
-  if (command_line.search(1, "-distributed_load"))
-    distributed_load = command_line.next(distributed_load);
+  const int distributed_load = libMesh::command_line_next("-distributed_load", 0);
 
   {
     Mesh mesh (init.comm(), 3);

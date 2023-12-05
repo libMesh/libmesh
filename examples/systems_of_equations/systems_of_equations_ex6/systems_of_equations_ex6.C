@@ -432,16 +432,9 @@ int main (int argc, char ** argv)
 #endif
 
   // Get the mesh size from the command line.
-  GetPot command_line (argc, argv);
-
-  int nx = 32, ny = 8, nz = 4;
-  if (command_line.search(1, "-nx"))
-    nx = command_line.next(nx);
-  if (command_line.search(1, "-ny"))
-    ny = command_line.next(ny);
-  if (command_line.search(1, "-nz"))
-    nz = command_line.next(nz);
-
+  const int nx = libMesh::command_line_next("-nx", 32),
+            ny = libMesh::command_line_next("-ny", 8),
+            nz = libMesh::command_line_next("-nz", 4);
 
   // Create a 3D mesh distributed across the default MPI communicator.
   Mesh mesh(init.comm(), dim);

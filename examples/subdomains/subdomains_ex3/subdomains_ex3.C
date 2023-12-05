@@ -86,13 +86,11 @@ int main (int argc, char ** argv)
   Mesh mesh(init.comm());
 
   {
-    unsigned int dim=2;
+    const unsigned int dim =
+      libMesh::command_line_next("-d", 2);
 
-    if (argc == 3 && std::atoi(argv[2]) == 3)
-      {
-        std::cout << "Running in 3D" << std::endl;
-        dim=3;
-      }
+    if (dim == 3)
+      std::cout << "Running in 3D" << std::endl;
 
     mesh.read ((dim==2) ? "mesh.xda" : "hybrid_3d.xda");
   }
@@ -101,12 +99,9 @@ int main (int argc, char ** argv)
   // This class handles all the details of mesh refinement and coarsening.
   MeshRefinement mesh_refinement (mesh);
 
-  GetPot command_line (argc, argv);
-
   // Uniformly refine the mesh, by default 4 times.
-  int n_refinements = 4;
-  if (command_line.search(1, "-n_refinements"))
-    n_refinements = command_line.next(n_refinements);
+  const int n_refinements =
+    libMesh::command_line_next("-n_refinements", 4);
 
   mesh_refinement.uniformly_refine (n_refinements);
 
