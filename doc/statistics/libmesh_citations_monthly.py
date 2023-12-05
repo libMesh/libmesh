@@ -217,6 +217,14 @@ pub_2023 = [
   '2023-09-01', 161,
   '2023-10-01', 189,
   '2023-11-01', 206,
+  '2023-12-01', 226,
+]
+
+# 2024 monthly publication totals (first of each month)
+pub_2024 = [
+  '2023-10-01', 0,
+  '2023-11-01', 1,
+  '2023-12-01', 3,
 ]
 
 """
@@ -255,6 +263,7 @@ plot_one_year(2020, pub_2020, muted_red)
 plot_one_year(2021, pub_2021, muted_pink)
 plot_one_year(2022, pub_2022, 'k')
 plot_one_year(2023, pub_2023, muted_grey)
+plot_one_year(2024, pub_2024, muted_yellow)
 
 # Label beginning and end of year.
 ax1.set_xticks([0, 12])
