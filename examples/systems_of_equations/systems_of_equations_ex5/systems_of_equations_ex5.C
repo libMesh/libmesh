@@ -103,7 +103,7 @@ int main (int argc, char ** argv)
   // Get the mesh size from the command line.
   GetPot command_line (argc, argv);
 
-  const int nx = libMesh::command_line_next("-nx", 50), 
+  const int nx = libMesh::command_line_next("-nx", 50),
             ny = libMesh::command_line_next("-ny", 10);
 
   // Create a 2D mesh distributed across the default MPI communicator.
