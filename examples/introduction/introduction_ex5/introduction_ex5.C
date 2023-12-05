@@ -124,7 +124,7 @@ int main (int argc, char ** argv)
   libMesh::out << std::endl << std::endl;
 
   // Set the quadrature rule type that the user wants
-  quad_type = string_to_enum<QuadratureType>
+  quad_type = Utility::string_to_enum<QuadratureType>
     (libMesh::command_line_next("-q", std::string("QGAUSS")));
 
   // Skip this 3D example if libMesh was compiled as 1D-only.
