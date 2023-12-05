@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from github_traffic_base import *
 
 # Derive from the PlotData to plot views.
