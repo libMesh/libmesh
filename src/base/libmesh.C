@@ -764,11 +764,19 @@ LibMeshInit::~LibMeshInit()
 #if defined(LIBMESH_HAVE_PETSC)
   // Let PETSc know about all the command line objects that we
   // consumed without asking them, so we don't get unused option
-  // warnings abou those.
+  // warnings about those.
   std::vector<std::string> cli_names = command_line_names();
   for (const auto & name : cli_names)
     if (!name.empty() && name[0] == '-')
-      PetscOptionsClearValue(NULL, name.c_str());
+      {
+        // Newer PETSc can give me a double-free I'm having trouble
+        // replicating; let's protect against trying to clear
+        // already-used values
+        PetscBool used = PETSC_FALSE;
+        PetscOptionsUsed(NULL, name.c_str(), &used);
+        if (used == PETSC_FALSE)
+          PetscOptionsClearValue(NULL, name.c_str());
+      }
 
   // Allow the user to bypass PETSc finalization
   if (!libMesh::on_command_line ("--disable-petsc")
