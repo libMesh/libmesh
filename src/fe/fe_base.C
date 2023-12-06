@@ -420,6 +420,12 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
       {
         switch (fet.family)
           {
+          case HIERARCHIC_VEC:
+            return std::make_unique<FEHierarchicVec<0>>(fet);
+
+          case L2_HIERARCHIC_VEC:
+            return std::make_unique<FEL2HierarchicVec<0>>(fet);
+
           case LAGRANGE_VEC:
             return std::make_unique<FELagrangeVec<0>>(fet);
 
@@ -437,6 +443,12 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
       {
         switch (fet.family)
           {
+          case HIERARCHIC_VEC:
+            return std::make_unique<FEHierarchicVec<1>>(fet);
+
+          case L2_HIERARCHIC_VEC:
+            return std::make_unique<FEL2HierarchicVec<1>>(fet);
+
           case LAGRANGE_VEC:
             return std::make_unique<FELagrangeVec<1>>(fet);
 
@@ -454,6 +466,12 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
       {
         switch (fet.family)
           {
+          case HIERARCHIC_VEC:
+            return std::make_unique<FEHierarchicVec<2>>(fet);
+
+          case L2_HIERARCHIC_VEC:
+            return std::make_unique<FEL2HierarchicVec<2>>(fet);
+
           case LAGRANGE_VEC:
             return std::make_unique<FELagrangeVec<2>>(fet);
 
@@ -480,6 +498,12 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
       {
         switch (fet.family)
           {
+          case HIERARCHIC_VEC:
+            return std::make_unique<FEHierarchicVec<3>>(fet);
+
+          case L2_HIERARCHIC_VEC:
+            return std::make_unique<FEL2HierarchicVec<3>>(fet);
+
           case LAGRANGE_VEC:
             return std::make_unique<FELagrangeVec<3>>(fet);
 

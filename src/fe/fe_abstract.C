@@ -102,11 +102,17 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
           case L2_LAGRANGE_VEC:
             return std::make_unique<FE<0,L2_LAGRANGE_VEC>>(fet);
 
+          case HIERARCHIC_VEC:
+            return std::make_unique<FE<0,HIERARCHIC_VEC>>(fet);
+
           case HIERARCHIC:
             return std::make_unique<FE<0,HIERARCHIC>>(fet);
 
           case L2_HIERARCHIC:
             return std::make_unique<FE<0,L2_HIERARCHIC>>(fet);
+
+          case L2_HIERARCHIC_VEC:
+            return std::make_unique<FE<0,L2_HIERARCHIC_VEC>>(fet);
 
           case SIDE_HIERARCHIC:
             return std::make_unique<FE<0,SIDE_HIERARCHIC>>(fet);
@@ -161,11 +167,17 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
           case L2_LAGRANGE_VEC:
             return std::make_unique<FE<1,L2_LAGRANGE_VEC>>(fet);
 
+          case HIERARCHIC_VEC:
+            return std::make_unique<FE<1,HIERARCHIC_VEC>>(fet);
+
           case HIERARCHIC:
             return std::make_unique<FE<1,HIERARCHIC>>(fet);
 
           case L2_HIERARCHIC:
             return std::make_unique<FE<1,L2_HIERARCHIC>>(fet);
+
+          case L2_HIERARCHIC_VEC:
+            return std::make_unique<FE<1,L2_HIERARCHIC_VEC>>(fet);
 
           case SIDE_HIERARCHIC:
             return std::make_unique<FE<1,SIDE_HIERARCHIC>>(fet);
@@ -222,11 +234,17 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
           case L2_LAGRANGE_VEC:
             return std::make_unique<FE<2,L2_LAGRANGE_VEC>>(fet);
 
+          case HIERARCHIC_VEC:
+            return std::make_unique<FE<2,HIERARCHIC_VEC>>(fet);
+
           case HIERARCHIC:
             return std::make_unique<FE<2,HIERARCHIC>>(fet);
 
           case L2_HIERARCHIC:
             return std::make_unique<FE<2,L2_HIERARCHIC>>(fet);
+
+          case L2_HIERARCHIC_VEC:
+            return std::make_unique<FE<2,L2_HIERARCHIC_VEC>>(fet);
 
           case SIDE_HIERARCHIC:
             return std::make_unique<FE<2,SIDE_HIERARCHIC>>(fet);
@@ -295,11 +313,17 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
           case L2_LAGRANGE_VEC:
             return std::make_unique<FE<3,L2_LAGRANGE_VEC>>(fet);
 
+          case HIERARCHIC_VEC:
+            return std::make_unique<FE<3,HIERARCHIC_VEC>>(fet);
+
           case HIERARCHIC:
             return std::make_unique<FE<3,HIERARCHIC>>(fet);
 
           case L2_HIERARCHIC:
             return std::make_unique<FE<3,L2_HIERARCHIC>>(fet);
+
+          case L2_HIERARCHIC_VEC:
+            return std::make_unique<FE<3,L2_HIERARCHIC_VEC>>(fet);
 
           case SIDE_HIERARCHIC:
             return std::make_unique<FE<3,SIDE_HIERARCHIC>>(fet);

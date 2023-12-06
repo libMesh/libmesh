@@ -63,6 +63,8 @@ enum FEFamily : int {
                RAVIART_THOMAS = 44,
                L2_RAVIART_THOMAS = 45,
                L2_LAGRANGE_VEC = 46,
+               HIERARCHIC_VEC = 47,
+               L2_HIERARCHIC_VEC = 48,
                // Rational basis functions
                RATIONAL_BERNSTEIN = 61,
                // Side-supported basis functions

@@ -134,8 +134,12 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<dim,HERMITE>::func_and_args suffix                    \
       case HIERARCHIC:                                                  \
         prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
+      case HIERARCHIC_VEC:                                              \
+        prefix FEHierarchicVec<dim>::func_and_args suffix               \
       case L2_HIERARCHIC:                                               \
         prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
+      case L2_HIERARCHIC_VEC:                                           \
+        prefix FEL2HierarchicVec<dim>::func_and_args suffix             \
       case SIDE_HIERARCHIC:                                             \
         prefix FE<dim,SIDE_HIERARCHIC>::func_and_args suffix            \
       case LAGRANGE:                                                    \
@@ -207,6 +211,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
       case SUBDIVISION:                                                 \
         libmesh_assert_equal_to (dim, 2);                               \
         prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
+      case HIERARCHIC_VEC:                                              \
+      case L2_HIERARCHIC_VEC:                                           \
       case LAGRANGE_VEC:                                                \
       case L2_LAGRANGE_VEC:                                             \
       case NEDELEC_ONE:                                                 \
@@ -224,6 +230,10 @@ FEInterface::is_InfFE_elem(const ElemType et)
   do {                                                                  \
     switch (fe_t.family)                                                \
       {                                                                 \
+      case HIERARCHIC_VEC:                                              \
+        prefix FEHierarchicVec<dim>::func_and_args suffix               \
+      case L2_HIERARCHIC_VEC:                                           \
+        prefix FEL2HierarchicVec<dim>::func_and_args suffix             \
       case LAGRANGE_VEC:                                                \
         prefix FELagrangeVec<dim>::func_and_args suffix                 \
       case L2_LAGRANGE_VEC:                                             \
@@ -298,8 +308,12 @@ FEInterface::is_InfFE_elem(const ElemType et)
         prefix FE<dim,HERMITE>::func_and_args suffix                    \
       case HIERARCHIC:                                                  \
         prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
+      case HIERARCHIC_VEC:                                              \
+        prefix FEHierarchicVec<dim>::func_and_args suffix               \
       case L2_HIERARCHIC:                                               \
         prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
+      case L2_HIERARCHIC_VEC:                                           \
+        prefix FEL2HierarchicVec<dim>::func_and_args suffix             \
       case SIDE_HIERARCHIC:                                             \
         prefix FE<dim,SIDE_HIERARCHIC>::func_and_args suffix            \
       case LAGRANGE:                                                    \
@@ -359,6 +373,7 @@ FEInterface::is_InfFE_elem(const ElemType et)
       case SUBDIVISION:                                                 \
         libmesh_assert_equal_to (dim, 2);                               \
         prefix  FE<2,SUBDIVISION>::func_and_args suffix                 \
+      case HIERARCHIC_VEC:                                              \
       case LAGRANGE_VEC:                                                \
       case L2_LAGRANGE_VEC:                                             \
       case NEDELEC_ONE:                                                 \
@@ -376,6 +391,10 @@ FEInterface::is_InfFE_elem(const ElemType et)
   do {                                                                  \
     switch (fe_t.family)                                                \
       {                                                                 \
+      case HIERARCHIC_VEC:                                              \
+        prefix FEHierarchicVec<dim>::func_and_args suffix               \
+      case L2_HIERARCHIC_VEC:                                           \
+        prefix FEL2HierarchicVec<dim>::func_and_args suffix             \
       case LAGRANGE_VEC:                                                \
         prefix FELagrangeVec<dim>::func_and_args suffix                 \
       case L2_LAGRANGE_VEC:                                             \
@@ -2222,6 +2241,18 @@ void FEInterface::compute_constraints (DofConstraints & constraints,
                                                    variable_number,
                                                    elem); return;
 
+          case HIERARCHIC_VEC:
+            FE<2,HIERARCHIC_VEC>::compute_constraints (constraints,
+                                                       dof_map,
+                                                       variable_number,
+                                                       elem); return;
+
+          case L2_HIERARCHIC_VEC:
+            FE<2,L2_HIERARCHIC_VEC>::compute_constraints (constraints,
+                                                          dof_map,
+                                                          variable_number,
+                                                          elem); return;
+
           case L2_HIERARCHIC:
             FE<2,L2_HIERARCHIC>::compute_constraints (constraints,
                                                       dof_map,
@@ -2318,6 +2349,18 @@ void FEInterface::compute_constraints (DofConstraints & constraints,
                                                         dof_map,
                                                         variable_number,
                                                         elem); return;
+
+          case HIERARCHIC_VEC:
+            FE<3,HIERARCHIC_VEC>::compute_constraints (constraints,
+                                                       dof_map,
+                                                       variable_number,
+                                                       elem); return;
+
+          case L2_HIERARCHIC_VEC:
+            FE<3,L2_HIERARCHIC_VEC>::compute_constraints (constraints,
+                                                          dof_map,
+                                                          variable_number,
+                                                          elem); return;
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
@@ -2459,6 +2502,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
     case L2_LAGRANGE:
     case L2_LAGRANGE_VEC:
     case L2_HIERARCHIC:
+    case L2_HIERARCHIC_VEC:
     case MONOMIAL_VEC:
       switch (el_t)
         {
@@ -2699,6 +2743,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         }
       break;
     case HIERARCHIC:
+    case HIERARCHIC_VEC:
       switch (el_t)
         {
         case EDGE2:
@@ -2859,6 +2904,8 @@ bool FEInterface::extra_hanging_dofs(const FEType & fe_t)
     case CLOUGH:
     case HERMITE:
     case HIERARCHIC:
+    case HIERARCHIC_VEC:
+    case L2_HIERARCHIC_VEC:
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
     case BERNSTEIN:
     case SZABAB:
@@ -2878,6 +2925,8 @@ FEFieldType FEInterface::field_type (const FEFamily & fe_family)
 {
   switch (fe_family)
     {
+    case HIERARCHIC_VEC:
+    case L2_HIERARCHIC_VEC:
     case LAGRANGE_VEC:
     case L2_LAGRANGE_VEC:
     case NEDELEC_ONE:
@@ -2897,6 +2946,8 @@ unsigned int FEInterface::n_vec_dim (const MeshBase & mesh,
     {
       //FIXME: We currently assume that the number of vector components is tied
       //       to the mesh dimension. This will break for mixed-dimension meshes.
+    case HIERARCHIC_VEC:
+    case L2_HIERARCHIC_VEC:
     case LAGRANGE_VEC:
     case L2_LAGRANGE_VEC:
     case NEDELEC_ONE:
@@ -2919,7 +2970,9 @@ FEInterface::is_hierarchic (const FEType & fe_type)
     {
     case HERMITE:
     case HIERARCHIC:
+    case HIERARCHIC_VEC:
     case L2_HIERARCHIC:
+    case L2_HIERARCHIC_VEC:
     case MONOMIAL:
     case MONOMIAL_VEC:
     case SIDE_HIERARCHIC:
@@ -2960,6 +3013,7 @@ FEContinuity FEInterface::get_continuity(const FEType & fe_type)
     case XYZ:
     case SCALAR:
     case L2_RAVIART_THOMAS:
+    case L2_HIERARCHIC_VEC:
     case L2_LAGRANGE_VEC:
       return DISCONTINUOUS;
 
@@ -2974,6 +3028,7 @@ FEContinuity FEInterface::get_continuity(const FEType & fe_type)
     case JACOBI_30_00:
     case LEGENDRE:
     case LAGRANGE_VEC:
+    case HIERARCHIC_VEC:
       return C_ZERO;
 
       // C1 elements
