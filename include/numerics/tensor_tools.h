@@ -71,12 +71,42 @@ inner_product(const TypeNTensor<N,T> & a, const TypeNTensor<N,T2> & b)
 
 template<typename T>
 inline
-T norm_sq(std::complex<T> a) { return std::norm(a); }
+auto norm(const T & a) -> decltype(std::abs(a))
+{ return std::abs(a); }
+
+template<typename T>
+inline
+T norm(std::complex<T> a) { return std::abs(a); }
+
+template <typename T>
+inline
+auto norm(const TypeVector<T> & a) -> decltype(TensorTools::norm(T()))
+{return std::sqrt(a.norm_sq());}
+
+template <typename T>
+inline
+auto norm(const VectorValue<T> & a) -> decltype(TensorTools::norm(T()))
+{return std::sqrt(a.norm_sq());}
+
+template <typename T>
+inline
+auto norm(const TypeTensor<T> & a) -> decltype(TensorTools::norm(T()))
+{return std::sqrt(a.norm_sq());}
+
+template <typename T>
+inline
+auto norm(const TensorValue<T> & a) -> decltype(TensorTools::norm(T()))
+{return std::sqrt(a.norm_sq());}
+
 
 template<typename T>
 inline
 auto norm_sq(const T & a) -> decltype(std::norm(a))
 { return std::norm(a); }
+
+template<typename T>
+inline
+T norm_sq(std::complex<T> a) { return std::norm(a); }
 
 template <typename T>
 inline
@@ -87,6 +117,17 @@ template <typename T>
 inline
 auto norm_sq(const VectorValue<T> & a) -> decltype(std::norm(T()))
 {return a.norm_sq();}
+
+template <typename T>
+inline
+auto norm_sq(const TypeTensor<T> & a) -> decltype(std::norm(T()))
+{return a.norm_sq();}
+
+template <typename T>
+inline
+auto norm_sq(const TensorValue<T> & a) -> decltype(std::norm(T()))
+{return a.norm_sq();}
+
 
 template<typename T>
 inline
