@@ -59,7 +59,7 @@
 #include <sstream>
 #include <string>
 #include <cstdio> // std::remove
-#include <cstdlib> // std::system
+#include <stdlib.h> // std::system, C version for POSIX mkstemp
 #ifndef LIBMESH_HAVE_MKSTEMP
 #include "win_mkstemp.h"
 #endif

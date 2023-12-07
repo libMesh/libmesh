@@ -160,6 +160,7 @@ AC_CXX_RTTI
 # Check for headers
 # --------------------------------------------------------------
 AC_CHECK_HEADERS(getopt.h)
+AC_CHECK_HEADERS(stdlib.h)
 AC_CHECK_HEADERS(sys/time.h)
 AC_CHECK_HEADERS(process.h)
 AC_CHECK_HEADERS(csignal)

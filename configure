@@ -47011,6 +47011,13 @@ then :
 
 fi
 
+ac_fn_cxx_check_header_compile "$LINENO" "stdlib.h" "ac_cv_header_stdlib_h" "$ac_includes_default"
+if test "x$ac_cv_header_stdlib_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_STDLIB_H 1" >>confdefs.h
+
+fi
+
 ac_fn_cxx_check_header_compile "$LINENO" "sys/time.h" "ac_cv_header_sys_time_h" "$ac_includes_default"
 if test "x$ac_cv_header_sys_time_h" = xyes
 then :
