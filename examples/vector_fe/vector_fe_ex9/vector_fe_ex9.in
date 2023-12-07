@@ -1,0 +1,17 @@
+# The element type
+element_type = TRI6
+
+# The coarse grid size from which to start adaptivity
+grid_size = 2
+
+# Higher quadrature order for more accurate error results
+extra_error_quadrature = 0
+
+# Whether performing an mms study
+mms = true
+
+# The kinematic viscosity
+nu = 1
+
+# Whether to do a lid cavity problem. This is incompatible with mms=true
+cavity = false

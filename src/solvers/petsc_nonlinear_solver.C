@@ -658,6 +658,51 @@ extern "C"
     return libmesh_petsc_snes_postcheck(nullptr, x, y, w, changed_y, changed_w, context);
   }
 #endif
+
+  PetscErrorCode libmesh_petsc_snes_precheck(SNESLineSearch, Vec X, Vec Y, PetscBool * changed, void * context)
+  {
+    LOG_SCOPE("precheck()", "PetscNonlinearSolver");
+
+    PetscErrorCode ierr = 0;
+
+    // PETSc almost certainly initializes these to false already, but
+    // it doesn't hurt to be explicit.
+    *changed = PETSC_FALSE;
+
+    libmesh_assert(context);
+
+    // Cast the context to a NonlinearSolver object.
+    PetscNonlinearSolver<Number> * solver =
+      static_cast<PetscNonlinearSolver<Number> *> (context);
+
+    libmesh_parallel_only(solver->comm());
+
+    // It's also possible that we don't need to do anything at all, in
+    // that case return early...
+    NonlinearImplicitSystem & sys = solver->system();
+
+    if (!solver->precheck_object)
+      return ierr;
+
+    // The user sets these flags in his/her postcheck function to
+    // indicate whether they changed something.
+    bool
+      petsc_changed = false;
+
+    PetscVector<Number> petsc_x(X, sys.comm());
+    PetscVector<Number> petsc_y(Y, sys.comm());
+
+    solver->precheck_object->precheck(petsc_x,
+                                      petsc_y,
+                                      petsc_changed,
+                                      sys);
+
+    // Record whether the user changed the solution or the search direction.
+    if (petsc_changed)
+      *changed = PETSC_TRUE;
+
+    return ierr;
+  }
 } // end extern "C"
 
 
@@ -797,6 +842,16 @@ void PetscNonlinearSolver<T>::init (const char * name)
       LIBMESH_CHKERR(ierr);
 
       ierr = SNESLineSearchSetPostCheck(linesearch, libmesh_petsc_snes_postcheck, this);
+      LIBMESH_CHKERR(ierr);
+    }
+
+  if (this->precheck_object)
+    {
+      SNESLineSearch linesearch;
+      PetscErrorCode ierr = SNESGetLineSearch(_snes, &linesearch);
+      LIBMESH_CHKERR(ierr);
+
+      ierr = SNESLineSearchSetPreCheck(linesearch, libmesh_petsc_snes_precheck, this);
       LIBMESH_CHKERR(ierr);
     }
 }

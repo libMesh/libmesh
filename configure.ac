@@ -446,6 +446,7 @@ AS_IF([test "x$enableexamples" = "xyes"],
                          examples/vector_fe/vector_fe_ex6/Makefile
                          examples/vector_fe/vector_fe_ex7/Makefile
                          examples/vector_fe/vector_fe_ex8/Makefile
+                         examples/vector_fe/vector_fe_ex9/Makefile
                          examples/Makefile])
      ])
 

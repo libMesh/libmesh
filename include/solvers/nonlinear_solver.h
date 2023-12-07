@@ -265,6 +265,8 @@ public:
    */
   NonlinearImplicitSystem::ComputePostCheck * postcheck_object;
 
+  NonlinearImplicitSystem::ComputePreCheck * precheck_object;
+
   /**
    * \returns A constant reference to the system we are solving.
    */
@@ -469,6 +471,7 @@ NonlinearSolver<T>::NonlinearSolver (sys_type & s) :
   user_presolve                (nullptr),
   postcheck                    (nullptr),
   postcheck_object             (nullptr),
+  precheck_object              (nullptr),
   max_nonlinear_iterations(0),
   max_function_evaluations(0),
   absolute_residual_tolerance(0),
