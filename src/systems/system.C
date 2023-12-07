@@ -49,6 +49,7 @@
 #include "libmesh/vector_value.h"
 #include "libmesh/tensor_tools.h"
 #include "libmesh/enum_norm_type.h"
+#include "libmesh/enum_fe_family.h"
 
 // C++ includes
 #include <sstream>   // for std::ostringstream
@@ -1784,8 +1785,10 @@ Real System::calculate_norm(const NumericVector<Number> & v,
 
       const FEType & fe_type = this->get_dof_map().variable_type(var);
 
-      // Allow space for dims 0-3, even if we don't use them all
+      // Allow space for dims 0-3, and for both scalar and vector
+      // elements, even if we don't use them all
       std::vector<std::unique_ptr<FEBase>> fe_ptrs(4);
+      std::vector<std::unique_ptr<FEVectorBase>> vec_fe_ptrs(4);
       std::vector<std::unique_ptr<QBase>> q_rules(4);
 
       const std::set<unsigned char> & elem_dims = _mesh.elem_dimensions();
@@ -1798,10 +1801,20 @@ Real System::calculate_norm(const NumericVector<Number> & v,
 
           // Construct quadrature and finite element objects
           q_rules[dim] = fe_type.default_quadrature_rule (dim);
-          fe_ptrs[dim] = FEBase::build(dim, fe_type);
 
-          // Attach quadrature rule to FE object
-          fe_ptrs[dim]->attach_quadrature_rule (q_rules[dim].get());
+          const FEFieldType field_type = FEInterface::field_type(fe_type);
+          if (field_type == TYPE_SCALAR)
+            {
+              fe_ptrs[dim] = FEBase::build(dim, fe_type);
+              fe_ptrs[dim]->attach_quadrature_rule (q_rules[dim].get());
+            }
+          else
+            {
+              vec_fe_ptrs[dim] = FEVectorBase::build(dim, fe_type);
+              vec_fe_ptrs[dim]->attach_quadrature_rule (q_rules[dim].get());
+              libmesh_assert_equal_to(field_type, TYPE_VECTOR);
+            }
+
         }
 
       std::vector<dof_id_type> dof_indices;
@@ -1820,37 +1833,45 @@ Real System::calculate_norm(const NumericVector<Number> & v,
           if (skip_dimensions && skip_dimensions->find(dim) != skip_dimensions->end())
             continue;
 
-          FEBase * fe = fe_ptrs[dim].get();
           QBase * qrule = q_rules[dim].get();
-          libmesh_assert(fe);
           libmesh_assert(qrule);
 
-          const std::vector<Real> &               JxW = fe->get_JxW();
-          const std::vector<std::vector<Real>> * phi = nullptr;
+          this->get_dof_map().dof_indices (elem, dof_indices, var);
+
+          auto element_calculation = [&dof_indices, &elem,
+               norm_type, norm_weight, norm_weight_sq, &qrule,
+               &local_v, &v_norm](auto & fe) {
+          typedef typename std::remove_reference<decltype(fe)>::type::OutputShape OutputShape;
+          typedef typename TensorTools::MakeNumber<OutputShape>::type OutputNumberShape;
+          typedef typename std::remove_reference<decltype(fe)>::type::OutputGradient OutputGradient;
+          typedef typename TensorTools::MakeNumber<OutputGradient>::type OutputNumberGradient;
+          typedef typename std::remove_reference<decltype(fe)>::type::OutputTensor OutputTensor;
+          typedef typename TensorTools::MakeNumber<OutputTensor>::type OutputNumberTensor;
+
+          const std::vector<Real> &                     JxW = fe.get_JxW();
+          const std::vector<std::vector<OutputShape>> * phi = nullptr;
           if (norm_type == H1 ||
               norm_type == H2 ||
               norm_type == L2 ||
               norm_type == L1 ||
               norm_type == L_INF)
-            phi = &(fe->get_phi());
+            phi = &(fe.get_phi());
 
-          const std::vector<std::vector<RealGradient>> * dphi = nullptr;
+          const std::vector<std::vector<OutputGradient>> * dphi = nullptr;
           if (norm_type == H1 ||
               norm_type == H2 ||
               norm_type == H1_SEMINORM ||
               norm_type == W1_INF_SEMINORM)
-            dphi = &(fe->get_dphi());
+            dphi = &(fe.get_dphi());
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          const std::vector<std::vector<RealTensor>> *   d2phi = nullptr;
+          const std::vector<std::vector<OutputTensor>> *  d2phi = nullptr;
           if (norm_type == H2 ||
               norm_type == H2_SEMINORM ||
               norm_type == W2_INF_SEMINORM)
-            d2phi = &(fe->get_d2phi());
+            d2phi = &(fe.get_d2phi());
 #endif
 
-          fe->reinit (elem);
-
-          this->get_dof_map().dof_indices (elem, dof_indices, var);
+          fe.reinit (elem);
 
           const unsigned int n_qp = qrule->n_points();
 
@@ -1862,26 +1883,26 @@ Real System::calculate_norm(const NumericVector<Number> & v,
             {
               if (norm_type == L1)
                 {
-                  Number u_h = 0.;
+                  OutputNumberShape u_h = 0.;
                   for (unsigned int i=0; i != n_sf; ++i)
                     u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
                   v_norm += norm_weight *
-                    JxW[qp] * std::abs(u_h);
+                    JxW[qp] * TensorTools::norm(u_h);
                 }
 
               if (norm_type == L_INF)
                 {
-                  Number u_h = 0.;
+                  OutputNumberShape u_h = 0.;
                   for (unsigned int i=0; i != n_sf; ++i)
                     u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
-                  v_norm = std::max(v_norm, norm_weight * std::abs(u_h));
+                  v_norm = std::max(v_norm, norm_weight * TensorTools::norm(u_h));
                 }
 
               if (norm_type == H1 ||
                   norm_type == H2 ||
                   norm_type == L2)
                 {
-                  Number u_h = 0.;
+                  OutputNumberShape u_h = 0.;
                   for (unsigned int i=0; i != n_sf; ++i)
                     u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
                   v_norm += norm_weight_sq *
@@ -1892,7 +1913,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                   norm_type == H2 ||
                   norm_type == H1_SEMINORM)
                 {
-                  Gradient grad_u_h;
+                  OutputNumberGradient grad_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
                   v_norm += norm_weight_sq *
@@ -1901,7 +1922,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
 
               if (norm_type == W1_INF_SEMINORM)
                 {
-                  Gradient grad_u_h;
+                  OutputNumberGradient grad_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
                   v_norm = std::max(v_norm, norm_weight * grad_u_h.norm());
@@ -1911,7 +1932,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
               if (norm_type == H2 ||
                   norm_type == H2_SEMINORM)
                 {
-                  Tensor hess_u_h;
+                  OutputNumberTensor hess_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
                   v_norm += norm_weight_sq *
@@ -1920,12 +1941,28 @@ Real System::calculate_norm(const NumericVector<Number> & v,
 
               if (norm_type == W2_INF_SEMINORM)
                 {
-                  Tensor hess_u_h;
+                  OutputNumberTensor hess_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
                   v_norm = std::max(v_norm, norm_weight * hess_u_h.norm());
                 }
 #endif
+            }
+          };
+
+          FEBase * scalar_fe = fe_ptrs[dim].get();
+          FEVectorBase * vec_fe = vec_fe_ptrs[dim].get();
+
+          if (scalar_fe)
+            {
+              libmesh_assert(!vec_fe);
+              element_calculation(*scalar_fe);
+            }
+
+          if (vec_fe)
+            {
+              libmesh_assert(!scalar_fe);
+              element_calculation(*vec_fe);
             }
         }
     }
