@@ -38,11 +38,16 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/gmv_io.h"
+
+// Include files for options
+#include "libmesh/enum_norm_type.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/getpot.h"
+#include "libmesh/string_to_enum.h"
 
 // Define the Finite Element object.
 #include "libmesh/fe.h"
+#include "libmesh/fe_interface.h"
 
 // Define Gauss quadrature rules.
 #include "libmesh/quadrature_gauss.h"
@@ -99,8 +104,6 @@ int main (int argc, char ** argv)
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Get the mesh size from the command line.
-  GetPot command_line (argc, argv);
-
   const int nx = libMesh::command_line_next("-nx", 15),
             ny = libMesh::command_line_next("-ny", 15);
 
@@ -125,18 +128,32 @@ int main (int argc, char ** argv)
 
   // Declare the Poisson system and its variables.
   // The Poisson system is another example of a steady system.
-  equation_systems.add_system<LinearImplicitSystem> ("Poisson");
+  System & poisson = equation_systems.add_system<LinearImplicitSystem> ("Poisson");
 
-  // Adds the variable "u" to "Poisson".  "u"
-  // will be approximated using second-order approximation
-  // using vector Lagrange elements. Since the mesh is 2-D, "u" will
-  // have two components.
-  equation_systems.get_system("Poisson").add_variable("u", SECOND, LAGRANGE_VEC);
+  // Read FE order from command line
+  std::string order_str = "SECOND";
+  order_str = libMesh::command_line_next("-o", order_str);
+  order_str = libMesh::command_line_next("-Order", order_str);
+  const Order order = Utility::string_to_enum<Order>(order_str);
+
+  // Read FE Family from command line
+  std::string family_str = "LAGRANGE_VEC";
+  family_str = libMesh::command_line_next("-f", family_str);
+  family_str = libMesh::command_line_next("-FEFamily", family_str);
+  const FEFamily family = Utility::string_to_enum<FEFamily>(family_str);
+
+  libmesh_error_msg_if(FEInterface::field_type(family) != TYPE_VECTOR,
+                       "FE family " + family_str + " isn't vector-valued");
+
+  // Adds the variable "u" to "Poisson".  "u" will be approximated
+  // using the requested order of approximation and vector element
+  // type. Since the mesh is 2-D, "u" will have two components.
+  poisson.add_variable("u", order, family);
 
   // Give the system a pointer to the matrix assembly
   // function.  This will be called when needed by the
   // library.
-  equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
+  poisson.attach_assemble_function (assemble_poisson);
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -159,7 +176,35 @@ int main (int argc, char ** argv)
   //
   // if you linked against the appropriate X libraries when you
   // built PETSc.
-  equation_systems.get_system("Poisson").solve();
+  poisson.solve();
+
+  const Real l2_norm =
+    poisson.calculate_norm(*poisson.solution, 0, L2);
+
+  libMesh::out << "L2 norm of solution = " << std::setprecision(17) <<
+    l2_norm << std::endl;
+
+  libmesh_error_msg_if (libmesh_isnan(l2_norm),
+                        "Failed to calculate solution");
+
+  const Real error_in_norm = std::abs(l2_norm - sqrt(Real(2)));
+
+  libMesh::out << "error in L2 norm = " << std::setprecision(17) <<
+    error_in_norm << std::endl;
+
+  // The error in the norm converges faster than the norm of the
+  // error, at least until it gets low enough that floating-point
+  // roundoff (and the penalty method) kill us.
+  const int n = std::min(nx, ny);
+  const int p = static_cast<int>(order);
+  const Real expected_error_bound = 2*std::pow(n, -p*2);
+  libMesh::out << "error bound = " << std::setprecision(17) <<
+    expected_error_bound << std::endl;
+  libMesh::out << "error ratio = " << std::setprecision(17) <<
+    error_in_norm / expected_error_bound << std::endl;
+  libmesh_error_msg_if (error_in_norm > expected_error_bound,
+                        "Error exceeds expected bound of " <<
+                        expected_error_bound);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
@@ -212,8 +257,8 @@ void assemble_poisson(EquationSystems & es,
   // class.
   std::unique_ptr<FEVectorBase> fe (FEVectorBase::build(dim, fe_type));
 
-  // A 5th order Gauss quadrature rule for numerical integration.
-  QGauss qrule (dim, FIFTH);
+  // A 2*p+1 order Gauss quadrature rule for numerical integration.
+  QGauss qrule (dim, fe_type.default_quadrature_order());
 
   // Tell the finite element object to use our quadrature rule.
   fe->attach_quadrature_rule (&qrule);
@@ -225,7 +270,7 @@ void assemble_poisson(EquationSystems & es,
   // Boundary integration requires one quadrature rule,
   // with dimensionality one less than the dimensionality
   // of the element.
-  QGauss qface(dim-1, FIFTH);
+  QGauss qface(dim-1, fe_type.default_quadrature_order());
 
   // Tell the finite element object to use our
   // quadrature rule.
@@ -307,6 +352,10 @@ void assemble_poisson(EquationSystems & es,
 
       Fe.resize (dof_indices.size());
 
+      // We'll use an element-size-dependent h below, so the FDM error
+      // doesn't easily dominate FEM error.
+      const Real eps = 1.e-3 * elem->hmin();
+
       // Now loop over the quadrature points.  This handles
       // the numeric integration.
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
@@ -325,7 +374,6 @@ void assemble_poisson(EquationSystems & es,
           {
             const Real x = q_point[qp](0);
             const Real y = q_point[qp](1);
-            const Real eps = 1.e-3;
 
             // "f" is the forcing function for the Poisson equation.
             // In this case we set f to be a finite difference
@@ -337,7 +385,7 @@ void assemble_poisson(EquationSystems & es,
             // u_xx + u_yy = (u(i,j-1) + u(i,j+1) +
             //                u(i-1,j) + u(i+1,j) +
             //                -4*u(i,j))/h^2
-            //
+
             // Since the value of the forcing function depends only
             // on the location of the quadrature point (q_point[qp])
             // we will compute it here, outside of the i-loop
