@@ -26,7 +26,7 @@ The default is to build libmesh "out of tree," i.e. within a separate `build` di
 1. `make install`
 
 Afterward, `make uninstall` is available if needed to remove the files
-copied to /some/final/install/directory (and its subdirectories) by
+copied to `/some/final/install/directory` (and its subdirectories) by
 `make install`.
 
 ## METHODS
