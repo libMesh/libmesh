@@ -163,7 +163,7 @@ int main (int argc, char ** argv)
   // Read FE Family from command line
   std::string family = "LAGRANGE";
   family = libMesh::command_line_next("-f", family);
-  family = libMesh::command_line_next("-Order", family);
+  family = libMesh::command_line_next("-FEFamily", family);
 
   // Cannot use discontinuous basis.
   libmesh_error_msg_if((family == "MONOMIAL") || (family == "XYZ"),
