@@ -108,6 +108,11 @@ main(int argc, char ** argv)
   // Read in parameters from the command line and the input file.
   const unsigned int dimension = infile("dim", 2);
   const unsigned int grid_size = infile("grid_size", 15);
+  const unsigned int order = infile("order", 1);
+  const std::string family_str = infile("family", "L2_LAGRANGE");
+  const FEFamily family = Utility::string_to_enum<FEFamily>(family_str);
+  const std::string vec_family_str = infile("vecfamily", "L2_LAGRANGE_VEC");
+  const FEFamily vec_family = Utility::string_to_enum<FEFamily>(vec_family_str);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build.
   libmesh_example_requires(dimension <= LIBMESH_DIM, dimension << "D support");
@@ -159,16 +164,16 @@ main(int argc, char ** argv)
 
   // Adds the variable "q" and "u" to "Mixed". "q" will be our vector field
   // whereas "u" will be the scalar field.
-  system.add_variable("q", FIRST, L2_LAGRANGE_VEC);
-  system.add_variable("u", FIRST, L2_LAGRANGE);
+  system.add_variable("q", static_cast<Order>(order), vec_family);
+  system.add_variable("u", static_cast<Order>(order), family);
 
   // We also add a higher order version of our 'p' variable whose solution we
   // will postprocess using the Lagrange multiplier, 'u', and the low order 'p'
   // solution
-  system.add_variable("u_enriched", SECOND, L2_LAGRANGE);
+  system.add_variable("u_enriched", static_cast<Order>(order+1), family);
 
   // Add our Lagrange multiplier to the implicit system
-  lm_system.add_variable("lambda", FIRST, SIDE_HIERARCHIC);
+  lm_system.add_variable("lambda", static_cast<Order>(order), SIDE_HIERARCHIC);
 
   // Give the system a pointer to the matrix assembly
   // function. This will be called when needed by the library.
@@ -479,7 +484,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   std::unique_ptr<FEBase> scalar_fe(FEBase::build(dim, scalar_fe_type));
 
   // Volumetric quadrature rule
-  QGauss qrule(dim, FIFTH);
+  QGauss qrule(dim, scalar_fe_type.default_quadrature_order());
 
   // Attach quadrature rules for the FE objects that we will reinit within the element "volume"
   vector_fe->attach_quadrature_rule(&qrule);
@@ -492,7 +497,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
 
   // Boundary integration requires one quadrature rule with dimensionality one
   // less than the dimensionality of the element.
-  QGauss qface(dim - 1, FIFTH);
+  QGauss qface(dim - 1, scalar_fe_type.default_quadrature_order());
 
   // Attach quadrature rules for the FE objects that we will reinit on the element faces
   vector_fe_face->attach_quadrature_rule(&qface);
@@ -848,7 +853,7 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
   std::unique_ptr<FEBase> scalar_fe(FEBase::build(dim, scalar_fe_type));
 
   // Volumetric quadrature rule
-  QGauss qrule(dim, FIFTH);
+  QGauss qrule(dim, scalar_fe_type.default_quadrature_order());
 
   // Attach quadrature rules for the FE objects that we will reinit within the element "volume"
   vector_fe->attach_quadrature_rule(&qrule);
@@ -861,7 +866,7 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
 
   // Boundary integration requires one quadrature rule with dimensionality one
   // less than the dimensionality of the element.
-  QGauss qface(dim - 1, FIFTH);
+  QGauss qface(dim - 1, scalar_fe_type.default_quadrature_order());
 
   // Attach quadrature rules for the FE objects that we will reinit on the element faces
   vector_fe_face->attach_quadrature_rule(&qface);
