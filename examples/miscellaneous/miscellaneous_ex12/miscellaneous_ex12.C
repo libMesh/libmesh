@@ -235,12 +235,6 @@ int main (int argc, char ** argv)
   // Print information about the system to the screen.
   equation_systems.print_info();
 
-  // This example can be run with EigenSparseLinearSolvers, but it
-  // only works with either the CG or SPARSELU types, and SparseLU
-  // turns out to be faster.
-  if (libMesh::default_solver_package() == EIGEN_SOLVERS)
-    system.get_linear_solver()->set_solver_type(SPARSELU);
-
   // Solve the linear system.
   system.solve();
 

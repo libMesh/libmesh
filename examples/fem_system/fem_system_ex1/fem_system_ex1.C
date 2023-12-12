@@ -83,7 +83,6 @@ int main (int argc, char ** argv)
 
   // Trilinos and Eigen solvers NaN by default here.
   // We'll skip this example for now.
-  libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
   libmesh_example_requires(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
 
   // Parse the input file
