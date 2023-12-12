@@ -181,9 +181,13 @@ void adjust_linear_solver(LinearSolver<Number> & linear_solver)
 
 void adjust_linear_solvers(LaplaceSystem & system)
 {
-  auto solver = cast_ptr<NewtonSolver*>(system.time_solver->diff_solver().get());
-  if (solver)
-    adjust_linear_solver(solver->get_linear_solver());
+  auto diff_solver = cast_ptr<NewtonSolver*>(system.get_time_solver().diff_solver().get());
+  if (diff_solver) // Some compilers don't like dynamic cast of nullptr?
+    {
+      auto solver = cast_ptr<NewtonSolver*>(diff_solver);
+      if (solver)
+        adjust_linear_solver(solver->get_linear_solver());
+    }
 
   adjust_linear_solver(*system.get_linear_solver());
 }
