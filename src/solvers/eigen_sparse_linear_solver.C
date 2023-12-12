@@ -141,8 +141,14 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
               retval = do_solve(solver, "Eigen CG solver without preconditioning");
               break;
             }
+          case ILU_PRECOND:
+            {
+              Eigen::ConjugateGradient<EigenSM,UPLO,IncompleteLUT<Number,eigen_idx_type>>
+                solver (matrix._mat);
+              retval = do_solve(solver, "Eigen CG solver with Incomplete Cholesky preconditioning");
+              break;
+            }
           case ICC_PRECOND:
-          case ILU_PRECOND: // If asked for CG we must be symmetric, right?
             {
               Eigen::ConjugateGradient<EigenSM,UPLO,
                 IncompleteCholesky<Number,Eigen::Lower,Eigen::AMDOrdering<eigen_idx_type>>>
