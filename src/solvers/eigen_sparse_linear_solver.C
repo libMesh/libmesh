@@ -101,8 +101,29 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
 
   std::pair<unsigned int, Real> retval(0,0.);
 
-  const int max_its = this->get_int_solver_setting("max_its", m_its);
-  const double abs_tol = this->get_real_solver_setting("abs_tol", tol);
+  // Eigen doesn't give us a solver base class?  We'll just use a
+  // generic lambda, then.
+  auto do_solve = [this, &rhs, &solution, tol, m_its]
+    (auto & solver, std::string_view msg) {
+    const int max_its = this->get_int_solver_setting("max_its", m_its);
+    const double abs_tol = this->get_real_solver_setting("abs_tol", tol);
+
+    solver.setMaxIterations(max_its);
+    solver.setTolerance(abs_tol);
+    libMesh::out << msg << std::endl;
+
+    solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
+
+    libMesh::out << "#iterations: " << solver.iterations() << " / " << max_its << std::endl;
+    libMesh::out << "estimated error: " << solver.error() << " / " << abs_tol << std::endl;
+    _comp_info = solver.info();
+    return std::make_pair(solver.iterations(), solver.error());
+  };
+
+  using Eigen::DiagonalPreconditioner;
+  using Eigen::IdentityPreconditioner;
+  using Eigen::IncompleteCholesky;
+  using Eigen::IncompleteLUT;
 
   // Solve the linear system
   switch (this->_solver_type)
@@ -110,38 +131,76 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
       // Conjugate-Gradient
     case CG:
       {
-        Eigen::ConjugateGradient<EigenSM> solver (matrix._mat);
-        solver.setMaxIterations(max_its);
-        solver.setTolerance(abs_tol);
-        solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
-        libMesh::out << "#iterations: " << solver.iterations() << std::endl;
-        libMesh::out << "estimated error: " << solver.error() << std::endl;
-        retval = std::make_pair(solver.iterations(), solver.error());
-        _comp_info = solver.info();
+        const int UPLO = Eigen::Lower|Eigen::Upper;
+
+        switch (this->_preconditioner_type)
+        {
+          case IDENTITY_PRECOND:
+            {
+              Eigen::ConjugateGradient<EigenSM,UPLO,IdentityPreconditioner> solver (matrix._mat);
+              retval = do_solve(solver, "Eigen CG solver without preconditioning");
+              break;
+            }
+          case ICC_PRECOND:
+          case ILU_PRECOND: // If asked for CG we must be symmetric, right?
+            {
+              Eigen::ConjugateGradient<EigenSM,UPLO,IncompleteCholesky<Number>> solver (matrix._mat);
+              retval = do_solve(solver, "Eigen CG solver with Incomplete Cholesky preconditioning");
+              break;
+            }
+          default: // For our default let's use their default
+            libmesh_warning("No EigenSparseLinearSolver support for " <<
+                            Utility::enum_to_string<PreconditionerType>(this->_preconditioner_type)
+                            << " preconditioning.");
+            libmesh_fallthrough();
+          case JACOBI_PRECOND:
+            {
+              Eigen::ConjugateGradient<EigenSM,UPLO,DiagonalPreconditioner<Number>> solver (matrix._mat);
+              retval = do_solve(solver, "Eigen CG solver with Jacobi preconditioning");
+              break;
+            }
+        }
         break;
       }
 
       // Bi-Conjugate Gradient Stabilized
     case BICGSTAB:
       {
-        Eigen::BiCGSTAB<EigenSM> solver (matrix._mat);
-        solver.setMaxIterations(max_its);
-        solver.setTolerance(abs_tol);
-        solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
-        libMesh::out << "#iterations: " << solver.iterations() << std::endl;
-        libMesh::out << "estimated error: " << solver.error() << std::endl;
-        retval = std::make_pair(solver.iterations(), solver.error());
-        _comp_info = solver.info();
+        switch (this->_preconditioner_type)
+        {
+          case IDENTITY_PRECOND:
+            {
+              Eigen::BiCGSTAB<EigenSM, IdentityPreconditioner> solver (matrix._mat);
+              retval = do_solve(solver, "Eigen BiCGStab solver");
+              break;
+            }
+          case ICC_PRECOND:
+          case ILU_PRECOND:
+            {
+              Eigen::BiCGSTAB<EigenSM,IncompleteLUT<Number>> solver (matrix._mat);
+              retval = do_solve(solver, "Eigen BiCGSTAB solver with ILU preconditioning");
+              break;
+            }
+          default: // For our default let's use their default
+            libmesh_warning("No EigenSparseLinearSolver support for " <<
+                            Utility::enum_to_string<PreconditionerType>(this->_preconditioner_type)
+                            << " preconditioning.");
+            libmesh_fallthrough();
+          case JACOBI_PRECOND:
+            {
+              Eigen::BiCGSTAB<EigenSM,DiagonalPreconditioner<Number>> solver (matrix._mat);
+              retval = do_solve(solver, "Eigen BiCGSTAB solver with Jacobi preconditioning");
+              break;
+            }
+        }
         break;
       }
 
       // Generalized Minimum Residual
     case GMRES:
       {
-        Eigen::GMRES<EigenSM> solver (matrix._mat);
-        solver.setMaxIterations(max_its);
-        solver.setTolerance(abs_tol);
-
+        auto set_restart_and_solve = [this, &do_solve]
+          (auto & solver, std::string_view msg) {
         // If there is an int parameter called "gmres_restart" in the
         // SolverConfiguration object, pass it to the Eigen GMRES
         // solver.
@@ -153,12 +212,38 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
               solver.set_restart(it->second);
           }
 
-        libMesh::out << "Eigen GMRES solver, restart = " << solver.get_restart() << std::endl;
-        solution._vec = solver.solveWithGuess(rhs._vec, solution._vec);
-        libMesh::out << "#iterations: " << solver.iterations() << std::endl;
-        libMesh::out << "estimated error: " << solver.error() << std::endl;
-        retval = std::make_pair(solver.iterations(), solver.error());
-        _comp_info = solver.info();
+          std::ostringstream full_msg;
+          full_msg << msg << ", restart = " << solver.get_restart();
+          return do_solve(solver, full_msg.str());
+        };
+
+        switch (this->_preconditioner_type)
+        {
+          case IDENTITY_PRECOND:
+            {
+              Eigen::GMRES<EigenSM,IdentityPreconditioner> solver (matrix._mat);
+              retval = set_restart_and_solve(solver, "Eigen GMRES solver without preconditioning");
+              break;
+            }
+          case ICC_PRECOND:
+          case ILU_PRECOND:
+            {
+              Eigen::GMRES<EigenSM,IncompleteLUT<Number>> solver (matrix._mat);
+              retval = set_restart_and_solve(solver, "Eigen GMRES solver with ILU preconditioning");
+              break;
+            }
+          default: // For our default let's use their default
+            libmesh_warning("No EigenSparseLinearSolver support for " <<
+                            Utility::enum_to_string<PreconditionerType>(this->_preconditioner_type)
+                            << " preconditioning.");
+            libmesh_fallthrough();
+          case JACOBI_PRECOND:
+            {
+              Eigen::GMRES<EigenSM,DiagonalPreconditioner<Number>> solver (matrix._mat);
+              retval = set_restart_and_solve(solver, "Eigen CG solver with Jacobi preconditioning");
+              break;
+            }
+        }
         break;
       }
 
@@ -189,6 +274,8 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
         // handle non-square matrices, but we don't allow non-square
         // sparse matrices to be built in libmesh...
         Eigen::SparseLU<EigenSM> solver;
+
+        libMesh::out << "Eigen Sparse LU solver" << std::endl;
 
         // Compute the ordering permutation vector from the structural pattern of the matrix.
         solver.analyzePattern(matrix._mat);
