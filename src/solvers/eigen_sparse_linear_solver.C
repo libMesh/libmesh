@@ -104,20 +104,20 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
   // Eigen doesn't give us a solver base class?  We'll just use a
   // generic lambda, then.
   auto do_solve = [this, &rhs, &solution, tol, m_its]
-    (auto & solver, std::string_view msg) {
+    (auto & e_solver, std::string_view msg) {
     const int max_its = this->get_int_solver_setting("max_its", m_its);
     const double abs_tol = this->get_real_solver_setting("abs_tol", tol);
 
-    solver.setMaxIterations(max_its);
-    solver.setTolerance(abs_tol);
+    e_solver.setMaxIterations(max_its);
+    e_solver.setTolerance(abs_tol);
     libMesh::out << msg << std::endl;
 
-    solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
+    solution._vec = e_solver.solveWithGuess(rhs._vec,solution._vec);
 
-    libMesh::out << "#iterations: " << solver.iterations() << " / " << max_its << std::endl;
-    libMesh::out << "estimated error: " << solver.error() << " / " << abs_tol << std::endl;
-    _comp_info = solver.info();
-    return std::make_pair(solver.iterations(), solver.error());
+    libMesh::out << "#iterations: " << e_solver.iterations() << " / " << max_its << std::endl;
+    libMesh::out << "estimated error: " << e_solver.error() << " / " << abs_tol << std::endl;
+    _comp_info = e_solver.info();
+    return std::make_pair(e_solver.iterations(), e_solver.error());
   };
 
   using Eigen::DiagonalPreconditioner;
@@ -203,7 +203,7 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
     case GMRES:
       {
         auto set_restart_and_solve = [this, &do_solve]
-          (auto & solver, std::string_view msg) {
+          (auto & gm_solver, std::string_view msg) {
         // If there is an int parameter called "gmres_restart" in the
         // SolverConfiguration object, pass it to the Eigen GMRES
         // solver.
@@ -212,12 +212,12 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
             auto it = this->_solver_configuration->int_valued_data.find("gmres_restart");
 
             if (it != this->_solver_configuration->int_valued_data.end())
-              solver.set_restart(it->second);
+              gm_solver.set_restart(it->second);
           }
 
           std::ostringstream full_msg;
-          full_msg << msg << ", restart = " << solver.get_restart();
-          return do_solve(solver, full_msg.str());
+          full_msg << msg << ", restart = " << gm_solver.get_restart();
+          return do_solve(gm_solver, full_msg.str());
         };
 
         switch (this->_preconditioner_type)
