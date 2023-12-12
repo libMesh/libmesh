@@ -31,10 +31,12 @@
 #include <math.h>
 
 // Basic include files needed for the mesh functionality.
+#include "libmesh/enum_solver_type.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/linear_implicit_system.h"
+#include "libmesh/linear_solver.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/gmv_io.h"
@@ -128,7 +130,7 @@ int main (int argc, char ** argv)
 
   // Declare the Poisson system and its variables.
   // The Poisson system is another example of a steady system.
-  System & poisson = equation_systems.add_system<LinearImplicitSystem> ("Poisson");
+  LinearImplicitSystem & poisson = equation_systems.add_system<LinearImplicitSystem> ("Poisson");
 
   // Read FE order from command line
   std::string order_str = "SECOND";
@@ -160,6 +162,12 @@ int main (int argc, char ** argv)
 
   // Prints information about the system to the screen.
   equation_systems.print_info();
+
+  // If we're using Eigen, the default BiCGStab solver does not seem
+  // to converge robustly for this system.  Let's try some other
+  // settings for them.
+  if (libMesh::default_solver_package() == EIGEN_SOLVERS)
+    poisson.get_linear_solver()->set_solver_type(GMRES);
 
   // Solve the system "Poisson".  Note that calling this
   // member will assemble the linear system and invoke
