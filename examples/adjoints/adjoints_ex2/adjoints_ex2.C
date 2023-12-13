@@ -189,7 +189,9 @@ void adjust_linear_solvers(LaplaceSystem & system)
         adjust_linear_solver(solver->get_linear_solver());
     }
 
-  adjust_linear_solver(*system.get_linear_solver());
+  LinearSolver<Number> * linear_solver = system.get_linear_solver();
+  if (linear_solver)
+    adjust_linear_solver(*linear_solver);
 }
 
 
