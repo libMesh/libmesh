@@ -63,6 +63,9 @@
 #include <memory>
 
 // General libMesh includes
+#include "libmesh/eigen_sparse_linear_solver.h"
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_solver_type.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/error_vector.h"
 #include "libmesh/mesh.h"
@@ -72,7 +75,6 @@
 #include "libmesh/petsc_diff_solver.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/system_norm.h"
-#include "libmesh/enum_solver_package.h"
 
 // Sensitivity Calculation related includes
 #include "libmesh/parameter_vector.h"
@@ -163,6 +165,36 @@ void write_output(EquationSystems & es,
 #endif
 }
 
+
+void adjust_linear_solver(LinearSolver<Number> & linear_solver)
+{
+  // Eigen's BiCGSTAB doesn't seem reliable at the full refinement
+  // level we use here.
+#ifdef LIBMESH_HAVE_EIGEN_SPARSE
+  EigenSparseLinearSolver<Number> * eigen_linear_solver =
+    dynamic_cast<EigenSparseLinearSolver<Number> *>(&linear_solver);
+
+  if (eigen_linear_solver)
+    eigen_linear_solver->set_solver_type(SPARSELU);
+#endif
+}
+
+void adjust_linear_solvers(LaplaceSystem & system)
+{
+  auto diff_solver = cast_ptr<NewtonSolver*>(system.get_time_solver().diff_solver().get());
+  if (diff_solver) // Some compilers don't like dynamic cast of nullptr?
+    {
+      auto solver = cast_ptr<NewtonSolver*>(diff_solver);
+      if (solver)
+        adjust_linear_solver(solver->get_linear_solver());
+    }
+
+  LinearSolver<Number> * linear_solver = system.get_linear_solver();
+  if (linear_solver)
+    adjust_linear_solver(*linear_solver);
+}
+
+
 // Set the parameters for the nonlinear and linear solvers to be used during the simulation
 void set_system_parameters(LaplaceSystem & system, FEMParameters & param)
 {
@@ -219,6 +251,7 @@ void set_system_parameters(LaplaceSystem & system, FEMParameters & param)
     solver->max_linear_iterations    = param.max_linear_iterations;
     solver->initial_linear_tolerance = param.initial_linear_tolerance;
     solver->minimum_linear_tolerance = param.minimum_linear_tolerance;
+    adjust_linear_solvers(system);
   }
 }
 
@@ -500,6 +533,9 @@ int main (int argc, char ** argv)
 
         // Dont forget to reinit the system after each adaptive refinement !
         equation_systems.reinit();
+
+        // Fix up the linear solver options if that reinit just cleared it
+        adjust_linear_solvers(system);
 
         libMesh::out << "Refined mesh to "
                      << mesh.n_active_elem()

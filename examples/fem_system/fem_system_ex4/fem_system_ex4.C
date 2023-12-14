@@ -75,9 +75,6 @@ int main (int argc, char ** argv)
   libmesh_example_requires(false, "--enable-dirichlet");
 #endif
 
-  // This doesn't converge with Eigen BICGSTAB for some reason...
-  libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
-
   // This doesn't converge without at least double precision
   libmesh_example_requires(sizeof(Real) > 4, "--disable-singleprecision");
 

@@ -234,11 +234,6 @@ int main (int argc, char ** argv)
   libmesh_example_requires(false, "--enable-dirichlet");
 #endif
 
-  // This doesn't converge with Eigen BICGSTAB for some reason...
-  libmesh_example_requires((libMesh::default_solver_package() != EIGEN_SOLVERS) &&
-                           (libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE),
-                           "--enable-petsc or --enable-trilinos");
-
   libMesh::out << "Started " << argv[0] << std::endl;
 
   // Make sure the general input file exists, and parse it
