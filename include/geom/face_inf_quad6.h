@@ -113,8 +113,7 @@ public:
 
   /**
    * \returns An id associated with the \p s side of this element.
-   * The id is not necessarily unique, but should be close.  This is
-   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   * The id is not necessarily unique, but should be close.
    *
    * We override this function to return a key for the Edge3 side
    * which is consistent which Edge3::key().

@@ -109,6 +109,9 @@ public:
   virtual dof_id_type key (const unsigned int) const override
   { remote_elem_error("key"); return 0; }
 
+  virtual dof_id_type low_order_key (const unsigned int) const override
+  { remote_elem_error("low_order_key"); return 0; }
+
   virtual unsigned int local_side_node(unsigned int /*side*/,
                                        unsigned int /*side_node*/) const override
   { remote_elem_error("local_side_node"); return 0; }
