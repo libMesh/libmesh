@@ -745,7 +745,7 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
           {
             auto interpolation_points_list_inner = interpolation_points_list_middle.init(j, phi_i_all_qp[j].size());
 
-            for (auto k : make_range(phi_i_all_qp[j].size()))
+            for (auto k : index_range(phi_i_all_qp[j]))
                 interpolation_points_list_inner.set(k, phi_i_all_qp[j][k]);
           }
       }
