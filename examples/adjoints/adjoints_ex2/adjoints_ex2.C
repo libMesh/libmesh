@@ -176,6 +176,8 @@ void adjust_linear_solver(LinearSolver<Number> & linear_solver)
 
   if (eigen_linear_solver)
     eigen_linear_solver->set_solver_type(SPARSELU);
+#else
+  libmesh_ignore(linear_solver);
 #endif
 }
 
