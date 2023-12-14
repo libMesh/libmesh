@@ -70,6 +70,18 @@ struct FEOutputType<L2_LAGRANGE_VEC>
 };
 
 template<>
+struct FEOutputType<HIERARCHIC_VEC>
+{
+  typedef RealVectorValue type;
+};
+
+template<>
+struct FEOutputType<L2_HIERARCHIC_VEC>
+{
+  typedef RealVectorValue type;
+};
+
+template<>
 struct FEOutputType<NEDELEC_ONE>
 {
   typedef RealVectorValue type;
@@ -1208,6 +1220,52 @@ public:
   {}
 };
 
+
+
+/**
+ * FEHierarchicVec objects are used for working with vector-valued
+ * high-order finite elements
+ *
+ * \author Roy H. Stogner
+ * \date 2023
+ */
+template <unsigned int Dim>
+class FEHierarchicVec : public FE<Dim,HIERARCHIC_VEC>
+{
+public:
+
+  /**
+   * Constructor. Creates a vector Hierarchic finite element
+   * to be used in dimension \p Dim.
+   */
+  explicit
+  FEHierarchicVec(const FEType & fet) :
+    FE<Dim,HIERARCHIC_VEC> (fet)
+  {}
+};
+
+
+/**
+ * FEHierarchicVec objects are used for working with vector-valued
+ * high-order piecewise-continuous finite elements
+ *
+ * \author Roy H. Stogner
+ * \date 2023
+ */
+template <unsigned int Dim>
+class FEL2HierarchicVec : public FE<Dim,L2_HIERARCHIC_VEC>
+{
+public:
+
+  /**
+   * Constructor. Creates a vector Hierarchic finite element
+   * to be used in dimension \p Dim.
+   */
+  explicit
+  FEL2HierarchicVec(const FEType & fet) :
+    FE<Dim,L2_HIERARCHIC_VEC> (fet)
+  {}
+};
 
 
 /**

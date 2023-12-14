@@ -56,6 +56,7 @@ libmesh_SOURCES =  \
         src/fe/fe_hierarchic_shape_1D.C \
         src/fe/fe_hierarchic_shape_2D.C \
         src/fe/fe_hierarchic_shape_3D.C \
+        src/fe/fe_hierarchic_vec.C \
         src/fe/fe_interface.C \
         src/fe/fe_interface_inf_fe.C \
         src/fe/fe_l2_hierarchic.C \

@@ -42,11 +42,13 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
     case HERMITE: // PB: Really H2
     case SUBDIVISION:
     case LAGRANGE_VEC:
+    case HIERARCHIC_VEC:
     case MONOMIAL: // PB: Shouldn't this be L2 conforming?
     case MONOMIAL_VEC: // PB: Shouldn't this be L2 conforming?
     case XYZ: // PB: Shouldn't this be L2 conforming?
     case RATIONAL_BERNSTEIN:
-    case L2_HIERARCHIC: // PB: Shouldn't this be L2 conforming?
+    case L2_HIERARCHIC:
+    case L2_HIERARCHIC_VEC:
     case SIDE_HIERARCHIC:
     case L2_LAGRANGE: // PB: Shouldn't this be L2 conforming?
     case L2_LAGRANGE_VEC: // PB: Shouldn't this be L2 conforming?
