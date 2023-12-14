@@ -836,8 +836,10 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
             if (element->neighbor_ptr(ms) == nullptr ||
                 element->neighbor_ptr(ms) == remote_elem)
               {
-                // Get the key for the side of this element
-                const dof_id_type key = element->key(ms);
+                // Get the key for the side of this element.  Use the
+                // low_order_key so we can find neighbors in
+                // mixed-order meshes if necessary.
+                const dof_id_type key = element->low_order_key(ms);
 
                 // Look for elements that have an identical side key
                 auto bounds = side_to_elem_map.equal_range(key);
