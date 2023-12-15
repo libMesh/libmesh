@@ -663,6 +663,8 @@ void DistributedVector<T>::swap (NumericVector<T> & other)
   std::swap(_first_local_index, v._first_local_index);
   std::swap(_last_local_index, v._last_local_index);
 
+  std::swap(this->_is_initialized, v._is_initialized);
+
   // This should be O(1) with any reasonable STL implementation
   std::swap(_values, v._values);
 }
