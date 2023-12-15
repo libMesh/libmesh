@@ -1845,7 +1845,6 @@ Real System::calculate_norm(const NumericVector<Number> & v,
           typedef typename TensorTools::MakeNumber<OutputShape>::type OutputNumberShape;
           typedef typename std::remove_reference<decltype(fe)>::type::OutputGradient OutputGradient;
           typedef typename TensorTools::MakeNumber<OutputGradient>::type OutputNumberGradient;
-          typedef typename std::remove_reference<decltype(fe)>::type::OutputTensor OutputTensor;
 
           const std::vector<Real> &                     JxW = fe.get_JxW();
           const std::vector<std::vector<OutputShape>> * phi = nullptr;
@@ -1864,7 +1863,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
             dphi = &(fe.get_dphi());
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          typedef typename TensorTools::MakeNumber<OutputTensor>::type OutputNumberTensor;
+          typedef typename std::remove_reference<decltype(fe)>::type::OutputTensor OutputTensor;
 
           const std::vector<std::vector<OutputTensor>> *  d2phi = nullptr;
           if (norm_type == H2 ||
@@ -1931,6 +1930,8 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+              typedef typename TensorTools::MakeNumber<OutputTensor>::type OutputNumberTensor;
+
               if (norm_type == H2 ||
                   norm_type == H2_SEMINORM)
                 {
