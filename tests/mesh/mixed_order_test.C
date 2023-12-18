@@ -38,7 +38,7 @@ public:
       for (const auto & neigh : elem->neighbor_ptr_range())
         if (neigh)
           ++n_neighbors;
-    mesh.comm().max(n_neighbors);
+    mesh.comm().sum(n_neighbors);
     return n_neighbors;
   }
 
