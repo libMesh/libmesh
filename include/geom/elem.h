@@ -249,10 +249,17 @@ public:
 
   /**
    * \returns An id associated with the \p s side of this element.
-   * The id is not necessarily unique, but should be close.  This is
-   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   * The id is not necessarily unique, but should be close.
    */
   virtual dof_id_type key (const unsigned int s) const = 0;
+
+  /**
+   * \returns An id associated with the \p s side of this element, as
+   * defined solely by element vertices.  The id is not necessarily
+   * unique, but should be close.  This is particularly useful in the
+   * \p MeshBase::find_neighbors() routine.
+   */
+  virtual dof_id_type low_order_key (const unsigned int s) const = 0;
 
   /**
    * \returns An id associated with the global node ids of this

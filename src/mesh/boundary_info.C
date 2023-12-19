@@ -3228,19 +3228,29 @@ void BoundaryInfo::clear_stitched_boundary_side_ids (const boundary_id_type side
     auto pred_result = predicate(*it, _boundary_side_id);
     if (pred_result.first)
     {
-      // First erase associated nodeset information
+      // First erase associated nodeset information.  Do it from both
+      // sides, so we get any higher-order nodes if we're looking at
+      // them from a lower-order side, and so we only remove the two
+      // boundary ids used for stitching.
       if (clear_nodeset_data)
       {
         const Elem & elem = *it->first;
+        const Elem & neigh = *pred_result.second->first;
         const auto elem_side = it->second.first;
-        const auto local_node_nums = elem.nodes_on_side(elem_side);
-        for (const auto local_node_num : local_node_nums)
-          // This will remove all boundary info associated with this node, e.g. nodeset info
-          // for both sideset_id and other_sideset_id which is what we want
-          this->remove(elem.node_ptr(local_node_num));
+        const boundary_id_type neigh_side = pred_result.second->second.first;
+        const auto elem_bcid = it->second.second;
+        const boundary_id_type neigh_bcid = pred_result.second->second.second;
+
+        for (const auto local_node_num : elem.nodes_on_side(elem_side))
+          this->remove_node(elem.node_ptr(local_node_num), elem_bcid);
+
+        for (const auto local_node_num : neigh.nodes_on_side(neigh_side))
+          this->remove_node(neigh.node_ptr(local_node_num), neigh_bcid);
       }
 
-      // Now erase the sideset information
+      // Now erase the sideset information for our element and its
+      // neighbor, together.  This is safe since a multimap doesn't
+      // invalidate iterators.
       _boundary_side_id.erase(pred_result.second);
       it = _boundary_side_id.erase(it);
     }

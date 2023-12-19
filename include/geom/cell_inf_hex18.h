@@ -160,8 +160,7 @@ public:
 
   /**
    * \returns An id associated with the \p s side of this element.
-   * The id is not necessarily unique, but should be close.  This is
-   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   * The id is not necessarily unique, but should be close.
    *
    * We reimplement this method here for the \p InfHex18 since we can
    * use the center node of the bottom face to provide a perfect (unique)

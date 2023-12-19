@@ -99,6 +99,18 @@ dof_id_type Hex::key (const unsigned int s) const
 
 
 
+dof_id_type Hex::low_order_key (const unsigned int s) const
+{
+  libmesh_assert_less (s, this->n_sides());
+
+  return this->compute_key(this->node_id(Hex8::side_nodes_map[s][0]),
+                           this->node_id(Hex8::side_nodes_map[s][1]),
+                           this->node_id(Hex8::side_nodes_map[s][2]),
+                           this->node_id(Hex8::side_nodes_map[s][3]));
+}
+
+
+
 unsigned int Hex::local_side_node(unsigned int side,
                                   unsigned int side_node) const
 {

@@ -61,6 +61,18 @@ dof_id_type InfQuad::key (const unsigned int s) const
 
 
 
+dof_id_type InfQuad::low_order_key (const unsigned int s) const
+{
+  libmesh_assert_less (s, this->n_sides());
+
+  // The order of the node ids does not matter, they are sorted by the
+  // compute_key() function.
+  return this->compute_key(this->node_id(InfQuad4::side_nodes_map[s][0]),
+                           this->node_id(InfQuad4::side_nodes_map[s][1]));
+}
+
+
+
 unsigned int InfQuad::local_side_node(unsigned int side,
                                       unsigned int side_node) const
 {

@@ -115,6 +115,13 @@ public:
   { libmesh_error_msg("Calling NodeElem::key(side) does not make sense."); return 0; }
 
   /**
+   * \returns An id associated with the \p s side of this element.
+   * This should never be important for NodeElems.
+   */
+  virtual dof_id_type low_order_key (const unsigned int) const override
+  { libmesh_error_msg("Calling NodeElem::low_order_key(side) does not make sense."); return 0; }
+
+  /**
    * NodeElems don't have sides, so they can't have nodes on sides.
    */
   virtual unsigned int local_side_node(unsigned int /*side*/,

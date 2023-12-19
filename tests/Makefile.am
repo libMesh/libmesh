@@ -76,6 +76,7 @@ unit_tests_sources = \
   mesh/mesh_stitch.C \
   mesh/mesh_triangulation.C \
   mesh/mixed_dim_mesh_test.C \
+  mesh/mixed_order_test.C \
   mesh/nodal_neighbors.C \
   mesh/libmesh_poly2tri.C \
   mesh/slit_mesh_test.C \

@@ -91,6 +91,33 @@ dof_id_type Pyramid::key (const unsigned int s) const
 
 
 
+dof_id_type Pyramid::low_order_key (const unsigned int s) const
+{
+  libmesh_assert_less (s, this->n_sides());
+
+  switch (s)
+    {
+    case 0: // triangular face 1
+    case 1: // triangular face 2
+    case 2: // triangular face 3
+    case 3: // triangular face 4
+      return this->compute_key (this->node_id(Pyramid5::side_nodes_map[s][0]),
+                                this->node_id(Pyramid5::side_nodes_map[s][1]),
+                                this->node_id(Pyramid5::side_nodes_map[s][2]));
+
+    case 4:  // the quad face at z=0
+      return this->compute_key (this->node_id(Pyramid5::side_nodes_map[s][0]),
+                                this->node_id(Pyramid5::side_nodes_map[s][1]),
+                                this->node_id(Pyramid5::side_nodes_map[s][2]),
+                                this->node_id(Pyramid5::side_nodes_map[s][3]));
+
+    default:
+      libmesh_error_msg("Invalid side s = " << s);
+    }
+}
+
+
+
 unsigned int Pyramid::local_side_node(unsigned int side,
                                       unsigned int side_node) const
 {

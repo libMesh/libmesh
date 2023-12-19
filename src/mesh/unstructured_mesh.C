@@ -836,8 +836,10 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
             if (element->neighbor_ptr(ms) == nullptr ||
                 element->neighbor_ptr(ms) == remote_elem)
               {
-                // Get the key for the side of this element
-                const dof_id_type key = element->key(ms);
+                // Get the key for the side of this element.  Use the
+                // low_order_key so we can find neighbors in
+                // mixed-order meshes if necessary.
+                const dof_id_type key = element->low_order_key(ms);
 
                 // Look for elements that have an identical side key
                 auto bounds = side_to_elem_map.equal_range(key);
@@ -1863,7 +1865,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                           // This side is on the boundary, add its information to side_to_elem
                           if (skip_find_neighbors && (i==0))
                             {
-                              key_type key = el->key(side_id);
+                              key_type key = el->low_order_key(side_id);
                               val_type val;
                               val.first = el;
                               val.second = cast_int<unsigned char>(side_id);
@@ -2407,7 +2409,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                     {
                       if (el->neighbor_ptr(s) == nullptr)
                         {
-                          key_type key = el->key(s);
+                          key_type key = el->low_order_key(s);
                           auto bounds = side_to_elem_map.equal_range(key);
 
                           if (bounds.first != bounds.second)
