@@ -280,8 +280,7 @@ protected:
   /**
    * Implementation of enrich_eim_approximation() for the case of element interiors.
    */
-  void enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
-                                             const std::vector<std::vector<Number>> & interior_pf_obs_values);
+  void enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf);
 
   /**
    * Update the matrices used in training the EIM approximation.
@@ -308,15 +307,6 @@ private:
    * so that we can use this in evaluation of the parametrized functions.
    */
   void initialize_qp_data();
-
-  /**
-   * Initialize the \p elem_ids and \p sbd_ids associated with the observation
-   * points so that we can subsequently evaluate parametrized functions at the
-   * observations points.
-   */
-  void initialize_observation_points_data(
-    std::vector<dof_id_type> & observation_points_elem_ids,
-    std::vector<subdomain_id_type> & observation_points_sbd_ids);
 
   /**
    * Evaluate the inner product of vec1 and vec2 which specify values at

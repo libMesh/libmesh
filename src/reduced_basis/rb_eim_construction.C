@@ -808,10 +808,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 
           libmesh_try
             {
-              // We leave v_obs_vals empty for now, but we can support this later
-              // by accumulating v_obs_vals in the same way that we accumulate v.
-              std::vector<std::vector<Number>> v_obs_vals;
-              enrich_eim_approximation_on_interiors(v, v_obs_vals);
+              enrich_eim_approximation_on_interiors(v);
               update_eim_matrices();
             }
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
@@ -1462,32 +1459,6 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
         }
 
       _parametrized_functions_for_training_obs_values.resize( get_n_training_samples() );
-
-      // Finally, we also evaluate the parametrized functions for training at the "observation points"
-      if (eim_eval.get_n_observation_points() > 0)
-        {
-          std::vector<dof_id_type> observation_points_elem_ids;
-          std::vector<subdomain_id_type> observation_points_sbd_ids;
-          initialize_observation_points_data(observation_points_elem_ids, observation_points_sbd_ids);
-
-          for (auto i : make_range(get_n_training_samples()))
-            {
-              libMesh::out << "Initializing observation values for training sample "
-                << (i+1) << " of " << get_n_training_samples() << std::endl;
-
-              set_params_from_training_set(i);
-
-              _parametrized_functions_for_training_obs_values[i] =
-                eim_eval.get_parametrized_function().evaluate_at_observation_points(get_parameters(),
-                                                                                    eim_eval.get_observation_points(),
-                                                                                    observation_points_elem_ids,
-                                                                                    observation_points_sbd_ids,
-                                                                                    *this);
-
-              libmesh_error_msg_if(_parametrized_functions_for_training_obs_values[i].size() != eim_eval.get_n_observation_points(),
-                                  "Number of observation values should match number of observation points");
-            }
-        }
     }
 }
 
@@ -1901,43 +1872,6 @@ void RBEIMConstruction::initialize_qp_data()
     }
 }
 
-void RBEIMConstruction::initialize_observation_points_data(
-  std::vector<dof_id_type> & observation_points_elem_ids,
-  std::vector<subdomain_id_type> & observation_points_sbd_ids)
-{
-  LOG_SCOPE("initialize_observation_points_data()", "RBEIMConstruction");
-
-  RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
-
-  if (eim_eval.get_n_observation_points() == 0)
-    return;
-
-  libmesh_error_msg_if (eim_eval.get_parametrized_function().on_mesh_sides(),
-                        "initialize_observation_points_data() not currently supported for data on element sides");
-
-  libMesh::out << "Initializing observation point locations" << std::endl;
-
-  const MeshBase & mesh = this->get_mesh();
-
-  const std::vector<Point> & observation_points = eim_eval.get_observation_points();
-
-  std::unique_ptr<PointLocatorBase> point_locator = mesh.sub_point_locator();
-
-  observation_points_elem_ids.resize(observation_points.size());
-  observation_points_sbd_ids.resize(observation_points.size());
-
-  for (unsigned int obs_pt_index : index_range(observation_points))
-    {
-      const Point & p = observation_points[obs_pt_index];
-      const Elem * elem = (*point_locator)(p);
-
-      libmesh_error_msg_if (!elem, "No element containing observation found");
-
-      observation_points_elem_ids[obs_pt_index] = elem->id();
-      observation_points_sbd_ids[obs_pt_index] = elem->subdomain_id();
-    }
-}
-
 Number
 RBEIMConstruction::inner_product(const QpDataMap & v, const QpDataMap & w)
 {
@@ -2058,14 +1992,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
     enrich_eim_approximation_on_nodes(_local_node_parametrized_functions_for_training[training_index]);
   else
     {
-      bool has_obs_vals = (eim_eval.get_n_observation_points() > 0);
-
-      std::vector<std::vector<Number>> new_bf_obs_vals;
-      if (has_obs_vals)
-        new_bf_obs_vals = _parametrized_functions_for_training_obs_values[training_index];
-
-      enrich_eim_approximation_on_interiors(_local_parametrized_functions_for_training[training_index],
-                                            new_bf_obs_vals);
+      enrich_eim_approximation_on_interiors(_local_parametrized_functions_for_training[training_index]);
     }
 }
 
@@ -2353,22 +2280,13 @@ void RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & no
                                                           optimal_boundary_id);
 }
 
-void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
-                                                              const std::vector<std::vector<Number>> & interior_pf_obs_values)
+void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf)
 {
   // Make a copy of the input parametrized function, since we will modify this below
   // to give us a new basis function.
   QpDataMap local_pf = interior_pf;
 
   RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
-
-  bool has_obs_vals = (eim_eval.get_n_observation_points() > 0);
-
-  std::vector<std::vector<Number>> new_bf_obs_vals;
-  if (has_obs_vals)
-    {
-      new_bf_obs_vals = interior_pf_obs_values;
-    }
 
   // If we have at least one basis function, then we need to use
   // rb_eim_solve() to find the EIM interpolation error. Otherwise,
@@ -2396,14 +2314,6 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
       // Load the "EIM residual" into solution by subtracting
       // the EIM approximation
       eim_eval.decrement_vector(local_pf, rb_eim_solution);
-
-      if(has_obs_vals)
-        {
-          for (unsigned int i=0; i<RB_size; i++)
-            for (unsigned int j=0; j<eim_eval.get_n_observation_points(); j++)
-              for (unsigned int k=0; k<new_bf_obs_vals[j].size(); k++)
-                new_bf_obs_vals[j][k] -= rb_eim_solution(i) * eim_eval.get_observation_values(i,j)[k];
-        }
     }
 
   // Find the quadrature point at which local_pf (which now stores
@@ -2547,17 +2457,6 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
                                                      optimal_elem_type,
                                                      optimal_JxW_all_qp,
                                                      optimal_phi_i_all_qp);
-
-  if (has_obs_vals)
-    {
-      // Apply the scame scaling to new_bf_obs_vals as we did to
-      // the new basis function itself
-      for (unsigned int i=0; i<new_bf_obs_vals.size(); i++)
-        for (unsigned int j=0; j<new_bf_obs_vals[i].size(); j++)
-          new_bf_obs_vals[i][j] *= 1./optimal_value;
-
-      eim_eval.add_observation_values_for_basis_function(new_bf_obs_vals);
-    }
 }
 
 void RBEIMConstruction::update_eim_matrices()
