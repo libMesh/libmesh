@@ -677,10 +677,8 @@ extern "C"
 
     libmesh_parallel_only(solver->comm());
 
-    // It's also possible that we don't need to do anything at all, in
+    // It's possible that we don't need to do anything at all, in
     // that case return early...
-    NonlinearImplicitSystem & sys = solver->system();
-
     if (!solver->precheck_object)
       return ierr;
 
@@ -689,10 +687,26 @@ extern "C"
     bool
       petsc_changed = false;
 
+    auto & sys = solver->system();
+    auto & x_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> petsc_x(X, sys.comm());
     PetscVector<Number> petsc_y(Y, sys.comm());
 
-    solver->precheck_object->precheck(petsc_x,
+    // Use the systems update() to get a good local version of the parallel solution
+    petsc_x.swap(x_sys);
+    sys.update();
+    petsc_x.swap(x_sys);
+
+    // Enforce constraints (if any) exactly on the
+    // current_local_solution.  This is the solution vector that is
+    // actually used in the computation of residuals and Jacobians, and is
+    // not locked by debug-enabled PETSc the way that "x" is.
+    libmesh_assert(sys.current_local_solution.get());
+    auto & local_soln = *sys.current_local_solution.get();
+    if (solver->_exact_constraint_enforcement)
+      sys.get_dof_map().enforce_constraints_exactly(sys, &local_soln);
+
+    solver->precheck_object->precheck(local_soln,
                                       petsc_y,
                                       petsc_changed,
                                       sys);

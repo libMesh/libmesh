@@ -212,15 +212,31 @@ public:
                             sys_type & S) = 0;
   };
 
+  /**
+   * Abstract base class to be used for applying user modifications to the Newton search direction
+   * \emph before the solver's line search is called.
+   */
   class ComputePreCheck
   {
   public:
     virtual ~ComputePreCheck () = default;
 
-    virtual void precheck (const NumericVector<Number> & old_soln,
-                           NumericVector<Number> & search_direction,
-                           bool & changed,
-                           sys_type & S) = 0;
+    /**
+     * Abstract precheck method that users must override
+     * @param precheck_soln This is the solution prior to the linesearch (which we have not
+     * performed yet). This will correspond to the system's \p current_local_solution data member,
+     * so it should hold all the information locally that a user might want to query from the vector
+     * (e.g. possibly ghost entries)
+     * @param search_direction The search direction that will be used in the upcoming line search.
+     * \emph Note that this is the \emph negative of the solution update, at least when using PETSc
+     * as the backend. The user may modify this vector
+     * @param changed Whether the user has modified the \p search_direction
+     * @param S The nonlinear implicit system
+     */
+    virtual void precheck(const NumericVector<Number> & precheck_soln,
+                          NumericVector<Number> & search_direction,
+                          bool & changed,
+                          sys_type & S) = 0;
   };
 
   /**

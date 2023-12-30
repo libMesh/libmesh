@@ -266,12 +266,8 @@ public:
   std::unique_ptr<FEBase> scalar_fe_face;
   std::unique_ptr<FEBase> lm_fe_face;
   std::unique_ptr<QBase> qface;
-  // Parallel version of LM increment
-  NumericVector<Number> * parallel_increment;
   // Ghosted version of LM increment
   NumericVector<Number> * ghosted_increment;
-  // Ghosted version of old solution
-  NumericVector<Number> * ghosted_old_solution;
   SparseMatrix<Number> * J;
   NumericVector<Number> * residual;
   boundary_id_type left_bnd;
@@ -339,15 +335,13 @@ public:
     assemble(true);
   }
 
-  virtual void precheck(const NumericVector<Number> & old_soln,
+  virtual void precheck(const NumericVector<Number> & /*precheck_soln*/,
                         NumericVector<Number> & search_direction,
                         bool & /*changed*/,
                         NonlinearImplicitSystem & /*S*/) override
   {
-    parallel_increment->zero();
-    *parallel_increment -= search_direction;
-    *ghosted_increment = *parallel_increment;
-    *ghosted_old_solution = old_soln;
+    ghosted_increment->zero();
+    *ghosted_increment -= search_direction;
     assemble(false);
   }
 
@@ -974,7 +968,7 @@ private:
 
   void assemble(const bool lm_solve)
   {
-    auto & lm_soln_vector = lm_solve ? *lm_system->current_local_solution : *ghosted_old_solution;
+    auto & lm_soln_vector = *lm_system->current_local_solution;
     const auto u_num = mixed_system->variable_number("vel_x");
     const auto v_num = mixed_system->variable_number("vel_y");
     const auto qu_num = mixed_system->variable_number("qu");
@@ -1413,10 +1407,8 @@ main(int argc, char ** argv)
   if (cavity)
     lm_system.add_variable("global_lm", FIRST, SCALAR);
 
-  // Add vectors for increment
+  // Add vector for increment
   auto & ghosted_inc = lm_system.add_vector("ghosted_increment", true, GHOSTED);
-  auto & parallel_inc = lm_system.add_vector("parallel_increment", true, PARALLEL);
-  auto & ghosted_old = lm_system.add_vector("ghosted_old", true, GHOSTED);
 
   const FEType vector_fe_type(FIRST, L2_LAGRANGE_VEC);
   const FEType scalar_fe_type(FIRST, L2_LAGRANGE);
@@ -1436,8 +1428,6 @@ main(int argc, char ** argv)
   hdg.scalar_fe_face = FEBase::build(dimension, scalar_fe_type);
   hdg.lm_fe_face = FEBase::build(dimension, lm_fe_type);
   hdg.ghosted_increment = &ghosted_inc;
-  hdg.parallel_increment = &parallel_inc;
-  hdg.ghosted_old_solution = &ghosted_old;
   hdg.mms = mms;
 
   lm_system.nonlinear_solver->residual_and_jacobian_object = &hdg;
