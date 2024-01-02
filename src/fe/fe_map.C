@@ -887,7 +887,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
             const Real det = (g11*g22 - g12*g21);
 
-            if (det <= 0.)
+            if (det <= jacobian_tolerance)
               {
                 // Don't call print_info() recursively if we're already
                 // failing.  print_info() calls Elem::volume() which may
