@@ -86,6 +86,7 @@
 #include <limits>    // for std::numeric_limits<>
 #include <cmath>     // for std::sqrt()
 #include <memory>
+#include <regex>     // for exceptions in volume()
 
 
 namespace libMesh
@@ -3065,7 +3066,20 @@ Real Elem::volume () const
 
   fe->attach_quadrature_rule(&qrule);
 
-  fe->reinit(this);
+  // Computations might scream and die here if we're on a tangled
+  // element with a negative mapping Jacobian at some quadrature
+  // point.  But this method really shouldn't throw, so let's just
+  // return a NaN there.
+
+  libmesh_try {
+    fe->reinit(this);
+  }
+  libmesh_catch (libMesh::LogicError & e) {
+    std::regex msg_regex("ERROR: negative Jacobian");
+    if (std::regex_search(e.what(), msg_regex))
+      return std::numeric_limits<Real>::quiet_NaN();
+    libmesh_rethrow;
+  }
 
   Real vol=0.;
   for (auto jxw : JxW)
