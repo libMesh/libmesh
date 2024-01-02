@@ -974,6 +974,10 @@ public:
 
   /**
    * \returns The (length/area/volume) of the geometric element.
+   *
+   * If the element is twisted or inverted such that the mapping
+   * Jacobian is singular at any point, implementations of this method
+   * may return a "net" volume or may simply return NaN.
    */
   virtual Real volume () const;
 
