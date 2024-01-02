@@ -24,6 +24,7 @@ class VolumeTest : public CppUnit::TestCase
 
 public:
   LIBMESH_CPPUNIT_TEST_SUITE( VolumeTest );
+  CPPUNIT_TEST( testTwistedVolume );
   CPPUNIT_TEST( testEdge3Volume );
   CPPUNIT_TEST( testEdge3Invertible );
   CPPUNIT_TEST( testEdge4Invertible );
@@ -153,6 +154,31 @@ public:
       LIBMESH_ASSERT_FP_EQUAL(0, true_centroid(2), TOLERANCE*TOLERANCE);
 #endif // LIBMESH_ENABLE_AMR
     }
+  }
+
+  void testTwistedVolume()
+  {
+    LOG_UNIT_TEST;
+
+    ReplicatedMesh mesh(*TestCommWorld);
+
+    // Build an element type that will fall back on our generic
+    // quadrature-based Elem::volume()
+    MeshTools::Generation::build_cube(mesh,
+                                      /*nelem=*/1, /*nelem=*/1, /*nelem=*/1,
+                                      /*xmin=*/-1, /*xmax=*/1,
+                                      /*ymin=*/-1, /*ymax=*/1,
+                                      /*zmin=*/-1, /*zmax=*/1,
+                                      PRISM21);
+
+    // Pick an element and twist it
+    Elem * prism6 = mesh.elem_ptr(0);
+    prism6->point(1) *= -1;
+    prism6->point(1) += 2*prism6->point(0);
+
+    // Its volume should now be NaN and shouldn't throw an error.
+    Real vol = prism6->volume();
+    CPPUNIT_ASSERT(libmesh_isnan(vol));
   }
 
   void testEdge3Volume()
