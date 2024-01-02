@@ -3058,6 +3058,10 @@ Real Elem::volume () const
   std::unique_ptr<FEBase> fe (FEBase::build(this->dim(),
                                             fe_type));
 
+  // Use a map with a negative Jacobian tolerance, in case we're asked
+  // for the net volume of a tangled element
+  fe->get_fe_map().set_jacobian_tolerance(std::numeric_limits<Real>::lowest());
+
   const std::vector<Real> & JxW = fe->get_JxW();
 
   // The default quadrature rule should integrate the mass matrix,
@@ -3066,20 +3070,7 @@ Real Elem::volume () const
 
   fe->attach_quadrature_rule(&qrule);
 
-  // Computations might scream and die here if we're on a tangled
-  // element with a negative mapping Jacobian at some quadrature
-  // point.  But this method really shouldn't throw, so let's just
-  // return a NaN there.
-
-  libmesh_try {
-    fe->reinit(this);
-  }
-  libmesh_catch (libMesh::LogicError & e) {
-    std::regex msg_regex("ERROR: negative Jacobian");
-    if (std::regex_search(e.what(), msg_regex))
-      return std::numeric_limits<Real>::quiet_NaN();
-    libmesh_rethrow;
-  }
+  fe->reinit(this);
 
   Real vol=0.;
   for (auto jxw : JxW)

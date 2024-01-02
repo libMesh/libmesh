@@ -176,9 +176,10 @@ public:
     prism6->point(1) *= -1;
     prism6->point(1) += 2*prism6->point(0);
 
-    // Its volume should now be NaN and shouldn't throw an error.
-    Real vol = prism6->volume();
-    CPPUNIT_ASSERT(libmesh_isnan(vol));
+    // The real test here is that volume() doesn't throw
+    const Real vol = prism6->volume();
+    const Real gold_vol = 3+Real(5)/9;
+    CPPUNIT_ASSERT_LESS(TOLERANCE, std::abs(vol-gold_vol));
   }
 
   void testEdge3Volume()
