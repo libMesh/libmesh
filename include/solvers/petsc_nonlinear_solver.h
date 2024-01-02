@@ -54,6 +54,7 @@ extern "C"
   PetscErrorCode libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx);
   PetscErrorCode libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r);
   PetscErrorCode libmesh_petsc_snes_jacobian (SNES, Vec x, Mat jac, Mat pc, void * ctx);
+  PetscErrorCode libmesh_petsc_snes_precheck(SNESLineSearch, Vec X, Vec Y, PetscBool * changed, void * context);
   PetscErrorCode libmesh_petsc_snes_postcheck(SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context);
   PetscErrorCode libmesh_petsc_linesearch_shellfunc(SNESLineSearch linesearch, void * ctx);
 
@@ -293,6 +294,11 @@ private:
   friend PetscErrorCode libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat jac, Mat pc, void * ctx);
+  friend PetscErrorCode libmesh_petsc_snes_precheck (SNESLineSearch,
+                                                     Vec X,
+                                                     Vec Y,
+                                                     PetscBool * changed,
+                                                     void * context);
 };
 
 } // namespace libMesh
