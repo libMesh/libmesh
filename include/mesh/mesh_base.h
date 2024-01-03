@@ -165,7 +165,7 @@ public:
   virtual ~MeshBase ();
 
   /**
-   * A partitioner to use at each prepare_for_use()
+   * A partitioner to use at each partitioning
    */
   virtual std::unique_ptr<Partitioner> & partitioner() { return _partitioner; }
 
@@ -194,7 +194,7 @@ public:
    * No Node is removed from the mesh, however even NodeElem elements
    * are deleted, so the remaining Nodes will be considered "unused"
    * and cleared unless they are reconnected to new elements before
-   * the next \p prepare_for_use()
+   * the next preparation step.
    *
    * This does not affect BoundaryInfo data; any boundary information
    * associated elements should already be cleared.
@@ -202,17 +202,105 @@ public:
   virtual void clear_elems () = 0;
 
   /**
-   * \returns \p true if the mesh has been prepared via a call
-   * to \p prepare_for_use, \p false otherwise.
+   * \returns \p true if the mesh has undergone all the preparation
+   * done in a call to \p prepare_for_use, \p false otherwise.
    */
   bool is_prepared () const
-  { return _is_prepared; }
+  { return _preparation; }
 
   /**
-   * Tells this we have done some operation where we should no longer consider ourself prepared
+   * \returns the \p Preparation structure with details about in what
+   * ways \p this mesh is currently prepared or unprepared.  This
+   * structure may change in the future when cache designs change.
+   */
+  struct Preparation;
+
+  Preparation preparation () const
+  { return _preparation; }
+
+  /**
+   * Tells this we have done some operation where we should no longer
+   * consider ourself prepared.  This is a very coarse setting; it may
+   * be preferable to mark finer-grained settings instead.
    */
   void set_isnt_prepared()
-  { _is_prepared = false; }
+  { _preparation = false; }
+
+  /**
+   * Tells this we have done some operation creating unpartitioned
+   * elements.
+   */
+  void set_isnt_partitioned()
+  { _preparation.is_partitioned = false; }
+
+  /**
+   * Tells this we have done some operation (e.g. adding elements to a
+   * distributed mesh on one processor only) which can lose
+   * synchronization of id counts.
+   */
+  void set_hasnt_synched_id_counts()
+  { _preparation.has_synched_id_counts = false; }
+
+  /**
+   * Tells this we have done some operation (e.g. adding elements
+   * without setting their neighbor pointers) which requires neighbor
+   * pointers to be found later
+   */
+  void set_hasnt_neighbor_ptrs()
+  { _preparation.has_neighbor_ptrs = false; }
+
+  /**
+   * Tells this we have done some operation (e.g. adding elements with
+   * a new dimension or subdomain value) which may invalidate cached
+   * summaries of element data
+   */
+  void set_hasnt_cached_elem_data()
+  { _preparation.has_cached_elem_data = false; }
+
+  /**
+   * Tells this we have done some operation (e.g. refining elements
+   * with interior parents) which requires interior parent pointers to
+   * be found later
+   */
+  void set_hasnt_interior_parent_ptrs()
+  { _preparation.has_interior_parent_ptrs = false; }
+
+  /**
+   * Tells this we have done some operation (e.g. repartitioning)
+   * which may have left elements as ghosted which on a distributed
+   * mesh should be remote.
+   *
+   * User code should probably never need to use this; we can set it
+   * in Partitioner.
+   */
+  void set_hasnt_removed_remote_elements()
+  { _preparation.has_removed_remote_elements = false; }
+
+  /**
+   * Tells this we have done some operation (e.g. coarsening)
+   * which may have left orphaned nodes in need of removal.
+   *
+   * Most user code should probably never need to use this; we can set
+   * it in MeshRefinement.
+   */
+  void set_hasnt_removed_orphaned_nodes()
+  { _preparation.has_removed_orphaned_nodes = false; }
+
+  /**
+   * Tells this we have done some operation (e.g. adding or removing
+   * elements) which may require a reinit() of custom ghosting
+   * functors.
+   */
+  void hasnt_reinit_ghosting_functors()
+  { _preparation.has_reinit_ghosting_functors = false; }
+
+  /**
+   * Tells this we have done some operation (e.g. removing elements or
+   * adding new boundary entries) which may have invalidated our
+   * cached boundary id sets.
+   */
+  void set_hasnt_boundary_id_sets()
+  { _preparation.has_boundary_id_sets = false; }
 
   /**
    * \returns \p true if all elements and nodes of the mesh
@@ -260,7 +348,9 @@ public:
    * except for "ghosts" which touch a local element, and deletes
    * all nodes which are not part of a local or ghost element
    */
-  virtual void delete_remote_elements () {}
+  virtual void delete_remote_elements () {
+    _preparation.has_removed_remote_elements = true;
+  }
 
   /**
    * Loops over ghosting functors and calls mesh_reinit()
@@ -742,7 +832,7 @@ public:
    * To ensure a specific element id, call e->set_id() before adding it;
    * only do this in parallel if you are manually keeping ids consistent.
    *
-   * Users should call MeshBase::prepare_for_use() after elements are
+   * Users should call MeshBase::complete_preparation() after elements are
    * added to and/or deleted from the mesh.
    */
   virtual Elem * add_elem (Elem * e) = 0;
@@ -761,7 +851,7 @@ public:
    * Insert elem \p e to the element array, preserving its id
    * and replacing/deleting any existing element with the same id.
    *
-   * Users should call MeshBase::prepare_for_use() after elements are
+   * Users should call MeshBase::complete_preparation() after elements are
    * added to and/or deleted from the mesh.
    */
   virtual Elem * insert_elem (Elem * e) = 0;
@@ -780,8 +870,8 @@ public:
    * Removes element \p e from the mesh. This method must be
    * implemented in derived classes in such a way that it does not
    * invalidate element iterators.  Users should call
-   * MeshBase::prepare_for_use() after elements are added to and/or
-   * deleted from the mesh.
+   * MeshBase::complete_preparation() after elements are added to
+   * and/or deleted from the mesh.
    *
    * \note Calling this method may produce isolated nodes, i.e. nodes
    * not connected to any element.
@@ -848,7 +938,7 @@ public:
 
   /**
    * Removes any orphaned nodes, nodes not connected to any elements.
-   * Typically done automatically in prepare_for_use
+   * Typically done automatically in a preparation step
    */
   void remove_orphaned_nodes ();
 
@@ -1122,12 +1212,19 @@ public:
                                           const std::vector<T> * default_values = nullptr);
 
   /**
-   * Prepare a newly ecreated (or read) mesh for use.
-   * This involves 4 steps:
-   *  1.) call \p find_neighbors()
-   *  2.) call \p partition()
-   *  3.) call \p renumber_nodes_and_elements()
-   *  4.) call \p cache_elem_data()
+   * Prepare a newly created (or read) mesh for use.
+   * This involves several steps:
+   *  1.) renumbering (if enabled)
+   *  2.) removing any orphaned nodes
+   *  3.) updating parallel id counts
+   *  4.) finding neighbor links
+   *  5.) caching summarized element data
+   *  6.) finding interior parent links
+   *  7.) clearing any old point locator
+   *  8.) calling reinit() on ghosting functors
+   *  9.) repartitioning (if enabled)
+   *  10.) removing any remote elements (if enabled)
+   *  11.) regenerating summarized boundary id sets
    *
    * The argument to skip renumbering is now deprecated - to prevent a
    * mesh from being renumbered, set allow_renumbering(false). The argument to skip
@@ -1143,6 +1240,15 @@ public:
   void prepare_for_use (const bool skip_renumber_nodes_and_elements);
 #endif // LIBMESH_ENABLE_DEPRECATED
   void prepare_for_use ();
+
+  /*
+   * Prepare a newly created or modified mesh for use.
+   *
+   * Unlike \p prepare_for_use(), \p complete_preparation() performs
+   * *only* those preparatory steps that have been marked as
+   * necessary in the MeshBase::Preparation state.
+   */
+  void complete_preparation();
 
   /**
    * Call the default partitioner (currently \p metis_partition()).
@@ -1844,6 +1950,58 @@ public:
                                      const boundary_id_type b2);
 #endif
 
+  /**
+   * Flags indicating in what ways a mesh has been prepared for use.
+   */
+  struct Preparation {
+    bool is_partitioned = false,
+         has_synched_id_counts = false,
+         has_neighbor_ptrs = false,
+         has_cached_elem_data = false,
+         has_interior_parent_ptrs = false,
+         has_removed_remote_elements = false,
+         has_removed_orphaned_nodes = false,
+         has_boundary_id_sets = false,
+         has_reinit_ghosting_functors = false;
+
+    operator bool() const {
+      return is_partitioned &&
+             has_synched_id_counts &&
+             has_neighbor_ptrs &&
+             has_cached_elem_data &&
+             has_interior_parent_ptrs &&
+             has_removed_remote_elements &&
+             has_removed_orphaned_nodes &&
+             has_reinit_ghosting_functors &&
+             has_boundary_id_sets;
+    }
+
+    Preparation & operator= (bool set_all) {
+      is_partitioned = set_all;
+      has_synched_id_counts = set_all;
+      has_neighbor_ptrs = set_all;
+      has_cached_elem_data = set_all;
+      has_interior_parent_ptrs = set_all;
+      has_removed_remote_elements = set_all;
+      has_removed_orphaned_nodes = set_all;
+      has_reinit_ghosting_functors = set_all;
+      has_boundary_id_sets = set_all;
+
+      return *this;
+    }
+
+    bool operator== (const Preparation & other) {
+      return is_partitioned == other.is_partitioned &&
+             has_synched_id_counts == other.has_synched_id_counts &&
+             has_neighbor_ptrs == other.has_neighbor_ptrs &&
+             has_cached_elem_data == other.has_cached_elem_data &&
+             has_interior_parent_ptrs == other.has_interior_parent_ptrs &&
+             has_removed_remote_elements == other.has_removed_remote_elements &&
+             has_removed_orphaned_nodes == other.has_removed_orphaned_nodes &&
+             has_reinit_ghosting_functors == other.has_reinit_ghosting_functors &&
+             has_boundary_id_sets == other.has_boundary_id_sets;
+    }
+  };
 
 protected:
 
@@ -1923,9 +2081,9 @@ protected:
   unsigned char _default_mapping_data;
 
   /**
-   * Flag indicating if the mesh has been prepared for use.
+   * Flags indicating in what ways \p this mesh has been prepared.
    */
-  bool _is_prepared;
+  Preparation _preparation;
 
   /**
    * A \p PointLocator class for this mesh.

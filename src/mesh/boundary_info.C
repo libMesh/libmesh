@@ -433,6 +433,8 @@ void BoundaryInfo::synchronize_global_id_set()
   libmesh_assert(_mesh);
   if (!_mesh->is_serial())
     _communicator.set_union(_global_boundary_ids);
+
+  _mesh->_preparation.has_boundary_id_sets = true;
 }
 
 
