@@ -680,6 +680,8 @@ void ReplicatedMesh::update_parallel_id_counts()
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id = this->parallel_max_unique_id();
 #endif
+
+  this->_preparation.has_synched_id_counts = true;
 }
 
 
@@ -856,6 +858,8 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
         _nodes.erase (nd, end);
       }
     }
+
+  this->_preparation.has_removed_orphaned_nodes = true;
 
   libmesh_assert_equal_to (next_free_elem, _elements.size());
   libmesh_assert_equal_to (next_free_node, _nodes.size());
