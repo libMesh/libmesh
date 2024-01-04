@@ -255,7 +255,7 @@ public:
    * which may have left orphaned nodes in need of removal.
    *
    * Most user code should probably never need to use this; we can set
-   * it in MeshRefinement. 
+   * it in MeshRefinement.
    */
   void set_hasnt_removed_orphaned_nodes()
   { _preparation.has_removed_orphaned_nodes = false; }
