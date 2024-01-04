@@ -34,6 +34,7 @@
 #include "libmesh/ignore_warnings.h"
 
 #include "vtkXMLUnstructuredGridReader.h"
+#include "vtkXMLPUnstructuredGridReader.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLPUnstructuredGridWriter.h"
 #include "vtkUnstructuredGrid.h"
@@ -193,7 +194,7 @@ void VTKIO::read (const std::string & name)
   elems_of_dimension.resize(4, false);
 
   // Use a typedef, because these names are just crazy
-  typedef vtkSmartPointer<vtkXMLUnstructuredGridReader> MyReader;
+  typedef vtkSmartPointer<vtkXMLPUnstructuredGridReader> MyReader;
   MyReader reader = MyReader::New();
 
   // Pass the filename along to the reader
