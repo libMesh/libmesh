@@ -86,6 +86,7 @@
 #include <limits>    // for std::numeric_limits<>
 #include <cmath>     // for std::sqrt()
 #include <memory>
+#include <regex>     // for exceptions in volume()
 
 
 namespace libMesh
@@ -3056,6 +3057,10 @@ Real Elem::volume () const
 
   std::unique_ptr<FEBase> fe (FEBase::build(this->dim(),
                                             fe_type));
+
+  // Use a map with a negative Jacobian tolerance, in case we're asked
+  // for the net volume of a tangled element
+  fe->get_fe_map().set_jacobian_tolerance(std::numeric_limits<Real>::lowest());
 
   const std::vector<Real> & JxW = fe->get_JxW();
 

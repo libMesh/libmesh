@@ -146,12 +146,14 @@ public:
 #define libmesh_noexcept noexcept
 
 #define LIBMESH_THROW(e) do { throw e; } while (0)
+#define libmesh_rethrow throw
 #define libmesh_try try
 #define libmesh_catch(e) catch(e)
 
 #else
 
 #define LIBMESH_THROW(e) do { libMesh::err << e.what(); std::abort(); } while (0)
+#define libmesh_rethrow
 #define libmesh_try
 #define libmesh_catch(e) if (0)
 
