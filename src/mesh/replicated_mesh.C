@@ -422,6 +422,9 @@ void ReplicatedMesh::renumber_elem(const dof_id_type old_id,
   Elem * el = _elements[old_id];
   libmesh_assert (el);
 
+  if (new_id >= _elements.size())
+    _elements.resize(new_id+1, nullptr);
+
   el->set_id(new_id);
   libmesh_assert (!_elements[new_id]);
   _elements[new_id] = el;
@@ -635,6 +638,9 @@ void ReplicatedMesh::renumber_node(const dof_id_type old_id,
   // This doesn't get used in serial yet
   Node * nd = _nodes[old_id];
   libmesh_assert (nd);
+
+  if (new_id >= _nodes.size())
+    _nodes.resize(new_id+1, nullptr);
 
   nd->set_id(new_id);
   libmesh_assert (!_nodes[new_id]);
