@@ -228,6 +228,29 @@ void VTKIO::read (const std::string & name)
   // Get the number of cells from the _vtk_grid object
   const unsigned int vtk_num_cells = static_cast<unsigned int>(_vtk_grid->GetNumberOfCells());
 
+  // Try to preserve any libMesh ids and subdomain ids we find in the
+  // file.  This will be null if there are none, e.g. if a non-libMesh
+  // program wrote this file.
+
+  vtkAbstractArray * abstract_elem_id =
+    _vtk_grid->GetCellData()->GetAbstractArray("libmesh_elem_id");
+  vtkAbstractArray * abstract_subdomain_id =
+    _vtk_grid->GetCellData()->GetAbstractArray("subdomain_id");
+
+  // Get ids as integers.  This will be null if they are another data
+  // type, e.g. if a non-libMesh program used the names we thought
+  // were unique for different data.
+  vtkIntArray * elem_id = vtkIntArray::SafeDownCast(abstract_elem_id);
+  vtkIntArray * subdomain_id = vtkIntArray::SafeDownCast(abstract_subdomain_id);
+
+  if (abstract_elem_id && !elem_id)
+    libmesh_warning("Found non-integral libmesh_elem_id array; forced to ignore it.\n"
+                    "This is technically valid but probably broken.");
+
+  if (abstract_subdomain_id && !subdomain_id)
+    libmesh_warning("Found non-integral subdomain_id array; forced to ignore it.\n"
+                    "This is technically valid but probably broken.");
+
   auto& element_map = libmesh_map_find(_element_maps, mesh.default_mapping_type());
 
   vtkSmartPointer<vtkGenericCell> cell = vtkSmartPointer<vtkGenericCell>::New();
@@ -255,7 +278,22 @@ void VTKIO::read (const std::string & name)
            j != n_conn; ++j)
         elem->set_node(j) = mesh.node_ptr(conn[j]);
 
-      elem->set_id(i);
+      if (elem_id)
+        {
+          auto id = elem_id->GetValue(i);
+          libmesh_error_msg_if
+            (mesh.query_elem_ptr(id), "Duplicate element id " << id <<
+             " found in libmesh_elem_ids");
+          elem->set_id(id);
+        }
+      else
+        elem->set_id(i);
+
+      if (subdomain_id)
+        {
+          auto sbdid = subdomain_id->GetValue(i);
+          elem->subdomain_id() = sbdid;
+        }
 
       elems_of_dimension[elem->dim()] = true;
 
