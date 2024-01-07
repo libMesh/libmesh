@@ -98,6 +98,11 @@ public:
   LIBMESH_CPPUNIT_TEST_SUITE( MeshInputTest );
 
 #if LIBMESH_DIM > 1
+#ifdef LIBMESH_HAVE_VTK
+  CPPUNIT_TEST( testVTKPreserveElemIds );
+  CPPUNIT_TEST( testVTKPreserveSubdomainIds );
+#endif
+
 #ifdef LIBMESH_HAVE_EXODUS_API
   CPPUNIT_TEST( testExodusCopyNodalSolutionDistributed );
   CPPUNIT_TEST( testExodusCopyElementSolutionDistributed );
@@ -200,6 +205,113 @@ public:
 
   void tearDown()
   {}
+
+#ifdef LIBMESH_HAVE_VTK
+  void testVTKPreserveElemIds ()
+  {
+    LOG_UNIT_TEST;
+
+    // Come up with some crazy numbering.  Make all the new ids higher
+    // than the existing ids so we don't have to worry about conflicts
+    // while renumbering.
+    const dof_id_type start_id = 10;
+
+    // first scope: write file
+    {
+      Mesh mesh(*TestCommWorld);
+      mesh.allow_renumbering(false);
+      MeshTools::Generation::build_square (mesh, 3, 3, 0., 1., 0., 1.);
+
+      CPPUNIT_ASSERT_LESS(start_id, mesh.max_elem_id());
+      for (const auto & elem : mesh.element_ptr_range())
+      {
+        const Point center = elem->vertex_average();
+        const int xn = center(0)*3;
+        const int yn = center(1)*3;
+        const dof_id_type new_id = start_id + yn*5 + xn;
+        mesh.renumber_elem(elem->id(), new_id);
+      }
+
+      // Explicit writer object here to be absolutely sure we get VTK
+      VTKIO vtk(mesh);
+      vtk.write("read_elem_ids_test.pvtu");
+    }
+
+    // Make sure that the writing is done before the reading starts.
+    TestCommWorld->barrier();
+
+    // second scope: read file
+    {
+      Mesh mesh(*TestCommWorld);
+      mesh.allow_renumbering(false);
+
+      mesh.read("read_elem_ids_test.pvtu");
+      mesh.prepare_for_use();
+
+      CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(16));
+      CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(9));
+
+      for (const auto & elem : mesh.element_ptr_range())
+      {
+        const Point center = elem->vertex_average();
+        const int xn = center(0)*3;
+        const int yn = center(1)*3;
+        const dof_id_type expected_id = start_id + yn*5 + xn;
+        CPPUNIT_ASSERT_EQUAL(elem->id(), expected_id);
+      }
+    }
+  }
+
+  void testVTKPreserveSubdomainIds ()
+  {
+    LOG_UNIT_TEST;
+
+    // first scope: write file
+    {
+      Mesh mesh(*TestCommWorld);
+      mesh.allow_renumbering(false);
+      MeshTools::Generation::build_square (mesh, 3, 3, 0., 1., 0., 1.);
+
+      for (const auto & elem : mesh.element_ptr_range())
+      {
+        const Point center = elem->vertex_average();
+        const int xn = center(0)*3;
+        const int yn = center(1)*3;
+        const subdomain_id_type new_id = yn*4 + xn;
+        elem->subdomain_id() = new_id;
+      }
+
+      // Explicit writer object here to be absolutely sure we get VTK
+      VTKIO vtk(mesh);
+      vtk.write("read_sbd_ids_test.pvtu");
+    }
+
+    // Make sure that the writing is done before the reading starts.
+    TestCommWorld->barrier();
+
+    // second scope: read file
+    {
+      Mesh mesh(*TestCommWorld);
+      mesh.allow_renumbering(false);
+
+      mesh.read("read_sbd_ids_test.pvtu");
+      mesh.prepare_for_use();
+
+      CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(16));
+      CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(9));
+
+      for (const auto & elem : mesh.element_ptr_range())
+      {
+        const Point center = elem->vertex_average();
+        const int xn = center(0)*3;
+        const int yn = center(1)*3;
+        const subdomain_id_type expected_id = yn*4 + xn;
+        CPPUNIT_ASSERT_EQUAL(elem->subdomain_id(), expected_id);
+      }
+    }
+  }
+#endif // LIBMESH_HAVE_VTK
+
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   void testExodusReadHeader ()

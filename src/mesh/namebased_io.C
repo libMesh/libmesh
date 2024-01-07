@@ -246,7 +246,8 @@ void NameBasedIO::read (const std::string & name)
           else if (basename.rfind(".gmv") < basename.size())
             GMVIO(mymesh).read (new_name);
 
-          else if (basename.rfind(".vtu") < basename.size())
+          else if (basename.rfind(".pvtu") < basename.size() ||
+                   basename.rfind(".vtu") < basename.size())
             VTKIO(mymesh).read(new_name);
 
           else if (basename.rfind(".inp") < basename.size())
@@ -279,6 +280,7 @@ void NameBasedIO::read (const std::string & name)
                                 << "     *.off  -- OOGL OFF surface format\n" \
                                 << "     *.ogl  -- OOGL OFF surface format\n" \
                                 << "     *.oogl -- OOGL OFF surface format\n" \
+                                << "     *.pvtu  -- Paraview VTK format\n" \
                                 << "     *.ucd  -- AVS's ASCII UCD format\n" \
                                 << "     *.unv  -- I-deas Universal format\n" \
                                 << "     *.vtu  -- Paraview VTK format\n" \
@@ -400,8 +402,8 @@ void NameBasedIO::write (const std::string & name)
         else if (basename.rfind(".fro") < basename.size())
           FroIO(mymesh).write (new_name);
 
-        else if (basename.rfind(".vtu") < basename.size())
-          VTKIO(mymesh).write (new_name);
+        else if (basename.rfind(".pvtu") < basename.size())
+          VTKIO(mymesh).write (name);
 
         else
           {
@@ -421,9 +423,9 @@ void NameBasedIO::write (const std::string & name)
               << "     *.nem   -- Sandia's Nemesis format\n"
               << "     *.plt   -- Tecplot binary file\n"
               << "     *.poly  -- TetGen ASCII file\n"
+              << "     *.pvtu   -- VTK (paraview-readable) format\n"
               << "     *.ucd   -- AVS's ASCII UCD format\n"
               << "     *.unv   -- I-deas Universal format\n"
-              << "     *.vtu   -- VTK (paraview-readable) format\n"
               << "     *.xda   -- libMesh ASCII format\n"
               << "     *.xdr   -- libMesh binary format,\n"
               << std::endl
