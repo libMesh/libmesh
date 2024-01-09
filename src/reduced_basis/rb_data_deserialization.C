@@ -682,7 +682,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
   // Note that we do not check rb_eim_evaluation.use_eim_error_indicator()
   // below because it can be false in some cases when we're reading in
   // data (e.g. if we're using a base class RBEIMEvaluation to do the
-  // reading). The check below will still give the right behavior whether
+  // reading). The check below will still give the right behavior
   // regardless of the value of use_eim_error_indicator().
   if (rb_eim_evaluation_reader.getInterpolationXyz().size() > n_bfs)
     n_bfs++;

@@ -425,7 +425,7 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
   _eim_projection_matrix.resize(max_matrix_size,max_matrix_size);
 
   rbe.initialize_parameters(*this);
-  rbe.resize_data_structures(get_Nmax());
+  rbe.resize_data_structures(max_matrix_size);
 
   // If we are continuing from a previous training run,
   // we might already be at the max number of basis functions.

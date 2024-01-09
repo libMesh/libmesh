@@ -78,11 +78,7 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
   _interpolation_points_comp.clear();
   _interpolation_points_spatial_indices.clear();
 
-  // We need space for one extra interpolation point if we're using the
-  // EIM error indicator.
-  unsigned int max_matrix_size = use_eim_error_indicator() ? Nmax+1 : Nmax;
-
-  _interpolation_matrix.resize(max_matrix_size,max_matrix_size);
+  _interpolation_matrix.resize(Nmax,Nmax);
 }
 
 void RBEIMEvaluation::set_parametrized_function(std::unique_ptr<RBParametrizedFunction> pf)
