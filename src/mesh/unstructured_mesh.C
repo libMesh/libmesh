@@ -245,7 +245,8 @@ void transfer_elem(Elem & lo_elem,
    * be its exterior child, not the old element.
    */
   Elem * interior_p = lo_elem.interior_parent();
-  hi_elem->set_interior_parent(interior_p);
+  if (interior_p)
+    hi_elem->set_interior_parent(interior_p);
 
   auto parent_exterior_it = exterior_children_of.find(interior_p);
   if (parent_exterior_it != exterior_children_of.end())
