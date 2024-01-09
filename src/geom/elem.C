@@ -1056,7 +1056,8 @@ Elem * Elem::interior_parent ()
 void Elem::set_interior_parent (Elem * p)
 {
   // interior parents make no sense for full-dimensional elements.
-  libmesh_assert_less (this->dim(), LIBMESH_DIM);
+  libmesh_assert (!p ||
+                  this->dim() < LIBMESH_DIM);
 
   // If we have an interior_parent, we USED TO assume it was a
   // one-higher-dimensional interior element, but we now allow e.g.
