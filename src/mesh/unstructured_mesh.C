@@ -40,11 +40,12 @@
 #endif
 
 // C++ includes
-#include <fstream>
-#include <sstream>
-#include <iomanip>
-#include <unordered_map>
 #include <algorithm> // std::all_of
+#include <fstream>
+#include <iomanip>
+#include <map>
+#include <sstream>
+#include <unordered_map>
 
 namespace {
 
@@ -85,7 +86,6 @@ map_hi_order_node(unsigned int hon,
   return adj_vertices_to_ho_nodes.try_emplace(adjacent_vertices_ids, nullptr).first;
 }
 
-
 void transfer_elem(Elem & lo_elem,
                    std::unique_ptr<Elem> hi_elem,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -93,7 +93,8 @@ void transfer_elem(Elem & lo_elem,
                    unique_id_type max_new_nodes_per_elem,
 #endif
                    UnstructuredMesh & mesh,
-                   std::map<std::vector<dof_id_type>, Node *> & adj_vertices_to_ho_nodes)
+                   std::map<std::vector<dof_id_type>, Node *> & adj_vertices_to_ho_nodes,
+                   std::unordered_map<Elem *, std::vector<Elem *>> & exterior_children_of)
 {
   libmesh_assert_equal_to (lo_elem.n_vertices(), hi_elem->n_vertices());
 
@@ -238,6 +239,41 @@ void transfer_elem(Elem & lo_elem,
     }
 
   /**
+   * If the old element has an interior_parent(), transfer it to the
+   * new element ... and if the interior_parent itself might be
+   * getting upgraded, make sure we later consider the new element to
+   * be its exterior child, not the old element.
+   */
+  Elem * interior_p = lo_elem.interior_parent();
+  hi_elem->set_interior_parent(interior_p);
+
+  auto parent_exterior_it = exterior_children_of.find(interior_p);
+  if (parent_exterior_it != exterior_children_of.end())
+    {
+      auto & exteriors = parent_exterior_it->second;
+      for (std::size_t i : index_range(exteriors))
+        if (exteriors[i] == &lo_elem)
+          {
+            exteriors[i] = hi_elem.get();
+            break;
+          }
+    }
+
+  /**
+   * If we had interior_parent() links to the old element, transfer
+   * them to the new element.
+   */
+  auto exterior_it = exterior_children_of.find(&lo_elem);
+  if (exterior_it != exterior_children_of.end())
+    {
+      for (Elem * exterior_elem : exterior_it->second)
+        {
+          libmesh_assert(exterior_elem->interior_parent() == &lo_elem);
+          exterior_elem->set_interior_parent(hi_elem.get());
+        }
+    }
+
+  /**
    * If the old element had any boundary conditions they
    * should be transferred to the second-order element.  The old
    * boundary conditions will be removed from the BoundaryInfo
@@ -349,8 +385,19 @@ all_increased_order_range (UnstructuredMesh & mesh,
    * used to identify already added higher-order
    * nodes.  We are safe to use node id's since we
    * make sure that these are correctly numbered.
+   *
+   * We lazily use an ordered map here to avoid having to implement a
+   * good hash for vector<dof_id_type>
    */
   std::map<std::vector<dof_id_type>, Node *> adj_vertices_to_ho_nodes;
+
+  /*
+   * This map helps us reset any interior_parent() values from the
+   * lower order element to its higher order replacement.  Unlike with
+   * neighbor pointers, we don't have backlinks here, so we have to
+   * iterate over the mesh to track forward links.
+   */
+  std::unordered_map<Elem *, std::vector<Elem *>> exterior_children_of;
 
   /*
    * max_new_nodes_per_elem is the maximum number of new higher order
@@ -385,13 +432,23 @@ all_increased_order_range (UnstructuredMesh & mesh,
    * order; we may need to share elements with a neighbor not in the
    * range.
    */
-  auto track_if_necessary = [&adj_vertices_to_ho_nodes](Elem * elem) {
-    if (elem && elem != remote_elem && elem->default_order() != FIRST)
-      for (unsigned int hon : make_range(elem->n_vertices(), elem->n_nodes()))
-        {
-          auto pos = map_hi_order_node(hon, *elem, adj_vertices_to_ho_nodes);
-          pos->second = elem->node_ptr(hon);
-        }
+  auto track_if_necessary = [&adj_vertices_to_ho_nodes,
+                             &exterior_children_of,
+                             &elem_type_converter](Elem * elem) {
+    if (elem && elem != remote_elem)
+      {
+        if (elem->default_order() != FIRST)
+          for (unsigned int hon : make_range(elem->n_vertices(), elem->n_nodes()))
+            {
+              auto pos = map_hi_order_node(hon, *elem, adj_vertices_to_ho_nodes);
+              pos->second = elem->node_ptr(hon);
+            }
+
+        const ElemType old_type = elem->type();
+        const ElemType new_type = elem_type_converter(old_type);
+        if (old_type != new_type)
+          exterior_children_of.emplace(elem, std::vector<Elem *>());
+      }
   };
 
   // If we're in the common case then just track everything; otherwise
@@ -416,6 +473,18 @@ all_increased_order_range (UnstructuredMesh & mesh,
           libmesh_ignore(coupling_map);
           track_if_necessary(const_cast<Elem *>(elem));
         }
+    }
+
+  /**
+   * Loop over all mesh elements to look for interior_parent links we
+   * need to upgrade later.
+   */
+  for (auto & elem : mesh.element_ptr_range())
+    {
+      Elem * interior_parent = elem->interior_parent();
+      auto exterior_map_it = exterior_children_of.find(interior_parent);
+      if (exterior_map_it != exterior_children_of.end())
+        exterior_map_it->second.push_back(elem);
     }
 
   /**
@@ -461,7 +530,8 @@ all_increased_order_range (UnstructuredMesh & mesh,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
                     max_unique_id, max_new_nodes_per_elem,
 #endif
-                    mesh, adj_vertices_to_ho_nodes);
+                    mesh, adj_vertices_to_ho_nodes,
+                    exterior_children_of);
     } // end for (auto & lo_elem : range)
 
   // we can clear the map at this point.
