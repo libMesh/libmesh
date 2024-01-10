@@ -50,6 +50,7 @@
 // C++ include
 #include <limits>
 #include <memory>
+#include <random>
 
 namespace libMesh
 {
@@ -808,7 +809,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 
           libmesh_try
             {
-              enrich_eim_approximation_on_interiors(v);
+              enrich_eim_approximation_on_interiors(v, /*extra_point_data*/ nullptr);
               update_eim_matrices();
             }
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
@@ -1992,7 +1993,8 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
     enrich_eim_approximation_on_nodes(_local_node_parametrized_functions_for_training[training_index]);
   else
     {
-      enrich_eim_approximation_on_interiors(_local_parametrized_functions_for_training[training_index]);
+      enrich_eim_approximation_on_interiors(_local_parametrized_functions_for_training[training_index],
+                                            /*extra_point_data*/ nullptr);
     }
 }
 
@@ -2280,7 +2282,8 @@ void RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & no
                                                           optimal_boundary_id);
 }
 
-void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf)
+void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
+                                                              EimPointData * extra_point_data)
 {
   // Make a copy of the input parametrized function, since we will modify this below
   // to give us a new basis function.
@@ -2291,7 +2294,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
   // If we have at least one basis function, then we need to use
   // rb_eim_solve() to find the EIM interpolation error. Otherwise,
   // just use solution as is.
-  if (eim_eval.get_n_basis_functions() > 0)
+  if (!extra_point_data && (eim_eval.get_n_basis_functions() > 0))
     {
       // Get the right-hand side vector for the EIM approximation
       // by sampling the parametrized function (stored in solution)
@@ -2363,7 +2366,15 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
               Number value = qp_values[qp];
               Real abs_value = std::abs(value);
 
-              if (abs_value > largest_abs_value)
+              bool update_optimal_point = false;
+              if (!extra_point_data)
+                update_optimal_point = (abs_value > largest_abs_value);
+              else
+                update_optimal_point = (elem_id == extra_point_data->elem_id) &&
+                                       (comp == extra_point_data->comp_index) &&
+                                       (qp == extra_point_data->qp_index);
+
+              if (update_optimal_point)
                 {
                   largest_abs_value = abs_value;
                   optimal_value = value;
@@ -2430,7 +2441,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
 
   libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
 
-  if (optimal_value == 0.)
+  if (!extra_point_data && (optimal_value == 0.))
     {
       // Use libMesh::out to print the error message because we want to see this error message
       // in this case that we're doing an extra basis enrichment for the error indicator and
@@ -2442,7 +2453,8 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
     }
 
   // Scale local_pf so that its largest value is 1.0
-  scale_parametrized_function(local_pf, 1./optimal_value);
+  if (!extra_point_data)
+    scale_parametrized_function(local_pf, 1./optimal_value);
 
   // Add local_pf as the new basis function and store data
   // associated with the interpolation point.
@@ -2578,6 +2590,40 @@ void RBEIMConstruction::scale_node_parametrized_function(NodeDataMap & local_pf,
       for ( auto & value : values)
         value *= scaling_factor;
     }
+}
+
+EimPointData RBEIMConstruction::get_random_point(const QpDataMap & v)
+{
+  EimPointData eim_point_data;
+
+  {
+    std::random_device seed;
+    std::mt19937 gen{seed()};
+    std::uniform_int_distribution<> dist{0, static_cast<int>(v.size()-1)};
+    unsigned int random_elem_idx = dist(gen);
+
+    auto item = v.begin();
+    std::advance(item, random_elem_idx);
+    eim_point_data.elem_id = item->first;
+  }
+
+  {
+    const auto & vars_and_qps = libmesh_map_find(v,eim_point_data.elem_id);
+    std::random_device seed;
+    std::mt19937 gen{seed()};
+    std::uniform_int_distribution<> dist{0, static_cast<int>(vars_and_qps.size()-1)};
+    eim_point_data.comp_index = dist(gen);
+  }
+
+  {
+    const auto & qps = libmesh_map_find(v,eim_point_data.elem_id)[eim_point_data.comp_index];
+    std::random_device seed;
+    std::mt19937 gen{seed()};
+    std::uniform_int_distribution<> dist{0, static_cast<int>(qps.size()-1)};
+    eim_point_data.qp_index = dist(gen);
+  }
+
+  return eim_point_data;
 }
 
 } // namespace libMesh

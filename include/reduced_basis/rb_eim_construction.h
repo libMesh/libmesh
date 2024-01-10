@@ -41,6 +41,18 @@ namespace libMesh
 {
 
 /**
+ * This struct is used to encapsulate the arguments required
+ * to specify an EIM point that we may add to our list of
+ * interpolation points.
+ */
+struct EimPointData
+{
+  dof_id_type elem_id;
+  unsigned int comp_index;
+  unsigned int qp_index;
+};
+
+/**
  * This class is part of the rbOOmit framework.
  *
  * RBEIMConstruction implements the Construction stage of the
@@ -279,8 +291,12 @@ protected:
 
   /**
    * Implementation of enrich_eim_approximation() for the case of element interiors.
+   *
+   * If \p extra_point_data is not nullptr, then we add the extra point that is
+   * specified rather than looking for the "optimal point" in \p interior_pf.
    */
-  void enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf);
+  void enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
+                                             EimPointData * extra_point_data);
 
   /**
    * Update the matrices used in training the EIM approximation.
@@ -404,6 +420,12 @@ private:
    */
   static void scale_node_parametrized_function(NodeDataMap & local_pf,
                                                Number scaling_factor);
+
+  /**
+   * Static helper function that identifies a random EIM point
+   * from \p v.
+   */
+  static EimPointData get_random_point(const QpDataMap & v);
 
   /**
    * Maximum number of EIM basis functions we are willing to use.

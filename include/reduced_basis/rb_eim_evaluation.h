@@ -760,6 +760,18 @@ private:
    */
   bool _is_eim_error_indicator_active;
 
+  /**
+   * Here we store an "interpolation matrix" associated with extra points.
+   * This allows us to efficiently evaluate the EIM approximation at these
+   * extra points. Note that the extra points are not used to construct
+   * the EIM approximation itself.
+   *
+   * The matrix M should have dimension "n extra points" x "n basis functions"
+   * and we may then compute the EIM approximation associated with each
+   * "extra point" via extra_point_values = M x eim_solution.
+   */
+  DenseMatrix<Number> _extra_points_interpolation_matrix;
+
 };
 
 }
