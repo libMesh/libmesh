@@ -545,6 +545,17 @@ public:
    */
   void set_eim_error_indicator_active(bool is_active);
 
+  /**
+   * Static helper function that updates the EIM solution vector
+   * in the case that we're using the EIM error indicator, and
+   * returns the EIM error indicator value. In this case we "drop"
+   * the last entry of the EIM solution vector and use it as the
+   * error indicator value instead.
+   */
+  static Real update_eim_solution_for_error_indicator(
+    unsigned int n_eim_pts_without_indicator,
+    DenseVector<Number> & eim_solution);
+
 private:
 
   /**

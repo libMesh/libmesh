@@ -291,23 +291,9 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
         // above when we set up n_interp_pts_in_solve.
         if (_is_eim_error_indicator_active && (n_interp_pts_in_solve > N))
           {
-            Number rb_eim_error_indicator_val = _rb_eim_solutions[counter](N);
-
-            // Drop the last entry from the solution vector since it is only used
-            // for the error indicator value, which we already obtained above.
-            auto rb_eim_sol_copy = _rb_eim_solutions[counter];
-            _rb_eim_solutions[counter].resize(N);
-            for (auto sol_idx : make_range(N))
-              _rb_eim_solutions[counter](sol_idx) = rb_eim_sol_copy(sol_idx);
-
-            // Normalize the error indicator based on the norm of the EIM coefficient vector,
-            // but also check for the case that the EIM coefficient vector is zero in order
-            // to handle that separately.
-            Real eim_coeff_norm = _rb_eim_solutions[counter].linfty_norm();
-            Real normalization = (eim_coeff_norm > 0.) ? eim_coeff_norm : 1.;
-
             _rb_eim_error_indicators[counter] =
-              std::abs(rb_eim_error_indicator_val) / normalization;
+              update_eim_solution_for_error_indicator(
+                N, _rb_eim_solutions[counter]);
           }
 
         counter++;
@@ -2987,6 +2973,30 @@ bool RBEIMEvaluation::use_eim_error_indicator() const
 void RBEIMEvaluation::set_eim_error_indicator_active(bool is_active)
 {
   _is_eim_error_indicator_active = (is_active && use_eim_error_indicator());
+}
+
+Real RBEIMEvaluation::update_eim_solution_for_error_indicator(
+  unsigned int n_eim_pts_without_indicator,
+  DenseVector<Number> & eim_solution)
+{
+  // In this case we use the last entry of the EIM solution as our
+  // EIM error indicator. We also drop this last entry from the
+  // EIM solution vector below, since we do not use it to construct
+  // the EIM approximation.
+  Number rb_eim_error_indicator_val = eim_solution(n_eim_pts_without_indicator);
+
+  auto rb_eim_sol_copy = eim_solution;
+  eim_solution.resize(n_eim_pts_without_indicator);
+  for (auto sol_idx : make_range(n_eim_pts_without_indicator))
+    eim_solution(sol_idx) = rb_eim_sol_copy(sol_idx);
+
+  // Normalize the error indicator based on the norm of the EIM coefficient vector,
+  // but also check for the case that the EIM coefficient vector is zero in order
+  // to handle that separately.
+  Real eim_coeff_norm = eim_solution.linfty_norm();
+  Real normalization = (eim_coeff_norm > 0.) ? eim_coeff_norm : 1.;
+
+  return std::abs(rb_eim_error_indicator_val) / normalization;
 }
 
 } // namespace libMesh
