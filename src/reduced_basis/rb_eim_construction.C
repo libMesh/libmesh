@@ -449,13 +449,24 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
   // error indicator, which requires one extra EIM iteration.
   bool exit_on_next_iteration = false;
 
+  // We also initialize a boolean to keep track of whether we have
+  // reached "n_samples" EIM basis functions, since we need to
+  // handle the EIM error indicator in a special way in this case.
+  bool bfs_equals_n_samples = false;
+
   while (true)
     {
       if (rbe.get_n_basis_functions() >= get_n_training_samples())
         {
           libMesh::out << "Number of basis functions (" << rbe.get_n_basis_functions()
-            << ") equals number of training samples, hence exiting." << std::endl;
-          break;
+            << ") equals number of training samples." << std::endl;
+
+          bfs_equals_n_samples = true;
+
+          // If exit_on_next_iteration==true then we don't exit yet, since
+          // we still need to add data for the error indicator before exiting.
+          if (!exit_on_next_iteration)
+            break;
         }
 
       libMesh::out << "Greedily selected parameter vector:" << std::endl;
@@ -465,10 +476,22 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
       libMesh::out << "Enriching the EIM approximation" << std::endl;
       libmesh_try
         {
+          // If bfs_equals_n_samples==true then we add an "extra point" because
+          // we cannot add a usual EIM interpolation point in that case since
+          // the full EIM space is already covered. This is necessary when we
+          // want to add an extra point for error indicator purposes in the
+          // bfs_equals_n_samples==true case, for example.
+          std::unique_ptr<EimPointData> eim_point_data;
+          if (bfs_equals_n_samples)
+              eim_point_data = std::make_unique<EimPointData>(get_random_point_from_training_sample());
+
+          // If exit_on_next_iteration==true then we do not add a basis function in
+          // that case since in that case we only need to add data for the EIM error
+          // indicator.
           enrich_eim_approximation(current_training_index,
-                                   /*add_basis_function*/ true,
-                                   /*eim_point_data*/ nullptr);
-          update_eim_matrices(/*add_extra_point_data*/ false);
+                                   /*add_basis_function*/ !exit_on_next_iteration,
+                                   eim_point_data.get());
+          update_eim_matrices(/*set_error_indicator*/ exit_on_next_iteration);
 
           libMesh::out << std::endl << "---- Basis dimension: "
                       << rbe.get_n_basis_functions() << " ----" << std::endl;
@@ -506,11 +529,6 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
       if (exit_on_next_iteration)
         {
           libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
-
-          // Before we exit we remove the "final" EIM basis function, since it was only added in order
-          // to create data for the EIM error indicator.
-          rbe.set_n_basis_functions(rbe.get_n_basis_functions()-1);
-
           break;
         }
 
@@ -682,20 +700,6 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
   bool j_equals_n_snapshots = false;
   while (true)
     {
-      if (exit_on_next_iteration)
-        {
-          libMesh::out << "Extra EIM iteration for error indicator is complete, POD error norm for extra iteration: " << rel_err << std::endl;
-
-          // Before we exit we remove the "final" EIM basis function, since it was only added in order
-          // to create data for the EIM error indicator.
-          get_rb_eim_evaluation().set_n_basis_functions(get_rb_eim_evaluation().get_n_basis_functions()-1);
-
-          break;
-        }
-
-      libMesh::out << "Number of basis functions: " << j
-                   << ", POD error norm: " << rel_err << std::endl;
-
       bool exit_condition_satisfied = false;
       if (j >= n_snapshots)
         {
@@ -715,6 +719,15 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           // "energy", in order to obtain a relative error.
           rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
         }
+
+      if (exit_on_next_iteration)
+        {
+          libMesh::out << "Extra EIM iteration for error indicator is complete, POD error norm for extra iteration: " << rel_err << std::endl;
+          break;
+        }
+
+      libMesh::out << "Number of basis functions: " << j
+                   << ", POD error norm: " << rel_err << std::endl;
 
       if (!exit_condition_satisfied)
         if (j >= get_Nmax())
@@ -2838,6 +2851,18 @@ EimPointData RBEIMConstruction::get_random_point(const NodeDataMap & v)
   }
 
   return eim_point_data;
+}
+
+EimPointData RBEIMConstruction::get_random_point_from_training_sample()
+{
+  RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
+
+  if (eim_eval.get_parametrized_function().on_mesh_sides())
+    return get_random_point(_local_side_parametrized_functions_for_training[0]);
+  else if (eim_eval.get_parametrized_function().on_mesh_nodes())
+    return get_random_point(_local_node_parametrized_functions_for_training[0]);
+  else
+    return get_random_point(_local_parametrized_functions_for_training[0]);
 }
 
 } // namespace libMesh

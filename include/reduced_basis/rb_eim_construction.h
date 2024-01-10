@@ -452,6 +452,12 @@ private:
   static EimPointData get_random_point(const NodeDataMap & v);
 
   /**
+   * Get a random point using the 0^th training sample as input to
+   * get_random_point().
+   */
+  EimPointData get_random_point_from_training_sample();
+
+  /**
    * Maximum number of EIM basis functions we are willing to use.
    */
   unsigned int _Nmax;
