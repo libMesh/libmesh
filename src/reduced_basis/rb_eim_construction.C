@@ -765,7 +765,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           // Make a "zero clone" by copying to get the same data layout, and then scaling by zero
           SideQpDataMap v = _local_side_parametrized_functions_for_training[0];
 
-          if (j_equals_n_snapshots)
+          if (!j_equals_n_snapshots)
             {
               scale(v, 0.);
 
@@ -865,7 +865,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           // Make a "zero clone" by copying to get the same data layout, and then scaling by zero
           QpDataMap v = _local_parametrized_functions_for_training[0];
 
-          if (j_equals_n_snapshots)
+          if (!j_equals_n_snapshots)
             {
               scale(v, 0.);
 
