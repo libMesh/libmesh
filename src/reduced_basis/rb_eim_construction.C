@@ -673,19 +673,13 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
   // Add dominant vectors from the POD as basis functions.
   unsigned int j = 0;
   Real rel_err = 0.;
+
+  // We also initialize a boolean to keep track of whether we have
+  // reached "n_snapshots" EIM basis functions, since we need to
+  // handle the EIM error indicator in a special way in this case.
+  bool j_equals_n_snapshots = false;
   while (true)
     {
-      if (j >= n_snapshots)
-        {
-          libMesh::out << "Number of basis functions (" << j << ") equals number of training samples, hence exiting." << std::endl;
-          break;
-        }
-
-      // The "energy" error in the POD approximation is determined by the first omitted
-      // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
-      // "energy", in order to obtain a relative error.
-      rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
-
       if (exit_on_next_iteration)
         {
           libMesh::out << "Extra EIM iteration for error indicator is complete, POD error norm for extra iteration: " << rel_err << std::endl;
@@ -701,11 +695,31 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
                    << ", POD error norm: " << rel_err << std::endl;
 
       bool exit_condition_satisfied = false;
-      if (j >= get_Nmax())
+      if (j >= n_snapshots)
         {
-          libMesh::out << "Maximum number of basis functions (" << j << ") reached." << std::endl;
+          libMesh::out << "Number of basis functions equals number of training samples." << std::endl;
           exit_condition_satisfied = true;
+          j_equals_n_snapshots = true;
+
+          // In this case we set the rel. error to be zero since we've filled up the
+          // entire space. We cannot use the formula below for rel_err since
+          // sigma(n_snapshots) is not defined.
+          rel_err = 0.;
         }
+      else
+        {
+          // The "energy" error in the POD approximation is determined by the first omitted
+          // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
+          // "energy", in order to obtain a relative error.
+          rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
+        }
+
+      if (!exit_condition_satisfied)
+        if (j >= get_Nmax())
+          {
+            libMesh::out << "Maximum number of basis functions (" << j << ") reached." << std::endl;
+            exit_condition_satisfied = true;
+          }
 
       if (!exit_condition_satisfied)
         if (rel_err < get_rel_training_tolerance())
@@ -798,18 +812,26 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
       else
         {
           // Make a "zero clone" by copying to get the same data layout, and then scaling by zero
-          QpDataMap v = _local_parametrized_functions_for_training[j];
-          scale(v, 0.);
+          QpDataMap v = _local_parametrized_functions_for_training[0];
 
-          for ( unsigned int i=0; i<n_snapshots; ++i )
-            add(v, U.el(i, j), _local_parametrized_functions_for_training[i] );
+          if (j_equals_n_snapshots)
+            {
+              scale(v, 0.);
 
-          Real norm_v = std::sqrt(sigma(j));
-          scale(v, 1./norm_v);
+              for ( unsigned int i=0; i<n_snapshots; ++i )
+                add(v, U.el(i, j), _local_parametrized_functions_for_training[i] );
+
+              Real norm_v = std::sqrt(sigma(j));
+              scale(v, 1./norm_v);
+            }
 
           libmesh_try
             {
-              enrich_eim_approximation_on_interiors(v, /*extra_point_data*/ nullptr);
+              std::unique_ptr<EimPointData> eim_point_data;
+              if (j_equals_n_snapshots)
+                  eim_point_data = std::make_unique<EimPointData>(get_random_point(v));
+
+              enrich_eim_approximation_on_interiors(v, eim_point_data.get());
               update_eim_matrices();
             }
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
