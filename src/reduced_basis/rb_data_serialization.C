@@ -609,11 +609,11 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
     const auto & error_indicator_row =
       rb_eim_evaluation.get_error_indicator_interpolation_row();
     for (unsigned int i=0; i < n_bfs; ++i)
-        {
-          set_scalar_in_list(error_indicator_data_list,
-                             i,
-                             error_indicator_row(i));
-        }
+      {
+        set_scalar_in_list(error_indicator_data_list,
+                            i,
+                            error_indicator_row(i));
+      }
   }
 
   // If we're using the EIM error indicator then we store one extra
