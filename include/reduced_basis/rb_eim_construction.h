@@ -48,6 +48,8 @@ namespace libMesh
 struct EimPointData
 {
   dof_id_type elem_id;
+  dof_id_type node_id;
+  unsigned int side_index;
   unsigned int comp_index;
   unsigned int qp_index;
 };
@@ -281,27 +283,40 @@ protected:
 
   /**
    * Implementation of enrich_eim_approximation() for the case of element sides.
+   *
+   * If \p add_basis_function is true, then we add an extra basis function to the
+   * EIM basis. If it is false, then we only store the data associated with the
+   * interpolation point that we identify, which can be relevant when setting up
+   * data for the error indicator, for example.
+   *
+   * If \p eim_point_data is not nullptr, then we add the extra point that is
+   * specified rather than looking for the "optimal point" in \p interior_pf.
    */
-  void enrich_eim_approximation_on_sides(const SideQpDataMap & side_pf);
+  void enrich_eim_approximation_on_sides(const SideQpDataMap & side_pf,
+                                         bool add_basis_function,
+                                         EimPointData * eim_point_data);
 
   /**
    * Implementation of enrich_eim_approximation() for the case of element nodes.
    */
-  void enrich_eim_approximation_on_nodes(const NodeDataMap & node_pf);
+  void enrich_eim_approximation_on_nodes(const NodeDataMap & node_pf,
+                                         bool add_basis_function,
+                                         EimPointData * eim_point_data);
 
   /**
    * Implementation of enrich_eim_approximation() for the case of element interiors.
-   *
-   * If \p extra_point_data is not nullptr, then we add the extra point that is
-   * specified rather than looking for the "optimal point" in \p interior_pf.
    */
   void enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
-                                             EimPointData * extra_point_data);
+                                             bool add_basis_function,
+                                             EimPointData * eim_point_data);
 
   /**
    * Update the matrices used in training the EIM approximation.
+   *
+   * If \p set_eim_error_indicator is true then we add data corresponding
+   * to the EIM error indicator.
    */
-  void update_eim_matrices();
+  void update_eim_matrices(bool set_eim_error_indicator);
 
 private:
 
@@ -388,7 +403,9 @@ private:
   /**
    * Add a new basis function to the EIM approximation.
    */
-  void enrich_eim_approximation(unsigned int training_index);
+  void enrich_eim_approximation(unsigned int training_index,
+                                bool add_basis_function,
+                                EimPointData * eim_point_data);
 
   /**
    * Scale all values in \p pf by \p scaling_factor
@@ -422,10 +439,17 @@ private:
                                                Number scaling_factor);
 
   /**
+   * Static helper function that is used by get_random_point().
+   */
+  static unsigned int get_random_int_0_to_n(unsigned int n);
+
+  /**
    * Static helper function that identifies a random EIM point
    * from \p v.
    */
   static EimPointData get_random_point(const QpDataMap & v);
+  static EimPointData get_random_point(const SideQpDataMap & v);
+  static EimPointData get_random_point(const NodeDataMap & v);
 
   /**
    * Maximum number of EIM basis functions we are willing to use.

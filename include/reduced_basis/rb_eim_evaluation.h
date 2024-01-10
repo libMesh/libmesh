@@ -422,8 +422,13 @@ public:
   /**
    * Add \p bf to our EIM basis.
    */
-  void add_basis_function_and_interpolation_data(
-    const QpDataMap & bf,
+  void add_basis_function(
+    const QpDataMap & bf);
+
+  /**
+   * Add interpolation data associated with a new basis function.
+   */
+  void add_interpolation_data(
     Point p,
     unsigned int comp,
     dof_id_type elem_id,
@@ -438,8 +443,13 @@ public:
   /**
    * Add \p side_bf to our EIM basis.
    */
-  void add_side_basis_function_and_interpolation_data(
-    const SideQpDataMap & side_bf,
+  void add_side_basis_function(
+    const SideQpDataMap & side_bf);
+
+  /**
+   * Add interpolation data associated with a new basis function.
+   */
+  void add_side_interpolation_data(
     Point p,
     unsigned int comp,
     dof_id_type elem_id,
@@ -453,8 +463,13 @@ public:
   /**
    * Add \p node_bf to our EIM basis.
    */
-  void add_node_basis_function_and_interpolation_data(
-    const NodeDataMap & node_bf,
+  void add_node_basis_function(
+    const NodeDataMap & node_bf);
+
+  /**
+   * Add interpolation data associated with a new basis function.
+   */
+  void add_node_interpolation_data(
     Point p,
     unsigned int comp,
     dof_id_type node_id,
@@ -544,6 +559,11 @@ public:
    * error indicator, whereas in "online solves" we do want to activate it.
    */
   void set_eim_error_indicator_active(bool is_active);
+
+  /**
+   * Add \p extra_point_row as a new row to _extra_points_interpolation_matrix.
+   */
+  void set_error_indicator_interpolation_row(const DenseVector<Number> & extra_point_row);
 
   /**
    * Static helper function that updates the EIM solution vector
@@ -761,16 +781,11 @@ private:
   bool _is_eim_error_indicator_active;
 
   /**
-   * Here we store an "interpolation matrix" associated with extra points.
-   * This allows us to efficiently evaluate the EIM approximation at these
-   * extra points. Note that the extra points are not used to construct
-   * the EIM approximation itself.
-   *
-   * The matrix M should have dimension "n extra points" x "n basis functions"
-   * and we may then compute the EIM approximation associated with each
-   * "extra point" via extra_point_values = M x eim_solution.
+   * Here we store an extra row of the interpolation matrix which is used to
+   * compute the EIM error indicator. This stores the EIM basis function
+   * values at the extra point associated with the error indicator.
    */
-  DenseMatrix<Number> _extra_points_interpolation_matrix;
+  DenseVector<Number> _error_indicator_interpolation_row;
 
 };
 

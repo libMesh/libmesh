@@ -904,8 +904,13 @@ bool RBEIMEvaluation::get_preserve_rb_eim_solutions() const
   return _preserve_rb_eim_solutions;
 }
 
-void RBEIMEvaluation::add_basis_function_and_interpolation_data(
-  const QpDataMap & bf,
+void RBEIMEvaluation::add_basis_function(
+  const QpDataMap & bf)
+{
+  _local_eim_basis_functions.emplace_back(bf);
+}
+
+void RBEIMEvaluation::add_interpolation_data(
   Point p,
   unsigned int comp,
   dof_id_type elem_id,
@@ -917,7 +922,6 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   const std::vector<Real> & JxW_all_qp,
   const std::vector<std::vector<Real>> & phi_i_all_qp)
 {
-  _local_eim_basis_functions.emplace_back(bf);
   _vec_eval_input.all_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
   _vec_eval_input.elem_ids.emplace_back(elem_id);
@@ -930,8 +934,13 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   _vec_eval_input.phi_i_all_qp.emplace_back(phi_i_all_qp);
 }
 
-void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
-  const SideQpDataMap & side_bf,
+void RBEIMEvaluation::add_side_basis_function(
+  const SideQpDataMap & side_bf)
+{
+  _local_side_eim_basis_functions.emplace_back(side_bf);
+}
+
+void RBEIMEvaluation::add_side_interpolation_data(
   Point p,
   unsigned int comp,
   dof_id_type elem_id,
@@ -942,7 +951,6 @@ void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
   const std::vector<Point> & perturbs,
   const std::vector<Real> & phi_i_qp)
 {
-  _local_side_eim_basis_functions.emplace_back(side_bf);
   _vec_eval_input.all_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
   _vec_eval_input.elem_ids.emplace_back(elem_id);
@@ -960,14 +968,18 @@ void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
   _vec_eval_input.phi_i_all_qp.emplace_back();
 }
 
-void RBEIMEvaluation::add_node_basis_function_and_interpolation_data(
-  const NodeDataMap & node_bf,
+void RBEIMEvaluation::add_node_basis_function(
+  const NodeDataMap & node_bf)
+{
+  _local_node_eim_basis_functions.emplace_back(node_bf);
+}
+
+void RBEIMEvaluation::add_node_interpolation_data(
   Point p,
   unsigned int comp,
   dof_id_type node_id,
   boundary_id_type boundary_id)
 {
-  _local_node_eim_basis_functions.emplace_back(node_bf);
   _vec_eval_input.all_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
   _vec_eval_input.node_ids.emplace_back(node_id);
@@ -2997,6 +3009,11 @@ Real RBEIMEvaluation::update_eim_solution_for_error_indicator(
   Real normalization = (eim_coeff_norm > 0.) ? eim_coeff_norm : 1.;
 
   return std::abs(rb_eim_error_indicator_val) / normalization;
+}
+
+void RBEIMEvaluation::set_error_indicator_interpolation_row(const DenseVector<Number> & extra_point_row)
+{
+  _error_indicator_interpolation_row = extra_point_row;
 }
 
 } // namespace libMesh
