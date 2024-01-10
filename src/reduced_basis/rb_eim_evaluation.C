@@ -2997,6 +2997,11 @@ Real RBEIMEvaluation::get_eim_error_indicator(
   return std::abs(error_indicator_val) / normalization;
 }
 
+const DenseVector<Number> & RBEIMEvaluation::get_error_indicator_interpolation_row() const
+{
+  return _error_indicator_interpolation_row;
+}
+
 void RBEIMEvaluation::set_error_indicator_interpolation_row(const DenseVector<Number> & extra_point_row)
 {
   _error_indicator_interpolation_row = extra_point_row;

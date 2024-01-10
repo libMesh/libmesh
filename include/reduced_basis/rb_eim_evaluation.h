@@ -561,9 +561,11 @@ public:
   void set_eim_error_indicator_active(bool is_active);
 
   /**
-   * Add \p extra_point_row as a new row to _extra_points_interpolation_matrix.
+   * Get/set _extra_points_interpolation_matrix.
    */
-  void set_error_indicator_interpolation_row(const DenseVector<Number> & extra_point_row);
+  const DenseVector<Number> & get_error_indicator_interpolation_row() const;
+  void set_error_indicator_interpolation_row(const DenseVector<Number> & error_indicator_row);
+
 
   /**
    * Evaluates the EIM error indicator based on \p error_indicator_rhs, \p eim_solution,
