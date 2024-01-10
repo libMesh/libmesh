@@ -202,20 +202,9 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
 
   std::vector<std::vector<Number>> evaluated_values_at_interp_points(num_rb_eim_solves);
 
-  // If we're computing the EIM error indicator, then we need to use
-  // one extra EIM interpolation point.
-  unsigned int n_interp_pts_in_solve = N;
+  std::vector<Number> evaluated_values_at_err_indicator_point;
   if (_is_eim_error_indicator_active)
-    {
-      // If we have at least N+1 EIM interpolation points stored, then
-      // we increment n_interp_pts_in_solve here. Note that we may not
-      // have any extra interpolation points since, for example, the
-      // EIM could have generated basis functions for "all" the input
-      // data. If that is the case then we simply skip using the error
-      // indicator here.
-      if (_interpolation_points_comp.size() > N)
-        n_interp_pts_in_solve++;
-    }
+    evaluated_values_at_err_indicator_point.resize(num_rb_eim_solves);
 
   // In this loop, counter goes from 0 to num_rb_eim_solves.  The
   // purpose of this loop is to strip out the "columns" of the
@@ -228,12 +217,9 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
         // Ignore compiler warnings about unused loop index
         libmesh_ignore(step_index);
 
-        evaluated_values_at_interp_points[counter].resize(n_interp_pts_in_solve);
+        evaluated_values_at_interp_points[counter].resize(N);
 
-        libmesh_error_msg_if(n_interp_pts_in_solve > _interpolation_points_comp.size(),
-          "Invalid number of interpolation points");
-
-        for (unsigned int interp_pt_index=0; interp_pt_index<n_interp_pts_in_solve; interp_pt_index++)
+        for (unsigned int interp_pt_index=0; interp_pt_index<N; interp_pt_index++)
           {
             unsigned int comp = _interpolation_points_comp[interp_pt_index];
 
@@ -241,6 +227,14 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
             // "counter" handle the multi-step RBParameters case.
             evaluated_values_at_interp_points[counter][interp_pt_index] =
               output_all_comps[counter][interp_pt_index][comp];
+          }
+
+        if (_is_eim_error_indicator_active)
+          {
+            unsigned int comp = _interpolation_points_comp[N];
+
+            evaluated_values_at_err_indicator_point[counter] =
+              output_all_comps[counter][N][comp];
           }
 
         counter++;
@@ -254,7 +248,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   }
 
   DenseMatrix<Number> interpolation_matrix_N;
-  _interpolation_matrix.get_principal_submatrix(n_interp_pts_in_solve, interpolation_matrix_N);
+  _interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
 
   // The number of RB EIM solutions is equal to the size of the
   // "evaluated_values_at_interp_points" vector which we determined
@@ -285,15 +279,12 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
         // vector (excluding the "last" entry). In Barrault et al. they use an absolute
         // error indicator, but we prefer not to follow that here since it can be harder
         // to set a target tolerance when using an absolute error indicator.
-        //
-        // Also note that we check n_interp_pts_in_solve > N below, since if this is not
-        // the case the we assume that the error indicator is inactive, as discussed
-        // above when we set up n_interp_pts_in_solve.
-        if (_is_eim_error_indicator_active && (n_interp_pts_in_solve > N))
+        if (_is_eim_error_indicator_active)
           {
+            Number error_indicator_rhs = evaluated_values_at_err_indicator_point[counter];
             _rb_eim_error_indicators[counter] =
-              update_eim_solution_for_error_indicator(
-                N, _rb_eim_solutions[counter]);
+              get_eim_error_indicator(
+                error_indicator_rhs, _rb_eim_solutions[counter]);
           }
 
         counter++;
@@ -2987,20 +2978,15 @@ void RBEIMEvaluation::set_eim_error_indicator_active(bool is_active)
   _is_eim_error_indicator_active = (is_active && use_eim_error_indicator());
 }
 
-Real RBEIMEvaluation::update_eim_solution_for_error_indicator(
-  unsigned int n_eim_pts_without_indicator,
-  DenseVector<Number> & eim_solution)
+Real RBEIMEvaluation::get_eim_error_indicator(
+  Number error_indicator_rhs,
+  const DenseVector<Number> & eim_solution)
 {
-  // In this case we use the last entry of the EIM solution as our
-  // EIM error indicator. We also drop this last entry from the
-  // EIM solution vector below, since we do not use it to construct
-  // the EIM approximation.
-  Number rb_eim_error_indicator_val = eim_solution(n_eim_pts_without_indicator);
+  DenseVector<Number> coeffs;
+  _error_indicator_interpolation_row.get_principal_subvector(eim_solution.size(), coeffs);
 
-  auto rb_eim_sol_copy = eim_solution;
-  eim_solution.resize(n_eim_pts_without_indicator);
-  for (auto sol_idx : make_range(n_eim_pts_without_indicator))
-    eim_solution(sol_idx) = rb_eim_sol_copy(sol_idx);
+  Real error_indicator_val =
+    std::real(error_indicator_rhs - (coeffs.dot(eim_solution)));
 
   // Normalize the error indicator based on the norm of the EIM coefficient vector,
   // but also check for the case that the EIM coefficient vector is zero in order
@@ -3008,7 +2994,7 @@ Real RBEIMEvaluation::update_eim_solution_for_error_indicator(
   Real eim_coeff_norm = eim_solution.linfty_norm();
   Real normalization = (eim_coeff_norm > 0.) ? eim_coeff_norm : 1.;
 
-  return std::abs(rb_eim_error_indicator_val) / normalization;
+  return std::abs(error_indicator_val) / normalization;
 }
 
 void RBEIMEvaluation::set_error_indicator_interpolation_row(const DenseVector<Number> & extra_point_row)
