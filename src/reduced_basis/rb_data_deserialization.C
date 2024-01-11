@@ -675,6 +675,8 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
   unsigned int n_bfs = rb_eim_evaluation_reader.getNBfs();
   rb_eim_evaluation.set_n_basis_functions(n_bfs);
 
+  rb_eim_evaluation.resize_data_structures(n_bfs);
+
   // EIM interpolation matrix
   {
     auto interpolation_matrix_list = rb_eim_evaluation_reader.getInterpolationMatrix();
@@ -719,8 +721,6 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
   // before n_bfs is incremented.
   if (rb_eim_evaluation_reader.getInterpolationXyz().size() > n_bfs)
     n_bfs++;
-
-  rb_eim_evaluation.resize_data_structures(n_bfs);
 
   auto parameter_ranges =
     rb_eim_evaluation_reader.getParameterRanges();
