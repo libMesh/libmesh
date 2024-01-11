@@ -435,7 +435,10 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
                        "Error: We currently only support EIM training starting from an empty basis");
 
   libMesh::out << std::endl << "---- Performing Greedy EIM basis enrichment ----" << std::endl;
-  Real greedy_error = 0.;
+
+  // Initialize greedy_error so that we do not incorrectly set is_zero_bf=true on
+  // the first iteration.
+  Real greedy_error = -1.;
   std::vector<RBParameters> greedy_param_list;
 
   // Initialize the current training index to the index that corresponds
@@ -476,13 +479,15 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
       libMesh::out << "Enriching the EIM approximation" << std::endl;
       libmesh_try
         {
-          // If bfs_equals_n_samples==true then we add an "extra point" because
-          // we cannot add a usual EIM interpolation point in that case since
+          bool is_zero_bf = bfs_equals_n_samples || (greedy_error == 0.);
+
+          // If is_zero_bf==true then we add an "extra point" because we
+          // cannot add a usual EIM interpolation point in that case since
           // the full EIM space is already covered. This is necessary when we
           // want to add an extra point for error indicator purposes in the
-          // bfs_equals_n_samples==true case, for example.
+          // is_zero_bf==true case, for example.
           std::unique_ptr<EimPointData> eim_point_data;
-          if (bfs_equals_n_samples)
+          if (is_zero_bf)
               eim_point_data = std::make_unique<EimPointData>(get_random_point_from_training_sample());
 
           // If exit_on_next_iteration==true then we do not add a basis function in
