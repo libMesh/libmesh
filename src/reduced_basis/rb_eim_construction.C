@@ -760,12 +760,13 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
             break;
         }
 
+      bool is_zero_bf = j_equals_n_snapshots || (rel_err == 0.);
       if (rbe.get_parametrized_function().on_mesh_sides())
         {
           // Make a "zero clone" by copying to get the same data layout, and then scaling by zero
           SideQpDataMap v = _local_side_parametrized_functions_for_training[0];
 
-          if (!j_equals_n_snapshots)
+          if (!is_zero_bf)
             {
               scale(v, 0.);
 
@@ -778,13 +779,13 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 
           libmesh_try
             {
-              // If j_equals_n_snapshots==true then we add an "extra point" because
-              // we cannot add a usual EIM interpolation point in that case since
-              // the full EIM space is already covered. This is necessary when we
-              // want to add an extra point for error indicator purposes in the
-              // j_equals_n_snapshots==true case, for example.
+              // If is_zero_bf==true then we add an "extra point" because we cannot
+              // add a usual EIM interpolation point in that case since the full EIM
+              // space is already covered. This is necessary when we want to add an
+              // extra point for error indicator purposes in the is_zero_bf==true
+              // case, for example.
               std::unique_ptr<EimPointData> eim_point_data;
-              if (j_equals_n_snapshots)
+              if (is_zero_bf)
                   eim_point_data = std::make_unique<EimPointData>(get_random_point(v));
 
               // If exit_on_next_iteration==true then we do not add a basis function in
@@ -815,7 +816,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           // Make a "zero clone" by copying to get the same data layout, and then scaling by zero
           NodeDataMap v = _local_node_parametrized_functions_for_training[0];
 
-          if (j_equals_n_snapshots)
+          if (!is_zero_bf)
             {
               scale_node_data_map(v, 0.);
 
@@ -828,13 +829,13 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 
           libmesh_try
             {
-              // If j_equals_n_snapshots==true then we add an "extra point" because
-              // we cannot add a usual EIM interpolation point in that case since
-              // the full EIM space is already covered. This is necessary when we
-              // want to add an extra point for error indicator purposes in the
-              // j_equals_n_snapshots==true case, for example.
+              // If is_zero_bf==true then we add an "extra point" because we cannot
+              // add a usual EIM interpolation point in that case since the full EIM
+              // space is already covered. This is necessary when we want to add an
+              // extra point for error indicator purposes in the is_zero_bf==true
+              // case, for example.
               std::unique_ptr<EimPointData> eim_point_data;
-              if (j_equals_n_snapshots)
+              if (is_zero_bf)
                   eim_point_data = std::make_unique<EimPointData>(get_random_point(v));
 
               // If exit_on_next_iteration==true then we do not add a basis function in
@@ -865,7 +866,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
           // Make a "zero clone" by copying to get the same data layout, and then scaling by zero
           QpDataMap v = _local_parametrized_functions_for_training[0];
 
-          if (!j_equals_n_snapshots)
+          if (!is_zero_bf)
             {
               scale(v, 0.);
 
@@ -878,13 +879,13 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 
           libmesh_try
             {
-              // If j_equals_n_snapshots==true then we add an "extra point" because
-              // we cannot add a usual EIM interpolation point in that case since
-              // the full EIM space is already covered. This is necessary when we
-              // want to add an extra point for error indicator purposes in the
-              // j_equals_n_snapshots==true case, for example.
+              // If is_zero_bf==true then we add an "extra point" because we cannot
+              // add a usual EIM interpolation point in that case since the full EIM
+              // space is already covered. This is necessary when we want to add an
+              // extra point for error indicator purposes in the is_zero_bf==true
+              // case, for example.
               std::unique_ptr<EimPointData> eim_point_data;
-              if (j_equals_n_snapshots)
+              if (is_zero_bf)
                   eim_point_data = std::make_unique<EimPointData>(get_random_point(v));
 
               // If exit_on_next_iteration==true then we do not add a basis function in
