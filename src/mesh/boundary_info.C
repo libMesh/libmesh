@@ -1829,6 +1829,9 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
   for (auto & p : _boundary_node_id)
     if (p.second == old_id)
       {
+        // If we already have this id on this node, we don't want to
+        // create a duplicate in our multimap
+        this->remove_node(p.first, new_id);
         p.second = new_id;
         found_node = true;
       }
@@ -1842,6 +1845,9 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
   for (auto & p : _boundary_edge_id)
     if (p.second.second == old_id)
       {
+        // If we already have this id on this edge, we don't want to
+        // create a duplicate in our multimap
+        this->remove_edge(p.first, p.second.first, new_id);
         p.second.second = new_id;
         found_edge = true;
       }
@@ -1855,6 +1861,9 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
   for (auto & p : _boundary_shellface_id)
     if (p.second.second == old_id)
       {
+        // If we already have this id on this shellface, we don't want
+        // to create a duplicate in our multimap
+        this->remove_shellface(p.first, p.second.first, new_id);
         p.second.second = new_id;
         found_shellface = true;
       }
@@ -1868,6 +1877,9 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
   for (auto & p : _boundary_side_id)
     if (p.second.second == old_id)
       {
+        // If we already have this id on this side, we don't want to
+        // create a duplicate in our multimap
+        this->remove_side(p.first, p.second.first, new_id);
         p.second.second = new_id;
         found_side = true;
       }
