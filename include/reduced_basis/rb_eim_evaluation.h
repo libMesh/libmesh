@@ -577,6 +577,11 @@ public:
     const DenseVector<Number> & eim_solution,
     const DenseVector<Number> & eim_rhs);
 
+  /**
+   * Get the VectorizedEvalInput data.
+   */
+  const VectorizedEvalInput & get_vec_eval_input() const;
+
 private:
 
   /**

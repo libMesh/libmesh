@@ -786,7 +786,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
               // case, for example.
               std::unique_ptr<EimPointData> eim_point_data;
               if (is_zero_bf)
-                  eim_point_data = std::make_unique<EimPointData>(get_random_point(v));
+                  eim_point_data = std::make_unique<EimPointData>(get_random_point(v, rbe.get_vec_eval_input()));
 
               // If exit_on_next_iteration==true then we do not add a basis function in
               // that case since in that case we only need to add data for the EIM error
@@ -836,7 +836,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
               // case, for example.
               std::unique_ptr<EimPointData> eim_point_data;
               if (is_zero_bf)
-                  eim_point_data = std::make_unique<EimPointData>(get_random_point(v));
+                  eim_point_data = std::make_unique<EimPointData>(get_random_point(v, rbe.get_vec_eval_input()));
 
               // If exit_on_next_iteration==true then we do not add a basis function in
               // that case since in that case we only need to add data for the EIM error
@@ -886,7 +886,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
               // case, for example.
               std::unique_ptr<EimPointData> eim_point_data;
               if (is_zero_bf)
-                  eim_point_data = std::make_unique<EimPointData>(get_random_point(v));
+                  eim_point_data = std::make_unique<EimPointData>(get_random_point(v, rbe.get_vec_eval_input()));
 
               // If exit_on_next_iteration==true then we do not add a basis function in
               // that case since in that case we only need to add data for the EIM error
@@ -2790,16 +2790,40 @@ unsigned int RBEIMConstruction::get_random_int_0_to_n(unsigned int n)
   return dist(gen);
 }
 
-EimPointData RBEIMConstruction::get_random_point(const QpDataMap & v)
+EimPointData RBEIMConstruction::get_random_point(const QpDataMap & v,
+                                                 const VectorizedEvalInput & vec_eval_input)
 {
   EimPointData eim_point_data;
 
   {
-    unsigned int random_elem_idx = get_random_int_0_to_n(v.size()-1);
+    std::set<dof_id_type> previous_elem_ids(vec_eval_input.elem_ids.begin(), vec_eval_input.elem_ids.end());
 
-    auto item = v.begin();
+    // We ensure that we select a point that has not been selected previously
+    // by setting up new_elem_ids to contain only elements that are not in
+    // previous_elem_ids, and then selecting the elem_id at random from new_elem_ids.
+    // We give an error if there are no elements in new_elem_ids. This is potentially
+    // an overzealous assertion since we could pick and element that has already
+    // been selected as long as we pick a (comp_index, qp_index) that has not already
+    // been selected for that element.
+    //
+    // However, in general we do not expect all elements to be selected in the EIM
+    // training, so it is reasonable to use the simple assertion below. Moreover, by
+    // ensuring that we choose a new element we should typically ensure that the
+    // randomly selected point has some separation from the previous EIM points, which
+    // is typically desirable if we want EIM evaluations that are independent from
+    // the EIM points (e.g. for EIM error indicator purposes).
+    std::set<dof_id_type> new_elem_ids;
+    for (const auto & v_pair : v)
+      if (previous_elem_ids.count(v_pair.first) == 0)
+        new_elem_ids.insert(v_pair.first);
+
+    libmesh_error_msg_if(new_elem_ids.empty(), "Could not find new element in get_random_point()");
+
+    unsigned int random_elem_idx = get_random_int_0_to_n(new_elem_ids.size()-1);
+
+    auto item = new_elem_ids.begin();
     std::advance(item, random_elem_idx);
-    eim_point_data.elem_id = item->first;
+    eim_point_data.elem_id = *item;
   }
 
   {
@@ -2815,17 +2839,35 @@ EimPointData RBEIMConstruction::get_random_point(const QpDataMap & v)
   return eim_point_data;
 }
 
-EimPointData RBEIMConstruction::get_random_point(const SideQpDataMap & v)
+EimPointData RBEIMConstruction::get_random_point(const SideQpDataMap & v,
+                                                 const VectorizedEvalInput & vec_eval_input)
 {
   EimPointData eim_point_data;
   std::pair<dof_id_type,unsigned int> elem_and_side;
 
   {
-    unsigned int random_elem_idx = get_random_int_0_to_n(v.size()-1);
+    std::set<std::pair<dof_id_type,unsigned int>> previous_elem_and_side_ids;
+    for (const auto idx : index_range(vec_eval_input.elem_ids))
+      {
+        previous_elem_and_side_ids.insert(
+          std::make_pair(vec_eval_input.elem_ids[idx],
+                         vec_eval_input.side_indices[idx]));
+      }
 
-    auto item = v.begin();
-    std::advance(item, random_elem_idx);
-    elem_and_side = item->first;
+    // See discussion above in the QpDataMap case for the justification
+    // of how we set up new_elem_and_side_ids below.
+    std::set<std::pair<dof_id_type,unsigned int>> new_elem_and_side_ids;
+    for (const auto & v_pair : v)
+      if (previous_elem_and_side_ids.count(v_pair.first) == 0)
+        new_elem_and_side_ids.insert(v_pair.first);
+
+    libmesh_error_msg_if(new_elem_and_side_ids.empty(), "Could not find new (element,side) in get_random_point()");
+
+    unsigned int random_elem_and_side_idx = get_random_int_0_to_n(new_elem_and_side_ids.size()-1);
+
+    auto item = new_elem_and_side_ids.begin();
+    std::advance(item, random_elem_and_side_idx);
+    elem_and_side = *item;
     eim_point_data.elem_id = elem_and_side.first;
     eim_point_data.side_index = elem_and_side.second;
   }
@@ -2843,16 +2885,28 @@ EimPointData RBEIMConstruction::get_random_point(const SideQpDataMap & v)
   return eim_point_data;
 }
 
-EimPointData RBEIMConstruction::get_random_point(const NodeDataMap & v)
+EimPointData RBEIMConstruction::get_random_point(const NodeDataMap & v,
+                                                 const VectorizedEvalInput & vec_eval_input)
 {
   EimPointData eim_point_data;
 
   {
-    unsigned int random_node_idx = get_random_int_0_to_n(v.size()-1);
+    std::set<dof_id_type> previous_node_ids(vec_eval_input.node_ids.begin(), vec_eval_input.node_ids.end());
 
-    auto item = v.begin();
+    // See discussion above in the QpDataMap case for the justification
+    // of how we set up new_node_ids below.
+    std::set<dof_id_type> new_node_ids;
+    for (const auto & v_pair : v)
+      if (previous_node_ids.count(v_pair.first) == 0)
+        new_node_ids.insert(v_pair.first);
+
+    libmesh_error_msg_if(new_node_ids.empty(), "Could not find new node in get_random_point()");
+
+    unsigned int random_node_idx = get_random_int_0_to_n(new_node_ids.size()-1);
+
+    auto item = new_node_ids.begin();
     std::advance(item, random_node_idx);
-    eim_point_data.node_id = item->first;
+    eim_point_data.node_id = *item;
   }
 
   {
@@ -2868,11 +2922,11 @@ EimPointData RBEIMConstruction::get_random_point_from_training_sample()
   RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
 
   if (eim_eval.get_parametrized_function().on_mesh_sides())
-    return get_random_point(_local_side_parametrized_functions_for_training[0]);
+    return get_random_point(_local_side_parametrized_functions_for_training[0], eim_eval.get_vec_eval_input());
   else if (eim_eval.get_parametrized_function().on_mesh_nodes())
-    return get_random_point(_local_node_parametrized_functions_for_training[0]);
+    return get_random_point(_local_node_parametrized_functions_for_training[0], eim_eval.get_vec_eval_input());
   else
-    return get_random_point(_local_parametrized_functions_for_training[0]);
+    return get_random_point(_local_parametrized_functions_for_training[0], eim_eval.get_vec_eval_input());
 }
 
 } // namespace libMesh

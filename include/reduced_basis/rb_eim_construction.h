@@ -447,9 +447,12 @@ private:
    * Static helper function that identifies a random EIM point
    * from \p v.
    */
-  static EimPointData get_random_point(const QpDataMap & v);
-  static EimPointData get_random_point(const SideQpDataMap & v);
-  static EimPointData get_random_point(const NodeDataMap & v);
+  static EimPointData get_random_point(const QpDataMap & v,
+                                       const VectorizedEvalInput & vec_eval_input);
+  static EimPointData get_random_point(const SideQpDataMap & v,
+                                       const VectorizedEvalInput & vec_eval_input);
+  static EimPointData get_random_point(const NodeDataMap & v,
+                                       const VectorizedEvalInput & vec_eval_input);
 
   /**
    * Get a random point using the 0^th training sample as input to

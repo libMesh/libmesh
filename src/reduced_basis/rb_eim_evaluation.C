@@ -2999,6 +2999,11 @@ Real RBEIMEvaluation::get_eim_error_indicator(
   return std::abs(error_indicator_val) / normalization;
 }
 
+const VectorizedEvalInput & RBEIMEvaluation::get_vec_eval_input() const
+{
+  return _vec_eval_input;
+}
+
 const DenseVector<Number> & RBEIMEvaluation::get_error_indicator_interpolation_row() const
 {
   return _error_indicator_interpolation_row;
