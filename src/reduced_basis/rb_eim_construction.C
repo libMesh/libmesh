@@ -2665,7 +2665,7 @@ void RBEIMConstruction::update_eim_matrices(bool set_eim_error_indicator)
               extra_point_row(j) = value;
             }
         }
-      
+
       eim_eval.set_error_indicator_interpolation_row(extra_point_row);
       return;
     }
