@@ -444,15 +444,11 @@ private:
   static unsigned int get_random_int_0_to_n(unsigned int n);
 
   /**
-   * Static helper function that identifies a random EIM point
-   * from \p v.
+   * Helper function that identifies a random EIM point from \p v.
    */
-  static EimPointData get_random_point(const QpDataMap & v,
-                                       const VectorizedEvalInput & vec_eval_input);
-  static EimPointData get_random_point(const SideQpDataMap & v,
-                                       const VectorizedEvalInput & vec_eval_input);
-  static EimPointData get_random_point(const NodeDataMap & v,
-                                       const VectorizedEvalInput & vec_eval_input);
+  EimPointData get_random_point(const QpDataMap & v);
+  EimPointData get_random_point(const SideQpDataMap & v);
+  EimPointData get_random_point(const NodeDataMap & v);
 
   /**
    * Get a random point using the 0^th training sample as input to
