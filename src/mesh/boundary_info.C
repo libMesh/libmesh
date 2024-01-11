@@ -3271,4 +3271,31 @@ BoundaryInfo::get_global_boundary_ids() const
   return _global_boundary_ids;
 }
 
+void
+BoundaryInfo::libmesh_assert_valid_multimaps() const
+{
+#ifndef NDEBUG
+  auto verify_multimap = [](const auto & themap) {
+    for (const auto & [key, val] : themap)
+      {
+        auto range = themap.equal_range(key);
+
+        int count = 0;
+        for (auto it = range.first; it != range.second; ++it)
+          if (it->second == val)
+            ++count;
+
+        libmesh_assert(count == 1);
+      }
+  };
+
+  verify_multimap(this->_boundary_node_id);
+  verify_multimap(this->_boundary_edge_id);
+  verify_multimap(this->_boundary_shellface_id);
+  verify_multimap(this->_boundary_side_id);
+#else
+  return;
+#endif
+}
+
 } // namespace libMesh
