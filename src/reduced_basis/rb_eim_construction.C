@@ -912,6 +912,15 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 #endif
         }
 
+      if (is_zero_bf)
+        {
+          // In this case we exit here instead of increment j and continuing because
+          // if we've encountered a zero EIM basis function then we must not have
+          // any more valid data to add.
+          std::cout << "Zero basis function encountered, hence exiting." << std::endl;
+          break;
+        }
+
       j++;
     }
   libMesh::out << std::endl;
