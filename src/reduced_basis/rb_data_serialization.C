@@ -602,7 +602,17 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
         }
   }
 
-  if (rb_eim_evaluation.use_eim_error_indicator())
+  // We check use_eim_error_indicator() and the number of interpolation
+  // points in order to set use_error_indicator. This is because even if
+  // use_error_indicator() is true, we may not be using an error indicator,
+  // e.g. if there are no parameters in the model then we will not use an
+  // error indicator, and we can detect this by comparing the number of
+  // interpolation points with n_bfs.
+  bool use_error_indicator =
+    (rb_eim_evaluation.use_eim_error_indicator() &&
+    (rb_eim_evaluation.get_n_interpolation_points() > n_bfs));
+
+  if (use_error_indicator)
   {
     auto error_indicator_data_list =
       rb_eim_evaluation_builder.initEimErrorIndicatorInterpData(n_bfs);
@@ -611,8 +621,8 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
     for (unsigned int i=0; i < n_bfs; ++i)
       {
         set_scalar_in_list(error_indicator_data_list,
-                            i,
-                            error_indicator_row(i));
+                           i,
+                           error_indicator_row(i));
       }
   }
 
@@ -623,8 +633,7 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
   // However the interpolation matrix and _error_indicator_interpolation_row
   // does not include this extra point, which is why we write it out above
   // before n_bfs is incremented.
-  if (rb_eim_evaluation.use_eim_error_indicator() &&
-      (rb_eim_evaluation.get_n_interpolation_points() > n_bfs))
+  if (use_error_indicator)
     n_bfs++;
 
   libmesh_error_msg_if(n_bfs != rb_eim_evaluation.get_n_interpolation_points(),
