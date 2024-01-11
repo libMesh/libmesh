@@ -2975,7 +2975,11 @@ bool RBEIMEvaluation::use_eim_error_indicator() const
 
 void RBEIMEvaluation::set_eim_error_indicator_active(bool is_active)
 {
-  _is_eim_error_indicator_active = (is_active && use_eim_error_indicator());
+  // We skip setting _is_eim_error_indicator_active in the case that
+  // we have no parameters, since we do not use the EIM error indicator
+  // in that case.
+  if (get_n_params() > 0)
+    _is_eim_error_indicator_active = (is_active && use_eim_error_indicator());
 }
 
 Real RBEIMEvaluation::get_eim_error_indicator(
