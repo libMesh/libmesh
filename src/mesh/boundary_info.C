@@ -1898,6 +1898,8 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
   renumber_name(_ss_id_to_name, old_id, new_id);
   renumber_name(_ns_id_to_name, old_id, new_id);
   renumber_name(_es_id_to_name, old_id, new_id);
+
+  this->libmesh_assert_valid_multimaps();
 }
 
 
@@ -3274,6 +3276,7 @@ void BoundaryInfo::clear_stitched_boundary_side_ids (const boundary_id_type side
   // *entirely*, so we need to recompute boundary id sets to check
   // for that.
   this->regenerate_id_sets();
+  this->libmesh_assert_valid_multimaps();
 }
 
 const std::set<boundary_id_type> &
