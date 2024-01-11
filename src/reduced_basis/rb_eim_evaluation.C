@@ -275,16 +275,16 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
         // equations", Barrault et al.
         //
         // The one difference here compared to Barrault et al. is that we use a relative
-        // error indicator based on normalizing relative to the max norm of the solution
-        // vector (excluding the "last" entry). In Barrault et al. they use an absolute
-        // error indicator, but we prefer not to follow that here since it can be harder
-        // to set a target tolerance when using an absolute error indicator.
+        // error indicator based on normalizing relative to the max norm of the RHS vector.
+        // In Barrault et al. they use an absolute error indicator, but we prefer not to
+        // follow that here since it can be harder to set a target tolerance when using
+        // an absolute error indicator.
         if (_is_eim_error_indicator_active)
           {
             Number error_indicator_rhs = evaluated_values_at_err_indicator_point[counter];
             _rb_eim_error_indicators[counter] =
               get_eim_error_indicator(
-                error_indicator_rhs, _rb_eim_solutions[counter]);
+                error_indicator_rhs, _rb_eim_solutions[counter], EIM_rhs);
           }
 
         counter++;
@@ -2980,7 +2980,8 @@ void RBEIMEvaluation::set_eim_error_indicator_active(bool is_active)
 
 Real RBEIMEvaluation::get_eim_error_indicator(
   Number error_indicator_rhs,
-  const DenseVector<Number> & eim_solution)
+  const DenseVector<Number> & eim_solution,
+  const DenseVector<Number> & eim_rhs)
 {
   DenseVector<Number> coeffs;
   _error_indicator_interpolation_row.get_principal_subvector(eim_solution.size(), coeffs);
@@ -2988,10 +2989,11 @@ Real RBEIMEvaluation::get_eim_error_indicator(
   Real error_indicator_val =
     std::real(error_indicator_rhs - (coeffs.dot(eim_solution)));
 
-  // Normalize the error indicator based on the norm of the EIM coefficient vector,
-  // but also check for the case that the EIM coefficient vector is zero in order
+  // Normalize the error indicator based on the norm of the EIM RHS vector,
+  // but also check for the case that the EIM RHS vector is zero in order
   // to handle that separately.
-  Real eim_coeff_norm = eim_solution.linfty_norm();
+  Real eim_coeff_norm = eim_rhs.linfty_norm();
+
   Real normalization = (eim_coeff_norm > 0.) ? eim_coeff_norm : 1.;
 
   return std::abs(error_indicator_val) / normalization;
