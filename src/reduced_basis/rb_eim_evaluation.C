@@ -2977,8 +2977,10 @@ void RBEIMEvaluation::set_eim_error_indicator_active(bool is_active)
 {
   // We skip setting _is_eim_error_indicator_active in the case that
   // we have no parameters, since we do not use the EIM error indicator
-  // in that case.
-  if (get_n_params() > 0)
+  // in that case. We also check if the number of interpolation points
+  // is larger than the number of EIM basis functions, since that is
+  // also always the case when the error indicator is active.
+  if ((get_n_params() > 0) && (get_n_interpolation_points() > get_n_basis_functions()))
     _is_eim_error_indicator_active = (is_active && use_eim_error_indicator());
 }
 
