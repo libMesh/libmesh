@@ -125,6 +125,7 @@ struct RBEIMEvaluationReal @0xf8121d2237427a80 {
   interpolationElemType       @18 :List(Integer);
   interpolationJxWAllQp       @19 :List(List(Real));
   interpolationPhiValuesAllQp @20 :List(List(List(Real)));
+  eimErrorIndicatorInterpData @21 :List(Real);
 }
 struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   nBfs                        @0  :Integer;
@@ -148,4 +149,5 @@ struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   interpolationElemType       @18 :List(Integer);
   interpolationJxWAllQp       @19 :List(List(Real));
   interpolationPhiValuesAllQp @20 :List(List(List(Real)));
+  eimErrorIndicatorInterpData @21 :List(Complex);
 }

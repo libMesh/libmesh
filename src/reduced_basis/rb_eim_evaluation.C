@@ -78,11 +78,7 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
   _interpolation_points_comp.clear();
   _interpolation_points_spatial_indices.clear();
 
-  // We need space for one extra interpolation point if we're using the
-  // EIM error indicator.
-  unsigned int max_matrix_size = use_eim_error_indicator() ? Nmax+1 : Nmax;
-
-  _interpolation_matrix.resize(max_matrix_size,max_matrix_size);
+  _interpolation_matrix.resize(Nmax,Nmax);
 }
 
 void RBEIMEvaluation::set_parametrized_function(std::unique_ptr<RBParametrizedFunction> pf)
@@ -206,20 +202,9 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
 
   std::vector<std::vector<Number>> evaluated_values_at_interp_points(num_rb_eim_solves);
 
-  // If we're computing the EIM error indicator, then we need to use
-  // one extra EIM interpolation point.
-  unsigned int n_interp_pts_in_solve = N;
+  std::vector<Number> evaluated_values_at_err_indicator_point;
   if (_is_eim_error_indicator_active)
-    {
-      // If we have at least N+1 EIM interpolation points stored, then
-      // we increment n_interp_pts_in_solve here. Note that we may not
-      // have any extra interpolation points since, for example, the
-      // EIM could have generated basis functions for "all" the input
-      // data. If that is the case then we simply skip using the error
-      // indicator here.
-      if (_interpolation_points_comp.size() > N)
-        n_interp_pts_in_solve++;
-    }
+    evaluated_values_at_err_indicator_point.resize(num_rb_eim_solves);
 
   // In this loop, counter goes from 0 to num_rb_eim_solves.  The
   // purpose of this loop is to strip out the "columns" of the
@@ -232,12 +217,9 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
         // Ignore compiler warnings about unused loop index
         libmesh_ignore(step_index);
 
-        evaluated_values_at_interp_points[counter].resize(n_interp_pts_in_solve);
+        evaluated_values_at_interp_points[counter].resize(N);
 
-        libmesh_error_msg_if(n_interp_pts_in_solve > _interpolation_points_comp.size(),
-          "Invalid number of interpolation points");
-
-        for (unsigned int interp_pt_index=0; interp_pt_index<n_interp_pts_in_solve; interp_pt_index++)
+        for (unsigned int interp_pt_index=0; interp_pt_index<N; interp_pt_index++)
           {
             unsigned int comp = _interpolation_points_comp[interp_pt_index];
 
@@ -245,6 +227,14 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
             // "counter" handle the multi-step RBParameters case.
             evaluated_values_at_interp_points[counter][interp_pt_index] =
               output_all_comps[counter][interp_pt_index][comp];
+          }
+
+        if (_is_eim_error_indicator_active)
+          {
+            unsigned int comp = _interpolation_points_comp[N];
+
+            evaluated_values_at_err_indicator_point[counter] =
+              output_all_comps[counter][N][comp];
           }
 
         counter++;
@@ -258,7 +248,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   }
 
   DenseMatrix<Number> interpolation_matrix_N;
-  _interpolation_matrix.get_principal_submatrix(n_interp_pts_in_solve, interpolation_matrix_N);
+  _interpolation_matrix.get_principal_submatrix(N, interpolation_matrix_N);
 
   // The number of RB EIM solutions is equal to the size of the
   // "evaluated_values_at_interp_points" vector which we determined
@@ -285,33 +275,16 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
         // equations", Barrault et al.
         //
         // The one difference here compared to Barrault et al. is that we use a relative
-        // error indicator based on normalizing relative to the max norm of the solution
-        // vector (excluding the "last" entry). In Barrault et al. they use an absolute
-        // error indicator, but we prefer not to follow that here since it can be harder
-        // to set a target tolerance when using an absolute error indicator.
-        //
-        // Also note that we check n_interp_pts_in_solve > N below, since if this is not
-        // the case the we assume that the error indicator is inactive, as discussed
-        // above when we set up n_interp_pts_in_solve.
-        if (_is_eim_error_indicator_active && (n_interp_pts_in_solve > N))
+        // error indicator based on normalizing relative to the max norm of the RHS vector.
+        // In Barrault et al. they use an absolute error indicator, but we prefer not to
+        // follow that here since it can be harder to set a target tolerance when using
+        // an absolute error indicator.
+        if (_is_eim_error_indicator_active)
           {
-            Number rb_eim_error_indicator_val = _rb_eim_solutions[counter](N);
-
-            // Drop the last entry from the solution vector since it is only used
-            // for the error indicator value, which we already obtained above.
-            auto rb_eim_sol_copy = _rb_eim_solutions[counter];
-            _rb_eim_solutions[counter].resize(N);
-            for (auto sol_idx : make_range(N))
-              _rb_eim_solutions[counter](sol_idx) = rb_eim_sol_copy(sol_idx);
-
-            // Normalize the error indicator based on the norm of the EIM coefficient vector,
-            // but also check for the case that the EIM coefficient vector is zero in order
-            // to handle that separately.
-            Real eim_coeff_norm = _rb_eim_solutions[counter].linfty_norm();
-            Real normalization = (eim_coeff_norm > 0.) ? eim_coeff_norm : 1.;
-
+            Number error_indicator_rhs = evaluated_values_at_err_indicator_point[counter];
             _rb_eim_error_indicators[counter] =
-              std::abs(rb_eim_error_indicator_val) / normalization;
+              get_eim_error_indicator(
+                error_indicator_rhs, _rb_eim_solutions[counter], EIM_rhs);
           }
 
         counter++;
@@ -922,8 +895,13 @@ bool RBEIMEvaluation::get_preserve_rb_eim_solutions() const
   return _preserve_rb_eim_solutions;
 }
 
-void RBEIMEvaluation::add_basis_function_and_interpolation_data(
-  const QpDataMap & bf,
+void RBEIMEvaluation::add_basis_function(
+  const QpDataMap & bf)
+{
+  _local_eim_basis_functions.emplace_back(bf);
+}
+
+void RBEIMEvaluation::add_interpolation_data(
   Point p,
   unsigned int comp,
   dof_id_type elem_id,
@@ -935,7 +913,6 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   const std::vector<Real> & JxW_all_qp,
   const std::vector<std::vector<Real>> & phi_i_all_qp)
 {
-  _local_eim_basis_functions.emplace_back(bf);
   _vec_eval_input.all_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
   _vec_eval_input.elem_ids.emplace_back(elem_id);
@@ -948,8 +925,13 @@ void RBEIMEvaluation::add_basis_function_and_interpolation_data(
   _vec_eval_input.phi_i_all_qp.emplace_back(phi_i_all_qp);
 }
 
-void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
-  const SideQpDataMap & side_bf,
+void RBEIMEvaluation::add_side_basis_function(
+  const SideQpDataMap & side_bf)
+{
+  _local_side_eim_basis_functions.emplace_back(side_bf);
+}
+
+void RBEIMEvaluation::add_side_interpolation_data(
   Point p,
   unsigned int comp,
   dof_id_type elem_id,
@@ -960,7 +942,6 @@ void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
   const std::vector<Point> & perturbs,
   const std::vector<Real> & phi_i_qp)
 {
-  _local_side_eim_basis_functions.emplace_back(side_bf);
   _vec_eval_input.all_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
   _vec_eval_input.elem_ids.emplace_back(elem_id);
@@ -978,14 +959,18 @@ void RBEIMEvaluation::add_side_basis_function_and_interpolation_data(
   _vec_eval_input.phi_i_all_qp.emplace_back();
 }
 
-void RBEIMEvaluation::add_node_basis_function_and_interpolation_data(
-  const NodeDataMap & node_bf,
+void RBEIMEvaluation::add_node_basis_function(
+  const NodeDataMap & node_bf)
+{
+  _local_node_eim_basis_functions.emplace_back(node_bf);
+}
+
+void RBEIMEvaluation::add_node_interpolation_data(
   Point p,
   unsigned int comp,
   dof_id_type node_id,
   boundary_id_type boundary_id)
 {
-  _local_node_eim_basis_functions.emplace_back(node_bf);
   _vec_eval_input.all_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
   _vec_eval_input.node_ids.emplace_back(node_id);
@@ -2990,7 +2975,49 @@ bool RBEIMEvaluation::use_eim_error_indicator() const
 
 void RBEIMEvaluation::set_eim_error_indicator_active(bool is_active)
 {
-  _is_eim_error_indicator_active = (is_active && use_eim_error_indicator());
+  // We skip setting _is_eim_error_indicator_active in the case that
+  // we have no parameters, since we do not use the EIM error indicator
+  // in that case. We also check if the number of interpolation points
+  // is larger than the number of EIM basis functions, since that is
+  // also always the case when the error indicator is active.
+  if ((get_n_params() > 0) && (get_n_interpolation_points() > get_n_basis_functions()))
+    _is_eim_error_indicator_active = (is_active && use_eim_error_indicator());
+}
+
+Real RBEIMEvaluation::get_eim_error_indicator(
+  Number error_indicator_rhs,
+  const DenseVector<Number> & eim_solution,
+  const DenseVector<Number> & eim_rhs)
+{
+  DenseVector<Number> coeffs;
+  _error_indicator_interpolation_row.get_principal_subvector(eim_solution.size(), coeffs);
+
+  Real error_indicator_val =
+    std::real(error_indicator_rhs - (coeffs.dot(eim_solution)));
+
+  // Normalize the error indicator based on the norm of the EIM RHS vector,
+  // but also check for the case that the EIM RHS vector is zero in order
+  // to handle that separately.
+  Real eim_coeff_norm = eim_rhs.linfty_norm();
+
+  Real normalization = (eim_coeff_norm > 0.) ? eim_coeff_norm : 1.;
+
+  return std::abs(error_indicator_val) / normalization;
+}
+
+const VectorizedEvalInput & RBEIMEvaluation::get_vec_eval_input() const
+{
+  return _vec_eval_input;
+}
+
+const DenseVector<Number> & RBEIMEvaluation::get_error_indicator_interpolation_row() const
+{
+  return _error_indicator_interpolation_row;
+}
+
+void RBEIMEvaluation::set_error_indicator_interpolation_row(const DenseVector<Number> & extra_point_row)
+{
+  _error_indicator_interpolation_row = extra_point_row;
 }
 
 } // namespace libMesh

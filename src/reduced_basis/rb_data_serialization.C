@@ -584,24 +584,6 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
   unsigned int n_bfs = rb_eim_evaluation.get_n_basis_functions();
   rb_eim_evaluation_builder.setNBfs(n_bfs);
 
-  // If we're using the EIM error indicator then we store one extra
-  // interpolation point and associated data, hence we increment n_bfs
-  // here so that we write out the extra data below.
-  if (rb_eim_evaluation.use_eim_error_indicator() &&
-      (rb_eim_evaluation.get_n_interpolation_points() > n_bfs))
-    n_bfs++;
-
-  libmesh_error_msg_if(n_bfs != rb_eim_evaluation.get_n_interpolation_points(),
-    "Number of basis functions should match number of interpolation points");
-
-  auto parameter_ranges_list =
-    rb_eim_evaluation_builder.initParameterRanges();
-  auto discrete_parameters_list =
-    rb_eim_evaluation_builder.initDiscreteParameters();
-  add_parameter_ranges_to_builder(rb_eim_evaluation,
-                                  parameter_ranges_list,
-                                  discrete_parameters_list);
-
   // EIM interpolation matrix
   {
     // We store the lower triangular part of an NxN matrix, the size of which is given by
@@ -619,6 +601,51 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
                              rb_eim_evaluation.get_interpolation_matrix()(i,j));
         }
   }
+
+  // We check use_eim_error_indicator() and the number of interpolation
+  // points in order to set use_error_indicator. This is because even if
+  // use_error_indicator() is true, we may not be using an error indicator,
+  // e.g. if there are no parameters in the model then we will not use an
+  // error indicator, and we can detect this by comparing the number of
+  // interpolation points with n_bfs.
+  bool use_error_indicator =
+    (rb_eim_evaluation.use_eim_error_indicator() &&
+    (rb_eim_evaluation.get_n_interpolation_points() > n_bfs));
+
+  if (use_error_indicator)
+  {
+    auto error_indicator_data_list =
+      rb_eim_evaluation_builder.initEimErrorIndicatorInterpData(n_bfs);
+    const auto & error_indicator_row =
+      rb_eim_evaluation.get_error_indicator_interpolation_row();
+    for (unsigned int i=0; i < n_bfs; ++i)
+      {
+        set_scalar_in_list(error_indicator_data_list,
+                           i,
+                           error_indicator_row(i));
+      }
+  }
+
+  // If we're using the EIM error indicator then we store one extra
+  // interpolation point and associated data, hence we increment n_bfs
+  // here so that we write out the extra data below.
+  //
+  // However the interpolation matrix and _error_indicator_interpolation_row
+  // does not include this extra point, which is why we write it out above
+  // before n_bfs is incremented.
+  if (use_error_indicator)
+    n_bfs++;
+
+  libmesh_error_msg_if(n_bfs != rb_eim_evaluation.get_n_interpolation_points(),
+    "Number of basis functions should match number of interpolation points");
+
+  auto parameter_ranges_list =
+    rb_eim_evaluation_builder.initParameterRanges();
+  auto discrete_parameters_list =
+    rb_eim_evaluation_builder.initDiscreteParameters();
+  add_parameter_ranges_to_builder(rb_eim_evaluation,
+                                  parameter_ranges_list,
+                                  discrete_parameters_list);
 
   // Interpolation points
   {

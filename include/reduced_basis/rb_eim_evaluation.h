@@ -422,8 +422,13 @@ public:
   /**
    * Add \p bf to our EIM basis.
    */
-  void add_basis_function_and_interpolation_data(
-    const QpDataMap & bf,
+  void add_basis_function(
+    const QpDataMap & bf);
+
+  /**
+   * Add interpolation data associated with a new basis function.
+   */
+  void add_interpolation_data(
     Point p,
     unsigned int comp,
     dof_id_type elem_id,
@@ -438,8 +443,13 @@ public:
   /**
    * Add \p side_bf to our EIM basis.
    */
-  void add_side_basis_function_and_interpolation_data(
-    const SideQpDataMap & side_bf,
+  void add_side_basis_function(
+    const SideQpDataMap & side_bf);
+
+  /**
+   * Add interpolation data associated with a new basis function.
+   */
+  void add_side_interpolation_data(
     Point p,
     unsigned int comp,
     dof_id_type elem_id,
@@ -453,8 +463,13 @@ public:
   /**
    * Add \p node_bf to our EIM basis.
    */
-  void add_node_basis_function_and_interpolation_data(
-    const NodeDataMap & node_bf,
+  void add_node_basis_function(
+    const NodeDataMap & node_bf);
+
+  /**
+   * Add interpolation data associated with a new basis function.
+   */
+  void add_node_interpolation_data(
     Point p,
     unsigned int comp,
     dof_id_type node_id,
@@ -544,6 +559,28 @@ public:
    * error indicator, whereas in "online solves" we do want to activate it.
    */
   void set_eim_error_indicator_active(bool is_active);
+
+  /**
+   * Get/set _extra_points_interpolation_matrix.
+   */
+  const DenseVector<Number> & get_error_indicator_interpolation_row() const;
+  void set_error_indicator_interpolation_row(const DenseVector<Number> & error_indicator_row);
+
+
+  /**
+   * Evaluates the EIM error indicator based on \p error_indicator_rhs, \p eim_solution,
+   * and _error_indicator_interpolation_row. We also pass in \p eim_rhs, since that is
+   * used in order to normalize the error indicator.
+   */
+  Real get_eim_error_indicator(
+    Number error_indicator_rhs,
+    const DenseVector<Number> & eim_solution,
+    const DenseVector<Number> & eim_rhs);
+
+  /**
+   * Get the VectorizedEvalInput data.
+   */
+  const VectorizedEvalInput & get_vec_eval_input() const;
 
 private:
 
@@ -748,6 +785,13 @@ private:
    * and to turn it on during "online solves".
    */
   bool _is_eim_error_indicator_active;
+
+  /**
+   * Here we store an extra row of the interpolation matrix which is used to
+   * compute the EIM error indicator. This stores the EIM basis function
+   * values at the extra point associated with the error indicator.
+   */
+  DenseVector<Number> _error_indicator_interpolation_row;
 
 };
 

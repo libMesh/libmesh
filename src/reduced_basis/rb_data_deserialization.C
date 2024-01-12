@@ -675,28 +675,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
   unsigned int n_bfs = rb_eim_evaluation_reader.getNBfs();
   rb_eim_evaluation.set_n_basis_functions(n_bfs);
 
-  // If we're using the EIM error indicator then we store one extra
-  // interpolation point and associated data, hence we increment n_bfs
-  // here so that we write out the extra data below.
-  //
-  // Note that we do not check rb_eim_evaluation.use_eim_error_indicator()
-  // below because it can be false in some cases when we're reading in
-  // data (e.g. if we're using a base class RBEIMEvaluation to do the
-  // reading). The check below will still give the right behavior whether
-  // regardless of the value of use_eim_error_indicator().
-  if (rb_eim_evaluation_reader.getInterpolationXyz().size() > n_bfs)
-    n_bfs++;
-
   rb_eim_evaluation.resize_data_structures(n_bfs);
-
-  auto parameter_ranges =
-    rb_eim_evaluation_reader.getParameterRanges();
-  auto discrete_parameters_list =
-    rb_eim_evaluation_reader.getDiscreteParameters();
-
-  load_parameter_ranges(rb_eim_evaluation,
-                        parameter_ranges,
-                        discrete_parameters_list);
 
   // EIM interpolation matrix
   {
@@ -713,6 +692,44 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
             i,j, load_scalar_value(interpolation_matrix_list[offset]));
         }
   }
+
+  // Note that we do not check rb_eim_evaluation.use_eim_error_indicator()
+  // below because it can be false in some cases when we're reading in
+  // data (e.g. if we're using a base class RBEIMEvaluation to do the
+  // reading). The check below will still give the right behavior
+  // regardless of the value of use_eim_error_indicator().
+  if (rb_eim_evaluation_reader.getInterpolationXyz().size() > n_bfs)
+  {
+    auto error_indicator_data_list = rb_eim_evaluation_reader.getEimErrorIndicatorInterpData();
+
+    libmesh_error_msg_if(error_indicator_data_list.size() != n_bfs,
+                         "Size error while reading the eim error indicator data.");
+
+    DenseVector<Number> eim_error_indicator_data(n_bfs);
+    for (unsigned int i=0; i<n_bfs; ++i)
+      eim_error_indicator_data(i) = load_scalar_value(error_indicator_data_list[i]);
+
+    rb_eim_evaluation.set_error_indicator_interpolation_row(eim_error_indicator_data);
+  }
+
+  // If we're using the EIM error indicator then we store one extra
+  // interpolation point and associated data, hence we increment n_bfs
+  // here so that we write out the extra data below.
+  //
+  // However the interpolation matrix and _error_indicator_interpolation_row
+  // does not include this extra point, which is why we read it in above
+  // before n_bfs is incremented.
+  if (rb_eim_evaluation_reader.getInterpolationXyz().size() > n_bfs)
+    n_bfs++;
+
+  auto parameter_ranges =
+    rb_eim_evaluation_reader.getParameterRanges();
+  auto discrete_parameters_list =
+    rb_eim_evaluation_reader.getDiscreteParameters();
+
+  load_parameter_ranges(rb_eim_evaluation,
+                        parameter_ranges,
+                        discrete_parameters_list);
 
   // Interpolation points
   {

@@ -50,6 +50,7 @@
 // C++ include
 #include <limits>
 #include <memory>
+#include <random>
 
 namespace libMesh
 {
@@ -425,7 +426,7 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
   _eim_projection_matrix.resize(max_matrix_size,max_matrix_size);
 
   rbe.initialize_parameters(*this);
-  rbe.resize_data_structures(get_Nmax());
+  rbe.resize_data_structures(max_matrix_size);
 
   // If we are continuing from a previous training run,
   // we might already be at the max number of basis functions.
@@ -434,7 +435,10 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
                        "Error: We currently only support EIM training starting from an empty basis");
 
   libMesh::out << std::endl << "---- Performing Greedy EIM basis enrichment ----" << std::endl;
-  Real greedy_error = 0.;
+
+  // Initialize greedy_error so that we do not incorrectly set is_zero_bf=true on
+  // the first iteration.
+  Real greedy_error = -1.;
   std::vector<RBParameters> greedy_param_list;
 
   // Initialize the current training index to the index that corresponds
@@ -448,13 +452,24 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
   // error indicator, which requires one extra EIM iteration.
   bool exit_on_next_iteration = false;
 
+  // We also initialize a boolean to keep track of whether we have
+  // reached "n_samples" EIM basis functions, since we need to
+  // handle the EIM error indicator in a special way in this case.
+  bool bfs_equals_n_samples = false;
+
   while (true)
     {
       if (rbe.get_n_basis_functions() >= get_n_training_samples())
         {
           libMesh::out << "Number of basis functions (" << rbe.get_n_basis_functions()
-            << ") equals number of training samples, hence exiting." << std::endl;
-          break;
+            << ") equals number of training samples." << std::endl;
+
+          bfs_equals_n_samples = true;
+
+          // If exit_on_next_iteration==true then we don't exit yet, since
+          // we still need to add data for the error indicator before exiting.
+          if (!exit_on_next_iteration)
+            break;
         }
 
       libMesh::out << "Greedily selected parameter vector:" << std::endl;
@@ -464,8 +479,24 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
       libMesh::out << "Enriching the EIM approximation" << std::endl;
       libmesh_try
         {
-          enrich_eim_approximation(current_training_index);
-          update_eim_matrices();
+          bool is_zero_bf = bfs_equals_n_samples || (greedy_error == 0.);
+
+          // If is_zero_bf==true then we add an "extra point" because we
+          // cannot add a usual EIM interpolation point in that case since
+          // the full EIM space is already covered. This is necessary when we
+          // want to add an extra point for error indicator purposes in the
+          // is_zero_bf==true case, for example.
+          std::unique_ptr<EimPointData> eim_point_data;
+          if (is_zero_bf)
+              eim_point_data = std::make_unique<EimPointData>(get_random_point_from_training_sample());
+
+          // If exit_on_next_iteration==true then we do not add a basis function in
+          // that case since in that case we only need to add data for the EIM error
+          // indicator.
+          enrich_eim_approximation(current_training_index,
+                                   /*add_basis_function*/ !exit_on_next_iteration,
+                                   eim_point_data.get());
+          update_eim_matrices(/*set_error_indicator*/ exit_on_next_iteration);
 
           libMesh::out << std::endl << "---- Basis dimension: "
                       << rbe.get_n_basis_functions() << " ----" << std::endl;
@@ -503,11 +534,6 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
       if (exit_on_next_iteration)
         {
           libMesh::out << "Extra EIM iteration for error indicator is complete, hence exiting EIM training now" << std::endl;
-
-          // Before we exit we remove the "final" EIM basis function, since it was only added in order
-          // to create data for the EIM error indicator.
-          rbe.set_n_basis_functions(rbe.get_n_basis_functions()-1);
-
           break;
         }
 
@@ -672,39 +698,48 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
   // Add dominant vectors from the POD as basis functions.
   unsigned int j = 0;
   Real rel_err = 0.;
+
+  // We also initialize a boolean to keep track of whether we have
+  // reached "n_snapshots" EIM basis functions, since we need to
+  // handle the EIM error indicator in a special way in this case.
+  bool j_equals_n_snapshots = false;
   while (true)
     {
+      bool exit_condition_satisfied = false;
       if (j >= n_snapshots)
         {
-          libMesh::out << "Number of basis functions (" << j << ") equals number of training samples, hence exiting." << std::endl;
-          break;
-        }
+          libMesh::out << "Number of basis functions equals number of training samples." << std::endl;
+          exit_condition_satisfied = true;
+          j_equals_n_snapshots = true;
 
-      // The "energy" error in the POD approximation is determined by the first omitted
-      // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
-      // "energy", in order to obtain a relative error.
-      rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
+          // In this case we set the rel. error to be zero since we've filled up the
+          // entire space. We cannot use the formula below for rel_err since
+          // sigma(n_snapshots) is not defined.
+          rel_err = 0.;
+        }
+      else
+        {
+          // The "energy" error in the POD approximation is determined by the first omitted
+          // singular value, i.e. sigma(j). We normalize by sigma(0), which gives the total
+          // "energy", in order to obtain a relative error.
+          rel_err = std::sqrt(sigma(j)) / std::sqrt(sigma(0));
+        }
 
       if (exit_on_next_iteration)
         {
           libMesh::out << "Extra EIM iteration for error indicator is complete, POD error norm for extra iteration: " << rel_err << std::endl;
-
-          // Before we exit we remove the "final" EIM basis function, since it was only added in order
-          // to create data for the EIM error indicator.
-          get_rb_eim_evaluation().set_n_basis_functions(get_rb_eim_evaluation().get_n_basis_functions()-1);
-
           break;
         }
 
       libMesh::out << "Number of basis functions: " << j
                    << ", POD error norm: " << rel_err << std::endl;
 
-      bool exit_condition_satisfied = false;
-      if (j >= get_Nmax())
-        {
-          libMesh::out << "Maximum number of basis functions (" << j << ") reached." << std::endl;
-          exit_condition_satisfied = true;
-        }
+      if (!exit_condition_satisfied)
+        if (j >= get_Nmax())
+          {
+            libMesh::out << "Maximum number of basis functions (" << j << ") reached." << std::endl;
+            exit_condition_satisfied = true;
+          }
 
       if (!exit_condition_satisfied)
         if (rel_err < get_rel_training_tolerance())
@@ -730,22 +765,41 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
             break;
         }
 
+      bool is_zero_bf = j_equals_n_snapshots || (rel_err == 0.);
       if (rbe.get_parametrized_function().on_mesh_sides())
         {
           // Make a "zero clone" by copying to get the same data layout, and then scaling by zero
-          SideQpDataMap v = _local_side_parametrized_functions_for_training[j];
-          scale(v, 0.);
+          SideQpDataMap v = _local_side_parametrized_functions_for_training[0];
 
-          for ( unsigned int i=0; i<n_snapshots; ++i )
-            add(v, U.el(i, j), _local_side_parametrized_functions_for_training[i] );
+          if (!is_zero_bf)
+            {
+              scale(v, 0.);
 
-          Real norm_v = std::sqrt(sigma(j));
-          scale(v, 1./norm_v);
+              for ( unsigned int i=0; i<n_snapshots; ++i )
+                add(v, U.el(i, j), _local_side_parametrized_functions_for_training[i] );
+
+              Real norm_v = std::sqrt(sigma(j));
+              scale(v, 1./norm_v);
+            }
 
           libmesh_try
             {
-              enrich_eim_approximation_on_sides(v);
-              update_eim_matrices();
+              // If is_zero_bf==true then we add an "extra point" because we cannot
+              // add a usual EIM interpolation point in that case since the full EIM
+              // space is already covered. This is necessary when we want to add an
+              // extra point for error indicator purposes in the is_zero_bf==true
+              // case, for example.
+              std::unique_ptr<EimPointData> eim_point_data;
+              if (is_zero_bf)
+                  eim_point_data = std::make_unique<EimPointData>(get_random_point(v));
+
+              // If exit_on_next_iteration==true then we do not add a basis function in
+              // that case since in that case we only need to add data for the EIM error
+              // indicator.
+              enrich_eim_approximation_on_sides(v,
+                                                /*add_basis_function*/ !exit_on_next_iteration,
+                                                eim_point_data.get());
+              update_eim_matrices(/*set_error_indicator*/ exit_on_next_iteration);
             }
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
           catch (const std::exception & e)
@@ -765,19 +819,37 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
       else if (rbe.get_parametrized_function().on_mesh_nodes())
         {
           // Make a "zero clone" by copying to get the same data layout, and then scaling by zero
-          NodeDataMap v = _local_node_parametrized_functions_for_training[j];
-          scale_node_data_map(v, 0.);
+          NodeDataMap v = _local_node_parametrized_functions_for_training[0];
 
-          for ( unsigned int i=0; i<n_snapshots; ++i )
-            add_node_data_map(v, U.el(i, j), _local_node_parametrized_functions_for_training[i] );
+          if (!is_zero_bf)
+            {
+              scale_node_data_map(v, 0.);
 
-          Real norm_v = std::sqrt(sigma(j));
-          scale_node_data_map(v, 1./norm_v);
+              for ( unsigned int i=0; i<n_snapshots; ++i )
+                add_node_data_map(v, U.el(i, j), _local_node_parametrized_functions_for_training[i] );
+
+              Real norm_v = std::sqrt(sigma(j));
+              scale_node_data_map(v, 1./norm_v);
+            }
 
           libmesh_try
             {
-              enrich_eim_approximation_on_nodes(v);
-              update_eim_matrices();
+              // If is_zero_bf==true then we add an "extra point" because we cannot
+              // add a usual EIM interpolation point in that case since the full EIM
+              // space is already covered. This is necessary when we want to add an
+              // extra point for error indicator purposes in the is_zero_bf==true
+              // case, for example.
+              std::unique_ptr<EimPointData> eim_point_data;
+              if (is_zero_bf)
+                  eim_point_data = std::make_unique<EimPointData>(get_random_point(v));
+
+              // If exit_on_next_iteration==true then we do not add a basis function in
+              // that case since in that case we only need to add data for the EIM error
+              // indicator.
+              enrich_eim_approximation_on_nodes(v,
+                                                /*add_basis_function*/ !exit_on_next_iteration,
+                                                eim_point_data.get());
+              update_eim_matrices(/*set_error_indicator*/ exit_on_next_iteration);
             }
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
           catch (const std::exception & e)
@@ -797,19 +869,37 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
       else
         {
           // Make a "zero clone" by copying to get the same data layout, and then scaling by zero
-          QpDataMap v = _local_parametrized_functions_for_training[j];
-          scale(v, 0.);
+          QpDataMap v = _local_parametrized_functions_for_training[0];
 
-          for ( unsigned int i=0; i<n_snapshots; ++i )
-            add(v, U.el(i, j), _local_parametrized_functions_for_training[i] );
+          if (!is_zero_bf)
+            {
+              scale(v, 0.);
 
-          Real norm_v = std::sqrt(sigma(j));
-          scale(v, 1./norm_v);
+              for ( unsigned int i=0; i<n_snapshots; ++i )
+                add(v, U.el(i, j), _local_parametrized_functions_for_training[i] );
+
+              Real norm_v = std::sqrt(sigma(j));
+              scale(v, 1./norm_v);
+            }
 
           libmesh_try
             {
-              enrich_eim_approximation_on_interiors(v);
-              update_eim_matrices();
+              // If is_zero_bf==true then we add an "extra point" because we cannot
+              // add a usual EIM interpolation point in that case since the full EIM
+              // space is already covered. This is necessary when we want to add an
+              // extra point for error indicator purposes in the is_zero_bf==true
+              // case, for example.
+              std::unique_ptr<EimPointData> eim_point_data;
+              if (is_zero_bf)
+                  eim_point_data = std::make_unique<EimPointData>(get_random_point(v));
+
+              // If exit_on_next_iteration==true then we do not add a basis function in
+              // that case since in that case we only need to add data for the EIM error
+              // indicator.
+              enrich_eim_approximation_on_interiors(v,
+                                                    /*add_basis_function*/ !exit_on_next_iteration,
+                                                    eim_point_data.get());
+              update_eim_matrices(/*set_error_indicator*/ exit_on_next_iteration);
             }
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
           catch (const std::exception & e)
@@ -825,6 +915,15 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
                 throw;
             }
 #endif
+        }
+
+      if (is_zero_bf)
+        {
+          // In this case we exit here instead of increment j and continuing because
+          // if we've encountered a zero EIM basis function then we must not have
+          // any more valid data to add.
+          std::cout << "Zero basis function encountered, hence exiting." << std::endl;
+          break;
         }
 
       j++;
@@ -1978,7 +2077,9 @@ Real RBEIMConstruction::get_node_max_abs_value(const NodeDataMap & v) const
   return max_value;
 }
 
-void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
+void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index,
+                                                 bool add_basis_function,
+                                                 EimPointData * eim_point_data)
 {
   LOG_SCOPE("enrich_eim_approximation()", "RBEIMConstruction");
 
@@ -1987,16 +2088,24 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index)
   set_params_from_training_set(training_index);
 
   if (eim_eval.get_parametrized_function().on_mesh_sides())
-    enrich_eim_approximation_on_sides(_local_side_parametrized_functions_for_training[training_index]);
+    enrich_eim_approximation_on_sides(_local_side_parametrized_functions_for_training[training_index],
+                                      add_basis_function,
+                                      eim_point_data);
   else if (eim_eval.get_parametrized_function().on_mesh_nodes())
-    enrich_eim_approximation_on_nodes(_local_node_parametrized_functions_for_training[training_index]);
+    enrich_eim_approximation_on_nodes(_local_node_parametrized_functions_for_training[training_index],
+                                      add_basis_function,
+                                      eim_point_data);
   else
     {
-      enrich_eim_approximation_on_interiors(_local_parametrized_functions_for_training[training_index]);
+      enrich_eim_approximation_on_interiors(_local_parametrized_functions_for_training[training_index],
+                                            add_basis_function,
+                                            eim_point_data);
     }
 }
 
-void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & side_pf)
+void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & side_pf,
+                                                          bool add_basis_function,
+                                                          EimPointData * eim_point_data)
 {
   // Make a copy of the input parametrized function, since we will modify this below
   // to give us a new basis function.
@@ -2007,7 +2116,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & 
   // If we have at least one basis function, then we need to use
   // rb_eim_solve() to find the EIM interpolation error. Otherwise,
   // just use solution as is.
-  if (eim_eval.get_n_basis_functions() > 0)
+  if (!eim_point_data && (eim_eval.get_n_basis_functions() > 0))
     {
       // Get the right-hand side vector for the EIM approximation
       // by sampling the parametrized function (stored in solution)
@@ -2095,7 +2204,16 @@ void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & 
               Number value = qp_values[qp];
               Real abs_value = std::abs(value);
 
-              if (abs_value > largest_abs_value)
+              bool update_optimal_point = false;
+              if (!eim_point_data)
+                update_optimal_point = (abs_value > largest_abs_value);
+              else
+                update_optimal_point = (elem_id == eim_point_data->elem_id) &&
+                                       (side_index == eim_point_data->side_index) &&
+                                       (comp == eim_point_data->comp_index) &&
+                                       (qp == eim_point_data->qp_index);
+
+              if (update_optimal_point)
                 {
                   largest_abs_value = abs_value;
                   optimal_value = value;
@@ -2149,35 +2267,41 @@ void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & 
 
   libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
 
-  if (optimal_value == 0.)
+  if (add_basis_function)
     {
-      // Use libMesh::out to print the error message because we want to see this error message
-      // in this case that we're doing an extra basis enrichment for the error indicator and
-      // we hit the "zero basis function" error. In that case we catch the exception and we
-      // do not print the exception's error message directly, so we print the message here
-      // instead.
-      libMesh::out << "Error in EIM basis enrichment: New EIM basis function should not be zero" << std::endl;
-      libmesh_error_msg("Error in EIM basis enrichment");
+      if (optimal_value == 0.)
+        {
+          // Use libMesh::out to print the error message because we want to see this error message
+          // in this case that we're doing an extra basis enrichment for the error indicator and
+          // we hit the "zero basis function" error. In that case we catch the exception and we
+          // do not print the exception's error message directly, so we print the message here
+          // instead.
+          libMesh::out << "Error in EIM basis enrichment: New EIM basis function should not be zero" << std::endl;
+          libmesh_error_msg("Error in EIM basis enrichment");
+        }
+
+      // Scale local_pf so that its largest value is 1.0
+      scale_parametrized_function(local_pf, 1./optimal_value);
+
+      // Add local_pf as the new basis function and store data
+      // associated with the interpolation point.
+      eim_eval.add_side_basis_function(local_pf);
     }
 
-  // Scale local_pf so that its largest value is 1.0
-  scale_parametrized_function(local_pf, 1./optimal_value);
-
-  // Add local_pf as the new basis function and store data
-  // associated with the interpolation point.
-  eim_eval.add_side_basis_function_and_interpolation_data(local_pf,
-                                                          optimal_point,
-                                                          optimal_comp,
-                                                          optimal_elem_id,
-                                                          optimal_side_index,
-                                                          optimal_subdomain_id,
-                                                          optimal_boundary_id,
-                                                          optimal_qp,
-                                                          optimal_point_perturbs,
-                                                          optimal_point_phi_i_qp);
+  eim_eval.add_side_interpolation_data(optimal_point,
+                                       optimal_comp,
+                                       optimal_elem_id,
+                                       optimal_side_index,
+                                       optimal_subdomain_id,
+                                       optimal_boundary_id,
+                                       optimal_qp,
+                                       optimal_point_perturbs,
+                                       optimal_point_phi_i_qp);
 }
 
-void RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & node_pf)
+void RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & node_pf,
+                                                          bool add_basis_function,
+                                                          EimPointData * eim_point_data)
 {
   // Make a copy of the input parametrized function, since we will modify this below
   // to give us a new basis function.
@@ -2188,7 +2312,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & no
   // If we have at least one basis function, then we need to use
   // rb_eim_solve() to find the EIM interpolation error. Otherwise,
   // just use solution as is.
-  if (eim_eval.get_n_basis_functions() > 0)
+  if (!eim_point_data && (eim_eval.get_n_basis_functions() > 0))
     {
       // Get the right-hand side vector for the EIM approximation
       // by sampling the parametrized function (stored in solution)
@@ -2230,7 +2354,14 @@ void RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & no
           Number value = values[comp];
           Real abs_value = std::abs(value);
 
-          if (abs_value > largest_abs_value)
+          bool update_optimal_point = false;
+          if (!eim_point_data)
+            update_optimal_point = (abs_value > largest_abs_value);
+          else
+            update_optimal_point = (node_id == eim_point_data->node_id) &&
+                                   (comp == eim_point_data->comp_index);
+
+          if (update_optimal_point)
             {
               largest_abs_value = abs_value;
               optimal_value = value;
@@ -2257,30 +2388,36 @@ void RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & no
 
   libmesh_error_msg_if(optimal_node_id == DofObject::invalid_id, "Error: Invalid node ID");
 
-  if (optimal_value == 0.)
+  if (add_basis_function)
     {
-      // Use libMesh::out to print the error message because we want to see this error message
-      // in this case that we're doing an extra basis enrichment for the error indicator and
-      // we hit the "zero basis function" error. In that case we catch the exception and we
-      // do not print the exception's error message directly, so we print the message here
-      // instead.
-      libMesh::out << "Error in EIM basis enrichment: New EIM basis function should not be zero" << std::endl;
-      libmesh_error_msg("Error in EIM basis enrichment");
+      if (optimal_value == 0.)
+        {
+          // Use libMesh::out to print the error message because we want to see this error message
+          // in this case that we're doing an extra basis enrichment for the error indicator and
+          // we hit the "zero basis function" error. In that case we catch the exception and we
+          // do not print the exception's error message directly, so we print the message here
+          // instead.
+          libMesh::out << "Error in EIM basis enrichment: New EIM basis function should not be zero" << std::endl;
+          libmesh_error_msg("Error in EIM basis enrichment");
+        }
+
+      // Scale local_pf so that its largest value is 1.0
+      scale_node_parametrized_function(local_pf, 1./optimal_value);
+
+      // Add local_pf as the new basis function and store data
+      // associated with the interpolation point.
+      eim_eval.add_node_basis_function(local_pf);
     }
 
-  // Scale local_pf so that its largest value is 1.0
-  scale_node_parametrized_function(local_pf, 1./optimal_value);
-
-  // Add local_pf as the new basis function and store data
-  // associated with the interpolation point.
-  eim_eval.add_node_basis_function_and_interpolation_data(local_pf,
-                                                          optimal_point,
-                                                          optimal_comp,
-                                                          optimal_node_id,
-                                                          optimal_boundary_id);
+  eim_eval.add_node_interpolation_data(optimal_point,
+                                       optimal_comp,
+                                       optimal_node_id,
+                                       optimal_boundary_id);
 }
 
-void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf)
+void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
+                                                              bool add_basis_function,
+                                                              EimPointData * eim_point_data)
 {
   // Make a copy of the input parametrized function, since we will modify this below
   // to give us a new basis function.
@@ -2291,7 +2428,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
   // If we have at least one basis function, then we need to use
   // rb_eim_solve() to find the EIM interpolation error. Otherwise,
   // just use solution as is.
-  if (eim_eval.get_n_basis_functions() > 0)
+  if (!eim_point_data && (eim_eval.get_n_basis_functions() > 0))
     {
       // Get the right-hand side vector for the EIM approximation
       // by sampling the parametrized function (stored in solution)
@@ -2363,7 +2500,15 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
               Number value = qp_values[qp];
               Real abs_value = std::abs(value);
 
-              if (abs_value > largest_abs_value)
+              bool update_optimal_point = false;
+              if (!eim_point_data)
+                update_optimal_point = (abs_value > largest_abs_value);
+              else
+                update_optimal_point = (elem_id == eim_point_data->elem_id) &&
+                                       (comp == eim_point_data->comp_index) &&
+                                       (qp == eim_point_data->qp_index);
+
+              if (update_optimal_point)
                 {
                   largest_abs_value = abs_value;
                   optimal_value = value;
@@ -2430,36 +2575,40 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
 
   libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
 
-  if (optimal_value == 0.)
+  if (add_basis_function)
     {
-      // Use libMesh::out to print the error message because we want to see this error message
-      // in this case that we're doing an extra basis enrichment for the error indicator and
-      // we hit the "zero basis function" error. In that case we catch the exception and we
-      // do not print the exception's error message directly, so we print the message here
-      // instead.
-      libMesh::out << "Error in EIM basis enrichment: New EIM basis function should not be zero" << std::endl;
-      libmesh_error_msg("Error in EIM basis enrichment");
+      if (optimal_value == 0.)
+        {
+          // Use libMesh::out to print the error message because we want to see this error message
+          // in this case that we're doing an extra basis enrichment for the error indicator and
+          // we hit the "zero basis function" error. In that case we catch the exception and we
+          // do not print the exception's error message directly, so we print the message here
+          // instead.
+          libMesh::out << "Error in EIM basis enrichment: New EIM basis function should not be zero" << std::endl;
+          libmesh_error_msg("Error in EIM basis enrichment");
+        }
+
+      // Scale local_pf so that its largest value is 1.0
+      scale_parametrized_function(local_pf, 1./optimal_value);
+
+      // Add local_pf as the new basis function and store data
+      // associated with the interpolation point.
+      eim_eval.add_basis_function(local_pf);
     }
 
-  // Scale local_pf so that its largest value is 1.0
-  scale_parametrized_function(local_pf, 1./optimal_value);
-
-  // Add local_pf as the new basis function and store data
-  // associated with the interpolation point.
-  eim_eval.add_basis_function_and_interpolation_data(local_pf,
-                                                     optimal_point,
-                                                     optimal_comp,
-                                                     optimal_elem_id,
-                                                     optimal_subdomain_id,
-                                                     optimal_qp,
-                                                     optimal_point_perturbs,
-                                                     optimal_point_phi_i_qp,
-                                                     optimal_elem_type,
-                                                     optimal_JxW_all_qp,
-                                                     optimal_phi_i_all_qp);
+  eim_eval.add_interpolation_data(optimal_point,
+                                  optimal_comp,
+                                  optimal_elem_id,
+                                  optimal_subdomain_id,
+                                  optimal_qp,
+                                  optimal_point_perturbs,
+                                  optimal_point_phi_i_qp,
+                                  optimal_elem_type,
+                                  optimal_JxW_all_qp,
+                                  optimal_phi_i_all_qp);
 }
 
-void RBEIMConstruction::update_eim_matrices()
+void RBEIMConstruction::update_eim_matrices(bool set_eim_error_indicator)
 {
   LOG_SCOPE("update_eim_matrices()", "RBEIMConstruction");
 
@@ -2467,6 +2616,64 @@ void RBEIMConstruction::update_eim_matrices()
   unsigned int RB_size = eim_eval.get_n_basis_functions();
 
   libmesh_assert_msg(RB_size >= 1, "Must have at least 1 basis function.");
+
+  if (set_eim_error_indicator)
+    {
+      // Here we have RB_size EIM basis functions, and RB_size+1 interpolation points,
+      // since we should have added one extra interpolation point for the EIM error
+      // indicator. As a result, we use RB_size as the index to access the (RB_size+1)^th
+      // interpolation point in the calls to eim_eval.get_interpolation_points_*.
+      DenseVector<Number> extra_point_row(RB_size);
+
+      if (eim_eval.get_parametrized_function().on_mesh_sides())
+        {
+          // update the EIM interpolation matrix
+          for (unsigned int j=0; j<RB_size; j++)
+            {
+              // Evaluate the basis functions at the new interpolation point in order
+              // to update the interpolation matrix
+              Number value =
+                eim_eval.get_eim_basis_function_side_value(j,
+                                                           eim_eval.get_interpolation_points_elem_id(RB_size),
+                                                           eim_eval.get_interpolation_points_side_index(RB_size),
+                                                           eim_eval.get_interpolation_points_comp(RB_size),
+                                                           eim_eval.get_interpolation_points_qp(RB_size));
+              extra_point_row(j) = value;
+            }
+        }
+      else if (eim_eval.get_parametrized_function().on_mesh_nodes())
+        {
+          // update the EIM interpolation matrix
+          for (unsigned int j=0; j<RB_size; j++)
+            {
+              // Evaluate the basis functions at the new interpolation point in order
+              // to update the interpolation matrix
+              Number value =
+                eim_eval.get_eim_basis_function_node_value(j,
+                                                           eim_eval.get_interpolation_points_node_id(RB_size),
+                                                           eim_eval.get_interpolation_points_comp(RB_size));
+              extra_point_row(j) = value;
+            }
+        }
+      else
+        {
+          // update the EIM interpolation matrix
+          for (unsigned int j=0; j<RB_size; j++)
+            {
+              // Evaluate the basis functions at the new interpolation point in order
+              // to update the interpolation matrix
+              Number value =
+                eim_eval.get_eim_basis_function_value(j,
+                                                      eim_eval.get_interpolation_points_elem_id(RB_size),
+                                                      eim_eval.get_interpolation_points_comp(RB_size),
+                                                      eim_eval.get_interpolation_points_qp(RB_size));
+              extra_point_row(j) = value;
+            }
+        }
+
+      eim_eval.set_error_indicator_interpolation_row(extra_point_row);
+      return;
+    }
 
   if (eim_eval.get_parametrized_function().on_mesh_sides())
     {
@@ -2578,6 +2785,220 @@ void RBEIMConstruction::scale_node_parametrized_function(NodeDataMap & local_pf,
       for ( auto & value : values)
         value *= scaling_factor;
     }
+}
+
+unsigned int RBEIMConstruction::get_random_int_0_to_n(unsigned int n)
+{
+  std::random_device seed;
+  std::mt19937 gen{seed()};
+  std::uniform_int_distribution<> dist{0, static_cast<int>(n)};
+  return dist(gen);
+}
+
+EimPointData RBEIMConstruction::get_random_point(const QpDataMap & v)
+{
+  EimPointData eim_point_data;
+
+  bool error_finding_new_element = false;
+  if (comm().rank() == 0)
+    {
+      const VectorizedEvalInput & vec_eval_input = get_rb_eim_evaluation().get_vec_eval_input();
+
+      {
+        std::set<dof_id_type> previous_elem_ids(vec_eval_input.elem_ids.begin(), vec_eval_input.elem_ids.end());
+
+        // We ensure that we select a point that has not been selected previously
+        // by setting up new_elem_ids to contain only elements that are not in
+        // previous_elem_ids, and then selecting the elem_id at random from new_elem_ids.
+        // We give an error if there are no elements in new_elem_ids. This is potentially
+        // an overzealous assertion since we could pick and element that has already
+        // been selected as long as we pick a (comp_index, qp_index) that has not already
+        // been selected for that element.
+        //
+        // However, in general we do not expect all elements to be selected in the EIM
+        // training, so it is reasonable to use the simple assertion below. Moreover, by
+        // ensuring that we choose a new element we should typically ensure that the
+        // randomly selected point has some separation from the previous EIM points, which
+        // is typically desirable if we want EIM evaluations that are independent from
+        // the EIM points (e.g. for EIM error indicator purposes).
+        std::set<dof_id_type> new_elem_ids;
+        for (const auto & v_pair : v)
+          if (previous_elem_ids.count(v_pair.first) == 0)
+            new_elem_ids.insert(v_pair.first);
+
+        // If new_elem_ids is empty then we set error_finding_new_element to true.
+        // We then broadcast the value of error_finding_new_element to all processors
+        // below in order to ensure that all processors agree on whether or not
+        // there was an error.
+        error_finding_new_element = (new_elem_ids.empty());
+
+        if (!error_finding_new_element)
+          {
+            unsigned int random_elem_idx = get_random_int_0_to_n(new_elem_ids.size()-1);
+
+            auto item = new_elem_ids.begin();
+            std::advance(item, random_elem_idx);
+            eim_point_data.elem_id = *item;
+          }
+      }
+
+      if (!error_finding_new_element)
+        {
+          {
+            const auto & vars_and_qps = libmesh_map_find(v,eim_point_data.elem_id);
+            eim_point_data.comp_index = get_random_int_0_to_n(vars_and_qps.size()-1);
+          }
+
+          {
+            const auto & qps = libmesh_map_find(v,eim_point_data.elem_id)[eim_point_data.comp_index];
+            eim_point_data.qp_index = get_random_int_0_to_n(qps.size()-1);
+          }
+        }
+    }
+
+  comm().broadcast(error_finding_new_element);
+  libmesh_error_msg_if(error_finding_new_element, "Could not find new element in get_random_point()");
+
+  // Broadcast the values computed above from rank 0
+  comm().broadcast(eim_point_data.elem_id);
+  comm().broadcast(eim_point_data.comp_index);
+  comm().broadcast(eim_point_data.qp_index);
+
+  return eim_point_data;
+}
+
+EimPointData RBEIMConstruction::get_random_point(const SideQpDataMap & v)
+{
+  EimPointData eim_point_data;
+
+  bool error_finding_new_element_and_side = false;
+  if (comm().rank() == 0)
+    {
+      const VectorizedEvalInput & vec_eval_input = get_rb_eim_evaluation().get_vec_eval_input();
+
+      std::pair<dof_id_type,unsigned int> elem_and_side;
+      {
+        std::set<std::pair<dof_id_type,unsigned int>> previous_elem_and_side_ids;
+        for (const auto idx : index_range(vec_eval_input.elem_ids))
+          {
+            previous_elem_and_side_ids.insert(
+              std::make_pair(vec_eval_input.elem_ids[idx],
+                             vec_eval_input.side_indices[idx]));
+          }
+
+        // See discussion above in the QpDataMap case for the justification
+        // of how we set up new_elem_and_side_ids below.
+        std::set<std::pair<dof_id_type,unsigned int>> new_elem_and_side_ids;
+        for (const auto & v_pair : v)
+          if (previous_elem_and_side_ids.count(v_pair.first) == 0)
+            new_elem_and_side_ids.insert(v_pair.first);
+
+        // If new_elem_and_side_ids is empty then we set error_finding_new_element_and_side
+        // to true. We then broadcast the value of error_finding_new_element_and_side to all
+        // processors below in order to ensure that all processors agree on whether
+        // or not there was an error.
+        error_finding_new_element_and_side = (new_elem_and_side_ids.empty());
+
+        if (!error_finding_new_element_and_side)
+          {
+            unsigned int random_elem_and_side_idx = get_random_int_0_to_n(new_elem_and_side_ids.size()-1);
+
+            auto item = new_elem_and_side_ids.begin();
+            std::advance(item, random_elem_and_side_idx);
+            elem_and_side = *item;
+            eim_point_data.elem_id = elem_and_side.first;
+            eim_point_data.side_index = elem_and_side.second;
+          }
+      }
+
+      if (!error_finding_new_element_and_side)
+        {
+          {
+            const auto & vars_and_qps = libmesh_map_find(v,elem_and_side);
+            eim_point_data.comp_index = get_random_int_0_to_n(vars_and_qps.size()-1);
+          }
+
+          {
+            const auto & qps = libmesh_map_find(v,elem_and_side)[eim_point_data.comp_index];
+            eim_point_data.qp_index = get_random_int_0_to_n(qps.size()-1);
+          }
+        }
+    }
+
+  comm().broadcast(error_finding_new_element_and_side);
+  libmesh_error_msg_if(error_finding_new_element_and_side, "Could not find new (element,side) in get_random_point()");
+
+  // Broadcast the values computed above from rank 0
+  comm().broadcast(eim_point_data.elem_id);
+  comm().broadcast(eim_point_data.side_index);
+  comm().broadcast(eim_point_data.comp_index);
+  comm().broadcast(eim_point_data.qp_index);
+
+  return eim_point_data;
+}
+
+EimPointData RBEIMConstruction::get_random_point(const NodeDataMap & v)
+{
+  EimPointData eim_point_data;
+
+  bool error_finding_new_node = false;
+  if (comm().rank() == 0)
+    {
+      const VectorizedEvalInput & vec_eval_input = get_rb_eim_evaluation().get_vec_eval_input();
+
+      {
+        std::set<dof_id_type> previous_node_ids(vec_eval_input.node_ids.begin(), vec_eval_input.node_ids.end());
+
+        // See discussion above in the QpDataMap case for the justification
+        // of how we set up new_node_ids below.
+        std::set<dof_id_type> new_node_ids;
+        for (const auto & v_pair : v)
+          if (previous_node_ids.count(v_pair.first) == 0)
+            new_node_ids.insert(v_pair.first);
+
+        // If new_node_ids is empty then we set error_finding_new_node
+        // to true. We then broadcast the value of error_finding_new_node to all
+        // processors below in order to ensure that all processors agree on whether
+        // or not there was an error.
+        error_finding_new_node = (new_node_ids.empty());
+
+        if (!error_finding_new_node)
+          {
+            unsigned int random_node_idx = get_random_int_0_to_n(new_node_ids.size()-1);
+
+            auto item = new_node_ids.begin();
+            std::advance(item, random_node_idx);
+            eim_point_data.node_id = *item;
+          }
+      }
+
+      if (!error_finding_new_node)
+        {
+          const auto & vars = libmesh_map_find(v,eim_point_data.node_id);
+          eim_point_data.comp_index = get_random_int_0_to_n(vars.size()-1);
+        }
+    }
+
+  comm().broadcast(error_finding_new_node);
+  libmesh_error_msg_if(error_finding_new_node, "Could not find new node in get_random_point()");
+
+  // Broadcast the values computed above from rank 0
+  comm().broadcast(eim_point_data.node_id);
+  comm().broadcast(eim_point_data.comp_index);
+
+  return eim_point_data;
+}
+
+EimPointData RBEIMConstruction::get_random_point_from_training_sample()
+{
+  RBEIMEvaluation & eim_eval = get_rb_eim_evaluation();
+
+  if (eim_eval.get_parametrized_function().on_mesh_sides())
+    return get_random_point(_local_side_parametrized_functions_for_training[0]);
+  else if (eim_eval.get_parametrized_function().on_mesh_nodes())
+    return get_random_point(_local_node_parametrized_functions_for_training[0]);
+  else
+    return get_random_point(_local_parametrized_functions_for_training[0]);
 }
 
 } // namespace libMesh
