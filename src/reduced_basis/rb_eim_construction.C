@@ -2799,6 +2799,7 @@ EimPointData RBEIMConstruction::get_random_point(const QpDataMap & v)
 {
   EimPointData eim_point_data;
 
+  bool error_finding_new_element = false;
   if (comm().rank() == 0)
     {
       const VectorizedEvalInput & vec_eval_input = get_rb_eim_evaluation().get_vec_eval_input();
@@ -2825,25 +2826,38 @@ EimPointData RBEIMConstruction::get_random_point(const QpDataMap & v)
           if (previous_elem_ids.count(v_pair.first) == 0)
             new_elem_ids.insert(v_pair.first);
 
-        libmesh_error_msg_if(new_elem_ids.empty(), "Could not find new element in get_random_point()");
+        // If new_elem_ids is empty then we set error_finding_new_element to true.
+        // We then broadcast the value of error_finding_new_element to all processors
+        // below in order to ensure that all processors agree on whether or not
+        // there was an error.
+        error_finding_new_element = (new_elem_ids.empty());
 
-        unsigned int random_elem_idx = get_random_int_0_to_n(new_elem_ids.size()-1);
+        if (!error_finding_new_element)
+          {
+            unsigned int random_elem_idx = get_random_int_0_to_n(new_elem_ids.size()-1);
 
-        auto item = new_elem_ids.begin();
-        std::advance(item, random_elem_idx);
-        eim_point_data.elem_id = *item;
+            auto item = new_elem_ids.begin();
+            std::advance(item, random_elem_idx);
+            eim_point_data.elem_id = *item;
+          }
       }
 
-      {
-        const auto & vars_and_qps = libmesh_map_find(v,eim_point_data.elem_id);
-        eim_point_data.comp_index = get_random_int_0_to_n(vars_and_qps.size()-1);
-      }
+      if (!error_finding_new_element)
+        {
+          {
+            const auto & vars_and_qps = libmesh_map_find(v,eim_point_data.elem_id);
+            eim_point_data.comp_index = get_random_int_0_to_n(vars_and_qps.size()-1);
+          }
 
-      {
-        const auto & qps = libmesh_map_find(v,eim_point_data.elem_id)[eim_point_data.comp_index];
-        eim_point_data.qp_index = get_random_int_0_to_n(qps.size()-1);
-      }
+          {
+            const auto & qps = libmesh_map_find(v,eim_point_data.elem_id)[eim_point_data.comp_index];
+            eim_point_data.qp_index = get_random_int_0_to_n(qps.size()-1);
+          }
+        }
     }
+
+  comm().broadcast(error_finding_new_element);
+  libmesh_error_msg_if(error_finding_new_element, "Could not find new element in get_random_point()");
 
   // Broadcast the values computed above from rank 0
   comm().broadcast(eim_point_data.elem_id);
@@ -2857,6 +2871,7 @@ EimPointData RBEIMConstruction::get_random_point(const SideQpDataMap & v)
 {
   EimPointData eim_point_data;
 
+  bool error_finding_new_element_and_side = false;
   if (comm().rank() == 0)
     {
       const VectorizedEvalInput & vec_eval_input = get_rb_eim_evaluation().get_vec_eval_input();
@@ -2878,27 +2893,40 @@ EimPointData RBEIMConstruction::get_random_point(const SideQpDataMap & v)
           if (previous_elem_and_side_ids.count(v_pair.first) == 0)
             new_elem_and_side_ids.insert(v_pair.first);
 
-        libmesh_error_msg_if(new_elem_and_side_ids.empty(), "Could not find new (element,side) in get_random_point()");
+        // If new_elem_and_side_ids is empty then we set error_finding_new_element_and_side
+        // to true. We then broadcast the value of error_finding_new_element_and_side to all
+        // processors below in order to ensure that all processors agree on whether
+        // or not there was an error.
+        error_finding_new_element_and_side = (new_elem_and_side_ids.empty());
 
-        unsigned int random_elem_and_side_idx = get_random_int_0_to_n(new_elem_and_side_ids.size()-1);
+        if (!error_finding_new_element_and_side)
+          {
+            unsigned int random_elem_and_side_idx = get_random_int_0_to_n(new_elem_and_side_ids.size()-1);
 
-        auto item = new_elem_and_side_ids.begin();
-        std::advance(item, random_elem_and_side_idx);
-        elem_and_side = *item;
-        eim_point_data.elem_id = elem_and_side.first;
-        eim_point_data.side_index = elem_and_side.second;
+            auto item = new_elem_and_side_ids.begin();
+            std::advance(item, random_elem_and_side_idx);
+            elem_and_side = *item;
+            eim_point_data.elem_id = elem_and_side.first;
+            eim_point_data.side_index = elem_and_side.second;
+          }
       }
 
-      {
-        const auto & vars_and_qps = libmesh_map_find(v,elem_and_side);
-        eim_point_data.comp_index = get_random_int_0_to_n(vars_and_qps.size()-1);
-      }
+      if (!error_finding_new_element_and_side)
+        {
+          {
+            const auto & vars_and_qps = libmesh_map_find(v,elem_and_side);
+            eim_point_data.comp_index = get_random_int_0_to_n(vars_and_qps.size()-1);
+          }
 
-      {
-        const auto & qps = libmesh_map_find(v,elem_and_side)[eim_point_data.comp_index];
-        eim_point_data.qp_index = get_random_int_0_to_n(qps.size()-1);
-      }
+          {
+            const auto & qps = libmesh_map_find(v,elem_and_side)[eim_point_data.comp_index];
+            eim_point_data.qp_index = get_random_int_0_to_n(qps.size()-1);
+          }
+        }
     }
+
+  comm().broadcast(error_finding_new_element_and_side);
+  libmesh_error_msg_if(error_finding_new_element_and_side, "Could not find new (element,side) in get_random_point()");
 
   // Broadcast the values computed above from rank 0
   comm().broadcast(eim_point_data.elem_id);
@@ -2913,6 +2941,7 @@ EimPointData RBEIMConstruction::get_random_point(const NodeDataMap & v)
 {
   EimPointData eim_point_data;
 
+  bool error_finding_new_node = false;
   if (comm().rank() == 0)
     {
       const VectorizedEvalInput & vec_eval_input = get_rb_eim_evaluation().get_vec_eval_input();
@@ -2927,20 +2956,31 @@ EimPointData RBEIMConstruction::get_random_point(const NodeDataMap & v)
           if (previous_node_ids.count(v_pair.first) == 0)
             new_node_ids.insert(v_pair.first);
 
-        libmesh_error_msg_if(new_node_ids.empty(), "Could not find new node in get_random_point()");
+        // If new_node_ids is empty then we set error_finding_new_node
+        // to true. We then broadcast the value of error_finding_new_node to all
+        // processors below in order to ensure that all processors agree on whether
+        // or not there was an error.
+        error_finding_new_node = (new_node_ids.empty());
 
-        unsigned int random_node_idx = get_random_int_0_to_n(new_node_ids.size()-1);
+        if (!error_finding_new_node)
+          {
+            unsigned int random_node_idx = get_random_int_0_to_n(new_node_ids.size()-1);
 
-        auto item = new_node_ids.begin();
-        std::advance(item, random_node_idx);
-        eim_point_data.node_id = *item;
+            auto item = new_node_ids.begin();
+            std::advance(item, random_node_idx);
+            eim_point_data.node_id = *item;
+          }
       }
 
-      {
-        const auto & vars = libmesh_map_find(v,eim_point_data.node_id);
-        eim_point_data.comp_index = get_random_int_0_to_n(vars.size()-1);
-      }
+      if (!error_finding_new_node)
+        {
+          const auto & vars = libmesh_map_find(v,eim_point_data.node_id);
+          eim_point_data.comp_index = get_random_int_0_to_n(vars.size()-1);
+        }
     }
+
+  comm().broadcast(error_finding_new_node);
+  libmesh_error_msg_if(error_finding_new_node, "Could not find new node in get_random_point()");
 
   // Broadcast the values computed above from rank 0
   comm().broadcast(eim_point_data.node_id);
