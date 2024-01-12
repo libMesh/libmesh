@@ -2868,7 +2868,7 @@ EimPointData RBEIMConstruction::get_random_point(const SideQpDataMap & v)
           {
             previous_elem_and_side_ids.insert(
               std::make_pair(vec_eval_input.elem_ids[idx],
-                            vec_eval_input.side_indices[idx]));
+                             vec_eval_input.side_indices[idx]));
           }
 
         // See discussion above in the QpDataMap case for the justification
