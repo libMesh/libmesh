@@ -1829,6 +1829,9 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
   for (auto & p : _boundary_node_id)
     if (p.second == old_id)
       {
+        // If we already have this id on this node, we don't want to
+        // create a duplicate in our multimap
+        this->remove_node(p.first, new_id);
         p.second = new_id;
         found_node = true;
       }
@@ -1842,6 +1845,9 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
   for (auto & p : _boundary_edge_id)
     if (p.second.second == old_id)
       {
+        // If we already have this id on this edge, we don't want to
+        // create a duplicate in our multimap
+        this->remove_edge(p.first, p.second.first, new_id);
         p.second.second = new_id;
         found_edge = true;
       }
@@ -1855,6 +1861,9 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
   for (auto & p : _boundary_shellface_id)
     if (p.second.second == old_id)
       {
+        // If we already have this id on this shellface, we don't want
+        // to create a duplicate in our multimap
+        this->remove_shellface(p.first, p.second.first, new_id);
         p.second.second = new_id;
         found_shellface = true;
       }
@@ -1868,6 +1877,9 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
   for (auto & p : _boundary_side_id)
     if (p.second.second == old_id)
       {
+        // If we already have this id on this side, we don't want to
+        // create a duplicate in our multimap
+        this->remove_side(p.first, p.second.first, new_id);
         p.second.second = new_id;
         found_side = true;
       }
@@ -1886,6 +1898,8 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
   renumber_name(_ss_id_to_name, old_id, new_id);
   renumber_name(_ns_id_to_name, old_id, new_id);
   renumber_name(_es_id_to_name, old_id, new_id);
+
+  this->libmesh_assert_valid_multimaps();
 }
 
 
@@ -3262,6 +3276,7 @@ void BoundaryInfo::clear_stitched_boundary_side_ids (const boundary_id_type side
   // *entirely*, so we need to recompute boundary id sets to check
   // for that.
   this->regenerate_id_sets();
+  this->libmesh_assert_valid_multimaps();
 }
 
 const std::set<boundary_id_type> &
@@ -3269,6 +3284,33 @@ BoundaryInfo::get_global_boundary_ids() const
 {
   libmesh_assert(_mesh && _mesh->is_prepared());
   return _global_boundary_ids;
+}
+
+void
+BoundaryInfo::libmesh_assert_valid_multimaps() const
+{
+#ifndef NDEBUG
+  auto verify_multimap = [](const auto & themap) {
+    for (const auto & [key, val] : themap)
+      {
+        auto range = themap.equal_range(key);
+
+        int count = 0;
+        for (auto it = range.first; it != range.second; ++it)
+          if (it->second == val)
+            ++count;
+
+        libmesh_assert(count == 1);
+      }
+  };
+
+  verify_multimap(this->_boundary_node_id);
+  verify_multimap(this->_boundary_edge_id);
+  verify_multimap(this->_boundary_shellface_id);
+  verify_multimap(this->_boundary_side_id);
+#else
+  return;
+#endif
 }
 
 } // namespace libMesh

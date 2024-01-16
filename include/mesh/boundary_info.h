@@ -926,6 +926,14 @@ public:
 private:
 
   /**
+   * Helper method for ensuring that our multimaps don't contain
+   * entries with duplicate keys *and* values.  Probably should have
+   * picked a different data structure there, and also not given users
+   * an accessor with raw access to it...
+   */
+  void libmesh_assert_valid_multimaps() const;
+
+  /**
    * Helper method for finding consistent maps of interior to boundary
    * dof_object ids.  Either node_id_map or side_id_map can be nullptr,
    * in which case it will not be filled.
