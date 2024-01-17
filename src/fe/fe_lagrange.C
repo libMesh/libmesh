@@ -822,7 +822,8 @@ void lagrange_compute_constraints (DofConstraints & constraints,
    }
 #endif
 
-  FEType fe_type = dof_map.variable_type(variable_number);
+  const Variable & var = dof_map.variable(variable_number);
+  const FEType fe_type = var.type();
   const bool add_p_level = dof_map.should_p_refine_var(variable_number);
 
   // Pull objects out of the loop to reduce heap operations
@@ -835,8 +836,10 @@ void lagrange_compute_constraints (DofConstraints & constraints,
     if (const Elem * const neigh = elem->neighbor_ptr(s);
         neigh && neigh != remote_elem)
       {
-        if (elem->neighbor_ptr(s)->level() < elem->level()) // constrain dofs shared between
-          {                                                 // this element and ones coarser
+        // constrain dofs shared between this element and ones coarser
+        if (neigh->level() < elem->level() &&
+            var.active_on_subdomain(neigh->subdomain_id()))
+          {
             // than this element.
             // Get pointers to the elements of interest and its parent.
             const Elem * parent = elem->parent();
