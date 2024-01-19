@@ -579,15 +579,6 @@ private:
    */
   std::map<std::pair<dof_id_type,unsigned int>, unsigned int > _local_side_quad_point_side_types;
 
-  /**
-   * We also optionally store the values at the "observation points" for all parametrized functions
-   * in the training set. These values are used to obtain the observation values that are stored in
-   * RBEIMEvaluation.
-   *
-   * Indexing is: training_index --> observation point index --> component --> value.
-   */
-  std::vector<std::vector<std::vector<Number>>> _parametrized_functions_for_training_obs_values;
-
 };
 
 } // namespace libMesh

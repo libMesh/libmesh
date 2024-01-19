@@ -1556,8 +1556,6 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
           else
             _component_scaling_in_training_set[i] = _max_abs_value_in_training_set / max_abs_value_per_component_in_training_set[i];
         }
-
-      _parametrized_functions_for_training_obs_values.resize( get_n_training_samples() );
     }
 }
 
