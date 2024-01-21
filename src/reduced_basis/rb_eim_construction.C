@@ -634,7 +634,9 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 
   libMesh::out << std::endl << "---- Performing POD EIM basis enrichment ----" << std::endl;
 
-  // Set up the POD "correlation matrix"
+  // Set up the POD "correlation matrix". This enables us to compute the POD via the
+  // "method of snapshots", in which we compute a low rank representation of the
+  // n_snapshots x n_snapshots matrix.
   unsigned int n_snapshots = get_n_training_samples();
   DenseMatrix<Number> correlation_matrix(n_snapshots,n_snapshots);
 
@@ -682,7 +684,12 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
     }
   std::cout << "Finished computing correlation matrix" << std::endl;
 
-  // compute SVD of correlation matrix
+  // Compute SVD of correlation matrix.
+  // Let Y = U S V^T, then the SVD below corresponds
+  // to Y^T Y = V S U^T U S V^T = V S^2 V^T.
+  // The POD basis we use is then given by U, which
+  // we can compute via U = Y V S^{-1}, which is what
+  // we compute below.
   DenseVector<Real> sigma( n_snapshots );
   DenseMatrix<Number> U( n_snapshots, n_snapshots );
   DenseMatrix<Number> VT( n_snapshots, n_snapshots );
