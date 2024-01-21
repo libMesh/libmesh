@@ -694,8 +694,9 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
   // Note that the formulation remains the same in the
   // case that we use a weighted inner product (as
   // in the case that we used apply_comp_scaling=true
-  // when computing the correlation matrix), see the
-  // lecture notes from Volkwein on POD for more details.
+  // when computing the correlation matrix), see (1.28)
+  // from the lecture notes from Volkwein on POD for more
+  // details.
   DenseVector<Real> sigma( n_snapshots );
   DenseMatrix<Number> U( n_snapshots, n_snapshots );
   DenseMatrix<Number> VT( n_snapshots, n_snapshots );
