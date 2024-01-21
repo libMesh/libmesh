@@ -690,6 +690,12 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
   // The POD basis we use is then given by U, which
   // we can compute via U = Y V S^{-1}, which is what
   // we compute below.
+  //
+  // Note that the formulation remains the same in the
+  // case that we use a weighted inner product (as
+  // in the case that we used apply_comp_scaling=true
+  // when computing the correlation matrix), see the
+  // lecture notes from Volkwein on POD for more details.
   DenseVector<Real> sigma( n_snapshots );
   DenseMatrix<Number> U( n_snapshots, n_snapshots );
   DenseMatrix<Number> VT( n_snapshots, n_snapshots );
