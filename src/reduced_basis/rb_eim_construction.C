@@ -639,6 +639,8 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
   DenseMatrix<Number> correlation_matrix(n_snapshots,n_snapshots);
 
   std::cout << "Start computing correlation matrix" << std::endl;
+
+  bool apply_comp_scaling = get_rb_eim_evaluation().scale_components_in_enrichment();
   for (unsigned int i=0; i<n_snapshots; i++)
     {
       for (unsigned int j=0; j<=i; j++)
@@ -648,19 +650,22 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
             {
               inner_prod = side_inner_product(
                 _local_side_parametrized_functions_for_training[i],
-                _local_side_parametrized_functions_for_training[j]);
+                _local_side_parametrized_functions_for_training[j],
+                apply_comp_scaling);
             }
           else if (rbe.get_parametrized_function().on_mesh_nodes())
             {
               inner_prod = node_inner_product(
                 _local_node_parametrized_functions_for_training[i],
-                _local_node_parametrized_functions_for_training[j]);
+                _local_node_parametrized_functions_for_training[j],
+                apply_comp_scaling);
             }
           else
             {
               inner_prod = inner_product(
                 _local_parametrized_functions_for_training[i],
-                _local_parametrized_functions_for_training[j]);
+                _local_parametrized_functions_for_training[j],
+                apply_comp_scaling);
             }
 
 
@@ -1173,7 +1178,9 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
               DenseVector<Number> best_fit_rhs(RB_size);
               for (unsigned int i=0; i<RB_size; i++)
                 {
-                  best_fit_rhs(i) = side_inner_product(solution_copy, get_rb_eim_evaluation().get_side_basis_function(i));
+                  best_fit_rhs(i) = side_inner_product(solution_copy,
+                                                       get_rb_eim_evaluation().get_side_basis_function(i),
+                                                       /*apply_comp_scaling*/ false);
                 }
 
               // Now compute the best fit by an LU solve
@@ -1203,7 +1210,9 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
               DenseVector<Number> best_fit_rhs(RB_size);
               for (unsigned int i=0; i<RB_size; i++)
                 {
-                  best_fit_rhs(i) = node_inner_product(solution_copy, get_rb_eim_evaluation().get_node_basis_function(i));
+                  best_fit_rhs(i) = node_inner_product(solution_copy,
+                                                       get_rb_eim_evaluation().get_node_basis_function(i),
+                                                       /*apply_comp_scaling*/ false);
                 }
 
               // Now compute the best fit by an LU solve
@@ -1233,7 +1242,9 @@ std::pair<Real,unsigned int> RBEIMConstruction::compute_max_eim_error()
               DenseVector<Number> best_fit_rhs(RB_size);
               for (unsigned int i=0; i<RB_size; i++)
                 {
-                  best_fit_rhs(i) = inner_product(solution_copy, get_rb_eim_evaluation().get_basis_function(i));
+                  best_fit_rhs(i) = inner_product(solution_copy,
+                                                  get_rb_eim_evaluation().get_basis_function(i),
+                                                  /*apply_comp_scaling*/ false);
                 }
 
               // Now compute the best fit by an LU solve
@@ -1970,7 +1981,7 @@ void RBEIMConstruction::initialize_qp_data()
 }
 
 Number
-RBEIMConstruction::inner_product(const QpDataMap & v, const QpDataMap & w)
+RBEIMConstruction::inner_product(const QpDataMap & v, const QpDataMap & w, bool apply_comp_scaling)
 {
   LOG_SCOPE("inner_product()", "RBEIMConstruction");
 
@@ -1986,8 +1997,16 @@ RBEIMConstruction::inner_product(const QpDataMap & v, const QpDataMap & w)
           const std::vector<Number> & v_qp = v_comp_and_qp[comp];
           const std::vector<Number> & w_qp = w_comp_and_qp[comp];
 
+          Real comp_scaling = 1.;
+          if (apply_comp_scaling)
+            {
+              // We square the component scaling here because it occurs twice in
+              // the inner product calculation below.
+              comp_scaling = std::pow(_component_scaling_in_training_set[comp], 2.);
+            }
+
           for (unsigned int qp : index_range(JxW))
-            val += JxW[qp] * v_qp[qp] * libmesh_conj(w_qp[qp]);
+            val += JxW[qp] * comp_scaling * v_qp[qp] * libmesh_conj(w_qp[qp]);
         }
     }
 
@@ -1996,7 +2015,7 @@ RBEIMConstruction::inner_product(const QpDataMap & v, const QpDataMap & w)
 }
 
 Number
-RBEIMConstruction::side_inner_product(const SideQpDataMap & v, const SideQpDataMap & w)
+RBEIMConstruction::side_inner_product(const SideQpDataMap & v, const SideQpDataMap & w, bool apply_comp_scaling)
 {
   LOG_SCOPE("side_inner_product()", "RBEIMConstruction");
 
@@ -2012,8 +2031,16 @@ RBEIMConstruction::side_inner_product(const SideQpDataMap & v, const SideQpDataM
           const std::vector<Number> & v_qp = v_comp_and_qp[comp];
           const std::vector<Number> & w_qp = w_comp_and_qp[comp];
 
+          Real comp_scaling = 1.;
+          if (apply_comp_scaling)
+            {
+              // We square the component scaling here because it occurs twice in
+              // the inner product calculation below.
+              comp_scaling = std::pow(_component_scaling_in_training_set[comp], 2.);
+            }
+
           for (unsigned int qp : index_range(JxW))
-            val += JxW[qp] * v_qp[qp] * libmesh_conj(w_qp[qp]);
+            val += JxW[qp] * comp_scaling * v_qp[qp] * libmesh_conj(w_qp[qp]);
         }
     }
 
@@ -2022,7 +2049,7 @@ RBEIMConstruction::side_inner_product(const SideQpDataMap & v, const SideQpDataM
 }
 
 Number
-RBEIMConstruction::node_inner_product(const NodeDataMap & v, const NodeDataMap & w)
+RBEIMConstruction::node_inner_product(const NodeDataMap & v, const NodeDataMap & w, bool apply_comp_scaling)
 {
   LOG_SCOPE("node_inner_product()", "RBEIMConstruction");
 
@@ -2036,7 +2063,16 @@ RBEIMConstruction::node_inner_product(const NodeDataMap & v, const NodeDataMap &
         {
           // There is no quadrature rule on nodes, so we just multiply the values directly.
           // Hence we effectively work with the Euclidean inner product in this case.
-          val += v_comps[comp] * libmesh_conj(w_comps[comp]);
+
+          Real comp_scaling = 1.;
+          if (apply_comp_scaling)
+            {
+              // We square the component scaling here because it occurs twice in
+              // the inner product calculation below.
+              comp_scaling = std::pow(_component_scaling_in_training_set[comp], 2.);
+            }
+
+          val += comp_scaling * v_comps[comp] * libmesh_conj(w_comps[comp]);
         }
     }
 
@@ -2682,7 +2718,8 @@ void RBEIMConstruction::update_eim_matrices(bool set_eim_error_indicator)
           for (unsigned int j=0; j<RB_size; j++)
             {
               Number value = side_inner_product(eim_eval.get_side_basis_function(j),
-                                                eim_eval.get_side_basis_function(i));
+                                                eim_eval.get_side_basis_function(i),
+                                                /*apply_comp_scaling*/ false);
 
               _eim_projection_matrix(i,j) = value;
               if (i!=j)
@@ -2716,7 +2753,8 @@ void RBEIMConstruction::update_eim_matrices(bool set_eim_error_indicator)
           for (unsigned int j=0; j<RB_size; j++)
             {
               Number value = node_inner_product(eim_eval.get_node_basis_function(j),
-                                                eim_eval.get_node_basis_function(i));
+                                                eim_eval.get_node_basis_function(i),
+                                                /*apply_comp_scaling*/ false);
 
               _eim_projection_matrix(i,j) = value;
               if (i!=j)
@@ -2748,7 +2786,8 @@ void RBEIMConstruction::update_eim_matrices(bool set_eim_error_indicator)
           for (unsigned int j=0; j<RB_size; j++)
             {
               Number value = inner_product(eim_eval.get_basis_function(j),
-                                           eim_eval.get_basis_function(i));
+                                           eim_eval.get_basis_function(i),
+                                           /*apply_comp_scaling*/ false);
 
               _eim_projection_matrix(i,j) = value;
               if (i!=j)

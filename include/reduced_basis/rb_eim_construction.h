@@ -344,18 +344,21 @@ private:
    * quadrature points. The inner product includes the JxW contributions
    * stored in _local_quad_point_JxW, so that this is equivalent to
    * computing w^t M v, where M is the mass matrix.
+   *
+   * If \p apply_comp_scaling then we will incorporate the scaling from
+   * _component_scaling_in_training_set in the inner product.
    */
-  Number inner_product(const QpDataMap & v, const QpDataMap & w);
+  Number inner_product(const QpDataMap & v, const QpDataMap & w, bool apply_comp_scaling);
 
   /**
    * Same as inner_product() except for side data.
    */
-  Number side_inner_product(const SideQpDataMap & v, const SideQpDataMap & w);
+  Number side_inner_product(const SideQpDataMap & v, const SideQpDataMap & w, bool apply_comp_scaling);
 
   /**
    * Same as inner_product() except for node data.
    */
-  Number node_inner_product(const NodeDataMap & v, const NodeDataMap & w);
+  Number node_inner_product(const NodeDataMap & v, const NodeDataMap & w, bool apply_comp_scaling);
 
   /**
    * Get the maximum absolute value from a vector stored in the format that we use
