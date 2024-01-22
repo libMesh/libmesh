@@ -284,7 +284,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
             Number error_indicator_rhs = evaluated_values_at_err_indicator_point[counter];
             _rb_eim_error_indicators[counter] =
               get_eim_error_indicator(
-                error_indicator_rhs, _rb_eim_solutions[counter], EIM_rhs);
+                error_indicator_rhs, _rb_eim_solutions[counter]);
           }
 
         counter++;
@@ -2983,8 +2983,7 @@ void RBEIMEvaluation::set_eim_error_indicator_active(bool is_active)
 
 Real RBEIMEvaluation::get_eim_error_indicator(
   Number error_indicator_rhs,
-  const DenseVector<Number> & eim_solution,
-  const DenseVector<Number> & eim_rhs)
+  const DenseVector<Number> & eim_solution)
 {
   DenseVector<Number> coeffs;
   _error_indicator_interpolation_row.get_principal_subvector(eim_solution.size(), coeffs);
