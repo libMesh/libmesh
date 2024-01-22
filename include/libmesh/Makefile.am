@@ -197,6 +197,7 @@ BUILT_SOURCES = \
         mesh_smoother_laplace.h \
         mesh_smoother_vsmoother.h \
         mesh_subdivision_support.h \
+        mesh_tet_interface.h \
         mesh_tetgen_interface.h \
         mesh_tetgen_wrapper.h \
         mesh_tools.h \
@@ -1165,6 +1166,9 @@ mesh_smoother_vsmoother.h: $(top_srcdir)/include/mesh/mesh_smoother_vsmoother.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_subdivision_support.h: $(top_srcdir)/include/mesh/mesh_subdivision_support.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+mesh_tet_interface.h: $(top_srcdir)/include/mesh/mesh_tet_interface.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_tetgen_interface.h: $(top_srcdir)/include/mesh/mesh_tetgen_interface.h

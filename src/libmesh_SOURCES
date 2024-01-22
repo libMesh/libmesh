@@ -220,6 +220,7 @@ libmesh_SOURCES =  \
         src/mesh/mesh_smoother_laplace.C \
         src/mesh/mesh_smoother_vsmoother.C \
         src/mesh/mesh_subdivision_support.C \
+        src/mesh/mesh_tet_interface.C \
         src/mesh/mesh_tetgen_interface.C \
         src/mesh/mesh_tetgen_wrapper.C \
         src/mesh/mesh_tools.C \
