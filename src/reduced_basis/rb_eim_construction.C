@@ -1442,7 +1442,8 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
       _component_scaling_in_training_set.resize(n_comps);
       for(unsigned int i : make_range(n_comps))
         {
-          if (max_abs_value_per_component_in_training_set[i] == 0.)
+          if ((eim_eval.scale_components_in_enrichment().count(i) == 0) ||
+               max_abs_value_per_component_in_training_set[i] == 0.)
             _component_scaling_in_training_set[i] = 1.;
           else
             _component_scaling_in_training_set[i] = _max_abs_value_in_training_set / max_abs_value_per_component_in_training_set[i];
@@ -1508,7 +1509,8 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
       _component_scaling_in_training_set.resize(n_comps);
       for(unsigned int i : make_range(n_comps))
         {
-          if (max_abs_value_per_component_in_training_set[i] == 0.)
+          if ((eim_eval.scale_components_in_enrichment().count(i) == 0) ||
+               max_abs_value_per_component_in_training_set[i] == 0.)
             _component_scaling_in_training_set[i] = 1.;
           else
             _component_scaling_in_training_set[i] = _max_abs_value_in_training_set / max_abs_value_per_component_in_training_set[i];
@@ -1576,7 +1578,8 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
       _component_scaling_in_training_set.resize(n_comps);
       for(unsigned int i : make_range(n_comps))
         {
-          if (max_abs_value_per_component_in_training_set[i] == 0.)
+          if ((eim_eval.scale_components_in_enrichment().count(i) == 0) ||
+               max_abs_value_per_component_in_training_set[i] == 0.)
             _component_scaling_in_training_set[i] = 1.;
           else
             _component_scaling_in_training_set[i] = _max_abs_value_in_training_set / max_abs_value_per_component_in_training_set[i];
