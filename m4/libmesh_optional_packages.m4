@@ -582,6 +582,27 @@ AC_CONFIG_FILES([contrib/poly2tri/modified/Makefile])
 
 
 # -------------------------------------------------------------
+# NetGen -- disabled unless --enable-netgen is specified
+#
+# The license is fine, but our interface is still experimental
+# -------------------------------------------------------------
+CONFIGURE_NETGEN
+AS_IF([test $enablenetgen = yes],
+      [libmesh_contrib_INCLUDES="$NETGEN_INCLUDE $libmesh_contrib_INCLUDES"
+       libmesh_optional_LIBS="$NETGEN_LIBS $libmesh_optional_LIBS"
+       libmesh_LDFLAGS="$NETGEN_BUILD_LDFLAGS $libmesh_LDFLAGS"
+      ])
+
+AM_CONDITIONAL(LIBMESH_ENABLE_NETGEN, test x$enablenetgen = xyes)
+AC_CONFIG_FILES([contrib/netgen/Makefile])
+# -------------------------------------------------------------
+
+
+
+
+
+
+# -------------------------------------------------------------
 # TetGen -- enabled unless --enable-strict-lgpl is specified
 # -------------------------------------------------------------
 AS_IF([test $enablestrictlgpl = yes],
