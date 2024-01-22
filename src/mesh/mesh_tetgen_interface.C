@@ -38,7 +38,7 @@ namespace libMesh
 //----------------------------------------------------------------------
 // TetGenMeshInterface class members
 TetGenMeshInterface::TetGenMeshInterface (UnstructuredMesh & mesh) :
-  _mesh(mesh),
+  MeshTetInterface(mesh),
   _serializer(_mesh),
   _switches("Q")
 {
@@ -55,6 +55,12 @@ void TetGenMeshInterface::set_switches(std::string switches)
   // for full list of options and their meaning: see the tetgen manual
   // (http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual005.html)
   _switches = std::move(switches);
+}
+
+
+void TetGenMeshInterface::triangulate ()
+{
+  this->triangulate_pointset();
 }
 
 
@@ -390,83 +396,6 @@ void TetGenMeshInterface::assign_nodes_to_elem(unsigned * node_labels, Elem * el
       elem->set_node(j) = current_node;
     }
 }
-
-
-
-
-
-unsigned TetGenMeshInterface::check_hull_integrity()
-{
-  // Check for easy return: if the Mesh is empty (i.e. if
-  // somebody called triangulate_conformingDelaunayMesh on
-  // a Mesh with no elements, then hull integrity check must
-  // fail...
-  if (_mesh.n_elem() == 0)
-    return 3;
-
-  for (auto & elem : this->_mesh.element_ptr_range())
-    {
-      // Check for proper element type
-      if (elem->type() != TRI3)
-        {
-          //libmesh_error_msg("ERROR: Some of the elements in the original mesh were not TRI3!");
-          return 1;
-        }
-
-      for (auto neigh : elem->neighbor_ptr_range())
-        {
-          if (neigh == nullptr)
-            {
-              // libmesh_error_msg("ERROR: Non-convex hull, cannot be tetrahedralized.");
-              return 2;
-            }
-        }
-    }
-
-  // If we made it here, return success!
-  return 0;
-}
-
-
-
-
-
-void TetGenMeshInterface::process_hull_integrity_result(unsigned result)
-{
-  if (result != 0)
-    {
-      libMesh::err << "Error! Conforming Delaunay mesh tetrahedralization requires a convex hull." << std::endl;
-
-      if (result==1)
-        {
-          libMesh::err << "Non-TRI3 elements were found in the input Mesh.  ";
-          libMesh::err << "A constrained Delaunay triangulation requires a convex hull of TRI3 elements." << std::endl;
-        }
-
-      libmesh_error_msg("Consider calling TetGenMeshInterface::pointset_convexhull() followed by Mesh::find_neighbors() first.");
-    }
-}
-
-
-
-
-void TetGenMeshInterface::delete_2D_hull_elements()
-{
-  for (auto & elem : this->_mesh.element_ptr_range())
-    {
-      // Check for proper element type. Yes, we legally delete elements while
-      // iterating over them because no entries from the underlying container
-      // are actually erased.
-      if (elem->type() == TRI3)
-        _mesh.delete_elem(elem);
-    }
-
-  // We just removed any boundary info associated with hull element
-  // edges, so let's update the boundary id caches.
-  this->_mesh.get_boundary_info().regenerate_id_sets();
-}
-
-
 
 } // namespace libMesh
 
