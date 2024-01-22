@@ -642,7 +642,7 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 
   std::cout << "Start computing correlation matrix" << std::endl;
 
-  bool apply_comp_scaling = get_rb_eim_evaluation().scale_components_in_enrichment();
+  bool apply_comp_scaling = !get_rb_eim_evaluation().scale_components_in_enrichment().empty();
   for (unsigned int i=0; i<n_snapshots; i++)
     {
       for (unsigned int j=0; j<=i; j++)
@@ -2105,11 +2105,8 @@ Real RBEIMConstruction::get_node_max_abs_value(const NodeDataMap & v) const
         {
           const auto & value = values[comp];
 
-          // If scale_components_in_enrichment() returns true then we
-          // apply a scaling to give an approximately uniform scaling
-          // for all components.
           Real comp_scaling = 1.;
-          if (get_rb_eim_evaluation().scale_components_in_enrichment())
+          if (get_rb_eim_evaluation().scale_components_in_enrichment().count(comp))
             {
               // Make sure that _component_scaling_in_training_set is initialized
               libmesh_error_msg_if(comp >= _component_scaling_in_training_set.size(),
@@ -2548,10 +2545,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
               Number value = qp_values[qp];
               Real abs_value = std::abs(value);
 
-              // If we are using component scaling in enrichment, then we
-              // also need to scale abs_value here so that we take the
-              // scaling into account when we determine largest_abs_value.
-              if (get_rb_eim_evaluation().scale_components_in_enrichment())
+              if (get_rb_eim_evaluation().scale_components_in_enrichment().count(comp))
                 abs_value *= _component_scaling_in_training_set[comp];
 
               bool update_optimal_point = false;

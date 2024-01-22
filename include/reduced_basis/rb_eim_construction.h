@@ -375,11 +375,8 @@ private:
 
         for (const auto & comp : index_range(v_comp_and_qp))
           {
-            // If scale_components_in_enrichment() returns true then we
-            // apply a scaling to give an approximately uniform scaling
-            // for all components.
             Real comp_scaling = 1.;
-            if (get_rb_eim_evaluation().scale_components_in_enrichment())
+            if (get_rb_eim_evaluation().scale_components_in_enrichment().count(comp))
               {
                 // Make sure that _component_scaling_in_training_set is initialized
                 libmesh_error_msg_if(comp >= _component_scaling_in_training_set.size(),

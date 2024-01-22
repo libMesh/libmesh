@@ -2920,9 +2920,9 @@ void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
   (*sys.solution) = current_local_soln;
 }
 
-std::set<unsigned int> RBEIMEvaluation::get_eim_vars_to_project_and_write() const
+const std::set<unsigned int> & RBEIMEvaluation::get_eim_vars_to_project_and_write() const
 {
-  return std::set<unsigned int>();
+  return _eim_vars_to_project_and_write;
 }
 
 void RBEIMEvaluation::write_out_projected_basis_functions(System & sys,
@@ -2958,12 +2958,9 @@ void RBEIMEvaluation::write_out_projected_basis_functions(System & sys,
     }
 }
 
-bool RBEIMEvaluation::scale_components_in_enrichment() const
+const std::set<unsigned int> & RBEIMEvaluation::scale_components_in_enrichment() const
 {
-  // Return false by default, but we override this in subclasses
-  // where the parametrized function components differ widely in
-  // magnitude.
-  return false;
+  return _scale_components_in_enrichment;
 }
 
 bool RBEIMEvaluation::use_eim_error_indicator() const

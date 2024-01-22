@@ -520,12 +520,9 @@ public:
                                        unsigned int var);
 
   /**
-   * Return a set that specifies which EIM variables will be projected
-   * and written out in write_out_projected_basis_functions().
-   * By default this returns an empty vector, but can be overridden in
-   * subclasses to specify the EIM variables that are relevant for visualization.
+   * Get _eim_vars_to_project_and_write.
    */
-  virtual std::set<unsigned int> get_eim_vars_to_project_and_write() const;
+  const std::set<unsigned int> & get_eim_vars_to_project_and_write() const;
 
   /**
    * Project all basis functions using project_qp_data_map_onto_system() and
@@ -535,12 +532,9 @@ public:
                                            const std::string & directory_name = "offline_data");
 
   /**
-   * Indicate whether we should apply scaling to the components of the parametrized
-   * function during basis function enrichment in order give an approximately uniform
-   * magnitude for all components. This is helpful in cases where the components vary
-   * widely in magnitude.
+   * Get _scale_components_in_enrichment.
    */
-  virtual bool scale_components_in_enrichment() const;
+  const std::set<unsigned int> & scale_components_in_enrichment() const;
 
   /**
    * Virtual function to indicate if we use the EIM error indicator in this case.
@@ -581,6 +575,27 @@ public:
    * Get the VectorizedEvalInput data.
    */
   const VectorizedEvalInput & get_vec_eval_input() const;
+
+protected:
+
+  /**
+   * This set specifies which EIM variables will be projected and written
+   * out in write_out_projected_basis_functions(). By default this is an empty
+   * set, but can be updated in subclasses to specify the EIM variables that
+   * are relevant for visualization.
+   */
+  std::set<unsigned int> _eim_vars_to_project_and_write;
+
+  /**
+   * This set that specifies which EIM variables will be scaled during EIM
+   * enrichment so that their maximum value matches the maximum value across
+   * all variables. This is helpful in cases where some components are much
+   * smaller in magnitude than others, since in those cases if we do not apply
+   * component scaling to the small components then the accuracy of the EIM
+   * approximation for those components will not be controlled well by the
+   * EIM enrichment process.
+   */
+  std::set<unsigned int> _scale_components_in_enrichment;
 
 private:
 
