@@ -794,6 +794,11 @@ LIBMESH_ENABLE_TETGEN_FALSE
 LIBMESH_ENABLE_TETGEN_TRUE
 TETGEN_LIBRARY
 TETGEN_INCLUDE
+LIBMESH_ENABLE_NETGEN_FALSE
+LIBMESH_ENABLE_NETGEN_TRUE
+NETGEN_BUILD_LDFLAGS
+NETGEN_LIBS
+NETGEN_INCLUDE
 LIBMESH_ENABLE_POLY2TRI_FALSE
 LIBMESH_ENABLE_POLY2TRI_TRUE
 HAVE_DOT
@@ -1292,6 +1297,7 @@ enable_parmetis
 with_parmetis
 with_parmetis_include
 enable_poly2tri
+enable_netgen
 enable_tetgen
 enable_triangle
 enable_qhull
@@ -2108,6 +2114,7 @@ Optional Features:
   --disable-parmetis      build without Parmetis parallel graph partitioning
                           support
   --enable-poly2tri       build with poly2tri API support
+  --enable-netgen         build with NetGen mesh generation library support
   --disable-tetgen        build without TetGen tetrahedralization library
                           support
   --disable-triangle      build without Triangle Delaunay triangulation
@@ -5947,13 +5954,13 @@ done
 
                           if test -z "$LOCAL_CC"
 then :
-  printf "%s\n" "None of the wrappers we look for exist in $MPI/bin. We will not try to use mpi compiler wrappers"
+  printf "%s\n" "None of the wrappers we look for exist in $MPI/bin. We will not try to use mpi C compiler wrappers"
 else $as_nop
   MPI_USING_WRAPPERS=1;CC="$MPI/bin/$LOCAL_CC"
 fi
 
 else $as_nop
-  printf "%s\n" "An MPI directory was specified, but $MPI/bin does not exist. We will not try to use mpi compiler wrappers"
+  printf "%s\n" "An MPI directory was specified, but $MPI/bin does not exist. We will not try to use mpi C compiler wrappers"
 fi
 
 else $as_nop
@@ -6834,7 +6841,6 @@ fi
 
 
 
-
   # --------------------------------------------------------------
   # libMesh itself is not written in any Fortran and does not need
   # a Fortran compiler.  Many optional packages however are and
@@ -7443,13 +7449,13 @@ done
 
                           if test -z "$LOCAL_CXX"
 then :
-  printf "%s\n" "None of the wrappers we look for exist in $MPI/bin. We will not try to use mpi compiler wrappers"
+  printf "%s\n" "None of the wrappers we look for exist in $MPI/bin. We will not try to use mpi C++ compiler wrappers"
 else $as_nop
   MPI_USING_WRAPPERS=1;CXX="$MPI/bin/$LOCAL_CXX"
 fi
 
 else $as_nop
-  printf "%s\n" "An MPI directory was specified, but $MPI/bin does not exist. We will not try to use mpi compiler wrappers"
+  printf "%s\n" "An MPI directory was specified, but $MPI/bin does not exist. We will not try to use mpi C++ compiler wrappers"
 fi
 
 else $as_nop
@@ -55332,6 +55338,100 @@ ac_config_files="$ac_config_files contrib/poly2tri/modified/Makefile"
 
 
 # -------------------------------------------------------------
+# NetGen -- disabled unless --enable-netgen is specified
+#
+# The license is fine, but our interface is still experimental
+# -------------------------------------------------------------
+
+  # Check whether --enable-netgen was given.
+if test ${enable_netgen+y}
+then :
+  enableval=$enable_netgen; case "${enableval}" in #(
+  yes) :
+    enablenetgen=yes ;; #(
+  no) :
+    enablenetgen=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-netgen" "$LINENO" 5 ;;
+esac
+else $as_nop
+  enablenetgen=no
+fi
+
+
+          NETGEN_INCLUDE=""
+  NETGEN_LIBS=""
+  NETGEN_BUILD_LDFLAGS=""
+  if test "x$enablenetgen" = "xyes"
+then :
+
+                              my_top_srcdir="$(cd $srcdir && pwd)"
+
+                              rm -rf contrib/netgen/build
+          mkdir -p contrib/netgen/build
+
+                                        mkdir -p contrib/netgen/install
+
+                                        if (cd contrib/netgen/build && cmake -DCMAKE_INSTALL_PREFIX:PATH=$abs_top_builddir/contrib/netgen/install $my_top_srcdir/contrib/netgen/netgen)
+then :
+
+                  NETGEN_INCLUDE="-I\$(top_srcdir)/contrib/netgen/ -I\$(top_builddir)/contrib/netgen/build/"
+                  NETGEN_LIBS="-lnglib -lngcore"
+                  NETGEN_BUILD_LDFLAGS="-L\$(abs_top_builddir)/contrib/netgen/build/netgen/ -L\$(abs_top_builddir)/contrib/netgen/build/netgen/libsrc/core/"
+                  if test "x$RPATHFLAG" != "x"
+then :
+  NETGEN_BUILD_LDFLAGS="$NETGEN_BUILD_LDFLAGS ${RPATHFLAG}\$(abs_top_builddir)/contrib/netgen/build/netgen/ ${RPATHFLAG}\$(abs_top_builddir)/contrib/netgen/build/netgen/libsrc/core/"
+fi;
+
+printf "%s\n" "#define HAVE_NETGEN 1" >>confdefs.h
+
+                  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Netgen support >>>" >&5
+printf "%s\n" "<<< Configuring library with Netgen support >>>" >&6; }
+
+else $as_nop
+
+                  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Failed cmake configuration of Netgen submodule >>>" >&5
+printf "%s\n" "<<< Failed cmake configuration of Netgen submodule >>>" >&6; }
+                  enablenetgen=no
+
+fi
+
+else $as_nop
+
+          enablenetgen=no
+
+fi
+
+
+
+
+
+if test $enablenetgen = yes
+then :
+  libmesh_contrib_INCLUDES="$NETGEN_INCLUDE $libmesh_contrib_INCLUDES"
+       libmesh_optional_LIBS="$NETGEN_LIBS $libmesh_optional_LIBS"
+       libmesh_LDFLAGS="$NETGEN_BUILD_LDFLAGS $libmesh_LDFLAGS"
+
+fi
+
+ if test x$enablenetgen = xyes; then
+  LIBMESH_ENABLE_NETGEN_TRUE=
+  LIBMESH_ENABLE_NETGEN_FALSE='#'
+else
+  LIBMESH_ENABLE_NETGEN_TRUE='#'
+  LIBMESH_ENABLE_NETGEN_FALSE=
+fi
+
+ac_config_files="$ac_config_files contrib/netgen/Makefile"
+
+# -------------------------------------------------------------
+
+
+
+
+
+
+# -------------------------------------------------------------
 # TetGen -- enabled unless --enable-strict-lgpl is specified
 # -------------------------------------------------------------
 if test $enablestrictlgpl = yes
@@ -60765,6 +60865,10 @@ if test -z "${LIBMESH_ENABLE_POLY2TRI_TRUE}" && test -z "${LIBMESH_ENABLE_POLY2T
   as_fn_error $? "conditional \"LIBMESH_ENABLE_POLY2TRI\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${LIBMESH_ENABLE_NETGEN_TRUE}" && test -z "${LIBMESH_ENABLE_NETGEN_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_NETGEN\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${LIBMESH_ENABLE_TETGEN_TRUE}" && test -z "${LIBMESH_ENABLE_TETGEN_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_TETGEN\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -62350,6 +62454,7 @@ do
     "contrib/metis/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/metis/Makefile" ;;
     "contrib/parmetis/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/parmetis/Makefile" ;;
     "contrib/poly2tri/modified/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/poly2tri/modified/Makefile" ;;
+    "contrib/netgen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/netgen/Makefile" ;;
     "contrib/tetgen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/tetgen/Makefile" ;;
     "contrib/triangle/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/triangle/Makefile" ;;
     "contrib/qhull/qhull/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/qhull/qhull/Makefile" ;;
@@ -64443,6 +64548,7 @@ fi
 then :
   printf "%s\n" "     version....................... : $netcdfversion"
 fi
+        printf "%s\n" "  netgen........................... : $enablenetgen"
         printf "%s\n" "  nlopt............................ : $enablenlopt"
         printf "%s\n" "  parmetis......................... : $enableparmetis"
         printf "%s\n" "  petsc............................ : $enablepetsc"

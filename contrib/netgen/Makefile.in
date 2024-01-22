@@ -13,7 +13,6 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
-
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -89,12 +88,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@LIBMESH_DBG_MODE_TRUE@am__append_1 = libdbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_2 = libdevel.la
-@LIBMESH_OPT_MODE_TRUE@am__append_3 = libopt.la
-@LIBMESH_PROF_MODE_TRUE@am__append_4 = libprof.la
-@LIBMESH_OPROF_MODE_TRUE@am__append_5 = liboprof.la
-subdir = contrib/gmv
+subdir = contrib/netgen
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_code_coverage.m4 \
@@ -161,56 +155,6 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-LTLIBRARIES = $(noinst_LTLIBRARIES)
-libdbg_la_DEPENDENCIES =
-am__libdbg_la_SOURCES_DIST = gmvread.c gmvread.h
-am__objects_1 = libdbg_la-gmvread.lo
-@LIBMESH_DBG_MODE_TRUE@am_libdbg_la_OBJECTS = $(am__objects_1)
-libdbg_la_OBJECTS = $(am_libdbg_la_OBJECTS)
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
-libdbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libdbg_la_CFLAGS) \
-	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-@LIBMESH_DBG_MODE_TRUE@am_libdbg_la_rpath =
-libdevel_la_DEPENDENCIES =
-am__libdevel_la_SOURCES_DIST = gmvread.c gmvread.h
-am__objects_2 = libdevel_la-gmvread.lo
-@LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_OBJECTS = $(am__objects_2)
-libdevel_la_OBJECTS = $(am_libdevel_la_OBJECTS)
-libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libdevel_la_CFLAGS) \
-	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-@LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_rpath =
-liboprof_la_DEPENDENCIES =
-am__liboprof_la_SOURCES_DIST = gmvread.c gmvread.h
-am__objects_3 = liboprof_la-gmvread.lo
-@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_OBJECTS = $(am__objects_3)
-liboprof_la_OBJECTS = $(am_liboprof_la_OBJECTS)
-liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(liboprof_la_CFLAGS) \
-	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_rpath =
-libopt_la_DEPENDENCIES =
-am__libopt_la_SOURCES_DIST = gmvread.c gmvread.h
-am__objects_4 = libopt_la-gmvread.lo
-@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_4)
-libopt_la_OBJECTS = $(am_libopt_la_OBJECTS)
-libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libopt_la_CFLAGS) \
-	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-@LIBMESH_OPT_MODE_TRUE@am_libopt_la_rpath =
-libprof_la_DEPENDENCIES =
-am__libprof_la_SOURCES_DIST = gmvread.c gmvread.h
-am__objects_5 = libprof_la-gmvread.lo
-@LIBMESH_PROF_MODE_TRUE@am_libprof_la_OBJECTS = $(am__objects_5)
-libprof_la_OBJECTS = $(am_libprof_la_OBJECTS)
-libprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libprof_la_CFLAGS) \
-	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-@LIBMESH_PROF_MODE_TRUE@am_libprof_la_rpath =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -223,65 +167,15 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
-depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
-am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/libdbg_la-gmvread.Plo \
-	./$(DEPDIR)/libdevel_la-gmvread.Plo \
-	./$(DEPDIR)/liboprof_la-gmvread.Plo \
-	./$(DEPDIR)/libopt_la-gmvread.Plo \
-	./$(DEPDIR)/libprof_la-gmvread.Plo
-am__mv = mv -f
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
-AM_V_CC = $(am__v_CC_@AM_V@)
-am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
-am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 = 
-CCLD = $(CC)
-LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-AM_V_CCLD = $(am__v_CCLD_@AM_V@)
-am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
-am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 = 
-SOURCES = $(libdbg_la_SOURCES) $(libdevel_la_SOURCES) \
-	$(liboprof_la_SOURCES) $(libopt_la_SOURCES) \
-	$(libprof_la_SOURCES)
-DIST_SOURCES = $(am__libdbg_la_SOURCES_DIST) \
-	$(am__libdevel_la_SOURCES_DIST) \
-	$(am__liboprof_la_SOURCES_DIST) $(am__libopt_la_SOURCES_DIST) \
-	$(am__libprof_la_SOURCES_DIST)
+SOURCES =
+DIST_SOURCES =
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
-# Read a list of newline-separated strings from the standard input,
-# and print each of them once, without duplicates.  Input order is
-# *not* preserved.
-am__uniquify_input = $(AWK) '\
-  BEGIN { nonempty = 0; } \
-  { items[$$0] = 1; nonempty = 1; } \
-  END { if (nonempty) { for (i in items) print i; }; } \
-'
-# Make sure the list of sources is unique.  This is necessary because,
-# e.g., the same source file might be shared among _SOURCES variables
-# for different programs/libraries.
-am__define_uniq_tagged_files = \
-  list='$(am__tagged_files)'; \
-  unique=`for i in $$list; do \
-    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-  done | $(am__uniquify_input)`
-am__DIST_COMMON = $(srcdir)/Makefile.in \
-	$(top_srcdir)/build-aux/depcomp \
-	$(top_srcdir)/contrib/Make.common
+am__DIST_COMMON = $(srcdir)/Makefile.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ACSM_ANY_PARANOID_FLAGS = @ACSM_ANY_PARANOID_FLAGS@
@@ -598,57 +492,10 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-pkg_sources = gmvread.c gmvread.h
-
-######################################################################
-#
-# Common environment for all contributed packages
-# 
-# If we are careful, common rules can be defined here, 
-# once and for all.
-# 
-AUTOMAKE_OPTIONS = subdir-objects 
-AM_CPPFLAGS = $(pkg_cppflags) # any defined package-specific include paths
-AM_CFLAGS = $(pkg_cflags)
-AM_CXXFLAGS = $(pkg_cxxflags)
-AM_LDFLAGS = $(libmesh_LDFLAGS)
-
-######################################################################
-#
-# Building the flavors
-#
-noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3) \
-	$(am__append_4) $(am__append_5)
-@LIBMESH_DBG_MODE_TRUE@libdbg_la_SOURCES = $(pkg_sources)
-@LIBMESH_DBG_MODE_TRUE@libdbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
-@LIBMESH_DBG_MODE_TRUE@libdbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
-@LIBMESH_DBG_MODE_TRUE@libdbg_la_CFLAGS = $(CFLAGS_DBG)
-@LIBMESH_DBG_MODE_TRUE@libdbg_la_LIBADD = $(pkg_libs) # any defined package-specific libs
-@LIBMESH_DEVEL_MODE_TRUE@libdevel_la_SOURCES = $(pkg_sources)
-@LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
-@LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
-@LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CFLAGS = $(CFLAGS_DEVEL)
-@LIBMESH_DEVEL_MODE_TRUE@libdevel_la_LIBADD = $(pkg_libs) # any defined package-specific libs
-@LIBMESH_OPT_MODE_TRUE@libopt_la_SOURCES = $(pkg_sources)
-@LIBMESH_OPT_MODE_TRUE@libopt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
-@LIBMESH_OPT_MODE_TRUE@libopt_la_CXXFLAGS = $(CXXFLAGS_OPT)
-@LIBMESH_OPT_MODE_TRUE@libopt_la_CFLAGS = $(CFLAGS_OPT)
-@LIBMESH_OPT_MODE_TRUE@libopt_la_LIBADD = $(pkg_libs) # any defined package-specific libs
-@LIBMESH_PROF_MODE_TRUE@libprof_la_SOURCES = $(pkg_sources)
-@LIBMESH_PROF_MODE_TRUE@libprof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
-@LIBMESH_PROF_MODE_TRUE@libprof_la_CXXFLAGS = $(CXXFLAGS_PROF)
-@LIBMESH_PROF_MODE_TRUE@libprof_la_CFLAGS = $(CFLAGS_PROF)
-@LIBMESH_PROF_MODE_TRUE@libprof_la_LIBADD = $(pkg_libs) # any defined package-specific libs
-@LIBMESH_OPROF_MODE_TRUE@liboprof_la_SOURCES = $(pkg_sources)
-@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
-@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
-@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CFLAGS = $(CFLAGS_OPROF)
-@LIBMESH_OPROF_MODE_TRUE@liboprof_la_LIBADD = $(pkg_libs) # any defined package-specific libs
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/contrib/Make.common $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -657,9 +504,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu contrib/gmv/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu contrib/netgen/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu contrib/gmv/Makefile
+	  $(AUTOMAKE) --gnu contrib/netgen/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -668,7 +515,6 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__maybe_remake_depfiles)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__maybe_remake_depfiles);; \
 	esac;
-$(top_srcdir)/contrib/Make.common $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
@@ -679,166 +525,17 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 
-clean-noinstLTLIBRARIES:
-	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
-	@list='$(noinst_LTLIBRARIES)'; \
-	locs=`for p in $$list; do echo $$p; done | \
-	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
-	      sort -u`; \
-	test -z "$$locs" || { \
-	  echo rm -f $${locs}; \
-	  rm -f $${locs}; \
-	}
-
-libdbg.la: $(libdbg_la_OBJECTS) $(libdbg_la_DEPENDENCIES) $(EXTRA_libdbg_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libdbg_la_LINK) $(am_libdbg_la_rpath) $(libdbg_la_OBJECTS) $(libdbg_la_LIBADD) $(LIBS)
-
-libdevel.la: $(libdevel_la_OBJECTS) $(libdevel_la_DEPENDENCIES) $(EXTRA_libdevel_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libdevel_la_LINK) $(am_libdevel_la_rpath) $(libdevel_la_OBJECTS) $(libdevel_la_LIBADD) $(LIBS)
-
-liboprof.la: $(liboprof_la_OBJECTS) $(liboprof_la_DEPENDENCIES) $(EXTRA_liboprof_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(liboprof_la_LINK) $(am_liboprof_la_rpath) $(liboprof_la_OBJECTS) $(liboprof_la_LIBADD) $(LIBS)
-
-libopt.la: $(libopt_la_OBJECTS) $(libopt_la_DEPENDENCIES) $(EXTRA_libopt_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libopt_la_LINK) $(am_libopt_la_rpath) $(libopt_la_OBJECTS) $(libopt_la_LIBADD) $(LIBS)
-
-libprof.la: $(libprof_la_OBJECTS) $(libprof_la_DEPENDENCIES) $(EXTRA_libprof_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libprof_la_LINK) $(am_libprof_la_rpath) $(libprof_la_OBJECTS) $(libprof_la_LIBADD) $(LIBS)
-
-mostlyclean-compile:
-	-rm -f *.$(OBJEXT)
-
-distclean-compile:
-	-rm -f *.tab.c
-
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdbg_la-gmvread.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdevel_la-gmvread.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboprof_la-gmvread.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libopt_la-gmvread.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libprof_la-gmvread.Plo@am__quote@ # am--include-marker
-
-$(am__depfiles_remade):
-	@$(MKDIR_P) $(@D)
-	@echo '# dummy' >$@-t && $(am__mv) $@-t $@
-
-am--depfiles: $(am__depfiles_remade)
-
-.c.o:
-@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
-@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.c.lo:
-@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
-@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
-
-libdbg_la-gmvread.lo: gmvread.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT libdbg_la-gmvread.lo -MD -MP -MF $(DEPDIR)/libdbg_la-gmvread.Tpo -c -o libdbg_la-gmvread.lo `test -f 'gmvread.c' || echo '$(srcdir)/'`gmvread.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdbg_la-gmvread.Tpo $(DEPDIR)/libdbg_la-gmvread.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gmvread.c' object='libdbg_la-gmvread.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o libdbg_la-gmvread.lo `test -f 'gmvread.c' || echo '$(srcdir)/'`gmvread.c
-
-libdevel_la-gmvread.lo: gmvread.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT libdevel_la-gmvread.lo -MD -MP -MF $(DEPDIR)/libdevel_la-gmvread.Tpo -c -o libdevel_la-gmvread.lo `test -f 'gmvread.c' || echo '$(srcdir)/'`gmvread.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdevel_la-gmvread.Tpo $(DEPDIR)/libdevel_la-gmvread.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gmvread.c' object='libdevel_la-gmvread.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o libdevel_la-gmvread.lo `test -f 'gmvread.c' || echo '$(srcdir)/'`gmvread.c
-
-liboprof_la-gmvread.lo: gmvread.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT liboprof_la-gmvread.lo -MD -MP -MF $(DEPDIR)/liboprof_la-gmvread.Tpo -c -o liboprof_la-gmvread.lo `test -f 'gmvread.c' || echo '$(srcdir)/'`gmvread.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboprof_la-gmvread.Tpo $(DEPDIR)/liboprof_la-gmvread.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gmvread.c' object='liboprof_la-gmvread.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o liboprof_la-gmvread.lo `test -f 'gmvread.c' || echo '$(srcdir)/'`gmvread.c
-
-libopt_la-gmvread.lo: gmvread.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT libopt_la-gmvread.lo -MD -MP -MF $(DEPDIR)/libopt_la-gmvread.Tpo -c -o libopt_la-gmvread.lo `test -f 'gmvread.c' || echo '$(srcdir)/'`gmvread.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libopt_la-gmvread.Tpo $(DEPDIR)/libopt_la-gmvread.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gmvread.c' object='libopt_la-gmvread.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o libopt_la-gmvread.lo `test -f 'gmvread.c' || echo '$(srcdir)/'`gmvread.c
-
-libprof_la-gmvread.lo: gmvread.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT libprof_la-gmvread.lo -MD -MP -MF $(DEPDIR)/libprof_la-gmvread.Tpo -c -o libprof_la-gmvread.lo `test -f 'gmvread.c' || echo '$(srcdir)/'`gmvread.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libprof_la-gmvread.Tpo $(DEPDIR)/libprof_la-gmvread.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gmvread.c' object='libprof_la-gmvread.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o libprof_la-gmvread.lo `test -f 'gmvread.c' || echo '$(srcdir)/'`gmvread.c
-
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
+tags TAGS:
 
-ID: $(am__tagged_files)
-	$(am__define_uniq_tagged_files); mkid -fID $$unique
-tags: tags-am
-TAGS: tags
+ctags CTAGS:
 
-tags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
-	set x; \
-	here=`pwd`; \
-	$(am__define_uniq_tagged_files); \
-	shift; \
-	if test -z "$(ETAGS_ARGS)$$*$$unique"; then :; else \
-	  test -n "$$unique" || unique=$$empty_fix; \
-	  if test $$# -gt 0; then \
-	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
-	      "$$@" $$unique; \
-	  else \
-	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
-	      $$unique; \
-	  fi; \
-	fi
-ctags: ctags-am
+cscope cscopelist:
 
-CTAGS: ctags
-ctags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
-	$(am__define_uniq_tagged_files); \
-	test -z "$(CTAGS_ARGS)$$unique" \
-	  || $(CTAGS) $(CTAGSFLAGS) $(AM_CTAGSFLAGS) $(CTAGS_ARGS) \
-	     $$unique
-
-GTAGS:
-	here=`$(am__cd) $(top_builddir) && pwd` \
-	  && $(am__cd) $(top_srcdir) \
-	  && gtags -i $(GTAGS_ARGS) "$$here"
-cscopelist: cscopelist-am
-
-cscopelist-am: $(am__tagged_files)
-	list='$(am__tagged_files)'; \
-	case "$(srcdir)" in \
-	  [\\/]* | ?:[\\/]*) sdir="$(srcdir)" ;; \
-	  *) sdir=$(subdir)/$(srcdir) ;; \
-	esac; \
-	for i in $$list; do \
-	  if test -f "$$i"; then \
-	    echo "$(subdir)/$$i"; \
-	  else \
-	    echo "$$sdir/$$i"; \
-	  fi; \
-	done >> $(top_builddir)/cscope.files
-
-distclean-tags:
-	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 distdir: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) distdir-am
 
@@ -874,7 +571,7 @@ distdir-am: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES)
+all-am: Makefile all-local
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -908,18 +605,11 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
-	mostlyclean-am
+clean-am: clean-generic clean-libtool clean-local mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/libdbg_la-gmvread.Plo
-	-rm -f ./$(DEPDIR)/libdevel_la-gmvread.Plo
-	-rm -f ./$(DEPDIR)/liboprof_la-gmvread.Plo
-	-rm -f ./$(DEPDIR)/libopt_la-gmvread.Plo
-	-rm -f ./$(DEPDIR)/libprof_la-gmvread.Plo
 	-rm -f Makefile
-distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-tags
+distclean-am: clean-am distclean-generic
 
 dvi: dvi-am
 
@@ -962,18 +652,12 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/libdbg_la-gmvread.Plo
-	-rm -f ./$(DEPDIR)/libdevel_la-gmvread.Plo
-	-rm -f ./$(DEPDIR)/liboprof_la-gmvread.Plo
-	-rm -f ./$(DEPDIR)/libopt_la-gmvread.Plo
-	-rm -f ./$(DEPDIR)/libprof_la-gmvread.Plo
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool
+mostlyclean-am: mostlyclean-generic mostlyclean-libtool
 
 pdf: pdf-am
 
@@ -987,28 +671,41 @@ uninstall-am:
 
 .MAKE: install-am install-strip
 
-.PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-am clean \
-	clean-generic clean-libtool clean-noinstLTLIBRARIES \
-	cscopelist-am ctags ctags-am distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am
+.PHONY: all all-am all-local check check-am clean clean-generic \
+	clean-libtool clean-local cscopelist-am ctags-am distclean \
+	distclean-generic distclean-libtool distdir dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags-am uninstall \
+	uninstall-am
 
 .PRECIOUS: Makefile
 
+all-local:
+	cd build && $(MAKE) $(AM_MAKEFLAGS)
 
-# Local Variables:
-# mode: makefile
-# End:
+# This doesn't seem to be cleaning...
+clean-local:
+	cd build && $(MAKE) $(AM_MAKEFLAGS) clean
 
-# import as much commonality as possible
+#netgendir = $(libdir)
+#netgen_DATA = build/netgen/libnglib.so \
+#              build/netgen/libsrc/core/libngcore.so
+
+# Maybe useful later?
+#              build/netgen/libnggui.so \
+#              build/netgen/libsrc/core/pyngcore.cpython-310-x86_64-linux-gnu.so \
+#              build/netgen/ng/libngpy.so \
+#              build/netgen/ng/libngguipy.so
+
+#netgen_SOURCES = build/netgen/netgen_config.hpp \
+#                 build/netgen/netgen_version.hpp \
+#                 netgen/nglib/nglib.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
