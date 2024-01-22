@@ -138,6 +138,7 @@ AS_IF([test "x$enableoptional" = "xyes"],
         AS_ECHO(["  netcdf........................... : $enablenetcdf"])
         AS_IF([test "x$netcdfversion" != "xno"],
               [AS_ECHO(["     version....................... : $netcdfversion"])])
+        AS_ECHO(["  netgen........................... : $enablenetgen"])
         AS_ECHO(["  nlopt............................ : $enablenlopt"])
         AS_ECHO(["  parmetis......................... : $enableparmetis"])
         AS_ECHO(["  petsc............................ : $enablepetsc"])
