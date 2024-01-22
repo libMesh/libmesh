@@ -2548,6 +2548,12 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
               Number value = qp_values[qp];
               Real abs_value = std::abs(value);
 
+              // If we are using component scaling in enrichment, then we
+              // also need to scale abs_value here so that we take the
+              // scaling into account when we determine largest_abs_value.
+              if (get_rb_eim_evaluation().scale_components_in_enrichment())
+                abs_value *= _component_scaling_in_training_set[comp];
+
               bool update_optimal_point = false;
               if (!eim_point_data)
                 update_optimal_point = (abs_value > largest_abs_value);
