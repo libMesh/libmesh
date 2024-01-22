@@ -498,7 +498,8 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
     unsigned int nv = n_scalar_vars + dim*n_vector_vars;
 
     // We'd better not have more than dim*his->n_vars() (all vector variables)
-    libmesh_assert_less_equal ( nv, dim*this->n_vars() );
+    // Treat the NodeElem-only mesh case as dim=1
+    libmesh_assert_less_equal ( nv, (dim > 0 ? dim : 1)*this->n_vars() );
 
     // 'nv' represents the max possible number of output variables, so allocate enough memory for
     // all variables in the system to be populated here. When this is called more than once on a
