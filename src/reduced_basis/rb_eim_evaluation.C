@@ -268,17 +268,16 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
         DenseVector<Number> EIM_rhs = evaluated_values_at_interp_points[counter];
         interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[counter]);
 
-        // If we're using the EIM error indicator, then we use the coefficient of the "last"
-        // EIM basis function as the error indicator. This is equivalent to the error
-        // indicator proposed in Proposition 3.3 of "An empirical interpolation method:
-        // application to efficient reduced-basis discretization of partial differential
-        // equations", Barrault et al.
+        // If we're using the EIM error indicator, then we compute it via the approach
+        // proposed in Proposition 3.3 of "An empirical interpolation method: application
+        // to efficient reduced-basis discretization of partial differential equations",
+        // Barrault et al.
         if (_is_eim_error_indicator_active)
           {
             Number error_indicator_rhs = evaluated_values_at_err_indicator_point[counter];
             _rb_eim_error_indicators[counter] =
               get_eim_error_indicator(
-                error_indicator_rhs, _rb_eim_solutions[counter], EIM_rhs);
+                error_indicator_rhs, _rb_eim_solutions[counter], EIM_rhs).first;
           }
 
         counter++;
@@ -2975,7 +2974,7 @@ void RBEIMEvaluation::set_eim_error_indicator_active(bool is_active)
     _is_eim_error_indicator_active = (is_active && use_eim_error_indicator());
 }
 
-Real RBEIMEvaluation::get_eim_error_indicator(
+std::pair<Real,Real> RBEIMEvaluation::get_eim_error_indicator(
   Number error_indicator_rhs,
   const DenseVector<Number> & eim_solution,
   const DenseVector<Number> & eim_rhs)
@@ -3005,7 +3004,10 @@ Real RBEIMEvaluation::get_eim_error_indicator(
   if (normalization == 0.)
     normalization = 1.;
 
-  return std::abs(error_indicator_val) / normalization;
+  // Return the relative error indicator, and the normalization that we used. By returning
+  // the normalization, we can subsequently recover the absolute error indicator if
+  // desired.
+  return std::make_pair(std::abs(error_indicator_val) / normalization, normalization);
 }
 
 const VectorizedEvalInput & RBEIMEvaluation::get_vec_eval_input() const

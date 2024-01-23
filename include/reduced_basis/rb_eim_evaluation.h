@@ -565,8 +565,12 @@ public:
    * Evaluates the EIM error indicator based on \p error_indicator_rhs, \p eim_solution,
    * and _error_indicator_interpolation_row. We also pass in \p eim_rhs since this is
    * used to normalize the error indicator.
+   *
+   * We return a pair that specifies the relative error indicator, and the normalization
+   * that was used to compute the relative error indicator. We can then recover the
+   * absolute error indicator via rel. indicator x normalization.
    */
-  Real get_eim_error_indicator(
+  std::pair<Real,Real> get_eim_error_indicator(
     Number error_indicator_rhs,
     const DenseVector<Number> & eim_solution,
     const DenseVector<Number> & eim_rhs);
