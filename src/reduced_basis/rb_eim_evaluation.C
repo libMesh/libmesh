@@ -284,7 +284,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
             Number error_indicator_rhs = evaluated_values_at_err_indicator_point[counter];
             _rb_eim_error_indicators[counter] =
               get_eim_error_indicator(
-                error_indicator_rhs, _rb_eim_solutions[counter], EIM_rhs);
+                error_indicator_rhs, _rb_eim_solutions[counter]);
           }
 
         counter++;
@@ -2920,9 +2920,9 @@ void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
   (*sys.solution) = current_local_soln;
 }
 
-std::set<unsigned int> RBEIMEvaluation::get_eim_vars_to_project_and_write() const
+const std::set<unsigned int> & RBEIMEvaluation::get_eim_vars_to_project_and_write() const
 {
-  return std::set<unsigned int>();
+  return _eim_vars_to_project_and_write;
 }
 
 void RBEIMEvaluation::write_out_projected_basis_functions(System & sys,
@@ -2958,12 +2958,9 @@ void RBEIMEvaluation::write_out_projected_basis_functions(System & sys,
     }
 }
 
-bool RBEIMEvaluation::scale_components_in_enrichment() const
+const std::set<unsigned int> & RBEIMEvaluation::scale_components_in_enrichment() const
 {
-  // Return false by default, but we override this in subclasses
-  // where the parametrized function components differ widely in
-  // magnitude.
-  return false;
+  return _scale_components_in_enrichment;
 }
 
 bool RBEIMEvaluation::use_eim_error_indicator() const
@@ -2986,8 +2983,7 @@ void RBEIMEvaluation::set_eim_error_indicator_active(bool is_active)
 
 Real RBEIMEvaluation::get_eim_error_indicator(
   Number error_indicator_rhs,
-  const DenseVector<Number> & eim_solution,
-  const DenseVector<Number> & eim_rhs)
+  const DenseVector<Number> & eim_solution)
 {
   DenseVector<Number> coeffs;
   _error_indicator_interpolation_row.get_principal_subvector(eim_solution.size(), coeffs);
@@ -2995,12 +2991,25 @@ Real RBEIMEvaluation::get_eim_error_indicator(
   Real error_indicator_val =
     std::real(error_indicator_rhs - (coeffs.dot(eim_solution)));
 
-  // Normalize the error indicator based on the norm of the EIM RHS vector,
-  // but also check for the case that the EIM RHS vector is zero in order
-  // to handle that separately.
-  Real eim_coeff_norm = eim_rhs.linfty_norm();
+  // We normalize the EIM error indicator based on adding the abs. value
+  // of the two terms that we subtract in order to compute error_indicator_val.
+  // This approach is appealing since (by the triangle inequality) it will
+  // normalize the error indicator so that it is always be bounded above by 1,
+  // which makes the indicator easier to interpret by comparing it to 1.
+  // An alternative normalization would be to use abs(error_indicator_rhs),
+  // and we note that in cases where abs(error_indicator_val) <<
+  // abs(error_indicator_rhs), then the two error indicator normalization options
+  //  will differ by approximately a factor of 2. This means that these two
+  // options behave similarly for practical error indicator purposes in the
+  // limit that the error indicator is small (since a factor of 2 difference is small
+  // for error indicator purposes), and in the limit that the indicator is large
+  // we prefer choice we use here since (as discussed above) ensuring that the
+  // indicator is bounded by 1 is convenient.
+  Real normalization = std::abs(error_indicator_rhs) + std::abs(coeffs.dot(eim_solution));
 
-  Real normalization = (eim_coeff_norm > 0.) ? eim_coeff_norm : 1.;
+  // We avoid NaNs by setting normalization to 1 in the case that it is exactly 0.
+  if (normalization == 0.)
+    normalization = 1.;
 
   return std::abs(error_indicator_val) / normalization;
 }

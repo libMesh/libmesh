@@ -344,18 +344,21 @@ private:
    * quadrature points. The inner product includes the JxW contributions
    * stored in _local_quad_point_JxW, so that this is equivalent to
    * computing w^t M v, where M is the mass matrix.
+   *
+   * If \p apply_comp_scaling then we will incorporate the scaling from
+   * _component_scaling_in_training_set in the inner product.
    */
-  Number inner_product(const QpDataMap & v, const QpDataMap & w);
+  Number inner_product(const QpDataMap & v, const QpDataMap & w, bool apply_comp_scaling);
 
   /**
    * Same as inner_product() except for side data.
    */
-  Number side_inner_product(const SideQpDataMap & v, const SideQpDataMap & w);
+  Number side_inner_product(const SideQpDataMap & v, const SideQpDataMap & w, bool apply_comp_scaling);
 
   /**
    * Same as inner_product() except for node data.
    */
-  Number node_inner_product(const NodeDataMap & v, const NodeDataMap & w);
+  Number node_inner_product(const NodeDataMap & v, const NodeDataMap & w, bool apply_comp_scaling);
 
   /**
    * Get the maximum absolute value from a vector stored in the format that we use
@@ -372,11 +375,8 @@ private:
 
         for (const auto & comp : index_range(v_comp_and_qp))
           {
-            // If scale_components_in_enrichment() returns true then we
-            // apply a scaling to give an approximately uniform scaling
-            // for all components.
             Real comp_scaling = 1.;
-            if (get_rb_eim_evaluation().scale_components_in_enrichment())
+            if (get_rb_eim_evaluation().scale_components_in_enrichment().count(comp))
               {
                 // Make sure that _component_scaling_in_training_set is initialized
                 libmesh_error_msg_if(comp >= _component_scaling_in_training_set.size(),
@@ -578,15 +578,6 @@ private:
    *  1 --> shellface
    */
   std::map<std::pair<dof_id_type,unsigned int>, unsigned int > _local_side_quad_point_side_types;
-
-  /**
-   * We also optionally store the values at the "observation points" for all parametrized functions
-   * in the training set. These values are used to obtain the observation values that are stored in
-   * RBEIMEvaluation.
-   *
-   * Indexing is: training_index --> observation point index --> component --> value.
-   */
-  std::vector<std::vector<std::vector<Number>>> _parametrized_functions_for_training_obs_values;
 
 };
 
