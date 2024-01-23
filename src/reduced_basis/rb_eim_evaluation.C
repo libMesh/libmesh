@@ -273,18 +273,12 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
         // indicator proposed in Proposition 3.3 of "An empirical interpolation method:
         // application to efficient reduced-basis discretization of partial differential
         // equations", Barrault et al.
-        //
-        // The one difference here compared to Barrault et al. is that we use a relative
-        // error indicator based on normalizing relative to the max norm of the RHS vector.
-        // In Barrault et al. they use an absolute error indicator, but we prefer not to
-        // follow that here since it can be harder to set a target tolerance when using
-        // an absolute error indicator.
         if (_is_eim_error_indicator_active)
           {
             Number error_indicator_rhs = evaluated_values_at_err_indicator_point[counter];
             _rb_eim_error_indicators[counter] =
               get_eim_error_indicator(
-                error_indicator_rhs, _rb_eim_solutions[counter]);
+                error_indicator_rhs, _rb_eim_solutions[counter], EIM_rhs);
           }
 
         counter++;
@@ -2983,7 +2977,8 @@ void RBEIMEvaluation::set_eim_error_indicator_active(bool is_active)
 
 Real RBEIMEvaluation::get_eim_error_indicator(
   Number error_indicator_rhs,
-  const DenseVector<Number> & eim_solution)
+  const DenseVector<Number> & eim_solution,
+  const DenseVector<Number> & eim_rhs)
 {
   DenseVector<Number> coeffs;
   _error_indicator_interpolation_row.get_principal_subvector(eim_solution.size(), coeffs);
@@ -2991,21 +2986,20 @@ Real RBEIMEvaluation::get_eim_error_indicator(
   Real error_indicator_val =
     std::real(error_indicator_rhs - (coeffs.dot(eim_solution)));
 
-  // We normalize the EIM error indicator based on adding the abs. value
-  // of the two terms that we subtract in order to compute error_indicator_val.
-  // This approach is appealing since (by the triangle inequality) it will
-  // normalize the error indicator so that it is always be bounded above by 1,
-  // which makes the indicator easier to interpret by comparing it to 1.
-  // An alternative normalization would be to use abs(error_indicator_rhs),
-  // and we note that in cases where abs(error_indicator_val) <<
-  // abs(error_indicator_rhs), then the two error indicator normalization options
-  //  will differ by approximately a factor of 2. This means that these two
-  // options behave similarly for practical error indicator purposes in the
-  // limit that the error indicator is small (since a factor of 2 difference is small
-  // for error indicator purposes), and in the limit that the indicator is large
-  // we prefer choice we use here since (as discussed above) ensuring that the
-  // indicator is bounded by 1 is convenient.
-  Real normalization = std::abs(error_indicator_rhs) + std::abs(coeffs.dot(eim_solution));
+  // Normalize the error indicator based on the norm of the EIM RHS vector.
+  // Other normalizations are possible (e.g. see the commented-out option
+  // below), but we prefer the RHS norm approach since it helps to handle
+  // the case where different EIM variables have different magnitudes in
+  // a more sensible manner, i.e. if error_indicator_val is based on a
+  // "small magnitude" variable, then by normalizing based on the entire
+  // RHS vector (which will typically include values from multiple different
+  // EIM variables) we will effectively scale down the error indicator
+  // corresponding to small variables, which is typically what we want.
+  Real normalization = std::max(eim_rhs.linfty_norm(), std::abs(error_indicator_rhs));
+
+  // Commented-out alternative normalization
+  // Real normalization =
+  //   std::abs(error_indicator_rhs) + std::abs(coeffs.dot(eim_solution));
 
   // We avoid NaNs by setting normalization to 1 in the case that it is exactly 0.
   if (normalization == 0.)

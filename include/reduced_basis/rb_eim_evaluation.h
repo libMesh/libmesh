@@ -563,11 +563,13 @@ public:
 
   /**
    * Evaluates the EIM error indicator based on \p error_indicator_rhs, \p eim_solution,
-   * and _error_indicator_interpolation_row.
+   * and _error_indicator_interpolation_row. We also pass in \p eim_rhs since this is
+   * used to normalize the error indicator.
    */
   Real get_eim_error_indicator(
     Number error_indicator_rhs,
-    const DenseVector<Number> & eim_solution);
+    const DenseVector<Number> & eim_solution,
+    const DenseVector<Number> & eim_rhs);
 
   /**
    * Get the VectorizedEvalInput data.
