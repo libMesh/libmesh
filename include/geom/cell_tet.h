@@ -220,7 +220,7 @@ protected:
   /**
    * Master element node locations
    */
-  static const Real _master_points[10][3];
+  static const Real _master_points[14][3];
 
   /**
    * Called by descendant classes with appropriate data to determine
