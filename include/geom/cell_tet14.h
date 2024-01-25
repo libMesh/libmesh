@@ -245,8 +245,7 @@ public:
   virtual
   const std::vector<std::pair<unsigned char, unsigned char>> &
   parent_bracketing_nodes(unsigned int c,
-                          unsigned int n) const override
-  { return _parent_bracketing_nodes[c][n]; }
+                          unsigned int n) const override;
 #endif
 
 protected:
@@ -275,10 +274,11 @@ protected:
 
   /**
    * Pairs of nodes that bracket child nodes when doing mesh
-   * refinement.
+   * refinement, for each of the three possible diagonal selection
+   * options.
    */
   static const std::vector<std::pair<unsigned char, unsigned char>>
-    _parent_bracketing_nodes[num_children][num_nodes];
+    _parent_bracketing_nodes[3][num_children][num_nodes];
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;
 
