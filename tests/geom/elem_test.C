@@ -440,7 +440,7 @@ public:
       }
   }
 
-  void test_refinement()
+  void test_n_refinements(unsigned int n)
   {
 #ifdef LIBMESH_ENABLE_AMR
     // We don't support refinement of all element types
@@ -452,19 +452,17 @@ public:
         elem_type == PYRAMID18)
       return;
 
-    LOG_UNIT_TEST;
-
     auto refining_mesh = this->_mesh->clone();
 
     MeshRefinement mr(*refining_mesh);
-    mr.uniformly_refine(1);
+    mr.uniformly_refine(n);
 
     std::set<std::pair<dof_id_type, unsigned int>> parent_node_was_touched;
     std::set<std::pair<dof_id_type, unsigned int>> parent_child_was_touched;
 
     for (const Elem * elem : refining_mesh->active_element_ptr_range())
       {
-        CPPUNIT_ASSERT_EQUAL(elem->level(), 1u);
+        CPPUNIT_ASSERT_EQUAL(elem->level(), n);
         CPPUNIT_ASSERT(!elem->ancestor());
         CPPUNIT_ASSERT(elem->active());
         CPPUNIT_ASSERT(!elem->subactive());
@@ -480,8 +478,17 @@ public:
         CPPUNIT_ASSERT(parent->has_children());
         CPPUNIT_ASSERT(!parent->has_ancestor_children());
         CPPUNIT_ASSERT(!parent->interior_parent());
-        CPPUNIT_ASSERT_EQUAL(parent, elem->top_parent());
-        CPPUNIT_ASSERT_EQUAL(parent, parent->top_parent());
+        if (n == 1)
+          {
+            CPPUNIT_ASSERT_EQUAL(parent, elem->top_parent());
+            CPPUNIT_ASSERT_EQUAL(parent, parent->top_parent());
+          }
+        else
+          {
+            CPPUNIT_ASSERT(parent != elem->top_parent());
+            CPPUNIT_ASSERT(parent != parent->top_parent());
+            CPPUNIT_ASSERT_EQUAL(elem->top_parent(), parent->top_parent());
+          }
 
         CPPUNIT_ASSERT(parent->is_ancestor_of(elem));
         const unsigned int c = parent->which_child_am_i(elem);
@@ -540,6 +547,9 @@ public:
                     CPPUNIT_ASSERT(parent_edge->contains_point(node));
               }
           }
+
+        if (parent->has_affine_map())
+          CPPUNIT_ASSERT(elem->has_affine_map());
       }
 
     // It's possible for a parent element on a distributed mesh to not
@@ -553,57 +563,78 @@ public:
           continue;
 
         // With only one layer of refinement the family tree methods
-        // should have the right number of elements, even if some are
+        // should have the full number of elements, even if some are
         // remote.
-        std::vector<const Elem *> family;
-        elem->family_tree(family);
-        CPPUNIT_ASSERT_EQUAL(family.size(),
-                             std::size_t(elem->n_children() + 1));
-
-        family.clear();
-        elem->total_family_tree(family);
-        CPPUNIT_ASSERT_EQUAL(family.size(),
-                             std::size_t(elem->n_children() + 1));
-
-        family.clear();
-        elem->active_family_tree(family);
-        CPPUNIT_ASSERT_EQUAL(family.size(),
-                             std::size_t(elem->n_children()));
-
-        for (auto s : make_range(elem->n_sides()))
+        if (n == 1)
           {
-            family.clear();
-            elem->active_family_tree_by_side(family,s);
-            if (!elem->build_side_ptr(s)->infinite())
-              CPPUNIT_ASSERT_EQUAL(double(family.size()),
-                                   std::pow(2.0, int(elem->dim()-1)));
-            else
-              CPPUNIT_ASSERT_EQUAL(double(family.size()),
-                                   std::pow(2.0, int(elem->dim()-2)));
-            for (const Elem * child : family)
-              {
-                if (child->is_remote())
-                  continue;
+            std::vector<const Elem *> family;
+            elem->family_tree(family);
+            CPPUNIT_ASSERT_EQUAL(family.size(),
+                                 std::size_t(elem->n_children() + 1));
 
-                unsigned int c = elem->which_child_am_i(child);
-                CPPUNIT_ASSERT(elem->is_child_on_side(c, s));
+            family.clear();
+            elem->total_family_tree(family);
+            CPPUNIT_ASSERT_EQUAL(family.size(),
+                                 std::size_t(elem->n_children() + 1));
+
+            family.clear();
+            elem->active_family_tree(family);
+            CPPUNIT_ASSERT_EQUAL(family.size(),
+                                 std::size_t(elem->n_children()));
+
+            for (auto s : make_range(elem->n_sides()))
+              {
+                family.clear();
+                elem->active_family_tree_by_side(family,s);
+                if (!elem->build_side_ptr(s)->infinite())
+                  CPPUNIT_ASSERT_EQUAL(double(family.size()),
+                                       std::pow(2.0, int(elem->dim()-1)));
+                else
+                  CPPUNIT_ASSERT_EQUAL(double(family.size()),
+                                       std::pow(2.0, int(elem->dim()-2)));
+                for (const Elem * child : family)
+                  {
+                    if (child->is_remote())
+                      continue;
+
+                    unsigned int c = elem->which_child_am_i(child);
+                    CPPUNIT_ASSERT(elem->is_child_on_side(c, s));
+                  }
               }
           }
 
-        for (auto c : make_range(elem->n_children()))
+        if (elem->level() + 1 == n)
           {
-            auto it = parent_child_was_touched.find(std::make_pair(elem->id(), c));
-            CPPUNIT_ASSERT(it != parent_child_was_touched.end());
-          }
+            for (auto c : make_range(elem->n_children()))
+              {
+                auto it = parent_child_was_touched.find(std::make_pair(elem->id(), c));
+                CPPUNIT_ASSERT(it != parent_child_was_touched.end());
+              }
 
-        for (auto n : make_range(elem->n_nodes()))
-          {
-            auto it = parent_node_was_touched.find(std::make_pair(elem->id(), n));
-            CPPUNIT_ASSERT(it != parent_node_was_touched.end());
+            for (auto n : make_range(elem->n_nodes()))
+              {
+                auto it = parent_node_was_touched.find(std::make_pair(elem->id(), n));
+                CPPUNIT_ASSERT(it != parent_node_was_touched.end());
+              }
           }
       }
 #endif
   }
+
+  void test_refinement()
+  {
+    LOG_UNIT_TEST;
+
+    test_n_refinements(1);
+  }
+
+  void test_double_refinement()
+  {
+    LOG_UNIT_TEST;
+
+    test_n_refinements(2);
+  }
+
 };
 
 #define ELEMTEST                                \
@@ -619,7 +650,8 @@ public:
   CPPUNIT_TEST( test_center_node_on_side );     \
   CPPUNIT_TEST( test_side_type );               \
   CPPUNIT_TEST( test_elem_side_builder );       \
-  CPPUNIT_TEST( test_refinement);
+  CPPUNIT_TEST( test_refinement);               \
+  CPPUNIT_TEST( test_double_refinement);
 
 #define INSTANTIATE_ELEMTEST(elemtype)                          \
   class ElemTest_##elemtype : public ElemTest<elemtype> {       \
