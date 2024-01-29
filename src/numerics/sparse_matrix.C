@@ -33,6 +33,7 @@
 
 // C++ includes
 #include <memory>
+#include <fstream>
 
 
 namespace libMesh
@@ -220,6 +221,14 @@ void SparseMatrix<T>::zero_rows (std::vector<numeric_index_type> &, T)
 }
 
 
+template <typename T>
+std::size_t SparseMatrix<T>::n_nonzeros() const
+{
+  if (!_sp)
+    return 0;
+  return _sp->n_nonzeros();
+}
+
 
 template <typename T>
 void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
@@ -343,6 +352,132 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
       this->comm().send(0,cbuf);
     }
 }
+
+
+template <typename T>
+void SparseMatrix<T>::print_matlab(const std::string & name) const
+{
+  parallel_object_only();
+
+  libmesh_assert (this->initialized());
+
+  libmesh_error_msg_if(!this->_dof_map, "Error!  Trying to print a matrix with no dof_map set!");
+
+
+  // We'll print the matrix from processor 0 to make sure
+  // it's serialized properly
+  if (this->processor_id() == 0)
+    {
+      std::unique_ptr<std::ofstream> file;
+
+      if (name != "")
+        file = std::make_unique<std::ofstream>(name.c_str());
+
+      std::ostream & os = (name == "") ? libMesh::out : *file;
+
+      std::size_t sparsity_nonzeros = this->n_nonzeros();
+
+      std::size_t real_nonzeros = 0;
+
+      for (numeric_index_type i=this->_dof_map->first_dof();
+           i!=this->_dof_map->end_dof(); ++i)
+        {
+          for (auto j : make_range(this->n()))
+            {
+              T c = (*this)(i,j);
+              if (c != static_cast<T>(0.0))
+                ++real_nonzeros;
+            }
+        }
+
+
+      for (auto p : IntRange<processor_id_type>(1, this->n_processors()))
+        {
+          std::size_t nonzeros_on_p = 0;
+          this->comm().receive(p, nonzeros_on_p);
+          real_nonzeros += nonzeros_on_p;
+        }
+
+      if (sparsity_nonzeros &&
+          sparsity_nonzeros != real_nonzeros)
+        libmesh_warning(sparsity_nonzeros <<
+                        " nonzeros allocated, but " <<
+                        real_nonzeros << " used.");
+
+      // We probably want to be more consistent than that, if our
+      // sparsity is overallocated.
+
+      // Print a header similar to PETSc's mat_view ascii_matlab
+      os << "%Mat Object: () " << this->n_processors() << " MPI processes\n"
+         << "%  type: " << (this->n_processors() > 1 ? "mpi" : "seq") << "aij\n"
+         << "% Size = " << this->m() << ' ' << this->n() << '\n'
+         << "% Nonzeros = " << real_nonzeros << '\n'
+         << "zzz = zeros(" << real_nonzeros << ",3);\n"
+         << "zzz = [\n";
+
+      libmesh_assert_equal_to (this->_dof_map->first_dof(), 0);
+      for (numeric_index_type i=this->_dof_map->first_dof();
+           i!=this->_dof_map->end_dof(); ++i)
+        {
+          // FIXME - we need a base class way to iterate over a
+          // SparseMatrix row.
+          for (auto j : make_range(this->n()))
+            {
+              T c = (*this)(i,j);
+              if (c != static_cast<T>(0.0))
+                {
+                  // Convert from 0-based to 1-based indexing
+                  os << (i+1) << ' ' << (j+1) << "  " << c << '\n';
+                }
+            }
+        }
+
+      std::vector<numeric_index_type> ibuf, jbuf;
+      std::vector<T> cbuf;
+      for (auto p : IntRange<processor_id_type>(1, this->n_processors()))
+        {
+          this->comm().receive(p, ibuf);
+          this->comm().receive(p, jbuf);
+          this->comm().receive(p, cbuf);
+          libmesh_assert_equal_to (ibuf.size(), jbuf.size());
+          libmesh_assert_equal_to (ibuf.size(), cbuf.size());
+
+          for (auto n : index_range(ibuf))
+            os << ibuf[n] << ' ' << jbuf[n] << "  " << cbuf[n] << '\n';
+        }
+
+      os << "];\n" << "Mat_sparse = spconvert(zzz);" << std::endl;
+    }
+  else
+    {
+      std::vector<numeric_index_type> ibuf, jbuf;
+      std::vector<T> cbuf;
+      std::size_t my_nonzeros = 0;
+
+      // We'll assume each processor has access to entire
+      // matrix rows, so (*this)(i,j) is valid if i is a local index.
+      for (numeric_index_type i=this->_dof_map->first_dof();
+           i!=this->_dof_map->end_dof(); ++i)
+        {
+          for (auto j : make_range(this->n()))
+            {
+              T c = (*this)(i,j);
+              if (c != static_cast<T>(0.0))
+                {
+                  ibuf.push_back(i);
+                  jbuf.push_back(j);
+                  cbuf.push_back(c);
+                  ++my_nonzeros;
+                }
+            }
+        }
+      this->comm().send(0,my_nonzeros);
+      this->comm().send(0,ibuf);
+      this->comm().send(0,jbuf);
+      this->comm().send(0,cbuf);
+    }
+}
+
 
 
 

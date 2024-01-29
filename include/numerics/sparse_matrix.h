@@ -350,6 +350,12 @@ public:
   virtual bool closed() const = 0;
 
   /**
+   * \returns the global number of non-zero entries in the matrix
+   * sparsity pattern
+   */
+  virtual std::size_t n_nonzeros() const;
+
+  /**
    * Print the contents of the matrix to the screen in a uniform
    * style, regardless of matrix/solver package being used.
    */
@@ -395,10 +401,7 @@ public:
    * format. Optionally prints the matrix to the file named \p name.
    * If \p name is not specified it is dumped to the screen.
    */
-  virtual void print_matlab(const std::string & /*name*/ = "") const
-  {
-    libmesh_not_implemented();
-  }
+  virtual void print_matlab(const std::string & /*name*/ = "") const;
 
   /**
    * This function creates a matrix called "submatrix" which is defined
