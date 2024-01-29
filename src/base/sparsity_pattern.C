@@ -605,5 +605,14 @@ void Build::apply_extra_sparsity_object(SparsityPattern::AugmentSparsityPattern 
 }
 
 
+std::size_t Build::n_nonzeros() const
+{
+  std::size_t total_nonzeros = std::reduce(n_nz.begin(), n_nz.end(), std::size_t(0));
+  total_nonzeros += std::reduce(n_oz.begin(), n_oz.end(), std::size_t(0));
+  this->comm().sum(total_nonzeros);
+  return total_nonzeros;
+}
+
+
 } // namespace SparsityPattern
 } // namespace libMesh
