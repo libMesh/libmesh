@@ -237,15 +237,15 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
 
   libmesh_assert (this->initialized());
 
-  libmesh_error_msg_if(!this->_dof_map, "Error!  Trying to print a matrix with no dof_map set!");
+  const numeric_index_type first_dof = this->row_start(),
+                           end_dof   = this->row_stop();
 
   // We'll print the matrix from processor 0 to make sure
   // it's serialized properly
   if (this->processor_id() == 0)
     {
-      libmesh_assert_equal_to (this->_dof_map->first_dof(), 0);
-      for (numeric_index_type i=this->_dof_map->first_dof();
-           i!=this->_dof_map->end_dof(); ++i)
+      libmesh_assert_equal_to (first_dof, 0);
+      for (numeric_index_type i : make_range(end_dof))
         {
           if (sparse)
             {
@@ -268,7 +268,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
 
       std::vector<numeric_index_type> ibuf, jbuf;
       std::vector<T> cbuf;
-      numeric_index_type currenti = this->_dof_map->end_dof();
+      numeric_index_type currenti = end_dof;
       for (auto p : IntRange<processor_id_type>(1, this->n_processors()))
         {
           this->comm().receive(p, ibuf);
@@ -333,8 +333,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
 
       // We'll assume each processor has access to entire
       // matrix rows, so (*this)(i,j) is valid if i is a local index.
-      for (numeric_index_type i=this->_dof_map->first_dof();
-           i!=this->_dof_map->end_dof(); ++i)
+      for (numeric_index_type i : make_range(first_dof, end_dof))
         {
           for (auto j : make_range(this->n()))
             {
@@ -361,8 +360,8 @@ void SparseMatrix<T>::print_matlab(const std::string & name) const
 
   libmesh_assert (this->initialized());
 
-  libmesh_error_msg_if(!this->_dof_map, "Error!  Trying to print a matrix with no dof_map set!");
-
+  const numeric_index_type first_dof = this->row_start(),
+                           end_dof   = this->row_stop();
 
   // We'll print the matrix from processor 0 to make sure
   // it's serialized properly
@@ -379,8 +378,8 @@ void SparseMatrix<T>::print_matlab(const std::string & name) const
 
       std::size_t real_nonzeros = 0;
 
-      for (numeric_index_type i=this->_dof_map->first_dof();
-           i!=this->_dof_map->end_dof(); ++i)
+      libmesh_assert_equal_to(first_dof, 0);
+      for (numeric_index_type i : make_range(end_dof))
         {
           for (auto j : make_range(this->n()))
             {
@@ -415,9 +414,7 @@ void SparseMatrix<T>::print_matlab(const std::string & name) const
          << "zzz = zeros(" << real_nonzeros << ",3);\n"
          << "zzz = [\n";
 
-      libmesh_assert_equal_to (this->_dof_map->first_dof(), 0);
-      for (numeric_index_type i=this->_dof_map->first_dof();
-           i!=this->_dof_map->end_dof(); ++i)
+      for (numeric_index_type i : make_range(end_dof))
         {
           // FIXME - we need a base class way to iterate over a
           // SparseMatrix row.
@@ -456,8 +453,7 @@ void SparseMatrix<T>::print_matlab(const std::string & name) const
 
       // We'll assume each processor has access to entire
       // matrix rows, so (*this)(i,j) is valid if i is a local index.
-      for (numeric_index_type i=this->_dof_map->first_dof();
-           i!=this->_dof_map->end_dof(); ++i)
+      for (numeric_index_type i : make_range(first_dof, end_dof))
         {
           for (auto j : make_range(this->n()))
             {
