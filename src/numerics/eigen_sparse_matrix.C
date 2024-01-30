@@ -255,6 +255,22 @@ numeric_index_type EigenSparseMatrix<T>::row_stop () const
 
 
 template <typename T>
+numeric_index_type EigenSparseMatrix<T>::col_start () const
+{
+  return 0;
+}
+
+
+
+template <typename T>
+numeric_index_type EigenSparseMatrix<T>::col_stop () const
+{
+  return this->n();
+}
+
+
+
+template <typename T>
 void EigenSparseMatrix<T>::set (const numeric_index_type i,
                                 const numeric_index_type j,
                                 const T value)

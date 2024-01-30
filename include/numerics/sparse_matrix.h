@@ -225,6 +225,11 @@ public:
   virtual numeric_index_type local_m () const { return row_stop() - row_start(); }
 
   /**
+   * Get the number of columns owned by this process
+   */
+  virtual numeric_index_type local_n () const { return col_stop() - col_start(); }
+
+  /**
    * \returns The column-dimension of the matrix.
    */
   virtual numeric_index_type n () const = 0;
@@ -240,6 +245,18 @@ public:
    * processor.
    */
   virtual numeric_index_type row_stop () const = 0;
+
+  /**
+   * \returns The index of the first matrix column owned by this
+   * processor.
+   */
+  virtual numeric_index_type col_start () const = 0;
+
+  /**
+   * \returns The index of the last matrix column (+1) owned by this
+   * processor.
+   */
+  virtual numeric_index_type col_stop () const = 0;
 
   /**
    * Set the element \p (i,j) to \p value.  Throws an error if the

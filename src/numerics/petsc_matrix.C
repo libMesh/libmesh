@@ -1073,6 +1073,8 @@ void PetscMatrix<T>::get_local_size (numeric_index_type & m,
   n = static_cast<numeric_index_type>(petsc_n);
 }
 
+
+
 template <typename T>
 numeric_index_type PetscMatrix<T>::row_start () const
 {
@@ -1098,6 +1100,38 @@ numeric_index_type PetscMatrix<T>::row_stop () const
   PetscErrorCode ierr=0;
 
   ierr = MatGetOwnershipRange(_mat, &start, &stop);
+  LIBMESH_CHKERR(ierr);
+
+  return static_cast<numeric_index_type>(stop);
+}
+
+
+
+template <typename T>
+numeric_index_type PetscMatrix<T>::col_start () const
+{
+  libmesh_assert (this->initialized());
+
+  PetscInt start=0, stop=0;
+  PetscErrorCode ierr=0;
+
+  ierr = MatGetOwnershipRangeColumn(_mat, &start, &stop);
+  LIBMESH_CHKERR(ierr);
+
+  return static_cast<numeric_index_type>(start);
+}
+
+
+
+template <typename T>
+numeric_index_type PetscMatrix<T>::col_stop () const
+{
+  libmesh_assert (this->initialized());
+
+  PetscInt start=0, stop=0;
+  PetscErrorCode ierr=0;
+
+  ierr = MatGetOwnershipRangeColumn(_mat, &start, &stop);
   LIBMESH_CHKERR(ierr);
 
   return static_cast<numeric_index_type>(stop);

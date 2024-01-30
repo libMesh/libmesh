@@ -413,6 +413,28 @@ numeric_index_type EpetraMatrix<T>::row_stop () const
 
 
 template <typename T>
+numeric_index_type EpetraMatrix<T>::col_start () const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(_map);
+
+  return static_cast<numeric_index_type>(_map->MinMyGID());
+}
+
+
+
+template <typename T>
+numeric_index_type EpetraMatrix<T>::col_stop () const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(_map);
+
+  return static_cast<numeric_index_type>(_map->MaxMyGID())+1;
+}
+
+
+
+template <typename T>
 void EpetraMatrix<T>::set (const numeric_index_type i,
                            const numeric_index_type j,
                            const T value)

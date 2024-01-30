@@ -365,6 +365,22 @@ numeric_index_type LaspackMatrix<T>::row_stop () const
 
 
 template <typename T>
+numeric_index_type LaspackMatrix<T>::col_start () const
+{
+  return 0;
+}
+
+
+
+template <typename T>
+numeric_index_type LaspackMatrix<T>::col_stop () const
+{
+  return this->n();
+}
+
+
+
+template <typename T>
 void LaspackMatrix<T>::set (const numeric_index_type i,
                             const numeric_index_type j,
                             const T value)

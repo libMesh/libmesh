@@ -178,6 +178,20 @@ DiagonalMatrix<T>::row_stop() const
 }
 
 template <typename T>
+numeric_index_type
+DiagonalMatrix<T>::col_start() const
+{
+  return _diagonal->first_local_index();
+}
+
+template <typename T>
+numeric_index_type
+DiagonalMatrix<T>::col_stop() const
+{
+  return _diagonal->last_local_index();
+}
+
+template <typename T>
 void
 DiagonalMatrix<T>::set(const numeric_index_type i, const numeric_index_type j, const T value)
 {

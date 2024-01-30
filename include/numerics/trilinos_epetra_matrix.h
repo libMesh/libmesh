@@ -141,6 +141,10 @@ public:
 
   virtual numeric_index_type row_stop () const override;
 
+  virtual numeric_index_type col_start () const override;
+
+  virtual numeric_index_type col_stop () const override;
+
   virtual void set (const numeric_index_type i,
                     const numeric_index_type j,
                     const T value) override;
