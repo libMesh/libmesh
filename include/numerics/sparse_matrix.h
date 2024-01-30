@@ -421,6 +421,19 @@ public:
   virtual void print_matlab(const std::string & /*name*/ = "") const;
 
   /**
+   * Read the contents of the matrix from Matlab's sparse matrix
+   * format.
+   *
+   * If the size and sparsity of the matrix in \p filename appears
+   * consistent with the existing sparsity of \p this then the
+   * existing parallel decomposition and sparsity will be retained.
+   * If not, then \p this will be initialized with the sparsity from
+   * the file, linearly partitioned onto the number of processors
+   * available.
+   */
+  virtual void read_matlab(const std::string & filename);
+
+  /**
    * This function creates a matrix called "submatrix" which is defined
    * by the row and column indices given in the "rows" and "cols" entries.
    * Currently this operation is only defined for the PetscMatrix type.
