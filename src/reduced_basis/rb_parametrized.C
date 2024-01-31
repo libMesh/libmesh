@@ -132,7 +132,7 @@ std::set<std::string> RBParametrized::get_parameter_names() const
 
 void RBParametrized::set_parameters(const RBParameters & params)
 {
-  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::set_current_parameters");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::set_parameters");
 
   valid_params(params); // Terminates if params has the wrong number of parameters
 
@@ -142,7 +142,7 @@ void RBParametrized::set_parameters(const RBParameters & params)
 
 const RBParameters & RBParametrized::get_parameters() const
 {
-  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_current_parameters");
+  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_parameters");
 
   return parameters;
 }
@@ -376,7 +376,11 @@ void RBParametrized::print_discrete_parameter_values() const
 
 bool RBParametrized::valid_params(const RBParameters & params)
 {
-  libmesh_error_msg_if(params.n_parameters() != get_n_params(), "Error: Number of parameters don't match");
+  libmesh_error_msg_if(params.n_parameters() != get_n_params(),
+                       "Error: Number of parameters don't match; found "
+                       << params.n_parameters() << ", expected "
+                       << get_n_params());
+
 
   bool valid = true;
   for (const auto & pr : params)

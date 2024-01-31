@@ -99,7 +99,8 @@ void RBConstructionBase<Base>::get_global_max_error_pair(const Parallel::Communi
 template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_n_training_samples() const
 {
-  libmesh_assert(_training_parameters_initialized);
+  libmesh_error_msg_if(!_training_parameters_initialized,
+                       "Error: training parameters must first be initialized.");
 
   // First we check if there are no parameters here, and in that case we
   // return 1 since a single training sample is sufficient to generate an
@@ -120,7 +121,8 @@ numeric_index_type RBConstructionBase<Base>::get_n_training_samples() const
 template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_local_n_training_samples() const
 {
-  libmesh_assert(_training_parameters_initialized);
+  libmesh_error_msg_if(!_training_parameters_initialized,
+                       "Error: training parameters must first be initialized.");
 
   // First we check if there are no parameters here, and in that case we
   // return 1 for both serial and parallel training sets. This is consistent
@@ -135,7 +137,8 @@ numeric_index_type RBConstructionBase<Base>::get_local_n_training_samples() cons
 template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_first_local_training_index() const
 {
-  libmesh_assert(_training_parameters_initialized);
+  libmesh_error_msg_if(!_training_parameters_initialized,
+                       "Error: training parameters must first be initialized.");
 
   // First we check if there are no parameters here, and in that case we
   // return 0 for a serial training set and comm().rank() for a parallel
@@ -156,7 +159,8 @@ numeric_index_type RBConstructionBase<Base>::get_first_local_training_index() co
 template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_last_local_training_index() const
 {
-  libmesh_assert(_training_parameters_initialized);
+  libmesh_error_msg_if(!_training_parameters_initialized,
+                       "Error: training parameters must first be initialized.");
 
   if (_training_parameters.empty())
     return 0;
@@ -173,7 +177,8 @@ void RBConstructionBase<Base>::set_params_from_training_set(unsigned int index)
 template <class Base>
 RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int index)
 {
-  libmesh_assert(_training_parameters_initialized);
+  libmesh_error_msg_if(!_training_parameters_initialized,
+                       "Error: training parameters must first be initialized.");
 
   libmesh_assert( (this->get_first_local_training_index() <= index) &&
                   (index < this->get_last_local_training_index()) );
@@ -196,7 +201,8 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
 template <class Base>
 void RBConstructionBase<Base>::set_params_from_training_set_and_broadcast(unsigned int index)
 {
-  libmesh_assert(_training_parameters_initialized);
+  libmesh_error_msg_if(!_training_parameters_initialized,
+                       "Error: training parameters must first be initialized.");
 
   processor_id_type root_id = 0;
   if ((this->get_first_local_training_index() <= index) &&
@@ -419,8 +425,9 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
                                                                    int training_parameters_random_seed,
                                                                    bool serial_training_set)
 {
-  libmesh_assert_equal_to ( min_parameters.n_parameters(), max_parameters.n_parameters() );
   const unsigned int num_params = min_parameters.n_parameters();
+  libmesh_error_msg_if(num_params!=max_parameters.n_parameters(),
+    "Number of parameters must be identical for min/max.");
 
   // Clear training_parameters_in
   training_parameters_in.clear();
@@ -537,11 +544,8 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
     return;
 
   if (num_params > 3)
-    {
-      libMesh::out << "ERROR: Deterministic training sample generation "
-                   << "not implemented for more than three parameters." << std::endl;
-      libmesh_not_implemented();
-    }
+    libmesh_not_implemented_msg("ERROR: Deterministic training sample generation "
+                                "not implemented for more than three parameters.");
 
   // Clear training_parameters_in (but don't remove existing keys!)
   for (auto & pr : training_parameters_in)
