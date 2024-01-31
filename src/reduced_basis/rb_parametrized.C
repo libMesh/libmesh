@@ -134,7 +134,7 @@ void RBParametrized::set_parameters(const RBParameters & params)
 {
   libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::set_parameters");
 
-  valid_params(params); // Terminates if params has the wrong number of parameters
+  check_if_valid_params(params); // Terminates if params has the wrong number of parameters
 
   // Make a copy of params (default assignment operator just does memberwise copy, which is sufficient here)
   this->parameters = params;
@@ -374,35 +374,46 @@ void RBParametrized::print_discrete_parameter_values() const
     }
 }
 
-bool RBParametrized::valid_params(const RBParameters & params)
+bool RBParametrized::check_if_valid_params(const RBParameters &params) const
 {
+  // Check if number of parameters is correct.
   libmesh_error_msg_if(params.n_parameters() != get_n_params(),
                        "Error: Number of parameters don't match; found "
                        << params.n_parameters() << ", expected "
                        << get_n_params());
 
-
-  bool valid = true;
-  for (const auto & pr : params)
+  bool is_valid = true;
+  for(const auto & [param_name, param_val] : params)
     {
-      const std::string & param_name = pr.first;
-      valid = valid && ( (get_parameter_min(param_name) <= params.get_value(param_name)) &&
-                         (params.get_value(param_name) <= get_parameter_max(param_name)) );
+      // Check every parameter value (including across samples) to ensure
+      // it's within the min/max range.
+      const bool outside_range =
+        ((param_val < get_parameter_min(param_name)) ||
+         (param_val > get_parameter_max(param_name)));
+      is_valid = is_valid && !outside_range;
+      if(outside_range && verbose_mode)
+        {
+          libMesh::out << "Warning: parameter " << param_name << " value="
+                       << param_val << " outside acceptable range: ("
+                       << get_parameter_min(param_name) << ", " << get_parameter_max(param_name)
+                       << ")";
+        }
 
+      // For discrete params, make sure params.get_value(param_name) is sufficiently
+      // close to one of the discrete parameter values.
       if (is_discrete_parameter(param_name))
         {
-          // make sure params.get_value(param_name) is sufficiently close
-          // to one of the discrete parameter values
-          valid = valid && is_value_in_list(params.get_value(param_name),
-                                            get_discrete_parameter_values().find(param_name)->second,
-                                            TOLERANCE);
+          const bool is_value_discrete =
+            is_value_in_list(params.get_value(param_name),
+                             get_discrete_parameter_values().find(param_name)->second,
+                             TOLERANCE);
+          is_valid = is_valid && is_value_discrete;
+          if(!is_value_discrete && verbose_mode)
+            libMesh::out << "Warning: parameter " << param_name << " value="
+                         << param_val << " is not in discrete value list.";
         }
     }
-
-  if (!valid && verbose_mode)
-    libMesh::out << "Warning: parameter is outside parameter range" << std::endl;
-
-  return valid;
+  return is_valid;
 }
 
 Real RBParametrized::get_closest_value(Real value, const std::vector<Real> & list_of_values)

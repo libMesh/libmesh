@@ -211,9 +211,13 @@ private:
                                                 std::map<std::string, std::vector<Real>> & discrete_parameter_values_in);
 
   /**
-   * Helper function to check that \p params is valid.
+   * Helper function to check that \p params is valid:
+   *  - same number of parameters (error)
+   *  - parameter values are within the min/max range (warning)
+   *  - discrete values are correctly discrete within tolerance (warning)
+   * Warnings are only printed if "verbose_mode" is true.
    */
-  bool valid_params(const RBParameters & params);
+  bool check_if_valid_params(const RBParameters & params) const;
 
   /**
    * Helper function to check if the specified value
