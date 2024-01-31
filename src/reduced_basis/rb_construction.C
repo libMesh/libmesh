@@ -292,10 +292,10 @@ void RBConstruction::set_rb_construction_parameters(
                                                     Real abs_training_tolerance_in,
                                                     bool normalize_rb_bound_in_greedy_in,
                                                     const std::string & RB_training_type_in,
-                                                    RBParameters mu_min_in,
-                                                    RBParameters mu_max_in,
-                                                    std::map<std::string, std::vector<Real>> discrete_parameter_values_in,
-                                                    std::map<std::string,bool> log_scaling_in,
+                                                    const RBParameters & mu_min_in,
+                                                    const RBParameters & mu_max_in,
+                                                    const std::map<std::string, std::vector<Real>> & discrete_parameter_values_in,
+                                                    const std::map<std::string,bool> & log_scaling_in,
                                                     std::map<std::string, std::vector<Number>> * training_sample_list)
 {
   // Read in training_parameters_random_seed value.  This is used to

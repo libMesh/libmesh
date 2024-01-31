@@ -133,7 +133,7 @@ public:
   virtual void initialize_training_parameters(const RBParameters & mu_min,
                                               const RBParameters & mu_max,
                                               unsigned int n_training_parameters,
-                                              std::map<std::string, bool> log_param_scale,
+                                              const std::map<std::string, bool> & log_param_scale,
                                               bool deterministic=true);
 
   /**
@@ -181,7 +181,7 @@ public:
    * Static helper function for generating a randomized set of parameters.
    */
   static void generate_training_parameters_random(const Parallel::Communicator & communicator,
-                                                  std::map<std::string, bool> log_param_scale,
+                                                  const std::map<std::string, bool> & log_param_scale,
                                                   std::map<std::string, std::unique_ptr<NumericVector<Number>>> & training_parameters_in,
                                                   unsigned int n_training_samples_in,
                                                   const RBParameters & min_parameters,
@@ -194,7 +194,7 @@ public:
    * parameters (as defined by the lengths of min/max parameters vectors), otherwise throws an error.
    */
   static void generate_training_parameters_deterministic(const Parallel::Communicator & communicator,
-                                                         std::map<std::string, bool> log_param_scale,
+                                                         const std::map<std::string, bool> & log_param_scale,
                                                          std::map<std::string, std::unique_ptr<NumericVector<Number>>> & training_parameters_in,
                                                          unsigned int n_training_samples_in,
                                                          const RBParameters & min_parameters,

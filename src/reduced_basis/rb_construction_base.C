@@ -230,7 +230,7 @@ template <class Base>
 void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters & mu_min,
                                                               const RBParameters & mu_max,
                                                               unsigned int n_training_samples,
-                                                              std::map<std::string,bool> log_param_scale,
+                                                              const std::map<std::string,bool> & log_param_scale,
                                                               bool deterministic)
 {
   if (!is_quiet())
@@ -423,7 +423,7 @@ void RBConstructionBase<Base>::set_training_parameter_values(
 
 template <class Base>
 void RBConstructionBase<Base>::generate_training_parameters_random(const Parallel::Communicator & communicator,
-                                                                   std::map<std::string, bool> log_param_scale,
+                                                                   const std::map<std::string, bool> & log_param_scale,
                                                                    std::map<std::string, std::unique_ptr<NumericVector<Number>>> & training_parameters_in,
                                                                    unsigned int n_training_samples_in,
                                                                    const RBParameters & min_parameters,
@@ -517,7 +517,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
           Real random_number = static_cast<Real>(std::rand()) / RAND_MAX; // in range [0,1]
 
           // Generate log10 scaled training parameters
-          if (log_param_scale[param_name])
+          if (log_param_scale.at(param_name))
             {
               Real log_min   = log10(min_parameters.get_value(param_name));
               Real log_range = log10(max_parameters.get_value(param_name) / min_parameters.get_value(param_name));
@@ -536,7 +536,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
 
 template <class Base>
 void RBConstructionBase<Base>::generate_training_parameters_deterministic(const Parallel::Communicator & communicator,
-                                                                          std::map<std::string, bool> log_param_scale,
+                                                                          const std::map<std::string, bool> & log_param_scale,
                                                                           std::map<std::string, std::unique_ptr<NumericVector<Number>>> & training_parameters_in,
                                                                           unsigned int n_training_samples_in,
                                                                           const RBParameters & min_parameters,
@@ -630,7 +630,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
     unsigned int i = 0;
     for (const std::string & param_name : param_names)
       {
-        bool use_log_scaling = log_param_scale[param_name];
+        const bool use_log_scaling = log_param_scale.at(param_name);
         Real min_param = min_parameters.get_value(param_name);
         Real max_param = max_parameters.get_value(param_name);
 
