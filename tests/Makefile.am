@@ -100,6 +100,7 @@ unit_tests_sources = \
   numerics/type_vector_test.h \
   numerics/vector_value_test.C \
   numerics/type_tensor_test.C \
+  numerics/sparse_matrix_test.h \
   numerics/dense_matrix_test.C \
   numerics/petsc_matrix_test.C \
   numerics/diagonal_matrix_test.C \
