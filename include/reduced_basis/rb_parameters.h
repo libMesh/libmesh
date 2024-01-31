@@ -183,14 +183,16 @@ public:
   bool has_extra_value(const std::string & param_name) const;
 
   /**
-   * Get the value of the specified parameter, throwing an error if it
-   * does not exist.
+   * Get the value of the specified parameter, throw an error if it does not exist.
+   * Here we assume that there is only one "step", throw an error otherwise.
    */
   Real get_value(const std::string & param_name) const;
 
   /**
    * Get the value of the specified parameter, returning the provided
    * default value if it does not exist.
+   * If the value does exist, we assume that there is only one "step",
+   * and throw an error otherwise.
    */
   Real get_value(const std::string & param_name, const Real & default_val) const;
 
@@ -399,8 +401,8 @@ private:
   std::map<std::string, std::vector<Real>> _parameters;
 
   /**
-   * The map that stores extra parameter vectors not used for RB
-   * training. Each vector is indexed by a name.
+   * Extra parameter vectors not used for RB training.
+   * Each vector is indexed by a name.
    */
   std::map<std::string, std::vector<Real>> _extra_parameters;
 };

@@ -61,17 +61,17 @@ bool RBParameters::has_extra_value(const std::string & param_name) const
 
 Real RBParameters::get_value(const std::string & param_name) const
 {
-  // get_value() is maintained for backwards compatibility. It simply
-  // returns the [0]th entry of the vector if it can, throwing an
-  // error otherwise.
+  // Simply return the [0]th entry of the vector if possible, otherwise error.
+  libmesh_error_msg_if(this->n_steps() != 1,
+    "Requesting value for parameter " << param_name << ", but parameter contains multiple steps.");
   return this->get_step_value(param_name, /*step=*/0);
 }
 
 Real RBParameters::get_value(const std::string & param_name, const Real & default_val) const
 {
-  // get_value() is maintained for backwards compatibility. It simply
-  // returns the [0]th entry of the vector if it can, or the default
-  // value otherwise.
+  // Simply return the [0]th entry of the vector if possible, otherwise error.
+  libmesh_error_msg_if(this->n_steps() != 1,
+    "Requesting value for parameter " << param_name << ", but parameter contains multiple steps.");
   return this->get_step_value(param_name, /*step=*/0, default_val);
 }
 
@@ -150,16 +150,21 @@ void RBParameters::push_back_extra_value(const std::string & param_name, Real va
 Real RBParameters::get_extra_value(const std::string & param_name) const
 {
   // Same as get_value(param_name) but for the map of extra parameters
-  const auto & vec = libmesh_map_find(_extra_parameters, param_name);
-  libmesh_error_msg_if(vec.size() == 0, "Error getting value for extra parameter " << param_name);
-  return vec[0];
+  const auto & step_vec = libmesh_map_find(_extra_parameters, param_name);
+  libmesh_error_msg_if(step_vec.size() != 1,
+    "Requesting value for extra parameter " << param_name << ", but parameter contains multiple steps.");
+  return step_vec[0];
 }
 
 Real RBParameters::get_extra_value(const std::string & param_name, const Real & default_val) const
 {
   // same as get_value(param_name, default_val) but for the map of extra parameters
   auto it = _extra_parameters.find(param_name);
-  return ((it != _extra_parameters.end() && it->second.size() != 0) ? it->second[0] : default_val);
+  if(it==_parameters.end())
+    return default_val;
+  libmesh_error_msg_if(it->second.size()!=1,
+    "Requesting value for extra parameter " << param_name << ", but parameter contains multiple steps.");
+  return it->second[0];
 }
 
 Real RBParameters::get_extra_step_value(const std::string & param_name, std::size_t step) const
