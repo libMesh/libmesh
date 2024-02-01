@@ -1,6 +1,8 @@
-#include <libmesh/petsc_matrix.h>
+#include <libmesh/libmesh_config.h>
 
 #ifdef LIBMESH_HAVE_PETSC
+
+#include <libmesh/petsc_matrix.h>
 
 #include "sparse_matrix_test.h"
 
