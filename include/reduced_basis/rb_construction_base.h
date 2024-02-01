@@ -21,6 +21,7 @@
 #define LIBMESH_RB_CONSTRUCTION_BASE_H
 
 // rbOOmit includes
+#include "libmesh/id_types.h"
 #include "libmesh/rb_parametrized.h"
 #include "libmesh/rb_theta_expansion.h"
 #include "libmesh/rb_theta.h"
@@ -106,7 +107,7 @@ public:
   { return this->quiet_mode; }
 
   /**
-   * Get the total number of training samples.
+   * Get the number of global training samples.
    */
   numeric_index_type get_n_training_samples() const;
 
@@ -129,29 +130,33 @@ public:
    * Initialize the parameter ranges and indicate whether deterministic
    * or random training parameters should be used and whether or
    * not we want the parameters to be scaled logarithmically.
+   * \p n_global_training_samples is the total number of samples to
+   * generate, which will be distributed across all the processors.
    */
   virtual void initialize_training_parameters(const RBParameters & mu_min,
                                               const RBParameters & mu_max,
-                                              unsigned int n_training_parameters,
+                                              const unsigned int n_global_training_samples,
                                               const std::map<std::string, bool> & log_param_scale,
-                                              bool deterministic=true);
+                                              const bool deterministic=true);
 
   /**
    * Overwrite the training parameters with new_training_set.
+   * This training set is assumed to contain only the samples local to this processor.
    */
   virtual void load_training_set(std::map<std::string, std::vector<Number>> & new_training_set);
 
   /**
-   * Overwrite the local part of the training set for \p param_name using \p values.
+   * Overwrite the local training samples for \p param_name using \p values.
    * This assumes that values.size() matches get_local_n_training_samples().
    */
   void set_training_parameter_values(const std::string & param_name, const std::vector<Number> & values);
 
   /**
-   * Broadcasts parameters on processor proc_id
-   * to all processors.
+   * Broadcasts parameters from processor proc_id to all processors.
+   * This broadcasts the RBParameters object from .get_parameters(),
+   * and then sets it on all processors with .set_parameters().
    */
-  void broadcast_parameters(unsigned int proc_id);
+  void broadcast_parameters(const unsigned int proc_id);
 
   /**
    * Set the seed that is used to randomly generate training parameters.
@@ -179,27 +184,37 @@ public:
 
   /**
    * Static helper function for generating a randomized set of parameters.
+   * The parameter \p n_global_training_samples_in is the total number of parameters to
+   * generate, and they will be split across all the processors (unless serial_training_set=true)
+   * in the \p local_training_parameters_in map.
+   * \return a pair of {first_local_index,last_local_index}
    */
-  static void generate_training_parameters_random(const Parallel::Communicator & communicator,
-                                                  const std::map<std::string, bool> & log_param_scale,
-                                                  std::map<std::string, std::unique_ptr<NumericVector<Number>>> & training_parameters_in,
-                                                  unsigned int n_training_samples_in,
-                                                  const RBParameters & min_parameters,
-                                                  const RBParameters & max_parameters,
-                                                  int training_parameters_random_seed=-1,
-                                                  bool serial_training_set=false);
+  static std::pair<std::size_t, std::size_t>
+  generate_training_parameters_random(const Parallel::Communicator & communicator,
+                                      const std::map<std::string, bool> & log_param_scale,
+                                      std::map<std::string, std::vector<Number>> & local_training_parameters_in,
+                                      const unsigned int n_global_training_samples_in,
+                                      const RBParameters & min_parameters,
+                                      const RBParameters & max_parameters,
+                                      const int training_parameters_random_seed=-1,
+                                      const bool serial_training_set=false);
 
   /**
    * Static helper function for generating a deterministic set of parameters. Only works with 1 or 2
    * parameters (as defined by the lengths of min/max parameters vectors), otherwise throws an error.
+   * The parameter \p n_global_training_samples_in is the total number of parameters to
+   * generate, and they will be split across all the processors (unless serial_training_set=true)
+   * in the \p local_training_parameters_in map.
+   * \return a pair of {first_local_index,last_local_index}
    */
-  static void generate_training_parameters_deterministic(const Parallel::Communicator & communicator,
-                                                         const std::map<std::string, bool> & log_param_scale,
-                                                         std::map<std::string, std::unique_ptr<NumericVector<Number>>> & training_parameters_in,
-                                                         unsigned int n_training_samples_in,
-                                                         const RBParameters & min_parameters,
-                                                         const RBParameters & max_parameters,
-                                                         bool serial_training_set=false);
+  static std::pair<std::size_t, std::size_t>
+  generate_training_parameters_deterministic(const Parallel::Communicator & communicator,
+                                             const std::map<std::string, bool> & log_param_scale,
+                                             std::map<std::string, std::vector<Number>> & local_training_parameters_in,
+                                             const unsigned int n_global_training_samples_in,
+                                             const RBParameters & min_parameters,
+                                             const RBParameters & max_parameters,
+                                             const bool serial_training_set=false);
 
 protected:
 
@@ -210,19 +225,21 @@ protected:
   virtual void init_data ();
 
   /**
-   * Return the RBParameters in index \p index of training set.
+   * Return the RBParameters in index \p global_index of the global training set.
+   * Why do we use an index here? RBParameters supports loading the full sample set.
+   * This seems probably unnecessary now to load individually. Maybe it's a memory issue?
    */
-  RBParameters get_params_from_training_set(unsigned int index);
+  RBParameters get_params_from_training_set(unsigned int global_index);
 
   /**
-   * Set parameters to the RBParameters stored in index \p index of the training set.
+   * Set parameters to the RBParameters stored in index \p global_index of the global training set.
    */
-  void set_params_from_training_set(unsigned int index);
+  void set_params_from_training_set(unsigned int global_index);
 
   /**
    * Load the specified training parameter and then broadcast to all processors.
    */
-  virtual void set_params_from_training_set_and_broadcast(unsigned int index);
+  virtual void set_params_from_training_set_and_broadcast(unsigned int global_index);
 
   /**
    * Static function to return the error pair (index,error)
@@ -266,9 +283,21 @@ private:
   bool _training_parameters_initialized;
 
   /**
-   * The training samples.
+   * The training samples for each parameter.
+   * When serial_training_set is true, the map contains all samples of all parameters.
+   * Otherwise, the sample vectors will only contain the values for the local samples
+   * as defined by _first_local_index and _n_local_training_samples.
    */
-  std::map<std::string, std::unique_ptr<NumericVector<Number>>> _training_parameters;
+  std::map<std::string, std::vector<Number>> _training_parameters;
+
+  /**
+   * The first sample-vector index from the global vector which is stored in
+   * the _training_parameters on this processor.
+   * _n_local_training_samples is equivalent to the .size() of any vector in _training_parameters.
+   */
+  numeric_index_type _first_local_index;
+  numeric_index_type _n_local_training_samples;
+  numeric_index_type _n_global_training_samples;
 
   /**
    * If < 0, use std::time() * processor_id() to seed the random
