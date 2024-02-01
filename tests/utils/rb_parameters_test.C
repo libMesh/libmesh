@@ -67,8 +67,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(params.get_value("c"), 3.);
 
     // Test that RBParameters objects constructed with the old
-    // constructor have the correct number of steps.
-    CPPUNIT_ASSERT_EQUAL(params.n_steps(), 1u);
+    // constructor have the correct number of samples.
+    CPPUNIT_ASSERT_EQUAL(params.n_samples(), 1u);
   }
 
   void testIterators()
@@ -100,13 +100,13 @@ public:
   {
     LOG_UNIT_TEST;
 
-    // Create first multi-step RBParameters object
+    // Create first multi-sample RBParameters object
     RBParameters params1;
     for (int i=0; i<3; ++i)
       params1.push_back_value("a", Real(i));
 
-    // Create second multi-step RBParameters object
-    // (must have same number of steps)
+    // Create second multi-sample RBParameters object
+    // (must have same number of samples)
     RBParameters params2;
     for (int i=0; i<3; ++i)
       {
@@ -125,8 +125,8 @@ public:
     CPPUNIT_ASSERT(params1.has_extra_value("c"));
     for (int i=0; i<3; ++i)
       {
-        CPPUNIT_ASSERT_EQUAL(params1.get_step_value("b", i), static_cast<Real>(i+3));
-        CPPUNIT_ASSERT_EQUAL(params1.get_extra_step_value("c", i), static_cast<Real>(i*i));
+        CPPUNIT_ASSERT_EQUAL(params1.get_sample_value("b", i), static_cast<Real>(i+3));
+        CPPUNIT_ASSERT_EQUAL(params1.get_extra_sample_value("c", i), static_cast<Real>(i*i));
       }
   }
 
@@ -134,19 +134,19 @@ public:
   {
     LOG_UNIT_TEST;
 
-    // A default-constructed RBparameters object has 1 step by definition
+    // A default-constructed RBparameters object has 1 sample by definition
     RBParameters params;
-    CPPUNIT_ASSERT_EQUAL(params.n_steps(), static_cast<unsigned int>(1));
+    CPPUNIT_ASSERT_EQUAL(params.n_samples(), static_cast<unsigned int>(1));
 
-    // Set the number of steps to use in the no-parameters case
-    params.set_n_steps(10);
-    CPPUNIT_ASSERT_EQUAL(params.n_steps(), static_cast<unsigned int>(10));
+    // Set the number of samples to use in the no-parameters case
+    params.set_n_samples(10);
+    CPPUNIT_ASSERT_EQUAL(params.n_samples(), static_cast<unsigned int>(10));
 
-    // Define multiple steps for a single parameter. Now we no longer
-    // use the set_n_steps() value, since we have actual steps.
+    // Define multiple samples for a single parameter. Now we no longer
+    // use the set_n_samples() value, since we have actual samples.
     params.push_back_value("a", 1.);
     params.push_back_value("a", 2.);
-    CPPUNIT_ASSERT_EQUAL(params.n_steps(), static_cast<unsigned int>(2));
+    CPPUNIT_ASSERT_EQUAL(params.n_samples(), static_cast<unsigned int>(2));
   }
 };
 

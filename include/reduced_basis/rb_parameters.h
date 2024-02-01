@@ -45,8 +45,8 @@ class RBParameters
 public:
 
   /**
-   * Constructor. Initializes the _n_steps parameter to 1 for
-   * backwards compatibility, but the set_n_steps() function can
+   * Constructor. Initializes the _n_samples parameter to 1 for
+   * backwards compatibility, but the set_n_samples() function can
    * always be called later to update this value.
    */
   RBParameters();
@@ -184,30 +184,30 @@ public:
 
   /**
    * Get the value of the specified parameter, throw an error if it does not exist.
-   * Here we assume that there is only one "step", throw an error otherwise.
+   * Here we assume that there is only one sample, throw an error otherwise.
    */
   Real get_value(const std::string & param_name) const;
 
   /**
    * Get the value of the specified parameter, returning the provided
    * default value if it does not exist.
-   * If the value does exist, we assume that there is only one "step",
+   * If the value does exist, we assume that there is only one sample,
    * and throw an error otherwise.
    */
   Real get_value(const std::string & param_name, const Real & default_val) const;
 
   /**
-   * Get the value of the specified parameter at the specified step,
+   * Get the value of the specified parameter at the specified sample,
    * throwing an error if it does not exist.
    */
-  Real get_step_value(const std::string & param_name, std::size_t step) const;
+  Real get_sample_value(const std::string & param_name, std::size_t sample_idx) const;
 
   /**
-   * Get the value of the specified parameter at the specified step,
+   * Get the value of the specified parameter at the specified sample,
    * returning the provided default value if either the parameter is
-   * not defined or the step is invalid.
+   * not defined or the sample is invalid.
    */
-  Real get_step_value(const std::string & param_name, std::size_t step, const Real & default_val) const;
+  Real get_sample_value(const std::string & param_name, std::size_t sample_idx, const Real & default_val) const;
 
   /**
    * Set the value of the specified parameter. If param_name
@@ -219,10 +219,8 @@ public:
   void set_value(const std::string & param_name, Real value);
 
   /**
-   * Set the value of the specified parameter at the specified vector
-   * index.  Note: each parameter is now allowed to be vector-valued,
-   * it is up to the user to organize what the vector indices refer to
-   * (e.g. load or time steps).
+   * Set the value of the specified parameter at the specified sample
+   * index. The sample index can refer to, e.g., load or time steps.
    */
   void set_value(const std::string & param_name, std::size_t index, Real value);
 
@@ -252,17 +250,17 @@ public:
   Real get_extra_value(const std::string & param_name, const Real & default_val) const;
 
   /**
-   * Get the value of the specified "extra" parameter at the specified step,
+   * Get the value of the specified "extra" parameter at the specified sample index,
    * throwing an error if it does not exist.
    */
-  Real get_extra_step_value(const std::string & param_name, std::size_t step) const;
+  Real get_extra_sample_value(const std::string & param_name, std::size_t sample_idx) const;
 
   /**
-   * Get the value of the specified extra parameter at the specified step,
+   * Get the value of the specified extra parameter at the specified sample index,
    * returning the provided default value if either the parameter is
-   * not defined or the step is invalid.
+   * not defined or the sample index is invalid.
    */
-  Real get_extra_step_value(const std::string & param_name, std::size_t step, const Real & default_val) const;
+  Real get_extra_sample_value(const std::string & param_name, std::size_t sample_idx, const Real & default_val) const;
 
   /**
    * Set the value of the specified extra parameter. If param_name
@@ -271,10 +269,8 @@ public:
   void set_extra_value(const std::string & param_name, Real value);
 
   /**
-   * Set the value of the specified extra parameter at the specified vector
-   * index.  Note: each parameter is now allowed to be vector-valued,
-   * it is up to the user to organize what the vector indices refer to
-   * (e.g. load or time steps).
+   * Set the value of the specified extra parameter at the specified sample
+   * index. The sample index can refer to, e.g., load or time steps.
    */
   void set_extra_value(const std::string & param_name, std::size_t index, Real value);
 
@@ -284,22 +280,22 @@ public:
   unsigned int n_parameters() const;
 
   /**
-   * Set the number of steps this RBParameters object is intended to
+   * Set the number of samples this RBParameters object is intended to
    * represent, in the case that there are no actual parameters stored
    * on it. Note: this value will only be used in the no-parameters
    * case; if there are actual parameters specified in this class, the
    * number set via this API is ignored. All parameters stored within
-   * the RBParameters object must have n_steps() steps.
+   * the RBParameters object must have n_samples() samples.
    */
-  void set_n_steps(unsigned int n_steps);
+  void set_n_samples(unsigned int n_samples);
 
   /**
-   * Returns the number of steps stored for all parameters. For
+   * Returns the number of samples stored for all parameters. For
    * simplicity, we require all parameters to store the same number of
-   * steps ("step" here may refer to time step or load step) and in
+   * "samples" ("sample" here may refer to, e.g., time step or load step) and in
    * debug mode we actually verify that is the case.
    */
-  unsigned int n_steps() const;
+  unsigned int n_samples() const;
 
   /**
    * Fill \p param_names with the names of the parameters.
@@ -357,7 +353,7 @@ public:
 
   /**
    * Append "rhs" to "*this".  Both RBParameters objects must have the
-   * same n_steps(), otherwise an error is thrown. If some of the
+   * same n_samples(), otherwise an error is thrown. If some of the
    * parameter names overlap, then the values from rhs overwrite
    * *this. Both parameters and "extra" parameters are appended.
    */
@@ -387,12 +383,12 @@ private:
                         Real value);
 
   /**
-   * The number of steps represented by this RBParameters object, in
+   * The number of samples represented by this RBParameters object, in
    * the case where there are no parameters actually stored on it. If
    * there are parameters stored on this RBParameters object, then the
-   * n_steps() API returns that number of steps instead.
+   * n_samples() API returns that number of samples instead.
    */
-  unsigned int _n_steps;
+  unsigned int _n_samples;
 
   /**
    * The map that stores the actual parameter vectors. Each vector is

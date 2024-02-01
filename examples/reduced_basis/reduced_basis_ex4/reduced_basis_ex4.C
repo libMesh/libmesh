@@ -255,7 +255,7 @@ int main (int argc, char ** argv)
       online_mu.push_back_value("center_y", 0.5);
 
       // Add 3rd (center_x, center_y) values. For debugging purposes,
-      // we want the number of "steps" (3) to be different from the
+      // we want the number of "samples" (3) to be different from the
       // number of parameters (2).
       online_mu.push_back_value("center_x", -0.25);
       online_mu.push_back_value("center_y", -0.25);
@@ -270,7 +270,7 @@ int main (int argc, char ** argv)
 
       // When performing an rb_solve() with "mu" values, we only
       // support single-valued RBParameters objects.  In this case,
-      // since the RBParameters object stores multiple "steps", we
+      // since the RBParameters object stores multiple "samples", we
       // take the approach of pre-evaluating the thetas for each
       // parameter while calling the rb_solve() in a loop.
       const RBThetaExpansion & rb_theta_expansion = rb_eval.get_rb_theta_expansion();
@@ -279,41 +279,41 @@ int main (int argc, char ** argv)
       // of eval_A_theta(), eval_F_theta(), etc. easier.
       std::vector<RBParameters> mu_vec = {online_mu};
 
-      // 1.) Evaluate and store "A" thetas at all steps:
+      // 1.) Evaluate and store "A" thetas at all samples:
       std::vector<std::vector<Number>> all_A(rb_theta_expansion.get_n_A_terms());
       for (unsigned int q_a=0; q_a<rb_theta_expansion.get_n_A_terms(); q_a++)
         {
           // Here we call the version of eval_A_theta() taking a
-          // vector, so we evaluate theta(mu) at all steps
+          // vector, so we evaluate theta(mu) at all samples
           // simultaneously.
           all_A[q_a] = rb_theta_expansion.eval_A_theta(q_a, mu_vec);
 
           // This size of each A_q vector here is:
-          // sum_i mu_vec[i].n_steps()
+          // sum_i mu_vec[i].n_samples()
           //
           // Each A_q vector contains the logically 2D ragged array of
-          // values (theta[i], step[j(i)]), arranged in "row-major"
-          // format, where the number of steps defined by each mu
+          // values (theta[i], sample[j(i)]), arranged in "row-major"
+          // format, where the number of samples defined by each mu
           // object can vary, and they are all concatenated together
-          // to produce one long list of steps.
+          // to produce one long list of samples.
           //
           // Example: suppose that there are 2 mu values containing
-          // the same sets of parameters, with 5 steps defined in the
-          // first and 10 steps defined in the second. Then, the A_q
+          // the same sets of parameters, with 5 samples defined in the
+          // first and 10 samples defined in the second. Then, the A_q
           // vector will look like:
           //
-          // {Theta(mu_vec[0], step_0), Theta(mu_vec[0], step_1), ... Theta(mu_vec[0], step_4),
-          //  Theta(mu_vec[1], step_0), Theta(mu_vec[1], step_1), ... Theta(mu_vec[1], step_4), ..., Theta(mu_vec[1], step_9)}
+          // {Theta(mu_vec[0], sample_0), Theta(mu_vec[0], sample_1), ... Theta(mu_vec[0], sample_4),
+          //  Theta(mu_vec[1], sample_0), Theta(mu_vec[1], sample_1), ... Theta(mu_vec[1], sample_4), ..., Theta(mu_vec[1], sample_9)}
           //
           // Note: this example is unusual in that it would be
           // conceptually much simpler to have either:
-          // (i) A vector of 15 single-step RBParameters objects, or
-          // (ii) A single RBParameters object with 15 steps defined in it.
+          // (i) A vector of 15 single-sample RBParameters objects, or
+          // (ii) A single RBParameters object with 15 samples defined in it.
           // but we can also support a combination of approaches (i)
           // and (ii) by concatenation, if necessary.
         }
 
-      // 2.) Evaluate "F" thetas at all steps:
+      // 2.) Evaluate "F" thetas at all samples:
       std::vector<std::vector<Number>> all_F(rb_theta_expansion.get_n_F_terms());
       for (unsigned int q_f=0; q_f<rb_theta_expansion.get_n_F_terms(); q_f++)
         all_F[q_f] = rb_theta_expansion.eval_F_theta(q_f, mu_vec);
@@ -327,7 +327,7 @@ int main (int argc, char ** argv)
                      << std::scientific << eim_error_indicators[idx] << std::endl;
       libMesh::out << std::endl;
 
-      // 3.) Evaluate "output" thetas at all steps: in this case, the
+      // 3.) Evaluate "output" thetas at all samples: in this case, the
       // output is particularly simple (does not depend on mu) so this
       // should just be a vector of all 1s.
       std::vector<std::vector<Number>> all_outputs(rb_theta_expansion.get_total_n_output_terms());
@@ -362,29 +362,29 @@ int main (int argc, char ** argv)
       rb_construction.set_rb_evaluation(rb_eval);
       rb_eval.read_in_basis_functions(rb_construction, "rb_data");
 
-      // Loop over each step, fill the evaluated_thetas array, call rb_solve()
-      for (unsigned step=0; step<online_mu.n_steps(); ++step)
+      // Loop over each sample, fill the evaluated_thetas array, call rb_solve()
+      for (unsigned sample_idx=0; sample_idx<online_mu.n_samples(); ++sample_idx)
         {
           unsigned int counter = 0;
 
-          // Set A Theta values for current step
+          // Set A Theta values for current sample
           for (unsigned int q_a=0; q_a<rb_theta_expansion.get_n_A_terms(); q_a++)
-            evaluated_thetas[counter++] = all_A[q_a][step];
+            evaluated_thetas[counter++] = all_A[q_a][sample_idx];
 
-          // Set F Theta values for current step
+          // Set F Theta values for current sample
           for (unsigned int q_f=0; q_f<rb_theta_expansion.get_n_F_terms(); q_f++)
-            evaluated_thetas[counter++] = all_F[q_f][step];
+            evaluated_thetas[counter++] = all_F[q_f][sample_idx];
 
-          // Set output Theta values for current step
+          // Set output Theta values for current sample
           {
             unsigned int output_counter = 0;
             for (unsigned int n=0; n<rb_theta_expansion.get_n_outputs(); n++)
               for (unsigned int q_l=0; q_l<rb_theta_expansion.get_n_output_terms(n); q_l++)
-                evaluated_thetas[counter++] = all_outputs[output_counter++][step];
+                evaluated_thetas[counter++] = all_outputs[output_counter++][sample_idx];
           }
 
           // Call rb_solve() for the current thetas
-          libMesh::out << "Performing solve for step " << step << std::endl;
+          libMesh::out << "Performing solve for step " << sample_idx << std::endl;
           rb_eval.rb_solve(rb_eval.get_n_basis_functions(), &evaluated_thetas);
 
           // Print the output as well as the corresponding output error bound
@@ -396,9 +396,9 @@ int main (int argc, char ** argv)
           // Write an exo file to visualize this solution
           rb_construction.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
-          ExodusII_IO(mesh).write_equation_systems("RB_sol_" + std::to_string(step) + ".e", equation_systems);
+          ExodusII_IO(mesh).write_equation_systems("RB_sol_" + std::to_string(sample_idx) + ".e", equation_systems);
 #endif
-        } // end for (step)
+        } // end for (sample)
     }
 
 #endif // LIBMESH_ENABLE_DIRICHLET

@@ -28,12 +28,12 @@ namespace libMesh
 {
 
 RBParameters::RBParameters() :
-  _n_steps(1)
+  _n_samples(1)
 {
 }
 
 RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map) :
-  _n_steps(1)
+  _n_samples(1)
 {
   // Backwards compatible support for constructing an RBParameters
   // object from a map<string, Real>. We store a single entry in each
@@ -44,7 +44,7 @@ RBParameters::RBParameters(const std::map<std::string, Real> & parameter_map) :
 
 void RBParameters::clear()
 {
-  _n_steps = 1;
+  _n_samples = 1;
   _parameters.clear();
   _extra_parameters.clear();
 }
@@ -62,30 +62,30 @@ bool RBParameters::has_extra_value(const std::string & param_name) const
 Real RBParameters::get_value(const std::string & param_name) const
 {
   // Simply return the [0]th entry of the vector if possible, otherwise error.
-  libmesh_error_msg_if(this->n_steps() != 1,
-    "Requesting value for parameter " << param_name << ", but parameter contains multiple steps.");
-  return this->get_step_value(param_name, /*step=*/0);
+  libmesh_error_msg_if(this->n_samples() != 1,
+    "Requesting value for parameter " << param_name << ", but parameter contains multiple samples.");
+  return this->get_sample_value(param_name, /*sample_idx=*/0);
 }
 
 Real RBParameters::get_value(const std::string & param_name, const Real & default_val) const
 {
   // Simply return the [0]th entry of the vector if possible, otherwise error.
-  libmesh_error_msg_if(this->n_steps() != 1,
-    "Requesting value for parameter " << param_name << ", but parameter contains multiple steps.");
-  return this->get_step_value(param_name, /*step=*/0, default_val);
+  libmesh_error_msg_if(this->n_samples() != 1,
+    "Requesting value for parameter " << param_name << ", but parameter contains multiple samples.");
+  return this->get_sample_value(param_name, /*sample_idx=*/0, default_val);
 }
 
-Real RBParameters::get_step_value(const std::string & param_name, std::size_t step) const
+Real RBParameters::get_sample_value(const std::string & param_name, std::size_t sample_idx) const
 {
   const auto & vec = libmesh_map_find(_parameters, param_name);
-  libmesh_error_msg_if(step >= vec.size(), "Error getting value for parameter " << param_name);
-  return vec[step];
+  libmesh_error_msg_if(sample_idx >= vec.size(), "Error getting value for parameter " << param_name);
+  return vec[sample_idx];
 }
 
-Real RBParameters::get_step_value(const std::string & param_name, std::size_t step, const Real & default_val) const
+Real RBParameters::get_sample_value(const std::string & param_name, std::size_t sample_idx, const Real & default_val) const
 {
   auto it = _parameters.find(param_name);
-  return ((it != _parameters.end() && step < it->second.size()) ? it->second[step] : default_val);
+  return ((it != _parameters.end() && sample_idx < it->second.size()) ? it->second[sample_idx] : default_val);
 }
 
 void RBParameters::set_value(const std::string & param_name, Real value)
@@ -150,10 +150,10 @@ void RBParameters::push_back_extra_value(const std::string & param_name, Real va
 Real RBParameters::get_extra_value(const std::string & param_name) const
 {
   // Same as get_value(param_name) but for the map of extra parameters
-  const auto & step_vec = libmesh_map_find(_extra_parameters, param_name);
-  libmesh_error_msg_if(step_vec.size() != 1,
-    "Requesting value for extra parameter " << param_name << ", but parameter contains multiple steps.");
-  return step_vec[0];
+  const auto & sample_vec = libmesh_map_find(_extra_parameters, param_name);
+  libmesh_error_msg_if(sample_vec.size() != 1,
+    "Requesting value for extra parameter " << param_name << ", but parameter contains multiple samples.");
+  return sample_vec[0];
 }
 
 Real RBParameters::get_extra_value(const std::string & param_name, const Real & default_val) const
@@ -163,22 +163,22 @@ Real RBParameters::get_extra_value(const std::string & param_name, const Real & 
   if(it==_parameters.end())
     return default_val;
   libmesh_error_msg_if(it->second.size()!=1,
-    "Requesting value for extra parameter " << param_name << ", but parameter contains multiple steps.");
+    "Requesting value for extra parameter " << param_name << ", but parameter contains multiple samples.");
   return it->second[0];
 }
 
-Real RBParameters::get_extra_step_value(const std::string & param_name, std::size_t step) const
+Real RBParameters::get_extra_sample_value(const std::string & param_name, std::size_t sample_idx) const
 {
   const auto & vec = libmesh_map_find(_extra_parameters, param_name);
-  libmesh_error_msg_if(step >= vec.size(), "Error getting value for parameter " << param_name);
-  return vec[step];
+  libmesh_error_msg_if(sample_idx >= vec.size(), "Error getting value for parameter " << param_name);
+  return vec[sample_idx];
 }
 
-Real RBParameters::get_extra_step_value(const std::string & param_name, std::size_t step, const Real & default_val) const
+Real RBParameters::get_extra_sample_value(const std::string & param_name, std::size_t sample_idx, const Real & default_val) const
 {
-  // same as get_step_value(param_name, index, default_val) but for the map of extra parameters
+  // same as get_sample_value(param_name, index, default_val) but for the map of extra parameters
   auto it = _extra_parameters.find(param_name);
-  return ((it != _extra_parameters.end() && step < it->second.size()) ? it->second[step] : default_val);
+  return ((it != _extra_parameters.end() && sample_idx < it->second.size()) ? it->second[sample_idx] : default_val);
 }
 
 void RBParameters::set_extra_value(const std::string & param_name, Real value)
@@ -192,28 +192,28 @@ unsigned int RBParameters::n_parameters() const
   return cast_int<unsigned int>(_parameters.size());
 }
 
-void RBParameters::set_n_steps(unsigned int n_steps)
+void RBParameters::set_n_samples(unsigned int n_samples)
 {
-  _n_steps = n_steps;
+  _n_samples = n_samples;
 }
 
-unsigned int RBParameters::n_steps() const
+unsigned int RBParameters::n_samples() const
 {
   // Quick return if there are no parameters
   if (_parameters.empty())
-    return _n_steps;
+    return _n_samples;
 
-  // If _parameters is not empty, we can check the number of steps in the first param
+  // If _parameters is not empty, we can check the number of samples in the first param
   auto size_first = _parameters.begin()->second.size();
 
 #ifdef DEBUG
-  // In debug mode, verify that all parameters have the same number of steps
+  // In debug mode, verify that all parameters have the same number of samples
   for (const auto & pr : _parameters)
-    libmesh_assert_msg(pr.second.size() == size_first, "All parameters must have the same number of steps.");
+    libmesh_assert_msg(pr.second.size() == size_first, "All parameters must have the same number of samples.");
 #endif
 
   // If we made it here in DEBUG mode, then all parameters were
-  // verified to have the same number of steps.
+  // verified to have the same number of samples.
   return size_first;
 }
 
@@ -278,8 +278,8 @@ bool RBParameters::operator!=(const RBParameters & rhs) const
 
 RBParameters & RBParameters::operator+= (const RBParameters & rhs)
 {
-  libmesh_error_msg_if(this->n_steps() != rhs.n_steps(),
-                       "Can only append RBParameters objects with matching numbers of steps");
+  libmesh_error_msg_if(this->n_samples() != rhs.n_samples(),
+                       "Can only append RBParameters objects with matching numbers of samples.");
 
   // Overwrite or add each (key, vec) pair in rhs to *this.
   for (const auto & [key, vec] : rhs._parameters)

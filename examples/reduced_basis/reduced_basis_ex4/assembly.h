@@ -69,15 +69,15 @@ struct ShiftedGaussian : public RBParametrizedFunction
     // Real center_y = mu.get_value("center_y");
     // return std::vector<Number> { std::exp(-2. * (pow<2>(center_x - p(0)) + pow<2>(center_y - p(1)))) };
 
-    // New way, there are get_n_components() * mu.n_steps() entries in
+    // New way, there are get_n_components() * mu.n_samples() entries in
     // the return vector.  In debug mode, we verify that the same
-    // number of steps are provided for all parameters when
-    // RBParameters::n_steps() is called.
-    std::vector<Number> ret(this->get_n_components() * mu.n_steps());
-    for (auto i : make_range(mu.n_steps()))
+    // number of samples are provided for all parameters when
+    // RBParameters::n_samples() is called.
+    std::vector<Number> ret(this->get_n_components() * mu.n_samples());
+    for (auto i : make_range(mu.n_samples()))
       {
-        Real center_x = mu.get_step_value("center_x", i);
-        Real center_y = mu.get_step_value("center_y", i);
+        Real center_x = mu.get_sample_value("center_x", i);
+        Real center_y = mu.get_sample_value("center_y", i);
         ret[i] = std::exp(-2. * (pow<2>(center_x - p(0)) + pow<2>(center_y - p(1))));
       }
     return ret;
@@ -97,36 +97,36 @@ struct ThetaConstant : RBTheta
   /**
    * Evaluate theta for a single scalar-valued RBParameters object.
    * In this case, Theta(mu) does not depend on mu explicitly, except
-   * to throw an error in case a multi-step RBParameters object has
+   * to throw an error in case a multi-sample RBParameters object has
    * been provided, since the evaluate() interface does not support
-   * multi-step RBParameters objects.
+   * multi-sample RBParameters objects.
    */
   virtual Number evaluate(const RBParameters & mu) override
   {
-    libmesh_error_msg_if(mu.n_steps() > 1,
-                         "You should only call the evaluate_vec() API when using multi-step RBParameters objects.");
+    libmesh_error_msg_if(mu.n_samples() > 1,
+                         "You should only call the evaluate_vec() API when using multi-sample RBParameters objects.");
 
     return _val;
   }
 
   /**
    * Evaluate theta for multiple mu values, each of which may have
-   * multiple "steps".  In this case, Theta(mu) does not depend on mu
-   * explicitly, except to determine the number of "steps" (aka
-   * n_steps()) which mu has, so that the output vector is sized
+   * multiple "samples".  In this case, Theta(mu) does not depend on mu
+   * explicitly, except to determine the number of "samples" (aka
+   * n_samples()) which mu has, so that the output vector is sized
    * appropriately.
    */
   virtual std::vector<Number> evaluate_vec(const std::vector<RBParameters> & mus) override
   {
     // Compute the number of values to be returned in the vector. For
-    // single-step RBParameters objects, there would be mus.size()
-    // values returned in the vector. For multi-step RBParameters
+    // single-sample RBParameters objects, there would be mus.size()
+    // values returned in the vector. For multi-sample RBParameters
     // objects, there are:
-    // sum_i mus[i].n_steps()
-    // total Thetas, i.e. one Theta per step.
+    // sum_i mus[i].n_samples()
+    // total Thetas, i.e. one Theta per sample.
     unsigned int count = 0;
     for (const auto & mu : mus)
-      count += mu.n_steps();
+      count += mu.n_samples();
 
     return std::vector<Number>(count, _val);
   }

@@ -619,7 +619,8 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
                          "Error: Number of training samples = "
                          << n_training_samples_in
                          << " does not enable a uniform grid of samples with "
-                         << num_params << " parameters.");
+                         << num_params << " parameters. Try "
+                         << total_samples_check << " samples instead?");
   }
 
   // First we make a list of training samples associated with each parameter,

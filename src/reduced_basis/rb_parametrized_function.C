@@ -170,7 +170,7 @@ void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters>
   // We first loop over all mus and all n_points, calling evaluate()
   // for each and storing the results.  It is easier to first
   // pre-compute all the values before filling output, since, in the
-  // case of multi-step RBParameters, the ordering of the loops is a
+  // case of multi-sample RBParameters, the ordering of the loops is a
   // bit complicated otherwise.
   std::vector<std::vector<std::vector<Number>>> all_evals(mus.size());
   for (auto mu_index : index_range(mus))
@@ -179,7 +179,7 @@ void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters>
       all_evals[mu_index].resize(n_points);
       for (auto point_index : index_range(all_evals[mu_index]))
         {
-          // Evaluate all steps for the current mu at the current interpolation point
+          // Evaluate all samples for the current mu at the current interpolation point
           all_evals[mu_index][point_index] =
             this->evaluate(mus[mu_index],
                            v.all_xyz[point_index],
@@ -190,27 +190,27 @@ void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters>
                            v.phi_i_qp[point_index]);
 
           // The vector returned by evaluate() should contain:
-          // n_components * mus[mu_index].n_steps()
-          // entries. That is, for multi-step RBParameters objects,
+          // n_components * mus[mu_index].n_samples()
+          // entries. That is, for multi-sample RBParameters objects,
           // the vector will be packed with entries as follows:
-          // [step0_component0, step0_component1, ..., step0_componentN,
-          //  step1_component0, step1_component1, ..., step1_componentN,
+          // [sample0_component0, sample0_component1, ..., sample0_componentN,
+          //  sample1_component0, sample1_component1, ..., sample1_componentN,
           //  ...
-          //  stepM_component0, stepM_component1, ..., stepM_componentN]
-          auto n_steps = mus[mu_index].n_steps();
+          //  sampleM_component0, sampleM_component1, ..., sampleM_componentN]
+          auto n_samples = mus[mu_index].n_samples();
           auto received_data = all_evals[mu_index][point_index].size();
-          libmesh_error_msg_if(received_data != n_components * n_steps,
+          libmesh_error_msg_if(received_data != n_components * n_samples,
                                "Recieved " << received_data <<
-                               " evaluated values but expected to receive " << n_components * n_steps);
+                               " evaluated values but expected to receive " << n_components * n_samples);
         }
     }
 
-  // TODO: move this code for computing the total number of "steps"
+  // TODO: move this code for computing the total number of samples
   // represented by a std::vector of RBParameters objects to a helper
   // function.
   unsigned int output_size = 0;
   for (const auto & mu : mus)
-    output_size += mu.n_steps();
+    output_size += mu.n_samples();
 
   output.resize(output_size);
 
@@ -218,8 +218,8 @@ void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters>
   // increment multiple loop counters all within the local scope of the for-loop.
   for (auto [mu_index, output_index] = std::make_tuple(0u, 0u); mu_index < mus.size(); ++mu_index)
     {
-      auto n_steps = mus[mu_index].n_steps();
-      for (auto mu_step = 0u; mu_step < n_steps; ++mu_step, ++output_index)
+      auto n_samples = mus[mu_index].n_samples();
+      for (auto mu_sample_idx = 0u; mu_sample_idx < n_samples; ++mu_sample_idx, ++output_index)
         {
           output[output_index].resize(n_points);
           for (auto point_index : make_range(n_points))
@@ -227,7 +227,7 @@ void RBParametrizedFunction::vectorized_evaluate(const std::vector<RBParameters>
               output[output_index][point_index].resize(n_components);
 
               for (auto comp : make_range(n_components))
-                output[output_index][point_index][comp] = all_evals[mu_index][point_index][n_components*mu_step + comp];
+                output[output_index][point_index][comp] = all_evals[mu_index][point_index][n_components*mu_sample_idx + comp];
             }
         }
     }
@@ -254,7 +254,7 @@ void RBParametrizedFunction::side_vectorized_evaluate(const std::vector<RBParame
   // We first loop over all mus and all n_points, calling side_evaluate()
   // for each and storing the results.  It is easier to first
   // pre-compute all the values before filling output, since, in the
-  // case of multi-step RBParameters, the ordering of the loops is a
+  // case of multi-sample RBParameters, the ordering of the loops is a
   // bit complicated otherwise.
   std::vector<std::vector<std::vector<Number>>> all_evals(mus.size());
   for (auto mu_index : index_range(mus))
@@ -263,7 +263,7 @@ void RBParametrizedFunction::side_vectorized_evaluate(const std::vector<RBParame
       all_evals[mu_index].resize(n_points);
       for (auto point_index : index_range(all_evals[mu_index]))
         {
-          // Evaluate all steps for the current mu at the current interpolation point
+          // Evaluate all samples for the current mu at the current interpolation point
           all_evals[mu_index][point_index] =
             this->side_evaluate(mus[mu_index],
                                 v.all_xyz[point_index],
@@ -276,27 +276,27 @@ void RBParametrizedFunction::side_vectorized_evaluate(const std::vector<RBParame
                                 v.phi_i_qp[point_index]);
 
           // The vector returned by side_evaluate() should contain:
-          // n_components * mus[mu_index].n_steps()
-          // entries. That is, for multi-step RBParameters objects,
+          // n_components * mus[mu_index].n_samples()
+          // entries. That is, for multi-sample RBParameters objects,
           // the vector will be packed with entries as follows:
-          // [step0_component0, step0_component1, ..., step0_componentN,
-          //  step1_component0, step1_component1, ..., step1_componentN,
+          // [sample0_component0, sample0_component1, ..., sample0_componentN,
+          //  sample1_component0, sample1_component1, ..., sample1_componentN,
           //  ...
-          //  stepM_component0, stepM_component1, ..., stepM_componentN]
-          auto n_steps = mus[mu_index].n_steps();
+          //  sampleM_component0, sampleM_component1, ..., sampleM_componentN]
+          auto n_samples = mus[mu_index].n_samples();
           auto received_data = all_evals[mu_index][point_index].size();
-          libmesh_error_msg_if(received_data != n_components * n_steps,
+          libmesh_error_msg_if(received_data != n_components * n_samples,
                                "Recieved " << received_data <<
-                               " evaluated values but expected to receive " << n_components * n_steps);
+                               " evaluated values but expected to receive " << n_components * n_samples);
         }
     }
 
-  // TODO: move this code for computing the total number of "steps"
+  // TODO: move this code for computing the total number of samples
   // represented by a std::vector of RBParameters objects to a helper
   // function.
   unsigned int output_size = 0;
   for (const auto & mu : mus)
-    output_size += mu.n_steps();
+    output_size += mu.n_samples();
 
   output.resize(output_size);
 
@@ -304,8 +304,8 @@ void RBParametrizedFunction::side_vectorized_evaluate(const std::vector<RBParame
   // increment multiple loop counters all within the local scope of the for-loop.
   for (auto [mu_index, output_index] = std::make_tuple(0u, 0u); mu_index < mus.size(); ++mu_index)
     {
-      auto n_steps = mus[mu_index].n_steps();
-      for (auto mu_step = 0u; mu_step < n_steps; ++mu_step, ++output_index)
+      auto n_samples = mus[mu_index].n_samples();
+      for (auto mu_sample_idx = 0u; mu_sample_idx < n_samples; ++mu_sample_idx, ++output_index)
         {
           output[output_index].resize(n_points);
           for (auto point_index : make_range(n_points))
@@ -313,7 +313,7 @@ void RBParametrizedFunction::side_vectorized_evaluate(const std::vector<RBParame
               output[output_index][point_index].resize(n_components);
 
               for (auto comp : make_range(n_components))
-                output[output_index][point_index][comp] = all_evals[mu_index][point_index][n_components*mu_step + comp];
+                output[output_index][point_index][comp] = all_evals[mu_index][point_index][n_components*mu_sample_idx + comp];
             }
         }
     }
@@ -334,7 +334,7 @@ void RBParametrizedFunction::node_vectorized_evaluate(const std::vector<RBParame
   // We first loop over all mus and all n_points, calling node_evaluate()
   // for each and storing the results.  It is easier to first
   // pre-compute all the values before filling output, since, in the
-  // case of multi-step RBParameters, the ordering of the loops is a
+  // case of multi-sample RBParameters, the ordering of the loops is a
   // bit complicated otherwise.
   std::vector<std::vector<std::vector<Number>>> all_evals(mus.size());
   for (auto mu_index : index_range(mus))
@@ -343,7 +343,7 @@ void RBParametrizedFunction::node_vectorized_evaluate(const std::vector<RBParame
       all_evals[mu_index].resize(n_points);
       for (auto point_index : index_range(all_evals[mu_index]))
         {
-          // Evaluate all steps for the current mu at the current interpolation point
+          // Evaluate all samples for the current mu at the current interpolation point
           all_evals[mu_index][point_index] =
             this->node_evaluate(mus[mu_index],
                                 v.all_xyz[point_index],
@@ -351,27 +351,27 @@ void RBParametrizedFunction::node_vectorized_evaluate(const std::vector<RBParame
                                 v.boundary_ids[point_index]);
 
           // The vector returned by node_evaluate() should contain:
-          // n_components * mus[mu_index].n_steps()
-          // entries. That is, for multi-step RBParameters objects,
+          // n_components * mus[mu_index].n_samples()
+          // entries. That is, for multi-sample RBParameters objects,
           // the vector will be packed with entries as follows:
-          // [step0_component0, step0_component1, ..., step0_componentN,
-          //  step1_component0, step1_component1, ..., step1_componentN,
+          // [sample0_component0, sample0_component1, ..., sample0_componentN,
+          //  sample1_component0, sample1_component1, ..., sample1_componentN,
           //  ...
-          //  stepM_component0, stepM_component1, ..., stepM_componentN]
-          auto n_steps = mus[mu_index].n_steps();
+          //  sampleM_component0, sampleM_component1, ..., sampleM_componentN]
+          auto n_samples = mus[mu_index].n_samples();
           auto received_data = all_evals[mu_index][point_index].size();
-          libmesh_error_msg_if(received_data != n_components * n_steps,
+          libmesh_error_msg_if(received_data != n_components * n_samples,
                                "Recieved " << received_data <<
-                               " evaluated values but expected to receive " << n_components * n_steps);
+                               " evaluated values but expected to receive " << n_components * n_samples);
         }
     }
 
-  // TODO: move this code for computing the total number of "steps"
+  // TODO: move this code for computing the total number of samples
   // represented by a std::vector of RBParameters objects to a helper
   // function.
   unsigned int output_size = 0;
   for (const auto & mu : mus)
-    output_size += mu.n_steps();
+    output_size += mu.n_samples();
 
   output.resize(output_size);
 
@@ -379,8 +379,8 @@ void RBParametrizedFunction::node_vectorized_evaluate(const std::vector<RBParame
   // increment multiple loop counters all within the local scope of the for-loop.
   for (auto [mu_index, output_index] = std::make_tuple(0u, 0u); mu_index < mus.size(); ++mu_index)
     {
-      auto n_steps = mus[mu_index].n_steps();
-      for (auto mu_step = 0u; mu_step < n_steps; ++mu_step, ++output_index)
+      auto n_samples = mus[mu_index].n_samples();
+      for (auto mu_sample_idx = 0u; mu_sample_idx < n_samples; ++mu_sample_idx, ++output_index)
         {
           output[output_index].resize(n_points);
           for (auto point_index : make_range(n_points))
@@ -388,7 +388,7 @@ void RBParametrizedFunction::node_vectorized_evaluate(const std::vector<RBParame
               output[output_index][point_index].resize(n_components);
 
               for (auto comp : make_range(n_components))
-                output[output_index][point_index][comp] = all_evals[mu_index][point_index][n_components*mu_step + comp];
+                output[output_index][point_index][comp] = all_evals[mu_index][point_index][n_components*mu_sample_idx + comp];
             }
         }
     }
