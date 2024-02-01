@@ -55,8 +55,8 @@ RBConstructionBase<Base>::RBConstructionBase (EquationSystems & es,
   : Base(es, name_in, number_in),
     quiet_mode(true),
     serial_training_set(false),
-    training_parameters_initialized(false),
-    training_parameters_random_seed(-1) // by default, use std::time to seed RNG
+    _training_parameters_initialized(false),
+    _training_parameters_random_seed(-1) // by default, use std::time to seed RNG
 {
 }
 
@@ -69,7 +69,7 @@ void RBConstructionBase<Base>::clear ()
   // clear the parent data
   Base::clear();
   RBParametrized::clear();
-  training_parameters.clear();
+  _training_parameters.clear();
 }
 
 template <class Base>
@@ -99,14 +99,14 @@ void RBConstructionBase<Base>::get_global_max_error_pair(const Parallel::Communi
 template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_n_training_samples() const
 {
-  libmesh_assert(training_parameters_initialized);
+  libmesh_assert(_training_parameters_initialized);
 
   // First we check if there are no parameters here, and in that case we
   // return 1 since a single training sample is sufficient to generate an
   // RB approximation if there are no parameters. Note that in parallel,
   // and when we don't have a serial training set, set return comm().size()
   // so that each processor is assigned a single (empty) training sample.
-  if (training_parameters.empty())
+  if (_training_parameters.empty())
     {
       if (serial_training_set)
         return 1;
@@ -114,35 +114,35 @@ numeric_index_type RBConstructionBase<Base>::get_n_training_samples() const
         return this->comm().size();
     }
 
-  return training_parameters.begin()->second->size();
+  return _training_parameters.begin()->second->size();
 }
 
 template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_local_n_training_samples() const
 {
-  libmesh_assert(training_parameters_initialized);
+  libmesh_assert(_training_parameters_initialized);
 
   // First we check if there are no parameters here, and in that case we
   // return 1 for both serial and parallel training sets. This is consistent
   // with get_n_training_samples(), and avoids accessing
   // training_parameters.begin() when training_parameters is empty.
-  if (training_parameters.empty())
+  if (_training_parameters.empty())
     return 1;
 
-  return training_parameters.begin()->second->local_size();
+  return _training_parameters.begin()->second->local_size();
 }
 
 template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_first_local_training_index() const
 {
-  libmesh_assert(training_parameters_initialized);
+  libmesh_assert(_training_parameters_initialized);
 
   // First we check if there are no parameters here, and in that case we
   // return 0 for a serial training set and comm().rank() for a parallel
   // training set. This is consistent with get_n_training_samples(), and
   // avoids accessing training_parameters.begin() when training_parameters
   // is empty.
-  if (training_parameters.empty())
+  if (_training_parameters.empty())
     {
       if (serial_training_set)
         return 0;
@@ -150,18 +150,18 @@ numeric_index_type RBConstructionBase<Base>::get_first_local_training_index() co
         return this->comm().rank();
     }
 
-  return training_parameters.begin()->second->first_local_index();
+  return _training_parameters.begin()->second->first_local_index();
 }
 
 template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_last_local_training_index() const
 {
-  libmesh_assert(training_parameters_initialized);
+  libmesh_assert(_training_parameters_initialized);
 
-  if (training_parameters.empty())
+  if (_training_parameters.empty())
     return 0;
 
-  return training_parameters.begin()->second->last_local_index();
+  return _training_parameters.begin()->second->last_local_index();
 }
 
 template <class Base>
@@ -173,13 +173,13 @@ void RBConstructionBase<Base>::set_params_from_training_set(unsigned int index)
 template <class Base>
 RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int index)
 {
-  libmesh_assert(training_parameters_initialized);
+  libmesh_assert(_training_parameters_initialized);
 
   libmesh_assert( (this->get_first_local_training_index() <= index) &&
                   (index < this->get_last_local_training_index()) );
 
   RBParameters params;
-  for (const auto & [param_name, vec_ptr] : training_parameters)
+  for (const auto & [param_name, vec_ptr] : _training_parameters)
     {
       Real param_value = libmesh_real((*vec_ptr)(index));
       params.set_value(param_name, param_value);
@@ -196,7 +196,7 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
 template <class Base>
 void RBConstructionBase<Base>::set_params_from_training_set_and_broadcast(unsigned int index)
 {
-  libmesh_assert(training_parameters_initialized);
+  libmesh_assert(_training_parameters_initialized);
 
   processor_id_type root_id = 0;
   if ((this->get_first_local_training_index() <= index) &&
@@ -242,7 +242,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
     {
       generate_training_parameters_deterministic(this->comm(),
                                                  log_param_scale,
-                                                 training_parameters,
+                                                 _training_parameters,
                                                  n_training_samples,
                                                  mu_min,
                                                  mu_max,
@@ -253,11 +253,11 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
       // Generate random training samples for all parameters
       generate_training_parameters_random(this->comm(),
                                           log_param_scale,
-                                          training_parameters,
+                                          _training_parameters,
                                           n_training_samples,
                                           mu_min,
                                           mu_max,
-                                          this->training_parameters_random_seed,
+                                          this->_training_parameters_random_seed,
                                           serial_training_set);
     }
 
@@ -265,7 +265,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
   // allowable discrete value
   if (get_n_discrete_params() > 0)
     {
-      for (const auto & pr : training_parameters)
+      for (const auto & pr : _training_parameters)
         {
           const std::string & param_name = pr.first;
           if (is_discrete_parameter(param_name))
@@ -287,7 +287,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
         }
     }
 
-  training_parameters_initialized = true;
+  _training_parameters_initialized = true;
 }
 
 template <class Base>
@@ -296,9 +296,8 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
   // Make sure we're running this on all processors at the same time
   libmesh_parallel_only(this->comm());
 
-  // First, make sure that an initial training set has already been
-  // generated
-  libmesh_error_msg_if(!training_parameters_initialized,
+  // First, make sure that an initial training set has already been generated
+  libmesh_error_msg_if(!_training_parameters_initialized,
                        "Error: load_training_set cannot be used to initialize parameters");
 
   // Make sure that the training set has the correct number of parameters
@@ -316,7 +315,7 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
       // with new_training_set.
 
       // Delete the training set vectors (but don't remove the existing keys!)
-      for (auto & pr : training_parameters)
+      for (auto & pr : _training_parameters)
         pr.second.reset(nullptr);
 
       numeric_index_type n_local_training_samples = 0;
@@ -328,7 +327,7 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
           numeric_index_type n_global_training_samples = n_local_training_samples;
           this->comm().sum(n_global_training_samples);
 
-          for (auto & pr : training_parameters)
+          for (auto & pr : _training_parameters)
             {
               pr.second = NumericVector<Number>::build(this->comm());
               pr.second->init(n_global_training_samples, n_local_training_samples, false, PARALLEL);
@@ -339,14 +338,14 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
           n_local_training_samples =
             cast_int<numeric_index_type>(new_training_set.begin()->second.size());
 
-          for (auto & pr : training_parameters)
+          for (auto & pr : _training_parameters)
             {
               pr.second = NumericVector<Number>::build(this->comm());
               pr.second->init(n_local_training_samples, false, SERIAL);
             }
         }
 
-      for (auto & pr : training_parameters)
+      for (auto & pr : _training_parameters)
         {
           const std::string & param_name = pr.first;
           NumericVector<Number> * training_vector = pr.second.get();
@@ -365,8 +364,7 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
       // length of training_parameters unchanged and overwrite the entries of the specified
       // parameters from new_training_set. Note that we repeatedly loop over new_training_set
       // to fill up the entire length of training_vector.
-
-      for (auto & pr : training_parameters)
+      for (auto & pr : _training_parameters)
         {
           const std::string & param_name = pr.first;
           if (new_training_set.count(param_name))
@@ -395,12 +393,12 @@ template <class Base>
 void RBConstructionBase<Base>::set_training_parameter_values(
   const std::string & param_name, const std::vector<Number> & values)
 {
-  libmesh_error_msg_if(!training_parameters_initialized,
+  libmesh_error_msg_if(!_training_parameters_initialized,
     "Training parameters must be initialized before calling set_training_parameter_values");
   libmesh_error_msg_if(values.size() != get_local_n_training_samples(),
     "Inconsistent sizes");
 
-  auto & training_vector = libmesh_map_find(training_parameters, param_name);
+  auto & training_vector = libmesh_map_find(_training_parameters, param_name);
 
   numeric_index_type first_index = training_vector->first_local_index();
   for (auto i : make_range(get_local_n_training_samples()))
@@ -729,7 +727,7 @@ void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
 template <class Base>
 void RBConstructionBase<Base>::set_training_random_seed(int seed)
 {
-  this->training_parameters_random_seed = seed;
+  this->_training_parameters_random_seed = seed;
 }
 
 // Template specializations

@@ -263,12 +263,12 @@ private:
    * Boolean flag to indicate whether or not the
    * parameter ranges have been initialized.
    */
-  bool training_parameters_initialized;
+  bool _training_parameters_initialized;
 
   /**
    * The training samples.
    */
-  std::map<std::string, std::unique_ptr<NumericVector<Number>>> training_parameters;
+  std::map<std::string, std::unique_ptr<NumericVector<Number>>> _training_parameters;
 
   /**
    * If < 0, use std::time() * processor_id() to seed the random
@@ -276,7 +276,7 @@ private:
    * >= 0, use the provided value * processor_id() as the random
    * number generator seed.
    */
-  int training_parameters_random_seed;
+  int _training_parameters_random_seed;
 };
 
 } // namespace libMesh
