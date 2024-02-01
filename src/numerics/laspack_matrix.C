@@ -234,6 +234,36 @@ void LaspackMatrix<T>::get_transpose (SparseMatrix<T> & /*dest*/) const
 
 
 template <typename T>
+void LaspackMatrix<T>::get_row(numeric_index_type i,
+                               std::vector<numeric_index_type> & indices,
+                               std::vector<T> & values) const
+{
+  indices.clear();
+  values.clear();
+
+  const numeric_index_type len = (_row_start[i+1] - _row_start[i]);
+
+  // Make sure we agree on the row length
+  libmesh_assert_equal_to (len, Q_GetLen(&_QMat, i+1));
+
+  auto r_start = _row_start[i];
+
+  for (numeric_index_type l=0; l<len; l++)
+    {
+      const numeric_index_type j = *(r_start + l);
+
+      // Make sure the data structures are working
+      libmesh_assert_equal_to ((j+1), Q_GetPos (&_QMat, i+1, l));
+
+      indices.push_back(j);
+
+      values.push_back(Q_GetVal (&_QMat, i+1, l));
+    }
+}
+
+
+
+template <typename T>
 LaspackMatrix<T>::LaspackMatrix (const Parallel::Communicator & comm) :
   SparseMatrix<T>(comm),
   _closed (false)

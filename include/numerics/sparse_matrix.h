@@ -514,12 +514,9 @@ public:
    *                corresponding to (possibly) non-zero values
    * @param values A container holding the column values
    */
-  virtual void get_row(numeric_index_type /*i*/,
-                       std::vector<numeric_index_type> & /*indices*/,
-                       std::vector<T> & /*values*/) const
-  {
-    libmesh_not_implemented();
-  }
+  virtual void get_row(numeric_index_type i,
+                       std::vector<numeric_index_type> & indices,
+                       std::vector<T> & values) const = 0;
 
 protected:
 

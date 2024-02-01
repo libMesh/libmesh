@@ -157,6 +157,10 @@ public:
 
   virtual void get_transpose(SparseMatrix<T> & dest) const override;
 
+  virtual void get_row(numeric_index_type i,
+                       std::vector<numeric_index_type> & indices,
+                       std::vector<T> & values) const override;
+
   virtual void zero_rows(std::vector<numeric_index_type> & rows, T val = 0) override;
 
   const NumericVector<T> & diagonal() const;

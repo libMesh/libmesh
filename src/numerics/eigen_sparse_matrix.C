@@ -380,6 +380,27 @@ Real EigenSparseMatrix<T>::linfty_norm () const
 }
 
 
+
+template <typename T>
+void EigenSparseMatrix<T>::get_row(numeric_index_type i,
+                                   std::vector<numeric_index_type> & indices,
+                                   std::vector<T> & values) const
+{
+  indices.clear();
+  values.clear();
+
+  // InnerIterator is over rows in RowMajor ordering
+  static_assert(EigenSM::IsRowMajor);
+
+  for (EigenSM::InnerIterator it(_mat, i); it; ++it)
+    {
+      indices.push_back(it.col());
+      values.push_back(it.value());
+    }
+}
+
+
+
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LIBMESH_EXPORT EigenSparseMatrix<Number>;
