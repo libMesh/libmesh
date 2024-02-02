@@ -152,7 +152,7 @@ public:
   virtual T operator () (const numeric_index_type i,
                          const numeric_index_type j) const override;
 
-  virtual Real l1_norm () const override { libmesh_not_implemented(); return 0.; }
+  virtual Real l1_norm () const override;
 
   virtual Real linfty_norm () const override { libmesh_not_implemented(); return 0.; }
 

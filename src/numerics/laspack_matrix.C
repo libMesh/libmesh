@@ -125,11 +125,11 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph & s
 
 
 template <typename T>
-void LaspackMatrix<T>::init (const numeric_index_type libmesh_dbg_var(m_in),
-                             const numeric_index_type libmesh_dbg_var(n_in),
-                             const numeric_index_type libmesh_dbg_var(m_l),
-                             const numeric_index_type libmesh_dbg_var(n_l),
-                             const numeric_index_type libmesh_dbg_var(nnz),
+void LaspackMatrix<T>::init (const numeric_index_type m_in,
+                             const numeric_index_type n_in,
+                             const numeric_index_type m_l,
+                             const numeric_index_type n_l,
+                             const numeric_index_type nnz,
                              const numeric_index_type,
                              const numeric_index_type)
 {
@@ -139,9 +139,67 @@ void LaspackMatrix<T>::init (const numeric_index_type libmesh_dbg_var(m_in),
   libmesh_assert_equal_to (m_in, n_in);
   libmesh_assert_greater (nnz, 0);
 
-  libmesh_error_msg("ERROR: Only the init() member that uses the DofMap is implemented for Laspack matrices!");
+  if ((m_in != m_l) ||
+      (n_in != n_l))
+    libmesh_not_implemented_msg("Laspack does not support distributed matrices");
+
+  if (m_in != n_in)
+    libmesh_not_implemented_msg("Laspack does not support rectangular matrices");
+
+  if (nnz < n_in)
+    libmesh_warning("Using inefficient LaspackMatrix allocation via this init() method");
+
+  const dof_id_type n_rows = m_in;
+
+  // Laspack doesn't let us assign sparse indices on the fly, so
+  // without a sparsity pattern we're stuck allocating a dense matrix
+  {
+    _csr.resize       (m_in * m_in);
+    _row_start.reserve(m_in + 1);
+  }
+
+  // Initialize the _csr data structure.
+  {
+    std::vector<numeric_index_type>::iterator position = _csr.begin();
+
+    _row_start.push_back (position);
+
+    for (numeric_index_type row=0; row<n_rows; row++)
+      {
+        // insert the row indices
+        for (const auto & col : make_range(n_rows))
+          {
+            libmesh_assert (position != _csr.end());
+            *position = col;
+            ++position;
+          }
+
+        _row_start.push_back (position);
+      }
+  }
+
+  Q_Constr(&_QMat, const_cast<char *>("Mat"), m_in, _LPFalse, Rowws, Normal, _LPTrue);
 
   this->_is_initialized = true;
+
+  // Tell the matrix about its structure.  Initialize it
+  // to zero.
+  for (numeric_index_type i=0; i<n_rows; i++)
+    {
+      auto rs = _row_start[i];
+
+      const numeric_index_type length = _row_start[i+1] - rs;
+
+      Q_SetLen (&_QMat, i+1, length);
+
+      for (numeric_index_type l=0; l<length; l++)
+        {
+          const numeric_index_type j = *(rs+l);
+
+          libmesh_assert_equal_to (this->pos(i,j), l);
+          Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
+        }
+    }
 }
 
 
@@ -153,8 +211,8 @@ void LaspackMatrix<T>::init (const ParallelType)
   if (this->initialized())
     return;
 
-  // We need the DofMap for this!
-  libmesh_assert(this->_dof_map);
+  // We need a sparsity pattern for this!
+  libmesh_assert(this->_sp);
 
   // Clear initialized matrices
   if (this->initialized())
@@ -213,6 +271,41 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
   for (unsigned int i=0; i<n_rows; i++)
     for (unsigned int j=0; j<n_cols; j++)
       this->add(rows[i],cols[j],dm(i,j));
+}
+
+
+
+template <typename T>
+Real LaspackMatrix<T>::l1_norm () const
+{
+  // There does not seem to be a straightforward way to iterate over
+  // the columns of a LaspackMatrix.  So we use some extra storage and
+  // keep track of the column sums while going over the row entries...
+  std::vector<Real> abs_col_sums(this->n());
+
+  const numeric_index_type n_rows = this->m();
+
+  for (numeric_index_type row : make_range(n_rows))
+    {
+      auto r_start = _row_start[row];
+
+      const numeric_index_type len = (_row_start[row+1] - _row_start[row]);
+
+      // Make sure we agree on the row length
+      libmesh_assert_equal_to (len, Q_GetLen(&_QMat, row+1));
+
+      for (numeric_index_type l=0; l<len; l++)
+        {
+          const numeric_index_type j = *(r_start + l);
+
+          // Make sure the data structures are working
+          libmesh_assert_equal_to ((j+1), Q_GetPos (&_QMat, row+1, l));
+
+          abs_col_sums[j] += std::abs(Q_GetVal (&_QMat, row+1, l));
+        }
+    }
+
+  return *(std::max_element(abs_col_sums.begin(), abs_col_sums.end()));
 }
 
 
@@ -329,18 +422,17 @@ void LaspackMatrix<T>::zero ()
 template <typename T>
 std::unique_ptr<SparseMatrix<T>> LaspackMatrix<T>::zero_clone () const
 {
-  // This function is marked as "not implemented" since it hasn't been
-  // tested, the code below might serve as a possible implementation.
-  libmesh_not_implemented();
-
   // Make empty copy with matching comm, initialize, zero, and return.
   auto mat_copy = std::make_unique<LaspackMatrix<T>>(this->comm());
-  mat_copy->init();
+  if (this->_dof_map)
+    mat_copy->attach_dof_map(*this->_dof_map);
+  else
+    mat_copy->init(this->m(), this->n(), this->local_m(),
+                   this->local_n(), this->local_n());
+
   mat_copy->zero();
 
-  // Work around an issue on older compilers.  We are able to simply
-  // "return mat_copy;" on newer compilers
-  return std::unique_ptr<SparseMatrix<T>>(mat_copy.release());
+  return mat_copy;
 }
 
 
