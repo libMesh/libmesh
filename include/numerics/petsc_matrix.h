@@ -197,7 +197,7 @@ public:
   /**
    * Get the number of columns owned by this process
    */
-  numeric_index_type local_n () const;
+  virtual numeric_index_type local_n () const final;
 
   /**
    * Get the number of rows and columns owned by this process
