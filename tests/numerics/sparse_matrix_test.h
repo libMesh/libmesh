@@ -159,6 +159,11 @@ public:
 
     TestCommWorld->barrier();
 
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+    // We're not supporting complex reads quite yet
+    return;
+#endif
+
     matrix->read_matlab(libmesh_suite_name+"_matrix.m");
 
     TestCommWorld->barrier();
