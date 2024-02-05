@@ -607,8 +607,17 @@ void Build::apply_extra_sparsity_object(SparsityPattern::AugmentSparsityPattern 
 
 std::size_t Build::n_nonzeros() const
 {
-  std::size_t total_nonzeros = std::reduce(n_nz.begin(), n_nz.end(), std::size_t(0));
-  total_nonzeros += std::reduce(n_oz.begin(), n_oz.end(), std::size_t(0));
+  // At some point I'll remember that "C++17" compilers don't always
+  // come with complete C++17 standard libraries.
+  // std::size_t total_nonzeros = std::reduce(n_nz.begin(), n_nz.end(), std::size_t(0));
+  // total_nonzeros += std::reduce(n_oz.begin(), n_oz.end(), std::size_t(0));
+
+  std::size_t total_nonzeros = 0;
+  for (auto nnzi : n_nz)
+    total_nonzeros += nnzi;
+  for (auto nozi : n_oz)
+    total_nonzeros += nozi;
+
   this->comm().sum(total_nonzeros);
   return total_nonzeros;
 }
