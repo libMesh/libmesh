@@ -20,6 +20,7 @@
 
 #define SPARSEMATRIXTEST                     \
   CPPUNIT_TEST(testGetAndSet);               \
+  CPPUNIT_TEST(testWriteAndRead);            \
   CPPUNIT_TEST(testClone);
 
 
@@ -134,6 +135,33 @@ public:
     LOG_UNIT_TEST;
 
     setValues();
+
+    testValues();
+  }
+
+  void testWriteAndRead()
+  {
+    LOG_UNIT_TEST;
+
+    setValues();
+
+    // If we're working with serial matrices then just print one of
+    // them so they don't step on the others' toes.
+    if (matrix->n_processors() > 1 ||
+        TestCommWorld->rank() == 0)
+      matrix->print_matlab(libmesh_suite_name+"_matrix.m");
+
+    matrix->clear();
+
+    // Let's make sure we don't have any race conditions; we have
+    // multiple SparseMatrix subclasses that might be trying to read
+    // and write the same file.
+
+    TestCommWorld->barrier();
+
+    matrix->read_matlab(libmesh_suite_name+"_matrix.m");
+
+    TestCommWorld->barrier();
 
     testValues();
   }
