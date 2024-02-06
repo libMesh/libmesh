@@ -27,11 +27,13 @@
 #include "libmesh/ghost_point_neighbors.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
+#include "libmesh/mesh_serializer.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_algebra.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/point_locator_base.h"
+#include "libmesh/sparse_matrix.h"
 #include "libmesh/threads.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_point_locator_type.h"
@@ -1930,9 +1932,13 @@ bool MeshBase::nodes_and_elements_equal(const MeshBase & other_mesh) const
   return true;
 }
 
+
+
 void
 MeshBase::copy_constraint_rows(const MeshBase & other_mesh)
 {
+  _constraint_rows.clear();
+
   const auto & other_constraint_rows = other_mesh.get_constraint_rows();
   for (const auto & [other_node, other_node_constraints] : other_constraint_rows)
   {
@@ -1947,5 +1953,197 @@ MeshBase::copy_constraint_rows(const MeshBase & other_mesh)
     _constraint_rows[our_node] = std::move(our_node_constraints);
   }
 }
+
+
+void
+MeshBase::copy_constraint_rows(const SparseMatrix<Real> & constraint_operator)
+{
+  this->_constraint_rows.clear();
+
+  // We're not going to support doing this distributed yet; it'd be
+  // pointless unless we temporarily had a linear partitioning to
+  // better match the constraint operator.
+  MeshSerializer serialize(*this);
+
+  // Our current mesh should already reflect the desired assembly space
+  libmesh_error_msg_if(this->n_nodes() != constraint_operator.m(),
+                       "Constraint operator matrix does not match this mesh");
+
+  // First, find what new unconstrained DoFs we need to add.  We can't
+  // iterate over columns in a SparseMatrix, so we'll iterate over
+  // rows and keep track of columns.
+
+  // If we have nodes that will work unconstrained, keep track of
+  // their node ids and corresponding column indices.
+  // existing_unconstrained_nodes[column_id] = node_id
+  std::map<dof_id_type, dof_id_type> existing_unconstrained_columns;
+  std::set<dof_id_type> existing_unconstrained_nodes;
+
+  // In case we need new nodes, keep track of their columns.
+  // columns[j][k] will be the kth row index and value of column j
+  typedef
+    std::unordered_map<dof_id_type,
+                       std::vector<std::pair<dof_id_type, Real>>>
+    columns_type;
+  columns_type columns(constraint_operator.n());
+
+  // Work in parallel, though we'll have to sync shortly
+  for (auto i : make_range(constraint_operator.row_start(),
+                           constraint_operator.row_stop()))
+    {
+      std::vector<numeric_index_type> indices;
+      std::vector<Real> values;
+
+      constraint_operator.get_row(i, indices, values);
+      libmesh_assert_equal_to(indices.size(), values.size());
+
+      if (indices.size() == 1 &&
+          values[0] == 1)
+        {
+          existing_unconstrained_nodes.insert(i);
+          existing_unconstrained_columns.emplace(indices[0],i);
+        }
+      else
+        for (auto jj : index_range(indices))
+          {
+            const auto j = indices[jj];
+            columns[j].emplace_back(i, values[jj]);
+          }
+    }
+
+  // Merge data from different processors' slabs of the matrix
+  this->comm().set_union(existing_unconstrained_nodes);
+  this->comm().set_union(existing_unconstrained_columns);
+
+  std::vector<columns_type> all_columns;
+  this->comm().allgather(columns, all_columns);
+
+  columns.clear();
+  for (auto p : index_range(all_columns))
+    for (auto & [j, subcol] : all_columns[p])
+      for (auto [i, v] : subcol)
+        columns[j].emplace_back(i,v);
+
+  // Keep track of elements on which unconstrained nodes exist, and
+  // their local node indices.
+  // node_to_elem_ptrs[node] = [elem_id, local_node_num]
+  std::unordered_map<const Node *, std::pair<dof_id_type, unsigned int>> node_to_elem_ptrs;
+
+  // Find elements attached to any existing nodes that will stay
+  // unconstrained
+  for (const Elem * elem : this->element_ptr_range())
+    for (auto n : make_range(elem->n_nodes()))
+      {
+        const Node * node = elem->node_ptr(n);
+        if (existing_unconstrained_nodes.count(node->id()))
+          node_to_elem_ptrs.emplace(node, std::make_pair(elem->id(), n));
+      }
+
+  for (auto j : make_range(constraint_operator.n()))
+    {
+      // If we already have a good node for this then we're done
+      if (existing_unconstrained_columns.find(j) !=
+          existing_unconstrained_columns.end())
+        continue;
+
+      // Get a half-decent spot to place a new NodeElem for
+      // unconstrained DoF(s) here.  Getting a *fully*-decent spot
+      // would require finding a Moore-Penrose pseudoinverse, and I'm
+      // not going to do that, but scaling a transpose will at least
+      // get us a little uniqueness to make visualization reasonable.
+      Point newpt;
+      Real total_scaling = 0;
+
+      // We'll get a decent initial pid choice here too, if only to
+      // aid in later repartitioning.
+      std::map<processor_id_type, int> pids;
+
+      auto & column = columns[j];
+      for (auto [i, r] : column)
+        {
+          Node & constrained_node = this->node_ref(i);
+          const Point constrained_pt = constrained_node;
+          newpt += r*constrained_pt;
+          total_scaling += r;
+          ++pids[constrained_node.processor_id()];
+        }
+      newpt /= total_scaling;
+
+      Node *n = this->add_point(newpt);
+      std::unique_ptr<Elem> elem = Elem::build(NODEELEM);
+      elem->set_node(0) = n;
+
+      int n_pids = 0;
+      for (auto [pid, count] : pids)
+        if (count >= n_pids)
+          {
+            n_pids = count;
+            elem->processor_id() = pid;
+            n->processor_id() = pid;
+          }
+
+      const Elem * added_elem = this->add_elem(std::move(elem));
+      node_to_elem_ptrs.emplace(n, std::make_pair(added_elem->id(), 0));
+      existing_unconstrained_columns.emplace(j,n->id());
+    }
+
+  // Calculate constraint rows in an indexed form that's easy for us
+  // to allgather
+  std::unordered_map<dof_id_type,
+    std::vector<std::pair<std::pair<dof_id_type, unsigned int>,Real>>>
+    indexed_constraint_rows;
+
+  for (auto i : make_range(constraint_operator.row_start(),
+                           constraint_operator.row_stop()))
+    {
+      if (existing_unconstrained_nodes.count(i))
+        continue;
+
+      std::vector<numeric_index_type> indices;
+      std::vector<Real> values;
+
+      constraint_operator.get_row(i, indices, values);
+
+      std::vector<std::pair<std::pair<dof_id_type, unsigned int>, Real>> constraint_row;
+
+      for (auto jj : index_range(indices))
+        {
+          const dof_id_type node_id =
+            existing_unconstrained_columns[indices[jj]];
+
+          Node & constraining_node = this->node_ref(node_id);
+
+          libmesh_assert(node_to_elem_ptrs.count(&constraining_node));
+
+          auto p = node_to_elem_ptrs[&constraining_node];
+
+          constraint_row.emplace_back(std::make_pair(p, values[jj]));
+        }
+
+      indexed_constraint_rows.emplace(i, std::move(constraint_row));
+    }
+
+  this->comm().set_union(indexed_constraint_rows);
+
+  // Add constraint rows as mesh constraint rows
+  for (auto & [node_id, indexed_row] : indexed_constraint_rows)
+    {
+      Node * constrained_node = this->node_ptr(node_id);
+
+      constraint_rows_mapped_type constraint_row;
+
+      for (auto [p, coef] : indexed_row)
+        {
+          const Elem * elem = this->elem_ptr(p.first);
+          constraint_row.emplace_back
+            (std::make_pair(std::make_pair(elem, p.second), coef));
+        }
+
+      this->_constraint_rows.emplace(constrained_node,
+                                     std::move(constraint_row));
+    }
+}
+
+
 
 } // namespace libMesh
