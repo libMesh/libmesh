@@ -225,6 +225,11 @@ public:
   virtual numeric_index_type local_m () const { return row_stop() - row_start(); }
 
   /**
+   * Get the number of columns owned by this process
+   */
+  virtual numeric_index_type local_n () const { return col_stop() - col_start(); }
+
+  /**
    * \returns The column-dimension of the matrix.
    */
   virtual numeric_index_type n () const = 0;
@@ -240,6 +245,18 @@ public:
    * processor.
    */
   virtual numeric_index_type row_stop () const = 0;
+
+  /**
+   * \returns The index of the first matrix column owned by this
+   * processor.
+   */
+  virtual numeric_index_type col_start () const = 0;
+
+  /**
+   * \returns The index of the last matrix column (+1) owned by this
+   * processor.
+   */
+  virtual numeric_index_type col_stop () const = 0;
 
   /**
    * Set the element \p (i,j) to \p value.  Throws an error if the
@@ -350,6 +367,12 @@ public:
   virtual bool closed() const = 0;
 
   /**
+   * \returns the global number of non-zero entries in the matrix
+   * sparsity pattern
+   */
+  virtual std::size_t n_nonzeros() const;
+
+  /**
    * Print the contents of the matrix to the screen in a uniform
    * style, regardless of matrix/solver package being used.
    */
@@ -395,10 +418,20 @@ public:
    * format. Optionally prints the matrix to the file named \p name.
    * If \p name is not specified it is dumped to the screen.
    */
-  virtual void print_matlab(const std::string & /*name*/ = "") const
-  {
-    libmesh_not_implemented();
-  }
+  virtual void print_matlab(const std::string & /*name*/ = "") const;
+
+  /**
+   * Read the contents of the matrix from Matlab's sparse matrix
+   * format.
+   *
+   * If the size and sparsity of the matrix in \p filename appears
+   * consistent with the existing sparsity of \p this then the
+   * existing parallel decomposition and sparsity will be retained.
+   * If not, then \p this will be initialized with the sparsity from
+   * the file, linearly partitioned onto the number of processors
+   * available.
+   */
+  virtual void read_matlab(const std::string & filename);
 
   /**
    * This function creates a matrix called "submatrix" which is defined
@@ -481,12 +514,9 @@ public:
    *                corresponding to (possibly) non-zero values
    * @param values A container holding the column values
    */
-  virtual void get_row(numeric_index_type /*i*/,
-                       std::vector<numeric_index_type> & /*indices*/,
-                       std::vector<T> & /*values*/) const
-  {
-    libmesh_not_implemented();
-  }
+  virtual void get_row(numeric_index_type i,
+                       std::vector<numeric_index_type> & indices,
+                       std::vector<T> & values) const = 0;
 
 protected:
 

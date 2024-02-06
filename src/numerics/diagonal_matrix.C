@@ -178,6 +178,20 @@ DiagonalMatrix<T>::row_stop() const
 }
 
 template <typename T>
+numeric_index_type
+DiagonalMatrix<T>::col_start() const
+{
+  return _diagonal->first_local_index();
+}
+
+template <typename T>
+numeric_index_type
+DiagonalMatrix<T>::col_stop() const
+{
+  return _diagonal->last_local_index();
+}
+
+template <typename T>
 void
 DiagonalMatrix<T>::set(const numeric_index_type i, const numeric_index_type j, const T value)
 {
@@ -267,12 +281,16 @@ DiagonalMatrix<T>::print_personal(std::ostream & os) const
   _diagonal->print(os);
 }
 
+
+
 template <typename T>
 void
 DiagonalMatrix<T>::get_diagonal(NumericVector<T> & dest) const
 {
   dest = *_diagonal;
 }
+
+
 
 template <typename T>
 void
@@ -285,6 +303,22 @@ DiagonalMatrix<T>::get_transpose(SparseMatrix<T> & dest) const
     libmesh_error_msg("DenseMatrix<T>::get_transpose currently only accepts another DenseMatrix<T> "
                       "as its argument");
 }
+
+
+
+template <typename T>
+void
+DiagonalMatrix<T>::get_row(numeric_index_type i,
+                           std::vector<numeric_index_type> & indices,
+                           std::vector<T> & values) const
+{
+  indices.clear();
+  indices.push_back(i);
+  values.clear();
+  values.push_back((*_diagonal)(i));
+}
+
+
 
 template <typename T>
 void

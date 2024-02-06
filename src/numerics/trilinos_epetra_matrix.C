@@ -329,6 +329,38 @@ void EpetraMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
 
 
 template <typename T>
+void EpetraMatrix<T>::get_row(numeric_index_type i,
+                              std::vector<numeric_index_type> & indices,
+                              std::vector<T> & values) const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(this->_mat);
+  libmesh_assert (this->_mat->MyGlobalRow(static_cast<int>(i)));
+  libmesh_assert_greater_equal (i, this->row_start());
+  libmesh_assert_less (i, this->row_stop());
+
+  int row_length;
+  int * row_indices;
+  double * row_values;
+
+  _mat->ExtractMyRowView (i-this->row_start(),
+                          row_length,
+                          row_values,
+                          row_indices);
+
+  indices.resize(row_length);
+  values.resize(row_length);
+
+  for (auto i : make_range(row_length))
+    {
+      indices[i] = row_indices[i];
+      values[i] = row_values[i];
+    }
+}
+
+
+
+template <typename T>
 EpetraMatrix<T>::EpetraMatrix(const Parallel::Communicator & comm) :
   SparseMatrix<T>(comm),
   _destroy_mat_on_exit(true),
@@ -403,6 +435,28 @@ numeric_index_type EpetraMatrix<T>::row_start () const
 
 template <typename T>
 numeric_index_type EpetraMatrix<T>::row_stop () const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(_map);
+
+  return static_cast<numeric_index_type>(_map->MaxMyGID())+1;
+}
+
+
+
+template <typename T>
+numeric_index_type EpetraMatrix<T>::col_start () const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(_map);
+
+  return static_cast<numeric_index_type>(_map->MinMyGID());
+}
+
+
+
+template <typename T>
+numeric_index_type EpetraMatrix<T>::col_stop () const
 {
   libmesh_assert (this->initialized());
   libmesh_assert(_map);

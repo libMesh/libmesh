@@ -33,6 +33,11 @@
 
 // C++ includes
 #include <memory>
+#include <fstream>
+
+#ifdef LIBMESH_HAVE_CXX11_REGEX
+#include <regex>
+#endif
 
 
 namespace libMesh
@@ -220,6 +225,14 @@ void SparseMatrix<T>::zero_rows (std::vector<numeric_index_type> &, T)
 }
 
 
+template <typename T>
+std::size_t SparseMatrix<T>::n_nonzeros() const
+{
+  if (!_sp)
+    return 0;
+  return _sp->n_nonzeros();
+}
+
 
 template <typename T>
 void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
@@ -228,15 +241,15 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
 
   libmesh_assert (this->initialized());
 
-  libmesh_error_msg_if(!this->_dof_map, "Error!  Trying to print a matrix with no dof_map set!");
+  const numeric_index_type first_dof = this->row_start(),
+                           end_dof   = this->row_stop();
 
   // We'll print the matrix from processor 0 to make sure
   // it's serialized properly
   if (this->processor_id() == 0)
     {
-      libmesh_assert_equal_to (this->_dof_map->first_dof(), 0);
-      for (numeric_index_type i=this->_dof_map->first_dof();
-           i!=this->_dof_map->end_dof(); ++i)
+      libmesh_assert_equal_to (first_dof, 0);
+      for (numeric_index_type i : make_range(end_dof))
         {
           if (sparse)
             {
@@ -259,7 +272,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
 
       std::vector<numeric_index_type> ibuf, jbuf;
       std::vector<T> cbuf;
-      numeric_index_type currenti = this->_dof_map->end_dof();
+      numeric_index_type currenti = end_dof;
       for (auto p : IntRange<processor_id_type>(1, this->n_processors()))
         {
           this->comm().receive(p, ibuf);
@@ -324,8 +337,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
 
       // We'll assume each processor has access to entire
       // matrix rows, so (*this)(i,j) is valid if i is a local index.
-      for (numeric_index_type i=this->_dof_map->first_dof();
-           i!=this->_dof_map->end_dof(); ++i)
+      for (numeric_index_type i : make_range(first_dof, end_dof))
         {
           for (auto j : make_range(this->n()))
             {
@@ -343,6 +355,396 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
       this->comm().send(0,cbuf);
     }
 }
+
+
+template <typename T>
+void SparseMatrix<T>::print_matlab(const std::string & name) const
+{
+  parallel_object_only();
+
+  libmesh_assert (this->initialized());
+
+  const numeric_index_type first_dof = this->row_start(),
+                           end_dof   = this->row_stop();
+
+  // We'll print the matrix from processor 0 to make sure
+  // it's serialized properly
+  if (this->processor_id() == 0)
+    {
+      std::unique_ptr<std::ofstream> file;
+
+      if (name != "")
+        file = std::make_unique<std::ofstream>(name.c_str());
+
+      std::ostream & os = (name == "") ? libMesh::out : *file;
+
+      std::size_t sparsity_nonzeros = this->n_nonzeros();
+
+      std::size_t real_nonzeros = 0;
+
+      libmesh_assert_equal_to(first_dof, 0);
+      for (numeric_index_type i : make_range(end_dof))
+        {
+          for (auto j : make_range(this->n()))
+            {
+              T c = (*this)(i,j);
+              if (c != static_cast<T>(0.0))
+                ++real_nonzeros;
+            }
+        }
+
+
+      for (auto p : IntRange<processor_id_type>(1, this->n_processors()))
+        {
+          std::size_t nonzeros_on_p = 0;
+          this->comm().receive(p, nonzeros_on_p);
+          real_nonzeros += nonzeros_on_p;
+        }
+
+      if (sparsity_nonzeros &&
+          sparsity_nonzeros != real_nonzeros)
+        libmesh_warning(sparsity_nonzeros <<
+                        " nonzeros allocated, but " <<
+                        real_nonzeros << " used.");
+
+      // We probably want to be more consistent than that, if our
+      // sparsity is overallocated.
+
+      // Print a header similar to PETSc's mat_view ascii_matlab
+      os << "%Mat Object: () " << this->n_processors() << " MPI processes\n"
+         << "%  type: " << (this->n_processors() > 1 ? "mpi" : "seq") << "aij\n"
+         << "% Size = " << this->m() << ' ' << this->n() << '\n'
+         << "% Nonzeros = " << real_nonzeros << '\n'
+         << "zzz = zeros(" << real_nonzeros << ",3);\n"
+         << "zzz = [\n";
+
+      for (numeric_index_type i : make_range(end_dof))
+        {
+          // FIXME - we need a base class way to iterate over a
+          // SparseMatrix row.
+          for (auto j : make_range(this->n()))
+            {
+              T c = (*this)(i,j);
+              if (c != static_cast<T>(0.0))
+                {
+                  // Convert from 0-based to 1-based indexing
+                  os << (i+1) << ' ' << (j+1) << "  " << c << '\n';
+                }
+            }
+        }
+
+      std::vector<numeric_index_type> ibuf, jbuf;
+      std::vector<T> cbuf;
+      for (auto p : IntRange<processor_id_type>(1, this->n_processors()))
+        {
+          this->comm().receive(p, ibuf);
+          this->comm().receive(p, jbuf);
+          this->comm().receive(p, cbuf);
+          libmesh_assert_equal_to (ibuf.size(), jbuf.size());
+          libmesh_assert_equal_to (ibuf.size(), cbuf.size());
+
+          for (auto n : index_range(ibuf))
+            os << ibuf[n] << ' ' << jbuf[n] << "  " << cbuf[n] << '\n';
+        }
+
+      os << "];\n" << "Mat_sparse = spconvert(zzz);" << std::endl;
+    }
+  else
+    {
+      std::vector<numeric_index_type> ibuf, jbuf;
+      std::vector<T> cbuf;
+      std::size_t my_nonzeros = 0;
+
+      // We'll assume each processor has access to entire
+      // matrix rows, so (*this)(i,j) is valid if i is a local index.
+      for (numeric_index_type i : make_range(first_dof, end_dof))
+        {
+          for (auto j : make_range(this->n()))
+            {
+              T c = (*this)(i,j);
+              if (c != static_cast<T>(0.0))
+                {
+                  ibuf.push_back(i);
+                  jbuf.push_back(j);
+                  cbuf.push_back(c);
+                  ++my_nonzeros;
+                }
+            }
+        }
+      this->comm().send(0,my_nonzeros);
+      this->comm().send(0,ibuf);
+      this->comm().send(0,jbuf);
+      this->comm().send(0,cbuf);
+    }
+}
+
+
+template <typename T>
+void SparseMatrix<T>::read_matlab(const std::string & filename)
+{
+#ifndef LIBMESH_HAVE_CXX11_REGEX
+  libmesh_not_implemented();  // What is your compiler?!?  Email us!
+#else
+  parallel_object_only();
+
+  // The sizes we get from the file
+  std::size_t m, n;
+
+  // We'll read through the file three times: once to get a reliable
+  // value for the matrix size (so we can divvy it up among
+  // processors), then again to get the sparsity to send to each
+  // processor, then a final time to get the entries to send to each
+  // processor.
+  std::unique_ptr<std::ifstream> file;
+
+  // We'll be using regular expressions to make ourselves slightly
+  // more robust to formatting.
+  const std::regex start_regex // assignment like "zzz = ["
+    ("\\s*\\w+\\s*=\\s*\\[");
+  const std::regex entry_regex // row/col/val like "1 1 -2.0e-4"
+    ("(\\d+)\\s+(\\d+)\\s+([+-]?(\\d+([.]\\d*)?([eE][+-]?\\d+)?|[.]\\d+([eE][+-]?\\d+)?))");
+  const std::regex end_regex // end of assignment
+    ("^[^%]*\\]");
+
+  // We'll read the matrix on processor 0 rather than try to juggle
+  // parallel I/O.  Start by reading to deduce the size.
+  if (this->processor_id() == 0)
+    {
+      file = std::make_unique<std::ifstream>(filename.c_str());
+
+      // If we have a matrix with all-zero trailing rows, the only
+      // way to get the size is if it ended up in a comment
+      const std::regex size_regex // comment like "% size = 8 8"
+        ("%\\s*[Ss][Ii][Zz][Ee]\\s*=\\s*(\\d+)\\s+(\\d+)");
+
+      // Get the size
+      bool have_started = false;
+      bool have_ended = false;
+      std::size_t largest_i_seen = 0, largest_j_seen = 0;
+      for (std::string line; std::getline(*file, line);)
+        {
+          std::smatch sm;
+
+          if (std::regex_search(line, sm, size_regex))
+            {
+              const std::string msize = sm[1];
+              const std::string nsize = sm[2];
+              m = std::stoull(msize);
+              n = std::stoull(nsize);
+            }
+
+          if (std::regex_search(line, start_regex))
+            have_started = true;
+
+          if (std::regex_search(line, sm, entry_regex))
+            {
+              libmesh_error_msg_if
+                (!have_started, "Confused by premature entries in matrix file " << filename);
+
+              const std::string istr = sm[1];
+              const std::string jstr = sm[2];
+
+              std::size_t i = std::stoull(istr);
+              largest_i_seen = std::max(i, largest_i_seen);
+              std::size_t j = std::stoull(jstr);
+              largest_j_seen = std::max(j, largest_j_seen);
+            }
+
+          if (std::regex_search(line, end_regex))
+            {
+              have_ended = true;
+              break;
+            }
+        }
+
+      libmesh_error_msg_if
+        (!have_started, "Confused by missing assignment beginning in matrix file " << filename);
+
+      libmesh_error_msg_if
+        (!have_ended, "Confused by missing assignment ending in matrix file " << filename);
+
+      libmesh_error_msg_if
+        (m > largest_i_seen, "Confused by missing final row(s) in matrix file " << filename);
+
+      libmesh_error_msg_if
+        (m > 0 && m < largest_i_seen, "Confused by extra final row(s) in matrix file " << filename);
+
+      if (!m)
+        m = largest_i_seen;
+
+      libmesh_error_msg_if
+        (n > largest_j_seen, "Confused by missing final column(s) in matrix file " << filename);
+
+      libmesh_error_msg_if
+        (n > 0 && n < largest_j_seen, "Confused by extra final column(s) in matrix file " << filename);
+
+      if (!n)
+        n = largest_j_seen;
+
+      this->comm().broadcast(m);
+      this->comm().broadcast(n);
+    }
+  else
+    {
+      this->comm().broadcast(m);
+      this->comm().broadcast(n);
+    }
+
+  // If we don't already have this size, we'll need to reinit later,
+  // and we'll need to redetermine which rows each processor is in
+  // charge of.
+
+  numeric_index_type
+    new_row_start =     this->processor_id() * m / this->n_processors(),
+    new_row_stop  = (this->processor_id()+1) * m / this->n_processors();
+  numeric_index_type
+    new_col_start =     this->processor_id() * n / this->n_processors(),
+    new_col_stop  = (this->processor_id()+1) * n / this->n_processors();
+
+  if (this->initialized() &&
+      m == this->m() &&
+      n == this->n())
+    {
+      new_row_start = this->row_start(),
+      new_row_stop  = this->row_stop();
+
+      new_col_start = this->col_start(),
+      new_col_stop  = this->col_stop();
+    }
+
+  std::vector<numeric_index_type> new_row_starts, new_row_stops,
+                                  new_col_starts, new_col_stops;
+
+  this->comm().gather(0, new_row_start, new_row_starts);
+  this->comm().gather(0, new_row_stop, new_row_stops);
+  this->comm().gather(0, new_col_start, new_col_starts);
+  this->comm().gather(0, new_col_stop, new_col_stops);
+
+  // Reread to deduce the sparsity pattern, or at least the maximum
+  // number of on- and off- diagonal non-zeros per row.
+  numeric_index_type  on_diagonal_nonzeros =0,
+                     off_diagonal_nonzeros =0;
+
+  if (this->processor_id() == 0)
+    {
+      file->seekg(0);
+
+      bool have_started = false;
+
+      // Data for the row we're working on
+
+      // Use 1-based indexing for current_row, as in the file
+      numeric_index_type current_row = 1;
+      processor_id_type current_proc = 0;
+      numeric_index_type current_on_diagonal_nonzeros = 0;
+      numeric_index_type current_off_diagonal_nonzeros = 0;
+
+      for (std::string line; std::getline(*file, line);)
+        {
+          std::smatch sm;
+
+          if (std::regex_search(line, start_regex))
+            have_started = true;
+
+          if (have_started && std::regex_search(line, sm, entry_regex))
+            {
+              const std::string istr = sm[1];
+              const std::string jstr = sm[2];
+
+              const numeric_index_type i = std::stoull(istr);
+              const numeric_index_type j = std::stoull(jstr);
+
+              libmesh_error_msg_if
+                (!i || !j, "Expected 1-based indexing in matrix file "
+                 << filename);
+
+              libmesh_error_msg_if
+                (i < current_row,
+                 "Can't handle out-of-order entries in matrix file "
+                 << filename);
+              if (i > current_row)
+                {
+                  current_row = i;
+                  // +1 for 1-based indexing in file
+                  while (current_row >= (new_row_stops[current_proc]+1))
+                    ++current_proc;
+                  current_on_diagonal_nonzeros = 0;
+                  current_off_diagonal_nonzeros = 0;
+                }
+
+              // +1 for 1-based indexing in file
+              if (j >= (new_col_starts[current_proc]+1) &&
+                  j < (new_col_stops[current_proc]+1))
+                {
+                  ++current_on_diagonal_nonzeros;
+                  on_diagonal_nonzeros =
+                    std::max(on_diagonal_nonzeros,
+                             current_on_diagonal_nonzeros);
+                }
+              else
+                {
+                  ++current_off_diagonal_nonzeros;
+                  off_diagonal_nonzeros =
+                    std::max(off_diagonal_nonzeros,
+                             current_off_diagonal_nonzeros);
+                }
+            }
+
+          if (std::regex_search(line, end_regex))
+            break;
+        }
+    }
+
+  this->comm().broadcast(on_diagonal_nonzeros);
+  this->comm().broadcast(off_diagonal_nonzeros);
+
+  this->init(m, n,
+             new_row_stop-new_row_start,
+             new_col_stop-new_col_start,
+             on_diagonal_nonzeros,
+             off_diagonal_nonzeros);
+
+  // One last reread to set values
+  if (this->processor_id() == 0)
+    {
+      file->seekg(0);
+
+      bool have_started = false;
+
+      for (std::string line; std::getline(*file, line);)
+        {
+          std::smatch sm;
+
+          if (std::regex_search(line, start_regex))
+            have_started = true;
+
+          if (have_started && std::regex_search(line, sm, entry_regex))
+            {
+              const std::string istr = sm[1];
+              const std::string jstr = sm[2];
+              const std::string cstr = sm[3];
+
+              const numeric_index_type i = std::stoull(istr);
+              const numeric_index_type j = std::stoull(jstr);
+
+              // Try to be compatible with
+              // higher-than-double-precision T
+              std::stringstream ss(cstr);
+              T value;
+              ss >> value;
+
+              // Convert from 1-based to 0-based indexing
+              this->set(i-1, j-1, value);
+            }
+
+          if (std::regex_search(line, end_regex))
+            break;
+        }
+    }
+  this->close();
+#endif
+}
+
 
 
 

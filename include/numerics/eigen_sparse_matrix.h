@@ -111,6 +111,10 @@ public:
 
   virtual numeric_index_type row_stop () const override;
 
+  virtual numeric_index_type col_start () const override;
+
+  virtual numeric_index_type col_stop () const override;
+
   virtual void set (const numeric_index_type i,
                     const numeric_index_type j,
                     const T value) override;
@@ -143,6 +147,9 @@ public:
 
   virtual void get_transpose (SparseMatrix<T> & dest) const override;
 
+  virtual void get_row(numeric_index_type i,
+                       std::vector<numeric_index_type> & indices,
+                       std::vector<T> & values) const override;
 private:
 
   /**

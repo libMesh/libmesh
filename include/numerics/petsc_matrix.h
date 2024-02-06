@@ -197,7 +197,7 @@ public:
   /**
    * Get the number of columns owned by this process
    */
-  numeric_index_type local_n () const;
+  virtual numeric_index_type local_n () const final;
 
   /**
    * Get the number of rows and columns owned by this process
@@ -209,6 +209,10 @@ public:
   virtual numeric_index_type row_start () const override;
 
   virtual numeric_index_type row_stop () const override;
+
+  virtual numeric_index_type col_start () const override;
+
+  virtual numeric_index_type col_stop () const override;
 
   virtual void set (const numeric_index_type i,
                     const numeric_index_type j,

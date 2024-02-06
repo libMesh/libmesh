@@ -255,6 +255,22 @@ numeric_index_type EigenSparseMatrix<T>::row_stop () const
 
 
 template <typename T>
+numeric_index_type EigenSparseMatrix<T>::col_start () const
+{
+  return 0;
+}
+
+
+
+template <typename T>
+numeric_index_type EigenSparseMatrix<T>::col_stop () const
+{
+  return this->n();
+}
+
+
+
+template <typename T>
 void EigenSparseMatrix<T>::set (const numeric_index_type i,
                                 const numeric_index_type j,
                                 const T value)
@@ -362,6 +378,27 @@ Real EigenSparseMatrix<T>::linfty_norm () const
 
   return max_abs_row_sum;
 }
+
+
+
+template <typename T>
+void EigenSparseMatrix<T>::get_row(numeric_index_type i,
+                                   std::vector<numeric_index_type> & indices,
+                                   std::vector<T> & values) const
+{
+  indices.clear();
+  values.clear();
+
+  // InnerIterator is over rows in RowMajor ordering
+  static_assert(EigenSM::IsRowMajor);
+
+  for (EigenSM::InnerIterator it(_mat, i); it; ++it)
+    {
+      indices.push_back(it.col());
+      values.push_back(it.value());
+    }
+}
+
 
 
 //------------------------------------------------------------------

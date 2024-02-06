@@ -159,6 +159,11 @@ public:
   { return nonlocal_pattern; }
 
   /**
+   * The total number of nonzeros in the global matrix.
+   */
+  std::size_t n_nonzeros() const;
+
+  /**
    * The number of on-processor nonzeros in my portion of the
    * global matrix.
    */
