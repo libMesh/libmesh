@@ -438,7 +438,7 @@ public:
                                       const RBParameters & mu_max_in,
                                       const std::map<std::string, std::vector<Real>> & discrete_parameter_values_in,
                                       const std::map<std::string,bool> & log_scaling,
-                                      std::map<std::string, std::vector<Number>> * training_sample_list=nullptr);
+                                      std::map<std::string, std::vector<Real>> * training_sample_list=nullptr);
 
   /**
    * Print out info that describes the current setup of this RBConstruction.

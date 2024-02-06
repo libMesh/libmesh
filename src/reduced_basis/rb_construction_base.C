@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // C++ includes
+#include <algorithm>
 #include <cstddef>
 #include <ctime>
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
@@ -239,10 +240,7 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
 
       const numeric_index_type local_index = global_index - get_first_local_training_index();
       for (const auto & [param_name, sample_vector] : _training_parameters)
-        {
-          Real param_value = libmesh_real(sample_vector[local_index]);
-          params.set_value(param_name, param_value);
-        }
+        params.set_value(param_name, sample_vector[local_index]);
 
       // Copy all extra values into the new RBParameters.
       const auto & mine = get_parameters();
@@ -343,7 +341,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
                 get_discrete_parameter_values().find(param_name)->second;
               for(const auto sample_idx : index_range(sample_vector))
                 {
-                  const Real value = libmesh_real(sample_vector[sample_idx]);
+                  const auto &value = sample_vector[sample_idx];
                   const Real nearest_discrete_value = get_closest_value(value, discrete_values);
                   sample_vector[sample_idx] = nearest_discrete_value;
                 }
@@ -355,7 +353,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
 }
 
 template <class Base>
-void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vector<Number>> & new_training_set)
+void RBConstructionBase<Base>::load_training_set(const std::map<std::string, std::vector<Real>> & new_training_set)
 {
   // Make sure we're running this on all processors at the same time
   libmesh_parallel_only(this->comm());
@@ -432,10 +430,9 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
     }
 }
 
-
 template <class Base>
 void RBConstructionBase<Base>::set_training_parameter_values(
-  const std::string & param_name, const std::vector<Number> & values)
+  const std::string & param_name, const std::vector<Real> & values)
 {
   libmesh_error_msg_if(!_training_parameters_initialized,
     "Training parameters must be initialized before calling set_training_parameter_values");
@@ -452,7 +449,7 @@ template <class Base>
 std::pair<std::size_t, std::size_t>
 RBConstructionBase<Base>::generate_training_parameters_random(const Parallel::Communicator & communicator,
                                                               const std::map<std::string, bool> & log_param_scale,
-                                                              std::map<std::string, std::vector<Number>> & local_training_parameters_in,
+                                                              std::map<std::string, std::vector<Real>> & local_training_parameters_in,
                                                               const unsigned int n_global_training_samples_in,
                                                               const RBParameters & min_parameters,
                                                               const RBParameters & max_parameters,
@@ -512,7 +509,7 @@ RBConstructionBase<Base>::generate_training_parameters_random(const Parallel::Co
       calculate_n_local_samples_and_index(communicator, n_global_training_samples_in,
                                           serial_training_set);
   for (const auto &[param_name, _] : min_parameters)
-    local_training_parameters_in[param_name] = std::vector<Number>(n_local_training_samples);
+    local_training_parameters_in[param_name] = std::vector<Real>(n_local_training_samples);
 
   // finally, set the values
   for (auto & [param_name, sample_vector]: local_training_parameters_in)
@@ -546,7 +543,7 @@ template <class Base>
 std::pair<std::size_t, std::size_t>
 RBConstructionBase<Base>::generate_training_parameters_deterministic(const Parallel::Communicator & communicator,
                                                                      const std::map<std::string, bool> & log_param_scale,
-                                                                     std::map<std::string, std::vector<Number>> & local_training_parameters_in,
+                                                                     std::map<std::string, std::vector<Real>> & local_training_parameters_in,
                                                                      const unsigned int n_global_training_samples_in,
                                                                      const RBParameters & min_parameters,
                                                                      const RBParameters & max_parameters,
@@ -568,7 +565,7 @@ RBConstructionBase<Base>::generate_training_parameters_deterministic(const Paral
                                          serial_training_set);
   const auto last_local_index = first_local_index + n_local_training_samples;
   for (const auto & [param_name, _] : min_parameters)
-    local_training_parameters_in[param_name] = std::vector<Number>(n_local_training_samples);
+    local_training_parameters_in[param_name] = std::vector<Real>(n_local_training_samples);
 
   // n_training_samples_per_param has 3 entries, but entries after "num_params"
   // are unused so we just set their value to 1. We need to set it to 1 (rather

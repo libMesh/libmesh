@@ -296,7 +296,7 @@ void RBConstruction::set_rb_construction_parameters(
                                                     const RBParameters & mu_max_in,
                                                     const std::map<std::string, std::vector<Real>> & discrete_parameter_values_in,
                                                     const std::map<std::string,bool> & log_scaling_in,
-                                                    std::map<std::string, std::vector<Number>> * training_sample_list)
+                                                    std::map<std::string, std::vector<Real>> * training_sample_list)
 {
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the

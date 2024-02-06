@@ -333,7 +333,7 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
                                                        const RBParameters & mu_max_in,
                                                        const std::map<std::string, std::vector<Real>> & discrete_parameter_values_in,
                                                        const std::map<std::string,bool> & log_scaling_in,
-                                                       std::map<std::string, std::vector<Number>> * training_sample_list)
+                                                       std::map<std::string, std::vector<Real>> * training_sample_list)
 {
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
@@ -404,7 +404,7 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
       const std::string & lookup_table_param_name =
         get_rb_eim_evaluation().get_parametrized_function().lookup_table_param_name;
 
-      std::vector<Number> lookup_table_training_samples(n_training_samples_in);
+      std::vector<Real> lookup_table_training_samples(n_training_samples_in);
       std::iota(lookup_table_training_samples.begin(), lookup_table_training_samples.end(), 0);
 
       set_training_parameter_values(lookup_table_param_name, lookup_table_training_samples);
