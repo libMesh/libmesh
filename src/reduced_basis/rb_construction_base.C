@@ -180,20 +180,26 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
   libmesh_error_msg_if(!_training_parameters_initialized,
                        "Error: training parameters must first be initialized.");
 
-  libmesh_assert( (this->get_first_local_training_index() <= index) &&
-                  (index < this->get_last_local_training_index()) );
-
+  // If the _training_parameters are empty, return an empty RBParameters.
   RBParameters params;
-  for (const auto & [param_name, vec_ptr] : _training_parameters)
+  if(!_training_parameters.empty())
     {
-      Real param_value = libmesh_real((*vec_ptr)(index));
-      params.set_value(param_name, param_value);
-    }
+      libmesh_error_msg_if((index<this->get_first_local_training_index()) ||
+                           (index>=this->get_last_local_training_index()),
+                           "Error: index " << index << " must be within range: "
+                           << this->get_first_local_training_index() << " - "
+                           << this->get_last_local_training_index());
+      for (const auto & [param_name, vec_ptr] : _training_parameters)
+        {
+          Real param_value = libmesh_real((*vec_ptr)(index));
+          params.set_value(param_name, param_value);
+        }
 
-  // Add potential extra values
-  const auto & mine = get_parameters();
-  for (const auto & [key, val] : as_range(mine.extra_begin(), mine.extra_end()))
-    params.set_extra_value(key, val);
+      // Add potential extra values
+      const auto & mine = get_parameters();
+      for (const auto & [key, val] : as_range(mine.extra_begin(), mine.extra_end()))
+        params.set_extra_value(key, val);
+    }
 
   return params;
 }
