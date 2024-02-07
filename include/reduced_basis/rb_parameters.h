@@ -33,6 +33,11 @@ namespace libMesh
 {
 
 /**
+ * Typedef for an individual RB parameter.
+ */
+using RBParameter = Real;
+
+/**
  * This class is part of the rbOOmit framework.
  *
  * This class defines a set of parameters index by strings.
@@ -64,9 +69,8 @@ public:
   /**
    * Constructor. Set parameters based on the std::map \p parameter_map.
    *
-   * This constructor will still be supported once we switch over to
-   * the vector-based storage for RBParameters objects. It will just set
-   * the 0th entry of the vector corresponding to each parameter name.
+   * It sets the values as the 0th entry of the sample-vector
+   * corresponding to each parameter name.
    */
   RBParameters(const std::map<std::string, Real> & parameter_map);
 
@@ -85,7 +89,7 @@ public:
     typedef value_type& reference;
 
     // Underlying iterator type, must match the container type of _parameters.
-    typedef std::map<std::string, std::vector<Real>>::const_iterator MapIter;
+    typedef std::map<std::string, std::vector<RBParameter>>::const_iterator MapIter;
 
     // Constructor
     const_iterator(const MapIter & it,
@@ -377,10 +381,10 @@ private:
    * Helper function for the 3-parameter versions of set_value() and
    * set_extra_value().
    */
-  void set_value_helper(std::map<std::string, std::vector<Real>> & map,
+  void set_value_helper(std::map<std::string, std::vector<RBParameter>> & map,
                         const std::string & param_name,
-                        std::size_t index,
-                        Real value);
+                        const std::size_t index,
+                        const RBParameter &value);
 
   /**
    * The number of samples represented by this RBParameters object, in
@@ -391,16 +395,16 @@ private:
   unsigned int _n_samples;
 
   /**
-   * The map that stores the actual parameter vectors. Each vector is
-   * indexed by a name.
+   * Actual parameter values (in std::vector<RBParameter> form) across a vector of samples.
+   * Each vector is indexed by a name.
    */
-  std::map<std::string, std::vector<Real>> _parameters;
+  std::map<std::string, std::vector<RBParameter>> _parameters;
 
   /**
    * Extra parameter vectors not used for RB training.
    * Each vector is indexed by a name.
    */
-  std::map<std::string, std::vector<Real>> _extra_parameters;
+  std::map<std::string, std::vector<RBParameter>> _extra_parameters;
 };
 
 } // namespace libMesh
