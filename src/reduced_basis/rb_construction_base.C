@@ -398,9 +398,9 @@ void RBConstructionBase<Base>::load_training_set(const std::map<std::string, std
         }
 
       // Ensure that the parameters are the same.
-      for (auto & [param_name, _] : _training_parameters)
+      for (auto & it : _training_parameters)
         {
-          libmesh_error_msg_if(new_training_set.find(param_name)==new_training_set.end(),
+          libmesh_error_msg_if(new_training_set.find(it.first)==new_training_set.end(),
             "Parameters must be identical in order to overwrite dataset.");
         }
 
@@ -508,8 +508,8 @@ RBConstructionBase<Base>::generate_training_parameters_random(const Parallel::Co
   const auto &[n_local_training_samples, first_local_index] =
       calculate_n_local_samples_and_index(communicator, n_global_training_samples_in,
                                           serial_training_set);
-  for (const auto &[param_name, _] : min_parameters)
-    local_training_parameters_in[param_name] = std::vector<Real>(n_local_training_samples);
+  for (const auto & it : min_parameters)
+    local_training_parameters_in[it.first] = std::vector<Real>(n_local_training_samples);
 
   // finally, set the values
   for (auto & [param_name, sample_vector]: local_training_parameters_in)
@@ -564,8 +564,8 @@ RBConstructionBase<Base>::generate_training_parameters_deterministic(const Paral
       calculate_n_local_samples_and_index(communicator, n_global_training_samples_in,
                                          serial_training_set);
   const auto last_local_index = first_local_index + n_local_training_samples;
-  for (const auto & [param_name, _] : min_parameters)
-    local_training_parameters_in[param_name] = std::vector<Real>(n_local_training_samples);
+  for (const auto & it : min_parameters)
+    local_training_parameters_in[it.first] = std::vector<Real>(n_local_training_samples);
 
   // n_training_samples_per_param has 3 entries, but entries after "num_params"
   // are unused so we just set their value to 1. We need to set it to 1 (rather
@@ -608,8 +608,9 @@ RBConstructionBase<Base>::generate_training_parameters_deterministic(const Paral
   std::vector<std::vector<Real>> training_samples_per_param(num_params);
   {
     unsigned int i = 0;
-    for (const auto & [param_name, _] : min_parameters)
+    for (const auto & it : min_parameters)
       {
+        const std::string &param_name = it.first;
         const bool use_log_scaling = log_param_scale.at(param_name);
         Real min_param = min_parameters.get_value(param_name);
         Real max_param = max_parameters.get_value(param_name);
@@ -664,6 +665,7 @@ RBConstructionBase<Base>::generate_training_parameters_deterministic(const Paral
                 unsigned int param_count = 0;
                 for (const auto & [param_name, _] : min_parameters)
                   {
+                    libmesh_ignore(_);
                     const auto & it = local_training_parameters_in.find(param_name);
                     libmesh_error_msg_if(it == local_training_parameters_in.end(),
                                          "Invalid parameter name: " + param_name);
@@ -707,9 +709,9 @@ void RBConstructionBase<Base>::broadcast_parameters(const unsigned int proc_id)
   // update the copy of the RBParameters object.
   // TODO - this only works with single-sample parameter objects.
   unsigned int count = 0;
-  for (const auto & [param_name, _]: current_parameters)
+  for (const auto & it : current_parameters)
     {
-      current_parameters.set_value(param_name, current_parameters_vector[count]);
+      current_parameters.set_value(it.first, current_parameters_vector[count]);
       count++;
     }
 
