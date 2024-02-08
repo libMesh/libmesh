@@ -1955,8 +1955,9 @@ MeshBase::copy_constraint_rows(const MeshBase & other_mesh)
 }
 
 
+template <typename T>
 void
-MeshBase::copy_constraint_rows(const SparseMatrix<Real> & constraint_operator)
+MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
 {
   this->_constraint_rows.clear();
 
@@ -1992,13 +1993,13 @@ MeshBase::copy_constraint_rows(const SparseMatrix<Real> & constraint_operator)
                            constraint_operator.row_stop()))
     {
       std::vector<numeric_index_type> indices;
-      std::vector<Real> values;
+      std::vector<T> values;
 
       constraint_operator.get_row(i, indices, values);
       libmesh_assert_equal_to(indices.size(), values.size());
 
       if (indices.size() == 1 &&
-          values[0] == 1)
+          values[0] == T(1))
         {
           existing_unconstrained_nodes.insert(i);
           existing_unconstrained_columns.emplace(indices[0],i);
@@ -2007,7 +2008,9 @@ MeshBase::copy_constraint_rows(const SparseMatrix<Real> & constraint_operator)
         for (auto jj : index_range(indices))
           {
             const auto j = indices[jj];
-            columns[j].emplace_back(i, values[jj]);
+            const Real coef = libmesh_real(values[jj]);
+            libmesh_assert_equal_to(coef, values[jj]);
+            columns[j].emplace_back(i, coef);
           }
     }
 
@@ -2100,7 +2103,7 @@ MeshBase::copy_constraint_rows(const SparseMatrix<Real> & constraint_operator)
         continue;
 
       std::vector<numeric_index_type> indices;
-      std::vector<Real> values;
+      std::vector<T> values;
 
       constraint_operator.get_row(i, indices, values);
 
@@ -2117,7 +2120,9 @@ MeshBase::copy_constraint_rows(const SparseMatrix<Real> & constraint_operator)
 
           auto p = node_to_elem_ptrs[&constraining_node];
 
-          constraint_row.emplace_back(std::make_pair(p, values[jj]));
+          const Real coef = libmesh_real(values[jj]);
+          libmesh_assert_equal_to(coef, values[jj]);
+          constraint_row.emplace_back(std::make_pair(p, coef));
         }
 
       indexed_constraint_rows.emplace(i, std::move(constraint_row));
@@ -2144,6 +2149,15 @@ MeshBase::copy_constraint_rows(const SparseMatrix<Real> & constraint_operator)
     }
 }
 
+
+// Explicit instantiations for our template function
+template LIBMESH_EXPORT void
+MeshBase::copy_constraint_rows(const SparseMatrix<Real> & constraint_operator);
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+template LIBMESH_EXPORT void
+MeshBase::copy_constraint_rows(const SparseMatrix<Complex> & constraint_operator);
+#endif
 
 
 } // namespace libMesh

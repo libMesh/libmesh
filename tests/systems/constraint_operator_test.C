@@ -150,7 +150,7 @@ public:
                                        0., 1.,
                                        EDGE2);
 
-    auto matrix = SparseMatrix<Real>::build (mesh.comm());
+    auto matrix = SparseMatrix<Number>::build (mesh.comm());
 
     // Create a projection matrix from 10 elements to 5.  We might as
     // well just make it on processor 0.

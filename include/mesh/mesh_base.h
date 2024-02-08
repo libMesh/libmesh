@@ -1702,8 +1702,14 @@ public:
    * For each matrix column index which does not correspond to an
    * existing node, a new NodeElem will be added to the mesh on which
    * to store the new unconstrained degree(s) of freedom.
+   *
+   * \p T for the constraint_operator in this function should be \p
+   * Real or \p Number ... and the data should be \p Real - we just
+   * allow complex \p T for the sake of subclasses which have to be
+   * configured and compiled with only one runtime option.
    */
-  void copy_constraint_rows(const SparseMatrix<Real> & constraint_operator);
+  template <typename T>
+  void copy_constraint_rows(const SparseMatrix<T> & constraint_operator);
 
   /**
    * \deprecated This method has ben replaced by \p cache_elem_data which
