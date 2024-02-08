@@ -1,8 +1,10 @@
 // libMesh includes
+#include "libmesh/libmesh_exceptions.h"
 #include "libmesh/rb_parameters.h"
 
 // CPPUnit includes
 #include "libmesh_cppunit.h"
+#include <cppunit/TestAssert.h>
 
 using namespace libMesh;
 
@@ -13,8 +15,9 @@ public:
   CPPUNIT_TEST( testScalar );
   CPPUNIT_TEST( testOldConstructor );
   CPPUNIT_TEST( testIterators );
+  CPPUNIT_TEST( testIteratorsWithSamples );
   CPPUNIT_TEST( testAppend );
-  CPPUNIT_TEST( testNSteps );
+  CPPUNIT_TEST( testNSamples );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -96,6 +99,36 @@ public:
     CPPUNIT_ASSERT_EQUAL(m["c"], 3.);
   }
 
+  void testIteratorsWithSamples()
+  {
+    LOG_UNIT_TEST;
+
+    RBParameters params;
+    params.set_value("a", 2, 1.);   // "a" : [0,0,1]
+    params.set_value("b", 2, 2.);   // "b" : [0,0,2]
+    params.set_value("c", 2, 3.);   // "c" : [0,0,3]
+
+    // The iterators work on a serialized version of the map, meaning we see an
+    // iterator for each sample of each parameter, e.g. {a,0}, {a,0}, {a,1}.
+    // map.insert(begin(),end()) says "it is unspecified which element is inserted" in this case,
+    // so instead we manually iterate and overwrite with the value from the latest sample.
+    std::map<std::string, Real> m;
+    // m.insert(params.begin(), params.end());  // unspecified behavior
+    for(const auto &it : params)
+      m[it.first] = it.second;
+
+    // Expected result
+    // a: 1.000000e+00
+    // b: 2.000000e+00
+    // c: 3.000000e+00
+    CPPUNIT_ASSERT(m.count("a"));
+    CPPUNIT_ASSERT(m.count("b"));
+    CPPUNIT_ASSERT(m.count("c"));
+    CPPUNIT_ASSERT_EQUAL(m["a"], 1.);
+    CPPUNIT_ASSERT_EQUAL(m["b"], 2.);
+    CPPUNIT_ASSERT_EQUAL(m["c"], 3.);
+  }
+
   void testAppend()
   {
     LOG_UNIT_TEST;
@@ -130,7 +163,7 @@ public:
       }
   }
 
-  void testNSteps()
+  void testNSamples()
   {
     LOG_UNIT_TEST;
 
@@ -144,10 +177,35 @@ public:
 
     // Define multiple samples for a single parameter. Now we no longer
     // use the set_n_samples() value, since we have actual samples.
+    params.push_back_value("a", 0.);
     params.push_back_value("a", 1.);
     params.push_back_value("a", 2.);
-    CPPUNIT_ASSERT_EQUAL(params.n_samples(), static_cast<unsigned int>(2));
+    params.push_back_value("a", 3.);
+    CPPUNIT_ASSERT_EQUAL(params.n_samples(), static_cast<unsigned int>(4));
+    CPPUNIT_ASSERT_EQUAL(params.get_sample_value("a", 2), static_cast<Real>(2.));
+
+    // Test set_value() with an index.
+    params.set_value("b", 3, 0.);
+    params.set_value("b", 2, 1.);
+    params.set_value("b", 1, 2.);
+    params.set_value("b", 0, 3.);
+    CPPUNIT_ASSERT_EQUAL(params.n_samples(), static_cast<unsigned int>(4));
+    CPPUNIT_ASSERT_EQUAL(params.n_parameters(), static_cast<unsigned int>(2));
+    CPPUNIT_ASSERT_EQUAL(params.get_sample_value("a", 2), static_cast<Real>(2.));
+    CPPUNIT_ASSERT_EQUAL(params.get_sample_value("b", 2), static_cast<Real>(1.));
+
+    // Test the default getters.
+    CPPUNIT_ASSERT_EQUAL(params.get_sample_value("a", 5, 100.), static_cast<Real>(100.));
+    CPPUNIT_ASSERT_EQUAL(params.get_sample_value("b", 5, 200.), static_cast<Real>(200.));
+    CPPUNIT_ASSERT_EQUAL(params.get_sample_value("c", 5, 300.), static_cast<Real>(300.));
+
+    // Test some errors.
+    CPPUNIT_ASSERT_THROW(params.get_sample_value("b", 5), libMesh::LogicError); // sample_idx 5 does not exist.
+    CPPUNIT_ASSERT_THROW(params.get_sample_value("c", 0), libMesh::LogicError); // parameter "c" does not exist.
+    CPPUNIT_ASSERT_THROW(params.get_value("a"), libMesh::LogicError);           // a has multiple samples.
+    CPPUNIT_ASSERT_THROW(params.get_value("a", 1.0), libMesh::LogicError);      // a has multiple samples.
   }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION ( RBParametersTest );
