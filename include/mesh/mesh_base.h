@@ -1688,7 +1688,7 @@ public:
 
   /**
    * Copy the constraints from the given matrix to this mesh.  The
-   * \p constraint_operator should be an mxn matrix, where 
+   * \p constraint_operator should be an mxn matrix, where
    * m == this->n_nodes() and the operator indexing matches the
    * current node indexing.  This may require users to disable mesh
    * renumbering in between loading a mesh file and loading a
