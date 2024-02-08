@@ -488,7 +488,8 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
   parallel_object_only();
 
   // The sizes we get from the file
-  std::size_t m, n;
+  std::size_t m = 0,
+              n = 0;
 
   // We'll read through the file three times: once to get a reliable
   // value for the matrix size (so we can divvy it up among
