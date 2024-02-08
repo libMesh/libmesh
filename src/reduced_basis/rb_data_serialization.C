@@ -263,7 +263,7 @@ void add_parameter_ranges_to_builder(const RBParametrized & rb_evaluation,
       if (!rb_evaluation.is_discrete_parameter(key))
         {
           names.set(count, key);
-          mins.set(count, val);
+          mins.set(count, parameters_min.get_value(key));
           maxs.set(count, parameters_max.get_value(key));
           ++count;
         }

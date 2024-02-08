@@ -220,7 +220,7 @@ void RBParametrized::write_parameter_ranges_to_file(const std::string & file_nam
       std::string param_name = pr.first;
       if (!is_discrete_parameter(param_name))
         {
-          Real param_value = pr.second;
+          Real param_value = get_parameters_min().get_value(param_name);
           parameter_ranges_out << param_name << param_value;
         }
     }
@@ -229,7 +229,7 @@ void RBParametrized::write_parameter_ranges_to_file(const std::string & file_nam
       std::string param_name = pr.first;
       if (!is_discrete_parameter(param_name))
         {
-          Real param_value = pr.second;
+          Real param_value = get_parameters_max().get_value(param_name);
           parameter_ranges_out << param_name << param_value;
         }
     }
